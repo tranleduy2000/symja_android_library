@@ -20,6 +20,16 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
 		return size() - 1;
 	}
 	
+	@Override
+	public IExpr first() {
+		return arg1();
+	}
+	
+	@Override
+	public IExpr last() {
+		return get(argSize());
+	}
+	
     @Override
     public abstract IAST clone() throws CloneNotSupportedException;
 
@@ -212,6 +222,10 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         return mapThread(replacement, position);
     }
 
+    public IASTAppendable rest() {
+		return removeAtClone(1);
+	}
+    
     /**
      * Create a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied) and set the
      * <code>expr</code> at the given <code>position</code>. In contrast to the <code>setAtClone()</code> method, this

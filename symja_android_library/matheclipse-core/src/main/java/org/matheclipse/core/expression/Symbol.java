@@ -179,6 +179,10 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 			// sort lexicographically
 			return US_COLLATOR.compare(fSymbolName, ((Symbol) expr).fSymbolName);
 		}
+		if (expr.isNot() && expr.first().isSymbol()) {
+			int cp = compareTo(expr.first());
+			return cp != 0 ? cp : -1;
+		}
 		return super.compareTo(expr);
 	}
 
@@ -727,6 +731,26 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 		return (fAttributes & CONSTANT) != CONSTANT;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public IExpr of(EvalEngine engine, IExpr... args) {
+		IAST ast = F.ast(args, this);
+		return engine.evaluate(ast);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public IExpr of(IExpr... args) {
+		return of(EvalEngine.get(), args);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean ofQ(EvalEngine engine, IExpr... args) {
+		IAST ast = F.ast(args, this);
+		return engine.evalTrue(ast);
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public final void popLocalVariable() {

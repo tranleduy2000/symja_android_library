@@ -470,6 +470,8 @@ public class F {
 	public final static IBuiltInSymbol If = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "if" : "If");
 	public final static IBuiltInSymbol Implies = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "implies" : "Implies");
+	public final static IBuiltInSymbol Inequality = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "inequality" : "Inequality");
 	public final static IBuiltInSymbol InexactNumberQ = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "inexactnumberq" : "InexactNumberQ");
 	public final static IBuiltInSymbol Insert = initFinalSymbol(
@@ -1210,6 +1212,10 @@ public class F {
 	public final static IBuiltInSymbol RussellRaoDissimilarity = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "russellraodissimilarity" : "RussellRaoDissimilarity");
 	public final static IBuiltInSymbol SameQ = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "sameq" : "SameQ");
+	public final static IBuiltInSymbol SatisfiabilityCount = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "satisfiabilitycount" : "SatisfiabilityCount");
+	public final static IBuiltInSymbol SatisfiabilityInstances = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "satisfiabilityinstances" : "SatisfiabilityInstances");
 	public final static IBuiltInSymbol SatisfiableQ = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "satisfiableq" : "SatisfiableQ");
 	public final static IBuiltInSymbol Scan = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "scan" : "Scan");

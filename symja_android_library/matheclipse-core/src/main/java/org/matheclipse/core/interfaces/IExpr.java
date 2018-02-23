@@ -300,6 +300,24 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     ElemFactory<IExpr> factory();
 
     /**
+	 * Get the first element of this <code>AST</code> list (i.e. get(1)). Return <code>F.NIL</code> if this object isn't
+	 * an <code>AST</code>.
+	 * 
+	 * @return the second argument of the function represented by this <code>AST</code> or <code>F.NIL</code> if this
+	 *         object isn't an AST.
+	 */
+    public IExpr first();
+    
+    /**
+	 * Get the last element of the <code>AST</code> list (i.e. get(size()-1). Return <code>F.NIL</code> if this object
+	 * isn't an <code>AST</code>.
+	 * 
+	 * @return the last argument of the function represented by this <code>AST</code>.
+	 * @see IExpr#head()
+	 */
+    public IExpr last();
+	
+    /**
      * Return the <code>FullForm()</code> of this expression
      *
      * @return
@@ -2077,6 +2095,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     @Deprecated
     IExpr replaceSlots(final IAST slotsList);
 
+    /**
+	 * Get the rest of the elements of this <code>AST</code> list. Return <code>F.NIL</code> if this object isn't an
+	 * <code>AST</code>.
+	 * 
+	 * @return the rest arguments of the function represented by this <code>AST</code> with the first argument removed.
+	 * @see IExpr#head()
+	 */
+	public IASTAppendable rest();
+	
     /**
      * Signum functionality is used in JAS toString() method, don't use it as math signum function.
      *

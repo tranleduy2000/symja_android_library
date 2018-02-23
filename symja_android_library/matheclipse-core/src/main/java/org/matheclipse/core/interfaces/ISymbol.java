@@ -336,6 +336,39 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     IExpr mapConstantDouble(DoubleFunction<IExpr> function);
 
     /**
+	 * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
+	 * 
+	 * @param engine
+	 *            the current evaluation engine
+	 * @param args
+	 *            the arguments for which this function symbol should be evaluated
+	 * @return
+	 */
+	public IExpr of(EvalEngine engine, IExpr... args);
+
+	/**
+	 * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code> to a boolean value.
+	 * If the result isn't a boolean value return <code>false</code>.
+	 * 
+	 * @param engine
+	 *            the current evaluation engine
+	 * @param args
+	 *            the arguments for which this function symbol should be evaluated
+	 * @return if the result isn't a boolean value return <code>false</code>.
+	 */
+	public boolean ofQ(EvalEngine engine, IExpr... args);
+	
+	
+	/**
+	 * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
+	 * 
+	 * @param args
+	 *            the arguments for which this function symbol should be evaluated
+	 * @return
+	 */
+	public IExpr of(IExpr... args);
+	
+    /**
      * Delete the topmost placeholder from the local variable stack
      */
     void popLocalVariable();

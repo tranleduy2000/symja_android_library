@@ -1,42 +1,50 @@
 package org.matheclipse.core.builtin;
 
+import static org.matheclipse.core.expression.F.List;
+
+import java.util.List;
+import java.util.Map;
+
+import org.logicng.datastructures.Assignment;
+import org.logicng.datastructures.Tristate;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.formulas.FormulaTransformation;
+import org.logicng.formulas.Variable;
+import org.logicng.solvers.MiniSat;
+import org.logicng.solvers.SATSolver;
+import org.logicng.transformations.cnf.CNFFactorization;
+import org.logicng.transformations.dnf.DNFFactorization;
 import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.boole.QuineMcCluskyFormula;
+import org.matheclipse.core.convert.LogicFormula;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.BooleanFunctionConversionException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.Lambda;
+import org.matheclipse.core.eval.util.Options;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.StringX;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
+import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ITernaryComparator;
-import org.matheclipse.core.visit.VisitorExpr;
 
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
-import com.duy.lambda.Predicate;
-
-import static org.matheclipse.core.expression.F.And;
-import static org.matheclipse.core.expression.F.Equivalent;
-import static org.matheclipse.core.expression.F.Implies;
-import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Nand;
-import static org.matheclipse.core.expression.F.Nor;
-import static org.matheclipse.core.expression.F.Or;
-import static org.matheclipse.core.expression.F.Xor;
+import com.duy.lambda.Predicate; 
 
 public final class BooleanFunctions {
 	public final static Equal CONST_EQUAL = new Equal();
@@ -59,6 +67,7 @@ public final class BooleanFunctions {
 		F.Greater.setEvaluator(CONST_GREATER);
 		F.GreaterEqual.setEvaluator(new GreaterEqual());
 		F.Implies.setEvaluator(new Implies());
+		F.Inequality.setEvaluator(new Inequality());
 		F.Less.setEvaluator(CONST_LESS);
 		F.LessEqual.setEvaluator(new LessEqual());
 		F.Max.setEvaluator(new Max());
@@ -73,6 +82,8 @@ public final class BooleanFunctions {
 		F.Or.setEvaluator(new Or());
 		F.Positive.setEvaluator(new Positive());
 		F.SameQ.setEvaluator(new SameQ());
+		F.SatisfiabilityCount.setEvaluator(new SatisfiabilityCount());
+		F.SatisfiabilityInstances.setEvaluator(new SatisfiabilityInstances());
 		F.SatisfiableQ.setEvaluator(new SatisfiableQ());
 		F.TautologyQ.setEvaluator(new TautologyQ());
 		F.TrueQ.setEvaluator(new TrueQ());
@@ -139,14 +150,32 @@ public final class BooleanFunctions {
 	}
 
 	/**
+	 * <pre>
+	 * And(expr1, expr2, ...)
+	 * </pre>
 	 * 
-	 * 
-	 * See <a href="http://en.wikipedia.org/wiki/Logical_conjunction">Logical conjunction</a>
-	 * 
+	 * <blockquote>
 	 * <p>
-	 * See the online Symja function reference:
-	 * <a href= "https://bitbucket.org/axelclk/symja_android_library/wiki/Symbols/And">And </a>
+	 * <code>expr1 &amp;&amp; expr2 &amp;&amp; ...</code> evaluates each expression in turn, returning
+	 * <code>False</code> as soon as an expression evaluates to <code>False</code>. If all expressions evaluate to
+	 * <code>True</code>, <code>And</code> returns <code>True</code>.
 	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; True &amp;&amp; True &amp;&amp; False
+	 * False
+	 * </pre>
+	 * <p>
+	 * If an expression does not evaluate to <code>True</code> or <code>False</code>, <code>And</code> returns a result
+	 * in symbolic form:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a &amp;&amp; b &amp;&amp; True &amp;&amp; c
+	 * a &amp;&amp; b &amp;&amp; c
+	 * </pre>
 	 */
 	private static class And extends AbstractCoreFunctionEvaluator {
 
@@ -202,7 +231,7 @@ public final class BooleanFunctions {
 				if (temp.isSymbol()) {
 					symbols[i] = flattenedAST.get(i).hashCode();
 				} else if (temp.isNot()) {
-					sym = ((IAST) temp).getAt(1);
+					sym = temp.first();
 					if (sym.isSymbol()) {
 						notSymbols[i] = sym.hashCode();
 					}
@@ -212,7 +241,7 @@ public final class BooleanFunctions {
 			for (int i = 1; i < symbols.length; i++) {
 				if (symbols[i] != 0) {
 					for (int j = 1; j < notSymbols.length; j++) {
-						if (i != j && symbols[i] == notSymbols[j] && (result.equalsAt(i, result.get(j).getAt(1)))) {
+						if (i != j && symbols[i] == notSymbols[j] && (result.equalsAt(i, result.get(j).first()))) {
 							// And[a, Not[a]] => True
 							return F.False;
 						}
@@ -325,87 +354,116 @@ public final class BooleanFunctions {
 
 	private static class BooleanConvert extends AbstractFunctionEvaluator {
 
-		static class BooleanConvertVisitor extends VisitorExpr {
-			public BooleanConvertVisitor() {
-				super();
-			}
-
-			@Override
-			protected IExpr visitAST(IAST ast) {
-				if (ast.isNot()) {
-					if (ast.arg1().isAST()) {
-						IAST notArg1 = (IAST) ast.arg1();
-						if (notArg1.isASTSizeGE(Nand, 1)) {
-							return notArg1.apply(And);
-						} else if (notArg1.isASTSizeGE(Nor, 1)) {
-							return notArg1.apply(Or);
-						} else if (notArg1.isASTSizeGE(And, 1)) {
-							return convertNand(notArg1);
-						} else if (notArg1.isASTSizeGE(Or, 1)) {
-							return convertNor(notArg1);
-						}
-
-					}
-				} else if (ast.isASTSizeGE(Equivalent, 1)) {
-					return convertEquivalent(ast);
-				} else if (ast.isAST(Implies, 3)) {
-					return convertImplies(ast);
-				} else if (ast.isASTSizeGE(Nand, 1)) {
-					return convertNand(ast);
-				} else if (ast.isASTSizeGE(Nor, 1)) {
-					return convertNor(ast);
-				} else if (ast.isASTSizeGE(Xor, 3)) {
-					return convertXor(ast);
-				}
-				return super.visitAST(ast);
-			}
-
-			public IAST convertEquivalent(IAST ast) {
-				IAST term1 = ast.apply(F.And);
-				IAST term2 = term1.mapThread(F.Not(null), 1);
-				return F.Or(term1, term2);
-			}
-
-			public IAST convertImplies(IAST ast) {
-				return F.Or(F.Not(ast.arg1()), ast.arg2());
-			}
-
-			public IAST convertNand(IAST ast) {
-				return Lambda.forEachAppend(ast, F.Or(), new Function<IExpr, IExpr>() {
-					@Override
-					public IExpr apply(IExpr x) {
-						return F.Not(x);
-					}
-				});
-			}
-
-			public IAST convertNor(IAST ast) {
-				return Lambda.forEachAppend(ast, F.And(), new Function<IExpr, IExpr>() {
-					@Override
-					public IExpr apply(IExpr x) {
-						return F.Not(x);
-					}
-				});
-			}
-
-			public IAST convertXor(IAST ast) {
-				IExpr temp = ast.arg2();
-				if (ast.size() > 3) {
-					IASTAppendable clone = ast.copyAppendable();
-					clone.remove(1);
-					temp = convertXor(clone);
-				}
-				return F.Or(F.And(ast.arg1(), F.Not(temp)), F.And(F.Not(ast.arg1()), temp));
-			}
-		}
+		// static class BooleanConvertVisitor extends VisitorExpr {
+		// public BooleanConvertVisitor() {
+		// super();
+		// }
+		//
+		// @Override
+		// protected IExpr visitAST(IAST ast) {
+		// if (ast.isNot()) {
+		// if (ast.arg1().isAST()) {
+		// IAST notArg1 = (IAST) ast.arg1();
+		// if (notArg1.isASTSizeGE(Nand, 1)) {
+		// return notArg1.apply(And);
+		// } else if (notArg1.isASTSizeGE(Nor, 1)) {
+		// return notArg1.apply(Or);
+		// } else if (notArg1.isASTSizeGE(And, 1)) {
+		// return convertNand(notArg1);
+		// } else if (notArg1.isASTSizeGE(Or, 1)) {
+		// return convertNor(notArg1);
+		// }
+		//
+		// }
+		// } else if (ast.isASTSizeGE(Equivalent, 1)) {
+		// return convertEquivalent(ast);
+		// } else if (ast.isAST(Implies, 3)) {
+		// return convertImplies(ast);
+		// } else if (ast.isASTSizeGE(Nand, 1)) {
+		// return convertNand(ast);
+		// } else if (ast.isASTSizeGE(Nor, 1)) {
+		// return convertNor(ast);
+		// } else if (ast.isASTSizeGE(Xor, 3)) {
+		// return convertXor(ast);
+		// }
+		// return super.visitAST(ast);
+		// }
+		//
+		// public IAST convertEquivalent(IAST ast) {
+		// IAST term1 = ast.apply(F.And);
+		// IAST term2 = term1.mapThread(F.Not(null), 1);
+		// return F.Or(term1, term2);
+		// }
+		//
+		// public IAST convertImplies(IAST ast) {
+		// return F.Or(F.Not(ast.arg1()), ast.arg2());
+		// }
+		//
+		// public IAST convertNand(IAST ast) {
+		// return Lambda.forEachAppend(ast, F.Or(), x -> F.Not(x));
+		// }
+		//
+		// public IAST convertNor(IAST ast) {
+		// return Lambda.forEachAppend(ast, F.And(), x -> F.Not(x));
+		// }
+		//
+		// public IAST convertXor(IAST ast) {
+		// IExpr temp = ast.arg2();
+		// if (ast.size() > 3) {
+		// IASTAppendable clone = ast.copyAppendable();
+		// clone.remove(1);
+		// temp = convertXor(clone);
+		// }
+		// return F.Or(F.And(ast.arg1(), F.Not(temp)), F.And(F.Not(ast.arg1()), temp));
+		// }
+		// }
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
+			Validate.checkRange(ast, 2, 3);
 
-			BooleanConvertVisitor bcVisitor = new BooleanConvertVisitor();
-			IExpr result = ast.arg1().accept(bcVisitor);
-			return result.isPresent() ? result : ast.arg1();
+			// BooleanConvertVisitor bcVisitor = new BooleanConvertVisitor();
+			// IExpr result = ast.arg1().accept(bcVisitor);
+			try {
+
+				FormulaTransformation transformation = transformation(ast, engine);
+				if (transformation != null) {
+					LogicFormula lf = new LogicFormula();
+					final Formula formula = lf.expr2BooleanFunction(ast.arg1());
+					return lf.booleanFunction2Expr(formula.transform(transformation));
+				}
+
+			} catch (ClassCastException cce) {
+				if (Config.DEBUG) {
+					cce.printStackTrace();
+				}
+			}
+			return F.NIL;
+		}
+
+		/**
+		 * Get the transformation from the ast options. Default is DNF.
+		 * 
+		 * @param ast
+		 * @param engine
+		 * @return <code>null</code> if no or wrong method is defined as option
+		 */
+		private static FormulaTransformation transformation(final IAST ast, EvalEngine engine) {
+			int size = ast.argSize();
+			FormulaTransformation transformation = new DNFFactorization();
+			if (size > 1 && ast.get(size).isString()) {
+				IStringX arg2 = (IStringX) ast.arg2();
+				String method = arg2.toString();
+				if (method.equals("DNF") || method.equals("SOP")) {
+					return transformation;
+				} else if (method.equals("CNF") || method.equals("POS")) {
+					transformation = new CNFFactorization();
+					return transformation;
+				}
+				engine.printMessage("Unknown method: " + method);
+				return null;
+			}
+			return transformation;
 		}
 	}
 
@@ -417,21 +475,35 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
+			Validate.checkRange(ast, 2, 3);
 
-			if (ast.arg1().isASTSizeGE(F.Or, 3)) {
-				try {
-					QuineMcCluskyFormula f = QuineMcCluskyFormula.read((IAST) ast.arg1());
-					f.reduceToPrimeImplicants();
-					f.reducePrimeImplicantsToSubset();
-					return f.toExpr();
-				} catch (BooleanFunctionConversionException bfc) {
-					if (Config.DEBUG) {
-						bfc.printStackTrace();
-					}
-					return F.NIL;
-				}
-			}
+			// QuineMcClusky contains bugs
+
+			// if (ast.arg1().isASTSizeGE(F.Or, 3)) {
+			// try {
+			// QuineMcCluskyFormula f = Formula.read((IAST) ast.arg1());
+			// f.reduceToPrimeImplicants();
+			// f.reducePrimeImplicantsToSubset();
+			// IExpr arg1 = f.toExpr();
+			//
+			// FormulaTransformation transformation = BooleanConvert.transformation(ast, engine);
+			// if (transformation != null) {
+			// LogicFormula lf = new LogicFormula();
+			// final Formula formula = lf.expr2BooleanFunction(arg1);
+			// return lf.booleanFunction2Expr(formula.transform(transformation));
+			// }
+			//
+			//
+			// } catch (BooleanFunctionConversionException bfc) {
+			// if (Config.DEBUG) {
+			// bfc.printStackTrace();
+			// }
+			// } catch (ClassCastException cce) {
+			// if (Config.DEBUG) {
+			// cce.printStackTrace();
+			// }
+			// }
+			// }
 
 			return F.NIL;
 		}
@@ -539,8 +611,7 @@ public final class BooleanFunctions {
 		 * @return
 		 */
 		private IExpr createComparatorResult(IAST lhsAST, IExpr rhs, ISymbol originalHead) {
-			IAST lhsClone = lhsAST.removeAtClone(1);
-			return F.binary(originalHead, lhsClone, rhs);
+			return F.binary(originalHead, lhsAST.rest(), rhs);
 		}
 
 		/**
@@ -956,7 +1027,7 @@ public final class BooleanFunctions {
 			IASTAppendable result = ast.copyAppendable();
 			IExpr.COMPARE_TERNARY[] cResult = new IExpr.COMPARE_TERNARY[ast.size()];
 			cResult[0] = IExpr.COMPARE_TERNARY.TRUE;
-			for (int i = 1; i < ast.size() - 1; i++) {
+			for (int i = 1; i < ast.argSize(); i++) {
 				b = prepareCompare(result.get(i), result.get(i + 1), engine);
 				if (b == IExpr.COMPARE_TERNARY.FALSE) {
 					return F.False;
@@ -966,7 +1037,7 @@ public final class BooleanFunctions {
 				}
 				cResult[i] = b;
 			}
-			cResult[ast.size() - 1] = IExpr.COMPARE_TERNARY.TRUE;
+			cResult[ast.argSize()] = IExpr.COMPARE_TERNARY.TRUE;
 			if (!evaled) {
 				// expression doesn't change
 				return F.NIL;
@@ -1214,6 +1285,58 @@ public final class BooleanFunctions {
 		}
 	}
 
+	private final static class Inequality extends AbstractEvaluator {
+		final static IBuiltInSymbol[] COMPARATOR_SYMBOLS = { F.Greater, F.GreaterEqual, F.Less, F.LessEqual };
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 4, Integer.MAX_VALUE);
+
+			if (ast.size() == 4) {
+				for (IBuiltInSymbol sym : COMPARATOR_SYMBOLS) {
+					if (sym.equals(ast.arg2())) {
+						return F.binary(ast.arg2(), ast.arg1(), ast.arg3());
+					}
+				}
+				return F.NIL;
+			}
+			return inequality(ast, engine);
+		}
+
+		/**
+		 * 
+		 * @param ast
+		 *            an Inequality AST with <code>size()>=4</code>.
+		 * @param engine
+		 * @return
+		 */
+		public IExpr inequality(final IAST ast, EvalEngine engine) {
+			for (int i = 3; i < ast.size(); i += 2) {
+				IExpr temp = F.NIL;
+				for (IBuiltInSymbol sym : COMPARATOR_SYMBOLS) {
+					if (sym.equals(ast.get(i - 1))) {
+						temp = engine.evaluate(F.binary(ast.get(i - 1), ast.get(i - 2), ast.get(i)));
+					}
+				}
+
+				if (temp.isFalse()) {
+					return F.False;
+				} else if (temp.isTrue()) {
+					continue;
+				}
+
+				return temp;
+			}
+			return F.True;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE);
+		}
+
+	}
+
 	/**
 	 * <code>&lt;</code> operator implementation.
 	 * 
@@ -1371,7 +1494,7 @@ public final class BooleanFunctions {
 			}
 
 			if (ast.arg1().isInterval1()) {
-				IAST list = (IAST) ast.arg1().getAt(1);
+				IAST list = (IAST) ast.arg1().first();
 				try {
 					return list.arg2();
 				} catch (ClassCastException cca) {
@@ -1513,7 +1636,7 @@ public final class BooleanFunctions {
 			}
 
 			if (ast.arg1().isInterval1()) {
-				IAST list = (IAST) ast.arg1().getAt(1);
+				IAST list = (IAST) ast.arg1().first();
 				try {
 					return list.arg1();
 				} catch (ClassCastException cca) {
@@ -1831,7 +1954,7 @@ public final class BooleanFunctions {
 			if (o.isAST()) {
 				IAST temp = (IAST) o;
 				if (o.isNot()) {
-					return ((IAST) o).arg1();
+					return o.first();
 				}
 				if (temp.isAST2()) {
 					IExpr head = temp.head();
@@ -1913,7 +2036,7 @@ public final class BooleanFunctions {
 				if (temp.isSymbol()) {
 					symbols[i] = flattenedAST.get(i).hashCode();
 				} else if (temp.isNot()) {
-					sym = ((IAST) temp).getAt(1);
+					sym = temp.first();
 					if (sym.isSymbol()) {
 						notSymbols[i] = sym.hashCode();
 					}
@@ -1923,7 +2046,7 @@ public final class BooleanFunctions {
 			for (int i = 1; i < symbols.length; i++) {
 				if (symbols[i] != 0) {
 					for (int j = 1; j < notSymbols.length; j++) {
-						if (i != j && symbols[i] == notSymbols[j] && (result.equalsAt(i, result.get(j).getAt(1)))) {
+						if (i != j && symbols[i] == notSymbols[j] && (result.equalsAt(i, result.get(j).first()))) {
 							// Or[a, Not[a]] => True
 							return F.True;
 						}
@@ -2000,28 +2123,269 @@ public final class BooleanFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * SatisfiabilityCount(boolean-expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * test whether the <code>boolean-expr</code> is satisfiable by a combination of boolean <code>False</code> and
+	 * <code>True</code> values for the variables of the boolean expression and return the number of possible
+	 * combinations.
+	 * </p>
+	 * </blockquote>
+	 * 
+	 * <pre>
+	 * SatisfiabilityCount(boolean-expr, list-of-variables)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * test whether the <code>boolean-expr</code> is satisfiable by a combination of boolean <code>False</code> and
+	 * <code>True</code> values for the <code>list-of-variables</code> and return the number of possible combinations.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; SatisfiabilityCount((a || b) &amp;&amp; (! a || ! b), {a, b})
+	 * 2
+	 * </pre>
+	 */
+	private final static class SatisfiabilityCount extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 2, 4);
+
+			IAST userDefinedVariables;
+			IExpr arg1 = ast.arg1();
+			try {
+				// currently only SAT is available
+				String method = "SAT";
+				if (ast.size() > 2) {
+					if (ast.arg2().isList()) {
+						userDefinedVariables = (IAST) ast.arg2();
+					} else {
+						userDefinedVariables = List(ast.arg2());
+					}
+					if (ast.size() > 3) {
+						final Options options = new Options(ast.topHead(), ast, 3, engine);
+						// "BDD" (binary decision diagram), "SAT", "TREE" ?
+						IExpr optionMethod = options.getOption("Method");
+						if (optionMethod.isString()) {
+							method = optionMethod.toString();
+						}
+					}
+				} else {
+					VariablesSet vSet = new VariablesSet(arg1);
+					userDefinedVariables = vSet.getVarList();
+				}
+				return logicNGSatisfiabilityCount(arg1, userDefinedVariables);
+			} catch (ClassCastException cce) {
+				if (Config.DEBUG) {
+					cce.printStackTrace();
+				}
+			}
+			return F.NIL;
+		}
+
+		/**
+		 * Use LogicNG MiniSAT method.
+		 * 
+		 * @param booleanExpression
+		 * @param variables
+		 *            a list of variables
+		 * @param maxChoices
+		 *            maximum number of choices, which satisfy the given boolean expression
+		 * @return
+		 */
+		private static IInteger logicNGSatisfiabilityCount(IExpr booleanExpression, IAST variables) {
+			FormulaFactory factory = new FormulaFactory();
+			LogicFormula lf = new LogicFormula(factory);
+			final Formula formula = lf.expr2BooleanFunction(booleanExpression);
+			final SATSolver miniSat = MiniSat.miniSat(factory);
+			miniSat.add(formula);
+			Variable[] vars = lf.ast2Variable(variables);
+			List<Assignment> assignments = miniSat.enumerateAllModels(vars);
+			return F.integer(assignments.size());
+		}
+	}
+
+	/**
+	 * <pre>
+	 * SatisfiabilityInstances(boolean-expr, list-of-variables)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * test whether the <code>boolean-expr</code> is satisfiable by a combination of boolean <code>False</code> and
+	 * <code>True</code> values for the <code>list-of-variables</code> and return exactly one instance of
+	 * <code>True, False</code> combinations if possible.
+	 * </p>
+	 * </blockquote>
+	 * 
+	 * <pre>
+	 * SatisfiabilityInstances(boolean-expr, list-of-variables, combinations)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * test whether the <code>boolean-expr</code> is satisfiable by a combination of boolean <code>False</code> and
+	 * <code>True</code> values for the <code>list-of-variables</code> and return up to <code>combinations</code>
+	 * instances of <code>True, False</code> combinations if possible.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; SatisfiabilityInstances((a || b) &amp;&amp; (! a || ! b), {a, b}, All)
+	 * {{False,True},{True,False}}
+	 * </pre>
+	 */
+	private final static class SatisfiabilityInstances extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 2, 4);
+
+			IAST userDefinedVariables;
+			IExpr arg1 = ast.arg1();
+			try {
+				// currently only SAT is available
+				String method = "SAT";
+				int maxChoices = 1;
+				if (ast.size() > 2) {
+					if (ast.arg2().isList()) {
+						userDefinedVariables = (IAST) ast.arg2();
+					} else {
+						userDefinedVariables = List(ast.arg2());
+					}
+					if (ast.size() > 3) {
+						final Options options = new Options(ast.topHead(), ast, 3, engine);
+						// "BDD" (binary decision diagram), "SAT", "TREE" ?
+						IExpr optionMethod = options.getOption("Method");
+						if (optionMethod.isString()) {
+							method = optionMethod.toString();
+						}
+					}
+
+					IExpr argN = ast.last();
+					if (argN.equals(F.All)) {
+						maxChoices = Integer.MAX_VALUE;
+					} else if (argN.isSignedNumber()) {
+						ISignedNumber sn = (ISignedNumber) argN;
+						maxChoices = sn.toIntDefault(0);
+					}
+				} else {
+					VariablesSet vSet = new VariablesSet(arg1);
+					userDefinedVariables = vSet.getVarList();
+				}
+				return satisfiabilityInstances(arg1, userDefinedVariables, maxChoices);
+			} catch (ClassCastException cce) {
+				if (Config.DEBUG) {
+					cce.printStackTrace();
+				}
+			}
+			return F.NIL;
+		}
+
+	}
+
+	/**
+	 * <pre>
+	 * SatisfiableQ(boolean-expr, list-of-variables)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * test whether the <code>boolean-expr</code> is satisfiable by a combination of boolean <code>False</code> and
+	 * <code>True</code> values for the <code>list-of-variables</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; SatisfiableQ((a || b) &amp;&amp; (! a || ! b), {a, b})
+	 * True
+	 * </pre>
+	 */
 	private final static class SatisfiableQ extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
+			Validate.checkRange(ast, 2, 4);
 
-			IAST variables;
-			if (ast.isAST2()) {
-				if (ast.arg2().isList()) {
-					variables = (IAST) ast.arg2();
+			IASTMutable userDefinedVariables;
+			IExpr arg1 = ast.arg1();
+			try {
+				// currently only SAT is available
+				String method = "SAT";
+				if (ast.size() > 2) {
+					if (ast.arg2().isList()) {
+						userDefinedVariables = ((IAST) ast.arg2()).copy();
+						EvalAttributes.sort(userDefinedVariables);
+					} else {
+						userDefinedVariables = List(ast.arg2());
+					}
+					if (ast.size() > 3) {
+						final Options options = new Options(ast.topHead(), ast, 3, engine);
+						// "BDD" (binary decision diagram), "SAT", "TREE" ?
+						IExpr optionMethod = options.getOption("Method");
+						if (optionMethod.isString()) {
+							method = optionMethod.toString();
+						}
+					}
+					VariablesSet vSet = new VariablesSet(arg1);
+					IAST variables = vSet.getVarList();
+					if (variables.equals(userDefinedVariables)) {
+						return logicNGSatisfiableQ(arg1);
+					}
+
 				} else {
-					variables = List(ast.arg2());
+					return logicNGSatisfiableQ(arg1);
 				}
-			} else {
-				VariablesSet vSet = new VariablesSet(ast.arg1());
-				variables = vSet.getVarList();
+				return bruteForceSatisfiableQ(arg1, userDefinedVariables, 1) ? F.True : F.False;
+			} catch (ClassCastException cce) {
+				if (Config.DEBUG) {
+					cce.printStackTrace();
+				}
 			}
-
-			return satisfiableQ(ast.arg1(), variables, 1) ? F.True : F.False;
+			return F.NIL;
 		}
 
-		private static boolean satisfiableQ(IExpr expr, IAST variables, int position) {
+		/**
+		 * Use LogicNG MiniSAT method.
+		 * 
+		 * @param arg1
+		 * @return
+		 */
+		private static IExpr logicNGSatisfiableQ(IExpr arg1) {
+			FormulaFactory factory = new FormulaFactory();
+			LogicFormula lf = new LogicFormula(factory);
+			final Formula formula = lf.expr2BooleanFunction(arg1);
+			final SATSolver miniSat = MiniSat.miniSat(factory);
+			miniSat.add(formula);
+			final Tristate result = miniSat.sat();
+			if (result == Tristate.TRUE) {
+				return F.True;
+			}
+			if (result == Tristate.FALSE) {
+				return F.False;
+			}
+			return F.NIL;
+		}
+
+		/**
+		 * Use brute force method.
+		 * 
+		 * @param expr
+		 * @param variables
+		 * @param position
+		 * @return
+		 */
+		private static boolean bruteForceSatisfiableQ(IExpr expr, IAST variables, int position) {
 			if (variables.size() <= position) {
 				return EvalEngine.get().evalTrue(expr);
 			}
@@ -2029,7 +2393,7 @@ public final class BooleanFunctions {
 			if (sym.isSymbol()) {
 				try {
 					((ISymbol) sym).pushLocalVariable(F.True);
-					if (satisfiableQ(expr, variables, position + 1)) {
+					if (bruteForceSatisfiableQ(expr, variables, position + 1)) {
 						return true;
 					}
 				} finally {
@@ -2037,7 +2401,7 @@ public final class BooleanFunctions {
 				}
 				try {
 					((ISymbol) sym).pushLocalVariable(F.False);
-					if (satisfiableQ(expr, variables, position + 1)) {
+					if (bruteForceSatisfiableQ(expr, variables, position + 1)) {
 						return true;
 					}
 				} finally {
@@ -2049,8 +2413,22 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * See <a href="https://en.wikipedia.org/wiki/Tautology_%28logic%29">Wikipedia: Tautology_</a>
+	 * <pre>
+	 * TautologyQ(boolean-expr, list-of-variables)
+	 * </pre>
 	 * 
+	 * <blockquote>
+	 * <p>
+	 * test whether the <code>boolean-expr</code> is satisfiable by all combinations of boolean <code>False</code> and
+	 * <code>True</code> values for the <code>list-of-variables</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Tautology_(logic)">Wikipedia - Tautology (logic)</a></li>
+	 * </ul>
 	 */
 	private static class TautologyQ extends AbstractFunctionEvaluator {
 
@@ -2058,23 +2436,62 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
-			IAST variables;
-			if (ast.isAST2()) {
-				if (ast.arg2().isList()) {
-					variables = (IAST) ast.arg2();
+			IASTMutable userDefinedVariables;
+			IExpr arg1 = ast.arg1();
+			try {
+				if (ast.isAST2()) {
+					if (ast.arg2().isList()) {
+						userDefinedVariables = ((IAST) ast.arg2()).copy();
+						EvalAttributes.sort(userDefinedVariables);
+					} else {
+						userDefinedVariables = List(ast.arg2());
+					}
+					VariablesSet vSet = new VariablesSet(arg1);
+					IAST variables = vSet.getVarList();
+					if (variables.equals(userDefinedVariables)) {
+						return logicNGTautologyQ(arg1);
+					}
 				} else {
-					variables = List(ast.arg2());
+					return logicNGTautologyQ(arg1);
 				}
-			} else {
-				VariablesSet vSet = new VariablesSet(ast.arg1());
-				variables = vSet.getVarList();
 
+				return bruteForceTautologyQ(arg1, userDefinedVariables, 1) ? F.True : F.False;
+			} catch (ClassCastException cce) {
+				if (Config.DEBUG) {
+					cce.printStackTrace();
+				}
 			}
-
-			return tautologyQ(ast.arg1(), variables, 1) ? F.True : F.False;
+			return F.NIL;
 		}
 
-		private static boolean tautologyQ(IExpr expr, IAST variables, int position) {
+		/**
+		 * <p>
+		 * Use LogicNG MiniSAT method.
+		 * </p>
+		 * <p>
+		 * <b>Note:</b> <code>TautologyQ(formula)</code> is equivalent to <code>!SatisfiableQ(!formula)</code>.
+		 * </p>
+		 * 
+		 * @param arg1
+		 * @return
+		 */
+		private static IExpr logicNGTautologyQ(IExpr arg1) {
+			IExpr temp = SatisfiableQ.logicNGSatisfiableQ(F.Not(arg1));
+			if (temp.isPresent()) {
+				return temp.isTrue() ? F.False : F.True;
+			}
+			return F.NIL;
+		}
+
+		/**
+		 * Use brute force method.
+		 * 
+		 * @param expr
+		 * @param variables
+		 * @param position
+		 * @return
+		 */
+		private static boolean bruteForceTautologyQ(IExpr expr, IAST variables, int position) {
 			if (variables.size() <= position) {
 				return EvalEngine.get().evalTrue(expr);
 			}
@@ -2082,7 +2499,7 @@ public final class BooleanFunctions {
 			if (sym.isSymbol()) {
 				try {
 					((ISymbol) sym).pushLocalVariable(F.True);
-					if (!tautologyQ(expr, variables, position + 1)) {
+					if (!bruteForceTautologyQ(expr, variables, position + 1)) {
 						return false;
 					}
 				} finally {
@@ -2090,7 +2507,7 @@ public final class BooleanFunctions {
 				}
 				try {
 					((ISymbol) sym).pushLocalVariable(F.False);
-					if (!tautologyQ(expr, variables, position + 1)) {
+					if (!bruteForceTautologyQ(expr, variables, position + 1)) {
 						return false;
 					}
 				} finally {
@@ -2239,7 +2656,7 @@ public final class BooleanFunctions {
 					} else if (result.isFalse()) {
 						result = F.True;
 					} else {
-						result = engine.evaluate(F.Not(result));
+						result = F.Not.of(engine, result);
 					}
 					evaled = true;
 				} else if (temp.isFalse()) {
@@ -2255,7 +2672,7 @@ public final class BooleanFunctions {
 						evaled = true;
 					} else {
 						if (result.isTrue()) {
-							result = engine.evaluate(F.Not(temp));
+							result = F.Not.of(engine, temp);
 							evaled = true;
 						} else if (result.isFalse()) {
 							result = temp;
@@ -2304,8 +2721,94 @@ public final class BooleanFunctions {
 		return CONST_EQUAL.simplifyCompare(arg1, arg2, F.Equal);
 	}
 
+	/**
+	 * Transform <code>Inequality()</code> AST to <code>And()</code> expression.
+	 * 
+	 * @param ast
+	 *            an Inequality AST with <code>size()>=4</code>.
+	 * @return
+	 */
+	public static IAST inequality2And(final IAST ast) {
+		IASTAppendable result = F.And();
+		for (int i = 3; i < ast.size(); i += 2) {
+			result.append(F.binary(ast.get(i - 1), ast.get(i - 2), ast.get(i)));
+		}
+		return result;
+	}
+
 	public static IExpr equals(final IAST ast) {
 		return equalNull(ast.arg1(), ast.arg2(), EvalEngine.get()).orElse(ast);
+	}
+
+	/**
+	 * Use LogicNG MiniSAT method.
+	 * 
+	 * Example: Create a list of rules in the form <code>{{False,True,False,False},{True,False,False,False},...}</code>
+	 * for the variables <code>{a,b,c,d}</code>
+	 * 
+	 * @param booleanExpression
+	 *            an expression build from symbols and boolean operators like
+	 *            <code>And, Or, Not, Xor, Nand, Nor, Implies, Equivalent,...</code>
+	 * @param variables
+	 *            the possible variables. Example: <code>{a,b,c,d}</code>
+	 * @param maxChoices
+	 *            maximum number of choices, which satisfy the given boolean expression
+	 * @return
+	 */
+	public static IAST satisfiabilityInstances(IExpr booleanExpression, IAST variables, int maxChoices) {
+		LogicFormula lf = new LogicFormula();
+		Variable[] vars = lf.ast2Variable(variables);
+		List<Assignment> assignments = logicNGSatisfiabilityInstances(booleanExpression, vars, lf, maxChoices);
+		Map<String, Integer> map = LogicFormula.name2Position(vars);
+		IASTAppendable list = F.ListAlloc(assignments.size());
+		for (int i = 0; i < assignments.size(); i++) {
+			if (i >= maxChoices) {
+				break;
+			}
+			list.append( //
+					lf.literals2BooleanList(assignments.get(i).literals(), map) //
+			);
+		}
+		return list;
+	}
+
+	/**
+	 * Example: Create a list of rules in the form
+	 * <code>{{a->False,b->True,c->False,d->False},{a->True,b->False,c->False,d->False},...}</code> for the variables
+	 * <code>{a,b,c,d}</code>
+	 * 
+	 * @param booleanExpression
+	 *            an expression build from symbols and boolean operators like
+	 *            <code>And, Or, Not, Xor, Nand, Nor, Implies, Equivalent,...</code>
+	 * @param variables
+	 *            the possible variables. Example: <code>{a,b,c,d}</code>
+	 * @param maxChoices
+	 * @return
+	 */
+	public static IAST solveInstances(IExpr booleanExpression, IAST variables, int maxChoices) {
+		LogicFormula lf = new LogicFormula();
+		Variable[] vars = lf.ast2Variable(variables);
+		List<Assignment> assignments = logicNGSatisfiabilityInstances(booleanExpression, vars, lf, maxChoices);
+		Map<String, Integer> map = LogicFormula.name2Position(vars);
+		IASTAppendable list = F.ListAlloc(assignments.size());
+		for (int i = 0; i < assignments.size(); i++) {
+			if (i >= maxChoices) {
+				break;
+			}
+			list.append( //
+					lf.literals2VariableList(assignments.get(i).literals(), map) //
+			);
+		}
+		return list;
+	}
+
+	public static List<Assignment> logicNGSatisfiabilityInstances(IExpr booleanExpression, Variable[] vars,
+			LogicFormula lf, int maxChoices) {
+
+		final Formula formula = lf.expr2BooleanFunction(booleanExpression);
+		final SATSolver miniSat = MiniSat.miniSat(lf.getFactory());
+		miniSat.add(formula);
+		return miniSat.enumerateAllModels(vars);
 	}
 
 	private final static BooleanFunctions CONST = new BooleanFunctions();

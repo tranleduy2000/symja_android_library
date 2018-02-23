@@ -330,7 +330,17 @@ public abstract class IExprImpl implements IExpr {
     public ElemFactory<IExpr> factory() {
         return ExprRingFactory.CONST;
     }
-
+ 
+    @Override
+    public IExpr first() {
+		return F.NIL;
+	}
+	
+    @Override
+    public IExpr last() {
+		return F.NIL;
+	}
+    
     /**
      * Return the <code>FullForm()</code> of this expression
      *
@@ -2651,6 +2661,11 @@ public abstract class IExprImpl implements IExpr {
         return accept(new VisitorReplaceSlots(slotsList));
     }
 
+    @Override
+    public IASTAppendable rest() {
+		return F.NIL;
+	}
+    
     /**
      * Signum functionality is used in JAS toString() method, don't use it as math signum function.
      *
