@@ -438,6 +438,11 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 	}
 
 	@Override
+	public int argSize() {
+		return size() - 1;
+	}
+	
+	@Override
 	public Set<IExpr> asSet() {
 		int size = size();
 		Set<IExpr> set = new HashSet<IExpr>(size > 16 ? size : 16);

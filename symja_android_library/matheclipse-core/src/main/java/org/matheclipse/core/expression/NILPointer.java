@@ -123,6 +123,11 @@ public class NILPointer extends AbstractAST implements IASTAppendable {
 	}
 
 	@Override
+	public int argSize() {
+		return SIZE - 1;
+	}
+	
+	@Override
 	public Set<IExpr> asSet() {
 		throw new UnsupportedOperationException();
 	}

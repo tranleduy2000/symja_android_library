@@ -234,6 +234,15 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     public IExpr arg5();
 
     /**
+	 * Returns the <b>number of arguments</b> in this {@code IAST}. The <b>number of arguments</b> equals
+	 * <code>size() - 1</code> (i.e. the <b>number of elements</b> minus 1)
+	 * 
+	 * @return the number of arguments in this {@code IAST}.
+	 * @see #size()
+	 */
+	public int argSize();
+	
+    /**
      * Collect all arguments of this AST in a new set.
      *
      * @return
