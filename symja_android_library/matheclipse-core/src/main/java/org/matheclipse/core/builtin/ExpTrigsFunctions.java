@@ -38,6 +38,7 @@ import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.num;
 
 import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.ObjIntConsumer;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
@@ -61,6 +62,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.expression.NumberUtil;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
@@ -112,6 +114,7 @@ public class ExpTrigsFunctions {
 		F.ArcSinh.setEvaluator(new ArcSinh());
 		F.ArcTan.setEvaluator(new ArcTan());
 		F.ArcTanh.setEvaluator(new ArcTanh());
+		F.CirclePoints.setEvaluator(new CirclePoints());
 		F.Cos.setEvaluator(new Cos());
 		F.Cosh.setEvaluator(new Cosh());
 		F.Cot.setEvaluator(new Cot());
@@ -952,6 +955,43 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+	}
+
+	private static class CirclePoints extends AbstractFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 2);
+
+			if (ast.arg1().isSignedNumber()) {
+
+				if (ast.arg1().isInteger()) {
+					int i = ((IInteger) ast.arg1()).toIntDefault(Integer.MIN_VALUE);
+					if (i > 0) {
+						// Pi/i - Pi/2
+						final IExpr start = engine.evaluate(F.Plus(F.Times(F.QQ(1, i), F.Pi), F.Times(F.CN1D2, F.Pi)));
+						// (2/i)*Pi
+						final IExpr angle = engine.evaluate(F.Times(F.QQ(2, i), F.Pi));
+
+						final IASTAppendable result = F.ListAlloc(10);
+						ast.forEach(0, i, //
+								new ObjIntConsumer<IExpr>() {
+									@Override
+									public void accept(IExpr x, int j) {
+										result.append(F.AngleVector(F.Plus(start, F.ZZ(j).multiply(angle))));
+									}
+
+								});
+						return result;
+					}
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
 	}
 
 	/**

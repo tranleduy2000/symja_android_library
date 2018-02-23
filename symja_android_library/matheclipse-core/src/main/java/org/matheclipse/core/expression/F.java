@@ -162,8 +162,6 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "khinchin" : "Khinchin");
 	public final static IBuiltInSymbol Pi = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "pi" : "Pi");
 
-	public final static IBuiltInSymbol Aborted = initFinalSymbol(
-			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$aborted" : "$Aborted");
 	public final static IBuiltInSymbol Assumptions = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "assumptions" : "Assumptions");
 	public final static IBuiltInSymbol Begin = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "begin" : "Begin");
@@ -222,10 +220,6 @@ public class F {
 	public final static IBuiltInSymbol Direction = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "direction" : "Direction");
 	public final static IBuiltInSymbol List = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "list" : "List");
-	public final static IBuiltInSymbol $RealVector = initFinalSymbol(
-			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$realvector" : "$RealVector");
-	public final static IBuiltInSymbol $RealMatrix = initFinalSymbol(
-			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$realmatrix" : "$RealMatrix");
 
 	public final static IBuiltInSymbol True = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "true" : "True");
 	public final static IBuiltInSymbol Null = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "null" : "Null");
@@ -755,6 +749,7 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "coprimeq" : "CoprimeQ");
 	public final static IBuiltInSymbol Correlation = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "correlation" : "Correlation");
+	public final static IBuiltInSymbol CirclePoints = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "circlepoints" : "CirclePoints");
 	public final static IBuiltInSymbol Cos = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "cos" : "Cos");
 	public final static IBuiltInSymbol Cosh = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "cosh" : "Cosh");
 	public final static IBuiltInSymbol CosineDistance = initFinalSymbol(
@@ -1359,6 +1354,14 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "yuledissimilarity" : "YuleDissimilarity");
 	public final static IBuiltInSymbol Zeta = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "zeta" : "Zeta");
 
+
+	public final static ISymbol $Aborted = initFinalHiddenSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$aborted" : "$Aborted");
+	public final static ISymbol $RealVector = initFinalHiddenSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$realvector" : "$RealVector");
+	public final static ISymbol $RealMatrix = initFinalHiddenSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$realmatrix" : "$RealMatrix");
+	
 	public final static ISymbol a = initFinalHiddenSymbol("a");
 	public final static ISymbol b = initFinalHiddenSymbol("b");
 	public final static ISymbol c = initFinalHiddenSymbol("c");
@@ -2597,6 +2600,10 @@ public class F {
 		return binary(And, a0, a1);
 	}
 
+	public static IAST AngleVector(final IExpr a0) {
+		return unaryAST1(AngleVector, a0);
+	}
+	
 	public static IAST Apart(final IExpr a0) {
 		return unaryAST1(Apart, a0);
 	}

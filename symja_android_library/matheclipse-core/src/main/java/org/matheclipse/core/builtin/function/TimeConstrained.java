@@ -58,7 +58,7 @@ public class TimeConstrained extends AbstractCoreFunctionEvaluator {
 					return ast.arg3();
 				}
 			}
-			return F.Aborted;
+			return F.$Aborted;
 		}
 
 		IExpr arg2 = engine.evaluate(ast.arg2());
@@ -89,12 +89,12 @@ public class TimeConstrained extends AbstractCoreFunctionEvaluator {
 			if (ast.isAST3()) {
 				return ast.arg3();
 			}
-			return F.Aborted;
+			return F.$Aborted;
 		} catch (com.google.common.util.concurrent.UncheckedTimeoutException e) {
 			if (ast.isAST3()) {
 				return ast.arg3();
 			}
-			return F.Aborted;
+			return F.$Aborted;
 		} catch (Exception e) {
 			if (Config.DEBUG) {
 				e.printStackTrace();
