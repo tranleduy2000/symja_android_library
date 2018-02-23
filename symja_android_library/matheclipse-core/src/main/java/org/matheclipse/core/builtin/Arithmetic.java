@@ -820,7 +820,7 @@ public final class Arithmetic {
 
 			IExpr arg1 = ast.arg1();
 			if (ast.isAST2()) {
-				IExpr arg2 = ast.arg2();
+				final IExpr arg2 = ast.arg2();
 				if (arg2.isOne()) {
 					return F.HarmonicNumber(arg1);
 				} else {

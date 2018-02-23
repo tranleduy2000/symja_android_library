@@ -495,11 +495,11 @@ public final class ExpVectorLong {
 	 * @return string representation of the variables.
 	 * @see java.util.Arrays#toString()
 	 */
-	public static String varsToString(IAST vars) {
+	public static String varsToString(final IAST vars) {
 		if (vars == null) {
 			return "null";
 		}
-		StringBuilder s = new StringBuilder();
+		final StringBuilder s = new StringBuilder();
 		vars.forEach(vars.size(), new ObjIntConsumer<IExpr>() {
             @Override
             public void accept(IExpr x, int i) {

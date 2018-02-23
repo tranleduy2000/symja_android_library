@@ -356,8 +356,8 @@ public final class LinearAlgebra {
 					if (dim1 == 0) {
 						return F.C0;
 					}
-					IAST a1 = ((IAST) arg1);
-					IAST a2 = ((IAST) arg2);
+					final IAST a1 = ((IAST) arg1);
+					final IAST a2 = ((IAST) arg2);
 					IASTAppendable maxAST = F.Max();
 					return maxAST.appendArgs(a1.size(), new IntFunction<IExpr>() {
                         @Override
@@ -736,7 +736,7 @@ public final class LinearAlgebra {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
-				IAST vector = (IAST) ast.arg1();
+				final IAST vector = (IAST) ast.arg1();
 				int m = vector.size();
 				final int offset = ast.isAST2() ? Validate.checkIntType(ast, 2, Integer.MIN_VALUE) : 0;
 				return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
@@ -810,7 +810,7 @@ public final class LinearAlgebra {
 		public static IAST dimensions(final IAST ast, int maximumLevel) {
 			IAST list = (IAST) ast.arg1();
 			IExpr header = list.head();
-			ArrayList<Integer> dims = getDimensions(list, header, maximumLevel - 1);
+			final ArrayList<Integer> dims = getDimensions(list, header, maximumLevel - 1);
 			int dimsSize = dims.size();
 			IASTAppendable res = F.ListAlloc(dimsSize);
 			return res.appendArgs(0, dimsSize, new IntFunction<IExpr>() {
@@ -1124,8 +1124,8 @@ public final class LinearAlgebra {
 			try {
 
 				EigenDecomposition ed = new EigenDecomposition(matrix);
-				double[] realValues = ed.getRealEigenvalues();
-				double[] imagValues = ed.getImagEigenvalues();
+				final double[] realValues = ed.getRealEigenvalues();
+				final double[] imagValues = ed.getImagEigenvalues();
 				int size = realValues.length;
 				IASTAppendable list = F.ListAlloc(size);
 				return list.appendArgs(0, size, new IntFunction<IExpr>() {
@@ -1249,7 +1249,7 @@ public final class LinearAlgebra {
 		@Override
 		public IAST realMatrixEval(RealMatrix matrix) {
 			try {
-				EigenDecomposition ed = new EigenDecomposition(matrix);
+				final EigenDecomposition ed = new EigenDecomposition(matrix);
 				int size = matrix.getColumnDimension();
 				IASTAppendable list = F.ListAlloc(size);
 				return list.appendArgs(0, size, new IntFunction<IExpr>() {
@@ -1305,8 +1305,8 @@ public final class LinearAlgebra {
 					if (dim1 == 0) {
 						return F.C0;
 					}
-					IAST a1 = ((IAST) arg1);
-					IAST a2 = ((IAST) arg2);
+					final IAST a1 = ((IAST) arg1);
+					final IAST a2 = ((IAST) arg2);
 					int size = a1.size();
 					IASTAppendable plusAST = F.PlusAlloc(size);
 					plusAST.appendArgs(size, new IntFunction<IExpr>() {
@@ -1348,10 +1348,10 @@ public final class LinearAlgebra {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isInteger()) {
-				int m = Validate.checkIntType(ast, 1);
+				final int m = Validate.checkIntType(ast, 1);
 				int[] count = new int[1];
 				count[0] = 1;
-				IAST scalar = F.Sqrt(F.QQ(1, m));
+				final IAST scalar = F.Sqrt(F.QQ(1, m));
 				return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
 					@Override
 					public IExpr apply(Integer i, Integer j) {
@@ -1511,7 +1511,7 @@ public final class LinearAlgebra {
 			}
 
 			@SuppressWarnings("unchecked")
-			private IAST recursion(ArrayList<Integer> list1Cur, ArrayList<Integer> list2Cur,
+			private IAST recursion(final ArrayList<Integer> list1Cur, final ArrayList<Integer> list2Cur,
 					List<Integer> list1RestDimensions, List<Integer> list2RestDimensions) {
 				if (list1RestDimensions.size() > 0) {
 					int size = list1RestDimensions.get(0) + 1;
@@ -1685,14 +1685,14 @@ public final class LinearAlgebra {
 					variables = (IAST) ast.arg2();
 				}
 				if (variables.isPresent()) {
-					int variablesSize = variables.size();
-					IAST vector = (IAST) ast.arg1();
+					final int variablesSize = variables.size();
+					final IAST vector = (IAST) ast.arg1();
 					int vectorSize = vector.size();
 					IASTAppendable jacobiMatrix = F.ListAlloc(vectorSize);
 					final IAST vars = variables;
 					return jacobiMatrix.appendArgs(vectorSize, new IntFunction<IExpr>() {
 						@Override
-						public IExpr apply(int i) {
+						public IExpr apply(final int i) {
 							IASTAppendable jacobiRow = F.ListAlloc(variablesSize);
 							return jacobiRow.appendArgs(variablesSize, new IntFunction<IExpr>() {
 								@Override
@@ -1876,7 +1876,7 @@ public final class LinearAlgebra {
 
 			int[] dim = ast.arg1().isMatrix();
 			if (dim != null) {
-				IAST matrix = (IAST) ast.arg1();
+				final IAST matrix = (IAST) ast.arg1();
 				final int k = (ast.size() == 3 && ast.arg2().isInteger())
 						? Validate.checkIntType(ast, 2, Integer.MIN_VALUE)
 						: 0;
@@ -2015,8 +2015,8 @@ public final class LinearAlgebra {
 					if (dim1 == 0) {
 						return F.C0;
 					}
-					IAST a1 = ((IAST) arg1);
-					IAST a2 = ((IAST) arg2);
+					final IAST a1 = ((IAST) arg1);
+					final IAST a2 = ((IAST) arg2);
 					int size = a1.size();
 					IASTAppendable plusAST = F.PlusAlloc(size);
 					return plusAST.appendArgs(size, new IntFunction<IExpr>() {
@@ -2363,7 +2363,7 @@ public final class LinearAlgebra {
 				}
 				IAST arg1AST = (IAST) arg1;
 				if (ast.isAST2()) {
-					IExpr arg2 = ast.arg2();
+					final IExpr arg2 = ast.arg2();
 					if (arg2.isInfinity()) {
 						return arg1AST.map(F.Max, new Function<IExpr, IExpr>() {
 							@Override
@@ -3008,8 +3008,8 @@ public final class LinearAlgebra {
 					if (dim1 == 0) {
 						return F.C0;
 					}
-					IAST a1 = ((IAST) arg1);
-					IAST a2 = ((IAST) arg2);
+					final IAST a1 = ((IAST) arg1);
+					final IAST a2 = ((IAST) arg2);
 					int size = a1.size();
 					IASTAppendable plusAST = F.PlusAlloc(size);
 
@@ -3037,7 +3037,7 @@ public final class LinearAlgebra {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isAST()) {
-				IAST vector = (IAST) ast.arg1();
+				final IAST vector = (IAST) ast.arg1();
 				int m = vector.size() - 1;
 				return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
 					@Override
@@ -3255,7 +3255,7 @@ public final class LinearAlgebra {
 		 *            number of columns of the matrix
 		 * @return
 		 */
-		public IAST transpose(final IAST matrix, int rows, int cols) {
+		public IAST transpose(final IAST matrix, final int rows, int cols) {
 			final IASTAppendable transposedMatrix = F.ast(F.List, cols, true);
 			transposedMatrix.setArgs(cols + 1, new IntFunction<IExpr>() {
 				@Override
@@ -3362,7 +3362,7 @@ public final class LinearAlgebra {
 
 			int[] dim = ast.arg1().isMatrix();
 			if (dim != null) {
-				IAST matrix = (IAST) ast.arg1();
+				final IAST matrix = (IAST) ast.arg1();
 				final int k = (ast.size() == 3 && ast.arg2().isInteger())
 						? Validate.checkIntType(ast, 2, Integer.MIN_VALUE)
 						: 0;
@@ -3674,10 +3674,10 @@ public final class LinearAlgebra {
 	 *            the evaluation engine
 	 * @return <code>F.NIL</code> if the linear system is inconsistent and has no solution
 	 */
-	public static IAST rowReduced2List(FieldMatrix<IExpr> matrix, boolean quiet, EvalEngine engine) {
+	public static IAST rowReduced2List(FieldMatrix<IExpr> matrix, boolean quiet, final EvalEngine engine) {
 
-		int rows = matrix.getRowDimension();
-		int cols = matrix.getColumnDimension();
+		final int rows = matrix.getRowDimension();
+		final int cols = matrix.getColumnDimension();
 		if (rows == 2 && cols == 3) {
 			IAST list = cramersRule2x3(matrix, quiet, engine);
 			if (list.isPresent()) {
@@ -3690,7 +3690,7 @@ public final class LinearAlgebra {
 			}
 		}
 		FieldReducedRowEchelonForm ref = new FieldReducedRowEchelonForm(matrix);
-		FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
+		final FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
 		IExpr lastVarCoefficient = rowReduced.getEntry(rows - 1, cols - 2);
 		if (lastVarCoefficient.isZero()) {
 			if (!rowReduced.getEntry(rows - 1, cols - 1).isZero()) {
@@ -3736,8 +3736,8 @@ public final class LinearAlgebra {
 	 *            the evaluation engine
 	 * @return resultList with the appended results as list of rules
 	 */
-	public static IAST rowReduced2RulesList(FieldMatrix<IExpr> matrix, IAST listOfVariables, IASTAppendable resultList,
-			EvalEngine engine) {
+	public static IAST rowReduced2RulesList(FieldMatrix<IExpr> matrix, final IAST listOfVariables, IASTAppendable resultList,
+			final EvalEngine engine) {
 		int rows = matrix.getRowDimension();
 		int cols = matrix.getColumnDimension();
 		IAST smallList = null;

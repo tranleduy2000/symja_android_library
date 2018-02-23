@@ -111,8 +111,8 @@ public class NMinimize extends AbstractFunctionEvaluator {
 		return x2LP.expr2ObjectiveFunction();
 	}
 
-	protected static List<LinearConstraint> getConstraints(VariablesSet vars, IAST listOfconstraints) {
-		List<LinearConstraint> constraints = new ArrayList<LinearConstraint>(listOfconstraints.size());
+	protected static List<LinearConstraint> getConstraints(final VariablesSet vars, IAST listOfconstraints) {
+		final List<LinearConstraint> constraints = new ArrayList<LinearConstraint>(listOfconstraints.size());
 		listOfconstraints.forEach(new Consumer<IExpr>() {
             @Override
             public void accept(IExpr x) {

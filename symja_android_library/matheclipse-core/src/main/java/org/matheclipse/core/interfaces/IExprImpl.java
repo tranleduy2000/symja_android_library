@@ -254,7 +254,7 @@ public abstract class IExprImpl implements IExpr {
      */
     public IExpr equalTo(IExpr that) {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
-        return ITernaryComparator.convertToExpr(temp);
+        return ExprUtil.convertToExpr(temp);
     }
 
     /**
@@ -404,7 +404,7 @@ public abstract class IExprImpl implements IExpr {
      */
     public IExpr greaterEqualThan(IExpr that) {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_GREATER_EQUAL.prepareCompare(this, that);
-        return ITernaryComparator.convertToExpr(temp);
+        return ExprUtil.convertToExpr(temp);
     }
 
     /**
@@ -420,7 +420,7 @@ public abstract class IExprImpl implements IExpr {
      */
     public IExpr greaterThan(IExpr that) {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_GREATER.prepareCompare(this, that);
-        return ITernaryComparator.convertToExpr(temp);
+        return ExprUtil.convertToExpr(temp);
     }
 
     /**
@@ -2212,7 +2212,7 @@ public abstract class IExprImpl implements IExpr {
      */
     public IExpr lessEqualThan(IExpr that) {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_LESS_EQUAL.prepareCompare(this, that);
-        return ITernaryComparator.convertToExpr(temp);
+        return ExprUtil.convertToExpr(temp);
     }
 
     /**
@@ -2228,7 +2228,7 @@ public abstract class IExprImpl implements IExpr {
      */
     public IExpr lessThan(IExpr that) {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_LESS.prepareCompare(this, that);
-        return ITernaryComparator.convertToExpr(temp);
+        return ExprUtil.convertToExpr(temp);
     }
 
     /**
@@ -2800,7 +2800,7 @@ public abstract class IExprImpl implements IExpr {
      */
     public IExpr unequalTo(IExpr that) {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
-        return ITernaryComparator.convertToExpr(temp);
+        return ExprUtil.convertToExpr(temp);
     }
 
     /**

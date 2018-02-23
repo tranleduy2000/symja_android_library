@@ -467,7 +467,7 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr mapMatrixColumns(int[] dim, Function<IExpr, IExpr> f) {
+	public IExpr mapMatrixColumns(final int[] dim, final Function<IExpr, IExpr> f) {
 		final int columnSize = dim[1];
 		IASTAppendable result = F.ListAlloc(columnSize);
 		return result.appendArgs(0, columnSize, new IntFunction<IExpr>() {

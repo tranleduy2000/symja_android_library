@@ -1137,8 +1137,8 @@ public class Solve extends AbstractFunctionEvaluator {
 	}
 
 	public static IAST integerSolve(final IAST list, final IAST variables) {
-		IASTAppendable result = F.List();
-		TreeMap<ISymbol, IntVariable> map = new TreeMap<ISymbol, IntVariable>();
+		final IASTAppendable result = F.List();
+		final TreeMap<ISymbol, IntVariable> map = new TreeMap<ISymbol, IntVariable>();
 		// Create a constraint network
 		Network net = new Network();
 		for (int i = 1; i < variables.size(); i++) {

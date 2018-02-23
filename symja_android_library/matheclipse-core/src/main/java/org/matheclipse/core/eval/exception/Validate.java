@@ -670,7 +670,7 @@ public final class Validate {
 	public static IASTAppendable checkEquations(final IAST ast, int position) {
 		IExpr expr = ast.get(position);
 		if (expr.isList() || expr.isAnd()) {
-			IAST listOrAndAST = (IAST) expr;
+			final IAST listOrAndAST = (IAST) expr;
 			int size = listOrAndAST.size();
 			IASTAppendable termsEqualZeroList = F.ListAlloc(size);
 			return termsEqualZeroList.appendArgs(size, new IntFunction<IExpr>() {

@@ -753,7 +753,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr e2ObjArg(IExpr s, IExpr a) {
+		public IExpr e2ObjArg(final IExpr s, final IExpr a) {
 			if (a.isZero()) {
 				return Zeta(s);
 			}

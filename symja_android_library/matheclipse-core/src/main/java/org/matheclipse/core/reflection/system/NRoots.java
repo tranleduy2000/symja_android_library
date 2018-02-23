@@ -58,7 +58,7 @@ public class NRoots extends AbstractFunctionEvaluator {
 	 * @see Roots
 	 */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 		Validate.checkRange(ast, 2, 3);
 		IAST variables;
 		if (ast.size() == 2) {
@@ -80,8 +80,8 @@ public class NRoots extends AbstractFunctionEvaluator {
 		if (!temp.isList()) {
 			return F.NIL;
 		}
-		IAST list = (IAST) temp;
-		int size = list.size();
+		final IAST list = (IAST) temp;
+		final int size = list.size();
 		IASTAppendable result = F.ListAlloc(size);
 		return result.appendArgs(size, new IntFunction<IExpr>() {
             @Override

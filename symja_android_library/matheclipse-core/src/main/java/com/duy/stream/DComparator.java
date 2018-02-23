@@ -8,7 +8,6 @@ import java.util.Comparator;
 /**
  * Created by Duy on 10/3/2017.
  */
-
 public class DComparator {
     /**
      * Accepts a function that extracts a {@code long} sort key from a type
@@ -25,7 +24,7 @@ public class DComparator {
      * @see #comparing(Function)
      * @since 1.8
      */
-    public static <T> Comparator<T> comparingLong(ToLongFunction<? super T> keyExtractor) {
+    public static <T> Comparator<T> comparingLong(final ToLongFunction<? super T> keyExtractor) {
         return new Comparator<T>() {
             @Override
             public int compare(T c1, T c2) {

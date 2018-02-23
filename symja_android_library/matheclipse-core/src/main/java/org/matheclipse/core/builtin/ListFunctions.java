@@ -617,8 +617,8 @@ public final class ListFunctions {
 			return F.NIL;
 		}
 
-		private static IExpr arrayPadMatrixAtom(IAST matrix, int[] dim, int m, int n, IExpr atom) {
-			int columnDim = dim[1] + m + n;
+		private static IExpr arrayPadMatrixAtom(final IAST matrix, int[] dim, final int m, final int n, final IExpr atom) {
+			final int columnDim = dim[1] + m + n;
 			IASTAppendable result = matrix.copyHead(dim[0] + m + n);
 			IAST row;
 			// prepend m rows
@@ -656,7 +656,7 @@ public final class ListFunctions {
 			return result;
 		}
 
-		private static IExpr arrayPadAtom(IAST ast, int m, int n, IExpr atom) {
+		private static IExpr arrayPadAtom(IAST ast, int m, int n, final IExpr atom) {
 			IASTAppendable result = ast.copyHead();
 			result.appendArgs(0, m, new IntFunction<IExpr>() {
 				@Override
@@ -847,8 +847,8 @@ public final class ListFunctions {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isList()) {
-				IAST list = (IAST) ast.arg1();
-				int[] size = { 1 };
+				final IAST list = (IAST) ast.arg1();
+				final int[] size = { 1 };
 				if (list.exists(new Predicate<IExpr>() {
 					@Override
 					public boolean test(IExpr x) {
@@ -1494,8 +1494,8 @@ public final class ListFunctions {
 				IExpr temp = engine.evaluate(ast.arg3());
 				if (temp.isAST()) {
 					final IAST list = (IAST) temp;
-					IExpr arg1 = engine.evaluate(ast.arg1());
-					IExpr arg2 = engine.evaluate(ast.arg2());
+					final IExpr arg1 = engine.evaluate(ast.arg1());
+					final IExpr arg2 = engine.evaluate(ast.arg2());
 					return list.foldLeft(new BiFunction<IExpr, IExpr, IExpr>() {
 						@Override
 						public IExpr apply(IExpr x, IExpr y) {
@@ -1530,8 +1530,8 @@ public final class ListFunctions {
 				IExpr temp = engine.evaluate(ast.arg3());
 				if (temp.isAST()) {
 					final IAST list = (IAST) temp;
-					IExpr arg1 = engine.evaluate(ast.arg1());
-					IExpr arg2 = engine.evaluate(ast.arg2());
+					final IExpr arg1 = engine.evaluate(ast.arg1());
+					final IExpr arg2 = engine.evaluate(ast.arg2());
 					return foldLeft(arg2, list, 1, list.size(), new BiFunction<IExpr, IExpr, IExpr>() {
 						@Override
 						public IExpr apply(IExpr x, IExpr y) {
@@ -1759,7 +1759,7 @@ public final class ListFunctions {
 
 			if (!ast.arg1().isAtom()) {
 				final IAST arg1 = (IAST) ast.arg1();
-				IASTAppendable resultList;
+				final IASTAppendable resultList;
 				if (lastIndex != 3) {
 					resultList = F.ListAlloc(8);
 				} else {
@@ -1893,7 +1893,7 @@ public final class ListFunctions {
 
 			if (ast.isAST1()) {
 				if (ast.arg1().isListOfLists()) {
-					IAST list = (IAST) ast.arg1();
+					final IAST list = (IAST) ast.arg1();
 					int maxSize = -1;
 					for (int i = 1; i < list.size(); i++) {
 						IAST subList = (IAST) list.get(i);
@@ -1935,7 +1935,7 @@ public final class ListFunctions {
 			return F.NIL;
 		}
 
-		public static IExpr padLeftAtom(IAST ast, int n, IExpr atom) {
+		public static IExpr padLeftAtom(IAST ast, int n, final IExpr atom) {
 			int length = n - ast.size() + 1;
 			if (length > 0) {
 				IASTAppendable result = ast.copyHead();
@@ -1992,7 +1992,7 @@ public final class ListFunctions {
 
 			if (ast.isAST1()) {
 				if (ast.arg1().isListOfLists()) {
-					IAST list = (IAST) ast.arg1();
+					final IAST list = (IAST) ast.arg1();
 					int maxSize = -1;
 					for (int i = 1; i < list.size(); i++) {
 						IAST subList = (IAST) list.get(i);
@@ -2035,7 +2035,7 @@ public final class ListFunctions {
 			return F.NIL;
 		}
 
-		public static IExpr padRightAtom(IAST ast, int n, IExpr atom) {
+		public static IExpr padRightAtom(IAST ast, int n, final IExpr atom) {
 			int length = n - ast.size() + 1;
 			if (length > 0) {
 				IASTAppendable result = ast.copyHead();
@@ -2532,13 +2532,13 @@ public final class ListFunctions {
 	private final static class Select extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			int size = ast.size();
 			if (ast.arg1().isAST()) {
 				IAST list = (IAST) ast.arg1();
-				IExpr predicateHead = ast.arg2();
+				final IExpr predicateHead = ast.arg2();
 				int allocSize = list.size() > 4 ? list.size() / 4 : 4;
 				if (size == 3) {
 					return list.filter(list.copyHead(allocSize), new Predicate<IExpr>() {
@@ -2626,11 +2626,11 @@ public final class ListFunctions {
 			return F.NIL;
 		}
 
-		private IExpr splitByFunction(IAST functorList, int pos, IAST list, EvalEngine engine) {
+		private IExpr splitByFunction(IAST functorList, int pos, IAST list, final EvalEngine engine) {
 			if (pos >= functorList.size()) {
 				return F.NIL;
 			}
-			IExpr functorHead = functorList.get(pos);
+			final IExpr functorHead = functorList.get(pos);
 			final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {

@@ -94,7 +94,7 @@ public final class RandomFunctions {
 			return F.NIL;
 		}
 
-		public static IAST shuffle(IAST list) {
+		public static IAST shuffle(final IAST list) {
 			final int len = list.size() - 1;
 
 			// Shuffle indices.

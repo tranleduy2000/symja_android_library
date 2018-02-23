@@ -102,7 +102,7 @@ public class Options {
 	 * @return the found option value or <code>F.NIL</code> if the option is not available
 	 */
 	public IExpr getOption(final String optionString) {
-		IAST[] rule = new IAST[1];
+		final IAST[] rule = new IAST[1];
 		if (fCurrentOptionsList != null) {
 			try {
 				if (fCurrentOptionsList.exists(new Predicate<IExpr>() {
@@ -149,7 +149,7 @@ public class Options {
 	}
 
 	public IExpr getOption(final ISymbol option) {
-		IAST[] rule = new IAST[1];
+		final IAST[] rule = new IAST[1];
 		if (fCurrentOptionsList != null) {
 			try {
 				if (fCurrentOptionsList.exists(new Predicate<IExpr>() {

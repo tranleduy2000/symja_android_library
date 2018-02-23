@@ -205,11 +205,11 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 	 * @param header
 	 * @return
 	 */
-	private IExpr getDerivativeArgN(IExpr x, final IAST ast, final IExpr head) {
-		IAST[] deriv = ast.isDerivative();
+	private IExpr getDerivativeArgN(final IExpr x, final IAST ast, final IExpr head) {
+		final IAST[] deriv = ast.isDerivative();
 		int size = ast.size();
 		if (deriv != null) {
-			IASTAppendable plus = F.PlusAlloc(size);
+			final IASTAppendable plus = F.PlusAlloc(size);
 			ast.forEach(size, new ObjIntConsumer<IExpr>() {
                 @Override
                 public void accept(IExpr expr, int i) {
@@ -219,7 +219,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 			return plus;
 		}
 		if (head.isSymbol()) {
-			IASTAppendable plus = F.PlusAlloc(size);
+			final IASTAppendable plus = F.PlusAlloc(size);
 			ast.forEach(size, new ObjIntConsumer<IExpr>() {
 				@Override
 				public void accept(IExpr expr, int i) {
@@ -281,7 +281,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 		if (ast.size() < 3) {
 			return F.NIL;
 		}
@@ -311,7 +311,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 			// D[fx_, {...}]
 			IAST xList = (IAST) x;
 			if (xList.isAST1() && xList.arg1().isListOfLists()) {
-				IAST subList = (IAST) xList.arg1();
+				final IAST subList = (IAST) xList.arg1();
 				IASTAppendable result = F.ListAlloc(subList.size());
 				result.appendArgs(subList.size(), new IntFunction<IExpr>() {
 					@Override

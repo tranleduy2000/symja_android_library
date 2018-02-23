@@ -88,9 +88,9 @@ public class Outer extends AbstractFunctionEvaluator {
 			this.head = head;
 		}
 
-		private IAST outer(int astPosition, IExpr expr, IASTAppendable current) {
+		private IAST outer(final int astPosition, final IExpr expr, final IASTAppendable current) {
 			if (expr.isAST() && head.equals(expr.head())) {
-				IAST list = (IAST) expr;
+				final IAST list = (IAST) expr;
 				int size = list.size();
 				IASTAppendable result = F.ast(head, size, false);
 				return result.appendArgs(size, new IntFunction<IExpr>() {

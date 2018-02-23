@@ -347,7 +347,7 @@ public class Discriminant extends AbstractFunctionEvaluator {
 
 			long n = poly.degree();
 			if (n >= 2L && n <= 5L) {
-				IAST result = poly.coefficientList();
+				final IAST result = poly.coefficientList();
 				IASTAppendable rules = F.ListAlloc(result.size());
 				rules.appendArgs(result.size(), new IntFunction<IExpr>() {
                     @Override

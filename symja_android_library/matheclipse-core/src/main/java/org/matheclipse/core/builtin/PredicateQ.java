@@ -114,7 +114,7 @@ public class PredicateQ {
 	private static class ArrayQ extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -478,7 +478,7 @@ public class PredicateQ {
 	private static class MatrixQ extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -489,7 +489,7 @@ public class PredicateQ {
 
 			if (ast.isAST2()) {
 				final IExpr arg2 = engine.evaluate(ast.arg2());
-				IASTAppendable temp = F.ast(arg2);
+				final IASTAppendable temp = F.ast(arg2);
 				temp.append(F.Slot1);
 				IAST matrix = (IAST) arg1;
 				for (int i = 1; i < dims[0]; i++) {
@@ -928,7 +928,7 @@ public class PredicateQ {
 	private static class VectorQ extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -939,7 +939,7 @@ public class PredicateQ {
 
 			if (ast.isAST2()) {
 				final IExpr arg2 = engine.evaluate(ast.arg2());
-				IASTAppendable temp = F.ast(arg2);
+				final IASTAppendable temp = F.ast(arg2);
 				temp.append(F.Slot1);
 
 				IAST vector = (IAST) arg1;

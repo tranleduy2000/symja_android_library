@@ -1271,7 +1271,7 @@ public class Algebra {
 				IInteger multinomial = NumberTheory.multinomial(j, n);
 				final IAST times = F.Times();
 				IExpr temp;
-				for (int[] indices : perm) {
+				for (final int[] indices : perm) {
 					final IASTAppendable timesAST = times.copyAppendable();
 					if (!multinomial.isOne()) {
 						timesAST.append(multinomial);
@@ -1283,7 +1283,7 @@ public class Algebra {
 								timesAST.append(temp);
 							} else {
 								if (temp.isTimes()) {
-									IAST ast = (IAST) temp;
+									final IAST ast = (IAST) temp;
 									final int ki = k;
 									timesAST.appendArgs(ast.size(),
 											new IntFunction<IExpr>() {
@@ -2615,7 +2615,7 @@ public class Algebra {
 				if (head.equals(Power)) {
 					if (x1.isTimes()) {
 						// Power[x_ * y_, z_] :> x^z * y^z
-						IAST timesAST = (IAST) x1;
+						final IAST timesAST = (IAST) x1;
 						IASTMutable timesResult = timesAST.mapThread(Power(Null, x2), 1);
 						if (assumptions) {
 							IASTAppendable plusResult = F.PlusAlloc(timesAST.size() + 1);
@@ -3090,7 +3090,7 @@ public class Algebra {
 		private static class SimplifyVisitor extends VisitorExpr {
 			final IsBasicExpressionVisitor isBasicAST = new IsBasicExpressionVisitor();
 			/**
-			 * This function is used to determine the “weight” of an expression. For example by counting the leafs of an
+			 * This function is used to determine the â€œweightâ€� of an expression. For example by counting the leafs of an
 			 * expression with the <code>IExpr#leafCountSimplify()</code> method.
 			 */
 			final Function<IExpr, Long> fComplexityFunction;
@@ -3369,7 +3369,7 @@ public class Algebra {
 		 * @param engine
 		 * @return
 		 */
-		private static Function<IExpr, Long> createComplexityFunction(IExpr complexityFunctionHead, EvalEngine engine) {
+		private static Function<IExpr, Long> createComplexityFunction(IExpr complexityFunctionHead, final EvalEngine engine) {
 			Function<IExpr, Long> complexityFunction = new Function<IExpr, Long>() {
 				@Override
 				public Long apply(IExpr x) {

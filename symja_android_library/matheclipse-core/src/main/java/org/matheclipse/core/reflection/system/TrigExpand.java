@@ -146,7 +146,7 @@ public class TrigExpand extends AbstractEvaluator {
 		 * @param theta
 		 * @return
 		 */
-		private static IExpr expandCosTimes(IInteger n, IExpr theta) {
+		private static IExpr expandCosTimes(final IInteger n, final IExpr theta) {
 			int ni = n.toIntDefault(Integer.MIN_VALUE);
 			if (ni > Integer.MIN_VALUE) {
 				return F.sum(new Function<IExpr, IExpr>() {
@@ -167,7 +167,7 @@ public class TrigExpand extends AbstractEvaluator {
 		 * @param theta
 		 * @return
 		 */
-		private static IExpr expandSinTimes(IInteger n, IExpr theta) {
+		private static IExpr expandSinTimes(final IInteger n, final IExpr theta) {
 			int ni = n.toIntDefault(Integer.MIN_VALUE);
 			if (ni > Integer.MIN_VALUE) {
 				return F.sum(new Function<IExpr, IExpr>() {

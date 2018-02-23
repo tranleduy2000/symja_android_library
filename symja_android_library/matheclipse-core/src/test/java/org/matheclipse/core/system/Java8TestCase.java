@@ -26,7 +26,7 @@ public class Java8TestCase extends AbstractTestCase {
 
     public void testForeach() {
         IAST ast = List(C10, a, b, c, d, e);
-        IASTAppendable result = F.List();
+        final IASTAppendable result = F.List();
         Consumer<IExpr> action = new Consumer<IExpr>() {
             @Override
             public void accept(IExpr x) {

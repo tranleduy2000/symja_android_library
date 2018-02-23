@@ -130,10 +130,10 @@ public class Structure {
 	private final static class Apply extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
-			IASTAppendable evaledAST = ast.copyAppendable();
+			final IASTAppendable evaledAST = ast.copyAppendable();
 			evaledAST.setArgs(evaledAST.size(), new IntFunction<IExpr>() {
                 @Override
                 public IExpr apply(int i) {
@@ -161,7 +161,7 @@ public class Structure {
 			return evalApply(arg1, arg2, evaledAST, lastIndex, heads, engine);
 		}
 
-		public static IExpr evalApply(IExpr arg1, IExpr arg2, IAST evaledAST, int lastIndex, boolean heads,
+		public static IExpr evalApply(final IExpr arg1, final IExpr arg2, final IAST evaledAST, int lastIndex, boolean heads,
 				EvalEngine engine) {
 			VisitorLevelSpecification level = null;
 			com.duy.lambda.Function<IExpr, IExpr> af = new com.duy.lambda.Function<IExpr, IExpr>() {
@@ -542,7 +542,7 @@ public class Structure {
 						return Lambda.replaceSlotsOrElse(arg1, ast, arg1);
 					} else if (function.isAST2()) {
 						IExpr arg2 = function.arg2();
-						IAST symbolSlots;
+						final IAST symbolSlots;
 						if (arg1.isList()) {
 							symbolSlots = (IAST) arg1;
 						} else {
@@ -657,8 +657,8 @@ public class Structure {
 			}
 
 			try {
-				IExpr arg1 = ast.arg1();
-				IExpr arg2 = ast.arg2();
+				final IExpr arg1 = ast.arg1();
+				final IExpr arg2 = ast.arg2();
 				VisitorLevelSpecification level;
 				if (lastIndex == 3) {
 					level = new VisitorLevelSpecification(new com.duy.lambda.Function<IExpr, IExpr>() {
@@ -1104,7 +1104,7 @@ public class Structure {
 	private final static class Scan extends Map {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
 			int lastIndex = ast.size() - 1;
@@ -1121,10 +1121,10 @@ public class Structure {
 			}
 
 			try {
-				IExpr arg1 = ast.arg1();
-				IExpr arg2 = ast.arg2();
+				final IExpr arg1 = ast.arg1();
+				final IExpr arg2 = ast.arg2();
 				if (lastIndex == 3) {
-					IASTAppendable result = F.ListAlloc(10);
+					final IASTAppendable result = F.ListAlloc(10);
 					com.duy.lambda.Function<IExpr, IExpr> sf = new com.duy.lambda.Function<IExpr, IExpr>() {
 						@Override
 						public IExpr apply(IExpr x) {
@@ -1440,12 +1440,11 @@ public class Structure {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
-				IAST arg1AST = (IAST) ast.arg1();
+				final IAST arg1AST = (IAST) ast.arg1();
 				IExpr arg1Head = arg1AST.head();
 				if (arg1Head.isAST()) {
 
-					IAST clonedList;
-					IAST arg1HeadAST = (IAST) arg1Head;
+					final IAST arg1HeadAST = (IAST) arg1Head;
 					if (ast.isAST2() && !arg1HeadAST.head().equals(ast.arg2())) {
 						return arg1AST;
 					}

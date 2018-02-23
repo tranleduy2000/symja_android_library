@@ -72,8 +72,8 @@ public class Distribute extends AbstractFunctionEvaluator {
 		return arg1;
 	}
 
-	private void distributePosition(IASTAppendable resultCollector, IAST stepResult, IExpr head, IAST arg1,
-			int position) {
+	private void distributePosition(final IASTAppendable resultCollector, final IAST stepResult, final IExpr head, final IAST arg1,
+			final int position) {
 		if (arg1.size() == position) {
 			resultCollector.append(stepResult);
 			return;

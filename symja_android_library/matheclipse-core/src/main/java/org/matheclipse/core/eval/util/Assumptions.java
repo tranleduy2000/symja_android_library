@@ -77,9 +77,9 @@ public class Assumptions extends AbstractAssumptions {
 		}
 	}
 
-	private static boolean addElement(IAST element, Assumptions assumptions) {
+	private static boolean addElement(IAST element, final Assumptions assumptions) {
 		if (element.arg2().isSymbol()) {
-			ISymbol domain = (ISymbol) element.arg2();
+			final ISymbol domain = (ISymbol) element.arg2();
 			if (domain.equals(F.Algebraics) || domain.equals(F.Booleans) || domain.equals(F.Complexes)
 					|| domain.equals(F.Integers) || domain.equals(F.Primes) || domain.equals(F.Rationals)
 					|| domain.equals(F.Reals)) {

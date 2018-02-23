@@ -779,10 +779,10 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 
 	/** {@inheritDoc} */
 	@Override
-	public final IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, int position) {
+	public final IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, final int position) {
 		// final Function<IExpr, IExpr> function = Functors.replaceArg(replacement,
 		// position);
-		EvalEngine engine = EvalEngine.get();
+		final EvalEngine engine = EvalEngine.get();
 		final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
             @Override
             public IExpr apply(IExpr x) {

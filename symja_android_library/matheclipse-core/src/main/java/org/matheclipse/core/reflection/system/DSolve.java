@@ -271,7 +271,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 		return new IExpr[] { m, n };
 	}
 
-	private static IExpr odeSeparable(EvalEngine engine, IExpr m, IExpr n, IExpr x, IExpr y, IExpr C_1) {
+	private static IExpr odeSeparable(EvalEngine engine, IExpr m, IExpr n, final IExpr x, final IExpr y, IExpr C_1) {
 		if (n.isOne()) {
 			IExpr fxExpr = F.NIL;
 			IExpr gyExpr = F.NIL;
@@ -280,8 +280,8 @@ public class DSolve extends AbstractFunctionEvaluator {
 				fxExpr = m;
 			} else if (m.isTimes()) {
 				IAST timesAST = (IAST) m;
-				IASTAppendable fx = F.TimesAlloc(timesAST.size());
-				IASTAppendable gy = F.TimesAlloc(timesAST.size());
+				final IASTAppendable fx = F.TimesAlloc(timesAST.size());
+				final IASTAppendable gy = F.TimesAlloc(timesAST.size());
 				timesAST.forEach(new Consumer<IExpr>() {
                     @Override
                     public void accept(IExpr expr) {

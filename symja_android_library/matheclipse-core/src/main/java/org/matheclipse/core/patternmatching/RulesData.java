@@ -41,7 +41,7 @@ public class RulesData implements Serializable {
 	 */
 	public static final int DEFAULT_VALUE_INDEX = Integer.MIN_VALUE;
 
-	public static boolean isComplicatedPatternRule(final IExpr lhsExpr, Set<ISymbol> neededSymbols) {
+	public static boolean isComplicatedPatternRule(final IExpr lhsExpr, final Set<ISymbol> neededSymbols) {
 		if (lhsExpr.isAST()) {
 			final IAST lhsAST = ((IAST) lhsExpr);
 			if (lhsAST.size() > 1) {
@@ -64,13 +64,13 @@ public class RulesData implements Serializable {
 						return true;
 					}
 					if (neededSymbols != null && arg1.isOrderlessAST()) {
-						boolean lambda = !lhsAST.exists(new Predicate<IExpr>() {
+						final boolean lambda = !lhsAST.exists(new Predicate<IExpr>() {
 							@Override
 							public boolean test(IExpr x) {
 								return x.isPatternDefault() || x.isOrderlessAST();
 							}
 						}, 1);
-						boolean[] isComplicated = { false };
+						final boolean[] isComplicated = { false };
 						arg1.forEach(new Consumer<IExpr>() {
 							@Override
 							public void accept(IExpr t) {

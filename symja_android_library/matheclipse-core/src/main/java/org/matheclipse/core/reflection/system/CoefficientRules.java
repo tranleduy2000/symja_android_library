@@ -49,7 +49,7 @@ public class CoefficientRules extends AbstractFunctionEvaluator {
 		IExpr expr = F.evalExpandAll(ast.arg1(), engine);
 		VariablesSet eVar;
 		IAST symbolList = F.List();
-		List<IExpr> varList;
+		final List<IExpr> varList;
 		if (ast.isAST1()) {
 			// extract all variables from the polynomial expression
 			eVar = new VariablesSet(ast.arg1());

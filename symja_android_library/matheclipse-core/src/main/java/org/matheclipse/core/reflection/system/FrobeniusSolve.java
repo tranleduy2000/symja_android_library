@@ -49,7 +49,7 @@ public class FrobeniusSolve extends AbstractEvaluator {
 		if (ast.arg1().isList()) {
 			IAST list = ast.getAST(1);
 			try {
-				IInteger[][] equations = new IInteger[1][list.size()];
+				final IInteger[][] equations = new IInteger[1][list.size()];
 				// format looks like: { { 12, 16, 20, 27, 123 } };
 				ObjIntConsumer<IExpr> action = new ObjIntConsumer<IExpr>() {
 					@Override

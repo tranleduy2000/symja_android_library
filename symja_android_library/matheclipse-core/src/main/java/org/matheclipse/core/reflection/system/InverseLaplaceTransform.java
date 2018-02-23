@@ -49,9 +49,9 @@ public class InverseLaplaceTransform extends AbstractFunctionEvaluator implement
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkSize(ast, 4);
 
-		IExpr a1 = ast.arg1();
-		IExpr s = ast.arg2();
-		IExpr t = ast.arg3();
+		final IExpr a1 = ast.arg1();
+		final IExpr s = ast.arg2();
+		final IExpr t = ast.arg3();
 		if (!s.isList() && !t.isList() && !s.equals(t)) {
 			if (a1.isFree(s)) {
 				return F.Times(a1, F.DiracDelta(t));

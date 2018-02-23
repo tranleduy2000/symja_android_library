@@ -19,7 +19,7 @@ public class Print extends AbstractCoreFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 		final PrintStream s = engine.getOutPrintStream();
 		final PrintStream stream;// = engine.getOutPrintStream();
 		if (s == null) {
@@ -28,7 +28,7 @@ public class Print extends AbstractCoreFunctionEvaluator {
 			stream = s;
 		}
 		final StringBuilder buf = new StringBuilder();
-		OutputFormFactory out = OutputFormFactory.get();
+		final OutputFormFactory out = OutputFormFactory.get();
 		ast.forEach(new Consumer<IExpr>() {
             @Override
             public void accept(IExpr x) {

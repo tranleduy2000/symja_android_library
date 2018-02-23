@@ -171,9 +171,9 @@ public final class Programming {
 	private final static class CompoundExpression extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			if (ast.size() > 1) {
-				IExpr[] result = { F.Null };
+				final IExpr[] result = { F.Null };
 				ast.forEach(new Consumer<IExpr>() {
                     @Override
                     public void accept(IExpr x) {
@@ -284,7 +284,7 @@ public final class Programming {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 3);
 			try {
 				final List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
@@ -611,7 +611,7 @@ public final class Programming {
 			IExpr arg3 = engine.evaluate(ast.arg3());
 			if (arg3.isInteger()) {
 				final int n = Validate.checkIntType(arg3);
-				IExpr arg1 = ast.arg1();
+				final IExpr arg1 = ast.arg1();
 				nestList(ast.arg2(), n, new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
@@ -671,7 +671,7 @@ public final class Programming {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
-			IExpr arg1 = ast.arg1();
+			final IExpr arg1 = ast.arg1();
 			return nestList(ast.arg2(), engine.evaluate(ast.arg3()), new Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {

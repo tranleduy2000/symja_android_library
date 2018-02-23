@@ -153,8 +153,8 @@ public class Roots extends AbstractFunctionEvaluator {
 
 			EigenDecomposition ed = new EigenDecomposition(c);
 
-			double[] realValues = ed.getRealEigenvalues();
-			double[] imagValues = ed.getImagEigenvalues();
+			final double[] realValues = ed.getRealEigenvalues();
+			final double[] imagValues = ed.getImagEigenvalues();
 
 			IASTAppendable roots = F.ListAlloc(N);
 			return roots.appendArgs(0, N,

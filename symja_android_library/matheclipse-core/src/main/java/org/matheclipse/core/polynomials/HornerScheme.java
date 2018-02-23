@@ -37,7 +37,7 @@ public class HornerScheme {
 		map = new TreeMap<ISignedNumber, IASTAppendable>(comp);
 	}
 
-	public IAST generate(boolean numericMode, IAST poly, ISymbol sym) {
+	public IAST generate(boolean numericMode, IAST poly, final ISymbol sym) {
 		if (numericMode) {
 			for (IExpr x : poly) {
 				collectTermN(sym, x);

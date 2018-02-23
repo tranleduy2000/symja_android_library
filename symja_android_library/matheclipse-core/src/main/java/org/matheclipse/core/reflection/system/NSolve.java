@@ -256,7 +256,7 @@ public class NSolve extends AbstractFunctionEvaluator {
 			return symbolSet;
 		}
 
-		private void getTimesEquationType(IExpr expr) {
+		private void getTimesEquationType(final IExpr expr) {
 			if (expr.isSymbol()) {
 				leafCount++;
 				vars.forEach(new ObjIntConsumer<IExpr>() {
@@ -502,8 +502,8 @@ public class NSolve extends AbstractFunctionEvaluator {
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkSize(ast, 3);
-		IAST vars = Validate.checkSymbolOrSymbolList(ast, 2);
-		IAST termsEqualZeroList = Validate.checkEquations(ast, 1);
+		final IAST vars = Validate.checkSymbolOrSymbolList(ast, 2);
+		final IAST termsEqualZeroList = Validate.checkEquations(ast, 1);
 
 		ExprAnalyzer exprAnalyzer;
 		ArrayList<ExprAnalyzer> analyzerList = new ArrayList<ExprAnalyzer>();
@@ -523,8 +523,8 @@ public class NSolve extends AbstractFunctionEvaluator {
 				// solve a linear equation <code>matrix.x == vector</code>
 				IExpr temp = engine.evaluate(F.LinearSolve(matrix, vector));
 				if (temp.isASTSizeGE(F.List, 2)) {
-					IAST rootsList = (IAST) temp;
-					int size = vars.size();
+					final IAST rootsList = (IAST) temp;
+					final int size = vars.size();
 					IASTAppendable list = F.ListAlloc(size);
 					list.appendArgs(size, new IntFunction<IExpr>() {
 						@Override

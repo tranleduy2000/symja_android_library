@@ -46,9 +46,9 @@ public class Package extends AbstractCoreFunctionEvaluator {
 		return F.Null;
 	}
 
-	public static void evalPackage(IAST publicSymbols, IAST list, EvalEngine engine) {
-		HashMap<String, ISymbol> convertedSymbolMap = new HashMap<String, ISymbol>();
-		HashSet<ISymbol> publicSymbolSet = new HashSet<ISymbol>();
+	public static void evalPackage(final IAST publicSymbols, final IAST list, EvalEngine engine) {
+		final HashMap<String, ISymbol> convertedSymbolMap = new HashMap<String, ISymbol>();
+		final HashSet<ISymbol> publicSymbolSet = new HashSet<ISymbol>();
 
 		ISymbol toSymbol;
 		for (int i = 1; i < publicSymbols.size(); i++) {

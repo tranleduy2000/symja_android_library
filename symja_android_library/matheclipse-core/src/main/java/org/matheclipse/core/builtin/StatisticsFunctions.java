@@ -601,8 +601,8 @@ public class StatisticsFunctions {
 				return F.Times(F.C1D2, F.Subtract(arg1.arg1(), arg1.arg2()),
 						F.Subtract(F.Conjugate(arg2.arg1()), F.Conjugate(arg2.arg2())));
 			}
-			IAST num1 = arg1.apply(F.Plus);
-			IExpr factor = F.integer(-1 * (arg1.size() - 2));
+			final IAST num1 = arg1.apply(F.Plus);
+			final IExpr factor = F.integer(-1 * (arg1.size() - 2));
 			IASTAppendable v1 = F.PlusAlloc(arg1.size());
 			v1.appendArgs(arg1.size(),
                     new IntFunction<IExpr>() {
@@ -1321,7 +1321,7 @@ public class StatisticsFunctions {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isAST()) {
-				IAST arg1 = (IAST) ast.arg1();
+				final IAST arg1 = (IAST) ast.arg1();
 				int[] matrixDimensions = arg1.isMatrix();
 				if (matrixDimensions != null) {
 					if (arg1.isRealMatrix()) {

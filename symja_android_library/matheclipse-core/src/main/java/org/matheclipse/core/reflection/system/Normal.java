@@ -29,15 +29,15 @@ public class Normal extends AbstractFunctionEvaluator {
 			if (seriesData.isAST(F.SeriesData) && (seriesData.size() == 7)) {
 				if (seriesData.arg3().isList()) {
 					try {
-						IExpr x = seriesData.arg1();
-						IExpr x0 = seriesData.arg2();
-						IAST list = (IAST) seriesData.arg3();
-						long nmin = ((IInteger) seriesData.arg4()).toLong();
-						long nmax = ((IInteger) seriesData.arg5()).toLong();
-						long den = ((IInteger) seriesData.get(6)).toLong();
+						final IExpr x = seriesData.arg1();
+						final IExpr x0 = seriesData.arg2();
+						final IAST list = (IAST) seriesData.arg3();
+						final long nmin = ((IInteger) seriesData.arg4()).toLong();
+						final long nmax = ((IInteger) seriesData.arg5()).toLong();
+						final long den = ((IInteger) seriesData.get(6)).toLong();
 						int size = list.size();
 
-						IASTAppendable result = F.PlusAlloc(size);
+						final IASTAppendable result = F.PlusAlloc(size);
 						list.forEach(new ObjIntConsumer<IExpr>() {
                             @Override
                             public void accept(IExpr expr, int i) {

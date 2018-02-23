@@ -42,9 +42,9 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkSize(ast, 4);
 
-		IExpr a1 = ast.arg1();
-		IExpr t = ast.arg2();
-		IExpr s = ast.arg3();
+		final IExpr a1 = ast.arg1();
+		final IExpr t = ast.arg2();
+		final IExpr s = ast.arg3();
 		if (!t.isList() && !s.isList() && !t.equals(s)) {
 			if (a1.isFree(t)) {// && a1.isAtom()) {
 				return F.Divide(a1, s);

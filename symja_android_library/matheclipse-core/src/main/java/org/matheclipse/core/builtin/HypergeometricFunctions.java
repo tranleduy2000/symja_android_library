@@ -110,8 +110,8 @@ public class HypergeometricFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
-			IExpr n = ast.arg1();
-			IExpr z = ast.arg2();
+			final IExpr n = ast.arg1();
+			final IExpr z = ast.arg2();
 
 			int nInt = n.toIntDefault(Integer.MIN_VALUE);
 			if (nInt > Integer.MIN_VALUE) {

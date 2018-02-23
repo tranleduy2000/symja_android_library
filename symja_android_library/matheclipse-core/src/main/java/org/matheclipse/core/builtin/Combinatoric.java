@@ -1359,7 +1359,7 @@ public final class Combinatoric {
 			 */
 			@Override
 			public IAST next() {
-				int j[] = fIterable.next();
+				final int j[] = fIterable.next();
 				if (j == null) {
 					return null;
 				}

@@ -86,9 +86,9 @@ public class TensorFunctions {
 			return F.NIL;
 		}
 
-		public static IExpr listCorrelate(IAST kernel, int kernelSize, IAST tensor, int tensorSize) {
-			ISymbol fFunction = F.Plus;
-			ISymbol gFunction = F.Times;
+		public static IExpr listCorrelate(final IAST kernel, int kernelSize, final IAST tensor, int tensorSize) {
+			final ISymbol fFunction = F.Plus;
+			final ISymbol gFunction = F.Times;
 			int diff = tensorSize - kernelSize;
 			IASTAppendable resultList = F.ListAlloc(tensorSize - 1);
 			final int[] fi = new int[1];

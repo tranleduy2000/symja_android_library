@@ -107,8 +107,8 @@ public final class BooleanFunctions {
 		 * @param engine
 		 * @return
 		 */
-		public IExpr allTrue(IAST list, IExpr head, EvalEngine engine) {
-			IASTAppendable logicalAnd = F.And();
+		public IExpr allTrue(IAST list, final IExpr head, final EvalEngine engine) {
+			final IASTAppendable logicalAnd = F.And();
 
 			if (!list.forAll(new Predicate<IExpr>() {
                 @Override
@@ -264,8 +264,8 @@ public final class BooleanFunctions {
 		 * @param engine
 		 * @return
 		 */
-		public IExpr anyTrue(IAST list, IExpr head, EvalEngine engine) {
-			IASTAppendable logicalOr = F.Or();
+		public IExpr anyTrue(IAST list, final IExpr head, final EvalEngine engine) {
+			final IASTAppendable logicalOr = F.Or();
 			if (list.exists(new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
@@ -1693,8 +1693,8 @@ public final class BooleanFunctions {
 		 * @param engine
 		 * @return
 		 */
-		public IExpr noneTrue(IAST list, IExpr head, EvalEngine engine) {
-			IASTAppendable logicalNor = F.ast(F.Nor);
+		public IExpr noneTrue(final IAST list, final IExpr head, final EvalEngine engine) {
+			final IASTAppendable logicalNor = F.ast(F.Nor);
 			if (list.exists(new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
@@ -2147,7 +2147,7 @@ public final class BooleanFunctions {
 					}
 				}
 
-				IASTMutable result = ast.copy();
+				final IASTMutable result = ast.copy();
 				result.setArgs(result.size(), new IntFunction<IExpr>() {
 					@Override
 					public IExpr apply(int i) {

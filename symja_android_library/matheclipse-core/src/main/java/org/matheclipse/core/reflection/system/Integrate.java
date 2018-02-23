@@ -67,7 +67,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST holdallAST, EvalEngine engine) {
+	public IExpr evaluate(final IAST holdallAST, final EvalEngine engine) {
 		boolean calledRubi = false;
 		boolean evaled = false;
 		IExpr result;

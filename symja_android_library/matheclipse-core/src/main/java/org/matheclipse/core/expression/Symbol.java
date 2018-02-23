@@ -1,6 +1,16 @@
 package org.matheclipse.core.expression;
 
-import com.duy.lambda.Function;
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
@@ -11,6 +21,7 @@ import org.matheclipse.core.eval.exception.RuleCreationError;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.generic.UnaryVariable2Slot;
+import org.matheclipse.core.interfaces.ExprUtil;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -29,17 +40,7 @@ import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.duy.lambda.Function;
 
 public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 	protected transient Context fContext;
@@ -349,7 +350,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 	@Override
 	public IExpr evaluate(EvalEngine engine) {
 		if (hasLocalVariableStack()) {
-			return IExpr.ofNullable(get());
+			return ExprUtil.ofNullable(get());
 		}
 		IExpr result;
 		if ((result = evalDownRule(engine, this)).isPresent()) {
