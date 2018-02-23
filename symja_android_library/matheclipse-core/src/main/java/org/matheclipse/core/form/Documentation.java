@@ -18,7 +18,7 @@ public class Documentation {
 				for (int i = 1; i < list.size(); i++) {
 
 					out.append(list.get(i).toString());
-					if (i != list.size() - 1) {
+					if (i != list.argSize()) {
 						out.append(", ");
 					}
 				}
@@ -39,7 +39,7 @@ public class Documentation {
 	 * 
 	 * @param symbolName
 	 */
-	public static void printDocumentation(Appendable out, String symbolName) {
+	public static boolean printDocumentation(Appendable out, String symbolName) {
 		// read markdown file
 		String fileName = symbolName + ".md";
 
@@ -69,10 +69,12 @@ public class Documentation {
 				}
 				f.close();
 				is.close();
+				return true;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 }

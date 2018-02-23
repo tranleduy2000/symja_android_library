@@ -2719,11 +2719,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testGet() {
-		if (Config.TEST_FILESYSTEM) {
+		if (Config.FILESYSTEM_ENABLED) {
 			String pathToVectorAnalysis;
 			pathToVectorAnalysis = getClass().getResource("/VectorAnalysis.m").toString();
 			// remove 'file:/'
-			pathToVectorAnalysis = pathToVectorAnalysis.substring(6);
+			pathToVectorAnalysis = pathToVectorAnalysis.substring(6); 
 			System.out.println(pathToVectorAnalysis);
 			check("Get(\"" + pathToVectorAnalysis + "\")", "");
 			check("DotProduct({a,b,c},{d,e,f}, Spherical)",
@@ -5650,7 +5650,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPutGet() {
-		if (Config.TEST_FILESYSTEM) {
+		if (Config.FILESYSTEM_ENABLED) {
 			check("Put(x + y, \"c:/temp/example_file1.m\"); Get(\"c:/temp/example_file1.m\")", "x+y");
 			check("Put(x + y, 2x^2 + 4z!, Cos(x) + I Sin(x), \"c:/temp/example_file2.m\");"
 					+ "Get(\"c:/temp/example_file2.m\")", "I*Sin(x)+Cos(x)");
