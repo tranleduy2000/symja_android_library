@@ -1011,6 +1011,8 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "lucasl" : "LucasL");
 	public final static IBuiltInSymbol LUDecomposition = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "ludecomposition" : "LUDecomposition");
+	public final static IBuiltInSymbol MangoldtLambda = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "mangoldtlambda" : "MangoldtLambda");
 	public final static IBuiltInSymbol ManhattanDistance = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "manhattandistance" : "ManhattanDistance");
 	public final static IBuiltInSymbol Map = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "map" : "Map");
@@ -1349,6 +1351,7 @@ public class F {
 	public final static IBuiltInSymbol Unequal = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "unequal" : "Unequal");
 	public final static IBuiltInSymbol Union = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "union" : "Union");
+	public final static IBuiltInSymbol Unitize = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "unitize" : "Unitize");
 	public final static IBuiltInSymbol UnitStep = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "unitstep" : "UnitStep");
 	public final static IBuiltInSymbol UnitVector = initFinalSymbol(

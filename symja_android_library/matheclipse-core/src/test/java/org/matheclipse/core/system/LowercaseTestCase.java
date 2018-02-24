@@ -3797,6 +3797,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("MachineNumberQ(1.5 + 5 *I)", "True");
 	}
 
+	public void testMangoldtLambda() {
+		check("MangoldtLambda(3^5)", "Log(3)");
+		check("MangoldtLambda({1,2,6})", "{0,Log(2),0}");
+		check("{MangoldtLambda(Prime(10^5)^10), MangoldtLambda(2*Prime(10^5)^10)}", "{Log(1299709),0}");
+	}
+
 	public void testManhattanDistance() {
 		check("ManhattanDistance({-1, -1}, {1, 1})", "4");
 	}
@@ -8057,11 +8063,31 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Unique(\"x\")", "x3");
 	}
 
+	public void testUnitize() {
+		check("Unitize({0, -1})", "{0,1}");
+		check("Unitize((E + Pi)^2 - E^2 - Pi^2 - 2*E*Pi)", "0");
+		check("Unitize(2^(2*I) - 2^(-2*I) - 2*I*Sin(Log(4)))", "0");
+		check("Unitize(Sqrt(2) + Sqrt(3) - Sqrt(5 + 2*Sqrt(6)))", "0");
+		check("Unitize(0)", "0");
+		check("Unitize(0.0)", "0");
+		check("Unitize(x)", "Unitize(x)");
+		check("Unitize(3/4)", "1");
+		check("Unitize(3*I)", "1");
+		check("Unitize(Pi)", "1");
+	}
+
 	public void testUnitStep() {
+		check("UnitStep(-Infinity)", "0");
+		check("UnitStep(Infinity)", "1");
+
+		check("UnitStep(0)", "1");
+		check("UnitStep(1)", "1");
+		check("UnitStep(-1)", "0");
+
 		check("UnitStep(Interval({0,42}))", "Interval({1,1})");
 		check("UnitStep(Interval({-3,-1}))", "Interval({0,0})");
 		check("UnitStep(Interval({-1,2}))", "Interval({0,1})");
-		check("UnitStep(0)", "1");
+
 		check("UnitStep(42)", "1");
 		check("UnitStep(-1)", "0");
 		check("UnitStep(-42)", "0");

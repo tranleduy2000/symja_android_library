@@ -1,7 +1,30 @@
 package org.matheclipse.core.builtin;
 
-import com.google.common.math.BigIntegerMath;
-import com.google.common.math.LongMath;
+import static java.lang.Math.addExact;
+import static java.lang.Math.floorMod;
+import static java.lang.Math.multiplyExact;
+import static java.lang.Math.subtractExact;
+import static org.matheclipse.core.expression.F.Binomial;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Subtract;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.integer;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.CombinatoricsUtils;
@@ -35,14 +58,8 @@ import org.matheclipse.core.numbertheory.GaussianInteger;
 import org.matheclipse.core.numbertheory.Primality;
 import org.matheclipse.parser.client.math.MathException;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import com.google.common.math.BigIntegerMath;
+import com.google.common.math.LongMath;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
 
@@ -52,23 +69,6 @@ import edu.jas.arith.ModIntegerRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.ufd.FactorAbstract;
 import edu.jas.ufd.FactorFactory;
-
-import static com.duy.lang.DMath.addExact;
-import static com.duy.lang.DMath.floorMod;
-import static com.duy.lang.DMath.multiplyExact;
-import static com.duy.lang.DMath.subtractExact;
-import static org.matheclipse.core.expression.F.Binomial;
-import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.Factorial;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Subtract;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.integer;
 
 public final class NumberTheory {
 
@@ -371,6 +371,7 @@ public final class NumberTheory {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 		}
 	}
+
 	/**
 	 * <pre>
 	 * CarmichaelLambda(n)
@@ -704,7 +705,7 @@ public final class NumberTheory {
 			for (int i = 1; i < size - 1; i++) {
 				expr = ast.get(i);
 				for (int j = i + 1; j < size; j++) {
-					if (!engine.evaluate(F.GCD(expr, ast.get(j))).isOne()) {
+					if (!F.GCD.of(engine, expr, ast.get(j)).isOne()) {
 						return F.False;
 					}
 				}
@@ -1344,10 +1345,7 @@ public final class NumberTheory {
 					public IExpr apply(int i) {
 						return F.integer(subBezouts[i]);
 					}
-				});
-				// for (int i = 0; i < subBezouts.length; i++) {
-				// subList.append(F.integer(subBezouts[i]));
-				// }
+				}); 
 				// create the output list
 				return F.List(F.integer(gcd), subList);
 			} catch (ArithmeticException ae) {
@@ -1504,6 +1502,12 @@ public final class NumberTheory {
 			if (arg1.isInteger()) {
 				return factorial((IInteger) arg1);
 			}
+			if (arg1.isInfinity()) {
+				return F.CInfinity;
+			}
+			if (arg1.isNegativeInfinity()) {
+				return F.Indeterminate;
+			}
 			return F.NIL;
 		}
 
@@ -1593,6 +1597,12 @@ public final class NumberTheory {
 						return F.fraction(-1L, 15L);
 					}
 				}
+			}
+			if (arg1.isInfinity()) {
+				return F.CInfinity;
+			}
+			if (arg1.isNegativeInfinity()) {
+				return F.Indeterminate;
 			}
 			return F.NIL;
 		}
@@ -1789,11 +1799,35 @@ public final class NumberTheory {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * KroneckerDelta(arg1, arg2, ... argN)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * if all arguments <code>arg1</code> to <code>argN</code> are equal return <code>1</code>, otherwise return
+	 * <code>0</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; KroneckerDelta(42)
+	 * 0
+	 * 
+	 * &gt;&gt; KroneckerDelta(42, 42.0, 42)
+	 * 1
+	 * </pre>
+	 */
 	private static class KroneckerDelta extends AbstractEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			int size = ast.size();
+			if (size == 1) {
+				return F.C1;
+			}
 			if (size > 1) {
 				IExpr arg1 = ast.arg1();
 				IExpr temp = arg1.evalNumber();
@@ -1848,13 +1882,13 @@ public final class NumberTheory {
 				return F.C1;
 			}
 			if (arg1.isInteger() && arg1.isPositive()) {
-				IExpr expr = engine.evaluate(F.FactorInteger(arg1));
+				IExpr expr = F.FactorInteger.of(engine, arg1);
 				if (expr.isList()) {
 					IAST list = (IAST) expr;
 					int result = 1;
 					IInteger temp;
 					for (int i = 1; i < list.size(); i++) {
-						temp = (IInteger) list.get(i).getAt(2);
+						temp = (IInteger) list.get(i).second();
 						if (temp.isOdd()) {
 							if (result == -1) {
 								result = 1;
@@ -1907,6 +1941,62 @@ public final class NumberTheory {
 		}
 	}
 
+	private static class MangoldtLambda extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 2);
+
+			IExpr arg1 = ast.arg1();
+			if (arg1.isInteger()) {
+				if (arg1.isZero() || arg1.isOne() || arg1.isNegative()) {
+					return F.C0;
+				}
+				IExpr expr = F.FactorInteger.of(engine, arg1);
+				if (expr.isList()) {
+					IAST list = (IAST) expr;
+					if (list.size() == 2) {
+						int result = 1;
+						IInteger temp=(IInteger) list.get(1).first(); 
+						return F.Log(temp);
+					}
+					return F.C0;
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE);
+		}
+	}
+
+	/**
+	 * <pre>
+	 * MersennePrimeExponent(n)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns the <code>n</code>th mersenne prime exponent. <code>2^n - 1</code> must be a prime number. Currently
+	 * <code>0 &lt;= n &lt;= 45</code> can be computed, otherwise the function returns unevaluated.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:<br />
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Mersenne_prime">Wikipedia - Mersenne prime</a></li>
+	 * <li><a href="https://en.wikipedia.org/wiki/List_of_perfect_numbers">Wikipedia - List of perfect numbers</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Table(MersennePrimeExponent(i), {i,20})
+	 * {2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423}
+	 * </pre>
+	 */
 	private static class MersennePrimeExponent extends AbstractTrigArg1 {
 
 		@Override
@@ -1930,6 +2020,31 @@ public final class NumberTheory {
 
 	}
 
+	/**
+	 * <pre>
+	 * MersennePrimeExponentQ(n)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>2^n - 1</code> is a prime number. Currently <code>0 &lt;= n &lt;= 45</code>
+	 * can be computed in reasonable time.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:<br />
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Mersenne_prime">Wikipedia - Mersenne prime</a></li>
+	 * <li><a href="https://en.wikipedia.org/wiki/List_of_perfect_numbers">Wikipedia - List of perfect numbers</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Select(Range(10000), MersennePrimeExponentQ)
+	 * {2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423,9689,9941}
+	 * </pre>
+	 */
 	private static class MersennePrimeExponentQ extends AbstractFunctionEvaluator {
 
 		@Override
@@ -2047,7 +2162,7 @@ public final class NumberTheory {
 	 */
 	private static class Multinomial extends AbstractFunctionEvaluator {
 		public static IInteger multinomial(final IAST ast) {
-			IInteger[] k = new IInteger[ast.size() - 1];
+			IInteger[] k = new IInteger[ast.argSize()];
 			IInteger n = F.C0;
 			for (int i = 1; i < ast.size(); i++) {
 				k[i - 1] = (IInteger) ast.get(i);
@@ -2079,11 +2194,6 @@ public final class NumberTheory {
 			}, 1)) {
 				return F.NIL;
 			}
-			// for (int i = 1; i < ast.size(); i++) {
-			// if (!(ast.get(i).isInteger()) || ((IInteger) ast.get(i)).isNegative()) {
-			// return F.NIL;
-			// }
-			// }
 
 			return multinomial(ast);
 
@@ -2525,7 +2635,7 @@ public final class NumberTheory {
 			IAST list = n.divisors();
 			if (list.isList()) {
 				IInteger sum = F.C0;
-				int size = list.size() - 1;
+				int size = list.argSize();
 				for (int i = 1; i < size; i++) {
 					sum = sum.add((IInteger) list.get(i));
 				}
@@ -2560,14 +2670,7 @@ public final class NumberTheory {
 	 * </pre>
 	 */
 	private static class Prime extends AbstractFunctionEvaluator {
-		/**
-		 * <code>Prime(i)</code> gives the i-th prime number for <code>i</code> less equal 103000000.
-		 * 
-		 * See: <a href="https://bitbucket.org/dafis/javaprimes">https://bitbucket.org/ dafis/ javaprimes</a><br />
-		 * <a href=
-		 * "http://stackoverflow.com/questions/9625663/calculating-and-printing-the-nth-prime-number/9704912#9704912">
-		 * stackoverflow. com - Calculating and printing the nth prime number</a>
-		 */
+
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
@@ -2792,10 +2895,6 @@ public final class NumberTheory {
 								return roots[i];
 							}
 						});
-						// for (int i = 0; i < size; i++) {
-						// list.append(roots[i]);
-						// }
-						// return list;
 					}
 				} catch (ArithmeticException e) {
 					// integer to large?
@@ -2855,8 +2954,6 @@ public final class NumberTheory {
 			}
 			try {
 				IExpr expr = F.evalExpandAll(ast.arg1(), engine);
-				// ASTRange r = new ASTRange(eVar.getVarList(), 1);
-				// List<IExpr> varList = r;
 				List<IExpr> varList = eVar.getVarList().copyTo();
 
 				if (ast.isAST2()) {
@@ -3206,9 +3303,6 @@ public final class NumberTheory {
 			return result;
 		}
 
-		public Subfactorial() {
-		}
-
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1) {
 			if (arg1.isInteger() && arg1.isPositive()) {
@@ -3225,6 +3319,53 @@ public final class NumberTheory {
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
+		}
+	}
+
+	/**
+	 * <pre>
+	 * Unitize(expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * maps a non-zero <code>expr</code> to <code>1</code>, and a zero <code>expr</code> to <code>0</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Unitize((E + Pi)^2 - E^2 - Pi^2 - 2*E*Pi)
+	 * 0
+	 * </pre>
+	 */
+	private static class Unitize extends AbstractEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			int size = ast.size();
+			if (size == 2) {
+				IExpr arg1 = ast.arg1();
+				if (arg1.isNumber()) {
+					return arg1.isZero() ? F.C0 : F.C1;
+				}
+				if (F.PossibleZeroQ.ofQ(engine, arg1)) {
+					return F.C0;
+				}
+				IExpr temp = arg1.evalNumber();
+				if (temp == null) {
+					temp = arg1;
+				}
+				if (temp.isNumber()) {
+					return temp.isZero() ? F.C0 : F.C1;
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 		}
 	}
 
@@ -3254,6 +3395,7 @@ public final class NumberTheory {
 		F.KroneckerDelta.setEvaluator(new KroneckerDelta());
 		F.LiouvilleLambda.setEvaluator(new LiouvilleLambda());
 		F.LucasL.setEvaluator(new LucasL());
+		F.MangoldtLambda.setEvaluator(new MangoldtLambda());
 		F.MersennePrimeExponent.setEvaluator(new MersennePrimeExponent());
 		F.MersennePrimeExponentQ.setEvaluator(new MersennePrimeExponentQ());
 		F.MoebiusMu.setEvaluator(new MoebiusMu());
@@ -3273,6 +3415,7 @@ public final class NumberTheory {
 		F.StirlingS1.setEvaluator(new StirlingS1());
 		F.StirlingS2.setEvaluator(new StirlingS2());
 		F.Subfactorial.setEvaluator(new Subfactorial());
+		F.Unitize.setEvaluator(new Unitize());
 	}
 
 	private final static NumberTheory CONST = new NumberTheory();
