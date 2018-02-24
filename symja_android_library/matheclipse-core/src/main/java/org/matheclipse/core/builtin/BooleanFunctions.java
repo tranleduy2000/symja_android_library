@@ -1,9 +1,8 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.List;
-
-import java.util.List;
-import java.util.Map;
+import com.duy.lambda.BiPredicate;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
 
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Tristate;
@@ -41,10 +40,10 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ITernaryComparator;
 
-import com.duy.lambda.BiPredicate;
-import com.duy.lambda.Function;
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.Predicate; 
+import java.util.List;
+import java.util.Map;
+
+import static org.matheclipse.core.expression.F.List;
 
 public final class BooleanFunctions {
 	public final static Equal CONST_EQUAL = new Equal();
@@ -2197,7 +2196,7 @@ public final class BooleanFunctions {
 		 * @param booleanExpression
 		 * @param variables
 		 *            a list of variables
-		 * @param maxChoices
+		 * param maxChoices
 		 *            maximum number of choices, which satisfy the given boolean expression
 		 * @return
 		 */

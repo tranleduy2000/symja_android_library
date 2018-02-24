@@ -93,71 +93,38 @@ To get an idea of the kinds of expressions Symja handles, see the [tests in this
 ```
 
 
-### Maven Usage
+### Gradle Usage
 
-Using Maven, add the following to your `pom.xml`
+1. Download latest version from https://github.com/tranleduy2000/symja_android_library/releases
+2. Compile project using Android Studio
+- Select ``File`` -> ``New`` -> ``Module``
+- Select ``Import jar/aar package``
+- Enter path of ``*.aar`` has been downloaded and click ``Finish``
 
-```xml
-<dependencies>
-  <dependency>
-    <groupId>org.matheclipse</groupId>
-      <artifactId>matheclipse-core</artifactId>
-	  <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-</dependencies>
+3. In your submodule ``gradle`` file, add
 
-<repositories> 
-  <repository>
-    <id>snapshots-repo</id>
-    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    <releases>
-      <enabled>false</enabled>
-    </releases>
-    <snapshots>
-      <enabled>true</enabled>
-    </snapshots>
-  </repository>
-  <repository>
-    <id>jas-repository</id>
-    <url>http://krum.rz.uni-mannheim.de/maven-repository</url>
-  </repository>
-  <repository>
-    <id>Lab4Inf</id>
-    <url>http://www.lab4inf.fh-muenster.de/lab4inf/maven-repository</url>
-  </repository>
-</repositories>
+```gradle
+...
+dependencies {
+    ...
+    compile project(':symja_android_library-release')
+}
 ```
 
-and run
-
-```
-mvn clean install
-```
-
-With the following command you can run the Symja console from the command line
-
-```
-mvn exec:java -pl matheclipse-core
-```
- 
-With the following command you can run a symja console with a Mathematica-compatible syntax and functions
-
-```
-mvn exec:java@mma -pl matheclipse-core 
+```gradle
+defaultConfig {
+    ...
+    multiDexEnabled true
+    ...
+}
 ```
 
-With the following command you can build a fat jar which contains all needed classes
+5. To build android app, open ``gradle.properties`` and add this line. This project required ``8GB RAM`` to build
+```
+org.gradle.jvmargs=-Xmx8192M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+```
 
-```
-mvn assembly:single -pl matheclipse-core
-```
-
-The *Excelsior JET Maven Plugin* provides Maven users with an easy way to compile their applications
-down to optimized native Windows, OS X, or Linux executables with [Excelsior JET](http://excelsiorjet.com).
-
-```
-mvn jet:build -pl matheclipse-core
-```
+5. Sync project
 
 ### Getting started
 
@@ -187,19 +154,14 @@ a) Fork the Symja repository to use as a starting point.
 * Once your fork is ready, open the new repository's "Settings" by clicking the link in the menu bar on the left.
 * Change the repository name to the name of your Library and save your changes.
   
-b) Clone your new repository to your Eclipse workspace.
+b) Clone your new repository to your ``Google Android Studio`` or ``JetBrains IntelliJ Ideas`` workspace.
 
-* Open Eclipse and select the "File -> Import..." menu item.
-* Select "Git -> Projects from Git", and click "Next >".
-* Select "URI" and click "Next >". 
-* Enter your repository's clone URL in the "URI" field. The remaining fields in the "Location" and "Connection" groups will get automatically filled in.
-* Enter your Github credentials in the "Authentication" group, and click "Next >".
-* Select the `master` branch on the next screen, and click "Next >".
-* The default settings on the "Local Configuration" screen should work fine, click "Next >".
-* Make sure "Import existing projects" is selected, and click "Next >".
-* Eclipse should find and select the `symja_android_library` automatically, click "Finish".
+* Download at https://www.jetbrains.com/idea/ or https://developer.android.com/studio/index.html
+* Select ``File`` -> ``New`` -> ``Project from version control`` -> ``GitHub``
+* Enter your git repo -> click ``Clone``
+* Wait for sync project
 
-See this [Git version control with Eclipse (EGit) - Tutorial](http://www.vogella.com/tutorials/EclipseGit/article.html) for a general overview.
+For more information, see https://developer.android.com/studio/intro/migrate.html
 
 ### Contact
 
