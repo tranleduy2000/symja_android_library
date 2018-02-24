@@ -101,9 +101,6 @@ public class TensorFunctions {
                         return F.binaryAST2(gFunction, kernel.get(k), tensor.get(k + fi[0]));
                     }
                 });
-				// for (int k = 1; k < kernelSize; k++) {
-				// plus.append(F.binaryAST2(gFunction, kernel.get(k), tensor.get(k + i)));
-				// }
 				resultList.append(plus);
 			}
 			return resultList;
@@ -172,18 +169,13 @@ public class TensorFunctions {
 				if (ast.size() >= 3) {
 					IExpr arg2 = ast.arg2();
 					if (arg2.equals(F.All)) {
-						n = indexes.length;
 					} else if (arg2.isSignedNumber()) {
 						ISignedNumber sn = (ISignedNumber) arg2;
-						try {
-							n = sn.toInt();
-							// if (n < 0) {
-							// return F.NIL;
-							// }
-						} catch (ArithmeticException ae) {
-							return F.NIL;
-						}
+						n = sn.toIntDefault(Integer.MIN_VALUE);
 					}
+				}
+				if (n == Integer.MIN_VALUE) {
+					return F.NIL;
 				}
 				return F.List(n, indexes);
 			}
@@ -251,7 +243,7 @@ public class TensorFunctions {
 			Validate.checkSize(ast, 2);
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
-				List<Integer> intList = LinearAlgebra.getDimensions((IAST) ast.arg1(), list.head(), Integer.MAX_VALUE);
+				List<Integer> intList = LinearAlgebra.dimensions((IAST) ast.arg1(), list.head(), Integer.MAX_VALUE);
 				return F.ZZ(intList.size());
 			}
 			return F.NIL;

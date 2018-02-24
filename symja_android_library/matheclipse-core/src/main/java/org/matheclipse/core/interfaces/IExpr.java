@@ -2104,6 +2104,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 	 */
 	public IASTAppendable rest();
 	
+	/**
+	 * Get the second element of this <code>AST</code> list (i.e. get(2)). Return <code>F.NIL</code> if this object
+	 * isn't an <code>AST</code>.
+	 * 
+	 * @return the second argument of the function represented by this <code>AST</code> or <code>F.NIL</code> if this
+	 *         object isn't an AST.
+	 */
+	public IExpr second();
+	
     /**
      * Signum functionality is used in JAS toString() method, don't use it as math signum function.
      *

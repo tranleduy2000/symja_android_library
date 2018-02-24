@@ -733,6 +733,12 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		}
 		return false;
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public boolean exists(Predicate<? super IExpr> predicate) {
+		return exists(predicate, 1); 
+	}
 
 	/**
 	 * Apply the functor to the elements of the range from left to right and return the final result. Results do

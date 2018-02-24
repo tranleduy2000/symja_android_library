@@ -20,9 +20,16 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
 		return size() - 1;
 	}
 	
+	/** {@inheritDoc} */
 	@Override
 	public IExpr first() {
 		return arg1();
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public IExpr second() {
+		return arg2();
 	}
 	
 	@Override

@@ -412,8 +412,7 @@ public class F {
 	public final static IBuiltInSymbol Definition = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "definition" : "Definition");
 	public final static IBuiltInSymbol Delete = initFinalSymbol(
-			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "delete" : "Delete",
-			new org.matheclipse.core.builtin.function.Delete());
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "delete" : "Delete");
 	public final static IBuiltInSymbol DeleteCases = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "deletecases" : "DeleteCases");
 	public final static IBuiltInSymbol Depth = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "depth" : "Depth");
@@ -472,8 +471,7 @@ public class F {
 	public final static IBuiltInSymbol Information = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "information" : "Information");
 	public final static IBuiltInSymbol Insert = initFinalSymbol(
-			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "insert" : "Insert",
-			new org.matheclipse.core.builtin.function.Insert());
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "insert" : "Insert");
 	public final static IBuiltInSymbol IntegerQ = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "integerq" : "IntegerQ");
 	public final static IBuiltInSymbol JavaForm = initFinalSymbol(

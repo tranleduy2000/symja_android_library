@@ -2661,11 +2661,18 @@ public abstract class IExprImpl implements IExpr {
         return accept(new VisitorReplaceSlots(slotsList));
     }
 
+    /** {@inheritDoc} */
     @Override
     public IASTAppendable rest() {
 		return F.NIL;
 	}
     
+    /** {@inheritDoc} */
+	@Override
+	public IExpr second() {
+		return F.NIL;
+	}
+	
     /**
      * Signum functionality is used in JAS toString() method, don't use it as math signum function.
      *

@@ -996,6 +996,19 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Composition(f, g, h) @@ {x, y, z}", "f(g(h(x,y,z)))");
 	}
 
+
+	public void testComposeList() {
+		check("ComposeList({f,g,h}, x)", //
+				"{x,f(x),g(f(x)),h(g(f(x)))}");
+		//check("ComposeList({1 - # &, 1/# &}[[{2, 2, 1, 2, 2, 1}]], x)", //
+		//		"{x,1/x,x,1-x,1/(1-x),1-x,x}");
+		//check("ComposeList({f, g}[[{1, 2, 1, 1, 2}]], x)", //
+		//		"{x,f(x),g(f(x)),f(g(f(x))),f(f(g(f(x)))),g(f(f(g(f(x)))))}");
+		check("ComposeList({a, b, c, d}, x)", //
+				"{x,a(x),b(a(x)),c(b(a(x))),d(c(b(a(x))))}");
+
+	}
+	
 	public void testCompoundExpression() {
 		check("1; 2; 3;", "");
 		check("1; 2; 3", "3");
@@ -1346,7 +1359,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Delete({a, b, c, d}, 3)", "{a,b,d}");
 		check("Delete({a, b, c, d}, -2)", "{a,b,d}");
 	}
-
+	
 	public void testDeleteCases() {
 		check("DeleteCases({a, 1, 2.5, \"string\"}, _Integer|_Real)", "{a,\"string\"}");
 		check("DeleteCases({a, b, 1, c, 2, 3}, _Symbol)", "{1,2,3}");
@@ -4608,6 +4621,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testNullSpace() {
+		check("NullSpace({{-1/3, 0, I}})", "{{I*3,0,1},\n" + " {0,1,0}}");
 		check("NullSpace({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})", "{{1,-2,1}}");
 		check("A = {{1, 1, 0}, {1, 0, 1}, {0, 1, 1}}", "{{1,1,0},{1,0,1},{0,1,1}}");
 		check("NullSpace(A)", "{}");
@@ -4620,13 +4634,17 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("NullSpace({{1,1,0,1,5},{1,0,0,2,2},{0,0,1,4,-1},{0,0,0,0,0}})", "{{-2,1,-4,1,0},\n" + " {-2,-3,1,0,1}}");
 		check("NullSpace({{a,b,c}," + "{c,b,a}})", "{{1,(-a-c)/b,1}}");
 		check("NullSpace({{1,2,3}," + "{5,6,7}," + "{9,10,11}})", "{{1,-2,1}}");
-		check("NullSpace({{1,2,3,4}," + "{5,6,7,8}," + "{9,10,11,12}})", "{{1,-2,1,0},\n" + " {2,-3,0,1}}");
+		check("NullSpace({{1,2,3,4}," //
+				+ "{5,6,7,8}," //
+				+ "{9,10,11,12}})", //
+				"{{2,-3,0,1},\n" //
+						+ " {1,-2,1,0}}");
 		check("(-1/2+I*1/2)*(-I)", "1/2+I*1/2");
 		check("NullSpace({{1+I,1-I}, {-1+I,1+I}})", "{{I,1}}");
 		check("NullSpace({{1,1,1,1,1},{1,0,0,0,0},{0,0,0,0,1},{0,1,1,1,0},{1,0,0,0,1}})",
 				"{{0,-1,1,0,0},\n" + " {0,-1,0,1,0}}");
 	}
-
+	
 	public void testNumberQ() {
 		check("NumberQ(3+I)", "True");
 		check("NumberQ(5!)", "True");

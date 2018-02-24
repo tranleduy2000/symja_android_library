@@ -2,6 +2,7 @@ package org.matheclipse.core.eval;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
+import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
@@ -246,6 +247,12 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 	 */
 	transient boolean fQuietMode = false;
 
+	/**
+	 * If <code>true</code> the engine throws an error if an error message is printed during evaluation.
+	 * 
+	 */
+	transient boolean fThrowError = false;
+	
 	/**
 	 * 
 	 * 
@@ -1610,6 +1617,10 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 		return fStopRequested;
 	}
 
+	public boolean isThrowError() {
+		return fThrowError;
+	}
+	
 	public boolean isTogetherMode() {
 		return fTogetherMode;
 	}
@@ -1687,6 +1698,9 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 				stream = System.out;
 			}
 			stream.println(str);
+		}
+		if (fThrowError) {
+			throw new IllegalArgument(str);
 		}
 	}
 
@@ -1785,6 +1799,16 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 		this.fQuietMode = quietMode;
 	}
 
+	/**
+	 * Throw an <code>IllegalArgument</code> exception if an error message is printed in method
+	 * <code>printMessage()</code>.
+	 * 
+	 * @param throwError
+	 */
+	public void setThrowError(boolean throwError) {
+		this.fThrowError = throwError;
+	}
+	
 	/**
 	 * @param reapList
 	 *            the reapList to set
