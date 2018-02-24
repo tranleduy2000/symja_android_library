@@ -191,6 +191,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     Object asType(Class<?> clazz);
 
+
+    /**
+	 * Get the first element of this <code>Power(base, exponent)</code> expression.
+	 * 
+	 * @return  
+	 */
+    public IExpr base();
+    
     /**
      * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
      * integer as this expression is canonical less than, equal to, or greater than the specified expression.
@@ -296,6 +304,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     IExpr evaluateHead(IAST ast, EvalEngine engine);
 
+    /**
+	 * Get the second element of this <code>Power(base, exponent)</code> expression.
+	 * 
+	 * @return  
+	 */
+    public IExpr exponent();
+    
     @Override
     ElemFactory<IExpr> factory();
 

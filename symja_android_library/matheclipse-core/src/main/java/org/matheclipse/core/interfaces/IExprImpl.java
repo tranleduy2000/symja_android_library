@@ -157,6 +157,11 @@ public abstract class IExprImpl implements IExpr {
         }
         throw new UnsupportedOperationException("ExprImpl.asType() - cast not supported.");
     }
+    
+    @Override
+    public IExpr base() {
+		return F.NIL;
+	}
 
     /**
      * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
@@ -326,6 +331,11 @@ public abstract class IExprImpl implements IExpr {
         return F.NIL;
     }
 
+    @Override
+    public IExpr exponent() {
+		return F.NIL;
+	}
+    
     @Override
     public ElemFactory<IExpr> factory() {
         return ExprRingFactory.CONST;

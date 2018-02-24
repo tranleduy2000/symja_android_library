@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
-import com.duy.lambda.BiFunction;
-import com.duy.lambda.Function;
-import com.duy.lambda.IntFunction;
 
 import javax.annotation.Nonnull;
 
@@ -51,6 +48,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.generic.Functors;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -67,6 +65,9 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.Function;
+import com.duy.lambda.IntFunction;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -5815,7 +5816,7 @@ public class F {
 		return ast(a, Times);
 	}
 
-	public static IAST Times(final IExpr a0, final IExpr a1) {
+	public static IASTMutable Times(final IExpr a0, final IExpr a1) {
 		if (a0 != null && a1 != null) {
 			if (a0.isTimes() || a1.isTimes()) {
 				int size = 0;

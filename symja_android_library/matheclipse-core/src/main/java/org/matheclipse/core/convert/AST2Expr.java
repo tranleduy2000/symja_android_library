@@ -502,6 +502,7 @@ public class AST2Expr {
 		}
 	}
 
+
 	/**
 	 * Convert less or greater relations on input. Example: convert expressions like <code>a<b<=c</code> to
 	 * <code>Less[a,b]&&LessEqual[b,c]</code>.
@@ -510,7 +511,7 @@ public class AST2Expr {
 	 * @param compareHead
 	 * @return
 	 */
-	private IExpr rewriteLessGreaterAST(final IASTMutable ast, ISymbol compareHead) {
+	public static IExpr rewriteLessGreaterAST(final IASTMutable ast, ISymbol compareHead) {
 		IExpr temp;
 		boolean evaled = false;
 		IASTAppendable andAST = F.And();
@@ -519,7 +520,7 @@ public class AST2Expr {
 			if (temp.isASTSizeGE(compareHead, 3)) {
 				IAST lt = (IAST) temp;
 				andAST.append(lt);
-				ast.set(i, lt.get(lt.size() - 1));
+				ast.set(i, lt.last());
 				evaled = true;
 			}
 		}

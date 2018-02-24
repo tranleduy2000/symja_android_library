@@ -17,8 +17,6 @@
 
 package org.matheclipse.parser.client.math;
 
-import com.duy.lang.DDouble;
-
 /**
  * Some useful additions to the built-in functions in {@link Math}.
  * 
@@ -485,7 +483,7 @@ public final class MathUtils {
 	 * @return the hash code
 	 */
 	public static int hash(double value) {
-		return DDouble.hashCode(value);
+		return Double.hashCode(value);
 		// long bits = Double.doubleToLongBits(value);
 		// return (int)(bits ^ (bits >>> 32));
 	}
