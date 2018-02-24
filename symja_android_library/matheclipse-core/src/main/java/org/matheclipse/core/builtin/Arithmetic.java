@@ -114,15 +114,21 @@ public final class Arithmetic {
 		F.Abs.setEvaluator(new Abs());
 		F.AddTo.setEvaluator(new AddTo());
 		F.Arg.setEvaluator(new Arg());
+		F.Chop.setEvaluator(new Chop());
+		F.Clip.setEvaluator(new Clip());
 		F.Complex.setEvaluator(CONST_COMPLEX);
 		F.Conjugate.setEvaluator(new Conjugate());
 		F.Decrement.setEvaluator(new Decrement());
 		F.DirectedInfinity.setEvaluator(new DirectedInfinity());
+		F.Divide.setEvaluator(new Divide());
 		F.DivideBy.setEvaluator(new DivideBy());
 		F.Gamma.setEvaluator(new Gamma());
+		F.GCD.setEvaluator(new GCD());
 		F.HarmonicNumber.setEvaluator(new HarmonicNumber());
 		F.Im.setEvaluator(new Im());
 		F.Increment.setEvaluator(new Increment());
+		F.LCM.setEvaluator(new LCM());
+		F.N.setEvaluator(new N());
 		F.Piecewise.setEvaluator(new Piecewise());
 		F.Pochhammer.setEvaluator(new Pochhammer());
 		F.Precision.setEvaluator(new Precision());
@@ -130,14 +136,34 @@ public final class Arithmetic {
 		F.PreIncrement.setEvaluator(new PreIncrement());
 		F.Rational.setEvaluator(CONST_RATIONAL);
 		F.Re.setEvaluator(new Re());
+		F.Subtract.setEvaluator(new Subtract());
 		F.SubtractFrom.setEvaluator(new SubtractFrom());
 		F.TimesBy.setEvaluator(new TimesBy());
 
 	}
 
 	/**
-	 * Absolute value of a number. See <a href="http://en.wikipedia.org/wiki/Absolute_value">Wikipedia:Absolute
-	 * value</a>
+	 * <pre>
+	 * Abs(expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns the absolute value of the real or complex number <code>expr</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:<br />
+	 * </p>
+	 * <ul>
+	 * <li><a href="http://en.wikipedia.org/wiki/Absolute_value">Wikipedia - Absolute value</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Abs(-3)
+	 * 3
+	 * </pre>
 	 */
 	private final static class Abs extends AbstractTrigArg1 implements INumeric, AbsRules, DoubleUnaryOperator {
 
@@ -241,8 +267,8 @@ public final class Arithmetic {
 					return result[0];
 				}
 			}
-			if (arg1.isPower() && arg1.getAt(2).isSignedNumber()) {
-				return F.Power(F.Abs(arg1.getAt(1)), arg1.getAt(2));
+			if (arg1.isPower() && arg1.exponent().isSignedNumber()) {
+				return F.Power(F.Abs(arg1.base()), arg1.exponent());
 			}
 			return F.NIL;
 		}
@@ -261,8 +287,27 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Operator +=
+	 * <pre>
+	 * AddTo(x, dx)
 	 * 
+	 * x += dx
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * is equivalent to <code>x = x + dx</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a = 10
+	 * &gt;&gt; a += 2   
+	 * 12    
+	 * 
+	 * &gt;&gt; a    
+	 * 12
+	 * </pre>
 	 */
 	private static class AddTo extends AbstractFunctionEvaluator {
 
@@ -293,10 +338,28 @@ public final class Arithmetic {
 	}
 
 	/**
+	 * <pre>
+	 * Arg(expr)
+	 * </pre>
 	 * 
-	 * See <a href="http://en.wikipedia.org/wiki/Argument_%28complex_analysis%29"> Wikipedia - Argument
-	 * (complex_analysis)</a>
+	 * <blockquote>
+	 * <p>
+	 * returns the argument of the complex number <code>expr</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="http://en.wikipedia.org/wiki/Argument_%28complex_analysis%29">Wikipedia - Argument
+	 * (complex_analysis)</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
 	 * 
+	 * <pre>
+	 * &gt;&gt; Arg(1+I)   
+	 * Pi/4
+	 * </pre>
 	 */
 	private static class Arg extends AbstractFunctionEvaluator implements INumeric, DoubleUnaryOperator {
 
@@ -370,6 +433,326 @@ public final class Arithmetic {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Chop(numerical - expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * replaces numerical values in the <code>numerical-expr</code> which are close to zero with symbolic value
+	 * <code>0</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Chop(0.00000000001)
+	 * 0
+	 * </pre>
+	 */
+	private static class Chop extends AbstractCoreFunctionEvaluator {
+		public final static double DEFAULT_CHOP_DELTA = 1.0e-10;
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 2, 3);
+
+			IExpr arg1 = ast.arg1();
+			double delta = DEFAULT_CHOP_DELTA;
+			if (ast.isAST2() && ast.arg2() instanceof INum) {
+				delta = ((INum) ast.arg2()).getRealPart();
+			}
+			try {
+				arg1 = engine.evaluate(arg1);
+				if (arg1.isAST()) {
+					IAST list = (IAST) arg1;
+					// Chop[{a,b,c}] -> {Chop[a],Chop[b],Chop[c]}
+					return list.mapThread(F.Chop(F.Null), 1);
+				}
+				if (arg1.isNumber()) {
+					return F.chopNumber((INumber) arg1, delta);
+				}
+			} catch (Exception e) {
+				if (Config.SHOW_STACKTRACE) {
+					e.printStackTrace();
+				}
+			}
+
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.LISTABLE);
+		}
+	}
+
+	/**
+	 * <pre>
+	 * Clip(expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns <code>expr</code> in the range <code>-1</code> to <code>1</code>. Returns <code>-1</code> if
+	 * <code>expr</code> is less than <code>-1</code>. Returns <code>1</code> if <code>expr</code> is greater than
+	 * <code>1</code>.
+	 * </p>
+	 * </blockquote>
+	 * 
+	 * <pre>
+	 * Clip(expr, {min, max})
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>min</code> if
+	 * <code>expr</code> is less than <code>min</code>. Returns <code>max</code> if <code>expr</code> is greater than
+	 * <code>max</code>.
+	 * </p>
+	 * </blockquote>
+	 * 
+	 * <pre>
+	 * Clip(expr, {min, max}, {vMin, vMax})
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>vMin</code> if
+	 * <code>expr</code> is less than <code>min</code>. Returns <code>vMax</code> if <code>expr</code> is greater than
+	 * <code>max</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Clip(Sin(Pi/7))
+	 * Sin(Pi/7)
+	 * 
+	 * &gt;&gt; Clip(Tan(E))
+	 * Tan(E)
+	 * 
+	 * &gt;&gt; Clip(Tan(2*E)
+	 * -1
+	 * 
+	 * &gt;&gt; Clip(Tan(-2*E))
+	 * 1
+	 * 
+	 * &gt;&gt; Clip(x)
+	 * Clip(x)
+	 * 
+	 * &gt;&gt; Clip(Tan(2*E), {-1/2,1/2})
+	 * -1/2
+	 * 
+	 * &gt;&gt; Clip(Tan(-2*E), {-1/2,1/2})
+	 * 1/2
+	 * 
+	 * &gt;&gt; Clip(Tan(E), {-1/2,1/2}, {a,b})
+	 * Tan(E)
+	 * 
+	 * &gt;&gt; Clip(Tan(2*E), {-1/2,1/2}, {a,b})
+	 * a
+	 * 
+	 * &gt;&gt; Clip(Tan(-2*E), {-1/2,1/2}, {a,b})
+	 * b
+	 * </pre>
+	 */
+	private final static class Clip extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 2, 4);
+
+			IExpr x = ast.first();
+			if (ast.size() == 2) {
+				return clip(x);
+			}
+
+			IExpr vMin = null;
+			IExpr vMax = null;
+			if (ast.size() == 4) {
+				IExpr arg3 = ast.arg3();
+				if (arg3.isAST(F.List, 3)) {
+					// { vMin, vMax } as 3rd argument expected
+					vMin = arg3.first();
+					vMax = arg3.second();
+				} else {
+					return F.NIL;
+				}
+			}
+			if (ast.size() >= 3) {
+				IExpr arg2 = ast.arg2();
+				if (arg2.isAST(F.List, 3)) {
+					// { min, max } as 2nd argument expected
+					IExpr min = arg2.first();
+					IExpr max = arg2.second();
+					if (ast.size() == 3) {
+						vMin = min;
+						vMax = max;
+					}
+					if (min.isSignedNumber() && max.isSignedNumber()) {
+						return clip(x, (ISignedNumber) min, (ISignedNumber) max, vMin, vMax);
+					}
+					ISignedNumber minEvaled = min.evalSignedNumber();
+					if (minEvaled != null) {
+						ISignedNumber maxEvaled = max.evalSignedNumber();
+						if (maxEvaled != null) {
+							return clip(x, (ISignedNumber) minEvaled, (ISignedNumber) maxEvaled, vMin, vMax);
+						}
+					}
+				}
+			}
+			return F.NIL;
+		}
+
+		private IExpr clip(IExpr x) {
+			if (x.isSignedNumber()) {
+				ISignedNumber real = (ISignedNumber) x;
+				if (real.isGreaterThan(F.C1)) {
+					return F.C1;
+				}
+				if (real.isLessThan(F.CN1)) {
+					return F.CN1;
+				}
+				return x;
+			}
+			ISignedNumber real = x.evalSignedNumber();
+			if (real != null) {
+				if (real.isGreaterThan(F.C1)) {
+					return F.C1;
+				}
+				if (real.isLessThan(F.CN1)) {
+					return F.CN1;
+				}
+				return x;
+			}
+			return F.NIL;
+		}
+
+		/**
+		 * gives <code>vMin</code> for <code>x<min</code> and <code>vMax</code> for <code>x>max</code>.
+		 * 
+		 * @param x
+		 *            the expreesion value
+		 * @param min
+		 *            minimum value
+		 * @param max
+		 *            maximum value
+		 * @param vMin
+		 *            value for x less than minimum
+		 * @param vMax
+		 *            value for x greater than minimum
+		 * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x is greater than
+		 *         max.
+		 */
+		private IExpr clip(IExpr x, ISignedNumber min, ISignedNumber max, IExpr vMin, IExpr vMax) {
+			if (x.isSignedNumber()) {
+				ISignedNumber real = (ISignedNumber) x;
+				if (real.isGreaterThan(max)) {
+					return vMax;
+				}
+				if (real.isLessThan(min)) {
+					return vMin;
+				}
+				return x;
+			}
+			ISignedNumber real = x.evalSignedNumber();
+			if (real != null) {
+				if (real.isGreaterThan(max)) {
+					return vMax;
+				}
+				if (real.isLessThan(min)) {
+					return vMin;
+				}
+				return x;
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.NUMERICFUNCTION);
+		}
+	}
+
+	/**
+	 * <pre>
+	 * Complex
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * is the head of complex numbers.
+	 * </p>
+	 * </blockquote>
+	 * 
+	 * <pre>
+	 * Complex(a, b)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * constructs the complex number <code>a + I * b</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Head(2 + 3*I)
+	 * Complex
+	 * 
+	 * &gt;&gt; Complex(1, 2/3)
+	 * 1+I*2/3
+	 * 
+	 * &gt;&gt; Abs(Complex(3, 4))
+	 * 5
+	 * 
+	 * &gt;&gt; -2 / 3 - I
+	 * -2/3-I
+	 * 
+	 * &gt;&gt; Complex(10, 0)
+	 * 10
+	 * 
+	 * &gt;&gt; 0. + I
+	 * I*1.0
+	 * 
+	 * &gt;&gt; 1 + 0*I
+	 * 1
+	 * 
+	 * &gt;&gt; Head(1 + 0*I)
+	 * Integer
+	 * 
+	 * &gt;&gt; Complex(0.0, 0.0)
+	 * 0.0
+	 * 
+	 * &gt;&gt; 0.*I
+	 * 0.0
+	 * 
+	 * &gt;&gt; 0. + 0.*I
+	 * 0.0
+	 * 
+	 * &gt;&gt; 1. + 0.*I
+	 * 1.0
+	 * 
+	 * &gt;&gt; 0. + 1.*I
+	 * I*1.0
+	 * </pre>
+	 * <p>
+	 * Check nesting Complex
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Complex(1, Complex(0, 1))
+	 * 0
+	 * 
+	 * &gt;&gt; Complex(1, Complex(1, 0))
+	 * 1+I 
+	 * 
+	 * &gt;&gt; Complex(1, Complex(1, 1))
+	 * I
+	 * </pre>
+	 */
 	private final static class Complex extends AbstractCoreFunctionEvaluator {
 
 		@Override
@@ -434,9 +817,36 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Conjugate the given argument.
+	 * <pre>
+	 * Conjugate(z)
+	 * </pre>
 	 * 
-	 * See <a href="http://en.wikipedia.org/wiki/Complex_conjugation">Wikipedia:Complex conjugation</a>
+	 * <blockquote>
+	 * <p>
+	 * returns the complex conjugate of the complex number <code>z</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Conjugate(3 + 4*I)
+	 * 3 - 4 I
+	 * 
+	 * &gt;&gt; Conjugate(3)
+	 * 3
+	 * 
+	 * &gt;&gt; Conjugate(a + b * I)
+	 * -I*Conjugate(b)+Conjugate(a)
+	 * 
+	 * &gt;&gt; Conjugate({{1, 2 + I*4, a + I*b}, {I}})
+	 * {{1,2-I*4,-I*Conjugate(b)+Conjugate(a)},{-I}}
+	 * 
+	 * &gt;&gt; {Conjugate(Pi), Conjugate(E)}
+	 * {Pi,E}
+	 * 
+	 * &gt;&gt; Conjugate(1.5 + 2.5*I)
+	 * 1.5+I*(-2.5)
+	 * </pre>
 	 */
 	private final static class Conjugate extends AbstractTrigArg1 implements INumeric, ConjugateRules {
 
@@ -491,9 +901,9 @@ public final class Arithmetic {
 				return temp;
 			}
 			if (arg1.isPower()) {
-				IExpr base = ((IAST) arg1).arg1();
+				IExpr base = arg1.base();
 				if (base.isPositiveResult()) {
-					return F.Power(base, F.Conjugate(((IAST) arg1).arg2()));
+					return F.Power(base, F.Conjugate(arg1.exponent()));
 				}
 			}
 			if (arg1.isPlus()) {
@@ -527,11 +937,11 @@ public final class Arithmetic {
 					return result;
 				}
 			} else if (arg1.isConjugate()) {
-				return arg1.getAt(1);
+				return arg1.first();
 			} else if (arg1.isAST(F.Zeta, 2)) {
-				return F.Zeta(F.Conjugate(arg1.getAt(1)));
-			} else if (arg1.isAST(F.Zeta, 3) && arg1.getAt(1).isSignedNumber() && arg1.getAt(2).isSignedNumber()) {
-				return F.Zeta(F.Conjugate(arg1.getAt(1)), F.Conjugate(arg1.getAt(2)));
+				return F.Zeta(F.Conjugate(arg1.first()));
+			} else if (arg1.isAST(F.Zeta, 3) && arg1.first().isSignedNumber() && arg1.second().isSignedNumber()) {
+				return F.Zeta(F.Conjugate(arg1.first()), F.Conjugate(arg1.second()));
 			}
 			return F.NIL;
 		}
@@ -549,6 +959,29 @@ public final class Arithmetic {
 
 	}
 
+	/**
+	 * <pre>
+	 * Decrement(x)
+	 * 
+	 * x--
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * decrements <code>x</code> by <code>1</code>, returning the original value of <code>x</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a = 5   
+	 * &gt;&gt; a--   
+	 * 5    
+	 * 
+	 * &gt;&gt; a    
+	 * 4
+	 * </pre>
+	 */
 	private static class Decrement extends AbstractFunctionEvaluator {
 
 		protected IASTMutable getAST() {
@@ -587,8 +1020,104 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Operator /=
+	 * <pre>
+	 * Divide(a, b)
 	 * 
+	 * a / b
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * represents the division of <code>a</code> by <code>b</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; 30 / 5
+	 * 6
+	 * 
+	 * &gt;&gt; 1 / 8
+	 * 1/8
+	 * 
+	 * &gt;&gt; Pi / 4
+	 * Pi / 4
+	 * </pre>
+	 * <p>
+	 * Use <code>N</code> or a decimal point to force numeric evaluation:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Pi / 4.0
+	 * 0.7853981633974483
+	 * 
+	 * &gt;&gt; N(1 / 8)
+	 * 0.125
+	 * </pre>
+	 * <p>
+	 * Nested divisions:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a / b / c
+	 * a/(b*c)
+	 * 
+	 * &gt;&gt; a / (b / c)
+	 * (a*c)/b
+	 * 
+	 * &gt;&gt; a / b / (c / (d / e))
+	 * (a*d)/(b*c*e)
+	 * 
+	 * &gt;&gt; a / (b ^ 2 * c ^ 3 / e)
+	 * (a*e)/(b^2*c^3) 
+	 * 
+	 * &gt;&gt; 1 / 4.0
+	 * 0.25
+	 * 
+	 * &gt;&gt; 10 / 3 // FullForm
+	 * "Rational(10,3)"
+	 * 
+	 * &gt;&gt; a / b // FullForm
+	 * "Times(a, Power(b, -1))"
+	 * </pre>
+	 */
+	private static class Divide extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+			// arg1 * arg2^(-1)
+			return F.Divide(ast.arg1(), ast.arg2());
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
+	}
+
+	/**
+	 * <pre>
+	 * DivideBy(x, dx)
+	 * 
+	 * x /= dx
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * is equivalent to <code>x = x / dx</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a = 10
+	 * &gt;&gt; a /= 2   
+	 * 5
+	 * 
+	 * &gt;&gt; a    
+	 * 5
+	 * </pre>
 	 */
 	private static class DivideBy extends AddTo {
 
@@ -725,14 +1254,27 @@ public final class Arithmetic {
 	}
 
 	/**
+	 * <pre>
+	 * Gamma(z)
+	 * </pre>
+	 * 
+	 * <blockquote>
 	 * <p>
-	 * Returns the Gamma function value.
+	 * is the gamma function on the complex number <code>z</code>.
 	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
 	 * 
-	 * See <a href="http://en.wikipedia.org/wiki/Gamma_function">Gamma function</a> and
-	 * <a href= "https://en.wikipedia.org/wiki/Particular_values_of_the_Gamma_function"> Particular values of the Gamma
-	 * function</a>
+	 * <pre>
+	 * &gt;&gt; Gamma(8)
+	 * 5040
 	 * 
+	 * &gt;&gt; Gamma(1/2)
+	 * Sqrt(Pi)
+	 * 
+	 * &gt;&gt; Gamma(2.2)
+	 * 1.1018024908797128
+	 * </pre>
 	 */
 	private final static class Gamma extends AbstractTrigArg1 implements DoubleUnaryOperator {
 
@@ -805,9 +1347,83 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Harmonic number of a given integer value
+	 * <pre>
+	 * GCD(n1, n2, ...)
+	 * </pre>
 	 * 
-	 * See: <a href="http://en.wikipedia.org/wiki/Harmonic_number">Harmonic number</a>
+	 * <blockquote>
+	 * <p>
+	 * computes the greatest common divisor of the given integers.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; GCD(20, 30)
+	 * 10
+	 * &gt;&gt; GCD(10, y)
+	 * GCD(10, y)
+	 * </pre>
+	 * <p>
+	 * 'GCD' is 'Listable':
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; GCD(4, {10, 11, 12, 13, 14})
+	 * {2, 1, 4, 1, 2}
+	 * </pre>
+	 */
+	private final static class GCD extends AbstractArgMultiple {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST0()) {
+				return F.C0;
+			} else if (ast.isAST1()) {
+				if (ast.arg1().isExactNumber()) {
+					return ast.arg1().abs();
+				}
+			}
+			return super.evaluate(ast, engine);
+		}
+
+		@Override
+		public IExpr e2FraArg(IFraction f0, IFraction f1) {
+			return f0.gcd(f1);
+		}
+
+		/**
+		 * Compute gcd of 2 integer numbers
+		 * 
+		 */
+		@Override
+		public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
+			return i0.gcd(i1);
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.ONEIDENTITY | ISymbol.ORDERLESS | ISymbol.FLAT | ISymbol.LISTABLE);
+		}
+
+	}
+
+	/**
+	 * <pre>
+	 * HarmonicNumber(n)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns the <code>n</code>th harmonic number.<br />
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Table(HarmonicNumber(n), {n, 8})
+	 * {1,3/2,11/6,25/12,137/60,49/20,363/140,761/280}
+	 * </pre>
 	 */
 	private final static class HarmonicNumber extends AbstractEvaluator {
 
@@ -851,10 +1467,6 @@ public final class Arithmetic {
                                 return Power(integer(i), Negate(arg2));
                             }
                         });
-						// for (int i = 1; i <= n; i++) {
-						// result.append(Power(integer(i), Negate(arg2)));
-						// }
-						// return result;
 					}
 					return F.NIL;
 				}
@@ -912,9 +1524,24 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Get the imaginary part of an expression
+	 * <pre>
+	 * Im(z)
+	 * </pre>
 	 * 
-	 * See: <a href="http://en.wikipedia.org/wiki/Imaginary_part">Imaginary part</a>
+	 * <blockquote>
+	 * <p>
+	 * returns the imaginary component of the complex number <code>z</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Im(3+4I)
+	 * 4
+	 * 
+	 * &gt;&gt; Im(0.5 + 2.3*I)
+	 * 2.3
+	 * </pre>
 	 */
 	private final static class Im extends AbstractEvaluator {
 
@@ -932,7 +1559,7 @@ public final class Arithmetic {
 					if (directedInfininty.isInfinity()) {
 						return F.C0;
 					}
-					IExpr im = engine.evaluate(F.Im(directedInfininty.arg1()));
+					IExpr im = F.Im.of(engine, directedInfininty.arg1());
 					if (im.isNumber()) {
 						if (im.isZero()) {
 							return F.C0;
@@ -952,29 +1579,27 @@ public final class Arithmetic {
 				return Negate(Im(negExpr));
 			}
 			if (arg1.isTimes()) {
-				if (arg1.getAt(1).isSignedNumber()) {
-					IAST temp = ((IAST) arg1).removeAtClone(1);
-					return F.Times(arg1.getAt(1), F.Im(temp));
+				IExpr first = arg1.first();
+				if (first.isSignedNumber()) {
+					return F.Times(first, F.Im(arg1.rest()));
 				}
-				if (arg1.getAt(1).isImaginaryUnit()) {
+				if (first.isImaginaryUnit()) {
 					// Im(I*temp) -> Re(temp)
-					return ((IAST) arg1).removeAtClone(1).re();
+					return arg1.rest().re();
 				}
 			}
 			if (arg1.isPlus()) {
 				return ((IAST) arg1).mapThread((IAST) F.Im(null), 1);
 			}
 			if (arg1.isPower()) {
-				IAST astPower = (IAST) arg1;
-				IExpr base = astPower.arg1();
-				if (base.isRealResult()) {
+				IExpr x = arg1.base();
+				if (x.isRealResult()) {
 					// test for x^(a+I*b)
-					IExpr x = base;
-					IExpr exponent = astPower.arg2();
+					IExpr exponent = arg1.exponent();
 					if (exponent.isNumber()) {
 						// (x^2)^(a/2)*E^(-b*Arg[x])*Sin[a*Arg[x]+1/2*b*Log[x^2]]
-						IExpr a = ((INumber) exponent).re();
-						IExpr b = ((INumber) exponent).im();
+						IExpr a = exponent.re();
+						IExpr b = exponent.im();
 						return imPowerComplex(x, a, b);
 					}
 					if (exponent.isNumericFunction()) {
@@ -1014,6 +1639,37 @@ public final class Arithmetic {
 
 	}
 
+	/**
+	 * <pre>
+	 * Increment(x)
+	 * 
+	 * x++
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * increments <code>x</code> by <code>1</code>, returning the original value of <code>x</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a = 2;   
+	 * &gt;&gt; a++    
+	 * 2    
+	 * 
+	 * &gt;&gt; a    
+	 * 3
+	 * </pre>
+	 * <p>
+	 * Grouping of 'Increment', 'PreIncrement' and 'Plus':<br />
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; ++++a+++++2//Hold//FullForm    
+	 * Hold(Plus(PreIncrement(PreIncrement(Increment(Increment(a)))), 2))
+	 * </pre>
+	 */
 	private static class Increment extends Decrement {
 
 		@Override
@@ -1027,6 +1683,98 @@ public final class Arithmetic {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * LCM(n1, n2, ...)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * computes the least common multiple of the given integers.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; LCM(15, 20)
+	 * 60
+	 * &gt;&gt; LCM(20, 30, 40, 50)
+	 * 600
+	 * </pre>
+	 */
+	private final static class LCM extends AbstractArgMultiple {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 2);
+
+			if (ast.isAST1()) {
+				if (ast.arg1().isExactNumber()) {
+					return ast.arg1().abs();
+				}
+			}
+			return super.evaluate(ast, engine);
+		}
+
+		/**
+		 * Compute lcm of 2 integer numbers
+		 * 
+		 */
+		@Override
+		public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
+			return i0.lcm(i1);
+		}
+
+		@Override
+		public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
+			if (o0.isZero()) {
+				return o0;
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.ORDERLESS | ISymbol.FLAT | ISymbol.LISTABLE);
+		}
+
+	}
+
+	/**
+	 * <pre>
+	 * Minus(expr)
+	 * 
+	 * 		- expr
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * is the negation of <code>expr</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; -a //FullForm
+	 * "Times(-1, a)"
+	 * </pre>
+	 * <p>
+	 * <code>Minus</code> automatically distributes:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; -(x - 2/3)
+	 * 2/3-x
+	 * </pre>
+	 * <p>
+	 * <code>Minus</code> threads over lists:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; -Range(10)
+	 * {-1,-2,-3,-4,-5,-6,-7,-8,-9,-10}
+	 * </pre>
+	 */
 	private final static class Minus extends AbstractCoreFunctionEvaluator {
 
 		@Override
@@ -1042,11 +1790,129 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * A piecewise-defined function (also called a piecewise function or a hybrid function) is a function which is
-	 * defined by multiple subfunctions, each subfunction applying to a certain interval of the main function's domain.
+	 * <pre>
+	 * N(expr)
+	 * </pre>
 	 * 
-	 * See: <a href="http://en.wikipedia.org/wiki/Piecewise">Wikipedia:Piecewise</a>
+	 * <blockquote>
+	 * <p>
+	 * gives the numerical value of <code>expr</code>.<br />
+	 * </p>
+	 * </blockquote>
 	 * 
+	 * <pre>
+	 * N(expr, precision)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * evaluates <code>expr</code> numerically with a precision of <code>prec</code> digits.<br />
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * <strong>Note</strong>: the upper case identifier <code>N</code> is different from the lower case identifier
+	 * <code>n</code>.
+	 * </p>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; N(Pi)
+	 * 3.141592653589793
+	 * 
+	 * &gt;&gt; N(Pi, 50)
+	 * 3.1415926535897932384626433832795028841971693993751
+	 * 
+	 * &gt;&gt; N(1/7)
+	 * 0.14285714285714285
+	 * 
+	 * &gt;&gt; N(1/7, 5)
+	 * 1.4285714285714285714e-1
+	 * </pre>
+	 */
+	private static class N extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			return numericEval(ast, engine);
+		}
+
+		@Override
+		public IExpr numericEval(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 2, 3);
+
+			final boolean numericMode = engine.isNumericMode();
+			final int oldPrecision = engine.getNumericPrecision();
+			try {
+				int numericPrecision = Config.MACHINE_PRECISION;
+				if (ast.isAST2()) {
+					numericPrecision = Validate.checkIntType(ast.arg2());
+				}
+				engine.setNumericMode(true, numericPrecision);
+				return engine.evalWithoutNumericReset(ast.arg1());
+			} finally {
+				engine.setNumericMode(numericMode);
+				engine.setNumericPrecision(oldPrecision);
+			}
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
+
+	}
+
+	/**
+	 * <pre>
+	 * Piecewise({{expr1, cond1}, ...})
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * represents a piecewise function.
+	 * </p>
+	 * </blockquote>
+	 * 
+	 * <pre>
+	 * Piecewise({{expr1, cond1}, ...}, expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * represents a piecewise function with default <code>expr</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="http://en.wikipedia.org/wiki/Piecewise">Wikipedia - Piecewise</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Piecewise({{-x, x&lt;0}, {x, x&gt;=0}})/.{{x-&gt;-3}, {x-&gt;-1/3}, {x-&gt;0}, {x-&gt;1/2}, {x-&gt;5}}
+	 * {3,1/3,0,1/2,5}
+	 * </pre>
+	 * <p>
+	 * Heaviside function
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Piecewise({{0, x &lt;= 0}}, 1)    
+	 * Piecewise({{0, x &lt;= 0}}, 1)
+	 * </pre>
+	 * <p>
+	 * Piecewise defaults to <code>0</code>, if no other case is matching.<br />
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Piecewise({{1, False}})    
+	 * 0    
+	 * 
+	 * &gt;&gt; Piecewise({{0 ^ 0, False}}, -1)    
+	 * -1
+	 * </pre>
 	 */
 	private final static class Piecewise extends AbstractFunctionEvaluator {
 
@@ -1130,6 +1996,81 @@ public final class Arithmetic {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Plus(a, b, ...)
+	 * 
+	 * a + b + ...
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * represents the sum of the terms <code>a, b, ...</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; 1 + 2
+	 * 3
+	 * </pre>
+	 * <p>
+	 * <code>Plus</code> performs basic simplification of terms:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a + b + a
+	 * 2*a+b
+	 * 
+	 * &gt;&gt; a + a + 3 * a
+	 * 5*a
+	 * 
+	 * &gt;&gt; a + b + 4.5 + a + b + a + 2 + 1.5 * b
+	 * 6.5+3.0*a+3.5*b
+	 * </pre>
+	 * <p>
+	 * Apply <code>Plus</code> on a list to sum up its elements:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Plus @@ {2, 4, 6}
+	 * 12
+	 * </pre>
+	 * <p>
+	 * The sum of the first <code>1000</code> integers:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Plus @@ Range(1000)
+	 * 500500
+	 * </pre>
+	 * <p>
+	 * <code>Plus</code> has default value <code>0</code>:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a /. n_. + x_ :&gt; {n, x}
+	 * {0,a}
+	 * 
+	 * &gt;&gt; -2*a - 2*b
+	 * -2*a-2*b
+	 * 
+	 * &gt;&gt; -4+2*x+2*Sqrt(3)
+	 * -4+2*x+2*Sqrt(3)
+	 * 
+	 * &gt;&gt; 1 - I * Sqrt(3)
+	 * 1-I*Sqrt(3)
+	 * 
+	 * &gt;&gt; Head(3 + 2 I)
+	 * Complex
+	 * 
+	 * &gt;&gt; N(Pi, 30) + N(E, 30)
+	 * 5.85987448204883847382293085463
+	 * 
+	 * &gt;&gt; N(Pi, 30) + N(E, 30) // Precision
+	 * 30
+	 * </pre>
+	 */
 	public static class Plus extends AbstractArgMultiple implements INumeric {
 
 		private static HashedOrderlessMatcherPlus ORDERLESS_MATCHER = new HashedOrderlessMatcherPlus();
@@ -1172,17 +2113,18 @@ public final class Arithmetic {
 			INum number = F.CD0;
 			int start = -1;
 			for (int i = 1; i < ast.size(); i++) {
-				if (ast.get(i) instanceof INum) {
-					if (ast.get(i) instanceof ApfloatNum) {
-						number = number.add((INum) ast.get(i));
+				IExpr temp = ast.get(i);
+				if (temp instanceof INum) {
+					if (temp instanceof ApfloatNum) {
+						number = number.add((INum) temp);
 					} else {
 						if (number instanceof ApfloatNum) {
-							number = number.add(((INum) ast.get(i)).apfloatNumValue(number.precision()));
+							number = number.add(((INum) temp).apfloatNumValue(number.precision()));
 						} else {
-							number = number.add((INum) ast.get(i));
+							number = number.add((INum) temp);
 						}
 					}
-				} else if (ast.get(i) instanceof IComplexNum) {
+				} else if (temp instanceof IComplexNum) {
 					start = i;
 					break;
 				} else {
@@ -1199,19 +2141,20 @@ public final class Arithmetic {
 				complexNumber = F.complexNum(((ApfloatNum) number).apfloatValue());
 			}
 			for (int i = start; i < ast.size(); i++) {
-				if (ast.get(i) instanceof INum) {
-					number = (INum) ast.get(i);
+				IExpr temp = ast.get(i);
+				if (temp instanceof INum) {
+					number = (INum) temp;
 					if (number instanceof Num) {
 						complexNumber = complexNumber.add(F.complexNum(((Num) number).doubleValue()));
 					} else {
 						complexNumber = complexNumber.add(F.complexNum(((ApfloatNum) number).apfloatValue()));
 					}
-				} else if (ast.get(i) instanceof IComplexNum) {
+				} else if (temp instanceof IComplexNum) {
 					if (complexNumber instanceof ApcomplexNum) {
 						complexNumber = complexNumber
-								.add(((IComplexNum) ast.get(i)).apcomplexNumValue(complexNumber.precision()));
+								.add(((IComplexNum) temp).apcomplexNumValue(complexNumber.precision()));
 					} else {
-						complexNumber = complexNumber.add((IComplexNum) ast.get(i));
+						complexNumber = complexNumber.add((IComplexNum) temp);
 					}
 				} else {
 					return F.NIL;
@@ -1263,7 +2206,7 @@ public final class Arithmetic {
 			if (size > 2) {
 				IExpr temp = evaluateHashsRepeated(ast, engine);
 				if (temp.isAST(F.Plus, 2)) {
-					return ((IAST) temp).arg1();
+					return temp.first();
 				}
 				return temp;
 			}
@@ -1321,11 +2264,27 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Compute Pochhammer's symbol (this)_n.
+	 * <pre>
+	 * Pochhammer(a, n)
+	 * </pre>
 	 * 
-	 * @param n
-	 *            The number of product terms in the evaluation.
-	 * @return Gamma(this+n)/Gamma(this) = this*(this+1)*...*(this+n-1).
+	 * <blockquote>
+	 * <p>
+	 * returns the pochhammer symbol for a rational number <code>a</code> and an integer number <code>n</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:<br />
+	 * </p>
+	 * <ul>
+	 * <li><a href="http://en.wikipedia.org/wiki/Pochhammer_symbol">Wikipedia - Pochhammer symbol</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Pochhammer(4, 8)
+	 * 6652800
+	 * </pre>
 	 */
 	private final static class Pochhammer extends AbstractArg2 {// implements PochhammerRules {
 
@@ -1424,6 +2383,120 @@ public final class Arithmetic {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Power(a, b)  
+	 * 
+	 * a ^ b
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * represents <code>a</code> raised to the power of <code>b</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; 4 ^ (1/2)
+	 * 2
+	 * 
+	 * &gt;&gt; 4 ^ (1/3)
+	 * 4^(1/3)
+	 * 
+	 * &gt;&gt; 3^123
+	 * 48519278097689642681155855396759336072749841943521979872827
+	 * 
+	 * &gt;&gt; (y ^ 2) ^ (1/2)
+	 * Sqrt(y^2)
+	 * 
+	 * &gt;&gt; (y ^ 2) ^ 3
+	 * y^6
+	 * </pre>
+	 * <p>
+	 * Use a decimal point to force numeric evaluation:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; 4.0 ^ (1/3)
+	 * 1.5874010519681994
+	 * </pre>
+	 * <p>
+	 * <code>Power</code> has default value <code>1</code> for its second argument:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a /. x_ ^ n_. :&gt; {x, n}
+	 * {a,1}
+	 * </pre>
+	 * <p>
+	 * <code>Power</code> can be used with complex numbers:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; (1.5 + 1.0*I) ^ 3.5
+	 * -3.682940057821917+I*6.951392664028508
+	 * 
+	 * &gt;&gt; (1.5 + 1.0*I) ^ (3.5 + 1.5*I)
+	 * -3.1918162904562815+I*0.6456585094161581
+	 * </pre>
+	 * <p>
+	 * Infinite expression 0^(negative number)
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; 1/0 
+	 * ComplexInfinity
+	 * 
+	 * &gt;&gt; 0 ^ -2
+	 * ComplexInfinity
+	 * 
+	 * &gt;&gt; 0 ^ (-1/2)
+	 * ComplexInfinity
+	 * 
+	 * &gt;&gt; 0 ^ -Pi
+	 * ComplexInfinity
+	 * </pre>
+	 * <p>
+	 * Indeterminate expression 0 ^ (complex number) encountered.
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; 0 ^ (2*I*E)
+	 * Indeterminate
+	 * 
+	 * &gt;&gt; 0 ^ - (Pi + 2*E*I)
+	 * ComplexInfinity
+	 * </pre>
+	 * <p>
+	 * Indeterminate expression 0 ^ 0 encountered.
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; 0 ^ 0
+	 * 
+	 * &gt;&gt; Sqrt(-3+2.*I)
+	 * 0.5502505227003375+I*1.8173540210239707
+	 * 
+	 * &gt;&gt; Sqrt(-3+2*I)
+	 * Sqrt(-3+I*2) 
+	 * 
+	 * &gt;&gt; (3/2+1/2I)^2
+	 * 2+I*3/2
+	 * 
+	 * &gt;&gt; I ^ I
+	 * I^I
+	 * 
+	 * &gt;&gt; 2 ^ 2.0
+	 * 4.0
+	 * 
+	 * &gt;&gt; Pi ^ 4.
+	 * 97.40909103400242
+	 * 
+	 * &gt;&gt; a ^ b
+	 * a^b
+	 * </pre>
+	 */
 	public static class Power extends AbstractArg2 implements INumeric, PowerRules {
 
 		/**
@@ -1840,10 +2913,10 @@ public final class Arithmetic {
 						return F.CInfinity;
 					}
 				} else if (arg1.isPower() && is1.isNumIntValue() && is1.isPositive()) {
-					IAST a0 = (IAST) arg1;
-					if (a0.arg2().isNumIntValue() && a0.arg2().isPositive()) {
+					IExpr exponent = arg1.exponent();
+					if (exponent.isNumIntValue() && exponent.isPositive()) {
 						// (x*n)^m => x ^(n*m)
-						return Power(a0.arg1(), is1.times(a0.arg2()));
+						return Power(arg1.base(), is1.times(exponent));
 					}
 				} else if (arg1.isNegativeInfinity() && arg2.isInteger()) {
 					IInteger ii = (IInteger) arg2;
@@ -1958,14 +3031,14 @@ public final class Arithmetic {
 			IASTAppendable resultAST = F.NIL;
 			for (int i = 1; i < timesAST.size(); i++) {
 				IExpr temp = timesAST.get(i);
-				if (temp.isPower() && temp.getAt(2).isMinusOne()) {
+				if (temp.isPower() && temp.exponent().isMinusOne()) {
 					if (!resultAST.isPresent()) {
 						resultAST = timesAST.copyAppendable();
 						for (int j = 1; j < i; j++) {
 							resultAST.set(j, F.Power(timesAST.get(j), arg2));
 						}
 					}
-					resultAST.set(i, temp.getAt(1));
+					resultAST.set(i, temp.base());
 				} else {
 					if (resultAST.isPresent()) {
 						resultAST.set(i, F.Power(temp, arg2));
@@ -2035,19 +3108,20 @@ public final class Arithmetic {
 		private IAST powerEPlus(IAST plus) {
 			IASTAppendable multiplicationFactors = F.NIL;
 			IASTAppendable plusClone = F.NIL;
-			for (int i = plus.size() - 1; i > 0; i--) {
-				if (plus.get(i).isLog()) {
+			for (int i = plus.argSize(); i > 0; i--) {
+				IExpr temp = plus.get(i);
+				if (temp.isLog()) {
 					if (!multiplicationFactors.isPresent()) {
 						multiplicationFactors = F.TimesAlloc(8);
 						plusClone = plus.copyAppendable();
 					}
-					multiplicationFactors.append(plus.get(i).getAt(1));
+					multiplicationFactors.append(temp.first());
 					plusClone.remove(i);
-				} else if (plus.get(i).isTimes()) {
-					IAST times = (IAST) plus.get(i);
-					for (int j = times.size() - 1; j > 0; j--) {
+				} else if (temp.isTimes()) {
+					IAST times = (IAST) temp;
+					for (int j = times.argSize(); j > 0; j--) {
 						if (times.get(j).isLog()) {
-							IExpr innerFunc = times.get(j).getAt(1);
+							IExpr innerFunc = times.get(j).first();
 							if (!multiplicationFactors.isPresent()) {
 								multiplicationFactors = F.TimesAlloc(8);
 								plusClone = plus.copyAppendable();
@@ -2181,11 +3255,33 @@ public final class Arithmetic {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * PreDecrement(x)
+	 * 
+	 * --x
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * decrements <code>x</code> by <code>1</code>, returning the new value of <code>x</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * <p>
+	 * <code>--a</code> is equivalent to <code>a = a - 1</code>:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a = 2   
+	 * &gt;&gt; --a    
+	 * 1
+	 * 
+	 * &gt;&gt; a    
+	 * 1
+	 * </pre>
+	 */
 	private static class PreDecrement extends Decrement {
-
-		public PreDecrement() {
-			super();
-		}
 
 		@Override
 		protected IASTMutable getAST() {
@@ -2203,6 +3299,32 @@ public final class Arithmetic {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * PreIncrement(x)
+	 * 
+	 * ++x
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * increments <code>x</code> by <code>1</code>, returning the new value of <code>x</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * <p>
+	 * <code>++a</code> is equivalent to <code>a = a + 1</code>:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a = 2   
+	 * &gt;&gt; ++a    
+	 * 3    
+	 * 
+	 * &gt;&gt; a    
+	 * 3
+	 * </pre>
+	 */
 	private static class PreIncrement extends PreDecrement {
 
 		@Override
@@ -2218,9 +3340,39 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Representation for a rational number
+	 * <pre>
+	 * Rational
+	 * </pre>
 	 * 
+	 * <blockquote>
+	 * <p>
+	 * is the head of rational numbers.
+	 * </p>
+	 * </blockquote>
+	 * 
+	 * <pre>
+	 * Rational(a, b)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * constructs the rational number <code>a / b</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Head(1/2)
+	 * Rational
+	 * 
+	 * &gt;&gt; Rational(1, 2)
+	 * 1/2
+	 * 
+	 * &gt;&gt; -2/3
+	 * -2/3
+	 * </pre>
 	 */
+
 	private final static class Rational extends AbstractCoreFunctionEvaluator {
 
 		@Override
@@ -2286,9 +3438,24 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Get the real part of an expression
+	 * <pre>
+	 * Re(z)
+	 * </pre>
 	 * 
-	 * See: <a href="http://en.wikipedia.org/wiki/Real_part">Real part</a>
+	 * <blockquote>
+	 * <p>
+	 * returns the real component of the complex number <code>z</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Re(3+4I)
+	 * 3
+	 * 
+	 * &gt;&gt; Im(0.5 + 2.3*I)
+	 * 2.3
+	 * </pre>
 	 */
 	private final static class Re extends AbstractEvaluator {
 
@@ -2323,29 +3490,27 @@ public final class Arithmetic {
 				return Negate(Re(negExpr));
 			}
 			if (expr.isTimes()) {
-				if (expr.getAt(1).isSignedNumber()) {
-					IAST temp = ((IAST) expr).removeAtClone(1);
-					return F.Times(expr.getAt(1), F.Re(temp));
+				IExpr first = expr.first();
+				if (first.isSignedNumber()) {
+					return F.Times(first, F.Re(expr.rest()));
 				}
-				if (expr.getAt(1).isImaginaryUnit()) {
+				if (first.isImaginaryUnit()) {
 					// Re(I*temp) -> -Im(temp)
-					IAST temp = ((IAST) expr).removeAtClone(1);
-					return F.Times(F.CN1, F.Im(temp));
+					return F.Times(F.CN1, F.Im(expr.rest()));
 				}
 			}
 			if (expr.isPlus()) {
 				return ((IAST) expr).mapThread((IAST) F.Re(null), 1);
 			}
 			if (expr.isPower()) {
-				IAST astPower = (IAST) expr;
-				IExpr base = astPower.arg1();
+				IExpr base = expr.base();
 				if (base.isRealResult()) {
 					// test for x^(a+I*b)
-					IExpr exponent = astPower.arg2();
-					if (exponent.isNumber()) {
-						// (x^2)^(a/2)*E^(-b*Arg[x])*Cos[a*Arg[x]+1/2*b*Log[x^2]]
-						return rePowerComplex(x, ((INumber) exponent).re(), ((INumber) exponent).im());
-					}
+					IExpr exponent = expr.exponent();
+					// if (exponent.isNumber()) {
+					// // (x^2)^(a/2)*E^(-b*Arg[x])*Cos[a*Arg[x]+1/2*b*Log[x^2]]
+					// return rePowerComplex(x, ((INumber) exponent).re(), ((INumber) exponent).im());
+					// }
 					// (x^2)^(a/2)*E^(-b*Arg[x])*Cos[a*Arg[x]+1/2*b*Log[x^2]]
 					return rePowerComplex(x, exponent.re(), exponent.im());
 				}
@@ -2387,10 +3552,47 @@ public final class Arithmetic {
 
 	}
 
+	/**
+	 * <pre>
+	 * Sqrt(expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns the square root of <code>expr</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Sqrt(4)
+	 * 2
+	 * 
+	 * &gt;&gt; Sqrt(5)
+	 * Sqrt(5)
+	 * 
+	 * &gt;&gt; Sqrt(5) // N
+	 * 2.23606797749979
+	 * 
+	 * &gt;&gt; Sqrt(a)^2
+	 * a
+	 * </pre>
+	 * <p>
+	 * Complex numbers:
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Sqrt(-4)
+	 * I*2
+	 * 
+	 * &gt;&gt; I == Sqrt(-1)
+	 * True
+	 * 
+	 * &gt;&gt; N(Sqrt(2), 50)
+	 * 1.41421356237309504880168872420969807856967187537694
+	 * </pre>
+	 */
 	private static class Sqrt extends AbstractArg1 implements INumeric {
-
-		public Sqrt() {
-		}
 
 		@Override
 		public IExpr e1ObjArg(final IExpr o) {
@@ -2414,6 +3616,23 @@ public final class Arithmetic {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Surd(expr, n)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns the <code>n</code>-th root of <code>expr</code>. If the result is defined, it's a real value.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; Surd(16.0,3)
+	 * 2.51984
+	 * </pre>
+	 */
 	private static class Surd extends AbstractArg2 implements INumeric {
 		@Override
 		public IExpr e2ApfloatArg(final ApfloatNum af0, final ApfloatNum af1) {
@@ -2433,7 +3652,7 @@ public final class Arithmetic {
 			double val = d0.doubleValue();
 			double r = d1.doubleValue();
 			double result = doubleSurd(val, r);
-			if (result == Double.NaN) {
+			if (Double.isNaN(result)) {
 				return F.Indeterminate;
 			}
 			return F.num(result);
@@ -2515,8 +3734,27 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Operator -=
-	 *
+	 * <pre>
+	 * SubtractFrom(x, dx)
+	 * 
+	 * x -= dx
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * is equivalent to <code>x = x - dx</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a = 10
+	 * &gt;&gt; a -= 2   
+	 * 8    
+	 * 
+	 * &gt;&gt; a    
+	 * 8
+	 * </pre>
 	 */
 	private static class SubtractFrom extends AddTo {
 
@@ -2531,6 +3769,145 @@ public final class Arithmetic {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Subtract(a, b)
+	 * 
+	 * a - b
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * represents the subtraction of <code>b</code> from <code>a</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; 5 - 3
+	 * 2
+	 * 
+	 * &gt;&gt; a - b // FullForm
+	 * "Plus(a, Times(-1, b))"
+	 * 
+	 * &gt;&gt; a - b - c
+	 * a-b-c
+	 * 
+	 * &gt;&gt; a - (b - c)
+	 * a-b+c
+	 * </pre>
+	 */
+	private static class Subtract extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+			// arg1 + (-1)*arg2
+			return F.Subtract(ast.arg1(), ast.arg2());
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
+	}
+
+	/**
+	 * <pre>
+	 * Times(a, b, ...)
+	 * 
+	 * a * b * ...
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * represents the product of the terms <code>a, b, ...</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; 10*2   
+	 * 20     
+	 * 
+	 * &gt;&gt; a * a   
+	 * a^2 
+	 * 
+	 * &gt;&gt; x ^ 10 * x ^ -2   
+	 * x^8
+	 * 
+	 * &gt;&gt; {1, 2, 3} * 4   
+	 * {4,8,12}  
+	 * 
+	 * &gt;&gt; Times @@ {1, 2, 3, 4}   
+	 * 24   
+	 * 
+	 * &gt;&gt; IntegerLength(Times@@Range(100))  
+	 * 158
+	 * </pre>
+	 * <p>
+	 * <code>Times</code> has default value <code>1</code>:<br />
+	 * </p>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a /. n_. * x_ :&gt; {n, x}   
+	 * {1,a}   
+	 * 
+	 * &gt;&gt; -a*b // FullForm   
+	 * "Times(-1, a, b)" 
+	 * 
+	 * &gt;&gt; -(x - 2/3)   
+	 * 2/3-x   
+	 * 
+	 * &gt;&gt; -x*2   
+	 * -2 x  
+	 * 
+	 * &gt;&gt; -(h/2) // FullForm   
+	 * "Times(Rational(-1,2), h)"  
+	 * 
+	 * &gt;&gt; x / x   
+	 * 1   
+	 * 
+	 * &gt;&gt; 2*x^2 / x^2   
+	 * 2   
+	 * 
+	 * &gt;&gt; 3.*Pi   
+	 * 9.42477796076938
+	 * 
+	 * &gt;&gt; Head(3 * I)   
+	 * Complex   
+	 * 
+	 * &gt;&gt; Head(Times(I, 1/2))   
+	 * Complex   
+	 * 
+	 * &gt;&gt; Head(Pi * I)   
+	 * Times   
+	 * 
+	 * &gt;&gt; -2.123456789 * x   
+	 * -2.123456789*x
+	 * 
+	 * &gt;&gt; -2.123456789 * I   
+	 * I*(-2.123456789)
+	 * 
+	 * &gt;&gt; N(Pi, 30) * I   
+	 * I*3.14159265358979323846264338327  
+	 * 
+	 * &gt;&gt; N(I*Pi, 30)   
+	 * I*3.14159265358979323846264338327 
+	 * 
+	 * &gt;&gt; N(Pi * E, 30)   
+	 * 8.53973422267356706546355086954   
+	 * 
+	 * &gt;&gt; N(Pi, 30) * N(E, 30)   
+	 * 8.53973422267356706546355086954   
+	 * 
+	 * &gt;&gt; N(Pi, 30) * E   
+	 * 8.53973422267356649108017774746   
+	 * 
+	 * &gt;&gt; N(Pi, 30) * E // Precision   
+	 * 30
+	 * </pre>
+	 */
 	public static class Times extends AbstractArgMultiple implements INumeric {
 		/**
 		 * Constructor for the singleton
@@ -2576,7 +3953,7 @@ public final class Arithmetic {
 
 				}
 				if (o1.isDirectedInfinity() && o1.isAST1()) {
-					return F.eval(F.DirectedInfinity(F.Times(inf.arg1(), ((IAST) o1).arg1())));
+					return F.eval(F.DirectedInfinity(F.Times(inf.first(), o1.first())));
 				}
 			}
 			return F.NIL;
@@ -2622,7 +3999,7 @@ public final class Arithmetic {
 			if (!expr.isPresent()) {
 				expr = originalExpr;
 			}
-			if (expr.isTimes() && expr.getAt(1).isInteger()) {
+			if (expr.isTimes() && expr.first().isInteger()) {
 				IAST times = (IAST) expr;
 				IInteger leadingFactor = (IInteger) times.arg1();
 
@@ -2630,9 +4007,9 @@ public final class Arithmetic {
 					IASTAppendable result = F.NIL;
 					for (int i = 2; i < times.size(); i++) {
 						IExpr temp = times.get(i);
-						if (temp.isPower() && temp.getAt(1).isInteger() && !temp.getAt(2).isNumber()) {
-							IASTMutable power = (IASTMutable) temp;
-							IInteger powArg1 = (IInteger) power.arg1();
+						if (temp.isPower() && temp.base().isInteger() && !temp.exponent().isNumber()) {
+							// IASTMutable power = (IASTMutable) temp;
+							IInteger powArg1 = (IInteger) temp.base();
 							if (powArg1.isPositive()) {
 								IInteger mod = F.C0;
 								int count = 0;
@@ -2649,8 +4026,8 @@ public final class Arithmetic {
 									if (!result.isPresent()) {
 										result = times.copyAppendable();
 									}
-									power = power.copyAppendable();
-									power.set(2, F.Plus(F.integer(count), power.arg2()));
+									IASTMutable power = ((IASTMutable) temp).copyAppendable();
+									power.set(2, F.Plus(F.integer(count), power.exponent()));
 									result.set(i, power);
 								}
 							}
@@ -2735,24 +4112,22 @@ public final class Arithmetic {
 
 			if (o0.isPower()) {
 				// (x^a) * b
-				final IAST power0 = (IAST) o0;
-				IExpr power0Arg1 = power0.arg1();
-				IExpr power0Arg2 = power0.arg2();
-				if (power0.equalsAt(1, o1)) {
+				IExpr power0Base = o0.base();
+				IExpr power0Exponent = o0.exponent();
+				if (((IAST)o0).equalsAt(1, o1)) {
 					// (x^a) * x
-					if (power0Arg2.isNumber() && !o1.isRational()) {
+					if (power0Exponent.isNumber() && !o1.isRational()) {
 						// avoid reevaluation of a root of a rational number (example: 2*Sqrt(2) )
-						return o1.power(power0Arg2.inc());
-					} else if (!power0Arg2.isNumber()) {
-						return o1.power(power0Arg2.inc());
+						return o1.power(power0Exponent.inc());
+					} else if (!power0Exponent.isNumber()) {
+						return o1.power(power0Exponent.inc());
 					}
 				}
 
 				if (o1.isPower()) {
-					final IAST power1 = (IAST) o1;
-					IExpr power1Arg1 = power1.arg1();
-					IExpr power1Arg2 = power1.arg2();
-					temp = timesPowerPower(power0Arg1, power0Arg2, power1Arg1, power1Arg2);
+					IExpr power1Base = o1.base();
+					IExpr power1Exponent = o1.exponent();
+					temp = timesPowerPower(power0Base, power0Exponent, power1Base, power1Exponent);
 					if (temp.isPresent()) {
 						return temp;
 					}
@@ -2760,10 +4135,9 @@ public final class Arithmetic {
 			}
 
 			if (o1.isPower()) {
-				final IAST power1 = (IAST) o1;
-				IExpr power1Arg1 = power1.arg1();
-				IExpr power1Arg2 = power1.arg2();
-				temp = timesArgPower(o0, power1Arg1, power1Arg2);
+				IExpr power1Base = o1.base();
+				IExpr power1Exponent = o1.exponent();
+				temp = timesArgPower(o0, power1Base, power1Exponent);
 				if (temp.isPresent()) {
 					return temp;
 				}
@@ -2805,17 +4179,18 @@ public final class Arithmetic {
 			INum number = F.CD1;
 			int start = -1;
 			for (int i = 1; i < ast.size(); i++) {
-				if (ast.get(i) instanceof INum) {
-					if (ast.get(i) instanceof ApfloatNum) {
-						number = number.multiply((INum) ast.get(i));
+				IExpr temp = ast.get(i);
+				if (temp instanceof INum) {
+					if (temp instanceof ApfloatNum) {
+						number = number.multiply((INum) temp);
 					} else {
 						if (number instanceof ApfloatNum) {
-							number = number.multiply(((INum) ast.get(i)).apfloatNumValue(number.precision()));
+							number = number.multiply(((INum) temp).apfloatNumValue(number.precision()));
 						} else {
-							number = number.multiply((INum) ast.get(i));
+							number = number.multiply((INum) temp);
 						}
 					}
-				} else if (ast.get(i) instanceof IComplexNum) {
+				} else if (temp instanceof IComplexNum) {
 					start = i;
 					break;
 				} else {
@@ -2832,19 +4207,20 @@ public final class Arithmetic {
 				complexNumber = F.complexNum(((ApfloatNum) number).apfloatValue());
 			}
 			for (int i = start; i < ast.size(); i++) {
-				if (ast.get(i) instanceof INum) {
-					number = (INum) ast.get(i);
+				IExpr temp = ast.get(i);
+				if (temp instanceof INum) {
+					number = (INum) temp;
 					if (number instanceof Num) {
 						complexNumber = complexNumber.multiply(F.complexNum(((Num) number).doubleValue()));
 					} else {
 						complexNumber = complexNumber.multiply(F.complexNum(((ApfloatNum) number).apfloatValue()));
 					}
-				} else if (ast.get(i) instanceof IComplexNum) {
+				} else if (temp instanceof IComplexNum) {
 					if (complexNumber instanceof ApcomplexNum) {
 						complexNumber = complexNumber
-								.multiply(((IComplexNum) ast.get(i)).apcomplexNumValue(complexNumber.precision()));
+								.multiply(((IComplexNum) temp).apcomplexNumValue(complexNumber.precision()));
 					} else {
-						complexNumber = complexNumber.multiply((IComplexNum) ast.get(i));
+						complexNumber = complexNumber.multiply((IComplexNum) temp);
 					}
 				} else {
 					return F.NIL;
@@ -2923,7 +4299,7 @@ public final class Arithmetic {
 								result = F.ast(sym, astTimes.size() - i + 1, false);
 							}
 							result.append(temp);
-							if (i == astTimes.size() - 1) {
+							if (i == astTimes.argSize()) {
 								result.append(astTimes.get(i));
 							} else {
 								temp = astTimes.get(i);
@@ -2935,7 +4311,7 @@ public final class Arithmetic {
 						evaled = true;
 						temp = tres;
 
-						if (i == (astTimes.size() - 1)) {
+						if (i == astTimes.argSize()) {
 							if (result == null) {
 								result = F.ast(sym, astTimes.size() - i + 1, false);
 							}
@@ -3114,8 +4490,27 @@ public final class Arithmetic {
 	}
 
 	/**
-	 * Operator *=
+	 * <pre>
+	 * TimesBy(x, dx)
 	 * 
+	 * x *= dx
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * is equivalent to <code>x = x * dx</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; a = 10
+	 * &gt;&gt; a *= 2   
+	 * 20    
+	 * 
+	 * &gt;&gt; a    
+	 * 20
+	 * </pre>
 	 */
 	private static class TimesBy extends AddTo {
 

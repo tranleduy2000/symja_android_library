@@ -396,6 +396,7 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "clearall" : "ClearAll");
 	public final static IBuiltInSymbol ClearAttributes = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "clearattributes" : "ClearAttributes");
+	public final static IBuiltInSymbol Clip = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "clip" : "Clip");
 	public final static IBuiltInSymbol Collect = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "collect" : "Collect");
 	public final static IBuiltInSymbol Compile = initFinalSymbol(
@@ -797,6 +798,8 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "distribute" : "Distribute");
 	public final static IBuiltInSymbol Divergence = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "divergence" : "Divergence");
+	public final static IBuiltInSymbol Divide = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "divide" : "Divide");
 	public final static IBuiltInSymbol DivideBy = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "divideby" : "DivideBy");
 	public final static IBuiltInSymbol Divisible = initFinalSymbol(
@@ -1283,6 +1286,8 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "subfactorial" : "Subfactorial");
 	public final static IBuiltInSymbol Subsets = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "subsets" : "Subsets");
+	public final static IBuiltInSymbol Subtract = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "subtract" : "Subtract");
 	public final static IBuiltInSymbol SubtractFrom = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "subtractfrom" : "SubtractFrom");
 	public final static IBuiltInSymbol Sum = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "sum" : "Sum");
