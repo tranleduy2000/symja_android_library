@@ -1,11 +1,10 @@
 package org.matheclipse.core.graphics;
 
-import java.awt.Color;
-import java.io.IOException;
-
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.ISignedNumber;
+
+import java.io.IOException;
 
 public class Dimensions2D {
 
