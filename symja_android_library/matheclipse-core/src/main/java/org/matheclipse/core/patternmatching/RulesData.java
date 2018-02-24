@@ -1,19 +1,5 @@
 package org.matheclipse.core.patternmatching;
 
-import com.duy.lambda.Consumer;
-import com.duy.lambda.Predicate;
-
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
-import org.matheclipse.core.eval.util.OpenIntToSet;
-import org.matheclipse.core.expression.Context;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.visit.AbstractVisitor;
-
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -28,6 +14,21 @@ import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.util.ArraySet;
+import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
+import org.matheclipse.core.eval.util.OpenIntToSet;
+import org.matheclipse.core.expression.Context;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.visit.AbstractVisitor;
+
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Predicate;
+
 /**
  * The pattern matching rules associated with a symbol.
  */
@@ -41,7 +42,7 @@ public class RulesData implements Serializable {
 	 */
 	public static final int DEFAULT_VALUE_INDEX = Integer.MIN_VALUE;
 
-	public static boolean isComplicatedPatternRule(final IExpr lhsExpr, final Set<ISymbol> neededSymbols) {
+	public static boolean isComplicatedPatternRule(final IExpr lhsExpr, final ArraySet neededSymbols) {
 		if (lhsExpr.isAST()) {
 			final IAST lhsAST = ((IAST) lhsExpr);
 			if (lhsAST.size() > 1) {
@@ -226,7 +227,8 @@ public class RulesData implements Serializable {
 		if (fSimplePatternDownRules != null && fSimplePatternDownRules.size() > 0) {
 			Iterator<IPatternMatcher> listIter;
 			Set<IPatternMatcher>[] setArr = fSimplePatternDownRules.getValues();
-			for (int i = 0; i < setArr.length; i++) {
+			final int length = setArr.length;
+			for (int i = 0; i < length; i++) {
 				if (setArr[i] != null) {
 					listIter = setArr[i].iterator();
 					IPatternMatcher elem;
@@ -245,7 +247,8 @@ public class RulesData implements Serializable {
 		if (fSimpleOrderlesPatternDownRules != null && fSimpleOrderlesPatternDownRules.size() > 0) {
 			Iterator<IPatternMatcher> listIter;
 			Set<IPatternMatcher>[] setArr = fSimpleOrderlesPatternDownRules.getValues();
-			for (int i = 0; i < setArr.length; i++) {
+			final int length = setArr.length;
+			for (int i = 0; i < length; i++) {
 				if (setArr[i] != null) {
 					listIter = setArr[i].iterator();
 					IPatternMatcher elem;
@@ -266,7 +269,8 @@ public class RulesData implements Serializable {
 		}
 		if (fPatternDownRules != null && fPatternDownRules.size() > 0) {
 			IPatternMatcher[] list = fPatternDownRules.toArray(new IPatternMatcher[0]);
-			for (int i = 0; i < list.length; i++) {
+			final int length = list.length;
+			for (int i = 0; i < length; i++) {
 				if (list[i] instanceof PatternMatcherAndEvaluator) {
 					pmEvaluator = (PatternMatcherAndEvaluator) list[i];
 					ast = pmEvaluator.getAsAST();
@@ -279,8 +283,8 @@ public class RulesData implements Serializable {
 		return null;
 	}
 
-	private PatternMatcher addSimpleOrderlessPatternDownRule(final Set<ISymbol> headerSymbols, final IExpr leftHandSide,
-			final PatternMatcher pmEvaluator) {
+	private PatternMatcher addSimpleOrderlessPatternDownRule(final ArraySet<ISymbol> headerSymbols,
+			final IExpr leftHandSide, final PatternMatcher pmEvaluator) {
 		for (ISymbol head : headerSymbols) {
 			final int hash = head.hashCode();
 			if (F.isSystemInitialized && fSimpleOrderlesPatternDownRules.containsEntry(hash, pmEvaluator)) {
@@ -349,10 +353,6 @@ public class RulesData implements Serializable {
 				key = iter.next();
 				pmEquals = fEqualUpRules.get(key);
 				setSymbol = pmEquals.getSetSymbol();
-				// ast = F.ast(setSymbol);
-				// ast.add(key);
-				// ast.add(pmEquals.getRHS());
-				// definitionList.add(ast);
 				definitionList.add(F.binaryAST2(setSymbol, key, pmEquals.getRHS()));
 			}
 		}
@@ -371,25 +371,13 @@ public class RulesData implements Serializable {
 
 							condition = pmEvaluator.getCondition();
 							if (condition != null) {
-								// ast = F.ast(setSymbol);
-								// ast.add(pmEvaluator.getLHS());
-								// ast.add(F.Condition(pmEvaluator.getRHS(),
-								// condition));
-								// definitionList.add(ast);
 								definitionList.add(F.binaryAST2(setSymbol, pmEvaluator.getLHS(),
 										F.Condition(pmEvaluator.getRHS(), condition)));
 							} else {
-								// ast = F.ast(setSymbol);
-								// ast.add(pmEvaluator.getLHS());
-								// ast.add(pmEvaluator.getRHS());
-								// definitionList.add(ast);
 								definitionList.add(F.binaryAST2(setSymbol, pmEvaluator.getLHS(), pmEvaluator.getRHS()));
 							}
 
 						}
-						// if (elem instanceof PatternMatcherAndInvoker) {
-						// don't show internal methods associated with a pattern
-						// }
 					}
 				}
 			}
@@ -426,7 +414,8 @@ public class RulesData implements Serializable {
 		if (fSimpleOrderlesPatternDownRules != null && fSimpleOrderlesPatternDownRules.size() > 0) {
 			Iterator<IPatternMatcher> listIter;
 			Set<IPatternMatcher>[] setArr = fSimpleOrderlesPatternDownRules.getValues();
-			for (int i = 0; i < setArr.length; i++) {
+			final int length = setArr.length;
+			for (int i = 0; i < length; i++) {
 				if (setArr[i] != null) {
 					listIter = setArr[i].iterator();
 					IPatternMatcher elem;
@@ -447,7 +436,8 @@ public class RulesData implements Serializable {
 		}
 		if (fPatternDownRules != null && fPatternDownRules.size() > 0) {
 			IPatternMatcher[] list = fPatternDownRules.toArray(new IPatternMatcher[0]);
-			for (int i = 0; i < list.length; i++) {
+			final int length = list.length;
+			for (int i = 0; i < length; i++) {
 				if (list[i] instanceof PatternMatcherAndEvaluator) {
 					pmEvaluator = (PatternMatcherAndEvaluator) list[i];
 					ast = pmEvaluator.getAsAST();
@@ -514,7 +504,7 @@ public class RulesData implements Serializable {
 	 * @param expr
 	 * @return <code>F.NIL</code> if no evaluation was possible
 	 */
-	public IExpr evalDownRule(final IExpr expr, EvalEngine engine) {
+	public IExpr evalDownRule(final IExpr expr, final EvalEngine engine) {
 		PatternMatcherEquals res;
 
 		if (Config.SHOW_PATTERN_EVAL_STEPS) {
@@ -539,7 +529,7 @@ public class RulesData implements Serializable {
 		try {
 			IPatternMatcher pmEvaluator;
 			if (expr.isAST()) {
-				IAST astExpr = (IAST) expr;
+				final IAST astExpr = (IAST) expr;
 				if (fSimplePatternDownRules != null) {
 					final int hash = ((IAST) expr).patternHashCode();
 					if (fSimplePatternDownRules.containsKey(hash)) {
@@ -552,18 +542,28 @@ public class RulesData implements Serializable {
 				}
 
 				if (fSimpleOrderlesPatternDownRules != null) {
-					int hash;
-					for (int i = 1; i < astExpr.size(); i++) {
-						if (astExpr.get(i).isAST() && astExpr.get(i).head().isSymbol()) {
-							hash = astExpr.get(i).head().hashCode();
-							if (fSimpleOrderlesPatternDownRules.containsKey(hash)) {
-								IExpr temp = evalSimpleRatternDownRule(fSimpleOrderlesPatternDownRules, hash, astExpr,
-										showSteps, engine);
-								if (temp.isPresent()) {
-									return temp;
+					final IExpr[] temp = new IExpr[1];
+					if (astExpr.exists(new Predicate<IExpr>() {
+						public boolean test(IExpr x) {
+							if (x.isAST() && x.head().isSymbol()) {
+								final int hash = x.head().hashCode();
+								if (fSimpleOrderlesPatternDownRules.containsKey(hash)) {
+									try {
+										IExpr result = evalSimpleRatternDownRule(fSimpleOrderlesPatternDownRules, hash,
+												astExpr, showSteps, engine);
+										if (result.isPresent()) {
+											temp[0] = result;
+											return true;
+										}
+									} catch (CloneNotSupportedException cnse) {
+										cnse.printStackTrace();
+									}
 								}
 							}
+							return false;
 						}
+					})) {
+						return temp[0];
 					}
 				}
 			}
@@ -749,7 +749,7 @@ public class RulesData implements Serializable {
 	}
 
 	public IPatternMatcher putDownRule(final IExpr leftHandSide, final AbstractPatternMatcherMethod pmEvaluator) {
-		Set<ISymbol> headerSymbols = new HashSet<ISymbol>();
+		ArraySet<ISymbol> headerSymbols = new ArraySet<ISymbol>();
 		if (!isComplicatedPatternRule(leftHandSide, headerSymbols)) {
 			fSimplePatternDownRules = getSimplePatternDownRules();
 			return addSimplePatternDownRule(leftHandSide, pmEvaluator);
@@ -779,8 +779,6 @@ public class RulesData implements Serializable {
 			final IExpr leftHandSide, final IExpr rightHandSide) {
 		if (equalRule) {
 			fEqualDownRules = getEqualDownRules();
-			// fEqualRules.put(leftHandSide, new Pair<ISymbol, IExpr>(setSymbol,
-			// rightHandSide));
 			PatternMatcherEquals pmEquals = new PatternMatcherEquals(setSymbol, leftHandSide, rightHandSide);
 			fEqualDownRules.put(leftHandSide, pmEquals);
 			return pmEquals;
@@ -791,15 +789,12 @@ public class RulesData implements Serializable {
 
 		if (pmEvaluator.isRuleWithoutPatterns()) {
 			fEqualDownRules = getEqualDownRules();
-			// fEqualRules.put(leftHandSide, new Pair<ISymbol, IExpr>(setSymbol,
-			// rightHandSide));
 			PatternMatcherEquals pmEquals = new PatternMatcherEquals(setSymbol, leftHandSide, rightHandSide);
 			fEqualDownRules.put(leftHandSide, pmEquals);
 			return pmEquals;
 		}
 
-		// pmEvaluator.setCondition(condition);
-		Set<ISymbol> headerSymbols = new HashSet<ISymbol>();
+		ArraySet<ISymbol> headerSymbols = new ArraySet<ISymbol>();
 		if (!isComplicatedPatternRule(leftHandSide, headerSymbols)) {
 			fSimplePatternDownRules = getSimplePatternDownRules();
 			return addSimplePatternDownRule(leftHandSide, pmEvaluator);
@@ -813,13 +808,6 @@ public class RulesData implements Serializable {
 			fPatternDownRules = getPatternDownRules();
 			if (F.isSystemInitialized) {
 				fPatternDownRules.remove(pmEvaluator);
-				// for (int i = 0; i < fPatternDownRules.size(); i++) {
-				// if (pmEvaluator.equals(fPatternDownRules.get(i))) {
-				// fPatternDownRules.set(i, pmEvaluator);
-				//
-				// return pmEvaluator;
-				// }
-				// }
 			}
 			fPatternDownRules.add(pmEvaluator);
 			return pmEvaluator;
@@ -830,7 +818,7 @@ public class RulesData implements Serializable {
 
 	public PatternMatcher putDownRule(final PatternMatcherAndInvoker pmEvaluator) {
 		final IExpr leftHandSide = pmEvaluator.getLHS();
-		Set<ISymbol> headerSymbols = new HashSet<ISymbol>();
+		ArraySet<ISymbol> headerSymbols = new ArraySet<ISymbol>();
 		if (!isComplicatedPatternRule(leftHandSide, headerSymbols)) {
 			fSimplePatternDownRules = getSimplePatternDownRules();
 			return addSimplePatternDownRule(leftHandSide, pmEvaluator);
@@ -895,7 +883,7 @@ public class RulesData implements Serializable {
 			}
 		}
 
-		Set<ISymbol> headerSymbols = new HashSet<ISymbol>();
+		ArraySet<ISymbol> headerSymbols = new ArraySet<ISymbol>();
 		boolean removed = false;
 		if (!isComplicatedPatternRule(leftHandSide, headerSymbols)) {
 			if (fSimplePatternDownRules != null) {
@@ -947,9 +935,10 @@ public class RulesData implements Serializable {
 	public String toString() {
 		StringWriter buf = new StringWriter();
 		List<IAST> list = definition();
-		for (int i = 0; i < list.size(); i++) {
+		final int size = list.size();
+		for (int i = 0; i < size; i++) {
 			buf.append(list.get(i).toString());
-			if (i < list.size() - 1) {
+			if (i < size - 1) {
 				buf.append(",\n ");
 			}
 		}

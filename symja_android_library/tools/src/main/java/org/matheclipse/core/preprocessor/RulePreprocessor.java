@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.util.ArraySet;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -83,7 +84,7 @@ public class RulePreprocessor {
 	private static void convertExpr(IExpr expr, String rulePostfix, final PrintWriter out, String symbolName) {
 		boolean last;
 		StringBuilder buffer = new StringBuilder();
-		Set<ISymbol> headerSymbols = new HashSet<ISymbol>();
+		ArraySet<ISymbol> headerSymbols = new ArraySet<ISymbol>();
 		if (expr.isAST()) {
 			IAST list = (IAST) expr;
 			if (symbolName != null) {
