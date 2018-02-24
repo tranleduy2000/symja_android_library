@@ -51,6 +51,12 @@ public interface IRational extends ISignedNumber, IBigNumber {
 	public IInteger floor();
 
 	/**
+	 * Return the fractional part of this fraction
+	 * @return
+	 */
+	public IRational fractionalPart();
+	
+	/**
 	 * Returns the denominator of this fraction.
 	 * 
 	 * @return denominator

@@ -85,7 +85,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		c.fReal = real;
 		c.fImaginary = imaginary;
 		return c;
-	}
+	} 
 
 	public static ComplexSym valueOf(final long real_numerator, final long real_denominator, final long imag_numerator,
 			final long imag_denominator) {
@@ -316,6 +316,12 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		return valueOf((IRational) fReal.floorFraction(), (IRational) fImaginary.floorFraction());
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public INumber fractionalPart() {
+		return valueOf(fReal.fractionalPart(), fImaginary.fractionalPart());
+	}
+	 
 	@Override
 	public String fullFormString() {
 		StringBuilder buf = new StringBuilder("Complex");

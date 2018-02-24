@@ -336,6 +336,8 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "bernoullidistribution" : "BernoulliDistribution");
 	public final static IBuiltInSymbol ErlangDistribution = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "erlangdistribution" : "ErlangDistribution");
+	public final static IBuiltInSymbol Expectation = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "expectation" : "Expectation");
 	public final static IBuiltInSymbol DiscreteUniformDistribution = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "discreteuniformdistribution" : "DiscreteUniformDistribution");
 	public final static IBuiltInSymbol ExponentialDistribution = initFinalSymbol(
@@ -670,6 +672,7 @@ public class F {
 	public final static IBuiltInSymbol BesselJ = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "besselj" : "BesselJ");
 	public final static IBuiltInSymbol Beta = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "beta" : "Beta");
+	public final static IBuiltInSymbol BetaRegularized = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "betaregularized" : "BetaRegularized");
 	public final static IBuiltInSymbol Binomial = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "binomial" : "Binomial");
 	public final static IBuiltInSymbol BitLength = initFinalSymbol(
@@ -879,6 +882,7 @@ public class F {
 	public final static IBuiltInSymbol FullSimplify = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "fullsimplify" : "FullSimplify");
 	public final static IBuiltInSymbol Gamma = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "gamma" : "Gamma");
+	public final static IBuiltInSymbol GammaRegularized = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "gammaregularized" : "GammaRegularized");
 	public final static IBuiltInSymbol Gather = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "gather" : "Gather");
 	public final static IBuiltInSymbol GCD = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "gcd" : "GCD");
@@ -1022,6 +1026,7 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "matrixrank" : "MatrixRank");
 	public final static IBuiltInSymbol Max = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "max" : "Max");
 	public final static IBuiltInSymbol Mean = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "mean" : "Mean");
+	public final static IBuiltInSymbol MeanDeviation = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "meandeviation" : "MeanDeviation");
 	public final static IBuiltInSymbol MersennePrimeExponent = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "mersenneprimeexponent" : "MersennePrimeExponent");
 	public final static IBuiltInSymbol MersennePrimeExponentQ = initFinalSymbol(
@@ -1168,6 +1173,8 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "qrdecomposition" : "QRDecomposition");
 	public final static IBuiltInSymbol Quotient = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "quotient" : "Quotient");
+	public final static IBuiltInSymbol QuotientRemainder = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "quotientremainder" : "QuotientRemainder");
 	public final static IBuiltInSymbol RandomChoice = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "randomchoice" : "RandomChoice");
 	public final static IBuiltInSymbol RandomInteger = initFinalSymbol(
@@ -1176,6 +1183,8 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "randomreal" : "RandomReal");
 	public final static IBuiltInSymbol RandomSample = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "randomsample" : "RandomSample");
+	public final static IBuiltInSymbol RandomVariate = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "randomsample" : "RandomVariate");
 	public final static IBuiltInSymbol Range = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "range" : "Range");
 	public final static IBuiltInSymbol Rationalize = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "rationalize" : "Rationalize");
@@ -1791,7 +1800,9 @@ public class F {
 
 	public final static IBuiltInSymbol HypergeometricPFQ = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "hypergeometricpfq" : "HypergeometricPFQ");
-
+	public final static IBuiltInSymbol HypergeometricPFQRegularized = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "hypergeometricpfqregularized" : "HypergeometricPFQRegularized");
+	
 	public final static IBuiltInSymbol LinearModelFit = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "linearmodelfit" : "LinearModelFit");
 	public final static IBuiltInSymbol CoshIntegral = initFinalSymbol(
@@ -2865,7 +2876,11 @@ public class F {
 	public static IAST Beta(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Beta, a0, a1);
 	}
-
+	
+	public static IAST BetaRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(BetaRegularized, a0, a1, a2);
+	}
+	
 	public static IAST Break() {
 		return headAST0(Break);
 	}
@@ -3872,6 +3887,14 @@ public class F {
 		return binaryAST2(Gamma, a0, a1);
 	}
 
+	public static IAST GammaRegularized(final IExpr a0, final IExpr a1) {
+		return binaryAST2(GammaRegularized, a0, a1);
+	}
+	
+	public static IAST GammaRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(GammaRegularized, a0, a1, a2);
+	}
+	
 	public static IAST GCD(final IExpr a0) {
 		return unaryAST1(GCD, a0);
 	}
@@ -3944,6 +3967,10 @@ public class F {
 		return ternaryAST3(HypergeometricPFQ, a0, a1, a2);
 	}
 
+	public static IAST HypergeometricPFQRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(HypergeometricPFQRegularized, a0, a1, a2);
+	}
+	
 	public static IAST Identity(final IExpr a0) {
 		return unaryAST1(Identity, a0);
 	}
@@ -4460,11 +4487,11 @@ public class F {
 	}
 
 	public static IAST LessEqual(final IExpr a0, final IExpr a1, final IExpr a2) {
-		return ternaryAST3(Less, a0, a1, a2);
+		return ternaryAST3(LessEqual, a0, a1, a2);
 	}
 
 	public static IAST LessEqual(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
-		return quaternary(Less, a0, a1, a2, a3);
+		return quaternary(LessEqual, a0, a1, a2, a3);
 	}
 
 	public static IAST Limit(final IExpr a0, final IExpr a1) {
@@ -4670,7 +4697,11 @@ public class F {
 	public static IAST Mean(final IExpr a0) {
 		return unaryAST1(Mean, a0);
 	}
-
+	
+	public static IAST MeanDeviation(final IExpr a0) {
+		return unaryAST1(MeanDeviation, a0);
+	}
+	
 	public static IAST Median(final IExpr a0) {
 		return unaryAST1(Median, a0);
 	}

@@ -450,6 +450,12 @@ public class ApfloatNum extends INumImpl implements INum {
 	public IInteger floorFraction() {
 		return F.integer(ApfloatMath.floor(fApfloat).toBigInteger());
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public ISignedNumber fractionalPart() {
+		return F.num(fApfloat.frac());
+	}
 
 	/**
 	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive

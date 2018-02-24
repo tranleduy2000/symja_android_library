@@ -327,7 +327,7 @@ public class FractionSym extends AbstractFractionSym {
 		}
 		return valueOf(fNumerator % fDenominator, fDenominator);
 	}
-
+	
 	@Override
 	public String fullFormString() {
 		StringBuilder buf = new StringBuilder("Rational");
@@ -636,6 +636,18 @@ public class FractionSym extends AbstractFractionSym {
 			return 0;
 		}
 		throw new ArithmeticException("toInt: denominator != 1");
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public int toIntDefault(int defaultValue) {
+		if (fDenominator == 1) {
+			return fNumerator;
+		}
+		if (fNumerator == 0) {
+			return 0;
+		}
+		return defaultValue;
 	}
 
 	/** {@inheritDoc} */

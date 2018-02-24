@@ -345,6 +345,12 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 				NumberUtil.toLong(Math.floor(fComplex.getImaginary())));
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public INumber fractionalPart() {
+		return F.complexNum(getRealPart() % 1, getImaginaryPart() % 1);
+	}
+	
 	public Complex getCMComplex() {
 		return new Complex(fComplex.getReal(), fComplex.getImaginary());
 	}

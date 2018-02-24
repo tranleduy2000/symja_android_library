@@ -461,6 +461,12 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 		return result;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public IRational fractionalPart() {
+		return F.C0;
+	}
+	
 	@Override
 	public IInteger floor() {
 		return this;

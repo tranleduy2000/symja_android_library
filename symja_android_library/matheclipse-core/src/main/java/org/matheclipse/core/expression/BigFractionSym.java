@@ -285,7 +285,7 @@ public class BigFractionSym extends AbstractFractionSym {
 		}
 		return AbstractFractionSym.valueOf(newnum, den);
 	}
-
+	
 	@Override
 	public String fullFormString() {
 		StringBuilder buf = new StringBuilder("Rational");
@@ -553,6 +553,19 @@ public class BigFractionSym extends AbstractFractionSym {
 		throw new ArithmeticException("toInt: denominator != 1");
 	}
 
+
+	/** {@inheritDoc} */
+	@Override
+	public int toIntDefault(int defaultValue) {
+		if (toBigDenominator().equals(BigInteger.ONE)) {
+			return NumberUtil.toInt(toBigNumerator());
+		}
+		if (toBigNumerator().equals(BigInteger.ZERO)) {
+			return 0;
+		}
+		return defaultValue;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public long toLong() throws ArithmeticException {

@@ -1638,7 +1638,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	@Override
 	public final boolean isEmpty() {
-		return size() == 0;
+		return size() == 1;
 	}
 
 	/** {@inheritDoc} */

@@ -521,6 +521,12 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 				F.integer(ApfloatMath.floor(fApcomplex.imag()).toBigInteger()));
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public INumber fractionalPart() {
+		return F.complexNum(fApcomplex.real().frac(), fApcomplex.imag().frac());
+	}
+	
 	@Override
 	public long precision() throws ApfloatRuntimeException {
 		return fApcomplex.precision();

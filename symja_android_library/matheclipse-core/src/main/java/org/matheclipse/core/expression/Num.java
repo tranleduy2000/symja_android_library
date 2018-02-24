@@ -286,6 +286,12 @@ public class Num extends INumImpl implements INum {
 
 	/** {@inheritDoc} */
 	@Override
+	public ISignedNumber fractionalPart() {
+		return F.num(getRealPart() % 1);
+	}
+	
+	/** {@inheritDoc} */
+	@Override
 	public ISignedNumber im() {
 		return F.CD0;
 	}
