@@ -317,7 +317,7 @@ public final class FFT extends L4MObject {
                             final double[] x, final double[] y) {
         int i, j, k, l, n = x.length, m = log2(n), o = 1, p;
         double ck = -1, sk = 0, cj, sj, tx, ty;
- 		/* Do the bit reversal */
+         /* Do the bit reversal */
         bitreverse(m, x, y);
  		/* Compute the FFT */
         for (k = 0; k < m; k++) {
