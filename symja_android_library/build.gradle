@@ -78,7 +78,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile files('lib/Lab4Math-2.0.5.jar')
-    compile group: 'org.logicng', name: 'logicng', version: '1.3.1'
 }
 
 
