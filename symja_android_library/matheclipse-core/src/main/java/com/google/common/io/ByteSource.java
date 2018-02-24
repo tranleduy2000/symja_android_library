@@ -14,21 +14,13 @@
 
 package com.google.common.io;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.io.ByteStreams.createBuffer;
-import static com.google.common.io.ByteStreams.skipUpTo;
-
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.base.Ascii;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.hash.Funnels;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hasher;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -39,6 +31,11 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.io.ByteStreams.createBuffer;
+import static com.google.common.io.ByteStreams.skipUpTo;
 
 /**
  * A readable source of bytes, such as a file. Unlike an {@link InputStream}, a {@code ByteSource}
@@ -317,17 +314,6 @@ public abstract class ByteSource {
   }
 
   /**
-   * Hashes the contents of this byte source using the given hash function.
-   *
-   * @throws IOException if an I/O error occurs in the process of reading from this source
-   */
-  public HashCode hash(HashFunction hashFunction) throws IOException {
-    Hasher hasher = hashFunction.newHasher();
-    copyTo(Funnels.asOutputStream(hasher));
-    return hasher.hash();
-  }
-
-  /**
    * Checks that the contents of this byte source are equal to the contents of the given byte
    * source.
    *
@@ -599,11 +585,6 @@ public abstract class ByteSource {
     public <T> T read(ByteProcessor<T> processor) throws IOException {
       processor.processBytes(bytes, offset, length);
       return processor.getResult();
-    }
-
-    @Override
-    public HashCode hash(HashFunction hashFunction) throws IOException {
-      return hashFunction.hashBytes(bytes, offset, length);
     }
 
     @Override

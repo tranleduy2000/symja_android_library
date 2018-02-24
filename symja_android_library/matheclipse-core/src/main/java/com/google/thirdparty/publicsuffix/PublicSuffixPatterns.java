@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * <b>Do not use this class directly. For access to public-suffix information,
- * use {@link com.google.common.net.InternetDomainName}.</b>
  *
  * A generated static class containing public members which provide domain
  * name patterns used in determining whether a given domain name is an

@@ -14,10 +14,6 @@
 
 package com.google.common.io;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.io.FileWriteMode.APPEND;
-
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.base.Joiner;
@@ -27,9 +23,8 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.TreeTraverser;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -51,6 +46,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.io.FileWriteMode.APPEND;
 
 /**
  * Provides utility methods for working with files.
@@ -566,19 +565,6 @@ public final class Files {
   @CanIgnoreReturnValue // some processors won't return a useful result
   public static <T> T readBytes(File file, ByteProcessor<T> processor) throws IOException {
     return asByteSource(file).read(processor);
-  }
-
-  /**
-   * Computes the hash code of the {@code file} using {@code hashFunction}.
-   *
-   * @param file the file to read
-   * @param hashFunction the hash function to use to hash the data
-   * @return the {@link HashCode} of all of the bytes in the file
-   * @throws IOException if an I/O error occurs
-   * @since 12.0
-   */
-  public static HashCode hash(File file, HashFunction hashFunction) throws IOException {
-    return asByteSource(file).hash(hashFunction);
   }
 
   /**
