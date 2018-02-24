@@ -46,6 +46,14 @@ public class Lab4IntSourceGetter extends TestCase {
         }
     }
 
+    public void test1() throws IOException {
+        downloadAndModifiedSource("de/lab4inf/math/Solver.html");
+    }
+
+    public void test2() throws IOException {
+        downloadAndModifiedSource("de/lab4inf/math/differentiation/Differentiator");
+    }
+
     private void downloadAndModifiedSource(final String path) throws IOException {
         System.out.println("link = " + path);
         String url = SOURCE_PREFIX + path;
