@@ -106,11 +106,6 @@ public abstract class ForwardingCache<K, V> extends ForwardingObject implements 
   }
 
   @Override
-  public CacheStats stats() {
-    return delegate().stats();
-  }
-
-  @Override
   public ConcurrentMap<K, V> asMap() {
     return delegate().asMap();
   }

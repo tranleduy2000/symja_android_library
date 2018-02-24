@@ -131,7 +131,7 @@ public class ExecutableServer extends Thread {
      */
     @Override
     public void run() {
-        SocketChannel channel = null;
+        SocketChannel channel;
         Executor s = null;
         mythread = Thread.currentThread();
         while (goon) {

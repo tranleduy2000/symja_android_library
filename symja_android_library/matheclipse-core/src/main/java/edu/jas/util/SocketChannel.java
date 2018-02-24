@@ -9,7 +9,6 @@ package edu.jas.util;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 
 
 /**
@@ -25,40 +24,19 @@ public class SocketChannel {
     /*
      * Input stream from the socket.
      */
-    private final ObjectInputStream in;
+    private ObjectInputStream in;
 
 
     /*
      * Output stream to the socket.
      */
-    private final ObjectOutputStream out;
+    private ObjectOutputStream out;
 
 
     /*
      * Underlying socket.
      */
-    private final Socket soc;
-
-
-    /**
-     * Constructs a socket channel on the given socket s.
-     *
-     * @param s A socket object.
-     */
-    public SocketChannel(Socket s) throws IOException {
-        soc = s;
-        out = new ObjectOutputStream(s.getOutputStream());
-        out.flush();
-        in = new ObjectInputStream(s.getInputStream());
-    }
-
-
-    /**
-     * Get the Socket
-     */
-    public Socket getSocket() {
-        return soc;
-    }
+//    private final Socket soc;
 
 
     /**
@@ -100,12 +78,6 @@ public class SocketChannel {
             } catch (IOException e) {
             }
         }
-        if (soc != null) {
-            try {
-                soc.close();
-            } catch (IOException e) {
-            }
-        }
     }
 
 
@@ -114,7 +86,7 @@ public class SocketChannel {
      */
     @Override
     public String toString() {
-        return "socketChannel(" + soc + ")";
+        return "socketChannel(" +  ")";
     }
 
 }

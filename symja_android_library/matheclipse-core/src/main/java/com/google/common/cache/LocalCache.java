@@ -14,14 +14,6 @@
 
 package com.google.common.cache;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.cache.CacheBuilder.NULL_TICKER;
-import static com.google.common.cache.CacheBuilder.UNSET_INT;
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.VisibleForTesting;
@@ -29,7 +21,6 @@ import com.google.common.base.Equivalence;
 import com.google.common.base.Function;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Ticker;
-import com.google.common.cache.AbstractCache.SimpleStatsCounter;
 import com.google.common.cache.AbstractCache.StatsCounter;
 import com.google.common.cache.CacheBuilder.NullListener;
 import com.google.common.cache.CacheBuilder.OneWeigher;
@@ -82,6 +73,14 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.cache.CacheBuilder.NULL_TICKER;
+import static com.google.common.cache.CacheBuilder.UNSET_INT;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * The concurrent hash map implementation built by {@link CacheBuilder}.
@@ -4945,16 +4944,6 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     @Override
     public ConcurrentMap<K, V> asMap() {
       return localCache;
-    }
-
-    @Override
-    public CacheStats stats() {
-      SimpleStatsCounter aggregator = new SimpleStatsCounter();
-      aggregator.incrementBy(localCache.globalStatsCounter);
-      for (Segment<K, V> segment : localCache.segments) {
-        aggregator.incrementBy(segment.statsCounter);
-      }
-      return aggregator.snapshot();
     }
 
     @Override

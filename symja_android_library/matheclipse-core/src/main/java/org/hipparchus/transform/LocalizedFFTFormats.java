@@ -17,11 +17,8 @@
 package org.hipparchus.transform;
 
 import org.hipparchus.exception.Localizable;
-import org.hipparchus.exception.UTF8Control;
 
 import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 /**
  * Enumeration for localized messages formats used in exceptions messages.
@@ -79,24 +76,6 @@ public enum LocalizedFFTFormats implements Localizable {
      */
     @Override
     public String getLocalizedString(final Locale locale) {
-        try {
-            final String path = LocalizedFFTFormats.class.getName().replaceAll("\\.", "/");
-            ResourceBundle bundle =
-                    ResourceBundle.getBundle("assets/" + path, locale, new UTF8Control());
-            if (bundle.getLocale().getLanguage().equals(locale.getLanguage())) {
-                final String translated = bundle.getString(name());
-                if ((translated != null) &&
-                        (translated.length() > 0) &&
-                        (!translated.toLowerCase().contains("missing translation"))) {
-                    // the value of the resource is the translated format
-                    return translated;
-                }
-            }
-
-        } catch (MissingResourceException mre) { // NOPMD
-            // do nothing here
-        }
-
         // either the locale is not supported or the resource is unknown
         // don't translate and fall back to using the source format
         return sourceFormat;

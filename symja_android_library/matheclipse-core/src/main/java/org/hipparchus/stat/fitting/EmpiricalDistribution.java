@@ -39,7 +39,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -232,41 +231,6 @@ public class EmpiricalDistribution extends AbstractRealDistribution {
         }
         loaded = true;
 
-    }
-
-    /**
-     * Computes the empirical distribution using data read from a URL.
-     * <p>
-     * <p>The input file <i>must</i> be an ASCII text file containing one
-     * valid numeric entry per line.</p>
-     *
-     * @param url url of the input file
-     * @throws IOException                  if an IO error occurs
-     * @throws NullArgumentException        if url is null
-     * @throws MathIllegalArgumentException if URL contains no data
-     */
-    public void load(URL url) throws IOException, MathIllegalArgumentException, NullArgumentException {
-        MathUtils.checkNotNull(url);
-        Charset charset = Charset.forName(FILE_CHARSET);
-        BufferedReader in =
-                new BufferedReader(new InputStreamReader(url.openStream(), charset));
-        try {
-            DataAdapter da = new StreamDataAdapter(in);
-            da.computeStats();
-            if (sampleStats.getN() == 0) {
-                throw new MathIllegalArgumentException(LocalizedCoreFormats.URL_CONTAINS_NO_DATA, url);
-            }
-            // new adapter for the second pass
-            in = new BufferedReader(new InputStreamReader(url.openStream(), charset));
-            fillBinStats(new StreamDataAdapter(in));
-            loaded = true;
-        } finally {
-            try {
-                in.close();
-            } catch (IOException ex) { //NOPMD
-                // ignore
-            }
-        }
     }
 
     /**

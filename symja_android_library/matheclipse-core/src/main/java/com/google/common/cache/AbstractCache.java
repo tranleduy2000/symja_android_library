@@ -122,18 +122,13 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
   }
 
   @Override
-  public CacheStats stats() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public ConcurrentMap<K, V> asMap() {
     throw new UnsupportedOperationException();
   }
 
   /**
    * Accumulates statistics during the operation of a {@link Cache} for presentation by
-   * {@link Cache#stats}. This is solely intended for consumption by {@code Cache} implementors.
+   * {link Cache#stats}. This is solely intended for consumption by {@code Cache} implementors.
    *
    * @since 10.0
    */
@@ -255,17 +250,5 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
           evictionCount.sum());
     }
 
-    /**
-     * Increments all counters by the values in {@code other}.
-     */
-    public void incrementBy(StatsCounter other) {
-      CacheStats otherStats = other.snapshot();
-      hitCount.add(otherStats.hitCount());
-      missCount.add(otherStats.missCount());
-      loadSuccessCount.add(otherStats.loadSuccessCount());
-      loadExceptionCount.add(otherStats.loadExceptionCount());
-      totalLoadTime.add(otherStats.totalLoadTime());
-      evictionCount.add(otherStats.evictionCount());
-    }
   }
 }

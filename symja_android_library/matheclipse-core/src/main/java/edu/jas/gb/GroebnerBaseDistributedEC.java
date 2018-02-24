@@ -500,13 +500,13 @@ class ReducerServerEC<C extends RingElem<C>> implements Runnable {
 
     public void run() {
         logger.info("reducer server running with " + cf);
-        try {
+        /*try {
             pairChannel = cf.getChannel();
         } catch (InterruptedException e) {
             logger.debug("get pair channel interrupted");
             e.printStackTrace();
             return;
-        }
+        }*/
         if (logger.isDebugEnabled()) {
             logger.debug("pairChannel = " + pairChannel);
         }

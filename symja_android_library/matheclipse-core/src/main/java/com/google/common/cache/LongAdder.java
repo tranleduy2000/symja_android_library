@@ -12,6 +12,7 @@
 package com.google.common.cache;
 
 import com.google.common.annotations.GwtCompatible;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,12 +21,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * One or more variables that together maintain an initially zero
- * {@code long} sum.  When updates (method {@link #add}) are contended
+ * {@code long} sum.  When updates (method {link #add}) are contended
  * across threads, the set of variables may grow dynamically to reduce
  * contention. Method {@link #sum} (or, equivalently, {@link
  * #longValue}) returns the current total combined across the
  * variables maintaining the sum.
- *
+ * <p>
  * <p>This class is usually preferable to {@link AtomicLong} when
  * multiple threads update a common sum that is used for purposes such
  * as collecting statistics, not for fine-grained synchronization
@@ -33,26 +34,21 @@ import java.util.concurrent.atomic.AtomicLong;
  * characteristics. But under high contention, expected throughput of
  * this class is significantly higher, at the expense of higher space
  * consumption.
- *
+ * <p>
  * <p>This class extends {@link Number}, but does <em>not</em> define
  * methods such as {@code equals}, {@code hashCode} and {@code
  * compareTo} because instances are expected to be mutated, and so are
  * not useful as collection keys.
- *
+ * <p>
  * <p><em>jsr166e note: This class is targeted to be placed in
  * java.util.concurrent.atomic.</em>
  *
- * @since 1.8
  * @author Doug Lea
+ * @since 1.8
  */
 @GwtCompatible(emulated = true)
 final class LongAdder extends Striped64 implements Serializable, LongAddable {
     private static final long serialVersionUID = 7249069246863182397L;
-
-    /**
-     * Version of plus for use in retryUpdate
-     */
-    final long fn(long v, long x) { return v + x; }
 
     /**
      * Creates a new adder with initial sum of zero.
@@ -61,18 +57,29 @@ final class LongAdder extends Striped64 implements Serializable, LongAddable {
     }
 
     /**
+     * Version of plus for use in retryUpdate
+     */
+    final long fn(long v, long x) {
+        return v + x;
+    }
+
+    /**
      * Adds the given value.
      *
      * @param x the value to add
      */
     public void add(long x) {
-        Cell[] as; long b, v; int[] hc; Cell a; int n;
+        Cell[] as;
+        long b, v;
+        int[] hc;
+        Cell a;
+        int n;
         if ((as = cells) != null || !casBase(b = base, b + x)) {
             boolean uncontended = true;
             if ((hc = threadHashCode.get()) == null ||
-                as == null || (n = as.length) < 1 ||
-                (a = as[(n - 1) & hc[0]]) == null ||
-                !(uncontended = a.cas(v = a.value, v + x)))
+                    as == null || (n = as.length) < 1 ||
+                    (a = as[(n - 1) & hc[0]]) == null ||
+                    !(uncontended = a.cas(v = a.value, v + x)))
                 retryUpdate(x, hc, uncontended);
         }
     }
@@ -154,6 +161,7 @@ final class LongAdder extends Striped64 implements Serializable, LongAddable {
 
     /**
      * Returns the String representation of the {@link #sum}.
+     *
      * @return the String representation of the {@link #sum}
      */
     public String toString() {
@@ -174,7 +182,7 @@ final class LongAdder extends Striped64 implements Serializable, LongAddable {
      * primitive conversion.
      */
     public int intValue() {
-        return (int)sum();
+        return (int) sum();
     }
 
     /**
@@ -182,7 +190,7 @@ final class LongAdder extends Striped64 implements Serializable, LongAddable {
      * after a widening primitive conversion.
      */
     public float floatValue() {
-        return (float)sum();
+        return (float) sum();
     }
 
     /**
@@ -190,7 +198,7 @@ final class LongAdder extends Striped64 implements Serializable, LongAddable {
      * primitive conversion.
      */
     public double doubleValue() {
-        return (double)sum();
+        return (double) sum();
     }
 
     private void writeObject(ObjectOutputStream s) throws IOException {

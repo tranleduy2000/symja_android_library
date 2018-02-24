@@ -404,7 +404,6 @@ class ReducerServerSeqPair<C extends RingElem<C>> implements Runnable {
 
     //private List<GenPolynomial<C>> G;
     private final CriticalPairList<C> pairlist;
-    private SocketChannel pairChannel;
 
 
     ReducerServerSeqPair(Terminator fin, ChannelFactory cf, DistHashTable<Integer, GenPolynomial<C>> dl,
@@ -419,6 +418,7 @@ class ReducerServerSeqPair<C extends RingElem<C>> implements Runnable {
 
     public void run() {
         logger.debug("reducer server running");
+        SocketChannel pairChannel;
         try {
             pairChannel = cf.getChannel();
         } catch (InterruptedException e) {

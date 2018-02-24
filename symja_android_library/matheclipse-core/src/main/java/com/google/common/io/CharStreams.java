@@ -111,7 +111,7 @@ public final class CharStreams {
    * line-termination characters, but do include other leading and trailing whitespace.
    *
    * <p>Does not close the {@code Readable}. If reading files or resources you should use the
-   * {@link Files#readLines} and {@link Resources#readLines} methods.
+   * {@link Files#readLines} and {link Resources#readLines} methods.
    *
    * @param r the object to read from
    * @return a mutable {@link List} containing all the lines

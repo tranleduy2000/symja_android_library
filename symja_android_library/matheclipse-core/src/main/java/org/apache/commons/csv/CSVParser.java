@@ -17,8 +17,7 @@
 
 package org.apache.commons.csv;
 
-import static org.apache.commons.csv.Token.Type.TOKEN;
-
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,9 +26,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.nio.charset.CharsetDecoder;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
+
+import static java.nio.file.Files.newInputStream;
+import static org.apache.commons.csv.Token.Type.TOKEN;
 
 /**
  * Parses CSV files according to the specified format.
@@ -55,7 +56,7 @@ import java.util.TreeMap;
  * <ul>
  *     <li>{@link #parse(File, Charset, CSVFormat)}</li>
  *     <li>{@link #parse(String, CSVFormat)}</li>
- *     <li>{@link #parse(URL, Charset, CSVFormat)}</li>
+ *     <li>{link #parse(URL, Charset, CSVFormat)}</li>
  * </ul>
  * <p>
  * Alternatively parsers can also be created by passing a {@link Reader} directly to the sole constructor.
@@ -203,7 +204,11 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
     public static CSVParser parse(final Path path, final Charset charset, final CSVFormat format) throws IOException {
         Assertions.notNull(path, "path");
         Assertions.notNull(format, "format");
-        return parse(Files.newBufferedReader(path, charset), format);
+
+        CharsetDecoder decoder = charset.newDecoder();
+        Reader reader = new InputStreamReader(newInputStream(path), decoder);
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        return parse(bufferedReader, format);
     }
 
     /**
@@ -247,34 +252,6 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
         Assertions.notNull(format, "format");
 
         return new CSVParser(new StringReader(string), format);
-    }
-
-    /**
-     * Creates a parser for the given URL.
-     *
-     * <p>
-     * If you do not read all records from the given {@code url}, you should call {@link #close()} on the parser, unless
-     * you close the {@code url}.
-     * </p>
-     *
-     * @param url
-     *            a URL. Must not be null.
-     * @param charset
-     *            the charset for the resource. Must not be null.
-     * @param format
-     *            the CSVFormat used for CSV parsing. Must not be null.
-     * @return a new parser
-     * @throws IllegalArgumentException
-     *             If the parameters of the format are inconsistent or if either url, charset or format are null.
-     * @throws IOException
-     *             If an I/O error occurs
-     */
-    public static CSVParser parse(final URL url, final Charset charset, final CSVFormat format) throws IOException {
-        Assertions.notNull(url, "url");
-        Assertions.notNull(charset, "charset");
-        Assertions.notNull(format, "format");
-
-        return new CSVParser(new InputStreamReader(url.openStream(), charset), format);
     }
 
     // the following objects are shared to reduce garbage

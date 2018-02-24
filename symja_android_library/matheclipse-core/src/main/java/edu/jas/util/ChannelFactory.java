@@ -9,11 +9,6 @@ package edu.jas.util;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.net.BindException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
@@ -45,13 +40,13 @@ public class ChannelFactory extends Thread {
     /**
      * BoundedBuffer for sockets.
      */
-    private final BlockingQueue<SocketChannel> buf;
+//    private final BlockingQueue<SocketChannel> buf;
 
 
     /**
      * local server socket.
      */
-    private volatile ServerSocket srv;
+//    private volatile ServerSocket srv;
 
 
     /**
@@ -80,13 +75,13 @@ public class ChannelFactory extends Thread {
      * @param p port.
      */
     public ChannelFactory(int p) {
-        buf = new LinkedBlockingQueue<SocketChannel>(/*infinite*/);
+//        buf = new LinkedBlockingQueue<SocketChannel>(/*infinite*/);
         if (p <= 0) {
             port = DEFAULT_PORT;
         } else {
             port = p;
         }
-        try {
+        /*try {
             srv = new ServerSocket(port);
             //this.start(); moved to init and getChannel
             logger.info("server bound to port " + port);
@@ -101,7 +96,7 @@ public class ChannelFactory extends Thread {
             if (logger.isDebugEnabled()) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
 
@@ -110,7 +105,8 @@ public class ChannelFactory extends Thread {
      */
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "(" + srv + ", buf = " + buf.size() + ")";
+//        return this.getClass().getSimpleName() + "(" + srv + ", buf = " + buf.size() + ")";
+        return super.toString();
     }
 
 
@@ -118,11 +114,11 @@ public class ChannelFactory extends Thread {
      * thread initialization and start.
      */
     public void init() {
-        if (srv != null && !srvstart) {
+       /* if (srv != null && !srvstart) {
             this.start();
             srvstart = true;
             logger.info("ChannelFactory at " + srv);
-        }
+        }*/
     }
 
 
@@ -131,14 +127,14 @@ public class ChannelFactory extends Thread {
      */
     public SocketChannel getChannel() throws InterruptedException {
         // return (SocketChannel)buf.get();
-        if (srv == null) {
-            if (srvrun) {
-                throw new IllegalArgumentException("dont call when no server listens");
-            }
-        } else if (!srvstart) {
-            init();
-        }
-        return buf.take();
+//        if (srv == null) {
+//            if (srvrun) {
+        throw new IllegalArgumentException("dont call when no server listens");
+//            }
+//        } else if (!srvstart) {
+//            init();
+//        }
+//        return buf.take();
     }
 
 
@@ -159,7 +155,7 @@ public class ChannelFactory extends Thread {
      * @param p port
      */
     public SocketChannel getChannel(String h, int p) throws IOException {
-        if (p <= 0) {
+        /*if (p <= 0) {
             p = port;
         }
         SocketChannel c = null;
@@ -191,7 +187,8 @@ public class ChannelFactory extends Thread {
             }
         }
         logger.debug("connected, iter = " + i);
-        return c;
+        return c;*/
+        throw new IOException("Interrupted during IO wait ");
     }
 
 
@@ -200,7 +197,7 @@ public class ChannelFactory extends Thread {
      */
     @Override
     public void run() {
-        if (srv == null) {
+       /* if (srv == null) {
             return; // nothing to do
         }
         srvrun = true;
@@ -230,7 +227,7 @@ public class ChannelFactory extends Thread {
                 srvrun = false;
                 return;
             }
-        }
+        }*/
     }
 
 
@@ -238,7 +235,7 @@ public class ChannelFactory extends Thread {
      * Terminate the Channel Factory
      */
     public void terminate() {
-        if (!srvstart) {
+       /* if (!srvstart) {
             logger.debug("server not started");
             return;
         }
@@ -266,7 +263,7 @@ public class ChannelFactory extends Thread {
         } catch (InterruptedException e) {
             // unfug Thread.currentThread().interrupt();
         }
-        logger.debug("ChannelFactory terminated");
+        logger.debug("ChannelFactory terminated");*/
     }
 
 }

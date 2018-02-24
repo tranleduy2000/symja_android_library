@@ -774,7 +774,7 @@ public final class CacheBuilder<K, V> {
 
   /**
    * Enable the accumulation of {@link CacheStats} during the operation of the cache. Without this
-   * {@link Cache#stats} will return zero for all statistics. Note that recording stats requires
+   * {link Cache#stats} will return zero for all statistics. Note that recording stats requires
    * bookkeeping to be performed with each operation, and thus imposes a performance penalty on
    * cache operation.
    *

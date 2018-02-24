@@ -59,7 +59,7 @@ public interface Cache<K, V> {
    * <li>{@linkplain LoadingCache#get(Object) awaiting the result of a pending load} rather than
    *     starting a redundant one
    * <li>eliminating the error-prone caching boilerplate
-   * <li>tracking load {@linkplain #stats statistics}
+   * <li>tracking load {linkplain #stats statistics}
    * </ul>
    *
    * <p>Among the further improvements that {@code LoadingCache} can provide but this method cannot:
@@ -146,19 +146,6 @@ public interface Cache<K, V> {
    * Returns the approximate number of entries in this cache.
    */
   long size();
-
-  /**
-   * Returns a current snapshot of this cache's cumulative statistics, or a set of default values if
-   * the cache is not recording statistics. All statistics begin at zero and never decrease over the
-   * lifetime of the cache.
-   *
-   * <p><b>Warning:</b> this cache may not be recording statistical data. For example, a cache
-   * created using {@link CacheBuilder} only does so if the {@link CacheBuilder#recordStats} method
-   * was called. If statistics are not being recorded, a {@code CacheStats} instance with zero for
-   * all values is returned.
-   *
-   */
-  CacheStats stats();
 
   /**
    * Returns a view of the entries stored in this cache as a thread-safe map. Modifications made to
