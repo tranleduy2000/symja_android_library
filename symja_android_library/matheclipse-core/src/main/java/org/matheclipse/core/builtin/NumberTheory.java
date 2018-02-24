@@ -1,30 +1,9 @@
 package org.matheclipse.core.builtin;
 
-import static java.lang.Math.addExact;
-import static java.lang.Math.floorMod;
-import static java.lang.Math.multiplyExact;
-import static java.lang.Math.subtractExact;
-import static org.matheclipse.core.expression.F.Binomial;
-import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.Factorial;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Subtract;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.integer;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
+import com.google.common.math.BigIntegerMath;
+import com.google.common.math.LongMath;
 
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.CombinatoricsUtils;
@@ -58,10 +37,14 @@ import org.matheclipse.core.numbertheory.GaussianInteger;
 import org.matheclipse.core.numbertheory.Primality;
 import org.matheclipse.parser.client.math.MathException;
 
-import com.google.common.math.BigIntegerMath;
-import com.google.common.math.LongMath;
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.Predicate;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import edu.jas.arith.BigRational;
 import edu.jas.arith.ModInteger;
@@ -69,6 +52,23 @@ import edu.jas.arith.ModIntegerRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.ufd.FactorAbstract;
 import edu.jas.ufd.FactorFactory;
+
+import static com.duy.lang.DMath.addExact;
+import static com.duy.lang.DMath.floorMod;
+import static com.duy.lang.DMath.multiplyExact;
+import static com.duy.lang.DMath.subtractExact;
+import static org.matheclipse.core.expression.F.Binomial;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Subtract;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.integer;
 
 public final class NumberTheory {
 
