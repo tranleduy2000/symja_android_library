@@ -1000,10 +1000,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testComposeList() {
 		check("ComposeList({f,g,h}, x)", //
 				"{x,f(x),g(f(x)),h(g(f(x)))}");
-		//check("ComposeList({1 - # &, 1/# &}[[{2, 2, 1, 2, 2, 1}]], x)", //
-		//		"{x,1/x,x,1-x,1/(1-x),1-x,x}");
-		//check("ComposeList({f, g}[[{1, 2, 1, 1, 2}]], x)", //
-		//		"{x,f(x),g(f(x)),f(g(f(x))),f(f(g(f(x)))),g(f(f(g(f(x)))))}");
+		check("ComposeList({1 - # &, 1/# &}[[{2, 2, 1, 2, 2, 1}]], x)", //
+				"{x,1/x,x,1-x,1/(1-x),1-x,x}");
+		check("ComposeList({f, g}[[{1, 2, 1, 1, 2}]], x)", //
+				"{x,f(x),g(f(x)),f(g(f(x))),f(f(g(f(x)))),g(f(f(g(f(x)))))}");
 		check("ComposeList({a, b, c, d}, x)", //
 				"{x,a(x),b(a(x)),c(b(a(x))),d(c(b(a(x))))}");
 
