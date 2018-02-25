@@ -1,24 +1,34 @@
 package org.matheclipse.core.reflection.system;
 
+import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 
 /**
- * <pre>FindInstance(equations, vars)
+ * <pre>
+ * FindInstance(equations, vars)
  * </pre>
- * <blockquote><p>attempts to find one instance which solves the <code>equations</code> for the variables <code>vars</code>.</p>
+ * 
+ * <blockquote>
+ * <p>
+ * attempts to find one instance which solves the <code>equations</code> for the variables <code>vars</code>.
+ * </p>
  * </blockquote>
  * <h3>Examples</h3>
- * <pre>&gt;&gt; FindInstance({x^2==4,x+y^2==6}, {x,y})
+ * 
+ * <pre>
+ * &gt;&gt; FindInstance({x^2==4,x+y^2==6}, {x,y})
  * {{x-&gt;-2,y-&gt;-2*Sqrt(2)}}
  * </pre>
+ * 
  * <h3>Related terms</h3>
- * <p><a href="Solve.md">Solve</a></p>
+ * <p>
+ * <a href="Solve.md">Solve</a>
+ * </p>
  */
 public class FindInstance extends Solve {
 
@@ -27,8 +37,7 @@ public class FindInstance extends Solve {
 	}
 
 	/**
-	 * Try to find at least one solution for a set of equations (i.e.
-	 * <code>Equal[...]</code> expressions).
+	 * Try to find at least one solution for a set of equations (i.e. <code>Equal[...]</code> expressions).
 	 */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -37,14 +46,12 @@ public class FindInstance extends Solve {
 		IAST vars = Validate.checkSymbolOrSymbolList(ast, 2);
 		if (ast.isAST3()) {
 			if (ast.arg3().equals(F.Booleans)) {
-				IASTAppendable resultList = F.List();
-				booleansSolve(ast.arg1(), vars, 1, 1, resultList);
-				return resultList;
+				return BooleanFunctions.solveInstances(ast.arg1(), vars, 1);
 			}
 			throw new WrongArgumentType(ast, ast.arg3(), 3, "Booleans expected!");
 		}
 		IAST termsEqualZeroList = Validate.checkEquations(ast, 1);
 
-		return solveEquations(termsEqualZeroList, vars, 1, engine);
+		return solveEquations(termsEqualZeroList, F.List(), vars, 1, engine);
 	}
 }

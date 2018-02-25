@@ -1,17 +1,18 @@
 package org.matheclipse.core.expression;
 
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.Supplier;
+import java.io.ObjectStreamException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 
-import java.io.ObjectStreamException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.Supplier;
 
 /**
  * The class <code>NILPointer</code> implements the constant object <code>F.NIL</code> (not in list), which indicates in
@@ -172,6 +173,19 @@ public class NILPointer extends AbstractAST implements IASTAppendable {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public void ifAppendable(Consumer<? super IASTAppendable> consumer) {
+	}
+	
+	@Override
+	public void ifPresent(Consumer<? super IExpr> consumer) {
+	}
+
+	@Override
+	public void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction) {
+		emptyAction.run();
+	}
+	
 	@Override
 	public final boolean isAST() {
 		return false;

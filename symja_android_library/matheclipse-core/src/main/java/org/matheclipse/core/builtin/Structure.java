@@ -21,11 +21,18 @@ import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IComplex;
+import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.patternmatching.ISymbol2IntMap;
+import org.matheclipse.core.visit.AbstractVisitorLong;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
 import org.matheclipse.parser.client.math.MathException;
+
+import com.duy.lambda.IntFunction;
 
 public class Structure {
 
@@ -35,6 +42,8 @@ public class Structure {
 		F.Flatten.setEvaluator(new Flatten());
 		F.FlattenAt.setEvaluator(new FlattenAt());
 		F.Function.setEvaluator(new Function());
+		F.Head.setEvaluator(new Head());
+		F.LeafCount.setEvaluator(new LeafCount());
 		F.Map.setEvaluator(new Map());
 		F.MapAll.setEvaluator(new MapAll());
 		F.MapAt.setEvaluator(new MapAt());
@@ -135,15 +144,17 @@ public class Structure {
 
 			final IASTAppendable evaledAST = ast.copyAppendable();
 			evaledAST.setArgs(evaledAST.size(), new IntFunction<IExpr>() {
-                @Override
-                public IExpr apply(int i) {
-                    return engine.evaluate(evaledAST.get(i));
-                }
-            });
+
+				@Override
+				public IExpr apply(int i) {
+					// TODO Auto-generated method stub
+					return engine.evaluate(evaledAST.get(i));
+				}
+			});
 			// for (int i = 1; i < evaledAST.size(); i++) {
 			// evaledAST.set(i, engine.evaluate(evaledAST.get(i)));
 			// }
-			int lastIndex = evaledAST.size() - 1;
+			int lastIndex = evaledAST.argSize();
 			boolean heads = false;
 			final Options options = new Options(evaledAST.topHead(), evaledAST, lastIndex, engine);
 			IExpr option = options.getOption("Heads");
@@ -161,7 +172,7 @@ public class Structure {
 			return evalApply(arg1, arg2, evaledAST, lastIndex, heads, engine);
 		}
 
-		public static IExpr evalApply(final IExpr arg1, final IExpr arg2, final IAST evaledAST, int lastIndex, boolean heads,
+		public static IExpr evalApply(final IExpr arg1, IExpr arg2, IAST evaledAST, int lastIndex, boolean heads,
 				EvalEngine engine) {
 			VisitorLevelSpecification level = null;
 			com.duy.lambda.Function<IExpr, IExpr> af = new com.duy.lambda.Function<IExpr, IExpr>() {
@@ -549,7 +560,7 @@ public class Structure {
 							symbolSlots = F.List(arg1);
 						}
 						if (symbolSlots.size() > ast.size()) {
-							throw new WrongNumberOfArguments(ast, symbolSlots.size() - 1, ast.size() - 1);
+							throw new WrongNumberOfArguments(ast, symbolSlots.argSize(), ast.argSize());
 						}
 						return arg2.replaceAll(new com.duy.lambda.Function<IExpr, IExpr>() {
 							@Override
@@ -557,6 +568,7 @@ public class Structure {
 								IExpr temp = getRulesMap(symbolSlots, ast).get(x);
 								return temp != null ? temp : F.NIL;
 							}
+
 						}).orElse(arg2);
 					}
 				}
@@ -565,7 +577,7 @@ public class Structure {
 		}
 
 		private static java.util.Map<IExpr, IExpr> getRulesMap(final IAST symbolSlots, final IAST ast) {
-			int size = symbolSlots.size() - 1;
+			int size = symbolSlots.argSize();
 			final java.util.Map<IExpr, IExpr> rulesMap;
 			if (size <= 5) {
 				rulesMap = new OpenFixedSizeMap<IExpr, IExpr>(size * 3 - 1);
@@ -583,6 +595,187 @@ public class Structure {
 			// don't set HOLDALL - the arguments are evaluated before applying the 'function
 			// head'
 		}
+	}
+
+	/**
+	 * <pre>
+	 * Head(expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * returns the head of the expression or atom <code>expr</code>.
+	 * </p>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt; Head(a * b)
+	 * Times
+	 * &gt; Head(6)
+	 * Integer
+	 * &gt; Head(x)
+	 * Symbol
+	 * </pre>
+	 * 
+	 * </blockquote>
+	 */
+	private static class Head extends AbstractCoreFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				return engine.evaluate(ast.arg1()).head();
+			}
+			return F.Symbol;
+		}
+
+	}
+
+	/**
+	 * Count the number of leaves of an expression.
+	 * 
+	 */
+	public static class LeafCount extends AbstractCoreFunctionEvaluator {
+
+		/**
+		 * Calculate the number of leaves in an AST
+		 */
+		public static class LeafCountVisitor extends AbstractVisitorLong {
+			int fHeadOffset;
+
+			public LeafCountVisitor() {
+				this(1);
+			}
+
+			public LeafCountVisitor(int hOffset) {
+				fHeadOffset = hOffset;
+			}
+
+			@Override
+			public long visit(IAST list) {
+				long sum = 0;
+				for (int i = fHeadOffset; i < list.size(); i++) {
+					sum += list.get(i).accept(this);
+				}
+				return sum;
+			}
+
+			@Override
+			public long visit(IComplex element) {
+				return element.leafCount();
+			}
+
+			@Override
+			public long visit(IComplexNum element) {
+				return element.leafCount();
+			}
+
+			@Override
+			public long visit(IFraction element) {
+				return element.leafCount();
+			}
+		}
+
+		/**
+		 * Calculate the number of leaves in an AST
+		 */
+		public static class SimplifyLeafCountVisitor extends AbstractVisitorLong {
+			int fHeadOffset;
+
+			public SimplifyLeafCountVisitor() {
+				this(1);
+			}
+
+			public SimplifyLeafCountVisitor(int hOffset) {
+				fHeadOffset = hOffset;
+			}
+
+			@Override
+			public long visit(IAST list) {
+				long sum = 0;
+				for (int i = fHeadOffset; i < list.size(); i++) {
+					sum += list.get(i).accept(this);
+				}
+				return sum;
+			}
+
+			@Override
+			public long visit(IComplex element) {
+				return element.leafCountSimplify();
+			}
+
+			@Override
+			public long visit(IComplexNum element) {
+				return 3;
+			}
+
+			@Override
+			public long visit(IFraction element) {
+				return element.leafCountSimplify();
+			}
+
+			@Override
+			public long visit(IInteger element) {
+				return element.leafCountSimplify();
+			}
+		}
+
+		public static class SimplifyLeafCountPatternMapVisitor extends AbstractVisitorLong {
+
+			int fHeadOffset;
+
+			ISymbol2IntMap fPatternMap;
+
+			public SimplifyLeafCountPatternMapVisitor(ISymbol2IntMap patternMap, int hOffset) {
+				fHeadOffset = hOffset;
+				fPatternMap = patternMap;
+			}
+
+			@Override
+			public long visit(IAST list) {
+				long sum = 0L;
+				// if (list.isAnd()) {
+				// sum = 1L;
+				// }
+				for (int i = fHeadOffset; i < list.size(); i++) {
+					sum += list.get(i).accept(this);
+				}
+				return sum;
+			}
+
+			@Override
+			public long visit(IComplex element) {
+				return element.leafCountSimplify();
+			}
+
+			@Override
+			public long visit(IComplexNum element) {
+				return 3;
+			}
+
+			@Override
+			public long visit(IFraction element) {
+				return element.leafCountSimplify();
+			}
+
+			@Override
+			public long visit(IInteger element) {
+				return element.leafCountSimplify();
+			}
+
+			@Override
+			public long visit(ISymbol element) {
+				return element.leafCountSimplify();
+			}
+
+		}
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 2);
+
+			return F.integer(engine.evaluate(ast.arg1()).leafCount());
+		}
+
 	}
 
 	/**
@@ -643,7 +836,7 @@ public class Structure {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
-			int lastIndex = ast.size() - 1;
+			int lastIndex = ast.argSize();
 			boolean heads = false;
 			final Options options = new Options(ast.topHead(), ast, lastIndex, engine);
 			IExpr option = options.getOption("Heads");
@@ -691,13 +884,13 @@ public class Structure {
 			Validate.checkRange(ast, 3);
 
 			final IExpr arg1 = ast.arg1();
-			final VisitorLevelSpecification level = new VisitorLevelSpecification(new com.duy.lambda.Function<IExpr, IExpr>() {
-				@Override
-				public IExpr apply(IExpr x) {
-					return F.unaryAST1(arg1, x);
-				}
-			}, 0,
-					Integer.MAX_VALUE, false);
+			final VisitorLevelSpecification level = new VisitorLevelSpecification(
+					new com.duy.lambda.Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
+							return F.unaryAST1(arg1, x);
+						}
+					}, 0, Integer.MAX_VALUE, false);
 
 			final IExpr result = ast.arg2().accept(level);
 			return result.isPresent() ? result : ast.arg2();
@@ -914,11 +1107,11 @@ public class Structure {
 		@Override
 		public boolean test(IAST ast) {
 			return ast.compareAdjacent(new BiPredicate<IExpr, IExpr>() {
-                @Override
-                public boolean test(IExpr x, IExpr y) {
-                    return x.isLEOrdered(y);
-                }
-            });
+				@Override
+				public boolean test(IExpr x, IExpr y) {
+					return x.isLEOrdered(y);
+				}
+			});
 		}
 
 	}
@@ -1107,7 +1300,7 @@ public class Structure {
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
-			int lastIndex = ast.size() - 1;
+			int lastIndex = ast.argSize();
 			boolean heads = false;
 			final Options options = new Options(ast.topHead(), ast, lastIndex, engine);
 			IExpr option = options.getOption("Heads");
@@ -1143,6 +1336,7 @@ public class Structure {
 						public void accept(IExpr x) {
 							engine.evaluate(x);
 						}
+
 					});
 					// for (int i = 1; i < result.size(); i++) {
 					// engine.evaluate(result.get(i));
@@ -1385,9 +1579,9 @@ public class Structure {
 			for (int i = 1; i < list.size(); i++) {
 				if ((list.get(i).isAST()) && (((IAST) list.get(i)).head().equals(head))) {
 					if (listLength == 0) {
-						listLength = ((IAST) list.get(i)).size() - 1;
+						listLength = ((IAST) list.get(i)).argSize();
 					} else {
-						if (listLength != ((IAST) list.get(i)).size() - 1) {
+						if (listLength != ((IAST) list.get(i)).argSize()) {
 							listLength = 0;
 							return F.NIL;
 							// for loop
@@ -1450,16 +1644,12 @@ public class Structure {
 					}
 					IASTAppendable result = F.ast(arg1HeadAST.head());
 					return result.appendArgs(arg1HeadAST.size(), new IntFunction<IExpr>() {
+
 						@Override
 						public IExpr apply(int i) {
 							return arg1AST.apply(arg1HeadAST.get(i));
 						}
 					});
-					// for (int i = 1; i < arg1HeadAST.size(); i++) {
-					// clonedList = arg1AST.apply(arg1HeadAST.get(i));
-					// result.append(clonedList);
-					// }
-					// return result;
 				}
 				return arg1AST;
 			}

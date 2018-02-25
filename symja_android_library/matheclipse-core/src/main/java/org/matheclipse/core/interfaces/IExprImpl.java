@@ -30,6 +30,9 @@ import org.matheclipse.core.visit.VisitorReplaceAll;
 import org.matheclipse.core.visit.VisitorReplacePart;
 import org.matheclipse.core.visit.VisitorReplaceSlots;
 
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.Sqrt;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +44,6 @@ import edu.jas.structure.ElemFactory;
 /**
  * Created by Duy on 2/20/2018.
  */
-
 public abstract class IExprImpl implements IExpr {
 
     /**
@@ -453,7 +455,11 @@ public abstract class IExprImpl implements IExpr {
     public void ifPresent(Consumer<? super IExpr> consumer) {
         consumer.accept(this);
     }
-
+ 
+    public void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction) {
+		consumer.accept(this);
+	}
+	
     /**
      * Return the imaginary part of this expression if possible. Otherwise return <code>Im(this)</code>.
      *
@@ -2700,6 +2706,34 @@ public abstract class IExprImpl implements IExpr {
         return 1;
     }
 
+    @Override
+	public IExpr sqrt() {
+		if (isPower()) {
+			return F.Power(base(), F.Times(C1D2, exponent()));
+		} else {
+			if (isTimes()) {
+				// see github issue #2: Get only real results
+				IAST times = (IAST) this;
+				int size = times.size();
+				IASTAppendable timesSqrt = F.TimesAlloc(size);
+				IASTAppendable timesRest = F.TimesAlloc(size);
+				for (int i = 1; i < size; i++) {
+					final IExpr arg = times.get(i);
+					if (arg.isPower()) {
+						timesRest.append( //
+								F.Power(arg.base(), //
+										F.Times(C1D2, arg.exponent())) //
+						);
+					} else {
+						timesSqrt.append(arg);
+					}
+				}
+				return F.Times(timesRest, Sqrt(timesSqrt));
+			}
+		}
+		return F.Sqrt(this);
+	}
+    
     @Override
     public IExpr subtract(IExpr that) {
         if (that.isZero()) {

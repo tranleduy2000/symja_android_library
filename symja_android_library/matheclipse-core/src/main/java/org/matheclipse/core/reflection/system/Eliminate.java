@@ -1,5 +1,8 @@
 package org.matheclipse.core.reflection.system;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -21,8 +24,6 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.AbstractVisitorBoolean;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Predicate;
 
@@ -171,12 +172,13 @@ public class Eliminate extends AbstractFunctionEvaluator {
 			}
 			try {
 				fCurrentDepth++;
+				final VariableCounterVisitor visitor = this;
 				ast.forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr x) {
-                        x.accept(VariableCounterVisitor.this);
-                    }
-                });
+					@Override
+					public void accept(IExpr x) {
+						x.accept(visitor);
+					}
+				});
 			} finally {
 				fCurrentDepth--;
 			}
@@ -393,13 +395,13 @@ public class Eliminate extends AbstractFunctionEvaluator {
 					IExpr value = F.Divide(exprWithoutVariable, timesClone);
 					return extractVariable(rest.getOneIdentity(F.C1), value, predicate, variable);
 				} else if (ast.isPower()) {
-					IExpr base = ast.arg1();
-					IExpr exponent = ast.arg2();
+					IExpr base = ast.base();
+					IExpr exponent = ast.exponent();
 					if (exponent.isFree(predicate, true)) {
 						// f(x) ^ a
 						IExpr value = F.Power(exprWithoutVariable, F.Divide(F.C1, exponent));
 						return extractVariable(base, value, predicate, variable);
-					} else if (ast.arg1().isFree(predicate, true)) {
+					} else if (base.isFree(predicate, true)) {
 						// a ^ f(x)
 						IExpr value = F.Divide(F.Log(exprWithoutVariable), F.Log(base));
 						return extractVariable(exponent, value, predicate, variable);
@@ -407,9 +409,6 @@ public class Eliminate extends AbstractFunctionEvaluator {
 				}
 			}
 		}
-		// else if (exprWithVariable.equals(variable)) {
-		// return exprWithoutVariable;
-		// }
 		return F.NIL;
 	}
 

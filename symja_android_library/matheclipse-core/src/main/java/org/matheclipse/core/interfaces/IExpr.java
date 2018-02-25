@@ -21,6 +21,9 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 import org.matheclipse.core.visit.VisitorReplaceAll;
 
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.Sqrt;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -419,6 +422,17 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     void ifPresent(Consumer<? super IExpr> consumer);
 
+    /**
+	 * If a value is present, performs the given <code>consumer</code> with the value, otherwise performs the given
+	 * empty-based action.
+	 * 
+	 * @param consumer
+	 *            the action to be performed, if a value is present
+	 * @param emptyAction
+	 *            the empty-based action to be performed, if no value is present
+	 */
+	void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction);
+	
     /**
      * Return the imaginary part of this expression if possible. Otherwise return <code>Im(this)</code>.
      *
@@ -2137,6 +2151,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     @Override
     int signum();
 
+    /**
+	 * Generate <code>Sqrt(this)</code>.
+	 * 
+	 */
+	IExpr sqrt();
+	
     @Override
     IExpr subtract(IExpr that);
 

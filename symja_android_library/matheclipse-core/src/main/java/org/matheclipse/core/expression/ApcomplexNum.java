@@ -377,6 +377,10 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 		return valueOf(ApcomplexMath.inverseRoot(fApcomplex, 1));
 	}
 
+	public IExpr sqrt() {
+		return valueOf(ApcomplexMath.sqrt(fApcomplex));
+	}
+	
 	/**
 	 * @param that
 	 * @return

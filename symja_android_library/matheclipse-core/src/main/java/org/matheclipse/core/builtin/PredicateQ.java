@@ -20,6 +20,7 @@ import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcherEvalEngine;
 
 public class PredicateQ {
+
 	/**
 	 * Constructor for the unary predicate
 	 */
@@ -69,10 +70,7 @@ public class PredicateQ {
 				}
 				return false;
 			}
-			if (!engine.evalTrue(F.Equal(F.Times(F.CN1, F.Conjugate(expr1)), expr2))) {
-				return false;
-			}
-			return true;
+			return F.Equal.ofQ(engine, F.Times(F.CN1, F.Conjugate(expr1)), expr2);
 		}
 
 		@Override
@@ -91,10 +89,7 @@ public class PredicateQ {
 				}
 				return false;
 			}
-			if (!engine.evalTrue(F.Equal(F.Times(F.CN1, expr1), expr2))) {
-				return false;
-			}
-			return true;
+			return F.Equal.ofQ(engine, F.Times(F.CN1, expr1), expr2);
 		}
 
 		@Override
@@ -105,43 +100,9 @@ public class PredicateQ {
 
 	/**
 	 * ArrayQ tests whether an expression is a full array.
-	 * <p>
-	 * See the online Symja function reference:
-	 * <a href= "https://bitbucket.org/axelclk/symja_android_library/wiki/Symbols/ArrayQ"> ArrayQ</a>
-	 * </p>
 	 *
 	 */
 	private static class ArrayQ extends AbstractCoreFunctionEvaluator {
-
-		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			Validate.checkRange(ast, 2, 4);
-
-			final IExpr arg1 = engine.evaluate(ast.arg1());
-			Predicate<IExpr> pred = null;
-			if ((ast.size() >= 4)) {
-				final IExpr arg3 = engine.evaluate(ast.arg3());
-				pred = new Predicate<IExpr>() {
-                    @Override
-                    public boolean test(IExpr x) {
-                        return engine.evalTrue(F.unaryAST1(arg3, x));
-                    }
-                };
-			}
-			int depth = determineDepth(arg1, 0, pred);
-			if (depth >= 0) {
-				if ((ast.size() >= 3)) {
-					// Match the depth with the second argumnt
-					final IPatternMatcher matcher = engine.evalPatternMatcher(ast.arg2());
-					if (!matcher.test(F.ZZ(depth), engine)) {
-						return F.False;
-					}
-				}
-				return F.True;
-			}
-			return F.False;
-
-		}
 
 		/**
 		 * Determine the depth of the given expression <code>expr</code> which should be a full array of (possibly
@@ -203,14 +164,42 @@ public class PredicateQ {
 			return resultDepth;
 		}
 
+		@Override
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+			Validate.checkRange(ast, 2, 4);
+
+			final IExpr arg1 = engine.evaluate(ast.arg1());
+			Predicate<IExpr> pred = null;
+			if ((ast.size() >= 4)) {
+				final IExpr arg3 = engine.evaluate(ast.arg3());
+				pred = new Predicate<IExpr>() {
+
+					@Override
+					public boolean test(IExpr x) {
+						return engine.evalTrue(F.unaryAST1(arg3, x));
+					}
+
+				};
+			}
+			int depth = determineDepth(arg1, 0, pred);
+			if (depth >= 0) {
+				if ((ast.size() >= 3)) {
+					// Match the depth with the second argumnt
+					final IPatternMatcher matcher = engine.evalPatternMatcher(ast.arg2());
+					if (!matcher.test(F.ZZ(depth), engine)) {
+						return F.False;
+					}
+				}
+				return F.True;
+			}
+			return F.False;
+
+		}
+
 	}
 
 	/**
 	 * Returns <code>True</code>, if the given expression is an atomic object (i.e. no AST instance)
-	 * <p>
-	 * See the online Symja function reference:
-	 * <a href= "https://bitbucket.org/axelclk/symja_android_library/wiki/Symbols/AtomQ"> AtomQ</a>
-	 * </p>
 	 *
 	 */
 	private static class AtomQ extends AbstractCorePredicateEvaluator implements Predicate<IExpr> {
@@ -313,27 +302,19 @@ public class PredicateQ {
 		}
 	}
 
-	private static class FreeQ extends AbstractCoreFunctionEvaluator {
-
+	private static class ExactNumberQ extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return F.bool(arg1.isExactNumber());
 			}
-			Validate.checkSize(ast, 3);
-			final IExpr arg1 = engine.evaluate(ast.arg1());
-			final IExpr arg2 = engine.evalPattern(ast.arg2());
-			final IPatternMatcher matcher = new PatternMatcherEvalEngine(arg2, engine);
-			if (matcher.isRuleWithoutPatterns()) {
-				// special for FreeQ(), don't implemented in MemberQ()!
-				if (arg1.isOrderlessAST() && arg2.isOrderlessAST() && arg1.head().equals(arg2.head())) {
-					if (!isFreeOrderless((IAST) arg1, (IAST) arg1)) {
-						return F.False;
-					}
-				}
-			}
-			return F.bool(arg1.isFree(matcher, true));
+			Validate.checkSize(ast, 2);
+			return F.NIL;
 		}
+	}
+
+	private static class FreeQ extends AbstractCoreFunctionEvaluator {
 
 		/**
 		 * Checks if <code>orderless1.size()</code> is greater or equal <code>orderless2.size()</code> and returns
@@ -372,6 +353,26 @@ public class PredicateQ {
 			}
 			return true;
 		}
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				return F.operatorFormAST1(ast);
+			}
+			Validate.checkSize(ast, 3);
+			final IExpr arg1 = engine.evaluate(ast.arg1());
+			final IExpr arg2 = engine.evalPattern(ast.arg2());
+			final IPatternMatcher matcher = new PatternMatcherEvalEngine(arg2, engine);
+			if (matcher.isRuleWithoutPatterns()) {
+				// special for FreeQ(), don't implemented in MemberQ()!
+				if (arg1.isOrderlessAST() && arg2.isOrderlessAST() && arg1.head().equals(arg2.head())) {
+					if (!isFreeOrderless((IAST) arg1, (IAST) arg1)) {
+						return F.False;
+					}
+				}
+			}
+			return F.bool(arg1.isFree(matcher, true));
+		}
 	}
 
 	private static class HermitianMatrixQ extends SymmetricMatrixQ {
@@ -389,16 +390,25 @@ public class PredicateQ {
 				}
 				return false;
 			}
-			if (!engine.evalTrue(F.Equal(F.Conjugate(expr1), expr2))) {
-				return false;
-			}
-			return true;
+			return F.Equal.ofQ(engine, F.Conjugate(expr1), expr2);
 		}
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
 
+	}
+
+	private static class InexactNumberQ extends AbstractCoreFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return F.bool(arg1.isInexactNumber());
+			}
+			Validate.checkSize(ast, 2);
+			return F.NIL;
+		}
 	}
 
 	/**
@@ -439,6 +449,18 @@ public class PredicateQ {
 		@Override
 		public boolean test(final IExpr expr) {
 			return expr.isList();
+		}
+	}
+
+	private static class MachineNumberQ extends AbstractCoreFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return F.bool(arg1.isMachineNumber());
+			}
+			Validate.checkSize(ast, 2);
+			return F.NIL;
 		}
 	}
 
@@ -499,6 +521,7 @@ public class PredicateQ {
 							temp.set(1, x);
 							return engine.evalTrue(temp);
 						}
+
 					}, 1)) {
 						return F.False;
 					}
@@ -524,7 +547,7 @@ public class PredicateQ {
 
 			boolean heads = false;
 			if (ast.size() > 3) {
-				final Options options = new Options(ast.topHead(), ast, ast.size() - 1, engine);
+				final Options options = new Options(ast.topHead(), ast, ast.argSize(), engine);
 				// IExpr option = options.getOption("Heads");
 				if (options.isOption("Heads")) {
 					heads = true;
@@ -596,67 +619,6 @@ public class PredicateQ {
 		}
 	}
 
-	private static class RealNumberQ extends AbstractCoreFunctionEvaluator {
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1()) {
-				IExpr arg1 = ast.arg1();
-				if (arg1.isNumber()) {
-					return F.bool(arg1.isRealNumber());
-				}
-				IExpr temp = engine.evaluate(arg1);
-				if (temp.isSignedNumber()) {
-					return F.True;
-				}
-				if (temp.isNumericFunction()) {
-					temp = engine.evalN(arg1);
-					if (temp.isSignedNumber()) {
-						return F.True;
-					}
-				}
-				return F.False;
-			}
-			Validate.checkSize(ast, 2);
-			return F.NIL;
-		}
-	}
-
-	private static class MachineNumberQ extends AbstractCoreFunctionEvaluator {
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1()) {
-				IExpr arg1 = engine.evaluate(ast.arg1());
-				return F.bool(arg1.isMachineNumber());
-			}
-			Validate.checkSize(ast, 2);
-			return F.NIL;
-		}
-	}
-
-	private static class ExactNumberQ extends AbstractCoreFunctionEvaluator {
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1()) {
-				IExpr arg1 = engine.evaluate(ast.arg1());
-				return F.bool(arg1.isExactNumber());
-			}
-			Validate.checkSize(ast, 2);
-			return F.NIL;
-		}
-	}
-
-	private static class InexactNumberQ extends AbstractCoreFunctionEvaluator {
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1()) {
-				IExpr arg1 = engine.evaluate(ast.arg1());
-				return F.bool(arg1.isInexactNumber());
-			}
-			Validate.checkSize(ast, 2);
-			return F.NIL;
-		}
-	}
-
 	/**
 	 * Returns <code>True</code>, if the given expression is a numeric function or value.
 	 * 
@@ -671,11 +633,6 @@ public class PredicateQ {
 		public NumericQ() {
 		}
 
-		@Override
-		public boolean test(IExpr arg) {
-			return arg.isNumericFunction();
-		}
-
 		/**
 		 * Returns <code>True</code> if the first argument is a numeric object; <code>False</code> otherwise
 		 */
@@ -688,6 +645,11 @@ public class PredicateQ {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
+		}
+
+		@Override
+		public boolean test(IExpr arg) {
+			return arg.isNumericFunction();
 		}
 
 	}
@@ -732,7 +694,34 @@ public class PredicateQ {
 
 		@Override
 		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
-			return possibleZeroQ(arg1, engine);
+			IExpr expr = arg1;
+			if (expr.isNumber()) {
+				return expr.isZero();
+			}
+			if (expr.isAST()) {
+				expr = F.expandAll(expr, true, true);
+				if (expr.isZero()) {
+					return true;
+				}
+				if (expr.isPlusTimesPower()) {
+					expr = engine.evaluate(expr);
+					if (expr.isNumber()) {
+						return expr.isZero();
+					}
+					if (expr.isPlusTimesPower()) {
+						expr = F.Together.of(engine, expr);
+						if (expr.isNumber()) {
+							return expr.isZero();
+						}
+					}
+				}
+			}
+			IExpr temp = arg1.evalNumber();
+			if (temp != null) {
+				return temp.isZero();
+			}
+
+			return expr.isZero();
 		}
 
 		@Override
@@ -762,13 +751,38 @@ public class PredicateQ {
 		}
 
 		@Override
-		public boolean test(final IInteger obj) {
-			return obj.isProbablePrime();
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE);
 		}
 
 		@Override
-		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.LISTABLE);
+		public boolean test(final IInteger obj) {
+			return obj.isProbablePrime();
+		}
+	}
+
+	private static class RealNumberQ extends AbstractCoreFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				IExpr arg1 = ast.arg1();
+				if (arg1.isNumber()) {
+					return F.bool(arg1.isRealNumber());
+				}
+				IExpr temp = engine.evaluate(arg1);
+				if (temp.isSignedNumber()) {
+					return F.True;
+				}
+				if (temp.isNumericFunction()) {
+					temp = engine.evalN(arg1);
+					if (temp.isSignedNumber()) {
+						return F.True;
+					}
+				}
+				return F.False;
+			}
+			Validate.checkSize(ast, 2);
+			return F.NIL;
 		}
 	}
 
@@ -790,6 +804,16 @@ public class PredicateQ {
 	}
 
 	private static class SymmetricMatrixQ extends AbstractCoreFunctionEvaluator {
+
+		protected boolean compareElements(IExpr expr1, IExpr expr2, EvalEngine engine) {
+			if (expr1.isNumber() && expr2.isNumber()) {
+				if (expr1.equals(expr2)) {
+					return true;
+				}
+				return false;
+			}
+			return F.Equal.ofQ(engine, expr1, expr2);
+		}
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -814,19 +838,6 @@ public class PredicateQ {
 				}
 			}
 			return F.True;
-		}
-
-		protected boolean compareElements(IExpr expr1, IExpr expr2, EvalEngine engine) {
-			if (expr1.isNumber() && expr2.isNumber()) {
-				if (expr1.equals(expr2)) {
-					return true;
-				}
-				return false;
-			}
-			if (!engine.evalTrue(F.Equal(expr1, expr2))) {
-				return false;
-			}
-			return true;
 		}
 
 		@Override
@@ -944,11 +955,13 @@ public class PredicateQ {
 
 				IAST vector = (IAST) arg1;
 				if (!vector.forAll(new Predicate<IExpr>() {
+
 					@Override
 					public boolean test(IExpr x) {
 						temp.set(1, x);
 						return engine.evalTrue(temp);
 					}
+
 				}, 1)) {
 					return F.False;
 				}
@@ -956,36 +969,6 @@ public class PredicateQ {
 			return F.True;
 		}
 
-	}
-
-	public static boolean possibleZeroQ(IExpr expr, EvalEngine engine) {
-		if (expr.isNumber()) {
-			return expr.isZero();
-		}
-		if (expr.isAST()) {
-			expr = F.expandAll(expr, true, true);
-			if (expr.isZero()) {
-				return true;
-			}
-			if (expr.isPlus() || expr.isPower() || expr.isTimes()) {
-				expr = engine.evaluate(expr);
-				if (expr.isZero()) {
-					return true;
-				}
-				if (expr.isPlus() || expr.isPower() || expr.isTimes()) {
-					expr = engine.evaluate(F.Together(expr));
-					if (expr.isZero()) {
-						return true;
-					}
-				}
-			}
-		}
-		if (expr.isNumericFunction()) {
-			IExpr temp = engine.evalN(expr);
-			return temp.isZero();
-		}
-
-		return expr.isZero();
 	}
 
 	private final static PredicateQ CONST = new PredicateQ();

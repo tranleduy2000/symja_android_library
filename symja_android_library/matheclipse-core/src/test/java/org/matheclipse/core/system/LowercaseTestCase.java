@@ -126,20 +126,26 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("AnyTrue(f(2, 7, 6), OddQ)", "True");
 	}
 
-	public void testApart() {
-		check("Sin(1 / (x ^ 2 - y ^ 2)) // Apart", "Sin(1/(x^2-y^2))");
+    public void testApart() {
+        // check("Factor(x^2 - y^2 )", "(x-y)*(x+y)");
+        // check("Solve(x^2 - y^2==0, y)", "{{y->-x},{y->x}}");
+        check("Apart(1 / (x^2 - y^2))", "1/(x^2-y^2)");
 
-		check("Apart(1 / (x^2 + 5x + 6))", "1/(2+x)+1/(-3-x)");
-		// TODO return -1 / (2 y (x + y)) + 1 / (2 y (x - y))
-		check("Apart(1 / (x^2 - y^2), x)", "Apart(1/(x^2-y^2),x)");
-		// TODO return 1 / (2 x (x + y)) + 1 / (2 x (x - y))
-		check("Apart(1 / (x^2 - y^2), y)", "Apart(1/(x^2-y^2),y)");
+        check("Apart(x/(2 x + a^2))", "x/(a^2+2*x)");
 
-		check("Apart({1 / (x^2 + 5x + 6)})", "{1/(2+x)+1/(-3-x)}");
+        check("Apart(y/(x + 2)/(x + 1),x)", "y/((1+x)*(2+x))");
 
-		check("Apart(1/((1 + x)*(5 + x)))", "1/(4+4*x)+1/(-20-4*x)");
-		check("Apart(1 < (x + 1)/(x - 1) < 2)", "1<1+2/(-1+x)<2");
-	}
+        check("Sin(1 / (x ^ 2 - y ^ 2)) // Apart", "Sin(1/(x^2-y^2))");
+
+        check("Apart(1 / (x^2 + 5x + 6))", "1/(2+x)+1/(-3-x)");
+        // TODO return -1 / (2 y (x + y)) + 1 / (2 y (x - y))
+        check("Apart(1 / (x^2 - y^2), x)", "1/(x^2-y^2)");
+        // TODO return 1 / (2 x (x + y)) + 1 / (2 x (x - y))
+        check("Apart(1 / (x^2 - y^2), y)", "1/(x^2-y^2)");
+
+        check("Apart(1/((1 + x)*(5 + x)))", "1/(4+4*x)+1/(-20-4*x)");
+        check("Apart(1 < (x + 1)/(x - 1) < 2)", "1<1+2/(-1+x)<2");
+    }
 
 	public void testAppend() {
 		check("Append({1, 2, 3}, 4) ", "{1,2,3,4}");
@@ -964,29 +970,33 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "2,5,3}->7,{1,5,4}->-7,{5,4,2}->-10}");
 	}
 
-	public void testCollect() {
-		// check("Collect(D(f(Sqrt(x^2 + 1)), {x, 3}), Derivative(_)[f][_],
-		// Together)", "");
-		check("x*(4*a^3+12*a^2+12*a+4)+x^4+(4*a+4)*x^3+(6*a^2+12*a+6)*x^2+a^4+4*a^3+6*a^2+4*a+1",
-				"1+4*a+6*a^2+4*a^3+a^4+(4+12*a+12*a^2+4*a^3)*x+(6+12*a+6*a^2)*x^2+(4+4*a)*x^3+x^4");
-		check("x+x^4", "x+x^4");
-		check("Collect(a, x)", "a");
-		check("Collect(a*y, {x,y})", "a*y");
-		check("Collect(42*a, {x,y})", "42*a");
-		check("Collect(a Sqrt(x) + Sqrt(x) + x^(2/3) - c*x + 3*x - 2*b*x^(2/3) + 5, x)",
-				"5+(1+a)*Sqrt(x)+(1-2*b)*x^(2/3)+(3-c)*x");
-		check("Collect(3 b x + x, x)", "(1+3*b)*x");
-		check("Collect(a x^4 + b x^4 + 2 a^2 x - 3 b x + x - 7, x)", "-7+(1+2*a^2-3*b)*x+(a+b)*x^4");
-		check("Collect((1 + a + x)^4, x)",
-				"1+4*a+6*a^2+4*a^3+a^4+(4+12*a+12*a^2+4*a^3)*x+(6+12*a+6*a^2)*x^2+(4+4*a)*x^3+x^4");
-		check("Collect((1 + a + x)^4, x, Simplify)", "(1+a)^4+4*(1+a)^3*x+6*(1+a)^2*x^2+(4+4*a)*x^3+x^4");
+    public void testCollect() {
+        check("Collect(x^2 + y*x^2 + x*y + y + a*y, {x, y})", "(1+a)*y+x*y+x^2*(1+y)");
+        check("Collect(a*x^2 + b*x^2 + a*x - b*x + c, x)", "c+(a-b)*x+(a+b)*x^2");
+        check("Collect(a*Exp(2*x) + b*Exp(2*x), Exp(2*x))", "(a+b)*E^(2*x)");
+        check("a*Exp(2*x) + b*Exp(2*x)", "a*E^(2*x)+b*E^(2*x)");
+        // check("Collect(D(f(Sqrt(x^2 + 1)), {x, 3}), Derivative(_)[f][_],
+        // Together)", "");
+        check("x*(4*a^3+12*a^2+12*a+4)+x^4+(4*a+4)*x^3+(6*a^2+12*a+6)*x^2+a^4+4*a^3+6*a^2+4*a+1",
+                "1+4*a+6*a^2+4*a^3+a^4+(4+12*a+12*a^2+4*a^3)*x+(6+12*a+6*a^2)*x^2+(4+4*a)*x^3+x^4");
+        check("x+x^4", "x+x^4");
+        check("Collect(a, x)", "a");
+        check("Collect(a*y, {x,y})", "a*y");
+        check("Collect(42*a, {x,y})", "42*a");
+        check("Collect(a Sqrt(x) + Sqrt(x) + x^(2/3) - c*x + 3*x - 2*b*x^(2/3) + 5, x)",
+                "5+(1+a)*Sqrt(x)+(1-2*b)*x^(2/3)+(3-c)*x");
+        check("Collect(3 b x + x, x)", "(1+3*b)*x");
+        check("Collect(a x^4 + b x^4 + 2 a^2 x - 3 b x + x - 7, x)", "-7+(1+2*a^2-3*b)*x+(a+b)*x^4");
+        check("Collect((1 + a + x)^4, x)",
+                "1+4*a+6*a^2+4*a^3+a^4+(4+12*a+12*a^2+4*a^3)*x+(6+12*a+6*a^2)*x^2+(4+4*a)*x^3+x^4");
+        check("Collect((1 + a + x)^4, x, Simplify)", "(1+a)^4+4*(1+a)^3*x+6*(1+a)^2*x^2+(4+4*a)*x^3+x^4");
 
-		check("Collect(a x + b y + c x, x)", "(a+c)*x+b*y");
-		check("Collect((x + y + z + 1)^4, {x, y})",
-				"1+x^4+4*y+6*y^2+4*y^3+y^4+4*z+12*y*z+12*y^2*z+4*y^3*z+x^3*(4+4*y+4*z)+6*z^2+12*y*z^\n"
-						+ "2+6*y^2*z^2+x^2*(6+6*y^2+12*z+y*(12+12*z)+6*z^2)+4*z^3+4*y*z^3+x*(4+4*y^3+12*z+y^\n"
-						+ "2*(12+12*z)+12*z^2+y*(12+24*z+12*z^2)+4*z^3)+z^4");
-	}
+        check("Collect(a x + b y + c x, x)", "(a+c)*x+b*y");
+        check("Collect((x + y + z + 1)^4, {x, y})",
+                "1+x^4+y^4+4*z+y^3*(4+4*z)+x^3*(4+4*y+4*z)+6*z^2+y^2*(6+12*z+6*z^2)+x^2*(6+6*y^2+\n"
+                        + "12*z+y*(12+12*z)+6*z^2)+4*z^3+y*(4+12*z+12*z^2+4*z^3)+x*(4+4*y^3+12*z+y^2*(12+12*z)+\n"
+                        + "12*z^2+y*(12+24*z+12*z^2)+4*z^3)+z^4");
+    }
 
 	public void testCommonest() {
 		check("Commonest({b, a, c, 2, a, b, 1, 2}, 4)", "{b,a,2,c}");
@@ -1049,10 +1059,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testComposeList() {
 		check("ComposeList({f,g,h}, x)", //
 				"{x,f(x),g(f(x)),h(g(f(x)))}");
-		//check("ComposeList({1 - # &, 1/# &}[[{2, 2, 1, 2, 2, 1}]], x)", //
-		//		"{x,1/x,x,1-x,1/(1-x),1-x,x}");
-		//check("ComposeList({f, g}[[{1, 2, 1, 1, 2}]], x)", //
-	    //			"{x,f(x),g(f(x)),f(g(f(x))),f(f(g(f(x)))),g(f(f(g(f(x)))))}");
+		check("ComposeList({1 - # &, 1/# &}[[{2, 2, 1, 2, 2, 1}]], x)", //
+				"{x,1/x,x,1-x,1/(1-x),1-x,x}");
+		check("ComposeList({f, g}[[{1, 2, 1, 1, 2}]], x)", //
+	    			"{x,f(x),g(f(x)),f(g(f(x))),f(f(g(f(x)))),g(f(f(g(f(x)))))}");
 		check("ComposeList({a, b, c, d}, x)", //
 				"{x,a(x),b(a(x)),c(b(a(x))),d(c(b(a(x))))}");
 
@@ -2421,7 +2431,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FindInstance({a x + y == 7, b x - y == 1}, {x, y})", "{{x->8/(a+b),y->(a-7*b)/(-a-b)}}");
 
 	}
-
+	
 	public void testFindRoot() {
 		// issue #181
 		check("FindRoot(2^x==0,{x,-100,100}, Method->Brent)", "{x->-100.0}");
@@ -6880,6 +6890,16 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSolve() {
+		check("Solve({Cos(x)*x==0, x > 10}, x)", "{}");
+		check("Solve({Cos(x)*x==0, x ==0}, x)", "{{x->0}}");
+		check("Solve({Cos(x)*x==0, x < 10}, x)", "{{x->0},{x->Pi/2}}");
+
+		// check("Solve((x^4 - 1)*(x^4 - 4) == 0, x, Integers)", "");
+		check("Solve(x == x, x)", "{{}}");
+		check("Solve(x == 1 && x == 2, x)", "{}");
+
+		check("Solve((5.0*x)/y==(0.8*y)/x,x)", "{{x->-0.4*y},{x->0.4*y}}");
+
 		// gh issue #2
 		check("Solve(x^2+y^2==5,x)", "{{x->-Sqrt(5-y^2)},{x->Sqrt(5-y^2)}}");
 
@@ -6926,11 +6946,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Solve(x^3==-2,x)", "{{x->-2^(1/3)},{x->(-1)^(1/3)*2^(1/3)},{x->-(-1)^(2/3)*2^(1/3)}}");
 
 		check("Solve(1 - (i*1)/10 == 0, i, Integers)", "{{i->10}}");
-		check("Solve({x^2 + 2 y^3 == 3681, x > 0, y > 0}, {x, y}, Integers)",
+		check("Solve({x^2 + 2*y^3 == 3681, x > 0, y > 0}, {x, y}, Integers)",
 				"{{x->15,y->12},{x->41,y->10},{x->57,y->6}}");
 		check("Solve({x>=0,y>=0,x+y==7,2*x+4*y==20},{x,y}, Integers)", "{{x->4,y->3}}");
 		check("Solve(x>=0 && y>=0 && x+y==7 && 2*x+4*y==20,{x,y}, Integers)", "{{x->4,y->3}}");
-		check("Solve({2 x + 3 y == 4, 3 x - 4 y <= 5,x - 2 y > -21}, {x,  y}, Integers)",
+		check("Solve({2 x + 3*y == 4, 3*x - 4*y <= 5,x - 2*y > -21}, {x,  y}, Integers)",
 				"{{x->-7,y->6},{x->-4,y->4},{x->-1,y->2}}");
 
 		// timeouts in Cream engine
@@ -6949,13 +6969,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// issue #121
 		check("Solve(Sqrt(x)==-1, x)", "{}");
 		check("Solve(x^2+1==0, x)", "{{x->-I},{x->I}}");
-		check("Solve((k*Q*q)/r^2==E,r)",
-				"{{r->(Sqrt(k)*Sqrt(q)*Sqrt(Q))/Sqrt(E)},{r->(-Sqrt(k)*Sqrt(q)*Sqrt(Q))/Sqrt(E)}}");
+		check("Solve((k*Q*q)/r^2==E,r)", "{{r->Sqrt(E*k*q*Q)/E},{r->-Sqrt(E*k*q*Q)/E}}");
 		check("Solve((k*Q*q)/r^2+1/r^4==E,r)",
 				"{{r->Sqrt(1/2)*Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)},{r->-Sqrt(1/2)*Sqrt((k*q*Q+Sqrt(\n"
 						+ "4*E+k^2*q^2*Q^2))/E)},{r->-I*Sqrt(1/2)*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)},{r->I*Sqrt(\n"
 						+ "1/2)*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)}}");
-		check("Solve((k*Q*q)/r^2+1/r^4==0,r)", "{{r->-I/(Sqrt(k)*Sqrt(q)*Sqrt(Q))},{r->I/(Sqrt(k)*Sqrt(q)*Sqrt(Q))}}");
+		check("Solve((k*Q*q)/r^2+1/r^4==0,r)", "{{r->(-I*Sqrt(k*q*Q))/(k*q*Q)},{r->(I*Sqrt(k*q*Q))/(k*q*Q)}}");
 		check("Solve(Abs(x-1) ==1,{x})", "{{x->0},{x->2}}");
 		check("Solve(Abs(x^2-1) ==0,{x})", "{{x->-1},{x->1}}");
 		check("Solve(Xor(a, b, c, d) && (a || b) && ! (c || d), {a, b, c, d}, Booleans)",

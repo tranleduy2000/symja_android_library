@@ -440,6 +440,7 @@ public class RubiIntegrationTest extends AbstractTestCase {
 	}
 
 	public void testTimesFx() {
+		check("ExpandAll(g'(x))", "g'(x)");
 		check("integrate(g(x)*f(x), x)", "Integrate(f(x)*g(x),x)");
 		// check("integrate(sqrt(x)*f(x), x)", "");
 	}

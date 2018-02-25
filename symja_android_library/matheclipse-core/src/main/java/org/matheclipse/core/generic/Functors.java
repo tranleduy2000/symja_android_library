@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.duy.lambda.Function;
-import com.duy.lambda.Predicate;
 
 import javax.annotation.Nonnull;
 
@@ -19,6 +17,9 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.patternmatching.PatternMatcherAndEvaluator;
+
+import com.duy.lambda.Function;
+import com.duy.lambda.Predicate;
 
 public class Functors {
 
@@ -137,9 +138,9 @@ public class Functors {
 		if (astRules.isList()) {
 			// assuming multiple rules in a list
 			IAST rule;
-			int size = astRules.size() - 1;
-			if (size <= 5) {
-				equalRules = new OpenFixedSizeMap<IExpr, IExpr>(size * 3 - 1);
+			int argsSize = astRules.argSize();
+			if (argsSize <= 5) {
+				equalRules = new OpenFixedSizeMap<IExpr, IExpr>(argsSize * 3 - 1);
 			} else {
 				equalRules = new HashMap<IExpr, IExpr>();
 			}

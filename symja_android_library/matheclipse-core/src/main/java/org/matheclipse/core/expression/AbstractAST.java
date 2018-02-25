@@ -1,5 +1,8 @@
 package org.matheclipse.core.expression;
 
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.Sqrt;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,8 +25,8 @@ import org.hipparchus.linear.Array2DRowRealMatrix;
 import org.hipparchus.linear.ArrayRealVector;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
+import org.matheclipse.core.builtin.Structure.LeafCount;
 import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.builtin.function.LeafCount;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -421,8 +424,8 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		this.hashValue = 0;
 	}
 
-	 @Override
-	 public abstract IAST clone() throws CloneNotSupportedException;
+	@Override
+	public abstract IAST clone() throws CloneNotSupportedException;
 	// {
 	// AbstractAST ast = null;
 	// try {
@@ -733,11 +736,11 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		}
 		return false;
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
 	public boolean exists(Predicate<? super IExpr> predicate) {
-		return exists(predicate, 1); 
+		return exists(predicate, 1);
 	}
 
 	/**
@@ -753,11 +756,11 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public IExpr foldLeft(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start) {
 		final IExpr[] value = { startValue };
 		forEach(start, size(), new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr x) {
-                value[0] = function.apply(value[0], x);
-            }
-        });
+			@Override
+			public void accept(IExpr x) {
+				value[0] = function.apply(value[0], x);
+			}
+		});
 		return value[0];
 		// for (int i = start; i < size(); i++) {
 		// value = function.apply(value, get(i));
@@ -924,9 +927,9 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public void forEach(Consumer<? super IExpr> action, int startOffset) {
 		final int size = size();
 		forEach(startOffset, size, action);
-//		for (int i = startOffset; i < size; i++) {
-//			action.accept(get(i));
-//		}
+		// for (int i = startOffset; i < size; i++) {
+		// action.accept(get(i));
+		// }
 	}
 
 	/** {@inheritDoc} */
@@ -2856,6 +2859,34 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			}
 		}
 		return 1;
+	}
+
+	@Override
+	public IExpr sqrt() {
+		if (isPower()) {
+			return F.Power(base(), F.Times(C1D2, exponent()));
+		} else {
+			if (isTimes()) {
+				// see github issue #2: Get only real results
+				IAST times = (IAST) this;
+				int size = times.size();
+				IASTAppendable timesSqrt = F.TimesAlloc(size);
+				IASTAppendable timesRest = F.TimesAlloc(size);
+				for (int i = 1; i < size; i++) {
+					final IExpr arg = times.get(i);
+					if (arg.isPower()) {
+						timesRest.append( //
+								F.Power(arg.base(), //
+										F.Times(C1D2, arg.exponent())) //
+						);
+					} else {
+						timesSqrt.append(arg);
+					}
+				}
+				return F.Times(timesRest, Sqrt(timesSqrt));
+			}
+		}
+		return F.Sqrt(this);
 	}
 
 	@Override

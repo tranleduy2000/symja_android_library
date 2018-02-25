@@ -583,12 +583,9 @@ public class Num extends INumImpl implements INum {
 	public int sign() {
 		return (int) Math.signum(fDouble);
 	}
-
-	/**
-	 * @return
-	 */
-	public double sqrt() {
-		return Math.sqrt(fDouble);
+ 
+	public IExpr sqrt() {
+		return valueOf(Math.sqrt(fDouble));
 	}
 
 	@Override

@@ -561,6 +561,11 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 		return 15;
 	}
 
+
+	public IExpr sqrt() {
+		return valueOf(fComplex.sqrt());
+	}
+	
 	/**
 	 * @param that
 	 * @return

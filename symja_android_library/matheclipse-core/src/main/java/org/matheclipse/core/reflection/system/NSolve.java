@@ -3,12 +3,9 @@ package org.matheclipse.core.reflection.system;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import com.duy.lambda.Consumer;
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.ObjIntConsumer;
 
 import org.matheclipse.core.builtin.Algebra;
-import org.matheclipse.core.builtin.PredicateQ;
+import org.matheclipse.core.builtin.PolynomialFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
@@ -18,6 +15,10 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import com.duy.lambda.Consumer;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.ObjIntConsumer;
 
 /**
  * Try to solve a set of equations (i.e. <code>Equal[...]</code> expressions).
@@ -218,12 +219,12 @@ public class NSolve extends AbstractFunctionEvaluator {
 								}
 							}
 						}
-					} else if (expr.isPower() && (expr.getAt(2).isInteger() || expr.getAt(2).isNumIntValue())) {
+					} else if (expr.isPower() && (expr.base().isInteger() || expr.exponent().isNumIntValue())) {
 						// (JASConvert.getExponent((IAST) expr) > 0)) {
 						if (equationType == LINEAR) {
 							equationType = POLYNOMIAL;
 						}
-						getTimesEquationType(((IAST) expr).arg1());
+						getTimesEquationType(expr.base());
 					} else {
 						leafCount += eqExpr.leafCount();
 						if (equationType <= POLYNOMIAL) {
@@ -278,8 +279,8 @@ public class NSolve extends AbstractFunctionEvaluator {
 				return;
 			}
 			if (expr.isPower()) {
-				IExpr base = ((IAST) expr).arg1();
-				IExpr exponent = ((IAST) expr).arg2();
+				IExpr base = expr.base();
+				IExpr exponent = expr.exponent();
 				if (exponent.isInteger()) {
 					if (equationType == LINEAR) {
 						equationType = POLYNOMIAL;
@@ -397,7 +398,7 @@ public class NSolve extends AbstractFunctionEvaluator {
 					if (expr.isNumber()) {
 						throw new NoSolution(NoSolution.WRONG_SOLUTION);
 					}
-					if (!PredicateQ.possibleZeroQ(expr, engine)) {
+					if (!F.PossibleZeroQ.ofQ(engine, expr)) {
 						throw new NoSolution(NoSolution.NO_SOLUTION_FOUND);
 					}
 				}
@@ -479,7 +480,7 @@ public class NSolve extends AbstractFunctionEvaluator {
 		IExpr denom = exprAnalyzer.getDenominator();
 		// try to solve the expr for a symbol in the symbol set
 		for (ISymbol sym : exprAnalyzer.getSymbolSet()) {
-			IExpr temp = Roots.rootsOfVariable(expr, denom, F.List(sym), true, engine);
+			IExpr temp = PolynomialFunctions.rootsOfVariable(expr, denom, F.List(sym), true, engine);
 			if (temp.isPresent()) {
 				IASTAppendable resultList = F.List();
 				if (temp.isASTSizeGE(F.List, 2)) {

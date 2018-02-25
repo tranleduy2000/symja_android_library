@@ -90,11 +90,12 @@ public class QuarticSolver {
 				int exponent = -1;
 				IASTAppendable coeff = ast.copyAppendable();
 				for (int i = 1; i < ast.size(); i++) {
-					if (ast.get(i).isPower()) {
-						final IExpr temp = ast.get(i).getAt(1);
-						if (x.equals(temp)) {
+					IExpr arg = ast.get(i);
+					if (arg.isPower()) {
+						final IExpr base = arg.base();
+						if (x.equals(base)) {
 							try {
-								exponent = Validate.checkPowerExponent((IAST) ast.get(i));
+								exponent = Validate.checkPowerExponent((IAST) arg);
 							} catch (WrongArgumentType e) {
 							}
 							if (exponent < 0 || exponent > 4) {
@@ -104,7 +105,7 @@ public class QuarticSolver {
 							coefficients[exponent] = F.eval(F.Plus(coefficients[exponent], coeff));
 							return true;
 						}
-					} else if (x.equals(ast.get(i))) {
+					} else if (x.equals(arg)) {
 						coeff.remove(i);
 						coefficients[1] = F.eval(F.Plus(coefficients[1], coeff));
 						return true;
@@ -521,35 +522,17 @@ public class QuarticSolver {
 					result.append(F.Times(F.CN1, b, Power(a, -1L)));
 				}
 			} else {
-				IExpr discriminantSqrt;
 				if (b.isZero()) {
-					// github issue #2
-					// to avoid introducing Sqrt's of negative numbers,
-					// split negation of expression a multiplication with factor 4
-					IExpr temp = a.times(c).negate().times(C4);
-					if (temp.isPower()) {
-						discriminantSqrt = F.Power(temp.getAt(1), F.Times(C1D2, temp.getAt(2)));
-					} else if (temp.isTimes()) {
-						IAST times = (IAST) temp;
-						int size = times.size();
-						IASTAppendable tmpResult = F.TimesAlloc(size);
-						for (int i = 1; i < size; i++) {
-							if (times.get(i).isPower()) {
-								tmpResult.append(F.Power(times.get(i).getAt(1), F.Times(C1D2, times.get(i).getAt(2))));
-							} else {
-								tmpResult.append(Sqrt(times.get(i)));
-							}
-						}
-						discriminantSqrt = tmpResult;
-					} else {
-						discriminantSqrt = Sqrt(Times(CN4, a, c));
-					}
+					IExpr discriminant = F.evalExpand(a.times(c).negate());
+					discriminant = discriminant.sqrt();
+					result.append(Times(discriminant, Power(a, -1L)));
+					result.append(Times(discriminant.negate(), Power(a, -1L)));
 				} else {
-					discriminantSqrt = Sqrt(Plus(Power(b, 2L), Times(CN4, a, c)));
+					IExpr discriminant = F.evalExpand(Plus(F.Sqr(b), a.times(c).times(F.C4).negate()));
+					discriminant = discriminant.sqrt();
+					result.append(Times(Plus(b.negate(), discriminant), Power(a.times(F.C2), -1L)));
+					result.append(Times(Plus(b.negate(), discriminant.negate()), Power(a.times(F.C2), -1L)));
 				}
-				result.append(Times(Plus(CN1.times(b), discriminantSqrt), Power(Times(C2, a), -1L)));
-
-				result.append(Times(Plus(CN1.times(b), Times(CN1, discriminantSqrt)), Power(Times(C2, a), -1L)));
 				return createSet(result);
 			}
 		} else {

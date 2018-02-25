@@ -706,6 +706,10 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 		return array[firstIndex];
 	}
 
+	public void ifAppendable(Consumer<? super IASTAppendable> consumer) {
+		consumer.accept(this);
+	}
+	
 	/**
 	 * Searches this list for the specified object and returns the index of the first occurrence.
 	 * 

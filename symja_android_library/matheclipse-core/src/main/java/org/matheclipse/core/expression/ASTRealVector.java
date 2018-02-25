@@ -7,12 +7,10 @@ import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.util.RandomAccess;
 import java.util.Set;
-import com.duy.lambda.DoubleUnaryOperator;
-import com.duy.lambda.Function;
-import com.duy.lambda.Predicate;
 
 import org.hipparchus.linear.ArrayRealVector;
 import org.hipparchus.linear.RealVector;
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
@@ -20,7 +18,10 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
+import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.Function;
+import com.duy.lambda.Predicate;
+
 
 /**
  * <p>

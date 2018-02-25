@@ -6,18 +6,13 @@ public final class FunctionDefinitions {
 	static {
 		AbsArg.setEvaluator(new org.matheclipse.core.reflection.system.AbsArg());
 		BesselJ.setEvaluator(new org.matheclipse.core.reflection.system.BesselJ());
-		Coefficient.setEvaluator(new org.matheclipse.core.reflection.system.Coefficient());
-		CoefficientList.setEvaluator(new org.matheclipse.core.reflection.system.CoefficientList());
-		CoefficientRules.setEvaluator(new org.matheclipse.core.reflection.system.CoefficientRules());
-		ComplexExpand.setEvaluator(new org.matheclipse.core.reflection.system.ComplexExpand());
-		ComposeList.setEvaluator(new org.matheclipse.core.reflection.system.ComposeList());
+		ComplexExpand.setEvaluator(new org.matheclipse.core.reflection.system.ComplexExpand()); 
 		ContinuedFraction.setEvaluator(new org.matheclipse.core.reflection.system.ContinuedFraction());
 		CosIntegral.setEvaluator(new org.matheclipse.core.reflection.system.CosIntegral());
 		Curl.setEvaluator(new org.matheclipse.core.reflection.system.Curl());
 		D.setEvaluator(new org.matheclipse.core.reflection.system.D());
 		Default.setEvaluator(new org.matheclipse.core.reflection.system.Default());
 		Derivative.setEvaluator(new org.matheclipse.core.reflection.system.Derivative());
-		Discriminant.setEvaluator(new org.matheclipse.core.reflection.system.Discriminant());
 		Distribute.setEvaluator(new org.matheclipse.core.reflection.system.Distribute());
 		Divergence.setEvaluator(new org.matheclipse.core.reflection.system.Divergence());
 		DSolve.setEvaluator(new org.matheclipse.core.reflection.system.DSolve());
@@ -61,7 +56,6 @@ public final class FunctionDefinitions {
 		NMinimize.setEvaluator(new org.matheclipse.core.reflection.system.NMinimize());
 		NonCommutativeMultiply.setEvaluator(new org.matheclipse.core.reflection.system.NonCommutativeMultiply());
 		Normal.setEvaluator(new org.matheclipse.core.reflection.system.Normal());
-		NRoots.setEvaluator(new org.matheclipse.core.reflection.system.NRoots());
 		NSolve.setEvaluator(new org.matheclipse.core.reflection.system.NSolve());
 		Out.setEvaluator(new org.matheclipse.core.reflection.system.Out());
 		Outer.setEvaluator(new org.matheclipse.core.reflection.system.Outer());
@@ -71,12 +65,8 @@ public final class FunctionDefinitions {
 		
 		Rationalize.setEvaluator(new org.matheclipse.core.reflection.system.Rationalize());
 		Replace.setEvaluator(new org.matheclipse.core.reflection.system.Replace());
-		ReplaceAll.setEvaluator(new org.matheclipse.core.reflection.system.ReplaceAll());
 		ReplaceList.setEvaluator(new org.matheclipse.core.reflection.system.ReplaceList());
 		ReplaceRepeated.setEvaluator(new org.matheclipse.core.reflection.system.ReplaceRepeated());
-		Resultant.setEvaluator(new org.matheclipse.core.reflection.system.Resultant());
-		RootIntervals.setEvaluator(new org.matheclipse.core.reflection.system.RootIntervals());
-		Roots.setEvaluator(new org.matheclipse.core.reflection.system.Roots());
 		Series.setEvaluator(new org.matheclipse.core.reflection.system.Series());
 		SeriesData.setEvaluator(new org.matheclipse.core.reflection.system.SeriesData());
 		Share.setEvaluator(new org.matheclipse.core.reflection.system.Share());

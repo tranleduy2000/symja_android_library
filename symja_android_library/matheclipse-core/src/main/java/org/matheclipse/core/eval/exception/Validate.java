@@ -102,7 +102,7 @@ public final class Validate {
 	public static long[] checkListOfLongs(IExpr arg, long startValue) {
 		if (arg.isList()) {
 			IAST list = (IAST) arg;
-			long[] result = new long[list.size() - 1];
+			long[] result = new long[list.argSize()];
 			long longValue = 0;
 			try {
 				IExpr expr;
@@ -131,8 +131,8 @@ public final class Validate {
 	public static BigInteger[] checkListOfBigIntegers(IExpr arg) {
 		if (arg.isList()) {
 			IAST list = (IAST) arg;
-			BigInteger[] result = new BigInteger[list.size() - 1];
-			
+			BigInteger[] result = new BigInteger[list.argSize()];
+
 			try {
 				IExpr expr;
 				BigInteger longValue = BigInteger.ZERO;
@@ -144,10 +144,10 @@ public final class Validate {
 					} else if (expr instanceof INum) {
 						longValue = BigInteger.valueOf(((INum) expr).toLong());
 					}
-//					if (startValue > longValue) {
-//						throw new WrongArgumentType(expr, "Trying to convert the expression into the integer range: "
-//								+ startValue + " - " + Long.MAX_VALUE);
-//					}
+					// if (startValue > longValue) {
+					// throw new WrongArgumentType(expr, "Trying to convert the expression into the integer range: "
+					// + startValue + " - " + Long.MAX_VALUE);
+					// }
 					result[i - 1] = longValue;
 				}
 				return result;
@@ -167,7 +167,7 @@ public final class Validate {
 	public static int[] checkListOfInts(IExpr arg, int minValue, int maxValue) {
 		if (arg.isList()) {
 			IAST list = (IAST) arg;
-			int[] result = new int[list.size() - 1];
+			int[] result = new int[list.argSize()];
 			int intValue = 0;
 			try {
 				IExpr expr;
@@ -365,10 +365,10 @@ public final class Validate {
 	 */
 	public static IAST checkRange(IAST ast, int from, int to) {
 		if (ast.size() < from) {
-			throw new WrongNumberOfArguments(ast, from - 1, ast.size() - 1);
+			throw new WrongNumberOfArguments(ast, from - 1, ast.argSize());
 		}
 		if (ast.size() > to) {
-			throw new WrongNumberOfArguments(ast, to - 1, ast.size() - 1);
+			throw new WrongNumberOfArguments(ast, to - 1, ast.argSize());
 		}
 		return ast;
 	}
@@ -381,7 +381,7 @@ public final class Validate {
 	 */
 	public static IAST checkSize(IAST ast, int size) {
 		if (ast.size() != size) {
-			throw new WrongNumberOfArguments(ast, size - 1, ast.size() - 1);
+			throw new WrongNumberOfArguments(ast, size - 1, ast.argSize());
 		}
 		return ast;
 	}
@@ -393,8 +393,8 @@ public final class Validate {
 	 *             if {@code ast.size()-1} is not even
 	 */
 	public static IAST checkEven(IAST ast) {
-		if (((ast.size() - 1) & 0x0001) == 0x0001) {
-			throw new WrongNumberOfArguments(1, ast, ast.size() - 1);
+		if (((ast.argSize()) & 0x0001) == 0x0001) {
+			throw new WrongNumberOfArguments(1, ast, ast.argSize());
 		}
 		return ast;
 	}
@@ -406,8 +406,8 @@ public final class Validate {
 	 *             if {@code ast.size()-1} is not odd
 	 */
 	public static IAST checkOdd(IAST ast) {
-		if (((ast.size() - 1) & 0x0001) == 0x0000) {
-			throw new WrongNumberOfArguments(2, ast, ast.size() - 1);
+		if (((ast.argSize()) & 0x0001) == 0x0000) {
+			throw new WrongNumberOfArguments(2, ast, ast.argSize());
 		}
 		return ast;
 	}
@@ -697,7 +697,7 @@ public final class Validate {
 	 *            the position of the equations argument in the <code>ast</code> expression.
 	 * @return
 	 */
-	public static IAST checkEquationsAndInequations(final IAST ast, int position) {
+	public static IASTAppendable checkEquationsAndInequations(final IAST ast, int position) {
 		IExpr expr = ast.get(position);
 		IAST eqns = null;
 		IASTAppendable termsEqualZeroList;
@@ -717,27 +717,43 @@ public final class Validate {
 				}
 			}
 			return termsEqualZeroList;
-		} else {
-			if (expr.isAST()) {
-				termsEqualZeroList = F.ListAlloc(1);
-				termsEqualZeroList.append(checkEquationAndInequation((IAST) expr));
-				return termsEqualZeroList;
-			}
-
+			// } else {
+			// if (expr.isAST()) {
+			// termsEqualZeroList = F.ListAlloc(1);
+			// termsEqualZeroList.append(checkEquationAndInequation((IAST) expr));
+			// return termsEqualZeroList;
+			// } else if (expr.isTrue()) {
+			// return F.List(F.True);
+			// } else if (expr.isFalse()) {
+			// return F.List(F.False);
+			// }
 		}
-		return F.List();
+		return F.List(checkEquationAndInequation(expr));
 	}
 
-	private static IAST checkEquationAndInequation(IAST eq) {
-		IExpr head = eq.head();
-		if (head.equals(F.Equal) || head.equals(F.Unequal) || head.equals(F.Greater) || head.equals(F.GreaterEqual)
-				|| head.equals(F.Less) || head.equals(F.LessEqual)) {
-			final IExpr[] arr = new IExpr[] { F.expandAll(eq.arg1(), true, true), F.expandAll(eq.arg2(), true, true) };
-			return F.ast(arr, head);
-		} else {
-			// not an equation or inequation
-			throw new WrongArgumentType(eq, "Equation or inequation expression expected");
+	private static IExpr checkEquationAndInequation(IExpr eq) {
+		if (eq.isEqual()) {
+			IAST equal = (IAST) eq;
+			final IExpr[] arr = new IExpr[] { F.evalExpandAll(F.Subtract(equal.arg1(), equal.arg2())),
+					F.C0  };
+			return F.ast(arr, F.Equal);
+		} 
+		if (eq.isAST()) {
+			IAST equal = (IAST) eq;
+			IExpr head = equal.head();
+			if (head.equals(F.Equal) || head.equals(F.Unequal) || head.equals(F.Greater) || head.equals(F.GreaterEqual)
+					|| head.equals(F.Less) || head.equals(F.LessEqual)) {
+				final IExpr[] arr = new IExpr[] { F.expandAll(equal.arg1(), true, true),
+						F.expandAll(equal.arg2(), true, true) };
+				return F.ast(arr, head);
+			}
+		} else if (eq.isTrue()) {
+			return F.True;
+		} else if (eq.isFalse()) {
+			return F.False;
 		}
+		// not an equation or inequation
+		throw new WrongArgumentType(eq, "Equation or inequation expression expected");
 	}
 
 	/**
@@ -751,6 +767,10 @@ public final class Validate {
 		if (expr.isEqual()) {
 			IAST equal = (IAST) expr;
 			return F.evalExpandAll(F.Subtract(equal.arg1(), equal.arg2()));
+		} else if (expr.isTrue()) {
+			return F.True;
+		} else if (expr.isFalse()) {
+			return F.False;
 		} else {
 			// not an equation
 			throw new WrongArgumentType(expr, "Equal[] expression (a==b) expected");
