@@ -1,24 +1,22 @@
 ## Symja Library - Java Symbolic Math System
 
-**Note**: this repository contains the **Java 8** version of the project. The [NCalc project](https://github.com/tranleduy2000/ncalc) maintains a [Java 7 branch based on Retrolambda](https://github.com/tranleduy2000/symja_java7).
+**Note**: this repository contains the **Java 7** android version of the project. The **Java 8** version is maintained in this [original Symja repository](https://github.com/axkr/symja_android_library).
 
 - [Quick start](#quick-start)
 - [Features](#features)
 - [Demos](#demos)
 - [Examples](#examples)
-- [Maven Usage](#maven-usage)
+- [Gradle Usage](#gradle-usage)
 - [Getting started](#getting-started)
 - [Github GIT](#github-git)
 - [Contact](#contact)
 - [License](#license)
- 
+  
 ### Quick start 
 
 Read the [Symja Manual](symja_android_library/doc/index.md) for the description of the Symja language.
 
 [![Join the chat at https://gitter.im/symja_android_library/Lobby](https://badges.gitter.im/symja_android_library/Lobby.svg)](https://gitter.im/symja_android_library/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Hosted on Algorithmia.com @[![Algorithmia.com](https://algorithmia.com/algorithms/axelclk/Computeralgebra/badge)](https://algorithmia.com/algorithms/axelclk/Computeralgebra)
 
 ### Features
 
@@ -31,7 +29,7 @@ Features of the Symja language:
      
 ### Demos
 
-* [Appengine web interface symjaweb.appspot.com](http://symjaweb.appspot.com/) - available as open source in this [Github repository](https://github.com/axkr/symja_web) 
+* [Appengine web interface symjaweb.appspot.com](http://symjaweb.appspot.com/) - available as open source in this [Java 8 Github repository](https://github.com/axkr/symja_web) 
 
 * [Android App Calculator N+ on Google play store](https://play.google.com/store/apps/details?id=com.duy.calculator.free) - available as open source in this [Github repository](https://github.com/tranleduy2000/ncalc)
 
