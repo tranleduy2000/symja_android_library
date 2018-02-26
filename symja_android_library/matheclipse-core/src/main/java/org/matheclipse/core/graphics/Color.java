@@ -25,7 +25,7 @@
 
 package org.matheclipse.core.graphics;
 
-import android.graphics.ColorSpace;
+//import android.graphics.ColorSpace;
 
 /**
  * The <code>Color</code> class is used to encapsulate colors in the default

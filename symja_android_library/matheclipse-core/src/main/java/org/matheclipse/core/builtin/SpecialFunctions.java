@@ -1,38 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import org.apfloat.Apcomplex;
-import org.apfloat.ApcomplexMath;
-import org.apfloat.Apfloat;
-import org.apfloat.ApfloatMath;
-import org.hipparchus.exception.MathIllegalStateException;
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.interfaces.AbstractArg12;
-import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
-import org.matheclipse.core.eval.interfaces.INumeric;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.Num;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IComplexNum;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IInteger;
-import org.matheclipse.core.interfaces.INum;
-import org.matheclipse.core.interfaces.ISignedNumber;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.reflection.system.rules.BetaRules;
-import org.matheclipse.core.reflection.system.rules.PolyGammaRules;
-import org.matheclipse.core.reflection.system.rules.PolyLogRules;
-import org.matheclipse.core.reflection.system.rules.ProductLogRules;
-import org.matheclipse.core.reflection.system.rules.StieltjesGammaRules;
-import org.matheclipse.core.reflection.system.rules.StruveHRules;
-import org.matheclipse.core.reflection.system.rules.StruveLRules;
-
-import java.math.BigDecimal;
-import com.duy.lambda.DoubleUnaryOperator;
-import com.duy.lambda.Function;
-
 import static org.matheclipse.core.expression.F.BernoulliB;
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
@@ -56,11 +23,47 @@ import static org.matheclipse.core.expression.F.Sqr;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.Zeta;
 
+import java.math.BigDecimal;
+import java.util.function.DoubleUnaryOperator;
+
+import org.apfloat.Apcomplex;
+import org.apfloat.ApcomplexMath;
+import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
+import org.hipparchus.exception.MathIllegalStateException;
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.interfaces.AbstractArg12;
+import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
+import org.matheclipse.core.eval.interfaces.INumeric;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.Num;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IComplexNum;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.INum;
+import org.matheclipse.core.interfaces.ISignedNumber;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.reflection.system.rules.BetaRules;
+import org.matheclipse.core.reflection.system.rules.PolyGammaRules;
+import org.matheclipse.core.reflection.system.rules.PolyLogRules;
+import org.matheclipse.core.reflection.system.rules.ProductLogRules;
+import org.matheclipse.core.reflection.system.rules.StieltjesGammaRules;
+import org.matheclipse.core.reflection.system.rules.StruveHRules;
+import org.matheclipse.core.reflection.system.rules.StruveLRules;
+
 public class SpecialFunctions {
 	static {
 		F.Beta.setEvaluator(new Beta());
+		F.BetaRegularized.setEvaluator(new BetaRegularized());
 		F.Erf.setEvaluator(new Erf());
 		F.Erfc.setEvaluator(new Erfc());
+		F.GammaRegularized.setEvaluator(new GammaRegularized());
+		F.HypergeometricPFQRegularized.setEvaluator(new HypergeometricPFQRegularized());
 		F.InverseErf.setEvaluator(new InverseErf());
 		F.InverseErfc.setEvaluator(new InverseErfc());
 		F.PolyGamma.setEvaluator(new PolyGamma());
@@ -81,7 +84,7 @@ public class SpecialFunctions {
 			IExpr a = ast.arg1();
 			IExpr b = ast.arg2();
 
-			if (a.isNumber() && b.isNumber()) { 
+			if (a.isNumber() && b.isNumber()) {
 				if (a.isInteger() && a.isPositive() && b.isInteger() && b.isPositive()) {
 					return Times(Factorial(Plus(CN1, a)), Factorial(Plus(CN1, b)),
 							Power(Factorial(Plus(CN1, a, b)), -1));
@@ -112,7 +115,45 @@ public class SpecialFunctions {
 
 	}
 
-	
+	private static class BetaRegularized extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 4);
+
+			IExpr z = ast.arg1();
+			IExpr a = ast.arg2();
+			IExpr n = ast.arg3();
+			if (n.isInteger()) {
+				if (n.isNegative()) {
+					// for n>=0; BetaRegularized(z, a, -n)=0
+					return F.C0;
+				}
+				int ni = n.toIntDefault(-1);
+				if (ni >= 0) {
+
+					IASTAppendable sum = F.PlusAlloc(ni);
+					// {k, 0, n - 1}
+					for (int k = 0; k < ni; k++) {
+						// (Pochhammer(a, k)*(1 - z)^k)/k!
+						IInteger kk = F.integer(k);
+						sum.append(F.Times(F.Power(F.Plus(F.C1, F.Negate(z)), kk), F.Power(F.Factorial(kk), -1),
+								F.Pochhammer(a, kk)));
+					}
+					// z^a * sum
+					return F.Times(F.Power(z, a), sum);
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+
+	}
 
 	/**
 	 * Returns the error function.
@@ -247,7 +288,65 @@ public class SpecialFunctions {
 		}
 	}
 
-	
+	private static class GammaRegularized extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+			
+			IExpr a = ast.arg1();
+			IExpr z = ast.arg2();
+			if (a.isZero()) {
+				return F.C0;
+			} else if (a.equals(F.C1D2)) {
+				// Erfc(Sqrt(z))
+				return F.Erfc(F.Sqrt(z));
+			} else if (a.isOne()) {
+				// E^(-z)
+				return F.Power(F.E, F.Negate(F.z));
+			} else if (a.isInteger() && a.isNegative()) {
+				return F.C0;
+			}
+
+			if (z.isZero()) {
+				IExpr temp = a.re();
+				if (temp.isPositive()) {
+					return F.C1;
+				}
+				if (temp.isNegative()) {
+					return F.CComplexInfinity;
+				}
+			} else if (z.isMinusOne()) {
+				// (E/Gamma[a])*Subfactorial(a - 1)
+				return F.Times(F.E, F.Power(F.Gamma(a), -1), F.Subfactorial(F.Plus(F.CN1, a)));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+
+	}
+
+	private static class HypergeometricPFQRegularized extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+
+	}
 
 	/**
 	 * Returns the inverse erf.
@@ -398,9 +497,8 @@ public class SpecialFunctions {
 	private static class PolyLog extends AbstractFunctionEvaluator implements PolyLogRules {
 
 		/**
-		 * See <a href=
-		 * "https://github.com/sympy/sympy/blob/master/sympy/functions/special/zeta_functions.py">Sympy
-		 * - zeta_functions.py</a>
+		 * See <a href= "https://github.com/sympy/sympy/blob/master/sympy/functions/special/zeta_functions.py">Sympy -
+		 * zeta_functions.py</a>
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -468,8 +566,7 @@ public class SpecialFunctions {
 	 * Lambert W function
 	 * </p>
 	 * 
-	 * See: <a href="http://en.wikipedia.org/wiki/Lambert_W_function">Wikipedia -
-	 * Lambert W function</a>
+	 * See: <a href="http://en.wikipedia.org/wiki/Lambert_W_function">Wikipedia - Lambert W function</a>
 	 */
 	private final static class ProductLog extends AbstractArg12 implements ProductLogRules {
 		@Override
@@ -753,7 +850,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr e2ObjArg(final IExpr s, final IExpr a) {
+		public IExpr e2ObjArg(IExpr s, IExpr a) {
 			if (a.isZero()) {
 				return Zeta(s);
 			}
@@ -766,12 +863,7 @@ public class SpecialFunctions {
 					if (nInt < 0) {
 						nInt *= -1;
 						// Zeta(s, -n) := Zeta(s) + Sum(1/k^s, {k, 1, n})
-						return Plus(F.sum(new Function<IExpr, IExpr>() {
-                            @Override
-                            public IExpr apply(IExpr k) {
-                                return Power(Power(k, s), -1);
-                            }
-                        }, 1, nInt), Zeta(s));
+						return Plus(F.sum(k -> Power(Power(k, s), -1), 1, nInt), Zeta(s));
 					}
 				}
 			}

@@ -1,9 +1,5 @@
 package org.matheclipse.core.expression;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -528,8 +524,7 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "optional" : "Optional");
 	public final static IBuiltInSymbol Or = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "or" : "Or");
 	public final static IBuiltInSymbol Package = initFinalSymbol(
-			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "package" : "Package",
-			new org.matheclipse.core.builtin.function.Package());
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "package" : "Package");
 	public final static IBuiltInSymbol Part = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "part" : "Part");
 	public final static IBuiltInSymbol Pattern = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "pattern" : "Pattern");
@@ -659,7 +654,8 @@ public class F {
 	public final static IBuiltInSymbol BesselJ = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "besselj" : "BesselJ");
 	public final static IBuiltInSymbol Beta = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "beta" : "Beta");
-	public final static IBuiltInSymbol BetaRegularized = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "betaregularized" : "BetaRegularized");
+	public final static IBuiltInSymbol BetaRegularized = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "betaregularized" : "BetaRegularized");
 	public final static IBuiltInSymbol Binomial = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "binomial" : "Binomial");
 	public final static IBuiltInSymbol BitLength = initFinalSymbol(
@@ -871,7 +867,8 @@ public class F {
 	public final static IBuiltInSymbol FullSimplify = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "fullsimplify" : "FullSimplify");
 	public final static IBuiltInSymbol Gamma = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "gamma" : "Gamma");
-	public final static IBuiltInSymbol GammaRegularized = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "gammaregularized" : "GammaRegularized");
+	public final static IBuiltInSymbol GammaRegularized = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "gammaregularized" : "GammaRegularized");
 	public final static IBuiltInSymbol Gather = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "gather" : "Gather");
 	public final static IBuiltInSymbol GCD = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "gcd" : "GCD");
@@ -1017,7 +1014,8 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "matrixrank" : "MatrixRank");
 	public final static IBuiltInSymbol Max = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "max" : "Max");
 	public final static IBuiltInSymbol Mean = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "mean" : "Mean");
-	public final static IBuiltInSymbol MeanDeviation = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "meandeviation" : "MeanDeviation");
+	public final static IBuiltInSymbol MeanDeviation = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "meandeviation" : "MeanDeviation");
 	public final static IBuiltInSymbol MersennePrimeExponent = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "mersenneprimeexponent" : "MersennePrimeExponent");
 	public final static IBuiltInSymbol MersennePrimeExponentQ = initFinalSymbol(
@@ -1337,7 +1335,8 @@ public class F {
 	public final static IBuiltInSymbol Unequal = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "unequal" : "Unequal");
 	public final static IBuiltInSymbol Union = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "union" : "Union");
-	public final static IBuiltInSymbol Unitize = initFinalSymbol(Config.PARSER_USE_LOWERCASE_SYMBOLS ? "unitize" : "Unitize");
+	public final static IBuiltInSymbol Unitize = initFinalSymbol(
+			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "unitize" : "Unitize");
 	public final static IBuiltInSymbol UnitStep = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "unitstep" : "UnitStep");
 	public final static IBuiltInSymbol UnitVector = initFinalSymbol(
@@ -1796,7 +1795,7 @@ public class F {
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "hypergeometricpfq" : "HypergeometricPFQ");
 	public final static IBuiltInSymbol HypergeometricPFQRegularized = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "hypergeometricpfqregularized" : "HypergeometricPFQRegularized");
-	
+
 	public final static IBuiltInSymbol LinearModelFit = initFinalSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "linearmodelfit" : "LinearModelFit");
 	public final static IBuiltInSymbol CoshIntegral = initFinalSymbol(
@@ -2048,12 +2047,12 @@ public class F {
 			createNumeratorFunctionMap();
 
 			ConstantDefinitions.initialize();
+			FunctionDefinitions.initialize();
 			Programming.initialize();
 			PatternMatching.initialize();
 			Algebra.initialize();
 			Structure.initialize();
 			ExpTrigsFunctions.initialize();
-			FunctionDefinitions.initialize();
 			NumberTheory.initialize();
 			BooleanFunctions.initialize();
 			LinearAlgebra.initialize();
@@ -2872,11 +2871,11 @@ public class F {
 	public static IAST Beta(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Beta, a0, a1);
 	}
-	
+
 	public static IAST BetaRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(BetaRegularized, a0, a1, a2);
 	}
-	
+
 	public static IAST Break() {
 		return headAST0(Break);
 	}
@@ -3886,11 +3885,11 @@ public class F {
 	public static IAST GammaRegularized(final IExpr a0, final IExpr a1) {
 		return binaryAST2(GammaRegularized, a0, a1);
 	}
-	
+
 	public static IAST GammaRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(GammaRegularized, a0, a1, a2);
 	}
-	
+
 	public static IAST GCD(final IExpr a0) {
 		return unaryAST1(GCD, a0);
 	}
@@ -3966,7 +3965,7 @@ public class F {
 	public static IAST HypergeometricPFQRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(HypergeometricPFQRegularized, a0, a1, a2);
 	}
-	
+
 	public static IAST Identity(final IExpr a0) {
 		return unaryAST1(Identity, a0);
 	}
@@ -4120,25 +4119,19 @@ public class F {
 					SYMBOL_OBSERVER = symbolObserver;
 				}
 
-				if (!noPackageLoading) {
-					Reader reader = null;
-					if (fileName != null) {
-						try {
-							reader = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						}
-					}
-					// if (reader == null) {
-					// InputStream systemPackage = F.class.getResourceAsStream("/System.mep");
-					// if (systemPackage != null) {
-					// reader = new InputStreamReader(systemPackage, "UTF-8");
-					// }
-					// }
-					if (reader != null) {
-						org.matheclipse.core.builtin.function.Package.loadPackage(EvalEngine.get(), reader);
-					}
-				}
+				// if (!noPackageLoading) {
+				// Reader reader = null;
+				// if (fileName != null) {
+				// try {
+				// reader = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
+				// } catch (FileNotFoundException e) {
+				// e.printStackTrace();
+				// }
+				// }
+				// if (reader != null) {
+				// org.matheclipse.core.builtin.function.Package.loadPackage(EvalEngine.get(), reader);
+				// }
+				// }
 
 				isSystemInitialized = true;
 			} catch (Throwable th) {
@@ -4203,7 +4196,7 @@ public class F {
 
 	public static IAST InterpolatingFunction(final IExpr list) {
 		return unaryAST1(InterpolatingFunction, list);
-	}
+	} 
 
 	/**
 	 * Create an "interval" expression: <code>Interval(list)</code>.
@@ -4224,10 +4217,10 @@ public class F {
 	 *            maximum value of the interval
 	 * @return
 	 */
-	public static IAST Interval(final ISignedNumber min, ISignedNumber max) {
+	public static IAST Interval(final IExpr min, final IExpr max) {
 		return unaryAST1(Interval, binaryAST2(List, min, max));
 	}
-
+	
 	public static IAST intIterator(ISymbol head, final Function<IExpr, IExpr> function, final int from, final int to,
 			final int step) {
 		IASTAppendable result = F.ast(head, to - from + 1, false);
@@ -4693,11 +4686,11 @@ public class F {
 	public static IAST Mean(final IExpr a0) {
 		return unaryAST1(Mean, a0);
 	}
-	
+
 	public static IAST MeanDeviation(final IExpr a0) {
 		return unaryAST1(MeanDeviation, a0);
 	}
-	
+
 	public static IAST Median(final IExpr a0) {
 		return unaryAST1(Median, a0);
 	}

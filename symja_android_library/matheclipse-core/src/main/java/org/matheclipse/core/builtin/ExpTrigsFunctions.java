@@ -144,18 +144,18 @@ public class ExpTrigsFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
-			IExpr arg1 = ast.arg1();
+			IExpr arg1 = ast.first();
 			IExpr phi;
 			if (ast.isAST2()) {
-				IExpr arg2 = ast.arg2();
+				IExpr arg2 = ast.second();
 
 				if (arg1.isAST(F.List, 3)) {
-					IExpr x = ((IAST) arg1).arg1();
-					IExpr y = ((IAST) arg1).arg2();
+					IExpr x = arg1.first();
+					IExpr y = arg1.second();
 					if (arg2.isAST(F.List, 3)) {
 						// 'AngleVector[{x_, y_}, {r_, phi_}]': '{x + r * Cos[phi], y + r * Sin[phi]}'
-						IExpr r = ((IAST) arg2).arg1();
-						phi = ((IAST) arg2).arg2();
+						IExpr r = arg2.first();
+						phi = arg2.second();
 						return F.List(F.Plus(x, F.Times(r, F.Cos(phi))), F.Plus(y, F.Times(r, F.Sin(phi))));
 					} else {
 						phi = arg2;
@@ -1608,8 +1608,8 @@ public class ExpTrigsFunctions {
 		@Override
 		public IExpr e1ObjArg(IExpr expr) {
 			if (expr.isPower()) {
-				IExpr base = expr.getAt(1);
-				IExpr exponent = expr.getAt(2);
+				IExpr base = expr.base();
+				IExpr exponent = expr.exponent();
 				// arg2*Log(arg1)
 				IExpr temp = F.eval(Times(exponent, F.Log(base)));
 				IExpr imTemp = F.eval(F.Im(temp));
@@ -1972,6 +1972,67 @@ public class ExpTrigsFunctions {
 					return Times(Power(CN1, parts.arg2()), Sin(parts.arg1()));
 				}
 
+			}
+			if (arg1.isInterval1()) {
+//				return evalInterval(arg1);
+			}
+			return F.NIL;
+		}
+
+		/**
+		 * TODO: wrong results
+		 * @param arg1
+		 *            is assumed to be an interval
+		 * @return
+		 */
+		private static IExpr evalInterval(final IExpr arg1) {
+			IExpr l = arg1.lower();
+			IExpr u = arg1.upper();
+			if (l.isSignedNumber() && u.isSignedNumber()) {
+				double ld = l.evalDouble();
+				double ud = u.evalDouble();
+				double diff = Math.abs(ld - ud);
+				if (diff > 2 * Math.PI) {
+					return F.Interval(F.CN1, F.C1);
+				}
+				double ldSin = Math.sin(ld);
+				double udSin = Math.sin(ud);
+				if (diff < Math.PI / 2) {
+					if (ldSin < udSin) {
+						return F.Interval(F.Sin(l), F.Sin(u));
+					} else {
+						return F.Interval(F.Sin(u), F.Sin(l));
+					}
+				} else if (diff <= Math.PI) {
+					if (ldSin <= udSin) {
+						if (ldSin <= 0) {
+							return F.Interval(F.CN1, F.Sin(u));
+						} else {
+							return F.Interval(F.Sin(l), F.C1);
+						}
+					} else {
+						if (udSin <= 0) {
+							return F.Interval(F.CN1, F.Sin(l));
+						} else {
+							return F.Interval(F.Sin(u), F.C1);
+						}
+					}
+				} else {
+					// diff > Math.PI
+//					if (ldSin <= udSin) {
+//						if (ldSin > 0) {
+//							if (udSin > 0) {
+//								return F.Interval(F.CN1, F.Sin(u));
+//							}
+//						}
+//					} else {
+//						if (ldSin > 0) {
+//							if (udSin > 0) {
+//								return F.Interval(F.CN1, F.Sin(l));
+//							}
+//						}
+//					}
+				}
 			}
 			return F.NIL;
 		}

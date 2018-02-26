@@ -3,7 +3,6 @@ package org.matheclipse.core.builtin;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import com.duy.lambda.IntFunction;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.matheclipse.core.eval.EvalEngine;
@@ -86,21 +85,19 @@ public class TensorFunctions {
 			return F.NIL;
 		}
 
-		public static IExpr listCorrelate(final IAST kernel, int kernelSize, final IAST tensor, int tensorSize) {
-			final ISymbol fFunction = F.Plus;
-			final ISymbol gFunction = F.Times;
+		public static IExpr listCorrelate(IAST kernel, int kernelSize, IAST tensor, int tensorSize) {
+			ISymbol fFunction = F.Plus;
+			ISymbol gFunction = F.Times;
 			int diff = tensorSize - kernelSize;
 			IASTAppendable resultList = F.ListAlloc(tensorSize - 1);
 			final int[] fi = new int[1];
 			for (int i = 0; i <= diff; i++) {
 				IASTAppendable plus = F.ast(fFunction, kernelSize, false);
-				fi[0]=i;
-				plus.appendArgs(kernelSize, new IntFunction<IExpr>() {
-                    @Override
-                    public IExpr apply(int k) {
-                        return F.binaryAST2(gFunction, kernel.get(k), tensor.get(k + fi[0]));
-                    }
-                });
+				fi[0] = i;
+				plus.appendArgs(kernelSize, k -> F.binaryAST2(gFunction, kernel.get(k), tensor.get(k + fi[0])));
+				// for (int k = 1; k < kernelSize; k++) {
+				// plus.append(F.binaryAST2(gFunction, kernel.get(k), tensor.get(k + i)));
+				// }
 				resultList.append(plus);
 			}
 			return resultList;
