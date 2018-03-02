@@ -2442,7 +2442,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 		checkNumeric("N(2^(-100))", "0.0");
 
 		check("FindRoot(Exp(x)-1 == 0,{x,-50,100}, Method->Muller)", "{x->0.0}");
-		check("Exp(1.2436240901689538E-16) - 1", "0.0");
+		if (!Config.EXPLICIT_TIMES_OPERATOR) {
+			// implicit times operator '*' allowed
+			check("Exp(1.2436240901689538 * E - 16) - 1", "-1.0");
+			check("Exp(1.2436240901689538E-16) - 1", "-1.0");
+		} else {
+			check("Exp(1.2436240901689538E-16) - 1", "0.0");
+		}
 
 		checkNumeric("FindRoot(Exp(x)==Pi^3,{x,-1,10})", "{x->3.4341896575482007}");
 		checkNumeric("$K=10000;\n" + "$g=0.0;\n" + "$n=10*12;\n" + "$Z=12;\n" + "$AA=0.0526;\n" + "$R=100;\n"

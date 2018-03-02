@@ -427,22 +427,47 @@ public class MainTestCase extends AbstractTestCase {
 		// check("1.6969545188681513E4", "1.6969545188681513e4");
 		// check("1.6969545188681513*^4", "1.69695451886815129e4");
 		// check("1.6969545188681513*^-10", "1.6969545188681513e-10");
-		check("1.6969545188681513E4", "16969.54519");
-		check("1.6969545188681513*^-10", "0.0");
 
-		check("-0.0001E+15", "-100000000000.0");
-		check("-0.0001E-15", "0.0");
+		if (!Config.EXPLICIT_TIMES_OPERATOR) {
+			// implicit times operator '*' allowed
+			check("1.6969545188681513E4", "1.69695*e4");
+			check("1.6969545188681513*^-10", "0.0");
+
+			check("-0.0001*E+15", "14.99973");
+			check("-0.0001E+15", "14.99973");
+			check("-0.0001*E-15", "-15.00027");
+			check("-0.0001E-15", "-15.00027");
+		} else {
+			check("1.6969545188681513E4", "16969.54519");
+			check("1.6969545188681513*^-10", "0.0");
+
+			check("-0.0001*E+15", "14.99973");
+			check("-0.0001E+15", "-100000000000.0");
+			check("-0.0001*E-15", "-15.00027");
+			check("-0.0001E-15", "0.0");
+		}
 	}
 
 	public void testSystem004() {
 		check("1.0-(1.0-1*(2))", "2.0");
 		check("1-(1-1*(2))", "2");
 
-		check("Chop((-2.4492935982947064E-16)+I*(-1.0E-19))", "0");
-		check("Chop(2.0+I*(-2.4492935982947064E-16))", "2.0");
-		check("Chop((-2.4492935982947064E-16)+I*0.5)", "I*0.5");
+		if (!Config.EXPLICIT_TIMES_OPERATOR) {
+			// implicit times operator '*' allowed
+			check("Chop((-2.4492935982947064E-16)+I*(-1.0E-19))", "-22.65787+I*(-21.71828)");
+			check("Chop(2.0+I*(-2.4492935982947064E-16))", "2.0+I*(-22.65787)");
+			check("Chop((-2.4492935982947064E-16)+I*0.5)", "-22.65787+I*0.5");
 
-		check("Chop({2.0+I*(-2.4492935982947064E-16),(-2.4492935982947064E-16)+I*0.5})", "{2.0,I*0.5}");
+			check("Chop({2.0+I*(-2.4492935982947064E-16),(-2.4492935982947064E-16)+I*0.5})",
+					"{2.0+I*(-22.65787),-22.65787+I*0.5}");
+		} else {
+			check("Chop((-2.4492935982947064E-16)+I*(-1.0E-19))", "0");
+			check("Chop(2.0+I*(-2.4492935982947064E-16))", "2.0");
+			check("Chop((-2.4492935982947064E-16)+I*0.5)", "I*0.5");
+
+			check("Chop({2.0+I*(-2.4492935982947064E-16),(-2.4492935982947064E-16)+I*0.5})", "{2.0,I*0.5}");
+
+		}
 	}
 
 	public void testSystem005() {
@@ -629,14 +654,14 @@ public class MainTestCase extends AbstractTestCase {
 		check("Trace(D(Sin(x),x))", "{{{D(x,x),1},1*Cos(x),Cos(x)},Cos(x)}");
 		check("D(Sin(x)^Cos(x),x)", "(Cos(x)*Cot(x)-Log(Sin(x))*Sin(x))*Sin(x)^Cos(x)");
 		check("Trace(D(Sin(x)^Cos(x),x))",
-				"{{{IntegerQ(#1)&&#1<0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}},Sin(x)^Cos(x)*(D(Cos(x),x)*Log(Sin(x))+(Cos(x)*D(Sin(x),x))/Sin(x)),{{IntegerQ(#1)&&#1<\n" + 
-				"0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}},{{{{{D(x,x),\n" + 
-				"1},(-1)*1*Sin(x),-Sin(x)},-Sin(x)},Log(Sin(x))*-Sin(x),-Log(Sin(x))*Sin(x)},{{{{D(x,x),\n" + 
-				"1},1*Cos(x),Cos(x)},Cos(x)},{{IntegerQ(#1)&&#1<0&[-1],IntegerQ(-1)&&-1<0,{IntegerQ(\n" + 
-				"-1),True},{-1<0,True},True},{{(-1)*(-1),1},Csc(x)^1,{IntegerQ(#1)&&#1<0&[1],IntegerQ(\n" + 
-				"1)&&1<0,{IntegerQ(1),True},{1<0,False},False},Csc(x)},Csc(x)},Cos(x)*Cos(x)*Csc(x),Cot(x)^\n" + 
-				"1*Cos(x),{{IntegerQ(#1)&&#1<0&[1],IntegerQ(1)&&1<0,{IntegerQ(1),True},{1<0,False},False},Cot(x)},Cos(x)*Cot(x)},Cos(x)*Cot(x)-Log(Sin(x))*Sin(x)},(Cos(x)*Cot(x)-Log(Sin(x))*Sin(x))*Sin(x)^Cos(x),{{IntegerQ(#1)&&#1<\n" + 
-				"0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}}}");
+				"{{{IntegerQ(#1)&&#1<0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}},Sin(x)^Cos(x)*(D(Cos(x),x)*Log(Sin(x))+(Cos(x)*D(Sin(x),x))/Sin(x)),{{IntegerQ(#1)&&#1<\n"
+						+ "0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}},{{{{{D(x,x),\n"
+						+ "1},(-1)*1*Sin(x),-Sin(x)},-Sin(x)},Log(Sin(x))*-Sin(x),-Log(Sin(x))*Sin(x)},{{{{D(x,x),\n"
+						+ "1},1*Cos(x),Cos(x)},Cos(x)},{{IntegerQ(#1)&&#1<0&[-1],IntegerQ(-1)&&-1<0,{IntegerQ(\n"
+						+ "-1),True},{-1<0,True},True},{{(-1)*(-1),1},Csc(x)^1,{IntegerQ(#1)&&#1<0&[1],IntegerQ(\n"
+						+ "1)&&1<0,{IntegerQ(1),True},{1<0,False},False},Csc(x)},Csc(x)},Cos(x)*Cos(x)*Csc(x),Cot(x)^\n"
+						+ "1*Cos(x),{{IntegerQ(#1)&&#1<0&[1],IntegerQ(1)&&1<0,{IntegerQ(1),True},{1<0,False},False},Cot(x)},Cos(x)*Cot(x)},Cos(x)*Cot(x)-Log(Sin(x))*Sin(x)},(Cos(x)*Cot(x)-Log(Sin(x))*Sin(x))*Sin(x)^Cos(x),{{IntegerQ(#1)&&#1<\n"
+						+ "0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}}}");
 	}
 
 	public void testSystem039() {
@@ -2870,18 +2895,9 @@ public class MainTestCase extends AbstractTestCase {
 	}
 
 	public void testSystem412() {
-		check("DiagonalMatrix({1,2,3,4})", "{{1,0,0,0},\n" + 
-				" {0,2,0,0},\n" + 
-				" {0,0,3,0},\n" + 
-				" {0,0,0,4}}");
-		check("DiagonalMatrix({1,2,3,4},2)", "{{0,0,1,0},\n" + 
-				" {0,0,0,2},\n" + 
-				" {0,0,0,0},\n" + 
-				" {0,0,0,0}}");
-		check("DiagonalMatrix({1,2,3,4},-2)", "{{0,0,0,0},\n" + 
-				" {0,0,0,0},\n" + 
-				" {3,0,0,0},\n" + 
-				" {0,4,0,0}}");
+		check("DiagonalMatrix({1,2,3,4})", "{{1,0,0,0},\n" + " {0,2,0,0},\n" + " {0,0,3,0},\n" + " {0,0,0,4}}");
+		check("DiagonalMatrix({1,2,3,4},2)", "{{0,0,1,0},\n" + " {0,0,0,2},\n" + " {0,0,0,0},\n" + " {0,0,0,0}}");
+		check("DiagonalMatrix({1,2,3,4},-2)", "{{0,0,0,0},\n" + " {0,0,0,0},\n" + " {3,0,0,0},\n" + " {0,4,0,0}}");
 	}
 
 	public void testSystem413() {
@@ -2916,7 +2932,7 @@ public class MainTestCase extends AbstractTestCase {
 	}
 
 	public void testSystem418() {
-		
+
 		check("Limit(Sin(x)/x, x->0)", "1");
 		// check("Limit(Sum(1/k*(k+1),{k,1,x}),x->Infinity)", "");
 		// check("Apart((4-x^4)/(2*x^3-5*x^4))",
@@ -3471,15 +3487,15 @@ public class MainTestCase extends AbstractTestCase {
 		check("NullSpace({{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}})", "{}");
 		check("NullSpace({{1,1.4,0},{3,2.5,7},{0.2546,2,0}})", "{}");
 		// see Issue#25
-		check("NullSpace({{1,0,-3,0,2,-8}," + "{0,1,5,0,-1,4}," + "{0,0,0,1,7,-9}," + "{0,0,0,0,0,0}})",//
+		check("NullSpace({{1,0,-3,0,2,-8}," + "{0,1,5,0,-1,4}," + "{0,0,0,1,7,-9}," + "{0,0,0,0,0,0}})", //
 				"{{8,-4,0,9,0,1},\n" + //
-				" {3,-5,1,0,0,0},\n" + //
-				" {-2,1,0,-7,1,0}}");
+						" {3,-5,1,0,0,0},\n" + //
+						" {-2,1,0,-7,1,0}}");
 		check("NullSpace({{0,0,0}," + "{0,0,0}," + "{0,0,0}," + "{0,0,0}})",
 				"{{1,0,0},\n" + " {0,1,0},\n" + " {0,0,1}}");
 		check("NullSpace({{0,0}," + "{0,0}," + "{0,0}," + "{0,0}})", "{{1,0},\n" + " {0,1}}");
 	}
-	
+
 	public void testSystem1105() {
 		check("$p(Sin(x_)^m_IntegerQ):=f(x)^(-m)/;m<0;$p(Sin(x)^2)", "$p(Sin(x)^2)");
 	}
@@ -3584,4 +3600,40 @@ public class MainTestCase extends AbstractTestCase {
 		check("Pi==Pi==Pi", "True");
 	}
 
+	public void testGithub18() {
+		// see: https://github.com/axkr/symja_android_library/issues/18
+		boolean old = Config.EXPLICIT_TIMES_OPERATOR;
+		try {
+			Config.EXPLICIT_TIMES_OPERATOR = false;
+			if (!Config.EXPLICIT_TIMES_OPERATOR) {
+				check("1E-2 // FullForm", "\"Plus(-2, E)\"");
+				checkNumeric("1.0E-2 // FullForm", "\"0.7182818284590451\"");
+				checkNumeric("1x-2 // FullForm", //
+						"\"Plus(-2, x)\"");
+				check("N(1E-2)", "0.71828");
+				check("0x1", "0");
+				check("0xf", "0");
+				check("0y1", "0");
+			}
+			Config.EXPLICIT_TIMES_OPERATOR = true;
+			if (Config.EXPLICIT_TIMES_OPERATOR) {
+				check("1E-2 // FullForm", //
+						"\"0.01\"");
+				checkNumeric("1.0E-2 // FullForm", "\"0.01\"");
+				checkNumeric("1x-2 // FullForm", //
+						"Syntax error in line: 1 - End-of-file not reached.\n" + //
+								"1x-2 // FullForm\n" + //
+								" ^");
+				check("N(1E-2)", "0.01");
+				check("0x1", "1");
+				check("0xf", "15");
+				check("0y1", //
+						"Syntax error in line: 1 - End-of-file not reached.\n" + //
+								"0y1\n" + //
+								" ^");
+			}
+		} finally {
+			Config.EXPLICIT_TIMES_OPERATOR = old;
+		}
+	}
 }
