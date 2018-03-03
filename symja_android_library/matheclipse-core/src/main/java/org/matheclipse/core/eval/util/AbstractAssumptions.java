@@ -12,6 +12,10 @@ import org.matheclipse.core.interfaces.IBuiltInSymbol;
 
 public abstract class AbstractAssumptions implements IAssumptions {
 
+	public IAssumptions addAssumption(IAST ast) {
+		return null;
+	}
+	
 	/**
 	 * TODO implement algebraic number conditions.
 	 * 
@@ -409,10 +413,10 @@ public abstract class AbstractAssumptions implements IAssumptions {
 				return flag;
 			}
 			if (ast.isPower()) {
-				IExpr arg1 = ast.arg1();
-				IExpr arg2 = ast.arg2();
-				if (arg1.isNegativeResult() && arg2.isInteger()) {
-					IInteger iArg2 = (IInteger) arg2;
+				IExpr base = ast.base();
+				IExpr exponent = ast.exponent();
+				if (base.isNegativeResult() && exponent.isInteger()) {
+					IInteger iArg2 = (IInteger) exponent;
 					if (iArg2.isOdd()) {
 						return true;
 					}
@@ -464,16 +468,16 @@ public abstract class AbstractAssumptions implements IAssumptions {
 				return flag;
 			}
 			if (ast.isPower()) {
-				IExpr arg1 = ast.arg1();
-				IExpr arg2 = ast.arg2();
-				if (arg1.isRealResult() && arg2.isInteger()) {
-					IInteger iArg2 = (IInteger) arg2;
+				IExpr base = ast.base();
+				IExpr exponent = ast.exponent();
+				if (base.isRealResult() && exponent.isInteger()) {
+					IInteger iArg2 = (IInteger) exponent;
 					if (iArg2.isEven()) {
 						return true;
 					}
 				}
-				if (arg1.isE()) {
-					if (arg2.isRealResult()) {
+				if (base.isE()) {
+					if (exponent.isRealResult()) {
 						return true;
 					}
 				}
@@ -524,23 +528,24 @@ public abstract class AbstractAssumptions implements IAssumptions {
 				return flag;
 			}
 			if (ast.isPower()) {
-				IExpr arg1 = ast.arg1();
-				IExpr arg2 = ast.arg2();
-				if (arg2.isInteger()) {
-					IInteger iArg2 = (IInteger) arg2;
-					if (arg1.isNegativeResult()) {
+				// base ^ exponent
+				IExpr base = ast.base();
+				IExpr exponent = ast.exponent();
+				if (exponent.isInteger()) {
+					IInteger iArg2 = (IInteger) exponent;
+					if (base.isNegativeResult()) {
 						if (iArg2.isEven()) {
 							return true;
 						}
 					}
-					if (arg1.isPositiveResult() && arg2.isInteger()) {
+					if (base.isPositiveResult() && exponent.isInteger()) {
 						if (iArg2.isEven()) {
 							return true;
 						}
 					}
 				}
-				if (arg1.isE()) {
-					if (arg2.isRealResult()) {
+				if (base.isE()) {
+					if (exponent.isRealResult()) {
 						return true;
 					}
 				}

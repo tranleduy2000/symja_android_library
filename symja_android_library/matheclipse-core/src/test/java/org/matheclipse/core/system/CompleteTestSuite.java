@@ -58,6 +58,8 @@ public class CompleteTestSuite extends TestCase {
 		suite.addTestSuite(ASCIIPrintTest.class);
 		suite.addTestSuite(SVGGraphicsTestCase.class);
 		
+		suite.addTestSuite(AssumptionTestCase.class);
+		
 		return suite;
 
 	}

@@ -170,7 +170,7 @@ public class ExprEvaluator {
 	 * @param value
 	 */
 	public ISymbol defineVariable(String variableName) {
-		return defineVariable(F.userSymbol(variableName, engine), null);
+		return defineVariable(F.symbol(variableName, engine), null);
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class ExprEvaluator {
 	 * @param value
 	 */
 	public void defineVariable(String variableName, boolean value) {
-		defineVariable(F.userSymbol(variableName, engine), value ? F.True : F.False);
+		defineVariable(F.symbol(variableName, engine), value ? F.True : F.False);
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class ExprEvaluator {
 	 * @param value
 	 */
 	public ISymbol defineVariable(String variableName, double value) {
-		return defineVariable(F.userSymbol(variableName, engine), F.num(value));
+		return defineVariable(F.symbol(variableName, engine), F.num(value));
 	}
 
 	/**
@@ -200,7 +200,7 @@ public class ExprEvaluator {
 	 * @param value
 	 */
 	public ISymbol defineVariable(String variableName, IExpr value) {
-		return defineVariable(F.userSymbol(variableName, engine), value);
+		return defineVariable(F.symbol(variableName, engine), value);
 	}
 
 	/**
@@ -436,7 +436,7 @@ public class ExprEvaluator {
 	 * @return
 	 */
 	public IExpr getVariable(String variableName) {
-		return fVariableMap.get(F.userSymbol(variableName, engine));
+		return fVariableMap.get(F.symbol(variableName, engine));
 	}
 
 	/**

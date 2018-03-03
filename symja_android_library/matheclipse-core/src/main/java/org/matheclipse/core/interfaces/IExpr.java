@@ -255,6 +255,18 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr[] egcd(IExpr b);
 
     /**
+	 * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>. Returns
+	 * <code>false</code> otherwise.
+	 * 
+	 * @param position
+	 *            the position in the <code>IAST</code> which should be tested for equality
+	 * @param expr
+	 *            the expression which should be tested for equality
+	 * @return
+	 */
+    public boolean equalsAt(int position, final IExpr expr);
+    
+    /**
      * Compare if <code>this == that</code:
      * <ul>
      * <li>return F.True if the comparison is <code>true</code></li>

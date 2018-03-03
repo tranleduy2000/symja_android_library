@@ -84,7 +84,7 @@ public class Object2Expr {
 			if (lst.size() == 0) {
 				return List();
 			} else {
-				final ISymbol head = F.userSymbol(lst.get(0).toString());
+				final ISymbol head = F.symbol(lst.get(0).toString());
 				int size = lst.size();
 				IASTAppendable list = F.ast(head, size, false);
 				return list.appendArgs(size, new IntFunction<IExpr>() {
