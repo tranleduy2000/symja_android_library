@@ -9,7 +9,7 @@ import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Times;
 
-import java.util.function.DoubleUnaryOperator;
+import com.duy.lambda.DoubleUnaryOperator;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;

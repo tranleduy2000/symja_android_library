@@ -24,7 +24,7 @@ import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.Zeta;
 
 import java.math.BigDecimal;
-import java.util.function.DoubleUnaryOperator;
+import com.duy.lambda.DoubleUnaryOperator;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;

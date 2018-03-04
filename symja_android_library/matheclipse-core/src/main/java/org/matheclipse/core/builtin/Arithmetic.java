@@ -1427,9 +1427,6 @@ public final class Arithmetic {
 	 */
 	private final static class HarmonicNumber extends AbstractEvaluator {
 
-		public HarmonicNumber() {
-		}
-
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
@@ -1471,7 +1468,9 @@ public final class Arithmetic {
 				}
 			}
 			if (arg1.isInteger()) {
-
+				if (arg1.isNegative()) {
+					return F.CComplexInfinity;
+				}
 				int n = Validate.checkIntType(ast, 1, Integer.MIN_VALUE);
 				if (n < 0) {
 					return F.NIL;
@@ -1484,6 +1483,12 @@ public final class Arithmetic {
 				}
 
 				return fraction(harmonicNumber(n));
+			}
+			if (arg1.isInfinity()) {
+				return arg1;
+			}
+			if (arg1.isNegativeInfinity()) {
+				return F.CComplexInfinity;
 			}
 
 			return F.NIL;
