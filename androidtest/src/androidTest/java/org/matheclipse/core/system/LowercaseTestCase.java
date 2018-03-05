@@ -127,15 +127,21 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testApart() {
+		// check("Factor(x^2 - y^2 )", "(x-y)*(x+y)");
+		// check("Solve(x^2 - y^2==0, y)", "{{y->-x},{y->x}}");
+		check("Apart(1 / (x^2 - y^2))", "1/(x^2-y^2)");
+
+		check("Apart(x/(2 x + a^2))", "x/(a^2+2*x)");
+
+		check("Apart(y/(x + 2)/(x + 1),x)", "y/((1+x)*(2+x))");
+
 		check("Sin(1 / (x ^ 2 - y ^ 2)) // Apart", "Sin(1/(x^2-y^2))");
 
 		check("Apart(1 / (x^2 + 5x + 6))", "1/(2+x)+1/(-3-x)");
 		// TODO return -1 / (2 y (x + y)) + 1 / (2 y (x - y))
-		check("Apart(1 / (x^2 - y^2), x)", "Apart(1/(x^2-y^2),x)");
+		check("Apart(1 / (x^2 - y^2), x)", "1/(x^2-y^2)");
 		// TODO return 1 / (2 x (x + y)) + 1 / (2 x (x - y))
-		check("Apart(1 / (x^2 - y^2), y)", "Apart(1/(x^2-y^2),y)");
-
-		check("Apart({1 / (x^2 + 5x + 6)})", "{1/(2+x)+1/(-3-x)}");
+		check("Apart(1 / (x^2 - y^2), y)", "1/(x^2-y^2)");
 
 		check("Apart(1/((1 + x)*(5 + x)))", "1/(4+4*x)+1/(-20-4*x)");
 		check("Apart(1 < (x + 1)/(x - 1) < 2)", "1<1+2/(-1+x)<2");
@@ -716,6 +722,35 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Catenate({{1,2,3},{a,b,c},{4,5,6}})", "{1,2,3,a,b,c,4,5,6}");
 	}
 
+	public void testCDF() {
+		check("CDF(BernoulliDistribution(p),k)", "Piecewise({{0,k<0},{1-p,0<=k&&k<1}},1)");
+		check("CDF(BinomialDistribution(n, m),k)",
+				"Piecewise({{BetaRegularized(1-m,n-Floor(k),1+Floor(k)),0<=k&&k<n},{1,k>=n}},0)");
+		check("CDF(ExponentialDistribution(n),k)", "Piecewise({{1-1/E^(k*n),k>=0}},0)");
+		check("CDF(PoissonDistribution(p),k)", "Piecewise({{GammaRegularized(1+Floor(k),p),k>=0}},0)");
+		check("CDF(DiscreteUniformDistribution({a, b}), k)",
+				"Piecewise({{(1-a+Floor(k))/(1-a+b),a<=k&&k<b},{1,k>=b}},0)");
+		check("CDF(ErlangDistribution(n, m),k)", "Piecewise({{GammaRegularized(n,0,k*m),k>0}},0)");
+		check("CDF(LogNormalDistribution(n,m),k)", "Piecewise({{Erfc((n-Log(k))/(Sqrt(2)*m))/2,k>0}},0)");
+		check("CDF(NakagamiDistribution(n, m),k)", "Piecewise({{GammaRegularized(n,0,(k^2*n)/m),k>0}},0)");
+		check("CDF(NormalDistribution(n, m),k)", "Erfc((-k+n)/(Sqrt(2)*m))/2");
+		check("CDF(FrechetDistribution(n, m),k)", "Piecewise({{E^(-1/(k/m)^n),k>0}},0)");
+		check("CDF(GammaDistribution(n, m),k)", "Piecewise({{GammaRegularized(n,0,k/m),k>0}},0)");
+		check("CDF(GeometricDistribution(n),k)", "Piecewise({{1-(1-n)^(1+Floor(k)),k>=0}},0)");
+		check("CDF(GumbelDistribution(n, m),k)", "1-1/E^E^((k-n)/m)");
+		check("CDF(HypergeometricDistribution(n, ns, nt),k)",
+				"Piecewise({{1+(-ns!*(-ns+nt)!*HypergeometricPFQRegularized({1,1-n+Floor(k),1-ns+Floor(k)},{\n"
+						+ "2+Floor(k),2-n-ns+nt+Floor(k)},1))/(Binomial(nt,n)*(-1+n-Floor(k))!*(-1+ns-Floor(k))!),\n"
+						+ "0<=k&&n+ns-nt<=k&&k<n&&k<ns},{1,k>=n||k>=ns}},0)");
+		check("CDF(StudentTDistribution(n),k)",
+				"Piecewise({{BetaRegularized(n/(k^2+n),n/2,1/2)/2,k<=0}},1/2*(1+BetaRegularized(k^\n"
+						+ "2/(k^2+n),1/2,n/2)))");
+		check("CDF(WeibullDistribution(n, m),k)", "Piecewise({{1-1/E^(k/m)^n,k>0}},0)");
+		check("CDF(BernoulliDistribution(4),k)", "Piecewise({{0,k<0},{-4+1,0<=k&&k<1}},1)");
+
+		check("CDF(DiscreteUniformDistribution({1, 5}), 3)", "3/5");
+	}
+
 	public void testCeiling() {
 		check("Ceiling(-9/4)", "-2");
 		check("Ceiling(1/3)", "1");
@@ -794,7 +829,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testChop() {
 		check("Chop(0.00000000001)", "0");
 	}
-	
+
 	public void testCirclePoints() {
 		check("CirclePoints(2)", "{{1,0},{-1,0}}");
 		check("CirclePoints(3)", "{{Sqrt(3)/2,-1/2},{0,1},{-Sqrt(3)/2,-1/2}}");
@@ -810,6 +845,25 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Attributes(f)", "{Orderless}");
 		check("ClearAttributes(f, Flat)", "");
 		check("Attributes(f)", "{Orderless}");
+	}
+
+	public void testClip() {
+		check("Clip(Tan(E),{-1/2,1/2})", "Tan(E)");
+		check("Clip(Tan(2*E),{-1/2,1/2})", "-1/2");
+		check("Clip(Tan(-2*E),{-1/2,1/2})", "1/2");
+
+		check("Clip(Tan(E), {-1/2,1/2}, {a,b})", "Tan(E)");
+		check("Clip(Tan(2*E), {-1/2,1/2}, {a,b})", "a");
+		check("Clip(Tan(-2*E), {-1/2,1/2}, {a,b})", "b");
+
+		check("Clip(x)", "Clip(x)");
+		check("Clip(1)", "1");
+		check("Clip(-1)", "-1");
+		check("Clip(Sin(Pi/7))", "Sin(Pi/7)");
+		check("Clip(Tan(E))", "Tan(E)");
+		check("Clip(Tan(2*E))", "-1");
+		check("Clip(Tan(-2*E))", "1");
+
 	}
 
 	public void testCoefficient() {
@@ -916,6 +970,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCollect() {
+		check("Collect(x^2 + y*x^2 + x*y + y + a*y, {x, y})", "(1+a)*y+x*y+x^2*(1+y)");
+		check("Collect(a*x^2 + b*x^2 + a*x - b*x + c, x)", "c+(a-b)*x+(a+b)*x^2");
+		check("Collect(a*Exp(2*x) + b*Exp(2*x), Exp(2*x))", "(a+b)*E^(2*x)");
+		check("a*Exp(2*x) + b*Exp(2*x)", "a*E^(2*x)+b*E^(2*x)");
 		// check("Collect(D(f(Sqrt(x^2 + 1)), {x, 3}), Derivative(_)[f][_],
 		// Together)", "");
 		check("x*(4*a^3+12*a^2+12*a+4)+x^4+(4*a+4)*x^3+(6*a^2+12*a+6)*x^2+a^4+4*a^3+6*a^2+4*a+1",
@@ -934,9 +992,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("Collect(a x + b y + c x, x)", "(a+c)*x+b*y");
 		check("Collect((x + y + z + 1)^4, {x, y})",
-				"1+x^4+4*y+6*y^2+4*y^3+y^4+4*z+12*y*z+12*y^2*z+4*y^3*z+x^3*(4+4*y+4*z)+6*z^2+12*y*z^\n"
-						+ "2+6*y^2*z^2+x^2*(6+6*y^2+12*z+y*(12+12*z)+6*z^2)+4*z^3+4*y*z^3+x*(4+4*y^3+12*z+y^\n"
-						+ "2*(12+12*z)+12*z^2+y*(12+24*z+12*z^2)+4*z^3)+z^4");
+				"1+x^4+y^4+4*z+y^3*(4+4*z)+x^3*(4+4*y+4*z)+6*z^2+y^2*(6+12*z+6*z^2)+x^2*(6+6*y^2+\n"
+						+ "12*z+y*(12+12*z)+6*z^2)+4*z^3+y*(4+12*z+12*z^2+4*z^3)+x*(4+4*y^3+12*z+y^2*(12+12*z)+\n"
+						+ "12*z^2+y*(12+24*z+12*z^2)+4*z^3)+z^4");
 	}
 
 	public void testCommonest() {
@@ -996,19 +1054,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Composition(f, g, h) @@ {x, y, z}", "f(g(h(x,y,z)))");
 	}
 
-
 	public void testComposeList() {
 		check("ComposeList({f,g,h}, x)", //
 				"{x,f(x),g(f(x)),h(g(f(x)))}");
-		//check("ComposeList({1 - # &, 1/# &}[[{2, 2, 1, 2, 2, 1}]], x)", //
-		//		"{x,1/x,x,1-x,1/(1-x),1-x,x}");
-		//check("ComposeList({f, g}[[{1, 2, 1, 1, 2}]], x)", //
-	    //			"{x,f(x),g(f(x)),f(g(f(x))),f(f(g(f(x)))),g(f(f(g(f(x)))))}");
+		check("ComposeList({1 - # &, 1/# &}[[{2, 2, 1, 2, 2, 1}]], x)", //
+				"{x,1/x,x,1-x,1/(1-x),1-x,x}");
+		check("ComposeList({f, g}[[{1, 2, 1, 1, 2}]], x)", //
+				"{x,f(x),g(f(x)),f(g(f(x))),f(f(g(f(x)))),g(f(f(g(f(x)))))}");
 		check("ComposeList({a, b, c, d}, x)", //
 				"{x,a(x),b(a(x)),c(b(a(x))),d(c(b(a(x))))}");
 
 	}
-	
+
 	public void testCompoundExpression() {
 		check("1; 2; 3;", "");
 		check("1; 2; 3", "3");
@@ -1251,6 +1308,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testD() {
 
+		check("D(HarmonicNumber(x), x)", "Pi^2/6-HarmonicNumber(x,2)");
+
 		check("D(ArcCsc(x),{x,2})", "(-1+2*x^2)/(Sqrt(1-1/x^2)*x^3*(-1+x^2))");
 		check("D(ArcSec(x),{x,2})", "(1-2*x^2)/(Sqrt(1-1/x^2)*x^3*(-1+x^2))");
 
@@ -1359,7 +1418,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Delete({a, b, c, d}, 3)", "{a,b,d}");
 		check("Delete({a, b, c, d}, -2)", "{a,b,d}");
 	}
-	
+
 	public void testDeleteCases() {
 		check("DeleteCases({a, 1, 2.5, \"string\"}, _Integer|_Real)", "{a,\"string\"}");
 		check("DeleteCases({a, b, 1, c, 2, 3}, _Symbol)", "{1,2,3}");
@@ -2383,7 +2442,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 		checkNumeric("N(2^(-100))", "0.0");
 
 		check("FindRoot(Exp(x)-1 == 0,{x,-50,100}, Method->Muller)", "{x->0.0}");
-		check("Exp(1.2436240901689538E-16) - 1", "0.0");
+		if (!Config.EXPLICIT_TIMES_OPERATOR) {
+			// implicit times operator '*' allowed
+			check("Exp(1.2436240901689538 * E - 16) - 1", "-1.0");
+			check("Exp(1.2436240901689538E-16) - 1", "-1.0");
+		} else {
+			check("Exp(1.2436240901689538E-16) - 1", "0.0");
+		}
 
 		checkNumeric("FindRoot(Exp(x)==Pi^3,{x,-1,10})", "{x->3.4341896575482007}");
 		checkNumeric("$K=10000;\n" + "$g=0.0;\n" + "$n=10*12;\n" + "$Z=12;\n" + "$AA=0.0526;\n" + "$R=100;\n"
@@ -2736,7 +2801,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 			String pathToVectorAnalysis;
 			pathToVectorAnalysis = getClass().getResource("/VectorAnalysis.m").toString();
 			// remove 'file:/'
-			pathToVectorAnalysis = pathToVectorAnalysis.substring(6); 
+			pathToVectorAnalysis = pathToVectorAnalysis.substring(6);
 			System.out.println(pathToVectorAnalysis);
 			check("Get(\"" + pathToVectorAnalysis + "\")", "");
 			check("DotProduct({a,b,c},{d,e,f}, Spherical)",
@@ -2799,6 +2864,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testHarmonicNumber() {
+		check("HarmonicNumber(-Infinity)", "ComplexInfinity");
+		check("HarmonicNumber(Infinity)", "Infinity");
+		check("HarmonicNumber(-42)", "ComplexInfinity");
 		check("HarmonicNumber(2,-3/2)", "1+2*Sqrt(2)");
 		check("Table(HarmonicNumber(n), {n, 8})", "{1,3/2,11/6,25/12,137/60,49/20,363/140,761/280}");
 		check("HarmonicNumber(4,r)", "1+2^(-r)+3^(-r)+4^(-r)");
@@ -3054,6 +3122,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testIntegerPart() {
+		check("IntegerPart(Infinity)", "Infinity");
+		check("IntegerPart(-Infinity)", "-Infinity");
+		check("IntegerPart(I*Infinity)", "I*Infinity");
+		check("IntegerPart(-I*Infinity)", "-I*Infinity");
+
+		check("IntegerPart(Pi)", "3");
+		check("IntegerPart(-Pi)", "-3");
+		check("IntegerPart(IntegerPart(Pi))", "3");
+
 		check("IntegerPart(-9/4)", "-2");
 		check("IntegerPart(2.4)", "2");
 		check("IntegerPart(-2.4)", "-2");
@@ -3739,6 +3816,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("MachineNumberQ(1.5 + 5 *I)", "True");
 	}
 
+	public void testMangoldtLambda() {
+		check("MangoldtLambda(3^5)", "Log(3)");
+		check("MangoldtLambda({1,2,6})", "{0,Log(2),0}");
+		check("{MangoldtLambda(Prime(10^5)^10), MangoldtLambda(2*Prime(10^5)^10)}", "{Log(1299709),0}");
+	}
+
 	public void testManhattanDistance() {
 		check("ManhattanDistance({-1, -1}, {1, 1})", "4");
 	}
@@ -3916,6 +3999,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Mean(StudentTDistribution(4))", "0");
 		check("Mean(StudentTDistribution(n))", "Piecewise({{0,n>1}},Indeterminate)");
 		check("Mean(WeibullDistribution(n, m))", "m*Gamma(1+1/n)");
+	}
+
+	public void testMeanDeviation() {
+		check("MeanDeviation({a, b, c})", "1/3*(Abs(a+1/3*(-a-b-c))+Abs(b+1/3*(-a-b-c))+Abs(1/3*(-a-b-c)+c))");
+		check("MeanDeviation({{1, 2}, {4, 8}, {5, 3}, {2, 15}})", "{3/2,9/2}");
+		check("MeanDeviation({1, 2, 3, 7})", "15/8");
+		check("MeanDeviation({Pi, E, 2})//Together", "1/9*(-8+2*E+2*Pi)");
 	}
 
 	public void testMedian() {
@@ -4644,7 +4734,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("NullSpace({{1,1,1,1,1},{1,0,0,0,0},{0,0,0,0,1},{0,1,1,1,0},{1,0,0,0,1}})",
 				"{{0,-1,1,0,0},\n" + " {0,-1,0,1,0}}");
 	}
-	
+
 	public void testNumberQ() {
 		check("NumberQ(3+I)", "True");
 		check("NumberQ(5!)", "True");
@@ -5035,10 +5125,32 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPDF() {
+		check("PDF(BernoulliDistribution(p),k)", "Piecewise({{1-p,k==0},{p,k==1}},0)");
+		check("PDF(BinomialDistribution(n, m),k)", "Piecewise({{(1-m)^(-k+n)*m^k*Binomial(n,k),0<=k<=n}},0)");
+		check("PDF(ExponentialDistribution(n),k)", "Piecewise({{n/E^(k*n),k>=0}},0)");
+		check("PDF(PoissonDistribution(p),k)", "Piecewise({{p^k/(E^p*k!),k>=0}},0)");
+		check("PDF(DiscreteUniformDistribution({a, b}), k)", "Piecewise({{1/(1-a+b),a<=k<=b}},0)");
+		check("PDF(ErlangDistribution(n, m),k)", "Piecewise({{m^n/(k^(1-n)*E^(k*m)*Gamma(n)),k>0}},0)");
+		check("PDF(LogNormalDistribution(n,m),k)", "Piecewise({{1/(E^((-n+Log(k))^2/(2*m^2))*k*m*Sqrt(2*Pi)),k>0}},0)");
+		check("PDF(NakagamiDistribution(n, m),k)",
+				"Piecewise({{(2*(n/m)^n)/(k^(1-2*n)*E^((k^2*n)/m)*Gamma(n)),k>0}},0)");
+		check("PDF(NormalDistribution(n, m),k)", "1/(Sqrt(2)*E^((k-n)^2/(2*m^2))*m*Sqrt(Pi))");
+		check("PDF(FrechetDistribution(n, m),k)", "Piecewise({{n/((k/m)^(1+n)*E^(k/m)^(-n)*m),k>0}},0)");
+		check("PDF(GammaDistribution(n, m),k)", "Piecewise({{1/(k^(1-n)*E^(k/m)*m^n*Gamma(n)),k>0}},0)");
+		check("PDF(GeometricDistribution(n),k)", "Piecewise({{(1-n)^k*n,k>=0}},0)");
+		check("PDF(GumbelDistribution(n, m),k)", "E^(-E^((k-n)/m)+(k-n)/m)/m");
+		check("PDF(HypergeometricDistribution(n, ns, nt),k)",
+				"Piecewise({{(Binomial(ns,k)*Binomial(-ns+nt,-k+n))/Binomial(nt,n),0<=k<=n&&n+ns-nt<=k<=n&&\n"
+						+ "0<=k<=ns&&n+ns-nt<=k<=ns}},0)");
+		check("PDF(StudentTDistribution(n),k)", "(n/(k^2+n))^(1/2*(1+n))/(Sqrt(n)*Beta(1/2,n/2))");
+		check("PDF(WeibullDistribution(n, m),k)", "Piecewise({{n/((k/m)^(1-n)*E^(k/m)^n*m),k>0}},0)");
+		check("PDF(StudentTDistribution(4),k)", "12*((1/(4+k^2)))^(5/2)");
+
+		check("PDF(DiscreteUniformDistribution({1, 5}), 3)", "1/5");
 		check("N(PDF(NormalDistribution(0, 1), 0))", "0.39894");
-		checkNumeric("N(PDF(BinomialDistribution(40, 0.5), 1))", "3.6379788070917175E-11");
-		checkNumeric("N(PDF(HypergeometricDistribution(20,50,100), 10))", "0.19687121770654953");
-		checkNumeric("N(PDF(PoissonDistribution(10), 15))", "0.03471806963068409");
+		checkNumeric("N(PDF(BinomialDistribution(40, 0.5), 1))", "3.637978807091713E-11");
+		checkNumeric("N(PDF(HypergeometricDistribution(20,50,100), 10))", "0.19687121770654958");
+		checkNumeric("N(PDF(PoissonDistribution(10), 15))", "0.03471806963068415");
 	}
 
 	public void testPermutations() {
@@ -6168,7 +6280,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{{{0,0,0},{0,0,1},{0,1,0}},{{0,0,1},{0,0,0},{1,0,0}},{{0,1,0},{1,0,0},{0,0,0}}}");
 	}
 
-
 	public void testSatisfiabilityCount() {
 		check("SatisfiabilityCount(Equivalent(a, b), {a, b})", //
 				"2");
@@ -6473,7 +6584,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				+ " Implies(b54R,  !c54a &&  !c54b &&  !c54c &&  !c54d && c54e))", "False");
 
 	}
-	
+
 	public void testScan() {
 		check("Scan(($u(#) = x) &, {55, 11, 77, 88});{$u(76), $u(77), $u(78)}", "{$u(76),x,$u(78)}");
 		check("Map(If(# > 5, #, False) &, {2, 4, 6, 8})", "{False,False,6,8}");
@@ -6786,6 +6897,16 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSolve() {
+		check("Solve({Cos(x)*x==0, x > 10}, x)", "{}");
+		check("Solve({Cos(x)*x==0, x ==0}, x)", "{{x->0}}");
+		check("Solve({Cos(x)*x==0, x < 10}, x)", "{{x->0},{x->Pi/2}}");
+
+		// check("Solve((x^4 - 1)*(x^4 - 4) == 0, x, Integers)", "");
+		check("Solve(x == x, x)", "{{}}");
+		check("Solve(x == 1 && x == 2, x)", "{}");
+
+		check("Solve((5.0*x)/y==(0.8*y)/x,x)", "{{x->-0.4*y},{x->0.4*y}}");
+
 		// gh issue #2
 		check("Solve(x^2+y^2==5,x)", "{{x->-Sqrt(5-y^2)},{x->Sqrt(5-y^2)}}");
 
@@ -6832,11 +6953,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Solve(x^3==-2,x)", "{{x->-2^(1/3)},{x->(-1)^(1/3)*2^(1/3)},{x->-(-1)^(2/3)*2^(1/3)}}");
 
 		check("Solve(1 - (i*1)/10 == 0, i, Integers)", "{{i->10}}");
-		check("Solve({x^2 + 2 y^3 == 3681, x > 0, y > 0}, {x, y}, Integers)",
+		check("Solve({x^2 + 2*y^3 == 3681, x > 0, y > 0}, {x, y}, Integers)",
 				"{{x->15,y->12},{x->41,y->10},{x->57,y->6}}");
 		check("Solve({x>=0,y>=0,x+y==7,2*x+4*y==20},{x,y}, Integers)", "{{x->4,y->3}}");
 		check("Solve(x>=0 && y>=0 && x+y==7 && 2*x+4*y==20,{x,y}, Integers)", "{{x->4,y->3}}");
-		check("Solve({2 x + 3 y == 4, 3 x - 4 y <= 5,x - 2 y > -21}, {x,  y}, Integers)",
+		check("Solve({2 x + 3*y == 4, 3*x - 4*y <= 5,x - 2*y > -21}, {x,  y}, Integers)",
 				"{{x->-7,y->6},{x->-4,y->4},{x->-1,y->2}}");
 
 		// timeouts in Cream engine
@@ -6855,13 +6976,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// issue #121
 		check("Solve(Sqrt(x)==-1, x)", "{}");
 		check("Solve(x^2+1==0, x)", "{{x->-I},{x->I}}");
-		check("Solve((k*Q*q)/r^2==E,r)",
-				"{{r->(Sqrt(k)*Sqrt(q)*Sqrt(Q))/Sqrt(E)},{r->(-Sqrt(k)*Sqrt(q)*Sqrt(Q))/Sqrt(E)}}");
+		check("Solve((k*Q*q)/r^2==E,r)", "{{r->Sqrt(E*k*q*Q)/E},{r->-Sqrt(E*k*q*Q)/E}}");
 		check("Solve((k*Q*q)/r^2+1/r^4==E,r)",
 				"{{r->Sqrt(1/2)*Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)},{r->-Sqrt(1/2)*Sqrt((k*q*Q+Sqrt(\n"
 						+ "4*E+k^2*q^2*Q^2))/E)},{r->-I*Sqrt(1/2)*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)},{r->I*Sqrt(\n"
 						+ "1/2)*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)}}");
-		check("Solve((k*Q*q)/r^2+1/r^4==0,r)", "{{r->-I/(Sqrt(k)*Sqrt(q)*Sqrt(Q))},{r->I/(Sqrt(k)*Sqrt(q)*Sqrt(Q))}}");
+		check("Solve((k*Q*q)/r^2+1/r^4==0,r)", "{{r->(-I*Sqrt(k*q*Q))/(k*q*Q)},{r->(I*Sqrt(k*q*Q))/(k*q*Q)}}");
 		check("Solve(Abs(x-1) ==1,{x})", "{{x->0},{x->2}}");
 		check("Solve(Abs(x^2-1) ==0,{x})", "{{x->-1},{x->1}}");
 		check("Solve(Xor(a, b, c, d) && (a || b) && ! (c || d), {a, b, c, d}, Booleans)",
@@ -7969,11 +8089,31 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Unique(\"x\")", "x3");
 	}
 
+	public void testUnitize() {
+		check("Unitize({0, -1})", "{0,1}");
+		check("Unitize((E + Pi)^2 - E^2 - Pi^2 - 2*E*Pi)", "0");
+		check("Unitize(2^(2*I) - 2^(-2*I) - 2*I*Sin(Log(4)))", "0");
+		check("Unitize(Sqrt(2) + Sqrt(3) - Sqrt(5 + 2*Sqrt(6)))", "0");
+		check("Unitize(0)", "0");
+		check("Unitize(0.0)", "0");
+		check("Unitize(x)", "Unitize(x)");
+		check("Unitize(3/4)", "1");
+		check("Unitize(3*I)", "1");
+		check("Unitize(Pi)", "1");
+	}
+
 	public void testUnitStep() {
+		check("UnitStep(-Infinity)", "0");
+		check("UnitStep(Infinity)", "1");
+
+		check("UnitStep(0)", "1");
+		check("UnitStep(1)", "1");
+		check("UnitStep(-1)", "0");
+
 		check("UnitStep(Interval({0,42}))", "Interval({1,1})");
 		check("UnitStep(Interval({-3,-1}))", "Interval({0,0})");
 		check("UnitStep(Interval({-1,2}))", "Interval({0,1})");
-		check("UnitStep(0)", "1");
+
 		check("UnitStep(42)", "1");
 		check("UnitStep(-1)", "0");
 		check("UnitStep(-42)", "0");

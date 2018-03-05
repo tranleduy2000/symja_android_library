@@ -75,7 +75,7 @@ public class SerializableTest extends TestCase {
 
 	public void testSymbol() {
 //		equalsCopy(F.Pi);
-		equalsCopy(F.userSymbol("testme"));
+		equalsCopy(F.symbol("testme"));
 	}
 
 	public void testStringX() {
@@ -87,8 +87,8 @@ public class SerializableTest extends TestCase {
 		equalsCopy(F.Continue());
 		equalsCopy(F.If(F.True, F.Plus(F.Infinity, F.Pi), F.False));
 		equalsCopy(F.Log(F.x, F.y));
-		equalsCopy(F.ast(F.userSymbol("fun1")));
-		equalsCopy(F.ast(new IExpr[] { F.x, F.y }, F.userSymbol("fun2")));
+		equalsCopy(F.ast(F.symbol("fun1")));
+		equalsCopy(F.ast(new IExpr[] { F.x, F.y }, F.symbol("fun2")));
 	}
 
 	public void testBlank() {
@@ -110,11 +110,13 @@ public class SerializableTest extends TestCase {
 	}
 
 	public void testIntegrateDefinition() {
-		// TODO: 2/24/2018 fix infinite loop on android device
-//		RulesData rulesData = F.Integrate.getRulesData();
-//		AbstractVisitor visitor = Share.createVisitor();
-//		rulesData.accept(visitor);
-//		equalsStringCopy(rulesData);
+		if (true){
+			return;
+		}
+		RulesData rulesData = F.Integrate.getRulesData();
+		AbstractVisitor visitor = Share.createVisitor();
+		rulesData.accept(visitor);
+		equalsStringCopy(rulesData);
 	}
 
 	public void testSinDefinition() {
