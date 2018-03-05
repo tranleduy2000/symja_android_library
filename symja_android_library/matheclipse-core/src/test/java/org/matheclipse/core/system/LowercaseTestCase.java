@@ -126,26 +126,26 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("AnyTrue(f(2, 7, 6), OddQ)", "True");
 	}
 
-    public void testApart() {
-        // check("Factor(x^2 - y^2 )", "(x-y)*(x+y)");
-        // check("Solve(x^2 - y^2==0, y)", "{{y->-x},{y->x}}");
-        check("Apart(1 / (x^2 - y^2))", "1/(x^2-y^2)");
+	public void testApart() {
+		// check("Factor(x^2 - y^2 )", "(x-y)*(x+y)");
+		// check("Solve(x^2 - y^2==0, y)", "{{y->-x},{y->x}}");
+		check("Apart(1 / (x^2 - y^2))", "1/(x^2-y^2)");
 
-        check("Apart(x/(2 x + a^2))", "x/(a^2+2*x)");
+		check("Apart(x/(2 x + a^2))", "x/(a^2+2*x)");
 
-        check("Apart(y/(x + 2)/(x + 1),x)", "y/((1+x)*(2+x))");
+		check("Apart(y/(x + 2)/(x + 1),x)", "y/((1+x)*(2+x))");
 
-        check("Sin(1 / (x ^ 2 - y ^ 2)) // Apart", "Sin(1/(x^2-y^2))");
+		check("Sin(1 / (x ^ 2 - y ^ 2)) // Apart", "Sin(1/(x^2-y^2))");
 
-        check("Apart(1 / (x^2 + 5x + 6))", "1/(2+x)+1/(-3-x)");
-        // TODO return -1 / (2 y (x + y)) + 1 / (2 y (x - y))
-        check("Apart(1 / (x^2 - y^2), x)", "1/(x^2-y^2)");
-        // TODO return 1 / (2 x (x + y)) + 1 / (2 x (x - y))
-        check("Apart(1 / (x^2 - y^2), y)", "1/(x^2-y^2)");
+		check("Apart(1 / (x^2 + 5x + 6))", "1/(2+x)+1/(-3-x)");
+		// TODO return -1 / (2 y (x + y)) + 1 / (2 y (x - y))
+		check("Apart(1 / (x^2 - y^2), x)", "1/(x^2-y^2)");
+		// TODO return 1 / (2 x (x + y)) + 1 / (2 x (x - y))
+		check("Apart(1 / (x^2 - y^2), y)", "1/(x^2-y^2)");
 
-        check("Apart(1/((1 + x)*(5 + x)))", "1/(4+4*x)+1/(-20-4*x)");
-        check("Apart(1 < (x + 1)/(x - 1) < 2)", "1<1+2/(-1+x)<2");
-    }
+		check("Apart(1/((1 + x)*(5 + x)))", "1/(4+4*x)+1/(-20-4*x)");
+		check("Apart(1 < (x + 1)/(x - 1) < 2)", "1<1+2/(-1+x)<2");
+	}
 
 	public void testAppend() {
 		check("Append({1, 2, 3}, 4) ", "{1,2,3,4}");
@@ -829,7 +829,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testChop() {
 		check("Chop(0.00000000001)", "0");
 	}
-	
+
 	public void testCirclePoints() {
 		check("CirclePoints(2)", "{{1,0},{-1,0}}");
 		check("CirclePoints(3)", "{{Sqrt(3)/2,-1/2},{0,1},{-Sqrt(3)/2,-1/2}}");
@@ -846,7 +846,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ClearAttributes(f, Flat)", "");
 		check("Attributes(f)", "{Orderless}");
 	}
-
 
 	public void testClip() {
 		check("Clip(Tan(E),{-1/2,1/2})", "Tan(E)");
@@ -866,7 +865,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Clip(Tan(-2*E))", "1");
 
 	}
-	
+
 	public void testCoefficient() {
 		// check("Apply(Plus,((Coefficient(x*(b+a),x,#1)*x^#1)&))", "");
 		check("Coefficient(x*y,y,1)", "x");
@@ -970,33 +969,33 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "2,5,3}->7,{1,5,4}->-7,{5,4,2}->-10}");
 	}
 
-    public void testCollect() {
-        check("Collect(x^2 + y*x^2 + x*y + y + a*y, {x, y})", "(1+a)*y+x*y+x^2*(1+y)");
-        check("Collect(a*x^2 + b*x^2 + a*x - b*x + c, x)", "c+(a-b)*x+(a+b)*x^2");
-        check("Collect(a*Exp(2*x) + b*Exp(2*x), Exp(2*x))", "(a+b)*E^(2*x)");
-        check("a*Exp(2*x) + b*Exp(2*x)", "a*E^(2*x)+b*E^(2*x)");
-        // check("Collect(D(f(Sqrt(x^2 + 1)), {x, 3}), Derivative(_)[f][_],
-        // Together)", "");
-        check("x*(4*a^3+12*a^2+12*a+4)+x^4+(4*a+4)*x^3+(6*a^2+12*a+6)*x^2+a^4+4*a^3+6*a^2+4*a+1",
-                "1+4*a+6*a^2+4*a^3+a^4+(4+12*a+12*a^2+4*a^3)*x+(6+12*a+6*a^2)*x^2+(4+4*a)*x^3+x^4");
-        check("x+x^4", "x+x^4");
-        check("Collect(a, x)", "a");
-        check("Collect(a*y, {x,y})", "a*y");
-        check("Collect(42*a, {x,y})", "42*a");
-        check("Collect(a Sqrt(x) + Sqrt(x) + x^(2/3) - c*x + 3*x - 2*b*x^(2/3) + 5, x)",
-                "5+(1+a)*Sqrt(x)+(1-2*b)*x^(2/3)+(3-c)*x");
-        check("Collect(3 b x + x, x)", "(1+3*b)*x");
-        check("Collect(a x^4 + b x^4 + 2 a^2 x - 3 b x + x - 7, x)", "-7+(1+2*a^2-3*b)*x+(a+b)*x^4");
-        check("Collect((1 + a + x)^4, x)",
-                "1+4*a+6*a^2+4*a^3+a^4+(4+12*a+12*a^2+4*a^3)*x+(6+12*a+6*a^2)*x^2+(4+4*a)*x^3+x^4");
-        check("Collect((1 + a + x)^4, x, Simplify)", "(1+a)^4+4*(1+a)^3*x+6*(1+a)^2*x^2+(4+4*a)*x^3+x^4");
+	public void testCollect() {
+		check("Collect(x^2 + y*x^2 + x*y + y + a*y, {x, y})", "(1+a)*y+x*y+x^2*(1+y)");
+		check("Collect(a*x^2 + b*x^2 + a*x - b*x + c, x)", "c+(a-b)*x+(a+b)*x^2");
+		check("Collect(a*Exp(2*x) + b*Exp(2*x), Exp(2*x))", "(a+b)*E^(2*x)");
+		check("a*Exp(2*x) + b*Exp(2*x)", "a*E^(2*x)+b*E^(2*x)");
+		// check("Collect(D(f(Sqrt(x^2 + 1)), {x, 3}), Derivative(_)[f][_],
+		// Together)", "");
+		check("x*(4*a^3+12*a^2+12*a+4)+x^4+(4*a+4)*x^3+(6*a^2+12*a+6)*x^2+a^4+4*a^3+6*a^2+4*a+1",
+				"1+4*a+6*a^2+4*a^3+a^4+(4+12*a+12*a^2+4*a^3)*x+(6+12*a+6*a^2)*x^2+(4+4*a)*x^3+x^4");
+		check("x+x^4", "x+x^4");
+		check("Collect(a, x)", "a");
+		check("Collect(a*y, {x,y})", "a*y");
+		check("Collect(42*a, {x,y})", "42*a");
+		check("Collect(a Sqrt(x) + Sqrt(x) + x^(2/3) - c*x + 3*x - 2*b*x^(2/3) + 5, x)",
+				"5+(1+a)*Sqrt(x)+(1-2*b)*x^(2/3)+(3-c)*x");
+		check("Collect(3 b x + x, x)", "(1+3*b)*x");
+		check("Collect(a x^4 + b x^4 + 2 a^2 x - 3 b x + x - 7, x)", "-7+(1+2*a^2-3*b)*x+(a+b)*x^4");
+		check("Collect((1 + a + x)^4, x)",
+				"1+4*a+6*a^2+4*a^3+a^4+(4+12*a+12*a^2+4*a^3)*x+(6+12*a+6*a^2)*x^2+(4+4*a)*x^3+x^4");
+		check("Collect((1 + a + x)^4, x, Simplify)", "(1+a)^4+4*(1+a)^3*x+6*(1+a)^2*x^2+(4+4*a)*x^3+x^4");
 
-        check("Collect(a x + b y + c x, x)", "(a+c)*x+b*y");
-        check("Collect((x + y + z + 1)^4, {x, y})",
-                "1+x^4+y^4+4*z+y^3*(4+4*z)+x^3*(4+4*y+4*z)+6*z^2+y^2*(6+12*z+6*z^2)+x^2*(6+6*y^2+\n"
-                        + "12*z+y*(12+12*z)+6*z^2)+4*z^3+y*(4+12*z+12*z^2+4*z^3)+x*(4+4*y^3+12*z+y^2*(12+12*z)+\n"
-                        + "12*z^2+y*(12+24*z+12*z^2)+4*z^3)+z^4");
-    }
+		check("Collect(a x + b y + c x, x)", "(a+c)*x+b*y");
+		check("Collect((x + y + z + 1)^4, {x, y})",
+				"1+x^4+y^4+4*z+y^3*(4+4*z)+x^3*(4+4*y+4*z)+6*z^2+y^2*(6+12*z+6*z^2)+x^2*(6+6*y^2+\n"
+						+ "12*z+y*(12+12*z)+6*z^2)+4*z^3+y*(4+12*z+12*z^2+4*z^3)+x*(4+4*y^3+12*z+y^2*(12+12*z)+\n"
+						+ "12*z^2+y*(12+24*z+12*z^2)+4*z^3)+z^4");
+	}
 
 	public void testCommonest() {
 		check("Commonest({b, a, c, 2, a, b, 1, 2}, 4)", "{b,a,2,c}");
@@ -1055,19 +1054,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Composition(f, g, h) @@ {x, y, z}", "f(g(h(x,y,z)))");
 	}
 
-
 	public void testComposeList() {
 		check("ComposeList({f,g,h}, x)", //
 				"{x,f(x),g(f(x)),h(g(f(x)))}");
 		check("ComposeList({1 - # &, 1/# &}[[{2, 2, 1, 2, 2, 1}]], x)", //
 				"{x,1/x,x,1-x,1/(1-x),1-x,x}");
 		check("ComposeList({f, g}[[{1, 2, 1, 1, 2}]], x)", //
-	    			"{x,f(x),g(f(x)),f(g(f(x))),f(f(g(f(x)))),g(f(f(g(f(x)))))}");
+				"{x,f(x),g(f(x)),f(g(f(x))),f(f(g(f(x)))),g(f(f(g(f(x)))))}");
 		check("ComposeList({a, b, c, d}, x)", //
 				"{x,a(x),b(a(x)),c(b(a(x))),d(c(b(a(x))))}");
 
 	}
-	
+
 	public void testCompoundExpression() {
 		check("1; 2; 3;", "");
 		check("1; 2; 3", "3");
@@ -1311,7 +1309,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testD() {
 
 		check("D(HarmonicNumber(x), x)", "Pi^2/6-HarmonicNumber(x,2)");
-		
+
 		check("D(ArcCsc(x),{x,2})", "(-1+2*x^2)/(Sqrt(1-1/x^2)*x^3*(-1+x^2))");
 		check("D(ArcSec(x),{x,2})", "(1-2*x^2)/(Sqrt(1-1/x^2)*x^3*(-1+x^2))");
 
@@ -1420,7 +1418,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Delete({a, b, c, d}, 3)", "{a,b,d}");
 		check("Delete({a, b, c, d}, -2)", "{a,b,d}");
 	}
-	
+
 	public void testDeleteCases() {
 		check("DeleteCases({a, 1, 2.5, \"string\"}, _Integer|_Real)", "{a,\"string\"}");
 		check("DeleteCases({a, b, 1, c, 2, 3}, _Symbol)", "{1,2,3}");
@@ -2433,7 +2431,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FindInstance({a x + y == 7, b x - y == 1}, {x, y})", "{{x->8/(a+b),y->(a-7*b)/(-a-b)}}");
 
 	}
-	
+
 	public void testFindRoot() {
 		// issue #181
 		check("FindRoot(2^x==0,{x,-100,100}, Method->Brent)", "{x->-100.0}");
@@ -2803,7 +2801,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 			String pathToVectorAnalysis;
 			pathToVectorAnalysis = getClass().getResource("/VectorAnalysis.m").toString();
 			// remove 'file:/'
-			pathToVectorAnalysis = pathToVectorAnalysis.substring(6); 
+			pathToVectorAnalysis = pathToVectorAnalysis.substring(6);
 			System.out.println(pathToVectorAnalysis);
 			check("Get(\"" + pathToVectorAnalysis + "\")", "");
 			check("DotProduct({a,b,c},{d,e,f}, Spherical)",
@@ -3128,11 +3126,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("IntegerPart(-Infinity)", "-Infinity");
 		check("IntegerPart(I*Infinity)", "I*Infinity");
 		check("IntegerPart(-I*Infinity)", "-I*Infinity");
-		
+
 		check("IntegerPart(Pi)", "3");
 		check("IntegerPart(-Pi)", "-3");
 		check("IntegerPart(IntegerPart(Pi))", "3");
-		
+
 		check("IntegerPart(-9/4)", "-2");
 		check("IntegerPart(2.4)", "2");
 		check("IntegerPart(-2.4)", "-2");
@@ -4003,7 +4001,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Mean(WeibullDistribution(n, m))", "m*Gamma(1+1/n)");
 	}
 
-
 	public void testMeanDeviation() {
 		check("MeanDeviation({a, b, c})", "1/3*(Abs(a+1/3*(-a-b-c))+Abs(b+1/3*(-a-b-c))+Abs(1/3*(-a-b-c)+c))");
 		check("MeanDeviation({{1, 2}, {4, 8}, {5, 3}, {2, 15}})", "{3/2,9/2}");
@@ -4737,7 +4734,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("NullSpace({{1,1,1,1,1},{1,0,0,0,0},{0,0,0,0,1},{0,1,1,1,0},{1,0,0,0,1}})",
 				"{{0,-1,1,0,0},\n" + " {0,-1,0,1,0}}");
 	}
-	
+
 	public void testNumberQ() {
 		check("NumberQ(3+I)", "True");
 		check("NumberQ(5!)", "True");
@@ -6283,7 +6280,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{{{0,0,0},{0,0,1},{0,1,0}},{{0,0,1},{0,0,0},{1,0,0}},{{0,1,0},{1,0,0},{0,0,0}}}");
 	}
 
-
 	public void testSatisfiabilityCount() {
 		check("SatisfiabilityCount(Equivalent(a, b), {a, b})", //
 				"2");
@@ -6588,7 +6584,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				+ " Implies(b54R,  !c54a &&  !c54b &&  !c54c &&  !c54d && c54e))", "False");
 
 	}
-	
+
 	public void testScan() {
 		check("Scan(($u(#) = x) &, {55, 11, 77, 88});{$u(76), $u(77), $u(78)}", "{$u(76),x,$u(78)}");
 		check("Map(If(# > 5, #, False) &, {2, 4, 6, 8})", "{False,False,6,8}");
@@ -8179,7 +8175,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Variables(E^x)", "{}");
 		check("Variables(a^x)", "{a^x}");
 	}
-
 
 	public void testVariance() {
 		check("Variance(BinomialDistribution(n, m))", "(1-m)*m*n");
