@@ -316,8 +316,9 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 		int index;
 		int start = firstIndex + startOffset;
 		if ((index = start) < lastIndex) {
+			int j = startOffset;
 			for (int i = startOffset; i < endOffset; i++) {
-				action.accept(array[index++],i);
+				action.accept(array[index++],j++);
 			}
 		}
 	} 
