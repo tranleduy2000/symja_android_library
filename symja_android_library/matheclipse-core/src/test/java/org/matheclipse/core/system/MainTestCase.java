@@ -3601,25 +3601,67 @@ public class MainTestCase extends AbstractTestCase {
 	}
 
 	public void testGithub18() {
-		// see: https://github.com/axkr/symja_android_library/issues/18
+		// github issue #18
 		boolean old = Config.EXPLICIT_TIMES_OPERATOR;
 		try {
 			Config.EXPLICIT_TIMES_OPERATOR = false;
 			if (!Config.EXPLICIT_TIMES_OPERATOR) {
-				check("1E-2 // FullForm", "\"Plus(-2, E)\"");
-				checkNumeric("1.0E-2 // FullForm", "\"0.7182818284590451\"");
+				Config.DOMINANT_IMPLICIT_TIMES = true;
+				if (Config.DOMINANT_IMPLICIT_TIMES) {
+					check("Hold(1/2Pi) // FullForm", "\"Hold(Power(Times(2, Pi), -1))\"");
+					check("1/2Pi // FullForm", "\"Times(Rational(1,2), Power(Pi, -1))\"");
+					check("1/2(a+b) // FullForm", "\"Times(Rational(1,2), Power(Plus(a, b), -1))\"");
+					check("1/(a+b)2 // FullForm", "\"Times(Rational(1,2), Power(Plus(a, b), -1))\"");
+				}
+				Config.DOMINANT_IMPLICIT_TIMES = false;
+				if (!Config.DOMINANT_IMPLICIT_TIMES) {
+					check("Hold(1/2Pi) // FullForm", "\"Hold(Times(Times(Rational(1,2), 1), Pi))\"");
+					check("1/2Pi // FullForm", "\"Times(Rational(1,2), Pi)\"");
+					check("1/2(a+b) // FullForm", "\"Times(Rational(1,2), Plus(a, b))\"");
+					check("1/(a+b)2 // FullForm", "\"Times(2, Power(Plus(a, b), -1))\"");
+				}
+
+				check("2(b+c) // FullForm", //
+						"\"Times(2, Plus(b, c))\"");
+				check("2(b+c)3 // FullForm", //
+						"\"Times(6, Plus(b, c))\"");
+				check("a(b+c) // FullForm", //
+						"\"a(Plus(b, c))\"");
+				check("a*(b+c) // FullForm", //
+						"\"Times(a, Plus(b, c))\"");
+				check("1E-2 // FullForm", //
+						"\"Plus(-2, E)\"");
+				check("1E+2 // FullForm", //
+						"\"Plus(2, E)\"");
+				checkNumeric("1.0E-2 // FullForm", //
+						"\"0.7182818284590451\"");
 				checkNumeric("1x-2 // FullForm", //
 						"\"Plus(-2, x)\"");
 				check("N(1E-2)", "0.71828");
-				check("0x1", "0");
-				check("0xf", "0");
-				check("0y1", "0");
+				check("0x1  // FullForm", "\"0\"");
+				check("0xf  // FullForm", "\"0\"");
+				check("0y1  // FullForm ", "\"0\"");
 			}
 			Config.EXPLICIT_TIMES_OPERATOR = true;
 			if (Config.EXPLICIT_TIMES_OPERATOR) {
+				check("2(b+c)", //
+						"Syntax error in line: 1 - End-of-file not reached.\n" + "2(b+c)\n" + " ^");
+				check("2(b+c)3 // FullForm",
+						"Syntax error in line: 1 - End-of-file not reached.\n" + "2(b+c)3 // FullForm\n" + " ^");
+				check("2*(b+c) // FullForm", //
+						"\"Times(2, Plus(b, c))\"");
+				check("2*(b+c)*3 // FullForm", //
+						"\"Times(6, Plus(b, c))\"");
+				check("a(b+c) // FullForm", //
+						"\"a(Plus(b, c))\"");
+				check("a*(b+c) // FullForm", //
+						"\"Times(a, Plus(b, c))\"");
 				check("1E-2 // FullForm", //
 						"\"0.01\"");
-				checkNumeric("1.0E-2 // FullForm", "\"0.01\"");
+				check("1E+2 // FullForm", //
+						"\"100.0\"");
+				checkNumeric("1.0E-2 // FullForm", //
+						"\"0.01\"");
 				checkNumeric("1x-2 // FullForm", //
 						"Syntax error in line: 1 - End-of-file not reached.\n" + //
 								"1x-2 // FullForm\n" + //
@@ -3631,6 +3673,8 @@ public class MainTestCase extends AbstractTestCase {
 						"Syntax error in line: 1 - End-of-file not reached.\n" + //
 								"0y1\n" + //
 								" ^");
+				checkNumeric("-3.1434555694057773E-11", //
+						"-3.143455569405777E-11");
 			}
 		} finally {
 			Config.EXPLICIT_TIMES_OPERATOR = old;
