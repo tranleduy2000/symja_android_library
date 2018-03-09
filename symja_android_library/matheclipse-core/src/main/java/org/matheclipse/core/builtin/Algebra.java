@@ -1185,7 +1185,6 @@ public class Algebra {
 			 * After that add the resulting expression to the <code>PlusOp</code>
 			 * 
 			 * @param result
-			 * @param expr
 			 */
 			public void evalAndExpandAST(IExpr expr1, IExpr expr2, final IASTAppendable result) {
 				IExpr arg = TimesOp.times(expr1, expr2);
@@ -2226,10 +2225,6 @@ public class Algebra {
 		// }
 
 		/**
-		 * 
-		 * @param polnomialExpr
-		 * @param symbol
-		 * @param numericFunction
 		 * @return
 		 * @deprecated use
 		 *             <code>ExprPolynomialRing ring = new ExprPolynomialRing(symbol); ExprPolynomial poly = ring.create(polnomialExpr);</code>

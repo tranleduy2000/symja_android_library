@@ -2,10 +2,6 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.IntFunction;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -18,6 +14,10 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public class TensorFunctions {
 	static {
@@ -67,8 +67,6 @@ public class TensorFunctions {
 		 * {a*x+b*y,b*x+c*y,c*x+d*y,d*x+e*y,e*x+f*y}
 		 * </pre>
 		 * 
-		 * @param kernel
-		 * @param tensor
 		 * @return correlation of kernel with tensor
 		 */
 		@Override

@@ -734,7 +734,7 @@ public class PredicateQ {
 	/**
 	 * Test if a number is prime. See: <a href="http://en.wikipedia.org/wiki/Prime_number">Wikipedia:Prime number</a>
 	 * 
-	 * @see org.matheclipse.core.reflection.system.NextPrime
+	 * @see org.matheclipse.core.builtin.NumberTheory.NextPrime
 	 */
 	private static class PrimeQ extends AbstractCorePredicateEvaluator implements Predicate<IInteger> {
 

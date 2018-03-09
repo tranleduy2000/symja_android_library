@@ -1,16 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.List;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Function;
@@ -56,6 +45,18 @@ import org.matheclipse.core.reflection.system.Sum;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
 import org.matheclipse.core.visit.VisitorRemoveLevelSpecification;
 import org.matheclipse.parser.client.math.MathException;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import static org.matheclipse.core.expression.F.List;
 
 public final class ListFunctions {
 	static {
@@ -1963,7 +1964,7 @@ public final class ListFunctions {
 		 * @param positionConverter
 		 *            the <code>positionConverter</code> creates an <code>int</code> value from the given position
 		 *            objects in <code>positions</code>.
-		 * @param headOffsez
+		 * @param headOffset
 		 */
 		private static IExpr extract(final IAST list, final IAST positions,
 				final IPositionConverter<? super IExpr> positionConverter, int headOffset) {

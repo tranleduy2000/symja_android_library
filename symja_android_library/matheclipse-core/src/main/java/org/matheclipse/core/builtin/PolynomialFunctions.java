@@ -348,7 +348,7 @@ public class PolynomialFunctions {
 		 * Get exponent vectors and coefficients of monomials of a polynomial expression.
 		 * 
 		 * @param polynomial
-		 * @param variable
+		 * @param variablesList
 		 * @param termOrder
 		 *            the JAS term ordering
 		 * @return the list of monomials of the univariate polynomial.
@@ -376,7 +376,7 @@ public class PolynomialFunctions {
 		 * Get exponent vectors and coefficients of monomials of a polynomial expression.
 		 * 
 		 * @param polynomial
-		 * @param variable
+		 * @param variablesList
 		 * @param termOrder
 		 *            the JAS term ordering
 		 * @param option
