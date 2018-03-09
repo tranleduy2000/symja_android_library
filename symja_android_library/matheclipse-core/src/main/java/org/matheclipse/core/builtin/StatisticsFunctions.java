@@ -1,15 +1,15 @@
 package org.matheclipse.core.builtin;
 
-import java.util.concurrent.ThreadLocalRandom;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Function;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
+import com.duy.lambda.Supplier;
 
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.stat.StatUtils;
 import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.builtin.StatisticsFunctions.ICDF;
-import org.matheclipse.core.builtin.StatisticsFunctions.IMean;
-import org.matheclipse.core.builtin.StatisticsFunctions.IPDF;
-import org.matheclipse.core.builtin.StatisticsFunctions.IVariance;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
@@ -21,7 +21,7 @@ import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractMatrix1Expr;
 import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
 import org.matheclipse.core.expression.ASTRealMatrix;
-import org.matheclipse.core.expression.ASTRealVector; 
+import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -35,11 +35,7 @@ import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import com.duy.lambda.Consumer;
-import com.duy.lambda.Function;
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.Predicate;
-import com.duy.lambda.Supplier;
+import java.util.Random;
 
 public class StatisticsFunctions {
 	static {
@@ -174,7 +170,7 @@ public class StatisticsFunctions {
 			implements IDiscreteDistribution, IMean, IPDF, IRandomVariate {
 		@Override
 		public final IExpr randomVariate(IAST dist) {
-			return protected_quantile(dist, F.num(ThreadLocalRandom.current().nextDouble()));
+			return protected_quantile(dist, F.num(new Random().nextDouble()));
 		}
 
 		/**
