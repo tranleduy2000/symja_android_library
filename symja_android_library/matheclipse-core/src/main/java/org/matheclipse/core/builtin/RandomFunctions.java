@@ -3,10 +3,6 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.IntFunction;
 
-import java.math.BigInteger;
-//import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.hipparchus.util.MathArrays;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -15,6 +11,9 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
+
+import java.math.BigInteger;
+import java.util.Random;
 
 public final class RandomFunctions {
 
@@ -31,7 +30,7 @@ public final class RandomFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 0 && ast.arg1().isAST()) {
 				IAST list = (IAST) ast.arg1();
-				ThreadLocalRandom random = ThreadLocalRandom.current();
+				Random random = new Random();
 				int listSize = list.argSize();
 				int randomIndex = random.nextInt(listSize);
 				return list.get(randomIndex + 1);
@@ -53,7 +52,7 @@ public final class RandomFunctions {
 				BigInteger n = ((IInteger) ast.arg1()).toBigNumerator();
 				BigInteger r;
 				do {
-					r = new BigInteger(n.bitLength(), ThreadLocalRandom.current());
+					r = new BigInteger(n.bitLength(), new Random());
 				} while (r.compareTo(n) >= 0);
 				return F.integer(r);
 			}
@@ -80,7 +79,7 @@ public final class RandomFunctions {
 
 	/**
 	 * Create a random shuffled list.
-	 * 
+	 *
 	 */
 	private static class RandomSample extends AbstractFunctionEvaluator {
 

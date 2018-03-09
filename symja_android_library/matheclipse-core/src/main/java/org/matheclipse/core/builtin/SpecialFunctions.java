@@ -1,29 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.BernoulliB;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.C4;
-import static org.matheclipse.core.expression.F.CComplexInfinity;
-import static org.matheclipse.core.expression.F.CInfinity;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.CN1D2;
-import static org.matheclipse.core.expression.F.CNInfinity;
-import static org.matheclipse.core.expression.F.Erf;
-import static org.matheclipse.core.expression.F.Factorial;
-import static org.matheclipse.core.expression.F.Log;
-import static org.matheclipse.core.expression.F.NIL;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Pi;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.QQ;
-import static org.matheclipse.core.expression.F.Sqr;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.Zeta;
-
-import java.math.BigDecimal;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
 
@@ -56,6 +32,31 @@ import org.matheclipse.core.reflection.system.rules.ProductLogRules;
 import org.matheclipse.core.reflection.system.rules.StieltjesGammaRules;
 import org.matheclipse.core.reflection.system.rules.StruveHRules;
 import org.matheclipse.core.reflection.system.rules.StruveLRules;
+
+import java.math.BigDecimal;
+
+import static org.matheclipse.core.expression.F.BernoulliB;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C4;
+import static org.matheclipse.core.expression.F.CComplexInfinity;
+import static org.matheclipse.core.expression.F.CInfinity;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.CN1D2;
+import static org.matheclipse.core.expression.F.CNInfinity;
+import static org.matheclipse.core.expression.F.Erf;
+import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.NIL;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Pi;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.QQ;
+import static org.matheclipse.core.expression.F.Sqr;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.Zeta;
 
 public class SpecialFunctions {
 	static {
@@ -159,7 +160,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the error function.
 	 * 
-	 * @see org.matheclipse.core.reflection.system.InverseErf
+	 * @see InverseErf
 	 */
 	private final static class Erf extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
 
@@ -352,7 +353,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the inverse erf.
 	 * 
-	 * @see org.matheclipse.core.reflection.system.Erf
+	 * @see Erf
 	 */
 	private final static class InverseErf extends AbstractTrigArg1 implements INumeric {
 
@@ -408,7 +409,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the inverse erf.
 	 * 
-	 * @see org.matheclipse.core.reflection.system.Erf
+	 * @see Erf
 	 */
 	private final static class InverseErfc extends AbstractTrigArg1 implements INumeric {
 

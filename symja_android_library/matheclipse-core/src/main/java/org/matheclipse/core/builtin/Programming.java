@@ -1,19 +1,9 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.Divide;
-import static org.matheclipse.core.expression.F.List;
-
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
@@ -45,8 +35,18 @@ import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.visit.ModuleReplaceAll;
 import org.matheclipse.parser.client.math.MathException;
 
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.common.util.concurrent.TimeLimiter;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
+import static org.matheclipse.core.expression.F.Divide;
+import static org.matheclipse.core.expression.F.List;
 
 public final class Programming {
 	private final static Programming CONST = new Programming();
@@ -2701,7 +2701,6 @@ public final class Programming {
 	 * @param expr
 	 * @param element
 	 * @param partPosition
-	 * @param pos
 	 * @param result
 	 *            will be cloned if an assignment occurs and returned by this method
 	 * @param position
