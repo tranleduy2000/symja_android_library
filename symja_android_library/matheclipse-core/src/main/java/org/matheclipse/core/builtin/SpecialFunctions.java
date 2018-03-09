@@ -25,6 +25,7 @@ import static org.matheclipse.core.expression.F.Zeta;
 
 import java.math.BigDecimal;
 import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.Function;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
@@ -863,7 +864,12 @@ public class SpecialFunctions {
 					if (nInt < 0) {
 						nInt *= -1;
 						// Zeta(s, -n) := Zeta(s) + Sum(1/k^s, {k, 1, n})
-						return Plus(F.sum(k -> Power(Power(k, s), -1), 1, nInt), Zeta(s));
+						return Plus(F.sum(new Function<IExpr, IExpr>() {
+							@Override
+							public IExpr apply(IExpr k) {
+								return Power(Power(k, s), -1);
+							}
+						}, 1, nInt), Zeta(s));
 					}
 				}
 			}

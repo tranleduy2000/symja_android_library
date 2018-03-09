@@ -1,6 +1,8 @@
 
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.IntFunction;
+
 import java.math.BigInteger;
 //import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -101,7 +103,12 @@ public final class RandomFunctions {
 			MathArrays.shuffle(indexList);
 
 			// Create shuffled list.
-			return list.copy().setArgs(1, len + 1, i -> list.get(indexList[i - 1] + 1));
+			return list.copy().setArgs(1, len + 1, new IntFunction<IExpr>() {
+				@Override
+				public IExpr apply(int i) {
+					return list.get(indexList[i - 1] + 1);
+				}
+			});
 		}
 	}
 

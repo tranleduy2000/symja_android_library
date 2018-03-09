@@ -1,15 +1,7 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.Factorial;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Times;
-
 import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.Function;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -25,6 +17,15 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.PolynomialsUtils;
 import org.matheclipse.core.reflection.system.rules.LegendrePRules;
 import org.matheclipse.core.reflection.system.rules.LegendreQRules;
+
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Times;
 
 public class HypergeometricFunctions {
 	static {
@@ -366,9 +367,14 @@ public class HypergeometricFunctions {
 					// 2*k)!), {k, 1, Floor(n/2)})
 					int floorND2 = nInt / 2;
 					return Plus(Times(Power(C2, n), Power(n, -1), Power(z, n)),
-							F.sum(k -> Times(Power(CN1, k), Power(Times(C2, z), Plus(Times(F.CN2, k), n)),
-									Power(Times(Factorial(k), Factorial(Plus(Times(F.CN2, k), n))), -1),
-									Factorial(Plus(CN1, Negate(k), n))), 1, floorND2));
+							F.sum(new Function<IExpr, IExpr>() {
+                                @Override
+                                public IExpr apply(IExpr k) {
+                                    return Times(Power(CN1, k), Power(Times(C2, z), Plus(Times(F.CN2, k), n)),
+                                            Power(Times(Factorial(k), Factorial(Plus(Times(F.CN2, k), n))), -1),
+                                            Factorial(Plus(CN1, Negate(k), n)));
+                                }
+                            }, 1, floorND2));
 				}
 			}
 

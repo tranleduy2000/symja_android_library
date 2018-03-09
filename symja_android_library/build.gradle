@@ -45,10 +45,10 @@ android {
         main {
             manifest.srcFile 'AndroidManifest.xml'
             java.srcDirs += 'matheclipse-core/src/main/java/'
-            java.srcDirs += 'tools/src/main/java/'
         }
         test {
-            java.srcDirs = ['matheclipse-core/src/test/java/']
+            java.srcDirs += "matheclipse-core/src/test/java/"
+            java.srcDirs += "tools/src/main/java/"
         }
         androidTest {
             java.srcDirs = ['matheclipse-core/src/androidTest/java/']
