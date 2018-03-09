@@ -2325,7 +2325,12 @@ public final class Arithmetic {
 				if (ni > Integer.MIN_VALUE) {
 					if (ni > 0) {
 						// Product(a + k, {k, 0, n - 1})
-						return F.product(x -> F.Plus(a, x), 0, ni - 1);
+						return F.product(new Function<IExpr, IExpr>() {
+                            @Override
+                            public IExpr apply(IExpr x) {
+                                return F.Plus(a, x);
+                            }
+                        }, 0, ni - 1);
 					}
 					if (ni < 0) {
 						// Product(1/(a - k), {k, 1, -n})
