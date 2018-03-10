@@ -162,7 +162,7 @@ public interface ScriptEngine  {
      * @throws NullPointerException if either argument is null.
      */
     public Object eval(String script, Bindings n) throws ScriptException;
-    
+
     /**
      * Same as <code>eval(String, Bindings)</code> except that the source of the script
      * is provided as a <code>Reader</code>.
@@ -176,9 +176,9 @@ public interface ScriptEngine  {
      * @throws NullPointerException if either argument is null.
      */
     public Object eval(Reader reader, Bindings n) throws ScriptException;
-    
-    
-    
+
+
+
     /**
      * Sets a key/value pair in the state of the ScriptEngine that may either create
      * a Java Language Binding to be used in the execution of scripts or be used in some
@@ -239,44 +239,8 @@ public interface ScriptEngine  {
      *
      */
     public Bindings getBindings(int scope);
-    
-    /**
-     * Sets a scope of named values to be used by scripts.  The possible scopes are:
-     *<br><br>
-     * <ul>
-     * <li><code>ScriptContext.ENGINE_SCOPE</code> - The specified <code>Bindings</code> replaces the
-     * engine scope of the <code>ScriptEngine</code>.
-     * </li>
-     * <li><code>ScriptContext.GLOBAL_SCOPE</code> - The specified <code>Bindings</code> must be visible
-     * as the <code>GLOBAL_SCOPE</code>.
-     * </li>
-     * <li>Any other value of scope defined in the default <code>ScriptContext</code> of the <code>ScriptEngine</code>.
-     *</li>
-     * </ul>
-     * <br><br>
-     * The method must have the same effect as calling the <code>setBindings</code> method of
-     * <code>ScriptContext</code> with the corresponding value of <code>scope</code> on the default
-     * <code>ScriptContext</code> of the <code>ScriptEngine</code>.
-     *
-     * @param bindings The <code>Bindings</code> for the specified scope.
-     * @param scope The specified scope.  Either <code>ScriptContext.ENGINE_SCOPE</code>,
-     * <code>ScriptContext.GLOBAL_SCOPE</code>, or any other valid value of scope.
-     *
-     * @throws IllegalArgumentException if the scope is invalid
-     * @throws NullPointerException if the bindings is null and the scope is
-     * <code>ScriptContext.ENGINE_SCOPE</code>
-     */
-    public void setBindings(Bindings bindings, int scope);
-    
-    
-    /**
-     * Returns an uninitialized <code>Bindings</code>.
-     *
-     * @return A <code>Bindings</code> that can be used to replace the state of this <code>ScriptEngine</code>.
-     **/
-    public Bindings createBindings();
-    
-    
+
+
     /**
      * Returns the default <code>ScriptContext</code> of the <code>ScriptEngine</code> whose Bindings, Reader
      * and Writers are used for script executions when no <code>ScriptContext</code> is specified.

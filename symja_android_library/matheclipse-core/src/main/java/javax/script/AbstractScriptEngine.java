@@ -106,30 +106,7 @@ public abstract class AbstractScriptEngine  implements ScriptEngine {
             throw new IllegalArgumentException("Invalid scope value.");
         }
     }
-    
-    /**
-     * Sets the <code>Bindings</code> with the corresponding scope value in the
-     * <code>context</code> field.
-     *
-     * @param bindings The specified <code>Bindings</code>.
-     * @param scope The specified scope.
-     *
-     * @throws IllegalArgumentException if the value of scope is
-     * invalid for the type the <code>context</code> field.
-     * @throws NullPointerException if the bindings is null and the scope is
-     * <code>ScriptContext.ENGINE_SCOPE</code>
-     */
-    public void setBindings(Bindings bindings, int scope) {
-        
-        if (scope == ScriptContext.GLOBAL_SCOPE) {
-            context.setBindings(bindings, ScriptContext.GLOBAL_SCOPE);;
-        } else if (scope == ScriptContext.ENGINE_SCOPE) {
-            context.setBindings(bindings, ScriptContext.ENGINE_SCOPE);;
-        } else {
-            throw new IllegalArgumentException("Invalid scope value.");
-        }
-    }
-    
+
     /**
      * Sets the specified value with the specified key in the <code>ENGINE_SCOPE</code>
      * <code>Bindings</code> of the protected <code>context</code> field.
@@ -167,8 +144,8 @@ public abstract class AbstractScriptEngine  implements ScriptEngine {
         
         return null;
     }
-    
-    
+
+
     /**
      * <code>eval(Reader, Bindings)</code> calls the abstract
      * <code>eval(Reader, ScriptContext)</code> method, passing it a <code>ScriptContext</code>
@@ -187,13 +164,13 @@ public abstract class AbstractScriptEngine  implements ScriptEngine {
      * @throws NullPointerException if any of the parameters is null.
      */
     public Object eval(Reader reader, Bindings bindings ) throws ScriptException {
-        
+
         ScriptContext ctxt = getScriptContext(bindings);
-        
+
         return eval(reader, ctxt);
     }
-    
-    
+
+
     /**
      * Same as <code>eval(Reader, Bindings)</code> except that the abstract
      * <code>eval(String, ScriptContext)</code> is used.

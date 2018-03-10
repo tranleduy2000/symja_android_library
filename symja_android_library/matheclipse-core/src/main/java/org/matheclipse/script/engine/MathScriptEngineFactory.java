@@ -1,14 +1,15 @@
 package org.matheclipse.script.engine;
 
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.expression.F;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
 
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.expression.F;
-
-public class MathScriptEngineFactory implements javax.script.ScriptEngineFactory {
+public class MathScriptEngineFactory implements ScriptEngineFactory {
 
 	static {
 		F.initSymbols(null, null, true);

@@ -1,5 +1,17 @@
 package org.matheclipse.script.engine;
 
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.convert.Object2Expr;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.EvalUtilities;
+import org.matheclipse.core.eval.exception.AbortException;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.form.output.OutputFormFactory;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.SyntaxError;
+import org.matheclipse.parser.client.math.MathException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -15,18 +27,6 @@ import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
-
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.convert.Object2Expr;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.EvalUtilities;
-import org.matheclipse.core.eval.exception.AbortException;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.form.output.OutputFormFactory;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.SyntaxError;
-import org.matheclipse.parser.client.math.MathException;
 
 public class MathScriptEngine extends AbstractScriptEngine {
 	public final static String RETURN_OBJECT = "RETURN_OBJECT";
@@ -46,11 +46,6 @@ public class MathScriptEngine extends AbstractScriptEngine {
 		// fEngine.setRecursionLimit(256);
 		// fEngine.setIterationLimit(256);
 		fUtility = new EvalUtilities(fEngine, false, false);
-	}
-
-	@Override
-	public Bindings createBindings() {
-		return null;
 	}
 
 	@Override
