@@ -342,12 +342,12 @@ public class AST2Expr {
 			} else if (ast.isASTSizeGE(F.Less, 3)) {
 				ISymbol compareHead = F.LessEqual;
 				return rewriteLessGreaterAST(ast, compareHead);
-			} else if (head.equals(F.PatternHead)) {
+			} else if (head.equals(F.Pattern)) {
 				final IExpr expr = Pattern.CONST.evaluate(ast, fEngine);
 				if (expr.isPresent()) {
 					return expr;
 				}
-			} else if (head.equals(F.BlankHead)) {
+			} else if (head.equals(F.Blank)) {
 				final IExpr expr = Blank.CONST.evaluate(ast, fEngine);
 				if (expr.isPresent()) {
 					return expr;

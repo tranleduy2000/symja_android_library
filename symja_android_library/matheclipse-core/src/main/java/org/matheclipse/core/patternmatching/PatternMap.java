@@ -249,7 +249,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	/**
 	 * Return the matched value for the given pattern object
 	 * 
-	 * @param pExpr
+	 * @param pattern
 	 * @return <code>null</code> if no matched expression exists
 	 */
 	public IExpr getValue(@Nonnull IPatternObject pattern) {

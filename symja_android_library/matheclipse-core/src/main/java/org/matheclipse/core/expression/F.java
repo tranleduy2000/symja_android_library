@@ -5186,7 +5186,7 @@ public class F {
 	 * given <code>expr</code>.
 	 *
 	 * @param expr
-	 * @param astRules
+	 * @param list
 	 *            rules of the form <code>x-&gt;y</code> or <code>{a-&gt;b, c-&gt;d}</code>; the left-hand-side of the
 	 *            rule can contain pattern objects.
 	 * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted

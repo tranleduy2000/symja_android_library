@@ -1,13 +1,15 @@
 package org.matheclipse.core.expression;
 
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.interfaces.ISymbol;
+
 import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.matheclipse.core.interfaces.ISymbol;
 
 public class Context implements Serializable {
 
@@ -18,6 +20,7 @@ public class Context implements Serializable {
 	 */
 	public final static Map<String, ISymbol> PREDEFINED_SYMBOLS_MAP = new HashMap<String, ISymbol>(997);
 
+	public final static Context DUMMY = new Context("DUMMY");
 	public final static Context SYSTEM = new Context("System", PREDEFINED_SYMBOLS_MAP);
 
 	private String contextName;
@@ -70,10 +73,10 @@ public class Context implements Serializable {
 		symbolTable = (Map<String, ISymbol>) stream.readObject();
 	}
 
-	// public Object readResolve() throws ObjectStreamException {
-	// Context context = EvalEngine.get().getContextPath().getContext(contextName);
-	// return context;
-	// }
+	public Object readResolve() throws ObjectStreamException {
+		Context context = EvalEngine.get().getContextPath().getContext(contextName);
+		return context;
+	}
 
 	public ISymbol remove(String key) {
 		return symbolTable.remove(key);

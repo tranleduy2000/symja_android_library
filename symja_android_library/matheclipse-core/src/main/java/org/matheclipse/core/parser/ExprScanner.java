@@ -15,12 +15,12 @@
  */
 package org.matheclipse.core.parser;
 
-import java.util.HashMap;
-import java.util.List;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.parser.client.Characters;
 import org.matheclipse.parser.client.SyntaxError;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class ExprScanner {
 
@@ -793,7 +793,6 @@ public class ExprScanner {
 			}
 		}
 
-		// }
 		int endPosition = fCurrentPosition--;
 		result[0] = fInputString.substring(startPosition, --endPosition);
 		result[1] = Integer.valueOf(numFormat);
@@ -845,9 +844,6 @@ public class ExprScanner {
 					throwSyntaxError("string - end of string not reached.");
 				}
 			} else {
-				// if ((fCurrentChar != '"') && ((fCurrentChar == '\n') ||
-				// (fToken ==
-				// TT_EOF))) {
 				if ((fCurrentChar != '"') && (fToken == TT_EOF)) {
 					throwSyntaxError("string -" + ident.toString() + "- not closed.");
 				}

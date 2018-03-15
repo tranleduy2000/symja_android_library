@@ -1450,8 +1450,6 @@ public final class Arithmetic {
      */
     private final static class HarmonicNumber extends AbstractEvaluator {
 
-        public HarmonicNumber() {
-        }
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 2, 3);
@@ -2876,7 +2874,7 @@ public final class Arithmetic {
                     final IExpr base = arg1.base();
                     final IExpr exponent = arg1.exponent();
                     if (exponent.isSignedNumber() && base.isNonNegativeResult()) {
-                        // (base ^ exponent) ^ arg2  ==> base ^ (exponent * arg2)
+                        // (base ^ exponent) ^ arg2 ==> base ^ (exponent * arg2)
                         return F.Power(base, exponent.times(arg2));
                     }
                 }
