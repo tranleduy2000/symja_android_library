@@ -11,9 +11,9 @@ import org.matheclipse.core.eval.exception.RuleCreationError;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.generic.UnaryVariable2Slot;
-import org.matheclipse.core.interfaces.ExprUtil;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -247,7 +247,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 		}
 		if (obj instanceof Symbol) {
 			Symbol symbol = (Symbol) obj;
-			if (fHashValue != symbol.fHashValue) {
+			if (hashCode() != symbol.hashCode()) {
 				return false;
 			}
 			if (fSymbolName.equals(symbol.fSymbolName)) {
@@ -771,7 +771,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 	@Override
 	public final IPatternMatcher putDownRule(final ISymbol.RuleType setSymbol, final boolean equalRule,
 			final IExpr leftHandSide, final IExpr rightHandSide, final int priority, boolean packageMode) {
-		EvalEngine evalEngine = EvalEngine.get();
 		if (!packageMode) {
 			if (isLocked(packageMode)) {
 				throw new RuleCreationError(leftHandSide);
@@ -780,7 +779,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 			EvalEngine.get().addModifiedVariable(this);
 		}
 		if (fRulesData == null) {
-			fRulesData = new RulesData(evalEngine.getContext());
+			fRulesData = new RulesData(EvalEngine.get().getContext());
 		}
 		return fRulesData.putDownRule(setSymbol, equalRule, leftHandSide, rightHandSide);
 	}

@@ -1,5 +1,20 @@
 package org.matheclipse.core.patternmatching;
 
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Predicate;
+
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.util.ArraySet;
+import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
+import org.matheclipse.core.eval.util.OpenIntToSet;
+import org.matheclipse.core.expression.Context;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.visit.AbstractVisitor;
+
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -14,21 +29,6 @@ import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.util.ArraySet;
-import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
-import org.matheclipse.core.eval.util.OpenIntToSet;
-import org.matheclipse.core.expression.Context;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.visit.AbstractVisitor;
-
-import com.duy.lambda.Consumer;
-import com.duy.lambda.Predicate;
-
 /**
  * The pattern matching rules associated with a symbol.
  */
@@ -42,7 +42,7 @@ public class RulesData implements Serializable {
 	 */
 	public static final int DEFAULT_VALUE_INDEX = Integer.MIN_VALUE;
 
-	public static boolean isComplicatedPatternRule(final IExpr lhsExpr, final ArraySet neededSymbols) {
+	public static boolean isComplicatedPatternRule(final IExpr lhsExpr, ArraySet neededSymbols) {
 		if (lhsExpr.isAST()) {
 			final IAST lhsAST = ((IAST) lhsExpr);
 			if (lhsAST.size() > 1) {
@@ -65,41 +65,23 @@ public class RulesData implements Serializable {
 						return true;
 					}
 					if (neededSymbols != null && arg1.isOrderlessAST()) {
-						final boolean lambda = !lhsAST.exists(new Predicate<IExpr>() {
-							@Override
-							public boolean test(IExpr x) {
-								return x.isPatternDefault() || x.isOrderlessAST();
-							}
-						}, 1);
-						final boolean[] isComplicated = { false };
-						arg1.forEach(new Consumer<IExpr>() {
-							@Override
-							public void accept(IExpr t) {
+						boolean lambda = !lhsAST.exists(x -> x.isPatternDefault() || x.isOrderlessAST());
+						boolean[] isComplicated = { false };
+						arg1.forEach(t -> {
 								if (t.isPatternDefault()) {
 									isComplicated[0] = true;
 								} else if (lambda && t.isAST() && t.head().isSymbol()) {
 									neededSymbols.add((ISymbol) t.head());
 								}
-							}
 						});
 						return isComplicated[0];
 					}
 					// the left hand side is associated with the first argument
 					// see if one of the arguments contain a pattern with default
 					// value
-					return arg1.exists(new Predicate<IExpr>() {
-						@Override
-						public boolean test(IExpr x) {
-							return x.isPatternDefault();
+					return arg1.exists(x -> x.isPatternDefault(), 1);
 						}
-					}, 1);
-				}
-				return lhsAST.exists(new Predicate<IExpr>() {
-					@Override
-					public boolean test(IExpr x) {
-						return x.isPatternDefault();
-					}
-				}, 2);
+				return lhsAST.exists(x -> x.isPatternDefault(), 2);
 			}
 		} else if (lhsExpr.isPattern()) {
 			return true;
@@ -504,7 +486,7 @@ public class RulesData implements Serializable {
 	 * @param expr
 	 * @return <code>F.NIL</code> if no evaluation was possible
 	 */
-	public IExpr evalDownRule(final IExpr expr, final EvalEngine engine) {
+	public IExpr evalDownRule(final IExpr expr, EvalEngine engine) {
 		PatternMatcherEquals res;
 
 		if (Config.SHOW_PATTERN_EVAL_STEPS) {
@@ -529,7 +511,7 @@ public class RulesData implements Serializable {
 		try {
 			IPatternMatcher pmEvaluator;
 			if (expr.isAST()) {
-				final IAST astExpr = (IAST) expr;
+				IAST astExpr = (IAST) expr;
 				if (fSimplePatternDownRules != null) {
 					final int hash = ((IAST) expr).patternHashCode();
 					if (fSimplePatternDownRules.containsKey(hash)) {
@@ -542,9 +524,8 @@ public class RulesData implements Serializable {
 				}
 
 				if (fSimpleOrderlesPatternDownRules != null) {
-					final IExpr[] temp = new IExpr[1];
-					if (astExpr.exists(new Predicate<IExpr>() {
-						public boolean test(IExpr x) {
+					IExpr[] temp = new IExpr[1];
+					if (astExpr.exists(x -> {
 							if (x.isAST() && x.head().isSymbol()) {
 								final int hash = x.head().hashCode();
 								if (fSimpleOrderlesPatternDownRules.containsKey(hash)) {
@@ -561,7 +542,6 @@ public class RulesData implements Serializable {
 								}
 							}
 							return false;
-						}
 					})) {
 						return temp[0];
 					}
@@ -911,21 +891,7 @@ public class RulesData implements Serializable {
 			}
 
 			if (fPatternDownRules != null) {
-				Predicate<IPatternMatcher> filter = new Predicate<IPatternMatcher>() {
-					@Override
-					public boolean test(IPatternMatcher x) {
-						return x.equivalentLHS(pmEvaluator) == 0;
-					}
-				};
-				boolean isRemoved = false;
-				Iterator<IPatternMatcher> each = fPatternDownRules.iterator();
-				while (each.hasNext()) {
-					if (filter.test(each.next())) {
-						each.remove();
-						isRemoved = true;
-					}
-				}
-				return isRemoved;
+				return fPatternDownRules.removeIf(x -> x.equivalentLHS(pmEvaluator) == 0);
 			}
 		}
 		return false;
