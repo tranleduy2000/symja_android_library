@@ -100,7 +100,6 @@ import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 
-//import org.matheclipse.core.visit.VisitorExpr;
 
 public class Algebra {
 	static {
@@ -363,19 +362,30 @@ public class Algebra {
 		 *            the integer gcd value
 		 * @return
 		 */
-		private static IExpr[] calculatePlusIntegerGCD(final IASTAppendable numeratorPlus, IInteger denominatorInt,
+		private static IExpr[] calculatePlusIntegerGCD(IASTAppendable numeratorPlus, IInteger denominatorInt,
 				IInteger gcd) {
-			for (int i = 1; i < numeratorPlus.size(); i++) {
-				if (numeratorPlus.get(i).isInteger()) {
-					numeratorPlus.set(i, ((IInteger) numeratorPlus.get(i)).div(gcd));
-				} else if (numeratorPlus.get(i).isTimes() && numeratorPlus.get(i).getAt(1).isInteger()) {
-					IASTMutable times = ((IAST) numeratorPlus.get(i)).copy();
+			numeratorPlus.forEach((x, i) -> {
+				if (x.isInteger()) {
+					numeratorPlus.set(i, ((IInteger) x).div(gcd));
+				} else if (x.isTimes() && x.first().isInteger()) {
+					IASTMutable times = ((IAST) x).copy();
 					times.set(1, ((IInteger) times.arg1()).div(gcd));
 					numeratorPlus.set(i, times);
 				} else {
-					throw new WrongArgumentType(numeratorPlus, numeratorPlus.get(i), i, "unexpected argument");
+					throw new WrongArgumentType(numeratorPlus, x, i, "unexpected argument");
 				}
-			}
+			});
+			// for (int i = 1; i < numeratorPlus.size(); i++) {
+			// if (numeratorPlus.get(i).isInteger()) {
+			// numeratorPlus.set(i, ((IInteger) numeratorPlus.get(i)).div(gcd));
+			// } else if (numeratorPlus.get(i).isTimes() && numeratorPlus.get(i).first().isInteger()) {
+			// IASTMutable times = ((IAST) numeratorPlus.get(i)).copy();
+			// times.set(1, ((IInteger) times.arg1()).div(gcd));
+			// numeratorPlus.set(i, times);
+			// } else {
+			// throw new WrongArgumentType(numeratorPlus, numeratorPlus.get(i), i, "unexpected argument");
+			// }
+			// }
 			IExpr[] result = new IExpr[3];
 			result[0] = F.C1;
 			result[1] = numeratorPlus;
@@ -395,12 +405,9 @@ public class Algebra {
 		 */
 		private static IExpr[] cancelPlusIntegerGCD(IAST numeratorPlus, IInteger denominatorInt) {
 			IASTAppendable plus = numeratorPlus.copyAppendable();
-			final IASTAppendable gcd = F.ast(F.GCD, plus.size() + 1, false);
+			IASTAppendable gcd = F.ast(F.GCD, plus.size() + 1, false);
 			gcd.append(denominatorInt);
-			boolean evaled = !plus.exists(new Predicate<IExpr>() {
-
-				@Override
-				public boolean test(IExpr x) {
+			boolean evaled = !plus.exists(x -> {
 					if (x.isInteger()) {
 						gcd.append(x);
 					} else {
@@ -411,9 +418,21 @@ public class Algebra {
 						}
 					}
 					return false;
-				}
 
 			});
+			// for (int i = 1; i < plus.size(); i++) {
+			// IExpr temp = plus.get(i);
+			// if (temp.isInteger()) {
+			// gcd.append(temp);
+			// } else {
+			// if (temp.isTimes() && temp.first().isInteger()) {
+			// gcd.append(temp.first());
+			// } else {
+			// evaled = false;
+			// break;
+			// }
+			// }
+			// }
 			if (evaled) {
 				// GCD() has attribute Orderless, so the arguments will
 				// be sorted by evaluation!
@@ -554,11 +573,11 @@ public class Algebra {
 		 * @return
 		 */
 		private IExpr collectSingleVariable(IExpr expr, IExpr x, final IAST listOfVariables, final int listPosition,
-				IExpr head, final EvalEngine engine) {
+				IExpr head, EvalEngine engine) {
 			if (expr.isAST()) {
 				Map<IExpr, IASTAppendable> map = new HashMap<IExpr, IASTAppendable>();
 				IAST poly = (IAST) expr;
-				final IASTAppendable rest = F.PlusAlloc(poly.size());
+				IASTAppendable rest = F.PlusAlloc(poly.size());
 
 				IPatternMatcher matcher = new PatternMatcherEvalEngine(x, engine);
 				collectToMap(poly, matcher, map, rest);
@@ -578,15 +597,11 @@ public class Algebra {
 				}
 
 				if (head != null) {
-					final IASTMutable simplifyAST = (IASTMutable) F.unaryAST1(head, null);
+					IASTMutable simplifyAST = (IASTMutable) F.unaryAST1(head, null);
 					IExpr coefficient;
-					rest.forEach(new ObjIntConsumer<IExpr>() {
-
-						@Override
-						public void accept(IExpr arg, int i) {
+					rest.forEach((arg, i) -> {
 							simplifyAST.set(1, arg);
 							rest.set(i, engine.evaluate(simplifyAST));
-						}
 					});
 					for (Map.Entry<IExpr, IASTAppendable> entry : map.entrySet()) {
 						simplifyAST.set(1, entry.getValue());
@@ -640,14 +655,17 @@ public class Algebra {
 				return;
 			} else if (expr.isTimes()) {
 				IAST timesAST = (IAST) expr;
-				for (int i = 1; i < timesAST.size(); i++) {
-					if (matcher.test(timesAST.get(i)) || isPowerMatched(timesAST.get(i), matcher)) {
+				if (timesAST.exists((x, i) -> {
+					if (matcher.test(x) || isPowerMatched(x, matcher)) {
 						IASTAppendable clone = timesAST.copyAppendable();
 						clone.remove(i);
-						addOneIdentityPowerFactor(timesAST.get(i), clone, map);
+						addOneIdentityPowerFactor(x, clone, map);
+						return true;
+					}
+					return false;
+				}, 1)) {
 						return;
 					}
-				}
 				rest.append(expr);
 				return;
 			}
@@ -666,14 +684,14 @@ public class Algebra {
 				return true;
 			} else if (expr.isTimes()) {
 				IAST timesAST = (IAST) expr;
-				for (int i = 1; i < timesAST.size(); i++) {
-					IExpr x = timesAST.get(i);
+				return timesAST.exists((x, i) -> {
 					if (matcher.test(x) || isPowerMatched(x, matcher)) {
 						IAST clone = timesAST.removeAtClone(i);
 						addOneIdentityPowerFactor(x, clone, map);
 						return true;
 					}
-				}
+					return false;
+				}, 1);
 			}
 
 			return false;
@@ -998,9 +1016,7 @@ public class Algebra {
 							continue;
 						}
 					}
-					if (result.isPresent()) {
-						result.append(arg);
-					}
+					result.ifAppendable(r -> r.append(arg));
 				}
 				if (result.isPresent()) {
 					return PlusOp.plus(result);
@@ -1147,15 +1163,11 @@ public class Algebra {
 					throw new ArithmeticException("");
 				}
 				final IASTAppendable result = F.ast(F.Plus, (int) numberOfTerms, false);
-				plusAST0.forEach(new Consumer<IExpr>() {
-					public void accept(final IExpr x) {
-						plusAST1.forEach(new Consumer<IExpr>() {
-							public void accept(final IExpr y) {
+				plusAST0.forEach(x -> {
+					plusAST1.forEach(y -> {
 								// evaluate to flatten out Times() exprs
 								evalAndExpandAST(x, y, result);
-							}
 						});
-					}
 				});
 				return PlusOp.plus(result);
 			}
@@ -1169,13 +1181,9 @@ public class Algebra {
 			 */
 			private IExpr expandExprTimesPlus(final IExpr expr1, final IAST plusAST) {
 				final IASTAppendable result = F.ast(F.Plus, plusAST.argSize(), false);
-				plusAST.forEach(new Consumer<IExpr>() {
-
-					@Override
-					public void accept(IExpr x) {
+				plusAST.forEach(x -> {
 						// evaluate to flatten out Times() exprs
 						evalAndExpandAST(expr1, x, result);
-					}
 
 				});
 				return PlusOp.plus(result);
@@ -1184,9 +1192,9 @@ public class Algebra {
 			/**
 			 * Evaluate <code>expr1 * expr2</code> and expand the resulting expression, if it's an <code>IAST</code>.
 			 * After that add the resulting expression to the <code>PlusOp</code>
-			 * @param expr1
-			 * @param expr2
+			 *
 			 * @param result
+			 * @param expr
 			 */
 			public void evalAndExpandAST(IExpr expr1, IExpr expr2, final IASTAppendable result) {
 				IExpr arg = TimesOp.times(expr1, expr2);
@@ -1223,7 +1231,7 @@ public class Algebra {
 				IInteger multinomial = NumberTheory.multinomial(j, n);
 				final IAST times = F.Times();
 				IExpr temp;
-				for (final int[] indices : perm) {
+				for (int[] indices : perm) {
 					final IASTAppendable timesAST = times.copyAppendable();
 					if (!multinomial.isOne()) {
 						timesAST.append(multinomial);
@@ -1235,14 +1243,10 @@ public class Algebra {
 								timesAST.append(temp);
 							} else {
 								if (temp.isTimes()) {
-									final IAST ast = (IAST) temp;
+									IAST ast = (IAST) temp;
 									final int ki = k;
-									timesAST.appendArgs(ast.size(), new IntFunction<IExpr>() {
-										@Override
-										public IExpr apply(int i) {
-											return PowerOp.power(ast.get(i), F.integer(indices[ki]));
-										}
-									});
+									timesAST.appendArgs(ast.size(),
+											i -> PowerOp.power(ast.get(i), F.integer(indices[ki])));
 								} else {
 									timesAST.append(PowerOp.power(temp, F.integer(indices[k])));
 								}
@@ -2197,7 +2201,52 @@ public class Algebra {
 
 		}
 
+		/**
+		 *
+		 * @param polnomialExpr
+		 * @param variables
+		 * @param numericFunction
+		 * @return
+		 * @deprecated use
+		 *             <code>ExprPolynomialRing ring = new ExprPolynomialRing(variables); ExprPolynomial poly = ring.create(polnomialExpr);</code>
+		 *             if possible.
+		 */
+		// private static GenPolynomial<IExpr> polynomial(final IExpr polnomialExpr,
+		// final IAST variables,
+		// boolean numericFunction) {
+		// IExpr expr = F.evalExpandAll(polnomialExpr, engine);
+		// int termOrder = ExprTermOrder.INVLEX;
+		// ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST,
+		// variables, variables.argSize(),
+		// new ExprTermOrder(termOrder), true);
+		// try {
+		// ExprPolynomial poly = ring.create(expr);
+		// ASTRange r = new ASTRange(variables, 1);
+		// JASIExpr jas = new JASIExpr(r, numericFunction);
+		// return jas.expr2IExprJAS(poly);
+		// } catch (RuntimeException ex) {
+		//
+		// }
+		// return null;
+		// }
 
+		/**
+		 *
+		 * @param polnomialExpr
+		 * @param symbol
+		 * @param numericFunction
+		 * @return
+		 * @deprecated use
+		 *             <code>ExprPolynomialRing ring = new ExprPolynomialRing(symbol); ExprPolynomial poly = ring.create(polnomialExpr);</code>
+		 *             if possible
+		 */
+		// private static GenPolynomial<IExpr> polynomial(final IExpr polnomialExpr,
+		// final ISymbol symbol,
+		// boolean numericFunction) {
+		// return polynomial(polnomialExpr, List(symbol), numericFunction);
+		// }
+
+		@Deprecated
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
@@ -2532,17 +2581,13 @@ public class Algebra {
 				if (head.equals(Power)) {
 					if (x1.isTimes()) {
 						// Power[x_ * y_, z_] :> x^z * y^z
-						final IAST timesAST = (IAST) x1;
+						IAST timesAST = (IAST) x1;
 						IASTMutable timesResult = timesAST.mapThread(Power(Null, x2), 1);
 						if (assumptions) {
 							IASTAppendable plusResult = F.PlusAlloc(timesAST.size() + 1);
 							plusResult.append(C1D2);
-							plusResult.appendArgs(timesAST.size(), new IntFunction<IExpr>() {
-								@Override
-								public IExpr apply(int i) {
-									return Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi)));
-								}
-							});
+							plusResult.appendArgs(timesAST.size(),
+									i -> Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi))));
 							IAST expResult = Power(E, Times(C2, I, Pi, x2, Floor(plusResult)));
 							if (!(timesResult instanceof IASTAppendable)) {
 								timesResult = timesResult.copyAppendable();
@@ -2954,12 +2999,7 @@ public class Algebra {
 			public boolean visit(IAST ast) {
 				if (ast.isTimes() || ast.isPlus()) {
 					// check the arguments
-					return ast.forAll(new Predicate<IExpr>() {
-						@Override
-						public boolean test(IExpr x) {
-							return x.accept(IsBasicExpressionVisitor.this);
-						}
-					}, 1);
+					return ast.forAll(x -> x.accept(this));
 				}
 				if (ast.isPower() && (ast.exponent().isInteger())) {
 					// check the arguments
@@ -3107,18 +3147,15 @@ public class Algebra {
 				}
 
 				if (ast.isPlus()) {
-					final IASTAppendable basicPlus = F.PlusAlloc(ast.size());
-					final IASTAppendable restPlus = F.PlusAlloc(ast.size());
+					IASTAppendable basicPlus = F.PlusAlloc(ast.size());
+					IASTAppendable restPlus = F.PlusAlloc(ast.size());
 
-					ast.forEach(new Consumer<IExpr>() {
-						@Override
-						public void accept(IExpr x) {
+					ast.forEach(x -> {
 							if (x.accept(isBasicAST)) {
 								basicPlus.append(x);
 							} else {
 								restPlus.append(x);
 							}
-						}
 
 					});
 					if (basicPlus.size() > 1) {
@@ -3281,25 +3318,16 @@ public class Algebra {
 		 * @param engine
 		 * @return
 		 */
-		private static Function<IExpr, Long> createComplexityFunction(IExpr complexityFunctionHead,
-				final EvalEngine engine) {
-			Function<IExpr, Long> complexityFunction = new Function<IExpr, Long>() {
-				@Override
-				public Long apply(IExpr x) {
-					return x.leafCountSimplify();
-				}
-			};
+		private static Function<IExpr, Long> createComplexityFunction(IExpr complexityFunctionHead, EvalEngine engine) {
+			Function<IExpr, Long> complexityFunction = x -> x.leafCountSimplify();
 			if (complexityFunctionHead.isPresent()) {
 				final IExpr head = complexityFunctionHead;
-				complexityFunction = new Function<IExpr, Long>() {
-					@Override
-					public Long apply(IExpr x) {
+				complexityFunction = x -> {
 						IExpr temp = engine.evaluate(F.unaryAST1(head, x));
 						if (temp.isInteger() && !temp.isNegative()) {
 							return ((IInteger) temp).toLong();
 						}
 						return Long.MAX_VALUE;
-					}
 				};
 			}
 			return complexityFunction;
@@ -3407,17 +3435,14 @@ public class Algebra {
 		 *            a <code>Plus[...]</code> expresion
 		 * @return <code>null</code> couldn't be transformed by <code>ExpandAll(()</code> od <code>togetherAST()</code>
 		 */
-		private static IExpr togetherPlus(final IAST plusAST) {
+		private static IExpr togetherPlus(IAST plusAST) {
 			if (plusAST.size() <= 2) {
 				return F.NIL;
 			}
-			final IASTAppendable numerator = F.ast(F.Plus, plusAST.size(), false);
-			final IASTAppendable denominator = F.ast(F.Times, plusAST.size(), false);
-			final boolean[] evaled = new boolean[1];
-			plusAST.forEach(new ObjIntConsumer<IExpr>() {
-
-				@Override
-				public void accept(IExpr x, int i) {
+			IASTAppendable numerator = F.ast(F.Plus, plusAST.size(), false);
+			IASTAppendable denominator = F.ast(F.Times, plusAST.size(), false);
+			boolean[] evaled = new boolean[1];
+			plusAST.forEach((x, i) -> {
 					IExpr[] fractionalParts = fractionalParts(x, false);
 					if (fractionalParts != null) {
 						numerator.append(i, fractionalParts[0]);
@@ -3430,15 +3455,12 @@ public class Algebra {
 						numerator.append(i, x);
 						denominator.append(i, F.C1);
 					}
-				}
 
 			});
 			if (!evaled[0]) {
 				return F.NIL;
 			}
-			numerator.forEach(new ObjIntConsumer<IExpr>() {
-				@Override
-				public void accept(IExpr x, int i) {
+			numerator.forEach((x, i) -> {
 					IASTAppendable ni = F.TimesAlloc(plusAST.argSize());
 					ni.append(x);
 					for (int j = 1; j < plusAST.size(); j++) {
@@ -3451,7 +3473,6 @@ public class Algebra {
 						}
 					}
 					numerator.set(i, ni.getOneIdentity(F.C1));
-				}
 			});
 			int i = 1;
 			while (denominator.size() > i) {
@@ -3722,8 +3743,8 @@ public class Algebra {
 	 *
 	 * @return <code>F.NIL</code> if the expression couldn't be expanded.
 	 */
-	public static IExpr expandAll(final IAST ast, final IExpr patt, final boolean expandNegativePowers,
-			final boolean distributePlus, final EvalEngine engine) {
+	public static IExpr expandAll(final IAST ast, IExpr patt, boolean expandNegativePowers, boolean distributePlus,
+			EvalEngine engine) {
 		if (patt != null && ast.isFree(patt, true)) {
 			return F.NIL;
 		}
@@ -3741,26 +3762,18 @@ public class Algebra {
 			}
 			return F.NIL;
 		}
-		final IASTAppendable[] result = new IASTAppendable[1];
+		IASTAppendable[] result = new IASTAppendable[1];
 		result[0] = F.NIL;
 		IExpr temp = F.NIL;
 
-		final int localASTSize = localAST.size();
-		final IExpr head = localAST.head();
+		int localASTSize = localAST.size();
+		IExpr head = localAST.head();
 		if (head.isAST()) {
 			temp = expandAll((IAST) head, patt, expandNegativePowers, distributePlus, engine);
-			temp.ifPresent(new Consumer<IExpr>() {
-				@Override
-				public void accept(IExpr x) {
-					result[0] = F.ast(x, localASTSize, false);
-				}
-			});
+			temp.ifPresent(x -> result[0] = F.ast(x, localASTSize, false));
 		}
 		final IAST localASTFinal = localAST;
-		localAST.forEach(new ObjIntConsumer<IExpr>() {
-
-			@Override
-			public void accept(final IExpr x, int i) {
+		localAST.forEach((x, i) -> {
 				if (x.isAST()) {
 					IExpr t = expandAll((IAST) x, patt, expandNegativePowers, distributePlus, engine);
 					if (t.isPresent()) {
@@ -3776,15 +3789,7 @@ public class Algebra {
 						return;
 					}
 				}
-				result[0].ifAppendable(new Consumer<IASTAppendable>() {
-					@Override
-					public void accept(IASTAppendable r) {
-						r.append(x);
-					}
-				}
-				// r -> r.append(x)
-				);
-			}
+			result[0].ifAppendable(r -> r.append(x));
 		});
 
 		if (!result[0].isPresent()) {

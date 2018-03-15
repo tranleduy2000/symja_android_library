@@ -1,18 +1,5 @@
 package org.matheclipse.core.polynomials;
 
-import static org.matheclipse.core.expression.F.ArcTan;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.C4;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.CN1D2;
-import static org.matheclipse.core.expression.F.Integrate;
-import static org.matheclipse.core.expression.F.Log;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Times;
-
 import org.matheclipse.core.convert.JASConvert;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -26,6 +13,19 @@ import edu.jas.arith.BigRational;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.Monomial;
+
+import static org.matheclipse.core.expression.F.ArcTan;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C4;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.CN1D2;
+import static org.matheclipse.core.expression.F.Integrate;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Times;
 
 /**
  * Generator to integrate a rational polynomial by partial fraction
@@ -148,10 +148,9 @@ public class PartialFractionIntegrateGenerator implements IPartialFractionGenera
 				if (A.isZero()) {
 					// JavaForm[B*((2*a*x+b)/((k-1)*(4*a*c-b^2)*(a*x^2+b*x+c)^(k-1))+
 					// (4*k*a-6*a)/((k-1)*(4*a*c-b^2))*Integrate[(a*x^2+b*x+c)^(-k+1),x])]
-					temp = Times(B,
-							Plus(Times(
-									Integrate(Power(Plus(c, Times(b, x), Times(a, Power(x, C2))),
-											Plus(C1, Times(CN1, k))), x),
+					temp = Times(B, Plus(
+							Times(Integrate(
+									Power(Plus(c, Times(b, x), Times(a, Power(x, C2))), Plus(C1, Times(CN1, k))), x),
 									Plus(Times(F.integer(-6L), a), Times(C4, a, k)),
 									Power(Plus(CN1, k),
 											CN1),
@@ -192,12 +191,10 @@ public class PartialFractionIntegrateGenerator implements IPartialFractionGenera
 	}
 
 	/**
-	 * Check if the polynomial has maximum degree 2 in 1 variable and return the
-	 * coefficients.
+	 * Check if the polynomial has maximum degree 2 in 1 variable and return the coefficients.
 	 * 
 	 * @param poly
-	 * @return <code>null</code> if the polynomials degree > 2 and number of
-	 *         variables <> 1
+	 * @return <code>null</code> if the polynomials degree > 2 and number of variables <> 1
 	 */
 	public static boolean isQuadratic(GenPolynomial<BigRational> poly, BigRational[] result) {
 		if (poly.degree() <= 2 && poly.numberOfVariables() == 1) {
@@ -217,12 +214,10 @@ public class PartialFractionIntegrateGenerator implements IPartialFractionGenera
 	}
 
 	/**
-	 * Check if the polynomial has maximum degree 2 in 1 variable and return the
-	 * coefficients.
+	 * Check if the polynomial has maximum degree 2 in 1 variable and return the coefficients.
 	 * 
 	 * @param poly
-	 * @return <code>null</code> if the polynomials degree > 2 and number of
-	 *         variables <> 1
+	 * @return <code>null</code> if the polynomials degree > 2 and number of variables <> 1
 	 */
 	public static boolean isQuadratic(GenPolynomial<BigInteger> poly, BigInteger[] result) {
 		if (poly.degree() <= 2 && poly.numberOfVariables() == 1) {
