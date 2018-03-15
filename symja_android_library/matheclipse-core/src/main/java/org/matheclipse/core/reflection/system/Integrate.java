@@ -1,5 +1,8 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.Predicate;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.eval.EvalEngine;
@@ -19,8 +22,6 @@ import org.matheclipse.core.polynomials.PartialFractionIntegrateGenerator;
 
 import java.util.HashSet;
 import java.util.Set;
-import com.duy.lambda.BiFunction;
-import com.duy.lambda.Predicate;
 
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
@@ -67,7 +68,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST holdallAST, final EvalEngine engine) {
+	public IExpr evaluate(final IAST holdallAST, EvalEngine engine) {
 		boolean calledRubi = false;
 		boolean evaled = false;
 		IExpr result;
@@ -179,14 +180,17 @@ public class Integrate extends AbstractFunctionEvaluator {
 				// }
 
 				if (fx.isPower()) {
-					if (fx.equalsAt(1, x) && fx.isFreeAt(2, x)) {
-						if (fx.arg2().isMinusOne()) {
+					// base ^ exponent
+					IExpr base = fx.base();
+					IExpr exponent = fx.exponent();
+					if (base.equals(x) && exponent.isFree(x)) {
+						if (exponent.isMinusOne()) {
 							// Integrate[ 1 / x_ , x_ ] -> Log[x]
 							return Log(x);
 						}
 						// Integrate[ x_ ^n_ , x_ ] -> x^(n+1)/(n+1) /;
 						// FreeQ[n, x]
-						IExpr temp = Plus(F.C1, fx.arg2());
+						IExpr temp = Plus(F.C1, exponent);
 						return Divide(Power(x, temp), temp);
 					}
 					if (fx.equalsAt(2, x) && fx.isFreeAt(1, x)) {
@@ -791,10 +795,9 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * See <a href="http://en.wikipedia.org/wiki/Integration_by_parts">Wikipedia- Integration by parts</a>
 	 * 
 	 * @param ast
-	 *            TODO
+	 *            TODO - not used
+	 * @param arg1
 	 * @param symbol
-	 * @param f
-	 * @param g
 	 * 
 	 * @return
 	 */
@@ -851,6 +854,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * @param g
 	 *            <code>g(x)</code>
 	 * @param x
+	 * @param recursioLimit
+	 *            TODO
 	 * @return <code>f(x) * g(x) - Integrate(f(x) * g'(x),x )</code>
 	 */
 	private static IExpr integrateByParts(IExpr f, IExpr g, IExpr x, int recursionLimit) {
