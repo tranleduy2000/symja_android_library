@@ -244,7 +244,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 		}
 		Set<IInteger> set = new TreeSet<IInteger>();
 		final IAST primeFactorsList = factorize();
-		int len = primeFactorsList.size() - 1;
+		int len = primeFactorsList.argSize();
 
 		// build the k-subsets from the primeFactorsList
 		for (int k = 1; k < len; k++) {
@@ -446,6 +446,10 @@ public class BigIntegerSym extends AbstractIntegerSym {
 		return internalJavaString(symbolsAsFactoryMethod, depth, true, false);
 	}
 
+	@Override
+	public byte byteValue() {
+		return fBigIntValue.byteValue();
+	}
 	@Override
 	public int intValue() {
 		return fBigIntValue.intValue();
