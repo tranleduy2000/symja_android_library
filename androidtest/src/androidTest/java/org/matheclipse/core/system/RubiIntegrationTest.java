@@ -452,7 +452,6 @@ public class RubiIntegrationTest extends AbstractTestCase {
 	}
 
 	public void testTimesFx() {
-		check("ExpandAll(g'(x))", "g'(x)");
 		check("integrate(g(x)*f(x), x)", "Integrate(f(x)*g(x),x)");
 		// check("integrate(sqrt(x)*f(x), x)", "");
 	}
@@ -464,7 +463,7 @@ public class RubiIntegrationTest extends AbstractTestCase {
 
 	public void testIssue64() {
 		// check("Integrate(e^(x^2+2x+3)(2x+2),x)", "");
-		check("Integrate((x^2+1)/(x^3+3x),x)", "Log(3*x)/3+Log(3+x^2)/3");
+		check("Integrate((x^2+1)/(x^3+3*x),x)", "Log(3*x)/3+Log(3+x^2)/3");
 		check("Together(D(1/3*Log(3*x^2+9)+1/3*Log(x),x))", "(1+x^2)/(3*x+x^3)");
 		check("Together(D(1/3*Log(x^2+3)+1/3*Log(x),x))", "(1+x^2)/(3*x+x^3)");
 	}
@@ -508,8 +507,10 @@ public class RubiIntegrationTest extends AbstractTestCase {
 	}
 
 	public void testGithub21() {
-		check("Integrate(4/(1-3*(x)) + 1/2*Sqrt((x)) - 5,x)", "-5*x+x^(3/2)/3-4/3*Log(1/3-x)");
-		check("Simplify(D(-5*x+x^(3/2)/3-4/3*Log(1/3-x),x))", "-5+4/(1-3*x)+Sqrt(x)/2");
+		check("Integrate(4/(1-3*(x)) + 1/2*Sqrt((x)) - 5,x)", //
+				"-5*x+x^(3/2)/3-4/3*Log(1/3-x)");
+		check("Simplify(D(-5*x+x^(3/2)/3-4/3*Log(1/3-x),x))", //
+				"-5+4/(1-3*x)+Sqrt(x)/2");
 	}
 
 	public void testGithub22() {
@@ -523,8 +524,8 @@ public class RubiIntegrationTest extends AbstractTestCase {
 		//    "Sin(x)^3*Cos(x)");
 
 		check("Expand(TrigToExp(Sin(x)^3*Cos(x)))", //
-				"(-I*1/16)/E^(I*4*x)(+I*1/8)/E^(I*2*x)-I*1/8*E^(I*2*x)+I*1/16*E^(I*4*x)");
+				"(-I*1/16)/E^(I*4*x)+(I*1/8)/E^(I*2*x)-I*1/8*E^(I*2*x)+I*1/16*E^(I*4*x)");
 		check("Expand(TrigToExp(Sin(2*x)/4-Sin(4*x)/8))", //
-				"(-I*1/16)/E^(I*4*x)(+I*1/8)/E^(I*2*x)-I*1/8*E^(I*2*x)+I*1/16*E^(I*4*x)");
+				"(-I*1/16)/E^(I*4*x)+(I*1/8)/E^(I*2*x)-I*1/8*E^(I*2*x)+I*1/16*E^(I*4*x)");
 	}
 }
