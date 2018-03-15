@@ -1,6 +1,5 @@
 package com.duy.lambda;
 
-@FunctionalInterface
 public interface Consumer<T> {
 
     /**

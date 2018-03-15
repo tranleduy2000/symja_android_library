@@ -1,6 +1,7 @@
 package org.matheclipse.core.generic;
 
-import java.util.Objects;
+import com.duy.util.DObjects;
+
 import java.util.function.BiPredicate;
 
 /**
@@ -41,8 +42,13 @@ public interface ObjIntPredicate<T> {
 	 *             if the other predicate is null
 	 */
 	default ObjIntPredicate<T> and(ObjIntPredicate<? super T> other) {
-		Objects.requireNonNull(other);
-		return (obj, value) -> test(obj, value) && other.test(obj, value);
+		DObjects.requireNonNull(other);
+		return new ObjIntPredicate<T>() {
+			@Override
+			public boolean test(T obj, int value) {
+				return ObjIntPredicate.this.test(obj, value) && other.test(obj, value);
+			}
+		};
 	}
 
 	/**
@@ -57,8 +63,13 @@ public interface ObjIntPredicate<T> {
 	 *             if the other predicate is null
 	 */
 	default ObjIntPredicate<T> or(ObjIntPredicate<? super T> other) {
-		Objects.requireNonNull(other);
-		return (obj, value) -> test(obj, value) || other.test(obj, value);
+		DObjects.requireNonNull(other);
+		return new ObjIntPredicate<T>() {
+            @Override
+            public boolean test(T obj, int value) {
+                return ObjIntPredicate.this.test(obj, value) || other.test(obj, value);
+            }
+        };
 	}
 
 	/**
@@ -67,7 +78,12 @@ public interface ObjIntPredicate<T> {
 	 * @return the predicate, "NOT this"
 	 */
 	default ObjIntPredicate<T> negate() {
-		return (obj, value) -> !test(obj, value);
+		return new ObjIntPredicate<T>() {
+			@Override
+			public boolean test(T obj, int value) {
+				return !ObjIntPredicate.this.test(obj, value);
+			}
+		};
 	}
 
 }

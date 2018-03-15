@@ -38,8 +38,8 @@ import java.util.Comparator;
  *
  * @since 1.7
  */
-public final class Objects {
-    private Objects() {
+public final class DObjects {
+    private DObjects() {
         throw new AssertionError("No java.util.Objects instances for you!");
     }
 
@@ -129,7 +129,7 @@ public final class Objects {
      * @return the result of calling {@code toString} on the first
      * argument if it is not {@code null} and the second argument
      * otherwise.
-     * @see Objects#toString(Object)
+     * @see DObjects#toString(Object)
      */
     public static String toString(Object o, String nullDefault) {
         return (o != null) ? o.toString() : nullDefault;

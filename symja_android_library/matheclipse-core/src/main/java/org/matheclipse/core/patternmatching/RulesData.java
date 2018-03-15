@@ -65,23 +65,41 @@ public class RulesData implements Serializable {
 						return true;
 					}
 					if (neededSymbols != null && arg1.isOrderlessAST()) {
-						boolean lambda = !lhsAST.exists(x -> x.isPatternDefault() || x.isOrderlessAST());
+						boolean lambda = !lhsAST.exists(new Predicate<IExpr>() {
+                            @Override
+                            public boolean test(IExpr x) {
+                                return x.isPatternDefault() || x.isOrderlessAST();
+                            }
+                        });
 						boolean[] isComplicated = { false };
-						arg1.forEach(t -> {
+						arg1.forEach(new Consumer<IExpr>() {
+							@Override
+							public void accept(IExpr t) {
 								if (t.isPatternDefault()) {
 									isComplicated[0] = true;
 								} else if (lambda && t.isAST() && t.head().isSymbol()) {
 									neededSymbols.add((ISymbol) t.head());
 								}
+							}
 						});
 						return isComplicated[0];
 					}
 					// the left hand side is associated with the first argument
 					// see if one of the arguments contain a pattern with default
 					// value
-					return arg1.exists(x -> x.isPatternDefault(), 1);
+					return arg1.exists(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr x) {
+							return x.isPatternDefault();
 						}
-				return lhsAST.exists(x -> x.isPatternDefault(), 2);
+					}, 1);
+						}
+				return lhsAST.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return x.isPatternDefault();
+					}
+				}, 2);
 			}
 		} else if (lhsExpr.isPattern()) {
 			return true;
@@ -525,12 +543,14 @@ public class RulesData implements Serializable {
 
 				if (fSimpleOrderlesPatternDownRules != null) {
 					IExpr[] temp = new IExpr[1];
-					if (astExpr.exists(x -> {
+					if (astExpr.exists(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr x) {
 							if (x.isAST() && x.head().isSymbol()) {
 								final int hash = x.head().hashCode();
 								if (fSimpleOrderlesPatternDownRules.containsKey(hash)) {
 									try {
-										IExpr result = evalSimpleRatternDownRule(fSimpleOrderlesPatternDownRules, hash,
+										IExpr result = RulesData.this.evalSimpleRatternDownRule(fSimpleOrderlesPatternDownRules, hash,
 												astExpr, showSteps, engine);
 										if (result.isPresent()) {
 											temp[0] = result;
@@ -542,6 +562,7 @@ public class RulesData implements Serializable {
 								}
 							}
 							return false;
+						}
 					})) {
 						return temp[0];
 					}
@@ -891,7 +912,21 @@ public class RulesData implements Serializable {
 			}
 
 			if (fPatternDownRules != null) {
-				return fPatternDownRules.removeIf(x -> x.equivalentLHS(pmEvaluator) == 0);
+				Predicate<IPatternMatcher> filter = new Predicate<IPatternMatcher>() {
+					@Override
+					public boolean test(IPatternMatcher x) {
+						return x.equivalentLHS(pmEvaluator) == 0;
+					}
+				};
+				boolean isRemoved = false;
+				Iterator<IPatternMatcher> each = fPatternDownRules.iterator();
+				while (each.hasNext()) {
+					if (filter.test(each.next())) {
+						each.remove();
+						isRemoved = true;
+					}
+				}
+				return isRemoved;
 			}
 		}
 		return false;

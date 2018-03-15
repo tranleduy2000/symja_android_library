@@ -8,6 +8,7 @@ import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.exception.WrongArgumentType;
+import org.matheclipse.core.generic.ObjIntPredicate;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -84,7 +85,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     /**
      * This expression represents an already decomposed partial fraction
      *
-     * @see Apart
+     * @see org.matheclipse.core.builtin.Algebra.Apart
      */
     public final int IS_DECOMPOSED_PARTIAL_FRACTION = 0x0080;
     /**
@@ -385,11 +386,10 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return if
      * one of the arguments satisfy the predicate.
      *
-     * @param predicate   the predicate which filters each argument in this <code>AST</code>
-     * @param startOffset start offset from which the element have to be tested
+     * @param predicate the predicate which filters each argument in this <code>AST</code>
      * @return the <code>true</code> if the predicate is true the first time or <code>false</code> otherwise
      */
-    public boolean exists(Predicate<? super IExpr> predicate, int startOffset);
+    boolean exists(ObjIntPredicate<? super IExpr> predicate);
 
     /**
      * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return if
@@ -399,17 +399,36 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param startOffset start offset from which the element have to be tested
      * @return the <code>true</code> if the predicate is true the first time or <code>false</code> otherwise
      */
-    public boolean exists(Predicate<? super IExpr> predicate);
+    public boolean exists(ObjIntPredicate<? super IExpr> predicate, int startOffset);
+
+    /**
+     * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return if
+     * one of the arguments satisfy the predicate.
+     *
+     * @param predicate the predicate which filters each argument in this <code>AST</code>
+     * @return the <code>true</code> if the predicate is true the first time or <code>false</code> otherwise
+     */
+    boolean exists(Predicate<? super IExpr> predicate);
+
+    /**
+     * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return if
+     * one of the arguments satisfy the predicate.
+     *
+     * @param predicate   the predicate which filters each argument in this <code>AST</code>
+     * @param startOffset start offset from which the element have to be tested
+     * @return the <code>true</code> if the predicate is true the first time or <code>false</code> otherwise
+     */
+    public boolean exists(Predicate<? super IExpr> predicate, int startOffset);
 
     /**
      * Compare the arguments pairwise with the <code>stopPredicate</code>. If the predicate gives <code>true</code>
      * return <code>true</code>. If the <code>stopPredicate</code> gives false for each pairwise comparison return the
      * <code>false</code> at the end.
+     * <p>
+     * //     * @param ast
      *
-     * @param ast
-     * @param stopPredicate
-     * @param stopExpr
-     * @param resultExpr
+     * @param stopPredicate //     * @param stopExpr
+     *                      //     * @param resultExpr
      * @return
      */
     boolean existsLeft(BiPredicate<IExpr, IExpr> stopPredicate);
@@ -487,6 +506,12 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     public int findFirstEquals(final IExpr expr);
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    IExpr first();
+
+    /**
      * Apply the functor to the elements of the range from left to right and return the final result. Results do
      * accumulate from one invocation to the next: each time this method is called, the accumulation starts over with
      * value from the previous function call.
@@ -507,6 +532,34 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return the accumulated elements
      */
     public IExpr foldRight(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start);
+
+    /**
+     * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return if
+     * all of the arguments satisfy the predicate.
+     *
+     * @param predicate the predicate which filters each argument in this <code>AST</code>
+     * @return the <code>true</code> if the predicate is true for all elements or <code>false</code> otherwise
+     */
+    boolean forAll(ObjIntPredicate<? super IExpr> predicate);
+
+    /**
+     * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return if
+     * all of the arguments satisfy the predicate.
+     *
+     * @param predicate   the predicate which filters each argument in this <code>AST</code>
+     * @param startOffset start offset from which the element have to be tested
+     * @return the <code>true</code> if the predicate is true for all elements or <code>false</code> otherwise
+     */
+    public boolean forAll(ObjIntPredicate<? super IExpr> predicate, int startOffset);
+
+    /**
+     * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return if
+     * all of the arguments satisfy the predicate.
+     *
+     * @param predicate the predicate which filters each argument in this <code>AST</code>
+     * @return the <code>true</code> if the predicate is true for all elements or <code>false</code> otherwise
+     */
+    boolean forAll(Predicate<? super IExpr> predicate);
 
     /**
      * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return if
@@ -639,7 +692,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param defaultValue default value, if <code>size() < 2</code>.
      * @return
      */
-    public IExpr getOneIdentity(IExpr publicValue);
+    public IExpr getOneIdentity(IExpr defaultValue);
 
     /**
      * Returns the element at the specified positions in the nested ASTs.
@@ -751,11 +804,9 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     // public Iterator<IExpr> iterator0();
 
     /**
-     * Get the last element of the <code>AST</code> list (i.e. get(size()-1).
-     *
-     * @return the last argument of the function represented by this <code>AST</code>.
-     * @see IExpr#head()
+     * {@inheritDoc}
      */
+    @Override
     public IExpr last();
 
     public int lastIndexOf(IExpr object);
@@ -946,6 +997,12 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     public IASTAppendable removeAtClone(int i);
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    IASTAppendable rest();
+
+    /**
      * Append the elements in reversed order to the given <code>list</code>
      *
      * @param list
@@ -970,6 +1027,12 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return the given list
      */
     public IAST rotateRight(IASTAppendable list, final int n);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    IExpr second();
 
     /**
      * Create a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied) and set the
