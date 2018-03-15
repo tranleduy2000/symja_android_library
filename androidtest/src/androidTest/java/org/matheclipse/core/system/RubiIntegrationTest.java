@@ -1,5 +1,8 @@
 package org.matheclipse.core.system;
 
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+
 import static org.matheclipse.core.expression.F.$s;
 import static org.matheclipse.core.expression.F.AtomQ;
 import static org.matheclipse.core.expression.F.C0;
@@ -43,10 +46,22 @@ import static org.matheclipse.core.expression.F.m;
 import static org.matheclipse.core.expression.F.p;
 import static org.matheclipse.core.expression.F.v;
 import static org.matheclipse.core.expression.F.x;
-import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.*;
-
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.AbortRubi;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.ContentFactor;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.DeactivateTrig;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.EasyDQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.ExpandToSum;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FixSimplify;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FunctionOfTrig;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FunctionOfTrigOfLinearQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.LinearQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PolyQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.QuadraticMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RealNumericQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RemoveContent;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SimpFixFactor;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SubstForFractionalPowerOfLinear;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.TrigSimplifyAux;
 
 /**
  * Tests for the Java port of the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.

@@ -1,6 +1,12 @@
 package org.matheclipse.core.system;
 
-import junit.framework.TestCase;
+import static org.matheclipse.core.expression.F.Cos;
+import static org.matheclipse.core.expression.F.D;
+import static org.matheclipse.core.expression.F.Sin;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.x;
+
+import java.math.BigInteger;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.ExprEvaluator;
@@ -15,13 +21,7 @@ import org.matheclipse.core.polynomials.ExprTermOrderByName;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
-import java.math.BigInteger;
-
-import static org.matheclipse.core.expression.F.Cos;
-import static org.matheclipse.core.expression.F.D;
-import static org.matheclipse.core.expression.F.Sin;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.x;
+import junit.framework.TestCase;
 
 public class ExprEvaluatorTest extends TestCase {
 

@@ -106,7 +106,7 @@ public class AssumptionTestCase extends TestCase {
 
 		EvalUtilities util = new EvalUtilities(false, true);
 
-		// define "t" with "t" assumed to be an element of the integers
+		// define "t" with "t" assumed to be an element of the integers 
 		// use #1 (Slot1) as placeholder for a new symbol!
 		ISymbol t = F.symbol("t", F.Element(F.Slot1, F.Integers));
 

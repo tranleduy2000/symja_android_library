@@ -1,6 +1,10 @@
 package org.matheclipse.core.system;
 
-import junit.framework.TestCase;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
@@ -8,11 +12,7 @@ import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.reflection.system.Share;
 import org.matheclipse.core.visit.AbstractVisitor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import junit.framework.TestCase;
 
 public class SerializableTest extends TestCase {
 
@@ -110,9 +110,6 @@ public class SerializableTest extends TestCase {
 	}
 
 	public void testIntegrateDefinition() {
-		if (true){
-			return;
-		}
 		RulesData rulesData = F.Integrate.getRulesData();
 		AbstractVisitor visitor = Share.createVisitor();
 		rulesData.accept(visitor);

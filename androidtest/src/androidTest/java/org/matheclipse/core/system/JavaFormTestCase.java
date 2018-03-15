@@ -1,16 +1,16 @@
 package org.matheclipse.core.system;
 
+import static org.matheclipse.core.expression.F.CI;
+import static org.matheclipse.core.expression.F.CInfinity;
+import static org.matheclipse.core.expression.F.Sinc;
+import static org.matheclipse.core.expression.F.Times;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.EvalUtilities;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.patternmatching.PatternMatcher;
-
-import static org.matheclipse.core.expression.F.CI;
-import static org.matheclipse.core.expression.F.CInfinity;
-import static org.matheclipse.core.expression.F.Sinc;
-import static org.matheclipse.core.expression.F.Times;
 
 /**
  * 

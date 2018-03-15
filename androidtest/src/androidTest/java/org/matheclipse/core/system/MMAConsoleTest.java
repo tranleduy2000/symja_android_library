@@ -1,8 +1,8 @@
 package org.matheclipse.core.system;
 
-import junit.framework.TestCase;
-
 import org.matheclipse.core.eval.MMAConsole;
+
+import junit.framework.TestCase;
 
 public class MMAConsoleTest extends TestCase {
 	MMAConsole console;

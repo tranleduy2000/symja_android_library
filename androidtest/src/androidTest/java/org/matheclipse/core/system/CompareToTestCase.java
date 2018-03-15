@@ -1,12 +1,5 @@
 package org.matheclipse.core.system;
 
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IPattern;
-import org.matheclipse.core.interfaces.ISymbol;
-
 import static org.matheclipse.core.expression.F.ArcCos;
 import static org.matheclipse.core.expression.F.ArcSin;
 import static org.matheclipse.core.expression.F.ArcTan;
@@ -23,6 +16,13 @@ import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.eval;
 import static org.matheclipse.core.expression.F.x;
+
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IPattern;
+import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  * Tests for the Java port of the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.

@@ -1,5 +1,7 @@
 package org.matheclipse.core.system;
 
+import org.matheclipse.core.system.AbstractTestCase;
+
 /**
  * View with: http://www.rapidtables.com/web/tools/svg-viewer-editor.htm
  * 

@@ -1,17 +1,17 @@
 package org.matheclipse.core.form.tex;
 
-import junit.framework.TestCase;
+import java.io.StringWriter;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.TeXUtilities;
 
-import java.io.StringWriter;
+import junit.framework.TestCase;
 
 /**
  * Tests LaTeX export function
  */
 public class BasicTeXTestCase extends TestCase {
-
+	
 	TeXUtilities texUtil;
 
 	public BasicTeXTestCase(String name) {
@@ -87,7 +87,7 @@ public class BasicTeXTestCase extends TestCase {
 
 	public void testTeX014() {
 		check("Sin(x)^2", "{\\sin(x)}^{2}");
-		check("Sin(2*x)^2", "{\\sin(2\\,x)}^{2}");
+		check("Sin(2x)^2", "{\\sin(2\\,x)}^{2}");
 	}
 
 	public void testTeX015() {
@@ -97,7 +97,7 @@ public class BasicTeXTestCase extends TestCase {
 		check("Complex(-a, -1)", " - a - \\imag");
 		check("Complex(a, -b)", "a - b\\,\\imag");
 		check("Complex(a, b)", "a + b\\,\\imag");
-		check("Complex(3/4,-(6/7)*I)", "\\frac{3}{4}+\\frac{6}{7}");
+		check("Complex(3/4,-(6/7)*I)", "\\frac{3}{4}+\\frac{6}{7}"); 
 		check("3/4-(6/7)*I", "\\frac{3}{4}-\\frac{6}{7}\\,i ");
 		check("1+2*I", "1+2\\,i ");
 		check("1-2*I", "1-2\\,i ");
@@ -112,20 +112,20 @@ public class BasicTeXTestCase extends TestCase {
 	public void testTeX016() {
 		check("(a*d+b*c)*d^(-1)*f^(-1)", "\\frac{b\\,c+a\\,d}{d\\,f}");
 	}
-
+	
 	public void testTeX017() {
 		check("1/4*d^(-1)*f^(-1)", "\\frac{1}{4\\,d\\,f}");
 	}
-
+	
 	public void testTeX018() {
 		check("1/4*a^2*b^(-1)*f^(-1)", "\\frac{a^{2}}{4\\,b\\,f}");
 	}
-
+	
 	public void testTeX019() {
 		check("n!", "n ! ");
 		check("n!!", "n !! ");
 	}
-
+	
 	public void testTeX020() {
 		check("Hold(++x)", "\\text{Hold}(\\text{++}x)");
 		check("Hold(y^2/.x->3)", "\\text{Hold}(y^{2}\\text{/.}\\,x\\to 3)");
@@ -133,38 +133,38 @@ public class BasicTeXTestCase extends TestCase {
 		check("Hold(1 * 5 * x + 1 * 63)", "\\text{Hold}(5\\,x+63)");
 		check("10*f(x)", "10\\,f(x)");
 		check("Hold((5*3)/2)", "\\text{Hold}(\\frac{3\\cdot 5}{2})");
-		check("Integrate(8+5*x, {x, 5, 10})", "\\int_{5}^{10} 8+5\\,x\\,\\mathrm{d}x");
+		check("Integrate(8+5x, {x, 5, 10})", "\\int_{5}^{10} 8+5\\,x\\,\\mathrm{d}x");
 	}
-
+	
 	public void testTeX021() {
 		check("-Infinity", " - \\infty");
 		check("GoldenRatio", "\\phi");
 		check("Infinity", "\\infty");
-
+		
 		check("EulerGamma", "\\gamma");
 		check("Pi", "\\pi");
 //		check("E", "E");
 //		check("Catalan", "");
 //		check("Degree", "");
-//
-//
+//		
+//		
 //		check("Glaisher", "");
 //		check("I", "");
-//
+//		
 //		check("Khinchin", "");
-
+		
 	}
-
+	
 	public void testTeX022() {
 		// issue #116
 		check("-I*1/2*Sqrt(2)", "\\frac{\\left( -1\\,i \\right) \\,\\sqrt{2}}{2}");
 	}
-
+	
 	public void testTeX023() {
 		// issue #117
 		check("5*3^(5*x)*Log(3)", "5\\cdot 3^{5\\,x}\\,\\log(3)");
 	}
-
+	
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();
 		texUtil.toTeX(strEval, stw);
