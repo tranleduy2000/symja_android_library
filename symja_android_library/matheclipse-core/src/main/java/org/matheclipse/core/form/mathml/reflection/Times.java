@@ -139,7 +139,7 @@ public class Times extends MMLOperator {
 					if ((arg1 instanceof ISignedNumber) && (((ISignedNumber) arg1).isNegative())) {
 						fFactory.tag(buf, "mo", "-");
 						fFactory.tagStart(buf, fFirstTag);
-						arg1 = ((ISignedNumber) arg1).opposite();
+						arg1 = ((ISignedNumber) arg1).negate();
 					} else {
 						fFactory.tag(buf, "mo", "+");
 						fFactory.tagStart(buf, fFirstTag);
