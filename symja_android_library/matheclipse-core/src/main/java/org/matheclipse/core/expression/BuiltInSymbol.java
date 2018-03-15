@@ -1,21 +1,21 @@
 package org.matheclipse.core.expression;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
+import com.duy.lambda.DoubleFunction;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractCorePredicateEvaluator;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISignedNumberConstant;
 import org.matheclipse.core.eval.interfaces.ISymbolEvaluator;
-import org.matheclipse.core.interfaces.ExprUtil;
+import org.matheclipse.core.interfaces.BuiltIns;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import com.duy.lambda.DoubleFunction;
+import java.io.IOException;
+import java.io.ObjectStreamException;
 
 /**
  * Implements Symbols for function, constant and variable names
@@ -23,7 +23,7 @@ import com.duy.lambda.DoubleFunction;
  */
 public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
-	static class DummyEvaluator implements IEvaluator {
+	private static class DummyEvaluator implements IEvaluator {
 
 		@Override
 		public void join() {
@@ -45,20 +45,29 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
 	/**
 	 * The evaluation class of this built-in-function. See packages: package
-	 * <code>org.matheclipse.core.builtin.function</code> and
-	 * <code>org.matheclipse.core.reflection.system</code>.
+	 * <code>org.matheclipse.core.builtin.function</code> and <code>org.matheclipse.core.reflection.system</code>.
 	 */
 	private transient IEvaluator fEvaluator;
 
-	public BuiltInSymbol(final String symbolName) {
-		this(symbolName, null);
-	}
+	private transient int fOrdinal;
 
-	public BuiltInSymbol(final String symbolName, final IEvaluator evaluator) {
+	// private BuiltInSymbol(final String symbolName) {
+	// this(symbolName, null);
+	// }
+	public BuiltInSymbol(final String symbolName, int ordinal) {
 		super(symbolName, Context.SYSTEM);
-		fEvaluator = evaluator;
+		// this(symbolName, null);
+		fOrdinal = ordinal;
 	}
 
+	// private BuiltInSymbol(final String symbolName, final IEvaluator evaluator) {
+	// this(symbolName, Context.SYSTEM, evaluator);
+	// }
+
+	// private BuiltInSymbol(final String symbolName, Context context, final IEvaluator evaluator) {
+	// super(symbolName, context);
+	// fEvaluator = evaluator;
+	// }
 	/** {@inheritDoc} */
 	@Override
 	public String definitionToString() throws IOException {
@@ -69,9 +78,14 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean equals(final Object obj) {
+		return this == obj;
+	}
+	/** {@inheritDoc} */
+	@Override
 	public IExpr evaluate(EvalEngine engine) {
 		if (hasLocalVariableStack()) {
-			return ExprUtil.ofNullable(get());
+			return IExpr.ofNullable(get());
 		}
 		IExpr result;
 		if ((result = evalDownRule(engine, this)).isPresent()) {
@@ -122,6 +136,17 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		return fEvaluator;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public int hashCode() {
+		return fOrdinal;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public int ordinal() {
+		return fOrdinal;
+	}
 	@Override
 	final public boolean isBuiltInSymbol() {
 		return true;
@@ -174,18 +199,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 	final public boolean isTrue() {
 		return this == F.True;
 	}
-	
-	/** {@inheritDoc} */
-	@Override
-	public IExpr mapConstantDouble(DoubleFunction<IExpr> function) {
-		if (fEvaluator instanceof ISignedNumberConstant) {
-			double value = ((ISignedNumberConstant) fEvaluator).evalReal();
-			if (value < Integer.MAX_VALUE && value > Integer.MIN_VALUE) {
-				return function.apply(value);
-			}
-		}
-		return F.NIL;
-	}
+
 
 	/** {@inheritDoc} */
 	@Override
@@ -212,15 +226,16 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		return engine.evalTrue(ast);
 	}
 
-	public Object readResolve() throws ObjectStreamException {
-		ISymbol sym = fContext.get(fSymbolName);
-		if (sym != null) {
-			return sym;
+	/** {@inheritDoc} */
+	@Override
+	public IExpr mapConstantDouble(DoubleFunction<IExpr> function) {
+		if (fEvaluator instanceof ISignedNumberConstant) {
+			double value = ((ISignedNumberConstant) fEvaluator).evalReal();
+			if (value < Integer.MAX_VALUE && value > Integer.MIN_VALUE) {
+				return function.apply(value);
 		}
-		BuiltInSymbol symbol = new BuiltInSymbol(fSymbolName);
-		fContext.put(fSymbolName, symbol);
-		symbol.fAttributes = fAttributes;
-		return symbol;
+		}
+		return F.NIL;
 	}
 
 	/** {@inheritDoc} */
@@ -228,5 +243,16 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 	public final void setEvaluator(final IEvaluator evaluator) {
 		evaluator.setUp(this);
 		fEvaluator = evaluator;
+	}
+	private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		fOrdinal = stream.readInt();
+	}
+
+	public Object readResolve() throws ObjectStreamException {
+		return BuiltIns.symbol(fOrdinal);
+	}
+
+	private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
+		stream.writeInt(fOrdinal);
 	}
 }

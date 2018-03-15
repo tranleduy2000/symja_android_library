@@ -1,16 +1,6 @@
 package org.matheclipse.core.expression;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.duy.lambda.Function;
 
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
@@ -40,7 +30,17 @@ import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
-import com.duy.lambda.Function;
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 	protected transient Context fContext;
@@ -53,45 +53,36 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 	/**
 	 * The pattern matching &quot;down value&quot; rules associated with this symbol.
 	 */
-	private transient RulesData fRulesData;
+	protected transient RulesData fRulesData;
 
 	/**
 	 * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower-
 	 * and upper-case function names.
 	 */
 	protected String fSymbolName;
-	/**
-	 * The hash value of this object computed in the constructor.
-	 *
-	 */
-	protected int fHashValue;
 
-	public Symbol(final String symbolName, Context context) {
+	// public static ISymbol valueOf(final String symbolName, final Context context) {
+	// return new Symbol(symbolName, context);
+	// }
+	public Symbol(final String symbolName, final Context context) {
 		super();
 		fContext = context;
-		fHashValue = symbolName.hashCode();
 		fSymbolName = symbolName;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public <T> T accept(IVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public boolean accept(IVisitorBoolean visitor) {
 		return visitor.visit(this);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public int accept(IVisitorInt visitor) {
 		return visitor.visit(this);
@@ -169,7 +160,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 	 */
 	@Override
 	public int compareTo(final IExpr expr) {
-		if (expr instanceof Symbol) {
+		if (expr instanceof ISymbol) {
 			// O-2
 			if (this == expr) {
 				// Symbols are unique objects
@@ -177,7 +168,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 				return 0;
 			}
 			// sort lexicographically
-			return US_COLLATOR.compare(fSymbolName, ((Symbol) expr).fSymbolName);
+			return US_COLLATOR.compare(fSymbolName, ((ISymbol) expr).getSymbolName());// fSymbolName);
 		}
 		if (expr.isNot() && expr.first().isSymbol()) {
 			int cp = compareTo(expr.first());
@@ -251,6 +242,9 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 		if (this == obj) {
 			return true;
 		}
+		if (obj instanceof IBuiltInSymbol) {
+			return false;
+		}
 		if (obj instanceof Symbol) {
 			Symbol symbol = (Symbol) obj;
 			if (fHashValue != symbol.fHashValue) {
@@ -259,7 +253,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 			if (fSymbolName.equals(symbol.fSymbolName)) {
 				// #172
 				return fContext.equals(symbol.fContext);
-				// return true;
 			}
 		}
 		return false;
@@ -354,7 +347,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 	@Override
 	public IExpr evaluate(EvalEngine engine) {
 		if (hasLocalVariableStack()) {
-			return ExprUtil.ofNullable(get());
+			return IExpr.ofNullable(get());
 		}
 		IExpr result;
 		if ((result = evalDownRule(engine, this)).isPresent()) {
@@ -363,6 +356,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 		return F.NIL;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluateHead(IAST ast, EvalEngine engine) {
 		IExpr result = evaluate(engine);
@@ -492,7 +486,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		return fHashValue;
+		return fSymbolName.hashCode();
 	}
 
 	/** {@inheritDoc} */
@@ -520,7 +514,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 	/** {@inheritDoc} */
 	@Override
 	public ISymbol head() {
-		return F.SymbolHead;
+		return F.Symbol;
 	}
 
 	/** {@inheritDoc} */
@@ -659,15 +653,10 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 		if (variables.isAST0()) {
 			return true;
 		}
-		for (int i = 1; i < variables.size(); i++) {
-			if (this.equals(variables.get(i))) {
-				return true;
-			}
-		}
 		if (isConstant()) {
 			return true;
 		}
-		return false;
+		return variables.exists(x -> this.equals(x));
 	}
 
 	/** {@inheritDoc} */
@@ -832,7 +821,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 
 	private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		fSymbolName = stream.readUTF();
-		fHashValue = fSymbolName.hashCode();
 		fAttributes = stream.read();
 		fContext = (Context) stream.readObject();
 		if (fContext == null) {
