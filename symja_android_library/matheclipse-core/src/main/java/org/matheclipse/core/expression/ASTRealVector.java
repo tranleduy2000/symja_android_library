@@ -73,7 +73,7 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	}
 
 	/**
-	 * The underlying matrix
+	 * The underlying vector
 	 */
 	RealVector vector;
 

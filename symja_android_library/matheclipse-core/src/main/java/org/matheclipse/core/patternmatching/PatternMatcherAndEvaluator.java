@@ -1,10 +1,5 @@
 package org.matheclipse.core.patternmatching;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-
 import org.matheclipse.core.builtin.Programming;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ConditionException;
@@ -15,6 +10,11 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbol.RuleType;
+
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 public class PatternMatcherAndEvaluator extends PatternMatcher implements Externalizable {
 
@@ -80,10 +80,10 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		fRHSleafCountSimplify = Long.MIN_VALUE;
 		if (fRightHandSide != null) {
 			if (fRightHandSide.isCondition()) {
-				fRHSleafCountSimplify = fRightHandSide.getAt(2).leafCountSimplify();
+				fRHSleafCountSimplify = fRightHandSide.second().leafCountSimplify();
 			} else if (fRightHandSide.isModuleOrWithCondition()) {
-				IAST condition = (IAST) fRightHandSide.getAt(2);
-				fRHSleafCountSimplify = condition.getAt(2).leafCountSimplify();
+				IAST condition = (IAST) fRightHandSide.second();
+				fRHSleafCountSimplify = condition.second().leafCountSimplify();
 			}
 		}
 	}
@@ -109,30 +109,30 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 			final PatternMap pm2) {
 		IExpr p1, p2;
 		if (patternExpr1.isCondition()) {
-			p1 = patternExpr1.getAt(2);
+			p1 = patternExpr1.second();
 			if (patternExpr2.isCondition()) {
-				p2 = patternExpr2.getAt(2);
+				p2 = patternExpr2.second();
 				if (equivalent(p1, p2, pm1, pm2)) {
 					return 0;
 				}
 				return p1.compareTo(p2);
 			} else if (patternExpr2.isModuleOrWithCondition()) {
-				p2 = ((IAST) patternExpr2.getAt(2)).getAt(2);
+				p2 =patternExpr2.second().second();
 				if (equivalent(p1, p2, pm1, pm2)) {
 					return 0;
 				}
 				return p1.compareTo(p2);
 			}
 		} else if (patternExpr1.isModuleOrWithCondition()) {
-			p1 = ((IAST) patternExpr1.getAt(2)).getAt(2);
+			p1 =  patternExpr1.second().second();
 			if (patternExpr2.isCondition()) {
-				p2 = patternExpr2.getAt(2);
+				p2 = patternExpr2.second();
 				if (equivalent(p1, p2, pm1, pm2)) {
 					return 0;
 				}
 				return p1.compareTo(p2);
 			} else if (patternExpr2.isModuleOrWithCondition()) {
-				p2 = ((IAST) patternExpr2.getAt(2)).getAt(2);
+				p2 =   patternExpr2.second() .second();
 				if (equivalent(p1, p2, pm1, pm2)) {
 					return 0;
 				}
@@ -158,9 +158,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		}
 		IExpr substConditon = fPatternMap.substituteSymbols(fRightHandSide);
 		if (substConditon.isCondition()) {
-			return Programming.checkCondition(substConditon.getAt(1), substConditon.getAt(2), engine);
+			return Programming.checkCondition(substConditon.first(), substConditon.second(), engine);
 		} else if (substConditon.isModuleOrWith()) {
-			return Programming.checkModuleOrWithCondition(substConditon.getAt(1), substConditon.getAt(2), engine);
+			return Programming.checkModuleOrWithCondition(substConditon.first(), substConditon.second(), engine);
 		}
 		return true;
 	}
