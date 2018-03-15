@@ -1,33 +1,12 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.Arg;
-import static org.matheclipse.core.expression.F.Assumptions;
-import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.Divide;
-import static org.matheclipse.core.expression.F.E;
-import static org.matheclipse.core.expression.F.Floor;
-import static org.matheclipse.core.expression.F.I;
-import static org.matheclipse.core.expression.F.Im;
-import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Log;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Null;
-import static org.matheclipse.core.expression.F.Pi;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Subtract;
-import static org.matheclipse.core.expression.F.Times;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-
-import javax.annotation.Nonnull;
+import com.duy.lambda.BiPredicate;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Function;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.ObjIntConsumer;
+import com.duy.lambda.Predicate;
+import com.google.common.math.LongMath;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Combinatoric.Permutations;
@@ -70,16 +49,16 @@ import org.matheclipse.core.polynomials.ExprPolynomialRing;
 import org.matheclipse.core.polynomials.IPartialFractionGenerator;
 import org.matheclipse.core.polynomials.PartialFractionGenerator;
 import org.matheclipse.core.visit.AbstractVisitorBoolean;
-//import org.matheclipse.core.visit.VisitorExpr;
 import org.matheclipse.core.visit.VisitorExpr;
 
-import com.duy.lambda.BiPredicate;
-import com.duy.lambda.Consumer;
-import com.duy.lambda.Function;
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.ObjIntConsumer;
-import com.duy.lambda.Predicate;
-import com.google.common.math.LongMath;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+
+import javax.annotation.Nonnull;
 
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
@@ -100,6 +79,28 @@ import edu.jas.ufd.GreatestCommonDivisor;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
 import edu.jas.ufd.SquarefreeAbstract;
 import edu.jas.ufd.SquarefreeFactory;
+
+import static org.matheclipse.core.expression.F.Arg;
+import static org.matheclipse.core.expression.F.Assumptions;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.Divide;
+import static org.matheclipse.core.expression.F.E;
+import static org.matheclipse.core.expression.F.Floor;
+import static org.matheclipse.core.expression.F.I;
+import static org.matheclipse.core.expression.F.Im;
+import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Null;
+import static org.matheclipse.core.expression.F.Pi;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Subtract;
+import static org.matheclipse.core.expression.F.Times;
+
+//import org.matheclipse.core.visit.VisitorExpr;
 
 public class Algebra {
 	static {
@@ -134,42 +135,42 @@ public class Algebra {
 
 	/**
 	 * <h2>Apart</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>Apart(expr)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * rewrites <code>expr</code> as a sum of individual fractions.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * <code>Apart(expr, var)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * treats <code>var</code> as main variable.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Apart((x-1)/(x^2+x))
 	 * 2/(x+1)-1/x
-	 * 
+	 *
 	 * &gt;&gt; Apart(1 / (x^2 + 5x + 6))
-	 * 1/(2+x)+1/(-3-x) 
+	 * 1/(2+x)+1/(-3-x)
 	 * </code>
 	 * </pre>
 	 * <p>
 	 * When several variables are involved, the results can be different depending on the main variable:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Apart(1 / (x^2 - y^2), x)
 	 * -1 / (2 y (x + y)) + 1 / (2 y (x - y))
@@ -180,7 +181,7 @@ public class Algebra {
 	 * <p>
 	 * 'Apart' is 'Listable':
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Apart({1 / (x^2 + 5x + 6)})
 	 * {1/(2+x)+1/(-3-x)}
@@ -189,7 +190,7 @@ public class Algebra {
 	 * <p>
 	 * But it does not touch other expressions:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Sin(1 / (x ^ 2 - y ^ 2)) // Apart
 	 * Sin(1/(x^2-y^2))
@@ -200,7 +201,7 @@ public class Algebra {
 
 		/**
 		 * Return the denominator for the given <code>Power[...]</code> AST, by separating positive and negative powers.
-		 * 
+		 *
 		 * @param powerAST
 		 *            a power expression (a^b)
 		 * @param trig
@@ -306,19 +307,19 @@ public class Algebra {
 
 	/**
 	 * <h2>Cancel</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>Cancel(expr)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * cancels out common factors in numerators and denominators.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Cancel(x / x ^ 2)
 	 * 1/x
@@ -327,11 +328,11 @@ public class Algebra {
 	 * <p>
 	 * 'Cancel' threads over sums:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Cancel(x / x ^ 2 + y / y ^ 2)
 	 * 1/x+1/y
-	 * 
+	 *
 	 * &gt;&gt; Cancel(f(x) / x + x * f(x) / x ^ 2)
 	 * (2*f(x))/x
 	 * </code>
@@ -353,7 +354,7 @@ public class Algebra {
 
 		/**
 		 * Return the result divided by the gcd value.
-		 * 
+		 *
 		 * @param numeratorPlus
 		 *            a <code>Plus[...]</code> expression as the numerator
 		 * @param denominatorInt
@@ -385,7 +386,7 @@ public class Algebra {
 		/**
 		 * Calculate the GCD[] of the integer factors in each element of the <code>numeratorPlus</code> expression with
 		 * the <code>denominatorInt</code>. After that return the result divided by the gcd value, if possible.
-		 * 
+		 *
 		 * @param numeratorPlus
 		 *            a <code>Plus[...]</code> expression as the numerator
 		 * @param denominatorInt
@@ -426,7 +427,7 @@ public class Algebra {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param powerTimesAST
 		 *            an <code>Times[...] or Power[...]</code> AST, where common factors should be canceled out.
 		 * @return <code>F.NIL</code> is no evaluation was possible
@@ -496,7 +497,7 @@ public class Algebra {
 	 * <pre>
 	 * Collect(expr, variable)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * collect subexpressions in <code>expr</code> which belong to the same <code>variable</code>.
@@ -536,7 +537,7 @@ public class Algebra {
 
 		/**
 		 * Collect terms in <code>expr</code> containing the same power expressions of <code>x</code>.
-		 * 
+		 *
 		 * @param expr
 		 * @param x
 		 *            the current variable from the list of variables which should be collected
@@ -708,19 +709,19 @@ public class Algebra {
 
 	/**
 	 * <h2>Denominator</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>Denominator(expr)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives the denominator in <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Denominator(a / b)
 	 * b
@@ -768,7 +769,7 @@ public class Algebra {
 		/**
 		 * Get the &quot;denominator form&quot; of the given function. Example: <code>Csc[x]</code> gives
 		 * <code>Sin[x]</code>.
-		 * 
+		 *
 		 * @param function
 		 *            the function which should be transformed to &quot;denominator form&quot; determine the denominator
 		 *            by splitting up functions like <code>Tan[],Cot[], Csc[],...</code>
@@ -800,64 +801,64 @@ public class Algebra {
 	 * <pre>
 	 * Expand(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * expands out positive rational powers and products of sums in <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Expand((x + y) ^ 3)
 	 * x^3+3*x^2*y+3*x*y^2+y^3
-	 * 
-	 * &gt;&gt; Expand((a + b) (a + c + d))  
-	 * a^2+a*b+a*c+b*c+a*d+b*d 
-	 * 
-	 * &gt;&gt; Expand((a + b) (a + c + d) (e + f) + e a a)  
-	 * 2*a^2*e+a*b*e+a*c*e+b*c*e+a*d*e+b*d*e+a^2*f+a*b*f+a*c*f+b*c*f+a*d*f+b*d*f 
-	 * 
-	 * &gt;&gt; Expand((a + b) ^ 2 * (c + d))  
-	 * a^2*c+2*a*b*c+b^2*c+a^2*d+2*a*b*d+b^2*d 
-	 * 
-	 * &gt;&gt; Expand((x + y) ^ 2 + x y) 
-	 * x^2+3*x*y+y^2  
-	 * 
-	 * &gt;&gt; Expand(((a + b) (c + d)) ^ 2 + b (1 + a))  
+	 *
+	 * &gt;&gt; Expand((a + b) (a + c + d))
+	 * a^2+a*b+a*c+b*c+a*d+b*d
+	 *
+	 * &gt;&gt; Expand((a + b) (a + c + d) (e + f) + e a a)
+	 * 2*a^2*e+a*b*e+a*c*e+b*c*e+a*d*e+b*d*e+a^2*f+a*b*f+a*c*f+b*c*f+a*d*f+b*d*f
+	 *
+	 * &gt;&gt; Expand((a + b) ^ 2 * (c + d))
+	 * a^2*c+2*a*b*c+b^2*c+a^2*d+2*a*b*d+b^2*d
+	 *
+	 * &gt;&gt; Expand((x + y) ^ 2 + x y)
+	 * x^2+3*x*y+y^2
+	 *
+	 * &gt;&gt; Expand(((a + b) (c + d)) ^ 2 + b (1 + a))
 	 * a^2*c^2+2*a*b*c^2+b^2*c^2+2*a^2*c*d+4*a*b*c*d+2*b^2*c*d+a^2*d^2+2*a*b*d^2+b^2*d^2+b(1+a)
 	 * </pre>
 	 * <p>
 	 * <code>Expand</code> expands out rational powers by expanding the <code>Floor()</code> part of the rational powers
 	 * number:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Expand((x + 3)^(5/2)+(x + 1)^(3/2)) Sqrt(1+x)+x*Sqrt(1+x)+9*Sqrt(3+x)+6*x*Sqrt(3+x)+x^2*Sqrt(3+x)
 	 * </pre>
 	 * <p>
 	 * <code>Expand</code> expands items in lists and rules:<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Expand({4 (x + y), 2 (x + y) -&gt; 4 (x + y)})  
+	 * &gt;&gt; Expand({4 (x + y), 2 (x + y) -&gt; 4 (x + y)})
 	 * {4*x+4*y,2*(x+y)-&gt;4*(x+y)}
 	 * </pre>
 	 * <p>
 	 * <code>Expand</code> does not change any other expression.<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Expand(Sin(x*(1 + y)))  
-	 * Sin(x*(1+y)) 
-	 * 
-	 * &gt;&gt; a*(b*(c+d)+e) // Expand  
-	 * a*b*c+a*b*d+a*e 
-	 * 
-	 * &gt;&gt; (y^2)^(1/2)/(2x+2y)//Expand  
-	 * Sqrt(y^2)/(2*x+2*y) 
-	 * 
-	 * &gt;&gt; 2(3+2x)^2/(5+x^2+3x)^3 // Expand  
+	 * &gt;&gt; Expand(Sin(x*(1 + y)))
+	 * Sin(x*(1+y))
+	 *
+	 * &gt;&gt; a*(b*(c+d)+e) // Expand
+	 * a*b*c+a*b*d+a*e
+	 *
+	 * &gt;&gt; (y^2)^(1/2)/(2x+2y)//Expand
+	 * Sqrt(y^2)/(2*x+2*y)
+	 *
+	 * &gt;&gt; 2(3+2x)^2/(5+x^2+3x)^3 // Expand
 	 * 18/(5+3*x+x^2)^3+(24*x)/(5+3*x+x^2)^3+(8*x^2)/(5+3*x+x^2)^3
 	 * </pre>
 	 */
@@ -881,7 +882,7 @@ public class Algebra {
 
 			/**
 			 * Check if the given expression doesn't contain the pattern.
-			 * 
+			 *
 			 * @param expression
 			 * @return
 			 */
@@ -979,7 +980,7 @@ public class Algebra {
 			}
 
 			/**
-			 * 
+			 *
 			 * @param ast
 			 * @return <code>F.NIL</code> if no evaluation is possible
 			 */
@@ -1011,7 +1012,7 @@ public class Algebra {
 			/**
 			 * Expand <code>(a+b)^i</code> with <code>i</code> an integer number in the range Integer.MIN_VALUE to
 			 * Integer.MAX_VALUE.
-			 * 
+			 *
 			 * @param powerAST
 			 * @return
 			 */
@@ -1055,7 +1056,7 @@ public class Algebra {
 			/**
 			 * Expand a polynomial power with the multinomial theorem. See
 			 * <a href= "http://en.wikipedia.org/wiki/Multinomial_theorem">Wikipedia - Multinomial theorem</a>
-			 * 
+			 *
 			 * @param plusAST
 			 * @param n
 			 *            <code>n &ge; 0</code>
@@ -1135,7 +1136,7 @@ public class Algebra {
 
 			/**
 			 * <code>(a+b)*(c+d) -> a*c+a*d+b*c+b*d</code>
-			 * 
+			 *
 			 * @param plusAST0
 			 * @param plusAST1
 			 * @return
@@ -1161,7 +1162,7 @@ public class Algebra {
 
 			/**
 			 * <code>expr*(a+b+c) -> expr*a+expr*b+expr*c</code>
-			 * 
+			 *
 			 * @param expr1
 			 * @param plusAST
 			 * @return
@@ -1183,7 +1184,8 @@ public class Algebra {
 			/**
 			 * Evaluate <code>expr1 * expr2</code> and expand the resulting expression, if it's an <code>IAST</code>.
 			 * After that add the resulting expression to the <code>PlusOp</code>
-			 * 
+			 * @param expr1
+			 * @param expr2
 			 * @param result
 			 */
 			public void evalAndExpandAST(IExpr expr1, IExpr expr2, final IASTAppendable result) {
@@ -1298,19 +1300,19 @@ public class Algebra {
 
 	/**
 	 * <h2>ExpandAll</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>ExpandAll(expr)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * expands out all positive integer powers and products of sums in <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; ExpandAll((a + b) ^ 2 / (c + d)^2)
 	 * (a^2+2*a*b+b^2)/(c^2+2*c*d+d^2)
@@ -1319,16 +1321,16 @@ public class Algebra {
 	 * <p>
 	 * <code>ExpandAll</code> descends into sub expressions
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; ExpandAll((a + Sin(x*(1 + y)))^2)
-	 * a^2+Sin(x+x*y)^2+2*a*Sin(x+x*y) 
+	 * a^2+Sin(x+x*y)^2+2*a*Sin(x+x*y)
 	 * </code>
 	 * </pre>
 	 * <p>
 	 * <code>ExpandAll</code> also expands heads
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; ExpandAll(((1 + x)(1 + y))[x])
 	 * (1+x+y+x*y)[x]
@@ -1363,27 +1365,27 @@ public class Algebra {
 
 	/**
 	 * <h2>Factor</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>Factor(expr)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * factors the polynomial expression <code>expr</code>
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Factor(1+2*x+x^2, x)
 	 * (1+x)^2
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
-	 * <code>``` 
+	 * <code>```
 	 * &gt;&gt; Factor(x^4-1, GaussianIntegers-&gt;True)
 	 * (x-1)*(x+1)*(x-I)*(x+I)
 	 * </code>
@@ -1498,7 +1500,7 @@ public class Algebra {
 
 		/**
 		 * Factor the <code>expr</code> with the option given in <code>ast</code>.
-		 * 
+		 *
 		 * @param ast
 		 * @param expr
 		 * @param varList
@@ -1528,12 +1530,12 @@ public class Algebra {
 
 	/**
 	 * <h2>FactorSquareFree</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>FactorSquareFree(polynomial)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * factor the polynomial expression <code>polynomial</code> square free.
@@ -1575,12 +1577,12 @@ public class Algebra {
 
 	/**
 	 * <h2>FactorSquareFreeList</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>FactorSquareFreeList(polynomial)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * get the square free factors of the polynomial expression <code>polynomial</code>.
@@ -1622,19 +1624,19 @@ public class Algebra {
 
 	/**
 	 * <h2>FactorTerms</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>FactorTerms(poly)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * pulls out any overall numerical factor in <code>poly</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; FactorTerms(3+3/4*x^3+12/17*x^2, x)
 	 * 3/68*(17*x^3+16*x^2+68)
@@ -1722,9 +1724,9 @@ public class Algebra {
 
 	/**
 	 * Try to simplify a given expression
-	 * 
+	 *
 	 * TODO currently FullSimplify simply calls Simplify
-	 * 
+	 *
 	 */
 	private static class FullSimplify extends Simplify {
 
@@ -1738,19 +1740,19 @@ public class Algebra {
 
 	/**
 	 * <h2>Numerator</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>Numerator(expr)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives the numerator in <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Numerator(a / b)
 	 * a
@@ -1798,7 +1800,7 @@ public class Algebra {
 		/**
 		 * Get the &quot;numerator form&quot; of the given function. Example: <code>Csc[x]</code> gives
 		 * <code>Sin[x]</code>.
-		 * 
+		 *
 		 * @param function
 		 *            the function which should be transformed to &quot;denominator form&quot; determine the denominator
 		 *            by splitting up functions like <code>Tan[9,Cot[], Csc[],...</code>
@@ -1826,24 +1828,24 @@ public class Algebra {
 
 	/**
 	 * <h2>PolynomialExtendedGCD</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialExtendedGCD(p, q, x)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the extended GCD ('greatest common divisor') of the univariate polynomials <code>p</code> and
 	 * <code>q</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialExtendedGCD(p, q, x, Modulus -&gt; prime)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the extended GCD ('greatest common divisor') of the univariate polynomials <code>p</code> and
@@ -1859,7 +1861,7 @@ public class Algebra {
 	 * Polynomial extended Euclidean algorithm</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; PolynomialExtendedGCD(x^8 + x^4 + x^3 + x + 1, x^6 + x^4 + x + 1, x, Modulus-&gt;2)
 	 * {1,{1+x^2+x^3+x^4+x^5,x+x^3+x^6+x^7}}
@@ -1952,23 +1954,23 @@ public class Algebra {
 
 	/**
 	 * <h2>PolynomialGCD</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialGCD(p, q)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the GCD ('greatest common divisor') of the polynomials <code>p</code> and <code>q</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialGCD(p, q, Modulus -&gt; prime)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the GCD ('greatest common divisor') of the polynomials <code>p</code> and <code>q</code> modulus the
@@ -2060,23 +2062,23 @@ public class Algebra {
 
 	/**
 	 * <h2>PolynomialLCM</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialLCM(p, q)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialLCM(p, q, Modulus -&gt; prime)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code> modulus the
@@ -2151,24 +2153,24 @@ public class Algebra {
 
 	/**
 	 * <h2>PolynomialQ</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialQ(p, x)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * return <code>True</code> if <code>p</code> is a polynomial for the variable <code>x</code>. Return
 	 * <code>False</code> in all other cases.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialQ(p, {x, y, ...})
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * return <code>True</code> if <code>p</code> is a polynomial for the variables <code>x, y, ...</code> defined in
@@ -2195,48 +2197,7 @@ public class Algebra {
 
 		}
 
-		/**
-		 * 
-		 * @param polnomialExpr
-		 * @param variables
-		 * @param numericFunction
-		 * @return
-		 * @deprecated use
-		 *             <code>ExprPolynomialRing ring = new ExprPolynomialRing(variables); ExprPolynomial poly = ring.create(polnomialExpr);</code>
-		 *             if possible.
-		 */
-		// private static GenPolynomial<IExpr> polynomial(final IExpr polnomialExpr,
-		// final IAST variables,
-		// boolean numericFunction) {
-		// IExpr expr = F.evalExpandAll(polnomialExpr, engine);
-		// int termOrder = ExprTermOrder.INVLEX;
-		// ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST,
-		// variables, variables.argSize(),
-		// new ExprTermOrder(termOrder), true);
-		// try {
-		// ExprPolynomial poly = ring.create(expr);
-		// ASTRange r = new ASTRange(variables, 1);
-		// JASIExpr jas = new JASIExpr(r, numericFunction);
-		// return jas.expr2IExprJAS(poly);
-		// } catch (RuntimeException ex) {
-		//
-		// }
-		// return null;
-		// }
 
-		/**
-		 * @return
-		 * @deprecated use
-		 *             <code>ExprPolynomialRing ring = new ExprPolynomialRing(symbol); ExprPolynomial poly = ring.create(polnomialExpr);</code>
-		 *             if possible
-		 */
-		// private static GenPolynomial<IExpr> polynomial(final IExpr polnomialExpr,
-		// final ISymbol symbol,
-		// boolean numericFunction) {
-		// return polynomial(polnomialExpr, List(symbol), numericFunction);
-		// }
-
-		@Deprecated
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
@@ -2255,24 +2216,24 @@ public class Algebra {
 
 	/**
 	 * <h2>PolynomialQuotient</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialQuotient(p, q, x)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable
 	 * <code>x</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialQuotient(p, q, x, Modulus -&gt; prime)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable
@@ -2312,24 +2273,24 @@ public class Algebra {
 
 	/**
 	 * <h2>PolynomialQuotientRemainder</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialQuotientRemainder(p, q, x)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns a list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code>
 	 * for the variable <code>x</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialQuotientRemainder(p, q, x, Modulus -&gt; prime)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for
@@ -2419,24 +2380,24 @@ public class Algebra {
 
 	/**
 	 * <h2>PolynomialQuotient</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialQuotient(p, q, x)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable
 	 * <code>x</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PolynomialQuotient(p, q, x, Modulus -&gt; prime)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable
@@ -2476,23 +2437,23 @@ public class Algebra {
 
 	/**
 	 * <h2>PowerExpand</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>PowerExpand(expr)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * expands out powers of the form <code>(x^y)^z</code> and <code>(x*y)^z</code> in <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; PowerExpand((a ^ b) ^ c)
 	 * a^(b*c)
-	 * 
+	 *
 	 * &gt;&gt; PowerExpand((a * b) ^ c)
 	 * a^c*b^c
 	 * </code>
@@ -2500,7 +2461,7 @@ public class Algebra {
 	 * <p>
 	 * <code>PowerExpand</code> is not correct without certain assumptions:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; PowerExpand((x ^ 2) ^ (1/2))
 	 * x
@@ -2649,7 +2610,7 @@ public class Algebra {
 
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1</code>.
-		 * 
+		 *
 		 * @param a
 		 *            coefficient a of the polynomial
 		 * @param b
@@ -2667,7 +2628,7 @@ public class Algebra {
 
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1 + c*Slot1^2</code>.
-		 * 
+		 *
 		 * @param a
 		 *            coefficient a of the polynomial
 		 * @param b
@@ -2689,7 +2650,7 @@ public class Algebra {
 
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1 + c*Slot1^2 + d*Slot1^3</code>.
-		 * 
+		 *
 		 * @param a
 		 *            coefficient a of the polynomial
 		 * @param b
@@ -2725,7 +2686,7 @@ public class Algebra {
 
 		/**
 		 * Root of a polynomial <code>a + b*Slot1 + c*Slot1^2 + d*Slot1^3 + e*Slot1^4</code>
-		 * 
+		 *
 		 * @param a
 		 * @param b
 		 * @param c
@@ -2911,17 +2872,17 @@ public class Algebra {
 	 * <pre>
 	 * Simplify(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * simplifies <code>expr</code>
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Simplify(expr, option1, option2, ...)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * simplify <code>expr</code> with some additional options set
@@ -2932,27 +2893,27 @@ public class Algebra {
 	 * <li>ComplexFunction - use this function to determine the &ldquo;weight&rdquo; of an expression.</li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Simplify(1/2*(2*x+2))
 	 * x+1
-	 * 
+	 *
 	 * &gt;&gt; Simplify(2*Sin(x)^2 + 2*Cos(x)^2)
 	 * 2
-	 * 
+	 *
 	 * &gt;&gt; Simplify(x)
 	 * x
-	 * 
+	 *
 	 * &gt;&gt; Simplify(f(x))
 	 * f(x)
-	 * 
+	 *
 	 * &gt;&gt; Simplify(a*x^2+b*x^2)
 	 * (a+b)*x^2
 	 * </pre>
 	 * <p>
 	 * Simplify with an assumption:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Simplify(Sqrt(x^2), Assumptions -&gt; x&gt;0)
 	 * x
@@ -2960,12 +2921,12 @@ public class Algebra {
 	 * <p>
 	 * For <code>Assumptions</code> you can define the assumption directly as second argument:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Simplify(Sqrt(x^2), x&gt;0)
 	 * x
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * ```
 	 * &gt;&gt; Simplify(Abs(x), x&lt;0)
@@ -2974,10 +2935,10 @@ public class Algebra {
 	 * <p>
 	 * With this &ldquo;complexity function&rdquo; the <code>Abs</code> expression gets a &ldquo;heavier weight&rdquo;.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; complexity(x_) := 2*Count(x, _Abs, {0, 10}) + LeafCount(x)
-	 * 
+	 *
 	 * &gt;&gt; Simplify(Abs(x), x&lt;0, ComplexityFunction-&gt;complexity)
 	 * -x
 	 * </pre>
@@ -3315,7 +3276,7 @@ public class Algebra {
 
 		/**
 		 * Creata the complexity function which determines the &quot;more simplified&quot; expression.
-		 * 
+		 *
 		 * @param complexityFunctionHead
 		 * @param engine
 		 * @return
@@ -3348,23 +3309,23 @@ public class Algebra {
 
 	/**
 	 * <h2>Together</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>Together(expr)
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * writes sums of fractions in <code>expr</code> together.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt;&gt; Together(a/b+x/y)
 	 * (a*y+b*x)*b^(-1)*y^(-1)
-	 * 
+	 *
 	 * &gt;&gt; Together(a / c + b / c)
 	 * (a+b)/c
 	 * </code>
@@ -3372,7 +3333,7 @@ public class Algebra {
 	 * <p>
 	 * <code>Together</code> operates on lists:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Together({x / (y+1) + x / (y+1)^2})
 	 * {x (2 + y) / (1 + y) ^ 2}
@@ -3381,7 +3342,7 @@ public class Algebra {
 	 * <p>
 	 * But it does not touch other functions:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Together(f(a / c + b / c))
 	 * f(a/c+b/c)
@@ -3394,7 +3355,7 @@ public class Algebra {
 
 		/**
 		 * Calls <code>Together</code> for each argument of the <code>ast</code>.
-		 * 
+		 *
 		 * @param ast
 		 * @return <code>F.NIL</code> if the <code>ast</code> couldn't be evaluated.
 		 */
@@ -3416,7 +3377,7 @@ public class Algebra {
 
 		/**
 		 * Do a <code>ExpandAll(ast)</code> and call <code>togetherAST</code> afterwards with the result..
-		 * 
+		 *
 		 * @param ast
 		 * @return <code>null</code> couldn't be transformed by <code>ExpandAll(()</code> od <code>togetherAST()</code>
 		 */
@@ -3441,7 +3402,7 @@ public class Algebra {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param plusAST
 		 *            a <code>Plus[...]</code> expresion
 		 * @return <code>null</code> couldn't be transformed by <code>ExpandAll(()</code> od <code>togetherAST()</code>
@@ -3615,26 +3576,26 @@ public class Algebra {
 
 	/**
 	 * <h2>Variables</h2>
-	 * 
+	 *
 	 * <pre>
 	 * <code>Variables[expr]
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives a list of the variables that appear in the polynomial <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * <code>&gt;&gt; Variables(a x^2 + b x + c)
 	 * {a,b,c,x}
-	 * 
+	 *
 	 * &gt;&gt; Variables({a + b x, c y^2 + x/2})
 	 * {a,b,c,x,y}
-	 * 
+	 *
 	 * &gt;&gt; Variables(x + Sin(y))
 	 * {x,Sin(y)}
 	 * </code>
@@ -3665,18 +3626,18 @@ public class Algebra {
 
 	/**
 	 * Calculate the 3 elements result array
-	 * 
+	 *
 	 * <pre>
-	 * [ 
-	 *   commonFactor, 
-	 *   numeratorPolynomial.divide(gcd(numeratorPolynomial, denominatorPolynomial)), 
-	 *   denominatorPolynomial.divide(gcd(numeratorPolynomial, denominatorPolynomial)) 
+	 * [
+	 *   commonFactor,
+	 *   numeratorPolynomial.divide(gcd(numeratorPolynomial, denominatorPolynomial)),
+	 *   denominatorPolynomial.divide(gcd(numeratorPolynomial, denominatorPolynomial))
 	 * ]
 	 * </pre>
-	 * 
+	 *
 	 * for the given expressions <code>numeratorPolynomial</code> and <code>denominatorPolynomial</code>.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param numeratorPolynomial
 	 *            a <code>BigRational</code> polynomial which could be converted to JAS polynomial
 	 * @param denominatorPolynomial
@@ -3739,7 +3700,7 @@ public class Algebra {
 
 	/**
 	 * Expand the given <code>ast</code> expression.
-	 * 
+	 *
 	 * @param ast
 	 * @param patt
 	 * @param distributePlus
@@ -3753,12 +3714,12 @@ public class Algebra {
 
 	/**
 	 * Expand the given <code>ast</code> expression.
-	 * 
+	 *
 	 * @param ast
 	 * @param patt
 	 * @param expandNegativePowers
 	 * @param distributePlus
-	 * 
+	 *
 	 * @return <code>F.NIL</code> if the expression couldn't be expanded.
 	 */
 	public static IExpr expandAll(final IAST ast, final IExpr patt, final boolean expandNegativePowers,
@@ -3849,7 +3810,7 @@ public class Algebra {
 
 	/**
 	 * Factor the <code>expr</code> in the domain of GaussianIntegers.
-	 * 
+	 *
 	 * @param expr
 	 * @param varList
 	 * @param head
@@ -3969,7 +3930,7 @@ public class Algebra {
 	/**
 	 * Split the expression into numerator and denominator parts, by calling the <code>Numerator[]</code> and
 	 * <code>Denominator[]</code> functions
-	 * 
+	 *
 	 * @param ast
 	 * @return an array with the numerator, denominator and the evaluated <code>Together[expr]</code>.
 	 */
@@ -3990,7 +3951,7 @@ public class Algebra {
 	/**
 	 * Return the numerator and denominator for the given <code>Times[...]</code> or <code>Power[a, b]</code> AST, by
 	 * separating positive and negative powers.
-	 * 
+	 *
 	 * @param timesPower
 	 *            a Times[] or Power[] expression (a*b*c....) or a^b
 	 * @param splitNumeratorOne
@@ -4116,7 +4077,7 @@ public class Algebra {
 
 	/**
 	 * Split the expression into numerator and denominator parts, by separating positive and negative powers.
-	 * 
+	 *
 	 * @param arg
 	 * @param trig
 	 *            determine the denominator by splitting up functions like <code>Tan[],Cot[], Csc[],...</code>
@@ -4217,7 +4178,7 @@ public class Algebra {
 	/**
 	 * Returns an AST with head <code>Plus</code>, which contains the partial fraction decomposition of the numerator
 	 * and denominator parts.
-	 * 
+	 *
 	 * @param pf
 	 *            partial fraction generator
 	 * @param parts
@@ -4282,7 +4243,7 @@ public class Algebra {
 
 	/**
 	 * Split the expression into numerator and denominator parts, by separating positive and negative powers.
-	 * 
+	 *
 	 * @param arg
 	 * @return the numerator and denominator expression
 	 */
