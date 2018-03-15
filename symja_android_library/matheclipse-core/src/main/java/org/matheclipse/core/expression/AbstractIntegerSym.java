@@ -183,10 +183,9 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 	}
 
 	/**
-	 * Returns the IInteger for the specified character sequence stated in the
-	 * specified radix. The characters must all be digits of the specified radix,
-	 * except the first character which may be a plus sign <code>'+'</code> or a
-	 * minus sign <code>'-'</code> .
+	 * Returns the IInteger for the specified character sequence stated in the specified radix. The characters must all
+	 * be digits of the specified radix, except the first character which may be a plus sign <code>'+'</code> or a minus
+	 * sign <code>'-'</code> .
 	 *
 	 * @param integerString
 	 *            the character sequence to parse.
@@ -194,10 +193,64 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 	 *            the radix to be used while parsing.
 	 * @return the corresponding large integer.
 	 * @throws NumberFormatException
-	 *             if the specified character sequence does not contain a parsable
-	 *             large integer.
+	 *             if the specified character sequence does not contain a parsable large integer.
 	 */
 	public static IInteger valueOf(final String integerString, final int radix) {
+		if (integerString.length() >= 1) {
+			char ch = integerString.charAt(0);
+			if (ch == '-') {
+				if (integerString.length() == 2) {
+					ch = integerString.charAt(1);
+					switch (ch) {
+					case '0':
+						return F.C0;
+					case '1':
+						return F.CN1;
+					case '2':
+						return F.CN2;
+					case '3':
+						return F.CN3;
+					case '4':
+						return F.CN4;
+					case '5':
+						return F.CN5;
+					case '6':
+						return F.CN6;
+					case '7':
+						return F.CN7;
+					case '8':
+						return F.CN8;
+					case '9':
+						return F.CN9;
+					}
+				}
+			} else {
+				if (integerString.length() == 1) {
+					switch (ch) {
+					case '0':
+						return F.C0;
+					case '1':
+						return F.C1;
+					case '2':
+						return F.C2;
+					case '3':
+						return F.C3;
+					case '4':
+						return F.C4;
+					case '5':
+						return F.C5;
+					case '6':
+						return F.C6;
+					case '7':
+						return F.C7;
+					case '8':
+						return F.C8;
+					case '9':
+						return F.C9;
+					}
+				}
+			}
+		}
 		try {
 			int value = Integer.parseInt(integerString, radix);
 			return new IntegerSym(value);
@@ -289,8 +342,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 	 * IntegerSym extended greatest common divisor.
 	 *
 	 * @param that
-	 *            if that is of type IntegerSym calculate the extended GCD otherwise
-	 *            call <code>super#egcd(IExpr)</code>
+	 *            if that is of type IntegerSym calculate the extended GCD otherwise call <code>super#egcd(IExpr)</code>
 	 *
 	 * @return [ gcd(this,S), a, b ] with a*this + b*S = gcd(this,S).
 	 */
@@ -498,7 +550,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 
 	@Override
 	public ISymbol head() {
-		return F.IntegerHead;
+		return F.Integer;
 	}
 
 	@Override
@@ -537,8 +589,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 	}
 
 	/**
-	 * See: <a href="http://en.wikipedia.org/wiki/Jacobi_symbol">Wikipedia - Jacobi
-	 * symbol</a><br/>
+	 * See: <a href="http://en.wikipedia.org/wiki/Jacobi_symbol">Wikipedia - Jacobi symbol</a><br/>
 	 * Book: Algorithmen Arbeitsbuch - D.Herrmann page 160
 	 *
 	 * @param b
@@ -593,8 +644,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 	}
 
 	/**
-	 * Returns the least common multiple of this large integer and the one
-	 * specified.
+	 * Returns the least common multiple of this large integer and the one specified.
 	 *
 	 */
 	@Override
@@ -635,9 +685,8 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 	public abstract IInteger negate();
 
 	/**
-	 * Split this integer into the nth-root (with prime factors less equal 1021) and
-	 * the &quot;rest-factor&quot;, so that
-	 * <code>this== (nth-root ^ n) + rest</code>
+	 * Split this integer into the nth-root (with prime factors less equal 1021) and the &quot;rest-factor&quot;, so
+	 * that <code>this== (nth-root ^ n) + rest</code>
 	 *
 	 * @return <code>{nth-root, rest}</code>
 	 */
@@ -761,7 +810,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 		}
 
 		IAST ast = phi.factorInteger();
-		IInteger d[] = new IInteger[ast.size() - 1];
+		IInteger d[] = new IInteger[ast.argSize()];
 		for (int i = 1; i < ast.size(); i++) {
 			IAST element = (IAST) ast.get(i);
 			IInteger q = (IInteger) element.arg1();
@@ -835,7 +884,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 		if (that instanceof ComplexSym) {
 			return ((ComplexSym) that).multiply(ComplexSym.valueOf(this)).normalize();
 		}
-		return super.times(that);
+		return IInteger.super.times(that);
 	}
 
 	@Override

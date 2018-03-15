@@ -1,6 +1,7 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lang.DDouble;
+import com.google.common.math.DoubleMath;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
@@ -20,6 +21,7 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * <code>INum</code> implementation which wraps a <code>double</code> value to represent a numeric floating-point
@@ -280,15 +282,15 @@ public class Num extends INumImpl implements INum {
 
 	/** {@inheritDoc} */
 	@Override
+	public ISignedNumber fractionalPart() {
+		return F.num(getRealPart() % 1);
+	}
+	/** {@inheritDoc} */
+	@Override
 	public IInteger floorFraction() {
 		return F.integer(NumberUtil.toLong(Math.floor(fDouble)));
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public ISignedNumber fractionalPart() {
-		return F.num(getRealPart() % 1);
-	}
 	
 	/** {@inheritDoc} */
 	@Override
@@ -328,7 +330,7 @@ public class Num extends INumImpl implements INum {
 
 	@Override
 	public ISymbol head() {
-		return F.RealHead;
+		return F.Real;
 	}
 
 	@Override
@@ -576,7 +578,8 @@ public class Num extends INumImpl implements INum {
 
 	@Override
 	public IInteger round() {
-		return F.integer(NumberUtil.toLong(Math.rint(fDouble)));
+		return F.integer(DoubleMath.roundToBigInteger(fDouble, RoundingMode.HALF_EVEN));
+		// return F.integer(NumberUtil.toLong(Math.rint(fDouble)));
 	}
 
 	@Override
@@ -584,13 +587,19 @@ public class Num extends INumImpl implements INum {
 		return (int) Math.signum(fDouble);
 	}
  
+	/**
+	 * @return
+	 */
+	// public double sqrt() {
+	// return Math.sqrt(fDouble);
+	// }
 	public IExpr sqrt() {
 		return valueOf(Math.sqrt(fDouble));
 	}
 
 	@Override
 	public ISignedNumber subtractFrom(ISignedNumber that) {
-		return Num.valueOf(doubleValue() - that.doubleValue());
+		return valueOf(doubleValue() - that.doubleValue());
 	}
 
 	/**

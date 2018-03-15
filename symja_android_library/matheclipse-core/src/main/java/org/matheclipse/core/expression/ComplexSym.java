@@ -311,10 +311,6 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		return (cTemp == this) ? F.NIL : cTemp;
 	}
 
-	@Override
-	public INumber floorFraction() {
-		return valueOf((IRational) fReal.floorFraction(), (IRational) fImaginary.floorFraction());
-	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -322,6 +318,10 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		return valueOf(fReal.fractionalPart(), fImaginary.fractionalPart());
 	}
 	 
+	@Override
+	public INumber floorFraction() {
+		return valueOf((IRational) fReal.floorFraction(), (IRational) fImaginary.floorFraction());
+	}
 	@Override
 	public String fullFormString() {
 		StringBuilder buf = new StringBuilder("Complex");

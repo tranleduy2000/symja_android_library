@@ -1,13 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.Ceiling;
-import static org.matheclipse.core.expression.F.Floor;
-import static org.matheclipse.core.expression.F.FractionalPart;
-import static org.matheclipse.core.expression.F.IntegerPart;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Round;
-
-import java.math.BigInteger;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
@@ -26,6 +18,15 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.math.BigInteger;
+
+import static org.matheclipse.core.expression.F.Ceiling;
+import static org.matheclipse.core.expression.F.Floor;
+import static org.matheclipse.core.expression.F.FractionalPart;
+import static org.matheclipse.core.expression.F.IntegerPart;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Round;
 
 public class IntegerFunctions {
 	static {
@@ -640,10 +641,6 @@ public class IntegerFunctions {
 					return signedNumberIntegerPart(signedNumber);
 				}
 				if (arg1.isIntegerResult()) {
-					return arg1;
-				}
-				if (arg1.isInfinity() || arg1.isNegativeInfinity() || arg1.isDirectedInfinity(F.CI)
-						|| arg1.isDirectedInfinity(F.CNI) || arg1.isAST(F.IntegerPart, 2)) {
 					return arg1;
 				}
 				IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);

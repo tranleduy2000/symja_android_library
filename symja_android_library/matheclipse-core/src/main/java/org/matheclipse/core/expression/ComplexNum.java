@@ -339,17 +339,17 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 		return this;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public INumber fractionalPart() {
+		return F.complexNum(getRealPart() % 1, getImaginaryPart() % 1);
+	}
 	@Override
 	public INumber floorFraction() throws ArithmeticException {
 		return F.complex(NumberUtil.toLong(Math.floor(fComplex.getReal())),
 				NumberUtil.toLong(Math.floor(fComplex.getImaginary())));
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public INumber fractionalPart() {
-		return F.complexNum(getRealPart() % 1, getImaginaryPart() % 1);
-	}
 	
 	public Complex getCMComplex() {
 		return new Complex(fComplex.getReal(), fComplex.getImaginary());
@@ -384,6 +384,9 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 		return F.num(getRealPart());
 	}
 
+	public IExpr sqrt() {
+		return valueOf(fComplex.sqrt());
+	}
 	@Override
 	public double getReal() {
 		return fComplex.getReal();
@@ -562,9 +565,6 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 	}
 
 
-	public IExpr sqrt() {
-		return valueOf(fComplex.sqrt());
-	}
 	
 	/**
 	 * @param that

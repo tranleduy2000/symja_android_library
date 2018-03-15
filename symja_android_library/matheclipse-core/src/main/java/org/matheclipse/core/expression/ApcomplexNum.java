@@ -377,9 +377,6 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 		return valueOf(ApcomplexMath.inverseRoot(fApcomplex, 1));
 	}
 
-	public IExpr sqrt() {
-		return valueOf(ApcomplexMath.sqrt(fApcomplex));
-	}
 	
 	/**
 	 * @param that
@@ -513,16 +510,13 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 		return F.num(getRealPart());
 	}
 
+	public IExpr sqrt() {
+		return valueOf(ApcomplexMath.sqrt(fApcomplex));
+	}
 	@Override
 	public INumber ceilFraction() throws ArithmeticException {
 		return F.complex(F.integer(ApfloatMath.ceil(fApcomplex.real()).toBigInteger()),
 				F.integer(ApfloatMath.ceil(fApcomplex.imag()).toBigInteger()));
-	}
-
-	@Override
-	public INumber floorFraction() throws ArithmeticException {
-		return F.complex(F.integer(ApfloatMath.floor(fApcomplex.real()).toBigInteger()),
-				F.integer(ApfloatMath.floor(fApcomplex.imag()).toBigInteger()));
 	}
 
 	/** {@inheritDoc} */
@@ -530,6 +524,12 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 	public INumber fractionalPart() {
 		return F.complexNum(fApcomplex.real().frac(), fApcomplex.imag().frac());
 	}
+	@Override
+	public INumber floorFraction() throws ArithmeticException {
+		return F.complex(F.integer(ApfloatMath.floor(fApcomplex.real()).toBigInteger()),
+				F.integer(ApfloatMath.floor(fApcomplex.imag()).toBigInteger()));
+	}
+
 	
 	@Override
 	public long precision() throws ApfloatRuntimeException {
