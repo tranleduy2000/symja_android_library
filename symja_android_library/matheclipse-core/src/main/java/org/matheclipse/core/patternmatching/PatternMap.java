@@ -24,7 +24,7 @@ import org.matheclipse.core.interfaces.ISymbol;
  * A map from a pattern to a possibly found value during pattern-matching.
  * 
  */
-public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
+public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 	private final static IExpr[] EMPTY_ARRAY = {};
 	
 	/**
@@ -112,11 +112,11 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 	protected PatternMap clone() {
 		PatternMap result = new PatternMap(null);
 		// avoid Arrays.copyOf because of Android version
-		result.fPatternValuesArray = new IExpr[fPatternValuesArray.length];
-		System.arraycopy(fPatternValuesArray, 0, result.fPatternValuesArray, 0, fPatternValuesArray.length);
+		final int length = fPatternValuesArray.length;
+		result.fPatternValuesArray = new IExpr[length];
+		System.arraycopy(fPatternValuesArray, 0, result.fPatternValuesArray, 0, length);
 
-		// don't clone the fSymbolsArray which is final after the
-		// #determinepatterns() method
+		// don't clone the fSymbolsArray which is final after the #determinepatterns() method
 		result.fPriority = fPriority;
 		result.fSymbolsArray = fSymbolsArray;
 		result.fPatternCounter = fPatternCounter;
@@ -131,8 +131,9 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 	 * @see PatternMap#resetPattern(IExpr[])
 	 */
 	protected IExpr[] copyPattern() {
-		IExpr[] patternValuesArray = new IExpr[fPatternValuesArray.length];
-		System.arraycopy(fPatternValuesArray, 0, patternValuesArray, 0, fPatternValuesArray.length);
+		final int length = fPatternValuesArray.length;
+		IExpr[] patternValuesArray = new IExpr[length];
+		System.arraycopy(fPatternValuesArray, 0, patternValuesArray, 0, length);
 		return patternValuesArray;
 	}
 
@@ -186,51 +187,41 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 	 * @param lhsPatternExpr
 	 *            the (left-hand-side) expression which could contain pattern objects.
 	 * @param treeLevel
-	 *            TODO
+	 *            the level of the tree where the patterns are determined
 	 */
 	private int determinePatternsRecursive(Map<IExpr, Integer> patternIndexMap, final IAST lhsPatternExpr,
 			int treeLevel) {
-		final IAST ast = lhsPatternExpr;
 		if (lhsPatternExpr.isAlternatives() || lhsPatternExpr.isExcept()) {
 			fRuleWithoutPattern = false;
 		}
-		int listEvalFlags = IAST.NO_FLAG;
-		for (int i = 0; i < ast.size(); i++) {
-			IExpr temp = ast.get(i);
-			if (temp.isAST()) {
-				listEvalFlags |= determinePatternsRecursive(patternIndexMap, (IAST) temp, treeLevel + 1);
+		int[] listEvalFlags = new int[] { IAST.NO_FLAG };
+		lhsPatternExpr.forEach(x -> {
+			if (x.isAST()) {
+				listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, (IAST) x, treeLevel + 1);
 				fPriority -= 11;
-			} else if (temp instanceof IPatternObject) {
-				int[] result = ((IPatternObject) temp).addPattern(this, patternIndexMap);
-				listEvalFlags |= result[0];
+			} else if (x instanceof IPatternObject) {
+				int[] result = ((IPatternObject) x).addPattern(this, patternIndexMap);
+				listEvalFlags[0] |= result[0];
 				fPriority -= result[1];
 			} else {
 				fPriority -= (50 - treeLevel);
 			}
-		}
-		ast.setEvalFlags(listEvalFlags);
+		}, 0);
+		lhsPatternExpr.setEvalFlags(listEvalFlags[0]);
 		// disable flag "pattern with default value"
 		// listEvalFlags &= IAST.CONTAINS_NO_DEFAULT_PATTERN_MASK;
-		return listEvalFlags;
+		return listEvalFlags[0];
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public int get(IExpr patternOrSymbol) {
-		int length = fSymbolsArray.length;
-		if (patternOrSymbol.isSymbol()) {
+		final int length = fSymbolsArray.length;
 			for (int i = 0; i < length; i++) {
 				if (patternOrSymbol == fSymbolsArray[i]) {
 					return i;
 				}
 			}
-		} else {
-			for (int i = 0; i < length; i++) {
-				if (patternOrSymbol == fSymbolsArray[i]) {
-					return i;
-				}
-			}
-		}
 		return -1;
 	}
 
@@ -285,12 +276,13 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 	}
 
 	protected List<IExpr> getValuesAsList() {
-		List<IExpr> args = new ArrayList<IExpr>(fPatternValuesArray.length);
-		IExpr arg;
-		for (int i = 0; i < fPatternValuesArray.length; i++) {
-			arg = fPatternValuesArray[i];
-			if (arg == null)
+		final int length = fPatternValuesArray.length;
+		List<IExpr> args = new ArrayList<IExpr>(length);
+		for (int i = 0; i < length; i++) {
+			IExpr arg = fPatternValuesArray[i];
+			if (arg == null) {
 				return null;
+			}
 			args.add(arg);
 		}
 		return args;
@@ -311,7 +303,8 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 	protected boolean isAllPatternsAssigned() {
 		if (fPatternValuesArray != null) {
 			// all patterns have values assigned?
-			for (int i = 0; i < fPatternValuesArray.length; i++) {
+			final int length = fPatternValuesArray.length;
+			for (int i = 0; i < length; i++) {
 				if (fPatternValuesArray[i] == null) {
 					return false;
 				}
@@ -352,13 +345,10 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 		}
 		IASTMutable test = (IASTMutable) F.unaryAST1(patternTest, null);
 		if (temp.isSequence()) {
-			for (int i = 1; i < ((IAST) temp).size(); i++) {
-				test.set(1, ((IAST) temp).get(i));
-				if (!engine.evalTrue(test)) {
-					return false;
-				}
-			}
-			return true;
+			return ((IAST) temp).forAll((x, i) -> {
+				test.set(1, x);
+				return engine.evalTrue(test);
+			}, 1);
 		}
 		test.set(1, temp);
 		if (!engine.evalTrue(test)) {
@@ -367,7 +357,7 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 		return true;
 	}
 
-	public boolean setValue(IPatternObject pattern, IExpr expr) {
+	public void setValue(IPatternObject pattern, IExpr expr) {
 		ISymbol sym = pattern.getSymbol();
 		IExpr temp = pattern;
 		if (sym != null) {
@@ -376,12 +366,12 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 		int indx = get(temp);
 		if (indx >= 0) {
 			fPatternValuesArray[indx] = expr;
-			return true;
+			return;
 		}
 		throw new IllegalStateException("Pattern:" + pattern + " is not available");
 	}
 
-	public boolean setValue(IPatternSequence pattern, IAST sequence) {
+	public void setValue(IPatternSequence pattern, IAST sequence) {
 		ISymbol sym = pattern.getSymbol();
 		IExpr temp = pattern;
 		if (sym != null) {
@@ -390,7 +380,7 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 		int indx = get(temp);
 		if (indx >= 0) {
 			fPatternValuesArray[indx] = sequence;
-			return true;
+			return;
 		}
 		throw new IllegalStateException("Patternsequence:" + pattern + " is not available");
 	}
@@ -412,20 +402,19 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 	 */
 	protected IExpr substitutePatternOrSymbols(final IExpr lhsPatternExpr) {
 		if (fPatternValuesArray != null) {
-			IExpr result = lhsPatternExpr.replaceAll(new Function<IExpr, IExpr>() {
-                                                         @Override
-                                                         public IExpr apply(IExpr input) {
+			IExpr result = lhsPatternExpr.replaceAll((IExpr input) -> {
                                                              if (input instanceof IPatternObject) {
                                                                  IPatternObject patternObject = (IPatternObject) input;
                                                                  ISymbol sym = patternObject.getSymbol();
+					final int length = fSymbolsArray.length;
                                                                  if (sym != null) {
-                                                                     for (int i = 0; i < fSymbolsArray.length; i++) {
+						for (int i = 0; i < length; i++) {
                                                                          if (sym == fSymbolsArray[i]) {
                                                                              return fPatternValuesArray[i] != null ? fPatternValuesArray[i] : F.NIL;
                                                                          }
                                                                      }
                                                                  } else {
-                                                                     for (int i = 0; i < fSymbolsArray.length; i++) {
+						for (int i = 0; i < length; i++) {
                                                                          if (patternObject == fSymbolsArray[i]) {
                                                                              return fPatternValuesArray[i] != null ? fPatternValuesArray[i] : F.NIL;
                                                                          }
@@ -434,7 +423,6 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
                                                              }
                                                              return F.NIL;
                                                          }
-                                                     }
 
 			);
 
@@ -456,26 +444,20 @@ public class PatternMap implements ISymbol2IntMap, Cloneable, Serializable {
 	 */
 	protected IExpr substituteSymbols(final IExpr rhsExpr) {
 		if (fPatternValuesArray != null) {
-			IExpr result = rhsExpr.replaceAll(new Function<IExpr, IExpr>() {
-												  @Override
-												  public IExpr apply(IExpr input) {
-													  if (input instanceof ISymbol) {
-														  ISymbol sym = (ISymbol) input;
-														  for (int i = 0; i < fSymbolsArray.length; i++) {
-															  if (sym == fSymbolsArray[i]) {
+			return rhsExpr.replaceAll((IExpr input) -> {
+				if (input.isSymbol()) {
+					final ISymbol symbol = (ISymbol) input;
+					final int length = fSymbolsArray.length;
+					for (int i = 0; i < length; i++) {
+						if (symbol == fSymbolsArray[i]) {
 																  return fPatternValuesArray[i] != null ? fPatternValuesArray[i] : F.NIL;
 															  }
 														  }
 													  }
 													  return F.NIL;
 												  }
-											  }
 
-			);
-
-			if (result.isPresent()) {
-				return result;
-			}
+			).orElse(rhsExpr);
 		}
 		return rhsExpr;
 	}
