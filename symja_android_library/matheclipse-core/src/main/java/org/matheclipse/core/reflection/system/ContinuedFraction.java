@@ -59,11 +59,13 @@ public class ContinuedFraction extends AbstractEvaluator {
 		}
 
 		if (arg1 instanceof INum) {
-			arg1 = F.fraction(((INum) arg1).getRealPart());
+			// arg1 = F.fraction(((INum) arg1).getRealPart());
+			return realToCF(((INum) arg1), maxIterations);
 		} else if (arg1.isAST() || arg1.isSymbol() && arg1.isNumericFunction()) {
 			IExpr num = engine.evalN(arg1);
 			if (num instanceof INum) {
-				arg1 = F.fraction(((INum) num).getRealPart());
+				// arg1 = F.fraction(((INum) num).getRealPart());
+				return realToCF(((INum) num), maxIterations);
 			}
 		}
 
@@ -100,6 +102,33 @@ public class ContinuedFraction extends AbstractEvaluator {
 		return F.NIL;
 	}
 
+	private static IAST realToCF(INum d, int limit) {
+		final double D = d.getRealPart();
+		IASTAppendable continuedFractionList = F.ListAlloc(10);
+		int ip = (int) D;
+		if (d.isNumIntValue()) {
+			continuedFractionList.append(F.ZZ((int) D));
+			return continuedFractionList;
+		}
+
+		int aNow = ip;
+		double tNow = D - aNow;
+		double tNext;
+		int aNext;
+		continuedFractionList.append(F.ZZ(aNow));
+		for (int i = 0; i < limit-1; i++) {
+			double rec = 1.0 / tNow;
+			aNext = (int) rec;
+			tNext = rec - aNext;
+			if (aNext==Integer.MAX_VALUE)  {
+				break;
+			}
+			continuedFractionList.append(F.ZZ(aNext));
+			tNow = tNext;
+		}
+		return continuedFractionList;
+
+	}
 	@Override
 	public void setUp(ISymbol newSymbol) {
 		newSymbol.setAttributes(ISymbol.NHOLDREST);
