@@ -1,5 +1,7 @@
 package org.matheclipse.core.polynomials;
 
+import com.duy.lambda.Consumer;
+
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -10,7 +12,6 @@ import org.matheclipse.core.interfaces.ISymbol;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeMap;
-import com.duy.lambda.Consumer;
 
 /**
  * Generate the horner scheme for univariate polynomials
@@ -122,7 +123,7 @@ public class HornerScheme {
 		if (value.isAST(F.Plus, 2)) {
 			coefficient = value.arg1();
 			if (coefficient.isAST(F.Times, 2)) {
-				coefficient = ((IAST) coefficient).arg1();
+				coefficient = coefficient.first();
 			}
 		} else {
 			coefficient = value;

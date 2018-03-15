@@ -3,7 +3,6 @@ package org.matheclipse.core.patternmatching.hash;
 import org.matheclipse.core.builtin.ExpTrigsFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 
@@ -13,7 +12,7 @@ public class HashedPatternRulesLog extends HashedPatternRules {
 	}
 
 	public HashedPatternRulesLog(IExpr lhsPattern1, IExpr lhsPattern2, IExpr rhsResult, IExpr condition,
-			boolean defaultHashCode) {
+								 boolean defaultHashCode) {
 		super(lhsPattern1, lhsPattern2, rhsResult, condition, defaultHashCode);
 	}
 
@@ -22,8 +21,8 @@ public class HashedPatternRulesLog extends HashedPatternRules {
 		if (num1.isOne() && num2.isMinusOne()) {
 			IExpr temp = getRulesData().evalDownRule(F.List(e1, e2), engine);
 			if (temp.isPresent()) {
-				IExpr i1=((IAST)e1).arg1();
-				IExpr i2=((IAST)e2).arg1();
+				IExpr i1 = e1.first();
+				IExpr i2 = e2.first();
 				if (i1.isInteger() && i2.isInteger()) {
 					return ExpTrigsFunctions.baseBLog((IInteger) i2, (IInteger) i1);
 				}

@@ -1,32 +1,20 @@
 package org.matheclipse.core.expression;
 
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.Sqrt;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
-import java.util.stream.Stream;
+import com.google.common.cache.Cache;
 
 import org.hipparchus.complex.Complex;
 import org.hipparchus.linear.Array2DRowRealMatrix;
 import org.hipparchus.linear.ArrayRealVector;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
-import org.matheclipse.core.builtin.Structure.LeafCount;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.Structure.LeafCount;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -61,8 +49,27 @@ import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
-public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable {
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.Sqrt;
+
+public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable {
+	/**
+	 * The enumeration map which possibly maps the properties (keys) to a user defined object.
+	 *
+	 */
+	private static Cache<IAST, EnumMap<PROPERTY, Object>> IAST_CACHE = null;
 	protected static final class ASTIterator implements ListIterator<IExpr> {
 
 		private int _currentIndex;
@@ -261,7 +268,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			} else {
 				text.append(ast.get(i).internalJavaString(symbolsAsFactoryMethod, depth + 1, useOperators, usePrefix));
 			}
-			if (i < ast.size() - 1) {
+			if (i < ast.argSize()) {
 				text.append(sep);
 			}
 		}
@@ -589,7 +596,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 		int j = from1;
 
-		for (int i = from0; i < size() - 1; i++) {
+		for (int i = from0; i < argSize(); i++) {
 			if (!get(i + 1).equals(f1.get(1 + j++))) {
 				return false;
 			}
@@ -780,7 +787,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	 */
 	public IExpr foldRight(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start) {
 		IExpr value = startValue;
-		int end = size() - 1;
+		int end = argSize();
 		for (int i = end; i >= start; i--) {
 			value = function.apply(value, get(i));
 		}
@@ -955,7 +962,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 				text.append("<null-arg>");
 			} else {
 				text.append(get(i).fullFormString());
-				if (i < size() - 1) {
+				if (i < argSize()) {
 					text.append(sep);
 				}
 			}
@@ -1250,7 +1257,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 				text.append(prefix + "$(");
 				for (int i = 0; i < size(); i++) {
 					text.append(get(i).internalJavaString(symbolsAsFactoryMethod, depth + 1, useOperators, usePrefix));
-					if (i < size() - 1) {
+					if (i < argSize()) {
 						text.append(sep);
 					}
 				}
@@ -1261,7 +1268,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			text.append(prefix + "$(");
 			for (int i = 0; i < size(); i++) {
 				text.append(get(i).internalJavaString(symbolsAsFactoryMethod, depth + 1, useOperators, usePrefix));
-				if (i < size() - 1) {
+				if (i < argSize()) {
 					text.append(sep);
 				}
 			}
@@ -1323,7 +1330,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			}
 			for (int i = 1; i < size(); i++) {
 				text.append(get(i).internalJavaString(symbolsAsFactoryMethod, depth + 1, useOperators, usePrefix));
-				if (i < size() - 1) {
+				if (i < argSize()) {
 					text.append(sep);
 					if (depth == 0 && isList()) {
 						text.append('\n');
@@ -1871,23 +1878,23 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public int[] isMatrix(boolean setMatrixFormat) {
 		if (isEvalFlagOn(IAST.IS_MATRIX)) {
 			final int[] dim = new int[2];
-			dim[0] = size() - 1;
-			dim[1] = ((IAST) arg1()).size() - 1;
+			dim[0] = argSize();
+			dim[1] = ((IAST) first()).argSize();
 			return dim;
 		}
 		if (isList()) {
 			final int[] dim = new int[2];
-			dim[0] = size() - 1;
+			dim[0] = argSize();
 			if (dim[0] > 0) {
 				dim[1] = 0;
 				if (arg1().isList()) {
-					dim[1] = ((IAST) arg1()).size() - 1;
+					dim[1] = ((IAST) arg1()).argSize();
 					for (int i = 2; i < size(); i++) {
 						if (!get(i).isList()) {
 							// this row is not a list
 							return null;
 						}
-						if (dim[1] != ((IAST) get(i)).size() - 1) {
+						if (dim[1] != ((IAST) get(i)).argSize()) {
 							// this row has another dimension
 							return null;
 						}
@@ -2142,12 +2149,12 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public boolean isRealMatrix() {
 		if (isList()) {
 			final int[] dim = new int[2];
-			dim[0] = size() - 1;
+			dim[0] = argSize();
 			if (dim[0] > 0) {
 				dim[1] = 0;
 				if (arg1().isList()) {
 					IAST row = (IAST) arg1();
-					dim[1] = row.size() - 1;
+					dim[1] = row.argSize();
 					boolean containsNum = false;
 					for (int j = 1; j < row.size(); j++) {
 						if (row.get(j).isSignedNumber()) {
@@ -2169,7 +2176,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 							return false;
 						}
 						row = (IAST) get(i);
-						if (dim[1] != row.size() - 1) {
+						if (dim[1] != row.argSize()) {
 							// this row has another dimension
 							return false;
 						}
@@ -2450,10 +2457,10 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	@Override
 	public int isVector() {
 		if (isEvalFlagOn(IAST.IS_VECTOR)) {
-			return size() - 1;
+			return argSize();
 		}
 		if (isList()) {
-			final int dim = size() - 1;
+			final int dim = argSize();
 			if (dim > 0) {
 				if (arg1().isList()) {
 					return -1;
@@ -2496,7 +2503,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	/** {@inheritDoc} */
 	@Override
 	public final IExpr last() {
-		return get(size() - 1);
+		return get(argSize());
 	}
 
 	@Override
@@ -2784,7 +2791,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	 * @return
 	 */
 	public IASTAppendable reverse(IASTAppendable list) {
-		for (int i = size() - 1; i >= 1; i--) {
+		for (int i = argSize(); i >= 1; i--) {
 			list.append(get(i));
 		}
 		return list;
@@ -2942,7 +2949,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	/** {@inheritDoc} */
 	@Override
 	public double[] toDoubleVector() {
-		double[] result = new double[size() - 1];
+		double[] result = new double[argSize()];
 		ISignedNumber signedNumber;
 		for (int i = 1; i < size(); i++) {
 			signedNumber = get(i).evalSignedNumber();
@@ -2975,7 +2982,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		for (int i = 1; i < size(); i++) {
 			final IExpr o = get(i);
 			text = text.append(o == this ? "(this AST)" : o.toString());
-			if (i < size() - 1) {
+			if (i < argSize()) {
 				text.append(sep);
 			}
 		}
@@ -3005,7 +3012,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		// * "DoubleComplex", "Double", "Integer", "Fraction", "Complex"
 		if (header.isSignedNumber()) {
 			if (header instanceof INum) {
-				return F.RealHead;
+				return F.Real;
 			}
 			if (header instanceof IInteger) {
 				return F.IntegerHead;
@@ -3070,7 +3077,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 				buf.append('{');
 				for (int i = 1; i < size(); i++) {
 					buf.append(get(i) == this ? "(this AST)" : String.valueOf(get(i)));
-					if (i < size() - 1) {
+					if (i < argSize()) {
 						buf.append(", ");
 					}
 				}
@@ -3108,7 +3115,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	@Override
 	public IExpr upper() {
 		if (isInterval1()) {
-			return ((IAST) arg1()).arg2();
+			return first().second();
 		}
 		return F.NIL;
 	}

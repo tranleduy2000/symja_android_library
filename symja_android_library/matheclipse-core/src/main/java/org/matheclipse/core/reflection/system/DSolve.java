@@ -1,5 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.Consumer;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
@@ -13,8 +15,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
-
-import com.duy.lambda.Consumer;
 
 /**
  * <pre>
@@ -94,7 +94,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 							IExpr res = F.subst(temp, F.List(F.Rule(xVar, boundaryCondition[0])));
 							IExpr C1 = engine.evaluate(F.Roots(F.Equal(res, boundaryCondition[1]), C_1));
 							if (C1.isAST(F.Equal, 3, C_1)) {
-								res = F.subst(temp, F.List(F.Rule(C_1, ((IAST) C1).arg2())));
+								res = F.subst(temp, F.List(F.Rule(C_1, C1.second())));
 								return F.List(F.List(F.Rule(uFunction1Arg, res)));
 							}
 						}
@@ -206,7 +206,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 			while (j < eq.size()) {
 				// TODO check for negative expression (i.e. Times[-1, eq.get(j)]
 				if (eq.get(j).isAST(head, uFunction1Arg.size())) {
-					uArg1 = ((IAST) eq.get(j)).arg1();
+					uArg1 = eq.get(j).first();
 					eq.remove(j);
 					continue;
 				}

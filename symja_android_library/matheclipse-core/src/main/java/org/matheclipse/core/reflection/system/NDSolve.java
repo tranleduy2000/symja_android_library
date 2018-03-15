@@ -17,8 +17,8 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 
 /**
- * See: <a href="https://en.wikipedia.org/wiki/Ordinary_differential_equation">
- * Wikipedia:Ordinary differential equation</a>
+ * See: <a href="https://en.wikipedia.org/wiki/Ordinary_differential_equation"> Wikipedia:Ordinary differential
+ * equation</a>
  * 
  */
 public class NDSolve extends AbstractFunctionEvaluator {
@@ -77,7 +77,7 @@ public class NDSolve extends AbstractFunctionEvaluator {
 		if (ast.arg3().isAST(F.List, 4)) {
 			try {
 				IAST uFunctionSymbols = Validate.checkSymbolOrSymbolList(ast, 2);
-				int dimension = uFunctionSymbols.size() - 1;
+				int dimension = uFunctionSymbols.argSize();
 				IAST xVarList = (IAST) ast.arg3();
 				ISymbol xVar = (ISymbol) xVarList.arg1();
 				IExpr xMinExpr = xVarList.arg2();
@@ -151,8 +151,7 @@ public class NDSolve extends AbstractFunctionEvaluator {
 	}
 
 	/**
-	 * Equation <code>-1+y(0)</code> gives <code>[0, 1]</code> (representing the
-	 * boundary equation y(0)==1)
+	 * Equation <code>-1+y(0)</code> gives <code>[0, 1]</code> (representing the boundary equation y(0)==1)
 	 * 
 	 * @param equation
 	 *            the equation
@@ -178,12 +177,12 @@ public class NDSolve extends AbstractFunctionEvaluator {
 				IExpr temp = eq.get(j);
 				for (int i = 1; i < uFunctionSymbols.size(); i++) {
 					negate = true;
-					if (temp.isAST2() && temp.getAt(1).isMinusOne()) {
-						temp = temp.getAt(2);
+					if (temp.isAST2() && temp.first().isMinusOne()) {
+						temp = temp.second();
 						negate = false;
 					}
 					if (temp.isAST(uFunctionSymbols.get(i))) {
-						uArg1 = ((IAST) temp).arg1();
+						uArg1 = temp.first();
 						if (boundaryCondition[0][i - 1] != null) {
 							return false;
 						}
@@ -221,8 +220,8 @@ public class NDSolve extends AbstractFunctionEvaluator {
 			while (j < eq.size()) {
 				negate = true;  
 				IExpr temp=eq.get(j);
-				if (temp.isAST2() && temp.getAt(1).isMinusOne()) {
-					temp = temp.getAt(2);
+				if (temp.isAST2() && temp.first().isMinusOne()) {
+					temp = temp.second();
 					negate = false;
 				}
 				IAST[] deriveExpr = temp.isDerivativeAST1();

@@ -234,14 +234,14 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     public IExpr arg5();
 
     /**
-	 * Returns the <b>number of arguments</b> in this {@code IAST}. The <b>number of arguments</b> equals
-	 * <code>size() - 1</code> (i.e. the <b>number of elements</b> minus 1)
-	 * 
-	 * @return the number of arguments in this {@code IAST}.
-	 * @see #size()
-	 */
-	public int argSize();
-	
+     * Returns the <b>number of arguments</b> in this {@code IAST}. The <b>number of arguments</b> equals
+     * <code>size() - 1</code> (i.e. the <b>number of elements</b> minus 1)
+     *
+     * @return the number of arguments in this {@code IAST}.
+     * @see #size()
+     */
+    public int argSize();
+
     /**
      * Collect all arguments of this AST in a new set.
      *
@@ -400,7 +400,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return the <code>true</code> if the predicate is true the first time or <code>false</code> otherwise
      */
     public boolean exists(Predicate<? super IExpr> predicate);
-    
+
     /**
      * Compare the arguments pairwise with the <code>stopPredicate</code>. If the predicate gives <code>true</code>
      * return <code>true</code>. If the <code>stopPredicate</code> gives false for each pairwise comparison return the
@@ -993,9 +993,12 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     public IASTMutable setAtCopy(int i, IExpr expr);
 
     /**
-     * Returns the number of elements in this {@code IAST}.
+     * Returns the <b>number of elements</b> in this {@code IAST}.The <b>number of elements</b> equals
+     * <code>argSize() + 1</code> (i.e. the <b>number of arguments</b> plus 1). If this is an atom return size
+     * <code>0</code>.
      *
-     * @return the number of elements in this {@code IAST}.
+     * @return the <b>number of elements</b> in this {@code IAST}.
+     * @see #argSize()
      */
     public int size();
 

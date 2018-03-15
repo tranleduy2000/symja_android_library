@@ -31,11 +31,10 @@ import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
- *
  * (I)nterface for a mathematical (Expr)ession<br />
- *
+ * <p>
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
- *
+ * <p>
  * <pre>
  * java.lang.Object
  *    |--- java.util.AbstractCollection
@@ -192,12 +191,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
 
     /**
-	 * Get the first element of this <code>Power(base, exponent)</code> expression.
-	 * 
-	 * @return  
-	 */
+     * Get the first element of this <code>Power(base, exponent)</code> expression.
+     *
+     * @return
+     */
     public IExpr base();
-    
+
     /**
      * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
      * integer as this expression is canonical less than, equal to, or greater than the specified expression.
@@ -247,21 +246,19 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     @Override
     IExpr divide(IExpr that);
 
-    
+
     IExpr[] egcd(IExpr b);
 
     /**
-	 * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>. Returns
-	 * <code>false</code> otherwise.
-	 * 
-	 * @param position
-	 *            the position in the <code>IAST</code> which should be tested for equality
-	 * @param expr
-	 *            the expression which should be tested for equality
-	 * @return
-	 */
+     * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>. Returns
+     * <code>false</code> otherwise.
+     *
+     * @param position the position in the <code>IAST</code> which should be tested for equality
+     * @param expr     the expression which should be tested for equality
+     * @return
+     */
     public boolean equalsAt(int position, final IExpr expr);
-    
+
     /**
      * Compare if <code>this == that</code:
      * <ul>
@@ -316,33 +313,33 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr evaluateHead(IAST ast, EvalEngine engine);
 
     /**
-	 * Get the second element of this <code>Power(base, exponent)</code> expression.
-	 * 
-	 * @return  
-	 */
+     * Get the second element of this <code>Power(base, exponent)</code> expression.
+     *
+     * @return
+     */
     public IExpr exponent();
-    
+
     @Override
     ElemFactory<IExpr> factory();
 
     /**
-	 * Get the first element of this <code>AST</code> list (i.e. get(1)). Return <code>F.NIL</code> if this object isn't
-	 * an <code>AST</code>.
-	 * 
-	 * @return the second argument of the function represented by this <code>AST</code> or <code>F.NIL</code> if this
-	 *         object isn't an AST.
-	 */
+     * Get the first element of this <code>AST</code> list (i.e. get(1)). Return <code>F.NIL</code> if this object isn't
+     * an <code>AST</code>.
+     *
+     * @return the second argument of the function represented by this <code>AST</code> or <code>F.NIL</code> if this
+     * object isn't an AST.
+     */
     public IExpr first();
-    
+
     /**
-	 * Get the last element of the <code>AST</code> list (i.e. get(size()-1). Return <code>F.NIL</code> if this object
-	 * isn't an <code>AST</code>.
-	 * 
-	 * @return the last argument of the function represented by this <code>AST</code>.
-	 * @see IExpr#head()
-	 */
+     * Get the last element of the <code>AST</code> list (i.e. get(size()-1). Return <code>F.NIL</code> if this object
+     * isn't an <code>AST</code>.
+     *
+     * @return the last argument of the function represented by this <code>AST</code>.
+     * @see IExpr#head()
+     */
     public IExpr last();
-	
+
     /**
      * Return the <code>FullForm()</code> of this expression
      *
@@ -350,7 +347,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     String fullFormString();
 
-   
+
     IExpr gcd(IExpr that);
 
     /**
@@ -431,16 +428,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     void ifPresent(Consumer<? super IExpr> consumer);
 
     /**
-	 * If a value is present, performs the given <code>consumer</code> with the value, otherwise performs the given
-	 * empty-based action.
-	 * 
-	 * @param consumer
-	 *            the action to be performed, if a value is present
-	 * @param emptyAction
-	 *            the empty-based action to be performed, if no value is present
-	 */
-	void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction);
-	
+     * If a value is present, performs the given <code>consumer</code> with the value, otherwise performs the given
+     * empty-based action.
+     *
+     * @param consumer    the action to be performed, if a value is present
+     * @param emptyAction the empty-based action to be performed, if no value is present
+     */
+    void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction);
+
     /**
      * Return the imaginary part of this expression if possible. Otherwise return <code>Im(this)</code>.
      *
@@ -2053,7 +2048,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     @Override
     public IExpr reciprocal() throws MathRuntimeException;
 
-   
+
     IExpr remainder(IExpr that);
 
     /**
@@ -2133,23 +2128,23 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr replaceSlots(final IAST slotsList);
 
     /**
-	 * Get the rest of the elements of this <code>AST</code> list. Return <code>F.NIL</code> if this object isn't an
-	 * <code>AST</code>.
-	 * 
-	 * @return the rest arguments of the function represented by this <code>AST</code> with the first argument removed.
-	 * @see IExpr#head()
-	 */
-	public IASTAppendable rest();
-	
-	/**
-	 * Get the second element of this <code>AST</code> list (i.e. get(2)). Return <code>F.NIL</code> if this object
-	 * isn't an <code>AST</code>.
-	 * 
-	 * @return the second argument of the function represented by this <code>AST</code> or <code>F.NIL</code> if this
-	 *         object isn't an AST.
-	 */
-	public IExpr second();
-	
+     * Get the rest of the elements of this <code>AST</code> list. Return <code>F.NIL</code> if this object isn't an
+     * <code>AST</code>.
+     *
+     * @return the rest arguments of the function represented by this <code>AST</code> with the first argument removed.
+     * @see IExpr#head()
+     */
+    public IASTAppendable rest();
+
+    /**
+     * Get the second element of this <code>AST</code> list (i.e. get(2)). Return <code>F.NIL</code> if this object
+     * isn't an <code>AST</code>.
+     *
+     * @return the second argument of the function represented by this <code>AST</code> or <code>F.NIL</code> if this
+     * object isn't an AST.
+     */
+    public IExpr second();
+
     /**
      * Signum functionality is used in JAS toString() method, don't use it as math signum function.
      *
@@ -2160,11 +2155,20 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     int signum();
 
     /**
-	 * Generate <code>Sqrt(this)</code>.
-	 * 
-	 */
-	IExpr sqrt();
-	
+     * Returns the <b>number of elements</b> in this {@code IAST}.The <b>number of elements</b> equals
+     * <code>argSize() + 1</code> (i.e. the <b>number of arguments</b> plus 1). If this is an atom return size
+     * <code>0</code>.
+     *
+     * @return the <b>number of elements</b> in this {@code IAST}.
+     * @see #argSize()
+     */
+    int size();
+
+    /**
+     * Generate <code>Sqrt(this)</code>.
+     */
+    IExpr sqrt();
+
     @Override
     IExpr subtract(IExpr that);
 
