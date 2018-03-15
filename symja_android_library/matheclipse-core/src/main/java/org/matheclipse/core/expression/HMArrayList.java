@@ -440,7 +440,7 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 
 	@Override
 	public int argSize() {
-		return size() - 1;
+		return argSize();
 	}
 	
 	@Override

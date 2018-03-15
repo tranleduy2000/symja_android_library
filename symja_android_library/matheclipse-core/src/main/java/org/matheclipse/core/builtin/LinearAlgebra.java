@@ -1528,7 +1528,7 @@ public final class LinearAlgebra {
 				ArrayList<Integer> list2Dimensions = dimensions(list2, list2.head(), Integer.MAX_VALUE);
 				list2Dim0 = list2Dimensions.get(0);
 				return recursion(new ArrayList<Integer>(), new ArrayList<Integer>(),
-						list1Dimensions.subList(0, list1Dimensions.size() - 1),
+						list1Dimensions.subList(0, list1Dimensions.argSize()),
 						list2Dimensions.subList(1, list2Dimensions.size()));
 			}
 
@@ -3063,7 +3063,7 @@ public final class LinearAlgebra {
 
 			if (ast.arg1().isAST()) {
 				final IAST vector = (IAST) ast.arg1();
-				int m = vector.size() - 1;
+				int m = vector.argSize();
 				return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
 					@Override
 					public IExpr apply(Integer i, Integer j) {

@@ -230,7 +230,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 		buf.append("\n");
 		for (int i = 0; i < list.size(); i++) {
 			off.convert(buf, list.get(i));
-			if (i < list.size() - 1) {
+			if (i < list.argSize()) {
 				buf.append("\n");
 				off.setColumnCounter(0);
 			}

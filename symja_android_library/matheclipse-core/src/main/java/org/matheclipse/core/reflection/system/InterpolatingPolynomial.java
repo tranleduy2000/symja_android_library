@@ -95,7 +95,7 @@ public class InterpolatingPolynomial extends AbstractEvaluator {
 			final IAST list = (IAST) ast.arg1();
 			final ISymbol x = (ISymbol) ast.arg2();
 			if (list.size() > 1) {
-				int n = list.size() - 1;
+				int n = list.argSize();
 				IExpr[] xv = new IExpr[n];
 				IExpr[] yv = new IExpr[n];
 				int[] dim = list.isMatrix();

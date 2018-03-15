@@ -1336,7 +1336,7 @@ public final class NumberTheory {
 			try {
 
 				// BigInteger factor = BigInteger.ONE;
-				final BigInteger[] subBezouts = new BigInteger[ast.size() - 1];
+				final BigInteger[] subBezouts = new BigInteger[ast.argSize()];
 				final BigInteger gcd = extendedGCD(ast, subBezouts);
 				// convert the Bezout numbers to sublists
 				IASTAppendable subList = F.ListAlloc(subBezouts.length);

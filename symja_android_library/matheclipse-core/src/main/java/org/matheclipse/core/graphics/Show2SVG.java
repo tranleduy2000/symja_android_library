@@ -150,7 +150,7 @@ public class Show2SVG {
 		if (ast.arg1().isList()) {
 			IAST pointList = (IAST) ast.arg1();
 			double x[], y[];
-			int numberOfPoints = pointList.size() - 1;
+			int numberOfPoints = pointList.argSize();
 
 			double xMin = Double.MAX_VALUE;
 			double xMax = Double.MIN_VALUE;
@@ -188,7 +188,7 @@ public class Show2SVG {
 				buf.append("<polyline points=\"");
 				IAST pointList = (IAST) ast.arg1();
 				double x[], y[];
-				int numberOfPoints = pointList.size() - 1;
+				int numberOfPoints = pointList.argSize();
 
 				int width = dim.width;
 				int height = dim.height;

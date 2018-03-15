@@ -883,7 +883,7 @@ public class StatisticsFunctions {
 					return F.Times(F.CN1, num1.setAtClone(i, F.Times(factor, arg1.get(i))), F.Conjugate(arg2.get(i)));
 				}
 			});
-			return F.Divide(v1, F.integer((arg1.size() - 1) * (arg1.size() - 2)));
+			return F.Divide(v1, F.integer((arg1.argSize()) * (arg1.size() - 2)));
 		}
 
 		@Override

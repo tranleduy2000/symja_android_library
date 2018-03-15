@@ -451,7 +451,7 @@ public final class ExpVectorLong {
 		StringBuilder s = new StringBuilder();
 		boolean pit;
 		int r = length();
-		if (r != vars.size() - 1) {
+		if (r != vars.argSize()) {
 			// logger.warn("length mismatch " + r + " <> " + vars.length);
 			return toString();
 		}
@@ -504,7 +504,7 @@ public final class ExpVectorLong {
             @Override
             public void accept(IExpr x, int i) {
                 s.append(x);
-                if (i < vars.size() - 1) {
+                if (i < vars.argSize()) {
                     s.append(",");
                 }
             }
@@ -531,7 +531,7 @@ public final class ExpVectorLong {
 	public String toScript(IAST vars) {
 		// Python case
 		int r = length();
-		if (r != vars.size() - 1) {
+		if (r != vars.argSize()) {
 			return toString();
 		}
 		StringBuilder s = new StringBuilder();

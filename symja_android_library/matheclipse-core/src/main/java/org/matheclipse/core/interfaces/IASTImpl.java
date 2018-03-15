@@ -40,7 +40,7 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
 
     @Override
     public int argSize() {
-        return size() - 1;
+        return argSize();
     }
 
     /**

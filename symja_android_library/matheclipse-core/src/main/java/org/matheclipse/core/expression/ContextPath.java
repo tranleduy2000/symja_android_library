@@ -87,14 +87,14 @@ public class ContextPath {
 		}
 		Context context;
 		ISymbol symbol;
-		for (int i = path.size() - 1; i >= 0; i--) {
+		for (int i = path.argSize(); i >= 0; i--) {
 			context = path.get(i);
 			symbol = context.get(name);
 			if (symbol != null) {
 				return symbol;
 			}
 		}
-		context = path.get(path.size() - 1);
+		context = path.get(path.argSize());
 
 		// EvalEngine engine = EvalEngine.get();
 		// if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
@@ -141,7 +141,7 @@ public class ContextPath {
 		}
 		Context context;
 		ISymbol symbol;
-		for (int i = path.size() - 1; i >= 0; i--) {
+		for (int i = path.argSize(); i >= 0; i--) {
 			context = path.get(i);
 			if (context.equals(Context.SYSTEM)) {
 				// don't remove predefined symbols

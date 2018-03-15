@@ -235,7 +235,7 @@ final public class FunctionNode extends ASTNode implements java.util.List<ASTNod
 		for (int i = 1; i < size(); i++) {
 			temp = get(i);
 			buf.append(temp == this ? "(this ListNode)" : String.valueOf(temp));
-			if (i < size() - 1) {
+			if (i < argSize()) {
 				buf.append(", ");
 			}
 		}

@@ -259,7 +259,7 @@ public final class PatternMatching {
 								contextPath.add(engine.getContextPath().getContext(ast.arg1().toString()));
 								i = addContextToPath(contextPath, node, i, engine, F.End);
 							} finally {
-								contextPath.remove(contextPath.size() - 1);
+								contextPath.remove(contextPath.argSize());
 							}
 							continue;
 						}

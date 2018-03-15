@@ -1124,7 +1124,7 @@ public final class ListFunctions {
 						if (!x.isList()) {
 							return true;
 						}
-						size[0] += list.size() - 1;
+						size[0] += list.argSize();
 						return false;
 					}
 				}, 1)) {

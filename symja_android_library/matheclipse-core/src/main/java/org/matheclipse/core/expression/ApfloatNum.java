@@ -412,7 +412,7 @@ public class ApfloatNum extends INumImpl implements INum {
 
 	@Override
 	public IInteger round() {
-		Apfloat f = ApfloatMath.round(fApfloat, 1, RoundingMode.HALF_UP);
+		Apfloat f = ApfloatMath.round(fApfloat, 1, RoundingMode.HALF_EVEN);
 		return F.integer(ApfloatMath.floor(f).toBigInteger());
 	}
 
@@ -445,15 +445,15 @@ public class ApfloatNum extends INumImpl implements INum {
 
 	/** {@inheritDoc} */
 	@Override
-	public IInteger floorFraction() {
-		return F.integer(ApfloatMath.floor(fApfloat).toBigInteger());
-	}
-	
-	/** {@inheritDoc} */
-	@Override
 	public ISignedNumber fractionalPart() {
 		return F.num(fApfloat.frac());
 	}
+	/** {@inheritDoc} */
+	@Override
+	public IInteger floorFraction() {
+		return F.integer(ApfloatMath.floor(fApfloat).toBigInteger());
+	}
+
 
 	/**
 	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
@@ -488,7 +488,7 @@ public class ApfloatNum extends INumImpl implements INum {
 
 	@Override
 	public ISymbol head() {
-		return F.RealHead;
+		return F.Real;
 	}
 
 	/**
