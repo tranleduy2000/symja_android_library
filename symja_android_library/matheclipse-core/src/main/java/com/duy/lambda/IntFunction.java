@@ -1,5 +1,6 @@
 package com.duy.lambda;
 
+@FunctionalInterface
 public interface IntFunction<R> {
 
     /**

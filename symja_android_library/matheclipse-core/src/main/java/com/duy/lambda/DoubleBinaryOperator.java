@@ -1,5 +1,5 @@
 package com.duy.lambda;
-
+@FunctionalInterface
 public interface DoubleBinaryOperator {
     /**
      * Applies this operator to the given operands.

@@ -1,5 +1,5 @@
 package com.duy.lambda;
-
+@FunctionalInterface
 public interface BiFunction<T, U, R> {
 
     /**
