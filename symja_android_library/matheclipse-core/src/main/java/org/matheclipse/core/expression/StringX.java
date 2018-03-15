@@ -24,66 +24,6 @@ public class StringX extends IStringXImpl implements IStringX {
      */
     private static final long serialVersionUID = -68464824682534930L;
 
-    // protected static final XmlFormat<StringImpl> SYMBOL_XML = new
-    // XmlFormat<StringImpl>(StringImpl.class) {
-    // @Override
-    // public void format(StringImpl obj, XmlElement xml) {
-    // StringImpl expr = obj;
-    // xml.setAttribute("name", expr.fString);
-    // }
-    //
-    // @Override
-    // public StringImpl parse(XmlElement xml) {
-    // StringImpl expr = (StringImpl) xml.object();
-    // expr.fString = xml.getAttribute("name", "");
-    // return expr;
-    // }
-    // };
-
-    // private static final ObjectFactory<StringX> FACTORY = new
-    // ObjectFactory<StringX>() {
-    // @Override
-    // protected StringX create() {
-    // if (Config.SERVER_MODE && currentQueue().getSize() >=
-    // Config.STRING_MAX_POOL_SIZE) {
-    // throw new PoolMemoryExceededException("StringX",
-    // currentQueue().getSize());
-    // }
-    // return new StringX(null);
-    // }
-    // };
-    private String fString;
-
-    private StringX(final String str) {
-        fString = str;
-    }
-
-    /**
-     * Be cautious with this method, no new internal String object is created
-     *
-     * @param value
-     * @return
-     */
-    protected static StringX newInstance(final String value) {
-        // IntegerImpl z = new IntegerImpl();
-        StringX d;
-        // if (Config.SERVER_MODE) {
-        // if (Config.STRING_MAX_SIZE < value.length()) {
-        // throw new ObjectMemoryExceededException("StringX", value.length());
-        // }
-        // d = FACTORY.object();
-        // } else {
-        d = new StringX(null);
-        // }
-        d.fString = value;
-        return d;
-    }
-
-    public static StringX newInstance(final byte[] bytes, Charset charset) {
-        StringX d = new StringX(null);
-        d.fString = new String(bytes, charset);
-        return d;
-    }
 
     /**
      * @param data
@@ -103,6 +43,24 @@ public class StringX extends IStringXImpl implements IStringX {
         return newInstance(String.copyValueOf(data, offset, count));
     }
 
+	public static StringX newInstance(final byte[] bytes, Charset charset) {
+		StringX d = new StringX(null);
+		d.fString = new String(bytes, charset);
+		return d;
+	}
+
+	/**
+	 * Be cautious with this method, no new internal String object is created
+	 *
+	 * @param value
+	 * @return
+	 */
+	protected static StringX newInstance(final String value) {
+		StringX d;
+		d = new StringX(null);
+		d.fString = value;
+		return d;
+	}
     /**
      * @param b
      * @return
@@ -181,6 +139,45 @@ public class StringX extends IStringXImpl implements IStringX {
         return newInstance(builder.toString());
     }
 
+	private String fString;
+
+	private StringX(final String str) {
+		fString = str;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public <T> T accept(IVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
+
+	// public int compareTo(Object o) {
+	// return fString.compareTo(((StringImpl) o).fString);
+	// }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean accept(IVisitorBoolean visitor) {
+		return visitor.visit(this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int accept(IVisitorInt visitor) {
+		return visitor.visit(this);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long accept(IVisitorLong visitor) {
+		return visitor.visit(this);
+	}
     /**
      * @param index
      * @return
@@ -189,9 +186,6 @@ public class StringX extends IStringXImpl implements IStringX {
         return fString.charAt(index);
     }
 
-    // public int compareTo(Object o) {
-    // return fString.compareTo(((StringImpl) o).fString);
-    // }
 
     /**
      * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
@@ -202,7 +196,7 @@ public class StringX extends IStringXImpl implements IStringX {
         if (expr instanceof StringX) {
             return fString.compareTo(((StringX) expr).fString);
         }
-        return super.compareTo(expr);
+		return super.compareTo(expr);
     }
 
     /**
@@ -275,9 +269,7 @@ public class StringX extends IStringXImpl implements IStringX {
         return fString.equalsIgnoreCase(anotherString);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public String fullFormString() {
         return "\"" + fString + "\"";
@@ -315,6 +307,10 @@ public class StringX extends IStringXImpl implements IStringX {
         return 37 * fString.hashCode();
     }
 
+	@Override
+	public ISymbol head() {
+		return F.String;
+	}
     @Override
     public int hierarchy() {
         return STRINGID;
@@ -373,9 +369,7 @@ public class StringX extends IStringXImpl implements IStringX {
         return "\"" + fString + "\"";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators, boolean usePrefix) {
         final StringBuilder buffer = new StringBuilder();
@@ -518,14 +512,10 @@ public class StringX extends IStringXImpl implements IStringX {
         return fString.toLowerCase(locale);
     }
 
-	/*
-     * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-    // public String toString() {
-    // return fString.toString();
-    // }
+	@Override
+	public String toString() {
+		return fString;
+	}
 
     /**
      * @return
@@ -549,70 +539,4 @@ public class StringX extends IStringXImpl implements IStringX {
         return fString.trim();
     }
 
-    // @Override
-    // public boolean move(final ObjectSpace os) {
-    // return super.move(os);
-    // }
-    // public StringX copy() {
-    // StringX r = FACTORY.object();
-    // r.fString = fString;
-    // return r;
-    // }
-    //
-    // public StringX copyNew() {
-    // StringX r = new StringX(null);
-    // r.fString = fString;
-    // return r;
-    // }
-    //
-    // public void recycle() {
-    // FACTORY.recycle(this);
-    // }
-
-    // public Text toText() {
-    // final TextBuilder tb = TextBuilder.newInstance();
-    // tb.append(fString);
-    // return tb.toText();
-    // }
-    @Override
-    public ISymbol head() {
-        return F.StringHead;
-    }
-
-    @Override
-    public String toString() {
-        return fString;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> T accept(IVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean accept(IVisitorBoolean visitor) {
-        return visitor.visit(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int accept(IVisitorInt visitor) {
-        return visitor.visit(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long accept(IVisitorLong visitor) {
-        return visitor.visit(this);
-    }
 }

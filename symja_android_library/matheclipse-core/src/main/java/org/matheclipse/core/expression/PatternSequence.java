@@ -157,7 +157,8 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 		if (value != null) {
 			return sequence.equals(value);
 		}
-		return patternMap.setValue(this, sequence);
+		patternMap.setValue(this, sequence);
+		return  true;
 	}
 
 	@Override
@@ -349,7 +350,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 
 	@Override
 	public ISymbol head() {
-		return F.PatternHead;
+		return F.Pattern;
 	}
 
 	@Override

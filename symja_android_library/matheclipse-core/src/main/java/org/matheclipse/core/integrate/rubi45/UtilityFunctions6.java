@@ -1,10 +1,65 @@
 package org.matheclipse.core.integrate.rubi45;
 
 
-import static org.matheclipse.core.expression.F.*;
-import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.*;
-
 import org.matheclipse.core.interfaces.IAST;
+
+import static org.matheclipse.core.expression.F.*;
+import static org.matheclipse.core.expression.F.Integer;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.BinomialQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.CalculusQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.CancelCommonFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.DerivativeDivides;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.Dist;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.Divides;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.EasyDQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.F;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FixInertTrigFunction;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FixIntRule;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FixRhsIntRule;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FreeFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FreeTerms;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.G;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.H;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.InertReciprocalQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.InertTrigSumQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.Int;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.IntSum;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.IntTerm;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.KnownCotangentIntegrandQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.KnownSecantIntegrandQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.KnownSineIntegrandQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.KnownTangentIntegrandQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.KnownTrigIntegrandQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.LinearQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NegQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NegativeOrZeroQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NegativeQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonfreeFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonfreeTerms;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonnumericFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonzeroQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NumericFactor;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PiecewiseLinearQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PosQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PositiveQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PowerQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.ProductOfLinearPowersQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.ProductQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RationalFunctionExponents;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RationalFunctionQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RationalQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RemoveContent;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.Rt;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RtAux;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.Simp;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SimplerIntegrandQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SimplerQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SimplerSqrtQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SumQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SumSimplerAuxQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SumSimplerQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.TogetherSimplify;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.ZeroQ;
 /** 
  * UtilityFunctions rules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
  * rule-based integrator</a>.
@@ -50,7 +105,7 @@ ISetDelayed(EasyDQ(u_,x_Symbol),
     If(Or(Or(AtomQ(u),FreeQ(u,x)),Equal(Length(u),C0)),True,If(CalculusQ(u),False,If(Equal(Length(u),C1),EasyDQ(Part(u,C1),x),If(Or(BinomialQ(u,x),ProductOfLinearPowersQ(u,x)),True,If(And(RationalFunctionQ(u,x),SameQ(RationalFunctionExponents(u,x),List(C1,C1))),True,If(ProductQ(u),If(FreeQ(First(u),x),EasyDQ(Rest(u),x),If(FreeQ(Rest(u),x),EasyDQ(First(u),x),False)),If(SumQ(u),And(EasyDQ(First(u),x),EasyDQ(Rest(u),x)),If(Equal(Length(u),C2),If(FreeQ(Part(u,C1),x),EasyDQ(Part(u,C2),x),If(FreeQ(Part(u,C2),x),EasyDQ(Part(u,C1),x),False)),False))))))))),
 ISetDelayed(ProductOfLinearPowersQ(u_,x_Symbol),
     Or(Or(FreeQ(u,x),MatchQ(u,Condition(Power(v_,n_DEFAULT),And(LinearQ(v,x),FreeQ(n,x))))),And(And(ProductQ(u),ProductOfLinearPowersQ(First(u),x)),ProductOfLinearPowersQ(Rest(u),x)))),
-ISetDelayed(Rt(u_,$p(n, IntegerHead)),
+ISetDelayed(Rt(u_,$p(n, Integer)),
     RtAux(TogetherSimplify(u),n)),
 ISetDelayed(RtAux(Complex(a_,b_),n_),
     Condition(Power(RtAux(Plus(Times(a,Power(Plus(Sqr(a),Sqr(b)),-1)),Times(CN1,b,Power(Plus(Sqr(a),Sqr(b)),-1),CI)),n),-1),And(And(And(RationalQ(a,b),Or(Not(IntegerQ(a)),Not(IntegerQ(b)))),IntegerQ(Times(a,Power(Plus(Sqr(a),Sqr(b)),-1)))),IntegerQ(Times(b,Power(Plus(Sqr(a),Sqr(b)),-1)))))),

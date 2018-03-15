@@ -1,40 +1,20 @@
 package org.matheclipse.core.integrate.rubi45;
 
-import static org.matheclipse.core.expression.F.$;
-import static org.matheclipse.core.expression.F.$s;
-import static org.matheclipse.core.expression.F.And;
-import static org.matheclipse.core.expression.F.C3;
-import static org.matheclipse.core.expression.F.Catch;
-import static org.matheclipse.core.expression.F.CompoundExpression;
-import static org.matheclipse.core.expression.F.False;
-import static org.matheclipse.core.expression.F.Function;
-import static org.matheclipse.core.expression.F.If;
-import static org.matheclipse.core.expression.F.Integrate;
-import static org.matheclipse.core.expression.F.ListQ;
-import static org.matheclipse.core.expression.F.Not;
-import static org.matheclipse.core.expression.F.Part;
-import static org.matheclipse.core.expression.F.SameQ;
-import static org.matheclipse.core.expression.F.Scan;
-import static org.matheclipse.core.expression.F.Slot1;
-import static org.matheclipse.core.expression.F.Throw;
-import static org.matheclipse.core.expression.F.True;
-import static org.matheclipse.core.expression.F.ast;
-import static org.matheclipse.core.expression.F.binaryAST2;
-import static org.matheclipse.core.expression.F.initFinalHiddenSymbol;
-import static org.matheclipse.core.expression.F.n;
-import static org.matheclipse.core.expression.F.quaternary;
-import static org.matheclipse.core.expression.F.quinary;
-import static org.matheclipse.core.expression.F.senary;
-import static org.matheclipse.core.expression.F.ternaryAST3;
-import static org.matheclipse.core.expression.F.u;
-import static org.matheclipse.core.expression.F.unaryAST1;
-import static org.matheclipse.core.expression.F.x;
-import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.BinomialQ;
-
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import static org.matheclipse.core.expression.F.$s;
+import static org.matheclipse.core.expression.F.Integrate;
+import static org.matheclipse.core.expression.F.ast;
+import static org.matheclipse.core.expression.F.binaryAST2;
+import static org.matheclipse.core.expression.F.initFinalHiddenSymbol;
+import static org.matheclipse.core.expression.F.quaternary;
+import static org.matheclipse.core.expression.F.quinary;
+import static org.matheclipse.core.expression.F.senary;
+import static org.matheclipse.core.expression.F.ternaryAST3;
+import static org.matheclipse.core.expression.F.unaryAST1;
 
 /**
  * UtilityFunction constructors from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
@@ -44,7 +24,7 @@ import org.matheclipse.core.interfaces.ISymbol;
  */
 public class UtilityFunctionCtors {
 
-	public final static String INTEGRATE_PREFIX = "integrate::";
+	public final static String INTEGRATE_PREFIX = "Integrate::";
 	public static ISymbol INTEGRATE_TRIG_SIMPLIFY = null;
 	public static ISymbol INTEGRATE_SMARTLEAFCOUNT = null;
 	public static ISymbol INTEGRATE_SMARTNUMERATOR = null;
@@ -70,11 +50,11 @@ public class UtilityFunctionCtors {
 	public final static ISymbol Y = initFinalHiddenSymbol("Y");
 	public final static ISymbol Z = initFinalHiddenSymbol("Z");
 
-	public static ISymbol AbortRubi = org.matheclipse.core.expression.F.initFinalSymbol(INTEGRATE_PREFIX + "AbortRubi",
-			new AbortRubi());
+	public static ISymbol AbortRubi = org.matheclipse.core.expression.F
+			.initFinalHiddenSymbol(INTEGRATE_PREFIX + "AbortRubi");
 
 	public static IAST AbortRubi(final IExpr a0) {
-		return unaryAST1(AbortRubi, a0);
+		return F.headAST0(F.Abort);
 	}
 
 	public static IAST F(final IExpr a0) {

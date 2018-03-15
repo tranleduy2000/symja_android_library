@@ -1,10 +1,94 @@
 package org.matheclipse.core.integrate.rubi45;
 
 
-import static org.matheclipse.core.expression.F.*;
-import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.*;
-
 import org.matheclipse.core.interfaces.IAST;
+
+import static org.matheclipse.core.expression.F.*;
+import static org.matheclipse.core.expression.F.Integer;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.AlgebraicFunctionFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.AlgebraicFunctionQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.BinomialDegree;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.BinomialMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.BinomialQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.BinomialTest;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.CalculusQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.CommonNumericFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.ContentFactor;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.CubicMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.ExpandIntegrand;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FalseQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FractionQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FractionalPowerOfQuotientOfLinears;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FractionalPowerQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FreeFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.FreeTerms;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GE;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GT;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.Gcd;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GeneralizedBinomialDegree;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GeneralizedBinomialMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GeneralizedBinomialQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GeneralizedBinomialTest;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GeneralizedTrinomialDegree;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GeneralizedTrinomialMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GeneralizedTrinomialQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.GeneralizedTrinomialTest;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.IndependentQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.IntegerPowerQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.IntegersQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.InverseFunctionOfQuotientOfLinears;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.InverseFunctionQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.LE;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.LinearMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.LinearPairQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.LinearQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.MinimumMonomialExponent;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.MonomialExponent;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.MonomialQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.MonomialSumQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonalgebraicFunctionFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonfreeFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonfreeTerms;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonpolynomialTerms;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonrationalFunctionFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NonzeroQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NotFalseQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.NumericFactor;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PerfectPowerTest;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PolyQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PolynomialTermQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PolynomialTerms;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PosQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PowerOfLinearMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PowerOfLinearQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.PowerQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.ProductQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.QuadraticMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.QuadraticQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.QuotientOfLinearsMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.QuotientOfLinearsP;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.QuotientOfLinearsParts;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.QuotientOfLinearsQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RationalFunctionExpand;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RationalFunctionExponents;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RationalFunctionFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RationalFunctionQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RationalPowerQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RationalQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.RealNumericQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SplitFreeFactors;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SubstForFractionalPower;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SubstForFractionalPowerAuxQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SubstForFractionalPowerOfQuotientOfLinears;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SubstForFractionalPowerQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SubstForInverseFunction;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SubstForInverseFunctionOfQuotientOfLinears;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.SumQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.TrinomialDegree;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.TrinomialMatchQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.TrinomialQ;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.TrinomialTest;
+import static org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors.ZeroQ;
 /** 
  * UtilityFunctions rules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
  * rule-based integrator</a>.
@@ -42,7 +126,7 @@ ISetDelayed(PowerOfLinearQ(Power(u_,m_DEFAULT),x_Symbol),
     And(And(FreeQ(m,x),PolynomialQ(u,x)),If(IntegerQ(m),MatchQ(FactorSquareFree(u),Condition(Power(w_,n_DEFAULT),And(FreeQ(n,x),LinearQ(w,x)))),LinearQ(u,x)))),
 ISetDelayed(QuadraticQ(u_,x_Symbol),
     PolyQ(u,x,C2)),
-ISetDelayed(PolyQ(u_,x_Symbol,$p(n, IntegerHead)),
+ISetDelayed(PolyQ(u_,x_Symbol,$p(n, Integer)),
     If(ListQ(u),Catch(CompoundExpression(Scan(Function(If(Not(PolyQ(Slot1,x,n)),Throw(False))),u),True)),And(And(PolynomialQ(u,x),Equal(Exponent(u,x),n)),UnsameQ(Coefficient(u,x,n),C0)))),
 ISetDelayed(LinearPairQ(u_,v_,x_Symbol),
     And(And(And(LinearQ(u,x),LinearQ(v,x)),NonzeroQ(Plus(u,Negate(x)))),ZeroQ(Plus(Times(Coefficient(u,x,C0),Coefficient(v,x,C1)),Times(CN1,Coefficient(u,x,C1),Coefficient(v,x,C0)))))),

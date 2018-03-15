@@ -1,43 +1,38 @@
 package org.matheclipse.core.expression;
 
-import java.util.HashSet;
-import java.util.Set;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * <p>
- * Immutable (A)bstract (S)yntax (T)ree of a given function with <b>exactly 1
- * argument</b>.
+ * Immutable (A)bstract (S)yntax (T)ree of a given function with <b>exactly 1 argument</b>.
  * </p>
  * 
  * <p>
- * In Symja, an abstract syntax tree (AST), is a tree representation of the
- * abstract syntactic structure of the Symja source code. Each node of the tree
- * denotes a construct occurring in the source code. The syntax is 'abstract' in
- * the sense that it does not represent every detail that appears in the real
- * syntax. For instance, grouping parentheses are implicit in the tree
- * structure, and a syntactic construct such as a <code>Sin[x]</code> expression
- * will be denoted by an AST with 2 nodes. One node for the header
- * <code>Sin</code> and one node for the argument <code>x</code>.
+ * In Symja, an abstract syntax tree (AST), is a tree representation of the abstract syntactic structure of the Symja
+ * source code. Each node of the tree denotes a construct occurring in the source code. The syntax is 'abstract' in the
+ * sense that it does not represent every detail that appears in the real syntax. For instance, grouping parentheses are
+ * implicit in the tree structure, and a syntactic construct such as a <code>Sin[x]</code> expression will be denoted by
+ * an AST with 2 nodes. One node for the header <code>Sin</code> and one node for the argument <code>x</code>.
  * </p>
  * 
- * Internally an AST is represented as a <code>java.util.List</code> which
- * contains
+ * Internally an AST is represented as a <code>java.util.List</code> which contains
  * <ul>
- * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos,
- * Inverse, Plus, Times,...) at index <code>0</code> and</li>
- * <li>the <code>n</code> arguments of a function in the index
- * <code>1 to n</code></li>
+ * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index
+ * <code>0</code> and</li>
+ * <li>the <code>n</code> arguments of a function in the index <code>1 to n</code></li>
  * </ul>
  * 
- * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract
- * syntax tree</a>.
+ * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a>.
  * 
  * @see AST
  */
@@ -71,13 +66,12 @@ public class AST1 extends AST0 {
 	}
 
 	/**
-	 * Get the first argument (i.e. the second element of the underlying list
-	 * structure) of the <code>AST</code> function (i.e. get(1) ). <br />
-	 * <b>Example:</b> for the AST representing the expression
-	 * <code>Sin(x)</code>, <code>arg1()</code> returns <code>x</code>.
+	 * Get the first argument (i.e. the second element of the underlying list structure) of the <code>AST</code>
+	 * function (i.e. get(1) ). <br />
+	 * <b>Example:</b> for the AST representing the expression <code>Sin(x)</code>, <code>arg1()</code> returns
+	 * <code>x</code>.
 	 * 
-	 * @return the first argument of the function represented by this
-	 *         <code>AST</code>.
+	 * @return the first argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
 	 */
 	@Override
@@ -85,6 +79,10 @@ public class AST1 extends AST0 {
 		return arg1;
 	}
 
+	/** {@inheritDoc} */
+	public int argSize() {
+		return SIZE - 1;
+	}
 	@Override
 	public Set<IExpr> asSet() {
 		Set<IExpr> set = new HashSet<IExpr>();
@@ -93,8 +91,8 @@ public class AST1 extends AST0 {
 	}
 
 	/**
-	 * Returns a new {@code HMArrayList} with the same elements, the same size
-	 * and the same capacity as this {@code HMArrayList}.
+	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this
+	 * {@code HMArrayList}.
 	 * 
 	 * @return a shallow copy of this {@code ArrayList}
 	 * @see java.lang.Cloneable
@@ -141,6 +139,29 @@ public class AST1 extends AST0 {
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean exists(Predicate<? super IExpr> predicate, int startOffset) {
+		switch (startOffset) {
+		case 0:
+			return predicate.test(arg0) || predicate.test(arg1);
+		case 1:
+			return predicate.test(arg1);
+		}
+		return false;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean exists(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+		switch (startOffset) {
+		case 0:
+			return predicate.test(arg0, 0) || predicate.test(arg1, 1);
+		case 1:
+			return predicate.test(arg1, 1);
+		}
+		return false;
+	}
+	/** {@inheritDoc} */
+	@Override
 	public IAST filter(IASTAppendable filterAST, IASTAppendable restAST, Predicate<? super IExpr> predicate) {
 		if (predicate.test(arg1)) {
 			filterAST.append(arg1);
@@ -159,6 +180,29 @@ public class AST1 extends AST0 {
 		return filterAST;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public boolean forAll(Predicate<? super IExpr> predicate, int startOffset) {
+		switch (startOffset) {
+		case 0:
+			return predicate.test(arg0) && predicate.test(arg1);
+		case 1:
+			return predicate.test(arg1);
+		}
+		return false;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean forAll(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+		switch (startOffset) {
+		case 0:
+			return predicate.test(arg0, 0) && predicate.test(arg1, 1);
+		case 1:
+			return predicate.test(arg1, 1);
+		}
+		return false;
+	}
 	/** {@inheritDoc} */
 	@Override
 	public void forEach(Consumer<? super IExpr> action) {
@@ -227,9 +271,13 @@ public class AST1 extends AST0 {
 		return arg0.equals(head) && length <= SIZE;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public IExpr last() {
+		return arg1;
+	}
 	/**
-	 * Replaces the element at the specified location in this {@code ArrayList}
-	 * with the specified object.
+	 * Replaces the element at the specified location in this {@code ArrayList} with the specified object.
 	 * 
 	 * @param location
 	 *            the index at which to put the specified object.
@@ -266,8 +314,7 @@ public class AST1 extends AST0 {
 	}
 
 	/**
-	 * Returns a new array containing all elements contained in this
-	 * {@code ArrayList}.
+	 * Returns a new array containing all elements contained in this {@code ArrayList}.
 	 * 
 	 * @return an array of the elements from this {@code ArrayList}
 	 */

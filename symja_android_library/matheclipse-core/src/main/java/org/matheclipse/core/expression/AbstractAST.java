@@ -7,6 +7,7 @@ import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
 import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import org.hipparchus.complex.Complex;
 import org.hipparchus.linear.Array2DRowRealMatrix;
@@ -14,6 +15,7 @@ import org.hipparchus.linear.ArrayRealVector;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.builtin.Structure.LeafCount;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
@@ -21,6 +23,7 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
 import org.matheclipse.core.form.output.OutputFormFactory;
+import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.generic.UnaryVariable2Slot;
 import org.matheclipse.core.interfaces.IAST;
@@ -60,9 +63,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
-
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.Sqrt;
 
 public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable {
 	/**
@@ -386,11 +386,11 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public IAST apply(final IExpr head, final int start, final int end) {
 		final IASTAppendable ast = F.ast(head, end - start, false);
 		ast.appendArgs(start, end, new IntFunction<IExpr>() {
-			@Override
-			public IExpr apply(int i) {
-				return AbstractAST.this.get(i);
-			}
-		});
+            @Override
+            public IExpr apply(int i) {
+                return AbstractAST.this.get(i);
+            }
+        });
 		// for (int i = start; i < end; i++) {
 		// ast.append(get(i));
 		// }
@@ -481,9 +481,9 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 			if (isPower() && rhs.isPower()) {
 				// O-4
-				int baseCompare = arg1().compareTo(rhs.arg1());
+				int baseCompare = base().compareTo(rhs.base());
 				if (baseCompare == 0) {
-					return arg2().compareTo(rhs.arg2());
+					return exponent().compareTo(rhs.exponent());
 				}
 				return baseCompare;
 			}
@@ -513,13 +513,12 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	/** {@inheritDoc} */
 	@Override
 	public boolean contains(Object object) {
-		int size = size();
-		for (int i = 0; i < size; i++) {
-			if (object.equals(get(i))) {
-				return true;
-			}
-		}
-		return false;
+		return exists(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr x) {
+                return object.equals(x);
+            }
+        }, 0);
 	}
 
 	public IAST copyAlloc(int capacity) {
@@ -568,17 +567,16 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			if (obj == this) {
 				return true;
 			}
-			IAST list = (IAST) obj;
+			final IAST list = (IAST) obj;
 			if (size() != list.size()) {
 				return false;
 			}
-			int size = size();
-			for (int i = 0; i < size; i++) {
-				if (!get(i).equals(list.get(i))) {
-					return false;
-				}
-			}
-			return true;
+			return forAll(new ObjIntPredicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x, int i) {
+                    return x.equals(list.get(i));
+                }
+            }, 0);
 		}
 		return false;
 	}
@@ -692,44 +690,46 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	 */
 	protected IAST filterFunction(IASTAppendable filterAST, IASTAppendable restAST,
 			final Function<IExpr, IExpr> function) {
-		final int size = size();
-		for (int i = 1; i < size; i++) {
-			IExpr temp = get(i);
-			IExpr expr = function.apply(temp);
-			if (expr.isPresent()) {
-				filterAST.append(expr);
-			} else {
-				restAST.append(temp);
-			}
-		}
+		forEach(new Consumer<IExpr>() {
+            @Override
+            public void accept(IExpr x) {
+                IExpr expr = function.apply(x);
+                if (expr.isPresent()) {
+                    filterAST.append(expr);
+                } else {
+                    restAST.append(x);
+                }
+            }
+        });
 		return filterAST;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public IAST filter(IASTAppendable filterAST, IASTAppendable restAST, Predicate<? super IExpr> predicate) {
-		final int size = size();
-		for (int i = 1; i < size; i++) {
-			IExpr temp = get(i);
-			if (predicate.test(temp)) {
-				filterAST.append(temp);
-			} else {
-				restAST.append(temp);
-			}
-		}
+		forEach(new Consumer<IExpr>() {
+            @Override
+            public void accept(IExpr x) {
+                if (predicate.test(x)) {
+                    filterAST.append(x);
+                } else {
+                    restAST.append(x);
+                }
+            }
+        });
 		return filterAST;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final IAST filter(IASTAppendable filterAST, final IExpr expr) {
-		final EvalEngine engine = EvalEngine.get();
+	public final IAST filter(IASTAppendable filterAST, IExpr expr) {
+		EvalEngine engine = EvalEngine.get();
 		return filter(filterAST, new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return engine.evalTrue(F.unaryAST1(expr, x));
-			}
-		});
+            @Override
+            public boolean test(IExpr x) {
+                return engine.evalTrue(F.unaryAST1(expr, x));
+            }
+        });
 	}
 
 	/** {@inheritDoc} */
@@ -746,8 +746,14 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean exists(Predicate<? super IExpr> predicate) {
-		return exists(predicate, 1);
+	public boolean exists(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+		final int size = size();
+		for (int i = startOffset; i < size; i++) {
+			if (predicate.test(get(i), i)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -763,16 +769,12 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public IExpr foldLeft(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start) {
 		final IExpr[] value = { startValue };
 		forEach(start, size(), new Consumer<IExpr>() {
-			@Override
-			public void accept(IExpr x) {
-				value[0] = function.apply(value[0], x);
-			}
-		});
+            @Override
+            public void accept(IExpr x) {
+                value[0] = function.apply(value[0], x);
+            }
+        });
 		return value[0];
-		// for (int i = start; i < size(); i++) {
-		// value = function.apply(value, get(i));
-		// }
-		// return value;
 	}
 
 	/**
@@ -808,40 +810,50 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public IAST filter(final IASTAppendable filterAST, final Predicate<? super IExpr> predicate) {
-		forEach(size(), new Consumer<IExpr>() {
-			@Override
-			public void accept(IExpr x) {
-				if (predicate.test(x)) {
-					filterAST.append(x);
-				}
+	public boolean forAll(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+		final int size = size();
+		for (int i = startOffset; i < size; i++) {
+			if (!predicate.test(get(i), i)) {
+				return false;
 			}
-		});
-		// for (int i = 1; i < size; i++) {
-		// if (predicate.test(get(i))) {
-		// filterAST.append(get(i));
-		// }
-		// }
+		}
+		return true;
+	}
+
+	/** {@inheritDoc} */
+			@Override
+	public IAST filter(IASTAppendable filterAST, Predicate<? super IExpr> predicate) {
+		forEach(size(), new Consumer<IExpr>() {
+            @Override
+            public void accept(IExpr x) {
+                if (predicate.test(x)) {
+                    filterAST.append(x);
+                }
+            }
+        });
 		return filterAST;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public IAST filter(IASTAppendable filterAST, Predicate<? super IExpr> predicate, int maxMatches) {
-		int count = 0;
-		if (count >= maxMatches) {
+		int[] count = new int[1];
+		if (count[0] >= maxMatches) {
 			return filterAST;
 		}
-		final int size = size();
-		for (int i = 1; i < size; i++) {
-			if (predicate.test(get(i))) {
-				if (++count == maxMatches) {
-					filterAST.append(get(i));
-					break;
-				}
-				filterAST.append(get(i));
-			}
-		}
+		exists(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr x) {
+                if (predicate.test(x)) {
+                    if (++count[0] == maxMatches) {
+                        filterAST.append(x);
+                        return true;
+                    }
+                    filterAST.append(x);
+                }
+                return false;
+            }
+        });
 		return filterAST;
 	}
 
@@ -857,7 +869,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final IAST partition(ISymbol operator, final Predicate<? super IExpr> predicate, IExpr init1, IExpr init2,
+	public final IAST partition(ISymbol operator, Predicate<? super IExpr> predicate, IExpr init1, IExpr init2,
 			ISymbol combiner, ISymbol action) {
 		if (head().equals(operator)) {
 			IASTAppendable result = F.ast(action, 3, false);
@@ -868,25 +880,18 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			} else {
 				newSize += 4;
 			}
-			final IASTAppendable yesAST = F.ast(combiner, newSize, false);
-			final IASTAppendable noAST = F.ast(combiner, newSize, false);
+			IASTAppendable yesAST = F.ast(combiner, newSize, false);
+			IASTAppendable noAST = F.ast(combiner, newSize, false);
 			forEach(size, new Consumer<IExpr>() {
-				@Override
-				public void accept(IExpr x) {
-					if (predicate.test(x)) {
-						yesAST.append(x);
-					} else {
-						noAST.append(x);
-					}
-				}
-			});
-			// for (int i = 1; i < size; i++) {
-			// if (predicate.test(get(i))) {
-			// yesAST.append(get(i));
-			// } else {
-			// noAST.append(get(i));
-			// }
-			// }
+                @Override
+                public void accept(IExpr x) {
+                    if (predicate.test(x)) {
+                        yesAST.append(x);
+                    } else {
+                        noAST.append(x);
+                    }
+                }
+            });
 			if (yesAST.size() > 1) {
 				result.append(F.eval(yesAST));
 			} else {
@@ -934,16 +939,16 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public void forEach(Consumer<? super IExpr> action, int startOffset) {
 		final int size = size();
 		forEach(startOffset, size, action);
-		// for (int i = startOffset; i < size; i++) {
-		// action.accept(get(i));
-		// }
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final String fullFormString() {
+	public String fullFormString() {
+		return fullFormString(head());
+	}
+
+	protected String fullFormString(IExpr head) {
 		final String sep = ", ";
-		IExpr head = head();
 		StringBuilder text = new StringBuilder();
 		if (head == null) {
 			text.append("<null-head>");
@@ -1116,6 +1121,24 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	}
 
 	/**
+	 * Returns the value to which the specified property is mapped, or <code>null</code> if this map contains no mapping
+	 * for the property.
+	 *
+	 * @param key
+	 * @return
+	 * @see #putProperty(PROPERTY, Object)
+	 */
+	public Object getProperty(PROPERTY key) {
+		if (IAST_CACHE != null) {
+			EnumMap<PROPERTY, Object> map = IAST_CACHE.getIfPresent(this);
+			if (map == null) {
+				return null;
+			}
+			return map.get(key);
+		}
+		return null;
+	}
+	/**
 	 * <p>
 	 * FNV-1 hash code of this <code>IAST</code>.
 	 * </p>
@@ -1178,6 +1201,10 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		if (this.equals(F.Slot2)) {
 			return prefix + "Slot2";
 		}
+		if (temp.equals(F.Inequality) && size() >= 4) {
+			return BooleanFunctions.inequality2And(this).internalJavaString(symbolsAsFactoryMethod, depth, useOperators,
+					usePrefix);
+		}
 		if (temp.equals(F.Rational) && size() == 3) {
 			if (arg1().isInteger() && arg2().isInteger()) {
 				return F.QQ((IInteger) arg1(), (IInteger) arg2()).internalJavaString(symbolsAsFactoryMethod, depth,
@@ -1187,9 +1214,9 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		}
 		if (isPower()) {
 			if (equalsAt(2, F.C1D2)) {
-				if (arg1().isInteger()) {
+				if (base().isInteger()) {
 					// square root of an integer number
-					IInteger i = (IInteger) arg1();
+					IInteger i = (IInteger) base();
 					if (i.equals(F.C2)) {
 						return prefix + "CSqrt2";
 					} else if (i.equals(F.C3)) {
@@ -1806,8 +1833,8 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		if (symbol.equals(F.Floor) || symbol.equals(F.Ceiling) || symbol.equals(F.IntegerPart)) {
 			return true;
 		}
-		if (isPower() && arg2().isInteger() && arg2().isPositive()) {
-			if (arg1().isIntegerResult()) {
+		if (isPower() && exponent().isInteger() && base().isPositive()) {
+			if (base().isIntegerResult()) {
 				return true;
 			}
 			return false;
@@ -1912,16 +1939,16 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isMember(final Predicate<IExpr> predicate, final boolean heads) {
+	public final boolean isMember(Predicate<IExpr> predicate, boolean heads) {
 		if (predicate.test(this)) {
 			return true;
 		}
 		return exists(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isMember(predicate, heads);
-			}
-		}, heads ? 0 : 1);
+            @Override
+            public boolean test(IExpr x) {
+                return x.isMember(predicate, heads);
+            }
+        }, heads ? 0 : 1);
 	}
 
 	/** {@inheritDoc} */
@@ -2221,7 +2248,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			}
 			return true;
 		}
-		if (isPower() && (!arg2().isZero() || !arg1().isZero())) {
+		if (isPower() && (!exponent().isZero() || !base().isZero())) {
 			if (!arg1().isRealResult()) {
 				return false;
 			}
@@ -2502,7 +2529,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final IExpr last() {
+	public IExpr last() {
 		return get(argSize());
 	}
 
@@ -2665,14 +2692,14 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, final int position) {
-		final EvalEngine engine = EvalEngine.get();
+	public IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, int position) {
+		EvalEngine engine = EvalEngine.get();
 		final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return engine.evaluate(replacement.setAtCopy(position, x));
-			}
-		};
+            @Override
+            public IExpr apply(IExpr x) {
+                return engine.evaluate(replacement.setAtCopy(position, x));
+            }
+        };
 
 		IExpr temp;
 		for (int i = 1; i < size(); i++) {
@@ -2686,14 +2713,14 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final IASTMutable mapThread(final IAST replacement, final int position) {
-		final EvalEngine engine = EvalEngine.get();
+	public final IASTMutable mapThread(final IAST replacement, int position) {
+		EvalEngine engine = EvalEngine.get();
 		final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return engine.evaluate(replacement.setAtCopy(position, x));
-			}
-		};
+            @Override
+            public IExpr apply(IExpr x) {
+                return engine.evaluate(replacement.setAtCopy(position, x));
+            }
+        };
 		return (IASTMutable) map(function, 1);
 	}
 
@@ -2717,7 +2744,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 					if (size() == 3) {
 						return arg2();
 					}
-					return removeAtClone(1);
+					return rest();
 				}
 				return setAtCopy(1, ((INumber) arg1).negate());
 			}
@@ -2776,6 +2803,27 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return appendAtClone(1, expr);
 	}
 
+	/**
+	 * Associates the specified value with the specified property in the associated
+	 * <code>EnumMap<PROPERTY, Object></code> map. If the map previously contained a mapping for this key, the old value
+	 * is replaced.
+	 *
+	 * @param key
+	 * @param value
+	 * @return
+	 * @see #getProperty(PROPERTY)
+	 */
+	public Object putProperty(PROPERTY key, Object value) {
+		if (IAST_CACHE == null) {
+			IAST_CACHE = CacheBuilder.newBuilder().maximumSize(500).build();
+		}
+		EnumMap<PROPERTY, Object> map = IAST_CACHE.getIfPresent(this);
+		if (map == null) {
+			map = new EnumMap<PROPERTY, Object>(PROPERTY.class);
+			IAST_CACHE.put(this, map);
+		}
+		return map.put(key, value);
+	}
 	/** {@inheritDoc} */
 	@Override
 	public final IASTAppendable removeAtClone(int position) {
@@ -2868,33 +2916,6 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return 1;
 	}
 
-	@Override
-	public IExpr sqrt() {
-		if (isPower()) {
-			return F.Power(base(), F.Times(C1D2, exponent()));
-		} else {
-			if (isTimes()) {
-				// see github issue #2: Get only real results
-				IAST times = (IAST) this;
-				int size = times.size();
-				IASTAppendable timesSqrt = F.TimesAlloc(size);
-				IASTAppendable timesRest = F.TimesAlloc(size);
-				for (int i = 1; i < size; i++) {
-					final IExpr arg = times.get(i);
-					if (arg.isPower()) {
-						timesRest.append( //
-								F.Power(arg.base(), //
-										F.Times(C1D2, arg.exponent())) //
-						);
-					} else {
-						timesSqrt.append(arg);
-					}
-				}
-				return F.Times(timesRest, Sqrt(timesSqrt));
-			}
-		}
-		return F.Sqrt(this);
-	}
 
 	@Override
 	public Stream<IExpr> stream() {
@@ -2913,11 +2934,11 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		}
 		if (this.isPlus()) {
 			IAST plus = this.map(new Function<IExpr, IExpr>() {
-				@Override
-				public IExpr apply(IExpr x) {
-					return x.times(that);
-				}
-			}, 1);
+                @Override
+                public IExpr apply(IExpr x) {
+                    return x.times(that);
+                }
+            }, 1);
 			return F.eval(plus);
 		}
 		return F.eval(F.Times(this, that));

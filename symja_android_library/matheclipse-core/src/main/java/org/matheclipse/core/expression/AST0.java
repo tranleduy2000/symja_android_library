@@ -1,5 +1,15 @@
 package org.matheclipse.core.expression;
 
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Function;
+import com.duy.lambda.Predicate;
+
+import org.matheclipse.core.generic.ObjIntPredicate;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IExpr;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -8,14 +18,6 @@ import java.io.ObjectStreamException;
 import java.util.HashSet;
 import java.util.RandomAccess;
 import java.util.Set;
-import com.duy.lambda.Consumer;
-import com.duy.lambda.Function;
-import com.duy.lambda.Predicate;
-
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IASTMutable;
-import org.matheclipse.core.interfaces.IExpr;
 
 /**
  * <p>
@@ -229,6 +231,10 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 		throw new UnsupportedOperationException();
 	}
 
+	/** {@inheritDoc} */
+	public int argSize() {
+		return SIZE - 1;
+	}
 	@Override
 	public Set<IExpr> asSet() {
 		// empty set:
@@ -241,11 +247,11 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	 * @see #isEmpty
 	 * @see #size
 	 */
-//	@Override
-//	public void clear() {
-//		hashValue = 0;
-//		throw new UnsupportedOperationException();
-//	}
+	// @Override
+	// public void clear() {
+	// hashValue = 0;
+	// throw new UnsupportedOperationException();
+	// }
 
 	/**
 	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this
@@ -293,17 +299,19 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean exists(Predicate<? super IExpr> predicate, int startOffset) {
+		return (startOffset == 0) && predicate.test(arg0);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean exists(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+		return (startOffset == 0) && predicate.test(arg0, 0);
+	}
+	/** {@inheritDoc} */
+	@Override
 	public final IAST filterFunction(IASTAppendable filterAST, IASTAppendable restAST,
 			final Function<IExpr, IExpr> function) {
-		final int size = size();
-		for (int i = 1; i < size; i++) {
-			IExpr expr = function.apply(get(i));
-			if (expr.isPresent()) {
-				filterAST.append(expr);
-			} else {
-				restAST.append(get(i));
-			}
-		}
 		return filterAST;
 	}
 
@@ -319,6 +327,17 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 		return filterAST;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public boolean forAll(Predicate<? super IExpr> predicate, int startOffset) {
+		return (startOffset == 0) && predicate.test(arg0);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean forAll(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+		return (startOffset == 0) && predicate.test(arg0, 0);
+	}
 	@Override
 	public void forEach(Consumer<? super IExpr> action) {
 		// do nothing
@@ -394,6 +413,11 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 		return arg0.equals(head) && length <= SIZE;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public IExpr last() {
+		return arg0;
+	}
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException, ClassNotFoundException {
 		this.fEvalFlags = objectInput.readShort();
@@ -443,10 +467,10 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	 * @throws IndexOutOfBoundsException
 	 *             when {@code start < 0, start > end} or {@code end > size()}
 	 */
-//	protected void removeRange(int start, int end) {
-//		hashValue = 0;
-//		throw new UnsupportedOperationException();
-//	}
+	// protected void removeRange(int start, int end) {
+	// hashValue = 0;
+	// throw new UnsupportedOperationException();
+	// }
 
 	/**
 	 * Replaces the element at the specified location in this {@code ArrayList} with the specified object.

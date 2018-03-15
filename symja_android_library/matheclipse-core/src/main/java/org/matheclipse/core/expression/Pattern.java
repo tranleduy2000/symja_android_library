@@ -174,7 +174,8 @@ public class Pattern extends Blank {
 		if (value != null) {
 			return expr.equals(value);
 		}
-		return patternMap.setValue(this, expr);
+		patternMap.setValue(this, expr);
+		return  true;
 	}
 
 	@Override
@@ -226,7 +227,7 @@ public class Pattern extends Blank {
 
 	@Override
 	public ISymbol head() {
-		return F.PatternHead;
+		return F.Pattern;
 	}
 
 	@Override
@@ -268,7 +269,7 @@ public class Pattern extends Blank {
 				if (!fDefault) {
 					if (fCondition == null) {
 						return prefix+symbolStr + "_";
-					} else if (fCondition == F.SymbolHead) {
+					} else if (fCondition == F.Symbol) {
 						return prefix+symbolStr + "_Symbol";
 					}
 				} else {
@@ -301,9 +302,9 @@ public class Pattern extends Blank {
 			buffer.append("\"" + symbolStr + "\"");
 		}
 		if (fCondition != null) {
-			if (fCondition == F.IntegerHead) {
+			if (fCondition == F.Integer) {
 				buffer.append(", IntegerHead");
-			} else if (fCondition == F.SymbolHead) {
+			} else if (fCondition == F.Symbol) {
 				buffer.append(", SymbolHead");
 			} else {
 				buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperaators, false));

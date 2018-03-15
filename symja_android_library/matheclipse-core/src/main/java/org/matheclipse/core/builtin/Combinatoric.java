@@ -113,7 +113,7 @@ public final class Combinatoric {
 				// IAST res = (IAST) current.clone();
 				IAST res = current.copyAppendable();
 				// search iterator which hasNext
-				int i = compit.argSize();
+				int i = compit.size()-1;
 				for (; i >= 0; i--) {
 					Iterator<IExpr> iter = compit.get(i);
 					if (iter.hasNext()) {
