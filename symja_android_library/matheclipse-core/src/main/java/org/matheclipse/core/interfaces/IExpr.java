@@ -13,7 +13,6 @@ import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
-import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.NILPointer;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
@@ -21,25 +20,22 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 import org.matheclipse.core.visit.VisitorReplaceAll;
 
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.Sqrt;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
+ *
  * (I)nterface for a mathematical (Expr)ession<br />
- * <p>
+ *
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
- * <p>
+ *
  * <pre>
  * java.lang.Object
  *    |--- java.util.AbstractCollection
