@@ -1,15 +1,6 @@
 package org.matheclipse.core.expression;
 
-import static org.matheclipse.core.expression.F.List;
-
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.Set;
-import java.util.TreeSet;
+import com.google.common.math.BigIntegerMath;
 
 import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.builtin.Combinatoric.Subsets;
@@ -25,7 +16,14 @@ import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.numbertheory.Primality;
 
-import com.google.common.math.BigIntegerMath;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.ObjectStreamException;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * IInteger implementation which delegates most of the methods to the BigInteger methods.
@@ -99,6 +97,10 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
 	public BigIntegerSym(BigInteger value) {
 		fBigIntValue = value;
+	}
+
+	public BigIntegerSym(byte[] bytes) {
+		fBigIntValue = new BigInteger(bytes);
 	}
 
 	/** {@inheritDoc} */
