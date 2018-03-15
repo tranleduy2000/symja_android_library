@@ -3015,7 +3015,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 				return F.Real;
 			}
 			if (header instanceof IInteger) {
-				return F.IntegerHead;
+				return F.Integer;
 			}
 			if (header instanceof IFraction) {
 				return F.Rational;
@@ -3028,10 +3028,10 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			return F.Complex;
 		}
 		if (header instanceof IPattern) {
-			return F.PatternHead;
+			return F.Pattern;
 		}
 		if (head() instanceof IStringX) {
-			return F.StringHead;
+			return F.String;
 		}
 		return null;
 	}

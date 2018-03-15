@@ -760,10 +760,10 @@ public final class PatternMatching {
 	 * </p>
 	 * 
 	 * <pre>
-	 * &gt;&gt; {a, b, c} = {10, 2, 3}    
-	 * {10,2,3}    
+     * &gt;&gt; {a, b, c} = {10, 2, 3}
+     * {10,2,3}
 	 * 
-	 * &gt;&gt; {a, b, {c, {d}}} = {1, 2, {{c1, c2}, {a}}} 
+     * &gt;&gt; {a, b, {c, {d}}} = {1, 2, {{c1, c2}, {a}}}
 	 * {1,2,{{c1,c2},{10}}}
 	 * 
 	 * &gt;&gt; d    
@@ -800,15 +800,15 @@ public final class PatternMatching {
 	 * </p>
 	 * 
 	 * <pre>
-	 * &gt;&gt; A = {{1, 2}, {3, 4}}    
+     * &gt;&gt; A = {{1, 2}, {3, 4}}
 	 * &gt;&gt; A[[1, 2]] = 5    
 	 * 5    
 	 * 
 	 * &gt;&gt; A    
-	 * {{1,5}, {3,4}}    
+     * {{1,5}, {3,4}}
 	 * 
-	 * &gt;&gt; A[[;;, 2]] = {6, 7}    
-	 * {6,7}    
+     * &gt;&gt; A[[;;, 2]] = {6, 7}
+     * {6,7}
 	 * 
 	 * &gt;&gt; A    
 	 * {{1,6},{3,7}}
@@ -818,8 +818,8 @@ public final class PatternMatching {
 	 * </p>
 	 * 
 	 * <pre>
-	 * &gt;&gt; B = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}    
-	 * &gt;&gt; B[[1;;2, 2;;-1]] = {{t, u}, {y, z}}   
+     * &gt;&gt; B = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+     * &gt;&gt; B[[1;;2, 2;;-1]] = {{t, u}, {y, z}}
 	 * &gt;&gt; B    
 	 * {{1, t, u}, {4, y, z}, {7, 8, 9}}
 	 * </pre>
@@ -939,7 +939,7 @@ public final class PatternMatching {
 	 * 
 	 * <pre>
 	 * &gt;&gt; Attributes(SetDelayed)    
-	 * {HoldAll}    
+     * {HoldAll}
 	 * 
 	 * &gt;&gt; a = 1    
 	 * 1    

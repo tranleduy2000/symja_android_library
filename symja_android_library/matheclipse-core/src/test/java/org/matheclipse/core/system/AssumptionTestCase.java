@@ -1,9 +1,6 @@
 package org.matheclipse.core.system;
 
-import static org.matheclipse.core.expression.F.Abs;
-import static org.matheclipse.core.expression.F.Floor;
-import static org.matheclipse.core.expression.F.x;
-import static org.matheclipse.core.expression.F.y;
+import junit.framework.TestCase;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalUtilities;
@@ -13,11 +10,14 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import junit.framework.TestCase;
+import static org.matheclipse.core.expression.F.Abs;
+import static org.matheclipse.core.expression.F.Floor;
+import static org.matheclipse.core.expression.F.x;
+import static org.matheclipse.core.expression.F.y;
 
 /**
  * Tests for the Java port of the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
- * 
+ *
  */
 public class AssumptionTestCase extends TestCase {
 	/**
@@ -89,7 +89,7 @@ public class AssumptionTestCase extends TestCase {
 		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;
 
 		EvalUtilities util = new EvalUtilities(false, true);
-		
+
 		// define "t" with "t" assumed greater than 0
 		// use #1 (Slot1) as placeholder for a new symbol!
 		ISymbol t = F.symbol("t", F.Greater(F.Slot1, F.C10));
@@ -99,13 +99,13 @@ public class AssumptionTestCase extends TestCase {
 		IExpr result = util.evaluate(function);
 		assertEquals(result.toString(), "t");
 	}
-	
+
 	public void testFloor001() {
 		// don't distinguish between lower- and uppercase identifiers
 		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;
 
 		EvalUtilities util = new EvalUtilities(false, true);
-		
+
 		// define "t" with "t" assumed to be an element of the integers 
 		// use #1 (Slot1) as placeholder for a new symbol!
 		ISymbol t = F.symbol("t", F.Element(F.Slot1, F.Integers));
@@ -114,6 +114,6 @@ public class AssumptionTestCase extends TestCase {
 		IExpr result = util.evaluate(function);
 		assertEquals(result.toString(), "t");
 	}
-	
-	
+
+
 }
