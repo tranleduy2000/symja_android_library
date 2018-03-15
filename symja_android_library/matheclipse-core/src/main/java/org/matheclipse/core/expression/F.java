@@ -238,6 +238,7 @@ public class F {
 	public final static IBuiltInSymbol Clear = BuiltIns.valueOf(BuiltIns.Clear);
 	public final static IBuiltInSymbol ClearAll = BuiltIns.valueOf(BuiltIns.ClearAll);
 	public final static IBuiltInSymbol ClearAttributes = BuiltIns.valueOf(BuiltIns.ClearAttributes);
+	public final static IBuiltInSymbol Clip = BuiltIns.valueOf(BuiltIns.Clip);
 	public final static IBuiltInSymbol Coefficient = BuiltIns.valueOf(BuiltIns.Coefficient);
 	public final static IBuiltInSymbol CoefficientList = BuiltIns.valueOf(BuiltIns.CoefficientList);
 	public final static IBuiltInSymbol CoefficientRules = BuiltIns.valueOf(BuiltIns.CoefficientRules);
@@ -1523,12 +1524,12 @@ public class F {
 			createNumeratorFunctionMap();
 
 			ConstantDefinitions.initialize();
+			FunctionDefinitions.initialize();
 			Programming.initialize();
 			PatternMatching.initialize();
 			Algebra.initialize();
 			Structure.initialize();
 			ExpTrigsFunctions.initialize();
-			FunctionDefinitions.initialize();
 			NumberTheory.initialize();
 			BooleanFunctions.initialize();
 			LinearAlgebra.initialize();
@@ -3706,7 +3707,7 @@ public class F {
 	 *            maximum value of the interval
 	 * @return
 	 */
-	public static IAST Interval(final ISignedNumber min, ISignedNumber max) {
+	public static IAST Interval(final IExpr min, final IExpr max) {
 		return unaryAST1(Interval, binaryAST2(List, min, max));
 	}
 
