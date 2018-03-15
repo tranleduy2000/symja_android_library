@@ -1,11 +1,5 @@
 package org.matheclipse.core.expression;
 
-import java.io.Externalizable;
-import java.math.BigInteger;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.hipparchus.util.ArithmeticUtils;
@@ -23,6 +17,12 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+
+import java.io.Externalizable;
+import java.math.BigInteger;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import edu.jas.arith.PrimeInteger;
 
@@ -445,7 +445,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 	/**
 	 * Get all prime factors of this integer
 	 *
-	 * @param result
+	 * param result
 	 *            add the prime factors to this result list
 	 * @return
 	 */
@@ -884,7 +884,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 		if (that instanceof ComplexSym) {
 			return ((ComplexSym) that).multiply(ComplexSym.valueOf(this)).normalize();
 		}
-		return IInteger.super.times(that);
+		return super.times(that);
 	}
 
 	@Override
