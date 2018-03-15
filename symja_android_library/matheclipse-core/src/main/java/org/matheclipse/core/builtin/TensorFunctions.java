@@ -1,7 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import com.duy.lambda.IntFunction;
-
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -29,15 +27,28 @@ public class TensorFunctions {
 		F.TensorRank.setEvaluator(new TensorRank());
 	}
 
+	/**
+	 * <pre>
+	 * ListConvolve(kernel - list, tensor - list)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * create the convolution of the <code>kernel-list</code> with <code>tensor-list</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; ListConvolve({x, y}, {a, b, c, d, e, f})
+	 * {b*x+a*y,c*x+b*y,d*x+c*y,e*x+d*y,f*x+e*y}
+	 * </pre>
+	 */
 	private static class ListConvolve extends AbstractEvaluator {
 		/**
 		 * See: <a href=
 		 * "https://github.com/idsc-frazzoli/tensor/blob/master/src/main/java/ch/ethz/idsc/tensor/alg/ListConvolve.java">tensor/alg/ListConvolve.java</a>
-		 * 
-		 * <pre>
-		 * ListConvolve({x, y}, {a, b, c, d, e, f}) ==
-		 * {b*x+a*y,c*x+b*y,d*x+c*y,e*x+d*y,f*x+e*y}
-		 * </pre>
+		 *
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -57,16 +68,28 @@ public class TensorFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * ListCorrelate(kernel - list, tensor - list)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * create the correlation of the <code>kernel-list</code> with <code>tensor-list</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; ListCorrelate({x, y}, {a, b, c, d, e, f})
+	 * {a*x+b*y,b*x+c*y,c*x+d*y,d*x+e*y,e*x+f*y}
+	 * </pre>
+	 */
 	private static class ListCorrelate extends AbstractEvaluator {
 		/**
 		 * See: <a href=
 		 * "https://github.com/idsc-frazzoli/tensor/blob/master/src/main/java/ch/ethz/idsc/tensor/alg/ListCorrelate.java">tensor/alg/ListCorrelate.java</a>
-		 * 
-		 * <pre>
-		 * ListCorrelate({x, y}, {a, b, c, d, e, f}) ==
-		 * {a*x+b*y,b*x+c*y,c*x+d*y,d*x+e*y,e*x+f*y}
-		 * </pre>
-		 * 
+		 *
 		 * @return correlation of kernel with tensor
 		 */
 		@Override
@@ -94,12 +117,7 @@ public class TensorFunctions {
 			for (int i = 0; i <= diff; i++) {
 				IASTAppendable plus = F.ast(fFunction, kernelSize, false);
 				fi[0] = i;
-				plus.appendArgs(kernelSize, new IntFunction<IExpr>() {
-                    @Override
-                    public IExpr apply(int k) {
-                        return F.binaryAST2(gFunction, kernel.get(k), tensor.get(k + fi[0]));
-                    }
-                });
+				plus.appendArgs(kernelSize, k -> F.binaryAST2(gFunction, kernel.get(k), tensor.get(k + fi[0])));
 				// for (int k = 1; k < kernelSize; k++) {
 				// plus.append(F.binaryAST2(gFunction, kernel.get(k), tensor.get(k + i)));
 				// }
@@ -109,6 +127,59 @@ public class TensorFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Ordering(list)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * calculate the permutation list of the elements in the sorted <code>list</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * Ordering(list, n)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * calculate the first <code>n</code> indexes of the permutation list of the elements in the sorted
+	 * <code>list</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * Ordering(list, -n)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * calculate the last <code>n</code> indexes of the permutation list of the elements in the sorted
+	 * <code>list</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * Ordering(list, n, head)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * calculate the first <code>n</code> indexes of the permutation list of the elements in the sorted
+	 * <code>list</code> using comparator operation <code>head</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Ordering({1,3,4,2,5,9,6})
+	 * {1,4,2,3,5,7,6}
+	 *
+	 * &gt;&gt; Ordering({1,3,4,2,5,9,6}, All, Greater)
+	 * {6,7,5,3,2,4,1}
+	 * </pre>
+	 */
 	private static class Ordering extends AbstractEvaluator {
 
 		/**
