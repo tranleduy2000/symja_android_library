@@ -85,26 +85,23 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluate(EvalEngine engine) {
+		// final IEvaluator module = getEvaluator();
+		if (fEvaluator instanceof ISymbolEvaluator) {
+			if (engine.isNumericMode()) {
+				if (engine.isApfloat()) {
+					return ((ISymbolEvaluator) fEvaluator).apfloatEval(this, engine);
+				} else {
+					return ((ISymbolEvaluator) fEvaluator).numericEval(this);
+				}
+			}
+			return ((ISymbolEvaluator) fEvaluator).evaluate(this);
+		}
 		if (hasLocalVariableStack()) {
 			return ExprUtil.ofNullable(get());
 		}
 		IExpr result;
 		if ((result = evalDownRule(engine, this)).isPresent()) {
 			return result;
-		}
-		final IEvaluator module = getEvaluator();
-		if (module instanceof ISymbolEvaluator) {
-			IExpr temp;
-			if (engine.isNumericMode()) {
-				if (engine.isApfloat()) {
-					temp = ((ISymbolEvaluator) module).apfloatEval(this, engine);
-				} else {
-					temp = ((ISymbolEvaluator) module).numericEval(this);
-				}
-			} else {
-				temp = ((ISymbolEvaluator) module).evaluate(this);
-			}
-			return temp;
 		}
 		return F.NIL;
 	}
@@ -143,6 +140,11 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		return fOrdinal;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public int ordinal() {
+		return fOrdinal;
+	}
 	@Override
 	final public boolean isBuiltInSymbol() {
 		return true;
