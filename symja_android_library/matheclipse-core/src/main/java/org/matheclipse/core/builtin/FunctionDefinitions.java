@@ -23,10 +23,8 @@ public final class FunctionDefinitions {
 		FindRoot.setEvaluator(new org.matheclipse.core.reflection.system.FindRoot());
 		Fit.setEvaluator(new org.matheclipse.core.reflection.system.Fit());
 		FrobeniusSolve.setEvaluator(new org.matheclipse.core.reflection.system.FrobeniusSolve());
-		FromCharacterCode.setEvaluator(new org.matheclipse.core.reflection.system.FromCharacterCode());
 		FromContinuedFraction.setEvaluator(new org.matheclipse.core.reflection.system.FromContinuedFraction());
 		FromPolarCoordinates.setEvaluator(new org.matheclipse.core.reflection.system.FromPolarCoordinates());
-		GCD.setEvaluator(new org.matheclipse.core.reflection.system.GCD());
 		GeometricMean.setEvaluator(new org.matheclipse.core.reflection.system.GeometricMean());
 		GroebnerBasis.setEvaluator(new org.matheclipse.core.reflection.system.GroebnerBasis());
 		HeavisideTheta.setEvaluator(new org.matheclipse.core.reflection.system.HeavisideTheta());
@@ -39,8 +37,6 @@ public final class FunctionDefinitions {
 		InverseFunction.setEvaluator(new org.matheclipse.core.reflection.system.InverseFunction());
 		InverseLaplaceTransform.setEvaluator(new org.matheclipse.core.reflection.system.InverseLaplaceTransform());
 		LaplaceTransform.setEvaluator(new org.matheclipse.core.reflection.system.LaplaceTransform());
-		LCM.setEvaluator(new org.matheclipse.core.reflection.system.LCM());
-		Limit.setEvaluator(new org.matheclipse.core.reflection.system.Limit());
 		LinearProgramming.setEvaluator(new org.matheclipse.core.reflection.system.LinearProgramming());
 		MonomialList.setEvaluator(new org.matheclipse.core.reflection.system.MonomialList());
 		Names.setEvaluator(new org.matheclipse.core.reflection.system.Names());
@@ -62,8 +58,6 @@ public final class FunctionDefinitions {
 		Replace.setEvaluator(new org.matheclipse.core.reflection.system.Replace());
 		ReplaceList.setEvaluator(new org.matheclipse.core.reflection.system.ReplaceList());
 		ReplaceRepeated.setEvaluator(new org.matheclipse.core.reflection.system.ReplaceRepeated());
-		Series.setEvaluator(new org.matheclipse.core.reflection.system.Series());
-		SeriesData.setEvaluator(new org.matheclipse.core.reflection.system.SeriesData());
 		Share.setEvaluator(new org.matheclipse.core.reflection.system.Share());
 		Sign.setEvaluator(new org.matheclipse.core.reflection.system.Sign());
 		SignCmp.setEvaluator(new org.matheclipse.core.reflection.system.SignCmp());

@@ -1163,7 +1163,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final int hierarchy() {
+	public int hierarchy() {
 		return ASTID;
 	}
 

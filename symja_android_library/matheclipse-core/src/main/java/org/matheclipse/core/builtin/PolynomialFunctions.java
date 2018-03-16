@@ -210,16 +210,7 @@ public class PolynomialFunctions {
 			Validate.checkSize(ast, 3);
 			IExpr expr = F.evalExpandAll(ast.arg1(), engine);
 			ISymbol arg2 = Validate.checkSymbolType(ast, 2);
-			try {
-				ExprPolynomialRing ring = new ExprPolynomialRing(F.List(arg2));
-				ExprPolynomial poly = ring.create(expr);
-				if (poly.isZero()) {
-					return F.List();
-				}
-				return poly.coefficientList();
-			} catch (RuntimeException ex) {
-				throw new WrongArgumentType(ast, expr, 1, "Polynomial expected!");
-			}
+			return coefficientList(expr, arg2);
 		}
 
 		private static long univariateCoefficientList(IExpr polynomial, final ISymbol variable, List<IExpr> resultList)
@@ -1422,7 +1413,7 @@ public class PolynomialFunctions {
 	 * @param variable
 	 * @return <code>null</code> if the list couldn't be evaluated.
 	 */
-	public static double[] coefficientList(IExpr polynomial, final ISymbol variable) throws JASConversionException {
+	private static double[] coefficients(IExpr polynomial, final ISymbol variable) throws JASConversionException {
 		try {
 			ExprPolynomialRing ring = new ExprPolynomialRing(F.List(variable));
 			ExprPolynomial poly = ring.create(polynomial);
@@ -1448,6 +1439,19 @@ public class PolynomialFunctions {
 		}
 	}
 
+	public static IAST coefficientList(IExpr expr, IExpr x) {
+		try {
+			ExprPolynomialRing ring = new ExprPolynomialRing(F.List(x));
+			ExprPolynomial poly = ring.create(expr);
+			if (poly.isZero()) {
+				return F.List();
+			}
+			return poly.coefficientList();
+		} catch (RuntimeException ex) {
+			// throw new WrongArgumentType(ast, expr, 1, "Polynomial expected!");
+		}
+		return F.NIL;
+	}
 	public static IAST roots(final IExpr arg1, IAST variables, EvalEngine engine) {
 		if (variables.size() != 2) {
 			// factor only possible for univariate polynomials
@@ -1853,8 +1857,7 @@ public class PolynomialFunctions {
 								}
 							}
 						} else {
-							double[] coefficients = PolynomialFunctions.coefficientList(temp,
-									(ISymbol) variables.arg1());
+							double[] coefficients = PolynomialFunctions.coefficients(temp, (ISymbol) variables.arg1());
 							if (coefficients == null) {
 								return F.NIL;
 							}

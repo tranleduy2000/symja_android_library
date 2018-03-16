@@ -5,8 +5,7 @@ import org.apfloat.ApfloatMath;
 import org.apfloat.Apint;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
-import org.matheclipse.core.builtin.PatternMatching.Blank;
-import org.matheclipse.core.builtin.PatternMatching.Pattern;
+import org.matheclipse.core.builtin.PatternMatching;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
@@ -68,10 +67,10 @@ public class AST2Expr {
 			"ChebyshevU", "ChessboardDistance", "ChineseRemainder", "CholeskyDecomposition", "Chop", "CirclePoints",
 			"Clear", "ClearAll", "ClearAttributes", "Clip", "Coefficient", "CoefficientList", "CoefficientRules",
 			"Colon", "Collect", "Commonest", "Complement", "Compile", "Complex", "ComplexExpand", "ComposeList",
-			"Composition", "CompoundExpression", "Condition", "Conjugate", "ConjugateTranspose", "ConstantArray",
-			"Continue", "ContinuedFraction", "ConvexHullMesh", "CoprimeQ", "Correlation", "Cos", "Cosh",
-			"CosineDistance", "CosIntegral", "CoshIntegral", "Cot", "Coth", "Count", "Covariance", "Cross", "Csc",
-			"Csch", "CubeRoot", "Curl", "Decrement", "Default", "Defer", "Definition", "Delete", "DeleteCases",
+			"ComposeSeries", "Composition", "CompoundExpression", "Condition", "Conjugate", "ConjugateTranspose",
+			"ConstantArray", "Continue", "ContinuedFraction", "ConvexHullMesh", "CoprimeQ", "Correlation", "Cos",
+			"Cosh", "CosineDistance", "CosIntegral", "CoshIntegral", "Cot", "Coth", "Count", "Covariance", "Cross",
+			"Csc", "Csch", "CubeRoot", "Curl", "Decrement", "Default", "Defer", "Definition", "Delete", "DeleteCases",
 			"DeleteDuplicates", "Denominator", "Depth", "Derivative", "DesignMatrix", "Det", "Diagonal",
 			"DiagonalMatrix", "DiceDissimilarity", "DigitQ", "Dimensions", "DiracDelta", "DiscreteDelta",
 			"DiscreteUniformDistribution", "DirectedInfinity", "Direction", "Discriminant", "Distribute", "Divergence",
@@ -95,12 +94,12 @@ public class AST2Expr {
 			"IntegerExponent", "IntegerLength", "IntegerPart", "IntegerPartitions", "IntegerQ", "Integrate",
 			"Interpolation", "InterpolatingFunction", "InterpolatingPolynomial", "Intersection", "Inverse",
 			"InverseErf", "InverseErfc", "InverseFunction", "InverseHaversine", "InverseLaplaceTransform",
-			"JaccardDissimilarity", "JacobiMatrix", "JacobiSymbol", "JavaForm", "Join", "KOrderlessPartitions",
-			"KPartitions", "KroneckerDelta", "Kurtosis", "Last", "LCM", "LeafCount", "LaguerreL", "LaplaceTransform",
-			"LeastSquares", "LegendreP", "LegendreQ", "Length", "Less", "LessEqual", "LetterQ", "Level", "LevelQ",
-			"Limit", "Line", "LinearModelFit", "LinearProgramming", "LinearSolve", "LiouvilleLambda", "List",
-			"ListConvolve", "ListCorrelate", "ListQ", "Literal", "Log", "Log2", "Log10", "LogGamma",
-			"LogNormalDistribution", "LogicalExpand", "LogisticSigmoid", "LogIntegral", "LowerCaseQ",
+			"InverseSeries", "JaccardDissimilarity", "JacobiMatrix", "JacobiSymbol", "JavaForm", "Join",
+			"KOrderlessPartitions", "KPartitions", "KroneckerDelta", "Kurtosis", "Last", "LCM", "LeafCount",
+			"LaguerreL", "LaplaceTransform", "LeastSquares", "LegendreP", "LegendreQ", "Length", "Less", "LessEqual",
+			"LetterQ", "Level", "LevelQ", "Limit", "Line", "LinearModelFit", "LinearProgramming", "LinearSolve",
+			"LiouvilleLambda", "List", "ListConvolve", "ListCorrelate", "ListQ", "Literal", "Log", "Log2", "Log10",
+			"LogGamma", "LogNormalDistribution", "LogicalExpand", "LogisticSigmoid", "LogIntegral", "LowerCaseQ",
 			"LowerTriangularize", "LucasL", "LUDecomposition", "MachineNumberQ", "ManhattanDistance", "MangoldtLambda",
 			"MantissaExponent", "Map", "MapAt", "MapAll", "MapThread", "MatchingDissimilarity", "MatchQ", "MathMLForm",
 			"MatrixForm", "MatrixMinimalPolynomial", "MatrixPower", "MatrixQ", "MatrixRank", "Max", "Mean",
@@ -127,10 +126,10 @@ public class AST2Expr {
 			"RogersTanimotoDissimilarity", "RootIntervals", "Root", "RootOf", "Roots", "RussellRaoDissimilarity",
 			"Surd", "RotateLeft", "RotateRight", "Round", "RowReduce", "Rule", "RuleDelayed", "SameQ",
 			"SatisfiabilityCount", "SatisfiabilityInstances", "SatisfiableQ", "Scan", "Sec", "Sech", "Select",
-			"Sequence", "Series", "SeriesData", "Set", "SetAttributes", "SetDelayed", "Share", "Show", "Sign",
-			"SignCmp", "Simplify", "Sin", "Sinc", "SingularValueDecomposition", "Sinh", "SinIntegral", "SinhIntegral",
-			"Skewness", "SokalSneathDissimilarity", "Solve", "Sort", "Sow", "Span", "Split", "SplitBy", "Sqrt",
-			"SquaredEuclideanDistance", "SquareFreeQ", "StandardDeviation", "Standardize", "StieltjesGamma",
+			"Sequence", "Series", "SeriesCoefficient", "SeriesData", "Set", "SetAttributes", "SetDelayed", "Share",
+			"Show", "Sign", "SignCmp", "Simplify", "Sin", "Sinc", "SingularValueDecomposition", "Sinh", "SinIntegral",
+			"SinhIntegral", "Skewness", "SokalSneathDissimilarity", "Solve", "Sort", "Sow", "Span", "Split", "SplitBy",
+			"Sqrt", "SquaredEuclideanDistance", "SquareFreeQ", "StandardDeviation", "Standardize", "StieltjesGamma",
 			"StirlingS1", "StirlingS2", "StringDrop", "StringJoin", "StringLength", "StringTake", "StruveH", "StruveL",
 			"StudentTDistribution", "Subfactorial", "Subscript", "Subsuperscript", "Subsets", "Subtract",
 			"SubtractFrom", "Sum", "Superscript", "SurfaceGraphics", "Switch", "SyntaxLength", "SymbolName", "SymbolQ",
@@ -322,13 +321,13 @@ public class AST2Expr {
 			} else if (ast.isAST(F.Exp, 2)) {
 				// rewrite from input: Exp(x) => E^x
 				return F.Power(F.E, ast.arg1());
-			} else if (ast.isPower() && ast.arg1().isPower() && ast.arg2().isMinusOne()) {
-				IAST arg1 = (IAST) ast.arg1();
-				if (arg1.arg2().isNumber()) {
+			} else if (ast.isPower() && ast.base().isPower() && ast.exponent().isMinusOne()) {
+				IAST arg1Power = (IAST) ast.base();
+				if (arg1Power.exponent().isNumber()) {
 					// Division operator
 					// rewrite from input: Power(Power(x, <number>),-1) =>
 					// Power(x, - <number>)
-					return F.Power(arg1.arg1(), ((INumber) arg1.arg2()).negate());
+					return F.Power(arg1Power.base(), ((INumber) arg1Power.exponent()).negate());
 				}
 			} else if (ast.isASTSizeGE(F.GreaterEqual, 3)) {
 				ISymbol compareHead = F.Greater;
@@ -343,12 +342,12 @@ public class AST2Expr {
 				ISymbol compareHead = F.LessEqual;
 				return rewriteLessGreaterAST(ast, compareHead);
 			} else if (head.equals(F.Pattern)) {
-				final IExpr expr = Pattern.CONST.evaluate(ast, fEngine);
+				final IExpr expr = PatternMatching.Pattern.CONST.evaluate(ast, fEngine);
 				if (expr.isPresent()) {
 					return expr;
 				}
 			} else if (head.equals(F.Blank)) {
-				final IExpr expr = Blank.CONST.evaluate(ast, fEngine);
+				final IExpr expr = PatternMatching.Blank.CONST.evaluate(ast, fEngine);
 				if (expr.isPresent()) {
 					return expr;
 				}
@@ -411,9 +410,11 @@ public class AST2Expr {
 			if (denominator.isZero()) {
 				return F.Rational(fr.isSign() ? numerator.negate() : numerator, denominator);
 			}
-			return F.Rational(fr.isSign() ? numerator.negate() : numerator, denominator);
-			// return F.fraction(numerator, fr.isSign() ? (IInteger) denominator.negate() :
-			// denominator);
+			if (denominator.isOne()) {
+				return fr.isSign() ? numerator.negate() : numerator;
+			}
+			// return F.Rational(fr.isSign() ? numerator.negate() : numerator, denominator);
+			return F.fraction(fr.isSign() ? numerator.negate() : numerator, denominator);
 		}
 		if (node instanceof StringNode) {
 			return F.$str(node.getString());

@@ -82,18 +82,19 @@ import edu.jas.structure.GcdRingElem;
  */
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
 
-    public final static int ASTID = 1024;
-    public final static int BLANKID = 256;
+    public final static int ASTID = 2024;
+    public final static int BLANKID = 512;
     public final static int COMPLEXID = 32;
     public final static int DOUBLECOMPLEXID = 4;
     public final static int DOUBLEID = 2;
     public final static int FRACTIONID = 16;
     public final static int INTEGERID = 8;
-    public final static int METHODSYMBOLID = 2048;
-    public final static int PATTERNID = 512;
-    public final static int STRINGID = 64;
-    public final static int SYMBOLID = 128;
+    public final static int METHODSYMBOLID = 4096;
+    public final static int PATTERNID = 1024;
+    public final static int SERIESID = 64;
+    public final static int STRINGID = 128;
 
+    public final static int SYMBOLID = 256;
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
