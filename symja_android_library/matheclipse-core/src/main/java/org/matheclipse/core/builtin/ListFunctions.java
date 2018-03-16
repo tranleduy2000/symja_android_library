@@ -2,6 +2,7 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
+import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
@@ -157,12 +158,12 @@ public final class ListFunctions {
 		private IExpr[] fCurrentIndex;
 
 		public TableGenerator(final List<? extends IIterator<IExpr>> iterList, final IAST prototypeList,
-				final IArrayFunction function) {
+							  final IArrayFunction function) {
 			this(iterList, prototypeList, function, (IExpr) null);
 		}
 
 		public TableGenerator(final List<? extends IIterator<IExpr>> iterList, final IAST prototypeList,
-				final IArrayFunction function, IExpr defaultValue) {
+							  final IArrayFunction function, IExpr defaultValue) {
 			fIterList = iterList;
 			fPrototypeList = prototypeList;
 			fFunction = function;
@@ -287,7 +288,7 @@ public final class ListFunctions {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param iter
 		 *            the current Iterator index
 		 * @param index
@@ -295,7 +296,7 @@ public final class ListFunctions {
 		 * @return
 		 */
 		private IExpr createGenericTable(final IIterator<IExpr> iter, final int index, final int allocationHint,
-				IExpr arg1, IExpr arg2) {
+										 IExpr arg1, IExpr arg2) {
 			final IASTAppendable result = fPrototypeList
 					.copyHead(fPrototypeList.size() + (allocationHint > 0 ? allocationHint : 0));
 			result.appendArgs(fPrototypeList);
@@ -323,12 +324,12 @@ public final class ListFunctions {
 		public IExpr toObject(final int i) {
 			if (i < 3) {
 				switch (i) {
-				case 0:
-					return F.C0;
-				case 1:
-					return F.C1;
-				case 2:
-					return F.C2;
+					case 0:
+						return F.C0;
+					case 1:
+						return F.C1;
+					case 2:
+						return F.C2;
 				}
 			}
 			return F.integer(i);
@@ -351,14 +352,14 @@ public final class ListFunctions {
 	 * <pre>
 	 * Accumulate(list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * accumulate the values of <code>list</code> returning a new list.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Accumulate({1, 2, 3})
 	 * {1,3,6}
@@ -375,12 +376,12 @@ public final class ListFunctions {
 				IAST list = (IAST) arg1;
 				int size = list.size();
 				IASTAppendable resultList = F.ast(list.head(), size, false);
-				return foldLeft(null, list, 1, list.size(), new BiFunction<IExpr, IExpr, IExpr>() {
-                    @Override
-                    public IExpr apply(IExpr x, IExpr y) {
-                        return F.binaryAST2(F.Plus, x, y);
-                    }
-                }, resultList);
+				return foldLeft(null, list, 1, size, new BiFunction<IExpr, IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x, IExpr y) {
+						return F.binaryAST2(F.Plus, x, y);
+					}
+				}, resultList);
 
 			}
 			return F.NIL;
@@ -392,40 +393,40 @@ public final class ListFunctions {
 	 * <pre>
 	 * Append(expr, item)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>expr</code> with <code>item</code> appended to its leaves.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Append({1, 2, 3}, 4)    
+	 * &gt;&gt; Append({1, 2, 3}, 4)
 	 * {1,2,3,4}
 	 * </pre>
 	 * <p>
 	 * <code>Append</code> works on expressions with heads other than <code>List</code>:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Append(f(a, b), c)    
+	 * &gt;&gt; Append(f(a, b), c)
 	 * f(a,b,c)
 	 * </pre>
 	 * <p>
 	 * Unlike <code>Join</code>, <code>Append</code> does not flatten lists in <code>item</code>:<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Append({a, b}, {c, d})    
+	 * &gt;&gt; Append({a, b}, {c, d})
 	 * {a,b,{c,d}}
 	 * </pre>
 	 * <p>
 	 * Nonatomic expression expected.<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Append(a, b)     
+	 * &gt;&gt; Append(a, b)
 	 * Append(a,b)
 	 * </pre>
 	 */
@@ -449,48 +450,48 @@ public final class ListFunctions {
 	 * <pre>
 	 * AppendTo(s, item)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * append <code>item</code> to value of <code>s</code> and sets <code>s</code> to the result.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; s = {}    
-	 * &gt;&gt; AppendTo(s, 1)    
-	 * {1}    
-	 * 
-	 * &gt;&gt; s    
+	 * &gt;&gt; s = {}
+	 * &gt;&gt; AppendTo(s, 1)
+	 * {1}
+	 *
+	 * &gt;&gt; s
 	 * {1}
 	 * </pre>
 	 * <p>
 	 * 'Append' works on expressions with heads other than 'List':<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; y = f()  
-	 * &gt;&gt; AppendTo(y, x)    
-	 * f(x)    
-	 * 
-	 * &gt;&gt; y    
+	 * &gt;&gt; y = f()
+	 * &gt;&gt; AppendTo(y, x)
+	 * f(x)
+	 *
+	 * &gt;&gt; y
 	 * f(x)
 	 * </pre>
 	 * <p>
 	 * {} is not a variable with a value, so its value cannot be changed.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; AppendTo({}, 1)     
+	 * &gt;&gt; AppendTo({}, 1)
 	 * AppendTo({}, 1)
 	 * </pre>
 	 * <p>
 	 * a is not a variable with a value, so its value cannot be changed.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; AppendTo(a, b)    
+	 * &gt;&gt; AppendTo(a, b)
 	 * AppendTo(a, b)
 	 * </pre>
 	 */
@@ -539,38 +540,38 @@ public final class ListFunctions {
 	 * <pre>
 	 * Array(f, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the <code>n</code>-element list <code>{f(1), ..., f(n)}</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Array(f, n, a)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the n-element list <code>{f(a), ..., f(a + n)}</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Array(f, {n, m}, {a, b})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns an <code>n</code>-by-<code>m</code> matrix created by applying <code>f</code> to indices ranging from
 	 * <code>(a, b)</code> to <code>(a + n, b + m)</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Array(f, dims, origins, h)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns an expression with the specified dimensions and index origins, with head <code>h</code> (instead of
@@ -578,36 +579,36 @@ public final class ListFunctions {
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Array(f, 4)
 	 * {f(1),f(2),f(3),f(4)}
-	 * 
+	 *
 	 * &gt;&gt; Array(f, {2, 3})
-	 * {{f(1,1),f(1,2),f(1,3)},{f(2,1),f(2,2),f(2,3)}} 
-	 * 
+	 * {{f(1,1),f(1,2),f(1,3)},{f(2,1),f(2,2),f(2,3)}}
+	 *
 	 * &gt;&gt; Array(f, {2, 3}, {4, 6})
 	 * {{f(4,6),f(4,7),f(4,8)},{f(5,6),f(5,7),f(5,8)}}
-	 * 
+	 *
 	 * &gt;&gt; Array(f, 4)
 	 * {f(1), f(2), f(3), f(4)}
-	 * 
+	 *
 	 * &gt;&gt; Array(f, {2, 3})
 	 * {{f(1, 1), f(1, 2), f(1, 3)}, {f(2, 1), f(2, 2), f(2, 3)}}
-	 * 
+	 *
 	 * &gt;&gt; Array(f, {2, 3}, 3)
 	 * {{f(3, 3), f(3, 4), f(3, 5)}, {f(4, 3), f(4, 4), f(4, 5)}}
-	 * 
+	 *
 	 * &gt;&gt; Array(f, {2, 3}, {4, 6})
 	 * {{f(4,6),f(4,7),f(4,8)},{f(5,6),f(5,7),f(5,8)}}
-	 * 
+	 *
 	 * &gt;&gt; Array(f, {2, 3}, 1, Plus)
 	 * f(1,1)+f(1,2)+f(1,3)+f(2,1)+f(2,2)+f(2,3)
 	 * </pre>
 	 * <p>
 	 * {2, 3} and {1, 2, 3} should have the same length.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Array(f, {2, 3}, {1, 2, 3})
 	 * Array(f, {2, 3}, {1, 2, 3})
@@ -615,7 +616,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Single or list of non-negative integers expected at position 2.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Array(f, a)
 	 * Array(f, a)
@@ -623,7 +624,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Single or list of non-negative integers expected at position 3.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Array(f, 2, b)
 	 * Array(f, 2, b)
@@ -772,34 +773,34 @@ public final class ListFunctions {
 	 * <pre>
 	 * ArrayPad(list, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * adds <code>n</code> times <code>0</code> on the left and right of the <code>list</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * ArrayPad(list, {m,n})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * adds <code>m</code> times <code>0</code> on the left and <code>n</code> times <code>0</code> on the right.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * ArrayPad(list, {m, n}, x)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * adds <code>m</code> times <code>x</code> on the left and <code>n</code> times <code>x</code> on the right.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ArrayPad({a, b, c}, 1, x)
 	 * {x,a,b,c,x}
@@ -834,8 +835,8 @@ public final class ListFunctions {
 			return F.NIL;
 		}
 
-		private static IExpr arrayPadMatrixAtom(final IAST matrix, int[] dim, final int m, final int n, final IExpr atom) {
-			final int columnDim = dim[1] + m + n;
+		private static IExpr arrayPadMatrixAtom(IAST matrix, int[] dim, int m, int n, IExpr atom) {
+			int columnDim = dim[1] + m + n;
 			IASTAppendable result = matrix.copyHead(dim[0] + m + n);
 			IAST row;
 			// prepend m rows
@@ -844,14 +845,21 @@ public final class ListFunctions {
 				public IExpr apply(int i) {
 					return F.constantArray(atom, columnDim);
 				}
-			}); 
+			});
+			// for (int i = 0; i < m; i++) {
+			// result.append(F.constantArray(atom, columnDim));
+			// }
 
 			result.appendArgs(1, dim[0] + 1, new IntFunction<IExpr>() {
 				@Override
 				public IExpr apply(int i) {
 					return arrayPadAtom(matrix.getAST(i), m, n, atom);
 				}
-			}); 
+			});
+			// for (int i = 1; i <= dim[0]; i++) {
+			// row = matrix.getAST(i);
+			// result.append(arrayPadAtom(row, m, n, atom));
+			// }
 
 			// append n rows
 			result.appendArgs(0, n, new IntFunction<IExpr>() {
@@ -859,11 +867,14 @@ public final class ListFunctions {
 				public IExpr apply(int i) {
 					return F.constantArray(atom, columnDim);
 				}
-			}); 
+			});
+			// for (int i = 0; i < n; i++) {
+			// result.append(F.constantArray(atom, columnDim));
+			// }
 			return result;
 		}
 
-		private static IExpr arrayPadAtom(IAST ast, int m, int n, final IExpr atom) {
+		private static IExpr arrayPadAtom(IAST ast, int m, int n, IExpr atom) {
 			IASTAppendable result = ast.copyHead();
 			result.appendArgs(0, m, new IntFunction<IExpr>() {
 				@Override
@@ -893,49 +904,49 @@ public final class ListFunctions {
 	 * <pre>
 	 * Cases(list, pattern)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the elements of <code>list</code> that match <code>pattern</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Cases(list, pattern, ls)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the elements matching at levelspec <code>ls</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Cases({a, 1, 2.5, \"string\"}, _Integer|_Real)
 	 * {1,2.5}
-	 * 
+	 *
 	 * &gt;&gt; Cases(_Complex)[{1, 2I, 3, 4-I, 5}]
 	 * {I*2,4-I}
-	 * 
+	 *
 	 * &gt;&gt; Cases(1, 2)
 	 * {}
-	 * 
+	 *
 	 * &gt;&gt; Cases(f(1, 2), 2)
 	 * {2}
-	 * 
+	 *
 	 * &gt;&gt; Cases(f(f(1, 2), f(2)), 2)
 	 * {}
-	 * 
+	 *
 	 * &gt;&gt; Cases(f(f(1, 2), f(2)), 2, 2)
 	 * {2,2}
-	 * 
+	 *
 	 * &gt;&gt; Cases(f(f(1, 2), f(2), 2), 2, Infinity)
 	 * {2,2,2}
-	 * 
+	 *
 	 * &gt;&gt; Cases({1, f(2), f(3, 3, 3), 4, f(5, 5)}, f(x__) :&gt; Plus(x))
 	 * {2,9,10}
-	 * 
+	 *
 	 * &gt;&gt; Cases({1, f(2), f(3, 3, 3), 4, f(5, 5)}, f(x__) -&gt; Plus(x))
 	 * {2, 3, 3, 3, 5, 5}
 	 * </pre>
@@ -959,7 +970,7 @@ public final class ListFunctions {
 			private int resultsCounter;
 
 			/**
-			 * 
+			 *
 			 * @param matcher
 			 *            the pattern-matcher
 			 * @param resultCollection
@@ -967,7 +978,7 @@ public final class ListFunctions {
 			 *            maximum number of results. -1 for for no limitation
 			 */
 			public CasesPatternMatcherFunctor(final PatternMatcher matcher, IASTAppendable resultCollection,
-					int maximumResults) {
+											  int maximumResults) {
 				this.matcher = matcher;
 				this.resultCollection = resultCollection;
 				this.maximumResults = maximumResults;
@@ -997,7 +1008,7 @@ public final class ListFunctions {
 			private int resultsCounter;
 
 			/**
-			 * 
+			 *
 			 * @param function
 			 *            the funtion which should determine the results
 			 * @param resultCollection
@@ -1005,7 +1016,7 @@ public final class ListFunctions {
 			 *            maximum number of results. -1 for for no limitation
 			 */
 			public CasesRulesFunctor(final Function<IExpr, IExpr> function, IASTAppendable resultCollection,
-					int maximumResults) {
+									 int maximumResults) {
 				this.function = function;
 				this.resultCollection = resultCollection;
 				this.maximumResults = maximumResults;
@@ -1096,14 +1107,14 @@ public final class ListFunctions {
 	 * <pre>
 	 * Catenate({l1, l2, ...})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * concatenates the lists <code>l1, l2, ...</code>
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Catenate({{1, 2, 3}, {4, 5}})
 	 * {1, 2, 3, 4, 5}
@@ -1116,8 +1127,8 @@ public final class ListFunctions {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isList()) {
-				final IAST list = (IAST) ast.arg1();
-				final int[] size = { 1 };
+				IAST list = (IAST) ast.arg1();
+				int[] size = { 1 };
 				if (list.exists(new Predicate<IExpr>() {
 					@Override
 					public boolean test(IExpr x) {
@@ -1127,13 +1138,16 @@ public final class ListFunctions {
 						size[0] += list.argSize();
 						return false;
 					}
-				}, 1)) {
+				})) {
 					return F.NIL;
 				}
 				IASTAppendable resultList = F.ast(F.List, size[0], false);
-				for (int i = 1; i < list.size(); i++) {
-					resultList.appendArgs((IAST) list.get(i));
-				}
+				list.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						resultList.appendArgs((IAST) x);
+					}
+				});
 				return resultList;
 			}
 			return F.NIL;
@@ -1167,13 +1181,16 @@ public final class ListFunctions {
 					IInteger max = (IInteger) ((IAST) tallyResult.arg1()).arg2();
 					IASTAppendable result = F.ListAlloc(size);
 					result.append(((IAST) tallyResult.arg1()).arg1());
-					for (int i = 2; i < size; i++) {
-						if (max.equals(((IAST) tallyResult.get(i)).arg2())) {
-							result.append(((IAST) tallyResult.get(i)).arg1());
-						} else {
-							break;
+					tallyResult.exists(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr x) {
+							if (max.equals(x.second())) {
+								result.append(x.first());
+								return false;
+							}
+							return true;
 						}
-					}
+					}, 2);
 					return result;
 				} else {
 					int counter = 0;
@@ -1202,7 +1219,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Complement(set1, set2)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * get the complement set from <code>set1</code> and <code>set2</code>.
@@ -1215,11 +1232,11 @@ public final class ListFunctions {
 	 * <li><a href="https://en.wikipedia.org/wiki/Complement_(set_theory)">Wikipedia - Complement (set theory)</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Complement({1,2,3},{2,3,4})
 	 * {1}
-	 * 
+	 *
 	 * &gt;&gt; Complement({2,3,4},{1,2,3})
 	 * {4}
 	 * </pre>
@@ -1246,12 +1263,14 @@ public final class ListFunctions {
 
 			Set<IExpr> set2 = arg2.asSet();
 			Set<IExpr> set3 = new HashSet<IExpr>();
-			for (int i = 1; i < arg1.size(); i++) {
-				IExpr temp = arg1.get(i);
-				if (!set2.contains(temp)) {
-					set3.add(temp);
+			arg1.forEach(new Consumer<IExpr>() {
+				@Override
+				public void accept(IExpr x) {
+					if (!set2.contains(x)) {
+						set3.add(x);
+					}
 				}
-			}
+			});
 			IASTAppendable result = F.ListAlloc(set3.size());
 			for (IExpr expr : set3) {
 				result.append(expr);
@@ -1265,14 +1284,14 @@ public final class ListFunctions {
 	 * <pre>
 	 * Composition(sym1, sym2,...)[arg1, arg2,...]
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * creates a composition of the symbols applied at the arguments.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Composition(u, v, w)[x, y]
 	 * u(v(w(x,y)))
@@ -1311,14 +1330,14 @@ public final class ListFunctions {
 	 * <pre>
 	 * ComposeList(list - of - symbols, variable)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * creates a list of compositions of the symbols applied at the argument <code>x</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ComposeList({f,g,h}, x)
 	 * {x,f(x),g(f(x)),h(g(f(x)))}
@@ -1337,18 +1356,16 @@ public final class ListFunctions {
 					// final EvalEngine engine = EvalEngine.get();
 					final IAST list = (IAST) ast.arg1();
 					final IAST constant = F.ast(ast.arg1());
-					ListFunctions.foldLeft(ast.arg2(), list, 1, list.size(), //
-							new BiFunction<IExpr, IExpr, IExpr>() {
-								@Override
-								public IExpr apply(IExpr x, IExpr y) {
-									final IASTAppendable a = constant.apply(y);
-									a.append(x);
-									return a;
-								}
-							},
-							resultList);
+					ListFunctions.foldLeft(ast.arg2(), list, 1, list.size(), new BiFunction<IExpr, IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x, IExpr y) {
+							final IASTAppendable a = constant.apply(y);
+							a.append(x);
+							return a;
+						}
+					}, resultList);
 					return resultList;
-				} 
+				}
 			} catch (final ArithmeticException e) {
 
 			}
@@ -1364,18 +1381,18 @@ public final class ListFunctions {
 	 * <pre>
 	 * ConstantArray(expr, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns a list of <code>n</code> copies of <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ConstantArray(a, 3)
 	 * {a, a, a}
-	 * 
+	 *
 	 * &gt;&gt; ConstantArray(a, {2, 3})
 	 * {{a, a, a}, {a, a, a}}
 	 * </pre>
@@ -1502,28 +1519,28 @@ public final class ListFunctions {
 	 * <pre>
 	 * Count(list, pattern)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the number of times <code>pattern</code> appears in <code>list</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Count(list, pattern, ls)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * counts the elements matching at levelspec <code>ls</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Count({3, 7, 10, 7, 5, 3, 7, 10}, 3)
 	 * 2
-	 * 
+	 *
 	 * &gt;&gt; Count({{a, a}, {a, a, a}, a}, a, {2})
 	 * 5
 	 * </pre>
@@ -1577,7 +1594,7 @@ public final class ListFunctions {
 
 	/**
 	 * Delete(list,n) - delete the n-th argument from the list. Negative n counts from the end.
-	 * 
+	 *
 	 */
 	private static class Delete extends AbstractCoreFunctionEvaluator {
 
@@ -1613,18 +1630,18 @@ public final class ListFunctions {
 	 * <pre>
 	 * DeleteCases(list, pattern)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the elements of <code>list</code> that do not match <code>pattern</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; DeleteCases({a, 1, 2.5, "string"}, _Integer|_Real)
 	 * {a,"string"}
-	 * 
+	 *
 	 * &gt;&gt; DeleteCases({a, b, 1, c, 2, 3}, _Symbol)
 	 * {1,2,3}
 	 * </pre>
@@ -1635,7 +1652,7 @@ public final class ListFunctions {
 			private final IPatternMatcher matcher;
 
 			/**
-			 * 
+			 *
 			 * @param matcher
 			 *            the pattern-matcher
 			 */
@@ -1748,47 +1765,47 @@ public final class ListFunctions {
 	 * <pre>
 	 * Drop(expr, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>expr</code> with the first <code>n</code> leaves removed.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Drop({a, b, c, d}, 3)
 	 * {d}
-	 * 
+	 *
 	 * &gt;&gt; Drop({a, b, c, d}, -2)
 	 * {a,b}
-	 * 
+	 *
 	 * &gt;&gt; Drop({a, b, c, d, e}, {2, -2})
 	 * {a,e}
 	 * </pre>
 	 * <p>
 	 * Drop a submatrix:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; A = Table(i*10 + j, {i, 4}, {j, 4})
 	 * {{11,12,13,14},{21,22,23,24},{31,32,33,34},{41,42,43,44}}
-	 * 
+	 *
 	 * &gt;&gt; Drop(A, {2, 3}, {2, 3})
 	 * {{11,14},{41,44}}
-	 * 
+	 *
 	 * &gt;&gt; Drop(Range(10), {-2, -6, -3})
 	 * {1,2,3,4,5,7,8,10}
-	 * 
+	 *
 	 * &gt;&gt; Drop(Range(10), {10, 1, -3})
 	 * {2, 3, 5, 6, 8, 9}
 	 * </pre>
 	 * <p>
 	 * Cannot drop positions -5 through -2 in {1, 2, 3, 4, 5, 6}.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Drop(Range(6), {-5, -2, -2}) 
+	 * &gt;&gt; Drop(Range(6), {-5, -2, -2})
 	 * Drop({1, 2, 3, 4, 5, 6}, {-5, -2, -2})
 	 * </pre>
 	 */
@@ -1831,7 +1848,7 @@ public final class ListFunctions {
 
 		/**
 		 * Drop (remove) the list elements according to the <code>sequenceSpecifications</code> for the list indexes.
-		 * 
+		 *
 		 * @param list
 		 * @param level
 		 *            recursion level
@@ -1882,17 +1899,17 @@ public final class ListFunctions {
 	 * <pre>
 	 * Extract(expr, list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * extracts parts of <code>expr</code> specified by <code>list</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Extract(expr, {list1, list2, ...})'
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * extracts a list of parts.
@@ -1902,11 +1919,11 @@ public final class ListFunctions {
 	 * <p>
 	 * <code>Extract(expr, i, j, ...)</code> is equivalent to <code>Part(expr, {i, j, ...})</code>.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Extract(a + b + c, {2})
 	 * b
-	 * 
+	 *
 	 * &gt;&gt; Extract({{a, b}, {c, d}}, {{1}, {2, 2}})
 	 * {{a,b},d}
 	 * </pre>
@@ -1958,7 +1975,7 @@ public final class ListFunctions {
 		/**
 		 * Traverse all <code>list</code> element's and filter out the elements in the given <code>positions</code>
 		 * list.
-		 * 
+		 *
 		 * @param list
 		 * @param positions
 		 * @param positionConverter
@@ -1967,7 +1984,7 @@ public final class ListFunctions {
 		 * @param headOffset
 		 */
 		private static IExpr extract(final IAST list, final IAST positions,
-				final IPositionConverter<? super IExpr> positionConverter, int headOffset) {
+									 final IPositionConverter<? super IExpr> positionConverter, int headOffset) {
 			int p = 0;
 			IAST temp = list;
 			int posSize = positions.argSize();
@@ -1994,7 +2011,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * First(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the first element in <code>expr</code>.
@@ -2004,18 +2021,18 @@ public final class ListFunctions {
 	 * <p>
 	 * <code>First(expr)</code> is equivalent to <code>expr[[1]]</code>.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; First({a, b, c})
 	 * a
-	 * 
+	 *
 	 * &gt;&gt; First(a + b + c)
 	 * a
 	 * </pre>
 	 * <p>
 	 * Nonatomic expression expected.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; First(x)
 	 * First(x)
@@ -2055,8 +2072,8 @@ public final class ListFunctions {
 				IExpr temp = engine.evaluate(ast.arg3());
 				if (temp.isAST()) {
 					final IAST list = (IAST) temp;
-					final IExpr arg1 = engine.evaluate(ast.arg1());
-					final IExpr arg2 = engine.evaluate(ast.arg2());
+					IExpr arg1 = engine.evaluate(ast.arg1());
+					IExpr arg2 = engine.evaluate(ast.arg2());
 					return list.foldLeft(new BiFunction<IExpr, IExpr, IExpr>() {
 						@Override
 						public IExpr apply(IExpr x, IExpr y) {
@@ -2091,8 +2108,8 @@ public final class ListFunctions {
 				IExpr temp = engine.evaluate(ast.arg3());
 				if (temp.isAST()) {
 					final IAST list = (IAST) temp;
-					final IExpr arg1 = engine.evaluate(ast.arg1());
-					final IExpr arg2 = engine.evaluate(ast.arg2());
+					IExpr arg1 = engine.evaluate(ast.arg1());
+					IExpr arg2 = engine.evaluate(ast.arg2());
 					return foldLeft(arg2, list, 1, list.size(), new BiFunction<IExpr, IExpr, IExpr>() {
 						@Override
 						public IExpr apply(IExpr x, IExpr y) {
@@ -2157,7 +2174,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Intersection(set1, set2)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * get the intersection set from <code>set1</code> and <code>set2</code>.
@@ -2201,7 +2218,7 @@ public final class ListFunctions {
 
 		/**
 		 * Create the (ordered) intersection set from both ASTs.
-		 * 
+		 *
 		 * @param ast1
 		 *            first AST set
 		 * @param ast2
@@ -2272,7 +2289,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Join(l1, l2)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * concatenates the lists <code>l1</code> and <code>l2</code>.
@@ -2282,18 +2299,18 @@ public final class ListFunctions {
 	 * <p>
 	 * <code>Join</code> concatenates lists:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Join({a, b}, {c, d, e})
 	 * {a,b,c,d,e}
-	 * 
+	 *
 	 * &gt;&gt; Join({{a, b}, {c, d}}, {{1, 2}, {3, 4}})
 	 * {{a,b},{c,d},{1,2},{3,4}}
 	 * </pre>
 	 * <p>
 	 * The concatenated expressions may have any head:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Join(a + b, c + d, e + f)
 	 * a+b+c+d+e+f
@@ -2301,20 +2318,20 @@ public final class ListFunctions {
 	 * <p>
 	 * However, it must be the same for all expressions:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Join(a + b, c * d)
 	 * Join(a+b,c*d)
-	 * 
+	 *
 	 * &gt;&gt; Join(x, y)
 	 * Join(x,y)
-	 * 
+	 *
 	 * &gt;&gt; Join(x + y, z)
 	 * Join(x+y,z)
-	 * 
+	 *
 	 * &gt;&gt; Join(x + y, y * z, a)
 	 * Join(x + y, y z, a)
-	 * 
+	 *
 	 * &gt;&gt; Join(x, y + z, y * z)
 	 * Join(x,y+z,y*z)
 	 * </pre>
@@ -2363,7 +2380,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Last(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the last element in <code>expr</code>.
@@ -2373,7 +2390,7 @@ public final class ListFunctions {
 	 * <p>
 	 * <code>Last(expr)</code> is equivalent to <code>expr[[-1]]</code>.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Last({a, b, c})
 	 * c
@@ -2381,7 +2398,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Nonatomic expression expected.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Last(x)
 	 * Last(x)
@@ -2410,7 +2427,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Length(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the number of leaves in <code>expr</code>.
@@ -2420,7 +2437,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Length of a list:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Length({1, 2, 3})
 	 * 3
@@ -2428,18 +2445,18 @@ public final class ListFunctions {
 	 * <p>
 	 * 'Length' operates on the 'FullForm' of expressions:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Length(Exp(x))
 	 * 2
-	 * 
+	 *
 	 * &gt;&gt; FullForm(Exp(x))
 	 * Power(E, x)
 	 * </pre>
 	 * <p>
 	 * The length of atoms is 0:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Length(a)
 	 * 0
@@ -2447,11 +2464,11 @@ public final class ListFunctions {
 	 * <p>
 	 * Note that rational and complex numbers are atoms, although their 'FullForm' might suggest the opposite:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Length(1/3)
 	 * 0
-	 * 
+	 *
 	 * &gt;&gt; FullForm(1/3)
 	 * Rational(1, 3)
 	 * </pre>
@@ -2475,7 +2492,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Level(expr, levelspec)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives a list of all sub-expressions of <code>expr</code> at the level(s) specified by <code>levelspec</code>.
@@ -2484,41 +2501,41 @@ public final class ListFunctions {
 	 * <p>
 	 * Level uses standard level specifications:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * n
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * levels <code>1</code> through <code>n</code>
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Infinity
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * all levels from level <code>1</code>
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * { n }
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * level <code>n</code> only
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * { m, n }
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * levels <code>m</code> through <code>n</code>
@@ -2532,40 +2549,40 @@ public final class ListFunctions {
 	 * <p>
 	 * Level <code>-1</code> is the set of atoms in an expression:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Level(a + b ^ 3 * f(2 x ^ 2), {-1})
 	 * {a,b,3,2,x,2}
-	 * 
+	 *
 	 * &gt;&gt; Level({{{{a}}}}, 3)
-	 * {{a},{{a}},{{{a}}}} 
-	 * 
+	 * {{a},{{a}},{{{a}}}}
+	 *
 	 * &gt;&gt; Level({{{{a}}}}, -4)
 	 * {{{{a}}}}
-	 * 
+	 *
 	 * &gt;&gt; Level({{{{a}}}}, -5)
 	 * {}
-	 * 
+	 *
 	 * &gt;&gt; Level(h0(h1(h2(h3(a)))), {0, -1})
 	 * {a,h3(a),h2(h3(a)),h1(h2(h3(a))),h0(h1(h2(h3(a))))}
 	 * </pre>
 	 * <p>
 	 * Use the option <code>Heads -&gt; True</code> to include heads:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Level({{{{a}}}}, 3, Heads -&gt; True)
-	 * {List,List,List,{a},{{a}},{{{a}}}} 
-	 * 
+	 * {List,List,List,{a},{{a}},{{{a}}}}
+	 *
 	 * &gt;&gt; Level(x^2 + y^3, 3, Heads -&gt; True)
-	 * {Plus,Power,x,2,x^2,Power,y,3,y^3} 
-	 * 
+	 * {Plus,Power,x,2,x^2,Power,y,3,y^3}
+	 *
 	 * &gt;&gt; Level(a ^ 2 + 2 * b, {-1}, Heads -&gt; True)
-	 * {Plus,Power,a,2,Times,2,b} 
-	 * 
+	 * {Plus,Power,a,2,Times,2,b}
+	 *
 	 * &gt;&gt; Level(f(g(h))[x], {-1}, Heads -&gt; True)
 	 * {f,g,h,x}
-	 * 
+	 *
 	 * &gt;&gt; Level(f(g(h))[x], {-2, -1}, Heads -&gt; True)
 	 * {f,g,h,g(h),x,f(g(h))[x]}
 	 * </pre>
@@ -2591,7 +2608,7 @@ public final class ListFunctions {
 
 			if (!ast.arg1().isAtom()) {
 				final IAST arg1 = (IAST) ast.arg1();
-				final IASTAppendable resultList;
+				IASTAppendable resultList;
 				if (lastIndex != 3) {
 					resultList = F.ListAlloc(8);
 				} else {
@@ -2619,24 +2636,24 @@ public final class ListFunctions {
 	 * <pre>
 	 * LevelQ(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * tests whether <code>expr</code> is a valid level specification.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; LevelQ(2)
 	 * True
-	 * 
+	 *
 	 * &gt;&gt; LevelQ({2, 4})
 	 * True
-	 * 
+	 *
 	 * &gt;&gt; LevelQ(Infinity)
 	 * True
-	 * 
+	 *
 	 * &gt;&gt; LevelQ(a + b)
 	 * False
 	 * </pre>
@@ -2664,7 +2681,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Most(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>expr</code> with the last element removed.
@@ -2674,20 +2691,20 @@ public final class ListFunctions {
 	 * <code>Most(expr)</code> is equivalent to <code>expr[[;;-2]]</code>.
 	 * </p>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Most({a, b, c})
 	 * {a,b}
-	 * 
+	 *
 	 * &gt;&gt; Most(a + b + c)
 	 * a+b
 	 * </pre>
 	 * <p>
 	 * Nonatomic expression expected.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Most(x) 
+	 * &gt;&gt; Most(x)
 	 * Most(x)
 	 * </pre>
 	 */
@@ -2730,7 +2747,7 @@ public final class ListFunctions {
 
 		/**
 		 * Gives the list of elements from <code>inputList</code> to which x is nearest.
-		 * 
+		 *
 		 * @param inputList
 		 * @param x
 		 * @param engine
@@ -2778,45 +2795,45 @@ public final class ListFunctions {
 	 * <pre>
 	 * PadLeft(list, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * pads <code>list</code> to length <code>n</code> by adding <code>0</code> on the left.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * PadLeft(list, n, x)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * pads <code>list</code> to length <code>n</code> by adding <code>x</code> on the left.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * PadLeft(list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * turns the ragged list <code>list</code> into a regular list by adding '0' on the left.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; PadLeft({1, 2, 3}, 5)    
-	 * {0,0,1,2,3}   
-	 * 
-	 * &gt;&gt; PadLeft(x(a, b, c), 5)    
-	 * x(0,0,a,b,c)    
-	 * 
-	 * &gt;&gt; PadLeft({1, 2, 3}, 2)    
-	 * {2, 3}    
-	 * 
-	 * &gt;&gt; PadLeft({{}, {1, 2}, {1, 2, 3}})    
+	 * &gt;&gt; PadLeft({1, 2, 3}, 5)
+	 * {0,0,1,2,3}
+	 *
+	 * &gt;&gt; PadLeft(x(a, b, c), 5)
+	 * x(0,0,a,b,c)
+	 *
+	 * &gt;&gt; PadLeft({1, 2, 3}, 2)
+	 * {2, 3}
+	 *
+	 * &gt;&gt; PadLeft({{}, {1, 2}, {1, 2, 3}})
 	 * {{0,0,0},{0,1,2},{1,2,3}}
 	 * </pre>
 	 */
@@ -2828,7 +2845,7 @@ public final class ListFunctions {
 
 			if (ast.isAST1()) {
 				if (ast.arg1().isListOfLists()) {
-					final IAST list = (IAST) ast.arg1();
+					IAST list = (IAST) ast.arg1();
 					int maxSize = -1;
 					for (int i = 1; i < list.size(); i++) {
 						IAST subList = (IAST) list.get(i);
@@ -2870,7 +2887,7 @@ public final class ListFunctions {
 			return F.NIL;
 		}
 
-		public static IExpr padLeftAtom(IAST ast, int n, final IExpr atom) {
+		public static IExpr padLeftAtom(IAST ast, int n, IExpr atom) {
 			int length = n - ast.size() + 1;
 			if (length > 0) {
 				IASTAppendable result = ast.copyHead();
@@ -2923,45 +2940,45 @@ public final class ListFunctions {
 	 * <pre>
 	 * PadRight(list, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * pads <code>list</code> to length <code>n</code> by adding <code>0</code> on the right.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * PadRight(list, n, x)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * pads <code>list</code> to length <code>n</code> by adding <code>x</code> on the right.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * PadRight(list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * turns the ragged list <code>list</code> into a regular list by adding '0' on the right.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; PadRight({1, 2, 3}, 5)    
-	 * {1,2,3,0,0}    
-	 * 
-	 * &gt;&gt; PadRight(x(a, b, c), 5)    
-	 * x(a,b,c,0,0)  
-	 * 
-	 * &gt;&gt; PadRight({1, 2, 3}, 2)    
-	 * {1,2}   
-	 * 
-	 * &gt;&gt; PadRight({{}, {1, 2}, {1, 2, 3}})    
+	 * &gt;&gt; PadRight({1, 2, 3}, 5)
+	 * {1,2,3,0,0}
+	 *
+	 * &gt;&gt; PadRight(x(a, b, c), 5)
+	 * x(a,b,c,0,0)
+	 *
+	 * &gt;&gt; PadRight({1, 2, 3}, 2)
+	 * {1,2}
+	 *
+	 * &gt;&gt; PadRight({{}, {1, 2}, {1, 2, 3}})
 	 * {{0,0,0},{1,2,0},{1,2,3}}
 	 * </pre>
 	 */
@@ -2973,7 +2990,7 @@ public final class ListFunctions {
 
 			if (ast.isAST1()) {
 				if (ast.arg1().isListOfLists()) {
-					final IAST list = (IAST) ast.arg1();
+					IAST list = (IAST) ast.arg1();
 					int maxSize = -1;
 					for (int i = 1; i < list.size(); i++) {
 						IAST subList = (IAST) list.get(i);
@@ -3016,7 +3033,7 @@ public final class ListFunctions {
 			return F.NIL;
 		}
 
-		public static IExpr padRightAtom(IAST ast, int n, final IExpr atom) {
+		public static IExpr padRightAtom(IAST ast, int n, IExpr atom) {
 			int length = n - ast.size() + 1;
 			if (length > 0) {
 				IASTAppendable result = ast.copyHead();
@@ -3065,20 +3082,20 @@ public final class ListFunctions {
 	 * <pre>
 	 * Position(expr, patt)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the list of positions for which <code>expr</code> matches <code>patt</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
-	 * Position(expr, patt, ls) 
+	 * Position(expr, patt, ls)
 	 * &gt; returns the positions on levels specified by levelspec `ls`.
-	 * 
+	 *
 	 * ### Examples
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote><blockquote>
 	 * <p>
 	 * Position({1, 2, 2, 1, 2, 3, 2}, 2) {{2},{3},{5},{7}}
@@ -3087,7 +3104,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Find positions upto 3 levels deep
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Position({1 + Sin(x), x, (Tan(x) - y)^2}, x, 3)
 	 * {{1,2,1},{2}}
@@ -3095,7 +3112,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Find all powers of x
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Position({1 + x^2, x y ^ 2,  4 y,  x ^ z}, x^_)
 	 * {{1,2},{4}}
@@ -3103,7 +3120,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Use Position as an operator
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Position(_Integer)({1.5, 2, 2.5})
 	 * {{2}}
@@ -3115,7 +3132,7 @@ public final class ListFunctions {
 		 * Add the positions to the <code>resultCollection</code> where the matching expressions appear in
 		 * <code>list</code>. The <code>positionConverter</code> converts the <code>int</code> position into an object
 		 * for the <code>resultCollection</code>.
-		 * 
+		 *
 		 * @param list
 		 * @param prototypeList
 		 * @param resultCollection
@@ -3126,8 +3143,8 @@ public final class ListFunctions {
 		 * @return
 		 */
 		public static IAST position(final IAST list, final IAST prototypeList, final IASTAppendable resultCollection,
-				final LevelSpec level, final Predicate<? super IExpr> matcher,
-				final IPositionConverter<? extends IExpr> positionConverter, int headOffset) {
+									final LevelSpec level, final Predicate<? super IExpr> matcher,
+									final IPositionConverter<? extends IExpr> positionConverter, int headOffset) {
 			int minDepth = 0;
 			level.incCurrentLevel();
 			IASTAppendable clone = null;
@@ -3217,7 +3234,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Prepend(expr, item)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>expr</code> with <code>item</code> prepended to its leaves.
@@ -3228,33 +3245,33 @@ public final class ListFunctions {
 	 * <code>Prepend</code> is similar to <code>Append</code>, but adds <code>item</code> to the beginning of
 	 * <code>expr</code>:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Prepend({2, 3, 4}, 1)    
+	 * &gt;&gt; Prepend({2, 3, 4}, 1)
 	 * {1,2,3,4}
 	 * </pre>
 	 * <p>
 	 * <code>Prepend</code> works on expressions with heads other than 'List':<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Prepend(f(b, c), a)    
+	 * &gt;&gt; Prepend(f(b, c), a)
 	 * f(a,b,c)
 	 * </pre>
 	 * <p>
 	 * Unlike <code>Join</code>, <code>Prepend</code> does not flatten lists in <code>item</code>:<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Prepend({c, d}, {a, b})  
+	 * &gt;&gt; Prepend({c, d}, {a, b})
 	 * {{a,b},c,d}
 	 * </pre>
 	 * <p>
 	 * Nonatomic expression expected.<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Prepend(a, b)       
+	 * &gt;&gt; Prepend(a, b)
 	 * Prepend(a,b)
 	 * </pre>
 	 */
@@ -3278,75 +3295,75 @@ public final class ListFunctions {
 	 * <pre>
 	 * PrependTo(s, item)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * prepend <code>item</code> to value of <code>s</code> and sets <code>s</code> to the result.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
-	 * Assign s to a list    
-	 * &gt;&gt; s = {1, 2, 4, 9}    
+	 * Assign s to a list
+	 * &gt;&gt; s = {1, 2, 4, 9}
 	 * {1,2,4,9}
 	 * </pre>
 	 * <p>
 	 * Add a new value at the beginning of the list:<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; PrependTo(s, 0)    
+	 * &gt;&gt; PrependTo(s, 0)
 	 * {0,1,2,4,9}
 	 * </pre>
 	 * <p>
 	 * The value assigned to s has changed:<br />
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; s    
+	 * &gt;&gt; s
 	 * {0,1,2,4,9}
 	 * </pre>
 	 * <p>
 	 * 'PrependTo' works with a head other than 'List':
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; y = f(a, b, c)    
-	 * &gt;&gt; PrependTo(y, x)    
-	 * f(x,a,b,c)  
-	 * 
-	 * &gt;&gt; y    
+	 * &gt;&gt; y = f(a, b, c)
+	 * &gt;&gt; PrependTo(y, x)
+	 * f(x,a,b,c)
+	 *
+	 * &gt;&gt; y
 	 * f(x,a,b,c)
 	 * </pre>
 	 * <p>
 	 * {a, b} is not a variable with a value, so its value cannot be changed.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; PrependTo({a, b}, 1)    
+	 * &gt;&gt; PrependTo({a, b}, 1)
 	 * PrependTo({a,b},1)
 	 * </pre>
 	 * <p>
 	 * a is not a variable with a value, so its value cannot be changed.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; PrependTo(a, b)     
+	 * &gt;&gt; PrependTo(a, b)
 	 * PrependTo(a,b)
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * ```
-	 * &gt;&gt; x = 1 + 2    
+	 * &gt;&gt; x = 1 + 2
 	 * 3
 	 * </pre>
 	 * <p>
 	 * Nonatomic expression expected at position 1 in PrependTo
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; PrependTo(x, {3, 4})      
+	 * &gt;&gt; PrependTo(x, {3, 4})
 	 * PrependTo(x,{3,4})
 	 * </pre>
 	 */
@@ -3396,31 +3413,31 @@ public final class ListFunctions {
 	 * <pre>
 	 * Range(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns a list of integers from <code>1</code> to <code>n</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Range(a, b)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns a list of integers from <code>a</code> to <code>b</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Range(5)
 	 * {1,2,3,4,5}
-	 * 
+	 *
 	 * &gt;&gt; Range(-3, 2)
-	 * {-3,-2,-1,0,1,2} 
-	 * 
+	 * {-3,-2,-1,0,1,2}
+	 *
 	 * &gt;&gt; Range(0, 2, 1/3)
 	 * {0,1/3,2/3,1,4/3,5/3,2}
 	 * </pre>
@@ -3457,7 +3474,7 @@ public final class ListFunctions {
 
 		/**
 		 * Range.of(2, 7) gives {2, 3, 4, 5, 6}
-		 * 
+		 *
 		 * @param startInclusive
 		 * @param endExclusive
 		 * @return
@@ -3466,14 +3483,12 @@ public final class ListFunctions {
 			int size = endExclusive - startInclusive;
 			if (size >= 0) {
 				IASTAppendable result = F.ListAlloc(size + 1);
-				return result.appendArgs(startInclusive, endExclusive, //
-					new IntFunction<IExpr>() {
-							@Override
-							public IExpr apply(int i) {
-								return F.integer(i);
-							}
-						});
-//						i -> F.integer(i));
+				return result.appendArgs(startInclusive, endExclusive, new IntFunction<IExpr>() {
+					@Override
+					public IExpr apply(int i) {
+						return F.integer(i);
+					}
+				});
 			}
 			return F.List();
 		}
@@ -3507,34 +3522,34 @@ public final class ListFunctions {
 	 * <p>
 	 * or
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * expr /. i -&gt; new
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * replaces all <code>i</code> in <code>expr</code> with <code>new</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * ReplaceAll(expr, {i1 -&gt; new1, i2 -&gt; new2, ... } )
 	 * </pre>
 	 * <p>
 	 * or
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * expr /. {i1 -&gt; new1, i2 -&gt; new2, ... }
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * replaces all <code>i</code>s in <code>expr</code> with <code>new</code>s.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; f(a) + f(b) /. f(x_) -&gt; x^2
 	 * a^2+b^2
@@ -3585,17 +3600,17 @@ public final class ListFunctions {
 	 * <pre>
 	 * ReplacePart(expr, i -&gt; new)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * replaces part <code>i</code> in <code>expr</code> with <code>new</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * ReplacePart(expr, {{i, j} -&gt; e1, {k, l} -&gt; e2})'
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * replaces parts <code>i</code> and <code>j</code> with <code>e1</code>, and parts <code>k</code> and
@@ -3603,24 +3618,24 @@ public final class ListFunctions {
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ReplacePart({a, b, c}, 1 -&gt; t)
 	 * {t,b,c}
-	 * 
+	 *
 	 * &gt;&gt; ReplacePart({{a, b}, {c, d}}, {2, 1} -&gt; t)
 	 * {{a,b},{t,d}}
-	 * 
+	 *
 	 * &gt;&gt; ReplacePart({{a, b}, {c, d}}, {{2, 1} -&gt; t, {1, 1} -&gt; t})
 	 * {{t,b},{t,d}}
-	 * 
+	 *
 	 * &gt;&gt; ReplacePart({a, b, c}, {{1}, {2}} -&gt; t)
 	 * {t,t,c}
 	 * </pre>
 	 * <p>
 	 * Delayed rules are evaluated once for each replacement:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; n = 1
 	 * &gt;&gt; ReplacePart({a, b, c, d}, {{1}, {3}} :&gt; n++)
@@ -3629,7 +3644,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Non-existing parts are simply ignored:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ReplacePart({a, b, c}, 4 -&gt; t)
 	 * {a,b,c}
@@ -3637,7 +3652,7 @@ public final class ListFunctions {
 	 * <p>
 	 * You can replace heads by replacing part <code>0</code>:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ReplacePart({a, b, c}, 0 -&gt; Times)
 	 * a*b*c
@@ -3645,7 +3660,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Negative part numbers count from the end:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ReplacePart({a, b, c}, -1 -&gt; t)
 	 * {a,b,t}
@@ -3703,7 +3718,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Rest(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>expr</code> with the first element removed.
@@ -3713,18 +3728,18 @@ public final class ListFunctions {
 	 * <code>Rest(expr)</code> is equivalent to <code>expr[[2;;]]</code>.
 	 * </p>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Rest({a, b, c})
 	 * {b,c}
-	 * 
+	 *
 	 * &gt;&gt; Rest(a + b + c)
 	 * b+c
 	 * </pre>
 	 * <p>
 	 * Nonatomic expression expected.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Rest(x)
 	 * Rest(x)
@@ -3750,18 +3765,18 @@ public final class ListFunctions {
 	 * <pre>
 	 * Reverse(list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * reverse the elements of the <code>list</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Reverse({1, 2, 3})
 	 * {3,2,1}
-	 * 
+	 *
 	 * &gt;&gt; Reverse(x(a,b,c))
 	 * x(c,b,a)
 	 * </pre>
@@ -3786,18 +3801,18 @@ public final class ListFunctions {
 	 * <pre>
 	 * Riffle(list1, list2)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * insert elements of <code>list2</code> between the elements of <code>list1</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Riffle({a, b, c}, x)
 	 * {a,x,b,x,c}
-	 * 
+	 *
 	 * &gt;&gt; Riffle({a, b, c}, {x, y, z})
 	 * {a,x,b,y,c,z}
 	 * </pre>
@@ -3864,31 +3879,31 @@ public final class ListFunctions {
 	 * <pre>
 	 * RotateLeft(list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * rotates the items of <code>list</code> by one item to the left.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * RotateLeft(list, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * rotates the items of <code>list</code> by <code>n</code> items to the left.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; RotateLeft({1, 2, 3})
 	 * {2,3,1}
-	 * 
+	 *
 	 * &gt;&gt; RotateLeft(Range(10), 3)
 	 * {4,5,6,7,8,9,10,1,2,3}
-	 * 
+	 *
 	 * &gt;&gt; RotateLeft(x(a, b, c), 2)
 	 * x(c,a,b)
 	 * </pre>
@@ -3928,31 +3943,31 @@ public final class ListFunctions {
 	 * <pre>
 	 * RotateRight(list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * rotates the items of <code>list</code> by one item to the right.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * RotateRight(list, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * rotates the items of <code>list</code> by <code>n</code> items to the right.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; RotateRight({1, 2, 3})
 	 * {3,1,2}
-	 * 
+	 *
 	 * &gt;&gt; RotateRight(Range(10), 3)
 	 * {8,9,10,1,2,3,4,5,6,7}
-	 * 
+	 *
 	 * &gt;&gt; RotateRight(x(a, b, c), 2)
 	 * x(b,c,a)
 	 * </pre>
@@ -3991,7 +4006,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Select({e1, e2, ...}, f)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns a list of the elements <code>ei</code> for which <code>f(ei)</code> returns <code>True</code>.
@@ -4001,7 +4016,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Find numbers greater than zero:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Select({-3, 0, 1, 3, a}, #&gt;0&amp;)
 	 * {1,3}
@@ -4009,7 +4024,7 @@ public final class ListFunctions {
 	 * <p>
 	 * <code>Select</code> works on an expression with any head:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Select(f(a, 2, 3), NumberQ)
 	 * f(2,3)
@@ -4017,22 +4032,22 @@ public final class ListFunctions {
 	 * <p>
 	 * Nonatomic expression expected.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; Select(a, True) 
+	 * &gt;&gt; Select(a, True)
 	 * Select(a,True)
 	 * </pre>
 	 */
 	private final static class Select extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			int size = ast.size();
 			if (ast.arg1().isAST()) {
 				IAST list = (IAST) ast.arg1();
-				final IExpr predicateHead = ast.arg2();
+				IExpr predicateHead = ast.arg2();
 				int allocSize = list.size() > 4 ? list.size() / 4 : 4;
 				if (size == 3) {
 					return list.filter(list.copyHead(allocSize), new Predicate<IExpr>() {
@@ -4065,50 +4080,50 @@ public final class ListFunctions {
 	 * <pre>
 	 * Split(list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * splits <code>list</code> into collections of consecutive identical elements.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Split(list, test)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * splits <code>list</code> based on whether the function <code>test</code> yields 'True' on consecutive elements.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Split({x, x, x, y, x, y, y, z})
-	 * {{x,x,x},{y},{x},{y,y},{z}} 
-	 * 
+	 * {{x,x,x},{y},{x},{y,y},{z}}
+	 *
 	 * &gt;&gt; Split({x, x, x, y, x, y, y, z}, x)
 	 * {{x},{x},{x},{y},{x},{y},{y},{z}}
 	 * </pre>
 	 * <p>
 	 * Split into increasing or decreasing runs of elements
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Split({1, 5, 6, 3, 6, 1, 6, 3, 4, 5, 4}, Less)
-	 * {{1,5,6},{3,6},{1,6},{3,4,5},{4}} 
-	 * 
+	 * {{1,5,6},{3,6},{1,6},{3,4,5},{4}}
+	 *
 	 * &gt;&gt; Split({1, 5, 6, 3, 6, 1, 6, 3, 4, 5, 4}, Greater)
 	 * {{1},{5},{6,3},{6,1},{6,3},{4},{5,4}}
 	 * </pre>
 	 * <p>
 	 * Split based on first element
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Split({x -&gt; a, x -&gt; y, 2 -&gt; a, z -&gt; c, z -&gt; a}, First(#1) === First(#2) &amp;)
-	 * {{x-&gt;a,x-&gt;y},{2-&gt;a},{z-&gt;c,z-&gt;a}} 
-	 * 
+	 * {{x-&gt;a,x-&gt;y},{2-&gt;a},{z-&gt;c,z-&gt;a}}
+	 *
 	 * &gt;&gt; Split({})
 	 * {}
 	 * </pre>
@@ -4158,7 +4173,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * SplitBy(list, f)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * splits <code>list</code> into collections of consecutive elements that give the same result when <code>f</code>
@@ -4166,15 +4181,15 @@ public final class ListFunctions {
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
-	 * &gt;&gt; SplitBy(Range(1, 3, 1/3), Round) 
+	 * &gt;&gt; SplitBy(Range(1, 3, 1/3), Round)
 	 * {{1,4/3},{5/3,2,7/3},{8/3,3}}
 	 * {{1, 4 / 3}, {5 / 3, 2, 7 / 3}, {8 / 3, 3}}
-	 * 
+	 *
 	 * &gt;&gt; SplitBy({1, 2, 1, 1.2}, {Round, Identity})
-	 * {{{1}},{{2}},{{1},{1.2}}} 
-	 * 
+	 * {{{1}},{{2}},{{1},{1.2}}}
+	 *
 	 * &gt;&gt; SplitBy(Tuples({1, 2}, 3), First)
 	 * {{{1,1,1},{1,1,2},{1,2,1},{1,2,2}},{{2,1,1},{2,1,2},{2,2,1},{2,2,2}}}
 	 * </pre>
@@ -4197,11 +4212,11 @@ public final class ListFunctions {
 			return F.NIL;
 		}
 
-		private IExpr splitByFunction(IAST functorList, int pos, IAST list, final EvalEngine engine) {
+		private IExpr splitByFunction(IAST functorList, int pos, IAST list, EvalEngine engine) {
 			if (pos >= functorList.size()) {
 				return F.NIL;
 			}
-			final IExpr functorHead = functorList.get(pos);
+			IExpr functorHead = functorList.get(pos);
 			final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {
@@ -4251,73 +4266,73 @@ public final class ListFunctions {
 	 * <pre>
 	 * Table(expr, {i, n})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>1</code> to <code>n</code>, returning a list
 	 * of the results.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Table(expr, {i, start, stop, step})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>start</code> to <code>stop</code>,
 	 * incrementing by <code>step</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Table(expr, {i, {e1, e2, ..., ei}})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * evaluates <code>expr</code> with <code>i</code> taking on the values <code>e1, e2, ..., ei</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Table(x!, {x, 8})
 	 * {1,2,6,24,120,720,5040,40320}
-	 * 
+	 *
 	 * &gt;&gt; Table(x, {4})
 	 * {x,x,x,x}
-	 * 
+	 *
 	 * &gt;&gt; n=0
 	 * &gt;&gt; Table(n= n + 1, {5})
 	 * {1,2,3,4,5}
-	 * 
+	 *
 	 * &gt;&gt; Table(i, {i, 4})
 	 * {1,2,3,4}
-	 * 
+	 *
 	 * &gt;&gt; Table(i, {i, 2, 5})
 	 * {2,3,4,5}
-	 * 
+	 *
 	 * &gt;&gt; Table(i, {i, 2, 6, 2})
 	 * {2,4,6}
-	 * 
+	 *
 	 * &gt;&gt; Table(i, {i, Pi, 2*Pi, Pi / 2})
-	 * {Pi,3/2*Pi,2*Pi} 
-	 * 
+	 * {Pi,3/2*Pi,2*Pi}
+	 *
 	 * &gt;&gt; Table(x^2, {x, {a, b, c}})
 	 * {a^2,b^2,c^2}
 	 * </pre>
 	 * <p>
 	 * <code>Table</code> supports multi-dimensional tables:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Table({i, j}, {i, {a, b}}, {j, 1, 2})
-	 * {{{a,1},{a,2}},{{b,1},{b,2}}} 
-	 * 
+	 * {{{a,1},{a,2}},{{b,1},{b,2}}}
+	 *
 	 * &gt;&gt; Table(x, {x,0,1/3})
 	 * {0}
-	 * 
+	 *
 	 * &gt;&gt; Table(x, {x, -0.2, 3.9})
 	 * {-0.2,0.8,1.8,2.8,3.8}
 	 * </pre>
@@ -4349,7 +4364,7 @@ public final class ListFunctions {
 
 		/**
 		 * Generate a table from standard iterator notation.
-		 * 
+		 *
 		 * @param ast
 		 * @param resultList
 		 *            the result list to which the generated expressions should be appended.
@@ -4360,7 +4375,7 @@ public final class ListFunctions {
 		 * @return <code>F.NIL</code> if no evaluation is possible
 		 */
 		protected static IExpr evaluateTable(final IAST ast, final IAST resultList, IExpr defaultValue,
-				EvalEngine engine) {
+											 EvalEngine engine) {
 			try {
 				if (ast.size() > 2) {
 					final List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
@@ -4384,7 +4399,7 @@ public final class ListFunctions {
 		}
 
 		protected static IExpr evaluateTableThrow(final IAST ast, final IAST resultList, IExpr defaultValue,
-				EvalEngine engine) {
+												  EvalEngine engine) {
 			try {
 				if (ast.size() > 2) {
 					final List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
@@ -4410,7 +4425,7 @@ public final class ListFunctions {
 		/**
 		 * Evaluate only the last iterator in <code>iter</code> for <code>Sum()</code> or <code>Product()</code>
 		 * function calls.
-		 * 
+		 *
 		 * @param expr
 		 * @param iter
 		 *            the iterator function
@@ -4423,7 +4438,7 @@ public final class ListFunctions {
 		 * @see Sum
 		 */
 		protected static IExpr evaluateLast(final IExpr expr, final IIterator<IExpr> iter, final IAST resultList,
-				IExpr defaultValue) {
+											IExpr defaultValue) {
 			try {
 				final List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
 				iterList.add(iter);
@@ -4445,7 +4460,7 @@ public final class ListFunctions {
 
 		/**
 		 * Determine all local variables of the iterators starting with index <code>2</code>.
-		 * 
+		 *
 		 * @param ast
 		 * @return
 		 */
@@ -4472,7 +4487,7 @@ public final class ListFunctions {
 		/**
 		 * Determine all local variables of the iterators starting with index <code>2</code> in the given
 		 * <code>ast</code>.
-		 * 
+		 *
 		 * @param ast
 		 * @return
 		 */
@@ -4498,7 +4513,7 @@ public final class ListFunctions {
 		/**
 		 * Disable the <code>Reap() and Sow()</code> mode temporary and evaluate an expression for the given &quot;local
 		 * variables list&quot;. If evaluation is not possible return the input object.
-		 * 
+		 *
 		 * @param expr
 		 *            the expression which should be evaluated
 		 * @param localVariablesList
@@ -4592,28 +4607,28 @@ public final class ListFunctions {
 	 * <pre>
 	 * Take(expr, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>expr</code> with all but the first <code>n</code> leaves removed.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Take({a, b, c, d}, 3)
 	 * {a,b,c}
-	 * 
+	 *
 	 * &gt;&gt; Take({a, b, c, d}, -2)
 	 * {c,d}
-	 * 
+	 *
 	 * &gt;&gt; Take({a, b, c, d, e}, {2, -2})
 	 * {b,c,d}
 	 * </pre>
 	 * <p>
 	 * Take a submatrix:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; A = {{a, b, c}, {d, e, f}}
 	 * &gt;&gt; Take(A, 2, 2)
@@ -4622,21 +4637,21 @@ public final class ListFunctions {
 	 * <p>
 	 * Take a single column:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Take(A, All, {2})
 	 * {{b},{e}}
-	 * 
+	 *
 	 * &gt;&gt; Take(Range(10), {8, 2, -1})
 	 * {8,7,6,5,4,3,2}
-	 * 
+	 *
 	 * &gt;&gt; Take(Range(10), {-3, -7, -2})
 	 * {8,6,4}
 	 * </pre>
 	 * <p>
 	 * Cannot take positions <code>-5</code> through <code>-2</code> in <code>{1, 2, 3, 4, 5, 6}</code>.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Take(Range(6), {-5, -2, -2})
 	 * Take({1, 2, 3, 4, 5, 6}, {-5, -2, -2})
@@ -4644,7 +4659,7 @@ public final class ListFunctions {
 	 * <p>
 	 * Nonatomic expression expected at position <code>1</code> in <code>Take(l, {-1})</code>.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Take(l, {-1})
 	 * Take(l,{-1})
@@ -4652,27 +4667,27 @@ public final class ListFunctions {
 	 * <p>
 	 * Empty case
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Take({1, 2, 3, 4, 5}, {-1, -2})
 	 * {}
-	 * 
+	 *
 	 * &gt;&gt; Take({1, 2, 3, 4, 5}, {0, -1})
 	 * {}
-	 * 
+	 *
 	 * &gt;&gt; Take({1, 2, 3, 4, 5}, {1, 0})
 	 * {}
-	 * 
+	 *
 	 * &gt;&gt; Take({1, 2, 3, 4, 5}, {2, 1})
 	 * {}
-	 * 
+	 *
 	 * &gt;&gt; Take({1, 2, 3, 4, 5}, {1, 0, 2})
 	 * {}
 	 * </pre>
 	 * <p>
 	 * Cannot take positions <code>1</code> through <code>0</code> in <code>{1, 2, 3, 4, 5}</code>.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Take({1, 2, 3, 4, 5}, {1, 0, -1})
 	 * Take({1, 2, 3, 4, 5}, {1, 0, -1})
@@ -4712,7 +4727,7 @@ public final class ListFunctions {
 
 		/**
 		 * Take the list elements according to the <code>sequenceSpecifications</code> for the list indexes.
-		 * 
+		 *
 		 * @param list
 		 * @param level
 		 *            recursion level
@@ -4776,44 +4791,44 @@ public final class ListFunctions {
 	 * <pre>
 	 * Total(list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * adds all values in <code>list</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Total(list, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * adds all values up to level <code>n</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Total(list, {n})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * totals only the values at level <code>{n}</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Total({1, 2, 3})
 	 * 6
-	 * 
+	 *
 	 * &gt;&gt; Total({{1, 2, 3}, {4, 5, 6}, {7, 8 ,9}})
 	 * {12,15,18}
-	 * 
+	 *
 	 * &gt;&gt; Total({{1, 2, 3}, {4, 5, 6}, {7, 8 ,9}}, 2)
 	 * 45
-	 * 
+	 *
 	 * &gt;&gt; Total({{1, 2, 3}, {4, 5, 6}, {7, 8 ,9}}, {2})
 	 * {6,15,24}
 	 * </pre>
@@ -4822,12 +4837,12 @@ public final class ListFunctions {
 
 		private static class TotalLevelSpecification extends VisitorLevelSpecification {
 			public TotalLevelSpecification(final Function<IExpr, IExpr> function, final IExpr unevaledLevelExpr,
-					boolean includeHeads, final EvalEngine engine) {
+										   boolean includeHeads, final EvalEngine engine) {
 				super(function, unevaledLevelExpr, includeHeads, engine);
 			}
 
 			public TotalLevelSpecification(final Function<IExpr, IExpr> function, final int level,
-					final boolean includeHeads) {
+										   final boolean includeHeads) {
 				super(function, level, includeHeads);
 			}
 
@@ -4884,7 +4899,7 @@ public final class ListFunctions {
 	 * <pre>
 	 * Union(set1, set2)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * get the union set from <code>set1</code> and <code>set2</code>.
@@ -4898,7 +4913,7 @@ public final class ListFunctions {
 	 * </li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Union({1,2,3},{2,3,4})
 	 * {1,2,3,4}
@@ -4932,7 +4947,7 @@ public final class ListFunctions {
 
 		/**
 		 * Create the (ordered) union from both ASTs.
-		 * 
+		 *
 		 * @param ast1
 		 *            first AST set
 		 * @param ast2
@@ -4963,7 +4978,7 @@ public final class ListFunctions {
 	 * Fold the list from <code>start</code> index including to <code>end</code> index excluding into the
 	 * <code>resultCollection</code>. If the <i>binaryFunction</i> returns <code>null</code>, the left element will be
 	 * added to the result list, otherwise the result will be <i>folded</i> again with the next element in the list.
-	 * 
+	 *
 	 * @param expr
 	 *            initial value. If <code>null</code>use first element of list as initial value.
 	 * @param list
@@ -4973,7 +4988,7 @@ public final class ListFunctions {
 	 * @param resultCollection
 	 */
 	public static IAST foldLeft(final IExpr expr, final IAST list, final int start, final int end,
-			final BiFunction<IExpr, IExpr, ? extends IExpr> binaryFunction, final IASTAppendable resultCollection) {
+								final BiFunction<IExpr, IExpr, ? extends IExpr> binaryFunction, final IASTAppendable resultCollection) {
 		if (start < end) {
 			IExpr elem;
 			int from = start;
@@ -4990,7 +5005,11 @@ public final class ListFunctions {
 					temp[0] = binaryFunction.apply(temp[0], list.get(i));
 					return temp[0];
 				}
-			}); 
+			});
+			// for (int i = from; i < end; i++) {
+			// elem = binaryFunction.apply(elem, list.get(i));
+			// resultCollection.append(elem);
+			// }
 
 		}
 		return resultCollection;
@@ -4998,7 +5017,7 @@ public final class ListFunctions {
 
 	/**
 	 * Reverse the elements in the given <code>list</code>.
-	 * 
+	 *
 	 * @param list
 	 * @return
 	 */
