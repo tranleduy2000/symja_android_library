@@ -46,26 +46,22 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * Create a LevelSpecification from an IInteger or IAST list-object.<br>
 	 * <br>
 	 * 
-	 * An <code>expr</code> is interpreted as a <i>level specification</i> for
-	 * the allowed levels in an AST.<br>
-	 * If <code>expr</code> is a non-negative IInteger iValue set Level
-	 * {1,iValue};<br>
-	 * If <code>expr</code> is a negative IInteger iValue set Level {iValue, 0};
-	 * <br>
-	 * If <code>expr</code> is a List {i0Value, i1Value} set Level {i0Value,
-	 * i1Value};<br>
+	 * An <code>expr</code> is interpreted as a <i>level specification</i> for the allowed levels in an AST.<br>
+	 * If <code>expr</code> is a non-negative IInteger iValue set Level {1,iValue};<br>
+	 * If <code>expr</code> is a negative IInteger iValue set Level {iValue, 0}; <br>
+	 * If <code>expr</code> is a List {i0Value, i1Value} set Level {i0Value, i1Value};<br>
 	 * 
 	 * @param function
 	 *            the function which should be applied for an element
 	 * @param unevaledLevelExpr
 	 *            the given <i>level specification</i>
 	 * @param includeHeads
-	 *            set to <code>true</code>, if the header of an AST expression
-	 *            should be included
+	 *            set to <code>true</code>, if the header of an AST expression should be included
 	 * @throws MathException
 	 *             if the <code>expr</code> is not a <i>level specification</i>
 	 */
-	public VisitorLevelSpecification(final Function<IExpr, IExpr> function, final IExpr unevaledLevelExpr, boolean includeHeads, final EvalEngine engine) {
+	public VisitorLevelSpecification(final Function<IExpr, IExpr> function, final IExpr unevaledLevelExpr,
+			boolean includeHeads, final EvalEngine engine) {
 		IExpr levelExpr = engine.evaluate(unevaledLevelExpr);
 		fFromLevel = fToLevel = -1;
 		fFromDepth = fToDepth = 0;
@@ -76,11 +72,11 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 
 			if (value.isNegative()) {
 				fFromDepth = Integer.MIN_VALUE;
-				fToDepth = Validate.checkIntType(value, Integer.MIN_VALUE);// value.getBigNumerator().intValue();
+				fToDepth = Validate.checkIntType(value, Integer.MIN_VALUE);
 				fFromLevel = 1;
 				fToLevel = Integer.MAX_VALUE;
 			} else {
-				fToLevel = Validate.checkIntType(value, Integer.MIN_VALUE);// value.getBigNumerator().intValue();
+				fToLevel = Validate.checkIntType(value, Integer.MIN_VALUE);
 				fFromLevel = 1;
 				fFromDepth = Integer.MIN_VALUE;
 				fToDepth = -1;
@@ -94,22 +90,17 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 				if (lst.arg1() instanceof IInteger) {
 					final IInteger i = (IInteger) lst.arg1();
 
+					final int level = Validate.checkIntType(i, Integer.MIN_VALUE);
 					if (i.isNegative()) {
-						fFromDepth = Validate.checkIntType(i, Integer.MIN_VALUE);// i.getBigNumerator().intValue();
-						fToDepth = Validate.checkIntType(i, Integer.MIN_VALUE);// i.getBigNumerator().intValue();
+						fFromDepth = level;
+						fToDepth = level;
 						fFromLevel = 0;
 						fToLevel = Integer.MAX_VALUE;
-						if (fToDepth < fFromDepth) {
-							throw new MathException("Invalid Level specification: " + levelExpr.toString());
-						}
 					} else {
-						fToLevel = Validate.checkIntType(i, Integer.MIN_VALUE);// i.getBigNumerator().intValue();
-						fFromLevel = Validate.checkIntType(i, Integer.MIN_VALUE); // i.getBigNumerator().intValue();
+						fToLevel = level;
+						fFromLevel = level;
 						fFromDepth = Integer.MIN_VALUE;
 						fToDepth = -1;
-						if (fToLevel < fFromLevel) {
-							throw new MathException("Invalid Level specification: " + levelExpr.toString());
-						}
 					}
 					return;
 				}
@@ -119,22 +110,22 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 						final IInteger i0 = (IInteger) lst.arg1();
 						final IInteger i1 = (IInteger) lst.arg2();
 						if (i0.isNegative() && i1.isNegative()) {
-							fFromDepth = Validate.checkIntType(i0, Integer.MIN_VALUE);// i0.getBigNumerator().intValue();
-							fToDepth = Validate.checkIntType(i1, Integer.MIN_VALUE); // i1.getBigNumerator().intValue();
+							fFromDepth = Validate.checkIntType(i0, Integer.MIN_VALUE);
+							fToDepth = Validate.checkIntType(i1, Integer.MIN_VALUE);
 							fFromLevel = 0;
 							fToLevel = Integer.MAX_VALUE;
 						} else if (i0.isNegative()) {
 							throw new MathException("Invalid Level specification: " + levelExpr.toString());
 						} else if (i1.isNegative()) {
 							fFromDepth = Integer.MIN_VALUE;
-							fToDepth = Validate.checkIntType(i1, Integer.MIN_VALUE);// i1.getBigNumerator().intValue();
-							fFromLevel = Validate.checkIntType(i0, Integer.MIN_VALUE);// i0.getBigNumerator().intValue();
+							fToDepth = Validate.checkIntType(i1, Integer.MIN_VALUE);
+							fFromLevel = Validate.checkIntType(i0, Integer.MIN_VALUE);
 							fToLevel = Integer.MAX_VALUE;
 						} else {
 							fFromDepth = Integer.MIN_VALUE;
 							fToDepth = -1;
-							fFromLevel = Validate.checkIntType(i0, Integer.MIN_VALUE);// i0.getBigNumerator().intValue();
-							fToLevel = Validate.checkIntType(i1, Integer.MIN_VALUE);// i1.getBigNumerator().intValue();
+							fFromLevel = Validate.checkIntType(i0, Integer.MIN_VALUE);
+							fToLevel = Validate.checkIntType(i1, Integer.MIN_VALUE);
 						}
 						return;
 					} else if ((lst.arg1() instanceof IInteger) && (lst.arg2().isInfinity())) {
@@ -144,7 +135,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 						} else {
 							fFromDepth = Integer.MIN_VALUE;
 							fToDepth = -1;
-							fFromLevel = Validate.checkIntType(i0, Integer.MIN_VALUE);// i0.getBigNumerator().intValue();
+							fFromLevel = Validate.checkIntType(i0, Integer.MIN_VALUE);
 							fToLevel = Integer.MAX_VALUE;
 						}
 						return;
@@ -152,7 +143,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 				}
 			}
 		}
-		if (levelExpr.equals(F.CInfinity)||levelExpr.equals(F.All)) {
+		if (levelExpr.equals(F.CInfinity) || levelExpr.equals(F.All)) {
 			fToLevel = Integer.MAX_VALUE;
 			fFromLevel = 1;
 			fFromDepth = Integer.MIN_VALUE;
@@ -163,8 +154,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	}
 
 	/**
-	 * Define a level specification for all elements on level <code>level</code>
-	 * .
+	 * Define a level specification for all elements on level <code>level</code> .
 	 * 
 	 * @param level
 	 */
@@ -343,51 +333,53 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 
 	@Override
 	public IExpr visit(IASTMutable ast) {
-		int minDepth = -1;
-		IExpr temp;
-		IASTMutable result = F.NIL;
+		int[] minDepth = new int[] { 0 };
+		IASTMutable[] result = new IASTMutable[] { F.NIL };
 		try {
 			fCurrentLevel++;
 			if (fIncludeHeads) {
-				temp = ast.get(0).accept(this);
+				final IExpr temp = ast.get(0).accept(this);
 				if (temp.isPresent()) {
-					if (!result.isPresent()) {
-						result = ast.copy();
+					if (!result[0].isPresent()) {
+						result[0] = createResult(ast, temp);
 					}
-					result.set(0, temp);
+					result[0].set(0, temp);
 				}
-				if (fCurrentDepth < minDepth) {
-					minDepth = fCurrentDepth;
+				if (fCurrentDepth < minDepth[0]) {
+					minDepth[0] = fCurrentDepth;
 				}
 			}
 			int size = ast.size();
 			for (int i = 1; i < size; i++) {
-				temp = ast.get(i).accept(this);
+				final IExpr temp = ast.get(i).accept(this);
 				if (temp.isPresent()) {
-					if (!result.isPresent()) {
-						result = ast.copy();
+					if (!result[0].isPresent()) {
+						result[0] = createResult(ast, temp);
 					}
-					result.set(i, temp);
+					result[0].set(i, temp);
 				}
-				if (fCurrentDepth < minDepth) {
-					minDepth = fCurrentDepth;
+				if (fCurrentDepth < minDepth[0]) {
+					minDepth[0] = fCurrentDepth;
 				}
-			}
+			} ;
 		} finally {
 			fCurrentLevel--;
 		}
-		fCurrentDepth = --minDepth;
-		if (isInRange(fCurrentLevel, minDepth)) {
-			if (!result.isPresent()) {
+		fCurrentDepth = --minDepth[0];
+		if (isInRange(fCurrentLevel, minDepth[0])) {
+			if (!result[0].isPresent()) {
 				return fFunction.apply(ast);
 			} else {
-				temp = fFunction.apply(result);
+				IExpr temp = fFunction.apply(result[0]);
 				if (temp.isPresent()) {
 					return temp;
 				}
 			}
 		}
-		return result;
+		return result[0];
+	}
 
+	public IASTMutable createResult(IASTMutable ast, final IExpr x) {
+		return ast.copy();
 	}
 }
