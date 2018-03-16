@@ -4847,7 +4847,7 @@ public final class ListFunctions {
 			Function<IExpr, IExpr> tf = new Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {
-					return x.isAST() ? ((IAST) x).setAtCopy(0, F.Plus) : F.NIL;
+					return x.isAST() ? ((IAST) x).setAtCopy(0, F.Plus) : x;
 				}
 			};
 

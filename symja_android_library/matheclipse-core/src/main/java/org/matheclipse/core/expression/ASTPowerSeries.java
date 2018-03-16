@@ -552,16 +552,24 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 	}
 
 	public ASTPowerSeries subtract(ASTPowerSeries b) {
-		return new ASTPowerSeries(n -> this.getCoef(n).subtract(b.getCoef(n)), ring);
+		return new ASTPowerSeries(new Function<Integer, IExpr>() {
+            @Override
+            public IExpr apply(Integer n) {
+                return ASTPowerSeries.this.getCoef(n).subtract(b.getCoef(n));
+            }
+        }, ring);
 	}
 
 	public ASTPowerSeries times(ASTPowerSeries b) {
-		Function<Integer, IExpr> g = k -> {
-			IExpr sum = F.C0;
-			for (Integer i = 0; i <= k; i++) {
-				sum = sum.plus(this.getCoef(i).times(b.getCoef(k - i)));
+		Function<Integer, IExpr> g = new Function<Integer, IExpr>() {
+			@Override
+			public IExpr apply(Integer k) {
+				IExpr sum = F.C0;
+				for (Integer i = 0; i <= k; i++) {
+					sum = sum.plus(ASTPowerSeries.this.getCoef(i).times(b.getCoef(k - i)));
+				}
+				return sum;
 			}
-			return sum;
 		};
 		return new ASTPowerSeries(g, ring);
 	}
