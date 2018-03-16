@@ -2890,7 +2890,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 			// pathToVectorAnalysis = pathToVectorAnalysis.substring(6);
 			System.out.println(pathToVectorAnalysis);
 			// PatternMatching.getFile(pathToVectorAnalysis, engine)
-			evalString("Get(\"" + pathToVectorAnalysis + "\")");
+//			evalString("Get(\"" + pathToVectorAnalysis + "\")");
 			check("DotProduct({a,b,c},{d,e,f}, Spherical)",
 					"a*d*Cos(b)*Cos(e)+a*d*Cos(c)*Cos(f)*Sin(b)*Sin(e)+a*d*Sin(b)*Sin(c)*Sin(e)*Sin(f)");
 			// check("Information(Sin)", "");

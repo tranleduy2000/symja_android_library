@@ -8,9 +8,9 @@ import java.io.ObjectStreamException;
 import java.util.HashMap;
 import java.util.RandomAccess;
 import java.util.Set;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.Function;
+import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
@@ -27,7 +27,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 	}
 
 	/**
-	 * 
+	 *
 	 * Returns a new ASTPowerSeries where each element is mapped by the given function.
 	 *
 	 * @param astVector
@@ -116,7 +116,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 	}
 
 	/**
-	 * 
+	 *
 	 * @param vals
 	 * @param deepCopy
 	 */
@@ -157,8 +157,8 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 	}
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param vector
 	 *            the vector which should be wrapped in this object.
 	 * @param deepCopy
@@ -175,7 +175,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 
 	/**
 	 * Order of a power series
-	 * 
+	 *
 	 * @return null if power series .isProbableZero() is true or the order of the power series
 	 */
 	public Integer order() {
@@ -202,7 +202,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 	}
 	/**
 	 * Adds the objects in the specified collection to this {@code ArrayList}.
-	 * 
+	 *
 	 * @param collection
 	 *            the collection of objects.
 	 * @return {@code true} if this {@code ArrayList} is modified, {@code false} otherwise.
@@ -221,7 +221,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 	/**
 	 * Inserts the objects in the specified collection at the specified location in this List. The objects are added in
 	 * the order they are returned from the collection's iterator.
-	 * 
+	 *
 	 * @param location
 	 *            the index at which to insert.
 	 * @param collection
@@ -263,7 +263,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 
 	/**
 	 * Adds the specified object at the end of this {@code ArrayList}.
-	 * 
+	 *
 	 * @param object
 	 *            the object to add.
 	 * @return always true
@@ -278,7 +278,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 	 * Inserts the specified object into this {@code ArrayList} at the specified location. The object is inserted before
 	 * any previous element at the specified location. If the location is equal to the size of this {@code ArrayList},
 	 * the object is added at the end.
-	 * 
+	 *
 	 * @param location
 	 *            the index at which to insert the object.
 	 * @param object
@@ -301,7 +301,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 
 	/**
 	 * Removes all elements from this {@code ArrayList}, leaving it empty.
-	 * 
+	 *
 	 * @see #isEmpty
 	 * @see #size
 	 */
@@ -314,7 +314,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 	/**
 	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this
 	 * {@code HMArrayList}.
-	 * 
+	 *
 	 * @return a shallow copy of this {@code ArrayList}
 	 * @see java.lang.Cloneable
 	 */
@@ -474,7 +474,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 
 	/**
 	 * Returns the number of elements in this {@code ASTPowerSeries}.
-	 * 
+	 *
 	 * @return the number of elements in this {@code ASTPowerSeries}.
 	 */
 	// @Override
@@ -536,7 +536,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 
 	/**
 	 * Shifts the power series
-	 * 
+	 *
 	 * @param s
 	 *            an integer
 	 * @return shifted series (to the right)
@@ -555,7 +555,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 		return new ASTPowerSeries(n -> this.getCoef(n).subtract(b.getCoef(n)), ring);
 	}
 
-	public ASTPowerSeries times(ASTPowerSeries b) { 
+	public ASTPowerSeries times(ASTPowerSeries b) {
 		Function<Integer, IExpr> g = k -> {
 			IExpr sum = F.C0;
 			for (Integer i = 0; i <= k; i++) {

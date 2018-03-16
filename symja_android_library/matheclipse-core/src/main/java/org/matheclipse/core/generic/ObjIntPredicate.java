@@ -2,7 +2,7 @@ package org.matheclipse.core.generic;
 
 import com.duy.util.DObjects;
 
-import java.util.function.BiPredicate;
+import com.duy.lambda.BiPredicate;
 
 /**
  * <p>
