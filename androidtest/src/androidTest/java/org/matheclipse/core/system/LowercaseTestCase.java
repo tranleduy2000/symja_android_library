@@ -2887,7 +2887,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		if (Config.FILESYSTEM_ENABLED) {
 			String pathToVectorAnalysis = getClass().getResource("/VectorAnalysis.m").getFile();
 			// remove 'file:/'
-			// pathToVeIssue #24 Implement Series...() functionsctorAnalysis = pathToVectorAnalysis.substring(6);
+			// pathToVectorAnalysis = pathToVectorAnalysis.substring(6);
 			System.out.println(pathToVectorAnalysis);
 			// PatternMatching.getFile(pathToVectorAnalysis, engine)
 //			evalString("Get(\"" + pathToVectorAnalysis + "\")");
