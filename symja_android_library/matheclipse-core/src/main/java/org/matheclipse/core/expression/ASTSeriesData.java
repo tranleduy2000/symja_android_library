@@ -8,8 +8,8 @@ import java.io.ObjectStreamException;
 import java.util.HashMap;
 import java.util.RandomAccess;
 import java.util.Set;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
+import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.Function;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
@@ -787,7 +787,12 @@ public class ASTSeriesData extends AST implements Cloneable, Externalizable, Ran
 	 * @return
 	 */
 	public ASTSeriesData subtractPS(ASTSeriesData b) {
-		return new ASTSeriesData(n -> this.getCoeff(n).subtract(b.getCoeff(n)), ring);
+		return new ASTSeriesData(new Function<Integer, IExpr>() {
+			@Override
+			public IExpr apply(Integer n) {
+				return ASTSeriesData.this.getCoeff(n).subtract(b.getCoeff(n));
+			}
+		}, ring);
 	}
 
 	@Override
