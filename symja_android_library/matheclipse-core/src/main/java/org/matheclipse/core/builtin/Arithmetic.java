@@ -25,6 +25,7 @@ import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
 import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.INumeric;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
+import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
@@ -2851,6 +2852,11 @@ public final class Arithmetic {
                     IInteger ii = (IInteger) arg2;
                     return powerInterval(arg1, ii);
                 }
+            } else if (arg1 instanceof ASTSeriesData) {
+                int exponent = arg2.toIntDefault(Integer.MIN_VALUE);
+                if (exponent != Integer.MIN_VALUE) {
+                    return ((ASTSeriesData) arg1).pow(exponent);
+                }
             }
 
             if (arg2.isZero()) {
@@ -2897,7 +2903,8 @@ public final class Arithmetic {
                         // (x*n)^m => x ^(n*m)
                         return Power(arg1.base(), is1.times(exponent));
                     }
-                } else if (arg1.isNegativeInfinity() && arg2.isInteger()) {
+                } else if (arg1.isNegativeInfinity()) {
+                    if (arg2.isInteger()) {
                     IInteger ii = (IInteger) arg2;
                     if (ii.isNegative()) {
                         return F.C0;
@@ -2906,6 +2913,20 @@ public final class Arithmetic {
                             return F.CNInfinity;
                         } else {
                             return F.CInfinity;
+                        }
+                    }
+                    } else {
+                        int exponent = arg2.toIntDefault(Integer.MIN_VALUE);
+                        if (exponent != Integer.MIN_VALUE) {
+                            if (exponent < 0) {
+                                return F.C0;
+                            } else {
+                                if ((exponent & 0x1) == 0x1) {
+                                    return F.CNInfinity;
+                                } else {
+                                    return F.CInfinity;
+                                }
+                            }
                         }
                     }
                 }
@@ -4119,7 +4140,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
-            IExpr temp = F.NIL;
 
             if (o0.isZero()) {
                 if (o1.isDirectedInfinity()) {
@@ -4150,6 +4170,7 @@ public final class Arithmetic {
                 return o0.power(F.C2);
             }
 
+            IExpr temp = F.NIL;
             if (o0.isDirectedInfinity()) {
                 temp = eInfinity((IAST) o0, o1);
             } else if (o1.isDirectedInfinity()) {
@@ -4181,18 +4202,14 @@ public final class Arithmetic {
                         return temp;
                     }
                 }
-            }
+            } else if (o0.isInterval1()) {
 
-            if (o1.isPower()) {
-                IExpr power1Base = o1.base();
-                IExpr power1Exponent = o1.exponent();
-                temp = timesArgPower(o0, power1Base, power1Exponent);
-                if (temp.isPresent()) {
-                    return temp;
+                if (o1.isInterval1() || o1.isSignedNumber()) {
+                    return timesInterval(o0, o1);
                 }
             }
 
-            if (o1.isPlus()) {
+            // if (o1.isPlus()) {
                 // final IAST f1 = (IAST) o1;
                 // issue#128
                 // if (o0.isMinusOne()) {
@@ -4205,16 +4222,21 @@ public final class Arithmetic {
                 // // o0 to be a fractional number
                 // return f1.mapAt(F.Times(o0, null), 2);
                 // }
+            // }
+
+            if (o1.isPower()) {
+                IExpr power1Base = o1.base();
+                IExpr power1Exponent = o1.exponent();
+                temp = timesArgPower(o0, power1Base, power1Exponent);
+                if (temp.isPresent()) {
+                    return temp;
             }
-            if (o0.isInterval1()) {
-                if (o1.isInterval1() || o1.isSignedNumber()) {
-                    return timesInterval(o0, o1);
-                }
-            }
-            if (o1.isInterval1()) {
+            } else if (o1.isInterval1()) {
                 if (o0.isInterval1() || o0.isSignedNumber()) {
                     return timesInterval(o0, o1);
                 }
+            } else if (o1 instanceof ASTSeriesData) {
+                return ((ASTSeriesData) o1).times(o0);
             }
             return F.NIL;
         }

@@ -5,7 +5,7 @@ import com.duy.lambda.ObjIntConsumer;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.expression.ASTPowerSeries;
+import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -24,8 +24,8 @@ public class Normal extends AbstractFunctionEvaluator {
         Validate.checkSize(ast, 2);
 
         IExpr arg1 = ast.arg1();
-        if (arg1 instanceof ASTPowerSeries) {
-            ASTPowerSeries seriesData = (ASTPowerSeries) arg1;
+		if (arg1 instanceof ASTSeriesData) {
+			ASTSeriesData seriesData = (ASTSeriesData) arg1;
             try {
                 IExpr x = seriesData.getX();
                 IExpr x0 = seriesData.getX0();

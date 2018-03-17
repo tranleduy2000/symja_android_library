@@ -532,6 +532,9 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 		}
 		long exp = n;
 		if (n < 0) {
+			if (n == Long.MIN_VALUE) {
+				throw new java.lang.ArithmeticException();
+			}
 			exp *= -1;
 		}
 		int b2pow = 0;

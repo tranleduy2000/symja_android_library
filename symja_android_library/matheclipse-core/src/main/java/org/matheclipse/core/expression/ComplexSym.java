@@ -463,7 +463,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	}
 
 	@Override
-	public IExpr inverse() {
+	public IComplex inverse() {
 		final IRational tmp = (fReal.multiply(fReal)).add(fImaginary.multiply(fImaginary));
 		return ComplexSym.valueOf(fReal.divideBy(tmp), fImaginary.negate().divideBy(tmp));
 	}
@@ -563,34 +563,53 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	}
 
 	@Override
-	public IComplex pow(final int parm1) {
-		int temp = parm1;
+	public IComplex pow(final long n) {
 
-		if ((parm1 == 0) && fReal.isZero() && fImaginary.isZero()) {
+		if ((n == 0) && fReal.isZero() && fImaginary.isZero()) {
 			throw new java.lang.ArithmeticException();
 		}
 
-		if (parm1 == 1) {
+		if (n == Long.MIN_VALUE) {
+			throw new java.lang.ArithmeticException();
+		}
+		if (n == 1) {
 			return this;
 		}
 
-		IComplex res = ONE;
+		if (n < 0) {
+			IComplex res = powPositive(-n);
+			return res.inverse();
+		}
+		return powPositive(n);
+	}
 
-		if (parm1 < 0) {
-			temp *= -1;
-			for (int i = 0; i < temp; i++) {
-				res = res.multiply(this);
+	/**
+	 *
+	 * @param n must be greater equal 0
+	 * @return
+	 */
+	private IComplex powPositive(final long n) {
+		long exp = n;
+		long b2pow = 0;
+		while ((exp & 1) == 0L) {
+			b2pow++;
+			exp >>= 1;
 			}
-			final IRational d = res.getRealPart().multiply(res.getRealPart())
-					.add(res.getImaginaryPart().multiply(res.getImaginaryPart()));
 
-			return ComplexSym.valueOf(res.getRealPart().divideBy(d), res.getImaginaryPart().negate().divideBy(d));
+		IComplex r = this;
+		IComplex x = r;
+
+		while ((exp >>= 1) > 0L) {
+			x = x.multiply(x);
+			if ((exp & 1) != 0) {
+				r = r.multiply(x);
 		}
-		for (int i = 0; i < temp; i++) {
-			res = res.multiply(this);
 		}
 
-		return res;
+		while (b2pow-- > 0L) {
+			r = r.multiply(r);
+		}
+		return r;
 	}
 
 	@Override
