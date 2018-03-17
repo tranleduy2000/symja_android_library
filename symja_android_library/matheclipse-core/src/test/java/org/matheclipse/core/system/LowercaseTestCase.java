@@ -2890,7 +2890,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 			// pathToVectorAnalysis = pathToVectorAnalysis.substring(6);
 			System.out.println(pathToVectorAnalysis);
 			// PatternMatching.getFile(pathToVectorAnalysis, engine)
-//			evalString("Get(\"" + pathToVectorAnalysis + "\")");
+			//evalString("Get(\"" + pathToVectorAnalysis + "\")");
 			check("DotProduct({a,b,c},{d,e,f}, Spherical)",
 					"a*d*Cos(b)*Cos(e)+a*d*Cos(c)*Cos(f)*Sin(b)*Sin(e)+a*d*Sin(b)*Sin(c)*Sin(e)*Sin(f)");
 			// check("Information(Sin)", "");
@@ -6830,15 +6830,39 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSeriesData() {
-		check("SeriesData(100, 0, Table(i^2, {i, 10}), 0, 10, 1)", "Indeterminate");
-		// check("SeriesData(x, 0, Table(i^2, {i, 10}), 0, 10, 1)",
-		// "1+4*x+9*x^2+16*x^3+25*x^4+36*x^5+49*x^6+64*x^7+81*x^8+100*x^9+O(x)^10");
+		// check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^12", //
+		// "x^12-2*x^14+29/15*x^16-649/540*x^18+3883/7200*x^20+O(x)^22");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^2", //
+				"x^2-x^4/3+2/45*x^6-x^8/360+x^10/14400+O(x)^12");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^3", //
+				"x^3-x^5/2+13/120*x^7-7/540*x^9+13/14400*x^11+O(x)^13");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)*SeriesData(x, 0,{1,0,-1/5,0,1/110}, 1, 11, 1) // FullForm", //
+				"\"SeriesData(x,0,{0,1,0,-11/30,0,67/1320,0,-7/2200,0,1/13200,0,0},1,12,1)\"");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)*SeriesData(x, 0,{1,0,-1/5,0,1/110}, 1, 11, 1)", //
+				"x^2-11/30*x^4+67/1320*x^6-7/2200*x^8+x^10/13200+O(x)^12");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)-SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)", //
+				"O(x)^11");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)+SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)", //
+				"2*x-x^3/3+x^5/60+O(x)^11");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120,0,-1/5040,0,1/362880}, 1, 11, 2)*7",
+				"7*Sqrt(x)-7/6*x^(3/2)+7/120*x^(5/2)-x^(7/2)/720+x^(9/2)/51840+O(x)^(11/2)");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120,0,-1/5040,0,1/362880}, 1, 11, 2)+4",
+				"4+Sqrt(x)-x^(3/2)/6+x^(5/2)/120-x^(7/2)/5040+x^(9/2)/362880+O(x)^(11/2)");
 		check("SeriesData(x, 0,{1,0,-1/6,0,1/120,0,-1/5040,0,1/362880}, 1, 11, 2)",
 				"Sqrt(x)-x^(3/2)/6+x^(5/2)/120-x^(7/2)/5040+x^(9/2)/362880+O(x)^(11/2)");
+		check("SeriesData(100, 0, Table(i^2, {i, 10}), 0, 10, 1)", //
+				"Indeterminate");
+		check("SeriesData(x, 0, Table(i^2, {i, 10}), 0, 10, 1)", //
+				"1+4*x+9*x^2+16*x^3+25*x^4+36*x^5+49*x^6+64*x^7+81*x^8+100*x^9+O(x)^10");
 	}
 
 	public void testSeriesCoefficient() {
 
+		check("SeriesCoefficient(d+4*x^e+7*x^f+Sin(x),{x, a, n})", //
+				"Piecewise({{(4*a^e*Binomial(e,n)+7*a^f*Binomial(f,n))/a^n,n>0},{4*a^e+7*a^f+d,n==\n"
+						+ "0}},0)+Piecewise({{Sin(a+1/2*n*Pi)/n!,n>=0}},0)");
+		check("SeriesCoefficient(d+4*x^e+7*x^f+Sin(x),{x, a, 10})", //
+				"(4*a^e*Binomial(e,10)+7*a^f*Binomial(f,10))/a^10-Sin(a)/3628800");
 		check("SeriesCoefficient(d+4*x^e+7*x^f,{x, a, n})", //
 				"Piecewise({{(4*a^e*Binomial(e,n)+7*a^f*Binomial(f,n))/a^n,n>0},{4*a^e+7*a^f+d,n==\n" + "0}},0)");
 		check("SeriesCoefficient(x^42,{x, a, n})", //
