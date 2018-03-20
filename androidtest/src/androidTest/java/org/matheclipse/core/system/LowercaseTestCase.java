@@ -1998,13 +1998,50 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEllipticE() {
+		check("EllipticE(0, m)", "0");
+		check("EllipticE(z,0)", "z");
+		check("EllipticE(Pi/2, m)", "EllipticE(m)");
+		check("EllipticE(5/4,1)", "Sin(5/4)");
 		check("EllipticE(0.4)", "1.39939");
-		check("EllipticE(2,0.999999)", "1.0");
+		check("EllipticE(2,0.999999)", "0.98923");
+		check("EllipticE(-Pi/2,0.5)", "-1.47622");
+		// TODO - use better approx:
+		check("Table(EllipticE(x,0.5), {x,-2.0, 2.0, 1/4})", //
+				"{-1.09625,-1.3187,-1.41407,-1.19329,-0.96779,-0.73531,-0.49541,-0.24941,0.0,0.24941,0.49541,0.73531,0.96779,1.19329,1.41407,1.3187,1.09625}");
 	}
 
+	public void testEllipticF() {
+		check("EllipticF(0, m)", "0");
+		check("EllipticF(z,0)", "z");
+		check("EllipticF(5/4, 1)", "Log(Sec(5/4)+Tan(5/4))");
+		// TODO - use better approx:
+		check("Table(EllipticF(x,0.5), {x,-2.0, 2.0, 1/4})", //
+				"{-2.15985,-1.87887,-1.59434,-1.31126,-1.03407,-0.76521,-0.50467,-0.25059,0.0,0.25059,0.50467,0.76521,1.03407,1.31126,1.59434,1.87887,2.15985}");
+	}
+
+	public void testEllipticK() {
+		check("EllipticK(0.5)", "1.85407");
+		check("Table(EllipticK(x), {x,-1.0, 1.0, 1/4})", //
+				"{1.31103,2.15652,1.85407,1.68575,1.5708,1.68575,1.85407,2.15652,ComplexInfinity}");
+
+	}
 	public void testEllipticPi() {
+		check("EllipticPi(n,0)", "Pi/(2*Sqrt(1-n))");
+		check("EllipticPi(n,1)", "Infinity/Sign(1-n)");
+		check("EllipticPi(n,n)", "EllipticE(n)/(1-n)");
 		check("EllipticPi(0.4,0.6)", "2.59092");
 		check("EllipticPi(1/3, Pi/5, 0.3)", "0.6594");
+		check("Table(EllipticPi(x,0.5), {x,-2.0, 2.0, 1/4})", //
+				"{1.0227,1.07184,1.12843,1.19454,1.27313,1.36859,1.48785,1.64253,1.85407,2.16762,2.70129,3.93061,ComplexInfinity,-0.59276,-0.45672,-0.37175,-0.31354}");
+	}
+
+	public void testJacobiZeta() {
+		check("JacobiZeta(z, 0)", "0");
+		check("JacobiZeta(-5/4, 1)", "-Sin(5/4)");
+		check("JacobiZeta(0, m)", "0");
+		check("JacobiZeta(Pi/2, m)", "0");
+		check("JacobiZeta(z, Infinity)", "ComplexInfinity");
+		check("JacobiZeta(z, -Infinity)", "ComplexInfinity");
 	}
 
 	public void testEqual() {
@@ -2250,9 +2287,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Plus @@ ($numbers * $factors)", "2");
 	}
 
+	public void testExpIntegralEi() {
+		check("ExpIntegralEi(I*Infinity)", "I*Pi");
+		check("ExpIntegralEi(-I*Infinity)", "-I*Pi");
+		check("Table(ExpIntegralEi(x), {x, 0.0, 3.0, 0.25})", //
+				"{-Infinity,-0.54254,0.45422,1.20733,1.89512,2.58105,3.30129,4.08365,4.95423,5.94057,7.07377,8.3903,9.93383}");
+		check("ExpIntegralEi(1.8)", "4.24987");
+	}
 	public void testExtract() {
-		check("Extract(a + b + c, {2})", "b");
-		check("Extract({{a, b}, {c, d}}, {{1}, {2, 2}})", "{{a,b},d}");
+		check("Extract(a + b + c, {2})", //
+				"b");
+		check("Extract({{a, b}, {c, d}}, {{1}, {2, 2}})", //
+				"{{a,b},d}");
 	}
 
 	public void testFactor() {
@@ -3501,10 +3547,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testInverseSeries() {
-		check("InverseSeries(Series(Sin(x), {x, 0, 7}))", //
-				"x+x^3/6+3/40*x^5+5/112*x^7+O(x)^8");
-		check("InverseSeries(Series(ArcSin(x), {x, 0, 5}))", //
-				"x-x^3/6+x^5/120+O(x)^6");
+		check("InverseSeries(Series(Sin(x), {x, 0, 9}))", //
+				"x+x^3/6+3/40*x^5+5/112*x^7+35/1152*x^9+O(x)^10");
+		check("InverseSeries(Series(ArcSin(x), {x, 0, 9}))", //
+				"x-x^3/6+x^5/120-x^7/5040+x^9/362880+O(x)^10");
+		check("InverseSeries(Series(Log(x+1), {x, 0, 9}))", //
+				"x+x^2/2+x^3/6+x^4/24+x^5/120+x^6/720+x^7/5040+x^8/40320+x^9/362880+O(x)^10");
 	}
 	public void testLaplaceTransform() {
 		check("LaplaceTransform(E^2,t,-3+s)", "E^2/(-3+s)");
@@ -3580,12 +3628,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// 35583840059240/5793115330933+275839049310660/5793115330933*I,
 		// -3352155369084/827587904419-28321055437140/827587904419*I}
 		check("Table(Complex(i,Rational(2 * i + 2 + j, 1 + 9 * i + j)),{i,0,3},{j,0,2})", //
-				"{{I*2,I*3/2,I*4/3},{1+I*2/5,1+I*5/11,1+I*1/2},{2+I*6/19,2+I*7/20,2+I*8/21},{3+I*\n"
-						+ "2/7,3+I*9/29,3+I*1/3}}");
+				"{{I*2,I*3/2,I*4/3},{1+I*2/5,1+I*5/11,1+I*1/2},{2+I*6/19,2+I*7/20,2+I*8/21},{3+\n"
+						+ "I*2/7,3+I*9/29,3+I*1/3}}");
 		check("LeastSquares(Table(Complex(i,Rational(2 * i + 2 + j, 1 + 9 * i + j)),{i,0,3},{j,0,2}), {1,1,1,1})", //
 				"{-1577780898195/827587904419-I*11087326045520/827587904419,35583840059240/\n"
-						+ "5793115330933+I*275839049310660/5793115330933,-3352155369084/827587904419-I*\n"
-						+ "28321055437140/827587904419}");
+						+ "5793115330933+I*275839049310660/5793115330933,-3352155369084/827587904419-\n"
+						+ "I*28321055437140/827587904419}");
 		check("LeastSquares({{1, 1}, {1, 2}, {1, 3.0}}, {7, 7, 8})", //
 				"{6.333333333333329,0.5000000000000018}");
 		check("LeastSquares({{1, 1}, {1, 2}, {1, 3}}, {7, 7, 8})", //
@@ -3890,6 +3938,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Log2(x)", "Log(x)/Log(2)");
 	}
 
+	public void testLogIntegral() {
+		check("LogIntegral(20.0)", "9.9053");
+		check("LogIntegral(Infinity)", "Infinity");
+		check("LogIntegral(ComplexInfinity)", "ComplexInfinity");
+		check("Table(LogIntegral(x), {x,1.0, 20.0, 2/3})", //
+				"{-Infinity,0.48973,1.47827,2.16359,2.71938,3.20126,3.63459,4.03318,4.40548,4.75705,5.09177,5.41245,5.72124,6.01976,6.30934,6.59101,6.86564,7.13395,7.39655,7.65394,7.90657,8.15482,8.39903,8.63949,8.87646,9.11018,9.34083,9.56863,9.79372}");
+
+	}
 	public void testLogisticSigmoid() {
 		check("D(LogisticSigmoid(x),x)", "(1-LogisticSigmoid(x))*LogisticSigmoid(x)");
 		check("LogisticSigmoid(Infinity)", "1");
@@ -6804,7 +6860,21 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testSeries() {
 		// check("FullForm(Series(Exp(x),{x,0,10}))", "");
 		// check("Series(Sin(Sqrt(x)), {x, 0, 5})", "");
+		check("s1=SeriesData(x, 0, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 2, 9, 1)", //
+				"x^2+x^3+x^4+x^5+x^6+x^7+x^8+O(x)^9");
+		check("s2=SeriesData(x, 0, {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800}, 3, 11, 1)", //
+				"x^3+x^4+2*x^5+6*x^6+24*x^7+120*x^8+720*x^9+5040*x^10+O(x)^11");
+		check("s1+s2", "x^2+2*x^3+2*x^4+3*x^5+7*x^6+25*x^7+121*x^8+O(x)^9");
+		// check("s1/s2",
+		// "x^2+2*x^3+2*x^4+3*x^5+7*x^6+25*x^7+121*x^8+O(x)^9");
 
+		check("s1=SeriesData(x, 0, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 0, 11, 1)", //
+				"1+x+x^2+x^3+x^4+x^5+x^6+x^7+x^8+x^9+x^10+O(x)^11");
+		check("s2=SeriesData(x, 0, {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800}, 0, 11, 1)", //
+				"1+x+2*x^2+6*x^3+24*x^4+120*x^5+720*x^6+5040*x^7+40320*x^8+362880*x^9+3628800*x^\n" //
+						+ "10+O(x)^11");
+		check("s1*s2",
+				"1+2*x+4*x^2+10*x^3+34*x^4+154*x^5+874*x^6+5914*x^7+46234*x^8+409114*x^9+4037914*x^\n" + "10+O(x)^11");
 		check("Series(x*4+x^2-y*x^10, {x, 0, 10})", "4*x+x^2-y*x^10+O(x)^11");
 		check("Series(x*4+x^2-y*x^11, {x, 0, 10})", "4*x+x^2+O(x)^11");
 
@@ -6831,15 +6901,47 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSeriesData() {
-		check("SeriesData(100, 0, Table(i^2, {i, 10}), 0, 10, 1)", "Indeterminate");
-		// check("SeriesData(x, 0, Table(i^2, {i, 10}), 0, 10, 1)",
-		// "1+4*x+9*x^2+16*x^3+25*x^4+36*x^5+49*x^6+64*x^7+81*x^8+100*x^9+O(x)^10");
+		check("SeriesData(x, 0, {1, 0, -1, -4, -17, -88, -549}, -1, 6, 1)", //
+				"1/x-x-4*x^2-17*x^3-88*x^4-549*x^5+O(x)^6");
+		check("s1=SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^2", //
+				"x^2-x^4/3+2/45*x^6-x^8/360+x^10/14400+O(x)^12");
+		check("s1 // FullForm", //
+				"\"SeriesData(x,0,{1,0,-1/3,0,2/45,0,-1/360,0,1/14400,0},2,12,1)\"");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^3", //
+				"x^3-x^5/2+13/120*x^7-7/540*x^9+13/14400*x^11+O(x)^13");
+		// check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^12", //
+		// "x^12-2*x^14+29/15*x^16-649/540*x^18+3883/7200*x^20+O(x)^22");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^2", //
+				"x^2-x^4/3+2/45*x^6-x^8/360+x^10/14400+O(x)^12");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^3", //
+				"x^3-x^5/2+13/120*x^7-7/540*x^9+13/14400*x^11+O(x)^13");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)*SeriesData(x, 0,{1,0,-1/5,0,1/110}, 1, 11, 1) // FullForm", //
+				"\"SeriesData(x,0,{1,0,-11/30,0,67/1320,0,-7/2200,0,1/13200,0},2,12,1)\"");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)*SeriesData(x, 0,{1,0,-1/5,0,1/110}, 1, 11, 1)", //
+				"x^2-11/30*x^4+67/1320*x^6-7/2200*x^8+x^10/13200+O(x)^12");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)-SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)", //
+				"O(x)^11");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)+SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)", //
+				"2*x-x^3/3+x^5/60+O(x)^11");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120,0,-1/5040,0,1/362880}, 1, 11, 2)*7",
+				"7*Sqrt(x)-7/6*x^(3/2)+7/120*x^(5/2)-x^(7/2)/720+x^(9/2)/51840+O(x)^(11/2)");
+		check("SeriesData(x, 0,{1,0,-1/6,0,1/120,0,-1/5040,0,1/362880}, 1, 11, 2)+4", //
+				"4+Sqrt(x)-x^(3/2)/6+x^(5/2)/120-x^(7/2)/5040+x^(9/2)/362880+O(x)^(11/2)");
 		check("SeriesData(x, 0,{1,0,-1/6,0,1/120,0,-1/5040,0,1/362880}, 1, 11, 2)",
 				"Sqrt(x)-x^(3/2)/6+x^(5/2)/120-x^(7/2)/5040+x^(9/2)/362880+O(x)^(11/2)");
+		check("SeriesData(100, 0, Table(i^2, {i, 10}), 0, 10, 1)", //
+				"Indeterminate");
+		check("SeriesData(x, 0, Table(i^2, {i, 10}), 0, 10, 1)", //
+				"1+4*x+9*x^2+16*x^3+25*x^4+36*x^5+49*x^6+64*x^7+81*x^8+100*x^9+O(x)^10");
 	}
 
 	public void testSeriesCoefficient() {
 
+		check("SeriesCoefficient(d+4*x^e+7*x^f+Sin(x),{x, a, n})", //
+				"Piecewise({{(4*a^e*Binomial(e,n)+7*a^f*Binomial(f,n))/a^n,n>0},{4*a^e+7*a^f+d,n==\n"
+						+ "0}},0)+Piecewise({{Sin(a+1/2*n*Pi)/n!,n>=0}},0)");
+		check("SeriesCoefficient(d+4*x^e+7*x^f+Sin(x),{x, a, 10})", //
+				"(4*a^e*Binomial(e,10)+7*a^f*Binomial(f,10))/a^10-Sin(a)/3628800");
 		check("SeriesCoefficient(d+4*x^e+7*x^f,{x, a, n})", //
 				"Piecewise({{(4*a^e*Binomial(e,n)+7*a^f*Binomial(f,n))/a^n,n>0},{4*a^e+7*a^f+d,n==\n" + "0}},0)");
 		check("SeriesCoefficient(x^42,{x, a, n})", //
@@ -7775,17 +7877,32 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTable() {
-		check("Table(x, {4})", "{x,x,x,x}");
+		check("Table(0.0^x, {x, -1.0, 1.0, 0.25})", //
+				"{ComplexInfinity,ComplexInfinity,ComplexInfinity,ComplexInfinity,Indeterminate,0.0,0.0,0.0,0.0}");
+		check("Table(0^x, {x,-1, 1,1/4})", //
+				"{ComplexInfinity,ComplexInfinity,ComplexInfinity,ComplexInfinity,Indeterminate,0,\n" + //
+						"0,0,0}");
+		check("Table(x, {4})", //
+				"{x,x,x,x}");
 		check("n=0", "0");
-		check("Table(n= n + 1, {5})", "{1,2,3,4,5}");
-		check("Table(i, {i, 4})", "{1,2,3,4}");
-		check("Table(i, {i, 2, 5})", "{2,3,4,5}");
-		check("Table(i, {i, 2, 6, 2})", "{2,4,6}");
-		check("Table(i, {i, Pi, 2*Pi, Pi / 2})", "{Pi,3/2*Pi,2*Pi}");
-		check("Table(x^2, {x, {a, b, c}})", "{a^2,b^2,c^2}");
-		check("Table({i, j}, {i, {a, b}}, {j, 1, 2})", "{{{a,1},{a,2}},{{b,1},{b,2}}}");
-		check("Table(x, {x,0,1/3})", "{0}");
-		check("Table(x, {x, -0.2, 3.9})", "{-0.2,0.8,1.8,2.8,3.8}");
+		check("Table(n= n + 1, {5})", //
+				"{1,2,3,4,5}");
+		check("Table(i, {i, 4})", //
+				"{1,2,3,4}");
+		check("Table(i, {i, 2, 5})", //
+				"{2,3,4,5}");
+		check("Table(i, {i, 2, 6, 2})", //
+				"{2,4,6}");
+		check("Table(i, {i, Pi, 2*Pi, Pi / 2})", //
+				"{Pi,3/2*Pi,2*Pi}");
+		check("Table(x^2, {x, {a, b, c}})", //
+				"{a^2,b^2,c^2}");
+		check("Table({i, j}, {i, {a, b}}, {j, 1, 2})", //
+				"{{{a,1},{a,2}},{{b,1},{b,2}}}");
+		check("Table(x, {x,0,1/3})", //
+				"{0}");
+		check("Table(x, {x, -0.2, 3.9})", //
+				"{-0.2,0.8,1.8,2.8,3.8}");
 
 		// check("Timing(Length(Table(i, {i, 1, 10000})))", "{0.159,10000}");
 		check("Table(x,10)", "{x,x,x,x,x,x,x,x,x,x}");

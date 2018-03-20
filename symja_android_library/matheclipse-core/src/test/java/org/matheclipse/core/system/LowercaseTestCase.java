@@ -2020,6 +2020,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{-2.15985,-1.87887,-1.59434,-1.31126,-1.03407,-0.76521,-0.50467,-0.25059,0.0,0.25059,0.50467,0.76521,1.03407,1.31126,1.59434,1.87887,2.15985}");
 	}
 
+	public void testEllipticK() {
+		check("EllipticK(0.5)", "1.85407");
+		check("Table(EllipticK(x), {x,-1.0, 1.0, 1/4})", //
+				"{1.31103,2.15652,1.85407,1.68575,1.5708,1.68575,1.85407,2.15652,ComplexInfinity}");
+
+	}
 	public void testEllipticPi() {
 		check("EllipticPi(n,0)", "Pi/(2*Sqrt(1-n))");
 		check("EllipticPi(n,1)", "Infinity/Sign(1-n)");
@@ -2028,6 +2034,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("EllipticPi(1/3, Pi/5, 0.3)", "0.6594");
 		check("Table(EllipticPi(x,0.5), {x,-2.0, 2.0, 1/4})", //
 				"{1.0227,1.07184,1.12843,1.19454,1.27313,1.36859,1.48785,1.64253,1.85407,2.16762,2.70129,3.93061,ComplexInfinity,-0.59276,-0.45672,-0.37175,-0.31354}");
+	}
+
+	public void testJacobiZeta() {
+		check("JacobiZeta(z, 0)", "0");
+		check("JacobiZeta(-5/4, 1)", "-Sin(5/4)");
+		check("JacobiZeta(0, m)", "0");
+		check("JacobiZeta(Pi/2, m)", "0");
+		check("JacobiZeta(z, Infinity)", "ComplexInfinity");
+		check("JacobiZeta(z, -Infinity)", "ComplexInfinity");
 	}
 
 	public void testEqual() {
