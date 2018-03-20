@@ -1,8 +1,5 @@
 package org.matheclipse.core.expression;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.form.output.OutputFormFactory;
@@ -12,6 +9,9 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * IFraction implementation which uses methods of the Apache <code>org.apache.commons.math3.fraction.BigFraction</code>
@@ -312,7 +312,7 @@ public class BigFractionSym extends AbstractFractionSym {
 			return valueOf(fFraction.getNumerator().gcd(arg2.getNumerator()),
 					AbstractIntegerSym.lcm(fFraction.getDenominator(), arg2.getDenominator()));
 		}
-		return super.gcd(that);
+		return F.GCD(this, that);
 	}
 
 	/**

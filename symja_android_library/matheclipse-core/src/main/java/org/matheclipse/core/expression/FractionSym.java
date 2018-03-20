@@ -1,9 +1,5 @@
 package org.matheclipse.core.expression;
 
-import java.io.ObjectStreamException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.util.ArithmeticUtils;
 import org.matheclipse.core.basic.Config;
@@ -14,6 +10,10 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
+
+import java.io.ObjectStreamException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * IFraction implementation which reimplements methods of the Apache
@@ -352,7 +352,7 @@ public class FractionSym extends AbstractFractionSym {
 		if (that instanceof FractionSym) {
 			return gcd((FractionSym) that);
 		}
-		return super.gcd(that);
+		return F.GCD(this, that);
 	}
 
 	/**
