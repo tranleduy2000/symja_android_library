@@ -21,6 +21,7 @@ import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.builtin.Combinatoric;
 import org.matheclipse.core.builtin.ComputationalGeometryFunctions;
 import org.matheclipse.core.builtin.ConstantDefinitions;
+import org.matheclipse.core.builtin.EllipticIntegrals;
 import org.matheclipse.core.builtin.ExpTrigsFunctions;
 import org.matheclipse.core.builtin.FunctionDefinitions;
 import org.matheclipse.core.builtin.HypergeometricFunctions;
@@ -329,6 +330,7 @@ public class F {
 	public final static IBuiltInSymbol Eliminate = BuiltIns.valueOf(BuiltIns.Eliminate);
 	public final static IBuiltInSymbol EllipticE = BuiltIns.valueOf(BuiltIns.EllipticE);
 	public final static IBuiltInSymbol EllipticF = BuiltIns.valueOf(BuiltIns.EllipticF);
+	public final static IBuiltInSymbol EllipticK = BuiltIns.valueOf(BuiltIns.EllipticK);
 	public final static IBuiltInSymbol EllipticPi = BuiltIns.valueOf(BuiltIns.EllipticPi);
 	public final static IBuiltInSymbol End = BuiltIns.valueOf(BuiltIns.End);
 	public final static IBuiltInSymbol EndPackage = BuiltIns.valueOf(BuiltIns.EndPackage);
@@ -1176,6 +1178,10 @@ public class F {
 	public static IAST CComplexInfinity;
 
 	/**
+	 * Represents <code>Pi/2</code> as Symja expression <code>Times(C1D2, Pi)</code>
+	 */
+	public static IAST CPiHalf;
+	/**
 	 * Represents <code>Sqrt(2)</code>
 	 */
 	public static IAST CSqrt2;
@@ -1381,6 +1387,7 @@ public class F {
 			CNIInfinity = unaryAST1(DirectedInfinity, CNI);
 			CComplexInfinity = headAST0(DirectedInfinity);
 
+			CPiHalf = binaryAST2(Times, C1D2, Pi);
 			CSqrt2 = binaryAST2(Power, C2, C1D2);
 			CSqrt3 = binaryAST2(Power, C3, C1D2);
 			CSqrt5 = binaryAST2(Power, C5, C1D2);
@@ -1550,6 +1557,7 @@ public class F {
 			RandomFunctions.initialize();
 			StatisticsFunctions.initialize();
 			HypergeometricFunctions.initialize();
+			EllipticIntegrals.initialize();
 			PolynomialFunctions.initialize();
 			SeriesFunctions.initialize();
 			AssumptionFunctions.initialize();
@@ -2976,6 +2984,9 @@ public class F {
 		return binaryAST2(EllipticF, a0, a1);
 	}
 
+	public static IAST EllipticK(final IExpr a0) {
+		return unaryAST1(EllipticK, a0);
+	}
 	public static IAST EllipticPi(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(EllipticPi, a0, a1, a2);
 	}
