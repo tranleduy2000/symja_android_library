@@ -1,14 +1,12 @@
 package org.matheclipse.script.engine;
 
 import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.EvalUtilities;
 import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
@@ -18,12 +16,9 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.script.AbstractScriptEngine;
-import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
@@ -67,19 +62,19 @@ public class MathScriptEngine extends AbstractScriptEngine {
 
 	@Override
 	public Object eval(final String script, final ScriptContext context) throws ScriptException {
-		final ArrayList<ISymbol> list = new ArrayList<ISymbol>();
+		// final ArrayList<ISymbol> list = new ArrayList<ISymbol>();
 		boolean relaxedSyntax = false;
 		try {
 			// first assign the EvalEngine to the current thread:
 			fUtility.startRequest();
 
-			final Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
-			ISymbol symbol;
-			for (Map.Entry<String, Object> currEntry : bindings.entrySet()) {
-				symbol = F.symbol(currEntry.getKey(), fEngine);
-				symbol.pushLocalVariable(Object2Expr.convert(currEntry.getValue()));
-				list.add(symbol);
-			}
+			// final Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
+			// ISymbol symbol;
+			// for (Map.Entry<String, Object> currEntry : bindings.entrySet()) {
+			// symbol = F.userSymbol(currEntry.getKey(), fEngine);
+			// symbol.pushLocalVariable(Object2Expr.convert(currEntry.getValue()));
+			// list.add(symbol);
+			// }
 
 			final Object decimalFormat = get("DECIMAL_FORMAT");
 			if (decimalFormat instanceof String) {
@@ -162,11 +157,11 @@ public class MathScriptEngine extends AbstractScriptEngine {
 			}
 			return "StackOverflowError";
 		} finally {
-			if (list.size() > 0) {
-				for (int i = 0; i < list.size(); i++) {
-					list.get(i).popLocalVariable();
-				}
-			}
+			// if (list.size() > 0) {
+			// for (int i = 0; i < list.size(); i++) {
+			// list.get(i).popLocalVariable();
+			// }
+			// }
 			EvalEngine.remove();
 		}
 
