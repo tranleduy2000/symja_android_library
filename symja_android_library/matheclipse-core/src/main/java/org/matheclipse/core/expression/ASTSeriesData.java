@@ -40,7 +40,7 @@ public class ASTSeriesData extends AST implements Cloneable, Externalizable, Ran
 	/**
 	 * The underlying matrix
 	 */
-	private Function<Integer, IExpr> f;
+	// private Function<Integer, IExpr> f;
 
 	// private HashMap<Integer, IExpr> vals;
 	// -1 => undetermined
@@ -72,35 +72,35 @@ public class ASTSeriesData extends AST implements Cloneable, Externalizable, Ran
 		// constructor. Since this class does not have one, serialization and deserialization will fail at runtime.
 	}
 
-	public ASTSeriesData(Function<Integer, IExpr> f, HashMap<Integer, IExpr> map, IExpr ring) {
-		super(F.SeriesData);
-		this.f = f;
-		// this.vals = map;
-		this.ring = ring;
-	}
+	// public ASTSeriesData(Function<Integer, IExpr> f, HashMap<Integer, IExpr> map, IExpr ring) {
+	// super(F.SeriesData);
+	// this.f = f;
+	// // this.vals = map;
+	// this.ring = ring;
+	// }
 
-	public ASTSeriesData(Function<Integer, IExpr> f, HashMap<Integer, IExpr> map, int order, IExpr ring) {
-		super(F.SeriesData);
-		this.power = order;
-		this.f = f;
-		// this.vals = map;
-		this.ring = ring;
-	}
+	// public ASTSeriesData(Function<Integer, IExpr> f, HashMap<Integer, IExpr> map, int order, IExpr ring) {
+	// super(F.SeriesData);
+	// this.power = order;
+	// this.f = f;
+	// // this.vals = map;
+	// this.ring = ring;
+	// }
 
-	public ASTSeriesData(Function<Integer, IExpr> f, IExpr ring) {
-		super(F.SeriesData);
-		this.f = f;
-		// this.vals = new HashMap<Integer, IExpr>();
-		this.ring = ring;
-	}
+	// public ASTSeriesData(Function<Integer, IExpr> f, IExpr ring) {
+	// super(F.SeriesData);
+	// this.f = f;
+	// // this.vals = new HashMap<Integer, IExpr>();
+	// this.ring = ring;
+	// }
 
-	public ASTSeriesData(Function<Integer, IExpr> f, int order, IExpr ring) {
-		super(F.SeriesData);
-		this.power = order;
-		this.f = f;
-		// this.vals = new HashMap<Integer, IExpr>();
-		this.ring = ring;
-	}
+	// public ASTSeriesData(Function<Integer, IExpr> f, int order, IExpr ring) {
+	// super(F.SeriesData);
+	// this.power = order;
+	// this.f = f;
+	// // this.vals = new HashMap<Integer, IExpr>();
+	// this.ring = ring;
+	// }
 
 	/**
 	 * 
@@ -929,12 +929,24 @@ public class ASTSeriesData extends AST implements Cloneable, Externalizable, Ran
 	 * @return
 	 */
 	public ASTSeriesData subtractPS(ASTSeriesData b) {
-		return new ASTSeriesData(new Function<Integer, IExpr>() {
-			@Override
-			public IExpr apply(Integer n) {
-				return ASTSeriesData.this.coeff(n).subtract(b.coeff(n));
+		int minSize = nMin;
+		if (nMin > b.nMin) {
+			minSize = b.nMin;
 			}
-		}, ring);
+		int maxSize = nMax;
+		if (nMax > b.nMax) {
+			maxSize = b.nMax;
+		}
+		int size = size();
+		if (size > b.size()) {
+			size = b.size();
+		}
+		ASTSeriesData series = new ASTSeriesData(x, x0, minSize, maxSize, denominator);
+		int j = 1;
+		for (int i = 0; i < size - 1; i++) {
+			series.append(j++, this.coeff(minSize + i).subtract(b.coeff(minSize + i)));
+		}
+		return series;
 	}
 
 	@Override
