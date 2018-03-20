@@ -32,8 +32,7 @@ public interface IFraction extends IRational {
     public IFraction div(IFraction other);
 
     /**
-     * Returns an array of two BigIntegers containing (numerator / denominator)
-     * followed by (numerator % denominator).
+     * Returns an array of two BigIntegers containing (numerator / denominator) followed by (numerator % denominator).
      *
      * @return
      */
@@ -47,6 +46,7 @@ public interface IFraction extends IRational {
     @Override
     public IFraction inverse();
 
+    public IFraction gcd(IFraction other);
     public IFraction mul(IFraction other);
 
     /**
@@ -81,8 +81,7 @@ public interface IFraction extends IRational {
     public BigInteger toBigDenominator();
 
     /**
-     * Return the <code>org.apache.commons.math3.fraction.BigFraction</code>
-     * representation.
+     * Return the <code>org.apache.commons.math3.fraction.BigFraction</code> representation.
      *
      * @return
      */
