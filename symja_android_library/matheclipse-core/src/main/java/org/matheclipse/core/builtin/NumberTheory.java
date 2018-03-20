@@ -106,19 +106,19 @@ public final class NumberTheory {
 	private static class BellB extends AbstractFunctionEvaluator {
 
 		/**
-		 * Generates the Bell Number of the given index, where B(1) is 1. This is recursive.
+		 * Generates the Bell number of the given index, where B(1) is 1. This is recursive.
 		 * 
 		 * @param index
 		 * @return
 		 */
-		public static BigInteger generateBellNumber(int index) {
+		private static BigInteger bellNumber(int index) {
 			if (index < BELLB_14.length) {
 				return BigInteger.valueOf(BELLB_14[index]);
 			}
 			if (index > 1) {
 				BigInteger sum = BigInteger.ZERO;
 				for (int i = 0; i < index; i++) {
-					BigInteger prevBellNum = generateBellNumber(i);
+					BigInteger prevBellNum = bellNumber(i);
 					BigInteger binomialCoeff = BigIntegerMath.binomial(index - 1, i);
 					sum = sum.add(binomialCoeff.multiply(prevBellNum));
 				}
@@ -127,21 +127,50 @@ public final class NumberTheory {
 			return BigInteger.ONE;
 		}
 
+		/**
+		 * Generates the Bell polynomial of the given index, where B(1) is 1. This is recursive.
+		 *
+		 * @param index
+		 * @return
+		 */
+		private static IExpr bellBPolynomial(int n, IExpr z) {
+			if (n == 0) {
+				return F.C1;
+			}
+
+			if (z.isZero()) {
+				return F.C0;
+			}
+			if (n == 1) {
+				return z;
+			}
+
+			IASTAppendable sum = F.PlusAlloc(n + 1);
+			for (int k = 0; k <= n; k++) {
+				sum.append(F.Times(F.StirlingS2(F.ZZ(n), F.ZZ(k)), F.Power(z, k)));
+			}
+			return sum;
+		}
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
+			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
+			int n = arg1.toIntDefault(Integer.MIN_VALUE);
+			if (n >= 0) {
+				if (ast.isAST2() && !ast.arg2().isOne()) {
+					// bell polynomials: Sum(StirlingS2(n, k)* z^k, {k, 0, n})
+					IExpr z = ast.arg2();
+					return bellBPolynomial(n, z);
+				}
+
+				// bell numbers start here
 			if (arg1.isZero()) {
 				return F.C1;
 			}
-			if (arg1.isInteger() && arg1.isPositive()) {
-				int index = ((IInteger) arg1).toIntDefault(0);
-				if (index != 0) {
-					BigInteger bellB = generateBellNumber(index);
+				BigInteger bellB = bellNumber(n);
 					return F.integer(bellB);
 				}
-			}
 			return F.NIL;
 		}
 
