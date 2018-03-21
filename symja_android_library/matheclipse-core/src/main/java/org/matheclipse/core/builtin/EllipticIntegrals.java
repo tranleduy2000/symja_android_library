@@ -16,6 +16,7 @@ public class EllipticIntegrals {
 		F.EllipticF.setEvaluator(new EllipticF());
 		F.EllipticK.setEvaluator(new EllipticK());
 		F.EllipticPi.setEvaluator(new EllipticPi()); 
+		F.JacobiZeta.setEvaluator(new JacobiZeta());
 	}
 
 	private static class EllipticE extends AbstractFunctionEvaluator {
@@ -235,6 +236,40 @@ public class EllipticIntegrals {
 		}
 	}
 
+	private static class JacobiZeta extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			IExpr z = ast.arg1();
+			IExpr m = ast.arg2();
+			if (m.isZero()) {
+				return F.C0;
+			}
+			if (z.isZero()) {
+				return F.C0;
+			}
+			if (z.equals(F.CPiHalf)) {
+				return F.C0;
+			}
+			if (m.isOne()) {
+				// Abs(Re(z)) <= Pi/2
+				if (engine.evalTrue(F.LessEqual(F.Abs(F.Re(z)), F.CPiHalf))) {
+					return F.Sin(z);
+				}
+			}
+			if (m.isInfinity() || m.isNegativeInfinity()) {
+				return F.CComplexInfinity;
+			}
+
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+	}
 	private final static EllipticIntegrals CONST = new EllipticIntegrals();
 
 	public static EllipticIntegrals initialize() {
