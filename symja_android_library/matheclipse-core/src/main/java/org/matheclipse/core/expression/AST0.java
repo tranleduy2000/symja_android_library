@@ -353,7 +353,7 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 
 	@Override
 	public int hashCode() {
-		if (hashValue == 0) {
+		if (hashValue == 0 && arg0 != null) {
 			hashValue = 0x811c9dc5;// decimal 2166136261;
 			hashValue = (hashValue * 16777619) ^ (arg0.hashCode() & 0xff);
 		}

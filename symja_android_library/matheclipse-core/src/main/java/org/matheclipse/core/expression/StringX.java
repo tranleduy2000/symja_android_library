@@ -304,7 +304,7 @@ public class StringX extends IStringXImpl implements IStringX {
 
     @Override
     public int hashCode() {
-        return 37 * fString.hashCode();
+        return (fString == null) ? 37 : 37 + fString.hashCode();
     }
 
 	@Override

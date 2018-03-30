@@ -1,12 +1,8 @@
 package org.matheclipse.core.expression;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
-import java.util.RandomAccess;
-import java.util.Set;
+import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.Function;
+import com.duy.lambda.Predicate;
 
 import org.hipparchus.linear.ArrayRealVector;
 import org.hipparchus.linear.RealVector;
@@ -18,9 +14,13 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 
-import com.duy.lambda.DoubleUnaryOperator;
-import com.duy.lambda.Function;
-import com.duy.lambda.Predicate;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.ObjectStreamException;
+import java.util.RandomAccess;
+import java.util.Set;
 
 
 /**
@@ -378,7 +378,7 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 
 	@Override
 	public int hashCode() {
-		if (hashValue == 0) {
+		if (hashValue == 0 && vector != null) {
 			hashValue = vector.hashCode();
 		}
 		return hashValue;

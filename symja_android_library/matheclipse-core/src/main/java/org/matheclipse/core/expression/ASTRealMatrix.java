@@ -1,12 +1,9 @@
 package org.matheclipse.core.expression;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
-import java.util.RandomAccess;
-import java.util.Set;
+import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.Function;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
 
 import org.hipparchus.linear.Array2DRowRealMatrix;
 import org.hipparchus.linear.RealMatrix;
@@ -18,10 +15,13 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 
-import com.duy.lambda.DoubleUnaryOperator;
-import com.duy.lambda.Function;
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.Predicate;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.ObjectStreamException;
+import java.util.RandomAccess;
+import java.util.Set;
 
 
 /**
@@ -158,10 +158,10 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	// throw new UnsupportedOperationException();
 	// }
 
-//	@Override
-//	public IAST appendOneIdentity(IAST subAST) {
-//		throw new UnsupportedOperationException();
-//	}
+	// @Override
+	// public IAST appendOneIdentity(IAST subAST) {
+	// throw new UnsupportedOperationException();
+	// }
 
 	/**
 	 * Adds the specified object at the end of this {@code ArrayList}.
@@ -170,11 +170,11 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	 *            the object to add.
 	 * @return always true
 	 */
-//	@Override
-//	public boolean append(IExpr object) {
-//		hashValue = 0;
-//		throw new UnsupportedOperationException();
-//	}
+	// @Override
+	// public boolean append(IExpr object) {
+	// hashValue = 0;
+	// throw new UnsupportedOperationException();
+	// }
 
 	/**
 	 * Inserts the specified object into this {@code ArrayList} at the specified location. The object is inserted before
@@ -264,6 +264,10 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 		return new ASTRealVector(matrix.getRowVector(4), false);
 	}
 
+	/** {@inheritDoc} */
+	public int argSize() {
+		return matrix.getRowDimension();
+	}
 	@Override
 	public Set<IExpr> asSet() {
 		throw new UnsupportedOperationException();
@@ -277,11 +281,11 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	 * @see #isEmpty
 	 * @see #size
 	 */
-//	@Override
-//	public void clear() {
-//		hashValue = 0;
-//		throw new UnsupportedOperationException();
-//	}
+	// @Override
+	// public void clear() {
+	// hashValue = 0;
+	// throw new UnsupportedOperationException();
+	// }
 
 	/**
 	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this
@@ -385,7 +389,7 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 
 	@Override
 	public int hashCode() {
-		if (hashValue == 0) {
+		if (hashValue == 0 && matrix != null) {
 			hashValue = matrix.hashCode();
 		}
 		return hashValue;
@@ -532,10 +536,10 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	 * @throws IndexOutOfBoundsException
 	 *             when {@code start < 0, start > end} or {@code end > size()}
 	 */
-//	protected void removeRange(int start, int end) {
-//		hashValue = 0;
-//		throw new UnsupportedOperationException();
-//	}
+	// protected void removeRange(int start, int end) {
+	// hashValue = 0;
+	// throw new UnsupportedOperationException();
+	// }
 
 	/**
 	 * Replaces the element at the specified location in this {@code ArrayList} with the specified object.

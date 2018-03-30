@@ -569,7 +569,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public int hashCode() {
-        return fSymbolName.hashCode();
+        return (fSymbolName == null) ? 31 : fSymbolName.hashCode();
     }
 
     /**
