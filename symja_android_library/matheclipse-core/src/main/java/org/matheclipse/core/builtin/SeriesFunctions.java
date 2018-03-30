@@ -1,6 +1,7 @@
 package org.matheclipse.core.builtin;
 
-import com.duy.lambda.Predicate;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
@@ -27,12 +28,7 @@ import org.matheclipse.core.polynomials.PartialFractionGenerator;
 import org.matheclipse.core.reflection.system.rules.LimitRules;
 import org.matheclipse.core.reflection.system.rules.SeriesCoefficientRules;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class SeriesFunctions {
-    private final static SeriesFunctions CONST = new SeriesFunctions();
-
     static {
         F.Limit.setEvaluator(new Limit());
         if (ToggleFeature.SERIES) {
@@ -45,26 +41,18 @@ public class SeriesFunctions {
         }
     }
 
-    private SeriesFunctions() {
-
-    }
-
-    public static SeriesFunctions initialize() {
-        return CONST;
-    }
-
     /**
      * <pre>
      * Limit(expr, x -&gt; x0)
      * </pre>
-     * <p>
+     *
      * <blockquote>
      * <p>
      * gives the limit of <code>expr</code> as <code>x</code> approaches <code>x0</code>
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+     *
      * <pre>
      * &gt;&gt; Limit(7+Sin(x)/x, x-&gt;Infinity)
      * 7
@@ -72,18 +60,79 @@ public class SeriesFunctions {
      */
     private final static class Limit extends AbstractFunctionEvaluator implements LimitRules {
 
-        /**
-         * Compute the limit approaching from larger real values.
-         */
-        public final static int DIRECTION_FROM_ABOVE = -1;
-        /**
-         * Compute the limit approaching from larger or smaller real values automatically.
-         */
-        public final static int DIRECTION_TWO_SIDED = 0;
-        /**
-         * Compute the limit approaching from smaller real values.
-         */
-        public final static int DIRECTION_FROM_BELOW = 1;
+        static class LimitData implements Cloneable {
+            final ISymbol symbol;
+
+            final IExpr limitValue;
+
+            final IAST rule;
+
+            int direction;
+
+            // public LimitData(ISymbol symbol, IExpr limitValue, IAST rule) {
+            // this(symbol, limitValue, rule, DIRECTION_TWO_SIDED);
+            // }
+
+            public LimitData(ISymbol symbol, IExpr limitValue, IAST rule, int direction) {
+                this.symbol = symbol;
+                this.limitValue = limitValue;
+                this.rule = rule;
+                this.direction = direction;
+            }
+
+            @Override
+            protected LimitData clone() throws CloneNotSupportedException {
+                return (LimitData) super.clone();
+            }
+
+            public int getDirection() {
+                return direction;
+            }
+
+            public IExpr getLimitValue() {
+                return limitValue;
+            }
+
+            public IAST getRule() {
+                return rule;
+            }
+
+            public ISymbol getSymbol() {
+                return symbol;
+            }
+
+            public void setDirection(int direction) {
+                this.direction = direction;
+            }
+
+            /**
+             * Create a new <code>F.Limit( arg1, ... )</code> expression from his <code>LimitData</code> object
+             *
+             * @param arg1
+             *            the first argument of the Limit expression
+             * @return a new <code>F.Limit( arg1, ... )</code> expression
+             */
+            public IAST limit(IExpr arg1) {
+                // if (direction == DIRECTION_FROM_LARGER_VALUES) {
+                // return F.Limit(arg1, rule, F.Rule(F.Direction, F.CN1));
+                // }
+
+                if (direction == DIRECTION_FROM_BELOW) {
+                    return F.Limit(arg1, rule, F.Rule(F.Direction, F.C1));
+                }
+                return F.Limit(arg1, rule);
+            }
+
+            /**
+             * Map a <code>F.Limit( arg1, ... )</code> expression at each argument of the given <code>ast</code>.
+             *
+             * @param ast
+             * @return
+             */
+            public IExpr mapLimit(final IAST ast) {
+                return ast.mapThread(limit(null), 1);
+            }
+        }
 
         private static IExpr evalLimitQuiet(final IExpr expr, LimitData data) {
             EvalEngine engine = EvalEngine.get();
@@ -98,60 +147,10 @@ public class SeriesFunctions {
         }
 
         /**
-         * See: <a href="http://en.wikibooks.org/wiki/Calculus/Infinite_Limits">Limits at Infinity of Rational
-         * Functions</a>
          *
-         * @param numeratorPoly
-         * @param denominatorPoly
-         * @param symbol
-         *            the variable for which to approach to the limit
-         * @param limit
-         *            the limit value which the variable should approach to
-         * @param rule
-         * @return
-         */
-        // private static IExpr limitsInfinityOfRationalFunctions(GenPolynomial<IExpr>
-        // numeratorPoly,
-        // GenPolynomial<IExpr> denominatorPoly, ISymbol symbol, IExpr limit, IAST rule)
-        // {
-        // long numDegree = numeratorPoly.degree();
-        // long denomDegree = denominatorPoly.degree();
-        // if (numDegree > denomDegree) {
-        // // If the numerator has the highest term, then the fraction is
-        // // called "top-heavy". If, when you divide the numerator
-        // // by the denominator the resulting exponent on the variable is
-        // // even, then the limit (at both \infty and -\infty) is
-        // // \infty. If it is odd, then the limit at \infty is \infty, and the
-        // // limit at -\infty is -\infty.
-        // long oddDegree = (numDegree + denomDegree) % 2;
-        // if (oddDegree == 1) {
-        // return F.Limit(F.Times(
-        // F.Divide(numeratorPoly.leadingBaseCoefficient(),
-        // denominatorPoly.leadingBaseCoefficient()),
-        // limit), rule);
-        // } else {
-        // return F.Limit(F.Times(
-        // F.Divide(numeratorPoly.leadingBaseCoefficient(),
-        // denominatorPoly.leadingBaseCoefficient()),
-        // F.CInfinity), rule);
-        // }
-        // } else if (numDegree < denomDegree) {
-        // // If the denominator has the highest term, then the fraction is
-        // // called "bottom-heavy" and the limit (at both \infty
-        // // and -\infty) is zero.
-        // return F.C0;
-        // }
-        // // If the exponent of the highest term in the numerator matches the
-        // // exponent of the highest term in the denominator,
-        // // the limit (at both \infty and -\infty) is the ratio of the
-        // // coefficients of the highest terms.
-        // return F.Divide(numeratorPoly.leadingBaseCoefficient(),
-        // denominatorPoly.leadingBaseCoefficient());
-        // }
-
-        /**
          * @param expr
-         * @param data     the limits data definition
+         * @param data
+         *            the limits data definition
          * @param evalExpr
          * @return
          */
@@ -227,17 +226,14 @@ public class SeriesFunctions {
             return F.NIL;
         }
 
-        // private static IExpr mapLimit(final IAST ast, LimitData data) {
-        // return ast.mapThread(data.limit(null), 1);
-        // }
-
         /**
          * Try L'hospitales rule. See <a href="http://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule"> Wikipedia
          * L'Hôpital's rule</a>
          *
          * @param numerator
          * @param denominator
-         * @param data        the limits data definition
+         * @param data
+         *            the limits data definition
          * @return
          */
         private static IExpr lHospitalesRule(IExpr numerator, IExpr denominator, LimitData data) {
@@ -278,8 +274,62 @@ public class SeriesFunctions {
          *
          * @param numeratorPoly
          * @param denominatorPoly
-         * @param symbol          the variable for which to approach to the limit
-         * @param data            the limit expression which the variable should approach to
+         * @param symbol
+         *            the variable for which to approach to the limit
+         * @param limit
+         *            the limit value which the variable should approach to
+         * @param rule
+         * @return
+         */
+        // private static IExpr limitsInfinityOfRationalFunctions(GenPolynomial<IExpr>
+        // numeratorPoly,
+        // GenPolynomial<IExpr> denominatorPoly, ISymbol symbol, IExpr limit, IAST rule)
+        // {
+        // long numDegree = numeratorPoly.degree();
+        // long denomDegree = denominatorPoly.degree();
+        // if (numDegree > denomDegree) {
+        // // If the numerator has the highest term, then the fraction is
+        // // called "top-heavy". If, when you divide the numerator
+        // // by the denominator the resulting exponent on the variable is
+        // // even, then the limit (at both \infty and -\infty) is
+        // // \infty. If it is odd, then the limit at \infty is \infty, and the
+        // // limit at -\infty is -\infty.
+        // long oddDegree = (numDegree + denomDegree) % 2;
+        // if (oddDegree == 1) {
+        // return F.Limit(F.Times(
+        // F.Divide(numeratorPoly.leadingBaseCoefficient(),
+        // denominatorPoly.leadingBaseCoefficient()),
+        // limit), rule);
+        // } else {
+        // return F.Limit(F.Times(
+        // F.Divide(numeratorPoly.leadingBaseCoefficient(),
+        // denominatorPoly.leadingBaseCoefficient()),
+        // F.CInfinity), rule);
+        // }
+        // } else if (numDegree < denomDegree) {
+        // // If the denominator has the highest term, then the fraction is
+        // // called "bottom-heavy" and the limit (at both \infty
+        // // and -\infty) is zero.
+        // return F.C0;
+        // }
+        // // If the exponent of the highest term in the numerator matches the
+        // // exponent of the highest term in the denominator,
+        // // the limit (at both \infty and -\infty) is the ratio of the
+        // // coefficients of the highest terms.
+        // return F.Divide(numeratorPoly.leadingBaseCoefficient(),
+        // denominatorPoly.leadingBaseCoefficient());
+        // }
+
+        /**
+         * See: <a href="http://en.wikibooks.org/wiki/Calculus/Infinite_Limits">Limits at Infinity of Rational
+         * Functions</a>
+         *
+         * @param numeratorPoly
+         * @param denominatorPoly
+         * @param symbol
+         *            the variable for which to approach to the limit
+         * @param data
+         *            the limit expression which the variable should approach to
          * @param rule
          * @return
          */
@@ -317,12 +367,17 @@ public class SeriesFunctions {
             return F.Divide(numeratorPoly.leadingBaseCoefficient(), denominatorPoly.leadingBaseCoefficient());
         }
 
+        // private static IExpr mapLimit(final IAST ast, LimitData data) {
+        // return ast.mapThread(data.limit(null), 1);
+        // }
+
         /**
          * Try l'Hospitales rule for numerator and denominator expression.
          *
          * @param numerator
          * @param denominator
-         * @param data        the limit data definition
+         * @param data
+         *            the limit data definition
          * @return <code>F.NIL</code> if no limit found
          */
         private static IExpr numeratorDenominatorLimit(final IExpr numerator, final IExpr denominator, LimitData data) {
@@ -401,12 +456,7 @@ public class SeriesFunctions {
                 return F.C1;
             }
             if (base.isTimes() && exponent.isFree(data.getSymbol())) {
-                IAST isFreeResult = ((IAST) base).partitionTimes(new Predicate<IExpr>() {
-                                                                     @Override
-                                                                     public boolean test(IExpr x) {
-                                                                         return x.isFree(data.getSymbol(), true);
-                                                                     }
-                                                                 }, F.C1, F.C1,
+                IAST isFreeResult = ((IAST) base).partitionTimes(x -> x.isFree(data.getSymbol(), true), F.C1, F.C1,
                         F.List);
                 if (!isFreeResult.get(2).isOne()) {
                     return F.Times(F.Power(isFreeResult.get(1), exponent),
@@ -488,7 +538,8 @@ public class SeriesFunctions {
          * <code>-Infinity</code>, <code>y</code> approaches <code>0</code>.
          *
          * @param arg1
-         * @param data (the datas limit must be Infinity or -Infinity)
+         * @param data
+         *            (the datas limit must be Infinity or -Infinity)
          * @return <code>F.NIL</code> if the substitution didn't succeed.
          */
         private static IExpr substituteInfinity(final IAST arg1, LimitData data) {
@@ -511,12 +562,7 @@ public class SeriesFunctions {
         }
 
         private static IExpr timesLimit(final IAST timesAST, LimitData data) {
-            IAST isFreeResult = timesAST.partitionTimes(new Predicate<IExpr>() {
-                @Override
-                public boolean test(IExpr x) {
-                    return x.isFree(data.getSymbol(), true);
-                }
-            }, F.C1, F.C1, F.List);
+            IAST isFreeResult = timesAST.partitionTimes(x -> x.isFree(data.getSymbol(), true), F.C1, F.C1, F.List);
             if (!isFreeResult.get(1).isOne()) {
                 return F.Times(isFreeResult.get(1), data.limit(isFreeResult.get(2)));
             }
@@ -575,12 +621,7 @@ public class SeriesFunctions {
                 IAST arg1 = logAST.setAtClone(1, firstArg.base());
                 return F.Times(firstArg.exponent(), data.limit(arg1));
             } else if (firstArg.isTimes()) {
-                IAST isFreeResult = firstArg.partitionTimes(new Predicate<IExpr>() {
-                    @Override
-                    public boolean test(IExpr x) {
-                        return x.isFree(data.getSymbol(), true);
-                    }
-                }, F.C1, F.C1, F.List);
+                IAST isFreeResult = firstArg.partitionTimes(x -> x.isFree(data.getSymbol(), true), F.C1, F.C1, F.List);
                 if (!isFreeResult.get(1).isOne()) {
                     IAST arg1 = logAST.setAtClone(1, isFreeResult.get(1));
                     IAST arg2 = logAST.setAtClone(1, isFreeResult.get(2));
@@ -589,6 +630,21 @@ public class SeriesFunctions {
             }
             return F.NIL;
         }
+
+        /**
+         * Compute the limit approaching from larger real values.
+         */
+        public final static int DIRECTION_FROM_ABOVE = -1;
+
+        /**
+         * Compute the limit approaching from larger or smaller real values automatically.
+         */
+        public final static int DIRECTION_TWO_SIDED = 0;
+
+        /**
+         * Compute the limit approaching from smaller real values.
+         */
+        public final static int DIRECTION_FROM_BELOW = 1;
 
         /**
          * Limit of a function. See <a href="http://en.wikipedia.org/wiki/List_of_limits">List of Limits</a>
@@ -657,93 +713,20 @@ public class SeriesFunctions {
             super.setUp(newSymbol);
         }
 
-        static class LimitData implements Cloneable {
-            final ISymbol symbol;
-
-            final IExpr limitValue;
-
-            final IAST rule;
-
-            int direction;
-
-            // public LimitData(ISymbol symbol, IExpr limitValue, IAST rule) {
-            // this(symbol, limitValue, rule, DIRECTION_TWO_SIDED);
-            // }
-
-            public LimitData(ISymbol symbol, IExpr limitValue, IAST rule, int direction) {
-                this.symbol = symbol;
-                this.limitValue = limitValue;
-                this.rule = rule;
-                this.direction = direction;
-            }
-
-            @Override
-            protected LimitData clone() throws CloneNotSupportedException {
-                return (LimitData) super.clone();
-            }
-
-            public int getDirection() {
-                return direction;
-            }
-
-            public void setDirection(int direction) {
-                this.direction = direction;
-            }
-
-            public IExpr getLimitValue() {
-                return limitValue;
-            }
-
-            public IAST getRule() {
-                return rule;
-            }
-
-            public ISymbol getSymbol() {
-                return symbol;
-            }
-
-            /**
-             * Create a new <code>F.Limit( arg1, ... )</code> expression from his <code>LimitData</code> object
-             *
-             * @param arg1 the first argument of the Limit expression
-             * @return a new <code>F.Limit( arg1, ... )</code> expression
-             */
-            public IAST limit(IExpr arg1) {
-                // if (direction == DIRECTION_FROM_LARGER_VALUES) {
-                // return F.Limit(arg1, rule, F.Rule(F.Direction, F.CN1));
-                // }
-
-                if (direction == DIRECTION_FROM_BELOW) {
-                    return F.Limit(arg1, rule, F.Rule(F.Direction, F.C1));
-                }
-                return F.Limit(arg1, rule);
-            }
-
-            /**
-             * Map a <code>F.Limit( arg1, ... )</code> expression at each argument of the given <code>ast</code>.
-             *
-             * @param ast
-             * @return
-             */
-            public IExpr mapLimit(final IAST ast) {
-                return ast.mapThread(limit(null), 1);
-            }
-        }
-
     }
 
     /**
      * <pre>
      * Normal(series)
      * </pre>
-     * <p>
+     *
      * <blockquote>
      * <p>
      * converts a <code>series</code> expression into a standard expression.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+     *
      * <pre>
      * &gt;&gt; Normal(SeriesData(x, 0, {1, 0, -1, -4, -17, -88, -549}, -1, 6, 1))
      * 1/x-x-4*x^2-17*x^3-88*x^4-549*x^5
@@ -767,24 +750,24 @@ public class SeriesFunctions {
      * <pre>
      * ComposeSeries(series1, series2)
      * </pre>
-     * <p>
+     *
      * <blockquote>
      * <p>
      * substitute <code>series2</code> into <code>series1</code>
      * </p>
      * </blockquote>
-     * <p>
+     *
      * <pre>
      * ComposeSeries(series1, series2, series3)
      * </pre>
-     * <p>
+     *
      * <blockquote>
      * <p>
      * return multiple series composed.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+     *
      * <pre>
      * &gt;&gt; ComposeSeries(SeriesData(x, 0, {1, 3}, 2, 4, 1), SeriesData(x, 0, {1, 1,0,0}, 0, 4, 1) - 1)
      * x^2+3*x^3+O(x)^4
@@ -797,7 +780,6 @@ public class SeriesFunctions {
                 if (ast.arg1() instanceof ASTSeriesData) {
                     ASTSeriesData result = (ASTSeriesData) ast.arg1();
                     for (int i = 2; i < ast.size(); i++) {
-
                         if (ast.get(i) instanceof ASTSeriesData) {
                             ASTSeriesData s2 = (ASTSeriesData) ast.get(i);
                             result = result.compose(s2);
@@ -813,18 +795,19 @@ public class SeriesFunctions {
         }
 
     }
+
     /**
      * <pre>
      * InverseSeries(series)
      * </pre>
-     * <p>
+     *
      * <blockquote>
      * <p>
      * return the inverse series.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+     *
      * <pre>
      * &gt;&gt; InverseSeries(Series(Sin(x), {x, 0, 7}))
      * x+x^3/6+3/40*x^5+5/112*x^7+O(x)^8
@@ -850,14 +833,14 @@ public class SeriesFunctions {
      * <pre>
      * Series(expr, {x, x0, n})
      * </pre>
-     * <p>
+     *
      * <blockquote>
      * <p>
      * create a power series of <code>expr</code> up to order <code>(x- x0)^n</code> at the point <code>x = x0</code>
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+     *
      * <pre>
      * &gt;&gt; Series(f(x),{x,a,3})
      * f(a)+f'(a)*(-a+x)+1/2*f''(a)*(-a+x)^2+1/6*Derivative(3)[f][a]*(-a+x)^3+O(-a+x)^4
@@ -874,8 +857,6 @@ public class SeriesFunctions {
                 IAST list = (IAST) ast.arg2();
                 IExpr x = list.arg1();
                 IExpr x0 = list.arg2();
-
-
                 final int n = Validate.checkIntType(list, 3, Integer.MIN_VALUE);
                 if (n < 0) {
                     return F.NIL;
@@ -890,10 +871,15 @@ public class SeriesFunctions {
         }
 
         /**
-         * @param function the function which should be generated as a power series
-         * @param x        the variable
-         * @param x0       the point to do the power expansion for
-         * @param n        the order of the expansion
+         *
+         * @param function
+         *            the function which should be generated as a power series
+         * @param x
+         *            the variable
+         * @param x0
+         *            the point to do the power expansion for
+         * @param n
+         *            the order of the expansion
          * @param denominator
          * @return
          */
@@ -902,7 +888,7 @@ public class SeriesFunctions {
             ISymbol order = F.Dummy("$$$n");
             IExpr temp = engine.evaluate(F.SeriesCoefficient(function, F.List(x, x0, order)));
             if (temp.isFree(F.SeriesCoefficient)) {
-            ASTSeriesData ps = new ASTSeriesData(x, x0, 0, n + denominator, denominator);
+                ASTSeriesData ps = new ASTSeriesData(x, x0, 0, n + denominator, denominator);
                 for (int i = 0; i <= n; i++) {
                     ps.setCoeff(i, engine.evaluate(temp.replaceAll(F.Rule(order, F.ZZ(i)))));
                 }
@@ -923,14 +909,14 @@ public class SeriesFunctions {
      * <pre>
      * SeriesCoefficient(expr, {x, x0, n})
      * </pre>
-     * <p>
+     *
      * <blockquote>
      * <p>
      * get the coefficient of <code>(x- x0)^n</code> at the point <code>x = x0</code>
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+     *
      * <pre>
      * &gt;&gt; SeriesCoefficient(Sin(x),{x,f+g,n})
      * Piecewise({{Sin(f+g+1/2*n*Pi)/n!,n&gt;=0}},0)
@@ -963,7 +949,6 @@ public class SeriesFunctions {
                 IExpr temp = polynomialSeriesCoefficient(function, x, x0, n, ast, engine);
                 if (temp.isPresent()) {
                     return temp;
-
                 }
                 if (function.isPower()) {
                     if (function.base().equals(x)) {
@@ -1022,6 +1007,7 @@ public class SeriesFunctions {
         }
 
         /**
+         *
          * @param univariatePolynomial
          * @param x
          * @param x0
@@ -1030,64 +1016,65 @@ public class SeriesFunctions {
          * @param engine
          * @return
          */
-        public IExpr polynomialSeriesCoefficient(IExpr univariatePolynomial, IExpr x, IExpr x0, IExpr n, final IAST seriesTemplate,
-                                                 EvalEngine engine) {
+        public IExpr polynomialSeriesCoefficient(IExpr univariatePolynomial, IExpr x, IExpr x0, IExpr n,
+                                                 final IAST seriesTemplate, EvalEngine engine) {
             try {
                 if (!x0.isZero()) {
-                Map<IExpr, IExpr> coefficientMap = new HashMap<IExpr, IExpr>();
-                IASTAppendable rest = F.ListAlloc(4);
-                ExprPolynomialRing.create(univariatePolynomial, x, coefficientMap, rest);
-                IASTAppendable coefficientPlus = F.PlusAlloc(2);
-                if (coefficientMap.size() > 0) {
-                    IASTAppendable piecewiseAST = F.ast(F.Piecewise);
-                    IASTAppendable rules = F.ListAlloc(2);
-                    IASTAppendable plus = F.PlusAlloc(coefficientMap.size());
-                    for (Map.Entry<IExpr, IExpr> entry : coefficientMap.entrySet()) {
-                        IExpr exp = entry.getKey();
-                        if (exp.isZero()) {
-                            continue;
+                    Map<IExpr, IExpr> coefficientMap = new HashMap<IExpr, IExpr>();
+                    IASTAppendable rest = F.ListAlloc(4);
+                    ExprPolynomialRing.create(univariatePolynomial, x, coefficientMap, rest);
+                    IASTAppendable coefficientPlus = F.PlusAlloc(2);
+                    if (coefficientMap.size() > 0) {
+                        IASTAppendable piecewiseAST = F.ast(F.Piecewise);
+                        IASTAppendable rules = F.ListAlloc(2);
+                        IASTAppendable plus = F.PlusAlloc(coefficientMap.size());
+                        for (Map.Entry<IExpr, IExpr> entry : coefficientMap.entrySet()) {
+                            IExpr exp = entry.getKey();
+                            if (exp.isZero()) {
+                                continue;
+                            }
+                            IExpr coefficient = entry.getValue();
+                            if (coefficient.isZero()) {
+                                continue;
+                            }
+                            if (coefficient.isOne()) {
+                                plus.append(F.Times(F.Power(x0, exp), F.Binomial(exp, n)));
+                            } else {
+                                plus.append(F.Times(coefficient, F.Power(x0, exp), F.Binomial(exp, n)));
+                            }
                         }
-                        IExpr coefficient = entry.getValue();
-                        if (coefficient.isZero()) {
-                            continue;
-                        }
-                        if (coefficient.isOne()) {
-                            plus.append(F.Times(F.Power(x0, exp), F.Binomial(exp, n)));
-                        } else {
-                            plus.append(F.Times(coefficient, F.Power(x0, exp), F.Binomial(exp, n)));
-                        }
-                    }
-                    rules.append(F.List(engine.evaluate(F.Times(F.Power(x0, n.negate()), plus)), F.Greater(n, F.C0)));
+                        rules.append(
+                                F.List(engine.evaluate(F.Times(F.Power(x0, n.negate()), plus)), F.Greater(n, F.C0)));
 
-                    plus = F.PlusAlloc(coefficientMap.size());
-                    for (Map.Entry<IExpr, IExpr> entry : coefficientMap.entrySet()) {
-                        IExpr exp = entry.getKey();
-                        IExpr coefficient = entry.getValue();
-                        if (coefficient.isZero()) {
-                            continue;
+                        plus = F.PlusAlloc(coefficientMap.size());
+                        for (Map.Entry<IExpr, IExpr> entry : coefficientMap.entrySet()) {
+                            IExpr exp = entry.getKey();
+                            IExpr coefficient = entry.getValue();
+                            if (coefficient.isZero()) {
+                                continue;
+                            }
+                            if (coefficient.isOne()) {
+                                plus.append(F.Times(F.Power(x0, exp)));
+                            } else {
+                                plus.append(F.Times(coefficient, F.Power(x0, exp)));
+                            }
                         }
-                        if (coefficient.isOne()) {
-                            plus.append(F.Times(F.Power(x0, exp)));
-                        } else {
-                            plus.append(F.Times(coefficient, F.Power(x0, exp)));
-                        }
-                    }
-                    rules.append(F.List(engine.evaluate(plus), F.Equal(n, F.C0)));
-                    piecewiseAST.append(rules);
+                        rules.append(F.List(engine.evaluate(plus), F.Equal(n, F.C0)));
+                        piecewiseAST.append(rules);
 
-                    piecewiseAST.append(F.C0);
-                    coefficientPlus.append(piecewiseAST);
-                } else {
-                    if (!univariatePolynomial.isPlus()) {
-                        return F.NIL;
+                        piecewiseAST.append(F.C0);
+                        coefficientPlus.append(piecewiseAST);
+                    } else {
+                        if (!univariatePolynomial.isPlus()) {
+                            return F.NIL;
+                        }
                     }
-                }
-                for (int i = 1; i < rest.size(); i++) {
-                    IASTAppendable term = seriesTemplate.copyAppendable();
-                    term.set(1, rest.get(i));
-                    coefficientPlus.append(term);
-                }
-                return coefficientPlus.getOneIdentity(F.C0);
+                    for (int i = 1; i < rest.size(); i++) {
+                        IASTAppendable term = seriesTemplate.copyAppendable();
+                        term.set(1, rest.get(i));
+                        coefficientPlus.append(term);
+                    }
+                    return coefficientPlus.getOneIdentity(F.C0);
                 }
             } catch (RuntimeException re) {
                 if (Config.SHOW_STACKTRACE) {
@@ -1102,7 +1089,7 @@ public class SeriesFunctions {
      * <pre>
      * SeriesData(x, x0, {coeff0, coeff1, coeff2,...}, nMin, nMax, denominator})
      * </pre>
-     * <p>
+     *
      * <blockquote>
      * <p>
      * internal structure of a power series at the point <code>x = x0</code> the <code>coeff</code>-i are coefficients
@@ -1110,7 +1097,7 @@ public class SeriesFunctions {
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+     *
      * <pre>
      * &gt;&gt; SeriesData(x, 0,{1,0,-1/6,0,1/120,0,-1/5040,0,1/362880}, 1, 11, 2)
      * Sqrt(x)-x^(3/2)/6+x^(5/2)/120-x^(7/2)/5040+x^(9/2)/362880+O(x)^(11/2)
@@ -1126,10 +1113,11 @@ public class SeriesFunctions {
                 }
                 IExpr x = ast.arg1();
                 IExpr x0 = ast.arg2();
-                IExpr coefficients = ast.arg3();
-                if (coefficients.isVector() < 0) {
+
+                if (ast.arg3().isVector() < 0) {
                     return F.NIL;
                 }
+                IAST coefficients = (IAST) ast.arg3();
                 final int nMin = ast.arg4().toIntDefault(Integer.MIN_VALUE);
                 if (nMin == Integer.MIN_VALUE) {
                     return F.NIL;
@@ -1142,22 +1130,20 @@ public class SeriesFunctions {
                 if (denominator == Integer.MIN_VALUE) {
                     return F.NIL;
                 }
-                ASTSeriesData ps = new ASTSeriesData(x, x0, nMin, power, denominator);
-                int size = coefficients.size();
-                int order = power - 1;
-                int coeff;
-                for (int i = 0; i < size - 1; i++) {
-                    coeff = nMin + i;
-                    if (coeff > order) {
-                        break;
-                    }
-                    ps.setCoeff(coeff, coefficients.getAt(i + 1));
-                }
-                return ps;
+                return new ASTSeriesData(x, x0, coefficients, nMin, power, denominator);
             }
             return F.NIL;
         }
     }
 
+    private final static SeriesFunctions CONST = new SeriesFunctions();
+
+    public static SeriesFunctions initialize() {
+        return CONST;
+    }
+
+    private SeriesFunctions() {
+
+    }
 
 }
