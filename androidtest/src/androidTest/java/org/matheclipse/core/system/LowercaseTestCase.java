@@ -4727,10 +4727,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testNIntegrate() {
-		checkNumeric("NIntegrate((x-1)*(x-0.5)*x*(x+0.5)*(x+1), {x,0,1}, Method->Trapezoid, MaxIterations->5000)",
-				"-0.0208333271245165");
+		// github #26
+		checkNumeric("NIntegrate(ln(x^2), {x, -5, 99}, Method->Romberg, MaxPoints->400, MaxIterations->10000000)", //
+				"717.9282476448197");
 
-		checkNumeric("NIntegrate((x-1)*(x-0.5)*x*(x+0.5)*(x+1), {x,0,1})", "-0.0208333333333333");
+		checkNumeric("NIntegrate((x-1)*(x-0.5)*x*(x+0.5)*(x+1), {x,0,1})", //
+				"-0.0208333333333333");
 		// LegendreGauss is default method
 		checkNumeric("NIntegrate((x-1)*(x-0.5)*x*(x+0.5)*(x+1), {x,0,1}, Method->LegendreGauss)",
 				"-0.0208333333333333");
@@ -4831,11 +4833,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Norm({})", "Norm({})");
 	}
 
-	public void testNormal() {
-		check("Normal(Series(Exp(x),{x,0,5}))", "1+x+x^2/2+x^3/6+x^4/24+x^5/120");
-		check("Normal(SeriesData(x, 0,{1,0,-1/6,0,1/120,0,-1/5040,0,1/362880}, 1, 11, 2))",
-				"Sqrt(x)-x^(3/2)/6+x^(5/2)/120-x^(7/2)/5040+x^(9/2)/362880");
-	}
 
 	public void testNormalize() {
 		check("Normalize({0})", "{0}");
