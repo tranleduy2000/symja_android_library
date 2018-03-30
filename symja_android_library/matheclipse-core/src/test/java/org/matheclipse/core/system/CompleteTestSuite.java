@@ -1,15 +1,15 @@
 package org.matheclipse.core.system;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.matheclipse.core.form.mathml.MathMLPresentationTestCase;
 import org.matheclipse.core.form.tex.BasicTeXTestCase;
 import org.matheclipse.parser.test.BracketBalancerTestCase;
 import org.matheclipse.parser.test.ParserTestCase;
 import org.matheclipse.parser.test.RelaxedParserTestCase;
 import org.matheclipse.parser.test.eval.EvalDoubleTestCase;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * General test suite. Starts all other tests.
@@ -46,6 +46,7 @@ public class CompleteTestSuite extends TestCase {
 		suite.addTestSuite(JavaFormTestCase.class);
 
 		suite.addTestSuite(LowercaseTestCase.class);
+		suite.addTestSuite(SeriesTest.class);
 		suite.addTestSuite(SerializableTest.class);
 		suite.addTestSuite(PatternsTest.class);
 		
@@ -58,7 +59,10 @@ public class CompleteTestSuite extends TestCase {
 		suite.addTestSuite(NumberTheoryTestCase.class);
 		suite.addTestSuite(ASCIIPrintTest.class);
 		suite.addTestSuite(SVGGraphicsTestCase.class);
-		
+//		suite.addTestSuite(Graphics3DTestCase.class);
+//		suite.addTestSuite(SymjifyTestCase.class);
+
+//		suite.addTestSuite(ConsoleTestCase.class);
 		suite.addTestSuite(AssumptionTestCase.class);
 		
 		return suite;
