@@ -2678,6 +2678,7 @@ public abstract class IExprImpl implements IExpr {
     public IExpr replace(final Predicate<IExpr> predicate, final Function<IExpr, IExpr> function) {
         return accept(new VisitorReplaceAllLambda(predicate, function)).orElse(this);
     }
+
     /**
      * Replace all (sub-) expressions with the given unary function. If no substitution matches, the method returns
      * <code>null</code>.
@@ -2999,7 +3000,21 @@ public abstract class IExprImpl implements IExpr {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
         return ExprUtil.convertToExpr(temp);
     }
-
+    /**
+     * Return <code>0</code> if this is less than <code>0</code>. Return <code>1</code> if this is greater equal than
+     * <code>0</code>. Return <code>F.UnitStep(this)</code> for all other cases.
+     *
+     * @return
+     */
+    @Override public IExpr unitStep() {
+        if (isNegativeResult()) {
+            return F.C0;
+        }
+        if (isNonNegativeResult()) {
+            return F.C1;
+        }
+        return F.UnitStep(this);
+    }
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>upper</code> value. If this is a
      * <code>ISignedNumber</code> expression return <code>this</code>.

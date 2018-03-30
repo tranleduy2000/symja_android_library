@@ -91,4 +91,9 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
     public IExpr upper() {
         return this;
     }
+
+    @Override
+    public IExpr unitStep() {
+        return isNegative() ? F.C0 : F.C1;
+    }
 }

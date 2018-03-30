@@ -170,6 +170,9 @@ public interface ISignedNumber extends INumber {
      */
     public long toLong() throws ArithmeticException;
 
+    @Override
+    IExpr unitStep();
+
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>upper</code> value. If this is a
      * <code>ISignedNUmber</code> expression return <code>this</code>.

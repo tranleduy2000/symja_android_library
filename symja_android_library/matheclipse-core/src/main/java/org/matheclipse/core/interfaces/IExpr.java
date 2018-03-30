@@ -2261,6 +2261,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     public IExpr unequalTo(IExpr that);
 
+    public IExpr unitStep();
+
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>upper</code> value. If this is a
      * <code>ISignedNumber</code> expression return <code>this</code>.
