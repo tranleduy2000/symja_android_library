@@ -1,6 +1,7 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.Function;
+import com.duy.lambda.Predicate;
 
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
@@ -656,7 +657,12 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         if (isConstant()) {
             return true;
         }
-		return variables.exists(x -> this.equals(x));
+		return variables.exists(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr x) {
+                return Symbol.this.equals(x);
+            }
+        });
 	}
 	/** {@inheritDoc} */
     @Override
