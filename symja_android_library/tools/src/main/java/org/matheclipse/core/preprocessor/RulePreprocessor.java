@@ -1,5 +1,6 @@
 package org.matheclipse.core.preprocessor;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.util.ArraySet;
 import org.matheclipse.core.expression.F;
@@ -49,9 +50,9 @@ public class RulePreprocessor {
 		if (evalRHS) {
 			rightHandSide = F.eval(rightHandSide);
 		}
-		buffer.append(leftHandSide.internalJavaString(false, 1, false, false));
-		buffer.append(",\n      ");
-		buffer.append(rightHandSide.internalJavaString(false, 1, false, false));
+		buffer.append(leftHandSide.internalJavaString(false, 1, false, false, false));
+		buffer.append( ",\n      ");
+		buffer.append(rightHandSide.internalJavaString(false, 1, false, false, false));
 		if (last) {
 			buffer.append(")\n");
 		} else {
@@ -232,6 +233,7 @@ public class RulePreprocessor {
 	}
 
 	public static void main(final String[] args) {
+		Config.EXPLICIT_TIMES_OPERATOR = true;
 		F.initSymbols();
 		// C:\\Users\\dev\\git\\symja_android_library
 		File sourceLocation = new File("..\\symja_android_library\\rules");

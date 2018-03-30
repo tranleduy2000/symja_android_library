@@ -1,8 +1,5 @@
 package org.matheclipse.core.preprocessor;
 
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.matheclipse.core.convert.AST2Expr;
@@ -13,6 +10,9 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
+
+import java.io.FileReader;
+import java.io.IOException;
 
 public class ElementPreprocessor {
 
@@ -62,7 +62,7 @@ public class ElementPreprocessor {
 			for (int i = 2; i < rowList.size(); i++) {
 				IAST columnList = (IAST) rowList.get(i);
 
-				System.out.print(columnList.internalJavaString(false, 1, false, false));
+				System.out.print(columnList.internalJavaString(false, 1, false, false, false));
 				System.out.println(", ");
 			}
 			// return rowList;

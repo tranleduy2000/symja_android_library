@@ -426,18 +426,19 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	@Override
 	public String internalFormString(boolean symbolsAsFactoryMethod, int depth) {
-		return internalJavaString(symbolsAsFactoryMethod, depth, false, false);
+		return internalJavaString(symbolsAsFactoryMethod, depth, false, false, false);
 	}
 
 	@Override
-	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators, boolean usePrefix) {
+	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators,
+			boolean usePrefix, boolean noSymbolPrefix) {
 		String prefix = usePrefix ? "F." : "";
 		return prefix+"complexNum(" + fComplex.getReal() + "," + fComplex.getImaginary() + ")";
 	}
 
 	@Override
 	public String internalScalaString(boolean symbolsAsFactoryMethod, int depth) {
-		return internalJavaString(symbolsAsFactoryMethod, depth, true, false);
+		return internalJavaString(symbolsAsFactoryMethod, depth, true, false, false);
 	}
 
 	@Override

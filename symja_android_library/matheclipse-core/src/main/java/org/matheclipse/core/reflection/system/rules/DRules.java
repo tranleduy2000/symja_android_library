@@ -1,7 +1,97 @@
 package org.matheclipse.core.reflection.system.rules;
 
-import static org.matheclipse.core.expression.F.*;
 import org.matheclipse.core.interfaces.IAST;
+
+import static org.matheclipse.core.expression.F.$;
+import static org.matheclipse.core.expression.F.$p;
+import static org.matheclipse.core.expression.F.Abs;
+import static org.matheclipse.core.expression.F.And;
+import static org.matheclipse.core.expression.F.ArcCos;
+import static org.matheclipse.core.expression.F.ArcCosh;
+import static org.matheclipse.core.expression.F.ArcCot;
+import static org.matheclipse.core.expression.F.ArcCoth;
+import static org.matheclipse.core.expression.F.ArcCsc;
+import static org.matheclipse.core.expression.F.ArcCsch;
+import static org.matheclipse.core.expression.F.ArcSec;
+import static org.matheclipse.core.expression.F.ArcSech;
+import static org.matheclipse.core.expression.F.ArcSin;
+import static org.matheclipse.core.expression.F.ArcSinh;
+import static org.matheclipse.core.expression.F.ArcTan;
+import static org.matheclipse.core.expression.F.ArcTanh;
+import static org.matheclipse.core.expression.F.BesselJ;
+import static org.matheclipse.core.expression.F.Binomial;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.CN1D2;
+import static org.matheclipse.core.expression.F.CN2;
+import static org.matheclipse.core.expression.F.Ceiling;
+import static org.matheclipse.core.expression.F.Condition;
+import static org.matheclipse.core.expression.F.Cos;
+import static org.matheclipse.core.expression.F.Cosh;
+import static org.matheclipse.core.expression.F.Cot;
+import static org.matheclipse.core.expression.F.Coth;
+import static org.matheclipse.core.expression.F.Csc;
+import static org.matheclipse.core.expression.F.Csch;
+import static org.matheclipse.core.expression.F.D;
+import static org.matheclipse.core.expression.F.Derivative;
+import static org.matheclipse.core.expression.F.DiracDelta;
+import static org.matheclipse.core.expression.F.Erf;
+import static org.matheclipse.core.expression.F.Erfc;
+import static org.matheclipse.core.expression.F.Erfi;
+import static org.matheclipse.core.expression.F.Exp;
+import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.Floor;
+import static org.matheclipse.core.expression.F.FractionalPart;
+import static org.matheclipse.core.expression.F.FreeQ;
+import static org.matheclipse.core.expression.F.FresnelC;
+import static org.matheclipse.core.expression.F.FresnelS;
+import static org.matheclipse.core.expression.F.Gamma;
+import static org.matheclipse.core.expression.F.GreaterEqual;
+import static org.matheclipse.core.expression.F.HarmonicNumber;
+import static org.matheclipse.core.expression.F.HeavisideTheta;
+import static org.matheclipse.core.expression.F.IInit;
+import static org.matheclipse.core.expression.F.ISetDelayed;
+import static org.matheclipse.core.expression.F.IntegerPart;
+import static org.matheclipse.core.expression.F.IntegerQ;
+import static org.matheclipse.core.expression.F.InverseErf;
+import static org.matheclipse.core.expression.F.KroneckerDelta;
+import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.LogisticSigmoid;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.NotListQ;
+import static org.matheclipse.core.expression.F.Pi;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Pochhammer;
+import static org.matheclipse.core.expression.F.PolyGamma;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.ProductLog;
+import static org.matheclipse.core.expression.F.QQ;
+import static org.matheclipse.core.expression.F.Round;
+import static org.matheclipse.core.expression.F.Sec;
+import static org.matheclipse.core.expression.F.Sech;
+import static org.matheclipse.core.expression.F.Sin;
+import static org.matheclipse.core.expression.F.Sinh;
+import static org.matheclipse.core.expression.F.Sqr;
+import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.Sum;
+import static org.matheclipse.core.expression.F.Tan;
+import static org.matheclipse.core.expression.F.Tanh;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.a;
+import static org.matheclipse.core.expression.F.a_;
+import static org.matheclipse.core.expression.F.f;
+import static org.matheclipse.core.expression.F.f_;
+import static org.matheclipse.core.expression.F.g;
+import static org.matheclipse.core.expression.F.g_;
+import static org.matheclipse.core.expression.F.j;
+import static org.matheclipse.core.expression.F.k;
+import static org.matheclipse.core.expression.F.n;
+import static org.matheclipse.core.expression.F.x;
+import static org.matheclipse.core.expression.F.x_;
 
 /**
  * <p>Generated by <code>org.matheclipse.core.preprocessor.RulePreprocessor</code>.</p>
@@ -58,13 +148,13 @@ public interface DRules {
       C0),
     // D(Erf(f_),x_NotListQ):=D(f,x)*2*1/(E^f^2*Sqrt(Pi))
     ISetDelayed(D(Erf(f_),$p(x,NotListQ)),
-      Times(D(f,x),C2,Power(E,Negate(Sqr(f))),Power(Pi,CN1D2))),
+      Times(D(f,x),C2,Exp(Negate(Sqr(f))),Power(Pi,CN1D2))),
     // D(Erfc(f_),x_NotListQ):=D(f,x)*-2*1/(E^f^2*Sqrt(Pi))
     ISetDelayed(D(Erfc(f_),$p(x,NotListQ)),
-      Times(D(f,x),CN2,Power(E,Negate(Sqr(f))),Power(Pi,CN1D2))),
+      Times(D(f,x),CN2,Exp(Negate(Sqr(f))),Power(Pi,CN1D2))),
     // D(Erfi(f_),x_NotListQ):=D(f,x)*2*E^f^2/Sqrt(Pi)
     ISetDelayed(D(Erfi(f_),$p(x,NotListQ)),
-      Times(D(f,x),C2,Power(E,Sqr(f)),Power(Pi,CN1D2))),
+      Times(D(f,x),C2,Exp(Sqr(f)),Power(Pi,CN1D2))),
     // D(Floor(f_),x_NotListQ):=0
     ISetDelayed(D(Floor(f_),$p(x,NotListQ)),
       C0),
@@ -91,7 +181,7 @@ public interface DRules {
       C0),
     // D(InverseErf(f_),x_NotListQ):=D(f,x)*1/2*Sqrt(Pi)*E^InverseErf(f)^2
     ISetDelayed(D(InverseErf(f_),$p(x,NotListQ)),
-      Times(D(f,x),C1D2,Sqrt(Pi),Power(E,Sqr(InverseErf(f))))),
+      Times(D(f,x),C1D2,Sqrt(Pi),Exp(Sqr(InverseErf(f))))),
     // D(Log(f_),x_NotListQ):=D(f,x)/f
     ISetDelayed(D(Log(f_),$p(x,NotListQ)),
       Times(D(f,x),Power(f,-1))),

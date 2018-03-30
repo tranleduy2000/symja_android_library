@@ -560,7 +560,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 
 	@Override
 	public String internalFormString(boolean symbolsAsFactoryMethod, int depth) {
-		return internalJavaString(symbolsAsFactoryMethod, depth, false, false);
+		return internalJavaString(symbolsAsFactoryMethod, depth, false, false, false);
 	}
 
 	@Override

@@ -578,7 +578,7 @@ public abstract class IExprImpl implements IExpr {
      * @return the internal Java form of this expression
      */
     public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators,
-                                     boolean usePrefix) {
+                                     boolean usePrefix, boolean noSymbolPrefix) {
         return toString();
     }
 

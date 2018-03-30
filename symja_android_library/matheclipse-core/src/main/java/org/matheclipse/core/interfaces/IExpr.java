@@ -472,7 +472,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return the internal Java form of this expression
      */
     String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators,
-                              boolean usePrefix);
+                              boolean usePrefix, boolean noSymbolPrefix);
 
     /**
      * Return the internal Scala form of this expression.
