@@ -1089,7 +1089,7 @@ public class OutputFormFactory {
 	}
 
 	/**
-	 * Convert a <code>SeriesData[...]</code> expression.
+	 * Convert a <code>SeriesData(...)</code> expression.
 	 * 
 	 * @param buf
 	 * @param seriesData
@@ -1162,9 +1162,16 @@ public class OutputFormFactory {
 			throws IOException {
 		IExpr plusArg;
 		if (coefficient.isZero()) {
-			plusArg = F.C0;
+			return call;
 		} else if (coefficient.isOne()) {
 			plusArg = pow;
+			if (plusArg.isPlus()) {
+				append(buf, "(");
+				convertPlusArgument(buf, plusArg, call);
+				append(buf, ")");
+				call = PLUS_CALL;
+				return call;
+			}
 		} else {
 			if (pow.isOne()) {
 				plusArg = coefficient;

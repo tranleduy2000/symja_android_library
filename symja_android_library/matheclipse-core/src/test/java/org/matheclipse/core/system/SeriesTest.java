@@ -11,9 +11,9 @@ public class SeriesTest extends AbstractTestCase {
 
 	public void testComposeSeries() {
 		check("Series(Log(x), {x, 1, 1}) ", //
-				"-1+x+O(-1+x)^2");
+				"(-1+x)+O(-1+x)^2");
 		check("Series(Log(x), {x, 1, 5}) ", //
-				"-1+x-(1-x)^2/2+(-1+x)^3/3-(1-x)^4/4+(-1+x)^5/5+O(-1+x)^6");
+				"(-1+x)-(1-x)^2/2+(-1+x)^3/3-(1-x)^4/4+(-1+x)^5/5+O(-1+x)^6");
 		check("SeriesData(x, 0, {1,3,0,0,0}, 0, 5, 1)", //
 				"1+3*x+O(x)^5");
 		check("ComposeSeries(Series(Log(x), {x, 1, 1}), SeriesData(x, 0, {1,3,0,0,0}, 0, 5, 1))", //
