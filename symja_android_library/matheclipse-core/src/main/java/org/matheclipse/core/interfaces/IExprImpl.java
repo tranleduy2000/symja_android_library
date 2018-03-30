@@ -1558,6 +1558,9 @@ public abstract class IExprImpl implements IExpr {
      * @return
      */
     public boolean isNonZeroComplexResult() {
+        if (isZero()) {
+            return false;
+        }
         if (isNonZeroRealResult()) {
             return true;
         }

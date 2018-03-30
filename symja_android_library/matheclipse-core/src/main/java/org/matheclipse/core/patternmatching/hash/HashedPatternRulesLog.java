@@ -6,15 +6,20 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 
+/**
+ * Evaluate <code>Log(x) * Log(y)</code> combinations. For example evaluate <code>Log(1000) / Log(10)</code> to
+ * <code>3</code>
+ *
+ */
 public class HashedPatternRulesLog extends HashedPatternRules {
-	public HashedPatternRulesLog(IExpr lhsPattern1, IExpr lhsPattern2, IExpr rhsResult) {
-		super(lhsPattern1, lhsPattern2, rhsResult, null, true);
+	public HashedPatternRulesLog(IExpr lhsPattern1, IExpr lhsPattern2) {
+		super(lhsPattern1, lhsPattern2, F.Null, null, true);
 	}
 
-	public HashedPatternRulesLog(IExpr lhsPattern1, IExpr lhsPattern2, IExpr rhsResult, IExpr condition,
-								 boolean defaultHashCode) {
-		super(lhsPattern1, lhsPattern2, rhsResult, condition, defaultHashCode);
-	}
+	// private HashedPatternRulesLog(IExpr lhsPattern1, IExpr lhsPattern2, IExpr rhsResult, IExpr condition,
+	// boolean defaultHashCode) {
+	// super(lhsPattern1, lhsPattern2, rhsResult, condition, defaultHashCode);
+	// }
 
 	@Override
 	public IExpr evalDownRule(IExpr e1, IExpr num1, IExpr e2, IExpr num2, EvalEngine engine) {
