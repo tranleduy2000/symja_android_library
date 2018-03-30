@@ -160,7 +160,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the error function.
 	 * 
-	 * @see InverseErf
+	 * @see org.matheclipse.core.reflection.system.InverseErf
 	 */
 	private final static class Erf extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
 
@@ -356,7 +356,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the inverse erf.
 	 * 
-	 * @see Erf
+	 * @see org.matheclipse.core.reflection.system.Erf
 	 */
 	private final static class InverseErf extends AbstractTrigArg1 implements INumeric {
 
@@ -412,7 +412,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the inverse erf.
 	 * 
-	 * @see Erf
+	 * @see org.matheclipse.core.reflection.system.Erf
 	 */
 	private final static class InverseErfc extends AbstractTrigArg1 implements INumeric {
 
@@ -618,6 +618,34 @@ public class SpecialFunctions {
 			super.setUp(newSymbol);
 		}
 
+		@Override
+		public IExpr e2ObjArg(IExpr k, IExpr z) {
+			// ProductLog(0,z_) := ProductLog(z)
+			if (k.isZero()) {
+				return F.ProductLog(z);
+			}
+			if (k.isMinusOne()) {
+				if (z.equals(F.CNPiHalf)) {
+					// ProductLog(-1, -(Pi/2)) := -((I*Pi)/2)
+					return F.Times(F.CC(0L, 1L, -1L, 2L), F.Pi);
+				}
+				// ProductLog(-1, -(1/E)) := -1
+				if (z.equals(F.Negate(F.Power(F.E, -1)))) {
+					return F.CN1;
+				}
+			}
+			if (z.isZero()) {
+				// ProductLog(k_NumberQ,0) := -Infinity/;k!=0
+				if (k.isNumber() && !k.isZero()) {
+					return F.CNInfinity;
+				}
+				if (k.isNegativeResult() || k.isPositiveResult()) {
+					return F.CNInfinity;
+				}
+			}
+
+			return super.e2ObjArg(k, z);
+		}
 	}
 
 	private static class StieltjesGamma extends AbstractFunctionEvaluator implements StieltjesGammaRules {
