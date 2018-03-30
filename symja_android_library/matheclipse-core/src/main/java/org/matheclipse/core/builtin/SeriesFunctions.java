@@ -38,6 +38,7 @@ public class SeriesFunctions {
         if (ToggleFeature.SERIES) {
             F.ComposeSeries.setEvaluator(new ComposeSeries());
             F.InverseSeries.setEvaluator(new InverseSeries());
+            F.Normal.setEvaluator(new Normal());
             F.Series.setEvaluator(new Series());
             F.SeriesCoefficient.setEvaluator(new SeriesCoefficient());
             F.SeriesData.setEvaluator(new SeriesData());
@@ -328,7 +329,7 @@ public class SeriesFunctions {
             IExpr numValue;
             IExpr denValue;
             IExpr limit = data.getLimitValue();
-            IAST rule = data.getRule();
+            // IAST rule = data.getRule();
             EvalEngine engine = EvalEngine.get();
             if (denominator.isOne() && numerator.isTimes()) {
                 // Limit[a_*b_*c_,sym->lim] ->
@@ -665,9 +666,9 @@ public class SeriesFunctions {
 
             int direction;
 
-            public LimitData(ISymbol symbol, IExpr limitValue, IAST rule) {
-                this(symbol, limitValue, rule, DIRECTION_TWO_SIDED);
-            }
+            // public LimitData(ISymbol symbol, IExpr limitValue, IAST rule) {
+            // this(symbol, limitValue, rule, DIRECTION_TWO_SIDED);
+            // }
 
             public LimitData(ISymbol symbol, IExpr limitValue, IAST rule, int direction) {
                 this.symbol = symbol;
@@ -731,6 +732,64 @@ public class SeriesFunctions {
 
     }
 
+    /**
+     * <pre>
+     * Normal(series)
+     * </pre>
+     * <p>
+     * <blockquote>
+     * <p>
+     * converts a <code>series</code> expression into a standard expression.
+     * </p>
+     * </blockquote>
+     * <h3>Examples</h3>
+     * <p>
+     * <pre>
+     * &gt;&gt; Normal(SeriesData(x, 0, {1, 0, -1, -4, -17, -88, -549}, -1, 6, 1))
+     * 1/x-x-4*x^2-17*x^3-88*x^4-549*x^5
+     * </pre>
+     */
+    private final static class Normal extends AbstractFunctionEvaluator {
+        @Override
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+            Validate.checkSize(ast, 2);
+
+            IExpr arg1 = ast.arg1();
+            if (arg1 instanceof ASTSeriesData) {
+                return ((ASTSeriesData) arg1).normal();
+            }
+            return F.NIL;
+        }
+
+    }
+
+    /**
+     * <pre>
+     * ComposeSeries(series1, series2)
+     * </pre>
+     * <p>
+     * <blockquote>
+     * <p>
+     * substitute <code>series2</code> into <code>series1</code>
+     * </p>
+     * </blockquote>
+     * <p>
+     * <pre>
+     * ComposeSeries(series1, series2, series3)
+     * </pre>
+     * <p>
+     * <blockquote>
+     * <p>
+     * return multiple series composed.
+     * </p>
+     * </blockquote>
+     * <h3>Examples</h3>
+     * <p>
+     * <pre>
+     * &gt;&gt; ComposeSeries(SeriesData(x, 0, {1, 3}, 2, 4, 1), SeriesData(x, 0, {1, 1,0,0}, 0, 4, 1) - 1)
+     * x^2+3*x^3+O(x)^4
+     * </pre>
+     */
     private final static class ComposeSeries extends AbstractFunctionEvaluator {
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -816,16 +875,6 @@ public class SeriesFunctions {
                 IExpr x = list.arg1();
                 IExpr x0 = list.arg2();
 
-                try {
-                    final int lowerLimit = ((ISignedNumber) x0).toInt();
-                    // if (lowerLimit != 0) {
-                    // // TODO support other cases than 0
-                    // return F.NIL;
-                    // }
-                    x0 = F.integer(lowerLimit);
-                } catch (ClassCastException cce) {
-                } catch (ArithmeticException ae) {
-                }
 
                 final int n = Validate.checkIntType(list, 3, Integer.MIN_VALUE);
                 if (n < 0) {
@@ -855,14 +904,14 @@ public class SeriesFunctions {
             if (temp.isFree(F.SeriesCoefficient)) {
             ASTSeriesData ps = new ASTSeriesData(x, x0, 0, n + denominator, denominator);
                 for (int i = 0; i <= n; i++) {
-                    ps.append(engine.evaluate(temp.replaceAll(F.Rule(order, F.ZZ(i)))));
+                    ps.setCoeff(i, engine.evaluate(temp.replaceAll(F.Rule(order, F.ZZ(i)))));
                 }
                 return ps;
             }
             ASTSeriesData ps = new ASTSeriesData(x, x0, 0, n + denominator, denominator);
             IExpr derivedFunction = function;
             for (int i = 0; i <= n; i++) {
-                ps.append(F.Times.of(F.Power(F.Factorial(F.integer(i)), F.CN1),
+                ps.setCoeff(i, F.Times.of(F.Power(F.Factorial(F.integer(i)), F.CN1),
                         F.ReplaceAll(derivedFunction, F.Rule(x, x0))));
                 derivedFunction = F.D(derivedFunction, x);
             }
@@ -984,6 +1033,7 @@ public class SeriesFunctions {
         public IExpr polynomialSeriesCoefficient(IExpr univariatePolynomial, IExpr x, IExpr x0, IExpr n, final IAST seriesTemplate,
                                                  EvalEngine engine) {
             try {
+                if (!x0.isZero()) {
                 Map<IExpr, IExpr> coefficientMap = new HashMap<IExpr, IExpr>();
                 IASTAppendable rest = F.ListAlloc(4);
                 ExprPolynomialRing.create(univariatePolynomial, x, coefficientMap, rest);
@@ -1038,6 +1088,7 @@ public class SeriesFunctions {
                     coefficientPlus.append(term);
                 }
                 return coefficientPlus.getOneIdentity(F.C0);
+                }
             } catch (RuntimeException re) {
                 if (Config.SHOW_STACKTRACE) {
                     re.printStackTrace();
@@ -1083,24 +1134,24 @@ public class SeriesFunctions {
                 if (nMin == Integer.MIN_VALUE) {
                     return F.NIL;
                 }
-                final int nMax = ast.arg5().toIntDefault(Integer.MIN_VALUE);
-                if (nMax == Integer.MIN_VALUE) {
+                final int power = ast.arg5().toIntDefault(Integer.MIN_VALUE);
+                if (power == Integer.MIN_VALUE) {
                     return F.NIL;
                 }
                 final int denominator = ast.get(6).toIntDefault(Integer.MIN_VALUE);
                 if (denominator == Integer.MIN_VALUE) {
                     return F.NIL;
                 }
-                ASTSeriesData ps = new ASTSeriesData(x, x0, nMin, nMax, denominator);
+                ASTSeriesData ps = new ASTSeriesData(x, x0, nMin, power, denominator);
                 int size = coefficients.size();
-                int minSize = nMax - nMin + 1;
-                if (minSize > size) {
-                    ps.appendArgs((IAST) coefficients, size);
-                    for (int i = size; i < minSize; i++) {
-                        ps.append(F.C0);
+                int order = power - 1;
+                int coeff;
+                for (int i = 0; i < size - 1; i++) {
+                    coeff = nMin + i;
+                    if (coeff > order) {
+                        break;
                     }
-                } else {
-                    ps.appendArgs((IAST) coefficients, minSize);
+                    ps.setCoeff(coeff, coefficients.getAt(i + 1));
                 }
                 return ps;
             }

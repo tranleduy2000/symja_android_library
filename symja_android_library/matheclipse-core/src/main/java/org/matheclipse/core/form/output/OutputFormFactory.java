@@ -1,13 +1,17 @@
 package org.matheclipse.core.form.output;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.text.NumberFormat;
+
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.convert.AST2Expr;
+import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
-import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
@@ -30,13 +34,9 @@ import org.matheclipse.parser.client.operator.Operator;
 import org.matheclipse.parser.client.operator.PostfixOperator;
 import org.matheclipse.parser.client.operator.PrefixOperator;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.text.NumberFormat;
-
 /**
  * Converts an internal <code>IExpr</code> into a user readable string.
- * 
+ *
  */
 public class OutputFormFactory {
 	/**
@@ -68,7 +68,7 @@ public class OutputFormFactory {
 
 	/**
 	 * Get an <code>OutputFormFactory</code> for converting an internal expression to a user readable string.
-	 * 
+	 *
 	 * @param relaxedSyntax
 	 *            If <code>true</code> use paranthesis instead of square brackets and ignore case for functions, i.e.
 	 *            sin() instead of Sin[]. If <code>true</code> use single square brackets instead of double square
@@ -81,7 +81,7 @@ public class OutputFormFactory {
 
 	/**
 	 * Get an <code>OutputFormFactory</code> for converting an internal expression to a user readable string.
-	 * 
+	 *
 	 * @param relaxedSyntax
 	 *            if <code>true</code> use paranthesis instead of square brackets and ignore case for functions, i.e.
 	 *            sin() instead of Sin[]. If <code>true</code> use single square brackets instead of double square
@@ -97,7 +97,7 @@ public class OutputFormFactory {
 
 	/**
 	 * Get an <code>OutputFormFactory</code> for converting an internal expression to a user readable string.
-	 * 
+	 *
 	 * @param relaxedSyntax
 	 *            if <code>true</code> use paranthesis instead of square brackets and ignore case for functions, i.e.
 	 *            sin() instead of Sin[]. If <code>true</code> use single square brackets instead of double square
@@ -110,14 +110,14 @@ public class OutputFormFactory {
 	 * @return
 	 */
 	public static OutputFormFactory get(final boolean relaxedSyntax, final boolean plusReversed,
-			NumberFormat numberFormat) {
+										NumberFormat numberFormat) {
 		return new OutputFormFactory(relaxedSyntax, plusReversed, numberFormat);
 	}
 
 	/**
 	 * Get an <code>OutputFormFactory</code> for converting an internal expression to a user readable string, with
 	 * <code>relaxedSyntax</code> set to false.
-	 * 
+	 *
 	 * @return
 	 * @see #get(boolean)
 	 */
@@ -149,7 +149,7 @@ public class OutputFormFactory {
 	}
 
 	private void convertDoubleString(final Appendable buf, final String d, final int precedence,
-			final boolean isNegative) throws IOException {
+									 final boolean isNegative) throws IOException {
 		if (isNegative && (ASTNodeFactory.PLUS_PRECEDENCE < precedence)) {
 			append(buf, "(");
 		}
@@ -270,7 +270,7 @@ public class OutputFormFactory {
 	}
 
 	public void convertFraction(final Appendable buf, final BigInteger numerator, BigInteger denominator,
-			final int precedence, boolean caller) throws IOException {
+								final int precedence, boolean caller) throws IOException {
 		boolean isInteger = denominator.compareTo(BigInteger.ONE) == 0;
 		final boolean isNegative = numerator.compareTo(BigInteger.ZERO) < 0;
 		final int prec = isNegative ? ASTNodeFactory.PLUS_PRECEDENCE : ASTNodeFactory.TIMES_PRECEDENCE;
@@ -356,34 +356,35 @@ public class OutputFormFactory {
 			int oldColumnCounter = fColumnCounter;
 			StringBuilder imagBuf = new StringBuilder();
 			try {
-			if (im.isNegative()) {
-			if (isReZero && (ASTNodeFactory.TIMES_PRECEDENCE < precedence)) {
-				append(buf, "(");
-			}
+				if (im.isNegative()) {
+					if (isReZero && (ASTNodeFactory.TIMES_PRECEDENCE < precedence)) {
+						append(buf, "(");
+					}
 					append(buf, "-");
 					oldColumnCounter = fColumnCounter;
 					fColumnCounter = 0;
 					append(imagBuf, "I*");
 					convertFraction(imagBuf, im.negate(), ASTNodeFactory.TIMES_PRECEDENCE, NO_PLUS_CALL);
-			} else {
-				if (isReZero) {
-					if (caller == PLUS_CALL) {
-						append(buf, "+");
-					}
-					if (ASTNodeFactory.TIMES_PRECEDENCE < precedence) {
-						append(buf, "(");
-					}
-						oldColumnCounter = fColumnCounter;
-						fColumnCounter = 0;
-						append(imagBuf, "I*");
 				} else {
+					if (isReZero) {
+						if (caller == PLUS_CALL) {
+							append(buf, "+");
+						}
+						if (ASTNodeFactory.TIMES_PRECEDENCE < precedence) {
+							append(buf, "(");
+						}
+						oldColumnCounter = fColumnCounter;
+						fColumnCounter = 0;
+						append(imagBuf, "I*");
+					} else {
 						append(buf, "+");
 						oldColumnCounter = fColumnCounter;
 						fColumnCounter = 0;
 						append(imagBuf, "I*");
-				}
+					}
 					convertFraction(imagBuf, im, ASTNodeFactory.TIMES_PRECEDENCE, NO_PLUS_CALL);
-			}
+				}
+
 			} finally {
 				fColumnCounter = oldColumnCounter;
 			}
@@ -428,7 +429,7 @@ public class OutputFormFactory {
 	}
 
 	private void convertPlusOperator(final Appendable buf, final IAST plusAST, final InfixOperator oper,
-			final int precedence) throws IOException {
+									 final int precedence) throws IOException {
 		int operPrecedence = oper.getPrecedence();
 		if (operPrecedence < precedence) {
 			append(buf, "(");
@@ -469,7 +470,7 @@ public class OutputFormFactory {
 	}
 
 	private void convertPlusOperatorReversed(final Appendable buf, final IAST plusAST, final InfixOperator oper,
-			final int precedence) throws IOException {
+											 final int precedence) throws IOException {
 		int operPrecedence = oper.getPrecedence();
 		if (operPrecedence < precedence) {
 			append(buf, "(");
@@ -541,7 +542,7 @@ public class OutputFormFactory {
 	}
 
 	private void convertTimesFraction(final Appendable buf, final IAST timesAST, final InfixOperator oper,
-			final int precedence, boolean caller) throws IOException {
+									  final int precedence, boolean caller) throws IOException {
 		IExpr[] parts = Algebra.fractionalPartsTimesPower(timesAST, true, false, false, false);
 		if (parts == null) {
 			convertTimesOperator(buf, timesAST, oper, precedence, caller);
@@ -597,7 +598,7 @@ public class OutputFormFactory {
 	}
 
 	private void convertTimesOperator(final Appendable buf, final IAST timesAST, final InfixOperator oper,
-			final int precedence, boolean caller) throws IOException {
+									  final int precedence, boolean caller) throws IOException {
 		boolean showOperator = true;
 		int currPrecedence = oper.getPrecedence();
 		if (currPrecedence < precedence) {
@@ -636,7 +637,7 @@ public class OutputFormFactory {
 	}
 
 	public void convertApplyOperator(final Appendable buf, final IAST list, final InfixOperator oper,
-			final int precedence) throws IOException {
+									 final int precedence) throws IOException {
 		IExpr arg2 = list.arg2();
 		if (arg2.isNumber()) {
 			INumber exp = (INumber) arg2;
@@ -665,7 +666,7 @@ public class OutputFormFactory {
 	}
 
 	public void convertPowerOperator(final Appendable buf, final IAST list, final InfixOperator oper,
-			final int precedence) throws IOException {
+									 final int precedence) throws IOException {
 		IExpr arg2 = list.arg2();
 		if (arg2.isNumber()) {
 			INumber exp = (INumber) arg2;
@@ -709,7 +710,7 @@ public class OutputFormFactory {
 	}
 
 	public void convertInfixOperator(final Appendable buf, final IAST list, final InfixOperator oper,
-			final int precedence) throws IOException {
+									 final int precedence) throws IOException {
 
 		if (list.isAST2()) {
 			if (oper.getPrecedence() < precedence) {
@@ -770,7 +771,7 @@ public class OutputFormFactory {
 	}
 
 	public void convertPrefixOperator(final Appendable buf, final IAST list, final PrefixOperator oper,
-			final int precedence) throws IOException {
+									  final int precedence) throws IOException {
 		if (oper.getPrecedence() < precedence) {
 			append(buf, "(");
 		}
@@ -782,7 +783,7 @@ public class OutputFormFactory {
 	}
 
 	public void convertPostfixOperator(final Appendable buf, final IAST list, final PostfixOperator oper,
-			final int precedence) throws IOException {
+									   final int precedence) throws IOException {
 		if (oper.getPrecedence() < precedence) {
 			append(buf, "(");
 		}
@@ -900,7 +901,7 @@ public class OutputFormFactory {
 				return;
 			}
 			if (list.isDirectedInfinity()) { // head.equals(F.DirectedInfinity))
-												// {
+				// {
 				if (list.isAST0()) {
 					append(buf, "ComplexInfinity");
 					return;
@@ -954,7 +955,7 @@ public class OutputFormFactory {
 	}
 
 	private boolean convertOperator(final Operator operator, final IAST list, final Appendable buf,
-			final int precedence, ISymbol head) throws IOException {
+									final int precedence, ISymbol head) throws IOException {
 		if ((operator instanceof PrefixOperator) && (list.isAST1())) {
 			convertPrefixOperator(buf, list, (PrefixOperator) operator, precedence);
 			return true;
@@ -1062,7 +1063,7 @@ public class OutputFormFactory {
 
 	/**
 	 * This method will only be called if <code>list.isAST2()==true</code> and the head equals "Part".
-	 * 
+	 *
 	 * @param buf
 	 * @param list
 	 * @throws IOException
@@ -1090,7 +1091,7 @@ public class OutputFormFactory {
 
 	/**
 	 * Convert a <code>SeriesData(...)</code> expression.
-	 * 
+	 *
 	 * @param buf
 	 * @param seriesData
 	 *            <code>SeriesData[x, x0, list, nmin, nmax, den]</code> expression
@@ -1112,27 +1113,25 @@ public class OutputFormFactory {
 			// SeriesData[x, x0, list, nmin, nmax, den]
 			IExpr x = seriesData.getX();
 			IExpr x0 = seriesData.getX0();
-			long nmin = seriesData.getNMin();
-			long nmax = seriesData.getNMax();
+			int nmin = seriesData.getNMin();
+			int nmax = seriesData.getNMax();
+			int power = seriesData.getPower();
 			long den = seriesData.getDenominator();
-			int size = seriesData.size();
 			boolean call = NO_PLUS_CALL;
-			if (size > 0) {
+			if (nmax > nmin) {
 				INumber exp = F.fraction(nmin, den).normalize();
 				IExpr pow = x.subtract(x0).power(exp);
-				call = convertSeriesDataArg(tempBuffer, seriesData.arg1(), pow, call);
-				for (int i = 2; i < size; i++) {
-					exp = F.fraction(nmin + i - 1L, den).normalize();
+				call = convertSeriesDataArg(tempBuffer, seriesData.coeff(nmin), pow, call);
+				for (int i = nmin + 1; i < nmax; i++) {
+					exp = F.fraction(i, den).normalize();
 					pow = x.subtract(x0).power(exp);
-					call = convertSeriesDataArg(tempBuffer, seriesData.get(i), pow, call);
-				} 
-				plusArg = F.Power(F.O(x.subtract(x0)), F.fraction(nmax, den).normalize());
-				if (!plusArg.isZero()) {
-					convertPlusArgument(tempBuffer, plusArg, call);
-					call = PLUS_CALL;
+					call = convertSeriesDataArg(tempBuffer, seriesData.coeff(i), pow, call);
 				}
-			} else {
-				return false;
+			}
+			plusArg = F.Power(F.O(x.subtract(x0)), F.fraction(power, den).normalize());
+			if (!plusArg.isZero()) {
+				convertPlusArgument(tempBuffer, plusArg, call);
+				call = PLUS_CALL;
 			}
 		} catch (Exception ex) {
 			return false;
@@ -1147,7 +1146,7 @@ public class OutputFormFactory {
 
 	/**
 	 * Convert a factor of a <code>SeriesData</code> object.
-	 * 
+	 *
 	 * @param buf
 	 * @param coefficient
 	 *            the coefficient expression of the factor
@@ -1206,7 +1205,7 @@ public class OutputFormFactory {
 
 	/**
 	 * Write a function into the given <code>Appendable</code>.
-	 * 
+	 *
 	 * @param buf
 	 * @param function
 	 * @throws IOException
@@ -1244,7 +1243,7 @@ public class OutputFormFactory {
 
 	/**
 	 * this resets the columnCounter to offset 0
-	 * 
+	 *
 	 */
 	private void newLine(Appendable buf) throws IOException {
 		if (!fIgnoreNewLine) {
