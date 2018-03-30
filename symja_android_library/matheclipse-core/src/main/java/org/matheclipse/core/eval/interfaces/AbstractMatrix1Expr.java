@@ -58,7 +58,9 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
 		Validate.checkSize(ast, 2);
 
 		RealMatrix matrix;
-		final IAST list = (IAST) ast.arg1();
+		IExpr arg1 = ast.arg1();
+		if (arg1.isList()) {
+			final IAST list = (IAST) arg1;
 		try {
 			if (engine.isApfloat()) {
 				FieldMatrix<IExpr> fieldMatrix = Convert.list2Matrix(list);
@@ -82,6 +84,7 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
 			}
 		}
 
+		}
 		return F.NIL;
 	}
 
