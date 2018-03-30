@@ -4825,8 +4825,8 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("Nor(x,y,z)", "Nor(x,y,z)");
         check("Nor(x,True,z)", "False");
         check("Nor(x,False,z)", "Nor(x,z)");
-        check("BooleanConvert(Nor(p, q, r))", "!p&&!q&&!r");
-        check("BooleanConvert(! Nor(p, q, r))", "p||q||r");
+		check("BooleanConvert(Nor(p, q, r))", "!p&&!q&&!r");
+		check("BooleanConvert(! Nor(p, q, r))", "p||q||r");
     }
 
     public void testNorm() {
@@ -6367,7 +6367,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
     /**
      * If this test fails try a change in <code>AbstractAST#isZERO()</code>.
-     * <p>
+	 *
      * <pre>
      * public boolean AbstractAST#isZERO() {
      *     return PredicateQ.possibleZeroQ(this, EvalEngine.get());

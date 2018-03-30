@@ -312,6 +312,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcTan() {
+        check("ArcTan(a, -a)", "(-(-a+2*Sqrt(a^2))*Pi)/(4*a)");
+        check("ArcTan(-a, a)", "((a+2*Sqrt(a^2))*Pi)/(4*a)");
+        check("ArcTan(a, a)", "((-a+2*Sqrt(a^2))*Pi)/(4*a)");
 		check("2*ArcTan(x)+4*ArcCot(x)", "Pi+2*ArcCot(x)");
 		check("7*ArcTan(x)+3*ArcCot(x)", "3/2*Pi+4*ArcTan(x)");
 		check("ArcTan(x)+ArcCot(x)", "Pi/2");
@@ -330,9 +333,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ArcTan(-1, -1)", "-3/4*Pi");
 
 		check("ArcTan(1, 0)", "0");
+        check("ArcTan(17, 0)", "0");
 		check("ArcTan(-1, 0)", "Pi");
 		check("ArcTan(0, 1)", "Pi/2");
 		check("ArcTan(0, -1)", "-Pi/2");
+        check("arctan(Infinity,y)", "0");
+        check("arctan(-Infinity,y)", "Pi*(-1+2*UnitStep(Re(y)))");
 
 		check("Abs( ArcTan(ComplexInfinity) )", "Pi/2");
 		check("arctan(infinity)", "Pi/2");
@@ -1905,6 +1911,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEigenvalues() {
+        check("Eigenvalues(A)", "Eigenvalues(A)");
 		check("Eigenvalues({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})", "{16.11684,-1.11684,0.0}");
 		check("Eigenvalues({{a}})", "{a}");
 		check("Eigenvalues({{a, b}, {0, a}})", "{a,a}");
@@ -1915,6 +1922,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEigenvectors() {
+        check("Eigenvectors(A)", "Eigenvectors(A)");
 		check("Eigenvectors({{a}})", "1");
 		check("Eigenvectors({{a, b}, {0, a}})", "{{1,0},{0,0}}");
 		check("Eigenvectors({{a, b}, {0, d}})", "{{1,0},{-b/(a-d),1}}");
@@ -2154,6 +2162,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Cases({1, 1, -5, EulerGamma, r, I, 0, Pi, 1/2}, Except(_Integer))", "{EulerGamma,r,I,Pi,1/2}");
 	}
 
+    public void testExists() {
+        check("Exists(a, f(b)>c)", "f(b)>c");
+    }
 	public void testExp() {
 		check("Exp(42+Log(a)+Log(b))", "a*b*E^42");
 		check("Exp(1)", "E");
@@ -2726,6 +2737,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("For($t = 1; $k = 1, $k <= 5, $k++, $t *= $k; Print($t); If($k < 2, Continue()); $t += 2)", "");
 	}
 
+    public void testForAll() {
+        check("ForAll(a, f(b)>c)", "f(b)>c");
+    }
 	public void testFourierMatrix() {
 		check("FourierMatrix(4)", //
 				"{{1/2,1/2,1/2,1/2},\n" + " {1/2,I*1/2,-1/2,-I*1/2},\n" + " {1/2,-1/2,1/2,-1/2},\n"
@@ -2883,8 +2897,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testGegenbauerC() {
 		check("GegenbauerC(5,z)", "2*z-8*z^3+32/5*z^5");
-		check("GegenbauerC(1/2,z)", "4*Sqrt(1/2)*Sqrt(1+z)");
-		check("GegenbauerC(-1/2,z)", "-4*Sqrt(1/2)*Sqrt(1+z)");
+        check("GegenbauerC(1/2,z)", "(4*Sqrt(1+z))/Sqrt(2)");
+        check("GegenbauerC(-1/2,z)", "(-4*Sqrt(1+z))/Sqrt(2)");
 		check("GegenbauerC(v,0)", "(2*Cos(1/2*Pi*v))/v");
 		check("GegenbauerC(v,1)", "2/v");
 		check("GegenbauerC(v,-1)", "(2*Cos(Pi*v))/v");
@@ -3147,6 +3161,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testImplies() {
 
+        check("Implies(!a,!a)", "True");
 		check("Implies(False, a)", "True");
 		check("Implies(True, a)", "a");
 		check("Implies(a,Implies(b,Implies(True,c)))", "Implies(a,Implies(b,c))");
@@ -3474,9 +3489,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("JavaForm(D(sin(x)*cos(x),x))", //
 				"\"Plus(Sqr(Cos(x)),Negate(Sqr(Sin(x))))\"");
 		check("JavaForm(I/2*E^((-I)*x)-I/2*E^(I*x), Prefix->True)", //
-				"\"F.Plus(F.Times(F.CC(0L,1L,1L,2L),F.Power(F.E,F.Times(F.CNI,F.x))),F.Times(F.CC(0L,1L,-1L,2L),F.Power(F.E,F.Times(F.CI,F.x))))\"");
+                "\"F.Plus(F.Times(F.CC(0L,1L,1L,2L),F.Exp(F.Times(F.CNI,F.x))),F.Times(F.CC(0L,1L,-1L,2L),F.Exp(F.Times(F.CI,F.x))))\"");
 		check("JavaForm(I/2*E^((-I)*x)-I/2*E^(I*x))", //
-				"\"Plus(Times(CC(0L,1L,1L,2L),Power(E,Times(CNI,x))),Times(CC(0L,1L,-1L,2L),Power(E,Times(CI,x))))\"");
+                "\"Plus(Times(CC(0L,1L,1L,2L),Exp(Times(CNI,x))),Times(CC(0L,1L,-1L,2L),Exp(Times(CI,x))))\"");
 		check("JavaForm(a+b+x^2+I+7+3/4+x+y, Prefix->True)",
 				"\"F.Plus(F.CC(31L,4L,1L,1L),F.a,F.b,F.x,F.Sqr(F.x),F.y)\"");
 		check("JavaForm(a+b+x^2+I+7+3/4+x+y)", "\"Plus(CC(31L,4L,1L,1L),a,b,x,Sqr(x),y)\"");
@@ -4398,11 +4413,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testNand() {
 		check("Nand( )", "False");
+        check("Nand(a)", "!a");
 		check("Nand(2+2)", "!4");
 		check("Nand(x,y,z)", "Nand(x,y,z)");
 		check("Nand(x,True,z)", "Nand(x,z)");
 		check("Nand(x,False,z)", "True");
 		check("Nand(True,False)", "True");
+        check("Nand(False, True)", "True");
 		check("Nand(Print(1); False, Print(2); True)", "True");
 		check("Nand(Print(1); True, Print(2); True)", "False");
 	}
@@ -4802,6 +4819,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Nor(x,y,z)", "Nor(x,y,z)");
 		check("Nor(x,True,z)", "False");
 		check("Nor(x,False,z)", "Nor(x,z)");
+		check("BooleanConvert(Nor(p, q, r))", "!p&&!q&&!r");
+		check("BooleanConvert(! Nor(p, q, r))", "p||q||r");
 	}
 
 	public void testNorm() {
@@ -4865,6 +4884,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Not(a>b)", "a<=b");
 		check("Not(a>=b)", "a<b");
 		check("Not(a==b)", "a!=b");
+        check("Not(x>1)", "x<=1");
+        check("!Exists(x, f(x))", "ForAll(x,!f(x))");
+        check("!ForAll(x, f(x))", "Exists(x,!f(x))");
 	}
 
 	public void testNSolve() {
@@ -5569,6 +5591,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPower() {
+        check("Sqrt(63/5)", "3*Sqrt(7/5)");
+        check("Sqrt(9/2)", "3/Sqrt(2)");
+        check("Sqrt(1/2)", "1/Sqrt(2)");
+        check("1/Sqrt(2)-Sqrt(1/2)", "0");
 		check("(2/3)^(-3/4)", "(3/2)^(3/4)");
 		check("(y*1/z)^(-1.0)", "z/y");
 		check("0^(3+I*4)", "0");
@@ -5638,7 +5664,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("27^(1/3)", "3");
 		check("(-27)^(1/3)", "3*(-1)^(1/3)");
 		check("(-5)^(1/2)", "I*Sqrt(5)");
-		check("(-5)^(-1/2)", "-I*Sqrt(1/5)");
+        check("(-5)^(-1/2)", "-I/Sqrt(5)");
 		check("(-(2/3))^(-1/2)", "-I*Sqrt(3/2)");
 		check("FullForm(a^b^c)", "\"Power(a, Power(b, c))\"");
 		check("FullForm((a^b)^c)", "\"Power(Power(a, b), c)\"");
@@ -5657,6 +5683,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("E^(y+Log(x)-z)", "E^(y-z)*x");
 		check("E^(y-Log(x)-z)", "E^(y-z)/x");
 		check("E^(y+Log(x)-a*Log(v)*b*Log(u)-z)", "(E^(y-z)*x)/v^(a*b*Log(u))");
+        check("Sqrt(1/a)", "Sqrt(1/a)");
 	}
 
 	public void testPowerExpand() {
@@ -5875,6 +5902,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testProductLog() {
+        check("ProductLog(-1, -(Pi/2))", "-I*1/2*Pi");
+        check("ProductLog(-1, -(1/E))", "-1");
+        check("Refine(ProductLog(k, 0), k>1)", "-Infinity");
 		check("ProductLog(2.5 + 2*I)", "1.05616796894863+I*3.5256052020787e-1");
 
 		check("z == ProductLog(z) * E ^ ProductLog(z)", "True");
@@ -6331,7 +6361,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	/**
 	 * If this test fails try a change in <code>AbstractAST#isZERO()</code>.
-	 *
+     * <p>
 	 * <pre>
 	 * public boolean AbstractAST#isZERO() {
 	 *     return PredicateQ.possibleZeroQ(this, EvalEngine.get());
@@ -6799,6 +6829,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSec() {
+		check("Sec(Pi/2+Pi*n)", "-Csc(n*Pi)");
 		check("Sec(0)", "1");
 		check("Sec(1)", "Sec(1)");
 		checkNumeric("Sec(1.)", "1.8508157176809255");
@@ -7141,9 +7172,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// y, z}, Integers)", "");
 
 		check("Solve((k*Q*q)/r^2+1/r^4==E,r)",
-				"{{r->Sqrt(1/2)*Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)},{r->-Sqrt(1/2)*Sqrt((k*q*Q+Sqrt(\n"
-						+ "4*E+k^2*q^2*Q^2))/E)},{r->-I*Sqrt(1/2)*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)},{r->I*Sqrt(\n"
-						+ "1/2)*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)}}");
+                "{{r->Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)/Sqrt(2)},{r->-Sqrt((k*q*Q+Sqrt(4*E+k^\n" +
+                        "2*q^2*Q^2))/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q+Sqrt(\n" +
+                        "4*E+k^2*q^2*Q^2))/E))/Sqrt(2)}}");
 		// issue #120
 		check("Solve(Sin(x)*x==0, x)", "{{x->0}}");
 		check("Solve(Cos(x)*x==0, x)", "{{x->0},{x->Pi/2}}");
@@ -7152,9 +7183,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Solve(x^2+1==0, x)", "{{x->-I},{x->I}}");
 		check("Solve((k*Q*q)/r^2==E,r)", "{{r->Sqrt(E*k*q*Q)/E},{r->-Sqrt(E*k*q*Q)/E}}");
 		check("Solve((k*Q*q)/r^2+1/r^4==E,r)",
-				"{{r->Sqrt(1/2)*Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)},{r->-Sqrt(1/2)*Sqrt((k*q*Q+Sqrt(\n"
-						+ "4*E+k^2*q^2*Q^2))/E)},{r->-I*Sqrt(1/2)*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)},{r->I*Sqrt(\n"
-						+ "1/2)*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)}}");
+                "{{r->Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)/Sqrt(2)},{r->-Sqrt((k*q*Q+Sqrt(4*E+k^\n" +
+                        "2*q^2*Q^2))/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q+Sqrt(\n" +
+                        "4*E+k^2*q^2*Q^2))/E))/Sqrt(2)}}");
 		check("Solve((k*Q*q)/r^2+1/r^4==0,r)", "{{r->(-I*Sqrt(k*q*Q))/(k*q*Q)},{r->(I*Sqrt(k*q*Q))/(k*q*Q)}}");
 		check("Solve(Abs(x-1) ==1,{x})", "{{x->0},{x->2}}");
 		check("Solve(Abs(x^2-1) ==0,{x})", "{{x->-1},{x->1}}");
@@ -7819,8 +7850,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTan() {
+        check("Tan(Pi/2+Pi*n)", "-Cot(n*Pi)");
 		check("Tan(ArcSin(x))", "x/Sqrt(1-x^2)");
 		check("Tan(ArcCos(x))", "Sqrt(1-x^2)/x");
+        check("Tan(ArcTan(x))", "x");
 
 		check("Tan(0)", "0");
 		check("Tan(Pi / 2)", "ComplexInfinity");
@@ -7999,6 +8032,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Times()", "1");
 		// OutputForm: I*Infinity is DirectedInfinity[I]
 		check("I*Infinity", "I*Infinity");
+        check("Gamma(a)*Gamma(1-a)", "Pi*Csc(a*Pi)");
+        check("Gamma(a)^3*Gamma(1-a)^3", "Pi^3*Csc(a*Pi)^3");
+        check("Gamma(a)^3*Gamma(1-a)^2", "Pi^2*Csc(a*Pi)^2*Gamma(a)");
 	}
 
 	public void testTimesBy() {
