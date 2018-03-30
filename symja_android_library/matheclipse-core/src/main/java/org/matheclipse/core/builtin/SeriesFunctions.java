@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Predicate;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -456,7 +458,12 @@ public class SeriesFunctions {
                 return F.C1;
             }
             if (base.isTimes() && exponent.isFree(data.getSymbol())) {
-                IAST isFreeResult = ((IAST) base).partitionTimes(x -> x.isFree(data.getSymbol(), true), F.C1, F.C1,
+                IAST isFreeResult = ((IAST) base).partitionTimes(new Predicate<IExpr>() {
+                                                                     @Override
+                                                                     public boolean test(IExpr x) {
+                                                                         return x.isFree(data.getSymbol(), true);
+                                                                     }
+                                                                 }, F.C1, F.C1,
                         F.List);
                 if (!isFreeResult.get(2).isOne()) {
                     return F.Times(F.Power(isFreeResult.get(1), exponent),
@@ -562,7 +569,12 @@ public class SeriesFunctions {
         }
 
         private static IExpr timesLimit(final IAST timesAST, LimitData data) {
-            IAST isFreeResult = timesAST.partitionTimes(x -> x.isFree(data.getSymbol(), true), F.C1, F.C1, F.List);
+            IAST isFreeResult = timesAST.partitionTimes(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return x.isFree(data.getSymbol(), true);
+                }
+            }, F.C1, F.C1, F.List);
             if (!isFreeResult.get(1).isOne()) {
                 return F.Times(isFreeResult.get(1), data.limit(isFreeResult.get(2)));
             }
@@ -621,7 +633,12 @@ public class SeriesFunctions {
                 IAST arg1 = logAST.setAtClone(1, firstArg.base());
                 return F.Times(firstArg.exponent(), data.limit(arg1));
             } else if (firstArg.isTimes()) {
-                IAST isFreeResult = firstArg.partitionTimes(x -> x.isFree(data.getSymbol(), true), F.C1, F.C1, F.List);
+                IAST isFreeResult = firstArg.partitionTimes(new Predicate<IExpr>() {
+                    @Override
+                    public boolean test(IExpr x) {
+                        return x.isFree(data.getSymbol(), true);
+                    }
+                }, F.C1, F.C1, F.List);
                 if (!isFreeResult.get(1).isOne()) {
                     IAST arg1 = logAST.setAtClone(1, isFreeResult.get(1));
                     IAST arg2 = logAST.setAtClone(1, isFreeResult.get(2));
