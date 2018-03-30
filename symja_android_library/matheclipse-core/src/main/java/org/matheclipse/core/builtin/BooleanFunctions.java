@@ -268,6 +268,49 @@ public final class BooleanFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * AnyTrue({expr1, expr2, ...}, test)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if any application of <code>test</code> to <code>expr1, expr2, ...</code> evaluates to
+	 * <code>True</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * AnyTrue(list, test, level)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if any application of <code>test</code> to items of <code>list</code> at
+	 * <code>level</code> evaluates to <code>True</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * AnyTrue(test)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * gives an operator that may be applied to expressions.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; AnyTrue({1, 3, 5}, EvenQ)
+	 * False
+	 * &gt;&gt; AnyTrue({1, 4, 5}, EvenQ)
+	 * True
+	 * &gt;&gt; AnyTrue({}, EvenQ)
+	 * False
+	 * </pre>
+	 */
 	private static class AnyTrue extends AbstractFunctionEvaluator {
 
 		@Override
@@ -324,10 +367,26 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * Predicate function
+	 * <pre>
+	 * Boole(expr)
+	 * </pre>
 	 * 
-	 * Returns <code>1</code> if the 1st argument evaluates to <code>True</code> ; returns <code>0</code> if the 1st
-	 * argument evaluates to <code>False</code>; and <code>null</code> otherwise.
+	 * <blockquote>
+	 * <p>
+	 * returns <code>1</code> if <code>expr</code> evaluates to <code>True</code>; returns <code>0</code> if
+	 * <code>expr</code> evaluates to <code>False</code>; and gives no result otherwise.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Boole(2 == 2)
+	 * 1
+	 * &gt;&gt; Boole(7 &lt; 5)
+	 * 0
+	 * &gt;&gt; Boole(a == 7)
+	 * Boole(a==7)
+	 * </pre>
 	 */
 	private static class Boole extends AbstractFunctionEvaluator {
 
@@ -353,6 +412,52 @@ public final class BooleanFunctions {
 
 	}
 
+	/**
+	 * <pre>
+	 * BooleanConvert(logical - expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * convert the <code>logical-expr</code> to
+	 * <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form">disjunctive normal form</a>
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * BooleanConvert(logical - expr, "CNF")
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * convert the <code>logical-expr</code> to
+	 * <a href="https://en.wikipedia.org/wiki/Conjunctive_normal_form">conjunctive normal form</a>
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * BooleanConvert(logical - expr, "DNF")
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * convert the <code>logical-expr</code> to
+	 * <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form">disjunctive normal form</a>
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; BooleanConvert(Xor(x,y))
+	 * x&amp;&amp;!y||y&amp;&amp;!x
+	 *
+	 * &gt;&gt; BooleanConvert(Xor(x,y), "CNF")
+	 * (x||y)&amp;&amp;(!x||!y)
+	 *
+	 * &gt;&gt; BooleanConvert(Xor(x,y), "DNF")
+	 * x&amp;&amp;!y||y&amp;&amp;!x
+	 * </pre>
+	 */
 	private static class BooleanConvert extends AbstractFunctionEvaluator {
 
 		// static class BooleanConvertVisitor extends VisitorExpr {
@@ -478,7 +583,7 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
-			// QuineMcClusky contains bugs
+			// TODO solve bugs in QuineMcClusky
 
 			// if (ast.arg1().isASTSizeGE(F.Or, 3)) {
 			// try {
@@ -598,8 +703,85 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * <code>==</code> operator implementation.
+	 * <pre>
+	 * Equal(x, y)
 	 * 
+	 * x == y
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * yields <code>True</code> if <code>x</code> and <code>y</code> are known to be equal, or <code>False</code> if
+	 * <code>x</code> and <code>y</code> are known to be unequal.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * lhs == rhs
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * represents the equation <code>lhs = rhs</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; a==a
+	 * True
+	 *
+	 * &gt;&gt; a==b
+	 * a == b
+	 *
+	 * &gt;&gt; 1==1
+	 * True
+	 * </pre>
+	 * <p>
+	 * Lists are compared based on their elements:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; {{1}, {2}} == {{1}, {2}}
+	 * True
+	 * &gt;&gt; {1, 2} == {1, 2, 3}
+	 * False
+	 * </pre>
+	 * <p>
+	 * Symbolic constants are compared numerically:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; E &gt; 1
+	 * True
+	 *
+	 * &gt;&gt; Pi == 3.14
+	 * False
+	 *
+	 * &gt;&gt; Pi ^ E == E ^ Pi
+	 * False
+	 *
+	 * &gt;&gt; N(E, 3) == N(E)
+	 * True
+	 *
+	 * &gt;&gt; {1, 2, 3} &lt; {1, 2, 3}
+	 * {1, 2, 3} &lt; {1, 2, 3}
+	 *
+	 * &gt;&gt; E == N(E)
+	 * True
+	 *
+	 * &gt;&gt; {Equal(Equal(0, 0), True), Equal(0, 0) == True}
+	 * {True, True}
+	 *
+	 * &gt;&gt; {Mod(6, 2) == 0, Mod(6, 4) == 0, (Mod(6, 2) == 0) == (Mod(6, 4) == 0), (Mod(6, 2) == 0) != (Mod(6, 4) == 0)}
+	 * {True,False,False,True}
+	 *
+	 * &gt;&gt; a == a == a
+	 * True
+	 *
+	 * &gt;&gt; {Equal(), Equal(x), Equal(1)}
+	 * {True, True, True}
+	 * </pre>
 	 */
 	public static class Equal extends AbstractFunctionEvaluator implements ITernaryComparator {
 
@@ -791,6 +973,49 @@ public final class BooleanFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Equivalent(arg1, arg2, ...)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * Equivalence relation. <code>Equivalent(A, B)</code> is <code>True</code> iff <code>A</code> and <code>B</code>
+	 * are both <code>True</code> or both <code>False</code>. Returns <code>True</code> if all of the arguments are
+	 * logically equivalent. Returns <code>False</code> otherwise. <code>Equivalent(arg1, arg2, ...)</code> is
+	 * equivalent to <code>(arg1 &amp;&amp; arg2 &amp;&amp; ...) || (!arg1 &amp;&amp; !arg2 &amp;&amp; ...)</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Equivalent(True, True, False)
+	 * False
+	 *
+	 * &gt;&gt; Equivalent(x, x &amp;&amp; True)
+	 * True
+	 * </pre>
+	 * <p>
+	 * If all expressions do not evaluate to 'True' or 'False', 'Equivalent' returns a result in symbolic form:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; Equivalent(a, b, c)
+	 * Equivalent(a,b,c)
+	 * </pre>
+	 * <p>
+	 * Otherwise, 'Equivalent' returns a result in DNF
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; Equivalent(a, b, True, c)
+	 * a &amp;&amp; b &amp;&amp; c
+	 * &gt;&gt; Equivalent()
+	 * True
+	 * &gt;&gt; Equivalent(a)
+	 * True
+	 * </pre>
+	 */
 	private final static class Equivalent extends AbstractFunctionEvaluator {
 
 		@Override
@@ -958,8 +1183,36 @@ public final class BooleanFunctions {
 		}
 	}
 	/**
-	 * <code>&gt;</code> operator implementation.
+	 * <pre>
+	 * Greater(x, y)
 	 * 
+	 * x &gt; y
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * yields <code>True</code> if <code>x</code> is known to be greater than <code>y</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * lhs &gt; rhs
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * represents the inequality <code>lhs &gt; rhs</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Pi&gt;0
+	 * True
+	 *
+	 * &gt;&gt; {Greater(), Greater(x), Greater(1)}
+	 * {True, True, True}
+	 * </pre>
 	 */
 	public static class Greater extends AbstractFunctionEvaluator implements ITernaryComparator {
 		public final static Greater CONST = new Greater();
@@ -1288,8 +1541,36 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * <code>&gt;=</code> operator implementation.
+	 * <pre>
+	 * GreaterEqual(x, y)
 	 * 
+	 * x &gt;= y
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * yields <code>True</code> if <code>x</code> is known to be greater than or equal to <code>y</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * lhs &gt;= rhs
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * represents the inequality <code>lhs &gt;= rhs</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; x&gt;=x
+	 * True
+	 *
+	 * &gt;&gt; {GreaterEqual(), GreaterEqual(x), GreaterEqual(1)}
+	 * {True, True, True}
+	 * </pre>
 	 */
 	public final static class GreaterEqual extends Greater {
 		public final static GreaterEqual CONST = new GreaterEqual();
@@ -1336,6 +1617,37 @@ public final class BooleanFunctions {
 
 	}
 
+	/**
+	 * <pre>
+	 * Implies(arg1, arg2)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * Logical implication. <code>Implies(A, B)</code> is equivalent to <code>!A || B</code>.
+	 * <code>Implies(expr1, expr2)</code> evaluates each argument in turn, returning <code>True</code> as soon as the
+	 * first argument evaluates to <code>False</code>. If the first argument evaluates to <code>True</code>,
+	 * <code>Implies</code> returns the second argument.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Implies(False, a)
+	 * True
+	 * &gt;&gt; Implies(True, a)
+	 * a
+	 * </pre>
+	 * <p>
+	 * If an expression does not evaluate to <code>True</code> or <code>False</code>, <code>Implies</code> returns a
+	 * result in symbolic form:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; Implies(a, Implies(b, Implies(True, c)))
+	 * Implies(a,Implies(b,c))
+	 * </pre>
+	 */
 	private final static class Implies extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1436,8 +1748,36 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * <code>&lt;</code> operator implementation.
+	 * <pre>
+	 * Less(x, y)
 	 * 
+	 * x &lt; y
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * yields <code>True</code> if <code>x</code> is known to be less than <code>y</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * lhs &lt; rhs
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * represents the inequality <code>lhs &lt; rhs</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; 3&lt;4
+	 * True
+	 *
+	 * &gt;&gt; {Less(), Less(x), Less(1)}
+	 * {True, True, True}
+	 * </pre>
 	 */
 	public final static class Less extends Greater {
 
@@ -1483,8 +1823,36 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * <code>&lt;=</code> operator implementation.
+	 * <pre>
+	 * LessEqual(x, y)
 	 * 
+	 * x &lt;= y
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * yields <code>True</code> if <code>x</code> is known to be less than or equal <code>y</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * lhs &lt;= rhs
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * represents the inequality <code>lhs ≤ rhs</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; 3&lt;=4
+	 * True
+	 *
+	 * &gt;&gt; {LessEqual(), LessEqual(x), LessEqual(1)}
+	 * {True, True, True}
+	 * </pre>
 	 */
 	public final static class LessEqual extends Greater {
 
@@ -1820,6 +2188,27 @@ public final class BooleanFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Nand(arg1, arg2, ...)'
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * Logical NAND function. It evaluates its arguments in order, giving <code>True</code> immediately if any of them
+	 * are <code>False</code>, and <code>False</code> if they are all <code>True</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Nand(True, True, True)
+	 * False
+	 *
+	 * &gt;&gt; Nand(True, False, a)
+	 * True
+	 * </pre>
+	 */
 	private final static class Nand extends AbstractCoreFunctionEvaluator {
 
 		@Override
@@ -1861,6 +2250,41 @@ public final class BooleanFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Negative(x)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>x</code> is a negative real number.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Negative(0)
+	 * False
+	 *
+	 * &gt;&gt; Negative(-3)
+	 * True
+	 *
+	 * &gt;&gt; Negative(10/7)
+	 * False
+	 *
+	 * &gt;&gt; Negative(1+2*I)
+	 * False
+	 *
+	 * &gt;&gt; Negative(a + b)
+	 * Negative(a+b)
+	 *
+	 * &gt;&gt; Negative(-E)
+	 * True
+	 *
+	 * &gt;&gt; Negative(Sin({11, 14}))
+	 * {True, False}
+	 * </pre>
+	 */
 	private static class Negative extends AbstractEvaluator {
 
 		@Override
@@ -1944,6 +2368,23 @@ public final class BooleanFunctions {
 
 	}
 
+	/**
+	 * <pre>
+	 * NonNegative(x)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>x</code> is a positive real number or zero.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; {Positive(0), NonNegative(0)}
+	 * {False,True}
+	 * </pre>
+	 */
 	private final static class NonNegative extends AbstractEvaluator {
 
 		@Override
@@ -1998,6 +2439,27 @@ public final class BooleanFunctions {
 
 	}
 
+	/**
+	 * <pre>
+	 * Nor(arg1, arg2, ...)'
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * Logical NOR function. It evaluates its arguments in order, giving <code>False</code> immediately if any of them
+	 * are <code>True</code>, and <code>True</code> if they are all <code>False</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Nor(False, False, False)
+	 * True
+	 *
+	 * &gt;&gt; Nor(False, True, a)
+	 * False
+	 * </pre>
+	 */
 	private static class Nor extends AbstractCoreFunctionEvaluator {
 
 		@Override
@@ -2081,9 +2543,32 @@ public final class BooleanFunctions {
 	}
 
 	/**
+	 * <pre>
+	 * Or(expr1, expr2, ...)'
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * <code>expr1 || expr2 || ...</code> evaluates each expression in turn, returning <code>True</code> as soon as an
+	 * expression evaluates to <code>True</code>. If all expressions evaluate to <code>False</code>, <code>Or</code>
+	 * returns <code>False</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
 	 * 
-	 * See <a href="http://en.wikipedia.org/wiki/Logical_disjunction">Logical disjunction</a>
-	 * 
+	 * <pre>
+	 * &gt;&gt; False || True
+	 * True
+	 * </pre>
+	 * <p>
+	 * If an expression does not evaluate to <code>True</code> or <code>False</code>, <code>Or</code> returns a result
+	 * in symbolic form:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; a || False || b
+	 * a || b
+	 * </pre>
 	 */
 	private static class Or extends AbstractCoreFunctionEvaluator {
 
@@ -2173,6 +2658,43 @@ public final class BooleanFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Positive(x)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>x</code> is a positive real number.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Positive(1)
+	 * True
+	 * </pre>
+	 * <p>
+	 * <code>Positive</code> returns <code>False</code> if <code>x</code> is zero or a complex number:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; Positive(0)
+	 * False
+	 *
+	 * &gt;&gt; Positive(1 + 2 I)
+	 * False
+	 *
+	 * &gt;&gt; Positive(Pi)
+	 * True
+	 *
+	 * &gt;&gt; Positive(x)
+	 * Positive(x)
+	 *
+	 * &gt;&gt; Positive(Sin({11, 14}))
+	 * {False, True}
+	 * </pre>
+	 */
 	private final static class Positive extends AbstractEvaluator {
 
 		@Override
@@ -2202,8 +2724,35 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * <code>===</code> operator implementation.
+	 * <pre>
+	 * SameQ(x, y)
 	 * 
+	 * x===y
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>x</code> and <code>y</code> are structurally identical.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * <p>
+	 * Any object is the same as itself:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; a===a
+	 * True
+	 * </pre>
+	 * <p>
+	 * Unlike <code>Equal</code>, <code>SameQ</code> only yields <code>True</code> if <code>x</code> and <code>y</code>
+	 * have the same type:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; {1==1., 1===1.}
+	 * {True,False}
+	 * </pre>
 	 */
 	private final static class SameQ extends AbstractFunctionEvaluator {
 		@Override
@@ -2621,7 +3170,25 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * Returns <code>True</code> if the 1st argument evaluates to <code>True</code>; <code>False</code> otherwise
+	 * <pre>
+	 * TrueQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if and only if <code>expr</code> is <code>True</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; TrueQ(True)
+	 * True
+	 * &gt;&gt; TrueQ(False)
+	 * False
+	 * &gt;&gt; TrueQ(a)
+	 * False
+	 * </pre>
 	 */
 	private static class TrueQ extends AbstractFunctionEvaluator {
 
@@ -2639,8 +3206,75 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * {@code !=} operator implementation.
+	 * <pre>
+	 * Unequal(x, y)
 	 * 
+	 * x != y
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * yields <code>False</code> if <code>x</code> and <code>y</code> are known to be equal, or <code>True</code> if
+	 * <code>x</code> and <code>y</code> are known to be unequal.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * lhs != rhs
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * represents the inequality <code>lhs &lt;&gt; rhs</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; 1 != 1
+	 * False
+	 * </pre>
+	 * <p>
+	 * Lists are compared based on their elements:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; {1} != {2}
+	 * True
+	 *
+	 * &gt;&gt; {1, 2} != {1, 2}
+	 * False
+	 *
+	 * &gt;&gt; {a} != {a}
+	 * False
+	 *
+	 * &gt;&gt; "a" != "b"
+	 * True
+	 *
+	 * &gt;&gt; "a" != "a"
+	 * False
+	 *
+	 * &gt;&gt; Pi != N(Pi)
+	 * False
+	 *
+	 * &gt;&gt; a_ != b_
+	 * a_ != b_
+	 *
+	 * &gt;&gt; a != a != a
+	 * False
+	 *
+	 * &gt;&gt; "abc" != "def" != "abc"
+	 * False
+	 *
+	 * &gt;&gt; a != a != b
+	 * False
+	 *
+	 * &gt;&gt; a != b != a
+	 * a != b != a
+	 *
+	 * &gt;&gt; {Unequal(), Unequal(x), Unequal(1)}
+	 * {True, True, True}
+	 * </pre>
 	 */
 	private final static class Unequal extends Equal {
 
@@ -2698,8 +3332,32 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * {@code =!=} operator implementation.
+	 * <pre>
+	 * UnsameQ(x, y)
 	 * 
+	 * x=!=y
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>x</code> and <code>y</code> are not structurally identical.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * <p>
+	 * Any object is the same as itself:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; a=!=a
+	 *  = False
+	 * </pre>
+	 *
+	 * <pre>
+	 * ```
+	 * &gt;&gt; 1=!=1
+	 * True
+	 * </pre>
 	 */
 	private final static class UnsameQ extends AbstractFunctionEvaluator {
 
@@ -2730,9 +3388,47 @@ public final class BooleanFunctions {
 	}
 
 	/**
+	 * <pre>
+	 * Xor(arg1, arg2, ...)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * Logical XOR (exclusive OR) function. Returns <code>True</code> if an odd number of the arguments are
+	 * <code>True</code> and the rest are <code>False</code>. Returns <code>False</code> if an even number of the
+	 * arguments are <code>True</code> and the rest are <code>False</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See: <a href="https://en.wikipedia.org/wiki/Exclusive_or">Wikipedia: Exclusive or</a>
+	 * </p>
+	 * <h3>Examples</h3>
 	 * 
-	 * See <a href="https://en.wikipedia.org/wiki/Exclusive_or">Wikipedia: Exclusive or</a>
-	 * 
+	 * <pre>
+	 * &gt;&gt; Xor(False, True)
+	 * True
+	 * &gt;&gt; Xor(True, True)
+	 * False
+	 * </pre>
+	 * <p>
+	 * If an expression does not evaluate to <code>True</code> or <code>False</code>, <code>Xor</code> returns a result
+	 * in symbolic form:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; Xor(a, False, b)
+	 * Xor(a,b)
+	 * &gt;&gt; Xor()
+	 * False
+	 * &gt;&gt; Xor(a)
+	 * a
+	 * &gt;&gt; Xor(False)
+	 * False
+	 * &gt;&gt; Xor(True)
+	 * True
+	 * &gt;&gt; Xor(a, b)
+	 * Xor(a,b)
+	 * </pre>
 	 */
 	private static class Xor extends AbstractFunctionEvaluator {
 
