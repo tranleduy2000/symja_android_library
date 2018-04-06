@@ -10,6 +10,14 @@ public class SeriesTest extends AbstractTestCase {
 	}
 
 	public void testComposeSeries() {
+		check("ComposeSeries(Series(Exp(x), {x, 0, 10}), Series(Sin(x), {x, 0, 10}))", //
+				"1+x+x^2/2-x^4/8-x^5/15-x^6/240+x^7/90+31/5760*x^8+x^9/5670-2951/3628800*x^10+O(x)^\n" + "11");
+		check("ComposeSeries(Series(x*Exp(x), {x, 0, 10}), Series(Sin(x), {x, 0, 10}))", //
+				"x+x^2+x^3/3-x^4/6-x^5/5-7/120*x^6+13/630*x^7+37/1680*x^8+2/405*x^9-4043/1814400*x^\n" + "10+O(x)^11");
+		// TODO check power
+		check("Series(Sin(x)*Exp(Sin(x)), {x, 0, 10})", //
+				"x+x^2+x^3/3-x^4/6-x^5/5-7/120*x^6+13/630*x^7+37/1680*x^8+2/405*x^9-4043/1814400*x^\n"
+						+ "10-11/6400*x^11+O(x)^12");
 		check("Series(Log(x), {x, 1, 1}) ", //
 				"(-1+x)+O(-1+x)^2");
 		check("Series(Log(x), {x, 1, 5}) ", //
@@ -51,6 +59,12 @@ public class SeriesTest extends AbstractTestCase {
 	}
 
 	public void testInverseSeries() {
+		check("InverseSeries(SeriesData(x,x0,{1,2,3},0,5,1))", //
+				"x0+1/2*(-1+x)-3/8*(1-x)^2+9/16*(-1+x)^3-135/128*(1-x)^4+O(-1+x)^5");
+		check("InverseSeries(SeriesData(x,0,{1,2,3},0,5,1))", //
+				"1/2*(-1+x)-3/8*(1-x)^2+9/16*(-1+x)^3-135/128*(1-x)^4+O(-1+x)^5");
+		check("InverseSeries(SeriesData(x,-4,{1,2,3},0,5,1))", //
+				"-4+1/2*(-1+x)-3/8*(1-x)^2+9/16*(-1+x)^3-135/128*(1-x)^4+O(-1+x)^5");
 		check("InverseSeries(Series(Log(x+1), {x, 0, 9}))", //
 				"x+x^2/2+x^3/6+x^4/24+x^5/120+x^6/720+x^7/5040+x^8/40320+x^9/362880+O(x)^10");
 
@@ -81,6 +95,10 @@ public class SeriesTest extends AbstractTestCase {
 		// check("Series(x^a*Sin(x),{x,0,5})",//
 		// "");
 
+		check("Series(ProductLog(x), {x, 0, 3}) ", //
+				"x-x^2+3/2*x^3+O(x)^4");
+		check("Series(Exp(Sin(x)), {x, 0, 10})", //
+				"1+x+x^2/2-x^4/8-x^5/15-x^6/240+x^7/90+31/5760*x^8+x^9/5670-2951/3628800*x^10+O(x)^\n" + "11");
 		// TODO check max power
 		check("Series(Sin(x)^2,{x,0,5})//FullForm", //
 				"\"SeriesData(x,0,{1,0,-1/3,0,2/45},2,7,1)\"");

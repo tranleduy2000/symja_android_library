@@ -493,7 +493,11 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
      */
     @Override
     public ASTSeriesData inverse() {
-        if (!isInvertible()) {
+		IExpr x0 = this.x0;
+		if (!coeff(0).isZero()) {
+			x0 = F.C1;
+		}
+		// if (!isInvertible()) {
             final int maxPower = power;
             if (maxPower > 10) {
                 return null;
@@ -502,7 +506,9 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
 
                 ASTSeriesData ps = new ASTSeriesData(x, x0, nMin, nMin, power, denominator,
                         new OpenIntToIExprHashMap());
-                // ps.setCoeff(0,F.C0);
+			if (!this.x0.isZero()) {
+				ps.setCoeff(0, this.x0);
+			}
 
                 IExpr a1 = coeff(1);
                 // a1^(-1)
@@ -644,22 +650,30 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
                 return ps;
             }
             throw new IllegalStateException("PowerSeries cannot be inverted");
-        }
-        IExpr d = this.coeff(0).power(-1L);
-        // HashMap<Integer, IExpr> bTable = new HashMap<>();
-        // bTable.put(0, a);
-        ASTSeriesData ps = new ASTSeriesData(x, x0, nMin, power, denominator);
-        ps.setCoeff(nMin, d);
-        for (int i = nMin + 1; i < nMax; i++) {
-            IExpr c = F.C0;
-            for (int k = 0; k < i; k++) {
-                IExpr m = this.coeff(k).times(this.coeff(i - k));
-                c = c.plus(m);
-            }
-            IExpr b = c.times(d.times(F.CN1));
-            ps.setCoeff(i, b);
-        }
-        return ps;
+		// }
+		// IExpr d = this.coeff(0).power(-1L);
+		// // HashMap<Integer, IExpr> bTable = new HashMap<>();
+		// // bTable.put(0, a);
+		// ASTSeriesData ps = new ASTSeriesData(x, d, 0, power, denominator);
+		// ps.setCoeff(nMin, d);
+		// for (int i = 1; i < nMax; i++) {
+		// // IExpr c = F.C0;
+		// // for (int k = 0; k < i; k++) {
+		// // IExpr m = this.coeff(k).times(this.coeff(i - k));
+		// // c = c.plus(m);
+		// // }
+		// // IExpr b = c.times(d.times(F.CN1));
+		//
+		// IExpr c = F.C0;
+		// for (int k = 0; k < i; k++) {
+		// IExpr m = this.coeff(k).times(this.coeff(i - k));
+		// c = c.plus(m);
+		// }
+		// c = c.multiply(d.negate());
+		//
+		// ps.setCoeff(i, c);
+		// }
+		// return ps;
     }
 
     /** {@inheritDoc} */
