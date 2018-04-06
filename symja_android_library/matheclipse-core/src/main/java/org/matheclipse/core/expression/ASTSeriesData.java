@@ -52,6 +52,9 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
      */
     private int denominator;
 
+	public void setDenominator(int denominator) {
+		this.denominator = denominator;
+	}
     public ASTSeriesData() {
         super();
         power = 0;
@@ -889,12 +892,17 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
             return;
         }
         coefficientValues.put(k, value);
+		if (coefficientValues.size() == 1) {
+			nMin = k;
+			nMax = k + 1;
+		} else {
         if (k < nMin) {
             nMin = k;
         } else if (k >= nMax) {
             nMax = k + 1;
         }
     }
+	}
 
     public void setZero(int k) {
         if (coefficientValues.containsKey(k)) {
@@ -908,6 +916,21 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
         }
     }
 
+	public ASTSeriesData shift(int shift, IExpr coefficient, int power) {
+		ASTSeriesData series = new ASTSeriesData(this.x, this.x0, this.nMin, power, denominator);
+		for (int i = this.nMin; i < this.nMax; i++) {
+			series.setCoeff(i + shift, this.coeff(i).times(coefficient));
+		}
+		return series;
+	}
+
+	public ASTSeriesData shiftTimes(int shift, IExpr coefficient, int power) {
+		ASTSeriesData series = new ASTSeriesData(this.x, this.x0, this.nMin, power, denominator);
+		for (int i = this.nMin; i < this.nMax; i++) {
+			series.setCoeff(i * shift, this.coeff(i).times(coefficient));
+		}
+		return series;
+	}
     @Override
     public int size() {
         return 7;
@@ -993,13 +1016,22 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
             minSize = b.nMin;
         }
         int newPower = power;
-        if (b.power < power) {
+		if (b.power > power) {
             newPower = b.power;
         }
-        if (b.power != power) {
+		int rest = newPower % denominator;
+		if (rest != 0) {
+			int div = newPower / denominator;
+			newPower = div * denominator + denominator;
+		} else {
+			// if (b.power != power) {
             newPower++;
+			// }
         }
-        ASTSeriesData series = new ASTSeriesData(x, x0, nMin + b.nMin, newPower + minSize, denominator);
+		// if (b.power != power) {
+		// newPower++;
+		// }
+		ASTSeriesData series = new ASTSeriesData(x, x0, nMin + b.nMin, newPower, denominator);
         int start = series.nMin;
 		int end = nMax + b.nMax + 1;
 		for (int n = start; n < end; n++) {

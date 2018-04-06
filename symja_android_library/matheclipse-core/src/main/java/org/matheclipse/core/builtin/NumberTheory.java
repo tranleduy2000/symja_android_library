@@ -84,7 +84,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * BellB(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * the Bell number function counts the number of different ways to partition a set that has exactly <code>n</code>
@@ -3453,20 +3453,7 @@ public final class NumberTheory {
 
 		int ni = x.toIntDefault(Integer.MIN_VALUE);
 		if (ni > Integer.MIN_VALUE) {
-			BigInteger result;
-			if (ni < 0) {
-				result = BigIntegerMath.factorial(-1 * ni);
-				if ((ni & 0x0001) == 0x0001) {
-					// odd integer number
-					result = result.multiply(BigInteger.valueOf(-1L));
-				}
-			} else {
-				if (ni <= 20) {
-					return AbstractIntegerSym.valueOf(LongMath.factorial(ni));
-				}
-				result = BigIntegerMath.factorial(ni);
-			}
-			return AbstractIntegerSym.valueOf(result);
+			return factorial(ni);
 		}
 
 		IInteger result = F.C1;
@@ -3483,6 +3470,24 @@ public final class NumberTheory {
 		}
 		return result;
 	}
+
+	public static IInteger factorial(int ni) {
+			BigInteger result;
+			if (ni < 0) {
+				result = BigIntegerMath.factorial(-1 * ni);
+				if ((ni & 0x0001) == 0x0001) {
+					// odd integer number
+					result = result.multiply(BigInteger.valueOf(-1L));
+				}
+			} else {
+				if (ni <= 20) {
+					return AbstractIntegerSym.valueOf(LongMath.factorial(ni));
+				}
+				result = BigIntegerMath.factorial(ni);
+			}
+			return AbstractIntegerSym.valueOf(result);
+		}
+
 
 	/**
 	 * <p>

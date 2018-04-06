@@ -1,12 +1,6 @@
 package org.matheclipse.core.system;
 
-import static org.matheclipse.core.expression.F.Cos;
-import static org.matheclipse.core.expression.F.D;
-import static org.matheclipse.core.expression.F.Sin;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.x;
-
-import java.math.BigInteger;
+import junit.framework.TestCase;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.ExprEvaluator;
@@ -21,7 +15,13 @@ import org.matheclipse.core.polynomials.ExprTermOrderByName;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
-import junit.framework.TestCase;
+import java.math.BigInteger;
+
+import static org.matheclipse.core.expression.F.Cos;
+import static org.matheclipse.core.expression.F.D;
+import static org.matheclipse.core.expression.F.Sin;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.x;
 
 public class ExprEvaluatorTest extends TestCase {
 
@@ -183,6 +183,28 @@ public class ExprEvaluatorTest extends TestCase {
 		}
 	}
 
+	public void testStringEval004() {
+		try {
+			ExprEvaluator util = new ExprEvaluator();
+			util.defineVariable("x", 1.0);
+			util.defineVariable("y", 1.0);
+			IExpr expr = util.eval("If(x*x+y*y==0,1,Sin(x*x+y*y)/(x*x+y*y))");
+			assertEquals("0.45464871341284085", expr.toString());
+
+		} catch (SyntaxError e) {
+			// catch Symja parser errors here
+			System.out.println(e.getMessage());
+		} catch (MathException me) {
+			// catch Symja math errors here
+			System.out.println(me.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} catch (final StackOverflowError soe) {
+			System.out.println(soe.getMessage());
+		} catch (final OutOfMemoryError oome) {
+			System.out.println(oome.getMessage());
+		}
+	}
 	public void testX2() {
 		ExprEvaluator evaluator = new ExprEvaluator();
 		evaluator.defineVariable("X", evaluator.parse("2"));
