@@ -1,6 +1,7 @@
 package org.matheclipse.core.visit;
 
 import com.duy.lambda.Function;
+import com.duy.lambda.ObjIntConsumer;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -115,8 +116,13 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 							fFromLevel = 0;
 							fToLevel = Integer.MAX_VALUE;
 						} else if (i0.isNegative()) {
-							throw new MathException("Invalid Level specification: " + levelExpr.toString());
+							// all subexpressions at levels i0 or above with a depth of -i1 or less.
+							fFromDepth = Validate.checkIntType(i0, Integer.MIN_VALUE);
+							fToDepth = -1;
+							fFromLevel = 0;
+							fToLevel = Validate.checkIntType(i1, Integer.MIN_VALUE);
 						} else if (i1.isNegative()) {
+							// all subexpressions at any level greater equal i0 that have a depth of -i1 or greater.
 							fFromDepth = Integer.MIN_VALUE;
 							fToDepth = Validate.checkIntType(i1, Integer.MIN_VALUE);
 							fFromLevel = Validate.checkIntType(i0, Integer.MIN_VALUE);
@@ -139,11 +145,19 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 							fToLevel = Integer.MAX_VALUE;
 						}
 						return;
+					} else if ((lst.arg1().isNegativeInfinity()) && (lst.arg2().isInfinity())) {
+						// level specification {-Infinity, Infinity} is effectively the same as {0,-1}
+						fFromDepth = Integer.MIN_VALUE;
+						fToDepth = -1;
+						fFromLevel = 0;
+						fToLevel = Integer.MAX_VALUE;
+						return;
 					}
 				}
 			}
 		}
-		if (levelExpr.equals(F.CInfinity) || levelExpr.equals(F.All)) {
+		if (levelExpr.isInfinity() || levelExpr.equals(F.All)) {
+			// level specification Infinity and -1 are equivalent
 			fToLevel = Integer.MAX_VALUE;
 			fFromLevel = 1;
 			fFromDepth = Integer.MIN_VALUE;
@@ -349,19 +363,21 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 					minDepth[0] = fCurrentDepth;
 				}
 			}
-			int size = ast.size();
-			for (int i = 1; i < size; i++) {
-				final IExpr temp = ast.get(i).accept(this);
-				if (temp.isPresent()) {
-					if (!result[0].isPresent()) {
-						result[0] = createResult(ast, temp);
+			ast.forEach(new ObjIntConsumer<IExpr>() {
+				@Override
+				public void accept(IExpr x, int i) {
+					final IExpr temp = x.accept(VisitorLevelSpecification.this);
+					if (temp.isPresent()) {
+						if (!result[0].isPresent()) {
+							result[0] = VisitorLevelSpecification.this.createResult(ast, temp);
+						}
+						result[0].set(i, temp);
 					}
-					result[0].set(i, temp);
+					if (fCurrentDepth < minDepth[0]) {
+						minDepth[0] = fCurrentDepth;
+					}
 				}
-				if (fCurrentDepth < minDepth[0]) {
-					minDepth[0] = fCurrentDepth;
-				}
-			} ;
+			});
 		} finally {
 			fCurrentLevel--;
 		}

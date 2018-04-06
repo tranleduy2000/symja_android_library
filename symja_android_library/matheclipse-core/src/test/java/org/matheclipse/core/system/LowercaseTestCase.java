@@ -2956,7 +2956,7 @@ public class LowercaseTestCase extends AbstractTestCase {
             // pathToVectorAnalysis = pathToVectorAnalysis.substring(6);
             System.out.println(pathToVectorAnalysis);
             // PatternMatching.getFile(pathToVectorAnalysis, engine)
-//			evalString("Get(\"" + pathToVectorAnalysis + "\")");
+			//evalString("Get(\"" + pathToVectorAnalysis + "\")");
             check("DotProduct({a,b,c},{d,e,f}, Spherical)",
                     "a*d*Cos(b)*Cos(e)+a*d*Cos(c)*Cos(f)*Sin(b)*Sin(e)+a*d*Sin(b)*Sin(c)*Sin(e)*Sin(f)");
             // check("Information(Sin)", "");
@@ -3725,6 +3725,58 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testLevel() {
+		check("Level(x, -1)", //
+				"{}");
+		check("Level(x, 0)", //
+				"{}");
+		check("Level(x, 1)", //
+				"{}");
+		check("demo=x+Cos(Pi/3*Sqrt(2+1/x))+Sin(Pi/6*Sqrt(x))", //
+				"x+Cos(1/3*Pi*Sqrt(2+1/x))+Sin(1/6*Pi*Sqrt(x))");
+		check("Level(demo, 1)", //
+				"{x,Cos(1/3*Pi*Sqrt(2+1/x)),Sin(1/6*Pi*Sqrt(x))}");
+		check("Level(demo, 2)", //
+				"{x,1/3*Pi*Sqrt(2+1/x),Cos(1/3*Pi*Sqrt(2+1/x)),1/6*Pi*Sqrt(x),Sin(1/6*Pi*Sqrt(x))}");
+		check("Level(demo, {2})", //
+				"{1/3*Pi*Sqrt(2+1/x),1/6*Pi*Sqrt(x)}");
+		check("Level(demo, {25})", //
+				"{}");
+		check("Level(demo, {2,4})", //
+				"{1/3,Pi,2+1/x,1/2,Sqrt(2+1/x),1/3*Pi*Sqrt(2+1/x),1/6,Pi,x,1/2,Sqrt(x),1/6*Pi*Sqrt(x)}");
+		check("Level(demo, {0,4})", //
+				"{x,1/3,Pi,2+1/x,1/2,Sqrt(2+1/x),1/3*Pi*Sqrt(2+1/x),Cos(1/3*Pi*Sqrt(2+1/x)),1/6,Pi,x,\n" +
+				"1/2,Sqrt(x),1/6*Pi*Sqrt(x),Sin(1/6*Pi*Sqrt(x)),x+Cos(1/3*Pi*Sqrt(2+1/x))+Sin(1/6*Pi*Sqrt(x))}");
+		check("Level(demo, {-1})", //
+				"{x,1/3,Pi,2,x,-1,1/2,1/6,Pi,x,1/2}");
+		check("Level(demo, {-4})", //
+				"{Sqrt(2+1/x),Sin(1/6*Pi*Sqrt(x))}");
+		check("Level(demo, {-25})", //
+				"{}");
+		check("Level(demo, -4)", //
+				"{Sqrt(2+1/x),1/3*Pi*Sqrt(2+1/x),Cos(1/3*Pi*Sqrt(2+1/x)),Sin(1/6*Pi*Sqrt(x))}");
+		check("Level(demo, -1)", //
+				"{x,1/3,Pi,2,x,-1,1/x,2+1/x,1/2,Sqrt(2+1/x),1/3*Pi*Sqrt(2+1/x),Cos(1/3*Pi*Sqrt(2+1/x)),\n" +
+				"1/6,Pi,x,1/2,Sqrt(x),1/6*Pi*Sqrt(x),Sin(1/6*Pi*Sqrt(x))}");
+		check("Level(demo, Infinity)", //
+				"{x,1/3,Pi,2,x,-1,1/x,2+1/x,1/2,Sqrt(2+1/x),1/3*Pi*Sqrt(2+1/x),Cos(1/3*Pi*Sqrt(2+1/x)),\n" +
+				"1/6,Pi,x,1/2,Sqrt(x),1/6*Pi*Sqrt(x),Sin(1/6*Pi*Sqrt(x))}");
+		check("Level(demo, {1, -3})", //
+				"{2+1/x,Sqrt(2+1/x),1/3*Pi*Sqrt(2+1/x),Cos(1/3*Pi*Sqrt(2+1/x)),1/6*Pi*Sqrt(x),Sin(\n" +
+				"1/6*Pi*Sqrt(x))}");
+		check("Level(demo, {-4, 2})", //
+				"{x,1/6*Pi*Sqrt(x),Sin(1/6*Pi*Sqrt(x))}");
+		check("Level(demo, {0, -1})", //
+				"{x,1/3,Pi,2,x,-1,1/x,2+1/x,1/2,Sqrt(2+1/x),1/3*Pi*Sqrt(2+1/x),Cos(1/3*Pi*Sqrt(2+1/x)),\n" +
+				"1/6,Pi,x,1/2,Sqrt(x),1/6*Pi*Sqrt(x),Sin(1/6*Pi*Sqrt(x)),x+Cos(1/3*Pi*Sqrt(2+1/x))+Sin(\n" +
+				"1/6*Pi*Sqrt(x))}");
+		check("Level(demo, {-Infinity, Infinity})", //
+				"{x,1/3,Pi,2,x,-1,1/x,2+1/x,1/2,Sqrt(2+1/x),1/3*Pi*Sqrt(2+1/x),Cos(1/3*Pi*Sqrt(2+1/x)),\n" +
+				"1/6,Pi,x,1/2,Sqrt(x),1/6*Pi*Sqrt(x),Sin(1/6*Pi*Sqrt(x)),x+Cos(1/3*Pi*Sqrt(2+1/x))+Sin(\n" +
+				"1/6*Pi*Sqrt(x))}");
+		check("Level(demo, {3, -6})", //
+				"{}");
+		check("Level(demo, {-3, -1})", //
+				"{x,1/3,Pi,2,x,-1,1/x,2+1/x,1/2,1/6,Pi,x,1/2,Sqrt(x),1/6*Pi*Sqrt(x)}");
         check("Level(a + f(x, y^n), {-1})", "{a,x,y,n}");
         check("Level(a + b ^ 3 * f(2*x ^ 2), {-1}, g)", "g(a,b,3,2,x,2)");
         check("Level(a + b ^ 3 * f(2*x ^ 2), {-1})", "{a,b,3,2,x,2}");
@@ -3737,8 +3789,8 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("Level(a ^ 2 + 2 * b, {-1}, Heads -> True)", "{Plus,Power,a,2,Times,2,b}");
         check("Level(f(g(h))[x], {-1}, Heads -> True)", "{f,g,h,x}");
         // TODO
-        // check("Level(f(g(h))[x], {-2, -1}, Heads -> True)",
-        // "{f,g,h,g(h),x,f(g(h))[x]}");
+//		 check("Level(f(g(h))[x], {-2, -1}, Heads -> True)",
+//		 "{f,g,h,g(h),x,f(g(h))[x]}");
 
         check("Level(a + f(x, y^n), {-1})", "{a,x,y,n}");
         check("Level(a + f(x, y^n0), 2)", "{a,x,y^n0,f(x,y^n0)}");
@@ -4330,6 +4382,7 @@ public class LowercaseTestCase extends AbstractTestCase {
             check("myGCD(m0_, n0_) :=\n" + " Module({m = m0, n = n0},\n" + "  While(n != 0, {m, n} = {n, Mod(m, n)});\n"
                     + "  m\n" + "  );myGCD(18, 21)", "3");
         }
+		check("xm=10;Module({xm=xm}, xm=xm+1;Print(xm));xm", "10");
     }
 
     public void testMoebiusMu() {
@@ -5360,6 +5413,8 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testPiecewise() {
+		check("Piecewise({})", "0");
+		check("Piecewise({},0)", "0");
         check("Piecewise({{0, x <= 0}}, 1)", "Piecewise({{0,x<=0}},1)");
         check("Piecewise({{1, False}})", "0");
         check("Piecewise({{0 ^ 0, False}}, -1)", "-1");
@@ -7177,9 +7232,9 @@ public class LowercaseTestCase extends AbstractTestCase {
         // y, z}, Integers)", "");
 
         check("Solve((k*Q*q)/r^2+1/r^4==E,r)",
-                "{{r->Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)/Sqrt(2)},{r->-Sqrt((k*q*Q+Sqrt(4*E+k^\n" +
-                        "2*q^2*Q^2))/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q+Sqrt(\n" +
-                        "4*E+k^2*q^2*Q^2))/E))/Sqrt(2)}}");
+				"{{r->Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)/Sqrt(2)},{r->-Sqrt((k*q*Q+Sqrt(4*E+k^\n"
+						+ "2*q^2*Q^2))/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q+Sqrt(\n"
+						+ "4*E+k^2*q^2*Q^2))/E))/Sqrt(2)}}");
         // issue #120
         check("Solve(Sin(x)*x==0, x)", "{{x->0}}");
         check("Solve(Cos(x)*x==0, x)", "{{x->0},{x->Pi/2}}");
@@ -7188,9 +7243,9 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("Solve(x^2+1==0, x)", "{{x->-I},{x->I}}");
         check("Solve((k*Q*q)/r^2==E,r)", "{{r->Sqrt(E*k*q*Q)/E},{r->-Sqrt(E*k*q*Q)/E}}");
         check("Solve((k*Q*q)/r^2+1/r^4==E,r)",
-                "{{r->Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)/Sqrt(2)},{r->-Sqrt((k*q*Q+Sqrt(4*E+k^\n" +
-                        "2*q^2*Q^2))/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q+Sqrt(\n" +
-                        "4*E+k^2*q^2*Q^2))/E))/Sqrt(2)}}");
+				"{{r->Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)/Sqrt(2)},{r->-Sqrt((k*q*Q+Sqrt(4*E+k^\n"
+						+ "2*q^2*Q^2))/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q+Sqrt(\n"
+						+ "4*E+k^2*q^2*Q^2))/E))/Sqrt(2)}}");
         check("Solve((k*Q*q)/r^2+1/r^4==0,r)", "{{r->(-I*Sqrt(k*q*Q))/(k*q*Q)},{r->(I*Sqrt(k*q*Q))/(k*q*Q)}}");
         check("Solve(Abs(x-1) ==1,{x})", "{{x->0},{x->2}}");
         check("Solve(Abs(x^2-1) ==0,{x})", "{{x->-1},{x->1}}");
