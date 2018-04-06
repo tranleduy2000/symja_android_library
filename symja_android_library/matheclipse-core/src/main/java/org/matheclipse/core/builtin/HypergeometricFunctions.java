@@ -517,11 +517,11 @@ public class HypergeometricFunctions {
 			if (a.isSignedNumber() && b.isSignedNumber() && c.isSignedNumber() && z.isSignedNumber()) {
 				double aDouble = ((ISignedNumber) a).doubleValue();
 				double bDouble = ((ISignedNumber) b).doubleValue();
-				double cDuble = ((ISignedNumber) c).doubleValue();
+				double cDouble = ((ISignedNumber) c).doubleValue();
 				double zDouble = ((ISignedNumber) z).doubleValue();
 				try {
 					return F.num(de.lab4inf.math.functions.HypergeometricGaussSeries.gaussSeries(aDouble, bDouble,
-							cDuble, zDouble));
+							cDouble, zDouble));
 				} catch (RuntimeException rex) {
 					engine.printMessage("Hypergeometric2F1: " + rex.getMessage());
 				}
