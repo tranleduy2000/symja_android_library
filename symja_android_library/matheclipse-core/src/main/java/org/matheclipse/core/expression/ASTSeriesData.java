@@ -1,5 +1,6 @@
 package org.matheclipse.core.expression;
 
+import org.hipparchus.util.ArithmeticUtils;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
 import org.matheclipse.core.interfaces.IAST;
@@ -823,7 +824,16 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
         if (power > b.power) {
             maxPower = b.power;
         }
-        ASTSeriesData series = new ASTSeriesData(x, x0, minSize, maxPower, denominator);
+		int newDenominator = denominator;
+		if (denominator != b.denominator) {
+			newDenominator = ArithmeticUtils.lcm(denominator, b.denominator);
+			int rest = maxPower % newDenominator;
+			if (rest != 0) {
+				int div = maxPower / newDenominator;
+				maxPower = div * newDenominator + newDenominator;
+			}
+		}
+		ASTSeriesData series = new ASTSeriesData(x, x0, minSize, maxPower, newDenominator);
         for (int i = minSize; i < maxSize; i++) {
             series.setCoeff(i, this.coeff(i).plus(b.coeff(i)));
         }
@@ -1033,19 +1043,25 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
 		if (b.power > power) {
             newPower = b.power;
         }
-		int rest = newPower % denominator;
+		int newDenominator = denominator;
+		if (denominator != b.denominator) {
+			newDenominator = ArithmeticUtils.lcm(denominator, b.denominator);
+			int rest = newPower % newDenominator;
 		if (rest != 0) {
-			int div = newPower / denominator;
-			newPower = div * denominator + denominator;
+				int div = newPower / newDenominator;
+				newPower = div * newDenominator + newDenominator;
 		} else {
 			// if (b.power != power) {
             newPower++;
 			// }
         }
+		} else {
 		// if (b.power != power) {
-		// newPower++;
+			newPower++;
 		// }
-		ASTSeriesData series = new ASTSeriesData(x, x0, nMin + b.nMin, newPower, denominator);
+		}
+
+		ASTSeriesData series = new ASTSeriesData(x, x0, nMin + b.nMin, newPower, newDenominator);
         int start = series.nMin;
 		int end = nMax + b.nMax + 1;
 		for (int n = start; n < end; n++) {
