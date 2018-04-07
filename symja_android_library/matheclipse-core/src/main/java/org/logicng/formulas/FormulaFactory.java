@@ -28,6 +28,8 @@
 
 package org.logicng.formulas;
 
+import com.duy.util.DObjects;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 import org.logicng.formulas.printer.DefaultStringRepresentation;
@@ -49,7 +51,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static org.logicng.formulas.FType.AND;
@@ -1070,7 +1071,7 @@ public class FormulaFactory {
 
     @Override
     public int hashCode() {
-      return Objects.hash(this.rhs, this.comparator, Arrays.hashCode(coefficients), Arrays.hashCode(literals));
+      return DObjects.hash(this.rhs, this.comparator, Arrays.hashCode(coefficients), Arrays.hashCode(literals));
     }
 
     @Override
@@ -1296,12 +1297,12 @@ public class FormulaFactory {
               ccCounter == that.ccCounter &&
               pbCounter == that.pbCounter &&
               cnfCounter == that.cnfCounter &&
-              Objects.equals(name, that.name);
+              DObjects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(name, positiveLiterals, negativeLiterals, negations, implications, equivalences, conjunctions2,
+      return DObjects.hash(name, positiveLiterals, negativeLiterals, negations, implications, equivalences, conjunctions2,
               conjunctions3, conjunctions4, conjunctionsN, disjunctions2, disjunctions3, disjunctions4, disjunctionsN,
               ccCounter, pbCounter, cnfCounter);
     }
