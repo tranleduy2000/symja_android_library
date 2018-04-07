@@ -1779,6 +1779,10 @@ public class Algebra {
 			return super.evaluate(ast, engine);
 		}
 
+        @Override
+        public boolean isFullSimplifyMode() {
+            return true;
+        }
 	}
 
 	/**

@@ -95,7 +95,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	/**
 	 * A default random sequence generator.
 	 */
-	protected final static ThreadLocalRandom random = ThreadLocalRandom.current();
+	protected final static Random random = new Random();
 
 	/**
 	 * Indicator if this ring is a field.

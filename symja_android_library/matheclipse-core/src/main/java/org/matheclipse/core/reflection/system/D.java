@@ -1,8 +1,13 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.ObjIntConsumer;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.BinaryBindIth1st;
 import org.matheclipse.core.interfaces.IAST;
@@ -12,10 +17,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.DRules;
-
-import com.duy.lambda.BiFunction;
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.ObjIntConsumer;
 
 /**
  * <pre>
@@ -350,8 +351,21 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 
 		}
 
+		if (!(x.isList())) {
+			if (fx instanceof ASTSeriesData) {
+				ASTSeriesData series = ((ASTSeriesData) fx);
+				if (series.getX().equals(x)) {
+					final IExpr temp = ((ASTSeriesData) fx).derive(x);
+					if (temp != null) {
+						return temp;
+					}
+					return F.NIL;
+				}
+				return F.C0;
+			}
 		if (!(x.isList()) && fx.isFree(x, true)) {
 			return F.C0;
+		}
 		}
 		if (fx.isNumber()) {
 			// D[x_NumberQ,y_] -> 0
@@ -370,15 +384,16 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 				return listArg1.mapThread(F.D(F.Null, x), 1);
 			} else if (listArg1.isTimes()) {
 				return listArg1.map(F.PlusAlloc(16), new BinaryBindIth1st(listArg1, F.D(F.Null, x)));
-			} else if (listArg1.isPower()) {// && !listArg1.isFreeAt(1, x) && !listArg1.isFreeAt(2, x)) {
-				final IExpr f = listArg1.arg1();
-				final IExpr g = listArg1.arg2();
+			} else if (listArg1.isPower()) {
+				// f ^ g
+				final IExpr f = listArg1.base();
+				final IExpr g = listArg1.exponent();
 				final IExpr y = ast.arg2();
-				if (listArg1.isFreeAt(2, x)) {
+				if (g.isFree(x)) {
 					// g*D(f,y)*f^(g-1)
 					return F.Times(g, F.D(f, y), F.Power(f, g.dec()));
 				}
-				if (listArg1.isFreeAt(1, x)) {
+				if (f.isFree(x)) {
 					// D(g,y)*Log(f)*f^g
 					return F.Times(F.D(g, y), F.Log(f), F.Power(f, g));
 				}
