@@ -4382,6 +4382,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 			check("myGCD(m0_, n0_) :=\n" + " Module({m = m0, n = n0},\n" + "  While(n != 0, {m, n} = {n, Mod(m, n)});\n"
 					+ "  m\n" + "  );myGCD(18, 21)", "3");
 		}
+
 		check("xm=10;Module({xm=xm}, xm=xm+1;Print(xm));xm", "10");
 	}
 
@@ -4911,7 +4912,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Norm({x, y}, 0.5)", "Norm({x,y},0.5)");
 		check("Norm({})", "Norm({})");
 	}
-
 
 	public void testNormalize() {
 		check("Normalize({0})", "{0}");
@@ -5652,6 +5652,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPower() {
+
 		check("Sqrt(63/5)", "3*Sqrt(7/5)");
 		check("Sqrt(9/2)", "3/Sqrt(2)");
 		check("Sqrt(1/2)", "1/Sqrt(2)");
@@ -5744,6 +5745,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("E^(y+Log(x)-z)", "E^(y-z)*x");
 		check("E^(y-Log(x)-z)", "E^(y-z)/x");
 		check("E^(y+Log(x)-a*Log(v)*b*Log(u)-z)", "(E^(y-z)*x)/v^(a*b*Log(u))");
+
 		check("Sqrt(1/a)", "Sqrt(1/a)");
 	}
 
@@ -5966,6 +5968,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ProductLog(-1, -(Pi/2))", "-I*1/2*Pi");
 		check("ProductLog(-1, -(1/E))", "-1");
 		check("Refine(ProductLog(k, 0), k>1)", "-Infinity");
+
 		check("ProductLog(2.5 + 2*I)", "1.05616796894863+I*3.5256052020787e-1");
 
 		check("z == ProductLog(z) * E ^ ProductLog(z)", "True");
@@ -6160,6 +6163,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRationalize() {
+		check("ArcCos(-Rationalize(0.5))", "2/3*Pi");
 		check("Rationalize(0.202898)", "101449/500000");
 		check("Rationalize(1.2 + 6.7*x)", "6/5+67/10*x");
 		check("Rationalize(Exp(Sqrt(2)), 2^-12)", "218/53");
@@ -8093,6 +8097,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Times()", "1");
 		// OutputForm: I*Infinity is DirectedInfinity[I]
 		check("I*Infinity", "I*Infinity");
+
 		check("Gamma(a)*Gamma(1-a)", "Pi*Csc(a*Pi)");
 		check("Gamma(a)^3*Gamma(1-a)^3", "Pi^3*Csc(a*Pi)^3");
 		check("Gamma(a)^3*Gamma(1-a)^2", "Pi^2*Csc(a*Pi)^2*Gamma(a)");
