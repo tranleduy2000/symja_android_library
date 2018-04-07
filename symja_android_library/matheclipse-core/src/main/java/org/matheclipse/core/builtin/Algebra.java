@@ -1,8 +1,8 @@
 package org.matheclipse.core.builtin;
 
 import com.duy.lambda.BiPredicate;
-import com.duy.lambda.Function;
 import com.duy.lambda.Consumer;
+import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
@@ -44,6 +44,9 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcherEvalEngine;
+import org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcher;
+import org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcherPlus;
+import org.matheclipse.core.patternmatching.hash.HashedPatternRules;
 import org.matheclipse.core.polynomials.ExprMonomial;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
@@ -100,6 +103,8 @@ import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.x;
+import static org.matheclipse.core.expression.F.x_;
 
 
 public class Algebra {
@@ -1221,8 +1226,9 @@ public class Algebra {
 			 * Evaluate <code>expr1 * expr2</code> and expand the resulting expression, if it's an <code>IAST</code>.
 			 * After that add the resulting expression to the <code>PlusOp</code>
 			 *
+			 * @param expr1
+			 * @param expr2
 			 * @param result
-			 * @param expr
 			 */
 			public void evalAndExpandAST(IExpr expr1, IExpr expr2, final IASTAppendable result) {
 				IExpr arg = TimesOp.times(expr1, expr2);
@@ -2234,52 +2240,6 @@ public class Algebra {
 
 		}
 
-		/**
-		 *
-		 * @param polnomialExpr
-		 * @param variables
-		 * @param numericFunction
-		 * @return
-		 * @deprecated use
-		 *             <code>ExprPolynomialRing ring = new ExprPolynomialRing(variables); ExprPolynomial poly = ring.create(polnomialExpr);</code>
-		 *             if possible.
-		 */
-		// private static GenPolynomial<IExpr> polynomial(final IExpr polnomialExpr,
-		// final IAST variables,
-		// boolean numericFunction) {
-		// IExpr expr = F.evalExpandAll(polnomialExpr, engine);
-		// int termOrder = ExprTermOrder.INVLEX;
-		// ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST,
-		// variables, variables.argSize(),
-		// new ExprTermOrder(termOrder), true);
-		// try {
-		// ExprPolynomial poly = ring.create(expr);
-		// ASTRange r = new ASTRange(variables, 1);
-		// JASIExpr jas = new JASIExpr(r, numericFunction);
-		// return jas.expr2IExprJAS(poly);
-		// } catch (RuntimeException ex) {
-		//
-		// }
-		// return null;
-		// }
-
-		/**
-		 *
-		 * @param polnomialExpr
-//		 * @param symbol
-//		 * @param numericFunction
-		 * @return
-		 * @deprecated use
-		 *             <code>ExprPolynomialRing ring = new ExprPolynomialRing(symbol); ExprPolynomial poly = ring.create(polnomialExpr);</code>
-		 *             if possible
-		 */
-		// private static GenPolynomial<IExpr> polynomial(final IExpr polnomialExpr,
-		// final ISymbol symbol,
-		// boolean numericFunction) {
-		// return polynomial(polnomialExpr, List(symbol), numericFunction);
-		// }
-
-		@Deprecated
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
@@ -3027,6 +2987,16 @@ public class Algebra {
 	 * </pre>
 	 */
 	private static class Simplify extends AbstractFunctionEvaluator {
+		private static HashedOrderlessMatcherPlus PLUS_ORDERLESS_MATCHER = new HashedOrderlessMatcherPlus();
+		static {
+			// Cosh(x)+Sinh(x) -> Exp(x)
+			PLUS_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRules(//
+					F.Cosh(x_), //
+					F.Sinh(x_), //
+					F.Exp(x), //
+					null, //
+					true));
+		}
 
 		private static class IsBasicExpressionVisitor extends AbstractVisitorBoolean {
 			public IsBasicExpressionVisitor() {
@@ -3090,9 +3060,14 @@ public class Algebra {
 			 */
 			final Function<IExpr, Long> fComplexityFunction;
 
-			public SimplifyVisitor(Function<IExpr, Long> complexityFunction) {
+			/**
+			 * If <code>true</code> we are in full simplify mode
+			 */
+			final boolean fFullSimplify;
+			public SimplifyVisitor(Function<IExpr, Long> complexityFunction, boolean fullSimplify) {
 				super();
 				fComplexityFunction = complexityFunction;
+				fFullSimplify = fullSimplify;
 			}
 
 			private IExpr tryExpandAllTransformation(IAST plusAST, IExpr test) {
@@ -3218,6 +3193,17 @@ public class Algebra {
 					if (temp.isPresent()) {
 						return temp;
 					}
+					if (fFullSimplify) {
+						HashedOrderlessMatcher hashRuleMap = PLUS_ORDERLESS_MATCHER;
+						if (hashRuleMap != null) {
+							ast.setEvalFlags(0);
+							EvalEngine engine = EvalEngine.get();
+							temp = hashRuleMap.evaluateRepeated(ast, engine);
+							if (temp.isPresent()) {
+								return engine.evaluate(temp);
+							}
+						}
+					}
 					return result;
 
 				} else if (ast.isTimes()) {
@@ -3338,24 +3324,35 @@ public class Algebra {
 					arg1 = temp;
 				}
 
-				temp = arg1.accept(new SimplifyVisitor(complexityFunction));
-				while (temp.isPresent()) {
-					count = complexityFunction.apply(temp);
-					if (count < minCounter) {
-						minCounter = count;
-						result = temp;
-						temp = result.accept(new SimplifyVisitor(complexityFunction));
-					} else {
-						return result;
-					}
-				}
-				return result;
+				return simplifyStep(arg1, complexityFunction, minCounter, result);
 
 			} catch (ArithmeticException e) {
 				//
 			}
 			return F.NIL;
 		}
+
+		private IExpr simplifyStep(IExpr arg1, Function<IExpr, Long> complexityFunction, long minCounter,
+				IExpr result) {
+			long count;
+			IExpr temp;
+			temp = arg1.accept(new SimplifyVisitor(complexityFunction, isFullSimplifyMode()));
+				while (temp.isPresent()) {
+					count = complexityFunction.apply(temp);
+					if (count < minCounter) {
+						minCounter = count;
+						result = temp;
+					temp = result.accept(new SimplifyVisitor(complexityFunction, isFullSimplifyMode()));
+					} else {
+						return result;
+					}
+				}
+				return result;
+		}
+
+		public boolean isFullSimplifyMode() {
+			return false;
+			}
 
 		/**
 		 * Creata the complexity function which determines the &quot;more simplified&quot; expression.
