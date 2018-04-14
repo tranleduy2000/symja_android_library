@@ -2885,26 +2885,14 @@ public final class LinearAlgebra {
 
     private static class Orthogonalize extends AbstractEvaluator {
 
-        static BuiltInSymbol oneStep = new BuiltInSymbol("oneStep", Integer.MAX_VALUE);
-
-        static {
-            IEvaluator evaluator = new AbstractEvaluator() {
-                @Override
-                public IExpr evaluate(IAST ast, EvalEngine engine) {
-                    IExpr vec = ast.arg1();
-                    IExpr vecmat = ast.arg2();
+        static IBuiltInSymbol oneStep = F.localBiFunction("oneStep", (vec, vecmat) -> {
                     if (vecmat.equals(F.List())) {
                         return vec;
                     }
-                    // (#1-(vec.#2)/(#2.#2)*#2)&
-                    IExpr result = F.Fold(F.Function(F.Plus(F.Slot1,
-                            F.Times(F.CN1, F.Dot(vec, F.Slot2), F.Power(F.Dot(F.Slot2, F.Slot2), -1), F.Slot2))), vec,
-                            vecmat);
-                    return F.eval(result);
-                }
-            };
-            oneStep.setEvaluator(evaluator);
-        }
+            IExpr function = // [$ (#1-(vec.#2)/(#2.#2)*#2)& $]
+                    F.Function(F.Plus(F.Slot1, F.Times(F.CN1, F.Dot(vec, F.Slot2), F.Power(F.Dot(F.Slot2, F.Slot2), -1), F.Slot2))); // $$;
+            return F.eval(F.Fold(function, vec, vecmat));
+        });
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 2, 3);

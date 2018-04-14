@@ -7,8 +7,10 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -114,6 +116,13 @@ public class ExprPreprocessor {
 							String str = convertSource(inputString);
 							if (str != null) {
 								System.out.println(str);
+								try {
+									BufferedWriter out = new BufferedWriter(new FileWriter(sourceFile));
+									out.write(str);
+									out.close();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
 							}
 						} catch (Exception e) {
 							e.printStackTrace();

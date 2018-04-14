@@ -1,8 +1,10 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.BiFunction;
+import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.math.DoubleMath;
@@ -44,6 +46,7 @@ import org.matheclipse.core.builtin.TensorFunctions;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.eval.util.Lambda;
 import org.matheclipse.core.generic.Functors;
@@ -4974,6 +4977,49 @@ public class F {
 		return new Symbol(name, Context.DUMMY);
 	}
 
+	public static IBuiltInSymbol localBiFunction(final String symbolName, BiFunction<IExpr, IExpr, IExpr> function) {
+		IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
+		localBuittIn.setEvaluator(new AbstractEvaluator() {
+			@Override
+			public IExpr evaluate(IAST ast, EvalEngine engine) {
+				return function.apply(ast.arg1(), ast.arg2());
+			}
+		});
+		return localBuittIn;
+	}
+
+	public static IBuiltInSymbol localFunction(final String symbolName, Function<IExpr, IExpr> function) {
+		IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
+		localBuittIn.setEvaluator(new AbstractEvaluator() {
+			@Override
+			public IExpr evaluate(IAST ast, EvalEngine engine) {
+				return function.apply(ast.arg1());
+			}
+		});
+		return localBuittIn;
+	}
+
+	public static IBuiltInSymbol localBiPredicate(final String symbolName, BiPredicate<IExpr, IExpr> function) {
+		IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
+		localBuittIn.setEvaluator(new AbstractEvaluator() {
+			@Override
+			public IExpr evaluate(IAST ast, EvalEngine engine) {
+				return F.bool(function.test(ast.arg1(), ast.arg2()));
+			}
+		});
+		return localBuittIn;
+	}
+
+	public static IBuiltInSymbol localPredicate(final String symbolName, Predicate<IExpr> function) {
+		IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
+		localBuittIn.setEvaluator(new AbstractEvaluator() {
+			@Override
+			public IExpr evaluate(IAST ast, EvalEngine engine) {
+				return F.bool(function.test(ast.arg1()));
+			}
+		});
+		return localBuittIn;
+	}
 	/**
 	 * Remove a user-defined symbol from the eval engines context path. Doesn't remove predefined names from the System
 	 * Context.
