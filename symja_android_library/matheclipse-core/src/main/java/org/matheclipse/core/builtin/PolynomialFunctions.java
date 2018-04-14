@@ -209,8 +209,8 @@ public class PolynomialFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			IExpr expr = F.evalExpandAll(ast.arg1(), engine);
-			ISymbol arg2 = Validate.checkSymbolType(ast, 2);
-			return coefficientList(expr, arg2);
+			IAST list = Validate.checkSymbolOrSymbolList(ast, 2);
+			return coefficientList(expr, list);
 		}
 
 		private static long univariateCoefficientList(IExpr polynomial, final ISymbol variable, List<IExpr> resultList)
@@ -1439,15 +1439,18 @@ public class PolynomialFunctions {
 		}
 	}
 
-	public static IAST coefficientList(IExpr expr, IExpr x) {
+	public static IAST coefficientList(IExpr expr, IAST coefficientList) {
 		try {
-			ExprPolynomialRing ring = new ExprPolynomialRing(F.List(x));
+			ExprPolynomialRing ring = new ExprPolynomialRing(coefficientList);
 			ExprPolynomial poly = ring.create(expr);
 			if (poly.isZero()) {
 				return F.List();
 			}
 			return poly.coefficientList();
 		} catch (RuntimeException ex) {
+			if (Config.SHOW_STACKTRACE) {
+				ex.printStackTrace();
+			}
 			// throw new WrongArgumentType(ast, expr, 1, "Polynomial expected!");
 		}
 		return F.NIL;

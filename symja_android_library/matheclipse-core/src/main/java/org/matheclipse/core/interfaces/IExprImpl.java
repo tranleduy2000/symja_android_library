@@ -255,6 +255,31 @@ public abstract class IExprImpl implements IExpr {
     }
 
     /**
+     * Get a nested list with <code>this</code> expression set as a value.
+     * <p>
+     * <pre>
+     * v.constantArray(2, 3) -> {{v, v, v}, {v, v, v}}
+     * </pre>
+     *
+     * @param startPosition the position from there to create the constant array recusively.
+     * @param arr           the nested lists dimensions. <code>arr.length</code> must be greater <code>0</code>
+     * @return <code>F.NIL</code> if <code>arr</code> has length 0.
+     */
+     public IASTAppendable constantArray(final int startPosition, int... arr) {
+        if (arr.length - 1 == startPosition) {
+            IASTAppendable list = F.ListAlloc(arr[startPosition]);
+            for (int i = 0; i < arr[startPosition]; i++) {
+                list.append(this);
+            }
+            return list;
+        }
+        IASTAppendable list = F.ListAlloc(arr[startPosition]);
+        for (int i = 0; i < arr[startPosition]; i++) {
+            list.append(constantArray(startPosition + 1, arr));
+        }
+        return list;
+    }
+    /**
      * Return <code>negate()</code> if <code>number.sign() < 0</code>, otherwise return <code>this</code>
      *
      * @param number
@@ -303,6 +328,17 @@ public abstract class IExprImpl implements IExpr {
         throw new UnsupportedOperationException(toString());
     }
 
+    /**
+     * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>. Returns
+     * <code>false</code> otherwise.
+     *
+     * @param position the position in the <code>IAST</code> which should be tested for equality
+     * @param expr     the expression which should be tested for equality
+     * @return
+     */
+    public boolean equalsAt(int position, final IExpr expr) {
+        return false;
+    }
 
     /**
      * Compare if <code>this == that</code:
@@ -320,18 +356,6 @@ public abstract class IExprImpl implements IExpr {
         return ExprUtil.convertToExpr(temp);
     }
 
-    /**
-     * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>. Returns
-     * <code>false</code> otherwise.
-     *
-     * @param position the position in the <code>IAST</code> which should be tested for equality
-     * @param expr     the expression which should be tested for equality
-     * @return
-     */
-    @Override
-    public boolean equalsAt(int position, final IExpr expr) {
-        return false;
-    }
 
     /**
      * Evaluate the expression to a <code>INumber</code> value.
@@ -575,6 +599,7 @@ public abstract class IExprImpl implements IExpr {
      * @param depth                  the recursion depth of this call. <code>0</code> indicates &quot;recurse without a limit&quot;.
      * @param useOperators           use operators instead of function names for representation of Plus, Times, Power,...
      * @param usePrefix              use the <code>F....</code> class prefix for genrating Java code.
+     * @param noSymbolPrefix         TODO
      * @return the internal Java form of this expression
      */
     public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators,

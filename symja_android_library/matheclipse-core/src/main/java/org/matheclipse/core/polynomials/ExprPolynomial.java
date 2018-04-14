@@ -1,10 +1,5 @@
 package org.matheclipse.core.polynomials;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import com.duy.lambda.Function;
 
 import org.apache.log4j.Logger;
@@ -12,7 +7,14 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import edu.jas.kern.PreemptingException;
 import edu.jas.kern.PrettyPrint;
@@ -2342,8 +2344,9 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 	 * @return the coefficients of a univariate polynomial up to n degree
 	 */
 	public IAST coefficientList() {
-		Validate.checkSize(ring.getVars(), 2);
 
+		int size = ring.getVars().size();
+		if (size == 2) {
 		long exp;
 		if (ring.tord.getEvord() == ExprTermOrder.IGRLEX || ring.tord.getEvord() == ExprTermOrder.REVILEX) {
 			long lastDegree = degree();
@@ -2372,7 +2375,32 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 			}
 			return result;
 		}
+		} else if (size > 2) {
+			long exp;
+			int[] arr = new int[size - 1];
+			for (int j = 0; j < size - 1; j++) {
+				arr[j] = (int) degree(j) + 1;
+			}
+			IASTMutable constantArray = F.C0.constantArray(0, arr);
 
+			long lastDegree = degree();
+			// IASTAppendable result = F.ListAlloc(val.size());
+			for (ExpVectorLong expArray : val.keySet()) {
+				// IExpr[] exprs = new IExpr[(int) lastDegree + 1];
+				// for (int i = 0; i < exprs.length; i++) {
+				// exprs[i] = F.C0;
+				// }
+				int[] positions = new int[size - 1];
+				for (int i = 0; i < expArray.length(); i++) {
+					exp = expArray.getVal(i);
+					positions[expArray.varIndex(i)] = (int) exp + 1;
+				}
+				constantArray.setPart(val.get(expArray), positions);
+				// result.append(F.ast(exprs, F.List));
+			}
+			return constantArray;
+		}
+		return F.NIL;
 	}
 
 	/**
