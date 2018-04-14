@@ -1444,7 +1444,7 @@ public class PolynomialFunctions {
 	public static IAST coefficientList(IExpr expr, IAST coefficientList) {
 		try {
 			ExprPolynomialRing ring = new ExprPolynomialRing(coefficientList);
-			ExprPolynomial poly = ring.create(expr);
+			ExprPolynomial poly = ring.create(expr,true,false);
 			if (poly.isZero()) {
 				return F.List();
 			}
