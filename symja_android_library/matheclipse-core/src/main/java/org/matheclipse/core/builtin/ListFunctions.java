@@ -896,20 +896,45 @@ public final class ListFunctions {
 			IASTAppendable result = matrix.copyHead(dim[0] + m + n);
 			IAST row;
 			// prepend m rows
-			result.appendArgs(0, m, i -> atom.constantArray(F.List, 0, columnDim));
+			result.appendArgs(0, m, new IntFunction<IExpr>() {
+                @Override
+                public IExpr apply(int i) {
+                    return atom.constantArray(F.List, 0, columnDim);
+                }
+            });
 
-			result.appendArgs(1, dim[0] + 1, i -> arrayPadAtom(matrix.getAST(i), m, n, atom));
+			result.appendArgs(1, dim[0] + 1, new IntFunction<IExpr>() {
+				@Override
+				public IExpr apply(int i) {
+					return arrayPadAtom(matrix.getAST(i), m, n, atom);
+				}
+			});
 
 			// append n rows
-			result.appendArgs(0, n, i -> atom.constantArray(F.List, 0, columnDim));
+			result.appendArgs(0, n, new IntFunction<IExpr>() {
+				@Override
+				public IExpr apply(int i) {
+					return atom.constantArray(F.List, 0, columnDim);
+				}
+			});
 			return result;
 		}
 
 		private static IExpr arrayPadAtom(IAST ast, int m, int n, IExpr atom) {
 			IASTAppendable result = ast.copyHead();
-			result.appendArgs(0, m, i -> atom);
+			result.appendArgs(0, m, new IntFunction<IExpr>() {
+				@Override
+				public IExpr apply(int i) {
+					return atom;
+				}
+			});
 			result.appendArgs(ast);
-			result.appendArgs(0, n, i -> atom);
+			result.appendArgs(0, n, new IntFunction<IExpr>() {
+				@Override
+				public IExpr apply(int i) {
+					return atom;
+				}
+			});
 			return result;
 		}
 

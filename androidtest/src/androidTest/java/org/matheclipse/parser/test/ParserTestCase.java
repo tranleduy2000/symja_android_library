@@ -2,11 +2,11 @@ package org.matheclipse.parser.test;
 
 import junit.framework.TestCase;
 
-import java.util.List;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
+
+import java.util.List;
 
 /**
  * Tests parser function for SimpleParserFactory
@@ -427,6 +427,17 @@ public class ParserTestCase extends TestCase {
 			Parser p = new Parser();
 			ASTNode obj = p.parse("f[x,y,]");
 			assertEquals(obj.toString(), "f(x, y, Null)");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+	public void testParser31() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("#1.#123");
+			assertEquals(obj.toString(),
+					"Dot(Slot(1), Slot(123))");
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals("", e.getMessage());

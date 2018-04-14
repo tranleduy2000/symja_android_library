@@ -1922,7 +1922,12 @@ public class StatisticsFunctions {
                                 if (arg2.isList()) {
                                     int[] indx = Validate.checkListOfInts(arg2, 0, Integer.MAX_VALUE);
                                     IASTAppendable list = F.ListAlloc(indx[0]);
-                                    return createArray(indx, 0, list, () -> variate.randomVariate(random, dist));
+                                    return createArray(indx, 0, list, new Supplier<IExpr>() {
+                                        @Override
+                                        public IExpr get() {
+                                            return variate.randomVariate(random, dist);
+                                        }
+                                    });
                                 } else {
                                     int n = arg2.toIntDefault(Integer.MIN_VALUE);
                                     if (n >= 0) {
@@ -2000,7 +2005,12 @@ public class StatisticsFunctions {
                 }
                 if (dim != null) {
                     IAST matrix = (IAST) arg1;
-                    return matrix.mapMatrixColumns(dim, x -> F.StandardDeviation(x));
+                    return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+                        @Override
+                        public IExpr apply(IExpr x) {
+                            return F.StandardDeviation(x);
+                        }
+                    });
                 }
             }
             return F.Sqrt(F.Variance(ast.arg1()));

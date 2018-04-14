@@ -756,6 +756,7 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testCDF() {
+        check("CDF(NormalDistribution(n, m),k)", "Erfc((-k+n)/(Sqrt(2)*m))/2");
         check("CDF(BernoulliDistribution(p),k)", "Piecewise({{0,k<0},{1-p,0<=k&&k<1}},1)");
         check("CDF(BinomialDistribution(n, m),k)",
                 "Piecewise({{BetaRegularized(1-m,n-Floor(k),1+Floor(k)),0<=k&&k<n},{1,k>=n}},0)");
@@ -1945,6 +1946,7 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testDot() {
+        check("#1.#123 // FullForm", "\"Dot(Slot(1), Slot(123))\"");
         check("{{1, 2}, {3.0, 4}, {5, 6}}.{1,1}", "{3.0,7.0,11.0}");
         check("{{1, 2}, {3.0, 4}, {5, 6}}.{{1},{1}}", "{{3.0},\n" + " {7.0},\n" + " {11.0}}");
         check("{1,1,1}.{{1, 2}, {3.0, 4}, {5, 6}}", "{9.0,12.0}");
@@ -3223,8 +3225,37 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testHoldForm() {
-        check("HoldForm(3*2)", "3*2");
-        check("HoldForm(6/8)==6/8", "6/8==3/4");
+        check("HoldForm(3*2)", //
+                "3*2");
+        check("HoldForm(6/8)==6/8", //
+                "6/8==3/4");
+    }
+
+    public void testHoldPattern() {
+        check("MatchQ(And(x, y, z), p__)", //
+                "True");
+        // because of OneIdentity attribute for Times
+        check("MatchQ(And(x, y, z), Times(p__))", //
+                "True");
+        check("Times(p__)===And(p__)", //
+                "True");
+        check("MatchQ(And(x, y, z), HoldPattern(Times(p__)))", //
+                "False");
+        check("HoldPattern(Times(p__))===HoldPattern(And(p__))", //
+                "False");
+        check("And(x, y, z)/.HoldPattern(And(a__)) ->List(a)", //
+                "{x,y,z}");
+        check("And(x, y, z)/.And->List", //
+                "{x,y,z}");
+        check("And(x, y, z)/.And(a_,b___)->List(a,b)", //
+                "{x,y,z}");
+
+        check("a + b /. HoldPattern(_ + _) -> 0", //
+                "0");
+        check("MatchQ(Log(a, b), HoldPattern(Log(_)/Log(_)))", //
+                "True");
+        check("Cases({a -> b, c -> d}, HoldPattern(a -> _))", //
+                "{a->b}");
     }
 
     public void testHornerForm() {
@@ -4241,10 +4272,10 @@ public class LowercaseTestCase extends AbstractTestCase {
     public void testMatchQ() {
         check("MatchQ(Simplify(1 + 1/GoldenRatio - GoldenRatio), 0)", "True");
 
-        check("MatchQ(Sin(Cos(x)), F_(G_(v_)) /; F==Sin&&G==Cos&&v==x )", "True");
-        check("MatchQ(Sin(x*y), F_(G_(v_)) /; Print(F,G,v) )", "False");
+        check("MatchQ(Sin(Cos(x)), HoldPattern(F_(G_(v_))) /; F==Sin&&G==Cos&&v==x )", "True");
+        check("MatchQ(Sin(x*y), HoldPattern(F_(G_(v_))) /; Print(F,G,v) )", "False");
 
-        check("MatchQ(Sin(Cos(x)), F_(G_(v_)))", "True");
+        check("MatchQ(Sin(Cos(x)), HoldPattern(F_(G_(v_))))", "True");
 
         check("MatchQ(Sin(3*y),Sin(u_*v_) /; IntegerQ(u))", "True");
         check("MatchQ(123, _Integer)", "True");
@@ -5253,9 +5284,21 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("f(a, b, c) /. f(a, c) -> d", "f(b,d)");
     }
 
-    // public void testOrthogonalize() {
-    // check("Orthogonalize({{1, 0, 1}, {1, 1, 1}})", "");
-    // }
+    public void testOrthogonalize() {
+        check("Orthogonalize({{3,1},{2,2}})", //
+                "{{3/Sqrt(10),1/Sqrt(10)},{-Sqrt(5/2)/5,3/5*Sqrt(5/2)}}");
+        check("Orthogonalize({{1,0,1},{1,1,1}})", //
+                "{{1/Sqrt(2),0,1/Sqrt(2)},{0,1,0}}");
+        check("Orthogonalize({{1, 2}, {3, 1}, {6, 9}, {7, 8}})", //
+                "{{1/Sqrt(5),2/Sqrt(5)},{2/Sqrt(5),-1/Sqrt(5)},{0,0},{0,0}}");
+        check("Orthogonalize({{2,3}, {2,7}, {4,5}})", //
+                "{{2/Sqrt(13),3/Sqrt(13)},{-3/Sqrt(13),2/Sqrt(13)},{0,0}}");
+        check("Orthogonalize({{1,2,3},{5,2,7},{3,5,1}})", //
+                "{{1/Sqrt(14),2/Sqrt(14),3/Sqrt(14)},{5/7*Sqrt(7/6),-4/7*Sqrt(7/6),Sqrt(7/6)/7},{1/Sqrt(\n"
+                        + "3),1/Sqrt(3),-1/Sqrt(3)}}");
+        check("Orthogonalize({{1,0,0},{0,0,1}})", //
+                "{{1,0,0},{0,0,1}}");
+    }
 
     public void testOuter() {
         check("Outer(f, {a, b}, {x, y, z})", "{{f(a,x),f(a,y),f(a,z)},{f(b,x),f(b,y),f(b,z)}}");
@@ -6187,6 +6230,10 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testQuantile() {
+        check("Quantile(NormalDistribution(m, s))", //
+                "ConditionalExpression(m-Sqrt(2)*s*InverseErfc(2*#1),0<=#1<=1)&");
+        check("Quantile(NormalDistribution(m, s), q)", //
+                "ConditionalExpression(m-Sqrt(2)*s*InverseErfc(2*q),0<=q<=1)");
         check("Quantile({1, 2, 3, 4, 5, 6, 7}, 1/2)", "4");
 
         check("Quantile({1,2}, 0.5)", "1");
@@ -6252,12 +6299,18 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testRandomVariate() {
-        // check("RandomVariate(DiscreteUniformDistribution({3,7}), {2})", "{3,7}");
-        // check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3})", "{{5,4,7},{5,7,3}}");
-        // check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3,4})",
-        // "{{{4,5,5,3},{5,4,4,6},{6,3,4,7}},{{6,6,7,3},{4,6,5,6},{7,7,6,5}}}");
-        // check("RandomVariate(DiscreteUniformDistribution({3,7}), 10)", "{6,5,7,7,7,7,4,5,6,3}");
-        // check("RandomVariate(DiscreteUniformDistribution({1, 5}) )", "3");
+//		check("RandomVariate(NormalDistribution(2,3), 10^1)", //
+//				"{1.14364,6.09674,5.16495,2.39937,-0.52143,-1.46678,3.60142,-0.85405,2.06373,-0.29795}");
+//		check("RandomVariate(NormalDistribution(2,3))", //
+//				"1.99583");
+//		check("RandomVariate(NormalDistribution())", //
+//				"-0.56291");
+//		check("RandomVariate(DiscreteUniformDistribution({3,7}), {2})", "{3,7}");
+//		check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3})", "{{5,4,7},{5,7,3}}");
+//		check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3,4})",
+//				"{{{4,5,5,3},{5,4,4,6},{6,3,4,7}},{{6,6,7,3},{4,6,5,6},{7,7,6,5}}}");
+//		check("RandomVariate(DiscreteUniformDistribution({3,7}), 10)", "{6,5,7,7,7,7,4,5,6,3}");
+//		check("RandomVariate(DiscreteUniformDistribution({1, 5}) )", "3");
     }
 
     public void testRange() {
@@ -7096,6 +7149,9 @@ public class LowercaseTestCase extends AbstractTestCase {
         // check("B[[1;;2, 2;;-1]] = {{t, u}, {y, z}}", "{{t,u},{y,z}}");
         // check("B", "{{1,t,u},{4,y,z},{7,8,9}}");
 
+        check("foo=barf", "barf");
+        check("foo[x]=1", "1");
+        check("barf[x]=1", "1");
         check("a = 3", "3");
         check("a", "3");
         check("{a, b, c} = {10, 2, 3}   ", "{10,2,3}");
