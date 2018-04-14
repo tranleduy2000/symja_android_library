@@ -28,7 +28,7 @@
 
 package org.logicng.util;
 
-import java.util.Objects;
+import com.duy.util.DObjects;
 
 /**
  * Data structure for a pair.
@@ -70,7 +70,7 @@ public class Pair<A, B> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(a, b);
+    return DObjects.hash(a, b);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class Pair<A, B> {
       return true;
     if (other instanceof Pair) {
       Pair o = (Pair) other;
-      return Objects.equals(b, o.b) && Objects.equals(a, o.a);
+      return DObjects.equals(b, o.b) && DObjects.equals(a, o.a);
     }
     return false;
   }
