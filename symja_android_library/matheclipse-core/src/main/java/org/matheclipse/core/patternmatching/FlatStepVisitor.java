@@ -1,7 +1,5 @@
 package org.matheclipse.core.patternmatching;
 
-import javax.annotation.Nonnull;
-
 import org.matheclipse.combinatoric.AbstractListStepVisitor;
 import org.matheclipse.combinatoric.NumberPartitionsIterator;
 import org.matheclipse.core.expression.F;
@@ -10,6 +8,8 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.PatternMatcher.StackMatcher;
+
+import javax.annotation.Nonnull;
 
 /**
  * This visitor is used in an <code>NumberPartitionsIterator</code> to match flat expressions in pattern matching.
@@ -33,7 +33,7 @@ public class FlatStepVisitor extends AbstractListStepVisitor<IExpr> {
 
 	public FlatStepVisitor(final ISymbol sym, IAST lhsPatternAST, IAST lhsEvalAST, StackMatcher stackMatcher,
 			PatternMap patternMap, boolean oneIdentity) {
-		super(lhsEvalAST);//, 1, lhsEvalAST.size());
+		super(lhsEvalAST);// , 1, lhsEvalAST.size());
 		this.fSymbol = sym;
 		this.stackMatcher = stackMatcher;
 		this.fPatternMap = patternMap;
@@ -75,18 +75,23 @@ public class FlatStepVisitor extends AbstractListStepVisitor<IExpr> {
 
 			for (int j = 0; j < result.length; j++) {
 				final int n = result[j].length;
+				final IExpr lhsPatternExpr = fLhsPatternAST.get(j + 1);
 				if (n == 1 && fOneIdentity) {
 					// OneIdentity here
-					if (!stackMatcher.push(fLhsPatternAST.get(j + 1), (IExpr) array[result[j][0]])) {
+					if (!stackMatcher.push(lhsPatternExpr, (IExpr) array[result[j][0]])) {
 						matched = false;
 						return false;
 					}
 				} else {
-					partitionElement = F.ast(fSymbol, n, false);
+					ISymbol head = fSymbol;
+					if (lhsPatternExpr.isPatternSequence()) {
+						head = F.Sequence;
+					}
+					partitionElement = F.ast(head, n, false);
 					for (int i = 0; i < n; i++) {
 						partitionElement.append((IExpr) array[result[j][i]]);
 					}
-					if (!stackMatcher.push(fLhsPatternAST.get(j + 1), partitionElement)) {
+					if (!stackMatcher.push(lhsPatternExpr, partitionElement)) {
 						matched = false;
 						return false;
 					}

@@ -65,7 +65,7 @@ public class Config {
 	 * Show the stack trace, if an exception is thrown in evaluation
 	 * 
 	 */
-	public static boolean SHOW_STACKTRACE = false;
+	public  static boolean SHOW_STACKTRACE = false;
 
 	/**
 	 * Show the console output, if an expression has a head symbol with attribute <code>ISymbol.CONSOLE_OUTPUT</code>.
@@ -137,6 +137,10 @@ public class Config {
 	 */
 	public final static double DEFAULT_ROOTS_CHOP_DELTA = 1.0e-5;
 
+	/**
+	 * Define the recursion limit for <code>Integrate#integrateByParts()</code>
+	 */
+	public static int INTEGRATE_BY_PARTS_RECURSION_LIMIT = 10;
 	/**
 	 * <p>
 	 * Flag for thread usage.
