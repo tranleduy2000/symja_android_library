@@ -7139,6 +7139,9 @@ public class LowercaseTestCase extends AbstractTestCase {
         // check("B[[1;;2, 2;;-1]] = {{t, u}, {y, z}}", "{{t,u},{y,z}}");
         // check("B", "{{1,t,u},{4,y,z},{7,8,9}}");
 
+		check("foo=barf", "barf");
+		check("foo[x]=1", "1");
+		check("barf[x]=1", "1");
         check("a = 3", "3");
         check("a", "3");
         check("{a, b, c} = {10, 2, 3}   ", "{10,2,3}");
