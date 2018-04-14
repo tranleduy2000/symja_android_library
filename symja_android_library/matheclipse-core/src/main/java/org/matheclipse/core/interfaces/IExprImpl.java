@@ -682,6 +682,16 @@ public abstract class IExprImpl implements IExpr {
     }
 
     /**
+     * Test if this expression is the <code>HoldPattern</code> function
+     * <code>HoldPattern[&lt;expression&gt;]</code>
+     *
+     * @return
+     */
+    public boolean isHoldPattern() {
+        return false;
+    }
+
+    /**
      * Test if this expression is the function <code>And[&lt;arg&gt;,...]</code>
      *
      * @return

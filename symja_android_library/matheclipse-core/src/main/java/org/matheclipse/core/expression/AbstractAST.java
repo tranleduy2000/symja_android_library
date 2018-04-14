@@ -1853,6 +1853,11 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
+	public final boolean isHoldPattern() {
+		return isSameHead(F.HoldPattern, 2);
+	}
+	/** {@inheritDoc} */
+	@Override
 	public final boolean isInfinity() {
 		return this.equals(F.CInfinity);
 	}
