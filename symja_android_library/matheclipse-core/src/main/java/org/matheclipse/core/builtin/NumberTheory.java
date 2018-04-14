@@ -1091,8 +1091,8 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
-		private static IExpr divisorSigma(final IExpr arg1, IInteger n) {
-			final IAST list = n.divisors();
+		private static IExpr divisorSigma(IExpr arg1, IInteger n) {
+			IAST list = n.divisors();
 			if (list.isList()) {
 				int size = list.size();
 				if (arg1.isOne()) {
@@ -2230,7 +2230,7 @@ public final class NumberTheory {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			newSymbol.setAttributes(ISymbol.ORDERLESS | ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 		}
 	}
 

@@ -1,10 +1,6 @@
 
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.List;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.basic.Config;
@@ -22,6 +18,11 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
+import static org.matheclipse.core.expression.F.List;
 
 public final class StringFunctions {
 
@@ -217,6 +218,11 @@ public final class StringFunctions {
 			}
 			return F.$str(buf.toString());
 
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.FLAT | ISymbol.ONEIDENTITY);
 		}
 	}
 
