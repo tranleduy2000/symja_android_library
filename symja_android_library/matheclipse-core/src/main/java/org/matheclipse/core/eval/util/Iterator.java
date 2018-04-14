@@ -2,6 +2,7 @@ package org.matheclipse.core.eval.util;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.NoEvalException;
+import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.interfaces.IAST;
@@ -16,16 +17,14 @@ import org.matheclipse.core.interfaces.ISymbol;
 
 import static org.matheclipse.core.expression.F.Divide;
 import static org.matheclipse.core.expression.F.Less;
-import static org.matheclipse.core.expression.F.LessEqual;
 import static org.matheclipse.core.expression.F.Subtract;
 
 /**
- * Create iterators for functions like <code>Table()</code>, <code>Sum()</code>
- * or <code>Product()</code>
+ * Create iterators for functions like <code>Table()</code>, <code>Sum()</code> or <code>Product()</code>
  * 
  * @see org.matheclipse.core.reflection.system.Product
  * @see org.matheclipse.core.reflection.system.Sum
- * @see org.matheclipse.core.builtin.ListFunctions.Table
+ * @see org.matheclipse.core.reflection.system.Table
  */
 public class Iterator {
 	public static class ExprIterator extends IIteratorImpl<IExpr> implements IIterator<IExpr> {
@@ -41,9 +40,8 @@ public class Iterator {
 		IExpr maxCounterOrList;
 
 		/**
-		 * If <code>maxCounterOrList</code> is a list the
-		 * <code>maxCounterOrListIndex</code> attribute points to the current
-		 * element.
+		 * If <code>maxCounterOrList</code> is a list the <code>maxCounterOrListIndex</code> attribute points to the
+		 * current element.
 		 */
 		int maxCounterOrListIndex;
 
@@ -95,8 +93,7 @@ public class Iterator {
 		/**
 		 * Tests if this enumeration contains more elements.
 		 * 
-		 * @return <code>true</code> if this enumeration contains more elements;
-		 *         <code>false</code> otherwise.
+		 * @return <code>true</code> if this enumeration contains more elements; <code>false</code> otherwise.
 		 */
 		@Override
 		public boolean hasNext() {
@@ -120,24 +117,30 @@ public class Iterator {
 				}
 				if (step.isSignedNumber()) {
 					if (((ISignedNumber) step).isNegative()) {
-						if (evalEngine.evalTrue(LessEqual(maxCounterOrList, count))) {
+						if (F.LessEqual.ofQ(evalEngine, maxCounterOrList, count)) {
 							return true;
 						}
 					} else {
-						if (evalEngine.evalTrue(LessEqual(count, maxCounterOrList))) {
+						if (F.LessEqual.ofQ(evalEngine, count, maxCounterOrList)) {
 							return true;
 						}
 					}
 				}
-				//else {
+				// else {
 					IExpr sub = evalEngine.evaluate(Divide(Subtract(maxCounterOrList, count), step));
 					if (sub.isSignedNumber()) {
 						return !((ISignedNumber) sub).isNegative();
 					}
+				try {
+					double d = sub.evalDouble();
+					return !(d < 0.0);
+				} catch (WrongArgumentType wt) {
+					// return false;
+				}
 					return false;
-				//}
+				// }
 			}
-//			return false;
+			// return false;
 		}
 
 		@Override
@@ -303,8 +306,7 @@ public class Iterator {
 		/**
 		 * Tests if this enumeration contains more elements.
 		 * 
-		 * @return <code>true</code> if this enumeration contains more elements;
-		 *         <code>false</code> otherwise.
+		 * @return <code>true</code> if this enumeration contains more elements; <code>false</code> otherwise.
 		 */
 		@Override
 		public boolean hasNext() {
