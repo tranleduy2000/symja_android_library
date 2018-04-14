@@ -260,6 +260,7 @@ public class F {
 	public final static IBuiltInSymbol Composition = BuiltIns.valueOf(BuiltIns.Composition);
 	public final static IBuiltInSymbol CompoundExpression = BuiltIns.valueOf(BuiltIns.CompoundExpression);
 	public final static IBuiltInSymbol Condition = BuiltIns.valueOf(BuiltIns.Condition);
+    public final static IBuiltInSymbol ConditionalExpression = BuiltIns.valueOf(BuiltIns.ConditionalExpression);
 	public final static IBuiltInSymbol Conjugate = BuiltIns.valueOf(BuiltIns.Conjugate);
 	public final static IBuiltInSymbol ConjugateTranspose = BuiltIns.valueOf(BuiltIns.ConjugateTranspose);
 	public final static IBuiltInSymbol Constant = BuiltIns.valueOf(BuiltIns.Constant);
@@ -835,6 +836,7 @@ public class F {
 	public final static IBuiltInSymbol True = BuiltIns.valueOf(BuiltIns.True);
 	public final static IBuiltInSymbol TrueQ = BuiltIns.valueOf(BuiltIns.TrueQ);
 	public final static IBuiltInSymbol Tuples = BuiltIns.valueOf(BuiltIns.Tuples);
+    public final static IBuiltInSymbol Undefined = BuiltIns.valueOf(BuiltIns.Undefined);
 	public final static IBuiltInSymbol Unequal = BuiltIns.valueOf(BuiltIns.Unequal);
 	public final static IBuiltInSymbol Unevaluated = BuiltIns.valueOf(BuiltIns.Unevaluated);
 	public final static IBuiltInSymbol Union = BuiltIns.valueOf(BuiltIns.Union);
@@ -2771,6 +2773,9 @@ public class F {
 		return binaryAST2(Condition, a0, a1);
 	}
 
+    public static IAST ConditionalExpression(final IExpr a0, final IExpr a1) {
+        return binaryAST2(ConditionalExpression, a0, a1);
+    }
 	public static IAST Conjugate(final IExpr a0) {
 		return unaryAST1(Conjugate, a0);
 	}
@@ -3782,6 +3787,9 @@ public class F {
 		return unaryAST1(InverseErf, a0);
 	}
 
+    public static IAST InverseErfc(final IExpr a0) {
+        return unaryAST1(InverseErfc, a0);
+    }
 	public static IAST InverseFunction(final IExpr a) {
 		return unaryAST1(InverseFunction, a);
 	}
@@ -4325,6 +4333,13 @@ public class F {
 		return unaryAST1(Norm, a);
 	}
 
+    public static IAST NormalDistribution() {
+        return headAST0(NormalDistribution);
+    }
+
+    public static IAST NormalDistribution(final IExpr a0, final IExpr a1) {
+        return binaryAST2(NormalDistribution, a0, a1);
+    }
 	public static IAST Normalize(final IExpr a) {
 		return unaryAST1(Normalize, a);
 	}
@@ -4756,6 +4771,9 @@ public class F {
 		return new AST(new IExpr[] { head, a0, a1, a2, a3 });
 	}
 
+    public static IAST Quantile(final IExpr a0) {
+        return unaryAST1(Quantile, a0);
+    }
 	public static IAST Quantile(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Quantile, a0, a1);
 	}

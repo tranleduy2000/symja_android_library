@@ -19,7 +19,7 @@ import java.util.Locale;
  * Java source code.
  *
  * Example from <code>TrigToExp</code>
- * 
+ *
  * <pre>
  * MATCHER.caseOf(Csch(x_), //
  * 		x -> // [$ 2/(E^x-E^(-x)) $]
@@ -94,7 +94,7 @@ public class ExprPreprocessor {
 					trimmedInput = inputExpression.trim();
 					if ((trimmedInput.length() >= 4)
 							&& trimmedInput.toLowerCase(Locale.ENGLISH).substring(0, 4).equals("exit")) {
-						System.out.println("Closing Symja console... bye.");
+						System.out.println("Closing ExprPreprocessor console... bye.");
 						System.exit(0);
 					}
 					System.out.println();
