@@ -15,13 +15,12 @@
  */
 package org.matheclipse.parser.client;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.parser.client.ast.IParserFactory;
 import org.matheclipse.parser.client.operator.Operator;
+
+import java.util.List;
+import java.util.Stack;
 
 public class Scanner {
 	/**
@@ -698,6 +697,16 @@ public class Scanner {
 		return null;
 	}
 
+	protected String getIntegerString() {
+		numFormat = 10;
+		int startPosition = fCurrentPosition - 1;
+		getChar();
+		while ((fCurrentChar >= '0') && (fCurrentChar <= '9')) {
+			getChar();
+		}
+		int endPosition = fCurrentPosition--;
+		return fInputString.substring(startPosition, --endPosition);
+	}
 	protected StringBuilder getStringBuilder() throws SyntaxError {
 		final StringBuilder ident = new StringBuilder();
 
