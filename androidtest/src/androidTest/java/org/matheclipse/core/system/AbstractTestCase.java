@@ -145,4 +145,7 @@ public abstract class AbstractTestCase extends TestCase {
 
     }
 
+    public void evalString(String expr){
+
+    }
 }
