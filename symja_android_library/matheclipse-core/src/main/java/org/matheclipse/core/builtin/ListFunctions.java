@@ -896,61 +896,20 @@ public final class ListFunctions {
 			IASTAppendable result = matrix.copyHead(dim[0] + m + n);
 			IAST row;
 			// prepend m rows
-			result.appendArgs(0, m, new IntFunction<IExpr>() {
-				@Override
-				public IExpr apply(int i) {
-					return F.constantArray(atom, columnDim);
-				}
-			});
-			// for (int i = 0; i < m; i++) {
-			// result.append(F.constantArray(atom, columnDim));
-			// }
+			result.appendArgs(0, m, i -> atom.constantArray(F.List, 0, columnDim));
 
-			result.appendArgs(1, dim[0] + 1, new IntFunction<IExpr>() {
-				@Override
-				public IExpr apply(int i) {
-					return arrayPadAtom(matrix.getAST(i), m, n, atom);
-				}
-			});
-			// for (int i = 1; i <= dim[0]; i++) {
-			// row = matrix.getAST(i);
-			// result.append(arrayPadAtom(row, m, n, atom));
-			// }
+			result.appendArgs(1, dim[0] + 1, i -> arrayPadAtom(matrix.getAST(i), m, n, atom));
 
 			// append n rows
-			result.appendArgs(0, n, new IntFunction<IExpr>() {
-				@Override
-				public IExpr apply(int i) {
-					return F.constantArray(atom, columnDim);
-				}
-			});
-			// for (int i = 0; i < n; i++) {
-			// result.append(F.constantArray(atom, columnDim));
-			// }
+			result.appendArgs(0, n, i -> atom.constantArray(F.List, 0, columnDim));
 			return result;
 		}
 
 		private static IExpr arrayPadAtom(IAST ast, int m, int n, IExpr atom) {
 			IASTAppendable result = ast.copyHead();
-			result.appendArgs(0, m, new IntFunction<IExpr>() {
-				@Override
-				public IExpr apply(int i) {
-					return atom;
-				}
-			});
-			// for (int i = 0; i < m; i++) {
-			// result.append(atom);
-			// }
+			result.appendArgs(0, m, i -> atom);
 			result.appendArgs(ast);
-			result.appendArgs(0, n, new IntFunction<IExpr>() {
-				@Override
-				public IExpr apply(int i) {
-					return atom;
-				}
-			});
-			// for (int i = 0; i < n; i++) {
-			// result.append(atom);
-			// }
+			result.appendArgs(0, n, i -> atom);
 			return result;
 		}
 
@@ -1469,13 +1428,15 @@ public final class ListFunctions {
 					final IExpr constantExpr = ast.arg1();
 					if ((ast.isAST2()) && (ast.arg2().isInteger())) {
 						indx1 = Validate.checkIntType(ast, 2);
-						return F.constantArray(constantExpr, indx1);
+						return constantExpr.constantArray(F.List, 0, indx1);
 					} else if ((ast.isAST2()) && ast.arg2().isList()) {
-						final IAST dimIter = (IAST) ast.arg2();
-						for (int i = 1; i < dimIter.size(); i++) {
-							indx1 = Validate.checkIntType(dimIter, i);
-							iterList.add(new ArrayIterator(indx1));
+						final IAST dimensions = (IAST) ast.arg2();
+						int[] dim = new int[dimensions.size() - 1];
+						for (int i = 1; i < dimensions.size(); i++) {
+							indx1 = Validate.checkIntType(dimensions, i);
+							dim[i - 1] = indx1;
 						}
+						return constantExpr.constantArray(F.List, 0, dim);
 					} else if (ast.size() >= 4) {
 						if (ast.arg2().isInteger() && ast.arg3().isInteger()) {
 							indx1 = Validate.checkIntType(ast, 3);

@@ -231,7 +231,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param arr           the nested lists dimensions. <code>arr.length</code> must be greater <code>0</code>
      * @return <code>F.NIL</code> if <code>arr</code> has length 0.
      */
-    IASTAppendable constantArray(final int startPosition, int... arr);
+    IASTAppendable constantArray(IExpr head, final int startPosition, int... arr);
 
     /**
      * Return <code>negate()</code> if <code>number.sign() < 0</code>, otherwise return <code>this</code>

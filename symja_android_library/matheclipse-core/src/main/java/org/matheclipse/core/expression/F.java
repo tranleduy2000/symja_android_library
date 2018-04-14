@@ -2256,8 +2256,8 @@ public class F {
 	 *            the initial capacity (i.e. number of arguments without the header element) of the list.
 	 * @return
 	 */
-	public static IAST constantArray(final IExpr value, final int copies) {
-		return constantArray(F.List, value, copies);
+	public static IASTAppendable constantArray(final IExpr value, final int copies) {
+		return value.constantArray(F.List, 0, copies);
 	}
 
 	/**
@@ -2273,14 +2273,8 @@ public class F {
 	 *            the initial capacity (i.e. number of arguments without the header element) of the list.
 	 * @return
 	 */
-	public static IAST constantArray(final IExpr head, final IExpr value, final int copies) {
-		final AST ast = AST.newInstance(copies, head);
-
-		for (int i = 0; i < copies; i++) {
-			ast.append(value);
-		}
-
-		return ast;
+	public static IASTAppendable constantArray(final IExpr head, final IExpr value, final int copies) {
+		return value.constantArray(head, 0, copies);
 	}
 
 	/**

@@ -261,24 +261,26 @@ public abstract class IExprImpl implements IExpr {
      * v.constantArray(2, 3) -> {{v, v, v}, {v, v, v}}
      * </pre>
      *
+     * @param head          the head for the new <code>IASTAppendable</code> objects.
      * @param startPosition the position from there to create the constant array recusively.
      * @param arr           the nested lists dimensions. <code>arr.length</code> must be greater <code>0</code>
      * @return <code>F.NIL</code> if <code>arr</code> has length 0.
      */
-     public IASTAppendable constantArray(final int startPosition, int... arr) {
+    public IASTAppendable constantArray(IExpr head, final int startPosition, int... arr) {
         if (arr.length - 1 == startPosition) {
-            IASTAppendable list = F.ListAlloc(arr[startPosition]);
+            IExpr[] exprArr = new IExpr[arr[startPosition]];
             for (int i = 0; i < arr[startPosition]; i++) {
-                list.append(this);
+                exprArr[i] = this;
             }
-            return list;
+            return F.ast(exprArr, head);
         }
-        IASTAppendable list = F.ListAlloc(arr[startPosition]);
+        IExpr[] exprArr = new IExpr[arr[startPosition]];
         for (int i = 0; i < arr[startPosition]; i++) {
-            list.append(constantArray(startPosition + 1, arr));
+            exprArr[i] = constantArray(head, startPosition + 1, arr);
         }
-        return list;
+        return F.ast(exprArr, head);
     }
+
     /**
      * Return <code>negate()</code> if <code>number.sign() < 0</code>, otherwise return <code>this</code>
      *
@@ -547,6 +549,18 @@ public abstract class IExprImpl implements IExpr {
     }
 
     /**
+     * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the expression itself, did not
+     * match the given pattern. Calls <code>isFree(pattern, true)</code>.
+     *
+     * @param pattern a pattern-matching expression
+     * @return
+     */
+    public boolean has(IExpr pattern) {
+        return isFree(pattern, true);
+    }
+
+
+    /**
      * If this expression unequals <code>F.NIL</code>, invoke the specified consumer with the <code>this</code> object,
      * otherwise do nothing.
      *
@@ -557,6 +571,13 @@ public abstract class IExprImpl implements IExpr {
         consumer.accept(this);
     }
 
+    /**
+     * If a value is present, performs the given <code>consumer</code> with the value, otherwise performs the given
+     * empty-based action.
+     *
+     * @param consumer    the action to be performed, if a value is present
+     * @param emptyAction the empty-based action to be performed, if no value is present
+     */
     public void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction) {
         consumer.accept(this);
     }
@@ -3028,13 +3049,15 @@ public abstract class IExprImpl implements IExpr {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
         return ExprUtil.convertToExpr(temp);
     }
+
     /**
      * Return <code>0</code> if this is less than <code>0</code>. Return <code>1</code> if this is greater equal than
      * <code>0</code>. Return <code>F.UnitStep(this)</code> for all other cases.
      *
      * @return
      */
-    @Override public IExpr unitStep() {
+    @Override
+    public IExpr unitStep() {
         if (isNegativeResult()) {
             return F.C0;
         }
@@ -3043,6 +3066,7 @@ public abstract class IExprImpl implements IExpr {
         }
         return F.UnitStep(this);
     }
+
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>upper</code> value. If this is a
      * <code>ISignedNumber</code> expression return <code>this</code>.

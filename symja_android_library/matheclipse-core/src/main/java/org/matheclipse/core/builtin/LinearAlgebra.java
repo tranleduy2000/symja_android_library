@@ -318,10 +318,10 @@ public final class LinearAlgebra {
      * @param engine the evaluation engine
      * @return <code>F.NIL</code> if the linear system is inconsistent and has no solution
      */
-    public static IAST rowReduced2List(FieldMatrix<IExpr> matrix, boolean quiet, final EvalEngine engine) {
+    public static IAST rowReduced2List(FieldMatrix<IExpr> matrix, boolean quiet, EvalEngine engine) {
 
-        final int rows = matrix.getRowDimension();
-        final int cols = matrix.getColumnDimension();
+        int rows = matrix.getRowDimension();
+        int cols = matrix.getColumnDimension();
         if (rows == 2 && cols == 3) {
             IAST list = cramersRule2x3(matrix, quiet, engine);
             if (list.isPresent()) {
@@ -334,7 +334,7 @@ public final class LinearAlgebra {
             }
         }
         FieldReducedRowEchelonForm ref = new FieldReducedRowEchelonForm(matrix);
-        final FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
+        FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
         IExpr lastVarCoefficient = rowReduced.getEntry(rows - 1, cols - 2);
         if (lastVarCoefficient.isZero()) {
             if (!rowReduced.getEntry(rows - 1, cols - 1).isZero()) {
