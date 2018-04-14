@@ -2,11 +2,11 @@ package org.matheclipse.parser.test;
 
 import junit.framework.TestCase;
 
-import java.util.List;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
+
+import java.util.List;
 
 /**
  * Tests parser function for SimpleParserFactory
@@ -89,7 +89,7 @@ public class ParserTestCase extends TestCase {
 			if (!Config.EXPLICIT_TIMES_OPERATOR) {
 				ASTNode obj = p.parse("4.7942553860420304E-1");
 				assertEquals(obj.toString(), "Plus(Times(4.7942553860420304, E), Times(-1, 1))");
-				
+
 				obj = p.parse("4.7942553860420304 * E - 1");
 				assertEquals(obj.toString(), "Plus(Times(4.7942553860420304, E), Times(-1, 1))");
 			} else {
@@ -414,19 +414,30 @@ public class ParserTestCase extends TestCase {
 		try {
 			Parser p = new Parser();
 			ASTNode obj = p.parse("FracPart[m_*u_,n_:1]");
-			assertEquals(obj.toString(),
-					"FracPart(Times(m_, u_), Optional(n_, 1))");
+			assertEquals(obj.toString(), "FracPart(Times(m_, u_), Optional(n_, 1))");
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals("", e.getMessage());
 		}
 	}
-	
+
 	public void testParse30() {
 		try {
 			Parser p = new Parser();
 			ASTNode obj = p.parse("f[x,y,]");
 			assertEquals(obj.toString(), "f(x, y, Null)");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParser31() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("#1.#123");
+			assertEquals(obj.toString(),
+					"Dot(Slot(1), Slot(123))");
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals("", e.getMessage());

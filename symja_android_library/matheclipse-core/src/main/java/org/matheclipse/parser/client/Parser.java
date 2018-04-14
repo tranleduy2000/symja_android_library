@@ -15,11 +15,7 @@
  */
 package org.matheclipse.parser.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.expression.F;
 import org.matheclipse.parser.client.ast.ASTNode;
 import org.matheclipse.parser.client.ast.FunctionNode;
 import org.matheclipse.parser.client.ast.IConstantOperators;
@@ -33,6 +29,9 @@ import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
 import org.matheclipse.parser.client.operator.PostfixOperator;
 import org.matheclipse.parser.client.operator.PrefixOperator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -409,7 +408,7 @@ public class Parser extends Scanner {
 			getNextToken();
 			final FunctionNode slot = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Slot));
 			if (fToken == TT_DIGIT) {
-				slot.add(getNumber(false));
+				slot.add(fFactory.createInteger(getIntegerNumber()));
 			} else {
 				slot.add(fFactory.createInteger(1));
 			}
@@ -549,12 +548,10 @@ public class Parser extends Scanner {
 	}
 
 	private int getIntegerNumber() throws SyntaxError {
-		final Object[] result = getNumberString();
-		final String number = (String) result[0];
-		final int numFormat = ((Integer) result[1]).intValue();
+		final String number = getIntegerString();
 		int intValue = 0;
 		try {
-			intValue = Integer.parseInt(number, numFormat);
+			intValue = Integer.parseInt(number, 10);
 		} catch (final NumberFormatException e) {
 			throwSyntaxError("Number format error (not an int type): " + number, number.length());
 		}
