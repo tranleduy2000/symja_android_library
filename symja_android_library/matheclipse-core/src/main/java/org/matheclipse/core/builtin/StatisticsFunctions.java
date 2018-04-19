@@ -23,7 +23,6 @@ import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.F.*;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
@@ -336,7 +335,8 @@ public class StatisticsFunctions {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
+            // Validate.checkSize(ast, 3);
+            // 2 args
             return F.NIL;
         }
 
@@ -644,7 +644,7 @@ public class StatisticsFunctions {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
+            // 0 or 2 args
             return F.NIL;
         }
 
@@ -1211,7 +1211,7 @@ public class StatisticsFunctions {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
+            // Validate.checkSize(ast, 3);
             return F.NIL;
         }
 
@@ -1398,7 +1398,7 @@ public class StatisticsFunctions {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
+            // Validate.checkSize(ast, 3);
             return F.NIL;
         }
 
@@ -1457,6 +1457,86 @@ public class StatisticsFunctions {
 
     }
 
+    /**
+     * <pre>
+     * NormalDistribution(m, s)
+     * </pre>
+     * <p>
+     * <blockquote>
+     * <p>
+     * returns the normal distribution of mean <code>m</code> and sigma <code>s</code>.
+     * </p>
+     * </blockquote>
+     * <p>
+     * <pre>
+     * NormalDistribution()
+     * </pre>
+     * <p>
+     * <blockquote>
+     * <p>
+     * returns the standard normal distribution for <code>m = 0</code> and <code>s = 1</code>.
+     * </p>
+     * </blockquote>
+     * <p>
+     * See:<br />
+     * </p>
+     * <ul>
+     * <li><a href="https://en.wikipedia.org/wiki/Normal_distribution">Wikipedia - Normal distribution</a></li>
+     * </ul>
+     * <h3>Examples</h3>
+     * <p>
+     * The <a href="https://en.wikipedia.org/wiki/Probability_density">probability density function</a> of the normal
+     * distribution is
+     * </p>
+     * <p>
+     * <pre>
+     * &gt;&gt; PDF(NormalDistribution(m, s), x)
+     * 1/(Sqrt(2)*E^((-m+x)^2/(2*s^2))*Sqrt(Pi)*s)
+     * </pre>
+     * <p>
+     * The <a href="https://en.wikipedia.org/wiki/Cumulative_distribution_function">cumulative distribution function</a>
+     * of the standard normal distribution is
+     * </p>
+     * <p>
+     * <pre>
+     * &gt;&gt; CDF(NormalDistribution( ), x)
+     * 1/2*(2-Erfc(x/Sqrt(2)))
+     * </pre>
+     * <p>
+     * The <a href="https://en.wikipedia.org/wiki/Mean">mean</a> of the normal distribution is
+     * </p>
+     * <p>
+     * <pre>
+     * &gt;&gt; Mean(NormalDistribution(m, s))
+     * m
+     * </pre>
+     * <p>
+     * The <a href="https://en.wikipedia.org/wiki/Standard_deviation">standard deviation</a> of the normal distribution
+     * is
+     * </p>
+     * <p>
+     * <pre>
+     * &gt;&gt; StandardDeviation(NormalDistribution(m, s))
+     * s
+     * </pre>
+     * <p>
+     * The <a href="https://en.wikipedia.org/wiki/Variance">variance</a> of the normal distribution is
+     * </p>
+     * <p>
+     * <pre>
+     * &gt;&gt; Variance(NormalDistribution(m, s))
+     * s^2
+     * </pre>
+     * <p>
+     * The <a href="https://en.wikipedia.org/wiki/Normal_distribution#Generating_values_from_normal_distribution">random
+     * variates</a> of a normal distribution can be generated with function <code>RandomVariate</code>
+     * </p>
+     * <p>
+     * <pre>
+     * &gt;&gt; RandomVariate(NormalDistribution(2,3), 10^1)
+     * {1.14364,6.09674,5.16495,2.39937,-0.52143,-1.46678,3.60142,-0.85405,2.06373,-0.29795}
+     * </pre>
+     */
     private final static class NormalDistribution extends AbstractEvaluator
             implements IDistribution, IVariance, IRandomVariate {
 
@@ -1690,7 +1770,7 @@ public class StatisticsFunctions {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkRange(ast, 3, 4);
+            Validate.checkRange(ast, 2, 4);
 
             IExpr arg1 = ast.arg1();
             int[] dim = arg1.isMatrix();
@@ -1722,7 +1802,7 @@ public class StatisticsFunctions {
                 IAST list = (IAST) arg1;
                 int dim1 = list.argSize();
                 try {
-                    if (dim1 >= 0) {
+                    if (dim1 >= 0 && ast.size() == 3) {
 
                         final IAST s = EvalAttributes.copySortLess(list);
                         final IInteger length = F.ZZ(s.argSize());
@@ -1789,7 +1869,7 @@ public class StatisticsFunctions {
                         ae.printStackTrace();
                     }
                 }
-            } else if (arg1.isDistribution()) {
+            } else if (arg1.isDistribution() && ast.size() >= 3) {
                             IExpr function = engine.evaluate(F.Quantile(arg1));
                             if (function.isFunction()) {
                     if (ast.arg2().isList()) {
@@ -1991,7 +2071,7 @@ public class StatisticsFunctions {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 2);
+            // 1 or 3 args
             return F.NIL;
         }
 
@@ -2116,7 +2196,7 @@ public class StatisticsFunctions {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
+            // 2 or 3 args
             return F.NIL;
         }
 

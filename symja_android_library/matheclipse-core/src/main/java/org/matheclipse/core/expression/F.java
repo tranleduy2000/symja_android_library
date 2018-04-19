@@ -468,6 +468,7 @@ public class F {
 	public final static IBuiltInSymbol Intersection = BuiltIns.valueOf(BuiltIns.Intersection);
 	public final static IBuiltInSymbol Interval = BuiltIns.valueOf(BuiltIns.Interval);
 	public final static IBuiltInSymbol Inverse = BuiltIns.valueOf(BuiltIns.Inverse);
+    public final static IBuiltInSymbol InverseBetaRegularized = BuiltIns.valueOf(BuiltIns.InverseBetaRegularized);
 	public final static IBuiltInSymbol InverseErf = BuiltIns.valueOf(BuiltIns.InverseErf);
 	public final static IBuiltInSymbol InverseErfc = BuiltIns.valueOf(BuiltIns.InverseErfc);
 	public final static IBuiltInSymbol InverseFunction = BuiltIns.valueOf(BuiltIns.InverseFunction);
@@ -2325,6 +2326,9 @@ public class F {
 		return unaryAST1(F.BernoulliB, a0);
 	}
 
+	public static IAST BernoulliDistribution(final IExpr a0) {
+		return unaryAST1(F.BernoulliDistribution, a0);
+	}
 	/**
 	 * Create a function with 2 arguments without evaluation.
 	 *
@@ -3028,6 +3032,9 @@ public class F {
 		return unaryAST1(Erfi, a);
 	}
 
+	public static IAST ErlangDistribution(final IExpr a0, final IExpr a1) {
+		return binaryAST2(ErlangDistribution, a0, a1);
+	}
 	/**
 	 * Evaluate an expression. If no evaluation was possible this method returns the given argument.
 	 *
@@ -3486,6 +3493,13 @@ public class F {
 		return binaryAST2(GreaterEqual, a0, a1);
 	}
 
+	public static IAST GumbelDistribution() {
+		return headAST0(GumbelDistribution);
+	}
+
+	public static IAST GumbelDistribution(final IExpr a0, final IExpr a1) {
+		return binaryAST2(GumbelDistribution, a0, a1);
+	}
 	public static IAST HarmonicNumber(final IExpr a) {
 		return unaryAST1(HarmonicNumber, a);
 	}
@@ -3807,6 +3821,9 @@ public class F {
 		return unaryAST1(Inverse, a0);
 	}
 
+	public static IAST InverseBetaRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(InverseBetaRegularized, a0, a1, a2);
+	}
 	public static IAST InverseErf(final IExpr a0) {
 		return unaryAST1(InverseErf, a0);
 	}
@@ -4147,6 +4164,9 @@ public class F {
 		return unaryAST1(LogisticSigmoid, a);
 	}
 
+	public static IAST LogNormalDistribution(final IExpr a0, final IExpr a1) {
+		return binaryAST2(LogNormalDistribution, a0, a1);
+	}
 	public static IAST Map(final IExpr a0) {
 
 		return unaryAST1(Map, a0);
@@ -4308,6 +4328,9 @@ public class F {
 		return unaryAST1(N, a0);
 	}
 
+	public static IAST NakagamiDistribution(final IExpr a0, final IExpr a1) {
+		return binaryAST2(NakagamiDistribution, a0, a1);
+	}
 	/**
 	 * Multiplies the given argument by <code>-1</code>. The <code>IExpr#negate()</code> method does evaluations, which
 	 * don't agree with pattern matching assumptions (in left-hand-sige expressions). so it is only called called for
@@ -5313,6 +5336,13 @@ public class F {
 		return binaryAST2(StruveL, a0, a1);
 	}
 
+	public static IAST StudentTDistribution(final IExpr a0) {
+		return unaryAST1(StudentTDistribution, a0);
+	}
+
+	public static IAST StudentTDistribution(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(StudentTDistribution, a0, a1, a2);
+	}
 	public static IAST Subfactorial(final IExpr a0) {
 		return unaryAST1(Subfactorial, a0);
 	}
@@ -5662,6 +5692,13 @@ public class F {
 		return unaryAST1(Variance, a0);
 	}
 
+	public static IAST WeibullDistribution(final IExpr a0, final IExpr a1) {
+		return binaryAST2(WeibullDistribution, a0, a1);
+	}
+
+	public static IAST WeibullDistribution(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(WeibullDistribution, a0, a1, a2);
+	}
 	public static IAST While(final IExpr a0, final IExpr a1) {
 		return binaryAST2(While, a0, a1);
 	}
