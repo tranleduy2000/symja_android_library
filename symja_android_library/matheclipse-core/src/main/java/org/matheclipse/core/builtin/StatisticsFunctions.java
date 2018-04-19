@@ -228,7 +228,12 @@ public class StatisticsFunctions {
                         IExpr function = engine.evaluate(F.CDF(arg1));
                         if (function.isFunction()) {
                             if (ast.arg2().isList()) {
-                                return ((IAST) ast.arg2()).map(x -> F.unaryAST1(function, x), 1);
+                                return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
+                                    @Override
+                                    public IExpr apply(IExpr x) {
+                                        return F.unaryAST1(function, x);
+                                    }
+                                }, 1);
                             }
                             return F.unaryAST1(function, ast.arg2());
                         }
@@ -1122,14 +1127,17 @@ public class StatisticsFunctions {
                         IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
                         if (evaluator instanceof IDiscreteDistribution) {
                             IDiscreteDistribution distribution = (IDiscreteDistribution) evaluator;
-                            return of(dist, x -> {
-                                            if (vars.size() > 1) {
-                                                IExpr temp = arg1.replaceAll(F.Rule(vars.arg1(), x));
-                                                if (temp.isPresent()) {
-                                                    return temp;
-                                                }
-                                            }
-                                            return arg1;
+                            return of(dist, new Function<IExpr, IExpr>() {
+                                @Override
+                                public IExpr apply(IExpr x) {
+                                    if (vars.size() > 1) {
+                                        IExpr temp = arg1.replaceAll(F.Rule(vars.arg1(), x));
+                                        if (temp.isPresent()) {
+                                            return temp;
+                                        }
+                                    }
+                                    return arg1;
+                                }
                             }, distribution);
                         }
                     }
@@ -1617,7 +1625,12 @@ public class StatisticsFunctions {
                         IExpr function = engine.evaluate(F.PDF(arg1));
                         if (function.isFunction()) {
                             if (ast.arg2().isList()) {
-                                return ((IAST) ast.arg2()).map(x -> F.unaryAST1(function, x), 1);
+                                return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
+                                    @Override
+                                    public IExpr apply(IExpr x) {
+                                        return F.unaryAST1(function, x);
+                                    }
+                                }, 1);
                             }
                             return F.unaryAST1(function, ast.arg2());
                         }
@@ -1783,7 +1796,12 @@ public class StatisticsFunctions {
             }
             if (dim != null) {
                 IAST matrix = (IAST) arg1;
-                return matrix.mapMatrixColumns(dim, (IExpr x) -> ast.setAtClone(1, x));
+                return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+                    @Override
+                    public IExpr apply(IExpr x) {
+                        return ast.setAtClone(1, x);
+                    }
+                });
             }
 
             if (arg1.isList()) {
@@ -1877,7 +1895,12 @@ public class StatisticsFunctions {
                             IExpr function = engine.evaluate(F.Quantile(arg1));
                             if (function.isFunction()) {
                     if (ast.arg2().isList()) {
-                        return ((IAST) ast.arg2()).map(x -> F.unaryAST1(function, x), 1);
+                        return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
+                            @Override
+                            public IExpr apply(IExpr x) {
+                                return F.unaryAST1(function, x);
+                            }
+                        }, 1);
                     }
                                 return F.unaryAST1(function, ast.arg2());
                             }

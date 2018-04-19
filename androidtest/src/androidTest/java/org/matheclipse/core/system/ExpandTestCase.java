@@ -1,5 +1,11 @@
 package org.matheclipse.core.system;
 
+import org.matheclipse.core.builtin.Algebra;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IExpr;
+
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C2;
@@ -13,12 +19,6 @@ import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.a;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.y;
-
-import org.matheclipse.core.builtin.Algebra;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IExpr;
 
 /**
  * 

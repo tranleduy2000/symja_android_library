@@ -1,12 +1,12 @@
 package org.matheclipse.core.system;
 
-import java.math.BigInteger;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import junit.framework.TestCase;
 
 import org.matheclipse.core.numbertheory.EllipticCurveMethod;
 
-import junit.framework.TestCase;
+import java.math.BigInteger;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class EllipticCurveMethodTest extends TestCase {
 

@@ -27,7 +27,6 @@ public abstract class AbstractTestCase extends TestCase {
     public AbstractTestCase(String name) {
         super(name);
         Config.SERVER_MODE = false;
-        Config.SHOW_STACKTRACE = true;
     }
 
     public void check(String evalString, String expectedResult) {
@@ -145,7 +144,7 @@ public abstract class AbstractTestCase extends TestCase {
 
     }
 
-    public void evalString(String expr){
+    public void evalString(String str) {
 
     }
 }

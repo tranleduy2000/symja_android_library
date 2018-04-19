@@ -13,7 +13,7 @@ import static org.matheclipse.core.expression.F.Sinc;
 import static org.matheclipse.core.expression.F.Times;
 
 /**
- *
+ * 
  */
 public class JavaFormTestCase extends AbstractTestCase {
 	public JavaFormTestCase(String name) {
@@ -33,7 +33,7 @@ public class JavaFormTestCase extends AbstractTestCase {
 		result = util.evaluate(function);
 		assertEquals(result.internalFormString(true, -1), "oo");
 	}
-
+	
 	public void testJavaForm002() {
 		// don't distinguish between lower- and uppercase identifiers
 		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;

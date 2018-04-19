@@ -757,6 +757,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
     public void testCDF() {
         check("CDF(NormalDistribution(n, m),k)", "Erfc((-k+n)/(Sqrt(2)*m))/2");
+
         check("CDF(BernoulliDistribution(p),k)", "Piecewise({{0,k<0},{1-p,0<=k&&k<1}},1)");
         check("CDF(BinomialDistribution(n, m),k)",
                 "Piecewise({{BetaRegularized(1-m,n-Floor(k),1+Floor(k)),0<=k&&k<n},{1,k>=n}},0)");
@@ -3025,8 +3026,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
     public void testGegenbauerC() {
         check("GegenbauerC(5,z)", "2*z-8*z^3+32/5*z^5");
-        check("GegenbauerC(1/2,z)", "(4*Sqrt(1+z))/Sqrt(2)");
-        check("GegenbauerC(-1/2,z)", "(-4*Sqrt(1+z))/Sqrt(2)");
+		check("GegenbauerC(1/2,z)", "2*Sqrt(2)*Sqrt(1+z)");
+		check("GegenbauerC(-1/2,z)", "-2*Sqrt(2)*Sqrt(1+z)");
         check("GegenbauerC(v,0)", "(2*Cos(1/2*Pi*v))/v");
         check("GegenbauerC(v,1)", "2/v");
         check("GegenbauerC(v,-1)", "(2*Cos(Pi*v))/v");
@@ -4108,7 +4109,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("Log(1000) / Log(10)", "3");
         check("Log(1.4)", "0.33647");
         checkNumeric("Log(Exp(1.4))", "1.3999999999999997");
-        checkNumeric("Log(-1.4)", "0.3364722366212129+I*3.141592653589793");
+        checkNumeric("Log(-1.4)", "0.33647223662121284+I*3.141592653589793");
 
         check("Log(-1)", "I*Pi");
         // test alias
@@ -5285,8 +5286,27 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testOrthogonalize() {
+		check("2/Sqrt(14)", //
+				"Sqrt(2)/Sqrt(7)");
+		check("(1/4)*Sqrt(1/2)", //
+				"1/(4*Sqrt(2))");
+		check("4*Sqrt(2)", //
+				"4*Sqrt(2)");
+		check("1/Sqrt(14)", //
+				"1/Sqrt(14)");
+		check("2/Sqrt(14)", //
+				"Sqrt(2)/Sqrt(7)");
+		check("5/Sqrt(42)", //
+				"5/Sqrt(42)");
+		check("-2/Sqrt(2/21)", //
+				"-Sqrt(42)");
+		check("1/Sqrt(3)", //
+				"1/Sqrt(3)");
+		check("-1/Sqrt(3)", //
+				"-1/Sqrt(3)");
         check("Orthogonalize({{3,1},{2,2}})", //
-                "{{3/Sqrt(10),1/Sqrt(10)},{-Sqrt(5/2)/5,3/5*Sqrt(5/2)}}");
+				"{{3/Sqrt(10),1/Sqrt(10)},{-1/Sqrt(10),3/Sqrt(10)}}");
+
         check("Orthogonalize({{1,0,1},{1,1,1}})", //
                 "{{1/Sqrt(2),0,1/Sqrt(2)},{0,1,0}}");
         check("Orthogonalize({{1, 2}, {3, 1}, {6, 9}, {7, 8}})", //
@@ -5294,8 +5314,8 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("Orthogonalize({{2,3}, {2,7}, {4,5}})", //
                 "{{2/Sqrt(13),3/Sqrt(13)},{-3/Sqrt(13),2/Sqrt(13)},{0,0}}");
         check("Orthogonalize({{1,2,3},{5,2,7},{3,5,1}})", //
-                "{{1/Sqrt(14),2/Sqrt(14),3/Sqrt(14)},{5/7*Sqrt(7/6),-4/7*Sqrt(7/6),Sqrt(7/6)/7},{1/Sqrt(\n"
-                        + "3),1/Sqrt(3),-1/Sqrt(3)}}");
+				"{{1/Sqrt(14),Sqrt(2)/Sqrt(7),3/Sqrt(14)},{5/Sqrt(42),(-2*Sqrt(2))/Sqrt(21),1/Sqrt(\n"
+						+ "42)},{1/Sqrt(3),1/Sqrt(3),-1/Sqrt(3)}}");
         check("Orthogonalize({{1,0,0},{0,0,1}})", //
                 "{{1,0,0},{0,0,1}}");
     }
@@ -5546,7 +5566,7 @@ public class LowercaseTestCase extends AbstractTestCase {
                 "Piecewise({{(2*(n/m)^n)/(k^(1-2*n)*E^((k^2*n)/m)*Gamma(n)),k>0}},0)");
         check("PDF(NormalDistribution(n, m),k)", "1/(Sqrt(2)*E^((k-n)^2/(2*m^2))*m*Sqrt(Pi))");
         check("PDF(FrechetDistribution(n, m),k)", "Piecewise({{n/((k/m)^(1+n)*E^(k/m)^(-n)*m),k>0}},0)");
-        check("PDF(GammaDistribution(n, m),k)", "Piecewise({{1/(k^(1-n)*E^(k/m)*m^n*Gamma(n)),k>0}},0)");
+		check("PDF(GammaDistribution(n, m),k)", "Piecewise({{1/(m^n*E^(k/m)*Gamma(n)*k^(1-n)),k>0}},0)");
         check("PDF(GeometricDistribution(n),k)", "Piecewise({{(1-n)^k*n,k>=0}},0)");
         check("PDF(GumbelDistribution(n, m),k)", "E^(-E^((k-n)/m)+(k-n)/m)/m");
         check("PDF(HypergeometricDistribution(n, ns, nt),k)",
@@ -5818,8 +5838,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 
     public void testPower() {
 
-        check("Sqrt(63/5)", "3*Sqrt(7/5)");
-        check("Sqrt(9/2)", "3/Sqrt(2)");
+		check("64^(2/3)", //
+				"16");
+		check("81^(3/4)", //
+				"27");
+		check("Sqrt(63/5)", //
+				"3*Sqrt(7/5)");
+		check("Sqrt(9/2)", //
+				"3/Sqrt(2)");
         check("Sqrt(1/2)", "1/Sqrt(2)");
         check("1/Sqrt(2)-Sqrt(1/2)", "0");
         check("(2/3)^(-3/4)", "(3/2)^(3/4)");
@@ -6234,6 +6260,7 @@ public class LowercaseTestCase extends AbstractTestCase {
                 "ConditionalExpression(m-Sqrt(2)*s*InverseErfc(2*#1),0<=#1<=1)&");
         check("Quantile(NormalDistribution(m, s), q)", //
                 "ConditionalExpression(m-Sqrt(2)*s*InverseErfc(2*q),0<=q<=1)");
+
         check("Quantile({1, 2, 3, 4, 5, 6, 7}, 1/2)", "4");
 
         check("Quantile({1,2}, 0.5)", "1");
@@ -6299,18 +6326,18 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testRandomVariate() {
-//		check("RandomVariate(NormalDistribution(2,3), 10^1)", //
-//				"{1.14364,6.09674,5.16495,2.39937,-0.52143,-1.46678,3.60142,-0.85405,2.06373,-0.29795}");
-//		check("RandomVariate(NormalDistribution(2,3))", //
-//				"1.99583");
-//		check("RandomVariate(NormalDistribution())", //
-//				"-0.56291");
-//		check("RandomVariate(DiscreteUniformDistribution({3,7}), {2})", "{3,7}");
-//		check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3})", "{{5,4,7},{5,7,3}}");
-//		check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3,4})",
-//				"{{{4,5,5,3},{5,4,4,6},{6,3,4,7}},{{6,6,7,3},{4,6,5,6},{7,7,6,5}}}");
-//		check("RandomVariate(DiscreteUniformDistribution({3,7}), 10)", "{6,5,7,7,7,7,4,5,6,3}");
-//		check("RandomVariate(DiscreteUniformDistribution({1, 5}) )", "3");
+		// check("RandomVariate(NormalDistribution(2,3), 10^1)", //
+		// "{1.14364,6.09674,5.16495,2.39937,-0.52143,-1.46678,3.60142,-0.85405,2.06373,-0.29795}");
+		// check("RandomVariate(NormalDistribution(2,3))", //
+		// "1.99583");
+		// check("RandomVariate(NormalDistribution())", //
+		// "-0.56291");
+		// check("RandomVariate(DiscreteUniformDistribution({3,7}), {2})", "{3,7}");
+		// check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3})", "{{5,4,7},{5,7,3}}");
+		// check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3,4})",
+		// "{{{4,5,5,3},{5,4,4,6},{6,3,4,7}},{{6,6,7,3},{4,6,5,6},{7,7,6,5}}}");
+		// check("RandomVariate(DiscreteUniformDistribution({3,7}), 10)", "{6,5,7,7,7,7,4,5,6,3}");
+		// check("RandomVariate(DiscreteUniformDistribution({1, 5}) )", "3");
     }
 
     public void testRange() {
@@ -7152,6 +7179,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("foo=barf", "barf");
         check("foo[x]=1", "1");
         check("barf[x]=1", "1");
+
         check("a = 3", "3");
         check("a", "3");
         check("{a, b, c} = {10, 2, 3}   ", "{10,2,3}");
@@ -7961,12 +7989,21 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testSurd() {
+		check("Surd(-16.0,2)", "Indeterminate");
+
+		checkNumeric("Surd(-3,3)", "-3^(1/3)");
+		checkNumeric("N((-3)^(1/3))", "0.7211247851537043+I*1.2490247664834064");
+		checkNumeric("Surd(-3,3)-(-3)^(1/3)", "-(-3)^(1/3)-3^(1/3)");
+		checkNumeric("Surd(-3.,3)-(-3)^(1/3)", "-2.1633743554611127+I*(-1.2490247664834064)");
+		checkNumeric("Surd(-3,3)", "-3^(1/3)");
+		checkNumeric("Surd(-3.,3)", "-1.4422495703074083");
+		checkNumeric("N(Surd(-3,3))", "-1.4422495703074083");
         checkNumeric("1/9 * 3^(4/3)", "1/3^(2/3)");
         // checkNumeric("1/9 * 3^(7/4)", "1/3^(1/4)");
         checkNumeric("1/9 * 3^(3/4)", "1/(3*3^(1/4))");
         checkNumeric("1/9 * 3^(-1/2)", "1/(9*Sqrt(3))");
         checkNumeric("1/9 * 3^(1/2)", "1/(3*Sqrt(3))");
-        checkNumeric(" 2^(1/4)*2^(-3) ", "1/(4*2^(3/4))");
+		checkNumeric(" 2^(1/4)*2^(-3) ", "1/(4*8^(1/4))");
         checkNumeric("2^(-3)", "1/8");
         checkNumeric("2^(-3/4)", "1/2^(3/4)");
 
@@ -7974,7 +8011,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         checkNumeric("Surd(2,4)/8-(1/(4*2^(1/4.0)))", "-0.061573214438088525");
         checkNumeric("1/(4*2^(1/4.0))", "0.21022410381342865");
         checkNumeric("Surd(2,4)", "2^(1/4)");
-        checkNumeric("Surd(2,4)/8", "1/(4*2^(3/4))");
+		checkNumeric("Surd(2,4)/8", "1/(4*8^(1/4))");
 
         checkNumeric("Surd(-2.,5)", "-1.148698354997035");
         // checkNumeric("(-2.0)^(1/5)", "-1.148698354997035");
@@ -7985,7 +8022,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("Surd(-3,-2)", "Indeterminate");
 
         check("Surd(I,2)", "Surd(I,2)");
-        check("Surd({-3, -2, -1, 0, 1, 2, 3}, 7)", "{(-3)^(1/7),(-2)^(1/7),-1,0,1,2^(1/7),3^(1/7)}");
+		check("Surd({-3, -2, -1, 0, 1, 2, 3}, 7)", "{-3^(1/7),-2^(1/7),-1,0,1,2^(1/7),3^(1/7)}");
         checkNumeric("N(Surd({-3, -2, -1, 0, 1, 2, 3}, 7))",
                 "{-1.169930812758687,-1.1040895136738123,-1.0,0.0,1.0,1.1040895136738123,1.169930812758687}");
         checkNumeric("N(Surd( -2,  5),25)", "-1.1486983549970350067986269");
@@ -8241,8 +8278,14 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testTimes() {
-        // String s = System.getProperty("os.name");
-        // if (s.contains("Windows")) {
+		// github #35
+		check("5/7*Sqrt(7/6)", //
+				"5/Sqrt(42)");
+
+		check("Sqrt(1/2)*(1+x)", //
+				"(1+x)/Sqrt(2)");
+		check("((5/21)^(2/3)*(7/6)^(2/7))  ", //
+				"5^(2/3)/(2^(2/7)*3^(20/21)*7^(8/21))");
         check("x*y/(y*z)", "x/z");
         check("x*y/(y^3*z)", "x/(y^2*z)");
         check("x*y/(y^(2/3)*z)", "(x*y^(1/3))/z");

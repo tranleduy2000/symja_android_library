@@ -2,6 +2,9 @@ package org.matheclipse.core.system;
 
 import junit.framework.TestCase;
 
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.expression.ASTSeriesData;
+import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.patternmatching.RulesData;
@@ -74,7 +77,7 @@ public class SerializableTest extends TestCase {
 	}
 
 	public void testSymbol() {
-//		equalsCopy(F.Pi);
+		// equalsCopy(F.Pi);
 		equalsCopy(F.symbol("testme"));
 	}
 
@@ -83,6 +86,7 @@ public class SerializableTest extends TestCase {
 	}
 
 	public void testFunction() {
+		equalsCopy(F.ast(F.symbol("fun1")));
 		equalsCopy(F.Sin(F.Times(F.C1D2, F.Pi)));
 		equalsCopy(F.Continue());
 		equalsCopy(F.If(F.True, F.Plus(F.Infinity, F.Pi), F.False));
@@ -110,10 +114,10 @@ public class SerializableTest extends TestCase {
 	}
 
 	public void testIntegrateDefinition() {
-		/*RulesData rulesData = F.Integrate.getRulesData();
+		RulesData rulesData = F.Integrate.getRulesData();
 		AbstractVisitor visitor = Share.createVisitor();
 		rulesData.accept(visitor);
-		equalsStringCopy(rulesData);*/
+		equalsStringCopy(rulesData);
 	}
 
 	public void testSinDefinition() {
@@ -124,10 +128,44 @@ public class SerializableTest extends TestCase {
 		equalsCopy(rulesData);
 	}
 
+	public void testPowerSeries() {
+		equalsCopy(new ASTSeriesData(F.x, F.a, F.List(F.C0, F.C1, F.C3), 0, 10, 1));
+		EvalEngine engine = EvalEngine.get();
+		IExpr result = engine.evaluate("Series(Log(x),{x,a,4})");
+		equalsCopy(result);
+	}
 	public void testNIL() {
 		equalsCopy(F.NIL);
 	}
 
+	public void testEvalEngine() {
+		try {
+			EvalEngine engine = EvalEngine.get();
+			engine.evaluate("x=10");
+			Context context = engine.getContextPath().getGlobalContext();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(context);
+			byte[] bArray = baos.toByteArray();
+			baos.close();
+			oos.close();
+			ByteArrayInputStream bais = new ByteArrayInputStream(bArray);
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			Context copy = (Context) ois.readObject();
+			bais.close();
+			ois.close();
+			engine.getContextPath().setGlobalContext(copy);
+			IExpr result = engine.evaluate("x");
+			assertEquals("10", result.toString());
+
+		} catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+			assertEquals("", cnfe.toString());
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+			assertEquals("", ioe.toString());
+		}
+	}
 	private void equalsCopy(Object original) {
 		try {
 
