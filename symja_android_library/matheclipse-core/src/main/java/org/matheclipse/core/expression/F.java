@@ -471,6 +471,7 @@ public class F {
 	public final static IBuiltInSymbol InverseErf = BuiltIns.valueOf(BuiltIns.InverseErf);
 	public final static IBuiltInSymbol InverseErfc = BuiltIns.valueOf(BuiltIns.InverseErfc);
 	public final static IBuiltInSymbol InverseFunction = BuiltIns.valueOf(BuiltIns.InverseFunction);
+    public final static IBuiltInSymbol InverseGammaRegularized = BuiltIns.valueOf(BuiltIns.InverseGammaRegularized);
 	public final static IBuiltInSymbol InverseHaversine = BuiltIns.valueOf(BuiltIns.InverseHaversine);
 	public final static IBuiltInSymbol InverseLaplaceTransform = BuiltIns.valueOf(BuiltIns.InverseLaplaceTransform);
 	public final static IBuiltInSymbol InverseSeries = BuiltIns.valueOf(BuiltIns.InverseSeries);
@@ -2472,6 +2473,13 @@ public class F {
 		return ComplexSym.valueOf(real_numerator, real_denominator, imag_numerator, imag_denominator);
 	}
 
+	public static IAST CDF(final IExpr a0) {
+		return unaryAST1(CDF, a0);
+	}
+
+	public static IAST CDF(final IExpr a0, final IExpr a1) {
+		return binaryAST2(CDF, a0, a1);
+	}
 	public static IAST Ceiling(final IExpr a0) {
 		return unaryAST1(Ceiling, a0);
 	}
@@ -3439,6 +3447,13 @@ public class F {
 	public static IAST Gamma(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(Gamma, a0, a1, a2);
 	}
+	public static IAST GammaDistribution(final IExpr a0, final IExpr a1) {
+		return binaryAST2(GammaDistribution, a0, a1);
+	}
+
+	public static IAST GammaDistribution(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
+		return quaternary(GammaDistribution, a0, a1, a2, a3);
+	}
 	public static IAST GammaRegularized(final IExpr a0, final IExpr a1) {
 		return binaryAST2(GammaRegularized, a0, a1);
 	}
@@ -3803,6 +3818,9 @@ public class F {
 		return unaryAST1(InverseFunction, a);
 	}
 
+	public static IAST InverseGammaRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(InverseGammaRegularized, a0, a1, a2);
+	}
 	public static IAST InverseLaplaceTransform(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(InverseLaplaceTransform, a0, a1, a2);
 	}
@@ -4497,6 +4515,13 @@ public class F {
 		return binaryAST2(PatternTest, a0, a1);
 	}
 
+	public static IAST PDF(final IExpr a0) {
+		return unaryAST1(PDF, a0);
+	}
+
+	public static IAST PDF(final IExpr a0, final IExpr a1) {
+		return binaryAST2(PDF, a0, a1);
+	}
 	public static IAST Piecewise(final IExpr a0) {
 		return unaryAST1(Piecewise, a0);
 	}
