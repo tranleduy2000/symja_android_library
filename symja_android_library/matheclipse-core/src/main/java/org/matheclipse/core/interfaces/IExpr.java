@@ -532,8 +532,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isAlternatives();
 
     /**
-     * Test if this expression is the <code>HoldPattern</code> function
-     * <code>HoldPattern[&lt;expression&gt;]</code>
+     * Test if this expression is the <code>HoldPattern</code> function <code>HoldPattern[&lt;expression&gt;]</code>
      *
      * @return
      */
@@ -597,6 +596,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see #isAtom()
      */
     boolean isAST();
+
+    /**
+     * Test if this expression is a Distribution AST (i.e. NormalDistribution(), PoissonDistribution(),...)
+     *
+     * @return
+     */
+    boolean isDistribution();
 
     /**
      * Test if this expression is an AST list, which contains the given <b>header element</b> at index position

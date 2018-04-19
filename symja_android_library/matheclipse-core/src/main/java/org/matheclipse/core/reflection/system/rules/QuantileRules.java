@@ -8,19 +8,29 @@ import static org.matheclipse.core.expression.F.C2;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.ConditionalExpression;
+import static org.matheclipse.core.expression.F.ExponentialDistribution;
+import static org.matheclipse.core.expression.F.FrechetDistribution;
 import static org.matheclipse.core.expression.F.Function;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISetDelayed;
 import static org.matheclipse.core.expression.F.InverseErfc;
+import static org.matheclipse.core.expression.F.Less;
 import static org.matheclipse.core.expression.F.LessEqual;
 import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.NormalDistribution;
+import static org.matheclipse.core.expression.F.Piecewise;
 import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Quantile;
 import static org.matheclipse.core.expression.F.Slot1;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.m;
 import static org.matheclipse.core.expression.F.m_;
+import static org.matheclipse.core.expression.F.n;
+import static org.matheclipse.core.expression.F.n_;
+import static org.matheclipse.core.expression.F.oo;
 import static org.matheclipse.core.expression.F.s;
 import static org.matheclipse.core.expression.F.s_;
 
@@ -34,12 +44,18 @@ public interface QuantileRules {
      * <li>index 0 - number of equal rules in <code>RULES</code></li>
      * </ul>
      */
-    final public static int[] SIZES = { 0, 1 };
+    final public static int[] SIZES = {0, 1};
 
     final public static IAST RULES = List(
             IInit(Quantile, SIZES),
             // Quantile(NormalDistribution(m_,s_)):=ConditionalExpression(m-Sqrt(2)*s*InverseErfc(2*#1),0<=#1<=1)&
-            ISetDelayed(Quantile(NormalDistribution(m_,s_)),
-                    Function(ConditionalExpression(Plus(m,Times(CN1,CSqrt2,s,InverseErfc(Times(C2,Slot1)))),LessEqual(C0,Slot1,C1))))
+            ISetDelayed(Quantile(NormalDistribution(m_, s_)),
+                    Function(ConditionalExpression(Plus(m, Times(CN1, CSqrt2, s, InverseErfc(Times(C2, Slot1)))), LessEqual(C0, Slot1, C1)))),
+            // Quantile(ExponentialDistribution(n_)):=ConditionalExpression(Piecewise({{-Log(1-#1)/n,#1<1}},Infinity),0<=#1<=1)&
+            ISetDelayed(Quantile(ExponentialDistribution(n_)),
+                    Function(ConditionalExpression(Piecewise(List(List(Times(CN1, Power(n, -1), Log(Plus(C1, Negate(Slot1)))), Less(Slot1, C1))), oo), LessEqual(C0, Slot1, C1)))),
+            // Quantile(FrechetDistribution(n_,m_)):=ConditionalExpression(Piecewise({{m/(-Log(#1))^(1/n),0<#1<1},{0,#1<=0}},Infinity),0<=#1<=1)&
+            ISetDelayed(Quantile(FrechetDistribution(n_, m_)),
+                    Function(ConditionalExpression(Piecewise(List(List(Times(m, Power(Power(Negate(Log(Slot1)), Power(n, -1)), -1)), Less(C0, Slot1, C1)), List(C0, LessEqual(Slot1, C0))), oo), LessEqual(C0, Slot1, C1))))
     );
 }

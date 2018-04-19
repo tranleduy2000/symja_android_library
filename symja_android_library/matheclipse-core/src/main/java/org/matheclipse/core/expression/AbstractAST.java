@@ -1710,6 +1710,13 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return isSameHead(F.DirectedInfinity, 2) && arg1().equals(x);
 	}
 
+	public boolean isDistribution() {
+		if (head().isBuiltInSymbol()) {
+			IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
+			return evaluator instanceof IMean;
+		}
+		return false;
+	}
 	@Override
 	public final boolean isEmpty() {
 		return size() == 1;

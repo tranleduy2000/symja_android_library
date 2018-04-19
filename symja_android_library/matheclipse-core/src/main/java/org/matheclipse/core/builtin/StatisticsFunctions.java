@@ -30,6 +30,7 @@ import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.IMean;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -124,15 +125,6 @@ public class StatisticsFunctions {
         IExpr p_equals(IAST dist, IExpr n);
     }
 
-    /**
-     * Any distribution for which an analytic expression of the mean exists should implement {@link IMean}.
-     * <p>
-     * <p>
-     * The function is used in {@link Expectation} to provide the mean of a given {@link IDistribution}.
-     */
-    interface IMean {
-        IExpr mean(IAST distribution);
-    }
 
     /**
      * Any distribution for which an analytic expression of the variance exists should implement {@link IVariance}.
@@ -1123,8 +1115,8 @@ public class StatisticsFunctions {
             Validate.checkSize(ast, 3);
 
             if (ast.arg2().isAST()) {
-                final IExpr arg1 = ast.arg1();
-                final IAST vars = VariablesSet.getVariables(arg1);
+                IExpr arg1 = ast.arg1();
+                IAST vars = VariablesSet.getVariables(arg1);
                 IAST dist = (IAST) ast.arg2();
                 if (dist.head().isSymbol()) {
                     ISymbol head = (ISymbol) dist.head();
@@ -1132,9 +1124,7 @@ public class StatisticsFunctions {
                         IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
                         if (evaluator instanceof IDiscreteDistribution) {
                             IDiscreteDistribution distribution = (IDiscreteDistribution) evaluator;
-                            return of(dist, new Function<IExpr, IExpr>() {
-                                        @Override
-                                        public IExpr apply(IExpr x) {
+                            return of(dist, x -> {
                                             if (vars.size() > 1) {
                                                 IExpr temp = arg1.replaceAll(F.Rule(vars.arg1(), x));
                                                 if (temp.isPresent()) {
@@ -1142,19 +1132,7 @@ public class StatisticsFunctions {
                                                 }
                                             }
                                             return arg1;
-                                        }
-
-                                    }
-                                    // x -> {
-                                    // if (vars.size() > 1) {
-                                    // IExpr temp = arg1.replaceAll(F.Rule(vars.arg1(), x));
-                                    // if (temp.isPresent()) {
-                                    // return temp;
-                                    // }
-                                    // }
-                                    // return arg1;
-                                    // }
-                                    , distribution);
+                            }, distribution);
                         }
                     }
                 }
@@ -1315,18 +1293,9 @@ public class StatisticsFunctions {
                 return F.Times(list.apply(F.Plus), F.Power(F.integer(list.argSize()), F.CN1));
             }
 
-            if (arg1.isAST()) {
-                IAST dist = (IAST) arg1;
-                if (dist.head().isSymbol()) {
-                    ISymbol head = (ISymbol) dist.head();
-                    if (head instanceof IBuiltInSymbol) {
-                        IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
-                        if (evaluator instanceof IMean) {
-                            IMean distribution = (IMean) evaluator;
-                            return distribution.mean(dist);
-                        }
-                    }
-                }
+            if (arg1.isDistribution()) {
+                IMean distribution = (IMean) ((IBuiltInSymbol) arg1.head()).getEvaluator();
+                return distribution.mean((IAST) arg1);
             }
             return F.NIL;
         }
@@ -1850,21 +1819,15 @@ public class StatisticsFunctions {
                         ae.printStackTrace();
                     }
                 }
-            } else if (arg1.isAST()) {
-                IAST dist = (IAST) arg1;
-                if (dist.head().isBuiltInSymbol()) {
-                    IBuiltInSymbol head = (IBuiltInSymbol) dist.head();
-                    IEvaluator evaluator = head.getEvaluator();
-                    if (evaluator instanceof IRandomVariate) {
-                        if (arg1.isAST2()) {
+            } else if (arg1.isDistribution()) {
                             IExpr function = engine.evaluate(F.Quantile(arg1));
                             if (function.isFunction()) {
+                    if (ast.arg2().isList()) {
+                        return ((IAST) ast.arg2()).map(x -> F.unaryAST1(function, x), 1);
+                    }
                                 return F.unaryAST1(function, ast.arg2());
                             }
                         }
-                    }
-                }
-            }
             return F.NIL;
         }
 

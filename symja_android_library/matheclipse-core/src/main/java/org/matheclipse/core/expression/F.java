@@ -3266,6 +3266,9 @@ public class F {
 		return ternaryAST3(Exponent, a0, a1, a2);
 	}
 
+	public static IAST ExponentialDistribution(final IExpr a0) {
+		return unaryAST1(ExponentialDistribution, a0);
+	}
 	public static IAST Extract(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Extract, a0, a1);
 	}
