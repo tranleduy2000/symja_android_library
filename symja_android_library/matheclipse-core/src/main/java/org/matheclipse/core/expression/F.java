@@ -4095,14 +4095,14 @@ public class F {
 			}
 			int j = 0;
 			for (int i = numbers.length - 1; i >= size; i--) {
-				a[j++] = new IntegerSym(numbers[i]);
+				a[j++] = F.ZZ(numbers[i]);
 			}
 		} else {
 			if (n < size) {
 				size = n;
 			}
 			for (int i = 0; i < size; i++) {
-				a[i] = new IntegerSym(numbers[i]);
+				a[i] = F.ZZ(numbers[i]);
 			}
 		}
 		return ast(a, List);

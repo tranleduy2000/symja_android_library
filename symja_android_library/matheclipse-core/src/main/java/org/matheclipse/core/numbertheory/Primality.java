@@ -6,9 +6,16 @@ import com.google.common.math.LongMath;
 import org.matheclipse.combinatoric.KSubsets;
 import org.matheclipse.combinatoric.KSubsets.KSubsetsList;
 import org.matheclipse.core.eval.exception.ReturnException;
+import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
+import org.matheclipse.core.expression.AbstractIntegerSym;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.IntegerSym;
+import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.IRational;
 
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,16 +26,55 @@ import java.util.TreeSet;
 
 /**
  * Provides primality probabilistic methods.
- * <p>
+ *
  * Copied from Apache Harmony projects java.math package.
+ *
  */
 public class Primality {
 
+    private static class PrimePowerTreedMap extends TreeMap<BigInteger, Integer> {
+        private static final long serialVersionUID = 7802239809732541730L;
+
+        @Override
+        public Integer put(BigInteger key, Integer value) {
+            Integer result = super.put(key, value);
+            if (size() > 1) {
+                // not a prime power:
+                throw ReturnException.RETURN_FALSE;
+            }
+            return result;
+        }
+    }
+
+    private static class SquareFreeTreedMap extends TreeMap<BigInteger, Integer> {
+        private static final long serialVersionUID = -7769218967264615452L;
+
+        @Override
+        public Integer put(BigInteger key, Integer value) {
+            Integer result = super.put(key, value);
+            if (value > 1) {
+                // not a square free number:
+                throw ReturnException.RETURN_FALSE;
+            }
+            if (result != null && result > 1) {
+                // not a square free number:
+                throw ReturnException.RETURN_FALSE;
+            }
+            return result;
+        }
+    }
+
+    private final static SecureRandom random = new SecureRandom();
     private final static BigInteger TWO = new BigInteger("2");
-    /**
-     * All prime numbers with bit length lesser than 10 bits.
-     */
-    private static final int primes[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+
+    /** Just to denote that this class can't be instantied. */
+    private Primality() {
+    }
+
+	/* Private Fields */
+
+    /** All prime numbers with bit length lesser than 10 bits. */
+    private static final int primes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
             73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181,
             191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307,
             311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421, 431, 433,
@@ -36,11 +82,12 @@ public class Primality {
             577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 701,
             709, 719, 727, 733, 739, 743, 751, 757, 761, 769, 773, 787, 797, 809, 811, 821, 823, 827, 829, 839, 853,
             857, 859, 863, 877, 881, 883, 887, 907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997,
-            1009, 1013, 1019, 1021};
+            1009, 1013, 1019, 1021 };
+
     /**
      * All prime numbers shorter than Short.MAX_VALUE which are not in <code>primes[]</code> array.
      */
-    private static final short[] SHORT_PRIMES = {1031, 1033, 1039, 1049, 1051, 1061, 1063, 1069, 1087, 1091, 1093,
+    private static final short[] SHORT_PRIMES = { 1031, 1033, 1039, 1049, 1051, 1061, 1063, 1069, 1087, 1091, 1093,
             1097, 1103, 1109, 1117, 1123, 1129, 1151, 1153, 1163, 1171, 1181, 1187, 1193, 1201, 1213, 1217, 1223, 1229,
             1231, 1237, 1249, 1259, 1277, 1279, 1283, 1289, 1291, 1297, 1301, 1303, 1307, 1319, 1321, 1327, 1361, 1367,
             1373, 1381, 1399, 1409, 1423, 1427, 1429, 1433, 1439, 1447, 1451, 1453, 1459, 1471, 1481, 1483, 1487, 1489,
@@ -251,29 +298,30 @@ public class Primality {
             32299, 32303, 32309, 32321, 32323, 32327, 32341, 32353, 32359, 32363, 32369, 32371, 32377, 32381, 32401,
             32411, 32413, 32423, 32429, 32441, 32443, 32467, 32479, 32491, 32497, 32503, 32507, 32531, 32533, 32537,
             32561, 32563, 32569, 32573, 32579, 32587, 32603, 32609, 32611, 32621, 32633, 32647, 32653, 32687, 32693,
-            32707, 32713, 32717, 32719, 32749};
+            32707, 32713, 32717, 32719, 32749 };
+
     /**
      * All {@code BigInteger} prime numbers with bit length lesser than 8 bits.
      */
     private static final BigInteger BIprimes[] = new BigInteger[primes.length];
 
-	/* Private Fields */
     /**
      * It encodes how many iterations of Miller-Rabin test are need to get an error bound not greater than
      * {@code 2<sup>(-100)</sup>}. For example: for a {@code 1000}-bit number we need {@code 4} iterations, since
      * {@code BITS[3]
      * < 1000 <= BITS[4]}.
      */
-    private static final int[] BITS = {0, 0, 1854, 1233, 927, 747, 627, 543, 480, 431, 393, 361, 335, 314, 295, 279,
+    private static final int[] BITS = { 0, 0, 1854, 1233, 927, 747, 627, 543, 480, 431, 393, 361, 335, 314, 295, 279,
             265, 253, 242, 232, 223, 216, 181, 169, 158, 150, 145, 140, 136, 132, 127, 123, 119, 114, 110, 105, 101, 96,
-            92, 87, 83, 78, 73, 69, 64, 59, 54, 49, 44, 38, 32, 26, 1};
+            92, 87, 83, 78, 73, 69, 64, 59, 54, 49, 44, 38, 32, 26, 1 };
+
     /**
      * It encodes how many i-bit primes there are in the table for {@code i=2,...,10}. For example
      * {@code offsetPrimes[6]} says that from index {@code 11} exists {@code 7} consecutive {@code 6}-bit prime numbers
      * in the array.
      */
-    private static final int[][] offsetPrimes = {null, null, {0, 2}, {2, 2}, {4, 2}, {6, 5}, {11, 7},
-            {18, 13}, {31, 23}, {54, 43}, {97, 75}};
+    private static final int[][] offsetPrimes = { null, null, { 0, 2 }, { 2, 2 }, { 4, 2 }, { 6, 5 }, { 11, 7 },
+            { 18, 13 }, { 31, 23 }, { 54, 43 }, { 97, 75 } };
 
     static {// To initialize the dual table of BigInteger primes
         for (int i = 0; i < primes.length; i++) {
@@ -282,74 +330,219 @@ public class Primality {
     }
 
     /**
-     * Just to denote that this class can't be instantied.
-     */
-    private Primality() {
-    }
-
-    /**
      * Factor the given value into primes less equal than 1021.
      *
-     * @param val a BigInteger value which should be factored by all primes less equal than 1021
-     * @param map a map which counts the prime integer factors less equal than 1021
+     * @param val
+     *            a BigInteger value which should be factored by all primes less equal than 1021
+     * @param map
+     *            a map which counts the prime integer factors less equal than 1021
      * @return the rest factor or zero, if the number could be factored completely into primes less equal then 1021
      */
     public static BigInteger countPrimes1021(final BigInteger val, Map<Integer, Integer> map) {
         BigInteger[] divRem;
         BigInteger result = val;
-        Integer count;
+        int count;
         for (int i = 0; i < primes.length; i++) {
             if (result.compareTo(BIprimes[i]) < 0) {
                 break;
             }
             divRem = result.divideAndRemainder(BIprimes[i]);
-            while (divRem[1].equals(BigInteger.ZERO)) {
-                count = map.get(primes[i]);
-                if (count == null) {
-                    map.put(primes[i], 1);
-                } else {
-                    map.put(primes[i], count + 1);
+            if (divRem[1].equals(BigInteger.ZERO)) {
+                count = 0;
+                Integer iCount = map.get(primes[i]);
+                if (iCount != null) {
+                    count = iCount;
                 }
-                result = divRem[0];// quotient
-                if (result.compareTo(BIprimes[i]) < 0) {
-                    break;
-                }
-                divRem = result.divideAndRemainder(BIprimes[i]);
+                do {
+                    count++;
+                    result = divRem[0];// quotient
+                    if (result.compareTo(BIprimes[i]) < 0) {
+                        break;
+                    }
+                    divRem = result.divideAndRemainder(BIprimes[i]);
+                } while (divRem[1].equals(BigInteger.ZERO));
+                map.put(primes[i], count);
             }
         }
         return result;
     }
 
     /**
+     * Factor the given base into primes less equal than 1021.
+     *
+     * @param base
+     *            a BigInteger value which should be factored by all primes less equal than 1021
+     * @param exponent
+     *            the exponent which should be used for the collected primes
+     * @param map
+     *            a map which collects the prime integer factors less equal than 1021 in the form
+     *            <code>prime-factor -> prime-count * exponent</code>
+     * @param evaled
+     *            if <code>evaled[0]</code> is <code>true</code> a transformations was done
+     * @return the rest factor or one, if the number could be factored completely into primes less equal then 1021
+     */
+    public static IInteger countPrimes1021(IInteger base, IRational exponent, OpenIntToIExprHashMap<IRational> map,
+                                           boolean[] evaled) {
+        if (base.isOne() || base.isMinusOne()) {
+            return base;
+        }
+        if (base instanceof IntegerSym) {
+            return countPrimes1021(base.intValue(), exponent, map, evaled);
+        }
+        return countPrimes1021(base.toBigNumerator(), exponent, map, evaled);
+    }
+
+    /**
+     * Factor the given base into primes less equal than 1021.
+     *
+     * @param base
+     *            a BigInteger value which should be factored by all primes less equal than 1021
+     * @param exponent
+     *            the exponent which should be used for the collected primes
+     * @param map
+     *            a map which collects the prime integer factors less equal than 1021 in the form
+     *            <code>prime-factor -> prime-count * exponent</code>
+     * @param evaled
+     *            if <code>evaled[0]</code> is <code>true</code> a transformations was done
+     * @return the rest factor or one, if the number could be factored completely into primes less equal then 1021
+     */
+    private static IInteger countPrimes1021(final BigInteger base, IRational exponent,
+                                            OpenIntToIExprHashMap<IRational> map, boolean[] evaled) {
+        BigInteger[] divRem;
+        BigInteger result = base;
+        int count;
+        if (base.compareTo(BigInteger.ZERO) < 0) {
+            // base < 0
+            IRational exp = map.get(-1);
+            if (exp == null) {
+                map.put(-1, exponent);
+            } else {
+                evaled[0] = true;
+                map.put(-1, exp.add(exponent));
+            }
+            result = base.negate();
+        }
+        for (int i = 0; i < primes.length; i++) {
+            if (result.compareTo(BIprimes[i]) < 0) {
+                break;
+            }
+            divRem = result.divideAndRemainder(BIprimes[i]);
+            if (divRem[1].equals(BigInteger.ZERO)) {
+                count = 0;
+                do {
+                    count++;
+                    result = divRem[0];// quotient
+                    if (result.compareTo(BIprimes[i]) < 0) {
+                        break;
+                    }
+                    divRem = result.divideAndRemainder(BIprimes[i]);
+                } while (divRem[1].equals(BigInteger.ZERO));
+                IRational exp = map.get(primes[i]);
+                if (exp == null) {
+                    map.put(primes[i], F.ZZ(count).multiply(exponent));
+                } else {
+                    evaled[0] = true;
+                    map.put(primes[i], exp.add(F.ZZ(count).multiply(exponent)));
+                }
+
+            }
+        }
+        return AbstractIntegerSym.valueOf(result);
+    }
+
+    /**
+     * Factor the given base into primes less equal than 1021.
+     *
+     * @param base
+     *            an int value which should be factored by all primes less equal than 1021
+     * @param exponent
+     *            the exponent which should be used for the collected primes
+     * @param map
+     *            a map which collects the prime integer factors less equal than 1021 in the form
+     *            <code>prime-factor -> prime-count * exponent</code>
+     * @param evaled
+     *            if <code>evaled[0]</code> is <code>true</code> a transformations was done
+     * @return the rest factor or one, if the number could be factored completely into primes less equal then 1021
+     */
+    private static IInteger countPrimes1021(final int base, IRational exponent, OpenIntToIExprHashMap<IRational> map,
+                                            boolean[] evaled) {
+        int result = base;
+        int count;
+        if (base < 0) {
+            IRational exp = map.get(-1);
+            if (exp == null) {
+                map.put(-1, exponent);
+            } else {
+                evaled[0] = true;
+                map.put(-1, exp.add(exponent));
+            }
+            result = -base;
+        }
+        for (int i = 0; i < primes.length; i++) {
+            if (result < primes[i]) {
+                break;
+            }
+            int div = result / primes[i];
+            int rem = result % primes[i];
+            if (rem == 0) {
+                count = 0;
+                do {
+                    count++;
+                    result = div;// quotient
+                    if (result < primes[i]) {
+                        break;
+                    }
+                    div = result / primes[i];
+                    rem = result % primes[i];
+                } while (rem == 0);
+                IRational exp = map.get(primes[i]);
+                if (exp == null) {
+                    map.put(primes[i], F.ZZ(count).multiply(exponent));
+                } else {
+                    evaled[0] = true;
+                    map.put(primes[i], exp.add(F.ZZ(count).multiply(exponent)));
+                }
+
+            }
+        }
+        return AbstractIntegerSym.valueOf(result);
+    }
+
+    /**
      * Factor the given value into primes less than <code>Short.MAX_VALUE</code> .
      *
-     * @param val a BigInteger value which should be factored by all primes less equal than 1021
-     * @param map a map which counts the prime integer factors less equal than 32749
+     * @param val
+     *            a BigInteger value which should be factored by all primes less equal than 1021
+     * @param map
+     *            a map which counts the prime integer factors less equal than 32749
      * @return the rest factor or zero, if the number could be factored completely into primes less equal then 1021
      */
     public static BigInteger countPrimes32749(final BigInteger val, Map<Integer, Integer> map) {
         BigInteger[] divRem;
         BigInteger result = val;
         BigInteger sqrt = BigIntegerMath.sqrt(result, RoundingMode.DOWN);
-        Integer count;
+        int count = 0;
         for (int i = 0; i < primes.length; i++) {
             if (sqrt.compareTo(BIprimes[i]) < 0) {
                 break;
             }
             divRem = result.divideAndRemainder(BIprimes[i]);
-            while (divRem[1].equals(BigInteger.ZERO)) {
-                count = map.get(primes[i]);
-                if (count == null) {
-                    map.put(primes[i], 1);
-                } else {
-                    map.put(primes[i], count + 1);
+            if (divRem[1].equals(BigInteger.ZERO)) {
+                count = 0;
+                Integer iCount = map.get(primes[i]);
+                if (iCount != null) {
+                    count = iCount;
                 }
-                result = divRem[0];// quotient
-                sqrt = BigIntegerMath.sqrt(result, RoundingMode.DOWN);
-                if (sqrt.compareTo(BIprimes[i]) < 0) {
-                    break;
-                }
-                divRem = result.divideAndRemainder(BIprimes[i]);
+                do {
+                    count++;
+                    result = divRem[0];// quotient
+                    sqrt = BigIntegerMath.sqrt(result, RoundingMode.DOWN);
+                    if (sqrt.compareTo(BIprimes[i]) < 0) {
+                        break;
+                    }
+                    divRem = result.divideAndRemainder(BIprimes[i]);
+                } while (divRem[1].equals(BigInteger.ZERO));
+                map.put(primes[i], count);
             }
         }
         BigInteger b;
@@ -362,19 +555,22 @@ public class Primality {
                 break;
             }
             divRem = result.divideAndRemainder(b);
-            while (divRem[1].equals(BigInteger.ZERO)) {
-                count = map.get(prime);
-                if (count == null) {
-                    map.put(prime, 1);
-                } else {
-                    map.put(prime, count + 1);
+            if (divRem[1].equals(BigInteger.ZERO)) {
+                count = 0;
+                Integer iCount = map.get(prime);
+                if (iCount != null) {
+                    count = iCount;
                 }
-                result = divRem[0];// quotient
-                sqrt = BigIntegerMath.sqrt(result, RoundingMode.DOWN);
-                if (sqrt.compareTo(b) < 0) {
-                    break;
-                }
-                divRem = result.divideAndRemainder(b);
+                do {
+                    count++;
+                    result = divRem[0];// quotient
+                    sqrt = BigIntegerMath.sqrt(result, RoundingMode.DOWN);
+                    if (sqrt.compareTo(b) < 0) {
+                        break;
+                    }
+                    divRem = result.divideAndRemainder(b);
+                } while (divRem[1].equals(BigInteger.ZERO));
+                map.put(prime, count);
             }
         }
         return result;
@@ -383,8 +579,10 @@ public class Primality {
     /**
      * Get the highest exponent of base (greater than 1) that divides val.
      *
-     * @param val  a BigInteger value
-     * @param base a base greater than 1
+     * @param val
+     *            a BigInteger value
+     * @param base
+     *            a base greater than 1
      * @return the exponent, which is the highest exponent of base that divides val.
      */
     public static BigInteger countExponent(final BigInteger val, final BigInteger base) {
@@ -401,6 +599,42 @@ public class Primality {
             divRem = result.divideAndRemainder(base);
         }
         return count;
+    }
+
+    /**
+     * See <a href="https://en.wikipedia.org/wiki/Pollard%27s_rho_algorithm"> Wikipedia: Pollards rho algorithm</a>
+     *
+     * @param val
+     * @param map
+     */
+    public static void pollardRhoFactors(final BigInteger val, Map<BigInteger, Integer> map) {
+        BigInteger factor;
+        BigInteger temp = val;
+        int iterationCounter = 0;
+        Integer count;
+        while (!temp.isProbablePrime(32)) {
+            factor = rho(temp);
+            if (factor.equals(temp)) {
+                if (iterationCounter++ > 4) {
+                    break;
+                }
+            } else {
+                iterationCounter = 1;
+            }
+            count = map.get(factor);
+            if (count == null) {
+                map.put(factor, 1);
+            } else {
+                map.put(factor, count + 1);
+            }
+            temp = temp.divide(factor);
+        }
+        count = map.get(temp);
+        if (count == null) {
+            map.put(temp, 1);
+        } else {
+            map.put(temp, count + 1);
+        }
     }
 
     public static List<BigInteger> factorize(final BigInteger val, List<BigInteger> result) {
@@ -420,11 +654,29 @@ public class Primality {
         ecm.factorize(map);
     }
 
+    public static BigInteger rho(final BigInteger val) {
+        BigInteger divisor;
+        BigInteger c = new BigInteger(val.bitLength(), random);
+        BigInteger x = new BigInteger(val.bitLength(), random);
+        BigInteger xx = x;
+
+        do {
+            x = x.multiply(x).mod(val).add(c).mod(val);
+            xx = xx.multiply(xx).mod(val).add(c).mod(val);
+            xx = xx.multiply(xx).mod(val).add(c).mod(val);
+            divisor = x.subtract(xx).gcd(val);
+        } while (divisor.equals(BigInteger.ONE));
+
+        return divisor;
+    }
+
     /**
      * Determine the n-th root from the prime decomposition of the primes[] array.
      *
-     * @param val  a BigInteger value which should be factored by all primes less equal than 1021
-     * @param root th n-th root which should be determined
+     * @param val
+     *            a BigInteger value which should be factored by all primes less equal than 1021
+     * @param root
+     *            th n-th root which should be determined
      * @return <code>(result[0] ^ root ) * result[1]</code>
      */
     public static BigInteger[] countRoot1021(final BigInteger val, int root) {
@@ -472,8 +724,10 @@ public class Primality {
     /**
      * Determine the n-th root from the prime decomposition of the primes[] array.
      *
-     * @param val  a BigInteger value which should be factored by all primes less equal than 1021
-     * @param root th n-th root which should be determined
+     * @param val
+     *            a BigInteger value which should be factored by all primes less equal than 1021
+     * @param root
+     *            th n-th root which should be determined
      * @return <code>(result[0] ^ root ) * result[1]</code>
      */
     public static long[] countRoot1021(final long val, int root) {
@@ -534,7 +788,7 @@ public class Primality {
 
     /**
      * Return all divisors of this integer number.
-     * <p>
+     *
      * <pre>
      * divisors(24) ==> [1,2,3,4,6,8,12,24]
      * </pre>
@@ -623,7 +877,7 @@ public class Primality {
 
     /**
      * Euler phi function.
-     * <p>
+     *
      * See: <a href="http://en.wikipedia.org/wiki/Euler%27s_totient_function">Euler's totient function</a>
      *
      * @return Euler's totient function
@@ -775,7 +1029,7 @@ public class Primality {
 
     /**
      * <code>Prime(i)</code> gives the i-th prime number for <code>i</code> less equal 103000000.
-     * <p>
+     *
      * See: <a href="https://bitbucket.org/dafis/javaprimes">https://bitbucket.org/dafis/javaprimes</a><br />
      * <a href=
      * "http://stackoverflow.com/questions/9625663/calculating-and-printing-the-nth-prime-number/9704912#9704912">
@@ -863,35 +1117,4 @@ public class Primality {
         return (n * 0x01010101) >> 24;
     }
 
-    private static class PrimePowerTreedMap extends TreeMap<BigInteger, Integer> {
-        private static final long serialVersionUID = 7802239809732541730L;
-
-        @Override
-        public Integer put(BigInteger key, Integer value) {
-            Integer result = super.put(key, value);
-            if (size() > 1) {
-                // not a prime power:
-                throw ReturnException.RETURN_FALSE;
-            }
-            return result;
-        }
-    }
-
-    private static class SquareFreeTreedMap extends TreeMap<BigInteger, Integer> {
-        private static final long serialVersionUID = -7769218967264615452L;
-
-        @Override
-        public Integer put(BigInteger key, Integer value) {
-            Integer result = super.put(key, value);
-            if (value > 1) {
-                // not a square free number:
-                throw ReturnException.RETURN_FALSE;
-            }
-            if (result != null && result > 1) {
-                // not a square free number:
-                throw ReturnException.RETURN_FALSE;
-            }
-            return result;
-        }
-    }
 }
