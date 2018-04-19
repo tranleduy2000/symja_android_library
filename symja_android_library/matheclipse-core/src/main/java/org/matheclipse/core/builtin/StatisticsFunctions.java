@@ -650,6 +650,10 @@ public class StatisticsFunctions {
 
         @Override
         public IExpr mean(IAST dist) {
+            if (dist.isAST0()) {
+                // -EulerGamma
+                return F.EulerGamma.negate();
+            }
             if (dist.isAST2()) {
                 IExpr n = dist.arg1();
                 IExpr m = dist.arg2();
