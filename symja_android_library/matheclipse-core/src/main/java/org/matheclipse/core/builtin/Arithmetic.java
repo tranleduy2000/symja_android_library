@@ -1,52 +1,10 @@
 package org.matheclipse.core.builtin;
 
-import com.duy.lambda.IntFunction;
 import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
-
-import static org.matheclipse.core.expression.F.And;
-import static org.matheclipse.core.expression.F.ArcCos;
-import static org.matheclipse.core.expression.F.ArcCot;
-import static org.matheclipse.core.expression.F.ArcSin;
-import static org.matheclipse.core.expression.F.ArcTan;
-import static org.matheclipse.core.expression.F.Arg;
-import static org.matheclipse.core.expression.F.BernoulliB;
-import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.Conjugate;
-import static org.matheclipse.core.expression.F.Cos;
-import static org.matheclipse.core.expression.F.E;
-import static org.matheclipse.core.expression.F.Equal;
-import static org.matheclipse.core.expression.F.Factorial;
-import static org.matheclipse.core.expression.F.Factorial2;
-import static org.matheclipse.core.expression.F.Gamma;
-import static org.matheclipse.core.expression.F.Im;
-import static org.matheclipse.core.expression.F.Log;
-import static org.matheclipse.core.expression.F.NIL;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Pi;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Positive;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Re;
-import static org.matheclipse.core.expression.F.Sin;
-import static org.matheclipse.core.expression.F.Sqrt;
-import static org.matheclipse.core.expression.F.Subtract;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.fraction;
-import static org.matheclipse.core.expression.F.integer;
-import static org.matheclipse.core.expression.F.num;
-import static org.matheclipse.core.expression.F.x;
-import static org.matheclipse.core.expression.F.x_;
-import static org.matheclipse.core.expression.F.y;
-import static org.matheclipse.core.expression.F.y_;
-
-import java.math.BigInteger;
-
+import com.duy.lambda.IntFunction;
+import com.duy.lang.DDouble;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
@@ -99,6 +57,48 @@ import org.matheclipse.core.reflection.system.rules.AbsRules;
 import org.matheclipse.core.reflection.system.rules.ConjugateRules;
 import org.matheclipse.core.reflection.system.rules.GammaRules;
 import org.matheclipse.core.reflection.system.rules.PowerRules;
+
+import java.math.BigInteger;
+
+import static org.matheclipse.core.expression.F.And;
+import static org.matheclipse.core.expression.F.ArcCos;
+import static org.matheclipse.core.expression.F.ArcCot;
+import static org.matheclipse.core.expression.F.ArcSin;
+import static org.matheclipse.core.expression.F.ArcTan;
+import static org.matheclipse.core.expression.F.Arg;
+import static org.matheclipse.core.expression.F.BernoulliB;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.Conjugate;
+import static org.matheclipse.core.expression.F.Cos;
+import static org.matheclipse.core.expression.F.E;
+import static org.matheclipse.core.expression.F.Equal;
+import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.Factorial2;
+import static org.matheclipse.core.expression.F.Gamma;
+import static org.matheclipse.core.expression.F.Im;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.NIL;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Pi;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Positive;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Re;
+import static org.matheclipse.core.expression.F.Sin;
+import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.Subtract;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.fraction;
+import static org.matheclipse.core.expression.F.integer;
+import static org.matheclipse.core.expression.F.num;
+import static org.matheclipse.core.expression.F.x;
+import static org.matheclipse.core.expression.F.x_;
+import static org.matheclipse.core.expression.F.y;
+import static org.matheclipse.core.expression.F.y_;
 
 public final class Arithmetic {
     public final static Plus CONST_PLUS = new Plus();
@@ -3829,7 +3829,7 @@ public final class Arithmetic {
             }
             if (val < 0.0d) {
                 double root = Math.floor(r);
-                if (Double.isFinite(r) && Double.compare(r, root) == 0) {
+                if (DDouble.isFinite(r) && Double.compare(r, root) == 0) {
                     // integer type
                     int iRoot = (int) root;
                     if ((iRoot & 0x0001) == 0x0000) {
