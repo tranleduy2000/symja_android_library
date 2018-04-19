@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 /*
  * Copyright (c) 2017 by Tran Le Duy
  *
@@ -17,6 +19,12 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
+static def buildDate() {
+    Date date = new Date();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy")
+    return dateFormat.format(date)
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -25,8 +33,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 9
-        versionName "30-Mar-18"
+        versionCode 10
+        versionName buildDate()
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
