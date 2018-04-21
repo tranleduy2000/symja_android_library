@@ -268,7 +268,7 @@ public class StatisticsFunctions {
 	}
 
 	private final static class BernoulliDistribution extends AbstractEvaluator
-			implements ICDF, IDistribution, IPDF, IVariance {
+			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -311,6 +311,17 @@ public class StatisticsFunctions {
 			if (dist.isAST1()) {
 				IExpr N = dist.arg1();
 				return F.Times(N, F.Subtract(F.C1, N));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr randomVariate(Random random, IAST dist) {
+			if (dist.isAST1()) {
+				double p = dist.arg1().evalDouble();
+				if (0 <= p && p <= 1) {
+					return F.ZZ(new BinomialGenerator(1, p, random).nextValue());
+				}
 			}
 			return F.NIL;
 		}
@@ -401,7 +412,9 @@ public class StatisticsFunctions {
 				int n = dist.arg1().toIntDefault(-1);
 				if (n > 0) {
 					double p = dist.arg2().evalDouble();
-					return F.ZZ(new BinomialGenerator(n, p, random).nextValue());
+					if (0 <= p && p <= 1) {
+						return F.ZZ(new BinomialGenerator(n, p, random).nextValue());
+					}
 				}
 			}
 			return F.NIL;
