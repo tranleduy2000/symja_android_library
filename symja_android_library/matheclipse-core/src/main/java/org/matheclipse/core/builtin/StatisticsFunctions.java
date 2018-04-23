@@ -1,9 +1,11 @@
 package org.matheclipse.core.builtin;
 
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Function;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
+import com.duy.lambda.Supplier;
+import com.duy.util.ThreadLocalRandom;
 
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
@@ -43,6 +45,8 @@ import org.uncommons.maths.random.DiscreteUniformGenerator;
 import org.uncommons.maths.random.ExponentialGenerator;
 import org.uncommons.maths.random.GaussianGenerator;
 import org.uncommons.maths.random.PoissonGenerator;
+
+import java.util.Random;
 
 public class StatisticsFunctions {
 
@@ -221,7 +225,12 @@ public class StatisticsFunctions {
 							IExpr function = engine.evaluate(F.CDF(arg1));
 							if (function.isFunction()) {
 								if (ast.arg2().isList()) {
-									return ((IAST) ast.arg2()).map(x -> F.unaryAST1(function, x), 1);
+									return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
+										@Override
+										public IExpr apply(IExpr x) {
+											return F.unaryAST1(function, x);
+										}
+									}, 1);
 								}
 								return F.unaryAST1(function, ast.arg2());
 							}
@@ -913,7 +922,12 @@ public class StatisticsFunctions {
 			IExpr factor = F.integer(-1 * (arg1.size() - 2));
 			IASTAppendable v1 = F.PlusAlloc(arg1.size());
 			v1.appendArgs(arg1.size(),
-					i -> F.Times(F.CN1, num1.setAtClone(i, F.Times(factor, arg1.get(i))), F.Conjugate(arg2.get(i))));
+					new IntFunction<IExpr>() {
+						@Override
+						public IExpr apply(int i) {
+							return F.Times(F.CN1, num1.setAtClone(i, F.Times(factor, arg1.get(i))), F.Conjugate(arg2.get(i)));
+						}
+					});
 			return F.Divide(v1, F.integer((arg1.argSize()) * (arg1.size() - 2)));
 		}
 
@@ -1139,14 +1153,17 @@ public class StatisticsFunctions {
 						IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
 						if (evaluator instanceof IDiscreteDistribution) {
 							IDiscreteDistribution distribution = (IDiscreteDistribution) evaluator;
-							return of(dist, x -> {
-								if (vars.size() > 1) {
-									IExpr temp = arg1.replaceAll(F.Rule(vars.arg1(), x));
-									if (temp.isPresent()) {
-										return temp;
+							return of(dist, new Function<IExpr, IExpr>() {
+								@Override
+								public IExpr apply(IExpr x) {
+									if (vars.size() > 1) {
+										IExpr temp = arg1.replaceAll(F.Rule(vars.arg1(), x));
+										if (temp.isPresent()) {
+											return temp;
+										}
 									}
+									return arg1;
 								}
-								return arg1;
 							}, distribution);
 						}
 					}
@@ -1385,7 +1402,12 @@ public class StatisticsFunctions {
 			}
 			if (dim != null) {
 				IAST matrix = (IAST) ast.arg1();
-				return matrix.mapMatrixColumns(dim, x -> F.MeanDeviation(x));
+				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return F.MeanDeviation(x);
+					}
+				});
 			}
 
 			int length = ast.arg1().isVector();
@@ -1394,7 +1416,12 @@ public class StatisticsFunctions {
 				int size = vector.size();
 				IASTAppendable sum = F.PlusAlloc(size);
 				final IExpr mean = F.eval(F.Mean(F.Negate(vector)));
-				vector.forEach(x -> sum.append(F.Abs(F.Plus(x, mean))));
+				vector.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						sum.append(F.Abs(F.Plus(x, mean)));
+					}
+				});
 				return F.Times(F.Power(F.ZZ(size - 1), -1), sum);
 			}
 
@@ -1425,7 +1452,12 @@ public class StatisticsFunctions {
 			}
 			if (dim != null) {
 				IAST matrix = (IAST) arg1;
-				return matrix.mapMatrixColumns(dim, x -> F.Median(x));
+				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return F.Median(x);
+					}
+				});
 			}
 			if (arg1.isList()) {
 				final IAST list = (IAST) arg1;
@@ -1673,7 +1705,12 @@ public class StatisticsFunctions {
 							IExpr function = engine.evaluate(F.PDF(arg1));
 							if (function.isFunction()) {
 								if (ast.arg2().isList()) {
-									return ((IAST) ast.arg2()).map(x -> F.unaryAST1(function, x), 1);
+									return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
+										@Override
+										public IExpr apply(IExpr x) {
+											return F.unaryAST1(function, x);
+										}
+									}, 1);
 								}
 								return F.unaryAST1(function, ast.arg2());
 							}
@@ -1856,7 +1893,12 @@ public class StatisticsFunctions {
 			}
 			if (dim != null) {
 				IAST matrix = (IAST) arg1;
-				return matrix.mapMatrixColumns(dim, (IExpr x) -> ast.setAtClone(1, x));
+				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return ast.setAtClone(1, x);
+					}
+				});
 			}
 
 			if (arg1.isList()) {
@@ -1888,8 +1930,18 @@ public class StatisticsFunctions {
 						int dim2 = q.isVector();
 						if (dim2 >= 0) {
 							final IAST vector = ((IAST) q);
-							if (vector.forAll(x -> x.isSignedNumber())) {
-								return vector.map(scalar -> of(s, length, (ISignedNumber) scalar), 1);
+							if (vector.forAll(new Predicate<IExpr>() {
+								@Override
+								public boolean test(IExpr x) {
+									return x.isSignedNumber();
+								}
+							})) {
+								return vector.map(new Function<IExpr, IExpr>() {
+									@Override
+									public IExpr apply(IExpr scalar) {
+										return Quantile.this.of(s, length, (ISignedNumber) scalar);
+									}
+								}, 1);
 							}
 						} else {
 							if (q.isSignedNumber()) {
@@ -1938,7 +1990,12 @@ public class StatisticsFunctions {
 				IExpr function = engine.evaluate(F.Quantile(arg1));
 				if (function.isFunction()) {
 					if (ast.arg2().isList()) {
-						return ((IAST) ast.arg2()).map(x -> F.unaryAST1(function, x), 1);
+						return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
+							@Override
+							public IExpr apply(IExpr x) {
+								return F.unaryAST1(function, x);
+							}
+						}, 1);
 					}
 					return F.unaryAST1(function, ast.arg2());
 				}
@@ -1988,7 +2045,12 @@ public class StatisticsFunctions {
 									if (arg2.isList()) {
 										int[] indx = Validate.checkListOfInts(arg2, 0, Integer.MAX_VALUE);
 										IASTAppendable list = F.ListAlloc(indx[0]);
-										return createArray(indx, 0, list, () -> variate.randomVariate(random, dist));
+										return createArray(indx, 0, list, new Supplier<IExpr>() {
+											@Override
+											public IExpr get() {
+												return variate.randomVariate(random, dist);
+											}
+										});
 									} else {
 										int n = arg2.toIntDefault(Integer.MIN_VALUE);
 										if (n >= 0) {
@@ -2084,7 +2146,12 @@ public class StatisticsFunctions {
 				}
 				if (dim != null) {
 					IAST matrix = arg1;
-					return matrix.mapMatrixColumns(dim, x -> F.StandardDeviation(x));
+					return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
+							return F.StandardDeviation(x);
+						}
+					});
 				}
 			}
 			return F.Sqrt(F.Variance(ast.arg1()));
@@ -2109,7 +2176,12 @@ public class StatisticsFunctions {
 			}
 			if (dim != null) {
 				IAST matrix = (IAST) arg1;
-				return F.Transpose(matrix.mapMatrixColumns(dim, v -> F.Standardize(v)));
+				return F.Transpose(matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr v) {
+						return F.Standardize(v);
+					}
+				}));
 			}
 
 			IExpr sd = F.StandardDeviation.of(engine, arg1);
@@ -2217,7 +2289,12 @@ public class StatisticsFunctions {
 							final int ii = i;
 							IASTAppendable list = F.ListAlloc(matrixDimensions[1]);
 							IAST variance = F.Variance(list);
-							list.appendArgs(matrixDimensions[0] + 1, j -> arg1.getPart(j, ii));
+							list.appendArgs(matrixDimensions[0] + 1, new IntFunction<IExpr>() {
+								@Override
+								public IExpr apply(int j) {
+									return arg1.getPart(j, ii);
+								}
+							});
 							result.append(variance);
 						}
 						return result;
