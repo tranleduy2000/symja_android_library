@@ -1,5 +1,7 @@
 package org.matheclipse.core.polynomials;
 
+import com.duy.util.ThreadLocalRandom;
+
 import org.apache.log4j.Logger;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
@@ -20,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import edu.jas.kern.PreemptStatus;
 import edu.jas.kern.PrettyPrint;
@@ -95,7 +96,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	/**
 	 * A default random sequence generator.
 	 */
-	protected final static Random random = new Random();
+	protected final static Random random = ThreadLocalRandom.current();
 
 	/**
 	 * Indicator if this ring is a field.
