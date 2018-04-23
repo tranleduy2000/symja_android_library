@@ -12,7 +12,6 @@ import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.stat.StatUtils;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
-import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -21,6 +20,8 @@ import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractMatrix1Expr;
 import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
+import org.matheclipse.core.eval.util.Assumptions;
+import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.F;
@@ -285,6 +286,14 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST1()) {
+				// (p) => Piecewise({{1, p > 1/2}}, 0)
+				return F.Piecewise(F.List(F.List(F.C1, F.Greater(dist.arg1(), F.C1D2))), F.C0);
+			}
+			return F.NIL;
+		}
+		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
 				IExpr p = dist.arg1();
@@ -371,6 +380,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			return F.NIL;
+		}
 		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST2()) {
@@ -504,6 +517,16 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				// (n,m) => m/Log(2)^n^(-1)
+				return F.Times(m, F.Power(F.Log(F.C2), F.Negate(F.Power(n, -1))));
+			}
+			return F.NIL;
+		}
+		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
@@ -581,6 +604,24 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				// (n,m) => m*InverseGammaRegularized(n, 0, 1/2)
+				return F.Times(m, F.InverseGammaRegularized(n, F.C0, F.C1D2));
+			}
+			if (dist.size() == 5) {
+				IExpr a = dist.arg1();
+				IExpr b = dist.arg2();
+				IExpr g = dist.arg3();
+				IExpr d = dist.arg4();
+				// (a,b,g,d) => d + b*InverseGammaRegularized(a, 1/2)^(1/g)
+				return F.Plus(d, F.Times(b, F.Power(F.InverseGammaRegularized(a, F.C1D2), F.Power(g, -1))));
+			}
+			return F.NIL;
+		}
+		@Override
 		public IExpr variance(IAST dist) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
@@ -616,6 +657,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			return F.NIL;
+		}
 		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
@@ -712,6 +757,20 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST0()) {
+				// ( ) => Log(Log(2))
+				return F.Log(F.Log(F.C2));
+			}
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				// (n, m) => n + m*Log(Log(2))
+				return F.Plus(n, F.Times(m, F.Log(F.Log(F.C2))));
+			}
+			return F.NIL;
+		}
+		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
@@ -794,6 +853,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			return F.NIL;
+		}
 		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST3()) {
@@ -970,7 +1033,7 @@ public class StatisticsFunctions {
 		}
 	}
 
-	private final static class DiscreteUniformDistribution extends AbstractDiscreteDistribution
+	private final static class DiscreteUniformDistribution extends AbstractEvaluator
 			implements IDistribution, IVariance, ICDF, IPDF, IRandomVariate {
 
 		@Override
@@ -989,6 +1052,17 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			IExpr[] minMax = minmax(dist);
+			if (minMax != null) {
+				IExpr l = minMax[0];
+				IExpr r = minMax[1];
+				// (l,r) => -1 + l + Max(1, Ceiling((1/2)*(1 - l + r)))
+				return F.Plus(F.CN1, l, F.Max(F.C1, F.Ceiling(F.Times(F.C1D2, F.Plus(F.C1, F.Negate(l), r)))));
+			}
+			return F.NIL;
+		}
 		@Override
 		public IExpr variance(IAST dist) {
 			IExpr[] minMax = minmax(dist);
@@ -1040,41 +1114,44 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
-		@Override
-		public IExpr lowerBound(IAST dist) {
-			IExpr[] minMax = minmax(dist);
-			if (minMax != null) {
-				return minMax[0];
-			}
-			return F.NIL;
-		}
+		// @Override
+		// public IExpr lowerBound(IAST dist) {
+		// IExpr[] minMax = minmax(dist);
+		// if (minMax != null) {
+		// return minMax[0];
+		// }
+		// return F.NIL;
+		// }
+		//
 
-		@Override
-		protected IExpr protected_quantile(IAST dist, IExpr q) {
-			IExpr[] minMax = minmax(dist);
-			if (minMax != null) {
-				IExpr min = minMax[0];
-				IExpr max = minMax[1].inc();
-				IExpr p = F.Power(F.Subtract(max, min), F.CN1);
-				return min.add(F.Floor(q.multiply(p.inverse())));
-			}
-			return F.NIL;
-		}
+		// @Override
+		// protected IExpr protected_quantile(IAST dist, IExpr q) {
+		// IExpr[] minMax = minmax(dist);
+		// if (minMax != null) {
+		// IExpr min = minMax[0];
+		// IExpr max = minMax[1].inc();
+		// IExpr p = F.Power(F.Subtract(max, min), F.CN1);
+		// return min.add(F.Floor(q.multiply(p.inverse())));
+		// }
+		// return F.NIL;
+		// }
+		//
 
-		@Override
-		protected IExpr protected_p_equals(IAST dist, IExpr n) {
-			IExpr[] minMax = minmax(dist);
-			if (minMax != null) {
-				IExpr min = minMax[0];
-				IExpr max = minMax[1].inc();
+		// @Override
+		// protected IExpr protected_p_equals(IAST dist, IExpr n) {
+		// IExpr[] minMax = minmax(dist);
+		// if (minMax != null) {
+		// IExpr min = minMax[0];
+		// IExpr max = minMax[1].inc();
+		//
 
-				if (F.evalTrue(F.LessEqual(max, n))) {
-					return F.C0;
-				}
-				return F.eval(F.Power(F.Subtract(max, min), F.CN1));
-			}
-			return F.NIL;
-		}
+		// if (F.evalTrue(F.LessEqual(max, n))) {
+		// return F.C0;
+		// }
+		// return F.eval(F.Power(F.Subtract(max, min), F.CN1));
+		// }
+		// return F.NIL;
+		// }
 
 		@Override
 		public IExpr randomVariate(Random random, IAST dist) {
@@ -1108,6 +1185,16 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				// (n,m) => InverseGammaRegularized(n, 0, 1/2)/m
+				return F.Times(F.Power(m, -1), F.InverseGammaRegularized(n, F.C0, F.C1D2));
+			}
+			return F.NIL;
+		}
 		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST2()) {
@@ -1156,31 +1243,35 @@ public class StatisticsFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
-			if (ast.arg2().isAST()) {
+			if (ast.arg2().isAST(F.Distributed, 3)) {
+				IAST distributed = (IAST) ast.arg2();
+				IExpr x = distributed.arg1();
 				IExpr arg1 = ast.arg1();
-				IAST vars = VariablesSet.getVariables(arg1);
-				IAST dist = (IAST) ast.arg2();
-				if (dist.head().isSymbol()) {
-					ISymbol head = (ISymbol) dist.head();
-					if (head instanceof IBuiltInSymbol) {
-						IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
-						if (evaluator instanceof IDiscreteDistribution) {
-							IDiscreteDistribution distribution = (IDiscreteDistribution) evaluator;
-							return of(dist, new Function<IExpr, IExpr>() {
-								@Override
-								public IExpr apply(IExpr x) {
-									if (vars.size() > 1) {
-										IExpr temp = arg1.replaceAll(F.Rule(vars.arg1(), x));
-										if (temp.isPresent()) {
-											return temp;
+				IAssumptions assumptions = Assumptions.getInstance(distributed);
+				if (assumptions != null) {
+					// TODO add implementaion for continous and discrete distributions
+					IAST distribution = assumptions.distribution(x);
+					if (distribution.isPresent()) {
 										}
 									}
-									return arg1;
-								}
-							}, distribution);
-						}
-					}
-				}
+				// if (dist.head().isSymbol()) {
+				// ISymbol head = (ISymbol) dist.head();
+				// if (head instanceof IBuiltInSymbol) {
+				// IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
+				// if (evaluator instanceof IDiscreteDistribution) {
+				// IDiscreteDistribution distribution = (IDiscreteDistribution) evaluator;
+				// return of(dist, x -> {
+				// if (vars.size() > 1) {
+				// IExpr temp = arg1.replaceAll(F.Rule(vars.arg1(), x));
+				// if (temp.isPresent()) {
+				// return temp;
+				// }
+				// }
+				// return arg1;
+				// }, distribution);
+				// }
+				// }
+				// }
 			}
 
 			return F.NIL;
@@ -1227,11 +1318,20 @@ public class StatisticsFunctions {
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST1()) {
+				// 1/x
 				return F.Power(dist.arg1(), F.CN1);
 			}
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST1()) {
+				// Log(2)/x
+				return F.Times(F.Log(F.C2), F.Power(dist.arg1(), F.CN1));
+			}
+			return F.NIL;
+		}
 		@Override
 		public IExpr variance(IAST dist) {
 			if (dist.isAST1()) {
@@ -1319,6 +1419,14 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST2()) {
+				// (m,s) -> E^(m+s^2/2)
+				return F.Power(F.E, dist.arg1());
+			}
+			return F.NIL;
+		}
 		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST2()) {
@@ -1486,6 +1594,10 @@ public class StatisticsFunctions {
 					}
 				}
 			}
+			if (arg1.isDistribution()) {
+				IDistribution distribution = (IDistribution) ((IBuiltInSymbol) arg1.head()).getEvaluator();
+				return distribution.median((IAST) arg1);
+			}
 			return F.NIL;
 		}
 
@@ -1515,6 +1627,16 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				// (n,m) -> Sqrt((m*InverseGammaRegularized(n, 0, 1/2))/n)
+				return F.Sqrt(F.Times(m, F.Power(n, -1), F.InverseGammaRegularized(n, F.C0, F.C1D2)));
+			}
+			return F.NIL;
+		}
 		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST2()) {
@@ -1662,6 +1784,16 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST0()) {
+				return F.C0;
+			}
+			if (dist.isAST2()) {
+				return dist.arg1();
+			}
+			return F.NIL;
+		}
+		@Override
 		public IExpr variance(IAST dist) {
 			if (dist.isAST0()) {
 				return F.C1;
@@ -1761,7 +1893,6 @@ public class StatisticsFunctions {
 
 	private final static class PoissonDistribution extends AbstractEvaluator
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
-		// private static final int P_EQUALS_MAX = 1950; // probabilities are zero beyond that point
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1777,6 +1908,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			return F.NIL;
+		}
 		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
@@ -1813,37 +1948,6 @@ public class StatisticsFunctions {
 		public void setUp(final ISymbol newSymbol) {
 		}
 
-		// // @Override
-		// public IExpr lowerBound(IAST dist) {
-		// return F.C0;
-		// }
-		//
-		// // @Override
-		// protected IExpr protected_p_equals(IAST dist, IExpr nExpr) {
-		// if (dist.isAST1() && nExpr.isInteger()) {
-		// int n = nExpr.toIntDefault(Integer.MIN_VALUE);
-		// if (n != Integer.MIN_VALUE) {
-		// if (P_EQUALS_MAX < n) {
-		// return F.C0;
-		// }
-		// IExpr lambda = dist.arg1();
-		// IASTAppendable values = F.List();
-		// values.append(F.Exp(lambda.negate()));
-		// while (values.argSize() <= n) {
-		// IExpr factor = lambda.times(F.fraction(1, values.argSize()));
-		// values.append(values.last().times(factor));
-		// }
-		// return values.last();
-		// }
-		// }
-		// return F.NIL;
-		// }
-
-		// @Override
-		// protected IExpr protected_quantile(IAST dist, IExpr p) {
-		// // TODO Auto-generated method stub
-		// return F.NIL;
-		// }
 
 		@Override
 		public IExpr randomVariate(Random random, IAST dist) {
@@ -2218,16 +2322,29 @@ public class StatisticsFunctions {
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST1()) {
-				// (v) -> Piecewise[{{0, v > 1}}, Indeterminate]
+				// (v) -> Piecewise({{0, v > 1}}, Indeterminate)
 				return F.Piecewise(F.List(F.List(F.C0, F.Greater(dist.arg1(), F.C1))), F.Indeterminate);
 			}
 			if (dist.isAST3()) {
-				// (m,s,v) -> Piecewise[{{m, v > 1}}, Indeterminate]
+				// (m,s,v) -> Piecewise({{m, v > 1}}, Indeterminate)
 				return F.Piecewise(F.List(F.List(dist.arg1(), F.Greater(dist.arg3(), F.C1))), F.Indeterminate);
 			}
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST1()) {
+				return F.C0;
+			}
+
+			if (dist.isAST3()) {
+				// (m,s,v) -> m
+				return dist.arg1();
+			}
+
+			return F.NIL;
+		}
 		@Override
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
@@ -2365,6 +2482,25 @@ public class StatisticsFunctions {
 				return F.Plus(dist.arg3(), F.Times(dist.arg2(), F.Gamma(F.Plus(F.C1, F.Power(dist.arg1(), F.CN1)))));
 			}
 
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr median(IAST dist) {
+			if (dist.isAST2()) {
+				// (a,b) -> b*Log(2)^(1/a)
+				IExpr a = dist.arg1();
+				IExpr b = dist.arg2();
+				return F.Times(b, F.Power(F.Log(F.C2), F.Power(a, -1)));
+			}
+
+			if (dist.isAST3()) {
+				// (a,b,m) -> m + b*Log(2)^(1/a)
+				IExpr a = dist.arg1();
+				IExpr b = dist.arg2();
+				IExpr m = dist.arg3();
+				return F.Plus(m, F.Times(b, F.Power(F.Log(F.C2), F.Power(a, -1))));
+			}
 			return F.NIL;
 		}
 
