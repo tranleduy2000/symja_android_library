@@ -171,6 +171,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testApply() {
+		// github issue #40
+		check("((#+##&) @@#&) /@{{1,2},{2,2,2},{3,4}}", //
+				"{4,8,10}");
+
 		check("Times @@ {1, 2, 3, 4}", //
 				"24");
 		check("f @@ {{a, b}, {c}, d}", "f({a,b},{c},d)");
@@ -2180,6 +2184,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testEqual() {
 		// github issue #42
 		check("1-i==1.0-i", "True");
+
 		// Issue #174
 		check("x/(y*x)==0.25", "1/y==0.25");
 
@@ -3474,13 +3479,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testInterpolatingFunction() {
-		check("ipf=InterpolatingFunction({{0, 0}, {1, 1}, {2, 3}, {3, 4}, {4, 3}, {5, 0}}); ipf(5/2) ",
+		check("ipf=InterpolatingFunction({{0,17},{1,3},{2,5},{3,4},{4,3},{5,0},{6,23}}); ipf(19/4) ", //
+				"-19/32");
+		check("ipf=InterpolatingFunction({{0, 0}, {1, 1}, {2, 3}, {3, 4}, {4, 3}, {5, 0}}); ipf(5/2) ", //
 				"59/16");
-		check("InterpolatingFunction({{0, 0}, {1, 1}, {2, 3}, {3, 4}, {4, 3}, {5, 0}})",
+		check("InterpolatingFunction({{0, 0}, {1, 1}, {2, 3}, {3, 4}, {4, 3}, {5, 0}})", //
 				"InterpolatingFunction({{0,0},{1,1},{2,3},{3,4},{4,3},{5,0}})");
-		check("ipf=InterpolatingFunction({{0, 0}, {1, 1}, {2, 3}, {3, 4}, {4, 3}, {5, 0}});{ipf(2.5),ipf(3.0),ipf(3.5)}",
+		check("ipf=InterpolatingFunction({{0, 0}, {1, 1}, {2, 3}, {3, 4}, {4, 3}, {5, 0}});{ipf(2.5),ipf(3.0),ipf(3.5)}", //
 				"{3.6875,4.0,3.75}");
-		check("InterpolatingFunction({{0, 0}, {1, 1}, {2, 3}, {3, 4}, {4, 3}, {5, 0}})",
+		check("InterpolatingFunction({{0, 0}, {1, 1}, {2, 3}, {3, 4}, {4, 3}, {5, 0}})", //
 				"InterpolatingFunction({{0,0},{1,1},{2,3},{3,4},{4,3},{5,0}})");
 	}
 
@@ -3578,6 +3585,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("InverseBetaRegularized(z,0,a,b)", "z");
 		check("InverseBetaRegularized(0,z,a,b)", "InverseBetaRegularized(z,a,b)");
 	}
+
 	public void testInverseErf() {
 		check("InverseErf /@ {-1, 0, 1}", "{-Infinity,0,Infinity}");
 		checkNumeric("InverseErf /@ {0.9, 1.0, 1.1}", "{1.1630871536766743,Infinity,InverseErf(1.1)}");
@@ -3615,6 +3623,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("InverseGammaRegularized(42,0)", "Infinity");
 		check("InverseGammaRegularized(10,1)", "0");
 	}
+
 	public void testInverseHaversine() {
 		checkNumeric("InverseHaversine(0.5)", "1.5707963267948968");
 		checkNumeric("InverseHaversine(1 + 2.5 * I)", "1.764589463349828+I*2.3309746530493127");
