@@ -2701,6 +2701,10 @@ public final class Arithmetic {
             }
 
             if (!exponent.getDenominator().isOne()) {
+				IExpr temp = rationalPower(base.getNumerator(), base.getDenominator(), exponent);
+				if (temp.isPresent()) {
+					return temp;
+				}
                 IInteger a;
                 IInteger b;
                 IFraction f0Temp = base;
@@ -4650,6 +4654,43 @@ public final class Arithmetic {
                             o0.upper().times(o1.upper()))));
         }
 
+	}
+
+	/**
+	 * <pre>
+	 * TimesBy(x, dx)
+	 *
+	 * x *= dx
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * is equivalent to <code>x = x * dx</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; a = 10
+	 * &gt;&gt; a *= 2
+	 * 20
+	 *
+	 * &gt;&gt; a
+	 * 20
+	 * </pre>
+	 */
+	private static class TimesBy extends AddTo {
+
+		@Override
+		protected IASTMutable getAST(final IExpr value) {
+			return (IASTMutable) F.Times(null, value);
+		}
+
+		@Override
+		protected ISymbol getFunctionSymbol() {
+			return F.TimesBy;
+		}
+	}
         /**
          * Try simpplifying <code>(power0Arg1 ^ power0Arg2) * (power1Arg1 ^ power1Arg2)</code>
          *
@@ -4659,7 +4700,7 @@ public final class Arithmetic {
          * @param power1Arg2
          * @return
          */
-        private IExpr timesPowerPower(IExpr power0Arg1, IExpr power0Arg2, IExpr power1Arg1, IExpr power1Arg2) {
+	private static IExpr timesPowerPower(IExpr power0Arg1, IExpr power0Arg2, IExpr power1Arg1, IExpr power1Arg2) {
             if (power0Arg2.isNumber()) {
                 if (power1Arg2.isNumber()) {
                     if (power0Arg1.equals(power1Arg1)) {
@@ -4702,17 +4743,17 @@ public final class Arithmetic {
          *
          * @return
          */
-        private IExpr timesPowerPower(IInteger p1Numer, IInteger p1Denom, IRational p1Exp, IInteger p2Numer,
+	public static IExpr timesPowerPower(IInteger p1Numer, IInteger p1Denom, IRational p1Exp, IInteger p2Numer,
                                       IInteger p2Denom, IRational p2Exp) {
             boolean[] evaled = new boolean[] { false };
 
             OpenIntToIExprHashMap<IRational> fn1Map = new OpenIntToIExprHashMap<IRational>();
-            IInteger fn1Rest = Primality.countPrimes1021(p1Numer, p1Exp, fn1Map, evaled);
-            IInteger fd2Rest = Primality.countPrimes1021(p2Denom, p2Exp.negate(), fn1Map, evaled);
+		IInteger fn1Rest = Primality.countPrimes1021(p1Numer, p1Exp, fn1Map, false, evaled);
+		IInteger fd2Rest = Primality.countPrimes1021(p2Denom, p2Exp.negate(), fn1Map, false, evaled);
 
             OpenIntToIExprHashMap<IRational> fn2Map = new OpenIntToIExprHashMap<IRational>();
-            IInteger fn2Rest = Primality.countPrimes1021(p2Numer, p2Exp, fn2Map, evaled);
-            IInteger fd1Rest = Primality.countPrimes1021(p1Denom, p1Exp.negate(), fn2Map, evaled);
+		IInteger fn2Rest = Primality.countPrimes1021(p2Numer, p2Exp, fn2Map, false, evaled);
+		IInteger fd1Rest = Primality.countPrimes1021(p1Denom, p1Exp.negate(), fn2Map, false, evaled);
 
             if (evaled[0]) {
                 OpenIntToIExprHashMap<IRational>.Iterator iter = fn2Map.iterator();
@@ -4724,7 +4765,6 @@ public final class Arithmetic {
                     if (exp == null) {
                         fn1Map.put(base, exponent);
                     } else {
-                        evaled[0] = true;
                         fn1Map.put(base, exp.add(exponent));
                     }
                 }
@@ -4755,42 +4795,40 @@ public final class Arithmetic {
 
             return F.NIL;
         }
-    }
 
     /**
-     * <pre>
-     * TimesBy(x, dx)
+	 * (p1Numer/p1Denom)^(p1Exp)
      *
-     * x *= dx
-     * </pre>
-     *
-     * <blockquote>
-     * <p>
-     * is equivalent to <code>x = x * dx</code>.
-     * </p>
-     * </blockquote>
-     * <h3>Examples</h3>
-     *
-     * <pre>
-     * &gt;&gt; a = 10
-	 * &gt;&gt; a *= 2
-	 * 20
-     *
-     * &gt;&gt; a
-     * 20
-     * </pre>
+	 * @return
      */
-    private static class TimesBy extends AddTo {
+	public static IExpr rationalPower(IInteger p1Numer, IInteger p1Denom, IRational p1Exp) {
+		boolean[] evaled = new boolean[] { false };
 
-        @Override
-        protected IASTMutable getAST(final IExpr value) {
-            return (IASTMutable) F.Times(null, value);
+		OpenIntToIExprHashMap<IRational> fn1Map = new OpenIntToIExprHashMap<IRational>();
+		IInteger fn1Rest = Primality.countPrimes1021(p1Numer, p1Exp, fn1Map, true, evaled);
+		IInteger fd1Rest = Primality.countPrimes1021(p1Denom, p1Exp.negate(), fn1Map, true, evaled);
+
+		if (evaled[0]) {
+			IASTAppendable times1 = F.TimesAlloc(fn1Map.size() + 4);
+			if (!fn1Rest.isOne()) {
+				times1.append(F.Power(fn1Rest, p1Exp));
+			}
+			if (!fd1Rest.isOne()) {
+				times1.append(F.Power(fd1Rest, p1Exp.negate()));
+			}
+			OpenIntToIExprHashMap<IRational>.Iterator iter = fn1Map.iterator();
+			while (iter.hasNext()) {
+				iter.advance();
+				int base = iter.key();
+				IRational exponent = iter.value();
+				if (base != 1) {
+					times1.append(F.Power(F.ZZ(base), exponent));
+				}
+			}
+			return times1;
         }
 
-        @Override
-        protected ISymbol getFunctionSymbol() {
-            return F.TimesBy;
-        }
+		return F.NIL;
     }
 
     private final static Arithmetic CONST = new Arithmetic();
