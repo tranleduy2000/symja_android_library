@@ -4,7 +4,7 @@ package com.duy.lang;
  * Created by Duy on 2/21/2018.
  */
 
-public class DMath {
+public class Math {
 
     /**
      * Returns the sum of its arguments,
@@ -114,8 +114,8 @@ public class DMath {
      */
     public static long multiplyExact(long x, long y) {
         long r = x * y;
-        long ax = Math.abs(x);
-        long ay = Math.abs(y);
+        long ax = java.lang.Math.abs(x);
+        long ay = java.lang.Math.abs(y);
         if (((ax | ay) >>> 31 != 0)) {
             // Some bits greater than 2^31 that might cause overflow
             // Check the result using the divide operator

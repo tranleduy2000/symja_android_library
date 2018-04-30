@@ -1,9 +1,9 @@
 package org.matheclipse.core.builtin;
 
-import static java.lang.Math.addExact;
-import static java.lang.Math.floorMod;
-import static java.lang.Math.multiplyExact;
-import static java.lang.Math.subtractExact;
+import static com.duy.lang.Math.addExact;
+import static com.duy.lang.Math.floorMod;
+import static com.duy.lang.Math.multiplyExact;
+import static com.duy.lang.Math.subtractExact;
 import static org.matheclipse.core.expression.F.Binomial;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
