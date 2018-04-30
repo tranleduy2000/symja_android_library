@@ -278,7 +278,7 @@ public class Math {
      * {@code int} value that is less than or equal to the algebraic quotient.
      * @throws ArithmeticException if the divisor {@code y} is zero
      * @see #floorMod(int, int)
-     * @see #floor(double)
+     * @see java.lang.Math#floor(double)
      * @since 1.8
      */
     public static int floorDiv(int x, int y) {
@@ -312,7 +312,7 @@ public class Math {
      * {@code long} value that is less than or equal to the algebraic quotient.
      * @throws ArithmeticException if the divisor {@code y} is zero
      * @see #floorMod(long, long)
-     * @see #floor(double)
+     * @see java.lang.Math#floor(double)
      * @since 1.8
      */
     public static long floorDiv(long x, long y) {

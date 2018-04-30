@@ -6,7 +6,7 @@ import static java.lang.Double.doubleToLongBits;
  * Created by Duy on 2/20/2018.
  */
 
-public class DDouble {
+public class Double {
     /**
      * Returns a hash code for a {@code double} value; compatible with
      * {@code Double.hashCode()}.
@@ -31,6 +31,6 @@ public class DDouble {
      * @since 1.8
      */
     public static boolean isFinite(double d) {
-        return Math.abs(d) <= Double.MAX_VALUE;
+        return java.lang.Math.abs(d) <= java.lang.Double.MAX_VALUE;
     }
 }

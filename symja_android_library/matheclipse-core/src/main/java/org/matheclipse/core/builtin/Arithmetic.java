@@ -4,7 +4,7 @@ import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
-import com.duy.lang.DDouble;
+import com.duy.lang.Double;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
@@ -3779,7 +3779,7 @@ public final class Arithmetic {
             double val = d0.doubleValue();
             double r = d1.doubleValue();
             double result = doubleSurd(val, r);
-            if (Double.isNaN(result)) {
+            if (java.lang.Double.isNaN(result)) {
                 return F.Indeterminate;
             }
             return F.num(result);
@@ -3833,21 +3833,21 @@ public final class Arithmetic {
             if (r == 0.0d) {
                 EvalEngine ee = EvalEngine.get();
                 ee.printMessage("Surd(a,b) division by zero");
-                return Double.NaN;
+                return java.lang.Double.NaN;
             }
             if (val < 0.0d) {
                 double root = Math.floor(r);
-                if (DDouble.isFinite(r) && Double.compare(r, root) == 0) {
+                if (Double.isFinite(r) && java.lang.Double.compare(r, root) == 0) {
                     // integer type
                     int iRoot = (int) root;
                     if ((iRoot & 0x0001) == 0x0000) {
                         EvalEngine ee = EvalEngine.get();
                         ee.printMessage("Surd(a,b) - undefined for negative \"a\" and even \"b\" values");
-                        return Double.NaN;
+                        return java.lang.Double.NaN;
                     }
                     return -Math.pow(Math.abs(val), 1.0d / r);
                 }
-                return Double.NaN;
+                return java.lang.Double.NaN;
             }
             return Math.pow(val, 1.0d / r);
         }
