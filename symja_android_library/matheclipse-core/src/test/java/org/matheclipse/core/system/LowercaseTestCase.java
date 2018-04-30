@@ -622,11 +622,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testBooleanMinimize() {
 
-//		check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c))", "a&&!b||!a&&c||b&&!c");
-//		 check("BooleanMinimize((a||b)&&(c||d))", "a&&c||a&&d||b&&c||b&&d");
-//		 check("BooleanMinimize((a||b)&&(c||d) )", "a&&c||a&&d||b&&c||b&&d");
-//		 check("BooleanMinimize(a && b || ! a && b)", "b");
-//		 check("BooleanMinimize(a && b || ! a && b )", "b");
+		// check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c))", "a&&!b||!a&&c||b&&!c");
+		// check("BooleanMinimize((a||b)&&(c||d))", "a&&c||a&&d||b&&c||b&&d");
+		// check("BooleanMinimize((a||b)&&(c||d) )", "a&&c||a&&d||b&&c||b&&d");
+		// check("BooleanMinimize(a && b || ! a && b)", "b");
+		// check("BooleanMinimize(a && b || ! a && b )", "b");
 	}
 
 	public void testBooleanQ() {
@@ -1171,19 +1171,19 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testComplexExpand() {
-//		check("ComplexExpand(a)", "a");
-//		check("ComplexExpand(42)", "42");
-//		check("ComplexExpand((-1)^(1/3))", //
-//				"1/2+I*1/2*Sqrt(3)");
-//		check("ComplexExpand((-1)^(4/3))", //
-//				"-1/2-I*1/2*Sqrt(3)");
-//		check("ComplexExpand(2^(4/3))", //
-//				"2*2^(1/3)");
-//		check("ComplexExpand((-2)^(4/3))", //
-//				"2*(1/2^(2/3)+I*1/2*Sqrt(3)*4^(1/6))");
-//		check("ComplexExpand(a*(b+c))", "a*b+a*c");
-//		check("ComplexExpand((-1)^(1/3)*(1+I*Sqrt(3)))", //
-//				"(1/2+I*1/2*Sqrt(3))*(1+I*Sqrt(3))");
+		check("ComplexExpand(a)", "a");
+		check("ComplexExpand(42)", "42");
+		check("ComplexExpand((-1)^(1/3))", //
+				"1/2+I*1/2*Sqrt(3)");
+		check("ComplexExpand((-1)^(4/3))", //
+				"-1/2-I*1/2*Sqrt(3)");
+		check("ComplexExpand(2^(4/3))", //
+				"2*2^(1/3)");
+		check("ComplexExpand((-2)^(4/3))", //
+				"2*(1/2^(2/3)+I*1/2*Sqrt(3)*4^(1/6))");
+		check("ComplexExpand(a*(b+c))", "a*b+a*c");
+		check("ComplexExpand((-1)^(1/3)*(1+I*Sqrt(3)))", //
+				"1/2+I*1/2*Sqrt(3)+(I*1/2-Sqrt(3)/2)*Sqrt(3)");
 		check("ComplexExpand(Cos(x+I*y))", "Cos(x)*Cosh(y)+I*Sin(x)*Sinh(y)");
 		check("ComplexExpand(Sin(x+I*y))", "Cosh(y)*Sin(x)+I*Cos(x)*Sinh(y)");
 		check("ComplexExpand(Cot(x+I*y))", "-Sin(2*x)/(Cos(2*x)-Cosh(2*y))+(I*Sinh(2*y))/(Cos(2*x)-Cosh(2*y))");
@@ -1633,6 +1633,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testDenominator() {
+		check("Denominator(a/(b*c))", "b*c");
+		check("Denominator(a^2*b)", "1");
+		check("Denominator(a^2*b^-2*c^-3)", "b^2*c^3");
+		check("Denominator(a^2*b^-a*c^-d)", "b^a*c^d");
 		check("Denominator(Csc(x))", "1");
 		check("Denominator(Csc(x), Trig->True)", "Sin(x)");
 		check("Denominator(Csc(x)^4)", "1");
@@ -3337,6 +3341,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testIm() {
+		check("Im(3*(-2)^(3/4))", "(3*4^(3/8))/Sqrt(2)");
+		check("Im(3*2^(3/4))", "0");
 		check("Im(0)", "0");
 		check("Im(I)", "1");
 		check("Im(Indeterminate)", "Indeterminate");
@@ -4157,6 +4163,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		checkNumeric("Log(-1.4)", "0.3364722366212129+I*3.141592653589793");
 
 		check("Log(-1)", "I*Pi");
+		check("Log(-2)", "I*Pi+Log(2)");
 		// test alias
 		check("Ln(E)", "1");
 		check("ln(E)", "1");
@@ -5223,6 +5230,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testNumerator() {
+		check("Numerator(a / b)", "a");
+		check("Numerator(a^2*b)", "a^2*b");
+		check("Numerator(a^2*b^-2)", "a^2");
+		check("Numerator(a^2*b^-a*c)", "a^2*c");
 		check("Numerator(Csc(x))", "Csc(x)");
 		check("Numerator(Csc(x), Trig->True)", "1");
 		check("Numerator(Csc(x)^4)", "Csc(x)^4");
@@ -5238,7 +5249,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Numerator(Tan(x))", "Tan(x)");
 		check("Numerator(Tan(x), Trig->True)", "Sin(x)");
 
-		check("Numerator(a / b)", "a");
 		check("Numerator(2 / 3)", "2");
 		check("Numerator(a + b)", "a+b");
 	}
@@ -5905,6 +5915,31 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPower() {
+		check("(-42)^Infinity", //
+				"ComplexInfinity");
+		check("(-1)^Infinity", //
+				"Indeterminate");
+		check("(-1/2)^Infinity", //
+				"0");
+		check("(1/4)^Infinity", //
+				"0");
+		check("(1)^Infinity", //
+				"Indeterminate");
+		check("(42)^Infinity", //
+				"Infinity");
+
+		check("(-42)^(-Infinity)", //
+				"0");
+		check("(-1)^(-Infinity)", //
+				"Indeterminate");
+		check("(-1/2)^(-Infinity)", //
+				"ComplexInfinity");
+		check("(1/4)^(-Infinity)", //
+				"Infinity");
+		check("(1)^(-Infinity)", //
+				"Indeterminate");
+		check("(42)^(-Infinity)", //
+				"0");
 		check("64^(2/3)", //
 				"16");
 		check("81^(3/4)", //
@@ -6008,6 +6043,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPowerExpand() {
+		check("PowerExpand(Log(x*y))", "Log(x)+Log(y)");
+		check("PowerExpand(Log(x^k))", "k*Log(x)");
+		check("PowerExpand(Sqrt(-a))", "I*Sqrt(a)");
+		check("PowerExpand(Sqrt(a^2))", "a");
+		// check("PowerExpand(Sqrt(a/b))", "Sqrt(a)*Sqrt(1/b)");
 
 		check("PowerExpand((a ^ b) ^ c)", "a^(b*c)");
 		check("PowerExpand((a * b) ^ c)", "a^c*b^c");
@@ -6181,6 +6221,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testProduct() {
+		check("Product(a, {a, 1, 5})", //
+				"120");
+		check("Product(f(a), {a, 1, 5})", //
+				"f(1)*f(2)*f(3)*f(4)*f(5)");
+		check("Product(a^2, {a, 4})", //
+				"576");
+		check("Product(a + b, {a, 1, 2}, {b, 1, 3})", //
+				"1440");
 		check("Product(k, {k, 1, 10})", "3628800");
 		check("10!", "3628800");
 		check("Product(x^k, {k, 2, 20, 2})", "x^110");
@@ -7936,6 +7984,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testSum() {
 
+		check("Sum(i, {i, 5, 10})", "45");
+		check("Sum(i, {i, 0, 30000})", "450015000");
+		check("Sum(i, {i, 0, n})", "1/2*n*(1+n)");
+		check("Sum(i, {i, 3, n})", "1/2*(-2+n)*(3+n)");
+		check("Sum(a + b, {a, 0, 2}, {b, 0, 3})", "30");
+		check("Sum(a, {a, {b, c, d, e}})", "b+c+d+e");
+		check("Sum(a*f, {a, {b, c, d, e}}, {f, {g, h}})", //
+				"b*g+c*g+d*g+e*g+b*h+c*h+d*h+e*h");
 		check("Sum(f(k,j),{k,0,-1+2}, {j,0,-1+k})", "f(1,0)");
 		check("Sum(k, {k, 1, n})", "1/2*n*(1+n)");
 		check("Sum(k, {k, 1, 10})", "55");
@@ -8450,6 +8506,22 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTogether() {
+		check("Together(1/(a + b) + 1/(c + d) - a)", //
+				"(a+b+c-a^2*c-a*b*c+d-a^2*d-a*b*d)/(a*c+b*c+a*d+b*d)");
+		check("Together(1/a+1/b)", //
+				"(a+b)/(a*b)");
+		check("Together(1/a+1/b+c)", //
+				"(a+b+a*b*c)/(a*b)");
+		check("Together(1/c+d)", //
+				"(1+c*d)/c");
+		check("Together(1/2+a)", //
+				"1/2*(1+2*a)");
+		check("Together((1+a/(c+d)+b/(c+d))/(a+b))", //
+				"(a+b+c+d)/((a+b)*(c+d))");
+		check("Together(1/a+1/b+c+d)", //
+				"(a+b+a*b*c+a*b*d)/(a*b)");
+		check("Together(2*a+2*b)", //
+				"2*(a+b)");
 		check("Together(-(a^2-c^2)/(a*b-b*c))", "-(a+c)/b");
 
 		check("Together(1/Sqrt(1+1/x) )", "Sqrt(x/(1+x))");

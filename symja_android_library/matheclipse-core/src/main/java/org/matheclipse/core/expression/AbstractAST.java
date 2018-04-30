@@ -2309,6 +2309,9 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			if (!arg1().isRealResult()) {
 				return false;
 			}
+			if (arg1().isNegativeResult()) {
+				return false;
+			}
 			if (!arg2().isRealResult()) {
 				return false;
 			}
