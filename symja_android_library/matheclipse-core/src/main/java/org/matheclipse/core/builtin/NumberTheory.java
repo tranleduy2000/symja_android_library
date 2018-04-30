@@ -59,6 +59,8 @@ import org.matheclipse.core.numbertheory.GaussianInteger;
 import org.matheclipse.core.numbertheory.Primality;
 import org.matheclipse.parser.client.math.MathException;
 
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
 import com.google.common.math.BigIntegerMath;
 import com.google.common.math.LongMath;
 
@@ -1124,7 +1126,12 @@ public final class NumberTheory {
 				}
 				// general formula
 				IASTAppendable sum = F.PlusAlloc(size);
-				return sum.appendArgs(size, i -> F.Power(list.get(i), arg1));
+				return sum.appendArgs(size, new IntFunction<IExpr>() {
+					@Override
+					public IExpr apply(int i) {
+						return F.Power(list.get(i), arg1);
+					}
+				});
 				// for (int i = 1; i < size; i++) {
 				// sum.append(F.Power(list.get(i), arg1));
 				// }
@@ -1374,7 +1381,12 @@ public final class NumberTheory {
 				BigInteger gcd = extendedGCD(ast, subBezouts);
 				// convert the Bezout numbers to sublists
 				IASTAppendable subList = F.ListAlloc(subBezouts.length);
-				subList.appendArgs(0, subBezouts.length, i -> F.integer(subBezouts[i]));
+				subList.appendArgs(0, subBezouts.length, new IntFunction<IExpr>() {
+					@Override
+					public IExpr apply(int i) {
+						return F.integer(subBezouts[i]);
+					}
+				});
 				// for (int i = 0; i < subBezouts.length; i++) {
 				// subList.append(F.integer(subBezouts[i]));
 				// }
@@ -2224,7 +2236,12 @@ public final class NumberTheory {
 			if (ast.isAST2()) {
 				return F.Binomial(F.Plus(ast.arg1(), ast.arg2()), ast.arg1());
 			}
-			if (ast.exists(x -> (!x.isInteger()) || ((IInteger) x).isNegative())) {
+			if (ast.exists(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return (!x.isInteger()) || ((IInteger) x).isNegative();
+				}
+			})) {
 				return F.NIL;
 			}
 
@@ -2933,7 +2950,12 @@ public final class NumberTheory {
 					if (roots != null) {
 						int size = roots.length;
 						IASTAppendable list = F.ListAlloc(size);
-						return list.appendArgs(0, size, i -> roots[i]);
+						return list.appendArgs(0, size, new IntFunction<IExpr>() {
+							@Override
+							public IExpr apply(int i) {
+								return roots[i];
+							}
+						});
 					}
 				} catch (ArithmeticException e) {
 					// integer to large?
