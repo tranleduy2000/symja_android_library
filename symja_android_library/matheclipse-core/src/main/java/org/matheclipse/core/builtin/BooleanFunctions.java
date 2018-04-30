@@ -574,8 +574,25 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * Minimize a boolean function with the <a href="http://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm">
-	 * Quine McCluskey algorithm</a>.
+	 * <pre>
+	 * BooleanMinimize(expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * minimizes a boolean function with the
+	 * <a href="https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm">Quine McCluskey algorithm</a>
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; BooleanMinimize(x&amp;&amp;y||(!x)&amp;&amp;y)
+	 * y
+	 * 
+	 * &gt;&gt; BooleanMinimize((a&amp;&amp;!b)||(!a&amp;&amp;b)||(b&amp;&amp;!c)||(!b&amp;&amp;c))
+	 * a&amp;&amp;!b||!a&amp;&amp;c||b&amp;&amp;!c
+	 * </pre>
 	 */
 	private static class BooleanMinimize extends AbstractFunctionEvaluator {
 
@@ -601,8 +618,24 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * See <a href="https://en.wikipedia.org/wiki/Truth_table">Wikipedia: Truth table</a>
+	 * <pre>
+	 * BooleanTable(logical - expr, variables)
+	 * </pre>
 	 * 
+	 * <blockquote>
+	 * <p>
+	 * generate <a href="https://en.wikipedia.org/wiki/Truth_table">truth values</a> from the <code>logical-expr</code>
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; BooleanTable(Implies(Implies(p, q), r), {p, q, r})
+	 * {True,False,True,True,True,False,True,False}
+	 * 
+	 * &gt;&gt; BooleanTable(Xor(p, q, r), {p, q, r})
+	 * {True,False,False,True,False,True,True,False}
+	 * </pre>
 	 */
 	private static class BooleanTable extends AbstractFunctionEvaluator {
 
@@ -653,8 +686,7 @@ public final class BooleanFunctions {
 					variables = List(ast.arg2());
 				}
 			} else {
-				VariablesSet vSet = new VariablesSet(ast.arg1());
-				variables = vSet.getVarList();
+				variables = BooleanVariables.booleanVariables(ast.arg1());
 			}
 
 			BooleanTableParameter btp = new BooleanTableParameter(variables, engine);
@@ -664,7 +696,21 @@ public final class BooleanFunctions {
 	}
 
 	/**
-	 * Determine the variable symbols of an expression
+	 * <pre>
+	 * BooleanVariables(logical - expr)
+	 * </pre>
+	 * 
+	 * <blockquote>
+	 * <p>
+	 * gives a list of the boolean variables that appear in the <code>logical-expr</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * 
+	 * <pre>
+	 * &gt;&gt; BooleanVariables(Xor(p,q,r))
+	 * {p,q,r}
+	 * </pre>
 	 */
 	private static class BooleanVariables extends AbstractFunctionEvaluator {
 
@@ -674,10 +720,13 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
-			VariablesSet eVar = new VariablesSet();
-			eVar.addBooleanVarList(ast.arg1());
-			return eVar.getVarList();
+			return booleanVariables(ast.arg1());
+		}
 
+		private static IAST booleanVariables(final IExpr expr) {
+			VariablesSet eVar = new VariablesSet();
+			eVar.addBooleanVarList(expr);
+			return eVar.getVarList();
 		}
 
 		@Override
