@@ -1,9 +1,31 @@
 package org.matheclipse.core.builtin;
 
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.Predicate;
-import com.google.common.math.BigIntegerMath;
-import com.google.common.math.LongMath;
+import static java.lang.Math.addExact;
+import static java.lang.Math.floorMod;
+import static java.lang.Math.multiplyExact;
+import static java.lang.Math.subtractExact;
+import static org.matheclipse.core.expression.F.Binomial;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.Cos;
+import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Subtract;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.integer;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.CombinatoricsUtils;
@@ -37,14 +59,8 @@ import org.matheclipse.core.numbertheory.GaussianInteger;
 import org.matheclipse.core.numbertheory.Primality;
 import org.matheclipse.parser.client.math.MathException;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import com.google.common.math.BigIntegerMath;
+import com.google.common.math.LongMath;
 
 import edu.jas.arith.BigRational;
 import edu.jas.arith.ModInteger;
@@ -52,23 +68,6 @@ import edu.jas.arith.ModIntegerRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.ufd.FactorAbstract;
 import edu.jas.ufd.FactorFactory;
-
-import static com.duy.lang.DMath.addExact;
-import static com.duy.lang.DMath.floorMod;
-import static com.duy.lang.DMath.multiplyExact;
-import static com.duy.lang.DMath.subtractExact;
-import static org.matheclipse.core.expression.F.Binomial;
-import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.Factorial;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Subtract;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.integer;
 
 public final class NumberTheory {
 
@@ -84,7 +83,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * BellB(expr)
 	 * </pre>
-	 *
+	 * 
 	 * <blockquote>
 	 * <p>
 	 * the Bell number function counts the number of different ways to partition a set that has exactly <code>n</code>
@@ -129,7 +128,7 @@ public final class NumberTheory {
 
 		/**
 		 * Generates the Bell polynomial of the given index, where B(1) is 1. This is recursive.
-		 *
+		 * 
 		 * @param index
 		 * @return
 		 */
@@ -151,6 +150,7 @@ public final class NumberTheory {
 			}
 			return sum;
 		}
+
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
@@ -165,12 +165,12 @@ public final class NumberTheory {
 				}
 
 				// bell numbers start here
-			if (arg1.isZero()) {
-				return F.C1;
-			}
-				BigInteger bellB = bellNumber(n);
-					return F.integer(bellB);
+				if (arg1.isZero()) {
+					return F.C1;
 				}
+				BigInteger bellB = bellNumber(n);
+				return F.integer(bellB);
+			}
 			return F.NIL;
 		}
 
@@ -432,6 +432,11 @@ public final class NumberTheory {
 					return ((IInteger) arg1).charmichaelLambda();
 				} catch (ArithmeticException ae) {
 
+				}
+			} else {
+				IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
+				if (negExpr.isPresent()) {
+					return F.CarmichaelLambda(negExpr);
 				}
 			}
 			return F.NIL;
@@ -1119,12 +1124,7 @@ public final class NumberTheory {
 				}
 				// general formula
 				IASTAppendable sum = F.PlusAlloc(size);
-				return sum.appendArgs(size, new IntFunction<IExpr>() {
-                    @Override
-                    public IExpr apply(int i) {
-                        return F.Power(list.get(i), arg1);
-                    }
-                });
+				return sum.appendArgs(size, i -> F.Power(list.get(i), arg1));
 				// for (int i = 1; i < size; i++) {
 				// sum.append(F.Power(list.get(i), arg1));
 				// }
@@ -1282,6 +1282,11 @@ public final class NumberTheory {
 				} catch (ArithmeticException e) {
 					// integer to large?
 				}
+			} else {
+				IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
+				if (negExpr.isPresent()) {
+					return F.EulerPhi(negExpr);
+				}
 			}
 			return F.NIL;
 		}
@@ -1365,16 +1370,14 @@ public final class NumberTheory {
 			try {
 
 				// BigInteger factor = BigInteger.ONE;
-				final BigInteger[] subBezouts = new BigInteger[ast.argSize()];
-				final BigInteger gcd = extendedGCD(ast, subBezouts);
+				BigInteger[] subBezouts = new BigInteger[ast.argSize()];
+				BigInteger gcd = extendedGCD(ast, subBezouts);
 				// convert the Bezout numbers to sublists
 				IASTAppendable subList = F.ListAlloc(subBezouts.length);
-				subList.appendArgs(0, subBezouts.length, new IntFunction<IExpr>() {
-					@Override
-					public IExpr apply(int i) {
-						return F.integer(subBezouts[i]);
-					}
-				}); 
+				subList.appendArgs(0, subBezouts.length, i -> F.integer(subBezouts[i]));
+				// for (int i = 0; i < subBezouts.length; i++) {
+				// subList.append(F.integer(subBezouts[i]));
+				// }
 				// create the output list
 				return F.List(F.integer(gcd), subList);
 			} catch (ArithmeticException ae) {
@@ -1986,7 +1989,7 @@ public final class NumberTheory {
 					IAST list = (IAST) expr;
 					if (list.size() == 2) {
 						int result = 1;
-						IInteger temp=(IInteger) list.get(1).first(); 
+						IInteger temp = (IInteger) list.get(1).first();
 						return F.Log(temp);
 					}
 					return F.C0;
@@ -2144,6 +2147,11 @@ public final class NumberTheory {
 				} catch (ArithmeticException e) {
 					// integer to large?
 				}
+			} else {
+				IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
+				if (negExpr.isPresent()) {
+					return F.MoebiusMu(negExpr);
+				}
 			}
 			return F.NIL;
 		}
@@ -2190,6 +2198,7 @@ public final class NumberTheory {
 	 * </pre>
 	 */
 	private static class Multinomial extends AbstractFunctionEvaluator {
+
 		public static IInteger multinomial(final IAST ast) {
 			IInteger[] k = new IInteger[ast.argSize()];
 			IInteger n = F.C0;
@@ -2215,12 +2224,7 @@ public final class NumberTheory {
 			if (ast.isAST2()) {
 				return F.Binomial(F.Plus(ast.arg1(), ast.arg2()), ast.arg1());
 			}
-			if (ast.exists(new Predicate<IExpr>() {
-				@Override
-				public boolean test(IExpr x) {
-					return (!x.isInteger()) || ((IInteger) x).isNegative();
-				}
-			}, 1)) {
+			if (ast.exists(x -> (!x.isInteger()) || ((IInteger) x).isNegative())) {
 				return F.NIL;
 			}
 
@@ -2398,10 +2402,10 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
-			final IExpr arg1 = ast.arg1();
+			IExpr arg1 = ast.arg1();
 			if (arg1.isZero()) {
 				return F.C1;
 			}
@@ -2488,10 +2492,10 @@ public final class NumberTheory {
 	private static class PartitionsQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
-			final IExpr arg1 = ast.arg1();
+			IExpr arg1 = ast.arg1();
 			if (arg1.isZero()) {
 				return F.C1;
 			}
@@ -2815,10 +2819,16 @@ public final class NumberTheory {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
+			if (arg1.isZero()) {
+				return F.NIL;
+			}
 			if (arg1.isOne()) {
 				return F.C0;
 			}
-			if (arg1.isInteger() && arg1.isPositive()) {
+			if (arg1.isInteger()) {
+				if (arg1.isNegative()) {
+					arg1 = arg1.negate();
+				}
 				SortedMap<BigInteger, Integer> map = new TreeMap<BigInteger, Integer>();
 				Primality.factorInteger(((IInteger) arg1).toBigNumerator(), map);
 				BigInteger sum = BigInteger.ZERO;
@@ -2826,6 +2836,11 @@ public final class NumberTheory {
 					sum = sum.add(BigInteger.valueOf(entry.getValue()));
 				}
 				return F.ZZ(sum);
+			} else {
+				IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
+				if (negExpr.isPresent()) {
+					return F.PrimeOmega(negExpr);
+				}
 			}
 			return F.NIL;
 		}
@@ -2914,16 +2929,11 @@ public final class NumberTheory {
 		public IExpr evaluateArg1(final IExpr arg1) {
 			if (arg1.isInteger()) {
 				try {
-					final IInteger[] roots = ((IInteger) arg1).primitiveRootList();
+					IInteger[] roots = ((IInteger) arg1).primitiveRootList();
 					if (roots != null) {
 						int size = roots.length;
 						IASTAppendable list = F.ListAlloc(size);
-						return list.appendArgs(0, size, new IntFunction<IExpr>() {
-							@Override
-							public IExpr apply(int i) {
-								return roots[i];
-							}
-						});
+						return list.appendArgs(0, size, i -> roots[i]);
 					}
 				} catch (ArithmeticException e) {
 					// integer to large?
@@ -3472,22 +3482,21 @@ public final class NumberTheory {
 	}
 
 	public static IInteger factorial(int ni) {
-			BigInteger result;
-			if (ni < 0) {
-				result = BigIntegerMath.factorial(-1 * ni);
-				if ((ni & 0x0001) == 0x0001) {
-					// odd integer number
-					result = result.multiply(BigInteger.valueOf(-1L));
-				}
-			} else {
-				if (ni <= 20) {
-					return AbstractIntegerSym.valueOf(LongMath.factorial(ni));
-				}
-				result = BigIntegerMath.factorial(ni);
+		BigInteger result;
+		if (ni < 0) {
+			result = BigIntegerMath.factorial(-1 * ni);
+			if ((ni & 0x0001) == 0x0001) {
+				// odd integer number
+				result = result.multiply(BigInteger.valueOf(-1L));
 			}
-			return AbstractIntegerSym.valueOf(result);
+		} else {
+			if (ni <= 20) {
+				return AbstractIntegerSym.valueOf(LongMath.factorial(ni));
+			}
+			result = BigIntegerMath.factorial(ni);
 		}
-
+		return AbstractIntegerSym.valueOf(result);
+	}
 
 	/**
 	 * <p>
