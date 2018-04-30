@@ -22,6 +22,9 @@ import javax.annotation.Nonnull;
  */
 public interface ISymbol extends IExpr { // Variable<IExpr>
 
+	public static enum RuleType {
+		SET, SET_DELAYED, UPSET, UPSET_DELAYED;
+	}
     /**
      * ISymbol attribute to indicate that a symbols evaluation should be printed to Console with System.out.println();
      */
@@ -206,12 +209,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
 	public int getAttributes();
 
-    /**
-     * Set the Attributes of this symbol (i.e. LISTABLE, FLAT, ORDERLESS,...)
-     *
-     * @param attributes the Attributes of this symbol
-     */
-    void setAttributes(int attributes);
 
     /**
      * Get the context this symbol is assigned to.
@@ -229,15 +226,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
 	public IExpr getDefaultValue();
 
-    /**
-     * Set the <i>general default value</i> for this symbol (i.e. <code>1</code> is the default value for
-     * <code>Times</code>, <code>0</code> is the default value for <code>Plus</code>). The general default value is used
-     * in pattern-matching for expressions like <code>a_. * b_. + c_</code>
-     *
-     * @param expr the general default value
-     * @see IBuiltInSymbol#getDefaultValue()
-     */
-    void setDefaultValue(IExpr expr);
 
     /**
      * Get the <i>default value</i> at the arguments position for this symbol (i.e. <code>1</code> is the default value
@@ -339,11 +327,12 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
 	public boolean isSymbolName(String name);
 
 	/**
-	 * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
+	 * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>. If the result is
+	 * <code>F.True</code> return <code>true</code>
 	 *
 	 * @param args
 	 *            the arguments for which this function symbol should be evaluated
-	 * @return
+	 * @return if the result is <code>F.True</code> return <code>true</code>, otherwise <code>false</code>.
 	 */
 	default boolean isTrue(IExpr... args) {
 		return of(args).isTrue();
@@ -374,8 +363,17 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
 	public IExpr of(EvalEngine engine, IExpr... args);
 
 	/**
-	 * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code> to a boolean value.
-	 * If the result isn't a boolean value return <code>false</code>.
+	 * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
+	 *
+	 * @param args
+	 *            the arguments for which this function symbol should be evaluated
+	 * @return
+	 */
+	public IExpr of(IExpr... args);
+
+	/**
+	 * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code> to a boolean
+	 * value. If the result isn't a boolean value return <code>false</code>.
 	 * 
 	 * @param engine
 	 *            the current evaluation engine
@@ -385,15 +383,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
 	 */
 	public boolean ofQ(EvalEngine engine, IExpr... args);
 	
-	
-	/**
-	 * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
-	 * 
-	 * @param args
-	 *            the arguments for which this function symbol should be evaluated
-	 * @return
-	 */
-	public IExpr of(IExpr... args);
+
 	
     /**
      * Delete the topmost placeholder from the local variable stack
@@ -561,6 +551,24 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
 	public void set(IExpr value);
 
+	/**
+	 * Set the Attributes of this symbol (i.e. LISTABLE, FLAT, ORDERLESS,...)
+	 *
+	 * @param attributes
+	 *            the Attributes of this symbol
+	 */
+	public void setAttributes(int attributes);
+
+	/**
+	 * Set the <i>general default value</i> for this symbol (i.e. <code>1</code> is the default value for
+	 * <code>Times</code>, <code>0</code> is the default value for <code>Plus</code>). The general default value is used
+	 * in pattern-matching for expressions like <code>a_. * b_. + c_</code>
+	 *
+	 * @param expr
+	 *            the general default value
+	 * @see IBuiltInSymbol#getDefaultValue()
+	 */
+	public void setDefaultValue(IExpr expr);
     /**
      * Set the <i>default value</i> at the arguments position for this symbol (i.e. <code>1</code> is the default value
      * for <code>Power</code> at <code>position</code> <code>2</code>). The default value is used in pattern-matching
@@ -583,8 +591,5 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
 	public boolean writeRules(java.io.ObjectOutputStream stream) throws java.io.IOException;
 
-    enum RuleType {
-        SET, SET_DELAYED, UPSET, UPSET_DELAYED
-    }
 
 }
