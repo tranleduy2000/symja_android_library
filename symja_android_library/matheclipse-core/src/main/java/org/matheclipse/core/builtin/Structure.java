@@ -1,6 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import java.util.HashMap;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.IntFunction;
@@ -32,7 +31,7 @@ import org.matheclipse.core.visit.AbstractVisitorLong;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
 import org.matheclipse.parser.client.math.MathException;
 
-import com.duy.lambda.IntFunction;
+import java.util.HashMap;
 
 public class Structure {
 
@@ -538,7 +537,7 @@ public class Structure {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.head().equals(F.Function)) {
-				IExpr temp = engine.evalSetAttributes(ast, true);
+				IExpr temp = engine.evalHoldPattern(ast, true);
 				if (temp.isPresent() && !temp.equals(ast)) {
 					return temp;
 				}
@@ -553,7 +552,7 @@ public class Structure {
 						return Lambda.replaceSlotsOrElse(arg1, ast, arg1);
 					} else if (function.isAST2()) {
 						IExpr arg2 = function.arg2();
-						final IAST symbolSlots;
+						IAST symbolSlots;
 						if (arg1.isList()) {
 							symbolSlots = (IAST) arg1;
 						} else {
@@ -1634,22 +1633,28 @@ public class Structure {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
-				final IAST arg1AST = (IAST) ast.arg1();
+				IAST arg1AST = (IAST) ast.arg1();
 				IExpr arg1Head = arg1AST.head();
 				if (arg1Head.isAST()) {
 
-					final IAST arg1HeadAST = (IAST) arg1Head;
+					IAST clonedList;
+					IAST arg1HeadAST = (IAST) arg1Head;
 					if (ast.isAST2() && !arg1HeadAST.head().equals(ast.arg2())) {
 						return arg1AST;
 					}
 					IASTAppendable result = F.ast(arg1HeadAST.head());
 					return result.appendArgs(arg1HeadAST.size(), new IntFunction<IExpr>() {
-
 						@Override
 						public IExpr apply(int i) {
 							return arg1AST.apply(arg1HeadAST.get(i));
 						}
 					});
+
+					// for (int i = 1; i < arg1HeadAST.size(); i++) {
+					// clonedList = arg1AST.apply(arg1HeadAST.get(i));
+					// result.append(clonedList);
+					// }
+					// return result;
 				}
 				return arg1AST;
 			}

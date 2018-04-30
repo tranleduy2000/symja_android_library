@@ -1023,7 +1023,7 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 				return evalWithoutNumericReset(expr);
 			}
 			if (expr.isAST()) {
-				return evalSetAttributes((IAST) expr).orElse(expr);
+				return evalHoldPattern((IAST) expr).orElse(expr);
 			}
 			return expr;
 		} catch (MathException ce) {
@@ -1155,8 +1155,8 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 	 * @param ast
 	 * @return <code>ast</code> if no evaluation was executed.
 	 */
-	public IExpr evalSetAttributes(IAST ast) {
-		return evalSetAttributes(ast, false);
+	public IExpr evalHoldPattern(IAST ast) {
+		return evalHoldPattern(ast, false);
 	}
 
 	/**
@@ -1169,7 +1169,7 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 	 *            (sub-)expressions which contain no patterns should not be evaluated
 	 * @return <code>ast</code> if no evaluation was executed.
 	 */
-	public IExpr evalSetAttributes(IAST ast, boolean noEvaluation) {
+	public IExpr evalHoldPattern(IAST ast, boolean noEvaluation) {
 		boolean evalLHSMode = fEvalLHSMode;
 		try {
 			fEvalLHSMode = true;
@@ -1183,6 +1183,33 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 		}
 	}
 
+	/**
+	 * Evaluate the ast recursively, according to the attributes Flat, HoldAll, HoldFirst, HoldRest, Orderless to create
+	 * pattern-matching expressions directly or for the left-hand-side of a <code>Set[]</code>,
+	 * <code>SetDelayed[]</code>, <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
+	 *
+	 * @param ast
+	 * @return <code>ast</code> if no evaluation was executed.
+	 * @deprecated use evalHoldPattern
+	 */
+	public IExpr evalSetAttributes(IAST ast) {
+		return evalHoldPattern(ast, false);
+	}
+
+	/**
+	 * Evaluate the ast recursively, according to the attributes Flat, HoldAll, HoldFirst, HoldRest, Orderless to create
+	 * pattern-matching expressions directly or for the left-hand-side of a <code>Set[]</code>,
+	 * <code>SetDelayed[]</code>, <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
+	 *
+	 * @param ast
+	 * @param noEvaluation
+	 *            (sub-)expressions which contain no patterns should not be evaluated
+	 * @return <code>ast</code> if no evaluation was executed.
+	 * @deprecated use evalHoldPattern
+	 */
+	public IExpr evalSetAttributes(IAST ast, boolean noEvaluation) {
+		return evalHoldPattern(ast, noEvaluation);
+	}
 	private IExpr evalSetAttributesRecursive(IAST ast, boolean noEvaluation, boolean evalNumericFunction, int level) {
 		if (ast.isAST(F.Literal, 2)) {
 			return ast.arg1();

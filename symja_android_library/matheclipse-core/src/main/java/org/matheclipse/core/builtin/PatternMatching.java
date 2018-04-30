@@ -49,7 +49,6 @@ import static org.matheclipse.core.expression.F.RuleDelayed;
 
 public final class PatternMatching {
 
-    private final static PatternMatching CONST = new PatternMatching();
 
     static {
         F.Blank.setEvaluator(Blank.CONST);
@@ -75,71 +74,6 @@ public final class PatternMatching {
         F.UpSetDelayed.setEvaluator(new UpSetDelayed());
     }
 
-    private PatternMatching() {
-
-    }
-
-    public static Object[] setDownRule(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
-        final Object[] result = new Object[]{null, rightHandSide};
-        if (leftHandSide.isAST()) {
-            final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
-            result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET, false, leftHandSide, rightHandSide, packageMode);
-            return result;
-        }
-        if (leftHandSide.isSymbol()) {
-            final ISymbol lhsSymbol = (ISymbol) leftHandSide;
-
-            if (lhsSymbol.hasLocalVariableStack()) {
-                lhsSymbol.set(rightHandSide);
-                return result;
-            }
-            result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET, true, leftHandSide, rightHandSide, packageMode);
-            return result;
-        }
-
-        throw new RuleCreationError(leftHandSide);
-    }
-
-    public static Object[] setDelayedDownRule(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
-        final Object[] result = new Object[]{null, rightHandSide};
-        if (leftHandSide.isAST()) {
-            final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
-
-            result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET_DELAYED, false, leftHandSide, rightHandSide,
-                    packageMode);
-            return result;
-        }
-        if (leftHandSide.isSymbol()) {
-            final ISymbol lhsSymbol = (ISymbol) leftHandSide;
-            if (lhsSymbol.hasLocalVariableStack()) {
-                lhsSymbol.set(rightHandSide);
-                return result;
-            }
-            result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET_DELAYED, true, leftHandSide, rightHandSide,
-                    packageMode);
-            return result;
-        }
-        throw new RuleCreationError(leftHandSide);
-    }
-
-    public static IExpr getFile(File file, EvalEngine engine) {
-        boolean packageMode = engine.isPackageMode();
-        try {
-            engine.setPackageMode(true);
-            FileReader reader = new FileReader(file);
-            return Get.loadPackage(engine, reader);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            engine.printMessage("Get exception: " + e.getMessage());
-        } finally {
-            engine.setPackageMode(packageMode);
-        }
-        return F.Null;
-    }
-
-    public static PatternMatching initialize() {
-        return CONST;
-    }
 
     public static class Blank extends AbstractCoreFunctionEvaluator {
         public final static Blank CONST = new Blank();
@@ -165,7 +99,7 @@ public final class PatternMatching {
      * <pre>
      * Clear(symbol1, symbol2,...)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * clears all values of the given symbols.
@@ -176,7 +110,7 @@ public final class PatternMatching {
      * <code>ClearAll</code> to do so.
      * </p>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; a=2
      * 2
@@ -306,6 +240,7 @@ public final class PatternMatching {
 
     /**
      * Get[{&lt;file name&gt;}}
+	 *
      */
     private static class Get extends AbstractFunctionEvaluator {
 
@@ -464,14 +399,14 @@ public final class PatternMatching {
      * <pre>
      * Hold(expr)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * <code>Hold</code> doesn't evaluate <code>expr</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Hold(3*2)
      * Hold(3*2)
@@ -491,6 +426,68 @@ public final class PatternMatching {
 
     }
 
+	/**
+	 * <pre>
+	 * HoldPattern(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * <code>HoldPattern</code> doesn't evaluate <code>expr</code> for pattern-matching.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * <p>
+	 * One might be very surprised that the following line evaluates to <code>True</code>!
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; MatchQ(And(x, y, z), Times(p__))
+	 * True
+	 * </pre>
+	 * <p>
+	 * When the line above is evaluated <code>Times(p__)</code> evaluates to <code>(p__)</code> before the kernel checks
+	 * to see if the pattern matches. <code>MatchQ</code> then determines if <code>And(x,y,z)</code> matches the pattern
+	 * <code>(p__)</code> and it does because <code>And(x,y,z)</code> is itself a sequence of one.
+	 * </p>
+	 * <p>
+	 * Now the next line also evaluates to <code>True</code> because both <code>( And(p__) )</code> and
+	 * <code>( Times(p__) )</code> evaluate to <code>( p__ )</code>.
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; Times(p__)===And(p__)
+	 * True
+	 * </pre>
+	 * <p>
+	 * In the examples above prevent the patterns from evaluating, by wrapping them with <code>HoldPattern</code> as in
+	 * the following lines.
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; MatchQ(And(x, y, z), HoldPattern(Times(p__)))
+	 * False
+	 *
+	 * &gt;&gt; HoldPattern(Times(p__))===HoldPattern(And(p__))
+	 * False
+	 * </pre>
+	 * <p>
+	 * In the next lines <code>HoldPattern</code> is used to ensure the head <code>(And)</code> is changed to
+	 * <code>(List)</code>.<br />
+	 * The two examples that follow have the same effect, but the use of <code>HoldPattern</code> isn't needed.
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; And(x, y, z)/.HoldPattern(And(a__)) -&gt;List(a)
+	 * {x,y,z}
+	 *
+	 * &gt;&gt; And(x, y, z)/.And-&gt;List
+	 * {x,y,z}
+	 *
+	 * &gt;&gt; And(x, y, z)/.And(a_,b___)-&gt;List(a,b)
+	 * {x,y,z}
+	 * </pre>
+	 */
     private static class HoldPattern extends AbstractCoreFunctionEvaluator {
 
         @Override
@@ -498,7 +495,7 @@ public final class PatternMatching {
             if (ast.size() == 2) {
                 IExpr arg1 = ast.arg1();
                 if (arg1.isAST()) {
-                    IExpr temp = PatternMatcher.evalLeftHandSide((IAST) arg1, engine);
+					IExpr temp = engine.evalHoldPattern((IAST) arg1);
                     if (temp == arg1) {
                         return F.NIL;
                     }
@@ -570,6 +567,7 @@ public final class PatternMatching {
 
     /**
      * MessageName[{&lt;file name&gt;}}
+	 *
      */
     private static class MessageName extends AbstractFunctionEvaluator {
 
@@ -606,18 +604,18 @@ public final class PatternMatching {
      * <p>
      * or
      * </p>
-     * <p>
+	 *
      * <pre>
      * patt : default
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * is a pattern which matches <code>patt</code>, which if omitted should be replaced by <code>default</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; f(x_, y_:1) := {x, y}
      * &gt;&gt; f(1, 2)
@@ -678,6 +676,7 @@ public final class PatternMatching {
 
     /**
      * Put[{&lt;file name&gt;}}
+	 *
      */
     private static final class Put extends AbstractFunctionEvaluator {
 
@@ -722,14 +721,14 @@ public final class PatternMatching {
      *
      * x -&gt; y
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * represents a rule replacing <code>x</code> with <code>y</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; a+b+c /. c-&gt;d
      * a+b+d
@@ -740,9 +739,9 @@ public final class PatternMatching {
      * <p>
      * Rule called with 3 arguments; 2 arguments are expected.
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; a /. Rule(1, 2, 3) -&gt; t
+	 * &gt;&gt; a /. Rule(1, 2, 3) -&gt; t
      * a
      * </pre>
      */
@@ -753,7 +752,7 @@ public final class PatternMatching {
             Validate.checkSize(ast, 3);
             IExpr leftHandSide = ast.arg1();
             if (leftHandSide.isAST()) {
-                leftHandSide = PatternMatcher.evalLeftHandSide((IAST) leftHandSide, engine);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
             } else {
                 leftHandSide = engine.evaluate(leftHandSide);
             }
@@ -779,7 +778,7 @@ public final class PatternMatching {
      *
      * x :&gt; y
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * represents a rule replacing <code>x</code> with <code>y</code>, with <code>y</code> held unevaluated.
@@ -793,7 +792,7 @@ public final class PatternMatching {
             Validate.checkSize(ast, 3);
             IExpr leftHandSide = ast.arg1();
             if (leftHandSide.isAST()) {
-                leftHandSide = PatternMatcher.evalLeftHandSide((IAST) leftHandSide, engine);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
             } else {
                 leftHandSide = engine.evaluate(leftHandSide);
             }
@@ -816,17 +815,17 @@ public final class PatternMatching {
      *
      * expr = value
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * evaluates <code>value</code> and assigns it to <code>expr</code>.
      * </p>
      * </blockquote>
-     * <p>
+	 *
      * <pre>
      * {s1, s2, s3} = {v1, v2, v3}
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * sets multiple symbols <code>(s1, s2, ...)</code> to the corresponding values <code>(v1, v2, ...)</code>.
@@ -836,80 +835,80 @@ public final class PatternMatching {
      * <p>
      * <code>Set</code> can be used to give a symbol a value:<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; a = 3
-     * 3
+	 * &gt;&gt; a = 3
+	 * 3
      *
-     * &gt;&gt; a
+	 * &gt;&gt; a
      * 3
      * </pre>
      * <p>
      * You can set multiple values at once using lists:<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; {a, b, c} = {10, 2, 3}
-     * {10,2,3}
+	 * &gt;&gt; {a, b, c} = {10, 2, 3}
+	 * {10,2,3}
      *
-     * &gt;&gt; {a, b, {c, {d}}} = {1, 2, {{c1, c2}, {a}}}
+	 * &gt;&gt; {a, b, {c, {d}}} = {1, 2, {{c1, c2}, {a}}}
      * {1,2,{{c1,c2},{10}}}
      *
-     * &gt;&gt; d
+	 * &gt;&gt; d
      * 10
      * </pre>
      * <p>
      * <code>Set</code> evaluates its right-hand side immediately and assigns it to the left-hand side:<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; a
-     * 1
+	 * &gt;&gt; a
+	 * 1
      *
-     * &gt;&gt; x = a
-     * 1
+	 * &gt;&gt; x = a
+	 * 1
      *
-     * &gt;&gt; a = 2
-     * 2
+	 * &gt;&gt; a = 2
+	 * 2
      *
-     * &gt;&gt; x
+	 * &gt;&gt; x
      * 1
      * </pre>
      * <p>
      * 'Set' always returns the right-hand side, which you can again use in an assignment:<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; a = b = c = 2
-     * &gt;&gt; a == b == c == 2
+	 * &gt;&gt; a = b = c = 2
+	 * &gt;&gt; a == b == c == 2
      * True
      * </pre>
      * <p>
      * 'Set' supports assignments to parts:<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; A = {{1, 2}, {3, 4}}
-     * &gt;&gt; A[[1, 2]] = 5
-     * 5
+	 * &gt;&gt; A = {{1, 2}, {3, 4}}
+	 * &gt;&gt; A[[1, 2]] = 5
+	 * 5
      *
-     * &gt;&gt; A
-     * {{1,5}, {3,4}}
+	 * &gt;&gt; A
+	 * {{1,5}, {3,4}}
      *
-     * &gt;&gt; A[[;;, 2]] = {6, 7}
-     * {6,7}
+	 * &gt;&gt; A[[;;, 2]] = {6, 7}
+	 * {6,7}
      *
-     * &gt;&gt; A
+	 * &gt;&gt; A
      * {{1,6},{3,7}}
      * </pre>
      * <p>
      * Set a submatrix:
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; B = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
-     * &gt;&gt; B[[1;;2, 2;;-1]] = {{t, u}, {y, z}}
-     * &gt;&gt; B
+	 * &gt;&gt; B = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+	 * &gt;&gt; B[[1;;2, 2;;-1]] = {{t, u}, {y, z}}
+	 * &gt;&gt; B
      * {{1, t, u}, {4, y, z}, {7, 8, 9}}
      * </pre>
      */
@@ -988,7 +987,7 @@ public final class PatternMatching {
                                              final EvalEngine engine) throws RuleCreationError {
 
             if (leftHandSide.isAST()) {
-                leftHandSide = PatternMatcher.evalLeftHandSide((IAST) leftHandSide, engine);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
             }
             try {
                 rightHandSide = engine.evaluate(rightHandSide);
@@ -1014,7 +1013,7 @@ public final class PatternMatching {
      *
      * expr := value
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * assigns <code>value</code> to <code>expr</code>, without evaluating <code>value</code>.
@@ -1025,27 +1024,27 @@ public final class PatternMatching {
      * <code>SetDelayed</code> is like <code>Set</code>, except it has attribute <code>HoldAll</code>, thus it does not
      * evaluate the right-hand side immediately, but evaluates it when needed.<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; Attributes(SetDelayed)
-     * {HoldAll}
+	 * &gt;&gt; Attributes(SetDelayed)
+	 * {HoldAll}
      *
-     * &gt;&gt; a = 1
-     * 1
+	 * &gt;&gt; a = 1
+	 * 1
      *
      * &gt;&gt; x := a
-     * &gt;&gt; x
+	 * &gt;&gt; x
      * 1
      * </pre>
      * <p>
      * Changing the value of <code>a</code> affects <code>x</code>:<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; a = 2
-     * 2
+	 * &gt;&gt; a = 2
+	 * 2
      *
-     * &gt;&gt; x
+	 * &gt;&gt; x
      * 2
      * </pre>
      * <p>
@@ -1054,11 +1053,11 @@ public final class PatternMatching {
      * </p>
      * <p>
      * <pre>
-     * &gt;&gt; f(x_) := p(x) /; x&gt;0
-     * &gt;&gt; f(3)
-     * p(3)
+	 * &gt;&gt; f(x_) := p(x) /; x&gt;0
+	 * &gt;&gt; f(3)
+	 * p(3)
      *
-     * &gt;&gt; f(-3)
+	 * &gt;&gt; f(-3)
      * f(-3)
      * </pre>
      */
@@ -1082,7 +1081,7 @@ public final class PatternMatching {
                                              final EvalEngine engine) throws RuleCreationError {
             if (leftHandSide.isAST()
                     && (((IAST) leftHandSide).getEvalFlags() & IAST.IS_FLATTENED_OR_SORTED_MASK) == IAST.NO_FLAG) {
-                leftHandSide = PatternMatcher.evalLeftHandSide((IAST) leftHandSide, engine);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
             }
             return setDelayedDownRule(leftHandSide, rightHandSide, packageMode);
         }
@@ -1094,28 +1093,70 @@ public final class PatternMatching {
 
     }
 
+	public static Object[] setDownRule(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
+		final Object[] result = new Object[] { null, rightHandSide };
+		if (leftHandSide.isAST()) {
+			final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
+			result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET, false, leftHandSide, rightHandSide, packageMode);
+			return result;
+		}
+		if (leftHandSide.isSymbol()) {
+			final ISymbol lhsSymbol = (ISymbol) leftHandSide;
+
+			if (lhsSymbol.hasLocalVariableStack()) {
+				lhsSymbol.set(rightHandSide);
+				return result;
+			}
+			result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET, true, leftHandSide, rightHandSide, packageMode);
+			return result;
+		}
+
+		throw new RuleCreationError(leftHandSide);
+	}
+
+	public static Object[] setDelayedDownRule(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
+		final Object[] result = new Object[] { null, rightHandSide };
+		if (leftHandSide.isAST()) {
+			final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
+
+			result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET_DELAYED, false, leftHandSide, rightHandSide,
+					packageMode);
+			return result;
+		}
+		if (leftHandSide.isSymbol()) {
+			final ISymbol lhsSymbol = (ISymbol) leftHandSide;
+			if (lhsSymbol.hasLocalVariableStack()) {
+				lhsSymbol.set(rightHandSide);
+				return result;
+			}
+			result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET_DELAYED, true, leftHandSide, rightHandSide,
+					packageMode);
+			return result;
+		}
+		throw new RuleCreationError(leftHandSide);
+	}
     /**
      * <pre>
      * Unique(expr)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * create a unique symbol of the form <code>expr$...</code>.
      * </p>
      * </blockquote>
-     * <p>
+	 *
      * <pre>
      * Unique("expr")
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * create a unique symbol of the form <code>expr...</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Unique(xy)
      * xy$1
@@ -1158,18 +1199,18 @@ public final class PatternMatching {
      * <p>
      * or
      * </p>
-     * <p>
+	 *
      * <pre>
      * expr =.
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * removes any definitions belonging to the left-hand-side <code>expr</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; a = 2
      * 2
@@ -1182,7 +1223,7 @@ public final class PatternMatching {
      * <p>
      * Unsetting an already unset or never defined variable will not change anything:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; a =.
      *
@@ -1192,7 +1233,7 @@ public final class PatternMatching {
      * <code>Unset</code> can unset particular function values. It will print a message if no corresponding rule is
      * found.
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; f[x_) =.
      * Assignment not found for: f(x_)
@@ -1229,7 +1270,7 @@ public final class PatternMatching {
                 throws RuleCreationError {
 
             if (leftHandSide.isAST()) {
-                leftHandSide = PatternMatcher.evalLeftHandSide((IAST) leftHandSide, engine);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
             }
             removeRule(leftHandSide, packageMode);
         }
@@ -1294,7 +1335,7 @@ public final class PatternMatching {
             final Object[] result = new Object[2];
 
             if (leftHandSide.isAST()) {
-                leftHandSide = PatternMatcher.evalLeftHandSide((IAST) leftHandSide, engine);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
             }
             try {
                 rightHandSide = engine.evaluate(rightHandSide);
@@ -1351,7 +1392,7 @@ public final class PatternMatching {
 
             if (leftHandSide.isAST()
                     && (((IAST) leftHandSide).getEvalFlags() & IAST.IS_FLATTENED_OR_SORTED_MASK) == IAST.NO_FLAG) {
-                leftHandSide = PatternMatcher.evalLeftHandSide((IAST) leftHandSide, engine);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
             }
             result[0] = null;
             result[1] = rightHandSide;
@@ -1379,5 +1420,29 @@ public final class PatternMatching {
             newSymbol.setAttributes(ISymbol.HOLDALL);
         }
 
+	}
+
+	public static IExpr getFile(File file, EvalEngine engine) {
+		boolean packageMode = engine.isPackageMode();
+		try {
+			engine.setPackageMode(true);
+			FileReader reader = new FileReader(file);
+			return Get.loadPackage(engine, reader);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			engine.printMessage("Get exception: " + e.getMessage());
+		} finally {
+			engine.setPackageMode(packageMode);
+		}
+		return F.Null;
+	}
+
+	private final static PatternMatching CONST = new PatternMatching();
+
+	public static PatternMatching initialize() {
+		return CONST;
+	}
+
+	private PatternMatching() {
     }
 }
