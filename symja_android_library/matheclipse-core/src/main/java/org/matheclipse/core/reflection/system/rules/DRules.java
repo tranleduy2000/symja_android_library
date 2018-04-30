@@ -39,7 +39,7 @@ import static org.matheclipse.core.expression.F.D;
 import static org.matheclipse.core.expression.F.Derivative;
 import static org.matheclipse.core.expression.F.DiracDelta;
 import static org.matheclipse.core.expression.F.Erf;
-import static org.matheclipse.core.expression.F.Erfc;
+import static org.matheclipse.core.expression.F.*;
 import static org.matheclipse.core.expression.F.Erfi;
 import static org.matheclipse.core.expression.F.Exp;
 import static org.matheclipse.core.expression.F.Factorial;

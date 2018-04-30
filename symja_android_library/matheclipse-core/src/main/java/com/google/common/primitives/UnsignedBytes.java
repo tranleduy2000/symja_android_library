@@ -16,10 +16,7 @@ package com.google.common.primitives;
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import java.util.Comparator;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -251,79 +248,4 @@ public final class UnsignedBytes {
         return builder.toString();
     }
 
-    /**
-     * Returns a comparator that compares two {@code byte} arrays <a
-     * href="http://en.wikipedia.org/wiki/Lexicographical_order">lexicographically</a>. That is, it
-     * compares, using {@link #compare(byte, byte)}), the first pair of values that follow any common
-     * prefix, or when one array is a prefix of the other, treats the shorter array as the lesser. For
-     * example, {@code [] < [0x01] < [0x01, 0x7F] < [0x01, 0x80] < [0x02]}. Values are treated as
-     * unsigned.
-     * <p>
-     * <p>The returned comparator is inconsistent with {@link Object#equals(Object)} (since arrays
-     * support only identity equality), but it is consistent with
-     * {@link java.util.Arrays#equals(byte[], byte[])}.
-     *
-     * @since 2.0
-     */
-    public static Comparator<byte[]> lexicographicalComparator() {
-        return LexicographicalComparatorHolder.BEST_COMPARATOR;
-    }
-
-    @VisibleForTesting
-    static Comparator<byte[]> lexicographicalComparatorJavaImpl() {
-        return LexicographicalComparatorHolder.PureJavaComparator.INSTANCE;
-    }
-
-    /**
-     * Provides a lexicographical comparator implementation; either a Java implementation or a faster
-     * implementation based on {link Unsafe}.
-     * <p>
-     * <p>Uses reflection to gracefully fall back to the Java implementation if {@code Unsafe} isn't
-     * available.
-     */
-    @VisibleForTesting
-    static class LexicographicalComparatorHolder {
-        static final String UNSAFE_COMPARATOR_NAME =
-                LexicographicalComparatorHolder.class.getName() + "$UnsafeComparator";
-
-        static final Comparator<byte[]> BEST_COMPARATOR = getBestComparator();
-
-        /**
-         * Returns the Unsafe-using Comparator, or falls back to the pure-Java implementation if unable
-         * to do so.
-         */
-        static Comparator<byte[]> getBestComparator() {
-            try {
-                Class<?> theClass = Class.forName(UNSAFE_COMPARATOR_NAME);
-
-                // yes, UnsafeComparator does implement Comparator<byte[]>
-                @SuppressWarnings("unchecked")
-                Comparator<byte[]> comparator = (Comparator<byte[]>) theClass.getEnumConstants()[0];
-                return comparator;
-            } catch (Throwable t) { // ensure we really catch *everything*
-                return lexicographicalComparatorJavaImpl();
-            }
-        }
-
-        enum PureJavaComparator implements Comparator<byte[]> {
-            INSTANCE;
-
-            @Override
-            public int compare(byte[] left, byte[] right) {
-                int minLength = Math.min(left.length, right.length);
-                for (int i = 0; i < minLength; i++) {
-                    int result = UnsignedBytes.compare(left[i], right[i]);
-                    if (result != 0) {
-                        return result;
-                    }
-                }
-                return left.length - right.length;
-            }
-
-            @Override
-            public String toString() {
-                return "UnsignedBytes.lexicographicalComparator() (pure Java version)";
-            }
-        }
-    }
 }

@@ -127,7 +127,7 @@ public final class Uninterruptibles {
    * <li>To retrieve a result from a {@code Future} that is already done, use
    *     {@link Futures#getDone Futures.getDone}.
    * <li>To treat {@link InterruptedException} uniformly with other exceptions, use
-   *     {@link Futures#getChecked(Future, Class) Futures.getChecked}.
+   *     {link Futures#getChecked(Future, Class) Futures.getChecked}.
    * <li>To get uninterruptibility and remove checked exceptions, use {@link Futures#getUnchecked}.
    * </ul>
    *
@@ -161,7 +161,7 @@ public final class Uninterruptibles {
    * <li>To retrieve a result from a {@code Future} that is already done, use
    *     {@link Futures#getDone Futures.getDone}.
    * <li>To treat {@link InterruptedException} uniformly with other exceptions, use
-   *     {@link Futures#getChecked(Future, Class, long, TimeUnit) Futures.getChecked}.
+   *     {link Futures#getChecked(Future, Class, long, TimeUnit) Futures.getChecked}.
    * <li>To get uninterruptibility and remove checked exceptions, use {@link Futures#getUnchecked}.
    * </ul>
    *

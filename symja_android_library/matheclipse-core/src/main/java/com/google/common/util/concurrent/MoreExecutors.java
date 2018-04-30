@@ -14,9 +14,6 @@
 
 package com.google.common.util.concurrent;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
@@ -27,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.ForwardingListenableFuture.SimpleForwardingListenableFuture;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,7 +47,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import javax.annotation.concurrent.GuardedBy;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Factory and utility methods for {@link Executor}, {@link ExecutorService},
@@ -797,7 +799,7 @@ public final class MoreExecutors {
   }
 
   /**
-   * Creates a thread using {@link #platformThreadFactory}, and sets its name to {@code name} unless
+   * Creates a thread using {link #platformThreadFactory}, and sets its name to {@code name} unless
    * changing the name is forbidden by the security manager.
    */
   @GwtIncompatible // concurrency
