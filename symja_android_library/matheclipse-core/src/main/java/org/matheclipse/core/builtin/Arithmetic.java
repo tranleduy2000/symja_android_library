@@ -310,10 +310,10 @@ public final class Arithmetic {
      *
      * <pre>
      * &gt;&gt; a = 10
-     * &gt;&gt; a += 2
-     * 12
+	 * &gt;&gt; a += 2
+	 * 12
      *
-     * &gt;&gt; a
+	 * &gt;&gt; a
      * 12
      * </pre>
      */
@@ -365,7 +365,7 @@ public final class Arithmetic {
      * <h3>Examples</h3>
      *
      * <pre>
-     * &gt;&gt; Arg(1+I)
+	 * &gt;&gt; Arg(1+I)
      * Pi/4
      * </pre>
      */
@@ -755,7 +755,7 @@ public final class Arithmetic {
      * 0
      *
      * &gt;&gt; Complex(1, Complex(1, 0))
-     * 1+I
+	 * 1+I
      *
      * &gt;&gt; Complex(1, Complex(1, 1))
      * I
@@ -1004,11 +1004,11 @@ public final class Arithmetic {
      * <h3>Examples</h3>
      *
      * <pre>
-     * &gt;&gt; a = 5
-     * &gt;&gt; a--
-     * 5
+	 * &gt;&gt; a = 5
+	 * &gt;&gt; a--
+	 * 5
      *
-     * &gt;&gt; a
+	 * &gt;&gt; a
      * 4
      * </pre>
      */
@@ -1099,7 +1099,7 @@ public final class Arithmetic {
      * (a*d)/(b*c*e)
      *
      * &gt;&gt; a / (b ^ 2 * c ^ 3 / e)
-     * (a*e)/(b^2*c^3)
+	 * (a*e)/(b^2*c^3)
      *
      * &gt;&gt; 1 / 4.0
      * 0.25
@@ -1142,10 +1142,10 @@ public final class Arithmetic {
      *
      * <pre>
      * &gt;&gt; a = 10
-     * &gt;&gt; a /= 2
+	 * &gt;&gt; a /= 2
      * 5
      *
-     * &gt;&gt; a
+	 * &gt;&gt; a
      * 5
      * </pre>
      */
@@ -2975,8 +2975,7 @@ public final class Arithmetic {
                             }
                         }
                         if (exponent.isMinusOne() && base.isTimes()) {
-                            IAST timesAST = (IAST) base;
-                            IExpr temp = powerTimesInverse(timesAST, exponent);
+							IExpr temp = powerTimesInverse((IAST) base, (ISignedNumber) exponent);
                             if (temp.isPresent()) {
                                 return temp;
                             }
@@ -3143,24 +3142,29 @@ public final class Arithmetic {
          * <code>Times(a^(-1.0),b^(-1.0),c^(-1.0),d,....)</code>
          *
          * @param timesAST
+		 *            a <code>Times(...)</code> expression
          * @param arg2
+		 *            equals <code>-1</code> or <code>-1.0</code>
          * @return <code>F.NIL</code> if the transformation isn't possible.
          */
-        private static IExpr powerTimesInverse(IAST timesAST, final IExpr arg2) {
+		private static IExpr powerTimesInverse(final IAST timesAST, final ISignedNumber arg2) {
             IASTAppendable resultAST = F.NIL;
             for (int i = 1; i < timesAST.size(); i++) {
                 IExpr temp = timesAST.get(i);
-                if (temp.isPower() && temp.exponent().isMinusOne()) {
+				if (temp.isPower() && temp.exponent().isSignedNumber()) {
                     if (!resultAST.isPresent()) {
                         resultAST = timesAST.copyAppendable();
-                        for (int j = 1; j < i; j++) {
-                            resultAST.set(j, F.Power(timesAST.get(j), arg2));
+						resultAST.map(resultAST, new Function<IExpr, IExpr>() {
+                            @Override
+                            public IExpr apply(IExpr x) {
+                                return F.Power(x, arg2);
+                            }
+                        });
                         }
-                    }
+					if (temp.exponent().isMinusOne()) {
                     resultAST.set(i, temp.base());
                 } else {
-                    if (resultAST.isPresent()) {
-                        resultAST.set(i, F.Power(temp, arg2));
+						resultAST.set(i, F.Power(temp.base(), temp.exponent().multiply(arg2)));
                     }
                 }
             }
@@ -3963,8 +3967,8 @@ public final class Arithmetic {
      * <h3>Examples</h3>
      *
      * <pre>
-     * &gt;&gt; 10*2
-     * 20
+	 * &gt;&gt; 10*2
+	 * 20
      *
      * &gt;&gt; a * a
      * a^2
@@ -3989,56 +3993,56 @@ public final class Arithmetic {
 	 * &gt;&gt; a /. n_. * x_ :&gt; {n, x}
 	 * {1,a}
      *
-     * &gt;&gt; -a*b // FullForm
-     * "Times(-1, a, b)"
+	 * &gt;&gt; -a*b // FullForm
+	 * "Times(-1, a, b)"
      *
-     * &gt;&gt; -(x - 2/3)
-     * 2/3-x
+	 * &gt;&gt; -(x - 2/3)
+	 * 2/3-x
      *
-     * &gt;&gt; -x*2
-     * -2 x
+	 * &gt;&gt; -x*2
+	 * -2 x
      *
-     * &gt;&gt; -(h/2) // FullForm
-     * "Times(Rational(-1,2), h)"
+	 * &gt;&gt; -(h/2) // FullForm
+	 * "Times(Rational(-1,2), h)"
      *
-     * &gt;&gt; x / x
-     * 1
+	 * &gt;&gt; x / x
+	 * 1
      *
-     * &gt;&gt; 2*x^2 / x^2
-     * 2
+	 * &gt;&gt; 2*x^2 / x^2
+	 * 2
      *
-     * &gt;&gt; 3.*Pi
+	 * &gt;&gt; 3.*Pi
      * 9.42477796076938
      *
-     * &gt;&gt; Head(3 * I)
-     * Complex
+	 * &gt;&gt; Head(3 * I)
+	 * Complex
      *
-     * &gt;&gt; Head(Times(I, 1/2))
-     * Complex
+	 * &gt;&gt; Head(Times(I, 1/2))
+	 * Complex
      *
-     * &gt;&gt; Head(Pi * I)
-     * Times
+	 * &gt;&gt; Head(Pi * I)
+	 * Times
      *
-     * &gt;&gt; -2.123456789 * x
+	 * &gt;&gt; -2.123456789 * x
      * -2.123456789*x
      *
-     * &gt;&gt; -2.123456789 * I
+	 * &gt;&gt; -2.123456789 * I
      * I*(-2.123456789)
      *
-     * &gt;&gt; N(Pi, 30) * I
-     * I*3.14159265358979323846264338327
+	 * &gt;&gt; N(Pi, 30) * I
+	 * I*3.14159265358979323846264338327
      *
-     * &gt;&gt; N(I*Pi, 30)
-     * I*3.14159265358979323846264338327
+	 * &gt;&gt; N(I*Pi, 30)
+	 * I*3.14159265358979323846264338327
      *
-     * &gt;&gt; N(Pi * E, 30)
-     * 8.53973422267356706546355086954
+	 * &gt;&gt; N(Pi * E, 30)
+	 * 8.53973422267356706546355086954
      *
-     * &gt;&gt; N(Pi, 30) * N(E, 30)
-     * 8.53973422267356706546355086954
+	 * &gt;&gt; N(Pi, 30) * N(E, 30)
+	 * 8.53973422267356706546355086954
      *
-     * &gt;&gt; N(Pi, 30) * E
-     * 8.53973422267356649108017774746
+	 * &gt;&gt; N(Pi, 30) * E
+	 * 8.53973422267356649108017774746
      *
      * &gt;&gt; N(Pi, 30) * E // Precision
      * 30
@@ -4769,8 +4773,8 @@ public final class Arithmetic {
      *
      * <pre>
      * &gt;&gt; a = 10
-     * &gt;&gt; a *= 2
-     * 20
+	 * &gt;&gt; a *= 2
+	 * 20
      *
      * &gt;&gt; a
      * 20
