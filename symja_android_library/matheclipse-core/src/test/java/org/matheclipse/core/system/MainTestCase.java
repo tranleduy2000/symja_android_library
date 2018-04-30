@@ -219,6 +219,9 @@ public class MainTestCase extends AbstractTestCase {
 	}
 
 	public void testSystem000b() {
+		// github issue#42
+//		check(" ((1 - (i/10)) / (1.0 - (i/10)))", "(1-i/10)/(1.0-0.1*i)");
+//		check(" ((1 - (i/10)) / (1.0 - (i/10)))", "(1-i/10)/(1.0-0.1*i)");
 		check("(1 - ((1 - (i/10)) / (1.0 - (i/10))))", "1-(1-i/10)/(1.0-0.1*i)");
 		check("(1 - ((1 - (i/10)) / (1 - (i/10))))", "0");
 		check("((1 - (i/10)) / (1 - (i/10)))", "1");

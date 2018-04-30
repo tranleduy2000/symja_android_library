@@ -171,7 +171,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testApply() {
-		check("Times @@ {1, 2, 3, 4}", "24");
+		check("Times @@ {1, 2, 3, 4}", //
+				"24");
 		check("f @@ {{a, b}, {c}, d}", "f({a,b},{c},d)");
 		check("apply(head, {3,4,5})", "Symbol");
 		check("apply(f, a)", "a");
@@ -2177,6 +2178,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEqual() {
+		// github issue #42
+		check("1-i==1.0-i", "True");
 		// Issue #174
 		check("x/(y*x)==0.25", "1/y==0.25");
 

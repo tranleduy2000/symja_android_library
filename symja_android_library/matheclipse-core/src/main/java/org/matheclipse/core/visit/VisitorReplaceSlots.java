@@ -59,6 +59,7 @@ public class VisitorReplaceSlots extends VisitorExpr {
 		int j = 0;
 		int size = ast.size();
 		while (i < size) {
+			if (!ast.get(i).isFunction()) {
 			if (ast.get(i).isSlotSequence()) {
 				IAST slotSequence = (IAST) ast.get(i);
 				if (slotSequence.arg1() instanceof IntegerSym) {
@@ -76,11 +77,13 @@ public class VisitorReplaceSlots extends VisitorExpr {
 				j++;
 				break;
 			}
+			}
 			j++;
 			i++;
 		}
 		if (result.isPresent()) {
 			while (i < size) {
+				if (!ast.get(i).isFunction()) {
 				if (ast.get(i).isSlotSequence()) {
 					IAST slotSequence = (IAST) ast.get(i);
 					if (slotSequence.arg1() instanceof IntegerSym) {
@@ -92,6 +95,7 @@ public class VisitorReplaceSlots extends VisitorExpr {
 				temp = ast.get(i).accept(this);
 				if (temp.isPresent()) {
 					result.set(j, temp);
+				}
 				}
 				i++;
 				j++;
