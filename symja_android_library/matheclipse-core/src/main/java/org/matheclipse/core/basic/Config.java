@@ -1,15 +1,15 @@
 package org.matheclipse.core.basic;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hipparchus.util.Precision;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * General configuration settings.
@@ -65,7 +65,7 @@ public class Config {
 	 * Show the stack trace, if an exception is thrown in evaluation
 	 * 
 	 */
-	public  static boolean SHOW_STACKTRACE = false;
+	public final static boolean SHOW_STACKTRACE = false;
 
 	/**
 	 * Show the console output, if an expression has a head symbol with attribute <code>ISymbol.CONSOLE_OUTPUT</code>.
@@ -141,10 +141,12 @@ public class Config {
 	 * Define the recursion limit for <code>Integrate#integrateByParts()</code> method.
 	 */
 	public static int INTEGRATE_BY_PARTS_RECURSION_LIMIT = 10;
+
 	/**
 	 * Define the recursion limit for <code>Limit#lHospitalesRule()</code> method.
 	 */
 	public static int LIMIT_LHOSPITAL_RECURSION_LIMIT = 128;
+
 	/**
 	 * <p>
 	 * Flag for thread usage.
@@ -163,9 +165,10 @@ public class Config {
 	public static final int MACHINE_PRECISION = 15;
 
 	/**
-	 * Enable tests and functions which use the local files.
+	 * Enable tests and functions which use the local files. Don't use <code>final</code> here because of grpc
+	 * interface.
 	 */
-	public final static boolean FILESYSTEM_ENABLED = false;
+	public static boolean FILESYSTEM_ENABLED = false;
 
 	public static boolean isFileSystemEnabled(EvalEngine engine) {
 		return FILESYSTEM_ENABLED || engine.isFileSystemEnabled();
@@ -192,12 +195,11 @@ public class Config {
 	 * </ul>
 	 * </p>
 	 * <p>
-	 *
+	 * 
 	 * </p>
 	 * <p>
 	 */
 	public static boolean EXPLICIT_TIMES_OPERATOR = false;
-	
 
 	/**
 	 * <p>
