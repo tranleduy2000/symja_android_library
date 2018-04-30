@@ -219,7 +219,11 @@ public class MainTestCase extends AbstractTestCase {
 	}
 
 	public void testSystem000b() {
-		check("(1 - ((1 - (i/10)) / (1.0 - (i/10))))", "1-(1-i/10)/(1.0-0.1*i)");
+		// github issue #42
+		check(" ((1 - (i/10)) / (1.0 - (i/10)))", //
+				"1.0");
+		check("(1 - ((1 - (i/10)) / (1.0 - (i/10))))", //
+				"0.0");
 		check("(1 - ((1 - (i/10)) / (1 - (i/10))))", "0");
 		check("((1 - (i/10)) / (1 - (i/10)))", "1");
 		check("Simplify(1+(1-x)^2/(-1+x))", "x");
@@ -503,7 +507,7 @@ public class MainTestCase extends AbstractTestCase {
 		check("(-1)^(1/3)", "(-1)^(1/3)");
 		check("-12528^(1/2)", "-12*Sqrt(87)");
 		check("(-27)^(1/3)", "3*(-1)^(1/3)");
-		check("(-27)^(2/3)", "9*(-1)^(1/3)");
+		check("(-27)^(2/3)", "9*(-1)^(2/3)");
 		check("8^(1/3)", "2");
 		check("81^(3/4)", "27");
 		check("82^(3/4)", "82^(3/4)");
@@ -512,7 +516,7 @@ public class MainTestCase extends AbstractTestCase {
 		check("(27/64)^(-2/3)", "16/9");
 		// check("16/9","");
 		check("10^4", "10000");
-		check("(-80/54)^(2/3)", "4/9*(-25)^(1/3)");
+		check("(-80/54)^(2/3)", "4/9*(-1)^(2/3)*5^(2/3)");
 	}
 
 	public void testSystem008() {
@@ -3633,6 +3637,7 @@ public class MainTestCase extends AbstractTestCase {
 					check("1/2Pi // FullForm", "\"Times(Rational(1,2), Power(Pi, -1))\"");
 					check("1/2(a+b) // FullForm", "\"Times(Rational(1,2), Power(Plus(a, b), -1))\"");
 					check("1/(a+b)2 // FullForm", "\"Times(Rational(1,2), Power(Plus(a, b), -1))\"");
+					check("a^(b)(c) // FullForm", "\"Power(a, Times(b, c))\"");
 				}
 				Config.DOMINANT_IMPLICIT_TIMES = false;
 				if (!Config.DOMINANT_IMPLICIT_TIMES) {
@@ -3640,6 +3645,7 @@ public class MainTestCase extends AbstractTestCase {
 					check("1/2Pi // FullForm", "\"Times(Rational(1,2), Pi)\"");
 					check("1/2(a+b) // FullForm", "\"Times(Rational(1,2), Plus(a, b))\"");
 					check("1/(a+b)2 // FullForm", "\"Times(2, Power(Plus(a, b), -1))\"");
+					check("a^(b)(c) // FullForm", "\"Times(Power(a, b), c)\"");
 				}
 
 				check("2(b+c) // FullForm", //
@@ -3656,6 +3662,8 @@ public class MainTestCase extends AbstractTestCase {
 						"\"Plus(2, E)\"");
 				checkNumeric("1.0E-2 // FullForm", //
 						"\"0.7182818284590451\"");
+				checkNumeric("1.0e-2 // FullForm", //
+						"\"Plus(-2.0, e)\"");
 				checkNumeric("1x-2 // FullForm", //
 						"\"Plus(-2, x)\"");
 				check("N(1E-2)", "0.71828");
