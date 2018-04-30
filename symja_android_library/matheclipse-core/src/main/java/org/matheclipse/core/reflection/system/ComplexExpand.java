@@ -1,5 +1,15 @@
 package org.matheclipse.core.reflection.system;
 
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.visit.VisitorExpr;
+
 import static org.matheclipse.core.expression.F.Abs;
 import static org.matheclipse.core.expression.F.C2;
 import static org.matheclipse.core.expression.F.CI;
@@ -21,26 +31,27 @@ import static org.matheclipse.core.expression.F.Tan;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.integer;
 
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.visit.VisitorExpr;
-
 /**
- * <pre>ComplexExpand(expr)
+ * <pre>
+ * ComplexExpand(expr)
  * </pre>
- * <blockquote><p>get the expanded <code>expr</code>. All variable symbols in <code>expr</code> are assumed to be non complex numbers.</p>
+ *
+ * <blockquote>
+ * <p>
+ * get the expanded <code>expr</code>. All variable symbols in <code>expr</code> are assumed to be non complex numbers.
+ * </p>
  * </blockquote>
- * <p>See:<br  /></p>
+ * <p>
+ * See:<br />
+ * </p>
  * <ul>
- * <li><a href="http://en.wikipedia.org/wiki/List_of_trigonometric_identities">Wikipedia - List of trigonometric identities</a></li>
+ * <li><a href="http://en.wikipedia.org/wiki/List_of_trigonometric_identities">Wikipedia - List of trigonometric
+ * identities</a></li>
  * </ul>
  * <h3>Examples</h3>
- * <pre>&gt;&gt; ComplexExpand(Sin(x+I*y))
+ *
+ * <pre>
+ * &gt;&gt; ComplexExpand(Sin(x+I*y))
  * Cosh(y)*Sin(x)+I*Cos(x)*Sinh(y)
  * </pre>
  */
@@ -58,6 +69,30 @@ public class ComplexExpand extends AbstractEvaluator {
 			fEngine = engine;
 		}
 
+		@Override
+		public IExpr visit(IASTMutable ast) {
+			if (ast.isTimes()) {
+				IExpr expanded = F.evalExpand(ast);
+				if (expanded.isPlus()) {
+					return F.ComplexExpand.of(expanded);
+				}
+			}
+			if (ast.isPower() && ast.base().isNegative() //
+					&& ast.exponent().isRational()) {
+				IExpr base = ast.base();
+				if (base.isInteger()) {
+					IExpr exponent = ast.exponent();
+					// ((base^2)^(exponent/2))
+					IExpr coeff = F.Power(F.Power(base, F.C2), F.C1D2.times(exponent));
+					// exponent*Arg(base)
+					IExpr inner = exponent.times(F.Arg(base));
+					// coeff*Cos(inner) + I*coeff*Sin(inner);
+					IExpr temp = F.Expand.of(F.Plus(F.Times(coeff, F.Cos(inner)), F.Times(F.CI, coeff, F.Sin(inner))));
+					return temp;
+				}
+			}
+			return super.visit(ast);
+		}
 		@Override
 		public IExpr visit2(IExpr head, IExpr arg1) {
 			IExpr x = arg1;

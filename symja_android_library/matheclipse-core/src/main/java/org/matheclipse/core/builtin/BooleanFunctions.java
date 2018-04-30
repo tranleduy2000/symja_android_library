@@ -581,35 +581,16 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
+			Validate.checkSize(ast, 2);
 
-			// TODO solve bugs in QuineMcClusky
+			// FormulaFactory factory = new FormulaFactory();
+			// LogicFormula lf = new LogicFormula(factory);
 
-			// if (ast.arg1().isASTSizeGE(F.Or, 3)) {
-			// try {
-			// QuineMcCluskyFormula f = Formula.read((IAST) ast.arg1());
-			// f.reduceToPrimeImplicants();
-			// f.reducePrimeImplicantsToSubset();
-			// IExpr arg1 = f.toExpr();
-			//
-			// FormulaTransformation transformation = BooleanConvert.transformation(ast, engine);
-			// if (transformation != null) {
-			// LogicFormula lf = new LogicFormula();
-			// final Formula formula = lf.expr2BooleanFunction(arg1);
+			// Formula formula = lf.expr2BooleanFunction(ast.arg1());
+			// System.out.println(formula.toString());
+			// formula = QuineMcCluskeyAlgorithm.compute(formula);
+			// FormulaTransformation transformation = new DNFFactorization();
 			// return lf.booleanFunction2Expr(formula.transform(transformation));
-			// }
-			//
-			//
-			// } catch (BooleanFunctionConversionException bfc) {
-			// if (Config.DEBUG) {
-			// bfc.printStackTrace();
-			// }
-			// } catch (ClassCastException cce) {
-			// if (Config.DEBUG) {
-			// cce.printStackTrace();
-			// }
-			// }
-			// }
 
 			return F.NIL;
 		}
@@ -2312,6 +2293,49 @@ public final class BooleanFunctions {
 
 	}
 
+	/**
+	 * <pre>
+	 * NoneTrue({expr1, expr2, ...}, test)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if no application of <code>test</code> to <code>expr1, expr2, ...</code> evaluates to
+	 * <code>True</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * NoneTrue(list, test, level)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if no application of <code>test</code> to items of <code>list</code> at
+	 * <code>level</code> evaluates to <code>True</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * NoneTrue(test)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * gives an operator that may be applied to expressions.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; NoneTrue({1, 3, 5}, EvenQ)
+	 * True
+	 * &gt;&gt; NoneTrue({1, 4, 5}, EvenQ)
+	 * False
+	 * &gt;&gt; NoneTrue({}, EvenQ)
+	 * True
+	 * </pre>
+	 */
 	private static class NoneTrue extends AbstractFunctionEvaluator {
 
 		@Override
@@ -2412,6 +2436,23 @@ public final class BooleanFunctions {
 
 	}
 
+	/**
+	 * <pre>
+	 * NonPositive(x)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>x</code> is a negative real number or zero.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; {Negative(0), NonPositive(0)}
+	 * {False,True}
+	 * </pre>
+	 */
 	private final static class NonPositive extends AbstractEvaluator {
 
 		@Override
@@ -2501,6 +2542,35 @@ public final class BooleanFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Not(expr)
+	 * </pre>
+	 * <p>
+	 * or
+	 * </p>
+	 *
+	 * <pre>
+	 * !expr
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * Logical Not function (negation). Returns <code>True</code> if the statement is <code>False</code>. Returns
+	 * <code>False</code> if the <code>expr</code> is <code>True</code>
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; !True
+	 * False
+	 * &gt;&gt; !False
+	 * True
+	 * &gt;&gt; !b
+	 * !b
+	 * </pre>
+	 */
 	private static class Not extends AbstractArg1 {
 
 		@Override
