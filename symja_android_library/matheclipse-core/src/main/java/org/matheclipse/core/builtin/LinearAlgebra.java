@@ -84,7 +84,6 @@ import static org.matheclipse.core.expression.F.y;
 
 public final class LinearAlgebra {
 
-    private final static LinearAlgebra CONST = new LinearAlgebra();
 
     static {
         F.ArrayDepth.setEvaluator(new ArrayDepth());
@@ -138,316 +137,22 @@ public final class LinearAlgebra {
         F.VectorAngle.setEvaluator(new VectorAngle());
     }
 
-    private LinearAlgebra() {
-
-    }
-
-    /**
-     * <p>
-     * Use cramer's rule to solve linear equations represented by a <code>2 x 3</code> augmented matrix which represents
-     * the system <code>M.x == b</code>, where the columns of the <code>2 x 2</code> matrix <code>M</code> are augmented
-     * by the vector <code>b</code>. This method assumes that the dimensions of the matrix are already checked by the
-     * caller.
-     * </p>
-     * See: <a href="https://en.wikipedia.org/wiki/Cramer's_rule">Wikipedia Cramer's rule</a>
-     *
-     * @param matrix the <code>2 x 3</code> augmented matrix
-     * @param quiet  show no message if there is no solution
-     * @param engine the evaluation engine
-     * @return a list of values which solve the equations or <code>F#NIL</code>, if the equations have no solution.
-     */
-    public static IAST cramersRule2x3(FieldMatrix<IExpr> matrix, boolean quiet, EvalEngine engine) {
-        IASTAppendable list = F.ListAlloc(2);
-        // a1 * b2 - b1 * a2
-        IExpr denominator = determinant2x2(matrix);
-        if (denominator.isZero()) {
-            if (!quiet) {
-                engine.printMessage("Row reduced linear equations have no solution.");
-            }
-            return F.NIL;
-        }
-        // c1 * b2 - b1 * c2
-        IExpr xNumerator = F.Subtract(F.Times(matrix.getEntry(0, 2), matrix.getEntry(1, 1)),
-                F.Times(matrix.getEntry(0, 1), matrix.getEntry(1, 2)));
-        list.append(F.Divide(xNumerator, denominator));
-        // a1 * c2 - c1*a2
-        IExpr yNumerator = F.Subtract(F.Times(matrix.getEntry(0, 0), matrix.getEntry(1, 2)),
-                F.Times(matrix.getEntry(0, 2), matrix.getEntry(1, 0)));
-        list.append(F.Divide(yNumerator, denominator));
-        return list;
-    }
-
-    /**
-     * <p>
-     * Use cramer's rule to solve linear equations represented by a <code>3 x 4</code> augmented matrix which represents
-     * the system <code>M.x == b</code>, where the columns of the <code>3 x 3</code> matrix <code>M</code> are augmented
-     * by the vector <code>b</code>. This method assumes that the dimensions of the matrix are already checked by the
-     * caller.
-     * </p>
-     * See: <a href="https://en.wikipedia.org/wiki/Cramer's_rule">Wikipedia Cramer's rule</a>
-     *
-     * @param matrix the <code>3 x 4</code> augmented matrix
-     * @param quiet  show no message if there is no solution
-     * @param engine the evaluation engine
-     * @return a list of values which solve the equations or <code>F#NIL</code>, if the equations have no solution.
-     */
-    public static IAST cramersRule3x4(FieldMatrix<IExpr> matrix, boolean quiet, EvalEngine engine) {
-        IASTAppendable list = F.ListAlloc(3);
-        FieldMatrix<IExpr> denominatorMatrix = matrix.getSubMatrix(0, 2, 0, 2);
-        IExpr denominator = determinant3x3(denominatorMatrix);
-        if (denominator.isZero()) {
-            if (!quiet) {
-                engine.printMessage("Row reduced linear equations have no solution.");
-            }
-            return F.NIL;
-        }
-
-        FieldMatrix<IExpr> xMatrix = denominatorMatrix.copy();
-        xMatrix.setColumn(0, new IExpr[]{matrix.getEntry(0, 3), matrix.getEntry(1, 3), matrix.getEntry(2, 3)});
-        IExpr xNumerator = determinant3x3(xMatrix);
-
-        list.append(F.Divide(xNumerator, denominator));
-
-        FieldMatrix<IExpr> yMatrix = denominatorMatrix.copy();
-        yMatrix.setColumn(1, new IExpr[]{matrix.getEntry(0, 3), matrix.getEntry(1, 3), matrix.getEntry(2, 3)});
-        IExpr yNumerator = determinant3x3(yMatrix);
-
-        list.append(F.Divide(yNumerator, denominator));
-
-        FieldMatrix<IExpr> zMatrix = denominatorMatrix.copy();
-        zMatrix.setColumn(2, new IExpr[]{matrix.getEntry(0, 3), matrix.getEntry(1, 3), matrix.getEntry(2, 3)});
-        IExpr zNumerator = determinant3x3(zMatrix);
-
-        list.append(F.Divide(zNumerator, denominator));
-
-        return list;
-    }
-
-    /**
-     * Get the determinant of a <code>2 x 2</code> matrix. This method assumes that the dimensions of the matrix are
-     * already checked by the caller.
-     *
-     * @param matrix a 2x2 matrix
-     * @return
-     */
-    public static IExpr determinant2x2(final FieldMatrix<IExpr> matrix) {
-        // 2x2 matrix
-        IExpr[] row1 = matrix.getRow(0);
-        IExpr[] row2 = matrix.getRow(1);
-        return F.evalExpand(row1[0].multiply(row2[1]).subtract((row1[1].multiply(row2[0]))));
-    }
-
-    /**
-     * Get the determinant of a <code>3 x 3</code> matrix. This method assumes that the dimensions of the matrix are
-     * already checked by the caller.
-     *
-     * @param matrix a 3x3 matrix
-     * @return
-     */
-    public static IExpr determinant3x3(final FieldMatrix<IExpr> matrix) {
-        // 3x3 matrix
-        IExpr[] row1 = matrix.getRow(0);
-        IExpr[] row2 = matrix.getRow(1);
-        IExpr[] row3 = matrix.getRow(2);
-        return F.evalExpand(row1[0].multiply(row2[1].multiply(row3[2]))
-                .subtract((row1[0].multiply(row2[2].multiply(row3[1]))))
-                .subtract((row1[1].multiply(row2[0].multiply(row3[2]))))
-                .plus((row1[1].multiply(row2[2].multiply(row3[0])))).plus((row1[2].multiply(row2[0].multiply(row3[1]))))
-                .subtract((row1[2].multiply(row2[1].multiply(row3[0])))));
-    }
-
-    /**
-     * Create a diagonal matrix from <code>valueArray[0]</code> (non-diagonal elements) and <code>valueArray[1]</code>
-     * (diagonal elements).
-     *
-     * @param valueArray 2 values for non-diagonal and diagonal elemnets of the matrix.
-     * @param dimension  of the square matrix
-     * @return
-     */
-    public static IAST diagonalMatrix(final IExpr[] valueArray, int dimension) {
-        final int[] indexArray = new int[2];
-        indexArray[0] = dimension;
-        indexArray[1] = dimension;
-        final IndexTableGenerator generator = new IndexTableGenerator(indexArray, F.List,
-                new IndexFunctionDiagonal(valueArray));
-        final IAST matrix = (IAST) generator.table();
-        matrix.addEvalFlags(IAST.IS_MATRIX);
-        return matrix;
-    }
-
-    public static ArrayList<Integer> dimensions(IAST ast) {
-        return dimensions(ast, ast.head(), Integer.MAX_VALUE, new ArrayList<Integer>());
-    }
-
-    public static ArrayList<Integer> dimensions(IAST ast, IExpr header, int maxLevel) {
-        return dimensions(ast, header, maxLevel, new ArrayList<Integer>());
-    }
-
-    public static ArrayList<Integer> dimensions(IAST ast, IExpr header, int maxLevel, ArrayList<Integer> dims) {
-        int size = ast.size();
-        dims.add(size - 1);
-        if (size > 1 && ast.arg1().isAST()) {
-            IAST arg1AST = (IAST) ast.arg1();
-            int arg1Size = arg1AST.size();
-            if (!header.equals(arg1AST.head())) {
-                return dims;
-            }
-            if (maxLevel > 0) {
-                for (int i = 2; i < size; i++) {
-                    if (!ast.get(i).isAST()) {
-                        return dims;
-                    }
-                    if (arg1Size != ((IAST) ast.get(i)).size()) {
-                        return dims;
-                    }
-                }
-                dimensions(arg1AST, header, maxLevel - 1, dims);
-            }
-        }
-        return dims;
-    }
-
-    public static LinearAlgebra initialize() {
-        return CONST;
-    }
-
-    /**
-     * Return the solution of the given (augmented-)matrix interpreted as a system of linear equations.
-     *
-     * @param matrix
-     * @param quiet  suppress warning messages if <code>true</code>
-     * @param engine the evaluation engine
-     * @return <code>F.NIL</code> if the linear system is inconsistent and has no solution
-     */
-    public static IAST rowReduced2List(FieldMatrix<IExpr> matrix, boolean quiet, EvalEngine engine) {
-
-        int rows = matrix.getRowDimension();
-        int cols = matrix.getColumnDimension();
-        if (rows == 2 && cols == 3) {
-            IAST list = cramersRule2x3(matrix, quiet, engine);
-            if (list.isPresent()) {
-                return list;
-            }
-        } else if (rows == 3 && cols == 4) {
-            IAST list = cramersRule3x4(matrix, quiet, engine);
-            if (list.isPresent()) {
-                return list;
-            }
-        }
-        FieldReducedRowEchelonForm ref = new FieldReducedRowEchelonForm(matrix);
-        FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
-        IExpr lastVarCoefficient = rowReduced.getEntry(rows - 1, cols - 2);
-        if (lastVarCoefficient.isZero()) {
-            if (!rowReduced.getEntry(rows - 1, cols - 1).isZero()) {
-                engine.printMessage("Row reduced linear equations have no solution.");
-                return F.NIL;
-            }
-        }
-        IASTAppendable list = F.ListAlloc(rows < cols - 1 ? cols - 1 : rows);
-        list.appendArgs(0, rows, new IntFunction<IExpr>() {
-            @Override
-            public IExpr apply(int j) {
-                return engine.evaluate(F.Together(rowReduced.getEntry(j, cols - 1)));
-            }
-        });
-        if (rows < cols - 1) {
-            list.appendArgs(rows, cols - 1, new IntFunction<IExpr>() {
-                @Override
-                public IExpr apply(int i) {
-                    return F.C0;
-                }
-            });
-        }
-        return list;
-    }
-
-    /**
-     * Row reduce the given <code>(augmented-)matrix</code> and append the result as rules for the given
-     * <code>variableList</code>.
-     *
-     * @param matrix          a (augmented-)matrix
-     * @param listOfVariables list of variable symbols
-     * @param resultList      a list to which the rules should be appended
-     * @param engine          the evaluation engine
-     * @return resultList with the appended results as list of rules
-     */
-    public static IAST rowReduced2RulesList(FieldMatrix<IExpr> matrix, final IAST listOfVariables,
-                                            IASTAppendable resultList, final EvalEngine engine) {
-        int rows = matrix.getRowDimension();
-        int cols = matrix.getColumnDimension();
-        IAST smallList = null;
-        if (rows == 2 && cols == 3) {
-            smallList = cramersRule2x3(matrix, true, engine);
-        } else if (rows == 3 && cols == 4) {
-            smallList = cramersRule3x4(matrix, true, engine);
-        }
-        if (smallList != null) {
-            if (!smallList.isPresent()) {
-                // no solution
-                return F.List();
-            }
-            final IAST sList = smallList;
-            int size = smallList.size();
-            IASTAppendable list = F.ListAlloc(size);
-            list.appendArgs(size, new IntFunction<IExpr>() {
-                @Override
-                public IExpr apply(int j) {
-                    return F.Rule(listOfVariables.get(j), engine.evaluate(sList.get(j)));
-                }
-            });
-
-            resultList.append(list);
-            return resultList;
-        }
-        FieldReducedRowEchelonForm ref = new FieldReducedRowEchelonForm(matrix);
-        FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
-        int size = listOfVariables.argSize();
-
-        IExpr lastVarCoefficient = rowReduced.getEntry(rows - 1, cols - 2);
-
-        if (lastVarCoefficient.isZero()) {
-            if (!rowReduced.getEntry(rows - 1, cols - 1).isZero()) {
-                // no solution
-                return F.List();
-            }
-        }
-        IAST rule;
-        IASTAppendable list = F.ListAlloc(rows);
-        for (int j = 1; j < rows + 1; j++) {
-            if (j < size + 1) {
-                IExpr diagonal = rowReduced.getEntry(j - 1, j - 1);
-                if (!diagonal.isZero()) {
-                    IASTAppendable plus = F.PlusAlloc(cols);
-                    plus.append(rowReduced.getEntry(j - 1, cols - 1));
-                    for (int i = j; i < cols - 1; i++) {
-                        if (!rowReduced.getEntry(j - 1, i).isZero()) {
-                            plus.append(F.Times(rowReduced.getEntry(j - 1, i).negate(), listOfVariables.get(i + 1)));
-                        }
-                    }
-                    rule = F.Rule(listOfVariables.get(j), F.eval(F.Together(plus.getOneIdentity(F.C0))));
-                    list.append(rule);
-                }
-            }
-        }
-        resultList.append(list);
-        return resultList;
-    }
 
     /**
      * <pre>
      * ArrayDepth(a)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the depth of the non-ragged array <code>a</code>, defined as <code>Length(Dimensions(a))</code>.<br />
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; ArrayDepth({{a,b},{c,d}})
-     * 2
+	 * &gt;&gt; ArrayDepth({{a,b},{c,d}})
+	 * 2
      *
      * &gt;&gt; ArrayDepth(x)
      * 0
@@ -480,13 +185,13 @@ public final class LinearAlgebra {
      * <pre>
      * BrayCurtisDistance(u, v)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the Bray Curtis distance between <code>u</code> and <code>v</code>.
      * </p>
      * </blockquote>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; BrayCurtisDistance[{-1, -1}, {10, 10}]
      * 11/9
@@ -523,7 +228,7 @@ public final class LinearAlgebra {
      * <pre>
      * CanberraDistance(u, v)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the canberra distance between <code>u</code> and <code>v</code>, which is a weighted version of the
@@ -531,7 +236,7 @@ public final class LinearAlgebra {
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; CanberraDistance({-1, -1}, {1, 1})
      * 2
@@ -568,7 +273,7 @@ public final class LinearAlgebra {
      * <pre>
      * CharacteristicPolynomial(matrix, var)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the characteristic polynomial of a <code>matrix</code> for the variable <code>var</code>.
@@ -582,7 +287,7 @@ public final class LinearAlgebra {
      * polynomial</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; CharacteristicPolynomial({{1, 2}, {42, 43}}, x)
      * -41-44*x+x^2
@@ -593,9 +298,12 @@ public final class LinearAlgebra {
         /**
          * Generate the characteristic polynomial of a square matrix.
          *
-         * @param dim      dimension of the square matrix
-         * @param matrix   the square matrix
-         * @param variable the variable which should be used in the resulting characteristic polynomial
+		 * @param dim
+		 *            dimension of the square matrix
+		 * @param matrix
+		 *            the square matrix
+		 * @param variable
+		 *            the variable which should be used in the resulting characteristic polynomial
          * @return
          */
         public static IAST generateCharacteristicPolynomial(int dim, IAST matrix, IExpr variable) {
@@ -623,7 +331,7 @@ public final class LinearAlgebra {
      * <pre>
      * ChessboardDistance(u, v)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the chessboard distance (also known as Chebyshev distance) between <code>u</code> and <code>v</code>,
@@ -632,7 +340,7 @@ public final class LinearAlgebra {
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; ChessboardDistance({-1, -1}, {1, 1})
      * 2
@@ -677,9 +385,10 @@ public final class LinearAlgebra {
 
     /**
      * Calculates the Cholesky decomposition of a matrix.
-     * <p>
+	 *
      * The Cholesky decomposition of a real symmetric positive-definite matrix A consists of a lower triangular matrix L
      * with same size such that: A = LL<sup>T</sup>. In a sense, this is the square root of A.
+	 *
      */
     private final static class CholeskyDecomposition extends AbstractFunctionEvaluator {
 
@@ -719,7 +428,7 @@ public final class LinearAlgebra {
      * <pre>
      * ConjugateTranspose(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * get the transposed <code>matrix</code> with conjugated matrix elements.
@@ -746,14 +455,14 @@ public final class LinearAlgebra {
      * <pre>
      * CosineDistance(u, v)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the cosine distance between <code>u</code> and <code>v</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; N(CosineDistance({7, 9}, {71, 89}))
      * 7.596457213221441E-5
@@ -793,7 +502,7 @@ public final class LinearAlgebra {
      * <pre>
      * Cross(a, b)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the vector cross product of <code>a</code> and <code>b</code>.
@@ -806,7 +515,7 @@ public final class LinearAlgebra {
      * <li><a href="https://en.wikipedia.org/wiki/Cross_product">Wikipedia: Cross product</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Cross({x1, y1, z1}, {x2, y2, z2})
      * {-y2*z1+y1*z2,x2*z1-x1*z2,-x2*y1+x1*y2}
@@ -818,7 +527,7 @@ public final class LinearAlgebra {
      * The arguments are expected to be vectors of equal length, and the number of arguments is expected to be 1 less
      * than their length.
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Cross({1, 2}, {3, 4, 5})
      * Cross({1, 2}, {3, 4, 5})
@@ -877,14 +586,14 @@ public final class LinearAlgebra {
      * <pre>
      * DesignMatrix(m, f, x)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the design matrix.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, x, x)
      * {{1,2},{1,3},{1,5},{1,7}}
@@ -947,7 +656,7 @@ public final class LinearAlgebra {
      * <li><a href="https://en.wikipedia.org/wiki/Determinant">Wikipedia: Determinant</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Det({{1, 1, 0}, {1, 0, 1}, {0, 1, 1}})
      * -2
@@ -955,7 +664,7 @@ public final class LinearAlgebra {
      * <p>
      * Symbolic determinant:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Det({{a, b, c}, {d, e, f}, {g, h, i}})
      * -c*e*g+b*f*g+c*d*h-a*f*h-b*d*i+a*e*i
@@ -1025,13 +734,13 @@ public final class LinearAlgebra {
      * <pre>
      * DiagonalMatrix(list)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * gives a matrix with the values in $list$ on its diagonal and zeroes elsewhere.
      * </p>
      * </blockquote>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; DiagonalMatrix({1, 2, 3})
      * {{1, 0, 0}, {0, 2, 0}, {0, 0, 3}}
@@ -1087,7 +796,7 @@ public final class LinearAlgebra {
      * <p>
      * A vector of length 3:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Dimensions({a, b, c})
      *  = {3}
@@ -1095,7 +804,7 @@ public final class LinearAlgebra {
      * <p>
      * A 3x2 matrix:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Dimensions({{a, b}, {c, d}, {e, f}})
      *  = {3, 2}
@@ -1103,7 +812,7 @@ public final class LinearAlgebra {
      * <p>
      * Ragged arrays are not taken into account:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Dimensions({{a, b}, {b, c}, {c, d, e}})
      * {3}
@@ -1111,7 +820,7 @@ public final class LinearAlgebra {
      * <p>
      * The expression can have any head:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Dimensions[f[f[a, b, c]]]
      * {1, 3}
@@ -1126,19 +835,15 @@ public final class LinearAlgebra {
         private static IAST getDimensions(final IAST ast, int maximumLevel) {
             IAST list = (IAST) ast.arg1();
             IExpr header = list.head();
-            final ArrayList<Integer> dims = dimensions(list, header, maximumLevel - 1);
+			ArrayList<Integer> dims = dimensions(list, header, maximumLevel - 1);
             int dimsSize = dims.size();
             IASTAppendable res = F.ListAlloc(dimsSize);
-            return res.appendArgs(0, dimsSize, new IntFunction<IExpr>() {
+			return res.appendArgs(0, dimsSize, new IntFunction<IExpr>() {
                 @Override
                 public IExpr apply(int i) {
                     return F.integer(dims.get(i).intValue());
                 }
             });
-            // for (int i = 0; i < dimsSize; i++) {
-            // res.append(F.integer(dims.get(i).intValue()));
-            // }
-            // return res;
         }
 
         @Override
@@ -1170,7 +875,7 @@ public final class LinearAlgebra {
      * <pre>
      * Dot(x, y) or x . y
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * <code>x . y</code> computes the vector dot product or matrix product <code>x . y</code>.
@@ -1186,7 +891,7 @@ public final class LinearAlgebra {
      * <p>
      * Scalar product of vectors:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; {a, b, c} . {x, y, z}
      * a*x+b*y+c*z
@@ -1194,7 +899,7 @@ public final class LinearAlgebra {
      * <p>
      * Product of matrices and vectors:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; {{a, b}, {c, d}} . {x, y}
      * {a*x+b*y,c*x+d*y}
@@ -1202,7 +907,7 @@ public final class LinearAlgebra {
      * <p>
      * Matrix product:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; {{a, b}, {c, d}} . {{r, s}, {t, u}}
      * {{a*r+b*t,a*s+b*u}, {c*r+d*t,c*s+d*u}}
@@ -1364,7 +1069,7 @@ public final class LinearAlgebra {
      * <pre>
      * Eigenvalues(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * get the numerical eigenvalues of the <code>matrix</code>.
@@ -1377,7 +1082,7 @@ public final class LinearAlgebra {
      * <li><a href="http://en.wikipedia.org/wiki/Eigenvalue">Wikipedia - Eigenvalue</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt;&gt; Eigenvalues({{1,0,0},{0,1,0},{0,0,1}})
      * {1.0,1.0,1.0}
@@ -2041,7 +1746,7 @@ public final class LinearAlgebra {
      * <pre>
      * LeastSquares(matrix, right)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * solves the linear least-squares problem 'matrix . x = right'.
@@ -2139,7 +1844,7 @@ public final class LinearAlgebra {
      * <p>
      * Infeasible systems are reported:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, -2, 3})
      *  : Linear equation encountered that has no solution.
@@ -2148,11 +1853,11 @@ public final class LinearAlgebra {
      * <p>
      * Argument {1, {2}} at position 1 is not a non-empty rectangular matrix.
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; LinearSolve({1, {2}}, {1, 2})
      * LinearSolve({1, {2}}, {1, 2})
-     * &gt;&gt; LinearSolve({{1, 2}, {3, 4}}, {1, {2}})
+	 * &gt;&gt; LinearSolve({{1, 2}, {3, 4}}, {1, {2}})
      * LinearSolve({{1, 2}, {3, 4}}, {1, {2}})
      * </pre>
      */
@@ -2162,17 +1867,63 @@ public final class LinearAlgebra {
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 3);
 
-            if (ast.arg1().isMatrix() != null && ast.arg2().isVector() >= 0) {
+			final int[] matrixDims = ast.arg1().isMatrix();
+			if (matrixDims != null && ast.arg2().isVector() >= 0) {
                 try {
-                    FieldMatrix<IExpr> augmentedMatrix = Convert.list2Matrix((IAST) ast.arg1(), (IAST) ast.arg2());
-                    if (augmentedMatrix != null) {
-                        return LinearAlgebra.rowReduced2List(augmentedMatrix, true, engine);
+					final IAST mat = (IAST) ast.arg1();
+					final IAST vec = (IAST) ast.arg2();
+					final FieldMatrix<IExpr> matrix = Convert.list2Matrix(mat);
+					final FieldVector<IExpr> vector = Convert.list2Vector(vec);
+					if (matrixDims[0] > matrixDims[1]) {
+						if (vector.getDimension() == matrix.getRowDimension()
+								&& vector.getDimension() <= matrix.getColumnDimension()) {
+							return underdeterminedSystem(mat, vec, engine);
                     }
-                } catch (final ClassCastException e) {
-                    if (Config.SHOW_STACKTRACE) {
-                        e.printStackTrace();
+						engine.printMessage("LinearSolve: first argument is not a square matrix.");
+						return F.NIL;
+					}
+					if (vector.getDimension() != matrix.getRowDimension()) {
+						engine.printMessage("LinearSolve: matrix row and vector have different dimensions.");
+						return F.NIL;
+					}
+					if (matrixDims[0] == 1 && matrixDims[1] >= 1) {
+						IExpr temp = eval1x1Matrix(matrix, vector, engine);
+						if (temp.isPresent()) {
+							return temp;
+						}
+						return underdeterminedSystem(mat, vec, engine);
+					}
+					if (matrixDims[0] == 2 && matrixDims[1] == 2) {
+						IExpr temp = eval2x2Matrix(matrix, vector, engine);
+						if (temp.isPresent()) {
+							return temp;
+						}
+						return underdeterminedSystem(mat, vec, engine);
+					}
+					if (matrixDims[0] == 3 && matrixDims[1] == 3) {
+						IExpr temp = eval3x3Matrix(matrix, vector, engine);
+						if (temp.isPresent()) {
+							return temp;
+						}
+						return underdeterminedSystem(mat, vec, engine);
+					}
+					if (matrixDims[0] != matrixDims[1]) {
+						return underdeterminedSystem(mat, vec, engine);
+					}
+					FieldDecompositionSolver<IExpr> solver = new FieldLUDecomposition<IExpr>(matrix).getSolver();
+					if (solver.isNonSingular()) {
+						FieldVector<IExpr> resultVector = solver.solve(vector);
+						for (int i = 0; i < resultVector.getDimension(); i++) {
+							if (resultVector.getEntry(i).isIndeterminate() || //
+									resultVector.getEntry(i).isDirectedInfinity()) {
+								return underdeterminedSystem(mat, vec, engine);
+							}
+						}
+						return Convert.vector2List(resultVector);
+					} else {
+						return underdeterminedSystem(mat, vec, engine);
                     }
-                } catch (final IndexOutOfBoundsException e) {
+				} catch (final Exception e) {
                     if (Config.SHOW_STACKTRACE) {
                         e.printStackTrace();
                     }
@@ -2182,6 +1933,161 @@ public final class LinearAlgebra {
             return F.NIL;
         }
 
+		/**
+		 * For a underdetermined system, return one of the possible solutions through a row reduced matrix.
+		 *
+		 * @param ast
+		 * @param engine
+		 * @return
+		 */
+		private IExpr underdeterminedSystem(final IAST matrix, IAST vector, EvalEngine engine) {
+			FieldMatrix<IExpr> augmentedMatrix = Convert.list2Matrix(matrix, vector);
+			if (augmentedMatrix != null) {
+				return LinearAlgebra.rowReduced2List(augmentedMatrix, true, engine);
+			}
+			return F.NIL;
+		}
+
+		/**
+		 * Solve <code>matrix . vector</code> for a <code>1 x 1</code> matrix
+		 *
+		 * @param matrix
+		 * @param vector
+		 * @param engine
+		 * @return
+		 */
+		private IExpr eval1x1Matrix(FieldMatrix<IExpr> matrix, FieldVector<IExpr> vector, EvalEngine engine) {
+			IASTAppendable result = F.ListAlloc(matrix.getColumnDimension());
+			IExpr a = matrix.getEntry(0, 0);
+			IExpr x = vector.getEntry(0);
+			// x/a
+			IExpr row = F.Divide(x, a);
+			result.append(row);
+			if (matrix.getColumnDimension() > 1) {
+				for (int i = 1; i < matrix.getColumnDimension(); i++) {
+					result.append(F.C0);
+				}
+			}
+			IExpr temp = engine.evaluate(result);
+			if (temp.isAST()) {
+				IAST ast = (IAST) temp;
+				for (int k = 1; k < ast.size(); k++) {
+					if (ast.get(k).isIndeterminate() || //
+							ast.get(k).isDirectedInfinity()) {
+						return F.NIL;
+					}
+				}
+			}
+			return temp;
+		}
+
+		/**
+		 * Solve <code>matrix . vector</code> for a <code>2 x 2</code> matrix
+		 *
+		 * @param matrix
+		 * @param vector
+		 * @param engine
+		 * @return
+		 */
+		private IExpr eval2x2Matrix(FieldMatrix<IExpr> matrix, FieldVector<IExpr> vector, EvalEngine engine) {
+			IASTAppendable result = F.ListAlloc(matrix.getColumnDimension());
+			IExpr a = matrix.getEntry(0, 0);
+			IExpr b = matrix.getEntry(0, 1);
+			IExpr c = matrix.getEntry(1, 0);
+			IExpr d = matrix.getEntry(1, 1);
+
+			IExpr x = vector.getEntry(0);
+			IExpr y = vector.getEntry(1);
+			// (d*x-b*y)/((-b)*c+a*d)
+			IExpr row = F.Times(F.Power(F.Plus(F.Times(F.CN1, b, c), F.Times(a, d)), -1),
+					F.Plus(F.Times(d, x), F.Times(F.CN1, b, y)));
+			result.append(row);
+			// (c*x-a*y)/(b*c-a*d)
+			row = F.Times(F.Power(F.Plus(F.Times(b, c), F.Times(F.CN1, a, d)), -1),
+					F.Plus(F.Times(c, x), F.Times(F.CN1, a, y)));
+			result.append(row);
+
+			if (matrix.getColumnDimension() > 2) {
+				for (int i = 2; i < matrix.getColumnDimension(); i++) {
+					result.append(F.C0);
+				}
+			}
+			IExpr temp = engine.evaluate(result);
+			if (temp.isAST()) {
+				IAST ast = (IAST) temp;
+				for (int k = 1; k < ast.size(); k++) {
+					if (ast.get(k).isIndeterminate() || //
+							ast.get(k).isDirectedInfinity()) {
+						return F.NIL;
+					}
+				}
+			}
+			return temp;
+		}
+
+		/**
+		 * Solve <code>matrix . vector</code> for a <code>3 x 3</code> matrix
+		 *
+		 * @param matrix
+		 * @param vector
+		 * @param engine
+		 * @return
+		 */
+		private IExpr eval3x3Matrix(FieldMatrix<IExpr> matrix, FieldVector<IExpr> vector, EvalEngine engine) {
+			IASTAppendable result = F.ListAlloc(matrix.getColumnDimension());
+			IExpr a = matrix.getEntry(0, 0);
+			IExpr b = matrix.getEntry(0, 1);
+			IExpr c = matrix.getEntry(0, 2);
+			IExpr d = matrix.getEntry(1, 0);
+			IExpr e = matrix.getEntry(1, 1);
+			IExpr f = matrix.getEntry(1, 2);
+			IExpr g = matrix.getEntry(2, 0);
+			IExpr h = matrix.getEntry(2, 1);
+			IExpr i = matrix.getEntry(2, 2);
+
+			IExpr x = vector.getEntry(0);
+			IExpr y = vector.getEntry(1);
+			IExpr z = vector.getEntry(2);
+			// (f*h*x-e*i*x-c*h*y+b*i*y+c*e*z-b*f*z)/(c*e*g-b*f*g-c*d*h+a*f*h+b*d*i-a*e*i)
+			IExpr row = F.Times(
+					F.Power(F.Plus(F.Times(c, e, g), F.Times(F.CN1, b, f, g), F.Times(F.CN1, c, d, h), F.Times(a, f, h),
+							F.Times(b, d, i), F.Times(F.CN1, a, e, i)), -1),
+					F.Plus(F.Times(f, h, x), F.Times(F.CN1, e, i, x), F.Times(F.CN1, c, h, y), F.Times(b, i, y),
+							F.Times(c, e, z), F.Times(F.CN1, b, f, z)));
+			result.append(row);
+			// ((-f)*g*x+d*i*x+c*g*y-a*i*y-c*d*z+a*f*z)/(c*e*g-b*f*g-c*d*h+a*f*h+b*d*i-a*e*i)
+			row = F.Times(
+					F.Power(F.Plus(F.Times(c, e, g), F.Times(F.CN1, b, f, g), F.Times(F.CN1, c, d, h), F.Times(a, f, h),
+							F.Times(b, d, i), F.Times(F.CN1, a, e, i)), -1),
+					F.Plus(F.Times(F.CN1, f, g, x), F.Times(d, i, x), F.Times(c, g, y), F.Times(F.CN1, a, i, y),
+							F.Times(F.CN1, c, d, z), F.Times(a, f, z)));
+			result.append(row);
+			// (e*g*x-d*h*x-b*g*y+a*h*y+b*d*z-a*e*z)/(c*e*g-b*f*g-c*d*h+a*f*h+b*d*i-a*e*i)
+			row = F.Times(
+					F.Power(F.Plus(F.Times(c, e, g), F.Times(F.CN1, b, f, g), F.Times(F.CN1, c, d, h), F.Times(a, f, h),
+							F.Times(b, d, i), F.Times(F.CN1, a, e, i)), -1),
+					F.Plus(F.Times(e, g, x), F.Times(F.CN1, d, h, x), F.Times(F.CN1, b, g, y), F.Times(a, h, y),
+							F.Times(b, d, z), F.Times(F.CN1, a, e, z)));
+			result.append(row);
+
+			if (matrix.getColumnDimension() > 3) {
+				for (int k = 3; k < matrix.getColumnDimension(); k++) {
+					result.append(F.C0);
+				}
+			}
+
+			IExpr temp = engine.evaluate(result);
+			if (temp.isAST()) {
+				IAST ast = (IAST) temp;
+				for (int k = 1; k < ast.size(); k++) {
+					if (ast.get(k).isIndeterminate() || //
+							ast.get(k).isDirectedInfinity()) {
+						return F.NIL;
+					}
+				}
+			}
+			return temp;
+		}
     }
 
     private static class LowerTriangularize extends AbstractFunctionEvaluator {
@@ -2212,7 +2118,7 @@ public final class LinearAlgebra {
      * <pre>
      * LUDecomposition(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * calculate the LUP-decomposition of a square <code>matrix</code>.
@@ -2228,7 +2134,7 @@ public final class LinearAlgebra {
      * Math - Class FieldLUDecomposition</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt;&gt; LUDecomposition[{{1, 2, 3}, {3, 4, 11}, {13, 7, 8}}]
      * {{{1,0,0},
@@ -2294,7 +2200,7 @@ public final class LinearAlgebra {
      * <pre>
      * ManhattanDistance(u, v)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the Manhattan distance between <code>u</code> and <code>v</code>, which is the number of horizontal or
@@ -2308,7 +2214,7 @@ public final class LinearAlgebra {
      * <li><a href="https://en.wikipedia.org/wiki/Taxicab_geometry">Wikipedia - Taxicab geometry</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; ManhattanDistance({-1, -1}, {1, 1})
      * 4
@@ -2361,7 +2267,7 @@ public final class LinearAlgebra {
      * <pre>
      * MatrixMinimalPolynomial(matrix, var)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the matrix minimal polynomial of a <code>matrix</code> for the variable <code>var</code>.
@@ -2375,7 +2281,7 @@ public final class LinearAlgebra {
      * (linear algebra)</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; MatrixMinimalPolynomial({{1, -1, -1}, {1, -2, 1}, {0, 1, -3}}, x)
      * -1+x+4*x^2+x^3
@@ -2420,14 +2326,14 @@ public final class LinearAlgebra {
      * <pre>
      * MatrixPower(matrix, n)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the <code>n</code>th power of a <code>matrix</code>
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; MatrixPower({{1, 2}, {1, 1}}, 10)
      * {{3363,4756},
@@ -2440,7 +2346,7 @@ public final class LinearAlgebra {
      * <p>
      * Argument {{1, 0}, {0}} at position 1 is not a non-empty rectangular matrix.
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; MatrixPower({{1, 0}, {0}}, 2)
      * MatrixPower({{1, 0}, {0}}, 2)
@@ -2519,7 +2425,7 @@ public final class LinearAlgebra {
      * <pre>
      * MatrixRank(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the rank of <code>matrix</code>.
@@ -2544,7 +2450,7 @@ public final class LinearAlgebra {
      * <p>
      * Argument <code>{{1, 0}, {0}}</code> at position <code>1</code> is not a non-empty rectangular matrix.
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; MatrixRank({{1, 0}, {0}})
      * MatrixRank({{1, 0}, {0}})
@@ -2591,61 +2497,61 @@ public final class LinearAlgebra {
      * <pre>
      * Norm(m, l)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the <code>l</code>-norm of matrix <code>m</code> (currently only works for vectors!).<br />
      * </p>
      * </blockquote>
-     * <p>
+	 *
      * <pre>
      * Norm(m)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the 2-norm of matrix <code>m</code> (currently only works for vectors!).<br />
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; Norm({1, 2, 3, 4}, 2)
-     * Sqrt(30)
+	 * &gt;&gt; Norm({1, 2, 3, 4}, 2)
+	 * Sqrt(30)
      *
-     * &gt;&gt; Norm({10, 100, 200}, 1)
-     * 310
+	 * &gt;&gt; Norm({10, 100, 200}, 1)
+	 * 310
      *
      * &gt;&gt; Norm({a, b, c})
-     * Sqrt(Abs(a)^2+Abs(b)^2+Abs(c)^2)
+	 * Sqrt(Abs(a)^2+Abs(b)^2+Abs(c)^2)
      *
-     * &gt;&gt; Norm({-100, 2, 3, 4}, Infinity)
-     * 100
+	 * &gt;&gt; Norm({-100, 2, 3, 4}, Infinity)
+	 * 100
      *
-     * &gt;&gt; Norm(1 + I)
+	 * &gt;&gt; Norm(1 + I)
      * Sqrt(2)
      * </pre>
      * <p>
      * The first Norm argument should be a number, vector, or matrix.<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; Norm({1, {2, 3}})
-     * Norm({1, {2, 3}})
+	 * &gt;&gt; Norm({1, {2, 3}})
+	 * Norm({1, {2, 3}})
      *
-     * &gt;&gt; Norm({x, y})
-     * Sqrt(Abs(x)^2+Abs(y)^2)
+	 * &gt;&gt; Norm({x, y})
+	 * Sqrt(Abs(x)^2+Abs(y)^2)
      *
-     * &gt;&gt; Norm({x, y}, p)
+	 * &gt;&gt; Norm({x, y}, p)
      * (Abs(x) ^ p + Abs(y) ^ p) ^ (1 / p)
      * </pre>
      * <p>
      * The second argument of Norm, 0, should be a symbol, Infinity, or an integer or real number not less than 1 for
      * vector p-norms; or 1, 2, Infinity, or &ldquo;Frobenius&rdquo; for matrix norms.<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; Norm({x, y}, 0)
+	 * &gt;&gt; Norm({x, y}, 0)
      * Norm({x, y}, 0)
      * </pre>
      * <p>
@@ -2654,13 +2560,13 @@ public final class LinearAlgebra {
      * </p>
      * <p>
      * <pre>
-     * &gt;&gt; Norm({x, y}, 0.5)
+	 * &gt;&gt; Norm({x, y}, 0.5)
      * Norm({x, y}, 0.5)
      *
-     * &gt;&gt; Norm({})
+	 * &gt;&gt; Norm({})
      * Norm({})
      *
-     * &gt;&gt; Norm(0)
+	 * &gt;&gt; Norm(0)
      * 0
      * </pre>
      */
@@ -2736,30 +2642,30 @@ public final class LinearAlgebra {
      * <pre>
      * Normalize(v)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * calculates the normalized vector <code>v</code>.
      * </p>
      * </blockquote>
-     * <p>
+	 *
      * <pre>
      * Normalize(z)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * calculates the normalized complex number <code>z</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Normalize({1, 1, 1, 1})
      * {1/2,1/2,1/2,1/2}
      *
      * &gt;&gt; Normalize(1 + I)
-     * (1+I)/Sqrt(2)
+	 * (1+I)/Sqrt(2)
      *
      * &gt;&gt; Normalize(0)
      * 0
@@ -2798,7 +2704,7 @@ public final class LinearAlgebra {
      * <pre>
      * NullSpace(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns a list of vectors that span the nullspace of the <code>matrix</code>.
@@ -2812,32 +2718,32 @@ public final class LinearAlgebra {
      * algebra)</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; NullSpace({{1,0,-3,0,2,-8},{0,1,5,0,-1,4},{0,0,0,1,7,-9},{0,0,0,0,0,0}})
      * {{3,-5,1,0,0,0},
      *  {-2,1,0,-7,1,0},
      *  {8,-4,0,9,0,1}}
      * </pre>
-     * <p>
+	 *
      * <pre>
-     * ```
-     * &gt;&gt; NullSpace({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})
+	 * ```
+	 * &gt;&gt; NullSpace({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})
      * {{1,-2,1}}
      *
-     * &gt;&gt; A = {{1, 1, 0}, {1, 0, 1}, {0, 1, 1}}
-     * &gt;&gt; NullSpace(A)
-     * {}
+	 * &gt;&gt; A = {{1, 1, 0}, {1, 0, 1}, {0, 1, 1}}
+	 * &gt;&gt; NullSpace(A)
+	 * {}
      *
-     * &gt;&gt; MatrixRank(A)
+	 * &gt;&gt; MatrixRank(A)
      * 3
      * </pre>
      * <p>
      * Argument {1, {2}} at position 1 is not a non-empty rectangular matrix.<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; NullSpace({1, {2}})
+	 * &gt;&gt; NullSpace({1, {2}})
      * NullSpace({1, {2}})
      * </pre>
      */
@@ -2919,17 +2825,17 @@ public final class LinearAlgebra {
      * <pre>
      * Projection(vector1, vector2)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * Find the orthogonal projection of <code>vector1</code> onto another <code>vector2</code>.
      * </p>
      * </blockquote>
-     * <p>
+	 *
      * <pre>
      * Projection(vector1, vector2, ipf)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * Find the orthogonal projection of <code>vector1</code> onto another <code>vector2</code> using the inner product
@@ -2937,7 +2843,7 @@ public final class LinearAlgebra {
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Projection({5, I, 7}, {1, 1, 1})
      * {4+I*1/3,4+I*1/3,4+I*1/3}
@@ -2948,10 +2854,14 @@ public final class LinearAlgebra {
         /**
          * Create a binary function &quot"dot product&quot; <code>head(u,v)</code> and evaluate it.
          *
-         * @param head   the header of the binary function
-         * @param u      the first argument of the function
-         * @param v      the second argument of the function
-         * @param engine the evaluation engine
+		 * @param head
+		 *            the header of the binary function
+		 * @param u
+		 *            the first argument of the function
+		 * @param v
+		 *            the second argument of the function
+		 * @param engine
+		 *            the evaluation engine
          * @return the evaluated <code>head(u,v)</code> AST.
          */
         private static IExpr dotProduct(IExpr head, IExpr u, IExpr v, EvalEngine engine) {
@@ -2999,7 +2909,7 @@ public final class LinearAlgebra {
      * <pre>
      * PseudoInverse(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the Moore-Penrose pseudoinverse of the <code>matrix</code>. If <code>matrix</code> is invertible, the
@@ -3014,7 +2924,7 @@ public final class LinearAlgebra {
      * pseudoinverse</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; PseudoInverse({{1, 2}, {2, 3}, {3, 4}})
      * {{1.0000000000000002,2.000000000000001},
@@ -3024,14 +2934,14 @@ public final class LinearAlgebra {
      * {{-2.999999999999998,1.9999999999999967,4.440892098500626E-16},
      *  {1.999999999999999,-0.9999999999999982,-2.7755575615628914E-16},
      *  {0.9999999999999999,-1.9999999999999991,1.0}}
-     * &gt;&gt; PseudoInverse({{1.0, 2.5}, {2.5, 1.0}})
+	 * &gt;&gt; PseudoInverse({{1.0, 2.5}, {2.5, 1.0}})
      * {{-0.19047619047619038,0.47619047619047616},
      *  {0.47619047619047616,-0.1904761904761904}}
      * </pre>
      * <p>
      * Argument {1, {2}} at position 1 is not a non-empty rectangular matrix.
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; PseudoInverse({1, {2}})
      * PseudoInverse({1, {2}})
@@ -3136,7 +3046,7 @@ public final class LinearAlgebra {
      * <pre>
      * RowReduce(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the reduced row-echelon form of <code>matrix</code>.
@@ -3149,15 +3059,15 @@ public final class LinearAlgebra {
      * <li><a href="http://en.wikipedia.org/wiki/Row_echelon_form">Wikipedia - Row echelon form</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; RowReduce({{1,1,0,1,5},{1,0,0,2,2},{0,0,1,4,-1},{0,0,0,0,0}})
-     * {{1,0,0,2,2},
+	 * {{1,0,0,2,2},
      *  {0,1,0,-1,3},
      *  {0,0,1,4,-1},
      *  {0,0,0,0,0}}
      *
-     * &gt;&gt; RowReduce({{1, 0, a}, {1, 1, b}})
+	 * &gt;&gt; RowReduce({{1, 0, a}, {1, 1, b}})
      * {{1,0,a},
      *  {0,1,-a+b}}
      *
@@ -3169,9 +3079,9 @@ public final class LinearAlgebra {
      * <p>
      * Argument {{1, 0}, {0}} at position 1 is not a non-empty rectangular matrix.<br />
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; RowReduce({{1, 0}, {0}})
+	 * &gt;&gt; RowReduce({{1, 0}, {0}})
      * RowReduce({{1, 0}, {0}})
      * </pre>
      */
@@ -3505,63 +3415,6 @@ public final class LinearAlgebra {
      */
     private static class Transpose extends AbstractEvaluator {
 
-        @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkRange(ast, 2, 3);
-
-            if (ast.size() == 3) {
-                if (ast.arg1().isList() && ast.arg2().isList()) {
-                    IAST tensor = (IAST) ast.arg1();
-                    ArrayList<Integer> dims = dimensions(tensor, tensor.head(), Integer.MAX_VALUE);
-                    int[] permutation = Validate.checkListOfInts(ast.arg2(), 1, dims.size());
-                    return new TransposePermute(tensor, dims, permutation).recursiveTranspose();
-                }
-                return F.NIL;
-            }
-            final int[] dim = ast.arg1().isMatrix();
-            if (dim != null) {
-                final IAST originalMatrix = (IAST) ast.arg1();
-                return transpose(originalMatrix, dim[0], dim[1]);
-            }
-            return F.NIL;
-        }
-
-        protected IExpr transform(final IExpr expr) {
-            return expr;
-        }
-
-        /**
-         * Transpose the given matrix.
-         *
-         * @param matrix the matrix which should be transposed
-         * @param rows   number of rows of the matrix
-         * @param cols   number of columns of the matrix
-         * @return
-         */
-        public IAST transpose(final IAST matrix, final int rows, final int cols) {
-            final IASTAppendable transposedMatrix = F.ast(F.List, cols, true);
-            transposedMatrix.setArgs(cols + 1, new IntFunction<IExpr>() {
-                @Override
-                public IExpr apply(int i) {
-                    return F.ast(F.List, rows, true);
-                }
-            });
-            // for (int i = 1; i <= cols; i++) {
-            // transposedMatrix.set(i, F.ast(F.List, rows, true));
-            // }
-
-            IAST originalRow;
-            IASTMutable transposedResultRow;
-            for (int i = 1; i <= rows; i++) {
-                originalRow = (IAST) matrix.get(i);
-                for (int j = 1; j <= cols; j++) {
-                    transposedResultRow = (IASTMutable) transposedMatrix.get(j);
-                    transposedResultRow.set(i, transform(originalRow.get(j)));
-                }
-            }
-            transposedMatrix.addEvalFlags(IAST.IS_MATRIX);
-            return transposedMatrix;
-        }
 
         private static class TransposePermute {
             /**
@@ -3596,8 +3449,11 @@ public final class LinearAlgebra {
             }
 
             /**
-             * @param permutationIndex the current permutation index, which should be used to get the element from permutation array
-             * @param resultList       the parent list or <code>null</code> if the root-list should be created.
+			 *
+			 * @param permutationIndex
+			 *            the current permutation index, which should be used to get the element from permutation array
+			 * @param resultList
+			 *            the parent list or <code>null</code> if the root-list should be created.
              * @return
              */
             private IAST recursiveTranspose(int permutationIndex, IASTAppendable resultList) {
@@ -3619,6 +3475,61 @@ public final class LinearAlgebra {
             }
         }
 
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 2, 3);
+
+			if (ast.size() == 3) {
+				if (ast.arg1().isList() && ast.arg2().isList()) {
+					IAST tensor = (IAST) ast.arg1();
+					ArrayList<Integer> dims = dimensions(tensor, tensor.head(), Integer.MAX_VALUE);
+					int[] permutation = Validate.checkListOfInts(ast.arg2(), 1, dims.size());
+					return new TransposePermute(tensor, dims, permutation).recursiveTranspose();
+				}
+				return F.NIL;
+			}
+			final int[] dim = ast.arg1().isMatrix();
+			if (dim != null) {
+				final IAST originalMatrix = (IAST) ast.arg1();
+				return transpose(originalMatrix, dim[0], dim[1]);
+			}
+			return F.NIL;
+		}
+
+		protected IExpr transform(final IExpr expr) {
+			return expr;
+		}
+
+		/**
+		 * Transpose the given matrix.
+		 *
+		 * @param matrix
+		 *            the matrix which should be transposed
+		 * @param rows
+		 *            number of rows of the matrix
+		 * @param cols
+		 *            number of columns of the matrix
+		 * @return
+		 */
+		public IAST transpose(final IAST matrix, int rows, int cols) {
+			final IASTAppendable transposedMatrix = F.ast(F.List, cols, true);
+			transposedMatrix.setArgs(cols + 1, i -> F.ast(F.List, rows, true));
+			// for (int i = 1; i <= cols; i++) {
+			// transposedMatrix.set(i, F.ast(F.List, rows, true));
+			// }
+
+			IAST originalRow;
+			IASTMutable transposedResultRow;
+			for (int i = 1; i <= rows; i++) {
+				originalRow = (IAST) matrix.get(i);
+				for (int j = 1; j <= cols; j++) {
+					transposedResultRow = (IASTMutable) transposedMatrix.get(j);
+					transposedResultRow.set(i, transform(originalRow.get(j)));
+				}
+			}
+			transposedMatrix.addEvalFlags(IAST.IS_MATRIX);
+			return transposedMatrix;
+		}
     }
 
     /**
@@ -3825,4 +3736,302 @@ public final class LinearAlgebra {
 
     }
 
+	private final static LinearAlgebra CONST = new LinearAlgebra();
+
+	/**
+	 * <p>
+	 * Use cramer's rule to solve linear equations represented by a <code>2 x 3</code> augmented matrix which represents
+	 * the system <code>M.x == b</code>, where the columns of the <code>2 x 2</code> matrix <code>M</code> are augmented
+	 * by the vector <code>b</code>. This method assumes that the dimensions of the matrix are already checked by the
+	 * caller.
+	 * </p>
+	 * See: <a href="https://en.wikipedia.org/wiki/Cramer's_rule">Wikipedia Cramer's rule</a>
+	 *
+	 * @param matrix
+	 *            the <code>2 x 3</code> augmented matrix
+	 * @param quiet
+	 *            show no message if there is no solution
+	 * @param engine
+	 *            the evaluation engine
+	 * @return a list of values which solve the equations or <code>F#NIL</code>, if the equations have no solution.
+	 */
+	public static IAST cramersRule2x3(FieldMatrix<IExpr> matrix, boolean quiet, EvalEngine engine) {
+		IASTAppendable list = F.ListAlloc(2);
+		// a1 * b2 - b1 * a2
+		IExpr denominator = determinant2x2(matrix);
+		if (denominator.isZero()) {
+			if (!quiet) {
+				engine.printMessage("Row reduced linear equations have no solution.");
+			}
+			return F.NIL;
+		}
+		// c1 * b2 - b1 * c2
+		IExpr xNumerator = F.Subtract(F.Times(matrix.getEntry(0, 2), matrix.getEntry(1, 1)),
+				F.Times(matrix.getEntry(0, 1), matrix.getEntry(1, 2)));
+		list.append(F.Divide(xNumerator, denominator));
+		// a1 * c2 - c1*a2
+		IExpr yNumerator = F.Subtract(F.Times(matrix.getEntry(0, 0), matrix.getEntry(1, 2)),
+				F.Times(matrix.getEntry(0, 2), matrix.getEntry(1, 0)));
+		list.append(F.Divide(yNumerator, denominator));
+		return list;
+	}
+
+	/**
+	 * <p>
+	 * Use cramer's rule to solve linear equations represented by a <code>3 x 4</code> augmented matrix which represents
+	 * the system <code>M.x == b</code>, where the columns of the <code>3 x 3</code> matrix <code>M</code> are augmented
+	 * by the vector <code>b</code>. This method assumes that the dimensions of the matrix are already checked by the
+	 * caller.
+	 * </p>
+	 * See: <a href="https://en.wikipedia.org/wiki/Cramer's_rule">Wikipedia Cramer's rule</a>
+	 *
+	 * @param matrix
+	 *            the <code>3 x 4</code> augmented matrix
+	 * @param quiet
+	 *            show no message if there is no solution
+	 * @param engine
+	 *            the evaluation engine
+	 * @return a list of values which solve the equations or <code>F#NIL</code>, if the equations have no solution.
+	 */
+	public static IAST cramersRule3x4(FieldMatrix<IExpr> matrix, boolean quiet, EvalEngine engine) {
+		IASTAppendable list = F.ListAlloc(3);
+		FieldMatrix<IExpr> denominatorMatrix = matrix.getSubMatrix(0, 2, 0, 2);
+		IExpr denominator = determinant3x3(denominatorMatrix);
+		if (denominator.isZero()) {
+			if (!quiet) {
+				engine.printMessage("Row reduced linear equations have no solution.");
+			}
+			return F.NIL;
+		}
+
+		FieldMatrix<IExpr> xMatrix = denominatorMatrix.copy();
+		xMatrix.setColumn(0, new IExpr[] { matrix.getEntry(0, 3), matrix.getEntry(1, 3), matrix.getEntry(2, 3) });
+		IExpr xNumerator = determinant3x3(xMatrix);
+
+		list.append(F.Divide(xNumerator, denominator));
+
+		FieldMatrix<IExpr> yMatrix = denominatorMatrix.copy();
+		yMatrix.setColumn(1, new IExpr[] { matrix.getEntry(0, 3), matrix.getEntry(1, 3), matrix.getEntry(2, 3) });
+		IExpr yNumerator = determinant3x3(yMatrix);
+
+		list.append(F.Divide(yNumerator, denominator));
+
+		FieldMatrix<IExpr> zMatrix = denominatorMatrix.copy();
+		zMatrix.setColumn(2, new IExpr[] { matrix.getEntry(0, 3), matrix.getEntry(1, 3), matrix.getEntry(2, 3) });
+		IExpr zNumerator = determinant3x3(zMatrix);
+
+		list.append(F.Divide(zNumerator, denominator));
+
+		return list;
+	}
+
+	/**
+	 * Get the determinant of a <code>2 x 2</code> matrix. This method assumes that the dimensions of the matrix are
+	 * already checked by the caller.
+	 *
+	 * @param matrix
+	 *            a 2x2 matrix
+	 * @return
+	 */
+	public static IExpr determinant2x2(final FieldMatrix<IExpr> matrix) {
+		// 2x2 matrix
+		IExpr[] row1 = matrix.getRow(0);
+		IExpr[] row2 = matrix.getRow(1);
+		return F.evalExpand(row1[0].multiply(row2[1]).subtract((row1[1].multiply(row2[0]))));
+	}
+
+	/**
+	 * Get the determinant of a <code>3 x 3</code> matrix. This method assumes that the dimensions of the matrix are
+	 * already checked by the caller.
+	 *
+	 * @param matrix
+	 *            a 3x3 matrix
+	 * @return
+	 */
+	public static IExpr determinant3x3(final FieldMatrix<IExpr> matrix) {
+		// 3x3 matrix
+		IExpr[] row1 = matrix.getRow(0);
+		IExpr[] row2 = matrix.getRow(1);
+		IExpr[] row3 = matrix.getRow(2);
+		return F.evalExpand(row1[0].multiply(row2[1].multiply(row3[2]))
+				.subtract((row1[0].multiply(row2[2].multiply(row3[1]))))
+				.subtract((row1[1].multiply(row2[0].multiply(row3[2]))))
+				.plus((row1[1].multiply(row2[2].multiply(row3[0])))).plus((row1[2].multiply(row2[0].multiply(row3[1]))))
+				.subtract((row1[2].multiply(row2[1].multiply(row3[0])))));
+	}
+
+	/**
+	 * Create a diagonal matrix from <code>valueArray[0]</code> (non-diagonal elements) and <code>valueArray[1]</code>
+	 * (diagonal elements).
+	 *
+	 * @param valueArray
+	 *            2 values for non-diagonal and diagonal elemnets of the matrix.
+	 * @param dimension
+	 *            of the square matrix
+	 *
+	 * @return
+	 */
+	public static IAST diagonalMatrix(final IExpr[] valueArray, int dimension) {
+		final int[] indexArray = new int[2];
+		indexArray[0] = dimension;
+		indexArray[1] = dimension;
+		final IndexTableGenerator generator = new IndexTableGenerator(indexArray, F.List,
+				new IndexFunctionDiagonal(valueArray));
+		final IAST matrix = (IAST) generator.table();
+		matrix.addEvalFlags(IAST.IS_MATRIX);
+		return matrix;
+	}
+
+	public static ArrayList<Integer> dimensions(IAST ast) {
+		return dimensions(ast, ast.head(), Integer.MAX_VALUE, new ArrayList<Integer>());
+	}
+
+	public static ArrayList<Integer> dimensions(IAST ast, IExpr header, int maxLevel) {
+		return dimensions(ast, header, maxLevel, new ArrayList<Integer>());
+	}
+
+	public static ArrayList<Integer> dimensions(IAST ast, IExpr header, int maxLevel, ArrayList<Integer> dims) {
+		int size = ast.size();
+		dims.add(size - 1);
+		if (size > 1 && ast.arg1().isAST()) {
+			IAST arg1AST = (IAST) ast.arg1();
+			int arg1Size = arg1AST.size();
+			if (!header.equals(arg1AST.head())) {
+				return dims;
+			}
+			if (maxLevel > 0) {
+				for (int i = 2; i < size; i++) {
+					if (!ast.get(i).isAST()) {
+						return dims;
+					}
+					if (arg1Size != ((IAST) ast.get(i)).size()) {
+						return dims;
+					}
+				}
+				dimensions(arg1AST, header, maxLevel - 1, dims);
+			}
+		}
+		return dims;
+	}
+
+	public static LinearAlgebra initialize() {
+		return CONST;
+	}
+
+	/**
+	 * Return the solution of the given (augmented-)matrix interpreted as a system of linear equations.
+	 *
+	 * @param matrix
+	 * @param quiet
+	 *            suppress warning messages if <code>true</code>
+	 * @param engine
+	 *            the evaluation engine
+	 * @return <code>F.NIL</code> if the linear system is inconsistent and has no solution
+	 */
+	public static IAST rowReduced2List(FieldMatrix<IExpr> matrix, boolean quiet, EvalEngine engine) {
+
+		int rows = matrix.getRowDimension();
+		int cols = matrix.getColumnDimension();
+		if (rows == 2 && cols == 3) {
+			IAST list = cramersRule2x3(matrix, quiet, engine);
+			if (list.isPresent()) {
+				return list;
+			}
+		} else if (rows == 3 && cols == 4) {
+			IAST list = cramersRule3x4(matrix, quiet, engine);
+			if (list.isPresent()) {
+				return list;
+			}
+		}
+		FieldReducedRowEchelonForm ref = new FieldReducedRowEchelonForm(matrix);
+		FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
+		IExpr lastVarCoefficient = rowReduced.getEntry(rows - 1, cols - 2);
+		if (lastVarCoefficient.isZero()) {
+			if (!rowReduced.getEntry(rows - 1, cols - 1).isZero()) {
+				engine.printMessage("Row reduced linear equations have no solution.");
+				return F.NIL;
+			}
+		}
+		IASTAppendable list = F.ListAlloc(rows < cols - 1 ? cols - 1 : rows);
+		list.appendArgs(0, rows, j -> F.Together.of(engine, rowReduced.getEntry(j, cols - 1)));
+		if (rows < cols - 1) {
+			list.appendArgs(rows, cols - 1, i -> F.C0);
+		}
+		return list;
+	}
+
+	/**
+	 * Row reduce the given <code>(augmented-)matrix</code> and append the result as rules for the given
+	 * <code>variableList</code>.
+	 *
+	 * @param matrix
+	 *            a (augmented-)matrix
+	 * @param listOfVariables
+	 *            list of variable symbols
+	 * @param resultList
+	 *            a list to which the rules should be appended
+	 * @param engine
+	 *            the evaluation engine
+	 * @return resultList with the appended results as list of rules
+	 */
+	public static IAST rowReduced2RulesList(FieldMatrix<IExpr> matrix, IAST listOfVariables, IASTAppendable resultList,
+			EvalEngine engine) {
+		int rows = matrix.getRowDimension();
+		int cols = matrix.getColumnDimension();
+		IAST smallList = null;
+		if (rows == 2 && cols == 3) {
+			smallList = cramersRule2x3(matrix, true, engine);
+		} else if (rows == 3 && cols == 4) {
+			smallList = cramersRule3x4(matrix, true, engine);
+		}
+		if (smallList != null) {
+			if (!smallList.isPresent()) {
+				// no solution
+				return F.List();
+			}
+			final IAST sList = smallList;
+			int size = smallList.size();
+			IASTAppendable list = F.ListAlloc(size);
+			list.appendArgs(size, j -> F.Rule(listOfVariables.get(j), engine.evaluate(sList.get(j))));
+
+			resultList.append(list);
+			return resultList;
+		}
+		FieldReducedRowEchelonForm ref = new FieldReducedRowEchelonForm(matrix);
+		FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
+		int size = listOfVariables.argSize();
+
+		IExpr lastVarCoefficient = rowReduced.getEntry(rows - 1, cols - 2);
+
+		if (lastVarCoefficient.isZero()) {
+			if (!rowReduced.getEntry(rows - 1, cols - 1).isZero()) {
+				// no solution
+				return F.List();
+			}
+		}
+		IAST rule;
+		IASTAppendable list = F.ListAlloc(rows);
+		for (int j = 1; j < rows + 1; j++) {
+			if (j < size + 1) {
+				IExpr diagonal = rowReduced.getEntry(j - 1, j - 1);
+				if (!diagonal.isZero()) {
+					IASTAppendable plus = F.PlusAlloc(cols);
+					plus.append(rowReduced.getEntry(j - 1, cols - 1));
+					for (int i = j; i < cols - 1; i++) {
+						if (!rowReduced.getEntry(j - 1, i).isZero()) {
+							plus.append(F.Times(rowReduced.getEntry(j - 1, i).negate(), listOfVariables.get(i + 1)));
+						}
+					}
+					rule = F.Rule(listOfVariables.get(j), F.eval(F.Together(plus.getOneIdentity(F.C0))));
+					list.append(rule);
+				}
+			}
+		}
+		resultList.append(list);
+		return resultList;
+	}
+
+	private LinearAlgebra() {
+
+	}
 }
