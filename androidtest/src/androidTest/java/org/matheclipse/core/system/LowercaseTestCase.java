@@ -577,6 +577,8 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testBooleanConvert() {
+		check("BooleanConvert((a||b)&&(c||d), \"CNF\")", //
+				"(a||b)&&(c||d)");
 		check("BooleanConvert(a&&!b||!a&&c||b&&!c, \"DNF\")", //
 				"a&&!b||!a&&c||b&&!c");
         check("BooleanConvert(Implies(x, y), \"CNF\")", "!x||y");
@@ -620,12 +622,20 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testBooleanMinimize() {
+		check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c))", //
+				"a&&!b||!a&&c||b&&!c");
+		check("BooleanMinimize((a||b)&&(c||d))", //
+				"a&&c||a&&d||b&&c||b&&d");
+		check("BooleanMinimize(a && b || ! a && b)", //
+				"b");
 
-		// check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c))", "a&&!b||!a&&c||b&&!c");
-        // check("BooleanMinimize((a||b)&&(c||d))", "a&&c||a&&d||b&&c||b&&d");
-		// check("BooleanMinimize((a||b)&&(c||d) )", "a&&c||a&&d||b&&c||b&&d");
-        // check("BooleanMinimize(a && b || ! a && b)", "b");
-		// check("BooleanMinimize(a && b || ! a && b )", "b");
+		// TODO CNF form after minimizing blows up the formula.
+		// check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c), \"CNF\")", //
+		// "(a||b||c)&&(!a||!b||!c)");
+		// check("BooleanMinimize((a||b)&&(c||d), \"CNF\")", //
+		// "(a||b)&&(a||b||c)&&(a||b||c||d)&&(a||b||d)&&(a||c||d)&&(b||c||d)&&(c||d)");
+		// check("BooleanMinimize(a && b || ! a && b, \"CNF\")", //
+		// "b");
     }
 
     public void testBooleanQ() {
@@ -636,7 +646,14 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testBooleanTable() {
-        check("BooleanTable(p || q, {p, q})", "{True,True,True,False}");
+		check("BooleanTable(Xor(p, q, r), {p, q, r})", //
+				"{True,False,False,True,False,True,True,False}");
+		check("BooleanTable(Implies(Implies(p, q), r), {p, q, r})", //
+				"{True,False,True,True,True,False,True,False}");
+		check("BooleanTable(p || q, {p, q})", //
+				"{True,True,True,False}");
+		check("BooleanTable(And(a, b, c), {a, b, c})", //
+				"{True,False,False,False,False,False,False,False}");
     }
 
     public void testBooleanVariables() {
@@ -644,6 +661,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("BooleanVariables(Xor(a, And(b, Or(c, d))))", "{a,b,c,d}");
         check("BooleanVariables(a && b || ! a && b)", "{a,b}");
 
+		check("BooleanVariables(Xor(p,q,r))", "{p,q,r}");
         check("BooleanVariables(a + b*c)", "{}");
     }
 
@@ -4184,19 +4202,45 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testLinearSolve() {
-        check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, 1, 1})", "{-1,1,0}");
-        check("LinearSolve({{1, 2}, {3, 4}}, {1, {2}})", "LinearSolve(\n" + "{{1,2},\n" + " {3,4}},{1,{2}})");
+		check("LinearSolve({{a, b, c, d}}, {x})", //
+				"{x/a,0,0,0}");
+		check("LinearSolve({{a, b,c,d,e}, {f,g,h,i,j}}, {x, y})", //
+				"{(g*x-b*y)/(-b*f+a*g),(-f*x+a*y)/(-b*f+a*g),0,0,0}");
+		check("LinearSolve({{a,b,c,d,e}, {f,g,h,i,j}, {k,l,m,n,o}}, {x,y,z})", //
+				"{(-h*l*x+g*m*x+c*l*y-b*m*y-c*g*z+b*h*z)/(-c*g*k+b*h*k+c*f*l-a*h*l-b*f*m+a*g*m),(h*k*x-f*m*x-c*k*y+a*m*y+c*f*z-a*h*z)/(-c*g*k+b*h*k+c*f*l-a*h*l-b*f*m+a*g*m),(-g*k*x+f*l*x+b*k*y-a*l*y-b*f*z+a*g*z)/(-c*g*k+b*h*k+c*f*l-a*h*l-b*f*m+a*g*m),\n"
+						+ "0,0}");
+		// underdetermined system:
+		check("LinearSolve({{1, 2, 3}, {4, 5, 6}}, {6, 15})", //
+				"{0,3,0}");
+		// linear equations have no solution
+		check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, -2, 1})", //
+				"LinearSolve(\n" + "{{1,2,3},\n" + " {4,5,6},\n" + " {7,8,9}},{1,-2,1})");
+		// github issue #44
+		check("LinearSolve({{1,0,-1,0},{0,1,0,-1},{1,-2,-1,0},{-1,0,3,1}},"//
+				+ "{0.06,0.06,-0.4,-0.06})", //
+				"{-0.025,0.23,-0.085,0.17}");
 
-        check("LinearSolve({{1, 1, 1}, {1, 2, 3}, {1, 4, 9}}, {1, 2, 3})", "{-1/2,2,-1/2}");
-        check("LinearSolve(N({{1, 1, 1}, {1, 2, 3}, {1, 4, 9}}), N({1, 2, 3}))", "{-0.5,2.0,-0.5}");
-        check("LinearSolve({{a, b}, {c, d}}, {x, y})", "{(d*x-b*y)/(-b*c+a*d),(-c*x+a*y)/(-b*c+a*d)}");
+		check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, 1, 1})", //
+				"{-1,1,0}");
+		check("LinearSolve({{1, 2}, {3, 4}}, {1, {2}})", //
+				"LinearSolve(\n" + "{{1,2},\n" + " {3,4}},{1,{2}})");
 
-        check("LinearSolve({{1, 1, 0}, {1, 0, 1}, {0, 1, 1}}, {1, 2, 3})", "{0,1,2}");
-        check("{{1, 1, 0}, {1, 0, 1}, {0, 1, 1}} . {0, 1, 2}", "{1,2,3}");
-        check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, 1, 1})", "{-1,1,0}");
-        check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, -2, 3})",
+		check("LinearSolve({{1, 1, 1}, {1, 2, 3}, {1, 4, 9}}, {1, 2, 3})", //
+				"{-1/2,2,-1/2}");
+		check("LinearSolve(N({{1, 1, 1}, {1, 2, 3}, {1, 4, 9}}), N({1, 2, 3}))", //
+				"{-0.5,2.0,-0.5}");
+		check("LinearSolve({{a, b}, {c, d}}, {x, y})", //
+				"{(d*x-b*y)/(-b*c+a*d),(c*x-a*y)/(b*c-a*d)}");
+		check("LinearSolve({{1, 1, 0}, {1, 0, 1}, {0, 1, 1}}, {1, 2, 3})", //
+				"{0,1,2}");
+		check("{{1, 1, 0}, {1, 0, 1}, {0, 1, 1}} . {0, 1, 2}", //
+				"{1,2,3}");
+		check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, 1, 1})", //
+				"{-1,1,0}");
+		check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, -2, 3})", //
                 "LinearSolve(\n" + "{{1,2,3},\n" + " {4,5,6},\n" + " {7,8,9}},{1,-2,3})");
-        check("LinearSolve({1, {2}}, {1, 2})", "LinearSolve({1,{2}},{1,2})");
+		check("LinearSolve({1, {2}}, {1, 2})", //
+				"LinearSolve({1,{2}},{1,2})");
     }
 
     public void testLiouvilleLambda() {
@@ -5282,7 +5326,8 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testNullSpace() {
-        check("NullSpace({{-1/3, 0, I}})", "{{I*3,0,1},\n" + " {0,1,0}}");
+		check("NullSpace({{-1/3, 0, I}})", //
+				"{{I*3,0,1},\n" + " {0,1,0}}");
         check("NullSpace({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})", "{{1,-2,1}}");
         check("A = {{1, 1, 0}, {1, 0, 1}, {0, 1, 1}}", "{{1,1,0},{1,0,1},{0,1,1}}");
         check("NullSpace(A)", "{}");
@@ -7637,6 +7682,10 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testSolve() {
+		// check("Solve(a*x^n+b*x^m==0, x)", //
+		// "");
+		check("Solve(a*x^2+b*x==0, x)", //
+				"{{x->0},{x->-b/a}}");
         check("Solve({Cos(x)*x==0, x > 10}, x)", "{}");
         check("Solve({Cos(x)*x==0, x ==0}, x)", "{{x->0}}");
         check("Solve({Cos(x)*x==0, x < 10}, x)", "{{x->0},{x->Pi/2}}");
