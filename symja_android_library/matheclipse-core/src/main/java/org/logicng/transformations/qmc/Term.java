@@ -31,11 +31,10 @@ class Term {
 
     private int countNonNegativeBits(Tristate[] bits) {
         int result = 0;
-        Tristate[] var3 = bits;
         int var4 = bits.length;
 
         for (int var5 = 0; var5 < var4; ++var5) {
-            Tristate bit = var3[var5];
+            Tristate bit = bits[var5];
             if (bit != Tristate.FALSE) {
                 ++result;
             }
@@ -99,7 +98,7 @@ class Term {
             } else {
                 Tristate[] newBits = (Tristate[]) Arrays.copyOf(this.bits, this.bits.length);
                 newBits[diffPosition] = Tristate.UNDEF;
-                List<Formula> newMinterms = new ArrayList(this.minterms);
+                List<Formula> newMinterms = new ArrayList<>(this.minterms);
                 newMinterms.addAll(other.minterms);
                 return new Term(newBits, newMinterms);
             }
@@ -111,7 +110,7 @@ class Term {
 
         assert this.bits.length == varOrder.size();
 
-        List<Literal> operands = new ArrayList(varOrder.size());
+        List<Literal> operands = new ArrayList<>(varOrder.size());
 
         for (int i = 0; i < this.bits.length; ++i) {
             if (this.bits[i] != Tristate.UNDEF) {
