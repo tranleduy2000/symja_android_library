@@ -578,6 +578,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testBooleanConvert() {
+		check("BooleanConvert((a||b)&&(c||d), \"CNF\")", //
+				"(a||b)&&(c||d)");
 		check("BooleanConvert(a&&!b||!a&&c||b&&!c, \"DNF\")", //
 				"a&&!b||!a&&c||b&&!c");
 
@@ -622,12 +624,20 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testBooleanMinimize() {
-		// check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c))", "a&&!b||!a&&c||b&&!c");
-		// check("BooleanMinimize((a||b)&&(c||d))", "a&&c||a&&d||b&&c||b&&d");
-		// check("BooleanMinimize((a||b)&&(c||d) )", "a&&c||a&&d||b&&c||b&&d");
-		// check("BooleanMinimize(a && b || ! a && b)", "b");
-		// check("BooleanMinimize(a && b || ! a && b )", "b");
+		check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c))", //
+				"a&&!b||!a&&c||b&&!c");
+		check("BooleanMinimize((a||b)&&(c||d))", //
+				"a&&c||a&&d||b&&c||b&&d");
+		check("BooleanMinimize(a && b || ! a && b)", //
+				"b");
 
+		// TODO CNF form after minimizing blows up the formula.
+		// check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c), \"CNF\")", //
+		// "(a||b||c)&&(!a||!b||!c)");
+		// check("BooleanMinimize((a||b)&&(c||d), \"CNF\")", //
+		// "(a||b)&&(a||b||c)&&(a||b||c||d)&&(a||b||d)&&(a||c||d)&&(b||c||d)&&(c||d)");
+		// check("BooleanMinimize(a && b || ! a && b, \"CNF\")", //
+		// "b");
 	}
 
 	public void testBooleanQ() {
