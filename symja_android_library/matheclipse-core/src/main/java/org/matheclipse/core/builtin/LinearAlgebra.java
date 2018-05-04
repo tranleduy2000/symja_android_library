@@ -612,21 +612,20 @@ public final class LinearAlgebra {
             IExpr x = ast.arg3();
             if (f.isList()) {
                 if (x.isAtom()) {
-                    // DesignMatrix[m_, f_List, x_?AtomQ] :=
-                    // DesignMatrix[m, {f}, ConstantArray[x, Length[f]]]
-                    return F.DesignMatrix(m, F.List(f), F.ConstantArray(x, F.Length(f)));
+					// DesignMatrix(m_, f_List, x_?AtomQ) :=
+					// DesignMatrix(m, {f}, ConstantArray(x, Length(f)))
+					return F.DesignMatrix(m, F.List(f), F.ConstantArray(x, F.ZZ(((IAST)f).argSize())));
                 } else if (x.isList()) {
-                    // DesignMatrix[m_, f_List, x_List] :=
-                    // Prepend[MapThread[Function[{g, y, r}, g /. y -> r], {f,
-                    // x, Most[#]}], 1]& /@ m
-                    return Map(Function(Prepend(
-                            MapThread(Function(List(g, y, r), ReplaceAll(g, Rule(y, r))), List(f, x, Most(Slot1))),
-                            C1)), m);
+					// DesignMatrix(m_, f_List, x_List) :=
+					// Prepend(MapThread(Function({g, y, r}, g /. y -> r), {f, x, Most(#)}), 1)& /@ m
+					return Map(
+							Function(Prepend(MapThread(Function(List(F.g, F.y, F.r), ReplaceAll(F.g, Rule(F.y, F.r))),
+									List(f, x, Most(Slot1))), C1)),
+							m);
                 }
             } else {
                 if (x.isAtom()) {
-                    // DesignMatrix[m_, f_, x_?AtomQ]': 'DesignMatrix[m, {f},
-                    // {x}]
+					// DesignMatrix(m_, f_, x_?AtomQ) :=  DesignMatrix(m, {f}, {x})
                     return F.DesignMatrix(m, F.List(f), F.List(x));
                 }
             }
@@ -643,7 +642,7 @@ public final class LinearAlgebra {
      * <pre>
      * Det(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the determinant of the <code>matrix</code>.
@@ -786,7 +785,7 @@ public final class LinearAlgebra {
      * <pre>
      * Dimensions(expr)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns a list of the dimensions of the expression <code>expr</code>.
@@ -1179,7 +1178,7 @@ public final class LinearAlgebra {
      * <pre>
      * Eigenvectors(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * get the numerical eigenvectors of the <code>matrix</code>.
@@ -1192,7 +1191,7 @@ public final class LinearAlgebra {
      * <li><a href="http://en.wikipedia.org/wiki/Eigenvalue">Wikipedia - Eigenvalue</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt;&gt; Eigenvectors({{1,0,0},{0,1,0},{0,0,1}})
      * {{1.0,0.0,0.0},{0.0,1.0,0.0},{0.0,0.0,1.0}}
@@ -1295,14 +1294,14 @@ public final class LinearAlgebra {
      * <pre>
      * EuclideanDistance(u, v)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns the euclidean distance between <code>u</code> and <code>v</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; EuclideanDistance({-1, -1}, {1, 1})
      * 2*Sqrt(2)
@@ -1402,7 +1401,7 @@ public final class LinearAlgebra {
      * <li><a href="http://en.wikipedia.org/wiki/Hilbert_matrix">Wikipedia - Hilbert matrix</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; HilbertMatrix(2)
      * {{1,1/2},
@@ -1439,14 +1438,14 @@ public final class LinearAlgebra {
      * <pre>
      * IdentityMatrix(n)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * gives the identity matrix with <code>n</code> rows and columns.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; IdentityMatrix(3)
      * {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
@@ -1476,14 +1475,14 @@ public final class LinearAlgebra {
      * <pre>
      * Inner(f, x, y, g)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes a generalised inner product of <code>x</code> and <code>y</code>, using a multiplication function
      * <code>f</code> and an addition function <code>g</code>.
      * </p>
      * </blockquote>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Inner(f, {a, b}, {x, y}, g)
      * g(f(a, x), f(b, y))
@@ -1491,14 +1490,14 @@ public final class LinearAlgebra {
      * <p>
      * 'Inner' can be used to compute a dot product:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Inner(Times, {a, b}, {c, d}, Plus) == {a, b} . {c, d}
      * </pre>
      * <p>
      * The inner product of two boolean matrices:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Inner(And, {{False, False}, {False, True}}, {{True, False}, {True, True}}, Or)
      * {{False, False}, {True, True}}
@@ -1506,29 +1505,6 @@ public final class LinearAlgebra {
      */
     private static class Inner extends AbstractFunctionEvaluator {
 
-        @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkRange(ast, 4, 5);
-
-            if (ast.arg2().isAST() && ast.arg3().isAST()) {
-                IExpr f = ast.arg1();
-                IAST list1 = (IAST) ast.arg2();
-                IAST list2 = (IAST) ast.arg3();
-                IExpr g;
-                if (ast.isAST3()) {
-                    g = F.Plus;
-                } else {
-                    g = ast.arg4();
-                }
-                IExpr head2 = list2.head();
-                if (!list1.head().equals(head2)) {
-                    return F.NIL;
-                }
-                InnerAlgorithm ic = new InnerAlgorithm(f, list1, list2, g);
-                return ic.inner();
-            }
-            return F.NIL;
-        }
 
         private static class InnerAlgorithm {
             final IExpr f;
@@ -1606,6 +1582,29 @@ public final class LinearAlgebra {
                 return result;
             }
         }
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 4, 5);
+
+			if (ast.arg2().isAST() && ast.arg3().isAST()) {
+				IExpr f = ast.arg1();
+				IAST list1 = (IAST) ast.arg2();
+				IAST list2 = (IAST) ast.arg3();
+				IExpr g;
+				if (ast.isAST3()) {
+					g = F.Plus;
+				} else {
+					g = ast.arg4();
+				}
+				IExpr head2 = list2.head();
+				if (!list1.head().equals(head2)) {
+					return F.NIL;
+				}
+				InnerAlgorithm ic = new InnerAlgorithm(f, list1, list2, g);
+				return ic.inner();
+			}
+			return F.NIL;
+		}
     }
 
     /**
@@ -1625,7 +1624,7 @@ public final class LinearAlgebra {
      * <li><a href="https://en.wikipedia.org/wiki/Invertible_matrix">Wikipedia - Invertible matrix</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Inverse({{1, 2, 0}, {2, 3, 0}, {3, 4, 1}})
      * {{-3,2,0},
@@ -1635,9 +1634,9 @@ public final class LinearAlgebra {
      * <p>
      * The matrix <code>{{1, 0}, {0, 0}}</code> is singular.
      * </p>
-     * <p>
+	 *
      * <pre>
-     * &gt;&gt; Inverse({{1, 0}, {0, 0}})
+	 * &gt;&gt; Inverse({{1, 0}, {0, 0}})
      * Inverse({{1, 0}, {0, 0}})
      *
      * &gt;&gt; Inverse({{1, 0, 0}, {0, Sqrt(3)/2, 1/2}, {0,-1 / 2, Sqrt(3)/2}})
@@ -1679,7 +1678,7 @@ public final class LinearAlgebra {
      * <pre>
      * JacobiMatrix(matrix, var)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * creates a Jacobian matrix.
@@ -1753,7 +1752,7 @@ public final class LinearAlgebra {
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; LeastSquares(Table(Complex(i,Rational(2 * i + 2 + j, 1 + 9 * i + j)),{i,0,3},{j,0,2}), {1,1,1,1})
      * {-1577780898195/827587904419-I*11087326045520/827587904419,35583840059240/5793115330933+I*275839049310660/5793115330933,-3352155369084/827587904419-I*2832105547140/827587904419}
@@ -1813,14 +1812,14 @@ public final class LinearAlgebra {
      * <pre>
      * LinearSolve(matrix, right)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * solves the linear equation system 'matrix . x = right' and returns one corresponding solution <code>x</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; LinearSolve({{1, 1, 0}, {1, 0, 1}, {0, 1, 1}}, {1, 2, 3})
      * {0,1,2}
@@ -1828,7 +1827,7 @@ public final class LinearAlgebra {
      * <p>
      * Test the solution:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; {{1, 1, 0}, {1, 0, 1}, {0, 1, 1}} . {0, 1, 2}
      * {1,2,3}
@@ -1836,7 +1835,7 @@ public final class LinearAlgebra {
      * <p>
      * If there are several solutions, one arbitrary solution is returned:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, 1, 1})
      * {-1,1,0}
