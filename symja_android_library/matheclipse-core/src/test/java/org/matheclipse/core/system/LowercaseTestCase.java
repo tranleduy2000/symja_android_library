@@ -580,6 +580,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testBooleanConvert() {
 		check("BooleanConvert((a||b)&&(c||d), \"CNF\")", //
 				"(a||b)&&(c||d)");
+
 		check("BooleanConvert(a&&!b||!a&&c||b&&!c, \"DNF\")", //
 				"a&&!b||!a&&c||b&&!c");
 
@@ -712,13 +713,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"4");
 		check("CarmichaelLambda(11)", //
 				"10");
-		check("CarmichaelLambda(35)",//
+		check("CarmichaelLambda(35)", //
 				"12");
 		check("CarmichaelLambda(50)", //
 				"20");
 		check("Table(CarmichaelLambda(-k), {k, 12})", //
 				"{1,1,2,2,4,2,6,2,6,4,10,2}");
-		check("Table(CarmichaelLambda(10^k), {k, 0, 10})",//
+		check("Table(CarmichaelLambda(10^k), {k, 0, 10})", //
 				"{1,4,20,100,500,5000,50000,500000,5000000,50000000,500000000}");
 	}
 
@@ -1791,8 +1792,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, f(x), x)", //
 				"{{1,f(2)},{1,f(3)},{1,f(5)},{1,f(7)}}");
 
-		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, x, x)", "{{1,2},{1,3},{1,5},{1,7}}");
-		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, f(x), x)", "{{1,f(2)},{1,f(3)},{1,f(5)},{1,f(7)}}");
+		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, x, x)", //
+				"{{1,2},{1,3},{1,5},{1,7}}");
+		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, f(x), x)", //
+				"{{1,f(2)},{1,f(3)},{1,f(5)},{1,f(7)}}");
 	}
 
 	public void testDet() {
@@ -3010,7 +3013,23 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("D(Fresnels(x),x)", "Sin(1/2*Pi*x^2)");
 	}
 
+	public void testFrobeniusNumber() {
+		check("FrobeniusNumber({1000, 1476, 3764, 4864, 4871, 7773})", //
+				"47350");
+		check("FrobeniusNumber({12,16,20,27})", //
+				"89");
+		check("Table(FrobeniusNumber({i, i + 1}), {i, 15})", //
+				"{-1,1,5,11,19,29,41,55,71,89,109,131,155,181,209}");
+	}
+
 	public void testFrobeniusSolve() {
+		check("FrobeniusSolve({1000, 1476, 3764, 4864, 4871, 7773}, 47349)", //
+				"{{5,2,4,2,3,0},{6,1,0,4,1,2},{7,5,1,3,3,0},{15,9,3,0,0,1},{17,12,0,1,0,1}}");
+		check("FrobeniusSolve({1000, 1476, 3764, 4864, 4871, 7773}, 47350)", //
+				"{}");
+		check("FrobeniusSolve({1000, 1476, 3764, 4864, 4871, 7773}, 47351)", //
+				"{{1,2,3,3,2,1},{3,5,0,4,2,1},{9,3,1,0,3,2},{12,13,3,0,1,0},{14,16,0,1,1,0},{32,2,\n" +
+				"2,0,1,0}}");
 		check("FrobeniusSolve({2, 3, 4}, 29)",
 				"{{0,3,5},{0,7,2},{1,1,6},{1,5,3},{1,9,0},{2,3,4},{2,7,1},{3,1,5},{3,5,2},{4,3,3},{\n"
 						+ "4,7,0},{5,1,4},{5,5,1},{6,3,2},{7,1,3},{7,5,0},{8,3,1},{9,1,2},{10,3,0},{11,1,1},{\n"
@@ -4223,6 +4242,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("LinearSolve({{1,0,-1,0},{0,1,0,-1},{1,-2,-1,0},{-1,0,3,1}},"//
 				+ "{0.06,0.06,-0.4,-0.06})", //
 				"{-0.025,0.23,-0.085,0.17}");
+
 		check("LinearSolve({{a, b, c, d}}, {x})", //
 				"{x/a,0,0,0}");
 		check("LinearSolve({{a, b,c,d,e}, {f,g,h,i,j}}, {x, y})", //
@@ -4248,6 +4268,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{-0.5,2.0,-0.5}");
 		check("LinearSolve({{a, b}, {c, d}}, {x, y})", //
 				"{(d*x-b*y)/(-b*c+a*d),(c*x-a*y)/(b*c-a*d)}");
+
 		check("LinearSolve({{1, 1, 0}, {1, 0, 1}, {0, 1, 1}}, {1, 2, 3})", //
 				"{0,1,2}");
 		check("{{1, 1, 0}, {1, 0, 1}, {0, 1, 1}} . {0, 1, 2}", //
@@ -4444,13 +4465,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testMapThread() {
-//		check("MapThread(f, {{{a, b}, {c, d}}, {{u, v}, {s, t}}}, 2)", //
-//				"{{f(a,c),f(b,d)},{f(u,s),f(v,t)}}");
+		// check("MapThread(f, {{{a, b}, {c, d}}, {{u, v}, {s, t}}}, 2)", //
+		// "{{f(a,c),f(b,d)},{f(u,s),f(v,t)}}");
 		check("MapThread(f, {{a, b, c}, {x, y, z}})", //
 				"{f(a,x),f(b,y),f(c,z)}");
+
 		check("MapThread(f, {{a, b, c}, {1, 2, 3}})", //
 				"{f(a,1),f(b,2),f(c,3)}");
 		// TODO
+
 		// check("MapThread(f, {{a, b}, {c, d}}, {1})", "");
 		// check("MapThread(f, {{a, b}, {c, d}}, 2)", "");
 		// check("MapThread(f, {{a}, {b, c}})", "");
@@ -5354,6 +5377,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{0,0,0}");
 		check("NullSpace({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})", //
 				"{{1,-2,1}}");
+
 		check("NullSpace({{-1/3, 0, I}})", //
 				"{{I*3,0,1},\n" + " {0,1,0}}");
 		check("NullSpace({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})", "{{1,-2,1}}");
@@ -7076,13 +7100,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testRowReduce() {
 		check("RowReduce({{1, 2, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 1}, {0, 0, -1}, {1, 2, 1}})", //
-				"{{1,2,0},\n" +
-				" {0,0,1},\n" +
-				" {0,0,0},\n" +
-				" {0,0,0},\n" +
-				" {0,0,0},\n" +
-				" {0,0,0},\n" +
-				" {0,0,0}}");
+				"{{1,2,0},\n" + " {0,0,1},\n" + " {0,0,0},\n" + " {0,0,0},\n" + " {0,0,0},\n" + " {0,0,0},\n"
+						+ " {0,0,0}}");
 
 		check("RowReduce({{1, 2, 3, 1}, {4, 5, 6, -1}, {7, 8, 9, 2}})",
 				"{{1,0,-1,0},\n" + " {0,1,2,0},\n" + " {0,0,0,1}}");
