@@ -3512,7 +3512,12 @@ public final class LinearAlgebra {
 		 */
 		public IAST transpose(final IAST matrix, int rows, int cols) {
 			final IASTAppendable transposedMatrix = F.ast(F.List, cols, true);
-			transposedMatrix.setArgs(cols + 1, i -> F.ast(F.List, rows, true));
+			transposedMatrix.setArgs(cols + 1, new IntFunction<IExpr>() {
+                @Override
+                public IExpr apply(int i) {
+                    return F.ast(F.List, rows, true);
+                }
+            });
 			// for (int i = 1; i <= cols; i++) {
 			// transposedMatrix.set(i, F.ast(F.List, rows, true));
 			// }
@@ -3952,9 +3957,19 @@ public final class LinearAlgebra {
 			}
 		}
 		IASTAppendable list = F.ListAlloc(rows < cols - 1 ? cols - 1 : rows);
-		list.appendArgs(0, rows, j -> F.Together.of(engine, rowReduced.getEntry(j, cols - 1)));
+		list.appendArgs(0, rows, new IntFunction<IExpr>() {
+            @Override
+            public IExpr apply(int j) {
+                return F.Together.of(engine, rowReduced.getEntry(j, cols - 1));
+            }
+        });
 		if (rows < cols - 1) {
-			list.appendArgs(rows, cols - 1, i -> F.C0);
+			list.appendArgs(rows, cols - 1, new IntFunction<IExpr>() {
+                @Override
+                public IExpr apply(int i) {
+                    return F.C0;
+                }
+            });
 		}
 		return list;
 	}
@@ -3991,7 +4006,12 @@ public final class LinearAlgebra {
 			final IAST sList = smallList;
 			int size = smallList.size();
 			IASTAppendable list = F.ListAlloc(size);
-			list.appendArgs(size, j -> F.Rule(listOfVariables.get(j), engine.evaluate(sList.get(j))));
+			list.appendArgs(size, new IntFunction<IExpr>() {
+                @Override
+                public IExpr apply(int j) {
+                    return F.Rule(listOfVariables.get(j), engine.evaluate(sList.get(j)));
+                }
+            });
 
 			resultList.append(list);
 			return resultList;
