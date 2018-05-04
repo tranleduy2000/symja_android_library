@@ -31,6 +31,7 @@ import org.matheclipse.core.visit.AbstractVisitorLong;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
 import org.matheclipse.parser.client.math.MathException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Structure {
