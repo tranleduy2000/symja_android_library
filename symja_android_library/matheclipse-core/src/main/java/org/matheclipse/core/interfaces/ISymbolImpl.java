@@ -13,4 +13,9 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     public IExpr mapConstantDouble(DoubleFunction<IExpr> function) {
         return F.NIL;
     }
+
+    @Override
+    public boolean isTrue(IExpr... args) {
+        return of(args).isTrue();
+    }
 }
