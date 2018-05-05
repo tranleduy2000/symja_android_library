@@ -1967,7 +1967,7 @@ public final class LinearAlgebra {
 					result.append(F.C0);
 				}
 			}
-			IExpr temp = engine.evaluate(result);
+			IExpr temp = engine.evalQuiet(result);
 			if (temp.isAST()) {
 				IAST ast = (IAST) temp;
 				for (int k = 1; k < ast.size(); k++) {
@@ -2011,7 +2011,7 @@ public final class LinearAlgebra {
 					result.append(F.C0);
 				}
 			}
-			IExpr temp = engine.evaluate(result);
+			IExpr temp = engine.evalQuiet(result);
 			if (temp.isAST()) {
 				IAST ast = (IAST) temp;
 				for (int k = 1; k < ast.size(); k++) {
@@ -2075,7 +2075,7 @@ public final class LinearAlgebra {
 				}
 			}
 
-			IExpr temp = engine.evaluate(result);
+			IExpr temp = engine.evalQuiet(result);
 			if (temp.isAST()) {
 				IAST ast = (IAST) temp;
 				for (int k = 1; k < ast.size(); k++) {
