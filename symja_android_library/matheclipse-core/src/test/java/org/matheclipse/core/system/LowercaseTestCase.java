@@ -1781,12 +1781,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testDesignMatrix() {
-//		check("data = Table({i, i^(3/2) }, {i, 2})", //
-//				"{{1,1},{2,2*Sqrt(2)}}");
-//		check("DesignMatrix(data, x, x)", //
-//				"{{1,1},{1,2}}");
-//		check("DesignMatrix(data, {x, x^2}, x)", //
-//				"{{1,{{x,x^2}},{x,x},{1}},{1,{{x,x^2}},{x,x},{2}}}");
+		// check("data = Table({i, i^(3/2) }, {i, 2})", //
+		// "{{1,1},{2,2*Sqrt(2)}}");
+		// check("DesignMatrix(data, x, x)", //
+		// "{{1,1},{1,2}}");
+		// check("DesignMatrix(data, {x, x^2}, x)", //
+		// "{{1,{{x,x^2}},{x,x},{1}},{1,{{x,x^2}},{x,x},{2}}}");
 		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, x, x)", //
 				"{{1,2},{1,3},{1,5},{1,7}}");
 		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, f(x), x)", //
@@ -4465,20 +4465,27 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testMapThread() {
-		// check("MapThread(f, {{{a, b}, {c, d}}, {{u, v}, {s, t}}}, 2)", //
-		// "{{f(a,c),f(b,d)},{f(u,s),f(v,t)}}");
+		check("MapThread(f, {}, 1)", //
+				"{}");
+		check("MapThread(f, {a, b}, 1)", //
+				"MapThread(f,{a,b},1)");
+		check("MapThread(f, {a, b}, 0)", //
+				"f(a,b)");
+		check("MapThread(f, {}, 0)", //
+				"f()");
+		check("MapThread(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 2)", //
+				"{{f({a,b},{u,v}),f({c,d},{s,t})}}");
+		check("MapThread(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 3)", //
+				"{{{f(a,u),f(b,v)},{f(c,s),f(d,t)}}}");
+		check("MapThread(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 4)", //
+				"MapThread(f,{{{{a,b},{c,d}}},{{{u,v},{s,t}}}},4)");
+		check("MapThread(f, {{{a, b}, {c, d}}, {{u, v}, {s, t}}}, 2)", //
+				"{{f(a,u),f(b,v)},{f(c,s),f(d,t)}}");
 		check("MapThread(f, {{a, b, c}, {x, y, z}})", //
 				"{f(a,x),f(b,y),f(c,z)}");
 
 		check("MapThread(f, {{a, b, c}, {1, 2, 3}})", //
 				"{f(a,1),f(b,2),f(c,3)}");
-		// TODO
-
-		// check("MapThread(f, {{a, b}, {c, d}}, {1})", "");
-		// check("MapThread(f, {{a, b}, {c, d}}, 2)", "");
-		// check("MapThread(f, {{a}, {b, c}})", "");
-		// check("MapThread(f, {}) ", "");
-		// check("MapThread(f, {a, b}, 0)", "");
 	}
 
 	public void testMatchingDissimilarity() {
