@@ -108,7 +108,7 @@ dependencies {
 ```
 
 ```gradle
-android{
+android {
     defaultConfig {
         multiDexEnabled true
     }
