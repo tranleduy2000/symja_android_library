@@ -1,23 +1,7 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.C3;
-import static org.matheclipse.core.expression.F.C4;
-import static org.matheclipse.core.expression.F.C5;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.evalExpandAll;
-import static org.matheclipse.core.expression.F.integer;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.annotation.Nonnull;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.IntFunction;
 
 import org.hipparchus.analysis.solvers.LaguerreSolver;
 import org.hipparchus.linear.Array2DRowRealMatrix;
@@ -56,11 +40,18 @@ import org.matheclipse.core.polynomials.ExprMonomial;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
 import org.matheclipse.core.polynomials.ExprTermOrder;
+import org.matheclipse.core.polynomials.PolynomialsUtils;
 import org.matheclipse.core.polynomials.QuarticSolver;
 import org.matheclipse.core.reflection.system.MonomialList;
+import org.matheclipse.core.reflection.system.rules.LegendrePRules;
+import org.matheclipse.core.reflection.system.rules.LegendreQRules;
 
-import com.duy.lambda.Consumer;
-import com.duy.lambda.IntFunction;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.annotation.Nonnull;
 
 import edu.jas.arith.BigRational;
 import edu.jas.arith.ModLong;
@@ -79,13 +70,32 @@ import edu.jas.root.Rectangle;
 import edu.jas.ufd.Squarefree;
 import edu.jas.ufd.SquarefreeFactory;
 
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C3;
+import static org.matheclipse.core.expression.F.C4;
+import static org.matheclipse.core.expression.F.C5;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.evalExpandAll;
+import static org.matheclipse.core.expression.F.integer;
+
 public class PolynomialFunctions {
 	static {
+		F.BellY.setEvaluator(new BellY());
+		F.ChebyshevT.setEvaluator(new ChebyshevT());
+		F.ChebyshevU.setEvaluator(new ChebyshevU());
 		F.Coefficient.setEvaluator(new Coefficient());
 		F.CoefficientList.setEvaluator(new CoefficientList());
 		F.CoefficientRules.setEvaluator(new CoefficientRules());
 		F.Discriminant.setEvaluator(new Discriminant());
 		F.Exponent.setEvaluator(new Exponent());
+		F.HermiteH.setEvaluator(new HermiteH());
+		F.LaguerreL.setEvaluator(new LaguerreL());
+		F.LegendreP.setEvaluator(new LegendreP());
+		F.LegendreQ.setEvaluator(new LegendreQ());
 		F.NRoots.setEvaluator(new NRoots());
 		F.Resultant.setEvaluator(new Resultant());
 		F.RootIntervals.setEvaluator(new RootIntervals());
@@ -1408,6 +1418,196 @@ public class PolynomialFunctions {
 
 	}
 
+	final private static class ChebyshevT extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+			IExpr arg1 = ast.arg1();
+			IExpr arg2 = ast.arg2();
+			if (arg1.isInteger()) {
+				int degree = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
+				if (degree == Integer.MIN_VALUE) {
+					return F.NIL;
+				}
+				if (degree < 0) {
+					degree *= -1;
+				}
+				return PolynomialsUtils.createChebyshevPolynomial(degree, ast.arg2());
+			}
+			if (arg2.isZero()) {
+				return F.Cos(F.Times(F.C1D2, F.Pi, arg1));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+	}
+
+	final private static class ChebyshevU extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+			IExpr arg1 = ast.arg1();
+			IExpr arg2 = ast.arg2();
+			if (arg1.isInteger()) {
+				int degree = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
+				if (degree == Integer.MIN_VALUE) {
+					return F.NIL;
+				}
+
+				if (degree < 0) {
+					return F.NIL;
+				}
+				if (degree == 0) {
+					return F.C1;
+				}
+				if (degree == 1) {
+					return F.Times(F.C2, arg2);
+				}
+				return F.Expand(F.Subtract(F.Times(F.C2, arg2, F.ChebyshevU(F.integer(degree - 1), arg2)),
+						F.ChebyshevU(F.integer(degree - 2), arg2)));
+			}
+			if (arg2.isOne()) {
+				return F.Plus(F.C1, arg1);
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+	}
+
+	final private static class BellY extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 4);
+			if (ast.arg2().isInteger() && ast.arg2().isInteger()) {
+				int n = ast.arg1().toIntDefault(Integer.MIN_VALUE);
+				int k = ast.arg2().toIntDefault(Integer.MIN_VALUE);
+				if (n < 0 || k < 0 || //
+						!ast.arg3().isList() || //
+						ast.arg3().isMatrix() != null) {
+					return F.NIL;
+				}
+				if (n == 0 && k == 0) {
+					return F.C1;
+				}
+				if (n == 0 || k == 0) {
+					return F.C0;
+				}
+				int max = n - k + 2;
+				if (max >= 0) {
+					return bellIncompletePolynomial(n, k, (IAST) ast.arg3());
+				}
+			}
+			return F.NIL;
+		}
+
+		private IExpr bellIncompletePolynomial(int n, int k, IAST symbols) {
+			if (n == 0 && k == 0) {
+				return F.C1;
+			}
+			if (n == 0 || k == 0) {
+				return F.C0;
+			}
+			IExpr s = F.C0;
+			int a = 1;
+			int max = n - k + 2;
+			for (int m = 1; m < max; m++) {
+				s = s.plus(F.Times(a, bellIncompletePolynomial(n - m, k - 1, symbols), symbols.get(m)));
+				a = a * (n - m) / m;
+			}
+			// for m in range(1, n - k + 2):
+			// s += a * bell._bell_incomplete_poly(
+			// n - m, k - 1, symbols) * symbols[m - 1]
+			// a = a * (n - m) / m
+			// return expand_mul(s)
+			return s;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			super.setUp(newSymbol);
+		}
+	}
+
+	final private static class HermiteH extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+
+			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
+			if (degree > Integer.MIN_VALUE) {
+				return PolynomialsUtils.createHermitePolynomial(degree, ast.arg2());
+			}
+			return F.NIL;
+		}
+
+	}
+
+	final private static class LaguerreL extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
+			if (degree == 0) {
+				return F.C1;
+			}
+			if (degree > 0) {
+				return PolynomialsUtils.createLaguerrePolynomial(degree, ast.arg2());
+			}
+			return F.NIL;
+		}
+
+	}
+
+	final private static class LegendreP extends AbstractFunctionEvaluator implements LegendrePRules {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+
+			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
+			if (degree > Integer.MIN_VALUE) {
+				return PolynomialsUtils.createLegendrePolynomial(degree, ast.arg2());
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IAST getRuleAST() {
+			return RULES;
+		}
+
+	}
+
+	final static class LegendreQ extends AbstractFunctionEvaluator implements LegendreQRules {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+
+			return F.NIL;
+		}
+
+		@Override
+		public IAST getRuleAST() {
+			return RULES;
+		}
+
+	}
 	/**
 	 * Get the coefficient list of a univariate polynomial.
 	 * 
