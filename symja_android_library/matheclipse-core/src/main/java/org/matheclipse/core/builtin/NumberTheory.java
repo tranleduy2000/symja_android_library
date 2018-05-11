@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.CombinatoricsUtils;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.NumberTheory.*;
 import org.matheclipse.core.convert.JASConvert;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
@@ -3324,7 +3325,7 @@ public final class NumberTheory {
 				throw new ArithmeticException("StirlingS2(n,k) n is not a positive int number");
 			}
 			for (int i = 0; i < ki; i++) {
-				IInteger bin = Binomial.binomial(k, F.ZZ(i));
+				IInteger bin = NumberTheory.Binomial.binomial(k, F.ZZ(i));
 				IInteger pow = k.add(F.ZZ(-i)).pow(nInt);
 				if ((i & 1) == 1) { // isOdd(i) ?
 					sum = sum.add(bin.negate().multiply(pow));
