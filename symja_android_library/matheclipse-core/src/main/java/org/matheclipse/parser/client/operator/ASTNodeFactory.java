@@ -15,11 +15,6 @@
  */
 package org.matheclipse.parser.client.operator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.expression.F;
@@ -34,6 +29,11 @@ import org.matheclipse.parser.client.ast.Pattern3Node;
 import org.matheclipse.parser.client.ast.PatternNode;
 import org.matheclipse.parser.client.ast.StringNode;
 import org.matheclipse.parser.client.ast.SymbolNode;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ASTNodeFactory implements IParserFactory {
 
@@ -161,7 +161,7 @@ public class ASTNodeFactory implements IParserFactory {
 			new PostfixOperator("++", "Increment", 660), new PostfixOperator("!!", "Factorial2", 610),
 			new InfixOperator("<=", "LessEqual", 290, InfixOperator.NONE),
 			new InfixOperator("**", "NonCommutativeMultiply", 510, InfixOperator.NONE),
-			new PostfixOperator("!", "Factorial", 610),
+			new PostfixOperator("!", "Factorial",610 ),
 			new InfixOperator("*", "Times", TIMES_PRECEDENCE, InfixOperator.NONE),
 			new InfixOperator("^", "Power", POWER_PRECEDENCE, InfixOperator.RIGHT_ASSOCIATIVE),
 			new InfixOperator(".", "Dot", 490, InfixOperator.NONE), new PrefixOperator("!", "Not", 230),
