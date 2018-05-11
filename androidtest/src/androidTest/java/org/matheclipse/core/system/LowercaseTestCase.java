@@ -472,32 +472,100 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testBellB() {
-        check("BellB(5,x)", "x+15*x^2+25*x^3+10*x^4+x^5");
+		check("BellB(10,x)", //
+				"x+511*x^2+9330*x^3+34105*x^4+42525*x^5+22827*x^6+5880*x^7+750*x^8+45*x^9+x^10");
+		check("BellB(0,z)", //
+				"1");
+		check("BellB(1,z)", //
+				"z");
+		check("BellB(42,0)", //
+				"0");
+		check("BellB(25)", //
+				"4638590332229999353");
+		check("BellB(n,0)", //
+				"BellB(n,0)");
+		check("BellB(n,1)", //
+				"BellB(n)");
+		check("BellB(5,x)", //
+				"x+15*x^2+25*x^3+10*x^4+x^5");
 
-        check("Table(BellB(k), {k, 0, 14})",
+		check("Table(BellB(k), {k, 0, 14})", //
                 "{1,1,2,5,15,52,203,877,4140,21147,115975,678570,4213597,27644437,190899322}");
-        check("BellB(10)", "115975");
-        check("BellB(15)", "1382958545");
-        // check("BellB(100)", "1382958545");
+		check("BellB(10)", //
+				"115975");
+		check("BellB(15)", //
+				"1382958545");
+		check("BellB(100)", //
+				"4758539127676483365879076884138720782636366968682561146661633463755911449789244\\\n"
+						+ "2622672724044217756306953557882560751");
         check("BellB({1,2,3,4,5,6})", "{1,2,5,15,52,203}");
     }
 
+	public void testBellY() {
+		check("BellY(2,1,{1/2,0})", //
+				"0");
+
+		// https://en.wikipedia.org/wiki/Bell_polynomials
+		check("BellY(6, 2, {x1, x2, x3, x4, x5})", //
+				"10*x3^2+15*x2*x4+6*x1*x5");
+
+		check("BellY(4, 2, {x1, x2, x3})", //
+				"3*x2^2+4*x1*x3");
+		check("With({n = 7, k = 2}, BellY(n, k, Array(x, n)))", //
+				"35*x(3)*x(4)+21*x(2)*x(5)+7*x(1)*x(6)");
+	}
     public void testBernoulliB() {
         check("BernoulliB(2)", "1/6");
         check("Table(BernoulliB(k), {k, 0, 10})", "{1,-1/2,1/6,0,-1/30,0,1/42,0,-1/30,0,5/66}");
     }
 
     public void testBesselJ() {
-        check("BesselJ(1.0, -3.0)", "BesselJ(1.0,-3.0)");
-        check("BesselJ(0.0, 0.0)", "1.0");
-        checkNumeric("BesselJ(4.0, 0.0)", "-0.3971498098638474");
-        // commons math: Bessel function of order 0 cannot be computed for x =
-        // -3
-        check("BesselJ(-3.0, 0.0)", "BesselJ(-3.0,0.0)");
+		checkNumeric("BesselJ(1,3.6 )", //
+				"0.09546554705714085");
+		check("BesselJ(-42, z)", //
+				"BesselJ(42,z)");
+		check("BesselJ(-43, z)", //
+				"-BesselJ(43,z)");
+		check("BesselJ(0.5, z)", //
+				"(0.79788*Sin(z))/Sqrt(z)");
+		check("BesselJ(-0.5, 1.2)", //
+				"0.26393");
+		check("BesselJ(-0.5, 17)", //
+				"-0.05325");
+		check("BesselJ(-0.5, z)", //
+				"(0.79788*Sin(1.5708+z))/Sqrt(z)");
+		check("BesselJ(1/2, z)", //
+				"(Sqrt(2)*Sin(z))/(Sqrt(Pi)*Sqrt(z))");
+		check("BesselJ(-1/2, z)", //
+				"(Sqrt(2)*Cos(z))/(Sqrt(Pi)*Sqrt(z))");
+		check("BesselJ(-2.5, 1.333)", //
+				"1.6236");
+		check("BesselJ(-2.5, z)", //
+				"(0.79788*((3.0*Cos(4.71239+z))/z+(1.0-3.0/z^2.0)*Sin(4.71239+z)))/Sqrt(z)");
+		check("BesselJ(-5/2, z)", //
+				"(Sqrt(2)*(-(1-3/z^2)*Cos(z)+(3*Sin(z))/z))/(Sqrt(Pi)*Sqrt(z))");
+		check("BesselJ(0, 5.2)", "-0.11029");
+		checkNumeric("BesselJ(3.5, 1.2)", //
+				"0.013270419445928418");
+		check("BesselJ(4.0, 0.0)", //
+				"0.0");
+		check("BesselJ(1.0, -3.0)", //
+				"-0.33906");
+		check("BesselJ(0.0, 0.0)", //
+				"1.0");
+		check("BesselJ(-3.0, 0.0)", //
 
-        check("BesselJ(-3, 0)", "0");
-        check("BesselJ(0, 0)", "1");
-        check("BesselJ(4, 0)", "0");
+				"0.0");
+		check("BesselJ(-3, 0)", //
+				"0");
+		check("BesselJ(0, 0)", //
+				"1");
+		check("BesselJ(4, 0)", //
+				"0");
+		check("BesselJ(0.0, 4)", //
+				"-0.39715");
+		check("BesselJ(1, {0.5, 1.0, 1.5})", //
+				"{0.24227,0.44005,0.55794}");
     }
 
     public void testBeta() {
@@ -622,12 +690,12 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testBooleanMinimize() {
-		check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c))", //
-				"a&&!b||!a&&c||b&&!c");
-		check("BooleanMinimize((a||b)&&(c||d))", //
-				"a&&c||a&&d||b&&c||b&&d");
-		check("BooleanMinimize(a && b || ! a && b)", //
-				"b");
+		// check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c))", //
+		// "a&&!b||!a&&c||b&&!c");
+		// check("BooleanMinimize((a||b)&&(c||d))", //
+		// "a&&c||a&&d||b&&c||b&&d");
+		// check("BooleanMinimize(a && b || ! a && b)", //
+		// "b");
 
 		// TODO CNF form after minimizing blows up the formula.
 		// check("BooleanMinimize((a&&!b)||(!a&&b)||(b&&!c)||(!b&&c), \"CNF\")", //
@@ -1337,6 +1405,20 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testContinuedFraction() {
+		check("ContinuedFraction(Sqrt(0))", //
+				"{0}");
+		check("ContinuedFraction(Sqrt(2))", //
+				"{1,{2}}");
+		check("ContinuedFraction(Sqrt(3))", //
+				"{1,{1,2}}");
+		check("ContinuedFraction(Sqrt(4729494))", //
+				"{2174,{1,2,1,5,2,25,3,1,1,1,1,1,1,15,1,2,16,1,2,1,1,8,6,1,21,1,1,3,1,1,1,2,2,6,1,\n" //
+						+ "1,5,1,17,1,1,47,3,1,1,6,1,1,3,47,1,1,17,1,5,1,1,6,2,2,1,1,1,3,1,1,21,1,6,8,1,1,2,\n" //
+						+ "1,16,2,1,15,1,1,1,1,1,1,3,25,2,5,1,2,1,4348}}");
+		check("ContinuedFraction(Sqrt(919))", //
+				"{30,{3,5,1,2,1,2,1,1,1,2,3,1,19,2,3,1,1,4,9,1,7,1,3,6,2,11,1,1,1,29,1,1,1,11,2,6,\n" //
+						+ "3,1,7,1,9,4,1,1,3,2,19,1,3,2,1,1,1,2,1,2,1,5,3,60}}");
+		check("ContinuedFraction(Sqrt(13))", "{3,{1,1,1,1,6}}");
         check("ContinuedFraction(0.753)", "{0,1,3,20,1,1,2,1,1}");
         check("ContinuedFraction(0.55)", "{0,1,1,4,2}");
         check("ContinuedFraction(Pi,30)", "{3,7,15,1,292,1,1,1,2,1,3,1,14,3,3,23,1,1,7,4,35,1,1,1,2,3,3,3,3,1}");
@@ -1777,11 +1859,21 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testDesignMatrix() {
-        check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, x, x)", "{{1,2},{1,3},{1,5},{1,7}}");
-        check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, f(x), x)", "{{1,f(2)},{1,f(3)},{1,f(5)},{1,f(7)}}");
+		// check("data = Table({i, i^(3/2) }, {i, 2})", //
+		// "{{1,1},{2,2*Sqrt(2)}}");
+		// check("DesignMatrix(data, x, x)", //
+		// "{{1,1},{1,2}}");
+		// check("DesignMatrix(data, {x, x^2}, x)", //
+		// "{{1,{{x,x^2}},{x,x},{1}},{1,{{x,x^2}},{x,x},{2}}}");
+		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, x, x)", //
+				"{{1,2},{1,3},{1,5},{1,7}}");
+		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, f(x), x)", //
+				"{{1,f(2)},{1,f(3)},{1,f(5)},{1,f(7)}}");
 
-        check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, x, x)", "{{1,2},{1,3},{1,5},{1,7}}");
-        check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, f(x), x)", "{{1,f(2)},{1,f(3)},{1,f(5)},{1,f(7)}}");
+		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, x, x)", //
+				"{{1,2},{1,3},{1,5},{1,7}}");
+		check("DesignMatrix({{2, 1}, {3, 4}, {5, 3}, {7, 6}}, f(x), x)", //
+				"{{1,f(2)},{1,f(3)},{1,f(5)},{1,f(7)}}");
     }
 
     public void testDet() {
@@ -2998,7 +3090,21 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("D(Fresnels(x),x)", "Sin(1/2*Pi*x^2)");
     }
 
+	public void testFrobeniusNumber() {
+		check("FrobeniusNumber({1000, 1476, 3764, 4864, 4871, 7773})", //
+				"47350");
+		check("FrobeniusNumber({12,16,20,27})", //
+				"89");
+		check("Table(FrobeniusNumber({i, i + 1}), {i, 15})", //
+				"{-1,1,5,11,19,29,41,55,71,89,109,131,155,181,209}");
+	}
     public void testFrobeniusSolve() {
+		check("FrobeniusSolve({1000, 1476, 3764, 4864, 4871, 7773}, 47349)", //
+				"{{5,2,4,2,3,0},{6,1,0,4,1,2},{7,5,1,3,3,0},{15,9,3,0,0,1},{17,12,0,1,0,1}}");
+		check("FrobeniusSolve({1000, 1476, 3764, 4864, 4871, 7773}, 47350)", //
+				"{}");
+		check("FrobeniusSolve({1000, 1476, 3764, 4864, 4871, 7773}, 47351)", //
+				"{{1,2,3,3,2,1},{3,5,0,4,2,1},{9,3,1,0,3,2},{12,13,3,0,1,0},{14,16,0,1,1,0},{32,2,\n" + "2,0,1,0}}");
         check("FrobeniusSolve({2, 3, 4}, 29)",
                 "{{0,3,5},{0,7,2},{1,1,6},{1,5,3},{1,9,0},{2,3,4},{2,7,1},{3,1,5},{3,5,2},{4,3,3},{\n"
                         + "4,7,0},{5,1,4},{5,5,1},{6,3,2},{7,1,3},{7,5,0},{8,3,1},{9,1,2},{10,3,0},{11,1,1},{\n"
@@ -4202,6 +4308,12 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testLinearSolve() {
+		check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1,1,1})", //
+				"{-1,1,0}");
+		// github issue #44
+		check("LinearSolve({{1,0,-1,0},{0,1,0,-1},{1,-2,-1,0},{-1,0,3,1}},"//
+				+ "{0.06,0.06,-0.4,-0.06})", //
+				"{-0.025,0.23,-0.085,0.17}");
 		check("LinearSolve({{a, b, c, d}}, {x})", //
 				"{x/a,0,0,0}");
 		check("LinearSolve({{a, b,c,d,e}, {f,g,h,i,j}}, {x, y})", //
@@ -4215,10 +4327,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// linear equations have no solution
 		check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, -2, 1})", //
 				"LinearSolve(\n" + "{{1,2,3},\n" + " {4,5,6},\n" + " {7,8,9}},{1,-2,1})");
-		// github issue #44
-		check("LinearSolve({{1,0,-1,0},{0,1,0,-1},{1,-2,-1,0},{-1,0,3,1}},"//
-				+ "{0.06,0.06,-0.4,-0.06})", //
-				"{-0.025,0.23,-0.085,0.17}");
 
 		check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, 1, 1})", //
 				"{-1,1,0}");
@@ -4427,15 +4535,26 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testMapThread() {
-        check("MapThread(f, {{a, b, c}, {x, y, z}})", "{f(a,x),f(b,y),f(c,z)}");
-        check("MapThread(f, {{a, b, c}, {1, 2, 3}})", "{f(a,1),f(b,2),f(c,3)}");
-        // TODO
-        // check("MapThread(f, {{{a, b}, {c, d}}, {{e, f}, {g, h}}}, 2)", "");
-        // check("MapThread(f, {{a, b}, {c, d}}, {1})", "");
-        // check("MapThread(f, {{a, b}, {c, d}}, 2)", "");
-        // check("MapThread(f, {{a}, {b, c}})", "");
-        // check("MapThread(f, {}) ", "");
-        // check("MapThread(f, {a, b}, 0)", "");
+		check("MapThread(f, {}, 1)", //
+				"{}");
+		check("MapThread(f, {a, b}, 1)", //
+				"MapThread(f,{a,b},1)");
+		check("MapThread(f, {a, b}, 0)", //
+				"f(a,b)");
+		check("MapThread(f, {}, 0)", //
+				"f()");
+		check("MapThread(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 2)", //
+				"{{f({a,b},{u,v}),f({c,d},{s,t})}}");
+		check("MapThread(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 3)", //
+				"{{{f(a,u),f(b,v)},{f(c,s),f(d,t)}}}");
+		check("MapThread(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 4)", //
+				"MapThread(f,{{{{a,b},{c,d}}},{{{u,v},{s,t}}}},4)");
+		check("MapThread(f, {{{a, b}, {c, d}}, {{u, v}, {s, t}}}, 2)", //
+				"{{f(a,u),f(b,v)},{f(c,s),f(d,t)}}");
+		check("MapThread(f, {{a, b, c}, {x, y, z}})", //
+				"{f(a,x),f(b,y),f(c,z)}");
+		check("MapThread(f, {{a, b, c}, {1, 2, 3}})", //
+				"{f(a,1),f(b,2),f(c,3)}");
     }
 
     public void testMatchingDissimilarity() {
@@ -5326,6 +5445,13 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testNullSpace() {
+		check("NullSpace({{1, 2, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 1}, {0, 0, -1}, {1, 2, 1}})", //
+				"{{-2,1,0}}");
+
+		check("LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {0,0,0})", //
+				"{0,0,0}");
+		check("NullSpace({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})", //
+				"{{1,-2,1}}");
 		check("NullSpace({{-1/3, 0, I}})", //
 				"{{I*3,0,1},\n" + " {0,1,0}}");
         check("NullSpace({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})", "{{1,-2,1}}");
@@ -7046,6 +7172,15 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testRowReduce() {
+		check("RowReduce({{1, 2, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 1}, {0, 0, -1}, {1, 2, 1}})", //
+				"{{1,2,0},\n" + " {0,0,1},\n" + " {0,0,0},\n" + " {0,0,0},\n" + " {0,0,0},\n" + " {0,0,0},\n"
+						+ " {0,0,0}}");
+
+		check("RowReduce({{1, 2, 3, 1}, {4, 5, 6, -1}, {7, 8, 9, 2}})",
+				"{{1,0,-1,0},\n" + " {0,1,2,0},\n" + " {0,0,0,1}}");
+
+		check("RowReduce({{1,0,-1,0},{0,1,0,-1},{1,-2,-1,0},{-1,0,3,1}})", //
+				"{{1,0,0,0},\n" + " {0,1,0,0},\n" + " {0,0,1,0},\n" + " {0,0,0,1}}");
         check("RowReduce({{1, 0, a}, {1, 1, b}})", "{{1,0,a},\n" + " {0,1,-a+b}}");
         check("RowReduce({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})", "{{1,0,-1},\n" + " {0,1,2},\n" + " {0,0,0}}");
         check("RowReduce({{1, 0}, {0}})", "RowReduce({{1,0},{0}})");
@@ -8079,6 +8214,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("StirlingS2({2, 4, 6}, 2)", "{1,7,31}");
         check("StirlingS2(10,4)", "34105");
         check("StirlingS2(1000, 500)", "11897164077580438091910055658742826<<SHORT>>", 35);
+		check("StirlingS2(2000, 199)", "12783663313027805423901972026528914<<SHORT>>", 35);
     }
 
     public void testStringJoin() {
@@ -9131,6 +9267,7 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testWhile() {
+		check("While(False)", "");
         check("{a, b} = {27, 6}; While(b != 0, {a, b} = {b, Mod(a, b)});a", "3");
         check("i = 1; While(True, If(i^2 > 100, Return(i + 1), i++))", "12");
         check("$n = 1; While($n < 4, Print($n); $n++)", "");
