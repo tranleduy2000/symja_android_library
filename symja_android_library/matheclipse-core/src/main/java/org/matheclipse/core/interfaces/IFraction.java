@@ -7,12 +7,11 @@ import java.math.BigInteger;
 
 /**
  * interface for "fractional" numbers
+ *
  */
 public interface IFraction extends IRational {
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public IFraction abs();
 
@@ -58,14 +57,16 @@ public interface IFraction extends IRational {
     public IFraction negate();
 
     @Override
-    public INumber normalize();
+	public IRational normalize();
 
     /**
      * Returns this number raised at the specified exponent.
      *
-     * @param exp the exponent.
+	 * @param exp
+	 *            the exponent.
      * @return <code>this<sup>exp</sup></code>
-     * @throws ArithmeticException if {@code 0^0} is given.
+	 * @throws ArithmeticException
+	 *             if {@code 0^0} is given.
      */
     @Override
     public IFraction pow(final long exp) throws ArithmeticException;
