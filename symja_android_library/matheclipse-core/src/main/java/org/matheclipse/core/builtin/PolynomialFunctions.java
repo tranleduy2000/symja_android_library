@@ -1581,27 +1581,6 @@ public class PolynomialFunctions {
 			return F.NIL;
 		}
 
-		private IExpr bellIncompletePolynomial(int n, int k, IAST symbols) {
-			if (n == 0 && k == 0) {
-				return F.C1;
-			}
-			if (n == 0 || k == 0) {
-				return F.C0;
-			}
-			IExpr s = F.C0;
-			int a = 1;
-			int max = n - k + 2;
-			for (int m = 1; m < max; m++) {
-				s = s.plus(F.Times(a, bellIncompletePolynomial(n - m, k - 1, symbols), symbols.get(m)));
-				a = a * (n - m) / m;
-			}
-			// for m in range(1, n - k + 2):
-			// s += a * bell._bell_incomplete_poly(
-			// n - m, k - 1, symbols) * symbols[m - 1]
-			// a = a * (n - m) / m
-			// return expand_mul(s)
-			return s;
-		}
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -1770,6 +1749,23 @@ public class PolynomialFunctions {
 			return RULES;
 		}
 
+	}
+
+	public static IExpr bellY(int n, int k, IAST symbols) {
+		if (n == 0 && k == 0) {
+			return F.C1;
+		}
+		if (n == 0 || k == 0) {
+			return F.C0;
+		}
+		IExpr s = F.C0;
+		int a = 1;
+		int max = n - k + 2;
+		for (int m = 1; m < max; m++) {
+			s = s.plus(F.Times(a, bellY(n - m, k - 1, symbols), symbols.get(m)));
+			a = a * (n - m) / m;
+		}
+		return s;
 	}
 	/**
 	 * Get the coefficient list of a univariate polynomial.
