@@ -1,17 +1,13 @@
 package org.matheclipse.core.form.output;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.text.NumberFormat;
-
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.convert.AST2Expr;
-import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
+import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
@@ -33,6 +29,10 @@ import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
 import org.matheclipse.parser.client.operator.PostfixOperator;
 import org.matheclipse.parser.client.operator.PrefixOperator;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.text.NumberFormat;
 
 /**
  * Converts an internal <code>IExpr</code> into a user readable string.
@@ -1165,6 +1165,9 @@ public class OutputFormFactory {
 		} else if (coefficient.isOne()) {
 			plusArg = pow;
 			if (plusArg.isPlus()) {
+				if (call == PLUS_CALL) {
+					append(buf, "+");
+				}
 				append(buf, "(");
 				convertPlusArgument(buf, plusArg, call);
 				append(buf, ")");
