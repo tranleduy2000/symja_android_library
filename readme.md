@@ -102,18 +102,16 @@ To get an idea of the kinds of expressions Symja handles, see the [tests in this
 3. In your submodule ``gradle`` file, add
 
 ```gradle
-...
 dependencies {
-    ...
-    compile project(':symja_android_library-release')
+    implementation project(':symja_android_library-release')
 }
 ```
 
 ```gradle
-defaultConfig {
-    ...
-    multiDexEnabled true
-    ...
+android{
+    defaultConfig {
+        multiDexEnabled true
+    }
 }
 ```
 
@@ -123,25 +121,6 @@ org.gradle.jvmargs=-Xmx8192M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF
 ```
 
 5. Sync project
-
-### Getting started
-
-First, you'll need a Java Development Kit compatible with Java 8 or later.
-
-You can find JDK installers at:
-
-* http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-
-If you're unsure how to install the JDK, you can find instructions for
-all operating systems here: 
-
-* https://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html
-
-Pay careful attention to anything about setting up your `PATH` or `CLASSPATH`.
-
-Install and open the latest version of the Eclipse development IDE for Java Developers:
-
-* http://www.eclipse.org/downloads/packages/
 
 ### Github GIT
 
@@ -176,4 +155,3 @@ If you would like to use parts of the system here are the associated licenses:
 * the Symja parser libraries (org.matheclipse.parser* packages) are published under the APACHE LICENSE Version 2.0.
 
 [1]: mailto:axelclk@gmail.com
-[2]: http://www.vogella.com/tutorials/EclipseGit/article.html

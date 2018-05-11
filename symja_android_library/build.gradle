@@ -63,6 +63,7 @@ android {
         }
     }
 
+    //avoid lint check, real binary not contains java 8
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -81,10 +82,10 @@ repositories {
 }
 
 dependencies {
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:3.0.1'
-    androidTestCompile 'com.android.support.test:runner:1.0.1'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.jsoup:jsoup:1.10.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.jsoup:jsoup:1.11.2'
     //compile files('lib/Lab4Math-2.0.5.jar')
 }
 
