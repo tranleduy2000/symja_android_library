@@ -1,15 +1,15 @@
 package org.matheclipse.core.basic;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import org.hipparchus.util.Precision;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * General configuration settings.
@@ -130,7 +130,7 @@ public class Config {
 	/**
 	 * The double tolerance used for comparisons.
 	 */
-	public final static double DOUBLE_TOLERANCE = DOUBLE_EPSILON * 10d;
+	public static double DOUBLE_TOLERANCE = DOUBLE_EPSILON * 10d;
 
 	/**
 	 * Replace <code>double</code> values in root algorithms by 0 if they are below this tolerance.

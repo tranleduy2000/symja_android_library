@@ -6,7 +6,7 @@ import static java.lang.Double.doubleToLongBits;
  * Created by Duy on 2/20/2018.
  */
 
-public class Double {
+public class DDouble {
     /**
      * Returns a hash code for a {@code double} value; compatible with
      * {@code Double.hashCode()}.

@@ -6,7 +6,6 @@ import org.apfloat.ApfloatRuntimeException;
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IComplexNumImpl;
 import org.matheclipse.core.interfaces.IExpr;
@@ -605,14 +604,14 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	@Override
 	public String toString() {
-		try {
-			StringBuilder sb = new StringBuilder();
-			OutputFormFactory.get().convertDoubleComplex(sb, this, Integer.MIN_VALUE, OutputFormFactory.NO_PLUS_CALL);
-			return sb.toString();
-		} catch (Exception e1) {
+		// try {
+		// StringBuilder sb = new StringBuilder();
+		// OutputFormFactory.get().convertDoubleComplex(sb, this, Integer.MIN_VALUE, OutputFormFactory.NO_PLUS_CALL);
+		// return sb.toString();
+		// } catch (Exception e1) {
 			// fall back to simple output format
 			return fComplex.toString();
-		}
+		// }
 	}
 
 }

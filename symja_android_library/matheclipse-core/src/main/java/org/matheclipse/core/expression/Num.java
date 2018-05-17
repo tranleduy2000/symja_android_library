@@ -1,6 +1,6 @@
 package org.matheclipse.core.expression;
 
-import com.duy.lang.Double;
+import com.duy.lang.DDouble;
 import com.google.common.math.DoubleMath;
 
 import org.apfloat.Apcomplex;
@@ -71,7 +71,7 @@ public class Num extends INumImpl implements INum {
 	 * @return
 	 */
 	public static double valueOf(final String chars) {
-		return java.lang.Double.parseDouble(chars);
+		return Double.parseDouble(chars);
 	}
 
 	double fDouble;
@@ -146,7 +146,7 @@ public class Num extends INumImpl implements INum {
 	@Override
 	public int compareAbsValueToOne() {
 		double temp = Math.abs(fDouble);
-		return java.lang.Double.compare(temp, 1.0);
+		return Double.compare(temp, 1.0);
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class Num extends INumImpl implements INum {
 	 * @return
 	 */
 	public int compareTo(final double that) {
-		return java.lang.Double.compare(fDouble, that);
+		return Double.compare(fDouble, that);
 	}
 
 	/**
@@ -164,10 +164,10 @@ public class Num extends INumImpl implements INum {
 	@Override
 	public int compareTo(final IExpr expr) {
 		if (expr instanceof Num) {
-			return java.lang.Double.compare(fDouble, ((Num) expr).fDouble);
+			return Double.compare(fDouble, ((Num) expr).fDouble);
 		}
 		if (expr.isSignedNumber()) {
-			return java.lang.Double.compare(fDouble, ((ISignedNumber) expr).doubleValue());
+			return Double.compare(fDouble, ((ISignedNumber) expr).doubleValue());
 		}
 		return super.compareTo(expr);
 	}
@@ -251,13 +251,13 @@ public class Num extends INumImpl implements INum {
 
 	@Override
 	public IExpr evaluate(EvalEngine engine) {
-		if (fDouble == java.lang.Double.POSITIVE_INFINITY) {
+		if (fDouble == Double.POSITIVE_INFINITY) {
 			return F.CInfinity;
 		}
-		if (fDouble == java.lang.Double.NEGATIVE_INFINITY) {
+		if (fDouble == Double.NEGATIVE_INFINITY) {
 			return F.CNInfinity;
 		}
-		if (java.lang.Double.isNaN(fDouble)) {
+		if (Double.isNaN(fDouble)) {
 			return F.Indeterminate;
 		}
 		if (engine.isNumericMode() && engine.isApfloat()) {
@@ -325,7 +325,7 @@ public class Num extends INumImpl implements INum {
 
 	@Override
 	public final int hashCode() {
-		return Double.hashCode(fDouble);
+		return DDouble.hashCode(fDouble);
 	}
 
 	@Override
@@ -386,7 +386,7 @@ public class Num extends INumImpl implements INum {
 	 * @return
 	 */
 	public boolean isInfinite() {
-		return java.lang.Double.isInfinite(fDouble);
+		return Double.isInfinite(fDouble);
 	}
 
 	@Override
@@ -404,7 +404,7 @@ public class Num extends INumImpl implements INum {
 	 * @return
 	 */
 	public boolean isNaN() {
-		return java.lang.Double.isNaN(fDouble);
+		return Double.isNaN(fDouble);
 	}
 
 	/** {@inheritDoc} */
@@ -659,9 +659,6 @@ public class Num extends INumImpl implements INum {
 	 */
 	@Override
 	public String toString() {
-		if (F.isZero(fDouble)) {
-			return "0.0";
-		}
-		return java.lang.Double.toString(fDouble);
+		return Double.toString(fDouble);
 	}
 }

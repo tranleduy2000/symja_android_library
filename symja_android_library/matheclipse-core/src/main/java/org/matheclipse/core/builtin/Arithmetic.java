@@ -4,7 +4,7 @@ import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
-import com.duy.lang.Double;
+import com.duy.lang.DDouble;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
@@ -3837,7 +3837,7 @@ public final class Arithmetic {
             }
             if (val < 0.0d) {
                 double root = Math.floor(r);
-                if (Double.isFinite(r) && java.lang.Double.compare(r, root) == 0) {
+                if (DDouble.isFinite(r) && java.lang.Double.compare(r, root) == 0) {
                     // integer type
                     int iRoot = (int) root;
                     if ((iRoot & 0x0001) == 0x0000) {
