@@ -6633,6 +6633,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testProduct() {
+		check("Product(0, {k, a, Infinity})", //
+				"0");
+		check("Product(1, {k, a, Infinity})", //
+				"1");
+		check("Product(42, {k, a, Infinity})", //
+				"Infinity");
 		// {k,a,n} assumes a<=k<=n
 		check("Product(2, {k, a, n})", //
 				"2^(1-a+n)");
@@ -8468,6 +8474,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSum() {
+		check("Sum(0, {k, a, Infinity})", //
+				"0");
+		check("Sum(1, {k, a, Infinity})", //
+				"Infinity");
+		check("Sum(-2, {k, a, Infinity})", //
+				"-Infinity");
+		check("Sum(42, {k, a, Infinity})", //
+				"Infinity");
+		
 		// {k,a,n} assumes a<=k<=n
 		check("Sum(2, {k, a, n})", //
 				"2*(1-a+n)");
