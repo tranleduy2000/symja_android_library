@@ -1,5 +1,10 @@
 package org.matheclipse.core.convert;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.apfloat.Apint;
@@ -31,11 +36,6 @@ import org.matheclipse.parser.client.ast.StringNode;
 import org.matheclipse.parser.client.ast.SymbolNode;
 import org.matheclipse.parser.client.eval.DoubleNode;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
-
 /**
  * Converts a parsed <code>org.matheclipse.parser.client.ast.ASTNode</code> expression into an IExpr expression
  * 
@@ -45,7 +45,7 @@ public class AST2Expr {
 	public final static String[] UPPERCASE_SYMBOL_STRINGS = { "D", "E", "I", "N", "O" };
 
 	public final static String[] DOLLAR_STRINGS = { "$Aborted" };
-	
+
 	public final static String[] SYMBOL_STRINGS = { "All", "Algebraics", "Automatic", "Axes", "AxesOrigin", "AxesStyle",
 			"Background", "Booleans", "CharacterEncoding", "ComplexInfinity", "Catalan", "Complexes",
 			"ComplexityFunction", "Constant", "Degree", "Disputed", "EulerGamma", "False", "Flat", "Glaisher",
@@ -104,47 +104,48 @@ public class AST2Expr {
 			"LiouvilleLambda", "List", "ListConvolve", "ListCorrelate", "ListQ", "Literal", "Log", "Log2", "Log10",
 			"LogGamma", "LogNormalDistribution", "LogicalExpand", "LogisticSigmoid", "LogIntegral", "LowerCaseQ",
 			"LowerTriangularize", "LucasL", "LUDecomposition", "MachineNumberQ", "ManhattanDistance", "MangoldtLambda",
-			"MantissaExponent", "Map", "MapAt", "MapAll", "MapThread", "MatchingDissimilarity", "MatchQ", "MathMLForm",
-			"MatrixForm", "MatrixMinimalPolynomial", "MatrixPower", "MatrixQ", "MatrixRank", "Max", "Mean",
-			"MeanDeviation", "Median", "MeijerG", "MemberQ", "MeshRange", "MessageName", "MersennePrimeExponent",
-			"MersennePrimeExponentQ", "Min", "MinimalPolynomial", "Minus", "Missing", "MissingQ", "Mod", "Module",
-			"MoebiusMu", "MonomialList", "Most", "Multinomial", "MultiplicativeOrder", "NakagamiDistribution", "Names",
-			"Nand", "NDSolve", "Nearest", "Negative", "Nest", "NestList", "NestWhile", "NestWhileList", "NextPrime",
-			"NFourierTransform", "NIntegrate", "NMaximize", "NMinimize", "NonCommutativeMultiply", "NonNegative",
-			"NonPositive", "NoneTrue", "Nor", "Normal", "Normalize", "Norm", "NormalDistribution", "Not", "NotListQ",
-			"NRoots", "NSolve", "NullSpace", "NumberFieldRootsOfUnity", "NumberQ", "Numerator", "NumericQ", "OddQ",
-			"Operate", "Optional", "Options", "Or", "Order", "Ordering", "OrderedQ", "Orthogonalize",
-			"OrthogonalMatrixQ", "Out", "Outer", "OutputForm", "Package", "PadLeft", "PadRight", "ParametricPlot",
-			"Part", "Partition", "PartitionsP", "PartitionsQ", "PerfectNumber", "PerfectNumberQ", "Pattern",
-			"PatternTest", "PDF", "Permutations", "Piecewise", "Plot", "PlotRange", "Plot3D", "Plus", "Pochhammer",
-			"Point", "PoissonDistribution", "PolyGamma", "Polygon", "PolyLog", "PolynomialExtendedGCD", "PolynomialGCD",
-			"PolynomialLCM", "PolynomialQ", "PolynomialQuotient", "PolynomialQuotientRemainder", "PolynomialRemainder",
-			"Position", "Positive", "PossibleZeroQ", "Power", "PowerExpand", "PowerMod", "Precision", "PreDecrement",
-			"PreIncrement", "PrePlus", "Prepend", "PrependTo", "Prime", "PrimeOmega", "PrimePi", "PrimePowerQ",
-			"PrimeQ", "PrimitiveRootList", "Print", "Product", "ProductLog", "Projection", "PseudoInverse", "Put",
-			"QRDecomposition", "Quantile", "Quiet", "Quit", "Quotient", "QuotientRemainder", "RandomChoice",
-			"RandomInteger", "RandomReal", "RandomSample", "RandomVariate", "Range", "Rational", "Rationalize", "Re",
-			"RealNumberQ", "Reap", "Rectangle", "Reduce", "Refine", "Repeated", "RepeatedNull", "Replace", "ReplaceAll",
-			"ReplaceList", "ReplacePart", "ReplaceRepeated", "Rest", "Resultant", "Return", "Reverse", "Riffle",
-			"RogersTanimotoDissimilarity", "RootIntervals", "Root", "RootOf", "Roots", "RussellRaoDissimilarity",
-			"Surd", "RotateLeft", "RotateRight", "Round", "RowReduce", "Rule", "RuleDelayed", "SameQ",
-			"SatisfiabilityCount", "SatisfiabilityInstances", "SatisfiableQ", "Scan", "Sec", "Sech", "Select",
-			"Sequence", "Series", "SeriesCoefficient", "SeriesData", "Set", "SetAttributes", "SetDelayed", "Share",
-			"Show", "Sign", "SignCmp", "Simplify", "Sin", "Sinc", "SingularValueDecomposition", "Sinh", "SinIntegral",
-			"SinhIntegral", "Skewness", "SokalSneathDissimilarity", "Solve", "Sort", "Sow", "Span", "Split", "SplitBy",
-			"Sqrt", "SquaredEuclideanDistance", "SquareFreeQ", "SquareMatrixQ", "StandardDeviation", "StandardForm",
-			"Standardize", "StieltjesGamma", "StirlingS1", "StirlingS2", "StringDrop", "StringJoin", "StringLength",
-			"StringTake", "StruveH", "StruveL", "StudentTDistribution", "Subdivide", "Subfactorial", "Subscript",
-			"Subsuperscript", "Subsets", "Subtract", "SubtractFrom", "Sum", "Superscript", "SurfaceGraphics", "Switch",
-			"SyntaxLength", "SymbolName", "SymbolQ", "SymmetricMatrixQ", "SyntaxQ", "Table", "Take", "Tally", "Tan",
-			"Tanh", "TautologyQ", "Taylor", "TensorDimensions", "TensorProduct", "TensorRank", "TeXForm", "Thread",
-			"Through", "Throw", "TimeConstrained", "Times", "TimesBy", "Timing", "ToCharacterCode", "ToeplitzMatrix",
-			"Together", "ToPolarCoordinates", "ToRadicals", "ToString", "Total", "ToUnicode", "Tr", "Trace",
-			"TraditionalForm", "Transpose", "TrigExpand", "TrigReduce", "TrigToExp", "TrueQ", "Tuples", "Undefined",
-			"Unequal", "Unevaluated", "Union", "Unique", "UnitaryMatrixQ", "Unitize", "UnitStep", "UnitVector",
-			"UnsameQ", "Unset", "UpperCaseQ", "UpperTriangularize", "UpSet", "UpSetDelayed", "ValueQ",
-			"VandermondeMatrix", "Variables", "Variance", "VectorAngle", "VectorQ", "WeibullDistribution", "Which",
-			"While", "With", "Xor", "YuleDissimilarity", "Zeta" };
+			"MantissaExponent", "Map", "MapAt", "MapAll", "MapIndexed", "MapThread", "MatchingDissimilarity", "MatchQ",
+			"MathMLForm", "MatrixForm", "MatrixMinimalPolynomial", "MatrixPower", "MatrixQ", "MatrixRank", "Max",
+			"Mean", "MeanDeviation", "Median", "MeijerG", "MemberQ", "MeshRange", "MessageName",
+			"MersennePrimeExponent", "MersennePrimeExponentQ", "Min", "MinimalPolynomial", "Minus", "Missing",
+			"MissingQ", "Mod", "Module", "MoebiusMu", "MonomialList", "Most", "Multinomial", "MultiplicativeOrder",
+			"NakagamiDistribution", "Names", "Nand", "NDSolve", "Nearest", "Negative", "Nest", "NestList", "NestWhile",
+			"NestWhileList", "NextPrime", "NFourierTransform", "NIntegrate", "NMaximize", "NMinimize",
+			"NonCommutativeMultiply", "NonNegative", "NonPositive", "NoneTrue", "Nor", "Normal", "Normalize", "Norm",
+			"NormalDistribution", "Not", "NotListQ", "NRoots", "NSolve", "NullSpace", "NumberFieldRootsOfUnity",
+			"NumberQ", "Numerator", "NumericQ", "OddQ", "Operate", "Optional", "Options", "Or", "Order", "Ordering",
+			"OrderedQ", "Orthogonalize", "OrthogonalMatrixQ", "Out", "Outer", "OutputForm", "Package", "PadLeft",
+			"PadRight", "ParametricPlot", "Part", "Partition", "PartitionsP", "PartitionsQ", "PerfectNumber",
+			"PerfectNumberQ", "Pattern", "PatternTest", "PDF", "Permutations", "Piecewise", "Plot", "PlotRange",
+			"Plot3D", "Plus", "Pochhammer", "Point", "PoissonDistribution", "PolyGamma", "Polygon", "PolyLog",
+			"PolynomialExtendedGCD", "PolynomialGCD", "PolynomialLCM", "PolynomialQ", "PolynomialQuotient",
+			"PolynomialQuotientRemainder", "PolynomialRemainder", "Position", "Positive", "PossibleZeroQ", "Power",
+			"PowerExpand", "PowerMod", "Precision", "PreDecrement", "PreIncrement", "PrePlus", "Prepend", "PrependTo",
+			"Prime", "PrimeOmega", "PrimePi", "PrimePowerQ", "PrimeQ", "PrimitiveRootList", "Print", "Product",
+			"ProductLog", "Projection", "PseudoInverse", "Put", "QRDecomposition", "Quantile", "Quiet", "Quit",
+			"Quotient", "QuotientRemainder", "RandomChoice", "RandomInteger", "RandomReal", "RandomSample",
+			"RandomVariate", "Range", "Rational", "Rationalize", "Re", "RealNumberQ", "Reap", "Rectangle", "Reduce",
+			"Refine", "Repeated", "RepeatedNull", "Replace", "ReplaceAll", "ReplaceList", "ReplacePart",
+			"ReplaceRepeated", "Rest", "Resultant", "Return", "Reverse", "Riffle", "RogersTanimotoDissimilarity",
+			"RootIntervals", "Root", "RootOf", "Roots", "RussellRaoDissimilarity", "Surd", "RotateLeft", "RotateRight",
+			"Round", "RowReduce", "Rule", "RuleDelayed", "SameQ", "SatisfiabilityCount", "SatisfiabilityInstances",
+			"SatisfiableQ", "Scan", "Sec", "Sech", "Select", "Sequence", "Series", "SeriesCoefficient", "SeriesData",
+			"Set", "SetAttributes", "SetDelayed", "Share", "Show", "Sign", "SignCmp", "Simplify", "Sin", "Sinc",
+			"SingularValueDecomposition", "Sinh", "SinIntegral", "SinhIntegral", "Skewness", "SokalSneathDissimilarity",
+			"Solve", "Sort", "Sow", "Span", "Split", "SplitBy", "Sqrt", "SquaredEuclideanDistance", "SquareFreeQ",
+			"SquareMatrixQ", "StandardDeviation", "StandardForm", "Standardize", "StieltjesGamma", "StirlingS1",
+			"StirlingS2", "StringDrop", "StringJoin", "StringLength", "StringTake", "StruveH", "StruveL",
+			"StudentTDistribution", "Subdivide", "Subfactorial", "Subscript", "Subsuperscript", "Subsets", "Subtract",
+			"SubtractFrom", "Sum", "Superscript", "SurfaceGraphics", "Switch", "SyntaxLength", "SymbolName", "SymbolQ",
+			"SymmetricMatrixQ", "SyntaxQ", "Table", "Take", "Tally", "Tan", "Tanh", "TautologyQ", "Taylor",
+			"TensorDimensions", "TensorProduct", "TensorRank", "TeXForm", "Thread", "Through", "Throw",
+			"TimeConstrained", "Times", "TimesBy", "Timing", "ToCharacterCode", "ToeplitzMatrix", "Together",
+			"ToPolarCoordinates", "ToRadicals", "ToString", "Total", "ToUnicode", "Tr", "Trace", "TraditionalForm",
+			"Transpose", "TrigExpand", "TrigReduce", "TrigToExp", "TrueQ", "Tuples", "Undefined", "Unequal",
+			"Unevaluated", "Union", "Unique", "UnitaryMatrixQ", "Unitize", "UnitStep", "UnitVector", "UnsameQ", "Unset",
+			"UpperCaseQ", "UpperTriangularize", "UpSet", "UpSetDelayed", "ValueQ", "VandermondeMatrix", "Variables",
+			"Variance", "VectorAngle", "VectorQ", "WeibullDistribution", "Which", "While", "With", "Xor",
+			"YuleDissimilarity", "Zeta" };
 
 	public static Map<String, Integer> RUBI_STATISTICS_MAP;
 
@@ -312,87 +313,87 @@ public class AST2Expr {
 				switch (functionID) {
 				case ID.N:
 					if (ast.isAST2()) {
-				try {
-					int precision = Validate.checkIntType(ast.arg2());
-					if (EvalEngine.isApfloat(precision)) {
-						fPrecision = precision;
-						ast.set(1, convertNode(functionNode.get(1)));
-					}
-					return ast;
-				} catch (WrongArgumentType wat) {
+						try {
+							int precision = Validate.checkIntType(ast.arg2());
+							if (EvalEngine.isApfloat(precision)) {
+								fPrecision = precision;
+								ast.set(1, convertNode(functionNode.get(1)));
+							}
+							return ast;
+						} catch (WrongArgumentType wat) {
 
-				}
+						}
 					}
 					break;
 				case ID.Sqrt:
-					if (ast.isAST1( )) {
-				// rewrite from input: Sqrt(x) => Power(x, 1/2)
-				return F.Power(ast.arg1(), F.C1D2);
+					if (ast.isAST1()) {
+						// rewrite from input: Sqrt(x) => Power(x, 1/2)
+						return F.Power(ast.arg1(), F.C1D2);
 					}
 					break;
 				case ID.Exp:
-					if (ast.isAST1( )) {
-				// rewrite from input: Exp(x) => E^x
-				return F.Power(F.E, ast.arg1());
+					if (ast.isAST1()) {
+						// rewrite from input: Exp(x) => E^x
+						return F.Power(F.E, ast.arg1());
 					}
 					break;
 				case ID.Power:
 					if (ast.isPower() && ast.base().isPower() && ast.exponent().isMinusOne()) {
-				IAST arg1Power = (IAST) ast.base();
-				if (arg1Power.exponent().isNumber()) {
-					// Division operator
-					// rewrite from input: Power(Power(x, <number>),-1) =>
-					// Power(x, - <number>)
-					return F.Power(arg1Power.base(), ((INumber) arg1Power.exponent()).negate());
-				}
+						IAST arg1Power = (IAST) ast.base();
+						if (arg1Power.exponent().isNumber()) {
+							// Division operator
+							// rewrite from input: Power(Power(x, <number>),-1) =>
+							// Power(x, - <number>)
+							return F.Power(arg1Power.base(), ((INumber) arg1Power.exponent()).negate());
+						}
 					}
 					break;
 				case ID.GreaterEqual:
 					if (ast.isASTSizeGE(F.GreaterEqual, 3)) {
-				ISymbol compareHead = F.Greater;
-				return rewriteLessGreaterAST(ast, compareHead);
+						ISymbol compareHead = F.Greater;
+						return rewriteLessGreaterAST(ast, compareHead);
 					}
 					break;
 				case ID.Greater:
 					if (ast.isASTSizeGE(F.Greater, 3)) {
-				ISymbol compareHead = F.GreaterEqual;
-				return rewriteLessGreaterAST(ast, compareHead);
+						ISymbol compareHead = F.GreaterEqual;
+						return rewriteLessGreaterAST(ast, compareHead);
 					}
 					break;
 				case ID.LessEqual:
 					if (ast.isASTSizeGE(F.LessEqual, 3)) {
-				ISymbol compareHead = F.Less;
-				return rewriteLessGreaterAST(ast, compareHead);
+						ISymbol compareHead = F.Less;
+						return rewriteLessGreaterAST(ast, compareHead);
 					}
 					break;
 				case ID.Less:
 					if (ast.isASTSizeGE(F.Less, 3)) {
-				ISymbol compareHead = F.LessEqual;
-				return rewriteLessGreaterAST(ast, compareHead);
+						ISymbol compareHead = F.LessEqual;
+						return rewriteLessGreaterAST(ast, compareHead);
 					}
 				case ID.Pattern:
 					expr = PatternMatching.Pattern.CONST.evaluate(ast, fEngine);
-				if (expr.isPresent()) {
-					return expr;
-				}
+					if (expr.isPresent()) {
+						return expr;
+					}
 					break;
 				case ID.Blank:
 					expr = PatternMatching.Blank.CONST.evaluate(ast, fEngine);
-				if (expr.isPresent()) {
-					return expr;
-				}
+					if (expr.isPresent()) {
+						return expr;
+					}
 					break;
 				case ID.Complex:
 					expr = Arithmetic.CONST_COMPLEX.evaluate(ast, fEngine);
-				if (expr.isPresent()) {
-					return expr;
-				}
+					if (expr.isPresent()) {
+						return expr;
+					}
 					break;
 				case ID.Rational:
 					expr = Arithmetic.CONST_RATIONAL.evaluate(ast, fEngine);
-				if (expr.isPresent()) {
-					return expr;
-				}
+					if (expr.isPresent()) {
+						return expr;
+					}
 					break;
 				}
 			}
@@ -537,7 +538,6 @@ public class AST2Expr {
 		}
 	}
 
-
 	/**
 	 * Convert less or greater relations on input. Example: convert expressions like <code>a &lt; b &lt;= c</code> to
 	 * <code>Less[a,b]&&LessEqual[b,c]</code>.
@@ -566,6 +566,7 @@ public class AST2Expr {
 			return ast;
 		}
 	}
+
 	public static void main(String[] args) {
 		for (int i = 0; i < FUNCTION_STRINGS.length; i++) {
 			System.out.println(FUNCTION_STRINGS[i]);

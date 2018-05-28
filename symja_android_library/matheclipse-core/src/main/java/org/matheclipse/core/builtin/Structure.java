@@ -1,9 +1,8 @@
 package org.matheclipse.core.builtin;
 
-import com.duy.lambda.BiPredicate;
-import com.duy.lambda.Consumer;
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.Predicate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.function.Predicate;
 
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -28,11 +27,9 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.ISymbol2IntMap;
 import org.matheclipse.core.visit.AbstractVisitorLong;
+import org.matheclipse.core.visit.IndexedLevel;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
 import org.matheclipse.parser.client.math.MathException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Structure {
 
@@ -47,6 +44,7 @@ public class Structure {
 		F.Map.setEvaluator(new Map());
 		F.MapAll.setEvaluator(new MapAll());
 		F.MapAt.setEvaluator(new MapAt());
+		F.MapIndexed.setEvaluator(new MapIndexed());
 		F.MapThread.setEvaluator(new MapThread());
 		F.Order.setEvaluator(new Order());
 		F.OrderedQ.setEvaluator(new OrderedQ());
@@ -139,18 +137,11 @@ public class Structure {
 	private final static class Apply extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
-			final IASTAppendable evaledAST = ast.copyAppendable();
-			evaledAST.setArgs(evaledAST.size(), new IntFunction<IExpr>() {
-
-				@Override
-				public IExpr apply(int i) {
-					// TODO Auto-generated method stub
-					return engine.evaluate(evaledAST.get(i));
-				}
-			});
+			IASTAppendable evaledAST = ast.copyAppendable();
+			evaledAST.setArgs(evaledAST.size(), i -> engine.evaluate(evaledAST.get(i)));
 			// for (int i = 1; i < evaledAST.size(); i++) {
 			// evaledAST.set(i, engine.evaluate(evaledAST.get(i)));
 			// }
@@ -172,15 +163,10 @@ public class Structure {
 			return evalApply(arg1, arg2, evaledAST, lastIndex, heads, engine);
 		}
 
-		public static IExpr evalApply(final IExpr arg1, IExpr arg2, IAST evaledAST, int lastIndex, boolean heads,
+		public static IExpr evalApply(IExpr arg1, IExpr arg2, IAST evaledAST, int lastIndex, boolean heads,
 				EvalEngine engine) {
 			VisitorLevelSpecification level = null;
-			com.duy.lambda.Function<IExpr, IExpr> af = new com.duy.lambda.Function<IExpr, IExpr>() {
-				@Override
-				public IExpr apply(IExpr x) {
-					return x.isAST() ? ((IAST) x).setAtCopy(0, arg1) : F.NIL;
-				}
-			};
+			java.util.function.Function<IExpr, IExpr> af = x -> x.isAST() ? ((IAST) x).setAtCopy(0, arg1) : F.NIL;
 			try {
 				if (lastIndex == 3) {
 					level = new VisitorLevelSpecification(af, evaledAST.get(lastIndex), heads, engine);
@@ -562,13 +548,9 @@ public class Structure {
 						if (symbolSlots.size() > ast.size()) {
 							throw new WrongNumberOfArguments(ast, symbolSlots.argSize(), ast.argSize());
 						}
-						return arg2.replaceAll(new com.duy.lambda.Function<IExpr, IExpr>() {
-							@Override
-							public IExpr apply(IExpr x) {
-								IExpr temp = getRulesMap(symbolSlots, ast).get(x);
-								return temp != null ? temp : F.NIL;
-							}
-
+						return arg2.replaceAll(x -> {
+							IExpr temp = getRulesMap(symbolSlots, ast).get(x);
+							return temp != null ? temp : F.NIL;
 						}).orElse(arg2);
 					}
 				}
@@ -850,23 +832,13 @@ public class Structure {
 			}
 
 			try {
-				final IExpr arg1 = ast.arg1();
-				final IExpr arg2 = ast.arg2();
+				IExpr arg1 = ast.arg1();
+				IExpr arg2 = ast.arg2();
 				VisitorLevelSpecification level;
 				if (lastIndex == 3) {
-					level = new VisitorLevelSpecification(new com.duy.lambda.Function<IExpr, IExpr>() {
-						@Override
-						public IExpr apply(IExpr x) {
-							return F.unaryAST1(arg1, x);
-						}
-					}, ast.get(lastIndex), heads, engine);
+					level = new VisitorLevelSpecification(x -> F.unaryAST1(arg1, x), ast.get(lastIndex), heads, engine);
 				} else {
-					level = new VisitorLevelSpecification(new com.duy.lambda.Function<IExpr, IExpr>() {
-						@Override
-						public IExpr apply(IExpr x) {
-							return F.unaryAST1(arg1, x);
-						}
-					}, 1, heads);
+					level = new VisitorLevelSpecification(x -> F.unaryAST1(arg1, x), 1, heads);
 				}
 				return arg2.accept(level).orElse(arg2);
 			} catch (final MathException e) {
@@ -884,13 +856,8 @@ public class Structure {
 			Validate.checkRange(ast, 3);
 
 			final IExpr arg1 = ast.arg1();
-			final VisitorLevelSpecification level = new VisitorLevelSpecification(
-					new com.duy.lambda.Function<IExpr, IExpr>() {
-						@Override
-						public IExpr apply(IExpr x) {
-							return F.unaryAST1(arg1, x);
-						}
-					}, 0, Integer.MAX_VALUE, false);
+			final VisitorLevelSpecification level = new VisitorLevelSpecification(x -> F.unaryAST1(arg1, x), 0,
+					Integer.MAX_VALUE, false);
 
 			final IExpr result = ast.arg2().accept(level);
 			return result.isPresent() ? result : ast.arg2();
@@ -916,6 +883,45 @@ public class Structure {
 					}
 				} catch (RuntimeException ae) {
 				}
+			}
+			return F.NIL;
+		}
+
+	}
+
+	private final static class MapIndexed extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 3, 4);
+
+			int lastIndex = ast.argSize();
+			boolean heads = false;
+			final Options options = new Options(ast.topHead(), ast, lastIndex, engine);
+			IExpr option = options.getOption("Heads");
+			if (option.isPresent()) {
+				lastIndex--;
+				if (option.isTrue()) {
+					heads = true;
+				}
+			}  
+
+			try {
+				IExpr arg1 = ast.arg1();
+				IndexedLevel level;
+				if (lastIndex == 3) {
+					level = new IndexedLevel((x, y) -> F.binaryAST2(arg1, x, y), ast.get(lastIndex), heads,
+							engine);
+				} else {
+					level = new IndexedLevel((x, y) -> F.binaryAST2(arg1, x, y), 1, heads);
+				}
+				
+				IExpr arg2 = ast.arg2();
+				if (arg2.isAST()) {
+					return level.visitAST(((IAST) arg2), new int[0]).orElse(arg2);
+				}
+			} catch (final MathException e) {
+				engine.printMessage(e.getMessage());
 			}
 			return F.NIL;
 		}
@@ -1010,31 +1016,28 @@ public class Structure {
 			private IAST recursiveMapThread(int recursionLevel, IAST lst, IASTAppendable resultList) {
 				if (recursionLevel >= level) {
 					return lst;
-			}
-
+				}
 				int size = lst.first().size() - 1;
-					IASTAppendable list;
+				IASTAppendable list;
 				if (level == recursionLevel + 1) {
 					list = EvalAttributes.threadList(lst, F.List, constant, size);
-						if (resultList != null) {
-							resultList.append(list);
-						}
-					} else {
+					if (resultList != null) {
+						resultList.append(list);
+					}
+				} else {
 					list = EvalAttributes.threadList(lst, F.List, F.List, size);
 					IASTAppendable result = F.ListAlloc(size);
 					for (int i = 1; i < list.size(); i++) {
 						recursiveMapThread(recursionLevel + 1, (IAST) list.get(i), result);
 					}
-						if (resultList != null) {
+					if (resultList != null) {
 						resultList.append(result);
-						}
-					return result;
 					}
-					return list;
+					return result;
 				}
+				return list;
 			}
-
-
+		}
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1048,18 +1051,19 @@ public class Structure {
 						return F.NIL;
 					}
 				}
+
 				IAST tensor = (IAST) ast.arg2();
 				ArrayList<Integer> dims = LinearAlgebra.dimensions(tensor, tensor.head(), Integer.MAX_VALUE);
 				if (dims.size() > level) {
 					if (level == 0) {
 						return tensor.apply(ast.arg1());
 					}
-			// if (level == 1) {
-			// return EvalAttributes.threadList(tensor, F.List, ast.arg1(), dims.get(level));
-			// }
+					// if (level == 1) {
+					// return EvalAttributes.threadList(tensor, F.List, ast.arg1(), dims.get(level));
+					// }
 					return new MapThreadLevel(ast.arg1(), level).recursiveMapThread(0, tensor, null);
-			}
-				if (tensor.isAST(F.List,1)) {
+				}
+				if (tensor.isAST(F.List, 1)) {
 					return tensor;
 				}
 				engine.printMessage("MapThread: argument 2 dimensions less than level.");
@@ -1144,12 +1148,7 @@ public class Structure {
 
 		@Override
 		public boolean test(IAST ast) {
-			return ast.compareAdjacent(new BiPredicate<IExpr, IExpr>() {
-				@Override
-				public boolean test(IExpr x, IExpr y) {
-					return x.isLEOrdered(y);
-				}
-			});
+			return ast.compareAdjacent((x, y) -> x.isLEOrdered(y));
 		}
 
 	}
@@ -1335,7 +1334,7 @@ public class Structure {
 	private final static class Scan extends Map {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
 			int lastIndex = ast.argSize();
@@ -1352,42 +1351,28 @@ public class Structure {
 			}
 
 			try {
-				final IExpr arg1 = ast.arg1();
-				final IExpr arg2 = ast.arg2();
+				IExpr arg1 = ast.arg1();
+				IExpr arg2 = ast.arg2();
 				if (lastIndex == 3) {
-					final IASTAppendable result = F.ListAlloc(10);
-					com.duy.lambda.Function<IExpr, IExpr> sf = new com.duy.lambda.Function<IExpr, IExpr>() {
-						@Override
-						public IExpr apply(IExpr x) {
-							IAST a = F.unaryAST1(arg1, x);
-							result.append(a);
-							return F.NIL;
-						}
+					IASTAppendable result = F.ListAlloc(10);
+					java.util.function.Function<IExpr, IExpr> sf = x -> {
+						IAST a = F.unaryAST1(arg1, x);
+						result.append(a);
+						return F.NIL;
 					};
 
 					VisitorLevelSpecification level = new VisitorLevelSpecification(sf, ast.get(lastIndex), heads,
 							engine);
 
 					arg2.accept(level);
-					result.forEach(result.size(), new Consumer<IExpr>() {
-						@Override
-						public void accept(IExpr x) {
-							engine.evaluate(x);
-						}
-
-					});
+					result.forEach(result.size(), x -> engine.evaluate(x));
 					// for (int i = 1; i < result.size(); i++) {
 					// engine.evaluate(result.get(i));
 					// }
 
 				} else {
 					if (arg2.isAST()) {
-						engine.evaluate(((IAST) arg2).map(new com.duy.lambda.Function<IExpr, IExpr>() {
-							@Override
-							public IExpr apply(IExpr x) {
-								return F.unaryAST1(arg1, x);
-							}
-						}, 1));
+						engine.evaluate(((IAST) arg2).map(x -> F.unaryAST1(arg1, x), 1));
 					} else {
 						engine.evaluate(arg2);
 					}
@@ -1682,13 +1667,7 @@ public class Structure {
 						return arg1AST;
 					}
 					IASTAppendable result = F.ast(arg1HeadAST.head());
-					return result.appendArgs(arg1HeadAST.size(), new IntFunction<IExpr>() {
-						@Override
-						public IExpr apply(int i) {
-							return arg1AST.apply(arg1HeadAST.get(i));
-						}
-					});
-
+					return result.appendArgs(arg1HeadAST.size(), i -> arg1AST.apply(arg1HeadAST.get(i)));
 					// for (int i = 1; i < arg1HeadAST.size(); i++) {
 					// clonedList = arg1AST.apply(arg1HeadAST.get(i));
 					// result.append(clonedList);

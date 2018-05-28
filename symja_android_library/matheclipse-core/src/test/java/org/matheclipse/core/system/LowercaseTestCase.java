@@ -617,6 +617,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("With({eps = 10^-6.}, \n" + " Table(Binomial(-3 - p eps, -5 - eps), {p, {-3, -2, -1, \n"
 				+ "    1, 2, 3, 4}}))", //
 				"{-2.0,-3.0,-6.0,6.0,3.0,2.0,1.5}");
+
 		check("Binomial(k, -1)", "0");
 		check("Binomial(k, -1.4)", "Binomial(k,-1.4)");
 		check("Binomial(k, 0)", "1");
@@ -860,8 +861,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Catch(a^2 + b^2 + c^2 /. b :> Throw(bbb))", "bbb");
 		check("Catch({Catch({a, Throw(b), c}), d, e})", "{b,d,e}");
 		check("Catch(Throw /@ {a, b, c})", "a");
-		check("$f(x_) := (If(x < 0, Throw(\"negative\")); Sqrt(x));Catch(Sum($f(i0), {i0, 5, -5, -1}))",
-				"negative");
+		check("$f(x_) := (If(x < 0, Throw(\"negative\")); Sqrt(x));Catch(Sum($f(i0), {i0, 5, -5, -1}))", "negative");
 		// check("$lst={0,v1,n1};\n" +
 		// " Catch(\n" +
 		// " {Map(Function($lst=False;\n" +
@@ -1466,6 +1466,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Convergents({a,b,c,d})", //
 				"{a,(1+a*b)/b,(a+c+a*b*c)/(1+b*c),(1+a*b+a*d+c*d+a*b*c*d)/(b+d+b*c*d)}");
 	}
+
 	public void testCoprimeQ() {
 		check("CoprimeQ(8,9,11)", "True");
 		check("CoprimeQ({1, 2, 3, 4, 5}, 6)", "{True,False,False,False,True}");
@@ -2450,6 +2451,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testEulerPhi() {
 		check("Refine(EulerPhi(p^n),Element(p, Primes)&&Element(n, Integers))", //
 				"-1/p^(1-n)+p^n");
+
 		check("EulerPhi(-a)", //
 				"EulerPhi(a)");
 		check("Table(EulerPhi(k), {k, 0, 20})", //
@@ -2721,7 +2723,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testFactorInteger() {
 		// 10^79+5923 - very slow test > 17 min
-
 		// check("FactorInteger(10^79+5923)", //
 		// "{{1333322076518899001350381760807974795003,1},{\n" +
 		// "7500063320115780212377802894180923803641,1}}");
@@ -2742,7 +2743,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// "{{213916881789829278910570173437,1},{467471286806848547076331371449,1}}");
 		// check("213916881789829278910570173437*467471286806848547076331371449== 10^59+213", //
 		// "True");
-
 		if (Config.EXPENSIVE_JUNIT_TESTS) {
 			check("FactorInteger(672924717570659549138949381690007452648932205241)", //
 					"{{324557421200651278898953,1},{2073361056053736024795697,1}}");
@@ -2752,15 +2752,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 					"{{59,1},{41387,1},{40320271,1},{85708917607365601059185614891297817,1}}");
 			check("FactorInteger(10^100+1)", "{{73,1},{137,1},{401,1},{1201,1},{1601,1},{1676321,1},{5964848081,1},{\n"
 					+ "129694419029057750551385771184564274499075700947656757821537291527196801,1}}");
-		check("FactorInteger(308119573764812073923)", //
-				"{{19,2},{367,1},{132491,1},{17553335119,1}}");
-		check("19^2*367*132491*17553335119", //
-				"308119573764812073923");
+			check("FactorInteger(308119573764812073923)", //
+					"{{19,2},{367,1},{132491,1},{17553335119,1}}");
+			check("19^2*367*132491*17553335119", //
+					"308119573764812073923");
 
-		check("FactorInteger(132296607982211351148)", //
-				"{{2,2},{3,4},{331,1},{107251,1},{11502026267,1}}");
-		check("2^2*3^4*331*107251*11502026267", //
-				"132296607982211351148");
+			check("FactorInteger(132296607982211351148)", //
+					"{{2,2},{3,4},{331,1},{107251,1},{11502026267,1}}");
+			check("2^2*3^4*331*107251*11502026267", //
+					"132296607982211351148");
 			check("FactorInteger(44343535354351600000003434353)", //
 					"{{149,1},{329569479697,1},{903019357561501,1}}");
 		}
@@ -2778,6 +2778,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{{11+I*14,1}}");
 		check("FactorInteger(8+21*I,GaussianIntegers->True)", //
 				"{{1+I*2,1},{10+I,1}}");
+
 		check("FactorInteger(16,GaussianIntegers->True)", //
 				"{{1+I,8}}");
 		check("FactorInteger(8+21*I,GaussianIntegers->True)", //
@@ -2801,6 +2802,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FactorInteger(50!*8392894255239922239)", //
 				"{{2,47},{3,23},{5,12},{7,9},{11,4},{13,3},{17,2},{19,2},{23,2},{29,1},{31,1},{37,\n"
 						+ "1},{41,1},{43,1},{47,1},{457,1},{11717,1},{84053,1},{887987,1}}");
+
 		check("FactorInteger(8392894255239922239)", //
 				"{{3,1},{7,1},{457,1},{11717,1},{84053,1},{887987,1}}");
 		check("FactorInteger(4)", //
@@ -2832,7 +2834,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Table(FactorInteger(2^2^n + 1), {n, 6})", //
 				"{{{5,1}},{{17,1}},{{257,1}},{{65537,1}},{{641,1},{6700417,1}},{{274177,1},{\n"
 						+ "67280421310721,1}}}");
-
 		check("FactorInteger(2010 / 2011)", //
 				"{{2,1},{3,1},{5,1},{67,1},{2011,-1}}");
 	}
@@ -3268,6 +3269,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testGamma() {
 		check("Refine(Gamma(n), Element(n,Integers)&&n>=0)", //
 				"(-1+n)!");
+
 		check("Gamma(-1)", //
 				"ComplexInfinity");
 		check("Gamma(Infinity)", //
@@ -3719,6 +3721,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("IntegerDigits(Range(0,7), 2, 3)", //
 				"{{0,0,0},{0,0,1},{0,1,0},{0,1,1},{1,0,0},{1,0,1},{1,1,0},{1,1,1}}");
 	}
+
 	public void testIntegerExponent() {
 		check("IntegerExponent(1230000)", "4");
 		check("IntegerExponent(2^10+2^7, 2)", "7");
@@ -4045,8 +4048,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"F.Plus(F.Times(F.CC(0L,1L,1L,2L),F.Exp(F.Times(F.CNI,F.x))),F.Times(F.CC(0L,1L,-1L,2L),F.Exp(F.Times(F.CI,F.x))))");
 		check("JavaForm(I/2*E^((-I)*x)-I/2*E^(I*x))", //
 				"Plus(Times(CC(0L,1L,1L,2L),Exp(Times(CNI,x))),Times(CC(0L,1L,-1L,2L),Exp(Times(CI,x))))");
-		check("JavaForm(a+b+x^2+I+7+3/4+x+y, Prefix->True)",
-				"F.Plus(F.CC(31L,4L,1L,1L),F.a,F.b,F.x,F.Sqr(F.x),F.y)");
+		check("JavaForm(a+b+x^2+I+7+3/4+x+y, Prefix->True)", "F.Plus(F.CC(31L,4L,1L,1L),F.a,F.b,F.x,F.Sqr(F.x),F.y)");
 		check("JavaForm(a+b+x^2+I+7+3/4+x+y)", "Plus(CC(31L,4L,1L,1L),a,b,x,Sqr(x),y)");
 	}
 
@@ -4676,6 +4678,49 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("MapAt(f, {a, b, c, d}, 2)", "{a,f(b),c,d}");
 	}
 
+	public void testMapIndexed() {
+		check("MapIndexed(f, {{a}, {c}}, {2})", //
+				"{{f(a,{1,1})},{f(c,{2,1})}}");
+
+		check("MapIndexed(f, {a, b})", //
+				"{f(a,{1}),f(b,{2})}");
+		check("MapIndexed(f, {{a, b}, {c, d, e}})", //
+				"{f({a,b},{1}),f({c,d,e},{2})}");
+		check("MapIndexed(f, {}, 1)", //
+				"{}");
+		check("MapIndexed(f, {a, b}, 1)", //
+				"{f(a,{1}),f(b,{2})}");
+		check("MapIndexed(f, {a, b}, 0)", //
+				"{a,b}");
+		check("MapIndexed(f, {}, 0)", //
+				"{}");
+		check("MapIndexed(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 2)", //
+				"{f({f({{a,b},{c,d}},{1,1})},{1}),f({f({{u,v},{s,t}},{2,1})},{2})}");
+		check("MapIndexed(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 3)", //
+				"{f({f({f({a,b},{1,1,1}),f({c,d},{1,1,2})},{1,1})},{1}),f({f({f({u,v},{2,1,1}),f({s,t},{\n"
+						+ "2,1,2})},{2,1})},{2})}");
+		check("MapIndexed(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 4)", //
+				"{f({f({f({f(a,{1,1,1,1}),f(b,{1,1,1,2})},{1,1,1}),f({f(c,{1,1,2,1}),f(d,{1,1,2,2})},{\n"
+						+ "1,1,2})},{1,1})},{1}),f({f({f({f(u,{2,1,1,1}),f(v,{2,1,1,2})},{2,1,1}),f({f(s,{2,\n"
+						+ "1,2,1}),f(t,{2,1,2,2})},{2,1,2})},{2,1})},{2})}");
+		check("MapIndexed(f, {{{a, b}, {c, d}}, {{u, v}, {s, t}}}, 2)", //
+				"{f({f({a,b},{1,1}),f({c,d},{1,2})},{1}),f({f({u,v},{2,1}),f({s,t},{2,2})},{2})}");
+		check("MapIndexed(f, {{a, b, c}, {x, y, z}})", //
+				"{f({a,b,c},{1}),f({x,y,z},{2})}");
+		check("MapIndexed(First(#2) + f(#1) &, {a, b, c, d})", //
+				"{1+f(a),2+f(b),3+f(c),4+f(d)}");
+		check("MapIndexed(f, {{a, b}, {c, d, e}}, {1})", //
+				"{f({a,b},{1}),f({c,d,e},{2})}");
+		check("MapIndexed(f, {{a, b}, {c, d, e}}, {2})", //
+				"{{f(a,{1,1}),f(b,{1,2})},{f(c,{2,1}),f(d,{2,2}),f(e,{2,3})}}");
+		check("MapIndexed(f, {{a, b}, {c, d, e}}, {3})", //
+				"{{a,b},{c,d,e}}");
+		check("MapIndexed(f, {{{{a}}}}, -1)", "{f({f({f({f(a,{1,1,1,1})},{1,1,1})},{1,1})},{1})}");
+		// TODO
+		// check("MapIndexed(f, {{{{a}}}}, -2)",
+		// " {f({f({f({a}{1,1,1})},{1,1})},{1})}");
+	}
+
 	public void testMapThread() {
 		check("MapThread(f, {}, 1)", //
 				"{}");
@@ -4742,8 +4787,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"False");
 		check("MatchQ(1.5,_Real)", //
 				"True");
+
 		check("MatchQ(f(2*I), f(Complex(i_Integer, r_Integer)) )", "True");
 		check("MatchQ(g(1/2), g(Rational(n_Integer, d_Integer)) )", "True");
+
 		check("MatchQ(Simplify(1 + 1/GoldenRatio - GoldenRatio), 0)", "True");
 
 		check("MatchQ(Sin(Cos(x)), HoldPattern(F_(G_(v_))) /; F==Sin&&G==Cos&&v==x )", "True");
@@ -4761,7 +4808,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("MatchQ(_Integer)[123]", "True");
 		check("MatchQ(22/7, _Rational)", "True");
 		check("MatchQ(6/3, _Rational)", "False");
-
 	}
 
 	public void testMathMLForm() {
@@ -6725,6 +6771,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "True,True,True,True,True,True,True,True,True,True,"//
 						+ "True,True,True,True,True,True,True,True,True,True,"//
 						+ "True,True,True,True,True,True,True,True,True}");
+
 		// Mersenne Prime
 		// https://en.wikipedia.org/wiki/Mersenne_prime
 		check("PrimeQ(131071)", "True");
@@ -6774,6 +6821,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"Pochhammer(m,1-m+n)^2");
 		check("Product(i^2, {i,k,k+j})", //
 				"Pochhammer(k,1+j)^2");
+
 		check("Product(a, {a, 1, 5})", //
 				"120");
 		check("Product(f(a), {a, 1, 5})", //
@@ -7219,7 +7267,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testReplaceAll() {
 		// TODO
-//		 check("ReplaceAll({a, b, c}, {___, x__, ___} -> {x})", "{a}");
+		// check("ReplaceAll({a, b, c}, {___, x__, ___} -> {x})", "{a}");
 
 		check("a == b /. _Equal -> 2", "2");
 		check("If(1 == k, itstrue, itsfalse) /. _If -> 99", "99");
@@ -7319,6 +7367,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{y^2,x^3}");
 		check("x^2 /. x -> (1 + y) /. y -> b", //
 				"(1+b)^2");
+
 		check("x^2 + y^6 /. {x -> 2 + a, a -> 3}", //
 				"(2+a)^2+y^6");
 		check("x^2 + y^6 //. {x -> 2 + a, a -> 3}", //
@@ -8427,7 +8476,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("SquareFreeQ(9 + 6*x + x^2)", "False");
 		check("SquareFreeQ(x^2 + 1, Modulus -> 2)", "False");
 	}
-	
+
 	public void testSquareMatrixQ() {
 		check("SquareMatrixQ({{1, 3 + 4*I}, {3 - 4*I, 2}})", "True");
 		check("SquareMatrixQ({{}})", "False");
@@ -8582,6 +8631,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Subdivide(N(E,21),N(Pi,21), 4)", //
 				"{2.71828182845904523536,2.82410953474173223613,2.92993724102441923691,3.03576494730710623768,3.14159265358979323846}");
 	}
+
 	public void testSubfactorial() {
 		check("Subfactorial(12)", "176214841");
 		check("Subfactorial(n)", "Subfactorial(n)");
@@ -8624,7 +8674,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"-Infinity");
 		check("Sum(42, {k, a, Infinity})", //
 				"Infinity");
-		
+
 		// {k,a,n} assumes a<=k<=n
 		check("Sum(2, {k, a, n})", //
 				"2*(1-a+n)");
@@ -8848,7 +8898,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("SyntaxQ(\"Integrate(f(x),{x,0,10})\")", "True");
 		check("SyntaxQ(\"Integrate(f(x),{x,0,10)\")", "False");
 	}
-	
+
 	public void testTable() {
 		check("Table(a + dx, {dx, 0, 3, Pi/8})", //
 				"{a,a+Pi/8,a+Pi/4,a+3/8*Pi,a+Pi/2,a+5/8*Pi,a+3/4*Pi,a+7/8*Pi}");
@@ -9271,12 +9321,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ToString(FullForm(d/2))", //
 				"Times(Rational(1,2), d)");
 	}
-	public void testToString() {
-		check("ToString(InputForm(d/2+f(x)))", //
-				"d/2+f(x)");
-		check("ToString(FullForm(d/2))", //
-				"Times(Rational(1,2), d)");
-	}
+
 	public void testTotal() {
 		check("Total({x^2, 3*x^3, 1})", "1+x^2+3*x^3");
 
@@ -9513,7 +9558,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("$x=5;$x=.;$x", "$x");
 		check("$f(x_):=x^2;$f(x_)=.;$f(3)", "$f(3)");
 	}
-	
+
 	public void testUpperCaseQ() {
 		check("UpperCaseQ(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\")", "True");
 		check("UpperCaseQ(\"ABCDEFGHIJKLMNopqRSTUVWXYZ\")", "False");
