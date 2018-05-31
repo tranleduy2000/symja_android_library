@@ -149,6 +149,7 @@ public class F {
 	 * @see java.util.Optional#isPresent
 	 */
 	public final static NILPointer NIL = new NILPointer();
+
 	public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
 	public final static IBuiltInSymbol Abs = F.initFinalSymbol("Abs", ID.Abs);
 	public final static IBuiltInSymbol AbsArg = F.initFinalSymbol("AbsArg", ID.AbsArg);
@@ -161,6 +162,7 @@ public class F {
 	public final static IBuiltInSymbol Alternatives = F.initFinalSymbol("Alternatives", ID.Alternatives);
 	public final static IBuiltInSymbol And = F.initFinalSymbol("And", ID.And);
 	public final static IBuiltInSymbol AngleVector = F.initFinalSymbol("AngleVector", ID.AngleVector);
+	public final static IBuiltInSymbol AntiSymmetric = F.initFinalSymbol("AntiSymmetric", ID.AntiSymmetric);
 	public final static IBuiltInSymbol AntihermitianMatrixQ = F.initFinalSymbol("AntihermitianMatrixQ",
 			ID.AntihermitianMatrixQ);
 	public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ",
@@ -188,7 +190,7 @@ public class F {
 	public final static IBuiltInSymbol ArrayDepth = F.initFinalSymbol("ArrayDepth", ID.ArrayDepth);
 	public final static IBuiltInSymbol ArrayPad = F.initFinalSymbol("ArrayPad", ID.ArrayPad);
 	public final static IBuiltInSymbol ArrayQ = F.initFinalSymbol("ArrayQ", ID.ArrayQ);
-    public final static IBuiltInSymbol Arrays = F.initFinalSymbol("Arrays", ID.Arrays);
+	public final static IBuiltInSymbol Arrays = F.initFinalSymbol("Arrays", ID.Arrays);
 	public final static IBuiltInSymbol Assumptions = F.initFinalSymbol("Assumptions", ID.Assumptions);
 	public final static IBuiltInSymbol AtomQ = F.initFinalSymbol("AtomQ", ID.AtomQ);
 	public final static IBuiltInSymbol Attributes = F.initFinalSymbol("Attributes", ID.Attributes);
@@ -862,6 +864,7 @@ public class F {
 	public final static IBuiltInSymbol Symbol = F.initFinalSymbol("Symbol", ID.Symbol);
 	public final static IBuiltInSymbol SymbolName = F.initFinalSymbol("SymbolName", ID.SymbolName);
 	public final static IBuiltInSymbol SymbolQ = F.initFinalSymbol("SymbolQ", ID.SymbolQ);
+	public final static IBuiltInSymbol Symmetric = F.initFinalSymbol("Symmetric", ID.Symmetric);
 	public final static IBuiltInSymbol SymmetricMatrixQ = F.initFinalSymbol("SymmetricMatrixQ", ID.SymmetricMatrixQ);
 	public final static IBuiltInSymbol SyntaxLength = F.initFinalSymbol("SyntaxLength", ID.SyntaxLength);
 	public final static IBuiltInSymbol SyntaxQ = F.initFinalSymbol("SyntaxQ", ID.SyntaxQ);
@@ -876,6 +879,7 @@ public class F {
 	public final static IBuiltInSymbol TensorDimensions = F.initFinalSymbol("TensorDimensions", ID.TensorDimensions);
 	public final static IBuiltInSymbol TensorProduct = F.initFinalSymbol("TensorProduct", ID.TensorProduct);
 	public final static IBuiltInSymbol TensorRank = F.initFinalSymbol("TensorRank", ID.TensorRank);
+	public final static IBuiltInSymbol TensorSymmetry = F.initFinalSymbol("TensorSymmetry", ID.TensorSymmetry);
 	public final static IBuiltInSymbol Thread = F.initFinalSymbol("Thread", ID.Thread);
 	public final static IBuiltInSymbol Through = F.initFinalSymbol("Through", ID.Through);
 	public final static IBuiltInSymbol Throw = F.initFinalSymbol("Throw", ID.Throw);
@@ -936,6 +940,7 @@ public class F {
 	public final static IBuiltInSymbol With = F.initFinalSymbol("With", ID.With);
 	public final static IBuiltInSymbol Xor = F.initFinalSymbol("Xor", ID.Xor);
 	public final static IBuiltInSymbol YuleDissimilarity = F.initFinalSymbol("YuleDissimilarity", ID.YuleDissimilarity);
+	public final static IBuiltInSymbol ZeroSymmetric = F.initFinalSymbol("ZeroSymmetric", ID.ZeroSymmetric);
 	public final static IBuiltInSymbol Zeta = F.initFinalSymbol("Zeta", ID.Zeta);
 
 	public final static ISymbol $Aborted = initFinalHiddenSymbol(
@@ -2038,6 +2043,16 @@ public class F {
 	}
 
 	/**
+	 * Full symmetry
+	 * 
+	 * @param a0
+	 * @return
+	 */
+	public static IAST Symmetric(final IExpr a0) {
+		return unaryAST1(Symmetric, a0);
+	}
+
+	/**
 	 * Converts an arbitrary expression to a type that can be used inside Symja.
 	 * 
 	 * For example, it will convert Java <code>Integer</code> into instance of <code>IntegerSym</code>,
@@ -2175,6 +2190,10 @@ public class F {
 		return unaryAST1(AngleVector, a0);
 	}
 
+	public static IAST AntiSymmetric(final IExpr a0) {
+		return unaryAST1(AntiSymmetric, a0);
+	}
+
 	public static IAST And(final IExpr a0, final IExpr a1) {
 		return binaryAST2(And, a0, a1);
 	}
@@ -2258,6 +2277,39 @@ public class F {
 
 	public static IAST Arg(final IExpr a0) {
 		return unaryAST1(Arg, a0);
+	}
+
+	/**
+	 * The domain of arrays.
+	 * 
+	 * @param dimension
+	 * @return <code>Arrays(dimensions, Complexes, {})</code>.
+	 */
+	public static IAST Arrays(final IAST dimension) {
+		return Arrays(dimension, F.Complexes, F.List());
+	}
+
+	/**
+	 * The domain of arrays.
+	 * 
+	 * @param dimension
+	 * @param domain
+	 * @return <code>Arrays(dimensions, domain, {})</code>.
+	 */
+	public static IAST Arrays(final IAST dimension, ISymbol domain) {
+		return Arrays(dimension, domain, F.List());
+	}
+
+	/**
+	 * The domain of arrays.
+	 * 
+	 * @param dimension
+	 * @param domain
+	 * @param symmetry
+	 * @return <code>Arrays(dimensions, domain, symmetry)</code>.
+	 */
+	public static IAST Arrays(final IAST dimension, ISymbol domain, IAST symmetry) {
+		return ternaryAST3(Arrays, dimension, domain, symmetry);
 	}
 
 	/**
@@ -5683,14 +5735,21 @@ public class F {
 	}
 
 	public static IAST Tanh(final IExpr a0) {
-
 		return unaryAST1(Tanh, a0);
 	}
 
 	public static IAST Taylor(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Taylor, a0, a1);
-	}
+	} 
 
+	public static IAST TensorSymmetry(final IExpr a0) {
+		return unaryAST1(TensorSymmetry, a0);
+	}
+	
+	public static IAST TensorSymmetry(final IExpr a0, final IExpr a1) {
+		return binaryAST2(TensorSymmetry, a0, a1);
+	}
+	
 	public static IAST TeXForm(final IExpr a0) {
 		return unaryAST1(TeXForm, a0);
 	}
@@ -5899,6 +5958,16 @@ public class F {
 
 	public static IAST With(final IExpr a0, final IExpr a1) {
 		return binaryAST2(With, a0, a1);
+	}
+
+	/**
+	 * Symmetry of a zero tensor.
+	 * 
+	 * @param a0
+	 * @return
+	 */
+	public static IAST ZeroSymmetric(final IExpr a0) {
+		return unaryAST1(ZeroSymmetric, a0);
 	}
 
 	public static IAST Zeta(final IExpr a0) {
