@@ -2,6 +2,7 @@ package org.matheclipse.core.expression;
 
 public class ID {
 
+
     public final static int UNKNOWN = -1;
     public final static int Abort = 0;
     public final static int Abs = 1;
