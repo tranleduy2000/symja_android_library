@@ -173,6 +173,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testApply() {
 		check("f@ g@ h@ i", //
 				"f(g(h(i)))");
+
 		// github issue #40
 		check("((#+##&) @@#&) /@{{1,2},{2,2,2},{3,4}}", //
 				"{4,8,10}");
@@ -1651,6 +1652,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"1+x+x^2-x^5-x^6-2*x^7-x^8-x^9+x^12+x^13+x^14+x^15+x^16+x^17-x^20-x^22-x^24-x^26-x^\n"
 						+ "28+x^31+x^32+x^33+x^34+x^35+x^36-x^39-x^40-2*x^41-x^42-x^43+x^46+x^47+x^48");
 	}
+
 	public void testD() {
 		check("Refine(D(Abs(x),x), Element(x, Reals))", //
 				"x/Abs(x)");
@@ -4083,14 +4085,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testJoin() {
-//		check("min = 0; max = 10^4;  "//
-//				+ "Union@ Flatten@ Table( n^expo, {expo, Prime@ Range@ PrimePi@ Log2@ max}, {n, Floor(1 + min^(1/expo)), max^(1/expo)})",
-//				"");
 		// http://oeis.org/A001597 - Perfect powers: m^k where m > 0 and k >= 2. //
 		check("Join({1}, Select(Range(1770), GCD@@FactorInteger(#)[[All, 2]]>1&))", //
 				"{1,4,8,9,16,25,27,32,36,49,64,81,100,121,125,128,144,169,196,216,225,243,256,289,\n"
 						+ "324,343,361,400,441,484,512,529,576,625,676,729,784,841,900,961,1000,1024,1089,\n"
 						+ "1156,1225,1296,1331,1369,1444,1521,1600,1681,1728,1764}");
+
 		check("Join({a, b}, {c, d, e})", "{a,b,c,d,e}");
 		check("Join({{a, b}, {c, d}}, {{1, 2}, {3, 4}})", "{{a,b},{c,d},{1,2},{3,4}}");
 		check("Join(a + b, c + d, e + f)", "a+b+c+d+e+f");
@@ -4483,6 +4483,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Limit(E^x, x->-Infinity)", "0");
 		check("Limit(a^x, x->0)", "1");
 		check("Limit(c*(x^(-10)), x->Infinity)", "0");
+
 		// TOOO distinguish between upper and lower limit convergence
 		check("Limit(1/(x - 4), x -> 4)", "Infinity");
 
@@ -4531,7 +4532,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{1,2,3,5,8,9,13,18,19,25,32,33,41,50,51,61,72,73,85,98,99,113,128,129,145,162,\n"
 						+ "163,181,200,201,221,242,243,265,288,289,313,338,339,365,392,393,421,450,451,481,\n"
 						+ "512,513,545,578,579,613,648,649,685,722,723,761,800,801}");
-		
+
 		// A050250 Number of nonzero palindromes less than 10^n.
 		// https://oeis.org/A050250
 		check("LinearRecurrence({1, 10, -10}, {9, 18, 108}, 30)", //
@@ -6710,7 +6711,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("E^(y-Log(x)-z)", "E^(y-z)/x");
 		check("E^(y+Log(x)-a*Log(v)*b*Log(u)-z)", "E^(y-z-a*b*Log(u)*Log(v))*x");
 		check("E^(y-Log(x)+Log(y)-a*Log(v)*b*Log(u)-z)", "(E^(y-z-a*b*Log(u)*Log(v))*y)/x");
-
 		check("Sqrt(1/a)", "Sqrt(1/a)");
 	}
 
@@ -7206,6 +7206,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{1,2,3,4,5}");
 		check("Range(-5.0)", //
 				"{}");
+
 		check("Range(0,10,Pi)", //
 				"{0,Pi,2*Pi,3*Pi}");
 		check("x * Range(-1, 1, 1/5)", //
@@ -8300,6 +8301,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"E^((Log(a)+Log(b))/m)");
 		check("Solve(a0*x^p+a1*x^q==0,x)", //
 				"{{x->E^((-I*Pi+Log(a0)-Log(a1))/(-p+q))}}");
+
 		check("Solve(a*x^2+b*x==0, x)", //
 				"{{x->0},{x->-b/a}}");
 		check("Solve({Cos(x)*x==0, x > 10}, x)", "{}");
@@ -9664,6 +9666,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testUnion() {
+		// http://oeis.org/A001597 - Perfect powers: m^k where m > 0 and k >= 2.
+		check("$min = 0; $max = 10^4;  "//
+				+ "Union@ Flatten@ Table( n^expo, {expo, Prime@ Range@ PrimePi@ Log2@ $max}, {n, Floor(1 + $min^(1/expo)), $max^(1/expo)})", //
+				"{1,4,8,9,16,25,27,32,36,49,64,81,100,121,125,128,144,169,196,216,225,243,256,289,\n"
+						+ "324,343,361,400,441,484,512,529,576,625,676,729,784,841,900,961,1000,1024,1089,\n"
+						+ "1156,1225,1296,1331,1369,1444,1521,1600,1681,1728,1764,1849,1936,2025,2048,2116,\n"
+						+ "2187,2197,2209,2304,2401,2500,2601,2704,2744,2809,2916,3025,3125,3136,3249,3364,\n"
+						+ "3375,3481,3600,3721,3844,3969,4096,4225,4356,4489,4624,4761,4900,4913,5041,5184,\n"
+						+ "5329,5476,5625,5776,5832,5929,6084,6241,6400,6561,6724,6859,6889,7056,7225,7396,\n"
+						+ "7569,7744,7776,7921,8000,8100,8192,8281,8464,8649,8836,9025,9216,9261,9409,9604,\n"
+						+ "9801,10000}");
+
 		check("Union({a,a,b,c})", "{a,b,c}");
 		check("Union({9, 0, 0, 3, 2, 3, 6, 2, 9, 8, 4, 9, 0, 2, 6, 5, 7, 4, 9, 8})", "{0,2,3,4,5,6,7,8,9}");
 	}
