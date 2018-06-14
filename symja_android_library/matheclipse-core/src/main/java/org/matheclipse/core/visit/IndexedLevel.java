@@ -24,7 +24,7 @@ import org.matheclipse.parser.client.math.MathException;
 /**
  * A level specification for levels used in the function <code>MapIndexed</code>
  *  
- * Example: the nested list <code>{x,{y}}</code> has depth <code>3</code> 
+ * Example: the nested list <code>{x,{y}}</code> has depth <code>3</code>
  * 
  */
 public class IndexedLevel {
@@ -219,7 +219,10 @@ public class IndexedLevel {
 	}
 
 	public IExpr visitExpr(IExpr element, int[] indx) {
-		if (isInRange(fCurrentLevel, -1)) {
+		if (element.isAtom()) {
+			fCurrentDepth = -1;
+		}
+		if (isInRange(fCurrentLevel, fCurrentDepth)) {
 			return fFunction.apply(element, createIndexes(indx));
 		}
 		return F.NIL;
