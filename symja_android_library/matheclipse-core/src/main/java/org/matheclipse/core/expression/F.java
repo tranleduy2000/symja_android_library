@@ -2114,7 +2114,7 @@ public class F {
 	}
 
 	public static IAST And(final IExpr a0, final IExpr a1) {
-		return binary(And, a0, a1);
+		return binaryAST2(And, a0, a1);
 	}
 
 	public static IAST Apart(final IExpr a0) {
@@ -2558,7 +2558,7 @@ public class F {
 	}
 
 	public static IAST CNInfinity() {
-		return binary(Times, CN1, Infinity);
+		return binaryAST2(Times, CN1, Infinity);
 	}
 
 	public static IAST Coefficient(final IExpr a0, final IExpr a1) {
@@ -2979,7 +2979,7 @@ public class F {
 	 * @return
 	 */
 	public static IAST Divide(final IExpr arg1, final IExpr arg2) {
-		return binary(Times, arg1, binaryAST2(Power, arg2, CN1));
+		return binaryAST2(Times, arg1, binaryAST2(Power, arg2, CN1));
 	}
 
 	public static IAST Divisible(final IExpr a0, final IExpr a1) {
@@ -2994,12 +2994,12 @@ public class F {
 		return binaryAST2(Do, a0, a1);
 	}
 
-	public static IAST Dot(final IExpr... a) {
+	public static IASTAppendable Dot(final IExpr... a) {
 		return ast(a, Dot);
 	}
 
 	public static IAST Dot(final IExpr a0, final IExpr a1) {
-		return binary(Dot, a0, a1);
+		return binaryAST2(Dot, a0, a1);
 	}
 
 	public static IAST Drop(final IExpr a0, final IExpr a1) {
@@ -3032,12 +3032,12 @@ public class F {
 		return ternaryAST3(EllipticPi, a0, a1, a2);
 	}
 
-	public static IAST Equal(final IExpr... a) {
+	public static IASTAppendable Equal(final IExpr... a) {
 		return ast(a, Equal);
 	}
 
 	public static IAST Equal(final IExpr a0, final IExpr a1) {
-		return binary(Equal, a0, a1);
+		return binaryAST2(Equal, a0, a1);
 	}
 
 	public static IAST Erf(final IExpr a) {
@@ -3437,7 +3437,7 @@ public class F {
 	}
 
 	public static IAST FrechetDistribution(final IExpr a0, final IExpr a1) {
-		return binary(FrechetDistribution, a0, a1);
+		return binaryAST2(FrechetDistribution, a0, a1);
 	}
 	public static IAST FresnelC(final IExpr a) {
 		return unaryAST1(FresnelC, a);
@@ -3456,11 +3456,11 @@ public class F {
 	}
 
 	public static IAST Function(final IExpr a0) {
-		return unary(Function, a0);
+		return unaryAST1(Function, a0);
 	}
 
 	public static IAST Function(final IExpr a0, final IExpr a1) {
-		return binary(Function, a0, a1);
+		return binaryAST2(Function, a0, a1);
 	}
 
 	public static IAST Gamma(final IExpr a0) {
@@ -4392,7 +4392,7 @@ public class F {
 		if (x.isNegativeInfinity()) {
 			return CInfinity;
 		}
-		return binary(Times, CN1, x);
+		return binaryAST2(Times, CN1, x);
 	}
 
 	public static IAST Negative(final IExpr a0) {
@@ -4541,7 +4541,7 @@ public class F {
 	}
 
 	public static IAST Or(final IExpr a0, final IExpr a1) {
-		return binary(Or, a0, a1);
+		return binaryAST2(Or, a0, a1);
 	}
 
 	public static IAST Or(final IExpr... a) {
@@ -4668,10 +4668,10 @@ public class F {
 			}
 			if (a0.compareTo(a1) > 0) {
 				// swap arguments
-				return binary(Plus, a1, a0);
+				return binaryAST2(Plus, a1, a0);
 			}
 		}
-		return binary(Plus, a0, a1);
+		return binaryAST2(Plus, a0, a1);
 	}
 
 	public static IAST Plus(final long num, final IExpr... a) {
@@ -5254,7 +5254,7 @@ public class F {
 	}
 
 	public static IAST Show(final IExpr a0) {
-		return unary(Show, a0);
+		return unaryAST1(Show, a0);
 	}
 
 	public static IAST Sign(final IExpr a) {
@@ -5502,10 +5502,10 @@ public class F {
 			}
 			IASTAppendable clone = F.PlusAlloc(arg1.size() + 1);
 			clone.appendArgs((IAST) arg1);
-			clone.append(binary(Times, CN1, arg2));
+			clone.append(binaryAST2(Times, CN1, arg2));
 			return clone;
 		}
-		return binary(Plus, arg1, binary(Times, CN1, arg2));
+		return binaryAST2(Plus, arg1, binaryAST2(Times, CN1, arg2));
 	}
 
 	public static IAST Sum(final IExpr a0, final IExpr a1) {
@@ -5665,10 +5665,10 @@ public class F {
 			}
 			if (a0.compareTo(a1) > 0) {
 				// swap arguments
-				return binary(Times, a1, a0);
+				return binaryAST2(Times, a1, a0);
 			}
 		}
-		return binary(Times, a0, a1);
+		return binaryAST2(Times, a0, a1);
 	}
 
 	public static IAST Times(final long num, final IExpr... a) {
@@ -5730,7 +5730,7 @@ public class F {
 	}
 
 	public static IAST Unequal(final IExpr a0, final IExpr a1) {
-		return binary(Unequal, a0, a1);
+		return binaryAST2(Unequal, a0, a1);
 	}
 
 	public static IAST Unevaluated(final IExpr a0) {

@@ -78,9 +78,6 @@ import static org.matheclipse.core.expression.F.Sqr;
 import static org.matheclipse.core.expression.F.Sqrt;
 import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.g;
-import static org.matheclipse.core.expression.F.r;
-import static org.matheclipse.core.expression.F.y;
 
 public final class LinearAlgebra {
 
@@ -2800,7 +2797,7 @@ public final class LinearAlgebra {
             if (dim != null) {
                 // Gram-Schmidt orthogonalization
                 IExpr result = F.Map(F.Function(F.Normalize(F.Slot1)), //
-                        F.Fold(F.Function(F.Append(F.Slot1, F.binary(oneStep, F.Slot2, F.Slot1))), F.List(), arg1));
+						F.Fold(F.Function(F.Append(F.Slot1, F.binaryAST2(oneStep, F.Slot2, F.Slot1))), F.List(), arg1));
                 return engine.evaluate(result);
             }
             return F.NIL;

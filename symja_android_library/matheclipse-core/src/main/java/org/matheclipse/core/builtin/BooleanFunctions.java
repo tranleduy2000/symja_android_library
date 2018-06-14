@@ -127,7 +127,7 @@ public final class BooleanFunctions {
 			if (!list.forAll(new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
-					IExpr temp = engine.evaluate(F.unary(head, x));
+					IExpr temp = engine.evaluate(F.unaryAST1(head, x));
 					if (temp.isTrue()) {
 						return true;
 					} else if (temp.isFalse()) {
@@ -353,7 +353,7 @@ public final class BooleanFunctions {
 		}
 
 		private static boolean anyTrueArgument(IExpr x, IExpr head, IASTAppendable resultCollector, EvalEngine engine) {
-			IExpr temp = engine.evaluate(F.unary(head, x));
+			IExpr temp = engine.evaluate(F.unaryAST1(head, x));
 			if (temp.isTrue()) {
 				return true;
 			} else if (!temp.isFalse()) {
@@ -2490,7 +2490,7 @@ public final class BooleanFunctions {
 
 		private static boolean noneTrueArgument(IExpr x, IExpr head, IASTAppendable resultCollector,
 				EvalEngine engine) {
-			IExpr temp = engine.evaluate(F.unary(head, x));
+			IExpr temp = engine.evaluate(F.unaryAST1(head, x));
 			if (temp.isTrue()) {
 				return true;
 			} else if (!temp.isFalse()) {
