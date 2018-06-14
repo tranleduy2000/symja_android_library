@@ -29,7 +29,6 @@ import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbol.RuleType;
-import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
@@ -152,7 +151,7 @@ public final class PatternMatching {
      * <pre>
      * ClearAll(symbol1, symbol2,...)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * clears all values and attributes associated with the given symbols.
@@ -187,7 +186,7 @@ public final class PatternMatching {
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Definition(ArcSinh)
      * {ArcSinh(0)=0,
@@ -384,7 +383,15 @@ public final class PatternMatching {
                 }
                 IStringX arg1 = (IStringX) ast.arg1();
                 File file = new File(arg1.toString());
+				if (file.exists()) {
+					// System.out.println(file.toString());
+					return getFile(file, engine);
+				} else {
+					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
+					if (file.exists()) {
                 return getFile(file, engine);
+					}
+				}
             }
             return F.NIL;
         }
