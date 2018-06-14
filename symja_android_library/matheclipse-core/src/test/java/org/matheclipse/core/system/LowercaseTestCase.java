@@ -4922,7 +4922,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Mod(14, 6)", "2");
 		check("Mod(-3,4)", "1");
 		check("Mod(-3,-4)", "-3");
-		check("Mod(5,0)", "Mod(5,0)");
+		check("Mod(2,-4)", "-2");
+		check("Mod(3,-4)", "-1");
+		check("Mod(5,0)", "Indeterminate");
 	}
 
 	public void testModule() {
