@@ -972,7 +972,7 @@ public final class Programming {
 				return ast.arg4();
 			}
 
-			return F.Null;
+			return F.NIL;
 		}
 
 		@Override
