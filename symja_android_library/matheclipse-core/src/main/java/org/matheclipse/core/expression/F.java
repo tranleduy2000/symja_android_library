@@ -457,6 +457,7 @@ public class F {
 	public final static IBuiltInSymbol Inner = BuiltIns.valueOf(BuiltIns.Inner);
 	public final static IBuiltInSymbol Insert = BuiltIns.valueOf(BuiltIns.Insert);
 	public final static IBuiltInSymbol Integer = BuiltIns.valueOf(BuiltIns.Integer);
+	public final static IBuiltInSymbol IntegerDigits = BuiltIns.valueOf(BuiltIns.IntegerDigits);
 	public final static IBuiltInSymbol IntegerExponent = BuiltIns.valueOf(BuiltIns.IntegerExponent);
 	public final static IBuiltInSymbol IntegerLength = BuiltIns.valueOf(BuiltIns.IntegerLength);
 	public final static IBuiltInSymbol IntegerPart = BuiltIns.valueOf(BuiltIns.IntegerPart);
