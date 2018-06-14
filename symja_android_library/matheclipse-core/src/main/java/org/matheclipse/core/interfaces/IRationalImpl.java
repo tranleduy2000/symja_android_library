@@ -20,7 +20,7 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
      *
      * @return denominator
      */
-    public abstract IInteger getNumerator();
+    public abstract IInteger numerator();
 
     public abstract IRational multiply(IRational parm1);
 

@@ -705,8 +705,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 			return matchASTSequence(lhsPatternAST, lhsEvalAST, 0, engine, stackMatcher);
 		}
 		if (lhsPatternAST.isAST(F.Rational, 3) && lhsEvalExpr.isRational()) {
-			IRational numer = ((IRational) lhsEvalExpr).getNumerator();
-			IRational denom = ((IRational) lhsEvalExpr).getDenominator();
+			IRational numer = ((IRational) lhsEvalExpr).numerator();
+			IRational denom = ((IRational) lhsEvalExpr).denominator();
 			if (matchExpr(lhsPatternAST.arg1(), numer, engine) && matchExpr(lhsPatternAST.arg2(), denom, engine)) {
 				return true;
 			}
@@ -873,8 +873,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 				matched = matchExpr(lhsPatternExpr.first(), re, engine, stackMatcher)
 						&& matchExpr(lhsPatternExpr.second(), im, engine, stackMatcher);
 			} else if (lhsPatternExpr.isAST(F.Rational, 3) && lhsEvalExpr.isRational()) {
-				IExpr numerator = ((IRational) lhsEvalExpr).getNumerator();
-				IExpr denominator = ((IRational) lhsEvalExpr).getDenominator();
+				IExpr numerator = ((IRational) lhsEvalExpr).numerator();
+				IExpr denominator = ((IRational) lhsEvalExpr).denominator();
 				matched = matchExpr(lhsPatternExpr.first(), numerator, engine, stackMatcher)
 						&& matchExpr(lhsPatternExpr.second(), denominator, engine, stackMatcher);
 			} else {

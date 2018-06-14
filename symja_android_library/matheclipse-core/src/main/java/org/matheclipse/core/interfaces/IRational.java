@@ -76,21 +76,21 @@ public interface IRational extends ISignedNumber, IBigNumber {
      *
      * @return denominator
      */
-    public IInteger getDenominator();
+    public IInteger denominator();
 
     /**
      * Returns this number as <code>BigFraction</code> number.
      *
      * @return <code>this</code> number s big fraction.
      */
-    public BigFraction getFraction();
+    public BigFraction toBigFraction();
 
     /**
      * Returns the numerator of this fraction.
      *
      * @return denominator
      */
-    public IInteger getNumerator();
+    public IInteger numerator();
 
     public IRational multiply(IRational parm1);
 

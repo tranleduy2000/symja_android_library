@@ -346,12 +346,6 @@ public class BigFractionSym extends AbstractFractionSym {
 
 	/** {@inheritDoc} */
 	@Override
-	public BigFraction getFraction() {
-		return fFraction;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public BigFraction toBigFraction() {
 		return fFraction;
 	}
