@@ -385,7 +385,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		return null;
 	}
 	@Override
-	public double getImaginary() {
+	public double imDoubleValue() {
 		return fImaginary.doubleValue();
 	}
 
@@ -400,7 +400,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	}
 
 	@Override
-	public double getReal() {
+	public double reDoubleValue() {
 		return fReal.doubleValue();
 	}
 

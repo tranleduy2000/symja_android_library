@@ -563,12 +563,12 @@ public class ApfloatNum extends INumImpl implements INum {
 	}
 
 	@Override
-	public double getImaginary() {
+	public double imDoubleValue() {
 		return 0.0;
 	}
 
 	@Override
-	public double getReal() {
+	public double reDoubleValue() {
 		return doubleValue();
 	}
 }

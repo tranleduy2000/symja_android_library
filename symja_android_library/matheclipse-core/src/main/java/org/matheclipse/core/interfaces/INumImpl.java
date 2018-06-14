@@ -10,6 +10,6 @@ public abstract class INumImpl extends ISignedNumberImpl implements INum {
 
 
     public INum multiply(IRational val) {
-        return multiply(F.num(val.getReal()));
+        return multiply(F.num(val.reDoubleValue()));
     }
 }

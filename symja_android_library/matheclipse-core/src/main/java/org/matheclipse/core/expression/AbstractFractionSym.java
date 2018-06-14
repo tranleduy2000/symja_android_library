@@ -366,7 +366,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	}
 
 	@Override
-	public double getImaginary() {
+	public double imDoubleValue() {
 		return 0.0;
 	}
 
@@ -386,7 +386,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	}
 
 	@Override
-	public double getReal() {
+	public double reDoubleValue() {
 		return doubleValue();
 	}
 

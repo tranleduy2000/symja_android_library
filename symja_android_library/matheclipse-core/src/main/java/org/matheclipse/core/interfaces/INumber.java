@@ -123,14 +123,14 @@ public interface INumber extends IExpr {
 	 * 
 	 * @return real part
 	 */
-	public double getImaginary();
+	public double imDoubleValue();
 
 	/**
 	 * Returns the real part of a complex number
 	 * 
 	 * @return real part
 	 */
-	public double getReal();
+	public double reDoubleValue();
 	
 	/**
 	 * Returns the imaginary part of a complex number
