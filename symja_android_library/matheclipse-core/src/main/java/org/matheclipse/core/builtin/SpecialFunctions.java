@@ -261,7 +261,7 @@ public class SpecialFunctions {
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1) {
-			if (arg1.isSignedNumber()) {
+			if (arg1.isReal()) {
 				if (arg1.isZero()) {
 					return F.C1;
 				}
@@ -390,7 +390,7 @@ public class SpecialFunctions {
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1) {
-			if (arg1.isSignedNumber()) {
+			if (arg1.isReal()) {
 				if (arg1.isZero()) {
 					return F.C0;
 				}
@@ -446,7 +446,7 @@ public class SpecialFunctions {
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1) {
-			if (arg1.isSignedNumber()) {
+			if (arg1.isReal()) {
 				ISignedNumber z = (ISignedNumber) arg1;
 				if (z.isZero()) {
 					return F.CInfinity;
@@ -600,7 +600,7 @@ public class SpecialFunctions {
 			}
 			if (arg2.isOne()) {
 				IExpr temp = arg1.re();
-				if (temp.isSignedNumber()) {
+				if (temp.isReal()) {
 					ISignedNumber num = (ISignedNumber) temp;
 					if (num.isOne()) {
 						return F.Indeterminate;
@@ -615,7 +615,7 @@ public class SpecialFunctions {
 				return Times(Plus(CN1, Power(C2, Plus(C1, Negate(arg1)))), Zeta(arg1));
 			}
 
-			if (arg1.isSignedNumber()) {
+			if (arg1.isReal()) {
 				if (arg1.isZero()) {
 					// arg2/(1 - arg2)
 					return Times(arg2, Power(Plus(C1, Negate(arg2)), -1));

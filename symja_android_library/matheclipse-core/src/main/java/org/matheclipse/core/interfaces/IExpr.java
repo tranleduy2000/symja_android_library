@@ -1667,7 +1667,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return
      */
-    boolean isSignedNumber();
+    boolean isReal();
 
     /**
      * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements the

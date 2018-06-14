@@ -464,7 +464,7 @@ public class ApfloatNum extends INumImpl implements INum {
 		if (expr instanceof ApfloatNum) {
 			return fApfloat.compareTo(((ApfloatNum) expr).fApfloat);
 		}
-		if (expr.isSignedNumber()) {
+		if (expr.isReal()) {
 			return Double.compare(fApfloat.doubleValue(), ((ISignedNumber) expr).doubleValue());
 		}
 		return super.compareTo(expr);

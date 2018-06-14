@@ -414,7 +414,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			}
 		} else if (clazz.equals(Integer.class)) {
 			IExpr temp = F.eval(this);
-			if (temp.isSignedNumber()) {
+			if (temp.isReal()) {
 				try {
 					return Integer.valueOf(((ISignedNumber) this).toInt());
 				} catch (final ArithmeticException e) {
@@ -645,7 +645,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public final ISignedNumber evalSignedNumber() {
 		if (isNumericFunction()) {
 			IExpr result = EvalEngine.get().evalN(this);
-			if (result.isSignedNumber()) {
+			if (result.isReal()) {
 				return (ISignedNumber) result;
 			}
 		}
@@ -2020,7 +2020,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public final boolean isNegative() {
 		if (isNumericFunction()) {
 			IExpr result = EvalEngine.get().evalN(this);
-			if (result.isSignedNumber()) {
+			if (result.isReal()) {
 				return ((ISignedNumber) result).isNegative();
 			}
 		}
@@ -2182,7 +2182,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public final boolean isPositive() {
 		if (isNumericFunction()) {
 			IExpr result = EvalEngine.get().evalN(this);
-			if (result.isSignedNumber()) {
+			if (result.isReal()) {
 				return ((ISignedNumber) result).isPositive();
 			}
 		}
@@ -2241,7 +2241,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 					dim[1] = row.argSize();
 					boolean containsNum = false;
 					for (int j = 1; j < row.size(); j++) {
-						if (row.get(j).isSignedNumber()) {
+						if (row.get(j).isReal()) {
 							if (row.get(j) instanceof INum) {
 								if (!(row.get(j) instanceof Num)) {
 									// Apfloat number
@@ -2265,7 +2265,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 							return false;
 						}
 						for (int j = 1; j < row.size(); j++) {
-							if (row.get(j).isSignedNumber()) {
+							if (row.get(j).isReal()) {
 								if (row.get(j) instanceof INum) {
 									if (!(row.get(j) instanceof Num)) {
 										// Apfloat number
@@ -2326,7 +2326,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		if (isList()) {
 			boolean containsNum = false;
 			for (int i = 1; i < size(); i++) {
-				if (get(i).isSignedNumber()) {
+				if (get(i).isReal()) {
 					if (get(i) instanceof INum) {
 						if (!(get(i) instanceof Num)) {
 							return false;
@@ -2421,7 +2421,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isSignedNumber() {
+	public final boolean isReal() {
 		return false;
 	}
 
@@ -2969,7 +2969,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public final int signum() {
 		if (isTimes()) {
 			IExpr temp = arg1();
-			if (temp.isSignedNumber() && ((ISignedNumber) temp).isNegative()) {
+			if (temp.isReal() && ((ISignedNumber) temp).isNegative()) {
 				return -1;
 			}
 		}
@@ -3091,7 +3091,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		}
 		// * Numbers return the header strings
 		// * "DoubleComplex", "Double", "Integer", "Fraction", "Complex"
-		if (header.isSignedNumber()) {
+		if (header.isReal()) {
 			if (header instanceof INum) {
 				return F.Real;
 			}
@@ -3163,7 +3163,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 				buf.append('}');
 				return buf.toString();
 
-			} else if (isAST(F.Slot, 2) && (arg1().isSignedNumber())) {
+			} else if (isAST(F.Slot, 2) && (arg1().isReal())) {
 				try {
 					final int slot = ((ISignedNumber) arg1()).toInt();
 					if (slot <= 0) {

@@ -108,7 +108,7 @@ public class BesselJ extends AbstractFunctionEvaluator {
 			}
 
 		}
-		if (n.isSignedNumber()) {
+		if (n.isReal()) {
 			IExpr in = engine.evaluate(((ISignedNumber) n).add(F.CN1D2));
 			if (in.isNumIntValue()) {
 				return besselJHalf(n, z);
@@ -131,7 +131,7 @@ public class BesselJ extends AbstractFunctionEvaluator {
 				return F.Times(F.Power(F.CN1, n), F.BesselJ(n.negate(), z));
 			}
 		}
-		if (n.isSignedNumber() && z instanceof INum) {
+		if (n.isReal() && z instanceof INum) {
 			try {
 				// numeric mode evaluation
 				if (order != Integer.MIN_VALUE) {

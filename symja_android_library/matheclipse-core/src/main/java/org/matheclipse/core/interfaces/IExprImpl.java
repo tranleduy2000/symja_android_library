@@ -192,7 +192,7 @@ public abstract class IExprImpl implements IExpr {
                 return Boolean.FALSE;
             }
         } else if (clazz.equals(Integer.class)) {
-            if (isSignedNumber()) {
+            if (isReal()) {
                 try {
                     return Integer.valueOf(((ISignedNumber) this).toInt());
                 } catch (final ArithmeticException e) {
@@ -378,7 +378,7 @@ public abstract class IExprImpl implements IExpr {
      * @return this expression converted to a Java <code>double</code> value.
      */
     public double evalDouble() {
-        if (isSignedNumber()) {
+        if (isReal()) {
             return ((ISignedNumber) this).doubleValue();
         }
         throw new WrongArgumentType(this, "Conversion into a double numeric value is not possible!");
@@ -402,7 +402,7 @@ public abstract class IExprImpl implements IExpr {
      * @return <code>null</code> if the conversion is not possible.
      */
     public ISignedNumber evalSignedNumber() {
-        if (isSignedNumber()) {
+        if (isReal()) {
             return (ISignedNumber) EvalEngine.get().evalN(this);
         }
         return null;
@@ -495,7 +495,7 @@ public abstract class IExprImpl implements IExpr {
      * @return
      */
     public IExpr greater(final IExpr a1) {
-        if (isSignedNumber() && a1.isSignedNumber()) {
+        if (isReal() && a1.isReal()) {
             return ((ISignedNumber) this).isGreaterThan(((ISignedNumber) a1)) ? F.True : F.False;
         }
         EvalEngine engine = EvalEngine.get();
@@ -509,7 +509,7 @@ public abstract class IExprImpl implements IExpr {
      * @return
      */
     public IExpr greaterEqual(final IExpr a1) {
-        if (isSignedNumber() && a1.isSignedNumber()) {
+        if (isReal() && a1.isReal()) {
             return ((ISignedNumber) this).isLessThan(((ISignedNumber) a1)) ? F.False : F.True;
         }
         EvalEngine engine = EvalEngine.get();
@@ -1644,7 +1644,7 @@ public abstract class IExprImpl implements IExpr {
         if (isNegativeResult() || isPositiveResult()) {
             return true;
         }
-        if (isSignedNumber()) {
+        if (isReal()) {
             return true;
         }
         if (isNegativeInfinity() || isInfinity()) {
@@ -2131,7 +2131,7 @@ public abstract class IExprImpl implements IExpr {
      *
      * @return
      */
-    public boolean isSignedNumber() {
+    public boolean isReal() {
         return this instanceof ISignedNumber;
     }
 
@@ -2357,7 +2357,7 @@ public abstract class IExprImpl implements IExpr {
      * @return
      */
     public IExpr less(final IExpr a1) {
-        if (isSignedNumber() && a1.isSignedNumber()) {
+        if (isReal() && a1.isReal()) {
             return ((ISignedNumber) this).isLessThan(((ISignedNumber) a1)) ? F.True : F.False;
         }
         EvalEngine engine = EvalEngine.get();
@@ -2371,7 +2371,7 @@ public abstract class IExprImpl implements IExpr {
      * @return
      */
     public IExpr lessEqual(final IExpr a1) {
-        if (isSignedNumber() && a1.isSignedNumber()) {
+        if (isReal() && a1.isReal()) {
             return ((ISignedNumber) this).isGreaterThan(((ISignedNumber) a1)) ? F.False : F.True;
         }
         EvalEngine engine = EvalEngine.get();
@@ -2879,7 +2879,7 @@ public abstract class IExprImpl implements IExpr {
         if (isZero()) {
             return 0;
         }
-        if (isSignedNumber()) {
+        if (isReal()) {
             return ((ISignedNumber) this).sign();
         }
         return 1;

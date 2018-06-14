@@ -211,7 +211,7 @@ public final class Validate {
 			}
 			return result;
 		}
-		if (ast.get(pos).isSignedNumber()) {
+		if (ast.get(pos).isReal()) {
 			try {
 				int result = ((ISignedNumber) ast.get(pos)).toInt();
 				if (startValue > result) {
@@ -261,7 +261,7 @@ public final class Validate {
 						+ startValue + " - " + Integer.MAX_VALUE);
 			}
 		}
-		if (expr.isSignedNumber()) {
+		if (expr.isReal()) {
 			try {
 				int result = ((ISignedNumber) expr).toInt();
 				if (startValue > result) {
@@ -318,7 +318,7 @@ public final class Validate {
 			}
 			return result;
 		}
-		if (expr.isSignedNumber()) {
+		if (expr.isReal()) {
 			try {
 				int result = ((ISignedNumber) expr).toInt();
 				if (startValue > result) {

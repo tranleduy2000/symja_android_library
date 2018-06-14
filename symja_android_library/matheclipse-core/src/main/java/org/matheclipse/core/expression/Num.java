@@ -166,7 +166,7 @@ public class Num extends INumImpl implements INum {
 		if (expr instanceof Num) {
 			return Double.compare(fDouble, ((Num) expr).fDouble);
 		}
-		if (expr.isSignedNumber()) {
+		if (expr.isReal()) {
 			return Double.compare(fDouble, ((ISignedNumber) expr).doubleValue());
 		}
 		return super.compareTo(expr);

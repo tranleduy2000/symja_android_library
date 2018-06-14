@@ -88,7 +88,7 @@ public class Sign extends AbstractEvaluator {
 				return result[0];
 			}
 		}
-		if (arg1.isPower() && arg1.getAt(2).isSignedNumber()) {
+		if (arg1.isPower() && arg1.getAt(2).isReal()) {
 			return F.Power(F.Sign(arg1.getAt(1)), arg1.getAt(2));
 		}
 		if (AbstractAssumptions.assumeNegative(arg1)) {
@@ -110,7 +110,7 @@ public class Sign extends AbstractEvaluator {
 	}
 
 	public static IExpr numberSign(INumber arg1) {
-		if (arg1.isSignedNumber()) {
+		if (arg1.isReal()) {
 			final int signum = ((ISignedNumber) arg1).sign();
 			return F.integer(signum);
 		} else if (arg1.isComplex()) {

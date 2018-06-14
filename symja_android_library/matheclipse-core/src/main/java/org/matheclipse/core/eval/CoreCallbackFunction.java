@@ -38,7 +38,7 @@ public class CoreCallbackFunction implements IDoubleCallbackFunction {
 			// fun.append(F.num(args[i]));
 			// }
 			final IExpr result = F.evaln(fun);
-			if (result.isSignedNumber()) {
+			if (result.isReal()) {
 				return ((ISignedNumber) result).doubleValue();
 			}
 		} else if (node instanceof FunctionNode) {
@@ -49,7 +49,7 @@ public class CoreCallbackFunction implements IDoubleCallbackFunction {
 				fun.append(F.num(args[i]));
 			}
 			final IExpr result = F.evaln(fun);
-			if (result.isSignedNumber()) {
+			if (result.isReal()) {
 				return ((ISignedNumber) result).doubleValue();
 			}
 		}

@@ -6,7 +6,6 @@ import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
-import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 
@@ -147,7 +146,7 @@ public class BigFractionSym extends AbstractFractionSym {
 		if (expr instanceof IInteger) {
 			return fFraction.compareTo(new BigFraction(((IInteger) expr).toBigNumerator(), BigInteger.ONE));
 		}
-		if (expr.isSignedNumber()) {
+		if (expr.isReal()) {
 			return Double.compare(fFraction.doubleValue(), ((ISignedNumber) expr).doubleValue());
 		}
 		return super.compareTo(expr);
