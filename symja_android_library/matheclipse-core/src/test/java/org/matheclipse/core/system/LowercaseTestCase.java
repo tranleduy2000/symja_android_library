@@ -1457,6 +1457,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ContinuedFraction(Sqrt(13),20)", "{3,1,1,1,1,6,1,1,1,1,6,1,1,1,1,6,1,1,1,1}");
 	}
 
+	public void testConvergents() {
+		check("Convergents({2,3,4,5})", //
+				"{2,7/3,30/13,157/68}");
+		check("Convergents({1,1,1,1,1})", //
+				"{1,2,3/2,5/3,8/5}");
+		check("Convergents({a,b,c,d})", //
+				"{a,(1+a*b)/b,(a+c+a*b*c)/(1+b*c),(1+a*b+a*d+c*d+a*b*c*d)/(b+d+b*c*d)}");
+	}
 	public void testCoprimeQ() {
 		check("CoprimeQ(8,9,11)", "True");
 		check("CoprimeQ({1, 2, 3, 4, 5}, 6)", "{True,False,False,False,True}");
@@ -3157,6 +3165,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFromContinuedFraction() {
+		check("FromContinuedFraction({1,1,1,1,1})", "8/5");
 		check("FromContinuedFraction({2,3,4,5})", "157/68");
 		check("ContinuedFraction(157/68)", "{2,3,4,5}");
 	}

@@ -270,6 +270,7 @@ public class F {
 	public final static IBuiltInSymbol ConstantArray = BuiltIns.valueOf(BuiltIns.ConstantArray);
 	public final static IBuiltInSymbol Continue = BuiltIns.valueOf(BuiltIns.Continue);
 	public final static IBuiltInSymbol ContinuedFraction = BuiltIns.valueOf(BuiltIns.ContinuedFraction);
+    public final static IBuiltInSymbol Convergents = BuiltIns.valueOf(BuiltIns.Convergents);
 	public final static IBuiltInSymbol ConvexHullMesh = BuiltIns.valueOf(BuiltIns.ConvexHullMesh);
 	public final static IBuiltInSymbol CoprimeQ = BuiltIns.valueOf(BuiltIns.CoprimeQ);
 	public final static IBuiltInSymbol Correlation = BuiltIns.valueOf(BuiltIns.Correlation);
