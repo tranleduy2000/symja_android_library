@@ -107,7 +107,6 @@ public class ExprParser extends Scanner {
 		return false;
 	}
 
-	protected IParserFactory fFactory;
 	/**
 	 * Set to true if the expression shouldn't be evaluated on input
 	 */
@@ -119,6 +118,7 @@ public class ExprParser extends Scanner {
 
 	private final EvalEngine fEngine;
 
+	protected IParserFactory fFactory;
 	public ExprParser(final EvalEngine engine) {
 		this(engine, ExprParserFactory.MMA_STYLE_FACTORY, engine.isRelaxedSyntax(), false);
 	}
@@ -148,13 +148,12 @@ public class ExprParser extends Scanner {
 	 *            if <code>true</code>, use '('...')' as brackets for arguments
 	 * @throws SyntaxError
 	 */
-	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax)
-			throws SyntaxError {
+	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax) throws SyntaxError {
 		this(engine, factory, relaxedSyntax, false);
 	}
 
-	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax,
-			boolean packageMode) throws SyntaxError {
+	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax, boolean packageMode)
+			throws SyntaxError {
 		super(packageMode);
 		this.fRelaxedSyntax = relaxedSyntax;
 		this.fFactory = factory;
@@ -750,19 +749,6 @@ public class ExprParser extends Scanner {
 
 	}
 
-	// private int getIntegerNumber() throws SyntaxError {
-	// final Object[] result = getNumberString();
-	// final String number = (String) result[0];
-	// final int numFormat = ((Integer) result[1]).intValue();
-	// int intValue = 0;
-	// try {
-	// intValue = Integer.parseInt(number, numFormat);
-	// } catch (final NumberFormatException e) {
-	// throwSyntaxError("Number format error (not an int type): " + number, number.length());
-	// }
-	// getNextToken();
-	// return intValue;
-	// }
 
 	/**
 	 * Get a list {...}
@@ -824,17 +810,6 @@ public class ExprParser extends Scanner {
 		return temp;
 	}
 
-	private int getInteger() throws SyntaxError {
-		int intValue = 0;
-		final String number = getIntegerString();
-		try {
-			intValue = Integer.parseInt(number, 10);
-		} catch (final NumberFormatException e) {
-			throwSyntaxError("Number format error (not an int type): " + number, number.length());
-		}
-		getNextToken();
-		return intValue;
-	}
 	private static INum getReal(String str) {
 		int index = str.indexOf("*^");
 		int fExponent = 1;
@@ -1353,6 +1328,9 @@ public class ExprParser extends Scanner {
 		return getPart(min_precedence);
 	}
 
+	public void setFactory(final IParserFactory factory) {
+		this.fFactory = factory;
+	}
 	/**
 	 * Convert less or greater relations on input. Example: convert expressions like <code>a<b<=c</code> to
 	 * <code>Less[a,b]&&LessEqual[b,c]</code>.
@@ -1382,7 +1360,4 @@ public class ExprParser extends Scanner {
 	// }
 	// }
 
-	public void setFactory(final IParserFactory factory) {
-		this.fFactory = factory;
-	}
 }

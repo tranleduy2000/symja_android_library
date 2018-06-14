@@ -395,7 +395,7 @@ public class Parser extends Scanner {
 			int countPercent = 1;
 			getNextToken();
 			if (fToken == TT_DIGIT) {
-				countPercent = getIntegerNumber();
+				countPercent = getInteger();
 				out.add(fFactory.createInteger(countPercent));
 				return out;
 			}
@@ -412,7 +412,7 @@ public class Parser extends Scanner {
 			getNextToken();
 			final FunctionNode slot = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Slot));
 			if (fToken == TT_DIGIT) {
-				slot.add(fFactory.createInteger(getIntegerNumber()));
+				slot.add(fFactory.createInteger(getInteger()));
 			} else {
 				slot.add(fFactory.createInteger(1));
 			}
@@ -593,17 +593,6 @@ public class Parser extends Scanner {
 		fCurrentPosition = startPosition;
 		throwSyntaxError("Operator token not found: " + fInputString.substring(startPosition, endPosition - 1));
 		return null;
-	}
-	private int getIntegerNumber() throws SyntaxError {
-		final String number = getIntegerString();
-		int intValue = 0;
-		try {
-			intValue = Integer.parseInt(number, 10);
-		} catch (final NumberFormatException e) {
-			throwSyntaxError("Number format error (not an int type): " + number, number.length());
-		}
-		getNextToken();
-		return intValue;
 	}
 
 	/**
