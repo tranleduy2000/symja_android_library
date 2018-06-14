@@ -954,7 +954,7 @@ public abstract class IExprImpl implements IExpr {
      * @return
      */
     public boolean isBuiltInSymbol() {
-        return this instanceof IBuiltInSymbol;;
+        return this instanceof IBuiltInSymbol;
     }
 
     /**
