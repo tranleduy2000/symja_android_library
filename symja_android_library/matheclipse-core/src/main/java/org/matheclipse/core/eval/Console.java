@@ -1,8 +1,8 @@
 package org.matheclipse.core.eval;
 
-import com.google.common.base.Charsets;
-
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.exception.AbortException;
+import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.Documentation;
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -55,8 +56,7 @@ public class Console {
 	private static int COUNTER = 1;
 
 	public static void main(final String args[]) {
-		F.initSymbols(null, null, true); // console.getDefaultSystemRulesFilename(),
-											// null, false);
+		F.initSymbols(null, null, true);
 
 		Console console;
 		try {
@@ -67,7 +67,11 @@ public class Console {
 		}
 		String inputExpression = null;
 		String trimmedInput = null;
+		try {
 		console.setArgs(args);
+		} catch (ReturnException re) {
+			return;
+		}
 
 		final File file = console.getFile();
 		if (file != null) {
@@ -167,6 +171,7 @@ public class Console {
 	private static void printUsage() {
 		final String lineSeparator = System.getProperty("line.separator");
 		final StringBuilder msg = new StringBuilder();
+		msg.append(Config.SYMJA);
 		msg.append("org.matheclipse.core.eval.Console [options]" + lineSeparator);
 		msg.append(lineSeparator);
 		msg.append("Program arguments: " + lineSeparator);
@@ -218,13 +223,14 @@ public class Console {
 		DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
 		DecimalFormat decimalFormat = new DecimalFormat("0.0####", usSymbols);
 		fOutputFactory = OutputFormFactory.get(true, false, decimalFormat);
+		fEvaluator.getEvalEngine().setFileSystemEnabled(true);
 	}
 
 	/**
 	 * Sets the arguments for the <code>main</code> method
 	 * 
 	 * @param args
-	 *            the aruments of the program
+	 *            the arguments of the program
 	 */
 	private void setArgs(final String args[]) {
 		String function = null;
@@ -235,14 +241,13 @@ public class Console {
 				try {
 					String outputExpression = interpreter(args[i + 1]);
 					if (outputExpression.length() > 0) {
-						System.out.println(outputExpression);
+						System.out.print(outputExpression);
 					}
-					System.exit(1);
+					throw ReturnException.RETURN_TRUE;
 				} catch (final ArrayIndexOutOfBoundsException aioobe) {
 					final String msg = "You must specify a command when " + "using the -code argument";
 					System.out.println(msg);
-					System.exit(-1);
-					return;
+					throw ReturnException.RETURN_FALSE;
 				}
 			} else if (arg.equals("-function") || arg.equals("-f")) {
 				try {
@@ -251,8 +256,7 @@ public class Console {
 				} catch (final ArrayIndexOutOfBoundsException aioobe) {
 					final String msg = "You must specify a function when " + "using the -function argument";
 					System.out.println(msg);
-					System.exit(-1);
-					return;
+					throw ReturnException.RETURN_FALSE;
 				}
 			} else if (arg.equals("-args") || arg.equals("-a")) {
 				try {
@@ -269,16 +273,15 @@ public class Console {
 						inputExpression.append(")");
 						String outputExpression = interpreter(inputExpression.toString());
 						if (outputExpression.length() > 0) {
-							System.out.println(outputExpression);
+							System.out.print(outputExpression);
 						}
-						System.exit(1);
+						throw ReturnException.RETURN_TRUE;
 					}
 					return;
 				} catch (final ArrayIndexOutOfBoundsException aioobe) {
 					final String msg = "You must specify a function when " + "using the -function argument";
 					System.out.println(msg);
-					System.exit(-1);
-					return;
+					throw ReturnException.RETURN_FALSE;
 				}
 			} else if (arg.equals("-help") || arg.equals("-h")) {
 				printUsageCompletely();
@@ -451,7 +454,7 @@ public class Console {
 
 	public String readString() {
 		final StringBuilder input = new StringBuilder();
-		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charsets.UTF_8));
+		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")));
 		boolean done = false;
 
 		try {
@@ -530,6 +533,7 @@ public class Console {
 			out.close();
 
 			System.out.println(temp.toURI().toString());
+//			java.awt.Desktop.getDesktop().browse(temp.toURI());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

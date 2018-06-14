@@ -5,12 +5,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-
+import com.duy.lambda.*;
 import javax.annotation.Nonnull;
 
 import org.apfloat.Apcomplex;

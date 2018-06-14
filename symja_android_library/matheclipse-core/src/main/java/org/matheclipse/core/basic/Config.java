@@ -16,6 +16,15 @@ import java.util.Set;
  */
 public class Config {
 
+	public static final String SYMJA = //
+			"" //
+					+ "     _______.____    ____ .___  ___.        __       ___      \n"
+					+ "    /       |\\   \\  /   / |   \\/   |       |  |     /   \\     \n"
+					+ "   |   (----` \\   \\/   /  |  \\  /  |       |  |    /  ^  \\    \n"
+					+ "    \\   \\      \\_    _/   |  |\\/|  | .--.  |  |   /  /_\\  \\   \n"
+					+ ".----)   |       |  |     |  |  |  | |  `--'  |  /  _____  \\  \n"
+					+ "|_______/        |__|     |__|  |__|  \\______/  /__/     \\__\\ \n"
+					+ "                                                              \n";
 	/**
 	 * A global expression cache which compares keys with <code>==</code> object identity instead of
 	 * <code>equals()</code>. The keys and values are weak references.
