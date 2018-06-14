@@ -16,7 +16,6 @@ import org.matheclipse.parser.client.math.MathException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -545,7 +544,7 @@ public class Console {
 			out.close();
 
 			System.out.println(temp.toURI().toString());
-			java.awt.Desktop.getDesktop().browse(temp.toURI());
+//			java.awt.Desktop.getDesktop().browse(temp.toURI());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

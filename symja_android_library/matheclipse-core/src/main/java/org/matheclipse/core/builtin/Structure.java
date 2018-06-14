@@ -889,6 +889,35 @@ public class Structure {
 
 	}
 
+	/**
+	 * <pre>
+	 * MapIndexed(f, expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * applies <code>f</code> to each part on the first level of <code>expr</code> and appending the elements position
+	 * as a list in the second argument.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * MapIndexed(f, expr, levelspec)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * applies <code>f</code> to each level specified by <code>levelspec</code> of <code>expr</code> and appending the
+	 * elements position as a list in the second argument.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; MapIndexed(f, {{{{a, b}, {c, d}}}, {{{u, v}, {s, t}}}}, 2)
+	 * {f({f({{a,b},{c,d}},{1,1})},{1}),f({f({{u,v},{s,t}},{2,1})},{2})}
+	 * </pre>
+	 */
 	private final static class MapIndexed extends AbstractFunctionEvaluator {
 
 		@Override
