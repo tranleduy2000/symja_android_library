@@ -1854,7 +1854,8 @@ public abstract class IExprImpl implements IExpr {
      *
      * @return
      */
-    public boolean isPatternSequence() {
+    @Override
+    public boolean isPatternSequence(boolean testNullSequence) {
         return false;
     }
 

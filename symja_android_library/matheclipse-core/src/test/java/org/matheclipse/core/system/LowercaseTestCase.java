@@ -3584,10 +3584,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testIf() {
+		check("If(1 == k, itstrue, itsfalse)", "If(1==k,itstrue,itsfalse)");
 		check("If(1<2, a, b)", "a");
 		check("If(1<2, a)", "a");
 		check("If(False, a) //FullForm", "\"Null\"");
-		check("If(a>b,true)", "");
+		check("If(a>b,true)", "If(a>b,True)");
 	}
 
 	public void testIm() {
@@ -4708,6 +4709,39 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testMatchQ() {
+		// TODO
+		check("MatchQ({a}, {a, ___})", //
+				"True");
+		check("MatchQ(2*x, c1_Integer*a_Symbol)", //
+				"True");
+		check("MatchQ(a + b, x_Symbol + x_Symbol)", //
+				"False");
+		check("MatchQ({2^a, a}, {2^x_Symbol, x_Symbol})", //
+				"True");
+		check("MatchQ({2^a, b}, {2^x_Symbol, x_Symbol})", //
+				"False");
+
+		check("MatchQ({a, b}, {a, __})", //
+				"True");
+		check("MatchQ({a}, {a, __})", //
+				"False");
+
+		check("MatchQ(1,_Integer)", //
+				"True");
+		check("MatchQ(_Symbol, _Symbol)", //
+				"False");
+		check("MatchQ(_Symbol, _Blank)", //
+				"True");
+		check("MatchQ(_Symbol, test_Blank)", //
+				"True");
+		check("MatchQ(name_Symbol, test_Pattern)", //
+				"True");
+		check("MatchQ(_Symbol, s)", //
+				"False");
+		check("MatchQ(1.5,_Integer)", //
+				"False");
+		check("MatchQ(1.5,_Real)", //
+				"True");
 		check("MatchQ(f(2*I), f(Complex(i_Integer, r_Integer)) )", "True");
 		check("MatchQ(g(1/2), g(Rational(n_Integer, d_Integer)) )", "True");
 		check("MatchQ(Simplify(1 + 1/GoldenRatio - GoldenRatio), 0)", "True");
@@ -7184,8 +7218,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testReplaceAll() {
 		// TODO
-		// check("ReplaceAll({a, b, c}, {___, x__, ___} -> {x})", "{a}");
-		// TODO
+//		 check("ReplaceAll({a, b, c}, {___, x__, ___} -> {x})", "{a}");
 
 		check("a == b /. _Equal -> 2", "2");
 		check("If(1 == k, itstrue, itsfalse) /. _If -> 99", "99");

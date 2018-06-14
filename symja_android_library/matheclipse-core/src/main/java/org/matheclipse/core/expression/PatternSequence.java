@@ -450,7 +450,10 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 
 	/** {@inheritDoc} */
 	@Override
-	final public boolean isPatternSequence() {
+	final public boolean isPatternSequence(boolean testNullSequence) {
+		if (testNullSequence) {
+			return fZeroArgsAllowed;
+		}
 		return true;
 	}
 

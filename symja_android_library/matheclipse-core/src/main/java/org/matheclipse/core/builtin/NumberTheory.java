@@ -2078,7 +2078,12 @@ public final class NumberTheory {
 			IAST list = (IAST) ast.arg1();
 			if (list.size() > 1) {
 				int size = list.argSize();
-				if (list.forAll(x -> x.isRealNumber())) {
+				if (list.forAll(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return x.isRealNumber();
+					}
+				})) {
 					IExpr result = list.get(size--);
 					for (int i = size; i >= 1; i--) {
 						result = list.get(i).plus(result.power(-1));

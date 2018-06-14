@@ -1450,7 +1450,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return
      */
-    boolean isPatternSequence();
+    boolean isPatternSequence(boolean testNullSequence);
 
     /**
      * Test if this expression is the <code>Except</code> function <code>Except[&lt;pattern1&gt;]</code> or
