@@ -2743,6 +2743,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("213916881789829278910570173437*467471286806848547076331371449== 10^59+213", //
 		// "True");
 
+		if (Config.EXPENSIVE_JUNIT_TESTS) {
+			check("FactorInteger(672924717570659549138949381690007452648932205241)", //
+					"{{324557421200651278898953,1},{2073361056053736024795697,1}}");
+			check("FactorInteger(475055344870856723877355576259313975012575765717)", //
+					"{{387850060601719154011751,1},{1224842775926979010778467,1}}");
+			check("FactorInteger(8438503049348381100385800049534923490020044110031)", //
+					"{{59,1},{41387,1},{40320271,1},{85708917607365601059185614891297817,1}}");
+			check("FactorInteger(10^100+1)", "{{73,1},{137,1},{401,1},{1201,1},{1601,1},{1676321,1},{5964848081,1},{\n"
+					+ "129694419029057750551385771184564274499075700947656757821537291527196801,1}}");
 		check("FactorInteger(308119573764812073923)", //
 				"{{19,2},{367,1},{132491,1},{17553335119,1}}");
 		check("19^2*367*132491*17553335119", //
@@ -2752,51 +2761,74 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{{2,2},{3,4},{331,1},{107251,1},{11502026267,1}}");
 		check("2^2*3^4*331*107251*11502026267", //
 				"132296607982211351148");
+			check("FactorInteger(44343535354351600000003434353)", //
+					"{{149,1},{329569479697,1},{903019357561501,1}}");
+		}
 
-		check("FactorInteger(10+30*I,GaussianIntegers->True)", "{{-1,1},{1+I,3},{1+I*2,1},{2+I,2}}");
-		check("FactorInteger(11+14*I,GaussianIntegers->True)", "{{11+I*14,1}}");
-		check("FactorInteger(8+21*I,GaussianIntegers->True)", "{{1+I*2,1},{10+I,1}}");
+		check("FactorInteger(2^32-1)", "{{3,1},{5,1},{17,1},{257,1},{65537,1}}");
+		check("FactorInteger(0)", "{{0,1}}");
+		check("FactorInteger(1)", "{{1,1}}");
+		check("FactorInteger(990)", "{{2,1},{3,2},{5,1},{11,1}}");
+		check("FactorInteger(-993)", "{{-1,1},{3,1},{331,1}}");
+		check("FactorInteger(2^32-1)", "{{3,1},{5,1},{17,1},{257,1},{65537,1}}");
 
-		check("FactorInteger(16,GaussianIntegers->True)", "{{1+I,8}}");
-		check("FactorInteger(8+21*I,GaussianIntegers->True)", "{{1+I*2,1},{10+I,1}}");
-		check("FactorInteger(361 - 1767*I ,GaussianIntegers->True)",
+		check("FactorInteger(16,GaussianIntegers->True)", //
+				"{{1+I,8}}");
+		check("FactorInteger(8+21*I,GaussianIntegers->True)", //
+				"{{1+I*2,1},{10+I,1}}");
+		check("FactorInteger(361 - 1767*I ,GaussianIntegers->True)", //
 				"{{-1,1},{1+I,1},{2+I,1},{4+I,1},{7+I*2,1},{19,1}}");
-		check("FactorInteger(440-55*I,GaussianIntegers->True)", "{{-1,1},{1+I*2,1},{2+I,2},{2+I*3,1},{11,1}}");
-		check("FactorInteger(5,GaussianIntegers->True)", "{{-I,1},{1+I*2,1},{2+I,1}}");
-		check("FactorInteger(12,GaussianIntegers->True)", "{{-1,1},{1+I,4},{3,1}}");
-		check("FactorInteger(5+7*I,GaussianIntegers->True)", "{{1+I,1},{6+I,1}}");
+		check("FactorInteger(440-55*I,GaussianIntegers->True)", //
+				"{{-1,1},{1+I*2,1},{2+I,2},{2+I*3,1},{11,1}}");
+		check("FactorInteger(5,GaussianIntegers->True)", //
+				"{{-I,1},{1+I*2,1},{2+I,1}}");
+		check("FactorInteger(12,GaussianIntegers->True)", //
+				"{{-1,1},{1+I,4},{3,1}}");
+		check("FactorInteger(5+7*I,GaussianIntegers->True)", //
+				"{{1+I,1},{6+I,1}}");
 
-		check("factors = FactorInteger(2010)", "{{2,1},{3,1},{5,1},{67,1}}");
-		check("Times @@ Power @@@ factors", "2010");
+		check("factors = FactorInteger(2010)", //
+				"{{2,1},{3,1},{5,1},{67,1}}");
+		check("Times @@ Power @@@ factors", //
+				"2010");
 
-		check("FactorInteger(10^100+1)", "{{73,1},{137,1},{401,1},{1201,1},{1601,1},{1676321,1},{5964848081,1},{\n"
-				+ "129694419029057750551385771184564274499075700947656757821537291527196801,1}}");
-		check("FactorInteger(50!*8392894255239922239)",
+		check("FactorInteger(50!*8392894255239922239)", //
 				"{{2,47},{3,23},{5,12},{7,9},{11,4},{13,3},{17,2},{19,2},{23,2},{29,1},{31,1},{37,\n"
 						+ "1},{41,1},{43,1},{47,1},{457,1},{11717,1},{84053,1},{887987,1}}");
-		check("FactorInteger(8438503049348381100385800049534923490020044110031)",
-				"{{59,1},{41387,1},{40320271,1},{85708917607365601059185614891297817,1}}");
-		check("FactorInteger(8392894255239922239)", "{{3,1},{7,1},{457,1},{11717,1},{84053,1},{887987,1}}");
-		check("FactorInteger(4)", "{{2,2}}");
-		check("FactorInteger(3/8)", "{{2,-3},{3,1}}");
+		check("FactorInteger(8392894255239922239)", //
+				"{{3,1},{7,1},{457,1},{11717,1},{84053,1},{887987,1}}");
+		check("FactorInteger(4)", //
+				"{{2,2}}");
+		check("FactorInteger(3/8)", //
+				"{{2,-3},{3,1}}");
 		// sort is important for rational numbers
-		check("FactorInteger(2345354/2424245)", "{{2,1},{5,-1},{11,1},{17,1},{311,-1},{1559,-1},{6271,1}}");
+		check("FactorInteger(2345354/2424245)", //
+				"{{2,1},{5,-1},{11,1},{17,1},{311,-1},{1559,-1},{6271,1}}");
 
-		check("FactorInteger(-1)", "{{-1,1}}");
-		check("FactorInteger(-100)", "{{-1,1},{2,2},{5,2}}");
-		check("FactorInteger(-5!)", "{{-1,1},{2,3},{3,1},{5,1}}");
-		check("FactorInteger(-4)", "{{-1,1},{2,2}}");
-		check("FactorInteger(0)", "{{0,1}}");
-		check("FactorInteger(2941189)", "{{1709,1},{1721,1}}");
-		check("FactorInteger(12007001)", "{{3001,1},{4001,1}}");
-		check("FactorInteger(16843009)", "{{257,1},{65537,1}}");
-		check("FactorInteger(-5!)", "{{-1,1},{2,3},{3,1},{5,1}}");
-		check("Table(FactorInteger(2^2^n + 1), {n, 6})",
+		check("FactorInteger(-1)", //
+				"{{-1,1}}");
+		check("FactorInteger(-100)", //
+				"{{-1,1},{2,2},{5,2}}");
+		check("FactorInteger(-5!)", //
+				"{{-1,1},{2,3},{3,1},{5,1}}");
+		check("FactorInteger(-4)", //
+				"{{-1,1},{2,2}}");
+		check("FactorInteger(0)", //
+				"{{0,1}}");
+		check("FactorInteger(2941189)", //
+				"{{1709,1},{1721,1}}");
+		check("FactorInteger(12007001)", //
+				"{{3001,1},{4001,1}}");
+		check("FactorInteger(16843009)", //
+				"{{257,1},{65537,1}}");
+		check("FactorInteger(-5!)", //
+				"{{-1,1},{2,3},{3,1},{5,1}}");
+		check("Table(FactorInteger(2^2^n + 1), {n, 6})", //
 				"{{{5,1}},{{17,1}},{{257,1}},{{65537,1}},{{641,1},{6700417,1}},{{274177,1},{\n"
 						+ "67280421310721,1}}}");
-		check("FactorInteger(44343535354351600000003434353)", "{{149,1},{329569479697,1},{903019357561501,1}}");
 
-		check("FactorInteger(2010 / 2011)", "{{2,1},{3,1},{5,1},{67,1},{2011,-1}}");
+		check("FactorInteger(2010 / 2011)", //
+				"{{2,1},{3,1},{5,1},{67,1},{2011,-1}}");
 	}
 
 	public void testFactorSquareFreeList() {
