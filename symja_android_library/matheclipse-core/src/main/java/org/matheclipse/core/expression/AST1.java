@@ -1,6 +1,7 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.Consumer;
+import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.generic.ObjIntPredicate;
@@ -159,6 +160,18 @@ public class AST1 extends AST0 {
 			return predicate.test(arg1, 1);
 		}
 		return false;
+	}
+	/** {@inheritDoc} */
+	@Override
+	public IAST filterFunction(IASTAppendable filterAST, IASTAppendable restAST,
+			final Function<IExpr, IExpr> function) {
+		IExpr expr = function.apply(arg1);
+		if (expr.isPresent()) {
+			filterAST.append(expr);
+		} else {
+			restAST.append(arg1);
+		}
+		return filterAST;
 	}
 	/** {@inheritDoc} */
 	@Override
