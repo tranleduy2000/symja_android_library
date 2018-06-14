@@ -287,24 +287,57 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr e2ObjArg(final IExpr n, final IExpr k) {
+			if (n.isInteger() && k.isInteger()) {
+				// use e2IntArg() method
+				return F.NIL;
+			}
+			int ni = n.toIntDefault(Integer.MIN_VALUE);
+			if (ni != Integer.MIN_VALUE) {
+				int ki = k.toIntDefault(Integer.MIN_VALUE);
+				if (ki != Integer.MIN_VALUE) {
+					return binomial(F.ZZ(ni), F.ZZ(ki));
+				}
+			}
+			if (n.isZero() && k.isZero()) {
+				return F.C1;
+			}
 			if (k.isOne()) {
 				return n;
 			}
+			if (k.isMinusOne()) {
+				return F.C0;
+			}
 			if (k.isInteger()) {
+				if (n.isInfinity()) {
+					if (k.isNegative()) {
+						return F.C0;
+					}
+					int ki = k.toIntDefault(Integer.MIN_VALUE);
+					if (ki >= 1 && ki <= 5) {
+						return F.Infinity;
+					}
+				} else if (n.isNegativeInfinity()) {
 				if (k.isNegative()) {
 					return F.C0;
 				}
-				if (n.isInteger()) {
-					// use e2IntArg() method
+					int ki = k.toIntDefault(Integer.MIN_VALUE);
+					if (ki >= 1 && ki <= 5) {
+						if (ki % 2 == 0) {
+							return F.CInfinity;
+						}
+						return F.CNInfinity;
+				}
+				}
+				if (k.isOne()) {
+					return n;
+				}
+				if (k.isZero()) {
+					return F.C1;
+				}
+				if (n.isDirectedInfinity()) {
 					return F.NIL;
 				}
 				IInteger ki = (IInteger) k;
-				if (ki.isOne()) {
-					return n;
-				}
-				if (ki.isZero()) {
-					return F.C1;
-				}
 				if (ki.compareInt(6) < 0 && ki.compareInt(1) > 0) {
 					int kInt = ki.intValue();
 					IASTAppendable ast = F.TimesAlloc(kInt);
@@ -321,13 +354,15 @@ public final class NumberTheory {
 			if (n.equals(k)) {
 				return F.C1;
 			}
-			if (n instanceof INum && k instanceof INum) {
-				// Gamma(n+1)/(Gamma(k+1)*Gamma(n-k+1))
-				return F.Times(F.Power(F.Gamma(F.Plus(F.C1, k)), -1), F.Gamma(F.Plus(F.C1, n)),
-						F.Power(F.Gamma(F.Plus(F.C1, F.Negate(k), n)), -1));
+			if (n.isNumber() && k.isNumber()) {
+				IExpr n1 = ((INumber) n).add(F.C1);
+				// (n,k) ==> Gamma(n+1)/(Gamma(k+1)*Gamma(n-k+1))
+				return F.Times(F.Gamma(n1), F.Power(F.Gamma(F.Plus(F.C1, k)), -1),
+						F.Power(F.Gamma(F.Plus(n1, F.Negate(k))), -1));
 			}
 			IExpr difference = F.eval(F.Subtract(n, F.C1));
 			if (difference.equals(k)) {
+				// n-1 == k
 				return n;
 			}
 			difference = F.eval(F.Subtract(k, n));
@@ -3552,7 +3587,21 @@ public final class NumberTheory {
 		return CONST;
 	}
 
+	/**
+	 * <p>
+	 * Calculate integer binomial number.
+	 * </p>
+	 * See definitions by <a href="https://arxiv.org/abs/1105.3689">Kronenburg 2011</a>
+	 *
+	 * @param n
+	 * @param k
+	 * @return
+	 */
 	public static IInteger binomial(final IInteger n, final IInteger k) {
+		if (n.isZero() && k.isZero()) {
+			return F.C1;
+		}
+		if (!n.isNegative() && !k.isNegative()) {
 		// k>n : by definition --> 0
 		if (k.isNegative() || k.compareTo(n) > 0) {
 			return F.C0;
@@ -3580,6 +3629,20 @@ public final class NumberTheory {
 			i = i.add(F.C1);
 		}
 		return bin;
+		} else if (n.isNegative()) {
+			// see definitions at https://arxiv.org/abs/1105.3689
+			if (!k.isNegative()) {
+				// (-1)^k * Binomial(-n+k-1, k)
+				IInteger factor = k.isOdd() ? F.CN1 : F.C1;
+				return binomial(n.negate().add(k).add(F.CN1), k).multiply(factor);
+			}
+			if (n.compareTo(k) >= 0) {
+				// (-1)^(n-k) * Binomial(-k-1, n-k)
+				IInteger factor = n.subtract(k).isOdd() ? F.CN1 : F.C1;
+				return binomial(k.add(F.C1).negate(), n.subtract(k)).multiply(factor);
+			}
+		}
+		return F.C0;
 	}
 
 	/**
