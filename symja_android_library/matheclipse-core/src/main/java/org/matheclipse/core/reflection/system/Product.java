@@ -1,10 +1,5 @@
 package org.matheclipse.core.reflection.system;
 
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Times;
-
 import org.matheclipse.core.builtin.ListFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -14,10 +9,14 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IIterator;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.ProductRules;
+
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Times;
 
 /**
  * <pre>
@@ -125,7 +124,7 @@ public class Product extends ListFunctions.Table implements ProductRules {
 		// determineIteratorVariables(ast));
 
 		if (arg1.isPower()) {
-			IExpr exponent = arg1.getAt(2);
+			IExpr exponent = arg1.exponent();
 			boolean flag = true;
 			// Prod( i^a, {i,from,to},... )
 			for (int i = 2; i < ast.size(); i++) {
@@ -138,32 +137,33 @@ public class Product extends ListFunctions.Table implements ProductRules {
 			}
 			if (flag) {
 				IASTMutable prod = ast.copy();
-				prod.set(1, arg1.getAt(1));
+				prod.set(1, arg1.base());
 				return F.Power(prod, exponent);
 			}
 		}
-		IExpr argN = ast.get(ast.argSize());
+		IExpr argN = ast.last();
 		if (ast.size() >= 3 && argN.isList()) {
 			IIterator<IExpr> iterator = Iterator.create((IAST) argN, engine);
-			if (iterator.isValidVariable()) {
-				if (iterator.getLowerLimit().isInteger() && iterator.getUpperLimit().isSymbol()
-						&& iterator.getStep().isOne()) {
+			if (iterator.isValidVariable() && !iterator.isNumericFunction()) {
+				// if (iterator.getLowerLimit().isInteger() && iterator.getUpperLimit().isSymbol()
+				// && iterator.getStep().isOne()) {
+				if (iterator.getUpperLimit().isSymbol() && iterator.getStep().isOne()) {
 					final ISymbol var = iterator.getVariable();
-					final IInteger from = (IInteger) iterator.getLowerLimit();
+					final IExpr from = iterator.getLowerLimit();
 					final ISymbol to = (ISymbol) iterator.getUpperLimit();
 					if (arg1.isPower()) {
-						IExpr powArg1 = arg1.getAt(1);
-						IExpr powArg2 = arg1.getAt(2);
-						if (powArg1.isFree(var)) {
+						IExpr base = arg1.base();
+						if (base.isFree(var)) {
 							if (iterator.getLowerLimit().isOne()) {
-								if (powArg2.equals(var)) {
+								IExpr exponent = arg1.exponent();
+								if (exponent.equals(var)) {
 									// Prod( a^i, ..., {i,from,to} )
 									if (ast.isAST2()) {
-										return F.Power(powArg1, Times(C1D2, to, Plus(C1, to)));
+										return F.Power(base, Times(C1D2, to, Plus(C1, to)));
 									}
-									IASTAppendable result = ast.copyAppendable();
-									result.remove(ast.argSize());
-									result.set(1, F.Power(powArg1, Times(C1D2, to, Plus(C1, to))));
+									IASTAppendable result = ast.removeAtClone(ast.argSize());
+									// result.remove(ast.argSize());
+									result.set(1, F.Power(base, Times(C1D2, to, Plus(C1, to))));
 									return result;
 								}
 							}
@@ -177,15 +177,24 @@ public class Product extends ListFunctions.Table implements ProductRules {
 							if (from.isZero()) {
 								return F.Power(ast.arg1(), Plus(to, C1));
 							}
+							if (from.isSymbol()) {
+								// 2^(1-from+to)
+								return F.Power(arg1, F.Plus(F.C1, from.negate(), to));
+							}
 						} else {
-							IASTAppendable result = ast.copyAppendable();
-							result.remove(ast.argSize());
+							IASTAppendable result = ast.removeAtClone(ast.argSize());
+							// result.remove(ast.argSize());
 							if (from.isOne()) {
 								result.set(1, F.Power(ast.arg1(), to));
 								return result;
 							}
 							if (from.isZero()) {
 								result.set(1, F.Power(ast.arg1(), Plus(to, C1)));
+								return result;
+							}
+							if (from.isSymbol()) {
+								// 2^(1-from+to)
+								result.set(1, F.Power(arg1, F.Plus(F.C1, from.negate(), to)));
 								return result;
 							}
 
@@ -202,8 +211,8 @@ public class Product extends ListFunctions.Table implements ProductRules {
 			if (ast.isAST2()) {
 				return temp;
 			} else {
-				IASTAppendable result = ast.copyAppendable();
-				result.remove(ast.argSize());
+				IASTAppendable result = ast.removeAtClone(ast.argSize());
+				// result.remove(ast.argSize());
 				result.set(1, temp);
 				return result;
 			}

@@ -2396,19 +2396,19 @@ public final class Arithmetic {
                 if (ni > Integer.MIN_VALUE) {
                     if (ni > 0) {
                         // Product(a + k, {k, 0, n - 1})
-                        return F.product(new com.duy.lambda.Function<IExpr, IExpr>() {
+						return F.product(new Function<IExpr, IExpr>() {
                             @Override
-                            public IExpr apply(IExpr x) {
-                                return F.Plus(a, x);
+                            public IExpr apply(IExpr k) {
+                                return F.Plus(a, k);
                             }
                         }, 0, ni - 1);
                     }
                     if (ni < 0) {
                         // Product(1/(a - k), {k, 1, -n})
-                        return Power(F.product(new com.duy.lambda.Function<IExpr, IExpr>() {
+						return Power(F.product(new Function<IExpr, IExpr>() {
                             @Override
-                            public IExpr apply(IExpr x) {
-                                return F.Plus(a, x.negate());
+                            public IExpr apply(IExpr k) {
+                                return F.Plus(a, k.negate());
                             }
                         }, 1, -ni), -1);
                     }
@@ -2439,6 +2439,9 @@ public final class Arithmetic {
             } else if (n.equals(BigInteger.ZERO)) {
                 return BigFraction.ONE;
             } else {
+				if (that.equals(BigInteger.ZERO)) {
+					return BigFraction.ZERO;
+				}
                 BigFraction res = new BigFraction(that.getNumerator(), that.getDenominator());
                 BigInteger i = BigInteger.ONE;
                 for (; i.compareTo(n) < 0; i = i.add(BigInteger.ONE)) {
@@ -3449,9 +3452,9 @@ public final class Arithmetic {
      * </p>
      *
      * <pre>
-     * &gt;&gt; a = 2
-     * &gt;&gt; ++a
-     * 3
+	 * &gt;&gt; a = 2
+	 * &gt;&gt; ++a
+	 * 3
      *
 	 * &gt;&gt; a
      * 3
@@ -3979,8 +3982,8 @@ public final class Arithmetic {
 	 * &gt;&gt; 10*2
 	 * 20
      *
-     * &gt;&gt; a * a
-     * a^2
+	 * &gt;&gt; a * a
+	 * a^2
      *
 	 * &gt;&gt; x ^ 10 * x ^ -2
      * x^8
