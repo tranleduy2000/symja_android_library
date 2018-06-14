@@ -1225,6 +1225,13 @@ public final class NumberTheory {
 					// integer to large?
 				}
 			} else {
+				if (arg1.isPower() && arg1.exponent().isIntegerResult()
+						&& AbstractAssumptions.assumePrime(arg1.base()).isTrue()) {
+					IExpr p = arg1.base();
+					IExpr n = arg1.exponent();
+					// Power(p, n) => p^n - p^(n - 1)
+					return F.Subtract(arg1, F.Power(p, F.Subtract(n, F.C1)));
+				}
 				IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
 				if (negExpr.isPresent()) {
 					return F.EulerPhi(negExpr);
@@ -2142,6 +2149,9 @@ public final class NumberTheory {
 					// integer to large?
 				}
 			} else {
+				if (AbstractAssumptions.assumePrime(arg1).isTrue()) {
+					return F.CN1;
+				}
 				IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
 				if (negExpr.isPresent()) {
 					return F.MoebiusMu(negExpr);

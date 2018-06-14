@@ -70,10 +70,10 @@ public class AssumptionFunctions {
 					return truthValue;
 				}
 			} else if (arg2.equals(F.Primes)) {
-				ISymbol truthValue = AbstractAssumptions.assumePrime(arg1);
-				if (truthValue != null) {
-					return truthValue;
-				}
+				return AbstractAssumptions.assumePrime(arg1);
+				// if (truthValue != null) {
+				// return truthValue;
+				// }
 			} else if (arg2.equals(F.Rationals)) {
 				ISymbol truthValue = AbstractAssumptions.assumeRational(arg1);
 				if (truthValue != null) {
@@ -135,6 +135,8 @@ public class AssumptionFunctions {
 			return ast.arg1();
 		}
 
+
+
 	}
 
 	public static IAssumptions determineAssumptions(final ISymbol symbol, final IExpr arg2, EvalEngine engine) {
@@ -148,7 +150,7 @@ public class AssumptionFunctions {
 	}
 
 	public static IExpr refineAssumptions(final IExpr expr, IAssumptions assumptions, EvalEngine engine) {
-		IAssumptions oldAssumptions = engine.getAssumptions();
+		IAssumptions oldAssumptions=engine.getAssumptions();
 		try {
 			engine.setAssumptions(assumptions);
 			// System.out.println(expr.toString());
