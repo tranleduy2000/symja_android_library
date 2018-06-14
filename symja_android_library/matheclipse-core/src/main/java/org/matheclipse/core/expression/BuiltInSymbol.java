@@ -144,10 +144,6 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 	public int ordinal() {
 		return fOrdinal;
 	}
-	@Override
-	final public boolean isBuiltInSymbol() {
-		return true;
-	}
 
 	/** {@inheritDoc} */
 	@Override

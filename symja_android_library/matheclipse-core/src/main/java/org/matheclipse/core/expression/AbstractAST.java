@@ -1751,11 +1751,6 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return topHead().hasFlatAttribute();
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final boolean isFraction() {
-		return false;
-	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -2041,16 +2036,6 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return size() == 2 && head().equals(F.Not);
 	}
 
-	@Override
-	public final boolean isNumber() {
-		return false;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final boolean isNumeric() {
-		return false;
-	}
 
 	/** {@inheritDoc} */
 	@Override
