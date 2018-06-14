@@ -188,6 +188,7 @@ public class F {
 	public final static IBuiltInSymbol ArrayDepth = F.initFinalSymbol("ArrayDepth", ID.ArrayDepth);
 	public final static IBuiltInSymbol ArrayPad = F.initFinalSymbol("ArrayPad", ID.ArrayPad);
 	public final static IBuiltInSymbol ArrayQ = F.initFinalSymbol("ArrayQ", ID.ArrayQ);
+    public final static IBuiltInSymbol Arrays = F.initFinalSymbol("Arrays", ID.Arrays);
 	public final static IBuiltInSymbol Assumptions = F.initFinalSymbol("Assumptions", ID.Assumptions);
 	public final static IBuiltInSymbol AtomQ = F.initFinalSymbol("AtomQ", ID.AtomQ);
 	public final static IBuiltInSymbol Attributes = F.initFinalSymbol("Attributes", ID.Attributes);
