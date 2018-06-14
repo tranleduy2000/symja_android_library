@@ -1349,11 +1349,17 @@ public final class Arithmetic {
 
         @Override
         public IExpr e1ObjArg(final IExpr arg1) {
-            if (arg1.isInteger()) {
+			if (arg1.isIntegerResult()) {
                 if (arg1.isNegative()) {
                     return F.CComplexInfinity;
                 }
-                return NumberTheory.factorial(((IInteger) arg1).subtract(C1));
+				if (arg1.isNonNegativeResult()) {
+					if (arg1.isInteger()) {
+						return NumberTheory.factorial(((IInteger) arg1).subtract(F.C1));
+					}
+					return F.Factorial(arg1.subtract(F.C1));
+				}
+				return F.NIL;
             }
             if (arg1.isFraction()) {
                 IFraction frac = (IFraction) arg1;
@@ -1368,8 +1374,7 @@ public final class Arithmetic {
                         return Times(Sqrt(Pi), Factorial2(n.subtract(C2)), Power(C2, Times(C1D2, Subtract(C1, n))));
                     }
                 }
-            }
-            if (arg1.isAST()) {
+			} else if (arg1.isAST()) {
                 IAST z = (IAST) arg1;
                 if (z.isAST(Conjugate, 2)) {
                     // mirror symmetry for Conjugate()
@@ -1709,11 +1714,11 @@ public final class Arithmetic {
      * <h3>Examples</h3>
      *
      * <pre>
-     * &gt;&gt; a = 2;
-     * &gt;&gt; a++
-     * 2
+	 * &gt;&gt; a = 2;
+	 * &gt;&gt; a++
+	 * 2
      *
-     * &gt;&gt; a
+	 * &gt;&gt; a
      * 3
      * </pre>
      * <p>
@@ -1721,7 +1726,7 @@ public final class Arithmetic {
      * </p>
      *
      * <pre>
-     * &gt;&gt; ++++a+++++2//Hold//FullForm
+	 * &gt;&gt; ++++a+++++2//Hold//FullForm
      * Hold(Plus(PreIncrement(PreIncrement(Increment(Increment(a)))), 2))
      * </pre>
      */
@@ -1954,7 +1959,7 @@ public final class Arithmetic {
      * </p>
      *
      * <pre>
-     * &gt;&gt; Piecewise({{0, x &lt;= 0}}, 1)
+	 * &gt;&gt; Piecewise({{0, x &lt;= 0}}, 1)
      * Piecewise({{0, x &lt;= 0}}, 1)
      * </pre>
      * <p>
@@ -1962,10 +1967,10 @@ public final class Arithmetic {
      * </p>
      *
      * <pre>
-     * &gt;&gt; Piecewise({{1, False}})
-     * 0
+	 * &gt;&gt; Piecewise({{1, False}})
+	 * 0
      *
-     * &gt;&gt; Piecewise({{0 ^ 0, False}}, -1)
+	 * &gt;&gt; Piecewise({{0 ^ 0, False}}, -1)
      * -1
      * </pre>
      */
@@ -2451,7 +2456,7 @@ public final class Arithmetic {
 
     /**
      * <pre>
-     * Power(a, b)
+	 * Power(a, b)
      *
      * a ^ b
      * </pre>
@@ -2511,7 +2516,7 @@ public final class Arithmetic {
      * </p>
      *
      * <pre>
-     * &gt;&gt; 1/0
+	 * &gt;&gt; 1/0
      * ComplexInfinity
      *
      * &gt;&gt; 0 ^ -2
@@ -2545,7 +2550,7 @@ public final class Arithmetic {
      * 0.5502505227003375+I*1.8173540210239707
      *
      * &gt;&gt; Sqrt(-3+2*I)
-     * Sqrt(-3+I*2)
+	 * Sqrt(-3+I*2)
      *
      * &gt;&gt; (3/2+1/2I)^2
      * 2+I*3/2
@@ -3400,11 +3405,11 @@ public final class Arithmetic {
      * </p>
      *
      * <pre>
-     * &gt;&gt; a = 2
-     * &gt;&gt; --a
+	 * &gt;&gt; a = 2
+	 * &gt;&gt; --a
      * 1
      *
-     * &gt;&gt; a
+	 * &gt;&gt; a
      * 1
      * </pre>
      */
@@ -3448,7 +3453,7 @@ public final class Arithmetic {
      * &gt;&gt; ++a
      * 3
      *
-     * &gt;&gt; a
+	 * &gt;&gt; a
      * 3
      * </pre>
      */
@@ -3893,10 +3898,10 @@ public final class Arithmetic {
      *
      * <pre>
      * &gt;&gt; a = 10
-     * &gt;&gt; a -= 2
-     * 8
+	 * &gt;&gt; a -= 2
+	 * 8
      *
-     * &gt;&gt; a
+	 * &gt;&gt; a
      * 8
      * </pre>
      */
@@ -3977,16 +3982,16 @@ public final class Arithmetic {
      * &gt;&gt; a * a
      * a^2
      *
-     * &gt;&gt; x ^ 10 * x ^ -2
+	 * &gt;&gt; x ^ 10 * x ^ -2
      * x^8
      *
-     * &gt;&gt; {1, 2, 3} * 4
+	 * &gt;&gt; {1, 2, 3} * 4
 	 * {4,8,12}
      *
 	 * &gt;&gt; Times @@ {1, 2, 3, 4}
-     * 24
+	 * 24
      *
-     * &gt;&gt; IntegerLength(Times@@Range(100))
+	 * &gt;&gt; IntegerLength(Times@@Range(100))
      * 158
      * </pre>
      * <p>
@@ -4048,7 +4053,7 @@ public final class Arithmetic {
 	 * &gt;&gt; N(Pi, 30) * E
 	 * 8.53973422267356649108017774746
      *
-     * &gt;&gt; N(Pi, 30) * E // Precision
+	 * &gt;&gt; N(Pi, 30) * E // Precision
      * 30
      * </pre>
      */
