@@ -19,7 +19,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.parser.client.ast.ASTNode;
 import org.matheclipse.parser.client.ast.FunctionNode;
 import org.matheclipse.parser.client.ast.IConstantOperators;
-import org.matheclipse.parser.client.ast.IParserFactory;
+import org.matheclipse.parser.client.ast.INodeParserFactory;
 import org.matheclipse.parser.client.ast.IntegerNode;
 import org.matheclipse.parser.client.ast.NumberNode;
 import org.matheclipse.parser.client.ast.PatternNode;
@@ -53,7 +53,7 @@ public class Parser extends Scanner {
 	 */
 	private final boolean fRelaxedSyntax;
 
-	protected IParserFactory fFactory;
+	protected INodeParserFactory fFactory;
 	/**
 	 * List of ASTNodes used for parsing packages
 	 */
@@ -111,7 +111,7 @@ public class Parser extends Scanner {
 	 * @param relaxedSyntax
 	 *            if <code>true</code>, use '('...')' as brackets for function arguments
 	 */
-	public Parser(IParserFactory factory, final boolean relaxedSyntax) {
+	public Parser(INodeParserFactory factory, final boolean relaxedSyntax) {
 		this(factory, relaxedSyntax, false);
 	}
 
@@ -131,7 +131,7 @@ public class Parser extends Scanner {
 	 * @param packageMode
 	 *            parse in &quot;package mode&quot; and initialize an internal list of ASTNodes
 	 */
-	public Parser(IParserFactory factory, final boolean relaxedSyntax, boolean packageMode) {
+	public Parser(INodeParserFactory factory, final boolean relaxedSyntax, boolean packageMode) {
 		super(packageMode);
 		this.fRelaxedSyntax = relaxedSyntax;
 		this.fFactory = factory;
@@ -446,7 +446,7 @@ public class Parser extends Scanner {
 		return null;
 	}
 
-	public IParserFactory getFactory() {
+	public INodeParserFactory getFactory() {
 		return fFactory;
 	}
 
@@ -1068,7 +1068,7 @@ public class Parser extends Scanner {
 		return getPart(min_precedence);
 	}
 
-	public void setFactory(final IParserFactory factory) {
+	public void setFactory(final INodeParserFactory factory) {
 		this.fFactory = factory;
 	}
 }
