@@ -1601,11 +1601,6 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return false;
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final boolean isComplex() {
-		return false;
-	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -1613,11 +1608,6 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return isSameHead(F.DirectedInfinity, 1);
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final boolean isComplexNumeric() {
-		return false;
-	}
 
 	/** {@inheritDoc} */
 	@Override

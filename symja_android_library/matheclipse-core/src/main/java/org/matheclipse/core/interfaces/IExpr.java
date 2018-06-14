@@ -31,10 +31,11 @@ import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
+ *
  * (I)nterface for a mathematical (Expr)ession<br />
- * <p>
+ *
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
- * <p>
+ *
  * <pre>
  * java.lang.Object
  *    |--- java.util.AbstractCollection
@@ -79,6 +80,7 @@ import edu.jas.structure.GcdRingElem;
  *            |--- org.matheclipse.core.expression.Symbol - represents variables, function names or constants
  *                                implements ISymbol, IExpr
  * </pre>
+ *
  */
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
 
