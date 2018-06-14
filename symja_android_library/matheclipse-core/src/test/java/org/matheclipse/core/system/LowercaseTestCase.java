@@ -5963,7 +5963,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("F[[;; All, 1 ;; 2, 3 ;; 3]] = k", "k");
 		check("F", "{{{1,2,k},{2,t,k},{3,t,9}},{{2,4,k},{4,t,k},{6,t,18}},{{3,6,k},{6,t,k},{9,t,27}}}");
 
-		check("A[[1]] + B[[2]] + C[[3]] // Hold // FullForm", "\"Hold(Plus(Part(A, 1), Part(B, 2), Part(C, 3)))\"");
+		check("A[[1]] + B[[2]] + C[[3]] // Hold // FullForm", "Hold(Plus(Part(A, 1), Part(B, 2), Part(C, 3)))");
 		check("a = {2,3,4}; i = 1; a[[i]] = 0; a", "{0,3,4}");
 
 		check("{1,2,3,4,5}[[3;;1;;-1]]", "{3,2,1}");
@@ -6635,6 +6635,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPrimePi() {
+		check("PrimePi(0)", "0");
 		check("PrimePi(3.5)", "2");
 
 		check("PrimePi(100)", "25");
@@ -8440,10 +8441,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSpan() {
-		check("FullForm( ;; )", "\"Span(1, All)\"");
-		check("FullForm(1;;4;;2)", "\"Span(1, 4, 2)\"");
-		check("FullForm(2;;-2)", "\"Span(2, -2)\"");
-		check("FullForm(;;3)", "\"Span(1, 3)\"");
+		check("FullForm( ;; )", "Span(1, All)");
+		check("FullForm(1;;4;;2)", "Span(1, 4, 2)");
+		check("FullForm(2;;-2)", "Span(2, -2)");
+		check("FullForm(;;3)", "Span(1, 3)");
 		// check("a ;; b ;; c ;; d", "(1;;d) (a;;b;;c)");
 
 		check("{a, b, c, d, e, f, g, h}[[2 ;; -3]]", "{b,c,d,e,f}");
@@ -9264,6 +9265,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "-256+(11-27*a)^2)-27*a)^(1/3)*E^(I*4/3*Pi))/(3*2^(1/3))");
 	}
 
+	public void testToString() {
+		check("ToString(InputForm(d/2+f(x)))", //
+				"d/2+f(x)");
+		check("ToString(FullForm(d/2))", //
+				"Times(Rational(1,2), d)");
+	}
+	public void testToString() {
+		check("ToString(InputForm(d/2+f(x)))", //
+				"d/2+f(x)");
+		check("ToString(FullForm(d/2))", //
+				"Times(Rational(1,2), d)");
+	}
 	public void testTotal() {
 		check("Total({x^2, 3*x^3, 1})", "1+x^2+3*x^3");
 

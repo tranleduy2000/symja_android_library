@@ -1,8 +1,7 @@
 
 package org.matheclipse.core.builtin;
 
-import java.io.StringWriter;
-
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.MathMLUtilities;
@@ -17,12 +16,15 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.HornerScheme;
 
+import java.io.StringWriter;
+
 public final class OutputFunctions {
 
 	static {
 		F.FullForm.setEvaluator(new FullForm());
 		F.HoldForm.setEvaluator(new HoldForm());
 		F.HornerForm.setEvaluator(new HornerForm());
+		F.InputForm.setEvaluator(new InputForm());
 		F.JavaForm.setEvaluator(new JavaForm());
 		F.MathMLForm.setEvaluator(new MathMLForm());
 		F.TeXForm.setEvaluator(new TeXForm());
@@ -53,8 +55,6 @@ public final class OutputFunctions {
 	 */
 	private static class FullForm extends AbstractCoreFunctionEvaluator {
 
-		public FullForm() {
-		}
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -173,6 +173,21 @@ public final class OutputFunctions {
 
 	}
 
+	private static class InputForm extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 2);
+			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+				return F.stringx(StringFunctions.inputForm(ast.arg1(), true));
+			}
+			return F.stringx(StringFunctions.inputForm(ast.arg1(), false));
+		}
+
+		@Override
+		public void setUp(ISymbol newSymbol) {
+		}
+	}
 	/**
 	 * <pre>
 	 * JavaForm(expr)

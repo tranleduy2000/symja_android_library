@@ -427,6 +427,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     public IExpr head();
 
     /**
+     * Get the head of an expression and if it is a built-in symbol return the ID of this symbol, otherwise return
+     * <code>-1</code> (ID.UNKNNOWN)
+     *
+     * @return return the ID of this built-in header symbol or <code>-1</code>
+     */
+    int headID();
+
+    /**
      * A unique integer ID for the implementation of this expression
      *
      * @return a unique integer id for the implementation of this expression

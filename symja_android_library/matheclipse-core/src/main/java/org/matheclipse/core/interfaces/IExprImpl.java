@@ -22,6 +22,7 @@ import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.ExprField;
 import org.matheclipse.core.expression.ExprRingFactory;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.NILPointer;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
@@ -548,6 +549,7 @@ public abstract class IExprImpl implements IExpr {
         return ExprUtil.convertToExpr(temp);
     }
 
+
     /**
      * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the expression itself, did not
      * match the given pattern. Calls <code>isFree(pattern, true)</code>.
@@ -559,6 +561,14 @@ public abstract class IExprImpl implements IExpr {
         return isFree(pattern, true);
     }
 
+    @Override
+    public int headID() {
+            IExpr head = head();
+            if (head.isBuiltInSymbol()) {
+                return ((IBuiltInSymbol) head).ordinal();
+            }
+            return ID.UNKNOWN;
+    }
 
     /**
      * If this expression unequals <code>F.NIL</code>, invoke the specified consumer with the <code>this</code> object,

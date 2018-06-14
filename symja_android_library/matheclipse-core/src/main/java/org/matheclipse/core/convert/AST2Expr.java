@@ -91,8 +91,8 @@ public class AST2Expr {
 			"HeavisideTheta", "HermiteH", "HermitianMatrixQ", "HilbertMatrix", "Hold", "HoldForm", "HoldPattern",
 			"Horner", "HornerForm", "HurwitzZeta", "HypergeometricDistribution", "HypergeometricPFQ",
 			"Hypergeometric1F1", "Hypergeometric2F1", "HypergeometricPFQRegularized", "Identity", "IdentityMatrix",
-			"If", "Im", "Implies", "Import", "Increment", "Inequality", "InexactNumberQ", "Inner", "Insert",
-			"Information", "Interval", "IntegerDigits", "IntegerExponent", "IntegerLength", "IntegerPart",
+			"If", "Im", "Implies", "Import", "Increment", "Inequality", "InexactNumberQ", "Inner", "InputForm",
+			"Insert", "Information", "Interval", "IntegerDigits", "IntegerExponent", "IntegerLength", "IntegerPart",
 			"IntegerPartitions", "IntegerQ", "Integrate", "Interpolation", "InterpolatingFunction",
 			"InterpolatingPolynomial", "Intersection", "Inverse", "InverseBetaRegularized", "InverseErf", "InverseErfc",
 			"InverseFunction", "InverseGammaRegularized", "InverseHaversine", "InverseLaplaceTransform",
@@ -113,10 +113,10 @@ public class AST2Expr {
 			"NonPositive", "NoneTrue", "Nor", "Normal", "Normalize", "Norm", "NormalDistribution", "Not", "NotListQ",
 			"NRoots", "NSolve", "NullSpace", "NumberFieldRootsOfUnity", "NumberQ", "Numerator", "NumericQ", "OddQ",
 			"Operate", "Optional", "Options", "Or", "Order", "Ordering", "OrderedQ", "Orthogonalize",
-			"OrthogonalMatrixQ", "Out", "Outer", "Package", "PadLeft", "PadRight", "ParametricPlot", "Part",
-			"Partition", "PartitionsP", "PartitionsQ", "PerfectNumber", "PerfectNumberQ", "Pattern", "PatternTest",
-			"PDF", "Permutations", "Piecewise", "Plot", "PlotRange", "Plot3D", "Plus", "Pochhammer", "Point",
-			"PoissonDistribution", "PolyGamma", "Polygon", "PolyLog", "PolynomialExtendedGCD", "PolynomialGCD",
+			"OrthogonalMatrixQ", "Out", "Outer", "OutputForm", "Package", "PadLeft", "PadRight", "ParametricPlot",
+			"Part", "Partition", "PartitionsP", "PartitionsQ", "PerfectNumber", "PerfectNumberQ", "Pattern",
+			"PatternTest", "PDF", "Permutations", "Piecewise", "Plot", "PlotRange", "Plot3D", "Plus", "Pochhammer",
+			"Point", "PoissonDistribution", "PolyGamma", "Polygon", "PolyLog", "PolynomialExtendedGCD", "PolynomialGCD",
 			"PolynomialLCM", "PolynomialQ", "PolynomialQuotient", "PolynomialQuotientRemainder", "PolynomialRemainder",
 			"Position", "Positive", "PossibleZeroQ", "Power", "PowerExpand", "PowerMod", "Precision", "PreDecrement",
 			"PreIncrement", "PrePlus", "Prepend", "PrependTo", "Prime", "PrimeOmega", "PrimePi", "PrimePowerQ",
@@ -131,19 +131,19 @@ public class AST2Expr {
 			"Sequence", "Series", "SeriesCoefficient", "SeriesData", "Set", "SetAttributes", "SetDelayed", "Share",
 			"Show", "Sign", "SignCmp", "Simplify", "Sin", "Sinc", "SingularValueDecomposition", "Sinh", "SinIntegral",
 			"SinhIntegral", "Skewness", "SokalSneathDissimilarity", "Solve", "Sort", "Sow", "Span", "Split", "SplitBy",
-			"Sqrt", "SquaredEuclideanDistance", "SquareFreeQ", "SquareMatrixQ", "StandardDeviation", "Standardize",
-			"StieltjesGamma", "StirlingS1", "StirlingS2", "StringDrop", "StringJoin", "StringLength", "StringTake",
-			"StruveH", "StruveL", "StudentTDistribution", "Subdivide", "Subfactorial", "Subscript", "Subsuperscript",
-			"Subsets", "Subtract", "SubtractFrom", "Sum", "Superscript", "SurfaceGraphics", "Switch", "SyntaxLength",
-			"SymbolName", "SymbolQ", "SymmetricMatrixQ", "SyntaxQ", "Table", "Take", "Tally", "Tan", "Tanh",
-			"TautologyQ", "Taylor", "TensorDimensions", "TensorProduct", "TensorRank", "TeXForm", "Thread", "Through",
-			"Throw", "TimeConstrained", "Times", "TimesBy", "Timing", "ToCharacterCode", "ToeplitzMatrix", "Together",
-			"ToPolarCoordinates", "ToRadicals", "ToString", "Total", "ToUnicode", "Tr", "Trace", "Transpose",
-			"TrigExpand", "TrigReduce", "TrigToExp", "TrueQ", "Tuples", "Undefined", "Unequal", "Unevaluated", "Union",
-			"Unique", "UnitaryMatrixQ", "Unitize", "UnitStep", "UnitVector", "UnsameQ", "Unset", "UpperCaseQ",
-			"UpperTriangularize", "UpSet", "UpSetDelayed", "ValueQ", "VandermondeMatrix", "Variables", "Variance",
-			"VectorAngle", "VectorQ", "WeibullDistribution", "Which", "While", "With", "Xor", "YuleDissimilarity",
-			"Zeta" };
+			"Sqrt", "SquaredEuclideanDistance", "SquareFreeQ", "SquareMatrixQ", "StandardDeviation", "StandardForm",
+			"Standardize", "StieltjesGamma", "StirlingS1", "StirlingS2", "StringDrop", "StringJoin", "StringLength",
+			"StringTake", "StruveH", "StruveL", "StudentTDistribution", "Subdivide", "Subfactorial", "Subscript",
+			"Subsuperscript", "Subsets", "Subtract", "SubtractFrom", "Sum", "Superscript", "SurfaceGraphics", "Switch",
+			"SyntaxLength", "SymbolName", "SymbolQ", "SymmetricMatrixQ", "SyntaxQ", "Table", "Take", "Tally", "Tan",
+			"Tanh", "TautologyQ", "Taylor", "TensorDimensions", "TensorProduct", "TensorRank", "TeXForm", "Thread",
+			"Through", "Throw", "TimeConstrained", "Times", "TimesBy", "Timing", "ToCharacterCode", "ToeplitzMatrix",
+			"Together", "ToPolarCoordinates", "ToRadicals", "ToString", "Total", "ToUnicode", "Tr", "Trace",
+			"TraditionalForm", "Transpose", "TrigExpand", "TrigReduce", "TrigToExp", "TrueQ", "Tuples", "Undefined",
+			"Unequal", "Unevaluated", "Union", "Unique", "UnitaryMatrixQ", "Unitize", "UnitStep", "UnitVector",
+			"UnsameQ", "Unset", "UpperCaseQ", "UpperTriangularize", "UpSet", "UpSetDelayed", "ValueQ",
+			"VandermondeMatrix", "Variables", "Variance", "VectorAngle", "VectorQ", "WeibullDistribution", "Which",
+			"While", "With", "Xor", "YuleDissimilarity", "Zeta" };
 
 	public static Map<String, Integer> RUBI_STATISTICS_MAP;
 
@@ -305,8 +305,12 @@ public class AST2Expr {
 				}
 			}
 
-			IExpr head = ast.head();
-			if (ast.isAST(F.N, 3)) {
+			int functionID = ast.headID();
+			if (functionID > ID.UNKNOWN) {
+				IExpr expr;
+				switch (functionID) {
+				case ID.N:
+					if (ast.isAST2()) {
 				try {
 					int precision = Validate.checkIntType(ast.arg2());
 					if (EvalEngine.isApfloat(precision)) {
@@ -317,13 +321,22 @@ public class AST2Expr {
 				} catch (WrongArgumentType wat) {
 
 				}
-			} else if (ast.isAST(F.Sqrt, 2)) {
+					}
+					break;
+				case ID.Sqrt:
+					if (ast.isAST1( )) {
 				// rewrite from input: Sqrt(x) => Power(x, 1/2)
 				return F.Power(ast.arg1(), F.C1D2);
-			} else if (ast.isAST(F.Exp, 2)) {
+					}
+					break;
+				case ID.Exp:
+					if (ast.isAST1( )) {
 				// rewrite from input: Exp(x) => E^x
 				return F.Power(F.E, ast.arg1());
-			} else if (ast.isPower() && ast.base().isPower() && ast.exponent().isMinusOne()) {
+					}
+					break;
+				case ID.Power:
+					if (ast.isPower() && ast.base().isPower() && ast.exponent().isMinusOne()) {
 				IAST arg1Power = (IAST) ast.base();
 				if (arg1Power.exponent().isNumber()) {
 					// Division operator
@@ -331,37 +344,55 @@ public class AST2Expr {
 					// Power(x, - <number>)
 					return F.Power(arg1Power.base(), ((INumber) arg1Power.exponent()).negate());
 				}
-			} else if (ast.isASTSizeGE(F.GreaterEqual, 3)) {
+					}
+					break;
+				case ID.GreaterEqual:
+					if (ast.isASTSizeGE(F.GreaterEqual, 3)) {
 				ISymbol compareHead = F.Greater;
 				return rewriteLessGreaterAST(ast, compareHead);
-			} else if (ast.isASTSizeGE(F.Greater, 3)) {
+					}
+					break;
+				case ID.Greater:
+					if (ast.isASTSizeGE(F.Greater, 3)) {
 				ISymbol compareHead = F.GreaterEqual;
 				return rewriteLessGreaterAST(ast, compareHead);
-			} else if (ast.isASTSizeGE(F.LessEqual, 3)) {
+					}
+					break;
+				case ID.LessEqual:
+					if (ast.isASTSizeGE(F.LessEqual, 3)) {
 				ISymbol compareHead = F.Less;
 				return rewriteLessGreaterAST(ast, compareHead);
-			} else if (ast.isASTSizeGE(F.Less, 3)) {
+					}
+					break;
+				case ID.Less:
+					if (ast.isASTSizeGE(F.Less, 3)) {
 				ISymbol compareHead = F.LessEqual;
 				return rewriteLessGreaterAST(ast, compareHead);
-			} else if (head.equals(F.Pattern)) {
-				final IExpr expr = PatternMatching.Pattern.CONST.evaluate(ast, fEngine);
+					}
+				case ID.Pattern:
+					expr = PatternMatching.Pattern.CONST.evaluate(ast, fEngine);
 				if (expr.isPresent()) {
 					return expr;
 				}
-			} else if (head.equals(F.Blank)) {
-				final IExpr expr = PatternMatching.Blank.CONST.evaluate(ast, fEngine);
+					break;
+				case ID.Blank:
+					expr = PatternMatching.Blank.CONST.evaluate(ast, fEngine);
 				if (expr.isPresent()) {
 					return expr;
 				}
-			} else if (head.equals(F.Complex)) {
-				final IExpr expr = Arithmetic.CONST_COMPLEX.evaluate(ast, fEngine);
+					break;
+				case ID.Complex:
+					expr = Arithmetic.CONST_COMPLEX.evaluate(ast, fEngine);
 				if (expr.isPresent()) {
 					return expr;
 				}
-			} else if (head.equals(F.Rational)) {
-				final IExpr expr = Arithmetic.CONST_RATIONAL.evaluate(ast, fEngine);
+					break;
+				case ID.Rational:
+					expr = Arithmetic.CONST_RATIONAL.evaluate(ast, fEngine);
 				if (expr.isPresent()) {
 					return expr;
+				}
+					break;
 				}
 			}
 			return ast;
@@ -507,7 +538,7 @@ public class AST2Expr {
 
 
 	/**
-	 * Convert less or greater relations on input. Example: convert expressions like <code>a<b<=c</code> to
+	 * Convert less or greater relations on input. Example: convert expressions like <code>a &lt; b &lt;= c</code> to
 	 * <code>Less[a,b]&&LessEqual[b,c]</code>.
 	 * 
 	 * @param ast

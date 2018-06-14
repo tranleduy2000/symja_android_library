@@ -14,7 +14,6 @@ import org.logicng.solvers.MiniSat;
 import org.logicng.solvers.SATSolver;
 import org.logicng.transformations.cnf.CNFFactorization;
 import org.logicng.transformations.dnf.DNFFactorization;
-import org.logicng.transformations.qmc.QuineMcCluskeyAlgorithm;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.LogicFormula;
 import org.matheclipse.core.convert.VariablesSet;
@@ -29,6 +28,7 @@ import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.Lambda;
 import org.matheclipse.core.eval.util.Options;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.StringX;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -600,16 +600,17 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
-			FormulaFactory factory = new FormulaFactory();
-			LogicFormula lf = new LogicFormula(factory);
+			// FormulaFactory factory = new FormulaFactory();
+			// LogicFormula lf = new LogicFormula(factory);
 
-			Formula formula = lf.expr2BooleanFunction(ast.arg1());
-			// System.out.println(">> " + formula.toString());
-			// only DNF form
-			formula = QuineMcCluskeyAlgorithm.compute(formula);
-			// System.out.println(formula.toString());
-			return lf.booleanFunction2Expr(formula);
+			// Formula formula = lf.expr2BooleanFunction(ast.arg1());
+			// // System.out.println(">> " + formula.toString());
+			// // only DNF form
+			// formula = QuineMcCluskeyAlgorithm.compute(formula);
+			// // System.out.println(formula.toString());
+			// return lf.booleanFunction2Expr(formula);
 
+			return F.NIL;
 			// TODO CNF form after minimizing blows up the formula.
 			// FormulaTransformation transformation = BooleanConvert.transformation(ast, engine);
 			// return lf.booleanFunction2Expr(formula.transform(transformation));
@@ -2700,23 +2701,28 @@ public final class BooleanFunctions {
 					return o.first();
 				}
 				if (temp.isAST2()) {
-					IExpr head = temp.head();
-					if (head.equals(F.Exists)) {
+					int functionID = temp.headID();
+					if (functionID > ID.UNKNOWN) {
+						switch (functionID) {
+						case ID.Exists:
 						return F.ForAll(temp.first(), F.Not(temp.second()));
-					} else if (head.equals(F.ForAll)) {
+						case ID.ForAll:
 						return F.Exists(temp.first(), F.Not(temp.second()));
-					} else if (head.equals(F.Equal)) {
+						case ID.Equal:
 						return temp.apply(F.Unequal);
-					} else if (head.equals(F.Unequal)) {
+						case ID.Unequal:
 						return temp.apply(F.Equal);
-					} else if (head.equals(F.Greater)) {
+						case ID.Greater:
 						return temp.apply(F.LessEqual);
-					} else if (head.equals(F.GreaterEqual)) {
+						case ID.GreaterEqual:
 						return temp.apply(F.Less);
-					} else if (head.equals(F.Less)) {
+						case ID.Less:
 						return temp.apply(F.GreaterEqual);
-					} else if (head.equals(F.LessEqual)) {
+						case ID.LessEqual:
 						return temp.apply(F.Greater);
+						default:
+							break;
+						}
 					}
 				}
 			}
@@ -3712,7 +3718,7 @@ public final class BooleanFunctions {
 	public static IAST inequality2And(final IAST ast) {
 		IASTAppendable result = F.And();
 		for (int i = 3; i < ast.size(); i += 2) {
-			result.append(F.binary(ast.get(i - 1), ast.get(i - 2), ast.get(i)));
+			result.append(F.binaryAST2(ast.get(i - 1), ast.get(i - 2), ast.get(i)));
 		}
 		return result;
 	}
