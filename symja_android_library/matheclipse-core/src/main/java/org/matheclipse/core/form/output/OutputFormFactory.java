@@ -10,6 +10,7 @@ import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -859,7 +860,8 @@ public class OutputFormFactory {
 				convertFunctionArgs(buf, list);
 				return;
 			}
-			ISymbol head = list.topHead();
+			if (list.head().isSymbol()) {
+				ISymbol head = (ISymbol) list.head();
 			final Operator operator = getOperator(head);
 			if (operator != null) {
 				if (operator instanceof PostfixOperator) {
@@ -873,35 +875,47 @@ public class OutputFormFactory {
 					}
 				}
 			}
+				int functionID = head.ordinal();
+				if (functionID > ID.UNKNOWN) {
+					switch (functionID) {
+					case ID.SeriesData:
 			// if (head.equals(F.SeriesData) && (list.size() == 7)) {
 			if (list instanceof ASTSeriesData) {
 				if (convertSeriesData(buf, (ASTSeriesData) list, precedence)) {
 					return;
 				}
 			}
-			// }
-			if (list.isList() || list instanceof ASTRealVector || list instanceof ASTRealMatrix) {
+						break;
+					case ID.List:
 				convertList(buf, list);
 				return;
-			}
-			if (head.equals(F.Part) && (list.size() >= 3)) {
+					case ID.Part:
+						if (list.size() >= 3) {
 				convertPart(buf, list);
 				return;
 			}
-			if (head.equals(F.Slot) && (list.isAST1()) && (list.arg1() instanceof IInteger)) {
+						break;
+					case ID.Slot:
+						if (list.isAST1() && list.arg1().isInteger()) {
 				convertSlot(buf, list);
 				return;
 			}
-			if (head.equals(F.SlotSequence) && (list.isAST1()) && (list.arg1() instanceof IInteger)) {
+						break;
+					case ID.SlotSequence:
+						if (list.isAST1() && list.arg1().isInteger()) {
 				convertSlotSequence(buf, list);
 				return;
 			}
-			if ((head.equals(F.HoldForm) || head.equals(F.Defer)) && (list.isAST1())) {
+						break;
+					case ID.Defer:
+					case ID.HoldForm:
+						if (list.isAST1()) {
 				convert(buf, list.arg1());
 				return;
 			}
+						break;
+					case ID.DirectedInfinity:
 			if (list.isDirectedInfinity()) { // head.equals(F.DirectedInfinity))
-				// {
 				if (list.isAST0()) {
 					append(buf, "ComplexInfinity");
 					return;
@@ -924,6 +938,15 @@ public class OutputFormFactory {
 						return;
 					} else if (list.arg1().isNegativeImaginaryUnit()) {
 						append(buf, "-I*Infinity");
+						return;
+					}
+				}
+			}
+						break;
+					}
+				} else {
+					if (list instanceof ASTRealVector || list instanceof ASTRealMatrix) {
+						convertList(buf, list);
 						return;
 					}
 				}

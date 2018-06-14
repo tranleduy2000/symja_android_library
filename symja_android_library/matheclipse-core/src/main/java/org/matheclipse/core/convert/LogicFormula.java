@@ -1,12 +1,5 @@
 package org.matheclipse.core.convert;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-
 import org.logicng.formulas.And;
 import org.logicng.formulas.CFalse;
 import org.logicng.formulas.CTrue;
@@ -17,11 +10,19 @@ import org.logicng.formulas.Not;
 import org.logicng.formulas.Or;
 import org.logicng.formulas.Variable;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.generic.Comparators.ExprComparator;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
 
 public class LogicFormula {
 
@@ -148,39 +149,67 @@ public class LogicFormula {
 	public Formula expr2BooleanFunction(final IExpr logicExpr) throws ClassCastException {
 		if (logicExpr instanceof IAST) {
 			final IAST ast = (IAST) logicExpr;
+			int functionID = ast.headID();
+			if (functionID > ID.UNKNOWN) {
+				switch (functionID) {
+				case ID.And:
 			if (ast.isAnd()) {
 				Formula[] result = new Formula[ast.argSize()];
 				for (int i = 1; i < ast.size(); i++) {
 					result[i - 1] = expr2BooleanFunction(ast.get(i));
 				}
 				return factory.and(result);
-			} else if (ast.isOr()) {
+					}
+					break;
+				case ID.Or:
+					if (ast.isOr()) {
 				Formula[] result = new Formula[ast.argSize()];
 				for (int i = 1; i < ast.size(); i++) {
 					result[i - 1] = expr2BooleanFunction(ast.get(i));
 				}
 				return factory.or(result);
-			} else if (ast.isASTSizeGE(F.Nand, 3)) {
+					}
+					break;
+				case ID.Nand:
+					if (ast.isASTSizeGE(F.Nand, 3)) {
 				Formula[] result = new Formula[ast.argSize()];
 				for (int i = 1; i < ast.size(); i++) {
 					result[i - 1] = factory.not(expr2BooleanFunction(ast.get(i)));
 				}
 				return factory.or(result);
-			} else if (ast.isASTSizeGE(F.Nor, 3)) {
+					}
+					break;
+				case ID.Nor:
+					if (ast.isASTSizeGE(F.Nor, 3)) {
 				Formula[] result = new Formula[ast.argSize()];
 				for (int i = 1; i < ast.size(); i++) {
 					result[i - 1] = factory.not(expr2BooleanFunction(ast.get(i)));
 				}
 				return factory.and(result);
-			} else if (ast.isASTSizeGE(F.Equivalent, 3)) {
+					}
+					break;
+				case ID.Equivalent:
+					if (ast.isASTSizeGE(F.Equivalent, 3)) {
 				return convertEquivalent(ast);
-			} else if (ast.isASTSizeGE(F.Xor, 3)) {
+					}
+					break;
+				case ID.Xor:
+					if (ast.isASTSizeGE(F.Xor, 3)) {
 				return convertXor(ast);
-			} else if (ast.isAST(F.Implies, 3)) {
+					}
+					break;
+				case ID.Implies:
+					if (ast.isAST(F.Implies, 3)) {
 				return factory.implication(expr2BooleanFunction(ast.arg1()), expr2BooleanFunction(ast.arg2()));
-			} else if (ast.isNot()) {
+					}
+					break;
+				case ID.Not:
+					if (ast.isNot()) {
 				IExpr expr = ast.arg1();
 				return factory.not(expr2BooleanFunction(expr));
+			}
+					break;
+				}
 			}
 		} else if (logicExpr instanceof ISymbol) {
 			ISymbol symbol = (ISymbol) logicExpr;

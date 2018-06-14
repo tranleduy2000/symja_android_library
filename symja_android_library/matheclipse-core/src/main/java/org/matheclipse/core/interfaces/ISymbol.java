@@ -6,6 +6,7 @@ import com.duy.lambda.Function;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.Context;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
@@ -380,8 +381,14 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
 	 * @return if the result isn't a boolean value return <code>false</code>.
 	 */
 	public boolean ofQ(EvalEngine engine, IExpr... args);
-	
 
+	/**
+	 * Get the ordinal number of this built-in symbol in the enumeration of built-in symbols.
+	 * If this is no built-in symbol return <code>-1</code> (ID.UNKNOWN)
+	 *
+	 * @return
+	 */
+	int ordinal();
 	
     /**
      * Delete the topmost placeholder from the local variable stack
