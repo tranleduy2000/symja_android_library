@@ -6622,6 +6622,31 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPrimeQ() {
+		// Gaussian primes
+		// https://en.wikipedia.org/wiki/Gaussian_integer#Gaussian_primes
+		check("PrimeQ(-3*I, GaussianIntegers->True)", //
+				"True");
+		check("PrimeQ(3*I, GaussianIntegers->True)", //
+				"True");
+		check("PrimeQ(-3, GaussianIntegers->True)", //
+				"True");
+		check("PrimeQ(-3)", "True");
+
+		check("PrimeQ({0,1,2,3,4,5,6,7,8,9,10,11}, GaussianIntegers->True)", //
+				"{False,False,False,True,False,False,False,True,False,False,False,True}");
+
+		check("PrimeQ({-5-4*I,-5-4*I, -5-2*I, -5+2*I, -5+4*I, " //
+				+ "-4-5*I, -4-I, -4+I, -4+5*I, " //
+				+ "-3-2*I, -3, -3+2*I, " //
+				+ "-2-5*I, -2-3*I, -2-I, -2+I, -2+3*I, -2+5*I, " //
+				+ "-1-4*I, -1-2*I, -1-I, -1+I, -1+2*I, -1+4*I, " //
+				+ "-3*I, 3*I, 1-4*I, 1-2*I, 1-I, 1+I, 1+2*I, 1+4*I, 2-5*I, 2-3*I, 2-I, 2+I, 2+3*I, " //
+				+ "2+5*I, 3-2*I, 3, 3+2*I, 4-5*I, 4-I, 4+I, 4+5*I, 5-4*I, 5-2*I, 5+2*I, 5+4*I}, GaussianIntegers->True)", //
+				"{True,True,True,True,True,True,True,True,True,True,"//
+						+ "True,True,True,True,True,True,True,True,True,True,"//
+						+ "True,True,True,True,True,True,True,True,True,True,"//
+						+ "True,True,True,True,True,True,True,True,True,True,"//
+						+ "True,True,True,True,True,True,True,True,True}");
 		// Mersenne Prime
 		// https://en.wikipedia.org/wiki/Mersenne_prime
 		check("PrimeQ(131071)", "True");

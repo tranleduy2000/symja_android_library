@@ -31,11 +31,10 @@ import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
- *
  * (I)nterface for a mathematical (Expr)ession<br />
- *
+ * <p>
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
- *
+ * <p>
  * <pre>
  * java.lang.Object
  *    |--- java.util.AbstractCollection
@@ -80,7 +79,6 @@ import edu.jas.structure.GcdRingElem;
  *            |--- org.matheclipse.core.expression.Symbol - represents variables, function names or constants
  *                                implements ISymbol, IExpr
  * </pre>
- *
  */
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
 
@@ -1087,6 +1085,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return
      */
     boolean isInteger();
+
+    /**
+     * Return the Gaussian integers real and imaginary parts. If this is not a Gaussian integer return <code>null</code>
+     *
+     * @return <code>null</code> if this is not a Gaussian integer
+     */
+    IInteger[] gaussianIntegers();
 
     /**
      * Test if this expression is a integer function (i.e. a number, a symbolic constant or an integer function where

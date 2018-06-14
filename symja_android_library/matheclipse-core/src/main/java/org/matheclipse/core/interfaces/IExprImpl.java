@@ -1356,6 +1356,11 @@ public abstract class IExprImpl implements IExpr {
         return this instanceof IInteger;
     }
 
+    @Override
+    public IInteger[] gaussianIntegers() {
+        return null;
+    }
+
     /**
      * Test if this expression is a integer function (i.e. a number, a symbolic constant or an integer function where
      * all arguments are also &quot;integer functions&quot;)

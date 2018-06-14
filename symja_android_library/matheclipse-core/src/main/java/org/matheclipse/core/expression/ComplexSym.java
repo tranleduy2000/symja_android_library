@@ -376,6 +376,14 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		return buf.toString();
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public IInteger[] gaussianIntegers() {
+		if (fReal.isInteger() && fImaginary.isInteger()) {
+			return new IInteger[] { ((IInteger) fReal), ((IInteger) fImaginary) };
+		}
+		return null;
+	}
 	@Override
 	public double getImaginary() {
 		return fImaginary.doubleValue();
@@ -585,7 +593,8 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
 	/**
 	 *
-	 * @param n must be greater equal 0
+	 * @param n
+	 *            must be greater equal 0
 	 * @return
 	 */
 	private IComplex powPositive(final long n) {
