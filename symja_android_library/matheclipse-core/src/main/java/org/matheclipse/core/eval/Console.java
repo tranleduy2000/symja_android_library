@@ -72,7 +72,6 @@ public class Console {
 		try {
 		console.setArgs(args);
 		} catch (ReturnException re) {
-			System.exit(0);
 			return;
 		}
 

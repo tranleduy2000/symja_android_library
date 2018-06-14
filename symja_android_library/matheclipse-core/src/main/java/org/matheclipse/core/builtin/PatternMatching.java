@@ -387,10 +387,10 @@ public final class PatternMatching {
 					// System.out.println(file.toString());
 					return getFile(file, engine);
 				} else {
-					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
-					if (file.exists()) {
-                return getFile(file, engine);
-					}
+//					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
+//					if (file.exists()) {
+//                return getFile(file, engine);
+//					}
 				}
             }
             return F.NIL;

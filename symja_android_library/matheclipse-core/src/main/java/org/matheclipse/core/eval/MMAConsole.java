@@ -1,17 +1,5 @@
 package org.matheclipse.core.eval;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.exception.ReturnException;
@@ -25,9 +13,21 @@ import org.matheclipse.core.reflection.system.Names;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 /**
  * A read-eval-print loop console for Mathematica like syntax input of expressions.
- * 
+ *
  * See {@link Console}
  */
 public class MMAConsole {
@@ -74,7 +74,6 @@ public class MMAConsole {
 		try {
 			console.setArgs(args);
 		} catch (ReturnException re) {
-			System.exit(0);
 			return;
 		}
 
@@ -170,7 +169,7 @@ public class MMAConsole {
 
 	/**
 	 * Load the documentation fro ressources folder if available ad print to output.
-	 * 
+	 *
 	 * @param symbolName
 	 */
 	private static void printDocumentation(String symbolName) {
@@ -338,7 +337,7 @@ public class MMAConsole {
 
 	/**
 	 * Sets the arguments for the <code>main</code> method
-	 * 
+	 *
 	 * @param args
 	 *            the arguments of the program
 	 */
@@ -435,7 +434,7 @@ public class MMAConsole {
 
 	/**
 	 * Evaluates the given string-expression and returns the result in <code>OutputForm</code>
-	 * 
+	 *
 	 * @param inputExpression
 	 * @return
 	 */
@@ -485,11 +484,11 @@ public class MMAConsole {
 
 	/**
 	 * prints a prompt on the console but doesn't print a newline
-	 * 
+	 *
 	 * @param out
 	 * @param prompt
 	 *            the prompt string to display
-	 * 
+	 *
 	 */
 
 	public void printPrompt(final PrintStream out, final String prompt) {
@@ -512,7 +511,7 @@ public class MMAConsole {
 
 	/**
 	 * read a string from the console. The string is terminated by a newline
-	 * 
+	 *
 	 * @param out
 	 *            Description of Parameter
 	 * @return the input string (without the newline)
@@ -520,7 +519,7 @@ public class MMAConsole {
 
 	public String readString(final PrintStream out) {
 		final StringBuilder input = new StringBuilder();
-		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")));
 		boolean done = false;
 
 		try {
@@ -547,7 +546,7 @@ public class MMAConsole {
 
 	/**
 	 * read a string from the console. The string is terminated by a newline
-	 * 
+	 *
 	 * @param prompt
 	 *            the prompt string to display
 	 * @param out
@@ -577,7 +576,7 @@ public class MMAConsole {
 	/**
 	 * Get the default rules textfile name, which should be loaded at startup. This file replaces the default built-in
 	 * System.mep resource stream.
-	 * 
+	 *
 	 * @return default rules textfile name
 	 */
 	public String getDefaultSystemRulesFilename() {
