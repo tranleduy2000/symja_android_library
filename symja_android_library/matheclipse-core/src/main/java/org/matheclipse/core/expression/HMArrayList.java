@@ -20,9 +20,11 @@ package org.matheclipse.core.expression;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
+import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -39,14 +41,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
 import java.util.Set;
-import com.duy.lambda.ObjIntConsumer;
 import java.util.stream.Stream;
 
 /**
  * HMArrayList is an implementation of a list, backed by an array. All optional operations adding, removing, and
  * replacing are supported. The elements can be any objects.
- * 
- * Copied and modified from the Apache Harmony project.
+ *
  * 
  */
 public abstract class HMArrayList extends AbstractAST implements IASTAppendable, Cloneable, Serializable, RandomAccess {
@@ -60,14 +60,14 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 	protected transient int lastIndex;
 
 	/**
-	 * Constructs a new instance of list with ten capacity.
+	 * Constructs a new instance of list with capacity <code>10</code>.
 	 */
 	public HMArrayList() {
 		this(10);
 	}
 
 	/**
-	 * Constructs a newlist containing the elements of the specified collection. The initial size of the
+	 * Constructs a new list containing the elements of the specified collection. The initial size of the
 	 * {@code ArrayList} will be 10% higher than the size of the specified collection.
 	 * 
 	 * @param collection
@@ -82,21 +82,76 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 		lastIndex = size;
 	}
 
-	public HMArrayList(IExpr ex, IExpr... es) {
-		int len = es.length + 1;
+	/**
+	 * Constructs a new list by allocating <code>1 + arguments.length</code> new elements for the list. The list
+	 * contains the <code>headExpr</code> as element at offset <code>0</code> and the arguments at offset
+	 * <code>1 .. arguments.length</code> in the list.
+	 *
+	 * @param headExpr
+	 *            the header expression
+	 * @param arguments
+	 *            the argument expressions
+	 */
+	public HMArrayList(IExpr headExpr, IExpr... arguments) {
 		firstIndex = hashValue = 0;
-		array = newElementArray(len);
-		array[0] = ex;
-		System.arraycopy(es, 0, array, 1, es.length);
-		lastIndex = len;
-	}
-
-	protected HMArrayList(IExpr[] array) {
-		init(array);
+		lastIndex = arguments.length + 1;
+		switch (lastIndex) {
+		case 0:
+			array = new IExpr[] { headExpr };
+			break;
+		case 1:
+			array = new IExpr[] { headExpr };
+			break;
+		case 2:
+			array = new IExpr[] { headExpr, arguments[0] };
+			break;
+		case 3:
+			array = new IExpr[] { headExpr, arguments[0], arguments[1] };
+			break;
+		case 4:
+			array = new IExpr[] { headExpr, arguments[0], arguments[1], arguments[2] };
+			break;
+		case 5:
+			array = new IExpr[] { headExpr, arguments[0], arguments[1], arguments[2], arguments[3] };
+			break;
+		case 6:
+			array = new IExpr[] { headExpr, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4] };
+			break;
+		case 7:
+			array = new IExpr[] { headExpr, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+					arguments[5] };
+			break;
+		case 8:
+			array = new IExpr[] { headExpr, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+					arguments[5], arguments[6] };
+			break;
+		case 9:
+			array = new IExpr[] { headExpr, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+					arguments[5], arguments[6], arguments[7] };
+			break;
+		default:
+			array = newElementArray(lastIndex);
+			array[0] = headExpr;
+			System.arraycopy(arguments, 0, array, 1, lastIndex - 1);
+		}
 	}
 
 	/**
-	 * Constructs a new instance of {@code ArrayList} with the specified capacity.
+	 * Constructs a new list assigning the given <code>array</code> to this lists array. No new memory is allocated for
+	 * the list. The list contains the arrays elements form offset <code>0</code> to offset <code>array.length-1</code>
+	 * in the list.
+	 *
+	 * @param array
+	 *            the array which will be used to store this lists elements.
+	 */
+	protected HMArrayList(IExpr[] array) {
+		this.array = array;
+		this.firstIndex = this.hashValue = 0;
+		this.lastIndex = array.length;
+	}
+
+	/**
+	 * Constructs a new instance of {@code HMArrayList} with the specified capacity.
 	 * 
 	 * @param capacity
 	 *            the initial capacity of this {@code ArrayList}.
@@ -438,9 +493,9 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 		return array[firstIndex + 5];
 	}
 
-	@Override
+	/** {@inheritDoc} */
 	public int argSize() {
-		return size() - 1;
+		return lastIndex - firstIndex - 1;
 	}
 	
 	@Override
@@ -562,6 +617,18 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean exists(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+		int start = firstIndex + startOffset;
+		int j = startOffset;
+		for (int i = start; i < lastIndex; i++) {
+			if (predicate.test(array[i], j++)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	/** {@inheritDoc} */
+	@Override
 	public final IAST filter(IASTAppendable filterAST, IASTAppendable restAST, Predicate<? super IExpr> predicate) {
 		for (int i = firstIndex + 1; i < lastIndex; i++) {
 			IExpr temp = array[i];
@@ -596,6 +663,18 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 		int start = firstIndex + startOffset;
 		for (int i = start; i < lastIndex; i++) {
 			if (!predicate.test(array[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+	/** {@inheritDoc} */
+	@Override
+	public boolean forAll(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+		final int start = firstIndex + startOffset;
+		int j = startOffset;
+		for (int i = start; i < lastIndex; i++) {
+			if (!predicate.test(array[i], j++)) {
 				return false;
 			}
 		}
@@ -707,9 +786,6 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 		return array[firstIndex];
 	}
 
-	public void ifAppendable(Consumer<? super IASTAppendable> consumer) {
-		consumer.accept(this);
-	}
 	
 	/**
 	 * Searches this list for the specified object and returns the index of the first occurrence.
@@ -739,10 +815,18 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 		return -1;
 	}
 
+	/**
+	 * Constructs a new list assigning the given <code>array</code> to this lists array. No new memory is allocated for
+	 * the list. The list contains the arrays elements from offset <code>0</code> to offset <code>array.length-1</code>
+	 * in the list.
+	 *
+	 * @param array
+	 *            the array which will be used to store this lists elements.
+	 */
 	protected final void init(IExpr[] array) {
 		this.array = array;
-		firstIndex = hashValue = 0;
-		lastIndex = array.length;
+		this.firstIndex = this.hashValue = 0;
+		this.lastIndex = array.length;
 	}
 
 	/** {@inheritDoc} */
@@ -923,11 +1007,7 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 				"Index: " + Integer.valueOf(location) + ", Size: " + Integer.valueOf(lastIndex - firstIndex));
 	}
 
-	/**
-	 * Returns the number of elements in this {@code ArrayList}.
-	 * 
-	 * @return the number of elements in this {@code ArrayList}.
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public int size() {
 		return lastIndex - firstIndex;
