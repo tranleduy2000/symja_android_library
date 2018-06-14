@@ -24,7 +24,9 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 
+ * A read-eval-print loop console for Mathematica like syntax input of expressions.
+ *
+ * See {@link Console}
  */
 public class MMAConsole {
 	/**

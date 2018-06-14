@@ -29,7 +29,9 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 
+ * A read-eval-print loop console for Symja syntax math expressions.
+ *
+ * See {@link MMAConsole}
  */
 public class Console {
 
@@ -533,7 +535,7 @@ public class Console {
 			out.close();
 
 			System.out.println(temp.toURI().toString());
-//			java.awt.Desktop.getDesktop().browse(temp.toURI());
+			java.awt.Desktop.getDesktop().browse(temp.toURI());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
