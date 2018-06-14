@@ -1130,6 +1130,29 @@ public class ExprParser extends Scanner {
 						while (fToken == TT_NEWLINE) {
 							getNextToken();
 						}
+						lhs = parseInfixOperator(lhs, infixOperator);
+						continue;
+					}
+				} else {
+					postfixOperator = determinePostfixOperator();
+
+					if (postfixOperator != null) {
+						if (postfixOperator.getPrecedence() >= min_precedence) {
+							lhs = parsePostfixOperator(lhs, postfixOperator);
+							continue;
+						}
+					} else {
+						throwSyntaxError("Operator: " + fOperatorString + " is no infix or postfix operator.");
+					}
+				}
+			}
+			break;
+		}
+		return lhs;
+	}
+
+	private final IExpr parseInfixOperator(IExpr lhs, InfixExprOperator infixOperator) {
+		IExpr rhs;
 						rhs = parseLookaheadOperator(infixOperator.getPrecedence());
 						lhs = createInfixFunction(infixOperator, lhs, rhs);
 
@@ -1150,25 +1173,13 @@ public class ExprParser extends Scanner {
 							((IASTAppendable) lhs).append(rhs);
 						}
 
-						continue;
+		return lhs;
 					}
-				} else {
-					postfixOperator = determinePostfixOperator();
 
-					if (postfixOperator != null) {
-						if (postfixOperator.getPrecedence() >= min_precedence) {
+	private final IExpr parsePostfixOperator(IExpr lhs, PostfixExprOperator postfixOperator) {
 							getNextToken();
 							lhs = postfixOperator.createFunction(fFactory, lhs);
 							lhs = parseArguments(lhs);
-							continue;
-						}
-					} else {
-						throwSyntaxError("Operator: " + fOperatorString + " is no infix or postfix operator.");
-					}
-				}
-			}
-			break;
-		}
 		return lhs;
 	}
 
@@ -1312,6 +1323,15 @@ public class ExprParser extends Scanner {
 			}
 			final PrefixExprOperator prefixOperator = determinePrefixOperator();
 			if (prefixOperator != null) {
+				return parsePrefixOperator(prefixOperator);
+			}
+			throwSyntaxError("Operator: " + fOperatorString + " is no prefix operator.");
+
+		}
+		return getPart(min_precedence);
+	}
+
+	private final IExpr parsePrefixOperator(final PrefixExprOperator prefixOperator) {
 				getNextToken();
 				final IExpr temp = parseLookaheadOperator(prefixOperator.getPrecedence());
 				if (prefixOperator.getFunctionName().equals("PreMinus")) {
@@ -1322,11 +1342,6 @@ public class ExprParser extends Scanner {
 				}
 				return prefixOperator.createFunction(fFactory, temp);
 			}
-			throwSyntaxError("Operator: " + fOperatorString + " is no prefix operator.");
-
-		}
-		return getPart(min_precedence);
-	}
 
 	public void setFactory(final IParserFactory factory) {
 		this.fFactory = factory;
