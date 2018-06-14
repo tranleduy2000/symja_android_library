@@ -1060,5 +1060,7 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 			stream.writeObject(get(i));
 		}
 	}
-
+	public void ifAppendable(Consumer<? super IASTAppendable> consumer) {
+		consumer.accept(this);
+	}
 }
