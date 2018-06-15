@@ -349,10 +349,6 @@ public class PredicateQ {
 			return arg1.isTrue() || arg1.isFalse();
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.LISTABLE);
-		}
 
 	}
 
@@ -383,10 +379,6 @@ public class PredicateQ {
 			return false;
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.LISTABLE);
-		}
 
 		@Override
 		public boolean test(final IExpr obj) {
@@ -686,10 +678,6 @@ public class PredicateQ {
 			return arg1.isInteger();
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.LISTABLE);
-		}
 
 	}
 
@@ -1520,10 +1508,6 @@ public class PredicateQ {
 			return ExprParser.test(arg1.toString(), engine);
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.LISTABLE);
-		}
 
 	}
 
