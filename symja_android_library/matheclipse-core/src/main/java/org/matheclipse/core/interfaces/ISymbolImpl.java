@@ -16,11 +16,6 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     }
 
     @Override
-    public boolean isTrue(IExpr... args) {
-        return of(args).isTrue();
-    }
-
-    @Override
     public int ordinal() {
         return ID.UNKNOWN;
     }
