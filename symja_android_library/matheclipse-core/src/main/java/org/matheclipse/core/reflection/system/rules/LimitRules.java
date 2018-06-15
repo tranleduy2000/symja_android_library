@@ -91,6 +91,12 @@ public interface LimitRules {
 
   final public static IAST RULES = List(
     IInit(Limit, SIZES),
+    // Limit(x_*(Sqrt(2)*Sqrt(Pi*x_)/x_!)^(1/x_),x_Symbol->Infinity):=E
+    ISetDelayed(Limit(Times(x_,Power(Times(CSqrt2,Sqrt(Times(Pi,x_)),Power(Factorial(x_),-1)),Power(x_,-1))),Rule(x_Symbol,oo)),
+      E),
+    // Limit(x_/(x_!)^(1/x_),x_Symbol->Infinity):=E
+    ISetDelayed(Limit(Times(x_,Power(Factorial(x_),Negate(Power(x_,-1)))),Rule(x_Symbol,oo)),
+      E),
     // Limit(x_^m_RealNumberQ,x_Symbol->Infinity):=If(m<0,0,Infinity)
     ISetDelayed(Limit(Power(x_,$p(m,RealNumberQ)),Rule(x_Symbol,oo)),
       If(Less(m,C0),C0,oo)),
