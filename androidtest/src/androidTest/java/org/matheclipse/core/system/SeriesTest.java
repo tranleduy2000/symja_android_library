@@ -59,6 +59,10 @@ public class SeriesTest extends AbstractTestCase {
 	}
 
 	public void testInverseSeries() {
+		check("InverseSeries(SeriesData(x,0,{1,1,1},0,3,1))", //
+				"(-1+x)-(1-x)^2+O(-1+x)^3");
+		check("InverseSeries(SeriesData(x,x0,{1,1,1},0,3,1))", //
+				"x0+(-1+x)-(1-x)^2+O(-1+x)^3");
 		check("InverseSeries(SeriesData(x,x0,{1,2,3},0,5,1))", //
 				"x0+1/2*(-1+x)-3/8*(1-x)^2+9/16*(-1+x)^3-135/128*(1-x)^4+O(-1+x)^5");
 		check("InverseSeries(SeriesData(x,0,{1,2,3},0,5,1))", //
@@ -77,6 +81,8 @@ public class SeriesTest extends AbstractTestCase {
 	}
 
 	public void testNormal() {
+		check("Normal(Series(Product((1+x^(k*(k+1)/2)), {k, 3}), {x, 0,6}))", //
+				"1+x+x^3+x^4+x^6+x^7");
 		check("Normal(SeriesData(x, 0, {1, 0, -1, -4, -17, -88, -549}, -1, 6, 1))", //
 				"1/x-x-4*x^2-17*x^3-88*x^4-549*x^5");
 		check("Normal(Series(Exp(x),{x,0,5}))", //
@@ -86,6 +92,9 @@ public class SeriesTest extends AbstractTestCase {
 	}
 
 	public void testSeries() {
+		https://oeis.org/A053614
+		check("nn=10; t=Rest(CoefficientList(Series(Product((1+x^(k*(k+1)/2)), {k, nn}), {x, 0, nn*(nn+1)/2}), x)); Flatten(Position(t, 0))",
+				"{2,5,8,12,23,33}");
 		// check("InverseSeries(Series(x,{x,0,3})) // FullForm", //
 		// "Log(a)+(-a+x)/a-(-a+x)^2/(2*a^2)+(-a+x)^3/(3*a^3)+O(-a+x)^4");
 		// check("Series(1/(3*x^2),{x,0,10})", //
@@ -101,28 +110,28 @@ public class SeriesTest extends AbstractTestCase {
 				"1+x+x^2/2-x^4/8-x^5/15-x^6/240+x^7/90+31/5760*x^8+x^9/5670-2951/3628800*x^10+O(x)^\n" + "11");
 		// TODO check max power
 		check("Series(Sin(x)^2,{x,0,5})//FullForm", //
-				"\"SeriesData(x,0,{1,0,-1/3,0,2/45},2,7,1)\"");
+				"SeriesData(x,0,{1,0,-1/3,0,2/45},2,7,1)");
 		// TODO check max power
 		check("Series(Sin(x)^3,{x,0,5})//FullForm", //
-				"\"SeriesData(x,0,{1,0,-1/2,0,13/120},3,8,1)\"");
+				"SeriesData(x,0,{1,0,-1/2,0,13/120},3,8,1)");
 
 		// TODO check power value
 		check("Series(Sin(x) ,{x,0,-2})//FullForm", //
-				"\"SeriesData(x,0,{},1,1,1)\"");
+				"SeriesData(x,0,{},1,1,1)");
 		// TODO check power value
 		check("Series(b*Sin(x) ,{x,0,-2})//FullForm", //
-				"\"SeriesData(x,0,{},1,2,1)\"");
+				"SeriesData(x,0,{},1,2,1)");
 
 		check("Series(b*x ,{x,0,-2})//FullForm", //
-				"\"SeriesData(x,0,{},0,-1,1)\"");
+				"SeriesData(x,0,{},0,-1,1)");
 		check("Series(b*x ,{x,0,5})//FullForm", //
-				"\"SeriesData(x,0,{b},1,6,1)\"");
+				"SeriesData(x,0,{b},1,6,1)");
 
 		// TODO check power value
 		check("Series(b*Sin(x) ,{x,0,5})//FullForm", //
-				"\"SeriesData(x,0,{b,0,-b/6,0,b/120},1,7,1)\"");
+				"SeriesData(x,0,{b,0,-b/6,0,b/120},1,7,1)");
 		check("Series(b+Sin(x) ,{x,0,5})//FullForm", //
-				"\"SeriesData(x,0,{b,1,0,-1/6,0,1/120},0,6,1)\"");
+				"SeriesData(x,0,{b,1,0,-1/6,0,1/120},0,6,1)");
 		check("Series(f(b) ,{x,0,5})", //
 				"f(b)");
 		check("Series(x,{x,0,5})", //
@@ -228,10 +237,10 @@ public class SeriesTest extends AbstractTestCase {
 		// check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, -2, 11, 3)^2", //
 		// "1/(x^(4/3))-1/(3*x^(2/3))+2/45-x^(2/3)/360+x^(4/3)/14400+O(x)^3");
 		// TODO wrong denominator handling
-//		check("SeriesData(x, 0,{1,1,1,1,1}, 1, 11,3) + SeriesData(x, 0,{1,1,1,1,1}, 1, 4,3)",
-//				"2*x^(1/3)+2*x^(2/3)+2*x+O(x)^(4/3)");
-//		check("SeriesData(x, 0,{1,1,1,1,1}, 1, 11,3) + SeriesData(x, 0,{1,1,1,1,1}, 1, 4,5)",
-//				"2*x^(1/3)+2*x^(2/3)+2*x+O(x)^(4/3)");
+		// check("SeriesData(x, 0,{1,1,1,1,1}, 1, 11,3) + SeriesData(x, 0,{1,1,1,1,1}, 1, 4,3)",
+		// "2*x^(1/3)+2*x^(2/3)+2*x+O(x)^(4/3)");
+		// check("SeriesData(x, 0,{1,1,1,1,1}, 1, 11,3) + SeriesData(x, 0,{1,1,1,1,1}, 1, 4,5)",
+		// "2*x^(1/3)+2*x^(2/3)+2*x+O(x)^(4/3)");
 		// TODO O(x)^(13/3)
 		check("SeriesData(x, 0, {1, 0, -1/3, 0, 2/45, 0, -1/360, 0, 1/14400}, 2, 12, 3)*SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 3)",//
 				"x-x^(5/3)/2+13/120*x^(7/3)-7/540*x^3+13/14400*x^(11/3)+O(x)^(13/3)");
@@ -240,12 +249,12 @@ public class SeriesTest extends AbstractTestCase {
 				"x+x^2+x^3+x^4+x^5+O(x)^11");
 		check("SeriesData(x, 0,{1,1,1,1,1}, 1, 11)^2", //
 				"x^2+2*x^3+3*x^4+4*x^5+5*x^6+4*x^7+3*x^8+2*x^9+x^10+O(x)^12");
-//		check("SeriesData(x, 0,{1,1,1,1,1}, 1, 11)*SeriesData(x, 0,{1,1,1,1,1}, 1, 5)", //
-//				"x^2+2*x^3+3*x^4+4*x^5+O(x)^6");
-//		check("SeriesData(x, 0,{1,1,1,1,1}, 1, 11, 3)*SeriesData(x, 0,{1,1,1,1,1}, 1, 5, 3)", //
-//				"x^(2/3)+2*x+3*x^(4/3)+4*x^(5/3)+O(x)^2");
+		// check("SeriesData(x, 0,{1,1,1,1,1}, 1, 11)*SeriesData(x, 0,{1,1,1,1,1}, 1, 5)", //
+		// "x^2+2*x^3+3*x^4+4*x^5+O(x)^6");
+		// check("SeriesData(x, 0,{1,1,1,1,1}, 1, 11, 3)*SeriesData(x, 0,{1,1,1,1,1}, 1, 5, 3)", //
+		// "x^(2/3)+2*x+3*x^(4/3)+4*x^(5/3)+O(x)^2");
 		check("s1=SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^2//FullForm", //
-				"\"SeriesData(x,0,{1,0,-1/3,0,2/45,0,-1/360,0,1/14400},2,12,1)\"");
+				"SeriesData(x,0,{1,0,-1/3,0,2/45,0,-1/360,0,1/14400},2,12,1)");
 		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, -2, 11, 3)", //
 				"1/x^(2/3)-1/6+x^(2/3)/120+O(x)^(11/3)");
 		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 3)^2", //
@@ -274,7 +283,7 @@ public class SeriesTest extends AbstractTestCase {
 		check("s1=SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^2", //
 				"x^2-x^4/3+2/45*x^6-x^8/360+x^10/14400+O(x)^12");
 		check("s1 // FullForm", //
-				"\"SeriesData(x,0,{1,0,-1/3,0,2/45,0,-1/360,0,1/14400},2,12,1)\"");
+				"SeriesData(x,0,{1,0,-1/3,0,2/45,0,-1/360,0,1/14400},2,12,1)");
 		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^3", //
 				"x^3-x^5/2+13/120*x^7-7/540*x^9+13/14400*x^11+O(x)^13");
 
@@ -285,7 +294,7 @@ public class SeriesTest extends AbstractTestCase {
 		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)^3", //
 				"x^3-x^5/2+13/120*x^7-7/540*x^9+13/14400*x^11+O(x)^13");
 		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)*SeriesData(x, 0,{1,0,-1/5,0,1/110}, 1, 11, 1) // FullForm", //
-				"\"SeriesData(x,0,{1,0,-11/30,0,67/1320,0,-7/2200,0,1/13200},2,12,1)\"");
+				"SeriesData(x,0,{1,0,-11/30,0,67/1320,0,-7/2200,0,1/13200},2,12,1)");
 		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)*SeriesData(x, 0,{1,0,-1/5,0,1/110}, 1, 11, 1)", //
 				"x^2-11/30*x^4+67/1320*x^6-7/2200*x^8+x^10/13200+O(x)^12");
 		check("SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)-SeriesData(x, 0,{1,0,-1/6,0,1/120}, 1, 11, 1)", //
