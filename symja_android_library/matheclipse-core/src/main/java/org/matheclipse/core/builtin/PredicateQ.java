@@ -91,9 +91,6 @@ public class PredicateQ {
 			return F.Equal.ofQ(engine, F.Times(F.CN1, F.Conjugate(expr1)), expr2);
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-		}
 
 	}
 
@@ -127,9 +124,6 @@ public class PredicateQ {
 			return F.Equal.ofQ(engine, F.Times(F.CN1, expr1), expr2);
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-		}
 
 	}
 
@@ -601,9 +595,6 @@ public class PredicateQ {
 			return F.Equal.ofQ(engine, F.Conjugate(expr1), expr2);
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-		}
 
 	}
 
@@ -1046,9 +1037,6 @@ public class PredicateQ {
 			return F.bool(arg1.isNumericFunction());
 		}
 
-		@Override
-		public void setUp(ISymbol newSymbol) {
-		}
 
 		@Override
 		public boolean test(IExpr arg) {
@@ -1376,9 +1364,6 @@ public class PredicateQ {
 			return F.True;
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-		}
 
 	}
 
@@ -1474,9 +1459,6 @@ public class PredicateQ {
 			return F.True;
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-		}
 
 	}
 
@@ -1542,10 +1524,6 @@ public class PredicateQ {
 			return test(arg1);
 		}
 
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.LISTABLE);
-		}
 
 		@Override
 		public boolean test(final IExpr obj) {
