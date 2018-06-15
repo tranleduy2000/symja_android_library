@@ -1,7 +1,7 @@
 package org.matheclipse.core.visit;
 
 import com.duy.lambda.BiFunction;
-import com.duy.lambda.Function;
+import com.duy.lambda.ObjIntConsumer;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -9,16 +9,8 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
-import org.matheclipse.core.interfaces.IComplex;
-import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
-import org.matheclipse.core.interfaces.INum;
-import org.matheclipse.core.interfaces.IPattern;
-import org.matheclipse.core.interfaces.IPatternSequence;
-import org.matheclipse.core.interfaces.IStringX;
-import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.math.MathException;
 
 /**
@@ -258,31 +250,34 @@ public class IndexedLevel {
 					minDepth[0] = fCurrentDepth;
 				}
 			}
-			ast.forEach((x, i) -> {
-				newIndx[size] = i;
-				IExpr element = x;
-				boolean evaled = false;
-				if (element.isAST()) {
-					IExpr temp = visitAST((IAST) element, newIndx);
+			ast.forEach(new ObjIntConsumer<IExpr>() {
+				@Override
+				public void accept(IExpr x, int i) {
+					newIndx[size] = i;
+					IExpr element = x;
+					boolean evaled = false;
+					if (element.isAST()) {
+						IExpr temp = IndexedLevel.this.visitAST((IAST) element, newIndx);
+						if (temp.isPresent()) {
+							evaled = true;
+							element = temp;
+						}
+					}
+					final IExpr temp = IndexedLevel.this.visitExpr(element, newIndx);
 					if (temp.isPresent()) {
-						evaled = true;
-						element = temp;
+						if (!result[0].isPresent()) {
+							result[0] = IndexedLevel.this.createResult(ast, temp);
+						}
+						result[0].set(i, temp);
+					} else if (evaled) {
+						if (!result[0].isPresent()) {
+							result[0] = IndexedLevel.this.createResult(ast, temp);
+						}
+						result[0].set(i, element);
 					}
-				}
-				final IExpr temp = visitExpr(element, newIndx);
-				if (temp.isPresent()) {
-					if (!result[0].isPresent()) {
-						result[0] = createResult(ast, temp);
+					if (fCurrentDepth < minDepth[0]) {
+						minDepth[0] = fCurrentDepth;
 					}
-					result[0].set(i, temp);
-				} else if (evaled) {
-					if (!result[0].isPresent()) {
-						result[0] = createResult(ast, temp);
-					}
-					result[0].set(i, element);
-				}
-				if (fCurrentDepth < minDepth[0]) {
-					minDepth[0] = fCurrentDepth;
 				}
 			});
 

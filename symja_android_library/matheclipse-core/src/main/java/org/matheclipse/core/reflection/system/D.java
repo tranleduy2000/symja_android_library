@@ -323,12 +323,12 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 				return result;
 			} else if (xList.isAST1() && xList.arg1().isList()) {
 				IAST subList = (IAST) xList.arg1();
-				return subList.mapLeft(F.List(), new BiFunction<IExpr, IExpr, IExpr>() {
-					@Override
-					public IExpr apply(IExpr a, IExpr b) {
-						return engine.evaluate(F.D(a, b));
-					}
-				}, fx);
+				return subList.mapLeft(F.ListAlloc(), new BiFunction<IExpr, IExpr, IExpr>() {
+                    @Override
+                    public IExpr apply(IExpr a, IExpr b) {
+                        return engine.evaluate(F.D(a, b));
+                    }
+                }, fx);
 			} else if (xList.isAST2() && xList.arg2().isInteger()) {
 				if (ast.isEvalFlagOn(IAST.IS_DERIVATIVE_EVALED)) {
 					return F.NIL;
@@ -342,7 +342,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 					}
 					IExpr temp = fx;
 					for (int i = 0; i < n; i++) {
-						temp = engine.evaluate(F.D(temp, x));
+						temp = F.D.of(engine, temp, x);
 					}
 					return temp;
 				}

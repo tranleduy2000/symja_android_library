@@ -152,9 +152,7 @@ public class UtilityFunctions {
 	// return unary($s("DownValues"), a);
 	// }
 
-	public static IAST RULES = List(
-			ISetDelayed(Dist(u_, Dist(v_, w_, x_), x_),
-					Dist(Times(u, v), w, x)),
+	public static IAST RULES = F.ListAlloc(ISetDelayed(Dist(u_, Dist(v_, w_, x_), x_), Dist(Times(u, v), w, x)),
 			ISetDelayed(
 					Dist(u_, v_,
 							x_),

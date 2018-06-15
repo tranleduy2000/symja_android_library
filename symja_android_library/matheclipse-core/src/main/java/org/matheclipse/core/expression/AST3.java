@@ -249,7 +249,7 @@ public class AST3 extends AST2 {
 		case 3:
 			return predicate.test(arg3);
 		}
-		return false;
+		return true;
 	}
 
 	/** {@inheritDoc} */
@@ -266,7 +266,7 @@ public class AST3 extends AST2 {
 		case 3:
 			return predicate.test(arg3, 3);
 		}
-		return false;
+		return true;
 	}
 	/** {@inheritDoc} */
 	@Override

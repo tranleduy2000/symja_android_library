@@ -3167,7 +3167,7 @@ public final class BooleanFunctions {
 						userDefinedVariables = ((IAST) ast.arg2()).copy();
 						EvalAttributes.sort(userDefinedVariables);
 					} else {
-						userDefinedVariables = List(ast.arg2());
+						userDefinedVariables = F.ListAlloc(ast.arg2());
 					}
 					if (ast.size() > 3) {
 						final Options options = new Options(ast.topHead(), ast, 3, engine);
@@ -3284,7 +3284,7 @@ public final class BooleanFunctions {
 						userDefinedVariables = ((IAST) ast.arg2()).copy();
 						EvalAttributes.sort(userDefinedVariables);
 					} else {
-						userDefinedVariables = List(ast.arg2());
+						userDefinedVariables = F.ListAlloc(ast.arg2());
 					}
 					VariablesSet vSet = new VariablesSet(arg1);
 					IAST variables = vSet.getVarList();

@@ -358,15 +358,14 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 		boolean oldTraceMode = isTraceMode();
 		try {
 			setTraceMode(false);
-			final int ruleSize = ruleList.size();
-			ruleList.forEach(ruleSize, new Consumer<IExpr>() {
-                @Override
-                public void accept(IExpr x) {
-                    if (x != null) {
-                        evaluate(x);
-                    }
-                }
-            });
+			ruleList.forEach(new Consumer<IExpr>() {
+				@Override
+				public void accept(IExpr x) {
+					if (x.isPresent()) {
+						evaluate(x);
+					}
+				}
+			});
 		} finally {
 
 			setTraceMode(oldTraceMode);

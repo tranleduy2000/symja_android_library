@@ -293,7 +293,7 @@ public final class StringFunctions {
 				return F.NIL;
 			}
 
-			return toCharacterCode(ast.arg1().toString(), "UTF-8", List());
+			return toCharacterCode(ast.arg1().toString(), "UTF-8", F.ListAlloc());
 		}
 
 		@Override

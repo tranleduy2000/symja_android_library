@@ -314,7 +314,15 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
 	 * @throws NullPointerException
 	 *             if {@code collection} is {@code null}.
      */
-    public boolean containsAll(Collection<?> collection);
+	default public boolean containsAll(Collection<?> collection) {
+		Iterator<?> it = collection.iterator();
+		while (it.hasNext()) {
+			if (!contains(it.next())) {
+				return false;
+			}
+		}
+		return true;
+	}
 
     /**
      * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied). In contrast

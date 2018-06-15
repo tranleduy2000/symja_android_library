@@ -687,7 +687,7 @@ public final class Validate {
 			// }
 			// return termsEqualZeroList;
 		}
-		return F.List(checkEquation(expr));
+		return F.ListAlloc(checkEquation(expr));
 	}
 
 	/**
@@ -731,7 +731,7 @@ public final class Validate {
 			// return F.List(F.False);
 			// }
 		}
-		return F.List(checkEquationAndInequation(expr));
+		return F.ListAlloc(checkEquationAndInequation(expr));
 	}
 
 	private static IExpr checkEquationAndInequation(IExpr eq) {

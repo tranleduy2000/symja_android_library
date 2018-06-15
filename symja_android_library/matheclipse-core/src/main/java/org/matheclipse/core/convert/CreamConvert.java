@@ -134,7 +134,7 @@ public class CreamConvert {
 	}
 
 	public  IAST integerSolve(final IAST list, final IAST variables) {
-		final IASTAppendable result = F.List();
+		final IASTAppendable result = F.ListAlloc();
 		
 		Solver solver = new DefaultSolver( expr2Cream(list, variables));
 

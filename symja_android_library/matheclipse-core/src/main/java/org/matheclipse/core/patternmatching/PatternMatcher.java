@@ -972,7 +972,12 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 				case ID.Alternatives:
 					if (lhsPatternAST.isAlternatives()) {
 					IAST alternatives = (IAST) lhsPatternAST;
-						matched = alternatives.exists(x -> matchExpr(x, lhsEvalExpr, engine));
+						matched = alternatives.exists(new Predicate<IExpr>() {
+                            @Override
+                            public boolean test(IExpr x) {
+                                return PatternMatcher.this.matchExpr(x, lhsEvalExpr, engine);
+                            }
+                        });
 				if (!matched) {
 					return false;
 				}

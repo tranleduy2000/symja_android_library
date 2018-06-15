@@ -79,7 +79,7 @@ public class Options {
 		} else {
 			fDefaultOptionsList = null;
 		}
-		this.fCurrentOptionsList = List();
+		this.fCurrentOptionsList = F.ListAlloc();
 		this.fCurrentOptionsList.append(optionExpr);
 	}
 

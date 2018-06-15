@@ -1127,7 +1127,7 @@ public final class Programming {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
-			return evaluateNestList(ast, List(), engine);
+			return evaluateNestList(ast, F.ListAlloc(), engine);
 		}
 
 		public static IExpr evaluateNestList(final IAST ast, final IASTAppendable resultList, EvalEngine engine) {
@@ -1235,13 +1235,13 @@ public final class Programming {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
-			final IExpr arg1 = ast.arg1();
+			IExpr arg1 = ast.arg1();
 			return nestList(ast.arg2(), engine.evaluate(ast.arg3()), new Function<IExpr, IExpr>() {
-				@Override
-				public IExpr apply(IExpr x) {
-					return F.unaryAST1(arg1, x);
-				}
-			}, List(), engine);
+                @Override
+                public IExpr apply(IExpr x) {
+                    return F.unaryAST1(arg1, x);
+                }
+            }, F.ListAlloc(), engine);
 			// Functors.append(F.ast(ast.arg1())), List(), engine);
 		}
 

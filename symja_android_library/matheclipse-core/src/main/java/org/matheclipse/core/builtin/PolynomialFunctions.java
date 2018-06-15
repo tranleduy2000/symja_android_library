@@ -174,7 +174,7 @@ public class PolynomialFunctions {
 					}
 				}
 			} else {
-				listOfVariables = F.List();
+				listOfVariables = F.ListAlloc();
 				listOfVariables.append(arg2);
 				exponents = new long[1];
 				exponents[0] = 1;
