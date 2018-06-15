@@ -660,7 +660,7 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 	/** {@inheritDoc} */
 	@Override
 	public boolean forAll(Predicate<? super IExpr> predicate, int startOffset) {
-		int start = firstIndex + startOffset;
+		final int start = firstIndex + startOffset;
 		for (int i = start; i < lastIndex; i++) {
 			if (!predicate.test(array[i])) {
 				return false;
@@ -894,7 +894,7 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 		return appendAST;
 	}
 
-	private IExpr[] newElementArray(int size) {
+	private static IExpr[] newElementArray(int size) {
 		return new IExpr[size];
 	}
 
@@ -1059,8 +1059,5 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 		for (int i = 0; i < size; i++) {
 			stream.writeObject(get(i));
 		}
-	}
-	public void ifAppendable(Consumer<? super IASTAppendable> consumer) {
-		consumer.accept(this);
 	}
 }
