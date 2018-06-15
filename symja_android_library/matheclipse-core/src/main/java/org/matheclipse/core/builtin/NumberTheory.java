@@ -2080,11 +2080,11 @@ public final class NumberTheory {
 			if (list.size() > 1) {
 				int size = list.argSize();
 				if (list.forAll(new Predicate<IExpr>() {
-					@Override
-					public boolean test(IExpr x) {
-						return x.isRealNumber();
-					}
-				})) {
+                    @Override
+                    public boolean test(IExpr x) {
+                        return x.isReal();
+                    }
+                })) {
 					IExpr result = list.get(size--);
 					for (int i = size; i >= 1; i--) {
 						result = list.get(i).plus(result.power(-1));
@@ -2180,7 +2180,7 @@ public final class NumberTheory {
 				return F.C1;
 			}
 			if (size > 1) {
-				IExpr arg1 = ast.arg1();
+				IExpr arg1 = engine.evaluate(ast.arg1());
 				IExpr temp = arg1.evalNumber();
 				if (temp == null) {
 					temp = arg1;
@@ -2196,7 +2196,7 @@ public final class NumberTheory {
 				}
 				arg1 = temp;
 				for (int i = 2; i < size; i++) {
-					IExpr expr = ast.get(i);
+					IExpr expr = engine.evaluate(ast.get(i));
 					if (expr.equals(arg1)) {
 						continue;
 					}
@@ -2379,6 +2379,28 @@ public final class NumberTheory {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * MangoldtLambda(n)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * the von Mangoldt function of <code>n</code>
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Von_Mangoldt_function">Wikipedia - Von Mangoldt function</a></li>
+	 * </ul>
+	 *
+	 * <pre>
+	 * &gt;&gt; MangoldtLambda({1,2,3,4,5,6,7,8,9})
+	 * {0,Log(2),Log(3),Log(2),Log(5),0,Log(7),Log(2),Log(3)}
+	 * </pre>
+	 */
 	private static class MangoldtLambda extends AbstractFunctionEvaluator {
 
 		@Override

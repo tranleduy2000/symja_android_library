@@ -1624,6 +1624,31 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "1,0,0)[h][x,y,z],-Derivative(0,1,0)[f][x,y,z]+Derivative(1,0,0)[g][x,y,z]}");
 	}
 
+	public void testCyclotomic() {
+		// https://en.wikipedia.org/wiki/Cyclotomic_polynomial
+		check("Cyclotomic(0,x)", //
+				"1");
+		check("Cyclotomic(1,x)", //
+				"-1+x");
+		check("Cyclotomic(5,x)", //
+				"1+x+x^2+x^3+x^4");
+		check("Cyclotomic(10,x)", //
+				"1-x+x^2-x^3+x^4");
+		check("Cyclotomic(25,x)", //
+				"1+x^5+x^10+x^15+x^20");
+		check("Cyclotomic(32,x)", //
+				"1+x^16");
+		check("Cyclotomic(94,x)", //
+				"1-x+x^2-x^3+x^4-x^5+x^6-x^7+x^8-x^9+x^10-x^11+x^12-x^13+x^14-x^15+x^16-x^17+x^18-x^\n"
+						+ "19+x^20-x^21+x^22-x^23+x^24-x^25+x^26-x^27+x^28-x^29+x^30-x^31+x^32-x^33+x^34-x^\n"
+						+ "35+x^36-x^37+x^38-x^39+x^40-x^41+x^42-x^43+x^44-x^45+x^46");
+		// The case of the 105-th cyclotomic polynomial is interesting because 105 is the lowest integer that is the
+		// product of three distinct odd prime numbers and this polynomial is the first one that has a coefficient other
+		// than 1, 0, or −1:
+		check("Cyclotomic(105, x)", //
+				"1+x+x^2-x^5-x^6-2*x^7-x^8-x^9+x^12+x^13+x^14+x^15+x^16+x^17-x^20-x^22-x^24-x^26-x^\n"
+						+ "28+x^31+x^32+x^33+x^34+x^35+x^36-x^39-x^40-2*x^41-x^42-x^43+x^46+x^47+x^48");
+	}
 	public void testD() {
 		check("Refine(D(Abs(x),x), Element(x, Reals))", //
 				"x/Abs(x)");
@@ -4067,8 +4092,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testKroneckerDelta() {
-		check("KroneckerDelta(n,0)", "KroneckerDelta(0,n)");
 		check("KroneckerDelta(2 - I, 2. - I)", "1");
+		check("KroneckerDelta(n,0)", "KroneckerDelta(0,n)");
 
 		check("KroneckerDelta( )", "1");
 		check("KroneckerDelta(0)", "1");
@@ -4489,10 +4514,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// A050250 Number of nonzero palindromes less than 10^n.
 		// https://oeis.org/A050250
 		check("LinearRecurrence({1, 10, -10}, {9, 18, 108}, 30)", //
-				"{9,18,108,198,1098,1998,10998,19998,109998,199998,1099998,1999998,10999998,\n" + 
-				"19999998,109999998,199999998,1099999998,1999999998,10999999998,19999999998,\n" + 
-				"109999999998,199999999998,1099999999998,1999999999998,10999999999998,\n" + 
-				"19999999999998,109999999999998,199999999999998,1099999999999998,1999999999999998}");
+				"{9,18,108,198,1098,1998,10998,19998,109998,199998,1099998,1999998,10999998,\n"
+						+ "19999998,109999998,199999998,1099999998,1999999998,10999999998,19999999998,\n"
+						+ "109999999998,199999999998,1099999999998,1999999999998,10999999999998,\n"
+						+ "19999999999998,109999999999998,199999999999998,1099999999999998,1999999999999998}");
 	}
 
 	public void testLinearSolve() {
