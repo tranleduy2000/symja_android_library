@@ -30,7 +30,6 @@ public class CompleteTestSuite extends TestCase {
 		suite.addTestSuite(MainTestCase.class);
 		suite.addTestSuite(BasicPatternPropertiesTestCase.class);
 		suite.addTestSuite(CompareToTestCase.class);
-		suite.addTestSuite(Java8TestCase.class);
 		suite.addTestSuite(PatternMatchingTestCase.class);
 		suite.addTestSuite(RubiIntegrationTest.class);
 		suite.addTestSuite(CombinatoricTestCase.class);

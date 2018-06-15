@@ -18,7 +18,6 @@ import static org.matheclipse.core.expression.F.e;
 /**
  * Tests for the Java port of the
  * <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
- *
  */
 public class Java8TestCase extends AbstractTestCase {
     public Java8TestCase(String name) {
