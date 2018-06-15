@@ -31,10 +31,11 @@ import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
+ *
  * (I)nterface for a mathematical (Expr)ession<br />
- * <p>
+ *
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
- * <p>
+ *
  * <pre>
  * java.lang.Object
  *    |--- java.util.AbstractCollection
@@ -1932,6 +1933,19 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see #opposite()
      */
     IExpr negative();
+
+    /**
+     * Converts a special expression (like a series) into a standard expression.
+     *
+     *
+     * <pre>
+     * &gt;&gt; Normal(SeriesData(x, 0, {1, 0, -1, -4, -17, -88, -549}, -1, 6, 1))
+     * 1/x-x-4*x^2-17*x^3-88*x^4-549*x^5
+     * </pre>
+     *
+     * @return the standard expression for special expressions ot <code>this</code> for the other expressions
+     */
+    IExpr normal();
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(-1) * this</code>. Calculates

@@ -563,11 +563,11 @@ public abstract class IExprImpl implements IExpr {
 
     @Override
     public int headID() {
-            IExpr head = head();
-            if (head.isBuiltInSymbol()) {
-                return ((IBuiltInSymbol) head).ordinal();
-            }
-            return ID.UNKNOWN;
+        IExpr head = head();
+        if (head.isBuiltInSymbol()) {
+            return ((IBuiltInSymbol) head).ordinal();
+        }
+        return ID.UNKNOWN;
     }
 
     /**
@@ -2485,6 +2485,11 @@ public abstract class IExprImpl implements IExpr {
      */
     public IExpr negative() {
         return opposite();
+    }
+
+    @Override
+    public IExpr normal() {
+        return this;
     }
 
     /**

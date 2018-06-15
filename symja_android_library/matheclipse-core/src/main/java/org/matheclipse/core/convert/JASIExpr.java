@@ -1,15 +1,11 @@
 package org.matheclipse.core.convert;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.SortedMap;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
+import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -19,6 +15,12 @@ import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.ExpVectorLong;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 
 import edu.jas.arith.BigRational;
 import edu.jas.poly.Complex;
@@ -207,7 +209,7 @@ public class JASIExpr {
 				}
 				return result;
 			} else if (ast.isPower()) {
-				final IExpr base = ast.arg1();
+				final IExpr base = ast.base();
 				if (base instanceof ISymbol) {
 					ExpVector leer = fPolyFactory.evzero;
 					int ix = leer.indexVar(base.toString(), fPolyFactory.getVars());
@@ -220,7 +222,7 @@ public class JASIExpr {
 						}
 						if (exponent < 0) {
 							throw new ArithmeticException(
-									"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
+									"JASConvert:expr2Poly - invalid exponent: " + ast.exponent().toString());
 						}
 						ExpVector e = ExpVector.create(fVariables.size(), ix, exponent);
 						return fPolyFactory.getONE().multiply(e);
@@ -265,6 +267,9 @@ public class JASIExpr {
 					return fPolyFactory.getONE().multiply(e);
 				}
 			}
+		}
+		if (exprPoly instanceof ASTSeriesData) {
+			return new GenPolynomial<IExpr>(fPolyFactory, exprPoly);
 		}
 		throw new ClassCastException(exprPoly.toString());
 	}
@@ -342,9 +347,9 @@ public class JASIExpr {
 	 *            polynomial with BigRational coefficients to be converted.
 	 * @return Object[] with 3 entries: [0]->gcd [1]->lcm and [2]->polynomial with BigInteger coefficients.
 	 */
-	public Object[] factorTerms(GenPolynomial<BigRational> A) {
-		return PolyUtil.integerFromRationalCoefficientsFactor(fBigIntegerPolyFactory, A);
-	}
+//	public Object[] factorTerms(GenPolynomial<BigRational> A) {
+//		return PolyUtil.integerFromRationalCoefficientsFactor(fBigIntegerPolyFactory, A);
+//	}
 
 	/**
 	 * @return the fPolyFactory

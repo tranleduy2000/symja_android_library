@@ -1,5 +1,9 @@
 package org.matheclipse.core.convert;
 
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Predicate;
+
+import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -14,13 +18,180 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import com.duy.lambda.Consumer;
-import com.duy.lambda.Predicate;
 
 /**
  * Determine the variable symbols from a Symja expression and store them internally in a <code>java.util.Set</code>.
  */
 public class VariablesSet {
+	/**
+	 * Collect the variables which satisfy the <code>IExpr#isVariable()</code> predicate and which are used in logical
+	 * functions like Not, And, OR, Xor,...
+	 *
+	 * @see IExpr#isVariable()
+	 */
+	public static class BooleanVariablesVisitor extends VisitorCollectionBoolean<IExpr> {
+
+		public BooleanVariablesVisitor(Collection<IExpr> collection) {
+			super(collection);
+		}
+
+		@Override
+		public boolean visit(IAST ast) {
+			ISymbol[] logicEquationHeads = { F.And, F.Or, F.Not, F.Xor, F.Nand, F.Nor, F.Implies, F.Equivalent, F.Equal,
+					F.Unequal };
+			for (int i = 0; i < logicEquationHeads.length; i++) {
+                if (ast.isAST(logicEquationHeads[i])) {
+					ast.forEach(new Consumer<IExpr>() {
+						@Override
+						public void accept(IExpr x) {
+							x.accept(BooleanVariablesVisitor.this);
+						}
+					});
+					break;
+				}
+			}
+
+			return false;
+		}
+
+		@Override
+		public boolean visit(ISymbol symbol) {
+			if (symbol.isVariable()) {
+				fCollection.add(symbol);
+				return true;
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Return <code>true</code>, if the expression contains one of the variable store in the internal
+	 * <code>java.util.Set</code>.
+	 *
+	 * @see IExpr#isVariable()
+	 */
+	public class IsMemberVisitor extends AbstractVisitorBoolean {
+		public IsMemberVisitor() {
+			super();
+		}
+
+		@Override
+		public boolean visit(IAST list) {
+			return list.exists(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.accept(IsMemberVisitor.this);
+				}
+			});
+		}
+
+		@Override
+		public boolean visit(ISymbol symbol) {
+			if (symbol.isVariable()) {
+				return fVariablesSet.contains(symbol);
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Collect the variables with the <code>IExpr#isVariable()</code> method.
+	 *
+	 * @see IExpr#isVariable()
+	 */
+	public static class AlgebraVariablesVisitor extends VisitorCollectionBoolean<IExpr> {
+		public AlgebraVariablesVisitor(Collection<IExpr> collection) {
+			super(collection);
+		}
+
+		@Override
+		public boolean visit(ISymbol symbol) {
+			if (symbol.isVariable()) {
+				fCollection.add(symbol);
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public boolean visit(IAST list) {
+			if (list.isList() || list.isPlus() || list.isTimes()) {
+				list.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						x.accept(AlgebraVariablesVisitor.this);
+					}
+				});
+				return false;
+			} else if (list.isPower()) {
+				IExpr base = list.base();
+				IExpr exponent = list.exponent();
+
+				if (exponent.isRational()) {
+					list.forEach(new Consumer<IExpr>() {
+						@Override
+						public void accept(IExpr x) {
+							x.accept(AlgebraVariablesVisitor.this);
+						}
+					});
+					return false;
+				} else if (exponent.isNumber()) {
+					fCollection.add(list);
+				} else if (!base.isNumericFunction()) {
+					fCollection.add(list);
+				}
+			} else {
+				fCollection.add(list);
+			}
+			return true;
+		}
+	}
+
+	/**
+	 * Collect the variables with the <code>IExpr#isVariable()</code> method.
+	 *
+	 * @see IExpr#isVariable()
+	 */
+	public static class VariablesVisitor extends VisitorCollectionBoolean<IExpr> {
+		public VariablesVisitor(Collection<IExpr> collection) {
+			super(collection);
+		}
+
+		@Override
+		public boolean visit(ISymbol symbol) {
+			if (symbol.isVariable()) {
+				fCollection.add(symbol);
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public boolean visit(IAST list) {
+			if (list instanceof ASTSeriesData) {
+				fCollection.add(((ASTSeriesData) list).getX());
+				return true;
+			}
+			return super.visit(list);
+		}
+	}
+
+	/**
+	 * Return a <code>Predicate</code> which tests, if the given input is free of the variables set.
+	 *
+	 * @param exprVar
+	 * @return
+	 */
+	public static Predicate<IExpr> isFree(final VariablesSet exprVar) {
+		return new Predicate<IExpr>() {
+			final IsMemberVisitor visitor = exprVar.new IsMemberVisitor();
+
+			@Override
+			public boolean test(IExpr input) {
+				return !input.accept(visitor);
+			}
+		};
+	}
     /**
      * The set of all collected variables.
      */
@@ -44,42 +215,15 @@ public class VariablesSet {
     }
 
     /**
-     * Return a <code>Predicate</code> which tests, if the given input is free of the variables set.
-     *
-     * @param exprVar
-     * @return
+	 * Determine the variable symbols from a Symja expression.
      */
-    public static Predicate<IExpr> isFree(final VariablesSet exprVar) {
-        return new Predicate<IExpr>() {
-            final IsMemberVisitor visitor = exprVar.new IsMemberVisitor();
+	// public VariablesSet(final IExpr expression, final Comparator<IExpr>
 
-            @Override
-            public boolean test(IExpr input) {
-                return !input.accept(visitor);
-            }
-        };
-    }
-
-    /**
-     * Transform the set of variables into an <code>IAST</code> list of ordered variables. Looks only inside sums,
-     * products, and rational powers and lists for variables.
-     *
-     * @return the ordered list of variables.
-     */
-    public static IAST getVariables(IExpr expr) {
-        Set<IExpr> fVariablesSet = new TreeSet<IExpr>();
-        return addVariables(fVariablesSet, expr);
-    }
-
-    public static IAST addVariables(Set<IExpr> fVariablesSet, IExpr expr) {
-        expr.accept(new AlgebraVariablesVisitor(fVariablesSet));
-        final Iterator<IExpr> iter = fVariablesSet.iterator();
-        final IASTAppendable list = F.ListAlloc(fVariablesSet.size());
-        while (iter.hasNext()) {
-            list.append(iter.next());
-        }
-        return list;
-    }
+	// comparator) {
+	// super();
+	// fVariablesSet = new TreeSet<ISymbol>();
+	// expression.accept(new VariablesVisitor(fVariablesSet));
+	// }
 
     /**
      * Add the symbol to the set of variables.
@@ -100,15 +244,6 @@ public class VariablesSet {
         expression.accept(new VariablesVisitor(fVariablesSet));
     }
 
-    /**
-     * Determine the variable symbols from a Symja expression.
-     */
-    // public VariablesSet(final IExpr expression, final Comparator<IExpr>
-    // comparator) {
-    // super();
-    // fVariablesSet = new TreeSet<ISymbol>();
-    // expression.accept(new VariablesVisitor(fVariablesSet));
-    // }
 
     /**
      * Add the variables which satisfy the <code>IExpr#isVariable()</code> predicate and which are used in logical
@@ -211,6 +346,26 @@ public class VariablesSet {
         return list;
     }
 
+	/**
+	 * Transform the set of variables into an <code>IAST</code> list of ordered variables. Looks only inside sums,
+	 * products, and rational powers and lists for variables.
+	 *
+	 * @return the ordered list of variables.
+	 */
+	public static IAST getVariables(IExpr expr) {
+		Set<IExpr> fVariablesSet = new TreeSet<IExpr>();
+		return addVariables(fVariablesSet, expr);
+	}
+
+	public static IAST addVariables(Set<IExpr> fVariablesSet, IExpr expr) {
+		expr.accept(new AlgebraVariablesVisitor(fVariablesSet));
+		final Iterator<IExpr> iter = fVariablesSet.iterator();
+		final IASTAppendable list = F.ListAlloc(fVariablesSet.size());
+		while (iter.hasNext()) {
+			list.append(iter.next());
+		}
+		return list;
+	}
     public String[] getVarListAsString() {
         String[] result = new String[fVariablesSet.size()];
         final Iterator<IExpr> iter = fVariablesSet.iterator();
@@ -259,148 +414,4 @@ public class VariablesSet {
         return fVariablesSet.toArray(a);
     }
 
-    /**
-     * Collect the variables which satisfy the <code>IExpr#isVariable()</code> predicate and which are used in logical
-     * functions like Not, And, OR, Xor,...
-     *
-     * @see IExpr#isVariable()
-     */
-    public static class BooleanVariablesVisitor extends VisitorCollectionBoolean<IExpr> {
-
-        public BooleanVariablesVisitor(Collection<IExpr> collection) {
-            super(collection);
-        }
-
-        @Override
-        public boolean visit(IAST ast) {
-            ISymbol[] logicEquationHeads = {F.And, F.Or, F.Not, F.Xor, F.Nand, F.Nor, F.Implies, F.Equivalent, F.Equal,
-                    F.Unequal};
-            for (int i = 0; i < logicEquationHeads.length; i++) {
-                if (ast.isAST(logicEquationHeads[i])) {
-                    ast.forEach(new Consumer<IExpr>() {
-                        @Override
-                        public void accept(IExpr x) {
-                            x.accept(BooleanVariablesVisitor.this);
-                        }
-                    });
-                    break;
-                }
-            }
-
-            return false;
-        }
-
-        @Override
-        public boolean visit(ISymbol symbol) {
-            if (symbol.isVariable()) {
-                fCollection.add(symbol);
-                return true;
-            }
-            return false;
-        }
-    }
-
-    /**
-     * Collect the variables with the <code>IExpr#isVariable()</code> method.
-     *
-     * @see IExpr#isVariable()
-     */
-    public static class AlgebraVariablesVisitor extends VisitorCollectionBoolean<IExpr> {
-        public AlgebraVariablesVisitor(Collection<IExpr> collection) {
-            super(collection);
-        }
-
-        @Override
-        public boolean visit(ISymbol symbol) {
-            if (symbol.isVariable()) {
-                fCollection.add(symbol);
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean visit(IAST list) {
-            if (list.isList() || list.isPlus() || list.isTimes()) {
-                list.forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr x) {
-                        x.accept(AlgebraVariablesVisitor.this);
-                    }
-                });
-                return false;
-            } else if (list.isPower()) {
-                IExpr base = list.arg1();
-                IExpr exponent = list.arg2();
-
-                if (exponent.isRational()) {
-                    list.forEach(new Consumer<IExpr>() {
-                        @Override
-                        public void accept(IExpr x) {
-                            x.accept(AlgebraVariablesVisitor.this);
-                        }
-                    });
-                    return false;
-                } else if (exponent.isNumber()) {
-                    fCollection.add(list);
-                } else if (!base.isNumericFunction()) {
-                    fCollection.add(list);
-                }
-            } else {
-                fCollection.add(list);
-            }
-            return true;
-        }
-    }
-
-    /**
-     * Collect the variables with the <code>IExpr#isVariable()</code> method.
-     *
-     * @see IExpr#isVariable()
-     */
-    public static class VariablesVisitor extends VisitorCollectionBoolean<IExpr> {
-        public VariablesVisitor(Collection<IExpr> collection) {
-            super(collection);
-        }
-
-        @Override
-        public boolean visit(ISymbol symbol) {
-            if (symbol.isVariable()) {
-                fCollection.add(symbol);
-                return true;
-            }
-            return false;
-        }
-
-    }
-
-    /**
-     * Return <code>true</code>, if the expression contains one of the variable store in the internal
-     * <code>java.util.Set</code>.
-     *
-     * @see IExpr#isVariable()
-     */
-    public class IsMemberVisitor extends AbstractVisitorBoolean {
-        public IsMemberVisitor() {
-            super();
-        }
-
-        @Override
-        public boolean visit(IAST list) {
-            return list.exists(new Predicate<IExpr>() {
-                @Override
-                public boolean test(IExpr x) {
-                    return x.accept(IsMemberVisitor.this);
-                }
-            }, 1);
-        }
-
-        @Override
-        public boolean visit(ISymbol symbol) {
-            if (symbol.isVariable()) {
-                return fVariablesSet.contains(symbol);
-            }
-            return false;
-        }
-    }
 }
