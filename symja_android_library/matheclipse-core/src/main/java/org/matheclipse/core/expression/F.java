@@ -1223,32 +1223,37 @@ public class F {
 	public static IAST CEmptyList;
 
 	/**
-	 * Represents <code>List(1)</code> (i.e. the constant empty list)
+	 * Represents <code>List(0)</code>
+	 */
+	public static IAST CListC0;
+
+	/**
+	 * Represents <code>List(1)</code>
 	 */
 	public static IAST CListC1;
 
 	/**
-	 * Represents <code>List(1,1)</code> (i.e. the constant empty list)
+	 * Represents <code>List(1,1)</code>
 	 */
 	public static IAST CListC1C1;
 
 	/**
-	 * Represents <code>List(1,2)</code> (i.e. the constant empty list)
+	 * Represents <code>List(1,2)</code>
 	 */
 	public static IAST CListC1C2;
 
 	/**
-	 * Represents <code>List(2)</code> (i.e. the constant empty list)
+	 * Represents <code>List(2)</code>
 	 */
 	public static IAST CListC2;
 
 	/**
-	 * Represents <code>List(2,1)</code> (i.e. the constant empty list)
+	 * Represents <code>List(2,1)</code>
 	 */
 	public static IAST CListC2C1;
 
 	/**
-	 * Represents <code>List(2,2)</code> (i.e. the constant empty list)
+	 * Represents <code>List(2,2)</code>
 	 */
 	public static IAST CListC2C2;
 	/**
@@ -1493,6 +1498,7 @@ public class F {
 			PatternTest.setAttributes(ISymbol.HOLDALL);
 
 			CEmptyList = headAST0(List);
+			CListC0 = unaryAST1(List, C0);
 			CListC1 = unaryAST1(List, C1);
 			CListC2 = unaryAST1(List, C2);
 
@@ -4379,6 +4385,9 @@ public class F {
 	public static IAST List(final IExpr... a) {
 		switch (a.length) {
 		case 1:
+			if (a[0].equals(F.C0)) {
+				return F.CListC0;
+			}
 			if (a[0].equals(F.C1)) {
 				return F.CListC1;
 			}
