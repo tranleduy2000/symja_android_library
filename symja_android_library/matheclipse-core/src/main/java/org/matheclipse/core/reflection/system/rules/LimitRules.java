@@ -16,7 +16,7 @@ import static org.matheclipse.core.expression.F.ArcSech;
 import static org.matheclipse.core.expression.F.ArcSin;
 import static org.matheclipse.core.expression.F.ArcSinh;
 import static org.matheclipse.core.expression.F.ArcTan;
-import static org.matheclipse.core.expression.F.ArcTanh;
+import static org.matheclipse.core.expression.F.*;
 import static org.matheclipse.core.expression.F.BernoulliB;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
