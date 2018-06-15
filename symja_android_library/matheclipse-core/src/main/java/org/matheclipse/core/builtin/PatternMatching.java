@@ -179,7 +179,7 @@ public final class PatternMatching {
      * <pre>
      * Definition(symbol)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * prints user-defined values and rules associated with <code>symbol</code>.
@@ -389,8 +389,7 @@ public final class PatternMatching {
 				} else {
 //					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
 //					if (file.exists()) {
-//                return getFile(file, engine);
-//					}
+//						return getFile(file, engine);
 				}
             }
             return F.NIL;
@@ -975,13 +974,13 @@ public final class PatternMatching {
                     return F.NIL;
                 } else if (leftHandSideAST.isAST(F.Attributes, 2)) {
                     IAST symbolList = Validate.checkSymbolOrSymbolList(leftHandSideAST, 1);
-                    symbolList.forEach(new Consumer<IExpr>() {
+					symbolList.forEach(new Consumer<IExpr>() {
                         @Override
                         public void accept(IExpr x) {
                             ((ISymbol) x).setAttributes(ISymbol.NOATTRIBUTE);
                         }
                     });
-                    return AttributeFunctions.setSymbolsAttributes(ast, engine, symbolList);
+					return AttributeFunctions.setSymbolsAttributes(symbolList, ast.arg2(), engine);
                 }
             }
             Object[] result;
@@ -1058,7 +1057,7 @@ public final class PatternMatching {
      * <code>Condition</code> (<code>/;</code>) can be used with <code>SetDelayed</code> to make an assignment that only
      * holds if a condition is satisfied:<br />
      * </p>
-     * <p>
+	 *
      * <pre>
 	 * &gt;&gt; f(x_) := p(x) /; x&gt;0
 	 * &gt;&gt; f(3)
