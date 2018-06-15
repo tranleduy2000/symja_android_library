@@ -79,15 +79,39 @@ public class SpecialFunctions {
 		F.Zeta.setEvaluator(new Zeta());
 	}
 
-	private static class Beta extends AbstractFunctionEvaluator implements BetaRules {
+	private static class Beta extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
+			Validate.checkRange(ast, 3, 4);
 
+			if (ast.size() == 4) {
+				IExpr z = ast.arg1();
+				IExpr a = ast.arg2();
+				IExpr b = ast.arg3();
+				if (engine.isNumericMode() && z.isReal() && a.isReal() && b.isReal()) {
+					double zDouble = ((ISignedNumber) z).doubleValue();
+					double aDouble = ((ISignedNumber) a).doubleValue();
+					double bDouble = ((ISignedNumber) b).doubleValue();
+					if (zDouble >= 0 && zDouble <= 1 && aDouble >= 0 && bDouble >= 0) {
+						// TODO improve bad precision
+						// double d = de.lab4inf.math.functions.IncompleteBeta.incBeta(zDouble, aDouble, bDouble);
+						// return F.num(d);
+					}
+				}
+				return F.NIL;
+			}
 			IExpr a = ast.arg1();
 			IExpr b = ast.arg2();
 
+			if (a.isZero() || b.isZero()) {
+				return F.CComplexInfinity;
+			}
+			if (engine.isNumericMode() && a.isReal() && b.isReal() && a.isPositive() && b.isPositive()) {
+				double d = de.lab4inf.math.functions.Beta.beta(((ISignedNumber) a).doubleValue(),
+						((ISignedNumber) b).doubleValue());
+				return F.num(d);
+			}
 			if (a.isNumber() && b.isNumber()) {
 				if (a.isInteger() && a.isPositive() && b.isInteger() && b.isPositive()) {
 					return Times(Factorial(Plus(CN1, a)), Factorial(Plus(CN1, b)),
@@ -106,14 +130,10 @@ public class SpecialFunctions {
 			return F.NIL;
 		}
 
-		@Override
-		public IAST getRuleAST() {
-			return RULES;
-		}
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.ORDERLESS | ISymbol.NUMERICFUNCTION);
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
 
