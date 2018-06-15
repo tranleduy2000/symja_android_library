@@ -1562,6 +1562,10 @@ public class PolynomialFunctions {
 			Validate.checkSize(ast, 3);
 			IExpr n = ast.arg1();
 			IExpr z = ast.arg2();
+			if (engine.isNumericMode() && n.isNumber() && z.isNumber()) {
+				// (n, z) => Cos(n*ArcCos(z))
+				return F.Cos(F.Times(n, F.ArcCos(z)));
+			}
 			int degree = n.toIntDefault(Integer.MIN_VALUE);
 			if (degree != Integer.MIN_VALUE) {
 				if (degree < 0) {
@@ -1577,10 +1581,6 @@ public class PolynomialFunctions {
 			if (z.isZero()) {
 				// Cos(Pi*n*(1/2))
 				return F.Cos(F.Times(F.C1D2, F.Pi, n));
-			}
-			if (engine.isNumericMode() && n.isNumber() && z.isNumber()) {
-				// (n, z) => Cos(n*ArcCos(z))
-				return F.Cos(F.Times(n, F.ArcCos(z)));
 			}
 			return F.NIL;
 		}
@@ -1622,6 +1622,11 @@ public class PolynomialFunctions {
 			Validate.checkSize(ast, 3);
 			IExpr n = ast.arg1();
 			IExpr z = ast.arg2();
+			if (engine.isNumericMode() && n.isNumber() && z.isNumber()) {
+				// Sin((n + 1)*ArcCos(z))/Sqrt(1 - z^2)
+				return F.Times(F.Power(F.Plus(F.C1, F.Negate(F.Sqr(z))), F.CN1D2),
+						F.Sin(F.Times(F.Plus(F.C1, n), F.ArcCos(z))));
+			}
 			int degree = n.toIntDefault(Integer.MIN_VALUE);
 			if (degree != Integer.MIN_VALUE) {
 
@@ -1665,11 +1670,6 @@ public class PolynomialFunctions {
 			}
 			if (z.isOne()) {
 				return F.Plus(F.C1, n);
-			}
-			if (engine.isNumericMode() && n.isNumber() && z.isNumber()) {
-				// Sin((n + 1)*ArcCos(z))/Sqrt(1 - z^2)
-				return F.Times(F.Power(F.Plus(F.C1, F.Negate(F.Sqr(z))), F.CN1D2),
-						F.Sin(F.Times(F.Plus(F.C1, n), F.ArcCos(z))));
 			}
 			return F.NIL;
 		}
