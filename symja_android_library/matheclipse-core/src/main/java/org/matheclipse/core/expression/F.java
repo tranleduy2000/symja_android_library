@@ -734,6 +734,7 @@ public class F {
 	public final static IBuiltInSymbol PrimePowerQ = F.initFinalSymbol("PrimePowerQ", ID.PrimePowerQ);
 	public final static IBuiltInSymbol PrimeQ = F.initFinalSymbol("PrimeQ", ID.PrimeQ);
 	public final static IBuiltInSymbol Primes = F.initFinalSymbol("Primes", ID.Primes);
+    public final static IBuiltInSymbol PrimitiveRoot = F.initFinalSymbol("PrimitiveRoot", ID.PrimitiveRoot);
 	public final static IBuiltInSymbol PrimitiveRootList = F.initFinalSymbol("PrimitiveRootList", ID.PrimitiveRootList);
 	public final static IBuiltInSymbol Print = F.initFinalSymbol("Print", ID.Print);
 	public final static IBuiltInSymbol Product = F.initFinalSymbol("Product", ID.Product);
