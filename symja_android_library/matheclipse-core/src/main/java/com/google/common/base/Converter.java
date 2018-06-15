@@ -79,7 +79,7 @@ import javax.annotation.Nullable;
  * <li>Convert in the "backward" direction using {@code converter.reverse().convert(b)} or {@code
  *     converter.reverse().convertAll(bs)}.
  * <li>Use {@code converter} or {@code converter.reverse()} anywhere a {@link
- *     java.util.function.Function} is accepted (for example {@link Stream#map}).
+ *     com.duy.lambda.Function} is accepted (for example {@link Stream#map}).
  * <li><b>Do not</b> call {@link #doForward} or {@link #doBackward} directly; these exist only to be
  *     overridden.
  * </ul>

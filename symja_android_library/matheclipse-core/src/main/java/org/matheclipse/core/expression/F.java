@@ -1,17 +1,13 @@
 package org.matheclipse.core.expression;
 
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-
-import javax.annotation.Nonnull;
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.BiPredicate;
+import com.duy.lambda.Function;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.math.DoubleMath;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
@@ -72,9 +68,13 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.math.DoubleMath;
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import edu.jas.kern.ComputerThreads;
 

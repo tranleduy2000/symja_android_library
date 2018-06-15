@@ -575,7 +575,7 @@ public abstract class IExprImpl implements IExpr {
      * otherwise do nothing.
      *
      * @param consumer block to be executed if this expression unequals <code>F.NIL</code>
-     * @see java.util.Optional#ifPresent(java.util.function.Consumer)
+     * @see java.util.Optional#ifPresent(com.duy.lambda.Consumer)
      */
     public void ifPresent(Consumer<? super IExpr> consumer) {
         consumer.accept(this);

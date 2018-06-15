@@ -35,7 +35,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import java.util.Spliterator;
-import java.util.function.Consumer;
+import com.duy.lambda.Consumer;
 
 /**
  * An unbounded priority {@linkplain java.util.Queue queue} based on a priority heap.

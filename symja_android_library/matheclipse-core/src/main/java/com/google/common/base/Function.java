@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 
 /**
  * Determines an output value based on an input value; a pre-Java-8 version of {@code
- * java.util.function.Function}.
+ * com.duy.lambda.Function}.
  *
  * <p>The {@link Functions} class provides common functions and related utilites.
  *
@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  *
  * <h3>For Java 8+ users</h3>
  *
- * <p>This interface is now a legacy type. Use {@code java.util.function.Function} (or the
+ * <p>This interface is now a legacy type. Use {@code com.duy.lambda.Function} (or the
  * appropriate primitive specialization such as {@code ToIntFunction}) instead whenever possible.
  * Otherwise, at least reduce <i>explicit</i> dependencies on this type by using lambda expressions
  * or method references instead of classes, leaving your code easier to migrate in the future.
@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
  * <p>To use an existing function (say, named {@code function}) in a context where the <i>other
  * type</i> of function is expected, use the method reference {@code function::apply}. A future
  * version of {@code com.google.common.base.Function} will be made to <i>extend</i> {@code
- * java.util.function.Function}, making conversion code necessary only in one direction. At that
+ * com.duy.lambda.Function}, making conversion code necessary only in one direction. At that
  * time, this interface will be officially discouraged.
  *
  * @author Kevin Bourrillion

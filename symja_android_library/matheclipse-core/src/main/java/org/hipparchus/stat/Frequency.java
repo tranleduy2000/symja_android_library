@@ -29,7 +29,7 @@
 //import java.util.NavigableMap;
 //import java.util.Objects;
 //import java.util.TreeMap;
-//import java.util.function.ToLongFunction;
+//import com.duy.lambda.ToLongFunction;
 //
 ///**
 // * Maintains a frequency distribution of Comparable values.

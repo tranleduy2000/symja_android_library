@@ -446,7 +446,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * otherwise do nothing.
      *
      * @param consumer block to be executed if this expression unequals <code>F.NIL</code>
-     * @see java.util.Optional#ifPresent(java.util.function.Consumer)
+     * @see java.util.Optional#ifPresent(com.duy.lambda.Consumer)
      */
     void ifPresent(Consumer<? super IExpr> consumer);
 

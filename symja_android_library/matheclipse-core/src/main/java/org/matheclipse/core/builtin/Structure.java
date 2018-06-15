@@ -1,8 +1,6 @@
 package org.matheclipse.core.builtin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.function.Predicate;
+import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -30,6 +28,9 @@ import org.matheclipse.core.visit.AbstractVisitorLong;
 import org.matheclipse.core.visit.IndexedLevel;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
 import org.matheclipse.parser.client.math.MathException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Structure {
 
@@ -166,7 +167,7 @@ public class Structure {
 		public static IExpr evalApply(IExpr arg1, IExpr arg2, IAST evaledAST, int lastIndex, boolean heads,
 				EvalEngine engine) {
 			VisitorLevelSpecification level = null;
-			java.util.function.Function<IExpr, IExpr> af = x -> x.isAST() ? ((IAST) x).setAtCopy(0, arg1) : F.NIL;
+			com.duy.lambda.Function<IExpr, IExpr> af = x -> x.isAST() ? ((IAST) x).setAtCopy(0, arg1) : F.NIL;
 			try {
 				if (lastIndex == 3) {
 					level = new VisitorLevelSpecification(af, evaledAST.get(lastIndex), heads, engine);
@@ -1384,7 +1385,7 @@ public class Structure {
 				IExpr arg2 = ast.arg2();
 				if (lastIndex == 3) {
 					IASTAppendable result = F.ListAlloc(10);
-					java.util.function.Function<IExpr, IExpr> sf = x -> {
+					com.duy.lambda.Function<IExpr, IExpr> sf = x -> {
 						IAST a = F.unaryAST1(arg1, x);
 						result.append(a);
 						return F.NIL;

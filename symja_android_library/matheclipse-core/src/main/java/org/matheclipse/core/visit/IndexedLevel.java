@@ -1,7 +1,7 @@
 package org.matheclipse.core.visit;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.Function;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;

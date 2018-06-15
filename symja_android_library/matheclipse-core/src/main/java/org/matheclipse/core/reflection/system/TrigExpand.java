@@ -10,7 +10,7 @@ import static org.matheclipse.core.expression.F.Sin;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.evalExpandAll;
 
-import com.duy.lambda.Function;
+import com.duy.lambda.*;
 
 import org.matheclipse.core.builtin.Structure;
 import org.matheclipse.core.eval.EvalEngine;
