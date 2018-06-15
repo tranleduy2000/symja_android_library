@@ -1,7 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.eval.EvalEngine;
@@ -22,10 +22,11 @@ import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.patternmatching.Matcher;
 import org.matheclipse.core.visit.AbstractVisitorBoolean;
 
-import com.duy.lambda.Consumer;
-import com.duy.lambda.Predicate;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * <pre>
@@ -371,6 +372,9 @@ public class Eliminate extends AbstractFunctionEvaluator {
 					}
 					if (plusClone.isAST0()) {
 						// no change for given expression
+						if (ast.size() == 3) {
+							return matchSpecialExpressions(ast, variable);
+						}
 						return F.NIL;
 					}
 					IExpr value = F.Subtract(exprWithoutVariable, plusClone);
@@ -408,6 +412,31 @@ public class Eliminate extends AbstractFunctionEvaluator {
 					}
 				}
 			}
+		}
+		return F.NIL;
+	}
+	/**
+	 * <p>
+	 * Match <code>a_.*variable^n_+b_.*variable^m_</code> to
+	 * <code>E^(((-I)*Pi + Log(a) - Log(b))/(m - n)) /; FreeQ(a,x)&&FreeQ(b,x)&&FreeQ(n,x)&&FreeQ(m,x)</code>
+	 * </p>
+	 *
+	 * @param ast
+	 * @param x
+	 * @return
+	 */
+	private static IExpr matchSpecialExpressions(IAST ast, IExpr x) {
+		final Matcher matcher = new Matcher();
+		// match a_.*variable^n_+b_.*variable^m_ to E^(((-I)*Pi + Log(a) - Log(b))/(m - n))
+		matcher.caseOf(F.Plus(F.Times(F.b_DEFAULT, F.Power(x, F.m_)), F.Times(F.a_DEFAULT, F.Power(x, F.n_))), //
+				F.Condition(
+						F.Exp(F.Times(F.Power(F.Plus(F.m, F.Negate(F.n)), -1),
+								F.Plus(F.Times(F.CNI, F.Pi), F.Log(F.a), F.Negate(F.Log(F.b))))),
+						F.And(F.FreeQ(F.a, x), F.FreeQ(F.b, x), F.FreeQ(F.n, x), F.FreeQ(F.m, x))));
+		IExpr result = matcher.replaceAll(ast);
+		if (result.isPresent()) {
+			// System.out.println(result.toString());
+			return result;
 		}
 		return F.NIL;
 	}
