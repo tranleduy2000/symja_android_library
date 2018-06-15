@@ -55,14 +55,14 @@ public class FunctionExpand extends AbstractEvaluator {
 				F.Condition(
 						F.Times(F.Beta(a, b),
 								F.Plus(F.C1, F.Times(F.CN1, F.Power(F.Plus(F.C1, F.Negate(z)), b),
-										F.Sum(F.Times(F.Power(z, k), F.Power(Factorial(k), -1), F.Pochhammer(b, k)),
+										F.Sum(F.Times(F.Power(z, k), F.Power(F.Factorial(k), -1), F.Pochhammer(b, k)),
 												F.List(k, F.C0, F.Plus(F.CN1, a)))))),
 						F.And(F.IntegerQ(a), F.Greater(a, F.C0)))); // $$);
 
 		MATCHER.caseOf(Beta(a_, b_), //
 				// [$ Factorial(a-1)*Product((k+b)^(-1),{k,0,a-1}) /; IntegerQ(a)&&a>0 $]
 				F.Condition(
-						F.Times(Factorial(F.Plus(F.CN1, a)),
+						F.Times(F.Factorial(F.Plus(F.CN1, a)),
 								F.Product(F.Power(F.Plus(k, b), -1), F.List(k, F.C0, F.Plus(F.CN1, a)))),
 						F.And(F.IntegerQ(a), F.Greater(a, F.C0)))); // $$);
 

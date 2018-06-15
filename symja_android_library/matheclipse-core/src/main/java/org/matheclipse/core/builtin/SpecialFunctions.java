@@ -25,7 +25,6 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.reflection.system.rules.BetaRules;
 import org.matheclipse.core.reflection.system.rules.PolyGammaRules;
 import org.matheclipse.core.reflection.system.rules.PolyLogRules;
 import org.matheclipse.core.reflection.system.rules.ProductLogRules;

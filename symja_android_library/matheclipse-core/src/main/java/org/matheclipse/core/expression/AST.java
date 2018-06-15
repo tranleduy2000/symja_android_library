@@ -389,4 +389,8 @@ public class AST extends HMArrayList implements Externalizable {
 		return optional(F.GLOBAL_IDS_MAP.get(this));
 	}
 
+	@Override
+	public void ifAppendable(Consumer<? super IASTAppendable> consumer) {
+		consumer.accept(this);
+	}
 }

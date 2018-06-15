@@ -1,4 +1,5 @@
 package org.matheclipse.core.builtin;
+
 import static org.matheclipse.core.expression.F.AbsArg;
 import static org.matheclipse.core.expression.F.BesselJ;
 import static org.matheclipse.core.expression.F.ComplexExpand;
@@ -18,6 +19,7 @@ import static org.matheclipse.core.expression.F.FindRoot;
 import static org.matheclipse.core.expression.F.Fit;
 import static org.matheclipse.core.expression.F.FrobeniusSolve;
 import static org.matheclipse.core.expression.F.FromPolarCoordinates;
+import static org.matheclipse.core.expression.F.FunctionExpand;
 import static org.matheclipse.core.expression.F.GeometricMean;
 import static org.matheclipse.core.expression.F.GroebnerBasis;
 import static org.matheclipse.core.expression.F.HeavisideTheta;
