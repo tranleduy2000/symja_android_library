@@ -543,6 +543,7 @@ public class F {
 	public final static IBuiltInSymbol Line = F.initFinalSymbol("Line", ID.Line);
 	public final static IBuiltInSymbol LinearModelFit = F.initFinalSymbol("LinearModelFit", ID.LinearModelFit);
 	public final static IBuiltInSymbol LinearProgramming = F.initFinalSymbol("LinearProgramming", ID.LinearProgramming);
+    public final static IBuiltInSymbol LinearRecurrence = F.initFinalSymbol("LinearRecurrence", ID.LinearRecurrence);
 	public final static IBuiltInSymbol LinearSolve = F.initFinalSymbol("LinearSolve", ID.LinearSolve);
 	public final static IBuiltInSymbol LiouvilleLambda = F.initFinalSymbol("LiouvilleLambda", ID.LiouvilleLambda);
 	public final static IBuiltInSymbol List = F.initFinalSymbol("List", ID.List);
