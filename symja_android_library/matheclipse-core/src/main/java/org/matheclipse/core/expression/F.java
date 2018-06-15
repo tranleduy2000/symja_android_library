@@ -3641,6 +3641,13 @@ public class F {
 		return binaryAST2(Function, a0, a1);
 	}
 
+	public static IAST FunctionExpand(final IExpr a0) {
+		return unaryAST1(FunctionExpand, a0);
+	}
+
+	public static IAST FunctionExpand(final IExpr a0, final IExpr a1) {
+		return binaryAST2(FunctionExpand, a0, a1);
+	}
 	public static IAST Get(final IExpr a0) {
 		return unaryAST1(Get, a0);
 	}
@@ -4230,10 +4237,16 @@ public class F {
 		return binaryAST2(LegendreP, a0, a1);
 	}
 
+	public static IAST LegendreP(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(LegendreP, a0, a1, a2);
+	}
 	public static IAST LegendreQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2(LegendreQ, a0, a1);
 	}
 
+	public static IAST LegendreQ(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(LegendreQ, a0, a1, a2);
+	}
 	public static IAST LeafCount(final IExpr a0) {
 		return unaryAST1(LeafCount, a0);
 	}
@@ -4485,6 +4498,9 @@ public class F {
 		return binaryAST2(LogNormalDistribution, a0, a1);
 	}
 
+	public static IAST LucasL(final IExpr a) {
+		return unaryAST1(LucasL, a);
+	}
 	public static IAST Map(final IExpr a0) {
 
 		return unaryAST1(Map, a0);

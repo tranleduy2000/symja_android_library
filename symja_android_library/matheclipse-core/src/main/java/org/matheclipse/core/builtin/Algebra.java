@@ -1776,7 +1776,7 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
+			Validate.checkRange(ast, 2, 3);
 			return super.evaluate(ast, engine);
 		}
 
@@ -3265,7 +3265,21 @@ public class Algebra {
 
 				long count = fComplexityFunction.apply(temp);
 				if (count < minCounter) {
-					return temp;
+					minCounter = count;
+					result = temp;
+				}
+
+				if (fFullSimplify) {
+					try {
+						temp = F.eval(F.FunctionExpand(ast));
+						count = fComplexityFunction.apply(temp);
+						if (count < minCounter) {
+							minCounter = count;
+							result = temp;
+						}
+					} catch (WrongArgumentType wat) {
+						//
+				}
 				}
 				return result;
 			}
@@ -3308,15 +3322,21 @@ public class Algebra {
 				return arg1;
 			}
 
+			IAssumptions oldAssumptions = engine.getAssumptions();
 			try {
 				Function<IExpr, Long> complexityFunction = createComplexityFunction(complexityFunctionHead, engine);
 				long minCounter = complexityFunction.apply(arg1);
 				IExpr result = arg1;
 				long count = 0L;
-				if (assumptionExpr.isPresent()) {
-					IAssumptions assumptions = AssumptionFunctions.determineAssumptions(ast.topHead(), assumptionExpr,
-							engine);
+				if (assumptionExpr.isPresent() && assumptionExpr.isAST()) {
+					IAssumptions assumptions = oldAssumptions;
+					if (oldAssumptions == null) {
+						assumptions = org.matheclipse.core.eval.util.Assumptions.getInstance(assumptionExpr);
+					} else {
+						assumptions = oldAssumptions.addAssumption((IAST) assumptionExpr);
+					}
 					if (assumptions != null) {
+						engine.setAssumptions(assumptions);
 						arg1 = AssumptionFunctions.refineAssumptions(arg1, assumptions, engine);
 						count = complexityFunction.apply(arg1);
 						if (count < minCounter) {
@@ -3336,6 +3356,8 @@ public class Algebra {
 
 			} catch (ArithmeticException e) {
 				//
+			} finally {
+				engine.setAssumptions(oldAssumptions);
 			}
 			return F.NIL;
 		}

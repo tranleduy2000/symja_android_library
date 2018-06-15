@@ -1866,7 +1866,7 @@ public class PolynomialFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
+			Validate.checkRange(ast, 3, 4);
 
 			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
 			if (degree > Integer.MIN_VALUE) {
@@ -1909,7 +1909,7 @@ public class PolynomialFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
+			Validate.checkRange(ast, 3, 4);
 
 			return F.NIL;
 		}
