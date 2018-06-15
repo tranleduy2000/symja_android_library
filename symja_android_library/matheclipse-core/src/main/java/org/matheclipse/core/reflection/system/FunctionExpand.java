@@ -1,7 +1,5 @@
 package org.matheclipse.core.reflection.system;
 
-import static org.matheclipse.core.expression.F.*;
-
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -11,6 +9,38 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.Matcher;
 
+import static org.matheclipse.core.expression.F.Beta;
+import static org.matheclipse.core.expression.F.ChebyshevT;
+import static org.matheclipse.core.expression.F.ChebyshevU;
+import static org.matheclipse.core.expression.F.a;
+import static org.matheclipse.core.expression.F.a_;
+import static org.matheclipse.core.expression.F.b;
+import static org.matheclipse.core.expression.F.b_;
+import static org.matheclipse.core.expression.F.k;
+import static org.matheclipse.core.expression.F.n;
+import static org.matheclipse.core.expression.F.n_;
+import static org.matheclipse.core.expression.F.x;
+import static org.matheclipse.core.expression.F.x_;
+import static org.matheclipse.core.expression.F.z;
+import static org.matheclipse.core.expression.F.z_;
+
+/**
+ * <pre>
+ * FunctionExpand(f)
+ * </pre>
+ *
+ * <blockquote>
+ * <p>
+ * expands the special function <code>f</code>.
+ * </p>
+ * </blockquote>
+ * <h3>Examples</h3>
+ *
+ * <pre>
+ * &gt;&gt; FunctionExpand(Beta(10, b))
+ * 362880/(b*(1+b)*(2+b)*(3+b)*(4+b)*(5+b)*(6+b)*(7+b)*(8+b)*(9+b))
+ * </pre>
+ */
 public class FunctionExpand extends AbstractEvaluator {
 
 	final static Matcher MATCHER = new Matcher(EvalEngine.get());
