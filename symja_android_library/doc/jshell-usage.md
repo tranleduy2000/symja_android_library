@@ -9,7 +9,7 @@ Use the [Java jshell](https://docs.oracle.com/javase/10/tools/jshell.htm) to int
 
 Download the latest [Symja release](https://github.com/axkr/symja_android_library/releases) and unzip the files for example in  a sub-directory named  `/symja`
 
-In this directory you can run the `symja-jshell.bat` batch file under Windows. Please adjust the `JAVA_HOME` path for your environment to a JDK installation greater equal than Java 9.
+In this directory you can run the [symja-jshell.bat](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/symja-jshell.bat) batch file under Windows. Please adjust the `JAVA_HOME` path for your environment to a JDK installation greater equal than Java 9.
 
 ```
   SET "JAVA_HOME=C:\Program Files\Java\jdk-10.0.1"
@@ -27,8 +27,8 @@ import static org.matheclipse.core.expression.F.*;
  
 ```
 
-* With the static imports of the `F.class` it's possible to use the formal symbols `a,b,c,...x,y,z` symbolically and to call functions like `Integrate()` or `FactorInteger()` and to omit the `F.` prefix. 
-* With the predefined `eval` method it's possible to evaluate a math string expressions like for example `eval("D(Sin(x),x)")` 
+* With the static imports of the `F.class` it's possible to use the formal symbols `a,b,c,...x,y,z` symbolically and to call functions like [Integrate](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Integrate.md) or [FactorInteger](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/FactorInteger.md) and to omit the `F.` prefix. 
+* With the predefined `eval` method it's possible to evaluate a math string expression like for example `eval("D(Sin(x),x)")` 
 
 ## Example script
 
@@ -38,10 +38,10 @@ C:\temp\symja>symja-jshell
 |  Welcome to JShell -- Version 10.0.1
 |  For an introduction type: /help intro
 
-jshell> D.of(Sin(x),x)
+jshell> D.of(Sin(x),x)  
 $1 ==> Cos(x)
 
-jshell> ev.eval("1+1")
+jshell> eval("1+1")
 $2 ==> 2
 
 jshell> Integrate.of(Times(Sin(x),Cos(x)),x)
@@ -71,7 +71,7 @@ $8 ==> Pi/4
 jshell> ISymbol xx=Dummy("xx")
 xx ==> xx
 
-jshell> Set.of(xx, Plus(x,y))
+jshell> Set.of(xx, Plus(x,y))  // assign x+y to variable xx
 $10 ==> x+y
 
 jshell> Definition.of(xx)
@@ -94,6 +94,10 @@ Im(z)
 
 >> Im(0.5 + 2.3*I)
 2.3
+
+
+jshell> eval("D(Sin(x),x)")
+$14 ==> Cos(x)
 
 jshell> /exit
 |  Goodbye 
