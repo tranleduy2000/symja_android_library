@@ -151,7 +151,6 @@ public class F {
 	 * @see java.util.Optional#isPresent
 	 */
 	public final static NILPointer NIL = new NILPointer();
-
 	public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
 	public final static IBuiltInSymbol Abs = F.initFinalSymbol("Abs", ID.Abs);
 	public final static IBuiltInSymbol AbsArg = F.initFinalSymbol("AbsArg", ID.AbsArg);
