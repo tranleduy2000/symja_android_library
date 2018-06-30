@@ -675,10 +675,16 @@ public class UtilityFunctionCtors {
 		return binaryAST2($s(INTEGRATE_PREFIX + "GtQ"), a0, a1);
 	}
 
+	public static IAST GtQ(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3($s(INTEGRATE_PREFIX + "GtQ"), a0, a1, a2);
+	}
 	public static IAST GeQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2($s(INTEGRATE_PREFIX + "GeQ"), a0, a1);
 	}
 
+	public static IAST GeQ(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3($s(INTEGRATE_PREFIX + "GeQ"), a0, a1, a2);
+	}
 	public static IAST Gcd(final IExpr... a) {
 		return ast(a, $s(INTEGRATE_PREFIX + "Gcd"));
 	}
@@ -883,10 +889,16 @@ public class UtilityFunctionCtors {
 		return binaryAST2($s(INTEGRATE_PREFIX + "LtQ"), a0, a1);
 	}
 
+	public static IAST LtQ(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3($s(INTEGRATE_PREFIX + "LtQ"), a0, a1, a2);
+	}
 	public static IAST LeQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2($s(INTEGRATE_PREFIX + "LeQ"), a0, a1);
 	}
 
+	public static IAST LeQ(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3($s(INTEGRATE_PREFIX + "LeQ"), a0, a1, a2);
+	}
 	public static IAST LT(final IExpr a0, final IExpr a1) {
 		return binaryAST2($s(INTEGRATE_PREFIX + "LT"), a0, a1);
 	}
@@ -1015,6 +1027,9 @@ public class UtilityFunctionCtors {
 		return unaryAST1($s(INTEGRATE_PREFIX + "NegQ"), a0);
 	}
 
+	public static IAST NegQ(final IExpr a0, final IExpr a1) {
+		return binaryAST2($s(INTEGRATE_PREFIX + "NegQ"), a0, a1);
+	}
 	public static IAST NegSumBaseQ(final IExpr a0) {
 		return unaryAST1($s(INTEGRATE_PREFIX + "NegSumBaseQ"), a0);
 	}
