@@ -63,6 +63,7 @@ public class SpecialFunctions {
 		F.BetaRegularized.setEvaluator(new BetaRegularized());
 		F.Erf.setEvaluator(new Erf());
 		F.Erfc.setEvaluator(new Erfc());
+		F.Erfi.setEvaluator(new Erfi());
 		F.GammaRegularized.setEvaluator(new GammaRegularized());
 		F.HypergeometricPFQRegularized.setEvaluator(new HypergeometricPFQRegularized());
 		F.InverseErf.setEvaluator(new InverseErf());
@@ -187,7 +188,7 @@ public class SpecialFunctions {
 
 		@Override
 		public double applyAsDouble(double operand) {
-			return org.hipparchus.special.Erf.erf(operand);
+			return de.lab4inf.math.functions.Erf.erf(operand);
 		}
 
 		@Override
@@ -315,6 +316,54 @@ public class SpecialFunctions {
 		}
 	}
 
+	/**
+	 * Returns the error function.
+	 *
+	 * @see org.matheclipse.core.reflection.system.InverseErf
+	 */
+	private final static class Erfi extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 2);
+
+			IExpr z = ast.arg1();
+			if (z.isZero()) {
+				return F.C0;
+			}
+			if (z.isNumber()) {
+				// (-I)*Erf(I*z)
+				INumber num = (INumber) ((INumber) z).times(F.CI);
+				return F.Times(F.CI, F.Erf(F.Times(num)));
+			}
+			if (z.isInfinity()) {
+				return F.CInfinity;
+			}
+			if (z.isNegativeInfinity()) {
+				return F.CNInfinity;
+			}
+			if (z.equals(F.CIInfinity)) {
+				return F.CI;
+			}
+			if (z.equals(F.CNIInfinity)) {
+				return F.CNI;
+			}
+			if (z.isComplexInfinity()) {
+				return F.Indeterminate;
+			}
+			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(z);
+			if (negExpr.isPresent()) {
+				return Negate(F.Erfi(negExpr));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+	}
 	private static class GammaRegularized extends AbstractFunctionEvaluator {
 
 		@Override
