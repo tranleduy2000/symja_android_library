@@ -2420,11 +2420,21 @@ public final class Arithmetic {
                 if (ni > Integer.MIN_VALUE) {
                     if (ni > 0) {
                         // Product(a + k, {k, 0, n - 1})
-						return F.product(k -> F.Plus(a, k), 0, ni - 1);
+						return F.product(new Function<IExpr, IExpr>() {
+                            @Override
+                            public IExpr apply(IExpr k) {
+                                return F.Plus(a, k);
+                            }
+                        }, 0, ni - 1);
                     }
                     if (ni < 0) {
                         // Product(1/(a - k), {k, 1, -n})
-						return Power(F.product(k -> F.Plus(a, k.negate()), 1, -ni), -1);
+						return Power(F.product(new Function<IExpr, IExpr>() {
+                            @Override
+                            public IExpr apply(IExpr k) {
+                                return F.Plus(a, k.negate());
+                            }
+                        }, 1, -ni), -1);
                     }
                 }
             }

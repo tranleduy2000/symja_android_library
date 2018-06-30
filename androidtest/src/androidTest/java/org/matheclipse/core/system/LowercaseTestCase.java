@@ -2566,7 +2566,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
     public void testErfc() {
 		checkNumeric("Erfc(5/Sqrt(2))/2 // N", //
-				"2.866515718791937E-7");
+				"2.866515718791945E-7");
 		check("Erfc(-0.28991)", //
 				"1.31819");
         check("Erfc(-x) / 2", "1/2*(2-Erfc(x))");
@@ -3119,9 +3119,9 @@ public class LowercaseTestCase extends AbstractTestCase {
         checkNumeric("$K=10000;\n" + "$g=0.0;\n" + "$n=10*12;\n" + "$Z=12;\n" + "$AA=0.0526;\n" + "$R=100;\n"
                         + "$d=0.00;\n" + "$vn=0;\n" + "$EAj=0;\n" + "$zj=0;\n" + "$sz=1;\n"
                         + "FindRoot((($K*(1+p-$g)^($n/$Z))/(1+$AA))+(Sum((($R*(1+$d)^(Floor(i0/$Z)))/(1+$AA))*(1+p-$g)^(($n-i0-$vn)/$Z),{i0,0,$n-1}))+(Sum(($EAj*(1+p-$g)^(($n-$zj)/$Z))/(1+$AA),{j,1,$sz})) - 30199, {p, 0, 0.1})",
-                "{p->0.04999709393822401}");
+                "{p->0.049997093938224005}");
         checkNumeric("$K=10000;\n" + "$g=0.0;\n" + "$n=10*12;\n" + "$Z=12;\n" + "$AA=0.0526;\n" + "$res=15474;\n"
-                + "FindRoot((($K*(1+p-$g)^($n/$Z))/(1+$AA)) - $res, {p, 0, 0.1})", "{p->0.049993464334866594}");
+                + "FindRoot((($K*(1+p-$g)^($n/$Z))/(1+$AA)) - $res, {p, 0, 0.1})", "{p->0.04999346433486659}");
 
         checkNumeric("Exp(3.4341896)", "31.006274895944433");
         checkNumeric("Pi^3.0", "31.006276680299816");
@@ -4901,7 +4901,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         check("Log(1000) / Log(10)", "3");
         check("Log(1.4)", "0.33647");
         checkNumeric("Log(Exp(1.4))", "1.3999999999999997");
-        checkNumeric("Log(-1.4)", "0.3364722366212129+I*3.141592653589793");
+        checkNumeric("Log(-1.4)", "0.33647223662121284+I*3.141592653589793");
 
         check("Log(-1)", "I*Pi");
         check("Log(-2)", "I*Pi+Log(2)");
@@ -8421,7 +8421,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
     public void testSech() {
         check("Sech(0)", "1");
-        checkNumeric("Sech(1.8)", "0.3218048695065879");
+        checkNumeric("Sech(1.8)", "0.3218048695065878");
         check("Sech(-x)", "Sech(x)");
         check("D(Sech(x),x)", "-Sech(x)*Tanh(x)");
     }

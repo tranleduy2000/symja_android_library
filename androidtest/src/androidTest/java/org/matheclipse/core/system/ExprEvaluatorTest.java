@@ -114,6 +114,7 @@ public class ExprEvaluatorTest extends TestCase {
 		} catch (final Exception ex) {
 			assertTrue(false);
 		} catch (final StackOverflowError soe) {
+			soe.printStackTrace();
 			assertTrue(false);
 		} catch (final OutOfMemoryError oome) {
 			assertTrue(false);
