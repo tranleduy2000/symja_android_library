@@ -287,9 +287,14 @@ public class HypergeometricFunctions {
 				if (nInt > 0) {
 					// Sum(((-1)^k*Pochhammer(l, n - k)*(2*z)^(n - 2*k))/(k!*(n - 2*k)!), {k, 0, Floor(n/2)})
 					return F.sum(
-							k -> F.Times(F.Power(F.CN1, k), F.Power(F.Times(F.C2, z), F.Plus(F.Times(F.CN2, k), n)),
-									F.Power(F.Factorial(k), -1), F.Power(F.Factorial(F.Plus(F.Times(F.CN2, k), n)), -1),
-									F.Pochhammer(l, F.Plus(F.Negate(k), n))),
+                            new Function<IExpr, IExpr>() {
+                                @Override
+                                public IExpr apply(IExpr k) {
+                                    return F.Times(F.Power(F.CN1, k), F.Power(F.Times(F.C2, z), F.Plus(F.Times(F.CN2, k), n)),
+                                            F.Power(F.Factorial(k), -1), F.Power(F.Factorial(F.Plus(F.Times(F.CN2, k), n)), -1),
+                                            F.Pochhammer(l, F.Plus(F.Negate(k), n)));
+                                }
+                            },
 							0, nInt / 2);
 				}
 				return F.NIL;

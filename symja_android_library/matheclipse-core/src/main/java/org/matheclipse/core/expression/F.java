@@ -2089,6 +2089,30 @@ public class F {
 	}
 
 	/**
+	 * <pre>
+	 * SymbolQ(x)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * is <code>True</code> if <code>x</code> is a symbol, or <code>False</code> otherwise.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; SymbolQ(a)
+	 * True
+	 * &gt;&gt; SymbolQ(1)
+	 * False
+	 * &gt;&gt; SymbolQ(a + b)
+	 * False
+	 * </pre>
+	 */
+	public static IAST SymbolQ(final IExpr x) {
+		return unaryAST1(SymbolQ, x);
+	}
+	/**
 	 * Full symmetry
 	 * 
 	 * @param a0
@@ -2463,6 +2487,36 @@ public class F {
 		return new AST(head, arr);
 	}
 
+	/**
+	 * <pre>
+	 * AtomQ(x)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * is true if <code>x</code> is an atom (an object such as a number or string, which cannot be divided into
+	 * subexpressions using 'Part').
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; AtomQ(x)
+	 * True
+	 *
+	 * &gt;&gt; AtomQ(1.2)
+	 * True
+	 *
+	 * &gt;&gt; AtomQ(2 + I)
+	 * True
+	 *
+	 * &gt;&gt; AtomQ(2 / 3)
+	 * True
+	 *
+	 * &gt;&gt; AtomQ(x + y)
+	 * False
+	 * </pre>
+	 */
 	public static IAST AtomQ(final IExpr a) {
 		return unaryAST1(AtomQ, a);
 	}
@@ -2538,6 +2592,36 @@ public class F {
 		return value ? True : False;
 	}
 
+	/**
+	 * <pre>
+	 * BooleanQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>expr</code> is either <code>True</code> or <code>False</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; BooleanQ(True)
+	 * True
+	 * &gt;&gt; BooleanQ(False)
+	 * True
+	 * &gt;&gt; BooleanQ(a)
+	 * False
+	 * &gt;&gt; BooleanQ(1 &lt; 2)
+	 * True
+	 * &gt;&gt; BooleanQ("string")
+	 * False
+	 * &gt;&gt; BooleanQ(Together(x/y + y/x))
+	 * False
+	 * </pre>
+	 */
+	public static IAST BooleanQ(final IExpr a) {
+		return unaryAST1(BooleanQ, a);
+	}
 	public static IAST BesselI(final IExpr a0, final IExpr a1) {
 		return binaryAST2(BesselI, a0, a1);
 	}
@@ -3366,6 +3450,38 @@ public class F {
 		return unaryAST1(EvenQ, a);
 	}
 
+	/**
+	 * <pre>
+	 * ExactNumberQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>expr</code> is an exact number, and <code>False</code> otherwise.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; ExactNumberQ(10)
+	 * True
+	 *
+	 * &gt;&gt; ExactNumberQ(4.0)
+	 * False
+	 *
+	 * &gt;&gt; ExactNumberQ(n)
+	 * False
+	 *
+	 * &gt;&gt; ExactNumberQ(1+I)
+	 * True
+	 *
+	 * &gt;&gt; ExactNumberQ(1 + 1. * I)
+	 * False
+	 * </pre>
+	 */
+	public static IAST ExactNumberQ(final IExpr a) {
+		return unaryAST1(ExactNumberQ, a);
+	}
 	public static IAST Exists(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Exists, a0, a1);
 	}
@@ -3813,6 +3929,40 @@ public class F {
 	}
 
 	/**
+	 * <pre>
+	 * InexactNumberQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>expr</code> is not an exact number, and <code>False</code> otherwise.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; InexactNumberQ(a)
+	 * False
+	 *
+	 * &gt;&gt; InexactNumberQ(3.0)
+	 * True
+	 *
+	 * &gt;&gt; InexactNumberQ(2/3)
+	 * False
+	 * </pre>
+	 * <p>
+	 * <code>InexactNumberQ</code> can be applied to complex numbers:
+	 * </p>
+	 *
+	 * <pre>
+	 * &gt;&gt; InexactNumberQ(4.0+I)
+	 * True
+	 * </pre>
+	 */
+	public static IAST InexactNumberQ(final IExpr a) {
+		return unaryAST1(InexactNumberQ, a);
+	}
+	/**
 	 * Convert the symbolName to lowercase (if <code>Config.PARSER_USE_LOWERCASE_SYMBOLS</code> is set) and insert a new
 	 * Symbol in the <code>PREDEFINED_SYMBOLS_MAP</code>. The symbol is created using the given upper case string to use
 	 * it as associated class name in package org.matheclipse.core.reflection.system.
@@ -3999,6 +4149,26 @@ public class F {
 		return unaryAST1(IntegerPart, a0);
 	}
 
+	/**
+	 * <pre>
+	 * IntegerQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>expr</code> is an integer, and <code>False</code> otherwise.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; IntegerQ(3)
+	 * 4
+	 *
+	 * &gt;&gt; IntegerQ(Pi)
+	 * False
+	 * </pre>
+	 */
 	public static IAST IntegerQ(final IExpr a) {
 		return unaryAST1(IntegerQ, a);
 	}
@@ -4458,6 +4628,29 @@ public class F {
 		return ast(a, List);
 	}
 
+	/**
+	 * <pre>
+	 * ListQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * tests whether <code>expr</code> is a <code>List</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; ListQ({1, 2, 3})
+	 * True
+	 *
+	 * &gt;&gt; ListQ({{1, 2}, {3, 4}})
+	 * True
+	 *
+	 * &gt;&gt; ListQ(x)
+	 * False
+	 * </pre>
+	 */
 	public static IAST ListQ(final IExpr a) {
 		return unaryAST1(ListQ, a);
 	}
@@ -4500,6 +4693,38 @@ public class F {
 
 	public static IAST LucasL(final IExpr a) {
 		return unaryAST1(LucasL, a);
+	}
+	/**
+	 * <pre>
+	 * MachineNumberQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>expr</code> is a machine-precision real or complex number.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; MachineNumberQ(3.14159265358979324)
+	 * False
+	 *
+	 * &gt;&gt; MachineNumberQ(1.5 + 2.3*I)
+	 * True
+	 *
+	 * &gt;&gt; MachineNumberQ(2.71828182845904524 + 3.14159265358979324*I)
+	 * False
+	 *
+	 * &gt;&gt; MachineNumberQ(1.5 + 3.14159265358979324*I)
+	 * True
+	 *
+	 * &gt;&gt; MachineNumberQ(1.5 + 5 *I)
+	 * True
+	 * </pre>
+	 */
+	public static IAST MachineNumberQ(final IExpr a0) {
+		return unaryAST1(MachineNumberQ, a0);
 	}
 	public static IAST Map(final IExpr a0) {
 
@@ -4608,6 +4833,26 @@ public class F {
 		return unaryAST1(Missing, a0);
 	}
 
+	/**
+	 * <pre>
+	 * MissingQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>expr</code> is a <code>Missing()</code> expression.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; MissingQ(Missing("Test message"))
+	 * True
+	 * </pre>
+	 */
+	public static IAST MissingQ(final IExpr a0) {
+		return unaryAST1(MissingQ, a0);
+	}
 	public static IAST MoebiusMu(final IExpr a0) {
 		return unaryAST1(MoebiusMu, a0);
 	}
@@ -4789,6 +5034,29 @@ public class F {
 		return Num.valueOf(Double.parseDouble(valueString));
 	}
 
+	/**
+	 * <pre>
+	 * NumberQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>expr</code> is an explicit number, and <code>False</code> otherwise.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; NumberQ(3+I)
+	 * True
+	 *
+	 * &gt;&gt; NumberQ(5!)
+	 * True
+	 *
+	 * &gt;&gt; NumberQ(Pi)
+	 * False
+	 * </pre>
+	 */
 	public static IAST NumberQ(final IExpr a0) {
 
 		return unaryAST1(NumberQ, a0);
@@ -4798,6 +5066,27 @@ public class F {
 		return unaryAST1(Numerator, a0);
 	}
 
+	/**
+	 * <pre>
+	 * NumericQ(expr)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>expr</code> is an explicit numeric expression, and <code>False</code>
+	 * otherwise.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; NumericQ(E+Pi)
+	 * True
+	 *
+	 * &gt;&gt; NumericQ(Sqrt(3))
+	 * True
+	 * </pre>
+	 */
 	public static IAST NumericQ(final IExpr a0) {
 		return unaryAST1(NumericQ, a0);
 	}

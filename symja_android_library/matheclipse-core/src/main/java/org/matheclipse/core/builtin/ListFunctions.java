@@ -2347,7 +2347,12 @@ public final class ListFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3);
 
-			if (ast.exists(PredicateQ.ATOMQ)) {
+			if (ast.exists(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return x.isAtom();
+                }
+            })) {
 				return F.NIL;
 			}
 

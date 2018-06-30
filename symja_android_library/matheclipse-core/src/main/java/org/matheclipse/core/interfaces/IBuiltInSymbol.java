@@ -1,8 +1,10 @@
 package org.matheclipse.core.interfaces;
 
+import com.duy.lambda.Predicate;
+
 /**
- * An expression representing a symbol (i.e. variable- constant- or
- * function-name)
+ * An expression representing a symbol (i.e. variable- constant- or function-name)
+ *
  */
 public interface IBuiltInSymbol extends ISymbol {
 
@@ -18,4 +20,8 @@ public interface IBuiltInSymbol extends ISymbol {
      */
     public void setEvaluator(IEvaluator module);
 
+	/**
+	 * Define a predicate as the current evaluator which is associated to this symbol
+	 */
+	public void setPredicateQ(Predicate<IExpr> predicate);
 }
