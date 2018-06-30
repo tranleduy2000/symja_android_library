@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import javax.annotation.Nonnull;
+
 public class PatternMatcherAndEvaluator extends PatternMatcher implements Externalizable {
 
 	/**
@@ -167,13 +169,20 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr eval(final IExpr leftHandSide, EvalEngine engine) {
+	public IExpr eval(final IExpr leftHandSide, @Nonnull EvalEngine engine) {
+		return replace(leftHandSide, engine, true);
+	}
+
+	final public IExpr replace(final IExpr leftHandSide, @Nonnull EvalEngine engine, boolean evaluate) {
 		if (isRuleWithoutPatterns()) {
 			// no patterns found match equally:
 			if (fLhsPatternExpr.equals(leftHandSide)) {
 				IExpr result = fRightHandSide;
 				try {
+					if (evaluate) {
 					return F.eval(result);
+					}
+					return result;
 				} catch (final ConditionException e) {
 					logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
 					return F.NIL;
@@ -207,7 +216,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 			IExpr result = fPatternMap.substituteSymbols(fRightHandSide);
 			try {
 				// System.out.println(result.toString());
+				if (evaluate) {
 				result = F.eval(result);
+				}
 			} catch (final ConditionException e) {
 				logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
 				return F.NIL;

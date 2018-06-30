@@ -1,13 +1,16 @@
 package org.matheclipse.core.patternmatching;
 
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.List;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
+
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * Interface for the pattern matcher
@@ -99,7 +102,7 @@ public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Se
 	 * @return <code>F.NIL</code> if the match wasn't successful, the evaluated
 	 *         expression otherwise.
 	 */
-	public abstract IExpr eval(final IExpr leftHandSide, EvalEngine engine);
+	public abstract IExpr eval(final IExpr leftHandSide, @Nonnull EvalEngine engine);
 
 	/**
 	 * Get the "left-hand-side" of a pattern-matching rule.

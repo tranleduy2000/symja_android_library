@@ -1437,6 +1437,11 @@ public abstract class IExprImpl implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isListOfRules() {
+        return false;
+    }
+
     /**
      * Test if this expression is the function <code>Log[&lt;arg&gt;]</code>
      *

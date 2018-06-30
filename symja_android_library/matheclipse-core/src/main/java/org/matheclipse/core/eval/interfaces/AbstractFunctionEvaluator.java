@@ -1,12 +1,5 @@
 package org.matheclipse.core.eval.interfaces;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Locale;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.AST2;
@@ -18,6 +11,15 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Locale;
+
+import javax.annotation.Nonnull;
 
 /**
  * Abstract interface for built-in Symja functions. The <code>numericEval()</code> method delegates to the
@@ -63,7 +65,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 
 	/** {@inheritDoc} */
 	@Override
-	abstract public IExpr evaluate(final IAST ast, EvalEngine engine);
+	abstract public IExpr evaluate(final IAST ast, @Nonnull EvalEngine engine);
 
 	/**
 	 * Create a rule which invokes the method name in this class instance.
@@ -111,7 +113,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 					if (((INumber) arg1).complexSign() < 0) {
 						IExpr negNum = ((INumber) arg1).negate();
 						if (negNum.isOne()) {
-							return timesAST.removeAtClone(1).getOneIdentity(F.C1);
+							return timesAST.rest().getOneIdentity(F.C1);
 						}
 						return timesAST.setAtClone(1, negNum);
 					}
@@ -206,7 +208,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 					IExpr arg1 = timesAST.arg1();
 					if (arg1.isNumber()) {
 						if (((INumber) arg1).isImaginaryUnit()) {
-							return timesAST.removeAtClone(1).getOneIdentity(factor);
+							return timesAST.rest().getOneIdentity(factor);
 						}
 					}
 				}

@@ -504,7 +504,7 @@ public class RulesData implements Serializable {
 	 * @param expr
 	 * @return <code>F.NIL</code> if no evaluation was possible
 	 */
-	public IExpr evalDownRule(final IExpr expr, EvalEngine engine) {
+	public IExpr evalDownRule(final IExpr expr, @Nonnull EvalEngine engine) {
 		PatternMatcherEquals res;
 
 		if (Config.SHOW_PATTERN_EVAL_STEPS) {
@@ -607,7 +607,7 @@ public class RulesData implements Serializable {
 	}
 
 	public IExpr evalSimpleRatternDownRule(OpenIntToSet<IPatternMatcher> hashToMatcherMap, final int hash,
-			final IAST expression, boolean showSteps, EvalEngine engine) throws CloneNotSupportedException {
+			final IAST expression, boolean showSteps, @Nonnull EvalEngine engine) throws CloneNotSupportedException {
 		IPatternMatcher pmEvaluator;
 
 		// TODO Performance hotspot
@@ -642,7 +642,7 @@ public class RulesData implements Serializable {
 		return F.NIL;
 	}
 
-	public IExpr evalUpRule(final IExpr expression, EvalEngine engine) {
+	public IExpr evalUpRule(final IExpr expression, @Nonnull EvalEngine engine) {
 		PatternMatcherEquals res;
 		if (fEqualUpRules != null) {
 			res = fEqualUpRules.get(expression);

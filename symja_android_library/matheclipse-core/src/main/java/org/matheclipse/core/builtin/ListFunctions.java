@@ -57,6 +57,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.annotation.Nonnull;
+
 import static org.matheclipse.core.expression.F.List;
 
 public final class ListFunctions {
@@ -1127,7 +1129,7 @@ public final class ListFunctions {
 			return F.List();
 		}
 
-		public static IAST cases(final IAST ast, final IExpr pattern, EvalEngine engine) {
+		public static IAST cases(final IAST ast, final IExpr pattern, @Nonnull EvalEngine engine) {
 			if (pattern.isRuleAST()) {
 				Function<IExpr, IExpr> function = Functors.rules((IAST) pattern, engine);
 				IAST[] results = ast.filter(function);
@@ -3585,27 +3587,33 @@ public final class ListFunctions {
 			}
 			Validate.checkSize(ast, 3);
 			try {
-				if (ast.arg2().isListOfLists()) {
-					IAST list = (IAST) ast.arg2();
+				IExpr arg1 = ast.arg1();
+				IExpr arg2 = engine.evaluate(ast.arg2());
+				if (arg2.isListOfRules()) {
+					return arg1.replaceAll((IAST) arg2).orElse(arg1);
+				} else if (arg2.isListOfLists()) {
+					IAST list = (IAST) arg2;
 					IASTAppendable result = F.ListAlloc(list.size());
 					for (IExpr subList : list) {
-						IExpr temp = engine.evaluate(subList);
-						if (temp.isAST()) {
-							result.append(F.subst(ast.arg1(), (IAST) temp));
+						if (subList.isListOfRules()) {
+							result.append(F.subst(arg1, (IAST) subList));
+						} else {
+							WrongArgumentType wat = new WrongArgumentType(ast, ast, -1,
+									"List of rule expressions (x->y) expected: ");
+							engine.printMessage(wat.getMessage());
 						}
 					}
 					return result;
-				}
-				if (ast.arg2().isAST()) {
-					IExpr temp = engine.evaluate(ast.arg2());
-					if (temp.isAST()) {
-						return F.subst(ast.arg1(), (IAST) temp);
-					}
+				} else if (arg2.isRuleAST()) {
+					return F.subst(arg1, (IAST) arg2);
 				} else {
 					WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
 					engine.printMessage(wat.getMessage());
 				}
 			} catch (WrongArgumentType wat) {
+				if (Config.SHOW_STACKTRACE) {
+					wat.printStackTrace();
+				}
 				engine.printMessage(wat.getMessage());
 			}
 			return F.NIL;

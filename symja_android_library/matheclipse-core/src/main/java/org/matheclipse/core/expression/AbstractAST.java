@@ -1930,6 +1930,20 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		}
 		return false;
 	}
+	/** {@inheritDoc} */
+	@Override
+	public boolean isListOfRules() {
+		if (head().equals(F.List)) {
+			for (int i = 1; i < size(); i++) {
+				if (!get(i).isRuleAST()) {
+					// the row is no list
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 
 	/** {@inheritDoc} */
 	@Override
