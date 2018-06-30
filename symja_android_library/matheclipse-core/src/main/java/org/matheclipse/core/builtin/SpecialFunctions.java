@@ -193,7 +193,8 @@ public class SpecialFunctions {
 		@Override
 		public IExpr e1DblArg(final double arg1) {
 			try {
-				return Num.valueOf(org.hipparchus.special.Erf.erf(arg1));
+				return Num.valueOf(de.lab4inf.math.functions.Erf.erf(arg1));
+				// return Num.valueOf(org.hipparchus.special.Erf.erf(arg1));
 			} catch (final MathIllegalStateException e) {
 			}
 			return F.NIL;
@@ -205,7 +206,8 @@ public class SpecialFunctions {
 				throw new UnsupportedOperationException();
 			}
 			try {
-				return org.hipparchus.special.Erf.erf(stack[top]);
+				return de.lab4inf.math.functions.Erf.erf(stack[top]);
+				// return org.hipparchus.special.Erf.erf(stack[top]);
 			} catch (final MathIllegalStateException e) {
 			}
 			throw new UnsupportedOperationException();
@@ -254,12 +256,13 @@ public class SpecialFunctions {
 
 		@Override
 		public IExpr e1DblArg(final double arg1) {
-			if (arg1 >= 0. && arg1 <= 2.0) {
 				try {
-					return Num.valueOf(org.hipparchus.special.Erf.erfc(arg1));
+				return Num.valueOf(de.lab4inf.math.functions.Erf.erfc(arg1));
+				// if (arg1 >= 0. && arg1 <= 2.0) {
+				// return Num.valueOf(org.hipparchus.special.Erf.erfc(arg1));
+				// }
 				} catch (final MathIllegalStateException e) {
 				}
-			}
 			return F.NIL;
 		}
 
@@ -270,9 +273,10 @@ public class SpecialFunctions {
 			}
 			try {
 				double arg1 = stack[top];
-				if (arg1 >= 0. && arg1 <= 2.0) {
-					return org.hipparchus.special.Erf.erfc(arg1);
-				}
+				return de.lab4inf.math.functions.Erf.erfc(arg1);
+				// if (arg1 >= 0. && arg1 <= 2.0) {
+				// return org.hipparchus.special.Erf.erfc(arg1);
+				// }
 			} catch (final MathIllegalStateException e) {
 			}
 			throw new UnsupportedOperationException();
