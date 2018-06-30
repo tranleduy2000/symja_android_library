@@ -448,11 +448,11 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 					try {
 						selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
 						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
-                            @Override
-                            public void accept(IExpr x, int i) {
-                                EvalEngine.this.evalArg(rlist, ast, x, i, isNumericFunction);
-                            }
-                        });
+							@Override
+							public void accept(IExpr x, int i) {
+								EvalEngine.this.evalArg(rlist, ast, x, i, isNumericFunction);
+							}
+						});
 					} finally {
 						if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
 							fNumericMode = numericMode;
@@ -823,34 +823,35 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 		try {
 			// remember which local variables we use:
 			if (localVariablesList.exists(new Predicate<IExpr>() {
-                @Override
-                public boolean test(IExpr x) {
+				@Override
+				public boolean test(IExpr x) {
 
-                    if (x.isSymbol()) {
-                        ISymbol blockVariableSymbol = (ISymbol) x;
-                        EvalEngine.this.localStackCreate(blockVariableSymbol).push(F.NIL);
-                        variables.add(blockVariableSymbol);
-                    } else {
-                        if (x.isAST(F.Set, 3)) {
-                            // lhs = rhs
-                            final IAST setFun = (IAST) x;
-                            if (setFun.arg1().isSymbol()) {
-                                ISymbol blockVariableSymbol = (ISymbol) setFun.arg1();
-                                final Deque<IExpr> localVariableStack = EvalEngine.this.localStackCreate(blockVariableSymbol);
-                                localVariableStack.push(F.NIL);
-                                // this evaluation step may throw an exception
-                                IExpr temp = EvalEngine.this.evaluate(setFun.arg2());
-                                localVariableStack.remove();
-                                localVariableStack.push(temp);
-                                variables.add(blockVariableSymbol);
-                            }
-                        } else {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            })) {
+					ISymbol blockVariableSymbol;
+					if (x.isSymbol()) {
+						blockVariableSymbol = (ISymbol) x;
+						EvalEngine.this.localStackCreate(blockVariableSymbol).push(F.NIL);
+						variables.add(blockVariableSymbol);
+					} else {
+						if (x.isAST(F.Set, 3)) {
+							// lhs = rhs
+							final IAST setFun = (IAST) x;
+							if (setFun.arg1().isSymbol()) {
+								blockVariableSymbol = (ISymbol) setFun.arg1();
+								final Deque<IExpr> localVariableStack = EvalEngine.this.localStackCreate(blockVariableSymbol);
+								localVariableStack.push(F.NIL);
+								// this evaluation step may throw an exception
+								IExpr temp = EvalEngine.this.evaluate(setFun.arg2());
+								localVariableStack.remove();
+								localVariableStack.push(temp);
+								variables.add(blockVariableSymbol);
+							}
+						} else {
+							return true;
+						}
+					}
+					return false;
+				}
+			})) {
 						return expr;
 					}
 

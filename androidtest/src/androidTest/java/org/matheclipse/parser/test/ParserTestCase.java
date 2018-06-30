@@ -235,8 +235,8 @@ public class ParserTestCase extends TestCase {
 	public void testParser17() {
 		try {
 			Parser p = new Parser();
-			ASTNode obj = p.parse("\\[Alpha]+\\[Alpha]");
-			assertEquals(obj.toString(), "Plus(α, α)");
+			ASTNode obj = p.parse("\\[Alpha]+\\[Alpha]*f[\\[CapitalSHacek]]");
+			assertEquals(obj.toString(), "Plus(α, Times(α, f(Š)))");
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals("", e.getMessage());
@@ -436,8 +436,43 @@ public class ParserTestCase extends TestCase {
 		try {
 			Parser p = new Parser();
 			ASTNode obj = p.parse("#1.#123");
+			assertEquals(obj.toString(), "Dot(Slot(1), Slot(123))");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParser32() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("(-1)^(a) (b)");
+			assertEquals(obj.toString(), "Times(Power(-1, a), b)");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse33() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("f@ g@ h");
+			assertEquals(obj.toString(), "f(g(h))");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse34() {
+		try {
+			Parser p = new Parser();
+			// http://oeis.org/A005132
+			ASTNode obj = p.parse(
+					"a = {1}; Do[ If[ a[ [ -1 ] ] - n > 0 && Position[ a, a[ [ -1 ] ] - n ] == {}, a = Append[ a, a[ [ -1 ] ] - n ], a = Append[ a, a[ [ -1 ] ] + n ] ], {n, 2, 70} ]; a");
 			assertEquals(obj.toString(),
-					"Dot(Slot(1), Slot(123))");
+					"CompoundExpression(Set(a, List(1)), Do(If(And(Greater(Plus(Part(a, -1), Times(-1, n)), 0), Equal(Position(a, Plus(Part(a, -1), Times(-1, n))), List())), Set(a, Append(a, Plus(Part(a, -1), Times(-1, n)))), Set(a, Append(a, Plus(Part(a, -1), n)))), List(n, 2, 70)), a)");
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals("", e.getMessage());

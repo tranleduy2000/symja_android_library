@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.TimeConstrainedEvaluator;
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.graphics.Show2SVG;
 import org.matheclipse.core.interfaces.IAST;
@@ -57,6 +58,15 @@ public abstract class AbstractTestCase extends TestCase {
         }
     }
 
+	public void evalString(String evalString) {
+		try {
+			// scriptEngine.put("STEPWISE",Boolean.TRUE);
+			String evaledResult = (String) fScriptEngine.eval(evalString);
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", "1");
+		}
+	}
     public void checkNumeric(String evalString, String expectedResult) {
         check(fNumericScriptEngine, evalString, expectedResult, -1);
     }
@@ -127,12 +137,13 @@ public abstract class AbstractTestCase extends TestCase {
     protected void setUp() {
         try {
             synchronized (mLocker) {
-                fScriptEngine = new MathScriptEngine();// mLocker.getEngineByExtension("m");
+                fScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
                 fScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
                 fScriptEngine.put("DECIMAL_FORMAT", "0.0####");
 
-                fNumericScriptEngine = new MathScriptEngine();// mLocker.getEngineByExtension("m");
+                fNumericScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
                 fNumericScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
+                F.join();
 
                 EvalEngine engine = EvalEngine.get();
                 engine.setRecursionLimit(256);
@@ -144,7 +155,4 @@ public abstract class AbstractTestCase extends TestCase {
 
     }
 
-    public void evalString(String str) {
-
-    }
 }
