@@ -1,12 +1,6 @@
 package org.matheclipse.core.convert;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
@@ -22,6 +16,13 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 import edu.jas.arith.BigRational;
 import edu.jas.arith.ModIntegerRing;
@@ -96,7 +97,9 @@ public class JASConvert<C extends RingElem<C>> {
 		try {
 			return expr2Poly(exprPoly, numeric2Rational);
 		} catch (Exception ae) {
-			// ae.printStackTrace();
+			if (Config.SHOW_STACKTRACE) {
+				ae.printStackTrace();
+			}
 			throw new JASConversionException();
 		}
 	}
@@ -179,8 +182,8 @@ public class JASConvert<C extends RingElem<C>> {
 						result = result.multiply(p);
 					}
 					return result;
-				} else if (ast.isPower() && ast.arg1().isSymbol()) {
-					final ISymbol base = (ISymbol) ast.arg1();
+				} else if (ast.isPower() && ast.base().isSymbol()) {
+					final ISymbol base = (ISymbol) ast.base();
 					int exponent = -1;
 					try {
 						exponent = Validate.checkPowerExponent(ast);

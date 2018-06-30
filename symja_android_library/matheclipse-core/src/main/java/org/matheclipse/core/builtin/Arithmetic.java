@@ -2382,9 +2382,10 @@ public final class Arithmetic {
             if (n.isOne()) {
                 return a;
             }
-            if (a.isRational() && n.isInteger()) {
+			int ni = n.toIntDefault(Integer.MIN_VALUE);
+			if (a.isRational() && ni > Integer.MIN_VALUE) {
                 BigFraction bf = ((IRational) a).toBigFraction();
-                BigFraction ph = pochhammer(bf, ((IInteger) n).toBigNumerator());
+				BigFraction ph = pochhammer(bf, ni);
                 if (ph != null) {
                     return F.fraction(ph);
                 }
@@ -2397,25 +2398,14 @@ public final class Arithmetic {
             }
 
             if (n.isInteger()) {
-                int ni = n.toIntDefault(Integer.MIN_VALUE);
                 if (ni > Integer.MIN_VALUE) {
                     if (ni > 0) {
                         // Product(a + k, {k, 0, n - 1})
-						return F.product(new Function<IExpr, IExpr>() {
-                            @Override
-                            public IExpr apply(IExpr k) {
-                                return F.Plus(a, k);
-                            }
-                        }, 0, ni - 1);
+						return F.product(k -> F.Plus(a, k), 0, ni - 1);
                     }
                     if (ni < 0) {
                         // Product(1/(a - k), {k, 1, -n})
-						return Power(F.product(new Function<IExpr, IExpr>() {
-                            @Override
-                            public IExpr apply(IExpr k) {
-                                return F.Plus(a, k.negate());
-                            }
-                        }, 1, -ni), -1);
+						return Power(F.product(k -> F.Plus(a, k.negate()), 1, -ni), -1);
                     }
                 }
             }
@@ -2433,23 +2423,21 @@ public final class Arithmetic {
          *            The number of product terms in the evaluation.
          * @return Gamma(that+n)/Gamma(that) = that*(that+1)*...*(that+n-1).
          */
-        public static BigFraction pochhammer(BigFraction that, final BigInteger n) {
-            if (n.compareTo(BigInteger.ZERO) < 0) {
+		public static BigFraction pochhammer(BigFraction that, final int n) {
+			if (n < 0) {
                 BigFraction res = BigFraction.ONE;
-                BigInteger i = BigInteger.valueOf(-1);
-                for (; i.compareTo(n) >= 0; i = i.subtract(BigInteger.ONE)) {
+				for (int i = (-1); i >= n; i--) {
                     res = res.multiply(that.add(i));
                 }
                 return res.reciprocal();
-            } else if (n.equals(BigInteger.ZERO)) {
+			} else if (n == 0) {
                 return BigFraction.ONE;
             } else {
-				if (that.equals(BigInteger.ZERO)) {
+				if (that.equals(BigFraction.ZERO)) {
 					return BigFraction.ZERO;
 				}
-                BigFraction res = new BigFraction(that.getNumerator(), that.getDenominator());
-                BigInteger i = BigInteger.ONE;
-                for (; i.compareTo(n) < 0; i = i.add(BigInteger.ONE)) {
+				BigFraction res = that;
+				for (int i = 1; i < n; i++) {
                     res = res.multiply(that.add(i));
                 }
                 return res;

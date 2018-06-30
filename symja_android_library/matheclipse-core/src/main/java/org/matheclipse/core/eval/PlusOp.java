@@ -17,6 +17,7 @@ import java.util.Map;
  * </p>
  * See: <a href="http://www.cs.berkeley.edu/~fateman/papers/newsimp.pdf">Experiments in Hash-coded Algebraic
  * Simplification</a>
+ *
  */
 public class PlusOp {
     final Map<IExpr, IExpr> plusMap;
@@ -27,7 +28,8 @@ public class PlusOp {
     /**
      * Constructor.
      *
-     * @param size the approximated size of the resulting <code>Plus()</code> AST.
+	 * @param size
+	 *            the approximated size of the resulting <code>Plus()</code> AST.
      */
     public PlusOp(final int size) {
         plusMap = new HashMap<IExpr, IExpr>(size + 5 + size / 10);
@@ -35,45 +37,14 @@ public class PlusOp {
         numberValue = null;
     }
 
-    /**
-     * Evaluate <code>Plus(a1, a2,...)</code>.
-     *
-     * @param plusAST the <code>a1+a2+...</code> Plus() expression
-     * @return
-     */
-    public static IExpr plus(IAST plusAST) {
-        IAST temp = EvalEngine.get().evalFlatOrderlessAttributesRecursive(plusAST);
-        if (!temp.isPresent()) {
-            temp = plusAST;
-        }
-        IExpr expr = Arithmetic.CONST_PLUS.evaluate(temp, null);
-        if (!expr.isPresent()) {
-            return plusAST.getOneIdentity(F.C0);
-        }
-        return expr;
-    }
-
-    /**
-     * Evaluate <code>a0 + a2</code>.
-     *
-     * @param a1
-     * @param a2
-     * @return
-     */
-    public static IExpr plus(IExpr a1, IExpr a2) {
-        IAST plus = F.Plus(a1, a2);
-        IExpr expr = Arithmetic.CONST_PLUS.evaluate(plus, null);
-        if (!expr.isPresent()) {
-            return plus;
-        }
-        return expr;
-    }
 
     /**
      * Add or merge the <code>key, value</code> pair into the given <code>plusMap</code>.
      *
-     * @param key   the key expression
-     * @param value the value expression
+	 * @param key
+	 *            the key expression
+	 * @param value
+	 *            the value expression
      */
     private boolean addMerge(final IExpr key, final IExpr value) {
         IExpr temp = plusMap.get(key);
@@ -314,6 +285,40 @@ public class PlusOp {
         return F.NIL;
     }
 
+	/**
+	 * Evaluate <code>Plus(a1, a2,...)</code>.
+	 *
+	 * @param plusAST
+	 *            the <code>a1+a2+...</code> Plus() expression
+	 * @return
+	 */
+	public static IExpr plus(IAST plusAST) {
+		IAST temp = EvalEngine.get().evalFlatOrderlessAttributesRecursive(plusAST);
+		if (!temp.isPresent()) {
+			temp = plusAST;
+		}
+		IExpr expr = Arithmetic.CONST_PLUS.evaluate(temp, EvalEngine.get());
+		if (!expr.isPresent()) {
+			return plusAST.getOneIdentity(F.C0);
+		}
+		return expr;
+	}
+
+	/**
+	 * Evaluate <code>a0 + a2</code>.
+	 *
+	 * @param a1
+	 * @param a2
+	 * @return
+	 */
+	public static IExpr plus(IExpr a1, IExpr a2) {
+		IAST plus = F.Plus(a1, a2);
+		IExpr expr = Arithmetic.CONST_PLUS.evaluate(plus, EvalEngine.get());
+		if (!expr.isPresent()) {
+			return plus;
+		}
+		return expr;
+	}
     /**
      * Use interval arithmetic to add to interval objects
      *
