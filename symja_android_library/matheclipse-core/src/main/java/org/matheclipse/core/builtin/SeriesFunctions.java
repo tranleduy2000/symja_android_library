@@ -662,12 +662,19 @@ public class SeriesFunctions {
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 3, 4);
 
-            if (!ast.arg2().isRuleAST()) {
-                throw new WrongArgumentType(ast, ast.arg2(), 2, "Limit: rule definition expected!");
+			IExpr arg1 = ast.arg1();
+			IExpr arg2 = ast.arg2();
+			if (!arg2.isRuleAST()) {
+				throw new WrongArgumentType(ast, arg2, 2, "Limit: rule definition expected!");
             }
-            IAST rule = (IAST) ast.arg2();
+			IAST rule = (IAST) arg2;
             if (!(rule.arg1().isSymbol())) {
-                throw new WrongArgumentType(ast, ast.arg1(), 2, "Limit: variable symbol for rule definition expected!");
+				throw new WrongArgumentType(ast, arg1, 2, "Limit: variable symbol for rule definition expected!");
+			}
+			if (arg1.isList()) {
+				IASTMutable clone = ast.copy();
+				clone.set(1, null);
+				return ((IAST) arg1).mapThread(clone, 1);
             }
             boolean numericMode = engine.isNumericMode();
             try {
@@ -684,13 +691,13 @@ public class SeriesFunctions {
                         } else if (option.equals(F.Automatic)) {
                             direction = DIRECTION_TWO_SIDED;
                         } else {
-                            throw new WrongArgumentType(ast, ast.arg2(), 2, "Limit: direction option expected!");
+							throw new WrongArgumentType(ast, arg2, 2, "Limit: direction option expected!");
                         }
                     } else {
-                        throw new WrongArgumentType(ast, ast.arg2(), 2, "Limit: direction option expected!");
+						throw new WrongArgumentType(ast, arg2, 2, "Limit: direction option expected!");
                     }
                     if (direction == DIRECTION_TWO_SIDED) {
-                        IExpr temp = F.Limit.evalDownRule(engine, F.Limit(ast.arg1(), ast.arg2()));
+						IExpr temp = F.Limit.evalDownRule(engine, F.Limit(arg1, arg2));
                         if (temp.isPresent()) {
                             return temp;
                         }
@@ -701,11 +708,11 @@ public class SeriesFunctions {
                 if (rule.isFreeAt(2, symbol)) {
                     limit = rule.arg2();
                 } else {
-                    throw new WrongArgumentType(ast, ast.arg2(), 2,
+					throw new WrongArgumentType(ast, arg2, 2,
                             "Limit: limit value contains variable symbol for rule definition!");
                 }
                 LimitData data = new LimitData(symbol, limit, rule, direction);
-                return evalLimit(ast.arg1(), data, true);
+				return evalLimit(arg1, data, true);
             } finally {
                 engine.setNumericMode(numericMode);
             }
