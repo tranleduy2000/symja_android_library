@@ -2548,6 +2548,16 @@ public abstract class IExprImpl implements IExpr {
     }
 
     /**
+     * Return <code>this</code> if <code>isList()==true</code>, otherwise create a new list <code>{this}</code> from
+     * this (i.e. return <code>F.List(this)</code>).
+     *
+     * @return <code>this</code> if <code>isList()==true</code>, otherwise return <code>F.List(this)</code>.
+     */
+    public IAST orNewList() {
+        return isList() ? (IAST) this : F.List(this);
+    }
+
+    /**
      * Return <code>this</code> if <code>this</code> unequals <code>F.NIL</code> , otherwise throw an exception to be
      * created by the provided supplier.
      *

@@ -4222,13 +4222,7 @@ public final class ListFunctions {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isAST()) {
-				IAST functorList;
-				if (ast.arg2().isList()) {
-					functorList = (IAST) ast.arg2();
-				} else {
-					functorList = F.List(ast.arg2());
-				}
-				return splitByFunction(functorList, 1, (IAST) ast.arg1(), engine);
+				return splitByFunction(ast.arg2().orNewList(), 1, (IAST) ast.arg1(), engine);
 			}
 			return F.NIL;
 		}
@@ -4239,11 +4233,11 @@ public final class ListFunctions {
 			}
 			IExpr functorHead = functorList.get(pos);
 			final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
-				@Override
-				public IExpr apply(IExpr x) {
-					return engine.evaluate(F.unaryAST1(functorHead, x));
-				}
-			};
+                @Override
+                public IExpr apply(IExpr x) {
+                    return engine.evaluate(F.unaryAST1(functorHead, x));
+                }
+            };
 
 			IASTAppendable result = F.ListAlloc(8);
 			if (list.size() > 1) {

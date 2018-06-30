@@ -2801,6 +2801,9 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return F.Or(this, that);
 	}
 
+	public IAST orElse(final IAST other) {
+		return this;
+	}
 	/**
 	 * Calculate a special hash value to find a matching rule in a hash table
 	 *

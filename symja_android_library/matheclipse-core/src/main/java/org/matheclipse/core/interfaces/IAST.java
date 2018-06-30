@@ -314,15 +314,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
 	 * @throws NullPointerException
 	 *             if {@code collection} is {@code null}.
      */
-	default public boolean containsAll(Collection<?> collection) {
-		Iterator<?> it = collection.iterator();
-		while (it.hasNext()) {
-			if (!contains(it.next())) {
-				return false;
-			}
-		}
-		return true;
-	}
+	public boolean containsAll(Collection<?> collection);
 
     /**
      * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied). In contrast
@@ -1052,6 +1044,14 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     public IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, int position);
 
+	/**
+	 * Return <code>this</code> if <code>this</code> unequals <code>F.NIL</code> , otherwise return <code>other</code>.
+	 *
+	 * @param other
+	 * @return <code>this</code> if <code>this</code> unequals <code>F.NIL</code>, otherwise return <code>other</code>.
+	 * @see java.util.Optional#orElse(Object)
+	 */
+	public IAST orElse(final IAST other);
     /**
      * Calculate a special hash value for pattern matching
      *

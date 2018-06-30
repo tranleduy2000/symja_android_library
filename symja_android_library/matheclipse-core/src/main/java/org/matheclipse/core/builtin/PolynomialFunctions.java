@@ -1231,7 +1231,7 @@ public class PolynomialFunctions {
 		 * @see Roots
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 			IAST variables;
 			if (ast.size() == 2) {
@@ -1243,25 +1243,21 @@ public class PolynomialFunctions {
 				}
 				variables = eVar.getVarList();
 			} else {
-				if (ast.arg2().isList()) {
-					variables = (IAST) ast.arg2();
-				} else {
-					variables = F.List(ast.arg2());
-				}
+				variables = ast.arg2().orNewList();
 			}
 			IExpr temp = roots(ast.arg1(), variables, engine);
 			if (!temp.isList()) {
 				return F.NIL;
 			}
-			final IAST list = (IAST) temp;
+			IAST list = (IAST) temp;
 			int size = list.size();
 			IASTAppendable result = F.ListAlloc(size);
 			return result.appendArgs(size, new IntFunction<IExpr>() {
-				@Override
-				public IExpr apply(int i) {
-					return engine.evalN(list.get(i));
-				}
-			});
+                @Override
+                public IExpr apply(int i) {
+                    return engine.evalN(list.get(i));
+                }
+            });
 			// for (int i = 1; i < size; i++) {
 			// result.append(engine.evalN(list.get(i)));
 			// }
