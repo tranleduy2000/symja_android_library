@@ -13,6 +13,7 @@ import static org.matheclipse.core.expression.F.EasterSunday;
 import static org.matheclipse.core.expression.F.ElementData;
 import static org.matheclipse.core.expression.F.Eliminate;
 import static org.matheclipse.core.expression.F.Export;
+import static org.matheclipse.core.expression.F.FindFit;
 import static org.matheclipse.core.expression.F.FindInstance;
 import static org.matheclipse.core.expression.F.FindRoot;
 import static org.matheclipse.core.expression.F.Fit;
