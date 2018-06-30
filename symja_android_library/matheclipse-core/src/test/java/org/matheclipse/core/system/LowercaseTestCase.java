@@ -2590,6 +2590,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{1,4,40,400,4000,40000,400000,4000000,40000000,400000000,4000000000}");
 	}
 
+	public void testEvaluate() {
+		check("cheb = ChebyshevT(5, x);Function(x, Evaluate(cheb))", //
+				"Function(x,5*x-20*x^3+16*x^5)");
+		check("Function(x, Evaluate(cheb))[10]", //
+				"1580050");
+		check("Hold(Evaluate(1+1),2+2)", //
+				"Hold(2,2+2)");
+		check("Evaluate(a,b)", //
+				"Sequence(a,b)");
+		check("x=Plus; {Attributes(x), Attributes(Evaluate(x))}", //
+				"{{},{Flat,Listable,OneIdentity,Orderless,NumericFunction}}");
+	}
 	public void testExactNumberQ() {
 		check("ExactNumberQ(10)", "True");
 		check("ExactNumberQ(4.0)", "False");
