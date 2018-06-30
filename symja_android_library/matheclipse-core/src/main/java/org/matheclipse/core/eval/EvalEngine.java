@@ -1199,17 +1199,20 @@ public class EvalEngine implements Serializable, IEvaluationEngine {
 			expr = argI;
 		}
 		if (expr.isAST()) {
+			if (((IAST) expr).size() == 2) {
+				IExpr arg1 = ((IAST) expr).arg1();
 			if (expr.isAST(F.Sqrt, 2)) {
 				if (resultList.isPresent()) {
-					resultList.set(i, PowerOp.power(expr, F.C1D2));
+						resultList.set(i, PowerOp.power(arg1, F.C1D2));
 				} else {
-					resultList = ast.setAtCopy(i, PowerOp.power(((IAST) expr).arg1(), F.C1D2));
+						resultList = ast.setAtCopy(i, PowerOp.power(arg1, F.C1D2));
 				}
 			} else if (expr.isAST(F.Exp, 2)) {
 				if (resultList.isPresent()) {
-					resultList.set(i, PowerOp.power(F.E, ((IAST) expr).arg1()));
+						resultList.set(i, PowerOp.power(F.E, arg1));
 				} else {
-					resultList = ast.setAtCopy(i, PowerOp.power(F.E, ((IAST) expr).arg1()));
+						resultList = ast.setAtCopy(i, PowerOp.power(F.E, arg1));
+					}
 				}
 			}
 		}
