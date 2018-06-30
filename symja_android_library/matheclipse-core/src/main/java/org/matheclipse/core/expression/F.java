@@ -6471,7 +6471,10 @@ public class F {
 	}
 
 	public static IAST Times(final long num, final IExpr... a) {
-		return ast(a, Times).prependClone(ZZ(num));
+		IASTAppendable ast = ast(Times, a.length + 1, false);
+		ast.append(ZZ(num));
+		ast.appendAll(a, 0, a.length);
+		return ast;
 	}
 
 	public static IAST Together(final IExpr a0) {

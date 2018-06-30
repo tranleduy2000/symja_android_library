@@ -1,6 +1,7 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.DoubleFunction;
+import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
