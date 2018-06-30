@@ -369,7 +369,7 @@ public final class Arithmetic {
      * Pi/4
      * </pre>
      */
-    private static class Arg extends AbstractFunctionEvaluator implements INumeric, DoubleUnaryOperator {
+	private static class Arg extends AbstractCoreFunctionEvaluator implements INumeric, DoubleUnaryOperator {
 
         @Override
         public double applyAsDouble(double operand) {
@@ -396,7 +396,10 @@ public final class Arithmetic {
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 2);
 
-            final IExpr arg1 = ast.arg1();
+			final IExpr arg1 = engine.evaluate(ast.arg1());
+			if (arg1.isList()) {
+				return ((IAST) arg1).mapThread(F.Arg(F.Null), 1);
+			}
             if (arg1.isIndeterminate()) {
                 return F.Indeterminate;
             }
@@ -436,7 +439,7 @@ public final class Arithmetic {
 
         @Override
         public void setUp(final ISymbol newSymbol) {
-            newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION | ISymbol.NHOLDFIRST);
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
             super.setUp(newSymbol);
         }
     }

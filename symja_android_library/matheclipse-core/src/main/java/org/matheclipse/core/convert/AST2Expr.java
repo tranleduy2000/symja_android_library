@@ -1,10 +1,5 @@
 package org.matheclipse.core.convert;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.apfloat.Apint;
@@ -35,6 +30,11 @@ import org.matheclipse.parser.client.ast.PatternNode;
 import org.matheclipse.parser.client.ast.StringNode;
 import org.matheclipse.parser.client.ast.SymbolNode;
 import org.matheclipse.parser.client.eval.DoubleNode;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Converts a parsed <code>org.matheclipse.parser.client.ast.ASTNode</code> expression into an IExpr expression
@@ -79,8 +79,8 @@ public class AST2Expr {
 			"Divergence", "Divide", "DivideBy", "Divisible", "Divisors", "DivisorSigma", "Do", "Dot", "Drop", "DSolve",
 			"EasterSunday", "Eigenvalues", "Eigenvectors", "Element", "ElementData", "Eliminate", "EllipticE",
 			"EllipticF", "EllipticK", "EllipticPi", "End", "EndPackage", "Equal", "Equivalent", "Erf", "Erfc", "Erfi",
-			"ErlangDistribution", "EuclideanDistance", "EulerE", "EulerPhi", "EvenQ", "ExactNumberQ", "Except",
-			"Exists", "Exp", "Expand", "ExpandAll", "Expectation", "ExponentialDistribution", "ExpIntegralE",
+			"ErlangDistribution", "EuclideanDistance", "EulerE", "EulerPhi", "Evaluate", "EvenQ", "ExactNumberQ",
+			"Except", "Exists", "Exp", "Expand", "ExpandAll", "Expectation", "ExponentialDistribution", "ExpIntegralE",
 			"ExpIntegralEi", "Exponent", "Export", "ExtendedGCD", "Extract", "Factor", "Factorial", "Factorial2",
 			"FactorInteger", "FactorSquareFree", "FactorSquareFreeList", "FactorTerms", "Flatten", "FlattenAt",
 			"Fibonacci", "FindInstance", "FindRoot", "First", "Fit", "FixedPoint", "FixedPointList", "Floor", "Fold",

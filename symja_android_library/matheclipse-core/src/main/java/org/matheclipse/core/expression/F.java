@@ -370,6 +370,7 @@ public class F {
 	public final static IBuiltInSymbol EulerE = F.initFinalSymbol("EulerE", ID.EulerE);
 	public final static IBuiltInSymbol EulerGamma = F.initFinalSymbol("EulerGamma", ID.EulerGamma);
 	public final static IBuiltInSymbol EulerPhi = F.initFinalSymbol("EulerPhi", ID.EulerPhi);
+	public final static IBuiltInSymbol Evaluate = F.initFinalSymbol("Evaluate", ID.Evaluate);
 	public final static IBuiltInSymbol EvenQ = F.initFinalSymbol("EvenQ", ID.EvenQ);
 	public final static IBuiltInSymbol ExactNumberQ = F.initFinalSymbol("ExactNumberQ", ID.ExactNumberQ);
 	public final static IBuiltInSymbol Except = F.initFinalSymbol("Except", ID.Except);
@@ -5436,7 +5437,10 @@ public class F {
 	}
 
 	public static IAST Plus(final long num, final IExpr... a) {
-		return ast(a, Plus).prependClone(ZZ(num));
+		IASTAppendable ast = ast(Plus, a.length + 1, false);
+		ast.append(ZZ(num));
+		ast.appendAll(a, 0, a.length);
+		return ast;
 	}
 
 	public static IAST Pochhammer(final IExpr a0, final IExpr a1) {

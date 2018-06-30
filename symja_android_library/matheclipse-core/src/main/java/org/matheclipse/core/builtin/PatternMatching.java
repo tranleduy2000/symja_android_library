@@ -54,6 +54,7 @@ public final class PatternMatching {
         F.Clear.setEvaluator(new Clear());
         F.ClearAll.setEvaluator(new ClearAll());
         F.Definition.setEvaluator(new Definition());
+		F.Evaluate.setEvaluator(new Evaluate());
         F.Get.setEvaluator(new Get());
         F.Hold.setEvaluator(new Hold());
         F.HoldPattern.setEvaluator(new HoldPattern());
@@ -237,6 +238,23 @@ public final class PatternMatching {
 
     }
 
+	private static class Evaluate extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.size() == 2) {
+				return engine.evaluate(ast.arg1());
+			}
+			IASTMutable sequence=ast.copy();
+			sequence.set(0, F.Sequence);
+			return engine.evaluate(sequence);
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
+	}
     /**
      * Get[{&lt;file name&gt;}}
 	 *
