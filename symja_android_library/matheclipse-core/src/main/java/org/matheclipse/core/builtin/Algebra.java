@@ -95,7 +95,6 @@ import static org.matheclipse.core.expression.F.E;
 import static org.matheclipse.core.expression.F.Floor;
 import static org.matheclipse.core.expression.F.I;
 import static org.matheclipse.core.expression.F.Im;
-import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Null;
@@ -114,6 +113,7 @@ public class Algebra {
 		F.Cancel.setEvaluator(new Cancel());
 		F.Collect.setEvaluator(new Collect());
 		F.Denominator.setEvaluator(new Denominator());
+		F.Distribute.setEvaluator(new Distribute());
 		F.Expand.setEvaluator(new Expand());
 		F.ExpandAll.setEvaluator(new ExpandAll());
 		F.Factor.setEvaluator(new Factor());
@@ -837,6 +837,93 @@ public class Algebra {
 
 	}
 
+	/**
+	 * <pre>
+	 * Distribute(f(x1, x2, x3,...))
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * distributes <code>f</code> over <code>Plus</code> appearing in any of the <code>xi</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:<br />
+	 * </p>
+	 * <ul>
+	 * <li><a href="http://en.wikipedia.org/wiki/Distributive_property">Wikipedia - Distributive property</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Distribute((a+b)*(x+y+z))
+	 * a*x+a*y+a*z+b*x+b*y+B*z
+	 * </pre>
+	 */
+	private final static class Distribute extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 2, 6);
+
+			IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
+			IExpr arg1 = temp.arg1();
+			IExpr head = F.Plus;
+			if (temp.size() >= 3) {
+				head = temp.arg2();
+			}
+			if (temp.isAST3()) {
+				if (!arg1.head().equals(temp.arg3())) {
+					return arg1;
+				}
+			}
+
+			if (arg1.isAST()) {
+				IASTAppendable resultCollector;
+				if (temp.size() >= 5) {
+					resultCollector = F.ast(temp.arg4());
+				} else {
+					resultCollector = F.ast(head);
+				}
+				IASTAppendable stepResult;
+				if (temp.size() >= 6) {
+					stepResult = F.ast(temp.arg5());
+				} else {
+					stepResult = F.ast(arg1.head());
+				}
+				distributePosition(resultCollector, stepResult, head, (IAST) arg1, 1);
+				return resultCollector;
+			}
+			return arg1;
+		}
+
+		private void distributePosition(IASTAppendable resultCollector, IASTAppendable stepResult, IExpr head, IAST arg1,
+				int position) {
+			if (arg1.size() == position) {
+				resultCollector.append(stepResult);
+				return;
+			}
+			if (arg1.size() < position) {
+				return;
+			}
+			if (arg1.get(position).isAST(head)) {
+				IAST temp = (IAST) arg1.get(position);
+				temp.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						IASTAppendable res2 = stepResult.copyAppendable();
+						res2.append(x);
+						Distribute.this.distributePosition(resultCollector, res2, head, arg1, position + 1);
+					}
+				});
+			} else {
+				IASTAppendable res2 = stepResult;
+				res2.append(arg1.get(position));
+				distributePosition(resultCollector, res2, head, arg1, position + 1);
+			}
+
+		}
+	}
 	/**
 	 * <pre>
 	 * Expand(expr)

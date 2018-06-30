@@ -8,7 +8,6 @@ import static org.matheclipse.core.expression.F.D;
 import static org.matheclipse.core.expression.F.DSolve;
 import static org.matheclipse.core.expression.F.Default;
 import static org.matheclipse.core.expression.F.Derivative;
-import static org.matheclipse.core.expression.F.Distribute;
 import static org.matheclipse.core.expression.F.Divergence;
 import static org.matheclipse.core.expression.F.EasterSunday;
 import static org.matheclipse.core.expression.F.ElementData;
@@ -71,7 +70,6 @@ public final class FunctionDefinitions {
 		D.setEvaluator(new org.matheclipse.core.reflection.system.D());
 		Default.setEvaluator(new org.matheclipse.core.reflection.system.Default());
 		Derivative.setEvaluator(new org.matheclipse.core.reflection.system.Derivative());
-		Distribute.setEvaluator(new org.matheclipse.core.reflection.system.Distribute());
 		Divergence.setEvaluator(new org.matheclipse.core.reflection.system.Divergence());
 		DSolve.setEvaluator(new org.matheclipse.core.reflection.system.DSolve());
 		EasterSunday.setEvaluator(new org.matheclipse.core.reflection.system.EasterSunday());
