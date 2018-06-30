@@ -17,9 +17,8 @@ import org.matheclipse.core.interfaces.IExpr;
  * See: <a href="http://en.wikipedia.org/wiki/Row_echelon_form">Wikipedia - Row echelon form</a>.
  * </p>
  * <p>
- * The code was adapted from:
- * <a href="http://rosettacode.org/wiki/Reduced_row_echelon_form#Java">Rosetta
- * Code - Reduced row echelon form</a>
+ * The code was adapted from: <a href="http://rosettacode.org/wiki/Reduced_row_echelon_form#Java">Rosetta Code - Reduced
+ * row echelon form</a>
  * </p>
  */
 public class FieldReducedRowEchelonForm {
@@ -84,15 +83,15 @@ public class FieldReducedRowEchelonForm {
 	 * 
 	 * @see #rowReduce()
 	 */
-	public FieldReducedRowEchelonForm(FieldMatrix<IExpr> matrix, FieldVector<IExpr> b) {
-		this.originalMatrix = matrix;
-		this.rowReducedMatrix = matrix.copy();
-		this.numRows = matrix.getRowDimension();
-		this.numCols = matrix.getColumnDimension();
-		this.matrixRankCache = -1;
-		this.nullSpaceCache = null;
-		rowReduce();
-	}
+//	public FieldReducedRowEchelonForm(FieldMatrix<IExpr> matrix, FieldVector<IExpr> b) {
+//		this.originalMatrix = matrix;
+//		this.rowReducedMatrix = matrix.copy();
+//		this.numRows = matrix.getRowDimension();
+//		this.numCols = matrix.getColumnDimension();
+//		this.matrixRankCache = -1;
+//		this.nullSpaceCache = null;
+//		rowReduce();
+//	}
 
 	/**
 	 * Test if <code>expr</code> equals the zero element.
@@ -170,11 +169,6 @@ public class FieldReducedRowEchelonForm {
 		b.row = t;
 	}
 
-	private void swapRow(int a, int b) {
-		IExpr[] temp = rowReducedMatrix.getRow(a);
-		rowReducedMatrix.setRow(a, rowReducedMatrix.getRow(b));
-		rowReducedMatrix.setRow(b, temp);
-	}
 	/**
 	 * Test if the column <code>a.col</code> of the matrix contains only zero-elements starting with the
 	 * <code>a.row</code> element.

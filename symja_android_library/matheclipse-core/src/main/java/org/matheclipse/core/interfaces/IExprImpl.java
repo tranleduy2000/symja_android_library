@@ -42,6 +42,7 @@ import edu.jas.structure.ElemFactory;
 
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.f;
 
 /**
  * (I)nterface for a mathematical (Expr)ession<br />
@@ -2147,13 +2148,14 @@ public abstract class IExprImpl implements IExpr {
         return false;
     }
 
-    /**
-     * Test if this expression is a signed number. I.e. an instance of type <code>ISignedNumber</code>.
-     *
-     * @return
-     */
-    public boolean isReal() {
-        return this instanceof ISignedNumber;
+    @Override
+    public boolean isSignedNumber() {
+        return isReal();
+    }
+
+    @Override
+    public boolean isRealConstant() {
+        return false;
     }
 
     /**
@@ -2163,8 +2165,18 @@ public abstract class IExprImpl implements IExpr {
      * @return
      */
     public boolean isSignedNumberConstant() {
-        return false;
+        return isRealConstant();
     }
+
+    /**
+     * Test if this expression is a signed number. I.e. an instance of type <code>ISignedNumber</code>.
+     *
+     * @return
+     */
+    public boolean isReal() {
+        return this instanceof ISignedNumber;
+    }
+
 
     /**
      * Test if this expression is the function <code>Sin[&lt;arg&gt;]</code>
