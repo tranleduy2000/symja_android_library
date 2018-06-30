@@ -125,6 +125,7 @@ public final class Arithmetic {
         F.ConditionalExpression.setEvaluator(new ConditionalExpression());
         F.Conjugate.setEvaluator(new Conjugate());
         F.Decrement.setEvaluator(new Decrement());
+		F.Differences.setEvaluator(new Differences());
         F.DirectedInfinity.setEvaluator(new DirectedInfinity());
         F.Divide.setEvaluator(new Divide());
         F.DivideBy.setEvaluator(new DivideBy());
@@ -1052,6 +1053,26 @@ public final class Arithmetic {
         }
     }
 
+	private static class Differences extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 2, 4);
+			IExpr arg1 = ast.arg1();
+			if (ast.size() == 2 && arg1.isList()) {
+				if (arg1.size() <= 2) {
+					return F.CEmptyList;
+				}
+				return F.ListConvolve(F.List(F.C1, F.CN1), arg1);
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
+	}
     /**
      * <pre>
      * Divide(a, b)

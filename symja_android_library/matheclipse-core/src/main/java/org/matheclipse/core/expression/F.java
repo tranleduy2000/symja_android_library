@@ -325,6 +325,7 @@ public class F {
 	public final static IBuiltInSymbol Diagonal = F.initFinalSymbol("Diagonal", ID.Diagonal);
 	public final static IBuiltInSymbol DiagonalMatrix = F.initFinalSymbol("DiagonalMatrix", ID.DiagonalMatrix);
 	public final static IBuiltInSymbol DiceDissimilarity = F.initFinalSymbol("DiceDissimilarity", ID.DiceDissimilarity);
+	public final static IBuiltInSymbol Differences = F.initFinalSymbol("Differences", ID.Differences);
 	public final static IBuiltInSymbol DigitQ = F.initFinalSymbol("DigitQ", ID.DigitQ);
 	public final static IBuiltInSymbol Dimensions = F.initFinalSymbol("Dimensions", ID.Dimensions);
 	public final static IBuiltInSymbol DiracDelta = F.initFinalSymbol("DiracDelta", ID.DiracDelta);
@@ -4782,6 +4783,9 @@ public class F {
 		return ast(a, List);
 	}
 
+	public static IAST ListConvolve(final IExpr a0, final IExpr a1) {
+		return binaryAST2(ListConvolve, a0, a1);
+	}
 	/**
 	 * <pre>
 	 * ListQ(expr)
