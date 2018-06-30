@@ -58,8 +58,6 @@ import org.matheclipse.core.reflection.system.rules.ConjugateRules;
 import org.matheclipse.core.reflection.system.rules.GammaRules;
 import org.matheclipse.core.reflection.system.rules.PowerRules;
 
-import java.math.BigInteger;
-
 import static org.matheclipse.core.expression.F.And;
 import static org.matheclipse.core.expression.F.ArcCos;
 import static org.matheclipse.core.expression.F.ArcCot;
@@ -3209,7 +3207,7 @@ public final class Arithmetic {
             if (a.isNumericFunction()) {
                 IExpr temp = engine.evalN(a);
                 if (temp.isReal()) {
-                    if (((ISignedNumber) temp).isNegative()) {
+					if (temp.isNegative()) {
                         engine.printMessage("Infinite expression 0^(negative number)");
                         return F.CComplexInfinity;
                     }

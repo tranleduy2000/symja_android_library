@@ -776,6 +776,7 @@ public class F {
 	public final static IBuiltInSymbol ReplaceList = F.initFinalSymbol("ReplaceList", ID.ReplaceList);
 	public final static IBuiltInSymbol ReplacePart = F.initFinalSymbol("ReplacePart", ID.ReplacePart);
 	public final static IBuiltInSymbol ReplaceRepeated = F.initFinalSymbol("ReplaceRepeated", ID.ReplaceRepeated);
+    public final static IBuiltInSymbol Rescale = F.initFinalSymbol("Rescale", ID.Rescale);
 	public final static IBuiltInSymbol Rest = F.initFinalSymbol("Rest", ID.Rest);
 	public final static IBuiltInSymbol Resultant = F.initFinalSymbol("Resultant", ID.Resultant);
 	public final static IBuiltInSymbol Return = F.initFinalSymbol("Return", ID.Return);
@@ -5514,6 +5515,10 @@ public class F {
 				return a0.power(exp);
 			}
 			if (exp == -1L) {
+				if (a0.isZero()) {
+					EvalEngine.get().printMessage("Infinite expression 0^(-1)");
+					return F.CComplexInfinity;
+				}
 				return a0.inverse();
 			}
 			if (exp == 0L && !a0.isZero()) {
