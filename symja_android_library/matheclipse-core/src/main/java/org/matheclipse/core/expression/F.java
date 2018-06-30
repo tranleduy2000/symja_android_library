@@ -3443,6 +3443,17 @@ public class F {
 	}
 
 	/**
+	 * Parse and evaluate a string expression.
+	 *
+	 * @param str
+	 *            the string expression which should be parsed and evaluated
+	 * @return the evaluated expression
+	 * @see EvalEngine#evaluate(IExpr)
+	 */
+	public static IExpr eval(String str) {
+		return EvalEngine.get().evaluate(str);
+	}
+	/**
 	 * Create a function with 1 argument and evaluate it.
 	 * 
 	 * @param head
