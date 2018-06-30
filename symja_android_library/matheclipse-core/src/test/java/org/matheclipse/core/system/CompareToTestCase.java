@@ -1,5 +1,12 @@
 package org.matheclipse.core.system;
 
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IPattern;
+import org.matheclipse.core.interfaces.ISymbol;
+
 import static org.matheclipse.core.expression.F.ArcCos;
 import static org.matheclipse.core.expression.F.ArcSin;
 import static org.matheclipse.core.expression.F.ArcTan;
@@ -16,13 +23,6 @@ import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.eval;
 import static org.matheclipse.core.expression.F.x;
-
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IPattern;
-import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  * Tests for the Java port of the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
@@ -102,6 +102,20 @@ public class CompareToTestCase extends AbstractTestCase {
 		check("-Infinity+b+a", "-Infinity+a+b");
 	}
 	
+	public void testOut002() {
+		IExpr ast1, ast2;
+		// -Infinity
+		ast1 = F.eval("-Infinity");
+		// x
+		ast2 = F.eval("x");
+		ast1 = eval(ast1);
+		ast2 = eval(ast2);
+
+		int res = ast1.compareTo(ast2);
+		assertEquals(-1, res);
+
+		check("-Infinity+b+a", "-Infinity+a+b");
+	}
 	public void testCT004() {
 		IASTAppendable ast1, ast2;
 		ast1 = F.ast(F.f);

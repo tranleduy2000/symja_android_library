@@ -5813,6 +5813,27 @@ public class F {
 	}
 
 	/**
+	 * Print the documentation for the given symbol.
+	 *
+	 * @param head
+	 * @return
+	 */
+	public final static String usage(final ISymbol head) {
+		return usage(head.toString());
+	}
+
+	/**
+	 * Print the documentation for the given symbol name.
+	 *
+	 * @param symbolName
+	 * @return
+	 */
+	public final static String usage(final String symbolName) {
+		StringBuilder buf = new StringBuilder();
+		Documentation.usageDocumentation(buf, symbolName);
+		return buf.toString();
+	}
+	/**
 	 * Get or create a user defined symbol which is retrieved from the evaluation engines context path.
 	 * 
 	 * @param symbolName
