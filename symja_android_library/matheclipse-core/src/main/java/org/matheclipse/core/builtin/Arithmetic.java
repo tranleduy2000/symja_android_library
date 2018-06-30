@@ -2697,11 +2697,12 @@ public final class Arithmetic {
                 return F.Power(base.denominator(), exponent.negate());
             }
 
-            if (exponent.equals(F.C1D2)) {
-                if (base.isNegative()) {
-                    return F.Times(F.CI, F.Power(base.negate(), exponent));
-                }
-            }
+			// if (exponent.equals(F.C1D2)) {
+			// if (base.isNegative()) {
+			// done in e2ObjArg
+			// return F.Times(F.CI, F.Power(base.negate(), exponent));
+			// }
+			// }
 
             if (exponent.equals(F.CN1D2)) {
                 if (base.isNegative()) {
@@ -3001,7 +3002,7 @@ public final class Arithmetic {
                 }
             }
 
-            if (base.isReal() && ((ISignedNumber) base).isNegative() && exponent.equals(F.C1D2)) {
+			if (base.isReal() && base.isNegative() && exponent.isNumEqualRational(F.C1D2)) {
                 // extract I for sqrt
                 return F.Times(F.CI, F.Power(F.Negate(base), exponent));
             }
@@ -3207,7 +3208,7 @@ public final class Arithmetic {
 
             IExpr a = exponent.re();
             if (a.isReal()) {
-                if (((ISignedNumber) a).isNegative()) {
+				if (a.isNegative()) {
                     engine.printMessage("Infinite expression 0^(negative number)");
                     return F.CComplexInfinity;
                 }

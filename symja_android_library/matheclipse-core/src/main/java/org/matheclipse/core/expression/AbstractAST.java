@@ -2020,7 +2020,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		if (isNumericFunction()) {
 			IExpr result = EvalEngine.get().evalN(this);
 			if (result.isReal()) {
-				return ((ISignedNumber) result).isNegative();
+				return result.isNegative();
 			}
 		}
 		return false;
@@ -2961,7 +2961,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	public final int signum() {
 		if (isTimes()) {
 			IExpr temp = arg1();
-			if (temp.isReal() && ((ISignedNumber) temp).isNegative()) {
+			if (temp.isReal() && temp.isNegative()) {
 				return -1;
 			}
 		}

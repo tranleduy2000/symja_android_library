@@ -116,7 +116,7 @@ public class Iterator {
 					throw NoEvalException.CONST;
 				}
 				if (step.isReal()) {
-					if (((ISignedNumber) step).isNegative()) {
+					if (step.isNegative()) {
 						if (F.LessEqual.ofQ(evalEngine, maxCounterOrList, count)) {
 							return true;
 						}
@@ -129,7 +129,7 @@ public class Iterator {
 				// else {
 					IExpr sub = evalEngine.evaluate(Divide(Subtract(maxCounterOrList, count), step));
 					if (sub.isReal()) {
-						return !((ISignedNumber) sub).isNegative();
+					return !sub.isNegative();
 					}
 				try {
 					double d = sub.evalDouble();

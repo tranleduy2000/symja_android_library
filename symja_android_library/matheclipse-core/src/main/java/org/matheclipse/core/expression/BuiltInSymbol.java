@@ -34,7 +34,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		/** {@inheritDoc} */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.size() == 2) {
+			if (ast.isAST1()) {
 				return predicate.test(engine.evaluate(ast.arg1())) ? F.True : F.False;
 			}
 			Validate.checkSize(ast, 2);
@@ -208,7 +208,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
 	/** {@inheritDoc} */
 	@Override
-	final public boolean isSignedNumberConstant() {
+	final public boolean isRealConstant() {
 		return fEvaluator instanceof ISignedNumberConstant;
 	}
 

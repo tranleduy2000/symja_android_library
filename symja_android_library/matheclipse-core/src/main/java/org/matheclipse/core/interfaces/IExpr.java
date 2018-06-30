@@ -1160,7 +1160,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see #isMatrix(boolean)
      * @see #isVector()
      */
-     boolean isListOfRules();
+    boolean isListOfRules();
 
     /**
      * Test if this expression is the function <code>Log[&lt;arg&gt;]</code>
@@ -1597,6 +1597,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isRationalValue(IRational value);
 
     /**
+     * Test if this expression is a signed number. I.e. an instance of type <code>ISignedNumber</code>.
+     *
+     * @return
+     */
+    boolean isReal();
+
+
+    /**
      * Test if this expression is a real matrix (i.e. an ASTRealMatrix) or a <code>List[List[...],...,List[...]]</code>
      * matrix with elements of type <code>org.matheclipse.core.expression.Num</code>.
      *
@@ -1688,11 +1696,21 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isSequence();
 
     /**
-     * Test if this expression is a signed number. I.e. an instance of type <code>ISignedNumber</code>.
+     * Test if this expression is a signed real number. I.e. an instance of type <code>IFraction</code> for exact number
+     * values or <code>INum</code> for approximated numbers.
+     *
+     * @return
+     * @deprecated use {@link #isReal()};
+     */
+    boolean isSignedNumber();
+
+    /**
+     * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements the
+     * <code>ISignedNumberConstant</code> interface (see package <code>org.matheclipse.core.builtin.constant</code>).
      *
      * @return
      */
-    boolean isReal();
+    boolean isRealConstant();
 
     /**
      * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements the

@@ -1,5 +1,65 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.ObjIntConsumer;
+
+import org.apfloat.Apcomplex;
+import org.apfloat.ApcomplexMath;
+import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
+import org.hipparchus.complex.Complex;
+import org.hipparchus.util.FastMath;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ComplexResultException;
+import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.interfaces.AbstractArg1;
+import org.matheclipse.core.eval.interfaces.AbstractArg12;
+import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
+import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
+import org.matheclipse.core.eval.interfaces.INumeric;
+import org.matheclipse.core.eval.util.AbstractAssumptions;
+import org.matheclipse.core.expression.ComplexNum;
+import org.matheclipse.core.expression.ComplexUtils;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.Num;
+import org.matheclipse.core.expression.NumberUtil;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IComplexNum;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IFraction;
+import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.INum;
+import org.matheclipse.core.interfaces.ISignedNumber;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.reflection.system.rules.ArcCosRules;
+import org.matheclipse.core.reflection.system.rules.ArcCoshRules;
+import org.matheclipse.core.reflection.system.rules.ArcCotRules;
+import org.matheclipse.core.reflection.system.rules.ArcCothRules;
+import org.matheclipse.core.reflection.system.rules.ArcCscRules;
+import org.matheclipse.core.reflection.system.rules.ArcCschRules;
+import org.matheclipse.core.reflection.system.rules.ArcSecRules;
+import org.matheclipse.core.reflection.system.rules.ArcSechRules;
+import org.matheclipse.core.reflection.system.rules.ArcSinRules;
+import org.matheclipse.core.reflection.system.rules.ArcSinhRules;
+import org.matheclipse.core.reflection.system.rules.ArcTanRules;
+import org.matheclipse.core.reflection.system.rules.ArcTanhRules;
+import org.matheclipse.core.reflection.system.rules.CosRules;
+import org.matheclipse.core.reflection.system.rules.CoshRules;
+import org.matheclipse.core.reflection.system.rules.CotRules;
+import org.matheclipse.core.reflection.system.rules.CothRules;
+import org.matheclipse.core.reflection.system.rules.CscRules;
+import org.matheclipse.core.reflection.system.rules.CschRules;
+import org.matheclipse.core.reflection.system.rules.LogRules;
+import org.matheclipse.core.reflection.system.rules.SecRules;
+import org.matheclipse.core.reflection.system.rules.SechRules;
+import org.matheclipse.core.reflection.system.rules.SinRules;
+import org.matheclipse.core.reflection.system.rules.SincRules;
+import org.matheclipse.core.reflection.system.rules.SinhRules;
+import org.matheclipse.core.reflection.system.rules.TanRules;
+import org.matheclipse.core.reflection.system.rules.TanhRules;
+
 import static org.matheclipse.core.expression.F.ArcCos;
 import static org.matheclipse.core.expression.F.ArcCot;
 import static org.matheclipse.core.expression.F.ArcCoth;
@@ -36,67 +96,6 @@ import static org.matheclipse.core.expression.F.Tan;
 import static org.matheclipse.core.expression.F.Tanh;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.num;
-
-import com.duy.lambda.DoubleUnaryOperator;
-import com.duy.lambda.ObjIntConsumer;
-
-import org.apfloat.Apcomplex;
-import org.apfloat.ApcomplexMath;
-import org.apfloat.Apfloat;
-import org.apfloat.ApfloatMath;
-import org.hipparchus.complex.Complex;
-import org.hipparchus.util.FastMath;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.ComplexResultException;
-import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.interfaces.AbstractArg1;
-import org.matheclipse.core.eval.interfaces.AbstractArg12;
-import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
-import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
-import org.matheclipse.core.eval.interfaces.INumeric;
-import org.matheclipse.core.eval.util.AbstractAssumptions;
-import org.matheclipse.core.expression.ComplexNum;
-import org.matheclipse.core.expression.ComplexUtils;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.Num;
-import org.matheclipse.core.expression.NumberUtil;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IComplexNum;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IFraction;
-import org.matheclipse.core.interfaces.IInteger;
-import org.matheclipse.core.interfaces.INum;
-import org.matheclipse.core.interfaces.INumber;
-import org.matheclipse.core.interfaces.ISignedNumber;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.reflection.system.rules.ArcCosRules;
-import org.matheclipse.core.reflection.system.rules.ArcCoshRules;
-import org.matheclipse.core.reflection.system.rules.ArcCotRules;
-import org.matheclipse.core.reflection.system.rules.ArcCothRules;
-import org.matheclipse.core.reflection.system.rules.ArcCscRules;
-import org.matheclipse.core.reflection.system.rules.ArcCschRules;
-import org.matheclipse.core.reflection.system.rules.ArcSecRules;
-import org.matheclipse.core.reflection.system.rules.ArcSechRules;
-import org.matheclipse.core.reflection.system.rules.ArcSinRules;
-import org.matheclipse.core.reflection.system.rules.ArcSinhRules;
-import org.matheclipse.core.reflection.system.rules.ArcTanRules;
-import org.matheclipse.core.reflection.system.rules.ArcTanhRules;
-import org.matheclipse.core.reflection.system.rules.CosRules;
-import org.matheclipse.core.reflection.system.rules.CoshRules;
-import org.matheclipse.core.reflection.system.rules.CotRules;
-import org.matheclipse.core.reflection.system.rules.CothRules;
-import org.matheclipse.core.reflection.system.rules.CscRules;
-import org.matheclipse.core.reflection.system.rules.CschRules;
-import org.matheclipse.core.reflection.system.rules.LogRules;
-import org.matheclipse.core.reflection.system.rules.SecRules;
-import org.matheclipse.core.reflection.system.rules.SechRules;
-import org.matheclipse.core.reflection.system.rules.SinRules;
-import org.matheclipse.core.reflection.system.rules.SincRules;
-import org.matheclipse.core.reflection.system.rules.SinhRules;
-import org.matheclipse.core.reflection.system.rules.TanRules;
-import org.matheclipse.core.reflection.system.rules.TanhRules;
 
 public class ExpTrigsFunctions {
 	static {
@@ -822,7 +821,7 @@ public class ExpTrigsFunctions {
 			}
 			IExpr yUnitStep = y.unitStep();
 			if (x.isNumber() && yUnitStep.isInteger()) {
-				if (((INumber) x).re().isNegative()) {
+				if (x.re().isNegative()) {
 					return F.Plus(F.ArcTan(F.Divide(y, x)),
 							F.Times(F.Subtract(F.Times(F.C2, yUnitStep), F.C1), F.Pi));
 				}
