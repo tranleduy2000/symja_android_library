@@ -2619,8 +2619,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testEvaluate() {
 		check("{f(2+2, 1+1, -1+2), f(Evaluate(2+2),Evaluate(1+1),-1+2,Evaluate(-1+2))}", //
 				"{f(4,2,1),f(4,2,1,1)}");
-	//	check("SetAttributes(hr,HoldRest); {hr(2+2, 1+1, -1+2), hr(2+2,Evaluate(1+1),-1+2,Evaluate(-1+2))}", //
-	//			"{hr(4,1+1,-1+2),hr(4,2,-1+2,1)}");
+		check("SetAttributes(hr,HoldRest); {hr(2+2, 1+1, -1+2), hr(2+2,Evaluate(1+1),-1+2,Evaluate(-1+2))}", //
+				"{hr(4,1+1,-1+2),hr(4,2,-1+2,1)}");
 		check("SetAttributes(hf,HoldFirst); {hf(1+1), hf(Evaluate(1+1))}", //
 				"{hf(1+1),hf(2)}");
 		check("cheb = ChebyshevT(5, x);Function(x, Evaluate(cheb))", //
@@ -3053,6 +3053,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFindFit() {
+		// initial guess [1.0, 1.0, 1.0] gives bad result:
+		check("FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1})," //
+				+ " a* Sin(w*t + f), {a,w,f}, t)", //
+				"{a->0.6688,w->1.49588,f->3.74845}");
+		// initial guess [2.0, 1.0, 1.0] gives better result:
+		check("FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1}), "//
+				+ "a* Sin(w*t + f), {{a, 2}, {w,1}, {f,1}}, t)", //
+				"{a->3.0,w->3.0,f->1.0}");
+		// initial guess [2.0, 1.0, 1.0] with 1.0 by default:
+		check("FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1}), "//
+				+ "a* Sin(w*t + f), {{a, 2}, w, f}, t)", //
+				"{a->3.0,w->3.0,f->1.0}");
 		check("FindFit({{1,1},{2,4},{3,9},{4,16}}, " //
 				+ "a+b*x+c*x^2, {a, b, c}, x)", //
 				"{a->0.0,b->0.0,c->1.0}");
@@ -3065,6 +3077,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FindFit({{1.0, 12.}, {1.9, 10.}, {2.6, 8.2}, {3.4, 6.9}, {5.0, 5.9}}, " //
 				+ "a*Exp(-k*t), {a, k}, t)", //
 				"{a->14.38886,k->0.19821}");
+		// initial guess [0, 0, 0] doesn't work
+		check("FindFit({2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71}, " //
+				+ "a*x*Log(b + c*x), {{a,0},{b,0},{c,0}}, x)", //
+				"FindFit({2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71},a*x*Log(b+c*x),{{a,\n"
+						+ "0},{b,0},{c,0}},x)");
 	}
 	public void testFindInstance() {
 		check("FindInstance({x^2==4,x+y^2==6}, {x,y})", "{{x->-2,y->-2*Sqrt(2)}}");

@@ -15,6 +15,7 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <pre>
@@ -215,6 +216,7 @@ public class FindFit extends AbstractFunctionEvaluator {
 			double[] initialGuess = new double[listOfSymbols.size() - 1];
 			listOfSymbols = initialGuess(listOfSymbols, initialGuess);
 			if (listOfSymbols.isPresent()) {
+				try {
 			AbstractCurveFitter fitter = SimpleCurveFitter
 					.create(new FindFitParametricFunction(function, listOfSymbols, x, engine), initialGuess);
 			WeightedObservedPoints obs = new WeightedObservedPoints();
@@ -223,6 +225,9 @@ public class FindFit extends AbstractFunctionEvaluator {
 			double[] values = fitter.fit(obs.toList());
 					return convertToRulesList(listOfSymbols, values);
 			}
+				} catch (MathException ex) {
+					engine.printMessage("FindFit: " + ex.getMessage());
+				}
 			}
 		}
 		return F.NIL;
