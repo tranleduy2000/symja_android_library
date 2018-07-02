@@ -380,10 +380,7 @@ public abstract class IExprImpl implements IExpr {
      * @return this expression converted to a Java <code>double</code> value.
      */
     public double evalDouble() {
-        if (isReal()) {
-            return ((ISignedNumber) this).doubleValue();
-        }
-        throw new WrongArgumentType(this, "Conversion into a double numeric value is not possible!");
+        return EvalEngine.get().evalDouble(this);
     }
 
     /**

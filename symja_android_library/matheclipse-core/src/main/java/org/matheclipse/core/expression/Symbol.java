@@ -45,8 +45,9 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
-    private final static Collator US_COLLATOR = Collator.getInstance(Locale.US);
     protected transient Context fContext;
+
+    private final static Collator US_COLLATOR = Collator.getInstance(Locale.US);
     /**
      * The attribute values of the symbol represented by single bits.
      */
@@ -269,15 +270,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         throw new WrongArgumentType(this, "Conversion into a complex numeric value is not possible!");
     }
 
-	/** {@inheritDoc} */
-    @Override
-    public final double evalDouble() {
-        ISignedNumber signedNumber = evalReal();
-        if (signedNumber != null) {
-            return signedNumber.doubleValue();
-        }
-        throw new WrongArgumentType(this, "Conversion into a double numeric value is not possible!");
-    }
 
 	/** {@inheritDoc} */
     @Override

@@ -619,14 +619,15 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	}
 
 	/** {@inheritDoc} */
-	@Override
-	public final double evalDouble() {
-		ISignedNumber signedNumber = evalReal();
-		if (signedNumber != null) {
-			return signedNumber.doubleValue();
-		}
-		throw new WrongArgumentType(this, "Conversion into a double numeric value is not possible!");
-	}
+//	@Override
+//	public final double evalDouble() {
+//		return EvalEngine.get().evalDouble(this);
+//		ISignedNumber signedNumber = evalReal();
+//		if (signedNumber != null) {
+//			return signedNumber.doubleValue();
+//		}
+//		throw new WrongArgumentType(this, "Conversion into a double numeric value is not possible!");
+//	}
 
 	/** {@inheritDoc} */
 	@Override
