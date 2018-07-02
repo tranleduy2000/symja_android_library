@@ -136,7 +136,7 @@ public class ApfloatNum extends INumImpl implements INum {
 	}
 
 	@Override
-	public ISignedNumber evalSignedNumber() {
+	public ISignedNumber evalReal() {
 		return this;
 	}
 

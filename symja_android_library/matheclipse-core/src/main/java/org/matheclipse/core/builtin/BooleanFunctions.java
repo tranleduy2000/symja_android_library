@@ -2393,7 +2393,7 @@ public final class BooleanFunctions {
 			if (arg1.isNumber()) {
 				return F.False;
 			}
-			ISignedNumber signedNumber = arg1.evalSignedNumber();
+			ISignedNumber signedNumber = arg1.evalReal();
 			if (signedNumber != null) {
 				return F.bool(signedNumber.isNegative());
 			}
@@ -2537,7 +2537,7 @@ public final class BooleanFunctions {
 			if (arg1.isNumber()) {
 				return F.False;
 			}
-			ISignedNumber signedNumber = arg1.evalSignedNumber();
+			ISignedNumber signedNumber = arg1.evalReal();
 			if (signedNumber != null) {
 				return F.bool(!signedNumber.isNegative());
 			}
@@ -2581,7 +2581,7 @@ public final class BooleanFunctions {
 			if (arg1.isNumber()) {
 				return F.False;
 			}
-			ISignedNumber signedNumber = arg1.evalSignedNumber();
+			ISignedNumber signedNumber = arg1.evalReal();
 			if (signedNumber != null) {
 				return F.bool(!signedNumber.isPositive());
 			}
@@ -2898,7 +2898,7 @@ public final class BooleanFunctions {
 			if (arg1.isNumber()) {
 				return F.False;
 			}
-			ISignedNumber signedNumber = arg1.evalSignedNumber();
+			ISignedNumber signedNumber = arg1.evalReal();
 			if (signedNumber != null) {
 				return F.bool(signedNumber.isPositive());
 			}

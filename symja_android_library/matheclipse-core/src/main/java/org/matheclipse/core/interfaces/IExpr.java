@@ -314,7 +314,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return <code>null</code> if the conversion is not possible.
      */
-    ISignedNumber evalSignedNumber();
+    ISignedNumber evalReal();
 
     /**
      * Evaluate an expression

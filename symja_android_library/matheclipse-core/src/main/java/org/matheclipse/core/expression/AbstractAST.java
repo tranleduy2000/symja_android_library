@@ -621,7 +621,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	/** {@inheritDoc} */
 	@Override
 	public final double evalDouble() {
-		ISignedNumber signedNumber = evalSignedNumber();
+		ISignedNumber signedNumber = evalReal();
 		if (signedNumber != null) {
 			return signedNumber.doubleValue();
 		}
@@ -642,7 +642,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final ISignedNumber evalSignedNumber() {
+	public final ISignedNumber evalReal() {
 		if (isNumericFunction()) {
 			IExpr result = EvalEngine.get().evalN(this);
 			if (result.isReal()) {
@@ -3008,7 +3008,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		for (int i = 1; i <= dim[0]; i++) {
 			IAST row = (IAST) get(i);
 			for (int j = 1; j <= dim[1]; j++) {
-				signedNumber = row.get(j).evalSignedNumber();
+				signedNumber = row.get(j).evalReal();
 				if (signedNumber != null) {
 					result[i - 1][j - 1] = signedNumber.doubleValue();
 				} else {
@@ -3025,7 +3025,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		double[] result = new double[argSize()];
 		ISignedNumber signedNumber;
 		for (int i = 1; i < size(); i++) {
-			signedNumber = get(i).evalSignedNumber();
+			signedNumber = get(i).evalReal();
 			if (signedNumber != null) {
 				result[i - 1] = signedNumber.doubleValue();
 			} else {

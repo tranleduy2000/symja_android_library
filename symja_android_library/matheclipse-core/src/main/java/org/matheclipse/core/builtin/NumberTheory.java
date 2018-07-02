@@ -1001,7 +1001,7 @@ public final class NumberTheory {
 			if (size > 1) {
 				for (int i = 1; i < size; i++) {
 					IExpr expr = ast.get(i);
-					ISignedNumber temp = expr.evalSignedNumber();
+					ISignedNumber temp = expr.evalReal();
 					if (temp != null) {
 						if (temp.isZero()) {
 							return F.NIL;
@@ -3215,7 +3215,7 @@ public final class NumberTheory {
 			} else if (arg1.isReal() && arg1.isPositive()) {
 				x = engine.evaluate(((ISignedNumber) arg1).floorFraction());
 			} else {
-				ISignedNumber sn = arg1.evalSignedNumber();
+				ISignedNumber sn = arg1.evalReal();
 				if (sn != null) {
 					x = engine.evaluate(sn.floorFraction());
 				}

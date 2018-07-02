@@ -403,7 +403,7 @@ public abstract class IExprImpl implements IExpr {
      *
      * @return <code>null</code> if the conversion is not possible.
      */
-    public ISignedNumber evalSignedNumber() {
+    public ISignedNumber evalReal() {
         if (isReal()) {
             return (ISignedNumber) EvalEngine.get().evalN(this);
         }

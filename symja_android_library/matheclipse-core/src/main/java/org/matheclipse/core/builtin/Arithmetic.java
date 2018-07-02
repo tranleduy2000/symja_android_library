@@ -604,9 +604,9 @@ public final class Arithmetic {
                     if (min.isReal() && max.isReal()) {
                         return clip(x, (ISignedNumber) min, (ISignedNumber) max, vMin, vMax);
                     }
-                    ISignedNumber minEvaled = min.evalSignedNumber();
+                    ISignedNumber minEvaled = min.evalReal();
                     if (minEvaled != null) {
-                        ISignedNumber maxEvaled = max.evalSignedNumber();
+                        ISignedNumber maxEvaled = max.evalReal();
                         if (maxEvaled != null) {
                             return clip(x, (ISignedNumber) minEvaled, (ISignedNumber) maxEvaled, vMin, vMax);
                         }
@@ -627,7 +627,7 @@ public final class Arithmetic {
                 }
                 return x;
             }
-            ISignedNumber real = x.evalSignedNumber();
+            ISignedNumber real = x.evalReal();
             if (real != null) {
                 if (real.isGreaterThan(F.C1)) {
                     return F.C1;
@@ -667,7 +667,7 @@ public final class Arithmetic {
                 }
                 return x;
             }
-            ISignedNumber real = x.evalSignedNumber();
+            ISignedNumber real = x.evalReal();
             if (real != null) {
                 if (real.isGreaterThan(max)) {
                     return vMax;
