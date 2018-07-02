@@ -1702,6 +1702,7 @@ public class F {
 			PolynomialFunctions.initialize();
 			SeriesFunctions.initialize();
 			AssumptionFunctions.initialize();
+			CurveFitterFunctions.initialize();
 			ComputationalGeometryFunctions.initialize();
 
 			// initialize only the utility function rules for Integrate
