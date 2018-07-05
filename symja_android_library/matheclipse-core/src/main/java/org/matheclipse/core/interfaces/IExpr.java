@@ -2373,6 +2373,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     IExpr variables2Slots(final Map<IExpr, IExpr> map, final Collection<IExpr> variableCollector);
 
+    String toString();
+
     public enum COMPARE_TERNARY {
         TRUE, FALSE, UNDEFINED
     }
