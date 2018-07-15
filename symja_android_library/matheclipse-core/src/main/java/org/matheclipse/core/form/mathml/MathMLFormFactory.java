@@ -1,13 +1,18 @@
 package org.matheclipse.core.form.mathml;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.text.NumberFormat;
+import java.util.HashMap;
+
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalAttributes;
+import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
-import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.F;
@@ -29,14 +34,9 @@ import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.PostfixOperator;
 import org.matheclipse.parser.client.operator.PrefixOperator;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.text.NumberFormat;
-import java.util.HashMap;
-
 /**
- * Presentation generator generates MathML presentation output
- *
+ * Generates MathML presentation output
+ * 
  */
 public class MathMLFormFactory extends AbstractMathMLFormFactory {
 
@@ -173,7 +173,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 
 	@Override
 	public void convertDoubleComplex(final StringBuilder buf, final IComplexNum dc, final int precedence,
-									 boolean caller) {
+			boolean caller) {
 		if (dc instanceof ApcomplexNum) {
 			convertApcomplex(buf, ((ApcomplexNum) dc).apcomplexValue(), precedence);
 			return;
@@ -288,7 +288,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	}
 
 	public void convertFraction(final StringBuilder buf, final BigInteger n, BigInteger denominator,
-								final int precedence, boolean caller) {
+			final int precedence, boolean caller) {
 		boolean isInteger = denominator.compareTo(BigInteger.ONE) == 0;
 		BigInteger numerator = n;
 		final boolean isNegative = numerator.compareTo(BigInteger.ZERO) < 0;
@@ -695,7 +695,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	}
 
 	private boolean convertOperator(final org.matheclipse.parser.client.operator.Operator operator, final IAST list,
-									final StringBuilder buf, final int precedence, ISymbol head) {
+			final StringBuilder buf, final int precedence, ISymbol head) {
 		if ((operator instanceof PrefixOperator) && (list.isAST1())) {
 			convertPrefixOperator(buf, list, (PrefixOperator) operator, precedence);
 			return true;
@@ -743,7 +743,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	}
 
 	public void convertPrefixOperator(final StringBuilder buf, final IAST list, final PrefixOperator oper,
-									  final int precedence) {
+			final int precedence) {
 		tagStart(buf, "mrow");
 		if (oper.getPrecedence() < precedence) {
 			// append(buf, "(");
@@ -760,7 +760,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	}
 
 	public void convertInfixOperator(final StringBuilder buf, final IAST list, final InfixOperator oper,
-									 final int precedence) {
+			final int precedence) {
 
 		if (list.isAST2()) {
 			tagStart(buf, "mrow");
@@ -835,7 +835,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	}
 
 	public void convertPostfixOperator(final StringBuilder buf, final IAST list, final PostfixOperator oper,
-									   final int precedence) {
+			final int precedence) {
 		tagStart(buf, "mrow");
 		if (oper.getPrecedence() < precedence) {
 			// append(buf, "(");
@@ -883,7 +883,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 
 	/**
 	 * This method will only be called if <code>list.isAST2()==true</code> and the head equals "Part".
-	 *
+	 * 
 	 * @param buf
 	 * @param list
 	 * @throws IOException
@@ -913,7 +913,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 
 	/**
 	 * Convert a <code>SeriesData[...]</code> expression.
-	 *
+	 * 
 	 * @param buf
 	 * @param seriesData
 	 *            <code>SeriesData[x, x0, list, nmin, nmax, den]</code> expression
@@ -980,7 +980,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 
 	/**
 	 * Convert a factor of a <code>SeriesData</code> object.
-	 *
+	 * 
 	 * @param buf
 	 * @param coefficient
 	 *            the coefficient expression of the factor
