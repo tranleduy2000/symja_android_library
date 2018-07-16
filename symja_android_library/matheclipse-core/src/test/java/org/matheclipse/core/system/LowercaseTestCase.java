@@ -464,6 +464,21 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ArrayQ({{a, b}, {c, d}},2,SymbolQ)", "True");
 	}
 
+	public void testArrayReshape() {
+		check("ArrayReshape(Range(1000), {3, 2, 2})", //
+				"{{{1,2},{3,4}},{{5,6},{7,8}},{{9,10},{11,12}}}");
+		check("ArrayReshape({a, b, c, d, e, f}, {2, 3})", //
+				"{{a,b,c},{d,e,f}}");
+		check("ArrayReshape({a, b, c, d, e, f}, {2, 3, 1})", //
+				"{{{a},{b},{c}},{{d},{e},{f}}}");
+		check("ArrayReshape(Range(24), {2, 3, 4})", //
+				"{{{1,2,3,4},{5,6,7,8},{9,10,11,12}},{{13,14,15,16},{17,18,19,20},{21,22,23,24}}}");
+		check("ArrayReshape({a, b, c, d, e, f}, {2, 7})", //
+				"{{a,b,c,d,e,f,0},{0,0,0,0,0,0,0}}");
+		check("ArrayReshape({a, b, c, d, e, f}, {2, 3, 3,2}, x)", //
+				"{{{{a,b},{c,d},{e,f}},{{x,x},{x,x},{x,x}},{{x,x},{x,x},{x,x}}},{{{x,x},{x,x},{x,x}},{{x,x},{x,x},{x,x}},{{x,x},{x,x},{x,x}}}}");
+
+	}
 	public void testAtomQ() {
 		check("AtomQ(Sin(Pi))", "True");
 		check("AtomQ(x)", "True");
@@ -10012,7 +10027,25 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testTrigToExp() {
 		check("a+E^x", "a+E^x");
+		check("TrigToExp(ArcCos(x))", "Pi/2+I*Log(I*x+Sqrt(1-x^2))");
+		check("TrigToExp(ArcCsc(x))", "-I*Log(Sqrt(1-1/x^2)+I/x)");
+		check("TrigToExp(ArcCot(x))", "I*1/2*Log(1-I/x)-I*1/2*Log(1+I/x)");
+		check("TrigToExp(ArcSec(x))", "Pi/2+I*Log(Sqrt(1-1/x^2)+I/x)");
+		check("TrigToExp(ArcSin(x))", "-I*Log(I*x+Sqrt(1-x^2))");
+		check("TrigToExp(ArcTan(x))", "I*1/2*Log(1-I*x)-I*1/2*Log(1+I*x)");
+		check("TrigToExp(ArcTan(x, y))", "-I*Log((x+I*y)/Sqrt(x^2+y^2))");
+
+		check("TrigToExp(ArcCosh(x))", "Log(x+Sqrt(-1+x)*Sqrt(1+x))");
+		check("TrigToExp(ArcCsch(x))", "Log(Sqrt(1+1/x^2)+1/x)");
+		check("TrigToExp(ArcCoth(x))", "-Log(1-1/x)/2+Log(1+1/x)/2");
+		check("TrigToExp(ArcSech(x))", "Log(Sqrt(-1+1/x)*Sqrt(1+1/x)+1/x)");
+		check("TrigToExp(ArcSinh(x))", "Log(x+Sqrt(1+x^2))");
+		check("TrigToExp(ArcTanh(x))", "-Log(1-x)/2+Log(1+x)/2");
 		check("TrigToExp(Cos(x))", "1/(2*E^(I*x))+E^(I*x)/2");
+		check("TrigToExp(Cot(x))", "(-I*(E^(-I*x)+E^(I*x)))/(E^(-I*x)-E^(I*x))");
+		check("TrigToExp(Csc(x))", "(-I*2)/(E^(-I*x)-E^(I*x))");
+		check("TrigToExp(Sec(x))", "2/(E^(-I*x)+E^(I*x))");
+		check("TrigToExp(Tan(x))", "(I*(E^(-I*x)-E^(I*x)))/(E^(-I*x)+E^(I*x))");
 		check("TrigToExp(Cosh(x)+a)", "a+1/2*(E^(-x)+E^x)");
 		check("TrigToExp(Csch(x)+a)", "a+2/(-1/E^x+E^x)");
 		check("TrigToExp(Coth(x)+a)", "a+(E^(-x)+E^x)/(-1/E^x+E^x)");
