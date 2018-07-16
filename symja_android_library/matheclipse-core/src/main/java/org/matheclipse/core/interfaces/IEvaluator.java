@@ -6,7 +6,9 @@ package org.matheclipse.core.interfaces;
  *
  */
 public interface IEvaluator {
-	public void join();
+	default void await()  throws InterruptedException {
+		// do nothing
+	}
 
 	/**
 	 * This method will be called every time a new ISymbol will be created.

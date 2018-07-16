@@ -160,7 +160,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 
 		VariablesSet variablesSet = determineIteratorExprVariables(ast);
 		IAST varList = variablesSet.getVarList();
-		IExpr argN = ast.get(ast.argSize());
+		IExpr argN = ast.last();
 		IIterator<IExpr> iterator = null;
 
 		if (argN.isList()) {
@@ -174,7 +174,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 			// return temp;
 			// } else {
 			// IAST result = ast.clone();
-			// result.remove(ast.size() - 1);
+			// result.remove(ast.argSize());
 			// result.set(1, temp);
 			// return result;
 			// }
@@ -291,7 +291,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 			if (from.isZero()) {
 				return F.Times(Plus(to, C1), arg1);
 			}
-			if (!engine.evalTrue(F.Greater(C1, from)) && !engine.evalTrue(F.Greater(from, to))) {
+			if (!F.Greater.ofQ(engine, C1, from) && !F.Greater.ofQ(engine, from, to)) {
 				return F.Times(Plus(C1, F.Negate(from), to), arg1);
 			}
 		} else {
@@ -379,10 +379,10 @@ public class Sum extends ListFunctions.Table implements SumRules {
 		if (from.isInteger() && !from.isOne()) {
 			IExpr subSum = engine.evaluateNull(F.Sum(expr, F.List(var, C1, to)));
 			if (subSum.isPresent()) {
-				if (engine.evalTrue(F.Less(from, C1))) {
+				if (F.Less.ofQ(engine, from, C1)) {
 					return F.Plus(F.Sum(expr, F.List(var, from, C0)), subSum);
 				}
-				if (engine.evalTrue(F.Greater(from, C1))) {
+				if (F.Greater.ofQ(engine, from, C1)) {
 					return F.Subtract(subSum, F.Sum(expr, F.List(var, C1, from.minus(F.C1))));
 				}
 			}
@@ -499,7 +499,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 		newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.DELAYED_RULE_EVALUATION);
 		IAST ruleList;
 		if ((ruleList = getRuleAST()) != null) {
-			EvalEngine.get().addRules(ruleList);
+//			EvalEngine.get().addRules(ruleList);
 		}
 
 	}

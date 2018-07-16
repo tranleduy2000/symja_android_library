@@ -349,23 +349,20 @@ public class EvalEngine implements Serializable {
 		fOutList.add(fAnswer);
 	}
 
-	public void addRules(IAST ruleList) {
-		boolean oldTraceMode = isTraceMode();
-		try {
-			setTraceMode(false);
-			ruleList.forEach(new Consumer<IExpr>() {
-				@Override
-				public void accept(IExpr x) {
-					if (x.isPresent()) {
-						evaluate(x);
-					}
-				}
-			});
-		} finally {
+//	public void addRules(IAST ruleList) {
+//		boolean oldTraceMode = isTraceMode();
+//		try {
+//			setTraceMode(false);
+//			ruleList.forEach(x -> {
+//				if (x.isPresent()) {
+//					evaluate(x);
+//				}
+//			});
+//		} finally {
 
-			setTraceMode(oldTraceMode);
-		}
-	}
+//			setTraceMode(oldTraceMode);
+//		}
+//	}
 
 	private void beginTrace(Predicate<IExpr> matcher, IAST list) {
 		setTraceMode(true);
@@ -1220,7 +1217,12 @@ public class EvalEngine implements Serializable {
 	 */
 	public IExpr evalRules(ISymbol symbol, IAST ast) {
 		if (symbol instanceof BuiltInSymbol) {
-			((BuiltInSymbol) symbol).getEvaluator().join();
+			try {
+				((BuiltInSymbol) symbol).getEvaluator().await();
+			} catch (InterruptedException ie) {
+				printMessage("EvalEngine#evalRules( )  interrupted");
+				return F.NIL;
+			}
 		}
 		IExpr[] result = new IExpr[1];
 		result[0] = F.NIL;

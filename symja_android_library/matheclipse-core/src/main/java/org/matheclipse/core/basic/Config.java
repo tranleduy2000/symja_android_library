@@ -169,6 +169,15 @@ public class Config {
 	public static boolean JAS_NO_THREADS = false;
 
 	/**
+	 * An object that creates new threads on demand. Using thread factories removes hardwiring of calls to new Thread,
+	 * enabling applications to use special thread subclasses, priorities, etc.
+	 *
+	 * For example <code>com.google.appengine.api.ThreadManager.currentRequestThreadFactory()</code> can be used on
+	 * Google appengine.
+	 *
+	 */
+	public static java.util.concurrent.ThreadFactory THREAD_FACTORY = null;
+	/**
 	 * Use <code>Num</code> objects for numeric calculations up to 15 digits precision.
 	 */
 	public static final int MACHINE_PRECISION = 15;
