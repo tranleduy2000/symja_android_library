@@ -2,6 +2,7 @@ package org.matheclipse.core.expression;
 
 public class ID {
 
+<<<<<<< HEAD
 
     public final static int UNKNOWN = -1;
     public final static int Abort = 0;
@@ -42,6 +43,47 @@ public class ID {
     public final static int ArrayDepth = 35;
     public final static int ArrayPad = 36;
     public final static int ArrayQ = 37;
+=======
+	public final static int UNKNOWN = -1;
+	public final static int Abort = 0;
+	public final static int Abs = 1;
+	public final static int AbsArg = 2;
+	public final static int Accumulate = 3;
+	public final static int AddTo = 4;
+	public final static int AlgebraicNumber = 5;
+	public final static int Algebraics = 6;
+	public final static int All = 7;
+	public final static int AllTrue = 8;
+	public final static int Alternatives = 9;
+	public final static int And = 10;
+	public final static int AngleVector = 11;
+	public final static int AntiSymmetric = 12;
+	public final static int AntihermitianMatrixQ = 13;
+	public final static int AntisymmetricMatrixQ = 14;
+	public final static int AnyTrue = 15;
+	public final static int Apart = 16;
+	public final static int AppellF1 = 17;
+	public final static int Append = 18;
+	public final static int AppendTo = 19;
+	public final static int Apply = 20;
+	public final static int ArcCos = 21;
+	public final static int ArcCosh = 22;
+	public final static int ArcCot = 23;
+	public final static int ArcCoth = 24;
+	public final static int ArcCsc = 25;
+	public final static int ArcCsch = 26;
+	public final static int ArcSec = 27;
+	public final static int ArcSech = 28;
+	public final static int ArcSin = 29;
+	public final static int ArcSinh = 30;
+	public final static int ArcTan = 31;
+	public final static int ArcTanh = 32;
+	public final static int Arg = 33;
+	public final static int Array = 34;
+	public final static int ArrayDepth = 35;
+	public final static int ArrayPad = 36;
+	public final static int ArrayQ = 37;
+>>>>>>> b26aa647a... #41 Refactor functions Curl, Div, Grad to VectorAnalysisFunctions.java
 	public final static int ArrayReshape = 38;
 	public final static int Arrays = 39;
 	public final static int Assumptions = 40;

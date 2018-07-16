@@ -84,7 +84,6 @@ public class CurveFitterFunctions {
 			final IExpr function;
 			IAST gradientList;
 			IASTAppendable listOfRules;
-			
 
 			public FindFitParametricFunction(final IExpr function, final IAST gradientList, final IAST listOfSymbols,
 					final ISymbol x, final EvalEngine engine) {
@@ -243,10 +242,18 @@ public class CurveFitterFunctions {
 						if (gradientList.isList()) {
 							AbstractCurveFitter fitter = SimpleCurveFitter.create(new FindFitParametricFunction(
 									function, (IAST) gradientList, listOfSymbols, x, engine), initialGuess);
+<<<<<<< HEAD
 						WeightedObservedPoints obs = new WeightedObservedPoints();
 						if (addWeightedObservedPoints(data, obs)) {
 							double[] values = fitter.fit(obs.toList());
 							return convertToRulesList(listOfSymbols, values);
+=======
+							WeightedObservedPoints obs = new WeightedObservedPoints();
+							if (addWeightedObservedPoints(data, obs)) {
+								double[] values = fitter.fit(obs.toList());
+								return convertToRulesList(listOfSymbols, values);
+							}
+>>>>>>> b26aa647a... #41 Refactor functions Curl, Div, Grad to VectorAnalysisFunctions.java
 						}
 						}
 					} catch (MathException ex) {

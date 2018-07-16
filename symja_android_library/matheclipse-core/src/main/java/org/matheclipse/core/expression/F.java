@@ -44,6 +44,7 @@ import org.matheclipse.core.builtin.StatisticsFunctions;
 import org.matheclipse.core.builtin.StringFunctions;
 import org.matheclipse.core.builtin.Structure;
 import org.matheclipse.core.builtin.TensorFunctions;
+import org.matheclipse.core.builtin.VectorAnalysisFunctions;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -3982,6 +3983,10 @@ public class F {
 	public static IAST Grad(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Grad, a0, a1);
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> b26aa647a... #41 Refactor functions Curl, Div, Grad to VectorAnalysisFunctions.java
 	public static IASTAppendable Graphics() {
 		return ast(Graphics);
 	}

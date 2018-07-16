@@ -1740,6 +1740,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "2,0,1)[f][x,y,z],Derivative(1,1,1)[f][x,y,z],Derivative(1,0,2)[f][x,y,z]},{Derivative(\n"
 						+ "1,1,1)[f][x,y,z],Derivative(0,2,1)[f][x,y,z],Derivative(0,1,2)[f][x,y,z]},{Derivative(\n"
 						+ "1,0,2)[f][x,y,z],Derivative(0,1,2)[f][x,y,z],Derivative(0,0,3)[f][x,y,z]}}}");
+<<<<<<< HEAD
+=======
+
+>>>>>>> b26aa647a... #41 Refactor functions Curl, Div, Grad to VectorAnalysisFunctions.java
 		check("Refine(D(Abs(x),x), Element(x, Reals))", //
 				"x/Abs(x)");
 
@@ -1766,6 +1770,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("D(y, x)", "0");
 		check("D(x, x)", "1");
 		check("D(f(x), x)", "f'(x)");
+<<<<<<< HEAD
+=======
+		 
+>>>>>>> b26aa647a... #41 Refactor functions Curl, Div, Grad to VectorAnalysisFunctions.java
 		check("D(f(x, x), x)", "Derivative(0,1)[f][x,x]+Derivative(1,0)[f][x,x]");
 		// chain rule
 		check("D(f(2*x+1, 2*y, x+y), x)", "Derivative(0,0,1)[f][1+2*x,2*y,x+y]+2*Derivative(1,0,0)[f][1+2*x,2*y,x+y]");
@@ -3701,7 +3709,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{Derivative(1,0)[f][x,y],Derivative(0,1)[f][x,y]}");
 		check("Grad(Sin(x^2 + y^2), {x, y})", //
 				"{2*x*Cos(x^2+y^2),2*y*Cos(x^2+y^2)}");
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> b26aa647a... #41 Refactor functions Curl, Div, Grad to VectorAnalysisFunctions.java
 		// wikipedia
 		check("Grad(2*x+3*y^2-Sin(z), {x, y, z})", //
 				"{2,6*y,-Cos(z)}");
