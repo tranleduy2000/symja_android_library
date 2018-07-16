@@ -16,6 +16,7 @@ import java.io.StringWriter;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
 /**
  * Tests system.reflection classes
@@ -38,20 +39,34 @@ public abstract class AbstractTestCase extends TestCase {
         check(fScriptEngine, evalString, expectedResult, resultLength);
     }
 
-    public void check(ScriptEngine scriptEngine, String evalString, String expectedResult, int resultLength) {
+    public void check(final ScriptEngine scriptEngine, final String evalString, final String expectedResult, final int resultLength) {
         try {
             if (evalString.length() == 0 && expectedResult.length() == 0) {
                 return;
             }
-            // scriptEngine.put("STEPWISE",Boolean.TRUE);
-            String evaledResult = (String) scriptEngine.eval(evalString);
+            ThreadGroup group = new ThreadGroup("CalculateThread");
+            Thread thread = new Thread(group, new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // scriptEngine.put("STEPWISE",Boolean.TRUE);
+                        String evaledResult = (String) scriptEngine.eval(evalString);
 
-            if (resultLength > 0 && evaledResult.length() > resultLength) {
-                evaledResult = evaledResult.substring(0, resultLength) + "<<SHORT>>";
-                assertEquals(expectedResult, evaledResult);
-            } else {
-                assertEquals(expectedResult, evaledResult);
-            }
+                        if (resultLength > 0 && evaledResult.length() > resultLength) {
+                            evaledResult = evaledResult.substring(0, resultLength) + "<<SHORT>>";
+                            assertEquals(expectedResult, evaledResult);
+                        } else {
+                            assertEquals(expectedResult, evaledResult);
+                        }
+                    } catch (ScriptException e) {
+                        e.printStackTrace();
+                        assertEquals(e.getMessage(), "");
+                    }
+                }
+            }, "CalculateThread", 20971520/*2MB*/);
+            thread.start();
+            thread.join();
+
         } catch (Exception e) {
             e.printStackTrace();
             assertEquals("", "1");
