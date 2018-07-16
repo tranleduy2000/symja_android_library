@@ -59,12 +59,12 @@ public class AST2Expr {
 			"AngleVector", "AnyTrue", "AntihermitianMatrixQ", "AntiSymmetric", "AntisymmetricMatrixQ",
 			"AlgebraicNumber", "Alternatives", "Apart", "AppellF1", "Append", "AppendTo", "Apply", "ArcCos", "ArcCosh",
 			"ArcCot", "ArcCoth", "ArcCsc", "ArcCsch", "ArcSec", "ArcSech", "ArcSin", "ArcSinh", "ArcTan", "ArcTanh",
-			"Arg", "Array", "ArrayDepth", "ArrayPad", "Arrays", "ArrayQ", "Assumptions", "AtomQ", "Attributes", "Begin",
-			"BeginPackage", "BellB", "BellY", "BernoulliB", "BernoulliDistribution", "BesselI", "BesselJ", "BesselK",
-			"BesselY", "Beta", "BetaRegularized", "BinCounts", "Binomial", "BinomialDistribution", "BitLength", "Blank",
-			"Block", "Boole", "BooleanQ", "BooleanConvert", "BooleanMinimize", "BooleanTable", "BooleanVariables",
-			"BrayCurtisDistance", "Break", "CanberraDistance", "Cancel", "CarmichaelLambda", "CartesianProduct",
-			"Cases", "CatalanNumber", "Catch", "Catenate", "CDF", "Ceiling", "CentralMoment",
+			"Arg", "Array", "ArrayDepth", "ArrayPad", "ArrayReshape", "Arrays", "ArrayQ", "Assumptions", "AtomQ",
+			"Attributes", "Begin", "BeginPackage", "BellB", "BellY", "BernoulliB", "BernoulliDistribution", "BesselI",
+			"BesselJ", "BesselK", "BesselY", "Beta", "BetaRegularized", "BinCounts", "Binomial", "BinomialDistribution",
+			"BitLength", "Blank", "Block", "Boole", "BooleanQ", "BooleanConvert", "BooleanMinimize", "BooleanTable",
+			"BooleanVariables", "BrayCurtisDistance", "Break", "CanberraDistance", "Cancel", "CarmichaelLambda",
+			"CartesianProduct", "Cases", "CatalanNumber", "Catch", "Catenate", "CDF", "Ceiling", "CentralMoment",
 			"CharacteristicPolynomial", "ChebyshevT", "ChebyshevU", "ChessboardDistance", "ChineseRemainder",
 			"CholeskyDecomposition", "Chop", "CirclePoints", "Clear", "ClearAll", "ClearAttributes", "Clip",
 			"Coefficient", "CoefficientList", "CoefficientRules", "Colon", "Collect", "Commonest", "Complement",
@@ -76,7 +76,7 @@ public class AST2Expr {
 			"DeleteCases", "DeleteDuplicates", "Denominator", "Depth", "Derivative", "DesignMatrix", "Det", "Diagonal",
 			"DiagonalMatrix", "DiceDissimilarity", "Differences", "DigitQ", "Dimensions", "DiracDelta", "DiscreteDelta",
 			"DiscreteUniformDistribution", "DirectedInfinity", "Direction", "Discriminant", "Distribute", "Distributed",
-			"Divergence", "Divide", "DivideBy", "Divisible", "Divisors", "DivisorSigma", "Do", "Dot", "Drop", "DSolve",
+			"Div", "Divide", "DivideBy", "Divisible", "Divisors", "DivisorSigma", "Do", "Dot", "Drop", "DSolve",
 			"EasterSunday", "Eigenvalues", "Eigenvectors", "Element", "ElementData", "Eliminate", "EllipticE",
 			"EllipticF", "EllipticK", "EllipticPi", "End", "EndPackage", "Equal", "Equivalent", "Erf", "Erfc", "Erfi",
 			"ErlangDistribution", "EuclideanDistance", "EulerE", "EulerPhi", "Evaluate", "EvenQ", "ExactNumberQ",
@@ -88,7 +88,7 @@ public class AST2Expr {
 			"FresnelC", "FresnelS", "FrobeniusNumber", "FrobeniusSolve", "FromCharacterCode", "FromContinuedFraction",
 			"FromDigits", "FromPolarCoordinates", "FullForm", "FullSimplify", "Function", "FunctionExpand", "Gamma",
 			"GammaDistribution", "GammaRegularized", "Gather", "GCD", "GegenbauerC", "GeometricDistribution",
-			"GeometricMean", "Get", "Graphics", "Graphics3D", "Greater", "GreaterEqual", "GroebnerBasis",
+			"GeometricMean", "Get", "Grad", "Graphics", "Graphics3D", "Greater", "GreaterEqual", "GroebnerBasis",
 			"GumbelDistribution", "Haversine", "HarmonicNumber", "Head", "HeavisideTheta", "HermiteH",
 			"HermitianMatrixQ", "HilbertMatrix", "Hold", "HoldForm", "HoldPattern", "Horner", "HornerForm",
 			"HurwitzZeta", "HypergeometricDistribution", "HypergeometricPFQ", "Hypergeometric1F1", "Hypergeometric2F1",
@@ -151,10 +151,10 @@ public class AST2Expr {
 
 	public static final Map<String, String> PREDEFINED_SYMBOLS_MAP = new HashMap<String, String>(997);
 
-	private final static String[] ALIASES_STRINGS = { "ACos", "ASin", "ATan", "ACosh", "ASinh", "ATanh", "Diff",
-			"EvalF", "Int", "Ln", "Trunc", "NthRoot" };
+	private final static String[] ALIASES_STRINGS = { "ACos", "ASin", "ATan", "ACosh", "ASinh", "ATanh", "Divergence",
+			"Diff", "EvalF", "Int", "Ln", "Trunc", "NthRoot" };
 	private final static String[] ALIASES_SUBSTITUTES = { "ArcCos", "ArcSin", "ArcTan", "ArcCosh", "ArcSinh", "ArcTanh",
-			"D", "N", "Integrate", "Log", "IntegerPart", "Surd" };
+			"Div", "D", "N", "Integrate", "Log", "IntegerPart", "Surd" };
 
 	/**
 	 * Aliases which are mapped to the standard function symbols.

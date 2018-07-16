@@ -192,6 +192,7 @@ public class F {
 	public final static IBuiltInSymbol ArrayDepth = F.initFinalSymbol("ArrayDepth", ID.ArrayDepth);
 	public final static IBuiltInSymbol ArrayPad = F.initFinalSymbol("ArrayPad", ID.ArrayPad);
 	public final static IBuiltInSymbol ArrayQ = F.initFinalSymbol("ArrayQ", ID.ArrayQ);
+	public final static IBuiltInSymbol ArrayReshape = F.initFinalSymbol("ArrayReshape", ID.ArrayReshape);
 	public final static IBuiltInSymbol Arrays = F.initFinalSymbol("Arrays", ID.Arrays);
 	public final static IBuiltInSymbol Assumptions = F.initFinalSymbol("Assumptions", ID.Assumptions);
 	public final static IBuiltInSymbol AtomQ = F.initFinalSymbol("AtomQ", ID.AtomQ);
@@ -338,7 +339,7 @@ public class F {
 	public final static IBuiltInSymbol Disputed = F.initFinalSymbol("Disputed", ID.Disputed);
 	public final static IBuiltInSymbol Distribute = F.initFinalSymbol("Distribute", ID.Distribute);
 	public final static IBuiltInSymbol Distributed = F.initFinalSymbol("Distributed", ID.Distributed);
-	public final static IBuiltInSymbol Divergence = F.initFinalSymbol("Divergence", ID.Divergence);
+	public final static IBuiltInSymbol Div = F.initFinalSymbol("Div", ID.Div);
 	public final static IBuiltInSymbol Divide = F.initFinalSymbol("Divide", ID.Divide);
 	public final static IBuiltInSymbol DivideBy = F.initFinalSymbol("DivideBy", ID.DivideBy);
 	public final static IBuiltInSymbol Divisible = F.initFinalSymbol("Divisible", ID.Divisible);
@@ -444,6 +445,7 @@ public class F {
 	public final static IBuiltInSymbol Get = F.initFinalSymbol("Get", ID.Get);
 	public final static IBuiltInSymbol Glaisher = F.initFinalSymbol("Glaisher", ID.Glaisher);
 	public final static IBuiltInSymbol GoldenRatio = F.initFinalSymbol("GoldenRatio", ID.GoldenRatio);
+	public final static IBuiltInSymbol Grad = F.initFinalSymbol("Grad", ID.Grad);
 	public final static IBuiltInSymbol Graphics = F.initFinalSymbol("Graphics", ID.Graphics);
 	public final static IBuiltInSymbol Graphics3D = F.initFinalSymbol("Graphics3D", ID.Graphics3D);
 	public final static IBuiltInSymbol Greater = F.initFinalSymbol("Greater", ID.Greater);
@@ -1587,7 +1589,7 @@ public class F {
 					Coth, Count, Cross, Csc, Csch, Curl, Decrement, Default, Defer, Definition, Delete, DeleteCases,
 					// DeleteDuplicates,
 					Denominator, Depth, Derivative, Det, DiagonalMatrix, DigitQ, Dimensions, DirectedInfinity,
-					Discriminant, Distribute, Divergence, DivideBy, Divisible,
+					Discriminant, Distribute, Div, DivideBy, Divisible,
 					// Divisors,
 					Do, Dot, Drop, Eigenvalues, Eigenvectors, Element,
 					// Eliminate,
@@ -1704,6 +1706,7 @@ public class F {
 			SeriesFunctions.initialize();
 			AssumptionFunctions.initialize();
 			CurveFitterFunctions.initialize();
+			VectorAnalysisFunctions.initialize();
 			ComputationalGeometryFunctions.initialize();
 
 			// initialize only the utility function rules for Integrate
@@ -3976,6 +3979,9 @@ public class F {
 		return binaryAST2(GegenbauerC, a0, a1);
 	}
 
+	public static IAST Grad(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Grad, a0, a1);
+	}
 	public static IASTAppendable Graphics() {
 		return ast(Graphics);
 	}
