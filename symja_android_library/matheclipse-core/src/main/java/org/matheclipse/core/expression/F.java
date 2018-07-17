@@ -6598,6 +6598,7 @@ public class F {
 	public static IAST List(final IExpr... a) {
 		switch (a.length) {
 		case 1:
+			if (a[0] != null) {
 			if (a[0].equals(F.C0)) {
 				return F.CListC0;
 			}
@@ -6608,7 +6609,10 @@ public class F {
 				return F.CListC2;
 			}
 			return unaryAST1(List, a[0]);
+			}
+			break;
 		case 2:
+			if (a[0] != null) {
 			if (a[0].equals(F.C1)) {
 				if (a[1].equals(F.C1)) {
 					return F.CListC1C1;
@@ -6625,6 +6629,8 @@ public class F {
 				}
 			}
 			return binaryAST2(List, a[0], a[1]);
+			}
+			break;
 		case 3:
 			return ternaryAST3(List, a[0], a[1], a[2]);
 		}

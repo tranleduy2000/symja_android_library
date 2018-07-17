@@ -449,7 +449,11 @@ public class HypergeometricFunctions {
 		}
 	}
 
-	private static class Hypergeometric2F1 extends AbstractFunctionEvaluator {
+	private static class Hypergeometric2F1 extends AbstractFunctionEvaluator implements Hypergeometric2F1Rules {
+		@Override
+		public IAST getRuleAST() {
+			return RULES;
+		}
 
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
