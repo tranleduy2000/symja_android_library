@@ -5,7 +5,9 @@ package org.matheclipse.core.interfaces;
  */
 
 public abstract class IEvaluatorImpl implements IEvaluator {
-    public void join() {
+
+    @Override
+    public void await() throws InterruptedException{
         // do nothing
     }
 }

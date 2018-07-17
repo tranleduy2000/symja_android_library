@@ -1896,10 +1896,10 @@ public final class Multimaps {
 
         @Override
         Iterator<Multiset.Entry<K>> entryIterator() {
-            return new TransformedIterator<Entry<K, Collection<V>>, Multiset.Entry<K>>(
+            return new TransformedIterator<Map.Entry<K, Collection<V>>, Multiset.Entry<K>>(
                     multimap.asMap().entrySet().iterator()) {
                 @Override
-                Multiset.Entry<K> transform(final Entry<K, Collection<V>> backingEntry) {
+                Multiset.Entry<K> transform(final Map.Entry<K, Collection<V>> backingEntry) {
                     return new Multisets.AbstractEntry<K>() {
                         @Override
                         public K getElement() {

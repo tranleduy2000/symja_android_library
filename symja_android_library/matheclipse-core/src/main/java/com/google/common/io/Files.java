@@ -25,8 +25,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.TreeTraverser;
 import com.google.common.graph.SuccessorsFunction;
 import com.google.common.graph.Traverser;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import java.io.BufferedReader;
@@ -528,22 +526,6 @@ public final class Files {
     @CanIgnoreReturnValue // some processors won't return a useful result
     public static <T> T readBytes(File file, ByteProcessor<T> processor) throws IOException {
         return asByteSource(file).read(processor);
-    }
-
-    /**
-     * Computes the hash code of the {@code file} using {@code hashFunction}.
-     *
-     * @param file         the file to read
-     * @param hashFunction the hash function to use to hash the data
-     * @return the {@link HashCode} of all of the bytes in the file
-     * @throws IOException if an I/O error occurs
-     * @since 12.0
-     * @deprecated Prefer {@code asByteSource(file).hash(hashFunction)}. This method is scheduled to
-     * be removed in January 2019.
-     */
-    @Deprecated
-    public static HashCode hash(File file, HashFunction hashFunction) throws IOException {
-        return asByteSource(file).hash(hashFunction);
     }
 
     /**

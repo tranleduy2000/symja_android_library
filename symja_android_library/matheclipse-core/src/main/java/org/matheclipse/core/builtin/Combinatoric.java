@@ -7,6 +7,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.eval.util.IntRangeSpec;
 import org.matheclipse.core.eval.util.LevelSpecification;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;

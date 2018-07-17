@@ -14,18 +14,25 @@
 
 package com.google.thirdparty.publicsuffix;
 
+import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 
 /**
- * Specifies the type of a top-level domain definition.
+ * <b>Do not use this class directly. For access to public-suffix information, use {@link
+ * com.google.common.net.InternetDomainName}.</b>
+ *
+ * <p>Specifies the type of a top-level domain definition.
+ *
+ * @since 23.3
  */
+@Beta
 @GwtCompatible
-enum PublicSuffixType {
+public enum PublicSuffixType {
 
-  /** private definition of a top-level domain */
+  /** Public suffix that is provided by a private company, e.g. "blogspot.com" */
   PRIVATE(':', ','),
-  /** ICANN definition of a top-level domain */
-  ICANN('!', '?');
+  /** Public suffix that is backed by an ICANN-style domain name registry */
+  REGISTRY('!', '?');
 
   /** The character used for an inner node in the trie encoding */
   private final char innerNodeCode;
@@ -33,7 +40,7 @@ enum PublicSuffixType {
   /** The character used for a leaf node in the trie encoding */
   private final char leafNodeCode;
 
-  private PublicSuffixType(char innerNodeCode, char leafNodeCode) {
+  PublicSuffixType(char innerNodeCode, char leafNodeCode) {
     this.innerNodeCode = innerNodeCode;
     this.leafNodeCode = leafNodeCode;
   }
@@ -57,6 +64,6 @@ enum PublicSuffixType {
   }
 
   static PublicSuffixType fromIsPrivate(boolean isPrivate) {
-    return isPrivate ? PRIVATE : ICANN;
+    return isPrivate ? PRIVATE : REGISTRY;
   }
 }

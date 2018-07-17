@@ -19,10 +19,6 @@ import com.google.common.annotations.GwtIncompatible;
 import com.google.common.base.Ascii;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.hash.Funnels;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hasher;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import java.io.BufferedInputStream;
@@ -396,17 +392,6 @@ public abstract class ByteSource {
     }
 
     /**
-     * Hashes the contents of this byte source using the given hash function.
-     *
-     * @throws IOException if an I/O error occurs while reading from this source
-     */
-    public HashCode hash(HashFunction hashFunction) throws IOException {
-        Hasher hasher = hashFunction.newHasher();
-        copyTo(Funnels.asOutputStream(hasher));
-        return hasher.hash();
-    }
-
-    /**
      * Checks that the contents of this byte source are equal to the contents of the given byte
      * source.
      *
@@ -496,11 +481,6 @@ public abstract class ByteSource {
         public long copyTo(OutputStream output) throws IOException {
             output.write(bytes, offset, length);
             return length;
-        }
-
-        @Override
-        public HashCode hash(HashFunction hashFunction) throws IOException {
-            return hashFunction.hashBytes(bytes, offset, length);
         }
 
         @Override

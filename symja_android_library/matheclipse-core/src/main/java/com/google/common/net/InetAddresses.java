@@ -19,7 +19,6 @@ import com.google.common.annotations.GwtIncompatible;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 
@@ -749,91 +748,6 @@ public final class InetAddresses {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Coerces an IPv6 address into an IPv4 address.
-     * <p>
-     * <p>HACK: As long as applications continue to use IPv4 addresses for indexing into tables,
-     * accounting, et cetera, it may be necessary to <b>coerce</b> IPv6 addresses into IPv4 addresses.
-     * This function does so by hashing the upper 64 bits into {@code 224.0.0.0/3} (64 bits into 29
-     * bits).
-     * <p>
-     * <p>A "coerced" IPv4 address is equivalent to itself.
-     * <p>
-     * <p>NOTE: This function is failsafe for security purposes: ALL IPv6 addresses (except localhost
-     * (::1)) are hashed to avoid the security risk associated with extracting an embedded IPv4
-     * address that might permit elevated privileges.
-     *
-     * @param ip {@link InetAddress} to "coerce"
-     * @return {@link Inet4Address} represented "coerced" address
-     * @since 7.0
-     */
-    public static Inet4Address getCoercedIPv4Address(InetAddress ip) {
-        if (ip instanceof Inet4Address) {
-            return (Inet4Address) ip;
-        }
-
-        // Special cases:
-        byte[] bytes = ip.getAddress();
-        boolean leadingBytesOfZero = true;
-        for (int i = 0; i < 15; ++i) {
-            if (bytes[i] != 0) {
-                leadingBytesOfZero = false;
-                break;
-            }
-        }
-        if (leadingBytesOfZero && (bytes[15] == 1)) {
-            return LOOPBACK4; // ::1
-        } else if (leadingBytesOfZero && (bytes[15] == 0)) {
-            return ANY4; // ::0
-        }
-
-        Inet6Address ip6 = (Inet6Address) ip;
-        long addressAsLong = 0;
-        if (hasEmbeddedIPv4ClientAddress(ip6)) {
-            addressAsLong = getEmbeddedIPv4ClientAddress(ip6).hashCode();
-        } else {
-
-            // Just extract the high 64 bits (assuming the rest is user-modifiable).
-            addressAsLong = ByteBuffer.wrap(ip6.getAddress(), 0, 8).getLong();
-        }
-
-        // Many strategies for hashing are possible. This might suffice for now.
-        int coercedHash = Hashing.murmur3_32().hashLong(addressAsLong).asInt();
-
-        // Squash into 224/4 Multicast and 240/4 Reserved space (i.e. 224/3).
-        coercedHash |= 0xe0000000;
-
-        // Fixup to avoid some "illegal" values. Currently the only potential
-        // illegal value is 255.255.255.255.
-        if (coercedHash == 0xffffffff) {
-            coercedHash = 0xfffffffe;
-        }
-
-        return getInet4Address(Ints.toByteArray(coercedHash));
-    }
-
-    /**
-     * Returns an integer representing an IPv4 address regardless of whether the supplied argument is
-     * an IPv4 address or not.
-     * <p>
-     * <p>IPv6 addresses are <b>coerced</b> to IPv4 addresses before being converted to integers.
-     * <p>
-     * <p>As long as there are applications that assume that all IP addresses are IPv4 addresses and
-     * can therefore be converted safely to integers (for whatever purpose) this function can be used
-     * to handle IPv6 addresses as well until the application is suitably fixed.
-     * <p>
-     * <p>NOTE: an IPv6 address coerced to an IPv4 address can only be used for such purposes as
-     * rudimentary identification or indexing into a collection of real {@link InetAddress}es. They
-     * cannot be used as real addresses for the purposes of network communication.
-     *
-     * @param ip {@link InetAddress} to convert
-     * @return {@code int}, "coerced" if ip is not an IPv4 address
-     * @since 7.0
-     */
-    public static int coerceToInteger(InetAddress ip) {
-        return ByteStreams.newDataInput(getCoercedIPv4Address(ip).getAddress()).readInt();
     }
 
     /**

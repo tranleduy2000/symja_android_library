@@ -30,7 +30,7 @@ public interface ICoreFunctionEvaluator extends IFunctionEvaluator {
         }
 
         @Override
-        public void join() {
+        public void await() {
 
         }
     };

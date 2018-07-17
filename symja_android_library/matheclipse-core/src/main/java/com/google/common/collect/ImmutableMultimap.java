@@ -724,8 +724,10 @@ public abstract class ImmutableMultimap<K, V> extends AbstractMultimap<K, V>
         }
 
         @Override
-        Multiset.Entry<K> getEntry(int index) {
-            Entry<K, ? extends Collection<V>> entry = map.entrySet().asList().get(index);
+        Entry<K> getEntry(int index) {
+            ImmutableSet<? extends Map.Entry<K, ? extends ImmutableCollection<V>>> entries = map.entrySet();
+            ImmutableList<? extends Map.Entry<K, ? extends ImmutableCollection<V>>> entries1 = entries.asList();
+            Map.Entry<K, ? extends Collection<V>> entry = entries1.get(index);
             return Multisets.immutableEntry(entry.getKey(), entry.getValue().size());
         }
 
