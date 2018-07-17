@@ -294,12 +294,18 @@ public final class Combinatoric {
 			private int fResultIndex[];
 
 			/**
-			 * 
+			 * @param n
+			 *            with <code>n > 1</code>
 			 */
 			public NumberPartitionsIterable(final int num) {
 				this(num, num);
 			}
 
+			/**
+			 * @param n
+			 *            with <code>n > 1</code>
+			 * @param l
+			 */
 			public NumberPartitionsIterable(final int num, final int l) {
 				super();
 				n = num;
@@ -399,19 +405,19 @@ public final class Combinatoric {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
-			int max = Integer.MAX_VALUE;
-			if (ast.size() == 3 && ast.arg2().isInteger()) {
-				max = ast.arg2().toIntDefault(-1);
-				if (max < 0) {
-					return F.NIL;
-				}
-			}
-			if (ast.arg1().isInteger()) {
-				final int n = ast.arg1().toIntDefault(-1);
+			IntRangeSpec range = IntRangeSpec.createNonNegative(ast, 2);
+			if (range != null) {
+				IExpr arg1 = ast.arg1();
+				if (arg1.isInteger()) {
+					final int n = arg1.toIntDefault(-1);
 				if (n >= 0) {
 					if (n == 0) {
 						return F.List(F.List());
 					}
+						if (n == 1) {
+							return F.List(F.List(F.C1));
+						}
+						// try {
 					IASTAppendable temp;
 					final NumberPartitionsIterable comb = new NumberPartitionsIterable(n);
 					IASTAppendable result = F.ListAlloc(16);
@@ -424,11 +430,22 @@ public final class Combinatoric {
 								break;
 							}
 						}
-						if (temp.size()-1 <= max) {
+							if (range.isIncluded(temp.size() - 1)) {
 							result.append(temp);
 						}
 					}
 					return result;
+						// } catch (ArrayIndexOutOfBoundsException aiex) {
+						// System.out.println(ast.toString());
+						// }
+					}
+					if (arg1.isNegative()) {
+						return F.CEmptyList;
+					}
+				} else if (arg1.isFraction()) {
+					if (ast.size() == 2) {
+						return F.CEmptyList;
+					}
 				}
 			}
 			return F.NIL;
