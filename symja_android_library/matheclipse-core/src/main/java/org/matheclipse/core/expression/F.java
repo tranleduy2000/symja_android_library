@@ -417,6 +417,8 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol CDF = F.initFinalSymbol("CDF", ID.CDF);
 
+	/***/
+	public final static IBuiltInSymbol CForm = F.initFinalSymbol("CForm", ID.CForm);
 	/**
 	 * CanberraDistance(u, v) - returns the canberra distance between `u` and `v`, which is a weighted version of the
 	 * Manhattan distance.
@@ -1851,6 +1853,9 @@ public class F {
 	/** Operate(p, expr) - applies `p` to the head of `expr`. */
 	public final static IBuiltInSymbol Operate = F.initFinalSymbol("Operate", ID.Operate);
 
+	/***/
+	public final static IBuiltInSymbol OptimizeExpression = F.initFinalSymbol("OptimizeExpression",
+			ID.OptimizeExpression);
 	/**
 	 * Optional(patt, default) - is a pattern which matches `patt`, which if omitted should be replaced by `default`.
 	 */
@@ -3311,13 +3316,13 @@ public class F {
 					try {
 						engine.setContextPath(new ContextPath("integrate`"));
 						IAST ruleList = org.matheclipse.core.reflection.system.Integrate.getUtilityFunctionsRuleAST();
-//						if (ruleList != null) {
-//							engine.addRules(ruleList);
-//						}
+						// if (ruleList != null) {
+						// engine.addRules(ruleList);
+						// }
 						ruleList = org.matheclipse.core.reflection.system.Integrate.getRuleASTStatic();
-//						if (ruleList != null) {
-//							engine.addRules(ruleList);
-//						}
+						// if (ruleList != null) {
+						// engine.addRules(ruleList);
+						// }
 					} finally {
 						engine.setContextPath(path);
 					}

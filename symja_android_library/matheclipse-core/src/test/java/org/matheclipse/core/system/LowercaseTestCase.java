@@ -1740,10 +1740,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "2,0,1)[f][x,y,z],Derivative(1,1,1)[f][x,y,z],Derivative(1,0,2)[f][x,y,z]},{Derivative(\n"
 						+ "1,1,1)[f][x,y,z],Derivative(0,2,1)[f][x,y,z],Derivative(0,1,2)[f][x,y,z]},{Derivative(\n"
 						+ "1,0,2)[f][x,y,z],Derivative(0,1,2)[f][x,y,z],Derivative(0,0,3)[f][x,y,z]}}}");
-<<<<<<< HEAD
-=======
 
->>>>>>> b26aa647a... #41 Refactor functions Curl, Div, Grad to VectorAnalysisFunctions.java
 		check("Refine(D(Abs(x),x), Element(x, Reals))", //
 				"x/Abs(x)");
 
@@ -1770,10 +1767,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("D(y, x)", "0");
 		check("D(x, x)", "1");
 		check("D(f(x), x)", "f'(x)");
-<<<<<<< HEAD
-=======
-		 
->>>>>>> b26aa647a... #41 Refactor functions Curl, Div, Grad to VectorAnalysisFunctions.java
+
 		check("D(f(x, x), x)", "Derivative(0,1)[f][x,x]+Derivative(1,0)[f][x,x]");
 		// chain rule
 		check("D(f(2*x+1, 2*y, x+y), x)", "Derivative(0,0,1)[f][1+2*x,2*y,x+y]+2*Derivative(1,0,0)[f][1+2*x,2*y,x+y]");
@@ -3709,11 +3703,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{Derivative(1,0)[f][x,y],Derivative(0,1)[f][x,y]}");
 		check("Grad(Sin(x^2 + y^2), {x, y})", //
 				"{2*x*Cos(x^2+y^2),2*y*Cos(x^2+y^2)}");
-<<<<<<< HEAD
 
-=======
-		
->>>>>>> b26aa647a... #41 Refactor functions Curl, Div, Grad to VectorAnalysisFunctions.java
 		// wikipedia
 		check("Grad(2*x+3*y^2-Sin(z), {x, y, z})", //
 				"{2,6*y,-Cos(z)}");
@@ -8579,6 +8569,29 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("f(-3)", "f(-3)");
 	}
 
+	public void testOptimizeExpression() {
+		check("OptimizeExpression(-3*a - 2*a^3 + 4*Sqrt(1 + a^2)*(5 - 9*Log(2)) + \r\n"
+				+ " 4*a^2*Sqrt(1 + a^2)*(5 - 9*Log(2)) + \r\n" + " 12*(1 + a^2)^(3/2)*Log(1 + Sqrt(1 + 1/a^2)) - \r\n"
+				+ " 6*(4*(Sqrt(1 + a^2) - a*(2 + a^2 - a*Sqrt(1 + a^2)))*Log(a) + a*Log(1 + a^2)))", //
+				//
+				"{-3*a-2*a^3+4*v1*v4+4*v1*v2*v4+12*v3^(3/2)*Log(1+Sqrt(1+1/a^2))-6*(4*(v1-a*(2-a*v1+v2))*Log(a)+a*Log(v3)),"//
+						+ "{v1->Sqrt(\n" + "1+a^2),"//
+						+ "v2->a^2," //
+						+ "v3->1+v2," //
+						+ "v4->5-9*Log(2)}}");
+		check("OptimizeExpression((3 + 3*a^2 + Sqrt(5 + 6*a + 5*a^2) + a*(4 + Sqrt(5 + 6*a + 5*a^2)))/6)", //
+				"{1/6*(3+3*v1+v2+a*(4+v2)),{v1->a^2,v2->Sqrt(5+6*a+5*v1)}}");
+
+		check("OptimizeExpression( Sin(x) + Cos(Sin(x)))", //
+				"{v1+Cos(v1),{v1->Sin(x)}}");
+		check("ReplaceRepeated@@OptimizeExpression( Sin(x) + Cos(Sin(x)))", //
+				"Cos(Sin(x))+Sin(x)");
+
+		check("ReplaceRepeated(1/6*(3+3*v1+v2+a*(4+v2)), {v1->a^2, v2->Sqrt(5+6*a+5*v1)})", //
+				"1/6*(3+3*a^2+Sqrt(5+6*a+5*a^2)+a*(4+Sqrt(5+6*a+5*a^2)))");
+		check("ReplaceRepeated(1/6*(3+3*v1+v2+a*(4+v2)), {v2->Sqrt(5+6*a+5*v1), v1->a^2})", //
+				"1/6*(3+3*a^2+Sqrt(5+6*a+5*a^2)+a*(4+Sqrt(5+6*a+5*a^2)))");
+	}
 	public void testShare() {
 		check("Share(Table(j*(x + i), {i, 5}, {j, i}))", "24");
 		check("Share(Table(xi = x + i; Table(j*xi, {j, i}), {i, 5}))", "0");

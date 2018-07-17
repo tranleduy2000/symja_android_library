@@ -1,6 +1,5 @@
 package org.matheclipse.core.reflection.system;
 
-import java.util.HashMap;
 import com.duy.lambda.Function;
 
 import org.matheclipse.core.eval.EvalEngine;
@@ -22,13 +21,15 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.AbstractVisitor;
 import org.matheclipse.core.visit.VisitorExpr;
 
+import java.util.HashMap;
+
 /**
  * Try to share common sub-<code>IASTs</code> expressions with the same object-id internally to minimize memory
  * consumption. Returns the number f shared sub-expressions
  *
  */
 public class Share extends AbstractFunctionEvaluator {
-	static class ShareFunction implements Function<IExpr, IExpr> {
+	private static class ShareFunction implements Function<IExpr, IExpr> {
 		java.util.Map<IExpr, IExpr> map;
 
 		public ShareFunction() {
@@ -54,7 +55,7 @@ public class Share extends AbstractFunctionEvaluator {
 	 * <code>F.NIL</code> value. The visitors <code>visit()</code> methods return <code>F.NIL</code> if no substitution
 	 * occurred.
 	 */
-	static class ShareReplaceAll extends VisitorExpr {
+	private static class ShareReplaceAll extends VisitorExpr {
 		final Function<IExpr, IExpr> fFunction;
 		final int fOffset;
 		public int fCounter;
@@ -199,8 +200,8 @@ public class Share extends AbstractFunctionEvaluator {
 	 *            the ast whose internal memory consumption should be minimized
 	 * @return the number of shared sub-expressions
 	 */
-	public static int shareAST(final IAST ast) {
-		ShareReplaceAll sra = (ShareReplaceAll) createVisitor();
+	private static int shareAST(final IAST ast) {
+		ShareReplaceAll sra = new ShareReplaceAll(new ShareFunction(), 1);
 		ast.accept(sra);
 		return sra.fCounter;
 	}

@@ -65,7 +65,7 @@ public class AST2Expr {
 			"BitLength", "Blank", "Block", "Boole", "BooleanQ", "BooleanConvert", "BooleanMinimize", "BooleanTable",
 			"BooleanVariables", "BrayCurtisDistance", "Break", "CanberraDistance", "Cancel", "CarmichaelLambda",
 			"CartesianProduct", "Cases", "CatalanNumber", "Catch", "Catenate", "CDF", "Ceiling", "CentralMoment",
-			"CharacteristicPolynomial", "ChebyshevT", "ChebyshevU", "ChessboardDistance", "ChineseRemainder",
+			"CForm", "CharacteristicPolynomial", "ChebyshevT", "ChebyshevU", "ChessboardDistance", "ChineseRemainder",
 			"CholeskyDecomposition", "Chop", "CirclePoints", "Clear", "ClearAll", "ClearAttributes", "Clip",
 			"Coefficient", "CoefficientList", "CoefficientRules", "Colon", "Collect", "Commonest", "Complement",
 			"Compile", "Complex", "ComplexExpand", "ComposeList", "ComposeSeries", "Composition", "CompoundExpression",
