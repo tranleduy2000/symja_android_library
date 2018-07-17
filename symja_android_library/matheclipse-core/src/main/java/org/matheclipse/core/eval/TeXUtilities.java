@@ -1,11 +1,11 @@
 package org.matheclipse.core.eval;
 
-import java.io.Writer;
-
 import org.matheclipse.core.form.tex.TeXFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
+
+import java.io.Writer;
 
 /**
  * Convert an expression into TeX output
@@ -66,6 +66,7 @@ public class TeXUtilities {
 		if (objectExpression != null) {
 			IExpr result = objectExpression;
 			if (objectExpression.isAST()) {
+				fEvalEngine.reset();
 				result = fEvalEngine.evalHoldPattern((IAST) objectExpression, true);
 			}
 			fTeXFactory.convert(buf, result, 0);
