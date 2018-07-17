@@ -16,82 +16,84 @@
 
 package com.google.common.graph;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * A base implementation of {@link NetworkConnections} for undirected networks.
  *
- * @author James Sexton
  * @param <N> Node parameter type
  * @param <E> Edge parameter type
+ * @author James Sexton
  */
 abstract class AbstractUndirectedNetworkConnections<N, E> implements NetworkConnections<N, E> {
-  /** Keys are edges incident to the origin node, values are the node at the other end. */
-  protected final Map<E, N> incidentEdgeMap;
+    /**
+     * Keys are edges incident to the origin node, values are the node at the other end.
+     */
+    protected final Map<E, N> incidentEdgeMap;
 
-  protected AbstractUndirectedNetworkConnections(Map<E, N> incidentEdgeMap) {
-    this.incidentEdgeMap = checkNotNull(incidentEdgeMap);
-  }
-
-  @Override
-  public Set<N> predecessors() {
-    return adjacentNodes();
-  }
-
-  @Override
-  public Set<N> successors() {
-    return adjacentNodes();
-  }
-
-  @Override
-  public Set<E> incidentEdges() {
-    return Collections.unmodifiableSet(incidentEdgeMap.keySet());
-  }
-
-  @Override
-  public Set<E> inEdges() {
-    return incidentEdges();
-  }
-
-  @Override
-  public Set<E> outEdges() {
-    return incidentEdges();
-  }
-
-  @Override
-  public N oppositeNode(Object edge) {
-    return checkNotNull(incidentEdgeMap.get(edge));
-  }
-
-  @Override
-  public N removeInEdge(Object edge, boolean isSelfLoop) {
-    if (!isSelfLoop) {
-      return removeOutEdge(edge);
+    protected AbstractUndirectedNetworkConnections(Map<E, N> incidentEdgeMap) {
+        this.incidentEdgeMap = checkNotNull(incidentEdgeMap);
     }
-    return null;
-  }
 
-  @Override
-  public N removeOutEdge(Object edge) {
-    N previousNode = incidentEdgeMap.remove(edge);
-    return checkNotNull(previousNode);
-  }
-
-  @Override
-  public void addInEdge(E edge, N node, boolean isSelfLoop) {
-    if (!isSelfLoop) {
-      addOutEdge(edge, node);
+    @Override
+    public Set<N> predecessors() {
+        return adjacentNodes();
     }
-  }
 
-  @Override
-  public void addOutEdge(E edge, N node) {
-    N previousNode = incidentEdgeMap.put(edge, node);
-    checkState(previousNode == null);
-  }
+    @Override
+    public Set<N> successors() {
+        return adjacentNodes();
+    }
+
+    @Override
+    public Set<E> incidentEdges() {
+        return Collections.unmodifiableSet(incidentEdgeMap.keySet());
+    }
+
+    @Override
+    public Set<E> inEdges() {
+        return incidentEdges();
+    }
+
+    @Override
+    public Set<E> outEdges() {
+        return incidentEdges();
+    }
+
+    @Override
+    public N adjacentNode(E edge) {
+        return checkNotNull(incidentEdgeMap.get(edge));
+    }
+
+    @Override
+    public N removeInEdge(E edge, boolean isSelfLoop) {
+        if (!isSelfLoop) {
+            return removeOutEdge(edge);
+        }
+        return null;
+    }
+
+    @Override
+    public N removeOutEdge(E edge) {
+        N previousNode = incidentEdgeMap.remove(edge);
+        return checkNotNull(previousNode);
+    }
+
+    @Override
+    public void addInEdge(E edge, N node, boolean isSelfLoop) {
+        if (!isSelfLoop) {
+            addOutEdge(edge, node);
+        }
+    }
+
+    @Override
+    public void addOutEdge(E edge, N node) {
+        N previousNode = incidentEdgeMap.put(edge, node);
+        checkState(previousNode == null);
+    }
 }

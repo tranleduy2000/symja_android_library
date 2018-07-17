@@ -16,8 +16,10 @@ package com.google.common.math;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
 import java.math.BigInteger;
-import javax.annotation.Nullable;
 
 /**
  * A collection of preconditions for math functions.
@@ -27,72 +29,79 @@ import javax.annotation.Nullable;
 @GwtCompatible
 @CanIgnoreReturnValue
 final class MathPreconditions {
-  static int checkPositive(@Nullable String role, int x) {
-    if (x <= 0) {
-      throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
+    private MathPreconditions() {
     }
-    return x;
-  }
 
-  static long checkPositive(@Nullable String role, long x) {
-    if (x <= 0) {
-      throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
+    static int checkPositive(@NullableDecl String role, int x) {
+        if (x <= 0) {
+            throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
+        }
+        return x;
     }
-    return x;
-  }
 
-  static BigInteger checkPositive(@Nullable String role, BigInteger x) {
-    if (x.signum() <= 0) {
-      throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
+    static long checkPositive(@NullableDecl String role, long x) {
+        if (x <= 0) {
+            throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
+        }
+        return x;
     }
-    return x;
-  }
 
-  static int checkNonNegative(@Nullable String role, int x) {
-    if (x < 0) {
-      throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+    static BigInteger checkPositive(@NullableDecl String role, BigInteger x) {
+        if (x.signum() <= 0) {
+            throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
+        }
+        return x;
     }
-    return x;
-  }
 
-  static long checkNonNegative(@Nullable String role, long x) {
-    if (x < 0) {
-      throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+    static int checkNonNegative(@NullableDecl String role, int x) {
+        if (x < 0) {
+            throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+        }
+        return x;
     }
-    return x;
-  }
 
-  static BigInteger checkNonNegative(@Nullable String role, BigInteger x) {
-    if (x.signum() < 0) {
-      throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+    static long checkNonNegative(@NullableDecl String role, long x) {
+        if (x < 0) {
+            throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+        }
+        return x;
     }
-    return x;
-  }
 
-  static double checkNonNegative(@Nullable String role, double x) {
-    if (!(x >= 0)) { // not x < 0, to work with NaN.
-      throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+    static BigInteger checkNonNegative(@NullableDecl String role, BigInteger x) {
+        if (x.signum() < 0) {
+            throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+        }
+        return x;
     }
-    return x;
-  }
 
-  static void checkRoundingUnnecessary(boolean condition) {
-    if (!condition) {
-      throw new ArithmeticException("mode was UNNECESSARY, but rounding was necessary");
+    static double checkNonNegative(@NullableDecl String role, double x) {
+        if (!(x >= 0)) { // not x < 0, to work with NaN.
+            throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+        }
+        return x;
     }
-  }
 
-  static void checkInRange(boolean condition) {
-    if (!condition) {
-      throw new ArithmeticException("not in range");
+    static void checkRoundingUnnecessary(boolean condition) {
+        if (!condition) {
+            throw new ArithmeticException("mode was UNNECESSARY, but rounding was necessary");
+        }
     }
-  }
 
-  static void checkNoOverflow(boolean condition) {
-    if (!condition) {
-      throw new ArithmeticException("overflow");
+    static void checkInRange(boolean condition) {
+        if (!condition) {
+            throw new ArithmeticException("not in range");
+        }
     }
-  }
 
-  private MathPreconditions() {}
+    static void checkNoOverflow(boolean condition, String methodName, int a, int b) {
+        if (!condition) {
+            throw new ArithmeticException("overflow: " + methodName + "(" + a + ", " + b + ")");
+        }
+    }
+
+    static void checkNoOverflow(boolean condition, String methodName, long a, long b) {
+        if (!condition) {
+            throw new ArithmeticException("overflow: " + methodName + "(" + a + ", " + b + ")");
+        }
+    }
 }

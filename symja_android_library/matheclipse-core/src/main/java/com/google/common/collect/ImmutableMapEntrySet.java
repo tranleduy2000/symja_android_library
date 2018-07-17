@@ -19,9 +19,11 @@ package com.google.common.collect;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.j2objc.annotations.Weak;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
 import java.io.Serializable;
 import java.util.Map.Entry;
-import javax.annotation.Nullable;
 
 /**
  * {@code entrySet()} implementation for {@link ImmutableMap}.
@@ -31,84 +33,96 @@ import javax.annotation.Nullable;
  */
 @GwtCompatible(emulated = true)
 abstract class ImmutableMapEntrySet<K, V> extends ImmutableSet<Entry<K, V>> {
-  static final class RegularEntrySet<K, V> extends ImmutableMapEntrySet<K, V> {
-    @Weak private final transient ImmutableMap<K, V> map;
-    private final transient Entry<K, V>[] entries;
+    ImmutableMapEntrySet() {
+    }
 
-    RegularEntrySet(ImmutableMap<K, V> map, Entry<K, V>[] entries) {
-      this.map = map;
-      this.entries = entries;
+    abstract ImmutableMap<K, V> map();
+
+    @Override
+    public int size() {
+        return map().size();
     }
 
     @Override
-    ImmutableMap<K, V> map() {
-      return map;
+    public boolean contains(@NullableDecl Object object) {
+        if (object instanceof Entry) {
+            Entry<?, ?> entry = (Entry<?, ?>) object;
+            V value = map().get(entry.getKey());
+            return value != null && value.equals(entry.getValue());
+        }
+        return false;
     }
 
     @Override
-    public UnmodifiableIterator<Entry<K, V>> iterator() {
-      return Iterators.forArray(entries);
+    boolean isPartialView() {
+        return map().isPartialView();
     }
 
     @Override
-    ImmutableList<Entry<K, V>> createAsList() {
-      return new RegularImmutableAsList<Entry<K, V>>(this, entries);
-    }
-  }
-
-  ImmutableMapEntrySet() {}
-
-  abstract ImmutableMap<K, V> map();
-
-  @Override
-  public int size() {
-    return map().size();
-  }
-
-  @Override
-  public boolean contains(@Nullable Object object) {
-    if (object instanceof Entry) {
-      Entry<?, ?> entry = (Entry<?, ?>) object;
-      V value = map().get(entry.getKey());
-      return value != null && value.equals(entry.getValue());
-    }
-    return false;
-  }
-
-  @Override
-  boolean isPartialView() {
-    return map().isPartialView();
-  }
-
-  @Override
-  @GwtIncompatible // not used in GWT
-  boolean isHashCodeFast() {
-    return map().isHashCodeFast();
-  }
-
-  @Override
-  public int hashCode() {
-    return map().hashCode();
-  }
-
-  @GwtIncompatible // serialization
-  @Override
-  Object writeReplace() {
-    return new EntrySetSerializedForm<K, V>(map());
-  }
-
-  @GwtIncompatible // serialization
-  private static class EntrySetSerializedForm<K, V> implements Serializable {
-    final ImmutableMap<K, V> map;
-
-    EntrySetSerializedForm(ImmutableMap<K, V> map) {
-      this.map = map;
+    @GwtIncompatible
+        // not used in GWT
+    boolean isHashCodeFast() {
+        return map().isHashCodeFast();
     }
 
-    Object readResolve() {
-      return map.entrySet();
+    @Override
+    public int hashCode() {
+        return map().hashCode();
     }
 
-    private static final long serialVersionUID = 0;
-  }
+    @GwtIncompatible // serialization
+    @Override
+    Object writeReplace() {
+        return new EntrySetSerializedForm<>(map());
+    }
+
+    static final class RegularEntrySet<K, V> extends ImmutableMapEntrySet<K, V> {
+        @Weak
+        private final transient ImmutableMap<K, V> map;
+        private final transient ImmutableList<Entry<K, V>> entries;
+
+        RegularEntrySet(ImmutableMap<K, V> map, Entry<K, V>[] entries) {
+            this(map, ImmutableList.<Entry<K, V>>asImmutableList(entries));
+        }
+
+        RegularEntrySet(ImmutableMap<K, V> map, ImmutableList<Entry<K, V>> entries) {
+            this.map = map;
+            this.entries = entries;
+        }
+
+        @Override
+        ImmutableMap<K, V> map() {
+            return map;
+        }
+
+        @Override
+        @GwtIncompatible("not used in GWT")
+        int copyIntoArray(Object[] dst, int offset) {
+            return entries.copyIntoArray(dst, offset);
+        }
+
+        @Override
+        public UnmodifiableIterator<Entry<K, V>> iterator() {
+            return entries.iterator();
+        }
+
+        @Override
+        ImmutableList<Entry<K, V>> createAsList() {
+            return entries;
+        }
+    }
+
+    @GwtIncompatible // serialization
+    private static class EntrySetSerializedForm<K, V> implements Serializable {
+        private static final long serialVersionUID = 0;
+        final ImmutableMap<K, V> map;
+
+        EntrySetSerializedForm(ImmutableMap<K, V> map) {
+            this.map = map;
+        }
+
+        Object readResolve() {
+            return map.entrySet();
+        }
+    }
 }

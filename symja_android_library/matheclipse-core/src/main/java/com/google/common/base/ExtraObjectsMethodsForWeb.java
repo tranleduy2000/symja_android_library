@@ -21,4 +21,5 @@ import com.google.common.annotations.GwtCompatible;
  * version.
  */
 @GwtCompatible(emulated = true)
-abstract class ExtraObjectsMethodsForWeb {}
+abstract class ExtraObjectsMethodsForWeb {
+}

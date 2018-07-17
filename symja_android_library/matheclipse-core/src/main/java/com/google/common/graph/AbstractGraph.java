@@ -16,99 +16,53 @@
 
 package com.google.common.graph;
 
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.graph.GraphConstants.GRAPH_STRING_FORMAT;
-
 import com.google.common.annotations.Beta;
-import com.google.common.collect.UnmodifiableIterator;
-import com.google.common.math.IntMath;
-import com.google.common.primitives.Ints;
-import java.util.AbstractSet;
-import java.util.Set;
-import javax.annotation.Nullable;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * This class provides a skeletal implementation of {@link Graph}. It is recommended to extend this
  * class rather than implement {@link Graph} directly.
  *
- * @author James Sexton
  * @param <N> Node parameter type
+ * @author James Sexton
  * @since 20.0
  */
 @Beta
-public abstract class AbstractGraph<N> implements Graph<N> {
+public abstract class AbstractGraph<N> extends AbstractBaseGraph<N> implements Graph<N> {
 
-  /**
-   * Returns the number of edges in this graph; used to calculate the size of {@link #edges()}. The
-   * default implementation is O(|N|). You can manually keep track of the number of edges and
-   * override this method for better performance.
-   */
-  protected long edgeCount() {
-    long degreeSum = 0L;
-    for (N node : nodes()) {
-      degreeSum += degree(node);
-    }
-    // According to the degree sum formula, this is equal to twice the number of edges.
-    checkState((degreeSum & 1) == 0);
-    return degreeSum >>> 1;
-  }
-
-  /**
-   * A reasonable default implementation of {@link Graph#edges()} defined in terms of {@link
-   * #nodes()} and {@link #successors(Object)}.
-   */
-  @Override
-  public Set<EndpointPair<N>> edges() {
-    return new AbstractSet<EndpointPair<N>>() {
-      @Override
-      public UnmodifiableIterator<EndpointPair<N>> iterator() {
-        return EndpointPairIterator.of(AbstractGraph.this);
-      }
-
-      @Override
-      public int size() {
-        return Ints.saturatedCast(edgeCount());
-      }
-
-      @Override
-      public boolean contains(@Nullable Object obj) {
-        if (!(obj instanceof EndpointPair)) {
-          return false;
+    @Override
+    public final boolean equals(@NullableDecl Object obj) {
+        if (obj == this) {
+            return true;
         }
-        EndpointPair<?> endpointPair = (EndpointPair<?>) obj;
-        return isDirected() == endpointPair.isOrdered()
-            && nodes().contains(endpointPair.nodeU())
-            && successors(endpointPair.nodeU()).contains(endpointPair.nodeV());
-      }
-    };
-  }
+        if (!(obj instanceof Graph)) {
+            return false;
+        }
+        Graph<?> other = (Graph<?>) obj;
 
-  @Override
-  public int degree(Object node) {
-    if (isDirected()) {
-      return IntMath.saturatedAdd(predecessors(node).size(), successors(node).size());
-    } else {
-      Set<N> neighbors = adjacentNodes(node);
-      int selfLoopCount = (allowsSelfLoops() && neighbors.contains(node)) ? 1 : 0;
-      return IntMath.saturatedAdd(neighbors.size(), selfLoopCount);
+        return isDirected() == other.isDirected()
+                && nodes().equals(other.nodes())
+                && edges().equals(other.edges());
     }
-  }
 
-  @Override
-  public int inDegree(Object node) {
-    return isDirected() ? predecessors(node).size() : degree(node);
-  }
+    @Override
+    public final int hashCode() {
+        return edges().hashCode();
+    }
 
-  @Override
-  public int outDegree(Object node) {
-    return isDirected() ? successors(node).size() : degree(node);
-  }
-
-  /** Returns a string representation of this graph. */
-  @Override
-  public String toString() {
-    String propertiesString =
-        String.format("isDirected: %s, allowsSelfLoops: %s", isDirected(), allowsSelfLoops());
-    return String.format(GRAPH_STRING_FORMAT, propertiesString, nodes(), edges());
-  }
+    /**
+     * Returns a string representation of this graph.
+     */
+    @Override
+    public String toString() {
+        return "isDirected: "
+                + isDirected()
+                + ", allowsSelfLoops: "
+                + allowsSelfLoops()
+                + ", nodes: "
+                + nodes()
+                + ", edges: "
+                + edges();
+    }
 }

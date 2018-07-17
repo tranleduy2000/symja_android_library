@@ -16,26 +16,26 @@
 
 package com.google.common.graph;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.graph.Graphs.checkNonNegative;
-
 import com.google.common.annotations.Beta;
 import com.google.common.base.Optional;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.graph.Graphs.checkNonNegative;
+
 /**
  * A builder for constructing instances of {@link MutableNetwork} with user-defined properties.
- *
+ * <p>
  * <p>A network built by this class will have the following properties by default:
- *
+ * <p>
  * <ul>
  * <li>does not allow parallel edges
  * <li>does not allow self-loops
- * <li>orders {@link Network#nodes()} and {@link Network#edges()} in the order in which the elements
- *     were added
+ * <li>orders {@link Network#nodes()} and {@link Network#edges()} in the order in which the
+ * elements were added
  * </ul>
- *
+ * <p>
  * <p>Example of use:
- *
+ * <p>
  * <pre>{@code
  * MutableNetwork<String, Integer> flightNetwork =
  *     NetworkBuilder.directed().allowsParallelEdges(true).build();
@@ -50,101 +50,113 @@ import com.google.common.base.Optional;
  */
 @Beta
 public final class NetworkBuilder<N, E> extends AbstractGraphBuilder<N> {
-  boolean allowsParallelEdges = false;
-  ElementOrder<? super E> edgeOrder = ElementOrder.insertion();
-  Optional<Integer> expectedEdgeCount = Optional.absent();
+    boolean allowsParallelEdges = false;
+    ElementOrder<? super E> edgeOrder = ElementOrder.insertion();
+    Optional<Integer> expectedEdgeCount = Optional.absent();
 
-  /** Creates a new instance with the specified edge directionality. */
-  private NetworkBuilder(boolean directed) {
-    super(directed);
-  }
+    /**
+     * Creates a new instance with the specified edge directionality.
+     */
+    private NetworkBuilder(boolean directed) {
+        super(directed);
+    }
 
-  /** Returns a {@link NetworkBuilder} for building directed networks. */
-  public static NetworkBuilder<Object, Object> directed() {
-    return new NetworkBuilder<Object, Object>(true);
-  }
+    /**
+     * Returns a {@link NetworkBuilder} for building directed networks.
+     */
+    public static NetworkBuilder<Object, Object> directed() {
+        return new NetworkBuilder<>(true);
+    }
 
-  /** Returns a {@link NetworkBuilder} for building undirected networks. */
-  public static NetworkBuilder<Object, Object> undirected() {
-    return new NetworkBuilder<Object, Object>(false);
-  }
+    /**
+     * Returns a {@link NetworkBuilder} for building undirected networks.
+     */
+    public static NetworkBuilder<Object, Object> undirected() {
+        return new NetworkBuilder<>(false);
+    }
 
-  /**
-   * Returns a {@link NetworkBuilder} initialized with all properties queryable from {@code
-   * network}.
-   *
-   * <p>The "queryable" properties are those that are exposed through the {@link Network} interface,
-   * such as {@link Network#isDirected()}. Other properties, such as {@link
-   * #expectedNodeCount(int)}, are not set in the new builder.
-   */
-  public static <N, E> NetworkBuilder<N, E> from(Network<N, E> network) {
-    return new NetworkBuilder<Object, Object>(network.isDirected())
-        .allowsParallelEdges(network.allowsParallelEdges())
-        .allowsSelfLoops(network.allowsSelfLoops())
-        .nodeOrder(network.nodeOrder())
-        .edgeOrder(network.edgeOrder());
-  }
+    /**
+     * Returns a {@link NetworkBuilder} initialized with all properties queryable from {@code
+     * network}.
+     * <p>
+     * <p>The "queryable" properties are those that are exposed through the {@link Network} interface,
+     * such as {@link Network#isDirected()}. Other properties, such as {@link
+     * #expectedNodeCount(int)}, are not set in the new builder.
+     */
+    public static <N, E> NetworkBuilder<N, E> from(Network<N, E> network) {
+        return new NetworkBuilder<N, E>(network.isDirected())
+                .allowsParallelEdges(network.allowsParallelEdges())
+                .allowsSelfLoops(network.allowsSelfLoops())
+                .nodeOrder(network.nodeOrder())
+                .edgeOrder(network.edgeOrder());
+    }
 
-  /**
-   * Specifies whether the network will allow parallel edges. Attempting to add a parallel edge to a
-   * network that does not allow them will throw an {@link UnsupportedOperationException}.
-   */
-  public NetworkBuilder<N, E> allowsParallelEdges(boolean allowsParallelEdges) {
-    this.allowsParallelEdges = allowsParallelEdges;
-    return this;
-  }
+    /**
+     * Specifies whether the network will allow parallel edges. Attempting to add a parallel edge to a
+     * network that does not allow them will throw an {@link UnsupportedOperationException}.
+     */
+    public NetworkBuilder<N, E> allowsParallelEdges(boolean allowsParallelEdges) {
+        this.allowsParallelEdges = allowsParallelEdges;
+        return this;
+    }
 
-  /**
-   * Specifies whether the network will allow self-loops (edges that connect a node to itself).
-   * Attempting to add a self-loop to a network that does not allow them will throw an {@link
-   * UnsupportedOperationException}.
-   */
-  public NetworkBuilder<N, E> allowsSelfLoops(boolean allowsSelfLoops) {
-    this.allowsSelfLoops = allowsSelfLoops;
-    return this;
-  }
+    /**
+     * Specifies whether the network will allow self-loops (edges that connect a node to itself).
+     * Attempting to add a self-loop to a network that does not allow them will throw an {@link
+     * UnsupportedOperationException}.
+     */
+    public NetworkBuilder<N, E> allowsSelfLoops(boolean allowsSelfLoops) {
+        this.allowsSelfLoops = allowsSelfLoops;
+        return this;
+    }
 
-  /**
-   * Specifies the expected number of nodes in the network.
-   *
-   * @throws IllegalArgumentException if {@code expectedNodeCount} is negative
-   */
-  public NetworkBuilder<N, E> expectedNodeCount(int expectedNodeCount) {
-    this.expectedNodeCount = Optional.of(checkNonNegative(expectedNodeCount));
-    return this;
-  }
+    /**
+     * Specifies the expected number of nodes in the network.
+     *
+     * @throws IllegalArgumentException if {@code expectedNodeCount} is negative
+     */
+    public NetworkBuilder<N, E> expectedNodeCount(int expectedNodeCount) {
+        this.expectedNodeCount = Optional.of(checkNonNegative(expectedNodeCount));
+        return this;
+    }
 
-  /**
-   * Specifies the expected number of edges in the network.
-   *
-   * @throws IllegalArgumentException if {@code expectedEdgeCount} is negative
-   */
-  public NetworkBuilder<N, E> expectedEdgeCount(int expectedEdgeCount) {
-    this.expectedEdgeCount = Optional.of(checkNonNegative(expectedEdgeCount));
-    return this;
-  }
+    /**
+     * Specifies the expected number of edges in the network.
+     *
+     * @throws IllegalArgumentException if {@code expectedEdgeCount} is negative
+     */
+    public NetworkBuilder<N, E> expectedEdgeCount(int expectedEdgeCount) {
+        this.expectedEdgeCount = Optional.of(checkNonNegative(expectedEdgeCount));
+        return this;
+    }
 
-  /** Specifies the order of iteration for the elements of {@link Network#nodes()}. */
-  public <N1 extends N> NetworkBuilder<N1, E> nodeOrder(ElementOrder<N1> nodeOrder) {
-    NetworkBuilder<N1, E> newBuilder = cast();
-    newBuilder.nodeOrder = checkNotNull(nodeOrder);
-    return newBuilder;
-  }
+    /**
+     * Specifies the order of iteration for the elements of {@link Network#nodes()}.
+     */
+    public <N1 extends N> NetworkBuilder<N1, E> nodeOrder(ElementOrder<N1> nodeOrder) {
+        NetworkBuilder<N1, E> newBuilder = cast();
+        newBuilder.nodeOrder = checkNotNull(nodeOrder);
+        return newBuilder;
+    }
 
-  /** Specifies the order of iteration for the elements of {@link Network#edges()}. */
-  public <E1 extends E> NetworkBuilder<N, E1> edgeOrder(ElementOrder<E1> edgeOrder) {
-    NetworkBuilder<N, E1> newBuilder = cast();
-    newBuilder.edgeOrder = checkNotNull(edgeOrder);
-    return newBuilder;
-  }
+    /**
+     * Specifies the order of iteration for the elements of {@link Network#edges()}.
+     */
+    public <E1 extends E> NetworkBuilder<N, E1> edgeOrder(ElementOrder<E1> edgeOrder) {
+        NetworkBuilder<N, E1> newBuilder = cast();
+        newBuilder.edgeOrder = checkNotNull(edgeOrder);
+        return newBuilder;
+    }
 
-  /** Returns an empty {@link MutableNetwork} with the properties of this {@link NetworkBuilder}. */
-  public <N1 extends N, E1 extends E> MutableNetwork<N1, E1> build() {
-    return new ConfigurableMutableNetwork<N1, E1>(this);
-  }
+    /**
+     * Returns an empty {@link MutableNetwork} with the properties of this {@link NetworkBuilder}.
+     */
+    public <N1 extends N, E1 extends E> MutableNetwork<N1, E1> build() {
+        return new ConfigurableMutableNetwork<>(this);
+    }
 
-  @SuppressWarnings("unchecked")
-  private <N1 extends N, E1 extends E> NetworkBuilder<N1, E1> cast() {
-    return (NetworkBuilder<N1, E1>) this;
-  }
+    @SuppressWarnings("unchecked")
+    private <N1 extends N, E1 extends E> NetworkBuilder<N1, E1> cast() {
+        return (NetworkBuilder<N1, E1>) this;
+    }
 }

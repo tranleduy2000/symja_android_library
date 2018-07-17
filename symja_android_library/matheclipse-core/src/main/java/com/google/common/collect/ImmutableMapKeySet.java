@@ -19,8 +19,10 @@ package com.google.common.collect;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.j2objc.annotations.Weak;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
 import java.io.Serializable;
-import javax.annotation.Nullable;
 
 /**
  * {@code keySet()} implementation for {@link ImmutableMap}.
@@ -29,56 +31,56 @@ import javax.annotation.Nullable;
  * @author Kevin Bourrillion
  */
 @GwtCompatible(emulated = true)
-final class ImmutableMapKeySet<K, V> extends ImmutableSet.Indexed<K> {
-  @Weak private final ImmutableMap<K, V> map;
+final class ImmutableMapKeySet<K, V> extends IndexedImmutableSet<K> {
+    @Weak
+    private final ImmutableMap<K, V> map;
 
-  ImmutableMapKeySet(ImmutableMap<K, V> map) {
-    this.map = map;
-  }
-
-  @Override
-  public int size() {
-    return map.size();
-  }
-
-  @Override
-  public UnmodifiableIterator<K> iterator() {
-    return map.keyIterator();
-  }
-
-  @Override
-  public boolean contains(@Nullable Object object) {
-    return map.containsKey(object);
-  }
-
-  @Override
-  K get(int index) {
-    return map.entrySet().asList().get(index).getKey();
-  }
-
-  @Override
-  boolean isPartialView() {
-    return true;
-  }
-
-  @GwtIncompatible // serialization
-  @Override
-  Object writeReplace() {
-    return new KeySetSerializedForm<K>(map);
-  }
-
-  @GwtIncompatible // serialization
-  private static class KeySetSerializedForm<K> implements Serializable {
-    final ImmutableMap<K, ?> map;
-
-    KeySetSerializedForm(ImmutableMap<K, ?> map) {
-      this.map = map;
+    ImmutableMapKeySet(ImmutableMap<K, V> map) {
+        this.map = map;
     }
 
-    Object readResolve() {
-      return map.keySet();
+    @Override
+    public int size() {
+        return map.size();
     }
 
-    private static final long serialVersionUID = 0;
-  }
+    @Override
+    public UnmodifiableIterator<K> iterator() {
+        return map.keyIterator();
+    }
+
+    @Override
+    public boolean contains(@NullableDecl Object object) {
+        return map.containsKey(object);
+    }
+
+    @Override
+    K get(int index) {
+        return map.entrySet().asList().get(index).getKey();
+    }
+
+    @Override
+    boolean isPartialView() {
+        return true;
+    }
+
+    @GwtIncompatible // serialization
+    @Override
+    Object writeReplace() {
+        return new KeySetSerializedForm<K>(map);
+    }
+
+    @GwtIncompatible // serialization
+    private static class KeySetSerializedForm<K> implements Serializable {
+        private static final long serialVersionUID = 0;
+        final ImmutableMap<K, ?> map;
+
+        KeySetSerializedForm(ImmutableMap<K, ?> map) {
+            this.map = map;
+        }
+
+        Object readResolve() {
+            return map.keySet();
+        }
+    }
 }

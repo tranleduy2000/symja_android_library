@@ -26,22 +26,22 @@ import java.lang.annotation.Target;
  * compatibility guarantees made by its containing library. Note that the presence of this
  * annotation implies nothing about the quality or performance of the API in question, only the fact
  * that it is not "API-frozen."
- *
+ * <p>
  * <p>It is generally safe for <i>applications</i> to depend on beta APIs, at the cost of some extra
  * work during upgrades. However it is generally inadvisable for <i>libraries</i> (which get
  * included on users' CLASSPATHs, outside the library developers' control) to do so.
- *
  *
  * @author Kevin Bourrillion
  */
 @Retention(RetentionPolicy.CLASS)
 @Target({
-  ElementType.ANNOTATION_TYPE,
-  ElementType.CONSTRUCTOR,
-  ElementType.FIELD,
-  ElementType.METHOD,
-  ElementType.TYPE
+        ElementType.ANNOTATION_TYPE,
+        ElementType.CONSTRUCTOR,
+        ElementType.FIELD,
+        ElementType.METHOD,
+        ElementType.TYPE
 })
 @Documented
 @GwtCompatible
-public @interface Beta {}
+public @interface Beta {
+}

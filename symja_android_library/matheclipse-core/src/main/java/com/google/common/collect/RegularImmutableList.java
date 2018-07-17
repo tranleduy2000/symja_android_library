@@ -17,54 +17,53 @@
 package com.google.common.collect;
 
 import com.google.common.annotations.GwtCompatible;
+import com.google.common.annotations.VisibleForTesting;
+
+import static com.google.common.base.Preconditions.checkElementIndex;
 
 /**
- * Implementation of {@link ImmutableList} used for 0 or 2+ elements (not 1).
+ * Implementation of {@link ImmutableList} backed by a simple array.
  *
  * @author Kevin Bourrillion
  */
 @GwtCompatible(serializable = true, emulated = true)
-@SuppressWarnings("serial") // uses writeReplace(), not default serialization
+@SuppressWarnings("serial")
+        // uses writeReplace(), not default serialization
 class RegularImmutableList<E> extends ImmutableList<E> {
-  static final ImmutableList<Object> EMPTY =
-      new RegularImmutableList<Object>(ObjectArrays.EMPTY_ARRAY);
+    static final ImmutableList<Object> EMPTY = new RegularImmutableList<>(new Object[0], 0);
 
-  private final transient Object[] array;
+    @VisibleForTesting
+    final transient Object[] array;
+    private final transient int size;
 
-  RegularImmutableList(Object[] array) {
-    this.array = array;
-  }
+    RegularImmutableList(Object[] array, int size) {
+        this.array = array;
+        this.size = size;
+    }
 
-  @Override
-  public int size() {
-    return array.length;
-  }
+    @Override
+    public int size() {
+        return size;
+    }
 
-  @Override
-  boolean isPartialView() {
-    return false;
-  }
+    @Override
+    boolean isPartialView() {
+        return false;
+    }
 
-  @Override
-  int copyIntoArray(Object[] dst, int dstOff) {
-    System.arraycopy(array, 0, dst, dstOff, array.length);
-    return dstOff + array.length;
-  }
+    @Override
+    int copyIntoArray(Object[] dst, int dstOff) {
+        System.arraycopy(array, 0, dst, dstOff, size);
+        return dstOff + size;
+    }
 
-  // The fake cast to E is safe because the creation methods only allow E's
-  @Override
-  @SuppressWarnings("unchecked")
-  public E get(int index) {
-    return (E) array[index];
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public UnmodifiableListIterator<E> listIterator(int index) {
-    // for performance
     // The fake cast to E is safe because the creation methods only allow E's
-    return (UnmodifiableListIterator<E>) Iterators.forArray(array, 0, array.length, index);
-  }
+    @Override
+    @SuppressWarnings("unchecked")
+    public E get(int index) {
+        checkElementIndex(index, size);
+        return (E) array[index];
+    }
 
-  // TODO(lowasser): benchmark optimizations for equals() and see if they're worthwhile
+    // TODO(lowasser): benchmark optimizations for equals() and see if they're worthwhile
 }

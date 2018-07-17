@@ -16,48 +16,51 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.annotations.GwtCompatible;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
 import java.io.Serializable;
 import java.util.Comparator;
-import javax.annotation.Nullable;
 
-/** An ordering for a pre-existing comparator. */
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * An ordering for a pre-existing comparator.
+ */
 @GwtCompatible(serializable = true)
 final class ComparatorOrdering<T> extends Ordering<T> implements Serializable {
-  final Comparator<T> comparator;
+    private static final long serialVersionUID = 0;
+    final Comparator<T> comparator;
 
-  ComparatorOrdering(Comparator<T> comparator) {
-    this.comparator = checkNotNull(comparator);
-  }
-
-  @Override
-  public int compare(T a, T b) {
-    return comparator.compare(a, b);
-  }
-
-  @Override
-  public boolean equals(@Nullable Object object) {
-    if (object == this) {
-      return true;
+    ComparatorOrdering(Comparator<T> comparator) {
+        this.comparator = checkNotNull(comparator);
     }
-    if (object instanceof ComparatorOrdering) {
-      ComparatorOrdering<?> that = (ComparatorOrdering<?>) object;
-      return this.comparator.equals(that.comparator);
+
+    @Override
+    public int compare(T a, T b) {
+        return comparator.compare(a, b);
     }
-    return false;
-  }
 
-  @Override
-  public int hashCode() {
-    return comparator.hashCode();
-  }
+    @Override
+    public boolean equals(@NullableDecl Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ComparatorOrdering) {
+            ComparatorOrdering<?> that = (ComparatorOrdering<?>) object;
+            return this.comparator.equals(that.comparator);
+        }
+        return false;
+    }
 
-  @Override
-  public String toString() {
-    return comparator.toString();
-  }
+    @Override
+    public int hashCode() {
+        return comparator.hashCode();
+    }
 
-  private static final long serialVersionUID = 0;
+    @Override
+    public String toString() {
+        return comparator.toString();
+    }
 }

@@ -15,45 +15,46 @@
 /**
  * Static utilities for working with the eight primitive types and {@code void}, and value types for
  * treating them as unsigned.
- *
+ * <p>
  * <p>This package is a part of the open-source <a href="http://github.com/google/guava">Guava</a>
  * library.
- *
- * <p>See the Guava User Guide article on
- * <a href="https://github.com/google/guava/wiki/PrimitivesExplained">primitive utilities</a>.
- *
+ * <p>
+ * <p>See the Guava User Guide article on <a
+ * href="https://github.com/google/guava/wiki/PrimitivesExplained">primitive utilities</a>.
+ * <p>
  * <h2>Contents</h2>
- *
+ * <p>
  * <h3>General static utilities</h3>
- *
+ * <p>
  * <ul>
  * <li>{@link com.google.common.primitives.Primitives}
  * </ul>
- *
+ * <p>
  * <h3>Per-type static utilities</h3>
- *
+ * <p>
  * <ul>
  * <li>{@link com.google.common.primitives.Booleans}
  * <li>{@link com.google.common.primitives.Bytes}
- *     <ul>
- *     <li>{@link com.google.common.primitives.SignedBytes}
- *     <li>{@link com.google.common.primitives.UnsignedBytes}
- *     </ul>
+ * <ul>
+ * <li>{@link com.google.common.primitives.SignedBytes}
+ * <li>{@link com.google.common.primitives.UnsignedBytes}
+ * </ul>
  * <li>{@link com.google.common.primitives.Chars}
  * <li>{@link com.google.common.primitives.Doubles}
  * <li>{@link com.google.common.primitives.Floats}
  * <li>{@link com.google.common.primitives.Ints}
- *     <ul>
- *     <li>{@link com.google.common.primitives.UnsignedInts}
- *     </ul>
+ * <ul>
+ * <li>{@link com.google.common.primitives.UnsignedInts}
+ * </ul>
  * <li>{@link com.google.common.primitives.Longs}
- *     <ul>
- *     <li>{@link com.google.common.primitives.UnsignedLongs}
- *     </ul>
+ * <ul>
+ * <li>{@link com.google.common.primitives.UnsignedLongs}
+ * </ul>
  * <li>{@link com.google.common.primitives.Shorts}
  * </ul>
- *
+ * <p>
  * <h3>Value types</h3>
+ * <p>
  * <ul>
  * <li>{@link com.google.common.primitives.UnsignedInteger}
  * <li>{@link com.google.common.primitives.UnsignedLong}
@@ -63,5 +64,6 @@
 @CheckReturnValue
 package com.google.common.primitives;
 
-import javax.annotation.CheckReturnValue;
+import com.google.errorprone.annotations.CheckReturnValue;
+
 import javax.annotation.ParametersAreNonnullByDefault;

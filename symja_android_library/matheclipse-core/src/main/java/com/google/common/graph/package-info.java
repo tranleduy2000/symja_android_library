@@ -17,7 +17,7 @@
 /**
  * An API for representing graph (node and edge) data. It is analogous to the Java Collections
  * Framework APIs for lists, maps, sets, etc.
- *
+ * <p>
  * <p>This package is a part of the open-source <a href="https://github.com/google/guava">Guava</a>
  * library.
  */
@@ -25,5 +25,6 @@
 @ParametersAreNonnullByDefault
 package com.google.common.graph;
 
-import javax.annotation.CheckReturnValue;
+import com.google.errorprone.annotations.CheckReturnValue;
+
 import javax.annotation.ParametersAreNonnullByDefault;

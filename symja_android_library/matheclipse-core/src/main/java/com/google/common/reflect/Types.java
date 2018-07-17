@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
 import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
@@ -36,11 +38,11 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.security.AccessControlException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -93,7 +95,7 @@ final class Types {
      * {@code ownerType}.
      */
     static ParameterizedType newParameterizedTypeWithOwner(
-            @Nullable Type ownerType, Class<?> rawType, Type... arguments) {
+            @NullableDecl Type ownerType, Class<?> rawType, Type... arguments) {
         if (ownerType == null) {
             return newParameterizedType(rawType, arguments);
         }
@@ -139,20 +141,17 @@ final class Types {
 
     /**
      * Returns human readable string representation of {@code type}.
-     * <ul>
-     * <li>For array type {@code Foo[]}, {@code "com.mypackage.Foo[]"} are returned.
-     * <li>For any class, {@code theClass.getName()} are returned.
-     * <li>For all other types, {@code type.toString()} are returned.
-     * </ul>
+     * <p>
+     * <p>The format is subject to change.
      */
     static String toString(Type type) {
         return (type instanceof Class) ? ((Class<?>) type).getName() : type.toString();
     }
 
-    @Nullable
+    @NullableDecl
     static Type getComponentType(Type type) {
         checkNotNull(type);
-        final AtomicReference<Type> result = new AtomicReference<Type>();
+        final AtomicReference<Type> result = new AtomicReference<>();
         new TypeVisitor() {
             @Override
             void visitTypeVariable(TypeVariable<?> t) {
@@ -181,7 +180,7 @@ final class Types {
      * Returns {@code ? extends X} if any of {@code bounds} is a subtype of {@code X[]}; or null
      * otherwise.
      */
-    @Nullable
+    @NullableDecl
     private static Type subtypeOfComponentType(Type[] bounds) {
         for (Type bound : bounds) {
             Type componentType = getComponentType(bound);
@@ -243,15 +242,15 @@ final class Types {
      */
     private enum ClassOwnership {
         OWNED_BY_ENCLOSING_CLASS {
-            @Nullable
             @Override
+            @NullableDecl
             Class<?> getOwnerType(Class<?> rawType) {
                 return rawType.getEnclosingClass();
             }
         },
         LOCAL_CLASS_HAS_NO_OWNER {
-            @Nullable
             @Override
+            @NullableDecl
             Class<?> getOwnerType(Class<?> rawType) {
                 if (rawType.isLocalClass()) {
                     return null;
@@ -277,11 +276,11 @@ final class Types {
             throw new AssertionError();
         }
 
-        @Nullable
+        @NullableDecl
         abstract Class<?> getOwnerType(Class<?> rawType);
     }
 
-    // TODO(benyu): Once we are on Java 8, delete this abstraction
+    // TODO(benyu): Once behavior is the same for all Java versions we support, delete this.
     enum JavaVersion {
         JAVA6 {
             @Override
@@ -334,11 +333,30 @@ final class Types {
                     return (String) getTypeName.invoke(type);
                 } catch (NoSuchMethodException e) {
                     throw new AssertionError("Type.getTypeName should be available in Java 8");
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
+                } catch (InvocationTargetException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        },
+        JAVA9 {
+            @Override
+            Type newArrayType(Type componentType) {
+                return JAVA8.newArrayType(componentType);
+            }
+
+            @Override
+            Type usedInGenericType(Type type) {
+                return JAVA8.usedInGenericType(type);
+            }
+
+            @Override
+            String typeName(Type type) {
+                return JAVA8.typeName(type);
+            }
+
+            @Override
+            boolean jdkTypeDuplicatesOwnerName() {
+                return false;
             }
         };
 
@@ -346,7 +364,14 @@ final class Types {
 
         static {
             if (AnnotatedElement.class.isAssignableFrom(TypeVariable.class)) {
-                CURRENT = JAVA8;
+                if (new TypeCapture<Entry<String, int[][]>>() {
+                }.capture()
+                        .toString()
+                        .contains("java.util.Map.java.util.Map")) {
+                    CURRENT = JAVA8;
+                } else {
+                    CURRENT = JAVA9;
+                }
             } else if (new TypeCapture<int[]>() {
             }.capture() instanceof Class) {
                 CURRENT = JAVA7;
@@ -359,16 +384,20 @@ final class Types {
 
         abstract Type usedInGenericType(Type type);
 
-        String typeName(Type type) {
-            return Types.toString(type);
-        }
-
         final ImmutableList<Type> usedInGenericType(Type[] types) {
             ImmutableList.Builder<Type> builder = ImmutableList.builder();
             for (Type type : types) {
                 builder.add(usedInGenericType(type));
             }
             return builder.build();
+        }
+
+        String typeName(Type type) {
+            return Types.toString(type);
+        }
+
+        boolean jdkTypeDuplicatesOwnerName() {
+            return true;
         }
     }
 
@@ -409,11 +438,12 @@ final class Types {
     private static final class ParameterizedTypeImpl implements ParameterizedType, Serializable {
 
         private static final long serialVersionUID = 0;
+        @NullableDecl
         private final Type ownerType;
         private final ImmutableList<Type> argumentsList;
         private final Class<?> rawType;
 
-        ParameterizedTypeImpl(@Nullable Type ownerType, Class<?> rawType, Type[] typeArguments) {
+        ParameterizedTypeImpl(@NullableDecl Type ownerType, Class<?> rawType, Type[] typeArguments) {
             checkNotNull(rawType);
             checkArgument(typeArguments.length == rawType.getTypeParameters().length);
             disallowPrimitiveType(typeArguments, "type parameter");
@@ -440,7 +470,7 @@ final class Types {
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
-            if (ownerType != null) {
+            if (ownerType != null && JavaVersion.CURRENT.jdkTypeDuplicatesOwnerName()) {
                 builder.append(JavaVersion.CURRENT.typeName(ownerType)).append('.');
             }
             return builder
@@ -481,11 +511,11 @@ final class Types {
      * that an abstract method is unimplemented. So instead we use a dynamic proxy to get an
      * implementation. If the method being called on the {@code TypeVariable} instance has the same
      * name as one of the public methods of {@link TypeVariableImpl}, the proxy calls the same method
-     * on its instance of {@code TypeVariableImpl}. Otherwise it throws
-     * {@link UnsupportedOperationException}; this should only apply to {@code getAnnotatedBounds()}.
-     * This does mean that users on Java 8 who obtain an instance of {@code TypeVariable} from
-     * {@link TypeResolver#resolveType} will not be able to call {@code getAnnotatedBounds()} on it,
-     * but that should hopefully be rare.
+     * on its instance of {@code TypeVariableImpl}. Otherwise it throws {@link
+     * UnsupportedOperationException}; this should only apply to {@code getAnnotatedBounds()}. This
+     * does mean that users on Java 8 who obtain an instance of {@code TypeVariable} from {@link
+     * TypeResolver#resolveType} will not be able to call {@code getAnnotatedBounds()} on it, but that
+     * should hopefully be rare.
      * <p>
      * <p>This workaround should be removed at a distant future time when we no longer support Java
      * versions earlier than 8.
@@ -499,7 +529,7 @@ final class Types {
                 if (method.getDeclaringClass().equals(TypeVariableImpl.class)) {
                     try {
                         method.setAccessible(true);
-                    } catch (Exception e) {
+                    } catch (AccessControlException e) {
                         // OK: the method is accessible to us anyway. The setAccessible call is only for
                         // unusual execution environments where that might not be true.
                     }
@@ -649,17 +679,18 @@ final class Types {
     }
 
     /**
-     * Per https://code.google.com/p/guava-libraries/issues/detail?id=1635, In JDK 1.7.0_51-b13,
-     * TypeVariableImpl.equals() is changed to no longer be equal to custom TypeVariable
-     * implementations. As a result, we need to make sure our TypeVariable implementation respects
-     * symmetry. Moreover, we don't want to reconstruct a native type variable <A> using our
-     * implementation unless some of its bounds have changed in resolution. This avoids creating
-     * unequal TypeVariable implementation unnecessarily. When the bounds do change, however, it's
-     * fine for the synthetic TypeVariable to be unequal to any native TypeVariable anyway.
+     * Per <a href="https://code.google.com/p/guava-libraries/issues/detail?id=1635">issue 1635</a>,
+     * In JDK 1.7.0_51-b13, {@link TypeVariableImpl#equals(Object)} is changed to no longer be equal
+     * to custom TypeVariable implementations. As a result, we need to make sure our TypeVariable
+     * implementation respects symmetry. Moreover, we don't want to reconstruct a native type variable
+     * {@code <A>} using our implementation unless some of its bounds have changed in resolution. This
+     * avoids creating unequal TypeVariable implementation unnecessarily. When the bounds do change,
+     * however, it's fine for the synthetic TypeVariable to be unequal to any native TypeVariable
+     * anyway.
      */
     static final class NativeTypeVariableEquals<X> {
         static final boolean NATIVE_TYPE_VARIABLE_ONLY =
-                !NativeTypeVariableEquals.class.getTypeParameters()[0]
-                        .equals(newArtificialTypeVariable(NativeTypeVariableEquals.class, "X"));
+                !NativeTypeVariableEquals.class.getTypeParameters()[0].equals(
+                        newArtificialTypeVariable(NativeTypeVariableEquals.class, "X"));
     }
 }

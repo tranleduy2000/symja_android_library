@@ -14,13 +14,15 @@
 
 package com.google.common.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.annotations.GwtIncompatible;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An {@link InputStream} that concatenates multiple substreams. At most one stream will be open at
@@ -32,91 +34,90 @@ import javax.annotation.Nullable;
 @GwtIncompatible
 final class MultiInputStream extends InputStream {
 
-  private Iterator<? extends ByteSource> it;
-  private InputStream in;
+    private Iterator<? extends ByteSource> it;
+    @NullableDecl
+    private InputStream in;
 
-  /**
-   * Creates a new instance.
-   *
-   * @param it an iterator of I/O suppliers that will provide each substream
-   */
-  public MultiInputStream(Iterator<? extends ByteSource> it) throws IOException {
-    this.it = checkNotNull(it);
-    advance();
-  }
+    /**
+     * Creates a new instance.
+     *
+     * @param it an iterator of I/O suppliers that will provide each substream
+     */
+    public MultiInputStream(Iterator<? extends ByteSource> it) throws IOException {
+        this.it = checkNotNull(it);
+        advance();
+    }
 
-  @Override
-  public void close() throws IOException {
-    if (in != null) {
-      try {
-        in.close();
-      } finally {
-        in = null;
-      }
+    @Override
+    public void close() throws IOException {
+        if (in != null) {
+            try {
+                in.close();
+            } finally {
+                in = null;
+            }
+        }
     }
-  }
 
-  /**
-   * Closes the current input stream and opens the next one, if any.
-   */
-  private void advance() throws IOException {
-    close();
-    if (it.hasNext()) {
-      in = it.next().openStream();
+    /**
+     * Closes the current input stream and opens the next one, if any.
+     */
+    private void advance() throws IOException {
+        close();
+        if (it.hasNext()) {
+            in = it.next().openStream();
+        }
     }
-  }
 
-  @Override
-  public int available() throws IOException {
-    if (in == null) {
-      return 0;
+    @Override
+    public int available() throws IOException {
+        if (in == null) {
+            return 0;
+        }
+        return in.available();
     }
-    return in.available();
-  }
 
-  @Override
-  public boolean markSupported() {
-    return false;
-  }
+    @Override
+    public boolean markSupported() {
+        return false;
+    }
 
-  @Override
-  public int read() throws IOException {
-    if (in == null) {
-      return -1;
+    @Override
+    public int read() throws IOException {
+        while (in != null) {
+            int result = in.read();
+            if (result != -1) {
+                return result;
+            }
+            advance();
+        }
+        return -1;
     }
-    int result = in.read();
-    if (result == -1) {
-      advance();
-      return read();
-    }
-    return result;
-  }
 
-  @Override
-  public int read(@Nullable byte[] b, int off, int len) throws IOException {
-    if (in == null) {
-      return -1;
+    @Override
+    public int read(@NullableDecl byte[] b, int off, int len) throws IOException {
+        while (in != null) {
+            int result = in.read(b, off, len);
+            if (result != -1) {
+                return result;
+            }
+            advance();
+        }
+        return -1;
     }
-    int result = in.read(b, off, len);
-    if (result == -1) {
-      advance();
-      return read(b, off, len);
-    }
-    return result;
-  }
 
-  @Override
-  public long skip(long n) throws IOException {
-    if (in == null || n <= 0) {
-      return 0;
+    @Override
+    public long skip(long n) throws IOException {
+        if (in == null || n <= 0) {
+            return 0;
+        }
+        long result = in.skip(n);
+        if (result != 0) {
+            return result;
+        }
+        if (read() == -1) {
+            return 0;
+        }
+        return 1 + in.skip(n - 1);
     }
-    long result = in.skip(n);
-    if (result != 0) {
-      return result;
-    }
-    if (read() == -1) {
-      return 0;
-    }
-    return 1 + in.skip(n - 1);
-  }
 }

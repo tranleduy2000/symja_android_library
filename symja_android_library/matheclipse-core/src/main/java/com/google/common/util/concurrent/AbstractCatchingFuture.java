@@ -44,6 +44,7 @@ abstract class AbstractCatchingFuture<V, X extends Throwable, F, T>
     Class<X> exceptionType;
     @NullableDecl
     F fallback;
+
     AbstractCatchingFuture(
             ListenableFuture<? extends V> inputFuture, Class<X> exceptionType, F fallback) {
         this.inputFuture = checkNotNull(inputFuture);

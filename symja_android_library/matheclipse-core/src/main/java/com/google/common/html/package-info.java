@@ -16,7 +16,7 @@
  * Escapers
  * for
  * HTML.
- *
+ * <p>
  * <p>This package is a part of the open-source <a href="http://github.com/google/guava">Guava</a>
  * library.
  */
@@ -24,5 +24,6 @@
 @ParametersAreNonnullByDefault
 package com.google.common.html;
 
-import javax.annotation.CheckReturnValue;
+import com.google.errorprone.annotations.CheckReturnValue;
+
 import javax.annotation.ParametersAreNonnullByDefault;

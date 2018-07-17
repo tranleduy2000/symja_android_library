@@ -16,248 +16,313 @@
 
 package com.google.common.collect;
 
+import com.google.common.annotations.GwtCompatible;
+import com.google.common.annotations.VisibleForTesting;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import java.util.AbstractMap;
+import java.util.Arrays;
+
+import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkPositionIndex;
 import static com.google.common.collect.CollectPreconditions.checkEntryNotNull;
-import static com.google.common.collect.ImmutableMapEntry.createEntryArray;
-
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.collect.ImmutableMapEntry.NonTerminalImmutableMapEntry;
-import com.google.j2objc.annotations.Weak;
-import java.io.Serializable;
-import javax.annotation.Nullable;
 
 /**
- * Implementation of {@link ImmutableMap} with two or more entries.
+ * A hash-based implementation of {@link ImmutableMap}.
  *
- * @author Jesse Wilson
- * @author Kevin Bourrillion
- * @author Gregory Kick
+ * @author Louis Wasserman
  */
 @GwtCompatible(serializable = true, emulated = true)
 final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
+    @SuppressWarnings("unchecked")
+    static final ImmutableMap<Object, Object> EMPTY =
+            new RegularImmutableMap<>(null, new Object[0], 0);
+    private static final int ABSENT = -1;
 
-  // entries in insertion order
-  private final transient Entry<K, V>[] entries;
-  // array of linked lists of entries
-  private final transient ImmutableMapEntry<K, V>[] table;
-  // 'and' with an int to get a table index
-  private final transient int mask;
+    /*
+     * This is an implementation of ImmutableMap optimized especially for Android, which does not like
+     * objects per entry.  Instead we use an open-addressed hash table.  This design is basically
+     * equivalent to RegularImmutableSet, save that instead of having a hash table containing the
+     * elements directly and null for empty positions, we store indices of the keys in the hash table,
+     * and ABSENT for empty positions.  We then look up the keys in alternatingKeysAndValues.
+     *
+     * (The index actually stored is the index of the key in alternatingKeysAndValues, which is
+     * double the index of the entry in entrySet.asList.)
+     *
+     * The basic data structure is described in https://en.wikipedia.org/wiki/Open_addressing.
+     * The pointer to a key is stored in hashTable[Hashing.smear(key.hashCode())] % table.length,
+     * save that if that location is already full, we try the next index, and the next, until we
+     * find an empty table position.  Since the table has a power-of-two size, we use
+     * & (table.length - 1) instead of % table.length, though.
+     */
+    // This class is never actually serialized directly, but we have to make the
+    // warning go away (and suppressing would suppress for all nested classes too)
+    private static final long serialVersionUID = 0;
+    @VisibleForTesting
+    final transient Object[] alternatingKeysAndValues;
+    private final transient int[] hashTable;
+    private final transient int size;
 
-  static <K, V> RegularImmutableMap<K, V> fromEntries(Entry<K, V>... entries) {
-    return fromEntryArray(entries.length, entries);
-  }
-
-  /**
-   * Creates a RegularImmutableMap from the first n entries in entryArray.  This implementation
-   * may replace the entries in entryArray with its own entry objects (though they will have the
-   * same key/value contents), and may take ownership of entryArray.
-   */
-  static <K, V> RegularImmutableMap<K, V> fromEntryArray(int n, Entry<K, V>[] entryArray) {
-    checkPositionIndex(n, entryArray.length);
-    Entry<K, V>[] entries;
-    if (n == entryArray.length) {
-      entries = entryArray;
-    } else {
-      entries = createEntryArray(n);
-    }
-    int tableSize = Hashing.closedTableSize(n, MAX_LOAD_FACTOR);
-    ImmutableMapEntry<K, V>[] table = createEntryArray(tableSize);
-    int mask = tableSize - 1;
-    for (int entryIndex = 0; entryIndex < n; entryIndex++) {
-      Entry<K, V> entry = entryArray[entryIndex];
-      K key = entry.getKey();
-      V value = entry.getValue();
-      checkEntryNotNull(key, value);
-      int tableIndex = Hashing.smear(key.hashCode()) & mask;
-      @Nullable ImmutableMapEntry<K, V> existing = table[tableIndex];
-      // prepend, not append, so the entries can be immutable
-      ImmutableMapEntry<K, V> newEntry;
-      if (existing == null) {
-        boolean reusable =
-            entry instanceof ImmutableMapEntry && ((ImmutableMapEntry<K, V>) entry).isReusable();
-        newEntry =
-            reusable ? (ImmutableMapEntry<K, V>) entry : new ImmutableMapEntry<K, V>(key, value);
-      } else {
-        newEntry = new NonTerminalImmutableMapEntry<K, V>(key, value, existing);
-      }
-      table[tableIndex] = newEntry;
-      entries[entryIndex] = newEntry;
-      checkNoConflictInKeyBucket(key, newEntry, existing);
-    }
-    return new RegularImmutableMap<K, V>(entries, table, mask);
-  }
-
-  private RegularImmutableMap(Entry<K, V>[] entries, ImmutableMapEntry<K, V>[] table, int mask) {
-    this.entries = entries;
-    this.table = table;
-    this.mask = mask;
-  }
-
-  static void checkNoConflictInKeyBucket(
-      Object key, Entry<?, ?> entry, @Nullable ImmutableMapEntry<?, ?> keyBucketHead) {
-    for (; keyBucketHead != null; keyBucketHead = keyBucketHead.getNextInKeyBucket()) {
-      checkNoConflict(!key.equals(keyBucketHead.getKey()), "key", entry, keyBucketHead);
-    }
-  }
-
-  /**
-   * Closed addressing tends to perform well even with high load factors.
-   * Being conservative here ensures that the table is still likely to be
-   * relatively sparse (hence it misses fast) while saving space.
-   */
-  private static final double MAX_LOAD_FACTOR = 1.2;
-
-  @Override
-  public V get(@Nullable Object key) {
-    return get(key, table, mask);
-  }
-
-  @Nullable
-  static <V> V get(@Nullable Object key, ImmutableMapEntry<?, V>[] keyTable, int mask) {
-    if (key == null) {
-      return null;
-    }
-    int index = Hashing.smear(key.hashCode()) & mask;
-    for (ImmutableMapEntry<?, V> entry = keyTable[index];
-        entry != null;
-        entry = entry.getNextInKeyBucket()) {
-      Object candidateKey = entry.getKey();
-
-      /*
-       * Assume that equals uses the == optimization when appropriate, and that
-       * it would check hash codes as an optimization when appropriate. If we
-       * did these things, it would just make things worse for the most
-       * performance-conscious users.
-       */
-      if (key.equals(candidateKey)) {
-        return entry.getValue();
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public int size() {
-    return entries.length;
-  }
-
-  @Override
-  boolean isPartialView() {
-    return false;
-  }
-
-  @Override
-  ImmutableSet<Entry<K, V>> createEntrySet() {
-    return new ImmutableMapEntrySet.RegularEntrySet<K, V>(this, entries);
-  }
-
-  @Override
-  ImmutableSet<K> createKeySet() {
-    return new KeySet<K, V>(this);
-  }
-
-  @GwtCompatible(emulated = true)
-  private static final class KeySet<K, V> extends ImmutableSet.Indexed<K> {
-    @Weak private final RegularImmutableMap<K, V> map;
-
-    KeySet(RegularImmutableMap<K, V> map) {
-      this.map = map;
+    private RegularImmutableMap(int[] hashTable, Object[] alternatingKeysAndValues, int size) {
+        this.hashTable = hashTable;
+        this.alternatingKeysAndValues = alternatingKeysAndValues;
+        this.size = size;
     }
 
-    @Override
-    K get(int index) {
-      return map.entries[index].getKey();
+    @SuppressWarnings("unchecked")
+    static <K, V> RegularImmutableMap<K, V> create(int n, Object[] alternatingKeysAndValues) {
+        if (n == 0) {
+            return (RegularImmutableMap<K, V>) EMPTY;
+        } else if (n == 1) {
+            checkEntryNotNull(alternatingKeysAndValues[0], alternatingKeysAndValues[1]);
+            return new RegularImmutableMap<K, V>(null, alternatingKeysAndValues, 1);
+        }
+        checkPositionIndex(n, alternatingKeysAndValues.length >> 1);
+        int tableSize = ImmutableSet.chooseTableSize(n);
+        int[] hashTable = createHashTable(alternatingKeysAndValues, n, tableSize, 0);
+        return new RegularImmutableMap<K, V>(hashTable, alternatingKeysAndValues, n);
     }
 
-    @Override
-    public boolean contains(Object object) {
-      return map.containsKey(object);
+    /**
+     * Returns a hash table for the specified keys and values, and ensures that neither keys nor
+     * values are null.
+     */
+    static int[] createHashTable(
+            Object[] alternatingKeysAndValues, int n, int tableSize, int keyOffset) {
+        if (n == 1) {
+            // for n=1 we don't create a hash table, but we need to do the checkEntryNotNull check!
+            checkEntryNotNull(
+                    alternatingKeysAndValues[keyOffset], alternatingKeysAndValues[keyOffset ^ 1]);
+            return null;
+        }
+        int mask = tableSize - 1;
+        int[] hashTable = new int[tableSize];
+        Arrays.fill(hashTable, ABSENT);
+        for (int i = 0; i < n; i++) {
+            Object key = alternatingKeysAndValues[2 * i + keyOffset];
+            Object value = alternatingKeysAndValues[2 * i + (keyOffset ^ 1)];
+            checkEntryNotNull(key, value);
+            for (int h = Hashing.smear(key.hashCode()); ; h++) {
+                h &= mask;
+                int previous = hashTable[h];
+                if (previous == ABSENT) {
+                    hashTable[h] = 2 * i + keyOffset;
+                    break;
+                } else if (alternatingKeysAndValues[previous].equals(key)) {
+                    throw new IllegalArgumentException(
+                            "Multiple entries with same key: "
+                                    + key
+                                    + "="
+                                    + value
+                                    + " and "
+                                    + alternatingKeysAndValues[previous]
+                                    + "="
+                                    + alternatingKeysAndValues[previous ^ 1]);
+                }
+            }
+        }
+        return hashTable;
     }
 
-    @Override
-    boolean isPartialView() {
-      return true;
+    static Object get(
+            @NullableDecl int[] hashTable,
+            @NullableDecl Object[] alternatingKeysAndValues,
+            int size,
+            int keyOffset,
+            @NullableDecl Object key) {
+        if (key == null) {
+            return null;
+        } else if (size == 1) {
+            return alternatingKeysAndValues[keyOffset].equals(key)
+                    ? alternatingKeysAndValues[keyOffset ^ 1]
+                    : null;
+        } else if (hashTable == null) {
+            return null;
+        }
+        int mask = hashTable.length - 1;
+        for (int h = Hashing.smear(key.hashCode()); ; h++) {
+            h &= mask;
+            int index = hashTable[h];
+            if (index == ABSENT) {
+                return null;
+            } else if (alternatingKeysAndValues[index].equals(key)) {
+                return alternatingKeysAndValues[index ^ 1];
+            }
+        }
     }
 
     @Override
     public int size() {
-      return map.size();
+        return size;
     }
 
-    @GwtIncompatible // serialization
+    @SuppressWarnings("unchecked")
     @Override
-    Object writeReplace() {
-      return new SerializedForm<K>(map);
-    }
-
-    @GwtIncompatible // serialization
-    private static class SerializedForm<K> implements Serializable {
-      final ImmutableMap<K, ?> map;
-
-      SerializedForm(ImmutableMap<K, ?> map) {
-        this.map = map;
-      }
-
-      Object readResolve() {
-        return map.keySet();
-      }
-
-      private static final long serialVersionUID = 0;
-    }
-  }
-
-  @Override
-  ImmutableCollection<V> createValues() {
-    return new Values<K, V>(this);
-  }
-
-  @GwtCompatible(emulated = true)
-  private static final class Values<K, V> extends ImmutableList<V> {
-    @Weak final RegularImmutableMap<K, V> map;
-
-    Values(RegularImmutableMap<K, V> map) {
-      this.map = map;
+    @NullableDecl
+    public V get(@NullableDecl Object key) {
+        return (V) get(hashTable, alternatingKeysAndValues, size, 0, key);
     }
 
     @Override
-    public V get(int index) {
-      return map.entries[index].getValue();
+    ImmutableSet<Entry<K, V>> createEntrySet() {
+        return new EntrySet<>(this, alternatingKeysAndValues, 0, size);
     }
 
     @Override
-    public int size() {
-      return map.size();
+    ImmutableSet<K> createKeySet() {
+        @SuppressWarnings("unchecked")
+        ImmutableList<K> keyList =
+                (ImmutableList<K>) new KeysOrValuesAsList(alternatingKeysAndValues, 0, size);
+        return new KeySet<K>(this, keyList);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    ImmutableCollection<V> createValues() {
+        return (ImmutableList<V>) new KeysOrValuesAsList(alternatingKeysAndValues, 1, size);
     }
 
     @Override
     boolean isPartialView() {
-      return true;
+        return false;
     }
 
-    @GwtIncompatible // serialization
-    @Override
-    Object writeReplace() {
-      return new SerializedForm<V>(map);
+    static class EntrySet<K, V> extends ImmutableSet<Entry<K, V>> {
+        private final transient ImmutableMap<K, V> map;
+        private final transient Object[] alternatingKeysAndValues;
+        private final transient int keyOffset;
+        private final transient int size;
+
+        EntrySet(ImmutableMap<K, V> map, Object[] alternatingKeysAndValues, int keyOffset, int size) {
+            this.map = map;
+            this.alternatingKeysAndValues = alternatingKeysAndValues;
+            this.keyOffset = keyOffset;
+            this.size = size;
+        }
+
+        @Override
+        public UnmodifiableIterator<Entry<K, V>> iterator() {
+            return asList().iterator();
+        }
+
+        @Override
+        int copyIntoArray(Object[] dst, int offset) {
+            return asList().copyIntoArray(dst, offset);
+        }
+
+        @Override
+        ImmutableList<Entry<K, V>> createAsList() {
+            return new ImmutableList<Entry<K, V>>() {
+                @Override
+                public Entry<K, V> get(int index) {
+                    checkElementIndex(index, size);
+                    @SuppressWarnings("unchecked")
+                    K key = (K) alternatingKeysAndValues[2 * index + keyOffset];
+                    @SuppressWarnings("unchecked")
+                    V value = (V) alternatingKeysAndValues[2 * index + (keyOffset ^ 1)];
+                    return new AbstractMap.SimpleImmutableEntry<K, V>(key, value);
+                }
+
+                @Override
+                public int size() {
+                    return size;
+                }
+
+                @Override
+                public boolean isPartialView() {
+                    return true;
+                }
+            };
+        }
+
+        @Override
+        public boolean contains(Object object) {
+            if (object instanceof Entry) {
+                Entry<?, ?> entry = (Entry<?, ?>) object;
+                Object k = entry.getKey();
+                Object v = entry.getValue();
+                return v != null && v.equals(map.get(k));
+            }
+            return false;
+        }
+
+        @Override
+        boolean isPartialView() {
+            return true;
+        }
+
+        @Override
+        public int size() {
+            return size;
+        }
     }
 
-    @GwtIncompatible // serialization
-    private static class SerializedForm<V> implements Serializable {
-      final ImmutableMap<?, V> map;
+    static final class KeysOrValuesAsList extends ImmutableList<Object> {
+        private final transient Object[] alternatingKeysAndValues;
+        private final transient int offset;
+        private final transient int size;
 
-      SerializedForm(ImmutableMap<?, V> map) {
-        this.map = map;
-      }
+        KeysOrValuesAsList(Object[] alternatingKeysAndValues, int offset, int size) {
+            this.alternatingKeysAndValues = alternatingKeysAndValues;
+            this.offset = offset;
+            this.size = size;
+        }
 
-      Object readResolve() {
-        return map.values();
-      }
+        @Override
+        public Object get(int index) {
+            checkElementIndex(index, size);
+            return alternatingKeysAndValues[2 * index + offset];
+        }
 
-      private static final long serialVersionUID = 0;
+        @Override
+        boolean isPartialView() {
+            return true;
+        }
+
+        @Override
+        public int size() {
+            return size;
+        }
     }
-  }
 
-  // This class is never actually serialized directly, but we have to make the
-  // warning go away (and suppressing would suppress for all nested classes too)
-  private static final long serialVersionUID = 0;
+    static final class KeySet<K> extends ImmutableSet<K> {
+        private final transient ImmutableMap<K, ?> map;
+        private final transient ImmutableList<K> list;
+
+        KeySet(ImmutableMap<K, ?> map, ImmutableList<K> list) {
+            this.map = map;
+            this.list = list;
+        }
+
+        @Override
+        public UnmodifiableIterator<K> iterator() {
+            return asList().iterator();
+        }
+
+        @Override
+        int copyIntoArray(Object[] dst, int offset) {
+            return asList().copyIntoArray(dst, offset);
+        }
+
+        @Override
+        public ImmutableList<K> asList() {
+            return list;
+        }
+
+        @Override
+        public boolean contains(@NullableDecl Object object) {
+            return map.get(object) != null;
+        }
+
+        @Override
+        boolean isPartialView() {
+            return true;
+        }
+
+        @Override
+        public int size() {
+            return map.size();
+        }
+    }
 }

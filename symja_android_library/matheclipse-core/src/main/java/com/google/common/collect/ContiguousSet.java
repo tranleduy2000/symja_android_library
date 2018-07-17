@@ -14,22 +14,35 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
+
 import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * A sorted set of contiguous values in a given {@link DiscreteDomain}.
- *
+ * A sorted set of contiguous values in a given {@link DiscreteDomain}. Example:
+ * <p>
+ * <pre>{@code
+ * ContiguousSet.create(Range.closed(5, 42), DiscreteDomain.integers())
+ * }</pre>
+ * <p>
+ * <p>Note that because bounded ranges over {@code int} and {@code long} values are so common, this
+ * particular example can be written as just:
+ * <p>
+ * <pre>{@code
+ * ContiguousSet.closed(5, 42)
+ * }</pre>
+ * <p>
  * <p><b>Warning:</b> Be extremely careful what you do with conceptually large instances (such as
- * {@code ContiguousSet.create(Range.greaterThan(0), DiscreteDomain.integers()}). Certain
- * operations on such a set can be performed efficiently, but others (such as {@link Set#hashCode}
- * or {@link Collections#frequency}) can cause major performance problems.
+ * {@code ContiguousSet.create(Range.greaterThan(0), DiscreteDomain.integers()}). Certain operations
+ * on such a set can be performed efficiently, but others (such as {@link Set#hashCode} or {@link
+ * Collections#frequency}) can cause major performance problems.
  *
  * @author Gregory Kick
  * @since 10.0
@@ -37,159 +50,219 @@ import java.util.Set;
 @GwtCompatible(emulated = true)
 @SuppressWarnings("rawtypes") // allow ungenerified Comparable types
 public abstract class ContiguousSet<C extends Comparable> extends ImmutableSortedSet<C> {
-  /**
-   * Returns a {@code ContiguousSet} containing the same values in the given domain
-   * {@linkplain Range#contains contained} by the range.
-   *
-   * @throws IllegalArgumentException if neither range nor the domain has a lower bound, or if
-   *     neither has an upper bound
-   *
-   * @since 13.0
-   */
-  public static <C extends Comparable> ContiguousSet<C> create(
-      Range<C> range, DiscreteDomain<C> domain) {
-    checkNotNull(range);
-    checkNotNull(domain);
-    Range<C> effectiveRange = range;
-    try {
-      if (!range.hasLowerBound()) {
-        effectiveRange = effectiveRange.intersection(Range.atLeast(domain.minValue()));
-      }
-      if (!range.hasUpperBound()) {
-        effectiveRange = effectiveRange.intersection(Range.atMost(domain.maxValue()));
-      }
-    } catch (NoSuchElementException e) {
-      throw new IllegalArgumentException(e);
+    final DiscreteDomain<C> domain;
+
+    ContiguousSet(DiscreteDomain<C> domain) {
+        super(Ordering.natural());
+        this.domain = domain;
     }
 
-    // Per class spec, we are allowed to throw CCE if necessary
-    boolean empty =
-        effectiveRange.isEmpty()
-            || Range.compareOrThrow(
-                    range.lowerBound.leastValueAbove(domain),
-                    range.upperBound.greatestValueBelow(domain))
-                > 0;
+    /**
+     * Returns a {@code ContiguousSet} containing the same values in the given domain {@linkplain
+     * Range#contains contained} by the range.
+     *
+     * @throws IllegalArgumentException if neither range nor the domain has a lower bound, or if
+     *                                  neither has an upper bound
+     * @since 13.0
+     */
+    public static <C extends Comparable> ContiguousSet<C> create(
+            Range<C> range, DiscreteDomain<C> domain) {
+        checkNotNull(range);
+        checkNotNull(domain);
+        Range<C> effectiveRange = range;
+        try {
+            if (!range.hasLowerBound()) {
+                effectiveRange = effectiveRange.intersection(Range.atLeast(domain.minValue()));
+            }
+            if (!range.hasUpperBound()) {
+                effectiveRange = effectiveRange.intersection(Range.atMost(domain.maxValue()));
+            }
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException(e);
+        }
 
-    return empty
-        ? new EmptyContiguousSet<C>(domain)
-        : new RegularContiguousSet<C>(effectiveRange, domain);
-  }
+        // Per class spec, we are allowed to throw CCE if necessary
+        boolean empty =
+                effectiveRange.isEmpty()
+                        || Range.compareOrThrow(
+                        range.lowerBound.leastValueAbove(domain),
+                        range.upperBound.greatestValueBelow(domain))
+                        > 0;
 
-  final DiscreteDomain<C> domain;
+        return empty
+                ? new EmptyContiguousSet<C>(domain)
+                : new RegularContiguousSet<C>(effectiveRange, domain);
+    }
 
-  ContiguousSet(DiscreteDomain<C> domain) {
-    super(Ordering.natural());
-    this.domain = domain;
-  }
+    /**
+     * Returns a nonempty contiguous set containing all {@code int} values from {@code lower}
+     * (inclusive) to {@code upper} (inclusive). (These are the same values contained in {@code
+     * Range.closed(lower, upper)}.)
+     *
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
+     * @since 23.0
+     */
+    @Beta
+    public static ContiguousSet<Integer> closed(int lower, int upper) {
+        return create(Range.closed(lower, upper), DiscreteDomain.integers());
+    }
 
-  @Override
-  public ContiguousSet<C> headSet(C toElement) {
-    return headSetImpl(checkNotNull(toElement), false);
-  }
+    /**
+     * Returns a nonempty contiguous set containing all {@code long} values from {@code lower}
+     * (inclusive) to {@code upper} (inclusive). (These are the same values contained in {@code
+     * Range.closed(lower, upper)}.)
+     *
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
+     * @since 23.0
+     */
+    @Beta
+    public static ContiguousSet<Long> closed(long lower, long upper) {
+        return create(Range.closed(lower, upper), DiscreteDomain.longs());
+    }
 
-  /**
-   * @since 12.0
-   */
-  @GwtIncompatible // NavigableSet
-  @Override
-  public ContiguousSet<C> headSet(C toElement, boolean inclusive) {
-    return headSetImpl(checkNotNull(toElement), inclusive);
-  }
+    /**
+     * Returns a contiguous set containing all {@code int} values from {@code lower} (inclusive) to
+     * {@code upper} (exclusive). If the endpoints are equal, an empty set is returned. (These are the
+     * same values contained in {@code Range.closedOpen(lower, upper)}.)
+     *
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
+     * @since 23.0
+     */
+    @Beta
+    public static ContiguousSet<Integer> closedOpen(int lower, int upper) {
+        return create(Range.closedOpen(lower, upper), DiscreteDomain.integers());
+    }
 
-  @Override
-  public ContiguousSet<C> subSet(C fromElement, C toElement) {
-    checkNotNull(fromElement);
-    checkNotNull(toElement);
-    checkArgument(comparator().compare(fromElement, toElement) <= 0);
-    return subSetImpl(fromElement, true, toElement, false);
-  }
+    /**
+     * Returns a contiguous set containing all {@code long} values from {@code lower} (inclusive) to
+     * {@code upper} (exclusive). If the endpoints are equal, an empty set is returned. (These are the
+     * same values contained in {@code Range.closedOpen(lower, upper)}.)
+     *
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
+     * @since 23.0
+     */
+    @Beta
+    public static ContiguousSet<Long> closedOpen(long lower, long upper) {
+        return create(Range.closedOpen(lower, upper), DiscreteDomain.longs());
+    }
 
-  /**
-   * @since 12.0
-   */
-  @GwtIncompatible // NavigableSet
-  @Override
-  public ContiguousSet<C> subSet(
-      C fromElement, boolean fromInclusive, C toElement, boolean toInclusive) {
-    checkNotNull(fromElement);
-    checkNotNull(toElement);
-    checkArgument(comparator().compare(fromElement, toElement) <= 0);
-    return subSetImpl(fromElement, fromInclusive, toElement, toInclusive);
-  }
+    /**
+     * Not supported. {@code ContiguousSet} instances are constructed with {@link #create}. This
+     * method exists only to hide {@link ImmutableSet#builder} from consumers of {@code
+     * ContiguousSet}.
+     *
+     * @throws UnsupportedOperationException always
+     * @deprecated Use {@link #create}.
+     */
+    @Deprecated
+    public static <E> ImmutableSortedSet.Builder<E> builder() {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public ContiguousSet<C> tailSet(C fromElement) {
-    return tailSetImpl(checkNotNull(fromElement), true);
-  }
+    @Override
+    public ContiguousSet<C> headSet(C toElement) {
+        return headSetImpl(checkNotNull(toElement), false);
+    }
 
-  /**
-   * @since 12.0
-   */
-  @GwtIncompatible // NavigableSet
-  @Override
-  public ContiguousSet<C> tailSet(C fromElement, boolean inclusive) {
-    return tailSetImpl(checkNotNull(fromElement), inclusive);
-  }
+    /**
+     * @since 12.0
+     */
+    @GwtIncompatible // NavigableSet
+    @Override
+    public ContiguousSet<C> headSet(C toElement, boolean inclusive) {
+        return headSetImpl(checkNotNull(toElement), inclusive);
+    }
 
-  /*
-   * These methods perform most headSet, subSet, and tailSet logic, besides parameter validation.
-   */
-  // TODO(kevinb): we can probably make these real @Overrides now
-  /* @Override */
-  abstract ContiguousSet<C> headSetImpl(C toElement, boolean inclusive);
+    @Override
+    public ContiguousSet<C> subSet(C fromElement, C toElement) {
+        checkNotNull(fromElement);
+        checkNotNull(toElement);
+        checkArgument(comparator().compare(fromElement, toElement) <= 0);
+        return subSetImpl(fromElement, true, toElement, false);
+    }
 
-  /* @Override */
-  abstract ContiguousSet<C> subSetImpl(
-      C fromElement, boolean fromInclusive, C toElement, boolean toInclusive);
+    /**
+     * @since 12.0
+     */
+    @GwtIncompatible // NavigableSet
+    @Override
+    public ContiguousSet<C> subSet(
+            C fromElement, boolean fromInclusive, C toElement, boolean toInclusive) {
+        checkNotNull(fromElement);
+        checkNotNull(toElement);
+        checkArgument(comparator().compare(fromElement, toElement) <= 0);
+        return subSetImpl(fromElement, fromInclusive, toElement, toInclusive);
+    }
 
-  /* @Override */
-  abstract ContiguousSet<C> tailSetImpl(C fromElement, boolean inclusive);
+    @Override
+    public ContiguousSet<C> tailSet(C fromElement) {
+        return tailSetImpl(checkNotNull(fromElement), true);
+    }
 
-  /**
-   * Returns the set of values that are contained in both this set and the other.
-   *
-   * <p>This method should always be used instead of
-   * {@link Sets#intersection} for {@link ContiguousSet} instances.
-   */
-  public abstract ContiguousSet<C> intersection(ContiguousSet<C> other);
+    /**
+     * @since 12.0
+     */
+    @GwtIncompatible // NavigableSet
+    @Override
+    public ContiguousSet<C> tailSet(C fromElement, boolean inclusive) {
+        return tailSetImpl(checkNotNull(fromElement), inclusive);
+    }
 
-  /**
-   * Returns a range, closed on both ends, whose endpoints are the minimum and maximum values
-   * contained in this set.  This is equivalent to {@code range(CLOSED, CLOSED)}.
-   *
-   * @throws NoSuchElementException if this set is empty
-   */
-  public abstract Range<C> range();
+    /*
+     * These methods perform most headSet, subSet, and tailSet logic, besides parameter validation.
+     */
+    // TODO(kevinb): we can probably make these real @Overrides now
+    /* @Override */
+    abstract ContiguousSet<C> headSetImpl(C toElement, boolean inclusive);
 
-  /**
-   * Returns the minimal range with the given boundary types for which all values in this set are
-   * {@linkplain Range#contains(Comparable) contained} within the range.
-   *
-   * <p>Note that this method will return ranges with unbounded endpoints if {@link BoundType#OPEN}
-   * is requested for a domain minimum or maximum.  For example, if {@code set} was created from the
-   * range {@code [1..Integer.MAX_VALUE]} then {@code set.range(CLOSED, OPEN)} must return
-   * {@code [1..∞)}.
-   *
-   * @throws NoSuchElementException if this set is empty
-   */
-  public abstract Range<C> range(BoundType lowerBoundType, BoundType upperBoundType);
+    /* @Override */
+    abstract ContiguousSet<C> subSetImpl(
+            C fromElement, boolean fromInclusive, C toElement, boolean toInclusive);
 
-  /** Returns a short-hand representation of the contents such as {@code "[1..100]"}. */
-  @Override
-  public String toString() {
-    return range().toString();
-  }
+    /* @Override */
+    abstract ContiguousSet<C> tailSetImpl(C fromElement, boolean inclusive);
 
-  /**
-   * Not supported. {@code ContiguousSet} instances are constructed with {@link #create}. This
-   * method exists only to hide {@link ImmutableSet#builder} from consumers of {@code
-   * ContiguousSet}.
-   *
-   * @throws UnsupportedOperationException always
-   * @deprecated Use {@link #create}.
-   */
-  @Deprecated
-  public static <E> Builder<E> builder() {
-    throw new UnsupportedOperationException();
-  }
+    /**
+     * Returns the set of values that are contained in both this set and the other.
+     * <p>
+     * <p>This method should always be used instead of {@link Sets#intersection} for {@link
+     * ContiguousSet} instances.
+     */
+    public abstract ContiguousSet<C> intersection(ContiguousSet<C> other);
+
+    /**
+     * Returns a range, closed on both ends, whose endpoints are the minimum and maximum values
+     * contained in this set. This is equivalent to {@code range(CLOSED, CLOSED)}.
+     *
+     * @throws NoSuchElementException if this set is empty
+     */
+    public abstract Range<C> range();
+
+    /**
+     * Returns the minimal range with the given boundary types for which all values in this set are
+     * {@linkplain Range#contains(Comparable) contained} within the range.
+     * <p>
+     * <p>Note that this method will return ranges with unbounded endpoints if {@link BoundType#OPEN}
+     * is requested for a domain minimum or maximum. For example, if {@code set} was created from the
+     * range {@code [1..Integer.MAX_VALUE]} then {@code set.range(CLOSED, OPEN)} must return {@code
+     * [1..∞)}.
+     *
+     * @throws NoSuchElementException if this set is empty
+     */
+    public abstract Range<C> range(BoundType lowerBoundType, BoundType upperBoundType);
+
+    @Override
+    @GwtIncompatible
+        // NavigableSet
+    ImmutableSortedSet<C> createDescendingSet() {
+        return new DescendingImmutableSortedSet<C>(this);
+    }
+
+    /**
+     * Returns a short-hand representation of the contents such as {@code "[1..100]"}.
+     */
+    @Override
+    public String toString() {
+        return range().toString();
+    }
 }

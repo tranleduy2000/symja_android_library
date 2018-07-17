@@ -64,6 +64,7 @@ final class TimeoutFuture<V> extends AbstractFuture.TrustedFuture<V> {
      */
     @NullableDecl
     private Future<?> timer;
+
     private TimeoutFuture(ListenableFuture<V> delegate) {
         this.delegateRef = Preconditions.checkNotNull(delegate);
     }

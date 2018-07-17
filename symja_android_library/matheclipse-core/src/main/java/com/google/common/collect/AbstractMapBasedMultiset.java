@@ -16,289 +16,255 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.CollectPreconditions.checkNonnegative;
-import static com.google.common.collect.CollectPreconditions.checkRemove;
-
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.io.InvalidObjectException;
-import java.io.ObjectStreamException;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
+import java.util.NoSuchElementException;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.CollectPreconditions.checkNonnegative;
 
 /**
  * Basic implementation of {@code Multiset<E>} backed by an instance of {@code
- * Map<E, Count>}.
- *
- * <p>For serialization to work, the subclass must specify explicit {@code
- * readObject} and {@code writeObject} methods.
+ * AbstractObjectCountMap<E>}.
+ * <p>
+ * <p>For serialization to work, the subclass must specify explicit {@code readObject} and {@code
+ * writeObject} methods.
  *
  * @author Kevin Bourrillion
  */
 @GwtCompatible(emulated = true)
 abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implements Serializable {
 
-  private transient Map<E, Count> backingMap;
+    @GwtIncompatible // Not needed in emulated source.
+    private static final long serialVersionUID = 0;
+    transient ObjectCountHashMap<E> backingMap;
+    transient long size;
 
-  /*
-   * Cache the size for efficiency. Using a long lets us avoid the need for
-   * overflow checking and ensures that size() will function correctly even if
-   * the multiset had once been larger than Integer.MAX_VALUE.
-   */
-  private transient long size;
+    AbstractMapBasedMultiset(int distinctElements) {
+        init(distinctElements);
+    }
 
-  /** Standard constructor. */
-  protected AbstractMapBasedMultiset(Map<E, Count> backingMap) {
-    this.backingMap = checkNotNull(backingMap);
-    this.size = super.size();
-  }
+    abstract void init(int distinctElements);
 
-  /** Used during deserialization only. The backing map must be empty. */
-  void setBackingMap(Map<E, Count> backingMap) {
-    this.backingMap = backingMap;
-  }
+    // Optional Operations - Modification Operations
 
-  // Required Implementations
+    @Override
+    public final int count(@NullableDecl Object element) {
+        return backingMap.get(element);
+    }
 
-  /**
-   * {@inheritDoc}
-   *
-   * <p>Invoking {@link Entry#getCount} on an entry in the returned
-   * set always returns the current count of that element in the multiset, as
-   * opposed to the count at the time the entry was retrieved.
-   */
-  @Override
-  public Set<Entry<E>> entrySet() {
-    return super.entrySet();
-  }
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalArgumentException if the call would result in more than {@link
+     *                                  Integer#MAX_VALUE} occurrences of {@code element} in this multiset.
+     */
+    @CanIgnoreReturnValue
+    @Override
+    public final int add(@NullableDecl E element, int occurrences) {
+        if (occurrences == 0) {
+            return count(element);
+        }
+        checkArgument(occurrences > 0, "occurrences cannot be negative: %s", occurrences);
+        int entryIndex = backingMap.indexOf(element);
+        if (entryIndex == -1) {
+            backingMap.put(element, occurrences);
+            size += occurrences;
+            return 0;
+        }
+        int oldCount = backingMap.getValue(entryIndex);
+        long newCount = (long) oldCount + (long) occurrences;
+        checkArgument(newCount <= Integer.MAX_VALUE, "too many occurrences: %s", newCount);
+        backingMap.setValue(entryIndex, (int) newCount);
+        size += occurrences;
+        return oldCount;
+    }
 
-  @Override
-  Iterator<Entry<E>> entryIterator() {
-    final Iterator<Map.Entry<E, Count>> backingEntries = backingMap.entrySet().iterator();
-    return new Iterator<Entry<E>>() {
-      Map.Entry<E, Count> toRemove;
+    @CanIgnoreReturnValue
+    @Override
+    public final int remove(@NullableDecl Object element, int occurrences) {
+        if (occurrences == 0) {
+            return count(element);
+        }
+        checkArgument(occurrences > 0, "occurrences cannot be negative: %s", occurrences);
+        int entryIndex = backingMap.indexOf(element);
+        if (entryIndex == -1) {
+            return 0;
+        }
+        int oldCount = backingMap.getValue(entryIndex);
+        int numberRemoved;
+        if (oldCount > occurrences) {
+            numberRemoved = occurrences;
+            backingMap.setValue(entryIndex, oldCount - occurrences);
+        } else {
+            numberRemoved = oldCount;
+            backingMap.removeEntry(entryIndex);
+        }
+        size -= numberRemoved;
+        return oldCount;
+    }
 
-      @Override
-      public boolean hasNext() {
-        return backingEntries.hasNext();
-      }
+    @CanIgnoreReturnValue
+    @Override
+    public final int setCount(@NullableDecl E element, int count) {
+        checkNonnegative(count, "count");
+        int oldCount = (count == 0) ? backingMap.remove(element) : backingMap.put(element, count);
+        size += (count - oldCount);
+        return oldCount;
+    }
 
-      @Override
-      public Entry<E> next() {
-        final Map.Entry<E, Count> mapEntry = backingEntries.next();
-        toRemove = mapEntry;
-        return new Multisets.AbstractEntry<E>() {
-          @Override
-          public E getElement() {
-            return mapEntry.getKey();
-          }
-
-          @Override
-          public int getCount() {
-            Count count = mapEntry.getValue();
-            if (count == null || count.get() == 0) {
-              Count frequency = backingMap.get(getElement());
-              if (frequency != null) {
-                return frequency.get();
-              }
+    @Override
+    public final boolean setCount(@NullableDecl E element, int oldCount, int newCount) {
+        checkNonnegative(oldCount, "oldCount");
+        checkNonnegative(newCount, "newCount");
+        int entryIndex = backingMap.indexOf(element);
+        if (entryIndex == -1) {
+            if (oldCount != 0) {
+                return false;
             }
-            return (count == null) ? 0 : count.get();
-          }
+            if (newCount > 0) {
+                backingMap.put(element, newCount);
+                size += newCount;
+            }
+            return true;
+        }
+        int actualOldCount = backingMap.getValue(entryIndex);
+        if (actualOldCount != oldCount) {
+            return false;
+        }
+        if (newCount == 0) {
+            backingMap.removeEntry(entryIndex);
+            size -= oldCount;
+        } else {
+            backingMap.setValue(entryIndex, newCount);
+            size += newCount - oldCount;
+        }
+        return true;
+    }
+
+    @Override
+    public final void clear() {
+        backingMap.clear();
+        size = 0;
+    }
+
+    @Override
+    final Iterator<E> elementIterator() {
+        return new Itr<E>() {
+            @Override
+            E result(int entryIndex) {
+                return backingMap.getKey(entryIndex);
+            }
         };
-      }
-
-      @Override
-      public void remove() {
-        checkRemove(toRemove != null);
-        size -= toRemove.getValue().getAndSet(0);
-        backingEntries.remove();
-        toRemove = null;
-      }
-    };
-  }
-
-  @Override
-  public void clear() {
-    for (Count frequency : backingMap.values()) {
-      frequency.set(0);
-    }
-    backingMap.clear();
-    size = 0L;
-  }
-
-  @Override
-  int distinctElements() {
-    return backingMap.size();
-  }
-
-  // Optimizations - Query Operations
-
-  @Override
-  public int size() {
-    return Ints.saturatedCast(size);
-  }
-
-  @Override
-  public Iterator<E> iterator() {
-    return new MapBasedMultisetIterator();
-  }
-
-  /*
-   * Not subclassing AbstractMultiset$MultisetIterator because next() needs to
-   * retrieve the Map.Entry<E, Count> entry, which can then be used for
-   * a more efficient remove() call.
-   */
-  private class MapBasedMultisetIterator implements Iterator<E> {
-    final Iterator<Map.Entry<E, Count>> entryIterator;
-    Map.Entry<E, Count> currentEntry;
-    int occurrencesLeft;
-    boolean canRemove;
-
-    MapBasedMultisetIterator() {
-      this.entryIterator = backingMap.entrySet().iterator();
     }
 
     @Override
-    public boolean hasNext() {
-      return occurrencesLeft > 0 || entryIterator.hasNext();
+    final Iterator<Entry<E>> entryIterator() {
+        return new Itr<Entry<E>>() {
+            @Override
+            Entry<E> result(int entryIndex) {
+                return backingMap.getEntry(entryIndex);
+            }
+        };
+    }
+
+    /**
+     * Allocation-free implementation of {@code target.addAll(this)}.
+     */
+    void addTo(Multiset<? super E> target) {
+        checkNotNull(target);
+        for (int i = backingMap.firstIndex(); i >= 0; i = backingMap.nextIndex(i)) {
+            target.add(backingMap.getKey(i), backingMap.getValue(i));
+        }
     }
 
     @Override
-    public E next() {
-      if (occurrencesLeft == 0) {
-        currentEntry = entryIterator.next();
-        occurrencesLeft = currentEntry.getValue().get();
-      }
-      occurrencesLeft--;
-      canRemove = true;
-      return currentEntry.getKey();
+    final int distinctElements() {
+        return backingMap.size();
     }
 
     @Override
-    public void remove() {
-      checkRemove(canRemove);
-      int frequency = currentEntry.getValue().get();
-      if (frequency <= 0) {
-        throw new ConcurrentModificationException();
-      }
-      if (currentEntry.getValue().addAndGet(-1) == 0) {
-        entryIterator.remove();
-      }
-      size--;
-      canRemove = false;
-    }
-  }
-
-  @Override
-  public int count(@Nullable Object element) {
-    Count frequency = Maps.safeGet(backingMap, element);
-    return (frequency == null) ? 0 : frequency.get();
-  }
-
-  // Optional Operations - Modification Operations
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws IllegalArgumentException if the call would result in more than
-   *     {@link Integer#MAX_VALUE} occurrences of {@code element} in this
-   *     multiset.
-   */
-  @CanIgnoreReturnValue
-  @Override
-  public int add(@Nullable E element, int occurrences) {
-    if (occurrences == 0) {
-      return count(element);
-    }
-    checkArgument(occurrences > 0, "occurrences cannot be negative: %s", occurrences);
-    Count frequency = backingMap.get(element);
-    int oldCount;
-    if (frequency == null) {
-      oldCount = 0;
-      backingMap.put(element, new Count(occurrences));
-    } else {
-      oldCount = frequency.get();
-      long newCount = (long) oldCount + (long) occurrences;
-      checkArgument(newCount <= Integer.MAX_VALUE, "too many occurrences: %s", newCount);
-      frequency.add(occurrences);
-    }
-    size += occurrences;
-    return oldCount;
-  }
-
-  @CanIgnoreReturnValue
-  @Override
-  public int remove(@Nullable Object element, int occurrences) {
-    if (occurrences == 0) {
-      return count(element);
-    }
-    checkArgument(occurrences > 0, "occurrences cannot be negative: %s", occurrences);
-    Count frequency = backingMap.get(element);
-    if (frequency == null) {
-      return 0;
+    public final Iterator<E> iterator() {
+        return Multisets.iteratorImpl(this);
     }
 
-    int oldCount = frequency.get();
-
-    int numberRemoved;
-    if (oldCount > occurrences) {
-      numberRemoved = occurrences;
-    } else {
-      numberRemoved = oldCount;
-      backingMap.remove(element);
+    @Override
+    public final int size() {
+        return Ints.saturatedCast(size);
     }
 
-    frequency.add(-numberRemoved);
-    size -= numberRemoved;
-    return oldCount;
-  }
-
-  // Roughly a 33% performance improvement over AbstractMultiset.setCount().
-  @CanIgnoreReturnValue
-  @Override
-  public int setCount(@Nullable E element, int count) {
-    checkNonnegative(count, "count");
-
-    Count existingCounter;
-    int oldCount;
-    if (count == 0) {
-      existingCounter = backingMap.remove(element);
-      oldCount = getAndSet(existingCounter, count);
-    } else {
-      existingCounter = backingMap.get(element);
-      oldCount = getAndSet(existingCounter, count);
-
-      if (existingCounter == null) {
-        backingMap.put(element, new Count(count));
-      }
+    /**
+     * @serialData the number of distinct elements, the first element, its count, the second element,
+     * its count, and so on
+     */
+    @GwtIncompatible // java.io.ObjectOutputStream
+    private void writeObject(ObjectOutputStream stream) throws IOException {
+        stream.defaultWriteObject();
+        Serialization.writeMultiset(this, stream);
     }
 
-    size += (count - oldCount);
-    return oldCount;
-  }
-
-  private static int getAndSet(@Nullable Count i, int count) {
-    if (i == null) {
-      return 0;
+    @GwtIncompatible // java.io.ObjectInputStream
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        int distinctElements = Serialization.readCount(stream);
+        init(ObjectCountHashMap.DEFAULT_SIZE);
+        Serialization.populateMultiset(this, stream, distinctElements);
     }
 
-    return i.getAndSet(count);
-  }
+    /**
+     * Skeleton of per-entry iterators. We could push this down and win a few bytes, but it's complex
+     * enough it's not especially worth it.
+     */
+    abstract class Itr<T> implements Iterator<T> {
+        int entryIndex = backingMap.firstIndex();
+        int toRemove = -1;
+        int expectedModCount = backingMap.modCount;
 
-  // Don't allow default serialization.
-  @GwtIncompatible // java.io.ObjectStreamException
-  private void readObjectNoData() throws ObjectStreamException {
-    throw new InvalidObjectException("Stream data required");
-  }
+        abstract T result(int entryIndex);
 
-  @GwtIncompatible // not needed in emulated source.
-  private static final long serialVersionUID = -2250766705698539974L;
+        private void checkForConcurrentModification() {
+            if (backingMap.modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            checkForConcurrentModification();
+            return entryIndex >= 0;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            T result = result(entryIndex);
+            toRemove = entryIndex;
+            entryIndex = backingMap.nextIndex(entryIndex);
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            checkForConcurrentModification();
+            CollectPreconditions.checkRemove(toRemove != -1);
+            size -= backingMap.removeEntry(toRemove);
+            entryIndex = backingMap.nextIndexAfterRemove(entryIndex, toRemove);
+            toRemove = -1;
+            expectedModCount = backingMap.modCount;
+        }
+    }
 }

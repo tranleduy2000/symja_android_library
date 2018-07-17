@@ -14,13 +14,15 @@
 
 package com.google.common.base;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Note this class is a copy of {@link com.google.common.collect.AbstractIterator} (for dependency
@@ -28,64 +30,65 @@ import javax.annotation.Nullable;
  */
 @GwtCompatible
 abstract class AbstractIterator<T> implements Iterator<T> {
-  private State state = State.NOT_READY;
+    private State state = State.NOT_READY;
+    @NullableDecl
+    private T next;
 
-  protected AbstractIterator() {}
+    protected AbstractIterator() {
+    }
 
-  private enum State {
-    READY,
-    NOT_READY,
-    DONE,
-    FAILED,
-  }
+    protected abstract T computeNext();
 
-  private T next;
+    @CanIgnoreReturnValue
+    @NullableDecl
+    protected final T endOfData() {
+        state = State.DONE;
+        return null;
+    }
 
-  protected abstract T computeNext();
+    @Override
+    public final boolean hasNext() {
+        checkState(state != State.FAILED);
+        switch (state) {
+            case READY:
+                return true;
+            case DONE:
+                return false;
+            default:
+        }
+        return tryToComputeNext();
+    }
 
-  @Nullable
-  @CanIgnoreReturnValue
-  protected final T endOfData() {
-    state = State.DONE;
-    return null;
-  }
-
-  @Override
-  public final boolean hasNext() {
-    checkState(state != State.FAILED);
-    switch (state) {
-      case READY:
-        return true;
-      case DONE:
+    private boolean tryToComputeNext() {
+        state = State.FAILED; // temporary pessimism
+        next = computeNext();
+        if (state != State.DONE) {
+            state = State.READY;
+            return true;
+        }
         return false;
-      default:
     }
-    return tryToComputeNext();
-  }
 
-  private boolean tryToComputeNext() {
-    state = State.FAILED; // temporary pessimism
-    next = computeNext();
-    if (state != State.DONE) {
-      state = State.READY;
-      return true;
+    @Override
+    public final T next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        state = State.NOT_READY;
+        T result = next;
+        next = null;
+        return result;
     }
-    return false;
-  }
 
-  @Override
-  public final T next() {
-    if (!hasNext()) {
-      throw new NoSuchElementException();
+    @Override
+    public final void remove() {
+        throw new UnsupportedOperationException();
     }
-    state = State.NOT_READY;
-    T result = next;
-    next = null;
-    return result;
-  }
 
-  @Override
-  public final void remove() {
-    throw new UnsupportedOperationException();
-  }
+    private enum State {
+        READY,
+        NOT_READY,
+        DONE,
+        FAILED,
+    }
 }

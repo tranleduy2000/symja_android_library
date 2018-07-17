@@ -14,14 +14,14 @@
 
 /**
  * Basic utility libraries and interfaces.
- *
+ * <p>
  * <p>This package is a part of the open-source <a href="http://github.com/google/guava">Guava</a>
  * library.
- *
+ * <p>
  * <h2>Contents</h2>
- *
+ * <p>
  * <h3>String-related utilities</h3>
- *
+ * <p>
  * <ul>
  * <li>{@link com.google.common.base.Ascii}
  * <li>{@link com.google.common.base.CaseFormat}
@@ -31,9 +31,9 @@
  * <li>{@link com.google.common.base.Splitter}
  * <li>{@link com.google.common.base.Strings}
  * </ul>
- *
+ * <p>
  * <h3>Function types</h3>
- *
+ * <p>
  * <ul>
  * <li>{@link com.google.common.base.Function}, {@link com.google.common.base.Functions}
  * <li>{@link com.google.common.base.Predicate}, {@link com.google.common.base.Predicates}
@@ -41,9 +41,9 @@
  * <li>{@link com.google.common.base.Converter}
  * <li>{@link com.google.common.base.Supplier}, {@link com.google.common.base.Suppliers}
  * </ul>
- *
+ * <p>
  * <h3>Other</h3>
- *
+ * <p>
  * <ul>
  * <li>{@link com.google.common.base.Defaults}
  * <li>{@link com.google.common.base.Enums}
@@ -53,11 +53,11 @@
  * <li>{@link com.google.common.base.Stopwatch}
  * <li>{@link com.google.common.base.Throwables}
  * </ul>
- *
  */
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package com.google.common.base;
 
-import javax.annotation.CheckReturnValue;
+import com.google.errorprone.annotations.CheckReturnValue;
+
 import javax.annotation.ParametersAreNonnullByDefault;

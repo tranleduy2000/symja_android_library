@@ -17,70 +17,73 @@
 package com.google.common.collect;
 
 import com.google.common.annotations.GwtCompatible;
-import java.io.Serializable;
-import javax.annotation.Nullable;
 
-/** An ordering that treats {@code null} as less than all other values. */
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import java.io.Serializable;
+
+/**
+ * An ordering that treats {@code null} as less than all other values.
+ */
 @GwtCompatible(serializable = true)
 final class NullsFirstOrdering<T> extends Ordering<T> implements Serializable {
-  final Ordering<? super T> ordering;
+    private static final long serialVersionUID = 0;
+    final Ordering<? super T> ordering;
 
-  NullsFirstOrdering(Ordering<? super T> ordering) {
-    this.ordering = ordering;
-  }
-
-  @Override
-  public int compare(@Nullable T left, @Nullable T right) {
-    if (left == right) {
-      return 0;
+    NullsFirstOrdering(Ordering<? super T> ordering) {
+        this.ordering = ordering;
     }
-    if (left == null) {
-      return RIGHT_IS_GREATER;
+
+    @Override
+    public int compare(@NullableDecl T left, @NullableDecl T right) {
+        if (left == right) {
+            return 0;
+        }
+        if (left == null) {
+            return RIGHT_IS_GREATER;
+        }
+        if (right == null) {
+            return LEFT_IS_GREATER;
+        }
+        return ordering.compare(left, right);
     }
-    if (right == null) {
-      return LEFT_IS_GREATER;
+
+    @Override
+    public <S extends T> Ordering<S> reverse() {
+        // ordering.reverse() might be optimized, so let it do its thing
+        return ordering.reverse().nullsLast();
     }
-    return ordering.compare(left, right);
-  }
 
-  @Override
-  public <S extends T> Ordering<S> reverse() {
-    // ordering.reverse() might be optimized, so let it do its thing
-    return ordering.reverse().nullsLast();
-  }
-
-  @SuppressWarnings("unchecked") // still need the right way to explain this
-  @Override
-  public <S extends T> Ordering<S> nullsFirst() {
-    return (Ordering<S>) this;
-  }
-
-  @Override
-  public <S extends T> Ordering<S> nullsLast() {
-    return ordering.nullsLast();
-  }
-
-  @Override
-  public boolean equals(@Nullable Object object) {
-    if (object == this) {
-      return true;
+    @SuppressWarnings("unchecked") // still need the right way to explain this
+    @Override
+    public <S extends T> Ordering<S> nullsFirst() {
+        return (Ordering<S>) this;
     }
-    if (object instanceof NullsFirstOrdering) {
-      NullsFirstOrdering<?> that = (NullsFirstOrdering<?>) object;
-      return this.ordering.equals(that.ordering);
+
+    @Override
+    public <S extends T> Ordering<S> nullsLast() {
+        return ordering.nullsLast();
     }
-    return false;
-  }
 
-  @Override
-  public int hashCode() {
-    return ordering.hashCode() ^ 957692532; // meaningless
-  }
+    @Override
+    public boolean equals(@NullableDecl Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof NullsFirstOrdering) {
+            NullsFirstOrdering<?> that = (NullsFirstOrdering<?>) object;
+            return this.ordering.equals(that.ordering);
+        }
+        return false;
+    }
 
-  @Override
-  public String toString() {
-    return ordering + ".nullsFirst()";
-  }
+    @Override
+    public int hashCode() {
+        return ordering.hashCode() ^ 957692532; // meaningless
+    }
 
-  private static final long serialVersionUID = 0;
+    @Override
+    public String toString() {
+        return ordering + ".nullsFirst()";
+    }
 }
