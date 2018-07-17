@@ -233,4 +233,8 @@ public class Config {
 	 * </p>
 	 */
 	public static boolean DOMINANT_IMPLICIT_TIMES = false;
+	/**
+	 * Default package mode with which the EvalEngines initially can be started
+	 */
+	public static boolean PACKAGE_MODE = true;
 }

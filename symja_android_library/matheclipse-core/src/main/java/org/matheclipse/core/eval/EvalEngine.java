@@ -195,7 +195,7 @@ public class EvalEngine implements Serializable {
 
 	protected int fIterationLimit;
 
-	protected boolean fPackageMode = F.PACKAGE_MODE;
+	protected boolean fPackageMode = Config.PACKAGE_MODE;
 
 	transient int fModuleCounter = 0;
 
@@ -1949,9 +1949,6 @@ public class EvalEngine implements Serializable {
 	}
 
 	public void setPackageMode(boolean packageMode) {
-		if (!packageMode) {
-			F.PACKAGE_MODE = false;
-		}
 		fPackageMode = packageMode;
 	}
 
