@@ -15,7 +15,7 @@ import static org.matheclipse.core.expression.F.FindInstance;
 import static org.matheclipse.core.expression.F.FindRoot;
 import static org.matheclipse.core.expression.F.FrobeniusSolve;
 import static org.matheclipse.core.expression.F.FromPolarCoordinates;
-import static org.matheclipse.core.expression.F.FunctionExpand;
+import static org.matheclipse.core.expression.F.*;
 import static org.matheclipse.core.expression.F.GeometricMean;
 import static org.matheclipse.core.expression.F.GroebnerBasis;
 import static org.matheclipse.core.expression.F.HeavisideTheta;
