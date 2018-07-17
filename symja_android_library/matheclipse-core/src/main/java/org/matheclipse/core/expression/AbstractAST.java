@@ -925,7 +925,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final int findFirstEquals(final IExpr expr) {
+	public final int indexOf(final IExpr expr) {
 		for (int i = 1; i < size(); i++) {
 			if (equalsAt(i, expr)) {
 				return i;
@@ -935,7 +935,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	}
 	/** {@inheritDoc} */
 	@Override
-	public final int findFirst(Predicate<? super IExpr> predicate) {
+	public final int indexOf(Predicate<? super IExpr> predicate) {
 		for (int i = 1; i < size(); i++) {
 			if (predicate.test(get(i))) {
 				return i;

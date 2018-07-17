@@ -5,6 +5,7 @@ import com.duy.lambda.Consumer;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.ObjIntPredicate;
 
 import java.util.ArrayList;
@@ -185,6 +186,17 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     }
 
     /**
+     * Find the first argument position, which equals <code>expr</code>. The search starts at index <code>1</code>.
+     *
+     * @param expr
+     * @return <code>-1</code> if no position was found
+     * @deprecated use {@link #indexOf(IExpr)} instead
+     */
+    public int findFirstEquals(final IExpr expr) {
+        return indexOf(expr);
+    }
+
+    /**
      * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return if
      * all of the arguments satisfy the predicate.
      *
@@ -338,6 +350,26 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     @Override
     public IASTAppendable rest() {
         return removeAtClone(1);
+    }
+
+    /**
+     * Create a new <code>IAST</code> and remove all arguments from position <code>fromPosition</code> inclusive to the
+     * end of this AST.
+     *
+     * @param fromPosition
+     * @return
+     */
+    public IAST removeFromEnd(int fromPosition) {
+        if (0 < fromPosition && fromPosition <= size()) {
+            if (fromPosition == size()) {
+                return this;
+            }
+            IASTAppendable ast = F.ast(head(), fromPosition, false);
+            ast.appendArgs(this, fromPosition);
+            return ast;
+        } else {
+            throw new IndexOutOfBoundsException("Index: " + Integer.valueOf(fromPosition) + ", Size: " + size());
+        }
     }
 
     /**

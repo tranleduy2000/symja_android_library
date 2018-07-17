@@ -2680,7 +2680,7 @@ public final class NumberTheory {
 			if (ast.isAST2()) {
 				return F.Binomial(F.Plus(ast.arg1(), ast.arg2()), ast.arg2());
 			}
-			int position = ast.findFirst(x -> (!x.isInteger()) || ((IInteger) x).isNegative());
+			int position = ast.indexOf(x -> (!x.isInteger()) || ((IInteger) x).isNegative());
 			if (position < 0) {
 				return multinomial(ast);
 				}
@@ -2688,8 +2688,8 @@ public final class NumberTheory {
 			if (position == argSize && !ast.get(argSize).isNumber()) {
 				// recurrence: Multinomial(n1, n2, n3,..., ni, k) =>
 				// Multinomial(n1+n2+n3+...+ni, k) * Multinomial(n1, n2, n3,..., ni)
-				IASTAppendable reducedPlus = ast.removeAtClone(argSize).apply(F.Plus);
-				IASTAppendable reducedMultinomial = ast.removeAtClone(argSize);
+				IAST reducedPlus = ast.removeFromEnd(argSize).apply(F.Plus);
+				IAST reducedMultinomial = ast.removeFromEnd(argSize);
 				return F.Times(F.Multinomial(reducedPlus, ast.get(argSize)), multinomial(reducedMultinomial));
 			}
 				return F.NIL;

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
-import java.util.EnumMap;
 import java.util.StringTokenizer;
 
 /**
@@ -186,11 +185,6 @@ public class AST extends HMArrayList implements Externalizable {
 		} while (tokenizer.hasMoreTokens());
 	}
 
-	/**
-	 * The enumeration map which possibly maps the properties (keys) to a user defined object.
-	 * 
-	 */
-	protected transient EnumMap<PROPERTY, Object> fProperties = null;
 
 	/**
 	 * Public no-arg constructor only needed for serialization
@@ -245,7 +239,7 @@ public class AST extends HMArrayList implements Externalizable {
 	@Override
 	public IAST clone() {
 		AST ast = new AST();
-		ast.fProperties = null;
+		// ast.fProperties = null;
 		ast.array = array.clone();
 		ast.hashValue = 0;
 		ast.firstIndex = firstIndex;
@@ -256,7 +250,7 @@ public class AST extends HMArrayList implements Externalizable {
 	@Override
 	public IASTAppendable copyAppendable() {
 		AST ast = new AST();
-		ast.fProperties = null;
+		// ast.fProperties = null;
 		ast.array = array.clone();
 		ast.hashValue = 0;
 		ast.firstIndex = firstIndex;
@@ -264,20 +258,6 @@ public class AST extends HMArrayList implements Externalizable {
 		return ast;
 	}
 
-	/**
-	 * Returns the value to which the specified property is mapped, or <code>null</code> if this map contains no mapping
-	 * for the property.
-	 * 
-	 * @param key
-	 * @return
-	 * @see #putProperty(PROPERTY, Object)
-	 */
-	public Object getProperty(PROPERTY key) {
-		if (fProperties == null) {
-			return null;
-		}
-		return fProperties.get(key);
-	}
 
 	@Override
 	public int hashCode() {
@@ -290,21 +270,19 @@ public class AST extends HMArrayList implements Externalizable {
 		return hashValue;
 	}
 
-	/**
-	 * Associates the specified value with the specified property in the associated
-	 * <code>EnumMap<PROPERTY, Object></code> map. If the map previously contained a mapping for this key, the old value
-	 * is replaced.
-	 * 
-	 * @param key
-	 * @param value
-	 * @return
-	 * @see #getProperty(PROPERTY)
-	 */
-	public Object putProperty(PROPERTY key, Object value) {
-		if (fProperties == null) {
-			fProperties = new EnumMap<PROPERTY, Object>(PROPERTY.class);
+	public IAST removeFromEnd(int fromPosition) {
+		if (0 < fromPosition && fromPosition <= size()) {
+			if (fromPosition == size()) {
+				return this;
 		}
-		return fProperties.put(key, value);
+			AST ast = new AST(array);
+			ast.firstIndex = firstIndex;
+			ast.lastIndex = firstIndex + fromPosition;
+			return ast;
+		} else {
+			throw new IndexOutOfBoundsException(
+					"Index: " + Integer.valueOf(fromPosition) + ", Size: " + Integer.valueOf(lastIndex - firstIndex));
+		}
 	}
 
 	@Override

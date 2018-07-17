@@ -507,15 +507,25 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param expr
      * @return <code>-1</code> if no position was found
      */
+    public int indexOf(final IExpr expr);
+
+    /**
+     * Find the first argument position, which equals <code>expr</code>. The search starts at index <code>1</code>.
+     *
+     * @param expr
+     * @return <code>-1</code> if no position was found
+     * @deprecated use {@link #indexOf(IExpr)} instead
+     */
     public int findFirstEquals(final IExpr expr);
 
     /**
-     * Find the first argument position, which fulfills the <code>predicate</code>. The search starts at index <code>1</code>.
+     * Find the first argument position, which fulfills the <code>predicate</code>. The search starts at index
+     * <code>1</code>.
      *
      * @param expr
      * @return <code>-1</code> if no position was found
      */
-    public int findFirst(Predicate<? super IExpr> predicate);
+    public int indexOf(Predicate<? super IExpr> predicate);
 
     /**
      * {@inheritDoc}
@@ -1021,6 +1031,15 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return a clone with removed element at the given position.
      */
     public IASTAppendable removeAtClone(int i);
+
+    /**
+     * Create a new <code>IAST</code> and remove all arguments from position <code>fromPosition</code> inclusive to the
+     * end of this AST.
+     *
+     * @param fromPosition
+     * @return
+     */
+    public IAST removeFromEnd(int fromPosition);
 
     /**
      * {@inheritDoc}
