@@ -15,7 +15,8 @@
 package com.google.common.util.concurrent;
 
 import com.google.common.annotations.GwtIncompatible;
-import javax.annotation.Nullable;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Unchecked version of {@link java.util.concurrent.TimeoutException}.
@@ -25,19 +26,20 @@ import javax.annotation.Nullable;
  */
 @GwtIncompatible
 public class UncheckedTimeoutException extends RuntimeException {
-  public UncheckedTimeoutException() {}
+    private static final long serialVersionUID = 0;
 
-  public UncheckedTimeoutException(@Nullable String message) {
-    super(message);
-  }
+    public UncheckedTimeoutException() {
+    }
 
-  public UncheckedTimeoutException(@Nullable Throwable cause) {
-    super(cause);
-  }
+    public UncheckedTimeoutException(@NullableDecl String message) {
+        super(message);
+    }
 
-  public UncheckedTimeoutException(@Nullable String message, @Nullable Throwable cause) {
-    super(message, cause);
-  }
+    public UncheckedTimeoutException(@NullableDecl Throwable cause) {
+        super(cause);
+    }
 
-  private static final long serialVersionUID = 0;
+    public UncheckedTimeoutException(@NullableDecl String message, @NullableDecl Throwable cause) {
+        super(message, cause);
+    }
 }

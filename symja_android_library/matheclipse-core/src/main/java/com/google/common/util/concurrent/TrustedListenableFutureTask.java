@@ -14,115 +14,168 @@
 
 package com.google.common.util.concurrent;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.annotations.GwtCompatible;
 import com.google.j2objc.annotations.WeakOuter;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RunnableFuture;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A {@link RunnableFuture} that also implements the {@link ListenableFuture} interface.
- *
+ * <p>
  * <p>This should be used in preference to {@link ListenableFutureTask} when possible for
  * performance reasons.
  */
 @GwtCompatible
 class TrustedListenableFutureTask<V> extends AbstractFuture.TrustedFuture<V>
-    implements RunnableFuture<V> {
+        implements RunnableFuture<V> {
 
-  /**
-   * Creates a {@code ListenableFutureTask} that will upon running, execute the given
-   * {@code Callable}.
-   *
-   * @param callable the callable task
-   */
-  static <V> TrustedListenableFutureTask<V> create(Callable<V> callable) {
-    return new TrustedListenableFutureTask<V>(callable);
-  }
+    /*
+     * In certain circumstances, this field might theoretically not be visible to an afterDone() call
+     * triggered by cancel(). For details, see the comments on the fields of TimeoutFuture.
+     *
+     * <p>{@code volatile} is required for j2objc transpiling:
+     * https://developers.google.com/j2objc/guides/j2objc-memory-model#atomicity
+     */
+    private volatile InterruptibleTask<?> task;
 
-  /**
-   * Creates a {@code ListenableFutureTask} that will upon running, execute the given
-   * {@code Runnable}, and arrange that {@code get} will return the given result on successful
-   * completion.
-   *
-   * @param runnable the runnable task
-   * @param result the result to return on successful completion. If you don't need a particular
-   *     result, consider using constructions of the form:
-   *     {@code ListenableFuture<?> f = ListenableFutureTask.create(runnable,
-   *     null)}
-   */
-  static <V> TrustedListenableFutureTask<V> create(Runnable runnable, @Nullable V result) {
-    return new TrustedListenableFutureTask<V>(Executors.callable(runnable, result));
-  }
-
-  /*
-   * In certain circumstances, this field might theoretically not be visible to an afterDone() call
-   * triggered by cancel(). For details, see the comments on the fields of TimeoutFuture.
-   */
-  private TrustedFutureInterruptibleTask task;
-
-  TrustedListenableFutureTask(Callable<V> callable) {
-    this.task = new TrustedFutureInterruptibleTask(callable);
-  }
-
-  @Override
-  public void run() {
-    TrustedFutureInterruptibleTask localTask = task;
-    if (localTask != null) {
-      localTask.run();
-    }
-  }
-
-  @Override
-  protected void afterDone() {
-    super.afterDone();
-
-    if (wasInterrupted()) {
-      TrustedFutureInterruptibleTask localTask = task;
-      if (localTask != null) {
-        localTask.interruptTask();
-      }
+    TrustedListenableFutureTask(Callable<V> callable) {
+        this.task = new TrustedFutureInterruptibleTask(callable);
     }
 
-    this.task = null;
-  }
+    TrustedListenableFutureTask(AsyncCallable<V> callable) {
+        this.task = new TrustedFutureInterruptibleAsyncTask(callable);
+    }
 
-  @Override
-  public String toString() {
-    return super.toString() + " (delegate = " + task + ")";
-  }
+    static <V> TrustedListenableFutureTask<V> create(AsyncCallable<V> callable) {
+        return new TrustedListenableFutureTask<V>(callable);
+    }
 
-  @WeakOuter
-  private final class TrustedFutureInterruptibleTask extends InterruptibleTask {
-    private final Callable<V> callable;
+    static <V> TrustedListenableFutureTask<V> create(Callable<V> callable) {
+        return new TrustedListenableFutureTask<V>(callable);
+    }
 
-    TrustedFutureInterruptibleTask(Callable<V> callable) {
-      this.callable = checkNotNull(callable);
+    /**
+     * Creates a {@code ListenableFutureTask} that will upon running, execute the given {@code
+     * Runnable}, and arrange that {@code get} will return the given result on successful completion.
+     *
+     * @param runnable the runnable task
+     * @param result   the result to return on successful completion. If you don't need a particular
+     *                 result, consider using constructions of the form: {@code ListenableFuture<?> f =
+     *                 ListenableFutureTask.create(runnable, null)}
+     */
+    static <V> TrustedListenableFutureTask<V> create(Runnable runnable, @NullableDecl V result) {
+        return new TrustedListenableFutureTask<V>(Executors.callable(runnable, result));
     }
 
     @Override
-    void runInterruptibly() {
-      // Ensure we haven't been cancelled or already run.
-      if (!isDone()) {
-        try {
-          set(callable.call());
-        } catch (Throwable t) {
-          setException(t);
+    public void run() {
+        InterruptibleTask localTask = task;
+        if (localTask != null) {
+            localTask.run();
         }
-      }
+        /*
+         * In the Async case, we may have called setFuture(pendingFuture), in which case afterDone()
+         * won't have been called yet.
+         */
+        this.task = null;
     }
 
     @Override
-    boolean wasInterrupted() {
-      return TrustedListenableFutureTask.this.wasInterrupted();
+    protected void afterDone() {
+        super.afterDone();
+
+        if (wasInterrupted()) {
+            InterruptibleTask localTask = task;
+            if (localTask != null) {
+                localTask.interruptTask();
+            }
+        }
+
+        this.task = null;
     }
 
     @Override
-    public String toString() {
-      return callable.toString();
+    protected String pendingToString() {
+        InterruptibleTask localTask = task;
+        if (localTask != null) {
+            return "task=[" + localTask + "]";
+        }
+        return super.pendingToString();
     }
-  }
+
+    @WeakOuter
+    private final class TrustedFutureInterruptibleTask extends InterruptibleTask<V> {
+        private final Callable<V> callable;
+
+        TrustedFutureInterruptibleTask(Callable<V> callable) {
+            this.callable = checkNotNull(callable);
+        }
+
+        @Override
+        final boolean isDone() {
+            return TrustedListenableFutureTask.this.isDone();
+        }
+
+        @Override
+        V runInterruptibly() throws Exception {
+            return callable.call();
+        }
+
+        @Override
+        void afterRanInterruptibly(V result, Throwable error) {
+            if (error == null) {
+                TrustedListenableFutureTask.this.set(result);
+            } else {
+                setException(error);
+            }
+        }
+
+        @Override
+        String toPendingString() {
+            return callable.toString();
+        }
+    }
+
+    @WeakOuter
+    private final class TrustedFutureInterruptibleAsyncTask
+            extends InterruptibleTask<ListenableFuture<V>> {
+        private final AsyncCallable<V> callable;
+
+        TrustedFutureInterruptibleAsyncTask(AsyncCallable<V> callable) {
+            this.callable = checkNotNull(callable);
+        }
+
+        @Override
+        final boolean isDone() {
+            return TrustedListenableFutureTask.this.isDone();
+        }
+
+        @Override
+        ListenableFuture<V> runInterruptibly() throws Exception {
+            return checkNotNull(
+                    callable.call(),
+                    "AsyncCallable.call returned null instead of a Future. "
+                            + "Did you mean to return immediateFuture(null)?");
+        }
+
+        @Override
+        void afterRanInterruptibly(ListenableFuture<V> result, Throwable error) {
+            if (error == null) {
+                setFuture(result);
+            } else {
+                setException(error);
+            }
+        }
+
+        @Override
+        String toPendingString() {
+            return callable.toString();
+        }
+    }
 }

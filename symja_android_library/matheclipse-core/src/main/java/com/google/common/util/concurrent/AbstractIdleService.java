@@ -19,6 +19,7 @@ import com.google.common.annotations.GwtIncompatible;
 import com.google.common.base.Supplier;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.j2objc.annotations.WeakOuter;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -35,177 +36,183 @@ import java.util.concurrent.TimeoutException;
 @GwtIncompatible
 public abstract class AbstractIdleService implements Service {
 
-  /* Thread names will look like {@code "MyService STARTING"}. */
-  private final Supplier<String> threadNameSupplier = new ThreadNameSupplier();
+    /* Thread names will look like {@code "MyService STARTING"}. */
+    private final Supplier<String> threadNameSupplier = new ThreadNameSupplier();
+    /* use AbstractService for state management */
+    private final Service delegate = new DelegateService();
 
-  @WeakOuter
-  private final class ThreadNameSupplier implements Supplier<String> {
-    @Override
-    public String get() {
-      return serviceName() + " " + state();
-    }
-  }
-
-  /* use AbstractService for state management */
-  private final Service delegate = new DelegateService();
-
-  @WeakOuter
-  private final class DelegateService extends AbstractService {
-    @Override
-    protected final void doStart() {
-      MoreExecutors.renamingDecorator(executor(), threadNameSupplier)
-          .execute(
-              new Runnable() {
-                @Override
-                public void run() {
-                  try {
-                    startUp();
-                    notifyStarted();
-                  } catch (Throwable t) {
-                    notifyFailed(t);
-                  }
-                }
-              });
+    /**
+     * Constructor for use by subclasses.
+     */
+    protected AbstractIdleService() {
     }
 
-    @Override
-    protected final void doStop() {
-      MoreExecutors.renamingDecorator(executor(), threadNameSupplier)
-          .execute(
-              new Runnable() {
-                @Override
-                public void run() {
-                  try {
-                    shutDown();
-                    notifyStopped();
-                  } catch (Throwable t) {
-                    notifyFailed(t);
-                  }
-                }
-              });
+    /**
+     * Start the service.
+     */
+    protected abstract void startUp() throws Exception;
+
+    /**
+     * Stop the service.
+     */
+    protected abstract void shutDown() throws Exception;
+
+    /**
+     * Returns the {@link Executor} that will be used to run this service. Subclasses may override
+     * this method to use a custom {@link Executor}, which may configure its worker thread with a
+     * specific name, thread group or priority. The returned executor's {@link
+     * Executor#execute(Runnable) execute()} method is called when this service is started and
+     * stopped, and should return promptly.
+     */
+    protected Executor executor() {
+        return new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                MoreExecutors.newThread(threadNameSupplier.get(), command).start();
+            }
+        };
     }
 
     @Override
     public String toString() {
-      return AbstractIdleService.this.toString();
+        return serviceName() + " [" + state() + "]";
     }
-  }
 
-  /** Constructor for use by subclasses. */
-  protected AbstractIdleService() {}
+    @Override
+    public final boolean isRunning() {
+        return delegate.isRunning();
+    }
 
-  /** Start the service. */
-  protected abstract void startUp() throws Exception;
+    @Override
+    public final State state() {
+        return delegate.state();
+    }
 
-  /** Stop the service. */
-  protected abstract void shutDown() throws Exception;
+    /**
+     * @since 13.0
+     */
+    @Override
+    public final void addListener(Listener listener, Executor executor) {
+        delegate.addListener(listener, executor);
+    }
 
-  /**
-   * Returns the {@link Executor} that will be used to run this service. Subclasses may override
-   * this method to use a custom {@link Executor}, which may configure its worker thread with a
-   * specific name, thread group or priority. The returned executor's {@link
-   * Executor#execute(Runnable) execute()} method is called when this service is started and
-   * stopped, and should return promptly.
-   */
-  protected Executor executor() {
-    return new Executor() {
-      @Override
-      public void execute(Runnable command) {
-        MoreExecutors.newThread(threadNameSupplier.get(), command).start();
-      }
-    };
-  }
+    /**
+     * @since 14.0
+     */
+    @Override
+    public final Throwable failureCause() {
+        return delegate.failureCause();
+    }
 
-  @Override
-  public String toString() {
-    return serviceName() + " [" + state() + "]";
-  }
+    /**
+     * @since 15.0
+     */
+    @CanIgnoreReturnValue
+    @Override
+    public final Service startAsync() {
+        delegate.startAsync();
+        return this;
+    }
 
-  @Override
-  public final boolean isRunning() {
-    return delegate.isRunning();
-  }
+    /**
+     * @since 15.0
+     */
+    @CanIgnoreReturnValue
+    @Override
+    public final Service stopAsync() {
+        delegate.stopAsync();
+        return this;
+    }
 
-  @Override
-  public final State state() {
-    return delegate.state();
-  }
+    /**
+     * @since 15.0
+     */
+    @Override
+    public final void awaitRunning() {
+        delegate.awaitRunning();
+    }
 
-  /**
-   * @since 13.0
-   */
-  @Override
-  public final void addListener(Listener listener, Executor executor) {
-    delegate.addListener(listener, executor);
-  }
+    /**
+     * @since 15.0
+     */
+    @Override
+    public final void awaitRunning(long timeout, TimeUnit unit) throws TimeoutException {
+        delegate.awaitRunning(timeout, unit);
+    }
 
-  /**
-   * @since 14.0
-   */
-  @Override
-  public final Throwable failureCause() {
-    return delegate.failureCause();
-  }
+    /**
+     * @since 15.0
+     */
+    @Override
+    public final void awaitTerminated() {
+        delegate.awaitTerminated();
+    }
 
-  /**
-   * @since 15.0
-   */
-  @CanIgnoreReturnValue
-  @Override
-  public final Service startAsync() {
-    delegate.startAsync();
-    return this;
-  }
+    /**
+     * @since 15.0
+     */
+    @Override
+    public final void awaitTerminated(long timeout, TimeUnit unit) throws TimeoutException {
+        delegate.awaitTerminated(timeout, unit);
+    }
 
-  /**
-   * @since 15.0
-   */
-  @CanIgnoreReturnValue
-  @Override
-  public final Service stopAsync() {
-    delegate.stopAsync();
-    return this;
-  }
+    /**
+     * Returns the name of this service. {@link AbstractIdleService} may include the name in debugging
+     * output.
+     *
+     * @since 14.0
+     */
+    protected String serviceName() {
+        return getClass().getSimpleName();
+    }
 
-  /**
-   * @since 15.0
-   */
-  @Override
-  public final void awaitRunning() {
-    delegate.awaitRunning();
-  }
+    @WeakOuter
+    private final class ThreadNameSupplier implements Supplier<String> {
+        @Override
+        public String get() {
+            return serviceName() + " " + state();
+        }
+    }
 
-  /**
-   * @since 15.0
-   */
-  @Override
-  public final void awaitRunning(long timeout, TimeUnit unit) throws TimeoutException {
-    delegate.awaitRunning(timeout, unit);
-  }
+    @WeakOuter
+    private final class DelegateService extends AbstractService {
+        @Override
+        protected final void doStart() {
+            MoreExecutors.renamingDecorator(executor(), threadNameSupplier)
+                    .execute(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        startUp();
+                                        notifyStarted();
+                                    } catch (Throwable t) {
+                                        notifyFailed(t);
+                                    }
+                                }
+                            });
+        }
 
-  /**
-   * @since 15.0
-   */
-  @Override
-  public final void awaitTerminated() {
-    delegate.awaitTerminated();
-  }
+        @Override
+        protected final void doStop() {
+            MoreExecutors.renamingDecorator(executor(), threadNameSupplier)
+                    .execute(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        shutDown();
+                                        notifyStopped();
+                                    } catch (Throwable t) {
+                                        notifyFailed(t);
+                                    }
+                                }
+                            });
+        }
 
-  /**
-   * @since 15.0
-   */
-  @Override
-  public final void awaitTerminated(long timeout, TimeUnit unit) throws TimeoutException {
-    delegate.awaitTerminated(timeout, unit);
-  }
-
-  /**
-   * Returns the name of this service. {@link AbstractIdleService} may include the name in debugging
-   * output.
-   *
-   * @since 14.0
-   */
-  protected String serviceName() {
-    return getClass().getSimpleName();
-  }
+        @Override
+        public String toString() {
+            return AbstractIdleService.this.toString();
+        }
+    }
 }
