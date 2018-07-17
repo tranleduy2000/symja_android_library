@@ -20,7 +20,7 @@ import org.matheclipse.core.polynomials.ExprPolynomialRing;
  * <pre>
  * DSolve(equation, f(var), var)
  * </pre>
- * 
+ *
  * <blockquote>
  * <p>
  * attempts to solve a linear differential <code>equation</code> for the function <code>f(var)</code> and variable
@@ -35,15 +35,15 @@ import org.matheclipse.core.polynomials.ExprPolynomialRing;
  * equation</a></li>
  * </ul>
  * <h3>Examples</h3>
- * 
+ *
  * <pre>
  * &gt;&gt; DSolve({y'(x)==y(x)+2},y(x), x)
  * {{y(x)-&gt;-2+E^x*C(1)}}
- * 
+ *
  * &gt;&gt;&gt; DSolve({y'(x)==y(x)+2,y(0)==1},y(x), x)
  * {{y(x)-&gt;-2+3*E^x}}
  * </pre>
- * 
+ *
  * <h3>Related terms</h3>
  * <p>
  * <a href="Factor.md">Factor</a>, <a href="FindRoot.md">FindRoot</a>,
@@ -62,9 +62,16 @@ public class DSolve extends AbstractFunctionEvaluator {
 		}
 		Validate.checkSize(ast, 4);
 
-		if (ast.arg2().isAST()) {
-			IAST uFunction1Arg = (IAST) ast.arg2();
+		IAST uFunction1Arg = F.NIL;
+		IExpr arg2 = ast.arg2();
 			IExpr xVar = ast.arg3();
+		if (arg2.isAST1()&& arg2.first().equals(xVar)) {
+			uFunction1Arg = (IAST) arg2;
+		} else if (arg2.isSymbol() && ast.arg3().isSymbol()) {
+			uFunction1Arg = F.unaryAST1(arg2, xVar);
+		}
+
+		if (uFunction1Arg.isPresent()) {
 			IASTAppendable listOfEquations = Validate.checkEquations(ast, 1).copyAppendable();
 			IExpr[] boundaryCondition = null;
 			int i = 1;
@@ -81,33 +88,52 @@ public class DSolve extends AbstractFunctionEvaluator {
 			}
 
 			if (uFunction1Arg.isAST1() && uFunction1Arg.arg1().equals(xVar)) {
+				return unaryODE(uFunction1Arg, arg2, xVar, listOfEquations, boundaryCondition, engine);
+			}
+		}
+		return F.NIL;
+	}
+
+	/**
+	 * Solve unary ODE.
+	 *
+	 * @param uFunction1Arg
+	 * @param arg2
+	 * @param xVar
+	 * @param listOfEquations
+	 * @param boundaryCondition
+	 * @param engine
+	 * @return
+	 */
+	private IExpr unaryODE(IAST uFunction1Arg, IExpr arg2, IExpr xVar, IASTAppendable listOfEquations,
+			IExpr[] boundaryCondition, EvalEngine engine) {
 				IAST listOfVariables = F.List(uFunction1Arg);
 				if (listOfEquations.size() <= 2) {
-					IExpr C_1 = F.$(F.CSymbol, F.C1); // constant C(1)
+			IExpr C_1 = F.unaryAST1(F.CSymbol, F.C1); // constant C(1)
 					IExpr equation = listOfEquations.arg1();
-					IExpr temp = solveSingleODE(equation, uFunction1Arg, xVar, listOfVariables, C_1, engine);
+			IExpr temp = solveSingleODE(equation, xVar, listOfVariables, C_1, engine);
 					if (!temp.isPresent()) {
 						temp = odeSolve(engine, equation, xVar, uFunction1Arg, C_1);
 					}
 					if (temp.isPresent()) {
 						if (boundaryCondition != null) {
 							IExpr res = F.subst(temp, F.List(F.Rule(xVar, boundaryCondition[0])));
-							IExpr C1 = engine.evaluate(F.Roots(F.Equal(res, boundaryCondition[1]), C_1));
+					IExpr C1 = F.Roots.of(engine, F.Equal(res, boundaryCondition[1]), C_1);
 							if (C1.isAST(F.Equal, 3, C_1)) {
 								res = F.subst(temp, F.List(F.Rule(C_1, C1.second())));
-								return F.List(F.List(F.Rule(uFunction1Arg, res)));
+						temp = res;
 							}
 						}
-						return F.List(F.List(F.Rule(uFunction1Arg, temp)));
+				if (arg2.isSymbol() && xVar.isSymbol()) {
+					return F.List(F.List(F.Rule(arg2, F.Function(F.List(xVar), temp))));
 					}
-				}
+				return F.List(F.List(F.Rule(arg2, temp)));
 			}
 		}
 		return F.NIL;
 	}
 
-	private IExpr solveSingleODE(IExpr equation, IAST uFunction1Arg, IExpr xVar, IAST listOfVariables, IExpr C_1,
-			EvalEngine engine) {
+	private IExpr solveSingleODE(IExpr equation, IExpr xVar, IAST listOfVariables, IExpr C_1, EvalEngine engine) {
 		ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, listOfVariables,
 				listOfVariables.argSize());
 
@@ -150,7 +176,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 						if (poly.degree() == 1) {
 							p = coeffs.get(2); // degree 1
 						}
-						return linearODE(p, q, uFunction1Arg, xVar, C_1, engine);
+						return linearODE(p, q, xVar, C_1, engine);
 					}
 				} catch (RuntimeException rex) {
 					if (Config.SHOW_STACKTRACE) {
@@ -182,7 +208,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 
 	/**
 	 * Equation <code>-1+y(0)</code> gives <code>[0, 1]</code> (representing the boundary equation y(0)==1)
-	 * 
+	 *
 	 * @param equation
 	 *            the equation
 	 * @param uFunction1Arg
@@ -225,7 +251,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 
 	/**
 	 * Solve linear ODE.
-	 * 
+	 *
 	 * @param p
 	 *            coefficient of degree 1
 	 * @param q
@@ -236,7 +262,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 	 *            the evaluation engine
 	 * @return <code>F.NIL</code> if the evaluation was not possible
 	 */
-	private IExpr linearODE(IExpr p, IExpr q, IExpr uFunction, IExpr xVar, IExpr C_1, EvalEngine engine) {
+	private IExpr linearODE(IExpr p, IExpr q, IExpr xVar, IExpr C_1, EvalEngine engine) {
 		// integrate p
 		IExpr pInt = engine.evaluate(F.Exp(F.Integrate(p, xVar)));
 
@@ -263,15 +289,15 @@ public class DSolve extends AbstractFunctionEvaluator {
 	}
 
 	private static IExpr[] odeTransform(EvalEngine engine, IExpr w, IExpr x, IExpr y) {
-		IExpr v = engine.evaluate(F.Together(w));
-		IExpr numerator = engine.evaluate(F.Numerator(v));
-		IExpr dyx = engine.evaluate(F.D(y, x));
-		IExpr m = engine.evaluate(F.Coefficient(numerator, dyx, F.C0));
-		IExpr n = engine.evaluate(F.Coefficient(numerator, dyx, F.C1));
+		IExpr v = F.Together.of(engine, w);
+		IExpr numerator = F.Numerator.of(engine, v);
+		IExpr dyx = F.D.of(engine, y, x);
+		IExpr m = F.Coefficient.of(engine, numerator, dyx, F.C0);
+		IExpr n = F.Coefficient.of(engine, numerator, dyx, F.C1);
 		return new IExpr[] { m, n };
 	}
 
-	private static IExpr odeSeparable(EvalEngine engine, IExpr m, IExpr n, final IExpr x, final IExpr y, IExpr C_1) {
+	private static IExpr odeSeparable(EvalEngine engine, IExpr m, IExpr n, IExpr x, IExpr y, IExpr C_1) {
 		if (n.isOne()) {
 			IExpr fxExpr = F.NIL;
 			IExpr gyExpr = F.NIL;
@@ -296,12 +322,12 @@ public class DSolve extends AbstractFunctionEvaluator {
 				gyExpr = engine.evaluate(gy);
 			}
 			if (fxExpr.isPresent() && gyExpr.isPresent()) {
-				gyExpr = engine.evaluate(F.Integrate(F.Divide(F.C1, gyExpr), y));
-				fxExpr = engine.evaluate(F.Plus(F.Integrate(F.Times(F.CN1, fxExpr), x), C_1));
-				IExpr yEquation = engine.evaluate(F.Subtract(gyExpr, fxExpr));
+				gyExpr = F.Integrate.of(engine, F.Divide(F.C1, gyExpr), y);
+				fxExpr = F.Plus.of(engine, F.Integrate(F.Times(F.CN1, fxExpr), x), C_1);
+				IExpr yEquation = F.Subtract.of(engine, gyExpr, fxExpr);
 				IExpr result = Eliminate.extractVariable(yEquation, y);
 				if (result.isPresent()) {
-					return result;
+					return engine.evaluate(result);
 				}
 			}
 
@@ -311,7 +337,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 
 	/**
 	 * An implicit solution to the differential equation <code>m + n*(dy/dx) == 0</code> or <code>F.NIL</code>.
-	 * 
+	 *
 	 * @param m
 	 *            algebraic expression
 	 * @param n
