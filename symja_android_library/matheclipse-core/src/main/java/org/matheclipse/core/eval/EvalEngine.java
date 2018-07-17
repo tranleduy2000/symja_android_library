@@ -1005,7 +1005,7 @@ public class EvalEngine implements Serializable {
 	 * @return <code>ast</code> if no evaluation was executed.
 	 */
 	public IExpr evalHoldPattern(IAST ast) {
-		return evalHoldPattern(ast, false);
+		return evalHoldPattern(ast, false, false);
 	}
 
 	/**
@@ -1016,9 +1016,10 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @param noEvaluation
 	 *            (sub-)expressions which contain no patterns should not be evaluated
+	 * @param evalNumericFunction TODO
 	 * @return <code>ast</code> if no evaluation was executed.
 	 */
-	public IExpr evalHoldPattern(IAST ast, boolean noEvaluation) {
+	public IExpr evalHoldPattern(IAST ast, boolean noEvaluation, boolean evalNumericFunction) {
 		boolean evalLHSMode = fEvalLHSMode;
 		try {
 			fEvalLHSMode = true;
@@ -1026,7 +1027,7 @@ public class EvalEngine implements Serializable {
 				// already flattened or sorted
 				return ast;
 			}
-			return evalSetAttributesRecursive(ast, noEvaluation, false, 0);
+			return evalSetAttributesRecursive(ast, noEvaluation, evalNumericFunction, 0);
 		} finally {
 			fEvalLHSMode = evalLHSMode;
 		}
@@ -1289,7 +1290,7 @@ public class EvalEngine implements Serializable {
 	 */
 	@Deprecated
 	public IExpr evalSetAttributes(IAST ast) {
-		return evalHoldPattern(ast, false);
+		return evalHoldPattern(ast, false, false);
 	}
 
 	/**
@@ -1305,7 +1306,7 @@ public class EvalEngine implements Serializable {
 	 */
 	@Deprecated
 	public IExpr evalSetAttributes(IAST ast, boolean noEvaluation) {
-		return evalHoldPattern(ast, noEvaluation);
+		return evalHoldPattern(ast, noEvaluation, false);
 	}
 	private IExpr evalSetAttributesRecursive(IAST ast, boolean noEvaluation, boolean evalNumericFunction, int level) {
 		if (ast.isAST(F.Literal, 2)) {
