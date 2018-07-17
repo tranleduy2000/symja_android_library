@@ -172,6 +172,15 @@ public class VariablesSet {
 				fCollection.add(((ASTSeriesData) list).getX());
 				return true;
 			}
+			if (list.head().isVariable()&&list.forAll(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return x.isInteger();
+                }
+            })) {
+				fCollection.add(list);
+				return true;
+			}
 			return super.visit(list);
 		}
 	}
