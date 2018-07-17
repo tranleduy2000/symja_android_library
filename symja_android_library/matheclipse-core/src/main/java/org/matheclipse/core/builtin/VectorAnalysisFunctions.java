@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.IntFunction;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
@@ -101,7 +103,12 @@ public class VectorAnalysisFunctions {
 				IAST variables = (IAST) ast.arg2();
 				int size = vector.size();
 				IASTAppendable divergenceValue = F.PlusAlloc(size);
-				return divergenceValue.appendArgs(size, i -> F.D(vector.get(i), variables.get(i)));
+				return divergenceValue.appendArgs(size, new IntFunction<IExpr>() {
+                    @Override
+                    public IExpr apply(int i) {
+                        return F.D(vector.get(i), variables.get(i));
+                    }
+                });
 			}
 
 			return F.NIL;
