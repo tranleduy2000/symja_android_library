@@ -2924,6 +2924,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testFactorial() {
 		check("Factorial(Infinity)", "Infinity");
+		check("Factorial2(-1)", "1");
+		check("Factorial2(-2)", "ComplexInfinity");
+		check("Factorial2(-3)", "-1");
+		check("Factorial2(-4)", "ComplexInfinity");
+		check("Factorial2(-5)", "1/3");
+		check("Factorial2(-6)", "ComplexInfinity");
+		check("Factorial2(-7)", "-1/15");
+		check("Factorial2(10)", "3840");
 		check("Factorial2(Infinity)", "Infinity");
 		check("Factorial(-Infinity)", "Indeterminate");
 		check("Factorial2(-Infinity)", "Indeterminate");
@@ -2931,11 +2939,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("3!!", "3");
 		check("Factorial(0)", "1");
 		check("Factorial(1)", "1");
-		check("Factorial(-1)", "-1");
+		check("Factorial(-1)", "ComplexInfinity");
 		check("Factorial(10)", "3628800");
-		check("Factorial(-10)", "3628800");
+		check("Factorial(-10)", "ComplexInfinity");
 		check("Factorial(11)", "39916800");
-		check("Factorial(-11)", "-39916800");
+		check("Factorial(-11)", "ComplexInfinity");
 		check("Factorial(19)", "121645100408832000");
 		check("Factorial(20)", "2432902008176640000");
 		check("Factorial(21)", "51090942171709440000");
