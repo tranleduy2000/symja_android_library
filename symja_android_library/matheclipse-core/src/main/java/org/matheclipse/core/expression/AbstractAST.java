@@ -933,6 +933,16 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		}
 		return -1;
 	}
+	/** {@inheritDoc} */
+	@Override
+	public final int findFirst(Predicate<? super IExpr> predicate) {
+		for (int i = 1; i < size(); i++) {
+			if (predicate.test(get(i))) {
+				return i;
+			}
+		}
+		return -1;
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -1858,11 +1868,6 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return this.equals(F.CInfinity);
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final boolean isInteger() {
-		return false;
-	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -2409,11 +2414,6 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return isSameHeadSizeGE(F.Sequence, 1);
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final boolean isReal() {
-		return false;
-	}
 
 	/** {@inheritDoc} */
 	@Override

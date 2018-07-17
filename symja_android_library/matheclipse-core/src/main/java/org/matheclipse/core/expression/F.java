@@ -6921,6 +6921,9 @@ public class F {
 		return Times(integer(i), b);
 	}
 
+	public static IAST Multinomial(final IExpr... a) {
+		return ast(a, Multinomial);
+	}
 	/**
 	 * Evaluate the given expression in numeric mode
 	 * 

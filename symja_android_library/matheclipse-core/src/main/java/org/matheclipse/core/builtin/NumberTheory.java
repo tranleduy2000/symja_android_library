@@ -341,7 +341,7 @@ public final class NumberTheory {
 					return F.NIL;
 				}
 				IInteger ki = (IInteger) k;
-				if (ki.compareInt(6) < 0 && ki.compareInt(1) > 0) {
+				if (ki.compareInt(6) < 0 && ki.compareInt(1) > 0 && !n.isNumber()) {
 					int kInt = ki.intValue();
 					IASTAppendable ast = F.TimesAlloc(kInt);
 					IAST temp;
@@ -374,6 +374,20 @@ public final class NumberTheory {
 				return F.C0;
 			}
 
+			if (!n.isNumber() && !k.isNumber()) {
+				int diff = F.eval(F.Subtract(n, k)).toIntDefault(-1);
+				if (diff > 0 && diff <= 5) {
+					IASTAppendable ast = F.TimesAlloc(diff + 1);
+					ast.append(F.Power(NumberTheory.factorial(diff), -1));
+					IAST temp;
+					IExpr nTemp = n;
+					for (int i = 1; i <= diff; i++) {
+						temp = F.Plus(F.ZZ(i), k);
+						ast.append(temp);
+					}
+					return ast;
+				}
+			}
 			IExpr boole = F.eval(F.Greater(F.Times(F.C2, k), n));
 			if (boole.isTrue()) {
 				// case k*2 > n : Binomial[n, k] -> Binomial[n, n-k]
@@ -2661,20 +2675,25 @@ public final class NumberTheory {
 				return F.C1;
 			}
 			if (ast.isAST2()) {
-				return F.Binomial(F.Plus(ast.arg1(), ast.arg2()), ast.arg1());
+				return F.Binomial(F.Plus(ast.arg1(), ast.arg2()), ast.arg2());
 			}
-			if (ast.exists(new Predicate<IExpr>() {
-				@Override
-				public boolean test(IExpr x) {
-					return (!x.isInteger()) || ((IInteger) x).isNegative();
+			int position = ast.findFirst(x -> (!x.isInteger()) || ((IInteger) x).isNegative());
+			if (position < 0) {
+				return multinomial(ast);
 				}
-			})) {
+			int argSize = ast.size() - 1;
+			if (position == argSize && !ast.get(argSize).isNumber()) {
+				// recurrence: Multinomial(n1, n2, n3,..., ni, k) =>
+				// Multinomial(n1+n2+n3+...+ni, k) * Multinomial(n1, n2, n3,..., ni)
+				IASTAppendable plus = F.PlusAlloc(argSize);
+				plus.appendArgs(ast, argSize);
+				IASTAppendable reducedMultinomial = F.ast(F.Multinomial, argSize, false);
+				reducedMultinomial.appendArgs(ast, argSize);
+				return F.Times(F.Multinomial(plus, ast.get(argSize)), reducedMultinomial);
+			}
 				return F.NIL;
 			}
 
-			return multinomial(ast);
-
-		}
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
@@ -3931,24 +3950,7 @@ public final class NumberTheory {
 
 	public static IInteger factorial(final IInteger x) {
 
-		int ni = x.toIntDefault(Integer.MIN_VALUE);
-		if (ni > Integer.MIN_VALUE) {
-			return factorial(ni);
-		}
-
-		IInteger result = F.C1;
-		if (x.compareTo(F.C0) == -1) {
-			result = F.CN1;
-
-			for (IInteger i = F.CN2; i.compareTo(x) >= 0; i = i.add(F.CN1)) {
-				result = result.multiply(i);
-			}
-		} else {
-			for (IInteger i = F.C2; i.compareTo(x) <= 0; i = i.add(F.C1)) {
-				result = result.multiply(i);
-			}
-		}
-		return result;
+		return x.factorial();
 	}
 
 	public static IInteger factorial(int ni) {
