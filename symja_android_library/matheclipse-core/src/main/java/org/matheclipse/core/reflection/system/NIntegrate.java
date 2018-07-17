@@ -12,7 +12,6 @@ import org.hipparchus.util.Precision;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.exception.WrappedException;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.Options;
 import org.matheclipse.core.expression.F;
@@ -187,10 +186,11 @@ public class NIntegrate extends AbstractFunctionEvaluator {
 						result = Precision.round(result, precisionGoal);
 						return Num.valueOf(result);
 					} catch (Exception e) {
-						if (Config.SHOW_STACKTRACE){
+						if (Config.SHOW_STACKTRACE) {
 							e.printStackTrace();
 						}
-						throw new WrappedException(e);
+						engine.printMessage("NIntegrate(method=" + method + ") " + e.getMessage());
+						// throw new WrappedException(e);
 					}
 				}
 			}

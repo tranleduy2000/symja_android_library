@@ -1,5 +1,10 @@
 package org.matheclipse.core.system;
 
+import static org.matheclipse.core.expression.F.ChebyshevT;
+import static org.matheclipse.core.expression.F.n_;
+import static org.matheclipse.core.expression.F.x_;
+
+import org.hipparchus.analysis.solvers.BisectionSolver;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
@@ -479,6 +484,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{{{{a,b},{c,d},{e,f}},{{x,x},{x,x},{x,x}},{{x,x},{x,x},{x,x}}},{{{x,x},{x,x},{x,x}},{{x,x},{x,x},{x,x}},{{x,x},{x,x},{x,x}}}}");
 
 	}
+
 	public void testAtomQ() {
 		check("AtomQ(Sin(Pi))", "True");
 		check("AtomQ(x)", "True");
@@ -597,6 +603,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"362880/(b*(1+b)*(2+b)*(3+b)*(4+b)*(5+b)*(6+b)*(7+b)*(8+b)*(9+b))");
 
 		check("Beta(2.3, 3.2)", "0.05403");
+
 		check("Beta(a, a+1)", "1/(a*(1+a)*CatalanNumber(a))");
 		check("Beta(b-1, b)", "1/((-1+b)*b*CatalanNumber(-1+b))");
 
@@ -932,6 +939,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("CDF(NormalDistribution(),0.41)", "0.6591");
 		checkNumeric("Table(CDF(NormalDistribution(0, s), x), {s, {.75, 1, 2}}, {x, -6,6}) // N", //
 				"{{0.0,1.3083924686053115E-11,4.82130336511414E-8,3.167124183311996E-5,0.0038303805675897395,0.0912112197258679,0.5,0.9087887802741321,0.9961696194324102,0.9999683287581669,0.9999999517869663,0.999999999986916,0.9999999999999993},{9.865876450377014E-10,2.866515718791945E-7,3.167124183311996E-5,0.0013498980316300957,0.022750131948179216,0.15865525393145705,0.5,0.8413447460685429,0.9772498680518208,0.9986501019683699,0.9999683287581669,0.9999997133484281,0.9999999990134123},{0.0013498980316300957,0.0062096653257761375,0.022750131948179216,0.06680720126885807,0.15865525393145705,0.30853753872598694,0.5,0.691462461274013,0.8413447460685429,0.9331927987311419,0.9772498680518208,0.9937903346742238,0.9986501019683699}}");
+
 		check("CDF(NormalDistribution(n, m),k)", "Erfc((-k+n)/(Sqrt(2)*m))/2");
 
 		check("CDF(BernoulliDistribution(p),k)", "Piecewise({{0,k<0},{1-p,0<=k&&k<1}},1)");
@@ -1110,6 +1118,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("Coefficient(-3*a(1)*(2*a(1)^2-a(2))+3*a(1)*a(2)-a(3),a(1)*a(2))", //
 				"6");
+
 		check("Coefficient(SeriesData(x, 0, {1, 1, 0, 1, 1, 0, 1, 1}, 0, 9, 1), x, 4)", //
 				"1");
 		check("Coefficient(x^2*y^2 + 3*x + 4*y+y^w, y, 0)", //
@@ -1954,6 +1963,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("h(x_):= 4 x / (x ^ 2 + 3*x + 5)", "");
 		check("extremes=Solve(h'(x)==0,x)", "{{x->-Sqrt(5)},{x->Sqrt(5)}}");
 		check("h''(x) /.extremes // N", "{1.65086,-0.06408}");
+
 		check("h(x_):=Sin(x)+x^2", "");
 		check("h'(x)", "2*x+Cos(x)");
 		check("h'(0.5)", "1.87758");
@@ -2079,6 +2089,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Differences({a,b})", "{-a+b}");
 		check("Differences({a,b,c})", "{-a+b,-b+c}");
 	}
+
 	public void testDigitQ() {
 		check("DigitQ(\"1234\")", "True");
 		check("DigitQ(\".\")", "False");
@@ -2364,8 +2375,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testDSolve() {
 
-		 check("DSolve(y'(t)==t+y(t), y, t)", "{{y->Function({t},-1-t+E^t*C(1))}}");
-		 check("DSolve(y'(t)==y(t), y, t)", "{{y->Function({t},E^t*C(1))}}");
+		check("DSolve(y'(t)==t+y(t), y, t)", "{{y->Function({t},-1-t+E^t*C(1))}}");
+		check("DSolve(y'(t)==y(t), y, t)", "{{y->Function({t},E^t*C(1))}}");
+
 		check("DSolve(y'(x)==2*x*y(x)^2, y, x)", "{{y->Function({x},1/(-x^2-C(1)))}}");
 		check("DSolve(y'(x)==2*x*y(x)^2, y(x), x)", "{{y(x)->1/(-x^2-C(1))}}");
 		check("DSolve({y'(x)==2*x*y(x)^2},y(x), x)", "{{y(x)->1/(-x^2-C(1))}}");
@@ -2555,6 +2567,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"True");
 		check("x^2+4*x+4==(x+2)^2", "True");
 		check("x^2+x==x*(x+1)", "True");
+
 		// github issue #42
 		check("1-i==1.0-i", "True");
 
@@ -2650,10 +2663,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Erfi(-x)", //
 				"-Erfi(x)");
 	}
+
 	public void testEuclideanDistance() {
 		check("EuclideanDistance({-1, -1}, {1, 1})", "2*Sqrt(2)");
 		check("EuclideanDistance({a, b}, {c, d})", "Sqrt(Abs(a-c)^2+Abs(b-d)^2)");
-
 	}
 
 	public void testEulerE() {
@@ -2679,8 +2692,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testEvaluate() {
 		check("{f(2+2, 1+1, -1+2), f(Evaluate(2+2),Evaluate(1+1),-1+2,Evaluate(-1+2))}", //
 				"{f(4,2,1),f(4,2,1,1)}");
-//		check("SetAttributes(hr,HoldRest); {hr(2+2, 1+1, -1+2), hr(2+2,Evaluate(1+1),-1+2,Evaluate(-1+2))}", //
-//				"{hr(4,1+1,-1+2),hr(4,2,-1+2,1)}");
+		check("SetAttributes(hr,HoldRest); {hr(2+2, 1+1, -1+2), hr(2+2,Evaluate(1+1),-1+2,Evaluate(-1+2))}", //
+				"{hr(4,1+1,-1+2),hr(4,2,-1+2,1)}");
 		check("SetAttributes(hf,HoldFirst); {hf(1+1), hf(Evaluate(1+1))}", //
 				"{hf(1+1),hf(2)}");
 		check("cheb = ChebyshevT(5, x);Function(x, Evaluate(cheb))", //
@@ -2694,6 +2707,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("x=Plus; {Attributes(x), Attributes(Evaluate(x))}", //
 				"{{},{Flat,Listable,OneIdentity,Orderless,NumericFunction}}");
 	}
+
 	public void testExactNumberQ() {
 		check("ExactNumberQ(10)", "True");
 		check("ExactNumberQ(4.0)", "False");
@@ -2923,7 +2937,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFactorial() {
+
 		check("Factorial(Infinity)", "Infinity");
+
 		check("Factorial2(-1)", "1");
 		check("Factorial2(-2)", "ComplexInfinity");
 		check("Factorial2(-3)", "-1");
@@ -3133,6 +3149,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1}), "//
 				+ "a* Sin(w*t + f), {{a, 2}, w, f}, t)", //
 				"{a->3.0,w->3.0,f->1.0}");
+
 		check("FindFit({{1,1},{2,4},{3,9},{4,16}}, " //
 				+ "a+b*x+c*x^2, {a, b, c}, x)", //
 				"{a->0.0,b->0.0,c->1.0}");
@@ -3145,12 +3162,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FindFit({{1.0, 12.}, {1.9, 10.}, {2.6, 8.2}, {3.4, 6.9}, {5.0, 5.9}}, " //
 				+ "a*Exp(-k*t), {a, k}, t)", //
 				"{a->14.38886,k->0.19821}");
+
 		// initial guess [0, 0, 0] doesn't work
 		check("FindFit({2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71}, " //
 				+ "a*x*Log(b + c*x), {{a,0},{b,0},{c,0}}, x)", //
 				"FindFit({2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71},a*x*Log(b+c*x),{{a,\n"
 						+ "0},{b,0},{c,0}},x)");
 	}
+
 	public void testFindInstance() {
 		check("FindInstance({x^2==4,x+y^2==6}, {x,y})", "{{x->-2,y->-2*Sqrt(2)}}");
 		check("FindInstance(x+5.0==a,x)", "{{x->-5.0+a}}");
@@ -3184,6 +3203,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// BisectionSolver solver = new BisectionSolver();
 	// System.out.println(solver.solve(100, x->Math.cos(x)+2, 0.0, 5.0));
 	// }
+
 	public void testFindRoot() {
 		// github issue #60
 		check("FindRoot(cos(x) + 2, {x, 0, 5}, Method->brent)", //
@@ -3192,9 +3212,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{}");
 		check("FindRoot(cos(x) + 2, {x, 0, 5}, Method->newton)", //
 				"{}");
+
 		// github issue #43
 		check("findroot(abs(x-1)-2x-3==0, {x, -10, 10})", //
 				"{x->-0.66667}");
+
 		// issue #181
 		check("FindRoot(2^x==0,{x,-100,100}, Method->Brent)", "{x->-100.0}");
 		// FindRoot: interval does not bracket a root: f(-1) = 0.5, f(100) =
@@ -3611,6 +3633,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FunctionExpand(Beta(z,3,b))", //
 				"(2*(1-(1-z)^b*(1+b*z+1/2*b*(1+b)*z^2)))/(b*(1+b)*(2+b))");
 	}
+
 	public void testGamma() {
 		check("Refine(Gamma(n), Element(n,Integers)&&n>=0)", //
 				"(-1+n)!");
@@ -3683,6 +3706,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"(2*Cos(Pi*v))/v");
 		check("GegenbauerC(v,i)", //
 				"GegenbauerC(v,i)");
+
 		check("GegenbauerC(0,z)", //
 				"ComplexInfinity");
 		check("GegenbauerC(1,z)", //
@@ -3760,8 +3784,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Grad(2*x+3*y^2-Sin(z), {x, y, z})", //
 				"{2,6*y,-Cos(z)}");
 	}
+
 	public void testGreater() {
 		check("42>Infinity", "False");
+
 		check("Infinity>Infinity", "False");
 
 		check("Refine(Infinity>x, x>0)", "True");
@@ -3955,8 +3981,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testHypergeometric2F1() {
+
 		check("Hypergeometric2F1(1,2,3/2,x^2/9)", //
 				"3/2*(1/3*Sqrt(1-x^2/9)*Sqrt(x^2)+ArcSin(Sqrt(x^2)/3))/((1-x^2/9)^(3/2)*Sqrt(x^2))");
+
 		// Hypergeometric2F1(1 - n, -n, 2, 1) == CatalanNumber(n)
 		check("Hypergeometric2F1(-3, -4, 2, 1)==CatalanNumber(4)", //
 				"True");
@@ -4175,7 +4203,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{{9,1},{8,2},{7,3},{6,4},{5,5}}");
 		check("IntegerPartitions(0)", //
 				"{{}}");
-
 		check("IntegerPartitions(1)", //
 				"{{1}}");
 		check("IntegerPartitions(-1)", //
@@ -4831,6 +4858,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"E");
 		check("Limit(x/((x!)^(1/x)), x->Infinity)", //
 				"E");
+
 		check("Limit((1+k/x)^x, x->Infinity)", "E^k");
 		check("Limit((1-1/x)^x, x->Infinity)", "1/E");
 		// check("Limit((1 + Sinh(x))/E^x, x ->Infinity)", "Infinity*Limit(E^(-x),x->Infinity)");
@@ -5706,6 +5734,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"(1+k)*(2+k)");
 		check("Multinomial(10,f(x),2,3,4)", //
 				"116396280*Binomial(19+f(x),f(x))");
+
 		check("Multinomial(0,0,0,0,0)", //
 				"1");
 		check("Multinomial(a,b)", //
@@ -5727,6 +5756,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("Select(Range(2,200), MultiplicativeOrder(10, # )== # - 1 &)", //
 				"{7,17,19,23,29,47,59,61,97,109,113,131,149,167,179,181,193}");
+
 		check("MultiplicativeOrder(7, 108)", //
 				"18");
 		check("MultiplicativeOrder(10^100 + 1, Prime(1000))", //
@@ -6090,6 +6120,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testNIntegrate() {
+		// github #61
+		// these methods correctly show "NIntegrate(method=method-nsme) maximal count (xxxxx) exceeded"
+		checkNumeric("NIntegrate(1/x, {x,0,5}, Method->Romberg)", //
+				"NIntegrate(1/x,{x,0,5},Method->romberg)");
+		checkNumeric("NIntegrate(1/x, {x,0,5}, Method->Simpson)", //
+				"NIntegrate(1/x,{x,0,5},Method->simpson)");
+		checkNumeric("NIntegrate(1/x, {x,0,5}, Method->Trapezoid)", //
+				"NIntegrate(1/x,{x,0,5},Method->trapezoid)");
+		// wrong result
+		checkNumeric("NIntegrate(1/x, {x,0,5}, Method->LegendreGauss)", //
+				"10.374755035279318");
+
 		// github #26
 		checkNumeric("NIntegrate(ln(x^2), {x, -5, 99}, Method->Romberg, MaxPoints->400, MaxIterations->10000000)", //
 				"717.9282476448197");
@@ -6382,6 +6424,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ReplaceRepeated(1/6*(3+3*v1+v2+a*(4+v2)), {v2->Sqrt(5+6*a+5*v1), v1->a^2})", //
 				"1/6*(3+3*a^2+Sqrt(5+6*a+5*a^2)+a*(4+Sqrt(5+6*a+5*a^2)))");
 	}
+
 	public void testOptional() {
 		check("f(a) /. f(x_, y_:3) -> {x, y}", "{a,3}");
 
@@ -6537,10 +6580,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPadRight() {
-//		check("PadRight({1, 2, 3}, 5)", "{1,2,3,0,0}");
-//		check("PadRight(x(a, b, c), 5) ", "x(a,b,c,0,0)");
-//		check("PadRight({1, 2, 3}, 2)", "{1,2}");
-//		check("PadRight({1, 2, 3}, 1)", "{1}");
+		// check("PadRight({1, 2, 3}, 5)", "{1,2,3,0,0}");
+		// check("PadRight(x(a, b, c), 5) ", "x(a,b,c,0,0)");
+		// check("PadRight({1, 2, 3}, 2)", "{1,2}");
+		// check("PadRight({1, 2, 3}, 1)", "{1}");
 		check("PadRight({{}, {1, 2}, {1, 2, 3}})", "{{0,0,0},{1,2,0},{1,2,3}}");
 
 		check("PadRight({a, b, c}, 10)", "{a,b,c,0,0,0,0,0,0,0}");
@@ -7244,6 +7287,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// 3 is not a primitive root for 13
 		check("PowerMod(3, Range(12), 13)", //
 				"{3,9,1,3,9,1,3,9,1,3,9,1}");
+
 		// check("PowerMod(6, 1/2, 10)", "1");
 
 		check("PowerMod(2, 10, 3)", //
@@ -7421,6 +7465,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("Select(Range(100), PrimitiveRoot(#) != {} &)", //
 		// "");
 	}
+
 	public void testPrimitiveRootList() {
 		check("PrimitiveRootList(2*Prime(5))", "{7,13,17,19}");
 		check("PrimitiveRootList(9)", "{2,5}");
@@ -10510,6 +10555,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Zeta(4.0)", "1.08232");
 		check("Zeta(1.0+I)", "0.58216+I*(-0.92685)");
 		check("Zeta(-3.0+I*1.0^(-100))", "0.01438+I*0.01035");
+
 		check("Zeta(-1)", "-1/12");
 		check("Zeta(2)", "Pi^2/6");
 		// TODO add implementation
