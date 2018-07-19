@@ -1183,6 +1183,8 @@ public class F {
 	public final static IBuiltInSymbol HurwitzZeta = F.initFinalSymbol("HurwitzZeta", ID.HurwitzZeta);
 
 	/***/
+	public final static IBuiltInSymbol Hypergeometric0F1 = F.initFinalSymbol("Hypergeometric0F1", ID.Hypergeometric0F1);
+	/***/
 	public final static IBuiltInSymbol Hypergeometric1F1 = F.initFinalSymbol("Hypergeometric1F1", ID.Hypergeometric1F1);
 
 	/***/
@@ -1852,7 +1854,10 @@ public class F {
 	/** Operate(p, expr) - applies `p` to the head of `expr`. */
 	public final static IBuiltInSymbol Operate = F.initFinalSymbol("Operate", ID.Operate);
 
-	/***/
+	/**
+	 * OptimizeExpression(function) - common subexpressions elimination for a complicated `function` by generating
+	 * "dummy" variables for these subexpressions.
+	 */
 	public final static IBuiltInSymbol OptimizeExpression = F.initFinalSymbol("OptimizeExpression",
 			ID.OptimizeExpression);
 	/**
@@ -5886,6 +5891,9 @@ public class F {
 		return binaryAST2(HurwitzZeta, a0, a1);
 	}
 
+	public static IAST Hypergeometric0F1(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Hypergeometric0F1, a0, a1);
+	}
 	public static IAST Hypergeometric2F1(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
 		return quaternary(Hypergeometric2F1, a0, a1, a2, a3);
 	}
