@@ -33,5 +33,6 @@ dependencies {
 
     implementation project(':symja_android_library')
     testImplementation 'org.jsoup:jsoup:1.11.2'
+    implementation 'com.annimon:stream:1.2.0'
 
 }
