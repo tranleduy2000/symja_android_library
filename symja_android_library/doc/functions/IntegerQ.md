@@ -1,7 +1,7 @@
 ## IntegerQ
 
 ```
-IntegerQ(expr)
+git(expr)
 ```
 
 > returns `True` if `expr` is an integer, and `False` otherwise.
