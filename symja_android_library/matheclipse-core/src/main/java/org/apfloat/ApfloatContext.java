@@ -6,7 +6,9 @@ import org.apfloat.spi.Util;
 
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -444,17 +446,17 @@ public class ApfloatContext
             throws ApfloatRuntimeException {
         Properties properties = new Properties();
 
-//        try {
-//            ResourceBundle resourceBundle = ResourceBundle.getBundle("apfloat");
-//
-//            Enumeration<String> keys = resourceBundle.getKeys();
-//            while (keys.hasMoreElements()) {
-//                String key = keys.nextElement();
-//                properties.setProperty(key, resourceBundle.getString(key));
-//            }
-//        } catch (MissingResourceException mre) {
-//            // Ignore - properties file or class is not found or can't be read
-//        }
+        try {
+            ResourceBundle resourceBundle = ResourceBundle.getBundle("apfloat");
+
+            Enumeration<String> keys = resourceBundle.getKeys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                properties.setProperty(key, resourceBundle.getString(key));
+            }
+        } catch (MissingResourceException mre) {
+            // Ignore - properties file or class is not found or can't be read
+        }
 
         return properties;
     }
