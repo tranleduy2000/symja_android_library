@@ -41,7 +41,7 @@ import static com.google.common.util.concurrent.Service.State.TERMINATED;
 /**
  * Base class for implementing services that can handle {@link #doStart} and {@link #doStop}
  * requests, responding to them with {@link #notifyStarted()} and {@link #notifyStopped()}
- * callbacks. Its subclasses must manage threads manually; consider {@link
+ * callbacks. Its subclasses must manage threads manually; consider {link
  * AbstractExecutionThreadService} if you need only a single execution thread.
  *
  * @author Jesse Wilson

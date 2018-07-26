@@ -218,8 +218,8 @@ final class FuturesGetChecked {
      */
     @VisibleForTesting
     static class GetCheckedTypeValidatorHolder {
-        static final String CLASS_VALUE_VALIDATOR_NAME =
-                GetCheckedTypeValidatorHolder.class.getName() + "$ClassValueValidator";
+//        static final String CLASS_VALUE_VALIDATOR_NAME =
+//                GetCheckedTypeValidatorHolder.class.getName() + "$ClassValueValidator";
 
         static final GetCheckedTypeValidator BEST_VALIDATOR = getBestValidator();
 
@@ -228,12 +228,12 @@ final class FuturesGetChecked {
          * unable to do so.
          */
         static GetCheckedTypeValidator getBestValidator() {
-            try {
-                Class<?> theClass = Class.forName(CLASS_VALUE_VALIDATOR_NAME);
-                return (GetCheckedTypeValidator) theClass.getEnumConstants()[0];
-            } catch (Throwable t) { // ensure we really catch *everything*
+//            try {
+//                Class<?> theClass = Class.forName(CLASS_VALUE_VALIDATOR_NAME);
+//                return (GetCheckedTypeValidator) theClass.getEnumConstants()[0];
+//            } catch (Throwable t) { // ensure we really catch *everything*
                 return weakSetValidator();
-            }
+//            }
         }
 
         enum WeakSetValidator implements GetCheckedTypeValidator {

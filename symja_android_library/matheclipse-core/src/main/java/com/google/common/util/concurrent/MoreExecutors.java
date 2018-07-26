@@ -66,104 +66,6 @@ public final class MoreExecutors {
     private MoreExecutors() {
     }
 
-    /**
-     * Converts the given ThreadPoolExecutor into an ExecutorService that exits when the application
-     * is complete. It does so by using daemon threads and adding a shutdown hook to wait for their
-     * completion.
-     * <p>
-     * <p>This is mainly for fixed thread pools. See {@link Executors#newFixedThreadPool(int)}.
-     *
-     * @param executor           the executor to modify to make sure it exits when the application is finished
-     * @param terminationTimeout how long to wait for the executor to finish before terminating the
-     *                           JVM
-     * @param timeUnit           unit of time for the time parameter
-     * @return an unmodifiable version of the input which will not hang the JVM
-     */
-    @Beta
-    @GwtIncompatible // TODO
-    public static ExecutorService getExitingExecutorService(
-            ThreadPoolExecutor executor, long terminationTimeout, TimeUnit timeUnit) {
-        return new Application().getExitingExecutorService(executor, terminationTimeout, timeUnit);
-    }
-
-    /**
-     * Converts the given ThreadPoolExecutor into an ExecutorService that exits when the application
-     * is complete. It does so by using daemon threads and adding a shutdown hook to wait for their
-     * completion.
-     * <p>
-     * <p>This method waits 120 seconds before continuing with JVM termination, even if the executor
-     * has not finished its work.
-     * <p>
-     * <p>This is mainly for fixed thread pools. See {@link Executors#newFixedThreadPool(int)}.
-     *
-     * @param executor the executor to modify to make sure it exits when the application is finished
-     * @return an unmodifiable version of the input which will not hang the JVM
-     */
-    @Beta
-    @GwtIncompatible // concurrency
-    public static ExecutorService getExitingExecutorService(ThreadPoolExecutor executor) {
-        return new Application().getExitingExecutorService(executor);
-    }
-
-    /**
-     * Converts the given ScheduledThreadPoolExecutor into a ScheduledExecutorService that exits when
-     * the application is complete. It does so by using daemon threads and adding a shutdown hook to
-     * wait for their completion.
-     * <p>
-     * <p>This is mainly for fixed thread pools. See {@link Executors#newScheduledThreadPool(int)}.
-     *
-     * @param executor           the executor to modify to make sure it exits when the application is finished
-     * @param terminationTimeout how long to wait for the executor to finish before terminating the
-     *                           JVM
-     * @param timeUnit           unit of time for the time parameter
-     * @return an unmodifiable version of the input which will not hang the JVM
-     */
-    @Beta
-    @GwtIncompatible // TODO
-    public static ScheduledExecutorService getExitingScheduledExecutorService(
-            ScheduledThreadPoolExecutor executor, long terminationTimeout, TimeUnit timeUnit) {
-        return new Application()
-                .getExitingScheduledExecutorService(executor, terminationTimeout, timeUnit);
-    }
-
-    /**
-     * Converts the given ScheduledThreadPoolExecutor into a ScheduledExecutorService that exits when
-     * the application is complete. It does so by using daemon threads and adding a shutdown hook to
-     * wait for their completion.
-     * <p>
-     * <p>This method waits 120 seconds before continuing with JVM termination, even if the executor
-     * has not finished its work.
-     * <p>
-     * <p>This is mainly for fixed thread pools. See {@link Executors#newScheduledThreadPool(int)}.
-     *
-     * @param executor the executor to modify to make sure it exits when the application is finished
-     * @return an unmodifiable version of the input which will not hang the JVM
-     */
-    @Beta
-    @GwtIncompatible // TODO
-    public static ScheduledExecutorService getExitingScheduledExecutorService(
-            ScheduledThreadPoolExecutor executor) {
-        return new Application().getExitingScheduledExecutorService(executor);
-    }
-
-    /**
-     * Add a shutdown hook to wait for thread completion in the given {@link ExecutorService service}.
-     * This is useful if the given service uses daemon threads, and we want to keep the JVM from
-     * exiting immediately on shutdown, instead giving these daemon threads a chance to terminate
-     * normally.
-     *
-     * @param service            ExecutorService which uses daemon threads
-     * @param terminationTimeout how long to wait for the executor to finish before terminating the
-     *                           JVM
-     * @param timeUnit           unit of time for the time parameter
-     */
-    @Beta
-    @GwtIncompatible // TODO
-    public static void addDelayedShutdownHook(
-            ExecutorService service, long terminationTimeout, TimeUnit timeUnit) {
-        new Application().addDelayedShutdownHook(service, terminationTimeout, timeUnit);
-    }
-
     @GwtIncompatible // TODO
     private static void useDaemonThreadFactory(ThreadPoolExecutor executor) {
         executor.setThreadFactory(
@@ -171,36 +73,6 @@ public final class MoreExecutors {
                         .setDaemon(true)
                         .setThreadFactory(executor.getThreadFactory())
                         .build());
-    }
-
-    /**
-     * Creates an executor service that runs each task in the thread that invokes {@code
-     * execute/submit}, as in {@link CallerRunsPolicy} This applies both to individually submitted
-     * tasks and to collections of tasks submitted via {@code invokeAll} or {@code invokeAny}. In the
-     * latter case, tasks will run serially on the calling thread. Tasks are run to completion before
-     * a {@code Future} is returned to the caller (unless the executor has been shutdown).
-     * <p>
-     * <p>Although all tasks are immediately executed in the thread that submitted the task, this
-     * {@code ExecutorService} imposes a small locking overhead on each task submission in order to
-     * implement shutdown and termination behavior.
-     * <p>
-     * <p>The implementation deviates from the {@code ExecutorService} specification with regards to
-     * the {@code shutdownNow} method. First, "best-effort" with regards to canceling running tasks is
-     * implemented as "no-effort". No interrupts or other attempts are made to stop threads executing
-     * tasks. Second, the returned list will always be empty, as any submitted task is considered to
-     * have started execution. This applies also to tasks given to {@code invokeAll} or {@code
-     * invokeAny} which are pending serial execution, even the subset of the tasks that have not yet
-     * started execution. It is unclear from the {@code ExecutorService} specification if these should
-     * be included, and it's much easier to implement the interpretation that they not be. Finally, a
-     * call to {@code shutdown} or {@code shutdownNow} may result in concurrent calls to {@code
-     * invokeAll/invokeAny} throwing RejectedExecutionException, although a subset of the tasks may
-     * already have been executed.
-     *
-     * @since 18.0 (present as MoreExecutors.sameThreadExecutor() since 10.0)
-     */
-    @GwtIncompatible // TODO
-    public static ListeningExecutorService newDirectExecutorService() {
-        return new DirectExecutorService();
     }
 
     /**
@@ -433,19 +305,23 @@ public final class MoreExecutors {
     @Beta
     @GwtIncompatible // concurrency
     public static ThreadFactory platformThreadFactory() {
-        if (!isAppEngine()) {
+//        if (!isAppEngine()) {
             return Executors.defaultThreadFactory();
-        }
-        try {
-            return (ThreadFactory)
-                    Class.forName("com.google.appengine.api.ThreadManager")
-                            .getMethod("currentRequestThreadFactory")
-                            .invoke(null);
-        } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException e) {
-            throw new RuntimeException("Couldn't invoke ThreadManager.currentRequestThreadFactory", e);
-        } catch (InvocationTargetException e) {
-            throw Throwables.propagate(e.getCause());
-        }
+//        }
+//        try {
+//            return (ThreadFactory)
+//                    Class.forName("com.google.appengine.api.ThreadManager")
+//                            .getMethod("currentRequestThreadFactory")
+//                            .invoke(null);
+//        } catch (IllegalAccessException e) {
+//            throw new RuntimeException("Couldn't invoke ThreadManager.currentRequestThreadFactory", e);
+//        } catch (ClassNotFoundException e) {
+//            throw new RuntimeException("Couldn't invoke ThreadManager.currentRequestThreadFactory", e);
+//        } catch (NoSuchMethodException e) {
+//            throw new RuntimeException("Couldn't invoke ThreadManager.currentRequestThreadFactory", e);
+//        } catch (InvocationTargetException e) {
+//            throw Throwables.propagate(e.getCause());
+//        }
     }
 
     @GwtIncompatible // TODO
@@ -453,25 +329,26 @@ public final class MoreExecutors {
         if (System.getProperty("com.google.appengine.runtime.environment") == null) {
             return false;
         }
-        try {
-            // If the current environment is null, we're not inside AppEngine.
-            return Class.forName("com.google.apphosting.api.ApiProxy")
-                    .getMethod("getCurrentEnvironment")
-                    .invoke(null)
-                    != null;
-        } catch (ClassNotFoundException e) {
-            // If ApiProxy doesn't exist, we're not on AppEngine at all.
-            return false;
-        } catch (InvocationTargetException e) {
-            // If ApiProxy throws an exception, we're not in a proper AppEngine environment.
-            return false;
-        } catch (IllegalAccessException e) {
-            // If the method isn't accessible, we're not on a supported version of AppEngine;
-            return false;
-        } catch (NoSuchMethodException e) {
-            // If the method doesn't exist, we're not on a supported version of AppEngine;
-            return false;
-        }
+//        try {
+//            // If the current environment is null, we're not inside AppEngine.
+//            return Class.forName("com.google.apphosting.api.ApiProxy")
+//                    .getMethod("getCurrentEnvironment")
+//                    .invoke(null)
+//                    != null;
+//        } catch (ClassNotFoundException e) {
+//            // If ApiProxy doesn't exist, we're not on AppEngine at all.
+//            return false;
+//        } catch (InvocationTargetException e) {
+//            // If ApiProxy throws an exception, we're not in a proper AppEngine environment.
+//            return false;
+//        } catch (IllegalAccessException e) {
+//            // If the method isn't accessible, we're not on a supported version of AppEngine;
+//            return false;
+//        } catch (NoSuchMethodException e) {
+//            // If the method doesn't exist, we're not on a supported version of AppEngine;
+//            return false;
+//        }
+        return false;
     }
 
     /**
