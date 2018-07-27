@@ -1,11 +1,7 @@
 package org.matheclipse.core.system;
 
-import static org.matheclipse.core.expression.F.ChebyshevT;
-import static org.matheclipse.core.expression.F.n_;
-import static org.matheclipse.core.expression.F.x_;
-
-import org.hipparchus.analysis.solvers.BisectionSolver;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
 
