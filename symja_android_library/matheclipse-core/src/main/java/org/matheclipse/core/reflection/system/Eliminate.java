@@ -3,6 +3,7 @@ package org.matheclipse.core.reflection.system;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
