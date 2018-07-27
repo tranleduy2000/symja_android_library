@@ -561,4 +561,24 @@ public class Eliminate extends AbstractFunctionEvaluator {
 		return eliminateOneVariable(analyzerList, variable);
 	}
 
+	/**
+	 *
+	 * @param result
+	 * @param slot
+	 * @return <code>null</code> if we can't eliminate an equation from the list for the given <code>variable</code> or
+	 *         the eliminated list of equations in index <code>[0]</code> and the last rule which is used for variable
+	 *         elimination in index <code>[1]</code>.
+	 */
+	public static IAST[] eliminateSlot(IAST result, IExpr slot) {
+
+		VariableCounterVisitor exprAnalyzer;
+		ArrayList<VariableCounterVisitor> analyzerList = new ArrayList<VariableCounterVisitor>();
+		IAST equalAST = result;
+		exprAnalyzer = new VariableCounterVisitor(equalAST, slot);
+		equalAST.accept(exprAnalyzer);
+		analyzerList.add(exprAnalyzer);
+		Collections.sort(analyzerList);
+
+		return eliminateOneVariable(analyzerList, slot);
+	}
 }
