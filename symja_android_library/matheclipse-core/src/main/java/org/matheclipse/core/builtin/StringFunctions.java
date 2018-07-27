@@ -22,8 +22,6 @@ import org.matheclipse.core.parser.ExprParser;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import static org.matheclipse.core.expression.F.List;
-
 public final class StringFunctions {
 
 	static {
@@ -324,6 +322,9 @@ public final class StringFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
+			if (ast.arg1().isString()) {
+				return ast.arg1();
+			}
 			return F.$str(inputForm(ast.arg1(), true));
 		}
 
@@ -379,6 +380,7 @@ public final class StringFunctions {
 			StringBuilder buf = new StringBuilder();
 			OutputFormFactory off = OutputFormFactory.get(relaxedSyntax, false);
 			off.setIgnoreNewLine(true);
+			off.setQuotes(true);
 			off.convert(buf, expression);
 			return buf.toString();
 		} catch (IOException e) {
