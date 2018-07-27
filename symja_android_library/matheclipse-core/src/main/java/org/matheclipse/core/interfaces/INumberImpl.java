@@ -1,5 +1,7 @@
 package org.matheclipse.core.interfaces;
 
+import org.matheclipse.core.expression.F;
+
 /**
  * Created by Duy on 2/20/2018.
  */
@@ -36,5 +38,20 @@ public abstract class INumberImpl extends IExprImpl implements INumber {
     @Deprecated
     public IExpr eabs() {
         return abs();
+    }
+
+    @Override
+    public double getImaginary() {
+        return imDoubleValue();
+    }
+
+    @Override
+    public double getReal() {
+        return reDoubleValue();
+    }
+
+    @Override
+    public IExpr[] linear(IExpr variable) {
+        return new IExpr[]{this, F.C0};
     }
 }

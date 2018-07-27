@@ -19,4 +19,12 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     public int ordinal() {
         return ID.UNKNOWN;
     }
+
+    @Override
+    public IExpr[] linear(IExpr variable) {
+        if (this.equals(variable)) {
+            return new IExpr[]{F.C0, F.C1};
+        }
+        return new IExpr[]{this, F.C0};
+    }
 }
