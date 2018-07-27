@@ -10245,6 +10245,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testToString() {
+		check("ToString(InputForm(a+\"b\"))", //
+				"a+\"b\"");
 		check("ToString(InputForm(d/2+f(x)))", //
 				"d/2+f(x)");
 		check("ToString(FullForm(d/2))", //
