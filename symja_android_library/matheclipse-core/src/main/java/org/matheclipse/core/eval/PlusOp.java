@@ -10,6 +10,8 @@ import org.matheclipse.core.interfaces.IExpr;
 import java.util.HashMap;
 import java.util.Map;
 
+import ch.ethz.idsc.tensor.qty.IQuantity;
+
 /**
  * <p>
  * Plus operator for adding multiple arguments with the <code>plus(argument)</code> method and returning the result,

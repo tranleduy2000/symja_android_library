@@ -1,7 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import java.util.function.UnaryOperator;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
@@ -11,9 +9,10 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
+import java.util.function.UnaryOperator;
+
 import ch.ethz.idsc.tensor.qty.IQuantity;
 import ch.ethz.idsc.tensor.qty.IUnit;
-import ch.ethz.idsc.tensor.qty.QuantityMagnitude;
 import ch.ethz.idsc.tensor.qty.UnitSystem;
 
 public class QuantityFunctions {

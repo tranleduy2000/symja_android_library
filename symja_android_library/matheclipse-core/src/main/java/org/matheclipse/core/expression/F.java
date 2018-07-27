@@ -37,6 +37,7 @@ import org.matheclipse.core.builtin.PatternMatching;
 import org.matheclipse.core.builtin.PolynomialFunctions;
 import org.matheclipse.core.builtin.PredicateQ;
 import org.matheclipse.core.builtin.Programming;
+import org.matheclipse.core.builtin.QuantityFunctions;
 import org.matheclipse.core.builtin.RandomFunctions;
 import org.matheclipse.core.builtin.SeriesFunctions;
 import org.matheclipse.core.builtin.SpecialFunctions;
@@ -80,6 +81,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import ch.ethz.idsc.tensor.QuantityParser;
 import edu.jas.kern.ComputerThreads;
 
 /**
@@ -2109,9 +2111,20 @@ public class F {
 	/** QRDecomposition(matrix) - computes the QR decomposition of the `matrix`.*/
 	public final static IBuiltInSymbol QRDecomposition = F.initFinalSymbol("QRDecomposition", ID.QRDecomposition);
 
-	/** Quantile(list, q) - returns the `q`-Quantile of `list`.*/
+    /** Quantile(list, q) - returns the `q`-Quantile of `list`. */
 	public final static IBuiltInSymbol Quantile = F.initFinalSymbol("Quantile", ID.Quantile);
 
+    /** Quantity(value, unit) - returns the quantity for `value` and `unit`*/
+    public final static IBuiltInSymbol Quantity = F.initFinalSymbol("Quantity", ID.Quantity);
+
+    /***/
+    public final static IBuiltInSymbol QuantityDistribution = F.initFinalSymbol("QuantityDistribution", ID.QuantityDistribution);
+
+    /** QuantityMagnitude(quantity) - returns the value of the `quantity` */
+    public final static IBuiltInSymbol QuantityMagnitude = F.initFinalSymbol("QuantityMagnitude", ID.QuantityMagnitude);
+
+    /***/
+    public final static IBuiltInSymbol QuantityQ = F.initFinalSymbol("QuantityQ", ID.QuantityQ);
 	/***/
 	public final static IBuiltInSymbol Quiet = F.initFinalSymbol("Quiet", ID.Quiet);
 
@@ -2674,9 +2687,9 @@ public class F {
 	/** Unique(expr) - create a unique symbol of the form `expr$...`.*/
 	public final static IBuiltInSymbol Unique = F.initFinalSymbol("Unique", ID.Unique);
 
-	/**
-	 * UnitStep(expr) - returns `0`, if `expr` is less than `0` and returns `1`, if `expr` is greater equal than `0`.
-	 */
+    /** UnitConvert(quantity) - convert the `quantity` to the base unit*/
+    public final static IBuiltInSymbol UnitConvert = F.initFinalSymbol("UnitConvert", ID.UnitConvert);
+    /** UnitStep(expr) - returns `0`, if `expr` is less than `0` and returns `1`, if `expr` is greater equal than `0`.*/
 	public final static IBuiltInSymbol UnitStep = F.initFinalSymbol("UnitStep", ID.UnitStep);
 
 	/** UnitVector(position) - returns a unit vector with element `1` at the given `position`.*/
@@ -8582,4 +8595,32 @@ public class F {
 		return matrix;
 	}
 
+	/**
+	 * parses given string to an instance of {@link IExpr}
+	 *
+	 * Examples:
+	 *
+	 * <pre>
+	 * "7/9" -> RationalScalar.of(7, 9)
+	 * "3.14" -> DoubleScalar.of(3.14)
+	 * "(3+2)*I/(-1+4)+8-I" -> ComplexScalar.of(8, 2/3) == "8+2/3*I"
+	 * "9.81[m*s^-2]" -> Quantity.of(9.81, "m*s^-2")
+	 * </pre>
+	 *
+	 * If the parsing logic encounters an inconsistency, the return type is a {@link IStringX} that holds the input
+	 * string.
+	 *
+	 * Scalar types that are not supported include {@link GaussScalar}.
+	 *
+	 * @param string
+	 * @return scalar
+	 */
+	public static IExpr fromString(String string) {
+		try {
+			return QuantityParser.of(string);
+		} catch (Exception exception) {
+			// ---
+		}
+		return stringx(string);
+	}
 }

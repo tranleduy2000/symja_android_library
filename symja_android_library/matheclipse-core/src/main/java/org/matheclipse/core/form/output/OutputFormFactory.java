@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 
+import ch.ethz.idsc.tensor.qty.IQuantity;
+
 /**
  * Converts an internal <code>IExpr</code> into a user readable string.
  *

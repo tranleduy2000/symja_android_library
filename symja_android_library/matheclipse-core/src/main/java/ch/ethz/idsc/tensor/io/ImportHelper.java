@@ -1,5 +1,9 @@
 package ch.ethz.idsc.tensor.io;
 
+import android.graphics.ImageFormat;
+
+import org.matheclipse.core.interfaces.IAST;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,8 +13,6 @@ import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
 import javax.imageio.ImageIO;
-
-import org.matheclipse.core.interfaces.IAST;
 
 
 

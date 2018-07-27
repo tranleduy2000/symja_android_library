@@ -58,6 +58,8 @@ import org.matheclipse.core.reflection.system.rules.ConjugateRules;
 import org.matheclipse.core.reflection.system.rules.GammaRules;
 import org.matheclipse.core.reflection.system.rules.PowerRules;
 
+import ch.ethz.idsc.tensor.qty.IQuantity;
+
 import static org.matheclipse.core.expression.F.And;
 import static org.matheclipse.core.expression.F.ArcCos;
 import static org.matheclipse.core.expression.F.ArcCot;

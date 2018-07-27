@@ -1,12 +1,6 @@
 package ch.ethz.idsc.tensor.qty;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
-import java.util.Objects;
-import java.util.Set;
+import com.duy.util.DObjects;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.AbstractAST;
@@ -17,6 +11,13 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.parser.client.math.MathException;
+
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.ObjectStreamException;
+import java.util.Set;
 
 public class QuantityImpl extends AbstractAST implements IQuantity, Externalizable {
 	/**
@@ -186,7 +187,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(arg1, unit);
+		return DObjects.hash(arg1, unit);
 	}
 
 	@Override

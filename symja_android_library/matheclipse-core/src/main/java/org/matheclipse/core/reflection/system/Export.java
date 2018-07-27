@@ -1,11 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
-import javax.imageio.ImageIO;
+import android.graphics.ImageFormat;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -16,7 +11,16 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
-import org.matheclipse.core.io.Filename;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+import javax.imageio.ImageIO;
+
+import ch.ethz.idsc.tensor.io.Extension;
+import ch.ethz.idsc.tensor.io.Filename;
 
 /**
  * Export some data from file system.

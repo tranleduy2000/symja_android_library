@@ -1,11 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.charset.Charset; 
-
-import javax.imageio.ImageIO;
+import android.graphics.ImageFormat;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -20,10 +15,19 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
-import org.matheclipse.core.io.Filename; 
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.ast.ASTNode;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+import javax.imageio.ImageIO;
+
+import ch.ethz.idsc.tensor.io.Extension;
+import ch.ethz.idsc.tensor.io.Filename;
 
 /**
  * Import some data from file system.
