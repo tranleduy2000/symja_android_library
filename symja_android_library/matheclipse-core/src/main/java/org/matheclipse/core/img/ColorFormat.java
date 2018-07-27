@@ -1,7 +1,6 @@
 package org.matheclipse.core.img;
 
-import java.awt.Color;
-import java.util.stream.IntStream;
+import com.duy.awt.Color;
 
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
@@ -25,7 +24,9 @@ public enum ColorFormat {
 	 */
 	private static final IExpr[] LOOKUP = new IExpr[256];
 	static {
-		IntStream.range(0, 256).forEach(index -> LOOKUP[index] = F.integer(index));
+		for (int index = 0; index < 256; index++) {
+			LOOKUP[index] = F.integer(index);
+		}
 	}
 	// ---
 
