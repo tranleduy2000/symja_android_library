@@ -205,33 +205,59 @@ public class StatisticsFunctions {
 		protected abstract IExpr protected_p_equals(IAST dist, IExpr n);
 	}
 
-	private static class ArithmeticGeometricMean extends AbstractFunctionEvaluator {
+	private static class ArithmeticGeometricMean extends AbstractArg2 {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
-			IExpr a = ast.arg1();
-			IExpr b = ast.arg2();
+		public IExpr e2ApcomplexArg(final ApcomplexNum a, final ApcomplexNum b) {
+			return F.complexNum(ApcomplexMath.agm(a.apcomplexValue(), b.apcomplexValue()));
+		}
+		@Override
+		public IExpr e2ApfloatArg(final ApfloatNum a, final ApfloatNum b) {
+			return F.num(ApfloatMath.agm(a.apfloatValue(), b.apfloatValue()));
+		}
+
+		@Override
+		public IExpr e2DblComArg(final IComplexNum a, final IComplexNum b) {
+			IComplexNum a1 = a;
+			IComplexNum b1 = b;
+			while (a1.subtract(b1).abs().evalDouble() >= Config.DOUBLE_TOLERANCE) {
+				IComplexNum arith = a1.add(b1).multiply(F.complexNum(1 / 2.0));
+				IComplexNum geom = a1.multiply(b1).pow(F.complexNum(1 / 2.0));
+				a1 = arith;
+				b1 = geom;
+			}
+			return a1;
+		}
+
+		@Override
+		public IExpr e2DblArg(final INum a, final INum b) {
+			double a1 = a.doubleValue();
+			double b1 = b.doubleValue();
+			while (Math.abs(a1 - b1) >= Config.DOUBLE_TOLERANCE) {
+				double arith = (a1 + b1) / 2.0;
+				double geom = Math.sqrt(a1 * b1);
+				a1 = arith;
+				b1 = geom;
+			}
+			return F.num(a1);
+		}
+
+		public IExpr e2ObjArg(final IExpr a, final IExpr b) {
 			if (a.isZero() || a.equals(b)) {
 				return a;
 			}
-			// IAST arg1 = Validate.checkASTType(ast, 1);
-			// if (arg1.isRealVector()) {
-			// return F.num(StatUtils.geometricMean(arg1.toDoubleVector()));
-			// }
-			// if (arg1.size() > 1) {
-			// return F.Power(arg1.setAtClone(0, F.Times), F.fraction(1, arg1.argSize()));
-			// }
+			if (b.isZero()) {
+				return b;
+			}
 			return F.NIL;
 		}
 
-		// @Override
-		// public IExpr numericEval(final IAST ast, EvalEngine engine) {
-		// Validate.checkSize(ast, 2);
-		//
-		// double[] values = Expr2Object.toDoubleVector(ast.getAST(1));
-		// return F.num(StatUtils.geometricMean(values));
-		// }
+		/** {@inheritDoc} */
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.ORDERLESS | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+	}
 	}
 	/**
 	 * Compute the cumulative distribution function
