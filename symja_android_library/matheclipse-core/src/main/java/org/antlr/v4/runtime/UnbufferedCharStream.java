@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /** Do not buffer up the entire char stream. It does keep a small buffer
@@ -102,7 +101,7 @@ public class UnbufferedCharStream implements CharStream {
 	}
 
 	public UnbufferedCharStream(InputStream input, int bufferSize) {
-		this(input, bufferSize, StandardCharsets.UTF_8);
+		this(input, bufferSize, Charset.forName("UTF-8"));
 	}
 
 	public UnbufferedCharStream(InputStream input, int bufferSize, Charset charset) {

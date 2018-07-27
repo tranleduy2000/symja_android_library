@@ -73,7 +73,7 @@ public final class CharStreams {
 	 * Reads the entire contents of the file into the result before returning.
 	 */
 	public static CharStream fromPath(Path path) throws IOException {
-		return fromPath(path, StandardCharsets.UTF_8);
+		return fromPath(path, Charset.forName("UTF-8"));
 	}
 
 	/**
@@ -102,7 +102,7 @@ public final class CharStreams {
 	 * Reads the entire contents of the file into the result before returning.
 	 */
 	public static CharStream fromFileName(String fileName) throws IOException {
-		return fromPath(Paths.get(fileName), StandardCharsets.UTF_8);
+		return fromPath(Paths.get(fileName), Charset.forName("UTF-8"));
 	}
 
 	/**
@@ -125,7 +125,7 @@ public final class CharStreams {
 	 * the result before returning, then closes the {@code InputStream}.
 	 */
 	public static CharStream fromStream(InputStream is) throws IOException {
-		return fromStream(is, StandardCharsets.UTF_8);
+		return fromStream(is, Charset.forName("UTF-8"));
 	}
 
 	/**
@@ -159,7 +159,7 @@ public final class CharStreams {
 	 * the result before returning, then closes the {@code channel}.
 	 */
 	public static CharStream fromChannel(ReadableByteChannel channel) throws IOException {
-		return fromChannel(channel, StandardCharsets.UTF_8);
+		return fromChannel(channel, Charset.forName("UTF-8"));
 	}
 
 	/**
@@ -243,7 +243,7 @@ public final class CharStreams {
 		String sourceName)
 		throws IOException
 	{
-		return fromChannel(channel, StandardCharsets.UTF_8, bufferSize, decodingErrorAction, sourceName, -1);
+		return fromChannel(channel, Charset.forName("UTF-8"), bufferSize, decodingErrorAction, sourceName, -1);
 	}
 
 	public static CodePointCharStream fromChannel(
