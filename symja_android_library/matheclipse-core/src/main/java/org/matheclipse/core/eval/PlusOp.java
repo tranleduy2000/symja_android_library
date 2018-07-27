@@ -239,6 +239,15 @@ public class PlusOp {
             numberValue = plusInterval(numberValue, arg);
             evaled = true;
             return F.NIL;
+		} else if (arg.isQuantity()) {
+			if (numberValue == null) {
+				numberValue = arg;
+				return F.NIL;
+			}
+			IQuantity q = (IQuantity) arg;
+			numberValue = q.plus(numberValue);
+			evaled = true;
+			return F.NIL;
         } else if (arg instanceof ASTSeriesData) {
             if (numberValue == null) {
                 numberValue = arg;

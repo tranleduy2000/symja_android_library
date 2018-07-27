@@ -21,7 +21,7 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /**
      * A map of the truncated power series coefficients <code>value != 0</code>
      */
-    OpenIntToIExprHashMap coefficientValues;
+	OpenIntToIExprHashMap<IExpr> coefficientValues;
 
     /**
      * The power of this series.

@@ -52,6 +52,7 @@ import java.util.Random;
 public class StatisticsFunctions {
 
 	static {
+		F.ArithmeticGeometricMean.setEvaluator(new ArithmeticGeometricMean());
 		F.CDF.setEvaluator(new CDF());
 		F.PDF.setEvaluator(new PDF());
 		F.BernoulliDistribution.setEvaluator(new BernoulliDistribution());
@@ -204,6 +205,34 @@ public class StatisticsFunctions {
 		protected abstract IExpr protected_p_equals(IAST dist, IExpr n);
 	}
 
+	private static class ArithmeticGeometricMean extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+			IExpr a = ast.arg1();
+			IExpr b = ast.arg2();
+			if (a.isZero() || a.equals(b)) {
+				return a;
+			}
+			// IAST arg1 = Validate.checkASTType(ast, 1);
+			// if (arg1.isRealVector()) {
+			// return F.num(StatUtils.geometricMean(arg1.toDoubleVector()));
+			// }
+			// if (arg1.size() > 1) {
+			// return F.Power(arg1.setAtClone(0, F.Times), F.fraction(1, arg1.argSize()));
+			// }
+			return F.NIL;
+		}
+
+		// @Override
+		// public IExpr numericEval(final IAST ast, EvalEngine engine) {
+		// Validate.checkSize(ast, 2);
+		//
+		// double[] values = Expr2Object.toDoubleVector(ast.getAST(1));
+		// return F.num(StatUtils.geometricMean(values));
+		// }
+	}
 	/**
 	 * Compute the cumulative distribution function
 	 */

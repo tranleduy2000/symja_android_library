@@ -2903,6 +2903,9 @@ public final class Arithmetic {
                     IInteger ii = (IInteger) exponent;
                     return powerInterval(base, ii);
                 }
+			} else if (base.isQuantity()) {
+				IQuantity q = (IQuantity) base;
+				return q.power(exponent);
             } else if (base instanceof ASTSeriesData) {
                 int exp = exponent.toIntDefault(Integer.MIN_VALUE);
                 if (exp != Integer.MIN_VALUE) {
@@ -4242,6 +4245,9 @@ public final class Arithmetic {
         public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
 
             if (o0.isZero()) {
+				if (o1.isQuantity()) {
+					return ((IQuantity)o1).ofUnit(F.C0);
+				}
                 if (o1.isDirectedInfinity()) {
                     return F.Indeterminate;
                 }
@@ -4249,6 +4255,9 @@ public final class Arithmetic {
             }
 
             if (o1.isZero()) {
+				if (o0.isQuantity()) {
+					return ((IQuantity)o0).ofUnit(F.C0);
+				}
                 if (o0.isDirectedInfinity()) {
                     return F.Indeterminate;
                 }
@@ -4306,6 +4315,9 @@ public final class Arithmetic {
                 if (o1.isInterval1() || o1.isReal()) {
                     return timesInterval(o0, o1);
                 }
+			} else if (o0.isQuantity()) {
+				IQuantity q = (IQuantity) o0;
+				return q.multiply(o1);
             } else if (o0.isNegative() && o1.isLog() && o1.first().isFraction() && o0.isReal()) {
                 // -<number> * Log(<fraction>) -> <number> * Log(<fraction>.inverse())
                 return o0.negate().times(F.Log(o1.first().inverse()));
@@ -4337,6 +4349,9 @@ public final class Arithmetic {
                 if (o0.isInterval1() || o0.isReal()) {
                     return timesInterval(o0, o1);
                 }
+			} else if (o1.isQuantity()) {
+				IQuantity q = (IQuantity) o1;
+				return q.multiply(o0);
             } else if (o1 instanceof ASTSeriesData) {
                 return ((ASTSeriesData) o1).times(o0);
             }

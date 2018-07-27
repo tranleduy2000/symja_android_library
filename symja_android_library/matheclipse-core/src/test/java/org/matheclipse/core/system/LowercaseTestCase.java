@@ -7707,6 +7707,42 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Quantile({{1,2},{ E, Pi, Sqrt(2),Sqrt(3)}}, 0.75)", "Quantile({{1,2},{E,Pi,Sqrt(2),Sqrt(3)}},0.75)");
 	}
 
+	public void testQuantity() {
+		if (ToggleFeature.QUANTITY) {
+			check("Quantity(3, \"Hz^(-2)*N*m^(-1)\")", //
+					"3[Hz^-2*N*m^-1]");
+			check("0+Quantity(3, \"m\")", //
+					"3[m]");
+			check("0*Quantity(3, \"m\")", //
+					"0[m]");
+			check("1*Quantity(3, \"m\")", //
+					"3[m]");
+			check("Quantity(3, \"m\")", //
+					"3[m]");
+			check("Quantity(3, \"Meters\")", //
+					"3[Meters]");
+		}
+	}
+
+	public void testQuantityQ() {
+		if (ToggleFeature.QUANTITY) {
+			check("QuantityQ(Quantity(2, x))", //
+					"False");
+			check("QuantityQ(Quantity(3, \"m\"))", //
+					"True");
+			check("QuantityQ(Quantity(3, \"Meters\"))", //
+					"True");
+		}
+	}
+
+	public void testQuantityMagnitude() {
+		if (ToggleFeature.QUANTITY) {
+			check("QuantityMagnitude(Quantity(3.4, \"m\"))", //
+					"3.4");
+			check("QuantityMagnitude(Quantity(3.4, \"km\"), \"m\")", //
+					"3400.0");
+		}
+	}
 	public void testQuiet() {
 		check("Quiet(1/0)", "ComplexInfinity");
 		check("1/0", "ComplexInfinity");
@@ -10357,6 +10393,17 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Unique(\"x\")", "x3");
 	}
 
+	public void testUnitConvert() {
+		if (ToggleFeature.QUANTITY) {
+			// assertEquals(ScalarParser.of("1.6021766208E-19"), F.num(1.6021766208E-19));
+			// check("UnitConvert(Quantity(3, \"Hz^-2*N*m^-1\") )", //
+			// "3[kg]");
+			check("UnitConvert(Quantity(3.8, \"lb\") )", //
+					"1.723651006[kg]");
+			check("UnitConvert(Quantity(8.2, \"nmi\"), \"km\")", //
+					"15.186399999999999[km]");
+		}
+	}
 	public void testUnitize() {
 		check("Unitize({0, -1})", "{0,1}");
 		check("Unitize((E + Pi)^2 - E^2 - Pi^2 - 2*E*Pi)", "0");

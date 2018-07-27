@@ -349,20 +349,19 @@ public class EvalEngine implements Serializable {
 		fOutList.add(fAnswer);
 	}
 
-//	public void addRules(IAST ruleList) {
-//		boolean oldTraceMode = isTraceMode();
-//		try {
-//			setTraceMode(false);
-//			ruleList.forEach(x -> {
-//				if (x.isPresent()) {
-//					evaluate(x);
-//				}
-//			});
-//		} finally {
-
-//			setTraceMode(oldTraceMode);
-//		}
-//	}
+	// public void addRules(IAST ruleList) {
+	// boolean oldTraceMode = isTraceMode();
+	// try {
+	// setTraceMode(false);
+	// ruleList.forEach(x -> {
+	// if (x.isPresent()) {
+	// evaluate(x);
+	// }
+	// });
+	// } finally {
+	// setTraceMode(oldTraceMode);
+	// }
+	// }
 
 	private void beginTrace(Predicate<IExpr> matcher, IAST list) {
 		setTraceMode(true);
@@ -1495,6 +1494,20 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
+	 * Parse the given <code>expression String</code> into an IExpr and evaluate it.
+	 *
+	 * @param expression
+	 *            an expression in math formula notation
+	 * @param explicitTimes
+	 *            if <code>true</code> require times operator &quot;*&quot;
+	 * @return
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
+	 */
+	final public IExpr evaluate(String expression, boolean explicitTimes) {
+		return evaluate(parse(expression, explicitTimes));
+	}
+	/**
 	 * Store the current numeric mode and evaluate the expression <code>expr</code>. After evaluation reset the numeric
 	 * mode to the value stored before the evaluation starts. If evaluation is not possible return the input object.
 	 *
@@ -1833,7 +1846,26 @@ public class EvalEngine implements Serializable {
 	 *             if a parsing error occurs
 	 */
 	final public IExpr parse(String expression) {
-		final ExprParser parser = new ExprParser(this, fRelaxedSyntax);
+		return parse(expression, Config.EXPLICIT_TIMES_OPERATOR);
+		// final ExprParser parser = new ExprParser(this, fRelaxedSyntax);
+		// return parser.parse(expression);
+	}
+
+	/**
+	 * Parse the given <code>expression String</code> into an IExpr without evaluation.
+	 *
+	 * @param expression
+	 *            an expression in math formula notation
+	 * @param explicitTimes
+	 *            if <code>true</code> require times operator &quot;*&quot;
+	 * @return
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
+	 */
+
+	final public IExpr parse(String expression, boolean explicitTimes) {
+		final ExprParser parser = new ExprParser(this, ExprParserFactory.RELAXED_STYLE_FACTORY, fRelaxedSyntax, false,
+				explicitTimes);
 		return parser.parse(expression);
 	}
 

@@ -886,6 +886,14 @@ public class OutputFormFactory {
 				int functionID = head.ordinal();
 				if (functionID > ID.UNKNOWN) {
 					switch (functionID) {
+					case ID.Quantity:
+						// if (head.equals(F.SeriesData) && (list.size() == 7)) {
+						if (list instanceof IQuantity) {
+							if (convertQuantityData(buf, (IQuantity) list, precedence)) {
+								return;
+							}
+						}
+						break;
 					case ID.SeriesData:
 			// if (head.equals(F.SeriesData) && (list.size() == 7)) {
 			if (list instanceof ASTSeriesData) {
@@ -1175,6 +1183,26 @@ public class OutputFormFactory {
 
 	}
 
+	public boolean convertQuantityData(final Appendable buf, final IQuantity quantity, final int precedence)
+			throws IOException {
+		int operPrecedence = ASTNodeFactory.PLUS_PRECEDENCE;
+		StringBuilder tempBuffer = new StringBuilder();
+		if (operPrecedence < precedence) {
+			append(tempBuffer, "(");
+		}
+
+		try {
+			buf.append(quantity.toString());
+		} catch (Exception ex) {
+			return false;
+		}
+		if (operPrecedence < precedence) {
+			append(tempBuffer, ")");
+		}
+		buf.append(tempBuffer);
+		return true;
+
+	}
 	/**
 	 * Convert a factor of a <code>SeriesData</code> object.
 	 *

@@ -2347,7 +2347,7 @@ public class Algebra {
 	private static class PolynomialQ extends AbstractCoreFunctionEvaluator implements BiPredicate<IExpr, IExpr> {
 
 		/**
-		 * Returns <code>True</code> if the given expression is a polynoomial object; <code>False</code> otherwise
+		 * Returns <code>True</code> if the given expression is a polynomial object; <code>False</code> otherwise
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -3858,7 +3858,6 @@ public class Algebra {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
-			// VariablesSet eVar = new VariablesSet(ast.arg1());
 			return VariablesSet.getVariables(ast.arg1());
 		}
 

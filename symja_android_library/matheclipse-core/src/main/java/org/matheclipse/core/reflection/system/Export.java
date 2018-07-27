@@ -106,15 +106,16 @@ public class Export extends AbstractEvaluator {
 		// if (filename.hasExtension("csv"))
 		// Files.write(file.toPath(), (Iterable<String>) CsvFormat.of(tensor)::iterator);
 		// else
-//		if (filename.hasExtension("jpg"))
-//			ImageIO.write(ImageFormat.jpg(tensor), "jpg", file);
+		Extension extension = filename.extension();
+		if (extension.equals(Extension.JPG))
+			ImageIO.write(ImageFormat.jpg(tensor), "jpg", file);
 		// else if (filename.hasExtension("m"))
 		// Files.write(file.toPath(), (Iterable<String>) MatlabExport.of(tensor)::iterator);
-//		else if (filename.hasExtension("png"))
-//			ImageIO.write(ImageFormat.of(tensor), "png", file);
+		if (extension.equals(Extension.PNG))
+			ImageIO.write(ImageFormat.of(tensor), "png", file);
 		// else if (filename.hasExtension("tensor"))
 		// object(file, tensor);
-//		else
+		else
 			throw new RuntimeException(file.toString());
 	}
 }

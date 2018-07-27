@@ -106,6 +106,7 @@ public class PredicateQ {
 		F.OddQ.setEvaluator(new OddQ());
 		F.PossibleZeroQ.setEvaluator(new PossibleZeroQ());
 		F.PrimeQ.setEvaluator(new PrimeQ());
+		F.QuantityQ.setEvaluator(new QuantityQ());
 		F.RealNumberQ.setEvaluator(new RealNumberQ());
 		F.SquareMatrixQ.setEvaluator(new SquareMatrixQ());
 		F.SymbolQ.setPredicateQ(new Predicate<IExpr>() {
@@ -538,157 +539,6 @@ public class PredicateQ {
 
 	/**
 	 * <pre>
-	 * InexactNumberQ(expr)
-	 * </pre>
-	 * 
-	 * <blockquote>
-	 * <p>
-	 * returns <code>True</code> if <code>expr</code> is not an exact number, and <code>False</code> otherwise.
-	 * </p>
-	 * </blockquote>
-	 * <h3>Examples</h3>
-	 * 
-	 * <pre>
-	 * &gt;&gt; InexactNumberQ(a)
-	 * False
-	 * 
-	 * &gt;&gt; InexactNumberQ(3.0)
-	 * True
-	 * 
-	 * &gt;&gt; InexactNumberQ(2/3)
-	 * False
-	 * </pre>
-	 * <p>
-	 * <code>InexactNumberQ</code> can be applied to complex numbers:
-	 * </p>
-	 * 
-	 * <pre>
-	 * &gt;&gt; InexactNumberQ(4.0+I)    
-	 * True
-	 * </pre>
-	 */
-	private static class InexactNumberQ extends AbstractCoreFunctionEvaluator {
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1()) {
-				IExpr arg1 = engine.evaluate(ast.arg1());
-				return F.bool(arg1.isInexactNumber());
-			}
-			Validate.checkSize(ast, 2);
-			return F.NIL;
-		}
-	}
-
-	/**
-	 * <pre>
-	 * IntegerQ(expr)
-	 * </pre>
-	 * 
-	 * <blockquote>
-	 * <p>
-	 * returns <code>True</code> if <code>expr</code> is an integer, and <code>False</code> otherwise.
-	 * </p>
-	 * </blockquote>
-	 * <h3>Examples</h3>
-	 * 
-	 * <pre>
-	 * &gt;&gt; IntegerQ(3)
-	 * 4
-	 * 
-	 * &gt;&gt; IntegerQ(Pi)
-	 * False
-	 * </pre>
-	 */
-	private static class IntegerQ extends AbstractCorePredicateEvaluator {
-
-
-		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
-			return arg1.isInteger();
-		}
-
-
-	}
-
-	/**
-	 * <pre>
-	 * ListQ(expr)
-	 * </pre>
-	 * 
-	 * <blockquote>
-	 * <p>
-	 * tests whether <code>expr</code> is a <code>List</code>.
-	 * </p>
-	 * </blockquote>
-	 * <h3>Examples</h3>
-	 * 
-	 * <pre>
-	 * &gt;&gt; ListQ({1, 2, 3})
-	 * True
-	 * 
-	 * &gt;&gt; ListQ({{1, 2}, {3, 4}})
-	 * True
-	 * 
-	 * &gt;&gt; ListQ(x)
-	 * False
-	 * </pre>
-	 */
-	private static class ListQ extends AbstractCorePredicateEvaluator implements Predicate<IExpr> {
-
-		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
-			return arg1.isList();
-		}
-
-		@Override
-		public boolean test(final IExpr expr) {
-			return expr.isList();
-		}
-	}
-
-	/**
-	 * <pre>
-	 * MachineNumberQ(expr)
-	 * </pre>
-	 * 
-	 * <blockquote>
-	 * <p>
-	 * returns <code>True</code> if <code>expr</code> is a machine-precision real or complex number.
-	 * </p>
-	 * </blockquote>
-	 * <h3>Examples</h3>
-	 * 
-	 * <pre>
-	 * &gt;&gt; MachineNumberQ(3.14159265358979324)
-	 * False
-	 * 
-	 * &gt;&gt; MachineNumberQ(1.5 + 2.3*I)
-	 * True
-	 * 
-	 * &gt;&gt; MachineNumberQ(2.71828182845904524 + 3.14159265358979324*I)
-	 * False
-	 * 
-	 * &gt;&gt; MachineNumberQ(1.5 + 3.14159265358979324*I)    
-	 * True
-	 * 
-	 * &gt;&gt; MachineNumberQ(1.5 + 5 *I)
-	 * True
-	 * </pre>
-	 */
-	private static class MachineNumberQ extends AbstractCoreFunctionEvaluator {
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1()) {
-				IExpr arg1 = engine.evaluate(ast.arg1());
-				return F.bool(arg1.isMachineNumber());
-			}
-			Validate.checkSize(ast, 2);
-			return F.NIL;
-		}
-	}
-
-	/**
-	 * <pre>
 	 * MatchQ(expr, form)
 	 * </pre>
 	 * 
@@ -892,6 +742,23 @@ public class PredicateQ {
 
 	}
 
+	private static class QuantityQ extends AbstractCorePredicateEvaluator implements Predicate<IExpr> {
+
+		@Override
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
+			return arg1.isQuantity();
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
+		@Override
+		public boolean test(final IExpr expr) {
+			return expr.isQuantity();
+		}
+
+	}
 	/**
 	 * <pre>
 	 * PossibleZeroQ(expr)

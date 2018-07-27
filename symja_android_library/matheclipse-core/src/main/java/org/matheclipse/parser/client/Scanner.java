@@ -18,7 +18,6 @@ package org.matheclipse.parser.client;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.parser.client.operator.Operator;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -294,12 +293,35 @@ public abstract class Scanner {
 	 */
 	protected int fCurrentColumnStartPosition;
 
+	/**
+	 * <p>
+	 * If <code>true</code> the <code>*</code> operator must be written for a <code>Times()</code> expression. I.e. you
+	 * cannot write <code>2(b+c)</code> anymore, but have to write <code>2*(b+c)</code> to get
+	 * <code>Times(2, Plus(b, c))</code>.
+	 * </p>
+	 * <p>
+	 * You also enable <a href="https://en.wikipedia.org/wiki/Scientific_notation#E-notation">scientific E-notation</a>.
+	 * I.e. <code>1E-2</code> is converted to a double value <code>0.01</code> for floating point numbers and not parsed
+	 * as <code>Plus(-2, E)</code> anymore.
+	 * </p>
+	 * <p>
+	 * You also enable integer literal input with a prefix, similar to
+	 * <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html">Java integer literals</a>
+	 * <ul>
+	 * <li><code>0b</code> or <code>0B</code> for binary numbers</li>
+	 * <li><code>0x</code> or <code>0X</code> for hexadecimal numbers</li>
+	 * <li><code>0o</code> or <code>0O</code> for octal numbers</li>
+	 * </ul>
+	 * </p>
+	 */
+	protected final boolean fExplicitTimes;
 
 	/**
 	 * Initialize Scanner without a math-expression
 	 */
-	protected Scanner(boolean packageMode) {
+	protected Scanner(boolean packageMode, boolean explicitTimes) {
 		fPackageMode = packageMode;
+		fExplicitTimes = explicitTimes;
 		initializeNullScanner();
 	}
 
@@ -655,7 +677,7 @@ public abstract class Scanner {
 			dFlag = true;
 		}
 		getChar();
-		if (Config.EXPLICIT_TIMES_OPERATOR) {
+		if (fExplicitTimes) {
 			if (firstCh == '0') {
 				switch (fCurrentChar) {
 				case 'b': // binary format

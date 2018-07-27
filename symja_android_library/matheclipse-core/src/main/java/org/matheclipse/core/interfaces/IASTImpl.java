@@ -39,11 +39,6 @@ import java.util.List;
 
 public abstract class IASTImpl extends IExprImpl implements IAST {
 
-    @Override
-    public int argSize() {
-        return size() - 1;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -83,6 +78,11 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
 
     @Override
     public abstract IAST clone() throws CloneNotSupportedException;
+
+    @Override
+    public int argSize() {
+        return size() - 1;
+    }
 
     /**
      * Tests whether this {@code Collection} contains all objects contained in the specified {@code Collection}. This
@@ -183,6 +183,26 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
             }
         }
         return false;
+    }
+
+    /**
+     * Copy of sub <code>AST</code> fromIndex (inclusive) to toIndex (exclusive).
+     *
+     * @param fromIndex
+     * @param toIndex
+     * @return copy of sub <code>AST</code> fromIndex (inclusive) to toIndex (exclusive)
+     */
+    @Override
+    public IASTAppendable extract(int fromIndex, int toIndex) {
+        if (0 < fromIndex && fromIndex <= size() && fromIndex < toIndex && toIndex <= size()) {
+            IASTAppendable ast = F.ast(head(), toIndex - fromIndex, false);
+            for (int i = fromIndex; i < toIndex; i++) {
+                ast.append(get(i));
+            }
+            return ast;
+        }
+        throw new IndexOutOfBoundsException("Index: " + Integer.valueOf(fromIndex) + ", Size: " + size());
+
     }
 
     /**

@@ -97,8 +97,10 @@ public class Import extends AbstractEvaluator {
 
 	public static IExpr of(File file, EvalEngine engine) throws IOException {
 		Filename filename = new Filename(file);
-		if (filename.hasExtension("jpg") || filename.hasExtension("png")) {
-//			return ImageFormat.from(ImageIO.read(file));
+		Extension extension = filename.extension();
+		if (extension.equals(Extension.JPG) || extension.equals(Extension.PNG)) {
+			// if (filename.hasExtension("jpg") || filename.hasExtension("png")) {
+			return ImageFormat.from(ImageIO.read(file));
 		}
 		AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
 		final Parser parser = new Parser(engine.isRelaxedSyntax(), true);

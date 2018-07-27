@@ -42,7 +42,6 @@ import edu.jas.structure.ElemFactory;
 
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.Sqrt;
-import static org.matheclipse.core.expression.F.f;
 
 /**
  * (I)nterface for a mathematical (Expr)ession<br />
@@ -183,6 +182,11 @@ public abstract class IExprImpl implements IExpr {
         // ast.append(leaves.get(i));
         // }
         // return ast;
+    }
+
+    @Override
+    public int argSize() {
+        return -1;
     }
 
     public Object asType(Class<?> clazz) {
@@ -1400,6 +1404,11 @@ public abstract class IExprImpl implements IExpr {
      * @return
      */
     public boolean isInterval1() {
+        return false;
+    }
+
+    @Override
+    public boolean isQuantity() {
         return false;
     }
 

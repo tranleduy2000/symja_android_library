@@ -238,13 +238,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     public IExpr arg5();
 
-    /**
-     * Returns the <b>number of arguments</b> in this {@code IAST}. The <b>number of arguments</b> equals
-     * <code>size() - 1</code> (i.e. the <b>number of elements</b> minus 1)
-     *
-     * @return the number of arguments in this {@code IAST}.
-     * @see #size()
-     */
     public int argSize();
 
     /**
@@ -436,6 +429,15 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return
      */
     boolean existsLeft(BiPredicate<IExpr, IExpr> stopPredicate);
+
+    /**
+     * Copy of sub <code>AST</code> fromIndex (inclusive) to toIndex (exclusive).
+     *
+     * @param fromIndex
+     * @param toIndex
+     * @return copy of sub <code>AST</code> fromIndex (inclusive) to toIndex (exclusive)
+     */
+    IASTAppendable extract(int fromIndex, int toIndex);
 
     /**
      * Select all elements by applying the <code>function</code> to each argument in this <code>AST</code> and append

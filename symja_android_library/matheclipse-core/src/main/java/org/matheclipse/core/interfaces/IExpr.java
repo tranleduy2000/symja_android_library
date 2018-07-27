@@ -82,19 +82,20 @@ import edu.jas.structure.GcdRingElem;
  */
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
 
-    public final static int ASTID = 2024;
-    public final static int BLANKID = 512;
-    public final static int COMPLEXID = 32;
-    public final static int DOUBLECOMPLEXID = 4;
-    public final static int DOUBLEID = 2;
-    public final static int FRACTIONID = 16;
-    public final static int INTEGERID = 8;
-    public final static int METHODSYMBOLID = 4096;
-    public final static int PATTERNID = 1024;
-    public final static int SERIESID = 64;
-    public final static int STRINGID = 128;
+    int ASTID = 4096;
+    int BLANKID = 16384;
+    int COMPLEXID = 32;
+    int DOUBLECOMPLEXID = 4;
+    int DOUBLEID = 2;
+    int FRACTIONID = 16;
+    int INTEGERID = 8;
+    int METHODSYMBOLID = 8192;
+    int PATTERNID = 2048;
+    int SERIESID = 64;
+    int QUANTITYID = 128;
 
-    public final static int SYMBOLID = 256;
+    int STRINGID = 256;
+    int SYMBOLID = 512;
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
@@ -145,7 +146,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param visitor
      * @return
      */
-    public <T> T accept(IVisitor<T> visitor);
+    <T> T accept(IVisitor<T> visitor);
 
     /**
      * Accept a visitor with return type <code>boolean</code>
@@ -153,7 +154,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param visitor
      * @return
      */
-    public boolean accept(IVisitorBoolean visitor);
+    boolean accept(IVisitorBoolean visitor);
 
     /**
      * Accept a visitor with return type <code>int</code>
@@ -161,7 +162,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param visitor
      * @return
      */
-    public int accept(IVisitorInt visitor);
+    int accept(IVisitorInt visitor);
 
     /**
      * Accept a visitor with return type <code>long</code>
@@ -169,7 +170,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param visitor
      * @return
      */
-    public long accept(IVisitorLong visitor);
+    long accept(IVisitorLong visitor);
 
     @Override
     IExpr add(IExpr that);
@@ -188,6 +189,16 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     IExpr apply(List<? extends IExpr> leaves);
 
+    /**
+     * Returns the <b>number of arguments</b> in this {@code IAST}. The <b>number of arguments</b> equals
+     * <code>size() - 1</code> (i.e. the <b>number of elements</b> minus 1). If this is an atom return size
+     * <code>-1</code>.
+     *
+     * @return the number of arguments in this {@code IAST}.
+     * @see #size()
+     */
+    int argSize();
+
     Object asType(Class<?> clazz);
 
 
@@ -196,7 +207,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return
      */
-    public IExpr base();
+    IExpr base();
 
     /**
      * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
@@ -272,7 +283,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param expr     the expression which should be tested for equality
      * @return
      */
-    public boolean equalsAt(int position, final IExpr expr);
+    boolean equalsAt(int position, final IExpr expr);
 
     /**
      * Compare if <code>this == that</code:
@@ -285,7 +296,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
-    public IExpr equalTo(IExpr that);
+    IExpr equalTo(IExpr that);
 
     /**
      * Evaluate the expression to a <code>INumber</code> value.
@@ -332,7 +343,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return
      */
-    public IExpr exponent();
+    IExpr exponent();
 
     @Override
     ElemFactory<IExpr> factory();
@@ -344,7 +355,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return the second argument of the function represented by this <code>AST</code> or <code>F.NIL</code> if this
      * object isn't an AST.
      */
-    public IExpr first();
+    IExpr first();
 
     /**
      * Get the last element of the <code>AST</code> list (i.e. get(size()-1). Return <code>F.NIL</code> if this object
@@ -353,7 +364,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return the last argument of the function represented by this <code>AST</code>.
      * @see IExpr#head()
      */
-    public IExpr last();
+    IExpr last();
 
     /**
      * Return the <code>FullForm()</code> of this expression
@@ -374,7 +385,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr getAt(final int index);
 
     @Override
-    public Field<IExpr> getField();
+    Field<IExpr> getField();
 
     /**
      * Evaluate Greater, if both arguments are real numbers
@@ -403,7 +414,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
-    public IExpr greaterEqualThan(IExpr that);
+    IExpr greaterEqualThan(IExpr that);
 
     /**
      * Compare if <code>this > that</code:
@@ -416,7 +427,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
-    public IExpr greaterThan(IExpr that);
+    IExpr greaterThan(IExpr that);
 
     /**
      * If this object is an instance of <code>IAST</code> get the first element (offset 0) of the <code>IAST</code> list
@@ -424,7 +435,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return the head of the expression, which must not be null.
      */
-    public IExpr head();
+    IExpr head();
 
     /**
      * Get the head of an expression and if it is a built-in symbol return the ID of this symbol, otherwise return
@@ -439,7 +450,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return a unique integer id for the implementation of this expression
      */
-    public int hierarchy();
+    int hierarchy();
 
     /**
      * If this expression unequals <code>F.NIL</code>, invoke the specified consumer with the <code>this</code> object,
@@ -464,7 +475,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return real part
      */
-    public IExpr im();
+    IExpr im();
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this + 1)</code>. Calculates
@@ -1125,6 +1136,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return
      */
     boolean isInterval1();
+
+    /**
+     * Test if this expression is a Quantity(a,unit) expression.
+     *
+     * @return
+     */
+    boolean isQuantity();
 
     /**
      * Compares this expression with the specified expression for order. Returns true if this expression is canonical
@@ -1899,7 +1917,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
-    public IExpr lessEqualThan(IExpr that);
+    IExpr lessEqualThan(IExpr that);
 
     /**
      * Compare if <code>this < that</code:
@@ -1912,7 +1930,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
-    public IExpr lessThan(IExpr that);
+    IExpr lessThan(IExpr that);
 
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>lower</code> value. If this is a
@@ -1920,7 +1938,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return <code>F.NIL</code> if this expression is no interval and no signed number.
      */
-    public IExpr lower();
+    IExpr lower();
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this - that)</code>. Calculates
@@ -1945,7 +1963,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr multiply(final IExpr that);
 
     @Override
-    public IExpr multiply(int n);
+    IExpr multiply(int n);
 
     /**
      * {@inheritDoc}
@@ -2136,10 +2154,10 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return real part
      */
-    public IExpr re();
+    IExpr re();
 
     @Override
-    public IExpr reciprocal() throws MathRuntimeException;
+    IExpr reciprocal() throws MathRuntimeException;
 
 
     IExpr remainder(IExpr that);
@@ -2227,7 +2245,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return the rest arguments of the function represented by this <code>AST</code> with the first argument removed.
      * @see IExpr#head()
      */
-    public IASTAppendable rest();
+    IASTAppendable rest();
 
     /**
      * Get the second element of this <code>AST</code> list (i.e. get(2)). Return <code>F.NIL</code> if this object
@@ -2236,7 +2254,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return the second argument of the function represented by this <code>AST</code> or <code>F.NIL</code> if this
      * object isn't an AST.
      */
-    public IExpr second();
+    IExpr second();
 
     /**
      * Signum functionality is used in JAS toString() method, don't use it as math signum function.
@@ -2286,7 +2304,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param that the multiplier expression
      * @return <code>(this * that)</code>
      */
-    public IExpr timesDistributed(final IExpr that);
+    IExpr timesDistributed(final IExpr that);
 
     /**
      * Convert this object into a <code>double[]</code> matrix.
@@ -2351,9 +2369,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
-    public IExpr unequalTo(IExpr that);
+    IExpr unequalTo(IExpr that);
 
-    public IExpr unitStep();
+    IExpr unitStep();
 
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>upper</code> value. If this is a
@@ -2361,7 +2379,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return <code>F.NIL</code> if this expression is no interval and no signed number.
      */
-    public IExpr upper();
+    IExpr upper();
 
     /**
      * Convert the variables (i.e. expressions of type <code>ISymbol</code> which aren't constants) in this expression
@@ -2375,7 +2393,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     String toString();
 
-    public enum COMPARE_TERNARY {
+    enum COMPARE_TERNARY {
         TRUE, FALSE, UNDEFINED
     }
 }
