@@ -17,8 +17,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.imageio.ImageIO;
-
 import ch.ethz.idsc.tensor.io.Extension;
 import ch.ethz.idsc.tensor.io.Filename;
 
