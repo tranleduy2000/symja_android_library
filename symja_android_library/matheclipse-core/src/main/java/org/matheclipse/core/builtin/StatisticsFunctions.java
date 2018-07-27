@@ -73,6 +73,7 @@ public class StatisticsFunctions {
 		F.ExponentialDistribution.setEvaluator(new ExponentialDistribution());
 		F.FrechetDistribution.setEvaluator(new FrechetDistribution());
 		F.GammaDistribution.setEvaluator(new GammaDistribution());
+		F.GeometricMean.setEvaluator(new GeometricMean());
 		F.GeometricDistribution.setEvaluator(new GeometricDistribution());
 		F.GumbelDistribution.setEvaluator(new GumbelDistribution());
 		F.HypergeometricDistribution.setEvaluator(new HypergeometricDistribution());
@@ -700,6 +701,29 @@ public class StatisticsFunctions {
 
 	}
 
+	private static class GeometricMean extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 2);
+			IAST arg1 = Validate.checkASTType(ast, 1);
+			if (arg1.isRealVector()) {
+				return F.num(StatUtils.geometricMean(arg1.toDoubleVector()));
+			}
+			if (arg1.size() > 1) {
+				return F.Power(arg1.setAtClone(0, F.Times), F.fraction(1, arg1.argSize()));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr numericEval(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 2);
+
+			double[] values = ast.getAST(1).toDoubleVector();
+			return F.num(StatUtils.geometricMean(values));
+		}
+	}
 	private final static class GeometricDistribution extends AbstractDiscreteDistribution
 			implements ICDF, IDiscreteDistribution, IDistribution, IPDF, IVariance, IRandomVariate {
 
