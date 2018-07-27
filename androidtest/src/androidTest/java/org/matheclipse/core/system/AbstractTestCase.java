@@ -44,28 +44,15 @@ public abstract class AbstractTestCase extends TestCase {
             if (evalString.length() == 0 && expectedResult.length() == 0) {
                 return;
             }
-            ThreadGroup group = new ThreadGroup("CalculateThread");
-            Thread thread = new Thread(group, new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        // scriptEngine.put("STEPWISE",Boolean.TRUE);
-                        String evaledResult = (String) scriptEngine.eval(evalString);
 
-                        if (resultLength > 0 && evaledResult.length() > resultLength) {
-                            evaledResult = evaledResult.substring(0, resultLength) + "<<SHORT>>";
-                            assertEquals(expectedResult, evaledResult);
-                        } else {
-                            assertEquals(expectedResult, evaledResult);
-                        }
-                    } catch (ScriptException e) {
-                        e.printStackTrace();
-                        assertEquals(e.getMessage(), "");
-                    }
-                }
-            }, "CalculateThread", 20971520/*2MB*/);
-            thread.start();
-            thread.join();
+            // scriptEngine.put("STEPWISE",Boolean.TRUE);
+            String evaledResult = (String) evals(scriptEngine, evalString);
+            if (resultLength > 0 && evaledResult.length() > resultLength) {
+                evaledResult = evaledResult.substring(0, resultLength) + "<<SHORT>>";
+                assertEquals(expectedResult, evaledResult);
+            } else {
+                assertEquals(expectedResult, evaledResult);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,15 +60,37 @@ public abstract class AbstractTestCase extends TestCase {
         }
     }
 
-	public void evalString(String evalString) {
-		try {
-			// scriptEngine.put("STEPWISE",Boolean.TRUE);
-			String evaledResult = (String) fScriptEngine.eval(evalString);
-		} catch (Exception e) {
-			e.printStackTrace();
-			assertEquals("", "1");
-		}
-	}
+    private String evals(final ScriptEngine scriptEngine, final String evalString) throws Exception {
+        final String[] result = new String[1];
+        final Exception[] exceptions = new Exception[1];
+        ThreadGroup group = new ThreadGroup("CalculateThread");
+        Thread thread = new Thread(group, new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    result[0] = (String) scriptEngine.eval(evalString);
+                } catch (ScriptException e) {
+                    exceptions[0] = e;
+                }
+            }
+        }, "CalculateThread", 20971520/*2MB*/);
+        thread.start();
+        thread.join();
+        if (exceptions[0] != null) {
+            throw exceptions[0];
+        }
+        return result[0];
+    }
+
+    public void evalString(String evalString) {
+        try {
+            // scriptEngine.put("STEPWISE",Boolean.TRUE);
+            String evaledResult = (String) fScriptEngine.eval(evalString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertEquals("", "1");
+        }
+    }
 
     public void checkNumeric(String evalString, String expectedResult) {
         check(fNumericScriptEngine, evalString, expectedResult, -1);
