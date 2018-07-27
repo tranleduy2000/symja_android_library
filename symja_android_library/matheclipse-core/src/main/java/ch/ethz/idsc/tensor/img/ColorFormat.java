@@ -1,5 +1,7 @@
 package ch.ethz.idsc.tensor.img;
 
+import com.duy.awt.Color;
+
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;

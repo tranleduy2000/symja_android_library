@@ -1,6 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
-import android.graphics.ImageFormat;
+
+import com.duy.imageio.ImageIO;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;

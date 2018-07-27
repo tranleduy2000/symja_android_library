@@ -1,6 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
-import android.graphics.ImageFormat;
+
+import com.duy.imageio.ImageIO;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -24,10 +25,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.imageio.ImageIO;
-
 import ch.ethz.idsc.tensor.io.Extension;
 import ch.ethz.idsc.tensor.io.Filename;
+import ch.ethz.idsc.tensor.io.ImageFormat;
 
 /**
  * Import some data from file system.
