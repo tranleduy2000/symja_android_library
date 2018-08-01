@@ -36,4 +36,4 @@ Passing a matrix returns the medians of the respective columns:
 
 >> Median(LogNormalDistribution(m,s))
 E^m
-```  
+```

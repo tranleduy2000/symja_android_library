@@ -5,7 +5,7 @@ Mean(list)
 ```
 
 > returns the statistical mean of `list`. 
-   
+
 See:
 * [Wikipedia - Mean](https://en.wikipedia.org/wiki/Mean)
 
@@ -26,7 +26,7 @@ See:
 
 >> Mean({a, b})
 1/2*(a+b)
-```  
+```
 
 The [mean](https://en.wikipedia.org/wiki/Mean) of the normal distribution is
 
