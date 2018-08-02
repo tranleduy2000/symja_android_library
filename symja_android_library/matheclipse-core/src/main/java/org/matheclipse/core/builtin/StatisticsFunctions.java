@@ -5,10 +5,12 @@ import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
+import com.duy.lang.DMath;
 import com.duy.util.ThreadLocalRandom;
 
 import org.apfloat.ApcomplexMath;
 import org.apfloat.ApfloatMath;
+import org.hipparchus.distribution.RealDistribution;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.stat.StatUtils;
@@ -43,7 +45,6 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.reflection.system.rules.PDFRules;
 import org.matheclipse.core.reflection.system.rules.QuantileRules;
 import org.matheclipse.core.reflection.system.rules.StandardDeviationRules;
 import org.uncommons.maths.random.BinomialGenerator;
@@ -984,7 +985,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
-		private static final double NEXTDOWNONE = Math.nextDown(1.0);
+		private static final double NEXTDOWNONE = DMath.nextDown(1.0);
 
 		// @Override
 		// public IExpr randomVariate(Random random, IAST dist) {

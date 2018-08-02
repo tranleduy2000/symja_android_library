@@ -4,7 +4,7 @@ package com.duy.lang;
  * Created by Duy on 2/21/2018.
  */
 
-public class Math {
+public class DMath {
 
     /**
      * Returns the sum of its arguments,
@@ -399,4 +399,41 @@ public class Math {
         return x - floorDiv(x, y) * y;
     }
 
+
+    /**
+     * Returns the floating-point value adjacent to {@code d} in
+     * the direction of negative infinity.  This method is
+     * semantically equivalent to {@code nextAfter(d,
+     * Double.NEGATIVE_INFINITY)}; however, a
+     * {@code nextDown} implementation may run faster than its
+     * equivalent {@code nextAfter} call.
+     *
+     * <p>Special Cases:
+     * <ul>
+     * <li> If the argument is NaN, the result is NaN.
+     *
+     * <li> If the argument is negative infinity, the result is
+     * negative infinity.
+     *
+     * <li> If the argument is zero, the result is
+     * {@code -Double.MIN_VALUE}
+     *
+     * </ul>
+     *
+     * @param d  starting floating-point value
+     * @return The adjacent floating-point value closer to negative
+     * infinity.
+     * @since 1.8
+     */
+    public static double nextDown(double d) {
+        if (Double.isNaN(d) || d == Double.NEGATIVE_INFINITY)
+            return d;
+        else {
+            if (d == 0.0)
+                return -Double.MIN_VALUE;
+            else
+                return Double.longBitsToDouble(Double.doubleToRawLongBits(d) +
+                        ((d > 0.0d)?-1L:+1L));
+        }
+    }
 }
