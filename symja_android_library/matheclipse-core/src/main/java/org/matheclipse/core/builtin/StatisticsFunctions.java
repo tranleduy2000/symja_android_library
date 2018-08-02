@@ -127,7 +127,7 @@ public class StatisticsFunctions {
 
 	/**
 	 * Any distribution for which an analytic expression of the variance exists should implement {@link IVariance}.
-	 * 
+	 *
 	 * <p>
 	 * The function is used in {@link Expectation} to provide the variance of a given {@link IDistribution}.
 	 */
@@ -138,10 +138,10 @@ public class StatisticsFunctions {
 
 	/**
 	 * Cumulative distribution function
-	 * 
+	 *
 	 * ICDF extends the capabilities of {@link IPDF}
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	public interface ICDF {
 		static final IExpr CDF_NUMERIC_THRESHOLD = F.num(1e-14);
@@ -152,21 +152,21 @@ public class StatisticsFunctions {
 
 	/**
 	 * probability density function
-	 * 
+	 *
 	 */
 	interface IPDF {
 		/**
-		 * 
+		 *
 		 * <p>
 		 * For {@link IDiscreteDistribution}, the function returns the P(X == x), i.e. probability of random variable X
 		 * == x
-		 * 
+		 *
 		 * <p>
 		 * For continuous distributions, the function
 		 * <ul>
 		 * <li>returns the value of the probability density function, which is <em>not</em> identical to P(X == x)]
 		 * </ul>
-		 * 
+		 *
 		 * @param x
 		 * @return
 		 */
@@ -180,24 +180,11 @@ public class StatisticsFunctions {
 		 *            function over all elements.
 		 * @return
 		 */
-		default IExpr callFunction(IExpr pureFunction, IExpr x) {
-			if (x.isPresent()) {
-				if (x.isList()) {
-					return ((IAST) x).map(new Function<IExpr, IExpr>() {
-                        @Override
-                        public IExpr apply(IExpr v) {
-                            return F.unaryAST1(pureFunction, v);
-                        }
-                    }, 1);
-				}
-				return F.unaryAST1(pureFunction, x);
-			}
-			return pureFunction;
-		}
+		IExpr callFunction(IExpr pureFunction, IExpr x);
 	}
 
 	/** functionality and suggested base class for a discrete probability distribution */
-	private static abstract class AbstractDiscreteDistribution extends AbstractEvaluator
+	private static abstract class AbstractDiscreteDistribution extends AbstractStatisticsFunctions
 			implements IDiscreteDistribution, IDistribution, IPDF, IRandomVariate {
 		// @Override
 		// public final IExpr randomVariate(Random random, IAST dist) {
@@ -360,7 +347,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class BernoulliDistribution extends AbstractEvaluator
+	private final static class BernoulliDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
@@ -463,7 +450,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class BinomialDistribution extends AbstractEvaluator
+	private final static class BinomialDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
@@ -549,7 +536,7 @@ public class StatisticsFunctions {
 	 * <pre>
 	 * CentralMoment(list, r)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives the the <code>r</code>th central moment (i.e. the <code>r</code>th moment about the mean) of
@@ -563,7 +550,7 @@ public class StatisticsFunctions {
 	 * <li><a href="https://en.wikipedia.org/wiki/Central_moment">Wikipedia - Central moment</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt;&gt; CentralMoment({1.1, 1.2, 1.4, 2.1, 2.4}, 4)
 	 * 0.10085
@@ -605,7 +592,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class FrechetDistribution extends AbstractEvaluator
+	private final static class FrechetDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
@@ -692,7 +679,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class GammaDistribution extends AbstractEvaluator
+	private final static class GammaDistribution extends AbstractStatisticsFunctions
 			implements IDistribution, IVariance, IPDF, ICDF {
 
 		@Override
@@ -842,7 +829,7 @@ public class StatisticsFunctions {
 			return F.num(StatUtils.geometricMean(values));
 		}
 	}
-	private final static class GeometricDistribution extends AbstractEvaluator
+	private final static class GeometricDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance {// , IRandomVariate
 
 		@Override
@@ -912,7 +899,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class GumbelDistribution extends AbstractEvaluator
+	private final static class GumbelDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
@@ -1012,7 +999,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class HypergeometricDistribution extends AbstractEvaluator
+	private final static class HypergeometricDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
@@ -1152,9 +1139,9 @@ public class StatisticsFunctions {
 
 	/**
 	 * Compute the covariance.
-	 * 
+	 *
 	 * See <a href="http://en.wikipedia.org/wiki/Covariance">Covariance</a>
-	 * 
+	 *
 	 */
 	private final static class Covariance extends AbstractMatrix1Expr {
 
@@ -1245,7 +1232,7 @@ public class StatisticsFunctions {
 		}
 	}
 
-	private final static class DiscreteUniformDistribution extends AbstractEvaluator
+	private final static class DiscreteUniformDistribution extends AbstractStatisticsFunctions
 			implements IDistribution, IVariance, ICDF, IPDF, IRandomVariate {
 
 		@Override
@@ -1347,7 +1334,7 @@ public class StatisticsFunctions {
 		}
 	}
 
-	private final static class ErlangDistribution extends AbstractEvaluator
+	private final static class ErlangDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
@@ -1490,7 +1477,7 @@ public class StatisticsFunctions {
 		}
 	}
 
-	private final static class ExponentialDistribution extends AbstractEvaluator
+	private final static class ExponentialDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
@@ -1637,7 +1624,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class LogNormalDistribution extends AbstractEvaluator
+	private final static class LogNormalDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
@@ -1723,7 +1710,7 @@ public class StatisticsFunctions {
 	}
 
 	/**
-	 * 
+	 *
 	 * See <a href="http://en.wikipedia.org/wiki/Arithmetic_mean">Arithmetic mean</a>
 	 */
 	private final static class Mean extends AbstractTrigArg1 {
@@ -1804,7 +1791,7 @@ public class StatisticsFunctions {
 	}
 
 	/**
-	 * 
+	 *
 	 * See <a href="http://en.wikipedia.org/wiki/Median">Median</a>
 	 */
 	private final static class Median extends AbstractTrigArg1 {
@@ -1854,7 +1841,7 @@ public class StatisticsFunctions {
 		}
 	}
 
-	private final static class NakagamiDistribution extends AbstractEvaluator
+	private final static class NakagamiDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
@@ -1942,17 +1929,17 @@ public class StatisticsFunctions {
 	 * <pre>
 	 * NormalDistribution(m, s)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the normal distribution of mean <code>m</code> and sigma <code>s</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * NormalDistribution()
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the standard normal distribution for <code>m = 0</code> and <code>s = 1</code>.
@@ -1969,7 +1956,7 @@ public class StatisticsFunctions {
 	 * The <a href="https://en.wikipedia.org/wiki/Probability_density">probability density function</a> of the normal
 	 * distribution is
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; PDF(NormalDistribution(m, s), x)
 	 * 1/(Sqrt(2)*E^((-m+x)^2/(2*s^2))*Sqrt(Pi)*s)
@@ -1978,7 +1965,7 @@ public class StatisticsFunctions {
 	 * The <a href="https://en.wikipedia.org/wiki/Cumulative_distribution_function">cumulative distribution function</a>
 	 * of the standard normal distribution is
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; CDF(NormalDistribution( ), x)
 	 * 1/2*(2-Erfc(x/Sqrt(2)))
@@ -1986,7 +1973,7 @@ public class StatisticsFunctions {
 	 * <p>
 	 * The <a href="https://en.wikipedia.org/wiki/Mean">mean</a> of the normal distribution is
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Mean(NormalDistribution(m, s))
 	 * m
@@ -1995,7 +1982,7 @@ public class StatisticsFunctions {
 	 * The <a href="https://en.wikipedia.org/wiki/Standard_deviation">standard deviation</a> of the normal distribution
 	 * is
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; StandardDeviation(NormalDistribution(m, s))
 	 * s
@@ -2003,7 +1990,7 @@ public class StatisticsFunctions {
 	 * <p>
 	 * The <a href="https://en.wikipedia.org/wiki/Variance">variance</a> of the normal distribution is
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Variance(NormalDistribution(m, s))
 	 * s^2
@@ -2012,13 +1999,13 @@ public class StatisticsFunctions {
 	 * The <a href="https://en.wikipedia.org/wiki/Normal_distribution#Generating_values_from_normal_distribution">random
 	 * variates</a> of a normal distribution can be generated with function <code>RandomVariate</code>
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; RandomVariate(NormalDistribution(2,3), 10^1)
 	 * {1.14364,6.09674,5.16495,2.39937,-0.52143,-1.46678,3.60142,-0.85405,2.06373,-0.29795}
 	 * </pre>
 	 */
-	private final static class NormalDistribution extends AbstractEvaluator
+	private final static class NormalDistribution extends AbstractStatisticsFunctions
 			implements IDistribution, IVariance, IRandomVariate, IPDF, ICDF {
 
 		@Override
@@ -2169,7 +2156,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class PoissonDistribution extends AbstractEvaluator
+	private final static class PoissonDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
@@ -2246,17 +2233,17 @@ public class StatisticsFunctions {
 	 * <pre>
 	 * Quantile(list, q)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the <code>q</code>-Quantile of <code>list</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * Quantile(list, {q1, q2, ...})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns a list of the <code>q</code>-Quantiles of <code>list</code>.
@@ -2269,7 +2256,7 @@ public class StatisticsFunctions {
 	 * <li><a href="https://en.wikipedia.org/wiki/Quantile">Wikipedia - Quantile</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Quantile({1,2}, 0.5)
 	 * 1
@@ -2547,7 +2534,7 @@ public class StatisticsFunctions {
 	 * <pre>
 	 * Skewness(list)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives Pearson's moment coefficient of skewness for $list$ (a measure for estimating the symmetry of a
@@ -2555,7 +2542,7 @@ public class StatisticsFunctions {
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt;&gt; Skewness({1.1, 1.2, 1.4, 2.1, 2.4})
 	 * 0.40704
@@ -2645,7 +2632,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class StudentTDistribution extends AbstractEvaluator
+	private final static class StudentTDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
@@ -2806,7 +2793,7 @@ public class StatisticsFunctions {
 
 	}
 
-	private final static class WeibullDistribution extends AbstractEvaluator
+	private final static class WeibullDistribution extends AbstractStatisticsFunctions
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
@@ -2901,6 +2888,31 @@ public class StatisticsFunctions {
 		}
 
 	}
+
+	private static abstract class AbstractStatisticsFunctions extends AbstractEvaluator
+            implements ICDF, IDistribution, IPDF {
+
+        @Override
+        public RealDistribution dist() {
+            return null;
+        }
+
+        @Override
+        public IExpr callFunction(IExpr pureFunction, IExpr x) {
+            if (x.isPresent()) {
+                if (x.isList()) {
+                    return ((IAST) x).map(new Function<IExpr, IExpr>() {
+                        @Override
+                        public IExpr apply(IExpr v) {
+                            return F.unaryAST1(pureFunction, v);
+                        }
+                    }, 1);
+                }
+                return F.unaryAST1(pureFunction, x);
+            }
+            return pureFunction;
+        }
+    }
 
 	private final static StatisticsFunctions CONST = new StatisticsFunctions();
 
