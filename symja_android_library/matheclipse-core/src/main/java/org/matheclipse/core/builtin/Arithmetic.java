@@ -2353,9 +2353,16 @@ public final class Arithmetic {
             ORDERLESS_MATCHER.defineHashRule(ArcTan(x_), ArcCot(x_), Times(C1D2, Pi));
             // ORDERLESS_MATCHER.setUpHashRule("ArcTan[x_]", "ArcTan[y_]", "Pi/2",
             // "Positive[x]&&(y==1/x)");
-            ORDERLESS_MATCHER.defineHashRule(ArcTan(x_), ArcTan(y_), Times(C1D2, Pi),
+			ORDERLESS_MATCHER.defineHashRule(ArcTan(x_), ArcTan(y_), //
+					Times(C1D2, Pi), //
                     And(Positive(x), Equal(y, Power(x, CN1))));
 
+			// ArcTan(1/2) + ArcTan(1/3) = Pi/4
+			ORDERLESS_MATCHER.defineHashRule(F.ArcTan(F.C1D3), F.ArcTan(F.C1D2), //
+					Times(F.C1D4, Pi));
+			// ArcTan(1/3) + ArcTan(1/7) = ArcTan(1/2)
+						ORDERLESS_MATCHER.defineHashRule(F.ArcTan(F.C1D3), F.ArcTan(F.QQ(1L,7L)), //
+								F.ArcTan(F.C1D2));
             // ORDERLESS_MATCHER.setUpHashRule("-ArcTan[x_]", "-ArcTan[y_]",
             // "-Pi/2", "Positive[x]&&(y==1/x)");
             // ORDERLESS_MATCHER.definePatternHashRule(Times(CN1, ArcTan(x_)), Times(CN1,
