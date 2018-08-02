@@ -2680,7 +2680,12 @@ public final class NumberTheory {
 			if (ast.isAST2()) {
 				return F.Binomial(F.Plus(ast.arg1(), ast.arg2()), ast.arg2());
 			}
-			int position = ast.indexOf(x -> (!x.isInteger()) || ((IInteger) x).isNegative());
+			int position = ast.indexOf(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return (!x.isInteger()) || ((IInteger) x).isNegative();
+                }
+            });
 			if (position < 0) {
 				return multinomial(ast);
 				}

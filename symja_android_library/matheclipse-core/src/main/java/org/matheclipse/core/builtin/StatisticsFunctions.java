@@ -183,7 +183,12 @@ public class StatisticsFunctions {
 		default IExpr callFunction(IExpr pureFunction, IExpr x) {
 			if (x.isPresent()) {
 				if (x.isList()) {
-					return ((IAST) x).map(v -> F.unaryAST1(pureFunction, v), 1);
+					return ((IAST) x).map(new Function<IExpr, IExpr>() {
+                        @Override
+                        public IExpr apply(IExpr v) {
+                            return F.unaryAST1(pureFunction, v);
+                        }
+                    }, 1);
 				}
 				return F.unaryAST1(pureFunction, x);
 			}
@@ -2288,7 +2293,12 @@ public class StatisticsFunctions {
 			}
 			if (dim != null) {
 				IAST matrix = (IAST) arg1;
-				return matrix.mapMatrixColumns(dim, (IExpr x) -> ast.setAtClone(1, x));
+				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return ast.setAtClone(1, x);
+					}
+				});
 			}
 
 			if (arg1.isList()) {
@@ -2435,7 +2445,12 @@ public class StatisticsFunctions {
 									if (arg2.isList()) {
 										int[] indx = Validate.checkListOfInts(arg2, 0, Integer.MAX_VALUE);
 										IASTAppendable list = F.ListAlloc(indx[0]);
-										return createArray(indx, 0, list, () -> variate.randomVariate(random, dist));
+										return createArray(indx, 0, list, new Supplier<IExpr>() {
+											@Override
+											public IExpr get() {
+												return variate.randomVariate(random, dist);
+											}
+										});
 									} else {
 										int n = arg2.toIntDefault(Integer.MIN_VALUE);
 										if (n >= 0) {
@@ -2748,7 +2763,12 @@ public class StatisticsFunctions {
 							final int ii = i;
 							IASTAppendable list = F.ListAlloc(matrixDimensions[1]);
 							IAST variance = F.Variance(list);
-							list.appendArgs(matrixDimensions[0] + 1, j -> arg1.getPart(j, ii));
+							list.appendArgs(matrixDimensions[0] + 1, new IntFunction<IExpr>() {
+								@Override
+								public IExpr apply(int j) {
+									return arg1.getPart(j, ii);
+								}
+							});
 							result.append(variance);
 						}
 						return result;
