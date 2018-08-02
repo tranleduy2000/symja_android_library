@@ -20,24 +20,27 @@ import java.io.ObjectStreamException;
 import java.util.Set;
 
 public class QuantityImpl extends AbstractAST implements IQuantity, Externalizable {
+	/**
+	 * @param value
+	 *            is assumed to be not instance of {@link IQuantity}
+	 * @param unit
+	 * @return
+	 */
+	/* package */ static IExpr of(IExpr value, IUnit unit) {
+		return Units.isOne(unit) ? value : new QuantityImpl(value, null, unit);
+	}
     private IExpr arg1;
     private String unitString;
     private IUnit unit; // not Unit.ONE
+	public QuantityImpl() {
+
+	}
     private QuantityImpl(IExpr value, String unitString, IUnit unit) {
         this.arg1 = value;
         this.unitString = unitString;
         this.unit = unit;
     }
 
-    /**
-     * @param value is assumed to be not instance of {@link IQuantity}
-     * @param unit
-     * @return
-     */
-    /* package */
-    static IExpr of(IExpr value, IUnit unit) {
-        return Units.isOne(unit) ? value : new QuantityImpl(value, null, unit);
-    }
 
     @Override
     public IExpr abs() {
@@ -119,9 +122,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
         return (INumber) ofUnit(F.Conjugate.of(arg1));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public IASTMutable copy() {
         return new QuantityImpl(arg1, unitString, unit);
@@ -158,9 +159,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public IExpr evaluate(EvalEngine engine) {
         return F.NIL;
@@ -197,9 +196,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
         return F.Quantity;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public int hierarchy() {
         return QUANTITYID;
@@ -210,33 +207,25 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
         return ofUnit(F.Im.of(arg1));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isAST0() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isAST1() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isAST2() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isAST3() {
         return false;
@@ -246,41 +235,31 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
         return arg1.isExactNumber();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isNegative() {
         return arg1.isNegative();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isNegativeInfinity() {
         return arg1.isNegativeInfinity();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isNegativeResult() {
         return arg1.isNegativeResult();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isNonNegativeResult() {
         return arg1.isNonNegativeResult();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isOne() {
         return arg1.isOne();
@@ -306,9 +285,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
         return arg1.isPositive();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isPositiveResult() {
         return arg1.isPositiveResult();
@@ -329,9 +306,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	/** {@inheritDoc} */
     @Override
     public boolean isZero() {
         return arg1.isZero();
