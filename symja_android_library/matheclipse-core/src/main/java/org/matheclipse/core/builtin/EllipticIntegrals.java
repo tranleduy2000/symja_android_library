@@ -71,6 +71,11 @@ public class EllipticIntegrals {
 				return F.Times(F.C1D4, F.Power(F.Pi, F.CN1D2), F.Power(F.Gamma(F.QQ(3L, 4L)), -2),
 						F.Plus(F.Sqr(F.Pi), F.Times(F.C2, F.Power(F.Gamma(F.QQ(3L, 4L)), 4))));
 			}
+			if (z.isMinusOne()) {
+				// (Pi^2+2*Gamma(3/4)^4)/(2*Sqrt(2)*Sqrt(Pi)*Gamma(3/4)^2)
+				return F.Times(F.C1D2, F.C1DSqrt2, F.Power(F.Pi, F.CN1D2), F.Power(F.Gamma(F.QQ(3L, 4L)), -2),
+						F.Plus(F.Sqr(F.Pi), F.Times(F.C2, F.Power(F.Gamma(F.QQ(3L, 4L)), 4))));
+			}
 			if (z instanceof INum) {
 				double a = ((ISignedNumber) z).doubleValue();
 				try {
@@ -109,6 +114,13 @@ public class EllipticIntegrals {
 			if (z.equals(F.CPiHalf)) {
 				// EllipticF(Pi/2, m) = EllipticK(m)
 				return F.EllipticK(m);
+			}
+			if (z.isTimes() && z.second().equals(F.Pi) && z.first().isRational()) {
+				IRational k = ((IRational) z.first()).multiply(F.C2).normalize();
+				if (k.isInteger()) {
+					// EllipticF(k*Pi/2, m) = k*EllipticK(m) /; IntegerQ(k)
+					return F.Times(k, F.EllipticK(m));
+				}
 			}
 			if (m.isOne()) {
 				// Abs(Re(z)) <= Pi/2

@@ -2559,6 +2559,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testEllipticE() {
 		check("EllipticE(0, m)", "0");
 		check("EllipticE(z,0)", "z");
+		check("EllipticE(1/2)", //
+				"(Pi^2+2*Gamma(3/4)^4)/(4*Sqrt(Pi)*Gamma(3/4)^2)");
+		check("EllipticE(-1)", //
+				"(Pi^2+2*Gamma(3/4)^4)/(2*Sqrt(2)*Sqrt(Pi)*Gamma(3/4)^2)");
 		check("EllipticE(Pi/2, m)", "EllipticE(m)");
 		check("EllipticE(5/4,1)", "Sin(5/4)");
 		check("EllipticE(0.4)", "1.39939");
@@ -2571,6 +2575,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEllipticF() {
+		check("EllipticF(17/2*Pi, m)", //
+				"17*EllipticK(m)");
 		check("EllipticF(Pi/2, m)", //
 				"EllipticK(m)");
 		check("EllipticF(a+42*Pi,m)", //
@@ -4773,13 +4779,19 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLegendreP() {
-		check("LegendreP(Pi,0)", "Sqrt(Pi)/(Gamma(1/2*(1-Pi))*Gamma(1+Pi/2))");
-		check("LegendreP(111,1)", "1");
-		check("LegendreP(4,x)", "3/8-15/4*x^2+35/8*x^4");
+		check("LegendreP(-(1/2), 1 - 2*z)", //
+				"(2*EllipticK(z))/Pi");
+		check("LegendreP(Pi,0)", //
+				"Sqrt(Pi)/(Gamma(1/2*(1-Pi))*Gamma(1+Pi/2))");
+		check("LegendreP(111,1)", //
+				"1");
+		check("LegendreP(4,x)", //
+				"3/8-15/4*x^2+35/8*x^4");
 		// TODO implement non integer args
 		// check("LegendreP(5/2, 1.5) ", "x");
 
-		check("LegendreP(0,x)", "1");
+		check("LegendreP(0,x)", //
+				"1");
 		check("LegendreP(1,x)", "x");
 		check("LegendreP(2,x)", "-1/2+3/2*x^2");
 		check("LegendreP(7,x)", "-35/16*x+315/16*x^3-693/16*x^5+429/16*x^7");
@@ -4787,6 +4799,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLegendreQ() {
+		check("LegendreQ(-(1/2), 2*z - 1)", //
+				"EllipticK(z)");
 		check("LegendreQ(-3,z)", "ComplexInfinity");
 		check("LegendreQ(1,z)", "-1+z*(-Log(1-z)/2+Log(1+z)/2)");
 		check("LegendreQ(2,z)", "-3/2*z+1/2*(-1/2+3/2*z^2)*(-Log(1-z)+Log(1+z))");

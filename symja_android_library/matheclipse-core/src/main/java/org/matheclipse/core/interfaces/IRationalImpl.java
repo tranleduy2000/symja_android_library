@@ -1,5 +1,7 @@
 package org.matheclipse.core.interfaces;
 
+import org.hipparchus.fraction.BigFraction;
+
 /**
  * Created by Duy on 2/20/2018.
  */
@@ -14,6 +16,21 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
     public abstract IRational add(IRational parm1);
 
     public abstract IRational divideBy(IRational parm1);
+
+    @Override
+    public IInteger getDenominator() {
+        return denominator();
+    }
+
+    @Override
+    public BigFraction getFraction() {
+        return toBigFraction();
+    }
+
+    @Override
+    public IInteger getNumerator() {
+        return numerator();
+    }
 
     /**
      * Returns the numerator of this fraction.

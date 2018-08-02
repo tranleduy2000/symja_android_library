@@ -648,7 +648,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	}
 
 	@Override
-	public INumber normalize() {
+	public IRational normalize() {
 		return this;
 	}
 
