@@ -13,6 +13,7 @@ import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CN2;
 import static org.matheclipse.core.expression.F.CN4;
 import static org.matheclipse.core.expression.F.Condition;
+import static org.matheclipse.core.expression.F.EllipticK;
 import static org.matheclipse.core.expression.F.Floor;
 import static org.matheclipse.core.expression.F.GreaterEqual;
 import static org.matheclipse.core.expression.F.IInit;
