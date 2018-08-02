@@ -1,5 +1,6 @@
 package org.matheclipse.script.engine;
 
+import org.apfloat.ApfloatRuntimeException;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.EvalUtilities;
@@ -135,6 +136,12 @@ public class MathScriptEngine extends AbstractScriptEngine {
 			}
 			// catch parser errors here
 			return e.getMessage();
+		} catch (final ApfloatRuntimeException e) {
+			if (Config.SHOW_STACKTRACE) {
+				e.printStackTrace();
+			}
+			// catch parser errors here
+			return "Apfloat: " + e.getMessage();
 		} catch (final Exception e) {
 			// if (e instanceof ExceptionContextProvider) {
 			// if (Config.DEBUG) {

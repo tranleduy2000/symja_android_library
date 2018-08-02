@@ -784,9 +784,9 @@ public final class Validate {
 		String msg = e.getMessage();
 		try {
 			if (msg != null) {
-				buf.append("\nError: " + msg);
+				buf.append("\n" + e.getClass().getName() + ": " + msg);
 			} else {
-				buf.append("\nError: " + e.getClass().getSimpleName());
+				buf.append("\n" + e.getClass().getName());
 			}
 		} catch (IOException e1) {
 			// ignore
