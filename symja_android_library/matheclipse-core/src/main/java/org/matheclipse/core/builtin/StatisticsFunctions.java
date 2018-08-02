@@ -212,6 +212,24 @@ public class StatisticsFunctions {
 		protected abstract IExpr protected_p_equals(IAST dist, IExpr n);
 	}
 
+	/**
+	 * <pre>
+	 * ArithmeticGeometricMean(a, b)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns the arithmetic geometric mean of <code>a</code> and <code>b</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean">Wikipedia - Arithmetic-geometric
+	 * mean)</a></li>
+	 * </ul>
+	 */
 	private static class ArithmeticGeometricMean extends AbstractArg2 {
 
 		@Override

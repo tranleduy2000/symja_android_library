@@ -19,6 +19,31 @@ public class EllipticIntegrals {
 		F.JacobiZeta.setEvaluator(new JacobiZeta());
 	}
 
+	/**
+	 * <pre>
+	 * EllipticE(z)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns the complete elliptic integral of the second kind.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href=
+	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind">Wikipedia -
+	 * Elliptic integral - Complete elliptic integral of the second kind)</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; EllipticE(5/4,1)
+	 * Sin(5/4)
+	 * </pre>
+	 */
 	private static class EllipticE extends AbstractFunctionEvaluator {
 
 		@Override
@@ -97,6 +122,31 @@ public class EllipticIntegrals {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * EllipticF(z)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns the incomplete elliptic integral of the first kind.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href=
+	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Incomplete_elliptic_integral_of_the_first_kind">Wikipedia -
+	 * Elliptic integral - Incomplete elliptic integral of the first kind)</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; EllipticF(17/2*Pi, m)
+	 * 17*EllipticK(m)
+	 * </pre>
+	 */
 	private static class EllipticF extends AbstractFunctionEvaluator {
 
 		@Override
@@ -203,6 +253,38 @@ public class EllipticIntegrals {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * EllipticPi(n, m)
+	 * </pre>
+	 * <p>
+	 * or
+	 * </p>
+	 *
+	 * <pre>
+	 * EllipticPi(n, m, z)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns the complete elliptic integral of the third kind.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href=
+	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_third_kind">Wikipedia -
+	 * Elliptic integral - Complete elliptic integral of the third kind</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; EllipticPi(n,Pi/2,x)
+	 * EllipticPi(n,x)
+	 * </pre>
+	 */
 	private static class EllipticPi extends AbstractFunctionEvaluator {
 
 		@Override
