@@ -17,6 +17,10 @@ public class LowercaseTestCase extends AbstractTestCase {
     public void test001() {
         // syntax error in relaxed mode
         // check("Sin[x]", "");
+		check("1.2345678*^7", //
+				"12345678.0");
+		check("1.23456789*^8", //
+				"123456789.0");
 		// github #66
 		Double d = Double.parseDouble("1231231236123216361256312631627.12312312");
 		checkNumeric("1231231236123216361256312631627.12312312", //
@@ -327,6 +331,10 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testArcTan() {
+		check("7*ArcTan(1/2) + a+ArcTan(1/3)", //
+				"a+Pi/4+6*ArcTan(1/2)");
+		check("ArcTan(1/3) + ArcTan(1/7)", //
+				"ArcTan(1/2)");
         check("ArcTan(a, -a)", "(-(-a+2*Sqrt(a^2))*Pi)/(4*a)");
         check("ArcTan(-a, a)", "((a+2*Sqrt(a^2))*Pi)/(4*a)");
         check("ArcTan(a, a)", "((-a+2*Sqrt(a^2))*Pi)/(4*a)");
@@ -496,6 +504,10 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
 	public void testArithmeticGeometricMean() {
+		check("ArithmeticGeometricMean(1, Infinity)", //
+				"Infinity");
+		check("ArithmeticGeometricMean(a, a*Sqrt(2))", //
+				"(Sqrt(2)*a*Gamma(3/4)^2)/Sqrt(Pi)");
 		check("ArithmeticGeometricMean(a, 1/a)", // orderless
 				"ArithmeticGeometricMean(1/a,a)");
 		check("ArithmeticGeometricMean(a, 0)", //
@@ -639,9 +651,14 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testBetaRegularized() {
-        check("BetaRegularized(2 , 2 , 3)", "8");
-        check("BetaRegularized(2 , 7 , 17)", "5512320");
-        check("BetaRegularized(2 , 7 , -17)", "0");
+		check("BetaRegularized(0.99 , 255.0 , 2.0)", //
+				"0.27365");
+		check("BetaRegularized(2 , 2 , 3)", //
+				"8");
+		check("BetaRegularized(2 , 7 , 17)", //
+				"5512320");
+		check("BetaRegularized(2 , 7 , -17)", //
+				"0");
     }
 
     public void testBlock() {
@@ -955,38 +972,56 @@ public class LowercaseTestCase extends AbstractTestCase {
 
     public void testCDF() {
 		// github #56
-		check("CDF(NormalDistribution(),-0.41)", "0.3409");
-		check("CDF(NormalDistribution(),0.41)", "0.6591");
+		check("CDF(NormalDistribution(),-0.41)", //
+				"0.3409");
+		check("CDF(NormalDistribution(),0.41)", //
+				"0.6591");
+		check("Table(CDF(NormalDistribution(0, s), x), {s, {.75, 1, 2}}, {x, -6,6}) // N", //
+				"{{0.0,0.0,0.0,0.00003,0.00383,0.09121,0.5,0.90879,0.99617,0.99997,1.0,1.0,1.0},{0.0,0.0,0.00003,0.00135,0.02275,0.15866,0.5,0.84134,0.97725,0.99865,0.99997,1.0,1.0},{0.00135,0.00621,0.02275,0.06681,0.15866,0.30854,0.5,0.69146,0.84134,0.93319,0.97725,0.99379,0.99865}}");
 		checkNumeric("Table(CDF(NormalDistribution(0, s), x), {s, {.75, 1, 2}}, {x, -6,6}) // N", //
 				"{{0.0,1.3083924686053115E-11,4.82130336511414E-8,3.167124183311996E-5,0.0038303805675897395,0.0912112197258679,0.5,0.9087887802741321,0.9961696194324102,0.9999683287581669,0.9999999517869663,0.999999999986916,0.9999999999999993},{9.865876450377014E-10,2.866515718791945E-7,3.167124183311996E-5,0.0013498980316300957,0.022750131948179216,0.15865525393145705,0.5,0.8413447460685429,0.9772498680518208,0.9986501019683699,0.9999683287581669,0.9999997133484281,0.9999999990134123},{0.0013498980316300957,0.0062096653257761375,0.022750131948179216,0.06680720126885807,0.15865525393145705,0.30853753872598694,0.5,0.691462461274013,0.8413447460685429,0.9331927987311419,0.9772498680518208,0.9937903346742238,0.9986501019683699}}");
-        check("CDF(NormalDistribution(n, m),k)", "Erfc((-k+n)/(Sqrt(2)*m))/2");
 
-        check("CDF(BernoulliDistribution(p),k)", "Piecewise({{0,k<0},{1-p,0<=k&&k<1}},1)");
-        check("CDF(BinomialDistribution(n, m),k)",
+		check("CDF(NormalDistribution(n, m),k)", //
+				"Erfc((-k+n)/(Sqrt(2)*m))/2");
+		check("CDF(BernoulliDistribution(p),k)", //
+				"Piecewise({{0,k<0},{1-p,0<=k&&k<1}},1)");
+		check("CDF(BinomialDistribution(n, m),k)", //
                 "Piecewise({{BetaRegularized(1-m,n-Floor(k),1+Floor(k)),0<=k&&k<n},{1,k>=n}},0)");
-        check("CDF(ExponentialDistribution(n),k)", "Piecewise({{1-1/E^(k*n),k>=0}},0)");
-        check("CDF(PoissonDistribution(p),k)", "Piecewise({{GammaRegularized(1+Floor(k),p),k>=0}},0)");
-        check("CDF(DiscreteUniformDistribution({a, b}), k)",
+		check("CDF(ExponentialDistribution(n),k)", //
+				"Piecewise({{1-1/E^(k*n),k>=0}},0)");
+		check("CDF(PoissonDistribution(p),k)", //
+				"Piecewise({{GammaRegularized(1+Floor(k),p),k>=0}},0)");
+		check("CDF(DiscreteUniformDistribution({a, b}), k)", //
                 "Piecewise({{(1-a+Floor(k))/(1-a+b),a<=k&&k<b},{1,k>=b}},0)");
-        check("CDF(ErlangDistribution(n, m),k)", "Piecewise({{GammaRegularized(n,0,k*m),k>0}},0)");
-        check("CDF(LogNormalDistribution(n,m),k)", "Piecewise({{Erfc((n-Log(k))/(Sqrt(2)*m))/2,k>0}},0)");
-        check("CDF(NakagamiDistribution(n, m),k)", "Piecewise({{GammaRegularized(n,0,(k^2*n)/m),k>0}},0)");
-        check("CDF(NormalDistribution(n, m),k)", "Erfc((-k+n)/(Sqrt(2)*m))/2");
-        check("CDF(FrechetDistribution(n, m),k)", "Piecewise({{E^(-1/(k/m)^n),k>0}},0)");
-        check("CDF(GammaDistribution(n, m),k)", "Piecewise({{GammaRegularized(n,0,k/m),k>0}},0)");
-        check("CDF(GeometricDistribution(n),k)", "Piecewise({{1-(1-n)^(1+Floor(k)),k>=0}},0)");
+		check("CDF(ErlangDistribution(n, m),k)", //
+				"Piecewise({{GammaRegularized(n,0,m*k),k>0}},0)");
+		check("CDF(LogNormalDistribution(n,m),k)", //
+				"Piecewise({{Erfc((n-Log(k))/(Sqrt(2)*m))/2,k>0}},0)");
+		check("CDF(NakagamiDistribution(n, m),k)", //
+				"Piecewise({{GammaRegularized(n,0,(n*k^2)/m),k>0}},0)");
+		check("CDF(NormalDistribution(n, m),k)", //
+				"Erfc((-k+n)/(Sqrt(2)*m))/2");
+		check("CDF(FrechetDistribution(n, m),k)", //
+				"Piecewise({{E^(-1/(k/m)^n),k>0}},0)");
+		check("CDF(GammaDistribution(n, m),k)", //
+				"Piecewise({{GammaRegularized(n,0,k/m),k>0}},0)");
+		check("CDF(GeometricDistribution(n),k)", //
+				"Piecewise({{1-(1-n)^(1+Floor(k)),k>=0}},0)");
         check("CDF(GumbelDistribution(n, m),k)", "1-1/E^E^((k-n)/m)");
-        check("CDF(HypergeometricDistribution(n, ns, nt),k)",
+		check("CDF(HypergeometricDistribution(n, ns, nt),k)", //
                 "Piecewise({{1+(-ns!*(-ns+nt)!*HypergeometricPFQRegularized({1,1-n+Floor(k),1-ns+Floor(k)},{\n"
                         + "2+Floor(k),2-n-ns+nt+Floor(k)},1))/(Binomial(nt,n)*(-1+n-Floor(k))!*(-1+ns-Floor(k))!),\n"
                         + "0<=k&&n+ns-nt<=k&&k<n&&k<ns},{1,k>=n||k>=ns}},0)");
-        check("CDF(StudentTDistribution(n),k)",
-                "Piecewise({{BetaRegularized(n/(k^2+n),n/2,1/2)/2,k<=0}},1/2*(1+BetaRegularized(k^\n"
-                        + "2/(k^2+n),1/2,n/2)))");
-        check("CDF(WeibullDistribution(n, m),k)", "Piecewise({{1-1/E^(k/m)^n,k>0}},0)");
-        check("CDF(BernoulliDistribution(4),k)", "Piecewise({{0,k<0},{-4+1,0<=k&&k<1}},1)");
+		check("CDF(StudentTDistribution(n),k)", //
+				"Piecewise({{BetaRegularized(n/(n+k^2),n/2,1/2)/2,k<=0}},1/2*(1+BetaRegularized(k^\n"
+						+ "2/(n+k^2),1/2,n/2)))");
+		check("CDF(WeibullDistribution(n, m),k)", //
+				"Piecewise({{1-1/E^(k/m)^n,k>0}},0)");
+		check("CDF(BernoulliDistribution(4),k)", //
+				"Piecewise({{0,k<0},{-4+1,0<=k&&k<1}},1)");
 
-        check("CDF(DiscreteUniformDistribution({1, 5}), 3)", "3/5");
+		check("CDF(DiscreteUniformDistribution({1, 5}), 3)", //
+				"3/5");
     }
 
     public void testCeiling() {
@@ -2535,6 +2570,10 @@ public class LowercaseTestCase extends AbstractTestCase {
     public void testEllipticE() {
         check("EllipticE(0, m)", "0");
         check("EllipticE(z,0)", "z");
+		check("EllipticE(1/2)", //
+				"(Pi^2+2*Gamma(3/4)^4)/(4*Sqrt(Pi)*Gamma(3/4)^2)");
+		check("EllipticE(-1)", //
+				"(Pi^2+2*Gamma(3/4)^4)/(2*Sqrt(2)*Sqrt(Pi)*Gamma(3/4)^2)");
         check("EllipticE(Pi/2, m)", "EllipticE(m)");
         check("EllipticE(5/4,1)", "Sin(5/4)");
         check("EllipticE(0.4)", "1.39939");
@@ -2547,6 +2586,14 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testEllipticF() {
+		check("EllipticF(17/2*Pi, m)", //
+				"17*EllipticK(m)");
+		check("EllipticF(Pi/2, m)", //
+				"EllipticK(m)");
+		check("EllipticF(a+42*Pi,m)", //
+				"EllipticF(a,m)+84*EllipticK(m)");
+		check("EllipticF(-z,m)", //
+				"-EllipticF(z,m)");
         check("EllipticF(0, m)", "0");
         check("EllipticF(z,0)", "z");
         check("EllipticF(5/4, 1)", "Log(Sec(5/4)+Tan(5/4))");
@@ -2558,16 +2605,29 @@ public class LowercaseTestCase extends AbstractTestCase {
     public void testEllipticK() {
         check("EllipticK(0.5)", "1.85407");
         check("Table(EllipticK(x), {x,-1.0, 1.0, 1/4})", //
-                "{1.31103,2.15652,1.85407,1.68575,1.5708,1.68575,1.85407,2.15652,ComplexInfinity}");
+				"{1.31103,1.35906,1.41574,1.48441,1.5708,1.68575,1.85407,2.15652,ComplexInfinity}");
 
+		check("Table(EllipticK(x+I), {x,-1.0, 1.0, 1/4})", //
+				"{1.26549+I*0.16224,1.30064+I*0.18478,1.33866+I*0.21305,1.37925+I*0.24904,1.42127+I*0.29538,1.46203+I*0.35524,1.49611+I*0.43136,1.51493+I*0.52354,1.50924+I*0.62515}");
     }
 
     public void testEllipticPi() {
-        check("EllipticPi(n,0)", "Pi/(2*Sqrt(1-n))");
-        check("EllipticPi(n,1)", "Infinity/Sign(1-n)");
-        check("EllipticPi(n,n)", "EllipticE(n)/(1-n)");
-        check("EllipticPi(0.4,0.6)", "2.59092");
-        check("EllipticPi(1/3, Pi/5, 0.3)", "0.6594");
+		check("EllipticPi(0,z,m)", //
+				"EllipticF(z,m)");
+		check("EllipticPi(n,Pi/2,n)", //
+				"EllipticE(n)/(1-n)");
+		check("EllipticPi(n,Pi/2,x)", //
+				"EllipticPi(n,x)");
+		check("EllipticPi(n,0)", //
+				"Pi/(2*Sqrt(1-n))");
+		check("EllipticPi(n,1)", //
+				"Infinity/Sign(1-n)");
+		check("EllipticPi(n,n)", //
+				"EllipticE(n)/(1-n)");
+		check("EllipticPi(0.4,0.6)", //
+				"2.59092");
+		check("EllipticPi(1/3, Pi/5, 0.3)", //
+				"0.6594");
         check("Table(EllipticPi(x,0.5), {x,-2.0, 2.0, 1/4})", //
                 "{1.0227,1.07184,1.12843,1.19454,1.27313,1.36859,1.48785,1.64253,1.85407,2.16762,2.70129,3.93061,ComplexInfinity,-0.59276,-0.45672,-0.37175,-0.31354}");
 
@@ -2711,8 +2771,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testEvaluate() {
 		check("{f(2+2, 1+1, -1+2), f(Evaluate(2+2),Evaluate(1+1),-1+2,Evaluate(-1+2))}", //
 				"{f(4,2,1),f(4,2,1,1)}");
-//		check("SetAttributes(hr,HoldRest); {hr(2+2, 1+1, -1+2), hr(2+2,Evaluate(1+1),-1+2,Evaluate(-1+2))}", //
-//				"{hr(4,1+1,-1+2),hr(4,2,-1+2,1)}");
+		check("SetAttributes(hr,HoldRest); {hr(2+2, 1+1, -1+2), hr(2+2,Evaluate(1+1),-1+2,Evaluate(-1+2))}", //
+				"{hr(4,1+1,-1+2),hr(4,2,-1+2,1)}");
 		check("SetAttributes(hf,HoldFirst); {hf(1+1), hf(Evaluate(1+1))}", //
 				"{hf(1+1),hf(2)}");
 		check("cheb = ChebyshevT(5, x);Function(x, Evaluate(cheb))", //
@@ -3644,6 +3704,16 @@ public class LowercaseTestCase extends AbstractTestCase {
                 "(2*(1-(1-z)^b*(1+b*z+1/2*b*(1+b)*z^2)))/(b*(1+b)*(2+b))");
     }
     public void testGamma() {
+		check("Gamma(0)", //
+				"ComplexInfinity");
+		check("Gamma(0.0+I*0.0)", //
+				"ComplexInfinity");
+		check("Table(Gamma(x+I*y), {x,-0.5, 0.5, 1/4}, {y,-0.5, 0.5, 1/4})", //
+				"{{-1.58148+I*0.05485,-2.75473+I*0.031,-3.54491,-2.75473+I*(-0.031),-1.58148+I*(-0.05485)},{-1.31815+I*1.01078,-2.77536+I*1.61484,-4.90167,-2.77536+I*(-1.61484),-1.31815+I*(-1.01078)},{-0.39928+I*1.60339,-0.52411+I*3.76716,"
+				+ "ComplexInfinity,-0.52411+I*(-3.76716),-0.39928+I*(-1.60339)},{0.51552+I*1.30733,1.65113+I*1.83788,3.62561,1.65113+I*(-1.83788),0.51552+I*(-1.30733)},{0.81816+I*0.76331,1.38511+I*0.67318,1.77245,1.38511+I*(-0.67318),0.81816+I*(-0.76331)}}");
+		check("Table(Gamma(x+I ), {x,-10.0, 10.0, 1/2})", //
+				"{0.0+I*0.0,-0.0+I*0.0,-0.0+I*(-0.0),0.0+I*(-0.0),0.00001+I*0.0,-0.00001+I*0.00002,-0.00005+I*(-0.00002),0.00006+I*(-0.00014),0.00039+I*0.00012,-0.00023+I*0.001,-0.00246+I*(-0.00035),0.00027+I*(-0.00571),0.01263+I*(-0.00072),0.00451+I*0.02596,-0.0498+I*0.01549,-0.04174+I*(-0.08637),0.13391+I*(-0.09629),0.19071+I*0.17419,-0.17153+I*0.32648,-0.46025+I*(-0.07057),-0.15495+I*(-0.49802),0.30069+I*(-0.42497),"
+				+ "0.49802+I*(-0.15495),0.57532+I*0.08821,0.65297+I*0.34307,0.77476+I*0.70763,0.96287+I*1.3391,1.22927+I*2.54384,1.5495+I*4.98016,1.75862+I*10.13271,1.21784+I*21.47013,-2.21893+I*47.35583,-15.38094+I*108.56846,-59.55994+I*258.23816,-200.85412+I*636.02983,-645.37778+I*1618.98809,-2042.00865+I*4251.35467,-6459.32143+I*11497.03293,-20587.42388+I*31968.82867,-66401.26509+I*91265.45845,-217255.64362+I*267132.03415}");
         check("Refine(Gamma(n), Element(n,Integers)&&n>=0)", //
                 "(-1+n)!");
 
@@ -4456,6 +4526,10 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testInverseFunction() {
+		check("InverseFunction((a*#)/(c*#) &)", //
+				"InverseFunction((a*#1)/(c*#1)&)");
+		check("InverseFunction((a*#)/(c*# + d) &)", //
+				"(d*#1)/(a*(1+(-c*#1)/a))&");
 		check("InverseFunction((a*# + b)/(c*# + d) &)", //
 				"(-b+d*#1)/(a-c*#1)&");
 		check("InverseFunction((a * # + b)&)", //
@@ -4711,13 +4785,19 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testLegendreP() {
-        check("LegendreP(Pi,0)", "Sqrt(Pi)/(Gamma(1/2*(1-Pi))*Gamma(1+Pi/2))");
-        check("LegendreP(111,1)", "1");
-        check("LegendreP(4,x)", "3/8-15/4*x^2+35/8*x^4");
+		check("LegendreP(-(1/2), 1 - 2*z)", //
+				"(2*EllipticK(z))/Pi");
+		check("LegendreP(Pi,0)", //
+				"Sqrt(Pi)/(Gamma(1/2*(1-Pi))*Gamma(1+Pi/2))");
+		check("LegendreP(111,1)", //
+				"1");
+		check("LegendreP(4,x)", //
+				"3/8-15/4*x^2+35/8*x^4");
         // TODO implement non integer args
         // check("LegendreP(5/2, 1.5) ", "x");
 
-        check("LegendreP(0,x)", "1");
+		check("LegendreP(0,x)", //
+				"1");
         check("LegendreP(1,x)", "x");
         check("LegendreP(2,x)", "-1/2+3/2*x^2");
         check("LegendreP(7,x)", "-35/16*x+315/16*x^3-693/16*x^5+429/16*x^7");
@@ -4725,6 +4805,8 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testLegendreQ() {
+		check("LegendreQ(-(1/2), 2*z - 1)", //
+				"EllipticK(z)");
         check("LegendreQ(-3,z)", "ComplexInfinity");
         check("LegendreQ(1,z)", "-1+z*(-Log(1-z)/2+Log(1+z)/2)");
         check("LegendreQ(2,z)", "-3/2*z+1/2*(-1/2+3/2*z^2)*(-Log(1-z)+Log(1+z))");
@@ -4960,7 +5042,8 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testLinearProgramming() {
-        check("LinearProgramming({1, 1}, {{1, 2}}, {3})", "{0.0,1.5}");
+		check("LinearProgramming({1, 1}, {{1, 2}}, {3})", //
+				"{0.0,1.5}");
         check("LinearProgramming({1, 1}, {{1, 2}}, {{3,0}})", "{0.0,1.5}");
         check("LinearProgramming({1, 1}, {{1, 2}}, {{3,-1}})", "{0.0,0.0}");
         check("LinearProgramming({1., 1.}, {{5., 2.}}, {3.})", "{0.6,0.0}");
@@ -6151,6 +6234,17 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testNIntegrate() {
+		// github #61
+		// these methods correctly show "NIntegrate(method=method-nsme) maximal count (xxxxx) exceeded"
+		checkNumeric("NIntegrate(1/x, {x,0,5}, Method->Romberg)", //
+				"NIntegrate(1/x,{x,0,5},Method->romberg)");
+		checkNumeric("NIntegrate(1/x, {x,0,5}, Method->Simpson)", //
+				"NIntegrate(1/x,{x,0,5},Method->simpson)");
+		checkNumeric("NIntegrate(1/x, {x,0,5}, Method->Trapezoid)", //
+				"NIntegrate(1/x,{x,0,5},Method->trapezoid)");
+		// wrong result
+		checkNumeric("NIntegrate(1/x, {x,0,5}, Method->LegendreGauss)", //
+				"10.374755035279318");
         // github #26
         checkNumeric("NIntegrate(ln(x^2), {x, -5, 99}, Method->Romberg, MaxPoints->400, MaxIterations->10000000)", //
                 "717.9282476448197");
@@ -6421,8 +6515,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testOptimizeExpression() {
-		check("OptimizeExpression(-3*a - 2*a^3 + 4*Sqrt(1 + a^2)*(5 - 9*Log(2)) + \r\n"
-				+ " 4*a^2*Sqrt(1 + a^2)*(5 - 9*Log(2)) + \r\n" + " 12*(1 + a^2)^(3/2)*Log(1 + Sqrt(1 + 1/a^2)) - \r\n"
+		check("OptimizeExpression( f(x))", //
+				"{f(x)}");
+		check("OptimizeExpression(-3*a - 2*a^3 + 4*Sqrt(1 + a^2)*(5 - 9*Log(2)) + \n"
+				+ " 4*a^2*Sqrt(1 + a^2)*(5 - 9*Log(2)) + \n" + " 12*(1 + a^2)^(3/2)*Log(1 + Sqrt(1 + 1/a^2)) - \n"
 				+ " 6*(4*(Sqrt(1 + a^2) - a*(2 + a^2 - a*Sqrt(1 + a^2)))*Log(a) + a*Log(1 + a^2)))", //
 				//
 				"{-3*a-2*a^3+4*v1*v4+4*v1*v2*v4+12*v3^(3/2)*Log(1+Sqrt(1+1/a^2))-6*(4*(v1-a*(2-a*v1+v2))*Log(a)+a*Log(v3)),"//
@@ -6598,10 +6694,10 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testPadRight() {
-//		check("PadRight({1, 2, 3}, 5)", "{1,2,3,0,0}");
-//		check("PadRight(x(a, b, c), 5) ", "x(a,b,c,0,0)");
-//		check("PadRight({1, 2, 3}, 2)", "{1,2}");
-//		check("PadRight({1, 2, 3}, 1)", "{1}");
+		// check("PadRight({1, 2, 3}, 5)", "{1,2,3,0,0}");
+		// check("PadRight(x(a, b, c), 5) ", "x(a,b,c,0,0)");
+		// check("PadRight({1, 2, 3}, 2)", "{1,2}");
+		// check("PadRight({1, 2, 3}, 1)", "{1}");
         check("PadRight({{}, {1, 2}, {1, 2, 3}})", "{{0,0,0},{1,2,0},{1,2,3}}");
 
         check("PadRight({a, b, c}, 10)", "{a,b,c,0,0,0,0,0,0,0}");
@@ -6793,32 +6889,61 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testPDF() {
-        check("PDF(BernoulliDistribution(p),k)", "Piecewise({{1-p,k==0},{p,k==1}},0)");
-        check("PDF(BinomialDistribution(n, m),k)", "Piecewise({{(1-m)^(-k+n)*m^k*Binomial(n,k),0<=k<=n}},0)");
-        check("PDF(ExponentialDistribution(n),k)", "Piecewise({{n/E^(k*n),k>=0}},0)");
-        check("PDF(PoissonDistribution(p),k)", "Piecewise({{p^k/(E^p*k!),k>=0}},0)");
-        check("PDF(DiscreteUniformDistribution({a, b}), k)", "Piecewise({{1/(1-a+b),a<=k<=b}},0)");
-        check("PDF(ErlangDistribution(n, m),k)", "Piecewise({{m^n/(k^(1-n)*E^(k*m)*Gamma(n)),k>0}},0)");
-        check("PDF(LogNormalDistribution(n,m),k)", "Piecewise({{1/(E^((-n+Log(k))^2/(2*m^2))*k*m*Sqrt(2*Pi)),k>0}},0)");
-        check("PDF(NakagamiDistribution(n, m),k)",
-                "Piecewise({{(2*(n/m)^n)/(k^(1-2*n)*E^((k^2*n)/m)*Gamma(n)),k>0}},0)");
-        check("PDF(NormalDistribution(n, m),k)", "1/(Sqrt(2)*E^((k-n)^2/(2*m^2))*m*Sqrt(Pi))");
-        check("PDF(FrechetDistribution(n, m),k)", "Piecewise({{n/((k/m)^(1+n)*E^(k/m)^(-n)*m),k>0}},0)");
-        check("PDF(GammaDistribution(n, m),k)", "Piecewise({{1/(m^n*E^(k/m)*Gamma(n)*k^(1-n)),k>0}},0)");
-        check("PDF(GeometricDistribution(n),k)", "Piecewise({{(1-n)^k*n,k>=0}},0)");
-        check("PDF(GumbelDistribution(n, m),k)", "E^(-E^((k-n)/m)+(k-n)/m)/m");
-        check("PDF(HypergeometricDistribution(n, ns, nt),k)",
-                "Piecewise({{(Binomial(ns,k)*Binomial(-ns+nt,-k+n))/Binomial(nt,n),0<=k<=n&&n+ns-nt<=k<=n&&\n"
-                        + "0<=k<=ns&&n+ns-nt<=k<=ns}},0)");
-        check("PDF(StudentTDistribution(n),k)", "(n/(k^2+n))^(1/2*(1+n))/(Sqrt(n)*Beta(1/2,n/2))");
-        check("PDF(WeibullDistribution(n, m),k)", "Piecewise({{n/((k/m)^(1-n)*E^(k/m)^n*m),k>0}},0)");
-        check("PDF(StudentTDistribution(4),k)", "12*((1/(4+k^2)))^(5/2)");
+		check("Table(PDF(NormalDistribution(m, 1.5), x), {m, {-1, 1, 2}},{x, {-1, 1, 2}}) ", //
+				"{{0.26596,0.10934,0.03599},{0.10934,0.26596,0.21297},{0.03599,0.21297,0.26596}}");
+		check("Table(PDF(NormalDistribution(0.0,1.0), x), {m, {-1, 1, 2}},{x, {-1, 1, 2}})//N ", //
+				"{{0.24197,0.24197,0.05399},{0.24197,0.24197,0.05399},{0.24197,0.24197,0.05399}}");
+		check("Table(PDF(NormalDistribution( ), x), {m, {-1, 1, 2}},{x, {-1, 1, 2}})//N ", //
+				"{{0.24197,0.24197,0.05399},{0.24197,0.24197,0.05399},{0.24197,0.24197,0.05399}}");
 
-        check("PDF(DiscreteUniformDistribution({1, 5}), 3)", "1/5");
-        check("N(PDF(NormalDistribution(0, 1), 0))", "0.39894");
-        checkNumeric("N(PDF(BinomialDistribution(40, 0.5), 1))", "3.637978807091713E-11");
-        checkNumeric("N(PDF(HypergeometricDistribution(20,50,100), 10))", "0.19687121770654947");
-        checkNumeric("N(PDF(PoissonDistribution(10), 15))", "0.03471806963068415");
+		check("PDF(NormalDistribution(n, m))", //
+				"1/(Sqrt(2)*E^((-n+#1)^2/(2*m^2))*m*Sqrt(Pi))&");
+		check("PDF(NormalDistribution(n, m),k)", //
+				"1/(Sqrt(2)*E^((k-n)^2/(2*m^2))*m*Sqrt(Pi))");
+		check("PDF(BernoulliDistribution(p),k)", //
+				"Piecewise({{1-p,k==0},{p,k==1}},0)");
+		check("PDF(BinomialDistribution(n, m),k)", //
+				"Piecewise({{(1-m)^(n-k)*m^k*Binomial(n,k),0<=k<=n}},0)");
+		check("PDF(ExponentialDistribution(n),k)", //
+				"Piecewise({{n/E^(n*k),k>=0}},0)");
+		check("PDF(PoissonDistribution(p),k)", //
+				"Piecewise({{p^k/(E^p*k!),k>=0}},0)");
+		check("PDF(DiscreteUniformDistribution({a, b}), k)", //
+				"Piecewise({{1/(1-a+b),a<=k<=b}},0)");
+		check("PDF(ErlangDistribution(n, m),k)", //
+				"Piecewise({{m^n/(E^(m*k)*Gamma(n)*k^(1-n)),k>0}},0)");
+		check("PDF(LogNormalDistribution(n,m),k)", //
+				"Piecewise({{1/(E^((-n+Log(k))^2/(2*m^2))*k*m*Sqrt(2*Pi)),k>0}},0)");
+		check("PDF(NakagamiDistribution(n, m),k)", //
+				"Piecewise({{(2*(n/m)^n)/(E^((n*k^2)/m)*Gamma(n)*k^(1-2*n)),k>0}},0)");
+		check("PDF(FrechetDistribution(n, m),k)", //
+				"Piecewise({{n/(E^(k/m)^(-n)*m*(k/m)^(1+n)),k>0}},0)");
+		check("PDF(GammaDistribution(n, m),k)", //
+				"Piecewise({{1/(m^n*E^(k/m)*Gamma(n)*k^(1-n)),k>0}},0)");
+		check("PDF(GeometricDistribution(n),k)", //
+				"Piecewise({{(1-n)^k*n,k>=0}},0)");
+		check("PDF(GumbelDistribution(n, m),k)", //
+				"E^(-E^((k-n)/m)+(k-n)/m)/m");
+		check("PDF(HypergeometricDistribution(n, ns, nt),k)", //
+				"Piecewise({{(Binomial(ns,k)*Binomial(-ns+nt,n-k))/Binomial(nt,n),0<=k<=n&&n+ns-nt<=k<=n&&\n"
+                        + "0<=k<=ns&&n+ns-nt<=k<=ns}},0)");
+		check("PDF(StudentTDistribution(n),k)", //
+				"(n/(k^2+n))^(1/2*(1+n))/(Sqrt(n)*Beta(n/2,1/2))");
+		check("PDF(WeibullDistribution(n, m),k)", //
+				"Piecewise({{n/(E^(k/m)^n*m*(k/m)^(1-n)),k>0}},0)");
+		check("PDF(StudentTDistribution(4),k)", //
+				"12*((1/(4+k^2)))^(5/2)");
+
+		check("PDF(DiscreteUniformDistribution({1, 5}), 3)", //
+				"1/5");
+		check("N(PDF(NormalDistribution(0, 1), 0))", //
+				"0.39894");
+		checkNumeric("N(PDF(BinomialDistribution(40, 0.5), 1))", //
+				"3.637978807091713E-11");
+		checkNumeric("N(PDF(HypergeometricDistribution(20,50,100), 10))", //
+				"0.19687121770654947");
+		checkNumeric("N(PDF(PoissonDistribution(10), 15))", //
+				"0.03471806963068415");
     }
 
     public void testPermutations() {
@@ -7777,7 +7902,18 @@ public class LowercaseTestCase extends AbstractTestCase {
         // check("RandomChoice({1,2,3,4,5,6,7})", "3");
     }
 
-    // public void testRandomVariate() {
+	public void testRandomVariate() {
+		// check("RandomVariate(NormalDistribution(), 10^1)", //
+		// "");
+		// check("KolmogorovSmirnovTest({-0.79675,0.3841,-0.84567,0.3421,0.46447,-0.01124,-0.33517,0.82206,1.40563,0.48811},
+		// NormalDistribution())", //
+		// "0.56794");
+		// check("KolmogorovSmirnovTest({-0.79675,0.3841,-0.84567,0.3421,0.46447,-0.01124,-0.33517,0.82206,1.40563,0.48811})",
+		// //
+		// "0.99446");
+		// check("KolmogorovSmirnovTest({-0.79675,0.3841,-0.84567,0.3421,0.46447,-0.01124,-0.33517,0.82206,1.40563,0.48811},"
+		// + "{1.64433,-0.31318,1.27263,0.16141,0.21162,-1.01509,-0.76259,0.73259,0.2478,1.28021})", //
+		// "0.7869");
     // check("RandomVariate(BinomialDistribution(100,0.25), 10^1)", //
     // "{28,25,30,25,25,26,29,17,33,20}");
     // check("RandomVariate(BernoulliDistribution(0.25), 10^1)", //
@@ -7800,7 +7936,7 @@ public class LowercaseTestCase extends AbstractTestCase {
     // "{{{4,5,5,3},{5,4,4,6},{6,3,4,7}},{{6,6,7,3},{4,6,5,6},{7,7,6,5}}}");
     // check("RandomVariate(DiscreteUniformDistribution({3,7}), 10)", "{6,5,7,7,7,7,4,5,6,3}");
     // check("RandomVariate(DiscreteUniformDistribution({1, 5}) )", "3");
-    // }
+	}
 
     public void testRange() {
         check("Range(5.0)", //
@@ -9060,10 +9196,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Solve(Cos(x)*x==0, x)", //
 				"{{x->0},{x->Pi/2}}");
         // issue #121
-        check("Solve(Sqrt(x)==-1, x)", "{}");
-        check("Solve(x^2+1==0, x)", "{{x->-I},{x->I}}");
-        check("Solve((k*Q*q)/r^2==E,r)", "{{r->Sqrt(E*k*q*Q)/E},{r->-Sqrt(E*k*q*Q)/E}}");
-        check("Solve((k*Q*q)/r^2+1/r^4==E,r)",
+		check("Solve(Sqrt(x)==-1, x)", //
+				"{}");
+		check("Solve(x^2+1==0, x)", //
+				"{{x->-I},{x->I}}");
+		check("Solve((k*Q*q)/r^2==E,r)", //
+				"{{r->Sqrt(E*k*q*Q)/E},{r->-Sqrt(E*k*q*Q)/E}}");
+		check("Solve((k*Q*q)/r^2+1/r^4==E,r)", //
                 "{{r->Sqrt((k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E)/Sqrt(2)},{r->-Sqrt((k*q*Q+Sqrt(4*E+k^\n"
                         + "2*q^2*Q^2))/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q+Sqrt(\n"
                         + "4*E+k^2*q^2*Q^2))/E))/Sqrt(2)}}");
@@ -10329,8 +10468,12 @@ public class LowercaseTestCase extends AbstractTestCase {
     }
 
     public void testTrigToExp() {
-        check("a+E^x", "a+E^x");
-		check("TrigToExp(ArcCos(x))", "Pi/2+I*Log(I*x+Sqrt(1-x^2))");
+		check("TrigToExp(Sin(x) < x < Tan(x))", //
+				"(I*1/2)/E^(I*x)-I*1/2*E^(I*x)<x<(I*(E^(-I*x)-E^(I*x)))/(E^(-I*x)+E^(I*x))");
+		check("a+E^x", //
+				"a+E^x");
+		check("TrigToExp(ArcCos(x))", //
+				"Pi/2+I*Log(I*x+Sqrt(1-x^2))");
 		check("TrigToExp(ArcCsc(x))", "-I*Log(Sqrt(1-1/x^2)+I/x)");
 		check("TrigToExp(ArcCot(x))", "I*1/2*Log(1-I/x)-I*1/2*Log(1+I/x)");
 		check("TrigToExp(ArcSec(x))", "Pi/2+I*Log(Sqrt(1-1/x^2)+I/x)");
