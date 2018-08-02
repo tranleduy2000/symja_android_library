@@ -4487,6 +4487,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testInverseFunction() {
+		check("InverseFunction((a*#)/(c*#) &)", //
+				"InverseFunction((a*#1)/(c*#1)&)");
+		check("InverseFunction((a*#)/(c*# + d) &)", //
+				"(d*#1)/(a*(1+(-c*#1)/a))&");
 		check("InverseFunction((a*# + b)/(c*# + d) &)", //
 				"(-b+d*#1)/(a-c*#1)&");
 		check("InverseFunction((a * # + b)&)", //
@@ -10382,8 +10386,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTrigToExp() {
-		check("a+E^x", "a+E^x");
-		check("TrigToExp(ArcCos(x))", "Pi/2+I*Log(I*x+Sqrt(1-x^2))");
+		check("TrigToExp(Sin(x) < x < Tan(x))", //
+				"(I*1/2)/E^(I*x)-I*1/2*E^(I*x)<x<(I*(E^(-I*x)-E^(I*x)))/(E^(-I*x)+E^(I*x))");
+		check("a+E^x", //
+				"a+E^x");
+		check("TrigToExp(ArcCos(x))", //
+				"Pi/2+I*Log(I*x+Sqrt(1-x^2))");
 		check("TrigToExp(ArcCsc(x))", "-I*Log(Sqrt(1-1/x^2)+I/x)");
 		check("TrigToExp(ArcCot(x))", "I*1/2*Log(1-I/x)-I*1/2*Log(1+I/x)");
 		check("TrigToExp(ArcSec(x))", "Pi/2+I*Log(Sqrt(1-1/x^2)+I/x)");
