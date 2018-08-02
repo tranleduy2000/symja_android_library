@@ -149,13 +149,12 @@ public class SpecialFunctions {
 			IExpr z = ast.arg1();
 			IExpr a = ast.arg2();
 			IExpr n = ast.arg3();
-			if (n.isInteger()) {
 				if (n.isNegative()) {
 					// for n>=0; BetaRegularized(z, a, -n)=0
 					return F.C0;
 				}
-				int ni = n.toIntDefault(-1);
-				if (ni >= 0) {
+			int ni = n.toIntDefault(Integer.MIN_VALUE);
+			if (ni != Integer.MIN_VALUE) {
 
 					IASTAppendable sum = F.PlusAlloc(ni);
 					// {k, 0, n - 1}
@@ -168,7 +167,6 @@ public class SpecialFunctions {
 					// z^a * sum
 					return F.Times(F.Power(z, a), sum);
 				}
-			}
 			return F.NIL;
 		}
 

@@ -655,9 +655,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testBetaRegularized() {
-		check("BetaRegularized(2 , 2 , 3)", "8");
-		check("BetaRegularized(2 , 7 , 17)", "5512320");
-		check("BetaRegularized(2 , 7 , -17)", "0");
+		check("BetaRegularized(0.99 , 255.0 , 2.0)", //
+				"0.27365");
+		check("BetaRegularized(2 , 2 , 3)", //
+				"8");
+		check("BetaRegularized(2 , 7 , 17)", //
+				"5512320");
+		check("BetaRegularized(2 , 7 , -17)", //
+				"0");
 	}
 
 	public void testBlock() {
