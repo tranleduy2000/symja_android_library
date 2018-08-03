@@ -1,11 +1,12 @@
 package ch.ethz.idsc.tensor.qty;
 
+import com.duy.lambda.UnaryOperator;
+
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.Objects;
 import java.util.Properties;
-import java.util.function.UnaryOperator;
 
 public class QuantityMagnitude {
     private static final QuantityMagnitude EMPTY = new QuantityMagnitude(SimpleUnitSystem.from(new Properties()));

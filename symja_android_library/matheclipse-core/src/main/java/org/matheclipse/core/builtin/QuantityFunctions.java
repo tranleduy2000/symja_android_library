@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.UnaryOperator;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
@@ -8,8 +10,6 @@ import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
-
-import java.util.function.UnaryOperator;
 
 import ch.ethz.idsc.tensor.qty.IQuantity;
 import ch.ethz.idsc.tensor.qty.IUnit;

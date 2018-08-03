@@ -1,10 +1,11 @@
 package ch.ethz.idsc.tensor.img;
 
+import com.duy.awt.Color;
+import com.duy.lambda.Function;
+
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
-import java.awt.Color;
-import java.util.function.Function;
 
 /**
  * function maps {@link IExpr}s to vectors of the form {R, G, B, A}

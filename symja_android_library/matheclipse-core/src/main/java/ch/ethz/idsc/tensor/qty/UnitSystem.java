@@ -1,9 +1,10 @@
 package ch.ethz.idsc.tensor.qty;
 
+import com.duy.lambda.UnaryOperator;
+
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.Map;
-import java.util.function.UnaryOperator;
 
 
 /**

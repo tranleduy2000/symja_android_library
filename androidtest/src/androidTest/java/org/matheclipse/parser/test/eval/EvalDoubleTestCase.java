@@ -1,7 +1,6 @@
 package org.matheclipse.parser.test.eval;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import junit.framework.TestCase;
 
 import org.junit.Assert;
 import org.matheclipse.core.basic.Config;
@@ -12,7 +11,7 @@ import org.matheclipse.parser.client.eval.DoubleVariable;
 import org.matheclipse.parser.client.eval.IDoubleValue;
 import org.matheclipse.parser.client.math.MathException;
 
-import junit.framework.TestCase;
+import java.util.HashSet;
 
 /**
  * Tests evaluation in <code>double</code> expression mode
@@ -171,11 +170,11 @@ public class EvalDoubleTestCase extends TestCase {
 		try {
 			HashSet<String> result = new HashSet<String>();
 			DoubleEvaluator.getVariables("a+2*b+$c", result);
-			ArrayList<String> list = new ArrayList<String>();
-			for (String string : result) {
-				list.add(string);
+			HashSet<String> expected = new HashSet<String>();
+			for (String string : new String[]{"a", "b", "$c"}) {
+				expected.add(string);
 			}
-			Assert.assertEquals(list.toString(), "[a, b, $c]");
+			Assert.assertEquals(result, "[a, b, $c]");
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.assertEquals("", e.getMessage());

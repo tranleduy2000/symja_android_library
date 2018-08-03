@@ -1,10 +1,11 @@
 package ch.ethz.idsc.tensor.qty;
 
+import com.duy.lambda.UnaryOperator;
+
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.Objects;
-import java.util.function.UnaryOperator;
 
 /**
  * inspired by
