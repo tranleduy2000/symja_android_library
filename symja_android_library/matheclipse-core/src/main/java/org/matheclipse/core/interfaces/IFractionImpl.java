@@ -14,7 +14,7 @@ public abstract class IFractionImpl extends IRationalImpl implements IFraction {
 
 
     @Override
-    public abstract IFraction floorFraction();
+    public abstract IInteger floorFraction();
 
     /**
      * Return the fractional part of this fraction

@@ -15,6 +15,22 @@ public abstract class IIntegerImpl extends IRationalImpl implements IInteger {
     @Override
     public abstract IInteger abs();
 
+    @Override
+    public IInteger div(int that) {
+        if (that == 1) {
+            return this;
+        }
+        return div(F.ZZ(that));
+    }
+
+    @Override
+    public IInteger mod(int that) {
+        if (that == 1) {
+            return F.C0;
+        }
+        return mod(F.ZZ(that));
+    }
+
     /**
      * Multiply this integer with value
      *

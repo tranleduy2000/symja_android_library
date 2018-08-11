@@ -17,10 +17,11 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
+ *
  * <p>
  * (I)nterface for the (A)bstract (S)yntax (T)ree of a given function.
  * </p>
- * <p>
+ *
  * <p>
  * In Symja, an abstract syntax tree (AST), is a tree representation of the abstract syntactic structure of the Symja
  * source code. Each node of the tree denotes a construct occurring in the source code. The syntax is 'abstract' in the
@@ -28,7 +29,7 @@ import java.util.stream.Stream;
  * implicit in the tree structure, and a syntactic construct such as a <code>Sin(x)</code> expression will be denoted by
  * an AST with 2 nodes. One node for the header <code>Sin</code> and one node for the argument <code>x</code>.
  * </p>
- * <p>
+ *
  * Internally an AST is represented as a list which contains
  * <ul>
  * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index
@@ -444,7 +445,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * the result elements for which the function returns non-null elements to the <code>0th element</code> of the
      * result array, or otherwise append it to the <code>1st element</code> of the result array.
      *
-     * @param function the function which filters each argument in this AST by returning a non-null result.
+	 * @param function
+	 *            the function which filters each argument in this AST by returning a <code>result != F.NIL</code> .
      * @return the resulting ASTs in the 0-th and 1-st element of the array
      */
     public IASTAppendable[] filter(final Function<IExpr, IExpr> function);

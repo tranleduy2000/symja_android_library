@@ -303,15 +303,15 @@ public class FractionSym extends AbstractFractionSym {
 	 * @return Next smaller integer of <code>this</code>.
 	 */
 	@Override
-	public IFraction floorFraction() {
+	public IInteger floorFraction() {
 		if (fDenominator == 1) {
-			return this;
+			return F.ZZ(fNumerator);
 		}
 		int div = fNumerator / fDenominator;
 		if (fNumerator < 0) {
 			div--;
 		}
-		return valueOf(div, 1);
+		return F.ZZ(div);
 	}
 
 	/**
