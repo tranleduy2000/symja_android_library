@@ -1,13 +1,13 @@
 package ch.ethz.idsc.tensor.img;
 
-import java.awt.Color;
+
+import com.duy.awt.Color;
+import com.duy.lang.DDouble;
 
 /**
  * standalone hsv to rgb conversion
  * <p>
  * an input scalar that does not satisfy {@link NumberQ} is mapped to a transparent color
- * <p>
- * inspired by <a href="https://reference.wolfram.com/language/ref/Hue.html">Hue</a>
  */
 public enum Hue {
     ;
@@ -21,7 +21,7 @@ public enum Hue {
      * @param alpha in [0, 1]
      */
     public static Color of(double hue, double sat, double val, double alpha) {
-        if (!Double.isFinite(hue))
+        if (!DDouble.isFinite(hue))
             throw new RuntimeException("h=" + hue);
         // ---
         final double r;

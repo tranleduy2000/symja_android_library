@@ -1,5 +1,7 @@
 package ch.ethz.idsc.tensor.qty;
 
+import com.duy.util.DObjects;
+
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
@@ -10,25 +12,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * reference implementation of {@link UnitSystem} with emphasis on simplicity
- */
+/** reference implementation of {@link UnitSystem} with emphasis on simplicity */
 public class SimpleUnitSystem implements UnitSystem {
-    // ---
-    private final Map<String, IExpr> map;
-
-    private SimpleUnitSystem(Map<String, IExpr> map) {
-        this.map = map;
-    }
 
     /**
      * given properties map a unit expression to a {@link IQuantity}
-     * <p>
+	 *
      * <p>
      * Example from the built-in file "/unit/si.properties":
-     * <p>
+	 *
      * <pre>
      * rad=1
      * Hz=1[s^-1]
@@ -39,11 +34,22 @@ public class SimpleUnitSystem implements UnitSystem {
      *
      * @param properties
      * @return
-     * @throws Exception if keys do not define unit conversions
+	 * @throws Exception
+	 *             if keys do not define unit conversions
      */
     public static UnitSystem from(Properties properties) {
         return new SimpleUnitSystem(properties.stringPropertyNames().stream().collect(Collectors.toMap( //
-                UnitHelper::requireValid, key -> requireNumeric(F.fromString(properties.getProperty(key))))));
+				new Function<String, String>() {
+					@Override
+					public String apply(String key1) {
+						return UnitHelper.requireValid(key1);
+					}
+				}, new Function<String, IExpr>() {
+					@Override
+					public IExpr apply(String key) {
+						return requireNumeric(F.fromString(properties.getProperty(key)));
+					}
+				})));
     }
 
     /**
@@ -52,24 +58,24 @@ public class SimpleUnitSystem implements UnitSystem {
      */
     public static UnitSystem from(Map<String, IExpr> map) {
         return new SimpleUnitSystem(map.entrySet().stream().collect(Collectors.toMap( //
-                entry -> UnitHelper.requireValid(entry.getKey()), entry -> requireNumeric(entry.getValue()))));
+				new Function<Entry<String, IExpr>, String>() {
+					@Override
+					public String apply(Entry<String, IExpr> entry) {
+						return UnitHelper.requireValid(entry.getKey());
+					}
+				}, new Function<Entry<String, IExpr>, IExpr>() {
+					@Override
+					public IExpr apply(Entry<String, IExpr> entry) {
+						return requireNumeric(entry.getValue());
+					}
+				})));
     }
 
-    // helper function
-    private static IExpr requireNumeric(IExpr scalar) {
-        if (scalar instanceof IStringX)
-            throw MathException.of(scalar);
-        if (scalar instanceof IQuantity) {
-            IQuantity quantity = (IQuantity) scalar;
-            if (quantity.value() instanceof IStringX)
-                throw MathException.of(scalar);
-        }
-        return scalar;
-    }
+	// ---
+	private final Map<String, IExpr> map;
 
-    // helper function
-    private static String format(Entry<String, IExpr> entry) {
-        return entry.getKey() + IUnit.POWER_DELIMITER + entry.getValue();
+	private SimpleUnitSystem(Map<String, IExpr> map) {
+		this.map = map;
     }
 
     @Override
@@ -79,9 +85,23 @@ public class SimpleUnitSystem implements UnitSystem {
             IExpr value = quantity.value();
             for (Entry<String, IExpr> entry : quantity.unit().map().entrySet()) {
                 IExpr lookup = map.get(entry.getKey());
-                value = value.multiply(Objects.isNull(lookup) //
+				IExpr entryValue = entry.getValue();
+				// if (entryValue.isOne()) {
+				// value = Objects.isNull(lookup) //
+				// ? IQuantity.of(F.C1, format(entry)) //
+				// :lookup;
+				// } else {
+				IExpr temp = DObjects.isNull(lookup) //
                         ? IQuantity.of(F.C1, format(entry)) //
-                        : F.Power.of(lookup, entry.getValue()));
+						: lookup.isQuantity()//
+								? ((IQuantity) lookup).power(entryValue)//
+								: F.Power.of(lookup, entryValue);
+				if (temp.isQuantity()) {
+					value = temp.multiply(value);
+				} else {
+					value = value.multiply(temp);
+				}
+				// }
             }
             return value;
         }
@@ -92,4 +112,20 @@ public class SimpleUnitSystem implements UnitSystem {
     public Map<String, IExpr> map() {
         return Collections.unmodifiableMap(map);
     }
+	// helper function
+	private static IExpr requireNumeric(IExpr scalar) {
+		if (scalar instanceof IStringX)
+			throw MathException.of(scalar);
+		if (scalar instanceof IQuantity) {
+			IQuantity quantity = (IQuantity) scalar;
+			if (quantity.value() instanceof IStringX)
+				throw MathException.of(scalar);
+		}
+		return scalar;
+	}
+
+	// helper function
+	private static String format(Entry<String, IExpr> entry) {
+		return entry.getKey() + IUnit.POWER_DELIMITER + entry.getValue();
+	}
 }

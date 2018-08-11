@@ -10,20 +10,14 @@ import java.util.stream.Collectors;
 
 /* package */ enum StaticHelper {
     ;
-    /**
-     * curly opening bracket of vector
-     */
+	/** curly opening bracket of vector */
     static final char OPENING_BRACKET = '{';
-    /**
-     * curly closing bracket of vector
-     */
+	/** curly closing bracket of vector */
     static final char CLOSING_BRACKET = '}';
     static final Collector<CharSequence, ?, String> EMBRACE = //
             Collectors.joining(", ", "" + OPENING_BRACKET, "" + CLOSING_BRACKET);
     // ---
-    /**
-     * code from java.lang.Double
-     */
+	/** code from java.lang.Double */
     private static final String Digits = "(\\p{Digit}+)";
     private static final String HexDigits = "(\\p{XDigit}+)";
     // an exponent is 'e' or 'E' followed by an optionally
@@ -53,7 +47,6 @@ import java.util.stream.Collectors;
             // 0[xX] HexDigits_opt . HexDigits BinaryExponent FloatTypeSuffix_opt
             "(0[xX]" + HexDigits + "?(\\.)" + HexDigits + ")" + ")[pP][+-]?" + Digits + "))" + "[fFdD]?))" //
     );
-    private static final IExpr PI_HALF = F.num(Math.PI / 2);
 
     // throws an exception if value is Infinity
     static BigInteger floor(BigDecimal bd) {

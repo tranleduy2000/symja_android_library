@@ -49,7 +49,8 @@ public class QuantityFunctions {
 						return IQuantity.of(arg1, IUnit.of(arg2.toString()));
 					}
 				}
-			} catch (Exception e) {
+			} catch (MathException e) {
+				engine.printMessage("Quantity: " + e.getMessage());
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
@@ -104,7 +105,8 @@ public class QuantityFunctions {
 						return suo.apply(arg1);
 					}
 				}
-			} catch (Exception e) {
+			} catch (MathException e) {
+				engine.printMessage("QuantityMagnitude: " + e.getMessage());
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
@@ -157,7 +159,8 @@ public class QuantityFunctions {
 						return unitConvert.to(unit).apply(arg1);
 					}
 				}
-			} catch (Exception e) {
+			} catch (MathException e) {
+				engine.printMessage("UnitConvert: " + e.getMessage());
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}

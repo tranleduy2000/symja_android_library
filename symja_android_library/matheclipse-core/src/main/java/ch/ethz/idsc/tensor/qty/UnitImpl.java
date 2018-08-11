@@ -18,10 +18,6 @@ import java.util.stream.Collectors;
         this.navigableMap = Collections.unmodifiableNavigableMap(navigableMap);
     }
 
-    private static String exponentString(IExpr exponent) {
-        String string = exponent.toString();
-        return string.equals("1") ? "" : IUnit.POWER_DELIMITER + string;
-    }
 
     @Override // from Unit
     public IUnit negate() {
@@ -36,7 +32,8 @@ import java.util.stream.Collectors;
             String key = entry.getKey();
             IExpr value = entry.getValue();
             if (map.containsKey(key)) {
-                IExpr sum = map.get(key).add(value);
+				// TODO this may not always use the defined UnitHelper.EvalEngine
+				IExpr sum = F.Plus.of(UnitHelper.ENGINE, map.get(key), value);
                 if (sum.isZero())
                     map.remove(key); // exponents cancel out
                 else
@@ -52,7 +49,8 @@ import java.util.stream.Collectors;
         if (factor instanceof ISignedNumber) {
             NavigableMap<String, IExpr> map = new TreeMap<>();
             for (Entry<String, IExpr> entry : navigableMap.entrySet()) {
-                IExpr value = entry.getValue().multiply(factor);
+				// TODO this may not always use the defined UnitHelper.EvalEngine
+				IExpr value = F.Times.of(UnitHelper.ENGINE, entry.getValue(), factor);
                 if (!value.isZero())
                     map.put(entry.getKey(), value);
             }
@@ -77,6 +75,10 @@ import java.util.stream.Collectors;
         return object instanceof IUnit && navigableMap.equals(((IUnit) object).map());
     }
 
+	private static String exponentString(IExpr exponent) {
+		String string = exponent.toString();
+		return string.equals("1") ? "" : IUnit.POWER_DELIMITER + string;
+	}
     @Override // from Object
     public String toString() {
         return navigableMap.entrySet().stream() //

@@ -40,5 +40,5 @@ public class ToggleFeature {
 	/**
 	 * If <code>true</code>, enable experimental Quantity functions
 	 */
-	public static boolean QUANTITY = false;
+	public static boolean QUANTITY = true;
 }

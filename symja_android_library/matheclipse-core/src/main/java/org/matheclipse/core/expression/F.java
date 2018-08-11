@@ -340,7 +340,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol BetaRegularized = F.initFinalSymbol("BetaRegularized", ID.BetaRegularized);
 
-	/***/
+    /** BinCounts(list, width-of-bin) - count the number of elements, if `list`, is divided into successive bins with width `width-of-bin`.*/
 	public final static IBuiltInSymbol BinCounts = F.initFinalSymbol("BinCounts", ID.BinCounts);
 
     /** Binomial(n, k) - returns the binomial coefficient of the 2 integers `n` and `k`*/
@@ -885,6 +885,8 @@ public class F {
     /** Fit(list-of-data-points, degree, variable) - solve a least squares problem using the Levenberg-Marquardt algorithm.*/
 	public final static IBuiltInSymbol Fit = F.initFinalSymbol("Fit", ID.Fit);
 
+    /***/
+    public final static IBuiltInSymbol FiveNum = F.initFinalSymbol("FiveNum", ID.FiveNum);
 	/** FixedPoint(f, expr) - starting with `expr`, iteratively applies `f` until the result no longer changes.*/
 	public final static IBuiltInSymbol FixedPoint = F.initFinalSymbol("FixedPoint", ID.FixedPoint);
 
@@ -921,7 +923,7 @@ public class F {
     /** FractionalPart(number) - get the fractional part of a `number`. */
 	public final static IBuiltInSymbol FractionalPart = F.initFinalSymbol("FractionalPart", ID.FractionalPart);
 
-	/***/
+    /** FrechetDistribution(a,b) - returns a Frechet distribution.*/
 	public final static IBuiltInSymbol FrechetDistribution = F.initFinalSymbol("FrechetDistribution",
 			ID.FrechetDistribution);
 
@@ -966,13 +968,13 @@ public class F {
 	/** FunctionExpand(f) - expands the special function `f`.*/
 	public final static IBuiltInSymbol FunctionExpand = F.initFinalSymbol("FunctionExpand", ID.FunctionExpand);
 
-	/** GCD(n1, n2, ...) - computes the greatest common divisor of the given integers.*/
+    /** GCD(n1, n2, ...) - computes the greatest common divisor of the given integers. */
 	public final static IBuiltInSymbol GCD = F.initFinalSymbol("GCD", ID.GCD);
 
 	/** Gamma(z) - is the gamma function on the complex number `z`.*/
 	public final static IBuiltInSymbol Gamma = F.initFinalSymbol("Gamma", ID.Gamma);
 
-	/***/
+    /** GammaDistribution(a,b) - returns a gamma distribution.*/
 	public final static IBuiltInSymbol GammaDistribution = F.initFinalSymbol("GammaDistribution", ID.GammaDistribution);
 
 	/***/
@@ -984,7 +986,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol GegenbauerC = F.initFinalSymbol("GegenbauerC", ID.GegenbauerC);
 
-	/***/
+    /** GeometricDistribution(p) - returns a geometric distribution.*/
 	public final static IBuiltInSymbol GeometricDistribution = F.initFinalSymbol("GeometricDistribution",
 			ID.GeometricDistribution);
 
@@ -1018,7 +1020,7 @@ public class F {
     /** GroebnerBasis({polynomial-list},{variable-list}) - returns a Gröbner basis for the `polynomial-list` and `variable-list`.*/
 	public final static IBuiltInSymbol GroebnerBasis = F.initFinalSymbol("GroebnerBasis", ID.GroebnerBasis);
 
-	/***/
+    /** GumbelDistribution(a, b) - returns a Gumbel distribution.*/
 	public final static IBuiltInSymbol GumbelDistribution = F.initFinalSymbol("GumbelDistribution",
 			ID.GumbelDistribution);
 
@@ -1040,7 +1042,7 @@ public class F {
 	/** HermitianMatrixQ(m) - returns `True` if `m` is a hermitian matrix.*/
 	public final static IBuiltInSymbol HermitianMatrixQ = F.initFinalSymbol("HermitianMatrixQ", ID.HermitianMatrixQ);
 
-	/** HilbertMatrix(n) - gives the hilbert matrix with `n` rows and columns.*/
+    /** HilbertMatrix(n) - gives the hilbert matrix with `n` rows and columns. */
 	public final static IBuiltInSymbol HilbertMatrix = F.initFinalSymbol("HilbertMatrix", ID.HilbertMatrix);
 
     /** Hold(expr) - `Hold` doesn't evaluate `expr`. */
@@ -1052,7 +1054,7 @@ public class F {
     /** HoldFirst - is an attribute specifying that the first argument of a function should be left unevaluated.    */
 	public final static IBuiltInSymbol HoldFirst = F.initFinalSymbol("HoldFirst", ID.HoldFirst);
 
-	/** HoldForm(expr) - `HoldForm` doesn't evaluate `expr` and didn't appear in the output */
+    /** HoldForm(expr) - `HoldForm` doesn't evaluate `expr` and didn't appear in the output*/
 	public final static IBuiltInSymbol HoldForm = F.initFinalSymbol("HoldForm", ID.HoldForm);
 
     /** HoldPattern(expr) - `HoldPattern` doesn't evaluate `expr` for pattern-matching. */
@@ -1078,7 +1080,7 @@ public class F {
     /** Hypergeometric2F1(a, b, c, z) - return the `Hypergeometric2F1` function*/
 	public final static IBuiltInSymbol Hypergeometric2F1 = F.initFinalSymbol("Hypergeometric2F1", ID.Hypergeometric2F1);
 
-	/***/
+    /** HypergeometricDistribution(n, s, t) - returns a hypergeometric distribution.*/
 	public final static IBuiltInSymbol HypergeometricDistribution = F.initFinalSymbol("HypergeometricDistribution",
 			ID.HypergeometricDistribution);
 
@@ -1161,10 +1163,7 @@ public class F {
 	/** Integers - is the set of integer numbers.*/
 	public final static IBuiltInSymbol Integers = F.initFinalSymbol("Integers", ID.Integers);
 
-	/**
-	 * Integrate(f, x) - integrates `f` with respect to `x`. The result does not contain the additive integration
-	 * constant.
-	 */
+    /** Integrate(f, x) - integrates `f` with respect to `x`. The result does not contain the additive integration constant.*/
 	public final static IBuiltInSymbol Integrate = F.initFinalSymbol("Integrate", ID.Integrate);
 
     /** InterpolatingFunction(data-list) - get the representation for the given `data-list` as piecewise `InterpolatingPolynomial`s.*/
@@ -1310,9 +1309,7 @@ public class F {
     /** LinearProgramming(coefficientsOfLinearObjectiveFunction, constraintList, constraintRelationList) - the `LinearProgramming` function provides an implementation of [George Dantzig's simplex algorithm](http://en.wikipedia.org/wiki/Simplex_algorithm) for solving linear optimization problems with linear equality and inequality constraints  and implicit non-negative variables.*/
 	public final static IBuiltInSymbol LinearProgramming = F.initFinalSymbol("LinearProgramming", ID.LinearProgramming);
 
-	/**
-	 * LinearRecurrence(list1, list2, n) - solve the linear recurrence and return the generated sequence of elements.
-	 */
+    /** LinearRecurrence(list1, list2, n) - solve the linear recurrence and return the generated sequence of elements.*/
 	public final static IBuiltInSymbol LinearRecurrence = F.initFinalSymbol("LinearRecurrence", ID.LinearRecurrence);
 
     /** LinearSolve(matrix, right) - solves the linear equation system 'matrix . x = right' and returns one corresponding solution `x`.*/
@@ -1354,7 +1351,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol LogIntegral = F.initFinalSymbol("LogIntegral", ID.LogIntegral);
 
-	/***/
+    /** LogNormalDistribution(m, s) - returns a log-normal distribution.*/
 	public final static IBuiltInSymbol LogNormalDistribution = F.initFinalSymbol("LogNormalDistribution",
 			ID.LogNormalDistribution);
 
@@ -1540,7 +1537,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol NSolve = F.initFinalSymbol("NSolve", ID.NSolve);
 
-	/***/
+    /** NakagamiDistribution(m, o) - returns a Nakagami distribution.*/
 	public final static IBuiltInSymbol NakagamiDistribution = F.initFinalSymbol("NakagamiDistribution",
 			ID.NakagamiDistribution);
 
@@ -1690,13 +1687,13 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol OutputForm = F.initFinalSymbol("OutputForm", ID.OutputForm);
 
-	/***/
+    /** PDF(distribution, value) - returns the probability density function of `value`. */
 	public final static IBuiltInSymbol PDF = F.initFinalSymbol("PDF", ID.PDF);
 
 	/***/
 	public final static IBuiltInSymbol Package = F.initFinalSymbol("Package", ID.Package);
 
-	/** PadLeft(list, n) - pads `list` to length `n` by adding `0` on the left.*/
+    /** PadLeft(list, n) - pads `list` to length `n` by adding `0` on the left. */
 	public final static IBuiltInSymbol PadLeft = F.initFinalSymbol("PadLeft", ID.PadLeft);
 
     /** PadRight(list, n) - pads `list` to length `n` by adding `0` on the right. */
@@ -1756,7 +1753,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Point = F.initFinalSymbol("Point", ID.Point);
 
-	/***/
+    /** PoissonDistribution(m) - returns a Poisson distribution.*/
 	public final static IBuiltInSymbol PoissonDistribution = F.initFinalSymbol("PoissonDistribution",
 			ID.PoissonDistribution);
 
@@ -1860,12 +1857,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Print = F.initFinalSymbol("Print", ID.Print);
 
-	/***/
+    /** Probability(pure-function, data-set) - returns the probability of the `pure-function` for the given `data-set`. */
 	public final static IBuiltInSymbol Probability = F.initFinalSymbol("Probability", ID.Probability);
 
-	/**
-	 * Product(expr, {i, imin, imax}) - evaluates the discrete product of `expr` with `i` ranging from `imin` to `imax`.
-	 */
+    /** Product(expr, {i, imin, imax}) - evaluates the discrete product of `expr` with `i` ranging from `imin` to `imax`.*/
 	public final static IBuiltInSymbol Product = F.initFinalSymbol("Product", ID.Product);
 
 	/** ProductLog(z) - returns the value of the Lambert W function at `z`.*/
@@ -2204,7 +2199,7 @@ public class F {
 	/** StruveL(n, z) - returns the modified Struve function `L_n(z)`.*/
 	public final static IBuiltInSymbol StruveL = F.initFinalSymbol("StruveL", ID.StruveL);
 
-	/***/
+    /** StudentTDistribution(v) - returns a Student's t-distribution.*/
 	public final static IBuiltInSymbol StudentTDistribution = F.initFinalSymbol("StudentTDistribution",
 			ID.StudentTDistribution);
 
@@ -2307,7 +2302,7 @@ public class F {
 	/** Thread(f(args) - threads `f` over any lists that appear in `args`.*/
 	public final static IBuiltInSymbol Thread = F.initFinalSymbol("Thread", ID.Thread);
 
-	/** Through(p(f)[x]) - gives `p(f(x))`.*/
+    /** Through(p(f)[x]) - gives `p(f(x))`. */
 	public final static IBuiltInSymbol Through = F.initFinalSymbol("Through", ID.Through);
 
 	/***/
@@ -2458,7 +2453,7 @@ public class F {
 	/** VectorQ(v) - returns `True` if `v` is a list of elements which are not themselves lists.*/
 	public final static IBuiltInSymbol VectorQ = F.initFinalSymbol("VectorQ", ID.VectorQ);
 
-	/***/
+    /** WeibullDistribution(a, b) - returns a Weibull distribution.*/
 	public final static IBuiltInSymbol WeibullDistribution = F.initFinalSymbol("WeibullDistribution",
 			ID.WeibullDistribution);
 
@@ -7420,7 +7415,7 @@ public class F {
 	 * @return the symbol object from the context path
 	 */
 	public static ISymbol symbol(final String symbolName, IAST assumptionAST, EvalEngine engine) {
-		ISymbol symbol = engine.getContextPath().getSymbol(symbolName);
+		ISymbol symbol = engine.getContextPath().getSymbol(symbolName, engine.isRelaxedSyntax());
 		if (assumptionAST != null) {
 			IExpr temp = Lambda.replaceSlots(assumptionAST, F.List(symbol));
 			if (!temp.isPresent()) {
