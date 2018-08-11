@@ -52,6 +52,7 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
+            resources.srcDirs = ['src/main/resources']
             java.srcDirs += 'matheclipse-core/src/main/java/'
         }
         test {
