@@ -458,7 +458,7 @@ public class EvalEngine implements Serializable {
 						fNumericMode = numericMode;
 					}
 				}
-						} else {
+			} else {
 				// the HoldFirst attribute is set here
 				try {
 					IExpr x = ast.arg1();
@@ -492,8 +492,7 @@ public class EvalEngine implements Serializable {
 							fNumericMode = numericMode;
 						}
 					}
-				}
-										} else {
+				} else {
 				// the HoldRest attribute is set here
 				numericMode = fNumericMode;
 				try {
@@ -511,6 +510,7 @@ public class EvalEngine implements Serializable {
 							fNumericMode = numericMode;
 						}
 					}
+				}
 				}
 			if (!isNumericArgument && ast.isNumericArgument()) {
 				// one of the arguments is a numeric value
