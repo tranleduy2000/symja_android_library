@@ -10862,6 +10862,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		checkNumeric("Variance({{5.2, 7}, {5.3, 8}, {5.4, 9}})", "{0.010000000000000018,1.0}");
 		checkNumeric("Variance({1.21, 3.4, 2, 4.66, 1.5, 5.61, 7.22})", "5.16122380952381");
 
+		check("Variance({1.21, 3.4, 2+3*I, 4.66-0.1*I, 1.5, 5.61, 7.22})", //
+				"6.46265");
 		// check("Variance(BernoulliDistribution(p))", "p*(1-p)");
 		// check("Variance(BinomialDistribution(n, p))", "n*p*(1-p)");
 	}
