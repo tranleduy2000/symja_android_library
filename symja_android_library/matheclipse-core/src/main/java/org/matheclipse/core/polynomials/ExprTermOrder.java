@@ -5,12 +5,12 @@
 package org.matheclipse.core.polynomials;
 
 
+import org.apache.log4j.Logger;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-
-import org.apache.log4j.Logger;
 
 import edu.jas.kern.Scripting;
 
@@ -154,7 +154,9 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Constructor for given term order.
-     * @param evord requested term order indicator / enumerator.
+	 *
+	 * @param evord
+	 *            requested term order indicator / enumerator.
      */
     public ExprTermOrder(int evord) {
         if (evord < MIN_EVORD || MAX_EVORD < evord) {
@@ -306,7 +308,9 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Constructor for given exponent weights.
-     * @param w weight vector of longs.
+	 *
+	 * @param w
+	 *            weight vector of longs.
      */
     public ExprTermOrder(long[] w) {
         this(new long[][] { w });
@@ -315,7 +319,9 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Constructor for given exponent weights.
-     * @param w weight array of longs.
+	 *
+	 * @param w
+	 *            weight array of longs.
      */
     public ExprTermOrder(long[][] w) {
         if (w == null || w.length == 0) {
@@ -356,10 +362,15 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Constructor for given split order.
-     * @param ev1 requested term order indicator for first block.
-     * @param ev2 requested term order indicator for second block.
-     * @param r max number of exponents to compare.
-     * @param split index.
+	 *
+	 * @param ev1
+	 *            requested term order indicator for first block.
+	 * @param ev2
+	 *            requested term order indicator for second block.
+	 * @param r
+	 *            max number of exponents to compare.
+	 * @param split
+	 *            index.
      */
     public ExprTermOrder(int ev1, int ev2, int r, int split) {
         if (ev1 < MIN_EVORD || MAX_EVORD-2 < ev1) {
@@ -378,7 +389,7 @@ public final class ExprTermOrder implements Serializable {
         if (evbeg2 < 0 || evbeg2 > evend2) {
             throw new IllegalArgumentException("invalid term order split, r = " + r + ", split = " + split);
         }
-        //System.out.println("evbeg2 " + evbeg2 + ", evend2 " + evend2);
+		// System.out.println("evbeg2 " + evbeg2 + ", evend2 " + evend2);
         switch (evord) { // horder = new EVhorder();
         case ExprTermOrder.LEX: {
             switch (evord2) {
@@ -772,7 +783,7 @@ public final class ExprTermOrder implements Serializable {
             }
             break;
         }
-        //----- begin reversed -----------
+		// ----- begin reversed -----------
         case ExprTermOrder.REVLEX: {
             switch (evord2) {
             case ExprTermOrder.LEX: {
@@ -1285,7 +1296,7 @@ public final class ExprTermOrder implements Serializable {
             }
             break;
         }
-        //----- end reversed-----------
+		// ----- end reversed-----------
         default: {
             horder = null;
         }
@@ -1316,18 +1327,19 @@ public final class ExprTermOrder implements Serializable {
 
 
     /*
-     * Constructor for default split order.
-     * @param r max number of exponents to compare.
-     * @param split index.
-    public ExprTermOrder(int r, int split) {
-        this(DEFAULT_EVORD, DEFAULT_EVORD, r, split);
-    }
-     */
+	 * Constructor for default split order.
+	 *
+	 * @param r max number of exponents to compare.
+	 *
+	 * @param split index. public ExprTermOrder(int r, int split) { this(DEFAULT_EVORD, DEFAULT_EVORD, r, split); }
+	 */
 
 
     /**
      * Create block term order at split index.
-     * @param s split index.
+	 *
+	 * @param s
+	 *            split index.
      * @return block ExprTermOrder with split index.
      */
     public ExprTermOrder blockOrder(int s) {
@@ -1337,8 +1349,11 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Create block term order at split index.
-     * @param s split index.
-     * @param len length of ExpVectors to compare
+	 *
+	 * @param s
+	 *            split index.
+	 * @param len
+	 *            length of ExpVectors to compare
      * @return block ExprTermOrder with split index.
      */
     public ExprTermOrder blockOrder(int s, int len) {
@@ -1348,8 +1363,11 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Create block term order at split index.
-     * @param s split index.
-     * @param t second term order.
+	 *
+	 * @param s
+	 *            split index.
+	 * @param t
+	 *            second term order.
      * @return block ExprTermOrder with split index.
      */
     public ExprTermOrder blockOrder(int s, ExprTermOrder t) {
@@ -1359,9 +1377,13 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Create block term order at split index.
-     * @param s split index.
-     * @param t second term order.
-     * @param len length of ExpVectors to compare
+	 *
+	 * @param s
+	 *            split index.
+	 * @param t
+	 *            second term order.
+	 * @param len
+	 *            length of ExpVectors to compare
      * @return block ExprTermOrder with split index.
      */
     public ExprTermOrder blockOrder(int s, ExprTermOrder t, int len) {
@@ -1371,6 +1393,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Get the first defined order indicator.
+	 *
      * @return evord.
      */
     public int getEvord() {
@@ -1380,6 +1403,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Get the second defined order indicator.
+	 *
      * @return evord2.
      */
     public int getEvord2() {
@@ -1389,6 +1413,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Get the split index.
+	 *
      * @return split.
      */
     public int getSplit() {
@@ -1398,6 +1423,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Get the weight array.
+	 *
      * @return weight.
      */
     public long[][] getWeight() {
@@ -1410,6 +1436,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Get the descending order comparator. Sorts the highest terms first.
+	 *
      * @return horder.
      */
     public EVComparator getDescendComparator() {
@@ -1419,6 +1446,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Get the ascending order comparator. Sorts the lowest terms first.
+	 *
      * @return lorder.
      */
     public EVComparator getAscendComparator() {
@@ -1428,6 +1456,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Get the sugar order comparator. Sorts the graded lowest terms first.
+	 *
      * @return sugar.
      */
     public EVComparator getSugarComparator() {
@@ -1437,6 +1466,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Comparison with any other object.
+	 *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -1459,6 +1489,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Hash code.
+	 *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -1479,6 +1510,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * String representation of weight matrix.
+	 *
      * @return string representation of weight matrix.
      */
     public String weightToString() {
@@ -1507,6 +1539,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Script representation of weight matrix.
+	 *
      * @return script representation of weight matrix.
      */
     public String weightToScript() {
@@ -1536,20 +1569,21 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * String representation of ExprTermOrder.
+	 *
      * @return script representation of ExprTermOrder.
      */
     public String toScript() {
         if (weight != null) {
         	StringBuilder erg = new StringBuilder();
-            //erg.append("ExprTermOrder( ");
+			// erg.append("ExprTermOrder( ");
             erg.append(weightToScript());
             if (evend1 == evend2) {
-                //erg.append(" )");
+				// erg.append(" )");
                 return erg.toString();
             }
             erg.append("[" + evbeg1 + "," + evend1 + "]");
             erg.append("[" + evbeg2 + "," + evend2 + "]");
-            //erg.append(" )");
+			// erg.append(" )");
             return erg.toString();
         }
         return toScriptPlain();
@@ -1558,6 +1592,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * String representation of ExprTermOrder.
+	 *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -1653,13 +1688,13 @@ public final class ExprTermOrder implements Serializable {
                 return "ReverseLexicographic";
             case GRLEX:
                 return "NegativeDegreeReverseLexicographic";
-            case ITDEGLEX: //IGRLEX:
+			case ITDEGLEX: // IGRLEX:
                 return "DegreeReverseLexicographic";
             case REVLEX:
                 return "NegativeLexicographic";
             case REVILEX:
                 return "Lexicographic";
-            case REVITDEG: //REVTDEG:
+			case REVITDEG: // REVTDEG:
                 return "NegativeDegreeLexicographic";
             case REVITDG:
                 return "DegreeLexicographic";
@@ -1674,13 +1709,13 @@ public final class ExprTermOrder implements Serializable {
                 return "invlex";
             case GRLEX:
                 return "negdegrevlex";
-            case ITDEGLEX: //IGRLEX:
+			case ITDEGLEX: // IGRLEX:
                 return "degrevlex";
             case REVLEX:
                 return "neglex";
             case REVILEX:
                 return "lex";
-            case REVITDEG: //REVTDEG:
+			case REVITDEG: // REVTDEG:
                 return "negdeglex";
             case REVITDG:
                 return "deglex";
@@ -1689,19 +1724,19 @@ public final class ExprTermOrder implements Serializable {
             }
         case Singular:
             switch (ev) {
-            //case LEX: // missing
-            //return "negrevlex";
+			// case LEX: // missing
+			// return "negrevlex";
             case INVLEX:
                 return "rp";
             case GRLEX:
                 return "ds";
-            case ITDEGLEX: //IGRLEX:
+			case ITDEGLEX: // IGRLEX:
                 return "dp";
             case REVLEX:
                 return "ls";
             case REVILEX:
                 return "lp";
-            case REVITDEG: //REVTDEG:
+			case REVITDEG: // REVTDEG:
                 return "Ds";
             case REVITDG:
                 return "Dp";
@@ -1735,15 +1770,18 @@ public final class ExprTermOrder implements Serializable {
                 return "invalid(" + ev + ")";
             }
         }
-        //return "invalid(" + ev + ")";
+		// return "invalid(" + ev + ")";
     }
 
 
     /**
-     * Extend variables. Used e.g. in module embedding. Extend ExprTermOrder by k
-     * elements. <b>Note:</b> todo distinguish TOP and POT orders.
-     * @param r current number of variables.
-     * @param k number of variables to extend.
+	 * Extend variables. Used e.g. in module embedding. Extend ExprTermOrder by k elements. <b>Note:</b> todo
+	 * distinguish TOP and POT orders.
+	 *
+	 * @param r
+	 *            current number of variables.
+	 * @param k
+	 *            number of variables to extend.
      * @return extended ExprTermOrder.
      */
     public ExprTermOrder extend(int r, int k) {
@@ -1756,7 +1794,7 @@ public final class ExprTermOrder implements Serializable {
                 for (int j = 0; j < wi.length; j++) {
                     if (wi[j] > max)
                         max = wi[j];
-                    //if ( wi[j] < min ) min = wi[j];
+					// if ( wi[j] < min ) min = wi[j];
                 }
                 max++;
                 long[] wj = new long[wi.length + k];
@@ -1769,24 +1807,26 @@ public final class ExprTermOrder implements Serializable {
             return new ExprTermOrder(w);
         }
         if (evord2 != 0) {
-            logger.debug("warn: ExprTermOrder is already extended");
+			// logger.debug("warn: ExprTermOrder is already extended");
             if (debug) {
                 throw new IllegalArgumentException("ExprTermOrder is already extended: " + this);
             }
             return new ExprTermOrder(evord, evord2, r + k, evend1 + k);
         }
-        //System.out.println("evord         = " + evord);
-        //System.out.println("DEFAULT_EVORD = " + DEFAULT_EVORD);
-        //System.out.println("tord          = " + this);
-        return new ExprTermOrder(DEFAULT_EVORD/*evord*/, evord, r + k, k); // don't change to evord, cause REVITDG
+		// System.out.println("evord = " + evord);
+		// System.out.println("DEFAULT_EVORD = " + DEFAULT_EVORD);
+		// System.out.println("tord = " + this);
+		return new ExprTermOrder(DEFAULT_EVORD/* evord */, evord, r + k, k); // don't change to evord, cause REVITDG
     }
 
 
     /**
-     * Extend lower variables. Extend ExprTermOrder by k elements. <b>Note:</b> todo
-     * distinguish TOP and POT orders.
-     * @param r current number of variables.
-     * @param k number of variables to extend.
+	 * Extend lower variables. Extend ExprTermOrder by k elements. <b>Note:</b> todo distinguish TOP and POT orders.
+	 *
+	 * @param r
+	 *            current number of variables.
+	 * @param k
+	 *            number of variables to extend.
      * @return extended ExprTermOrder.
      */
     public ExprTermOrder extendLower(int r, int k) {
@@ -1794,14 +1834,14 @@ public final class ExprTermOrder implements Serializable {
             long[][] w = new long[weight.length][];
             for (int i = 0; i < weight.length; i++) {
                 long[] wi = weight[i];
-                //long max = 0;
+				// long max = 0;
                 long min = Long.MAX_VALUE;
                 for (int j = 0; j < wi.length; j++) {
-                    //if ( wi[j] > max ) max = wi[j];
+					// if ( wi[j] > max ) max = wi[j];
                     if (wi[j] < min)
                         min = wi[j];
                 }
-                //max++;
+				// max++;
                 long[] wj = new long[wi.length + k];
                 for (int j = 0; j < i; j++) {
                     wj[wi.length + j] = min;
@@ -1813,22 +1853,24 @@ public final class ExprTermOrder implements Serializable {
         }
         if (evord2 != 0) {
             if (debug) {
-                logger.warn("ExprTermOrder is already extended");
+				// logger.warn("ExprTermOrder is already extended");
             }
             return new ExprTermOrder(evord, evord2, r + k, evend1 + k);
         }
-        //System.out.println("evord         = " + evord);
-        //System.out.println("DEFAULT_EVORD = " + DEFAULT_EVORD);
-        //System.out.println("tord          = " + this);
+		// System.out.println("evord = " + evord);
+		// System.out.println("DEFAULT_EVORD = " + DEFAULT_EVORD);
+		// System.out.println("tord = " + this);
         return new ExprTermOrder(evord);
     }
 
 
     /**
-     * Contract variables. Used e.g. in module embedding. Contract ExprTermOrder to
-     * non split status.
-     * @param k position of first element to be copied.
-     * @param len new length.
+	 * Contract variables. Used e.g. in module embedding. Contract ExprTermOrder to non split status.
+	 *
+	 * @param k
+	 *            position of first element to be copied.
+	 * @param len
+	 *            new length.
      * @return contracted ExprTermOrder.
      */
     public ExprTermOrder contract(int k, int len) {
@@ -1844,7 +1886,7 @@ public final class ExprTermOrder implements Serializable {
         }
         if (evord2 == 0) {
             if (debug) {
-                logger.warn("ExprTermOrder is already contracted");
+				// logger.warn("ExprTermOrder is already contracted");
             }
             return new ExprTermOrder(evord);
         }
@@ -1867,6 +1909,7 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Reverse variables. Used e.g. in opposite rings.
+	 *
      * @return ExprTermOrder for reversed variables.
      */
     public ExprTermOrder reverse() {
@@ -1876,14 +1919,16 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Reverse variables. Used e.g. in opposite rings.
-     * @param partial true for partialy reversed term orders.
+	 *
+	 * @param partial
+	 *            true for partialy reversed term orders.
      * @return ExprTermOrder for reversed variables.
      */
     public ExprTermOrder reverse(boolean partial) {
         ExprTermOrder t;
         if (weight != null) {
             if (partial) {
-                logger.error("partial reversed weight order not implemented");
+				// logger.error("partial reversed weight order not implemented");
             }
             long[][] w = new long[weight.length][];
             for (int i = 0; i < weight.length; i++) {
@@ -1895,7 +1940,7 @@ public final class ExprTermOrder implements Serializable {
                 w[i] = wj;
             }
             t = new ExprTermOrder(w);
-            logger.info("reverse = " + t + ", from = " + this);
+			// logger.info("reverse = " + t + ", from = " + this);
             return t;
         }
         if (evord2 == 0) {
@@ -1907,14 +1952,16 @@ public final class ExprTermOrder implements Serializable {
         } else {
             t = new ExprTermOrder(revert(evord2), revert(evord), evend2, evend2 - evbeg2);
         }
-        logger.info("reverse = " + t + ", from = " + this);
+		// logger.info("reverse = " + t + ", from = " + this);
         return t;
     }
 
 
     /**
      * Revert exponent order. Used e.g. in opposite rings.
-     * @param evord exponent order to be reverted.
+	 *
+	 * @param evord
+	 *            exponent order to be reverted.
      * @return reverted exponent order.
      */
     public static int revert(int evord) {
@@ -1945,7 +1992,7 @@ public final class ExprTermOrder implements Serializable {
             i = IGRLEX;
             break;
         default: // REVITDEG, ITDEGLEX
-            logger.error("can not revert " + evord);
+			// logger.error("can not revert " + evord);
             break;
         }
         return i;
@@ -1954,8 +2001,11 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Permutation of a long array.
-     * @param a array of long.
-     * @param P permutation.
+	 *
+	 * @param a
+	 *            array of long.
+	 * @param P
+	 *            permutation.
      * @return P(a).
      */
     public static long[] longArrayPermutation(List<Integer> P, long[] a) {
@@ -1974,16 +2024,18 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Permutation of the termorder.
-     * @param P permutation.
+	 *
+	 * @param P
+	 *            permutation.
      * @return P(a).
      */
     public ExprTermOrder permutation(List<Integer> P) {
         ExprTermOrder tord = this;
         if (getEvord2() != 0) {
-            //throw new IllegalArgumentException("split term orders not permutable");
+			// throw new IllegalArgumentException("split term orders not permutable");
             tord = new ExprTermOrder(getEvord2());
-            logger.warn("split term order '" + this + "' not permutable, resetting to most base term order "
-                            + tord);
+			// logger.warn("split term order '" + this + "' not permutable, resetting to most base term order "
+			// + tord);
         }
         long[][] weight = getWeight();
         if (weight != null) {
@@ -1999,12 +2051,14 @@ public final class ExprTermOrder implements Serializable {
 
     /**
      * Weight ExprTermOrder with reversed weight vectors.
-     * @param w weight matrix
+	 *
+	 * @param w
+	 *            weight matrix
      * @return ExprTermOrder with reversed weight vectors
      */
     public static ExprTermOrder reverseWeight(long[][] w) {
         if (w == null) {
-            logger.warn("null weight matrix ignored");
+			// logger.warn("null weight matrix ignored");
             return new ExprTermOrder();
         }
         long[][] wr = new long[w.length][];

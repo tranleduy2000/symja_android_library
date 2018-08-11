@@ -7,7 +7,6 @@ package org.matheclipse.core.polynomials;
 
 
 
-// import org.apache.log4j.Logger;
 
 
 /**
