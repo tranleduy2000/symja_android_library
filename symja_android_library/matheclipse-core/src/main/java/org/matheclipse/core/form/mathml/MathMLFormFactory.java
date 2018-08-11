@@ -2074,7 +2074,8 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		CONVERTERS.put(F.Less, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("Less").getPrecedence(), "&lt;"));
 		CONVERTERS.put(F.LessEqual,
 				new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("LessEqual").getPrecedence(), "&#x2264;"));
-		CONVERTERS.put(F.MatrixForm, new MatrixForm());
+		CONVERTERS.put(F.MatrixForm, new MatrixForm(false));
+		CONVERTERS.put(F.TableForm, new MatrixForm(true));
 		CONVERTERS.put(F.Not, new Not());
 		CONVERTERS.put(F.Or, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("Or").getPrecedence(), "&#x2228;"));
 		CONVERTERS.put(F.Plus, new Plus());

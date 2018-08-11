@@ -2263,6 +2263,8 @@ public class F {
 	/** Table(expr, {i, n}) - evaluates `expr` with `i` ranging from `1` to `n`, returning a list of the results.*/
 	public final static IBuiltInSymbol Table = F.initFinalSymbol("Table", ID.Table);
 
+    /***/
+    public final static IBuiltInSymbol TableForm = F.initFinalSymbol("TableForm", ID.TableForm);
 	/** Take(expr, n) - returns `expr` with all but the first `n` leaves removed.*/
 	public final static IBuiltInSymbol Take = F.initFinalSymbol("Take", ID.Take);
 
