@@ -15,7 +15,6 @@
  */
 package org.matheclipse.parser.client;
 
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.parser.client.operator.Operator;
 
 import java.util.List;
@@ -733,7 +732,7 @@ public abstract class Scanner {
 			}
 
 			if (fCurrentChar == 'E' || fCurrentChar == 'e') {
-			if (Config.EXPLICIT_TIMES_OPERATOR) {
+				if (fExplicitTimes) {
 				numFormat = -1;
 				getChar();
 				if ((fCurrentChar == '+') || (fCurrentChar == '-')) {
@@ -830,6 +829,9 @@ public abstract class Scanner {
 					case 't':
 						ident.append('\t');
 
+						break;
+					case '\"':
+						ident.append('\"');
 						break;
 					default:
 						throwSyntaxError("string - unknown character after back-slash.");
