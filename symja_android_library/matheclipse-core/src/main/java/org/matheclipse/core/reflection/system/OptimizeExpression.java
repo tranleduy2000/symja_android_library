@@ -80,7 +80,7 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
 		java.util.Map<IExpr, ReferenceCounter> map;
 
 		public ShareFunction() {
-			map = new HashMap<IExpr, ReferenceCounter>();
+			map = new TreeMap<IExpr, ReferenceCounter>();
 		}
 
 		@Override

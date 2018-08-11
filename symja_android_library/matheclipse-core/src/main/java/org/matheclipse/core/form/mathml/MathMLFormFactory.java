@@ -294,6 +294,11 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 
 	private final static class MatrixForm extends AbstractConverter {
 
+		final boolean tableForm;
+
+		public MatrixForm(boolean tableForm) {
+			this.tableForm = tableForm;
+		}
 		/**
 		 * Converts a given function into the corresponding MathML output
 		 * 
@@ -314,8 +319,10 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 					return false;
 				} else {
 					final IAST vector = (IAST) f.arg1();
+					if (!tableForm) {
 					fFactory.tagStart(buf, "mrow");
 					fFactory.tag(buf, "mo", "(");
+					}
 					fFactory.tagStart(buf, "mtable", "columnalign=\"center\"");
 
 					IExpr temp;
@@ -330,13 +337,17 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 					}
 
 					fFactory.tagEnd(buf, "mtable");
+					if (!tableForm) {
 					fFactory.tag(buf, "mo", ")");
 					fFactory.tagEnd(buf, "mrow");
 				}
+				}
 			} else {
 				final IAST matrix = (IAST) f.arg1();
+				if (!tableForm) {
 				fFactory.tagStart(buf, "mrow");
 				fFactory.tag(buf, "mo", "(");
+				}
 				fFactory.tagStart(buf, "mtable", "columnalign=\"center\"");
 
 				IAST temp;
@@ -354,8 +365,10 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 				}
 
 				fFactory.tagEnd(buf, "mtable");
+				if (!tableForm) {
 				fFactory.tag(buf, "mo", ")");
 				fFactory.tagEnd(buf, "mrow");
+			}
 			}
 			return true;
 		}
