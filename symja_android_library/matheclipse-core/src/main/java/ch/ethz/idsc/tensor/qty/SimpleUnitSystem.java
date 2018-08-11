@@ -8,12 +8,11 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /** reference implementation of {@link UnitSystem} with emphasis on simplicity */
 public class SimpleUnitSystem implements UnitSystem {
@@ -38,18 +37,14 @@ public class SimpleUnitSystem implements UnitSystem {
 	 *             if keys do not define unit conversions
      */
     public static UnitSystem from(Properties properties) {
-        return new SimpleUnitSystem(properties.stringPropertyNames().stream().collect(Collectors.toMap( //
-				new Function<String, String>() {
-					@Override
-					public String apply(String key1) {
-						return UnitHelper.requireValid(key1);
-					}
-				}, new Function<String, IExpr>() {
-					@Override
-					public IExpr apply(String key) {
-						return requireNumeric(F.fromString(properties.getProperty(key)));
-					}
-				})));
+		//
+		Map<String, IExpr> result = new HashMap<>();
+		for (String key : properties.stringPropertyNames()) {
+			if (result.put(UnitHelper.requireValid(key), requireNumeric(F.fromString(properties.getProperty(key)))) != null) {
+				throw new IllegalStateException("Duplicate key");
+			}
+		}
+		return new SimpleUnitSystem(result);
     }
 
     /**
@@ -57,18 +52,14 @@ public class SimpleUnitSystem implements UnitSystem {
      * @return unit system
      */
     public static UnitSystem from(Map<String, IExpr> map) {
-        return new SimpleUnitSystem(map.entrySet().stream().collect(Collectors.toMap( //
-				new Function<Entry<String, IExpr>, String>() {
-					@Override
-					public String apply(Entry<String, IExpr> entry) {
-						return UnitHelper.requireValid(entry.getKey());
-					}
-				}, new Function<Entry<String, IExpr>, IExpr>() {
-					@Override
-					public IExpr apply(Entry<String, IExpr> entry) {
-						return requireNumeric(entry.getValue());
-					}
-				})));
+		//
+		Map<String, IExpr> result = new HashMap<>();
+		for (Entry<String, IExpr> entry : map.entrySet()) {
+			if (result.put(UnitHelper.requireValid(entry.getKey()), requireNumeric(entry.getValue())) != null) {
+				throw new IllegalStateException("Duplicate key");
+			}
+		}
+		return new SimpleUnitSystem(result);
     }
 
 	// ---

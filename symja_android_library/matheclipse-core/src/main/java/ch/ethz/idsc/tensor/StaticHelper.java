@@ -1,8 +1,5 @@
 package ch.ethz.idsc.tensor;
 
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IExpr;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.stream.Collector;

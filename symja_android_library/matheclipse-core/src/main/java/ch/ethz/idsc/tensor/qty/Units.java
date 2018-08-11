@@ -1,8 +1,8 @@
 package ch.ethz.idsc.tensor.qty;
 
-import org.matheclipse.core.interfaces.IExpr;
+import com.duy.util.DObjects;
 
-import java.util.Objects;
+import org.matheclipse.core.interfaces.IExpr;
 
 
 /**
@@ -20,7 +20,7 @@ public enum Units {
             IQuantity quantity = (IQuantity) scalar;
             return quantity.unit();
         }
-        if (Objects.isNull(scalar))
+        if (DObjects.isNull(scalar))
             throw new IllegalArgumentException(); // scalar == null
         return IUnit.ONE;
     }
