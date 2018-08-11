@@ -72,6 +72,7 @@ public class StatisticsFunctions {
 		F.ErlangDistribution.setEvaluator(new ErlangDistribution());
 		F.Expectation.setEvaluator(new Expectation());
 		F.ExponentialDistribution.setEvaluator(new ExponentialDistribution());
+		F.FiveNum.setEvaluator(new FiveNum());
 		F.FrechetDistribution.setEvaluator(new FrechetDistribution());
 		F.GammaDistribution.setEvaluator(new GammaDistribution());
 		F.GeometricMean.setEvaluator(new GeometricMean());
@@ -650,6 +651,35 @@ public class StatisticsFunctions {
 
 	}
 
+	private final static class FiveNum extends AbstractEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 2);
+			int size = ast.arg1().isVector();
+			if (size >= 0) {
+				IAST param = F.List(F.List(F.C1D2, F.C0), //
+						F.List(F.C0, F.C1));
+
+				IAST list = (IAST) ast.arg1();
+				IASTAppendable result = F.ListAlloc(5);
+
+				result.append(F.Min(list));
+				result.append(F.Quantile(list, F.C1D4, param));
+				result.append(F.Median(list));
+				result.append(F.Quantile(list, F.C3D4, param));
+				result.append(F.Max(list));
+
+				return result;
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
+	}
 	private final static class FrechetDistribution extends IDistributionFunctionImpl
 			implements ICDF, IDistribution, IPDF, IVariance {
 

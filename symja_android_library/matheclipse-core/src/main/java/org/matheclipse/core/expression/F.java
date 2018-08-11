@@ -387,7 +387,7 @@ public class F {
 	/** Break() - exits a `For`, `While`, or `Do` loop.*/
 	public final static IBuiltInSymbol Break = F.initFinalSymbol("Break", ID.Break);
 
-	/***/
+    /** CDF(distribution, value) - returns the cumulative distribution function of `value`. */
 	public final static IBuiltInSymbol CDF = F.initFinalSymbol("CDF", ID.CDF);
 
 	/***/
@@ -680,7 +680,7 @@ public class F {
     /** DiscreteDelta(n1, n2, n3, ...) - `DiscreteDelta` function returns `1` if all the `ni` are `0`. Returns `0` otherwise.*/
 	public final static IBuiltInSymbol DiscreteDelta = F.initFinalSymbol("DiscreteDelta", ID.DiscreteDelta);
 
-	/***/
+    /** DiscreteUniformDistribution({min, max}) - returns a discrete uniform distribution.*/
 	public final static IBuiltInSymbol DiscreteUniformDistribution = F.initFinalSymbol("DiscreteUniformDistribution",
 			ID.DiscreteUniformDistribution);
 
@@ -777,7 +777,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Erfi = F.initFinalSymbol("Erfi", ID.Erfi);
 
-	/***/
+    /** ErlangDistribution({k, lambda}) - returns a Erlang distribution.*/
 	public final static IBuiltInSymbol ErlangDistribution = F.initFinalSymbol("ErlangDistribution",
 			ID.ErlangDistribution);
 
@@ -823,13 +823,13 @@ public class F {
     /** ExpandAll(expr) - expands out all positive integer powers and products of sums in `expr`. */
 	public final static IBuiltInSymbol ExpandAll = F.initFinalSymbol("ExpandAll", ID.ExpandAll);
 
-	/***/
+    /** Expectation(pure-function, data-set) - returns the expected value of the `pure-function` for the given `data-set`. */
 	public final static IBuiltInSymbol Expectation = F.initFinalSymbol("Expectation", ID.Expectation);
 
     /** Exponent(polynomial, x) - gives the maximum power with which `x` appears in the expanded form of `polynomial`.*/
 	public final static IBuiltInSymbol Exponent = F.initFinalSymbol("Exponent", ID.Exponent);
 
-	/***/
+    /** ExponentialDistribution(lambda) - returns an exponential distribution.*/
 	public final static IBuiltInSymbol ExponentialDistribution = F.initFinalSymbol("ExponentialDistribution",
 			ID.ExponentialDistribution);
 
@@ -2236,10 +2236,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol SurfaceGraphics = F.initFinalSymbol("SurfaceGraphics", ID.SurfaceGraphics);
 
-	/**
-	 * Switch(expr, pattern1, value1, pattern2, value2, ...) - yields the first `value` for which `expr` matches the
-	 * corresponding pattern.
-	 */
+    /** Switch(expr, pattern1, value1, pattern2, value2, ...) - yields the first `value` for which `expr` matches the corresponding pattern.*/
 	public final static IBuiltInSymbol Switch = F.initFinalSymbol("Switch", ID.Switch);
 
 	/** Symbol - is the head of symbols.*/
@@ -7262,6 +7259,9 @@ public class F {
 		return binaryAST2(Quantile, a0, a1);
 	}
 
+	public static IAST Quantile(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(Quantile, a0, a1, a2);
+	}
 	public static IAST Quantity(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Quantity, a0, a1);
 	}
@@ -7337,13 +7337,6 @@ public class F {
 		return binaryAST2(ReplacePart, a0, a1);
 	}
 
-	/**
-	 * 
-	 * @param a0
-	 * @param a1
-	 * @param a2
-	 * @return
-	 */
 	public static IAST ReplacePart(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(ReplacePart, a0, a1, a2);
 	}
