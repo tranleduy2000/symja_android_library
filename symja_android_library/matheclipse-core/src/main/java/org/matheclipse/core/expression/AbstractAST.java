@@ -33,6 +33,7 @@ import org.matheclipse.core.interfaces.IASTMutableImpl;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
+import org.matheclipse.core.interfaces.IDiscreteDistribution;
 import org.matheclipse.core.interfaces.IDistribution;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
@@ -1718,6 +1719,13 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		if (head().isBuiltInSymbol()) {
 			IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
 			return evaluator instanceof IDistribution;
+		}
+		return false;
+	}
+	public boolean isDiscreteDistribution() {
+		if (head().isBuiltInSymbol()) {
+			IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
+			return evaluator instanceof IDiscreteDistribution;
 		}
 		return false;
 	}

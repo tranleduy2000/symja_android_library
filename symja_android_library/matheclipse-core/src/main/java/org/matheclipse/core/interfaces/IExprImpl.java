@@ -796,6 +796,11 @@ public abstract class IExprImpl implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isDiscreteDistribution() {
+        return false;
+    }
+
     /**
      * Test if this expression is an AST list, which contains the given <b>header element</b> at index position
      * <code>0</code> and optional <b>argument elements</b> at the index positions <code>1..(length-1)</code>. If this

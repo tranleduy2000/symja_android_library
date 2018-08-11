@@ -617,11 +617,18 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isAST();
 
     /**
-     * Test if this expression is a Distribution AST (i.e. NormalDistribution(), PoissonDistribution(),...)
+     * Test if this expression is a distribution AST (i.e. NormalDistribution(), PoissonDistribution(),...)
      *
      * @return
      */
     boolean isDistribution();
+
+    /**
+     * Test if this expression is a discrete distribution AST (i.e. BinomialDistribution(), PoissonDistribution(),...)
+     *
+     * @return
+     */
+    boolean isDiscreteDistribution();
 
     /**
      * Test if this expression is an AST list, which contains the given <b>header element</b> at index position
@@ -1931,15 +1938,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>F.True, F.False or F.NIL</code
      */
     IExpr lessThan(IExpr that);
+
     /**
      * If this is a linear expression return the addedn at index 0 and the multiplicant at index 1
      *
-     * @param variable
-     *            th variable to check for linearity
-     *
+     * @param variable th variable to check for linearity
      * @return <code>null</code> if this is not a linear expression
      */
-     IExpr[] linear(IExpr variable);
+    IExpr[] linear(IExpr variable);
 
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>lower</code> value. If this is a
