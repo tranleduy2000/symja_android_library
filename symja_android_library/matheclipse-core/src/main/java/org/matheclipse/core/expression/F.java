@@ -1860,7 +1860,12 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Print = F.initFinalSymbol("Print", ID.Print);
 
-    /** Product(expr, {i, imin, imax}) - evaluates the discrete product of `expr` with `i` ranging from `imin` to `imax`.*/
+	/***/
+	public final static IBuiltInSymbol Probability = F.initFinalSymbol("Probability", ID.Probability);
+
+	/**
+	 * Product(expr, {i, imin, imax}) - evaluates the discrete product of `expr` with `i` ranging from `imin` to `imax`.
+	 */
 	public final static IBuiltInSymbol Product = F.initFinalSymbol("Product", ID.Product);
 
 	/** ProductLog(z) - returns the value of the Lambert W function at `z`.*/
@@ -4191,6 +4196,9 @@ public class F {
 		return value ? True : False;
 	}
 
+	public static IAST Boole(final IExpr a) {
+		return unaryAST1(Boole, a);
+	}
 	/**
 	 * <pre>
 	 * BooleanQ(expr)
