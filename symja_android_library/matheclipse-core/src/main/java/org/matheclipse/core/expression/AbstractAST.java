@@ -2298,6 +2298,10 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			// TODO add more functions
 			return arg1().isRealResult();
 		}
+		ISignedNumber e = evalReal();
+		if (e != null) {
+			return true;
+		}
 		if (isPlus() || isTimes()) {
 			// check if all arguments are &quot;real values&quot;
 			for (int i = 1; i < size(); i++) {

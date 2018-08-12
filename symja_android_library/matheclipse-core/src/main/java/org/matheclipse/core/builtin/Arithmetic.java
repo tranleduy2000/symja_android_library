@@ -4163,6 +4163,14 @@ public final class Arithmetic {
                 if (o1.isComplexInfinity()) {
                     return F.CComplexInfinity;
                 }
+				if (!o1.isZero()) {
+					if (o1.isNegativeResult()) {
+						return F.CNInfinity;
+					}
+					if (o1.isPositiveResult()) {
+						return F.CInfinity;
+					}
+				}
             }
             if (inf.isNegativeInfinity()) {
                 if (o1.isInfinity()) {
@@ -4174,6 +4182,14 @@ public final class Arithmetic {
                 if (o1.isComplexInfinity()) {
                     return F.CComplexInfinity;
                 }
+				if (!o1.isZero()) {
+					if (o1.isNegativeResult()) {
+						return F.CInfinity;
+					}
+					if (o1.isPositiveResult()) {
+						return F.CNInfinity;
+					}
+				}
             }
             if (inf.isAST1()) {
                 if (o1.isNumber() || o1.isSymbol()) {

@@ -5262,6 +5262,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLog() {
+		check("Log(a, 0)", "(-Infinity)/Log(a)");
+		check("Log(2, 0)", "-Infinity");
+		check("Log(3/4, 0)", "Infinity");
+		check("Log(-2, 0)", "(-Infinity)/(I*Pi+Log(2))");
 		check("Exp(Log(x))", "x");
 		check("Refine(Log(Exp(x)),Element(x, Reals))", "x");
 		check("Log({0, 1, E, E * E, E ^ 3, E ^ x})", "{-Infinity,0,1,2,3,Log(E^x)}");
@@ -7070,6 +7074,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPlus() {
+		check("-Infinity+0.0", "-Infinity");
+		check("Infinity+0.0", "Infinity");
+		check("-Infinity+Sin(-2)", "-Infinity");
+		check("-Infinity+Log(2)", "-Infinity");
+		check("Infinity+Sin(-2)", "Infinity");
+		check("Infinity+Log(2)", "Infinity");
 		check("{1,2}+{4,5,6}", "{1,2}+{4,5,6}");
 		check("2+4/3*2^b/c", "2+4/3*2^b/c");
 		check("Refine(Infinity+x, x>0)", "Infinity");
@@ -10281,6 +10291,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTimes() {
+		check("(-Infinity)/Sin(-2)", "Infinity");
+		check("(-Infinity)/(-2)", "Infinity");
+		check("(-Infinity)/Log(2)", "-Infinity");
+		check("(-Infinity)/2", "-Infinity");
 		// github #35
 		check(" y^2*y^(-0.6666) ", //
 				"y^1.3334");

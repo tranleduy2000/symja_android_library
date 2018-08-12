@@ -11,7 +11,7 @@ public interface ISignedNumber extends INumber {
      * {@inheritDoc}
      */
     @Override
-    public ISignedNumber abs();
+    ISignedNumber abs();
 
     /**
      * Get a <code>Apfloat</code> number wrapped into an <code>ApfloatNum</code> object.
@@ -19,19 +19,19 @@ public interface ISignedNumber extends INumber {
      * @param precision set the precision of the resulting ApfloatNum
      * @return this signed number represented as an ApfloatNum
      */
-    public ApfloatNum apfloatNumValue(long precision);
+    ApfloatNum apfloatNumValue(long precision);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public IExpr complexArg();
+    IExpr complexArg();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public INumber conjugate();
+    INumber conjugate();
 
     /**
      * Divide <code>this</code> signed number by <code>that</code> signed number.
@@ -39,42 +39,43 @@ public interface ISignedNumber extends INumber {
      * @param that a signed number
      * @return
      */
-    public ISignedNumber divideBy(ISignedNumber that);
+    ISignedNumber divideBy(ISignedNumber that);
 
     /**
      * Returns the value of the specified number as a {@code double}, which may involve rounding.
      *
      * @return the numeric value represented by this object after conversion to type {@code double}.
      */
-    public double doubleValue();
+    double doubleValue();
 
-    public IInteger floorFraction() throws ArithmeticException;
+    IInteger floorFraction() throws ArithmeticException;
+
     /**
      * Return the fractional part of this fraction
      *
      * @return
      */
-    public ISignedNumber fractionalPart();
+    ISignedNumber fractionalPart();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ISignedNumber inverse();
+    ISignedNumber inverse();
 
     /**
      * Test if <code>this</code> signed number is greater <code>than</code> that signed number..
      *
      * @return <code>this > that</code>
      */
-    public boolean isGreaterThan(ISignedNumber that);
+    boolean isGreaterThan(ISignedNumber that);
 
     /**
      * Test if <code>this</code> signed number is less <code>than</code> that signed number..
      *
      * @return <code>this < that</code>
      */
-    public boolean isLessThan(ISignedNumber that);
+    boolean isLessThan(ISignedNumber that);
 
     /**
      * Test if this number is negative.
@@ -82,7 +83,11 @@ public interface ISignedNumber extends INumber {
      * @return <code>true</code>, if <code>this < 0</code>
      */
     @Override
-    public boolean isNegative();
+    boolean isNegative();
+
+    boolean isNegativeResult();
+
+    boolean isNonNegativeResult();
 
     /**
      * Test if this number is positive.
@@ -90,13 +95,15 @@ public interface ISignedNumber extends INumber {
      * @return <code>true</code>, if <code>this > 0</code>
      */
     @Override
-    public boolean isPositive();
+    boolean isPositive();
+
+    boolean isPositiveResult();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isZero();
+    boolean isZero();
 
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>lower</code> value. If this is a
@@ -105,7 +112,7 @@ public interface ISignedNumber extends INumber {
      * @return <code>F.NIL</code> if this expression is no interval and no signed number.
      */
     @Override
-    public IExpr lower();
+    IExpr lower();
 
     /**
      * Returns (-1) * this
@@ -113,17 +120,17 @@ public interface ISignedNumber extends INumber {
      * @return
      */
     @Override
-    public ISignedNumber negate();
+    ISignedNumber negate();
 
     /**
      * Get a Java double number wrapped into a <code>Num</code> object.
      *
      * @return
      */
-    public INum numValue();
+    INum numValue();
 
     @Override
-    public ISignedNumber opposite();
+    ISignedNumber opposite();
 
     /**
      * Returns the closest <code>IInteger</code> to the argument. The result is rounded to an integer by adding 1/2 and
@@ -133,7 +140,7 @@ public interface ISignedNumber extends INumber {
      *
      * @return the closest integer to the argument.
      */
-    public IInteger round();
+    IInteger round();
 
     /**
      * Returns the signum function of this number (i.e., -1, 0 or 1 as the value of this number is negative, zero or
@@ -143,7 +150,7 @@ public interface ISignedNumber extends INumber {
      * 0 if this is a zero;<br/>
      * -1 if this is a negative number;
      */
-    public int sign();
+    int sign();
 
     /**
      * Subtract <code>that</code> signed number from <code>this</code> signed number
@@ -151,7 +158,7 @@ public interface ISignedNumber extends INumber {
      * @param that a signed number
      * @return
      */
-    public ISignedNumber subtractFrom(ISignedNumber that);
+    ISignedNumber subtractFrom(ISignedNumber that);
 
     /**
      * Converts this number to <code>int</code>; unlike {@link #intValue} this method raises {@link ArithmeticException}
@@ -160,7 +167,7 @@ public interface ISignedNumber extends INumber {
      * @return the numeric value represented by this integer after conversion to type <code>int</code>.
      * @throws ArithmeticException if conversion to <code>int</code> is not possible.
      */
-    public int toInt() throws ArithmeticException;
+    int toInt() throws ArithmeticException;
 
     /**
      * Converts this number to <code>long</code>; unlike {@link #longValue} this method raises
@@ -169,7 +176,7 @@ public interface ISignedNumber extends INumber {
      * @return the numeric value represented by this integer after conversion to type <code>long</code>.
      * @throws ArithmeticException if conversion to <code>long</code> is not possible.
      */
-    public long toLong() throws ArithmeticException;
+    long toLong() throws ArithmeticException;
 
     @Override
     IExpr unitStep();
@@ -181,5 +188,5 @@ public interface ISignedNumber extends INumber {
      * @return <code>F.NIL</code> if this expression is no interval and no signed number.
      */
     @Override
-    public IExpr upper();
+    IExpr upper();
 }

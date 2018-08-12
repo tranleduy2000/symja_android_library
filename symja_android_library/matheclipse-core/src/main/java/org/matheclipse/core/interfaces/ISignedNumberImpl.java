@@ -6,6 +6,21 @@ import org.matheclipse.core.expression.F;
  * Created by Duy on 2/20/2018.
  */
 public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNumber {
+    @Override
+    public boolean isPositiveResult() {
+        return isPositive();
+    }
+
+    @Override
+    public boolean isNegativeResult() {
+        return isNegative();
+    }
+
+    @Override
+    public boolean isNonNegativeResult() {
+        return !isNegative();
+    }
+
     /**
      * {@inheritDoc}
      */
