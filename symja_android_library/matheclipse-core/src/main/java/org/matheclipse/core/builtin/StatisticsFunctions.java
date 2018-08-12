@@ -2483,7 +2483,7 @@ public class StatisticsFunctions {
 				IAST list = (IAST) arg1;
 				int dim1 = list.argSize();
 				try {
-					if (dim1 >= 0 && ast.size() == 3) {
+					if (dim1 >= 0 && ast.size() >= 3) {
 
 						final IAST s = EvalAttributes.copySortLess(list);
 						final IInteger length = F.ZZ(s.argSize());
