@@ -344,8 +344,8 @@ public class Num extends INumImpl implements INum {
 	}
 
 	@Override
-	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators,
-			boolean usePrefix, boolean noSymbolPrefix) {
+	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators, boolean usePrefix,
+			boolean noSymbolPrefix) {
 		String prefix = usePrefix ? "F." : "";
 		return prefix + "num(" + fDouble + ")";
 	}
