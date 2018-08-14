@@ -2430,7 +2430,7 @@ public final class Programming {
 			int step = span[2];
 			return spanPart(ast, pos, arg1, arg2, start, last, step, p1, engine);
 		} else if (arg2.equals(F.All)) {
-			return spanPart(ast, pos, arg1, arg2, 1, arg1.size()-1, 1, p1, engine);
+			return spanPart(ast, pos, arg1, arg2, 1, arg1.size() - 1, 1, p1, engine);
 		} else if (arg2.isReal()) {
 			final int indx = Validate.checkIntType(ast, pos, Integer.MIN_VALUE);
 			IExpr result = null;
