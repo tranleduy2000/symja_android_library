@@ -266,7 +266,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 							return temp;
 						}
 					}
-					result = integrateByRubiRules(ast);
+					result = integrateByRubiRules(ast, F.NIL);
 					if (result.isPresent()) {
 						return result;
 					}
@@ -277,7 +277,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 						if (fxExpanded != fx) {
 							if (fxExpanded.isPolynomial(x)) {
 								if (arg1.isTimes()) {
-									result = integrateByRubiRules(ast);
+									result = integrateByRubiRules(ast, (IAST) fxExpanded);
 									if (result.isPresent()) {
 										return result;
 									}
@@ -345,9 +345,9 @@ public class Integrate extends AbstractFunctionEvaluator {
 						}
 					}
 
-					if (!ast.equalsAt(1, fxExpanded)) {
-						return integrateByRubiRules(ast);
-					}
+					// if (!ast.equalsAt(1, fxExpanded)) {
+					// return integrateByRubiRules(ast);
+					// }
 
 					final IExpr header = arg1AST.head();
 					if (arg1AST.size() >= 3) {
@@ -357,7 +357,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 								if (parts != null) {
 									// try Rubi rules first
 									if (!parts[0].isPolynomial(x) || !parts[1].isPolynomial(x)) {
-										result = integrateByRubiRules(ast);
+										result = integrateByRubiRules(ast, F.NIL);
 										if (result.isPresent()) {
 											return result;
 										}
@@ -374,7 +374,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 										return apartPlus;
 									}
 									if (parts[0].isPolynomial(x) && parts[1].isPolynomial(x)) {
-										result = integrateByRubiRules(ast);
+										result = integrateByRubiRules(ast, F.NIL);
 										if (result.isPresent()) {
 											return result;
 										}
@@ -395,7 +395,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 				// EvalEngine engine= EvalEngine.get();
 				// engine.setIterationLimit(8);
 				if (!calledRubi) {
-					return integrateByRubiRules(ast);
+					return integrateByRubiRules(ast, F.NIL);
 				}
 			}
 			// } else {
@@ -866,18 +866,35 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * expression.
 	 * 
 	 * @param ast
+	 * @param secondTry
+	 *            do a second attempt with an equivalent expression
 	 * @return
 	 */
-	private static IExpr integrateByRubiRules(IAST ast) {
+	private static IExpr integrateByRubiRules(IAST ast, IAST secondTry) {
 		ISymbol head = ast.arg1().topHead();
+		EvalEngine engine = EvalEngine.get();
+		int limit = engine.getRecursionLimit();
 		try {
 			// Issue #91
 			if ((head.getAttributes() & ISymbol.NUMERICFUNCTION) == ISymbol.NUMERICFUNCTION
 					|| INT_RUBI_FUNCTIONS.contains(head) || head.getSymbolName().startsWith("§")
 					|| head.getSymbolName().startsWith(UtilityFunctionCtors.INTEGRATE_PREFIX)) {
+				try {
+					if (limit <= 0 || limit > Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT) {
+						engine.setRecursionLimit(Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT);
+					}
+					// System.out.println(ast.toString());
 				IExpr temp = F.Integrate.evalDownRule(EvalEngine.get(), ast);
 				if (temp.isPresent()) {
 					return temp;
+				}
+				} catch (RecursionLimitExceeded rle) {
+					engine.setRecursionLimit(limit);
+					if (secondTry.isPresent()) {
+						return integrateByRubiRules(secondTry, F.NIL);
+					}
+				} finally {
+					engine.setRecursionLimit(limit);
 				}
 			}
 		} catch (AbortException ae) {
@@ -1186,18 +1203,18 @@ public class Integrate extends AbstractFunctionEvaluator {
 		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules132.RULES);
 		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules133.RULES);
 		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules134.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules135.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules136.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules137.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules138.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules139.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules135.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules136.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules137.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules138.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules139.RULES);
 
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules140.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules141.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules142.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules143.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules144.RULES);
-//		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules145.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules140.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules141.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules142.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules143.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules144.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules145.RULES);
 		// org.matheclipse.integrate.rubi45.UtilityFunctions.init();
 	}
 
@@ -1242,12 +1259,16 @@ public class Integrate extends AbstractFunctionEvaluator {
 		F.ISet(F.$s("§$InverseTrigFunctions"), F.List(F.ArcSin, F.ArcCos, F.ArcTan, F.ArcCot, F.ArcSec, F.ArcCsc));
 		F.ISet(F.$s("§$InverseHyperbolicFunctions"),
 				F.List(F.ArcSinh, F.ArcCosh, F.ArcTanh, F.ArcCoth, F.ArcSech, F.ArcCsch));
-		F.ISet(F.$s("§$CalculusFunctions"), F.List(F.D, Integrate, F.Sum, F.Product, F.Integrate)); // , F.Unintegrable,
-																									// F.CannotIntegrate,
-																									// F.Dif, F.Subst));
-		F.ISet(F.$s("§$StopFunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern, F.If, F.Integrate));// ,
-																											// F.Unintegrable,
-																											// F.CannotIntegrate));
+		F.ISet(F.$s("§$CalculusFunctions"),
+				F.List(F.D, Integrate, F.Sum, F.Product, F.Integrate,
+						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Unintegrable"),
+						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "CannotIntegrate"),
+						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Dif"),
+						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Subst")));
+		F.ISet(F.$s("§$StopFunctions"),
+				F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern, F.If, F.Integrate,
+						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Unintegrable"),
+						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "CannotIntegrate")));
 		F.ISet(F.$s("§$HeldFunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern));
 
 		F.ISet(UtilityFunctionCtors.FalseQ(F.False), F.True);
