@@ -224,7 +224,7 @@ public abstract class AbstractAssumptions implements IAssumptions {
 	 */
 	public static boolean assumeNonNegative(final IExpr expr) {
 		if (expr.isReal()) {
-			return !expr.isNegative();
+			return ((ISignedNumber) expr).isNonNegativeResult();
 		}
 		if (expr.isNumber()) {
 			return false;

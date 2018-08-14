@@ -1260,7 +1260,7 @@ public final class BooleanFunctions {
 		 *            the right-hand-side of the comparison
 		 * @return
 		 */
-		protected IExpr checkAssumptions(IExpr arg1, IExpr arg2) {
+		protected IExpr checkAssumptions(IExpr arg1, ISignedNumber arg2) {
 			if (arg2.isNegative()) {
 				// arg1 > "negative number"
 				if (arg1.isNonNegativeResult() || arg1.isPositiveResult()) {
@@ -1275,8 +1275,8 @@ public final class BooleanFunctions {
 					return F.False;
 				}
 			} else {
-				// arg1 > "positive number" > 0
-				if (arg1.isNegativeResult()) {
+				// arg1 < "positive number"
+				if (arg1.isNegativeResult() || arg1.isZero()) {
 					return F.False;
 				}
 			}
@@ -1405,7 +1405,7 @@ public final class BooleanFunctions {
 					// this part is used in other comparator operations like
 					// Less,
 					// GreaterEqual,...
-					IExpr temp2 = checkAssumptions(arg1, arg2);
+					IExpr temp2 = checkAssumptions(arg1, (ISignedNumber) arg2);
 					if (temp2.isPresent()) {
 						return temp2;
 					}
@@ -1613,7 +1613,7 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		protected IExpr checkAssumptions(IExpr arg1, IExpr arg2) {
+		protected IExpr checkAssumptions(IExpr arg1, ISignedNumber arg2) {
 			if (arg2.isNegative()) {
 				// arg1 >= "negative number"
 				if (arg1.isNonNegativeResult() || arg1.isPositiveResult()) {
@@ -1629,7 +1629,7 @@ public final class BooleanFunctions {
 				}
 			} else {
 				// arg1 >= "positive number" > 0
-				if (arg1.isNegativeResult()) {
+				if (arg1.isNegativeResult() || arg1.isZero()) {
 					return F.False;
 				}
 			}
@@ -1879,7 +1879,7 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		protected IExpr checkAssumptions(IExpr arg1, IExpr arg2) {
+		protected IExpr checkAssumptions(IExpr arg1, ISignedNumber arg2) {
 			if (arg2.isNegative()) {
 				// arg1 < "negative number"
 				if (arg1.isPositiveResult()) {
@@ -1896,7 +1896,7 @@ public final class BooleanFunctions {
 				}
 			} else {
 				// arg1 < "positive number"
-				if (arg1.isNegativeResult()) {
+				if (arg1.isNegativeResult() || arg1.isZero()) {
 					return F.True;
 				}
 			}
@@ -1954,7 +1954,7 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		protected IExpr checkAssumptions(IExpr arg1, IExpr arg2) {
+		protected IExpr checkAssumptions(IExpr arg1, ISignedNumber arg2) {
 			if (arg2.isNegative()) {
 				// arg1 <= "negative number"
 				if (arg1.isNonNegativeResult() || arg1.isPositiveResult()) {
@@ -1970,7 +1970,7 @@ public final class BooleanFunctions {
 				}
 			} else {
 				// arg1 <= "positive number"
-				if (arg1.isNegativeResult()) {
+				if (arg1.isNegativeResult() || arg1.isZero()) {
 					return F.True;
 				}
 			}
@@ -2074,7 +2074,7 @@ public final class BooleanFunctions {
 
 		private IExpr maximum(IAST list, boolean flattenedList) {
 			boolean evaled = false;
-			int j = 1;
+			// int j = 1;
 			IASTAppendable f = Lambda.remove(list, new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
