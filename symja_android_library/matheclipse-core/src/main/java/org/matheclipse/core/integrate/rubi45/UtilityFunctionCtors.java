@@ -1,5 +1,7 @@
 package org.matheclipse.core.integrate.rubi45;
 
+import com.duy.lambda.Predicate;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.expression.F;
@@ -80,7 +82,12 @@ public class UtilityFunctionCtors {
 						return ast.arg1().isFraction() ? F.True : F.False;
 					}
 					if (ast.size() > 2) {
-						return ast.forAll(x -> x.isFraction(), 1) ? F.True : F.False;
+						return ast.forAll(new Predicate<IExpr>() {
+							@Override
+							public boolean test(IExpr x) {
+								return x.isFraction();
+							}
+						}, 1) ? F.True : F.False;
 					}
 					return F.False;
 				}
@@ -94,7 +101,12 @@ public class UtilityFunctionCtors {
 						return ast.arg1().isInteger() ? F.True : F.False;
 					}
 					if (ast.size() > 2) {
-						return ast.forAll(x -> x.isInteger(), 1) ? F.True : F.False;
+						return ast.forAll(new Predicate<IExpr>() {
+							@Override
+							public boolean test(IExpr x) {
+								return x.isInteger();
+							}
+						}, 1) ? F.True : F.False;
 					}
 					return F.False;
 				}

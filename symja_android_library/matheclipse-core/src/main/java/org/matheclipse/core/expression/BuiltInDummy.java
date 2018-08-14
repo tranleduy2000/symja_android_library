@@ -648,7 +648,12 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		if (isConstant()) {
 			return true;
 		}
-		return variables.exists(x -> this.equals(x));
+		return variables.exists(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return BuiltInDummy.this.equals(x);
+			}
+		});
 	}
 
 	/** {@inheritDoc} */

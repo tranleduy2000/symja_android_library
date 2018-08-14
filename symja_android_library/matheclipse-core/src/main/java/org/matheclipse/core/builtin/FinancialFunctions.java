@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Function;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
@@ -49,7 +51,12 @@ public class FinancialFunctions {
 			if (ast.size() == 2) {
 				int dim = a.isVector();
 				if (dim >= 0) {
-					IAST l = ((IAST) a).map(x -> x.inc(), 1);
+					IAST l = ((IAST) a).map(new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
+							return x.inc();
+						}
+					}, 1);
 					return
 					// [$ -1 + GeometricMean(l) $]
 					F.Plus(F.CN1, F.GeometricMean(l)); // $$;
@@ -60,7 +67,12 @@ public class FinancialFunctions {
 				final IExpr b = ast.arg2();
 				int dim = a.isVector();
 				if (dim >= 0) {
-					return ((IAST) a).map(x -> effectiveInterestFormula(x, b), 1);
+					return ((IAST) a).map(new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
+							return EffectiveInterest.this.effectiveInterestFormula(x, b);
+						}
+					}, 1);
 				}
 				return effectiveInterestFormula(a, b);
 			}
