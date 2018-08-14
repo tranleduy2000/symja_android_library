@@ -218,13 +218,13 @@ public class Num extends INumImpl implements INum {
 	/** {@inheritDoc} */
 	@Override
 	public IExpr dec() {
-		return add(F.CND1);
+		return valueOf(fDouble - 1.0);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public IExpr inc() {
-		return add(F.CD1);
+		return valueOf(fDouble + 1.0);
 	}
 
 	/** {@inheritDoc} */

@@ -90,7 +90,7 @@ import edu.jas.kern.ComputerThreads;
  * 
  */
 public class F {
-	private final static IBuiltInSymbol[] BUILT_IN_SYMBOLS = new IBuiltInSymbol[ID.Zeta + 1];
+	private final static IBuiltInSymbol[] BUILT_IN_SYMBOLS = new IBuiltInSymbol[ID.Zeta + 10];
 
 
 	/**
@@ -729,6 +729,8 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol EasterSunday = F.initFinalSymbol("EasterSunday", ID.EasterSunday);
 
+    /***/
+    public final static IBuiltInSymbol EffectiveInterest = F.initFinalSymbol("EffectiveInterest", ID.EffectiveInterest);
 	/** Eigenvalues(matrix) - get the numerical eigenvalues of the `matrix`.*/
 	public final static IBuiltInSymbol Eigenvalues = F.initFinalSymbol("Eigenvalues", ID.Eigenvalues);
 
@@ -2316,6 +2318,7 @@ public class F {
 	/** TimesBy(x, dx) - is equivalent to `x = x * dx`.*/
 	public final static IBuiltInSymbol TimesBy = F.initFinalSymbol("TimesBy", ID.TimesBy);
 
+    public final static IBuiltInSymbol TimeValue = F.initFinalSymbol("TimeValue", ID.TimeValue);
 	/***/
 	public final static IBuiltInSymbol Timing = F.initFinalSymbol("Timing", ID.Timing);
 
@@ -2389,7 +2392,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Unevaluated = F.initFinalSymbol("Unevaluated", ID.Unevaluated);
 
-    /***/
+    /** UniformDistribution({min, max}) - returns a uniform distribution.*/
     public final static IBuiltInSymbol UniformDistribution = F.initFinalSymbol("UniformDistribution", ID.UniformDistribution);
 	/** Union(set1, set2) - get the union set from `set1` and `set2`.*/
 	public final static IBuiltInSymbol Union = F.initFinalSymbol("Union", ID.Union);
@@ -3245,6 +3248,7 @@ public class F {
 			CurveFitterFunctions.initialize();
 			VectorAnalysisFunctions.initialize();
 			QuantityFunctions.initialize();
+			FinancialFunctions.initialize();
 			ComputationalGeometryFunctions.initialize();
 
 			// initialize only the utility function rules for Integrate
@@ -5549,6 +5553,9 @@ public class F {
 		return binaryAST2(GegenbauerC, a0, a1);
 	}
 
+	public static IAST GeometricMean(final IExpr a0) {
+		return unaryAST1(GeometricMean, a0);
+	}
 	public static IAST Grad(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Grad, a0, a1);
 	}
