@@ -772,6 +772,9 @@ public class SpecialFunctions {
 			super.setUp(newSymbol);
 		}
 
+		public IExpr e1ObjArg(final IExpr o) {
+			return F.NIL;
+		}
 		@Override
 		public IExpr e2ObjArg(IExpr k, IExpr z) {
 			// ProductLog(0,z_) := ProductLog(z)

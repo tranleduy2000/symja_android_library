@@ -1217,6 +1217,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "-12600,15120,-5040,-1,16,56,-168,112,-1008,1344,70,-1680,-1260,10080,-8400,-1680,\n"
 						+ "6720,20160,-67200,40320,2520,-50400,151200,-141120,40320}");
 
+		check("Coefficient(x*y,y,Exponent(x*y,y))", //
+				"x");
 		check("Coefficient(-3*a(1)*(2*a(1)^2-a(2))+3*a(1)*a(2)-a(3),a(1)*a(2))", //
 				"6");
 
@@ -3646,6 +3648,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testFreeQ() {
 		// see notes for MemberQ
+		check("FreeQ(Sin(x*y),Sin)", "False");
+		check("s=Sin;FreeQ(Sin(x*y),s)", "False");
 		check("FreeQ(x_+y_+z_)[a+b]", "True");
 		check("FreeQ(a + b + c, a + c)", "False");
 	}
@@ -4427,10 +4431,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("Limit(1/9*x*(9-x^2)^(3/2)*Hypergeometric2F1(1,2,3/2,x^2/9),x->3)", //
 		// "");
 		check("Integrate(Sqrt(9-x^2),x)", //
-				"(x*(9-x^2)^(3/2)*(1/3*Sqrt(1-x^2/9)*Sqrt(x^2)+ArcSin(Sqrt(x^2)/3)))/(6*(1-x^2/9)^(\n"
-						+ "3/2)*Sqrt(x^2))");
+				"3*x*Hypergeometric2F1(-1/2,1/2,3/2,x^2/9)");
 		check("Integrate(Sqrt(9-x^2),{x,0,3})", //
-				"Integrate(Sqrt(9-x^2),{x,0,3})");
+				"9*Hypergeometric2F1(-1/2,1/2,3/2,1)");
 		check("Integrate({Sin(x),Cos(x)},x)", //
 				"{-Cos(x),Sin(x)}");
 		check("Integrate({Sin(x),Cos(x)},{x,a,b})", //
@@ -6982,6 +6985,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// OptionValue(a), OptionValue(b)}", "");
 	}
 
+	public void testPatternSequence() {
+		check("integersQ(__Integer) = True", //
+				"True");
+		check("integersQ(__) = False", //
+				"False");
+		check("integersQ(1,2,3)", "True");
+		check("integersQ(1,2,a)", "False");
+	}
 	public void testPatternTest() {
 		check("MatchQ(3, _Integer?(#>0&))", "True");
 		check("MatchQ(-3, _Integer?(#>0&))", "False");
@@ -8302,6 +8313,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Refine(Arg(x), Assumptions -> x>0)", "0");
 		check("Refine(Arg(x), Assumptions -> x<0)", "Pi");
 
+		check("Refine(x==0)", //
+				"x==0");
 	}
 
 	public void testReplace() {

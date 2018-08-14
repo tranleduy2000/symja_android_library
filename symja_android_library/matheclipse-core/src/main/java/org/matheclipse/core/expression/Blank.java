@@ -123,6 +123,9 @@ public class Blank extends IPatternImpl implements IPattern {
 			result[0] = IAST.CONTAINS_PATTERN;
 			result[1] = 5;
 		}
+		if (fCondition!=null) {
+			result[1] += 2;
+		}
 		return result;
 	}
 

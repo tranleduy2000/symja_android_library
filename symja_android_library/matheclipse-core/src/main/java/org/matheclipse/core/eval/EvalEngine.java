@@ -1017,7 +1017,8 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @param noEvaluation
 	 *            (sub-)expressions which contain no patterns should not be evaluated
-	 * @param evalNumericFunction TODO
+	 * @param evalNumericFunction
+	 *            TODO
 	 * @return <code>ast</code> if no evaluation was executed.
 	 */
 	public IExpr evalHoldPattern(IAST ast, boolean noEvaluation, boolean evalNumericFunction) {

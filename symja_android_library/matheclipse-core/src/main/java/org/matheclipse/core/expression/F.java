@@ -2534,6 +2534,8 @@ public class F {
 	public final static ISymbol CSymbol = initFinalHiddenSymbol("C");
 	public final static ISymbol FSymbol = initFinalHiddenSymbol("F");
 	public final static ISymbol GSymbol = initFinalHiddenSymbol("G");
+	public final static ISymbol PSymbol = initFinalHiddenSymbol("P");
+	public final static ISymbol QSymbol = initFinalHiddenSymbol("Q");
 
 	public final static IPattern a_ = initPredefinedPattern(a);
 	public final static IPattern b_ = initPredefinedPattern(b);
@@ -2571,6 +2573,10 @@ public class F {
 	public final static IPattern C_ = initPredefinedPattern(CSymbol);
 	public final static IPattern F_ = initPredefinedPattern(FSymbol);
 	public final static IPattern G_ = initPredefinedPattern(GSymbol);
+	public final static IPattern P_ = initPredefinedPattern(PSymbol);
+	public final static IPattern Q_ = initPredefinedPattern(QSymbol);
+	public final static IPattern P_ = initPredefinedPattern(PSymbol);
+	public final static IPattern Q_ = initPredefinedPattern(QSymbol);
 
 	public final static IPattern m_Integer = new Pattern(m, F.Integer);
 	public final static IPattern n_Integer = new Pattern(n, F.Integer);

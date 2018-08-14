@@ -89,6 +89,9 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 		int[] result = new int[2];
 		result[0] = IAST.CONTAINS_PATTERN_SEQUENCE;
 		result[1] = 1;
+		if (fCondition!=null) {
+			result[1] += 2;
+		}
 		return result;
 	}
 

@@ -21,6 +21,7 @@
   FresnelC->Cos((Pi*#^2)/2),
   FresnelS->Sin((Pi*#^2)/2),
   Gamma->Gamma(#)*PolyGamma(#),
+  HarmonicNumber->(Pi^2)/6 - HarmonicNumber(#, 2),
   HeavisideTheta->DiracDelta(#),
   IntegerPart->0,
   InverseErf->(1/2*Sqrt(Pi)*E^(InverseErf(x)^2)),
@@ -39,7 +40,9 @@
   Tan->Sec(#)^2,
   Tanh->Sech(#)^(2),
   Sec->Sec(#)*Tan(#),
-  Sech->(-1)*Tanh(#)*Sech(#)
+  Sech->(-1)*Tanh(#)*Sech(#),
+  SinIntegral->Sinc(#),
+  CosIntegral->Cos(#)/#
 },
 {
   ArcSin->#*(1-#^2)^(-3/2),
