@@ -1192,6 +1192,12 @@ public class Integrate extends AbstractFunctionEvaluator {
 		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules138.RULES);
 		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules139.RULES);
 
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules140.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules141.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules142.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules143.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules144.RULES);
+		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules145.RULES);
 		// org.matheclipse.integrate.rubi45.UtilityFunctions.init();
 	}
 
