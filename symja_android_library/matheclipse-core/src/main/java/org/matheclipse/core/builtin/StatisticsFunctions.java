@@ -13,6 +13,7 @@ import org.apfloat.ApfloatMath;
 import org.hipparchus.distribution.RealDistribution;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
+import org.hipparchus.random.RandomDataGenerator;
 import org.hipparchus.stat.StatUtils;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
@@ -96,6 +97,7 @@ public class StatisticsFunctions {
 		F.StandardDeviation.setEvaluator(new StandardDeviation());
 		F.Standardize.setEvaluator(new Standardize());
 		F.StudentTDistribution.setEvaluator(new StudentTDistribution());
+		F.UniformDistribution.setEvaluator(new UniformDistribution());
 		F.Variance.setEvaluator(new Variance());
 		F.WeibullDistribution.setEvaluator(new WeibullDistribution());
 	}
@@ -1071,7 +1073,7 @@ public class StatisticsFunctions {
 	}
 
 	private final static class GammaDistribution extends IDistributionFunctionImpl
-			implements IDistribution, IVariance, IPDF, ICDF {
+			implements IDistribution, IRandomVariate, IVariance, IPDF, ICDF {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1142,6 +1144,19 @@ public class StatisticsFunctions {
 				IExpr d = dist.arg4();
 				// (a,b,g,d) => d + b*InverseGammaRegularized(a, 1/2)^(1/g)
 				return F.Plus(d, F.Times(b, F.Power(F.InverseGammaRegularized(a, F.C1D2), F.Power(g, -1))));
+			}
+			return F.NIL;
+		}
+		@Override
+		public IExpr randomVariate(Random random, IAST dist) {
+			if (dist.isAST2()) {
+				//
+				ISignedNumber a = dist.arg1().evalReal();
+				ISignedNumber b = dist.arg2().evalReal();
+				if (a != null && b != null) {
+					RandomDataGenerator rdg = new RandomDataGenerator();
+					return F.num(rdg.nextGamma(a.doubleValue(), b.doubleValue()));
+				}
 			}
 			return F.NIL;
 		}
@@ -3280,7 +3295,8 @@ public class StatisticsFunctions {
 								return variate.randomVariate(random, dist);
 							}
 						}
-					} catch (Exception ex) {
+					} catch (RuntimeException ex) {
+						engine.printMessage("RandomVariate: " + ex.getMessage());
 						if (Config.SHOW_STACKTRACE) {
 							ex.printStackTrace();
 						}
@@ -3642,6 +3658,113 @@ public class StatisticsFunctions {
 
 	}
 
+	private final static class UniformDistribution extends IDistributionFunctionImpl
+			implements IDistribution, IVariance, ICDF, IPDF, IRandomVariate {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 2);
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr mean(IAST dist) {
+			IExpr[] minMax = minmax(dist);
+			if (minMax != null) {
+				// (max + min)/2
+				return F.Times(F.C1D2, F.Plus(minMax[0], minMax[1]));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr median(IAST dist) {
+			IExpr[] minMax = minmax(dist);
+			if (minMax != null) {
+				IExpr l = minMax[0];
+				IExpr r = minMax[1];
+				return
+				// [$ (l + r)/2 $]
+				F.Times(F.C1D2, F.Plus(l, r)); // $$;
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr variance(IAST dist) {
+			IExpr[] minMax = minmax(dist);
+			if (minMax != null) {
+				IExpr l = minMax[0];
+				IExpr r = minMax[1];
+				return
+				// [$ (1/12)*(l - r)^2 $]
+				F.Times(F.QQ(1L, 12L), F.Sqr(F.Plus(l, F.Negate(r)))); // $$;
+			}
+
+			return F.NIL;
+		}
+
+		public IExpr[] minmax(IAST dist) {
+			if (dist.size() == 2 && dist.arg1().isList()) {
+				IAST list = (IAST) dist.arg1();
+				if (list.isAST2()) {
+					IExpr l = list.arg1();
+					IExpr r = list.arg2();
+					return new IExpr[] { l, r };
+				}
+			} else if (dist.size() == 1) {
+				return new IExpr[] { F.C0, F.C1 };
+			}
+			return null;
+		}
+
+		@Override
+		public IExpr cdf(IAST dist, IExpr k) {
+			IExpr[] minMax = minmax(dist);
+			if (minMax != null) {
+				IExpr a = minMax[0];
+				IExpr b = minMax[1];
+				IExpr function =
+						// [$ Piecewise({{(# - a)/(b - a), a <= # <= b}, {1, # > b}}, 0) & $]
+						F.Function(
+								F.Piecewise(F.List(
+										F.List(F.Times(F.Power(F.Plus(F.Negate(a), b), -1),
+												F.Plus(F.Negate(a), F.Slot1)), F.LessEqual(a, F.Slot1, b)),
+										F.List(F.C1, F.Greater(F.Slot1, b))), F.C0)); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr pdf(IAST dist, IExpr k) {
+			IExpr[] minMax = minmax(dist);
+			if (minMax != null) {
+				IExpr a = minMax[0];
+				IExpr b = minMax[1];
+				IExpr function =
+						// [$ Piecewise({{1/(b - a), a <= # <= b}}, 0)& $]
+						F.Function(F.Piecewise(
+								F.List(F.List(F.Power(F.Plus(F.Negate(a), b), -1), F.LessEqual(a, F.Slot1, b))), F.C0)); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr randomVariate(Random random, IAST dist) {
+			IExpr[] minMax = minmax(dist);
+			if (minMax != null) {
+				ISignedNumber min = minMax[0].evalReal();
+				ISignedNumber max = minMax[1].evalReal();
+				if (min != null && max != null) {
+					RandomDataGenerator rdg = new RandomDataGenerator();
+					return F.num(rdg.nextUniform(min.doubleValue(), max.doubleValue()));
+				}
+			}
+			return F.NIL;
+		}
+	}
 	/**
 	 * <pre>
 	 * Variance(list)
