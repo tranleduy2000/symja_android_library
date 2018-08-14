@@ -16,7 +16,6 @@ import java.io.StringWriter;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 
 /**
  * Tests system.reflection classes
@@ -54,22 +53,22 @@ public abstract class AbstractTestCase extends TestCase {
                 assertEquals(expectedResult, evaledResult);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertEquals("", "1");
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            fail(throwable.getMessage());
         }
     }
 
-    private String evals(final ScriptEngine scriptEngine, final String evalString) throws Exception {
+    private String evals(final ScriptEngine scriptEngine, final String evalString) throws Throwable {
         final String[] result = new String[1];
-        final Exception[] exceptions = new Exception[1];
+        final Throwable[] exceptions = new Throwable[1];
         ThreadGroup group = new ThreadGroup("CalculateThread");
         Thread thread = new Thread(group, new Runnable() {
             @Override
             public void run() {
                 try {
                     result[0] = (String) scriptEngine.eval(evalString);
-                } catch (ScriptException e) {
+                } catch (Throwable e) {
                     exceptions[0] = e;
                 }
             }
