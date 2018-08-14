@@ -191,6 +191,11 @@ public class F {
 	/** AngleVector(phi) - returns the point at angle `phi` on the unit circle.*/
 	public final static IBuiltInSymbol AngleVector = F.initFinalSymbol("AngleVector", ID.AngleVector);
 
+    /***/
+    public final static IBuiltInSymbol Annuity = F.initFinalSymbol("Annuity", ID.Annuity);
+
+    /***/
+    public final static IBuiltInSymbol AnnuityDue = F.initFinalSymbol("AnnuityDue", ID.AnnuityDue);
 	/***/
 	public final static IBuiltInSymbol AntiSymmetric = F.initFinalSymbol("AntiSymmetric", ID.AntiSymmetric);
 
