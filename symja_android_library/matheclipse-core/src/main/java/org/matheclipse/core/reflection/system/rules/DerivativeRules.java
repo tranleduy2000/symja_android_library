@@ -25,6 +25,7 @@ import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CN2;
 import static org.matheclipse.core.expression.F.Ceiling;
 import static org.matheclipse.core.expression.F.Cos;
+import static org.matheclipse.core.expression.F.*;
 import static org.matheclipse.core.expression.F.Cosh;
 import static org.matheclipse.core.expression.F.Cot;
 import static org.matheclipse.core.expression.F.Coth;

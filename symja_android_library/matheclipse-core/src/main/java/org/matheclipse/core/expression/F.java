@@ -62,6 +62,7 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
+import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
@@ -156,7 +157,7 @@ public class F {
 	 */
 	public final static NILPointer NIL = new NILPointer();
 
-	/** Abort() - aborts an evaluation completely and returns `$Aborted`.*/
+	/** Abort() - aborts an evaluation completely and returns `$Aborted`. */
 	public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
 
 	/** Abs(expr) - returns the absolute value of the real or complex number `expr`.*/
@@ -7535,36 +7536,36 @@ public class F {
 	}
 
 	public static IBuiltInSymbol localFunction(final String symbolName, Function<IExpr, IExpr> function) {
-		IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
-		localBuittIn.setEvaluator(new AbstractCoreFunctionEvaluator() {
+		return localFunction(symbolName, new AbstractCoreFunctionEvaluator() {
 			@Override
 			public IExpr evaluate(IAST ast, EvalEngine engine) {
 				return function.apply(ast.arg1());
 			}
 		});
+	}
+
+	public static IBuiltInSymbol localFunction(final String symbolName, IEvaluator evaluator) {
+		IBuiltInSymbol localBuittIn = new BuiltInDummy(symbolName);
+		localBuittIn.setEvaluator(evaluator);
 		return localBuittIn;
 	}
 
 	public static IBuiltInSymbol localBiPredicate(final String symbolName, BiPredicate<IExpr, IExpr> function) {
-		IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
-		localBuittIn.setEvaluator(new AbstractCoreFunctionEvaluator() {
+		return localFunction(symbolName,new AbstractCoreFunctionEvaluator() {
 			@Override
 			public IExpr evaluate(IAST ast, EvalEngine engine) {
 				return F.bool(function.test(ast.arg1(), ast.arg2()));
 			}
 		});
-		return localBuittIn;
 	}
 
 	public static IBuiltInSymbol localPredicate(final String symbolName, Predicate<IExpr> function) {
-		IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
-		localBuittIn.setEvaluator(new AbstractCoreFunctionEvaluator() {
+		return localFunction(symbolName,new AbstractCoreFunctionEvaluator() {
 			@Override
 			public IExpr evaluate(IAST ast, EvalEngine engine) {
 				return F.bool(function.test(ast.arg1()));
 			}
 		});
-		return localBuittIn;
 	}
 
 	/**
