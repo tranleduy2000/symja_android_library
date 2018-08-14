@@ -2575,8 +2575,6 @@ public class F {
 	public final static IPattern G_ = initPredefinedPattern(GSymbol);
 	public final static IPattern P_ = initPredefinedPattern(PSymbol);
 	public final static IPattern Q_ = initPredefinedPattern(QSymbol);
-	public final static IPattern P_ = initPredefinedPattern(PSymbol);
-	public final static IPattern Q_ = initPredefinedPattern(QSymbol);
 
 	public final static IPattern m_Integer = new Pattern(m, F.Integer);
 	public final static IPattern n_Integer = new Pattern(n, F.Integer);
@@ -6071,6 +6069,13 @@ public class F {
 			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
 		}
 		PatternMatching.setDelayedDownRule(lhs, rhs, true);
+		return F.NIL;
+	}
+	public static IAST ISetDelayed(int priority,final IExpr lhs, final IExpr rhs) {
+		if (lhs.isAST()) {
+			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
+		}
+		PatternMatching.setDelayedDownRule(priority,lhs, rhs, true);
 		return F.NIL;
 	}
 

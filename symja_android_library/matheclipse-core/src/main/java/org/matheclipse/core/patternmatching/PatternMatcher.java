@@ -560,6 +560,9 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 		return fLHSPriority;
 	}
 
+	public void setLHSPriority(final int priority) {
+		fLHSPriority = priority;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;

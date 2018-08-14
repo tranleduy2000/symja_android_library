@@ -1028,6 +1028,9 @@ public final class Programming {
 				rememberModuleVariables(intializerList, varAppend, moduleVariables, engine);
 				IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine));
 				if (subst.isPresent()) {
+					// IExpr temp= engine.evaluate(subst);
+					// System.out.println(temp.toString());
+					// return temp;
 					return engine.evaluate(subst);
 				}
 				return arg2;
@@ -1826,8 +1829,6 @@ public final class Programming {
 
 		}
 
-		public TimeConstrained() {
-		}
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -2730,6 +2731,7 @@ public final class Programming {
 	 * @param expr
 	 * @param element
 	 * @param partPosition
+	 * @param pos
 	 * @param result
 	 *            will be cloned if an assignment occurs and returned by this method
 	 * @param position
