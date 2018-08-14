@@ -30,6 +30,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.Monomial;
 
+import static org.matheclipse.core.expression.F.$s;
 import static org.matheclipse.core.expression.F.ArcTan;
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
@@ -1254,25 +1255,25 @@ public class Integrate extends AbstractFunctionEvaluator {
 		// }
 		// hack for TimeConstrained time limit:
 		// F.ISet(F.$s("§timelimit"), F.integer(12));
-		F.ISet(F.$s("§$timelimit"), F.integer(12));
+		F.ISet($s("§$timelimit"), F.integer(12));
 
 		UtilityFunctionCtors.ReapList.setAttributes(ISymbol.HOLDFIRST);
-		F.ISet(F.$s("§$trigfunctions"), F.List(F.Sin, F.Cos, F.Tan, F.Cot, F.Sec, F.Csc));
-		F.ISet(F.$s("§$hyperbolicfunctions"), F.List(F.Sinh, F.Cosh, F.Tanh, F.Coth, F.Sech, F.Csch));
-		F.ISet(F.$s("§$inverseTrigfunctions"), F.List(F.ArcSin, F.ArcCos, F.ArcTan, F.ArcCot, F.ArcSec, F.ArcCsc));
-		F.ISet(F.$s("§$inversehyperbolicfunctions"),
+		F.ISet($s("§$trigfunctions"), F.List(F.Sin, F.Cos, F.Tan, F.Cot, F.Sec, F.Csc));
+		F.ISet($s("§$hyperbolicfunctions"), F.List(F.Sinh, F.Cosh, F.Tanh, F.Coth, F.Sech, F.Csch));
+		F.ISet($s("§$inverseTrigfunctions"), F.List(F.ArcSin, F.ArcCos, F.ArcTan, F.ArcCot, F.ArcSec, F.ArcCsc));
+		F.ISet($s("§$inversehyperbolicfunctions"),
 				F.List(F.ArcSinh, F.ArcCosh, F.ArcTanh, F.ArcCoth, F.ArcSech, F.ArcCsch));
-		F.ISet(F.$s("§$calculusfunctions"),
+		F.ISet($s("§$calculusfunctions"),
 				F.List(F.D, Integrate, F.Sum, F.Product, F.Integrate,
 						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Unintegrable"),
 						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "CannotIntegrate"),
 						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Dif"),
 						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Subst")));
-		F.ISet(F.$s("§$stopfunctions"),
+		F.ISet($s("§$stopfunctions"),
 				F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern, F.If, F.Integrate,
 						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Unintegrable"),
 						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "CannotIntegrate")));
-		F.ISet(F.$s("§$heldfunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern));
+		F.ISet($s("§$heldfunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern));
 
 
 		F.ISet(UtilityFunctionCtors.IntegerPowerQ, //
