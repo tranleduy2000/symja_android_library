@@ -170,7 +170,7 @@ public class EvalDoubleTestCase extends TestCase {
 		try {
 			TreeSet<String> result = new TreeSet<String>();
 			DoubleEvaluator.getVariables("a+2*b+$c", result);
-			Assert.assertEquals(result, "[$c, a, b]");
+			Assert.assertEquals(result.toString(), "[$c, a, b]");
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.assertEquals("", e.getMessage());
