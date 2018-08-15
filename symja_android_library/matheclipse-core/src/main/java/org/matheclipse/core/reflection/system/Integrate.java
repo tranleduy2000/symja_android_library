@@ -1,35 +1,5 @@
 package org.matheclipse.core.reflection.system;
 
-import com.duy.lambda.BiFunction;
-import com.duy.lambda.Predicate;
-
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.builtin.Algebra;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.AbortException;
-import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
-import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.expression.ASTSeriesData;
-import org.matheclipse.core.expression.Context;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.Symbol;
-import org.matheclipse.core.generic.Predicates;
-import org.matheclipse.core.integrate.rubi.UtilityFunctionCtors;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.polynomials.PartialFractionIntegrateGenerator;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import edu.jas.arith.BigInteger;
-import edu.jas.arith.BigRational;
-import edu.jas.poly.ExpVector;
-import edu.jas.poly.GenPolynomial;
-import edu.jas.poly.Monomial;
-
 import static org.matheclipse.core.expression.F.$s;
 import static org.matheclipse.core.expression.F.ArcTan;
 import static org.matheclipse.core.expression.F.C1;
@@ -47,22 +17,51 @@ import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Sqrt;
 import static org.matheclipse.core.expression.F.Times;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
+
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.Algebra;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.AbortException;
+import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
+import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.expression.ASTSeriesData;
+import org.matheclipse.core.expression.Context;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.Symbol;
+import org.matheclipse.core.generic.Predicates;
+import org.matheclipse.core.integrate.rubi.UtilityFunctionCtors;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IBuiltInSymbol;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.polynomials.PartialFractionIntegrateGenerator;
+
+import edu.jas.arith.BigInteger;
+import edu.jas.arith.BigRational;
+import edu.jas.poly.ExpVector;
+import edu.jas.poly.GenPolynomial;
+import edu.jas.poly.Monomial;
+
 /**
  * <pre>
  * Integrate(f, x)
  * </pre>
- *
+ * 
  * <blockquote>
  * <p>
  * integrates <code>f</code> with respect to <code>x</code>. The result does not contain the additive integration
  * constant.
  * </p>
  * </blockquote>
- *
+ * 
  * <pre>
  * Integrate(f, {x,a,b})
  * </pre>
- *
+ * 
  * <blockquote>
  * <p>
  * computes the definite integral of <code>f</code> with respect to <code>x</code> from <code>a</code> to
@@ -73,11 +72,11 @@ import static org.matheclipse.core.expression.F.Times;
  * See: <a href="https://en.wikipedia.org/wiki/Integral">Wikipedia: Integral</a>
  * </p>
  * <h3>Examples</h3>
- *
+ * 
  * <pre>
  * &gt;&gt; Integrate(x^2, x)
  * x^3/3
- *
+ * 
  * &gt;&gt; Integrate(Tan(x) ^ 5, x)
  * -Log(Cos(x))-Tan(x)^2/2+Tan(x)^4/4
  * </pre>
@@ -124,12 +123,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			if (holdallAST.size() > 3) {
 				// reduce arguments by folding Integrate[fxy, x, y] to
 				// Integrate[Integrate[fxy, y], x] ...
-				return holdallAST.foldRight(new BiFunction<IExpr, IExpr, IExpr>() {
-                    @Override
-                    public IExpr apply(IExpr x, IExpr y) {
-                        return engine.evaluate(F.Integrate(x, y));
-                    }
-                }, arg1, 2);
+				return holdallAST.foldRight((x, y) -> engine.evaluate(F.Integrate(x, y)), arg1, 2);
 			}
 
 			IExpr arg2 = engine.evaluateNull(holdallAST.arg2());
@@ -887,10 +881,10 @@ public class Integrate extends AbstractFunctionEvaluator {
 						engine.setRecursionLimit(Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT);
 					}
 					// System.out.println(ast.toString());
-				IExpr temp = F.Integrate.evalDownRule(EvalEngine.get(), ast);
-				if (temp.isPresent()) {
-					return temp;
-				}
+					IExpr temp = F.Integrate.evalDownRule(EvalEngine.get(), ast);
+					if (temp.isPresent()) {
+						return temp;
+					}
 				} catch (RecursionLimitExceeded rle) {
 					engine.setRecursionLimit(limit);
 					if (secondTry.isPresent()) {
@@ -958,7 +952,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * @param restTimes
 	 *            the non-polynomil terms part
 	 */
-	private static void collectPolynomialTerms(final IAST timesAST, IExpr symbol, IASTAppendable polyTimes, IASTAppendable restTimes) {
+	private static void collectPolynomialTerms(final IAST timesAST, IExpr symbol, IASTAppendable polyTimes,
+			IASTAppendable restTimes) {
 		IExpr temp;
 		for (int i = 1; i < timesAST.size(); i++) {
 			temp = timesAST.get(i);
@@ -988,7 +983,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * @param restTimes
 	 *            the non-polynomil terms part
 	 */
-	private static void collectFreeTerms(final IAST timesAST, ISymbol x, IASTAppendable freeTimes, IASTAppendable restTimes) {
+	private static void collectFreeTerms(final IAST timesAST, ISymbol x, IASTAppendable freeTimes,
+			IASTAppendable restTimes) {
 		IExpr temp;
 		for (int i = 1; i < timesAST.size(); i++) {
 			temp = timesAST.get(i);
@@ -1218,6 +1214,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules143.RULES);
 		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules144.RULES);
 		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules145.RULES);
+
 		// org.matheclipse.integrate.rubi45.UtilityFunctions.init();
 	}
 
@@ -1239,8 +1236,10 @@ public class Integrate extends AbstractFunctionEvaluator {
 		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions4.RULES;
 		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions5.RULES;
 		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions6.RULES;
+
 		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions7.RULES;
 		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions8.RULES;
+
 		org.matheclipse.core.integrate.rubi.UtilityFunctions.init();
 		return ast;
 	}
@@ -1253,10 +1252,12 @@ public class Integrate extends AbstractFunctionEvaluator {
 		// if (Config.LOAD_SERIALIZED_RULES) {
 		// initSerializedRules(symbol);
 		// }
+
 		// hack for TimeConstrained time limit:
+
 		// F.ISet(F.$s("§timelimit"), F.integer(12));
 		F.ISet(F.$s("§$timelimit"), F.integer(12));
-
+		F.ISet(F.$s("§$showsteps"), F.False);
 		UtilityFunctionCtors.ReapList.setAttributes(ISymbol.HOLDFIRST);
 		F.ISet(F.$s("§$trigfunctions"), F.List(F.Sin, F.Cos, F.Tan, F.Cot, F.Sec, F.Csc));
 		F.ISet(F.$s("§$hyperbolicfunctions"), F.List(F.Sinh, F.Cosh, F.Tanh, F.Coth, F.Sech, F.Csch));
@@ -1274,7 +1275,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Unintegrable"),
 						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "CannotIntegrate")));
 		F.ISet(F.$s("§$heldfunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern));
-
 
 		F.ISet(UtilityFunctionCtors.IntegerPowerQ, //
 				F.Function(F.And(F.SameQ(F.Head(F.Slot1), F.Power), F.IntegerQ(F.Part(F.Slot1, F.C2)))));
