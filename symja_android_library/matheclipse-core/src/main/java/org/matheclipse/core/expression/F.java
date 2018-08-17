@@ -6157,6 +6157,13 @@ public class F {
 				true) ;
 		return F.NIL;
 	}
+	
+	public static IAST IIntegrate(int priority, final IAST lhs, final IExpr rhs) {
+			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
+		F.Integrate.putDownRule(ISymbol.RuleType.SET_DELAYED, false, lhs, rhs, priority,
+				true) ;
+		return F.NIL;
+	}
 
 	public static boolean isNumEqualInteger(double value, IInteger ii) throws ArithmeticException {
 		return isZero(value - ii.doubleValue(), Config.DOUBLE_TOLERANCE);
