@@ -1,16 +1,5 @@
 package org.matheclipse.core.integrate.rubi;
 
-import com.duy.lambda.Predicate;
-
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IBuiltInSymbol;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-
 import static org.matheclipse.core.expression.F.Integrate;
 import static org.matheclipse.core.expression.F.ast;
 import static org.matheclipse.core.expression.F.binaryAST2;
@@ -20,6 +9,14 @@ import static org.matheclipse.core.expression.F.quinary;
 import static org.matheclipse.core.expression.F.senary;
 import static org.matheclipse.core.expression.F.ternaryAST3;
 import static org.matheclipse.core.expression.F.unaryAST1;
+
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  * UtilityFunction constructors from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
@@ -56,14 +53,12 @@ public class UtilityFunctionCtors {
 	public final static ISymbol Z = initFinalHiddenSymbol("Z");
 
 	public static ISymbol Dist = org.matheclipse.core.expression.F.$rubi(INTEGRATE_PREFIX + "Dist");
-	public static ISymbol IntegerPowerQ = org.matheclipse.core.expression.F
-			.$rubi(INTEGRATE_PREFIX + "IntegerPowerQ");
+	public static ISymbol IntegerPowerQ = org.matheclipse.core.expression.F.$rubi(INTEGRATE_PREFIX + "IntegerPowerQ");
 	public static ISymbol FractionalPowerQ = org.matheclipse.core.expression.F
 			.$rubi(INTEGRATE_PREFIX + "FractionalPowerQ");
-	public static ISymbol AbortRubi = org.matheclipse.core.expression.F
-			.$rubi(INTEGRATE_PREFIX + "AbortRubi");
-	public static ISymbol ReapList = org.matheclipse.core.expression.F
-			.$rubi(INTEGRATE_PREFIX + "ReapList");
+
+	public static ISymbol AbortRubi = org.matheclipse.core.expression.F.$rubi(INTEGRATE_PREFIX + "AbortRubi");
+	public static ISymbol ReapList = org.matheclipse.core.expression.F.$rubi(INTEGRATE_PREFIX + "ReapList");
 
 	static ISymbol FalseQ = F.$rubi(INTEGRATE_PREFIX + "FalseQ", new AbstractCoreFunctionEvaluator() {
 		@Override
@@ -75,79 +70,73 @@ public class UtilityFunctionCtors {
 		}
 	});
 
-	static ISymbol FractionQ = F.$rubi(INTEGRATE_PREFIX + "FractionQ",
-			new AbstractCoreFunctionEvaluator() {
-				@Override
-				public IExpr evaluate(IAST ast, EvalEngine engine) {
-					if (ast.size() == 2) {
-						return ast.arg1().isFraction() ? F.True : F.False;
-					}
-					if (ast.size() > 2) {
-						return ast.forAll(new Predicate<IExpr>() {
-							@Override
-							public boolean test(IExpr x) {
-								return x.isFraction();
-							}
-						}, 1) ? F.True : F.False;
-					}
-					return F.False;
-				}
-			});
+	static ISymbol FractionQ = F.$rubi(INTEGRATE_PREFIX + "FractionQ", new AbstractCoreFunctionEvaluator() {
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.size() == 2) {
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return arg1.isFraction() ? F.True : F.False;
+			}
+			if (ast.size() > 2) {
+				return ast.forAll(x -> engine.evaluate(x).isFraction(), 1) ? F.True : F.False;
+			}
+			return F.False;
+		}
+	});
 
-	static ISymbol IntegersQ = F.$rubi(INTEGRATE_PREFIX + "IntegersQ",
-			new AbstractCoreFunctionEvaluator() {
-				@Override
-				public IExpr evaluate(IAST ast, EvalEngine engine) {
-					if (ast.size() == 2) {
-						return ast.arg1().isInteger() ? F.True : F.False;
-					}
-					if (ast.size() > 2) {
-						return ast.forAll(new Predicate<IExpr>() {
-							@Override
-							public boolean test(IExpr x) {
-								return x.isInteger();
-							}
-						}, 1) ? F.True : F.False;
-					}
-					return F.False;
-				}
-			});
+	static ISymbol IntegersQ = F.$rubi(INTEGRATE_PREFIX + "IntegersQ", new AbstractCoreFunctionEvaluator() {
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.size() == 2) {
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return arg1.isInteger() ? F.True : F.False;
+			}
+			if (ast.size() > 2) {
+				return ast.forAll(x -> engine.evaluate(x).isInteger(), 1) ? F.True : F.False;
+			}
+			return F.False;
+		}
+	});
 
-	static ISymbol ComplexNumberQ = F.$rubi(INTEGRATE_PREFIX + "ComplexNumberQ",
-			new AbstractCoreFunctionEvaluator() {
-				@Override
-				public IExpr evaluate(IAST ast, EvalEngine engine) {
-					if (ast.size() == 2) {
-						return ast.arg1().isComplex() || ast.arg1().isComplexNumeric() ? F.True : F.False;
-					}
-					return F.False;
-				}
-			});
+	static ISymbol ComplexNumberQ = F.$rubi(INTEGRATE_PREFIX + "ComplexNumberQ", new AbstractCoreFunctionEvaluator() {
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.size() == 2) {
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return arg1.isComplex() || arg1.isComplexNumeric() ? F.True : F.False;
+			}
+			return F.False;
+		}
+	});
 
 	static ISymbol PowerQ = F.$rubi(INTEGRATE_PREFIX + "PowerQ", new AbstractCoreFunctionEvaluator() {
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
-				return ast.arg1().head().equals(F.Power) ? F.True : F.False;
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return arg1.head().equals(F.Power) ? F.True : F.False;
 			}
 			return F.False;
 		}
 	});
-	static ISymbol ProductQ = F.$rubi(INTEGRATE_PREFIX + "ProductQ",
-			new AbstractCoreFunctionEvaluator() {
-				@Override
-				public IExpr evaluate(IAST ast, EvalEngine engine) {
-					if (ast.size() == 2) {
-						return ast.arg1().head().equals(F.Times) ? F.True : F.False;
-					}
-					return F.False;
-				}
-			});
+
+	static ISymbol ProductQ = F.$rubi(INTEGRATE_PREFIX + "ProductQ", new AbstractCoreFunctionEvaluator() {
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.size() == 2) {
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return arg1.head().equals(F.Times) ? F.True : F.False;
+			}
+			return F.False;
+		}
+	});
+
 	static ISymbol SumQ = F.$rubi(INTEGRATE_PREFIX + "SumQ", new AbstractCoreFunctionEvaluator() {
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
-				return ast.arg1().head().equals(F.Plus) ? F.True : F.False;
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return arg1.head().equals(F.Plus) ? F.True : F.False;
 			}
 			return F.False;
 		}
@@ -156,11 +145,13 @@ public class UtilityFunctionCtors {
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
-				return ast.arg1().head().equals(F.Plus) ? F.False : F.True;
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				return arg1.head().equals(F.Plus) ? F.False : F.True;
 			}
 			return F.False;
 		}
 	});
+
 	public static IAST AbortRubi(final IExpr a0) {
 		return F.headAST0(F.Abort);
 	}
@@ -212,15 +203,14 @@ public class UtilityFunctionCtors {
 	public static IAST IntHide(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "IntHide"), a0, a1);
 	}
-	
+
 	public static IAST IntLinearQ(final IExpr... a) {
 		return ast(a, F.$rubi(INTEGRATE_PREFIX + "IntLinearQ"));
 	}
-	
+
 	public static IAST IntQuadraticQ(final IExpr... a) {
 		return ast(a, F.$rubi(INTEGRATE_PREFIX + "IntQuadraticQ"));
 	}
-
 
 	public static IAST Dist(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Dist, a0, a1);
@@ -321,6 +311,7 @@ public class UtilityFunctionCtors {
 	public static IAST CannotIntegrate(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "CannotIntegrate"), a0, a1);
 	}
+
 	public static IAST CollectReciprocals(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "CollectReciprocals"), a0, a1);
 	}
@@ -444,6 +435,7 @@ public class UtilityFunctionCtors {
 	public static IAST EveryQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "EveryQ"), a0, a1);
 	}
+
 	public static IAST EvenQuotientQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "EvenQuotientQ"), a0, a1);
 	}
@@ -566,6 +558,7 @@ public class UtilityFunctionCtors {
 	public static IAST FixIntRule(final IExpr a0) {
 		return unaryAST1(F.$rubi(INTEGRATE_PREFIX + "FixIntRule"), a0);
 	}
+
 	public static IAST FixIntRule(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "FixIntRule"), a0, a1);
 	}
@@ -795,6 +788,7 @@ public class UtilityFunctionCtors {
 	public static IAST GtQ(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(F.$rubi(INTEGRATE_PREFIX + "GtQ"), a0, a1, a2);
 	}
+
 	public static IAST GeQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "GeQ"), a0, a1);
 	}
@@ -802,6 +796,7 @@ public class UtilityFunctionCtors {
 	public static IAST GeQ(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(F.$rubi(INTEGRATE_PREFIX + "GeQ"), a0, a1, a2);
 	}
+
 	public static IAST Gcd(final IExpr... a) {
 		return ast(a, F.$rubi(INTEGRATE_PREFIX + "Gcd"));
 	}
@@ -861,6 +856,7 @@ public class UtilityFunctionCtors {
 	public static IAST HalfIntegerQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "HalfIntegerQ"), a0, a1);
 	}
+
 	public static IAST HeldFormQ(final IExpr a0) {
 		return unaryAST1(F.$rubi(INTEGRATE_PREFIX + "HeldFormQ"), a0);
 	}
@@ -1024,6 +1020,7 @@ public class UtilityFunctionCtors {
 	public static IAST LtQ(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(F.$rubi(INTEGRATE_PREFIX + "LtQ"), a0, a1, a2);
 	}
+
 	public static IAST LeQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "LeQ"), a0, a1);
 	}
@@ -1031,6 +1028,7 @@ public class UtilityFunctionCtors {
 	public static IAST LeQ(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(F.$rubi(INTEGRATE_PREFIX + "LeQ"), a0, a1, a2);
 	}
+
 	public static IAST LT(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "LT"), a0, a1);
 	}
@@ -1162,6 +1160,7 @@ public class UtilityFunctionCtors {
 	public static IAST NegQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "NegQ"), a0, a1);
 	}
+
 	public static IAST NegSumBaseQ(final IExpr a0) {
 		return unaryAST1(F.$rubi(INTEGRATE_PREFIX + "NegSumBaseQ"), a0);
 	}
@@ -1329,6 +1328,7 @@ public class UtilityFunctionCtors {
 	public static IAST PolyGCD(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(F.$rubi(INTEGRATE_PREFIX + "PolyGCD"), a0, a1, a2);
 	}
+
 	public static IAST PolyQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "PolyQ"), a0, a1);
 	}
@@ -1508,6 +1508,7 @@ public class UtilityFunctionCtors {
 	public static IAST QuadraticProductQ(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "QuadraticProductQ"), a0, a1);
 	}
+
 	public static IAST RationalFunctionExpand(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "RationalFunctionExpand"), a0, a1);
 	}
@@ -1732,6 +1733,7 @@ public class UtilityFunctionCtors {
 	public static IAST StopFunctionQ(final IExpr a0) {
 		return unaryAST1(F.$rubi(INTEGRATE_PREFIX + "StopFunctionQ"), a0);
 	}
+
 	public static IAST Subst(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "Subst"), a0, a1);
 	}
@@ -1747,6 +1749,7 @@ public class UtilityFunctionCtors {
 	public static IAST SubstAux(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
 		return quaternary(F.$rubi(INTEGRATE_PREFIX + "SubstAux"), a0, a1, a2, a3);
 	}
+
 	public static IAST SubstFor(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(F.$rubi(INTEGRATE_PREFIX + "SubstFor"), a0, a1, a2);
 	}
@@ -1912,6 +1915,7 @@ public class UtilityFunctionCtors {
 	// public static IAST Unintegrable(final IExpr a0, final IExpr a1) {
 	// return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "Unintegrable"), a0, a1);
 	// }
+
 	public static IAST UnifyInertTrigFunction(final IExpr a0, final IExpr a1) {
 		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "UnifyInertTrigFunction"), a0, a1);
 	}
@@ -1926,7 +1930,7 @@ public class UtilityFunctionCtors {
 	 *     Dist[w*u,v,x] /;
 	 *     w=!=-1
 	 * </pre>
-	 *
+	 * 
 	 * @param astTimes
 	 * @return
 	 */
@@ -1948,23 +1952,23 @@ public class UtilityFunctionCtors {
 
 	/**
 	 * Rule 1:
-	 *
+	 * 
 	 * <pre>
 	 * Dist[u_,v_,x_]+Dist[w_,v_,x_] :=
 	 *     If[EqQ[u+w,0],
 	 *     0,
 	 *     Dist[u+w,v,x]]
 	 * </pre>
-	 *
+	 * 
 	 * Rule 2:
-	 *
+	 * 
 	 * <pre>
 	 * Dist[u_,v_,x_]-Dist[w_,v_,x_] :=
 	 *     If[EqQ[u-w,0],
 	 *     0,
 	 *     Dist[u-w,v,x]]
 	 * </pre>
-	 *
+	 * 
 	 * @param astTimes
 	 * @return
 	 */
