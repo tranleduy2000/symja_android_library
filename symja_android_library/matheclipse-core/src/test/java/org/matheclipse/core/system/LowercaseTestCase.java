@@ -17,7 +17,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void test001() {
 		// syntax error in relaxed mode
 		// check("Sin[x]", "");
-		
+
 		check("1.2345678*^7", //
 				"12345678.0");
 		check("1.23456789*^8", //
@@ -28,7 +28,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				d.toString());
 		checkNumeric("N(1231231236123216361256312631627.12312312,50)", //
 				"1.23123123612321636125631263162712312312e30");
-		
+
 		check("f[[1,2]]", "(f[[1,2]])");
 		check("-cos(x)", "-Cos(x)");
 		check("expand((a+b)^3)", "a^3+3*a^2*b+3*a*b^2+b^3");
@@ -341,6 +341,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"a+Pi/4+6*ArcTan(1/2)");
 		check("ArcTan(1/3) + ArcTan(1/7)", //
 				"ArcTan(1/2)");
+
 		check("ArcTan(a, -a)", "(-(-a+2*Sqrt(a^2))*Pi)/(4*a)");
 		check("ArcTan(-a, a)", "((a+2*Sqrt(a^2))*Pi)/(4*a)");
 		check("ArcTan(a, a)", "((-a+2*Sqrt(a^2))*Pi)/(4*a)");
@@ -534,6 +535,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("N(ArithmeticGeometricMean(1 - I, 2.5 + I), 30)", //
 				"1.83462883815328396810218573046+I*(-1.91461625197137083440493535055e-1)");
 	}
+
 	public void testAttributes() {
 		check("Attributes(Plus)", "{Flat,Listable,OneIdentity,Orderless,NumericFunction}");
 	}
@@ -2560,6 +2562,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 					"{{nr->(-1+(1+eff)^(1/f))*f}}");
 		}
 	}
+
 	public void testEigenvalues() {
 		check("Eigenvalues(A)", "Eigenvalues(A)");
 		check("Eigenvalues({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})", "{16.11684,-1.11684,0.0}");
@@ -2646,6 +2649,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// TODO
 		// check("Eliminate({a0*x^p+a1*x^q==0},x)", //
 		// "(-a1)*x^q == a0*x^p");
+
 		check("Eliminate({(a*x + b)/(c*x + d)==y},x)", //
 				"True");
 		check("Eliminate({x == 2 + y, y == z}, y)", //
@@ -2705,7 +2709,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("EllipticK(0.5)", "1.85407");
 		check("Table(EllipticK(x), {x,-1.0, 1.0, 1/4})", //
 				"{1.31103,1.35906,1.41574,1.48441,1.5708,1.68575,1.85407,2.15652,ComplexInfinity}");
-
 		check("Table(EllipticK(x+I), {x,-1.0, 1.0, 1/4})", //
 				"{1.26549+I*0.16224,1.30064+I*0.18478,1.33866+I*0.21305,1.37925+I*0.24904,1.42127+I*0.29538,1.46203+I*0.35524,1.49611+I*0.43136,1.51493+I*0.52354,1.50924+I*0.62515}");
 	}
@@ -3001,8 +3004,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		// TODO return a ^ 2 / (c ^ 2 + 2 c d + d ^ 2) + 2 a b / (c ^ 2 + 2 c d
 		// + d ^ 2) + b ^ 2 / (c ^ 2 + 2 c d + d ^ 2)
-		check("ExpandAll((a + b) ^ 2 / (c + d)^2)",
-				"a^2/(c^2+2*c*d+d^2)+(2*a*b)/(c^2+2*c*d+d^2)+b^2/(c^2+2*c*d+d^2)");
+		check("ExpandAll((a + b) ^ 2 / (c + d)^2)", "a^2/(c^2+2*c*d+d^2)+(2*a*b)/(c^2+2*c*d+d^2)+b^2/(c^2+2*c*d+d^2)");
 		check("ExpandAll((a + Sin(x*(1 + y)))^2)", "a^2+2*a*Sin(x+x*y)+Sin(x+x*y)^2");
 		check("ExpandAll(((1 + x)*(1 + y))[x])", "(1+x+y+x*y)[x]");
 	}
@@ -3122,7 +3124,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFactorial() {
-
 		check("Factorial(2.5)", "3.32335");
 		check("Factorial(Infinity)", "Infinity");
 
@@ -3479,6 +3480,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FiveNum({20,12,16,32,27,65,44,45,22,18})", //
 				"{12,18,49/2,44,65}");
 	}
+
 	public void testFixedPoint() {
 		check("FixedPoint(Cos, 1.0)", "0.73909");
 		check("FixedPoint(#+1 &, 1, 20)", "21");
@@ -3843,10 +3845,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"ComplexInfinity");
 		check("Table(Gamma(x+I*y), {x,-0.5, 0.5, 1/4}, {y,-0.5, 0.5, 1/4})", //
 				"{{-1.58148+I*0.05485,-2.75473+I*0.031,-3.54491,-2.75473+I*(-0.031),-1.58148+I*(-0.05485)},{-1.31815+I*1.01078,-2.77536+I*1.61484,-4.90167,-2.77536+I*(-1.61484),-1.31815+I*(-1.01078)},{-0.39928+I*1.60339,-0.52411+I*3.76716,"
-				+ "ComplexInfinity,-0.52411+I*(-3.76716),-0.39928+I*(-1.60339)},{0.51552+I*1.30733,1.65113+I*1.83788,3.62561,1.65113+I*(-1.83788),0.51552+I*(-1.30733)},{0.81816+I*0.76331,1.38511+I*0.67318,1.77245,1.38511+I*(-0.67318),0.81816+I*(-0.76331)}}");
+						+ "ComplexInfinity,-0.52411+I*(-3.76716),-0.39928+I*(-1.60339)},{0.51552+I*1.30733,1.65113+I*1.83788,3.62561,1.65113+I*(-1.83788),0.51552+I*(-1.30733)},{0.81816+I*0.76331,1.38511+I*0.67318,1.77245,1.38511+I*(-0.67318),0.81816+I*(-0.76331)}}");
 		check("Table(Gamma(x+I ), {x,-10.0, 10.0, 1/2})", //
 				"{0.0+I*0.0,-0.0+I*0.0,-0.0+I*(-0.0),0.0+I*(-0.0),0.00001+I*0.0,-0.00001+I*0.00002,-0.00005+I*(-0.00002),0.00006+I*(-0.00014),0.00039+I*0.00012,-0.00023+I*0.001,-0.00246+I*(-0.00035),0.00027+I*(-0.00571),0.01263+I*(-0.00072),0.00451+I*0.02596,-0.0498+I*0.01549,-0.04174+I*(-0.08637),0.13391+I*(-0.09629),0.19071+I*0.17419,-0.17153+I*0.32648,-0.46025+I*(-0.07057),-0.15495+I*(-0.49802),0.30069+I*(-0.42497),"
-				+ "0.49802+I*(-0.15495),0.57532+I*0.08821,0.65297+I*0.34307,0.77476+I*0.70763,0.96287+I*1.3391,1.22927+I*2.54384,1.5495+I*4.98016,1.75862+I*10.13271,1.21784+I*21.47013,-2.21893+I*47.35583,-15.38094+I*108.56846,-59.55994+I*258.23816,-200.85412+I*636.02983,-645.37778+I*1618.98809,-2042.00865+I*4251.35467,-6459.32143+I*11497.03293,-20587.42388+I*31968.82867,-66401.26509+I*91265.45845,-217255.64362+I*267132.03415}");
+						+ "0.49802+I*(-0.15495),0.57532+I*0.08821,0.65297+I*0.34307,0.77476+I*0.70763,0.96287+I*1.3391,1.22927+I*2.54384,1.5495+I*4.98016,1.75862+I*10.13271,1.21784+I*21.47013,-2.21893+I*47.35583,-15.38094+I*108.56846,-59.55994+I*258.23816,-200.85412+I*636.02983,-645.37778+I*1618.98809,-2042.00865+I*4251.35467,-6459.32143+I*11497.03293,-20587.42388+I*31968.82867,-66401.26509+I*91265.45845,-217255.64362+I*267132.03415}");
+
 		check("Refine(Gamma(n), Element(n,Integers)&&n>=0)", //
 				"(-1+n)!");
 
@@ -4194,6 +4197,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		checkNumeric("Hypergeometric0F1(1,1.5)", //
 				"3.1655890675997793");
 	}
+
 	public void testHypergeometric1F1() {
 		check("Hypergeometric1F1(1,b,z)", "(-1+b)*E^z*z^(1-b)*(Gamma(-1+b)-Gamma(-1+b,z))");
 		check("Hypergeometric1F1(2,b,z)", //
@@ -4211,7 +4215,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Hypergeometric1F1(-1,2,3.0)", "-0.5");
 		check("Hypergeometric1F1(1,2,3.0)", "6.36185");
 		checkNumeric("Hypergeometric1F1(1,{2,3,4},5.0)", "{29.4826318205153,11.393052728206118,6.235831636923671}");
-
 	}
 
 	public void testHypergeometric2F1() {
@@ -5318,6 +5321,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Log(2, 0)", "-Infinity");
 		check("Log(3/4, 0)", "Infinity");
 		check("Log(-2, 0)", "(-Infinity)/(I*Pi+Log(2))");
+
 		check("Exp(Log(x))", "x");
 		check("Refine(Log(Exp(x)),Element(x, Reals))", "x");
 		check("Log({0, 1, E, E * E, E ^ 3, E ^ x})", "{-Infinity,0,1,2,3,Log(E^x)}");
@@ -7016,6 +7020,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("integersQ(1,2,3)", "True");
 		check("integersQ(1,2,a)", "False");
 	}
+
 	public void testPatternTest() {
 		check("MatchQ(3, _Integer?(#>0&))", "True");
 		check("MatchQ(-3, _Integer?(#>0&))", "False");
@@ -7079,6 +7084,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"Piecewise({{1/(E^((-n+Log(k))^2/(2*m^2))*k*m*Sqrt(2*Pi)),k>0}},0)");
 		check("PDF(NakagamiDistribution(n, m),k)", //
 				"Piecewise({{(2*(n/m)^n)/(E^((n*k^2)/m)*Gamma(n)*k^(1-2*n)),k>0}},0)");
+
 		check("PDF(FrechetDistribution(n, m),k)", //
 				"Piecewise({{n/(E^(k/m)^(-n)*m*(k/m)^(1+n)),k>0}},0)");
 		check("PDF(GammaDistribution(n, m),k)", //
@@ -7148,6 +7154,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("-Infinity+Log(2)", "-Infinity");
 		check("Infinity+Sin(-2)", "Infinity");
 		check("Infinity+Log(2)", "Infinity");
+
 		check("{1,2}+{4,5,6}", "{1,2}+{4,5,6}");
 		check("2+4/3*2^b/c", "2+4/3*2^b/c");
 		check("Refine(Infinity+x, x>0)", "Infinity");
@@ -7819,6 +7826,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Probability(1 < x < 7, Distributed(x, PoissonDistribution(1)))", //
 				"517/720*1/E");
 	}
+
 	public void testProduct() {
 		check("Product(0, {k, a, Infinity})", //
 				"0");
@@ -7995,7 +8003,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testQuantile() {
-		check("Quantile({10, 50, 10, 15, 20}, 3/4, {{1/2, 0}, {0, 1}})",//
+		check("Quantile({10, 50, 10, 15, 20}, 3/4, {{1/2, 0}, {0, 1}})", //
 				"55/2");
 		check("Quantile(NormalDistribution(m, s))", //
 				"ConditionalExpression(m-Sqrt(2)*s*InverseErfc(2*#1),0<=#1<=1)&");
@@ -8063,6 +8071,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 					"3400.0");
 		}
 	}
+
 	public void testQuiet() {
 		check("Quiet(1/0)", "ComplexInfinity");
 		check("1/0", "ComplexInfinity");
@@ -8101,8 +8110,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// "8+8*m+m^2");
 		// check("Expectation(E^(2*x) + 3, Distributed( x, PoissonDistribution(l)))", //
 		// "");
-//
-
+		//
 		// check("Expectation(x,Distributed(x, DiscreteUniformDistribution({4, 9})))", "13/2");
 		// check("Expectation(x,Distributed(x, DiscreteUniformDistribution({4, 10})))", "7");
 		//
@@ -8140,28 +8148,28 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("KolmogorovSmirnovTest({-0.79675,0.3841,-0.84567,0.3421,0.46447,-0.01124,-0.33517,0.82206,1.40563,0.48811},"
 		// + "{1.64433,-0.31318,1.27263,0.16141,0.21162,-1.01509,-0.76259,0.73259,0.2478,1.28021})", //
 		// "0.7869");
-	// check("RandomVariate(BinomialDistribution(100,0.25), 10^1)", //
-	// "{28,25,30,25,25,26,29,17,33,20}");
-	// check("RandomVariate(BernoulliDistribution(0.25), 10^1)", //
-	// "{1,0,0,0,1,0,0,0,0,0}");
-	// check("RandomVariate(ExponentialDistribution(5.6), 10^1)", //
-	// "{0.36309,0.10609,0.14096,0.11642,0.01146,0.11286,0.05236,0.00071,0.01648,0.0303}");
-	// check("RandomVariate(DiscreteUniformDistribution({50,1000}), 10^1)", //
-	// "{468,989,156,353,469,91,399,304,700,137}");
-	// check("RandomVariate(PoissonDistribution(2.0), 10^1)", //
-	// "{1,3,5,3,2,2,2,5,1,2}");
-	// check("RandomVariate(NormalDistribution(2,3), 10^1)", //
-	// "{3.16579,3.4267,6.43772,4.53451,3.45249,6.51662,2.10209,-3.8462,3.87387,-4.47763}");
-	// check("RandomVariate(NormalDistribution(2,3))", //
-	// "1.99583");
-	// check("RandomVariate(NormalDistribution())", //
-	// "-0.56291");
-	// check("RandomVariate(DiscreteUniformDistribution({3,7}), {2})", "{3,7}");
-	// check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3})", "{{5,4,7},{5,7,3}}");
-	// check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3,4})",
-	// "{{{4,5,5,3},{5,4,4,6},{6,3,4,7}},{{6,6,7,3},{4,6,5,6},{7,7,6,5}}}");
-	// check("RandomVariate(DiscreteUniformDistribution({3,7}), 10)", "{6,5,7,7,7,7,4,5,6,3}");
-	// check("RandomVariate(DiscreteUniformDistribution({1, 5}) )", "3");
+		// check("RandomVariate(BinomialDistribution(100,0.25), 10^1)", //
+		// "{28,25,30,25,25,26,29,17,33,20}");
+		// check("RandomVariate(BernoulliDistribution(0.25), 10^1)", //
+		// "{1,0,0,0,1,0,0,0,0,0}");
+		// check("RandomVariate(ExponentialDistribution(5.6), 10^1)", //
+		// "{0.36309,0.10609,0.14096,0.11642,0.01146,0.11286,0.05236,0.00071,0.01648,0.0303}");
+		// check("RandomVariate(DiscreteUniformDistribution({50,1000}), 10^1)", //
+		// "{468,989,156,353,469,91,399,304,700,137}");
+		// check("RandomVariate(PoissonDistribution(2.0), 10^1)", //
+		// "{1,3,5,3,2,2,2,5,1,2}");
+		// check("RandomVariate(NormalDistribution(2,3), 10^1)", //
+		// "{3.16579,3.4267,6.43772,4.53451,3.45249,6.51662,2.10209,-3.8462,3.87387,-4.47763}");
+		// check("RandomVariate(NormalDistribution(2,3))", //
+		// "1.99583");
+		// check("RandomVariate(NormalDistribution())", //
+		// "-0.56291");
+		// check("RandomVariate(DiscreteUniformDistribution({3,7}), {2})", "{3,7}");
+		// check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3})", "{{5,4,7},{5,7,3}}");
+		// check("RandomVariate(DiscreteUniformDistribution({3,7}), {2,3,4})",
+		// "{{{4,5,5,3},{5,4,4,6},{6,3,4,7}},{{6,6,7,3},{4,6,5,6},{7,7,6,5}}}");
+		// check("RandomVariate(DiscreteUniformDistribution({3,7}), 10)", "{6,5,7,7,7,7,4,5,6,3}");
+		// check("RandomVariate(DiscreteUniformDistribution({1, 5}) )", "3");
 	}
 
 	public void testRange() {
@@ -8256,6 +8264,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRefine() {
+
 		check("Refine(MoebiusMu(p),Element(p, Primes))", "-1");
 
 		// TODO
@@ -8338,6 +8347,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("Refine(x==0)", //
 				"x==0");
+
 	}
 
 	public void testReplace() {
@@ -9319,6 +9329,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testSolve() {
 		check("Solve((a*x + b)/(c*x + d)==y,x)", //
 				"{{x->-b/(a-c*y)+(d*y)/(a-c*y)}}");
+
 		check("E^((Log(a)+Log(b))/m)", //
 				"E^((Log(a)+Log(b))/m)");
 		check("Solve(a0*x^p+a1*x^q==0,x)", //
@@ -9434,9 +9445,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Solve((k*Q*q)/r^2==E,r)", //
 				"{{r->Sqrt(E*k*q*Q)/E},{r->-Sqrt(E*k*q*Q)/E}}");
 		check("Solve((k*Q*q)/r^2+1/r^4==E,r)", //
-				"{{r->Sqrt((k*q*Q)/E+Sqrt(4*E+k^2*q^2*Q^2)/E)/Sqrt(2)},{r->-Sqrt((k*q*Q)/E+Sqrt(4*E+k^\n" +
-				"2*q^2*Q^2)/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q)/E+Sqrt(4*E+k^2*q^2*Q^2)/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q)/E+Sqrt(\n" +
-				"4*E+k^2*q^2*Q^2)/E))/Sqrt(2)}}");
+				"{{r->Sqrt((k*q*Q)/E+Sqrt(4*E+k^2*q^2*Q^2)/E)/Sqrt(2)},{r->-Sqrt((k*q*Q)/E+Sqrt(4*E+k^\n"
+						+ "2*q^2*Q^2)/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q)/E+Sqrt(4*E+k^2*q^2*Q^2)/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q)/E+Sqrt(\n"
+						+ "4*E+k^2*q^2*Q^2)/E))/Sqrt(2)}}");
 		check("Solve((k*Q*q)/r^2+1/r^4==0,r)", //
 				"{{r->(-I*Sqrt(k*q*Q))/(k*q*Q)},{r->(I*Sqrt(k*q*Q))/(k*q*Q)}}");
 		check("Solve(Abs(x-1) ==1,{x})", //
@@ -10371,10 +10382,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTimes() {
+
 		check("(-Infinity)/Sin(-2)", "Infinity");
 		check("(-Infinity)/(-2)", "Infinity");
 		check("(-Infinity)/Log(2)", "-Infinity");
 		check("(-Infinity)/2", "-Infinity");
+
 		// github #35
 		check(" y^2*y^(-0.6666) ", //
 				"y^1.3334");
@@ -10484,6 +10497,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 					"6381.06644");
 		}
 	}
+
 	public void testToeplitzMatrix() {
 		check("ToeplitzMatrix(3)", //
 				"{{1,2,3},\n" + " {2,1,2},\n" + " {3,2,1}}");
@@ -10693,9 +10707,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("TrigExpand(Tanh(a+b))", //
 				"Tanh(a)/(1+Tanh(a)*Tanh(b))+Tanh(b)/(1+Tanh(a)*Tanh(b))");
 		check("TrigExpand(Tanh(a+b+c))",
-				"Tanh(a)/(1+(Tanh(a)*Tanh(b))/(1+Tanh(b)*Tanh(c))+(Tanh(a)*Tanh(c))/(1+Tanh(b)*Tanh(c)))+Tanh(b)/((\n" +
-				"1+Tanh(b)*Tanh(c))*(1+(Tanh(a)*Tanh(b))/(1+Tanh(b)*Tanh(c))+(Tanh(a)*Tanh(c))/(1+Tanh(b)*Tanh(c))))+Tanh(c)/((\n" +
-				"1+Tanh(b)*Tanh(c))*(1+(Tanh(a)*Tanh(b))/(1+Tanh(b)*Tanh(c))+(Tanh(a)*Tanh(c))/(1+Tanh(b)*Tanh(c))))");
+				"Tanh(a)/(1+(Tanh(a)*Tanh(b))/(1+Tanh(b)*Tanh(c))+(Tanh(a)*Tanh(c))/(1+Tanh(b)*Tanh(c)))+Tanh(b)/((\n"
+						+ "1+Tanh(b)*Tanh(c))*(1+(Tanh(a)*Tanh(b))/(1+Tanh(b)*Tanh(c))+(Tanh(a)*Tanh(c))/(1+Tanh(b)*Tanh(c))))+Tanh(c)/((\n"
+						+ "1+Tanh(b)*Tanh(c))*(1+(Tanh(a)*Tanh(b))/(1+Tanh(b)*Tanh(c))+(Tanh(a)*Tanh(c))/(1+Tanh(b)*Tanh(c))))");
 
 		check("TrigExpand(Csc(a+b+c))",
 				"1/(Cos(b)*Cos(c)*Sin(a)+Cos(a)*Cos(c)*Sin(b)+Cos(a)*Cos(b)*Sin(c)-Sin(a)*Sin(b)*Sin(c))");
@@ -10863,6 +10877,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 					"15.186399999999999[km]");
 		}
 	}
+
 	public void testUnitize() {
 		check("Unitize({0, -1})", "{0,1}");
 		check("Unitize((E + Pi)^2 - E^2 - Pi^2 - 2*E*Pi)", "0");
@@ -10988,7 +11003,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		checkNumeric("Variance({1., 2., 3., 4.})", "1.6666666666666667");
 		checkNumeric("Variance({{5.2, 7}, {5.3, 8}, {5.4, 9}})", "{0.010000000000000018,1.0}");
 		checkNumeric("Variance({1.21, 3.4, 2, 4.66, 1.5, 5.61, 7.22})", "5.16122380952381");
-
 		check("Variance({1.21, 3.4, 2+3*I, 4.66-0.1*I, 1.5, 5.61, 7.22})", //
 				"6.46265");
 		// check("Variance(BernoulliDistribution(p))", "p*(1-p)");
