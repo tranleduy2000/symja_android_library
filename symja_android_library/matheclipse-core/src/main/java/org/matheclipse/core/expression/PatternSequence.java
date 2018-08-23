@@ -90,7 +90,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 		int[] result = new int[2];
 		result[0] = IAST.CONTAINS_PATTERN_SEQUENCE;
 		result[1] = 1;
-		if (fCondition!=null) {
+		if (fCondition != null) {
 			result[1] += 2;
 		}
 		return result;
@@ -162,7 +162,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 			return sequence.equals(value);
 		}
 		patternMap.setValue(this, sequence);
-		return  true;
+		return true;
 	}
 
 	@Override
@@ -207,15 +207,17 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	@Override
-	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators, boolean usePrefix, boolean noSymbolPrefix) {
+	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators, boolean usePrefix,
+			boolean noSymbolPrefix) {
 		if (symbolsAsFactoryMethod) {
 			String prefix = usePrefix ? "F." : "";
 			final StringBuilder buffer = new StringBuilder();
-			buffer.append(prefix+"$ps(");
+			buffer.append(prefix + "$ps(");
 			if (fSymbol == null) {
 				buffer.append("(ISymbol)null");
 				if (fCondition != null) {
-					buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperators, usePrefix, noSymbolPrefix));
+					buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperators,
+							usePrefix, noSymbolPrefix));
 				}
 				if (fDefault) {
 					if (fCondition == null) {
@@ -226,7 +228,8 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 			} else {
 				buffer.append("\"" + fSymbol.toString() + "\"");
 				if (fCondition != null) {
-					buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperators, usePrefix, noSymbolPrefix));
+					buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperators,
+							usePrefix, noSymbolPrefix));
 				}
 				if (fDefault) {
 					buffer.append(",true");
