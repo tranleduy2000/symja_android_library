@@ -264,11 +264,10 @@ public class Logarithms extends AbstractRubiTestCase {
 
 	// {2447}
 	public void test0045() {
-//		check(//
-//				"Integrate[Log[(a*(1 - c) + b*(1 + c)*x)/(a + b*x)]/(a^2 - b^2*x^2), x]", //
-//				"PolyLog[2, 1 - (a*(1 - c) + b*(1 + c)*x)/(a + b*x)]/(2*a*b)", // rubi
-//				"PolyLog[2,(c*(a-b*x))/(a+b*x)]/(2*a*b)", //
-//				2447);
+		check(//
+				"Integrate[Log[(a*(1 - c) + b*(1 + c)*x)/(a + b*x)]/(a^2 - b^2*x^2), x]", //
+				"PolyLog[2, 1 - (a*(1 - c) + b*(1 + c)*x)/(a + b*x)]/(2*a*b)", //
+				2447);
 	}
 
 	// {2447}
@@ -537,8 +536,6 @@ public class Logarithms extends AbstractRubiTestCase {
 
 	// {2447}
 	public void test0128() {
-
-		// needs FullSimplify
 		check(//
 				"Integrate[Log[(2*x*(d*Sqrt[-(e/d)] + e*x))/(d + e*x^2)]/(d + e*x^2), x]", //
 				"-(Sqrt[-(e/d)]*PolyLog[2, 1 - (2*x*(d*Sqrt[-(e/d)] + e*x))/(d + e*x^2)])/(2*e)", //
