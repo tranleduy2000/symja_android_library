@@ -1482,7 +1482,7 @@ public class EvalEngine implements Serializable {
 		try {
 			return evaluate(expr).isTrue();
 		} catch (MathException fce) {
-			if (Config.DEBUG) {
+			if (Config.SHOW_STACKTRACE) {
 				fce.printStackTrace();
 			}
 			return false;

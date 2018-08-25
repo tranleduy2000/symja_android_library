@@ -886,17 +886,14 @@ public class PolynomialFunctions {
 
 				long n = poly.degree();
 				if (n >= 2L && n <= 5L) {
-					final IAST result = poly.coefficientList();
+					IAST result = poly.coefficientList();
 					IASTAppendable rules = F.ListAlloc(result.size());
-					rules.appendArgs(result.size(), 
-							new IntFunction<IExpr>() {
-								@Override
-								public IExpr apply(int i) {
-									return F.Rule(vars[i - 1], result.get(i));
-								}
-							}
-//							i -> F.Rule(vars[i - 1], result.get(i))
-							);
+					rules.appendArgs(result.size(), new IntFunction<IExpr>() {
+                        @Override
+                        public IExpr apply(int i) {
+                            return F.Rule(vars[i - 1], result.get(i));
+                        }
+                    });
 					switch ((int) n) {
 					case 2:
 						return QUADRATIC.replaceAll(rules);
@@ -2076,8 +2073,8 @@ public class PolynomialFunctions {
 
 			EigenDecomposition ed = new EigenDecomposition(c);
 
-			final double[] realValues = ed.getRealEigenvalues();
-			final double[] imagValues = ed.getImagEigenvalues();
+			double[] realValues = ed.getRealEigenvalues();
+			double[] imagValues = ed.getImagEigenvalues();
 
 			IASTAppendable roots = F.ListAlloc(N);
 			return roots.appendArgs(0, N,
@@ -2086,9 +2083,7 @@ public class PolynomialFunctions {
 						public IExpr apply(int i) {
 							return F.chopExpr(F.complexNum(realValues[i], imagValues[i]), Config.DEFAULT_ROOTS_CHOP_DELTA);
 						}
-					}
-//					i -> F.chopExpr(F.complexNum(realValues[i], imagValues[i]), Config.DEFAULT_ROOTS_CHOP_DELTA)
-					);
+					});
 			// for (int i = 0; i < N; i++) {
 			// roots.append(F.chopExpr(F.complexNum(realValues[i], imagValues[i]),
 			// Config.DEFAULT_ROOTS_CHOP_DELTA));
@@ -2405,7 +2400,7 @@ public class PolynomialFunctions {
 			}
 			result = QuarticSolver.createSet(result);
 			return result;
-		} catch (JASConversionException e) {
+		} catch (RuntimeException rex) {
 			result = rootsOfExprPolynomial(expr, variables, true);
 		}
 		if (result.isPresent()) {

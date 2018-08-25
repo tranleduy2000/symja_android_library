@@ -896,6 +896,14 @@ public class Integrate extends AbstractFunctionEvaluator {
 					if (secondTry.isPresent()) {
 						return integrateByRubiRules(secondTry, F.NIL);
 					}
+				} catch (RuntimeException rex) {
+					if (Config.SHOW_STACKTRACE) {
+						rex.printStackTrace();
+					}
+					engine.setRecursionLimit(limit);
+					if (secondTry.isPresent()) {
+						return integrateByRubiRules(secondTry, F.NIL);
+					}
 				} finally {
 					engine.setRecursionLimit(limit);
 				}
@@ -1262,7 +1270,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 		// hack for TimeConstrained time limit:
 
 		// F.ISet(F.$s("§timelimit"), F.integer(12));
-		F.ISet(F.$s("§$timelimit"), F.integer(12));
+		F.ISet(F.$s("§$timelimit"), F.ZZ(12));
 		F.ISet(F.$s("§$showsteps"), F.False);
 		UtilityFunctionCtors.ReapList.setAttributes(ISymbol.HOLDFIRST);
 		F.ISet(F.$s("§$trigfunctions"), F.List(F.Sin, F.Cos, F.Tan, F.Cot, F.Sec, F.Csc));
