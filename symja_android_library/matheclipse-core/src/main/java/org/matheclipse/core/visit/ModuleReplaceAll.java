@@ -1,13 +1,13 @@
 package org.matheclipse.core.visit;
 
-import java.util.IdentityHashMap;
-
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.util.IdentityHashMap;
 
 /**
  * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non
@@ -128,7 +128,7 @@ public class ModuleReplaceAll extends VisitorExpr {
 						variables = (IdentityHashMap<ISymbol, IExpr>) fModuleVariables.clone();
 					}
 					variables.remove(symbol);
-					variables.put(symbol, F.$s(symbol.toString() + varAppend));
+					variables.put(symbol, F.Dummy(symbol.toString() + varAppend));
 				}
 			} else {
 				if (temp.isAST(F.Set, 3)) {
@@ -141,7 +141,7 @@ public class ModuleReplaceAll extends VisitorExpr {
 								variables = (IdentityHashMap<ISymbol, IExpr>) fModuleVariables.clone();
 							}
 							variables.remove(symbol);
-							variables.put(symbol, F.$s(symbol.toString() + varAppend));
+							variables.put(symbol, F.Dummy(symbol.toString() + varAppend));
 						}
 					}
 				}
