@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  * <code>0</code> and</li>
  * <li>the <code>n</code> arguments of a function in the index <code>1 to n</code></li>
  * </ul>
- * <p>
+ *
  * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a>,
  * <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed acyclic graph</a>
  */

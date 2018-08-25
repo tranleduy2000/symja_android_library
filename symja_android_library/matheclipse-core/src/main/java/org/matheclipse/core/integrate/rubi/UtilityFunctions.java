@@ -1,53 +1,9 @@
 package org.matheclipse.core.integrate.rubi;
 
-import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Pattern;
-import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.ISymbol;
-
-import static org.matheclipse.core.expression.F.$;
-import static org.matheclipse.core.expression.F.$s;
-import static org.matheclipse.core.expression.F.$str;
-import static org.matheclipse.core.expression.F.And;
-import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.CompoundExpression;
-import static org.matheclipse.core.expression.F.Defer;
-import static org.matheclipse.core.expression.F.FreeQ;
-import static org.matheclipse.core.expression.F.Function;
-import static org.matheclipse.core.expression.F.Greater;
-import static org.matheclipse.core.expression.F.ISetDelayed;
-import static org.matheclipse.core.expression.F.If;
-import static org.matheclipse.core.expression.F.Less;
-import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Map;
-import static org.matheclipse.core.expression.F.Module;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Print;
-import static org.matheclipse.core.expression.F.SameQ;
-import static org.matheclipse.core.expression.F.Set;
-import static org.matheclipse.core.expression.F.Slot1;
-import static org.matheclipse.core.expression.F.Sqr;
-import static org.matheclipse.core.expression.F.Subtract;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.UnsameQ;
-import static org.matheclipse.core.expression.F.u;
-import static org.matheclipse.core.expression.F.u_;
-import static org.matheclipse.core.expression.F.v;
-import static org.matheclipse.core.expression.F.v_;
-import static org.matheclipse.core.expression.F.w;
-import static org.matheclipse.core.expression.F.w_;
-import static org.matheclipse.core.expression.F.x;
-import static org.matheclipse.core.expression.F.x_;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Dist;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NumericFactor;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Simp;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SumQ;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.EqQ;
 
 /**
  * UtilityFunctions from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
@@ -153,50 +109,37 @@ public class UtilityFunctions {
 	// return unary($s("DownValues"), a);
 	// }
 
-	public static IAST RULES = F.ListAlloc(ISetDelayed(Dist(u_, Dist(v_, w_, x_), x_), Dist(Times(u, v), w, x)),
-			ISetDelayed(
-					Dist(u_, v_,
-							x_),
-					If(SameQ(u, C1), v,
-							If(SameQ(u, C0),
-									CompoundExpression(
-											Print($str("*** Warning ***:  Dist[0,"), v, $str(" "), x, $str("]")), C0),
-									If(And(Less(NumericFactor(u), C0), Greater(NumericFactor(Times(CN1, u)), C0)),
-											Times(CN1,
-													Dist(Times(CN1, u), v,
-															x)),
-											If(SumQ(v),
-													Map(Function(
-															Dist(u, Slot1,
-																	x)),
-															v),
-													If(FreeQ(v, $s("Int")), Simp(Times(u, v), x), Module(
-															List(Set(w,
-																	Times(Simp(Times(u, Sqr(x)), x),
-																			Power(Sqr(x), CN1)))),
-															If(And(And(UnsameQ(w, u), FreeQ(w, x)),
-																	SameQ(w, Simp(w, x))), Dist(w, v, x),
-																	$(Defer($s("Integrate::Dist")), u, v, x))))))))));
+	// public static IAST RULES = F.ListAlloc(ISetDelayed(Dist(u_, Dist(v_, w_, x_), x_), Dist(Times(u, v), w, x)),
+	// ISetDelayed(Dist(u_, v_, x_), If(SameQ(u, C1), v, If(SameQ(u, C0),
+	// CompoundExpression(Print($str("*** Warning ***: Dist[0,"), v, $str(" "), x, $str("]")), C0),
+	// If(And(Less(NumericFactor(u), C0), Greater(NumericFactor(Times(CN1, u)), C0)),
+	// Times(CN1, Dist(Times(CN1, u), v, x)),
+	// If(SumQ(v), Map(Function(Dist(u, Slot1, x)), v),
+	// If(FreeQ(v, $s("Int")), Simp(Times(u, v), x),
+	// Module(List(Set(w, Times(Simp(Times(u, Sqr(x)), x), Power(Sqr(x), CN1)))),
+	// If(And(And(UnsameQ(w, u), FreeQ(w, x)), SameQ(w, Simp(w, x))),
+	// Dist(w, v, x),
+	// $(Defer($s("Integrate::Dist")), u, v, x))))))))));
 
-	public static void init() {
+//	public static void init() {
 		// Dist[u_,v_,x_]+Dist[w_,v_,x_] :=
 		// If[EqQ[u+w,0],
 		// 0,
 		// Dist[u+w,v,x]]
-		Arithmetic.CONST_PLUS.defineHashRule(Dist(u_, v_, x_), Dist(w_, v_, x_),
-				If(EqQ(Plus(u, w), C0), C0, Dist(Plus(u, w), v, x)), null);
+		// Arithmetic.CONST_PLUS.defineHashRule(Dist(u_, v_, x_), Dist(w_, v_, x_),
+		// If(EqQ(Plus(u, w), C0), C0, Dist(Plus(u, w), v, x)), null);
 
 		// Dist[u_,v_,x_]-Dist[w_,v_,x_] :=
 		// If[EqQ[u-w,0],
 		// 0,
 		// Dist[u-w,v,x]]
-		Arithmetic.CONST_PLUS.defineHashRule(Dist(u_, v_, x_), Times(CN1, Dist(w_, v_, x_)),
-				If(EqQ(Subtract(u,  w ), C0), C0, Dist(Subtract(u, w ), v, x)), null);
+		// Arithmetic.CONST_PLUS.defineHashRule(Dist(u_, v_, x_), Times(CN1, Dist(w_, v_, x_)),
+		// If(EqQ(Subtract(u, w), C0), C0, Dist(Subtract(u, w), v, x)), null);
 
-		// w_*Dist[u_,v_,x_] := 
+		// w_*Dist[u_,v_,x_] :=
 		// Dist[w*u,v,x] /;
 		// w=!=-1
-		Arithmetic.CONST_TIMES.defineHashRule(Dist(u_, v_, x_), w_, Dist(Times(w, u), v, x), UnsameQ(w, CN1));
+		// Arithmetic.CONST_TIMES.defineHashRule(Dist(u_, v_, x_), w_, Dist(Times(w, u), v, x), UnsameQ(w, CN1));
 
-	} 
+//	}
 }

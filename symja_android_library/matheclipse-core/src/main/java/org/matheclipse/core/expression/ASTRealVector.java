@@ -264,6 +264,10 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 		return F.num(vector.getEntry(4));
 	}
 
+	/** {@inheritDoc} */
+	public int argSize() {
+		return vector.getDimension();
+	}
 	@Override
 	public Set<IExpr> asSet() {
 		throw new UnsupportedOperationException();
@@ -335,6 +339,9 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluate(EvalEngine engine) {
+		// if ((getEvalFlags() & IAST.DEFER_AST) == IAST.DEFER_AST) {
+		// return F.NIL;
+		// }
 		return F.NIL;
 	}
 
@@ -354,6 +361,11 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 		return filterAST;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public final String fullFormString() {
+		return fullFormString(F.List);
+	}
 	/** {@inheritDoc} */
 	@Override
 	public IAST filter(IASTAppendable filterAST, IASTAppendable restAST, Predicate<? super IExpr> predicate) {

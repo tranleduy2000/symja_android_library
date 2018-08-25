@@ -1,7 +1,9 @@
 package org.matheclipse.core.system;
 
+import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
 
 import static org.matheclipse.core.expression.F.$s;
 import static org.matheclipse.core.expression.F.AtomQ;
@@ -49,6 +51,7 @@ import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.AbortRubi
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ActivateTrig;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ContentFactor;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.DeactivateTrig;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Dist;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.EasyDQ;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ExpandToSum;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FixSimplify;
@@ -275,6 +278,23 @@ public class RubiIntegrationTest extends AbstractTestCase {
 		check(ast, "ArcSin[Pi/6+r/3+s-x]");
 	}
 
+	public void testRubi017() {
+		IAST ast;
+		ast = F.Times(F.z, Dist(F.C0, F.v, F.w));
+		check(ast, "0");
+	}
+
+	public void testRubi018() {
+		IASTAppendable ast = F.quaternary(Plus, F.z, Dist(F.C3, F.v, F.w), Dist(F.C0, F.v, F.w), F.g);
+		EvalAttributes.sort(ast);
+		check(ast, "g+3*v+z");
+	}
+
+	public void testRubi019() {
+		IASTAppendable ast = F.quaternary(Plus, Dist(F.C3, F.v, F.w), F.a, F.Times(F.CN1, Dist(F.C3, F.v, F.w)), F.g);
+		EvalAttributes.sort(ast);
+		check(ast, "a+g");
+	}
     public void testSqrtSin() {
         check("Integrate(Sqrt(a*Sin(x)^2),x)", "-Cot(x)*Sqrt(a*Sin(x)^2)");
     }
@@ -360,8 +380,8 @@ public class RubiIntegrationTest extends AbstractTestCase {
 		check("Integrate(x*Sin(a + b*x)^2,x)", //
 				"x^2/4+(-x*Cos(a+b*x)*Sin(a+b*x))/(2*b)+Sin(a+b*x)^2/(4*b^2)");
 		check("Integrate(x*Sin(a + b*x)^3,x)", //
-				"-2/3*(x*Cos(a+b*x))/b+2/3*Sin(a+b*x)/b^2+(-x*Cos(a+b*x)*Sin(a+b*x)^2)/(3*b)+Sin(a+b*x)^\n" +
-				"3/(9*b^2)");
+				"-2/3*(x*Cos(a+b*x))/b+2/3*Sin(a+b*x)/b^2+(-x*Cos(a+b*x)*Sin(a+b*x)^2)/(3*b)+Sin(a+b*x)^\n"
+						+ "3/(9*b^2)");
 
 		check("Integrate(x^2*Sin(a + b*x),x)",//
 				"(2*Cos(a+b*x))/b^3+(-x^2*Cos(a+b*x))/b+(2*x*Sin(a+b*x))/b^2");
@@ -393,7 +413,8 @@ public class RubiIntegrationTest extends AbstractTestCase {
 
 		check("Integrate((a + b*Sin(c + g*x))^4,x)", //
 				"a^4*x+(-4*a^3*b*Cos(c+g*x))/g+4*a*b^3*(-Cos(c+g*x)/g+Cos(c+g*x)^3/(3*g))+6*a^2*b^\n" + //
-				"2*(x/2+(-Cos(c+g*x)*Sin(c+g*x))/(2*g))+b^4*(3/8*x-3/8*(Cos(c+g*x)*Sin(c+g*x))/g+(-Cos(c+g*x)*Sin(c+g*x)^\n" + //
+						"2*(x/2+(-Cos(c+g*x)*Sin(c+g*x))/(2*g))+b^4*(3/8*x-3/8*(Cos(c+g*x)*Sin(c+g*x))/g+(-Cos(c+g*x)*Sin(c+g*x)^\n"
+						+ //
 				"3)/(4*g))");
 
 		check("$f(a_.+b_.*c_):={a,b,c};$f(x)", //

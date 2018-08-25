@@ -73,7 +73,7 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 					evaled = true;
 					temp = tres;
 
-					if (i == (tempAST.argSize())) {
+					if (i == tempAST.argSize()) {
 						result.append(temp);
 					}
 
