@@ -1,6 +1,8 @@
 package org.matheclipse.core.rubi;
 
-import junit.framework.TestCase;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.concurrent.TimeUnit;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalControlledCallable;
@@ -14,9 +16,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.concurrent.TimeUnit;
+import junit.framework.TestCase;
 
 /**
  * Tests system.reflection classes
@@ -44,29 +44,39 @@ public abstract class AbstractRubiTestCase extends TestCase {
 		if (result.equals(F.$Aborted)) {
 			return "TIMEOUT";
 		}
-		if (manuallyCheckedResult != null) {
-			manuallyCheckedResult = manuallyCheckedResult.trim();
-			if (manuallyCheckedResult.length() > 0) {
-				IExpr expected = fEvaluator.eval(manuallyCheckedResult);
+
+		if (result.isFree(F.Integrate)) {
+			if (manuallyCheckedResult != null) {
+				manuallyCheckedResult = manuallyCheckedResult.trim();
+				if (manuallyCheckedResult.length() > 0) {
+					IExpr expected = fEvaluator.eval(manuallyCheckedResult);
+					if (result.equals(expected)) {
+						// the expressions are structurally equal
+						return expectedResult;
+					}
+				}
+			}
+
+			expectedResult = expectedResult.trim();
+			if (expectedResult.length() > 0) {
+				IExpr expected = fEvaluator.eval(expectedResult);
 				if (result.equals(expected)) {
 					// the expressions are structurally equal
 					return expectedResult;
 				}
+
+				expected = fEvaluator.eval(F.PossibleZeroQ(F.Subtract(result, expected)));
+				if (expected.isTrue()) {
+					// the expressions are structurally equal
+					return expectedResult;
+				}
+				// IExpr resultTogether= F.Together.of(F.ExpandAll(result));
+				// IExpr expectedTogether = F.Together.of(F.ExpandAll(expected));
+				// if (resultTogether.equals(expectedTogether)) {
+				// // the expressions are structurally equal
+				// return expectedResult;
+				// }
 			}
-		}
-		expectedResult = expectedResult.trim();
-		if (expectedResult.length() > 0) {
-		IExpr expected = fEvaluator.eval(expectedResult);
-		if (result.equals(expected)) {
-			// the expressions are structurally equal
-			return expectedResult;
-		}
-		// IExpr resultTogether= F.Together.of(F.ExpandAll(result));
-		// IExpr expectedTogether = F.Together.of(F.ExpandAll(expected));
-		// if (resultTogether.equals(expectedTogether)) {
-		// // the expressions are structurally equal
-		// return expectedResult;
-		// }
 		}
 		final StringWriter buf = new StringWriter();
 		OutputFormFactory.get(true).convert(buf, result);
@@ -161,7 +171,7 @@ public abstract class AbstractRubiTestCase extends TestCase {
 
 	/**
 	 * Tests if in the evaluation of the integral the same rule is used as is used by Mathematica Rubi
-	 *
+	 * 
 	 * @param evalString
 	 *            String of the form "Integrate(expr, x)
 	 * @param ruleNumberUsed
@@ -176,6 +186,7 @@ public abstract class AbstractRubiTestCase extends TestCase {
 	public void check(String evalString, String expectedResult, String manuallyCheckedResult, int... ruleNumberUsed) {
 		checkLength(evalString, expectedResult, manuallyCheckedResult, -1);
 	}
+
 	/**
 	 * The JUnit setup method
 	 */
@@ -183,7 +194,6 @@ public abstract class AbstractRubiTestCase extends TestCase {
 	protected void setUp() {
 		try {
 			F.await();
-
 			// start test with fresh instance
 			EvalEngine engine = new EvalEngine(isRelaxedSyntax);
 			fEvaluator = new ExprEvaluator(engine, true, 0);
@@ -194,7 +204,6 @@ public abstract class AbstractRubiTestCase extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override
