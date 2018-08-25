@@ -1017,7 +1017,14 @@ public class Algebra {
 				return (pattern != null && expression.isFree(pattern, false));
 			}
 
-			public IExpr expandAST(final IAST ast) {
+			/**
+			 *
+			 * @param ast
+			 * @param evalParts
+			 *            evaluate the determined numerator and denominator parts
+			 * @return
+			 */
+			private IExpr expandAST(final IAST ast, boolean evalParts) {
 				if (isPatternFree(ast)) {
 					return F.NIL;
 				}
@@ -1029,7 +1036,7 @@ public class Algebra {
 				} else if (ast.isTimes()) {
 					// (a+b)*(c+d)...
 
-					IExpr[] temp = fractionalPartsTimesPower(ast, false, false, false, true);
+					IExpr[] temp = fractionalPartsTimesPower(ast, false, false, false, evalParts);
 					IExpr tempExpr;
 					if (temp == null) {
 						return expandTimes(ast);
@@ -1044,7 +1051,7 @@ public class Algebra {
 							return F.NIL;
 						}
 						if (temp[1].isPower() || temp[1].isPlus()) {
-							IExpr denom = expandAST((IAST) temp[1]);
+							IExpr denom = expandAST((IAST) temp[1], evalParts);
 							if (denom.isPresent()) {
 								return PowerOp.power(denom, F.CN1);
 							}
@@ -1074,7 +1081,7 @@ public class Algebra {
 							}
 						} else {
 							if (temp[1].isPower() || temp[1].isPlus()) {
-								IExpr denom = expandAST((IAST) temp[1]);
+								IExpr denom = expandAST((IAST) temp[1], evalParts);
 								if (denom.isPresent()) {
 									temp[1] = denom;
 									evaled = true;
@@ -1116,7 +1123,7 @@ public class Algebra {
 				for (int i = 1; i < ast.size(); i++) {
 					final IExpr arg = ast.get(i);
 					if (arg.isAST()) {
-						IExpr temp = expand((IAST) arg, pattern, expandNegativePowers, false);
+						IExpr temp = expand((IAST) arg, pattern, expandNegativePowers, false, true);
 						if (temp.isPresent()) {
 							if (!result.isPresent()) {
 								result = ast.copyUntil(ast.size(), i);
@@ -1156,7 +1163,8 @@ public class Algebra {
 							INumber floorPart = fraction.floorFraction().normalize();
 							if (!floorPart.isZero()) {
 								IFraction fractionalPart = fraction.fractionalPart();
-								return expandAST(F.Times(F.Power(base, fractionalPart), F.Power(base, floorPart)));
+								return expandAST(F.Times(F.Power(base, fractionalPart), F.Power(base, floorPart)),
+										true);
 							}
 						}
 					}
@@ -1321,7 +1329,7 @@ public class Algebra {
 			public void evalAndExpandAST(IExpr expr1, IExpr expr2, final IASTAppendable result) {
 				IExpr arg = TimesOp.times(expr1, expr2);
 				if (arg.isAST()) {
-					appendPlus(result, expandAST((IAST) arg).orElse(arg));
+					appendPlus(result, expandAST((IAST) arg, true).orElse(arg));
 					return;
 				}
 				result.append(arg);
@@ -1422,7 +1430,7 @@ public class Algebra {
 				if (ast.size() > 2) {
 					patt = ast.arg2();
 				}
-				return expand(arg1, patt, false, true).orElse(arg1);
+				return expand(arg1, patt, false, true, true).orElse(arg1);
 			}
 
 			return ast.arg1();
@@ -3955,11 +3963,14 @@ public class Algebra {
 	 * @param patt
 	 * @param distributePlus
 	 *            TODO
+	 * @param evalParts
+	 *            evaluate the determined numerator and denominator parts
 	 * @return <code>F.NIL</code> if the expression couldn't be expanded.
 	 */
-	public static IExpr expand(final IAST ast, IExpr patt, boolean expandNegativePowers, boolean distributePlus) {
+	public static IExpr expand(final IAST ast, IExpr patt, boolean expandNegativePowers, boolean distributePlus,
+			boolean evalParts) {
 		Expand.Expander expander = new Expand.Expander(patt, expandNegativePowers, distributePlus);
-		return expander.expandAST(ast);
+		return expander.expandAST(ast, evalParts);
 	}
 
 	/**
@@ -4035,7 +4046,7 @@ public class Algebra {
         });
 
 		if (!result[0].isPresent()) {
-			temp = expand(localAST, patt, expandNegativePowers, distributePlus);
+			temp = expand(localAST, patt, expandNegativePowers, distributePlus, true);
 			if (temp.isPresent()) {
 				ExpandAll.setAllExpanded(temp, expandNegativePowers, distributePlus);
 				return temp;
@@ -4048,7 +4059,7 @@ public class Algebra {
 			ExpandAll.setAllExpanded(ast, expandNegativePowers, distributePlus);
 			return F.NIL;
 		}
-		temp = expand(result[0], patt, expandNegativePowers, distributePlus);
+		temp = expand(result[0], patt, expandNegativePowers, distributePlus, true);
 		if (temp.isPresent()) {
 			return ExpandAll.setAllExpanded(temp, expandNegativePowers, distributePlus);
 		}
@@ -4209,7 +4220,7 @@ public class Algebra {
 	 * @param trig
 	 *            try to find a trigonometric numerator/denominator form (Example: Csc[x] gives 1 / Sin[x])
 	 * @param evalParts
-	 *            evaluate the determined parts
+	 *            evaluate the determined numerator and denominator parts
 	 * @return the numerator and denominator expression and an optional fractional number (maybe <code>null</code>), if
 	 *         splitNumeratorOne is <code>true</code>.
 	 */

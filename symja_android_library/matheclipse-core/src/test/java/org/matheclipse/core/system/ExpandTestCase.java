@@ -1,5 +1,11 @@
 package org.matheclipse.core.system;
 
+import org.matheclipse.core.builtin.Algebra;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IExpr;
+
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C2;
@@ -13,12 +19,6 @@ import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.a;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.y;
-
-import org.matheclipse.core.builtin.Algebra;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IExpr;
 
 /**
  * 
@@ -36,7 +36,7 @@ public class ExpandTestCase extends AbstractTestCase {
 
 	public void testExpand002() {
 		IAST ast = Times(x, Times(C1D2, x));
-		IExpr temp = Algebra.expand(ast, null, false, false);
+		IExpr temp = Algebra.expand(ast, null, false, false, true);
 		assertEquals(temp.toString(), "x^2/2");
 	}
 
@@ -69,7 +69,7 @@ public class ExpandTestCase extends AbstractTestCase {
 	public void testExpand006() {
 		// (3*x^2+2)^2
 		IAST ast = Power(Plus(C2, Times(C3, Power(x, 2))), C2);
-		IExpr temp = Algebra.expand(ast, null, true, false);
+		IExpr temp = Algebra.expand(ast, null, true, false, true);
 		if (temp == null) {
 			temp = ast;
 		}
@@ -79,7 +79,7 @@ public class ExpandTestCase extends AbstractTestCase {
 	public void testExpand007() {
 		// Sec(x)^2*Sin(x)^2
 		IAST ast = Times(Power(Sec(x), C2), Power(Sin(x), 2));
-		IExpr temp = Algebra.expand(ast, null, true, false);
+		IExpr temp = Algebra.expand(ast, null, true, false, true);
 		if (!temp.isPresent()) {
 			assertEquals(ast.toString(), "Sec[x]^2*Sin[x]^2");
 			return;

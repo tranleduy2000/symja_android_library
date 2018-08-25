@@ -160,13 +160,13 @@ public class F {
 	/** Abort() - aborts an evaluation completely and returns `$Aborted`. */
 	public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
 
-	/** Abs(expr) - returns the absolute value of the real or complex number `expr`.*/
+	/** Abs(expr) - returns the absolute value of the real or complex number `expr`. */
 	public final static IBuiltInSymbol Abs = F.initFinalSymbol("Abs", ID.Abs);
 
-	/** AbsArg(expr) - returns a list the 2 values of the real or complex number `Abs(expr), Arg(expr)`.*/
+	/** AbsArg(expr) - returns a list the 2 values of the real or complex number `Abs(expr), Arg(expr)`. */
 	public final static IBuiltInSymbol AbsArg = F.initFinalSymbol("AbsArg", ID.AbsArg);
 
-	/** Accumulate(list) - accumulate the values of `list` returning a new list.*/
+	/** Accumulate(list) - accumulate the values of `list` returning a new list. */
 	public final static IBuiltInSymbol Accumulate = F.initFinalSymbol("Accumulate", ID.Accumulate);
 
 	/** AddTo(x, dx) - is equivalent to `x = x + dx`.*/
@@ -2184,7 +2184,10 @@ public class F {
     /** StirlingS1(n, k) - returns the Stirling numbers of the first kind. */
 	public final static IBuiltInSymbol StirlingS1 = F.initFinalSymbol("StirlingS1", ID.StirlingS1);
 
-    /** StirlingS2(n, k) - returns the Stirling numbers of the second kind. `StirlingS2(n,k)` is the number of ways of partitioning an `n`-element set into `k` non-empty subsets.*/
+	/**
+	 * StirlingS2(n, k) - returns the Stirling numbers of the second kind. `StirlingS2(n,k)` is the number of ways of
+	 * partitioning an `n`-element set into `k` non-empty subsets.
+	 */
 	public final static IBuiltInSymbol StirlingS2 = F.initFinalSymbol("StirlingS2", ID.StirlingS2);
 
 	/***/
@@ -5257,17 +5260,19 @@ public class F {
 	 *            TODO
 	 * @param distributePlus
 	 *            TODO
+	 * @param evalParts
+	 *            evaluate the determined numerator and denominator parts
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
-	public static IExpr expand(IExpr a, boolean expandNegativePowers, boolean distributePlus) {
+	public static IExpr expand(IExpr a, boolean expandNegativePowers, boolean distributePlus, boolean evalParts) {
 		if (a.isAST()) {
 			EvalEngine engine = EvalEngine.get();
 			IAST ast = engine.evalFlatOrderlessAttributesRecursive((IAST) a);
 			if (!ast.isPresent()) {
 				ast = (IAST) a;
 			}
-			return Algebra.expand(ast, null, expandNegativePowers, distributePlus).orElse(a);
+			return Algebra.expand(ast, null, expandNegativePowers, distributePlus, evalParts).orElse(a);
 		}
 		return a;
 	}
