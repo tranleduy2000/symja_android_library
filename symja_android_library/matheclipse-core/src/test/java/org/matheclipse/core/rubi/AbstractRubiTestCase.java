@@ -1,8 +1,6 @@
 package org.matheclipse.core.rubi;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.concurrent.TimeUnit;
+import junit.framework.TestCase;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalControlledCallable;
@@ -16,7 +14,9 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
-import junit.framework.TestCase;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Tests system.reflection classes
@@ -49,12 +49,18 @@ public abstract class AbstractRubiTestCase extends TestCase {
 			if (manuallyCheckedResult != null) {
 				manuallyCheckedResult = manuallyCheckedResult.trim();
 				if (manuallyCheckedResult.length() > 0) {
+					if (manuallyCheckedResult.equals(result.toString())) {
+						// the expressions are textual equal
+						return expectedResult;
+					}
+					
 					IExpr expected = fEvaluator.eval(manuallyCheckedResult);
 					if (result.equals(expected)) {
 						// the expressions are structurally equal
 						return expectedResult;
 					}
 				}
+				
 			}
 
 			expectedResult = expectedResult.trim();
