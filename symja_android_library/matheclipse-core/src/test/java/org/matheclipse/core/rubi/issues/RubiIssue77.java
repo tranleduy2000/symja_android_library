@@ -1,18 +1,18 @@
-package org.matheclipse.core.rubi; 
-
-//Integrate[x*(2*c+3*d*x)*(a+c*x^2+d*x^3)^n,x]
+package org.matheclipse.core.rubi.issues;
 
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.rubi.AbstractRubiTestCase;
 
+//Integrate[x*(2*c+3*d*x)*(a+c*x^2+d*x^3)^n,x]
 /**
- *
+ * 
  * <pre>
- *   Int[(Pp_)*(Qq_)^(m_.), x_Symbol] :=
- *       With[{p = Expon[Pp, x], q = Expon[Qq, x]}, Simp[(Coeff[Pp, x, p]*x^(p - q + 1)*Qq^(m + 1))/((p + m*q + 1)*Coeff[Qq, x, q]), x]
- *                 /; NeQ[p + m*q + 1, 0] && EqQ[(p + m*q + 1)*Coeff[Qq, x, q]*Pp, Coeff[Pp, x, p]*x^(p - q)*((p - q + 1)*Qq + (m + 1)*x*D[Qq, x])]]
+ *   Int[(Pp_)*(Qq_)^(m_.), x_Symbol] := 
+ *       With[{p = Expon[Pp, x], q = Expon[Qq, x]}, Simp[(Coeff[Pp, x, p]*x^(p - q + 1)*Qq^(m + 1))/((p + m*q + 1)*Coeff[Qq, x, q]), x] 
+ *                 /; NeQ[p + m*q + 1, 0] && EqQ[(p + m*q + 1)*Coeff[Qq, x, q]*Pp, Coeff[Pp, x, p]*x^(p - q)*((p - q + 1)*Qq + (m + 1)*x*D[Qq, x])]] 
  *       /; FreeQ[m, x] && PolyQ[Pp, x] && PolyQ[Qq, x] && NeQ[m, -1]
  * </pre>
- *
+ * 
  * <pre>
  * IIntegrate(1588,Int(Times($p("§pp"),Power($p("§qq"),m_DEFAULT)),x_Symbol),
  *   Condition(With(List(Set(p,Expon($s("§pp"),x)),Set(q,Expon($s("§qq"),x))),
@@ -415,7 +415,8 @@ public class RubiIssue77 extends AbstractRubiTestCase {
 	}
 
 	public void test0092() {
-		check("Integrate::MergeFactors[(1 + n)^(-1), (a + c*x^2 + d*x^3)^(1 + n)]", "(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)");
+		check("Integrate::MergeFactors[(1 + n)^(-1), (a + c*x^2 + d*x^3)^(1 + n)]",
+				"(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)");
 	}
 
 	public void test0093() {
@@ -535,7 +536,8 @@ public class RubiIssue77 extends AbstractRubiTestCase {
 	}
 
 	public void test0122() {
-		check("Integrate::NormalizeSumFactors[(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)]", "(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)");
+		check("Integrate::NormalizeSumFactors[(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)]",
+				"(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)");
 	}
 
 	public void test0123() {
@@ -887,7 +889,8 @@ public class RubiIssue77 extends AbstractRubiTestCase {
 	}
 
 	public void test0210() {
-		check("Integrate::SignOfFactor[(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)]", "{1, (a + c*x^2 + d*x^3)^(1 + n)/(1 + n)}");
+		check("Integrate::SignOfFactor[(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)]",
+				"{1, (a + c*x^2 + d*x^3)^(1 + n)/(1 + n)}");
 	}
 
 	public void test0211() {
@@ -959,7 +962,8 @@ public class RubiIssue77 extends AbstractRubiTestCase {
 	}
 
 	public void test0228() {
-		check("Integrate::SimpHelp[(3*(a + c*x^2 + d*x^3)^(1 + n))/(3 + 3*n), x]", "(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)");
+		check("Integrate::SimpHelp[(3*(a + c*x^2 + d*x^3)^(1 + n))/(3 + 3*n), x]",
+				"(a + c*x^2 + d*x^3)^(1 + n)/(1 + n)");
 	}
 
 	public void test0229() {
@@ -1105,6 +1109,7 @@ public class RubiIssue77 extends AbstractRubiTestCase {
 	public void test0264() {
 		check("Integrate::TrigQ[(a + c*x^2 + d*x^3)^(1 + n)]", "False");
 	}
+
 	public void test0265() {
 		check("PolynomialQ[(2*c+3*d*x)*(a+c*x^2+d*x^3)^n,x]", "False");
 		check("Integrate::PolyQ[(2*c+3*d*x)*(a+c*x^2+d*x^3)^n,x]", "False");
@@ -1132,4 +1137,5 @@ public class RubiIssue77 extends AbstractRubiTestCase {
 		check("D[2*c+3*d*x,x]+(1+n)*x*(2*c+3*d*x)*D[a+c*x^2+d*x^3,x]", //
 				"3*d+(1+n)*x*(2*c+3*d*x)*(2*c*x+3*d*x^2)");
 	}
+
 }
