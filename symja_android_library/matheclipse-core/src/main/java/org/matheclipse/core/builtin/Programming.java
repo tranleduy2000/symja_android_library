@@ -1869,18 +1869,10 @@ public final class Programming {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
-			if (Config.TIMECONSTARINED_NO_THREAD) {
-				// no thread can be spawned
-				try {
+			long s = engine.getSeconds();
+			if (s > 0 || Config.TIMECONSTARINED_NO_THREAD) {
+				// no new thread should be spawned
 					return engine.evaluate(ast.arg1());
-				} catch (final MathException e) {
-					throw e;
-				} catch (final Throwable th) {
-					if (ast.isAST3()) {
-						return ast.arg3();
-					}
-				}
-				return F.$Aborted;
 			}
 
 			IExpr arg2 = engine.evaluate(ast.arg2());
@@ -1902,7 +1894,7 @@ public final class Programming {
 				return F.NIL;
 			}
 
-			TimeLimiter timeLimiter = SimpleTimeLimiter.create(Executors.newSingleThreadExecutor());
+			TimeLimiter timeLimiter = SimpleTimeLimiter.create(engine.getExecutorService());// Executors.newSingleThreadExecutor());
 			EvalControlledCallable work = new EvalControlledCallable(engine);
 
 			work.setExpr(ast.arg1());
@@ -2330,7 +2322,7 @@ public final class Programming {
 				// if (oldSymbol.toString().equals("num")){
 				// System.out.println(variablesList.toString());
 				// }
-				newSymbol = F.Dummy(oldSymbol.toString() + varAppend);//, engine);
+				newSymbol = F.Dummy(oldSymbol.toString() + varAppend);// , engine);
 				variablesMap.put(oldSymbol, newSymbol);
 				// newSymbol.pushLocalVariable();
 				engine.localStackCreate(newSymbol).push(F.NIL);
@@ -2339,7 +2331,7 @@ public final class Programming {
 					final IAST setFun = (IAST) variablesList.get(i);
 					if (setFun.arg1().isSymbol()) {
 						oldSymbol = (ISymbol) setFun.arg1();
-						newSymbol = F.Dummy(oldSymbol.toString() + varAppend);//, engine);
+						newSymbol = F.Dummy(oldSymbol.toString() + varAppend);// , engine);
 						variablesMap.put(oldSymbol, newSymbol);
 						IExpr rightHandSide = setFun.arg2();
 						try {

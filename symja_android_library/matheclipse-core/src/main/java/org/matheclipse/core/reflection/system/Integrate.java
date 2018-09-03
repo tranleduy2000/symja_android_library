@@ -197,7 +197,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 				DEBUG_EXPR.add(arg1);
 			}
 			if (arg1.isAST()) {
-				IAST fx = (IAST) arg1;
+				final IAST fx = (IAST) arg1;
 				if (fx.topHead().equals(x)) {
 					// issue #91
 					return F.NIL;
@@ -268,12 +268,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 					}
 				}
 				}
-				IExpr fxExpanded = F.expand(fx, true, false, false);
-				if (fxExpanded.isAST()) {
-					if (fxExpanded.isPlus()) {
-						if (fxExpanded != fx) {
-							if (fxExpanded.isPolynomial(x)) {
-								if (arg1.isTimes()) {
+				// >>>
+				if (fx.isTimes() || fx.isPower()) {
 									// deleted - Rubi seems to work w/o second try: result = integrateByRubiRules(ast,
 									// (IAST) fxExpanded);
 									if (!calledRubi) {
@@ -284,8 +280,25 @@ public class Integrate extends AbstractFunctionEvaluator {
 										calledRubi = true;
 									}
 								}
-							}
-						}
+				// <<<
+				IExpr fxExpanded = F.expand(fx, false, false, false);
+				if (fxExpanded.isAST()) {
+					if (fxExpanded.isPlus()) {
+						// if (fxExpanded != fx) {
+						// if (fxExpanded.isPolynomial(x)) {
+						// if (fx.isTimes()||fx.isPower()) {
+						// // deleted - Rubi seems to work w/o second try: result = integrateByRubiRules(ast,
+						// // (IAST) fxExpanded);
+						// if (!calledRubi) {
+						// result = integrateByRubiRules(ast, F.NIL);
+						// if (result.isPresent()) {
+						// return result;
+						// }
+						// calledRubi = true;
+						// }
+						// }
+						// }
+						// }
 
 						// Integrate[a_+b_+...,x_] ->
 						// Integrate[a,x]+Integrate[b,x]+...

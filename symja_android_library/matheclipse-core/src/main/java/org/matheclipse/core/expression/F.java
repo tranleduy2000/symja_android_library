@@ -85,6 +85,7 @@ import javax.annotation.Nonnull;
 
 import ch.ethz.idsc.tensor.QuantityParser;
 import edu.jas.kern.ComputerThreads;
+import edu.jas.kern.PreemptStatus;
 
 /**
  * 
@@ -107,6 +108,7 @@ public class F {
 	 */
 	public static Cache<IAST, IExpr> REMEMBER_INTEGER_CACHE = CacheBuilder.newBuilder().maximumSize(5000).build();
 
+	public static Cache<IAST, IExpr> REMEMBER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(5000).build();
 	/**
 	 * Set to <code>true</code> at the start of initSymbols() method
 	 */
@@ -169,7 +171,7 @@ public class F {
 	/** Accumulate(list) - accumulate the values of `list` returning a new list. */
 	public final static IBuiltInSymbol Accumulate = F.initFinalSymbol("Accumulate", ID.Accumulate);
 
-	/** AddTo(x, dx) - is equivalent to `x = x + dx`.*/
+	/** AddTo(x, dx) - is equivalent to `x = x + dx`. */
 	public final static IBuiltInSymbol AddTo = F.initFinalSymbol("AddTo", ID.AddTo);
 
 	/***/
@@ -3020,6 +3022,7 @@ public class F {
 	static {
 		Thread INIT_THREAD = null;
 		try {
+			PreemptStatus.setNotAllow();
 			ComputerThreads.NO_THREADS = Config.JAS_NO_THREADS;
 			Runnable runnable = new Runnable() {
 				@Override

@@ -456,36 +456,52 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	 */
 	@Override
 	public int compareTo(final IExpr rhsExpr) {
-		if (isAST(F.DirectedInfinity)) {
-			if (!rhsExpr.isAST(F.DirectedInfinity)) {
-				return -1;
-			}
-			return compareToASTIncreasing(this, (IAST) rhsExpr);
-		} else {
-			if (rhsExpr.isAST(F.DirectedInfinity)) {
-				return 1;
-			}
-		}
-		if (rhsExpr.isSymbol() && isNot() && arg1().isSymbol()) {
-			return -1 * rhsExpr.compareTo(this);
-		}
+		final int lhsOrdinal = (head() instanceof IBuiltInSymbol) ? ((IBuiltInSymbol) head()).ordinal() : -1;
+		int rhsOrdinal = -1;
+		if (lhsOrdinal < 0) {
 		if (rhsExpr.isNumber()) {
 			// O-7
 			return 1;
 		}
 
+			rhsOrdinal = (rhsExpr.head() instanceof IBuiltInSymbol) ? ((IBuiltInSymbol) rhsExpr.head()).ordinal() : -1;
+			if (rhsOrdinal < 0) {
+				if (rhsExpr.isAST()) {
+					return compareToASTIncreasing(this, (IAST) rhsExpr);
+				}
+				return super.compareTo(rhsExpr);
+			}
+		} else {
+			if (lhsOrdinal == ID.DirectedInfinity && isDirectedInfinity()) {
+				if (!rhsExpr.isDirectedInfinity()) {
+					return -1;
+				}
+				return compareToASTIncreasing(this, (IAST) rhsExpr);
+			}
+			rhsOrdinal = (rhsExpr.head() instanceof IBuiltInSymbol) ? ((IBuiltInSymbol) rhsExpr.head()).ordinal() : -1;
+		}
 		if (rhsExpr.isAST()) {
+			if (rhsOrdinal == ID.DirectedInfinity && rhsExpr.isDirectedInfinity()) {
+				return 1;
+			}
+			if (lhsOrdinal >= ID.Plus && size() > 1) {
 			IAST rhs = (IAST) rhsExpr;
-			if (isSameHeadSizeGE(F.Plus, 1) && rhs.isSameHeadSizeGE(F.Plus, 1)) {
+				switch (lhsOrdinal) {
+				case ID.Plus:
+					if (rhsOrdinal == ID.Plus) {
+						if (rhs.size() >= 1) {
 				// O-3
 				return compareToASTDecreasing(this, rhs);
 			}
-			if (isSameHeadSizeGE(F.Times, 1) && rhs.isSameHeadSizeGE(F.Times, 1)) {
-				// O-3
-				return compareToASTDecreasing(this, rhs);
+					} else if (!rhsExpr.isSameHeadSizeGE(F.Plus, 1) && !rhsExpr.isSameHeadSizeGE(F.Times, 1)) {
+						// O-10
+						return compareToASTDecreasingArg1(this, rhsExpr, F.C0);
 			}
 
-			if (isPower() && rhs.isPower()) {
+					break;
+				case ID.Power:
+					if (rhsOrdinal == ID.Power) {
+						if (rhs.size() == 3) {
 				// O-4
 				int baseCompare = base().compareTo(rhs.base());
 				if (baseCompare == 0) {
@@ -493,24 +509,53 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 				}
 				return baseCompare;
 			}
+						// O-9
+						return compareToASTIncreasingArg1(this, rhsExpr, F.C1);
+					} else if (!rhsExpr.isSameHeadSizeGE(F.Times, 1) && !rhsExpr.isSameHeadSizeGE(F.Plus, 1)) {
+						// O-9
+						return compareToASTIncreasingArg1(this, rhsExpr, F.C1);
 		}
-		if (isSameHeadSizeGE(F.Times, 1)) {
+					break;
+				case ID.Times:
+					if (rhsOrdinal == ID.Times && rhs.size() >= 1) {
+						// O-3
+						return compareToASTDecreasing(this, rhs);
+					}
 			// O-8
 			return compareToASTDecreasingArg1(this, rhsExpr, F.C1);
 		}
-		if (isPower() && !rhsExpr.isSameHeadSizeGE(F.Times, 1) && !rhsExpr.isSameHeadSizeGE(F.Plus, 1)) {
+			}
+			if (rhsOrdinal < 0 || !rhsExpr.isPlusTimesPower()) {
+				return compareToASTIncreasing(this, (IAST) rhsExpr);
+			}
+
+			return super.compareTo(rhsExpr);
+		}
+
+		if (rhsExpr.isNumber()) {
+			// O-7
+			return 1;
+		}
+		if (lhsOrdinal >= ID.Not && size() > 1) {
+			switch (lhsOrdinal) {
+			case ID.Not:
+				if (rhsExpr.isSymbol() && arg1().isSymbol() && size() == 2) {
+					return -1 * rhsExpr.compareTo(this);
+				}
+				break;
+			case ID.Plus:
+				// Plus O-10
+				return compareToASTDecreasingArg1(this, rhsExpr, F.C1);
+			case ID.Power:
+				if (size() == 3) {
 			// O-9
 			return compareToASTIncreasingArg1(this, rhsExpr, F.C1);
 		}
-		if (isSameHeadSizeGE(F.Plus, 1) && !rhsExpr.isSameHeadSizeGE(F.Plus, 1)
-				&& !rhsExpr.isSameHeadSizeGE(F.Times, 1)) {
-			// O-10
-			return compareToASTDecreasingArg1(this, rhsExpr, F.C0);
+				break;
+			case ID.Times:
+				// Times O-8
+				return compareToASTDecreasingArg1(this, rhsExpr, F.C1);
 		}
-		if (rhsExpr.isAST()) {
-			if (!rhsExpr.isPlusTimesPower()) {
-				return compareToASTIncreasing(this, (IAST) rhsExpr);
-			}
 		}
 
 		return super.compareTo(rhsExpr);

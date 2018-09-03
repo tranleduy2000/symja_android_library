@@ -28,10 +28,7 @@ import edu.jas.structure.RingElem;
  * long entries (this will eventually be changed in the future). C can also be a non integral domain, e.g. a ModInteger,
  * i.e. it may contain zero divisors, since multiply() does now check for zeros. <b>Note:</b> multiply() now checks for
  * wrong method dispatch for GenSolvablePolynomial.
- * 
- * @param <C>
- *            coefficient type
- * @author Heinz Kredel
+ *
  */
 public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMonomial> {
 
@@ -68,12 +65,6 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 	private ExprPolynomial(ExprPolynomialRing r, TreeMap<ExpVectorLong, IExpr> t) {
 		ring = r;
 		val = t;
-		if (ring.checkPreempt) {
-			if (Thread.currentThread().isInterrupted()) {
-				logger.debug("throw PreemptingException");
-				throw new PreemptingException();
-			}
-		}
 	}
 
 	/**

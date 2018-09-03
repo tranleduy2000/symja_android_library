@@ -1536,12 +1536,16 @@ public class Algebra {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
-			VariablesSet eVar = new VariablesSet(ast.arg1());
 
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
 				return list.mapThread(F.ListAlloc(list.size()), ast, 1);
 			}
+			IExpr result = F.REMEMBER_AST_CACHE.getIfPresent(ast);
+			if (result != null) {
+				return result;
+			}
+			VariablesSet eVar = new VariablesSet(ast.arg1());
 			IExpr expr = ast.arg1();
 			if (ast.isAST1()) {
 				expr = F.Together.of(engine, ast.arg1());
@@ -1561,7 +1565,12 @@ public class Algebra {
 				if (ast.isAST2()) {
 					return factorWithOption(ast, expr, varList, false, engine);
 				}
-				return factor(expr, varList, false);
+				if (expr.isAST()) {
+					IExpr temp = factor((IAST) expr, varList, false);
+					F.REMEMBER_AST_CACHE.put(ast, temp);
+					return temp;
+				}
+				return expr;
 
 			} catch (JASConversionException e) {
 				if (Config.DEBUG) {
@@ -1593,6 +1602,7 @@ public class Algebra {
 				map = factorAbstract.factors(poly);
 			}
 			} catch (RuntimeException rex) {
+				// System.out.println("Factor failed: " + expr.toString());
 				return expr;
 			}
 			IASTAppendable result = F.TimesAlloc(map.size() + 1);
@@ -1611,6 +1621,7 @@ public class Algebra {
 					result.append(F.Power(jas.integerPoly2Expr(entry.getKey()), F.integer(entry.getValue())));
 				}
 			}
+			// System.out.println("Factor: " + expr.toString() + " ==> " + result.toString());
 			return result.getOneIdentity(F.C0);
 		}
 
@@ -1679,7 +1690,10 @@ public class Algebra {
 				if (ast.isAST2()) {
 					return factorWithOption(ast, expr, varList, true, engine);
 				}
-				return factor(expr, varList, true);
+				if (expr.isAST()) {
+					return factor((IAST) expr, varList, true);
+				}
+				return expr;
 
 			} catch (JASConversionException jce) {
 				// toInt() conversion failed

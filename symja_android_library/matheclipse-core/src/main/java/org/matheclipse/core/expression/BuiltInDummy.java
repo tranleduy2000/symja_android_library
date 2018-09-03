@@ -71,7 +71,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 
 	public BuiltInDummy(final String symbolName ) {
 		super();
-//		fContext = context;
+		// fContext = context;
 		fSymbolName = symbolName;
 	}
 
@@ -800,33 +800,22 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 	@Override
 	public final IPatternMatcher putUpRule(final ISymbol.RuleType setSymbol, final boolean equalRule,
 			final IAST leftHandSide, final IExpr rightHandSide, final int priority) {
-		EvalEngine engine = EvalEngine.get();
-		if (!engine.isPackageMode()) {
-			if (isLocked(false)) {
-				throw new RuleCreationError(leftHandSide);
-			}
-
-			engine.addModifiedVariable(this);
-		}
-		if (fRulesData == null) {
-			fRulesData = new RulesData(engine.getContext());
-		}
-		return fRulesData.putUpRule(setSymbol, equalRule, leftHandSide, rightHandSide);
+		throw new UnsupportedOperationException();
 	}
 
 	private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		fSymbolName = stream.readUTF();
 		fAttributes = stream.read();
-//		fContext = (Context) stream.readObject();
-//		if (fContext == null) {
-//			fContext = Context.SYSTEM;
-//		} else {
-//			boolean hasDownRulesData = stream.readBoolean();
-//			if (hasDownRulesData) {
-//				fRulesData = new RulesData(EvalEngine.get().getContext());
-//				fRulesData = (RulesData) stream.readObject();
-//			}
-//		}
+		// fContext = (Context) stream.readObject();
+		// if (fContext == null) {
+		// fContext = Context.SYSTEM;
+		// } else {
+		// boolean hasDownRulesData = stream.readBoolean();
+		// if (hasDownRulesData) {
+		// fRulesData = new RulesData(EvalEngine.get().getContext());
+		// fRulesData = (RulesData) stream.readObject();
+		// }
+		// }
 	}
 
 	// public Object readResolve() throws ObjectStreamException {
@@ -1008,17 +997,17 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 	private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
 		stream.writeUTF(fSymbolName);
 		stream.write(fAttributes);
-//		if (fContext.equals(Context.SYSTEM)) {
-//			stream.writeObject(null);
-//		} else {
-//			stream.writeObject(fContext);
-//			if (fRulesData == null) {
-//				stream.writeBoolean(false);
-//			} else {
-//				stream.writeBoolean(true);
-//				stream.writeObject(fRulesData);
-//			}
-//		}
+		// if (fContext.equals(Context.SYSTEM)) {
+		// stream.writeObject(null);
+		// } else {
+		// stream.writeObject(fContext);
+		// if (fRulesData == null) {
+		// stream.writeBoolean(false);
+		// } else {
+		// stream.writeBoolean(true);
+		// stream.writeObject(fRulesData);
+		// }
+		// }
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
