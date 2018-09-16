@@ -1,6 +1,10 @@
 package cc.redberry.rings.util;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Base64;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -9,7 +13,8 @@ import java.util.zip.GZIPOutputStream;
  * @since 1.0
  */
 public final class ZipUtil {
-    private ZipUtil() {}
+    private ZipUtil() {
+    }
 
     /**
      * Compress object to a string

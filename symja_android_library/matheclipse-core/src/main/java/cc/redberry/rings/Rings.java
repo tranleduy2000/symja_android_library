@@ -34,19 +34,34 @@ import cc.redberry.rings.poly.univar.UnivariatePolynomialZp64;
  * @since 1.0
  */
 public final class Rings {
-    private Rings() {}
-
-    static RandomGenerator privateRandom = new Well44497b(System.nanoTime());
-
     /**
      * Ring of integers (Z)
      */
     public static final Integers Z = Integers.Integers;
-
     /**
      * Field of rationals (Q)
      */
     public static final Rationals<BigInteger> Q = new Rationals<>(Z);
+    /**
+     * Ring of univariate polynomials over integers (Z[x])
+     */
+    public static final UnivariateRing<UnivariatePolynomial<BigInteger>> UnivariateRingZ = UnivariateRing(Z);
+    /**
+     * Ring of univariate polynomials over rationals (Q[x])
+     */
+    public static final UnivariateRing<UnivariatePolynomial<Rational<BigInteger>>> UnivariateRingQ = UnivariateRing(Q);
+    /**
+     * Field of Gaussian rationals (rational complex numbers).
+     */
+    public static AlgebraicNumberField<UnivariatePolynomial<Rational<BigInteger>>> GaussianRationals = GaussianNumbers(Q);
+    /**
+     * Ring of Gaussian integers (integer complex numbers).
+     */
+    public static AlgebraicNumberField<UnivariatePolynomial<BigInteger>> GaussianIntegers = GaussianNumbers(Z);
+    static RandomGenerator privateRandom = new Well44497b(System.nanoTime());
+
+    private Rings() {
+    }
 
     /**
      * Ring of rational functions over specified ring
@@ -62,21 +77,27 @@ public final class Rings {
      *
      * @param modulus the modulus
      */
-    public static IntegersZp64 Zp64(long modulus) {return new IntegersZp64(modulus);}
+    public static IntegersZp64 Zp64(long modulus) {
+        return new IntegersZp64(modulus);
+    }
 
     /**
      * Ring of integers modulo {@code modulus} (arbitrary large modulus)
      *
      * @param modulus the modulus (arbitrary large)
      */
-    public static IntegersZp Zp(long modulus) {return new IntegersZp(modulus);}
+    public static IntegersZp Zp(long modulus) {
+        return new IntegersZp(modulus);
+    }
 
     /**
      * Ring of integers modulo {@code modulus} (arbitrary large modulus)
      *
      * @param modulus the modulus (arbitrary large)
      */
-    public static IntegersZp Zp(BigInteger modulus) {return new IntegersZp(modulus);}
+    public static IntegersZp Zp(BigInteger modulus) {
+        return new IntegersZp(modulus);
+    }
 
     /**
      * Galois field with the cardinality {@code prime ^ exponent} (with prime < 2^63).
@@ -128,16 +149,6 @@ public final class Rings {
     public static <E> AlgebraicNumberField<UnivariatePolynomial<E>> GaussianNumbers(Ring<E> ring) {
         return AlgebraicNumberField(UnivariatePolynomial.create(ring, ring.createArray(ring.getOne(), ring.getZero(), ring.getOne())));
     }
-
-    /**
-     * Field of Gaussian rationals (rational complex numbers).
-     */
-    public static AlgebraicNumberField<UnivariatePolynomial<Rational<BigInteger>>> GaussianRationals = GaussianNumbers(Q);
-
-    /**
-     * Ring of Gaussian integers (integer complex numbers).
-     */
-    public static AlgebraicNumberField<UnivariatePolynomial<BigInteger>> GaussianIntegers = GaussianNumbers(Z);
 
     /**
      * Quotient ring {@code baseRing/<modulus> }
@@ -202,16 +213,6 @@ public final class Rings {
     public static <Poly extends IUnivariatePolynomial<Poly>> UnivariateRing<Poly> UnivariateRing(Poly factory) {
         return new UnivariateRing<>(factory);
     }
-
-    /**
-     * Ring of univariate polynomials over integers (Z[x])
-     */
-    public static final UnivariateRing<UnivariatePolynomial<BigInteger>> UnivariateRingZ = UnivariateRing(Z);
-
-    /**
-     * Ring of univariate polynomials over rationals (Q[x])
-     */
-    public static final UnivariateRing<UnivariatePolynomial<Rational<BigInteger>>> UnivariateRingQ = UnivariateRing(Q);
 
     /**
      * Ring of univariate polynomials over Zp integers (Zp[x])

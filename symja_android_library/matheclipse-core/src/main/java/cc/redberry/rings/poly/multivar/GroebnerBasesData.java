@@ -1,11 +1,11 @@
 package cc.redberry.rings.poly.multivar;
 
-import cc.redberry.rings.Rational;
-import cc.redberry.rings.bigint.BigInteger;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import cc.redberry.rings.Rational;
+import cc.redberry.rings.bigint.BigInteger;
 
 import static cc.redberry.rings.Rings.Q;
 
@@ -17,6 +17,8 @@ import static cc.redberry.rings.Rings.Q;
 public final class GroebnerBasesData {
 
     /* **************************************** Katsura **************************************************** */
+
+    public static int MIN_KATSURA = 2, MAX_KATSURA = 14;
 
     public static List<MultivariatePolynomial<Rational<BigInteger>>> katsura2() {
         String[] vars = {"u0", "u1", "u2"};
@@ -200,7 +202,6 @@ public final class GroebnerBasesData {
                 MultivariatePolynomial.parse("u14 + u13 + u12 + u11 + u10 + u9 + u8 + u7 + u6 + u5 + u4 + u3 + u2 + u1 + u0 + u1 + u2 + u3 + u4 + u5 + u6 + u7 + u8 + u9 + u10 + u11 + u12 + u13 + u14 - 1", Q, vars));
     }
 
-
     public static List<MultivariatePolynomial<Rational<BigInteger>>> cyclic(int n) {
         MultivariatePolynomial<Rational<BigInteger>> factory = MultivariatePolynomial.zero(n, Q, MonomialOrder.GREVLEX);
 
@@ -226,25 +227,36 @@ public final class GroebnerBasesData {
         return polynomials;
     }
 
-
-    public static int MIN_KATSURA = 2, MAX_KATSURA = 14;
-
     public static List<MultivariatePolynomial<Rational<BigInteger>>> katsura(int i) {
         switch (i) {
-            case 2: return katsura2();
-            case 3: return katsura3();
-            case 4: return katsura4();
-            case 5: return katsura5();
-            case 6: return katsura6();
-            case 7: return katsura7();
-            case 8: return katsura8();
-            case 9: return katsura9();
-            case 10: return katsura10();
-            case 11: return katsura11();
-            case 12: return katsura12();
-            case 13: return katsura13();
-            case 14: return katsura14();
-            default: throw new IllegalArgumentException();
+            case 2:
+                return katsura2();
+            case 3:
+                return katsura3();
+            case 4:
+                return katsura4();
+            case 5:
+                return katsura5();
+            case 6:
+                return katsura6();
+            case 7:
+                return katsura7();
+            case 8:
+                return katsura8();
+            case 9:
+                return katsura9();
+            case 10:
+                return katsura10();
+            case 11:
+                return katsura11();
+            case 12:
+                return katsura12();
+            case 13:
+                return katsura13();
+            case 14:
+                return katsura14();
+            default:
+                throw new IllegalArgumentException();
         }
     }
 }

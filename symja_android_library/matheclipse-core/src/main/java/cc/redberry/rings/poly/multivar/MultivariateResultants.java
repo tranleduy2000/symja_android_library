@@ -1,21 +1,5 @@
 package cc.redberry.rings.poly.multivar;
 
-import cc.redberry.rings.ChineseRemainders.ChineseRemaindersMagic;
-import cc.redberry.rings.*;
-import cc.redberry.rings.bigint.BigInteger;
-import cc.redberry.rings.linear.LinearSolver;
-import cc.redberry.rings.poly.AlgebraicNumberField;
-import cc.redberry.rings.poly.*;
-import cc.redberry.rings.poly.MultipleFieldExtension;
-import cc.redberry.rings.poly.MultivariateRing;
-import cc.redberry.rings.poly.SimpleFieldExtension;
-import cc.redberry.rings.poly.UnivariateRing;
-import cc.redberry.rings.poly.univar.*;
-import cc.redberry.rings.primes.PrimesIterator;
-import cc.redberry.rings.util.ArraysUtil;
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TLongHashSet;
 import org.hipparchus.random.RandomGenerator;
 
 import java.util.Arrays;
@@ -24,19 +8,73 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import cc.redberry.rings.ChineseRemainders.ChineseRemaindersMagic;
+import cc.redberry.rings.IntegersZp;
+import cc.redberry.rings.IntegersZp64;
+import cc.redberry.rings.Rational;
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.Rings;
+import cc.redberry.rings.bigint.BigInteger;
+import cc.redberry.rings.linear.LinearSolver;
+import cc.redberry.rings.poly.AlgebraicNumberField;
+import cc.redberry.rings.poly.FiniteField;
+import cc.redberry.rings.poly.MultipleFieldExtension;
+import cc.redberry.rings.poly.MultivariateRing;
+import cc.redberry.rings.poly.PolynomialMethods;
+import cc.redberry.rings.poly.SimpleFieldExtension;
+import cc.redberry.rings.poly.UnivariateRing;
+import cc.redberry.rings.poly.Util;
+import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
+import cc.redberry.rings.poly.univar.UnivariateGCD;
+import cc.redberry.rings.poly.univar.UnivariatePolynomial;
+import cc.redberry.rings.poly.univar.UnivariatePolynomialZp64;
+import cc.redberry.rings.poly.univar.UnivariateResultants;
+import cc.redberry.rings.primes.PrimesIterator;
+import cc.redberry.rings.util.ArraysUtil;
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TLongHashSet;
+
 import static cc.redberry.rings.ChineseRemainders.ChineseRemainders;
 import static cc.redberry.rings.ChineseRemainders.createMagic;
-import static cc.redberry.rings.Rings.*;
-import static cc.redberry.rings.poly.MachineArithmetic.*;
+import static cc.redberry.rings.Rings.Q;
+import static cc.redberry.rings.Rings.UnivariateRing;
+import static cc.redberry.rings.Rings.UnivariateRingZp64;
+import static cc.redberry.rings.Rings.Z;
+import static cc.redberry.rings.Rings.Zp;
+import static cc.redberry.rings.Rings.Zp64;
+import static cc.redberry.rings.poly.MachineArithmetic.safeAdd;
+import static cc.redberry.rings.poly.MachineArithmetic.safeMultiply;
+import static cc.redberry.rings.poly.MachineArithmetic.safeToInt;
 import static cc.redberry.rings.poly.Util.commonDenominator;
-import static cc.redberry.rings.poly.multivar.Conversions64bit.*;
-import static cc.redberry.rings.poly.multivar.MultivariateGCD.*;
+import static cc.redberry.rings.poly.multivar.Conversions64bit.asOverZp64;
+import static cc.redberry.rings.poly.multivar.Conversions64bit.canConvertToZp64;
+import static cc.redberry.rings.poly.multivar.Conversions64bit.convertFromZp64;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.MAX_FAILED_SUBSTITUTIONS;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.VandermondeSystem;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.ZippelEvaluations;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.ZippelEvaluationsZp64;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.getSkeleton;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.inversePermutation;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.isOverMultivariate;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.isOverMultivariateZp64;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.isOverUnivariate;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.isOverUnivariateZp64;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.lVandermondeSystem;
+import static cc.redberry.rings.poly.multivar.MultivariateGCD.randomElement;
 
 /**
  * Polynomial resultants.
  */
 public final class MultivariateResultants {
-    private MultivariateResultants() {}
+    /**
+     * Number of updates in modular algorithm which doesn't change the result so we consider the obtained answer as the
+     * correct one
+     */
+    private static final int N_UNCHANGED_INTERPOLATIONS = 5;
+
+    private MultivariateResultants() {
+    }
 
     /**
      * Computes discriminant of polynomial
@@ -178,6 +216,9 @@ public final class MultivariateResultants {
         return ModularResultantInZ(a, b, variable);
     }
 
+
+    /* ============================================== Auxiliary methods ============================================= */
+
     /**
      * Computes resultant via subresultant sequences
      */
@@ -186,66 +227,6 @@ public final class MultivariateResultants {
         if (canConvertToZp64(a))
             return convertFromZp64(ClassicalResultant(asOverZp64(a), asOverZp64(b), variable));
         return UnivariateResultants.Resultant(a.asUnivariateEliminate(variable), b.asUnivariateEliminate(variable)).insertVariable(variable);
-    }
-
-
-    /* ============================================== Auxiliary methods ============================================= */
-
-    /** structure with required input for resultant algorithms */
-    static final class ResultantInput<Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>> {
-        /** input polynomials (with variables renamed and main variable dropped) */
-        final Poly aReduced0, bReduced0;
-        /** input polynomials (with variables renamed and main variable dropped) */
-        final UnivariatePolynomial<Poly> aReduced, bReduced;
-        /** earlyResultant if possible (in trivial cases) */
-        final Poly earlyResultant;
-        /** resultant degree bounds, mapping used to rename variables so that degreeBounds are in descending order */
-        final int[] degreeBounds, mapping;
-        /** last present variable */
-        final int lastPresentVariable;
-        /** ring cardinality (or -1, if cardinality is greater than Integer.MAX_VALUE) */
-        final int evaluationStackLimit;
-        /** Resultant part coming from GCD of monomial content of a and b **/
-        final Poly monomialResultant;
-        /**
-         * degree of irreducible univariate polynomial used to construct field extension q^n (if the coefficient ring
-         * has so small cardinality so that modular algorithm will fail)
-         */
-        final int finiteExtensionDegree;
-
-        ResultantInput(Poly earlyResultant) {
-            this.earlyResultant = earlyResultant;
-            aReduced0 = bReduced0 = null;
-            aReduced = bReduced = null;
-            degreeBounds = mapping = null;
-            lastPresentVariable = evaluationStackLimit = -1;
-            monomialResultant = null;
-            finiteExtensionDegree = -1;
-        }
-
-        ResultantInput(Poly aReduced0, Poly bReduced0,
-                       Poly monomialResultant,
-                       int evaluationStackLimit,
-                       int[] degreeBounds, int[] mapping, int lastPresentVariable,
-                       int finiteExtensionDegree) {
-            //assert monomialGCD == null || aReduced.ring.isOne(monomialGCD.coefficient);
-            this.aReduced0 = aReduced0;
-            this.bReduced0 = bReduced0;
-            this.aReduced = aReduced0.asUnivariateEliminate(0);
-            this.bReduced = bReduced0.asUnivariateEliminate(0);
-            this.monomialResultant = monomialResultant;
-            this.earlyResultant = null;
-            this.evaluationStackLimit = evaluationStackLimit;
-            this.degreeBounds = degreeBounds;
-            this.mapping = inversePermutation(mapping);
-            this.lastPresentVariable = lastPresentVariable;
-            this.finiteExtensionDegree = finiteExtensionDegree;
-        }
-
-        /** recover initial order of variables in the result */
-        Poly restoreResultant(Poly result) {
-            return AMultivariatePolynomial.renameVariables(result.insertVariable(0), mapping).multiply(monomialResultant);
-        }
     }
 
     static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
@@ -454,7 +435,9 @@ public final class MultivariateResultants {
         return null;
     }
 
-    /** resultant with monomial */
+    /**
+     * resultant with monomial
+     */
     @SuppressWarnings("unchecked")
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     Poly resultantWithMonomial(Term monomial, Poly poly, int variable) {
@@ -464,7 +447,9 @@ public final class MultivariateResultants {
         return cFactor.multiply(xFactor);
     }
 
-    /** resultant with monomial */
+    /**
+     * resultant with monomial
+     */
     @SuppressWarnings("unchecked")
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     Poly resultantWithMonomial(Poly poly, Term monomial, int variable) {
@@ -551,12 +536,6 @@ public final class MultivariateResultants {
 
         return resInput.restoreResultant(ModularResultantInZ0(resInput.aReduced0, resInput.bReduced0));
     }
-
-    /**
-     * Number of updates in modular algorithm which doesn't change the result so we consider the obtained answer as the
-     * correct one
-     */
-    private static final int N_UNCHANGED_INTERPOLATIONS = 5;
 
     private static BigInteger centralMultinomialCoefficient(int n, int d) {
         int q = n / d, r = n % d;
@@ -718,9 +697,9 @@ public final class MultivariateResultants {
         return res;
     }
 
-    /* ================================== Modular resultant in simple number fields ================================ */
-
-    /** if all coefficients are simple numbers */
+    /**
+     * if all coefficients are simple numbers
+     */
     private static <E> MultivariatePolynomial<UnivariatePolynomial<E>>
     TrivialResultantInExtension(MultivariatePolynomial<UnivariatePolynomial<E>> a,
                                 MultivariatePolynomial<UnivariatePolynomial<E>> b,
@@ -739,6 +718,8 @@ public final class MultivariateResultants {
         return Resultant(ar, br, variable)
                 .mapCoefficients(ring, cf -> UnivariatePolynomial.constant(cfRing, cf));
     }
+
+    /* ================================== Modular resultant in simple number fields ================================ */
 
     /**
      * Modular resultant in simple number field
@@ -881,7 +862,9 @@ public final class MultivariateResultants {
             MultivariatePolynomial<UnivariatePolynomialZp64> base;
             try {
                 base = ResultantInGF(aMod, bMod, 0).dropVariable(0);
-            } catch (Throwable t) {continue;}// bad base prime
+            } catch (Throwable t) {
+                continue;
+            }// bad base prime
 
             MultivariatePolynomial<UnivariatePolynomial<BigInteger>> bBase = base.mapCoefficients(auxRing, cf -> cf.asPolyZ(false).toBigPoly());
 
@@ -1001,8 +984,6 @@ public final class MultivariateResultants {
         return res;
     }
 
-    /* ============================================== Brown algorithm ============================================= */
-
     /**
      * Brown's algorithm for resultant with dense interpolation
      */
@@ -1014,6 +995,8 @@ public final class MultivariateResultants {
         else
             return (Poly) BrownResultant((MultivariatePolynomial) a, (MultivariatePolynomial) b, variable);
     }
+
+    /* ============================================== Brown algorithm ============================================= */
 
     /**
      * Brown's algorithm for resultant with dense interpolation
@@ -1060,7 +1043,9 @@ public final class MultivariateResultants {
                 return null;
 
             long v;
-            do { v = ring.randomElement(rnd); }
+            do {
+                v = ring.randomElement(rnd);
+            }
             while (evaluationStack.contains(v));
             final long randomPoint = v;
             evaluationStack.add(randomPoint);
@@ -1136,7 +1121,9 @@ public final class MultivariateResultants {
                 return null;
 
             E v;
-            do { v = randomElement(ring, rnd); }
+            do {
+                v = randomElement(ring, rnd);
+            }
             while (evaluationStack.contains(v));
             final E randomPoint = v;
             evaluationStack.add(randomPoint);
@@ -1164,8 +1151,6 @@ public final class MultivariateResultants {
         }
     }
 
-    /* ============================================== Zippel algorithm ============================================= */
-
     /**
      * Brown's algorithm for resultant with dense interpolation
      */
@@ -1177,6 +1162,8 @@ public final class MultivariateResultants {
         else
             return (Poly) ZippelResultant((MultivariatePolynomial) a, (MultivariatePolynomial) b, variable);
     }
+
+    /* ============================================== Zippel algorithm ============================================= */
 
     /**
      * Zippel's algorithm for resultant with sparse interpolation
@@ -1226,7 +1213,9 @@ public final class MultivariateResultants {
                 return null;
 
             long v;
-            do { v = ring.randomElement(rnd); }
+            do {
+                v = ring.randomElement(rnd);
+            }
             while (globalEvaluationStack.contains(v));
             final long seedRandomPoint = v;
             globalEvaluationStack.add(seedRandomPoint);
@@ -1265,7 +1254,9 @@ public final class MultivariateResultants {
                     // all elements of the ring are tried
                     continue main;
 
-                do { v = ring.randomElement(rnd); }
+                do {
+                    v = ring.randomElement(rnd);
+                }
                 while (localEvaluationStack.contains(v));
                 final long randomPoint = v;
                 localEvaluationStack.add(randomPoint);
@@ -1334,7 +1325,9 @@ public final class MultivariateResultants {
                 return null;
 
             E v;
-            do { v = randomElement(ring, rnd); }
+            do {
+                v = randomElement(ring, rnd);
+            }
             while (globalEvaluationStack.contains(v));
             final E seedRandomPoint = v;
             globalEvaluationStack.add(seedRandomPoint);
@@ -1373,7 +1366,9 @@ public final class MultivariateResultants {
                     // all elements of the ring are tried
                     continue main;
 
-                do { v = randomElement(ring, rnd); }
+                do {
+                    v = randomElement(ring, rnd);
+                }
                 while (localEvaluationStack.contains(v));
                 final E randomPoint = v;
                 localEvaluationStack.add(randomPoint);
@@ -1471,18 +1466,186 @@ public final class MultivariateResultants {
         return new MultivariatePolynomialZp64.lPrecomputedPowersHolder(factory.ring, pp);
     }
 
+    static <E> SparseInterpolationE<E> createInterpolation(int variable,
+                                                           UnivariatePolynomial<MultivariatePolynomial<E>> a,
+                                                           UnivariatePolynomial<MultivariatePolynomial<E>> b,
+                                                           MultivariatePolynomial<E> skeleton,
+                                                           int expectedNumberOfEvaluations,
+                                                           RandomGenerator rnd) {
+        MultivariatePolynomial<E> factory = a.lc();
+        assert factory.nVariables > 1;
+        skeleton = skeleton.clone().setAllCoefficientsToUnit();
+
+        Set<DegreeVector> globalSkeleton = skeleton.getSkeleton();
+        TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton = getSkeleton(skeleton);
+        int[] sparseUnivarDegrees = univarSkeleton.keys();
+
+        Ring<E> ring = factory.ring;
+
+        int lastVariable = variable == -1 ? factory.nVariables - 1 : variable;
+        int[] evaluationVariables = ArraysUtil.sequence(1, lastVariable + 1);//variable inclusive
+        E[] evaluationPoint = ring.createArray(evaluationVariables.length);
+
+        MultivariatePolynomial.PrecomputedPowersHolder<E> powers;
+        int fails = 0;
+        search_for_good_evaluation_point:
+        while (true) {
+            if (fails >= MAX_FAILED_SUBSTITUTIONS)
+                return null;
+            //avoid zero evaluation points
+            for (int i = lastVariable - 1; i >= 0; --i)
+                do {
+                    evaluationPoint[i] = randomElement(ring, rnd);
+                } while (ring.isZero(evaluationPoint[i]));
+
+            powers = mkPrecomputedPowers(a, b, evaluationVariables, evaluationPoint);
+
+            Iterator<MultivariatePolynomial<E>> it = Stream.concat(Stream.concat(a.stream(), b.stream()), Stream.of(skeleton)).iterator();
+            while (it.hasNext()) {
+                MultivariatePolynomial<E> p = it.next();
+                if (!p.getSkeleton(0).equals(p.evaluate(powers, evaluationVariables).getSkeleton())) {
+                    ++fails;
+                    continue search_for_good_evaluation_point;
+                }
+            }
+            break;
+        }
+
+        int requiredNumberOfEvaluations = -1;
+        for (TIntObjectIterator<MultivariatePolynomial<E>> it = univarSkeleton.iterator(); it.hasNext(); ) {
+            it.advance();
+            MultivariatePolynomial<E> v = it.value();
+            if (v.size() > requiredNumberOfEvaluations)
+                requiredNumberOfEvaluations = v.size();
+        }
+
+        return new SparseInterpolationE<>(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees,
+                evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations, requiredNumberOfEvaluations, rnd);
+    }
+
+    static <E> MultivariatePolynomial.PrecomputedPowersHolder<E> mkPrecomputedPowers(
+            UnivariatePolynomial<MultivariatePolynomial<E>> a, UnivariatePolynomial<MultivariatePolynomial<E>> b,
+            int[] evaluationVariables, E[] evaluationPoint) {
+        MultivariatePolynomial<E> factory = a.lc();
+        int[] degrees = null;
+        for (int i = 0; i <= a.degree(); i++) {
+            if (degrees == null)
+                degrees = a.get(i).degreesRef();
+            else
+                degrees = ArraysUtil.max(degrees, a.get(i).degreesRef());
+        }
+        assert degrees != null;
+        for (int i = 0; i <= b.degree(); i++)
+            degrees = ArraysUtil.max(degrees, b.get(i).degreesRef());
+
+        @SuppressWarnings("unchecked")
+        MultivariatePolynomial.PrecomputedPowers<E>[] pp = new MultivariatePolynomial.PrecomputedPowers[factory.nVariables];
+        for (int i = 0; i < evaluationVariables.length; ++i)
+            pp[evaluationVariables[i]] = new MultivariatePolynomial.PrecomputedPowers<>(
+                    Math.min(degrees[evaluationVariables[i]], MultivariatePolynomialZp64.MAX_POWERS_CACHE_SIZE),
+                    evaluationPoint[i], factory.ring);
+        return new MultivariatePolynomial.PrecomputedPowersHolder<>(factory.ring, pp);
+    }
+
+    /**
+     * structure with required input for resultant algorithms
+     */
+    static final class ResultantInput<Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>> {
+        /**
+         * input polynomials (with variables renamed and main variable dropped)
+         */
+        final Poly aReduced0, bReduced0;
+        /**
+         * input polynomials (with variables renamed and main variable dropped)
+         */
+        final UnivariatePolynomial<Poly> aReduced, bReduced;
+        /**
+         * earlyResultant if possible (in trivial cases)
+         */
+        final Poly earlyResultant;
+        /**
+         * resultant degree bounds, mapping used to rename variables so that degreeBounds are in descending order
+         */
+        final int[] degreeBounds, mapping;
+        /**
+         * last present variable
+         */
+        final int lastPresentVariable;
+        /**
+         * ring cardinality (or -1, if cardinality is greater than Integer.MAX_VALUE)
+         */
+        final int evaluationStackLimit;
+        /**
+         * Resultant part coming from GCD of monomial content of a and b
+         **/
+        final Poly monomialResultant;
+        /**
+         * degree of irreducible univariate polynomial used to construct field extension q^n (if the coefficient ring
+         * has so small cardinality so that modular algorithm will fail)
+         */
+        final int finiteExtensionDegree;
+
+        ResultantInput(Poly earlyResultant) {
+            this.earlyResultant = earlyResultant;
+            aReduced0 = bReduced0 = null;
+            aReduced = bReduced = null;
+            degreeBounds = mapping = null;
+            lastPresentVariable = evaluationStackLimit = -1;
+            monomialResultant = null;
+            finiteExtensionDegree = -1;
+        }
+
+        ResultantInput(Poly aReduced0, Poly bReduced0,
+                       Poly monomialResultant,
+                       int evaluationStackLimit,
+                       int[] degreeBounds, int[] mapping, int lastPresentVariable,
+                       int finiteExtensionDegree) {
+            //assert monomialGCD == null || aReduced.ring.isOne(monomialGCD.coefficient);
+            this.aReduced0 = aReduced0;
+            this.bReduced0 = bReduced0;
+            this.aReduced = aReduced0.asUnivariateEliminate(0);
+            this.bReduced = bReduced0.asUnivariateEliminate(0);
+            this.monomialResultant = monomialResultant;
+            this.earlyResultant = null;
+            this.evaluationStackLimit = evaluationStackLimit;
+            this.degreeBounds = degreeBounds;
+            this.mapping = inversePermutation(mapping);
+            this.lastPresentVariable = lastPresentVariable;
+            this.finiteExtensionDegree = finiteExtensionDegree;
+        }
+
+        /**
+         * recover initial order of variables in the result
+         */
+        Poly restoreResultant(Poly result) {
+            return AMultivariatePolynomial.renameVariables(result.insertVariable(0), mapping).multiply(monomialResultant);
+        }
+    }
+
     static final class SparseInterpolationZp64 {
-        /** the ring */
+        /**
+         * the ring
+         */
         final IntegersZp64 ring;
-        /** variable which we are evaluating */
+        /**
+         * variable which we are evaluating
+         */
         final int variable;
-        /** initial polynomials */
+        /**
+         * initial polynomials
+         */
         final UnivariatePolynomial<MultivariatePolynomialZp64> a, b;
-        /** global skeleton of the result */
+        /**
+         * global skeleton of the result
+         */
         final Set<DegreeVector> globalSkeleton;
-        /** skeleton of each of the coefficients of polynomial viewed as Zp[x_1,...,x_N][x_0] */
+        /**
+         * skeleton of each of the coefficients of polynomial viewed as Zp[x_1,...,x_N][x_0]
+         */
         final TIntObjectHashMap<MultivariatePolynomialZp64> univarSkeleton;
-        /** univariate degrees of {@code univarSkeleton} with respect to x_0 */
+        /**
+         * univariate degrees of {@code univarSkeleton} with respect to x_0
+         */
         final int[] sparseUnivarDegrees;
         /**
          * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
@@ -1495,15 +1658,25 @@ public final class MultivariateResultants {
          * matrix
          */
         final long[] evaluationPoint;
-        /** cached powers for {@code evaluationPoint} */
+        /**
+         * cached powers for {@code evaluationPoint}
+         */
         final MultivariatePolynomialZp64.lPrecomputedPowersHolder powers;
-        /** Efficient structures for evaluating polynomials for interpolation */
+        /**
+         * Efficient structures for evaluating polynomials for interpolation
+         */
         final ZippelEvaluationsZp64[] aEvals, bEvals;
-        /** required number of sparse evaluations to reconstruct all coefficients in skeleton */
+        /**
+         * required number of sparse evaluations to reconstruct all coefficients in skeleton
+         */
         final int requiredNumberOfEvaluations;
-        /** random */
+        /**
+         * random
+         */
         final RandomGenerator rnd;
-        /** random */
+        /**
+         * random
+         */
         final MultivariatePolynomialZp64 factory;
 
         SparseInterpolationZp64(IntegersZp64 ring,
@@ -1632,99 +1805,30 @@ public final class MultivariateResultants {
         }
     }
 
-    static <E> SparseInterpolationE<E> createInterpolation(int variable,
-                                                           UnivariatePolynomial<MultivariatePolynomial<E>> a,
-                                                           UnivariatePolynomial<MultivariatePolynomial<E>> b,
-                                                           MultivariatePolynomial<E> skeleton,
-                                                           int expectedNumberOfEvaluations,
-                                                           RandomGenerator rnd) {
-        MultivariatePolynomial<E> factory = a.lc();
-        assert factory.nVariables > 1;
-        skeleton = skeleton.clone().setAllCoefficientsToUnit();
-
-        Set<DegreeVector> globalSkeleton = skeleton.getSkeleton();
-        TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton = getSkeleton(skeleton);
-        int[] sparseUnivarDegrees = univarSkeleton.keys();
-
-        Ring<E> ring = factory.ring;
-
-        int lastVariable = variable == -1 ? factory.nVariables - 1 : variable;
-        int[] evaluationVariables = ArraysUtil.sequence(1, lastVariable + 1);//variable inclusive
-        E[] evaluationPoint = ring.createArray(evaluationVariables.length);
-
-        MultivariatePolynomial.PrecomputedPowersHolder<E> powers;
-        int fails = 0;
-        search_for_good_evaluation_point:
-        while (true) {
-            if (fails >= MAX_FAILED_SUBSTITUTIONS)
-                return null;
-            //avoid zero evaluation points
-            for (int i = lastVariable - 1; i >= 0; --i)
-                do {
-                    evaluationPoint[i] = randomElement(ring, rnd);
-                } while (ring.isZero(evaluationPoint[i]));
-
-            powers = mkPrecomputedPowers(a, b, evaluationVariables, evaluationPoint);
-
-            Iterator<MultivariatePolynomial<E>> it = Stream.concat(Stream.concat(a.stream(), b.stream()), Stream.of(skeleton)).iterator();
-            while (it.hasNext()) {
-                MultivariatePolynomial<E> p = it.next();
-                if (!p.getSkeleton(0).equals(p.evaluate(powers, evaluationVariables).getSkeleton())) {
-                    ++fails;
-                    continue search_for_good_evaluation_point;
-                }
-            }
-            break;
-        }
-
-        int requiredNumberOfEvaluations = -1;
-        for (TIntObjectIterator<MultivariatePolynomial<E>> it = univarSkeleton.iterator(); it.hasNext(); ) {
-            it.advance();
-            MultivariatePolynomial<E> v = it.value();
-            if (v.size() > requiredNumberOfEvaluations)
-                requiredNumberOfEvaluations = v.size();
-        }
-
-        return new SparseInterpolationE<>(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees,
-                evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations, requiredNumberOfEvaluations, rnd);
-    }
-
-    static <E> MultivariatePolynomial.PrecomputedPowersHolder<E> mkPrecomputedPowers(
-            UnivariatePolynomial<MultivariatePolynomial<E>> a, UnivariatePolynomial<MultivariatePolynomial<E>> b,
-            int[] evaluationVariables, E[] evaluationPoint) {
-        MultivariatePolynomial<E> factory = a.lc();
-        int[] degrees = null;
-        for (int i = 0; i <= a.degree(); i++) {
-            if (degrees == null)
-                degrees = a.get(i).degreesRef();
-            else
-                degrees = ArraysUtil.max(degrees, a.get(i).degreesRef());
-        }
-        assert degrees != null;
-        for (int i = 0; i <= b.degree(); i++)
-            degrees = ArraysUtil.max(degrees, b.get(i).degreesRef());
-
-        @SuppressWarnings("unchecked")
-        MultivariatePolynomial.PrecomputedPowers<E>[] pp = new MultivariatePolynomial.PrecomputedPowers[factory.nVariables];
-        for (int i = 0; i < evaluationVariables.length; ++i)
-            pp[evaluationVariables[i]] = new MultivariatePolynomial.PrecomputedPowers<>(
-                    Math.min(degrees[evaluationVariables[i]], MultivariatePolynomialZp64.MAX_POWERS_CACHE_SIZE),
-                    evaluationPoint[i], factory.ring);
-        return new MultivariatePolynomial.PrecomputedPowersHolder<>(factory.ring, pp);
-    }
-
     static final class SparseInterpolationE<E> {
-        /** the ring */
+        /**
+         * the ring
+         */
         final Ring<E> ring;
-        /** variable which we are evaluating */
+        /**
+         * variable which we are evaluating
+         */
         final int variable;
-        /** initial polynomials */
+        /**
+         * initial polynomials
+         */
         final UnivariatePolynomial<MultivariatePolynomial<E>> a, b;
-        /** global skeleton of the result */
+        /**
+         * global skeleton of the result
+         */
         final Set<DegreeVector> globalSkeleton;
-        /** skeleton of each of the coefficients of polynomial viewed as Zp[x_1,...,x_N][x_0] */
+        /**
+         * skeleton of each of the coefficients of polynomial viewed as Zp[x_1,...,x_N][x_0]
+         */
         final TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton;
-        /** univariate degrees of {@code univarSkeleton} with respect to x_0 */
+        /**
+         * univariate degrees of {@code univarSkeleton} with respect to x_0
+         */
         final int[] sparseUnivarDegrees;
         /**
          * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
@@ -1737,15 +1841,25 @@ public final class MultivariateResultants {
          * matrix
          */
         final E[] evaluationPoint;
-        /** cached powers for {@code evaluationPoint} */
+        /**
+         * cached powers for {@code evaluationPoint}
+         */
         final MultivariatePolynomial.PrecomputedPowersHolder<E> powers;
-        /** Efficient structures for evaluating polynomials for interpolation */
+        /**
+         * Efficient structures for evaluating polynomials for interpolation
+         */
         final ZippelEvaluations<E>[] aEvals, bEvals;
-        /** required number of sparse evaluations to reconstruct all coefficients in skeleton */
+        /**
+         * required number of sparse evaluations to reconstruct all coefficients in skeleton
+         */
         final int requiredNumberOfEvaluations;
-        /** random */
+        /**
+         * random
+         */
         final RandomGenerator rnd;
-        /** random */
+        /**
+         * random
+         */
         final MultivariatePolynomial<E> factory;
 
         @SuppressWarnings("unchecked")

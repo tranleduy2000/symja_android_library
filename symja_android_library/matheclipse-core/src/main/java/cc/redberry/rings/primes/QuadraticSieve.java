@@ -1,18 +1,18 @@
 package cc.redberry.rings.primes;
 
-import cc.redberry.rings.bigint.BigInteger;
-
 import java.util.ArrayList;
+
+import cc.redberry.rings.bigint.BigInteger;
 
 import static cc.redberry.rings.bigint.BigInteger.ONE;
 import static cc.redberry.rings.bigint.BigInteger.ZERO;
 
 // Simple Quadratic Sieve found somewhere on the internet
 final class QuadraticSieve {
-    private final BigInteger n;
     private static final int bitChunkSize = 30;
     private static final int PRIME_BASE = 1500;
     private static final int ADDITIONAL = bitChunkSize;
+    private final BigInteger n;
     private final int primes[];
     private final BigInteger primesBig[];
     private final double primeLog;
@@ -83,56 +83,6 @@ final class QuadraticSieve {
 
     private static BigInteger quadraticF(BigInteger x, BigInteger n) {
         return x.multiply(x).subtract(n);
-    }
-
-    private byte[] decomposeNumber(BigInteger number) {
-        int j;
-        byte result[] = new byte[PRIME_BASE];
-        boolean divided = false;
-        if (number.signum() < 0) {
-            number = ZERO.subtract(number);
-            result[0] = 1;
-        } else
-            result[0] = 0;
-        for (j = 1; j < PRIME_BASE; j++) {
-            result[j] = 0;
-            BigInteger k = primesBig[j];
-            while (number.mod(k).compareTo(ZERO) == 0) {
-                divided = true;
-                number = number.divide(k);
-                result[j]++;
-            }
-            if ((j * 2 == PRIME_BASE) && (!divided))
-                break;
-        }
-        if (number.compareTo(ONE) > 0)
-            result[0] = -1;
-        return result;
-    }
-
-    private byte[][] buildMatrix(BigInteger numbers[], int size) {
-        byte matrix[][] = new byte[size][size];
-        BigInteger temp, prim;
-        int j, k;
-        for (j = 0; j < size; j++) {
-            temp = numbers[j];
-            if (temp.signum() < 0) {
-                temp = temp.negate();
-                matrix[j][0] = 1;
-            } else
-                matrix[j][0] = 0;
-            for (k = 1; k < PRIME_BASE; k++) {
-                matrix[j][k] = 0;
-                prim = primesBig[k];
-                while (temp.mod(prim).compareTo(ZERO) == 0) {
-                    matrix[j][k]++; // = 1 - matrix[j][k];
-                    temp = temp.divide(prim);
-                }
-            }
-            for (k = PRIME_BASE; k < size; k++)
-                matrix[j][k] = 0;
-        }
-        return matrix;
     }
 
     private static int[][] flattenMatrix(byte matrix[][]) {
@@ -210,6 +160,170 @@ final class QuadraticSieve {
             gaussElim(matrix, right, j, k);
     }
 
+    static long legendreSymbol(long n, long p) {
+        long count, temp;
+        long legendre = 1;
+        if (n == 0)
+            return 0;
+        if (n < 0) {
+            n = -n;
+            if (p % 4 == 3)
+                legendre = -1;
+        }
+        do {
+            count = 0;
+            while (n % 2 == 0) {
+                n = n / 2;
+                count = 1 - count;
+            }
+            if ((count * (p * p - 1)) % 16 == 8)
+                legendre = -legendre;
+            if (((n - 1) * (p - 1)) % 8 == 4)
+                legendre = -legendre;
+            temp = n;
+            n = p % n;
+            p = temp;
+        } while (n > 1);
+        return legendre;
+    }
+
+    private static long modPowLong(long n, long p, long m) {
+        if (p == 0)
+            return 1;
+        if (p % 2 == 1)
+            return (n * modPowLong(n, p - 1, m)) % m;
+        else {
+            long result = modPowLong(n, p / 2, m);
+            return (result * result) % m;
+        }
+    }
+
+    static BigInteger sqrtBigInt(BigInteger i) {
+        long c;
+        BigInteger medium;
+        BigInteger high = i;
+        BigInteger low = BigInteger.ONE;
+        while (high.subtract(low).compareTo(BigInteger.ONE) > 0) {
+            medium = high.add(low).divide(BigInteger.ONE.add(BigInteger.ONE));
+            c = medium.multiply(medium).compareTo(i);
+            if (c > 0) high = medium;
+            if (c < 0) low = medium;
+            if (c == 0)
+                return medium;
+        }
+        if (high.multiply(high).compareTo(i) == 0)
+            return high;
+        else
+            return low;
+    }
+
+    private static long v(long i, long h, long n, long p) {
+        if (i == 1)
+            return h;
+        if (i == 2)
+            return (h * h - 2 * n) % p;
+        long vi = v(i / 2, h, n, p);
+        long vi_1 = v(i / 2 + 1, h, n, p);
+        if (i % 2 == 1) {
+            vi = (vi * vi_1 - h * modPowLong(n, i / 2, p)) % p;
+            if (vi < 0)
+                vi += p;
+            return vi;
+        } else
+            return (vi * vi - 2 * modPowLong(n, i / 2, p)) % p;
+    }
+
+    private static long v_(long j, long h, long n, long p) {
+        long b[] = new long[64];
+        long m = n;
+        long v = h;
+        long w = (h * h - 2 * m) % p;
+        long x;
+        int k, t;
+        t = 0;
+        while (j > 0) {
+            b[++t] = j % 2;
+            j /= 2;
+        }
+        for (k = t - 1; k >= 1; k--) {
+            x = (v * w - h * m) % p;
+            v = (v * v - 2 * m) % p;
+            w = (w * w - 2 * n * m) % p;
+            m = m * m % p;
+            if (b[k] == 0)
+                w = x;
+            else {
+                v = x;
+                m = n * m % p;
+            }
+        }
+        return v;
+    }
+
+
+    /****************************************************************************************************/
+    /***** CFRAC: The Continued Fractions algorithm, first presented by Brillhart and Morrison.     *****/
+    /***** Continued Fraction works - just as the Quadratic Sieve - using an x² = y² (mod n) con-   *****/
+    /***** gruence. The difference: Instead of sieving, CFRAC speeds things up by producing small   *****/
+    /***** y²'s that can easily be factored.                                                        *****/
+
+    private byte[] decomposeNumber(BigInteger number) {
+        int j;
+        byte result[] = new byte[PRIME_BASE];
+        boolean divided = false;
+        if (number.signum() < 0) {
+            number = ZERO.subtract(number);
+            result[0] = 1;
+        } else
+            result[0] = 0;
+        for (j = 1; j < PRIME_BASE; j++) {
+            result[j] = 0;
+            BigInteger k = primesBig[j];
+            while (number.mod(k).compareTo(ZERO) == 0) {
+                divided = true;
+                number = number.divide(k);
+                result[j]++;
+            }
+            if ((j * 2 == PRIME_BASE) && (!divided))
+                break;
+        }
+        if (number.compareTo(ONE) > 0)
+            result[0] = -1;
+        return result;
+    }
+
+
+    /****************************************************************************************************/
+    /***** QUADRATIC SIEVE: this algorithm is highly sophisticated, though not fully optimized yet. *****/
+    /***** Like most modern factoring techniques, QS uses congruences x^2 = y^2 (mod n) to find     *****/
+    /***** a non-trivial divisor of n.                                                              *****/
+    /***** See David M. Bressoud: "Factorization and Primality Testing" (1989) for further details. *****/
+
+    private byte[][] buildMatrix(BigInteger numbers[], int size) {
+        byte matrix[][] = new byte[size][size];
+        BigInteger temp, prim;
+        int j, k;
+        for (j = 0; j < size; j++) {
+            temp = numbers[j];
+            if (temp.signum() < 0) {
+                temp = temp.negate();
+                matrix[j][0] = 1;
+            } else
+                matrix[j][0] = 0;
+            for (k = 1; k < PRIME_BASE; k++) {
+                matrix[j][k] = 0;
+                prim = primesBig[k];
+                while (temp.mod(prim).compareTo(ZERO) == 0) {
+                    matrix[j][k]++; // = 1 - matrix[j][k];
+                    temp = temp.divide(prim);
+                }
+            }
+            for (k = PRIME_BASE; k < size; k++)
+                matrix[j][k] = 0;
+        }
+        return matrix;
+    }
+
     private byte[] extractLine(int right[][], int index) {
         int j, k;
         int line[] = right[index];
@@ -281,7 +395,6 @@ final class QuadraticSieve {
         return result;
     }
 
-
     private void removeHighestPower(int index, BigInteger p) {
         if (fs[index].mod(p).compareTo(ZERO) == 0) {
             do fs[index] = fs[index].divide(p);
@@ -302,12 +415,6 @@ final class QuadraticSieve {
         }
     }
 
-
-    /****************************************************************************************************/
-    /***** CFRAC: The Continued Fractions algorithm, first presented by Brillhart and Morrison.     *****/
-    /***** Continued Fraction works - just as the Quadratic Sieve - using an x² = y² (mod n) con-   *****/
-    /***** gruence. The difference: Instead of sieving, CFRAC speeds things up by producing small   *****/
-    /***** y²'s that can easily be factored.                                                        *****/
     /****************************************************************************************************/
     public BigInteger CFRAC(int upperBound) {
         int i, k;
@@ -415,12 +522,6 @@ final class QuadraticSieve {
         return x;
     }
 
-
-    /****************************************************************************************************/
-    /***** QUADRATIC SIEVE: this algorithm is highly sophisticated, though not fully optimized yet. *****/
-    /***** Like most modern factoring techniques, QS uses congruences x^2 = y^2 (mod n) to find     *****/
-    /***** a non-trivial divisor of n.                                                              *****/
-    /***** See David M. Bressoud: "Factorization and Primality Testing" (1989) for further details. *****/
     /****************************************************************************************************/
     public BigInteger quadraticSieve(int upperBound) {
         BigInteger m, x, y, test, prim;
@@ -580,106 +681,5 @@ final class QuadraticSieve {
         } while (--loop > PRIME_BASE);
 
         return test;
-    }
-
-    static long legendreSymbol(long n, long p) {
-        long count, temp;
-        long legendre = 1;
-        if (n == 0)
-            return 0;
-        if (n < 0) {
-            n = -n;
-            if (p % 4 == 3)
-                legendre = -1;
-        }
-        do {
-            count = 0;
-            while (n % 2 == 0) {
-                n = n / 2;
-                count = 1 - count;
-            }
-            if ((count * (p * p - 1)) % 16 == 8)
-                legendre = -legendre;
-            if (((n - 1) * (p - 1)) % 8 == 4)
-                legendre = -legendre;
-            temp = n;
-            n = p % n;
-            p = temp;
-        } while (n > 1);
-        return legendre;
-    }
-
-    private static long modPowLong(long n, long p, long m) {
-        if (p == 0)
-            return 1;
-        if (p % 2 == 1)
-            return (n * modPowLong(n, p - 1, m)) % m;
-        else {
-            long result = modPowLong(n, p / 2, m);
-            return (result * result) % m;
-        }
-    }
-
-    static BigInteger sqrtBigInt(BigInteger i) {
-        long c;
-        BigInteger medium;
-        BigInteger high = i;
-        BigInteger low = BigInteger.ONE;
-        while (high.subtract(low).compareTo(BigInteger.ONE) > 0) {
-            medium = high.add(low).divide(BigInteger.ONE.add(BigInteger.ONE));
-            c = medium.multiply(medium).compareTo(i);
-            if (c > 0) high = medium;
-            if (c < 0) low = medium;
-            if (c == 0)
-                return medium;
-        }
-        if (high.multiply(high).compareTo(i) == 0)
-            return high;
-        else
-            return low;
-    }
-
-
-    private static long v(long i, long h, long n, long p) {
-        if (i == 1)
-            return h;
-        if (i == 2)
-            return (h * h - 2 * n) % p;
-        long vi = v(i / 2, h, n, p);
-        long vi_1 = v(i / 2 + 1, h, n, p);
-        if (i % 2 == 1) {
-            vi = (vi * vi_1 - h * modPowLong(n, i / 2, p)) % p;
-            if (vi < 0)
-                vi += p;
-            return vi;
-        } else
-            return (vi * vi - 2 * modPowLong(n, i / 2, p)) % p;
-    }
-
-    private static long v_(long j, long h, long n, long p) {
-        long b[] = new long[64];
-        long m = n;
-        long v = h;
-        long w = (h * h - 2 * m) % p;
-        long x;
-        int k, t;
-        t = 0;
-        while (j > 0) {
-            b[++t] = j % 2;
-            j /= 2;
-        }
-        for (k = t - 1; k >= 1; k--) {
-            x = (v * w - h * m) % p;
-            v = (v * v - 2 * m) % p;
-            w = (w * w - 2 * n * m) % p;
-            m = m * m % p;
-            if (b[k] == 0)
-                w = x;
-            else {
-                v = x;
-                m = n * m % p;
-            }
-        }
-        return v;
     }
 }

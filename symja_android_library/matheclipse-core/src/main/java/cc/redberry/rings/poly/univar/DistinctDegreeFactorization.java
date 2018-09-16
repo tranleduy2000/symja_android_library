@@ -1,11 +1,14 @@
 package cc.redberry.rings.poly.univar;
 
+import java.util.ArrayList;
+
 import cc.redberry.rings.poly.PolynomialFactorDecomposition;
 import cc.redberry.rings.poly.Util;
 
-import java.util.ArrayList;
-
-import static cc.redberry.rings.poly.univar.ModularComposition.*;
+import static cc.redberry.rings.poly.univar.ModularComposition.compositionBrentKung;
+import static cc.redberry.rings.poly.univar.ModularComposition.polyPowers;
+import static cc.redberry.rings.poly.univar.ModularComposition.powModulusMod;
+import static cc.redberry.rings.poly.univar.ModularComposition.xPowers;
 import static cc.redberry.rings.poly.univar.UnivariateGCD.PolynomialGCD;
 import static cc.redberry.rings.poly.univar.UnivariatePolynomialArithmetic.polyMultiplyMod;
 import static cc.redberry.rings.poly.univar.UnivariatePolynomialArithmetic.polyPowMod;
@@ -17,12 +20,22 @@ import static cc.redberry.rings.poly.univar.UnivariatePolynomialArithmetic.polyP
  * @since 1.0
  */
 public final class DistinctDegreeFactorization {
-    private DistinctDegreeFactorization() {}
+    /**
+     * Shoup's parameter
+     */
+    private static final double SHOUP_BETA = 0.5;
+    /**
+     * when to switch to Shoup's algorithm
+     */
+    private static final int DEGREE_SWITCH_TO_SHOUP = 256;
+
+    private DistinctDegreeFactorization() {
+    }
 
     /**
      * Performs distinct-degree factorization for square-free polynomial {@code poly} using plain incremental exponents
      * algorithm.
-     *
+     * <p>
      * <p> In the case of not square-free input, the algorithm works, but the resulting d.d.f. may be incomplete.
      *
      * @param poly the polynomial
@@ -71,7 +84,7 @@ public final class DistinctDegreeFactorization {
     /**
      * Performs distinct-degree factorization for square-free polynomial {@code poly} using plain incremental exponents
      * algorithm with precomputed exponents.
-     *
+     * <p>
      * <p> In the case of not square-free input, the algorithm works, but the resulting d.d.f. may be incomplete.
      *
      * @param poly the polynomial
@@ -118,10 +131,9 @@ public final class DistinctDegreeFactorization {
         return result.setUnit(poly.createConstant(factor));
     }
 
-    /** Shoup's parameter */
-    private static final double SHOUP_BETA = 0.5;
-
-    /** Shoup's main gcd loop */
+    /**
+     * Shoup's main gcd loop
+     */
     private static <T extends IUnivariatePolynomial<T>> void DistinctDegreeFactorizationShoup(T poly,
                                                                                               BabyGiantSteps<T> steps,
                                                                                               PolynomialFactorDecomposition<T> result) {
@@ -151,11 +163,10 @@ public final class DistinctDegreeFactorization {
             result.addFactor(current.monic(), current.degree());
     }
 
-
     /**
      * Performs distinct-degree factorization for square-free polynomial {@code poly} using Victor Shoup's baby step /
      * giant step algorithm.
-     *
+     * <p>
      * <p> In the case of not square-free input, the algorithm works, but the resulting d.d.f. may be incomplete.
      *
      * @param poly the polynomial
@@ -170,14 +181,72 @@ public final class DistinctDegreeFactorization {
         return result;
     }
 
+    /**
+     * Performs distinct-degree factorization for square-free polynomial {@code poly}.
+     * <p>
+     * <p> In the case of not square-free input, the algorithm works, but the resulting d.d.f. may be incomplete.
+     *
+     * @param poly the polynomial
+     * @return distinct-degree decomposition of {@code poly}
+     */
+    public static PolynomialFactorDecomposition<UnivariatePolynomialZp64> DistinctDegreeFactorization(UnivariatePolynomialZp64 poly) {
+        if (poly.degree < DEGREE_SWITCH_TO_SHOUP)
+            return DistinctDegreeFactorizationPrecomputedExponents(poly);
+        else
+            return DistinctDegreeFactorizationShoup(poly);
+    }
 
-    /** baby/giant steps for Shoup's d.d.f. algorithm */
+    /**
+     * Performs distinct-degree factorization for square-free polynomial {@code poly}.
+     * <p>
+     * <p> In the case of not square-free input, the algorithm works, but the resulting d.d.f. may be incomplete.
+     *
+     * @param poly the polynomial
+     * @return distinct-degree decomposition of {@code poly}
+     */
+    @SuppressWarnings("unchecked")
+    public static <Poly extends IUnivariatePolynomial<Poly>> PolynomialFactorDecomposition<Poly> DistinctDegreeFactorization(Poly poly) {
+        Util.ensureOverFiniteField(poly);
+        if (poly instanceof UnivariatePolynomialZp64)
+            return (PolynomialFactorDecomposition<Poly>) DistinctDegreeFactorization((UnivariatePolynomialZp64) poly);
+        else
+            return DistinctDegreeFactorizationShoup(poly);
+    }
+
+    /**
+     * Performs square-free factorization followed by distinct-degree factorization modulo {@code modulus}.
+     *
+     * @param poly the polynomial
+     * @return square-free and distinct-degree decomposition of {@code poly} modulo {@code modulus}
+     */
+    static PolynomialFactorDecomposition<UnivariatePolynomialZp64> DistinctDegreeFactorizationComplete(UnivariatePolynomialZp64 poly) {
+        PolynomialFactorDecomposition<UnivariatePolynomialZp64> squareFree = UnivariateSquareFreeFactorization.SquareFreeFactorization(poly);
+        long overallFactor = squareFree.unit.lc();
+
+        PolynomialFactorDecomposition<UnivariatePolynomialZp64> result = PolynomialFactorDecomposition.unit(poly.createOne());
+        for (int i = squareFree.size() - 1; i >= 0; --i) {
+            PolynomialFactorDecomposition<UnivariatePolynomialZp64> dd = DistinctDegreeFactorization(squareFree.get(i));
+            int nFactors = dd.size();
+            for (int j = nFactors - 1; j >= 0; --j)
+                result.addFactor(dd.get(j), squareFree.getExponent(i));
+            overallFactor = poly.multiply(overallFactor, dd.unit.lc());
+        }
+
+        return result.setUnit(poly.createConstant(overallFactor));
+    }
+
+    /**
+     * baby/giant steps for Shoup's d.d.f. algorithm
+     */
     private static final class BabyGiantSteps<Poly extends IUnivariatePolynomial<Poly>> {
         final int l, m;
         final ArrayList<Poly> babySteps;
         final ArrayList<Poly> giantSteps;
         final UnivariateDivision.InverseModMonomial<Poly> invMod;
-
+        final Poly poly;
+        final ArrayList<Poly> hPowers;
+        final int tBrentKung;
+        Poly xPowerBig;
         public BabyGiantSteps(Poly poly) {
             int n = poly.degree();
             l = (int) Math.ceil(Math.pow(1.0 * n, SHOUP_BETA));
@@ -207,11 +276,6 @@ public final class DistinctDegreeFactorization {
             this.poly = poly;
         }
 
-        final Poly poly;
-        final ArrayList<Poly> hPowers;
-        final int tBrentKung;
-        Poly xPowerBig;
-
         Poly giantStep(int j) {
             if (giantSteps.size() > j)
                 return giantSteps.get(j);
@@ -221,63 +285,5 @@ public final class DistinctDegreeFactorization {
 
             return giantSteps.get(j);
         }
-    }
-
-    /** when to switch to Shoup's algorithm */
-    private static final int DEGREE_SWITCH_TO_SHOUP = 256;
-
-    /**
-     * Performs distinct-degree factorization for square-free polynomial {@code poly}.
-     *
-     * <p> In the case of not square-free input, the algorithm works, but the resulting d.d.f. may be incomplete.
-     *
-     * @param poly the polynomial
-     * @return distinct-degree decomposition of {@code poly}
-     */
-    public static PolynomialFactorDecomposition<UnivariatePolynomialZp64> DistinctDegreeFactorization(UnivariatePolynomialZp64 poly) {
-        if (poly.degree < DEGREE_SWITCH_TO_SHOUP)
-            return DistinctDegreeFactorizationPrecomputedExponents(poly);
-        else
-            return DistinctDegreeFactorizationShoup(poly);
-    }
-
-    /**
-     * Performs distinct-degree factorization for square-free polynomial {@code poly}.
-     *
-     * <p> In the case of not square-free input, the algorithm works, but the resulting d.d.f. may be incomplete.
-     *
-     * @param poly the polynomial
-     * @return distinct-degree decomposition of {@code poly}
-     */
-    @SuppressWarnings("unchecked")
-    public static <Poly extends IUnivariatePolynomial<Poly>> PolynomialFactorDecomposition<Poly> DistinctDegreeFactorization(Poly poly) {
-        Util.ensureOverFiniteField(poly);
-        if (poly instanceof UnivariatePolynomialZp64)
-            return (PolynomialFactorDecomposition<Poly>) DistinctDegreeFactorization((UnivariatePolynomialZp64) poly);
-        else
-            return DistinctDegreeFactorizationShoup(poly);
-    }
-
-
-    /**
-     * Performs square-free factorization followed by distinct-degree factorization modulo {@code modulus}.
-     *
-     * @param poly the polynomial
-     * @return square-free and distinct-degree decomposition of {@code poly} modulo {@code modulus}
-     */
-    static PolynomialFactorDecomposition<UnivariatePolynomialZp64> DistinctDegreeFactorizationComplete(UnivariatePolynomialZp64 poly) {
-        PolynomialFactorDecomposition<UnivariatePolynomialZp64> squareFree = UnivariateSquareFreeFactorization.SquareFreeFactorization(poly);
-        long overallFactor = squareFree.unit.lc();
-
-        PolynomialFactorDecomposition<UnivariatePolynomialZp64> result = PolynomialFactorDecomposition.unit(poly.createOne());
-        for (int i = squareFree.size() - 1; i >= 0; --i) {
-            PolynomialFactorDecomposition<UnivariatePolynomialZp64> dd = DistinctDegreeFactorization(squareFree.get(i));
-            int nFactors = dd.size();
-            for (int j = nFactors - 1; j >= 0; --j)
-                result.addFactor(dd.get(j), squareFree.getExponent(i));
-            overallFactor = poly.multiply(overallFactor, dd.unit.lc());
-        }
-
-        return result.setUnit(poly.createConstant(overallFactor));
     }
 }

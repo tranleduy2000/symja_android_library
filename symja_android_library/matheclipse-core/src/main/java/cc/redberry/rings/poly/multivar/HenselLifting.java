@@ -1,17 +1,32 @@
 package cc.redberry.rings.poly.multivar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.Rational;
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.linear.LinearSolver;
-import cc.redberry.rings.poly.*;
+import cc.redberry.rings.poly.IPolynomial;
+import cc.redberry.rings.poly.IPolynomialRing;
+import cc.redberry.rings.poly.MultivariateRing;
+import cc.redberry.rings.poly.PolynomialMethods;
+import cc.redberry.rings.poly.UnivariateRing;
 import cc.redberry.rings.poly.multivar.MultivariatePolynomialZp64.lPrecomputedPowersHolder;
 import cc.redberry.rings.poly.multivar.MultivariatePolynomialZp64.lUSubstitution;
-import cc.redberry.rings.poly.univar.*;
+import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
+import cc.redberry.rings.poly.univar.UnivariateDivision;
+import cc.redberry.rings.poly.univar.UnivariateGCD;
+import cc.redberry.rings.poly.univar.UnivariatePolynomial;
+import cc.redberry.rings.poly.univar.UnivariatePolynomialZ64;
 import cc.redberry.rings.util.ArraysUtil;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static cc.redberry.rings.Rings.Frac;
 import static cc.redberry.rings.Rings.PolynomialRing;
@@ -22,9 +37,18 @@ import static cc.redberry.rings.Rings.PolynomialRing;
  * @since 1.0
  */
 public final class HenselLifting {
-    private HenselLifting() {}
+    /**
+     * Sparsity threshold when to try sparse Hensel lifting
+     */
+    private static final double SPARSITY_THRESHOLD = 0.1;
+    private static final long MAX_TERMS_IN_EXPAND_FORM = 8_388_608L;
 
-    /** runs xgcd for coprime polynomials ensuring that gcd is 1 (not another constant) */
+    private HenselLifting() {
+    }
+
+    /**
+     * runs xgcd for coprime polynomials ensuring that gcd is 1 (not another constant)
+     */
     private static <PolyZp extends IUnivariatePolynomial<PolyZp>>
     PolyZp[] monicExtendedEuclid(PolyZp a, PolyZp b) {
         PolyZp[] xgcd = UnivariateGCD.PolynomialExtendedGCD(a, b);
@@ -69,259 +93,11 @@ public final class HenselLifting {
         return poly;
     }
 
-    /**
-     * Holds a substitution x2 -> b2, ..., xN -> bN
-     */
-    interface IEvaluation<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>> {
-
-        /**
-         * Substitutes all variables starting from specified {@code variable} (inclusive), i.e. {@code variable -> b_i,
-         * variable + 1-> b_(i + 1), ... xN -> bN}
-         */
-        Poly evaluateFrom(Poly poly, int variable);
-
-        /**
-         * Substitutes all variables starting from specified variable {@code from} (inclusive) and except specified
-         * variable
-         */
-        Poly evaluateFromExcept(Poly poly, int from, int except);
-
-        /**
-         * Substitute value for variable
-         */
-        Poly evaluate(Poly poly, int variable);
-
-        /**
-         * Sequentially evaliate all elements
-         */
-        default Poly[] evaluateFrom(Poly[] array, int variable) {
-            Poly[] result = array[0].createArray(array.length);
-            for (int i = 0; i < result.length; i++)
-                result[i] = evaluateFrom(array[i], variable);
-            return result;
-        }
-
-        boolean isZeroSubstitution(int variable);
-
-        /**
-         * @return {@code (1/order!) d(poly)/(d var) | var -> b}
-         */
-        default Poly taylorCoefficient(Poly poly, int variable, int order) {
-            if (isZeroSubstitution(variable))
-                return poly.coefficientOf(variable, order);
-
-            return evaluate(poly.seriesCoefficient(variable, order), variable);
-        }
-
-        /** @return {@code (x_i - b_i)^exponent} */
-        Poly linearPower(int variable, int exponent);
-
-        default Poly modImage(Poly poly, int variable, int idealExponent) {
-            if (idealExponent == 0)
-                return poly.clone();
-            int degree = poly.degree(variable);
-            if (idealExponent < degree - idealExponent) {
-                // select terms
-                Poly result = poly.createZero();
-                for (int i = 0; i < idealExponent; i++) {
-                    Poly term = evaluate(poly.seriesCoefficient(variable, i), variable).multiply(linearPower(variable, i));
-                    if (term.isZero())
-                        continue;
-                    result.add(term);
-                }
-                return result;
-            } else {
-                // drop terms
-                poly = poly.clone();
-                for (int i = idealExponent; i <= degree; i++) {
-                    Poly term = evaluate(poly.seriesCoefficient(variable, i), variable).multiply(linearPower(variable, i));
-                    if (term.isZero())
-                        continue;
-                    poly.subtract(term);
-                }
-                return poly;
-            }
-        }
-
-        default Poly modImage(Poly poly, int[] degreeBounds) {
-            for (int i = 1; i < degreeBounds.length; i++)
-                poly = modImage(poly, i, degreeBounds[i] + 1);
-            return poly;
-        }
-
-        IEvaluation<Term, Poly> dropVariable(int variable);
-
-        IEvaluation<Term, Poly> renameVariables(int[] newVariablesExceptFirst);
-    }
-
-    /** Evaluations for {@link MultivariatePolynomialZp64} */
-    static final class lEvaluation implements IEvaluation<MonomialZp64, MultivariatePolynomialZp64> {
-        final long[] values;
-        final int nVariables;
-        final lPrecomputedPowersHolder precomputedPowers;
-        final lUSubstitution[] linearPowers;
-        final IntegersZp64 ring;
-        final Comparator<DegreeVector> ordering;
-
-        lEvaluation(int nVariables, long[] values, IntegersZp64 ring, Comparator<DegreeVector> ordering) {
-            this.nVariables = nVariables;
-            this.values = values;
-            this.ring = ring;
-            this.ordering = ordering;
-            this.precomputedPowers = MultivariatePolynomialZp64.mkPrecomputedPowers(nVariables, ring, ArraysUtil.sequence(1, nVariables), values);
-            this.linearPowers = new lUSubstitution[nVariables - 1];
-            for (int i = 0; i < nVariables - 1; i++)
-                linearPowers[i] = new lUSubstitution(UnivariatePolynomialZ64.create(-values[i], 1).modulus(ring), i + 1, nVariables, ordering);
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 evaluate(MultivariatePolynomialZp64 poly, int variable) {
-            return poly.evaluate(variable, precomputedPowers.powers[variable]);
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 evaluateFrom(MultivariatePolynomialZp64 poly, int variable) {
-            if (variable >= poly.nVariables)
-                return poly.clone();
-            if (variable == 1 && poly.univariateVariable() == 0)
-                return poly.clone();
-            return poly.evaluate(precomputedPowers, ArraysUtil.sequence(variable, nVariables));
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 evaluateFromExcept(MultivariatePolynomialZp64 poly, int from, int except) {
-            if (from >= poly.nVariables)
-                return poly.clone();
-            if (from == 1 && poly.univariateVariable() == 0)
-                return poly.clone();
-
-            int[] vars = new int[poly.nVariables - from - 1];
-            int c = 0;
-            for (int i = from; i < except; i++)
-                vars[c++] = i;
-            for (int i = except + 1; i < nVariables; i++)
-                vars[c++] = i;
-
-            return poly.evaluate(precomputedPowers, vars);
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 linearPower(int variable, int exponent) {
-            return linearPowers[variable - 1].pow(exponent);
-        }
-
-        @Override
-        public boolean isZeroSubstitution(int variable) {
-            return values[variable - 1] == 0;
-        }
-
-        @Override
-        public lEvaluation dropVariable(int variable) {
-            return new lEvaluation(nVariables - 1, ArraysUtil.remove(values, variable - 1), ring, ordering);
-        }
-
-        @Override
-        public lEvaluation renameVariables(int[] variablesExceptFirst) {
-            return new lEvaluation(nVariables, map(values, variablesExceptFirst), ring, ordering);
-        }
-
-        @Override
-        public String toString() {
-            return Arrays.toString(values);
-        }
-    }
-
     private static long[] map(long[] oldArray, int[] mapping) {
         long[] newArray = new long[oldArray.length];
         for (int i = 0; i < oldArray.length; i++)
             newArray[i] = oldArray[mapping[i]];
         return newArray;
-    }
-
-    /** Generic evaluations */
-    static final class Evaluation<E> implements IEvaluation<Monomial<E>, MultivariatePolynomial<E>> {
-        final E[] values;
-        final int nVariables;
-        final Ring<E> ring;
-        final MultivariatePolynomial.PrecomputedPowersHolder<E> precomputedPowers;
-        final MultivariatePolynomial.USubstitution<E>[] linearPowers;
-        final Comparator<DegreeVector> ordering;
-
-        @SuppressWarnings("unchecked")
-        Evaluation(int nVariables, E[] values, Ring<E> ring, Comparator<DegreeVector> ordering) {
-            this.nVariables = nVariables;
-            this.values = values;
-            this.ring = ring;
-            this.ordering = ordering;
-            this.precomputedPowers = MultivariatePolynomial.mkPrecomputedPowers(nVariables, ring, ArraysUtil.sequence(1, nVariables), values);
-            this.linearPowers = new MultivariatePolynomial.USubstitution[nVariables - 1];
-            for (int i = 0; i < nVariables - 1; i++)
-                linearPowers[i] = new MultivariatePolynomial.USubstitution<>(
-                        UnivariatePolynomial.createUnsafe(ring, ring.createArray(ring.negate(values[i]), ring.getOne())),
-                        i + 1, nVariables, ordering);
-        }
-
-        Evaluation<E> setRing(Ring<E> ring) {
-            return new Evaluation<>(nVariables, values, ring, ordering);
-        }
-
-        @Override
-        public MultivariatePolynomial<E> evaluate(MultivariatePolynomial<E> poly, int variable) {
-            return poly.evaluate(variable, precomputedPowers.powers[variable]);
-        }
-
-        @Override
-        public MultivariatePolynomial<E> evaluateFrom(MultivariatePolynomial<E> poly, int variable) {
-            if (variable >= poly.nVariables)
-                return poly.clone();
-            if (variable == 1 && poly.univariateVariable() == 0)
-                return poly.clone();
-            return poly.evaluate(precomputedPowers, ArraysUtil.sequence(variable, nVariables));
-        }
-
-        @Override
-        public MultivariatePolynomial<E> evaluateFromExcept(MultivariatePolynomial<E> poly, int from, int except) {
-            if (from >= poly.nVariables)
-                return poly.clone();
-            if (from == 1 && poly.univariateVariable() == 0)
-                return poly.clone();
-
-            int[] vars = new int[poly.nVariables - from - 1];
-            int c = 0;
-            for (int i = from; i < except; i++)
-                vars[c++] = i;
-            for (int i = except + 1; i < nVariables; i++)
-                vars[c++] = i;
-
-            return poly.evaluate(precomputedPowers, vars);
-        }
-
-        @Override
-        public MultivariatePolynomial<E> linearPower(int variable, int exponent) {
-            return linearPowers[variable - 1].pow(exponent);
-        }
-
-        @Override
-        public boolean isZeroSubstitution(int variable) {
-            return ring.isZero(values[variable - 1]);
-        }
-
-        @Override
-        public Evaluation<E> dropVariable(int variable) {
-            return new Evaluation<>(nVariables - 1, ArraysUtil.remove(values, variable - 1), ring, ordering);
-        }
-
-        @Override
-        public Evaluation<E> renameVariables(int[] variablesExceptFirst) {
-            return new Evaluation<>(nVariables, map(ring, values, variablesExceptFirst), ring, ordering);
-        }
-
-        @Override
-        public String toString() {
-            return Arrays.toString(values);
-        }
     }
 
     private static <E> E[] map(Ring<E> ring, E[] oldArray, int[] mapping) {
@@ -330,250 +106,6 @@ public final class HenselLifting {
             newArray[i] = oldArray[mapping[i]];
         return newArray;
     }
-
-    /**
-     * Effectively holds all possible combinations of product of elements [p1,p2,...,pN]
-     */
-    static final class AllProductsCache<Poly extends IPolynomial<Poly>> {
-        final Poly[] factors;
-        final HashMap<BitSet, Poly> products = new HashMap<>();
-
-        AllProductsCache(Poly[] factors) {
-            assert factors.length >= 1;
-            this.factors = factors;
-        }
-
-        private static BitSet clear(BitSet set, int from, int to) {
-            set = (BitSet) set.clone();
-            set.clear(from, to);
-            return set;
-        }
-
-        Poly multiply(BitSet selector) {
-            int cardinality = selector.cardinality();
-            assert cardinality > 0;
-            if (cardinality == 1)
-                return factors[selector.nextSetBit(0)];
-            Poly cached = products.get(selector);
-            if (cached != null)
-                return cached;
-            // split BitSet into two ~equal parts:
-            int half = cardinality / 2;
-            for (int i = 0; ; ++i) {
-                if (selector.get(i))
-                    --half;
-                if (half == 0) {
-                    products.put(selector, cached =
-                            multiply(clear(selector, 0, i + 1)).clone()
-                                    .multiply(multiply(clear(selector, i + 1, factors.length))));
-                    return cached;
-                }
-            }
-        }
-
-        Poly multiply(int[] selector) {
-            BitSet bits = new BitSet(factors.length);
-            for (int i = 0; i < selector.length; i++)
-                bits.set(selector[i]);
-            return multiply(bits);
-        }
-
-        int size() {
-            return factors.length;
-        }
-
-        Poly get(int var) {
-            return factors[var];
-        }
-
-        Poly except(int var) {
-            BitSet bits = new BitSet(factors.length);
-            bits.set(0, factors.length);
-            bits.clear(var);
-            return multiply(bits);
-        }
-
-        Poly from(int var) {
-            BitSet bits = new BitSet(factors.length);
-            bits.set(var, factors.length);
-            return multiply(bits);
-        }
-
-        Poly[] exceptArray() {
-            Poly[] arr = factors[0].createArray(factors.length);
-            for (int i = 0; i < arr.length; i++)
-                arr[i] = except(i);
-            return arr;
-        }
-
-        Poly multiplyAll() {
-            BitSet bits = new BitSet(factors.length);
-            bits.set(0, factors.length);
-            return multiply(bits);
-        }
-    }
-
-    /**
-     * Solves a * x + b * y = rhs for given univariate a, b and r (a and b are coprime) and unknown x and y
-     */
-    static final class UDiophantineSolver<uPoly extends IUnivariatePolynomial<uPoly>> {
-        /** the given factors */
-        final uPoly a, b;
-        /** Bezout's factors: a * aCoFactor + b * bCoFactor = 1 */
-        final uPoly aCoFactor, bCoFactor;
-
-        UDiophantineSolver(uPoly a, uPoly b) {
-            this.a = a;
-            this.b = b;
-            uPoly[] xgcd = monicExtendedEuclid(a, b);
-            this.aCoFactor = xgcd[1];
-            this.bCoFactor = xgcd[2];
-        }
-
-        /** the solution */
-        uPoly x, y;
-
-        void solve(uPoly rhs) {
-            x = aCoFactor.clone().multiply(rhs);
-            y = bCoFactor.clone().multiply(rhs);
-
-            uPoly[] qd = UnivariateDivision.divideAndRemainder(x, b, false);
-            x = qd[1];
-            y = y.add(qd[0].multiply(a));
-        }
-    }
-
-    /**
-     * Solves a1 * x1 + a2 * x2 + ... = rhs for given univariate a1, a2, ... and rhs (all a_i are coprime) and unknown
-     * x_i
-     */
-    static final class UMultiDiophantineSolver<uPoly extends IUnivariatePolynomial<uPoly>> {
-        /** the given factors */
-        final AllProductsCache<uPoly> factors;
-        final UDiophantineSolver<uPoly>[] biSolvers;
-        final uPoly[] solution;
-
-        @SuppressWarnings("unchecked")
-        UMultiDiophantineSolver(AllProductsCache<uPoly> factors) {
-            this.factors = factors;
-            this.biSolvers = new UDiophantineSolver[factors.size() - 1];
-            for (int i = 0; i < biSolvers.length; i++)
-                biSolvers[i] = new UDiophantineSolver<>(factors.get(i), factors.from(i + 1));
-            this.solution = factors.factors[0].createArray(factors.factors.length);
-        }
-
-        void solve(uPoly rhs) {
-            uPoly tmp = rhs.clone();
-            for (int i = 0; i < factors.size() - 1; i++) {
-                biSolvers[i].solve(tmp);
-                solution[i] = biSolvers[i].y;
-                tmp = biSolvers[i].x;
-            }
-            solution[factors.size() - 1] = tmp;
-        }
-    }
-
-    /**
-     * Solves a1 * x1 + a2 * x2 + ... = rhs for given multivariate a1, a2, ... and rhs (all a_i are coprime) and unknown
-     * x_i
-     */
-    static final class MultiDiophantineSolver<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>,
-            uPoly extends IUnivariatePolynomial<uPoly>> {
-        final IEvaluation<Term, Poly> evaluation;
-        final UMultiDiophantineSolver<uPoly> uSolver;
-        final Poly[] solution;
-        final int[] degreeBounds;
-        final Ring<Poly> mRing;
-        final UnivariatePolynomial<Poly>[][] imageSeries;
-
-        MultiDiophantineSolver(IEvaluation<Term, Poly> evaluation,
-                               Poly[] factors,
-                               UMultiDiophantineSolver<uPoly> uSolver,
-                               int[] degreeBounds,
-                               int from) {
-            assert from >= 1;
-            this.evaluation = evaluation;
-            this.uSolver = uSolver;
-            this.degreeBounds = degreeBounds;
-            Poly factory = factors[0];
-            this.solution = factory.createArray(factors.length);
-            this.mRing = new MultivariateRing<>(factors[0]);
-            this.imageSeries = new UnivariatePolynomial[factory.nVariables][factors.length];
-            for (int i = from - 1; i >= 1; --i)
-                for (int j = 0; j < factors.length; j++)
-                    this.imageSeries[i][j] = seriesExpansion(mRing, evaluation.evaluateFrom(factors[j], i + 1), i, evaluation);
-        }
-
-        void updateImageSeries(int liftingVariable, Poly[] factors) {
-            for (int i = 0; i < factors.length; i++)
-                imageSeries[liftingVariable][i] = seriesExpansion(mRing, factors[i], liftingVariable, evaluation);
-        }
-
-        @SuppressWarnings("unchecked")
-        void solve(Poly rhs, int liftingVariable) {
-            if (rhs.isZero()) {
-                for (int i = 0; i < solution.length; i++)
-                    solution[i] = rhs.createZero();
-                return;
-            }
-            rhs = evaluation.evaluateFrom(rhs, liftingVariable + 1);
-            if (liftingVariable == 0) {
-                uSolver.solve((uPoly) rhs.asUnivariate());
-                for (int i = 0; i < solution.length; i++)
-                    solution[i] = AMultivariatePolynomial.asMultivariate(uSolver.solution[i], rhs.nVariables, 0, rhs.ordering);
-                return;
-            }
-
-            // solve equation with x_i replaced with b_i:
-            // a[x1, ..., x(i-1), b(i), ... b(N)] * x[x1, ..., x(i-1), b(i), ... b(N)]
-            //    + b[x1, ..., x(i-1), b(i), ... b(N)] * y[x1, ..., x(i-1), b(i), ... b(N)]
-            //         = rhs[x1, ..., x(i-1), b(i), ... b(N)]
-            solve(rhs, liftingVariable - 1);
-
-            // <- x and y are now:
-            // x = x[x1, ..., x(i-1), b(i), ... b(N)]
-            // y = y[x1, ..., x(i-1), b(i), ... b(N)]
-
-            UnivariatePolynomial<Poly> rhsSeries = seriesExpansion(mRing, rhs, liftingVariable, evaluation);
-            UnivariatePolynomial<Poly>[] tmpSolution = new UnivariatePolynomial[solution.length];
-            for (int i = 0; i < tmpSolution.length; i++)
-                tmpSolution[i] = seriesExpansion(mRing, solution[i], liftingVariable, evaluation);
-
-            BernardinsTrick<Poly>[] pProducts = new BernardinsTrick[solution.length];
-            for (int i = 0; i < solution.length; i++)
-                pProducts[i] = createBernardinsTrick(new UnivariatePolynomial[]{tmpSolution[i], imageSeries[liftingVariable][i]}, degreeBounds[liftingVariable]);
-
-            for (int degree = 1; degree <= degreeBounds[liftingVariable]; degree++) {
-                // Δ = (rhs - a * x - b * y) mod (x_i - b_i)^degree
-                Poly rhsDelta = rhsSeries.get(degree);
-                for (int i = 0; i < solution.length; i++)
-                    rhsDelta = rhsDelta.subtract(pProducts[i].fullProduct().get(degree));
-
-                solve(rhsDelta, liftingVariable - 1);
-                //assert x.isZero() || (x.degree(0) < b.degree(0)) : "\na:" + a + "\nb:" + b + "\nx:" + x + "\ny:" + y;
-
-                // (x_i - b_i) ^ degree
-                for (int i = 0; i < solution.length; i++)
-                    pProducts[i].update(solution[i], rhs.createZero());
-            }
-
-            for (int i = 0; i < solution.length; i++)
-                solution[i] = seriesToPoly(rhs, tmpSolution[i], liftingVariable, evaluation);
-        }
-    }
-
-//    static <Poly extends IPolynomial<Poly>> void correctUnit(Poly poly, Poly[] factors) {
-//        Poly lc = poly.lcAsPoly();
-//        Poly flc = Arrays.stream(factors)
-//                .map(IPolynomial::lcAsPoly)
-//                .reduce(poly.createOne(), IPolynomial::multiply);
-//        assert lc.isConstant();
-//        assert flc.isConstant();
-//
-//        factors[0].multiplyByLC(lc.divideByLC(flc));
-//    }
 
     /**
      * Fast bivariate Hensel lifting which uses dense representation for bivariate polynomials and without leading
@@ -689,7 +221,6 @@ public final class HenselLifting {
             factors[i].set(denseSeriesToPoly(base, solution[i], 1, evaluation));
     }
 
-
     @SuppressWarnings("unchecked")
     private static <
             Term extends AMonomial<Term>,
@@ -703,6 +234,17 @@ public final class HenselLifting {
             res[i] = (uPoly) evaluation.evaluateFrom(array[i], 1).asUnivariate();
         return res;
     }
+
+//    static <Poly extends IPolynomial<Poly>> void correctUnit(Poly poly, Poly[] factors) {
+//        Poly lc = poly.lcAsPoly();
+//        Poly flc = Arrays.stream(factors)
+//                .map(IPolynomial::lcAsPoly)
+//                .reduce(poly.createOne(), IPolynomial::multiply);
+//        assert lc.isConstant();
+//        assert flc.isConstant();
+//
+//        factors[0].multiplyByLC(lc.divideByLC(flc));
+//    }
 
     @SuppressWarnings("unchecked")
     private static <
@@ -822,7 +364,6 @@ public final class HenselLifting {
         }
     }
 
-
     /**
      * Multifactor multivariate Hensel lifting
      *
@@ -841,11 +382,6 @@ public final class HenselLifting {
                            int[] degreeBounds) {
         multivariateLift0(base, factors, factorsLC, evaluation, degreeBounds, 1);
     }
-
-    /**
-     * Sparsity threshold when to try sparse Hensel lifting
-     */
-    private static final double SPARSITY_THRESHOLD = 0.1;
 
     /**
      * Multifactor multivariate Hensel lifting
@@ -879,7 +415,8 @@ public final class HenselLifting {
                 // (exception actually arises when calculating some GCDs, since some non-unit elements
                 //  may be picked up from at random from Zp in randomized methods)
                 sparseFactors = sparseLifting(base, factors, factorsLC);
-            } catch (ArithmeticException ignore) { }
+            } catch (ArithmeticException ignore) {
+            }
 
             if (sparseFactors != null) {
                 System.arraycopy(sparseFactors, 0, factors, 0, factors.length);
@@ -957,8 +494,6 @@ public final class HenselLifting {
         return result;
     }
 
-    /*=========================== Bernardin's trick for fast error computation in lifting =============================*/
-
     static <Poly extends IPolynomial<Poly>>
     BernardinsTrick<Poly> createBernardinsTrick(UnivariatePolynomial<Poly>[] factors, int degreeBound) {
         if (Arrays.stream(factors).allMatch(UnivariatePolynomial::isConstant))
@@ -966,135 +501,6 @@ public final class HenselLifting {
         else
             return new BernardinsTrickWithLCCorrection<>(factors, degreeBound);
     }
-
-    static abstract class BernardinsTrick<Poly extends IPolynomial<Poly>> {
-        // the factors
-        final UnivariatePolynomial<Poly>[] factors;
-        // partial products: {factor[0] * factor[1], (factor[0] * factor[1]) * factor[2], ... }
-        final UnivariatePolynomial<Poly>[] partialProducts;
-        final Ring<Poly> ring;
-
-        BernardinsTrick(UnivariatePolynomial<Poly>... factors) {
-            this.factors = factors;
-            this.partialProducts = factors[0].createArray(factors.length - 1);
-            this.ring = factors[0].ring;
-
-            partialProducts[0] = factors[0].clone().multiply(factors[1]);
-            for (int i = 1; i < partialProducts.length; i++)
-                partialProducts[i] = partialProducts[i - 1].clone().multiply(factors[i + 1]);
-        }
-
-        /** update products */
-        abstract void update(Poly... updates);
-
-        /** get's (f_0 * f_1 * ... * f_N) mod y^(degree + 1) */
-        final UnivariatePolynomial<Poly> fullProduct() {return partialProducts[partialProducts.length - 1];}
-
-        final UnivariatePolynomial<Poly> partialProduct(int i) {
-            return partialProducts[i];
-        }
-    }
-
-    /** Bernardin's trick for fast f_0 * f_1 * ... * f_N computing (leading coefficients are discarded) */
-    static final class BernardinsTrickWithoutLCCorrection<Poly extends IPolynomial<Poly>>
-            extends BernardinsTrick<Poly> {
-        public BernardinsTrickWithoutLCCorrection(UnivariatePolynomial<Poly>[] factors) {
-            super(factors);
-        }
-
-        // current lift, so that factors are known mod I^pDegree
-        private int pDegree = 0;
-
-        /** update products */
-        @Override
-        void update(Poly... updates) {
-            ++pDegree;
-            // update factors
-            for (int i = 0; i < factors.length; i++)
-                factors[i].set(pDegree, updates[i]);
-
-            // update the first product: factors[0] * factors[1]
-            // k-th element is updated by (factors[0]_k * factors[1]_0 + factors[0]_0 * factors[1]_k)
-            Poly updateValue = factors[0].get(pDegree).clone().multiply(factors[1].get(0))
-                    .add(factors[1].get(pDegree).clone().multiply(factors[0].get(0)));
-            partialProducts[0].addMonomial(updateValue, pDegree);
-
-            // (k+1)-th element is calculated as (factors[0]_1*factors[1]_k + ... + factors[0]_k*factors[1]_1)
-            Poly newElement = ring.getZero();
-            for (int i = 1; i <= pDegree; i++)
-                newElement.add(factors[0].get(i).clone().multiply(factors[1].get(pDegree - i + 1)));
-            partialProducts[0].set(pDegree + 1, newElement);
-
-            // => the first product (factors[0] * factors[1]) is updated
-            // update other partial products accordingly
-            for (int j = 1; j < partialProducts.length; j++) {
-
-                // k-th element is updated by (update(p_k) * factors[j+1]_0 + p_0 * factors[j+1]_k),
-                // where p is the previous partial product (without factors[j+1]) and
-                // update(p_k) is the k-th element update of the previous partial product
-                Poly currentUpdate =
-                        partialProducts[j - 1].get(0).clone().multiply(factors[j + 1].get(pDegree))
-                                .add(updateValue.multiply(factors[j + 1].get(0)));
-                partialProducts[j].addMonomial(currentUpdate, pDegree);
-                // cache current update for the next cycle
-                updateValue = currentUpdate;
-
-                // (k+1)-th element is calculated as (p[0]_1*factors[1]_k + ... + p[0]_k*factors[1]_1 + p[0]_(k+1)*factors[1]_0)
-                newElement = ring.getZero();
-                for (int i = 1; i <= (pDegree + 1); i++)
-                    newElement.add(partialProducts[j - 1].get(i).clone().multiply(factors[j + 1].get(pDegree - i + 1)));
-                partialProducts[j].set(pDegree + 1, newElement);
-            }
-        }
-    }
-
-    /** Bernardin's trick for fast f_0 * f_1 * ... * f_N computing (leading coefficients are took into account) */
-    static final class BernardinsTrickWithLCCorrection<Poly extends IPolynomial<Poly>>
-            extends BernardinsTrick<Poly> {
-        final int degreeBound;
-
-        BernardinsTrickWithLCCorrection(UnivariatePolynomial<Poly>[] factors, int degreeBound) {
-            super(factors);
-            this.degreeBound = degreeBound;
-        }
-
-        // current lift, so that factors are known mod I^pDegree
-        private int pDegree = 0;
-
-        private void updatePair(int iFactor, Poly leftUpdate, Poly rightUpdate, int degree) {
-            // update factors
-            UnivariatePolynomial<Poly>
-                    left = iFactor == 0 ? factors[0] : partialProducts[iFactor - 1],
-                    right = (iFactor + 1 < factors.length) ? factors[iFactor + 1] : null;
-
-            if (leftUpdate != null) {
-                left.addMonomial(leftUpdate, degree);
-                if (iFactor < (factors.length - 1))
-                    for (int i = degree; i <= Math.min(degreeBound, degree + right.degree()); i++)
-                        updatePair(iFactor + 1, right.get(i - degree).clone().multiply(leftUpdate), null, i);
-            }
-
-            if (rightUpdate != null) {
-                right.addMonomial(rightUpdate, degree);
-                if (iFactor < (factors.length - 1))
-                    for (int i = degree; i <= Math.min(degreeBound, degree + left.degree()); i++)
-                        updatePair(iFactor + 1, left.get(i - degree).clone().multiply(rightUpdate), null, i);
-            }
-        }
-
-        @Override
-        void update(Poly... updates) {
-            ++pDegree;
-            updatePair(0, updates[0], updates[1], pDegree);
-            for (int i = 0; i < factors.length - 2; i++)
-                updatePair(i + 1, null, updates[i + 2], pDegree);
-        }
-    }
-
-
-    /*=========================== Sparse Hensel lifting from bivariate factors =============================*/
-
-    private static final long MAX_TERMS_IN_EXPAND_FORM = 8_388_608L;
 
     /**
      * Sparse Hensel lifting
@@ -1341,6 +747,657 @@ public final class HenselLifting {
         rhs.add(0, new Rational<>(polyRing, eq.rhs));
     }
 
+    /**
+     * split terms in polynomials that are fixed (those coming from l.c.) and with unknown coefficients
+     */
+    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    void populateUnknownTerms(Poly biPoly, Poly lc, List<Term> fixed, List<Term> unknown) {
+        // degree in x0
+        int xDeg = biPoly.degree(0);
+        for (Term term : biPoly) {
+            if (term.exponents[0] == xDeg) {
+                Poly cf = lc.coefficientOf(1, term.exponents[1]);
+                term = term.setCoefficientFrom(cf.monomialAlgebra.getUnitTerm(cf.nVariables));
+                fixed.addAll(cf.multiply(term).collection());
+            } else
+                unknown.add(term);
+        }
+    }
+
+    /**
+     * Holds a substitution x2 -> b2, ..., xN -> bN
+     */
+    interface IEvaluation<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>> {
+
+        /**
+         * Substitutes all variables starting from specified {@code variable} (inclusive), i.e. {@code variable -> b_i,
+         * variable + 1-> b_(i + 1), ... xN -> bN}
+         */
+        Poly evaluateFrom(Poly poly, int variable);
+
+        /**
+         * Substitutes all variables starting from specified variable {@code from} (inclusive) and except specified
+         * variable
+         */
+        Poly evaluateFromExcept(Poly poly, int from, int except);
+
+        /**
+         * Substitute value for variable
+         */
+        Poly evaluate(Poly poly, int variable);
+
+        /**
+         * Sequentially evaliate all elements
+         */
+        default Poly[] evaluateFrom(Poly[] array, int variable) {
+            Poly[] result = array[0].createArray(array.length);
+            for (int i = 0; i < result.length; i++)
+                result[i] = evaluateFrom(array[i], variable);
+            return result;
+        }
+
+        boolean isZeroSubstitution(int variable);
+
+        /**
+         * @return {@code (1/order!) d(poly)/(d var) | var -> b}
+         */
+        default Poly taylorCoefficient(Poly poly, int variable, int order) {
+            if (isZeroSubstitution(variable))
+                return poly.coefficientOf(variable, order);
+
+            return evaluate(poly.seriesCoefficient(variable, order), variable);
+        }
+
+        /**
+         * @return {@code (x_i - b_i)^exponent}
+         */
+        Poly linearPower(int variable, int exponent);
+
+        default Poly modImage(Poly poly, int variable, int idealExponent) {
+            if (idealExponent == 0)
+                return poly.clone();
+            int degree = poly.degree(variable);
+            if (idealExponent < degree - idealExponent) {
+                // select terms
+                Poly result = poly.createZero();
+                for (int i = 0; i < idealExponent; i++) {
+                    Poly term = evaluate(poly.seriesCoefficient(variable, i), variable).multiply(linearPower(variable, i));
+                    if (term.isZero())
+                        continue;
+                    result.add(term);
+                }
+                return result;
+            } else {
+                // drop terms
+                poly = poly.clone();
+                for (int i = idealExponent; i <= degree; i++) {
+                    Poly term = evaluate(poly.seriesCoefficient(variable, i), variable).multiply(linearPower(variable, i));
+                    if (term.isZero())
+                        continue;
+                    poly.subtract(term);
+                }
+                return poly;
+            }
+        }
+
+        default Poly modImage(Poly poly, int[] degreeBounds) {
+            for (int i = 1; i < degreeBounds.length; i++)
+                poly = modImage(poly, i, degreeBounds[i] + 1);
+            return poly;
+        }
+
+        IEvaluation<Term, Poly> dropVariable(int variable);
+
+        IEvaluation<Term, Poly> renameVariables(int[] newVariablesExceptFirst);
+    }
+
+    /*=========================== Bernardin's trick for fast error computation in lifting =============================*/
+
+    /**
+     * Evaluations for {@link MultivariatePolynomialZp64}
+     */
+    static final class lEvaluation implements IEvaluation<MonomialZp64, MultivariatePolynomialZp64> {
+        final long[] values;
+        final int nVariables;
+        final lPrecomputedPowersHolder precomputedPowers;
+        final lUSubstitution[] linearPowers;
+        final IntegersZp64 ring;
+        final Comparator<DegreeVector> ordering;
+
+        lEvaluation(int nVariables, long[] values, IntegersZp64 ring, Comparator<DegreeVector> ordering) {
+            this.nVariables = nVariables;
+            this.values = values;
+            this.ring = ring;
+            this.ordering = ordering;
+            this.precomputedPowers = MultivariatePolynomialZp64.mkPrecomputedPowers(nVariables, ring, ArraysUtil.sequence(1, nVariables), values);
+            this.linearPowers = new lUSubstitution[nVariables - 1];
+            for (int i = 0; i < nVariables - 1; i++)
+                linearPowers[i] = new lUSubstitution(UnivariatePolynomialZ64.create(-values[i], 1).modulus(ring), i + 1, nVariables, ordering);
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 evaluate(MultivariatePolynomialZp64 poly, int variable) {
+            return poly.evaluate(variable, precomputedPowers.powers[variable]);
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 evaluateFrom(MultivariatePolynomialZp64 poly, int variable) {
+            if (variable >= poly.nVariables)
+                return poly.clone();
+            if (variable == 1 && poly.univariateVariable() == 0)
+                return poly.clone();
+            return poly.evaluate(precomputedPowers, ArraysUtil.sequence(variable, nVariables));
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 evaluateFromExcept(MultivariatePolynomialZp64 poly, int from, int except) {
+            if (from >= poly.nVariables)
+                return poly.clone();
+            if (from == 1 && poly.univariateVariable() == 0)
+                return poly.clone();
+
+            int[] vars = new int[poly.nVariables - from - 1];
+            int c = 0;
+            for (int i = from; i < except; i++)
+                vars[c++] = i;
+            for (int i = except + 1; i < nVariables; i++)
+                vars[c++] = i;
+
+            return poly.evaluate(precomputedPowers, vars);
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 linearPower(int variable, int exponent) {
+            return linearPowers[variable - 1].pow(exponent);
+        }
+
+        @Override
+        public boolean isZeroSubstitution(int variable) {
+            return values[variable - 1] == 0;
+        }
+
+        @Override
+        public lEvaluation dropVariable(int variable) {
+            return new lEvaluation(nVariables - 1, ArraysUtil.remove(values, variable - 1), ring, ordering);
+        }
+
+        @Override
+        public lEvaluation renameVariables(int[] variablesExceptFirst) {
+            return new lEvaluation(nVariables, map(values, variablesExceptFirst), ring, ordering);
+        }
+
+        @Override
+        public String toString() {
+            return Arrays.toString(values);
+        }
+    }
+
+    /**
+     * Generic evaluations
+     */
+    static final class Evaluation<E> implements IEvaluation<Monomial<E>, MultivariatePolynomial<E>> {
+        final E[] values;
+        final int nVariables;
+        final Ring<E> ring;
+        final MultivariatePolynomial.PrecomputedPowersHolder<E> precomputedPowers;
+        final MultivariatePolynomial.USubstitution<E>[] linearPowers;
+        final Comparator<DegreeVector> ordering;
+
+        @SuppressWarnings("unchecked")
+        Evaluation(int nVariables, E[] values, Ring<E> ring, Comparator<DegreeVector> ordering) {
+            this.nVariables = nVariables;
+            this.values = values;
+            this.ring = ring;
+            this.ordering = ordering;
+            this.precomputedPowers = MultivariatePolynomial.mkPrecomputedPowers(nVariables, ring, ArraysUtil.sequence(1, nVariables), values);
+            this.linearPowers = new MultivariatePolynomial.USubstitution[nVariables - 1];
+            for (int i = 0; i < nVariables - 1; i++)
+                linearPowers[i] = new MultivariatePolynomial.USubstitution<>(
+                        UnivariatePolynomial.createUnsafe(ring, ring.createArray(ring.negate(values[i]), ring.getOne())),
+                        i + 1, nVariables, ordering);
+        }
+
+        Evaluation<E> setRing(Ring<E> ring) {
+            return new Evaluation<>(nVariables, values, ring, ordering);
+        }
+
+        @Override
+        public MultivariatePolynomial<E> evaluate(MultivariatePolynomial<E> poly, int variable) {
+            return poly.evaluate(variable, precomputedPowers.powers[variable]);
+        }
+
+        @Override
+        public MultivariatePolynomial<E> evaluateFrom(MultivariatePolynomial<E> poly, int variable) {
+            if (variable >= poly.nVariables)
+                return poly.clone();
+            if (variable == 1 && poly.univariateVariable() == 0)
+                return poly.clone();
+            return poly.evaluate(precomputedPowers, ArraysUtil.sequence(variable, nVariables));
+        }
+
+        @Override
+        public MultivariatePolynomial<E> evaluateFromExcept(MultivariatePolynomial<E> poly, int from, int except) {
+            if (from >= poly.nVariables)
+                return poly.clone();
+            if (from == 1 && poly.univariateVariable() == 0)
+                return poly.clone();
+
+            int[] vars = new int[poly.nVariables - from - 1];
+            int c = 0;
+            for (int i = from; i < except; i++)
+                vars[c++] = i;
+            for (int i = except + 1; i < nVariables; i++)
+                vars[c++] = i;
+
+            return poly.evaluate(precomputedPowers, vars);
+        }
+
+        @Override
+        public MultivariatePolynomial<E> linearPower(int variable, int exponent) {
+            return linearPowers[variable - 1].pow(exponent);
+        }
+
+        @Override
+        public boolean isZeroSubstitution(int variable) {
+            return ring.isZero(values[variable - 1]);
+        }
+
+        @Override
+        public Evaluation<E> dropVariable(int variable) {
+            return new Evaluation<>(nVariables - 1, ArraysUtil.remove(values, variable - 1), ring, ordering);
+        }
+
+        @Override
+        public Evaluation<E> renameVariables(int[] variablesExceptFirst) {
+            return new Evaluation<>(nVariables, map(ring, values, variablesExceptFirst), ring, ordering);
+        }
+
+        @Override
+        public String toString() {
+            return Arrays.toString(values);
+        }
+    }
+
+    /**
+     * Effectively holds all possible combinations of product of elements [p1,p2,...,pN]
+     */
+    static final class AllProductsCache<Poly extends IPolynomial<Poly>> {
+        final Poly[] factors;
+        final HashMap<BitSet, Poly> products = new HashMap<>();
+
+        AllProductsCache(Poly[] factors) {
+            assert factors.length >= 1;
+            this.factors = factors;
+        }
+
+        private static BitSet clear(BitSet set, int from, int to) {
+            set = (BitSet) set.clone();
+            set.clear(from, to);
+            return set;
+        }
+
+        Poly multiply(BitSet selector) {
+            int cardinality = selector.cardinality();
+            assert cardinality > 0;
+            if (cardinality == 1)
+                return factors[selector.nextSetBit(0)];
+            Poly cached = products.get(selector);
+            if (cached != null)
+                return cached;
+            // split BitSet into two ~equal parts:
+            int half = cardinality / 2;
+            for (int i = 0; ; ++i) {
+                if (selector.get(i))
+                    --half;
+                if (half == 0) {
+                    products.put(selector, cached =
+                            multiply(clear(selector, 0, i + 1)).clone()
+                                    .multiply(multiply(clear(selector, i + 1, factors.length))));
+                    return cached;
+                }
+            }
+        }
+
+        Poly multiply(int[] selector) {
+            BitSet bits = new BitSet(factors.length);
+            for (int i = 0; i < selector.length; i++)
+                bits.set(selector[i]);
+            return multiply(bits);
+        }
+
+        int size() {
+            return factors.length;
+        }
+
+        Poly get(int var) {
+            return factors[var];
+        }
+
+        Poly except(int var) {
+            BitSet bits = new BitSet(factors.length);
+            bits.set(0, factors.length);
+            bits.clear(var);
+            return multiply(bits);
+        }
+
+        Poly from(int var) {
+            BitSet bits = new BitSet(factors.length);
+            bits.set(var, factors.length);
+            return multiply(bits);
+        }
+
+        Poly[] exceptArray() {
+            Poly[] arr = factors[0].createArray(factors.length);
+            for (int i = 0; i < arr.length; i++)
+                arr[i] = except(i);
+            return arr;
+        }
+
+        Poly multiplyAll() {
+            BitSet bits = new BitSet(factors.length);
+            bits.set(0, factors.length);
+            return multiply(bits);
+        }
+    }
+
+    /**
+     * Solves a * x + b * y = rhs for given univariate a, b and r (a and b are coprime) and unknown x and y
+     */
+    static final class UDiophantineSolver<uPoly extends IUnivariatePolynomial<uPoly>> {
+        /**
+         * the given factors
+         */
+        final uPoly a, b;
+        /**
+         * Bezout's factors: a * aCoFactor + b * bCoFactor = 1
+         */
+        final uPoly aCoFactor, bCoFactor;
+        /**
+         * the solution
+         */
+        uPoly x, y;
+
+        UDiophantineSolver(uPoly a, uPoly b) {
+            this.a = a;
+            this.b = b;
+            uPoly[] xgcd = monicExtendedEuclid(a, b);
+            this.aCoFactor = xgcd[1];
+            this.bCoFactor = xgcd[2];
+        }
+
+        void solve(uPoly rhs) {
+            x = aCoFactor.clone().multiply(rhs);
+            y = bCoFactor.clone().multiply(rhs);
+
+            uPoly[] qd = UnivariateDivision.divideAndRemainder(x, b, false);
+            x = qd[1];
+            y = y.add(qd[0].multiply(a));
+        }
+    }
+
+
+    /*=========================== Sparse Hensel lifting from bivariate factors =============================*/
+
+    /**
+     * Solves a1 * x1 + a2 * x2 + ... = rhs for given univariate a1, a2, ... and rhs (all a_i are coprime) and unknown
+     * x_i
+     */
+    static final class UMultiDiophantineSolver<uPoly extends IUnivariatePolynomial<uPoly>> {
+        /**
+         * the given factors
+         */
+        final AllProductsCache<uPoly> factors;
+        final UDiophantineSolver<uPoly>[] biSolvers;
+        final uPoly[] solution;
+
+        @SuppressWarnings("unchecked")
+        UMultiDiophantineSolver(AllProductsCache<uPoly> factors) {
+            this.factors = factors;
+            this.biSolvers = new UDiophantineSolver[factors.size() - 1];
+            for (int i = 0; i < biSolvers.length; i++)
+                biSolvers[i] = new UDiophantineSolver<>(factors.get(i), factors.from(i + 1));
+            this.solution = factors.factors[0].createArray(factors.factors.length);
+        }
+
+        void solve(uPoly rhs) {
+            uPoly tmp = rhs.clone();
+            for (int i = 0; i < factors.size() - 1; i++) {
+                biSolvers[i].solve(tmp);
+                solution[i] = biSolvers[i].y;
+                tmp = biSolvers[i].x;
+            }
+            solution[factors.size() - 1] = tmp;
+        }
+    }
+
+    /**
+     * Solves a1 * x1 + a2 * x2 + ... = rhs for given multivariate a1, a2, ... and rhs (all a_i are coprime) and unknown
+     * x_i
+     */
+    static final class MultiDiophantineSolver<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>,
+            uPoly extends IUnivariatePolynomial<uPoly>> {
+        final IEvaluation<Term, Poly> evaluation;
+        final UMultiDiophantineSolver<uPoly> uSolver;
+        final Poly[] solution;
+        final int[] degreeBounds;
+        final Ring<Poly> mRing;
+        final UnivariatePolynomial<Poly>[][] imageSeries;
+
+        MultiDiophantineSolver(IEvaluation<Term, Poly> evaluation,
+                               Poly[] factors,
+                               UMultiDiophantineSolver<uPoly> uSolver,
+                               int[] degreeBounds,
+                               int from) {
+            assert from >= 1;
+            this.evaluation = evaluation;
+            this.uSolver = uSolver;
+            this.degreeBounds = degreeBounds;
+            Poly factory = factors[0];
+            this.solution = factory.createArray(factors.length);
+            this.mRing = new MultivariateRing<>(factors[0]);
+            this.imageSeries = new UnivariatePolynomial[factory.nVariables][factors.length];
+            for (int i = from - 1; i >= 1; --i)
+                for (int j = 0; j < factors.length; j++)
+                    this.imageSeries[i][j] = seriesExpansion(mRing, evaluation.evaluateFrom(factors[j], i + 1), i, evaluation);
+        }
+
+        void updateImageSeries(int liftingVariable, Poly[] factors) {
+            for (int i = 0; i < factors.length; i++)
+                imageSeries[liftingVariable][i] = seriesExpansion(mRing, factors[i], liftingVariable, evaluation);
+        }
+
+        @SuppressWarnings("unchecked")
+        void solve(Poly rhs, int liftingVariable) {
+            if (rhs.isZero()) {
+                for (int i = 0; i < solution.length; i++)
+                    solution[i] = rhs.createZero();
+                return;
+            }
+            rhs = evaluation.evaluateFrom(rhs, liftingVariable + 1);
+            if (liftingVariable == 0) {
+                uSolver.solve((uPoly) rhs.asUnivariate());
+                for (int i = 0; i < solution.length; i++)
+                    solution[i] = AMultivariatePolynomial.asMultivariate(uSolver.solution[i], rhs.nVariables, 0, rhs.ordering);
+                return;
+            }
+
+            // solve equation with x_i replaced with b_i:
+            // a[x1, ..., x(i-1), b(i), ... b(N)] * x[x1, ..., x(i-1), b(i), ... b(N)]
+            //    + b[x1, ..., x(i-1), b(i), ... b(N)] * y[x1, ..., x(i-1), b(i), ... b(N)]
+            //         = rhs[x1, ..., x(i-1), b(i), ... b(N)]
+            solve(rhs, liftingVariable - 1);
+
+            // <- x and y are now:
+            // x = x[x1, ..., x(i-1), b(i), ... b(N)]
+            // y = y[x1, ..., x(i-1), b(i), ... b(N)]
+
+            UnivariatePolynomial<Poly> rhsSeries = seriesExpansion(mRing, rhs, liftingVariable, evaluation);
+            UnivariatePolynomial<Poly>[] tmpSolution = new UnivariatePolynomial[solution.length];
+            for (int i = 0; i < tmpSolution.length; i++)
+                tmpSolution[i] = seriesExpansion(mRing, solution[i], liftingVariable, evaluation);
+
+            BernardinsTrick<Poly>[] pProducts = new BernardinsTrick[solution.length];
+            for (int i = 0; i < solution.length; i++)
+                pProducts[i] = createBernardinsTrick(new UnivariatePolynomial[]{tmpSolution[i], imageSeries[liftingVariable][i]}, degreeBounds[liftingVariable]);
+
+            for (int degree = 1; degree <= degreeBounds[liftingVariable]; degree++) {
+                // Δ = (rhs - a * x - b * y) mod (x_i - b_i)^degree
+                Poly rhsDelta = rhsSeries.get(degree);
+                for (int i = 0; i < solution.length; i++)
+                    rhsDelta = rhsDelta.subtract(pProducts[i].fullProduct().get(degree));
+
+                solve(rhsDelta, liftingVariable - 1);
+                //assert x.isZero() || (x.degree(0) < b.degree(0)) : "\na:" + a + "\nb:" + b + "\nx:" + x + "\ny:" + y;
+
+                // (x_i - b_i) ^ degree
+                for (int i = 0; i < solution.length; i++)
+                    pProducts[i].update(solution[i], rhs.createZero());
+            }
+
+            for (int i = 0; i < solution.length; i++)
+                solution[i] = seriesToPoly(rhs, tmpSolution[i], liftingVariable, evaluation);
+        }
+    }
+
+    static abstract class BernardinsTrick<Poly extends IPolynomial<Poly>> {
+        // the factors
+        final UnivariatePolynomial<Poly>[] factors;
+        // partial products: {factor[0] * factor[1], (factor[0] * factor[1]) * factor[2], ... }
+        final UnivariatePolynomial<Poly>[] partialProducts;
+        final Ring<Poly> ring;
+
+        BernardinsTrick(UnivariatePolynomial<Poly>... factors) {
+            this.factors = factors;
+            this.partialProducts = factors[0].createArray(factors.length - 1);
+            this.ring = factors[0].ring;
+
+            partialProducts[0] = factors[0].clone().multiply(factors[1]);
+            for (int i = 1; i < partialProducts.length; i++)
+                partialProducts[i] = partialProducts[i - 1].clone().multiply(factors[i + 1]);
+        }
+
+        /**
+         * update products
+         */
+        abstract void update(Poly... updates);
+
+        /**
+         * get's (f_0 * f_1 * ... * f_N) mod y^(degree + 1)
+         */
+        final UnivariatePolynomial<Poly> fullProduct() {
+            return partialProducts[partialProducts.length - 1];
+        }
+
+        final UnivariatePolynomial<Poly> partialProduct(int i) {
+            return partialProducts[i];
+        }
+    }
+
+    /**
+     * Bernardin's trick for fast f_0 * f_1 * ... * f_N computing (leading coefficients are discarded)
+     */
+    static final class BernardinsTrickWithoutLCCorrection<Poly extends IPolynomial<Poly>>
+            extends BernardinsTrick<Poly> {
+        // current lift, so that factors are known mod I^pDegree
+        private int pDegree = 0;
+
+        public BernardinsTrickWithoutLCCorrection(UnivariatePolynomial<Poly>[] factors) {
+            super(factors);
+        }
+
+        /**
+         * update products
+         */
+        @Override
+        void update(Poly... updates) {
+            ++pDegree;
+            // update factors
+            for (int i = 0; i < factors.length; i++)
+                factors[i].set(pDegree, updates[i]);
+
+            // update the first product: factors[0] * factors[1]
+            // k-th element is updated by (factors[0]_k * factors[1]_0 + factors[0]_0 * factors[1]_k)
+            Poly updateValue = factors[0].get(pDegree).clone().multiply(factors[1].get(0))
+                    .add(factors[1].get(pDegree).clone().multiply(factors[0].get(0)));
+            partialProducts[0].addMonomial(updateValue, pDegree);
+
+            // (k+1)-th element is calculated as (factors[0]_1*factors[1]_k + ... + factors[0]_k*factors[1]_1)
+            Poly newElement = ring.getZero();
+            for (int i = 1; i <= pDegree; i++)
+                newElement.add(factors[0].get(i).clone().multiply(factors[1].get(pDegree - i + 1)));
+            partialProducts[0].set(pDegree + 1, newElement);
+
+            // => the first product (factors[0] * factors[1]) is updated
+            // update other partial products accordingly
+            for (int j = 1; j < partialProducts.length; j++) {
+
+                // k-th element is updated by (update(p_k) * factors[j+1]_0 + p_0 * factors[j+1]_k),
+                // where p is the previous partial product (without factors[j+1]) and
+                // update(p_k) is the k-th element update of the previous partial product
+                Poly currentUpdate =
+                        partialProducts[j - 1].get(0).clone().multiply(factors[j + 1].get(pDegree))
+                                .add(updateValue.multiply(factors[j + 1].get(0)));
+                partialProducts[j].addMonomial(currentUpdate, pDegree);
+                // cache current update for the next cycle
+                updateValue = currentUpdate;
+
+                // (k+1)-th element is calculated as (p[0]_1*factors[1]_k + ... + p[0]_k*factors[1]_1 + p[0]_(k+1)*factors[1]_0)
+                newElement = ring.getZero();
+                for (int i = 1; i <= (pDegree + 1); i++)
+                    newElement.add(partialProducts[j - 1].get(i).clone().multiply(factors[j + 1].get(pDegree - i + 1)));
+                partialProducts[j].set(pDegree + 1, newElement);
+            }
+        }
+    }
+
+    /**
+     * Bernardin's trick for fast f_0 * f_1 * ... * f_N computing (leading coefficients are took into account)
+     */
+    static final class BernardinsTrickWithLCCorrection<Poly extends IPolynomial<Poly>>
+            extends BernardinsTrick<Poly> {
+        final int degreeBound;
+        // current lift, so that factors are known mod I^pDegree
+        private int pDegree = 0;
+
+        BernardinsTrickWithLCCorrection(UnivariatePolynomial<Poly>[] factors, int degreeBound) {
+            super(factors);
+            this.degreeBound = degreeBound;
+        }
+
+        private void updatePair(int iFactor, Poly leftUpdate, Poly rightUpdate, int degree) {
+            // update factors
+            UnivariatePolynomial<Poly>
+                    left = iFactor == 0 ? factors[0] : partialProducts[iFactor - 1],
+                    right = (iFactor + 1 < factors.length) ? factors[iFactor + 1] : null;
+
+            if (leftUpdate != null) {
+                left.addMonomial(leftUpdate, degree);
+                if (iFactor < (factors.length - 1))
+                    for (int i = degree; i <= Math.min(degreeBound, degree + right.degree()); i++)
+                        updatePair(iFactor + 1, right.get(i - degree).clone().multiply(leftUpdate), null, i);
+            }
+
+            if (rightUpdate != null) {
+                right.addMonomial(rightUpdate, degree);
+                if (iFactor < (factors.length - 1))
+                    for (int i = degree; i <= Math.min(degreeBound, degree + left.degree()); i++)
+                        updatePair(iFactor + 1, left.get(i - degree).clone().multiply(rightUpdate), null, i);
+            }
+        }
+
+        @Override
+        void update(Poly... updates) {
+            ++pDegree;
+            updatePair(0, updates[0], updates[1], pDegree);
+            for (int i = 0; i < factors.length - 2; i++)
+                updatePair(i + 1, null, updates[i + 2], pDegree);
+        }
+    }
+
     static final class BlockSolution<
             Term extends AMonomial<Term>,
             Poly extends AMultivariatePolynomial<Term, Poly>> {
@@ -1365,15 +1422,25 @@ public final class HenselLifting {
     static final class Equation<
             Term extends AMonomial<Term>,
             Poly extends AMultivariatePolynomial<Term, Poly>> {
-        /** lhs in R[x0, x1, ...., xN][u1, ... uL] */
+        /**
+         * lhs in R[x0, x1, ...., xN][u1, ... uL]
+         */
         final MultivariatePolynomial<Poly> lhs;
-        /** rhs in R[x0, x1, ...., xN] */
+        /**
+         * rhs in R[x0, x1, ...., xN]
+         */
         final Poly rhs;
-        /** lhs.degrees() */
+        /**
+         * lhs.degrees()
+         */
         final int[] lhsDegrees;
-        /** if equation is linear */
+        /**
+         * if equation is linear
+         */
         final boolean isLinear;
-        /** number of really unknown variables presented in this equation */
+        /**
+         * number of really unknown variables presented in this equation
+         */
         final int nUnknowns;
 
         Equation(Poly lhs, Poly rhs) {
@@ -1404,9 +1471,13 @@ public final class HenselLifting {
             return false;
         }
 
-        boolean isIdentity() { return ArraysUtil.sum(lhsDegrees) == 0;}
+        boolean isIdentity() {
+            return ArraysUtil.sum(lhsDegrees) == 0;
+        }
 
-        boolean isLinear() { return isLinear;}
+        boolean isLinear() {
+            return isLinear;
+        }
 
         int[] getUnknowns() {
             int[] unknowns = new int[nUnknowns];
@@ -1452,21 +1523,6 @@ public final class HenselLifting {
             int result = lhs.hashCode();
             result = 31 * result + rhs.hashCode();
             return result;
-        }
-    }
-
-    /** split terms in polynomials that are fixed (those coming from l.c.) and with unknown coefficients */
-    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    void populateUnknownTerms(Poly biPoly, Poly lc, List<Term> fixed, List<Term> unknown) {
-        // degree in x0
-        int xDeg = biPoly.degree(0);
-        for (Term term : biPoly) {
-            if (term.exponents[0] == xDeg) {
-                Poly cf = lc.coefficientOf(1, term.exponents[1]);
-                term = term.setCoefficientFrom(cf.monomialAlgebra.getUnitTerm(cf.nVariables));
-                fixed.addAll(cf.multiply(term).collection());
-            } else
-                unknown.add(term);
         }
     }
 }

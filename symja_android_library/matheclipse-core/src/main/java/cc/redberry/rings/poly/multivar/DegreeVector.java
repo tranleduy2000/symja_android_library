@@ -1,12 +1,12 @@
 package cc.redberry.rings.poly.multivar;
 
-import cc.redberry.rings.io.IStringifier;
-import cc.redberry.rings.util.ArraysUtil;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import cc.redberry.rings.io.IStringifier;
+import cc.redberry.rings.util.ArraysUtil;
 
 /**
  * Degree vector. This is parent class for all monomials. Instances are immutable. All {@code DegreeVector} methods are
@@ -18,9 +18,13 @@ import java.util.stream.Collectors;
  */
 public class DegreeVector implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-    /** exponents */
+    /**
+     * exponents
+     */
     public final int[] exponents;
-    /** Sum of all exponents (total degree) */
+    /**
+     * Sum of all exponents (total degree)
+     */
     public final int totalDegree;
 
     /**
@@ -40,10 +44,20 @@ public class DegreeVector implements java.io.Serializable {
         this(exponents, ArraysUtil.sum(exponents));
     }
 
-    /** Returns number of variables */
-    public final int nVariables() { return exponents.length;}
+    private static String toString0(String var, int exp) {
+        return exp == 0 ? "" : var + (exp == 1 ? "" : "^" + exp);
+    }
 
-    /** Returns whether all exponents are zero */
+    /**
+     * Returns number of variables
+     */
+    public final int nVariables() {
+        return exponents.length;
+    }
+
+    /**
+     * Returns whether all exponents are zero
+     */
     public final boolean isZeroVector() {
         return totalDegree == 0;
     }
@@ -52,7 +66,9 @@ public class DegreeVector implements java.io.Serializable {
         return this;
     }
 
-    /** Returns the total degree in specified variables */
+    /**
+     * Returns the total degree in specified variables
+     */
     public final int dvTotalDegree(int... variables) {
         int d = 0;
         for (int v : variables)
@@ -60,7 +76,9 @@ public class DegreeVector implements java.io.Serializable {
         return d;
     }
 
-    /** Multiplies this by oth */
+    /**
+     * Multiplies this by oth
+     */
     public final DegreeVector dvMultiply(DegreeVector oth) {
         if (oth.isZeroVector())
             return this;
@@ -70,7 +88,9 @@ public class DegreeVector implements java.io.Serializable {
         return new DegreeVector(res, totalDegree + oth.totalDegree);
     }
 
-    /** Multiplies this by oth */
+    /**
+     * Multiplies this by oth
+     */
     public final DegreeVector dvMultiply(int[] oth) {
         int deg = totalDegree;
         int[] res = new int[exponents.length];
@@ -83,7 +103,9 @@ public class DegreeVector implements java.io.Serializable {
         return new DegreeVector(res, deg);
     }
 
-    /** Multiplies this by variable^exponent */
+    /**
+     * Multiplies this by variable^exponent
+     */
     public final DegreeVector dvMultiply(int variable, int exponent) {
         int[] res = exponents.clone();
         res[variable] += exponent;
@@ -92,12 +114,16 @@ public class DegreeVector implements java.io.Serializable {
         return new DegreeVector(res, totalDegree + exponent);
     }
 
-    /** Divides this by variable^exponent */
+    /**
+     * Divides this by variable^exponent
+     */
     public final DegreeVector dvDivideOrNull(int variable, int exponent) {
         return dvMultiply(variable, -exponent);
     }
 
-    /** Gives quotient {@code this / oth } or null if exact division is not possible (e.g. a^2*b^3 / a^3*b^5) */
+    /**
+     * Gives quotient {@code this / oth } or null if exact division is not possible (e.g. a^2*b^3 / a^3*b^5)
+     */
     public final DegreeVector dvDivideOrNull(DegreeVector divider) {
         if (divider.isZeroVector())
             return this;
@@ -110,7 +136,9 @@ public class DegreeVector implements java.io.Serializable {
         return new DegreeVector(res, totalDegree - divider.totalDegree);
     }
 
-    /** Gives quotient {@code this / oth } or null if exact division is not possible (e.g. a^2*b^3 / a^3*b^5) */
+    /**
+     * Gives quotient {@code this / oth } or null if exact division is not possible (e.g. a^2*b^3 / a^3*b^5)
+     */
     public final DegreeVector dvDivideOrNull(int[] divider) {
         int deg = totalDegree;
         int[] res = new int[exponents.length];
@@ -147,7 +175,9 @@ public class DegreeVector implements java.io.Serializable {
         return quot;
     }
 
-    /** Tests whether this can be divided by {@code oth} degree vector */
+    /**
+     * Tests whether this can be divided by {@code oth} degree vector
+     */
     public final boolean dvDivisibleBy(int[] oth) {
         for (int i = 0; i < exponents.length; i++)
             if (exponents[i] < oth[i])
@@ -155,22 +185,30 @@ public class DegreeVector implements java.io.Serializable {
         return true;
     }
 
-    /** Tests whether this can be divided by {@code oth} degree vector */
+    /**
+     * Tests whether this can be divided by {@code oth} degree vector
+     */
     public final boolean dvDivisibleBy(DegreeVector oth) {
         return dvDivisibleBy(oth.exponents);
     }
 
-    /** Joins new variable (with zero exponent) to degree vector */
+    /**
+     * Joins new variable (with zero exponent) to degree vector
+     */
     public final DegreeVector dvJoinNewVariable() {
         return dvJoinNewVariables(1);
     }
 
-    /** Joins new variables (with zero exponents) to degree vector */
+    /**
+     * Joins new variables (with zero exponents) to degree vector
+     */
     public final DegreeVector dvJoinNewVariables(int n) {
         return new DegreeVector(Arrays.copyOf(exponents, exponents.length + n), totalDegree);
     }
 
-    /** internal API */
+    /**
+     * internal API
+     */
     public final DegreeVector dvJoinNewVariables(int newNVariables, int[] mapping) {
         int[] res = new int[newNVariables];
         int c = 0;
@@ -179,7 +217,9 @@ public class DegreeVector implements java.io.Serializable {
         return new DegreeVector(res, totalDegree);
     }
 
-    /** Sets the number of variables */
+    /**
+     * Sets the number of variables
+     */
     public final DegreeVector dvSetNVariables(int n) {
         if (n == exponents.length)
             return this;
@@ -189,14 +229,18 @@ public class DegreeVector implements java.io.Serializable {
             return new DegreeVector(Arrays.copyOf(exponents, n));
     }
 
-    /** Sets exponents of all variables except the specified variable to zero */
+    /**
+     * Sets exponents of all variables except the specified variable to zero
+     */
     public final DegreeVector dvSelect(int var) {
         int[] res = new int[exponents.length];
         res[var] = exponents[var];
         return new DegreeVector(res, exponents[var]);
     }
 
-    /** Set's exponents of all variables except specified variables to zero */
+    /**
+     * Set's exponents of all variables except specified variables to zero
+     */
     public final DegreeVector dvSelect(int[] variables) {
         int[] res = new int[exponents.length];
         int deg = 0;
@@ -207,7 +251,9 @@ public class DegreeVector implements java.io.Serializable {
         return new DegreeVector(res, deg);
     }
 
-    /** Picks only specified exponents */
+    /**
+     * Picks only specified exponents
+     */
     public final DegreeVector dvDropSelect(int[] variables) {
         int[] res = new int[variables.length];
         int deg = 0;
@@ -232,14 +278,18 @@ public class DegreeVector implements java.io.Serializable {
         return new DegreeVector(Arrays.copyOfRange(exponents, from, to));
     }
 
-    /** Set exponent of specified {@code var} to zero */
+    /**
+     * Set exponent of specified {@code var} to zero
+     */
     public final DegreeVector dvSetZero(int var) {
         int[] res = exponents.clone();
         res[var] = 0;
         return new DegreeVector(res, totalDegree - exponents[var]);
     }
 
-    /** Set exponents of specified variables to zero */
+    /**
+     * Set exponents of specified variables to zero
+     */
     public final DegreeVector dvSetZero(int[] variables) {
         int[] res = exponents.clone();
         int deg = totalDegree;
@@ -250,22 +300,30 @@ public class DegreeVector implements java.io.Serializable {
         return new DegreeVector(res, deg);
     }
 
-    /** Drops specified variable (number of variables will be reduced) */
+    /**
+     * Drops specified variable (number of variables will be reduced)
+     */
     public final DegreeVector dvWithout(int variable) {
         return new DegreeVector(ArraysUtil.remove(exponents, variable), totalDegree - exponents[variable]);
     }
 
-    /** Drops specified variables (number of variables will be reduced) */
+    /**
+     * Drops specified variables (number of variables will be reduced)
+     */
     public final DegreeVector dvWithout(int[] variables) {
         return new DegreeVector(ArraysUtil.remove(exponents, variables));
     }
 
-    /** Inserts new variable */
+    /**
+     * Inserts new variable
+     */
     public final DegreeVector dvInsert(int variable) {
         return new DegreeVector(ArraysUtil.insert(exponents, variable, 0), totalDegree);
     }
 
-    /** Inserts new variables */
+    /**
+     * Inserts new variables
+     */
     public final DegreeVector dvInsert(int variable, int count) {
         return new DegreeVector(ArraysUtil.insert(exponents, variable, 0, count), totalDegree);
     }
@@ -289,7 +347,7 @@ public class DegreeVector implements java.io.Serializable {
      * Creates degree vector with old variables renamed to specified mapping variables
      *
      * @param nVariables new total number of variables
-     * @param mapping  mapping from old variables to new variables
+     * @param mapping    mapping from old variables to new variables
      */
     public final DegreeVector dvMap(int nVariables, int[] mapping) {
         int[] newExponents = new int[nVariables];
@@ -303,10 +361,6 @@ public class DegreeVector implements java.io.Serializable {
             if (exponents[i] != 0)
                 return i;
         return -1;
-    }
-
-    private static String toString0(String var, int exp) {
-        return exp == 0 ? "" : var + (exp == 1 ? "" : "^" + exp);
     }
 
     /**

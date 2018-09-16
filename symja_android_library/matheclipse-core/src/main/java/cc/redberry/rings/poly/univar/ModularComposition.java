@@ -9,7 +9,8 @@ import java.util.ArrayList;
  * @since 1.0
  */
 public final class ModularComposition {
-    private ModularComposition() {}
+    private ModularComposition() {
+    }
 
     /**
      * Returns {@code x^{i*modulus} mod polyModulus} for i in {@code [0...degree]}, where {@code degree} is {@code
@@ -40,7 +41,9 @@ public final class ModularComposition {
         return exponents;
     }
 
-    /** writes poly^{i} mod polyModulus for i in [0...nIterations] to exponents */
+    /**
+     * writes poly^{i} mod polyModulus for i in [0...nIterations] to exponents
+     */
     private static <T extends IUnivariatePolynomial<T>> void polyPowers(T polyReduced, T polyModulus, UnivariateDivision.InverseModMonomial<T> invMod, int nIterations, ArrayList<T> exponents) {
         exponents.add(polyReduced.createOne());
         // polyReduced must be reduced!
@@ -72,7 +75,9 @@ public final class ModularComposition {
         return powModulusMod0(poly, polyModulus, invMod, xPowers);
     }
 
-    /** doesn't do poly mod polyModulus first */
+    /**
+     * doesn't do poly mod polyModulus first
+     */
     private static UnivariatePolynomialZp64 powModulusMod0(UnivariatePolynomialZp64 poly,
                                                            UnivariatePolynomialZp64 polyModulus,
                                                            UnivariateDivision.InverseModMonomial<UnivariatePolynomialZp64> invMod,
@@ -107,7 +112,9 @@ public final class ModularComposition {
         return powModulusMod0(poly, polyModulus, invMod, xPowers);
     }
 
-    /** doesn't do poly mod polyModulus first */
+    /**
+     * doesn't do poly mod polyModulus first
+     */
     private static <E> UnivariatePolynomial<E> powModulusMod0(UnivariatePolynomial<E> poly,
                                                               UnivariatePolynomial<E> polyModulus,
                                                               UnivariateDivision.InverseModMonomial<UnivariatePolynomial<E>> invMod,

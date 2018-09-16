@@ -1,11 +1,12 @@
 package cc.redberry.rings.primes;
 
-import cc.redberry.rings.bigint.BigInteger;
 import org.hipparchus.random.RandomGenerator;
 import org.hipparchus.random.Well1024a;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cc.redberry.rings.bigint.BigInteger;
 
 /**
  * Prime factorization of BigIntegers
@@ -16,7 +17,8 @@ public final class BigPrimes {
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static final Well1024a privateRandom = new Well1024a(0x1a9e2b8f3c7d6a4bL);
 
-    private BigPrimes() {}
+    private BigPrimes() {
+    }
 
     /**
      * Strong primality test. Switches between trial divisions, probabilistic Miller-Rabin (ensures that is not prime),

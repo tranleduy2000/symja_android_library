@@ -1,10 +1,11 @@
 package cc.redberry.rings.poly.univar;
 
-import cc.redberry.rings.bigint.BigInteger;
-import cc.redberry.rings.poly.PolynomialFactorDecomposition;
-import cc.redberry.rings.poly.MachineArithmetic;
-import cc.redberry.rings.poly.Util;
 import org.hipparchus.random.RandomGenerator;
+
+import cc.redberry.rings.bigint.BigInteger;
+import cc.redberry.rings.poly.MachineArithmetic;
+import cc.redberry.rings.poly.PolynomialFactorDecomposition;
+import cc.redberry.rings.poly.Util;
 
 
 /**
@@ -13,7 +14,8 @@ import org.hipparchus.random.RandomGenerator;
  * @since 1.0
  */
 public final class EqualDegreeFactorization {
-    private EqualDegreeFactorization() {}
+    private EqualDegreeFactorization() {
+    }
 
     @SuppressWarnings("unchecked")
     static <T extends IUnivariatePolynomial<T>> T randomMonicPoly(T factory) {

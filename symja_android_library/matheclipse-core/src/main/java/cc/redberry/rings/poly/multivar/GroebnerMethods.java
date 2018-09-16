@@ -1,25 +1,38 @@
 package cc.redberry.rings.poly.multivar;
 
+import org.hipparchus.random.RandomGenerator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import cc.redberry.combinatorics.Combinatorics;
 import cc.redberry.combinatorics.IntCombinatorialPort;
 import cc.redberry.combinatorics.IntCompositions;
-import cc.redberry.rings.*;
+import cc.redberry.rings.FactorDecomposition;
+import cc.redberry.rings.IntegersZp64;
+import cc.redberry.rings.Rational;
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.linear.LinearSolver;
 import cc.redberry.rings.poly.IPolynomial;
 import cc.redberry.rings.poly.MultivariateRing;
 import cc.redberry.rings.poly.PolynomialMethods;
 import cc.redberry.rings.util.ArraysUtil;
-import org.hipparchus.random.RandomGenerator;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static cc.redberry.rings.Rings.*;
+import static cc.redberry.rings.Rings.MultivariateRing;
+import static cc.redberry.rings.Rings.Q;
+import static cc.redberry.rings.Rings.Z;
 import static cc.redberry.rings.linear.LinearSolver.SystemInfo.Consistent;
 import static cc.redberry.rings.linear.LinearSolver.SystemInfo.Inconsistent;
-import static cc.redberry.rings.poly.multivar.GroebnerBases.*;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.GroebnerBasis;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.isMonomialIdeal;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.optimalOrder;
 import static cc.redberry.rings.poly.multivar.MonomialOrder.GREVLEX;
 import static cc.redberry.rings.poly.multivar.MonomialOrder.LEX;
 
@@ -27,9 +40,16 @@ import static cc.redberry.rings.poly.multivar.MonomialOrder.LEX;
  * Utility methods based on Groebner bases
  */
 public final class GroebnerMethods {
-    private GroebnerMethods() {}
+    /**
+     * Number of random substitutions for polynomial Jacobian to deduce its rank
+     */
+    private static final int N_JACOBIAN_EVALUATIONS_TRIES = 2;
 
     /* *********************************************** Elimination *********************************************** */
+    private static final int NULLSTELLENSATZ_LIN_SYS_THRESHOLD = 1 << 16;
+
+    private GroebnerMethods() {
+    }
 
     /**
      * Eliminates specified variables from the given ideal.
@@ -39,6 +59,8 @@ public final class GroebnerMethods {
     List<Poly> eliminate(List<Poly> ideal, int variable) {
         return eliminate0(ideal, variable);
     }
+
+    /* ******************************************* Algebraic dependence ******************************************** */
 
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Poly> eliminate0(List<Poly> ideal, int variable) {
@@ -81,8 +103,6 @@ public final class GroebnerMethods {
             ideal = eliminate(ideal, variable);
         return ideal;
     }
-
-    /* ******************************************* Algebraic dependence ******************************************** */
 
     /**
      * Returns true if a given set of polynomials is probably algebraically dependent or false otherwise (which means
@@ -155,11 +175,8 @@ public final class GroebnerMethods {
     }
 
     /**
-     * Number of random substitutions for polynomial Jacobian to deduce its rank
+     * Probabilistic test for the maximality of the rank of Jacobian matrix
      */
-    private static final int N_JACOBIAN_EVALUATIONS_TRIES = 2;
-
-    /** Probabilistic test for the maximality of the rank of Jacobian matrix */
     @SuppressWarnings("unchecked")
     static <Poly extends AMultivariatePolynomial>
     boolean probablyMaximalJacobianRankQ(Poly[][] jacobian) {
@@ -169,7 +186,9 @@ public final class GroebnerMethods {
             return probablyMaximalJacobianRankQ((MultivariatePolynomial[][]) jacobian);
     }
 
-    /** Probabilistic test for the maximality of the rank of Jacobian matrix */
+    /**
+     * Probabilistic test for the maximality of the rank of Jacobian matrix
+     */
     static boolean probablyMaximalJacobianRankQ(MultivariatePolynomialZp64[][] jacobian) {
         int nRows = jacobian.length, nColumns = jacobian[0].length;
         MultivariatePolynomialZp64 factory = jacobian[0][0];
@@ -192,7 +211,9 @@ public final class GroebnerMethods {
         return false;
     }
 
-    /** Probabilistic test for the maximality of the rank of Jacobian matrix */
+    /**
+     * Probabilistic test for the maximality of the rank of Jacobian matrix
+     */
     static <E> boolean probablyMaximalJacobianRankQ(MultivariatePolynomial<E>[][] jacobian) {
         int nRows = jacobian.length, nColumns = jacobian[0].length;
         MultivariatePolynomial<E> factory = jacobian[0][0];
@@ -245,6 +266,8 @@ public final class GroebnerMethods {
                 .collect(Collectors.toList());
     }
 
+    /* **************************************** Nullstellensatz certificate **************************************** */
+
     /**
      * Creates a Jacobian matrix of a given list of polynomials
      */
@@ -260,10 +283,6 @@ public final class GroebnerMethods {
         return jacobian;
     }
 
-    /* **************************************** Nullstellensatz certificate **************************************** */
-
-    private static final int NULLSTELLENSATZ_LIN_SYS_THRESHOLD = 1 << 16;
-
     /**
      * Computes Nullstellensatz certificate for a given list of polynomials assuming that they have no common zeros (or
      * equivalently assuming that the ideal formed by the list is trivial). The method doesn't perform explicit check
@@ -271,8 +290,8 @@ public final class GroebnerMethods {
      *
      * @param polynomials list of polynomials
      * @return polynomials {@code S_i} such that {@code S_1 * f_1 + ... + S_n * f_n = 1} or null if no solution with
-     *         moderate degree bounds exist (either since {@code polynomials} have a common root or because the degree
-     *         bound on the solutions is so big that the system is intractable for computer)
+     * moderate degree bounds exist (either since {@code polynomials} have a common root or because the degree
+     * bound on the solutions is so big that the system is intractable for computer)
      */
     @SuppressWarnings("unchecked")
     public static <Poly extends AMultivariatePolynomial>
@@ -287,8 +306,8 @@ public final class GroebnerMethods {
      *
      * @param polynomials list of polynomials
      * @return polynomials {@code S_i} such that {@code S_1 * f_1 + ... + S_n * f_n = 1} or null if no solution with
-     *         moderate degree bounds exist (either since {@code polynomials} have a common root or because the degree
-     *         bound on the solutions is so big that the system is intractable for computer)
+     * moderate degree bounds exist (either since {@code polynomials} have a common root or because the degree
+     * bound on the solutions is so big that the system is intractable for computer)
      */
     @SuppressWarnings("unchecked")
     public static <Poly extends AMultivariatePolynomial>
@@ -306,7 +325,7 @@ public final class GroebnerMethods {
      * @param boundTotalDeg whether to perform evaluations by increasing total degree of unknown polys or by increasing
      *                      individual degrees of vars
      * @return polynomials {@code S_i} such that {@code S_1 * f_1 + ... + S_n * f_n = g} or null if no solution with
-     *         moderate degree bounds exists
+     * moderate degree bounds exists
      */
     @SuppressWarnings("unchecked")
     public static <Poly extends AMultivariatePolynomial>
@@ -404,7 +423,9 @@ public final class GroebnerMethods {
             return findCertificateE((MultivariatePolynomial) eq, (List) certificate, (MultivariatePolynomial) rhs, nUnknowns);
     }
 
-    /** Solve in Zp64 */
+    /**
+     * Solve in Zp64
+     */
     private static List<MultivariatePolynomialZp64> findCertificateZp64(
             MultivariatePolynomial<MultivariatePolynomialZp64> eq,
             List<MultivariatePolynomial<MultivariatePolynomialZp64>> certificate,
@@ -443,7 +464,9 @@ public final class GroebnerMethods {
                 .collect(Collectors.toList());
     }
 
-    /** Solve in genetic ring */
+    /**
+     * Solve in genetic ring
+     */
     private static <E> List<MultivariatePolynomial<E>> findCertificateE(
             MultivariatePolynomial<MultivariatePolynomial<E>> eq,
             List<MultivariatePolynomial<MultivariatePolynomial<E>>> certificate,

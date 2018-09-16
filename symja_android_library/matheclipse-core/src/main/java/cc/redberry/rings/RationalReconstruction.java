@@ -11,7 +11,8 @@ import cc.redberry.rings.poly.univar.UnivariateGCD;
  * @since 2.3
  */
 public final class RationalReconstruction {
-    private RationalReconstruction() {}
+    private RationalReconstruction() {
+    }
 
     /**
      * Performs a rational number reconstruction. If the answer is not unique, {@code null} is returned.

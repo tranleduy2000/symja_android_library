@@ -1,12 +1,12 @@
 package cc.redberry.rings.poly.univar;
 
 
+import java.util.ArrayList;
+
 import cc.redberry.libdivide4j.FastDivision.Magic;
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.poly.MachineArithmetic;
-
-import java.util.ArrayList;
 
 import static cc.redberry.libdivide4j.FastDivision.divideSignedFast;
 import static cc.redberry.libdivide4j.FastDivision.magicSigned;
@@ -17,7 +17,8 @@ import static cc.redberry.libdivide4j.FastDivision.magicSigned;
  * @since 1.0
  */
 public final class UnivariateDivision {
-    private UnivariateDivision() {}
+    private UnivariateDivision() {
+    }
 
     /* **************************************** Common methods  *************************************** */
 
@@ -94,7 +95,9 @@ public final class UnivariateDivision {
         return divideAndRemainderClassic0(dividend, divider, factor, copy);
     }
 
-    /** Plain school implementation */
+    /**
+     * Plain school implementation
+     */
     static UnivariatePolynomialZ64[] divideAndRemainderClassic0(final UnivariatePolynomialZ64 dividend,
                                                                 final UnivariatePolynomialZ64 divider,
                                                                 final long dividendRaiseFactor,
@@ -125,7 +128,9 @@ public final class UnivariateDivision {
         return new UnivariatePolynomialZ64[]{UnivariatePolynomialZ64.create(quotient), remainder};
     }
 
-    /** Plain school implementation */
+    /**
+     * Plain school implementation
+     */
     private static UnivariatePolynomialZ64[] divideAndRemainderClassicMonic(final UnivariatePolynomialZ64 dividend,
                                                                             final UnivariatePolynomialZ64 divider,
                                                                             final boolean copy) {
@@ -167,7 +172,9 @@ public final class UnivariateDivision {
         return pseudoDivideAndRemainderAdaptive0(dividend, divider, copy);
     }
 
-    /** general implementation */
+    /**
+     * general implementation
+     */
     static UnivariatePolynomialZ64[] pseudoDivideAndRemainderAdaptive0(final UnivariatePolynomialZ64 dividend,
                                                                        final UnivariatePolynomialZ64 divider,
                                                                        final boolean copy) {
@@ -198,7 +205,9 @@ public final class UnivariateDivision {
         return new UnivariatePolynomialZ64[]{UnivariatePolynomialZ64.create(quotient), remainder};
     }
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     static UnivariatePolynomialZ64[] pseudoDivideAndRemainderLinearDividerAdaptive(UnivariatePolynomialZ64 dividend, UnivariatePolynomialZ64 divider, boolean copy) {
         assert divider.degree == 1;
 
@@ -230,17 +239,23 @@ public final class UnivariateDivision {
         return new UnivariatePolynomialZ64[]{UnivariatePolynomialZ64.create(quotient), UnivariatePolynomialZ64.create(res)};
     }
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     static UnivariatePolynomialZ64[] divideAndRemainderLinearDivider(UnivariatePolynomialZ64 dividend, UnivariatePolynomialZ64 divider, boolean copy) {
         return divideAndRemainderLinearDivider0(dividend, divider, 1, copy);
     }
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     static UnivariatePolynomialZ64[] pseudoDivideAndRemainderLinearDivider(UnivariatePolynomialZ64 dividend, UnivariatePolynomialZ64 divider, boolean copy) {
         return divideAndRemainderLinearDivider0(dividend, divider, MachineArithmetic.safePow(divider.lc(), dividend.degree), copy);
     }
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     static UnivariatePolynomialZ64[] divideAndRemainderLinearDivider0(UnivariatePolynomialZ64 dividend, UnivariatePolynomialZ64 divider, long raiseFactor, boolean copy) {
         assert divider.degree == 1;
 
@@ -289,7 +304,9 @@ public final class UnivariateDivision {
         return remainder0(dividend, divider, copy);
     }
 
-    /** Plain school implementation */
+    /**
+     * Plain school implementation
+     */
     static UnivariatePolynomialZ64 remainder0(final UnivariatePolynomialZ64 dividend,
                                               final UnivariatePolynomialZ64 divider,
                                               final boolean copy) {
@@ -329,7 +346,9 @@ public final class UnivariateDivision {
     /* ************************************ Machine-precision division in Zp[x]  ************************************ */
 
 
-    /** when to switch between classical and Newton's */
+    /**
+     * when to switch between classical and Newton's
+     */
     private static boolean useClassicalDivision(IUnivariatePolynomial dividend,
                                                 IUnivariatePolynomial divider) {
         // practical benchmarks show that without pre-conditioning,
@@ -337,7 +356,9 @@ public final class UnivariateDivision {
         return true;
     }
 
-    /** early checks for division */
+    /**
+     * early checks for division
+     */
     private static UnivariatePolynomialZp64[] earlyDivideAndRemainderChecks(final UnivariatePolynomialZp64 dividend,
                                                                             final UnivariatePolynomialZp64 divider,
                                                                             final boolean copy) {
@@ -393,7 +414,9 @@ public final class UnivariateDivision {
         return divideAndRemainderClassic0(dividend, divider, copy);
     }
 
-    /** Plain school implementation */
+    /**
+     * Plain school implementation
+     */
     static UnivariatePolynomialZp64[] divideAndRemainderClassic0(final UnivariatePolynomialZp64 dividend,
                                                                  final UnivariatePolynomialZp64 divider,
                                                                  final boolean copy) {
@@ -414,7 +437,9 @@ public final class UnivariateDivision {
         return new UnivariatePolynomialZp64[]{dividend.createFromArray(quotient), remainder};
     }
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     static UnivariatePolynomialZp64[] divideAndRemainderLinearDividerModulus(UnivariatePolynomialZp64 dividend, UnivariatePolynomialZp64 divider, boolean copy) {
         assert divider.degree == 1;
         assert dividend.degree > 0;
@@ -442,7 +467,9 @@ public final class UnivariateDivision {
 
     /* ************************************ Multi-precision division ************************************ */
 
-    /** early checks for division */
+    /**
+     * early checks for division
+     */
     private static <E> UnivariatePolynomial<E>[] earlyDivideAndRemainderChecks(final UnivariatePolynomial<E> dividend,
                                                                                final UnivariatePolynomial<E> divider,
                                                                                final boolean copy) {
@@ -527,7 +554,9 @@ public final class UnivariateDivision {
         return divideAndRemainderClassic0(dividend, divider, dividend.ring.getOne(), copy);
     }
 
-    /** Plain school implementation */
+    /**
+     * Plain school implementation
+     */
     static <E> UnivariatePolynomial<E>[] divideAndRemainderClassic0(final UnivariatePolynomial<E> dividend,
                                                                     final UnivariatePolynomial<E> divider,
                                                                     final E dividendRaiseFactor,
@@ -563,18 +592,24 @@ public final class UnivariateDivision {
         return dividend.createArray(dividend.createFromArray(quotient), remainder);
     }
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     static <E> UnivariatePolynomial<E>[] divideAndRemainderLinearDivider(UnivariatePolynomial<E> dividend, UnivariatePolynomial<E> divider, boolean copy) {
         return divideAndRemainderLinearDivider0(dividend, divider, dividend.ring.getOne(), copy);
     }
 
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     static <E> UnivariatePolynomial<E>[] pseudoDivideAndRemainderLinearDivider(UnivariatePolynomial<E> dividend, UnivariatePolynomial<E> divider, boolean copy) {
         return divideAndRemainderLinearDivider0(dividend, divider, dividend.ring.pow(divider.lc(), dividend.degree), copy);
     }
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     static <E> UnivariatePolynomial<E>[] divideAndRemainderLinearDivider0(UnivariatePolynomial<E> dividend, UnivariatePolynomial<E> divider, E raiseFactor, boolean copy) {
         assert divider.degree == 1;
         assert dividend.degree > 0;
@@ -636,7 +671,9 @@ public final class UnivariateDivision {
         return pseudoDivideAndRemainderAdaptive0(dividend, divider, copy);
     }
 
-    /** general implementation */
+    /**
+     * general implementation
+     */
     @SuppressWarnings("unchecked")
     static <E> UnivariatePolynomial<E>[] pseudoDivideAndRemainderAdaptive0(final UnivariatePolynomial<E> dividend,
                                                                            final UnivariatePolynomial<E> divider,
@@ -669,7 +706,9 @@ public final class UnivariateDivision {
         return new UnivariatePolynomial[]{UnivariatePolynomial.create(ring, quotient), remainder};
     }
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     @SuppressWarnings("unchecked")
     static <E> UnivariatePolynomial<E>[] pseudoDivideAndRemainderLinearDividerAdaptive(UnivariatePolynomial<E> dividend, UnivariatePolynomial<E> divider, boolean copy) {
         assert divider.degree == 1;
@@ -726,7 +765,9 @@ public final class UnivariateDivision {
         return pseudoRemainderAdaptive0(dividend, divider, copy);
     }
 
-    /** general implementation */
+    /**
+     * general implementation
+     */
     @SuppressWarnings("unchecked")
     static <E> UnivariatePolynomial<E> pseudoRemainderAdaptive0(final UnivariatePolynomial<E> dividend,
                                                                 final UnivariatePolynomial<E> divider,
@@ -755,7 +796,9 @@ public final class UnivariateDivision {
         return remainder;
     }
 
-    /** Fast division with remainder for divider of the form f(x) = x - u **/
+    /**
+     * Fast division with remainder for divider of the form f(x) = x - u
+     **/
     @SuppressWarnings("unchecked")
     static <E> UnivariatePolynomial<E> pseudoRemainderLinearDividerAdaptive(UnivariatePolynomial<E> dividend, UnivariatePolynomial<E> divider, boolean copy) {
         assert divider.degree == 1;
@@ -789,43 +832,6 @@ public final class UnivariateDivision {
         return 33 - Integer.numberOfLeadingZeros(l - 1);
     }
 
-    /** Holds {@code poly^(-1) mod x^i } */
-    public static final class InverseModMonomial<Poly extends IUnivariatePolynomial<Poly>>
-            implements java.io.Serializable {
-        private static final long serialVersionUID = 1L;
-        final Poly poly;
-
-        private InverseModMonomial(Poly poly) {
-            if (!poly.isUnitCC())
-                throw new IllegalArgumentException("Smallest coefficient is not a unit: " + poly);
-            this.poly = poly;
-        }
-
-        /** the inverses */
-        private final ArrayList<Poly> inverses = new ArrayList<>();
-
-        /**
-         * Returns {@code poly^(-1) mod x^xDegree }. Newton iterations are inside.
-         *
-         * @param xDegree monomial degree
-         * @return {@code poly^(-1) mod x^xDegree }
-         */
-        public Poly getInverse(int xDegree) {
-            if (xDegree < 1)
-                return null;
-            int r = log2(xDegree);
-            if (inverses.size() >= r)
-                return inverses.get(r - 1);
-            int currentSize = inverses.size();
-            Poly gPrev = currentSize == 0 ? poly.createOne() : inverses.get(inverses.size() - 1);
-            for (int i = currentSize; i < r; ++i) {
-                Poly tmp = gPrev.clone().multiply(2).subtract(gPrev.clone().square().multiply(poly));
-                inverses.add(gPrev = remainderMonomial(tmp, 1 << i, false));
-            }
-            return gPrev;
-        }
-    }
-
     /**
      * Prepares {@code rev(divider)^(-1) mod x^i } for fast division.
      *
@@ -846,7 +852,9 @@ public final class UnivariateDivision {
         return new InverseModMonomial<>(divider.clone().monic().reverse());
     }
 
-    /** fast division implementation */
+    /**
+     * fast division implementation
+     */
     public static <Poly extends IUnivariatePolynomial<Poly>> Poly[] divideAndRemainderFast0(Poly dividend, Poly divider,
                                                                                             InverseModMonomial<Poly> invRevMod,
                                                                                             boolean copy) {
@@ -857,8 +865,6 @@ public final class UnivariateDivision {
         Poly r = (copy ? dividend.clone() : dividend).subtract(divider.clone().multiply(q));
         return dividend.createArray(q, r);
     }
-
-    /* ********************************* Machine-precision fast division in Zp[x]  ******************************** */
 
     /**
      * Fast algorithm for division with remainder using Newton's iteration.
@@ -877,6 +883,8 @@ public final class UnivariateDivision {
             return r;
         return divideAndRemainderFast0(dividend, divider, copy);
     }
+
+    /* ********************************* Machine-precision fast division in Zp[x]  ******************************** */
 
     /**
      * Fast algorithm for division with remainder using Newton's iteration.
@@ -939,8 +947,6 @@ public final class UnivariateDivision {
         return result;
     }
 
-    /* ********************************* Multi-precision fast division in Zp[x]  ******************************** */
-
     /**
      * Fast algorithm for division with remainder using Newton's iteration.
      *
@@ -958,6 +964,8 @@ public final class UnivariateDivision {
             return r;
         return divideAndRemainderFast0(dividend, divider, copy);
     }
+
+    /* ********************************* Multi-precision fast division in Zp[x]  ******************************** */
 
     /**
      * Fast algorithm for division with remainder using Newton's iteration.
@@ -1020,9 +1028,9 @@ public final class UnivariateDivision {
         return result;
     }
 
-    /* ********************************* Machine-precision remainders ******************************** */
-
-    /** fast division checks */
+    /**
+     * fast division checks
+     */
     private static UnivariatePolynomialZp64 earlyRemainderChecks(final UnivariatePolynomialZp64 dividend,
                                                                  final UnivariatePolynomialZp64 divider,
                                                                  final boolean copy) {
@@ -1039,6 +1047,8 @@ public final class UnivariateDivision {
         }
         return null;
     }
+
+    /* ********************************* Machine-precision remainders ******************************** */
 
     /**
      * Returns remainder of dividing {@code dividend} by {@code divider}.
@@ -1062,7 +1072,9 @@ public final class UnivariateDivision {
         return divideAndRemainderFast0(dividend, divider, copy)[1];
     }
 
-    /** Plain school implementation */
+    /**
+     * Plain school implementation
+     */
     static UnivariatePolynomialZp64 remainderClassical0(final UnivariatePolynomialZp64 dividend,
                                                         final UnivariatePolynomialZp64 divider,
                                                         final boolean copy) {
@@ -1142,10 +1154,9 @@ public final class UnivariateDivision {
         return divideAndRemainderFastCorrectLC(dividend, divider, invMod, copy)[0];
     }
 
-    /* ********************************* Multi-precision remainders ******************************** */
-
-
-    /** fast division checks */
+    /**
+     * fast division checks
+     */
     private static <E> UnivariatePolynomial<E> earlyRemainderChecks(final UnivariatePolynomial<E> dividend,
                                                                     final UnivariatePolynomial<E> divider,
                                                                     final boolean copy) {
@@ -1161,6 +1172,8 @@ public final class UnivariateDivision {
         }
         return null;
     }
+
+    /* ********************************* Multi-precision remainders ******************************** */
 
     /**
      * Returns remainder of {@code dividend} and {@code divider}.
@@ -1184,7 +1197,9 @@ public final class UnivariateDivision {
         return divideAndRemainderFast0(dividend, divider, copy)[1];
     }
 
-    /** Plain school implementation */
+    /**
+     * Plain school implementation
+     */
     static <E> UnivariatePolynomial<E> remainderClassical0(final UnivariatePolynomial<E> dividend,
                                                            final UnivariatePolynomial<E> divider,
                                                            final boolean copy) {
@@ -1275,9 +1290,6 @@ public final class UnivariateDivision {
         return divideAndRemainderFastCorrectLC(dividend, divider, invMod, copy)[0];
     }
 
-
-    /* ********************************** Common conversion ********************************** */
-
     /**
      * Returns quotient and remainder of {@code dividend} and {@code divider} using pseudo division.
      *
@@ -1301,6 +1313,9 @@ public final class UnivariateDivision {
         } else
             throw new RuntimeException(dividend.getClass().toString());
     }
+
+
+    /* ********************************** Common conversion ********************************** */
 
     /**
      * Returns {@code {quotient, remainder}} of {@code dividend} and {@code divider} or {@code null} if the division is
@@ -1455,5 +1470,45 @@ public final class UnivariateDivision {
         return ring.multiply(dividend.maxAbsCoefficient(),
                 ring.pow(ring.increment(ring.quotient(divider.maxAbsCoefficient(), divider.lc())),
                         dividend.degree - divider.degree + 1));
+    }
+
+    /**
+     * Holds {@code poly^(-1) mod x^i }
+     */
+    public static final class InverseModMonomial<Poly extends IUnivariatePolynomial<Poly>>
+            implements java.io.Serializable {
+        private static final long serialVersionUID = 1L;
+        final Poly poly;
+        /**
+         * the inverses
+         */
+        private final ArrayList<Poly> inverses = new ArrayList<>();
+
+        private InverseModMonomial(Poly poly) {
+            if (!poly.isUnitCC())
+                throw new IllegalArgumentException("Smallest coefficient is not a unit: " + poly);
+            this.poly = poly;
+        }
+
+        /**
+         * Returns {@code poly^(-1) mod x^xDegree }. Newton iterations are inside.
+         *
+         * @param xDegree monomial degree
+         * @return {@code poly^(-1) mod x^xDegree }
+         */
+        public Poly getInverse(int xDegree) {
+            if (xDegree < 1)
+                return null;
+            int r = log2(xDegree);
+            if (inverses.size() >= r)
+                return inverses.get(r - 1);
+            int currentSize = inverses.size();
+            Poly gPrev = currentSize == 0 ? poly.createOne() : inverses.get(inverses.size() - 1);
+            for (int i = currentSize; i < r; ++i) {
+                Poly tmp = gPrev.clone().multiply(2).subtract(gPrev.clone().square().multiply(poly));
+                inverses.add(gPrev = remainderMonomial(tmp, 1 << i, false));
+            }
+            return gPrev;
+        }
     }
 }

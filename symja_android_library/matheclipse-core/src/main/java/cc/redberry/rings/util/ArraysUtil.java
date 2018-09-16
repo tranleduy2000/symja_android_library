@@ -23,7 +23,6 @@
 package cc.redberry.rings.util;
 
 
-import cc.redberry.rings.bigint.BigInteger;
 import org.hipparchus.random.RandomGenerator;
 
 import java.lang.reflect.Array;
@@ -31,6 +30,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.function.Function;
+
+import cc.redberry.rings.bigint.BigInteger;
 
 /**
  * This class contains additional methods for manipulating arrays (such as sorting and searching). For all quick sort
@@ -41,11 +42,7 @@ import java.util.function.Function;
  * @see Arrays
  */
 public final class ArraysUtil {
-    private ArraysUtil() {
-    }
-
     public static final Comparator<Object> HASH_COMPARATOR = (o1, o2) -> Integer.compare(o1.hashCode(), o2.hashCode());
-
     /**
      * Lexicographic order
      */
@@ -59,7 +56,6 @@ public final class ArraysUtil {
         }
         return 0;
     };
-
     /**
      * Lexicographic order
      */
@@ -73,7 +69,6 @@ public final class ArraysUtil {
         }
         return 0;
     };
-
     /**
      * Lexicographic order
      */
@@ -87,6 +82,9 @@ public final class ArraysUtil {
         }
         return 0;
     };
+
+    private ArraysUtil() {
+    }
 
     public static int[] flatten(int[][] array) {
         int len = 0;
@@ -465,7 +463,8 @@ public final class ArraysUtil {
     }
 
     public static int max(int[] array, int from, int to) {
-        int a = Integer.MIN_VALUE; ;
+        int a = Integer.MIN_VALUE;
+        ;
         for (int i = from; i < to; i++)
             a = Math.max(a, array[i]);
         return a;
@@ -786,7 +785,7 @@ public final class ArraysUtil {
      * @param array1 the first array whose elements are added to the new array, may be {@code null}
      * @param array2 the second array whose elements are added to the new array, may be {@code null}
      * @return The new array, {@code null} if both arrays are {@code null}. The type of the new array is the type of the
-     *         first array, unless the first array is null, in which case the type is the same as the second array.
+     * first array, unless the first array is null, in which case the type is the same as the second array.
      * @throws IllegalArgumentException if the array types are incompatible
      * @since 2.1
      */
@@ -988,9 +987,9 @@ public final class ArraysUtil {
      * @param a   the array to be searched
      * @param key the value to be searched for
      * @return index of the search key, if it is contained in the array; otherwise, <tt><i>insertion point</i></tt>. The
-     *         <i>insertion point</i> is defined as the point at which the key would be inserted into the array: the
-     *         index of the first element greater than the key, or <tt>a.length</tt> if all elements in the array are
-     *         less than the specified key.
+     * <i>insertion point</i> is defined as the point at which the key would be inserted into the array: the
+     * index of the first element greater than the key, or <tt>a.length</tt> if all elements in the array are
+     * less than the specified key.
      */
     public static int binarySearch1(int[] a, int key) {
         return binarySearch1(a, 0, a.length, key);
@@ -1006,9 +1005,9 @@ public final class ArraysUtil {
      * @param fromIndex the index of the first element (inclusive) to be searched
      * @param toIndex   the index of the last element (exclusive) to be searched
      * @return index of the search key, if it is contained in the array; otherwise, <tt><i>insertion point</i></tt>. The
-     *         <i>insertion point</i> is defined as the point at which the key would be inserted into the array: the
-     *         index of the first element greater than the key, or <tt>toIndex</tt> if all elements in the array are
-     *         less than the specified key.
+     * <i>insertion point</i> is defined as the point at which the key would be inserted into the array: the
+     * index of the first element greater than the key, or <tt>toIndex</tt> if all elements in the array are
+     * less than the specified key.
      */
     public static int binarySearch1(int[] a, int fromIndex, int toIndex,
                                     int key) {

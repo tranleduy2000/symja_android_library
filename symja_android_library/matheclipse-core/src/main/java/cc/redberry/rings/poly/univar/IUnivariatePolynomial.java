@@ -1,15 +1,15 @@
 package cc.redberry.rings.poly.univar;
 
+import java.util.Comparator;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.poly.IPolynomial;
 import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
 import cc.redberry.rings.poly.multivar.DegreeVector;
 import cc.redberry.rings.poly.multivar.MonomialOrder;
 import gnu.trove.set.hash.TIntHashSet;
-
-import java.util.Comparator;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 /**
  * Parent interface for univariate polynomials. Dense representation (array of coefficients) is used to hold univariate
@@ -25,7 +25,9 @@ public interface IUnivariatePolynomial<Poly extends IUnivariatePolynomial<Poly>>
      * @return the degree of this polynomial
      */
     @Override
-    default int size() {return degree() + 1;}
+    default int size() {
+        return degree() + 1;
+    }
 
     /**
      * Returns the number of non zero terms in this poly
@@ -222,7 +224,9 @@ public interface IUnivariatePolynomial<Poly extends IUnivariatePolynomial<Poly>>
         return asMultivariate(MonomialOrder.DEFAULT);
     }
 
-    /** ensures that internal storage has enough size to store {@code desiredCapacity} elements */
+    /**
+     * ensures that internal storage has enough size to store {@code desiredCapacity} elements
+     */
     void ensureInternalCapacity(int desiredCapacity);
 
     @Override

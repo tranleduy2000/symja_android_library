@@ -1,10 +1,10 @@
 package cc.redberry.rings.poly.univar;
 
+import java.util.ArrayList;
+
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.Ring;
 import gnu.trove.list.array.TLongArrayList;
-
-import java.util.ArrayList;
 
 /**
  * Univariate polynomial interpolation.
@@ -12,7 +12,8 @@ import java.util.ArrayList;
  * @since 1.0
  */
 public final class UnivariateInterpolation {
-    private UnivariateInterpolation() {}
+    private UnivariateInterpolation() {
+    }
 
     private static void checkInput(long[] points, long[] values) {
         if (points.length != values.length)
@@ -133,15 +134,25 @@ public final class UnivariateInterpolation {
      */
     public static final class InterpolationZp64 {
         private final IntegersZp64 ring;
-        /** list of evaluation points */
+        /**
+         * list of evaluation points
+         */
         private final TLongArrayList points = new TLongArrayList();
-        /** list of values at points */
+        /**
+         * list of values at points
+         */
         private final TLongArrayList values = new TLongArrayList();
-        /** mixed radix form of interpolating polynomial */
+        /**
+         * mixed radix form of interpolating polynomial
+         */
         private final TLongArrayList mixedRadix = new TLongArrayList();
-        /** total modulus (x_i - points[0])*(x_i - points[1])*... */
+        /**
+         * total modulus (x_i - points[0])*(x_i - points[1])*...
+         */
         private final UnivariatePolynomialZp64 lins;
-        /** resulting interpolating polynomial */
+        /**
+         * resulting interpolating polynomial
+         */
         private final UnivariatePolynomialZp64 poly;
 
         /**
@@ -205,28 +216,36 @@ public final class UnivariateInterpolation {
          *
          * @return interpolating polynomial
          */
-        public UnivariatePolynomialZp64 getInterpolatingPolynomial() {return poly;}
+        public UnivariatePolynomialZp64 getInterpolatingPolynomial() {
+            return poly;
+        }
 
         /**
          * Returns the list of evaluation points used in interpolation
          *
          * @return list of evaluation points used in interpolation
          */
-        public TLongArrayList getPoints() {return points;}
+        public TLongArrayList getPoints() {
+            return points;
+        }
 
         /**
          * Returns the list of polynomial values at interpolation points
          *
          * @return the list of polynomial values at interpolation points
          */
-        public TLongArrayList getValues() {return values;}
+        public TLongArrayList getValues() {
+            return values;
+        }
 
         /**
          * Returns the number of interpolation points used
          *
          * @return number of interpolation points used
          */
-        public int numberOfPoints() {return points.size();}
+        public int numberOfPoints() {
+            return points.size();
+        }
     }
 
     /**
@@ -234,15 +253,25 @@ public final class UnivariateInterpolation {
      */
     public static final class Interpolation<E> {
         private final Ring<E> ring;
-        /** list of evaluation points */
+        /**
+         * list of evaluation points
+         */
         private final ArrayList<E> points = new ArrayList<>();
-        /** list of values at points */
+        /**
+         * list of values at points
+         */
         private final ArrayList<E> values = new ArrayList<>();
-        /** mixed radix form of interpolating polynomial */
+        /**
+         * mixed radix form of interpolating polynomial
+         */
         private final ArrayList<E> mixedRadix = new ArrayList<>();
-        /** total modulus (x_i - points[0])*(x_i - points[1])*... */
+        /**
+         * total modulus (x_i - points[0])*(x_i - points[1])*...
+         */
         private final UnivariatePolynomial<E> lins;
-        /** resulting interpolating polynomial */
+        /**
+         * resulting interpolating polynomial
+         */
         private final UnivariatePolynomial<E> poly;
 
         /**
@@ -306,27 +335,35 @@ public final class UnivariateInterpolation {
          *
          * @return interpolating polynomial
          */
-        public UnivariatePolynomial<E> getInterpolatingPolynomial() {return poly;}
+        public UnivariatePolynomial<E> getInterpolatingPolynomial() {
+            return poly;
+        }
 
         /**
          * Returns the list of evaluation points used in interpolation
          *
          * @return list of evaluation points used in interpolation
          */
-        public ArrayList<E> getPoints() {return points;}
+        public ArrayList<E> getPoints() {
+            return points;
+        }
 
         /**
          * Returns the list of polynomial values at interpolation points
          *
          * @return the list of polynomial values at interpolation points
          */
-        public ArrayList<E> getValues() {return values;}
+        public ArrayList<E> getValues() {
+            return values;
+        }
 
         /**
          * Returns the number of interpolation points used
          *
          * @return number of interpolation points used
          */
-        public int numberOfPoints() {return points.size();}
+        public int numberOfPoints() {
+            return points.size();
+        }
     }
 }

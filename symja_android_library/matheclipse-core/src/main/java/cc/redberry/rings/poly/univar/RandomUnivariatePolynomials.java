@@ -1,14 +1,15 @@
 package cc.redberry.rings.poly.univar;
 
+import org.hipparchus.random.RandomDataGenerator;
+import org.hipparchus.random.RandomGenerator;
+
+import java.util.function.Function;
+
 import cc.redberry.rings.IntegersZp;
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.util.RandomUtil;
-import org.hipparchus.random.RandomDataGenerator;
-import org.hipparchus.random.RandomGenerator;
-
-import java.util.function.Function;
 
 /**
  * Methods to generate random polynomials.
@@ -16,9 +17,10 @@ import java.util.function.Function;
  * @since 1.0
  */
 public final class RandomUnivariatePolynomials {
-    private RandomUnivariatePolynomials() {}
-
     private static final int DEFAULT_BOUND = 100;
+
+    private RandomUnivariatePolynomials() {
+    }
 
     /**
      * Creates random polynomial of specified {@code degree}.
@@ -78,7 +80,9 @@ public final class RandomUnivariatePolynomials {
      */
     public static UnivariatePolynomial<BigInteger> randomMonicPoly(int degree, BigInteger modulus, RandomGenerator rnd) {
         UnivariatePolynomial<BigInteger> r = randomPoly(degree, modulus, rnd);
-        while ((r.data[degree].mod(modulus)).isZero()) {r.data[r.degree] = RandomUtil.randomInt(modulus, rnd);}
+        while ((r.data[degree].mod(modulus)).isZero()) {
+            r.data[r.degree] = RandomUtil.randomInt(modulus, rnd);
+        }
         return r.setRing(new IntegersZp(modulus)).monic();
     }
 

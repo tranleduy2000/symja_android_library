@@ -1,20 +1,31 @@
 package cc.redberry.rings.poly.univar;
 
+import java.util.List;
+import java.util.function.Function;
+
 import cc.redberry.combinatorics.Combinatorics;
 import cc.redberry.rings.IntegersZp;
 import cc.redberry.rings.Rational;
 import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
-import cc.redberry.rings.poly.*;
+import cc.redberry.rings.poly.AlgebraicNumberField;
+import cc.redberry.rings.poly.MachineArithmetic;
+import cc.redberry.rings.poly.MultipleFieldExtension;
+import cc.redberry.rings.poly.MultivariateRing;
+import cc.redberry.rings.poly.PolynomialFactorDecomposition;
+import cc.redberry.rings.poly.SimpleFieldExtension;
+import cc.redberry.rings.poly.UnivariateRing;
+import cc.redberry.rings.poly.Util;
 import cc.redberry.rings.poly.Util.Tuple2;
-import cc.redberry.rings.poly.multivar.*;
+import cc.redberry.rings.poly.multivar.AMonomial;
+import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
+import cc.redberry.rings.poly.multivar.MonomialOrder;
+import cc.redberry.rings.poly.multivar.MultivariateFactorization;
+import cc.redberry.rings.poly.multivar.MultivariatePolynomial;
 import cc.redberry.rings.poly.univar.HenselLifting.QuadraticLiftAbstract;
 import cc.redberry.rings.primes.BigPrimes;
 import cc.redberry.rings.primes.SmallPrimes;
 import cc.redberry.rings.util.ArraysUtil;
-
-import java.util.List;
-import java.util.function.Function;
 
 import static cc.redberry.rings.poly.univar.Conversions64bit.asOverZp64;
 import static cc.redberry.rings.poly.univar.Conversions64bit.canConvertToZp64;
@@ -28,7 +39,21 @@ import static cc.redberry.rings.poly.univar.UnivariateSquareFreeFactorization.Sq
  * @since 1.0
  */
 public final class UnivariateFactorization {
-    private UnivariateFactorization() {}
+    final static int N_MODULAR_FACTORIZATION_TRIALS = 2;
+    private static final double
+            MAX_PRIME_GAP = 382,
+            MIGNOTTE_MAX_DOUBLE_32 = (2.0 * Integer.MAX_VALUE) - 10 * MAX_PRIME_GAP,
+            MIGNOTTE_MAX_DOUBLE_64 = MIGNOTTE_MAX_DOUBLE_32 * MIGNOTTE_MAX_DOUBLE_32;
+    private static final int
+            LOWER_RND_MODULUS_BOUND = 1 << 24,
+            UPPER_RND_MODULUS_BOUND = 1 << 30;
+    /**
+     * cache of references
+     **/
+    private static int[][] naturalSequenceRefCache = new int[32][];
+
+    private UnivariateFactorization() {
+    }
 
     /**
      * Factors univariate {@code poly}.
@@ -99,6 +124,8 @@ public final class UnivariateFactorization {
                 .addUnit(poly.createConstant(new Rational<>(integral.ring, integral.ring.getOne(), denominator)));
     }
 
+    /* =========================================== Factorization in Zp[x] =========================================== */
+
     private static <
             Term extends AMonomial<Term>,
             mPoly extends AMultivariatePolynomial<Term, mPoly>,
@@ -111,17 +138,9 @@ public final class UnivariateFactorization {
                 .mapTo(p -> p.mapCoefficients(ring, ring::image));
     }
 
-    /** x^n * poly */
-    private static final class FactorMonomial<T extends IUnivariatePolynomial<T>> {
-        final T theRest, monomial;
-
-        FactorMonomial(T theRest, T monomial) {
-            this.theRest = theRest;
-            this.monomial = monomial;
-        }
-    }
-
-    /** factor out common monomial term (x^n) */
+    /**
+     * factor out common monomial term (x^n)
+     */
     private static <Poly extends IUnivariatePolynomial<Poly>> FactorMonomial<Poly> factorOutMonomial(Poly poly) {
         int i = poly.firstNonZeroCoefficientPosition();
 
@@ -130,15 +149,15 @@ public final class UnivariateFactorization {
         return new FactorMonomial<>(poly.clone().shiftLeft(i), poly.createMonomial(i));
     }
 
-    /** early check for trivial cases */
+    /**
+     * early check for trivial cases
+     */
     private static <Poly extends IUnivariatePolynomial<Poly>> PolynomialFactorDecomposition<Poly> earlyFactorizationChecks(Poly poly) {
         if (poly.degree() <= 1 || poly.isMonomial())
             return PolynomialFactorDecomposition.of(poly.lcAsPoly(), poly.isMonic() ? poly : poly.clone().monic());
 
         return null;
     }
-
-    /* =========================================== Factorization in Zp[x] =========================================== */
 
     /**
      * Factors polynomial over finite field
@@ -179,6 +198,8 @@ public final class UnivariateFactorization {
         FactorSquareFreeInGF(poly, 1, result);
         return result;
     }
+
+    /* =========================================== Factorization in Z[x] =========================================== */
 
     private static <T extends IUnivariatePolynomial<T>>
     void FactorSquareFreeInGF(T poly, int exponent, PolynomialFactorDecomposition<T> result) {
@@ -221,18 +242,14 @@ public final class UnivariateFactorization {
         assert poly.equals(factorization.multiplyIgnoreExponents());
     }
 
-    /* =========================================== Factorization in Z[x] =========================================== */
-
-
-    /** assertion for correct Hensel structure */
+    /**
+     * assertion for correct Hensel structure
+     */
     static <T extends IUnivariatePolynomial<T>> void assertHenselLift(QuadraticLiftAbstract<T> lift) {
         assert lift.polyMod().equals(lift.aFactor.clone().multiply(lift.bFactor)) : lift.toString();
         assert (lift.aCoFactor == null && lift.bCoFactor == null)
                 || lift.aFactor.clone().multiply(lift.aCoFactor).add(lift.bFactor.clone().multiply(lift.bCoFactor)).isOne() : lift.toString();
     }
-
-    /** cache of references **/
-    private static int[][] naturalSequenceRefCache = new int[32][];
 
     private static int[] createSeq(int n) {
         int[] r = new int[n];
@@ -241,7 +258,9 @@ public final class UnivariateFactorization {
         return r;
     }
 
-    /** returns sequence of natural numbers */
+    /**
+     * returns sequence of natural numbers
+     */
     private static int[] naturalSequenceRef(int n) {
         if (n >= naturalSequenceRefCache.length)
             return createSeq(n);
@@ -250,7 +269,9 @@ public final class UnivariateFactorization {
         return naturalSequenceRefCache[n] = createSeq(n);
     }
 
-    /** select elements by their positions */
+    /**
+     * select elements by their positions
+     */
     private static int[] select(int[] data, int[] positions) {
         int[] r = new int[positions.length];
         int i = 0;
@@ -259,7 +280,9 @@ public final class UnivariateFactorization {
         return r;
     }
 
-    /** reconstruct true factors by enumerating all combinations */
+    /**
+     * reconstruct true factors by enumerating all combinations
+     */
     static PolynomialFactorDecomposition<UnivariatePolynomialZ64> reconstructFactorsZ(
             UnivariatePolynomialZ64 poly,
             PolynomialFactorDecomposition<UnivariatePolynomialZp64> modularFactors) {
@@ -312,8 +335,9 @@ public final class UnivariateFactorization {
         return trueFactors;
     }
 
-
-    /** reconstruct true factors by enumerating all combinations */
+    /**
+     * reconstruct true factors by enumerating all combinations
+     */
     static PolynomialFactorDecomposition<UnivariatePolynomial<BigInteger>> reconstructFactorsZ(
             UnivariatePolynomial<BigInteger> poly,
             PolynomialFactorDecomposition<UnivariatePolynomial<BigInteger>> modularFactors) {
@@ -366,15 +390,6 @@ public final class UnivariateFactorization {
         return trueFactors;
     }
 
-    private static final double
-            MAX_PRIME_GAP = 382,
-            MIGNOTTE_MAX_DOUBLE_32 = (2.0 * Integer.MAX_VALUE) - 10 * MAX_PRIME_GAP,
-            MIGNOTTE_MAX_DOUBLE_64 = MIGNOTTE_MAX_DOUBLE_32 * MIGNOTTE_MAX_DOUBLE_32;
-
-    private static final int
-            LOWER_RND_MODULUS_BOUND = 1 << 24,
-            UPPER_RND_MODULUS_BOUND = 1 << 30;
-
     private static int randomModulusInf() {
         return LOWER_RND_MODULUS_BOUND + PrivateRandom.getRandom().nextInt(UPPER_RND_MODULUS_BOUND - LOWER_RND_MODULUS_BOUND);
     }
@@ -387,8 +402,6 @@ public final class UnivariateFactorization {
         } else
             return SmallPrimes.nextPrime(val);
     }
-
-    final static int N_MODULAR_FACTORIZATION_TRIALS = 2;
 
     /**
      * Factors primitive square-free polynomial using Hensel lifting
@@ -438,13 +451,17 @@ public final class UnivariateFactorization {
         return reconstructFactorsZ(poly, PolynomialFactorDecomposition.of(modularFactors));
     }
 
-    /** machine integers -> BigIntegers */
+    /**
+     * machine integers -> BigIntegers
+     */
     static <T extends AUnivariatePolynomial64<T>> PolynomialFactorDecomposition<UnivariatePolynomial<BigInteger>>
     convertFactorizationToBigIntegers(PolynomialFactorDecomposition<T> decomposition) {
         return decomposition.mapTo(AUnivariatePolynomial64::toBigPoly);
     }
 
-    /** determines the lower bound for the possible modulus for Zp trials */
+    /**
+     * determines the lower bound for the possible modulus for Zp trials
+     */
     private static int chooseModulusLowerBound(double bound2) {
         long infinum;
         if (bound2 < MIGNOTTE_MAX_DOUBLE_32) {
@@ -594,8 +611,6 @@ public final class UnivariateFactorization {
         }
     }
 
-    /* ======================================== Factorization in Q(alpha)[x] ======================================== */
-
     /**
      * Factors polynomial in Q(alpha)[x] via Trager's algorithm
      *
@@ -628,12 +643,16 @@ public final class UnivariateFactorization {
         return result;
     }
 
+    /* ======================================== Factorization in Q(alpha)[x] ======================================== */
+
     private static void FactorInNumberField(UnivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>> poly,
                                             PolynomialFactorDecomposition<UnivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>>> result) {
         FactorGeneric(poly, result, UnivariateFactorization::FactorSquareFreeInNumberField);
     }
 
-    /** Factors polynomial in Q(alpha)[x] via Trager's algorithm */
+    /**
+     * Factors polynomial in Q(alpha)[x] via Trager's algorithm
+     */
     public static PolynomialFactorDecomposition<UnivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>>>
     FactorSquareFreeInNumberField(UnivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>> poly) {
         AlgebraicNumberField<UnivariatePolynomial<Rational<BigInteger>>> numberField
@@ -678,5 +697,17 @@ public final class UnivariateFactorization {
     toNumberField(AlgebraicNumberField<UnivariatePolynomial<Rational<BigInteger>>> numberField,
                   UnivariatePolynomial<Rational<BigInteger>> poly) {
         return poly.mapCoefficients(numberField, cf -> UnivariatePolynomial.constant(Rings.Q, cf));
+    }
+
+    /**
+     * x^n * poly
+     */
+    private static final class FactorMonomial<T extends IUnivariatePolynomial<T>> {
+        final T theRest, monomial;
+
+        FactorMonomial(T theRest, T monomial) {
+            this.theRest = theRest;
+            this.monomial = monomial;
+        }
     }
 }

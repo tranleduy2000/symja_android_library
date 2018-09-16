@@ -6,7 +6,8 @@ import static cc.redberry.rings.bigint.BigInteger.ONE;
  * @since 1.0
  */
 public final class BigIntegerUtil {
-    private BigIntegerUtil() {}
+    private BigIntegerUtil() {
+    }
 
     public static BigInteger max(BigInteger a, BigInteger b) {
         return a.compareTo(b) > 0 ? a : b;
@@ -134,7 +135,8 @@ public final class BigIntegerUtil {
         // starting with y = x / 2 avoids magnitude issues with x squared
         for (y = val.shiftRight(1);
              y.compareTo(val.divide(y)) > 0;
-             y = ((val.divide(y)).add(y)).shiftRight(1)) {}
+             y = ((val.divide(y)).add(y)).shiftRight(1)) {
+        }
 
         return y;
     }
@@ -156,7 +158,8 @@ public final class BigIntegerUtil {
         // starting with y = x / 2 avoids magnitude issues with x squared
         for (y = val.shiftRight(1);
              y.compareTo(val.divide(y)) > 0;
-             y = ((val.divide(y)).add(y)).shiftRight(1)) {}
+             y = ((val.divide(y)).add(y)).shiftRight(1)) {
+        }
 
         if (val.compareTo(y.multiply(y)) == 0)
             return y;

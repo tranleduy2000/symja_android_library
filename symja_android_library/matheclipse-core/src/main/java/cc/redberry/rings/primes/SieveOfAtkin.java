@@ -1,9 +1,10 @@
 package cc.redberry.rings.primes;
 
-import cc.redberry.rings.bigint.BigInteger;
 import org.hipparchus.random.RandomGenerator;
 
 import java.util.BitSet;
+
+import cc.redberry.rings.bigint.BigInteger;
 
 /**
  * Plain sieve of Atkin implementation based on <a href="https://stackoverflow.com/a/12066272/946635">this stackoverflow
@@ -12,6 +13,8 @@ import java.util.BitSet;
  * @since 1.0
  */
 public final class SieveOfAtkin {
+    //cached sieve
+    static final SieveOfAtkin SmallPrimesSieve = new SieveOfAtkin(64 * 1024);
     private final int limit;
     private final BigInteger blimit;
     private final BitSet sieve;
@@ -20,10 +23,6 @@ public final class SieveOfAtkin {
         this.limit = limit;
         this.blimit = blimit;
         this.sieve = sieve;
-    }
-
-    SieveOfAtkin toLimit(int newLimit) {
-        return limit == newLimit ? this : new SieveOfAtkin(newLimit, BigInteger.valueOf(newLimit), sieve);
     }
 
     /**
@@ -102,13 +101,31 @@ public final class SieveOfAtkin {
         }
     }
 
+    public static SieveOfAtkin createSieve(int limit) {
+        if (limit <= SmallPrimesSieve.limit)
+            return SmallPrimesSieve.toLimit(limit);
+        return new SieveOfAtkin(limit);
+    }
+
+    public static SieveOfAtkin createSieve(BigInteger limit) {
+        if (limit.compareTo(SmallPrimesSieve.blimit) < 9)
+            return SmallPrimesSieve.toLimit(limit.intValue());
+        return new SieveOfAtkin(limit.intValueExact(), limit);
+    }
+
+    SieveOfAtkin toLimit(int newLimit) {
+        return limit == newLimit ? this : new SieveOfAtkin(newLimit, BigInteger.valueOf(newLimit), sieve);
+    }
+
     public boolean isPrime(int n) {
         if (n > limit)
             throw new IndexOutOfBoundsException("Out of sieve bounds.");
         return sieve.get(n);
     }
 
-    /** Returns the last prime in this sieve */
+    /**
+     * Returns the last prime in this sieve
+     */
     public int lastPrime() {
         for (int i = limit; i >= 0; --i)
             if (isPrime(i))
@@ -130,20 +147,5 @@ public final class SieveOfAtkin {
 
     public BigInteger getLimitAsBigInteger() {
         return blimit;
-    }
-
-    //cached sieve
-    static final SieveOfAtkin SmallPrimesSieve = new SieveOfAtkin(64 * 1024);
-
-    public static SieveOfAtkin createSieve(int limit) {
-        if (limit <= SmallPrimesSieve.limit)
-            return SmallPrimesSieve.toLimit(limit);
-        return new SieveOfAtkin(limit);
-    }
-
-    public static SieveOfAtkin createSieve(BigInteger limit) {
-        if (limit.compareTo(SmallPrimesSieve.blimit) < 9)
-            return SmallPrimesSieve.toLimit(limit.intValue());
-        return new SieveOfAtkin(limit.intValueExact(), limit);
     }
 }

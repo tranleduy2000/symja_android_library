@@ -1,6 +1,8 @@
 package cc.redberry.rings.poly.multivar;
 
 
+import java.util.Arrays;
+
 import cc.redberry.rings.Rings;
 import cc.redberry.rings.poly.IPolynomialRing;
 import cc.redberry.rings.poly.MultivariateRing;
@@ -8,14 +10,13 @@ import cc.redberry.rings.poly.UnivariateRing;
 import cc.redberry.rings.poly.univar.UnivariatePolynomial;
 import cc.redberry.rings.util.ArraysUtil;
 
-import java.util.Arrays;
-
 /**
  * @author Stanislav Poslavsky
  * @since 2.2
  */
 public final class MultivariateConversions {
-    private MultivariateConversions() {}
+    private MultivariateConversions() {
+    }
 
     /**
      * Given poly in R[x1,x2,...,xN] converts to poly in R[variables][other_variables]

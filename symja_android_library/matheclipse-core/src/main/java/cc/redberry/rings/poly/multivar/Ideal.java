@@ -1,17 +1,27 @@
 package cc.redberry.rings.poly.multivar;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.Rings;
 import cc.redberry.rings.io.IStringifier;
 import cc.redberry.rings.io.Stringifiable;
 import cc.redberry.rings.poly.MultivariateRing;
-import cc.redberry.rings.poly.multivar.GroebnerBases.*;
+import cc.redberry.rings.poly.multivar.GroebnerBases.HilbertSeries;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static cc.redberry.rings.poly.multivar.GroebnerBases.*;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.GroebnerBasis;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.GroebnerBasisWithOptimizedGradedOrder;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.HilbertConvertBasis;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.HilbertSeriesOfLeadingTermsSet;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.canonicalize;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.isHomogeneousIdeal;
+import static cc.redberry.rings.poly.multivar.GroebnerBases.isMonomialIdeal;
 import static cc.redberry.rings.poly.multivar.MonomialOrder.GREVLEX;
 import static cc.redberry.rings.poly.multivar.MonomialOrder.isGradedOrder;
 
@@ -22,16 +32,28 @@ import static cc.redberry.rings.poly.multivar.MonomialOrder.isGradedOrder;
  */
 public final class Ideal<Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
         implements Stringifiable<Poly>, Serializable {
-    /** list of original generators */
-    private final List<Poly> originalGenerators;
-    /** monomial order used for standard basis */
+    /**
+     * monomial order used for standard basis
+     */
     public final Comparator<DegreeVector> ordering;
-    /** util factory polynomial (ordered by monomialOrder) */
+    /**
+     * list of original generators
+     */
+    private final List<Poly> originalGenerators;
+    /**
+     * util factory polynomial (ordered by monomialOrder)
+     */
     private final Poly factory;
-    /** Groebner basis with respect to {@code monomialOrder} */
+    /**
+     * Groebner basis with respect to {@code monomialOrder}
+     */
     private final List<Poly> groebnerBasis;
-    /** the whole ring instance (ordered by monomialOrder) */
+    /**
+     * the whole ring instance (ordered by monomialOrder)
+     */
     private final MultivariateRing<Poly> ring;
+    // lazy Hilbert-Poincare series
+    private HilbertSeries hilbertSeries = null;
 
     private Ideal(List<Poly> originalGenerators, List<Poly> groebnerBasis) {
         this.originalGenerators = Collections.unmodifiableList(originalGenerators);
@@ -43,6 +65,91 @@ public final class Ideal<Term extends AMonomial<Term>, Poly extends AMultivariat
 
     private Ideal(List<Poly> groebnerBasis) {
         this(groebnerBasis, groebnerBasis);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <Poly extends AMultivariatePolynomial<?, Poly>>
+    Poly setOrdering(Poly poly, Comparator<DegreeVector> monomialOrder) {
+        return poly.ordering == monomialOrder
+                ? poly
+                : poly.setOrdering(monomialOrder);
+    }
+
+    /**
+     * Creates ideal given by a list of generators. Groebner basis with respect to GREVLEX order will be used.
+     */
+    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    Ideal<Term, Poly> create(List<Poly> generators) {
+        return create(generators, GREVLEX);
+    }
+
+    /**
+     * Creates ideal given by a list of generators. Groebner basis with respect to GREVLEX order will be used.
+     */
+    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    Ideal<Term, Poly> create(Poly... generators) {
+        return create(Arrays.asList(generators));
+    }
+
+    /**
+     * Creates ideal given by a list of generators. Groebner basis with respect to specified {@code monomialOrder} will
+     * be used.
+     *
+     * @param monomialOrder monomial order for unique Groebner basis of the ideal
+     */
+    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    Ideal<Term, Poly> create(List<Poly> generators, Comparator<DegreeVector> monomialOrder) {
+        return new Ideal<>(generators, GroebnerBasis(generators, monomialOrder));
+    }
+
+    /**
+     * Creates trivial ideal (ideal = ring)
+     */
+    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    Ideal<Term, Poly> trivial(Poly factory) {
+        return trivial(factory, GREVLEX);
+    }
+
+    /**
+     * Creates trivial ideal (ideal = ring)
+     */
+    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    Ideal<Term, Poly> trivial(Poly factory, Comparator<DegreeVector> monomialOrder) {
+        return new Ideal<>(Collections.singletonList(factory.createOne().setOrdering(monomialOrder)));
+    }
+
+    /**
+     * Creates empty ideal
+     */
+    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    Ideal<Term, Poly> empty(Poly factory) {
+        return empty(factory, GREVLEX);
+    }
+
+    /**
+     * Creates empty ideal
+     */
+    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    Ideal<Term, Poly> empty(Poly factory, Comparator<DegreeVector> monomialOrder) {
+        return new Ideal<>(Collections.singletonList(factory.createZero().setOrdering(monomialOrder)));
+    }
+
+    /**
+     * Shortcut for parse
+     */
+    public static <E> Ideal<Monomial<E>, MultivariatePolynomial<E>>
+    parse(String[] generators, Ring<E> field, String[] variables) {
+        return parse(generators, field, GREVLEX, variables);
+    }
+
+    /**
+     * Shortcut for parse
+     */
+    public static <E> Ideal<Monomial<E>, MultivariatePolynomial<E>>
+    parse(String[] generators, Ring<E> field, Comparator<DegreeVector> monomialOrder, String[] variables) {
+        return create(Arrays.stream(generators).
+                map(p -> MultivariatePolynomial.parse(p, field, monomialOrder, variables))
+                .collect(Collectors.toList()), monomialOrder);
     }
 
     /**
@@ -64,15 +171,9 @@ public final class Ideal<Term extends AMonomial<Term>, Poly extends AMultivariat
         return create(originalGenerators, newMonomialOrder);
     }
 
-    @SuppressWarnings("unchecked")
-    private static <Poly extends AMultivariatePolynomial<?, Poly>>
-    Poly setOrdering(Poly poly, Comparator<DegreeVector> monomialOrder) {
-        return poly.ordering == monomialOrder
-                ? poly
-                : poly.setOrdering(monomialOrder);
-    }
-
-    /** set ordering of poly to monomialOrder */
+    /**
+     * set ordering of poly to monomialOrder
+     */
     private Poly setOrdering(Poly poly) {
         return setOrdering(poly, ordering);
     }
@@ -192,10 +293,9 @@ public final class Ideal<Term extends AMonomial<Term>, Poly extends AMultivariat
         return quotient(oth).isTrivial();
     }
 
-    // lazy Hilbert-Poincare series
-    private HilbertSeries hilbertSeries = null;
-
-    /** Hilbert-Poincare series of this ideal */
+    /**
+     * Hilbert-Poincare series of this ideal
+     */
     public synchronized HilbertSeries hilbertSeries() {
         if (hilbertSeries == null) {
             if (isHomogeneous() || isGradedOrder(ordering))
@@ -208,12 +308,16 @@ public final class Ideal<Term extends AMonomial<Term>, Poly extends AMultivariat
         return hilbertSeries;
     }
 
-    /** Returns the affine dimension of this ideal */
+    /**
+     * Returns the affine dimension of this ideal
+     */
     public int dimension() {
         return hilbertSeries().dimension();
     }
 
-    /** Returns the affine degree of this ideal */
+    /**
+     * Returns the affine degree of this ideal
+     */
     public int degree() {
         return hilbertSeries().degree();
     }
@@ -424,82 +528,5 @@ public final class Ideal<Term extends AMonomial<Term>, Poly extends AMultivariat
     @Override
     public String toString() {
         return toString(IStringifier.dummy());
-    }
-
-    /**
-     * Creates ideal given by a list of generators. Groebner basis with respect to GREVLEX order will be used.
-     */
-    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    Ideal<Term, Poly> create(List<Poly> generators) {
-        return create(generators, GREVLEX);
-    }
-
-    /**
-     * Creates ideal given by a list of generators. Groebner basis with respect to GREVLEX order will be used.
-     */
-    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    Ideal<Term, Poly> create(Poly... generators) {
-        return create(Arrays.asList(generators));
-    }
-
-    /**
-     * Creates ideal given by a list of generators. Groebner basis with respect to specified {@code monomialOrder} will
-     * be used.
-     *
-     * @param monomialOrder monomial order for unique Groebner basis of the ideal
-     */
-    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    Ideal<Term, Poly> create(List<Poly> generators, Comparator<DegreeVector> monomialOrder) {
-        return new Ideal<>(generators, GroebnerBasis(generators, monomialOrder));
-    }
-
-    /**
-     * Creates trivial ideal (ideal = ring)
-     */
-    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    Ideal<Term, Poly> trivial(Poly factory) {
-        return trivial(factory, GREVLEX);
-    }
-
-    /**
-     * Creates trivial ideal (ideal = ring)
-     */
-    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    Ideal<Term, Poly> trivial(Poly factory, Comparator<DegreeVector> monomialOrder) {
-        return new Ideal<>(Collections.singletonList(factory.createOne().setOrdering(monomialOrder)));
-    }
-
-    /**
-     * Creates empty ideal
-     */
-    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    Ideal<Term, Poly> empty(Poly factory) {
-        return empty(factory, GREVLEX);
-    }
-
-    /**
-     * Creates empty ideal
-     */
-    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    Ideal<Term, Poly> empty(Poly factory, Comparator<DegreeVector> monomialOrder) {
-        return new Ideal<>(Collections.singletonList(factory.createZero().setOrdering(monomialOrder)));
-    }
-
-    /**
-     * Shortcut for parse
-     */
-    public static <E> Ideal<Monomial<E>, MultivariatePolynomial<E>>
-    parse(String[] generators, Ring<E> field, String[] variables) {
-        return parse(generators, field, GREVLEX, variables);
-    }
-
-    /**
-     * Shortcut for parse
-     */
-    public static <E> Ideal<Monomial<E>, MultivariatePolynomial<E>>
-    parse(String[] generators, Ring<E> field, Comparator<DegreeVector> monomialOrder, String[] variables) {
-        return create(Arrays.stream(generators).
-                map(p -> MultivariatePolynomial.parse(p, field, monomialOrder, variables))
-                .collect(Collectors.toList()), monomialOrder);
     }
 }

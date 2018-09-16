@@ -10,7 +10,13 @@ import cc.redberry.rings.poly.MachineArithmetic;
  * @since 1.0
  */
 public final class UnivariatePolynomialArithmetic {
-    private UnivariatePolynomialArithmetic() {}
+    /**
+     * switch between plain and log2 algorithms
+     */
+    private static final long MONOMIAL_MOD_EXPONENT_THRESHOLD = 64;
+
+    private UnivariatePolynomialArithmetic() {
+    }
 
     /**
      * Returns the remainder of {@code dividend} and {@code polyModulus}.
@@ -288,11 +294,8 @@ public final class UnivariatePolynomialArithmetic {
     public static <T extends IUnivariatePolynomial<T>> T polyPowMod(final T base, BigInteger exponent,
                                                                     T polyModulus,
                                                                     boolean copy) {
-       return polyPowMod(base, exponent, polyModulus, UnivariateDivision.fastDivisionPreConditioning(polyModulus), copy);
+        return polyPowMod(base, exponent, polyModulus, UnivariateDivision.fastDivisionPreConditioning(polyModulus), copy);
     }
-
-    /** switch between plain and log2 algorithms */
-    private static final long MONOMIAL_MOD_EXPONENT_THRESHOLD = 64;
 
     /**
      * Creates {@code x^exponent mod polyModulus}.
@@ -340,12 +343,16 @@ public final class UnivariatePolynomialArithmetic {
             return largeMonomial(exponent, polyModulus, invMod);
     }
 
-    /** plain create and reduce */
+    /**
+     * plain create and reduce
+     */
     static <T extends IUnivariatePolynomial<T>> T smallMonomial(long exponent, T polyModulus, UnivariateDivision.InverseModMonomial<T> invMod) {
         return UnivariatePolynomialArithmetic.polyMod(polyModulus.createMonomial(MachineArithmetic.safeToInt(exponent)), polyModulus, invMod, false);
     }
 
-    /** repeated squaring */
+    /**
+     * repeated squaring
+     */
     static <T extends IUnivariatePolynomial<T>> T largeMonomial(long exponent, T polyModulus, UnivariateDivision.InverseModMonomial<T> invMod) {
         return polyPowMod(polyModulus.createMonomial(1), exponent, polyModulus, invMod, false);
 //        T base = UnivariatePolynomialArithmetic.polyMod(
@@ -365,7 +372,9 @@ public final class UnivariatePolynomialArithmetic {
 //        return UnivariatePolynomialArithmetic.polyMultiplyMod(result, rest, polyModulus, invMod, false);
     }
 
-    /** repeated squaring */
+    /**
+     * repeated squaring
+     */
     static <T extends IUnivariatePolynomial<T>> T largeMonomial(BigInteger exponent, T polyModulus, UnivariateDivision.InverseModMonomial<T> invMod) {
         return polyPowMod(polyModulus.createMonomial(1), exponent, polyModulus, invMod, false);
 //        T base = UnivariatePolynomialArithmetic.polyMod(

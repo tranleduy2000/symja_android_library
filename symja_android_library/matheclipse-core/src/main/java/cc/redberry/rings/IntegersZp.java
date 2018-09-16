@@ -1,10 +1,11 @@
 package cc.redberry.rings;
 
-import cc.redberry.rings.bigint.BigInteger;
-import cc.redberry.rings.util.RandomUtil;
 import org.hipparchus.random.RandomGenerator;
 
 import java.util.Iterator;
+
+import cc.redberry.rings.bigint.BigInteger;
+import cc.redberry.rings.util.RandomUtil;
 
 /**
  * Ring of integers modulo some {@code modulus}.
@@ -17,6 +18,11 @@ public final class IntegersZp extends AIntegers {
      * The modulus.
      */
     public final BigInteger modulus;
+    /**
+     * ring for perfectPowerBase()
+     */
+    private IntegersZp ppBaseDomain = null;
+    private IntegersZp64 lDomain;
 
     /**
      * Creates Zp ring for specified modulus.
@@ -37,16 +43,24 @@ public final class IntegersZp extends AIntegers {
     }
 
     @Override
-    public boolean isField() {return true;}
+    public boolean isField() {
+        return true;
+    }
 
     @Override
-    public boolean isEuclideanRing() {return true;}
+    public boolean isEuclideanRing() {
+        return true;
+    }
 
     @Override
-    public BigInteger cardinality() {return modulus;}
+    public BigInteger cardinality() {
+        return modulus;
+    }
 
     @Override
-    public BigInteger characteristic() {return modulus;}
+    public BigInteger characteristic() {
+        return modulus;
+    }
 
     @Override
     public boolean isUnit(BigInteger element) {
@@ -82,23 +96,29 @@ public final class IntegersZp extends AIntegers {
 
     @Override
     public BigInteger add(BigInteger a, BigInteger b) {
-        a = valueOf(a); b = valueOf(b);
+        a = valueOf(a);
+        b = valueOf(b);
         BigInteger r = a.add(b), rm = r.subtract(modulus);
         return rm.signum() >= 0 ? rm : r;
     }
 
     @Override
     public BigInteger subtract(BigInteger a, BigInteger b) {
-        a = valueOf(a); b = valueOf(b);
+        a = valueOf(a);
+        b = valueOf(b);
         BigInteger r = a.subtract(b);
         return r.signum() < 0 ? r.add(modulus) : r;
     }
 
     @Override
-    public BigInteger negate(BigInteger element) {return element.isZero() ? element : modulus.subtract(valueOf(element));}
+    public BigInteger negate(BigInteger element) {
+        return element.isZero() ? element : modulus.subtract(valueOf(element));
+    }
 
     @Override
-    public BigInteger multiply(BigInteger a, BigInteger b) {return modulus(a.multiply(b));}
+    public BigInteger multiply(BigInteger a, BigInteger b) {
+        return modulus(a.multiply(b));
+    }
 
     @Override
     public BigInteger[] divideAndRemainder(BigInteger a, BigInteger b) {
@@ -130,37 +150,24 @@ public final class IntegersZp extends AIntegers {
     }
 
     @Override
-    public BigInteger valueOf(BigInteger val) {return modulus(val);}
+    public BigInteger valueOf(BigInteger val) {
+        return modulus(val);
+    }
 
     @Override
-    public BigInteger valueOf(long val) {return valueOf(BigInteger.valueOf(val));}
+    public BigInteger valueOf(long val) {
+        return valueOf(BigInteger.valueOf(val));
+    }
 
     @Override
-    public BigInteger randomElement(RandomGenerator rnd) {return RandomUtil.randomInt(modulus, rnd);}
+    public BigInteger randomElement(RandomGenerator rnd) {
+        return RandomUtil.randomInt(modulus, rnd);
+    }
 
     @Override
     public Iterator<BigInteger> iterator() {
         return new It();
     }
-
-    private final class It implements Iterator<BigInteger> {
-        private BigInteger val = BigInteger.ZERO;
-
-        @Override
-        public boolean hasNext() {
-            return val.compareTo(modulus) < 0;
-        }
-
-        @Override
-        public BigInteger next() {
-            BigInteger r = val;
-            val = val.increment();
-            return r;
-        }
-    }
-
-    /** ring for perfectPowerBase() */
-    private IntegersZp ppBaseDomain = null;
 
     /**
      * Returns ring for {@link #perfectPowerBase()} or {@code this} if modulus is not a perfect power
@@ -183,8 +190,6 @@ public final class IntegersZp extends AIntegers {
         return ppBaseDomain;
     }
 
-    private IntegersZp64 lDomain;
-
     /**
      * Returns machine integer ring or null if modulus is larger than {@code long}
      *
@@ -203,7 +208,9 @@ public final class IntegersZp extends AIntegers {
     }
 
     @Override
-    public String toString() {return "Z/" + modulus;}
+    public String toString() {
+        return "Z/" + modulus;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -218,5 +225,21 @@ public final class IntegersZp extends AIntegers {
     @Override
     public int hashCode() {
         return modulus.hashCode();
+    }
+
+    private final class It implements Iterator<BigInteger> {
+        private BigInteger val = BigInteger.ZERO;
+
+        @Override
+        public boolean hasNext() {
+            return val.compareTo(modulus) < 0;
+        }
+
+        @Override
+        public BigInteger next() {
+            BigInteger r = val;
+            val = val.increment();
+            return r;
+        }
     }
 }

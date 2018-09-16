@@ -1,5 +1,25 @@
 package cc.redberry.rings.poly.multivar;
 
+import org.hipparchus.random.RandomGenerator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigIntegerUtil;
@@ -12,19 +32,10 @@ import cc.redberry.rings.poly.univar.UnivariatePolynomialZp64;
 import cc.redberry.rings.util.ArraysUtil;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.hash.TIntHashSet;
-import org.hipparchus.random.RandomGenerator;
-
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * Parent class for multivariate polynomials.
- *
+ * <p>
  * <p> <i><b>Variables:</b></i> <p> The number of variables is invariant, which means that binary arithmetic operations
  * on polynomials with different number of variables (see {@link #nVariables}) are prohibited. Of course all exponents
  * of particular variable may be zero, so e.g.
@@ -32,7 +43,7 @@ import java.util.stream.Collectors;
  * <code>MultivariatePolynomial.parse("x^2 + 2*x*y + y^3", "x", "y", "z")
  * </code></pre>
  * will have nVariables == 3 while "z" is actually absent in the poly.
- *
+ * <p>
  * <p> Particular string names of variables are not stored in the polynomial data structure, instead the variables are
  * treated as consequent integer numbers (0, 1, 2,...), where 0 states for the first variable, 1 for the second etc.
  * Information about variables is accessible by the integer index of the variable. The mapping between the variable
@@ -57,9 +68,9 @@ import java.util.stream.Collectors;
  * System.out.println(poly.toString());
  * </code>
  * </pre>
- *
+ * <p>
  * <p> <i><b>Terms storage and ordering:</b></i>
- *
+ * <p>
  * <p> Terms of multivariate polynomial are stored in a sorted map {@code DegreeVector -> Monomial} (see {@link
  * MonomialSet}). The order of monomials is defined by the {@code Comparator<DegreeVector>} which possible values are
  * {@link MonomialOrder#LEX}, {@link MonomialOrder#ALEX}, {@link MonomialOrder#GREVLEX} and {@link MonomialOrder#GRLEX}.
@@ -76,16 +87,36 @@ import java.util.stream.Collectors;
 public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
         implements IPolynomial<Poly>, MonomialSetView<Term>, Iterable<Term> {
     private static final long serialVersionUID = 1L;
-    /** The number of variables */
+    /**
+     * when to switch to Kronecker's method
+     */
+    static int KRONECKER_THRESHOLD = 256;
+    /**
+     * The number of variables
+     */
     public final int nVariables;
-    /** The ordering */
+    /**
+     * The ordering
+     */
     public final Comparator<DegreeVector> ordering;
-    /** Monomial algebra */
+    /**
+     * Monomial algebra
+     */
     public final IMonomialAlgebra<Term> monomialAlgebra;
-    /** the actual data */
+    /**
+     * the actual data
+     */
     final MonomialSet<Term> terms;
     @SuppressWarnings("unchecked")
     private final Poly self = (Poly) this;
+    /**
+     * cached degree()
+     */
+    private int cachedDegree = -1;
+    /**
+     * cached degrees
+     */
+    private int[] cachesDegrees = null;
 
     AMultivariatePolynomial(int nVariables, Comparator<DegreeVector> ordering, IMonomialAlgebra<Term> monomialAlgebra, MonomialSet<Term> terms) {
         this.nVariables = nVariables;
@@ -190,6 +221,72 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
             return (Poly) MultivariatePolynomialZp64.asMultivariate((UnivariatePolynomialZp64) poly, nVariables, variable, ordering);
         else
             throw new RuntimeException();
+    }
+
+    /**
+     * */
+    public static <Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>>
+    Poly asMultivariate(UnivariatePolynomial<Poly> univariate, int uVariable, boolean join) {
+        Poly factory = univariate.get(0);
+        if (join)
+            factory = factory.insertVariable(uVariable);
+        Poly result = factory.createZero();
+        for (int i = 0; i <= univariate.degree(); i++) {
+            Poly cf = univariate.get(i);
+            if (join)
+                cf = cf.insertVariable(uVariable);
+            result.add(cf.multiply(factory.createMonomial(uVariable, i)));
+        }
+        return result;
+    }
+
+    /**
+     * Convert univariate polynomial over multivariate polynomials to a normal multivariate poly
+     *
+     * @param uPoly    univariate polynomial over multivariate polynomials
+     * @param variable the univariate variable
+     * @return multivariate poly
+     */
+    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    Poly asMultivariate(UnivariatePolynomial<Poly> uPoly, int variable) {
+        Poly result = uPoly.ring.getZero();
+        for (int i = uPoly.degree(); i >= 0; --i) {
+            if (uPoly.isZeroAt(i))
+                continue;
+            result.add(result.createMonomial(variable, i).multiply(uPoly.get(i)));
+        }
+        return result;
+    }
+
+    static int setMin(int[] dv, int[] exponents) {
+        int sum = 0;
+        for (int i = 0; i < exponents.length; ++i) {
+            if (dv[i] < exponents[i])
+                exponents[i] = dv[i];
+            sum += exponents[i];
+        }
+        return sum;
+    }
+
+    static long[] KroneckerMap(int[] degrees) {
+        long[] result = new long[degrees.length];
+        result[0] = 1L;
+        for (int i = 1; i < degrees.length; i++) {
+            result[i] = 1L;
+            double check = 1;
+            for (int j = 0; j < i; j++) {
+                long b = 2L * degrees[j] + 1;
+                result[i] *= b;
+                check *= b;
+            }
+
+            if (check > Long.MAX_VALUE) {
+                // long overflow -> can't use Kronecker's trick
+                return null;
+            }
+        }
+        return result;
     }
 
     /**
@@ -306,7 +403,9 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
         return setOrdering(newOrdering);
     }
 
-    /** release caches */
+    /**
+     * release caches
+     */
     protected void release() {
         cachesDegrees = null;
         cachedDegree = -1;
@@ -318,10 +417,14 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      * @return the number of terms
      */
     @Override
-    public final int size() {return terms.size();}
+    public final int size() {
+        return terms.size();
+    }
 
     @Override
-    public final boolean isZero() { return terms.isEmpty(); }
+    public final boolean isZero() {
+        return terms.isEmpty();
+    }
 
     @Override
     public boolean isLinearOrConstant() {
@@ -475,7 +578,9 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
         return create(nVariables + count, newData);
     }
 
-    /** auxiliary method */
+    /**
+     * auxiliary method
+     */
     public final Poly setNVariables(int newNVariables) {
         if (newNVariables == nVariables)
             return self;
@@ -521,7 +626,9 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
         return create(nVariables + n, newData);
     }
 
-    /** internal API */
+    /**
+     * internal API
+     */
     final Poly joinNewVariables(int newNVariables, int[] mapping) {
         MonomialSet<Term> newData = new MonomialSet<>(ordering);
         for (Term term : terms)
@@ -542,9 +649,6 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
                 ++r;
         return r;
     }
-
-    /** cached degree() */
-    private int cachedDegree = -1;
 
     /**
      * Returns the total degree of this polynomial, that is the maximal total degree among all terms
@@ -592,10 +696,9 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
         return degreesRef()[variable];
     }
 
-    /** cached degrees */
-    private int[] cachesDegrees = null;
-
-    /** returns reference (content must not be modified) */
+    /**
+     * returns reference (content must not be modified)
+     */
     protected int[] degreesRef() {
         if (cachesDegrees == null) {
             int[] degrees = new int[nVariables];
@@ -854,24 +957,6 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
     }
 
     /**
-     * */
-    public static <Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>>
-    Poly asMultivariate(UnivariatePolynomial<Poly> univariate, int uVariable, boolean join) {
-        Poly factory = univariate.get(0);
-        if (join)
-            factory = factory.insertVariable(uVariable);
-        Poly result = factory.createZero();
-        for (int i = 0; i <= univariate.degree(); i++) {
-            Poly cf = univariate.get(i);
-            if (join)
-                cf = cf.insertVariable(uVariable);
-            result.add(cf.multiply(factory.createMonomial(uVariable, i)));
-        }
-        return result;
-    }
-
-    /**
      * Converts this to a multivariate polynomial with coefficients being univariate polynomials over {@code variable}
      *
      * @param variable variable
@@ -885,7 +970,7 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      *
      * @param variable the variable
      * @return multivariate polynomial with coefficients being univariate polynomials over {@code variable}, the
-     *         resulting polynomial have (nVariable - 1) multivariate variables
+     * resulting polynomial have (nVariable - 1) multivariate variables
      */
     public abstract MultivariatePolynomial<? extends IUnivariatePolynomial> asOverUnivariateEliminate(int variable);
 
@@ -895,7 +980,7 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      *
      * @param variables the variables to separate
      * @return multivariate polynomial with coefficients being multivariate polynomials polynomials over {@code
-     *         variables} that is polynomial in R[variables][other_variables]
+     * variables} that is polynomial in R[variables][other_variables]
      */
     public abstract MultivariatePolynomial<Poly> asOverMultivariate(int... variables);
 
@@ -905,7 +990,7 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      *
      * @param variables the variables to separate
      * @return multivariate polynomial with coefficients being multivariate polynomials polynomials over {@code
-     *         variables} that is polynomial in R[variables][other_variables]
+     * variables} that is polynomial in R[variables][other_variables]
      */
     public final MultivariatePolynomial<Poly> asOverMultivariateEliminate(int... variables) {
         return asOverMultivariateEliminate(variables, ordering);
@@ -918,27 +1003,9 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      * @param variables the variables to separate
      * @param prdering  monomial order to use for result
      * @return multivariate polynomial with coefficients being multivariate polynomials polynomials over {@code
-     *         variables} that is polynomial in R[variables][other_variables]
+     * variables} that is polynomial in R[variables][other_variables]
      */
     public abstract MultivariatePolynomial<Poly> asOverMultivariateEliminate(int[] variables, Comparator<DegreeVector> prdering);
-
-    /**
-     * Convert univariate polynomial over multivariate polynomials to a normal multivariate poly
-     *
-     * @param uPoly    univariate polynomial over multivariate polynomials
-     * @param variable the univariate variable
-     * @return multivariate poly
-     */
-    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    Poly asMultivariate(UnivariatePolynomial<Poly> uPoly, int variable) {
-        Poly result = uPoly.ring.getZero();
-        for (int i = uPoly.degree(); i >= 0; --i) {
-            if (uPoly.isZeroAt(i))
-                continue;
-            result.add(result.createMonomial(variable, i).multiply(uPoly.get(i)));
-        }
-        return result;
-    }
 
     /**
      * Gives primitive part of this considered as R[variable][other_variables]
@@ -1125,16 +1192,6 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
         return monomialAlgebra.create(new DegreeVector(exponents, totalDegree));
     }
 
-    static int setMin(int[] dv, int[] exponents) {
-        int sum = 0;
-        for (int i = 0; i < exponents.length; ++i) {
-            if (dv[i] < exponents[i])
-                exponents[i] = dv[i];
-            sum += exponents[i];
-        }
-        return sum;
-    }
-
     /**
      * Divides this polynomial by a {@code monomial} or returns {@code null} (causing loss of internal data) if some of
      * the elements can't be exactly divided by the {@code monomial}. NOTE: if {@code null} is returned, the content of
@@ -1156,7 +1213,9 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
         return loadFrom(map);
     }
 
-    /** check whether number of variables is the same */
+    /**
+     * check whether number of variables is the same
+     */
     final void checkSameDomainWith(Term oth) {
         if (nVariables != oth.exponents.length)
             throw new IllegalArgumentException("Combining multivariate polynomials from different fields: this.nVariables = " + nVariables + " oth.nVariables = " + oth.nVariables());
@@ -1172,10 +1231,14 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      */
     public abstract Poly divideOrNull(Term monomial);
 
-    /** add term to polynomial represented as terms */
+    /**
+     * add term to polynomial represented as terms
+     */
     abstract void add(MonomialSet<Term> terms, Term term);
 
-    /** subtract term from polynomial represented as terms */
+    /**
+     * subtract term from polynomial represented as terms
+     */
     abstract void subtract(MonomialSet<Term> terms, Term term);
 
     @Override
@@ -1243,7 +1306,6 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
         release();
         return self;
     }
-
 
     /**
      * Subtracts {@code monomial} from this polynomial
@@ -1391,7 +1453,7 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      * @param oth       other multivariate polynomial
      * @param variables variables to test
      * @return {@code true} if {@code this} and {@code oth} have the same skeleton with respect to specified {@code
-     *         variables} and {@code false} otherwise
+     * variables} and {@code false} otherwise
      */
     public final boolean sameSkeletonQ(AMultivariatePolynomial oth, int... variables) {
         return getSkeleton(variables).equals(oth.getSkeleton(variables));
@@ -1404,7 +1466,7 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      * @param oth       other multivariate polynomial
      * @param variables variables to exclude
      * @return {@code true} if {@code this} and {@code oth} have the same skeleton with respect to all except specified
-     *         {@code variables} and {@code false} otherwise
+     * {@code variables} and {@code false} otherwise
      */
     public final boolean sameSkeletonExceptQ(AMultivariatePolynomial oth, int... variables) {
         return getSkeletonExcept(variables).equals(oth.getSkeletonExcept(variables));
@@ -1416,7 +1478,9 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      * @param variable the variable
      * @return partial derivative with respect to specified variable
      */
-    public final Poly derivative(int variable) {return derivative(variable, 1);}
+    public final Poly derivative(int variable) {
+        return derivative(variable, 1);
+    }
 
     /**
      * Gives partial derivative of specified {@code order} with respect to specified variable (new instance created)
@@ -1435,7 +1499,7 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      * @param variable the variable
      * @param order    derivative order
      * @return {@code derivative(poly, variable, order) / order! }, where the derivative is formal derivative and
-     *         calculated with arithmetic performed in Z ring (to overcome possible zeros in Zp)
+     * calculated with arithmetic performed in Z ring (to overcome possible zeros in Zp)
      */
     public abstract Poly seriesCoefficient(int variable, int order);
 
@@ -1595,6 +1659,13 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
 
     public abstract <E> MultivariatePolynomial<E> mapCoefficientsAsPolys(Ring<E> ring, Function<Poly, E> mapper);
 
+    @Override
+    public final String toString() {
+        return toString(IStringifier.dummy());
+    }
+
+    /* shared constant */
+
     /**
      * Collector which collects stream of element to a UnivariatePolynomial
      */
@@ -1638,33 +1709,4 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
             return EnumSet.of(Characteristics.IDENTITY_FINISH);
         }
     }
-
-    @Override
-    public final String toString() {
-        return toString(IStringifier.dummy());
-    }
-
-    static long[] KroneckerMap(int[] degrees) {
-        long[] result = new long[degrees.length];
-        result[0] = 1L;
-        for (int i = 1; i < degrees.length; i++) {
-            result[i] = 1L;
-            double check = 1;
-            for (int j = 0; j < i; j++) {
-                long b = 2L * degrees[j] + 1;
-                result[i] *= b;
-                check *= b;
-            }
-
-            if (check > Long.MAX_VALUE) {
-                // long overflow -> can't use Kronecker's trick
-                return null;
-            }
-        }
-        return result;
-    }
-
-    /* shared constant */
-    /** when to switch to Kronecker's method */
-    static int KRONECKER_THRESHOLD = 256;
 }

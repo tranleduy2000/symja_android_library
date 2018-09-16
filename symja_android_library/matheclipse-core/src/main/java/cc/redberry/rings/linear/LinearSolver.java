@@ -1,5 +1,7 @@
 package cc.redberry.rings.linear;
 
+import java.util.ArrayList;
+
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.poly.univar.UnivariateDivision;
@@ -9,9 +11,9 @@ import cc.redberry.rings.util.ArraysUtil;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 
-import java.util.ArrayList;
-
-import static cc.redberry.rings.linear.LinearSolver.SystemInfo.*;
+import static cc.redberry.rings.linear.LinearSolver.SystemInfo.Consistent;
+import static cc.redberry.rings.linear.LinearSolver.SystemInfo.Inconsistent;
+import static cc.redberry.rings.linear.LinearSolver.SystemInfo.UnderDetermined;
 
 /**
  * Solver for quadratic linear system
@@ -19,7 +21,8 @@ import static cc.redberry.rings.linear.LinearSolver.SystemInfo.*;
  * @since 1.0
  */
 public final class LinearSolver {
-    private LinearSolver() {}
+    private LinearSolver() {
+    }
 
     /**
      * Transpose square matrix
@@ -210,18 +213,6 @@ public final class LinearSolver {
         if (info != Consistent)
             throw new ArithmeticException("singular or under-determined matrix");
         return result;
-    }
-
-    /**
-     * Info about linear system
-     */
-    public enum SystemInfo {
-        /** Under-determined system */
-        UnderDetermined,
-        /** Inconsistent system */
-        Inconsistent,
-        /** Consistent system */
-        Consistent;
     }
 
     /**
@@ -508,9 +499,6 @@ public final class LinearSolver {
         return Consistent;
     }
 
-
-    /* ========================================= Machine numbers ============================================ */
-
     /**
      * Gives the row echelon form of the matrix
      *
@@ -521,6 +509,9 @@ public final class LinearSolver {
     public static int rowEchelonForm(IntegersZp64 ring, long[][] matrix) {
         return rowEchelonForm(ring, matrix, false);
     }
+
+
+    /* ========================================= Machine numbers ============================================ */
 
     /**
      * Gives the row echelon form of the matrix
@@ -954,5 +945,23 @@ public final class LinearSolver {
                 result[i] = ring.add(result[i], ring.multiply(rhs[j], quot.get(j)));
         }
         return Consistent;
+    }
+
+    /**
+     * Info about linear system
+     */
+    public enum SystemInfo {
+        /**
+         * Under-determined system
+         */
+        UnderDetermined,
+        /**
+         * Inconsistent system
+         */
+        Inconsistent,
+        /**
+         * Consistent system
+         */
+        Consistent;
     }
 }

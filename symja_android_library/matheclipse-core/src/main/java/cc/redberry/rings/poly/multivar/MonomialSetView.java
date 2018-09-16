@@ -1,9 +1,9 @@
 package cc.redberry.rings.poly.multivar;
 
-import cc.redberry.rings.util.ArraysUtil;
-
 import java.util.Collection;
 import java.util.Iterator;
+
+import cc.redberry.rings.util.ArraysUtil;
 
 /**
  * Parent auxiliary interface for multivariate polynomials.
@@ -16,13 +16,21 @@ interface MonomialSetView<Term extends AMonomial<Term>> extends Iterable<Term> {
     Iterator<Term> descendingIterator();
 
     @Override
-    default Iterator<Term> iterator() { return ascendingIterator(); }
+    default Iterator<Term> iterator() {
+        return ascendingIterator();
+    }
 
-    default Term first() { return ascendingIterator().next(); }
+    default Term first() {
+        return ascendingIterator().next();
+    }
 
-    default Term last() { return descendingIterator().next(); }
+    default Term last() {
+        return descendingIterator().next();
+    }
 
-    default Term lt() { return descendingIterator().next(); }
+    default Term lt() {
+        return descendingIterator().next();
+    }
 
     int size();
 
@@ -39,7 +47,9 @@ interface MonomialSetView<Term extends AMonomial<Term>> extends Iterable<Term> {
      *
      * @return sum of {@link #degrees()}
      */
-    default int degreeSum() { return ArraysUtil.sum(degrees());}
+    default int degreeSum() {
+        return ArraysUtil.sum(degrees());
+    }
 
     /**
      * Collection view of all terms

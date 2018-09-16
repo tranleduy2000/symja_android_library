@@ -1,5 +1,7 @@
 package cc.redberry.rings.poly.multivar;
 
+import java.util.Arrays;
+
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.poly.IPolynomial;
@@ -9,8 +11,6 @@ import cc.redberry.rings.poly.Util;
 import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
 import cc.redberry.rings.poly.univar.UnivariateSquareFreeFactorization;
 
-import java.util.Arrays;
-
 import static cc.redberry.rings.poly.multivar.Conversions64bit.asOverZp64;
 import static cc.redberry.rings.poly.multivar.Conversions64bit.canConvertToZp64;
 import static cc.redberry.rings.poly.multivar.MultivariateDivision.divideExact;
@@ -19,7 +19,8 @@ import static cc.redberry.rings.poly.multivar.MultivariateDivision.divideExact;
  * @since 1.0
  */
 public final class MultivariateSquareFreeFactorization {
-    private MultivariateSquareFreeFactorization() {}
+    private MultivariateSquareFreeFactorization() {
+    }
 
     /**
      * Performs square-free factorization of a {@code poly.
@@ -228,7 +229,9 @@ public final class MultivariateSquareFreeFactorization {
         return fct.addFactor(content[0], 1).addFactor(lc, 1);
     }
 
-    /** {@code poly} will be destroyed */
+    /**
+     * {@code poly} will be destroyed
+     */
     @SuppressWarnings("ConstantConditions")
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     PolynomialFactorDecomposition<Poly> SquareFreeFactorizationMusser0(Poly poly) {
@@ -277,7 +280,9 @@ public final class MultivariateSquareFreeFactorization {
         }
     }
 
-    /** p-th root of poly */
+    /**
+     * p-th root of poly
+     */
     @SuppressWarnings("unchecked")
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     Poly pRoot(Poly poly) {

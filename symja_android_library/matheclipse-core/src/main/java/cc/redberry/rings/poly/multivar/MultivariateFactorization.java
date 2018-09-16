@@ -1,22 +1,50 @@
 package cc.redberry.rings.poly.multivar;
 
+import org.hipparchus.random.RandomGenerator;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import cc.redberry.combinatorics.Combinatorics;
-import cc.redberry.rings.*;
+import cc.redberry.rings.IntegersZp;
+import cc.redberry.rings.IntegersZp64;
+import cc.redberry.rings.Rational;
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.bigint.BigIntegerUtil;
-import cc.redberry.rings.poly.*;
+import cc.redberry.rings.poly.AlgebraicNumberField;
+import cc.redberry.rings.poly.FiniteField;
+import cc.redberry.rings.poly.IPolynomial;
+import cc.redberry.rings.poly.MachineArithmetic;
+import cc.redberry.rings.poly.MultipleFieldExtension;
+import cc.redberry.rings.poly.MultivariateRing;
+import cc.redberry.rings.poly.PolynomialFactorDecomposition;
+import cc.redberry.rings.poly.PolynomialMethods;
+import cc.redberry.rings.poly.SimpleFieldExtension;
+import cc.redberry.rings.poly.UnivariateRing;
+import cc.redberry.rings.poly.Util;
 import cc.redberry.rings.poly.Util.Tuple2;
-import cc.redberry.rings.poly.univar.*;
+import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
+import cc.redberry.rings.poly.univar.IrreduciblePolynomials;
+import cc.redberry.rings.poly.univar.UnivariateDivision;
+import cc.redberry.rings.poly.univar.UnivariateFactorization;
+import cc.redberry.rings.poly.univar.UnivariatePolynomial;
+import cc.redberry.rings.poly.univar.UnivariatePolynomialZp64;
+import cc.redberry.rings.poly.univar.UnivariateSquareFreeFactorization;
 import cc.redberry.rings.primes.SmallPrimes;
 import cc.redberry.rings.util.ArraysUtil;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.TLongHashSet;
-import org.hipparchus.random.RandomGenerator;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static cc.redberry.rings.poly.PolynomialMethods.polyPow;
 import static cc.redberry.rings.poly.multivar.Conversions64bit.asOverZp64;
@@ -28,7 +56,40 @@ import static cc.redberry.rings.poly.multivar.Conversions64bit.canConvertToZp64;
  * @since 1.0
  */
 public final class MultivariateFactorization {
-    private MultivariateFactorization() {}
+    /**
+     * Number of univariate factorizations performed with different evaluation homomorphisms before doing Hensel
+     * lifting
+     **/
+    private static final long UNIVARIATE_FACTORIZATION_ATTEMPTS = 3;
+    /**
+     * starting extension field exponent
+     */
+    private static final int EXTENSION_FIELD_EXPONENT = 3;
+    /**
+     * number of attempts to factor in base ring before switching to extension
+     */
+    private static final int N_FAILS_BEFORE_SWITCH_TO_EXTENSION = 32;
+    /**
+     * number of attempts to factor which lead to inconsistent bivariate factorizations over different variables (e.g.
+     * incompatible factorization patterns) before switch to extension field (take place only for domains of very small
+     * characteristic)
+     */
+    private static final int N_INCONSISTENT_BIFACTORS_BEFORE_SWITCH_TO_EXTENSION = 32;
+    /**
+     * number of attempts to factor which lead to superfluous bivariate factors (#factors > #expected_factors)
+     */
+    private static final int N_SUPERFLUOUS_FACTORS_BEFORE_TRY_OTHER_VAR = 8;
+    /**
+     * number of attempts to generate unique evaluation before switching to extension field
+     */
+    private static final int N_DIFF_EVALUATIONS_FAIL = 32;
+    /**
+     * cache of references
+     **/
+    private static int[][] naturalSequenceRefCache = new int[32][];
+
+    private MultivariateFactorization() {
+    }
 
     /**
      * Factors multivariate polynomial
@@ -66,7 +127,6 @@ public final class MultivariateFactorization {
     static boolean isOverUnivariate(AMultivariatePolynomial poly) {
         return (poly instanceof MultivariatePolynomial && ((MultivariatePolynomial) poly).ring instanceof UnivariateRing);
     }
-
 
     @SuppressWarnings("unchecked")
     static <Poly extends AMultivariatePolynomial<?, Poly>>
@@ -107,6 +167,8 @@ public final class MultivariateFactorization {
                 MultivariatePolynomial.asNormalMultivariate(poly, cfVars, mainVars))
                 .mapTo(p -> p.asOverMultivariateEliminate(cfVars));
     }
+
+    /* ============================================== Auxiliary methods ============================================= */
 
     private static PolynomialFactorDecomposition<MultivariatePolynomial<MultivariatePolynomialZp64>>
     FactorOverMultivariateZp64(MultivariatePolynomial<MultivariatePolynomialZp64> poly,
@@ -218,8 +280,6 @@ public final class MultivariateFactorization {
         return res;
     }
 
-    /* ============================================== Auxiliary methods ============================================= */
-
     @SuppressWarnings("unchecked")
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     PolynomialFactorDecomposition<Poly> factorUnivariate(Poly poly) {
@@ -251,21 +311,7 @@ public final class MultivariateFactorization {
         return res;
     }
 
-    private interface FactorizationAlgorithm<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>> {
-        PolynomialFactorDecomposition<Poly> factor(Poly poly, boolean switchToExtensionField);
-    }
-
-
-    /**
-     * Number of univariate factorizations performed with different evaluation homomorphisms before doing Hensel
-     * lifting
-     **/
-    private static final long UNIVARIATE_FACTORIZATION_ATTEMPTS = 3;
-
-    /** starting extension field exponent */
-    private static final int EXTENSION_FIELD_EXPONENT = 3;
+    /* ========================================= Newton polygons (bivariate) ======================================== */
 
     /**
      * Factors primitive, square-free bivariate polynomial over Zp switching to extension field
@@ -374,8 +420,6 @@ public final class MultivariateFactorization {
         return result;
     }
 
-    /* ========================================= Newton polygons (bivariate) ======================================== */
-
     /**
      * Calculates the convex hull of a set of 2d points
      *
@@ -422,40 +466,16 @@ public final class MultivariateFactorization {
         return stack.toArray(new int[stack.size()][]);
     }
 
-    /** turn direction: > 0 - counter clockwise, < 0 clockwise, = 0 collinear */
+    /**
+     * turn direction: > 0 - counter clockwise, < 0 clockwise, = 0 collinear
+     */
     private static int ccw(int[] p1, int[] p2, int[] p3) {
         return (p2[0] - p1[0]) * (p3[1] - p1[1]) - (p2[1] - p1[1]) * (p3[0] - p1[0]);
     }
 
-    /** sort according to polar angle relative to some base point (origin) */
-    private static final class PolarAngleComparator implements Comparator<int[]> {
-        private final int[] basePoint;
-
-        PolarAngleComparator(int[] basePoint) {
-            this.basePoint = basePoint;
-        }
-
-        @Override
-        public int compare(int[] p1, int[] p2) {
-            if (Arrays.equals(p1, p2))
-                return 0;
-            int
-                    p1x = p1[0] - basePoint[0], p2x = p2[0] - basePoint[0],
-                    p1y = p1[1] - basePoint[1], p2y = p2[1] - basePoint[1];
-            double
-                    d1 = Math.sqrt(p1x * p1x + p1y * p1y),
-                    d2 = Math.sqrt(p2x * p2x + p2y * p2y),
-                    cos1 = p1x / d1,
-                    cos2 = p2x / d2;
-
-            int c = Double.compare(cos2, cos1);
-            if (c != 0)
-                return c;
-            return Double.compare(d1, d2);
-        }
-    }
-
-    /** Newton polygon of bivariate polynomial */
+    /**
+     * Newton polygon of bivariate polynomial
+     */
     static int[][] NewtonPolygon(Iterable<DegreeVector> poly) {
         List<int[]> points = new ArrayList<>();
         for (DegreeVector dv : poly)
@@ -463,7 +483,11 @@ public final class MultivariateFactorization {
         return convexHul(points.toArray(new int[points.size()][]));
     }
 
-    /** Newton polygon of bivariate polynomial */
+    /* ================================= Bivariate factorization over finite fields ================================= */
+
+    /**
+     * Newton polygon of bivariate polynomial
+     */
     static int[][] NewtonPolygon(AMultivariatePolynomial<? extends DegreeVector, ?> poly) {
         return NewtonPolygon(poly.getSkeleton());
     }
@@ -501,8 +525,6 @@ public final class MultivariateFactorization {
     static boolean isBivariateCertainlyIrreducible(AMultivariatePolynomial<? extends DegreeVector, ?> poly) {
         return poly.nVariables == 2 && isCertainlyIndecomposable(NewtonPolygon(poly));
     }
-
-    /* ================================= Bivariate factorization over finite fields ================================= */
 
     /**
      * Factors primitive, square-free bivariate polynomial over Zp
@@ -905,9 +927,6 @@ public final class MultivariateFactorization {
         return result;
     }
 
-    /** cache of references **/
-    private static int[][] naturalSequenceRefCache = new int[32][];
-
     private static int[] createSeq(int n) {
         int[] r = new int[n];
         for (int i = 0; i < n; i++)
@@ -915,7 +934,9 @@ public final class MultivariateFactorization {
         return r;
     }
 
-    /** returns sequence of natural numbers */
+    /**
+     * returns sequence of natural numbers
+     */
     private static int[] naturalSequenceRef(int n) {
         if (n >= naturalSequenceRefCache.length)
             return createSeq(n);
@@ -924,7 +945,11 @@ public final class MultivariateFactorization {
         return naturalSequenceRefCache[n] = createSeq(n);
     }
 
-    /** select elements by their positions */
+    /* ======================================= Bivariate factorization over Z ======================================= */
+
+    /**
+     * select elements by their positions
+     */
     private static int[] select(int[] data, int[] positions) {
         int[] r = new int[positions.length];
         int i = 0;
@@ -992,8 +1017,6 @@ public final class MultivariateFactorization {
 
         return trueFactors.monic();
     }
-
-    /* ======================================= Bivariate factorization over Z ======================================= */
 
     /**
      * Factors primitive, square-free bivariate polynomial over Z
@@ -1228,7 +1251,9 @@ public final class MultivariateFactorization {
         return bound;
     }
 
-    /** naive recombination for lifting to factorization in Z */
+    /**
+     * naive recombination for lifting to factorization in Z
+     */
     static PolynomialFactorDecomposition<MultivariatePolynomial<BigInteger>> denseBivariateRecombinationZ(
             MultivariatePolynomial<BigInteger> baseZ,
             MultivariatePolynomial<BigInteger> factoryZp,
@@ -1309,7 +1334,9 @@ public final class MultivariateFactorization {
         return result;
     }
 
-    /** Given poly as R[x][y] transform it to R[y][x] */
+    /**
+     * Given poly as R[x][y] transform it to R[y][x]
+     */
     private static <uPoly extends IUnivariatePolynomial<uPoly>>
     UnivariatePolynomial<uPoly> changeDenseRepresentation(UnivariatePolynomial<uPoly> poly) {
         int xDegree = -1;
@@ -1322,7 +1349,9 @@ public final class MultivariateFactorization {
         return result;
     }
 
-    /** Given poly as R[x][y] returns coefficient of x^xDegree which is R[y] */
+    /**
+     * Given poly as R[x][y] returns coefficient of x^xDegree which is R[y]
+     */
     private static <uPoly extends IUnivariatePolynomial<uPoly>> uPoly
     coefficientInSeries(int xDegree, UnivariatePolynomial<uPoly> poly) {
         Ring<uPoly> ring = poly.ring;
@@ -1331,6 +1360,8 @@ public final class MultivariateFactorization {
             result.setFrom(i, poly.get(i), xDegree);
         return result;
     }
+
+    /* ================================ Multivariate factorization over finite fields ================================ */
 
     /**
      * Given poly as R[x][y] returns leading coefficient of x which is R[y] viewed as R[x][y] (with all coefficients
@@ -1366,8 +1397,6 @@ public final class MultivariateFactorization {
             return (PolynomialFactorDecomposition<Poly>) bivariateDenseFactorSquareFreeInGF((MultivariatePolynomial) poly, switchToExtensionField, true);
     }
 
-    /* ================================ Multivariate factorization over finite fields ================================ */
-
     @SuppressWarnings("unchecked")
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     PolynomialFactorDecomposition<Poly> factorInExtensionFieldGeneric(Poly poly, FactorizationAlgorithm<Term, Poly> algorithm) {
@@ -1377,35 +1406,6 @@ public final class MultivariateFactorization {
             return (PolynomialFactorDecomposition<Poly>) factorInExtensionField((MultivariatePolynomial) poly, (FactorizationAlgorithm) algorithm);
         else
             throw new RuntimeException();
-    }
-
-    static final class OrderByDegrees<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>> {
-        /** input polynomial (with variables renamed) */
-        final Poly ordered;
-        /** factors degree bounds, mapping used to rename variables so that degreeBounds are in descending order */
-        final int[] degreeBounds, variablesSorted, variablesMapping;
-        /** number of variables in poly */
-        final int nVariables;
-
-        OrderByDegrees(Poly ordered, int[] degreeBounds, int[] variablesSorted, int nVariables) {
-            this.ordered = ordered;
-            this.degreeBounds = degreeBounds;
-            this.variablesSorted = variablesSorted;
-            this.variablesMapping = MultivariateGCD.inversePermutation(variablesSorted);
-            this.nVariables = nVariables;
-        }
-
-        /** recover initial order of variables in the result */
-        Poly restoreOrder(Poly factor) {
-            return AMultivariatePolynomial.renameVariables(
-                    factor.setNVariables(nVariables), variablesMapping);
-        }
-
-        Poly order(Poly factor) {
-            return AMultivariatePolynomial.renameVariables(factor, variablesSorted);
-        }
     }
 
     /**
@@ -1504,78 +1504,6 @@ public final class MultivariateFactorization {
         return decomposition.mapTo(input::restoreOrder);
     }
 
-    static final class LeadingCoefficientData<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>> {
-
-        // the following data represented as F[x2,x3,...,xN] (i.e. with x1 dropped, variables shifted)
-
-        /** the original leading coefficient */
-        final Poly lc;
-        /** its square-free decomposition */
-        final PolynomialFactorDecomposition<Poly> lcSqFreeDecomposition;
-        /** square-free part of l.c. */
-        final Poly lcSqFreePart;
-        /**
-         * square-free part of l.c. divided into content in x_i and prim. part in x_i for different i (sorted in order
-         * of decreasing content degrees, to provide optimal l.c. lifts)
-         */
-        final SplitContent<Term, Poly>[] lcSplits;
-        /**
-         * Whether the algorithm allows to fully reconstruct the leading coefficient. Leading coefficients can't be
-         * fully reconstructed in some rare cases in the domains of very small characteritics, when l.c. factor
-         * decomposition contains p-th powers in some variable (so that any univariate image is not square free)
-         */
-        final boolean fullyReconstructable;
-
-        @SuppressWarnings("unchecked")
-        LeadingCoefficientData(Poly lc) {
-            lc = lc.dropVariable(0);
-            this.lc = lc;
-            this.lcSqFreeDecomposition = MultivariateSquareFreeFactorization.SquareFreeFactorization(lc);
-            this.lcSqFreePart = lcSqFreeDecomposition.squareFreePart();
-
-            ArrayList<SplitContent<Term, Poly>> splits = new ArrayList<>();
-            // split sq.-free part of l.c. in the max degree variable
-            Poly content = lcSqFreePart;
-            main:
-            while (!content.isConstant()) {
-                // if there is some non trivial content, additional bivariate evaluations will be necessary
-
-                int[] cDegrees = content.degrees();
-                int[] variables = ArraysUtil.sequence(0, cDegrees.length);
-                // use stable sort
-                ArraysUtil.insertionSort(ArraysUtil.negate(cDegrees), variables);
-
-                int iMax = 0;
-                for (; iMax < variables.length; iMax++) {
-                    int maxDegreeVariable = variables[iMax];
-                    if (cDegrees[iMax] == 0)
-                        break main;
-                    Poly pContent = lcSqFreePart.contentExcept(maxDegreeVariable);
-                    Poly primitivePart = MultivariateDivision.divideExact(lcSqFreePart, pContent);
-                    if (containsPPower(primitivePart, maxDegreeVariable))
-                        // ppPart if a p-power in main variable (e.g. (a^3*b + c) for characteristic 3)
-                        // => any univariate image will not be square-free,  so we are not able to
-                        // reconstruct the l.c. using this bivariate factorization and just skip it
-                        continue;
-
-                    splits.add(new SplitContent<>(maxDegreeVariable, pContent, primitivePart));
-                    content = content.contentExcept(maxDegreeVariable);
-                    continue main;
-                }
-                // content is pPower in each variables => nothing more can be done
-                break;
-            }
-
-            this.lcSplits = splits.toArray(new SplitContent[splits.size()]);
-            this.fullyReconstructable = content.isConstant();
-
-            // assert that for domains of large characteristic l.c. always can be fully reconstructed
-            assert fullyReconstructable || lc.coefficientRingCharacteristic().shiftRight(16).signum() == 0;
-        }
-    }
-
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     boolean isPPower(Poly p, int variable) {
         BigInteger characteristics = p.coefficientRingCharacteristic();
@@ -1602,44 +1530,6 @@ public final class MultivariateFactorization {
                 && characteristics.intValueExact() <= p.degree()
                 && !MultivariateGCD.PolynomialGCD(p, p.derivative(variable)).isConstant();
     }
-
-    static final class SplitContent<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>> {
-        final int variable;
-        final Poly content, primitivePart;
-        final OrderByDegrees<Term, Poly> ppOrdered;
-
-//        SplitContent(int variable, Poly poly) {
-//            this.variable = variable;
-//            this.content = poly.contentExcept(variable);
-//            this.primitivePart = MultivariateDivision.divideExact(poly, content);
-//            this.ppOrdered = orderByDegrees(primitivePart, false, variable);
-//        }
-
-        SplitContent(int variable, Poly content, Poly primitivePart) {
-            this.variable = variable;
-            this.content = content;
-            this.primitivePart = primitivePart;
-            this.ppOrdered = orderByDegrees(primitivePart, false, variable);
-            assert !containsPPower(primitivePart, variable);
-        }
-    }
-
-    /** number of attempts to factor in base ring before switching to extension */
-    private static final int N_FAILS_BEFORE_SWITCH_TO_EXTENSION = 32;
-
-    /**
-     * number of attempts to factor which lead to inconsistent bivariate factorizations over different variables (e.g.
-     * incompatible factorization patterns) before switch to extension field (take place only for domains of very small
-     * characteristic)
-     */
-    private static final int N_INCONSISTENT_BIFACTORS_BEFORE_SWITCH_TO_EXTENSION = 32;
-
-    /**
-     * number of attempts to factor which lead to superfluous bivariate factors (#factors > #expected_factors)
-     */
-    private static final int N_SUPERFLUOUS_FACTORS_BEFORE_TRY_OTHER_VAR = 8;
 
     /**
      * The main factorization algorithm in finite fields
@@ -2150,86 +2040,6 @@ public final class MultivariateFactorization {
             return (IEvaluationLoop<Term, Poly>) new EvaluationLoop((MultivariatePolynomial) factory);
     }
 
-    interface IEvaluationLoop<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>> {
-        HenselLifting.IEvaluation<Term, Poly> next();
-    }
-
-    /** number of attempts to generate unique evaluation before switching to extension field */
-    private static final int N_DIFF_EVALUATIONS_FAIL = 32;
-
-    static final class lEvaluationLoop implements IEvaluationLoop<MonomialZp64, MultivariatePolynomialZp64> {
-        final MultivariatePolynomialZp64 factory;
-        final RandomGenerator rnd = PrivateRandom.getRandom();
-        final TreeSet<long[]> tried = new TreeSet<>(ArraysUtil.COMPARATOR_LONG);
-
-        lEvaluationLoop(MultivariatePolynomialZp64 factory) {
-            this.factory = factory;
-        }
-
-        @Override
-        public HenselLifting.lEvaluation next() {
-            long[] point = new long[factory.nVariables - 1];
-            int tries = 0;
-            do {
-                if (tries > N_DIFF_EVALUATIONS_FAIL)
-                    return null;
-                for (int i = 0; i < point.length; i++)
-                    point[i] = factory.ring.randomElement(rnd);
-                ++tries;
-            } while (tried.contains(point));
-
-            tried.add(point);
-            return new HenselLifting.lEvaluation(factory.nVariables, point, factory.ring, factory.ordering);
-        }
-    }
-
-    static final class EvaluationLoop<E> implements IEvaluationLoop<Monomial<E>, MultivariatePolynomial<E>> {
-        final MultivariatePolynomial<E> factory;
-        final RandomGenerator rnd = PrivateRandom.getRandom();
-        final HashSet<ArrayRef<E>> tried = new HashSet<>();
-
-        EvaluationLoop(MultivariatePolynomial<E> factory) {
-            this.factory = factory;
-        }
-
-        @Override
-        public HenselLifting.Evaluation<E> next() {
-            E[] point = factory.ring.createArray(factory.nVariables - 1);
-            ArrayRef<E> array = new ArrayRef<>(point);
-            int tries = 0;
-            do {
-                if (tries > N_DIFF_EVALUATIONS_FAIL)
-                    return null;
-                for (int i = 0; i < point.length; i++)
-                    point[i] = factory.ring.randomElement(rnd);
-                ++tries;
-            } while (tried.contains(array));
-
-            tried.add(array);
-            return new HenselLifting.Evaluation<>(factory.nVariables, point, factory.ring, factory.ordering);
-        }
-    }
-
-    private static class ArrayRef<T> {
-        final T[] data;
-
-        ArrayRef(T[] data) {this.data = data;}
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            return !(o == null || getClass() != o.getClass())
-                    && Arrays.equals(data, ((ArrayRef<?>) o).data);
-        }
-
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(data);
-        }
-    }
-
     static <Poly extends IPolynomial<Poly>>
     void GCDFreeBasis(PolynomialFactorDecomposition<Poly>[] decompositions) {
         ArrayList<FactorRef<Poly>> allFactors = new ArrayList<>();
@@ -2299,72 +2109,6 @@ public final class MultivariateFactorization {
                     continue main;
                 }
             }
-        }
-    }
-
-    private static final class FactorRef<Poly extends IPolynomial<Poly>> {
-        final List<PolynomialFactorDecomposition<Poly>> decompositions;
-        final TIntArrayList indexes;
-
-        FactorRef() {
-            this.decompositions = new ArrayList<>();
-            this.indexes = new TIntArrayList();
-        }
-
-        FactorRef(PolynomialFactorDecomposition<Poly> decomposition, int index) {
-            this.decompositions = new ArrayList<>();
-            this.indexes = new TIntArrayList();
-            decompositions.add(decomposition);
-            indexes.add(index);
-        }
-
-        Poly factor() {return decompositions.get(0).get(indexes.get(0));}
-
-        TIntArrayList update(Poly reduced, Poly gcd) {
-            TIntArrayList gcdIndexes = new TIntArrayList(indexes.size());
-            // add gcd to all required decompositions
-            for (int i = 0; i < decompositions.size(); i++) {
-                PolynomialFactorDecomposition<Poly> decomposition = decompositions.get(i);
-                decomposition.factors.set(indexes.get(i), reduced); // <- just in case
-                gcdIndexes.add(decomposition.size());
-                decomposition.addFactor(gcd, decomposition.getExponent(indexes.get(i)));
-            }
-            return gcdIndexes;
-        }
-    }
-
-    /* ===================================== Multivariate factorization over Z ====================================== */
-
-    /** specialized evaluations which tries small integers first */
-    static final class EvaluationLoopZ implements IEvaluationLoop<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>> {
-        final MultivariatePolynomial<BigInteger> factory;
-        final RandomGenerator rnd = PrivateRandom.getRandom();
-        final HashSet<ArrayRef<BigInteger>> tried = new HashSet<>();
-
-        EvaluationLoopZ(MultivariatePolynomial<BigInteger> factory) {
-            this.factory = factory;
-        }
-
-        private int counter = 0;
-
-        @Override
-        public HenselLifting.Evaluation<BigInteger> next() {
-            BigInteger[] point = factory.ring.createArray(factory.nVariables - 1);
-            ArrayRef<BigInteger> array = new ArrayRef<>(point);
-            int tries = 0;
-            do {
-                if (tries > N_DIFF_EVALUATIONS_FAIL) {
-                    counter += 5;
-                    return next();
-                }
-                for (int i = 0; i < point.length; i++)
-                    point[i] = BigInteger.valueOf(rnd.nextInt(10 * (counter / 5 + 1)));
-                ++tries;
-            } while (tried.contains(array));
-
-            tried.add(array);
-            ++counter;
-            return new HenselLifting.Evaluation<>(factory.nVariables, point, factory.ring, factory.ordering);
         }
     }
 
@@ -2743,7 +2487,9 @@ public final class MultivariateFactorization {
         }
     }
 
-    /** lift multivariate factors to factorization in Z */
+    /**
+     * lift multivariate factors to factorization in Z
+     */
     private static MultivariatePolynomial<BigInteger>[] liftZ(MultivariatePolynomial<BigInteger> base, IntegersZp zpDomain, HenselLifting.Evaluation<BigInteger> evaluationZp,
                                                               MultivariatePolynomial<BigInteger>[] biFactorsArrayMainZ, MultivariatePolynomial<BigInteger>[] lcFactors) {
         biFactorsArrayMainZ = Arrays.stream(biFactorsArrayMainZ).map(f -> f.setRing(zpDomain)).toArray(base::createArray);
@@ -2768,10 +2514,9 @@ public final class MultivariateFactorization {
                 factor.multiply(constant);
     }
 
-
-    /* =========================== Multivariate factorization over simple number fields ============================ */
-
-    /** Factors polynomial in Q(alpha)[x1,..,xN] via Trager's algorithm */
+    /**
+     * Factors polynomial in Q(alpha)[x1,..,xN] via Trager's algorithm
+     */
     static PolynomialFactorDecomposition<MultivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>>>
     factorPrimitiveInNumberField(MultivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>> poly) {
         AlgebraicNumberField<UnivariatePolynomial<Rational<BigInteger>>> numberField
@@ -2828,5 +2573,330 @@ public final class MultivariateFactorization {
     toNumberField(AlgebraicNumberField<UnivariatePolynomial<Rational<BigInteger>>> numberField,
                   MultivariatePolynomial<Rational<BigInteger>> poly) {
         return poly.mapCoefficients(numberField, cf -> UnivariatePolynomial.constant(Rings.Q, cf));
+    }
+
+    private interface FactorizationAlgorithm<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>> {
+        PolynomialFactorDecomposition<Poly> factor(Poly poly, boolean switchToExtensionField);
+    }
+
+    interface IEvaluationLoop<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>> {
+        HenselLifting.IEvaluation<Term, Poly> next();
+    }
+
+    /**
+     * sort according to polar angle relative to some base point (origin)
+     */
+    private static final class PolarAngleComparator implements Comparator<int[]> {
+        private final int[] basePoint;
+
+        PolarAngleComparator(int[] basePoint) {
+            this.basePoint = basePoint;
+        }
+
+        @Override
+        public int compare(int[] p1, int[] p2) {
+            if (Arrays.equals(p1, p2))
+                return 0;
+            int
+                    p1x = p1[0] - basePoint[0], p2x = p2[0] - basePoint[0],
+                    p1y = p1[1] - basePoint[1], p2y = p2[1] - basePoint[1];
+            double
+                    d1 = Math.sqrt(p1x * p1x + p1y * p1y),
+                    d2 = Math.sqrt(p2x * p2x + p2y * p2y),
+                    cos1 = p1x / d1,
+                    cos2 = p2x / d2;
+
+            int c = Double.compare(cos2, cos1);
+            if (c != 0)
+                return c;
+            return Double.compare(d1, d2);
+        }
+    }
+
+    static final class OrderByDegrees<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>> {
+        /**
+         * input polynomial (with variables renamed)
+         */
+        final Poly ordered;
+        /**
+         * factors degree bounds, mapping used to rename variables so that degreeBounds are in descending order
+         */
+        final int[] degreeBounds, variablesSorted, variablesMapping;
+        /**
+         * number of variables in poly
+         */
+        final int nVariables;
+
+        OrderByDegrees(Poly ordered, int[] degreeBounds, int[] variablesSorted, int nVariables) {
+            this.ordered = ordered;
+            this.degreeBounds = degreeBounds;
+            this.variablesSorted = variablesSorted;
+            this.variablesMapping = MultivariateGCD.inversePermutation(variablesSorted);
+            this.nVariables = nVariables;
+        }
+
+        /**
+         * recover initial order of variables in the result
+         */
+        Poly restoreOrder(Poly factor) {
+            return AMultivariatePolynomial.renameVariables(
+                    factor.setNVariables(nVariables), variablesMapping);
+        }
+
+        Poly order(Poly factor) {
+            return AMultivariatePolynomial.renameVariables(factor, variablesSorted);
+        }
+    }
+
+    /* ===================================== Multivariate factorization over Z ====================================== */
+
+    static final class LeadingCoefficientData<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>> {
+
+        // the following data represented as F[x2,x3,...,xN] (i.e. with x1 dropped, variables shifted)
+
+        /**
+         * the original leading coefficient
+         */
+        final Poly lc;
+        /**
+         * its square-free decomposition
+         */
+        final PolynomialFactorDecomposition<Poly> lcSqFreeDecomposition;
+        /**
+         * square-free part of l.c.
+         */
+        final Poly lcSqFreePart;
+        /**
+         * square-free part of l.c. divided into content in x_i and prim. part in x_i for different i (sorted in order
+         * of decreasing content degrees, to provide optimal l.c. lifts)
+         */
+        final SplitContent<Term, Poly>[] lcSplits;
+        /**
+         * Whether the algorithm allows to fully reconstruct the leading coefficient. Leading coefficients can't be
+         * fully reconstructed in some rare cases in the domains of very small characteritics, when l.c. factor
+         * decomposition contains p-th powers in some variable (so that any univariate image is not square free)
+         */
+        final boolean fullyReconstructable;
+
+        @SuppressWarnings("unchecked")
+        LeadingCoefficientData(Poly lc) {
+            lc = lc.dropVariable(0);
+            this.lc = lc;
+            this.lcSqFreeDecomposition = MultivariateSquareFreeFactorization.SquareFreeFactorization(lc);
+            this.lcSqFreePart = lcSqFreeDecomposition.squareFreePart();
+
+            ArrayList<SplitContent<Term, Poly>> splits = new ArrayList<>();
+            // split sq.-free part of l.c. in the max degree variable
+            Poly content = lcSqFreePart;
+            main:
+            while (!content.isConstant()) {
+                // if there is some non trivial content, additional bivariate evaluations will be necessary
+
+                int[] cDegrees = content.degrees();
+                int[] variables = ArraysUtil.sequence(0, cDegrees.length);
+                // use stable sort
+                ArraysUtil.insertionSort(ArraysUtil.negate(cDegrees), variables);
+
+                int iMax = 0;
+                for (; iMax < variables.length; iMax++) {
+                    int maxDegreeVariable = variables[iMax];
+                    if (cDegrees[iMax] == 0)
+                        break main;
+                    Poly pContent = lcSqFreePart.contentExcept(maxDegreeVariable);
+                    Poly primitivePart = MultivariateDivision.divideExact(lcSqFreePart, pContent);
+                    if (containsPPower(primitivePart, maxDegreeVariable))
+                        // ppPart if a p-power in main variable (e.g. (a^3*b + c) for characteristic 3)
+                        // => any univariate image will not be square-free,  so we are not able to
+                        // reconstruct the l.c. using this bivariate factorization and just skip it
+                        continue;
+
+                    splits.add(new SplitContent<>(maxDegreeVariable, pContent, primitivePart));
+                    content = content.contentExcept(maxDegreeVariable);
+                    continue main;
+                }
+                // content is pPower in each variables => nothing more can be done
+                break;
+            }
+
+            this.lcSplits = splits.toArray(new SplitContent[splits.size()]);
+            this.fullyReconstructable = content.isConstant();
+
+            // assert that for domains of large characteristic l.c. always can be fully reconstructed
+            assert fullyReconstructable || lc.coefficientRingCharacteristic().shiftRight(16).signum() == 0;
+        }
+    }
+
+    static final class SplitContent<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>> {
+        final int variable;
+        final Poly content, primitivePart;
+        final OrderByDegrees<Term, Poly> ppOrdered;
+
+//        SplitContent(int variable, Poly poly) {
+//            this.variable = variable;
+//            this.content = poly.contentExcept(variable);
+//            this.primitivePart = MultivariateDivision.divideExact(poly, content);
+//            this.ppOrdered = orderByDegrees(primitivePart, false, variable);
+//        }
+
+        SplitContent(int variable, Poly content, Poly primitivePart) {
+            this.variable = variable;
+            this.content = content;
+            this.primitivePart = primitivePart;
+            this.ppOrdered = orderByDegrees(primitivePart, false, variable);
+            assert !containsPPower(primitivePart, variable);
+        }
+    }
+
+    static final class lEvaluationLoop implements IEvaluationLoop<MonomialZp64, MultivariatePolynomialZp64> {
+        final MultivariatePolynomialZp64 factory;
+        final RandomGenerator rnd = PrivateRandom.getRandom();
+        final TreeSet<long[]> tried = new TreeSet<>(ArraysUtil.COMPARATOR_LONG);
+
+        lEvaluationLoop(MultivariatePolynomialZp64 factory) {
+            this.factory = factory;
+        }
+
+        @Override
+        public HenselLifting.lEvaluation next() {
+            long[] point = new long[factory.nVariables - 1];
+            int tries = 0;
+            do {
+                if (tries > N_DIFF_EVALUATIONS_FAIL)
+                    return null;
+                for (int i = 0; i < point.length; i++)
+                    point[i] = factory.ring.randomElement(rnd);
+                ++tries;
+            } while (tried.contains(point));
+
+            tried.add(point);
+            return new HenselLifting.lEvaluation(factory.nVariables, point, factory.ring, factory.ordering);
+        }
+    }
+
+    static final class EvaluationLoop<E> implements IEvaluationLoop<Monomial<E>, MultivariatePolynomial<E>> {
+        final MultivariatePolynomial<E> factory;
+        final RandomGenerator rnd = PrivateRandom.getRandom();
+        final HashSet<ArrayRef<E>> tried = new HashSet<>();
+
+        EvaluationLoop(MultivariatePolynomial<E> factory) {
+            this.factory = factory;
+        }
+
+        @Override
+        public HenselLifting.Evaluation<E> next() {
+            E[] point = factory.ring.createArray(factory.nVariables - 1);
+            ArrayRef<E> array = new ArrayRef<>(point);
+            int tries = 0;
+            do {
+                if (tries > N_DIFF_EVALUATIONS_FAIL)
+                    return null;
+                for (int i = 0; i < point.length; i++)
+                    point[i] = factory.ring.randomElement(rnd);
+                ++tries;
+            } while (tried.contains(array));
+
+            tried.add(array);
+            return new HenselLifting.Evaluation<>(factory.nVariables, point, factory.ring, factory.ordering);
+        }
+    }
+
+    private static class ArrayRef<T> {
+        final T[] data;
+
+        ArrayRef(T[] data) {
+            this.data = data;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            return !(o == null || getClass() != o.getClass())
+                    && Arrays.equals(data, ((ArrayRef<?>) o).data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(data);
+        }
+    }
+
+
+    /* =========================== Multivariate factorization over simple number fields ============================ */
+
+    private static final class FactorRef<Poly extends IPolynomial<Poly>> {
+        final List<PolynomialFactorDecomposition<Poly>> decompositions;
+        final TIntArrayList indexes;
+
+        FactorRef() {
+            this.decompositions = new ArrayList<>();
+            this.indexes = new TIntArrayList();
+        }
+
+        FactorRef(PolynomialFactorDecomposition<Poly> decomposition, int index) {
+            this.decompositions = new ArrayList<>();
+            this.indexes = new TIntArrayList();
+            decompositions.add(decomposition);
+            indexes.add(index);
+        }
+
+        Poly factor() {
+            return decompositions.get(0).get(indexes.get(0));
+        }
+
+        TIntArrayList update(Poly reduced, Poly gcd) {
+            TIntArrayList gcdIndexes = new TIntArrayList(indexes.size());
+            // add gcd to all required decompositions
+            for (int i = 0; i < decompositions.size(); i++) {
+                PolynomialFactorDecomposition<Poly> decomposition = decompositions.get(i);
+                decomposition.factors.set(indexes.get(i), reduced); // <- just in case
+                gcdIndexes.add(decomposition.size());
+                decomposition.addFactor(gcd, decomposition.getExponent(indexes.get(i)));
+            }
+            return gcdIndexes;
+        }
+    }
+
+    /**
+     * specialized evaluations which tries small integers first
+     */
+    static final class EvaluationLoopZ implements IEvaluationLoop<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>> {
+        final MultivariatePolynomial<BigInteger> factory;
+        final RandomGenerator rnd = PrivateRandom.getRandom();
+        final HashSet<ArrayRef<BigInteger>> tried = new HashSet<>();
+        private int counter = 0;
+
+        EvaluationLoopZ(MultivariatePolynomial<BigInteger> factory) {
+            this.factory = factory;
+        }
+
+        @Override
+        public HenselLifting.Evaluation<BigInteger> next() {
+            BigInteger[] point = factory.ring.createArray(factory.nVariables - 1);
+            ArrayRef<BigInteger> array = new ArrayRef<>(point);
+            int tries = 0;
+            do {
+                if (tries > N_DIFF_EVALUATIONS_FAIL) {
+                    counter += 5;
+                    return next();
+                }
+                for (int i = 0; i < point.length; i++)
+                    point[i] = BigInteger.valueOf(rnd.nextInt(10 * (counter / 5 + 1)));
+                ++tries;
+            } while (tried.contains(array));
+
+            tried.add(array);
+            ++counter;
+            return new HenselLifting.Evaluation<>(factory.nVariables, point, factory.ring, factory.ordering);
+        }
     }
 }

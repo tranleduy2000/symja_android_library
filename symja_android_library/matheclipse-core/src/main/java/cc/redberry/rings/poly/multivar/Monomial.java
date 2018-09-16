@@ -7,7 +7,9 @@ package cc.redberry.rings.poly.multivar;
  * @since 1.0
  */
 public class Monomial<E> extends AMonomial<Monomial<E>> {
-    /** the coefficient */
+    /**
+     * the coefficient
+     */
     public final E coefficient;
 
     /**

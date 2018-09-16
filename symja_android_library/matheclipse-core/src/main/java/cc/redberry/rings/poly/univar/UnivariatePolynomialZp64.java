@@ -1,5 +1,8 @@
 package cc.redberry.rings.poly.univar;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import cc.redberry.rings.IntegersZp;
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.bigint.BigInteger;
@@ -10,9 +13,6 @@ import cc.redberry.rings.poly.multivar.DegreeVector;
 import cc.redberry.rings.poly.multivar.MonomialOrder;
 import cc.redberry.rings.poly.multivar.MultivariatePolynomialZp64;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 /**
  * Univariate polynomial over Zp ring with modulus in the range of {@code [2, 2^62) } (the last value is specified by
  * {@link MachineArithmetic#MAX_SUPPORTED_MODULUS_BITS}. Fast methods from {@link IntegersZp64} are used to perform all
@@ -22,7 +22,9 @@ import java.util.Comparator;
  */
 public final class UnivariatePolynomialZp64 extends AUnivariatePolynomial64<UnivariatePolynomialZp64> {
     private static final long serialVersionUID = 1L;
-    /** The coefficient ring */
+    /**
+     * The coefficient ring
+     */
     public final IntegersZp64 ring;
 
     private UnivariatePolynomialZp64(IntegersZp64 ring, long[] data, int degree) {
@@ -104,12 +106,16 @@ public final class UnivariatePolynomialZp64 extends AUnivariatePolynomial64<Univ
         return create(modulus, new long[]{cc, lc});
     }
 
-    /** data is not reduced modulo modulus */
+    /**
+     * data is not reduced modulo modulus
+     */
     public static UnivariatePolynomialZp64 createUnsafe(long modulus, long[] data) {
         return new UnivariatePolynomialZp64(new IntegersZp64(modulus), data);
     }
 
-    /** data is not reduced modulo modulus */
+    /**
+     * data is not reduced modulo modulus
+     */
     public static UnivariatePolynomialZp64 createUnsafe(IntegersZp64 ring, long[] data) {
         return new UnivariatePolynomialZp64(ring, data);
     }
@@ -197,15 +203,23 @@ public final class UnivariatePolynomialZp64 extends AUnivariatePolynomial64<Univ
         return setModulus(univariatePolynomialZp64.ring);
     }
 
-    /** Returns the modulus */
-    public long modulus() {return ring.modulus;}
+    /**
+     * Returns the modulus
+     */
+    public long modulus() {
+        return ring.modulus;
+    }
 
-    /** does not copy the data and does not reduce the data with new modulus */
+    /**
+     * does not copy the data and does not reduce the data with new modulus
+     */
     public UnivariatePolynomialZp64 setModulusUnsafe(long newModulus) {
         return setModulusUnsafe(new IntegersZp64(newModulus));
     }
 
-    /** does not copy the data and does not reduce the data with new modulus */
+    /**
+     * does not copy the data and does not reduce the data with new modulus
+     */
     public UnivariatePolynomialZp64 setModulusUnsafe(IntegersZp64 newModulus) {
         return new UnivariatePolynomialZp64(newModulus, data, degree);
     }
@@ -240,7 +254,7 @@ public final class UnivariatePolynomialZp64 extends AUnivariatePolynomial64<Univ
      * -modulus/2 <= cfx <= modulus/2}).
      *
      * @return Z[x] version of this with coefficients represented in symmetric modular form ({@code -modulus/2 <= cfx <=
-     *         modulus/2}).
+     * modulus/2}).
      */
     @SuppressWarnings("unchecked")
     public UnivariatePolynomialZ64 asPolyZSymmetric() {
@@ -305,13 +319,19 @@ public final class UnivariatePolynomialZp64 extends AUnivariatePolynomial64<Univ
     }
 
     @Override
-    public boolean isOverField() {return true;}
+    public boolean isOverField() {
+        return true;
+    }
 
     @Override
-    public boolean isOverFiniteField() {return true;}
+    public boolean isOverFiniteField() {
+        return true;
+    }
 
     @Override
-    public boolean isOverZ() {return false;}
+    public boolean isOverZ() {
+        return false;
+    }
 
     @Override
     public BigInteger coefficientRingCardinality() {

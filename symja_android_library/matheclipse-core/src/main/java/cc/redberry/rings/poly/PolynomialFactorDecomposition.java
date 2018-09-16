@@ -1,10 +1,5 @@
 package cc.redberry.rings.poly;
 
-import cc.redberry.rings.FactorDecomposition;
-import cc.redberry.rings.util.ArraysUtil;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,8 +7,12 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import cc.redberry.rings.FactorDecomposition;
+import cc.redberry.rings.util.ArraysUtil;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import static cc.redberry.rings.Rings.PolynomialRing;
-import static cc.redberry.rings.poly.PolynomialMethods.polyPow;
 
 /**
  * {@inheritDoc}
@@ -31,6 +30,87 @@ public final class PolynomialFactorDecomposition<Poly extends IPolynomial<Poly>>
 
     private PolynomialFactorDecomposition(FactorDecomposition<Poly> factors) {
         super(factors.ring, factors.unit, factors.factors, factors.exponents);
+    }
+
+    /**
+     * Unit factorization
+     */
+    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly> unit(Poly unit) {
+        if (!unit.isConstant())
+            throw new IllegalArgumentException();
+        return empty(unit).addUnit(unit);
+    }
+
+    /**
+     * Empty factorization
+     */
+    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly> empty(Poly factory) {
+        return new PolynomialFactorDecomposition<>(factory.createOne(), new ArrayList<>(), new TIntArrayList());
+    }
+
+    /**
+     * Factor decomposition with specified factors and exponents
+     *
+     * @param unit      the unit coefficient
+     * @param factors   the factors
+     * @param exponents the exponents
+     */
+    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
+    of(Poly unit, List<Poly> factors, TIntArrayList exponents) {
+        if (factors.size() != exponents.size())
+            throw new IllegalArgumentException();
+        PolynomialFactorDecomposition<Poly> r = empty(unit).addUnit(unit);
+        for (int i = 0; i < factors.size(); i++)
+            r.addFactor(factors.get(i), exponents.get(i));
+        return r;
+    }
+
+    /**
+     * Factor decomposition with specified factors and exponents
+     *
+     * @param factors factors
+     */
+    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
+    of(Poly... factors) {
+        if (factors.length == 0)
+            throw new IllegalArgumentException();
+        return of(Arrays.asList(factors));
+    }
+
+    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
+    of(Poly a) {
+        Poly[] array = a.createArray(1);
+        array[0] = a;
+        return of(array);
+    }
+
+    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
+    of(Poly a, Poly b) {
+        return of(a.createArray(a, b));
+    }
+
+    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
+    of(Poly a, Poly b, Poly c) {
+        return of(a.createArray(a, b, c));
+    }
+
+    /**
+     * Factor decomposition with specified factors and exponents
+     *
+     * @param factors factors
+     */
+    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly> of(Collection<Poly> factors) {
+        TObjectIntHashMap<Poly> map = new TObjectIntHashMap<>();
+        for (Poly e : factors)
+            map.adjustOrPutValue(e, 1, 1);
+        List<Poly> l = new ArrayList<>();
+        TIntArrayList e = new TIntArrayList();
+        map.forEachEntry((a, b) -> {
+            l.add(a);
+            e.add(b);
+            return true;
+        });
+        return of(factors.iterator().next().createOne(), l, e);
     }
 
     @Override
@@ -169,82 +249,5 @@ public final class PolynomialFactorDecomposition<Poly extends IPolynomial<Poly>>
     @Override
     public PolynomialFactorDecomposition<Poly> clone() {
         return new PolynomialFactorDecomposition<>(unit.clone(), factors.stream().map(Poly::clone).collect(Collectors.toList()), new TIntArrayList(exponents));
-    }
-
-    /** Unit factorization */
-    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly> unit(Poly unit) {
-        if (!unit.isConstant())
-            throw new IllegalArgumentException();
-        return empty(unit).addUnit(unit);
-    }
-
-    /** Empty factorization */
-    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly> empty(Poly factory) {
-        return new PolynomialFactorDecomposition<>(factory.createOne(), new ArrayList<>(), new TIntArrayList());
-    }
-
-    /**
-     * Factor decomposition with specified factors and exponents
-     *
-     * @param unit      the unit coefficient
-     * @param factors   the factors
-     * @param exponents the exponents
-     */
-    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
-    of(Poly unit, List<Poly> factors, TIntArrayList exponents) {
-        if (factors.size() != exponents.size())
-            throw new IllegalArgumentException();
-        PolynomialFactorDecomposition<Poly> r = empty(unit).addUnit(unit);
-        for (int i = 0; i < factors.size(); i++)
-            r.addFactor(factors.get(i), exponents.get(i));
-        return r;
-    }
-
-    /**
-     * Factor decomposition with specified factors and exponents
-     *
-     * @param factors factors
-     */
-    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
-    of(Poly... factors) {
-        if (factors.length == 0)
-            throw new IllegalArgumentException();
-        return of(Arrays.asList(factors));
-    }
-
-    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
-    of(Poly a) {
-        Poly[] array = a.createArray(1);
-        array[0] = a;
-        return of(array);
-    }
-
-    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
-    of(Poly a, Poly b) {
-        return of(a.createArray(a, b));
-    }
-
-    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly>
-    of(Poly a, Poly b, Poly c) {
-        return of(a.createArray(a, b, c));
-    }
-
-    /**
-     * Factor decomposition with specified factors and exponents
-     *
-     * @param factors factors
-     */
-    public static <Poly extends IPolynomial<Poly>> PolynomialFactorDecomposition<Poly> of(Collection<Poly> factors) {
-        TObjectIntHashMap<Poly> map = new TObjectIntHashMap<>();
-        for (Poly e : factors)
-            map.adjustOrPutValue(e, 1, 1);
-        List<Poly> l = new ArrayList<>();
-        TIntArrayList e = new TIntArrayList();
-        map.forEachEntry((a, b) -> {
-            l.add(a);
-            e.add(b);
-            return true;
-        });
-        return of(factors.iterator().next().createOne(), l, e);
     }
 }

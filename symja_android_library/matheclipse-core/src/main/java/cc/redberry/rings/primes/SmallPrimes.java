@@ -1,9 +1,9 @@
 package cc.redberry.rings.primes;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.math.BigInteger;
 import java.util.Arrays;
+
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Prime factorization of 32-bit integers. The code is taken from Apache Commons Math.
@@ -11,206 +11,6 @@ import java.util.Arrays;
  * @since 1.0
  */
 public final class SmallPrimes {
-    private SmallPrimes() { }
-
-    /**
-     * Primality test: tells if the argument is a (provable) prime or not. <p> It uses the Miller-Rabin probabilistic
-     * test in such a way that a result is guaranteed: it uses the firsts prime numbers as successive base (see Handbook
-     * of applied cryptography by Menezes, table 4.1).
-     *
-     * @param n number to test.
-     * @return true if n is prime. (All numbers &lt; 2 return false).
-     */
-    public static boolean isPrime(int n) {
-        if (n < 2)
-            return false;
-
-        for (int p : SmallPrimes12)
-            if (0 == (n % p))
-                return n == p;
-        return millerRabinPrimeTest(n);
-    }
-
-
-    /**
-     * Return the smallest prime greater than or equal to n.
-     *
-     * @param n a positive number.
-     * @return the smallest prime greater than or equal to n.
-     * @throws IllegalArgumentException if n &lt; 0.
-     */
-    public static int nextPrime(int n) {
-        if (n < 0)
-            throw new IllegalArgumentException("Negative input: " + n);
-
-        if (n == 2)
-            return 2;
-
-        n = n | 1;//make sure n is odd
-        if (n == 1) {
-            return 2;
-        }
-
-        if (isPrime(n)) {
-            return n;
-        }
-
-        // prepare entry in the +2, +4 loop:
-        // n should not be a multiple of 3
-        final int rem = n % 3;
-        if (0 == rem) { // if n % 3 == 0
-            n += 2; // n % 3 == 2
-        } else if (1 == rem) { // if n % 3 == 1
-            // if (isPrime(n)) return n;
-            n += 4; // n % 3 == 2
-        }
-        while (true) { // this loop skips all multiple of 3
-            if (isPrime(n)) {
-                return n;
-            }
-            n += 2; // n % 3 == 1
-            if (isPrime(n)) {
-                return n;
-            }
-            n += 4; // n % 3 == 2
-        }
-    }
-
-    /**
-     * Miller-Rabin probabilistic primality test for int type, used in such a way that a result is always guaranteed.
-     * <p> It uses the prime numbers as successive base therefore it is guaranteed to be always correct. (see Handbook
-     * of applied cryptography by Menezes, table 4.1)
-     *
-     * @param n number to test: an odd integer &ge; 3
-     * @return true if n is prime. false if n is definitely composite.
-     */
-    public static boolean millerRabinPrimeTest(final int n) {
-        final int nMinus1 = n - 1;
-        final int s = Integer.numberOfTrailingZeros(nMinus1);
-        final int r = nMinus1 >> s;
-        //r must be odd, it is not checked here
-        int t = 1;
-        if (n >= 2047) {
-            t = 2;
-        }
-        if (n >= 1373653) {
-            t = 3;
-        }
-        if (n >= 25326001) {
-            t = 4;
-        } // works up to 3.2 billion, int range stops at 2.7 so we are safe :-)
-        BigInteger br = BigInteger.valueOf(r);
-        BigInteger bn = BigInteger.valueOf(n);
-
-        for (int i = 0; i < t; i++) {
-            BigInteger a = BigInteger.valueOf(SmallPrimes9[i]);
-            BigInteger bPow = a.modPow(br, bn);
-            int y = bPow.intValue();
-            if ((1 != y) && (y != nMinus1)) {
-                int j = 1;
-                while ((j <= s - 1) && (nMinus1 != y)) {
-                    long square = ((long) y) * y;
-                    y = (int) (square % n);
-                    if (1 == y) {
-                        return false;
-                    } // definitely composite
-                    j++;
-                }
-                if (nMinus1 != y) {
-                    return false;
-                } // definitely composite
-            }
-        }
-        return true; // definitely prime
-    }
-
-    /**
-     * Extract small factors.
-     *
-     * @param n       the number to factor, must be &gt; 0.
-     * @param factors the list where to add the factors.
-     * @return the part of n which remains to be factored, it is either a prime or a semi-prime
-     */
-    public static int smallTrialDivision(int n, final TIntArrayList factors) {
-        for (int p : SmallPrimes12) {
-            while (0 == n % p) {
-                n = n / p;
-                factors.add(p);
-            }
-        }
-        return n;
-    }
-
-    /**
-     * Extract factors in the range <code>PRIME_LAST+2</code> to <code>maxFactors</code>.
-     *
-     * @param n         the number to factorize, must be >= PRIME_LAST+2 and must not contain any factor below
-     *                  PRIME_LAST+2
-     * @param maxFactor the upper bound of trial division: if it is reached, the method gives up and returns n.
-     * @param factors   the list where to add the factors.
-     * @return n or 1 if factorization is completed.
-     */
-    public static int boundedTrialDivision(int n, int maxFactor, TIntArrayList factors) {
-        int f = PRIMES12_LAST + 2;
-        // no check is done about n >= f
-        while (f <= maxFactor) {
-            if (0 == n % f) {
-                n = n / f;
-                factors.add(f);
-                break;
-            }
-            f += 4;
-            if (0 == n % f) {
-                n = n / f;
-                factors.add(f);
-                break;
-            }
-            f += 2;
-        }
-        if (n != 1) {
-            factors.add(n);
-        }
-        return n;
-    }
-
-    /**
-     * Factorization by trial division.
-     *
-     * @param n the number to factor
-     * @return the list of prime factors of n
-     */
-    private static int[] trialDivision(int n) {
-        final TIntArrayList factors = new TIntArrayList(32);
-        n = smallTrialDivision(n, factors);
-        if (1 == n)
-            return factors.toArray();
-
-        // here we are sure that n is either a prime or a semi prime
-        final int bound = (int) Math.sqrt(n);
-        boundedTrialDivision(n, bound, factors);
-        return factors.toArray();
-    }
-
-    /**
-     * Prime factors decomposition. Uses trial divisions (that is quite fast for ints).
-     *
-     * @param n number to factorize: must be &ge; 2
-     * @return list of prime factors of n
-     * @throws IllegalArgumentException if n &lt; 2.
-     * @see BigPrimes#primeFactors(cc.redberry.rings.bigint.BigInteger)
-     */
-    public static int[] primeFactors(int n) {
-        if (n < 0)
-            throw new IllegalArgumentException("Negative number: " + n);
-        if (n < 2)
-            return new int[]{n};
-
-        // slower than trial div unless we do an awful lot of computation
-        // (then it finally gets JIT-compiled efficiently
-        // List<Integer> out = PollardRho.primeFactors(n);
-        return trialDivision(n);
-    }
-
     /**
      * First 2^12 primes
      */
@@ -629,5 +429,205 @@ public final class SmallPrimes {
         PRIMES12_LAST = SmallPrimes12[SmallPrimes12.length - 1];
         SmallPrimes10 = Arrays.copyOf(SmallPrimes12, 1024);
         SmallPrimes9 = Arrays.copyOf(SmallPrimes12, 512);
+    }
+
+    private SmallPrimes() {
+    }
+
+    /**
+     * Primality test: tells if the argument is a (provable) prime or not. <p> It uses the Miller-Rabin probabilistic
+     * test in such a way that a result is guaranteed: it uses the firsts prime numbers as successive base (see Handbook
+     * of applied cryptography by Menezes, table 4.1).
+     *
+     * @param n number to test.
+     * @return true if n is prime. (All numbers &lt; 2 return false).
+     */
+    public static boolean isPrime(int n) {
+        if (n < 2)
+            return false;
+
+        for (int p : SmallPrimes12)
+            if (0 == (n % p))
+                return n == p;
+        return millerRabinPrimeTest(n);
+    }
+
+    /**
+     * Return the smallest prime greater than or equal to n.
+     *
+     * @param n a positive number.
+     * @return the smallest prime greater than or equal to n.
+     * @throws IllegalArgumentException if n &lt; 0.
+     */
+    public static int nextPrime(int n) {
+        if (n < 0)
+            throw new IllegalArgumentException("Negative input: " + n);
+
+        if (n == 2)
+            return 2;
+
+        n = n | 1;//make sure n is odd
+        if (n == 1) {
+            return 2;
+        }
+
+        if (isPrime(n)) {
+            return n;
+        }
+
+        // prepare entry in the +2, +4 loop:
+        // n should not be a multiple of 3
+        final int rem = n % 3;
+        if (0 == rem) { // if n % 3 == 0
+            n += 2; // n % 3 == 2
+        } else if (1 == rem) { // if n % 3 == 1
+            // if (isPrime(n)) return n;
+            n += 4; // n % 3 == 2
+        }
+        while (true) { // this loop skips all multiple of 3
+            if (isPrime(n)) {
+                return n;
+            }
+            n += 2; // n % 3 == 1
+            if (isPrime(n)) {
+                return n;
+            }
+            n += 4; // n % 3 == 2
+        }
+    }
+
+    /**
+     * Miller-Rabin probabilistic primality test for int type, used in such a way that a result is always guaranteed.
+     * <p> It uses the prime numbers as successive base therefore it is guaranteed to be always correct. (see Handbook
+     * of applied cryptography by Menezes, table 4.1)
+     *
+     * @param n number to test: an odd integer &ge; 3
+     * @return true if n is prime. false if n is definitely composite.
+     */
+    public static boolean millerRabinPrimeTest(final int n) {
+        final int nMinus1 = n - 1;
+        final int s = Integer.numberOfTrailingZeros(nMinus1);
+        final int r = nMinus1 >> s;
+        //r must be odd, it is not checked here
+        int t = 1;
+        if (n >= 2047) {
+            t = 2;
+        }
+        if (n >= 1373653) {
+            t = 3;
+        }
+        if (n >= 25326001) {
+            t = 4;
+        } // works up to 3.2 billion, int range stops at 2.7 so we are safe :-)
+        BigInteger br = BigInteger.valueOf(r);
+        BigInteger bn = BigInteger.valueOf(n);
+
+        for (int i = 0; i < t; i++) {
+            BigInteger a = BigInteger.valueOf(SmallPrimes9[i]);
+            BigInteger bPow = a.modPow(br, bn);
+            int y = bPow.intValue();
+            if ((1 != y) && (y != nMinus1)) {
+                int j = 1;
+                while ((j <= s - 1) && (nMinus1 != y)) {
+                    long square = ((long) y) * y;
+                    y = (int) (square % n);
+                    if (1 == y) {
+                        return false;
+                    } // definitely composite
+                    j++;
+                }
+                if (nMinus1 != y) {
+                    return false;
+                } // definitely composite
+            }
+        }
+        return true; // definitely prime
+    }
+
+    /**
+     * Extract small factors.
+     *
+     * @param n       the number to factor, must be &gt; 0.
+     * @param factors the list where to add the factors.
+     * @return the part of n which remains to be factored, it is either a prime or a semi-prime
+     */
+    public static int smallTrialDivision(int n, final TIntArrayList factors) {
+        for (int p : SmallPrimes12) {
+            while (0 == n % p) {
+                n = n / p;
+                factors.add(p);
+            }
+        }
+        return n;
+    }
+
+    /**
+     * Extract factors in the range <code>PRIME_LAST+2</code> to <code>maxFactors</code>.
+     *
+     * @param n         the number to factorize, must be >= PRIME_LAST+2 and must not contain any factor below
+     *                  PRIME_LAST+2
+     * @param maxFactor the upper bound of trial division: if it is reached, the method gives up and returns n.
+     * @param factors   the list where to add the factors.
+     * @return n or 1 if factorization is completed.
+     */
+    public static int boundedTrialDivision(int n, int maxFactor, TIntArrayList factors) {
+        int f = PRIMES12_LAST + 2;
+        // no check is done about n >= f
+        while (f <= maxFactor) {
+            if (0 == n % f) {
+                n = n / f;
+                factors.add(f);
+                break;
+            }
+            f += 4;
+            if (0 == n % f) {
+                n = n / f;
+                factors.add(f);
+                break;
+            }
+            f += 2;
+        }
+        if (n != 1) {
+            factors.add(n);
+        }
+        return n;
+    }
+
+    /**
+     * Factorization by trial division.
+     *
+     * @param n the number to factor
+     * @return the list of prime factors of n
+     */
+    private static int[] trialDivision(int n) {
+        final TIntArrayList factors = new TIntArrayList(32);
+        n = smallTrialDivision(n, factors);
+        if (1 == n)
+            return factors.toArray();
+
+        // here we are sure that n is either a prime or a semi prime
+        final int bound = (int) Math.sqrt(n);
+        boundedTrialDivision(n, bound, factors);
+        return factors.toArray();
+    }
+
+    /**
+     * Prime factors decomposition. Uses trial divisions (that is quite fast for ints).
+     *
+     * @param n number to factorize: must be &ge; 2
+     * @return list of prime factors of n
+     * @throws IllegalArgumentException if n &lt; 2.
+     * @see BigPrimes#primeFactors(cc.redberry.rings.bigint.BigInteger)
+     */
+    public static int[] primeFactors(int n) {
+        if (n < 0)
+            throw new IllegalArgumentException("Negative number: " + n);
+        if (n < 2)
+            return new int[]{n};
+
+        // slower than trial div unless we do an awful lot of computation
+        // (then it finally gets JIT-compiled efficiently
+        // List<Integer> out = PollardRho.primeFactors(n);
+        return trialDivision(n);
     }
 }

@@ -1,12 +1,12 @@
 package cc.redberry.rings.poly.univar;
 
+import java.util.Arrays;
+
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.poly.MachineArithmetic;
 import cc.redberry.rings.poly.PolynomialFactorDecomposition;
 import cc.redberry.rings.poly.multivar.MultivariateSquareFreeFactorization;
-
-import java.util.Arrays;
 
 import static cc.redberry.rings.poly.univar.Conversions64bit.asOverZp64;
 import static cc.redberry.rings.poly.univar.Conversions64bit.canConvertToZp64;
@@ -18,7 +18,8 @@ import static cc.redberry.rings.poly.univar.Conversions64bit.canConvertToZp64;
  * @since 1.0
  */
 public final class UnivariateSquareFreeFactorization {
-    private UnivariateSquareFreeFactorization() {}
+    private UnivariateSquareFreeFactorization() {
+    }
 
     /**
      * Returns {@code true} if {@code poly} is square-free and {@code false} otherwise
@@ -77,7 +78,9 @@ public final class UnivariateSquareFreeFactorization {
 
         // x^2 + x^3 -> x^2 (1 + x)
         int exponent = 0;
-        while (exponent <= poly.degree() && poly.isZeroAt(exponent)) { ++exponent; }
+        while (exponent <= poly.degree() && poly.isZeroAt(exponent)) {
+            ++exponent;
+        }
         if (exponent == 0)
             return SquareFreeFactorizationYun0(poly);
 
@@ -210,7 +213,9 @@ public final class UnivariateSquareFreeFactorization {
         PolynomialFactorDecomposition<Poly> factorization;
         // x^2 + x^3 -> x^2 (1 + x)
         int exponent = 0;
-        while (exponent <= poly.degree() && poly.isZeroAt(exponent)) { ++exponent; }
+        while (exponent <= poly.degree() && poly.isZeroAt(exponent)) {
+            ++exponent;
+        }
         if (exponent == 0)
             factorization = SquareFreeFactorizationMusser0(poly);
         else {
@@ -222,7 +227,9 @@ public final class UnivariateSquareFreeFactorization {
         return factorization.setUnit(lc);
     }
 
-    /** {@code poly} will be destroyed */
+    /**
+     * {@code poly} will be destroyed
+     */
     @SuppressWarnings("ConstantConditions")
     private static <Poly extends IUnivariatePolynomial<Poly>> PolynomialFactorDecomposition<Poly> SquareFreeFactorizationMusser0(Poly poly) {
         poly.monic();
@@ -270,7 +277,9 @@ public final class UnivariateSquareFreeFactorization {
         }
     }
 
-    /** p-th root of poly */
+    /**
+     * p-th root of poly
+     */
     @SuppressWarnings("unchecked")
     private static <Poly extends IUnivariatePolynomial<Poly>> Poly pRoot(Poly poly) {
         if (poly instanceof UnivariatePolynomialZp64)
@@ -281,7 +290,9 @@ public final class UnivariateSquareFreeFactorization {
             throw new RuntimeException(poly.getClass().toString());
     }
 
-    /** p-th root of poly */
+    /**
+     * p-th root of poly
+     */
     private static UnivariatePolynomialZp64 pRoot(UnivariatePolynomialZp64 poly) {
         if (poly.ring.modulus > Integer.MAX_VALUE)
             throw new IllegalArgumentException("Too big modulus: " + poly.ring.modulus);
@@ -298,7 +309,9 @@ public final class UnivariateSquareFreeFactorization {
         return poly.createFromArray(rootData);
     }
 
-    /** p-th root of poly */
+    /**
+     * p-th root of poly
+     */
     private static <E> UnivariatePolynomial<E> pRoot(UnivariatePolynomial<E> poly) {
         if (!poly.coefficientRingCharacteristic().isInt())
             throw new IllegalArgumentException("Infinite or too large ring: " + poly.ring);

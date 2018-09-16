@@ -1,14 +1,15 @@
 package cc.redberry.rings.poly;
 
+import org.hipparchus.random.RandomGenerator;
+
+import java.util.Iterator;
+
 import cc.redberry.rings.ARing;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.io.IStringifier;
 import cc.redberry.rings.poly.multivar.AMonomial;
 import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
 import cc.redberry.rings.poly.multivar.Ideal;
-import org.hipparchus.random.RandomGenerator;
-
-import java.util.Iterator;
 
 /**
  * Multivariate quotient ring
@@ -16,11 +17,17 @@ import java.util.Iterator;
 public class QuotientRing<Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
         extends ARing<Poly> implements IPolynomialRing<Poly> {
     private static final long serialVersionUID = 1L;
-    /** the base ring */
+    /**
+     * the base ring
+     */
     public final MultivariateRing<Poly> baseRing;
-    /** the ideal */
+    /**
+     * the ideal
+     */
     public final Ideal<Term, Poly> ideal;
-    /** factory element */
+    /**
+     * factory element
+     */
     private final Poly factory;
 
     public QuotientRing(MultivariateRing<Poly> baseRing, Ideal<Term, Poly> ideal) {

@@ -5,9 +5,12 @@ package cc.redberry.rings.poly.univar;
  * @since 2.1
  */
 public final class DiophantineEquations {
-    private DiophantineEquations() {}
+    private DiophantineEquations() {
+    }
 
-    /** runs xgcd for coprime polynomials ensuring that gcd is 1 (not another constant) */
+    /**
+     * runs xgcd for coprime polynomials ensuring that gcd is 1 (not another constant)
+     */
     public static <Poly extends IUnivariatePolynomial<Poly>>
     Poly[] monicExtendedEuclid(Poly a, Poly b) {
         Poly[] xgcd = UnivariateGCD.PolynomialExtendedGCD(a, b);
@@ -26,7 +29,9 @@ public final class DiophantineEquations {
      * Solves a1 * x1 + a2 * x2 + ... = rhs for given univariate and rhs and unknown x_i
      */
     public static final class DiophantineSolver<Poly extends IUnivariatePolynomial<Poly>> {
-        /** the given factors */
+        /**
+         * the given factors
+         */
         final Poly[] factors;
         final Poly[] solution;
         final Poly gcd;

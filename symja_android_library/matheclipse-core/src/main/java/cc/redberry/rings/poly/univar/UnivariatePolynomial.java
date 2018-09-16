@@ -1,6 +1,29 @@
 package cc.redberry.rings.poly.univar;
 
-import cc.redberry.rings.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.ToLongFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
+
+import cc.redberry.rings.IntegersZp;
+import cc.redberry.rings.IntegersZp64;
+import cc.redberry.rings.Rational;
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.bigint.BigIntegerUtil;
 import cc.redberry.rings.io.Coder;
@@ -10,13 +33,6 @@ import cc.redberry.rings.poly.multivar.DegreeVector;
 import cc.redberry.rings.poly.multivar.MonomialOrder;
 import cc.redberry.rings.poly.multivar.MultivariatePolynomial;
 import cc.redberry.rings.util.ArraysUtil;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collector;
-import java.util.stream.Stream;
 
 import static cc.redberry.rings.bigint.BigInteger.ONE;
 import static cc.redberry.rings.bigint.BigInteger.ZERO;
@@ -28,12 +44,28 @@ import static cc.redberry.rings.bigint.BigIntegerUtil.abs;
  * @since 1.0
  */
 public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<UnivariatePolynomial<E>>, Iterable<E> {
+    /**
+     * switch to classical multiplication
+     */
+    static final long KARATSUBA_THRESHOLD = 1024L;
+    /**
+     * when use Karatsuba fast multiplication
+     */
+    static final long
+            MUL_CLASSICAL_THRESHOLD = 256L * 256L,
+            MUL_MOD_CLASSICAL_THRESHOLD = 128L * 128L;
     private static final long serialVersionUID = 1L;
-    /** The coefficient ring */
+    /**
+     * The coefficient ring
+     */
     public final Ring<E> ring;
-    /** list of coefficients { x^0, x^1, ... , x^degree } */
+    /**
+     * list of coefficients { x^0, x^1, ... , x^degree }
+     */
     E[] data;
-    /** points to the last non zero element in the data array */
+    /**
+     * points to the last non zero element in the data array
+     */
     int degree;
 
     private UnivariatePolynomial(Ring<E> ring, E[] data, int degree) {
@@ -97,7 +129,9 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
         return new UnivariatePolynomial<>(ring, data);
     }
 
-    /** skips {@code ring.setToValueOf(data)} */
+    /**
+     * skips {@code ring.setToValueOf(data)}
+     */
     public static <E> UnivariatePolynomial<E> createUnsafe(Ring<E> ring, E[] data) {
         return new UnivariatePolynomial<>(ring, data);
     }
@@ -226,7 +260,7 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
      *
      * @param poly Zp polynomial
      * @return Z[x] version of the poly with coefficients represented in symmetric modular form ({@code -modulus/2 <=
-     *         cfx <= modulus/2}).
+     * cfx <= modulus/2}).
      * @throws IllegalArgumentException is {@code poly.ring} is not a {@link IntegersZp}
      */
     public static UnivariatePolynomial<BigInteger> asPolyZSymmetric(UnivariatePolynomial<BigInteger> poly) {
@@ -239,13 +273,56 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
         return UnivariatePolynomial.createUnsafe(Rings.Z, newData);
     }
 
+    /**
+     * Returns Mignotte's bound (sqrt(n+1) * 2^n max |this|) of the poly
+     */
+    public static BigInteger mignotteBound(UnivariatePolynomial<BigInteger> poly) {
+        return ONE.shiftLeft(poly.degree).multiply(norm2(poly));
+    }
+
+    /**
+     * Returns L1 norm of the polynomial, i.e. sum of abs coefficients
+     */
+    public static BigInteger norm1(UnivariatePolynomial<BigInteger> poly) {
+        BigInteger norm = ZERO;
+        for (int i = poly.degree; i >= 0; --i)
+            norm = norm.add(abs(poly.data[i]));
+        return norm;
+    }
+
+    /**
+     * Returns L2 norm of the polynomial, i.e. a square root of a sum of coefficient squares.
+     */
+    public static BigInteger norm2(UnivariatePolynomial<BigInteger> poly) {
+        BigInteger norm = ZERO;
+        for (int i = poly.degree; i >= 0; --i)
+            norm = norm.add(poly.data[i].multiply(poly.data[i]));
+        return BigIntegerUtil.sqrtCeil(norm);
+    }
+
+    /**
+     * Returns L2 norm of the poly, i.e. a square root of a sum of coefficient squares.
+     */
+    public static double norm2Double(UnivariatePolynomial<BigInteger> poly) {
+        double norm = 0;
+        for (int i = poly.degree; i >= 0; --i) {
+            double d = poly.data[i].doubleValue();
+            norm += d * d;
+        }
+        return Math.sqrt(norm);
+    }
+
     @Override
-    public int degree() {return degree;}
+    public int degree() {
+        return degree;
+    }
 
     /**
      * Returns i-th coefficient of this poly
      */
-    public E get(int i) { return i > degree ? ring.getZero() : data[i];}
+    public E get(int i) {
+        return i > degree ? ring.getZero() : data[i];
+    }
 
     /**
      * Sets i-th coefficient of this poly with specified value
@@ -294,7 +371,9 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
         return new UnivariatePolynomial<>(newRing, newData);
     }
 
-    /** internal API */
+    /**
+     * internal API
+     */
     public UnivariatePolynomial<E> setRingUnsafe(Ring<E> newRing) {
         return new UnivariatePolynomial<>(newRing, data, degree);
     }
@@ -304,23 +383,33 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
      *
      * @return leading coefficient
      */
-    public E lc() {return data[degree];}
+    public E lc() {
+        return data[degree];
+    }
 
     @Override
-    public UnivariatePolynomial<E> lcAsPoly() {return createConstant(lc());}
+    public UnivariatePolynomial<E> lcAsPoly() {
+        return createConstant(lc());
+    }
 
     @Override
-    public UnivariatePolynomial<E> ccAsPoly() {return createConstant(cc());}
+    public UnivariatePolynomial<E> ccAsPoly() {
+        return createConstant(cc());
+    }
 
     @Override
-    public UnivariatePolynomial<E> getAsPoly(int i) {return createConstant(get(i));}
+    public UnivariatePolynomial<E> getAsPoly(int i) {
+        return createConstant(get(i));
+    }
 
     /**
      * Returns the constant coefficient
      *
      * @return constant coefficient
      */
-    public E cc() {return data[0];}
+    public E cc() {
+        return data[0];
+    }
 
     @Override
     public void ensureInternalCapacity(int desiredCapacity) {
@@ -414,7 +503,9 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
     }
 
     @Override
-    public UnivariatePolynomial<E> createMonomial(int degree) {return createMonomial(ring.getOne(), degree);}
+    public UnivariatePolynomial<E> createMonomial(int degree) {
+        return createMonomial(ring.getOne(), degree);
+    }
 
     /**
      * Creates linear polynomial of form {@code cc + x * lc} (over the same ring)
@@ -454,19 +545,18 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
     }
 
     @Override
-    public UnivariatePolynomial<E> createZero() {return createConstant(ring.getZero());}
+    public UnivariatePolynomial<E> createZero() {
+        return createConstant(ring.getZero());
+    }
 
     @Override
-    public UnivariatePolynomial<E> createOne() {return createConstant(ring.getOne());}
+    public UnivariatePolynomial<E> createOne() {
+        return createConstant(ring.getOne());
+    }
 
     @Override
-    public boolean isZeroAt(int i) {return i >= data.length || ring.isZero(data[i]);}
-
-    @Override
-    public final UnivariatePolynomial<E> setZero(int i) {
-        if (i < data.length)
-            data[i] = ring.getZero();
-        return this;
+    public boolean isZeroAt(int i) {
+        return i >= data.length || ring.isZero(data[i]);
     }
 
     @Override
@@ -478,19 +568,36 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
     }
 
     @Override
-    public boolean isZero() {return ring.isZero(data[degree]);}
+    public boolean isZero() {
+        return ring.isZero(data[degree]);
+    }
 
     @Override
-    public boolean isOne() {return degree == 0 && ring.isOne(data[0]);}
+    public final UnivariatePolynomial<E> setZero(int i) {
+        if (i < data.length)
+            data[i] = ring.getZero();
+        return this;
+    }
 
     @Override
-    public boolean isMonic() {return ring.isOne(lc());}
+    public boolean isOne() {
+        return degree == 0 && ring.isOne(data[0]);
+    }
 
     @Override
-    public boolean isUnitCC() {return ring.isOne(cc());}
+    public boolean isMonic() {
+        return ring.isOne(lc());
+    }
 
     @Override
-    public boolean isConstant() {return degree == 0;}
+    public boolean isUnitCC() {
+        return ring.isOne(cc());
+    }
+
+    @Override
+    public boolean isConstant() {
+        return degree == 0;
+    }
 
     @Override
     public boolean isMonomial() {
@@ -516,7 +623,9 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
     }
 
     @Override
-    public boolean isOverZ() {return ring.equals(Rings.Z);}
+    public boolean isOverZ() {
+        return ring.equals(Rings.Z);
+    }
 
     @Override
     public BigInteger coefficientRingCardinality() {
@@ -541,45 +650,6 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
     @Override
     public BigInteger coefficientRingPerfectPowerExponent() {
         return ring.perfectPowerExponent();
-    }
-
-    /**
-     * Returns Mignotte's bound (sqrt(n+1) * 2^n max |this|) of the poly
-     */
-    public static BigInteger mignotteBound(UnivariatePolynomial<BigInteger> poly) {
-        return ONE.shiftLeft(poly.degree).multiply(norm2(poly));
-    }
-
-    /**
-     * Returns L1 norm of the polynomial, i.e. sum of abs coefficients
-     */
-    public static BigInteger norm1(UnivariatePolynomial<BigInteger> poly) {
-        BigInteger norm = ZERO;
-        for (int i = poly.degree; i >= 0; --i)
-            norm = norm.add(abs(poly.data[i]));
-        return norm;
-    }
-
-    /**
-     * Returns L2 norm of the polynomial, i.e. a square root of a sum of coefficient squares.
-     */
-    public static BigInteger norm2(UnivariatePolynomial<BigInteger> poly) {
-        BigInteger norm = ZERO;
-        for (int i = poly.degree; i >= 0; --i)
-            norm = norm.add(poly.data[i].multiply(poly.data[i]));
-        return BigIntegerUtil.sqrtCeil(norm);
-    }
-
-    /**
-     * Returns L2 norm of the poly, i.e. a square root of a sum of coefficient squares.
-     */
-    public static double norm2Double(UnivariatePolynomial<BigInteger> poly) {
-        double norm = 0;
-        for (int i = poly.degree; i >= 0; --i) {
-            double d = poly.data[i].doubleValue();
-            norm += d * d;
-        }
-        return Math.sqrt(norm);
     }
 
     /**
@@ -777,7 +847,9 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
         return result;
     }
 
-    /** Replaces x -> scale * x and returns a copy */
+    /**
+     * Replaces x -> scale * x and returns a copy
+     */
     public UnivariatePolynomial<E> scale(E scaling) {
         if (ring.isOne(scaling))
             return this.clone();
@@ -1167,86 +1239,12 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
         return UnivariatePolynomialZp64.create(ring, stream().mapToLong(mapper).toArray());
     }
 
-    private static final class ListToPoly<E> implements Function<List<E>, UnivariatePolynomial<E>> {
-        final Ring<E> ring;
-
-        public ListToPoly(Ring<E> ring) {
-            this.ring = ring;
-        }
-
-        @Override
-        public UnivariatePolynomial<E> apply(List<E> es) {
-            return UnivariatePolynomial.create(ring, es.toArray(ring.createArray(es.size())));
-        }
-    }
-
     /**
-     * Collector which collects stream of element to a UnivariatePolynomial
-     *
-     * @param <E> element type
+     * internal API
      */
-    public static final class PolynomialCollector<E>
-            implements Collector<E, List<E>, UnivariatePolynomial<E>> {
-        final Supplier<List<E>> supplier = ArrayList::new;
-        final BiConsumer<List<E>, E> accumulator = List::add;
-        final BinaryOperator<List<E>> combiner = (l, r) -> {
-            l.addAll(r);
-            return l;
-        };
-        final Function<List<E>, UnivariatePolynomial<E>> finisher;
-        final Ring<E> ring;
-
-        public PolynomialCollector(Ring<E> ring) {
-            this.ring = ring;
-            this.finisher = new ListToPoly<>(ring);
-        }
-
-        @Override
-        public Supplier<List<E>> supplier() {
-            return supplier;
-        }
-
-        @Override
-        public BiConsumer<List<E>, E> accumulator() {
-            return accumulator;
-        }
-
-        @Override
-        public BinaryOperator<List<E>> combiner() {
-            return combiner;
-        }
-
-        @Override
-        public Function<List<E>, UnivariatePolynomial<E>> finisher() {
-            return finisher;
-        }
-
-        @Override
-        public Set<Characteristics> characteristics() {
-            return Collections.emptySet();
-        }
+    public E[] getDataReferenceUnsafe() {
+        return data;
     }
-
-    private final class It implements Iterator<E> {
-        int index = 0;
-
-        @Override
-        public boolean hasNext() {
-            synchronized (UnivariatePolynomial.this) {
-                return index <= degree;
-            }
-        }
-
-        @Override
-        public E next() {
-            synchronized (UnivariatePolynomial.this) {
-                return data[index++];
-            }
-        }
-    }
-
-    /** internal API */
-    public E[] getDataReferenceUnsafe() {return data;}
 
     @Override
     public MultivariatePolynomial<E> asMultivariate() {
@@ -1347,17 +1345,9 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
         return result;
     }
 
-    /* =========================== Exact multiplication with safe arithmetics =========================== */
-
-
-    /** switch to classical multiplication */
-    static final long KARATSUBA_THRESHOLD = 1024L;
-    /** when use Karatsuba fast multiplication */
-    static final long
-            MUL_CLASSICAL_THRESHOLD = 256L * 256L,
-            MUL_MOD_CLASSICAL_THRESHOLD = 128L * 128L;
-
-    /** switch algorithms */
+    /**
+     * switch algorithms
+     */
     final E[] multiplySafe0(UnivariatePolynomial<E> oth) {
         if (1L * (degree + 1) * (degree + 1) <= MUL_CLASSICAL_THRESHOLD)
             return multiplyClassicalSafe(data, 0, degree + 1, oth.data, 0, oth.degree + 1);
@@ -1365,7 +1355,11 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
             return multiplyKaratsubaSafe(data, 0, degree + 1, oth.data, 0, oth.degree + 1);
     }
 
-    /** switch algorithms */
+    /* =========================== Exact multiplication with safe arithmetics =========================== */
+
+    /**
+     * switch algorithms
+     */
     final E[] squareSafe0() {
         if (1L * (degree + 1) * (degree + 1) <= MUL_CLASSICAL_THRESHOLD)
             return squareClassicalSafe(data, 0, degree + 1);
@@ -1534,7 +1528,6 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
         return x;
     }
 
-
     /**
      * Square the poly {@code data} using classical algorithm
      *
@@ -1624,5 +1617,83 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
             result[i + 2 * split] = ring.addMutable(result[i + 2 * split], f1g1[i]);
 
         return result;
+    }
+
+    private static final class ListToPoly<E> implements Function<List<E>, UnivariatePolynomial<E>> {
+        final Ring<E> ring;
+
+        public ListToPoly(Ring<E> ring) {
+            this.ring = ring;
+        }
+
+        @Override
+        public UnivariatePolynomial<E> apply(List<E> es) {
+            return UnivariatePolynomial.create(ring, es.toArray(ring.createArray(es.size())));
+        }
+    }
+
+    /**
+     * Collector which collects stream of element to a UnivariatePolynomial
+     *
+     * @param <E> element type
+     */
+    public static final class PolynomialCollector<E>
+            implements Collector<E, List<E>, UnivariatePolynomial<E>> {
+        final Supplier<List<E>> supplier = ArrayList::new;
+        final BiConsumer<List<E>, E> accumulator = List::add;
+        final BinaryOperator<List<E>> combiner = (l, r) -> {
+            l.addAll(r);
+            return l;
+        };
+        final Function<List<E>, UnivariatePolynomial<E>> finisher;
+        final Ring<E> ring;
+
+        public PolynomialCollector(Ring<E> ring) {
+            this.ring = ring;
+            this.finisher = new ListToPoly<>(ring);
+        }
+
+        @Override
+        public Supplier<List<E>> supplier() {
+            return supplier;
+        }
+
+        @Override
+        public BiConsumer<List<E>, E> accumulator() {
+            return accumulator;
+        }
+
+        @Override
+        public BinaryOperator<List<E>> combiner() {
+            return combiner;
+        }
+
+        @Override
+        public Function<List<E>, UnivariatePolynomial<E>> finisher() {
+            return finisher;
+        }
+
+        @Override
+        public Set<Characteristics> characteristics() {
+            return Collections.emptySet();
+        }
+    }
+
+    private final class It implements Iterator<E> {
+        int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            synchronized (UnivariatePolynomial.this) {
+                return index <= degree;
+            }
+        }
+
+        @Override
+        public E next() {
+            synchronized (UnivariatePolynomial.this) {
+                return data[index++];
+            }
+        }
     }
 }

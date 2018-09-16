@@ -3,13 +3,17 @@ package cc.redberry.rings;
 import cc.redberry.libdivide4j.FastDivision;
 import cc.redberry.rings.bigint.BigInteger;
 
-import static java.lang.Math.*;
+import static java.lang.Math.addExact;
+import static java.lang.Math.floorMod;
+import static java.lang.Math.multiplyExact;
+import static java.lang.Math.subtractExact;
 
 /**
  * @since 1.0
  */
 public final class ChineseRemainders {
-    private ChineseRemainders() {}
+    private ChineseRemainders() {
+    }
 
     /**
      * Runs Chinese Remainders algorithm
@@ -101,22 +105,8 @@ public final class ChineseRemainders {
     }
 
     /**
-     * Magic data to make CRT faster via precomputing Bezout coefficients
+     * Magic for fast repeated Chinese Remainders
      */
-    public static class ChineseRemaindersMagic<E> {
-        final E prime1, prime2, mulPrimes;
-        final E bezout0_prime2_prime1, bezout0_prime1_prime2;
-
-        private ChineseRemaindersMagic(Ring<E> ring, E prime1, E prime2) {
-            this.prime1 = prime1;
-            this.prime2 = prime2;
-            this.mulPrimes = ring.multiply(prime1, prime2);
-            this.bezout0_prime1_prime2 = bezout0(ring, prime1, prime2);
-            this.bezout0_prime2_prime1 = bezout0(ring, prime2, prime1);
-        }
-    }
-
-    /** Magic for fast repeated Chinese Remainders */
     public static <E> ChineseRemaindersMagic<E> createMagic(Ring<E> ring, E prime1, E prime2) {
         return new ChineseRemaindersMagic<>(ring, prime1, prime2);
     }
@@ -142,7 +132,9 @@ public final class ChineseRemainders {
         return result;
     }
 
-    /** Magic for fast repeated Chinese Remainders */
+    /**
+     * Magic for fast repeated Chinese Remainders
+     */
     public static ChineseRemaindersMagicZp64 createMagic(long prime1, long prime2) {
         long modulus = multiplyExact(prime1, prime2);
         return new ChineseRemaindersMagicZp64(
@@ -151,48 +143,6 @@ public final class ChineseRemainders {
                 prime1 <= Integer.MAX_VALUE, prime2 <= Integer.MAX_VALUE, modulus <= Integer.MAX_VALUE,
                 bezout0(prime1, prime2), bezout0(prime2, prime1)
         );
-    }
-
-    public static class ChineseRemaindersMagicZp64 {
-        final long prime1, prime2, modulus;
-        final FastDivision.Magic magic1, magic2, magicModulus;
-        final boolean prime1IsInt, prime2IsInt, modulusIsInt;
-        final FastDivision.Magic magic32Prime1, magic32Prime2, magic32Modulus;
-        final long bezoutPrime1Prime2, bezoutPrime2Prime1;
-
-        ChineseRemaindersMagicZp64(long prime1, long prime2, long modulus, FastDivision.Magic magic1, FastDivision.Magic magic2, FastDivision.Magic magicModulus, boolean prime1IsInt, boolean prime2IsInt, boolean modulusIsInt, long bezoutPrime1Prime2, long bezoutPrime2Prime1) {
-            this.prime1 = prime1;
-            this.prime2 = prime2;
-            this.modulus = modulus;
-            this.magic1 = magic1;
-            this.magic2 = magic2;
-            this.magicModulus = magicModulus;
-            this.prime1IsInt = prime1IsInt;
-            this.prime2IsInt = prime2IsInt;
-            this.modulusIsInt = modulusIsInt;
-            this.magic32Prime1 = prime1IsInt ? null : FastDivision.magic32ForMultiplyMod(prime1);
-            this.magic32Prime2 = prime2IsInt ? null : FastDivision.magic32ForMultiplyMod(prime2);
-            this.magic32Modulus = modulusIsInt ? null : FastDivision.magic32ForMultiplyMod(modulus);
-            this.bezoutPrime1Prime2 = Math.floorMod(bezoutPrime1Prime2, prime2);
-            this.bezoutPrime2Prime1 = Math.floorMod(bezoutPrime2Prime1, prime1);
-        }
-
-        long mulModPrime1(long a, long b) {
-            return prime1IsInt ? FastDivision.modUnsignedFast(a * b, magic1) : FastDivision.multiplyMod128Unsigned(a, b, prime1, magic32Prime1);
-        }
-
-        long mulModPrime2(long a, long b) {
-            return prime2IsInt ? FastDivision.modUnsignedFast(a * b, magic2) : FastDivision.multiplyMod128Unsigned(a, b, prime2, magic32Prime2);
-        }
-
-        long mulModModulus(long a, long b) {
-            return modulusIsInt ? FastDivision.modUnsignedFast(a * b, magicModulus) : FastDivision.multiplyMod128Unsigned(a, b, modulus, magic32Modulus);
-        }
-
-        long addMod(long a, long b) {
-            long r = a + b;
-            return r - modulus >= 0 ? r - modulus : r;
-        }
     }
 
     /**
@@ -307,5 +257,63 @@ public final class ChineseRemainders {
         if (!ring.isOne(r))
             s = ring.divideExact(s, r);
         return s;
+    }
+
+    /**
+     * Magic data to make CRT faster via precomputing Bezout coefficients
+     */
+    public static class ChineseRemaindersMagic<E> {
+        final E prime1, prime2, mulPrimes;
+        final E bezout0_prime2_prime1, bezout0_prime1_prime2;
+
+        private ChineseRemaindersMagic(Ring<E> ring, E prime1, E prime2) {
+            this.prime1 = prime1;
+            this.prime2 = prime2;
+            this.mulPrimes = ring.multiply(prime1, prime2);
+            this.bezout0_prime1_prime2 = bezout0(ring, prime1, prime2);
+            this.bezout0_prime2_prime1 = bezout0(ring, prime2, prime1);
+        }
+    }
+
+    public static class ChineseRemaindersMagicZp64 {
+        final long prime1, prime2, modulus;
+        final FastDivision.Magic magic1, magic2, magicModulus;
+        final boolean prime1IsInt, prime2IsInt, modulusIsInt;
+        final FastDivision.Magic magic32Prime1, magic32Prime2, magic32Modulus;
+        final long bezoutPrime1Prime2, bezoutPrime2Prime1;
+
+        ChineseRemaindersMagicZp64(long prime1, long prime2, long modulus, FastDivision.Magic magic1, FastDivision.Magic magic2, FastDivision.Magic magicModulus, boolean prime1IsInt, boolean prime2IsInt, boolean modulusIsInt, long bezoutPrime1Prime2, long bezoutPrime2Prime1) {
+            this.prime1 = prime1;
+            this.prime2 = prime2;
+            this.modulus = modulus;
+            this.magic1 = magic1;
+            this.magic2 = magic2;
+            this.magicModulus = magicModulus;
+            this.prime1IsInt = prime1IsInt;
+            this.prime2IsInt = prime2IsInt;
+            this.modulusIsInt = modulusIsInt;
+            this.magic32Prime1 = prime1IsInt ? null : FastDivision.magic32ForMultiplyMod(prime1);
+            this.magic32Prime2 = prime2IsInt ? null : FastDivision.magic32ForMultiplyMod(prime2);
+            this.magic32Modulus = modulusIsInt ? null : FastDivision.magic32ForMultiplyMod(modulus);
+            this.bezoutPrime1Prime2 = Math.floorMod(bezoutPrime1Prime2, prime2);
+            this.bezoutPrime2Prime1 = Math.floorMod(bezoutPrime2Prime1, prime1);
+        }
+
+        long mulModPrime1(long a, long b) {
+            return prime1IsInt ? FastDivision.modUnsignedFast(a * b, magic1) : FastDivision.multiplyMod128Unsigned(a, b, prime1, magic32Prime1);
+        }
+
+        long mulModPrime2(long a, long b) {
+            return prime2IsInt ? FastDivision.modUnsignedFast(a * b, magic2) : FastDivision.multiplyMod128Unsigned(a, b, prime2, magic32Prime2);
+        }
+
+        long mulModModulus(long a, long b) {
+            return modulusIsInt ? FastDivision.modUnsignedFast(a * b, magicModulus) : FastDivision.multiplyMod128Unsigned(a, b, modulus, magic32Modulus);
+        }
+
+        long addMod(long a, long b) {
+            long r = a + b;
+            return r - modulus >= 0 ? r - modulus : r;
+        }
     }
 }

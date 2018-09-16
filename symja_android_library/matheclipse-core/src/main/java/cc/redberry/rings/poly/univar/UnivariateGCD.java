@@ -1,11 +1,29 @@
 package cc.redberry.rings.poly.univar;
 
 
-import cc.redberry.rings.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import cc.redberry.rings.ChineseRemainders;
 import cc.redberry.rings.ChineseRemainders.ChineseRemaindersMagic;
+import cc.redberry.rings.IntegersZp;
+import cc.redberry.rings.IntegersZp64;
+import cc.redberry.rings.Rational;
+import cc.redberry.rings.RationalReconstruction;
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.bigint.BigIntegerUtil;
-import cc.redberry.rings.poly.*;
+import cc.redberry.rings.poly.AlgebraicNumberField;
+import cc.redberry.rings.poly.FiniteField;
+import cc.redberry.rings.poly.MachineArithmetic;
+import cc.redberry.rings.poly.MultipleFieldExtension;
+import cc.redberry.rings.poly.MultivariateRing;
+import cc.redberry.rings.poly.SimpleFieldExtension;
+import cc.redberry.rings.poly.UnivariateRing;
+import cc.redberry.rings.poly.Util;
 import cc.redberry.rings.poly.Util.Tuple2;
 import cc.redberry.rings.poly.multivar.AMonomial;
 import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
@@ -13,11 +31,6 @@ import cc.redberry.rings.poly.multivar.MultivariateGCD;
 import cc.redberry.rings.primes.PrimesIterator;
 import cc.redberry.rings.primes.SmallPrimes;
 import cc.redberry.rings.util.ArraysUtil;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static cc.redberry.rings.ChineseRemainders.ChineseRemainders;
 import static cc.redberry.rings.ChineseRemainders.createMagic;
@@ -35,7 +48,17 @@ import static cc.redberry.rings.poly.univar.UnivariatePolynomial.asOverZp64;
  * @since 1.0
  */
 public final class UnivariateGCD {
-    private UnivariateGCD() {}
+    /**
+     * for polynomial degrees larger than this a Half-GCD algorithm will be used
+     */
+    static int SWITCH_TO_HALF_GCD_ALGORITHM_DEGREE = 180;
+    /**
+     * for polynomial degrees larger than this a Half-GCD algorithm for hMatrix will be used
+     */
+    static int SWITCH_TO_HALF_GCD_H_MATRIX_DEGREE = 25;
+
+    private UnivariateGCD() {
+    }
 
     /**
      * Calculates the GCD of two polynomials. Depending on the coefficient ring, the algorithm switches between Half-GCD
@@ -188,6 +211,8 @@ public final class UnivariateGCD {
         };
     }
 
+    /* ========================================== implementation ==================================================== */
+
     /**
      * Returns GCD of a list of polynomials.
      *
@@ -213,8 +238,6 @@ public final class UnivariateGCD {
             gcd = gcd == null ? poly : PolynomialGCD(gcd, poly);
         return gcd;
     }
-
-    /* ========================================== implementation ==================================================== */
 
     private static <T extends IUnivariatePolynomial<T>> T TrivialGCD(final T a, final T b) {
         if (a.isZero()) return normalizeGCD(b.clone());
@@ -364,11 +387,6 @@ public final class UnivariateGCD {
         result[1] = old_s;
         return normalizeExtendedGCD(result);
     }
-
-    /** for polynomial degrees larger than this a Half-GCD algorithm will be used */
-    static int SWITCH_TO_HALF_GCD_ALGORITHM_DEGREE = 180;
-    /** for polynomial degrees larger than this a Half-GCD algorithm for hMatrix will be used */
-    static int SWITCH_TO_HALF_GCD_H_MATRIX_DEGREE = 25;
 
     /**
      * Half-GCD algorithm. The algorithm automatically switches to Euclidean algorithm for small input. If coefficient
@@ -562,7 +580,9 @@ public final class UnivariateGCD {
         return matrixMultiply(hMatrixL, hMatrixR);
     }
 
-    /** a and b will be modified */
+    /**
+     * a and b will be modified
+     */
     static <T extends IUnivariatePolynomial<T>> T[][] reduceExtendedHalfGCD(T a, T b, int d) {
         assert a.degree() >= b.degree();
         if (b.isZero() || b.degree() <= a.degree() - d)
@@ -612,7 +632,9 @@ public final class UnivariateGCD {
         return matrixMultiply(hMatrixL, hMatrixR);
     }
 
-    /** a and b will be modified */
+    /**
+     * a and b will be modified
+     */
     static <T extends IUnivariatePolynomial<T>> T[] reduceHalfGCD(T a, T b) {
         int d = (a.degree() + 1) / 2;
 
@@ -694,7 +716,9 @@ public final class UnivariateGCD {
         return ModularGCD0(a.clone().divideOrNull(aContent), b.clone().divideOrNull(bContent)).multiply(contentGCD);
     }
 
-    /** modular GCD for primitive polynomials */
+    /**
+     * modular GCD for primitive polynomials
+     */
     @SuppressWarnings("ConstantConditions")
     private static UnivariatePolynomialZ64 ModularGCD0(UnivariatePolynomialZ64 a, UnivariatePolynomialZ64 b) {
         assert a.degree >= b.degree;
@@ -800,7 +824,9 @@ public final class UnivariateGCD {
         return ModularGCD0(a.clone().divideOrNull(aContent), b.clone().divideOrNull(bContent)).multiply(contentGCD);
     }
 
-    /** modular GCD for primitive polynomials */
+    /**
+     * modular GCD for primitive polynomials
+     */
     @SuppressWarnings("ConstantConditions")
     private static UnivariatePolynomial<BigInteger> ModularGCD0(UnivariatePolynomial<BigInteger> a,
                                                                 UnivariatePolynomial<BigInteger> b) {
@@ -814,7 +840,8 @@ public final class UnivariateGCD {
             try {
                 // long overflow may occur here in very very rare cases
                 return ModularGCD(UnivariatePolynomial.asOverZ64(a), UnivariatePolynomial.asOverZ64(b)).toBigPoly();
-            } catch (ArithmeticException e) {}
+            } catch (ArithmeticException e) {
+            }
 
         UnivariatePolynomialZ64 previousBase = null;
         UnivariatePolynomialZp64 base = null;
@@ -1011,7 +1038,9 @@ public final class UnivariateGCD {
         return xgcd;
     }
 
-    /** modular extended GCD in Q[x] for primitive polynomials */
+    /**
+     * modular extended GCD in Q[x] for primitive polynomials
+     */
     @SuppressWarnings({"ConstantConditions", "unchecked"})
     static UnivariatePolynomial<Rational<BigInteger>>[] ModularExtendedRationalGCD0(
             UnivariatePolynomial<BigInteger> a,
@@ -1290,7 +1319,9 @@ public final class UnivariateGCD {
         return xgcd;
     }
 
-    /** modular extended GCD for primitive coprime polynomials */
+    /**
+     * modular extended GCD for primitive coprime polynomials
+     */
     @SuppressWarnings({"ConstantConditions", "unchecked"})
     private static UnivariatePolynomial<BigInteger>[] ModularExtendedResultantGCD0(UnivariatePolynomial<BigInteger> a,
                                                                                    UnivariatePolynomial<BigInteger> b) {
@@ -1407,7 +1438,9 @@ public final class UnivariateGCD {
         return PolynomialGCD(ar, br).mapCoefficients(ring, cf -> UnivariatePolynomial.constant(ring.getMinimalPolynomial().ring, cf));
     }
 
-    /** Computes GCD via Langemyr & Mccallum modular algorithm over algebraic number field */
+    /**
+     * Computes GCD via Langemyr & Mccallum modular algorithm over algebraic number field
+     */
     @SuppressWarnings("ConstantConditions")
     public static UnivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>>
     PolynomialGCDInNumberField(UnivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>> a,
@@ -1474,7 +1507,9 @@ public final class UnivariateGCD {
         return denominator;
     }
 
-    /** Computes some GCD associate via Langemyr & Mccallum modular algorithm over algebraic integers */
+    /**
+     * Computes some GCD associate via Langemyr & Mccallum modular algorithm over algebraic integers
+     */
     @SuppressWarnings("ConstantConditions")
     public static UnivariatePolynomial<UnivariatePolynomial<BigInteger>>
     PolynomialGCDInRingOfIntegersOfNumberField(UnivariatePolynomial<UnivariatePolynomial<BigInteger>> a,
@@ -1496,7 +1531,9 @@ public final class UnivariateGCD {
         return gcdAssociateInNumberField0(a, b).multiply(contentGCD);
     }
 
-    /** Computes some GCD associate via Langemyr & McCallum modular algorithm over algebraic integers */
+    /**
+     * Computes some GCD associate via Langemyr & McCallum modular algorithm over algebraic integers
+     */
     @SuppressWarnings("ConstantConditions")
     static UnivariatePolynomial<UnivariatePolynomial<BigInteger>> gcdAssociateInNumberField(
             UnivariatePolynomial<UnivariatePolynomial<BigInteger>> a,
@@ -1530,7 +1567,9 @@ public final class UnivariateGCD {
         return gcd;
     }
 
-    /** Langemyr & McCallum modular algorithm for primitive polynomials with integer lead coefficients */
+    /**
+     * Langemyr & McCallum modular algorithm for primitive polynomials with integer lead coefficients
+     */
     @SuppressWarnings("ConstantConditions")
     static UnivariatePolynomial<UnivariatePolynomial<BigInteger>> gcdAssociateInNumberField0(
             UnivariatePolynomial<UnivariatePolynomial<BigInteger>> a,

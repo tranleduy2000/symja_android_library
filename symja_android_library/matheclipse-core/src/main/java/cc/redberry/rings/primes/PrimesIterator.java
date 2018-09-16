@@ -1,24 +1,26 @@
 package cc.redberry.rings.primes;
 
-import cc.redberry.rings.bigint.BigInteger;
-
 import java.util.Arrays;
+
+import cc.redberry.rings.bigint.BigInteger;
 
 /**
  * Iterator over prime numbers.
  */
 public final class PrimesIterator {
+    private static final int largeSieveLimit = 16777216;
     private final int[] smallPrimes = SmallPrimes.SmallPrimes12;
+    private final SieveOfAtkin smallSieve = SieveOfAtkin.SmallPrimesSieve;
     private long pointer;
     private int smallPrimesPointer = Integer.MAX_VALUE;
-    private static final int largeSieveLimit = 16777216;
-    private final SieveOfAtkin smallSieve = SieveOfAtkin.SmallPrimesSieve;
     private SieveOfAtkin largeSieve = null;
 
     /**
      * Create iterator over prime numbers starting from 2.
      */
-    public PrimesIterator() {pointer = 0;}
+    public PrimesIterator() {
+        pointer = 0;
+    }
 
     /**
      * Create iterator over prime numbers starting from the prime closest to the specified value (prime >= from)

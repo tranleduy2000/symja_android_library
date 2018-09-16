@@ -1,19 +1,47 @@
 package cc.redberry.rings.poly.multivar;
 
 
-import cc.redberry.rings.*;
+import org.hipparchus.random.RandomGenerator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import cc.redberry.rings.ChineseRemainders;
 import cc.redberry.rings.ChineseRemainders.ChineseRemaindersMagic;
+import cc.redberry.rings.IntegersZp;
+import cc.redberry.rings.IntegersZp64;
+import cc.redberry.rings.Rational;
+import cc.redberry.rings.RationalReconstruction;
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.bigint.BigIntegerUtil;
 import cc.redberry.rings.linear.LinearSolver;
 import cc.redberry.rings.poly.AlgebraicNumberField;
-import cc.redberry.rings.poly.*;
+import cc.redberry.rings.poly.FiniteField;
+import cc.redberry.rings.poly.MachineArithmetic;
 import cc.redberry.rings.poly.MultipleFieldExtension;
 import cc.redberry.rings.poly.MultivariateRing;
 import cc.redberry.rings.poly.SimpleFieldExtension;
 import cc.redberry.rings.poly.UnivariateRing;
+import cc.redberry.rings.poly.Util;
 import cc.redberry.rings.poly.Util.Tuple2;
-import cc.redberry.rings.poly.univar.*;
+import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
+import cc.redberry.rings.poly.univar.IrreduciblePolynomials;
+import cc.redberry.rings.poly.univar.UnivariateDivision;
+import cc.redberry.rings.poly.univar.UnivariateGCD;
+import cc.redberry.rings.poly.univar.UnivariatePolynomial;
+import cc.redberry.rings.poly.univar.UnivariatePolynomialZp64;
+import cc.redberry.rings.poly.univar.UnivariateResultants;
 import cc.redberry.rings.primes.PrimesIterator;
 import cc.redberry.rings.primes.SmallPrimes;
 import cc.redberry.rings.util.ArraysUtil;
@@ -23,18 +51,16 @@ import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.set.hash.TLongHashSet;
-import org.hipparchus.random.RandomGenerator;
-
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static cc.redberry.rings.ChineseRemainders.ChineseRemainders;
 import static cc.redberry.rings.ChineseRemainders.createMagic;
-import static cc.redberry.rings.Rings.*;
+import static cc.redberry.rings.Rings.Q;
+import static cc.redberry.rings.Rings.UnivariateRing;
+import static cc.redberry.rings.Rings.Z;
 import static cc.redberry.rings.poly.Util.commonDenominator;
-import static cc.redberry.rings.poly.multivar.Conversions64bit.*;
+import static cc.redberry.rings.poly.multivar.Conversions64bit.asOverZp64;
+import static cc.redberry.rings.poly.multivar.Conversions64bit.canConvertToZp64;
+import static cc.redberry.rings.poly.multivar.Conversions64bit.convertFromZp64;
 import static cc.redberry.rings.poly.multivar.MultivariateDivision.pseudoRemainder;
 
 
@@ -44,7 +70,50 @@ import static cc.redberry.rings.poly.multivar.MultivariateDivision.pseudoRemaind
  * @since 1.0
  */
 public final class MultivariateGCD {
-    private MultivariateGCD() {}
+    /**
+     * maximal number of attempts to choose a good evaluation point for sparse interpolation
+     */
+    static final int MAX_FAILED_SUBSTITUTIONS = 32;
+    private static final double SPARSITY_THRESHOLD_NVARS_4 = 0.2;
+    private static final double SPARSITY2_THRESHOLD = 0.5;
+    private static final int SPARSITY_SIZE_THRESHOLD = 256;
+    private static final int MAX_OVER_ITERATIONS = 18;
+    // when to use fast division check
+    private static final int LARGE_SIZE_USE_FAST_DIV_TEST = 64_000;
+    /**
+     * Maximal number of fails before switch to a new homomorphism
+     */
+    private static final int MAX_SPARSE_INTERPOLATION_FAILS = 64;
+    /**
+     * Maximal number of sparse interpolations after interpolation.numberOfPoints() > degreeBounds[variable]
+     */
+    private static final int ALLOWED_OVER_INTERPOLATED_ATTEMPTS = 64;
+    /**
+     * switch to sparse recursive form for repeated evaluations if expected number of evaluations is sufficiently large
+     */
+    private static final int N_EVALUATIONS_RECURSIVE_SWITCH = 16;
+    /**
+     * switch to sparse recursive form for repeated evaluations only for quite large polynomials
+     */
+    private static final int SIZE_OF_POLY_RECURSIVE_SWITCH = 512;
+    /**
+     * Number of retries when raise condition occurs; then drop up with new homomorphism
+     */
+    private static final int
+            SMALL_FIELD_BIT_LENGTH = 13,
+            NUMBER_OF_UNDER_DETERMINED_RETRIES = 8,
+            NUMBER_OF_UNDER_DETERMINED_RETRIES_SMALL_FIELD = 24;
+    private static final int
+            SAME_BASE_VARIABLE_ATTEMPTS = 8,
+            ATTEMPTS_WITH_MAX_ZEROS = 2;
+    static int
+            EARLY_ADJUST_SMALL_POLY_SIZE_THRESHOLD = 1024,
+            EARLY_ADJUST_POLY_DISBALANCE = 10,
+            EARLY_ADJUST_LARGE_POLY_SIZE_THRESHOLD = EARLY_ADJUST_SMALL_POLY_SIZE_THRESHOLD * EARLY_ADJUST_POLY_DISBALANCE;
+    static boolean ALWAYS_LINZIP = false;
+
+    private MultivariateGCD() {
+    }
 
     /**
      * Calculates greatest common divisor of the array of polynomials
@@ -375,10 +444,6 @@ public final class MultivariateGCD {
                 .primitivePart();
     }
 
-    private static final double SPARSITY_THRESHOLD_NVARS_4 = 0.2;
-    private static final double SPARSITY2_THRESHOLD = 0.5;
-    private static final int SPARSITY_SIZE_THRESHOLD = 256;
-
     private static <Poly extends AMultivariatePolynomial> boolean isDenseGCDProblem(Poly a, Poly b) {
         return a.nVariables >= 4
                 && a.size() > SPARSITY_SIZE_THRESHOLD
@@ -401,6 +466,8 @@ public final class MultivariateGCD {
 
         return null;
     }
+
+    /* ============================================== Auxiliary methods ============================================= */
 
     static <Poly extends AMultivariatePolynomial>
     boolean isOverPolynomialRing(Poly p) {
@@ -496,62 +563,14 @@ public final class MultivariateGCD {
                 .mapCoefficients(ring, ring::image);
     }
 
-    /* ============================================== Auxiliary methods ============================================= */
-
-    /** calculates the inverse permutation */
+    /**
+     * calculates the inverse permutation
+     */
     static int[] inversePermutation(int[] permutation) {
         final int[] inv = new int[permutation.length];
         for (int i = permutation.length - 1; i >= 0; --i)
             inv[permutation[i]] = i;
         return inv;
-    }
-
-    /** structure with required input for GCD algorithms */
-    static final class GCDInput<Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>> {
-        /** input polynomials (with variables renamed) and earlyGCD if possible (in trivial cases) */
-        final Poly aReduced, bReduced, earlyGCD;
-        /** gcd degree bounds, mapping used to rename variables so that degreeBounds are in descending order */
-        final int[] degreeBounds, mapping;
-        /** last present variable */
-        final int lastPresentVariable;
-        /** ring cardinality (or -1, if cardinality is greater than Integer.MAX_VALUE) */
-        final int evaluationStackLimit;
-        /** GCD of monomial content of a and b **/
-        final Term monomialGCD;
-        /**
-         * degree of irreducible univariate polynomial used to construct field extension q^n (if the coefficient ring
-         * has so small cardinality so that modular algorithm will fail)
-         */
-        final int finiteExtensionDegree;
-
-        GCDInput(Poly earlyGCD) {
-            this.earlyGCD = earlyGCD;
-            aReduced = bReduced = null;
-            degreeBounds = mapping = null;
-            lastPresentVariable = evaluationStackLimit = -1;
-            monomialGCD = null;
-            finiteExtensionDegree = -1;
-        }
-
-        GCDInput(Poly aReduced, Poly bReduced, Term monomialGCD,
-                 int evaluationStackLimit, int[] degreeBounds, int[] mapping, int lastPresentVariable,
-                 int finiteExtensionDegree) {
-            //assert monomialGCD == null || aReduced.ring.isOne(monomialGCD.coefficient);
-            this.aReduced = aReduced;
-            this.bReduced = bReduced;
-            this.monomialGCD = monomialGCD;
-            this.earlyGCD = null;
-            this.evaluationStackLimit = evaluationStackLimit;
-            this.degreeBounds = degreeBounds;
-            this.mapping = inversePermutation(mapping);
-            this.lastPresentVariable = lastPresentVariable;
-            this.finiteExtensionDegree = finiteExtensionDegree;
-        }
-
-        /** recover initial order of variables in the result */
-        Poly restoreGCD(Poly result) {
-            return AMultivariatePolynomial.renameVariables(result, mapping).multiply(monomialGCD);
-        }
     }
 
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
@@ -601,12 +620,9 @@ public final class MultivariateGCD {
             return linear.createConstant(cGCD);
     }
 
-    static int
-            EARLY_ADJUST_SMALL_POLY_SIZE_THRESHOLD = 1024,
-            EARLY_ADJUST_POLY_DISBALANCE = 10,
-            EARLY_ADJUST_LARGE_POLY_SIZE_THRESHOLD = EARLY_ADJUST_SMALL_POLY_SIZE_THRESHOLD * EARLY_ADJUST_POLY_DISBALANCE;
-
-    /** prepare input for modular GCD algorithms (Brown, Zippel, LinZip) */
+    /**
+     * prepare input for modular GCD algorithms (Brown, Zippel, LinZip)
+     */
     static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     GCDInput<Term, Poly> preparedGCDInput(Poly a, Poly b, BiFunction<Poly, Poly, Poly> gcdAlgorithm) {
         Poly trivialGCD = trivialGCD(a, b);
@@ -836,7 +852,9 @@ public final class MultivariateGCD {
                         return; // nothing can be done
                     // find non trivial substitution
                     long rval;
-                    do { rval = a.ring.randomElement(rnd); } while (seen.contains(rval));
+                    do {
+                        rval = a.ring.randomElement(rnd);
+                    } while (seen.contains(rval));
                     seen.add(rval);
                     subs[i] = rval;
                 } while (a.evaluate(i, subs[i]).isZero() || b.evaluate(i, subs[i]).isZero());
@@ -856,7 +874,9 @@ public final class MultivariateGCD {
         }
     }
 
-    /** substitutes {@code values} for {@code variables} */
+    /**
+     * substitutes {@code values} for {@code variables}
+     */
     @SuppressWarnings("unchecked")
     static UnivariatePolynomialZp64[] univariateImages(MultivariatePolynomialZp64 poly, long[] subs) {
         long[][] univariate = new long[poly.nVariables][];
@@ -908,7 +928,9 @@ public final class MultivariateGCD {
                         return; // nothing can be done
                     // find non trivial substitution
                     E rval;
-                    do { rval = randomElement(a.ring, rnd); } while (seen.contains(rval));
+                    do {
+                        rval = randomElement(a.ring, rnd);
+                    } while (seen.contains(rval));
                     seen.add(rval);
                     subs[i] = rval;
                 } while (a.evaluate(i, subs[i]).isZero() || b.evaluate(i, subs[i]).isZero());
@@ -928,7 +950,9 @@ public final class MultivariateGCD {
         }
     }
 
-    /** substitutes {@code values} for {@code variables} */
+    /**
+     * substitutes {@code values} for {@code variables}
+     */
     @SuppressWarnings("unchecked")
     static <E> UnivariatePolynomial<E>[] univariateImages(MultivariatePolynomial<E> poly, E[] subs) {
         E[][] univariate = poly.ring.createArray2d(poly.nVariables);
@@ -1014,7 +1038,9 @@ public final class MultivariateGCD {
         adjustDegreeBounds(aMod, bMod, gcdDegreeBounds);
     }
 
-    /** substitutes {@code values} for {@code variables} */
+    /**
+     * substitutes {@code values} for {@code variables}
+     */
     @SuppressWarnings("unchecked")
     static UnivariatePolynomial<BigInteger>[] univariateImagesZ(MultivariatePolynomial<BigInteger> poly, BigInteger[] subs) {
         assert Arrays.stream(subs).allMatch(BigInteger::isOne);
@@ -1037,12 +1063,16 @@ public final class MultivariateGCD {
         return result;
     }
 
-    /** gcd with monomial */
+    /**
+     * gcd with monomial
+     */
     @SuppressWarnings("unchecked")
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     Poly gcdWithMonomial(Term monomial, Poly poly) {
         return poly.create(poly.commonContent(monomial));
     }
+
+    /* =========================================== Multivariate GCD over Z ========================================== */
 
     /**
      * Removes monomial content from a and b and returns monomial gcd
@@ -1065,24 +1095,6 @@ public final class MultivariateGCD {
         assert a != null && b != null;
 
         return monomialGCD;
-    }
-
-    /**
-     * Primitive part and content of multivariate polynomial considered as polynomial over Zp[x_i][x_1, ..., x_N]
-     */
-    private static final class UnivariateContent<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>,
-            uPoly extends IUnivariatePolynomial<uPoly>> {
-        final MultivariatePolynomial<uPoly> poly;
-        final Poly primitivePart;
-        final uPoly content;
-
-        public UnivariateContent(MultivariatePolynomial<uPoly> poly, Poly primitivePart, uPoly content) {
-            this.poly = poly;
-            this.primitivePart = primitivePart;
-            this.content = content;
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1123,25 +1135,6 @@ public final class MultivariateGCD {
         return new UnivariateContent(conv, primitivePart, uContent);
     }
 
-    /** holds primitive parts of a and b viewed as polynomials in Zp[x_k][x_1 ... x_{k-1}] */
-    private static final class PrimitiveInput<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>,
-            uPoly extends IUnivariatePolynomial<uPoly>> {
-        /** primitive parts of a and b viewed as polynomials in Zp[x_k][x_1 ... x_{k-1}] */
-        final Poly aPrimitive, bPrimitive;
-        /** gcd of content and leading coefficient of a and b given as Zp[x_k][x_1 ... x_{k-1}] */
-        final uPoly contentGCD, lcGCD;
-
-        PrimitiveInput(Poly aPrimitive, Poly bPrimitive,
-                       uPoly contentGCD, uPoly lcGCD) {
-            this.aPrimitive = aPrimitive;
-            this.bPrimitive = bPrimitive;
-            this.contentGCD = contentGCD;
-            this.lcGCD = lcGCD;
-        }
-    }
-
     /**
      * Primitive parts, contents and leading coefficients of {@code a} and {@code b} viewed as polynomials in
      * Zp[x_k][x_1 ... x_{k-1}] with {@code x_k = variable}
@@ -1167,13 +1160,17 @@ public final class MultivariateGCD {
         return new PrimitiveInput(a, b, contentGCD, lcGCD);
     }
 
-    /** coefficients specified variable as multivariate polynomials */
+    /**
+     * coefficients specified variable as multivariate polynomials
+     */
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     Poly[] multivariateCoefficients(Poly poly, int variable) {
         return Arrays.stream(poly.degrees(variable)).mapToObj(d -> poly.coefficientOf(variable, d)).toArray(poly::createArray);
     }
 
-    /** gcd of content of a and b with respect to specified variable */
+    /**
+     * gcd of content of a and b with respect to specified variable
+     */
     static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     Poly contentGCD(Poly a, Poly b, int variable, BiFunction<Poly, Poly, Poly> algorithm) {
         Poly[] aCfs = multivariateCoefficients(a, variable);
@@ -1189,7 +1186,9 @@ public final class MultivariateGCD {
         return gcd;
     }
 
-    /** simple random elements */
+    /**
+     * simple random elements
+     */
     static <E> E randomElement(Ring<E> ring, RandomGenerator rnd) {
         if (ring.isFiniteField() && ring.characteristic().bitLength() > 16)
             return ring.valueOf(rnd.nextLong());
@@ -1199,7 +1198,7 @@ public final class MultivariateGCD {
             return ring.randomElement(rnd);
     }
 
-    /* =========================================== Multivariate GCD over Z ========================================== */
+    /* =============================== Multivariate GCD over algebraic number fields ================================= */
 
     /**
      * Sparse modular GCD algorithm for polynomials over Z.
@@ -1692,9 +1691,9 @@ public final class MultivariateGCD {
         }
     }
 
-    /* =============================== Multivariate GCD over algebraic number fields ================================= */
-
-    /** if all coefficients are simple numbers */
+    /**
+     * if all coefficients are simple numbers
+     */
     private static <E> MultivariatePolynomial<UnivariatePolynomial<E>>
     TrivialGCDInExtension(MultivariatePolynomial<UnivariatePolynomial<E>> a, MultivariatePolynomial<UnivariatePolynomial<E>> b) {
         AlgebraicNumberField<UnivariatePolynomial<E>> ring
@@ -1712,24 +1711,32 @@ public final class MultivariateGCD {
                 .mapCoefficients(ring, cf -> UnivariatePolynomial.constant(cfRing, cf));
     }
 
-    /** integer "content" of poly over algebraic extension */
+    /**
+     * integer "content" of poly over algebraic extension
+     */
     static BigInteger iContent(MultivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>> a) {
         return Z.gcd(a.stream().flatMap(UnivariatePolynomial::stream).map(Rational::numerator).collect(Collectors.toList()));
     }
 
-    /** integer "common denominator" of poly over algebraic extension */
+    /**
+     * integer "common denominator" of poly over algebraic extension
+     */
     static BigInteger iDenominator(MultivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>> a) {
         return Z.lcm(a.stream().flatMap(UnivariatePolynomial::stream).map(Rational::denominator).collect(Collectors.toList()));
     }
 
-    /** integer max coefficient of poly over algebraic extension */
+    /**
+     * integer max coefficient of poly over algebraic extension
+     */
     static BigInteger iMax(MultivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>> a) {
         return a.stream()
                 .flatMap(p -> p.stream().flatMap(cf -> Stream.of(cf.numerator(), cf.denominator())))
                 .map(Z::abs).max(Z).orElse(Z.getZero());
     }
 
-    /** integer max coefficient of poly over algebraic extension */
+    /**
+     * integer max coefficient of poly over algebraic extension
+     */
     static BigInteger iMaxZ(MultivariatePolynomial<UnivariatePolynomial<BigInteger>> a) {
         return a.stream()
                 .flatMap(UnivariatePolynomial::stream)
@@ -1764,7 +1771,8 @@ public final class MultivariateGCD {
         if (minimalPoly.stream().allMatch(Rational::isIntegral)) {
             // minimal polynomial is integral (monic)
 
-            a = a.clone(); b = b.clone();
+            a = a.clone();
+            b = b.clone();
             // remove integer content (to facilitate rational reconstruction)
             BigInteger aiCont = iContent(a), biCont = iContent(b);
             a.multiply(UnivariatePolynomial.constant(Q, Q.mkDenominator(aiCont)));
@@ -1900,7 +1908,9 @@ public final class MultivariateGCD {
             MultivariatePolynomial<UnivariatePolynomialZp64> baseMod;
             try {
                 baseMod = PolynomialGCD(aMod, bMod).monic();
-            } catch (Throwable t) { continue; } // bad prime
+            } catch (Throwable t) {
+                continue;
+            } // bad prime
 
             // accumulator to update coefficients via Chineese remainding
             MultivariatePolynomial<UnivariatePolynomial<BigInteger>> base = baseMod
@@ -1933,7 +1943,9 @@ public final class MultivariateGCD {
                 MultivariatePolynomial<UnivariatePolynomialZp64> modularGCD;
                 try {
                     modularGCD = interpolateGCD(aMod, bMod, baseMod.mapCoefficients(numberFieldMod, cf -> cf.setModulusUnsafe(prime)), random);
-                } catch (Throwable t) {continue;} // unlucky prime
+                } catch (Throwable t) {
+                    continue;
+                } // unlucky prime
 
                 if (modularGCD == null) {
                     // interpolation failed => assumed form is wrong => start over
@@ -2057,7 +2069,12 @@ public final class MultivariateGCD {
                                 MultivariateGCD::ZippelGCDAssociateInNumberFieldViaLangemyrMcCallum0)));
     }
 
-    /** Computes some GCD associate via Langemyr & McCallum modular algorithm over algebraic integers */
+
+    /* ======================== Multivariate GCD over finite fields with small cardinality ========================== */
+
+    /**
+     * Computes some GCD associate via Langemyr & McCallum modular algorithm over algebraic integers
+     */
     @SuppressWarnings("ConstantConditions")
     private static MultivariatePolynomial<UnivariatePolynomial<BigInteger>>
     PolynomialGCDAssociateInNumberFieldViaLangemyrMcCallum(
@@ -2148,7 +2165,9 @@ public final class MultivariateGCD {
             MultivariatePolynomial<UnivariatePolynomialZp64> baseMod;
             try {
                 baseMod = PolynomialGCD(aMod, bMod).monic();
-            } catch (Throwable t) { continue;} // bad prime
+            } catch (Throwable t) {
+                continue;
+            } // bad prime
 
             // correction
             baseMod.monic(numberFieldMod.valueOf(correctionFactor.mod(basePrime).longValueExact()));
@@ -2181,7 +2200,9 @@ public final class MultivariateGCD {
                 MultivariatePolynomial<UnivariatePolynomialZp64> modularGCD;
                 try {
                     modularGCD = interpolateGCD(aMod, bMod, baseMod.mapCoefficients(numberFieldMod, cf -> cf.setModulusUnsafe(prime)), random);
-                } catch (Throwable t) {continue;} // unlucky prime
+                } catch (Throwable t) {
+                    continue;
+                } // unlucky prime
 
                 if (modularGCD == null) {
                     // interpolation failed => assumed form is wrong => start over
@@ -2335,7 +2356,9 @@ public final class MultivariateGCD {
             MultivariatePolynomial<UnivariatePolynomialZp64> modularGCD;
             try {
                 modularGCD = modularAlgorithm.apply(aMod, bMod);
-            } catch (Throwable t) {continue;} // unlucky prime
+            } catch (Throwable t) {
+                continue;
+            } // unlucky prime
 
             if (modularGCD == null) {
                 // interpolation failed => assumed form is wrong => start over
@@ -2510,7 +2533,9 @@ public final class MultivariateGCD {
             MultivariatePolynomial<UnivariatePolynomialZp64> modularGCD;
             try {
                 modularGCD = modularAlgorithm.apply(aMod, bMod).monic();
-            } catch (Throwable t) {continue;} // unlucky prime
+            } catch (Throwable t) {
+                continue;
+            } // unlucky prime
 
             if (modularGCD == null) {
                 // interpolation failed => assumed form is wrong => start over
@@ -2587,10 +2612,6 @@ public final class MultivariateGCD {
         }
     }
 
-
-    /* ======================== Multivariate GCD over finite fields with small cardinality ========================== */
-
-
     /**
      * Modular GCD algorithm for polynomials over finite fields of small cardinality.
      *
@@ -2617,10 +2638,6 @@ public final class MultivariateGCD {
             MultivariatePolynomial<E> a,
             MultivariatePolynomial<E> b) {
         return KaltofenMonaganModularGCDInGF(a, b, MultivariateGCD::KaltofenMonaganEEZModularGCDInGF0);
-    }
-
-    private interface KaltofenMonaganAlgorithm<uPoly extends IUnivariatePolynomial<uPoly>> {
-        MultivariatePolynomial<uPoly> apply(MultivariatePolynomial<uPoly> a, MultivariatePolynomial<uPoly> b, int uDegreeBound, int finiteExtensionDegree);
     }
 
     /**
@@ -2817,6 +2834,8 @@ public final class MultivariateGCD {
         return lKaltofenMonaganModularGCDInGF(gcdInput, MultivariateGCD::KaltofenMonaganSparseModularGCDInGF0);
     }
 
+    /* ===================================== Multivariate GCD over finite fields ==================================== */
+
     private static MultivariatePolynomialZp64 lKaltofenMonaganModularGCDInGF(
             GCDInput<MonomialZp64, MultivariatePolynomialZp64> gcdInput,
             KaltofenMonaganAlgorithm<UnivariatePolynomialZp64> algorithm) {
@@ -2852,8 +2871,6 @@ public final class MultivariateGCD {
         }
         throw new RuntimeException("\na: " + a + "\nb: " + b);
     }
-
-    private static final int MAX_OVER_ITERATIONS = 18;
 
     static <uPoly extends IUnivariatePolynomial<uPoly>>
     MultivariatePolynomial<uPoly> KaltofenMonaganSparseModularGCDInGF0(
@@ -3104,20 +3121,6 @@ public final class MultivariateGCD {
         }
     }
 
-    private static final class IrreduciblePolynomialsIterator<uPoly extends IUnivariatePolynomial<uPoly>> {
-        final uPoly factory;
-        int degree;
-
-        IrreduciblePolynomialsIterator(uPoly factory, int degree) {
-            this.factory = factory;
-            this.degree = degree;
-        }
-
-        uPoly next() {
-            return IrreduciblePolynomials.randomIrreduciblePolynomial(factory, degree++, PrivateRandom.getRandom());
-        }
-    }
-
     static <E> MultivariatePolynomial<E> interpolateGCD(MultivariatePolynomial<E> a, MultivariatePolynomial<E> b, MultivariatePolynomial<E> skeleton, RandomGenerator rnd) {
         a.assertSameCoefficientRingWith(b);
         a.assertSameCoefficientRingWith(skeleton);
@@ -3139,8 +3142,6 @@ public final class MultivariateGCD {
 
         return gcd;//.multiply(content);
     }
-
-    /* ===================================== Multivariate GCD over finite fields ==================================== */
 
     /**
      * Calculates GCD of two multivariate polynomials over Zp using Brown's algorithm with dense interpolation.
@@ -3307,7 +3308,9 @@ public final class MultivariateGCD {
         }
     }
 
-    /** division test **/
+    /**
+     * division test
+     **/
     private static <E> MultivariatePolynomial<E> doDivisionCheck(
             MultivariatePolynomial<E> a, MultivariatePolynomial<E> b,
             UnivariatePolynomial<E> contentGCD, MultivariateInterpolation.Interpolation<E> interpolation, int variable) {
@@ -3324,10 +3327,9 @@ public final class MultivariateGCD {
         return interpolated.multiply(poly);
     }
 
-    // when to use fast division check
-    private static final int LARGE_SIZE_USE_FAST_DIV_TEST = 64_000;
-
-    /** test whether gcd divide a and b **/
+    /**
+     * test whether gcd divide a and b
+     **/
     private static <E> boolean isGCDTriplet(MultivariatePolynomial<E> a, MultivariatePolynomial<E> b, MultivariatePolynomial<E> gcd) {
         if (Math.max(a.size(), b.size()) > LARGE_SIZE_USE_FAST_DIV_TEST) {
             Ring<E> ring = a.ring;
@@ -3350,7 +3352,9 @@ public final class MultivariateGCD {
         return MultivariateDivision.dividesQ(a, gcd) && MultivariateDivision.dividesQ(b, gcd);
     }
 
-    /** substitute all variables except last one **/
+    /**
+     * substitute all variables except last one
+     **/
     private static <E> UnivariatePolynomial<E> subsToUnivariate(MultivariatePolynomial<E> a, MultivariatePolynomial.PrecomputedPowersHolder<E> powers) {
         E[] aUni = a.ring.createZeroesArray(a.degree(a.nVariables - 1) + 1);
         for (Monomial<E> t : a) {
@@ -3405,11 +3409,6 @@ public final class MultivariateGCD {
         result = result.multiply(content);
         return gcdInput.restoreGCD(result);
     }
-
-    /** Maximal number of fails before switch to a new homomorphism */
-    private static final int MAX_SPARSE_INTERPOLATION_FAILS = 64;
-    /** Maximal number of sparse interpolations after interpolation.numberOfPoints() > degreeBounds[variable] */
-    private static final int ALLOWED_OVER_INTERPOLATED_ATTEMPTS = 64;
 
     @SuppressWarnings("unchecked")
     private static <E> MultivariatePolynomial<E> ZippelGCD(
@@ -3571,10 +3570,6 @@ public final class MultivariateGCD {
         }
     }
 
-    static boolean ALWAYS_LINZIP = false;
-    /** maximal number of attempts to choose a good evaluation point for sparse interpolation */
-    static final int MAX_FAILED_SUBSTITUTIONS = 32;
-
     static <E> SparseInterpolation<E> createInterpolation(int variable,
                                                           MultivariatePolynomial<E> a,
                                                           MultivariatePolynomial<E> b,
@@ -3655,7 +3650,6 @@ public final class MultivariateGCD {
         return new MultivariatePolynomial.PrecomputedPowersHolder<>(a.ring, pp);
     }
 
-
     /**
      * view multivariate polynomial as a univariate in Zp[x_1, ... x_N][x_0] and return the map (x_0)^exponent ->
      * coefficient in Zp[x_1, ... x_N]
@@ -3674,123 +3668,6 @@ public final class MultivariateGCD {
         return skeleton;
     }
 
-    interface SparseInterpolation<E> {
-        /**
-         * Returns interpolating gcd
-         *
-         * @return gcd
-         */
-        MultivariatePolynomial<E> evaluate();
-
-        /**
-         * Returns interpolating gcd at specified point
-         *
-         * @param newPoint evaluation point
-         * @return gcd at {@code variable = newPoint}
-         */
-        MultivariatePolynomial<E> evaluate(E newPoint);
-    }
-
-    static final class TrivialSparseInterpolation<E> implements SparseInterpolation<E> {
-        final MultivariatePolynomial<E> val;
-
-        TrivialSparseInterpolation(MultivariatePolynomial<E> val) {
-            this.val = val;
-        }
-
-        @Override
-        public MultivariatePolynomial<E> evaluate() {
-            return val;
-        }
-
-        @Override
-        public MultivariatePolynomial<E> evaluate(E newPoint) {
-            return val;
-        }
-    }
-
-    static abstract class ASparseInterpolation<E> implements SparseInterpolation<E> {
-        /** the ring */
-        final Ring<E> ring;
-        /** variable which we are evaluating */
-        final int variable;
-        /** initial polynomials */
-        final MultivariatePolynomial<E> a, b;
-        /** global skeleton of the result */
-        final Set<DegreeVector> globalSkeleton;
-        /** skeleton of each of the coefficients of polynomial viewed as Zp[x_1,...,x_N][x_0] */
-        final TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton;
-        /** univariate degrees of {@code univarSkeleton} with respect to x_0 */
-        final int[] sparseUnivarDegrees;
-        /**
-         * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
-         * variable] }
-         */
-        final int[] evaluationVariables;
-        /**
-         * values that will be subsituted for {@code evaluationVariables}; values {@code V} for variables {@code [1, 2
-         * ... variable-1]} are fixed and successive powers {@code V, V^2, V^3 ...} will be used to form Vandermonde
-         * matrix
-         */
-        final E[] evaluationPoint;
-        /** cached powers for {@code evaluationPoint} */
-        final MultivariatePolynomial.PrecomputedPowersHolder<E> powers;
-        /** Efficient structures for evaluating polynomials for interpolation */
-        final ZippelEvaluations<E> aEvals, bEvals;
-        /** random */
-        final RandomGenerator rnd;
-
-        ASparseInterpolation(Ring<E> ring, int variable,
-                             MultivariatePolynomial<E> a, MultivariatePolynomial<E> b,
-                             Set<DegreeVector> globalSkeleton,
-                             TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton,
-                             int[] sparseUnivarDegrees, int[] evaluationVariables,
-                             E[] evaluationPoint,
-                             MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int expectedNumberOfEvaluations, RandomGenerator rnd) {
-            this.ring = ring;
-            this.variable = variable;
-            this.a = a;
-            this.b = b;
-            this.globalSkeleton = globalSkeleton;
-            this.univarSkeleton = univarSkeleton;
-            this.sparseUnivarDegrees = sparseUnivarDegrees;
-            this.evaluationVariables = evaluationVariables;
-            this.evaluationPoint = evaluationPoint;
-            this.aEvals = createEvaluations(a, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations);
-            this.bEvals = createEvaluations(b, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations);
-            this.powers = powers;
-            this.rnd = rnd;
-        }
-
-        @Override
-        public final MultivariatePolynomial<E> evaluate() {
-            return evaluate(evaluationPoint[evaluationPoint.length - 1]);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public final MultivariatePolynomial<E> evaluate(E newPoint) {
-            // constant is constant
-            if (globalSkeleton.size() == 1)
-                return a.create(((Monomial<E>) globalSkeleton.iterator().next()).setCoefficient(ring.getOne()));
-            // variable = newPoint
-            evaluationPoint[evaluationPoint.length - 1] = newPoint;
-            powers.set(evaluationVariables[evaluationVariables.length - 1], newPoint);
-            return evaluate0(newPoint);
-        }
-
-        abstract MultivariatePolynomial<E> evaluate0(E newPoint);
-    }
-
-    /**
-     * switch to sparse recursive form for repeated evaluations if expected number of evaluations is sufficiently large
-     */
-    private static final int N_EVALUATIONS_RECURSIVE_SWITCH = 16;
-    /**
-     * switch to sparse recursive form for repeated evaluations only for quite large polynomials
-     */
-    private static final int SIZE_OF_POLY_RECURSIVE_SWITCH = 512;
-
     static <E> ZippelEvaluations<E> createEvaluations(MultivariatePolynomial<E> poly,
                                                       int[] evaluationVariables,
                                                       E[] evaluationPoint,
@@ -3801,254 +3678,6 @@ public final class MultivariateGCD {
             return new FastSparseRecursiveEvaluations<>(poly, evaluationPoint, evaluationVariables[evaluationVariables.length - 1]);
         else
             return new PlainEvaluations<>(poly, evaluationVariables, evaluationPoint, basePowers);
-    }
-
-    /** efficient data structure for repeated evaluations in Zippel method */
-    interface ZippelEvaluations<E> {
-        /** evaluate underlying polynomial */
-        UnivariatePolynomial<E> evaluate(int raiseFactor, E value);
-    }
-
-    /** evaluation with plain MultivariatePolynomial#evaluate method (with minor enhancements) */
-    private static final class PlainEvaluations<E> implements ZippelEvaluations<E> {
-        /** initial poly */
-        private final MultivariatePolynomial<E> poly;
-        /**
-         * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
-         * variable] }
-         */
-        private final int[] evaluationVariables;
-        /** evaluation point */
-        private final E[] evaluationPoint;
-        /** base powers (raiseFactor == 1) */
-        private final MultivariatePolynomial.PrecomputedPowersHolder<E> basePowers;
-        /** cache */
-        private final TIntObjectHashMap<MultivariatePolynomial.PrecomputedPowersHolder<E>> powersCache
-                = new TIntObjectHashMap<>();
-
-        PlainEvaluations(MultivariatePolynomial<E> poly,
-                         int[] evaluationVariables,
-                         E[] evaluationPoint,
-                         MultivariatePolynomial.PrecomputedPowersHolder<E> basePowers) {
-            this.poly = poly;
-            this.evaluationVariables = evaluationVariables;
-            this.evaluationPoint = evaluationPoint;
-            this.basePowers = basePowers.clone();
-            this.powersCache.put(1, this.basePowers);
-        }
-
-        @Override
-        public UnivariatePolynomial<E> evaluate(int raiseFactor, E value) {
-            basePowers.set(evaluationVariables[evaluationVariables.length - 1], value);
-
-            MultivariatePolynomial.PrecomputedPowersHolder<E> powers = powersCache.get(raiseFactor);
-            Ring<E> ring = poly.ring;
-            if (powers == null) {
-                powers = basePowers.clone();
-                for (int i = 0; i < (evaluationVariables.length - 1); ++i)
-                    powers.set(evaluationVariables[i], ring.pow(evaluationPoint[i], raiseFactor));
-                powersCache.put(raiseFactor, powers);
-            }
-            powers.set(evaluationVariables[evaluationVariables.length - 1], value);
-
-            E[] result = ring.createZeroesArray(poly.degree(0) + 1);
-            for (Monomial<E> el : poly) {
-                E ucf = el.coefficient;
-                for (int variable : evaluationVariables)
-                    ucf = ring.multiply(ucf, powers.pow(variable, el.exponents[variable]));
-                int uDeg = el.exponents[0];
-                result[uDeg] = ring.add(result[uDeg], ucf);
-            }
-
-            return UnivariatePolynomial.create(ring, result);
-        }
-    }
-
-    /** special data structure for fast evaluation of polynomials in Zippel method */
-    private static final class FastSparseRecursiveEvaluations<E> implements ZippelEvaluations<E> {
-        /** initial poly */
-        private final MultivariatePolynomial<E> poly;
-        /** evaluation point */
-        private final E[] evaluationPoint;
-        /** last variable (that will be actually evaluated with different values) */
-        private final int variable;
-
-        FastSparseRecursiveEvaluations(MultivariatePolynomial<E> poly, E[] evaluationPoint, int variable) {
-            this.poly = poly;
-            this.variable = variable;
-            this.evaluationPoint = evaluationPoint;
-        }
-
-        /** cache of bivariate polynomials for different raise factors */
-        private final TIntObjectHashMap<MultivariatePolynomial<MultivariatePolynomial<E>>> bivariateCache
-                = new TIntObjectHashMap<>();
-
-        /**
-         * returns a sparse recursive form of initial poly with all but first and last variables evaluated with given
-         * raise factor (that is poly in R[xN][x0])
-         */
-        @SuppressWarnings("unchecked")
-        MultivariatePolynomial<MultivariatePolynomial<E>> getSparseRecursiveForm(int raiseFactor) {
-            MultivariatePolynomial<MultivariatePolynomial<E>> recForm = bivariateCache.get(raiseFactor);
-            if (recForm == null) {
-                MultivariatePolynomial<E> bivariate;
-                if (variable == 1)
-                    bivariate = poly;
-                else {
-                    // values for all variables except first and last
-                    E[] values = poly.ring.createArray(variable - 1);
-                    for (int i = 0; i < values.length; ++i)
-                        values[i] = poly.ring.pow(evaluationPoint[i], raiseFactor);
-
-                    // substitute all that variables to obtain bivariate poly R[x0, xN]
-                    bivariate = poly.evaluate(ArraysUtil.sequence(1, variable), values);
-                }
-                if (bivariate.nVariables > 2)
-                    bivariate = bivariate.dropSelectVariables(0, variable);
-                // swap variables to R[xN, x0]
-                bivariate = AMultivariatePolynomial.swapVariables(bivariate, 0, 1);
-                // convert to sparse recursive form R[xN][x0]
-                recForm = (MultivariatePolynomial<MultivariatePolynomial<E>>) bivariate.toSparseRecursiveForm();
-                bivariateCache.put(raiseFactor, recForm);
-            }
-            return recForm;
-        }
-
-        /**
-         * Evaluate initial poly with a given raise factor for all but first and last variable and with a given value
-         * for the last variable
-         */
-        @Override
-        @SuppressWarnings("unchecked")
-        public UnivariatePolynomial<E> evaluate(int raiseFactor, E value) {
-            // get sparse recursive form for fast evaluation
-            MultivariatePolynomial<MultivariatePolynomial<E>> recForm = getSparseRecursiveForm(raiseFactor);
-            // resulting univariate data
-            E[] data = poly.ring.createZeroesArray(recForm.degree() + 1);
-
-            int cacheSize = 128;//recForm.stream().mapToInt(p -> p.degree()).max().orElse(1);
-            // cached exponents for value^i
-            MultivariatePolynomial.PrecomputedPowersHolder<E> ph =
-                    new MultivariatePolynomial.PrecomputedPowersHolder<E>(poly.ring,
-                            new MultivariatePolynomial.PrecomputedPowers[]{new MultivariatePolynomial.PrecomputedPowers<>(cacheSize, value, poly.ring)});
-            for (Monomial<MultivariatePolynomial<E>> r : recForm)
-                // fast Horner-like evaluation of sparse univariate polynomials
-                data[r.totalDegree] = MultivariatePolynomial.evaluateSparseRecursiveForm(r.coefficient, ph, 0);
-
-            return UnivariatePolynomial.create(poly.ring, data);
-        }
-    }
-
-    /** Number of retries when raise condition occurs; then drop up with new homomorphism */
-    private static final int
-            SMALL_FIELD_BIT_LENGTH = 13,
-            NUMBER_OF_UNDER_DETERMINED_RETRIES = 8,
-            NUMBER_OF_UNDER_DETERMINED_RETRIES_SMALL_FIELD = 24;
-
-    static final class LinZipInterpolation<E> extends ASparseInterpolation<E> {
-        LinZipInterpolation(Ring<E> ring, int variable, MultivariatePolynomial<E> a, MultivariatePolynomial<E> b,
-                            Set<DegreeVector> globalSkeleton, TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton,
-                            int[] sparseUnivarDegrees, int[] evaluationVariables, E[] evaluationPoint,
-                            MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int expectedNumberOfEvaluations,
-                            RandomGenerator rnd) {
-            super(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees, evaluationVariables,
-                    evaluationPoint, powers, expectedNumberOfEvaluations, rnd);
-        }
-
-        @Override
-        public MultivariatePolynomial<E> evaluate0(E newPoint) {
-            @SuppressWarnings("unchecked")
-            LinZipSystem<E>[] systems = new LinZipSystem[sparseUnivarDegrees.length];
-            for (int i = 0; i < sparseUnivarDegrees.length; i++)
-                systems[i] = new LinZipSystem<>(sparseUnivarDegrees[i], univarSkeleton.get(sparseUnivarDegrees[i]), powers, variable == -1 ? a.nVariables - 1 : variable - 1);
-
-
-            int nUnknowns = globalSkeleton.size(), nUnknownScalings = -1;
-            int raiseFactor = 0;
-
-            // number of retries before meet raise condition
-            int nUnderDeterminedRetries = ring.characteristic().bitLength() <= SMALL_FIELD_BIT_LENGTH
-                    ? NUMBER_OF_UNDER_DETERMINED_RETRIES_SMALL_FIELD
-                    : NUMBER_OF_UNDER_DETERMINED_RETRIES;
-
-            int previousFreeVars = -1, underDeterminedTries = 0;
-            boolean lastChanceUsed = false;
-            for (int iTry = 0; ; ++iTry) {
-                if (iTry == nUnderDeterminedRetries) {
-                    if (lastChanceUsed)
-                        // allow this trick only once, then break
-                        break;
-                    else {
-                        // give the last chance
-                        lastChanceUsed = true;
-                        nUnderDeterminedRetries += nUnderDeterminedLinZip(a, systems, nUnknownScalings);
-                    }
-                }
-
-                for (; ; ) {
-                    // increment at each loop!
-                    ++nUnknownScalings;
-                    // sequential powers of evaluation point
-                    ++raiseFactor;
-
-                    E lastVarValue = newPoint;
-                    if (variable == -1)
-                        lastVarValue = ring.pow(lastVarValue, raiseFactor);
-
-                    // evaluate a and b to univariate and calculate gcd
-                    UnivariatePolynomial<E>
-                            aUnivar = aEvals.evaluate(raiseFactor, lastVarValue),
-                            bUnivar = bEvals.evaluate(raiseFactor, lastVarValue),
-                            gcdUnivar = UnivariateGCD.PolynomialGCD(aUnivar, bUnivar);
-
-                    if (a.degree(0) != aUnivar.degree() || b.degree(0) != bUnivar.degree())
-                        // unlucky main homomorphism or bad evaluation point
-                        return null;
-
-                    assert gcdUnivar.isMonic();
-                    if (!univarSkeleton.keySet().containsAll(gcdUnivar.exponents()))
-                        // univariate gcd contains terms that are not present in the skeleton
-                        // again unlucky main homomorphism
-                        return null;
-
-                    int totalEquations = 0;
-                    for (LinZipSystem<E> system : systems) {
-                        E rhs = gcdUnivar.degree() < system.univarDegree ? ring.getZero() : gcdUnivar.get(system.univarDegree);
-                        system.oneMoreEquation(rhs, nUnknownScalings != 0);
-                        totalEquations += system.nEquations();
-                    }
-
-                    if (nUnknowns + nUnknownScalings <= totalEquations)
-                        break;
-
-                    if (underDeterminedTries > nUnderDeterminedRetries)
-                        // raise condition: new equations does not fix enough variables
-                        return null;
-
-                    int freeVars = nUnknowns + nUnknownScalings - totalEquations;
-                    if (freeVars >= previousFreeVars)
-                        ++underDeterminedTries;
-                    else
-                        underDeterminedTries = 0;
-
-                    previousFreeVars = freeVars;
-                }
-
-                MultivariatePolynomial<E> result = a.createZero();
-                LinearSolver.SystemInfo info = solveLinZip(a, systems, nUnknownScalings, result);
-                if (info == LinearSolver.SystemInfo.UnderDetermined)
-                    //try to generate more equations
-                    continue;
-                if (info == LinearSolver.SystemInfo.Consistent)
-                    //well done
-                    return result;
-                if (info == LinearSolver.SystemInfo.Inconsistent)
-                    //inconsistent system => unlucky homomorphism
-                    return null;
-            }
-            // still under determined
-            return null;
-        }
     }
 
     private static <E> int nUnderDeterminedLinZip(MultivariatePolynomial<E> factory, LinZipSystem<E>[] subSystems, int nUnknownScalings) {
@@ -4117,222 +3746,6 @@ public final class MultivariateGCD {
         return info;
     }
 
-
-    static final class MonicInterpolation<E> extends ASparseInterpolation<E> {
-        /** required number of sparse evaluations to reconstruct all coefficients in skeleton */
-        final int requiredNumberOfEvaluations;
-        /** univar exponent with monomial factor that can be used for scaling */
-        final int monicScalingExponent;
-
-        MonicInterpolation(Ring<E> ring, int variable, MultivariatePolynomial<E> a, MultivariatePolynomial<E> b,
-                           Set<DegreeVector> globalSkeleton, TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton,
-                           int[] sparseUnivarDegrees, int[] evaluationVariables, E[] evaluationPoint,
-                           MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int expectedNumberOfEvaluations,
-                           RandomGenerator rnd, int requiredNumberOfEvaluations, int monicScalingExponent) {
-            super(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees, evaluationVariables,
-                    evaluationPoint, powers, expectedNumberOfEvaluations, rnd);
-            this.requiredNumberOfEvaluations = requiredNumberOfEvaluations;
-            this.monicScalingExponent = monicScalingExponent;
-        }
-
-        @Override
-        public MultivariatePolynomial<E> evaluate0(E newPoint) {
-            @SuppressWarnings("unchecked")
-            VandermondeSystem<E>[] systems = new VandermondeSystem[sparseUnivarDegrees.length];
-            for (int i = 0; i < sparseUnivarDegrees.length; i++)
-                systems[i] = new VandermondeSystem<>(sparseUnivarDegrees[i], univarSkeleton.get(sparseUnivarDegrees[i]), powers, variable == -1 ? a.nVariables - 1 : variable - 1);
-
-            for (int i = 0; i < requiredNumberOfEvaluations; ++i) {
-                // sequential powers of evaluation point
-                int raiseFactor = i + 1;
-
-                E lastVarValue = newPoint;
-                if (variable == -1)
-                    lastVarValue = ring.pow(lastVarValue, raiseFactor);
-
-                // evaluate a and b to univariate and calculate gcd
-                UnivariatePolynomial<E>
-                        aUnivar = aEvals.evaluate(raiseFactor, lastVarValue),
-                        bUnivar = bEvals.evaluate(raiseFactor, lastVarValue),
-                        gcdUnivar = UnivariateGCD.PolynomialGCD(aUnivar, bUnivar);
-
-                if (a.degree(0) != aUnivar.degree() || b.degree(0) != bUnivar.degree())
-                    // unlucky main homomorphism or bad evaluation point
-                    return null;
-
-                assert gcdUnivar.isMonic();
-                if (!univarSkeleton.keySet().containsAll(gcdUnivar.exponents()))
-                    // univariate gcd contains terms that are not present in the skeleton
-                    // again unlucky main homomorphism
-                    return null;
-
-                if (monicScalingExponent != -1) {
-                    // single scaling factor
-                    // scale the system according to it
-
-                    if (gcdUnivar.degree() < monicScalingExponent || ring.isZero(gcdUnivar.get(monicScalingExponent)))
-                        // unlucky homomorphism
-                        return null;
-
-                    E normalization = evaluateExceptFirst(ring, powers, ring.getOne(), univarSkeleton.get(monicScalingExponent).lt(), i + 1, variable == -1 ? a.nVariables - 1 : variable - 1);
-                    //normalize univariate gcd in order to reconstruct leading coefficient polynomial
-                    normalization = ring.multiply(ring.reciprocal(gcdUnivar.get(monicScalingExponent)), normalization);
-                    gcdUnivar = gcdUnivar.multiply(normalization);
-                }
-
-                boolean allDone = true;
-                for (VandermondeSystem<E> system : systems)
-                    if (system.nEquations() < system.nUnknownVariables()) {
-                        E rhs = gcdUnivar.degree() < system.univarDegree ? ring.getZero() : gcdUnivar.get(system.univarDegree);
-                        system.oneMoreEquation(rhs);
-                        if (system.nEquations() < system.nUnknownVariables())
-                            allDone = false;
-                    }
-
-                if (allDone)
-                    break;
-            }
-
-            for (VandermondeSystem<E> system : systems) {
-                //solve each system
-                LinearSolver.SystemInfo info = system.solve();
-                if (info != LinearSolver.SystemInfo.Consistent)
-                    // system is inconsistent or under determined
-                    // unlucky homomorphism
-                    return null;
-            }
-
-            MultivariatePolynomial<E> gcdVal = a.createZero();
-            for (VandermondeSystem<E> system : systems) {
-                assert monicScalingExponent == -1 || system.univarDegree != monicScalingExponent || ring.isOne(system.solution[0]);
-                for (int i = 0; i < system.skeleton.length; i++) {
-                    Monomial<E> degreeVector = system.skeleton[i].set(0, system.univarDegree);
-                    E value = system.solution[i];
-                    gcdVal.add(degreeVector.setCoefficient(value));
-                }
-            }
-
-            return gcdVal;
-        }
-    }
-
-    private static abstract class LinearSystem<E> {
-        final int univarDegree;
-        /** the ring */
-        final Ring<E> ring;
-        /** the skeleton */
-        final Monomial<E>[] skeleton;
-        /** the lhs matrix */
-        final ArrayList<E[]> matrix;
-        /** the rhs values */
-        final ArrayList<E> rhs = new ArrayList<>();
-        /** precomputed powers */
-        final MultivariatePolynomial.PrecomputedPowersHolder<E> powers;
-        /** number of non-fixed variables, i.e. variables that will be substituted */
-        final int nVars;
-
-        @SuppressWarnings("unchecked")
-        LinearSystem(int univarDegree, MultivariatePolynomial<E> skeleton, MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int nVars) {
-            this.univarDegree = univarDegree;
-            this.ring = skeleton.ring;
-            //todo refactor generics
-            this.skeleton = skeleton.getSkeleton().toArray(new Monomial[skeleton.size()]);
-            this.powers = powers;
-            this.nVars = nVars;
-            this.matrix = new ArrayList<>();
-        }
-
-        final int nUnknownVariables() {
-            return skeleton.length;
-        }
-
-        final int nEquations() {
-            return matrix.size();
-        }
-
-        @Override
-        public String toString() {
-            return "{" + matrix.stream().map(Arrays::toString).collect(Collectors.joining(",")) + "} = " + rhs;
-        }
-    }
-
-    /** Vandermonde system builder */
-    private static final class LinZipSystem<E> extends LinearSystem<E> {
-        public LinZipSystem(int univarDegree, MultivariatePolynomial<E> skeleton, MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int nVars) {
-            super(univarDegree, skeleton, powers, nVars);
-        }
-
-        private final ArrayList<E> scalingMatrix = new ArrayList<>();
-
-        public void oneMoreEquation(E rhsVal, boolean newScalingIntroduced) {
-            E[] row = ring.createArray(skeleton.length);
-            for (int i = 0; i < skeleton.length; i++)
-                row[i] = evaluateExceptFirst(ring, powers, ring.getOne(), skeleton[i], matrix.size() + 1, nVars);
-            matrix.add(row);
-
-            if (newScalingIntroduced) {
-                scalingMatrix.add(ring.negate(rhsVal));
-                rhsVal = ring.getZero();
-            } else
-                scalingMatrix.add(ring.getZero());
-            rhs.add(rhsVal);
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < matrix.size(); i++) {
-                E[] row = matrix.get(i);
-                for (int j = 0; j < row.length; j++) {
-                    if (j != 0)
-                        sb.append("+");
-                    sb.append(row[j]).append("*c" + j);
-                }
-                if (i != 0)
-                    sb.append("+").append(scalingMatrix.get(i)).append("*m" + (i - 1));
-
-                sb.append("=").append(rhs.get(i)).append("\n");
-            }
-            return sb.toString();
-        }
-    }
-
-    /** Vandermonde system builder */
-    static final class VandermondeSystem<E> extends LinearSystem<E> {
-        public VandermondeSystem(int univarDegree, MultivariatePolynomial<E> skeleton, MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int nVars) {
-            super(univarDegree, skeleton, powers, nVars);
-        }
-
-        E[] solution = null;
-
-        LinearSolver.SystemInfo solve() {
-            if (solution == null)
-                solution = ring.createArray(nUnknownVariables());
-
-            if (nUnknownVariables() <= 8)
-                // for small systems Gaussian elimination is indeed faster
-                return LinearSolver.solve(ring, matrix.toArray(ring.createArray2d(matrix.size())), rhs.toArray(ring.createArray(rhs.size())), solution);
-
-            // solve vandermonde system
-            E[] vandermondeRow = matrix.get(0);
-            LinearSolver.SystemInfo info = LinearSolver.solveVandermondeT(ring, vandermondeRow, rhs.toArray(ring.createArray(rhs.size())), solution);
-            if (info == LinearSolver.SystemInfo.Consistent)
-                for (int i = 0; i < solution.length; ++i)
-                    solution[i] = ring.divideExact(solution[i], vandermondeRow[i]);
-
-            return info;
-        }
-
-        public VandermondeSystem<E> oneMoreEquation(E rhsVal) {
-            E[] row = ring.createArray(skeleton.length);
-            for (int i = 0; i < skeleton.length; i++)
-                row[i] = evaluateExceptFirst(ring, powers, ring.getOne(), skeleton[i], matrix.size() + 1, nVars);
-            matrix.add(row);
-            rhs.add(rhsVal);
-            return this;
-        }
-    }
-
     private static <E> E evaluateExceptFirst(Ring<E> ring,
                                              MultivariatePolynomial.PrecomputedPowersHolder<E> powers,
                                              E coefficient,
@@ -4354,9 +3767,6 @@ public final class MultivariateGCD {
         }
         return true;
     }
-
-
-    /* ================================================ Machine numbers ============================================= */
 
     /**
      * Calculates GCD of two multivariate polynomials over Zp using Brown's algorithm with dense interpolation.
@@ -4519,7 +3929,9 @@ public final class MultivariateGCD {
         }
     }
 
-    /** division test **/
+    /**
+     * division test
+     **/
     private static MultivariatePolynomialZp64 doDivisionCheck(
             MultivariatePolynomialZp64 a, MultivariatePolynomialZp64 b,
             UnivariatePolynomialZp64 contentGCD, MultivariateInterpolation.InterpolationZp64 interpolation, int variable) {
@@ -4538,7 +3950,9 @@ public final class MultivariateGCD {
         return interpolated.multiply(poly);
     }
 
-    /** test whether gcd divide a and b **/
+    /**
+     * test whether gcd divide a and b
+     **/
     private static boolean isGCDTriplet(MultivariatePolynomialZp64 a, MultivariatePolynomialZp64 b, MultivariatePolynomialZp64 gcd) {
         if (Math.max(a.size(), b.size()) > LARGE_SIZE_USE_FAST_DIV_TEST) {
             IntegersZp64 ring = a.ring;
@@ -4558,7 +3972,9 @@ public final class MultivariateGCD {
         return MultivariateDivision.dividesQ(a, gcd) && MultivariateDivision.dividesQ(b, gcd);
     }
 
-    /** substitute all variables except last one **/
+    /**
+     * substitute all variables except last one
+     **/
     private static UnivariatePolynomialZp64 subsToUnivariate(MultivariatePolynomialZp64 a, MultivariatePolynomialZp64.lPrecomputedPowersHolder powers) {
         long[] aUni = new long[a.degree(a.nVariables - 1) + 1];
         for (MonomialZp64 t : a) {
@@ -4569,7 +3985,6 @@ public final class MultivariateGCD {
         }
         return UnivariatePolynomialZp64.createUnsafe(a.ring, aUni);
     }
-
 
     /**
      * Calculates GCD of two multivariate polynomials over Zp using Zippel's algorithm with sparse interpolation.
@@ -4865,114 +4280,6 @@ public final class MultivariateGCD {
         return skeleton;
     }
 
-    interface lSparseInterpolation {
-        /**
-         * Returns interpolating gcd
-         *
-         * @return gcd
-         */
-        MultivariatePolynomialZp64 evaluate();
-
-        /**
-         * Returns interpolating gcd at specified point
-         *
-         * @param newPoint evaluation point
-         * @return gcd at {@code variable = newPoint}
-         */
-        MultivariatePolynomialZp64 evaluate(long newPoint);
-    }
-
-    static final class lTrivialSparseInterpolation implements lSparseInterpolation {
-        final MultivariatePolynomialZp64 val;
-
-        lTrivialSparseInterpolation(MultivariatePolynomialZp64 val) {
-            this.val = val;
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 evaluate() {
-            return val;
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 evaluate(long newPoint) {
-            return val;
-        }
-    }
-
-    static abstract class lASparseInterpolation implements lSparseInterpolation {
-        /** the ring */
-        final IntegersZp64 ring;
-        /** variable which we are evaluating */
-        final int variable;
-        /** initial polynomials */
-        final MultivariatePolynomialZp64 a, b;
-        /** global skeleton of the result */
-        final Set<DegreeVector> globalSkeleton;
-        /** skeleton of each of the coefficients of polynomial viewed as Zp[x_1,...,x_N][x_0] */
-        final TIntObjectHashMap<MultivariatePolynomialZp64> univarSkeleton;
-        /** univariate degrees of {@code univarSkeleton} with respect to x_0 */
-        final int[] sparseUnivarDegrees;
-        /**
-         * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
-         * variable] }
-         */
-        final int[] evaluationVariables;
-        /**
-         * values that will be subsituted for {@code evaluationVariables}; values {@code V} for variables {@code [1, 2
-         * ... variable-1]} are fixed and successive powers {@code V, V^2, V^3 ...} will be used to form Vandermonde
-         * matrix
-         */
-        final long[] evaluationPoint;
-        /** cached powers for {@code evaluationPoint} */
-        final MultivariatePolynomialZp64.lPrecomputedPowersHolder powers;
-        /** Efficient structures for evaluating polynomials for interpolation */
-        final ZippelEvaluationsZp64 aEvals, bEvals;
-        /** random */
-        final RandomGenerator rnd;
-
-        lASparseInterpolation(IntegersZp64 ring, int variable,
-                              MultivariatePolynomialZp64 a, MultivariatePolynomialZp64 b,
-                              Set<DegreeVector> globalSkeleton,
-                              TIntObjectHashMap<MultivariatePolynomialZp64> univarSkeleton,
-                              int[] sparseUnivarDegrees, int[] evaluationVariables,
-                              long[] evaluationPoint,
-                              MultivariatePolynomialZp64.lPrecomputedPowersHolder powers,
-                              int expectedNumberOfEvaluations, RandomGenerator rnd) {
-            this.ring = ring;
-            this.variable = variable;
-            this.a = a;
-            this.b = b;
-            this.globalSkeleton = globalSkeleton;
-            this.univarSkeleton = univarSkeleton;
-            this.sparseUnivarDegrees = sparseUnivarDegrees;
-            this.evaluationPoint = evaluationPoint;
-            this.aEvals = createEvaluations(a, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations);
-            this.bEvals = createEvaluations(b, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations);
-            this.evaluationVariables = evaluationVariables;
-            this.powers = powers;
-            this.rnd = rnd;
-        }
-
-        @Override
-        public final MultivariatePolynomialZp64 evaluate() {
-            return evaluate(evaluationPoint[evaluationPoint.length - 1]);
-        }
-
-        @Override
-        public final MultivariatePolynomialZp64 evaluate(long newPoint) {
-            // constant is constant
-            if (globalSkeleton.size() == 1)
-                return a.create(((MonomialZp64) globalSkeleton.iterator().next()).setCoefficient(1));
-            // variable = newPoint
-            evaluationPoint[evaluationPoint.length - 1] = newPoint;
-            powers.set(evaluationVariables[evaluationVariables.length - 1], newPoint);
-            return evaluate0(newPoint);
-        }
-
-        abstract MultivariatePolynomialZp64 evaluate0(long newPoint);
-    }
-
     static ZippelEvaluationsZp64 createEvaluations(MultivariatePolynomialZp64 poly,
                                                    int[] evaluationVariables,
                                                    long[] evaluationPoint,
@@ -4983,247 +4290,6 @@ public final class MultivariateGCD {
             return new FastSparseRecursiveEvaluationsZp64(poly, evaluationPoint, evaluationVariables[evaluationVariables.length - 1]);
         else
             return new PlainEvaluationsZp64(poly, evaluationVariables, evaluationPoint, basePowers);
-    }
-
-    /** efficient data structure for repeated evaluations in Zippel method */
-    interface ZippelEvaluationsZp64 {
-        /** evaluate underlying polynomial */
-        UnivariatePolynomialZp64 evaluate(int raiseFactor, long value);
-    }
-
-    /** evaluation with plain MultivariatePolynomial#evaluate method (with minor enhancements) */
-    static final class PlainEvaluationsZp64 implements ZippelEvaluationsZp64 {
-        /** initial poly */
-        private final MultivariatePolynomialZp64 poly;
-        /**
-         * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
-         * variable] }
-         */
-        private final int[] evaluationVariables;
-        /** evaluation point */
-        private final long[] evaluationPoint;
-        /** base powers (raiseFactor == 1) */
-        private final MultivariatePolynomialZp64.lPrecomputedPowersHolder basePowers;
-        /** cache */
-        private final TIntObjectHashMap<MultivariatePolynomialZp64.lPrecomputedPowersHolder> powersCache
-                = new TIntObjectHashMap<>();
-
-        PlainEvaluationsZp64(MultivariatePolynomialZp64 poly,
-                             int[] evaluationVariables,
-                             long[] evaluationPoint,
-                             MultivariatePolynomialZp64.lPrecomputedPowersHolder basePowers) {
-            this.poly = poly;
-            this.evaluationVariables = evaluationVariables;
-            this.evaluationPoint = evaluationPoint;
-            this.basePowers = basePowers.clone();
-            this.powersCache.put(1, this.basePowers);
-        }
-
-        @Override
-        public UnivariatePolynomialZp64 evaluate(int raiseFactor, long value) {
-            basePowers.set(evaluationVariables[evaluationVariables.length - 1], value);
-
-            MultivariatePolynomialZp64.lPrecomputedPowersHolder powers = powersCache.get(raiseFactor);
-            IntegersZp64 ring = poly.ring;
-            if (powers == null) {
-                powers = basePowers.clone();
-                for (int i = 0; i < (evaluationVariables.length - 1); ++i)
-                    powers.set(evaluationVariables[i], ring.powMod(evaluationPoint[i], raiseFactor));
-                powersCache.put(raiseFactor, powers);
-            }
-            powers.set(evaluationVariables[evaluationVariables.length - 1], value);
-
-            long[] result = new long[poly.degree(0) + 1];
-            for (MonomialZp64 el : poly) {
-                long ucf = el.coefficient;
-                for (int variable : evaluationVariables)
-                    ucf = ring.multiply(ucf, powers.pow(variable, el.exponents[variable]));
-                int uDeg = el.exponents[0];
-                result[uDeg] = ring.add(result[uDeg], ucf);
-            }
-
-            return UnivariatePolynomialZp64.create(ring, result);
-        }
-    }
-
-
-    /** fast evaluation of polynomials in Zippel method with the use of sparse recursive form and Horner scheme */
-    static final class FastSparseRecursiveEvaluationsZp64 implements ZippelEvaluationsZp64 {
-        /** initial poly */
-        private final MultivariatePolynomialZp64 poly;
-        /** evaluation point */
-        private final long[] evaluationPoint;
-        /** last variable (that will be actually evaluated with different values) */
-        private final int variable;
-
-        FastSparseRecursiveEvaluationsZp64(MultivariatePolynomialZp64 poly, long[] evaluationPoint, int variable) {
-            this.poly = poly;
-            this.variable = variable;
-            this.evaluationPoint = evaluationPoint;
-        }
-
-        /** cache of bivariate polynomials for different raise factors */
-        private final TIntObjectHashMap<MultivariatePolynomial<MultivariatePolynomialZp64>> bivariateCache
-                = new TIntObjectHashMap<>();
-
-        /**
-         * returns a sparse recursive form of initial poly with all but first and last variables evaluated with given
-         * raise factor (that is poly in R[xN][x0])
-         */
-        @SuppressWarnings("unchecked")
-        MultivariatePolynomial<MultivariatePolynomialZp64> getSparseRecursiveForm(int raiseFactor) {
-            MultivariatePolynomial<MultivariatePolynomialZp64> recForm = bivariateCache.get(raiseFactor);
-            if (recForm == null) {
-                MultivariatePolynomialZp64 bivariate;
-                if (variable == 1)
-                    bivariate = poly;
-                else {
-                    // values for all variables except first and last
-                    long[] values = new long[variable - 1];
-                    for (int i = 0; i < values.length; ++i)
-                        values[i] = poly.ring.powMod(evaluationPoint[i], raiseFactor);
-
-                    // substitute all that variables to obtain bivariate poly R[x0, xN]
-                    bivariate = poly.evaluate(ArraysUtil.sequence(1, variable), values);
-                }
-                if (bivariate.nVariables > 2)
-                    bivariate = bivariate.dropSelectVariables(0, variable);
-                // swap variables to R[xN, x0]
-                bivariate = AMultivariatePolynomial.swapVariables(bivariate, 0, 1);
-                // convert to sparse recursive form R[xN][x0]
-                recForm = (MultivariatePolynomial<MultivariatePolynomialZp64>) bivariate.toSparseRecursiveForm();
-                bivariateCache.put(raiseFactor, recForm);
-            }
-            return recForm;
-        }
-
-        /**
-         * Evaluate initial poly with a given raise factor for all but first and last variable and with a given value
-         * for the last variable
-         */
-        @Override
-        public UnivariatePolynomialZp64 evaluate(int raiseFactor, long value) {
-            // get sparse recursive form for fast evaluation
-            MultivariatePolynomial<MultivariatePolynomialZp64> recForm = getSparseRecursiveForm(raiseFactor);
-            // resulting univariate data
-            long[] data = new long[recForm.degree() + 1];
-
-            int cacheSize = 128;//recForm.stream().mapToInt(p -> p.degree()).max().orElse(1);
-            // cached exponents for value^i
-            MultivariatePolynomialZp64.lPrecomputedPowersHolder ph =
-                    new MultivariatePolynomialZp64.lPrecomputedPowersHolder(poly.ring,
-                            new MultivariatePolynomialZp64.lPrecomputedPowers[]{new MultivariatePolynomialZp64.lPrecomputedPowers(cacheSize, value, poly.ring)});
-            for (Monomial<MultivariatePolynomialZp64> r : recForm)
-                // fast Horner-like evaluation of sparse univariate polynomials
-                data[r.totalDegree] = MultivariatePolynomialZp64.evaluateSparseRecursiveForm(r.coefficient, ph, 0);
-
-            return UnivariatePolynomialZp64.create(poly.ring, data);
-        }
-    }
-
-    static final class lLinZipInterpolation extends lASparseInterpolation {
-        lLinZipInterpolation(IntegersZp64 ring, int variable, MultivariatePolynomialZp64 a,
-                             MultivariatePolynomialZp64 b, Set<DegreeVector> globalSkeleton,
-                             TIntObjectHashMap<MultivariatePolynomialZp64> univarSkeleton, int[] sparseUnivarDegrees,
-                             int[] evaluationVariables, long[] evaluationPoint, MultivariatePolynomialZp64.lPrecomputedPowersHolder powers,
-                             int expectedNumberOfEvaluations, RandomGenerator rnd) {
-            super(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations, rnd);
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 evaluate0(long newPoint) {
-            @SuppressWarnings("unchecked")
-            lLinZipSystem[] systems = new lLinZipSystem[sparseUnivarDegrees.length];
-            for (int i = 0; i < sparseUnivarDegrees.length; i++)
-                systems[i] = new lLinZipSystem(sparseUnivarDegrees[i], univarSkeleton.get(sparseUnivarDegrees[i]), powers, variable == -1 ? a.nVariables - 1 : variable - 1);
-
-            int nUnknowns = globalSkeleton.size(), nUnknownScalings = -1;
-            int raiseFactor = 0;
-
-            // number of retries before meet raise condition
-            int nUnderDeterminedRetries = ring.modulus <= (1 << SMALL_FIELD_BIT_LENGTH)
-                    ? NUMBER_OF_UNDER_DETERMINED_RETRIES_SMALL_FIELD
-                    : NUMBER_OF_UNDER_DETERMINED_RETRIES;
-
-            int previousFreeVars = -1, underDeterminedTries = 0;
-            boolean lastChanceUsed = false;
-            for (int iTry = 0; ; ++iTry) {
-                if (iTry == nUnderDeterminedRetries) {
-                    if (lastChanceUsed)
-                        // allow this trick only once, then break
-                        break;
-                    else {
-                        // give the last chance
-                        lastChanceUsed = true;
-                        nUnderDeterminedRetries += nUnderDeterminedLinZip(a, systems, nUnknownScalings);
-                    }
-                }
-
-                for (; ; ) {
-                    // increment at each loop!
-                    ++nUnknownScalings;
-                    // sequential powers of evaluation point
-                    ++raiseFactor;
-
-                    long lastVarValue = newPoint;
-                    if (variable == -1)
-                        lastVarValue = ring.powMod(lastVarValue, raiseFactor);
-
-                    // evaluate a and b to univariate and calculate gcd
-                    UnivariatePolynomialZp64
-                            aUnivar = aEvals.evaluate(raiseFactor, lastVarValue),
-                            bUnivar = bEvals.evaluate(raiseFactor, lastVarValue),
-                            gcdUnivar = UnivariateGCD.PolynomialGCD(aUnivar, bUnivar);
-
-                    if (a.degree(0) != aUnivar.degree() || b.degree(0) != bUnivar.degree())
-                        // unlucky main homomorphism or bad evaluation point
-                        return null;
-
-                    assert gcdUnivar.isMonic();
-                    if (!univarSkeleton.keySet().containsAll(gcdUnivar.exponents()))
-                        // univariate gcd contains terms that are not present in the skeleton
-                        // again unlucky main homomorphism
-                        return null;
-
-                    int totalEquations = 0;
-                    for (lLinZipSystem system : systems) {
-                        long rhs = gcdUnivar.degree() < system.univarDegree ? 0 : gcdUnivar.get(system.univarDegree);
-                        system.oneMoreEquation(rhs, nUnknownScalings != 0);
-                        totalEquations += system.nEquations();
-                    }
-
-                    if (nUnknowns + nUnknownScalings <= totalEquations)
-                        break;
-
-                    if (underDeterminedTries > nUnderDeterminedRetries) {
-                        // raise condition: new equations does not fix enough variables
-                        return null;
-                    }
-
-                    int freeVars = nUnknowns + nUnknownScalings - totalEquations;
-                    if (freeVars >= previousFreeVars)
-                        ++underDeterminedTries;
-                    else
-                        underDeterminedTries = 0;
-
-                    previousFreeVars = freeVars;
-                }
-
-                MultivariatePolynomialZp64 result = a.createZero();
-                LinearSolver.SystemInfo info = solveLinZip(a, systems, nUnknownScalings, result);
-                if (info == LinearSolver.SystemInfo.UnderDetermined)
-                    //try to generate more equations
-                    continue;
-                if (info == LinearSolver.SystemInfo.Consistent)
-                    //well done
-                    return result;
-                if (info == LinearSolver.SystemInfo.Inconsistent)
-                    //inconsistent system => unlucky homomorphism
-                    return null;
-            }
-            // still under determined
-            return null;
-        }
     }
 
     private static int nUnderDeterminedLinZip(MultivariatePolynomialZp64 factory,
@@ -5297,202 +4363,6 @@ public final class MultivariateGCD {
         return info;
     }
 
-    static final class lMonicInterpolation extends lASparseInterpolation {
-        /** required number of sparse evaluations to reconstruct all coefficients in skeleton */
-        final int requiredNumberOfEvaluations;
-        /** univar exponent with monomial factor that can be used for scaling */
-        final int monicScalingExponent;
-
-        lMonicInterpolation(IntegersZp64 ring, int variable, MultivariatePolynomialZp64 a, MultivariatePolynomialZp64 b,
-                            Set<DegreeVector> globalSkeleton, TIntObjectHashMap<MultivariatePolynomialZp64> univarSkeleton,
-                            int[] sparseUnivarDegrees, int[] evaluationVariables, long[] evaluationPoint,
-                            MultivariatePolynomialZp64.lPrecomputedPowersHolder powers, int expectedNumberOfEvaluations, RandomGenerator rnd, int requiredNumberOfEvaluations,
-                            int monicScalingExponent) {
-            super(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations, rnd);
-            this.requiredNumberOfEvaluations = requiredNumberOfEvaluations;
-            this.monicScalingExponent = monicScalingExponent;
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 evaluate0(long newPoint) {
-            @SuppressWarnings("unchecked")
-            lVandermondeSystem[] systems = new lVandermondeSystem[sparseUnivarDegrees.length];
-            for (int i = 0; i < sparseUnivarDegrees.length; i++)
-                systems[i] = new lVandermondeSystem(sparseUnivarDegrees[i], univarSkeleton.get(sparseUnivarDegrees[i]), powers, variable == -1 ? a.nVariables - 1 : variable - 1);
-
-            for (int i = 0; i < requiredNumberOfEvaluations; ++i) {
-                // sequential powers of evaluation point
-                int raiseFactor = i + 1;
-
-                long lastVarValue = newPoint;
-                if (variable == -1)
-                    lastVarValue = ring.powMod(lastVarValue, raiseFactor);
-
-                // evaluate a and b to univariate and calculate gcd
-                UnivariatePolynomialZp64
-                        aUnivar = aEvals.evaluate(raiseFactor, lastVarValue),
-                        bUnivar = bEvals.evaluate(raiseFactor, lastVarValue),
-                        gcdUnivar = UnivariateGCD.PolynomialGCD(aUnivar, bUnivar);
-
-                if (a.degree(0) != aUnivar.degree() || b.degree(0) != bUnivar.degree())
-                    // unlucky main homomorphism or bad evaluation point
-                    return null;
-
-                assert gcdUnivar.isMonic();
-                if (!univarSkeleton.keySet().containsAll(gcdUnivar.exponents()))
-                    // univariate gcd contains terms that are not present in the skeleton
-                    // again unlucky main homomorphism
-                    return null;
-
-                if (monicScalingExponent != -1) {
-                    // single scaling factor
-                    // scale the system according to it
-
-                    if (gcdUnivar.degree() < monicScalingExponent || gcdUnivar.get(monicScalingExponent) == 0)
-                        // unlucky homomorphism
-                        return null;
-
-                    long normalization = evaluateExceptFirst(ring, powers, 1, univarSkeleton.get(monicScalingExponent).lt(), i + 1, variable == -1 ? a.nVariables - 1 : variable - 1);
-                    //normalize univariate gcd in order to reconstruct leading coefficient polynomial
-                    normalization = ring.multiply(ring.reciprocal(gcdUnivar.get(monicScalingExponent)), normalization);
-                    gcdUnivar = gcdUnivar.multiply(normalization);
-                }
-
-                boolean allDone = true;
-                for (lVandermondeSystem system : systems)
-                    if (system.nEquations() < system.nUnknownVariables()) {
-                        long rhs = gcdUnivar.degree() < system.univarDegree ? 0 : gcdUnivar.get(system.univarDegree);
-                        system.oneMoreEquation(rhs);
-                        if (system.nEquations() < system.nUnknownVariables())
-                            allDone = false;
-                    }
-
-                if (allDone)
-                    break;
-            }
-
-            for (lVandermondeSystem system : systems) {
-                //solve each system
-                LinearSolver.SystemInfo info = system.solve();
-                if (info != LinearSolver.SystemInfo.Consistent)
-                    // system is inconsistent or under determined
-                    // unlucky homomorphism
-                    return null;
-            }
-
-            MultivariatePolynomialZp64 gcdVal = a.createZero();
-            for (lVandermondeSystem system : systems) {
-                assert monicScalingExponent == -1 || system.univarDegree != monicScalingExponent || system.solution[0] == 1;
-                for (int i = 0; i < system.skeleton.length; i++) {
-                    MonomialZp64 degreeVector = system.skeleton[i].set(0, system.univarDegree);
-                    long value = system.solution[i];
-                    gcdVal.add(degreeVector.setCoefficient(value));
-                }
-            }
-
-            return gcdVal;
-        }
-    }
-
-    static abstract class lLinearSystem {
-        final int univarDegree;
-        /** the ring */
-        final IntegersZp64 ring;
-        /** the skeleton */
-        final MonomialZp64[] skeleton;
-        /** the lhs matrix */
-        final ArrayList<long[]> matrix;
-        /** the rhs values */
-        final TLongArrayList rhs = new TLongArrayList();
-        /** precomputed powers */
-        final MultivariatePolynomialZp64.lPrecomputedPowersHolder powers;
-        /** number of non-fixed variables, i.e. variables that will be substituted */
-        final int nVars;
-
-        @SuppressWarnings("unchecked")
-        lLinearSystem(int univarDegree, MultivariatePolynomialZp64 skeleton, MultivariatePolynomialZp64.lPrecomputedPowersHolder powers, int nVars) {
-            this.univarDegree = univarDegree;
-            this.ring = skeleton.ring;
-            //todo refactor generics
-            this.skeleton = skeleton.getSkeleton().toArray(new MonomialZp64[skeleton.size()]);
-            this.powers = powers;
-            this.nVars = nVars;
-            this.matrix = new ArrayList<>();
-        }
-
-        final int nUnknownVariables() {
-            return skeleton.length;
-        }
-
-        final int nEquations() {
-            return matrix.size();
-        }
-
-        @Override
-        public String toString() {
-            return "{" + matrix.stream().map(Arrays::toString).collect(Collectors.joining(",")) + "} = " + rhs;
-        }
-    }
-
-    /** Vandermonde system builder */
-    static final class lLinZipSystem extends lLinearSystem {
-        public lLinZipSystem(int univarDegree, MultivariatePolynomialZp64 skeleton, MultivariatePolynomialZp64.lPrecomputedPowersHolder powers, int nVars) {
-            super(univarDegree, skeleton, powers, nVars);
-        }
-
-        private final TLongArrayList scalingMatrix = new TLongArrayList();
-
-        public void oneMoreEquation(long rhsVal, boolean newScalingIntroduced) {
-            long[] row = new long[skeleton.length];
-            for (int i = 0; i < skeleton.length; i++)
-                row[i] = evaluateExceptFirst(ring, powers, 1, skeleton[i], matrix.size() + 1, nVars);
-            matrix.add(row);
-
-            if (newScalingIntroduced) {
-                scalingMatrix.add(ring.negate(rhsVal));
-                rhsVal = 0;
-            } else
-                scalingMatrix.add(0);
-            rhs.add(rhsVal);
-        }
-    }
-
-    /** Vandermonde system builder */
-    static final class lVandermondeSystem extends lLinearSystem {
-        public lVandermondeSystem(int univarDegree, MultivariatePolynomialZp64 skeleton, MultivariatePolynomialZp64.lPrecomputedPowersHolder powers, int nVars) {
-            super(univarDegree, skeleton, powers, nVars);
-        }
-
-        long[] solution = null;
-
-        LinearSolver.SystemInfo solve() {
-            if (solution == null)
-                solution = new long[nUnknownVariables()];
-
-            if (nUnknownVariables() <= 8)
-                // for small systems Gaussian elimination is indeed faster
-                return LinearSolver.solve(ring, matrix.toArray(new long[matrix.size()][]), rhs.toArray(), solution);
-
-            // solve vandermonde system
-            long[] vandermondeRow = matrix.get(0);
-            LinearSolver.SystemInfo info = LinearSolver.solveVandermondeT(ring, vandermondeRow, rhs.toArray(), solution);
-            if (info == LinearSolver.SystemInfo.Consistent)
-                for (int i = 0; i < solution.length; ++i)
-                    solution[i] = ring.divide(solution[i], vandermondeRow[i]);
-
-            return info;
-        }
-
-        public lVandermondeSystem oneMoreEquation(long rhsVal) {
-            long[] row = new long[skeleton.length];
-            for (int i = 0; i < skeleton.length; i++)
-                row[i] = evaluateExceptFirst(ring, powers, 1, skeleton[i], matrix.size() + 1, nVars);
-            matrix.add(row);
-            rhs.add(rhsVal);
-            return this;
-        }
-    }
-
     private static long evaluateExceptFirst(IntegersZp64 ring,
                                             MultivariatePolynomialZp64.lPrecomputedPowersHolder powers,
                                             long coefficient,
@@ -5504,9 +4374,6 @@ public final class MultivariateGCD {
             tmp = ring.multiply(tmp, powers.pow(k, raiseFactor * skeleton.exponents[k]));
         return tmp;
     }
-
-    /* =============================================== EZ-GCD algorithm ============================================ */
-
 
     /**
      * Calculates GCD of two multivariate polynomials over Zp using EZ algorithm
@@ -5552,7 +4419,12 @@ public final class MultivariateGCD {
         return gcdInput.restoreGCD(result);
     }
 
-    /** actual EZ-GCD implementation */
+
+    /* ================================================ Machine numbers ============================================= */
+
+    /**
+     * actual EZ-GCD implementation
+     */
     private static MultivariatePolynomialZp64 EZGCD0(
             MultivariatePolynomialZp64 a, MultivariatePolynomialZp64 b, int nUsedVariables, RandomGenerator rnd) {
 
@@ -5742,7 +4614,9 @@ public final class MultivariateGCD {
         return result;
     }
 
-    /** list of available zero substitutions for poly */
+    /**
+     * list of available zero substitutions for poly
+     */
     static ZeroVariables possibleZeros(MultivariatePolynomialZp64 poly, int nVariables) {
         ZeroVariables result = new ZeroVariables(nVariables);
         if (poly.cc() != 0) {
@@ -5761,56 +4635,9 @@ public final class MultivariateGCD {
         return result;
     }
 
-    /** a list of variables that can be replaced with zeroes */
-    static final class ZeroVariables {
-        final List<BitSet> pZeros = new ArrayList<>();
-        final int nVariables;
-
-        public ZeroVariables(int nVariables) {
-            this.nVariables = nVariables;
-        }
-
-        int iMaxPossibleZeros = -1, maxPossibleZeros = -1;
-        boolean allZeroes = false;
-
-        void add(BitSet zeros) {
-            if (allZeroes)
-                return;
-            int nZeros = zeros.cardinality();
-            if (nVariables == nZeros) {
-                maxPossibleZeros = zeros.length();
-                iMaxPossibleZeros = 0;
-                allZeroes = true;
-                pZeros.clear();
-                pZeros.add(zeros);
-                return;
-            }
-            Iterator<BitSet> it = pZeros.iterator();
-            while (it.hasNext()) {
-                BitSet e = it.next();
-                if (contains(e, zeros))
-                    return;
-                if (contains(zeros, e))
-                    it.remove();
-            }
-            pZeros.add(zeros);
-            if (nZeros > maxPossibleZeros) {
-                maxPossibleZeros = nZeros;
-                iMaxPossibleZeros = pZeros.size() - 1;
-            }
-        }
-
-        BitSet maxZeros() {
-            return pZeros.isEmpty() ? new BitSet(nVariables) : pZeros.get(iMaxPossibleZeros);
-        }
-
-        @Override
-        public String toString() {
-            return pZeros.toString();
-        }
-    }
-
-    /** test whether major contains all elements of minor */
+    /**
+     * test whether major contains all elements of minor
+     */
     static boolean contains(BitSet major, BitSet minor) {
         if (major.equals(minor))
             return true;
@@ -5818,223 +4645,6 @@ public final class MultivariateGCD {
         tmp.and(minor);
         return tmp.equals(minor);
     }
-
-    private static final int
-            SAME_BASE_VARIABLE_ATTEMPTS = 8,
-            ATTEMPTS_WITH_MAX_ZEROS = 2;
-
-    static final class EZGCDEvaluations {
-        final MultivariatePolynomialZp64 a, b;
-        final RandomGenerator rnd;
-        // actual number of variables in use [0, ... nVariables] (may be less than a.nVariables)
-        final int nVariables;
-        // variables in which both cc and lc in a and b are non zeroes
-        final TIntArrayList perfectVariables = new TIntArrayList();
-
-        EZGCDEvaluations(MultivariatePolynomialZp64 a,
-                         MultivariatePolynomialZp64 b,
-                         int nVariables,
-                         RandomGenerator rnd) {
-            this.a = a;
-            this.b = b;
-            this.rnd = rnd;
-            this.nVariables = nVariables;
-
-            // search for main variables
-            for (int var = 0; var < nVariables; ++var) {
-                UnivariatePolynomialZp64 ub = b.evaluateAtZeroAllExcept(var);
-                if (ub.degree() == 0 || ub.cc() == 0 || ub.degree() != b.degree(var))
-                    continue;
-
-                UnivariatePolynomialZp64 ua = a.evaluateAtZeroAllExcept(var);
-                if (ua.degree() == 0 || ua.cc() == 0 || ua.degree() != a.degree(var))
-                    continue;
-
-                perfectVariables.add(var);
-            }
-        }
-
-        // modified a and b so that all except first variables
-        // may be evaluated to zero
-        MultivariatePolynomialZp64 aReduced, bReduced;
-
-        // pointers in perfectVariables list
-        int
-                currentPerfectVariable = -1,
-                nextPerfectVariable = 0;
-
-        int baseVariable = -1;
-        int[]
-                zeroVariables, // variables that may be replaced with zeros ( 0 <> baseVariable are swaped )
-                shiftingVariables; // variables that must be shifted before substituting zeros ( 0 <> baseVariable are swaped )
-        // shift values for shiftingVariables
-        long[] shifts;
-
-        // number of tries keeping as many zero variables as possible
-        int nAttemptsWithZeros = 0;
-        // variable that were used as main variables
-        final TIntHashSet usedBaseVariables = new TIntHashSet();
-        int nAttemptsWithSameBaseVariable = 0;
-
-        // returns whether the main variable was changed
-        boolean nextEvaluation() {
-            // first try to evaluate all but one variables to zeroes
-
-            if (nextPerfectVariable < perfectVariables.size()) {
-                // we have the main variable
-                currentPerfectVariable = perfectVariables.get(nextPerfectVariable);
-                ++nextPerfectVariable;
-
-                aReduced = AMultivariatePolynomial.swapVariables(a, 0, currentPerfectVariable);
-                bReduced = AMultivariatePolynomial.swapVariables(b, 0, currentPerfectVariable);
-                return true;
-            }
-
-            // no possible zero substitutions more
-            // => shift some variables and try to
-            // minimize intermediate expression swell
-            // due to "bad zero problem"
-
-            boolean changedMainVariable = false;
-            currentPerfectVariable = -1;
-
-            int previousBaseVariable = baseVariable;
-            // try to substitute as many zeroes as possible
-            if (baseVariable == -1 || nAttemptsWithSameBaseVariable > SAME_BASE_VARIABLE_ATTEMPTS) {
-                if (usedBaseVariables.size() == nVariables)
-                    usedBaseVariables.clear();
-                nAttemptsWithSameBaseVariable = nAttemptsWithZeros = 0;
-                ZeroVariables maxZeros = null;
-                for (int var = 0; var < nVariables; ++var) {
-                    if (usedBaseVariables.contains(var))
-                        continue;
-                    ZeroVariables pZeros;
-                    if (a.degree(var) == 0 || b.degree(var) == 0)
-                        continue;
-                    pZeros = possibleZeros(b.coefficientOf(var, 0), nVariables);
-                    if (maxZeros != null && pZeros.maxPossibleZeros < maxZeros.maxPossibleZeros)
-                        continue;
-
-                    pZeros = commonPossibleZeroes(pZeros, possibleZeros(b.coefficientOf(var, b.degree(var)), nVariables));
-                    if (maxZeros != null && pZeros.maxPossibleZeros < maxZeros.maxPossibleZeros)
-                        continue;
-
-                    pZeros = commonPossibleZeroes(pZeros, possibleZeros(a.coefficientOf(var, 0), nVariables));
-                    if (maxZeros != null && pZeros.maxPossibleZeros < maxZeros.maxPossibleZeros)
-                        continue;
-
-                    pZeros = commonPossibleZeroes(pZeros, possibleZeros(a.coefficientOf(var, a.degree(var)), nVariables));
-                    if (maxZeros != null && pZeros.maxPossibleZeros < maxZeros.maxPossibleZeros)
-                        continue;
-
-                    maxZeros = pZeros;
-                    baseVariable = var;
-                }
-                if (maxZeros == null) {
-                    // all free variables are bad
-                    usedBaseVariables.clear();
-                    return nextEvaluation();
-                }
-                usedBaseVariables.add(baseVariable);
-
-                // <- we chose the main variable and those that can be safely substituted with zeros
-
-                BitSet zeroSubstitutions = maxZeros.maxZeros();
-                // swap 0 and baseVariable
-                zeroSubstitutions.set(baseVariable, zeroSubstitutions.get(0));
-                zeroSubstitutions.clear(0);
-
-                zeroVariables = new int[zeroSubstitutions.cardinality()];
-                shiftingVariables = new int[nVariables - zeroSubstitutions.cardinality() - 1];
-                int iCounter = 0, jCounter = 0;
-                for (int j = 0; j < nVariables; j++)
-                    if (zeroSubstitutions.get(j))
-                        zeroVariables[iCounter++] = j;
-                    else if (j != 0) // don't shift the main variable
-                        shiftingVariables[jCounter++] = j;
-
-                if (shiftingVariables.length == 0) { // <- perfect variable exists; just pickup some var for random substitutions
-                    shiftingVariables = new int[]{zeroVariables[zeroVariables.length - 1]};
-                    zeroVariables = Arrays.copyOf(zeroVariables, zeroVariables.length - 1);
-                }
-                shifts = new long[shiftingVariables.length];
-
-                changedMainVariable = previousBaseVariable != baseVariable;
-            }
-
-            aReduced = AMultivariatePolynomial.swapVariables(a, 0, baseVariable);
-            bReduced = AMultivariatePolynomial.swapVariables(b, 0, baseVariable);
-
-            if (nAttemptsWithZeros > ATTEMPTS_WITH_MAX_ZEROS && zeroVariables.length != 0) {
-                // fill with some value some zero variable
-                shiftingVariables = Arrays.copyOf(shiftingVariables, shiftingVariables.length + 1);
-                shiftingVariables[shiftingVariables.length - 1] = zeroVariables[zeroVariables.length - 1];
-                zeroVariables = Arrays.copyOf(zeroVariables, zeroVariables.length - 1);
-                shifts = new long[shiftingVariables.length];
-                nAttemptsWithZeros = 0;
-            }
-
-            ++nAttemptsWithSameBaseVariable;
-            ++nAttemptsWithZeros;
-            int
-                    ubDegree = bReduced.degree(0),
-                    uaDegree = aReduced.degree(0);
-
-            // choosing random shifts
-            for (int nFails = 0; ; ++nFails) {
-                if (nFails > 8) {
-                    // base variable is unlucky -> start over
-                    nAttemptsWithSameBaseVariable = SAME_BASE_VARIABLE_ATTEMPTS + 1;
-                    return nextEvaluation();
-                }
-                for (int i = 0; i < shiftingVariables.length; ++i)
-                    shifts[i] = a.ring.randomElement(rnd);
-
-                UnivariatePolynomialZp64 ub = bReduced
-                        .evaluateAtZero(zeroVariables)
-                        .evaluate(shiftingVariables, shifts)
-                        .asUnivariate();
-
-                if (ub.isZeroAt(0) || ub.isZeroAt(ubDegree))
-                    continue;
-
-                UnivariatePolynomialZp64 ua = aReduced
-                        .evaluateAtZero(zeroVariables)
-                        .evaluate(shiftingVariables, shifts)
-                        .asUnivariate();
-
-                if (ua.isZeroAt(0) || ua.isZeroAt(uaDegree))
-                    continue;
-
-                break;
-            }
-            aReduced = aReduced.shift(shiftingVariables, shifts);
-            bReduced = bReduced.shift(shiftingVariables, shifts);
-
-            return changedMainVariable;
-        }
-
-        MultivariatePolynomialZp64 convert(MultivariatePolynomialZp64 poly) {
-            if (currentPerfectVariable != -1)
-                // just swap the vars
-                return currentPerfectVariable == 0 ?
-                        poly.clone() : MultivariatePolynomialZp64.swapVariables(poly, 0, currentPerfectVariable);
-            return AMultivariatePolynomial.swapVariables(poly, 0, baseVariable).shift(shiftingVariables, shifts);
-        }
-
-        MultivariatePolynomialZp64 reconstruct(MultivariatePolynomialZp64 poly) {
-            if (currentPerfectVariable != -1)
-                // just swap the vars
-                return currentPerfectVariable == 0 ?
-                        poly : MultivariatePolynomialZp64.swapVariables(poly, 0, currentPerfectVariable);
-
-            poly = poly.shift(shiftingVariables, ArraysUtil.negate(shifts.clone()));
-            poly = MultivariatePolynomialZp64.swapVariables(poly, 0, baseVariable);
-            return poly;
-        }
-    }
-
-    /* =============================================== EEZ-GCD algorithm ============================================ */
 
     /**
      * Calculates GCD of two multivariate polynomials over Zp using enhanced EZ algorithm
@@ -6257,7 +4867,9 @@ public final class MultivariateGCD {
         }
     }
 
-    /** test whether gcd divide a and b **/
+    /**
+     * test whether gcd divide a and b
+     **/
     @SuppressWarnings("unchecked")
     private static <Term extends AMonomial<Term>,
             Poly extends AMultivariatePolynomial<Term, Poly>>
@@ -6266,5 +4878,1622 @@ public final class MultivariateGCD {
             return isGCDTriplet((MultivariatePolynomial) a, (MultivariatePolynomial) b, (MultivariatePolynomial) gcd);
         else
             return isGCDTriplet((MultivariatePolynomialZp64) a, (MultivariatePolynomialZp64) b, (MultivariatePolynomialZp64) gcd);
+    }
+
+    private interface KaltofenMonaganAlgorithm<uPoly extends IUnivariatePolynomial<uPoly>> {
+        MultivariatePolynomial<uPoly> apply(MultivariatePolynomial<uPoly> a, MultivariatePolynomial<uPoly> b, int uDegreeBound, int finiteExtensionDegree);
+    }
+
+    interface SparseInterpolation<E> {
+        /**
+         * Returns interpolating gcd
+         *
+         * @return gcd
+         */
+        MultivariatePolynomial<E> evaluate();
+
+        /**
+         * Returns interpolating gcd at specified point
+         *
+         * @param newPoint evaluation point
+         * @return gcd at {@code variable = newPoint}
+         */
+        MultivariatePolynomial<E> evaluate(E newPoint);
+    }
+
+    /**
+     * efficient data structure for repeated evaluations in Zippel method
+     */
+    interface ZippelEvaluations<E> {
+        /**
+         * evaluate underlying polynomial
+         */
+        UnivariatePolynomial<E> evaluate(int raiseFactor, E value);
+    }
+
+    interface lSparseInterpolation {
+        /**
+         * Returns interpolating gcd
+         *
+         * @return gcd
+         */
+        MultivariatePolynomialZp64 evaluate();
+
+        /**
+         * Returns interpolating gcd at specified point
+         *
+         * @param newPoint evaluation point
+         * @return gcd at {@code variable = newPoint}
+         */
+        MultivariatePolynomialZp64 evaluate(long newPoint);
+    }
+
+
+    /**
+     * efficient data structure for repeated evaluations in Zippel method
+     */
+    interface ZippelEvaluationsZp64 {
+        /**
+         * evaluate underlying polynomial
+         */
+        UnivariatePolynomialZp64 evaluate(int raiseFactor, long value);
+    }
+
+    /**
+     * structure with required input for GCD algorithms
+     */
+    static final class GCDInput<Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>> {
+        /**
+         * input polynomials (with variables renamed) and earlyGCD if possible (in trivial cases)
+         */
+        final Poly aReduced, bReduced, earlyGCD;
+        /**
+         * gcd degree bounds, mapping used to rename variables so that degreeBounds are in descending order
+         */
+        final int[] degreeBounds, mapping;
+        /**
+         * last present variable
+         */
+        final int lastPresentVariable;
+        /**
+         * ring cardinality (or -1, if cardinality is greater than Integer.MAX_VALUE)
+         */
+        final int evaluationStackLimit;
+        /**
+         * GCD of monomial content of a and b
+         **/
+        final Term monomialGCD;
+        /**
+         * degree of irreducible univariate polynomial used to construct field extension q^n (if the coefficient ring
+         * has so small cardinality so that modular algorithm will fail)
+         */
+        final int finiteExtensionDegree;
+
+        GCDInput(Poly earlyGCD) {
+            this.earlyGCD = earlyGCD;
+            aReduced = bReduced = null;
+            degreeBounds = mapping = null;
+            lastPresentVariable = evaluationStackLimit = -1;
+            monomialGCD = null;
+            finiteExtensionDegree = -1;
+        }
+
+        GCDInput(Poly aReduced, Poly bReduced, Term monomialGCD,
+                 int evaluationStackLimit, int[] degreeBounds, int[] mapping, int lastPresentVariable,
+                 int finiteExtensionDegree) {
+            //assert monomialGCD == null || aReduced.ring.isOne(monomialGCD.coefficient);
+            this.aReduced = aReduced;
+            this.bReduced = bReduced;
+            this.monomialGCD = monomialGCD;
+            this.earlyGCD = null;
+            this.evaluationStackLimit = evaluationStackLimit;
+            this.degreeBounds = degreeBounds;
+            this.mapping = inversePermutation(mapping);
+            this.lastPresentVariable = lastPresentVariable;
+            this.finiteExtensionDegree = finiteExtensionDegree;
+        }
+
+        /**
+         * recover initial order of variables in the result
+         */
+        Poly restoreGCD(Poly result) {
+            return AMultivariatePolynomial.renameVariables(result, mapping).multiply(monomialGCD);
+        }
+    }
+
+    /**
+     * Primitive part and content of multivariate polynomial considered as polynomial over Zp[x_i][x_1, ..., x_N]
+     */
+    private static final class UnivariateContent<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>,
+            uPoly extends IUnivariatePolynomial<uPoly>> {
+        final MultivariatePolynomial<uPoly> poly;
+        final Poly primitivePart;
+        final uPoly content;
+
+        public UnivariateContent(MultivariatePolynomial<uPoly> poly, Poly primitivePart, uPoly content) {
+            this.poly = poly;
+            this.primitivePart = primitivePart;
+            this.content = content;
+        }
+    }
+
+    /**
+     * holds primitive parts of a and b viewed as polynomials in Zp[x_k][x_1 ... x_{k-1}]
+     */
+    private static final class PrimitiveInput<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>,
+            uPoly extends IUnivariatePolynomial<uPoly>> {
+        /**
+         * primitive parts of a and b viewed as polynomials in Zp[x_k][x_1 ... x_{k-1}]
+         */
+        final Poly aPrimitive, bPrimitive;
+        /**
+         * gcd of content and leading coefficient of a and b given as Zp[x_k][x_1 ... x_{k-1}]
+         */
+        final uPoly contentGCD, lcGCD;
+
+        PrimitiveInput(Poly aPrimitive, Poly bPrimitive,
+                       uPoly contentGCD, uPoly lcGCD) {
+            this.aPrimitive = aPrimitive;
+            this.bPrimitive = bPrimitive;
+            this.contentGCD = contentGCD;
+            this.lcGCD = lcGCD;
+        }
+    }
+
+    private static final class IrreduciblePolynomialsIterator<uPoly extends IUnivariatePolynomial<uPoly>> {
+        final uPoly factory;
+        int degree;
+
+        IrreduciblePolynomialsIterator(uPoly factory, int degree) {
+            this.factory = factory;
+            this.degree = degree;
+        }
+
+        uPoly next() {
+            return IrreduciblePolynomials.randomIrreduciblePolynomial(factory, degree++, PrivateRandom.getRandom());
+        }
+    }
+
+    static final class TrivialSparseInterpolation<E> implements SparseInterpolation<E> {
+        final MultivariatePolynomial<E> val;
+
+        TrivialSparseInterpolation(MultivariatePolynomial<E> val) {
+            this.val = val;
+        }
+
+        @Override
+        public MultivariatePolynomial<E> evaluate() {
+            return val;
+        }
+
+        @Override
+        public MultivariatePolynomial<E> evaluate(E newPoint) {
+            return val;
+        }
+    }
+
+    static abstract class ASparseInterpolation<E> implements SparseInterpolation<E> {
+        /**
+         * the ring
+         */
+        final Ring<E> ring;
+        /**
+         * variable which we are evaluating
+         */
+        final int variable;
+        /**
+         * initial polynomials
+         */
+        final MultivariatePolynomial<E> a, b;
+        /**
+         * global skeleton of the result
+         */
+        final Set<DegreeVector> globalSkeleton;
+        /**
+         * skeleton of each of the coefficients of polynomial viewed as Zp[x_1,...,x_N][x_0]
+         */
+        final TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton;
+        /**
+         * univariate degrees of {@code univarSkeleton} with respect to x_0
+         */
+        final int[] sparseUnivarDegrees;
+        /**
+         * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
+         * variable] }
+         */
+        final int[] evaluationVariables;
+        /**
+         * values that will be subsituted for {@code evaluationVariables}; values {@code V} for variables {@code [1, 2
+         * ... variable-1]} are fixed and successive powers {@code V, V^2, V^3 ...} will be used to form Vandermonde
+         * matrix
+         */
+        final E[] evaluationPoint;
+        /**
+         * cached powers for {@code evaluationPoint}
+         */
+        final MultivariatePolynomial.PrecomputedPowersHolder<E> powers;
+        /**
+         * Efficient structures for evaluating polynomials for interpolation
+         */
+        final ZippelEvaluations<E> aEvals, bEvals;
+        /**
+         * random
+         */
+        final RandomGenerator rnd;
+
+        ASparseInterpolation(Ring<E> ring, int variable,
+                             MultivariatePolynomial<E> a, MultivariatePolynomial<E> b,
+                             Set<DegreeVector> globalSkeleton,
+                             TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton,
+                             int[] sparseUnivarDegrees, int[] evaluationVariables,
+                             E[] evaluationPoint,
+                             MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int expectedNumberOfEvaluations, RandomGenerator rnd) {
+            this.ring = ring;
+            this.variable = variable;
+            this.a = a;
+            this.b = b;
+            this.globalSkeleton = globalSkeleton;
+            this.univarSkeleton = univarSkeleton;
+            this.sparseUnivarDegrees = sparseUnivarDegrees;
+            this.evaluationVariables = evaluationVariables;
+            this.evaluationPoint = evaluationPoint;
+            this.aEvals = createEvaluations(a, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations);
+            this.bEvals = createEvaluations(b, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations);
+            this.powers = powers;
+            this.rnd = rnd;
+        }
+
+        @Override
+        public final MultivariatePolynomial<E> evaluate() {
+            return evaluate(evaluationPoint[evaluationPoint.length - 1]);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public final MultivariatePolynomial<E> evaluate(E newPoint) {
+            // constant is constant
+            if (globalSkeleton.size() == 1)
+                return a.create(((Monomial<E>) globalSkeleton.iterator().next()).setCoefficient(ring.getOne()));
+            // variable = newPoint
+            evaluationPoint[evaluationPoint.length - 1] = newPoint;
+            powers.set(evaluationVariables[evaluationVariables.length - 1], newPoint);
+            return evaluate0(newPoint);
+        }
+
+        abstract MultivariatePolynomial<E> evaluate0(E newPoint);
+    }
+
+    /**
+     * evaluation with plain MultivariatePolynomial#evaluate method (with minor enhancements)
+     */
+    private static final class PlainEvaluations<E> implements ZippelEvaluations<E> {
+        /**
+         * initial poly
+         */
+        private final MultivariatePolynomial<E> poly;
+        /**
+         * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
+         * variable] }
+         */
+        private final int[] evaluationVariables;
+        /**
+         * evaluation point
+         */
+        private final E[] evaluationPoint;
+        /**
+         * base powers (raiseFactor == 1)
+         */
+        private final MultivariatePolynomial.PrecomputedPowersHolder<E> basePowers;
+        /**
+         * cache
+         */
+        private final TIntObjectHashMap<MultivariatePolynomial.PrecomputedPowersHolder<E>> powersCache
+                = new TIntObjectHashMap<>();
+
+        PlainEvaluations(MultivariatePolynomial<E> poly,
+                         int[] evaluationVariables,
+                         E[] evaluationPoint,
+                         MultivariatePolynomial.PrecomputedPowersHolder<E> basePowers) {
+            this.poly = poly;
+            this.evaluationVariables = evaluationVariables;
+            this.evaluationPoint = evaluationPoint;
+            this.basePowers = basePowers.clone();
+            this.powersCache.put(1, this.basePowers);
+        }
+
+        @Override
+        public UnivariatePolynomial<E> evaluate(int raiseFactor, E value) {
+            basePowers.set(evaluationVariables[evaluationVariables.length - 1], value);
+
+            MultivariatePolynomial.PrecomputedPowersHolder<E> powers = powersCache.get(raiseFactor);
+            Ring<E> ring = poly.ring;
+            if (powers == null) {
+                powers = basePowers.clone();
+                for (int i = 0; i < (evaluationVariables.length - 1); ++i)
+                    powers.set(evaluationVariables[i], ring.pow(evaluationPoint[i], raiseFactor));
+                powersCache.put(raiseFactor, powers);
+            }
+            powers.set(evaluationVariables[evaluationVariables.length - 1], value);
+
+            E[] result = ring.createZeroesArray(poly.degree(0) + 1);
+            for (Monomial<E> el : poly) {
+                E ucf = el.coefficient;
+                for (int variable : evaluationVariables)
+                    ucf = ring.multiply(ucf, powers.pow(variable, el.exponents[variable]));
+                int uDeg = el.exponents[0];
+                result[uDeg] = ring.add(result[uDeg], ucf);
+            }
+
+            return UnivariatePolynomial.create(ring, result);
+        }
+    }
+
+    /**
+     * special data structure for fast evaluation of polynomials in Zippel method
+     */
+    private static final class FastSparseRecursiveEvaluations<E> implements ZippelEvaluations<E> {
+        /**
+         * initial poly
+         */
+        private final MultivariatePolynomial<E> poly;
+        /**
+         * evaluation point
+         */
+        private final E[] evaluationPoint;
+        /**
+         * last variable (that will be actually evaluated with different values)
+         */
+        private final int variable;
+        /**
+         * cache of bivariate polynomials for different raise factors
+         */
+        private final TIntObjectHashMap<MultivariatePolynomial<MultivariatePolynomial<E>>> bivariateCache
+                = new TIntObjectHashMap<>();
+
+        FastSparseRecursiveEvaluations(MultivariatePolynomial<E> poly, E[] evaluationPoint, int variable) {
+            this.poly = poly;
+            this.variable = variable;
+            this.evaluationPoint = evaluationPoint;
+        }
+
+        /**
+         * returns a sparse recursive form of initial poly with all but first and last variables evaluated with given
+         * raise factor (that is poly in R[xN][x0])
+         */
+        @SuppressWarnings("unchecked")
+        MultivariatePolynomial<MultivariatePolynomial<E>> getSparseRecursiveForm(int raiseFactor) {
+            MultivariatePolynomial<MultivariatePolynomial<E>> recForm = bivariateCache.get(raiseFactor);
+            if (recForm == null) {
+                MultivariatePolynomial<E> bivariate;
+                if (variable == 1)
+                    bivariate = poly;
+                else {
+                    // values for all variables except first and last
+                    E[] values = poly.ring.createArray(variable - 1);
+                    for (int i = 0; i < values.length; ++i)
+                        values[i] = poly.ring.pow(evaluationPoint[i], raiseFactor);
+
+                    // substitute all that variables to obtain bivariate poly R[x0, xN]
+                    bivariate = poly.evaluate(ArraysUtil.sequence(1, variable), values);
+                }
+                if (bivariate.nVariables > 2)
+                    bivariate = bivariate.dropSelectVariables(0, variable);
+                // swap variables to R[xN, x0]
+                bivariate = AMultivariatePolynomial.swapVariables(bivariate, 0, 1);
+                // convert to sparse recursive form R[xN][x0]
+                recForm = (MultivariatePolynomial<MultivariatePolynomial<E>>) bivariate.toSparseRecursiveForm();
+                bivariateCache.put(raiseFactor, recForm);
+            }
+            return recForm;
+        }
+
+        /**
+         * Evaluate initial poly with a given raise factor for all but first and last variable and with a given value
+         * for the last variable
+         */
+        @Override
+        @SuppressWarnings("unchecked")
+        public UnivariatePolynomial<E> evaluate(int raiseFactor, E value) {
+            // get sparse recursive form for fast evaluation
+            MultivariatePolynomial<MultivariatePolynomial<E>> recForm = getSparseRecursiveForm(raiseFactor);
+            // resulting univariate data
+            E[] data = poly.ring.createZeroesArray(recForm.degree() + 1);
+
+            int cacheSize = 128;//recForm.stream().mapToInt(p -> p.degree()).max().orElse(1);
+            // cached exponents for value^i
+            MultivariatePolynomial.PrecomputedPowersHolder<E> ph =
+                    new MultivariatePolynomial.PrecomputedPowersHolder<E>(poly.ring,
+                            new MultivariatePolynomial.PrecomputedPowers[]{new MultivariatePolynomial.PrecomputedPowers<>(cacheSize, value, poly.ring)});
+            for (Monomial<MultivariatePolynomial<E>> r : recForm)
+                // fast Horner-like evaluation of sparse univariate polynomials
+                data[r.totalDegree] = MultivariatePolynomial.evaluateSparseRecursiveForm(r.coefficient, ph, 0);
+
+            return UnivariatePolynomial.create(poly.ring, data);
+        }
+    }
+
+    /* =============================================== EZ-GCD algorithm ============================================ */
+
+    static final class LinZipInterpolation<E> extends ASparseInterpolation<E> {
+        LinZipInterpolation(Ring<E> ring, int variable, MultivariatePolynomial<E> a, MultivariatePolynomial<E> b,
+                            Set<DegreeVector> globalSkeleton, TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton,
+                            int[] sparseUnivarDegrees, int[] evaluationVariables, E[] evaluationPoint,
+                            MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int expectedNumberOfEvaluations,
+                            RandomGenerator rnd) {
+            super(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees, evaluationVariables,
+                    evaluationPoint, powers, expectedNumberOfEvaluations, rnd);
+        }
+
+        @Override
+        public MultivariatePolynomial<E> evaluate0(E newPoint) {
+            @SuppressWarnings("unchecked")
+            LinZipSystem<E>[] systems = new LinZipSystem[sparseUnivarDegrees.length];
+            for (int i = 0; i < sparseUnivarDegrees.length; i++)
+                systems[i] = new LinZipSystem<>(sparseUnivarDegrees[i], univarSkeleton.get(sparseUnivarDegrees[i]), powers, variable == -1 ? a.nVariables - 1 : variable - 1);
+
+
+            int nUnknowns = globalSkeleton.size(), nUnknownScalings = -1;
+            int raiseFactor = 0;
+
+            // number of retries before meet raise condition
+            int nUnderDeterminedRetries = ring.characteristic().bitLength() <= SMALL_FIELD_BIT_LENGTH
+                    ? NUMBER_OF_UNDER_DETERMINED_RETRIES_SMALL_FIELD
+                    : NUMBER_OF_UNDER_DETERMINED_RETRIES;
+
+            int previousFreeVars = -1, underDeterminedTries = 0;
+            boolean lastChanceUsed = false;
+            for (int iTry = 0; ; ++iTry) {
+                if (iTry == nUnderDeterminedRetries) {
+                    if (lastChanceUsed)
+                        // allow this trick only once, then break
+                        break;
+                    else {
+                        // give the last chance
+                        lastChanceUsed = true;
+                        nUnderDeterminedRetries += nUnderDeterminedLinZip(a, systems, nUnknownScalings);
+                    }
+                }
+
+                for (; ; ) {
+                    // increment at each loop!
+                    ++nUnknownScalings;
+                    // sequential powers of evaluation point
+                    ++raiseFactor;
+
+                    E lastVarValue = newPoint;
+                    if (variable == -1)
+                        lastVarValue = ring.pow(lastVarValue, raiseFactor);
+
+                    // evaluate a and b to univariate and calculate gcd
+                    UnivariatePolynomial<E>
+                            aUnivar = aEvals.evaluate(raiseFactor, lastVarValue),
+                            bUnivar = bEvals.evaluate(raiseFactor, lastVarValue),
+                            gcdUnivar = UnivariateGCD.PolynomialGCD(aUnivar, bUnivar);
+
+                    if (a.degree(0) != aUnivar.degree() || b.degree(0) != bUnivar.degree())
+                        // unlucky main homomorphism or bad evaluation point
+                        return null;
+
+                    assert gcdUnivar.isMonic();
+                    if (!univarSkeleton.keySet().containsAll(gcdUnivar.exponents()))
+                        // univariate gcd contains terms that are not present in the skeleton
+                        // again unlucky main homomorphism
+                        return null;
+
+                    int totalEquations = 0;
+                    for (LinZipSystem<E> system : systems) {
+                        E rhs = gcdUnivar.degree() < system.univarDegree ? ring.getZero() : gcdUnivar.get(system.univarDegree);
+                        system.oneMoreEquation(rhs, nUnknownScalings != 0);
+                        totalEquations += system.nEquations();
+                    }
+
+                    if (nUnknowns + nUnknownScalings <= totalEquations)
+                        break;
+
+                    if (underDeterminedTries > nUnderDeterminedRetries)
+                        // raise condition: new equations does not fix enough variables
+                        return null;
+
+                    int freeVars = nUnknowns + nUnknownScalings - totalEquations;
+                    if (freeVars >= previousFreeVars)
+                        ++underDeterminedTries;
+                    else
+                        underDeterminedTries = 0;
+
+                    previousFreeVars = freeVars;
+                }
+
+                MultivariatePolynomial<E> result = a.createZero();
+                LinearSolver.SystemInfo info = solveLinZip(a, systems, nUnknownScalings, result);
+                if (info == LinearSolver.SystemInfo.UnderDetermined)
+                    //try to generate more equations
+                    continue;
+                if (info == LinearSolver.SystemInfo.Consistent)
+                    //well done
+                    return result;
+                if (info == LinearSolver.SystemInfo.Inconsistent)
+                    //inconsistent system => unlucky homomorphism
+                    return null;
+            }
+            // still under determined
+            return null;
+        }
+    }
+
+    static final class MonicInterpolation<E> extends ASparseInterpolation<E> {
+        /**
+         * required number of sparse evaluations to reconstruct all coefficients in skeleton
+         */
+        final int requiredNumberOfEvaluations;
+        /**
+         * univar exponent with monomial factor that can be used for scaling
+         */
+        final int monicScalingExponent;
+
+        MonicInterpolation(Ring<E> ring, int variable, MultivariatePolynomial<E> a, MultivariatePolynomial<E> b,
+                           Set<DegreeVector> globalSkeleton, TIntObjectHashMap<MultivariatePolynomial<E>> univarSkeleton,
+                           int[] sparseUnivarDegrees, int[] evaluationVariables, E[] evaluationPoint,
+                           MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int expectedNumberOfEvaluations,
+                           RandomGenerator rnd, int requiredNumberOfEvaluations, int monicScalingExponent) {
+            super(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees, evaluationVariables,
+                    evaluationPoint, powers, expectedNumberOfEvaluations, rnd);
+            this.requiredNumberOfEvaluations = requiredNumberOfEvaluations;
+            this.monicScalingExponent = monicScalingExponent;
+        }
+
+        @Override
+        public MultivariatePolynomial<E> evaluate0(E newPoint) {
+            @SuppressWarnings("unchecked")
+            VandermondeSystem<E>[] systems = new VandermondeSystem[sparseUnivarDegrees.length];
+            for (int i = 0; i < sparseUnivarDegrees.length; i++)
+                systems[i] = new VandermondeSystem<>(sparseUnivarDegrees[i], univarSkeleton.get(sparseUnivarDegrees[i]), powers, variable == -1 ? a.nVariables - 1 : variable - 1);
+
+            for (int i = 0; i < requiredNumberOfEvaluations; ++i) {
+                // sequential powers of evaluation point
+                int raiseFactor = i + 1;
+
+                E lastVarValue = newPoint;
+                if (variable == -1)
+                    lastVarValue = ring.pow(lastVarValue, raiseFactor);
+
+                // evaluate a and b to univariate and calculate gcd
+                UnivariatePolynomial<E>
+                        aUnivar = aEvals.evaluate(raiseFactor, lastVarValue),
+                        bUnivar = bEvals.evaluate(raiseFactor, lastVarValue),
+                        gcdUnivar = UnivariateGCD.PolynomialGCD(aUnivar, bUnivar);
+
+                if (a.degree(0) != aUnivar.degree() || b.degree(0) != bUnivar.degree())
+                    // unlucky main homomorphism or bad evaluation point
+                    return null;
+
+                assert gcdUnivar.isMonic();
+                if (!univarSkeleton.keySet().containsAll(gcdUnivar.exponents()))
+                    // univariate gcd contains terms that are not present in the skeleton
+                    // again unlucky main homomorphism
+                    return null;
+
+                if (monicScalingExponent != -1) {
+                    // single scaling factor
+                    // scale the system according to it
+
+                    if (gcdUnivar.degree() < monicScalingExponent || ring.isZero(gcdUnivar.get(monicScalingExponent)))
+                        // unlucky homomorphism
+                        return null;
+
+                    E normalization = evaluateExceptFirst(ring, powers, ring.getOne(), univarSkeleton.get(monicScalingExponent).lt(), i + 1, variable == -1 ? a.nVariables - 1 : variable - 1);
+                    //normalize univariate gcd in order to reconstruct leading coefficient polynomial
+                    normalization = ring.multiply(ring.reciprocal(gcdUnivar.get(monicScalingExponent)), normalization);
+                    gcdUnivar = gcdUnivar.multiply(normalization);
+                }
+
+                boolean allDone = true;
+                for (VandermondeSystem<E> system : systems)
+                    if (system.nEquations() < system.nUnknownVariables()) {
+                        E rhs = gcdUnivar.degree() < system.univarDegree ? ring.getZero() : gcdUnivar.get(system.univarDegree);
+                        system.oneMoreEquation(rhs);
+                        if (system.nEquations() < system.nUnknownVariables())
+                            allDone = false;
+                    }
+
+                if (allDone)
+                    break;
+            }
+
+            for (VandermondeSystem<E> system : systems) {
+                //solve each system
+                LinearSolver.SystemInfo info = system.solve();
+                if (info != LinearSolver.SystemInfo.Consistent)
+                    // system is inconsistent or under determined
+                    // unlucky homomorphism
+                    return null;
+            }
+
+            MultivariatePolynomial<E> gcdVal = a.createZero();
+            for (VandermondeSystem<E> system : systems) {
+                assert monicScalingExponent == -1 || system.univarDegree != monicScalingExponent || ring.isOne(system.solution[0]);
+                for (int i = 0; i < system.skeleton.length; i++) {
+                    Monomial<E> degreeVector = system.skeleton[i].set(0, system.univarDegree);
+                    E value = system.solution[i];
+                    gcdVal.add(degreeVector.setCoefficient(value));
+                }
+            }
+
+            return gcdVal;
+        }
+    }
+
+    private static abstract class LinearSystem<E> {
+        final int univarDegree;
+        /**
+         * the ring
+         */
+        final Ring<E> ring;
+        /**
+         * the skeleton
+         */
+        final Monomial<E>[] skeleton;
+        /**
+         * the lhs matrix
+         */
+        final ArrayList<E[]> matrix;
+        /**
+         * the rhs values
+         */
+        final ArrayList<E> rhs = new ArrayList<>();
+        /**
+         * precomputed powers
+         */
+        final MultivariatePolynomial.PrecomputedPowersHolder<E> powers;
+        /**
+         * number of non-fixed variables, i.e. variables that will be substituted
+         */
+        final int nVars;
+
+        @SuppressWarnings("unchecked")
+        LinearSystem(int univarDegree, MultivariatePolynomial<E> skeleton, MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int nVars) {
+            this.univarDegree = univarDegree;
+            this.ring = skeleton.ring;
+            //todo refactor generics
+            this.skeleton = skeleton.getSkeleton().toArray(new Monomial[skeleton.size()]);
+            this.powers = powers;
+            this.nVars = nVars;
+            this.matrix = new ArrayList<>();
+        }
+
+        final int nUnknownVariables() {
+            return skeleton.length;
+        }
+
+        final int nEquations() {
+            return matrix.size();
+        }
+
+        @Override
+        public String toString() {
+            return "{" + matrix.stream().map(Arrays::toString).collect(Collectors.joining(",")) + "} = " + rhs;
+        }
+    }
+
+    /**
+     * Vandermonde system builder
+     */
+    private static final class LinZipSystem<E> extends LinearSystem<E> {
+        private final ArrayList<E> scalingMatrix = new ArrayList<>();
+
+        public LinZipSystem(int univarDegree, MultivariatePolynomial<E> skeleton, MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int nVars) {
+            super(univarDegree, skeleton, powers, nVars);
+        }
+
+        public void oneMoreEquation(E rhsVal, boolean newScalingIntroduced) {
+            E[] row = ring.createArray(skeleton.length);
+            for (int i = 0; i < skeleton.length; i++)
+                row[i] = evaluateExceptFirst(ring, powers, ring.getOne(), skeleton[i], matrix.size() + 1, nVars);
+            matrix.add(row);
+
+            if (newScalingIntroduced) {
+                scalingMatrix.add(ring.negate(rhsVal));
+                rhsVal = ring.getZero();
+            } else
+                scalingMatrix.add(ring.getZero());
+            rhs.add(rhsVal);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < matrix.size(); i++) {
+                E[] row = matrix.get(i);
+                for (int j = 0; j < row.length; j++) {
+                    if (j != 0)
+                        sb.append("+");
+                    sb.append(row[j]).append("*c" + j);
+                }
+                if (i != 0)
+                    sb.append("+").append(scalingMatrix.get(i)).append("*m" + (i - 1));
+
+                sb.append("=").append(rhs.get(i)).append("\n");
+            }
+            return sb.toString();
+        }
+    }
+
+    /**
+     * Vandermonde system builder
+     */
+    static final class VandermondeSystem<E> extends LinearSystem<E> {
+        E[] solution = null;
+
+        public VandermondeSystem(int univarDegree, MultivariatePolynomial<E> skeleton, MultivariatePolynomial.PrecomputedPowersHolder<E> powers, int nVars) {
+            super(univarDegree, skeleton, powers, nVars);
+        }
+
+        LinearSolver.SystemInfo solve() {
+            if (solution == null)
+                solution = ring.createArray(nUnknownVariables());
+
+            if (nUnknownVariables() <= 8)
+                // for small systems Gaussian elimination is indeed faster
+                return LinearSolver.solve(ring, matrix.toArray(ring.createArray2d(matrix.size())), rhs.toArray(ring.createArray(rhs.size())), solution);
+
+            // solve vandermonde system
+            E[] vandermondeRow = matrix.get(0);
+            LinearSolver.SystemInfo info = LinearSolver.solveVandermondeT(ring, vandermondeRow, rhs.toArray(ring.createArray(rhs.size())), solution);
+            if (info == LinearSolver.SystemInfo.Consistent)
+                for (int i = 0; i < solution.length; ++i)
+                    solution[i] = ring.divideExact(solution[i], vandermondeRow[i]);
+
+            return info;
+        }
+
+        public VandermondeSystem<E> oneMoreEquation(E rhsVal) {
+            E[] row = ring.createArray(skeleton.length);
+            for (int i = 0; i < skeleton.length; i++)
+                row[i] = evaluateExceptFirst(ring, powers, ring.getOne(), skeleton[i], matrix.size() + 1, nVars);
+            matrix.add(row);
+            rhs.add(rhsVal);
+            return this;
+        }
+    }
+
+    static final class lTrivialSparseInterpolation implements lSparseInterpolation {
+        final MultivariatePolynomialZp64 val;
+
+        lTrivialSparseInterpolation(MultivariatePolynomialZp64 val) {
+            this.val = val;
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 evaluate() {
+            return val;
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 evaluate(long newPoint) {
+            return val;
+        }
+    }
+
+    static abstract class lASparseInterpolation implements lSparseInterpolation {
+        /**
+         * the ring
+         */
+        final IntegersZp64 ring;
+        /**
+         * variable which we are evaluating
+         */
+        final int variable;
+        /**
+         * initial polynomials
+         */
+        final MultivariatePolynomialZp64 a, b;
+        /**
+         * global skeleton of the result
+         */
+        final Set<DegreeVector> globalSkeleton;
+        /**
+         * skeleton of each of the coefficients of polynomial viewed as Zp[x_1,...,x_N][x_0]
+         */
+        final TIntObjectHashMap<MultivariatePolynomialZp64> univarSkeleton;
+        /**
+         * univariate degrees of {@code univarSkeleton} with respect to x_0
+         */
+        final int[] sparseUnivarDegrees;
+        /**
+         * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
+         * variable] }
+         */
+        final int[] evaluationVariables;
+        /**
+         * values that will be subsituted for {@code evaluationVariables}; values {@code V} for variables {@code [1, 2
+         * ... variable-1]} are fixed and successive powers {@code V, V^2, V^3 ...} will be used to form Vandermonde
+         * matrix
+         */
+        final long[] evaluationPoint;
+        /**
+         * cached powers for {@code evaluationPoint}
+         */
+        final MultivariatePolynomialZp64.lPrecomputedPowersHolder powers;
+        /**
+         * Efficient structures for evaluating polynomials for interpolation
+         */
+        final ZippelEvaluationsZp64 aEvals, bEvals;
+        /**
+         * random
+         */
+        final RandomGenerator rnd;
+
+        lASparseInterpolation(IntegersZp64 ring, int variable,
+                              MultivariatePolynomialZp64 a, MultivariatePolynomialZp64 b,
+                              Set<DegreeVector> globalSkeleton,
+                              TIntObjectHashMap<MultivariatePolynomialZp64> univarSkeleton,
+                              int[] sparseUnivarDegrees, int[] evaluationVariables,
+                              long[] evaluationPoint,
+                              MultivariatePolynomialZp64.lPrecomputedPowersHolder powers,
+                              int expectedNumberOfEvaluations, RandomGenerator rnd) {
+            this.ring = ring;
+            this.variable = variable;
+            this.a = a;
+            this.b = b;
+            this.globalSkeleton = globalSkeleton;
+            this.univarSkeleton = univarSkeleton;
+            this.sparseUnivarDegrees = sparseUnivarDegrees;
+            this.evaluationPoint = evaluationPoint;
+            this.aEvals = createEvaluations(a, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations);
+            this.bEvals = createEvaluations(b, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations);
+            this.evaluationVariables = evaluationVariables;
+            this.powers = powers;
+            this.rnd = rnd;
+        }
+
+        @Override
+        public final MultivariatePolynomialZp64 evaluate() {
+            return evaluate(evaluationPoint[evaluationPoint.length - 1]);
+        }
+
+        @Override
+        public final MultivariatePolynomialZp64 evaluate(long newPoint) {
+            // constant is constant
+            if (globalSkeleton.size() == 1)
+                return a.create(((MonomialZp64) globalSkeleton.iterator().next()).setCoefficient(1));
+            // variable = newPoint
+            evaluationPoint[evaluationPoint.length - 1] = newPoint;
+            powers.set(evaluationVariables[evaluationVariables.length - 1], newPoint);
+            return evaluate0(newPoint);
+        }
+
+        abstract MultivariatePolynomialZp64 evaluate0(long newPoint);
+    }
+
+    /**
+     * evaluation with plain MultivariatePolynomial#evaluate method (with minor enhancements)
+     */
+    static final class PlainEvaluationsZp64 implements ZippelEvaluationsZp64 {
+        /**
+         * initial poly
+         */
+        private final MultivariatePolynomialZp64 poly;
+        /**
+         * variables that will be substituted with random values for sparse interpolation, i.e. {@code [1, 2 ...
+         * variable] }
+         */
+        private final int[] evaluationVariables;
+        /**
+         * evaluation point
+         */
+        private final long[] evaluationPoint;
+        /**
+         * base powers (raiseFactor == 1)
+         */
+        private final MultivariatePolynomialZp64.lPrecomputedPowersHolder basePowers;
+        /**
+         * cache
+         */
+        private final TIntObjectHashMap<MultivariatePolynomialZp64.lPrecomputedPowersHolder> powersCache
+                = new TIntObjectHashMap<>();
+
+        PlainEvaluationsZp64(MultivariatePolynomialZp64 poly,
+                             int[] evaluationVariables,
+                             long[] evaluationPoint,
+                             MultivariatePolynomialZp64.lPrecomputedPowersHolder basePowers) {
+            this.poly = poly;
+            this.evaluationVariables = evaluationVariables;
+            this.evaluationPoint = evaluationPoint;
+            this.basePowers = basePowers.clone();
+            this.powersCache.put(1, this.basePowers);
+        }
+
+        @Override
+        public UnivariatePolynomialZp64 evaluate(int raiseFactor, long value) {
+            basePowers.set(evaluationVariables[evaluationVariables.length - 1], value);
+
+            MultivariatePolynomialZp64.lPrecomputedPowersHolder powers = powersCache.get(raiseFactor);
+            IntegersZp64 ring = poly.ring;
+            if (powers == null) {
+                powers = basePowers.clone();
+                for (int i = 0; i < (evaluationVariables.length - 1); ++i)
+                    powers.set(evaluationVariables[i], ring.powMod(evaluationPoint[i], raiseFactor));
+                powersCache.put(raiseFactor, powers);
+            }
+            powers.set(evaluationVariables[evaluationVariables.length - 1], value);
+
+            long[] result = new long[poly.degree(0) + 1];
+            for (MonomialZp64 el : poly) {
+                long ucf = el.coefficient;
+                for (int variable : evaluationVariables)
+                    ucf = ring.multiply(ucf, powers.pow(variable, el.exponents[variable]));
+                int uDeg = el.exponents[0];
+                result[uDeg] = ring.add(result[uDeg], ucf);
+            }
+
+            return UnivariatePolynomialZp64.create(ring, result);
+        }
+    }
+
+    /**
+     * fast evaluation of polynomials in Zippel method with the use of sparse recursive form and Horner scheme
+     */
+    static final class FastSparseRecursiveEvaluationsZp64 implements ZippelEvaluationsZp64 {
+        /**
+         * initial poly
+         */
+        private final MultivariatePolynomialZp64 poly;
+        /**
+         * evaluation point
+         */
+        private final long[] evaluationPoint;
+        /**
+         * last variable (that will be actually evaluated with different values)
+         */
+        private final int variable;
+        /**
+         * cache of bivariate polynomials for different raise factors
+         */
+        private final TIntObjectHashMap<MultivariatePolynomial<MultivariatePolynomialZp64>> bivariateCache
+                = new TIntObjectHashMap<>();
+
+        FastSparseRecursiveEvaluationsZp64(MultivariatePolynomialZp64 poly, long[] evaluationPoint, int variable) {
+            this.poly = poly;
+            this.variable = variable;
+            this.evaluationPoint = evaluationPoint;
+        }
+
+        /**
+         * returns a sparse recursive form of initial poly with all but first and last variables evaluated with given
+         * raise factor (that is poly in R[xN][x0])
+         */
+        @SuppressWarnings("unchecked")
+        MultivariatePolynomial<MultivariatePolynomialZp64> getSparseRecursiveForm(int raiseFactor) {
+            MultivariatePolynomial<MultivariatePolynomialZp64> recForm = bivariateCache.get(raiseFactor);
+            if (recForm == null) {
+                MultivariatePolynomialZp64 bivariate;
+                if (variable == 1)
+                    bivariate = poly;
+                else {
+                    // values for all variables except first and last
+                    long[] values = new long[variable - 1];
+                    for (int i = 0; i < values.length; ++i)
+                        values[i] = poly.ring.powMod(evaluationPoint[i], raiseFactor);
+
+                    // substitute all that variables to obtain bivariate poly R[x0, xN]
+                    bivariate = poly.evaluate(ArraysUtil.sequence(1, variable), values);
+                }
+                if (bivariate.nVariables > 2)
+                    bivariate = bivariate.dropSelectVariables(0, variable);
+                // swap variables to R[xN, x0]
+                bivariate = AMultivariatePolynomial.swapVariables(bivariate, 0, 1);
+                // convert to sparse recursive form R[xN][x0]
+                recForm = (MultivariatePolynomial<MultivariatePolynomialZp64>) bivariate.toSparseRecursiveForm();
+                bivariateCache.put(raiseFactor, recForm);
+            }
+            return recForm;
+        }
+
+        /**
+         * Evaluate initial poly with a given raise factor for all but first and last variable and with a given value
+         * for the last variable
+         */
+        @Override
+        public UnivariatePolynomialZp64 evaluate(int raiseFactor, long value) {
+            // get sparse recursive form for fast evaluation
+            MultivariatePolynomial<MultivariatePolynomialZp64> recForm = getSparseRecursiveForm(raiseFactor);
+            // resulting univariate data
+            long[] data = new long[recForm.degree() + 1];
+
+            int cacheSize = 128;//recForm.stream().mapToInt(p -> p.degree()).max().orElse(1);
+            // cached exponents for value^i
+            MultivariatePolynomialZp64.lPrecomputedPowersHolder ph =
+                    new MultivariatePolynomialZp64.lPrecomputedPowersHolder(poly.ring,
+                            new MultivariatePolynomialZp64.lPrecomputedPowers[]{new MultivariatePolynomialZp64.lPrecomputedPowers(cacheSize, value, poly.ring)});
+            for (Monomial<MultivariatePolynomialZp64> r : recForm)
+                // fast Horner-like evaluation of sparse univariate polynomials
+                data[r.totalDegree] = MultivariatePolynomialZp64.evaluateSparseRecursiveForm(r.coefficient, ph, 0);
+
+            return UnivariatePolynomialZp64.create(poly.ring, data);
+        }
+    }
+
+    static final class lLinZipInterpolation extends lASparseInterpolation {
+        lLinZipInterpolation(IntegersZp64 ring, int variable, MultivariatePolynomialZp64 a,
+                             MultivariatePolynomialZp64 b, Set<DegreeVector> globalSkeleton,
+                             TIntObjectHashMap<MultivariatePolynomialZp64> univarSkeleton, int[] sparseUnivarDegrees,
+                             int[] evaluationVariables, long[] evaluationPoint, MultivariatePolynomialZp64.lPrecomputedPowersHolder powers,
+                             int expectedNumberOfEvaluations, RandomGenerator rnd) {
+            super(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations, rnd);
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 evaluate0(long newPoint) {
+            @SuppressWarnings("unchecked")
+            lLinZipSystem[] systems = new lLinZipSystem[sparseUnivarDegrees.length];
+            for (int i = 0; i < sparseUnivarDegrees.length; i++)
+                systems[i] = new lLinZipSystem(sparseUnivarDegrees[i], univarSkeleton.get(sparseUnivarDegrees[i]), powers, variable == -1 ? a.nVariables - 1 : variable - 1);
+
+            int nUnknowns = globalSkeleton.size(), nUnknownScalings = -1;
+            int raiseFactor = 0;
+
+            // number of retries before meet raise condition
+            int nUnderDeterminedRetries = ring.modulus <= (1 << SMALL_FIELD_BIT_LENGTH)
+                    ? NUMBER_OF_UNDER_DETERMINED_RETRIES_SMALL_FIELD
+                    : NUMBER_OF_UNDER_DETERMINED_RETRIES;
+
+            int previousFreeVars = -1, underDeterminedTries = 0;
+            boolean lastChanceUsed = false;
+            for (int iTry = 0; ; ++iTry) {
+                if (iTry == nUnderDeterminedRetries) {
+                    if (lastChanceUsed)
+                        // allow this trick only once, then break
+                        break;
+                    else {
+                        // give the last chance
+                        lastChanceUsed = true;
+                        nUnderDeterminedRetries += nUnderDeterminedLinZip(a, systems, nUnknownScalings);
+                    }
+                }
+
+                for (; ; ) {
+                    // increment at each loop!
+                    ++nUnknownScalings;
+                    // sequential powers of evaluation point
+                    ++raiseFactor;
+
+                    long lastVarValue = newPoint;
+                    if (variable == -1)
+                        lastVarValue = ring.powMod(lastVarValue, raiseFactor);
+
+                    // evaluate a and b to univariate and calculate gcd
+                    UnivariatePolynomialZp64
+                            aUnivar = aEvals.evaluate(raiseFactor, lastVarValue),
+                            bUnivar = bEvals.evaluate(raiseFactor, lastVarValue),
+                            gcdUnivar = UnivariateGCD.PolynomialGCD(aUnivar, bUnivar);
+
+                    if (a.degree(0) != aUnivar.degree() || b.degree(0) != bUnivar.degree())
+                        // unlucky main homomorphism or bad evaluation point
+                        return null;
+
+                    assert gcdUnivar.isMonic();
+                    if (!univarSkeleton.keySet().containsAll(gcdUnivar.exponents()))
+                        // univariate gcd contains terms that are not present in the skeleton
+                        // again unlucky main homomorphism
+                        return null;
+
+                    int totalEquations = 0;
+                    for (lLinZipSystem system : systems) {
+                        long rhs = gcdUnivar.degree() < system.univarDegree ? 0 : gcdUnivar.get(system.univarDegree);
+                        system.oneMoreEquation(rhs, nUnknownScalings != 0);
+                        totalEquations += system.nEquations();
+                    }
+
+                    if (nUnknowns + nUnknownScalings <= totalEquations)
+                        break;
+
+                    if (underDeterminedTries > nUnderDeterminedRetries) {
+                        // raise condition: new equations does not fix enough variables
+                        return null;
+                    }
+
+                    int freeVars = nUnknowns + nUnknownScalings - totalEquations;
+                    if (freeVars >= previousFreeVars)
+                        ++underDeterminedTries;
+                    else
+                        underDeterminedTries = 0;
+
+                    previousFreeVars = freeVars;
+                }
+
+                MultivariatePolynomialZp64 result = a.createZero();
+                LinearSolver.SystemInfo info = solveLinZip(a, systems, nUnknownScalings, result);
+                if (info == LinearSolver.SystemInfo.UnderDetermined)
+                    //try to generate more equations
+                    continue;
+                if (info == LinearSolver.SystemInfo.Consistent)
+                    //well done
+                    return result;
+                if (info == LinearSolver.SystemInfo.Inconsistent)
+                    //inconsistent system => unlucky homomorphism
+                    return null;
+            }
+            // still under determined
+            return null;
+        }
+    }
+
+    static final class lMonicInterpolation extends lASparseInterpolation {
+        /**
+         * required number of sparse evaluations to reconstruct all coefficients in skeleton
+         */
+        final int requiredNumberOfEvaluations;
+        /**
+         * univar exponent with monomial factor that can be used for scaling
+         */
+        final int monicScalingExponent;
+
+        lMonicInterpolation(IntegersZp64 ring, int variable, MultivariatePolynomialZp64 a, MultivariatePolynomialZp64 b,
+                            Set<DegreeVector> globalSkeleton, TIntObjectHashMap<MultivariatePolynomialZp64> univarSkeleton,
+                            int[] sparseUnivarDegrees, int[] evaluationVariables, long[] evaluationPoint,
+                            MultivariatePolynomialZp64.lPrecomputedPowersHolder powers, int expectedNumberOfEvaluations, RandomGenerator rnd, int requiredNumberOfEvaluations,
+                            int monicScalingExponent) {
+            super(ring, variable, a, b, globalSkeleton, univarSkeleton, sparseUnivarDegrees, evaluationVariables, evaluationPoint, powers, expectedNumberOfEvaluations, rnd);
+            this.requiredNumberOfEvaluations = requiredNumberOfEvaluations;
+            this.monicScalingExponent = monicScalingExponent;
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 evaluate0(long newPoint) {
+            @SuppressWarnings("unchecked")
+            lVandermondeSystem[] systems = new lVandermondeSystem[sparseUnivarDegrees.length];
+            for (int i = 0; i < sparseUnivarDegrees.length; i++)
+                systems[i] = new lVandermondeSystem(sparseUnivarDegrees[i], univarSkeleton.get(sparseUnivarDegrees[i]), powers, variable == -1 ? a.nVariables - 1 : variable - 1);
+
+            for (int i = 0; i < requiredNumberOfEvaluations; ++i) {
+                // sequential powers of evaluation point
+                int raiseFactor = i + 1;
+
+                long lastVarValue = newPoint;
+                if (variable == -1)
+                    lastVarValue = ring.powMod(lastVarValue, raiseFactor);
+
+                // evaluate a and b to univariate and calculate gcd
+                UnivariatePolynomialZp64
+                        aUnivar = aEvals.evaluate(raiseFactor, lastVarValue),
+                        bUnivar = bEvals.evaluate(raiseFactor, lastVarValue),
+                        gcdUnivar = UnivariateGCD.PolynomialGCD(aUnivar, bUnivar);
+
+                if (a.degree(0) != aUnivar.degree() || b.degree(0) != bUnivar.degree())
+                    // unlucky main homomorphism or bad evaluation point
+                    return null;
+
+                assert gcdUnivar.isMonic();
+                if (!univarSkeleton.keySet().containsAll(gcdUnivar.exponents()))
+                    // univariate gcd contains terms that are not present in the skeleton
+                    // again unlucky main homomorphism
+                    return null;
+
+                if (monicScalingExponent != -1) {
+                    // single scaling factor
+                    // scale the system according to it
+
+                    if (gcdUnivar.degree() < monicScalingExponent || gcdUnivar.get(monicScalingExponent) == 0)
+                        // unlucky homomorphism
+                        return null;
+
+                    long normalization = evaluateExceptFirst(ring, powers, 1, univarSkeleton.get(monicScalingExponent).lt(), i + 1, variable == -1 ? a.nVariables - 1 : variable - 1);
+                    //normalize univariate gcd in order to reconstruct leading coefficient polynomial
+                    normalization = ring.multiply(ring.reciprocal(gcdUnivar.get(monicScalingExponent)), normalization);
+                    gcdUnivar = gcdUnivar.multiply(normalization);
+                }
+
+                boolean allDone = true;
+                for (lVandermondeSystem system : systems)
+                    if (system.nEquations() < system.nUnknownVariables()) {
+                        long rhs = gcdUnivar.degree() < system.univarDegree ? 0 : gcdUnivar.get(system.univarDegree);
+                        system.oneMoreEquation(rhs);
+                        if (system.nEquations() < system.nUnknownVariables())
+                            allDone = false;
+                    }
+
+                if (allDone)
+                    break;
+            }
+
+            for (lVandermondeSystem system : systems) {
+                //solve each system
+                LinearSolver.SystemInfo info = system.solve();
+                if (info != LinearSolver.SystemInfo.Consistent)
+                    // system is inconsistent or under determined
+                    // unlucky homomorphism
+                    return null;
+            }
+
+            MultivariatePolynomialZp64 gcdVal = a.createZero();
+            for (lVandermondeSystem system : systems) {
+                assert monicScalingExponent == -1 || system.univarDegree != monicScalingExponent || system.solution[0] == 1;
+                for (int i = 0; i < system.skeleton.length; i++) {
+                    MonomialZp64 degreeVector = system.skeleton[i].set(0, system.univarDegree);
+                    long value = system.solution[i];
+                    gcdVal.add(degreeVector.setCoefficient(value));
+                }
+            }
+
+            return gcdVal;
+        }
+    }
+
+    /* =============================================== EEZ-GCD algorithm ============================================ */
+
+    static abstract class lLinearSystem {
+        final int univarDegree;
+        /**
+         * the ring
+         */
+        final IntegersZp64 ring;
+        /**
+         * the skeleton
+         */
+        final MonomialZp64[] skeleton;
+        /**
+         * the lhs matrix
+         */
+        final ArrayList<long[]> matrix;
+        /**
+         * the rhs values
+         */
+        final TLongArrayList rhs = new TLongArrayList();
+        /**
+         * precomputed powers
+         */
+        final MultivariatePolynomialZp64.lPrecomputedPowersHolder powers;
+        /**
+         * number of non-fixed variables, i.e. variables that will be substituted
+         */
+        final int nVars;
+
+        @SuppressWarnings("unchecked")
+        lLinearSystem(int univarDegree, MultivariatePolynomialZp64 skeleton, MultivariatePolynomialZp64.lPrecomputedPowersHolder powers, int nVars) {
+            this.univarDegree = univarDegree;
+            this.ring = skeleton.ring;
+            //todo refactor generics
+            this.skeleton = skeleton.getSkeleton().toArray(new MonomialZp64[skeleton.size()]);
+            this.powers = powers;
+            this.nVars = nVars;
+            this.matrix = new ArrayList<>();
+        }
+
+        final int nUnknownVariables() {
+            return skeleton.length;
+        }
+
+        final int nEquations() {
+            return matrix.size();
+        }
+
+        @Override
+        public String toString() {
+            return "{" + matrix.stream().map(Arrays::toString).collect(Collectors.joining(",")) + "} = " + rhs;
+        }
+    }
+
+    /**
+     * Vandermonde system builder
+     */
+    static final class lLinZipSystem extends lLinearSystem {
+        private final TLongArrayList scalingMatrix = new TLongArrayList();
+
+        public lLinZipSystem(int univarDegree, MultivariatePolynomialZp64 skeleton, MultivariatePolynomialZp64.lPrecomputedPowersHolder powers, int nVars) {
+            super(univarDegree, skeleton, powers, nVars);
+        }
+
+        public void oneMoreEquation(long rhsVal, boolean newScalingIntroduced) {
+            long[] row = new long[skeleton.length];
+            for (int i = 0; i < skeleton.length; i++)
+                row[i] = evaluateExceptFirst(ring, powers, 1, skeleton[i], matrix.size() + 1, nVars);
+            matrix.add(row);
+
+            if (newScalingIntroduced) {
+                scalingMatrix.add(ring.negate(rhsVal));
+                rhsVal = 0;
+            } else
+                scalingMatrix.add(0);
+            rhs.add(rhsVal);
+        }
+    }
+
+    /**
+     * Vandermonde system builder
+     */
+    static final class lVandermondeSystem extends lLinearSystem {
+        long[] solution = null;
+
+        public lVandermondeSystem(int univarDegree, MultivariatePolynomialZp64 skeleton, MultivariatePolynomialZp64.lPrecomputedPowersHolder powers, int nVars) {
+            super(univarDegree, skeleton, powers, nVars);
+        }
+
+        LinearSolver.SystemInfo solve() {
+            if (solution == null)
+                solution = new long[nUnknownVariables()];
+
+            if (nUnknownVariables() <= 8)
+                // for small systems Gaussian elimination is indeed faster
+                return LinearSolver.solve(ring, matrix.toArray(new long[matrix.size()][]), rhs.toArray(), solution);
+
+            // solve vandermonde system
+            long[] vandermondeRow = matrix.get(0);
+            LinearSolver.SystemInfo info = LinearSolver.solveVandermondeT(ring, vandermondeRow, rhs.toArray(), solution);
+            if (info == LinearSolver.SystemInfo.Consistent)
+                for (int i = 0; i < solution.length; ++i)
+                    solution[i] = ring.divide(solution[i], vandermondeRow[i]);
+
+            return info;
+        }
+
+        public lVandermondeSystem oneMoreEquation(long rhsVal) {
+            long[] row = new long[skeleton.length];
+            for (int i = 0; i < skeleton.length; i++)
+                row[i] = evaluateExceptFirst(ring, powers, 1, skeleton[i], matrix.size() + 1, nVars);
+            matrix.add(row);
+            rhs.add(rhsVal);
+            return this;
+        }
+    }
+
+    /**
+     * a list of variables that can be replaced with zeroes
+     */
+    static final class ZeroVariables {
+        final List<BitSet> pZeros = new ArrayList<>();
+        final int nVariables;
+        int iMaxPossibleZeros = -1, maxPossibleZeros = -1;
+        boolean allZeroes = false;
+        public ZeroVariables(int nVariables) {
+            this.nVariables = nVariables;
+        }
+
+        void add(BitSet zeros) {
+            if (allZeroes)
+                return;
+            int nZeros = zeros.cardinality();
+            if (nVariables == nZeros) {
+                maxPossibleZeros = zeros.length();
+                iMaxPossibleZeros = 0;
+                allZeroes = true;
+                pZeros.clear();
+                pZeros.add(zeros);
+                return;
+            }
+            Iterator<BitSet> it = pZeros.iterator();
+            while (it.hasNext()) {
+                BitSet e = it.next();
+                if (contains(e, zeros))
+                    return;
+                if (contains(zeros, e))
+                    it.remove();
+            }
+            pZeros.add(zeros);
+            if (nZeros > maxPossibleZeros) {
+                maxPossibleZeros = nZeros;
+                iMaxPossibleZeros = pZeros.size() - 1;
+            }
+        }
+
+        BitSet maxZeros() {
+            return pZeros.isEmpty() ? new BitSet(nVariables) : pZeros.get(iMaxPossibleZeros);
+        }
+
+        @Override
+        public String toString() {
+            return pZeros.toString();
+        }
+    }
+
+    static final class EZGCDEvaluations {
+        final MultivariatePolynomialZp64 a, b;
+        final RandomGenerator rnd;
+        // actual number of variables in use [0, ... nVariables] (may be less than a.nVariables)
+        final int nVariables;
+        // variables in which both cc and lc in a and b are non zeroes
+        final TIntArrayList perfectVariables = new TIntArrayList();
+        // variable that were used as main variables
+        final TIntHashSet usedBaseVariables = new TIntHashSet();
+        // modified a and b so that all except first variables
+        // may be evaluated to zero
+        MultivariatePolynomialZp64 aReduced, bReduced;
+
+        // pointers in perfectVariables list
+        int
+                currentPerfectVariable = -1,
+                nextPerfectVariable = 0;
+
+        int baseVariable = -1;
+        int[]
+                zeroVariables, // variables that may be replaced with zeros ( 0 <> baseVariable are swaped )
+                shiftingVariables; // variables that must be shifted before substituting zeros ( 0 <> baseVariable are swaped )
+        // shift values for shiftingVariables
+        long[] shifts;
+
+        // number of tries keeping as many zero variables as possible
+        int nAttemptsWithZeros = 0;
+        int nAttemptsWithSameBaseVariable = 0;
+        EZGCDEvaluations(MultivariatePolynomialZp64 a,
+                         MultivariatePolynomialZp64 b,
+                         int nVariables,
+                         RandomGenerator rnd) {
+            this.a = a;
+            this.b = b;
+            this.rnd = rnd;
+            this.nVariables = nVariables;
+
+            // search for main variables
+            for (int var = 0; var < nVariables; ++var) {
+                UnivariatePolynomialZp64 ub = b.evaluateAtZeroAllExcept(var);
+                if (ub.degree() == 0 || ub.cc() == 0 || ub.degree() != b.degree(var))
+                    continue;
+
+                UnivariatePolynomialZp64 ua = a.evaluateAtZeroAllExcept(var);
+                if (ua.degree() == 0 || ua.cc() == 0 || ua.degree() != a.degree(var))
+                    continue;
+
+                perfectVariables.add(var);
+            }
+        }
+
+        // returns whether the main variable was changed
+        boolean nextEvaluation() {
+            // first try to evaluate all but one variables to zeroes
+
+            if (nextPerfectVariable < perfectVariables.size()) {
+                // we have the main variable
+                currentPerfectVariable = perfectVariables.get(nextPerfectVariable);
+                ++nextPerfectVariable;
+
+                aReduced = AMultivariatePolynomial.swapVariables(a, 0, currentPerfectVariable);
+                bReduced = AMultivariatePolynomial.swapVariables(b, 0, currentPerfectVariable);
+                return true;
+            }
+
+            // no possible zero substitutions more
+            // => shift some variables and try to
+            // minimize intermediate expression swell
+            // due to "bad zero problem"
+
+            boolean changedMainVariable = false;
+            currentPerfectVariable = -1;
+
+            int previousBaseVariable = baseVariable;
+            // try to substitute as many zeroes as possible
+            if (baseVariable == -1 || nAttemptsWithSameBaseVariable > SAME_BASE_VARIABLE_ATTEMPTS) {
+                if (usedBaseVariables.size() == nVariables)
+                    usedBaseVariables.clear();
+                nAttemptsWithSameBaseVariable = nAttemptsWithZeros = 0;
+                ZeroVariables maxZeros = null;
+                for (int var = 0; var < nVariables; ++var) {
+                    if (usedBaseVariables.contains(var))
+                        continue;
+                    ZeroVariables pZeros;
+                    if (a.degree(var) == 0 || b.degree(var) == 0)
+                        continue;
+                    pZeros = possibleZeros(b.coefficientOf(var, 0), nVariables);
+                    if (maxZeros != null && pZeros.maxPossibleZeros < maxZeros.maxPossibleZeros)
+                        continue;
+
+                    pZeros = commonPossibleZeroes(pZeros, possibleZeros(b.coefficientOf(var, b.degree(var)), nVariables));
+                    if (maxZeros != null && pZeros.maxPossibleZeros < maxZeros.maxPossibleZeros)
+                        continue;
+
+                    pZeros = commonPossibleZeroes(pZeros, possibleZeros(a.coefficientOf(var, 0), nVariables));
+                    if (maxZeros != null && pZeros.maxPossibleZeros < maxZeros.maxPossibleZeros)
+                        continue;
+
+                    pZeros = commonPossibleZeroes(pZeros, possibleZeros(a.coefficientOf(var, a.degree(var)), nVariables));
+                    if (maxZeros != null && pZeros.maxPossibleZeros < maxZeros.maxPossibleZeros)
+                        continue;
+
+                    maxZeros = pZeros;
+                    baseVariable = var;
+                }
+                if (maxZeros == null) {
+                    // all free variables are bad
+                    usedBaseVariables.clear();
+                    return nextEvaluation();
+                }
+                usedBaseVariables.add(baseVariable);
+
+                // <- we chose the main variable and those that can be safely substituted with zeros
+
+                BitSet zeroSubstitutions = maxZeros.maxZeros();
+                // swap 0 and baseVariable
+                zeroSubstitutions.set(baseVariable, zeroSubstitutions.get(0));
+                zeroSubstitutions.clear(0);
+
+                zeroVariables = new int[zeroSubstitutions.cardinality()];
+                shiftingVariables = new int[nVariables - zeroSubstitutions.cardinality() - 1];
+                int iCounter = 0, jCounter = 0;
+                for (int j = 0; j < nVariables; j++)
+                    if (zeroSubstitutions.get(j))
+                        zeroVariables[iCounter++] = j;
+                    else if (j != 0) // don't shift the main variable
+                        shiftingVariables[jCounter++] = j;
+
+                if (shiftingVariables.length == 0) { // <- perfect variable exists; just pickup some var for random substitutions
+                    shiftingVariables = new int[]{zeroVariables[zeroVariables.length - 1]};
+                    zeroVariables = Arrays.copyOf(zeroVariables, zeroVariables.length - 1);
+                }
+                shifts = new long[shiftingVariables.length];
+
+                changedMainVariable = previousBaseVariable != baseVariable;
+            }
+
+            aReduced = AMultivariatePolynomial.swapVariables(a, 0, baseVariable);
+            bReduced = AMultivariatePolynomial.swapVariables(b, 0, baseVariable);
+
+            if (nAttemptsWithZeros > ATTEMPTS_WITH_MAX_ZEROS && zeroVariables.length != 0) {
+                // fill with some value some zero variable
+                shiftingVariables = Arrays.copyOf(shiftingVariables, shiftingVariables.length + 1);
+                shiftingVariables[shiftingVariables.length - 1] = zeroVariables[zeroVariables.length - 1];
+                zeroVariables = Arrays.copyOf(zeroVariables, zeroVariables.length - 1);
+                shifts = new long[shiftingVariables.length];
+                nAttemptsWithZeros = 0;
+            }
+
+            ++nAttemptsWithSameBaseVariable;
+            ++nAttemptsWithZeros;
+            int
+                    ubDegree = bReduced.degree(0),
+                    uaDegree = aReduced.degree(0);
+
+            // choosing random shifts
+            for (int nFails = 0; ; ++nFails) {
+                if (nFails > 8) {
+                    // base variable is unlucky -> start over
+                    nAttemptsWithSameBaseVariable = SAME_BASE_VARIABLE_ATTEMPTS + 1;
+                    return nextEvaluation();
+                }
+                for (int i = 0; i < shiftingVariables.length; ++i)
+                    shifts[i] = a.ring.randomElement(rnd);
+
+                UnivariatePolynomialZp64 ub = bReduced
+                        .evaluateAtZero(zeroVariables)
+                        .evaluate(shiftingVariables, shifts)
+                        .asUnivariate();
+
+                if (ub.isZeroAt(0) || ub.isZeroAt(ubDegree))
+                    continue;
+
+                UnivariatePolynomialZp64 ua = aReduced
+                        .evaluateAtZero(zeroVariables)
+                        .evaluate(shiftingVariables, shifts)
+                        .asUnivariate();
+
+                if (ua.isZeroAt(0) || ua.isZeroAt(uaDegree))
+                    continue;
+
+                break;
+            }
+            aReduced = aReduced.shift(shiftingVariables, shifts);
+            bReduced = bReduced.shift(shiftingVariables, shifts);
+
+            return changedMainVariable;
+        }
+
+        MultivariatePolynomialZp64 convert(MultivariatePolynomialZp64 poly) {
+            if (currentPerfectVariable != -1)
+                // just swap the vars
+                return currentPerfectVariable == 0 ?
+                        poly.clone() : MultivariatePolynomialZp64.swapVariables(poly, 0, currentPerfectVariable);
+            return AMultivariatePolynomial.swapVariables(poly, 0, baseVariable).shift(shiftingVariables, shifts);
+        }
+
+        MultivariatePolynomialZp64 reconstruct(MultivariatePolynomialZp64 poly) {
+            if (currentPerfectVariable != -1)
+                // just swap the vars
+                return currentPerfectVariable == 0 ?
+                        poly : MultivariatePolynomialZp64.swapVariables(poly, 0, currentPerfectVariable);
+
+            poly = poly.shift(shiftingVariables, ArraysUtil.negate(shifts.clone()));
+            poly = MultivariatePolynomialZp64.swapVariables(poly, 0, baseVariable);
+            return poly;
+        }
     }
 }

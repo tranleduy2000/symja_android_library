@@ -12,7 +12,8 @@ import cc.redberry.rings.poly.univar.UnivariatePolynomial;
  * @since 1.0
  */
 public final class Util {
-    private Util() {}
+    private Util() {
+    }
 
     public static void ensureOverFiniteField(IPolynomial... polys) {
         for (IPolynomial poly : polys)
@@ -47,7 +48,9 @@ public final class Util {
         return ring instanceof IntegersZp && ((IntegersZp) ring).modulus.bitLength() < MachineArithmetic.MAX_SUPPORTED_MODULUS_BITS;
     }
 
-    /** Whether coefficient domain is rationals */
+    /**
+     * Whether coefficient domain is rationals
+     */
     public static <T extends IPolynomial<T>> boolean isOverRationals(T poly) {
         if (poly instanceof UnivariatePolynomial && ((UnivariatePolynomial) poly).ring instanceof Rationals)
             return true;
@@ -57,7 +60,9 @@ public final class Util {
             return false;
     }
 
-    /** Whether coefficient domain is F(alpha) */
+    /**
+     * Whether coefficient domain is F(alpha)
+     */
     @SuppressWarnings("unchecked")
     public static <T extends IPolynomial<T>> boolean isOverSimpleFieldExtension(T poly) {
         if (poly instanceof UnivariatePolynomial
@@ -70,7 +75,9 @@ public final class Util {
             return false;
     }
 
-    /** Whether coefficient domain is F(alpha1, alpha2, ...) */
+    /**
+     * Whether coefficient domain is F(alpha1, alpha2, ...)
+     */
     @SuppressWarnings("unchecked")
     public static <T extends IPolynomial<T>> boolean isOverMultipleFieldExtension(T poly) {
         if (poly instanceof UnivariatePolynomial
@@ -83,7 +90,9 @@ public final class Util {
             return false;
     }
 
-    /** Whether coefficient domain is Q(alpha) */
+    /**
+     * Whether coefficient domain is Q(alpha)
+     */
     @SuppressWarnings("unchecked")
     public static <T extends IPolynomial<T>> boolean isOverSimpleNumberField(T poly) {
         if (poly instanceof UnivariatePolynomial
@@ -98,7 +107,9 @@ public final class Util {
             return false;
     }
 
-    /** Whether coefficient domain is Q(alpha) */
+    /**
+     * Whether coefficient domain is Q(alpha)
+     */
     @SuppressWarnings("unchecked")
     public static <T extends IPolynomial<T>> boolean isOverRingOfIntegersOfSimpleNumberField(T poly) {
         if (poly instanceof UnivariatePolynomial
@@ -113,7 +124,9 @@ public final class Util {
             return false;
     }
 
-    /** Whether coefficient domain is Q */
+    /**
+     * Whether coefficient domain is Q
+     */
     public static <T extends IPolynomial<T>> boolean isOverQ(T poly) {
         Object rep;
 
@@ -130,19 +143,11 @@ public final class Util {
         return ((Rational) rep).numerator() instanceof BigInteger;
     }
 
-    /** Whether coefficient domain is Z */
+    /**
+     * Whether coefficient domain is Z
+     */
     public static <T extends IPolynomial<T>> boolean isOverZ(T poly) {
         return poly.isOverZ();
-    }
-
-    public static final class Tuple2<A, B> {
-        public final A _1;
-        public final B _2;
-
-        public Tuple2(A _1, B _2) {
-            this._1 = _1;
-            this._2 = _2;
-        }
     }
 
     /**
@@ -229,5 +234,15 @@ public final class Util {
 
     public static <E> MultivariatePolynomial<Rational<E>> divideOverRationals(Ring<Rational<E>> field, MultivariatePolynomial<E> poly, E denominator) {
         return poly.mapCoefficients(field, cf -> new Rational<>(poly.ring, cf, denominator));
+    }
+
+    public static final class Tuple2<A, B> {
+        public final A _1;
+        public final B _2;
+
+        public Tuple2(A _1, B _2) {
+            this._1 = _1;
+            this._2 = _2;
+        }
     }
 }

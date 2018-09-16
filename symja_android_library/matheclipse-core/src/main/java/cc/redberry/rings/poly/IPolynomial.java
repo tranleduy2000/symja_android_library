@@ -9,7 +9,7 @@ import cc.redberry.rings.io.Stringifiable;
  * where it is stated explicitly will in general modify the instance. All arithmetic operations ({@code add(oth),
  * multiply(oth), monic()} etc.) applies to {@code this} inplace and return {@code this} reference ( so e.g. {@code
  * (poly == poly.add(other))}).
- *
+ * <p>
  * <p><b>Note:</b> modifier operations are not synchronized.
  *
  * @param <Poly> the type of polynomial (self type)
@@ -172,7 +172,7 @@ public interface IPolynomial<Poly extends IPolynomial<Poly>>
      * finite
      *
      * @return {@code base} so that {@code coefficientRingCardinality() == base^exponent} or null if cardinality is not
-     *         finite
+     * finite
      */
     BigInteger coefficientRingPerfectPowerBase();
 
@@ -181,7 +181,7 @@ public interface IPolynomial<Poly extends IPolynomial<Poly>>
      * not finite
      *
      * @return {@code exponent} so that {@code coefficientRingCardinality() == base^exponent} or null if cardinality is
-     *         not finite
+     * not finite
      */
     BigInteger coefficientRingPerfectPowerExponent();
 
@@ -438,7 +438,7 @@ public interface IPolynomial<Poly extends IPolynomial<Poly>>
      *
      * @param other other polynomial
      * @return monic part multiplied by the leading coefficient of {@code other} or null if exact division by the
-     *         reduced leading coefficient is not possible
+     * reduced leading coefficient is not possible
      */
     Poly monicWithLC(Poly other);
 
@@ -462,25 +462,37 @@ public interface IPolynomial<Poly extends IPolynomial<Poly>>
      *
      * @return deep copy of this
      */
-    default Poly copy() { return clone(); }
+    default Poly copy() {
+        return clone();
+    }
 
-    /** overcome Java generics... */
+    /**
+     * overcome Java generics...
+     */
     Poly[] createArray(int length);
 
-    /** overcome Java generics... */
+    /**
+     * overcome Java generics...
+     */
     Poly[][] createArray2d(int length);
 
-    /** overcome Java generics... */
+    /**
+     * overcome Java generics...
+     */
     Poly[][] createArray2d(int length1, int length2);
 
-    /** overcome Java generics... */
+    /**
+     * overcome Java generics...
+     */
     default Poly[] createArray(Poly a) {
         Poly[] r = createArray(1);
         r[0] = a;
         return r;
     }
 
-    /** overcome Java generics... */
+    /**
+     * overcome Java generics...
+     */
     default Poly[] createArray(Poly a, Poly b) {
         Poly[] r = createArray(2);
         r[0] = a;
@@ -488,7 +500,9 @@ public interface IPolynomial<Poly extends IPolynomial<Poly>>
         return r;
     }
 
-    /** overcome Java generics... */
+    /**
+     * overcome Java generics...
+     */
     default Poly[] createArray(Poly a, Poly b, Poly c) {
         Poly[] r = createArray(3);
         r[0] = a;

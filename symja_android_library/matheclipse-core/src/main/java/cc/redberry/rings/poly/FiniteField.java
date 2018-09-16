@@ -1,11 +1,15 @@
 package cc.redberry.rings.poly;
 
-import cc.redberry.rings.IntegersZp64;
-import cc.redberry.rings.Ring;
-import cc.redberry.rings.poly.univar.*;
-
 import java.util.Arrays;
 import java.util.Iterator;
+
+import cc.redberry.rings.IntegersZp64;
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
+import cc.redberry.rings.poly.univar.IrreduciblePolynomials;
+import cc.redberry.rings.poly.univar.UnivariatePolynomial;
+import cc.redberry.rings.poly.univar.UnivariatePolynomialZ64;
+import cc.redberry.rings.poly.univar.UnivariatePolynomialZp64;
 
 /**
  * Galois field {@code GF(p, q)}. Galois field is represented as a quotient ring {@code F[x]/<m(x)>} with given
@@ -21,15 +25,19 @@ import java.util.Iterator;
  */
 public final class FiniteField<E extends IUnivariatePolynomial<E>>
         extends SimpleFieldExtension<E> {
-    private static final long serialVersionUID = 1L;
-    /** GF(3^3) */
+    /**
+     * GF(3^3)
+     */
     public static final FiniteField<UnivariatePolynomialZp64> GF27 = new FiniteField<>(UnivariatePolynomialZ64.create(-1, -1, 0, 1).modulus(3));
-    /** GF(17^5) */
+    /**
+     * GF(17^5)
+     */
     public static final FiniteField<UnivariatePolynomialZp64> GF17p5 = new FiniteField<>(UnivariatePolynomialZ64.create(11, 11, 0, 3, 9, 9).modulus(17).monic());
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs finite field from the specified irreducible polynomial.
-     *
+     * <p>
      * <p><b>NOTE:</b> irreducibility test for the minimal polynomial is not performed here, use {@link
      * IrreduciblePolynomials#irreducibleQ(IUnivariatePolynomial)} to test irreducibility.
      *
@@ -87,6 +95,7 @@ public final class FiniteField<E extends IUnivariatePolynomial<E>>
         final Ring<E> ring;
         final E[] data;
         final Iterator<E>[] iterators;
+        private boolean first = true;
 
         @SuppressWarnings("unchecked")
         It(Ring<E> ring, int degree) {
@@ -103,8 +112,6 @@ public final class FiniteField<E extends IUnivariatePolynomial<E>>
         public boolean hasNext() {
             return Arrays.stream(iterators).anyMatch(Iterator::hasNext);
         }
-
-        private boolean first = true;
 
         @Override
         public UnivariatePolynomial<E> next() {
@@ -131,6 +138,7 @@ public final class FiniteField<E extends IUnivariatePolynomial<E>>
     private static final class lIt implements Iterator<UnivariatePolynomialZp64> {
         final IntegersZp64 ring;
         final long[] data;
+        private boolean first = true;
 
         @SuppressWarnings("unchecked")
         lIt(IntegersZp64 ring, int degree) {
@@ -142,8 +150,6 @@ public final class FiniteField<E extends IUnivariatePolynomial<E>>
         public boolean hasNext() {
             return Arrays.stream(data).anyMatch(l -> l < (ring.modulus - 1));
         }
-
-        private boolean first = true;
 
         @Override
         public UnivariatePolynomialZp64 next() {

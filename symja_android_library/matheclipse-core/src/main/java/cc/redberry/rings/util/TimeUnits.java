@@ -7,7 +7,8 @@ import org.hipparchus.stat.descriptive.DescriptiveStatistics;
  * @since 1.0
  */
 public final class TimeUnits {
-    private TimeUnits() {}
+    private TimeUnits() {
+    }
 
     public static String nanosecondsToString(long nano) {
         String pf = "ns";
@@ -37,7 +38,9 @@ public final class TimeUnits {
         return nanosecondsToString((long) (median ? stats.getPercentile(0.5) : stats.getMean())) + " ± " + nanosecondsToString((long) stats.getStandardDeviation());
     }
 
-    private static String ns(double nano) { return nanosecondsToString((long) nano);}
+    private static String ns(double nano) {
+        return nanosecondsToString((long) nano);
+    }
 
     public static String statisticsNanotimeFull(DescriptiveStatistics stats) {
         StringBuilder outBuffer = new StringBuilder();

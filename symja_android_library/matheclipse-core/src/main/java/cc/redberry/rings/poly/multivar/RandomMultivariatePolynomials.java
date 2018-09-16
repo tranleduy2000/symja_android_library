@@ -1,14 +1,15 @@
 package cc.redberry.rings.poly.multivar;
 
+import org.hipparchus.random.RandomGenerator;
+
+import java.util.Comparator;
+import java.util.function.Function;
+
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.util.RandomUtil;
-import org.hipparchus.random.RandomGenerator;
-
-import java.util.Comparator;
-import java.util.function.Function;
 
 /**
  * Methods to generate random multivariate polynomials.
@@ -16,7 +17,8 @@ import java.util.function.Function;
  * @since 1.0
  */
 public final class RandomMultivariatePolynomials {
-    private RandomMultivariatePolynomials() { }
+    private RandomMultivariatePolynomials() {
+    }
 
     /**
      * Generates random Z[X] polynomial with coefficients bounded by {@code bound}

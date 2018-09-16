@@ -9,7 +9,9 @@ import cc.redberry.rings.bigint.BigInteger;
  * @since 1.0
  */
 public final class MonomialZp64 extends AMonomial<MonomialZp64> {
-    /** the coefficient */
+    /**
+     * the coefficient
+     */
     public final long coefficient;
 
     /**

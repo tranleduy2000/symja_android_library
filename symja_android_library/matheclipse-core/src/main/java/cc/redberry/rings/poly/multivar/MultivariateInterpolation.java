@@ -1,13 +1,13 @@
 package cc.redberry.rings.poly.multivar;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.poly.IPolynomialRing;
 import gnu.trove.list.array.TLongArrayList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Multivariate interpolation
@@ -15,7 +15,8 @@ import java.util.List;
  * @since 1.0
  */
 public final class MultivariateInterpolation {
-    private MultivariateInterpolation() {}
+    private MultivariateInterpolation() {
+    }
 
     private static void checkInput(Object[] points, Object[] values) {
         if (points.length != values.length)
@@ -64,19 +65,33 @@ public final class MultivariateInterpolation {
      * Updatable Newton interpolation
      */
     public static final class Interpolation<E> {
-        /** variable */
+        /**
+         * variable
+         */
         private final int variable;
-        /** list of evaluation points */
+        /**
+         * list of evaluation points
+         */
         private final List<E> points = new ArrayList<>();
-        /** list of values at points */
+        /**
+         * list of values at points
+         */
         private final List<MultivariatePolynomial<E>> values = new ArrayList<>();
-        /** mixed radix form of interpolating polynomial */
+        /**
+         * mixed radix form of interpolating polynomial
+         */
         private final List<MultivariatePolynomial<E>> mixedRadix = new ArrayList<>();
-        /** total modulus (x_i - points[0])*(x_i - points[1])*... */
+        /**
+         * total modulus (x_i - points[0])*(x_i - points[1])*...
+         */
         private final MultivariatePolynomial<E> lins;
-        /** resulting interpolating polynomial */
+        /**
+         * resulting interpolating polynomial
+         */
         private final MultivariatePolynomial<E> poly;
-        /** ring */
+        /**
+         * ring
+         */
         private final Ring<E> ring;
 
         /**
@@ -170,54 +185,78 @@ public final class MultivariateInterpolation {
          *
          * @return variable used in the interpolation
          */
-        public int getVariable() {return variable;}
+        public int getVariable() {
+            return variable;
+        }
 
         /**
          * Returns resulting interpolating polynomial
          *
          * @return interpolating polynomial
          */
-        public MultivariatePolynomial<E> getInterpolatingPolynomial() {return poly;}
+        public MultivariatePolynomial<E> getInterpolatingPolynomial() {
+            return poly;
+        }
 
         /**
          * Returns the list of evaluation points used in interpolation
          *
          * @return list of evaluation points used in interpolation
          */
-        public List<E> getPoints() {return points;}
+        public List<E> getPoints() {
+            return points;
+        }
 
         /**
          * Returns the list of polynomial values at interpolation points
          *
          * @return the list of polynomial values at interpolation points
          */
-        public List<MultivariatePolynomial<E>> getValues() {return values;}
+        public List<MultivariatePolynomial<E>> getValues() {
+            return values;
+        }
 
         /**
          * Returns the number of interpolation points used
          *
          * @return number of interpolation points used
          */
-        public int numberOfPoints() {return points.size();}
+        public int numberOfPoints() {
+            return points.size();
+        }
     }
 
     /**
      * Updatable Newton interpolation
      */
     public static final class InterpolationZp64 {
-        /** variable */
+        /**
+         * variable
+         */
         private final int variable;
-        /** list of evaluation points */
+        /**
+         * list of evaluation points
+         */
         private final TLongArrayList points = new TLongArrayList();
-        /** list of values at points */
+        /**
+         * list of values at points
+         */
         private final List<MultivariatePolynomialZp64> values = new ArrayList<>();
-        /** mixed radix form of interpolating polynomial */
+        /**
+         * mixed radix form of interpolating polynomial
+         */
         private final List<MultivariatePolynomialZp64> mixedRadix = new ArrayList<>();
-        /** total modulus (x_i - points[0])*(x_i - points[1])*... */
+        /**
+         * total modulus (x_i - points[0])*(x_i - points[1])*...
+         */
         private final MultivariatePolynomialZp64 lins;
-        /** resulting interpolating polynomial */
+        /**
+         * resulting interpolating polynomial
+         */
         private final MultivariatePolynomialZp64 poly;
-        /** ring */
+        /**
+         * ring
+         */
         private final IntegersZp64 ring;
 
         /**
@@ -310,34 +349,44 @@ public final class MultivariateInterpolation {
          *
          * @return variable used in the interpolation
          */
-        public int getVariable() {return variable;}
+        public int getVariable() {
+            return variable;
+        }
 
         /**
          * Returns resulting interpolating polynomial
          *
          * @return interpolating polynomial
          */
-        public MultivariatePolynomialZp64 getInterpolatingPolynomial() {return poly;}
+        public MultivariatePolynomialZp64 getInterpolatingPolynomial() {
+            return poly;
+        }
 
         /**
          * Returns the list of evaluation points used in interpolation
          *
          * @return list of evaluation points used in interpolation
          */
-        public TLongArrayList getPoints() {return points;}
+        public TLongArrayList getPoints() {
+            return points;
+        }
 
         /**
          * Returns the list of polynomial values at interpolation points
          *
          * @return the list of polynomial values at interpolation points
          */
-        public List<MultivariatePolynomialZp64> getValues() {return values;}
+        public List<MultivariatePolynomialZp64> getValues() {
+            return values;
+        }
 
         /**
          * Returns the number of interpolation points used
          *
          * @return number of interpolation points used
          */
-        public int numberOfPoints() {return points.size();}
+        public int numberOfPoints() {
+            return points.size();
+        }
     }
 }

@@ -42,53 +42,109 @@ public abstract class AMonomial<Term extends AMonomial<Term>> extends DegreeVect
         return new DegreeVector(exponents, totalDegree);
     }
 
-    /** Sets coefficient of this with coefficient of oth */
+    /**
+     * Sets coefficient of this with coefficient of oth
+     */
     public abstract Term setCoefficientFrom(Term oth);
 
-    /** Sets the degree vector */
+    /**
+     * Sets the degree vector
+     */
     public abstract Term setDegreeVector(DegreeVector oth);
 
-    /** Sets the degree vector */
+    /**
+     * Sets the degree vector
+     */
     public abstract Term setDegreeVector(int[] exponents, int totalDegree);
 
-    /** Sets the degree vector */
+    /**
+     * Sets the degree vector
+     */
     public abstract Term forceSetDegreeVector(int[] exponents, int totalDegree);
 
-    /** Sets the degree vector */
-    public final Term setDegreeVector(int[] exponents) { return setDegreeVector(exponents, ArraysUtil.sum(exponents));}
+    /**
+     * Sets the degree vector
+     */
+    public final Term setDegreeVector(int[] exponents) {
+        return setDegreeVector(exponents, ArraysUtil.sum(exponents));
+    }
 
-    /** Multiplies this by oth */
-    public final Term multiply(DegreeVector oth) {return setDegreeVector(dvMultiply(oth));}
+    /**
+     * Multiplies this by oth
+     */
+    public final Term multiply(DegreeVector oth) {
+        return setDegreeVector(dvMultiply(oth));
+    }
 
-    /** Multiplies this by oth */
-    public final Term multiply(int[] oth) {return setDegreeVector(dvMultiply(oth));}
+    /**
+     * Multiplies this by oth
+     */
+    public final Term multiply(int[] oth) {
+        return setDegreeVector(dvMultiply(oth));
+    }
 
-    /** Gives quotient {@code this / oth } or null if exact division is not possible (e.g. a^2*b^3 / a^3*b^5) */
-    public final Term divideOrNull(DegreeVector divider) {return setDegreeVector(dvDivideOrNull(divider));}
+    /**
+     * Gives quotient {@code this / oth } or null if exact division is not possible (e.g. a^2*b^3 / a^3*b^5)
+     */
+    public final Term divideOrNull(DegreeVector divider) {
+        return setDegreeVector(dvDivideOrNull(divider));
+    }
 
-    /** Gives quotient {@code this / oth } or null if exact division is not possible (e.g. a^2*b^3 / a^3*b^5) */
-    public final Term divideOrNull(int[] divider) {return setDegreeVector(dvDivideOrNull(divider));}
+    /**
+     * Gives quotient {@code this / oth } or null if exact division is not possible (e.g. a^2*b^3 / a^3*b^5)
+     */
+    public final Term divideOrNull(int[] divider) {
+        return setDegreeVector(dvDivideOrNull(divider));
+    }
 
-    /** Joins new variable (with zero exponent) to degree vector */
-    public final Term joinNewVariable() {return setDegreeVector(dvJoinNewVariable());}
+    /**
+     * Joins new variable (with zero exponent) to degree vector
+     */
+    public final Term joinNewVariable() {
+        return setDegreeVector(dvJoinNewVariable());
+    }
 
-    /** Joins new variables (with zero exponents) to degree vector */
-    public final Term joinNewVariables(int n) {return setDegreeVector(dvJoinNewVariables(n));}
+    /**
+     * Joins new variables (with zero exponents) to degree vector
+     */
+    public final Term joinNewVariables(int n) {
+        return setDegreeVector(dvJoinNewVariables(n));
+    }
 
-    /** internal API */
-    public final Term joinNewVariables(int newNVariables, int[] mapping) {return setDegreeVector(dvJoinNewVariables(newNVariables, mapping));}
+    /**
+     * internal API
+     */
+    public final Term joinNewVariables(int newNVariables, int[] mapping) {
+        return setDegreeVector(dvJoinNewVariables(newNVariables, mapping));
+    }
 
-    /** Sets the number of variables */
-    public final Term setNVariables(int n) {return setDegreeVector(dvSetNVariables(n));}
+    /**
+     * Sets the number of variables
+     */
+    public final Term setNVariables(int n) {
+        return setDegreeVector(dvSetNVariables(n));
+    }
 
-    /** Sets exponents of all variables except the specified variable to zero */
-    public final Term select(int var) {return setDegreeVector(dvSelect(var));}
+    /**
+     * Sets exponents of all variables except the specified variable to zero
+     */
+    public final Term select(int var) {
+        return setDegreeVector(dvSelect(var));
+    }
 
-    /** Set's exponents of all variables except specified variables to zero */
-    public final Term select(int[] variables) {return setDegreeVector(dvSelect(variables));}
+    /**
+     * Set's exponents of all variables except specified variables to zero
+     */
+    public final Term select(int[] variables) {
+        return setDegreeVector(dvSelect(variables));
+    }
 
-    /** Picks only specified exponents */
-    public final Term dropSelect(int[] variables) {return setDegreeVector(dvDropSelect(variables));}
+    /**
+     * Picks only specified exponents
+     */
+    public final Term dropSelect(int[] variables) {
+        return setDegreeVector(dvDropSelect(variables));
+    }
 
     /**
      * Selects range from this
@@ -96,12 +152,20 @@ public abstract class AMonomial<Term extends AMonomial<Term>> extends DegreeVect
      * @param from from inclusive
      * @param to   to exclusive
      */
-    public final Term range(int from, int to) {return setDegreeVector(dvRange(from, to));}
+    public final Term range(int from, int to) {
+        return setDegreeVector(dvRange(from, to));
+    }
 
-    /** Set exponent of specified {@code var} to zero */
-    public final Term setZero(int var) {return setDegreeVector(dvSetZero(var));}
+    /**
+     * Set exponent of specified {@code var} to zero
+     */
+    public final Term setZero(int var) {
+        return setDegreeVector(dvSetZero(var));
+    }
 
-    /** Set all exponents to zero */
+    /**
+     * Set all exponents to zero
+     */
     @SuppressWarnings("unchecked")
     public final Term toZero() {
         if (isZeroVector())
@@ -109,20 +173,40 @@ public abstract class AMonomial<Term extends AMonomial<Term>> extends DegreeVect
         return setDegreeVector(new DegreeVector(new int[nVariables()], 0));
     }
 
-    /** Set exponents of specified variables to zero */
-    public final Term setZero(int[] variables) {return setDegreeVector(dvSetZero(variables));}
+    /**
+     * Set exponents of specified variables to zero
+     */
+    public final Term setZero(int[] variables) {
+        return setDegreeVector(dvSetZero(variables));
+    }
 
-    /** Drops specified variable (number of variables will be reduced) */
-    public final Term without(int variable) {return setDegreeVector(dvWithout(variable));}
+    /**
+     * Drops specified variable (number of variables will be reduced)
+     */
+    public final Term without(int variable) {
+        return setDegreeVector(dvWithout(variable));
+    }
 
-    /** Drops specified variables (number of variables will be reduced) */
-    public final Term without(int[] variables) {return setDegreeVector(dvWithout(variables));}
+    /**
+     * Drops specified variables (number of variables will be reduced)
+     */
+    public final Term without(int[] variables) {
+        return setDegreeVector(dvWithout(variables));
+    }
 
-    /** Inserts new variable (with zero exponent) */
-    public final Term insert(int variable) {return setDegreeVector(dvInsert(variable));}
+    /**
+     * Inserts new variable (with zero exponent)
+     */
+    public final Term insert(int variable) {
+        return setDegreeVector(dvInsert(variable));
+    }
 
-    /** Inserts new variables (with zero exponent) */
-    public final Term insert(int variable, int count) {return setDegreeVector(dvInsert(variable, count));}
+    /**
+     * Inserts new variables (with zero exponent)
+     */
+    public final Term insert(int variable, int count) {
+        return setDegreeVector(dvInsert(variable, count));
+    }
 
     /**
      * Renames old variables to new according to mapping
@@ -130,7 +214,9 @@ public abstract class AMonomial<Term extends AMonomial<Term>> extends DegreeVect
      * @param nVariables new total number of variables
      * @param mapping    mapping from old variables to new variables
      */
-    public final Term map(int nVariables, int[] mapping) {return setDegreeVector(dvMap(nVariables, mapping));}
+    public final Term map(int nVariables, int[] mapping) {
+        return setDegreeVector(dvMap(nVariables, mapping));
+    }
 
     /**
      * Set's exponent of specified variable to specified value
@@ -138,7 +224,9 @@ public abstract class AMonomial<Term extends AMonomial<Term>> extends DegreeVect
      * @param variable the variable
      * @param exponent new exponent
      */
-    public final Term set(int variable, int exponent) {return setDegreeVector(dvSet(variable, exponent));}
+    public final Term set(int variable, int exponent) {
+        return setDegreeVector(dvSet(variable, exponent));
+    }
 
     public final String dvToString(String[] vars) {
         return super.toString(vars);

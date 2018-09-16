@@ -1,7 +1,30 @@
 package cc.redberry.rings.poly.multivar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.OptionalInt;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import cc.redberry.rings.ChineseRemainders.ChineseRemaindersMagic;
-import cc.redberry.rings.*;
+import cc.redberry.rings.IntegersZp;
+import cc.redberry.rings.IntegersZp64;
+import cc.redberry.rings.Rational;
+import cc.redberry.rings.RationalReconstruction;
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.bigint.BigIntegerUtil;
 import cc.redberry.rings.linear.LinearSolver;
@@ -23,18 +46,20 @@ import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.set.hash.TIntHashSet;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import static cc.redberry.rings.ChineseRemainders.ChineseRemainders;
 import static cc.redberry.rings.ChineseRemainders.createMagic;
-import static cc.redberry.rings.Rings.*;
-import static cc.redberry.rings.linear.LinearSolver.SystemInfo.*;
-import static cc.redberry.rings.poly.multivar.Conversions64bit.*;
+import static cc.redberry.rings.Rings.Frac;
+import static cc.redberry.rings.Rings.MultivariateRing;
+import static cc.redberry.rings.Rings.Q;
+import static cc.redberry.rings.Rings.Z;
+import static cc.redberry.rings.Rings.Zp;
+import static cc.redberry.rings.Rings.Zp64;
+import static cc.redberry.rings.linear.LinearSolver.SystemInfo.Consistent;
+import static cc.redberry.rings.linear.LinearSolver.SystemInfo.Inconsistent;
+import static cc.redberry.rings.linear.LinearSolver.SystemInfo.UnderDetermined;
+import static cc.redberry.rings.poly.multivar.Conversions64bit.asOverZp64;
+import static cc.redberry.rings.poly.multivar.Conversions64bit.canConvertToZp64;
+import static cc.redberry.rings.poly.multivar.Conversions64bit.convertFromZp64;
 import static cc.redberry.rings.poly.multivar.MonomialOrder.GREVLEX;
 import static cc.redberry.rings.poly.multivar.MonomialOrder.isGradedOrder;
 
@@ -44,11 +69,68 @@ import static cc.redberry.rings.poly.multivar.MonomialOrder.isGradedOrder;
  * @since 2.3
  */
 public final class GroebnerBases {
-    private GroebnerBases() {}
+    // flag that we may be will switch off in the future
+    private static final boolean USE_MODULAR_ALGORITHM = true;
+    // maximal number of variables for modular algorithm used by default
+    private static final int MODULAR_ALGORITHM_MAX_N_VARIABLES = 3;
+    /**
+     * Minimal size of selected set of critical pairs
+     */
+    private static final int F4_MIN_SELECTION_SIZE = 0; // not used actually
+    /**
+     * The boundary size of S-pairs set when still normal Buchberger algorithm should be applied
+     */
+    private static final int
+            F4_OVER_FIELD_LINALG_THRESHOLD = 16,
+            F4_OVER_EUCLID_LINALG_THRESHOLD = 6;
+    private static final double DENSE_FILLING_THRESHOLD = 0.1;
+    /**
+     * thresholds to control sparse over modular reconstruction in ModularGB
+     */
+    private static final int
+            N_UNKNOWNS_THRESHOLD = 32,
+            N_BUCHBERGER_STEPS_THRESHOLD = 2 * 32;
+    /**
+     * thresholds to control traditional GB over modular in ModularGB
+     */
+    private static final int
+            N_MOD_STEPS_THRESHOLD = 4,
+            N_BUCHBERGER_STEPS_REDUNDANCY_DELTA = 9;
+    /**
+     * when to drop unused variables
+     */
+    private static final int DROP_SOLVED_VARIABLES_THRESHOLD = 128;
+
+    /* **************************************** Common methods ************************************************ */
+    /**
+     * when to drop unused variables
+     */
+    private static final double DROP_SOLVED_VARIABLES_RELATIVE_THRESHOLD = 0.1;
+    /**
+     * no any minimization at intermediate steps, just keep all track of generators as is
+     */
+    public static MinimizationStrategy NO_MINIMIZATION = (prev, curr) -> false;
+    private static Comparator<HilbertSeries> ModHilbertSeriesComparator = (a, b) -> {
+        UnivariatePolynomial<Rational<BigInteger>>
+                aHilbert = a.hilbertPolynomial(),
+                bHilbert = b.hilbertPolynomial();
+
+        if (aHilbert.equals(bHilbert))
+            return 0;
+
+        for (int n = Math.max(a.numerator.degree(), b.numerator.degree()) + 1; ; ++n) {
+            int c = aHilbert.evaluate(n).compareTo(bHilbert.evaluate(n));
+            if (c != 0)
+                return c;
+        }
+    };
+
+    private GroebnerBases() {
+    }
 
     /**
      * Computes Groebner basis (minimized and reduced) of a given ideal represented by a list of generators.
-     *
+     * <p>
      * <p>The implementation switches between F4 algorithm (for graded orders) and Hilbert-driven Buchberger algorithm
      * for hard orders like LEX. For polynomials over Q modular methods are also used in some cases.
      *
@@ -81,10 +163,10 @@ public final class GroebnerBases {
     /**
      * Computes Groebner basis (minimized and reduced) of a given ideal over finite filed represented by a list of
      * generators.
-     *
+     * <p>
      * <p>The implementation switches between F4 algorithm (for graded orders) and Hilbert-driven Buchberger algorithm
      * for hard orders like LEX.
-     *
+     * <p>
      * <p>If a non null value for Hilbert-Poincare series {@code hilbertSeries} is passed, it will be used to speed up
      * computations with some Hilbert-driven criteria.
      *
@@ -115,17 +197,12 @@ public final class GroebnerBases {
             return BuchbergerGB(generators, monomialOrder);
     }
 
-    // flag that we may be will switch off in the future
-    private static final boolean USE_MODULAR_ALGORITHM = true;
-    // maximal number of variables for modular algorithm used by default
-    private static final int MODULAR_ALGORITHM_MAX_N_VARIABLES = 3;
-
     /**
      * Computes Groebner basis (minimized and reduced) of a given ideal over Z represented by a list of generators.
-     *
+     * <p>
      * <p>The implementation switches between F4 algorithm (for graded orders) and Hilbert-driven Buchberger algorithm
      * for hard orders like LEX. For polynomials in less or equals than three variables modular algorithm is used.
-     *
+     * <p>
      * <p>If a non null value for Hilbert-Poincare series {@code hilbertSeries} is passed, it will be used to speed up
      * computations with some Hilbert-driven criteria.
      *
@@ -158,10 +235,10 @@ public final class GroebnerBases {
 
     /**
      * Computes Groebner basis (minimized and reduced) of a given ideal over Q represented by a list of generators.
-     *
+     * <p>
      * <p>The implementation switches between F4 algorithm (for graded orders) and Hilbert-driven Buchberger algorithm
      * for hard orders like LEX. For polynomials in less or equals than three variables modular algorithm is used.
-     *
+     * <p>
      * <p>If a non null value for Hilbert-Poincare series {@code hilbertSeries} is passed, it will be used to speed up
      * computations with some Hilbert-driven criteria.
      *
@@ -176,15 +253,17 @@ public final class GroebnerBases {
         return FracGB(generators, monomialOrder, hilbertSeries, (p, o, s) -> GroebnerBasisInZ(p, o, s, tryModular));
     }
 
-    /** Converts basis into a basis for desired monomial order */
+    /**
+     * Converts basis into a basis for desired monomial order
+     */
     public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Poly> ConvertBasis(List<Poly> generators, Comparator<DegreeVector> desiredOrder) {
         return HilbertConvertBasis(generators, desiredOrder);
     }
 
-    /* **************************************** Common methods ************************************************ */
-
-    /** Set monomial order inplace */
+    /**
+     * Set monomial order inplace
+     */
     @SuppressWarnings("unchecked")
     static <Poly extends AMultivariatePolynomial<?, Poly>>
     void setMonomialOrder(List<Poly> list, Comparator<DegreeVector> order) {
@@ -195,7 +274,9 @@ public final class GroebnerBases {
         }
     }
 
-    /** Make each poly monic and sort list */
+    /**
+     * Make each poly monic and sort list
+     */
     static <Poly extends AMultivariatePolynomial<?, Poly>>
     List<Poly> canonicalize(List<Poly> list) {
         if (Util.isOverRationals(list.get(0)))
@@ -212,7 +293,9 @@ public final class GroebnerBases {
         list.replaceAll(p -> Util.toCommonDenominator(p)._1.canonical().mapCoefficients(p.ring, c -> new Rational<>(fRing, c)));
     }
 
-    /** set monomial order, monicize, sort etc. */
+    /**
+     * set monomial order, monicize, sort etc.
+     */
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Poly> prepareGenerators(List<Poly> generators, Comparator<DegreeVector> monomialOrder) {
         // clone generators & set monomial order
@@ -252,8 +335,9 @@ public final class GroebnerBases {
         return generators;
     }
 
-
-    /** Minimizes Groebner basis. The input should be a Groebner basis */
+    /**
+     * Minimizes Groebner basis. The input should be a Groebner basis
+     */
     public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     void minimizeGroebnerBases(List<Poly> basis) {
         outer:
@@ -273,7 +357,9 @@ public final class GroebnerBases {
         }
     }
 
-    /** Computes reduced Groebner basis */
+    /**
+     * Computes reduced Groebner basis
+     */
     public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     void removeRedundant(List<Poly> basis) {
         for (int i = 0, size = basis.size(); i < size; ++i) {
@@ -287,55 +373,25 @@ public final class GroebnerBases {
         }
     }
 
-    /** Abstract critical pair: used with different Poly type for Buchberger and F4 algorithms */
-    public static class SyzygyPair<Term extends AMonomial<Term>, Poly extends MonomialSetView<Term>> {
-        /** Positions of polynomials {@code fi} and {@code fj} in the list of generators */
-        final int i, j;
-        /** Polynomials to form a syzygy */
-        final Poly fi, fj;
-        /** {@code lcm(fi.lt(), fj.lt())} */
-        final DegreeVector syzygyGamma;
-        /** The sugar */
-        final int sugar;
-
-        SyzygyPair(int i, int j, Poly fi, Poly fj) {
-            if (i > j) {
-                int s = i; i = j; j = s;
-                Poly fs = fi; fi = fj; fj = fs;
-            }
-            assert i != j && fi != fj;
-            assert shareVariablesQ(fi.lt(), fj.lt());
-            this.i = i; this.j = j;
-            this.fi = fi; this.fj = fj;
-            this.syzygyGamma = lcm(fi.lt(), fj.lt());
-            this.sugar = Math.max(
-                    fi.degreeSum() - fi.lt().totalDegree,
-                    fj.degreeSum() - fj.lt().totalDegree) + syzygyGamma.totalDegree;
-        }
-
-        SyzygyPair(int i, int j, List<Poly> generators) {
-            this(i, j, generators.get(i), generators.get(j));
-        }
-
-        /** syzygy degree */
-        final int degree() { return syzygyGamma.totalDegree;}
-
-        final int sugar() { return sugar; }
-    }
-
-    /** Computes syzygy of given polynomials */
+    /**
+     * Computes syzygy of given polynomials
+     */
     public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     Poly syzygy(Poly a, Poly b) {
         return syzygy(new DegreeVector(lcm(a.multidegree(), b.multidegree())), a, b);
     }
 
-    /** Computes syzygy of given polynomials */
+    /**
+     * Computes syzygy of given polynomials
+     */
     public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     Poly syzygy(SyzygyPair<Term, Poly> sPair) {
         return syzygy(sPair.syzygyGamma, sPair.fi, sPair.fj);
     }
 
-    /** Computes syzygy of given polynomials */
+    /**
+     * Computes syzygy of given polynomials
+     */
     @SuppressWarnings("unchecked")
     static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     Poly syzygy(DegreeVector dvlcm, Poly a, Poly b) {
@@ -353,117 +409,6 @@ public final class GroebnerBases {
                 bReduced = b.clone().multiply(mAlgebra.divideExact(lcm, b.lt())),
                 syzygy = aReduced.subtract(bReduced);
         return syzygy;
-    }
-
-    /**
-     * Data structure which holds current set of critical pairs. This set may be just a Set&lt;SyzygyPair&gt; (TreeSet
-     * actually), or some more complicated structure (map of sets, e.g. TreeMap&lt;Integer,
-     * TreeSet&lt;SyzygyPair&lt;Term, Poly&gt;&gt;&gt; of degree -&gt; set of pairs with this degree) for graded
-     * algorithms (F4, homogeneous Buchberger etc).
-     */
-    interface SyzygySet<Term extends AMonomial<Term>, Poly extends MonomialSetView<Term>> {
-        /** add new syzygy to set */
-        void add(SyzygyPair<Term, Poly> sPair);
-
-        /** remove syzygy from set */
-        void remove(SyzygyPair<Term, Poly> sPair);
-
-        /** is empty */
-        boolean isEmpty();
-
-        default int size() { return allSets().stream().mapToInt(TreeSet::size).sum(); }
-
-        /** remove a bunch of syzygies to process */
-        Collection<SyzygyPair<Term, Poly>> getAndRemoveNextBunch();
-
-        /** a view of all sets of syzygies */
-        Collection<TreeSet<SyzygyPair<Term, Poly>>> allSets();
-
-        default List<SyzygyPair<Term, Poly>> allPairs() {
-            return allSets().stream().flatMap(Collection::stream).collect(Collectors.toList());
-        }
-    }
-
-    /**
-     * A plain set of critical pairs --- wrapper around TreeSet&lt;SyzygyPair&lt;Term, Poly&gt;&gt;. Elements are
-     * ordered according to the comparator of TreeSet instance.
-     */
-    static final class SyzygyTreeSet<Term extends AMonomial<Term>, Poly extends MonomialSetView<Term>>
-            implements SyzygySet<Term, Poly> {
-        final TreeSet<SyzygyPair<Term, Poly>> sPairs;
-
-        SyzygyTreeSet(TreeSet<SyzygyPair<Term, Poly>> sPairs) { this.sPairs = sPairs; }
-
-        @Override
-        public void add(SyzygyPair<Term, Poly> sPair) { sPairs.add(sPair); }
-
-        @Override
-        public void remove(SyzygyPair<Term, Poly> sPair) { sPairs.remove(sPair); }
-
-        @Override
-        public boolean isEmpty() { return sPairs.isEmpty(); }
-
-        /**
-         * Returns the single element from the top of TreeSet
-         */
-        @Override
-        public Collection<SyzygyPair<Term, Poly>> getAndRemoveNextBunch() {return Collections.singleton(sPairs.pollFirst());}
-
-        /**
-         * Returns the single TreeSet (this)
-         */
-        @Override
-        public Collection<TreeSet<SyzygyPair<Term, Poly>>> allSets() { return new ArrayList<>(Collections.singleton(sPairs));}
-    }
-
-    /**
-     * Graded set of syzygies: critical pairs are collected in the sets each one containing critical pairs with the same
-     * degree. Wrapper around TreeMap&lt;Integer, TreeSet&lt;SyzygyPair&lt;Term, Poly&gt;&gt;&gt;
-     */
-    static final class GradedSyzygyTreeSet<Term extends AMonomial<Term>, Poly extends MonomialSetView<Term>>
-            implements SyzygySet<Term, Poly> {
-        final TreeMap<Integer, TreeSet<SyzygyPair<Term, Poly>>> sPairs;
-        final Comparator<SyzygyPair> selectionStrategy;
-        final ToIntFunction<SyzygyPair<Term, Poly>> weightFunction;
-
-        GradedSyzygyTreeSet(TreeMap<Integer, TreeSet<SyzygyPair<Term, Poly>>> sPairs,
-                            Comparator<SyzygyPair> selectionStrategy,
-                            ToIntFunction<SyzygyPair<Term, Poly>> weightFunction) {
-            this.sPairs = sPairs;
-            this.selectionStrategy = selectionStrategy;
-            this.weightFunction = weightFunction;
-        }
-
-        @Override
-        public void add(SyzygyPair<Term, Poly> sPair) {
-            sPairs.computeIfAbsent(weightFunction.applyAsInt(sPair), __ -> new TreeSet<>(selectionStrategy)).add(sPair);
-        }
-
-        @Override
-        public void remove(SyzygyPair<Term, Poly> sPair) {
-            int weight = weightFunction.applyAsInt(sPair);
-            TreeSet<SyzygyPair<Term, Poly>> set = sPairs.get(weight);
-            if (set != null) {
-                set.remove(sPair);
-                if (set.isEmpty())
-                    sPairs.remove(weight);
-            }
-        }
-
-        @Override
-        public boolean isEmpty() { return sPairs.isEmpty(); }
-
-        /**
-         * Returns all syzygies with the minimal degree
-         */
-        @Override
-        public Collection<SyzygyPair<Term, Poly>> getAndRemoveNextBunch() {return sPairs.pollFirstEntry().getValue();}
-
-        /**
-         * Returns sets of syzygies each one with fixed degree
-         */
-        @Override
-        public Collection<TreeSet<SyzygyPair<Term, Poly>>> allSets() { return sPairs.values();}
     }
 
     /**
@@ -621,39 +566,37 @@ public final class GroebnerBases {
         return selectionStrategy;
     }
 
-    /** Ecart comparator */
-    private static final class EcartComparator<Poly extends AMultivariatePolynomial<?, Poly>>
-            implements Comparator<Poly> {
-        @Override
-        public int compare(Poly a, Poly b) {
-            int c = Integer.compare(a.ecart(), b.ecart());
-            if (c != 0)
-                return c;
-            return a.ordering.compare(a.lt(), b.lt());
-        }
-    }
-
-    /** whether this monomial order is OK for use with homogenization-dehomogenization algorithms */
+    /**
+     * whether this monomial order is OK for use with homogenization-dehomogenization algorithms
+     */
     static boolean isHomogenizationCompatibleOrder(Comparator<DegreeVector> monomialOrder) {
         return isGradedOrder(monomialOrder) || monomialOrder == MonomialOrder.LEX;
     }
 
-    /** whether monomial order is graded */
+    /**
+     * whether monomial order is graded
+     */
     static boolean isEasyOrder(Comparator<DegreeVector> monomialOrder) {
         return isGradedOrder(monomialOrder);
     }
 
-    /** l.c.m. of degree vectors */
+    /**
+     * l.c.m. of degree vectors
+     */
     static DegreeVector lcm(DegreeVector a, DegreeVector b) {
         return new DegreeVector(lcm(a.exponents, b.exponents));
     }
 
-    /** l.c.m. of degree vectors */
+    /**
+     * l.c.m. of degree vectors
+     */
     static int[] lcm(int[] a, int[] b) {
         return ArraysUtil.max(a, b);
     }
 
-    /** whether dividend degree vector can be divided by divider degree vector */
+    /**
+     * whether dividend degree vector can be divided by divider degree vector
+     */
     private static boolean dividesQ(int[] divider, int[] dividend) {
         for (int i = 0; i < dividend.length; i++)
             if (dividend[i] < divider[i])
@@ -661,12 +604,16 @@ public final class GroebnerBases {
         return true;
     }
 
-    /** whether dividend monomial can be divided by divider monomial */
+    /**
+     * whether dividend monomial can be divided by divider monomial
+     */
     private static boolean dividesQ(DegreeVector divider, DegreeVector dividend) {
         return dividend.dvDivisibleBy(divider);
     }
 
-    /** have variables in common */
+    /**
+     * have variables in common
+     */
     static boolean shareVariablesQ(DegreeVector a, DegreeVector b) {
         for (int i = 0; i < a.exponents.length; i++)
             if (a.exponents[i] != 0 && b.exponents[i] != 0)
@@ -697,7 +644,11 @@ public final class GroebnerBases {
                 .collect(Collectors.toList());
     }
 
-    /** Groebner basis over fraction fields */
+    /* ************************************** Buchberger algorithm ********************************************** */
+
+    /**
+     * Groebner basis over fraction fields
+     */
     static <E> GBResult<Monomial<Rational<E>>, MultivariatePolynomial<Rational<E>>>
     FracGB(List<MultivariatePolynomial<Rational<E>>> ideal,
            Comparator<DegreeVector> monomialOrder,
@@ -706,7 +657,9 @@ public final class GroebnerBases {
         return FracGB(algorithm).GroebnerBasis(ideal, monomialOrder, hps);
     }
 
-    /** Groebner basis over fraction fields */
+    /**
+     * Groebner basis over fraction fields
+     */
     static <E> GroebnerAlgorithm<Monomial<Rational<E>>, MultivariatePolynomial<Rational<E>>>
     FracGB(GroebnerAlgorithm<Monomial<E>, MultivariatePolynomial<E>> algorithm) {
         return (gens, ord, hilb) -> {
@@ -714,62 +667,6 @@ public final class GroebnerBases {
             return new GBResult<>(toFractions(r), r);
         };
     }
-
-    /** auxiliary interface for Groebner basis methods */
-    interface GroebnerAlgorithm<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>> {
-        GBResult<Term, Poly> GroebnerBasis(List<Poly> ideal,
-                                           Comparator<DegreeVector> monomialOrder,
-                                           HilbertSeries hps);
-    }
-
-    /** Auxiliary class used to control complexity of Groebner basis computation */
-    static final class GBResult<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>>
-            extends ListWrapper<Poly> {
-        /** Total number of reduced polynomials (twice number of computed syzygies in case of Buchberger algorithm) */
-        final int nProcessedPolynomials;
-        /**
-         * Number of zero reductions (twice number of computed zero syzygies in case of Buchberger algorithm)
-         */
-        final int nZeroReductions;
-        /**
-         * Number of zero reductions (twice number of computed zero syzygies in case of Buchberger algorithm)
-         */
-        final int nHilbertRemoved;
-
-        GBResult(List<Poly> list, int nProcessedPolynomials, int nZeroReductions, int nHilbertRemoved) {
-            super(list);
-            this.nProcessedPolynomials = nProcessedPolynomials;
-            this.nZeroReductions = nZeroReductions;
-            this.nHilbertRemoved = nHilbertRemoved;
-        }
-
-        GBResult(List<Poly> list, GBResult r) {
-            super(list);
-            this.nProcessedPolynomials = r.nProcessedPolynomials;
-            this.nZeroReductions = r.nZeroReductions;
-            this.nHilbertRemoved = r.nHilbertRemoved;
-        }
-
-        boolean isBuchbergerType() {
-            return nProcessedPolynomials != -1;
-        }
-
-        static <T extends AMonomial<T>, P extends AMultivariatePolynomial<T, P>>
-        GBResult<T, P> notBuchberger(List<P> basis) {
-            return new GBResult<>(basis, -1, -1, -1);
-        }
-
-        static <T extends AMonomial<T>, P extends AMultivariatePolynomial<T, P>>
-        GBResult<T, P> trivial(List<P> basis) {
-            return new GBResult<>(basis, 0, 0, 0);
-        }
-    }
-
-    /* ************************************** Buchberger algorithm ********************************************** */
 
     /**
      * Computes minimized and reduced Groebner basis of a given ideal via Buchberger algorithm. It uses normal strategy
@@ -964,7 +861,9 @@ public final class GroebnerBases {
         return new GBResult<>(groebner, 2 * nProcessedSyzygies, 2 * nRedundantSyzygies, nHilbertRemoved);
     }
 
-    /** remove redundant S-pairs using Hilbert function */
+    /**
+     * remove redundant S-pairs using Hilbert function
+     */
     private static <Term extends AMonomial<Term>, Poly extends MonomialSetView<Term>>
     HilbertUpdate updateWithHPS(HilbertSeries hilbertSeries,
                                 HilbertSeries currentHPS,
@@ -990,43 +889,9 @@ public final class GroebnerBases {
         return new HilbertUpdate(currentDegree, hilbertDelta, sizeBefore - sPairs.size());
     }
 
-    /** auxiliary structure that holds results of Hilbert update */
-    private static final class HilbertUpdate {
-        final int currentDegree;
-        final int hilbertDelta;
-        final int nRemovedPairs;
-        final boolean finished;
-
-        HilbertUpdate() {
-            this.finished = true;
-            this.nRemovedPairs = -1;
-            this.currentDegree = -1;
-            this.hilbertDelta = -1;
-        }
-
-        HilbertUpdate(int currentDegree, int hilbertDelta, int nRemovedPairs) {
-            this.currentDegree = currentDegree;
-            this.hilbertDelta = hilbertDelta;
-            this.nRemovedPairs = nRemovedPairs;
-            this.finished = false;
-        }
-    }
-
-    /** Strategy used to reduce and minimize basis in the intermediate steps of Buchberger algorithm */
-    public interface MinimizationStrategy {
-        /**
-         * true means "yes, do minimization and reduction", false means "just keep all generators as is"
-         *
-         * @param previousSize size of generators list on the previous invocation of minimization
-         * @param currentSize  current size of generators list
-         */
-        boolean doMinimize(int previousSize, int currentSize);
-    }
-
-    /** no any minimization at intermediate steps, just keep all track of generators as is */
-    public static MinimizationStrategy NO_MINIMIZATION = (prev, curr) -> false;
-
-    /** reduce & minimize current basis */
+    /**
+     * reduce & minimize current basis
+     */
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     void reduceAndMinimizeGroebnerBases(List<Poly> generators,
                                         SyzygySet<Term, Poly> sPairs,
@@ -1151,13 +1016,17 @@ public final class GroebnerBases {
         return new GBResult<>(l, r);
     }
 
-    /** computes Groebner basis in GREVLEX with shuffled variables */
+    /**
+     * computes Groebner basis in GREVLEX with shuffled variables
+     */
     public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Poly> GroebnerBasisWithOptimizedGradedOrder(List<Poly> ideal) {
         return GroebnerBasisWithOptimizedGradedOrder(ideal, (l, o, h) -> GBResult.notBuchberger(GroebnerBasis(l, o)));
     }
 
-    /** computes Groebner basis in GREVLEX with shuffled variables */
+    /**
+     * computes Groebner basis in GREVLEX with shuffled variables
+     */
     public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Poly> GroebnerBasisWithOptimizedGradedOrder(List<Poly> ideal, GroebnerAlgorithm<Term, Poly> baseAlgorithm) {
         Comparator<DegreeVector> ord = optimalOrder(ideal);
@@ -1170,7 +1039,9 @@ public final class GroebnerBases {
         return GroebnerBasisRegardingGrevLexWithPermutation(ideal, baseAlgorithm, order);
     }
 
-    /** computes Groebner basis in GREVLEX with shuffled variables */
+    /**
+     * computes Groebner basis in GREVLEX with shuffled variables
+     */
     public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Poly> GroebnerBasisRegardingGrevLexWithPermutation(List<Poly> ideal, GroebnerAlgorithm<Term, Poly> baseAlgorithm, GrevLexWithPermutation order) {
         int[] inversePermutation = MultivariateGCD.inversePermutation(order.permutation);
@@ -1205,8 +1076,6 @@ public final class GroebnerBases {
         return new GrevLexWithPermutation(permutation);
     }
 
-    /* ************************************************** F4 ******************************************************* */
-
     /**
      * Computes minimized and reduced Groebner basis of a given ideal via Faugère's F4 F4 algorithm.
      *
@@ -1220,9 +1089,11 @@ public final class GroebnerBases {
         return F4GB(generators, monomialOrder, null);
     }
 
+    /* ************************************************** F4 ******************************************************* */
+
     /**
      * Computes minimized and reduced Groebner basis of a given ideal via Faugère's F4 algorithm.
-     *
+     * <p>
      * <p>Simplification routine used is due to Joux & Vitse, "A variant of F4 algorithm",
      * https://eprint.iacr.org/2010/158.pdf, 2011
      *
@@ -1246,152 +1117,9 @@ public final class GroebnerBases {
                 hilbertSeries);
     }
 
-    /*
-     * In F4 algorithm we don't need tree-based structure for multivariate polynomials, since no any additions/divisions
-     * performed (all operations are reduced to matrix operations). The only arithmetic operation used under the hood
-     * of F4 is multiplication by monomial, which still preserves the order of terms. So, we switch here to array-based
-     * (with sorted array) representation of polynomials which is much faster than tree-based.
-     */
-
-    /**
-     * Array-based polynomial representation. The data array is sorted in descending order, so the first element is the
-     * leading term.
-     */
-    private static final class ArrayBasedPoly<Term extends AMonomial<Term>> implements MonomialSetView<Term> {
-        /** sorted (in reverse order, so lt is the first) array of terms */
-        final IMonomialAlgebra<Term> mAlgebra;
-        final Term[] data;
-        final int[] degrees;
-
-        ArrayBasedPoly(AMultivariatePolynomial<Term, ?> poly) {
-            // retrieve data array from poly in descending order
-            this.mAlgebra = poly.monomialAlgebra;
-            this.data = poly.terms.descendingMap().values().toArray(poly.monomialAlgebra.createArray(poly.size()));
-            this.degrees = poly.degrees();
-        }
-
-        ArrayBasedPoly(IMonomialAlgebra<Term> mAlgebra, Term[] data, int[] degrees) {
-            this.mAlgebra = mAlgebra;
-            this.data = data;
-            this.degrees = degrees;
-        }
-
-        ArrayBasedPoly(IMonomialAlgebra<Term> mAlgebra, Term[] data, int nVariables) {
-            this.mAlgebra = mAlgebra;
-            this.data = data;
-            this.degrees = new int[nVariables];
-            for (Term db : data)
-                for (int i = 0; i < nVariables; i++)
-                    if (db.exponents[i] > degrees[i])
-                        degrees[i] = db.exponents[i];
-        }
-
-        @Override
-        public Iterator<Term> ascendingIterator() { throw new UnsupportedOperationException(); }
-
-        @Override
-        public Iterator<Term> descendingIterator() { return Arrays.asList(data).iterator(); }
-
-        @Override
-        public Iterator<Term> iterator() { return descendingIterator(); }
-
-        @Override
-        public int[] degrees() { return degrees; }
-
-        @Override
-        public Term first() { return data[data.length - 1]; }
-
-        @Override
-        public Term last() { return data[0]; }
-
-        @Override
-        public int size() { return data.length; }
-
-        Term get(int i) { return data[i]; }
-
-        Term find(Term dv, Comparator<DegreeVector> ordering) {
-            int i = Arrays.binarySearch(data, dv, (a, b) -> ordering.compare(b, a));
-            if (i < 0)
-                return null;
-            return data[i];
-        }
-
-        @Override
-        public Collection<Term> collection() { return Arrays.asList(data); }
-
-        @Override
-        public ArrayBasedPoly<Term> clone() { return new ArrayBasedPoly<>(mAlgebra, data.clone(), degrees.clone()); }
-
-        @Override
-        public String toString() {
-            return Arrays.toString(data);
-        }
-
-        void multiply(Term term) {
-            for (int i = data.length - 1; i >= 0; --i)
-                data[i] = mAlgebra.multiply(data[i], term);
-            for (int i = 0; i < degrees.length; ++i)
-                degrees[i] += term.exponents[i];
-        }
-
-        void multiply(DegreeVector term) {
-            for (int i = data.length - 1; i >= 0; --i)
-                data[i] = data[i].multiply(term);
-            for (int i = 0; i < degrees.length; ++i)
-                degrees[i] += term.exponents[i];
-        }
-
-        void divideExact(Term term) {
-            for (int i = data.length - 1; i >= 0; --i)
-                data[i] = mAlgebra.divideExact(data[i], term);
-            for (int i = 0; i < degrees.length; ++i)
-                degrees[i] -= term.exponents[i];
-        }
-
-        /** Multiply array-based poly by a monomial */
-        void monic() {
-            Term unit = mAlgebra.getUnitTerm(lt().exponents.length);
-            multiply(mAlgebra.divideExact(unit, lt().setDegreeVector(unit)));
-        }
-
-        @SuppressWarnings("unchecked")
-        void primitivePart() {
-            if (mAlgebra instanceof IMonomialAlgebra.MonomialAlgebra) {
-                Ring ring = ((IMonomialAlgebra.MonomialAlgebra) mAlgebra).ring;
-                Object gcd = ring.gcd(Arrays.stream(data).map(t -> ((Monomial) t).coefficient).collect(Collectors.toList()));
-                this.divideExact((Term) new Monomial(data[0].exponents.length, gcd));
-            }
-        }
-
-        void canonical() {
-            if (mAlgebra instanceof IMonomialAlgebra.MonomialAlgebra
-                    && !((IMonomialAlgebra.MonomialAlgebra) mAlgebra).ring.isField())
-                primitivePart();
-            else
-                monic();
-        }
-
-        /** Sets the leading coefficient of poly from the coefficient of term (poly is copied only if necessary) */
-        ArrayBasedPoly<Term> setLeadCoeffFrom(Term term) {
-            if (mAlgebra.haveSameCoefficients(lt(), term))
-                return this;
-            ArrayBasedPoly<Term> poly = clone();
-            poly.multiply(mAlgebra.divideExact(term.toZero(), poly.lt().toZero()));
-            return poly;
-        }
-    }
-
-    /** Minimal size of selected set of critical pairs */
-    private static final int F4_MIN_SELECTION_SIZE = 0; // not used actually
-
-    /** The boundary size of S-pairs set when still normal Buchberger algorithm should be applied */
-    private static final int
-            F4_OVER_FIELD_LINALG_THRESHOLD = 16,
-            F4_OVER_EUCLID_LINALG_THRESHOLD = 6;
-
     /**
      * Computes minimized and reduced Groebner basis of a given ideal via Faugère's F4 algorithm.
-     *
+     * <p>
      * <p>Simplification routine used is due to Joux & Vitse, "A variant of F4 algorithm",
      * https://eprint.iacr.org/2010/158.pdf, 2011
      *
@@ -1636,21 +1364,12 @@ public final class GroebnerBases {
         return new GBResult<>(result, nProcessedPolynomials, nRedundantSyzygies, nHilbertRemoved);
     }
 
-    /**
-     * A simple container for polynomial and the index of this polynomial (or initial basis polynomial which was reduced
-     * in F4 to this polynomial) in the list of generators
+    /*
+     * In F4 algorithm we don't need tree-based structure for multivariate polynomials, since no any additions/divisions
+     * performed (all operations are reduced to matrix operations). The only arithmetic operation used under the hood
+     * of F4 is multiplication by monomial, which still preserves the order of terms. So, we switch here to array-based
+     * (with sorted array) representation of polynomials which is much faster than tree-based.
      */
-    static final class HPolynomial<Term extends AMonomial<Term>> {
-        /** polynomial */
-        final ArrayBasedPoly<Term> hPoly;
-        /** index in generators list of the original polynomial */
-        final int indexOfOrigin;
-
-        HPolynomial(ArrayBasedPoly<Term> hPoly, int indexOfOrigin) {
-            this.hPoly = hPoly;
-            this.indexOfOrigin = indexOfOrigin;
-        }
-    }
 
     /**
      * Simplifies h-polynomial by replacing it with its previously computed reduction. For details see Joux & Vitse, "A
@@ -1720,11 +1439,6 @@ public final class GroebnerBases {
             return (List<ArrayBasedPoly<Term>>) reduceMatrixE(
                     (MultivariatePolynomial) factory, (List) basis, (List) hPolynomials, hMonomials, (List) f4reductions);
     }
-
-    private static final double DENSE_FILLING_THRESHOLD = 0.1;
-
-
-    /* ******************************************* F4 Zp64 linear algebra ******************************************* */
 
     @SuppressWarnings("unchecked")
     private static List<ArrayBasedPoly<MonomialZp64>> reduceMatrixZp64(
@@ -2060,196 +1774,6 @@ public final class GroebnerBases {
         return nPlusPolynomials;
     }
 
-    /** Sparse array implementation */
-    static final class SparseArrayZp64 {
-        final IntegersZp64 ring;
-        final int length;
-        final int[] densePositions;
-        final long[] denseValues;
-        int[] sparsePositions;
-        long[] sparseValues;
-
-        SparseArrayZp64(IntegersZp64 ring,
-                        int length,
-                        int[] densePositions,
-                        int[] sparsePositions,
-                        long[] denseValues,
-                        long[] sparseValues) {
-            this.ring = ring;
-            this.length = length;
-            this.densePositions = densePositions;
-            this.sparsePositions = sparsePositions;
-            this.denseValues = denseValues;
-            this.sparseValues = sparseValues;
-            assert isSorted(sparsePositions);
-        }
-
-        SparseArrayZp64(IntegersZp64 ring,
-                        int[] densePositions,
-                        long[] denseArray) {
-            this.ring = ring;
-            this.densePositions = densePositions;
-            this.length = denseArray.length;
-            this.denseValues = new long[densePositions.length];
-            for (int i = 0; i < densePositions.length; i++)
-                denseValues[i] = denseArray[densePositions[i]];
-
-            TIntArrayList sparsePositions = new TIntArrayList();
-            TLongArrayList sparseValues = new TLongArrayList();
-            for (int i = 0; i < denseArray.length; ++i) {
-                if (denseArray[i] == 0)
-                    continue;
-                if (Arrays.binarySearch(densePositions, i) >= 0)
-                    continue;
-                sparsePositions.add(i);
-                sparseValues.add(denseArray[i]);
-            }
-            this.sparsePositions = sparsePositions.toArray();
-            this.sparseValues = sparseValues.toArray();
-        }
-
-        long[] toDense() {
-            long[] result = new long[length];
-            for (int i = 0; i < densePositions.length; ++i)
-                result[densePositions[i]] = denseValues[i];
-            for (int i = 0; i < sparsePositions.length; ++i)
-                result[sparsePositions[i]] = sparseValues[i];
-            return result;
-        }
-
-        void subtract(SparseArrayZp64 pivot, long factor, int iColumn, int firstDense) {
-            if (factor == 0)
-                return;
-            assert pivot.densePositions == densePositions;
-            long negFactor = ring.negate(factor);
-
-            // adding dense parts
-            for (int i = firstDense; i < denseValues.length; i++)
-                denseValues[i] = ring.subtract(denseValues[i], ring.multiply(factor, pivot.denseValues[i]));
-
-            // subtracting sparse parts
-            int[] pivCols = pivot.sparsePositions;
-            long[] pivVals = pivot.sparseValues;
-
-            int firstSparse = ArraysUtil.binarySearch1(sparsePositions, iColumn);
-
-            // resulting non-zero columns
-            TIntArrayList resCols = new TIntArrayList(sparsePositions.length + pivCols.length);
-            TLongArrayList resVals = new TLongArrayList(sparsePositions.length + pivCols.length);
-
-            resCols.add(sparsePositions, 0, firstSparse);
-            resVals.add(sparseValues, 0, firstSparse);
-
-            int iSel = firstSparse, iPiv = 0;
-            while (iSel < sparsePositions.length && iPiv < pivCols.length) {
-                int
-                        selCol = sparsePositions[iSel],
-                        othCol = pivCols[iPiv];
-
-                if (selCol == othCol) {
-                    long subtract = ring.subtract(sparseValues[iSel], ring.multiply(factor, pivVals[iPiv]));
-                    if (subtract != 0) {
-                        resCols.add(selCol);
-                        resVals.add(subtract);
-                    }
-
-                    ++iSel;
-                    ++iPiv;
-                } else if (selCol < othCol) {
-                    resCols.add(selCol);
-                    resVals.add(sparseValues[iSel]);
-
-                    ++iSel;
-                } else if (selCol > othCol) {
-                    resCols.add(othCol);
-                    resVals.add(ring.multiply(negFactor, pivVals[iPiv]));
-
-                    ++iPiv;
-                }
-            }
-
-            if (iSel < sparsePositions.length)
-                for (; iSel < sparsePositions.length; ++iSel) {
-                    resCols.add(sparsePositions[iSel]);
-                    resVals.add(sparseValues[iSel]);
-                }
-
-            if (iPiv < pivCols.length)
-                for (; iPiv < pivCols.length; ++iPiv) {
-                    resCols.add(pivCols[iPiv]);
-                    resVals.add(ring.multiply(negFactor, pivVals[iPiv]));
-                }
-
-            sparsePositions = resCols.toArray();
-            sparseValues = resVals.toArray();
-        }
-
-        void subtract(SparseArrayZp64 pivot, long factor) {
-            subtract(pivot, factor, 0, 0);
-        }
-
-        void multiply(long factor) {
-            if (factor == 1)
-                return;
-            for (int i = 0; i < sparseValues.length; ++i)
-                sparseValues[i] = ring.multiply(sparseValues[i], factor);
-            for (int i = 0; i < denseValues.length; ++i)
-                denseValues[i] = ring.multiply(denseValues[i], factor);
-        }
-
-        long coefficient(int iRow) {
-            int index = Arrays.binarySearch(sparsePositions, iRow);
-            if (index >= 0)
-                return sparseValues[index];
-            index = Arrays.binarySearch(densePositions, iRow);
-            if (index >= 0)
-                return denseValues[index];
-            return 0;
-        }
-
-        void multiply(int iRow, long value) {
-            int index = Arrays.binarySearch(sparsePositions, iRow);
-            if (index >= 0)
-                sparseValues[index] = ring.multiply(sparseValues[index], value);
-            else {
-                index = Arrays.binarySearch(densePositions, iRow);
-                if (index >= 0)
-                    denseValues[index] = ring.multiply(denseValues[index], value);
-            }
-        }
-
-        void subtract(int iRow, long value) {
-            if (value == 0)
-                return;
-
-            int index = Arrays.binarySearch(densePositions, iRow);
-            if (index >= 0)
-                denseValues[index] = ring.subtract(denseValues[index], value);
-            else {
-                index = Arrays.binarySearch(sparsePositions, iRow);
-                if (index >= 0) {
-                    sparseValues[index] = ring.subtract(sparseValues[index], value);
-                    if (sparseValues[index] == 0) {
-                        sparsePositions = ArraysUtil.remove(sparsePositions, index);
-                        sparseValues = ArraysUtil.remove(sparseValues, index);
-                    }
-                } else {
-                    index = ~index;
-                    sparsePositions = ArraysUtil.insert(sparsePositions, index, iRow);
-                    sparseValues = ArraysUtil.insert(sparseValues, index, ring.negate(value));
-                }
-            }
-        }
-
-        int firstNonZeroPosition() {
-            int firstSparse = sparsePositions.length != 0 ? sparsePositions[0] : Integer.MAX_VALUE;
-            for (int i = 0; i < densePositions.length; ++i)
-                if (denseValues[i] != 0)
-                    return Math.min(densePositions[i], firstSparse);
-            return firstSparse;
-        }
-    }
-
     // denseArray - factor * sparseArray
     static void subtractSparseFromDense(IntegersZp64 ring, long[] denseArray, SparseArrayZp64 sparseArray, long factor) {
         for (int i = 0; i < sparseArray.densePositions.length; i++)
@@ -2257,153 +1781,6 @@ public final class GroebnerBases {
         for (int i = 0; i < sparseArray.sparsePositions.length; i++)
             denseArray[sparseArray.sparsePositions[i]] = ring.subtract(denseArray[sparseArray.sparsePositions[i]], ring.multiply(factor, sparseArray.sparseValues[i]));
     }
-
-    static final class SparseColumnMatrixZp64 {
-        final IntegersZp64 ring;
-        final int nRows, nColumns;
-        final int[] densePositions;
-        final SparseArrayZp64[] columns;
-
-        SparseColumnMatrixZp64(IntegersZp64 ring, int nRows, int nColumns, int[] densePositions) {
-            this.ring = ring;
-            this.nRows = nRows;
-            this.nColumns = nColumns;
-            this.densePositions = densePositions;
-            this.columns = new SparseArrayZp64[nColumns];
-        }
-
-        void multiplyRow(int iRow, long value) {
-            if (value != 1)
-                for (int i = 0; i < nColumns; ++i)
-                    columns[i].multiply(iRow, value);
-        }
-
-        SparseRowMatrixZp64 toRowMatrix(int[] densePositions) {
-            SparseRowMatrixZp64 rowMatrix = new SparseRowMatrixZp64(ring, nRows, nColumns, densePositions);
-            TIntArrayList[] sparseColumns = new TIntArrayList[nRows];
-            TLongArrayList[] sparseValues = new TLongArrayList[nRows];
-            long[][] denseValues = new long[nRows][densePositions.length];
-
-            for (int iRow = 0; iRow < nRows; ++iRow) {
-                sparseColumns[iRow] = new TIntArrayList();
-                sparseValues[iRow] = new TLongArrayList();
-            }
-
-            for (int iColumn = 0; iColumn < nColumns; ++iColumn) {
-                SparseArrayZp64 column = columns[iColumn];
-                int iDenseColumn = Arrays.binarySearch(densePositions, iColumn);
-                if (iDenseColumn >= 0) {
-                    for (int i = 0; i < column.densePositions.length; i++)
-                        denseValues[column.densePositions[i]][iDenseColumn] = column.denseValues[i];
-                    for (int i = 0; i < column.sparsePositions.length; ++i)
-                        denseValues[column.sparsePositions[i]][iDenseColumn] = column.sparseValues[i];
-                } else {
-                    for (int i = 0; i < column.densePositions.length; i++) {
-                        sparseColumns[column.densePositions[i]].add(iColumn);
-                        sparseValues[column.densePositions[i]].add(column.denseValues[i]);
-                    } for (int i = 0; i < column.sparsePositions.length; ++i) {
-                        sparseColumns[column.sparsePositions[i]].add(iColumn);
-                        sparseValues[column.sparsePositions[i]].add(column.sparseValues[i]);
-                    }
-                }
-            }
-
-            for (int iRow = 0; iRow < nRows; ++iRow)
-                rowMatrix.rows[iRow] = new SparseArrayZp64(ring, nColumns, densePositions, sparseColumns[iRow].toArray(), denseValues[iRow], sparseValues[iRow].toArray());
-
-            return rowMatrix;
-        }
-    }
-
-    static final class SparseRowMatrixZp64 {
-        final IntegersZp64 ring;
-        final int nRows, nColumns;
-        final int[] densePositions;
-        final SparseArrayZp64[] rows;
-
-        SparseRowMatrixZp64(IntegersZp64 ring, int nRows, int nColumns, int[] densePositions) {
-            this.ring = ring;
-            this.nRows = nRows;
-            this.nColumns = nColumns;
-            this.densePositions = densePositions;
-            this.rows = new SparseArrayZp64[nRows];
-        }
-
-        SparseRowMatrixZp64(IntegersZp64 ring, int nRows, int nColumns, int[] densePositions, SparseArrayZp64[] rows) {
-            this.ring = ring;
-            this.nRows = nRows;
-            this.nColumns = nColumns;
-            this.densePositions = densePositions;
-            this.rows = rows;
-        }
-
-        SparseRowMatrixZp64 range(int from, int to) {
-            return new SparseRowMatrixZp64(ring, to - from, nColumns, densePositions, Arrays.copyOfRange(rows, from, to));
-        }
-
-        long[][] denseMatrix() {
-            long[][] result = new long[rows.length][nColumns];
-            for (int iRow = 0; iRow < rows.length; ++iRow) {
-                SparseArrayZp64 row = rows[iRow];
-                for (int i = 0; i < row.sparsePositions.length; i++)
-                    result[iRow][row.sparsePositions[i]] = row.sparseValues[i];
-                for (int i = 0; i < densePositions.length; i++)
-                    result[iRow][densePositions[i]] = row.denseValues[i];
-            }
-            return result;
-        }
-
-
-        // return rank
-        int rowReduce() {
-            // Gaussian elimination
-            int nZeroRows = 0;
-            for (int iCol = 0, to = rows.length; iCol < to; ++iCol) {
-                int iRow = iCol - nZeroRows;
-                int pivotIndex = -1;
-
-                for (int i = iRow; i < rows.length; ++i) {
-                    if (rows[i].coefficient(iCol) == 0)
-                        continue;
-                    if (pivotIndex == -1) {
-                        pivotIndex = i;
-                        continue;
-                    }
-                    if (rows[i].sparsePositions.length < rows[pivotIndex].sparsePositions.length)
-                        pivotIndex = i;
-                }
-
-                if (pivotIndex == -1) {
-                    ++nZeroRows;
-                    to = Math.min(nColumns, rows.length + nZeroRows);
-                    continue;
-                }
-
-                ArraysUtil.swap(rows, pivotIndex, iRow);
-                SparseArrayZp64 pivot = rows[iRow];
-                long diagonalValue = pivot.coefficient(iCol);
-
-                // row-reduction
-                pivot.multiply(ring.reciprocal(diagonalValue));
-
-                int firstDense = ArraysUtil.binarySearch1(densePositions, iCol);
-                for (int row = 0; row < rows.length; ++row) {
-                    if (row == iRow)
-                        continue;
-
-                    long value = rows[row].coefficient(iCol);
-                    if (value == 0)
-                        continue;
-
-                    rows[row].subtract(pivot, value, iCol, firstDense);
-                }
-            }
-            return Math.min(nRows, nColumns) - nZeroRows;
-        }
-    }
-
-
-    /* ******************************************* F4 generic linear algebra ******************************************* */
 
     @SuppressWarnings("unchecked")
     private static <E> List<ArrayBasedPoly<Monomial<E>>> reduceMatrixE(
@@ -2833,7 +2210,1537 @@ public final class GroebnerBases {
         return nPlusPolynomials;
     }
 
-    /** Sparse array implementation */
+    // denseArray - factor * sparseArray
+    static <E> void subtractSparseFromDense(Ring<E> ring, E[] denseArray, SparseArray<E> sparseArray, E factor) {
+        for (int i = 0; i < sparseArray.densePositions.length; i++)
+            denseArray[sparseArray.densePositions[i]] = ring.subtract(denseArray[sparseArray.densePositions[i]], ring.multiply(factor, sparseArray.denseValues[i]));
+        for (int i = 0; i < sparseArray.sparsePositions.length; i++)
+            denseArray[sparseArray.sparsePositions[i]] = ring.subtract(denseArray[sparseArray.sparsePositions[i]], ring.multiply(factor, sparseArray.sparseValues[i]));
+    }
+
+    // denseFactor * denseArray - sparseFactor * sparseArray
+    static <E> void subtractSparseFromDense(Ring<E> ring, E[] denseArray, E denseFactor, SparseArray<E> sparseArray, E sparseFactor) {
+        if (!ring.isOne(denseFactor))
+            for (int i = 0; i < denseArray.length; i++)
+                denseArray[i] = ring.multiply(denseArray[i], denseFactor);
+
+        for (int i = 0; i < sparseArray.densePositions.length; i++) {
+            int dPosition = sparseArray.densePositions[i];
+            denseArray[dPosition] = ring.subtract(denseArray[dPosition], ring.multiply(sparseFactor, sparseArray.denseValues[i]));
+        }
+        for (int i = 0; i < sparseArray.sparsePositions.length; i++) {
+            int sPosition = sparseArray.sparsePositions[i];
+            denseArray[sPosition] = ring.subtract(denseArray[sPosition], ring.multiply(sparseFactor, sparseArray.sparseValues[i]));
+        }
+    }
+
+    private static boolean isSorted(int[] arr) {
+        for (int i = 1; i < arr.length; ++i)
+            if (arr[i - 1] >= arr[i])
+                return false;
+        return true;
+    }
+
+
+    /* ******************************************* F4 Zp64 linear algebra ******************************************* */
+
+    /**
+     * Check whether all specified generators are monomials
+     */
+    public static boolean isMonomialIdeal(List<? extends AMultivariatePolynomial> ideal) {
+        return ideal.stream().allMatch(AMultivariatePolynomial::isMonomial);
+    }
+
+    /**
+     * Check whether ideal is homogeneous
+     */
+    public static boolean isHomogeneousIdeal(List<? extends AMultivariatePolynomial> ideal) {
+        return ideal.stream().allMatch(AMultivariatePolynomial::isHomogeneous);
+    }
+
+    /**
+     * List of lead terms of generators
+     */
+    public static List<DegreeVector> leadTermsSet(List<? extends AMultivariatePolynomial> ideal) {
+        return ideal.stream().map(AMultivariatePolynomial::lt).collect(Collectors.toList());
+    }
+
+    /**
+     * Computes Hilbert-Poincare series of specified ideal given by its Groebner basis
+     */
+    public static HilbertSeries HilbertSeriesOfLeadingTermsSet(List<? extends AMultivariatePolynomial> ideal) {
+        if (!isHomogeneousIdeal(ideal) && !isGradedOrder(ideal.get(0).ordering))
+            throw new IllegalArgumentException("Basis should be homogeneous or use graded (degree compatible) monomial order");
+        if (ideal.stream().anyMatch(IPolynomial::isZero))
+            return new HilbertSeries(UnivariatePolynomial.one(Q), ideal.get(0).nVariables);
+        return HilbertSeries(leadTermsSet(ideal));
+    }
+
+    /**
+     * Minimizes Groebner basis of monomial ideal. The input should be a Groebner basis
+     */
+    static void reduceMonomialIdeal(List<DegreeVector> basis) {
+        outer:
+        for (int i = basis.size() - 1; i >= 1; --i) {
+            for (int j = i - 1; j >= 0; --j) {
+                DegreeVector pi = basis.get(i), pj = basis.get(j);
+                if (pi.dvDivisibleBy(pj)) {
+                    basis.remove(i);
+                    continue outer;
+                }
+                if (pj.dvDivisibleBy(pi)) {
+                    basis.remove(j);
+                    --i;
+                    continue;
+                }
+            }
+        }
+    }
+
+
+    /* ******************************************* F4 generic linear algebra ******************************************* */
+
+    /**
+     * Computes Hilbert-Poincare series of monomial ideal
+     */
+    public static HilbertSeries HilbertSeries(List<DegreeVector> ideal) {
+        ideal = new ArrayList<>(ideal);
+        reduceMonomialIdeal(ideal);
+        UnivariatePolynomial<Rational<BigInteger>> initialNumerator = HilbertSeriesNumerator(ideal).mapCoefficients(Q, c -> new Rational<>(Z, c));
+        return new HilbertSeries(initialNumerator, ideal.get(0).nVariables());
+    }
+
+    /**
+     * initial numerator of Hilbert series
+     */
+    private static UnivariatePolynomial<BigInteger> HilbertSeriesNumerator(List<DegreeVector> ideal) {
+        UnivariateRing<UnivariatePolynomial<BigInteger>> uniRing = Rings.UnivariateRing(Z);
+        if (ideal.isEmpty())
+            // zero ideal
+            return uniRing.getOne();
+        if (ideal.size() == 1 && ideal.get(0).isZeroVector())
+            // ideal = ring
+            return uniRing.getZero();
+        if (ideal.stream().allMatch(m -> m.totalDegree == 1))
+            // plain variables
+            return uniRing.pow(uniRing.getOne().subtract(uniRing.variable(0)), ideal.size());
+
+        // pick monomial
+        DegreeVector pivotMonomial = ideal.stream().filter(m -> m.totalDegree > 1).findAny().get();
+        int nVariables = pivotMonomial.exponents.length, var;
+        for (var = 0; var < nVariables; ++var)
+            if (pivotMonomial.exponents[var] != 0)
+                break;
+        final int variable = var;
+
+        int[] varExponents = new int[nVariables];
+        varExponents[variable] = 1;
+        DegreeVector varMonomial = new DegreeVector(varExponents, 1);
+
+        // sum J + <x_i>
+        List<DegreeVector> sum = ideal.stream()
+                .filter(m -> m.exponents[variable] == 0)
+                .collect(Collectors.toList());
+        sum.add(varMonomial);
+
+        // quotient J : <x_i>
+        List<DegreeVector> quot = ideal.stream()
+                .map(m -> m.exponents[variable] > 0 ? m.dvDivideOrNull(variable, 1) : m)
+                .collect(Collectors.toList());
+        reduceMonomialIdeal(quot);
+
+        return HilbertSeriesNumerator(sum).add(HilbertSeriesNumerator(quot).shiftRight(1));
+    }
+
+    /**
+     * Modular Groebner basis algorithm.
+     * <p>
+     * The algorithm switches between modular Chinese remainder techniques as described in Elizabeth A. Arnold, "Modular
+     * algorithms for computing Groebner bases", Journal of Symbolic Computation 35 (2003) 403–419 and sparse Groebner
+     * basis reconstruction with linear algebra ({@link #solveGB(List, List, Comparator)}).
+     */
+    public static GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>>
+    ModularGB(List<MultivariatePolynomial<BigInteger>> ideal,
+              Comparator<DegreeVector> monomialOrder) {
+        return ModularGB(ideal, monomialOrder, null, false);
+    }
+
+    /**
+     * Modular Groebner basis algorithm.
+     * <p>
+     * The algorithm switches between modular Chinese remainder techniques as described in Elizabeth A. Arnold, "Modular
+     * algorithms for computing Groebner bases", Journal of Symbolic Computation 35 (2003) 403–419 and sparse Groebner
+     * basis reconstruction with linear algebra ({@link #solveGB(List, List, Comparator)}).
+     *
+     * @param hilbertSeries optional Hilbert-Poincare series of ideal
+     */
+    public static GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>>
+    ModularGB(List<MultivariatePolynomial<BigInteger>> ideal,
+              Comparator<DegreeVector> monomialOrder,
+              HilbertSeries hilbertSeries) {
+        return ModularGB(ideal, monomialOrder, hilbertSeries, false);
+    }
+
+    /**
+     * Modular Groebner basis algorithm.
+     * <p>
+     * The algorithm switches between modular Chinese remainder techniques as described in Elizabeth A. Arnold, "Modular
+     * algorithms for computing Groebner bases", Journal of Symbolic Computation 35 (2003) 403–419 and sparse Groebner
+     * basis reconstruction with linear algebra.
+     *
+     * @param ideal         ideal generators
+     * @param monomialOrder monomial order
+     * @param hilbertSeries optional Hilbert-Poincare series of ideal
+     * @param trySparse     whether to try sparse reconstruction in particularly small resulting bases via {@link
+     *                      #solveGB(List, List, Comparator)}
+     */
+    @SuppressWarnings("unchecked")
+    public static GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>>
+    ModularGB(List<MultivariatePolynomial<BigInteger>> ideal,
+              Comparator<DegreeVector> monomialOrder,
+              HilbertSeries hilbertSeries,
+              boolean trySparse) {
+        return ModularGB(ideal, monomialOrder,
+                GroebnerBases::GroebnerBasisInGF,
+                (p, o, s) -> GroebnerBasisInZ(p, o, s, false),
+                BigInteger.ONE.shiftLeft(59),
+                hilbertSeries, trySparse);
+    }
+
+    static List<MultivariatePolynomialZp64> mod(List<MultivariatePolynomial<BigInteger>> polys, long modulus) {
+        IntegersZp64 ring = Zp64(modulus);
+        IntegersZp gRing = ring.asGenericRing();
+        return polys.stream().map(p -> MultivariatePolynomial.asOverZp64(p.setRing(gRing))).collect(Collectors.toList());
+    }
+
+    /**
+     * Modular Groebner basis algorithm.
+     * <p>
+     * The algorithm switches between modular Chinese remainder techniques as described in Elizabeth A. Arnold, "Modular
+     * algorithms for computing Groebner bases", Journal of Symbolic Computation 35 (2003) 403–419 and sparse Groebner
+     * basis reconstruction with linear algebra.
+     *
+     * @param ideal            ideal generators
+     * @param monomialOrder    monomial order
+     * @param modularAlgorithm algorithm used to find Groebner basis mod prime
+     * @param defaultAlgorithm algorithm used to find Groebner basis if modular algorithm failed
+     * @param firstPrime       prime number to start modulo iterations
+     * @param hilbertSeries    optional Hilbert-Poincare series of ideal
+     * @param trySparse        whether to try sparse reconstruction in particularly small resulting bases via {@link
+     *                         #solveGB(List, List, Comparator)}
+     */
+    @SuppressWarnings("unchecked")
+    public static GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>>
+    ModularGB(List<MultivariatePolynomial<BigInteger>> ideal,
+              Comparator<DegreeVector> monomialOrder,
+              GroebnerAlgorithm modularAlgorithm,
+              GroebnerAlgorithm defaultAlgorithm,
+              BigInteger firstPrime,
+              HilbertSeries hilbertSeries,
+              boolean trySparse) {
+        // required for Hilbert functions
+        assert isHomogeneousIdeal(ideal) || isGradedOrder(monomialOrder);
+
+        // simplify generators as much as possible
+        ideal = prepareGenerators(ideal, monomialOrder);
+        if (ideal.size() == 1)
+            return GBResult.trivial(canonicalize(ideal));
+
+        GBResult baseResult = null;
+        BigInteger basePrime = null;
+        HilbertSeries baseSeries = hilbertSeries;
+        List<MultivariatePolynomial<BigInteger>> baseBasis = null;
+
+        PrimesIterator0 primes = new PrimesIterator0(firstPrime);// start with a large enough prime
+        List<MultivariatePolynomial<BigInteger>> previousGBCandidate = null;
+        // number of CRT liftings
+        int nModIterations = 0;
+        main:
+        while (true) {
+
+            // check whether we dont' take too long
+            if (baseResult != null
+                    && baseResult.isBuchbergerType()
+                    && nModIterations > N_MOD_STEPS_THRESHOLD
+                    && Math.abs(baseResult.nProcessedPolynomials - baseResult.nZeroReductions - baseBasis.size()) < N_BUCHBERGER_STEPS_REDUNDANCY_DELTA) {
+                // modular reconstruction is too hard in this case, switch to the non-modular algorithm
+                return defaultAlgorithm.GroebnerBasis(ideal, monomialOrder, hilbertSeries);
+            }
+
+            // pick up next prime number
+            BigInteger prime = primes.next();
+            IntegersZp ring = Zp(prime);
+
+            // number of traditional "Buchberger" steps
+            List<MultivariatePolynomial<BigInteger>> bModBasis;
+            GBResult modResult;
+            if (prime.isLong()) {
+                // generators mod prime
+                List<MultivariatePolynomialZp64> modGenerators = mod(ideal, prime.longValueExact());
+                // Groebner basis mod prime
+                GBResult<MonomialZp64, MultivariatePolynomialZp64> r = modularAlgorithm.GroebnerBasis((List) modGenerators, monomialOrder, null);
+                bModBasis = r.stream().map(MultivariatePolynomialZp64::toBigPoly).collect(Collectors.toList());
+                modResult = r;
+            } else {
+                List<MultivariatePolynomial<BigInteger>> modGenerators = ideal.stream().map(p -> p.setRing(ring)).collect(Collectors.toList());
+                GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>> r = modularAlgorithm.GroebnerBasis((List) modGenerators, monomialOrder, null);
+                bModBasis = r.list;
+                modResult = r;
+            }
+
+            // sort generators by increasing lead terms
+            bModBasis.sort((a, b) -> monomialOrder.compare(a.lt(), b.lt()));
+            HilbertSeries modSeries = HilbertSeries(leadTermsSet(bModBasis));
+
+            // first iteration
+            if (baseBasis == null) {
+                if (trySparse) {
+                    // try to solve sparse GB on the first iteration
+                    // number of unknowns
+                    int nSparseUnknowns = bModBasis.stream().mapToInt(p -> p.size() - 1).sum();
+                    // try to solve on in most simple cases
+                    if (nSparseUnknowns < N_UNKNOWNS_THRESHOLD && modResult.nProcessedPolynomials > N_BUCHBERGER_STEPS_THRESHOLD) {
+                        List<MultivariatePolynomial<BigInteger>> solvedGB =
+                                solveGB(ideal,
+                                        bModBasis.stream().map(AMultivariatePolynomial::getSkeleton).collect(Collectors.toList()),
+                                        monomialOrder);
+                        if (solvedGB != null && isGroebnerBasis(ideal, solvedGB, monomialOrder))
+                            return GBResult.notBuchberger(solvedGB);
+                    }
+                }
+
+                baseBasis = bModBasis;
+                basePrime = prime;
+                baseSeries = modSeries;
+                baseResult = modResult;
+                nModIterations = 0;
+                continue;
+            }
+
+            // check for Hilbert luckiness
+            int c = ModHilbertSeriesComparator.compare(baseSeries, modSeries);
+            if (c < 0)
+                // current prime is unlucky
+                continue;
+            else if (c > 0) {
+                // base prime was unlucky
+                baseBasis = bModBasis;
+                basePrime = prime;
+                baseSeries = modSeries;
+                baseResult = modResult;
+                nModIterations = 0;
+                continue;
+            }
+
+            // prime is Hilbert prime, so we compare monomial sets
+            for (int i = 0, size = Math.min(baseBasis.size(), bModBasis.size()); i < size; ++i) {
+                c = monomialOrder.compare(baseBasis.get(i).lt(), bModBasis.get(i).lt());
+                if (c > 0)
+                    // current prime is unlucky
+                    continue main;
+                else if (c < 0) {
+                    // base prime was unlucky
+                    baseBasis = bModBasis;
+                    basePrime = ring.modulus;
+                    baseSeries = modSeries;
+                    baseResult = modResult;
+                    nModIterations = 0;
+                    continue main;
+                }
+            }
+
+            if (baseBasis.size() < bModBasis.size()) {
+                // base prime was unlucky
+                baseBasis = bModBasis;
+                basePrime = ring.modulus;
+                baseSeries = modSeries;
+                baseResult = modResult;
+                nModIterations = 0;
+                continue;
+            } else if (baseBasis.size() > bModBasis.size())
+                // current prime is unlucky
+                continue;
+
+            ++nModIterations;
+            ChineseRemaindersMagic<BigInteger> magic = createMagic(Z, basePrime, prime);
+            // prime is probably lucky, we can do Chinese Remainders
+            for (int iGenerator = 0; iGenerator < baseBasis.size(); ++iGenerator) {
+                MultivariatePolynomial<BigInteger> baseGenerator = baseBasis.get(iGenerator);
+                PairedIterator<
+                        Monomial<BigInteger>, MultivariatePolynomial<BigInteger>,
+                        Monomial<BigInteger>, MultivariatePolynomial<BigInteger>
+                        > iterator = new PairedIterator<>(baseGenerator, bModBasis.get(iGenerator));
+
+                baseGenerator = baseGenerator.createZero();
+                while (iterator.hasNext()) {
+                    iterator.advance();
+
+                    Monomial<BigInteger> baseTerm = iterator.aTerm;
+                    BigInteger crt = ChineseRemainders(Z, magic, baseTerm.coefficient, iterator.bTerm.coefficient);
+                    baseGenerator.add(baseTerm.setCoefficient(crt));
+                }
+
+                baseBasis.set(iGenerator, baseGenerator);
+            }
+
+            basePrime = basePrime.multiply(prime);
+
+            List<MultivariatePolynomial<Rational<BigInteger>>> gbCandidateFrac = new ArrayList<>();
+            for (MultivariatePolynomial<BigInteger> gen : baseBasis) {
+                MultivariatePolynomial<Rational<BigInteger>> gbGen = reconstructPoly(gen, basePrime);
+                if (gbGen == null)
+                    continue main;
+                gbCandidateFrac.add(gbGen);
+            }
+
+            List<MultivariatePolynomial<BigInteger>> gbCandidate = toIntegral(gbCandidateFrac);
+            if (gbCandidate.equals(previousGBCandidate) && isGroebnerBasis(ideal, gbCandidate, monomialOrder))
+                return GBResult.notBuchberger(canonicalize(gbCandidate));
+            previousGBCandidate = gbCandidate;
+        }
+    }
+
+    /* ************************************** Hilbert-Poincare series ********************************************** */
+
+    /**
+     * reconstruct rational polynomial from its modulo image
+     */
+    private static MultivariatePolynomial<Rational<BigInteger>> reconstructPoly(
+            MultivariatePolynomial<BigInteger> base, BigInteger prime) {
+        MultivariatePolynomial<Rational<BigInteger>> result = MultivariatePolynomial.zero(base.nVariables, Q, base.ordering);
+        for (Monomial<BigInteger> term : base) {
+            BigInteger[] numDen = RationalReconstruction.reconstructFareyErrorTolerant(term.coefficient, prime);
+            if (numDen == null)
+                return null;
+            result.add(new Monomial<>(term, new Rational<>(Rings.Z, numDen[0], numDen[1])));
+        }
+        return result;
+    }
+
+    /**
+     * Sparse Groebner basis via "linear lifting". Given a generating set and a skeleton of Groebner basis (may be
+     * computed via mod prime etc.), it build a system of equations and finds a true Groebner basis, or return null if
+     * the system was not solvable.
+     *
+     * @param generators    generators
+     * @param gbSkeleton    skeleton of true reduced Groebner basis
+     * @param monomialOrder monomial order
+     */
+    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    List<Poly> solveGB(List<Poly> generators,
+                       List<Collection<DegreeVector>> gbSkeleton,
+                       Comparator<DegreeVector> monomialOrder) {
+        return solveGB0(generators, gbSkeleton.stream().map(c -> {
+            TreeSet<DegreeVector> set = new TreeSet<>(monomialOrder);
+            set.addAll(c);
+            return set;
+        }).collect(Collectors.toList()), monomialOrder);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    List<Poly> solveGB0(List<Poly> generators,
+                        List<SortedSet<DegreeVector>> gbSkeleton,
+                        Comparator<DegreeVector> monomialOrder) {
+        Poly factory = generators.get(0).createZero();
+        if (!factory.isOverField()) {
+            List gb = solveGB0(toFractions((List) generators), gbSkeleton, monomialOrder);
+            if (gb == null)
+                return null;
+            return canonicalize((List<Poly>) toIntegral(gb));
+        }
+
+        // total number of unknowns
+        int nUnknowns = gbSkeleton.stream().mapToInt(p -> p.size() - 1).sum();
+        // we consider polynomials as R[u0, u1, ..., uM][x0, ..., xN], where u_i are unknowns
+        // ring R[u0, u1, ..., uM]
+        MultivariateRing<Poly> cfRing = Rings.MultivariateRing(factory.setNVariables(nUnknowns));
+        // ring R[u0, u1, ..., uM][x0, ..., xN]
+        MultivariateRing<MultivariatePolynomial<Poly>> pRing = Rings.MultivariateRing(factory.nVariables, cfRing, monomialOrder);
+
+        AtomicInteger varCounter = new AtomicInteger(0);
+        @SuppressWarnings("unchecked")
+        MultivariatePolynomial<Poly>[] gbCandidate = gbSkeleton.stream().map(p -> {
+            MultivariatePolynomial<Poly> head = pRing.create(p.last());
+            MultivariatePolynomial<Poly> tail = p.headSet(p.last())
+                    .stream()
+                    .map(t -> pRing.create(t).multiply(cfRing.variable(varCounter.getAndIncrement())))
+                    .reduce(pRing.getZero(), (a, b) -> a.add(b));
+            return head.add(tail);
+        }).toArray(MultivariatePolynomial[]::new);
+
+        Term uTerm = factory.monomialAlgebra.getUnitTerm(nUnknowns);
+        // initial ideal viewed as R[u0, u1, ..., uM][x0, ..., xN]
+        List<MultivariatePolynomial<Poly>> initialIdeal
+                = generators
+                .stream().map(p -> pRing.factory().create(p.collection()
+                        .stream().map(t -> new Monomial<>(t, cfRing.factory().create(uTerm.setCoefficientFrom(t))))
+                        .collect(Collectors.toList())))
+                .collect(Collectors.toList());
+
+
+        // build set of all syzygies
+        List<MultivariatePolynomial<Poly>> _tmp_gb_ = new ArrayList<>(initialIdeal);
+        // list of all non trivial S-pairs
+        SyzygySet<Monomial<Poly>, MultivariatePolynomial<Poly>> sPairsSet = new SyzygyTreeSet<>(new TreeSet<>(defaultSelectionStrategy(monomialOrder)));
+        Arrays.stream(gbCandidate).forEach(gb -> updateBasis(_tmp_gb_, sPairsSet, gb));
+
+        // source of equations
+        List<EqSupplier<Term, Poly>> source = new ArrayList<>();
+        // initial ideal must reduce to zero
+        initialIdeal.forEach(p -> source.add(new EqSupplierPoly<>(p)));
+        // S-pairs must reduce to zero
+        sPairsSet.allPairs().forEach(p -> source.add(new EqSupplierSyzygy<>(initialIdeal, gbCandidate, p)));
+        // iterate from "simplest" to "hardest" equations
+        source.sort((a, b) -> monomialOrder.compare(a.signature(), b.signature()));
+
+        List<Equation<Term, Poly>> nonLinearEquations = new ArrayList<>();
+        EquationSolver<Term, Poly> solver = createSolver(factory);
+        TIntHashSet solvedVariables = new TIntHashSet();
+        for (EqSupplier<Term, Poly> eqSupplier : source) {
+            if (solvedVariables.size() == nUnknowns)
+                // system is solved
+                return gbSolution(factory, gbCandidate);
+
+            MultivariatePolynomial<Poly> next = eqSupplier.poly();
+
+            SystemInfo result = reduceAndSolve(next, gbCandidate, solver, nonLinearEquations);
+
+            if (result == Inconsistent)
+                return null;
+            solvedVariables.addAll(solver.solvedVariables);
+
+            if (solver.solvedVariables.size() > 0)
+                // simplify GB candidate
+                solver.simplifyGB(gbCandidate);
+
+            // clear solutions (this gives some speed up)
+            solver.clear();
+
+            if (solvedVariables.size() > DROP_SOLVED_VARIABLES_THRESHOLD
+                    && 1.0 * solvedVariables.size() / nUnknowns >= DROP_SOLVED_VARIABLES_RELATIVE_THRESHOLD) {
+                dropSolvedVariables(solvedVariables, initialIdeal, gbCandidate, nonLinearEquations, solver);
+                nUnknowns -= solvedVariables.size();
+                solvedVariables.clear();
+            }
+        }
+
+        if (solver.nSolved() == nUnknowns)
+            // system is solved
+            return gbSolution(factory, gbCandidate);
+
+        return null;
+    }
+
+    static int[] usedVars(AMultivariatePolynomial equation) {
+        int[] degrees = equation.degrees();
+        TIntArrayList usedVars = new TIntArrayList();
+        for (int i = 0; i < degrees.length; ++i)
+            if (degrees[i] > 0)
+                usedVars.add(i);
+        return usedVars.toArray();
+    }
+
+    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    MultivariatePolynomial<Poly> getFi(int i,
+                                       List<MultivariatePolynomial<Poly>> initialIdeal,
+                                       MultivariatePolynomial<Poly>[] gbCandidate) {
+        return i < initialIdeal.size() ? initialIdeal.get(i) : gbCandidate[i - initialIdeal.size()];
+    }
+
+    /**
+     * get rid of auxiliary variables used for unknowns that were solved
+     */
+    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    void dropSolvedVariables(
+            TIntHashSet solvedVariables,
+            List<MultivariatePolynomial<Poly>> initialIdeal,
+            MultivariatePolynomial<Poly>[] gbCandidate,
+            List<Equation<Term, Poly>> nonLinearEquations,
+            EquationSolver<Term, Poly> solver) {
+        if (solver.nSolved() != 0)
+            throw new IllegalArgumentException();
+
+        final int[] solved = solvedVariables.toArray();
+        Arrays.sort(solved);
+
+        MultivariateRing<Poly> oldPRing = ((MultivariateRing<Poly>) initialIdeal.get(0).ring);
+        // new coefficient ring
+        MultivariateRing<Poly> pRing = MultivariateRing(oldPRing.factory().dropVariables(solved));
+
+        // transform initial ideal
+        initialIdeal.replaceAll(p -> p.mapCoefficients(pRing, cf -> cf.dropVariables(solved)));
+        // transform groebner basis
+        Arrays.asList(gbCandidate).replaceAll(p -> p.mapCoefficients(pRing, cf -> cf.dropVariables(solved)));
+
+        int[] vMapping = new int[oldPRing.nVariables()];
+        int c = 0;
+        for (int i = 0; i < vMapping.length; ++i) {
+            if (Arrays.binarySearch(solved, i) >= 0)
+                vMapping[i] = -1;
+            else
+                vMapping[i] = c++;
+        }
+
+        // transform non-linear
+        nonLinearEquations.forEach(eq -> eq.dropVariables(vMapping));
+
+        // transform linear
+        solver.equations.forEach(eq -> eq.dropVariables(vMapping));
+    }
+
+    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    List<Poly> gbSolution(Poly factory, MultivariatePolynomial<Poly>[] gbCandidate) {
+        List<Poly> result = new ArrayList<>();
+        for (MultivariatePolynomial<Poly> gbElement : gbCandidate) {
+            if (!gbElement.stream().allMatch(Poly::isConstant))
+                return null;
+
+            result.add(factory.create(gbElement.collection()
+                    .stream()
+                    .map(t -> t.coefficient.lt().setDegreeVector(t)).collect(Collectors.toList())));
+        }
+        return canonicalize(result);
+    }
+
+    /**
+     * Builds & tries to solve system of equations obtained from a single reduction
+     *
+     * @param toReduce           generator (or S-pair) that should reduce to zero with GB candidate
+     * @param gbCandidate        GB candidate
+     * @param solver             solver
+     * @param nonLinearEquations set of non-linear equations
+     */
+    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    SystemInfo reduceAndSolve(MultivariatePolynomial<Poly> toReduce,
+                              MultivariatePolynomial<Poly>[] gbCandidate,
+                              EquationSolver<Term, Poly> solver,
+                              List<Equation<Term, Poly>> nonLinearEquations) {
+        // reduce poly with GB candidate
+        MultivariatePolynomial<Poly> remainder = MultivariateDivision.remainder(toReduce, gbCandidate);
+        if (remainder.isZero())
+            return Consistent;
+
+        // previous number of solved variables
+        int nSolved = solver.solvedVariables.size();
+        // whether some independent linear equations were generated
+        boolean newLinearEqsObtained = false;
+        for (Poly cf : remainder.coefficients()) {
+            if (cf.isConstant())
+                // equation is not solvable
+                return Inconsistent;
+
+            cf = solver.simplify(cf).monic();
+            Equation<Term, Poly> eq = new Equation<>(cf);
+            if (eq.isLinear) {
+                // add equation
+                boolean isNewEq = solver.addEquation(eq);
+                if (isNewEq)
+                    // equation is new (independent)
+                    newLinearEqsObtained = true;
+            } else if (!nonLinearEquations.contains(eq))
+                nonLinearEquations.add(eq);
+        }
+
+        if (!newLinearEqsObtained)
+            // nothing to do further
+            return Consistent;
+
+        if (solver.solvedVariables.size() > nSolved)
+            // if some new solutions were already obtained we
+            // can simplify non-linear equations so that
+            // new linear combinations will be found
+            updateNonLinear(solver, nonLinearEquations);
+
+        while (true) {
+            // try to find and solve some subset of linear equations
+            SystemInfo result = solver.solve();
+
+            if (result == Inconsistent)
+                return Inconsistent;
+            else if (result == UnderDetermined)
+                return Consistent;
+
+            // update non-linear equations with new solutions
+            updateNonLinear(solver, nonLinearEquations);
+        }
+    }
+
+
+
+
+    /* ********************************** Modular & Sparse Groebner basis ****************************************** */
+
+    private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
+    void updateNonLinear(EquationSolver<Term, Poly> solver,
+                         List<Equation<Term, Poly>> nonLinearEquations) {
+        while (true) {
+            boolean nlReduced = false;
+            for (int i = nonLinearEquations.size() - 1; i >= 0; --i) {
+                Equation<Term, Poly> eq = solver.simplify(nonLinearEquations.get(i));
+                if (eq.reducedEquation.isZero())
+                    nonLinearEquations.remove(i);
+                else if (isLinear(eq.reducedEquation)) {
+                    nlReduced = true;
+                    solver.addEquation(eq);
+                    nonLinearEquations.remove(i);
+                } else
+                    nonLinearEquations.set(i, eq);
+            }
+            if (!nlReduced)
+                return;
+        }
+    }
+
+    /**
+     * whether poly is linear
+     */
+    static boolean isLinear(AMultivariatePolynomial<? extends AMonomial, ?> poly) {
+        return poly.collection().stream().allMatch(t -> t.totalDegree <= 1);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>>
+    EquationSolver<Term, Poly> createSolver(Poly factory) {
+        if (factory instanceof MultivariatePolynomial)
+            return (EquationSolver<Term, Poly>) new EquationSolverE(((MultivariatePolynomial) factory).ring);
+        else
+            throw new RuntimeException();
+    }
+
+    /**
+     * Data structure which holds current set of critical pairs. This set may be just a Set&lt;SyzygyPair&gt; (TreeSet
+     * actually), or some more complicated structure (map of sets, e.g. TreeMap&lt;Integer,
+     * TreeSet&lt;SyzygyPair&lt;Term, Poly&gt;&gt;&gt; of degree -&gt; set of pairs with this degree) for graded
+     * algorithms (F4, homogeneous Buchberger etc).
+     */
+    interface SyzygySet<Term extends AMonomial<Term>, Poly extends MonomialSetView<Term>> {
+        /**
+         * add new syzygy to set
+         */
+        void add(SyzygyPair<Term, Poly> sPair);
+
+        /**
+         * remove syzygy from set
+         */
+        void remove(SyzygyPair<Term, Poly> sPair);
+
+        /**
+         * is empty
+         */
+        boolean isEmpty();
+
+        default int size() {
+            return allSets().stream().mapToInt(TreeSet::size).sum();
+        }
+
+        /**
+         * remove a bunch of syzygies to process
+         */
+        Collection<SyzygyPair<Term, Poly>> getAndRemoveNextBunch();
+
+        /**
+         * a view of all sets of syzygies
+         */
+        Collection<TreeSet<SyzygyPair<Term, Poly>>> allSets();
+
+        default List<SyzygyPair<Term, Poly>> allPairs() {
+            return allSets().stream().flatMap(Collection::stream).collect(Collectors.toList());
+        }
+    }
+
+    /**
+     * auxiliary interface for Groebner basis methods
+     */
+    interface GroebnerAlgorithm<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>> {
+        GBResult<Term, Poly> GroebnerBasis(List<Poly> ideal,
+                                           Comparator<DegreeVector> monomialOrder,
+                                           HilbertSeries hps);
+    }
+
+    /**
+     * Strategy used to reduce and minimize basis in the intermediate steps of Buchberger algorithm
+     */
+    public interface MinimizationStrategy {
+        /**
+         * true means "yes, do minimization and reduction", false means "just keep all generators as is"
+         *
+         * @param previousSize size of generators list on the previous invocation of minimization
+         * @param currentSize  current size of generators list
+         */
+        boolean doMinimize(int previousSize, int currentSize);
+    }
+
+    interface EqSupplier<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>> {
+        MultivariatePolynomial<Poly> poly();
+
+        DegreeVector signature();
+    }
+
+    /**
+     * Abstract critical pair: used with different Poly type for Buchberger and F4 algorithms
+     */
+    public static class SyzygyPair<Term extends AMonomial<Term>, Poly extends MonomialSetView<Term>> {
+        /**
+         * Positions of polynomials {@code fi} and {@code fj} in the list of generators
+         */
+        final int i, j;
+        /**
+         * Polynomials to form a syzygy
+         */
+        final Poly fi, fj;
+        /**
+         * {@code lcm(fi.lt(), fj.lt())}
+         */
+        final DegreeVector syzygyGamma;
+        /**
+         * The sugar
+         */
+        final int sugar;
+
+        SyzygyPair(int i, int j, Poly fi, Poly fj) {
+            if (i > j) {
+                int s = i;
+                i = j;
+                j = s;
+                Poly fs = fi;
+                fi = fj;
+                fj = fs;
+            }
+            assert i != j && fi != fj;
+            assert shareVariablesQ(fi.lt(), fj.lt());
+            this.i = i;
+            this.j = j;
+            this.fi = fi;
+            this.fj = fj;
+            this.syzygyGamma = lcm(fi.lt(), fj.lt());
+            this.sugar = Math.max(
+                    fi.degreeSum() - fi.lt().totalDegree,
+                    fj.degreeSum() - fj.lt().totalDegree) + syzygyGamma.totalDegree;
+        }
+
+        SyzygyPair(int i, int j, List<Poly> generators) {
+            this(i, j, generators.get(i), generators.get(j));
+        }
+
+        /**
+         * syzygy degree
+         */
+        final int degree() {
+            return syzygyGamma.totalDegree;
+        }
+
+        final int sugar() {
+            return sugar;
+        }
+    }
+
+    /**
+     * A plain set of critical pairs --- wrapper around TreeSet&lt;SyzygyPair&lt;Term, Poly&gt;&gt;. Elements are
+     * ordered according to the comparator of TreeSet instance.
+     */
+    static final class SyzygyTreeSet<Term extends AMonomial<Term>, Poly extends MonomialSetView<Term>>
+            implements SyzygySet<Term, Poly> {
+        final TreeSet<SyzygyPair<Term, Poly>> sPairs;
+
+        SyzygyTreeSet(TreeSet<SyzygyPair<Term, Poly>> sPairs) {
+            this.sPairs = sPairs;
+        }
+
+        @Override
+        public void add(SyzygyPair<Term, Poly> sPair) {
+            sPairs.add(sPair);
+        }
+
+        @Override
+        public void remove(SyzygyPair<Term, Poly> sPair) {
+            sPairs.remove(sPair);
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return sPairs.isEmpty();
+        }
+
+        /**
+         * Returns the single element from the top of TreeSet
+         */
+        @Override
+        public Collection<SyzygyPair<Term, Poly>> getAndRemoveNextBunch() {
+            return Collections.singleton(sPairs.pollFirst());
+        }
+
+        /**
+         * Returns the single TreeSet (this)
+         */
+        @Override
+        public Collection<TreeSet<SyzygyPair<Term, Poly>>> allSets() {
+            return new ArrayList<>(Collections.singleton(sPairs));
+        }
+    }
+
+    /**
+     * Graded set of syzygies: critical pairs are collected in the sets each one containing critical pairs with the same
+     * degree. Wrapper around TreeMap&lt;Integer, TreeSet&lt;SyzygyPair&lt;Term, Poly&gt;&gt;&gt;
+     */
+    static final class GradedSyzygyTreeSet<Term extends AMonomial<Term>, Poly extends MonomialSetView<Term>>
+            implements SyzygySet<Term, Poly> {
+        final TreeMap<Integer, TreeSet<SyzygyPair<Term, Poly>>> sPairs;
+        final Comparator<SyzygyPair> selectionStrategy;
+        final ToIntFunction<SyzygyPair<Term, Poly>> weightFunction;
+
+        GradedSyzygyTreeSet(TreeMap<Integer, TreeSet<SyzygyPair<Term, Poly>>> sPairs,
+                            Comparator<SyzygyPair> selectionStrategy,
+                            ToIntFunction<SyzygyPair<Term, Poly>> weightFunction) {
+            this.sPairs = sPairs;
+            this.selectionStrategy = selectionStrategy;
+            this.weightFunction = weightFunction;
+        }
+
+        @Override
+        public void add(SyzygyPair<Term, Poly> sPair) {
+            sPairs.computeIfAbsent(weightFunction.applyAsInt(sPair), __ -> new TreeSet<>(selectionStrategy)).add(sPair);
+        }
+
+        @Override
+        public void remove(SyzygyPair<Term, Poly> sPair) {
+            int weight = weightFunction.applyAsInt(sPair);
+            TreeSet<SyzygyPair<Term, Poly>> set = sPairs.get(weight);
+            if (set != null) {
+                set.remove(sPair);
+                if (set.isEmpty())
+                    sPairs.remove(weight);
+            }
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return sPairs.isEmpty();
+        }
+
+        /**
+         * Returns all syzygies with the minimal degree
+         */
+        @Override
+        public Collection<SyzygyPair<Term, Poly>> getAndRemoveNextBunch() {
+            return sPairs.pollFirstEntry().getValue();
+        }
+
+        /**
+         * Returns sets of syzygies each one with fixed degree
+         */
+        @Override
+        public Collection<TreeSet<SyzygyPair<Term, Poly>>> allSets() {
+            return sPairs.values();
+        }
+    }
+
+    /**
+     * Ecart comparator
+     */
+    private static final class EcartComparator<Poly extends AMultivariatePolynomial<?, Poly>>
+            implements Comparator<Poly> {
+        @Override
+        public int compare(Poly a, Poly b) {
+            int c = Integer.compare(a.ecart(), b.ecart());
+            if (c != 0)
+                return c;
+            return a.ordering.compare(a.lt(), b.lt());
+        }
+    }
+
+    /**
+     * Auxiliary class used to control complexity of Groebner basis computation
+     */
+    static final class GBResult<
+            Term extends AMonomial<Term>,
+            Poly extends AMultivariatePolynomial<Term, Poly>>
+            extends ListWrapper<Poly> {
+        /**
+         * Total number of reduced polynomials (twice number of computed syzygies in case of Buchberger algorithm)
+         */
+        final int nProcessedPolynomials;
+        /**
+         * Number of zero reductions (twice number of computed zero syzygies in case of Buchberger algorithm)
+         */
+        final int nZeroReductions;
+        /**
+         * Number of zero reductions (twice number of computed zero syzygies in case of Buchberger algorithm)
+         */
+        final int nHilbertRemoved;
+
+        GBResult(List<Poly> list, int nProcessedPolynomials, int nZeroReductions, int nHilbertRemoved) {
+            super(list);
+            this.nProcessedPolynomials = nProcessedPolynomials;
+            this.nZeroReductions = nZeroReductions;
+            this.nHilbertRemoved = nHilbertRemoved;
+        }
+
+        GBResult(List<Poly> list, GBResult r) {
+            super(list);
+            this.nProcessedPolynomials = r.nProcessedPolynomials;
+            this.nZeroReductions = r.nZeroReductions;
+            this.nHilbertRemoved = r.nHilbertRemoved;
+        }
+
+        static <T extends AMonomial<T>, P extends AMultivariatePolynomial<T, P>>
+        GBResult<T, P> notBuchberger(List<P> basis) {
+            return new GBResult<>(basis, -1, -1, -1);
+        }
+
+        static <T extends AMonomial<T>, P extends AMultivariatePolynomial<T, P>>
+        GBResult<T, P> trivial(List<P> basis) {
+            return new GBResult<>(basis, 0, 0, 0);
+        }
+
+        boolean isBuchbergerType() {
+            return nProcessedPolynomials != -1;
+        }
+    }
+
+    /**
+     * auxiliary structure that holds results of Hilbert update
+     */
+    private static final class HilbertUpdate {
+        final int currentDegree;
+        final int hilbertDelta;
+        final int nRemovedPairs;
+        final boolean finished;
+
+        HilbertUpdate() {
+            this.finished = true;
+            this.nRemovedPairs = -1;
+            this.currentDegree = -1;
+            this.hilbertDelta = -1;
+        }
+
+        HilbertUpdate(int currentDegree, int hilbertDelta, int nRemovedPairs) {
+            this.currentDegree = currentDegree;
+            this.hilbertDelta = hilbertDelta;
+            this.nRemovedPairs = nRemovedPairs;
+            this.finished = false;
+        }
+    }
+
+    /**
+     * Array-based polynomial representation. The data array is sorted in descending order, so the first element is the
+     * leading term.
+     */
+    private static final class ArrayBasedPoly<Term extends AMonomial<Term>> implements MonomialSetView<Term> {
+        /**
+         * sorted (in reverse order, so lt is the first) array of terms
+         */
+        final IMonomialAlgebra<Term> mAlgebra;
+        final Term[] data;
+        final int[] degrees;
+
+        ArrayBasedPoly(AMultivariatePolynomial<Term, ?> poly) {
+            // retrieve data array from poly in descending order
+            this.mAlgebra = poly.monomialAlgebra;
+            this.data = poly.terms.descendingMap().values().toArray(poly.monomialAlgebra.createArray(poly.size()));
+            this.degrees = poly.degrees();
+        }
+
+        ArrayBasedPoly(IMonomialAlgebra<Term> mAlgebra, Term[] data, int[] degrees) {
+            this.mAlgebra = mAlgebra;
+            this.data = data;
+            this.degrees = degrees;
+        }
+
+        ArrayBasedPoly(IMonomialAlgebra<Term> mAlgebra, Term[] data, int nVariables) {
+            this.mAlgebra = mAlgebra;
+            this.data = data;
+            this.degrees = new int[nVariables];
+            for (Term db : data)
+                for (int i = 0; i < nVariables; i++)
+                    if (db.exponents[i] > degrees[i])
+                        degrees[i] = db.exponents[i];
+        }
+
+        @Override
+        public Iterator<Term> ascendingIterator() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Iterator<Term> descendingIterator() {
+            return Arrays.asList(data).iterator();
+        }
+
+        @Override
+        public Iterator<Term> iterator() {
+            return descendingIterator();
+        }
+
+        @Override
+        public int[] degrees() {
+            return degrees;
+        }
+
+        @Override
+        public Term first() {
+            return data[data.length - 1];
+        }
+
+        @Override
+        public Term last() {
+            return data[0];
+        }
+
+        @Override
+        public int size() {
+            return data.length;
+        }
+
+        Term get(int i) {
+            return data[i];
+        }
+
+        Term find(Term dv, Comparator<DegreeVector> ordering) {
+            int i = Arrays.binarySearch(data, dv, (a, b) -> ordering.compare(b, a));
+            if (i < 0)
+                return null;
+            return data[i];
+        }
+
+        @Override
+        public Collection<Term> collection() {
+            return Arrays.asList(data);
+        }
+
+        @Override
+        public ArrayBasedPoly<Term> clone() {
+            return new ArrayBasedPoly<>(mAlgebra, data.clone(), degrees.clone());
+        }
+
+        @Override
+        public String toString() {
+            return Arrays.toString(data);
+        }
+
+        void multiply(Term term) {
+            for (int i = data.length - 1; i >= 0; --i)
+                data[i] = mAlgebra.multiply(data[i], term);
+            for (int i = 0; i < degrees.length; ++i)
+                degrees[i] += term.exponents[i];
+        }
+
+        void multiply(DegreeVector term) {
+            for (int i = data.length - 1; i >= 0; --i)
+                data[i] = data[i].multiply(term);
+            for (int i = 0; i < degrees.length; ++i)
+                degrees[i] += term.exponents[i];
+        }
+
+        void divideExact(Term term) {
+            for (int i = data.length - 1; i >= 0; --i)
+                data[i] = mAlgebra.divideExact(data[i], term);
+            for (int i = 0; i < degrees.length; ++i)
+                degrees[i] -= term.exponents[i];
+        }
+
+        /**
+         * Multiply array-based poly by a monomial
+         */
+        void monic() {
+            Term unit = mAlgebra.getUnitTerm(lt().exponents.length);
+            multiply(mAlgebra.divideExact(unit, lt().setDegreeVector(unit)));
+        }
+
+        @SuppressWarnings("unchecked")
+        void primitivePart() {
+            if (mAlgebra instanceof IMonomialAlgebra.MonomialAlgebra) {
+                Ring ring = ((IMonomialAlgebra.MonomialAlgebra) mAlgebra).ring;
+                Object gcd = ring.gcd(Arrays.stream(data).map(t -> ((Monomial) t).coefficient).collect(Collectors.toList()));
+                this.divideExact((Term) new Monomial(data[0].exponents.length, gcd));
+            }
+        }
+
+        void canonical() {
+            if (mAlgebra instanceof IMonomialAlgebra.MonomialAlgebra
+                    && !((IMonomialAlgebra.MonomialAlgebra) mAlgebra).ring.isField())
+                primitivePart();
+            else
+                monic();
+        }
+
+        /**
+         * Sets the leading coefficient of poly from the coefficient of term (poly is copied only if necessary)
+         */
+        ArrayBasedPoly<Term> setLeadCoeffFrom(Term term) {
+            if (mAlgebra.haveSameCoefficients(lt(), term))
+                return this;
+            ArrayBasedPoly<Term> poly = clone();
+            poly.multiply(mAlgebra.divideExact(term.toZero(), poly.lt().toZero()));
+            return poly;
+        }
+    }
+
+    /**
+     * A simple container for polynomial and the index of this polynomial (or initial basis polynomial which was reduced
+     * in F4 to this polynomial) in the list of generators
+     */
+    static final class HPolynomial<Term extends AMonomial<Term>> {
+        /**
+         * polynomial
+         */
+        final ArrayBasedPoly<Term> hPoly;
+        /**
+         * index in generators list of the original polynomial
+         */
+        final int indexOfOrigin;
+
+        HPolynomial(ArrayBasedPoly<Term> hPoly, int indexOfOrigin) {
+            this.hPoly = hPoly;
+            this.indexOfOrigin = indexOfOrigin;
+        }
+    }
+
+    /**
+     * Sparse array implementation
+     */
+    static final class SparseArrayZp64 {
+        final IntegersZp64 ring;
+        final int length;
+        final int[] densePositions;
+        final long[] denseValues;
+        int[] sparsePositions;
+        long[] sparseValues;
+
+        SparseArrayZp64(IntegersZp64 ring,
+                        int length,
+                        int[] densePositions,
+                        int[] sparsePositions,
+                        long[] denseValues,
+                        long[] sparseValues) {
+            this.ring = ring;
+            this.length = length;
+            this.densePositions = densePositions;
+            this.sparsePositions = sparsePositions;
+            this.denseValues = denseValues;
+            this.sparseValues = sparseValues;
+            assert isSorted(sparsePositions);
+        }
+
+        SparseArrayZp64(IntegersZp64 ring,
+                        int[] densePositions,
+                        long[] denseArray) {
+            this.ring = ring;
+            this.densePositions = densePositions;
+            this.length = denseArray.length;
+            this.denseValues = new long[densePositions.length];
+            for (int i = 0; i < densePositions.length; i++)
+                denseValues[i] = denseArray[densePositions[i]];
+
+            TIntArrayList sparsePositions = new TIntArrayList();
+            TLongArrayList sparseValues = new TLongArrayList();
+            for (int i = 0; i < denseArray.length; ++i) {
+                if (denseArray[i] == 0)
+                    continue;
+                if (Arrays.binarySearch(densePositions, i) >= 0)
+                    continue;
+                sparsePositions.add(i);
+                sparseValues.add(denseArray[i]);
+            }
+            this.sparsePositions = sparsePositions.toArray();
+            this.sparseValues = sparseValues.toArray();
+        }
+
+        long[] toDense() {
+            long[] result = new long[length];
+            for (int i = 0; i < densePositions.length; ++i)
+                result[densePositions[i]] = denseValues[i];
+            for (int i = 0; i < sparsePositions.length; ++i)
+                result[sparsePositions[i]] = sparseValues[i];
+            return result;
+        }
+
+        void subtract(SparseArrayZp64 pivot, long factor, int iColumn, int firstDense) {
+            if (factor == 0)
+                return;
+            assert pivot.densePositions == densePositions;
+            long negFactor = ring.negate(factor);
+
+            // adding dense parts
+            for (int i = firstDense; i < denseValues.length; i++)
+                denseValues[i] = ring.subtract(denseValues[i], ring.multiply(factor, pivot.denseValues[i]));
+
+            // subtracting sparse parts
+            int[] pivCols = pivot.sparsePositions;
+            long[] pivVals = pivot.sparseValues;
+
+            int firstSparse = ArraysUtil.binarySearch1(sparsePositions, iColumn);
+
+            // resulting non-zero columns
+            TIntArrayList resCols = new TIntArrayList(sparsePositions.length + pivCols.length);
+            TLongArrayList resVals = new TLongArrayList(sparsePositions.length + pivCols.length);
+
+            resCols.add(sparsePositions, 0, firstSparse);
+            resVals.add(sparseValues, 0, firstSparse);
+
+            int iSel = firstSparse, iPiv = 0;
+            while (iSel < sparsePositions.length && iPiv < pivCols.length) {
+                int
+                        selCol = sparsePositions[iSel],
+                        othCol = pivCols[iPiv];
+
+                if (selCol == othCol) {
+                    long subtract = ring.subtract(sparseValues[iSel], ring.multiply(factor, pivVals[iPiv]));
+                    if (subtract != 0) {
+                        resCols.add(selCol);
+                        resVals.add(subtract);
+                    }
+
+                    ++iSel;
+                    ++iPiv;
+                } else if (selCol < othCol) {
+                    resCols.add(selCol);
+                    resVals.add(sparseValues[iSel]);
+
+                    ++iSel;
+                } else if (selCol > othCol) {
+                    resCols.add(othCol);
+                    resVals.add(ring.multiply(negFactor, pivVals[iPiv]));
+
+                    ++iPiv;
+                }
+            }
+
+            if (iSel < sparsePositions.length)
+                for (; iSel < sparsePositions.length; ++iSel) {
+                    resCols.add(sparsePositions[iSel]);
+                    resVals.add(sparseValues[iSel]);
+                }
+
+            if (iPiv < pivCols.length)
+                for (; iPiv < pivCols.length; ++iPiv) {
+                    resCols.add(pivCols[iPiv]);
+                    resVals.add(ring.multiply(negFactor, pivVals[iPiv]));
+                }
+
+            sparsePositions = resCols.toArray();
+            sparseValues = resVals.toArray();
+        }
+
+        void subtract(SparseArrayZp64 pivot, long factor) {
+            subtract(pivot, factor, 0, 0);
+        }
+
+        void multiply(long factor) {
+            if (factor == 1)
+                return;
+            for (int i = 0; i < sparseValues.length; ++i)
+                sparseValues[i] = ring.multiply(sparseValues[i], factor);
+            for (int i = 0; i < denseValues.length; ++i)
+                denseValues[i] = ring.multiply(denseValues[i], factor);
+        }
+
+        long coefficient(int iRow) {
+            int index = Arrays.binarySearch(sparsePositions, iRow);
+            if (index >= 0)
+                return sparseValues[index];
+            index = Arrays.binarySearch(densePositions, iRow);
+            if (index >= 0)
+                return denseValues[index];
+            return 0;
+        }
+
+        void multiply(int iRow, long value) {
+            int index = Arrays.binarySearch(sparsePositions, iRow);
+            if (index >= 0)
+                sparseValues[index] = ring.multiply(sparseValues[index], value);
+            else {
+                index = Arrays.binarySearch(densePositions, iRow);
+                if (index >= 0)
+                    denseValues[index] = ring.multiply(denseValues[index], value);
+            }
+        }
+
+        void subtract(int iRow, long value) {
+            if (value == 0)
+                return;
+
+            int index = Arrays.binarySearch(densePositions, iRow);
+            if (index >= 0)
+                denseValues[index] = ring.subtract(denseValues[index], value);
+            else {
+                index = Arrays.binarySearch(sparsePositions, iRow);
+                if (index >= 0) {
+                    sparseValues[index] = ring.subtract(sparseValues[index], value);
+                    if (sparseValues[index] == 0) {
+                        sparsePositions = ArraysUtil.remove(sparsePositions, index);
+                        sparseValues = ArraysUtil.remove(sparseValues, index);
+                    }
+                } else {
+                    index = ~index;
+                    sparsePositions = ArraysUtil.insert(sparsePositions, index, iRow);
+                    sparseValues = ArraysUtil.insert(sparseValues, index, ring.negate(value));
+                }
+            }
+        }
+
+        int firstNonZeroPosition() {
+            int firstSparse = sparsePositions.length != 0 ? sparsePositions[0] : Integer.MAX_VALUE;
+            for (int i = 0; i < densePositions.length; ++i)
+                if (denseValues[i] != 0)
+                    return Math.min(densePositions[i], firstSparse);
+            return firstSparse;
+        }
+    }
+
+    static final class SparseColumnMatrixZp64 {
+        final IntegersZp64 ring;
+        final int nRows, nColumns;
+        final int[] densePositions;
+        final SparseArrayZp64[] columns;
+
+        SparseColumnMatrixZp64(IntegersZp64 ring, int nRows, int nColumns, int[] densePositions) {
+            this.ring = ring;
+            this.nRows = nRows;
+            this.nColumns = nColumns;
+            this.densePositions = densePositions;
+            this.columns = new SparseArrayZp64[nColumns];
+        }
+
+        void multiplyRow(int iRow, long value) {
+            if (value != 1)
+                for (int i = 0; i < nColumns; ++i)
+                    columns[i].multiply(iRow, value);
+        }
+
+        SparseRowMatrixZp64 toRowMatrix(int[] densePositions) {
+            SparseRowMatrixZp64 rowMatrix = new SparseRowMatrixZp64(ring, nRows, nColumns, densePositions);
+            TIntArrayList[] sparseColumns = new TIntArrayList[nRows];
+            TLongArrayList[] sparseValues = new TLongArrayList[nRows];
+            long[][] denseValues = new long[nRows][densePositions.length];
+
+            for (int iRow = 0; iRow < nRows; ++iRow) {
+                sparseColumns[iRow] = new TIntArrayList();
+                sparseValues[iRow] = new TLongArrayList();
+            }
+
+            for (int iColumn = 0; iColumn < nColumns; ++iColumn) {
+                SparseArrayZp64 column = columns[iColumn];
+                int iDenseColumn = Arrays.binarySearch(densePositions, iColumn);
+                if (iDenseColumn >= 0) {
+                    for (int i = 0; i < column.densePositions.length; i++)
+                        denseValues[column.densePositions[i]][iDenseColumn] = column.denseValues[i];
+                    for (int i = 0; i < column.sparsePositions.length; ++i)
+                        denseValues[column.sparsePositions[i]][iDenseColumn] = column.sparseValues[i];
+                } else {
+                    for (int i = 0; i < column.densePositions.length; i++) {
+                        sparseColumns[column.densePositions[i]].add(iColumn);
+                        sparseValues[column.densePositions[i]].add(column.denseValues[i]);
+                    }
+                    for (int i = 0; i < column.sparsePositions.length; ++i) {
+                        sparseColumns[column.sparsePositions[i]].add(iColumn);
+                        sparseValues[column.sparsePositions[i]].add(column.sparseValues[i]);
+                    }
+                }
+            }
+
+            for (int iRow = 0; iRow < nRows; ++iRow)
+                rowMatrix.rows[iRow] = new SparseArrayZp64(ring, nColumns, densePositions, sparseColumns[iRow].toArray(), denseValues[iRow], sparseValues[iRow].toArray());
+
+            return rowMatrix;
+        }
+    }
+
+    static final class SparseRowMatrixZp64 {
+        final IntegersZp64 ring;
+        final int nRows, nColumns;
+        final int[] densePositions;
+        final SparseArrayZp64[] rows;
+
+        SparseRowMatrixZp64(IntegersZp64 ring, int nRows, int nColumns, int[] densePositions) {
+            this.ring = ring;
+            this.nRows = nRows;
+            this.nColumns = nColumns;
+            this.densePositions = densePositions;
+            this.rows = new SparseArrayZp64[nRows];
+        }
+
+        SparseRowMatrixZp64(IntegersZp64 ring, int nRows, int nColumns, int[] densePositions, SparseArrayZp64[] rows) {
+            this.ring = ring;
+            this.nRows = nRows;
+            this.nColumns = nColumns;
+            this.densePositions = densePositions;
+            this.rows = rows;
+        }
+
+        SparseRowMatrixZp64 range(int from, int to) {
+            return new SparseRowMatrixZp64(ring, to - from, nColumns, densePositions, Arrays.copyOfRange(rows, from, to));
+        }
+
+        long[][] denseMatrix() {
+            long[][] result = new long[rows.length][nColumns];
+            for (int iRow = 0; iRow < rows.length; ++iRow) {
+                SparseArrayZp64 row = rows[iRow];
+                for (int i = 0; i < row.sparsePositions.length; i++)
+                    result[iRow][row.sparsePositions[i]] = row.sparseValues[i];
+                for (int i = 0; i < densePositions.length; i++)
+                    result[iRow][densePositions[i]] = row.denseValues[i];
+            }
+            return result;
+        }
+
+
+        // return rank
+        int rowReduce() {
+            // Gaussian elimination
+            int nZeroRows = 0;
+            for (int iCol = 0, to = rows.length; iCol < to; ++iCol) {
+                int iRow = iCol - nZeroRows;
+                int pivotIndex = -1;
+
+                for (int i = iRow; i < rows.length; ++i) {
+                    if (rows[i].coefficient(iCol) == 0)
+                        continue;
+                    if (pivotIndex == -1) {
+                        pivotIndex = i;
+                        continue;
+                    }
+                    if (rows[i].sparsePositions.length < rows[pivotIndex].sparsePositions.length)
+                        pivotIndex = i;
+                }
+
+                if (pivotIndex == -1) {
+                    ++nZeroRows;
+                    to = Math.min(nColumns, rows.length + nZeroRows);
+                    continue;
+                }
+
+                ArraysUtil.swap(rows, pivotIndex, iRow);
+                SparseArrayZp64 pivot = rows[iRow];
+                long diagonalValue = pivot.coefficient(iCol);
+
+                // row-reduction
+                pivot.multiply(ring.reciprocal(diagonalValue));
+
+                int firstDense = ArraysUtil.binarySearch1(densePositions, iCol);
+                for (int row = 0; row < rows.length; ++row) {
+                    if (row == iRow)
+                        continue;
+
+                    long value = rows[row].coefficient(iCol);
+                    if (value == 0)
+                        continue;
+
+                    rows[row].subtract(pivot, value, iCol, firstDense);
+                }
+            }
+            return Math.min(nRows, nColumns) - nZeroRows;
+        }
+    }
+
+    /**
+     * Sparse array implementation
+     */
     static final class SparseArray<E> {
         final Ring<E> ring;
         final int length;
@@ -3073,30 +3980,6 @@ public final class GroebnerBases {
         }
     }
 
-    // denseArray - factor * sparseArray
-    static <E> void subtractSparseFromDense(Ring<E> ring, E[] denseArray, SparseArray<E> sparseArray, E factor) {
-        for (int i = 0; i < sparseArray.densePositions.length; i++)
-            denseArray[sparseArray.densePositions[i]] = ring.subtract(denseArray[sparseArray.densePositions[i]], ring.multiply(factor, sparseArray.denseValues[i]));
-        for (int i = 0; i < sparseArray.sparsePositions.length; i++)
-            denseArray[sparseArray.sparsePositions[i]] = ring.subtract(denseArray[sparseArray.sparsePositions[i]], ring.multiply(factor, sparseArray.sparseValues[i]));
-    }
-
-    // denseFactor * denseArray - sparseFactor * sparseArray
-    static <E> void subtractSparseFromDense(Ring<E> ring, E[] denseArray, E denseFactor, SparseArray<E> sparseArray, E sparseFactor) {
-        if (!ring.isOne(denseFactor))
-            for (int i = 0; i < denseArray.length; i++)
-                denseArray[i] = ring.multiply(denseArray[i], denseFactor);
-
-        for (int i = 0; i < sparseArray.densePositions.length; i++) {
-            int dPosition = sparseArray.densePositions[i];
-            denseArray[dPosition] = ring.subtract(denseArray[dPosition], ring.multiply(sparseFactor, sparseArray.denseValues[i]));
-        }
-        for (int i = 0; i < sparseArray.sparsePositions.length; i++) {
-            int sPosition = sparseArray.sparsePositions[i];
-            denseArray[sPosition] = ring.subtract(denseArray[sPosition], ring.multiply(sparseFactor, sparseArray.sparseValues[i]));
-        }
-    }
-
     static final class SparseColumnMatrix<E> {
         final Ring<E> ring;
         final int nRows, nColumns;
@@ -3140,7 +4023,8 @@ public final class GroebnerBases {
                     for (int i = 0; i < column.densePositions.length; i++) {
                         sparseColumns[column.densePositions[i]].add(iColumn);
                         sparseValues[column.densePositions[i]].add(column.denseValues[i]);
-                    } for (int i = 0; i < column.sparsePositions.length; ++i) {
+                    }
+                    for (int i = 0; i < column.sparsePositions.length; ++i) {
                         sparseColumns[column.sparsePositions[i]].add(iColumn);
                         sparseValues[column.sparsePositions[i]].add(column.sparseValues[i]);
                     }
@@ -3257,121 +4141,48 @@ public final class GroebnerBases {
         }
     }
 
-    private static boolean isSorted(int[] arr) {
-        for (int i = 1; i < arr.length; ++i)
-            if (arr[i - 1] >= arr[i])
-                return false;
-        return true;
-    }
-
-    /* ************************************** Hilbert-Poincare series ********************************************** */
-
-    /** Check whether all specified generators are monomials */
-    public static boolean isMonomialIdeal(List<? extends AMultivariatePolynomial> ideal) {
-        return ideal.stream().allMatch(AMultivariatePolynomial::isMonomial);
-    }
-
-    /** Check whether ideal is homogeneous */
-    public static boolean isHomogeneousIdeal(List<? extends AMultivariatePolynomial> ideal) {
-        return ideal.stream().allMatch(AMultivariatePolynomial::isHomogeneous);
-    }
-
-    /** List of lead terms of generators */
-    public static List<DegreeVector> leadTermsSet(List<? extends AMultivariatePolynomial> ideal) {
-        return ideal.stream().map(AMultivariatePolynomial::lt).collect(Collectors.toList());
-    }
-
     /**
-     * Computes Hilbert-Poincare series of specified ideal given by its Groebner basis
+     * Hilbert-Poincare series HPS(t) = P(t) / (1 - t)^m
      */
-    public static HilbertSeries HilbertSeriesOfLeadingTermsSet(List<? extends AMultivariatePolynomial> ideal) {
-        if (!isHomogeneousIdeal(ideal) && !isGradedOrder(ideal.get(0).ordering))
-            throw new IllegalArgumentException("Basis should be homogeneous or use graded (degree compatible) monomial order");
-        if (ideal.stream().anyMatch(IPolynomial::isZero))
-            return new HilbertSeries(UnivariatePolynomial.one(Q), ideal.get(0).nVariables);
-        return HilbertSeries(leadTermsSet(ideal));
-    }
-
-    /** Minimizes Groebner basis of monomial ideal. The input should be a Groebner basis */
-    static void reduceMonomialIdeal(List<DegreeVector> basis) {
-        outer:
-        for (int i = basis.size() - 1; i >= 1; --i) {
-            for (int j = i - 1; j >= 0; --j) {
-                DegreeVector pi = basis.get(i), pj = basis.get(j);
-                if (pi.dvDivisibleBy(pj)) {
-                    basis.remove(i);
-                    continue outer;
-                }
-                if (pj.dvDivisibleBy(pi)) {
-                    basis.remove(j);
-                    --i;
-                    continue;
-                }
-            }
-        }
-    }
-
-    /** Computes Hilbert-Poincare series of monomial ideal */
-    public static HilbertSeries HilbertSeries(List<DegreeVector> ideal) {
-        ideal = new ArrayList<>(ideal);
-        reduceMonomialIdeal(ideal);
-        UnivariatePolynomial<Rational<BigInteger>> initialNumerator = HilbertSeriesNumerator(ideal).mapCoefficients(Q, c -> new Rational<>(Z, c));
-        return new HilbertSeries(initialNumerator, ideal.get(0).nVariables());
-    }
-
-    /** initial numerator of Hilbert series */
-    private static UnivariatePolynomial<BigInteger> HilbertSeriesNumerator(List<DegreeVector> ideal) {
-        UnivariateRing<UnivariatePolynomial<BigInteger>> uniRing = Rings.UnivariateRing(Z);
-        if (ideal.isEmpty())
-            // zero ideal
-            return uniRing.getOne();
-        if (ideal.size() == 1 && ideal.get(0).isZeroVector())
-            // ideal = ring
-            return uniRing.getZero();
-        if (ideal.stream().allMatch(m -> m.totalDegree == 1))
-            // plain variables
-            return uniRing.pow(uniRing.getOne().subtract(uniRing.variable(0)), ideal.size());
-
-        // pick monomial
-        DegreeVector pivotMonomial = ideal.stream().filter(m -> m.totalDegree > 1).findAny().get();
-        int nVariables = pivotMonomial.exponents.length, var;
-        for (var = 0; var < nVariables; ++var)
-            if (pivotMonomial.exponents[var] != 0)
-                break;
-        final int variable = var;
-
-        int[] varExponents = new int[nVariables];
-        varExponents[variable] = 1;
-        DegreeVector varMonomial = new DegreeVector(varExponents, 1);
-
-        // sum J + <x_i>
-        List<DegreeVector> sum = ideal.stream()
-                .filter(m -> m.exponents[variable] == 0)
-                .collect(Collectors.toList());
-        sum.add(varMonomial);
-
-        // quotient J : <x_i>
-        List<DegreeVector> quot = ideal.stream()
-                .map(m -> m.exponents[variable] > 0 ? m.dvDivideOrNull(variable, 1) : m)
-                .collect(Collectors.toList());
-        reduceMonomialIdeal(quot);
-
-        return HilbertSeriesNumerator(sum).add(HilbertSeriesNumerator(quot).shiftRight(1));
-    }
-
-    /** Hilbert-Poincare series HPS(t) = P(t) / (1 - t)^m */
     public static final class HilbertSeries {
         private static final UnivariatePolynomial<Rational<BigInteger>> DENOMINATOR =
                 UnivariatePolynomial.create(1, -1).mapCoefficients(Q, c -> new Rational<>(Z, c));
-        /** Initial numerator (numerator and denominator may have nontrivial GCD) */
+        /**
+         * Initial numerator (numerator and denominator may have nontrivial GCD)
+         */
         public final UnivariatePolynomial<Rational<BigInteger>> initialNumerator;
-        /** Initial denominator exponent (numerator and denominator may have nontrivial GCD) */
+        /**
+         * Initial denominator exponent (numerator and denominator may have nontrivial GCD)
+         */
         public final int initialDenominatorExponent;
-        /** Reduced numerator (GCD is cancelled) */
+        /**
+         * Reduced numerator (GCD is cancelled)
+         */
         public final UnivariatePolynomial<Rational<BigInteger>> numerator;
-        /** Denominator exponent of reduced HPS(t) (that is ideal Krull dimension) */
+        /**
+         * Denominator exponent of reduced HPS(t) (that is ideal Krull dimension)
+         */
         public final int denominatorExponent;
-
+        /**
+         * Degree of ideal
+         */
+        private int idealDegree = -1;
+        /**
+         * Integral part I(t) of HPS(t): HPS(t) = I(t) + R(t)/(1-t)^m
+         */
+        private UnivariatePolynomial<Rational<BigInteger>> integralPart = null;
+        /**
+         * Remainder part R(t) of HPS(t): HPS(t) = I(t) + R(t)/(1-t)^m
+         */
+        private UnivariatePolynomial<Rational<BigInteger>> remainderNumerator = null;
+        /**
+         * Integral Hilbert polynomial (i.e. Hilbert polynomial multiplied by (dimension - 1)!)
+         */
+        private UnivariatePolynomial<Rational<BigInteger>> hilbertPolynomialZ = null;
+        /**
+         * Hilbert polynomial
+         */
+        private UnivariatePolynomial<Rational<BigInteger>> hilbertPolynomial = null;
         private HilbertSeries(UnivariatePolynomial<Rational<BigInteger>> initialNumerator, int initialDenominatorExponent) {
             this.initialNumerator = initialNumerator;
             this.initialDenominatorExponent = initialDenominatorExponent;
@@ -3389,15 +4200,16 @@ public final class GroebnerBases {
             this.denominatorExponent = reducedDenominatorDegree;
         }
 
-        /** The dimension of ideal */
+        /**
+         * The dimension of ideal
+         */
         public int dimension() {
             return denominatorExponent;
         }
 
-        /** Degree of ideal */
-        private int idealDegree = -1;
-
-        /** The degree of ideal */
+        /**
+         * The degree of ideal
+         */
         public synchronized int degree() {
             if (idealDegree == -1) {
                 Rational<BigInteger> degree = numerator.evaluate(1);
@@ -3407,18 +4219,17 @@ public final class GroebnerBases {
             return idealDegree;
         }
 
-        /** Integral part I(t) of HPS(t): HPS(t) = I(t) + R(t)/(1-t)^m */
-        private UnivariatePolynomial<Rational<BigInteger>> integralPart = null;
-        /** Remainder part R(t) of HPS(t): HPS(t) = I(t) + R(t)/(1-t)^m */
-        private UnivariatePolynomial<Rational<BigInteger>> remainderNumerator = null;
-
-        /** Integral part I(t) of HPS(t): HPS(t) = I(t) + Q(t)/(1-t)^m */
+        /**
+         * Integral part I(t) of HPS(t): HPS(t) = I(t) + Q(t)/(1-t)^m
+         */
         public UnivariatePolynomial<Rational<BigInteger>> integralPart() {
             computeIntegralAndRemainder();
             return integralPart;
         }
 
-        /** Remainder part R(t) of HPS(t): HPS(t) = I(t) + R(t)/(1-t)^m */
+        /**
+         * Remainder part R(t) of HPS(t): HPS(t) = I(t) + R(t)/(1-t)^m
+         */
         public UnivariatePolynomial<Rational<BigInteger>> remainderNumerator() {
             computeIntegralAndRemainder();
             return remainderNumerator;
@@ -3433,10 +4244,9 @@ public final class GroebnerBases {
             }
         }
 
-        /** Integral Hilbert polynomial (i.e. Hilbert polynomial multiplied by (dimension - 1)!) */
-        private UnivariatePolynomial<Rational<BigInteger>> hilbertPolynomialZ = null;
-
-        /** Integral Hilbert polynomial (i.e. Hilbert polynomial multiplied by (dimension - 1)!) */
+        /**
+         * Integral Hilbert polynomial (i.e. Hilbert polynomial multiplied by (dimension - 1)!)
+         */
         public synchronized UnivariatePolynomial<Rational<BigInteger>> hilbertPolynomialZ() {
             if (hilbertPolynomialZ == null) {
                 hilbertPolynomialZ = UnivariatePolynomial.zero(Q);
@@ -3452,10 +4262,9 @@ public final class GroebnerBases {
             return hilbertPolynomialZ;
         }
 
-        /** Hilbert polynomial */
-        private UnivariatePolynomial<Rational<BigInteger>> hilbertPolynomial = null;
-
-        /** Hilbert polynomial */
+        /**
+         * Hilbert polynomial
+         */
         public synchronized UnivariatePolynomial<Rational<BigInteger>> hilbertPolynomial() {
             if (hilbertPolynomial == null) {
                 Rational<BigInteger> facCf = new Rational<>(Z, BigIntegerUtil.factorial(denominatorExponent - 1));
@@ -3488,269 +4297,6 @@ public final class GroebnerBases {
         }
     }
 
-
-
-
-    /* ********************************** Modular & Sparse Groebner basis ****************************************** */
-
-    /**
-     * Modular Groebner basis algorithm.
-     *
-     * The algorithm switches between modular Chinese remainder techniques as described in Elizabeth A. Arnold, "Modular
-     * algorithms for computing Groebner bases", Journal of Symbolic Computation 35 (2003) 403–419 and sparse Groebner
-     * basis reconstruction with linear algebra ({@link #solveGB(List, List, Comparator)}).
-     */
-    public static GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>>
-    ModularGB(List<MultivariatePolynomial<BigInteger>> ideal,
-              Comparator<DegreeVector> monomialOrder) {
-        return ModularGB(ideal, monomialOrder, null, false);
-    }
-
-    /**
-     * Modular Groebner basis algorithm.
-     *
-     * The algorithm switches between modular Chinese remainder techniques as described in Elizabeth A. Arnold, "Modular
-     * algorithms for computing Groebner bases", Journal of Symbolic Computation 35 (2003) 403–419 and sparse Groebner
-     * basis reconstruction with linear algebra ({@link #solveGB(List, List, Comparator)}).
-     *
-     * @param hilbertSeries optional Hilbert-Poincare series of ideal
-     */
-    public static GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>>
-    ModularGB(List<MultivariatePolynomial<BigInteger>> ideal,
-              Comparator<DegreeVector> monomialOrder,
-              HilbertSeries hilbertSeries) {
-        return ModularGB(ideal, monomialOrder, hilbertSeries, false);
-    }
-
-    /**
-     * Modular Groebner basis algorithm.
-     *
-     * The algorithm switches between modular Chinese remainder techniques as described in Elizabeth A. Arnold, "Modular
-     * algorithms for computing Groebner bases", Journal of Symbolic Computation 35 (2003) 403–419 and sparse Groebner
-     * basis reconstruction with linear algebra.
-     *
-     * @param ideal         ideal generators
-     * @param monomialOrder monomial order
-     * @param hilbertSeries optional Hilbert-Poincare series of ideal
-     * @param trySparse     whether to try sparse reconstruction in particularly small resulting bases via {@link
-     *                      #solveGB(List, List, Comparator)}
-     */
-    @SuppressWarnings("unchecked")
-    public static GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>>
-    ModularGB(List<MultivariatePolynomial<BigInteger>> ideal,
-              Comparator<DegreeVector> monomialOrder,
-              HilbertSeries hilbertSeries,
-              boolean trySparse) {
-        return ModularGB(ideal, monomialOrder,
-                GroebnerBases::GroebnerBasisInGF,
-                (p, o, s) -> GroebnerBasisInZ(p, o, s, false),
-                BigInteger.ONE.shiftLeft(59),
-                hilbertSeries, trySparse);
-    }
-
-    /** thresholds to control sparse over modular reconstruction in ModularGB */
-    private static final int
-            N_UNKNOWNS_THRESHOLD = 32,
-            N_BUCHBERGER_STEPS_THRESHOLD = 2 * 32;
-
-    /** thresholds to control traditional GB over modular in ModularGB */
-    private static final int
-            N_MOD_STEPS_THRESHOLD = 4,
-            N_BUCHBERGER_STEPS_REDUNDANCY_DELTA = 9;
-
-    static List<MultivariatePolynomialZp64> mod(List<MultivariatePolynomial<BigInteger>> polys, long modulus) {
-        IntegersZp64 ring = Zp64(modulus);
-        IntegersZp gRing = ring.asGenericRing();
-        return polys.stream().map(p -> MultivariatePolynomial.asOverZp64(p.setRing(gRing))).collect(Collectors.toList());
-    }
-
-    /**
-     * Modular Groebner basis algorithm.
-     *
-     * The algorithm switches between modular Chinese remainder techniques as described in Elizabeth A. Arnold, "Modular
-     * algorithms for computing Groebner bases", Journal of Symbolic Computation 35 (2003) 403–419 and sparse Groebner
-     * basis reconstruction with linear algebra.
-     *
-     * @param ideal            ideal generators
-     * @param monomialOrder    monomial order
-     * @param modularAlgorithm algorithm used to find Groebner basis mod prime
-     * @param defaultAlgorithm algorithm used to find Groebner basis if modular algorithm failed
-     * @param firstPrime       prime number to start modulo iterations
-     * @param hilbertSeries    optional Hilbert-Poincare series of ideal
-     * @param trySparse        whether to try sparse reconstruction in particularly small resulting bases via {@link
-     *                         #solveGB(List, List, Comparator)}
-     */
-    @SuppressWarnings("unchecked")
-    public static GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>>
-    ModularGB(List<MultivariatePolynomial<BigInteger>> ideal,
-              Comparator<DegreeVector> monomialOrder,
-              GroebnerAlgorithm modularAlgorithm,
-              GroebnerAlgorithm defaultAlgorithm,
-              BigInteger firstPrime,
-              HilbertSeries hilbertSeries,
-              boolean trySparse) {
-        // required for Hilbert functions
-        assert isHomogeneousIdeal(ideal) || isGradedOrder(monomialOrder);
-
-        // simplify generators as much as possible
-        ideal = prepareGenerators(ideal, monomialOrder);
-        if (ideal.size() == 1)
-            return GBResult.trivial(canonicalize(ideal));
-
-        GBResult baseResult = null;
-        BigInteger basePrime = null;
-        HilbertSeries baseSeries = hilbertSeries;
-        List<MultivariatePolynomial<BigInteger>> baseBasis = null;
-
-        PrimesIterator0 primes = new PrimesIterator0(firstPrime);// start with a large enough prime
-        List<MultivariatePolynomial<BigInteger>> previousGBCandidate = null;
-        // number of CRT liftings
-        int nModIterations = 0;
-        main:
-        while (true) {
-
-            // check whether we dont' take too long
-            if (baseResult != null
-                    && baseResult.isBuchbergerType()
-                    && nModIterations > N_MOD_STEPS_THRESHOLD
-                    && Math.abs(baseResult.nProcessedPolynomials - baseResult.nZeroReductions - baseBasis.size()) < N_BUCHBERGER_STEPS_REDUNDANCY_DELTA) {
-                // modular reconstruction is too hard in this case, switch to the non-modular algorithm
-                return defaultAlgorithm.GroebnerBasis(ideal, monomialOrder, hilbertSeries);
-            }
-
-            // pick up next prime number
-            BigInteger prime = primes.next();
-            IntegersZp ring = Zp(prime);
-
-            // number of traditional "Buchberger" steps
-            List<MultivariatePolynomial<BigInteger>> bModBasis;
-            GBResult modResult;
-            if (prime.isLong()) {
-                // generators mod prime
-                List<MultivariatePolynomialZp64> modGenerators = mod(ideal, prime.longValueExact());
-                // Groebner basis mod prime
-                GBResult<MonomialZp64, MultivariatePolynomialZp64> r = modularAlgorithm.GroebnerBasis((List) modGenerators, monomialOrder, null);
-                bModBasis = r.stream().map(MultivariatePolynomialZp64::toBigPoly).collect(Collectors.toList());
-                modResult = r;
-            } else {
-                List<MultivariatePolynomial<BigInteger>> modGenerators = ideal.stream().map(p -> p.setRing(ring)).collect(Collectors.toList());
-                GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>> r = modularAlgorithm.GroebnerBasis((List) modGenerators, monomialOrder, null);
-                bModBasis = r.list;
-                modResult = r;
-            }
-
-            // sort generators by increasing lead terms
-            bModBasis.sort((a, b) -> monomialOrder.compare(a.lt(), b.lt()));
-            HilbertSeries modSeries = HilbertSeries(leadTermsSet(bModBasis));
-
-            // first iteration
-            if (baseBasis == null) {
-                if (trySparse) {
-                    // try to solve sparse GB on the first iteration
-                    // number of unknowns
-                    int nSparseUnknowns = bModBasis.stream().mapToInt(p -> p.size() - 1).sum();
-                    // try to solve on in most simple cases
-                    if (nSparseUnknowns < N_UNKNOWNS_THRESHOLD && modResult.nProcessedPolynomials > N_BUCHBERGER_STEPS_THRESHOLD) {
-                        List<MultivariatePolynomial<BigInteger>> solvedGB =
-                                solveGB(ideal,
-                                        bModBasis.stream().map(AMultivariatePolynomial::getSkeleton).collect(Collectors.toList()),
-                                        monomialOrder);
-                        if (solvedGB != null && isGroebnerBasis(ideal, solvedGB, monomialOrder))
-                            return GBResult.notBuchberger(solvedGB);
-                    }
-                }
-
-                baseBasis = bModBasis;
-                basePrime = prime;
-                baseSeries = modSeries;
-                baseResult = modResult;
-                nModIterations = 0;
-                continue;
-            }
-
-            // check for Hilbert luckiness
-            int c = ModHilbertSeriesComparator.compare(baseSeries, modSeries);
-            if (c < 0)
-                // current prime is unlucky
-                continue;
-            else if (c > 0) {
-                // base prime was unlucky
-                baseBasis = bModBasis;
-                basePrime = prime;
-                baseSeries = modSeries;
-                baseResult = modResult;
-                nModIterations = 0;
-                continue;
-            }
-
-            // prime is Hilbert prime, so we compare monomial sets
-            for (int i = 0, size = Math.min(baseBasis.size(), bModBasis.size()); i < size; ++i) {
-                c = monomialOrder.compare(baseBasis.get(i).lt(), bModBasis.get(i).lt());
-                if (c > 0)
-                    // current prime is unlucky
-                    continue main;
-                else if (c < 0) {
-                    // base prime was unlucky
-                    baseBasis = bModBasis;
-                    basePrime = ring.modulus;
-                    baseSeries = modSeries;
-                    baseResult = modResult;
-                    nModIterations = 0;
-                    continue main;
-                }
-            }
-
-            if (baseBasis.size() < bModBasis.size()) {
-                // base prime was unlucky
-                baseBasis = bModBasis;
-                basePrime = ring.modulus;
-                baseSeries = modSeries;
-                baseResult = modResult;
-                nModIterations = 0;
-                continue;
-            } else if (baseBasis.size() > bModBasis.size())
-                // current prime is unlucky
-                continue;
-
-            ++nModIterations;
-            ChineseRemaindersMagic<BigInteger> magic = createMagic(Z, basePrime, prime);
-            // prime is probably lucky, we can do Chinese Remainders
-            for (int iGenerator = 0; iGenerator < baseBasis.size(); ++iGenerator) {
-                MultivariatePolynomial<BigInteger> baseGenerator = baseBasis.get(iGenerator);
-                PairedIterator<
-                        Monomial<BigInteger>, MultivariatePolynomial<BigInteger>,
-                        Monomial<BigInteger>, MultivariatePolynomial<BigInteger>
-                        > iterator = new PairedIterator<>(baseGenerator, bModBasis.get(iGenerator));
-
-                baseGenerator = baseGenerator.createZero();
-                while (iterator.hasNext()) {
-                    iterator.advance();
-
-                    Monomial<BigInteger> baseTerm = iterator.aTerm;
-                    BigInteger crt = ChineseRemainders(Z, magic, baseTerm.coefficient, iterator.bTerm.coefficient);
-                    baseGenerator.add(baseTerm.setCoefficient(crt));
-                }
-
-                baseBasis.set(iGenerator, baseGenerator);
-            }
-
-            basePrime = basePrime.multiply(prime);
-
-            List<MultivariatePolynomial<Rational<BigInteger>>> gbCandidateFrac = new ArrayList<>();
-            for (MultivariatePolynomial<BigInteger> gen : baseBasis) {
-                MultivariatePolynomial<Rational<BigInteger>> gbGen = reconstructPoly(gen, basePrime);
-                if (gbGen == null)
-                    continue main;
-                gbCandidateFrac.add(gbGen);
-            }
-
-            List<MultivariatePolynomial<BigInteger>> gbCandidate = toIntegral(gbCandidateFrac);
-            if (gbCandidate.equals(previousGBCandidate) && isGroebnerBasis(ideal, gbCandidate, monomialOrder))
-                return GBResult.notBuchberger(canonicalize(gbCandidate));
-            previousGBCandidate = gbCandidate;
-        }
-    }
-
     private static final class PrimesIterator0 {
         private BigInteger from;
         private PrimesIterator base;
@@ -3773,175 +4319,25 @@ public final class GroebnerBases {
         }
     }
 
-    /** reconstruct rational polynomial from its modulo image */
-    private static MultivariatePolynomial<Rational<BigInteger>> reconstructPoly(
-            MultivariatePolynomial<BigInteger> base, BigInteger prime) {
-        MultivariatePolynomial<Rational<BigInteger>> result = MultivariatePolynomial.zero(base.nVariables, Q, base.ordering);
-        for (Monomial<BigInteger> term : base) {
-            BigInteger[] numDen = RationalReconstruction.reconstructFareyErrorTolerant(term.coefficient, prime);
-            if (numDen == null)
-                return null;
-            result.add(new Monomial<>(term, new Rational<>(Rings.Z, numDen[0], numDen[1])));
-        }
-        return result;
-    }
-
-    private static Comparator<HilbertSeries> ModHilbertSeriesComparator = (a, b) -> {
-        UnivariatePolynomial<Rational<BigInteger>>
-                aHilbert = a.hilbertPolynomial(),
-                bHilbert = b.hilbertPolynomial();
-
-        if (aHilbert.equals(bHilbert))
-            return 0;
-
-        for (int n = Math.max(a.numerator.degree(), b.numerator.degree()) + 1; ; ++n) {
-            int c = aHilbert.evaluate(n).compareTo(bHilbert.evaluate(n));
-            if (c != 0)
-                return c;
-        }
-    };
-
-    /**
-     * Sparse Groebner basis via "linear lifting". Given a generating set and a skeleton of Groebner basis (may be
-     * computed via mod prime etc.), it build a system of equations and finds a true Groebner basis, or return null if
-     * the system was not solvable.
-     *
-     * @param generators    generators
-     * @param gbSkeleton    skeleton of true reduced Groebner basis
-     * @param monomialOrder monomial order
-     */
-    public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    List<Poly> solveGB(List<Poly> generators,
-                       List<Collection<DegreeVector>> gbSkeleton,
-                       Comparator<DegreeVector> monomialOrder) {
-        return solveGB0(generators, gbSkeleton.stream().map(c -> {
-            TreeSet<DegreeVector> set = new TreeSet<>(monomialOrder);
-            set.addAll(c);
-            return set;
-        }).collect(Collectors.toList()), monomialOrder);
-    }
-
-    /** when to drop unused variables */
-    private static final int DROP_SOLVED_VARIABLES_THRESHOLD = 128;
-    /** when to drop unused variables */
-    private static final double DROP_SOLVED_VARIABLES_RELATIVE_THRESHOLD = 0.1;
-
-    @SuppressWarnings("unchecked")
-    private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    List<Poly> solveGB0(List<Poly> generators,
-                        List<SortedSet<DegreeVector>> gbSkeleton,
-                        Comparator<DegreeVector> monomialOrder) {
-        Poly factory = generators.get(0).createZero();
-        if (!factory.isOverField()) {
-            List gb = solveGB0(toFractions((List) generators), gbSkeleton, monomialOrder);
-            if (gb == null)
-                return null;
-            return canonicalize((List<Poly>) toIntegral(gb));
-        }
-
-        // total number of unknowns
-        int nUnknowns = gbSkeleton.stream().mapToInt(p -> p.size() - 1).sum();
-        // we consider polynomials as R[u0, u1, ..., uM][x0, ..., xN], where u_i are unknowns
-        // ring R[u0, u1, ..., uM]
-        MultivariateRing<Poly> cfRing = Rings.MultivariateRing(factory.setNVariables(nUnknowns));
-        // ring R[u0, u1, ..., uM][x0, ..., xN]
-        MultivariateRing<MultivariatePolynomial<Poly>> pRing = Rings.MultivariateRing(factory.nVariables, cfRing, monomialOrder);
-
-        AtomicInteger varCounter = new AtomicInteger(0);
-        @SuppressWarnings("unchecked")
-        MultivariatePolynomial<Poly>[] gbCandidate = gbSkeleton.stream().map(p -> {
-            MultivariatePolynomial<Poly> head = pRing.create(p.last());
-            MultivariatePolynomial<Poly> tail = p.headSet(p.last())
-                    .stream()
-                    .map(t -> pRing.create(t).multiply(cfRing.variable(varCounter.getAndIncrement())))
-                    .reduce(pRing.getZero(), (a, b) -> a.add(b));
-            return head.add(tail);
-        }).toArray(MultivariatePolynomial[]::new);
-
-        Term uTerm = factory.monomialAlgebra.getUnitTerm(nUnknowns);
-        // initial ideal viewed as R[u0, u1, ..., uM][x0, ..., xN]
-        List<MultivariatePolynomial<Poly>> initialIdeal
-                = generators
-                .stream().map(p -> pRing.factory().create(p.collection()
-                        .stream().map(t -> new Monomial<>(t, cfRing.factory().create(uTerm.setCoefficientFrom(t))))
-                        .collect(Collectors.toList())))
-                .collect(Collectors.toList());
-
-
-        // build set of all syzygies
-        List<MultivariatePolynomial<Poly>> _tmp_gb_ = new ArrayList<>(initialIdeal);
-        // list of all non trivial S-pairs
-        SyzygySet<Monomial<Poly>, MultivariatePolynomial<Poly>> sPairsSet = new SyzygyTreeSet<>(new TreeSet<>(defaultSelectionStrategy(monomialOrder)));
-        Arrays.stream(gbCandidate).forEach(gb -> updateBasis(_tmp_gb_, sPairsSet, gb));
-
-        // source of equations
-        List<EqSupplier<Term, Poly>> source = new ArrayList<>();
-        // initial ideal must reduce to zero
-        initialIdeal.forEach(p -> source.add(new EqSupplierPoly<>(p)));
-        // S-pairs must reduce to zero
-        sPairsSet.allPairs().forEach(p -> source.add(new EqSupplierSyzygy<>(initialIdeal, gbCandidate, p)));
-        // iterate from "simplest" to "hardest" equations
-        source.sort((a, b) -> monomialOrder.compare(a.signature(), b.signature()));
-
-        List<Equation<Term, Poly>> nonLinearEquations = new ArrayList<>();
-        EquationSolver<Term, Poly> solver = createSolver(factory);
-        TIntHashSet solvedVariables = new TIntHashSet();
-        for (EqSupplier<Term, Poly> eqSupplier : source) {
-            if (solvedVariables.size() == nUnknowns)
-                // system is solved
-                return gbSolution(factory, gbCandidate);
-
-            MultivariatePolynomial<Poly> next = eqSupplier.poly();
-
-            SystemInfo result = reduceAndSolve(next, gbCandidate, solver, nonLinearEquations);
-
-            if (result == Inconsistent)
-                return null;
-            solvedVariables.addAll(solver.solvedVariables);
-
-            if (solver.solvedVariables.size() > 0)
-                // simplify GB candidate
-                solver.simplifyGB(gbCandidate);
-
-            // clear solutions (this gives some speed up)
-            solver.clear();
-
-            if (solvedVariables.size() > DROP_SOLVED_VARIABLES_THRESHOLD
-                    && 1.0 * solvedVariables.size() / nUnknowns >= DROP_SOLVED_VARIABLES_RELATIVE_THRESHOLD) {
-                dropSolvedVariables(solvedVariables, initialIdeal, gbCandidate, nonLinearEquations, solver);
-                nUnknowns -= solvedVariables.size();
-                solvedVariables.clear();
-            }
-        }
-
-        if (solver.nSolved() == nUnknowns)
-            // system is solved
-            return gbSolution(factory, gbCandidate);
-
-        return null;
-    }
-
-    interface EqSupplier<
-            Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>> {
-        MultivariatePolynomial<Poly> poly();
-
-        DegreeVector signature();
-    }
-
     final static class EqSupplierPoly<
             Term extends AMonomial<Term>,
             Poly extends AMultivariatePolynomial<Term, Poly>>
             implements EqSupplier<Term, Poly> {
         final MultivariatePolynomial<Poly> poly;
 
-        EqSupplierPoly(MultivariatePolynomial<Poly> poly) { this.poly = poly; }
+        EqSupplierPoly(MultivariatePolynomial<Poly> poly) {
+            this.poly = poly;
+        }
 
         @Override
-        public MultivariatePolynomial<Poly> poly() { return poly; }
+        public MultivariatePolynomial<Poly> poly() {
+            return poly;
+        }
 
         @Override
-        public DegreeVector signature() { return poly.lt(); }
+        public DegreeVector signature() {
+            return poly.lt();
+        }
     }
 
     final static class EqSupplierSyzygy<
@@ -3968,178 +4364,32 @@ public final class GroebnerBases {
         }
 
         @Override
-        public DegreeVector signature() { return sPair.syzygyGamma; }
-    }
-
-    static int[] usedVars(AMultivariatePolynomial equation) {
-        int[] degrees = equation.degrees();
-        TIntArrayList usedVars = new TIntArrayList();
-        for (int i = 0; i < degrees.length; ++i)
-            if (degrees[i] > 0)
-                usedVars.add(i);
-        return usedVars.toArray();
-    }
-
-    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    MultivariatePolynomial<Poly> getFi(int i,
-                                       List<MultivariatePolynomial<Poly>> initialIdeal,
-                                       MultivariatePolynomial<Poly>[] gbCandidate) {
-        return i < initialIdeal.size() ? initialIdeal.get(i) : gbCandidate[i - initialIdeal.size()];
-    }
-
-    /** get rid of auxiliary variables used for unknowns that were solved */
-    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    void dropSolvedVariables(
-            TIntHashSet solvedVariables,
-            List<MultivariatePolynomial<Poly>> initialIdeal,
-            MultivariatePolynomial<Poly>[] gbCandidate,
-            List<Equation<Term, Poly>> nonLinearEquations,
-            EquationSolver<Term, Poly> solver) {
-        if (solver.nSolved() != 0)
-            throw new IllegalArgumentException();
-
-        final int[] solved = solvedVariables.toArray();
-        Arrays.sort(solved);
-
-        MultivariateRing<Poly> oldPRing = ((MultivariateRing<Poly>) initialIdeal.get(0).ring);
-        // new coefficient ring
-        MultivariateRing<Poly> pRing = MultivariateRing(oldPRing.factory().dropVariables(solved));
-
-        // transform initial ideal
-        initialIdeal.replaceAll(p -> p.mapCoefficients(pRing, cf -> cf.dropVariables(solved)));
-        // transform groebner basis
-        Arrays.asList(gbCandidate).replaceAll(p -> p.mapCoefficients(pRing, cf -> cf.dropVariables(solved)));
-
-        int[] vMapping = new int[oldPRing.nVariables()];
-        int c = 0;
-        for (int i = 0; i < vMapping.length; ++i) {
-            if (Arrays.binarySearch(solved, i) >= 0)
-                vMapping[i] = -1;
-            else
-                vMapping[i] = c++;
+        public DegreeVector signature() {
+            return sPair.syzygyGamma;
         }
-
-        // transform non-linear
-        nonLinearEquations.forEach(eq -> eq.dropVariables(vMapping));
-
-        // transform linear
-        solver.equations.forEach(eq -> eq.dropVariables(vMapping));
-    }
-
-    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    List<Poly> gbSolution(Poly factory, MultivariatePolynomial<Poly>[] gbCandidate) {
-        List<Poly> result = new ArrayList<>();
-        for (MultivariatePolynomial<Poly> gbElement : gbCandidate) {
-            if (!gbElement.stream().allMatch(Poly::isConstant))
-                return null;
-
-            result.add(factory.create(gbElement.collection()
-                    .stream()
-                    .map(t -> t.coefficient.lt().setDegreeVector(t)).collect(Collectors.toList())));
-        }
-        return canonicalize(result);
     }
 
     /**
-     * Builds & tries to solve system of equations obtained from a single reduction
-     *
-     * @param toReduce           generator (or S-pair) that should reduce to zero with GB candidate
-     * @param gbCandidate        GB candidate
-     * @param solver             solver
-     * @param nonLinearEquations set of non-linear equations
+     * A single equation
      */
-    static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    SystemInfo reduceAndSolve(MultivariatePolynomial<Poly> toReduce,
-                              MultivariatePolynomial<Poly>[] gbCandidate,
-                              EquationSolver<Term, Poly> solver,
-                              List<Equation<Term, Poly>> nonLinearEquations) {
-        // reduce poly with GB candidate
-        MultivariatePolynomial<Poly> remainder = MultivariateDivision.remainder(toReduce, gbCandidate);
-        if (remainder.isZero())
-            return Consistent;
-
-        // previous number of solved variables
-        int nSolved = solver.solvedVariables.size();
-        // whether some independent linear equations were generated
-        boolean newLinearEqsObtained = false;
-        for (Poly cf : remainder.coefficients()) {
-            if (cf.isConstant())
-                // equation is not solvable
-                return Inconsistent;
-
-            cf = solver.simplify(cf).monic();
-            Equation<Term, Poly> eq = new Equation<>(cf);
-            if (eq.isLinear) {
-                // add equation
-                boolean isNewEq = solver.addEquation(eq);
-                if (isNewEq)
-                    // equation is new (independent)
-                    newLinearEqsObtained = true;
-            } else if (!nonLinearEquations.contains(eq))
-                nonLinearEquations.add(eq);
-        }
-
-        if (!newLinearEqsObtained)
-            // nothing to do further
-            return Consistent;
-
-        if (solver.solvedVariables.size() > nSolved)
-            // if some new solutions were already obtained we
-            // can simplify non-linear equations so that
-            // new linear combinations will be found
-            updateNonLinear(solver, nonLinearEquations);
-
-        while (true) {
-            // try to find and solve some subset of linear equations
-            SystemInfo result = solver.solve();
-
-            if (result == Inconsistent)
-                return Inconsistent;
-            else if (result == UnderDetermined)
-                return Consistent;
-
-            // update non-linear equations with new solutions
-            updateNonLinear(solver, nonLinearEquations);
-        }
-    }
-
-    private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
-    void updateNonLinear(EquationSolver<Term, Poly> solver,
-                         List<Equation<Term, Poly>> nonLinearEquations) {
-        while (true) {
-            boolean nlReduced = false;
-            for (int i = nonLinearEquations.size() - 1; i >= 0; --i) {
-                Equation<Term, Poly> eq = solver.simplify(nonLinearEquations.get(i));
-                if (eq.reducedEquation.isZero())
-                    nonLinearEquations.remove(i);
-                else if (isLinear(eq.reducedEquation)) {
-                    nlReduced = true;
-                    solver.addEquation(eq);
-                    nonLinearEquations.remove(i);
-                } else
-                    nonLinearEquations.set(i, eq);
-            }
-            if (!nlReduced)
-                return;
-        }
-    }
-
-    /** whether poly is linear */
-    static boolean isLinear(AMultivariatePolynomial<? extends AMonomial, ?> poly) {
-        return poly.collection().stream().allMatch(t -> t.totalDegree <= 1);
-    }
-
-    /** A single equation */
     private static class Equation<
             Term extends AMonomial<Term>,
             Poly extends AMultivariatePolynomial<Term, Poly>> {
-        /** variables that present in this equation */
+        /**
+         * variables that present in this equation
+         */
         final int[] usedVars;
-        /** variable -> variable_in_reduced_equation */
+        /**
+         * variable -> variable_in_reduced_equation
+         */
         final TIntIntHashMap mapping;
-        /** compact form of equation (with unused variables dropped) */
+        /**
+         * compact form of equation (with unused variables dropped)
+         */
         final Poly reducedEquation;
-        /** whether this equation is linear */
+        /**
+         * whether this equation is linear
+         */
         final boolean isLinear;
 
         Equation(Poly equation) {
@@ -4179,8 +4429,12 @@ public final class GroebnerBases {
                 mapping.put(this.usedVars[i], i);
         }
 
-        /** whether variable present in equation */
-        boolean hasVariable(int variable) { return Arrays.binarySearch(usedVars, variable) >= 0;}
+        /**
+         * whether variable present in equation
+         */
+        boolean hasVariable(int variable) {
+            return Arrays.binarySearch(usedVars, variable) >= 0;
+        }
 
         @Override
         public boolean equals(Object o) {
@@ -4198,65 +4452,85 @@ public final class GroebnerBases {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    static <Term extends AMonomial<Term>,
-            Poly extends AMultivariatePolynomial<Term, Poly>>
-    EquationSolver<Term, Poly> createSolver(Poly factory) {
-        if (factory instanceof MultivariatePolynomial)
-            return (EquationSolver<Term, Poly>) new EquationSolverE(((MultivariatePolynomial) factory).ring);
-        else
-            throw new RuntimeException();
-    }
-
-
-    /** solver */
+    /**
+     * solver
+     */
     private static abstract class EquationSolver<
             Term extends AMonomial<Term>,
             Poly extends AMultivariatePolynomial<Term, Poly>> {
-        /** list of linear equations */
+        /**
+         * list of linear equations
+         */
         final List<Equation<Term, Poly>> equations = new ArrayList<>();
-        /** variables solved so far */
+        /**
+         * variables solved so far
+         */
         final TIntArrayList solvedVariables = new TIntArrayList();
 
-        EquationSolver() {}
+        EquationSolver() {
+        }
 
-        /** number of equations */
-        final int nEquations() {return equations.size();}
+        /**
+         * number of equations
+         */
+        final int nEquations() {
+            return equations.size();
+        }
 
-        /** add equation and return whether it was a new equation (true) or it is redundant (false) */
+        /**
+         * add equation and return whether it was a new equation (true) or it is redundant (false)
+         */
         abstract boolean addEquation(Equation<Term, Poly> eq);
 
-        /** searches for a solvable block of equations and tries to solve it */
+        /**
+         * searches for a solvable block of equations and tries to solve it
+         */
         abstract SystemInfo solve();
 
-        /** simplifies given equation with solutions obtained so far */
+        /**
+         * simplifies given equation with solutions obtained so far
+         */
         abstract Equation<Term, Poly> simplify(Equation<Term, Poly> eq);
 
-        /** simplifies given poly with solutions obtained so far */
+        /**
+         * simplifies given poly with solutions obtained so far
+         */
         abstract Poly simplify(Poly poly);
 
-        /** clear all solutions */
+        /**
+         * clear all solutions
+         */
         abstract void clear();
 
-        /** simplifies GB element with solutions obtained so far */
+        /**
+         * simplifies GB element with solutions obtained so far
+         */
         final MultivariatePolynomial<Poly> simplifyGB(MultivariatePolynomial<Poly> poly) {
             return poly.mapCoefficients(poly.ring, this::simplify);
         }
 
-        /** simplifies GB with solutions obtained so far */
+        /**
+         * simplifies GB with solutions obtained so far
+         */
         final void simplifyGB(MultivariatePolynomial<Poly>[] gbCandidate) {
             for (int i = 0; i < gbCandidate.length; i++)
                 gbCandidate[i] = simplifyGB(gbCandidate[i]);
         }
 
-        final int nSolved() { return solvedVariables.size(); }
+        final int nSolved() {
+            return solvedVariables.size();
+        }
     }
 
     private static final class EquationSolverE<E>
             extends EquationSolver<Monomial<E>, MultivariatePolynomial<E>> {
-        /** solutions obtained so far */
+        /**
+         * solutions obtained so far
+         */
         private final List<E> solutions = new ArrayList<>();
-        /** the ring */
+        /**
+         * the ring
+         */
         private final Ring<E> ring;
 
         EquationSolverE(Ring<E> ring) {
@@ -4310,7 +4584,9 @@ public final class GroebnerBases {
             return true;
         }
 
-        /** updates self with new solutions */
+        /**
+         * updates self with new solutions
+         */
         private void selfUpdate() {
             List<Equation<Monomial<E>, MultivariatePolynomial<E>>> needUpdate = new ArrayList<>();
             for (int i = equations.size() - 1; i >= 0; --i) {
@@ -4412,7 +4688,9 @@ public final class GroebnerBases {
             return UnderDetermined;
         }
 
-        /** solves a system of linear equations */
+        /**
+         * solves a system of linear equations
+         */
         SystemInfo solve(List<Equation<Monomial<E>, MultivariatePolynomial<E>>> equations, int[] usedVariables) {
             int nUsedVariables = usedVariables.length;
 

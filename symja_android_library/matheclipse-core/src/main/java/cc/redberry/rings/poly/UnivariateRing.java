@@ -1,10 +1,17 @@
 package cc.redberry.rings.poly;
 
-import cc.redberry.rings.Ring;
-import cc.redberry.rings.poly.univar.*;
 import org.hipparchus.random.RandomGenerator;
 
 import java.util.function.Function;
+
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
+import cc.redberry.rings.poly.univar.RandomUnivariatePolynomials;
+import cc.redberry.rings.poly.univar.UnivariateDivision;
+import cc.redberry.rings.poly.univar.UnivariateFactorization;
+import cc.redberry.rings.poly.univar.UnivariateGCD;
+import cc.redberry.rings.poly.univar.UnivariatePolynomial;
+import cc.redberry.rings.poly.univar.UnivariateSquareFreeFactorization;
 
 /**
  * Ring of univariate polynomials.
@@ -13,6 +20,14 @@ import java.util.function.Function;
  * @since 1.0
  */
 public final class UnivariateRing<Poly extends IUnivariatePolynomial<Poly>> extends APolynomialRing<Poly> {
+    /**
+     * The minimal degree of polynomial generated with {@link #randomElement(RandomGenerator)}
+     */
+    public static final int MIN_DEGREE_OF_RANDOM_POLY = 0;
+    /**
+     * The maximal degree of polynomial generated with {@link #randomElement(RandomGenerator)}
+     */
+    public static final int MAX_DEGREE_OF_RANDOM_POLY = 32;
     private static final long serialVersionUID = 1L;
 
     /**
@@ -21,19 +36,29 @@ public final class UnivariateRing<Poly extends IUnivariatePolynomial<Poly>> exte
      *
      * @param factory factory polynomial (the exact value of {@code factory} is irrelevant)
      */
-    public UnivariateRing(Poly factory) { super(factory); }
+    public UnivariateRing(Poly factory) {
+        super(factory);
+    }
 
     @Override
-    public int nVariables() { return 1; }
+    public int nVariables() {
+        return 1;
+    }
 
     @Override
-    public Poly remainder(Poly a, Poly b) {return UnivariateDivision.remainder(a, b, true);}
+    public Poly remainder(Poly a, Poly b) {
+        return UnivariateDivision.remainder(a, b, true);
+    }
 
     @Override
-    public Poly[] divideAndRemainder(Poly a, Poly b) {return UnivariateDivision.divideAndRemainder(a, b, true);}
+    public Poly[] divideAndRemainder(Poly a, Poly b) {
+        return UnivariateDivision.divideAndRemainder(a, b, true);
+    }
 
     @Override
-    public Poly gcd(Poly a, Poly b) {return UnivariateGCD.PolynomialGCD(a, b);}
+    public Poly gcd(Poly a, Poly b) {
+        return UnivariateGCD.PolynomialGCD(a, b);
+    }
 
     @Override
     public Poly[] extendedGCD(Poly a, Poly b) {
@@ -70,7 +95,7 @@ public final class UnivariateRing<Poly extends IUnivariatePolynomial<Poly>> exte
      * @param maxDegree the maximal degree of the result
      * @param rnd       the source of randomness
      * @return random univariate polynomial with the degree randomly picked from {@code minDegree} (inclusive) to {@code
-     *         maxDegree} (exclusive)
+     * maxDegree} (exclusive)
      * @see RandomUnivariatePolynomials
      */
     public Poly randomElement(int minDegree, int maxDegree, RandomGenerator rnd) {
@@ -88,15 +113,6 @@ public final class UnivariateRing<Poly extends IUnivariatePolynomial<Poly>> exte
     public Poly randomElement(int degree, RandomGenerator rnd) {
         return randomElement(degree, degree, rnd);
     }
-
-    /**
-     * The minimal degree of polynomial generated with {@link #randomElement(RandomGenerator)}
-     */
-    public static final int MIN_DEGREE_OF_RANDOM_POLY = 0;
-    /**
-     * The maximal degree of polynomial generated with {@link #randomElement(RandomGenerator)}
-     */
-    public static final int MAX_DEGREE_OF_RANDOM_POLY = 32;
 
     /**
      * Gives a random univariate polynomial with the degree randomly picked from {@link #MIN_DEGREE_OF_RANDOM_POLY}
@@ -118,7 +134,7 @@ public final class UnivariateRing<Poly extends IUnivariatePolynomial<Poly>> exte
      * @param maxDegree the maximal degree of the result
      * @param rnd       the source of randomness
      * @return random univariate polynomial with the degree randomly picked from {@code minDegree} (inclusive) to {@code
-     *         maxDegree} (exclusive)
+     * maxDegree} (exclusive)
      * @see RandomUnivariatePolynomials
      */
     @SuppressWarnings("unchecked")

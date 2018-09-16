@@ -30,7 +30,7 @@ package cc.redberry.rings.bigint;
  * and clearing of bits in a storage array. The size of the sieve is assumed to
  * be constant to reduce overhead. All the bits of a new bitSieve are zero, and
  * bits are removed from it by setting them.
- *
+ * <p>
  * To reduce storage space and increase efficiency, no even numbers are
  * represented in the sieve (each bit in the sieve represents an odd number).
  * The relationship between the index of a bit and the number it represents is
@@ -40,26 +40,24 @@ package cc.redberry.rings.bigint;
  * even integer offset indicating where the sieve begins, and index is the
  * index of a bit in the sieve array.
  *
- * @see     BigInteger
- * @author  Michael McCloskey
- * @since   1.3
+ * @author Michael McCloskey
+ * @see BigInteger
+ * @since 1.3
  */
 class BitSieve {
-    /**
-     * Stores the bits in this bitSieve.
-     */
-    private long bits[];
-
-    /**
-     * Length is how many bits this sieve holds.
-     */
-    private int length;
-
     /**
      * A small sieve used to filter out multiples of small primes in a search
      * sieve.
      */
     private static BitSieve smallSieve = new BitSieve();
+    /**
+     * Stores the bits in this bitSieve.
+     */
+    private long bits[];
+    /**
+     * Length is how many bits this sieve holds.
+     */
+    private int length;
 
     /**
      * Construct a "small sieve" with a base of 0.  This constructor is
@@ -85,8 +83,8 @@ class BitSieve {
         do {
             sieveSingle(length, nextIndex + nextPrime, nextPrime);
             nextIndex = sieveSearch(length, nextIndex + 1);
-            nextPrime = 2*nextIndex + 1;
-        } while((nextIndex > 0) && (nextPrime < length));
+            nextPrime = 2 * nextIndex + 1;
+        } while ((nextIndex > 0) && (nextPrime < length));
     }
 
     /**
@@ -102,12 +100,12 @@ class BitSieve {
          * are represented in the sieve (each bit in the sieve represents an
          * odd number).
          */
-        bits = new long[(unitIndex(searchLen-1) + 1)];
+        bits = new long[(unitIndex(searchLen - 1) + 1)];
         length = searchLen;
         int start = 0;
 
         int step = smallSieve.sieveSearch(smallSieve.length, start);
-        int convertedStep = (step *2) + 1;
+        int convertedStep = (step * 2) + 1;
 
         // Construct the large sieve at an even offset specified by base
         MutableBigInteger b = new MutableBigInteger(base);
@@ -118,13 +116,13 @@ class BitSieve {
 
             // Take each multiple of step out of sieve
             start = convertedStep - start;
-            if (start%2 == 0)
+            if (start % 2 == 0)
                 start += convertedStep;
-            sieveSingle(searchLen, (start-1)/2, convertedStep);
+            sieveSingle(searchLen, (start - 1) / 2, convertedStep);
 
             // Find next prime from small sieve
-            step = smallSieve.sieveSearch(smallSieve.length, step+1);
-            convertedStep = (step *2) + 1;
+            step = smallSieve.sieveSearch(smallSieve.length, step + 1);
+            convertedStep = (step * 2) + 1;
         } while (step > 0);
     }
 
@@ -139,7 +137,7 @@ class BitSieve {
      * Return a unit that masks the specified bit in its unit.
      */
     private static long bit(int bitIndex) {
-        return 1L << (bitIndex & ((1<<6) - 1));
+        return 1L << (bitIndex & ((1 << 6) - 1));
     }
 
     /**
@@ -172,7 +170,7 @@ class BitSieve {
             if (!get(index))
                 return index;
             index++;
-        } while(index < limit-1);
+        } while (index < limit - 1);
         return -1;
     }
 
@@ -182,7 +180,7 @@ class BitSieve {
      * up to the specified limit.
      */
     private void sieveSingle(int limit, int start, int step) {
-        while(start < limit) {
+        while (start < limit) {
             set(start);
             start += step;
         }
@@ -194,17 +192,17 @@ class BitSieve {
     BigInteger retrieve(BigInteger initValue, int certainty, java.util.Random random) {
         // Examine the sieve one long at a time to find possible primes
         int offset = 1;
-        for (int i=0; i<bits.length; i++) {
+        for (int i = 0; i < bits.length; i++) {
             long nextLong = ~bits[i];
-            for (int j=0; j<64; j++) {
+            for (int j = 0; j < 64; j++) {
                 if ((nextLong & 1) == 1) {
                     BigInteger candidate = initValue.add(
-                                           BigInteger.valueOf(offset));
+                            BigInteger.valueOf(offset));
                     if (candidate.primeToCertainty(certainty, random))
                         return candidate;
                 }
                 nextLong >>>= 1;
-                offset+=2;
+                offset += 2;
             }
         }
         return null;

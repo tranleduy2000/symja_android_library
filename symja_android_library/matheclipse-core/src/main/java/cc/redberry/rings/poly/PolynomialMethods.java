@@ -1,11 +1,20 @@
 package cc.redberry.rings.poly;
 
-import cc.redberry.rings.bigint.BigInteger;
-import cc.redberry.rings.poly.multivar.*;
-import cc.redberry.rings.poly.univar.*;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.util.stream.StreamSupport;
+
+import cc.redberry.rings.bigint.BigInteger;
+import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
+import cc.redberry.rings.poly.multivar.MultivariateDivision;
+import cc.redberry.rings.poly.multivar.MultivariateFactorization;
+import cc.redberry.rings.poly.multivar.MultivariateGCD;
+import cc.redberry.rings.poly.multivar.MultivariateSquareFreeFactorization;
+import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
+import cc.redberry.rings.poly.univar.IrreduciblePolynomials;
+import cc.redberry.rings.poly.univar.UnivariateDivision;
+import cc.redberry.rings.poly.univar.UnivariateFactorization;
+import cc.redberry.rings.poly.univar.UnivariateGCD;
+import cc.redberry.rings.poly.univar.UnivariateSquareFreeFactorization;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 /**
  * High-level methods for polynomials.
@@ -13,7 +22,8 @@ import java.util.stream.StreamSupport;
  * @since 1.0
  */
 public final class PolynomialMethods {
-    private PolynomialMethods() {}
+    private PolynomialMethods() {
+    }
 
     /**
      * Factor polynomial.

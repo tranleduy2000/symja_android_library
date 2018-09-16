@@ -1,18 +1,30 @@
 package cc.redberry.rings.util;
 
-import java.util.*;
+import java.util.AbstractList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-/** A simple list wrapper */
+/**
+ * A simple list wrapper
+ */
 public class ListWrapper<Poly>
         extends AbstractList<Poly> {
-    /** Inner list */
+    /**
+     * Inner list
+     */
     public final List<Poly> list;
 
-    public ListWrapper(List<Poly> list) { this.list = list; }
+    public ListWrapper(List<Poly> list) {
+        this.list = list;
+    }
 
     @Override
     public boolean isEmpty() {

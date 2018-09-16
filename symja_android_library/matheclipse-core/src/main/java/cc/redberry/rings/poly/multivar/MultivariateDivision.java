@@ -1,9 +1,9 @@
 package cc.redberry.rings.poly.multivar;
 
-import cc.redberry.rings.Ring;
-
 import java.util.Arrays;
 import java.util.Collection;
+
+import cc.redberry.rings.Ring;
 
 /**
  * Division with remainder of multivariate polynomials (multivariate reduction).
@@ -11,7 +11,8 @@ import java.util.Collection;
  * @since 1.0
  */
 public final class MultivariateDivision {
-    private MultivariateDivision() {}
+    private MultivariateDivision() {
+    }
 
     /**
      * Performs multivariate division with remainder. The resulting array of quotients and remainder (last element of

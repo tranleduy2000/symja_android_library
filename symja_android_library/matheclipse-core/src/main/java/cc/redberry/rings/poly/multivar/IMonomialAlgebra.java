@@ -1,10 +1,10 @@
 package cc.redberry.rings.poly.multivar;
 
+import java.io.Serializable;
+
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.bigint.BigInteger;
-
-import java.io.Serializable;
 
 /**
  * Algebraic operations (multiplication, division) and utility methods for monomials.
@@ -78,22 +78,34 @@ public interface IMonomialAlgebra<Term extends AMonomial<Term>> extends Serializ
      */
     boolean isPureDegreeVector(Term term);
 
-    /** creates term with specified exponents and unit coefficient */
+    /**
+     * creates term with specified exponents and unit coefficient
+     */
     Term create(int[] exponents);
 
-    /** creates term with specified exponents and unit coefficient */
+    /**
+     * creates term with specified exponents and unit coefficient
+     */
     Term create(DegreeVector degreeVector);
 
-    /** creates generic array of specified length */
+    /**
+     * creates generic array of specified length
+     */
     Term[] createArray(int length);
 
-    /** creates a unit term */
+    /**
+     * creates a unit term
+     */
     Term getUnitTerm(int nVariables);
 
-    /** creates a zero term */
+    /**
+     * creates a zero term
+     */
     Term getZeroTerm(int nVariables);
 
-    /** whether two terms have the same coefficients */
+    /**
+     * whether two terms have the same coefficients
+     */
     boolean haveSameCoefficients(Term a, Term b);
 
     /**

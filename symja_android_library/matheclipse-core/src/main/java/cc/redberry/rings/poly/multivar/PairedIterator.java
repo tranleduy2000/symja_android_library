@@ -16,7 +16,10 @@ public final class PairedIterator<
     final Comparator<DegreeVector> ordering;
     final Iterator<Term1> aIterator;
     final Iterator<Term2> bIterator;
-
+    public Term1 aTerm = null;
+    public Term2 bTerm = null;
+    private Term1 aTermCached = null;
+    private Term2 bTermCached = null;
     public PairedIterator(Poly1 a, Poly2 b) {
         this.zeroTerm1 = a.monomialAlgebra.getZeroTerm(a.nVariables);
         this.zeroTerm2 = b.monomialAlgebra.getZeroTerm(b.nVariables);
@@ -28,11 +31,6 @@ public final class PairedIterator<
     public boolean hasNext() {
         return aIterator.hasNext() || bIterator.hasNext() || aTermCached != null || bTermCached != null;
     }
-
-    public Term1 aTerm = null;
-    public Term2 bTerm = null;
-    private Term1 aTermCached = null;
-    private Term2 bTermCached = null;
 
     public void advance() {
         if (aTermCached != null) {

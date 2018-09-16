@@ -1,6 +1,5 @@
 package cc.redberry.rings;
 
-import cc.redberry.rings.bigint.BigInteger;
 import org.hipparchus.random.RandomGenerator;
 
 import java.util.Iterator;
@@ -9,11 +8,15 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
+import cc.redberry.rings.bigint.BigInteger;
+
 /**
  * A ring obtained via isomorphism specified by {@link #image(Object)} and {@link #inverse(Object)} functions.
  */
 public class ImageRing<F, I> implements Ring<I> {
-    /** the ring */
+    /**
+     * the ring
+     */
     public final Ring<F> ring;
     public final Function<F, I> imageFunc;
     public final Function<I, F> inverseFunc;
@@ -24,7 +27,9 @@ public class ImageRing<F, I> implements Ring<I> {
         this.imageFunc = imageFunc;
     }
 
-    public I image(F el) {return imageFunc.apply(el);}
+    public I image(F el) {
+        return imageFunc.apply(el);
+    }
 
     public I[] image(F[] el) {
         I[] array = createArray(el.length);
@@ -33,7 +38,9 @@ public class ImageRing<F, I> implements Ring<I> {
         return array;
     }
 
-    public F inverse(I el) {return inverseFunc.apply(el);}
+    public F inverse(I el) {
+        return inverseFunc.apply(el);
+    }
 
     public F[] inverse(I[] el) {
         F[] array = ring.createArray(el.length);

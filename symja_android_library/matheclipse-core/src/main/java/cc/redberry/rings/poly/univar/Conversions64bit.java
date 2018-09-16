@@ -7,12 +7,13 @@ import cc.redberry.rings.poly.Util;
  * @since 1.0
  */
 final class Conversions64bit {
-    private Conversions64bit() {}
-
     /**
      * whether to switch to 64 bit integer arithmetic when possible (false in tests)
      */
     static boolean SWITCH_TO_64bit = true;
+
+    private Conversions64bit() {
+    }
 
     static boolean canConvertToZp64(IUnivariatePolynomial poly) {
         return SWITCH_TO_64bit && Util.canConvertToZp64(poly);

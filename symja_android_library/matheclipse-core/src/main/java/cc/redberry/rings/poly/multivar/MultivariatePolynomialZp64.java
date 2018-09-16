@@ -1,5 +1,17 @@
 package cc.redberry.rings.poly.multivar;
 
+import org.hipparchus.random.RandomGenerator;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.LongFunction;
+
 import cc.redberry.libdivide4j.FastDivision;
 import cc.redberry.rings.IntegersZp;
 import cc.redberry.rings.IntegersZp64;
@@ -20,12 +32,6 @@ import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
-import org.hipparchus.random.RandomGenerator;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.function.LongFunction;
 
 /**
  * Multivariate polynomial over Zp ring with the modulus in the range (0, 2^62) (see {@link
@@ -36,6 +42,14 @@ import java.util.function.LongFunction;
  * @since 1.0
  */
 public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<MonomialZp64, MultivariatePolynomialZp64> {
+    /**
+     * the default cache size for precomputed powers
+     */
+    static final int DEFAULT_POWERS_CACHE_SIZE = 64;
+    /**
+     * the maximal cache size for precomputed powers
+     */
+    static final int MAX_POWERS_CACHE_SIZE = 1014;
     private static final long serialVersionUID = 1L;
     /**
      * The ring.
@@ -207,6 +221,353 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         return new MultivariatePolynomialZp64(nVariables, poly.ring, ordering, map);
     }
 
+    /**
+     * Converts multivariate polynomial over univariate polynomial ring (Zp[variable][other_variables]) to a
+     * multivariate polynomial over coefficient ring (Zp[all_variables])
+     *
+     * @param poly     the polynomial
+     * @param variable the variable to insert
+     * @return multivariate polynomial over normal coefficient ring
+     */
+    public static MultivariatePolynomialZp64 asNormalMultivariate(MultivariatePolynomial<UnivariatePolynomialZp64> poly, int variable) {
+        IntegersZp64 ring = poly.ring.getZero().ring;
+        int nVariables = poly.nVariables + 1;
+        MultivariatePolynomialZp64 result = zero(nVariables, ring, poly.ordering);
+        for (Monomial<UnivariatePolynomialZp64> entry : poly.terms) {
+            UnivariatePolynomialZp64 uPoly = entry.coefficient;
+            DegreeVector dv = entry.dvInsert(variable);
+            for (int i = 0; i <= uPoly.degree(); ++i) {
+                if (uPoly.isZeroAt(i))
+                    continue;
+                result.add(new MonomialZp64(dv.dvSet(variable, i), uPoly.get(i)));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Converts multivariate polynomial over multivariate polynomial ring to a multivariate polynomial over coefficient
+     * ring
+     *
+     * @param poly the polynomial
+     * @return multivariate polynomial over normal coefficient ring
+     */
+    public static MultivariatePolynomialZp64 asNormalMultivariate(MultivariatePolynomial<MultivariatePolynomialZp64> poly) {
+        IntegersZp64 ring = poly.ring.getZero().ring;
+        int nVariables = poly.nVariables;
+        MultivariatePolynomialZp64 result = zero(nVariables, ring, poly.ordering);
+        for (Monomial<MultivariatePolynomialZp64> term : poly.terms) {
+            MultivariatePolynomialZp64 uPoly = term.coefficient;
+            result.add(uPoly.clone().multiply(new MonomialZp64(term.exponents, term.totalDegree, 1)));
+        }
+        return result;
+    }
+
+    /**
+     * Converts multivariate polynomial over multivariate polynomial ring to a multivariate polynomial over coefficient
+     * ring
+     *
+     * @param poly the polynomial
+     * @return multivariate polynomial over normal coefficient ring
+     */
+    public static MultivariatePolynomialZp64 asNormalMultivariate(
+            MultivariatePolynomial<MultivariatePolynomialZp64> poly,
+            int[] coefficientVariables, int[] mainVariables) {
+        IntegersZp64 ring = poly.ring.getZero().ring;
+        int nVariables = coefficientVariables.length + mainVariables.length;
+        MultivariatePolynomialZp64 result = zero(nVariables, ring, poly.ordering);
+        for (Monomial<MultivariatePolynomialZp64> term : poly.terms) {
+            MultivariatePolynomialZp64 coefficient =
+                    term.coefficient.joinNewVariables(nVariables, coefficientVariables);
+            Monomial<MultivariatePolynomialZp64> t = term.joinNewVariables(nVariables, mainVariables);
+            result.add(coefficient.multiply(new MonomialZp64(t.exponents, t.totalDegree, 1)));
+        }
+        return result;
+    }
+
+    /**
+     * Converts poly from a recursive univariate representation.
+     *
+     * @param recForm  recursive univariate representation
+     * @param ordering monomial order
+     */
+    public static MultivariatePolynomialZp64 fromDenseRecursiveForm(IUnivariatePolynomial recForm,
+                                                                    Comparator<DegreeVector> ordering) {
+        // compute number of variables
+        int nVariables = 1;
+        IUnivariatePolynomial p = recForm;
+        while (p instanceof UnivariatePolynomial) {
+            p = (IUnivariatePolynomial) ((UnivariatePolynomial) p).cc();
+            ++nVariables;
+        }
+
+        return fromDenseRecursiveForm(recForm, nVariables, ordering);
+    }
+
+    /**
+     * Converts poly from a recursive univariate representation.
+     *
+     * @param recForm    recursive univariate representation
+     * @param nVariables number of variables in multivariate polynomial
+     * @param ordering   monomial order
+     */
+    public static MultivariatePolynomialZp64 fromDenseRecursiveForm(IUnivariatePolynomial recForm,
+                                                                    int nVariables,
+                                                                    Comparator<DegreeVector> ordering) {
+        return fromDenseRecursiveForm(recForm, nVariables, ordering, nVariables - 1);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static MultivariatePolynomialZp64 fromDenseRecursiveForm(IUnivariatePolynomial recForm,
+                                                                     int nVariables,
+                                                                     Comparator<DegreeVector> ordering,
+                                                                     int variable) {
+        if (variable == 0)
+            return asMultivariate((UnivariatePolynomialZp64) recForm, nVariables, 0, ordering);
+
+        UnivariatePolynomial<IUnivariatePolynomial> _recForm = (UnivariatePolynomial<IUnivariatePolynomial>) recForm;
+        MultivariatePolynomialZp64[] data = new MultivariatePolynomialZp64[_recForm.degree() + 1];
+        for (int j = 0; j < data.length; ++j)
+            data[j] = fromDenseRecursiveForm(_recForm.get(j), nVariables, ordering, variable - 1);
+
+        return asMultivariate(UnivariatePolynomial.create(Rings.MultivariateRing(data[0]), data), variable);
+    }
+
+    /**
+     * Evaluates polynomial given in a dense recursive form at a given points
+     */
+    @SuppressWarnings("unchecked")
+    public static long evaluateDenseRecursiveForm(IUnivariatePolynomial recForm, long[] values) {
+        // compute number of variables
+        int nVariables = 1;
+        IUnivariatePolynomial p = recForm;
+        while (p instanceof UnivariatePolynomial) {
+            p = (IUnivariatePolynomial) ((UnivariatePolynomial) p).cc();
+            ++nVariables;
+        }
+        if (nVariables != values.length)
+            throw new IllegalArgumentException();
+        return evaluateDenseRecursiveForm(recForm, values, ((UnivariatePolynomialZp64) p).ring, nVariables - 1);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static long evaluateDenseRecursiveForm(IUnivariatePolynomial recForm, long[] values, IntegersZp64 ring, int variable) {
+        if (variable == 0)
+            return ((UnivariatePolynomialZp64) recForm).evaluate(values[0]);
+        UnivariatePolynomial<IUnivariatePolynomial> _recForm = (UnivariatePolynomial<IUnivariatePolynomial>) recForm;
+        long result = 0L;
+        for (int i = _recForm.degree(); i >= 0; --i)
+            result = ring.add(ring.multiply(values[variable], result), evaluateDenseRecursiveForm(_recForm.get(i), values, ring, variable - 1));
+
+        return result;
+    }
+
+    /**
+     * Converts poly from a sparse recursive univariate representation.
+     *
+     * @param recForm  recursive univariate representation
+     * @param ordering monomial order
+     */
+    public static MultivariatePolynomialZp64 fromSparseRecursiveForm(AMultivariatePolynomial recForm,
+                                                                     Comparator<DegreeVector> ordering) {
+        // compute number of variables
+        int nVariables = 1;
+        AMultivariatePolynomial p = recForm;
+        while (p instanceof MultivariatePolynomial) {
+            p = (AMultivariatePolynomial) ((MultivariatePolynomial) p).cc();
+            ++nVariables;
+        }
+
+        return fromSparseRecursiveForm(recForm, nVariables, ordering);
+    }
+
+    /* ============================================ Main methods ============================================ */
+
+    /**
+     * Converts poly from a recursive univariate representation.
+     *
+     * @param recForm    recursive univariate representation
+     * @param nVariables number of variables in multivariate polynomial
+     * @param ordering   monomial order
+     */
+    public static MultivariatePolynomialZp64 fromSparseRecursiveForm(AMultivariatePolynomial recForm,
+                                                                     int nVariables,
+                                                                     Comparator<DegreeVector> ordering) {
+        return fromSparseRecursiveForm(recForm, nVariables, ordering, nVariables - 1);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static MultivariatePolynomialZp64 fromSparseRecursiveForm(AMultivariatePolynomial recForm,
+                                                                      int nVariables,
+                                                                      Comparator<DegreeVector> ordering,
+                                                                      int variable) {
+        if (variable == 0) {
+            assert recForm.nVariables == 1;
+            return ((MultivariatePolynomialZp64) recForm).setNVariables(nVariables).setOrdering(ordering);
+        }
+
+        MultivariatePolynomial<AMultivariatePolynomial> _recForm = (MultivariatePolynomial<AMultivariatePolynomial>) recForm;
+        Monomial<MultivariatePolynomialZp64>[] data = new Monomial[_recForm.size() == 0 ? 1 : _recForm.size()];
+        int j = 0;
+        for (Monomial<AMultivariatePolynomial> term : _recForm.size() == 0 ? Collections.singletonList(_recForm.lt()) : _recForm) {
+            int[] exponents = new int[nVariables];
+            exponents[variable] = term.totalDegree;
+            data[j++] = new Monomial<>(exponents, term.totalDegree, fromSparseRecursiveForm(term.coefficient, nVariables, ordering, variable - 1));
+        }
+
+        MultivariatePolynomial<MultivariatePolynomialZp64> result = MultivariatePolynomial.create(nVariables, Rings.MultivariateRing(data[0].coefficient), ordering, data);
+        return asNormalMultivariate(result);
+    }
+
+    /**
+     * Evaluates polynomial given in a sparse recursive form at a given points
+     */
+    @SuppressWarnings("unchecked")
+    public static long evaluateSparseRecursiveForm(AMultivariatePolynomial recForm, long[] values) {
+        // compute number of variables
+        int nVariables = 1;
+        AMultivariatePolynomial p = recForm;
+        TIntArrayList degrees = new TIntArrayList();
+        while (p instanceof MultivariatePolynomial) {
+            p = (AMultivariatePolynomial) ((MultivariatePolynomial) p).cc();
+            degrees.add(p.degree());
+            ++nVariables;
+        }
+        degrees.add(p.degree());
+        if (nVariables != values.length)
+            throw new IllegalArgumentException();
+
+        IntegersZp64 ring = ((MultivariatePolynomialZp64) p).ring;
+
+        lPrecomputedPowers[] pp = new lPrecomputedPowers[nVariables];
+        for (int i = 0; i < nVariables; ++i)
+            pp[i] = new lPrecomputedPowers(Math.min(degrees.get(i), MAX_POWERS_CACHE_SIZE), values[i], ring);
+
+        return evaluateSparseRecursiveForm(recForm, new lPrecomputedPowersHolder(ring, pp), nVariables - 1);
+    }
+
+    @SuppressWarnings("unchecked")
+    static long evaluateSparseRecursiveForm(AMultivariatePolynomial recForm, lPrecomputedPowersHolder ph, int variable) {
+        IntegersZp64 ring = ph.ring;
+        if (variable == 0) {
+            assert MonomialOrder.isGradedOrder(recForm.ordering);
+            MultivariatePolynomialZp64 _recForm = (MultivariatePolynomialZp64) recForm;
+
+            Iterator<MonomialZp64> it = _recForm.terms.descendingIterator();
+            int previousExponent = -1;
+            long result = 0L;
+            while (it.hasNext()) {
+                MonomialZp64 m = it.next();
+                assert previousExponent == -1 || previousExponent > m.totalDegree;
+                result = ring.add(
+                        ring.multiply(result, ph.pow(variable, previousExponent == -1 ? 1 : previousExponent - m.totalDegree)),
+                        m.coefficient);
+                previousExponent = m.totalDegree;
+            }
+            if (previousExponent > 0)
+                result = ring.multiply(result, ph.pow(variable, previousExponent));
+            return result;
+        }
+        MultivariatePolynomial<AMultivariatePolynomial> _recForm = (MultivariatePolynomial<AMultivariatePolynomial>) recForm;
+
+        Iterator<Monomial<AMultivariatePolynomial>> it = _recForm.terms.descendingIterator();
+        int previousExponent = -1;
+        long result = 0L;
+        while (it.hasNext()) {
+            Monomial<AMultivariatePolynomial> m = it.next();
+            assert previousExponent == -1 || previousExponent > m.totalDegree;
+            result = ring.add(
+                    ring.multiply(result, ph.pow(variable, previousExponent == -1 ? 1 : previousExponent - m.totalDegree)),
+                    evaluateSparseRecursiveForm(m.coefficient, ph, variable - 1));
+            previousExponent = m.totalDegree;
+        }
+        if (previousExponent > 0)
+            result = ring.multiply(result, ph.pow(variable, previousExponent));
+        return result;
+    }
+
+    public static lPrecomputedPowersHolder mkPrecomputedPowers(int nVariables, IntegersZp64 ring, int[] variables, long[] values) {
+        lPrecomputedPowers[] pp = new lPrecomputedPowers[nVariables];
+        for (int i = 0; i < variables.length; ++i)
+            pp[variables[i]] = new lPrecomputedPowers(MAX_POWERS_CACHE_SIZE, values[i], ring);
+        return new lPrecomputedPowersHolder(ring, pp);
+    }
+
+    private static TLongObjectHashMap<CfHolder> multiplySparseUnivariate(IntegersZp64 ring,
+                                                                         TLongObjectHashMap<CfHolder> a,
+                                                                         TLongObjectHashMap<CfHolder> b) {
+        TLongObjectHashMap<CfHolder> result = new TLongObjectHashMap<>(a.size() + b.size());
+        TLongObjectIterator<CfHolder> ait = a.iterator();
+        while (ait.hasNext()) {
+            ait.advance();
+            TLongObjectIterator<CfHolder> bit = b.iterator();
+            while (bit.hasNext()) {
+                bit.advance();
+
+                long deg = ait.key() + bit.key();
+                long val = ring.multiply(ait.value().coefficient, bit.value().coefficient);
+
+                CfHolder r = result.putIfAbsent(deg, new CfHolder(val));
+                if (r != null)
+                    r.coefficient = ring.add(r.coefficient, val);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * exp * (exp - 1) * ... * (exp - order + 1) / (1 * 2 * ... * order) mod modulus
+     */
+    static long seriesCoefficientFactor(int exponent, int order, IntegersZp64 ring) {
+        IntegersZp64 baseDomain = ring.perfectPowerBaseDomain();
+        if (order < baseDomain.modulus) {
+            long factor = 1;
+            for (int i = 0; i < order; ++i)
+                factor = ring.multiply(factor, exponent - i);
+            factor = ring.divide(factor, ring.factorial(order));
+            return factor;
+        }
+
+        long numerator = 1, denominator = 1;
+        int numZeros = 0, denZeros = 0;
+        for (int i = 1; i <= order; ++i) {
+            long
+                    num = exponent - i + 1,
+                    numMod = baseDomain.modulus(num);
+
+            while (num > 1 && numMod == 0) {
+                num = FastDivision.divideSignedFast(num, baseDomain.magic);
+                numMod = baseDomain.modulus(num);
+                ++numZeros;
+            }
+
+            if (numMod != 0)
+                numerator = ring.multiply(numerator, ring == baseDomain ? numMod : ring.modulus(num));
+
+            long
+                    den = i,
+                    denMod = baseDomain.modulus(i);
+
+            while (den > 1 && denMod == 0) {
+                den = FastDivision.divideSignedFast(den, baseDomain.magic);
+                denMod = baseDomain.modulus(den);
+                ++denZeros;
+            }
+
+            if (denMod != 0)
+                denominator = ring.multiply(denominator, ring == baseDomain ? denMod : ring.modulus(den));
+        }
+
+        if (numZeros > denZeros)
+            numerator = ring.multiply(numerator, ring.powMod(baseDomain.modulus, numZeros - denZeros));
+        else if (denZeros < numZeros)
+            denominator = ring.multiply(denominator, ring.powMod(baseDomain.modulus, denZeros - numZeros));
+
+        if (numerator == 0)
+            return numerator;
+        return ring.divide(numerator, denominator);
+    }
+
     @Override
     public UnivariatePolynomialZp64 asUnivariate() {
         if (isConstant())
@@ -304,70 +665,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
     }
 
     /**
-     * Converts multivariate polynomial over univariate polynomial ring (Zp[variable][other_variables]) to a
-     * multivariate polynomial over coefficient ring (Zp[all_variables])
-     *
-     * @param poly     the polynomial
-     * @param variable the variable to insert
-     * @return multivariate polynomial over normal coefficient ring
-     */
-    public static MultivariatePolynomialZp64 asNormalMultivariate(MultivariatePolynomial<UnivariatePolynomialZp64> poly, int variable) {
-        IntegersZp64 ring = poly.ring.getZero().ring;
-        int nVariables = poly.nVariables + 1;
-        MultivariatePolynomialZp64 result = zero(nVariables, ring, poly.ordering);
-        for (Monomial<UnivariatePolynomialZp64> entry : poly.terms) {
-            UnivariatePolynomialZp64 uPoly = entry.coefficient;
-            DegreeVector dv = entry.dvInsert(variable);
-            for (int i = 0; i <= uPoly.degree(); ++i) {
-                if (uPoly.isZeroAt(i))
-                    continue;
-                result.add(new MonomialZp64(dv.dvSet(variable, i), uPoly.get(i)));
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Converts multivariate polynomial over multivariate polynomial ring to a multivariate polynomial over coefficient
-     * ring
-     *
-     * @param poly the polynomial
-     * @return multivariate polynomial over normal coefficient ring
-     */
-    public static MultivariatePolynomialZp64 asNormalMultivariate(MultivariatePolynomial<MultivariatePolynomialZp64> poly) {
-        IntegersZp64 ring = poly.ring.getZero().ring;
-        int nVariables = poly.nVariables;
-        MultivariatePolynomialZp64 result = zero(nVariables, ring, poly.ordering);
-        for (Monomial<MultivariatePolynomialZp64> term : poly.terms) {
-            MultivariatePolynomialZp64 uPoly = term.coefficient;
-            result.add(uPoly.clone().multiply(new MonomialZp64(term.exponents, term.totalDegree, 1)));
-        }
-        return result;
-    }
-
-    /**
-     * Converts multivariate polynomial over multivariate polynomial ring to a multivariate polynomial over coefficient
-     * ring
-     *
-     * @param poly the polynomial
-     * @return multivariate polynomial over normal coefficient ring
-     */
-    public static MultivariatePolynomialZp64 asNormalMultivariate(
-            MultivariatePolynomial<MultivariatePolynomialZp64> poly,
-            int[] coefficientVariables, int[] mainVariables) {
-        IntegersZp64 ring = poly.ring.getZero().ring;
-        int nVariables = coefficientVariables.length + mainVariables.length;
-        MultivariatePolynomialZp64 result = zero(nVariables, ring, poly.ordering);
-        for (Monomial<MultivariatePolynomialZp64> term : poly.terms) {
-            MultivariatePolynomialZp64 coefficient =
-                    term.coefficient.joinNewVariables(nVariables, coefficientVariables);
-            Monomial<MultivariatePolynomialZp64> t = term.joinNewVariables(nVariables, mainVariables);
-            result.add(coefficient.multiply(new MonomialZp64(t.exponents, t.totalDegree, 1)));
-        }
-        return result;
-    }
-
-    /**
      * Returns polynomial over Z formed from the coefficients of this represented in symmetric modular form ({@code
      * -modulus/2 <= cfx <= modulus/2}).
      *
@@ -405,8 +702,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         return new MultivariatePolynomial<>(nVariables, ring.asGenericRing(), ordering, bTerms);
     }
 
-    /* ============================================ Main methods ============================================ */
-
     @Override
     public MultivariatePolynomialZp64 contentAsPoly() {
         return createConstant(content());
@@ -433,19 +728,29 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
     }
 
     @Override
-    public boolean isOverField() {return true;}
+    public boolean isOverField() {
+        return true;
+    }
 
     @Override
-    public boolean isOverFiniteField() {return true;}
+    public boolean isOverFiniteField() {
+        return true;
+    }
 
     @Override
-    public boolean isOverZ() {return false;}
+    public boolean isOverZ() {
+        return false;
+    }
 
     @Override
-    public BigInteger coefficientRingCardinality() {return BigInteger.valueOf(ring.modulus);}
+    public BigInteger coefficientRingCardinality() {
+        return BigInteger.valueOf(ring.modulus);
+    }
 
     @Override
-    public BigInteger coefficientRingCharacteristic() {return BigInteger.valueOf(ring.modulus);}
+    public BigInteger coefficientRingCharacteristic() {
+        return BigInteger.valueOf(ring.modulus);
+    }
 
     @Override
     public boolean isOverPerfectPower() {
@@ -464,7 +769,9 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
 
     @Override
     @SuppressWarnings("unchecked")
-    public MultivariatePolynomialZp64[] createArray(int length) {return new MultivariatePolynomialZp64[length];}
+    public MultivariatePolynomialZp64[] createArray(int length) {
+        return new MultivariatePolynomialZp64[length];
+    }
 
     @Override
     public MultivariatePolynomialZp64[][] createArray2d(int length) {
@@ -486,7 +793,9 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         return setRing(lMonomialTerms.ring);
     }
 
-    /** release caches */
+    /**
+     * release caches
+     */
     @Override
     protected void release() {
         super.release();
@@ -532,7 +841,9 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         return new MultivariatePolynomial(nVariables, newRing, ordering, newData);
     }
 
-    /** internal API */
+    /**
+     * internal API
+     */
     public MultivariatePolynomialZp64 setRingUnsafe(IntegersZp64 newDomain) {
         return new MultivariatePolynomialZp64(nVariables, newDomain, ordering, terms);
     }
@@ -588,7 +899,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         }
         return new MultivariatePolynomialZp64(nVariables, ring, ordering, data);
     }
-
 
     @Override
     public boolean isMonic() {
@@ -815,83 +1125,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
     }
 
     /**
-     * Converts poly from a recursive univariate representation.
-     *
-     * @param recForm  recursive univariate representation
-     * @param ordering monomial order
-     */
-    public static MultivariatePolynomialZp64 fromDenseRecursiveForm(IUnivariatePolynomial recForm,
-                                                                    Comparator<DegreeVector> ordering) {
-        // compute number of variables
-        int nVariables = 1;
-        IUnivariatePolynomial p = recForm;
-        while (p instanceof UnivariatePolynomial) {
-            p = (IUnivariatePolynomial) ((UnivariatePolynomial) p).cc();
-            ++nVariables;
-        }
-
-        return fromDenseRecursiveForm(recForm, nVariables, ordering);
-    }
-
-    /**
-     * Converts poly from a recursive univariate representation.
-     *
-     * @param recForm    recursive univariate representation
-     * @param nVariables number of variables in multivariate polynomial
-     * @param ordering   monomial order
-     */
-    public static MultivariatePolynomialZp64 fromDenseRecursiveForm(IUnivariatePolynomial recForm,
-                                                                    int nVariables,
-                                                                    Comparator<DegreeVector> ordering) {
-        return fromDenseRecursiveForm(recForm, nVariables, ordering, nVariables - 1);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static MultivariatePolynomialZp64 fromDenseRecursiveForm(IUnivariatePolynomial recForm,
-                                                                     int nVariables,
-                                                                     Comparator<DegreeVector> ordering,
-                                                                     int variable) {
-        if (variable == 0)
-            return asMultivariate((UnivariatePolynomialZp64) recForm, nVariables, 0, ordering);
-
-        UnivariatePolynomial<IUnivariatePolynomial> _recForm = (UnivariatePolynomial<IUnivariatePolynomial>) recForm;
-        MultivariatePolynomialZp64[] data = new MultivariatePolynomialZp64[_recForm.degree() + 1];
-        for (int j = 0; j < data.length; ++j)
-            data[j] = fromDenseRecursiveForm(_recForm.get(j), nVariables, ordering, variable - 1);
-
-        return asMultivariate(UnivariatePolynomial.create(Rings.MultivariateRing(data[0]), data), variable);
-    }
-
-    /**
-     * Evaluates polynomial given in a dense recursive form at a given points
-     */
-    @SuppressWarnings("unchecked")
-    public static long evaluateDenseRecursiveForm(IUnivariatePolynomial recForm, long[] values) {
-        // compute number of variables
-        int nVariables = 1;
-        IUnivariatePolynomial p = recForm;
-        while (p instanceof UnivariatePolynomial) {
-            p = (IUnivariatePolynomial) ((UnivariatePolynomial) p).cc();
-            ++nVariables;
-        }
-        if (nVariables != values.length)
-            throw new IllegalArgumentException();
-        return evaluateDenseRecursiveForm(recForm, values, ((UnivariatePolynomialZp64) p).ring, nVariables - 1);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static long evaluateDenseRecursiveForm(IUnivariatePolynomial recForm, long[] values, IntegersZp64 ring, int variable) {
-        if (variable == 0)
-            return ((UnivariatePolynomialZp64) recForm).evaluate(values[0]);
-        UnivariatePolynomial<IUnivariatePolynomial> _recForm = (UnivariatePolynomial<IUnivariatePolynomial>) recForm;
-        long result = 0L;
-        for (int i = _recForm.degree(); i >= 0; --i)
-            result = ring.add(ring.multiply(values[variable], result), evaluateDenseRecursiveForm(_recForm.get(i), values, ring, variable - 1));
-
-        return result;
-    }
-
-    /**
      * Gives a recursive sparse univariate representation of this poly.
      */
     public AMultivariatePolynomial toSparseRecursiveForm() {
@@ -917,128 +1150,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
     }
 
     /**
-     * Converts poly from a sparse recursive univariate representation.
-     *
-     * @param recForm  recursive univariate representation
-     * @param ordering monomial order
-     */
-    public static MultivariatePolynomialZp64 fromSparseRecursiveForm(AMultivariatePolynomial recForm,
-                                                                     Comparator<DegreeVector> ordering) {
-        // compute number of variables
-        int nVariables = 1;
-        AMultivariatePolynomial p = recForm;
-        while (p instanceof MultivariatePolynomial) {
-            p = (AMultivariatePolynomial) ((MultivariatePolynomial) p).cc();
-            ++nVariables;
-        }
-
-        return fromSparseRecursiveForm(recForm, nVariables, ordering);
-    }
-
-    /**
-     * Converts poly from a recursive univariate representation.
-     *
-     * @param recForm    recursive univariate representation
-     * @param nVariables number of variables in multivariate polynomial
-     * @param ordering   monomial order
-     */
-    public static MultivariatePolynomialZp64 fromSparseRecursiveForm(AMultivariatePolynomial recForm,
-                                                                     int nVariables,
-                                                                     Comparator<DegreeVector> ordering) {
-        return fromSparseRecursiveForm(recForm, nVariables, ordering, nVariables - 1);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static MultivariatePolynomialZp64 fromSparseRecursiveForm(AMultivariatePolynomial recForm,
-                                                                      int nVariables,
-                                                                      Comparator<DegreeVector> ordering,
-                                                                      int variable) {
-        if (variable == 0) {
-            assert recForm.nVariables == 1;
-            return ((MultivariatePolynomialZp64) recForm).setNVariables(nVariables).setOrdering(ordering);
-        }
-
-        MultivariatePolynomial<AMultivariatePolynomial> _recForm = (MultivariatePolynomial<AMultivariatePolynomial>) recForm;
-        Monomial<MultivariatePolynomialZp64>[] data = new Monomial[_recForm.size() == 0 ? 1 : _recForm.size()];
-        int j = 0;
-        for (Monomial<AMultivariatePolynomial> term : _recForm.size() == 0 ? Collections.singletonList(_recForm.lt()) : _recForm) {
-            int[] exponents = new int[nVariables];
-            exponents[variable] = term.totalDegree;
-            data[j++] = new Monomial<>(exponents, term.totalDegree, fromSparseRecursiveForm(term.coefficient, nVariables, ordering, variable - 1));
-        }
-
-        MultivariatePolynomial<MultivariatePolynomialZp64> result = MultivariatePolynomial.create(nVariables, Rings.MultivariateRing(data[0].coefficient), ordering, data);
-        return asNormalMultivariate(result);
-    }
-
-    /**
-     * Evaluates polynomial given in a sparse recursive form at a given points
-     */
-    @SuppressWarnings("unchecked")
-    public static long evaluateSparseRecursiveForm(AMultivariatePolynomial recForm, long[] values) {
-        // compute number of variables
-        int nVariables = 1;
-        AMultivariatePolynomial p = recForm;
-        TIntArrayList degrees = new TIntArrayList();
-        while (p instanceof MultivariatePolynomial) {
-            p = (AMultivariatePolynomial) ((MultivariatePolynomial) p).cc();
-            degrees.add(p.degree());
-            ++nVariables;
-        }
-        degrees.add(p.degree());
-        if (nVariables != values.length)
-            throw new IllegalArgumentException();
-
-        IntegersZp64 ring = ((MultivariatePolynomialZp64) p).ring;
-
-        lPrecomputedPowers[] pp = new lPrecomputedPowers[nVariables];
-        for (int i = 0; i < nVariables; ++i)
-            pp[i] = new lPrecomputedPowers(Math.min(degrees.get(i), MAX_POWERS_CACHE_SIZE), values[i], ring);
-
-        return evaluateSparseRecursiveForm(recForm, new lPrecomputedPowersHolder(ring, pp), nVariables - 1);
-    }
-
-    @SuppressWarnings("unchecked")
-    static long evaluateSparseRecursiveForm(AMultivariatePolynomial recForm, lPrecomputedPowersHolder ph, int variable) {
-        IntegersZp64 ring = ph.ring;
-        if (variable == 0) {
-            assert MonomialOrder.isGradedOrder(recForm.ordering);
-            MultivariatePolynomialZp64 _recForm = (MultivariatePolynomialZp64) recForm;
-
-            Iterator<MonomialZp64> it = _recForm.terms.descendingIterator();
-            int previousExponent = -1;
-            long result = 0L;
-            while (it.hasNext()) {
-                MonomialZp64 m = it.next();
-                assert previousExponent == -1 || previousExponent > m.totalDegree;
-                result = ring.add(
-                        ring.multiply(result, ph.pow(variable, previousExponent == -1 ? 1 : previousExponent - m.totalDegree)),
-                        m.coefficient);
-                previousExponent = m.totalDegree;
-            }
-            if (previousExponent > 0)
-                result = ring.multiply(result, ph.pow(variable, previousExponent));
-            return result;
-        }
-        MultivariatePolynomial<AMultivariatePolynomial> _recForm = (MultivariatePolynomial<AMultivariatePolynomial>) recForm;
-
-        Iterator<Monomial<AMultivariatePolynomial>> it = _recForm.terms.descendingIterator();
-        int previousExponent = -1;
-        long result = 0L;
-        while (it.hasNext()) {
-            Monomial<AMultivariatePolynomial> m = it.next();
-            assert previousExponent == -1 || previousExponent > m.totalDegree;
-            result = ring.add(
-                    ring.multiply(result, ph.pow(variable, previousExponent == -1 ? 1 : previousExponent - m.totalDegree)),
-                    evaluateSparseRecursiveForm(m.coefficient, ph, variable - 1));
-            previousExponent = m.totalDegree;
-        }
-        if (previousExponent > 0)
-            result = ring.multiply(result, ph.pow(variable, previousExponent));
-        return result;
-    }
-
-    /**
      * Gives data structure for fast Horner-like sparse evaluation of this multivariate polynomial
      *
      * @param evaluationVariables variables which will be substituted
@@ -1050,40 +1161,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         Ring<AMultivariatePolynomial> newRing = Rings.PolynomialRing(p.cc().toSparseRecursiveForm());
         return new HornerFormZp64(ring, evalDegrees, evaluationVariables.length,
                 p.mapCoefficients(newRing, MultivariatePolynomialZp64::toSparseRecursiveForm));
-    }
-
-    /**
-     * A representation of multivariate polynomial specifically optimized for fast evaluation of given variables
-     */
-    public static final class HornerFormZp64 {
-        private final IntegersZp64 ring;
-        private final int nEvalVariables;
-        private final int[] evalDegrees;
-        private final MultivariatePolynomial<AMultivariatePolynomial> recForm;
-
-        private HornerFormZp64(IntegersZp64 ring,
-                               int[] evalDegrees,
-                               int nEvalVariables,
-                               MultivariatePolynomial<AMultivariatePolynomial> recForm) {
-            this.ring = ring;
-            this.evalDegrees = evalDegrees;
-            this.nEvalVariables = nEvalVariables;
-            this.recForm = recForm;
-        }
-
-        /**
-         * Substitute given values for evaluation variables (for example, if this is in R[x1,x2,x3,x4] and evaluation
-         * variables are x2 and x4, the result will be a poly in R[x1,x3]).
-         */
-        public MultivariatePolynomialZp64 evaluate(long[] values) {
-            if (values.length != nEvalVariables)
-                throw new IllegalArgumentException();
-            lPrecomputedPowers[] pp = new lPrecomputedPowers[nEvalVariables];
-            for (int i = 0; i < nEvalVariables; ++i)
-                pp[i] = new lPrecomputedPowers(Math.min(evalDegrees[i], MAX_POWERS_CACHE_SIZE), values[i], ring);
-            return recForm.mapCoefficients(ring,
-                    p -> evaluateSparseRecursiveForm(p, new lPrecomputedPowersHolder(ring, pp), nEvalVariables - 1));
-        }
     }
 
     /**
@@ -1154,7 +1231,9 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         return evaluateAtZero(variables);
     }
 
-    /** substitutes {@code values} for {@code variables} */
+    /**
+     * substitutes {@code values} for {@code variables}
+     */
     @SuppressWarnings("unchecked")
     MultivariatePolynomialZp64 evaluate(lPrecomputedPowersHolder powers, int[] variables) {
         MonomialSet<MonomialZp64> newData = new MonomialSet<>(ordering);
@@ -1230,7 +1309,9 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         return evaluateAtZero(variables).dropVariables(variables);
     }
 
-    /** substitutes {@code values} for {@code variables} */
+    /**
+     * substitutes {@code values} for {@code variables}
+     */
     MultivariatePolynomialZp64 eliminate(lPrecomputedPowersHolder powers, int[] variables) {
         MonomialSet<MonomialZp64> newData = new MonomialSet<>(ordering);
         for (MonomialZp64 el : terms) {
@@ -1243,49 +1324,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
             add(newData, r);
         }
         return new MultivariatePolynomialZp64(nVariables - variables.length, ring, ordering, newData);
-    }
-
-    /** the default cache size for precomputed powers */
-    static final int DEFAULT_POWERS_CACHE_SIZE = 64;
-    /** the maximal cache size for precomputed powers */
-    static final int MAX_POWERS_CACHE_SIZE = 1014;
-
-    /** cached powers used to save some time */
-    public static final class lPrecomputedPowers {
-        public final long value;
-        public final IntegersZp64 ring;
-        private final long[] precomputedPowers;
-
-        public lPrecomputedPowers(long value, IntegersZp64 ring) {
-            this(DEFAULT_POWERS_CACHE_SIZE, value, ring);
-        }
-
-        public lPrecomputedPowers(int cacheSize, long value, IntegersZp64 ring) {
-            this.value = ring.modulus(value);
-            this.ring = ring;
-            this.precomputedPowers = new long[cacheSize + 1];
-            Arrays.fill(precomputedPowers, -1);
-        }
-
-        public long pow(int exponent) {
-            if (exponent >= precomputedPowers.length)
-                return ring.powMod(value, exponent);
-
-            if (precomputedPowers[exponent] != -1)
-                return precomputedPowers[exponent];
-
-            long result = 1L;
-            long k2p = value;
-            int rExp = 0, kExp = 1;
-            for (; ; ) {
-                if ((exponent & 1) != 0)
-                    precomputedPowers[rExp += kExp] = result = ring.multiply(result, k2p);
-                exponent = exponent >> 1;
-                if (exponent == 0)
-                    return precomputedPowers[rExp] = result;
-                precomputedPowers[kExp *= 2] = k2p = ring.multiply(k2p, k2p);
-            }
-        }
     }
 
     public lPrecomputedPowersHolder mkPrecomputedPowers(int variable, long value) {
@@ -1302,13 +1340,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         return new lPrecomputedPowersHolder(ring, pp);
     }
 
-    public static lPrecomputedPowersHolder mkPrecomputedPowers(int nVariables, IntegersZp64 ring, int[] variables, long[] values) {
-        lPrecomputedPowers[] pp = new lPrecomputedPowers[nVariables];
-        for (int i = 0; i < variables.length; ++i)
-            pp[variables[i]] = new lPrecomputedPowers(MAX_POWERS_CACHE_SIZE, values[i], ring);
-        return new lPrecomputedPowersHolder(ring, pp);
-    }
-
     public lPrecomputedPowersHolder mkPrecomputedPowers(long[] values) {
         if (values.length != nVariables)
             throw new IllegalArgumentException();
@@ -1317,34 +1348,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         for (int i = 0; i < nVariables; ++i)
             pp[i] = new lPrecomputedPowers(Math.min(degrees[i], MAX_POWERS_CACHE_SIZE), values[i], ring);
         return new lPrecomputedPowersHolder(ring, pp);
-    }
-
-    /** holds an array of precomputed powers */
-    public static final class lPrecomputedPowersHolder {
-        final IntegersZp64 ring;
-        final lPrecomputedPowers[] powers;
-
-        public lPrecomputedPowersHolder(IntegersZp64 ring, lPrecomputedPowers[] powers) {
-            this.ring = ring;
-            this.powers = powers;
-        }
-
-        public void set(int i, long point) {
-            if (powers[i] == null || powers[i].value != point)
-                powers[i] = new lPrecomputedPowers(powers[i] == null
-                        ? DEFAULT_POWERS_CACHE_SIZE
-                        : powers[i].precomputedPowers.length,
-                        point, ring);
-        }
-
-        public long pow(int variable, int exponent) {
-            return powers[variable].pow(exponent);
-        }
-
-        @Override
-        public lPrecomputedPowersHolder clone() {
-            return new lPrecomputedPowersHolder(ring, powers.clone());
-        }
     }
 
     /**
@@ -1438,65 +1441,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
             result.add(temp.multiply(term));
         }
         return result;
-    }
-
-    static final class lPrecomputedSubstitutions {
-        final lPrecomputedSubstitution[] subs;
-
-        public lPrecomputedSubstitutions(lPrecomputedSubstitution[] subs) {
-            this.subs = subs;
-        }
-
-        MultivariatePolynomialZp64 getSubstitutionPower(int var, int exponent) {
-            if (subs[var] == null)
-                throw new IllegalArgumentException();
-
-            return subs[var].pow(exponent);
-        }
-    }
-
-    interface lPrecomputedSubstitution {
-        MultivariatePolynomialZp64 pow(int exponent);
-    }
-
-    static final class lUSubstitution implements lPrecomputedSubstitution {
-        final int variable;
-        final int nVariables;
-        final Comparator<DegreeVector> ordering;
-        final UnivariatePolynomialZp64 base;
-        final TIntObjectHashMap<UnivariatePolynomialZp64> uCache = new TIntObjectHashMap<>();
-        final TIntObjectHashMap<MultivariatePolynomialZp64> mCache = new TIntObjectHashMap<>();
-
-        lUSubstitution(UnivariatePolynomialZp64 base, int variable, int nVariables, Comparator<DegreeVector> ordering) {
-            this.nVariables = nVariables;
-            this.variable = variable;
-            this.ordering = ordering;
-            this.base = base;
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 pow(int exponent) {
-            MultivariatePolynomialZp64 cached = mCache.get(exponent);
-            if (cached != null)
-                return cached.clone();
-            UnivariatePolynomialZp64 r = PolynomialMethods.polyPow(base, exponent, true, uCache);
-            mCache.put(exponent, cached = asMultivariate(r, nVariables, variable, ordering));
-            return cached.clone();
-        }
-    }
-
-    static final class lMSubstitution implements lPrecomputedSubstitution {
-        final MultivariatePolynomialZp64 base;
-        final TIntObjectHashMap<MultivariatePolynomialZp64> cache = new TIntObjectHashMap<>();
-
-        lMSubstitution(MultivariatePolynomialZp64 base) {
-            this.base = base;
-        }
-
-        @Override
-        public MultivariatePolynomialZp64 pow(int exponent) {
-            return PolynomialMethods.polyPow(base, exponent, true, cache);
-        }
     }
 
     @Override
@@ -1656,28 +1600,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         return result;
     }
 
-    private static TLongObjectHashMap<CfHolder> multiplySparseUnivariate(IntegersZp64 ring,
-                                                                         TLongObjectHashMap<CfHolder> a,
-                                                                         TLongObjectHashMap<CfHolder> b) {
-        TLongObjectHashMap<CfHolder> result = new TLongObjectHashMap<>(a.size() + b.size());
-        TLongObjectIterator<CfHolder> ait = a.iterator();
-        while (ait.hasNext()) {
-            ait.advance();
-            TLongObjectIterator<CfHolder> bit = b.iterator();
-            while (bit.hasNext()) {
-                bit.advance();
-
-                long deg = ait.key() + bit.key();
-                long val = ring.multiply(ait.value().coefficient, bit.value().coefficient);
-
-                CfHolder r = result.putIfAbsent(deg, new CfHolder(val));
-                if (r != null)
-                    r.coefficient = ring.add(r.coefficient, val);
-            }
-        }
-        return result;
-    }
-
     private MultivariatePolynomialZp64 fromKronecker(TLongObjectHashMap<CfHolder> p,
                                                      long[] kroneckerMap) {
         terms.clear();
@@ -1697,14 +1619,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
         }
         release();
         return this;
-    }
-
-    static final class CfHolder {
-        long coefficient = 0;
-
-        CfHolder(long coefficient) {
-            this.coefficient = coefficient;
-        }
     }
 
     @Override
@@ -1749,57 +1663,6 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
             add(newTerms, new MonomialZp64(newExponents, term.totalDegree - order, newCoefficient));
         }
         return new MultivariatePolynomialZp64(nVariables, ring, ordering, newTerms);
-    }
-
-    /** exp * (exp - 1) * ... * (exp - order + 1) / (1 * 2 * ... * order) mod modulus */
-    static long seriesCoefficientFactor(int exponent, int order, IntegersZp64 ring) {
-        IntegersZp64 baseDomain = ring.perfectPowerBaseDomain();
-        if (order < baseDomain.modulus) {
-            long factor = 1;
-            for (int i = 0; i < order; ++i)
-                factor = ring.multiply(factor, exponent - i);
-            factor = ring.divide(factor, ring.factorial(order));
-            return factor;
-        }
-
-        long numerator = 1, denominator = 1;
-        int numZeros = 0, denZeros = 0;
-        for (int i = 1; i <= order; ++i) {
-            long
-                    num = exponent - i + 1,
-                    numMod = baseDomain.modulus(num);
-
-            while (num > 1 && numMod == 0) {
-                num = FastDivision.divideSignedFast(num, baseDomain.magic);
-                numMod = baseDomain.modulus(num);
-                ++numZeros;
-            }
-
-            if (numMod != 0)
-                numerator = ring.multiply(numerator, ring == baseDomain ? numMod : ring.modulus(num));
-
-            long
-                    den = i,
-                    denMod = baseDomain.modulus(i);
-
-            while (den > 1 && denMod == 0) {
-                den = FastDivision.divideSignedFast(den, baseDomain.magic);
-                denMod = baseDomain.modulus(den);
-                ++denZeros;
-            }
-
-            if (denMod != 0)
-                denominator = ring.multiply(denominator, ring == baseDomain ? denMod : ring.modulus(den));
-        }
-
-        if (numZeros > denZeros)
-            numerator = ring.multiply(numerator, ring.powMod(baseDomain.modulus, numZeros - denZeros));
-        else if (denZeros < numZeros)
-            denominator = ring.multiply(denominator, ring.powMod(baseDomain.modulus, denZeros - numZeros));
-
-        if (numerator == 0)
-            return numerator;
-        return ring.divide(numerator, denominator);
     }
 
     @Override
@@ -1939,5 +1802,176 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
     @Override
     public String coefficientRingToString(IStringifier<MultivariatePolynomialZp64> stringifier) {
         return ring.toString();
+    }
+
+    interface lPrecomputedSubstitution {
+        MultivariatePolynomialZp64 pow(int exponent);
+    }
+
+    /**
+     * A representation of multivariate polynomial specifically optimized for fast evaluation of given variables
+     */
+    public static final class HornerFormZp64 {
+        private final IntegersZp64 ring;
+        private final int nEvalVariables;
+        private final int[] evalDegrees;
+        private final MultivariatePolynomial<AMultivariatePolynomial> recForm;
+
+        private HornerFormZp64(IntegersZp64 ring,
+                               int[] evalDegrees,
+                               int nEvalVariables,
+                               MultivariatePolynomial<AMultivariatePolynomial> recForm) {
+            this.ring = ring;
+            this.evalDegrees = evalDegrees;
+            this.nEvalVariables = nEvalVariables;
+            this.recForm = recForm;
+        }
+
+        /**
+         * Substitute given values for evaluation variables (for example, if this is in R[x1,x2,x3,x4] and evaluation
+         * variables are x2 and x4, the result will be a poly in R[x1,x3]).
+         */
+        public MultivariatePolynomialZp64 evaluate(long[] values) {
+            if (values.length != nEvalVariables)
+                throw new IllegalArgumentException();
+            lPrecomputedPowers[] pp = new lPrecomputedPowers[nEvalVariables];
+            for (int i = 0; i < nEvalVariables; ++i)
+                pp[i] = new lPrecomputedPowers(Math.min(evalDegrees[i], MAX_POWERS_CACHE_SIZE), values[i], ring);
+            return recForm.mapCoefficients(ring,
+                    p -> evaluateSparseRecursiveForm(p, new lPrecomputedPowersHolder(ring, pp), nEvalVariables - 1));
+        }
+    }
+
+    /**
+     * cached powers used to save some time
+     */
+    public static final class lPrecomputedPowers {
+        public final long value;
+        public final IntegersZp64 ring;
+        private final long[] precomputedPowers;
+
+        public lPrecomputedPowers(long value, IntegersZp64 ring) {
+            this(DEFAULT_POWERS_CACHE_SIZE, value, ring);
+        }
+
+        public lPrecomputedPowers(int cacheSize, long value, IntegersZp64 ring) {
+            this.value = ring.modulus(value);
+            this.ring = ring;
+            this.precomputedPowers = new long[cacheSize + 1];
+            Arrays.fill(precomputedPowers, -1);
+        }
+
+        public long pow(int exponent) {
+            if (exponent >= precomputedPowers.length)
+                return ring.powMod(value, exponent);
+
+            if (precomputedPowers[exponent] != -1)
+                return precomputedPowers[exponent];
+
+            long result = 1L;
+            long k2p = value;
+            int rExp = 0, kExp = 1;
+            for (; ; ) {
+                if ((exponent & 1) != 0)
+                    precomputedPowers[rExp += kExp] = result = ring.multiply(result, k2p);
+                exponent = exponent >> 1;
+                if (exponent == 0)
+                    return precomputedPowers[rExp] = result;
+                precomputedPowers[kExp *= 2] = k2p = ring.multiply(k2p, k2p);
+            }
+        }
+    }
+
+    /**
+     * holds an array of precomputed powers
+     */
+    public static final class lPrecomputedPowersHolder {
+        final IntegersZp64 ring;
+        final lPrecomputedPowers[] powers;
+
+        public lPrecomputedPowersHolder(IntegersZp64 ring, lPrecomputedPowers[] powers) {
+            this.ring = ring;
+            this.powers = powers;
+        }
+
+        public void set(int i, long point) {
+            if (powers[i] == null || powers[i].value != point)
+                powers[i] = new lPrecomputedPowers(powers[i] == null
+                        ? DEFAULT_POWERS_CACHE_SIZE
+                        : powers[i].precomputedPowers.length,
+                        point, ring);
+        }
+
+        public long pow(int variable, int exponent) {
+            return powers[variable].pow(exponent);
+        }
+
+        @Override
+        public lPrecomputedPowersHolder clone() {
+            return new lPrecomputedPowersHolder(ring, powers.clone());
+        }
+    }
+
+    static final class lPrecomputedSubstitutions {
+        final lPrecomputedSubstitution[] subs;
+
+        public lPrecomputedSubstitutions(lPrecomputedSubstitution[] subs) {
+            this.subs = subs;
+        }
+
+        MultivariatePolynomialZp64 getSubstitutionPower(int var, int exponent) {
+            if (subs[var] == null)
+                throw new IllegalArgumentException();
+
+            return subs[var].pow(exponent);
+        }
+    }
+
+    static final class lUSubstitution implements lPrecomputedSubstitution {
+        final int variable;
+        final int nVariables;
+        final Comparator<DegreeVector> ordering;
+        final UnivariatePolynomialZp64 base;
+        final TIntObjectHashMap<UnivariatePolynomialZp64> uCache = new TIntObjectHashMap<>();
+        final TIntObjectHashMap<MultivariatePolynomialZp64> mCache = new TIntObjectHashMap<>();
+
+        lUSubstitution(UnivariatePolynomialZp64 base, int variable, int nVariables, Comparator<DegreeVector> ordering) {
+            this.nVariables = nVariables;
+            this.variable = variable;
+            this.ordering = ordering;
+            this.base = base;
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 pow(int exponent) {
+            MultivariatePolynomialZp64 cached = mCache.get(exponent);
+            if (cached != null)
+                return cached.clone();
+            UnivariatePolynomialZp64 r = PolynomialMethods.polyPow(base, exponent, true, uCache);
+            mCache.put(exponent, cached = asMultivariate(r, nVariables, variable, ordering));
+            return cached.clone();
+        }
+    }
+
+    static final class lMSubstitution implements lPrecomputedSubstitution {
+        final MultivariatePolynomialZp64 base;
+        final TIntObjectHashMap<MultivariatePolynomialZp64> cache = new TIntObjectHashMap<>();
+
+        lMSubstitution(MultivariatePolynomialZp64 base) {
+            this.base = base;
+        }
+
+        @Override
+        public MultivariatePolynomialZp64 pow(int exponent) {
+            return PolynomialMethods.polyPow(base, exponent, true, cache);
+        }
+    }
+
+    static final class CfHolder {
+        long coefficient = 0;
+
+        CfHolder(long coefficient) {
+            this.coefficient = coefficient;
+        }
     }
 }

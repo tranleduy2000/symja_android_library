@@ -1,14 +1,16 @@
 package cc.redberry.rings.util;
 
-import cc.redberry.rings.bigint.BigInteger;
 import org.hipparchus.random.RandomDataGenerator;
 import org.hipparchus.random.RandomGenerator;
+
+import cc.redberry.rings.bigint.BigInteger;
 
 /**
  * @since 1.0
  */
 public final class RandomUtil {
-    private RandomUtil() {}
+    private RandomUtil() {
+    }
 
     /**
      * Creates random array of length {@code degree + 1} with elements bounded by {@code bound} (by absolute value).

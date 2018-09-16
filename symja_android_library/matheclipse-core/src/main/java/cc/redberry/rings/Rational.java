@@ -1,13 +1,5 @@
 package cc.redberry.rings;
 
-import cc.redberry.rings.bigint.BigInteger;
-import cc.redberry.rings.io.IStringifier;
-import cc.redberry.rings.io.Stringifiable;
-import cc.redberry.rings.poly.MultivariateRing;
-import cc.redberry.rings.poly.UnivariateRing;
-import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
-import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,22 +9,56 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import cc.redberry.rings.bigint.BigInteger;
+import cc.redberry.rings.io.IStringifier;
+import cc.redberry.rings.io.Stringifiable;
+import cc.redberry.rings.poly.MultivariateRing;
+import cc.redberry.rings.poly.UnivariateRing;
+import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
+import cc.redberry.rings.poly.univar.IUnivariatePolynomial;
+
 import static cc.redberry.rings.io.IStringifier.encloseMathParenthesisInSumIfNeeded;
 
 /**
  *
  */
 public class Rational<E> implements Comparable<Rational<E>>,
-                                    Stringifiable<Rational<E>>,
-                                    java.io.Serializable {
+        Stringifiable<Rational<E>>,
+        java.io.Serializable {
     private static final long serialVersionUID = 1L;
-    /** The ring. */
+    /**
+     * polynomials with size smaller than this will be multiplied
+     */
+    private static final int
+            SIMPLE_UPOLY_SIZE = 8, // univariate polynomials
+            SIMPLE_MPOLY_DENSE_SIZE = 3, // dense multivariate polynomials
+            SIMPLE_MPOLY_SPARSE_SIZE = 16; // sparse multivariate polynomials
+    private static final double SIMPLE_POLY_SPARSITY2 = 1e-3;
+    /**
+     * integers with bit length smaller than this will be multiplied
+     */
+    private static final int SIMPLE_INTEGER_N_BITS = 512;
+    // criteria singletons
+    private static final Predicate<BigInteger> intSimplicityCriteria = p -> p.bitLength() <= SIMPLE_INTEGER_N_BITS;
+    private static final Predicate<IUnivariatePolynomial> upolySimplicityCriteria = p -> p.size() <= SIMPLE_UPOLY_SIZE;
+    private static final Predicate<AMultivariatePolynomial> mpolySimplicityCriteria
+            = p -> p.size() <= SIMPLE_MPOLY_DENSE_SIZE || (p.size() < SIMPLE_MPOLY_SPARSE_SIZE && p.sparsity2() < SIMPLE_POLY_SPARSITY2);
+    private static final Predicate defaultFalse = __ -> false;
+    /**
+     * The ring.
+     */
     public final Ring<E> ring;
-    /** The numerator factors. */
+    /**
+     * The numerator factors.
+     */
     final Operand numerator;
-    /** The denominator factors. */
+    /**
+     * The denominator factors.
+     */
     final Operand denominator;
-    /** whether the underlying ring is a polynomial ring */
+    /**
+     * whether the underlying ring is a polynomial ring
+     */
     private final Predicate<E> simplicityCriteria;
 
     public Rational(Ring<E> ring, E numerator) {
@@ -41,7 +67,6 @@ public class Rational<E> implements Comparable<Rational<E>>,
         this.numerator = new Operand(numerator);
         this.denominator = new Operand(ring.getOne());
     }
-
     public Rational(Ring<E> ring, E numerator, E denominator) {
         if (ring.isZero(denominator))
             throw new ArithmeticException("division by zero");
@@ -61,7 +86,6 @@ public class Rational<E> implements Comparable<Rational<E>>,
         this.numerator = numden[0];
         this.denominator = numden[1];
     }
-
     Rational(Ring<E> ring, Operand numerator, Operand denominator) {
         this.ring = ring;
         this.simplicityCriteria = simplicityCriteria(ring);
@@ -71,30 +95,12 @@ public class Rational<E> implements Comparable<Rational<E>>,
         this.numerator = numden[0];
         this.denominator = numden[1];
     }
-
     Rational(boolean skipNormalize, Ring<E> ring, Operand numerator, Operand denominator) {
         this.ring = ring;
         this.simplicityCriteria = simplicityCriteria(ring);
         this.numerator = numerator;
         this.denominator = denominator;
     }
-
-    /** polynomials with size smaller than this will be multiplied */
-    private static final int
-            SIMPLE_UPOLY_SIZE = 8, // univariate polynomials
-            SIMPLE_MPOLY_DENSE_SIZE = 3, // dense multivariate polynomials
-            SIMPLE_MPOLY_SPARSE_SIZE = 16; // sparse multivariate polynomials
-    private static final double SIMPLE_POLY_SPARSITY2 = 1e-3;
-
-    /** integers with bit length smaller than this will be multiplied */
-    private static final int SIMPLE_INTEGER_N_BITS = 512;
-
-    // criteria singletons
-    private static final Predicate<BigInteger> intSimplicityCriteria = p -> p.bitLength() <= SIMPLE_INTEGER_N_BITS;
-    private static final Predicate<IUnivariatePolynomial> upolySimplicityCriteria = p -> p.size() <= SIMPLE_UPOLY_SIZE;
-    private static final Predicate<AMultivariatePolynomial> mpolySimplicityCriteria
-            = p -> p.size() <= SIMPLE_MPOLY_DENSE_SIZE || (p.size() < SIMPLE_MPOLY_SPARSE_SIZE && p.sparsity2() < SIMPLE_POLY_SPARSITY2);
-    private static final Predicate defaultFalse = __ -> false;
 
     @SuppressWarnings("unchecked")
     private static <E> Predicate<E> simplicityCriteria(Ring<E> ring) {
@@ -123,247 +129,8 @@ public class Rational<E> implements Comparable<Rational<E>>,
     }
 
     /**
-     * A single operand (either numerator or denominator) represented by a list of factors. If there is a unit factor it
-     * is always stored in the first position.
+     * bring fraction to canonical form
      */
-    final class Operand extends ArrayList<E> {
-        /** all factors multiplied */
-        private E expandForm = null;
-        /** some factors already multiplied (for faster #expand()) */
-        private List<E> toExpand = this;
-
-        Operand() {}
-
-        Operand(Collection<? extends E> c) {
-            super(c);
-            if (size() == 1) setExpandForm(get(0));
-        }
-
-        Operand(E el) {
-            add(el);
-            setExpandForm(el);
-        }
-
-        private void setExpandForm(E e) {
-            expandForm = e;
-            toExpand = Collections.singletonList(e);
-        }
-
-        /** normalize list of factors: get rid of units and treat other special cases */
-        private void normalize() {
-            if (isEmpty()) {
-                set(ring.getOne());
-                return;
-            }
-            if (size() == 1) {
-                if (ring.signum(first()) < 0) {
-                    set(0, ring.negate(first()));
-                    add(0, ring.getNegativeOne());
-                }
-                return;
-            }
-
-            E unit = ring.getOne(), simple = ring.getOne();
-            for (int i = size() - 1; i >= 0; --i)
-                if (ring.isUnitOrZero(get(i)))
-                    unit = ring.multiplyMutable(unit, remove(i));
-                else {
-                    if (ring.signum(get(i)) < 0) {
-                        set(i, ring.negate(get(i)));
-                        unit = ring.negate(unit);
-                    }
-                    if (simplicityCriteria.test(get(i))) {
-                        if (!simplicityCriteria.test(simple)) {
-                            add(simple);
-                            simple = remove(i);
-                        } else
-                            simple = ring.multiplyMutable(simple, remove(i));
-                    }
-                }
-
-            if (!ring.isOne(simple))
-                add(simple);
-            if (ring.isZero(unit))
-                clear();
-            if (!ring.isOne(unit) || isEmpty())
-                add(0, unit);
-        }
-
-        /** Gives expanded form of this operand */
-        private E expand() {
-            if (expandForm != null)
-                return expandForm;
-            if (size() == 1)
-                expandForm = get(0);
-            else
-                expandForm = ring.multiply(toExpand);
-            toExpand = Collections.singletonList(expandForm);
-            return expandForm;
-        }
-
-        /** Whether the operand is zero */
-        private boolean isZero() {
-            return size() == 1 && ring.isZero(get(0));
-        }
-
-        /** Whether the operand is unit */
-        private boolean isUnit() {
-            return size() == 1 && ring.isUnit(get(0));
-        }
-
-        /** Whether the operand is one */
-        private boolean isOne() {
-            return isUnit() && ring.isOne(get(0));
-        }
-
-        /** get the first element in list */
-        private E first() {
-            return get(0);
-        }
-
-        /** get the last element in list */
-        private E last() {
-            return get(size() - 1);
-        }
-
-        /** get the unit element if it is in list */
-        private E unitOrNull() {
-            E u = first();
-            if (ring.isUnit(u))
-                return u;
-            else
-                return null;
-        }
-
-        /** get the unit element if it is in list */
-        private E unitOrOne() {
-            E u = unitOrNull();
-            return u == null ? ring.getOne() : u;
-        }
-
-        /** Multiply by other operand (shallow copy) */
-        Operand multiply(Operand oth) {
-            if (isOne())
-                return oth;
-            if (oth.isOne())
-                return this;
-            if (isZero())
-                return this;
-            if (oth.isZero())
-                return oth;
-
-            Operand r = new Operand();
-            r.addAll(this);
-            r.addAll(oth);
-            if (expandForm != null && oth.expandForm != null)
-                r.setExpandForm(ring.multiply(expandForm, oth.expandForm));
-            else if (toExpand != this || oth.toExpand != oth) {
-                r.toExpand = new ArrayList<>();
-                r.toExpand.addAll(toExpand);
-                r.toExpand.addAll(oth.toExpand);
-            }
-
-            // fix
-            r.normalize();
-            return r;
-        }
-
-        /** Multiply by other operand (shallow copy) */
-        Operand multiply(E oth) {
-            if (isOne())
-                return new Operand(oth);
-            if (ring.isOne(oth))
-                return this;
-            if (isZero())
-                return this;
-            if (ring.isZero(oth))
-                return new Operand(oth);
-
-            Operand r = new Operand(this);
-            r.add(oth);
-            if (expandForm != null) {
-                r.setExpandForm(ring.multiply(expandForm, oth));
-            } if (toExpand != this) {
-                r.toExpand = new ArrayList<>(toExpand);
-                r.toExpand.add(oth);
-            }
-            if (ring.isUnit(oth) || ring.signum(oth) < 0 || simplicityCriteria.test(oth))
-                // fix
-                r.normalize();
-            return r;
-        }
-
-        /** divide i-th factor by a given divider */
-        void divide(int i, E divider) {
-            E div = ring.divideExact(get(i), divider);
-            set(i, div);
-            if (expandForm != null) {
-                if (size() == 1 && toExpand == this)
-                    expandForm = get(0); // already divided
-                else
-                    expandForm = ring.divideExact(expandForm, divider);  // divide
-                toExpand = Collections.singletonList(expandForm);
-            } else {
-                expandForm = null;
-                toExpand = this;
-            }
-            // don't normalize here!
-        }
-
-        @Override
-        public void clear() {
-            super.clear();
-            toExpand = this;
-        }
-
-        private void set(E value) {
-            clear();
-            add(value);
-            setExpandForm(value);
-        }
-
-        /** shallow copy of this */
-        Operand shallowCopy() {
-            Operand op = new Operand(this);
-            if (expandForm != null)
-                op.setExpandForm(expandForm);
-            else if (toExpand != this)
-                op.toExpand = new ArrayList<>(toExpand);
-            return op;
-        }
-
-        /** deep copy of this */
-        Operand deepCopy() {
-            return map(ring::copy);
-        }
-
-        Operand map(Function<E, E> mapper) {
-            Operand op = stream().map(mapper).collect(Collectors.toCollection(Operand::new));
-            if (toExpand != this)
-                op.toExpand = toExpand.stream().map(mapper).collect(Collectors.toList());
-            op.expandForm = mapper.apply(expandForm);
-            return op;
-        }
-
-        Operand pow(long exponent) {
-            return pow(BigInteger.valueOf(exponent));
-        }
-
-        Operand pow(BigInteger exponent) {
-            Operand pow = stream().map(f -> ring.pow(f, exponent)).collect(Collectors.toCollection(Operand::new));
-            if (expandForm != null) {
-                if (size() == 1)
-                    pow.expandForm = pow.first();
-                else
-                    pow.expandForm = ring.pow(expandForm, exponent);
-                pow.toExpand = Collections.singletonList(pow.expandForm);
-            } else if (toExpand != this)
-                pow.toExpand = toExpand.stream().map(f -> ring.pow(f, exponent)).collect(Collectors.toList());
-            return pow;
-        }
-    }
-
-    /** bring fraction to canonical form */
     private void normalize(Operand[] numden) {
         Operand numerator = numden[0].shallowCopy();
         Operand denominator = numden[1].shallowCopy();
@@ -423,40 +190,62 @@ public class Rational<E> implements Comparable<Rational<E>>,
         return new Operand[]{aReduced, bReduced, gcd};
     }
 
-    /** whether this rational is zero */
-    public boolean isZero() { return numerator.isZero(); }
+    /**
+     * whether this rational is zero
+     */
+    public boolean isZero() {
+        return numerator.isZero();
+    }
 
-    /** whether this rational is one */
-    public boolean isOne() { return denominator.isOne() && numerator.isOne(); }
+    /**
+     * whether this rational is one
+     */
+    public boolean isOne() {
+        return denominator.isOne() && numerator.isOne();
+    }
 
-    /** whether this rational is integral */
-    public boolean isIntegral() { return denominator.isOne(); }
+    /**
+     * whether this rational is integral
+     */
+    public boolean isIntegral() {
+        return denominator.isOne();
+    }
 
-    /** Numerator of this rational */
+    /**
+     * Numerator of this rational
+     */
     public E numerator() {
         return numerator.expand();
     }
 
-    /** Numerator of this rational */
+    /**
+     * Numerator of this rational
+     */
     public E numeratorExact() {
         if (!isIntegral())
             throw new IllegalArgumentException("not integral fraction");
         return numerator();
     }
 
-    /** Denominator of this rational */
+    /**
+     * Denominator of this rational
+     */
     public E denominator() {
         return denominator.expand();
     }
 
-    /** Factor decomposition of denominator */
+    /**
+     * Factor decomposition of denominator
+     */
     public FactorDecomposition<E> factorDenominator() {
         return denominator.stream()
                 .map(ring::factor)
                 .reduce(FactorDecomposition.empty(ring), FactorDecomposition::addAll);
     }
 
-    /** Factor decomposition of denominator */
+    /**
+     * Factor decomposition of denominator
+     */
     public FactorDecomposition<E> factorNumerator() {
         return numerator.stream()
                 .map(ring::factor)
@@ -731,5 +520,280 @@ public class Rational<E> implements Comparable<Rational<E>>,
     @Override
     public String toString() {
         return toString(IStringifier.dummy());
+    }
+
+    /**
+     * A single operand (either numerator or denominator) represented by a list of factors. If there is a unit factor it
+     * is always stored in the first position.
+     */
+    final class Operand extends ArrayList<E> {
+        /**
+         * all factors multiplied
+         */
+        private E expandForm = null;
+        /**
+         * some factors already multiplied (for faster #expand())
+         */
+        private List<E> toExpand = this;
+
+        Operand() {
+        }
+
+        Operand(Collection<? extends E> c) {
+            super(c);
+            if (size() == 1) setExpandForm(get(0));
+        }
+
+        Operand(E el) {
+            add(el);
+            setExpandForm(el);
+        }
+
+        private void setExpandForm(E e) {
+            expandForm = e;
+            toExpand = Collections.singletonList(e);
+        }
+
+        /**
+         * normalize list of factors: get rid of units and treat other special cases
+         */
+        private void normalize() {
+            if (isEmpty()) {
+                set(ring.getOne());
+                return;
+            }
+            if (size() == 1) {
+                if (ring.signum(first()) < 0) {
+                    set(0, ring.negate(first()));
+                    add(0, ring.getNegativeOne());
+                }
+                return;
+            }
+
+            E unit = ring.getOne(), simple = ring.getOne();
+            for (int i = size() - 1; i >= 0; --i)
+                if (ring.isUnitOrZero(get(i)))
+                    unit = ring.multiplyMutable(unit, remove(i));
+                else {
+                    if (ring.signum(get(i)) < 0) {
+                        set(i, ring.negate(get(i)));
+                        unit = ring.negate(unit);
+                    }
+                    if (simplicityCriteria.test(get(i))) {
+                        if (!simplicityCriteria.test(simple)) {
+                            add(simple);
+                            simple = remove(i);
+                        } else
+                            simple = ring.multiplyMutable(simple, remove(i));
+                    }
+                }
+
+            if (!ring.isOne(simple))
+                add(simple);
+            if (ring.isZero(unit))
+                clear();
+            if (!ring.isOne(unit) || isEmpty())
+                add(0, unit);
+        }
+
+        /**
+         * Gives expanded form of this operand
+         */
+        private E expand() {
+            if (expandForm != null)
+                return expandForm;
+            if (size() == 1)
+                expandForm = get(0);
+            else
+                expandForm = ring.multiply(toExpand);
+            toExpand = Collections.singletonList(expandForm);
+            return expandForm;
+        }
+
+        /**
+         * Whether the operand is zero
+         */
+        private boolean isZero() {
+            return size() == 1 && ring.isZero(get(0));
+        }
+
+        /**
+         * Whether the operand is unit
+         */
+        private boolean isUnit() {
+            return size() == 1 && ring.isUnit(get(0));
+        }
+
+        /**
+         * Whether the operand is one
+         */
+        private boolean isOne() {
+            return isUnit() && ring.isOne(get(0));
+        }
+
+        /**
+         * get the first element in list
+         */
+        private E first() {
+            return get(0);
+        }
+
+        /**
+         * get the last element in list
+         */
+        private E last() {
+            return get(size() - 1);
+        }
+
+        /**
+         * get the unit element if it is in list
+         */
+        private E unitOrNull() {
+            E u = first();
+            if (ring.isUnit(u))
+                return u;
+            else
+                return null;
+        }
+
+        /**
+         * get the unit element if it is in list
+         */
+        private E unitOrOne() {
+            E u = unitOrNull();
+            return u == null ? ring.getOne() : u;
+        }
+
+        /**
+         * Multiply by other operand (shallow copy)
+         */
+        Operand multiply(Operand oth) {
+            if (isOne())
+                return oth;
+            if (oth.isOne())
+                return this;
+            if (isZero())
+                return this;
+            if (oth.isZero())
+                return oth;
+
+            Operand r = new Operand();
+            r.addAll(this);
+            r.addAll(oth);
+            if (expandForm != null && oth.expandForm != null)
+                r.setExpandForm(ring.multiply(expandForm, oth.expandForm));
+            else if (toExpand != this || oth.toExpand != oth) {
+                r.toExpand = new ArrayList<>();
+                r.toExpand.addAll(toExpand);
+                r.toExpand.addAll(oth.toExpand);
+            }
+
+            // fix
+            r.normalize();
+            return r;
+        }
+
+        /**
+         * Multiply by other operand (shallow copy)
+         */
+        Operand multiply(E oth) {
+            if (isOne())
+                return new Operand(oth);
+            if (ring.isOne(oth))
+                return this;
+            if (isZero())
+                return this;
+            if (ring.isZero(oth))
+                return new Operand(oth);
+
+            Operand r = new Operand(this);
+            r.add(oth);
+            if (expandForm != null) {
+                r.setExpandForm(ring.multiply(expandForm, oth));
+            }
+            if (toExpand != this) {
+                r.toExpand = new ArrayList<>(toExpand);
+                r.toExpand.add(oth);
+            }
+            if (ring.isUnit(oth) || ring.signum(oth) < 0 || simplicityCriteria.test(oth))
+                // fix
+                r.normalize();
+            return r;
+        }
+
+        /**
+         * divide i-th factor by a given divider
+         */
+        void divide(int i, E divider) {
+            E div = ring.divideExact(get(i), divider);
+            set(i, div);
+            if (expandForm != null) {
+                if (size() == 1 && toExpand == this)
+                    expandForm = get(0); // already divided
+                else
+                    expandForm = ring.divideExact(expandForm, divider);  // divide
+                toExpand = Collections.singletonList(expandForm);
+            } else {
+                expandForm = null;
+                toExpand = this;
+            }
+            // don't normalize here!
+        }
+
+        @Override
+        public void clear() {
+            super.clear();
+            toExpand = this;
+        }
+
+        private void set(E value) {
+            clear();
+            add(value);
+            setExpandForm(value);
+        }
+
+        /**
+         * shallow copy of this
+         */
+        Operand shallowCopy() {
+            Operand op = new Operand(this);
+            if (expandForm != null)
+                op.setExpandForm(expandForm);
+            else if (toExpand != this)
+                op.toExpand = new ArrayList<>(toExpand);
+            return op;
+        }
+
+        /**
+         * deep copy of this
+         */
+        Operand deepCopy() {
+            return map(ring::copy);
+        }
+
+        Operand map(Function<E, E> mapper) {
+            Operand op = stream().map(mapper).collect(Collectors.toCollection(Operand::new));
+            if (toExpand != this)
+                op.toExpand = toExpand.stream().map(mapper).collect(Collectors.toList());
+            op.expandForm = mapper.apply(expandForm);
+            return op;
+        }
+
+        Operand pow(long exponent) {
+            return pow(BigInteger.valueOf(exponent));
+        }
+
+        Operand pow(BigInteger exponent) {
+            Operand pow = stream().map(f -> ring.pow(f, exponent)).collect(Collectors.toCollection(Operand::new));
+            if (expandForm != null) {
+                if (size() == 1)
+                    pow.expandForm = pow.first();
+                else
+                    pow.expandForm = ring.pow(expandForm, exponent);
+                pow.toExpand = Collections.singletonList(pow.expandForm);
+            } else if (toExpand != this)
+                pow.toExpand = toExpand.stream().map(f -> ring.pow(f, exponent)).collect(Collectors.toList());
+            return pow;
+        }
     }
 }

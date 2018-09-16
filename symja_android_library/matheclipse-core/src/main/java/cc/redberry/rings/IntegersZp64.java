@@ -20,12 +20,26 @@ import static cc.redberry.libdivide4j.FastDivision.multiplyMod128Unsigned;
  */
 public final class IntegersZp64 implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-    /** the modulus */
+    /**
+     * the modulus
+     */
     public final long modulus;
-    /** magic **/
+    /**
+     * magic
+     **/
     public final Magic magic, magic32MulMod;
-    /** whether modulus less then 2^32 (if so, faster mulmod available) **/
+    /**
+     * whether modulus less then 2^32 (if so, faster mulmod available)
+     **/
     public final boolean modulusFits32;
+    /**
+     * if modulus = a^b, a and b are stored in this array
+     */
+    private final long[] perfectPowerDecomposition = {-1, -1};
+    /**
+     * ring for perfectPowerBase()
+     */
+    private IntegersZp64 ppBaseDomain = null;
 
     public IntegersZp64(long modulus, Magic magic, Magic magic32MulMod, boolean modulusFits32) {
         this.modulus = modulus;
@@ -43,55 +57,75 @@ public final class IntegersZp64 implements java.io.Serializable {
         this(modulus, magicSigned(modulus), magic32ForMultiplyMod(modulus), MachineArithmetic.fits31bitWord(modulus));
     }
 
-    /** Returns {@code val % this.modulus} */
+    /**
+     * Returns {@code val % this.modulus}
+     */
     public long modulus(long val) {
         return modSignedFast(val, magic);
     }
 
-    /** Returns {@code val % this.modulus} */
+    /**
+     * Returns {@code val % this.modulus}
+     */
     public long modulus(BigInteger val) {
         return val.isLong() ? modSignedFast(val.longValue(), magic) : val.mod(BigInteger.valueOf(modulus)).longValue();
     }
 
-    /** Inplace sets elements of {@code data} to {@code data % this.modulus} */
+    /**
+     * Inplace sets elements of {@code data} to {@code data % this.modulus}
+     */
     public void modulus(long[] data) {
         for (int i = 0; i < data.length; ++i)
             data[i] = modulus(data[i]);
     }
 
-    /** Multiply mod operation */
+    /**
+     * Multiply mod operation
+     */
     public long multiply(long a, long b) {
         return modulusFits32 ? modulus(a * b) : multiplyMod128Unsigned(a, b, modulus, magic32MulMod);
     }
 
-    /** Add mod operation */
+    /**
+     * Add mod operation
+     */
     public long add(long a, long b) {
         long r = a + b;
         return r - modulus >= 0 ? r - modulus : r;
     }
 
-    /** Subtract mod operation */
+    /**
+     * Subtract mod operation
+     */
     public long subtract(long a, long b) {
         long r = a - b;
         return r + ((r >> 63) & modulus);
     }
 
-    /** Subtract mod operation */
+    /**
+     * Subtract mod operation
+     */
     public long divide(long a, long b) {
         return multiply(a, reciprocal(b));
     }
 
-    /** Returns modular inverse of {@code val} */
+    /**
+     * Returns modular inverse of {@code val}
+     */
     public long reciprocal(long val) {
         return MachineArithmetic.modInverse(val, modulus);
     }
 
-    /** Negate mod operation */
+    /**
+     * Negate mod operation
+     */
     public long negate(long val) {
         return val == 0 ? val : modulus - val;
     }
 
-    /** to symmetric modulus */
+    /**
+     * to symmetric modulus
+     */
     public long symmetricForm(long value) {
         return value <= modulus / 2 ? value : value - modulus;
     }
@@ -176,11 +210,6 @@ public final class IntegersZp64 implements java.io.Serializable {
         return result;
     }
 
-    /**
-     * if modulus = a^b, a and b are stored in this array
-     */
-    private final long[] perfectPowerDecomposition = {-1, -1};
-
     private void checkPerfectPower() {
         // lazy initialization
         if (perfectPowerDecomposition[0] == -1) {
@@ -230,9 +259,6 @@ public final class IntegersZp64 implements java.io.Serializable {
         return perfectPowerDecomposition[1];
     }
 
-    /** ring for perfectPowerBase() */
-    private IntegersZp64 ppBaseDomain = null;
-
     /**
      * Returns ring for {@link #perfectPowerBase()} or {@code this} if modulus is not a perfect power
      *
@@ -265,7 +291,9 @@ public final class IntegersZp64 implements java.io.Serializable {
     }
 
     @Override
-    public String toString() {return "Z/" + modulus;}
+    public String toString() {
+        return "Z/" + modulus;
+    }
 
     @Override
     public int hashCode() {

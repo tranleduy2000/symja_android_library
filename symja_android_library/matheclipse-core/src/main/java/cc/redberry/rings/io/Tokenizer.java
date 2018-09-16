@@ -7,51 +7,29 @@ import java.util.List;
  * Simple math expression tokenizer
  */
 public final class Tokenizer {
+    public static final Token
+            END = new Token(TokenType.T_END, ""),
+            PLUS = new Token(TokenType.T_PLUS, "+"),
+            MINUS = new Token(TokenType.T_MINUS, "-"),
+            MULTIPLY = new Token(TokenType.T_MULTIPLY, "*"),
+            DIVIDE = new Token(TokenType.T_DIVIDE, "/"),
+            EXPONENT = new Token(TokenType.T_EXPONENT, "^"),
+            BRACKET_OPEN = new Token(TokenType.T_BRACKET_OPEN, "("),
+            BRACKET_CLOSE = new Token(TokenType.T_BRACKET_CLOSE, ")"),
+            SPACE = new Token(TokenType.T_SPACE, " ");
     private final CharacterStream stream;
+    // whether there is a single char in local buffer
+    private boolean bufferedCharDefined;
+    // local buffer with only one character
+    private char bufferedChar;
+    // envelope tokens wit ( )
+    private boolean first = true, last = true;
 
     /**
      * Create tokenizer of a given char stream
      */
     public Tokenizer(CharacterStream stream) {
         this.stream = stream;
-    }
-
-    /** token type */
-    public enum TokenType {
-        T_VARIABLE,
-        T_PLUS,
-        T_MINUS,
-        T_MULTIPLY,
-        T_DIVIDE,
-        T_EXPONENT,
-        T_SPACE,
-        T_NEWLINE,
-        T_BRACKET_OPEN,
-        T_BRACKET_CLOSE,
-        T_END
-    }
-
-    // whether there is a single char in local buffer
-    private boolean bufferedCharDefined;
-    // local buffer with only one character
-    private char bufferedChar;
-
-    /** has more elements to consider */
-    private boolean hasNextChar() {
-        return bufferedCharDefined || stream.hasNext();
-    }
-
-    /** next character */
-    private char nextChar() {
-        char c;
-        if (bufferedCharDefined) {
-            bufferedCharDefined = false;
-            c = bufferedChar;
-        } else
-            c = stream.next();
-
-        checkChar(c);
-        return c;
     }
 
     private static void checkChar(char c) {
@@ -65,8 +43,112 @@ public final class Tokenizer {
         }
     }
 
-    // envelope tokens wit ( )
-    private boolean first = true, last = true;
+    private static Token primitiveToken(char character) {
+        switch (character) {
+            case '+':
+                return PLUS;
+            case '-':
+                return MINUS;
+            case '*':
+                return MULTIPLY;
+            case '/':
+                return DIVIDE;
+            case '^':
+                return EXPONENT;
+            case '(':
+                return BRACKET_OPEN;
+            case ')':
+                return BRACKET_CLOSE;
+            case '\t':
+            case '\n':
+            case ' ':
+                return SPACE;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Concat char streams
+     */
+    public static CharacterStream concat(CharacterStream a, CharacterStream b) {
+        List<CharacterStream> streams = new ArrayList<>();
+        streams.add(a);
+        streams.add(b);
+        return new ConcatStreams(streams);
+    }
+
+    /**
+     * Create character stream from string
+     *
+     * @param terminateChar if a non-null value specified, stream will terminate on the last char preceding the {@code terminateChar}
+     */
+    public static CharacterStream mkCharacterStream(String string, Character terminateChar) {
+        return new CharacterStream() {
+            int index = 0;
+            int currentIndex = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < string.length()
+                        && (terminateChar == null || string.charAt(index) != terminateChar);
+            }
+
+            @Override
+            public char next() {
+                currentIndex = index;
+                return string.charAt(index++);
+            }
+
+            @Override
+            public String currentString() {
+                return string;
+            }
+
+            @Override
+            public int indexInCurrentString() {
+                return currentIndex;
+            }
+        };
+    }
+
+    /**
+     * Create string tokenizer
+     *
+     * @param terminateChar if a non-null value specified, stream will terminate on the last char preceding the {@code terminateChar}
+     */
+    public static Tokenizer mkTokenizer(String string, Character terminateChar) {
+        return new Tokenizer(mkCharacterStream(string, terminateChar));
+    }
+
+    /**
+     * Create string tokenizer
+     */
+    public static Tokenizer mkTokenizer(String string) {
+        return new Tokenizer(mkCharacterStream(string, null));
+    }
+
+    /**
+     * has more elements to consider
+     */
+    private boolean hasNextChar() {
+        return bufferedCharDefined || stream.hasNext();
+    }
+
+    /**
+     * next character
+     */
+    private char nextChar() {
+        char c;
+        if (bufferedCharDefined) {
+            bufferedCharDefined = false;
+            c = bufferedChar;
+        } else
+            c = stream.next();
+
+        checkChar(c);
+        return c;
+    }
 
     private Token firstToken() {
         first = false;
@@ -164,61 +246,45 @@ public final class Tokenizer {
         return new Token(TokenType.T_VARIABLE, variable);
     }
 
-    private static Token primitiveToken(char character) {
-        switch (character) {
-            case '+': return PLUS;
-            case '-': return MINUS;
-            case '*': return MULTIPLY;
-            case '/': return DIVIDE;
-            case '^': return EXPONENT;
-            case '(': return BRACKET_OPEN;
-            case ')': return BRACKET_CLOSE;
-            case '\t':
-            case '\n':
-            case ' ': return SPACE;
-            default: return null;
-        }
+    /**
+     * token type
+     */
+    public enum TokenType {
+        T_VARIABLE,
+        T_PLUS,
+        T_MINUS,
+        T_MULTIPLY,
+        T_DIVIDE,
+        T_EXPONENT,
+        T_SPACE,
+        T_NEWLINE,
+        T_BRACKET_OPEN,
+        T_BRACKET_CLOSE,
+        T_END
     }
 
-    public static final Token
-            END = new Token(TokenType.T_END, ""),
-            PLUS = new Token(TokenType.T_PLUS, "+"),
-            MINUS = new Token(TokenType.T_MINUS, "-"),
-            MULTIPLY = new Token(TokenType.T_MULTIPLY, "*"),
-            DIVIDE = new Token(TokenType.T_DIVIDE, "/"),
-            EXPONENT = new Token(TokenType.T_EXPONENT, "^"),
-            BRACKET_OPEN = new Token(TokenType.T_BRACKET_OPEN, "("),
-            BRACKET_CLOSE = new Token(TokenType.T_BRACKET_CLOSE, ")"),
-            SPACE = new Token(TokenType.T_SPACE, " ");
-
-    /** Simple token */
-    public static final class Token {
-        public final TokenType tokenType;
-        public final String content;
-
-        Token(TokenType tokenType, String content) {
-            this.tokenType = tokenType;
-            this.content = content;
-        }
-
-        @Override
-        public String toString() {
-            return tokenType + "(" + content + ")";
-        }
-    }
-
-    /** Stream of chars. Implementations are not synchronized and doesn't support concurrent iteration. */
+    /**
+     * Stream of chars. Implementations are not synchronized and doesn't support concurrent iteration.
+     */
     public interface CharacterStream {
-        /** next char available in this stream */
+        /**
+         * next char available in this stream
+         */
         boolean hasNext();
 
-        /** next char from this stream */
+        /**
+         * next char from this stream
+         */
         char next();
 
-        /** string containing current char */
+        /**
+         * string containing current char
+         */
         String currentString();
 
-        /** index of char in string */
+        /**
+         * index of char in string
+         */
         int indexInCurrentString();
 
         /**
@@ -233,6 +299,24 @@ public final class Tokenizer {
                     return true;
             }
             return false;
+        }
+    }
+
+    /**
+     * Simple token
+     */
+    public static final class Token {
+        public final TokenType tokenType;
+        public final String content;
+
+        Token(TokenType tokenType, String content) {
+            this.tokenType = tokenType;
+            this.content = content;
+        }
+
+        @Override
+        public String toString() {
+            return tokenType + "(" + content + ")";
         }
     }
 
@@ -278,63 +362,5 @@ public final class Tokenizer {
         public int indexInCurrentString() {
             return streams.get(currentStream).indexInCurrentString();
         }
-    }
-
-    /** Concat char streams */
-    public static CharacterStream concat(CharacterStream a, CharacterStream b) {
-        List<CharacterStream> streams = new ArrayList<>();
-        streams.add(a);
-        streams.add(b);
-        return new ConcatStreams(streams);
-    }
-
-    /**
-     * Create character stream from string
-     *
-     * @param terminateChar if a non-null value specified, stream will terminate on the last char preceding the {@code terminateChar}
-     */
-    public static CharacterStream mkCharacterStream(String string, Character terminateChar) {
-        return new CharacterStream() {
-            int index = 0;
-            int currentIndex = 0;
-
-            @Override
-            public boolean hasNext() {
-                return index < string.length()
-                        && (terminateChar == null || string.charAt(index) != terminateChar);
-            }
-
-            @Override
-            public char next() {
-                currentIndex = index;
-                return string.charAt(index++);
-            }
-
-            @Override
-            public String currentString() {
-                return string;
-            }
-
-            @Override
-            public int indexInCurrentString() {
-                return currentIndex;
-            }
-        };
-    }
-
-    /**
-     * Create string tokenizer
-     *
-     * @param terminateChar if a non-null value specified, stream will terminate on the last char preceding the {@code terminateChar}
-     */
-    public static Tokenizer mkTokenizer(String string, Character terminateChar) {
-        return new Tokenizer(mkCharacterStream(string, terminateChar));
-    }
-
-    /**
-     * Create string tokenizer
-     */
-    public static Tokenizer mkTokenizer(String string) {
-        return new Tokenizer(mkCharacterStream(string, null));
     }
 }

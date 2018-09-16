@@ -1,16 +1,25 @@
 package cc.redberry.rings.poly.univar;
 
-import cc.redberry.rings.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+
+import cc.redberry.rings.ChineseRemainders;
+import cc.redberry.rings.IntegersZp;
+import cc.redberry.rings.IntegersZp64;
+import cc.redberry.rings.Rational;
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
-import cc.redberry.rings.poly.*;
+import cc.redberry.rings.poly.AlgebraicNumberField;
+import cc.redberry.rings.poly.FiniteField;
+import cc.redberry.rings.poly.MultipleFieldExtension;
+import cc.redberry.rings.poly.SimpleFieldExtension;
+import cc.redberry.rings.poly.Util;
 import cc.redberry.rings.poly.multivar.AMonomial;
 import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
 import cc.redberry.rings.primes.PrimesIterator;
 import gnu.trove.list.array.TLongArrayList;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
 
 import static cc.redberry.rings.Rings.Q;
 import static cc.redberry.rings.Rings.Z;
@@ -26,7 +35,8 @@ import static cc.redberry.rings.poly.univar.UnivariatePolynomial.asOverZp64;
  * @since 2.5
  */
 public final class UnivariateResultants {
-    private UnivariateResultants() {}
+    private UnivariateResultants() {
+    }
 
     /**
      * Computes discriminant of polynomial and returns the result as a constant poly
@@ -339,32 +349,44 @@ public final class UnivariateResultants {
         }
     }
 
-    /** Computes polynomial remainder sequence using classical division algorithm */
+    /**
+     * Computes polynomial remainder sequence using classical division algorithm
+     */
     public static PolynomialRemainderSequenceZp64 ClassicalPRS(UnivariatePolynomialZp64 a, UnivariatePolynomialZp64 b) {
         return new PolynomialRemainderSequenceZp64(a, b).run();
     }
 
-    /** Computes polynomial remainder sequence using classical division algorithm */
+    /**
+     * Computes polynomial remainder sequence using classical division algorithm
+     */
     public static <E> PolynomialRemainderSequence<E> ClassicalPRS(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) {
         return new ClassicalPolynomialRemainderSequence<>(a, b).run();
     }
 
-    /** Computes polynomial remainder sequence using pseudo division algorithm */
+    /**
+     * Computes polynomial remainder sequence using pseudo division algorithm
+     */
     public static <E> PolynomialRemainderSequence<E> PseudoPRS(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) {
         return new PseudoPolynomialRemainderSequence<>(a, b).run();
     }
 
-    /** Computes polynomial remainder sequence using primitive division algorithm */
+    /**
+     * Computes polynomial remainder sequence using primitive division algorithm
+     */
     public static <E> PolynomialRemainderSequence<E> PrimitivePRS(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) {
         return new PrimitivePolynomialRemainderSequence<>(a, b).run();
     }
 
-    /** Computes polynomial remainder sequence using reduced division algorithm */
+    /**
+     * Computes polynomial remainder sequence using reduced division algorithm
+     */
     public static <E> PolynomialRemainderSequence<E> ReducedPRS(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) {
         return new ReducedPolynomialRemainderSequence<>(a, b).run();
     }
 
-    /** Computes subresultant polynomial remainder sequence */
+    /**
+     * Computes subresultant polynomial remainder sequence
+     */
     public static <E> PolynomialRemainderSequence<E> SubresultantPRS(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) {
         return new SubresultantPolynomialRemainderSequence<>(a, b).run();
     }
@@ -373,11 +395,17 @@ public final class UnivariateResultants {
      * Polynomial remainder sequence (PRS).
      */
     public static class APolynomialRemainderSequence<Poly extends IUnivariatePolynomial<Poly>> {
-        /** Polynomial remainder sequence */
+        /**
+         * Polynomial remainder sequence
+         */
         public final List<Poly> remainders = new ArrayList<>();
-        /** Quotients arised in PRS */
+        /**
+         * Quotients arised in PRS
+         */
         public final List<Poly> quotients = new ArrayList<>();
-        /** Initial polynomials */
+        /**
+         * Initial polynomials
+         */
         public final Poly a, b;
 
         public APolynomialRemainderSequence(Poly a, Poly b) {
@@ -385,12 +413,16 @@ public final class UnivariateResultants {
             this.b = b;
         }
 
-        /** The last element in PRS, that is the GCD */
+        /**
+         * The last element in PRS, that is the GCD
+         */
         public final Poly lastRemainder() {
             return remainders.get(remainders.size() - 1);
         }
 
-        /** The last element in PRS, that is the GCD */
+        /**
+         * The last element in PRS, that is the GCD
+         */
         @SuppressWarnings("unchecked")
         public final Poly gcd() {
             if (a.isZero()) return b;
@@ -414,14 +446,26 @@ public final class UnivariateResultants {
      * that {@code alpha_i r_(i - 2) = quot_(i - 1) * r_(i - 1) + beta_i * r_i} where {@code {r_i} } is PRS.
      */
     public static abstract class PolynomialRemainderSequence<E> extends APolynomialRemainderSequence<UnivariatePolynomial<E>> {
-        /** alpha coefficients */
+        /**
+         * alpha coefficients
+         */
         public final List<E> alphas = new ArrayList<>();
-        /** beta coefficients */
+        /**
+         * beta coefficients
+         */
         public final List<E> betas = new ArrayList<>();
-        /** the ring */
+        /**
+         * the ring
+         */
         final Ring<E> ring;
-        /** whether the first poly had smaller degree than the second */
+        /**
+         * whether the first poly had smaller degree than the second
+         */
         final boolean swap;
+        /**
+         * scalar subresultants
+         */
+        private final ArrayList<E> subresultants = new ArrayList<>();
 
         PolynomialRemainderSequence(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) {
             super(a, b);
@@ -437,13 +481,19 @@ public final class UnivariateResultants {
             }
         }
 
-        /** compute alpha based on obtained so far PRS */
+        /**
+         * compute alpha based on obtained so far PRS
+         */
         abstract E nextAlpha();
 
-        /** compute beta based on obtained so far PRS and newly computed remainder */
+        /**
+         * compute beta based on obtained so far PRS and newly computed remainder
+         */
         abstract E nextBeta(UnivariatePolynomial<E> remainder);
 
-        /** A single step of the Euclidean algorithm */
+        /**
+         * A single step of the Euclidean algorithm
+         */
         private UnivariatePolynomial<E> step() {
             int i = remainders.size();
             UnivariatePolynomial<E>
@@ -472,21 +522,23 @@ public final class UnivariateResultants {
             return remainder;
         }
 
-        /** Run all steps. */
+        /**
+         * Run all steps.
+         */
         final PolynomialRemainderSequence<E> run() {
             if (lastRemainder().isZero())
                 // on of the factors is zero
                 return this;
-            while (!step().isZero()) ; return this;
+            while (!step().isZero()) ;
+            return this;
         }
 
-        /** n_i - n_{i+1} */
+        /**
+         * n_i - n_{i+1}
+         */
         final int degreeDiff(int i) {
             return remainders.get(i).degree - remainders.get(i + 1).degree;
         }
-
-        /** scalar subresultants */
-        private final ArrayList<E> subresultants = new ArrayList<>();
 
         synchronized final void computeSubresultants() {
             if (!subresultants.isEmpty())
@@ -501,7 +553,9 @@ public final class UnivariateResultants {
                 this.subresultants.set(remainders.get(i).degree, subresultants.get(i - 1));
         }
 
-        /** general setting for Fundamental Theorem of Resultant Theory */
+        /**
+         * general setting for Fundamental Theorem of Resultant Theory
+         */
         List<E> nonZeroSubresultants() {
             List<E> subresultants = new ArrayList<>();
             // largest subresultant
@@ -537,7 +591,9 @@ public final class UnivariateResultants {
             return subresultants;
         }
 
-        /** Resultant of initial polynomials */
+        /**
+         * Resultant of initial polynomials
+         */
         public final E resultant() {
             return getSubresultants().get(0);
         }
@@ -552,10 +608,14 @@ public final class UnivariateResultants {
         }
 
         @Override
-        final E nextAlpha() { return ring.getOne(); }
+        final E nextAlpha() {
+            return ring.getOne();
+        }
 
         @Override
-        E nextBeta(UnivariatePolynomial<E> remainder) { return ring.getOne(); }
+        E nextBeta(UnivariatePolynomial<E> remainder) {
+            return ring.getOne();
+        }
 
         @Override
         List<E> nonZeroSubresultants() {
@@ -636,10 +696,14 @@ public final class UnivariateResultants {
      * Primitive pseudo-division
      */
     private static final class PrimitivePolynomialRemainderSequence<E> extends PseudoPolynomialRemainderSequence<E> {
-        PrimitivePolynomialRemainderSequence(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) { super(a, b); }
+        PrimitivePolynomialRemainderSequence(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) {
+            super(a, b);
+        }
 
         @Override
-        E nextBeta(UnivariatePolynomial<E> remainder) { return remainder.content(); }
+        E nextBeta(UnivariatePolynomial<E> remainder) {
+            return remainder.content();
+        }
     }
 
     /**
@@ -648,7 +712,9 @@ public final class UnivariateResultants {
     private static final class SubresultantPolynomialRemainderSequence<E> extends PseudoPolynomialRemainderSequence<E> {
         final List<E> psis = new ArrayList<>();
 
-        SubresultantPolynomialRemainderSequence(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) { super(a, b); }
+        SubresultantPolynomialRemainderSequence(UnivariatePolynomial<E> a, UnivariatePolynomial<E> b) {
+            super(a, b);
+        }
 
         @Override
         E nextBeta(UnivariatePolynomial<E> remainder) {
@@ -712,10 +778,18 @@ public final class UnivariateResultants {
      * Classical division rule for polynomials over Zp
      */
     public static final class PolynomialRemainderSequenceZp64 extends APolynomialRemainderSequence<UnivariatePolynomialZp64> {
-        /** the ring */
+        /**
+         * the ring
+         */
         final IntegersZp64 ring;
-        /** whether the first poly had smaller degree than the second */
+        /**
+         * whether the first poly had smaller degree than the second
+         */
         final boolean swap;
+        /**
+         * scalar subresultants
+         */
+        private final TLongArrayList subresultants = new TLongArrayList();
 
         PolynomialRemainderSequenceZp64(UnivariatePolynomialZp64 a, UnivariatePolynomialZp64 b) {
             super(a, b);
@@ -731,7 +805,9 @@ public final class UnivariateResultants {
             }
         }
 
-        /** A single step of the Euclidean algorithm */
+        /**
+         * A single step of the Euclidean algorithm
+         */
         private UnivariatePolynomialZp64 step() {
             int i = remainders.size();
             UnivariatePolynomialZp64
@@ -752,16 +828,20 @@ public final class UnivariateResultants {
             return remainder;
         }
 
-        /** Run all steps. */
-        private PolynomialRemainderSequenceZp64 run() { while (!step().isZero()) ; return this;}
+        /**
+         * Run all steps.
+         */
+        private PolynomialRemainderSequenceZp64 run() {
+            while (!step().isZero()) ;
+            return this;
+        }
 
-        /** n_i - n_{i+1} */
+        /**
+         * n_i - n_{i+1}
+         */
         final int degreeDiff(int i) {
             return remainders.get(i).degree - remainders.get(i + 1).degree;
         }
-
-        /** scalar subresultants */
-        private final TLongArrayList subresultants = new TLongArrayList();
 
         synchronized final void computeSubresultants() {
             if (!subresultants.isEmpty())
@@ -779,7 +859,9 @@ public final class UnivariateResultants {
                 this.subresultants.set(remainders.get(i).degree, subresultants.get(i - 1));
         }
 
-        /** general setting for Fundamental Theorem of Resultant Theory */
+        /**
+         * general setting for Fundamental Theorem of Resultant Theory
+         */
         TLongArrayList nonZeroSubresultants() {
             TLongArrayList subresultants = new TLongArrayList();
             // largest subresultant
@@ -808,7 +890,9 @@ public final class UnivariateResultants {
             return subresultants;
         }
 
-        /** Resultant of initial polynomials */
+        /**
+         * Resultant of initial polynomials
+         */
         public final long resultant() {
             return getSubresultants().get(0);
         }

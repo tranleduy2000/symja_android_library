@@ -1,21 +1,22 @@
 package cc.redberry.rings.poly.multivar;
 
-import cc.redberry.rings.bigint.BigInteger;
-import cc.redberry.rings.poly.Util;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import cc.redberry.rings.bigint.BigInteger;
+import cc.redberry.rings.poly.Util;
 
 /**
  * @since 1.0
  */
 class Conversions64bit {
-    private Conversions64bit() {}
-
     /**
      * whether to switch to 64 bit integer arithmetic when possible (false in tests)
      */
     static boolean SWITCH_TO_64bit = true;
+
+    private Conversions64bit() {
+    }
 
     static boolean canConvertToZp64(AMultivariatePolynomial poly) {
         return SWITCH_TO_64bit && Util.canConvertToZp64(poly);

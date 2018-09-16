@@ -11,45 +11,69 @@ import cc.redberry.rings.primes.BigPrimes;
  * @since 1.0
  */
 public final class Integers extends AIntegers {
+    /**
+     * The ring of integers (Z)
+     */
+    public static final Integers Integers = new Integers();
     private static final long serialVersionUID = 1L;
 
-    /** The ring of integers (Z) */
-    public static final Integers Integers = new Integers();
-
-    private Integers() {}
+    private Integers() {
+    }
 
     @Override
-    public boolean isField() {return false;}
+    public boolean isField() {
+        return false;
+    }
 
     @Override
-    public boolean isEuclideanRing() {return true;}
+    public boolean isEuclideanRing() {
+        return true;
+    }
 
     @Override
-    public BigInteger cardinality() {return null;}
+    public BigInteger cardinality() {
+        return null;
+    }
 
     @Override
-    public BigInteger characteristic() {return BigInteger.ZERO;}
+    public BigInteger characteristic() {
+        return BigInteger.ZERO;
+    }
 
     @Override
-    public boolean isUnit(BigInteger element) {return isOne(element) || isMinusOne(element);}
+    public boolean isUnit(BigInteger element) {
+        return isOne(element) || isMinusOne(element);
+    }
 
     @Override
-    public BigInteger add(BigInteger a, BigInteger b) {return a.add(b);}
+    public BigInteger add(BigInteger a, BigInteger b) {
+        return a.add(b);
+    }
 
     @Override
-    public BigInteger subtract(BigInteger a, BigInteger b) {return a.subtract(b);}
+    public BigInteger subtract(BigInteger a, BigInteger b) {
+        return a.subtract(b);
+    }
 
     @Override
-    public BigInteger negate(BigInteger element) {return element.negate();}
+    public BigInteger negate(BigInteger element) {
+        return element.negate();
+    }
 
     @Override
-    public BigInteger multiply(BigInteger a, BigInteger b) {return a.multiply(b);}
+    public BigInteger multiply(BigInteger a, BigInteger b) {
+        return a.multiply(b);
+    }
 
     @Override
-    public BigInteger[] divideAndRemainder(BigInteger a, BigInteger b) {return a.divideAndRemainder(b);}
+    public BigInteger[] divideAndRemainder(BigInteger a, BigInteger b) {
+        return a.divideAndRemainder(b);
+    }
 
     @Override
-    public BigInteger remainder(BigInteger a, BigInteger b) {return a.mod(b);}
+    public BigInteger remainder(BigInteger a, BigInteger b) {
+        return a.mod(b);
+    }
 
     @Override
     public BigInteger reciprocal(BigInteger element) {
@@ -93,16 +117,24 @@ public final class Integers extends AIntegers {
     }
 
     @Override
-    public BigInteger valueOf(BigInteger val) {return val;}
+    public BigInteger valueOf(BigInteger val) {
+        return val;
+    }
 
     @Override
-    public BigInteger valueOf(long val) {return BigInteger.valueOf(val);}
+    public BigInteger valueOf(long val) {
+        return BigInteger.valueOf(val);
+    }
 
     @Override
-    public BigInteger getNegativeOne() {return BigInteger.NEGATIVE_ONE;}
+    public BigInteger getNegativeOne() {
+        return BigInteger.NEGATIVE_ONE;
+    }
 
     @Override
-    public boolean isMinusOne(BigInteger bigInteger) {return bigInteger.isMinusOne();}
+    public boolean isMinusOne(BigInteger bigInteger) {
+        return bigInteger.isMinusOne();
+    }
 
     @Override
     public final int signum(BigInteger element) {
@@ -115,7 +147,9 @@ public final class Integers extends AIntegers {
     }
 
     @Override
-    public String toString() {return "Z";}
+    public String toString() {
+        return "Z";
+    }
 
     @Override
     public Iterator<BigInteger> iterator() {

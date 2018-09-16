@@ -22,11 +22,11 @@ import cc.redberry.rings.io.Stringifiable;
  * @since 1.0
  */
 public interface Ring<E> extends
-                         Comparator<E>,
-                         Iterable<E>,
-                         IParser<E>,
-                         Stringifiable<E>,
-                         java.io.Serializable {
+        Comparator<E>,
+        Iterable<E>,
+        IParser<E>,
+        Stringifiable<E>,
+        java.io.Serializable {
     /**
      * Returns whether this ring is a field
      *
@@ -209,7 +209,9 @@ public interface Ring<E> extends
      * @param b the second element
      * @return a + b
      */
-    default E addMutable(E a, E b) {return add(a, b);}
+    default E addMutable(E a, E b) {
+        return add(a, b);
+    }
 
     /**
      * Subtracts {@code b} from {@code a} and destroys the initial content of {@code a}
@@ -218,7 +220,9 @@ public interface Ring<E> extends
      * @param b the second element
      * @return a - b
      */
-    default E subtractMutable(E a, E b) {return subtract(a, b);}
+    default E subtractMutable(E a, E b) {
+        return subtract(a, b);
+    }
 
     /**
      * Multiplies two elements and destroys the initial content of {@code a}
@@ -227,7 +231,9 @@ public interface Ring<E> extends
      * @param b the second element
      * @return a * b
      */
-    default E multiplyMutable(E a, E b) { return multiply(a, b);}
+    default E multiplyMutable(E a, E b) {
+        return multiply(a, b);
+    }
 
     /**
      * Negates the given element and destroys the initial content of {@code element}
@@ -235,7 +241,9 @@ public interface Ring<E> extends
      * @param element the ring element (may be destroyed)
      * @return -element
      */
-    default E negateMutable(E element) { return negate(element);}
+    default E negateMutable(E element) {
+        return negate(element);
+    }
 
     /**
      * Makes a deep copy of the specified element (for immutable instances the same reference returned).
@@ -342,7 +350,9 @@ public interface Ring<E> extends
         return result;
     }
 
-    /** Internal API */
+    /**
+     * Internal API
+     */
     default E divideExactMutable(E dividend, E divider) {
         return divideExact(dividend, divider);
     }
@@ -860,7 +870,9 @@ public interface Ring<E> extends
      *
      * @return random element from this ring
      */
-    default E randomElement() { return randomElement(Rings.privateRandom);}
+    default E randomElement() {
+        return randomElement(Rings.privateRandom);
+    }
 
     /**
      * Returns a random element from this ring
@@ -868,7 +880,9 @@ public interface Ring<E> extends
      * @param rnd the source of randomness
      * @return random element from this ring
      */
-    default E randomElement(RandomGenerator rnd) { return valueOf(rnd.nextLong());}
+    default E randomElement(RandomGenerator rnd) {
+        return valueOf(rnd.nextLong());
+    }
 
     /**
      * If this ring has a complicated nested structure, this method guaranties that the resulting random element will
@@ -876,7 +890,9 @@ public interface Ring<E> extends
      *
      * @return random element from this ring
      */
-    default E randomElementTree(RandomGenerator rnd) { return randomElement(rnd);}
+    default E randomElementTree(RandomGenerator rnd) {
+        return randomElement(rnd);
+    }
 
     /**
      * If this ring has a complicated nested structure, this method guaranties that the resulting random element will
@@ -884,7 +900,9 @@ public interface Ring<E> extends
      *
      * @return random element from this ring
      */
-    default E randomElementTree() { return randomElementTree(Rings.privateRandom);}
+    default E randomElementTree() {
+        return randomElementTree(Rings.privateRandom);
+    }
 
     /**
      * Returns a random non zero element from this ring

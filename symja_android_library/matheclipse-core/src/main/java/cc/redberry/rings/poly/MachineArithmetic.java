@@ -9,14 +9,20 @@ import cc.redberry.rings.bigint.BigInteger;
  * @since 1.0
  */
 public final class MachineArithmetic {
-    private MachineArithmetic() {}
-
-    /** Max supported modulus bits which fits into machine word */
+    /**
+     * Max supported modulus bits which fits into machine word
+     */
     public static final int MAX_SUPPORTED_MODULUS_BITS = 62;
-    /** Max supported modulus which fits into machine word */
+    /**
+     * Max supported modulus which fits into machine word
+     */
     public static final long MAX_SUPPORTED_MODULUS = (1L << MAX_SUPPORTED_MODULUS_BITS) - 1L;
-    /** Max supported modulus */
+    /**
+     * Max supported modulus
+     */
     public static final BigInteger b_MAX_SUPPORTED_MODULUS = BigInteger.valueOf(MAX_SUPPORTED_MODULUS);
+    private MachineArithmetic() {
+    }
 
     /**
      * Returns true if {@code val} fits into 32-bit machine word (unsigned) and false otherwise
@@ -454,7 +460,9 @@ public final class MachineArithmetic {
         return gcd(integers, 0, integers.length);
     }
 
-    /** Delegates to {@link Math#floorMod(long, long)} */
+    /**
+     * Delegates to {@link Math#floorMod(long, long)}
+     */
     public static long mod(long num, long modulus) {
         if (num < 0)
             num += modulus; //<- may help

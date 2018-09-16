@@ -46,22 +46,53 @@ public class Coder<
         Poly extends AMultivariatePolynomial<Term, Poly>>
         implements IParser<Element>, IStringifier<Element> {
     // parser stuff
-    /** the base ring */
+    private static final Operator[] tokenToOp;
+
+    static {
+        tokenToOp = new Operator[TokenType.values().length];
+        tokenToOp[TokenType.T_BRACKET_OPEN.ordinal()] = Operator.BRACKET_OPEN;
+        tokenToOp[TokenType.T_BRACKET_CLOSE.ordinal()] = Operator.BRACKET_CLOSE;
+        tokenToOp[TokenType.T_MULTIPLY.ordinal()] = Operator.MULTIPLY;
+        tokenToOp[TokenType.T_DIVIDE.ordinal()] = Operator.DIVIDE;
+        tokenToOp[TokenType.T_PLUS.ordinal()] = Operator.PLUS;
+        tokenToOp[TokenType.T_MINUS.ordinal()] = Operator.MINUS;
+        tokenToOp[TokenType.T_EXPONENT.ordinal()] = Operator.POWER;
+    }
+
+    /**
+     * the base ring
+     */
     protected final Ring<Element> baseRing;
-    /** map variableName -> Element (if it is a polynomial variable) */
+    /**
+     * map variableName -> Element (if it is a polynomial variable)
+     */
     protected final Map<String, Element> eVariables;
-    /** auxiliary polynomial ring */
+    /**
+     * auxiliary polynomial ring
+     */
     protected final MultivariateRing<Poly> polyRing;
-    /** map variableName -> variableIndex (if it is a polynomial variable) */
-    protected final Map<String, Integer> pVariables;
-    /** convert polynomial to base ring elements */
-    protected final Function<Poly, Element> polyToElement;
 
     // stringifier stuff
-    /** toString bindings */
+    /**
+     * map variableName -> variableIndex (if it is a polynomial variable)
+     */
+    protected final Map<String, Integer> pVariables;
+    /**
+     * convert polynomial to base ring elements
+     */
+    protected final Function<Poly, Element> polyToElement;
+    /**
+     * toString bindings
+     */
     protected final Map<Element, String> bindings;
-    /** inner coders */
+    /**
+     * inner coders
+     */
     protected final Map<Ring<?>, Coder<?, ?, ?>> subcoders;
+    /**
+     * zero operand
+     */
+    private final NumberOperand Zero = new NumberOperand(BigInteger.ZERO);
 
     private Coder(Ring<Element> baseRing,
                   Map<String, Element> eVariables,
@@ -82,84 +113,6 @@ public class Coder<
                 .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (prev, n) -> n));
         this.subcoders = new HashMap<>();
     }
-
-    /** Add string -> element mapping */
-    public Coder<Element, Term, Poly> bind(String var, Element el) {
-        bindings.put(el, var);
-        eVariables.put(var, el);
-        return this;
-    }
-
-    /** Add string -> element mapping */
-    public Coder<Element, Term, Poly> bindAlias(String var, Element el) {
-        eVariables.put(var, el);
-        return this;
-    }
-
-    /** Add stringifier of inner elements */
-    public Coder<Element, Term, Poly> withEncoder(Coder<?, ?, ?> subencoder) {
-        subcoders.put(subencoder.baseRing, subencoder);
-        return this;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <K> IStringifier<K> substringifier(Ring<K> ring) {
-        IStringifier<K> s = (IStringifier<K>) subcoders.get(ring);
-        if (s == null)
-            return IStringifier.dummy();
-        else
-            return s;
-    }
-
-    @Override
-    public Map<Element, String> getBindings() {
-        return bindings;
-    }
-
-    /**
-     * Decode element from its string representation (#parse)
-     */
-    public Element decode(String string) {
-        return parse(string);
-    }
-
-    /**
-     * Encode element to its string representation (#stringify)
-     */
-    @SuppressWarnings("unchecked")
-    public String encode(Element element) {
-        return stringify(element);
-    }
-
-    /**
-     * Maps this coder to a given type via mapper {@code func} which just applies to each parsed element as well as to
-     * bindings (for {@link #stringify(Object)}).
-     */
-    public <Oth> Coder<Oth, ?, ?> map(Ring<Oth> ring, Function<Element, Oth> func) {
-        Map<String, Oth> _eVariables = eVariables
-                .entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> func.apply(e.getValue())));
-
-        Map<Oth, String> _bindings = bindings
-                .entrySet().stream()
-                .collect(Collectors.toMap(e -> func.apply(e.getKey()), Map.Entry::getValue));
-
-        Coder<Element, Term, Poly> _this = this;
-        return new Coder<Oth, Term, Poly>(ring, _eVariables, null, null, null) {
-            {
-                this.subcoders.putAll(_this.subcoders);
-                this.bindings.putAll(_bindings);
-            }
-
-            @Override
-            public Oth parse(Tokenizer tokenizer) {
-                return func.apply(_this.parse(tokenizer));
-            }
-        };
-    }
-
-    ////////////////////////////////////////////////////Factory////////////////////////////////////////////////////////
 
     /**
      * @param baseRing      the base ring
@@ -246,6 +199,8 @@ public class Coder<
                              String... variables) {
         return mkMultipleExtensionCoder(field, mkVarsMap(field, variables));
     }
+
+    ////////////////////////////////////////////////////Factory////////////////////////////////////////////////////////
 
     private static <E extends IPolynomial<E>> Map<String, E>
     mkVarsMap(IPolynomialRing<E> ring, String... variables) {
@@ -337,7 +292,6 @@ public class Coder<
         return mkMultivariateCoder(ring, cfCoder, eVariables);
     }
 
-
     /**
      * Create coder for univariate polynomial rings
      *
@@ -363,7 +317,9 @@ public class Coder<
     public static <Poly extends IUnivariatePolynomial<Poly>>
     Coder<Poly, ?, ?> mkUnivariateCoder(IPolynomialRing<Poly> ring,
                                         String variable) {
-        return mkUnivariateCoder(ring, new HashMap<String, Poly>() {{put(variable, ring.variable(0));}});
+        return mkUnivariateCoder(ring, new HashMap<String, Poly>() {{
+            put(variable, ring.variable(0));
+        }});
     }
 
     /**
@@ -409,7 +365,7 @@ public class Coder<
 
     /**
      * Create coder for nested rings (e.g. fractions over polynomials etc).
-     *
+     * <p>
      * <p>Example:
      * <pre><code>
      * // GF(17, 3) as polynomials over "t"
@@ -461,9 +417,126 @@ public class Coder<
                 .withEncoder(innerCoder);
     }
 
+    /**
+     * convert token to operator
+     */
+    private static Operator tokenToOp(TokenType tType) {
+        return tokenToOp[tType.ordinal()];
+    }
+
+    private static boolean isInteger(String str) {
+        if (str == null) {
+            return false;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        int i = 0;
+        if (str.charAt(0) == '-') {
+            if (length == 1) {
+                return false;
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char c = str.charAt(i);
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Add string -> element mapping
+     */
+    public Coder<Element, Term, Poly> bind(String var, Element el) {
+        bindings.put(el, var);
+        eVariables.put(var, el);
+        return this;
+    }
+
+    /**
+     * Add string -> element mapping
+     */
+    public Coder<Element, Term, Poly> bindAlias(String var, Element el) {
+        eVariables.put(var, el);
+        return this;
+    }
+
+    /**
+     * Add stringifier of inner elements
+     */
+    public Coder<Element, Term, Poly> withEncoder(Coder<?, ?, ?> subencoder) {
+        subcoders.put(subencoder.baseRing, subencoder);
+        return this;
+    }
+
     ///////////////////////////////////////////////////Implementation///////////////////////////////////////////////////
 
-    /** Parse string */
+    @Override
+    @SuppressWarnings("unchecked")
+    public <K> IStringifier<K> substringifier(Ring<K> ring) {
+        IStringifier<K> s = (IStringifier<K>) subcoders.get(ring);
+        if (s == null)
+            return IStringifier.dummy();
+        else
+            return s;
+    }
+
+    @Override
+    public Map<Element, String> getBindings() {
+        return bindings;
+    }
+
+    /**
+     * Decode element from its string representation (#parse)
+     */
+    public Element decode(String string) {
+        return parse(string);
+    }
+
+    /**
+     * Encode element to its string representation (#stringify)
+     */
+    @SuppressWarnings("unchecked")
+    public String encode(Element element) {
+        return stringify(element);
+    }
+
+    /**
+     * Maps this coder to a given type via mapper {@code func} which just applies to each parsed element as well as to
+     * bindings (for {@link #stringify(Object)}).
+     */
+    public <Oth> Coder<Oth, ?, ?> map(Ring<Oth> ring, Function<Element, Oth> func) {
+        Map<String, Oth> _eVariables = eVariables
+                .entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> func.apply(e.getValue())));
+
+        Map<Oth, String> _bindings = bindings
+                .entrySet().stream()
+                .collect(Collectors.toMap(e -> func.apply(e.getKey()), Map.Entry::getValue));
+
+        Coder<Element, Term, Poly> _this = this;
+        return new Coder<Oth, Term, Poly>(ring, _eVariables, null, null, null) {
+            {
+                this.subcoders.putAll(_this.subcoders);
+                this.bindings.putAll(_bindings);
+            }
+
+            @Override
+            public Oth parse(Tokenizer tokenizer) {
+                return func.apply(_this.parse(tokenizer));
+            }
+        };
+    }
+
+    //////////////////////////////////////////////////////Operands//////////////////////////////////////////////////////
+
+    /**
+     * Parse string
+     */
     public Element parse(String string) {
         return parse(Tokenizer.mkTokenizer(string));
     }
@@ -530,7 +603,9 @@ public class Coder<
         return baseRing.valueOf(operands.pop().toElement());
     }
 
-    /** parse operand token */
+    /**
+     * parse operand token
+     */
     private IOperand<Poly, Element> mkOperand(Token operand) {
         if (isInteger(operand.content))
             return new NumberOperand(new BigInteger(operand.content));
@@ -551,7 +626,9 @@ public class Coder<
         throw new RuntimeException("illegal operand: " + operand);
     }
 
-    /** whether can pop element from ops stack */
+    /**
+     * whether can pop element from ops stack
+     */
     private boolean canPop(Operator op, ArrayDeque<Operator> opsStack) {
         if (opsStack.isEmpty())
             return false;
@@ -565,7 +642,9 @@ public class Coder<
                 || (op.associativity == Associativity.RightToLeft && pOp > pOpPrev);
     }
 
-    /** pop two elements from operands stack and apply binary op from ops stack */
+    /**
+     * pop two elements from operands stack and apply binary op from ops stack
+     */
     private void popEvaluate(ArrayDeque<Operator> opsStack, ArrayDeque<IOperand<Poly, Element>> exprStack) {
         IOperand<Poly, Element>
                 right = exprStack.pop(),
@@ -592,23 +671,75 @@ public class Coder<
                     throw new IllegalArgumentException("Exponents must be positive integers, but got " + right.toElement());
                 result = left.pow(((NumberOperand) right).number);
                 break;
-            default: throw new RuntimeException();
+            default:
+                throw new RuntimeException();
         }
 
         exprStack.push(result);
     }
 
-    //////////////////////////////////////////////////////Operands//////////////////////////////////////////////////////
+    private enum Associativity {
+        LeftToRight,
+        RightToLeft
+    }
 
-    /** optimized operations with operands */
+    /**
+     * Operators
+     */
+    private enum Operator {
+        // dummy ops
+        BRACKET_OPEN(null, -1),
+        BRACKET_CLOSE(null, -1),
+
+        // priority = 2
+        POWER(Associativity.LeftToRight, 20),
+
+        // priority = 3
+        UNARY_PLUS(Associativity.RightToLeft, 30),
+        UNARY_MINUS(Associativity.RightToLeft, 30),
+
+        // priority = 5
+        MULTIPLY(Associativity.LeftToRight, 50),
+        DIVIDE(Associativity.LeftToRight, 50),
+
+        // priority = 6
+        PLUS(Associativity.LeftToRight, 60),
+        MINUS(Associativity.LeftToRight, 60);
+
+        final Associativity associativity;
+        final int priority;
+
+        Operator(Associativity associativity, int priority) {
+            this.associativity = associativity;
+            this.priority = priority;
+        }
+
+        static boolean isPlusMinus(Operator op) {
+            return PLUS == op || MINUS == op;
+        }
+
+        static Operator toUnaryPlusMinus(Operator op) {
+            return op == PLUS ? UNARY_PLUS : op == MINUS ? UNARY_MINUS : null;
+        }
+    }
+
+    /**
+     * optimized operations with operands
+     */
     private interface IOperand<P, E> {
-        /** to auxiliary poly */
+        /**
+         * to auxiliary poly
+         */
         P toPoly();
 
-        /** to base ring element */
+        /**
+         * to base ring element
+         */
         E toElement();
 
-        /** whether this operand is already converted to a base ring element */
+        /**
+         * whether this operand is already converted to a base ring element
+         */
         default boolean inBaseRing() {
             return this instanceof Coder.ElementOperand;
         }
@@ -624,7 +755,11 @@ public class Coder<
         IOperand<P, E> pow(BigInteger exponent);
     }
 
-    /** default implementation of operands algebra */
+    /////////////////////////////////////////////////////Operators//////////////////////////////////////////////////////
+
+    /**
+     * default implementation of operands algebra
+     */
     private abstract class DefaultOperandOps implements IOperand<Poly, Element> {
         @Override
         public Element toElement() {
@@ -669,14 +804,15 @@ public class Coder<
         }
     }
 
-    /** zero operand */
-    private final NumberOperand Zero = new NumberOperand(BigInteger.ZERO);
-
-    /** A single number */
+    /**
+     * A single number
+     */
     private final class NumberOperand extends DefaultOperandOps implements IOperand<Poly, Element> {
         final BigInteger number;
 
-        NumberOperand(BigInteger number) { this.number = number; }
+        NumberOperand(BigInteger number) {
+            this.number = number;
+        }
 
         @Override
         public Poly toPoly() {
@@ -730,14 +866,20 @@ public class Coder<
         }
     }
 
-    /** A single variable */
+    /**
+     * A single variable
+     */
     private final class VarOperand extends DefaultOperandOps implements IOperand<Poly, Element> {
         final int variable;
 
-        VarOperand(int variable) { this.variable = variable; }
+        VarOperand(int variable) {
+            this.variable = variable;
+        }
 
         @Override
-        public Poly toPoly() { return polyRing.variable(variable); }
+        public Poly toPoly() {
+            return polyRing.variable(variable);
+        }
 
         @Override
         public IOperand<Poly, Element> multiply(IOperand<Poly, Element> oth) {
@@ -762,7 +904,9 @@ public class Coder<
         }
     }
 
-    /** A single monomial (x*y^2*z etc) */
+    /**
+     * A single monomial (x*y^2*z etc)
+     */
     private class MonomialOperand extends DefaultOperandOps implements IOperand<Poly, Element> {
         Term term;
 
@@ -808,17 +952,25 @@ public class Coder<
         }
     }
 
-    /** A single polynomial */
+    /**
+     * A single polynomial
+     */
     private class PolyOperand extends DefaultOperandOps implements IOperand<Poly, Element> {
         final Poly poly;
 
-        PolyOperand(Poly poly) { this.poly = poly; }
+        PolyOperand(Poly poly) {
+            this.poly = poly;
+        }
 
         @Override
-        public Poly toPoly() { return poly; }
+        public Poly toPoly() {
+            return poly;
+        }
     }
 
-    /** Base ring element */
+    /**
+     * Base ring element
+     */
     private class ElementOperand extends DefaultOperandOps implements IOperand<Poly, Element> {
         final Element element;
 
@@ -835,92 +987,5 @@ public class Coder<
         public Element toElement() {
             return element;
         }
-    }
-
-    /////////////////////////////////////////////////////Operators//////////////////////////////////////////////////////
-
-    private enum Associativity {
-        LeftToRight,
-        RightToLeft
-    }
-
-    /** Operators */
-    private enum Operator {
-        // dummy ops
-        BRACKET_OPEN(null, -1),
-        BRACKET_CLOSE(null, -1),
-
-        // priority = 2
-        POWER(Associativity.LeftToRight, 20),
-
-        // priority = 3
-        UNARY_PLUS(Associativity.RightToLeft, 30),
-        UNARY_MINUS(Associativity.RightToLeft, 30),
-
-        // priority = 5
-        MULTIPLY(Associativity.LeftToRight, 50),
-        DIVIDE(Associativity.LeftToRight, 50),
-
-        // priority = 6
-        PLUS(Associativity.LeftToRight, 60),
-        MINUS(Associativity.LeftToRight, 60);
-
-        final Associativity associativity;
-        final int priority;
-
-        Operator(Associativity associativity, int priority) {
-            this.associativity = associativity;
-            this.priority = priority;
-        }
-
-        static boolean isPlusMinus(Operator op) {
-            return PLUS == op || MINUS == op;
-        }
-
-        static Operator toUnaryPlusMinus(Operator op) {
-            return op == PLUS ? UNARY_PLUS : op == MINUS ? UNARY_MINUS : null;
-        }
-    }
-
-    /** convert token to operator */
-    private static Operator tokenToOp(TokenType tType) {
-        return tokenToOp[tType.ordinal()];
-    }
-
-    private static final Operator[] tokenToOp;
-
-    static {
-        tokenToOp = new Operator[TokenType.values().length];
-        tokenToOp[TokenType.T_BRACKET_OPEN.ordinal()] = Operator.BRACKET_OPEN;
-        tokenToOp[TokenType.T_BRACKET_CLOSE.ordinal()] = Operator.BRACKET_CLOSE;
-        tokenToOp[TokenType.T_MULTIPLY.ordinal()] = Operator.MULTIPLY;
-        tokenToOp[TokenType.T_DIVIDE.ordinal()] = Operator.DIVIDE;
-        tokenToOp[TokenType.T_PLUS.ordinal()] = Operator.PLUS;
-        tokenToOp[TokenType.T_MINUS.ordinal()] = Operator.MINUS;
-        tokenToOp[TokenType.T_EXPONENT.ordinal()] = Operator.POWER;
-    }
-
-    private static boolean isInteger(String str) {
-        if (str == null) {
-            return false;
-        }
-        int length = str.length();
-        if (length == 0) {
-            return false;
-        }
-        int i = 0;
-        if (str.charAt(0) == '-') {
-            if (length == 1) {
-                return false;
-            }
-            i = 1;
-        }
-        for (; i < length; i++) {
-            char c = str.charAt(i);
-            if (c < '0' || c > '9') {
-                return false;
-            }
-        }
-        return true;
     }
 }

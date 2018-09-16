@@ -10,105 +10,43 @@ import java.util.Comparator;
  * @since 1.0
  */
 public final class MonomialOrder {
-    private MonomialOrder() { }
-
     /**
      * Lexicographic monomial order.
      */
     public static final Comparator<DegreeVector> LEX = Lex.instance;
-
-    private static final class Lex implements Comparator<DegreeVector>, Serializable {
-        private static final Lex instance = new Lex();
-
-        private Lex() {}
-
-        @Override
-        public int compare(DegreeVector a, DegreeVector b) {
-            for (int i = 0; i < a.exponents.length; ++i) {
-                int c = Integer.compare(a.exponents[i], b.exponents[i]);
-                if (c != 0)
-                    return c;
-            }
-            return 0;
-        }
-
-        protected Object readResolve() { return instance; }
-    }
-
     /**
      * Graded lexicographic monomial order.
      */
     public static final Comparator<DegreeVector> GRLEX = Grlex.instance;
-
-    private static final class Grlex implements Comparator<DegreeVector>, Serializable {
-        private static final Grlex instance = new Grlex();
-
-        private Grlex() {}
-
-        @Override
-        public int compare(DegreeVector a, DegreeVector b) {
-            int c = Integer.compare(a.totalDegree, b.totalDegree);
-            return c != 0 ? c : LEX.compare(a, b);
-        }
-
-        protected Object readResolve() { return instance; }
-    }
-
-
     /**
      * Antilexicographic monomial order.
      */
     public static final Comparator<DegreeVector> ALEX = Alex.instance;
-
-    private static final class Alex implements Comparator<DegreeVector>, Serializable {
-        private static final Alex instance = new Alex();
-
-        private Alex() {}
-
-        @Override
-        public int compare(DegreeVector a, DegreeVector b) {
-            return LEX.compare(b, a);
-        }
-
-        protected Object readResolve() { return instance; }
-    }
-
     /**
      * Graded reverse lexicographic monomial order
      */
     public static final Comparator<DegreeVector> GREVLEX = Grevlex.instance;
-
-    private static final class Grevlex implements Comparator<DegreeVector>, Serializable {
-        private static final Grevlex instance = new Grevlex();
-
-        private Grevlex() {}
-
-        @Override
-        public int compare(DegreeVector a, DegreeVector b) {
-            int c = Integer.compare(a.totalDegree, b.totalDegree);
-            if (c != 0)
-                return c;
-            for (int i = a.exponents.length - 1; i >= 0; --i) {
-                c = Integer.compare(b.exponents[i], a.exponents[i]);
-                if (c != 0)
-                    return c;
-            }
-            return 0;
-        }
-
-        protected Object readResolve() { return instance; }
-    }
-
-    /** Default monomial order (GREVLEX) */
+    /**
+     * Default monomial order (GREVLEX)
+     */
     public static final Comparator<DegreeVector> DEFAULT = parse(System.getProperty("defaultMonomialOrder", "grevlex").toLowerCase());
+
+
+    private MonomialOrder() {
+    }
 
     static Comparator<DegreeVector> parse(String string) {
         switch (string.toLowerCase()) {
-            case "lex": return LEX;
-            case "grlex": return GRLEX;
-            case "grevlex": return GREVLEX;
-            case "alex": return ALEX;
-            default: throw new RuntimeException("unknown: " + string);
+            case "lex":
+                return LEX;
+            case "grlex":
+                return GRLEX;
+            case "grevlex":
+                return GREVLEX;
+            case "alex":
+                return ALEX;
+            default:
+                throw new RuntimeException("unknown: " + string);
         }
     }
 
@@ -127,11 +65,91 @@ public final class MonomialOrder {
         return new ProductOrder(new Comparator[]{a, b}, new int[]{anVariables, bnVariable});
     }
 
-    /** whether monomial order is graded */
+    /**
+     * whether monomial order is graded
+     */
     public static boolean isGradedOrder(Comparator<DegreeVector> monomialOrder) {
         return monomialOrder == GREVLEX
                 || monomialOrder == GRLEX
                 || monomialOrder instanceof GrevLexWithPermutation;
+    }
+
+    private static final class Lex implements Comparator<DegreeVector>, Serializable {
+        private static final Lex instance = new Lex();
+
+        private Lex() {
+        }
+
+        @Override
+        public int compare(DegreeVector a, DegreeVector b) {
+            for (int i = 0; i < a.exponents.length; ++i) {
+                int c = Integer.compare(a.exponents[i], b.exponents[i]);
+                if (c != 0)
+                    return c;
+            }
+            return 0;
+        }
+
+        protected Object readResolve() {
+            return instance;
+        }
+    }
+
+    private static final class Grlex implements Comparator<DegreeVector>, Serializable {
+        private static final Grlex instance = new Grlex();
+
+        private Grlex() {
+        }
+
+        @Override
+        public int compare(DegreeVector a, DegreeVector b) {
+            int c = Integer.compare(a.totalDegree, b.totalDegree);
+            return c != 0 ? c : LEX.compare(a, b);
+        }
+
+        protected Object readResolve() {
+            return instance;
+        }
+    }
+
+    private static final class Alex implements Comparator<DegreeVector>, Serializable {
+        private static final Alex instance = new Alex();
+
+        private Alex() {
+        }
+
+        @Override
+        public int compare(DegreeVector a, DegreeVector b) {
+            return LEX.compare(b, a);
+        }
+
+        protected Object readResolve() {
+            return instance;
+        }
+    }
+
+    private static final class Grevlex implements Comparator<DegreeVector>, Serializable {
+        private static final Grevlex instance = new Grevlex();
+
+        private Grevlex() {
+        }
+
+        @Override
+        public int compare(DegreeVector a, DegreeVector b) {
+            int c = Integer.compare(a.totalDegree, b.totalDegree);
+            if (c != 0)
+                return c;
+            for (int i = a.exponents.length - 1; i >= 0; --i) {
+                c = Integer.compare(b.exponents[i], a.exponents[i]);
+                if (c != 0)
+                    return c;
+            }
+            return 0;
+        }
+
+        protected Object readResolve() {
+            return instance;
+        }
     }
 
     static final class ProductOrder implements Comparator<DegreeVector>, Serializable {

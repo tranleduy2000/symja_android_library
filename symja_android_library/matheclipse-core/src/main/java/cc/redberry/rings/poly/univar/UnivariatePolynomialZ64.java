@@ -1,5 +1,8 @@
 package cc.redberry.rings.poly.univar;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import cc.redberry.libdivide4j.FastDivision.Magic;
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.Rings;
@@ -9,16 +12,13 @@ import cc.redberry.rings.poly.MachineArithmetic;
 import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
 import cc.redberry.rings.poly.multivar.DegreeVector;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 import static cc.redberry.libdivide4j.FastDivision.divideSignedFast;
 import static cc.redberry.libdivide4j.FastDivision.magicSigned;
 
 /**
  * Univariate polynomial over machine integers in range [-2^63, 2^63]. <b>NOTE:</b> this class is used in internal
  * routines for performance reasons, for usual polynomials over Z use {@link UnivariatePolynomial} over BigIntegers.
- *
+ * <p>
  * <p> Arithmetic operations on instances of this type may cause long overflow in which case a proper {@link
  * ArithmeticException} will be thrown.
  *
@@ -27,7 +27,9 @@ import static cc.redberry.libdivide4j.FastDivision.magicSigned;
 public final class UnivariatePolynomialZ64 extends AUnivariatePolynomial64<UnivariatePolynomialZ64> {
     private static final long serialVersionUID = 1L;
 
-    /** main constructor */
+    /**
+     * main constructor
+     */
     private UnivariatePolynomialZ64(long[] data) {
         this.data = data;
         this.degree = data.length - 1;
@@ -35,7 +37,9 @@ public final class UnivariatePolynomialZ64 extends AUnivariatePolynomial64<Univa
         assert data.length > 0;
     }
 
-    /** copy constructor */
+    /**
+     * copy constructor
+     */
     private UnivariatePolynomialZ64(long[] data, int degree) {
         this.data = data;
         this.degree = degree;
@@ -149,7 +153,9 @@ public final class UnivariatePolynomialZ64 extends AUnivariatePolynomial64<Univa
         return modulus(ring, true);
     }
 
-    /** internal API */
+    /**
+     * internal API
+     */
     UnivariatePolynomialZp64 modulusUnsafe(long modulus) {
         return UnivariatePolynomialZp64.createUnsafe(modulus, data);
     }
@@ -215,7 +221,9 @@ public final class UnivariatePolynomialZ64 extends AUnivariatePolynomial64<Univa
     }
 
     @Override
-    public boolean sameCoefficientRingWith(UnivariatePolynomialZ64 oth) {return true;}
+    public boolean sameCoefficientRingWith(UnivariatePolynomialZ64 oth) {
+        return true;
+    }
 
     @Override
     public UnivariatePolynomialZ64 createFromArray(long[] data) {
@@ -228,16 +236,24 @@ public final class UnivariatePolynomialZ64 extends AUnivariatePolynomial64<Univa
     }
 
     @Override
-    public boolean isOverField() {return false;}
+    public boolean isOverField() {
+        return false;
+    }
 
     @Override
-    public boolean isOverFiniteField() {return false;}
+    public boolean isOverFiniteField() {
+        return false;
+    }
 
     @Override
-    public boolean isOverZ() {return true;}
+    public boolean isOverZ() {
+        return true;
+    }
 
     @Override
-    public BigInteger coefficientRingCardinality() {return null;}
+    public BigInteger coefficientRingCardinality() {
+        return null;
+    }
 
     @Override
     public BigInteger coefficientRingCharacteristic() {
@@ -272,19 +288,29 @@ public final class UnivariatePolynomialZ64 extends AUnivariatePolynomial64<Univa
     }
 
     @Override
-    long add(long a, long b) {return MachineArithmetic.safeAdd(a, b);}
+    long add(long a, long b) {
+        return MachineArithmetic.safeAdd(a, b);
+    }
 
     @Override
-    long subtract(long a, long b) {return MachineArithmetic.safeSubtract(a, b);}
+    long subtract(long a, long b) {
+        return MachineArithmetic.safeSubtract(a, b);
+    }
 
     @Override
-    long multiply(long a, long b) {return MachineArithmetic.safeMultiply(a, b);}
+    long multiply(long a, long b) {
+        return MachineArithmetic.safeMultiply(a, b);
+    }
 
     @Override
-    long negate(long a) {return MachineArithmetic.safeNegate(a);}
+    long negate(long a) {
+        return MachineArithmetic.safeNegate(a);
+    }
 
     @Override
-    long valueOf(long a) {return a;}
+    long valueOf(long a) {
+        return a;
+    }
 
     @Override
     public UnivariatePolynomialZ64 monic() {
@@ -338,7 +364,9 @@ public final class UnivariatePolynomialZ64 extends AUnivariatePolynomial64<Univa
         return multiply(factor.longValueExact());
     }
 
-    /** internal API */
+    /**
+     * internal API
+     */
     UnivariatePolynomialZ64 multiplyUnsafe(long factor) {
         for (int i = degree; i >= 0; --i)
             data[i] *= factor;
@@ -375,7 +403,9 @@ public final class UnivariatePolynomialZ64 extends AUnivariatePolynomial64<Univa
         return this;
     }
 
-    /** internal API */
+    /**
+     * internal API
+     */
     UnivariatePolynomialZ64 multiplyUnsafe(UnivariatePolynomialZ64 oth) {
         if (isZero())
             return this;

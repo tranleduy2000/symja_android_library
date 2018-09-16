@@ -1,5 +1,7 @@
 package cc.redberry.rings.poly.univar;
 
+import org.hipparchus.random.RandomGenerator;
+
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.Rings;
 import cc.redberry.rings.bigint.BigInteger;
@@ -9,7 +11,6 @@ import cc.redberry.rings.primes.SmallPrimes;
 import cc.redberry.rings.util.ArraysUtil;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.hipparchus.random.RandomGenerator;
 
 import static cc.redberry.rings.poly.univar.Conversions64bit.asOverZp64;
 import static cc.redberry.rings.poly.univar.Conversions64bit.canConvertToZp64;
@@ -20,7 +21,8 @@ import static cc.redberry.rings.poly.univar.Conversions64bit.canConvertToZp64;
  * @since 1.0
  */
 public final class IrreduciblePolynomials {
-    private IrreduciblePolynomials() {}
+    private IrreduciblePolynomials() {
+    }
 
     /**
      * Tests whether {@code poly} is irreducible

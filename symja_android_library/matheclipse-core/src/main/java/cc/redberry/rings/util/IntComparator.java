@@ -23,7 +23,7 @@
 package cc.redberry.rings.util;
 
 public interface IntComparator {
-    int compare(int a, int b);
-
     IntComparator DEFAULT = (a, b) -> Integer.compare(a, b);
+
+    int compare(int a, int b);
 }

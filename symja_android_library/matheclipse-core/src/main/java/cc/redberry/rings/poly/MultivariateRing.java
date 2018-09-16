@@ -1,12 +1,22 @@
 package cc.redberry.rings.poly;
 
-import cc.redberry.rings.Ring;
-import cc.redberry.rings.poly.multivar.*;
 import org.hipparchus.random.RandomGenerator;
 import org.hipparchus.random.Well44497b;
 
 import java.util.Comparator;
 import java.util.function.Function;
+
+import cc.redberry.rings.Ring;
+import cc.redberry.rings.poly.multivar.AMonomial;
+import cc.redberry.rings.poly.multivar.AMultivariatePolynomial;
+import cc.redberry.rings.poly.multivar.DegreeVector;
+import cc.redberry.rings.poly.multivar.IMonomialAlgebra;
+import cc.redberry.rings.poly.multivar.MultivariateDivision;
+import cc.redberry.rings.poly.multivar.MultivariateFactorization;
+import cc.redberry.rings.poly.multivar.MultivariateGCD;
+import cc.redberry.rings.poly.multivar.MultivariatePolynomial;
+import cc.redberry.rings.poly.multivar.MultivariateSquareFreeFactorization;
+import cc.redberry.rings.poly.multivar.RandomMultivariatePolynomials;
 
 /**
  * Ring of multivariate polynomials.
@@ -15,7 +25,16 @@ import java.util.function.Function;
  * @since 1.0
  */
 public final class MultivariateRing<Poly extends AMultivariatePolynomial<?, Poly>> extends APolynomialRing<Poly> {
+    /**
+     * Default degree of polynomial generated with {@link #randomElementTree(RandomGenerator)}
+     */
+    public static final int DEGREE_OF_RANDOM_POLY = 16;
+    /**
+     * Default size of polynomial generated with {@link #randomElementTree(RandomGenerator)}
+     */
+    public static final int SIZE_OF_RANDOM_POLY = 16;
     private static final long serialVersionUID = 1L;
+    private static final RandomGenerator privateRandom = new Well44497b(System.nanoTime());
 
     /**
      * Creates ring of multivariate polynomials which support operations over multivariate polynomials of the type and
@@ -24,7 +43,9 @@ public final class MultivariateRing<Poly extends AMultivariatePolynomial<?, Poly
      * @param factory the factory polynomial (the exact value of {@code factory} is irrelevant) which fixes the element
      *                type of this ring, coefficient ring and the number of variables
      */
-    public MultivariateRing(Poly factory) { super(factory); }
+    public MultivariateRing(Poly factory) {
+        super(factory);
+    }
 
     @SuppressWarnings("unchecked")
     public <Term extends AMonomial<Term>> IMonomialAlgebra<Term> monomialAlgebra() {
@@ -33,9 +54,13 @@ public final class MultivariateRing<Poly extends AMultivariatePolynomial<?, Poly
     }
 
     @Override
-    public int nVariables() { return factory.nVariables; }
+    public int nVariables() {
+        return factory.nVariables;
+    }
 
-    public Comparator<DegreeVector> ordering() { return factory.ordering; }
+    public Comparator<DegreeVector> ordering() {
+        return factory.ordering;
+    }
 
     public MultivariateRing<Poly> dropVariable() {
         return new MultivariateRing<>(factory.dropVariable(0));
@@ -125,9 +150,6 @@ public final class MultivariateRing<Poly extends AMultivariatePolynomial<?, Poly
             return randomElement(degree, size, rnd);
     }
 
-
-    private static final RandomGenerator privateRandom = new Well44497b(System.nanoTime());
-
     /**
      * Generates random multivariate polynomial
      *
@@ -152,15 +174,6 @@ public final class MultivariateRing<Poly extends AMultivariatePolynomial<?, Poly
     public Poly randomElement(RandomGenerator rnd) {
         return super.randomElement(rnd);
     }
-
-    /**
-     * Default degree of polynomial generated with {@link #randomElementTree(RandomGenerator)}
-     */
-    public static final int DEGREE_OF_RANDOM_POLY = 16;
-    /**
-     * Default size of polynomial generated with {@link #randomElementTree(RandomGenerator)}
-     */
-    public static final int SIZE_OF_RANDOM_POLY = 16;
 
     @Override
     public Poly randomElementTree(RandomGenerator rnd) {

@@ -1,6 +1,10 @@
 package cc.redberry.rings.poly.multivar;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Sorted set of monomials -- basic underlying data structure of multivariate polynomials.
@@ -38,15 +42,25 @@ public final class MonomialSet<Term extends AMonomial<Term>>
      * @param term monomial
      * @return this
      */
-    public Term add(Term term) {return put(term, term);}
+    public Term add(Term term) {
+        return put(term, term);
+    }
 
-    /** First monomial in this set */
+    /**
+     * First monomial in this set
+     */
     @Override
-    public Term first() {return firstEntry().getValue();}
+    public Term first() {
+        return firstEntry().getValue();
+    }
 
-    /** Last monomial in this set */
+    /**
+     * Last monomial in this set
+     */
     @Override
-    public Term last() {return lastEntry().getValue();}
+    public Term last() {
+        return lastEntry().getValue();
+    }
 
     @Override
     public Iterator<Term> ascendingIterator() {
@@ -70,5 +84,7 @@ public final class MonomialSet<Term extends AMonomial<Term>>
 
     @Override
     @SuppressWarnings("unchecked")
-    public MonomialSet<Term> clone() {return (MonomialSet<Term>) super.clone();}
+    public MonomialSet<Term> clone() {
+        return (MonomialSet<Term>) super.clone();
+    }
 }
