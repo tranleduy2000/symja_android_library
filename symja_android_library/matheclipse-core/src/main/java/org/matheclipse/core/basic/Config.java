@@ -182,7 +182,6 @@ public class Config {
 	 *
 	 */
 	public static boolean TIMECONSTARINED_NO_THREAD = false;
-
 	/**
 	 * An object that creates new threads on demand. Using thread factories removes hardwiring of calls to new Thread,
 	 * enabling applications to use special thread subclasses, priorities, etc.

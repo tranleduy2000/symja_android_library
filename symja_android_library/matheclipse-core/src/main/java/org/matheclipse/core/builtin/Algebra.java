@@ -612,12 +612,9 @@ public class Algebra {
 				if (head != null) {
 					IASTMutable simplifyAST = (IASTMutable) F.unaryAST1(head, null);
 					IExpr coefficient;
-					rest.forEach(new ObjIntConsumer<IExpr>() {
-                        @Override
-                        public void accept(IExpr arg, int i) {
+					rest.forEach((arg, i) -> {
                             simplifyAST.set(1, arg);
                             rest.set(i, engine.evaluate(simplifyAST));
-                        }
                     });
 					for (Map.Entry<IExpr, IASTAppendable> entry : map.entrySet()) {
 						simplifyAST.set(1, entry.getValue());
@@ -1580,7 +1577,7 @@ public class Algebra {
 			return expr;
 		}
 
-		public static IExpr factor(IExpr expr, List<IExpr> varList, boolean factorSquareFree)
+		public static IExpr factor(IAST expr, List<IExpr> varList, boolean factorSquareFree)
 				throws JASConversionException {
 			JASConvert<BigRational> jas = new JASConvert<BigRational>(varList, BigRational.ZERO);
 			GenPolynomial<BigRational> polyRat = jas.expr2JAS(expr, false);
@@ -2509,7 +2506,6 @@ public class Algebra {
 			}
 			return F.List(result[0], result[1]);
 		}
-
 		public static IExpr[] quotientRemainder(final IExpr arg1, IExpr arg2, ISymbol variable) {
 
 			try {
@@ -2722,12 +2718,7 @@ public class Algebra {
 							IASTAppendable plusResult = F.PlusAlloc(timesAST.size() + 1);
 							plusResult.append(C1D2);
 							plusResult.appendArgs(timesAST.size(),
-                                    new IntFunction<IExpr>() {
-                                        @Override
-                                        public IExpr apply(int i) {
-                                            return Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi)));
-                                        }
-                                    });
+									i -> Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi))));
 							IAST expResult = Power(E, Times(C2, I, Pi, x2, Floor(plusResult)));
 							if (!(timesResult instanceof IASTAppendable)) {
 								timesResult = timesResult.copyAppendable();
@@ -3318,16 +3309,13 @@ public class Algebra {
 					IASTAppendable basicPlus = F.PlusAlloc(ast.size());
 					IASTAppendable restPlus = F.PlusAlloc(ast.size());
 
-					ast.forEach(new com.duy.lambda.Consumer<IExpr>() {
-                        @Override
-                        public void accept(IExpr x) {
+					ast.forEach(x -> {
                             if (x.accept(isBasicAST)) {
                                 basicPlus.append(x);
                             } else {
                                 restPlus.append(x);
                             }
 
-                        }
                     });
 					if (basicPlus.size() > 1) {
 						temp = tryTransformations(basicPlus.getOneIdentity(F.C0));

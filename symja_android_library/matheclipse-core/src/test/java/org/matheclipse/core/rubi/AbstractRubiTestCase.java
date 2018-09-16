@@ -41,6 +41,16 @@ public abstract class AbstractRubiTestCase extends TestCase {
 		if (result.equals(F.$Aborted)) {
 			return "TIMEOUT";
 		}
+		if (manuallyCheckedResult != null) {
+			manuallyCheckedResult = manuallyCheckedResult.trim();
+			if (manuallyCheckedResult.length() > 0) {
+				IExpr expected = fEvaluator.eval(manuallyCheckedResult);
+				if (result.equals(expected)) {
+					// the expressions are structurally equal
+					return expectedResult;
+				}
+			}
+		}
 		expectedResult = expectedResult.trim();
 		if (expectedResult.length() > 0) {
 		IExpr expected = fEvaluator.eval(expectedResult);
@@ -62,7 +72,7 @@ public abstract class AbstractRubiTestCase extends TestCase {
 
 	/**
 	 * Evaluates the given string-expression and returns the result in <code>OutputForm</code>
-	 * 
+	 *
 	 * @param inputExpression
 	 * @return
 	 */

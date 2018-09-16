@@ -183,16 +183,22 @@ public class F {
     /** All - is a possible value for `Span` and `Quiet`. */
 	public final static IBuiltInSymbol All = F.initFinalSymbol("All", ID.All);
 
-    /** AllTrue({expr1, expr2, ...}, test) - returns `True` if all applications of `test` to `expr1, expr2, ...` evaluate to `True`.*/
+	/**
+	 * AllTrue({expr1, expr2, ...}, test) - returns `True` if all applications of `test` to `expr1, expr2, ...` evaluate
+	 * to `True`.
+	 */
 	public final static IBuiltInSymbol AllTrue = F.initFinalSymbol("AllTrue", ID.AllTrue);
 
-	/** Alternatives(p1, p2, ..., p_i) - is a pattern that matches any of the patterns `p1, p2,...., p_i`.*/
+	/** Alternatives(p1, p2, ..., p_i) - is a pattern that matches any of the patterns `p1, p2,...., p_i`. */
 	public final static IBuiltInSymbol Alternatives = F.initFinalSymbol("Alternatives", ID.Alternatives);
 
-    /** And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.*/
+	/**
+	 * And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as
+	 * an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.
+	 */
 	public final static IBuiltInSymbol And = F.initFinalSymbol("And", ID.And);
 
-	/** AngleVector(phi) - returns the point at angle `phi` on the unit circle.*/
+	/** AngleVector(phi) - returns the point at angle `phi` on the unit circle. */
 	public final static IBuiltInSymbol AngleVector = F.initFinalSymbol("AngleVector", ID.AngleVector);
 
     /***/

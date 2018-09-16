@@ -583,8 +583,27 @@ public class RulesData implements Serializable {
 									.println(" COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
 						}
 					}
+					// if (pmEvaluator.getLHSPriority()==432) {
+					// continue;
+					// }
+					if (Config.SHOW_STACKTRACE) {
+						if (isShowPriority(pmEvaluator)) {
+							System.out.print("try: " + pmEvaluator.getLHSPriority() + " - ");
+						}
+						// if (pmEvaluator.getLHSPriority() == 432) {
+						// System.out.println(pmEvaluator.toString());
+						// System.out.println(expr);
+						// System.out.println("Debug from this line");
+						// }
+					}
 					result = pmEvaluator.eval(expr, engine);
 					if (result.isPresent()) {
+						if (Config.SHOW_STACKTRACE) {
+							if (isShowPriority(pmEvaluator)) {
+								System.out.println(
+										"matched: " + pmEvaluator.getLHSPriority() + ": " + pmEvaluator.toString());
+							}
+						}
 						if (showSteps) {
 							if (isShowSteps(pmEvaluator)) {
 								IExpr rhs = pmEvaluator.getRHS();
@@ -597,6 +616,12 @@ public class RulesData implements Serializable {
 							}
 						}
 						return result;
+					} else {
+						if (Config.SHOW_STACKTRACE) {
+							if (isShowPriority(pmEvaluator)) {
+								System.out.print("not matched: " + pmEvaluator.getLHSPriority() + " ");
+							}
+						}
 					}
 				}
 			}
@@ -608,7 +633,15 @@ public class RulesData implements Serializable {
 
 	private boolean isShowSteps(IPatternMatcher pmEvaluator) {
 		IExpr head = pmEvaluator.getLHS().head();
-		// if (head.toString().toLowerCase().contains("integrate::") ) {
+		if (head.toString().toLowerCase().contains("integrate::")) {
+			return true;
+		}
+		return head.equals(F.Integrate);
+	}
+
+	private boolean isShowPriority(IPatternMatcher pmEvaluator) {
+		IExpr head = pmEvaluator.getLHS().head();
+		// if (head.toString().toLowerCase().contains("integrate::")) {
 		// return true;
 		// }
 		return head.equals(F.Integrate);
@@ -713,7 +746,7 @@ public class RulesData implements Serializable {
 		return fEqualUpRules;
 	}
 
-	private Set<IPatternMatcher> getPatternDownRules() {
+	public Set<IPatternMatcher> getPatternDownRules() {
 		if (fPatternDownRules == null) {
 			// fPatternDownRules = new TreeSet<IPatternMatcher>();
 			fPatternDownRules = new TreeSet<IPatternMatcher>(IPatternMatcher.EQUIVALENCE_COMPARATOR);
@@ -728,7 +761,7 @@ public class RulesData implements Serializable {
 		return fSimpleOrderlesPatternDownRules;
 	}
 
-	private OpenIntToSet<IPatternMatcher> getSimplePatternDownRules() {
+	public OpenIntToSet<IPatternMatcher> getSimplePatternDownRules() {
 		if (fSimplePatternDownRules == null) {
 			fSimplePatternDownRules = new OpenIntToSet<IPatternMatcher>(IPatternMatcher.EQUIVALENCE_COMPARATOR);
 		}
@@ -811,6 +844,23 @@ public class RulesData implements Serializable {
 
 		if (PatternMap.DEFAULT_RULE_PRIORITY!=priority) {
 			pmEvaluator.setLHSPriority(priority);
+			if (leftHandSide.isAST(F.Integrate)) {
+				// keep Integrate rules in order predefined by Rubi project
+				ArraySet<ISymbol> headerSymbols = new ArraySet<ISymbol>();
+				isComplicatedPatternRule(leftHandSide, headerSymbols);
+				// TODO test later, if this can be uncommented for speed performance:
+				// if (headerSymbols.size() > 0) {
+				// fSimpleOrderlesPatternDownRules = getSimpleOrderlessPatternDownRules();
+				// for (ISymbol head : headerSymbols) {
+				// fSimpleOrderlesPatternDownRules.put(head.hashCode(), pmEvaluator);
+				// }
+				// return pmEvaluator;
+				// }
+
+				fPatternDownRules = getPatternDownRules();
+				fPatternDownRules.add(pmEvaluator);
+				return pmEvaluator;
+			}
 		}
 		ArraySet<ISymbol> headerSymbols = new ArraySet<ISymbol>();
 		if (!isComplicatedPatternRule(leftHandSide, headerSymbols)) {
