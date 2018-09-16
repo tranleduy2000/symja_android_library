@@ -401,6 +401,29 @@ public class BigDecimal extends Number {
             100000000000000000L,   // 17 / 10^17
             1000000000000000000L   // 18 / 10^18
     };
+    private static volatile BigInteger BIG_TEN_POWERS_TABLE[] = {
+            BigInteger.ONE,
+            BigInteger.valueOf(10),
+            BigInteger.valueOf(100),
+            BigInteger.valueOf(1000),
+            BigInteger.valueOf(10000),
+            BigInteger.valueOf(100000),
+            BigInteger.valueOf(1000000),
+            BigInteger.valueOf(10000000),
+            BigInteger.valueOf(100000000),
+            BigInteger.valueOf(1000000000),
+            BigInteger.valueOf(10000000000L),
+            BigInteger.valueOf(100000000000L),
+            BigInteger.valueOf(1000000000000L),
+            BigInteger.valueOf(10000000000000L),
+            BigInteger.valueOf(100000000000000L),
+            BigInteger.valueOf(1000000000000000L),
+            BigInteger.valueOf(10000000000000000L),
+            BigInteger.valueOf(100000000000000000L),
+            BigInteger.valueOf(1000000000000000000L)
+    };
+    private static final int BIG_TEN_POWERS_TABLE_INITLEN =
+            BIG_TEN_POWERS_TABLE.length;
     private static final int BIG_TEN_POWERS_TABLE_MAX =
             16 * BIG_TEN_POWERS_TABLE_INITLEN;
     private static final long THRESHOLDS_TABLE[] = {
@@ -447,29 +470,8 @@ public class BigDecimal extends Number {
             {0x785ee10d5da46d9L, 0x00f436a000000000L},  //10^37
             {0x4b3b4ca85a86c47aL, 0x098a224000000000L},  //10^38
     };
-    private static volatile BigInteger BIG_TEN_POWERS_TABLE[] = {
-            BigInteger.ONE,
-            BigInteger.valueOf(10),
-            BigInteger.valueOf(100),
-            BigInteger.valueOf(1000),
-            BigInteger.valueOf(10000),
-            BigInteger.valueOf(100000),
-            BigInteger.valueOf(1000000),
-            BigInteger.valueOf(10000000),
-            BigInteger.valueOf(100000000),
-            BigInteger.valueOf(1000000000),
-            BigInteger.valueOf(10000000000L),
-            BigInteger.valueOf(100000000000L),
-            BigInteger.valueOf(1000000000000L),
-            BigInteger.valueOf(10000000000000L),
-            BigInteger.valueOf(100000000000000L),
-            BigInteger.valueOf(1000000000000000L),
-            BigInteger.valueOf(10000000000000000L),
-            BigInteger.valueOf(100000000000000000L),
-            BigInteger.valueOf(1000000000000000000L)
-    };
-    private static final int BIG_TEN_POWERS_TABLE_INITLEN =
-            BIG_TEN_POWERS_TABLE.length;
+
+
     /**
      * The unscaled value of this BigDecimal, as returned by {@link
      * #unscaledValue}.
@@ -4976,39 +4978,6 @@ public class BigDecimal extends Number {
     }
 
     /**
-     * Reconstitute the {@code BigDecimal} instance from a stream (that is,
-     * deserialize it).
-     *
-     * @param s the stream being read.
-     */
-    private void readObject(java.io.ObjectInputStream s)
-            throws java.io.IOException, ClassNotFoundException {
-        // Read in all fields
-        s.defaultReadObject();
-        // validate possibly bad fields
-        if (intVal == null) {
-            String message = "BigDecimal: null intVal in stream";
-            throw new java.io.StreamCorruptedException(message);
-            // [all values of scale are now allowed]
-        }
-        UnsafeHolder.setIntCompactVolatile(this, compactValFor(intVal));
-    }
-
-    /**
-     * Serialize this {@code BigDecimal} to the stream in question
-     *
-     * @param s the stream to serialize to.
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-            throws java.io.IOException {
-        // Must inflate to maintain compatible serial form.
-        if (this.intVal == null)
-            UnsafeHolder.setIntValVolatile(this, BigInteger.valueOf(this.intCompact));
-        // Could reset intVal back to null if it has to be set.
-        s.defaultWriteObject();
-    }
-
-    /**
      * Check a scale for Underflow or Overflow.  If this BigDecimal is
      * nonzero, throw an exception if the scale is outof range. If this
      * is zero, saturate the scale to the extreme value of the right
@@ -5195,29 +5164,4 @@ public class BigDecimal extends Number {
         }
     }
 
-    private static class UnsafeHolder {
-        private static final sun.misc.Unsafe unsafe;
-        private static final long intCompactOffset;
-        private static final long intValOffset;
-
-        static {
-            try {
-                unsafe = sun.misc.Unsafe.getUnsafe();
-                intCompactOffset = unsafe.objectFieldOffset
-                        (BigDecimal.class.getDeclaredField("intCompact"));
-                intValOffset = unsafe.objectFieldOffset
-                        (BigDecimal.class.getDeclaredField("intVal"));
-            } catch (Exception ex) {
-                throw new ExceptionInInitializerError(ex);
-            }
-        }
-
-        static void setIntCompactVolatile(BigDecimal bd, long val) {
-            unsafe.putLongVolatile(bd, intCompactOffset, val);
-        }
-
-        static void setIntValVolatile(BigDecimal bd, BigInteger val) {
-            unsafe.putObjectVolatile(bd, intValOffset, val);
-        }
-    }
 }

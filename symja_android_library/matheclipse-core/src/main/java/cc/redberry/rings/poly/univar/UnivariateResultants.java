@@ -254,8 +254,8 @@ public final class UnivariateResultants {
                     bDen = removeDenominators(b),
                     den = aDen.pow(b.degree).multiply(bDen.pow(a.degree));
 
-            assert a.stream().allMatch(p -> p.stream().allMatch(Rational::isIntegral));
-            assert b.stream().allMatch(p -> p.stream().allMatch(Rational::isIntegral));
+//            assert a.stream().allMatch(p -> p.stream().allMatch(Rational::isIntegral));
+//            assert b.stream().allMatch(p -> p.stream().allMatch(Rational::isIntegral));
 
             return ModularResultantInRingOfIntegersOfNumberField(
                     a.mapCoefficients(numberFieldZ, cf -> cf.mapCoefficients(Z, Rational::numerator)),

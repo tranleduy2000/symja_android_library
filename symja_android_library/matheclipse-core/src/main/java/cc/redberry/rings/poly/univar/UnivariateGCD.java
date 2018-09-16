@@ -4,6 +4,7 @@ package cc.redberry.rings.poly.univar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 import cc.redberry.rings.ChineseRemainders;
@@ -1103,11 +1104,25 @@ public final class UnivariateGCD {
             BigInteger[] primesArray = primes.toArray(new BigInteger[primes.size()]);
             for (int i = 0; i < 3; ++i) {
                 xgcdBase[i] = UnivariatePolynomial.zero(Z);
-                int deg = gst[i].stream().mapToInt(UnivariatePolynomial::degree).max().getAsInt();
+                boolean seen = false;
+                int best = 0;
+                for (UnivariatePolynomial<BigInteger> bigIntegers : gst[i]) {
+                    int degree = bigIntegers.degree();
+                    if (!seen || degree > best) {
+                        seen = true;
+                        best = degree;
+                    }
+                }
+                int deg = (seen ? OptionalInt.of(best) : OptionalInt.empty()).getAsInt();
                 xgcdBase[i].ensureCapacity(deg);
                 for (int j = 0; j <= deg; ++j) {
                     final int jf = j;
-                    BigInteger[] cfs = gst[i].stream().map(p -> p.get(jf)).toArray(BigInteger[]::new);
+                    List<BigInteger> list = new ArrayList<>();
+                    for (UnivariatePolynomial<BigInteger> p : gst[i]) {
+                        BigInteger bigInteger = p.get(jf);
+                        list.add(bigInteger);
+                    }
+                    BigInteger[] cfs = list.toArray(new BigInteger[0]);
                     xgcdBase[i].data[j] = ChineseRemainders(primesArray, cfs);
                 }
                 xgcdBase[i].fixDegree();
@@ -1468,8 +1483,8 @@ public final class UnivariateGCD {
             removeDenominators(a);
             removeDenominators(b);
 
-            assert a.stream().allMatch(p -> p.stream().allMatch(Rational::isIntegral));
-            assert b.stream().allMatch(p -> p.stream().allMatch(Rational::isIntegral));
+//            assert a.stream().allMatch(p -> p.stream().allMatch(Rational::isIntegral));
+//            assert b.stream().allMatch(p -> p.stream().allMatch(Rational::isIntegral));
 
             UnivariatePolynomial<UnivariatePolynomial<BigInteger>> gcdZ =
                     gcdAssociateInNumberField(
@@ -1502,7 +1517,9 @@ public final class UnivariateGCD {
     }
 
     static BigInteger removeDenominators(UnivariatePolynomial<UnivariatePolynomial<Rational<BigInteger>>> a) {
-        BigInteger denominator = Z.lcm(() -> a.stream().map(Util::commonDenominator).iterator());
+        BigInteger denominator = Z.lcm(() -> {
+            return a.stream().map(Util::commonDenominator).iterator();
+        });
         a.multiply(a.ring.valueOfBigInteger(denominator));
         return denominator;
     }

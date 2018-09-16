@@ -671,8 +671,8 @@ public final class MultivariateFactorization {
             ++univariateFactorizations;
         }
 
-        assert ySubstitution != -1;
-        assert uFactorization.factors.stream().allMatch(UnivariatePolynomialZp64::isMonic);
+//        assert ySubstitution != -1;
+//        assert uFactorization.factors.stream().allMatch(UnivariatePolynomialZp64::isMonic);
 
         // univariate factors are calculated
         @SuppressWarnings("unchecked")
@@ -690,7 +690,7 @@ public final class MultivariateFactorization {
         if (!lc.isConstant()) {
             // add lc to lifting factors
             UnivariatePolynomialZp64 ulc = evaluation.evaluateFrom(lc, 1).asUnivariate();
-            assert ulc.isConstant();
+//            assert ulc.isConstant();
             factorList.add(0, ulc);
         } else
             factorList.get(0).multiply(lc.cc());
@@ -1051,7 +1051,7 @@ public final class MultivariateFactorization {
         }
 
         MultivariatePolynomial<BigInteger> xDerivative = reducedPoly.derivative(0);
-        assert !xDerivative.isZero();
+//        assert !xDerivative.isZero();
         MultivariatePolynomial<BigInteger> dGCD = MultivariateGCD.PolynomialGCD(xDerivative, reducedPoly);
         if (!dGCD.isConstant()) {
             PolynomialFactorDecomposition<MultivariatePolynomial<BigInteger>>
@@ -1858,20 +1858,22 @@ public final class MultivariateFactorization {
                     Poly[] ilcFactorsSqFree = ilcFactorsSet
                             .toArray(poly.createArray(ilcFactorsSet.size()));
 
-                    assert ilcFactorsSqFree.length > 0;
-                    assert Arrays.stream(ilcFactorsSqFree).noneMatch(Poly::isConstant);
+//                    assert ilcFactorsSqFree.length > 0;
+//                    assert Arrays.stream(ilcFactorsSqFree).noneMatch(Poly::isConstant);
 
                     // the sum of degrees of all unique factors in univariate gcd-free decomposition
                     // must be equal to the degree of primitive part we want to lift to
-                    assert Arrays.stream(ilcFactorsSqFree).mapToInt(AMultivariatePolynomial::degree).reduce(0, (a, b) -> a + b)
-                            == ppPart.degree(0);
+//                    assert Arrays.stream(ilcFactorsSqFree).mapToInt(AMultivariatePolynomial::degree).reduce(0, (a, b) -> a + b)
+//                            == ppPart.degree(0);
                     Poly ppPartLC = ilcEvaluation.evaluateFrom(ppPart.lc(0), 1);
-                    Poly realLC = Arrays.stream(ilcFactorsSqFree)
-                            .map(Poly::lcAsPoly)
-                            .reduce(ilcFactorsSqFree[0].createOne(), Poly::multiply);
+                    Poly realLC = ilcFactorsSqFree[0].createOne();
+                    for (Poly terms : ilcFactorsSqFree) {
+                        Poly lcAsPoly = terms.lcAsPoly();
+                        realLC = realLC.multiply(lcAsPoly);
+                    }
 
-                    assert ppPartLC.isConstant();
-                    assert realLC.isConstant();
+//                    assert ppPartLC.isConstant();
+//                    assert realLC.isConstant();
 
                     Poly base = ppPart.clone().multiplyByLC(realLC.divideByLC(ppPartLC));
                     if (ilcFactorsSqFree.length == 1)

@@ -99,7 +99,12 @@ public final class GroebnerMethods {
             eliminationIdeal = result;
         }
 
-        return eliminationIdeal.stream().map(p -> p.setOrdering(originalOrder)).collect(Collectors.toList());
+        List<Poly> list = new ArrayList<>();
+        for (Poly p : eliminationIdeal) {
+            Poly terms = p.setOrdering(originalOrder);
+            list.add(terms);
+        }
+        return list;
     }
 
     /**

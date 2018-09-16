@@ -1,5 +1,13 @@
 package cc.redberry.rings.poly.univar;
 
+import com.duy.lambda.BiConsumer;
+import com.duy.lambda.BinaryOperator;
+import com.duy.lambda.Function;
+import com.duy.lambda.Supplier;
+import com.duy.lambda.ToLongFunction;
+import com.duy.stream.Collector;
+import com.duy.util.DMap;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,14 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Spliterator;
-import com.duy.lambda.BiConsumer;
-import com.duy.lambda.BinaryOperator;
-import com.duy.lambda.Function;
-import com.duy.lambda.Supplier;
-import com.duy.lambda.ToLongFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import cc.redberry.rings.IntegersZp;
@@ -1285,7 +1287,8 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
         if (isConstant())
             return cfStringifier.stringify(cc());
 
-        String varString = stringifier.getBindings().getOrDefault(createMonomial(1), IStringifier.defaultVar());
+        String varString = DMap.getOrDefault(stringifier.getBindings(), createMonomial(1), IStringifier.defaultVar());
+        ;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i <= degree; i++) {
             E el = data[i];
@@ -1639,8 +1642,18 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
      */
     public static final class PolynomialCollector<E>
             implements Collector<E, List<E>, UnivariatePolynomial<E>> {
-        final Supplier<List<E>> supplier = ArrayList::new;
-        final BiConsumer<List<E>, E> accumulator = List::add;
+        final Supplier<List<E>> supplier = new Supplier<List<E>>() {
+            @Override
+            public List<E> get() {
+                return new ArrayList<E>();
+            }
+        };
+        final BiConsumer<List<E>, E> accumulator = new BiConsumer<List<E>, E>() {
+            @Override
+            public void accept(List<E> list, E e) {
+                list.add(e);
+            }
+        };
         final BinaryOperator<List<E>> combiner = (l, r) -> {
             l.addAll(r);
             return l;
@@ -1653,27 +1666,22 @@ public final class UnivariatePolynomial<E> implements IUnivariatePolynomial<Univ
             this.finisher = new ListToPoly<>(ring);
         }
 
-        @Override
         public Supplier<List<E>> supplier() {
             return supplier;
         }
 
-        @Override
         public BiConsumer<List<E>, E> accumulator() {
             return accumulator;
         }
 
-        @Override
         public BinaryOperator<List<E>> combiner() {
             return combiner;
         }
 
-        @Override
         public Function<List<E>, UnivariatePolynomial<E>> finisher() {
             return finisher;
         }
 
-        @Override
         public Set<Characteristics> characteristics() {
             return Collections.emptySet();
         }

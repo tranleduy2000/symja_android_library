@@ -276,7 +276,12 @@ public final class Ideal<Term extends AMonomial<Term>, Poly extends AMultivariat
     public Ideal<Term, Poly> ltIdeal() {
         if (isMonomial())
             return this;
-        return new Ideal<>(groebnerBasis.stream().map(AMultivariatePolynomial::ltAsPoly).collect(Collectors.toList()));
+        List<Poly> list = new ArrayList<>();
+        for (Poly groebnerBasi : groebnerBasis) {
+            Poly ltAsPoly = groebnerBasi.ltAsPoly();
+            list.add(ltAsPoly);
+        }
+        return new Ideal<>(list);
     }
 
     /**

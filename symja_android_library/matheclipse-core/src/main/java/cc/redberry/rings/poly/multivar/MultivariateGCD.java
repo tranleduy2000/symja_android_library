@@ -1817,8 +1817,8 @@ public final class MultivariateGCD {
                     MultivariatePolynomial<UnivariatePolynomial<BigInteger>>,
                     MultivariatePolynomial<UnivariatePolynomial<BigInteger>>
                     > algorithmForGcdAssociate) {
-        assert a.stream().allMatch(cf -> cf.stream().allMatch(Rational::isIntegral));
-        assert b.stream().allMatch(cf -> cf.stream().allMatch(Rational::isIntegral));
+//        assert a.stream().allMatch(cf -> cf.stream().allMatch(Rational::isIntegral));
+//        assert b.stream().allMatch(cf -> cf.stream().allMatch(Rational::isIntegral));
 
         GCDInput<
                 Monomial<UnivariatePolynomial<Rational<BigInteger>>>,

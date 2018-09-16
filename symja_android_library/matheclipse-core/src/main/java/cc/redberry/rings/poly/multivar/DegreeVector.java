@@ -3,7 +3,7 @@ package cc.redberry.rings.poly.multivar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 
 import cc.redberry.rings.io.IStringifier;
 import cc.redberry.rings.util.ArraysUtil;
@@ -372,7 +372,13 @@ public class DegreeVector implements java.io.Serializable {
         List<String> result = new ArrayList<>();
         for (int i = 0; i < exponents.length; i++)
             result.add(toString0(vars[i], exponents[i]));
-        return result.stream().filter(s -> !s.isEmpty()).collect(Collectors.joining("*"));
+        StringJoiner joiner = new StringJoiner("*");
+        for (String s : result) {
+            if (!s.isEmpty()) {
+                joiner.add(s);
+            }
+        }
+        return joiner.toString();
     }
 
     @Override

@@ -2,15 +2,18 @@ package cc.redberry.rings.poly.multivar;
 
 import org.hipparchus.random.RandomGenerator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import com.duy.lambda.Function;
 import com.duy.lambda.LongFunction;
+import com.duy.util.DMap;
 
 import cc.redberry.libdivide4j.FastDivision;
 import cc.redberry.rings.IntegersZp;
@@ -968,7 +971,7 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
      */
     public long cc() {
         MonomialZp64 zero = new MonomialZp64(nVariables, 0L);
-        return terms.getOrDefault(zero, zero).coefficient;
+        return DMap.getOrDefault(terms, zero, zero).coefficient;
     }
 
     /**
@@ -994,7 +997,15 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
      * @return array of polynomial coefficients
      */
     public long[] coefficients() {
-        return terms.values().stream().mapToLong(x -> x.coefficient).toArray();
+        long[] arr = new long[10];
+        int count = 0;
+        for (MonomialZp64 x : terms.values()) {
+            long coefficient = x.coefficient;
+            if (arr.length == count) arr = Arrays.copyOf(arr, count * 2);
+            arr[count++] = coefficient;
+        }
+        arr = Arrays.copyOfRange(arr, 0, count);
+        return arr;
     }
 
     @Override
@@ -1267,7 +1278,12 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
      */
     @SuppressWarnings("unchecked")
     public MultivariatePolynomialZp64[] evaluate(int variable, long... values) {
-        return Arrays.stream(values).mapToObj(p -> evaluate(variable, p)).toArray(MultivariatePolynomialZp64[]::new);
+        List<MultivariatePolynomialZp64> list = new ArrayList<>();
+        for (long p : values) {
+            MultivariatePolynomialZp64 evaluate = evaluate(variable, p);
+            list.add(evaluate);
+        }
+        return list.toArray(new MultivariatePolynomialZp64[0]);
     }
 
     /**
@@ -1711,12 +1727,22 @@ public final class MultivariatePolynomialZp64 extends AMultivariatePolynomial<Mo
      * @return a new polynomial with terms obtained by applying mapper to this terms (only coefficients are changed)
      */
     public <T> MultivariatePolynomial<T> mapCoefficients(Ring<T> newRing, LongFunction<T> mapper) {
-        return mapTerms(newRing, t -> new Monomial<>(t.exponents, t.totalDegree, mapper.apply(t.coefficient)));
+        return mapTerms(newRing, new Function<MonomialZp64, Monomial<T>>() {
+            @Override
+            public Monomial<T> apply(MonomialZp64 t) {
+                return new Monomial<>(t.exponents, t.totalDegree, mapper.apply(t.coefficient));
+            }
+        });
     }
 
     @Override
     public <E> MultivariatePolynomial<E> mapCoefficientsAsPolys(Ring<E> ring, Function<MultivariatePolynomialZp64, E> mapper) {
-        return mapCoefficients(ring, cf -> mapper.apply(createConstant(cf)));
+        return mapCoefficients(ring, new LongFunction<E>() {
+            @Override
+            public E apply(long cf) {
+                return mapper.apply(MultivariatePolynomialZp64.this.createConstant(cf));
+            }
+        });
     }
 
     @Override

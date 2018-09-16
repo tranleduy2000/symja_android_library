@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import cc.redberry.rings.IntegersZp;
 import cc.redberry.rings.Rings;
@@ -369,8 +368,14 @@ public final class HenselLifting {
         if (!quadratic && !modulus.isLong())
             throw new IllegalArgumentException("Only max 64-bit modulus for linear lift allowed.");
         LiftingInfo im = nIterations(modulus, desiredBound, quadratic);
-        if (im.nIterations == 0)
-            return modularFactors.stream().map(UnivariatePolynomialZp64::toBigPoly).collect(Collectors.toList());
+        if (im.nIterations == 0) {
+            List<UnivariatePolynomial<BigInteger>> list = new ArrayList<>();
+            for (UnivariatePolynomialZp64 modularFactor : modularFactors) {
+                UnivariatePolynomial<BigInteger> toBigPoly = modularFactor.toBigPoly();
+                list.add(toBigPoly);
+            }
+            return list;
+        }
         LiftFactory<UnivariatePolynomialZp64> factory = quadratic ? HenselLifting::createQuadraticLift : HenselLifting::createLinearLift;
         return liftFactorization0(modulus, im.finalModulus, im.nIterations, poly, modularFactors, factory);
     }

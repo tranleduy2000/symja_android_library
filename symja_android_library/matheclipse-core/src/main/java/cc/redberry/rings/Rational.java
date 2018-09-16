@@ -39,11 +39,31 @@ public class Rational<E> implements Comparable<Rational<E>>,
      */
     private static final int SIMPLE_INTEGER_N_BITS = 512;
     // criteria singletons
-    private static final Predicate<BigInteger> intSimplicityCriteria = p -> p.bitLength() <= SIMPLE_INTEGER_N_BITS;
-    private static final Predicate<IUnivariatePolynomial> upolySimplicityCriteria = p -> p.size() <= SIMPLE_UPOLY_SIZE;
+    private static final Predicate<BigInteger> intSimplicityCriteria = new Predicate<BigInteger>() {
+        @Override
+        public boolean test(BigInteger p) {
+            return p.bitLength() <= SIMPLE_INTEGER_N_BITS;
+        }
+    };
+    private static final Predicate<IUnivariatePolynomial> upolySimplicityCriteria = new Predicate<IUnivariatePolynomial>() {
+        @Override
+        public boolean test(IUnivariatePolynomial p) {
+            return p.size() <= SIMPLE_UPOLY_SIZE;
+        }
+    };
     private static final Predicate<AMultivariatePolynomial> mpolySimplicityCriteria
-            = p -> p.size() <= SIMPLE_MPOLY_DENSE_SIZE || (p.size() < SIMPLE_MPOLY_SPARSE_SIZE && p.sparsity2() < SIMPLE_POLY_SPARSITY2);
-    private static final Predicate defaultFalse = __ -> false;
+            = new Predicate<AMultivariatePolynomial>() {
+        @Override
+        public boolean test(AMultivariatePolynomial p) {
+            return p.size() <= SIMPLE_MPOLY_DENSE_SIZE || (p.size() < SIMPLE_MPOLY_SPARSE_SIZE && p.sparsity2() < SIMPLE_POLY_SPARSITY2);
+        }
+    };
+    private static final Predicate defaultFalse = new Predicate() {
+        @Override
+        public boolean test(Object __) {
+            return false;
+        }
+    };
     /**
      * The ring.
      */
@@ -82,7 +102,7 @@ public class Rational<E> implements Comparable<Rational<E>>,
         this.ring = ring;
         this.simplicityCriteria = simplicityCriteria(ring);
         @SuppressWarnings("unchecked")
-        Operand[] numden = new Operand[2]{new Operand(numerator), new Operand(denominator)};
+        Operand[] numden = new Operand[]{new Operand(numerator), new Operand(denominator)};
         normalize(numden);
         this.numerator = numden[0];
         this.denominator = numden[1];
@@ -493,7 +513,7 @@ public class Rational<E> implements Comparable<Rational<E>>,
      * Stream of numerator and denominator
      */
     public ArrayList<E> stream() {
-        return Lists.newArrayList(numerator.expand(), denominator.expand()));
+        return Lists.newArrayList(numerator.expand(), denominator.expand());
     }
 
     @Override

@@ -63,4 +63,10 @@ public class DMap {
         }
     }
 
+    public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
+        V v;
+        return (((v = map.get(key)) != null) || map.containsKey(key))
+                ? v
+                : defaultValue;
+    }
 }

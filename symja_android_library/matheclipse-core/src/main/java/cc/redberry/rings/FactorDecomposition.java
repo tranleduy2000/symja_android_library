@@ -356,7 +356,12 @@ public class FactorDecomposition<E>
         ArraysUtil.quickSort(wr, ex);
         factors.clear();
         exponents.clear();
-        factors.addAll(Arrays.stream(wr).map(w -> w.el).collect(Collectors.toList()));
+        List<E> list = new ArrayList<>();
+        for (wrapper<E> w : wr) {
+            E el = w.el;
+            list.add(el);
+        }
+        factors.addAll(list);
         exponents.addAll(ex);
         return this;
     }

@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -328,9 +329,12 @@ public final class GroebnerBases {
             return generators;
         }
 
-        if (generators.stream().anyMatch(Poly::isConstant))
-            // contains non zero constant => ideal == whole ring
-            return Collections.singletonList(factory.createOne());
+        // contains non zero constant => ideal == whole ring
+        for (Poly generator : generators) {
+            if (generator.isConstant()) {
+                return Collections.singletonList(factory.createOne());
+            }
+        }
 
         return generators;
     }
@@ -623,25 +627,41 @@ public final class GroebnerBases {
 
     static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Poly> homogenize(List<Poly> ideal) {
-        return ideal.stream().map(p -> p.homogenize(p.nVariables)).collect(Collectors.toList());
+        List<Poly> list = new ArrayList<>();
+        for (Poly p : ideal) {
+            Poly homogenize = p.homogenize(p.nVariables);
+            list.add(homogenize);
+        }
+        return list;
     }
 
     static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Poly> dehomogenize(List<Poly> ideal) {
-        return ideal.stream().map(p -> p.dropVariable(p.nVariables - 1)).collect(Collectors.toList());
+        List<Poly> list = new ArrayList<>();
+        for (Poly p : ideal) {
+            Poly terms = p.dropVariable(p.nVariables - 1);
+            list.add(terms);
+        }
+        return list;
     }
 
     static <E> List<MultivariatePolynomial<E>> toIntegral(List<MultivariatePolynomial<Rational<E>>> ideal) {
-        return ideal.stream()
-                .map(p -> Util.toCommonDenominator(p)._1)
-                .collect(Collectors.toList());
+        List<MultivariatePolynomial<E>> list = new ArrayList<>();
+        for (MultivariatePolynomial<Rational<E>> p : ideal) {
+            MultivariatePolynomial<E> monomials = Util.toCommonDenominator(p)._1;
+            list.add(monomials);
+        }
+        return list;
     }
 
     static <E> List<MultivariatePolynomial<Rational<E>>> toFractions(List<MultivariatePolynomial<E>> ideal) {
         Ring<Rational<E>> ring = Frac(ideal.get(0).ring);
-        return ideal.stream()
-                .map(p -> p.mapCoefficients(ring, c -> new Rational<>(p.ring, c)))
-                .collect(Collectors.toList());
+        List<MultivariatePolynomial<Rational<E>>> list = new ArrayList<>();
+        for (MultivariatePolynomial<E> p : ideal) {
+            MultivariatePolynomial<Rational<E>> monomials = p.mapCoefficients(ring, c -> new Rational<>(p.ring, c));
+            list.add(monomials);
+        }
+        return list;
     }
 
     /* ************************************** Buchberger algorithm ********************************************** */
@@ -773,9 +793,17 @@ public final class GroebnerBases {
         // Groebner basis that will be computed
         List<Poly> groebner = new ArrayList<>();
         // update Groebner basis with initial generators
-        generators.forEach(g -> updateBasis(groebner, sPairs, g));
+        for (Poly g : generators) {
+            updateBasis(groebner, sPairs, g);
+        }
         // cache array used in divisions (little performance improvement actually)
-        Poly[] reducersArray = groebner.stream().filter(Objects::nonNull).toArray(factory::createArray);
+        List<Poly> list = new ArrayList<>();
+        for (Poly terms : groebner) {
+            if (terms != null) {
+                list.add(terms);
+            }
+        }
+        Poly[] reducersArray = list.toArray(factory.createArray(0));
 
         // syzygies degree to pickup for Hilbert-driven algorithm (used only when HPS is supplied)
         int hilbertDegree = 0;
@@ -1045,15 +1073,19 @@ public final class GroebnerBases {
     public static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Poly> GroebnerBasisRegardingGrevLexWithPermutation(List<Poly> ideal, GroebnerAlgorithm<Term, Poly> baseAlgorithm, GrevLexWithPermutation order) {
         int[] inversePermutation = MultivariateGCD.inversePermutation(order.permutation);
-        return baseAlgorithm.GroebnerBasis(ideal
-                        .stream()
-                        .map(p -> AMultivariatePolynomial.renameVariables(p, order.permutation))
-                        .collect(Collectors.toList()),
-                GREVLEX, null)
-                .stream()
-                .map(p -> AMultivariatePolynomial.renameVariables(p, inversePermutation))
-                .map(p -> p.setOrdering(order))
-                .collect(Collectors.toList());
+        List<Poly> list = new ArrayList<>();
+        for (Poly terms : ideal) {
+            Poly poly = AMultivariatePolynomial.renameVariables(terms, order.permutation);
+            list.add(poly);
+        }
+        List<Poly> result = new ArrayList<>();
+        for (Poly p : baseAlgorithm.GroebnerBasis(list,
+                GREVLEX, null)) {
+            Poly terms = AMultivariatePolynomial.renameVariables(p, inversePermutation);
+            Poly poly = terms.setOrdering(order);
+            result.add(poly);
+        }
+        return result;
     }
 
     /**
@@ -1064,7 +1096,12 @@ public final class GroebnerBases {
         if (ideal.isEmpty())
             return GREVLEX;
         Poly factory = ideal.get(0);
-        int[] degrees = ideal.stream().map(AMultivariatePolynomial::degrees).reduce(new int[factory.nVariables], ArraysUtil::sum);
+        int[] acc = new int[factory.nVariables];
+        for (Poly terms : ideal) {
+            int[] ints = terms.degrees();
+            acc = ArraysUtil.sum(acc, ints);
+        }
+        int[] degrees = acc;
         if (Arrays.stream(degrees).allMatch(i -> i == degrees[0]))
             // all variables have the same degree
             return GREVLEX;
@@ -1330,13 +1367,24 @@ public final class GroebnerBases {
                             reducers.set(i, null);
 
                     // recompute array
-                    reducersArray = reducers.stream().filter(Objects::nonNull).toArray(factory::createArray);
+                    List<Poly> list = new ArrayList<>();
+                    for (Poly reducer : reducers) {
+                        if (reducer != null) {
+                            list.add(reducer);
+                        }
+                    }
+                    reducersArray = list.toArray(factory.createArray(0));
                 }
             }
 
             if (hilbertSeries != null && (subset != null || hilbertDegree == 0)) {
                 //compute Hilbert series for LT(ideal) obtained so far
-                HilbertSeries currentHPS = HilbertSeries(groebner.stream().map(MonomialSetView::lt).collect(Collectors.toList()));
+                List<DegreeVector> list = new ArrayList<>();
+                for (ArrayBasedPoly<Term> terms : groebner) {
+                    Term lt = terms.lt();
+                    list.add(lt);
+                }
+                HilbertSeries currentHPS = HilbertSeries(list);
                 HilbertUpdate update = updateWithHPS(hilbertSeries, currentHPS, sPairs);
                 if (update.finished)
                     // we are done
@@ -2142,8 +2190,11 @@ public final class GroebnerBases {
         // <- STEP 6: finally form N+ polynomials
 
         // leading monomials of H-polynomials
-        TreeSet<DegreeVector> hLeadMonomials = hPolynomials.stream().map(p -> p.hPoly.lt())
-                .collect(Collectors.toCollection(() -> new TreeSet<>(factory.ordering)));
+        TreeSet<DegreeVector> hLeadMonomials = new TreeSet<>(factory.ordering);
+        for (HPolynomial<Monomial<E>> p : hPolynomials) {
+            Monomial<E> lt = p.hPoly.lt();
+            hLeadMonomials.add(lt);
+        }
 
         List<ArrayBasedPoly<Monomial<E>>> nPolynomials = new ArrayList<>();
         for (iRow = 0; iRow < nRows; ++iRow) {
@@ -2410,7 +2461,12 @@ public final class GroebnerBases {
     static List<MultivariatePolynomialZp64> mod(List<MultivariatePolynomial<BigInteger>> polys, long modulus) {
         IntegersZp64 ring = Zp64(modulus);
         IntegersZp gRing = ring.asGenericRing();
-        return polys.stream().map(p -> MultivariatePolynomial.asOverZp64(p.setRing(gRing))).collect(Collectors.toList());
+        List<MultivariatePolynomialZp64> list = new ArrayList<>();
+        for (MultivariatePolynomial<BigInteger> p : polys) {
+            MultivariatePolynomialZp64 monomialZp64s = MultivariatePolynomial.asOverZp64(p.setRing(gRing));
+            list.add(monomialZp64s);
+        }
+        return list;
     }
 
     /**
@@ -2479,10 +2535,19 @@ public final class GroebnerBases {
                 List<MultivariatePolynomialZp64> modGenerators = mod(ideal, prime.longValueExact());
                 // Groebner basis mod prime
                 GBResult<MonomialZp64, MultivariatePolynomialZp64> r = modularAlgorithm.GroebnerBasis((List) modGenerators, monomialOrder, null);
-                bModBasis = r.stream().map(MultivariatePolynomialZp64::toBigPoly).collect(Collectors.toList());
+                List<MultivariatePolynomial<BigInteger>> list = new ArrayList<>();
+                for (MultivariatePolynomialZp64 monomialZp64s : r) {
+                    MultivariatePolynomial<BigInteger> toBigPoly = monomialZp64s.toBigPoly();
+                    list.add(toBigPoly);
+                }
+                bModBasis = list;
                 modResult = r;
             } else {
-                List<MultivariatePolynomial<BigInteger>> modGenerators = ideal.stream().map(p -> p.setRing(ring)).collect(Collectors.toList());
+                List<MultivariatePolynomial<BigInteger>> modGenerators = new ArrayList<>();
+                for (MultivariatePolynomial<BigInteger> p : ideal) {
+                    MultivariatePolynomial<BigInteger> monomials = p.setRing(ring);
+                    modGenerators.add(monomials);
+                }
                 GBResult<Monomial<BigInteger>, MultivariatePolynomial<BigInteger>> r = modularAlgorithm.GroebnerBasis((List) modGenerators, monomialOrder, null);
                 bModBasis = r.list;
                 modResult = r;
@@ -2497,12 +2562,21 @@ public final class GroebnerBases {
                 if (trySparse) {
                     // try to solve sparse GB on the first iteration
                     // number of unknowns
-                    int nSparseUnknowns = bModBasis.stream().mapToInt(p -> p.size() - 1).sum();
+                    int nSparseUnknowns = 0;
+                    for (MultivariatePolynomial<BigInteger> p : bModBasis) {
+                        int i = p.size() - 1;
+                        nSparseUnknowns += i;
+                    }
                     // try to solve on in most simple cases
                     if (nSparseUnknowns < N_UNKNOWNS_THRESHOLD && modResult.nProcessedPolynomials > N_BUCHBERGER_STEPS_THRESHOLD) {
+                        List<Collection<DegreeVector>> list = new ArrayList<>();
+                        for (MultivariatePolynomial<BigInteger> bModBasi : bModBasis) {
+                            Set<DegreeVector> skeleton = bModBasi.getSkeleton();
+                            list.add(skeleton);
+                        }
                         List<MultivariatePolynomial<BigInteger>> solvedGB =
                                 solveGB(ideal,
-                                        bModBasis.stream().map(AMultivariatePolynomial::getSkeleton).collect(Collectors.toList()),
+                                        list,
                                         monomialOrder);
                         if (solvedGB != null && isGroebnerBasis(ideal, solvedGB, monomialOrder))
                             return GBResult.notBuchberger(solvedGB);
@@ -2651,7 +2725,11 @@ public final class GroebnerBases {
         }
 
         // total number of unknowns
-        int nUnknowns = gbSkeleton.stream().mapToInt(p -> p.size() - 1).sum();
+        int nUnknowns = 0;
+        for (SortedSet<DegreeVector> degreeVectors : gbSkeleton) {
+            int i = degreeVectors.size() - 1;
+            nUnknowns += i;
+        }
         // we consider polynomials as R[u0, u1, ..., uM][x0, ..., xN], where u_i are unknowns
         // ring R[u0, u1, ..., uM]
         MultivariateRing<Poly> cfRing = Rings.MultivariateRing(factory.setNVariables(nUnknowns));
@@ -2662,35 +2740,47 @@ public final class GroebnerBases {
         @SuppressWarnings("unchecked")
         MultivariatePolynomial<Poly>[] gbCandidate = gbSkeleton.stream().map(p -> {
             MultivariatePolynomial<Poly> head = pRing.create(p.last());
-            MultivariatePolynomial<Poly> tail = p.headSet(p.last())
-                    .stream()
-                    .map(t -> pRing.create(t).multiply(cfRing.variable(varCounter.getAndIncrement())))
-                    .reduce(pRing.getZero(), (a, b) -> a.add(b));
+            MultivariatePolynomial<Poly> tail = pRing.getZero();
+            for (DegreeVector t : p.headSet(p.last())) {
+                MultivariatePolynomial<Poly> multiply = pRing.create(t).multiply(cfRing.variable(varCounter.getAndIncrement()));
+                tail = tail.add(multiply);
+            }
             return head.add(tail);
         }).toArray(MultivariatePolynomial[]::new);
 
         Term uTerm = factory.monomialAlgebra.getUnitTerm(nUnknowns);
         // initial ideal viewed as R[u0, u1, ..., uM][x0, ..., xN]
         List<MultivariatePolynomial<Poly>> initialIdeal
-                = generators
-                .stream().map(p -> pRing.factory().create(p.collection()
-                        .stream().map(t -> new Monomial<>(t, cfRing.factory().create(uTerm.setCoefficientFrom(t))))
-                        .collect(Collectors.toList())))
-                .collect(Collectors.toList());
+                = new ArrayList<>();
+        for (Poly generator : generators) {
+            List<Monomial<Poly>> list = new ArrayList<>();
+            for (Term t : generator.collection()) {
+                Monomial<Poly> polyMonomial = new Monomial<>(t, cfRing.factory().create(uTerm.setCoefficientFrom(t)));
+                list.add(polyMonomial);
+            }
+            MultivariatePolynomial<Poly> monomials = pRing.factory().create(list);
+            initialIdeal.add(monomials);
+        }
 
 
         // build set of all syzygies
         List<MultivariatePolynomial<Poly>> _tmp_gb_ = new ArrayList<>(initialIdeal);
         // list of all non trivial S-pairs
         SyzygySet<Monomial<Poly>, MultivariatePolynomial<Poly>> sPairsSet = new SyzygyTreeSet<>(new TreeSet<>(defaultSelectionStrategy(monomialOrder)));
-        Arrays.stream(gbCandidate).forEach(gb -> updateBasis(_tmp_gb_, sPairsSet, gb));
+        for (MultivariatePolynomial<Poly> gb : gbCandidate) {
+            updateBasis(_tmp_gb_, sPairsSet, gb);
+        }
 
         // source of equations
         List<EqSupplier<Term, Poly>> source = new ArrayList<>();
         // initial ideal must reduce to zero
-        initialIdeal.forEach(p -> source.add(new EqSupplierPoly<>(p)));
+        for (MultivariatePolynomial<Poly> monomials : initialIdeal) {
+            source.add(new EqSupplierPoly<>(monomials));
+        }
         // S-pairs must reduce to zero
-        sPairsSet.allPairs().forEach(p -> source.add(new EqSupplierSyzygy<>(initialIdeal, gbCandidate, p)));
+        for (SyzygyPair<Monomial<Poly>, MultivariatePolynomial<Poly>> p : sPairsSet.allPairs()) {
+            source.add(new EqSupplierSyzygy<>(initialIdeal, gbCandidate, p));
+        }
         // iterate from "simplest" to "hardest" equations
         source.sort((a, b) -> monomialOrder.compare(a.signature(), b.signature()));
 

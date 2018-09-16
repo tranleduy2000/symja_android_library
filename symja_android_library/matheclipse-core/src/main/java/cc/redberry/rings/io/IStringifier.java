@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import cc.redberry.rings.Ring;
@@ -177,7 +178,12 @@ public interface IStringifier<Element> {
      */
     @SuppressWarnings("unchecked")
     default String stringify(Collection<Element> c) {
-        return c.stream().map(this::stringify).collect(Collectors.joining(","));
+        StringJoiner joiner = new StringJoiner(",");
+        for (Element element : c) {
+            String stringify = stringify(element);
+            joiner.add(stringify);
+        }
+        return joiner.toString();
     }
 
     /**
