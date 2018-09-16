@@ -749,7 +749,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Binomial({2, 3, 5, 7, 11}, 3)", //
 				"{0,1,10,35,165}");
 		check("With({eps = 10^-6.}, \n" + " Table(Binomial(-3 - p eps, -5 - eps), {p, {-3, -2, -1, \n"
-				+ "    1, 2, 3, 4}}))", //
+						+ "    1, 2, 3, 4}}))", //
 				"{-2.0,-3.0,-6.0,6.0,3.0,2.0,1.5}");
 
 		check("Binomial(k, -1)", "0");
@@ -1215,9 +1215,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testCoefficient() {
 		// http://oeis.org/A133314
 		check("b(0) = 1; " //
-				+ "b(n_) := b(n)=-Sum(Binomial(n, j)*a(j)*b(n-j), {j, 1, n}); row(0) = {1}; " //
-				+ "row(n_) := Coefficient(b(n), #)& /@ (Times @@ (a /@ #)&) /@ IntegerPartitions(n); " //
-				+ "Table(row(n), {n, 0, 8}) // Flatten", //
+						+ "b(n_) := b(n)=-Sum(Binomial(n, j)*a(j)*b(n-j), {j, 1, n}); row(0) = {1}; " //
+						+ "row(n_) := Coefficient(b(n), #)& /@ (Times @@ (a /@ #)&) /@ IntegerPartitions(n); " //
+						+ "Table(row(n), {n, 0, 8}) // Flatten", //
 				"{1,-1,-1,2,-1,6,-6,-1,8,6,-36,24,-1,10,20,-60,-90,240,-120,-1,12,30,-90,20,-360,\n"
 						+ "480,-90,1080,-1800,720,-1,14,42,-126,70,-630,840,-420,-630,5040,-4200,2520,\n"
 						+ "-12600,15120,-5040,-1,16,56,-168,112,-1008,1344,70,-1680,-1260,10080,-8400,-1680,\n"
@@ -3326,37 +3326,37 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testFindFit() {
 		// https://stackoverflow.com/a/51696587/24819
 		check("FindFit({ {1.3,0.5}, {2.8,0.9}, {5.0,2.6}, {10.2,7.1}, {16.5,12.3}, {21.3,15.3},{ 31.8,20.4}, {52.2,24.4}}, " //
-				+ "d+((a-d)/ (1+(x/c)^ b)),  {{a, 1}, {b,2}, {c,20}, {d,20}}, x)", //
+						+ "d+((a-d)/ (1+(x/c)^ b)),  {{a, 1}, {b,2}, {c,20}, {d,20}}, x)", //
 				"{a->0.17432,b->1.75938,c->19.69032,d->28.83068}");
 		// initial guess [1.0, 1.0, 1.0] gives bad result:
 		check("FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1})," //
-				+ " a* Sin(w*t + f), {a,w,f}, t)", //
+						+ " a* Sin(w*t + f), {a,w,f}, t)", //
 				"{a->0.6688,w->1.49588,f->3.74845}");
 		// initial guess [2.0, 1.0, 1.0] gives better result:
 		check("FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1}), "//
-				+ "a* Sin(w*t + f), {{a, 2}, {w,1}, {f,1}}, t)", //
+						+ "a* Sin(w*t + f), {{a, 2}, {w,1}, {f,1}}, t)", //
 				"{a->3.0,w->3.0,f->1.0}");
 		// initial guess [2.0, 1.0, 1.0] with 1.0 by default:
 		check("FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1}), "//
-				+ "a* Sin(w*t + f), {{a, 2}, w, f}, t)", //
+						+ "a* Sin(w*t + f), {{a, 2}, w, f}, t)", //
 				"{a->3.0,w->3.0,f->1.0}");
 
 		check("FindFit({{1,1},{2,4},{3,9},{4,16}}, " //
-				+ "a+b*x+c*x^2, {a, b, c}, x)", //
+						+ "a+b*x+c*x^2, {a, b, c}, x)", //
 				"{a->0.0,b->0.0,c->1.0}");
 		check("FindFit({{15.2,8.9},{31.1,9.9},{38.6,10.3},{52.2,10.7},{75.4,11.4}}, " //
-				+ "a*Log(b*x), {a, b}, x)", //
+						+ "a*Log(b*x), {a, b}, x)", //
 				"{a->1.54503,b->20.28258}");
 		check("FindFit({2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71}, " //
-				+ "a*x*Log(b + c*x), {a, b, c}, x)", //
+						+ "a*x*Log(b + c*x), {a, b, c}, x)", //
 				"{a->1.42076,b->1.65558,c->0.53464}");
 		check("FindFit({{1.0, 12.}, {1.9, 10.}, {2.6, 8.2}, {3.4, 6.9}, {5.0, 5.9}}, " //
-				+ "a*Exp(-k*t), {a, k}, t)", //
+						+ "a*Exp(-k*t), {a, k}, t)", //
 				"{a->14.38886,k->0.19821}");
 
 		// initial guess [0, 0, 0] doesn't work
 		check("FindFit({2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71}, " //
-				+ "a*x*Log(b + c*x), {{a,0},{b,0},{c,0}}, x)", //
+						+ "a*x*Log(b + c*x), {{a,0},{b,0},{c,0}}, x)", //
 				"FindFit({2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71},a*x*Log(b+c*x),{{a,\n"
 						+ "0},{b,0},{c,0}},x)");
 	}
@@ -3427,8 +3427,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		checkNumeric("FindRoot(Exp(x)==Pi^3,{x,-1,10})", "{x->3.4341896575482007}");
 		checkNumeric("$K=10000;\n" + "$g=0.0;\n" + "$n=10*12;\n" + "$Z=12;\n" + "$AA=0.0526;\n" + "$R=100;\n"
-				+ "$d=0.00;\n" + "$vn=0;\n" + "$EAj=0;\n" + "$zj=0;\n" + "$sz=1;\n"
-				+ "FindRoot((($K*(1+p-$g)^($n/$Z))/(1+$AA))+(Sum((($R*(1+$d)^(Floor(i0/$Z)))/(1+$AA))*(1+p-$g)^(($n-i0-$vn)/$Z),{i0,0,$n-1}))+(Sum(($EAj*(1+p-$g)^(($n-$zj)/$Z))/(1+$AA),{j,1,$sz})) - 30199, {p, 0, 0.1})",
+						+ "$d=0.00;\n" + "$vn=0;\n" + "$EAj=0;\n" + "$zj=0;\n" + "$sz=1;\n"
+						+ "FindRoot((($K*(1+p-$g)^($n/$Z))/(1+$AA))+(Sum((($R*(1+$d)^(Floor(i0/$Z)))/(1+$AA))*(1+p-$g)^(($n-i0-$vn)/$Z),{i0,0,$n-1}))+(Sum(($EAj*(1+p-$g)^(($n-$zj)/$Z))/(1+$AA),{j,1,$sz})) - 30199, {p, 0, 0.1})",
 				"{p->0.04999709393822401}");
 		checkNumeric("$K=10000;\n" + "$g=0.0;\n" + "$n=10*12;\n" + "$Z=12;\n" + "$AA=0.0526;\n" + "$res=15474;\n"
 				+ "FindRoot((($K*(1+p-$g)^($n/$Z))/(1+$AA)) - $res, {p, 0, 0.1})", "{p->0.049993464334866594}");
@@ -5242,7 +5242,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{-1,1,0}");
 		// github issue #44
 		check("LinearSolve({{1,0,-1,0},{0,1,0,-1},{1,-2,-1,0},{-1,0,3,1}},"//
-				+ "{0.06,0.06,-0.4,-0.06})", //
+						+ "{0.06,0.06,-0.4,-0.06})", //
 				"{-0.025,0.23,-0.085,0.17}");
 
 		check("LinearSolve({{a, b, c, d}}, {x})", //
@@ -6223,8 +6223,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// 10, 28, 8/3 as constants for the Lorenz equations
 		// https://socialinnovationsimulation.com/2013/07/19/tutorial-differential-equations-2/
 		check("NDSolve({x'(t) == 10*(y(t) - x(t)), \n"
-				+ " y'(t) == x(t)*(28 - z(t)) - y(t), z'(t) == x(t)*y(t) - 8/3*z(t),\n"
-				+ " x(0)== 0, y(0) == 1, z(0) == 0}, {x, y, z}, {t, 0, 20})",
+						+ " y'(t) == x(t)*(28 - z(t)) - y(t), z'(t) == x(t)*y(t) - 8/3*z(t),\n"
+						+ " x(0)== 0, y(0) == 1, z(0) == 0}, {x, y, z}, {t, 0, 20})",
 				"InterpolatingFunction(\n" + "{{0.0,0.91204,2.09193,0.06245},\n" + " {0.1,3.05475,6.63831,0.76714},\n"
 						+ " {0.2,9.46273,19.37015,7.5869},\n" + " {0.3,19.59444,23.40222,39.84913},\n"
 						+ " {0.4,9.81955,-6.62076,41.60318},\n" + " {0.5,-2.04439,-8.94178,29.85607},\n"
@@ -6575,8 +6575,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("NullSpace({{a,b,c}," + "{c,b,a}})", "{{1,(-a-c)/b,1}}");
 		check("NullSpace({{1,2,3}," + "{5,6,7}," + "{9,10,11}})", "{{1,-2,1}}");
 		check("NullSpace({{1,2,3,4}," //
-				+ "{5,6,7,8}," //
-				+ "{9,10,11,12}})", //
+						+ "{5,6,7,8}," //
+						+ "{9,10,11,12}})", //
 				"{{2,-3,0,1},\n" //
 						+ " {1,-2,1,0}}");
 		check("(-1/2+I*1/2)*(-I)", "1/2+I*1/2");
@@ -6674,8 +6674,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("OptimizeExpression( f(x))", //
 				"{f(x)}");
 		check("OptimizeExpression(-3*a - 2*a^3 + 4*Sqrt(1 + a^2)*(5 - 9*Log(2)) + \n"
-				+ " 4*a^2*Sqrt(1 + a^2)*(5 - 9*Log(2)) + \n" + " 12*(1 + a^2)^(3/2)*Log(1 + Sqrt(1 + 1/a^2)) - \n"
-				+ " 6*(4*(Sqrt(1 + a^2) - a*(2 + a^2 - a*Sqrt(1 + a^2)))*Log(a) + a*Log(1 + a^2)))", //
+						+ " 4*a^2*Sqrt(1 + a^2)*(5 - 9*Log(2)) + \n" + " 12*(1 + a^2)^(3/2)*Log(1 + Sqrt(1 + 1/a^2)) - \n"
+						+ " 6*(4*(Sqrt(1 + a^2) - a*(2 + a^2 - a*Sqrt(1 + a^2)))*Log(a) + a*Log(1 + a^2)))", //
 				//
 				"{-3*a-2*a^3+4*v1*v4+4*v1*v2*v4+12*v3^(3/2)*Log(1+Sqrt(1+1/a^2))-6*(4*(v1-a*(2-a*v1+v2))*Log(a)+a*Log(v3)),"//
 						+ "{v1->Sqrt(\n" + "1+a^2),"//
@@ -7756,12 +7756,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{False,False,False,True,False,False,False,True,False,False,False,True}");
 
 		check("PrimeQ({-5-4*I,-5-4*I, -5-2*I, -5+2*I, -5+4*I, " //
-				+ "-4-5*I, -4-I, -4+I, -4+5*I, " //
-				+ "-3-2*I, -3, -3+2*I, " //
-				+ "-2-5*I, -2-3*I, -2-I, -2+I, -2+3*I, -2+5*I, " //
-				+ "-1-4*I, -1-2*I, -1-I, -1+I, -1+2*I, -1+4*I, " //
-				+ "-3*I, 3*I, 1-4*I, 1-2*I, 1-I, 1+I, 1+2*I, 1+4*I, 2-5*I, 2-3*I, 2-I, 2+I, 2+3*I, " //
-				+ "2+5*I, 3-2*I, 3, 3+2*I, 4-5*I, 4-I, 4+I, 4+5*I, 5-4*I, 5-2*I, 5+2*I, 5+4*I}, GaussianIntegers->True)", //
+						+ "-4-5*I, -4-I, -4+I, -4+5*I, " //
+						+ "-3-2*I, -3, -3+2*I, " //
+						+ "-2-5*I, -2-3*I, -2-I, -2+I, -2+3*I, -2+5*I, " //
+						+ "-1-4*I, -1-2*I, -1-I, -1+I, -1+2*I, -1+4*I, " //
+						+ "-3*I, 3*I, 1-4*I, 1-2*I, 1-I, 1+I, 1+2*I, 1+4*I, 2-5*I, 2-3*I, 2-I, 2+I, 2+3*I, " //
+						+ "2+5*I, 3-2*I, 3, 3+2*I, 4-5*I, 4-I, 4+I, 4+5*I, 5-4*I, 5-2*I, 5+2*I, 5+4*I}, GaussianIntegers->True)", //
 				"{True,True,True,True,True,True,True,True,True,True,"//
 						+ "True,True,True,True,True,True,True,True,True,True,"//
 						+ "True,True,True,True,True,True,True,True,True,True,"//
@@ -8128,6 +8128,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRandomChoice() {
+		// check("RandomChoice({1,2,3,4,5,6,7},11.0)", "{2,1,5,3,5,7,4,5,5,6,5}");
+		// check("RandomChoice({1,2,3,4,5,6,7},10)", "{3,7,3,6,2,7,4,1,1,4}");
 		// check("RandomChoice({False, True})", "True");
 		// check("RandomChoice({1,2,3,4,5,6,7})", "3");
 	}
@@ -8554,7 +8556,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"Indeterminate");
 		// celsius to fahrenheit in steps of 10 degrees from -40 to 100 degree
 		check("Table({x, Rescale(x, {-40, 100}, {-40, 212})}, " //
-				+ "{x, -40, 100, 10})", //
+						+ "{x, -40, 100, 10})", //
 				"{{-40,-40},{-30,-22},{-20,-4},{-10,14},{0,32},{10,50},{20,68},{30,86},{40,104},{\n"
 						+ "50,122},{60,140},{70,158},{80,176},{90,194},{100,212}}");
 		check("Rescale({1, 2, 3, 4, 5}, {-100, 100})", //
@@ -8563,7 +8565,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	/**
 	 * If this test fails try a change in <code>AbstractAST#isZERO()</code>.
-	 * 
+	 *
 	 * <pre>
 	 * public boolean AbstractAST#isZERO() {
 	 *     return PredicateQ.possibleZeroQ(this, EvalEngine.get());
@@ -10560,7 +10562,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Together((-8)*a^(-1)*(-a^(-1)*b-1)^(-1))", "8/(a+b)");
 
 		check("Together((2*(2*x^3-4*x+5)*x^3*(3*x^2+2)^(-1)-4*x*(2*x^3-4*x+5)*(3*x^2+2)^(-1)+5*(2*x^3-4*x+\n"
-				+ "5)*(3*x^2+2)^(-1)-4*x^4+8*x^2-10*x)*(3*x^2+2)^(-1)+x^2-2)",
+						+ "5)*(3*x^2+2)^(-1)-4*x^4+8*x^2-10*x)*(3*x^2+2)^(-1)+x^2-2)",
 				"(17-60*x+12*x^2-10*x^3-6*x^4+x^6)/(4+12*x^2+9*x^4)");
 		check("Together((4*x^6-8*x^4+10*x^3)*(3*x^2+2)^(-1)+(-8*x^4+16*x^2-20*x)*(3*x^2+2)^(-1)+(10*x^3\n"
 				+ "-20*x+25)*(3*x^2+2)^(-1)-4*x^4+8*x^2-10*x)", "(25-60*x+32*x^2-10*x^3-8*x^6)/(2+3*x^2)");
@@ -10831,7 +10833,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testUnion() {
 		// http://oeis.org/A001597 - Perfect powers: m^k where m > 0 and k >= 2.
 		check("$min = 0; $max = 10^4;  "//
-				+ "Union@ Flatten@ Table( n^expo, {expo, Prime@ Range@ PrimePi@ Log2@ $max}, {n, Floor(1 + $min^(1/expo)), $max^(1/expo)})", //
+						+ "Union@ Flatten@ Table( n^expo, {expo, Prime@ Range@ PrimePi@ Log2@ $max}, {n, Floor(1 + $min^(1/expo)), $max^(1/expo)})", //
 				"{1,4,8,9,16,25,27,32,36,49,64,81,100,121,125,128,144,169,196,216,225,243,256,289,\n"
 						+ "324,343,361,400,441,484,512,529,576,625,676,729,784,841,900,961,1000,1024,1089,\n"
 						+ "1156,1225,1296,1331,1369,1444,1521,1600,1681,1728,1764,1849,1936,2025,2048,2116,\n"

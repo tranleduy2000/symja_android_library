@@ -272,7 +272,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 * Transform the ast recursively, according to the attributes Flat, HoldAll, HoldFirst, HoldRest, Orderless for the
 	 * left-hand-side of a Set[] or SetDelayed[] expression. Delegates to
 	 * <code>EvalEngine#evalSetAttributes()</code>method
-	 * 
+	 *
 	 * @param ast
 	 * @return <code>F.NIL</code> if evaluation is not possible
 	 * @deprecated use EvalEngine#evalHoldPattern(leftHandSide)
@@ -457,7 +457,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param lhsPatternAST
 	 * @param lhsEvalAST
 	 * @param rhsExpr
