@@ -640,8 +640,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 	// {
 	// try {
 	// IAST variableList = F.List(x);
-	// IExpr exprNumerator = F.evalExpandAll(parts[0], true, false);
-	// IExpr exprDenominator = F.evalExpandAll(parts[1], true, false);
+	// IExpr exprNumerator = F.expandAll(parts[0], true, false);
+	// IExpr exprDenominator = F.expandAll(parts[1], true, false);
 	// ASTRange r = new ASTRange(variableList, 1);
 	// List<IExpr> varList = r.toList();
 	//
@@ -894,18 +894,31 @@ public class Integrate extends AbstractFunctionEvaluator {
 					// || INT_RUBI_FUNCTIONS.contains(head)
 					|| head.isBuiltInSymbol() || head.getSymbolName().startsWith("§")) {
 				// || head.getSymbolName().startsWith(UtilityFunctionCtors.INTEGRATE_PREFIX)) {
+				boolean newCache = false;
+				if (engine.REMEMBER_AST_CACHE != null) {
+					IExpr result = engine.REMEMBER_AST_CACHE.getIfPresent(ast);
+					if (result != null) {
+						// RecursionLimitExceeded.throwIt(engine.getRecursionCounter(), ast);
+						return F.NIL;
+					}
+				} else {
+					newCache = true;
+					engine.REMEMBER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(50).build();
+				}
 				try {
 					if (limit <= 0 || limit > Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT) {
 						engine.setRecursionLimit(Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT);
 					}
+					engine.REMEMBER_AST_CACHE.put(ast, F.True);
 					// System.out.println(ast.toString());
 					IExpr temp = F.Integrate.evalDownRule(EvalEngine.get(), ast);
 					if (temp.isPresent()) {
 						return temp;
 					}
 				} catch (RecursionLimitExceeded rle) {
-					engine.printMessage("Integrate Rubi recursion limit " + Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT
-							+ " exceeded: " + ast.toString());
+					// engine.printMessage("Integrate(Rubi recursion): " + Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT
+					// + " exceeded: " + ast.toString());
+					engine.printMessage("Integrate(Rubi recursion): " + rle.getMessage());
 					engine.setRecursionLimit(limit);
 					if (secondTry.isPresent()) {
 						return integrateByRubiRules(secondTry, F.NIL);
@@ -922,6 +935,9 @@ public class Integrate extends AbstractFunctionEvaluator {
 					}
 				} finally {
 					engine.setRecursionLimit(limit);
+					if (newCache) {
+						engine.REMEMBER_AST_CACHE = null;
+					}
 				}
 			}
 		} catch (AbortException ae) {
@@ -1283,6 +1299,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 		// hack for TimeConstrained time limit:
 
 		// F.ISet(F.$s("§timelimit"), F.integer(12));
+		F.ISet(F.$s("§simplifyflag"), F.False);
 		F.ISet(F.$s("§$timelimit"), F.ZZ(12));
 		F.ISet(F.$s("§$showsteps"), F.False);
 		UtilityFunctionCtors.ReapList.setAttributes(ISymbol.HOLDFIRST);

@@ -66,6 +66,7 @@ public class EvalEngine implements Serializable {
 
 	static int fAnonymousCounter = 0;
 
+	public Cache<IAST, IExpr> REMEMBER_AST_CACHE = null;
 	public final static boolean DEBUG = false;
 
 	transient private static final ThreadLocal<EvalEngine> instance = new ThreadLocal<EvalEngine>() {
