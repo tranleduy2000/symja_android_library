@@ -101,9 +101,8 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
 	}
 
 	/**
-	 * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non
-	 * <code>F.NIL</code> value. The visitors <code>visit()</code> methods return <code>F.NIL</code> if no substitution
-	 * occurred.
+	 * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non <code>F.NIL</code>
+	 * value. The visitors <code>visit()</code> methods return <code>F.NIL</code> if no substitution occurred.
 	 */
 	private static class ShareReplaceAll extends VisitorExpr {
 		final Function<IExpr, IExpr> fFunction;
@@ -245,8 +244,7 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
 	/**
 	 * Try to optimize/extract common sub-<code>IASTs</code> expressions to minimize the number of operations
 	 *
-	 * @param ast
-	 *            the ast whose internal memory consumption should be minimized
+	 * @param ast the ast whose internal memory consumption should be minimized
 	 * @return the number of shared sub-expressions
 	 */
 	private static IExpr optimizeExpression(final IAST ast) {
@@ -280,6 +278,30 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
 			}
 		}
 		return F.List(ast);
+	}
+
+	public static IAST cseArray(final IAST ast, int minReferences, int minLeafCounter) {
+		ShareFunction function = new ShareFunction();
+		ShareReplaceAll sra = new ShareReplaceAll(function, 1);
+		IExpr sharedExpr = ast.accept(sra);
+		if (sharedExpr != null) {
+			ArrayList<ReferenceCounter> list = new ArrayList<ReferenceCounter>();
+			for (Map.Entry<IExpr, ReferenceCounter> entry : function.map.entrySet()) {
+				ReferenceCounter rc = entry.getValue();
+				if (rc.counter >= minReferences && rc.reference.leafCount() > minLeafCounter) {
+					list.add(rc);
+				}
+			}
+
+			Collections.sort(list, Collections.reverseOrder());
+			IASTAppendable result = F.ListAlloc(list.size());
+			for (ReferenceCounter rc : list) {
+				IExpr ref = rc.reference;
+				result.append(ref);
+			}
+			return result;
+		}
+		return F.NIL;
 	}
 
 }
