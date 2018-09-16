@@ -6801,7 +6801,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testOrthogonalize() {
 		check("2/Sqrt(14)", //
-				"Sqrt(2)/Sqrt(7)");
+				"Sqrt(2/7)");
 		check("(1/4)*Sqrt(1/2)", //
 				"1/(4*Sqrt(2))");
 		check("4*Sqrt(2)", //
@@ -6809,7 +6809,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("1/Sqrt(14)", //
 				"1/Sqrt(14)");
 		check("2/Sqrt(14)", //
-				"Sqrt(2)/Sqrt(7)");
+				"Sqrt(2/7)");
 		check("5/Sqrt(42)", //
 				"5/Sqrt(42)");
 		check("-2/Sqrt(2/21)", //
@@ -6828,8 +6828,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Orthogonalize({{2,3}, {2,7}, {4,5}})", //
 				"{{2/Sqrt(13),3/Sqrt(13)},{-3/Sqrt(13),2/Sqrt(13)},{0,0}}");
 		check("Orthogonalize({{1,2,3},{5,2,7},{3,5,1}})", //
-				"{{1/Sqrt(14),Sqrt(2)/Sqrt(7),3/Sqrt(14)},{5/Sqrt(42),(-2*Sqrt(2))/Sqrt(21),1/Sqrt(\n"
-						+ "42)},{1/Sqrt(3),1/Sqrt(3),-1/Sqrt(3)}}");
+				"{{1/Sqrt(14),Sqrt(2/7),3/Sqrt(14)},{5/Sqrt(42),-2*Sqrt(2/21),1/Sqrt(42)},{1/Sqrt(\n" +
+				"3),1/Sqrt(3),-1/Sqrt(3)}}");
 		check("Orthogonalize({{1,0,0},{0,0,1}})", //
 				"{{1,0,0},{0,0,1}}");
 	}
@@ -7452,7 +7452,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("(-5/6)^(1/2)", //
 				"I*Sqrt(5/6)");
 		check("(9/4)^(-3/8)", //
-				"2^(3/4)/3^(3/4)");
+				"(2/3)^(3/4)");
 		check("4^(-3/8)", //
 				"1/2^(3/4)");
 		check("5103^(1/3)", //
@@ -7491,7 +7491,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("81^(3/4)", //
 				"27");
 		check("Sqrt(63/5)", //
-				"(3*Sqrt(7))/Sqrt(5)");
+				"3*Sqrt(7/5)");
 		check("Sqrt(9/2)", //
 				"3/Sqrt(2)");
 		check("Sqrt(1/2)", "1/Sqrt(2)");
@@ -8633,8 +8633,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("h(-1) // FullForm", "Null");
 
 		check("f(x_) := Return(x)", "");
-		check("g(y_) := Module({}, z = f(y); 2)", "");
-		check("g(1)", "2");
+		check("g(y_) := Module({}, z = f(y); 2)", //
+				"");
+		check("g(1)", //
+				"2");
 
 		check("$a(x_):=Return(1); $b(x_):=Module({},$c=$a(y);2); $b(1)", "2");
 		check("$f(x_) := (If(x > 5, Return(a)); x + 3); $f(6)", "a");
@@ -10438,6 +10440,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testTimes() {
 
+		check("(Sqrt(3)*x)/Sqrt(2)", //
+				"Sqrt(3/2)*x");
+		check("(2^(3/4)*x*7^(-15/4))", //
+				"1/343*(2/7)^(3/4)*x");
 		check("1/(sq(a)*sq(b))//FullForm", //
 				"Times(Power(sq(a), -1), Power(sq(b), -1))");
 		check("(-Infinity)/Sin(-2)", "Infinity");
