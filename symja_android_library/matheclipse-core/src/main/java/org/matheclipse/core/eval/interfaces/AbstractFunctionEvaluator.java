@@ -163,8 +163,16 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 						return result;
 					}
 				}
-			} else if (expression.isNegativeInfinity()) {
+				// } else if (expression.isNegativeInfinity()) {
+				// return F.CInfinity;
+			} else if (expression.isDirectedInfinity() && expression.isAST1()) {
+				IExpr arg1 = expression.first();
+				if (arg1.isMinusOne()) {
 				return F.CInfinity;
+			}
+				if (arg1.isNegativeImaginaryUnit()) {
+					return F.DirectedInfinity(F.CI);
+				}
 			}
 		}
 		// if (expression.isNegativeResult()) {
@@ -295,8 +303,16 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 						return result;
 					}
 				}
-			} else if (expression.isNegativeInfinity()) {
+				// } else if (expression.isNegativeInfinity()) {
+				// return F.CInfinity;
+			} else if (expression.isDirectedInfinity() && expression.isAST1()) {
+				IExpr arg1 = expression.first();
+				if (arg1.isMinusOne()) {
 				return F.CInfinity;
+			}
+				if (arg1.isNegativeImaginaryUnit()) {
+					return F.DirectedInfinity(F.CI);
+				}
 			}
 		}
 		// if (expression.isNegativeResult()) {

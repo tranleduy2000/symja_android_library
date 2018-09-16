@@ -1217,7 +1217,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 
 		// F.ISet(F.$s("§timelimit"), F.integer(12));
 		F.ISet(F.$s("§simplifyflag"), F.False);
-		F.ISet(F.$s("§$timelimit"), F.ZZ(12));
+
+		F.ISet(F.$s("§$timelimit"), F.ZZ(Config.INTEGRATE_RUBI_TIMELIMIT));
 		F.ISet(F.$s("§$showsteps"), F.False);
 		UtilityFunctionCtors.ReapList.setAttributes(ISymbol.HOLDFIRST);
 		F.ISet(F.$s("§$trigfunctions"), F.List(F.Sin, F.Cos, F.Tan, F.Cot, F.Sec, F.Csc));
