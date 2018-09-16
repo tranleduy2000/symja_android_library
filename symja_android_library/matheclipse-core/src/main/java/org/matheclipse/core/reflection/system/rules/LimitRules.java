@@ -87,12 +87,12 @@ public interface LimitRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 41, 14 };
+  final public static int[] SIZES = { 41, 16 };
 
   final public static IAST RULES = List(
     IInit(Limit, SIZES),
-    // Limit(x_*(Sqrt(2*Pi*x_)/x_!)^(1/x_),x_Symbol->Infinity):=E
-    ISetDelayed(Limit(Times(x_,Power(Times(Sqrt(Times(C2,Pi,x_)),Power(Factorial(x_),-1)),Power(x_,-1))),Rule(x_Symbol,oo)),
+    // Limit(x_*(Sqrt(2*Pi))^(1/x_)*(Sin(x_)/x_!)^(1/x_),x_Symbol->Infinity):=E
+    ISetDelayed(Limit(Times(Power(Sqrt(Times(C2,Pi)),Power(x_,-1)),x_,Power(Times(Power(Factorial(x_),-1),Sin(x_)),Power(x_,-1))),Rule(x_Symbol,oo)),
       E),
     // Limit(x_/(x_!)^(1/x_),x_Symbol->Infinity):=E
     ISetDelayed(Limit(Times(x_,Power(Factorial(x_),Negate(Power(x_,-1)))),Rule(x_Symbol,oo)),

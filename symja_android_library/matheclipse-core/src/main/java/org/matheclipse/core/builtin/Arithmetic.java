@@ -1,5 +1,6 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Consumer;
 import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
@@ -3056,9 +3057,9 @@ public final class Arithmetic {
                     } else {
                         IExpr o1negExpr = F.NIL;
                         if (exponent.isInteger() && ((IInteger) exponent).isEven()) {
-                            o1negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(base, true);
+							o1negExpr = AbstractFunctionEvaluator.getPowerNegativeExpression(base, true);
                         } else {
-                            o1negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(base, false);
+							o1negExpr = AbstractFunctionEvaluator.getPowerNegativeExpression(base, false);
                         }
                         if (o1negExpr.isPresent()) {
                             if (exponent.isMinusOne()) {
@@ -3093,39 +3094,60 @@ public final class Arithmetic {
             }
 
             if (base.isAST()) {
-                IAST astArg1 = (IAST) base;
-                if (astArg1.isTimes()) {
+				IAST powBase = (IAST) base;
+				if (powBase.isTimes()) {
                     if (exponent.isInteger() || exponent.isMinusOne()) {
                         // (a * b * c)^n => a^n * b^n * c^n
-                        return astArg1.mapThread(Power(null, exponent), 1);
+						return powBase.mapThread(Power(null, exponent), 1);
                     }
 					// if (exponent.isNumber()) {
 					// final IAST f0 = astArg1;
 //
 
-					// if ((f0.size() > 1) && (f0.arg1().isNumber())) {
-					// return Times(Power(f0.arg1(), exponent),
-					// Power(F.ast(f0, F.Times, true, 2, f0.size()), exponent));
-					// }
-					// }
-                } else if (astArg1.isPower()) {
-                    if (astArg1.arg2().isReal() && exponent.isReal()) {
-                        IExpr temp = astArg1.arg2().times(exponent);
-                        if (temp.isOne()) {
-                            if (astArg1.arg1().isNonNegativeResult()) {
-                                return astArg1.arg1();
+					if ((base.size() > 1) && (base.first().isRealResult())) {
+						IASTAppendable filterAST = powBase.copyHead();
+						IASTAppendable restAST = powBase.copyHead();
+						powBase.forEach(new Consumer<IExpr>() {
+                            @Override
+                            public void accept(IExpr x) {
+                                if (x.isRealResult()) {
+                                    if (x.isMinusOne()) {
+                                        restAST.append(x);
+                                    } else {
+                                        if (x.isNegativeResult()) {
+                                            filterAST.append(x.negate());
+                                            restAST.append(F.CN1);
+                                        } else {
+                                            filterAST.append(x);
+                                        }
+                                    }
+                                } else {
+                                    restAST.append(x);
+                                }
                             }
-                            if (astArg1.arg1().isRealResult()) {
-                                return F.Abs(astArg1.arg1());
+                        });
+						if (filterAST.size() > 1 && restAST.size() > 1) {
+							return Times(Power(filterAST, exponent), Power(restAST, exponent));
+						}
+					}
+				} else if (base.isPower()) {
+					if (base.exponent().isReal() && exponent.isReal()) {
+						IExpr temp = base.exponent().times(exponent);
+                        if (temp.isOne()) {
+							if (base.base().isNonNegativeResult()) {
+								return base.base();
+                            }
+							if (base.base().isRealResult()) {
+								return F.Abs(base.base());
                             }
                         }
                     }
                     if (exponent.isInteger()) {
                         // (a ^ b )^n => a ^ (b * n)
-                        if (astArg1.arg2().isNumber()) {
-                            return F.Power(astArg1.arg1(), exponent.times(astArg1.arg2()));
+						if (base.exponent().isNumber()) {
+							return F.Power(base.base(), exponent.times(base.exponent()));
                         }
-                        return F.Power(astArg1.arg1(), F.Times(exponent, astArg1.arg2()));
+						return F.Power(base.base(), F.Times(exponent, base.exponent()));
                     }
                 }
             }
@@ -3867,7 +3889,7 @@ public final class Arithmetic {
             double val = d0.doubleValue();
             double r = d1.doubleValue();
             double result = doubleSurd(val, r);
-            if (java.lang.Double.isNaN(result)) {
+            if (Double.isNaN(result)) {
                 return F.Indeterminate;
             }
             return F.num(result);
@@ -3921,21 +3943,21 @@ public final class Arithmetic {
             if (r == 0.0d) {
                 EvalEngine ee = EvalEngine.get();
                 ee.printMessage("Surd(a,b) division by zero");
-                return java.lang.Double.NaN;
+                return Double.NaN;
             }
             if (val < 0.0d) {
                 double root = Math.floor(r);
-                if (DDouble.isFinite(r) && java.lang.Double.compare(r, root) == 0) {
+                if (DDouble.isFinite(r) && Double.compare(r, root) == 0) {
                     // integer type
                     int iRoot = (int) root;
                     if ((iRoot & 0x0001) == 0x0000) {
                         EvalEngine ee = EvalEngine.get();
                         ee.printMessage("Surd(a,b) - undefined for negative \"a\" and even \"b\" values");
-                        return java.lang.Double.NaN;
+                        return Double.NaN;
                     }
                     return -Math.pow(Math.abs(val), 1.0d / r);
                 }
-                return java.lang.Double.NaN;
+                return Double.NaN;
             }
             return Math.pow(val, 1.0d / r);
         }
