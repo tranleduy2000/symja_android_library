@@ -210,7 +210,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol AntiSymmetric = F.initFinalSymbol("AntiSymmetric", ID.AntiSymmetric);
 
-	/** AntihermitianMatrixQ(m) - returns `True` if `m` is a anti hermitian matrix.*/
+	/** AntihermitianMatrixQ(m) - returns `True` if `m` is a anti hermitian matrix. */
 	public final static IBuiltInSymbol AntihermitianMatrixQ = F.initFinalSymbol("AntihermitianMatrixQ",
 			ID.AntihermitianMatrixQ);
 
@@ -3039,11 +3039,11 @@ public class F {
 					ContextPath path = engine.getContextPath();
 					try {
 						engine.setContextPath(new ContextPath("integrate`"));
-						IAST ruleList = org.matheclipse.core.reflection.system.Integrate.getUtilityFunctionsRuleAST();
+						org.matheclipse.core.reflection.system.Integrate.getUtilityFunctionsRuleAST();
 						// if (ruleList != null) {
 						// engine.addRules(ruleList);
 						// }
-						ruleList = org.matheclipse.core.reflection.system.Integrate.getRuleASTStatic();
+						org.matheclipse.core.reflection.system.Integrate.getRuleASTStatic();
 						// if (ruleList != null) {
 						// engine.addRules(ruleList);
 						// }
@@ -6151,17 +6151,11 @@ public class F {
 		PatternMatching.setDelayedDownRule(priority,lhs, rhs, true);
 		return F.NIL;
 	}
-	public static IAST IIntegrate(int priority, final IAST lhs, final IExpr rhs) {
-			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
-		F.Integrate.putDownRule(ISymbol.RuleType.SET_DELAYED, false, lhs, rhs, priority,
-				true) ;
-		return F.NIL;
-	}
 	
 	public static IAST IIntegrate(int priority, final IAST lhs, final IExpr rhs) {
 			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
-		F.Integrate.putDownRule(ISymbol.RuleType.SET_DELAYED, false, lhs, rhs, priority,
-				true) ;
+		org.matheclipse.core.reflection.system.Integrate.INTEGRATE_RULES_DATA.putDownRule(ISymbol.RuleType.SET_DELAYED,
+				false, lhs, rhs, priority);
 		return F.NIL;
 	}
 

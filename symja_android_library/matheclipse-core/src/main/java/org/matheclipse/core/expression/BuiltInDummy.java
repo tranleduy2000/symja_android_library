@@ -200,10 +200,11 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 
 	/** {@inheritDoc} */
 	@Override
-	public final void createRulesData(int[] sizes) {
+	public final RulesData createRulesData(int[] sizes) {
 		if (fRulesData == null) {
 			fRulesData = new RulesData(EvalEngine.get().getContext(), sizes);
 		}
+		return fRulesData;
 	}
 
 	/**
