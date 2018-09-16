@@ -224,6 +224,14 @@ public class Blank extends IPatternImpl implements IPattern {
 	@Override
 	public String fullFormString() {
 		StringBuilder buf = new StringBuilder();
+		if (fDefaultValue!=null||fDefault) {
+			buf.append("Optional");
+			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+				buf.append('(');
+			} else {
+				buf.append('[');
+			}
+		}
 		buf.append("Blank");
 		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
 			buf.append('(');

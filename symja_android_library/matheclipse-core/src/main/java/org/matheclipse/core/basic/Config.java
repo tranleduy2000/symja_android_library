@@ -170,7 +170,7 @@ public class Config {
 	 * 
 	 * @see edu.jas.ufd.GCDFactory#getProxy(edu.jas.structure.RingFactory)
 	 */
-	public static boolean JAS_NO_THREADS = true;
+	public static boolean JAS_NO_THREADS = false;
 
 	/**
 	 * <p>
