@@ -831,14 +831,18 @@ public class RulesData implements Serializable {
 			return pmEquals;
 		}
 
-		final PatternMatcherAndEvaluator pmEvaluator = new PatternMatcherAndEvaluator(setSymbol, leftHandSide,
-				rightHandSide);
+		final PatternMatcherAndEvaluator pmEvaluator;
+		if (leftHandSide.isAST(F.Integrate)) {
+			pmEvaluator = new PatternMatcherAndEvaluator(setSymbol, leftHandSide, rightHandSide, false);
+		} else {
+			pmEvaluator = new PatternMatcherAndEvaluator(setSymbol, leftHandSide, rightHandSide);
 
 		if (pmEvaluator.isRuleWithoutPatterns()) {
 			fEqualDownRules = getEqualDownRules();
 			PatternMatcherEquals pmEquals = new PatternMatcherEquals(setSymbol, leftHandSide, rightHandSide);
 			fEqualDownRules.put(leftHandSide, pmEquals);
 			return pmEquals;
+		}
 		}
 
 		if (PatternMap.DEFAULT_RULE_PRIORITY!=priority) {

@@ -297,6 +297,10 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 */
 	protected transient PatternMap fPatternMap;
     public PatternMap getPatternMap() {
+		if (fPatternMap == null) {
+			fPatternMap = new PatternMap();
+			fPatternMap.determinePatterns(fLhsPatternExpr);
+		}
         return fPatternMap;
     }
 
@@ -314,6 +318,10 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	}
 
 	public PatternMatcher(final IExpr patternExpr) {
+		this(patternExpr, true);
+	}
+
+	public PatternMatcher(final IExpr patternExpr, boolean initAll) {
 		super(patternExpr);
 		this.fLHSPriority = PatternMap.DEFAULT_RULE_PRIORITY;
 		this.fPatternCondition = null;
@@ -321,8 +329,10 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 			this.fLhsPatternExpr = patternExpr.first();
 			this.fPatternCondition = patternExpr.second();
 		}
-		this.fPatternMap = new PatternMap();
+		if (initAll) {
+			fPatternMap = new PatternMap();
 		init(fLhsPatternExpr);
+	}
 	}
     /**
      * Check if the condition for this pattern matcher evaluates to <code>true</code>.
@@ -369,7 +379,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     public Object clone() throws CloneNotSupportedException {
         PatternMatcher v = (PatternMatcher) super.clone();
         v.fPatternCondition = fPatternCondition;
-        v.fPatternMap = fPatternMap.clone();
+		PatternMap patternMap = getPatternMap();
+		v.fPatternMap = patternMap.clone();
         v.fLHSPriority = fLHSPriority;
         return v;
     }
@@ -545,11 +556,11 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     }
 
     /**
-     * Return the matched value for index 0 if possisble.
+	 * Return the matched value for index 0 if possible.
      *
      * @return <code>null</code> if no matched expression exists
      */
-    public IExpr getPatternValue0() {
+	private IExpr getPatternValue0() {
         return fPatternMap.getValue(0);
     }
 
@@ -579,7 +590,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     }
 
     protected final void init(IExpr patternExpr) {
-        fLHSPriority = fPatternMap.determinePatterns(patternExpr);
+		fLHSPriority = getPatternMap().determinePatterns(patternExpr);
     }
 
     /**
@@ -589,7 +600,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
      */
     @Override
     final public boolean isRuleWithoutPatterns() {
-        return fPatternMap.isRuleWithoutPatterns();
+		return getPatternMap().isRuleWithoutPatterns();
     }
 
     protected void logConditionFalse(final IExpr lhsEvalAST, final IExpr lhsPatternAST, IExpr rhsAST) {
