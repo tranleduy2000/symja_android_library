@@ -160,7 +160,7 @@ public class F {
 	 */
 	public final static NILPointer NIL = new NILPointer();
 
-	/** Abort() - aborts an evaluation completely and returns `$Aborted`. */
+    /** Abort() - aborts an evaluation completely and returns `$Aborted`.*/
 	public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
 
 	/** Abs(expr) - returns the absolute value of the real or complex number `expr`. */
@@ -2331,13 +2331,14 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol TimeConstrained = F.initFinalSymbol("TimeConstrained", ID.TimeConstrained);
 
+    /** TimeValue(p, i, n) - returns an time value calculation.*/
+    public final static IBuiltInSymbol TimeValue = F.initFinalSymbol("TimeValue", ID.TimeValue);
     /** Times(a, b, ...) - represents the product of the terms `a, b, ...`. */
 	public final static IBuiltInSymbol Times = F.initFinalSymbol("Times", ID.Times);
 
 	/** TimesBy(x, dx) - is equivalent to `x = x * dx`.*/
 	public final static IBuiltInSymbol TimesBy = F.initFinalSymbol("TimesBy", ID.TimesBy);
 
-    public final static IBuiltInSymbol TimeValue = F.initFinalSymbol("TimeValue", ID.TimeValue);
 	/***/
 	public final static IBuiltInSymbol Timing = F.initFinalSymbol("Timing", ID.Timing);
 
@@ -3386,6 +3387,27 @@ public class F {
 	}
 
 	/**
+	 * Create a <code>BlankSequence[condition]</code> pattern object for pattern-matching and term rewriting
+	 *
+	 * @param condition
+	 *            additional condition which should be checked in pattern-matching
+	 * @return IPattern
+	 */
+	public static PatternSequence $bs(final IExpr condition) {
+		return org.matheclipse.core.expression.PatternSequence.valueOf(null, condition, false);
+	}
+
+	/**
+	 * Create a <code>BlankNullSequence[condition]</code> pattern object for pattern-matching and term rewriting
+	 *
+	 * @param condition
+	 *            additional condition which should be checked in pattern-matching
+	 * @return IPattern
+	 */
+	public static PatternSequence $bns(final IExpr condition) {
+		return org.matheclipse.core.expression.PatternSequence.valueOf(null, condition, false);
+	}
+	/**
 	 * Create a <code>Blank[]</code> pattern object for pattern-matching and term rewriting
 	 * 
 	 * @return IPattern
@@ -3608,7 +3630,7 @@ public class F {
 	 * @return IPattern
 	 */
 	public static IPatternSequence $ps(final ISymbol symbol) {
-		return PatternSequence.valueOf(symbol);
+		return PatternSequence.valueOf(symbol, false);
 	}
 
 	/**
@@ -3620,7 +3642,7 @@ public class F {
 	 * @return IPattern
 	 */
 	public static IPatternSequence $ps(final ISymbol symbol, final IExpr check) {
-		return PatternSequence.valueOf(symbol, check);
+		return PatternSequence.valueOf(symbol, check, false);
 	}
 
 	/**
@@ -3649,7 +3671,7 @@ public class F {
 	 * @return IPattern
 	 */
 	public static IPatternSequence $ps(final String symbolName) {
-		return PatternSequence.valueOf($s(symbolName));
+		return PatternSequence.valueOf($s(symbolName),false);
 	}
 
 	/**
@@ -4274,6 +4296,9 @@ public class F {
 		return binaryAST2(F.Binomial, a0, a1);
 	}
 
+	public static IAST BlankSequence( ) {
+		return headAST0(BlankSequence);
+	}
 	public static IAST Block(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Block, a0, a1);
 	}
@@ -5887,7 +5912,7 @@ public class F {
 	}
 
 	public static IPatternSequence initPredefinedPatternSequence(@Nonnull final ISymbol symbol) {
-		PatternSequence temp = PatternSequence.valueOf(symbol);
+		PatternSequence temp = PatternSequence.valueOf(symbol, false);
 		PREDEFINED_PATTERNSEQUENCE_MAP.put(symbol.toString(), temp);
 		return temp;
 	}
@@ -6994,6 +7019,9 @@ public class F {
 		return binaryAST2(Optional, a0, a1);
 	}
 
+	public static IAST Optional(final IExpr a0) {
+		return unaryAST1(Optional, a0);
+	}
 	public static IAST Options(final IExpr a0) {
 
 		return unaryAST1(Options, a0);
@@ -7055,6 +7083,9 @@ public class F {
 		return unaryAST1(PartitionsQ, a0);
 	}
 
+	public static IAST Pattern(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Pattern, a0, a1);
+	}
 	public static IAST PatternTest(final IExpr a0, final IExpr a1) {
 		return binaryAST2(PatternTest, a0, a1);
 	}

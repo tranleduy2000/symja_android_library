@@ -51,15 +51,16 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	 * @param numerator
 	 * @return
 	 */
-	public static PatternSequence valueOf(final ISymbol symbol, final IExpr check) {
+	public static PatternSequence valueOf(final ISymbol symbol, final IExpr check, boolean zeroArgsAllowed) {
 		PatternSequence p = new PatternSequence();
 		p.fSymbol = symbol;
 		p.fCondition = check;
+		p.fZeroArgsAllowed = zeroArgsAllowed;
 		return p;
 	}
 
-	public static PatternSequence valueOf(final ISymbol symbol) {
-		return valueOf(symbol, null);
+	public static PatternSequence valueOf(final ISymbol symbol, boolean zeroArgsAllowed) {
+		return valueOf(symbol, null, zeroArgsAllowed);
 	}
 
 	/**
@@ -114,8 +115,8 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	/**
-	 * Check if the two left-hand-side pattern expressions are equivalent. (i.e.
-	 * <code>f[x_,y_]</code> is equivalent to <code>f[a_,b_]</code> )
+	 * Check if the two left-hand-side pattern expressions are equivalent. (i.e. <code>f[x_,y_]</code> is equivalent to
+	 * <code>f[a_,b_]</code> )
 	 * 
 	 * @param patternExpr2
 	 * @param pm1
@@ -305,9 +306,8 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	/**
-	 * Compares this expression with the specified expression for order. Returns
-	 * a negative integer, zero, or a positive integer as this expression is
-	 * canonical less than, equal to, or greater than the specified expression.
+	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
+	 * integer as this expression is canonical less than, equal to, or greater than the specified expression.
 	 */
 	@Override
 	public int compareTo(final IExpr expr) {
