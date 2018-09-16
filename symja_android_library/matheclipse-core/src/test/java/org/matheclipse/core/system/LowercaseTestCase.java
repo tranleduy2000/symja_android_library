@@ -3887,6 +3887,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testGamma() {
+		check("Gamma(1/2, a*x)", //
+				"Gamma(1/2,a*x)");
 		check("Gamma(3, a*x)", //
 				"Gamma(3,a*x)");
 		check("Gamma(0)", //
@@ -3917,7 +3919,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Gamma(-3/4, 0)", "ComplexInfinity");
 		check("Gamma(10, -1)", "133496*E");
 		check("Gamma(1/2, x)", //
-				"Sqrt(Pi)*Erfc(Sqrt(x))");
+				"Gamma(1/2,x)");
 		check("Gamma(8)", "5040");
 		check("Gamma(1/2)", "Sqrt(Pi)");
 		// check("Gamma(1.0+I)", "");

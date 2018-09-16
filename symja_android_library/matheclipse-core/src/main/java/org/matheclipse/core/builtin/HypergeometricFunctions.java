@@ -29,6 +29,7 @@ import static org.matheclipse.core.expression.F.Times;
 public class HypergeometricFunctions {
 	static {
 		F.CosIntegral.setEvaluator(new CosIntegral());
+		F.ExpIntegralE.setEvaluator(new ExpIntegralE());
 		F.ExpIntegralEi.setEvaluator(new ExpIntegralEi());
 		F.FresnelC.setEvaluator(new FresnelC());
 		F.FresnelS.setEvaluator(new FresnelS());
@@ -73,6 +74,27 @@ public class HypergeometricFunctions {
 		}
 	}
 
+	private static class ExpIntegralE extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+
+			IExpr n = ast.arg1();
+			IExpr z = ast.arg2();
+			if (n.isZero()) {
+				// 1/(E^z*z)
+				return F.Power(F.Times(z, F.Power(F.E, z)), -1);
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+	}
 	private static class ExpIntegralEi extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
 
 		@Override
