@@ -3309,14 +3309,17 @@ public class Algebra {
 					IASTAppendable basicPlus = F.PlusAlloc(ast.size());
 					IASTAppendable restPlus = F.PlusAlloc(ast.size());
 
-					ast.forEach(x -> {
-                            if (x.accept(isBasicAST)) {
-                                basicPlus.append(x);
-                            } else {
-                                restPlus.append(x);
-                            }
+					ast.forEach(new Consumer<IExpr>() {
+						@Override
+						public void accept(IExpr x) {
+							if (x.accept(isBasicAST)) {
+								basicPlus.append(x);
+							} else {
+								restPlus.append(x);
+							}
 
-                    });
+						}
+					});
 					if (basicPlus.size() > 1) {
 						temp = tryTransformations(basicPlus.getOneIdentity(F.C0));
 						if (temp.isPresent()) {

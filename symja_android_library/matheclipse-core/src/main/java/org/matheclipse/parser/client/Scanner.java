@@ -419,6 +419,18 @@ public abstract class Scanner {
 		if (fCurrentChar == '$') {
 			getChar();
 		}
+		while (Character.isLetterOrDigit(fCurrentChar) || (fCurrentChar == '$') || (fCurrentChar == ':')) {
+			if (fCurrentChar == ':') {
+				if ((fCurrentChar == ':') && fInputString.length() > fCurrentPosition
+						&& fInputString.charAt(fCurrentPosition ) == ':') {
+					// for Rubi identifiers integrate::PolyQ etc
+					getChar();
+					getChar();
+				}
+				break;
+			}
+			getChar();
+		}
 		while (Character.isLetterOrDigit(fCurrentChar) || (fCurrentChar == '$')) {
 			getChar();
 		}
