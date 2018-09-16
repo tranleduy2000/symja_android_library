@@ -160,7 +160,7 @@ public class F {
 	 */
 	public final static NILPointer NIL = new NILPointer();
 
-    /** Abort() - aborts an evaluation completely and returns `$Aborted`.*/
+	/** Abort() - aborts an evaluation completely and returns `$Aborted`. */
 	public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
 
 	/** Abs(expr) - returns the absolute value of the real or complex number `expr`. */
@@ -1635,6 +1635,8 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol NotAvailable = F.initFinalSymbol("NotAvailable", ID.NotAvailable);
 
+	/***/
+	public final static IBuiltInSymbol NotElement = F.initFinalSymbol("NotElement", ID.NotElement);
 	/***/
 	public final static IBuiltInSymbol NotListQ = F.initFinalSymbol("NotListQ", ID.NotListQ);
 
@@ -6884,6 +6886,9 @@ public class F {
 		return unaryAST1(Not, a);
 	}
 
+	public static IAST NotElement(final IExpr a0, final IExpr a1) {
+		return binaryAST2(NotElement, a0, a1);
+	}
 	public static IAST NullSpace(final IExpr a0) {
 		return unaryAST1(NullSpace, a0);
 	}

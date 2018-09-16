@@ -19,6 +19,7 @@ public class AssumptionFunctions {
 	static {
 		F.Arrays.setEvaluator(new Arrays());
 		F.Element.setEvaluator(new Element());
+		F.NotElement.setEvaluator(new NotElement());
 		F.Refine.setEvaluator(new Refine());
 	}
 
@@ -149,6 +150,29 @@ public class AssumptionFunctions {
 
 	}
 
+	private static class NotElement extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+
+			final IExpr arg2 = engine.evaluate(ast.arg2());
+			if (arg2.isSymbol()) {
+				final IExpr arg1 = engine.evaluate(ast.arg1());
+				if (arg1.isAST(F.Alternatives)) {
+					IAST alternatives = (IAST) arg1;
+					IASTAppendable andList = F.And();
+					for (int i = 1; i < alternatives.size(); i++) {
+						andList.append(F.Not(F.Element(alternatives.get(i), (ISymbol) arg2)));
+					}
+					return andList;
+				}
+				return F.Not(F.Element(arg1, (ISymbol) arg2));
+			}
+			return F.NIL;
+		}
+
+	}
 	/**
 	 * <pre>
 	 * Refine(expression, assumptions)
