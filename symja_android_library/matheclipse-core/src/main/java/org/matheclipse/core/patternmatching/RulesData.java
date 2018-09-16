@@ -583,8 +583,21 @@ public class RulesData implements Serializable {
 									.println(" COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
 						}
 					}
+					if (Config.SHOW_STACKTRACE) {
+						if (isShowPriority(pmEvaluator)) {
+							System.out.print("try: " + pmEvaluator.getLHSPriority() + " - ");
+						}
+						if (pmEvaluator.getLHSPriority()==4574) {
+							System.out.println("Debug from this line");
+						}
+					}
 					result = pmEvaluator.eval(expr, engine);
 					if (result.isPresent()) {
+						if (Config.SHOW_STACKTRACE) {
+							if (isShowPriority(pmEvaluator)) {
+								System.out.println("matched: " + pmEvaluator.getLHSPriority()+": "+pmEvaluator.toString());
+							}
+						}
 						if (showSteps) {
 							if (isShowSteps(pmEvaluator)) {
 								IExpr rhs = pmEvaluator.getRHS();
@@ -597,6 +610,12 @@ public class RulesData implements Serializable {
 							}
 						}
 						return result;
+					}else {
+						if (Config.SHOW_STACKTRACE) {
+							if (isShowPriority(pmEvaluator)) {
+								System.out.print("not matched: " + pmEvaluator.getLHSPriority()+" ");
+							}
+						}
 					}
 				}
 			}
@@ -614,6 +633,13 @@ public class RulesData implements Serializable {
 		return head.equals(F.Integrate);
 	}
 
+	private boolean isShowPriority(IPatternMatcher pmEvaluator) {
+		IExpr head = pmEvaluator.getLHS().head();
+		// if (head.toString().toLowerCase().contains("integrate::")) {
+		// return true;
+		// }
+		return head.equals(F.Integrate);
+	}
 	public IExpr evalSimpleRatternDownRule(OpenIntToSet<IPatternMatcher> hashToMatcherMap, final int hash,
 			final IAST expression, boolean showSteps, @Nonnull EvalEngine engine) throws CloneNotSupportedException {
 		IPatternMatcher pmEvaluator;
