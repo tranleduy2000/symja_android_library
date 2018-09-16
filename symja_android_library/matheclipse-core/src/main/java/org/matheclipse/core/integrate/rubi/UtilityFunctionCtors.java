@@ -1614,7 +1614,7 @@ public class UtilityFunctionCtors {
 	}
 
 	public static IAST Simp(final IExpr a0, final IExpr a1) {
-		return binaryAST2(F.$s(INTEGRATE_PREFIX + "Simp"), a0, a1);
+		return binaryAST2(F.$rubi(INTEGRATE_PREFIX + "Simp"), a0, a1);
 	}
 
 	public static IAST SimpFixFactor(final IExpr a0, final IExpr a1) {
