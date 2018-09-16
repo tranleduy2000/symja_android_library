@@ -1865,24 +1865,6 @@ public final class MultivariateFactorization {
                     // must be equal to the degree of primitive part we want to lift to
                     assert Arrays.stream(ilcFactorsSqFree).mapToInt(AMultivariatePolynomial::degree).reduce(0, (a, b) -> a + b)
                             == ppPart.degree(0);
-//                    if (totalUDegree != ppPart.degree(0)) {
-//                        assert !UnivariateSquareFreeFactorization.isSquareFree(ilcEvaluation.evaluateFrom(ppPart, 1).asUnivariate());
-//                        // univariate image is not square-free two reasons possible:
-//                        // 1. bad evaluation (common for fields of large characteristic)
-//                        //    => we can try another evaluation
-//                        // 2. ppPart if a p-power in main variable (e.g. (a^3*b + c) for characteristic 3)
-//                        //    => any evaluation will lead to non square-free univariate image,
-//                        //    so we are not able to fully reconstruct the l.c.
-//
-//                        if (containsPPower(ppPart, 0))
-//                            // <= we are not possible to reconstruct l.c. fully
-//                            continue lc_reconstruction;
-//                        else
-//                            // <= try another evaluation, otherwise
-//                            continue main;
-//                    }
-
-                    // we need to correct lcSqFreePrimitive (obtain correct numerical l.c.)
                     Poly ppPartLC = ilcEvaluation.evaluateFrom(ppPart.lc(0), 1);
                     Poly realLC = Arrays.stream(ilcFactorsSqFree)
                             .map(Poly::lcAsPoly)
@@ -2317,10 +2299,13 @@ public final class MultivariateFactorization {
                             .equals(biFactorsMain.mapTo(p -> evaluation.evaluateFrom(p, 1).asUnivariate()).primitive().canonical());
 
                     // square-free decomposition of the leading coefficients of bivariate factors
+                    List<PolynomialFactorDecomposition<UnivariatePolynomial<BigInteger>>> list = new ArrayList<>();
+                    for (MultivariatePolynomial<BigInteger> f : biFactors.factors) {
+                        PolynomialFactorDecomposition<UnivariatePolynomial<BigInteger>> univariatePolynomials = UnivariateSquareFreeFactorization.SquareFreeFactorization(f.lc(0).asUnivariate());
+                        list.add(univariatePolynomials);
+                    }
                     PolynomialFactorDecomposition[] ulcFactors = (PolynomialFactorDecomposition[])
-                            biFactors.factors.stream()
-                                    .map(f -> UnivariateSquareFreeFactorization.SquareFreeFactorization(f.lc(0).asUnivariate()))
-                                    .toArray(PolynomialFactorDecomposition[]::new);
+                            list.toArray(new PolynomialFactorDecomposition[0]);
 
                     // move to GCD-free basis of sq.-f. decomposition (univariate, because fast)
                     GCDFreeBasis(ulcFactors);
@@ -2492,9 +2477,20 @@ public final class MultivariateFactorization {
      */
     private static MultivariatePolynomial<BigInteger>[] liftZ(MultivariatePolynomial<BigInteger> base, IntegersZp zpDomain, HenselLifting.Evaluation<BigInteger> evaluationZp,
                                                               MultivariatePolynomial<BigInteger>[] biFactorsArrayMainZ, MultivariatePolynomial<BigInteger>[] lcFactors) {
-        biFactorsArrayMainZ = Arrays.stream(biFactorsArrayMainZ).map(f -> f.setRing(zpDomain)).toArray(base::createArray);
-        if (lcFactors != null)
-            lcFactors = Arrays.stream(lcFactors).map(f -> f.setRing(zpDomain)).toArray(base::createArray);
+        List<MultivariatePolynomial<BigInteger>> list = new ArrayList<>();
+        for (MultivariatePolynomial<BigInteger> monomials : biFactorsArrayMainZ) {
+            MultivariatePolynomial<BigInteger> bigIntegerMultivariatePolynomial = monomials.setRing(zpDomain);
+            list.add(bigIntegerMultivariatePolynomial);
+        }
+        biFactorsArrayMainZ = list.toArray(base.createArray(0));
+        if (lcFactors != null) {
+            List<MultivariatePolynomial<BigInteger>> result = new ArrayList<>();
+            for (MultivariatePolynomial<BigInteger> f : lcFactors) {
+                MultivariatePolynomial<BigInteger> monomials = f.setRing(zpDomain);
+                result.add(monomials);
+            }
+            lcFactors = result.toArray(base.createArray(0));
+        }
 
         HenselLifting.multivariateLift0(base, biFactorsArrayMainZ, lcFactors, evaluationZp, base.degrees(), 2);
 

@@ -10,8 +10,11 @@ final class PrivateRandom {
     /**
      * thread local instance of random
      */
-    private static final ThreadLocal<RandomGenerator> ThreadLocalRandom
-            = ThreadLocal.withInitial(() -> new Well1024a(0x7f67fcad528cfae9L));
+    private static final RandomGenerator sRandom;
+
+    static {
+        sRandom = new Well1024a(System.currentTimeMillis());
+    }
 
     private PrivateRandom() {
     }
@@ -20,6 +23,6 @@ final class PrivateRandom {
      * Returns random generator associated with current thread
      */
     static RandomGenerator getRandom() {
-        return ThreadLocalRandom.get();
+        return sRandom;
     }
 }
