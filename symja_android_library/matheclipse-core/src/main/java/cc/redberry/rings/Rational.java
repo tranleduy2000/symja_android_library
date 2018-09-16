@@ -1,13 +1,13 @@
 package cc.redberry.rings;
 
+import com.duy.lambda.Function;
+import com.duy.lambda.Predicate;
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.io.IStringifier;
@@ -67,6 +67,7 @@ public class Rational<E> implements Comparable<Rational<E>>,
         this.numerator = new Operand(numerator);
         this.denominator = new Operand(ring.getOne());
     }
+
     public Rational(Ring<E> ring, E numerator, E denominator) {
         if (ring.isZero(denominator))
             throw new ArithmeticException("division by zero");
@@ -81,11 +82,12 @@ public class Rational<E> implements Comparable<Rational<E>>,
         this.ring = ring;
         this.simplicityCriteria = simplicityCriteria(ring);
         @SuppressWarnings("unchecked")
-        Operand[] numden = new Operand[]{new Operand(numerator), new Operand(denominator)};
+        Operand[] numden = new Operand[2]{new Operand(numerator), new Operand(denominator)};
         normalize(numden);
         this.numerator = numden[0];
         this.denominator = numden[1];
     }
+
     Rational(Ring<E> ring, Operand numerator, Operand denominator) {
         this.ring = ring;
         this.simplicityCriteria = simplicityCriteria(ring);
@@ -95,6 +97,7 @@ public class Rational<E> implements Comparable<Rational<E>>,
         this.numerator = numden[0];
         this.denominator = numden[1];
     }
+
     Rational(boolean skipNormalize, Ring<E> ring, Operand numerator, Operand denominator) {
         this.ring = ring;
         this.simplicityCriteria = simplicityCriteria(ring);
@@ -238,18 +241,24 @@ public class Rational<E> implements Comparable<Rational<E>>,
      * Factor decomposition of denominator
      */
     public FactorDecomposition<E> factorDenominator() {
-        return denominator.stream()
-                .map(ring::factor)
-                .reduce(FactorDecomposition.empty(ring), FactorDecomposition::addAll);
+        FactorDecomposition<E> acc = FactorDecomposition.empty(ring);
+        for (E e : denominator) {
+            FactorDecomposition<E> factor = ring.factor(e);
+            acc = acc.addAll(factor);
+        }
+        return acc;
     }
 
     /**
      * Factor decomposition of denominator
      */
     public FactorDecomposition<E> factorNumerator() {
-        return numerator.stream()
-                .map(ring::factor)
-                .reduce(FactorDecomposition.empty(ring), FactorDecomposition::addAll);
+        FactorDecomposition<E> acc = FactorDecomposition.empty(ring);
+        for (E e : numerator) {
+            FactorDecomposition<E> factor = ring.factor(e);
+            acc = acc.addAll(factor);
+        }
+        return acc;
     }
 
     /**
@@ -483,8 +492,8 @@ public class Rational<E> implements Comparable<Rational<E>>,
     /**
      * Stream of numerator and denominator
      */
-    public Stream<E> stream() {
-        return Stream.of(numerator.expand(), denominator.expand());
+    public ArrayList<E> stream() {
+        return Lists.newArrayList(numerator.expand(), denominator.expand()));
     }
 
     @Override
@@ -526,7 +535,7 @@ public class Rational<E> implements Comparable<Rational<E>>,
      * A single operand (either numerator or denominator) represented by a list of factors. If there is a unit factor it
      * is always stored in the first position.
      */
-    final class Operand extends ArrayList<E> {
+    public final class Operand extends ArrayList<E> {
         /**
          * all factors multiplied
          */
@@ -772,9 +781,20 @@ public class Rational<E> implements Comparable<Rational<E>>,
         }
 
         Operand map(Function<E, E> mapper) {
-            Operand op = stream().map(mapper).collect(Collectors.toCollection(Operand::new));
-            if (toExpand != this)
-                op.toExpand = toExpand.stream().map(mapper).collect(Collectors.toList());
+            Operand es = new Operand();
+            for (E e : this) {
+                E e1 = mapper.apply(e);
+                es.add(e1);
+            }
+            Operand op = es;
+            if (toExpand != this) {
+                List<E> list = new ArrayList<>();
+                for (E e : toExpand) {
+                    E e1 = mapper.apply(e);
+                    list.add(e1);
+                }
+                op.toExpand = list;
+            }
             op.expandForm = mapper.apply(expandForm);
             return op;
         }
@@ -784,15 +804,26 @@ public class Rational<E> implements Comparable<Rational<E>>,
         }
 
         Operand pow(BigInteger exponent) {
-            Operand pow = stream().map(f -> ring.pow(f, exponent)).collect(Collectors.toCollection(Operand::new));
+            Operand es = new Operand();
+            for (E e : this) {
+                E pow1 = ring.pow(e, exponent);
+                es.add(pow1);
+            }
+            Operand pow = es;
             if (expandForm != null) {
                 if (size() == 1)
                     pow.expandForm = pow.first();
                 else
                     pow.expandForm = ring.pow(expandForm, exponent);
                 pow.toExpand = Collections.singletonList(pow.expandForm);
-            } else if (toExpand != this)
-                pow.toExpand = toExpand.stream().map(f -> ring.pow(f, exponent)).collect(Collectors.toList());
+            } else if (toExpand != this) {
+                List<E> list = new ArrayList<>();
+                for (E f : toExpand) {
+                    E e = ring.pow(f, exponent);
+                    list.add(e);
+                }
+                pow.toExpand = list;
+            }
             return pow;
         }
     }

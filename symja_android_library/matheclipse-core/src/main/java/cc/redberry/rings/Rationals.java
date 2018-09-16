@@ -168,18 +168,22 @@ public final class Rationals<E> implements Ring<Rational<E>> {
     }
 
     private FactorDecomposition<Rational<E>> factor(Rational<E> element, Function<E, FactorDecomposition<E>> factor) {
-        FactorDecomposition<E> numFactors = element.numerator.stream()
-                .map(factor)
-                .reduce(FactorDecomposition.empty(ring), FactorDecomposition::addAll);
+        FactorDecomposition<E> numFactors = FactorDecomposition.empty(ring);
+        for (E e : element.numerator) {
+            FactorDecomposition<E> es = factor.apply(e);
+            numFactors = numFactors.addAll(es);
+        }
         FactorDecomposition<Rational<E>> factors = FactorDecomposition.empty(this);
 
         for (int i = 0; i < numFactors.size(); i++)
             factors.addNonUnitFactor(new Rational<>(ring, numFactors.get(i)), numFactors.getExponent(i));
         factors.addFactor(new Rational<>(ring, numFactors.unit), 1);
 
-        FactorDecomposition<E> denFactors = element.denominator.stream()
-                .map(factor)
-                .reduce(FactorDecomposition.empty(ring), FactorDecomposition::addAll);
+        FactorDecomposition<E> denFactors = FactorDecomposition.empty(ring);
+        for (E e : element.denominator) {
+            FactorDecomposition<E> es = factor.apply(e);
+            denFactors = denFactors.addAll(es);
+        }
         for (int i = 0; i < denFactors.size(); i++)
             factors.addNonUnitFactor(new Rational<>(ring, ring.getOne(), denFactors.get(i)), denFactors.getExponent(i));
         factors.addFactor(new Rational<>(ring, ring.getOne(), denFactors.unit), 1);
