@@ -186,10 +186,6 @@ public class RubiIssue72 extends AbstractRubiTestCase {
 	}
 
 	public void test0045() {
-		check("ExpandAll[(1+x)/Sqrt[2] ]", "1/Sqrt(2)+x/Sqrt(2)");
-		check("Exponent[(1+x)/Sqrt[2],x]", "1");
-		check("Exponent[(1+x)/2,x, List]", "{0, 1}");
-		check("Exponent[(1+x)/Sqrt[2],x, List]", "{0, 1}");
 		check("Integrate::Expon[(2 + 2*x)/(2*Sqrt[2]), x, List]", "{0, 1}");
 	}
 
@@ -390,12 +386,7 @@ public class RubiIssue72 extends AbstractRubiTestCase {
 	}
 
 	public void test0095() {
-		check("1/Sqrt[2]", "1/Sqrt(2)");
-		// TODO answer has equivalent form:
-		// check("Integrate::NonnumericFactors[1/Sqrt[2]]", //
-		// "Sqrt[2]");
-		check("Integrate::NonnumericFactors[1/Sqrt[2]]", //
-				"2/Sqrt[2]");
+        check("Integrate::NonnumericFactors[1/Sqrt[2]]", "Sqrt[2]");
 	}
 
 	public void test0096() {
@@ -415,11 +406,7 @@ public class RubiIssue72 extends AbstractRubiTestCase {
 	}
 
 	public void test0100() {
-		// TODO answer has equivalent form:
-		// check("Integrate::NonnumericFactors[(2 + 2*x)/(2*Sqrt[2])]", //
-		// "Sqrt[2]*(1 + x)");
-		check("Integrate::NonnumericFactors[(2 + 2*x)/(2*Sqrt[2])]", //
-				"(2*(1+x))/Sqrt[2]");
+        check("Integrate::NonnumericFactors[(2 + 2*x)/(2*Sqrt[2])]", "Sqrt[2]*(1 + x)");
 	}
 
 	public void test0101() {
@@ -671,13 +658,11 @@ public class RubiIssue72 extends AbstractRubiTestCase {
 	}
 
 	public void test0163() {
-		check("Integrate::Simp[1/Sqrt[2] + x/Sqrt[2], x]", //
-				"1/Sqrt[2] + x/Sqrt[2]");
+        check("Integrate::Simp[1/Sqrt[2] + x/Sqrt[2], x]", "1/Sqrt[2] + x/Sqrt[2]");
 	}
 
 	public void test0164() {
-		check("Integrate::Simp[Plus @@ (Integrate::Coeff[(2 + 2*x)/(2*Sqrt[2]), x, #1]*x^#1 & ) /@ Integrate::Expon[(2 + 2*x)/(2*Sqrt[2]), x, List], x]", //
-				"1/Sqrt[2] + x/Sqrt[2]");
+        check("Integrate::Simp[Plus @@ (Integrate::Coeff[(2 + 2*x)/(2*Sqrt[2]), x, #1]*x^#1 & ) /@ Integrate::Expon[(2 + 2*x)/(2*Sqrt[2]), x, List], x]", "1/Sqrt[2] + x/Sqrt[2]");
 	}
 
 	public void test0165() {
@@ -688,6 +673,13 @@ public class RubiIssue72 extends AbstractRubiTestCase {
 		check("Integrate::SimpFixFactor[x, x]", "x");
 	}
 
+    public void test0167() {
+        check("Integrate::SimpHelp[Integrate::w$62784, x]", "x/Sqrt[2]");
+    }
+
+    public void test0168() {
+        check("Integrate::SimpHelp[Integrate::w$62787, x]", "x");
+    }
 	public void test0169() {
 		check("Integrate::SimpHelp[x, x]", "x");
 	}
