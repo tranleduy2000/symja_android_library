@@ -27,7 +27,7 @@ public abstract class AbstractRubiTestCase extends TestCase {
 	/**
 	 * Timeout limit in seconds as the default value for Symja expression evaluation.
 	 */
-	private long fSeconds = 60;
+	private long fSeconds = 10;
 
 	public AbstractRubiTestCase(String name) {
 		super(name);
@@ -40,16 +40,6 @@ public abstract class AbstractRubiTestCase extends TestCase {
 		}
 		if (result.equals(F.$Aborted)) {
 			return "TIMEOUT";
-		}
-		if (manuallyCheckedResult != null) {
-			manuallyCheckedResult = manuallyCheckedResult.trim();
-			if (manuallyCheckedResult.length() > 0) {
-				IExpr expected = fEvaluator.eval(manuallyCheckedResult);
-				if (result.equals(expected)) {
-					// the expressions are structurally equal
-					return expectedResult;
-				}
-			}
 		}
 		expectedResult = expectedResult.trim();
 		if (expectedResult.length() > 0) {
