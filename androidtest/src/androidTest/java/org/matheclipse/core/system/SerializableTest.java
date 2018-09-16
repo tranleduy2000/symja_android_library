@@ -3,6 +3,8 @@ package org.matheclipse.core.system;
 import junit.framework.TestCase;
 
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.expression.ASTRealMatrix;
+import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
@@ -23,7 +25,7 @@ public class SerializableTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		// wait for initializing of Integrate() rules:
-		F.join();
+		F.await();
 	}
 
 	public void testNum() {
@@ -128,10 +130,24 @@ public class SerializableTest extends TestCase {
 		equalsCopy(rulesData);
 	}
 
+	public void testASTRealMatrix() {
+		equalsCopy(new ASTRealMatrix(new double[][] {{ 1.0, 2.0, 3.0},{3.3, 4.4, 5.5} }, false));
+
+		// PseudoInverse({{1,2,3},{3,4,5}})
+		EvalEngine engine = EvalEngine.get();
+		IExpr result = engine.evaluate(F.PseudoInverse(F.List(F.List(F.C1, F.C2, F.C3), F.List(F.C4, F.C5, F.C6))));
+		equalsCopy(result);
+	}
+
+	public void testASTRealVector() {
+		equalsCopy(new ASTRealVector(new double[] { 1.0, 1.2, 3.4 }, false));
+	}
+
 	public void testPowerSeries() {
 		equalsCopy(new ASTSeriesData(F.x, F.a, F.List(F.C0, F.C1, F.C3), 0, 10, 1));
+		// Series(Log(x),{x,a,4})
 		EvalEngine engine = EvalEngine.get();
-		IExpr result = engine.evaluate("Series(Log(x),{x,a,4})");
+		IExpr result = engine.evaluate(F.Series(F.Log(F.x), F.List(F.x, F.a, F.C4)));
 		equalsCopy(result);
 	}
 	public void testNIL() {
