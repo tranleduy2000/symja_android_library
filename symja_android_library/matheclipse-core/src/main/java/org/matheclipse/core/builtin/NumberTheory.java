@@ -939,9 +939,9 @@ public final class NumberTheory {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3);
 
 			int size = ast.size();
+			if (size >= 3) {
 			IExpr expr;
 			for (int i = 1; i < size - 1; i++) {
 				expr = ast.get(i);
@@ -952,6 +952,8 @@ public final class NumberTheory {
 				}
 			}
 			return F.True;
+		}
+			return F.False;
 		}
 
 		@Override

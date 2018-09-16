@@ -921,6 +921,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Cancel((c*d+d^2*x)^2/d^2 )", //
 				"(c+d*x)^2");
 
+		check("Cancel(x / x ^ 2)", //
+				"1/x");
+		check("Cancel(x / x ^ 2 + y / y ^ 2)", //
+				"1/x+1/y");
+		check("Cancel(f(x) / x + x * f(x) / x ^ 2)", //
+				"(2*f(x))/x");
 		check("Cancel((x - a)/(x^2 - a^2) == 0 && (x^2 - 2*x + 1)/(x - 1) >= 0)",//
 				"1/(a+x)==0&&x>=1");
 		check("9+3*x+x^2", "9+3*x+x^2");
@@ -1702,6 +1708,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCoprimeQ() {
+		check("CoprimeQ(7,3)", "True");
+		check("CoprimeQ(7)", "False");
+		check("CoprimeQ( )", "False");
 		check("CoprimeQ(8,9,11)", "True");
 		check("CoprimeQ({1, 2, 3, 4, 5}, 6)", "{True,False,False,False,True}");
 		check("CoprimeQ(2, 3, 5)", "True");
@@ -5952,9 +5961,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("$gcd(m0_, n0_) :=\n" + " Module({m = m0, n = n0},\n" + "  While(n != 0, {m, n} = {n, Mod(m, n)});\n"
 				+ "  m\n" + "  );$gcd(18, 21)", "3");
 
-		check("{Module({x}, x), Module({x}, x)}", "{x$16,x$17}");
-		check("Module({e = Expand((1 + x)^5)}, Function(x, e))", "Function(x$19,e$18)");
-		check("Module({a,b}, Block({c}, c+a))", "a$20+c");
+		check("{Module({x}, x), Module({x}, x)}", //
+				"{x$24,x$25}");
+		check("Module({e = Expand((1 + x)^5)}, Function(x, e))", //
+				"Function(x$27,e$26)");
+		check("Module({a,b}, Block({c}, c+a))", //
+				"a$28+c");
 
 		if (Config.SERVER_MODE == false) {
 			check("f(x0_) :=\n" + " Module({x = x0},\n" + "  While(x > 0, x = Log(x));\n" + "  x\n" + "  );f(2.0)",
@@ -6816,6 +6828,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("f(c, a, b, a + b, 3, 1.0)", "f(1.0,3,a,b,a+b,c)");
 		check("f(a, b) == f(b, a)", "True");
 		check("SetAttributes(f, Flat)", "");
+		check("Attributes(f)", "{Flat,Orderless}");
 		check("f(a, b, c) /. f(a, c) -> d", "f(b,d)");
 	}
 
