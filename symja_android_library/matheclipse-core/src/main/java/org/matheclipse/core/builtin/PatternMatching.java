@@ -405,11 +405,12 @@ public final class PatternMatching {
 					// System.out.println(file.toString());
 					return getFile(file, engine);
 				} else {
-//					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
-//					if (file.exists()) {
-//						return getFile(file, engine);
+					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
+					if (file.exists()) {
+						return getFile(file, engine);
 				}
             }
+			}
             return F.NIL;
         }
 
@@ -1159,24 +1160,28 @@ public final class PatternMatching {
 		}
 		throw new RuleCreationError(leftHandSide);
 	}
-	public static Object[] setDelayedDownRule(int priority, IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
-		final Object[] result = new Object[] { null, rightHandSide };
+	// public static void setDelayedIntegrateRule(int priority, IAST leftHandSide, IExpr rightHandSide,
+	// boolean packageMode) {
+	// F.Integrate.putDownRule(ISymbol.RuleType.SET_DELAYED, false, leftHandSide, rightHandSide, priority,
+	// packageMode) ;
+	// }
+	public static void setDelayedDownRule(int priority, IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
 		if (leftHandSide.isAST()) {
 			final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
 
-			result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET_DELAYED, false, leftHandSide, rightHandSide,
-					priority, packageMode);
-			return result;
+			lhsSymbol.putDownRule(ISymbol.RuleType.SET_DELAYED, false, leftHandSide, rightHandSide, priority,
+					packageMode);
+			return;
 		}
 		if (leftHandSide.isSymbol()) {
 			final ISymbol lhsSymbol = (ISymbol) leftHandSide;
 			if (lhsSymbol.hasLocalVariableStack()) {
 				lhsSymbol.set(rightHandSide);
-				return result;
+				return;
 			}
-			result[0] = lhsSymbol.putDownRule(ISymbol.RuleType.SET_DELAYED, true, leftHandSide, rightHandSide,
-					priority, packageMode);
-			return result;
+			lhsSymbol.putDownRule(ISymbol.RuleType.SET_DELAYED, true, leftHandSide, rightHandSide, priority,
+					packageMode);
+			return;
 		}
 		throw new RuleCreationError(leftHandSide);
 	}
