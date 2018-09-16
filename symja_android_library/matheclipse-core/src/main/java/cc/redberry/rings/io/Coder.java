@@ -3,7 +3,7 @@ package cc.redberry.rings.io;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import com.duy.lambda.Function;
 import java.util.stream.Collectors;
 
 import cc.redberry.rings.Rational;
@@ -108,9 +108,11 @@ public class Coder<
         if (pVariables != null)
             pVariables.forEach((k, v) -> eVariables.computeIfAbsent(k, __ -> polyToElement.apply(polyRing.variable(v))));
 
-        this.bindings = eVariables.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (prev, n) -> n));
+        Map<Element, String> map = new HashMap<>();
+        for (Map.Entry<String, Element> stringElementEntry : eVariables.entrySet()) {
+            map.put(stringElementEntry.getValue(), stringElementEntry.getKey());
+        }
+        this.bindings = map;
         this.subcoders = new HashMap<>();
     }
 

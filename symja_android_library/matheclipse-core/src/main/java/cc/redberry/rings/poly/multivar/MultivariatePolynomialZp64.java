@@ -9,8 +9,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.LongFunction;
+import com.duy.lambda.Function;
+import com.duy.lambda.LongFunction;
 
 import cc.redberry.libdivide4j.FastDivision;
 import cc.redberry.rings.IntegersZp;

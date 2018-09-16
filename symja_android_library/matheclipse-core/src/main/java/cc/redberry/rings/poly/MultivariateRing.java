@@ -1,10 +1,11 @@
 package cc.redberry.rings.poly;
 
+import com.duy.lambda.Function;
+
 import org.hipparchus.random.RandomGenerator;
 import org.hipparchus.random.Well44497b;
 
 import java.util.Comparator;
-import java.util.function.Function;
 
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.poly.multivar.AMonomial;

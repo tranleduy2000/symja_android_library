@@ -1,7 +1,7 @@
 package cc.redberry.rings.poly.univar;
 
 import java.util.Comparator;
-import java.util.function.Function;
+import com.duy.lambda.Function;
 import java.util.stream.Stream;
 
 import cc.redberry.rings.Ring;

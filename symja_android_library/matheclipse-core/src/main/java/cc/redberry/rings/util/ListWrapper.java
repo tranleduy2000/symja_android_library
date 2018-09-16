@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Predicate;
+import com.duy.lambda.UnaryOperator;
 import java.util.stream.Stream;
 
 /**

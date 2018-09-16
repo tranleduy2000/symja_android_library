@@ -29,7 +29,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
-import java.util.function.Function;
+import com.duy.lambda.Function;
 
 import cc.redberry.rings.bigint.BigInteger;
 

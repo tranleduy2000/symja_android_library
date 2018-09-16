@@ -1,7 +1,7 @@
 package cc.redberry.rings.poly.univar;
 
 import java.util.Arrays;
-import java.util.function.LongFunction;
+import com.duy.lambda.LongFunction;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 

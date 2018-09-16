@@ -2,7 +2,7 @@ package cc.redberry.rings.poly;
 
 import org.hipparchus.random.RandomGenerator;
 
-import java.util.function.Function;
+import com.duy.lambda.Function;
 
 import cc.redberry.rings.Ring;
 import cc.redberry.rings.poly.univar.IUnivariatePolynomial;

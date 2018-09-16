@@ -2,7 +2,7 @@ package cc.redberry.rings.poly.univar;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
+import com.duy.lambda.BiFunction;
 
 import cc.redberry.rings.ChineseRemainders;
 import cc.redberry.rings.IntegersZp;

@@ -1,9 +1,10 @@
 package cc.redberry.rings;
 
+import com.duy.lambda.Function;
+
 import org.hipparchus.random.RandomGenerator;
 
 import java.util.Iterator;
-import java.util.function.Function;
 
 import cc.redberry.rings.bigint.BigInteger;
 import cc.redberry.rings.io.IStringifier;

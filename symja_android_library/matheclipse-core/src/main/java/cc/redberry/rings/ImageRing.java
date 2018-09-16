@@ -5,7 +5,7 @@ import org.hipparchus.random.RandomGenerator;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.Function;
+import com.duy.lambda.Function;
 import java.util.stream.StreamSupport;
 
 import cc.redberry.rings.bigint.BigInteger;

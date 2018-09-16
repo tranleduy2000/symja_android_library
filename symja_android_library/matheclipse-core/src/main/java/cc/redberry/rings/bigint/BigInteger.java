@@ -29,13 +29,14 @@
 
 package cc.redberry.rings.bigint;
 
+import com.duy.lang.DInteger;
+import com.duy.util.ThreadLocalRandom;
+
 import org.hipparchus.random.RandomGenerator;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamField;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,7 +45,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadLocalRandom;
 
 import sun.misc.DoubleConsts;
 import sun.misc.FloatConsts;
@@ -601,6 +601,7 @@ public final class BigInteger extends Number implements Comparable<BigInteger> {
             checkRange();
         }
     }
+
     /**
      * Translates the String representation of a BigInteger in the
      * specified radix into a BigInteger.  The String representation
@@ -695,6 +696,7 @@ public final class BigInteger extends Number implements Comparable<BigInteger> {
             checkRange();
         }
     }
+
     /*
      * Constructs a new BigInteger using a char array with radix=10.
      * Sign is precalculated outside and not allowed in the val.
@@ -3051,8 +3053,8 @@ public final class BigInteger extends Number implements Comparable<BigInteger> {
         int lower = (int) bits;
 
         // return (upper << 32) + lower
-        return (valueOf(Integer.toUnsignedLong(upper))).shiftLeft(32).
-                add(valueOf(Integer.toUnsignedLong(lower)));
+        return (valueOf(DInteger.toUnsignedLong(upper))).shiftLeft(32).
+                add(valueOf(DInteger.toUnsignedLong(lower)));
     }
 
     /**
@@ -5746,64 +5748,6 @@ public final class BigInteger extends Number implements Comparable<BigInteger> {
     }
 
     /**
-     * Reconstitute the {@code BigInteger} instance from a stream (that is,
-     * deserialize it). The magnitude is read in as an array of bytes
-     * for historical reasons, but it is converted to an array of ints
-     * and the byte array is discarded.
-     * Note:
-     * The current convention is to initialize the cache fields, bitCount,
-     * bitLength and lowestSetBit, to 0 rather than some other marker value.
-     * Therefore, no explicit action to set these fields needs to be taken in
-     * readObject because those fields already have a 0 value be default since
-     * defaultReadObject is not being used.
-     */
-    private void readObject(ObjectInputStream s)
-            throws IOException, ClassNotFoundException {
-        /*
-         * In order to maintain compatibility with previous serialized forms,
-         * the magnitude of a BigInteger is serialized as an array of bytes.
-         * The magnitude field is used as a temporary store for the byte array
-         * that is deserialized. The cached computation fields should be
-         * transient but are serialized for compatibility reasons.
-         */
-
-        // prepare to read the alternate persistent fields
-        ObjectInputStream.GetField fields = s.readFields();
-
-        // Read the alternate persistent fields that we care about
-        int sign = fields.get("signum", -2);
-        byte[] magnitude = (byte[]) fields.get("magnitude", null);
-
-        // Validate signum
-        if (sign < -1 || sign > 1) {
-            String message = "BigInteger: Invalid signum value";
-            if (fields.defaulted("signum"))
-                message = "BigInteger: Signum not present in stream";
-            throw new java.io.StreamCorruptedException(message);
-        }
-        int[] mag = stripLeadingZeroBytes(magnitude);
-        if ((mag.length == 0) != (sign == 0)) {
-            String message = "BigInteger: signum-magnitude mismatch";
-            if (fields.defaulted("magnitude"))
-                message = "BigInteger: Magnitude not present in stream";
-            throw new java.io.StreamCorruptedException(message);
-        }
-
-        // Commit final fields via Unsafe
-        UnsafeHolder.putSign(this, sign);
-
-        // Calculate mag field from magnitude and discard magnitude
-        UnsafeHolder.putMag(this, mag);
-        if (mag.length >= MAX_MAG_LENGTH) {
-            try {
-                checkRange();
-            } catch (ArithmeticException e) {
-                throw new java.io.StreamCorruptedException("BigInteger: Out of the supported range");
-            }
-        }
-    }
-
-    /**
      * Save the {@code BigInteger} instance to a stream.
      * The magnitude of a BigInteger is serialized as a byte array for
      * historical reasons.
@@ -5969,108 +5913,4 @@ public final class BigInteger extends Number implements Comparable<BigInteger> {
         return subtract(ONE);
     }
 
-    // Support for resetting final fields while deserializing
-    private static class UnsafeHolder {
-        private static final sun.misc.Unsafe unsafe;
-        private static final long signumOffset;
-        private static final long magOffset;
-
-        static {
-            try {
-                unsafe = getUnsafe();// sun.misc.Unsafe.getUnsafe();
-                signumOffset = unsafe.objectFieldOffset
-                        (BigInteger.class.getDeclaredField("signum"));
-                magOffset = unsafe.objectFieldOffset
-                        (BigInteger.class.getDeclaredField("mag"));
-            } catch (Exception ex) {
-                throw new ExceptionInInitializerError(ex);
-            }
-        }
-
-        @SuppressWarnings("restriction")
-        private static sun.misc.Unsafe getUnsafe() {
-            try {
-                Field workaround = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
-                workaround.setAccessible(true);
-                return (sun.misc.Unsafe) workaround.get(null);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        static void putSign(BigInteger bi, int sign) {
-            unsafe.putIntVolatile(bi, signumOffset, sign);
-        }
-
-        static void putMag(BigInteger bi, int[] magnitude) {
-            unsafe.putObjectVolatile(bi, magOffset, magnitude);
-        }
-    }
-
-//    //todo improve and comment
-//    public BigInteger sqrtFloor() {
-//        long c;
-//        BigInteger medium;
-//        BigInteger high = this;
-//        BigInteger low = BigInteger.ONE;
-//        while (high.subtract(low).compareTo(BigInteger.ONE) > 0) {
-//            medium = high.add(low).divide(BigInteger.ONE.add(BigInteger.ONE));
-//            c = medium.multiply(medium).compareTo(this);
-//            if (c > 0) high = medium;
-//            if (c < 0) low = medium;
-//            if (c == 0)
-//                return medium;
-//        }
-//        if (high.multiply(high).compareTo(this) == 0)
-//            return high;
-//        else
-//            return low;
-//    }
-//
-//    //todo improve and comment
-//    public BigInteger sqrtCeil() {
-//        long c;
-//        BigInteger medium;
-//        BigInteger high = this;
-//        BigInteger low = BigInteger.ONE;
-//        while (high.subtract(low).compareTo(BigInteger.ONE) > 0) {
-//            medium = high.add(low).divide(BigInteger.ONE.add(BigInteger.ONE));
-//            c = medium.multiply(medium).compareTo(this);
-//            if (c > 0) high = medium;
-//            if (c < 0) low = medium;
-//            if (c == 0)
-//                return medium;
-//        }
-//        if (high.multiply(high).compareTo(this) == 0)
-//            return high;
-//        else
-//            return low.increment();
-//    }
-//
-//    @Override
-//    public BigInteger[] gcdExtended(BigInteger b) {
-//        BigInteger s = BigInteger.ZERO, old_s = BigInteger.ONE;
-//        BigInteger t = BigInteger.ONE, old_t = BigInteger.ZERO;
-//        BigInteger r = b, old_r = this;
-//
-//        BigInteger q;
-//        BigInteger tmp;
-//        while (!r.isZero()) {
-//            q = old_r.divide(r);
-//
-//            tmp = old_r;
-//            old_r = r;
-//            r = tmp.subtract(q.multiply(r));
-//
-//            tmp = old_s;
-//            old_s = s;
-//            s = tmp.subtract(q.multiply(s));
-//
-//            tmp = old_t;
-//            old_t = t;
-//            t = tmp.subtract(q.multiply(t));
-//        }
-//        assert old_r.equals(this.multiply(old_s).add(b.multiply(old_t)));
-//        return new BigInteger[]{old_r, old_s, old_t};
-//    }
 }

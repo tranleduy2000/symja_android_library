@@ -13,8 +13,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
+import com.duy.lambda.Supplier;
+import com.duy.lambda.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 

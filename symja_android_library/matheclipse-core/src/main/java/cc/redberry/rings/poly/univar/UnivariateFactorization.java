@@ -1,7 +1,7 @@
 package cc.redberry.rings.poly.univar;
 
 import java.util.List;
-import java.util.function.Function;
+import com.duy.lambda.Function;
 
 import cc.redberry.combinatorics.Combinatorics;
 import cc.redberry.rings.IntegersZp;

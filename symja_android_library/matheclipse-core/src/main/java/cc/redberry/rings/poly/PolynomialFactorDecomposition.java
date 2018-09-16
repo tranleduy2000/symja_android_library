@@ -1,10 +1,11 @@
 package cc.redberry.rings.poly;
 
+import com.duy.lambda.Function;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import cc.redberry.rings.FactorDecomposition;
@@ -13,6 +14,7 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import static cc.redberry.rings.Rings.PolynomialRing;
+import static cc.redberry.rings.poly.PolynomialMethods.polyPow;
 
 /**
  * {@inheritDoc}
@@ -152,7 +154,7 @@ public final class PolynomialFactorDecomposition<Poly extends IPolynomial<Poly>>
         for (int i = fTmp.length - 1; i >= 0; --i) {
             Poly poly = fTmp[i];
             if (poly.isMonomial() && eTmp[i] != 1) {
-                poly = PolynomialMethods.polyPow(poly, eTmp[i], false);
+                poly = polyPow(poly, eTmp[i], false);
                 assert poly.isMonomial();
             }
             if (poly.signumOfLC() < 0) {
@@ -177,7 +179,7 @@ public final class PolynomialFactorDecomposition<Poly extends IPolynomial<Poly>>
     public PolynomialFactorDecomposition<Poly> setLcFrom(Poly poly) {
         Poly u = ring.getOne();
         for (int i = 0; i < size(); i++)
-            u = u.multiply(PolynomialMethods.polyPow(get(i).lcAsPoly(), getExponent(i)));
+            u = u.multiply(polyPow(get(i).lcAsPoly(), getExponent(i)));
         return setUnit(PolynomialMethods.divideExact(poly.lcAsPoly(), u));
     }
 
@@ -187,7 +189,7 @@ public final class PolynomialFactorDecomposition<Poly extends IPolynomial<Poly>>
     public Poly lc() {
         Poly u = unit.clone();
         for (int i = 0; i < size(); i++)
-            u = u.multiply(PolynomialMethods.polyPow(get(i).lcAsPoly(), getExponent(i)));
+            u = u.multiply(polyPow(get(i).lcAsPoly(), getExponent(i)));
         return u;
     }
 
@@ -248,6 +250,11 @@ public final class PolynomialFactorDecomposition<Poly extends IPolynomial<Poly>>
 
     @Override
     public PolynomialFactorDecomposition<Poly> clone() {
-        return new PolynomialFactorDecomposition<>(unit.clone(), factors.stream().map(Poly::clone).collect(Collectors.toList()), new TIntArrayList(exponents));
+        List<Poly> list = new ArrayList<>();
+        for (Poly factor : factors) {
+            Poly clone = factor.clone();
+            list.add(clone);
+        }
+        return new PolynomialFactorDecomposition<>(unit.clone(), list, new TIntArrayList(exponents));
     }
 }

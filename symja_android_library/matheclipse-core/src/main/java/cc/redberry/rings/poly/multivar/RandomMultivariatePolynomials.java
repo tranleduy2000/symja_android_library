@@ -3,7 +3,7 @@ package cc.redberry.rings.poly.multivar;
 import org.hipparchus.random.RandomGenerator;
 
 import java.util.Comparator;
-import java.util.function.Function;
+import com.duy.lambda.Function;
 
 import cc.redberry.rings.IntegersZp64;
 import cc.redberry.rings.Ring;

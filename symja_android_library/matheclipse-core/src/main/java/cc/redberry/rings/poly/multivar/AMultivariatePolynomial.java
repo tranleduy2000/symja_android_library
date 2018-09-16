@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import com.duy.lambda.BiConsumer;
+import com.duy.lambda.BinaryOperator;
+import com.duy.lambda.Function;
+import com.duy.lambda.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
