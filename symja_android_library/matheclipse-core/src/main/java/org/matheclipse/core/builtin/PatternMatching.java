@@ -740,8 +740,6 @@ public final class PatternMatching {
     public static class Pattern extends AbstractCoreFunctionEvaluator {
         public final static Pattern CONST = new Pattern();
 
-        public Pattern() {
-        }
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -850,7 +848,7 @@ public final class PatternMatching {
             Validate.checkSize(ast, 3);
             IExpr leftHandSide = ast.arg1();
             if (leftHandSide.isAST()) {
-				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
+				leftHandSide = engine.evalLHSPattern((IAST) leftHandSide);
             } else {
                 leftHandSide = engine.evaluate(leftHandSide);
             }
@@ -890,7 +888,7 @@ public final class PatternMatching {
             Validate.checkSize(ast, 3);
             IExpr leftHandSide = ast.arg1();
             if (leftHandSide.isAST()) {
-				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
+				leftHandSide = engine.evalLHSPattern((IAST) leftHandSide);
             } else {
                 leftHandSide = engine.evaluate(leftHandSide);
             }

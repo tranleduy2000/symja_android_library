@@ -7,7 +7,6 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
-import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.patternmatching.RulesData;
 
 import java.io.BufferedReader;
@@ -45,7 +44,7 @@ public class RulePreprocessor {
 		IExpr leftHandSide = ast.arg1();
 		IExpr rightHandSide = ast.arg2();
 		if (ast.arg1().isAST()) {
-			leftHandSide = EvalEngine.get().evalHoldPattern((IAST) leftHandSide);
+			leftHandSide = EvalEngine.get().evalLHSPattern((IAST) leftHandSide);
 		}
 		if (evalRHS) {
 			rightHandSide = F.eval(rightHandSide);
