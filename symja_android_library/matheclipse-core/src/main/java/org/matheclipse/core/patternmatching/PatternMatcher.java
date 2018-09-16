@@ -628,7 +628,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
             }
         }
         if (lhsEvalExpr instanceof IAST) {
-            if (!lhsPatternAST.isPatternExpr() && lhsPatternAST.equals(lhsEvalExpr)) {
+			if (lhsPatternAST.isFreeOfPatterns() && lhsPatternAST.equals(lhsEvalExpr)) {
                 return stackMatcher == null || stackMatcher.matchRest();
             }
 
@@ -1063,11 +1063,9 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                 if (!matched) {
                     IExpr temp = null;
                     fPatternMap.resetPattern(patternValues);
-                    if (lhsEvalExpr.isAST() && lhsPatternAST.hasOptionalArgument()
-                            && !lhsPatternAST.isOrderlessAST()) {
+					if (lhsEvalExpr.isAST() && lhsPatternAST.hasOptionalArgument() && !lhsPatternAST.isOrderlessAST()) {
 						// TODO for Power[x_, y_.] matching Power[a,b] test both cases Power[a,b] && Power[Power[a,b],1]
-                        temp = matchOptionalArgumentsAST(lhsPatternAST.topHead(), lhsPatternAST,
-                                (IAST) lhsEvalExpr);
+						temp = matchOptionalArgumentsAST(lhsPatternAST.topHead(), lhsPatternAST, (IAST) lhsEvalExpr);
                         if (temp.isPresent()) {
                             matched = matchExpr(temp, lhsEvalExpr, engine, stackMatcher);
                         }

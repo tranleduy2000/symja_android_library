@@ -1884,7 +1884,6 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 				continue;
 			} else if (temp instanceof IPatternObject) {
 				isFreeOfPatterns = false;
-				addEvalFlags(getEvalFlags());
 			}
 		}
 		if (isFreeOfPatterns) {

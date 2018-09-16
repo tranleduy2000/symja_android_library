@@ -113,7 +113,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	public int[] addPattern(PatternMap patternMap, Map<IExpr, Integer> patternIndexMap) {
 		patternMap.addPattern(patternIndexMap, this);
 		int[] result = new int[2];
-		if (isPatternDefault()) {
+		if (isPatternDefault() || isPatternOptional()) {
 			// the ast contains a pattern with default value (i.e. "x_." or
 			// "x_:")
 			result[0] = IAST.CONTAINS_DEFAULT_PATTERN;
@@ -245,6 +245,21 @@ public class Blank extends IPatternImpl implements IPattern {
 			buf.append(')');
 		} else {
 			buf.append(']');
+		}
+		if (fDefaultValue != null) {
+			buf.append(",");
+			buf.append(fDefaultValue.fullFormString());
+			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+				buf.append(")");
+			} else {
+				buf.append("]");
+			}
+		} else if (fDefault) {
+			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+				buf.append(")");
+			} else {
+				buf.append("]");
+			}
 		}
 		return buf.toString();
 	}
