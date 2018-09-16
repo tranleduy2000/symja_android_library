@@ -31,11 +31,10 @@ import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
- *
  * (I)nterface for a mathematical (Expr)ession<br />
- *
+ * <p>
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
- *
+ * <p>
  * <pre>
  * java.lang.Object
  *    |--- java.util.AbstractCollection
@@ -1044,6 +1043,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>true</code> if the expression contains no <code>IPatternObject</code>.
      */
     boolean isFreeOfPatterns();
+
+    /**
+     * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the expression itself, are no
+     * pattern objects with "default values" (i.e. <code>x_.</code> or <code>x_:value</code>)
+     *
+     * @return <code>true</code> if the expression contains no <code>IPatternObject</code> which has a "default pattern" defined.
+     */
+    boolean isFreeOfDefaultPatterns();
 
     /**
      * Test if this expression is a <code>Function( arg1 )</code> expression with at least 1 argument.

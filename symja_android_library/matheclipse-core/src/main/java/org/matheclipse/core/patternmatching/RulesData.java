@@ -66,11 +66,11 @@ public class RulesData implements Serializable {
 					}
 					if (neededSymbols != null && arg1.isOrderlessAST()) {
 						boolean lambda = !lhsAST.exists(new Predicate<IExpr>() {
-                            @Override
-                            public boolean test(IExpr x) {
-                                return x.isPatternDefault() || x.isOrderlessAST();
-                            }
-                        });
+							@Override
+							public boolean test(IExpr x) {
+								return x.isPatternDefault() || x.isOrderlessAST();
+							}
+						});
 						boolean[] isComplicated = { false };
 						arg1.forEach(new Consumer<IExpr>() {
 							@Override
@@ -583,7 +583,7 @@ public class RulesData implements Serializable {
 									.println(" COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
 						}
 					}
-					// if (pmEvaluator.getLHSPriority() == 2510) {
+					// if (pmEvaluator.getLHSPriority() == 2447) {
 					// System.out.println("Debug from this line");
 					// }
 					if (Config.SHOW_STACKTRACE) {

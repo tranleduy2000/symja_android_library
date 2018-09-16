@@ -3,6 +3,7 @@ package org.matheclipse.core.patternmatching;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 
+import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.ObjIntPredicate;
@@ -255,7 +256,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	/**
 	 * Return the matched value for the given pattern object
 	 * 
-	 * @param pattern
+	 * @param pExpr
 	 * @return <code>null</code> if no matched expression exists
 	 */
 	public IExpr getValue(@Nonnull IPatternObject pattern) {
@@ -346,7 +347,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 
 	public boolean isPatternTest(IExpr expr, IExpr patternTest, EvalEngine engine) {
 		IExpr temp = substitutePatternOrSymbols(expr);
-		if (temp == null) {
+		if (!temp.isPresent()) {
 			temp = expr;
 		}
 		IASTMutable test = (IASTMutable) F.unaryAST1(patternTest, null);
@@ -405,15 +406,13 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 * pattern values arrays
 	 * 
 	 * @param lhsPatternExpr
-	 *            left-hand-side expression which may containe pattern objects
+	 *            left-hand-side expression which may contain pattern objects
 	 * 
-	 * @return
+	 * @return <code>F.NIL</code> if substitutions isn't possible
 	 */
 	protected IExpr substitutePatternOrSymbols(final IExpr lhsPatternExpr) {
 		if (fPatternValuesArray != null) {
-			IExpr result = lhsPatternExpr.replaceAll(new Function<IExpr, IExpr>() {
-                                                         @Override
-                                                         public IExpr apply(IExpr input) {
+			IExpr result = lhsPatternExpr.replaceAll((IExpr input) -> {
                                                              if (input instanceof IPatternObject) {
                                                                  IPatternObject patternObject = (IPatternObject) input;
                                                                  ISymbol sym = patternObject.getSymbol();
@@ -433,12 +432,19 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
                                                                  }
                                                              }
                                                              return F.NIL;
+			});
+
+			if (result.isPresent()) {
+				if (result.isFlatAST()) {
+					IExpr temp = EvalAttributes.flatten((IAST) result);
+					if (temp.isPresent()) {
+						result = temp;
+					}
                                                          }
+				if (result.isOrderlessAST()) {
+					EvalAttributes.sort((IASTMutable) result);
                                                      }
 
-			);
-
-			if (result != null) {
 				return result;
 			}
 		}

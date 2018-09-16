@@ -377,6 +377,11 @@ public class Blank extends IPatternImpl implements IPattern {
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean isFreeOfDefaultPatterns() {
+		return !fDefault && fDefaultValue == null;
+	}
+	/** {@inheritDoc} */
+	@Override
 	public boolean isPatternDefault() {
 		return fDefault;
 	}

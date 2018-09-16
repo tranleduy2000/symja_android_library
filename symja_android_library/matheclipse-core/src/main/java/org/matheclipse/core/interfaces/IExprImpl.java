@@ -1287,6 +1287,11 @@ public abstract class IExprImpl implements IExpr {
         return true;
     }
 
+    @Override
+    public boolean isFreeOfDefaultPatterns() {
+        return true;
+    }
+
     /**
      * Test if this expression is a <code>Function( arg1 )</code> expression with at least 1 argument.
      *
