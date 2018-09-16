@@ -103,15 +103,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 			}
 			final IExpr subPattern = fLHSPatternAST.get(lhsPosition);
 			final IExpr[] patternValues = fPatternMap.copyPattern();
-			return fLHSEvalAST.exists(new ObjIntPredicate<IExpr>() {
-				@Override
-				public boolean test(IExpr temp, int j) {
-					if (fLHSPatternAST.forAll(new ObjIntPredicate<IExpr>() {
-						@Override
-						public boolean test(IExpr x, int i) {
-							return fUsedIndex[i - 1] != j;
-						}
-					})) {
+			return fLHSEvalAST.exists((temp, j) -> {
+				if (fLHSPatternAST.forAll((x, i) -> fUsedIndex[i - 1] != j)) {
 						boolean matched = false;
 						final StackMatcher localStackMatcher = stackMatcher == null ? new StackMatcher(engine)
 								: stackMatcher;
@@ -119,7 +112,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 						try {
 							if (localStackMatcher.push(subPattern, temp)) {
 								fUsedIndex[lhsPosition - 1] = j;
-								if (OrderlessMatcher.this.matchOrderlessAST(lhsPosition + 1, localStackMatcher, engine)) {
+							if (matchOrderlessAST(lhsPosition + 1, localStackMatcher, engine)) {
 									matched = true;
 									return true;
 								}
@@ -133,7 +126,6 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 						}
 					}
 					return false;
-				}
 			});
 		}
 	}
@@ -172,7 +164,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 		}
 
 		public boolean push(IExpr patternExpr, IExpr evalExpr) {
-			if (!patternExpr.isFreeOfPatterns()) {
+			if (patternExpr.isPatternExpr()) {
 				if (patternExpr.isAST()) {
 					// insert for delayed evaluation in matchRest() method
 					push(new Entry(patternExpr, evalExpr));
@@ -334,6 +326,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	public boolean checkCondition(EvalEngine engine) {
 
 		if (fPatternCondition != null) {
+			// final EvalEngine engine = EvalEngine.get();
 			boolean traceMode = false;
 			try {
 				traceMode = engine.isTraceMode();
@@ -346,16 +339,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 			} finally {
 				engine.setTraceMode(traceMode);
 			}
-		} else {
-			boolean traceMode = false;
-			try {
-				traceMode = engine.isTraceMode();
-				engine.setTraceMode(false);
-				return checkRHSCondition(engine);
-			} finally {
-				engine.setTraceMode(traceMode);
 		}
-		}
+		return true;
 	}
 
 	/**
@@ -1067,7 +1052,6 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 							fPatternMap.resetPattern(patternValues);
 							if (lhsEvalExpr.isAST() && lhsPatternAST.hasOptionalArgument()
 									&& !lhsPatternAST.isOrderlessAST()) {
-						// TODO for Power[x_, y_.] matching Power[a,b] test both cases Power[a,b] && Power[Power[a,b],1]
 								temp = matchOptionalArgumentsAST(lhsPatternAST.topHead(), lhsPatternAST,
 										(IAST) lhsEvalExpr);
 								if (temp.isPresent()) {
@@ -1098,38 +1082,21 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 			// lhsEvalAST.toString());
 
 			if (lhsPatternAST.isAST1()) {
+				// TODO check for OneIdentity?
 				return matchExpr(lhsPatternAST.arg1(), lhsEvalAST, engine, stackMatcher);
 			}
-			IExpr[] patternValues = fPatternMap.copyPattern();
 			for (int i = 1; i < lhsPatternSize; i++) {
 				IExpr temp = lhsPatternAST.get(i);
 				if (!(temp instanceof IPatternObject)) {
 					final int index = i;
 					// try to find a matching sub-expression
 					return lhsEvalAST.exists((x, j) -> {
-						StackMatcher myStackMatcher = stackMatcher;
-						if (myStackMatcher == null) {
-							myStackMatcher = new StackMatcher(engine);
-						}
-						int lastStackSize = myStackMatcher.size();
-
-						if (myStackMatcher.push(lhsPatternAST.removeAtClone(index), lhsEvalAST.removeAtClone(j))) {
-							boolean matched = false;
-							try {
-								if (matchExpr(lhsPatternAST.get(index), x, engine, myStackMatcher)) {
-									// if (matchFlatAndFlatOrderlessAST(sym, lhsPatternAST.removeAtClone(index),
-									// lhsEvalAST.removeAtClone(j), engine, stackMatcher)) {
-									matched = true;
+						if (matchExpr(lhsPatternAST.get(index), x, engine)) {
+							if (matchFlatAndFlatOrderlessAST(sym, lhsPatternAST.removeAtClone(index),
+									lhsEvalAST.removeAtClone(j), engine, stackMatcher)) {
 									return true;
-									// }
-								}
-							} finally {
-								if (!matched) {
-									stackMatcher.removeFrom(lastStackSize);
 								}
 							}
-						}
-						fPatternMap.resetPattern(patternValues);
 							return false;
 					}, 1);
 				}
@@ -1139,9 +1106,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 					stackMatcher, fPatternMap);
 			MultisetPartitionsIterator iter = new MultisetPartitionsIterator(visitor, lhsPatternAST.argSize());
 			return !iter.execute();
-		} else
-
-		{
+		} else {
 			int lhsEvalSize = lhsEvalAST.size();
 			if (lhsPatternAST.isAST1()) {
 				if (lhsPatternAST.arg1().isPatternSequence(false)) {
@@ -1183,15 +1148,13 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 		for (int i = 1; i < lhsPatternAST.size(); i++) {
 			if (lhsPatternAST.get(i).isPatternDefault()) {
 				IPattern pattern = (IPattern) lhsPatternAST.get(i);
-				IExpr positionDefaultValue = symbolWithDefaultValue.getDefaultValue(i);
-				if (positionDefaultValue == null) {
 					if (i < lhsSize && symbolWithDefaultValue.equals(head)) {
 						cloned.append(pattern);
 						continue;
 					}
-				}
+				IExpr positionDefaultValue = pattern.getDefaultValue();
 					if (positionDefaultValue == null) {
-					positionDefaultValue = pattern.getDefaultValue();
+					positionDefaultValue = symbolWithDefaultValue.getDefaultValue(i);
 					}
 					if (positionDefaultValue != null) {
 					if (!((IPatternObject) lhsPatternAST.get(i)).matchPattern(positionDefaultValue, fPatternMap)) {
