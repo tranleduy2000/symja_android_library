@@ -162,15 +162,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 			boolean matched = true;
 			Entry entry = pop();
 			try {
-				// if (SUBSTITUTE_MATCHED_PATTERNS) {
-				// IExpr temp = fPatternMap.substitutePatternOrSymbols(entry.fPatternExpr);
-				// if (!temp.isPresent()) {
-				// temp = entry.fPatternExpr;
-				// }
-				// matched = matchExpr(temp, entry.fEvalExpr, fEngine, this);
-				// } else {
 				matched = matchExpr(entry.fPatternExpr, entry.fEvalExpr, fEngine, this);
-				// }
 				return matched;
 			} finally {
 				if (!matched) {
@@ -1067,9 +1059,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
         try {
             matched = matchAST(lhsPatternAST, lhsEvalExpr, engine, stackMatcher);
                 if (!matched) {
-				if (!lhsPatternAST.isFreeOfDefaultPatterns()) {
-					// if ((lhsPatternAST.getEvalFlags() & IAST.CONTAINS_DEFAULT_PATTERN) ==
-					// IAST.CONTAINS_DEFAULT_PATTERN) {
+				if ((lhsPatternAST.getEvalFlags() & IAST.CONTAINS_DEFAULT_PATTERN) == IAST.CONTAINS_DEFAULT_PATTERN) {
+					// if (!lhsPatternAST.isFreeOfDefaultPatterns()) {
                     IExpr temp = null;
                     fPatternMap.resetPattern(patternValues);
 					if (lhsEvalExpr.isAST() && lhsPatternAST.hasOptionalArgument() && !lhsPatternAST.isOrderlessAST()) {
@@ -1159,31 +1150,34 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 				temp = lhsPatternFinal.get(i);
 				if (!(temp instanceof IPatternObject)) {
                     final int index = i;
-					return lhsEval.exists((x, j) -> {
-						StackMatcher myStackMatcher = stackMatcher;
-						if (myStackMatcher == null) {
-							myStackMatcher = new StackMatcher(engine);
-						}
-						int lastStackSize = myStackMatcher.size();
+					return lhsEval.exists(new ObjIntPredicate<IExpr>() {
+                        @Override
+                        public boolean test(IExpr x, int j) {
+                            StackMatcher myStackMatcher = stackMatcher;
+                            if (myStackMatcher == null) {
+                                myStackMatcher = new StackMatcher(engine);
+                            }
+                            int lastStackSize = myStackMatcher.size();
 
-						if (myStackMatcher.push(lhsPatternFinal.removeAtClone(index), lhsEvalFinal.removeAtClone(j))) {
-							boolean matched = false;
-							try {
-								if (matchExpr(lhsPatternFinal.get(index), x, engine, myStackMatcher)) {
-									// if (matchFlatAndFlatOrderlessAST(sym, lhsPatternAST.removeAtClone(index),
-									// lhsEvalAST.removeAtClone(j), engine, stackMatcher)) {
-									matched = true;
-                                    return true;
-									// }
-								}
-							} finally {
-								if (!matched) {
-									stackMatcher.removeFrom(lastStackSize);
+                            if (myStackMatcher.push(lhsPatternFinal.removeAtClone(index), lhsEvalFinal.removeAtClone(j))) {
+                                boolean matched = false;
+                                try {
+                                    if (PatternMatcher.this.matchExpr(lhsPatternFinal.get(index), x, engine, myStackMatcher)) {
+                                        // if (matchFlatAndFlatOrderlessAST(sym, lhsPatternAST.removeAtClone(index),
+                                        // lhsEvalAST.removeAtClone(j), engine, stackMatcher)) {
+                                        matched = true;
+                                        return true;
+                                        // }
+                                    }
+                                } finally {
+                                    if (!matched) {
+                                        stackMatcher.removeFrom(lastStackSize);
+                                    }
                                 }
                             }
-						}
-						fPatternMap.resetPattern(patternValues);
+                            fPatternMap.resetPattern(patternValues);
                             return false;
+                        }
                     }, 1);
                 }
             }

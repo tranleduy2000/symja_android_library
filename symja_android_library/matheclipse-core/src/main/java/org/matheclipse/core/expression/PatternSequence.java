@@ -449,6 +449,10 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	/** {@inheritDoc} */
+//	public boolean isFreeOfDefaultPatterns() {
+//		return true;
+//	}
+	/** {@inheritDoc} */
 	@Override
 	public final boolean isPatternExpr() {
 		return true;

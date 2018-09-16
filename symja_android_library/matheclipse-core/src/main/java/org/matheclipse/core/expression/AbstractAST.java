@@ -43,6 +43,7 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternObject;
+import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -1884,6 +1885,17 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 				continue;
 			} else if (temp instanceof IPatternObject) {
 				isFreeOfPatterns = false;
+				if (temp instanceof IPatternSequence) {
+					if (temp.isPatternDefault()) {
+						addEvalFlags(IAST.CONTAINS_DEFAULT_PATTERN);
+					}
+					addEvalFlags(IAST.CONTAINS_PATTERN_SEQUENCE);
+				} else {
+					if (temp.isPatternDefault()) {
+						addEvalFlags(IAST.CONTAINS_DEFAULT_PATTERN);
+					}
+					addEvalFlags(IAST.CONTAINS_PATTERN);
+				}
 			}
 		}
 		if (isFreeOfPatterns) {
