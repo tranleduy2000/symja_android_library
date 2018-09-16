@@ -452,8 +452,7 @@ public final class Arithmetic {
      *
      * <blockquote>
      * <p>
-     * replaces numerical values in the <code>numerical-expr</code> which are close to zero with symbolic value
-     * <code>0</code>.
+	 * replaces numerical values in the <code>numerical-expr</code> which are close to zero with symbolic value <code>0</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
@@ -507,9 +506,8 @@ public final class Arithmetic {
      *
      * <blockquote>
      * <p>
-     * returns <code>expr</code> in the range <code>-1</code> to <code>1</code>. Returns <code>-1</code> if
-     * <code>expr</code> is less than <code>-1</code>. Returns <code>1</code> if <code>expr</code> is greater than
-     * <code>1</code>.
+	 * returns <code>expr</code> in the range <code>-1</code> to <code>1</code>. Returns <code>-1</code> if <code>expr</code> is less
+	 * than <code>-1</code>. Returns <code>1</code> if <code>expr</code> is greater than <code>1</code>.
      * </p>
      * </blockquote>
      *
@@ -4664,12 +4662,29 @@ public final class Arithmetic {
             TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
                     F.Sin(x_), //
                     F.Sec(x_), //
-                    F.Tan(x), true));
+					F.Tan(x)));
             TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
                     F.Cos(x_), //
                     F.Csc(x_), //
-                    F.Cot(x), true));
+					F.Cot(x)));
 
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
+					F.Cosh(x_), //
+					F.Tanh(x_), //
+					F.Sinh(x)));
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
+					F.Coth(x_), //
+					F.Sinh(x_), //
+					F.Cosh(x)));
+
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
+					F.Csch(x_), //
+					F.Tanh(x_), //
+					F.Sech(x)));
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
+					F.Coth(x_), //
+					F.Sech(x_), //
+					F.Csch(x)));
             super.setUp(newSymbol);
         }
 
