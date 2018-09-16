@@ -2470,7 +2470,16 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3);
+			if (ast.isAST0()) {
+				return F.NIL;
+			}
+			if (ast.isAST1()) {
+				IExpr arg1 = ast.arg1();
+				if (arg1.isNegativeResult()) {
+					return arg1.negate();
+				}
+				return arg1;
+			}
 
 			VariablesSet eVar = new VariablesSet();
 			eVar.addVarList(ast, 1);
