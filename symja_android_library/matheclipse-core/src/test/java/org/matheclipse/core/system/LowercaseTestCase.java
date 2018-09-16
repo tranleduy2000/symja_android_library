@@ -2993,9 +2993,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ExpandAll((-2*x^3+4*x-5)*((-2*x^3+4*x-5)*(a)^(-1)-2*x))",
 				"25/a+10*x+(-40*x)/a-8*x^2+(16*x^2)/a+(20*x^3)/a+4*x^4+(-16*x^4)/a+(4*x^6)/a");
 		check("ExpandAll((-(-2*x^3+4*x-5)*(-(-2*x^3+4*x-5)*(3*x^2+2)^(-1)-2*x)*(3*x^2+2)^(-1)+x^2-2))",
-				"-2+x^2+(-10*x)/(2+3*x^2)+(8*x^2)/(2+3*x^2)+(-4*x^4)/(2+3*x^2)+25/(4+12*x^2+9*x^4)+(\n" +
-				"-40*x)/(4+12*x^2+9*x^4)+(16*x^2)/(4+12*x^2+9*x^4)+(20*x^3)/(4+12*x^2+9*x^4)+(-16*x^\n" +
-				"4)/(4+12*x^2+9*x^4)+(4*x^6)/(4+12*x^2+9*x^4)");
+				"-2+x^2+(-10*x)/(2+3*x^2)+(8*x^2)/(2+3*x^2)+(-4*x^4)/(2+3*x^2)+25/(4+12*x^2+9*x^4)+(\n"
+						+ "-40*x)/(4+12*x^2+9*x^4)+(16*x^2)/(4+12*x^2+9*x^4)+(20*x^3)/(4+12*x^2+9*x^4)+(-16*x^\n"
+						+ "4)/(4+12*x^2+9*x^4)+(4*x^6)/(4+12*x^2+9*x^4)");
 		check("ExpandAll(Sqrt((1 + x)^2))", //
 				"Sqrt(1+2*x+x^2)");
 
@@ -3778,6 +3778,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFullForm() {
+		// FullForm[Hold[(#1[[1]]*#1[[2]] & )[SignOfFactor[NormalizeSumFactors /@ u]]]]
+		check("Hold(Function(#[[1]]*#[[2]])[SignOfFactor(Map(NormalizeSumFactors,u))]) // FullForm", //
+				"Hold(Function(Times(Part(Slot(1), 1), Part(Slot(1), 2)))[signoffactor(Map(normalizesumfactors, u))])");
 		check("FullForm(a:=b)", "Null");
 	}
 
@@ -9415,9 +9418,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// y, z}, Integers)", "");
 
 		check("Solve((k*Q*q)/r^2+1/r^4==E,r)", //
-				"{{r->Sqrt((k*q*Q)/E+Sqrt(4*E+k^2*q^2*Q^2)/E)/Sqrt(2)},{r->-Sqrt((k*q*Q)/E+Sqrt(4*E+k^\n" +
-				"2*q^2*Q^2)/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q)/E+Sqrt(4*E+k^2*q^2*Q^2)/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q)/E+Sqrt(\n" +
-				"4*E+k^2*q^2*Q^2)/E))/Sqrt(2)}}");
+				"{{r->Sqrt((k*q*Q)/E+Sqrt(4*E+k^2*q^2*Q^2)/E)/Sqrt(2)},{r->-Sqrt((k*q*Q)/E+Sqrt(4*E+k^\n"
+						+ "2*q^2*Q^2)/E)/Sqrt(2)},{r->(-I*Sqrt((-k*q*Q)/E+Sqrt(4*E+k^2*q^2*Q^2)/E))/Sqrt(2)},{r->(I*Sqrt((-k*q*Q)/E+Sqrt(\n"
+						+ "4*E+k^2*q^2*Q^2)/E))/Sqrt(2)}}");
 		// issue #120
 		check("Solve(Sin(x)*x==0, x)", //
 				"{{x->0}}");

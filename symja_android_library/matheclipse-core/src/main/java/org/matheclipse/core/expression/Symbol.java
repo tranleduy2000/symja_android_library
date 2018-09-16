@@ -674,9 +674,17 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
             String alias = F.PREDEFINED_INTERNAL_FORM_STRINGS.get(fSymbolName);
             if (alias != null) {
                 if (alias.contains("::")) {
+                    if (Config.RUBI_CONVERT_SYMBOLS) {
+                        return "$rubi(\"" + alias + "\")";
+                    }
                     return "$s(\"" + alias + "\")";
                 }
                 return alias;
+            }
+        }
+        if (fSymbolName.contains("::")) {
+            if (Config.RUBI_CONVERT_SYMBOLS) {
+                return "$rubi(\"" + fSymbolName + "\")";
             }
         }
         return "$s(\"" + fSymbolName + "\")";
