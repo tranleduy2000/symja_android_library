@@ -18,6 +18,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.polynomials.PartialFractionIntegrateGenerator;
 
 import java.util.HashSet;
@@ -29,7 +30,6 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.Monomial;
 
-import static org.matheclipse.core.expression.F.$s;
 import static org.matheclipse.core.expression.F.ArcTan;
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
@@ -916,7 +916,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 					if (Config.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
-					engine.printMessage("Integrate Rubi RuntimeException: " + ast.toString());
+					engine.printMessage("Integrate Rubi recursion limit " + Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT
+							+ " RuntimeException: " + ast.toString());
 					engine.setRecursionLimit(limit);
 					if (secondTry.isPresent()) {
 						return integrateByRubiRules(secondTry, F.NIL);
