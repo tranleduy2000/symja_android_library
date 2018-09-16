@@ -60,7 +60,6 @@ import org.matheclipse.core.reflection.system.rules.SinhRules;
 import org.matheclipse.core.reflection.system.rules.TanRules;
 import org.matheclipse.core.reflection.system.rules.TanhRules;
 
-import static org.matheclipse.core.expression.F.ArcCos;
 import static org.matheclipse.core.expression.F.ArcCot;
 import static org.matheclipse.core.expression.F.ArcCoth;
 import static org.matheclipse.core.expression.F.ArcCsc;
@@ -235,10 +234,11 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1) {
-			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
-			if (negExpr.isPresent()) {
-				return Plus(Negate(Pi), ArcCos(negExpr));
-			}
+			// don't simplify negative argument because it disturbs Rubi pattern matchin
+			// IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1, false);
+			// if (negExpr.isPresent()) {
+			// return Plus(Negate(Pi), ArcCos(negExpr));
+			// }
 			return F.NIL;
 		}
 
@@ -379,7 +379,7 @@ public class ExpTrigsFunctions {
 		public IExpr evaluateArg1(final IExpr arg1) {
 			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
 			if (negExpr.isPresent()) {
-				return Plus(Negate(Pi), ArcCot(negExpr));
+				return Plus(Negate(ArcCot(negExpr)));
 			}
 			IExpr imPart = AbstractFunctionEvaluator.getPureImaginaryPart(arg1);
 			if (imPart.isPresent()) {
