@@ -1,7 +1,6 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.Function;
-import com.duy.lambda.Predicate;
 
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
@@ -658,6 +657,9 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
             if ('A' <= ch && ch <= 'G' && ch != 'D' && ch != 'E') {
                 return fSymbolName + "Symbol";
             }
+            if ('P' == ch || ch == 'Q') {
+                return fSymbolName + "Symbol";
+            }
         }
         if (Config.RUBI_CONVERT_SYMBOLS) {
             if (fSymbolName.length() == 2 && '§' == fSymbolName.charAt(0)
@@ -752,12 +754,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         if (isConstant()) {
             return true;
         }
-        return variables.exists(new Predicate<IExpr>() {
-            @Override
-            public boolean test(IExpr x) {
-                return Symbol.this.equals(x);
-            }
-        });
+        return true;
+        // return variables.exists(x -> this.equals(x));
     }
 
     /**
@@ -765,10 +763,11 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public boolean isPolynomial(IExpr variable) {
-        if (variable == null) {
             return true;
-        }
-        return this.equals(variable);
+        // if (variable == null) {
+        // return true;
+        // }
+        // return this.equals(variable);
     }
 
     /**

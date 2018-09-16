@@ -2381,12 +2381,18 @@ public class Algebra {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST2()) {
-				IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
-				return F.bool(temp.arg1().isPolynomial(temp.arg2().orNewList()));
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				IExpr arg2 = engine.evaluate(ast.arg2());
+				return F.bool(arg1.isPolynomial(arg2.orNewList()));
 			}
-			Validate.checkSize(ast, 3);
+			return F.False;
+			// if (ast.isAST2()) {
+			// IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
+			// return F.bool(temp.arg1().isPolynomial(temp.arg2().orNewList()));
+			// }
+			// Validate.checkSize(ast, 3);
 
-			return F.NIL;
+			// return F.NIL;
 		}
 
 		@Override

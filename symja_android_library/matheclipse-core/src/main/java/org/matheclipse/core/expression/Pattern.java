@@ -268,7 +268,8 @@ public class Pattern extends Blank {
 		String symbolStr = fSymbol.toString();
 		char ch = symbolStr.charAt(0);
 		if (symbolStr.length() == 1 && fDefaultValue == null) {
-			if (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'G' && ch != 'D' && ch != 'E')) {
+			if (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'G' && ch != 'D' && ch != 'E') || ch == 'P'
+					|| ch == 'Q') {
 				if (!fDefault) {
 					if (fCondition == null) {
 						return prefix+symbolStr + "_";
