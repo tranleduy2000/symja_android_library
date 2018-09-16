@@ -273,7 +273,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
      * @param randomGenerator the underlying PRNG
      * @throws MathIllegalArgumentException if randomGenerator is null
      */
-    private RandomDataGenerator(RandomGenerator randomGenerator) {
+    public RandomDataGenerator(RandomGenerator randomGenerator) {
         MathUtils.checkNotNull(randomGenerator);
         this.randomGenerator = randomGenerator;
     }

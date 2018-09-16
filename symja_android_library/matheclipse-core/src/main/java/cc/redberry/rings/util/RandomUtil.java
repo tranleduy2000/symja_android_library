@@ -1,6 +1,6 @@
 package cc.redberry.rings.util;
 
-import org.hipparchus.random.RandomDataGenerator;
+
 import org.hipparchus.random.RandomGenerator;
 
 import cc.redberry.rings.bigint.BigInteger;
