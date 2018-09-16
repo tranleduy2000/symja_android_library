@@ -7519,6 +7519,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// "$Aborted");
 		// check("TimeConstrained(1^3^3^3, 10)", //
 		// "1");
+		check("Sqrt(Pi/b)",
+				"Sqrt(1/b)*Sqrt(Pi)");
 		check("(2*x*y)^n", //
 				"2^n*(x*y)^n");
 		check("(0.3333*x*y)^n", //
@@ -10435,10 +10437,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTaylor() {
-		check("Taylor(f(x),{x,a,2})", "f(a)+(-a+x)*f'(a)+1/2*(-a+x)^2*f''(a)");
-		check("Taylor(ArcSin(x),{x,0,10})", "x+x^3/6+3/40*x^5+5/112*x^7+35/1152*x^9");
-		check("Limit(ArcSin(x)/x,x->0)", "1");
-		check("(-0^2+1)^(-1/2)", "1");
+		check("Taylor(f(x),{x,a,2})", //
+				"f(a)+(-a+x)*f'(a)+1/2*(-a+x)^2*f''(a)");
+		check("Taylor(ArcSin(x),{x,0,10})", //
+				"x+x^3/6+3/40*x^5+5/112*x^7+35/1152*x^9");
+		check("Limit(ArcSin(x)/x,x->0)", //
+				"1");
+		check("(-0^2+1)^(-1/2)", //
+				"1");
 	}
 
 	public void testTensorDimensions() {

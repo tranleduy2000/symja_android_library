@@ -4718,6 +4718,7 @@ public final class Arithmetic {
 					}
 				}
 			}
+
 			if (base2.equals(arg1)) {
 				if (exponent2.isNumber() && !arg1.isRational()) {
                     // avoid reevaluation of a root of a rational number (example: 2*Sqrt(2) )
@@ -4841,7 +4842,9 @@ public final class Arithmetic {
 		protected ISymbol getFunctionSymbol() {
 			return F.TimesBy;
 		}
+
 	}
+
         /**
          * Try simpplifying <code>(power0Arg1 ^ power0Arg2) * (power1Arg1 ^ power1Arg2)</code>
          *
