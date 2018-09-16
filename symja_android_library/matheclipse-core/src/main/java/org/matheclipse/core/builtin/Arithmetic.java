@@ -1629,7 +1629,8 @@ public final class Arithmetic {
         /**
          * The Harmonic number at the index specified
          *
-		 * @param n the index, non-negative.
+		 * @param n
+		 *            the index, non-negative.
          * @return the H_1=1 for n=1, H_2=3/2 for n=2 etc. For values of n less than 1, zero is returned.
          */
         public BigFraction harmonicNumber(int n) {
@@ -1945,7 +1946,8 @@ public final class Arithmetic {
      * </p>
      * </blockquote>
      * <p>
-	 * <strong>Note</strong>: the upper case identifier <code>N</code> is different from the lower case identifier <code>n</code>.
+	 * <strong>Note</strong>: the upper case identifier <code>N</code> is different from the lower case identifier
+	 * <code>n</code>.
      * </p>
      * <h3>Examples</h3>
      *
@@ -2329,9 +2331,11 @@ public final class Arithmetic {
 
         /**
          *
-		 * See: <a href="http://www.cs.berkeley.edu/~fateman/papers/newsimp.pdf"> Experiments in Hash-coded Algebraic Simplification</a>
+		 * See: <a href="http://www.cs.berkeley.edu/~fateman/papers/newsimp.pdf"> Experiments in Hash-coded Algebraic
+		 * Simplification</a>
          *
-		 * @param ast the abstract syntax tree (AST) of the form <code>Plus(...)</code> which should be evaluated
+		 * @param ast
+		 *            the abstract syntax tree (AST) of the form <code>Plus(...)</code> which should be evaluated
          * @return the evaluated object or <code>null</code>, if evaluation isn't possible
          */
         @Override
@@ -2504,7 +2508,8 @@ public final class Arithmetic {
          * Compute Pochhammer's symbol (that)_n.
          *
          * @param that
-		 * @param n    The number of product terms in the evaluation.
+		 * @param n
+		 *            The number of product terms in the evaluation.
          * @return Gamma(that+n)/Gamma(that) = that*(that+1)*...*(that+n-1).
          */
 		public static BigFraction pochhammer(BigFraction that, final int n) {
@@ -4663,12 +4668,22 @@ public final class Arithmetic {
 					F.Power(F.Csc(x_), F.m_), //
 					F.Power(F.Cot(x_), F.n_DEFAULT), //
 					F.Condition(F.Times(F.Power(F.Csc(F.x), F.Plus(F.m, F.n)), F.Power(F.Cos(F.x), F.n)),
-							F.And(F.SymbolQ(F.m), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
+							F.And(F.Not(F.NumberQ(F.m)), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
 			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
 					F.Power(F.Sec(x_), F.m_), //
 					F.Power(F.Tan(x_), F.n_DEFAULT), //
 					F.Condition(F.Times(F.Power(F.Sec(F.x), F.Plus(F.m, F.n)), F.Power(F.Sin(F.x), F.n)),
-							F.And(F.SymbolQ(F.m), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
+							F.And(F.Not(F.NumberQ(F.m)), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
+					F.Power(F.Csch(x_), F.m_), //
+					F.Power(F.Coth(x_), F.n_DEFAULT), //
+					F.Condition(F.Times(F.Power(F.Csch(F.x), F.Plus(F.m, F.n)), F.Power(F.Cosh(F.x), F.n)),
+							F.And(F.Not(F.NumberQ(F.m)), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
+					F.Power(F.Sech(x_), F.m_), //
+					F.Power(F.Tanh(x_), F.n_DEFAULT), //
+					F.Condition(F.Times(F.Power(F.Sech(F.x), F.Plus(F.m, F.n)), F.Power(F.Sinh(F.x), F.n)),
+							F.And(F.Not(F.NumberQ(F.m)), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
 			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
                     F.ProductLog(x_), //
                     F.Power(F.E, F.ProductLog(x_)), //
