@@ -5,8 +5,9 @@ package org.matheclipse.core.rubi;
  *
  */
 public class RubiTests001 extends AbstractRubiTestCase {
+
 	public RubiTests001(String name) {
-		super(name);
+        super(name, true);
 	}
 
 	@Override

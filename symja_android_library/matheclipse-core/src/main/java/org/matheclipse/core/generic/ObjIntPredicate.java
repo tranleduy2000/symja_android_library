@@ -14,7 +14,8 @@ import com.duy.util.DObjects;
  * @param <T> the type of the object parameter
  * @see BiPredicate
  */
-public abstract class ObjIntPredicate<T> {
+@FunctionalInterface
+public interface ObjIntPredicate<T> {
 
     /**
      * Evaluates the predicate.
@@ -34,7 +35,7 @@ public abstract class ObjIntPredicate<T> {
      * @return the combined predicate, "this AND that"
      * @throws NullPointerException if the other predicate is null
      */
-    public ObjIntPredicate<T> and(ObjIntPredicate<? super T> other) {
+    default ObjIntPredicate<T> and(ObjIntPredicate<? super T> other) {
         DObjects.requireNonNull(other);
         return new ObjIntPredicate<T>() {
             @Override
@@ -53,7 +54,7 @@ public abstract class ObjIntPredicate<T> {
      * @return the combined predicate, "this OR that"
      * @throws NullPointerException if the other predicate is null
      */
-    public ObjIntPredicate<T> or(ObjIntPredicate<? super T> other) {
+    default ObjIntPredicate<T> or(ObjIntPredicate<? super T> other) {
         DObjects.requireNonNull(other);
         return new ObjIntPredicate<T>() {
             @Override
@@ -68,7 +69,7 @@ public abstract class ObjIntPredicate<T> {
      *
      * @return the predicate, "NOT this"
      */
-    public ObjIntPredicate<T> negate() {
+    default ObjIntPredicate<T> negate() {
         return new ObjIntPredicate<T>() {
             @Override
             public boolean test(T obj, int value) {

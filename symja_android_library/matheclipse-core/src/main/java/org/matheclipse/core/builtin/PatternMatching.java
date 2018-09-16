@@ -452,10 +452,10 @@ public final class PatternMatching {
 					// System.out.println(file.toString());
 					return getFile(file, engine);
 				} else {
-					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
-					if (file.exists()) {
-						return getFile(file, engine);
-				}
+//					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
+//					if (file.exists()) {
+//						return getFile(file, engine);
+//				}
             }
 			}
             return F.NIL;
@@ -1066,7 +1066,12 @@ public final class PatternMatching {
                     return F.NIL;
                 } else if (leftHandSideAST.isAST(F.Attributes, 2)) {
                     IAST symbolList = Validate.checkSymbolOrSymbolList(leftHandSideAST, 1);
-					symbolList.forEach(x -> ((ISymbol) x).setAttributes(ISymbol.NOATTRIBUTE));
+					symbolList.forEach(new Consumer<IExpr>() {
+                        @Override
+                        public void accept(IExpr x) {
+                            ((ISymbol) x).setAttributes(ISymbol.NOATTRIBUTE);
+                        }
+                    });
 					return AttributeFunctions.setSymbolsAttributes(symbolList, ast.arg2(), engine);
                 }
             }

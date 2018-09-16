@@ -372,6 +372,11 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Blank = F.initFinalSymbol("Blank", ID.Blank);
 
+    /***/
+    public final static IBuiltInSymbol BlankNullSequence = F.initFinalSymbol("BlankNullSequence", ID.BlankNullSequence);
+
+    /***/
+    public final static IBuiltInSymbol BlankSequence = F.initFinalSymbol("BlankSequence", ID.BlankSequence);
     /** Block({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables`*/
 	public final static IBuiltInSymbol Block = F.initFinalSymbol("Block", ID.Block);
 

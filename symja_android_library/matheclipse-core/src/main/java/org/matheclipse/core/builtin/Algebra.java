@@ -106,7 +106,6 @@ import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
 
-
 public class Algebra {
 	static {
 		F.Apart.setEvaluator(new Apart());
@@ -1659,7 +1658,7 @@ public class Algebra {
 	 * </code>
 	 * </pre>
 	 */
-	private static class Factor extends AbstractFunctionEvaluator {
+	public static class Factor extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1723,8 +1722,6 @@ public class Algebra {
 			GenPolynomial<edu.jas.arith.BigInteger> poly = (GenPolynomial<edu.jas.arith.BigInteger>) objects[2];
 			FactorAbstract<edu.jas.arith.BigInteger> factorAbstract = FactorFactory
 					.getImplementation(edu.jas.arith.BigInteger.ONE);
-			SortedMap<GenPolynomial<edu.jas.arith.BigInteger>, Long> map;
-			try {
 			if (factorSquareFree) {
 				map = factorAbstract.squarefreeFactors(poly);// factors(poly);
 			} else {
