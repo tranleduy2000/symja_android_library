@@ -8,7 +8,7 @@ public class RubiTests002 extends AbstractRubiTestCase {
 	@Override
 	public void check(String evalString, String expectedResult) {
 		System.out.println(getName());
-		check(evalString, expectedResult, -1);
+		super.check(evalString, expectedResult);
 	}
 
 
