@@ -721,7 +721,7 @@ public class MainTestCase extends AbstractTestCase {
 	public void testSystem044() {
 
 		check("$test(F_(a_)):={a,b,F,m,x};$test(g(h))", "{h,b,g,m,x}");
-		check("clear($test);$test(F_(a_.*x_^m_.)):={a,b,F,m,x};$test(g(h*y^2))", "{h,b,g,2,y}");
+		check("$test(F_(a_.*x_^m_.)):={a,b,F,m,x};$test(g(h*y^2))", "{h,b,g,2,y}");
 		check("$test(F_(a_.*x_^l_.),x_Symbol,b_.*x_^m_):={a,b,F,l,m,x};$test(g(h*y^2),y,k*y^3)", "{h,k,g,2,3,y}");
 		check("$test(F_(a_.*x_^l_.),x_Symbol,b_.*x_^m_):={a,b,F,l,m,x};$test(g(y),y,y^3)", "{1,1,g,1,3,y}");
 		check("$test(F_(a_.*x_^l_.),x_Symbol,b_.*x_^m_):={a,b,F,l,m,x};$test(g(y),y,k*y^3)", "{1,k,g,1,3,y}");
@@ -1577,7 +1577,7 @@ public class MainTestCase extends AbstractTestCase {
 		check("Integrate((2*x+5)/(x^2-2*x+5),x)", //
 				"-7/2*ArcTan(1/2*(1-x))+Log(5-2*x+x^2)");
 		check("Integrate((8*x+1)/(x^2+2*x+1),x)", //
-				"7/(1+x)+8*Log(1+x)");
+				"8/(1+x)-(1+x)/(1+2*x+x^2)+8*Log(1+x)");
 	}
 
 	public void testSystem171b() {
