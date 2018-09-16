@@ -622,6 +622,19 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	}
 
 	@Override
+	public IRational rationalFactor() {
+		if (fReal.isZero()) {
+			return fImaginary;
+		}
+		if (fImaginary.isZero()) {
+			return fReal;
+		}
+		if (fReal.equals(fImaginary)) {
+			return fReal;
+		}
+		return null;
+	}
+	@Override
 	public ISignedNumber re() {
 		if (fReal.denominator().isOne()) {
 			return fReal.numerator();

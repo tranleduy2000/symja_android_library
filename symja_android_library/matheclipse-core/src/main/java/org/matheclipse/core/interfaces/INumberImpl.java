@@ -21,6 +21,14 @@ public abstract class INumberImpl extends IExprImpl implements INumber {
     @Override
     public abstract INumber opposite();
 
+    @Override
+    public IRational rationalFactor() {
+        if (this instanceof IRational) {
+            return (IRational) this;
+        }
+        return null;
+    }
+
     /**
      * Returns the real part of a complex number
      *
