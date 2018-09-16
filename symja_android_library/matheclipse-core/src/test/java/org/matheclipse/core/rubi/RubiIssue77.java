@@ -1,6 +1,9 @@
 package org.matheclipse.core.rubi; 
 
 //Integrate[x*(2*c+3*d*x)*(a+c*x^2+d*x^3)^n,x]
+
+import org.matheclipse.core.interfaces.IExpr;
+
 /**
  *
  * <pre>
