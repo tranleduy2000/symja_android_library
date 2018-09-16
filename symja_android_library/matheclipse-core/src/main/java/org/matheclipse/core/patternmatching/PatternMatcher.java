@@ -1086,6 +1086,16 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 
     }
 
+	/**
+	 * Match flat or orderless LHS pattern expressions.
+	 *
+	 * @param sym
+	 * @param lhsPattern
+	 * @param lhsEval
+	 * @param engine
+	 * @param stackMatcher
+	 * @return
+	 */
 	private boolean matchFlatAndFlatOrderlessAST(final ISymbol sym, IAST lhsPattern, IAST lhsEval, EvalEngine engine,
 			StackMatcher stackMatcher) {
 		int lhsPatternSize = lhsPattern.size();
@@ -1102,38 +1112,14 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 			if (!temp.isPresent()) {
 				temp = lhsPattern;
 			}
-			IASTAppendable lhsPatternAST = (IASTAppendable) ((IAST) temp).copyAppendable();
-			IASTAppendable lhsEvalAST = (IASTAppendable) lhsEval.copyAppendable();
-			int iIndex = 1;
-			while (iIndex < lhsPatternAST.size()) {
-				// for (int i = 1; i < lhsPatternSize; i++) {
-				temp = lhsPatternAST.get(iIndex);
-
-				if (temp.isFreeOfPatterns()) {
-					boolean evaled = false;
-					int jIndex = 1;
-					while (jIndex < lhsEvalAST.size()) {
-						IExpr x = lhsEvalAST.get(jIndex);
-						if (x.equals(temp)) {
-							lhsPatternAST.remove(iIndex);
-							lhsEvalAST.remove(jIndex);
-							evaled = true;
-							break;
-						}
-						jIndex++;
-					}
-					if (!evaled) {
+			IASTAppendable[] removed=removeOrderless( ((IAST) temp),  lhsEval);
+			if (removed==null) {
 						return false;
 					}
-					continue;
-				}
-				iIndex++;
-			}
+			IASTAppendable lhsPatternAST = removed[0];
+			IASTAppendable lhsEvalAST =  removed[1];
 			if (lhsPatternAST.size() <= 2) {
-				if (lhsPatternAST.isOneIdentityAST1()) {
-					return matchExpr(lhsPatternAST.arg1(), lhsEvalAST, engine, stackMatcher);
-				}
-				if (lhsPatternAST.size() == 2) {
+				if (lhsPatternAST.isAST1()) {
                 return matchExpr(lhsPatternAST.arg1(), lhsEvalAST, engine, stackMatcher);
             }
 				if (lhsPatternAST.size() == 1 && lhsEvalAST.size() > 1) {
@@ -1210,6 +1196,45 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
         }
     }
 
+	/**
+	 * Remove parts which are "free of patterns" in <code>lhsPattern</code> and <code>lhsEval</code>.
+	 *
+	 * @param lhsPattern
+	 *            the expression which can contain pattern-matching objects
+	 * @param lhsEval
+	 *            the expression which can contain no patterns
+	 * @return <code>null</code> if the matching isn't possible.
+	 */
+	private IASTAppendable[] removeOrderless(final IAST lhsPattern, final IAST lhsEval) {
+		IASTAppendable lhsPatternAST = (IASTAppendable) lhsPattern.copyAppendable();
+		IASTAppendable lhsEvalAST = (IASTAppendable) lhsEval.copyAppendable();
+		int iIndex = 1;
+		while (iIndex < lhsPatternAST.size()) {
+			// for (int i = 1; i < lhsPatternSize; i++) {
+			IExpr temp = lhsPatternAST.get(iIndex);
+
+			if (temp.isFreeOfPatterns()) {
+				boolean evaled = false;
+				int jIndex = 1;
+				while (jIndex < lhsEvalAST.size()) {
+					IExpr x = lhsEvalAST.get(jIndex);
+					if (x.equals(temp)) {
+						lhsPatternAST.remove(iIndex);
+						lhsEvalAST.remove(jIndex);
+						evaled = true;
+						break;
+					}
+					jIndex++;
+				}
+				if (!evaled) {
+					return null;
+				}
+				continue;
+			}
+			iIndex++;
+		}
+		return new IASTAppendable[] { lhsPatternAST, lhsEvalAST };
+	}
     /**
      * Match the <code>lhsPatternAST</code> with its <code>Default[]</code> values.
      *

@@ -348,8 +348,9 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	public boolean isPatternTest(IExpr expr, IExpr patternTest, EvalEngine engine) {
 		IExpr temp = substitutePatternOrSymbols(expr);
 		if (!temp.isPresent()) {
-			temp = expr;
+			temp = (IAST) expr;
 		}
+		// }
 		IASTMutable test = (IASTMutable) F.unaryAST1(patternTest, null);
 		if (temp.isSequence()) {
 			return ((IAST) temp).forAll(new ObjIntPredicate<IExpr>() {
@@ -435,6 +436,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 			});
 
 			if (result.isPresent()) {
+				if (result.isAST()) {
 				if (result.isFlatAST()) {
 					IExpr temp = EvalAttributes.flatten((IAST) result);
 					if (temp.isPresent()) {
@@ -445,6 +447,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 					EvalAttributes.sort((IASTMutable) result);
                                                      }
 
+				}
 				return result;
 			}
 		}
