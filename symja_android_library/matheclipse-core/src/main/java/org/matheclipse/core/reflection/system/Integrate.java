@@ -1,6 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.Predicate;
+import com.google.common.cache.CacheBuilder;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;

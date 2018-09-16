@@ -4,6 +4,7 @@ import com.duy.lambda.Consumer;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
+import com.google.common.cache.Cache;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
