@@ -1,6 +1,9 @@
 package com.duy.lambda;
+
 @FunctionalInterface
 public interface Function<T, R> {
+
+    java.util.function.Function
 
     /**
      * Applies this function to the given argument.

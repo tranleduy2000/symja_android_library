@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import cc.redberry.rings.FactorDecomposition;
 import cc.redberry.rings.util.ArraysUtil;
@@ -238,7 +237,12 @@ public final class PolynomialFactorDecomposition<Poly extends IPolynomial<Poly>>
     }
 
     public <OthPoly extends IPolynomial<OthPoly>> PolynomialFactorDecomposition<OthPoly> mapTo(Function<Poly, OthPoly> mapper) {
-        return of(mapper.apply(unit), factors.stream().map(mapper).collect(Collectors.toList()), exponents);
+        List<OthPoly> list = new ArrayList<>();
+        for (Poly factor : factors) {
+            OthPoly r = mapper.apply(factor);
+            list.add(r);
+        }
+        return of(mapper.apply(unit), list, exponents);
     }
 
     /**

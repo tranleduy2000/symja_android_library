@@ -1,10 +1,13 @@
 package cc.redberry.rings.io;
 
+import com.duy.lambda.BiConsumer;
+import com.duy.lambda.Function;
+import com.duy.lambda.SFunction;
+import com.duy.util.DMap;
+
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
-import com.duy.lambda.Function;
-import java.util.stream.Collectors;
 
 import cc.redberry.rings.Rational;
 import cc.redberry.rings.Rationals;
@@ -229,9 +232,11 @@ public class Coder<
         for (Map.Entry<String, mPoly> v : variables.entrySet())
             sVars.put(v.getKey(), field.inverse(v.getValue()));
         Coder<mPoly, ?, ?> coder = mkUnivariateCoder(field.getSimpleExtension(), sVars).map(field, field.imageFunc);
-        coder.bindings.putAll(variables.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (prev, n) -> n)));
+        Map<mPoly, String> map = new HashMap<>();
+        for (Map.Entry<String, mPoly> stringmPolyEntry : variables.entrySet()) {
+            map.put(stringmPolyEntry.getValue(), stringmPolyEntry.getKey());
+        }
+        coder.bindings.putAll(map);
         return coder;
     }
 
@@ -273,7 +278,12 @@ public class Coder<
     mkMultivariateCoder(MultivariateRing<MultivariatePolynomial<E>> ring,
                         Coder<E, ?, ?> cfCoder,
                         Map<String, MultivariatePolynomial<E>> variables) {
-        cfCoder.eVariables.forEach((k, v) -> variables.put(k, ring.factory().createConstant(v)));
+        DMap.forEach(cfCoder.eVariables, (new BiConsumer<String, E>() {
+            @Override
+            public void accept(String k, E v) {
+                variables.put(k, ring.factory().createConstant(v));
+            }
+        }));
         return mkMultivariateCoder(ring, variables).withEncoder(cfCoder);
     }
 
@@ -305,8 +315,12 @@ public class Coder<
     Coder<Poly, ?, ?> mkUnivariateCoder(IPolynomialRing<Poly> ring,
                                         Map<String, Poly> variables) {
         MultivariateRing mRing = Rings.MultivariateRing(ring.factory().asMultivariate());
-        Map<String, AMultivariatePolynomial> pVariables = variables.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().asMultivariate()));
+        Map<String, AMultivariatePolynomial> pVariables = new HashMap<>();
+        for (Map.Entry<String, Poly> e : variables.entrySet()) {
+            if (pVariables.put(e.getKey(), e.getValue().asMultivariate()) != null) {
+                throw new IllegalStateException("Duplicate key");
+            }
+        }
         return mkCoder(ring, variables, mRing, pVariables, p -> (Poly) p.asUnivariate());
     }
 
@@ -335,7 +349,7 @@ public class Coder<
     mkUnivariateCoder(IPolynomialRing<UnivariatePolynomial<E>> ring,
                       Coder<E, ?, ?> cfCoder,
                       Map<String, UnivariatePolynomial<E>> variables) {
-        cfCoder.eVariables.forEach((k, v) -> variables.put(k, ring.factory().createConstant(v)));
+        DMap.forEach(cfCoder.eVariables, ((k, v) -> variables.put(k, ring.factory().createConstant(v))));
         return mkUnivariateCoder(ring, variables).withEncoder(cfCoder);
     }
 
@@ -409,7 +423,12 @@ public class Coder<
         else if (ring instanceof UnivariateRing && ((UnivariateRing) ring).factory() instanceof UnivariatePolynomial)
             return mkUnivariateCoder((UnivariateRing) ring, innerCoder, (Map) variables);
 
-        innerCoder.eVariables.forEach((k, v) -> variables.put(k, imageFunc.apply(v)));
+        DMap.forEach(innerCoder.eVariables, (new BiConsumer<String, I>() {
+            @Override
+            public void accept(String k, I v) {
+                variables.put(k, imageFunc.apply(v));
+            }
+        }));
         return new Coder(
                 ring,
                 variables,
@@ -512,13 +531,21 @@ public class Coder<
      * bindings (for {@link #stringify(Object)}).
      */
     public <Oth> Coder<Oth, ?, ?> map(Ring<Oth> ring, Function<Element, Oth> func) {
-        Map<String, Oth> _eVariables = eVariables
-                .entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> func.apply(e.getValue())));
+        Map<String, Oth> _eVariables = new HashMap<>();
+        for (Map.Entry<String, Element> stringElementEntry : eVariables
+                .entrySet()) {
+            if (_eVariables.put(stringElementEntry.getKey(), func.apply(stringElementEntry.getValue())) != null) {
+                throw new IllegalStateException("Duplicate key");
+            }
+        }
 
-        Map<Oth, String> _bindings = bindings
-                .entrySet().stream()
-                .collect(Collectors.toMap(e -> func.apply(e.getKey()), Map.Entry::getValue));
+        Map<Oth, String> _bindings = new HashMap<>();
+        for (Map.Entry<Element, String> e : bindings
+                .entrySet()) {
+            if (_bindings.put(func.apply(e.getKey()), e.getValue()) != null) {
+                throw new IllegalStateException("Duplicate key");
+            }
+        }
 
         Coder<Element, Term, Poly> _this = this;
         return new Coder<Oth, Term, Poly>(ring, _eVariables, null, null, null) {

@@ -1,5 +1,7 @@
 package cc.redberry.libdivide4j;
 
+import com.duy.stream.DLong;
+
 /**
  * Fast integer division and modulo operation (both signed and unsigned).
  *
@@ -119,13 +121,13 @@ public final class FastDivision {
         un1 = un10 >>> 32;         // Break right half of
         un0 = un10 & 0xFFFFFFFFL;  // dividend into two digits.
 
-        q1 = Long.divideUnsigned(un64, vn1);            // Compute the first
+        q1 = DLong.divideUnsigned(un64, vn1);            // Compute the first
         rhat = un64 - q1 * vn1;     // quotient digit, q1.
         while (true) {
-            if (Long.compareUnsigned(q1, b) >= 0 || Long.compareUnsigned(q1 * vn0, b * rhat + un1) > 0) { //if (q1 >= b || q1 * vn0 > b * rhat + un1) {
+            if (DLong.compareUnsigned(q1, b) >= 0 || DLong.compareUnsigned(q1 * vn0, b * rhat + un1) > 0) { //if (q1 >= b || q1 * vn0 > b * rhat + un1) {
                 q1 = q1 - 1;
                 rhat = rhat + vn1;
-                if (Long.compareUnsigned(rhat, b) < 0)
+                if (DLong.compareUnsigned(rhat, b) < 0)
                     continue;
             }
             break;
@@ -133,13 +135,13 @@ public final class FastDivision {
 
         un21 = un64 * b + un1 - q1 * v;  // Multiply and subtract.
 
-        q0 = Long.divideUnsigned(un21, vn1);            // Compute the second
+        q0 = DLong.divideUnsigned(un21, vn1);            // Compute the second
         rhat = un21 - q0 * vn1;     // quotient digit, q0.
         while (true) {
-            if (Long.compareUnsigned(q0, b) >= 0 || Long.compareUnsigned(q0 * vn0, b * rhat + un0) > 0) {
+            if (DLong.compareUnsigned(q0, b) >= 0 || DLong.compareUnsigned(q0 * vn0, b * rhat + un0) > 0) {
                 q0 = q0 - 1;
                 rhat = rhat + vn1;
-                if (Long.compareUnsigned(rhat, b) < 0)
+                if (DLong.compareUnsigned(rhat, b) < 0)
                     continue;
             }
             break;
@@ -307,7 +309,7 @@ public final class FastDivision {
                 // int32_t.
                 proposed_m += proposed_m;
                 long twice_rem = rem + rem;
-                if (Long.compareUnsigned(twice_rem, absD) >= 0 || Long.compareUnsigned(twice_rem, rem) < 0)
+                if (DLong.compareUnsigned(twice_rem, absD) >= 0 || DLong.compareUnsigned(twice_rem, rem) < 0)
                     proposed_m += 1;
                 // note that we only set the LIBDIVIDE_NEGATIVE_DIVISOR bit if we
                 // also set ADD_MARKER this is an annoying optimization that
@@ -501,10 +503,10 @@ public final class FastDivision {
         q1 = divideUnsignedFast(un64, magic32);            // Compute the first
         rhat = un64 - q1 * vn1;     // quotient digit, q1.
         while (true) {
-            if (Long.compareUnsigned(q1, b) >= 0 || Long.compareUnsigned(q1 * vn0, b * rhat + un1) > 0) { //if (q1 >= b || q1 * vn0 > b * rhat + un1) {
+            if (DLong.compareUnsigned(q1, b) >= 0 || DLong.compareUnsigned(q1 * vn0, b * rhat + un1) > 0) { //if (q1 >= b || q1 * vn0 > b * rhat + un1) {
                 q1 = q1 - 1;
                 rhat = rhat + vn1;
-                if (Long.compareUnsigned(rhat, b) < 0)
+                if (DLong.compareUnsigned(rhat, b) < 0)
                     continue;
             }
             break;
@@ -515,10 +517,10 @@ public final class FastDivision {
         q0 = divideUnsignedFast(un21, magic32);            // Compute the second
         rhat = un21 - q0 * vn1;     // quotient digit, q0.
         while (true) {
-            if (Long.compareUnsigned(q0, b) >= 0 || Long.compareUnsigned(q0 * vn0, b * rhat + un0) > 0) {
+            if (DLong.compareUnsigned(q0, b) >= 0 || DLong.compareUnsigned(q0 * vn0, b * rhat + un0) > 0) {
                 q0 = q0 - 1;
                 rhat = rhat + vn1;
-                if (Long.compareUnsigned(rhat, b) < 0)
+                if (DLong.compareUnsigned(rhat, b) < 0)
                     continue;
             }
             break;

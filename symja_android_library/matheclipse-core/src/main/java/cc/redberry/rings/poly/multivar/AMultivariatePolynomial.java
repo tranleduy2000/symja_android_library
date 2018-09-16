@@ -778,7 +778,10 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      */
     public double sparsity2() {
         TIntHashSet distinctTotalDegrees = new TIntHashSet();
-        terms.keySet().stream().mapToInt(dv -> dv.totalDegree).forEach(distinctTotalDegrees::add);
+        for (DegreeVector dv : terms.keySet()) {
+            int totalDegree = dv.totalDegree;
+            distinctTotalDegrees.add(totalDegree);
+        }
         TIntIterator it = distinctTotalDegrees.iterator();
         double nDenseTerms = 0.0;
         while (it.hasNext()) {
@@ -1412,7 +1415,12 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      * @return skeleton of this poly with respect to specified {@code variables}
      */
     public final Set<DegreeVector> getSkeleton(int... variables) {
-        return terms.keySet().stream().map(dv -> dv.dvSelect(variables)).collect(Collectors.toCollection(() -> new TreeSet<>(ordering)));
+        TreeSet<DegreeVector> degreeVectors = new TreeSet<>(ordering);
+        for (DegreeVector dv : terms.keySet()) {
+            DegreeVector degreeVector = dv.dvSelect(variables);
+            degreeVectors.add(degreeVector);
+        }
+        return degreeVectors;
     }
 
     /**
@@ -1424,7 +1432,12 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
     public final Set<DegreeVector> getSkeletonDrop(int... variables) {
         int[] variablesSorted = variables.clone();
         Arrays.sort(variablesSorted);
-        return terms.keySet().stream().map(dv -> dv.dvDropSelect(variablesSorted)).collect(Collectors.toCollection(() -> new TreeSet<>(ordering)));
+        TreeSet<DegreeVector> degreeVectors = new TreeSet<>(ordering);
+        for (DegreeVector dv : terms.keySet()) {
+            DegreeVector degreeVector = dv.dvDropSelect(variablesSorted);
+            degreeVectors.add(degreeVector);
+        }
+        return degreeVectors;
     }
 
     /**
@@ -1434,7 +1447,12 @@ public abstract class AMultivariatePolynomial<Term extends AMonomial<Term>, Poly
      * @return skeleton of this poly with respect to all except specified {@code variables}
      */
     public final Set<DegreeVector> getSkeletonExcept(int... variables) {
-        return terms.keySet().stream().map(dv -> dv.dvSetZero(variables)).collect(Collectors.toCollection(() -> new TreeSet<>(ordering)));
+        TreeSet<DegreeVector> degreeVectors = new TreeSet<>(ordering);
+        for (DegreeVector dv : terms.keySet()) {
+            DegreeVector degreeVector = dv.dvSetZero(variables);
+            degreeVectors.add(degreeVector);
+        }
+        return degreeVectors;
     }
 
     /**

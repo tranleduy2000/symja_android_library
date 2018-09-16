@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import cc.redberry.combinatorics.Combinatorics;
 import cc.redberry.combinatorics.IntCombinatorialPort;
@@ -71,24 +71,32 @@ public final class GroebnerMethods {
         Comparator<DegreeVector> optimalOrder = optimalOrder(ideal);
 
         List<Poly> eliminationIdeal = ideal;
-        if (!(optimalOrder instanceof MonomialOrder.GrevLexWithPermutation))
-            eliminationIdeal = GroebnerBasis(
+        if (!(optimalOrder instanceof MonomialOrder.GrevLexWithPermutation)) {
+            List<Poly> list = new ArrayList<>();
+            for (Poly p : GroebnerBasis(
                     eliminationIdeal,
-                    new MonomialOrder.EliminationOrder(optimalOrder, variable))
-                    .stream()
-                    .filter(p -> p.degree(variable) == 0)
-                    .collect(Collectors.toList());
-        else {
+                    new MonomialOrder.EliminationOrder(optimalOrder, variable))) {
+                if (p.degree(variable) == 0) {
+                    list.add(p);
+                }
+            }
+            eliminationIdeal = list;
+        } else {
             MonomialOrder.GrevLexWithPermutation order = (MonomialOrder.GrevLexWithPermutation) optimalOrder;
             int[] inversePermutation = MultivariateGCD.inversePermutation(order.permutation);
-            eliminationIdeal = GroebnerBasis(eliminationIdeal
-                    .stream()
-                    .map(p -> AMultivariatePolynomial.renameVariables(p, order.permutation))
-                    .collect(Collectors.toList()), new MonomialOrder.EliminationOrder(GREVLEX, inversePermutation[variable]))
-                    .stream()
-                    .map(p -> AMultivariatePolynomial.renameVariables(p, inversePermutation))
-                    .filter(p -> p.degree(variable) == 0)
-                    .collect(Collectors.toList());
+            List<Poly> list = new ArrayList<>();
+            for (Poly terms : eliminationIdeal) {
+                Poly poly = AMultivariatePolynomial.renameVariables(terms, order.permutation);
+                list.add(poly);
+            }
+            List<Poly> result = new ArrayList<>();
+            for (Poly p : GroebnerBasis(list, new MonomialOrder.EliminationOrder(GREVLEX, inversePermutation[variable]))) {
+                Poly terms = AMultivariatePolynomial.renameVariables(p, inversePermutation);
+                if (terms.degree(variable) == 0) {
+                    result.add(terms);
+                }
+            }
+            eliminationIdeal = result;
         }
 
         return eliminationIdeal.stream().map(p -> p.setOrdering(originalOrder)).collect(Collectors.toList());
@@ -121,7 +129,14 @@ public final class GroebnerMethods {
 
         // give a check for LEX leading terms set
         List<DegreeVector> leadTerms;
-        if (sys.stream().allMatch(p -> p.ordering == LEX))
+        boolean b = true;
+        for (Poly sy : sys) {
+            if (sy.ordering != LEX) {
+                b = false;
+                break;
+            }
+        }
+        if (b)
             leadTerms = sys.stream().map(AMultivariatePolynomial::lt).collect(Collectors.toList());
         else
             leadTerms = sys.stream().map(p -> p.lt(LEX)).collect(Collectors.toList());
@@ -260,10 +275,12 @@ public final class GroebnerMethods {
         }
 
         int[] dropVars = ArraysUtil.sequence(0, nInitialVars);
-        return eliminate(helpPolys, dropVars)
-                .stream()
-                .map(p -> p.dropVariables(dropVars))
-                .collect(Collectors.toList());
+        List<Poly> list = new ArrayList<>();
+        for (Poly p : eliminate(helpPolys, dropVars)) {
+            Poly terms = p.dropVariables(dropVars);
+            list.add(terms);
+        }
+        return list;
     }
 
     /* **************************************** Nullstellensatz certificate **************************************** */
@@ -345,11 +362,14 @@ public final class GroebnerMethods {
         for (int degreeBound = 1; ; ++degreeBound) {
             // number of coefficients in a single unknown poly
             BigInteger _maxCfSize;
-            if (boundTotalDeg)
-                _maxCfSize = IntStream.rangeClosed(0, degreeBound)
-                        .mapToObj(d -> Z.binomial(d + factory.nVariables - 1, factory.nVariables - 1))
-                        .reduce(Z.getZero(), Z::add);
-            else
+            if (boundTotalDeg) {
+                BigInteger acc = Z.getZero();
+                for (int d = 0; d <= degreeBound; d++) {
+                    BigInteger binomial = Z.binomial(d + factory.nVariables - 1, factory.nVariables - 1);
+                    acc = Z.add(acc, binomial);
+                }
+                _maxCfSize = acc;
+            } else
                 _maxCfSize = Z.pow(Z.valueOf(degreeBound), factory.nVariables);
             // total number of unknown coefficients
             BigInteger _nUnknowns = _maxCfSize.multiply(Z.valueOf(polynomials.size()));
@@ -369,7 +389,11 @@ public final class GroebnerMethods {
             MultivariateRing<MultivariatePolynomial<Poly>> linSysRing = Rings.MultivariateRing(factory.nVariables, cfRing);
 
             // initial system as R[u1, ..., uM][x1, ..., xN]
-            List<MultivariatePolynomial<Poly>> convertedPolynomials = polynomials.stream().map(p -> p.asOverPoly(cfFactory)).collect(Collectors.toList());
+            List<MultivariatePolynomial<Poly>> convertedPolynomials = new ArrayList<>();
+            for (Poly p : polynomials) {
+                MultivariatePolynomial<Poly> monomials = p.asOverPoly(cfFactory);
+                convertedPolynomials.add(monomials);
+            }
 
             // solution
             List<MultivariatePolynomial<Poly>> certificate = new ArrayList<>();
@@ -396,13 +420,26 @@ public final class GroebnerMethods {
     private static List<MultivariatePolynomial<BigInteger>> NullstellensatzSolverZ(List<MultivariatePolynomial<BigInteger>> polynomials,
                                                                                    MultivariatePolynomial<BigInteger> rhs, boolean boundTotalDeg) {
         // fixme: a crutch
+        List<MultivariatePolynomial<Rational<BigInteger>>> list = new ArrayList<>();
+        for (MultivariatePolynomial<BigInteger> polynomial : polynomials) {
+            MultivariatePolynomial<Rational<BigInteger>> monomials = polynomial.mapCoefficients(Q, Q::mkNumerator);
+            list.add(monomials);
+        }
         List<MultivariatePolynomial<Rational<BigInteger>>> result = NullstellensatzSolver(
-                polynomials.stream().map(p -> p.mapCoefficients(Q, Q::mkNumerator)).collect(Collectors.toList()),
+                list,
                 rhs.mapCoefficients(Q, Q::mkNumerator),
                 boundTotalDeg);
-        if (result.stream().anyMatch(p -> !p.stream().allMatch(Rational::isIntegral)))
-            return null;
-        return result.stream().map(p -> p.mapCoefficients(Z, Rational::numerator)).collect(Collectors.toList());
+        for (MultivariatePolynomial<Rational<BigInteger>> monomials : result) {
+            if (!monomials.stream().allMatch(Rational::isIntegral)) {
+                return null;
+            }
+        }
+        List<MultivariatePolynomial<BigInteger>> list1 = new ArrayList<>();
+        for (MultivariatePolynomial<Rational<BigInteger>> p : result) {
+            MultivariatePolynomial<BigInteger> monomials = p.mapCoefficients(Z, Rational::numerator);
+            list1.add(monomials);
+        }
+        return list1;
     }
 
     /**
@@ -458,10 +495,12 @@ public final class GroebnerMethods {
         if (solve == Inconsistent)
             return null;
 
-        return certificate
-                .stream()
-                .map(p -> p.mapCoefficients(ring, m -> m.evaluate(result)))
-                .collect(Collectors.toList());
+        List<MultivariatePolynomialZp64> list = new ArrayList<>();
+        for (MultivariatePolynomial<MultivariatePolynomialZp64> p : certificate) {
+            MultivariatePolynomialZp64 monomialZp64s = p.mapCoefficients(ring, m -> m.evaluate(result));
+            list.add(monomialZp64s);
+        }
+        return list;
     }
 
     /**
@@ -499,10 +538,12 @@ public final class GroebnerMethods {
         if (solve == Inconsistent)
             return null;
 
-        return certificate
-                .stream()
-                .map(p -> p.mapCoefficients(ring, m -> m.evaluate(result)))
-                .collect(Collectors.toList());
+        List<MultivariatePolynomial<E>> list = new ArrayList<>();
+        for (MultivariatePolynomial<MultivariatePolynomial<E>> p : certificate) {
+            MultivariatePolynomial<E> monomials = p.mapCoefficients(ring, m -> m.evaluate(result));
+            list.add(monomials);
+        }
+        return list;
     }
 
     /**
@@ -546,14 +587,21 @@ public final class GroebnerMethods {
     private static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
     List<Rational<Poly>> LeinartDecomposition0(Rational<Poly> fraction) {
         FactorDecomposition<Poly> denDecomposition = fraction.factorDenominator();
-        List<Factor<Term, Poly>> denominator = IntStream.range(0, denDecomposition.size())
-                .mapToObj(i -> new Factor<>(denDecomposition.get(i), denDecomposition.getExponent(i)))
-                .collect(Collectors.toList());
+        List<Factor<Term, Poly>> denominator = new ArrayList<>();
+        int bound = denDecomposition.size();
+        for (int i = 0; i < bound; i++) {
+            Factor<Term, Poly> termPolyFactor = new Factor<>(denDecomposition.get(i), denDecomposition.getExponent(i));
+            denominator.add(termPolyFactor);
+        }
 
-        return NullstellensatzDecomposition(new Fraction<>(fraction.numerator(), denominator, denDecomposition.unit))
-                .stream().flatMap(p -> AlgebraicDecomposition(p).stream())
-                .map(f -> f.toRational(fraction.ring))
-                .collect(Collectors.toList());
+        List<Rational<Poly>> list = new ArrayList<>();
+        for (Fraction<Term, Poly> p : NullstellensatzDecomposition(new Fraction<>(fraction.numerator(), denominator, denDecomposition.unit))) {
+            for (Fraction<Term, Poly> f : AlgebraicDecomposition(p)) {
+                Rational<Poly> polyRational = f.toRational(fraction.ring);
+                list.add(polyRational);
+            }
+        }
+        return list;
     }
 
     static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
@@ -564,10 +612,15 @@ public final class GroebnerMethods {
         // denominators have not common zeros
         // apply Nullstellensatz decomposition
         List<Poly> certificate = NullstellensatzCertificate(fraction.raisedDenominator());
-        return IntStream.range(0, certificate.size())
-                .mapToObj(i -> new Fraction<>(certificate.get(i).multiply(fraction.numerator), remove(fraction.denominator, i), fraction.denominatorConstantFactor))
-                .flatMap(f -> NullstellensatzDecomposition(f).stream())
-                .collect(Collectors.toList());
+        List<Fraction<Term, Poly>> list = new ArrayList<>();
+        int bound = certificate.size();
+        for (int i = 0; i < bound; i++) {
+            Fraction<Term, Poly> f = new Fraction<>(certificate.get(i).multiply(fraction.numerator), remove(fraction.denominator, i), fraction.denominatorConstantFactor);
+            for (Fraction<Term, Poly> termPolyFraction : NullstellensatzDecomposition(f)) {
+                list.add(termPolyFraction);
+            }
+        }
+        return list;
     }
 
     static <Term extends AMonomial<Term>, Poly extends AMultivariatePolynomial<Term, Poly>>
@@ -584,9 +637,16 @@ public final class GroebnerMethods {
 
         // denominators are algebraically dependent
         // choose the simplest annihilator
-        Poly annihilator = annihilators
-                .stream()
-                .min(Comparator.comparingInt(p -> p.mt().totalDegree)).get()
+        boolean seen = false;
+        Poly best = null;
+        Comparator<Poly> comparator = Comparator.comparingInt(p -> p.mt().totalDegree);
+        for (Poly terms : annihilators) {
+            if (!seen || comparator.compare(terms, best) < 0) {
+                seen = true;
+                best = terms;
+            }
+        }
+        Poly annihilator = (seen ? Optional.of(best) : Optional.<Poly>empty()).get()
                 .setOrderingUnsafe(GREVLEX);
         // choose the simplest monomial in annihilator
         Term minNormTerm = annihilator.mt();
@@ -595,7 +655,15 @@ public final class GroebnerMethods {
         Poly numerator = fraction.numerator;
         List<Factor<Term, Poly>> denominator = fraction.denominator;
 
-        int[] denominatorExponents = denominator.stream().mapToInt(f -> f.exponent).toArray();
+        int[] denominatorExponents = new int[10];
+        int count = 0;
+        for (Factor<Term, Poly> f : denominator) {
+            int exponent = f.exponent;
+            if (denominatorExponents.length == count)
+                denominatorExponents = Arrays.copyOf(denominatorExponents, count * 2);
+            denominatorExponents[count++] = exponent;
+        }
+        denominatorExponents = Arrays.copyOfRange(denominatorExponents, 0, count);
 
         List<Fraction<Term, Poly>> result = new ArrayList<>();
         for (Term numFactor : annihilator) {
@@ -613,16 +681,21 @@ public final class GroebnerMethods {
                 }
             }
 
-            Poly num = IntStream
-                    .range(0, numExponents.length)
-                    .mapToObj(i -> denominator.get(i).setExponent(numExponents[i]).raised)
-                    .reduce(numerator.clone(), (a, b) -> a.multiply(b))
+            Poly acc = numerator.clone();
+            int bound = numExponents.length;
+            for (int i = 0; i < bound; i++) {
+                Poly raised = denominator.get(i).setExponent(numExponents[i]).raised;
+                acc = acc.multiply(raised);
+            }
+            Poly num = acc
                     .multiply(numerator.createConstantFromTerm(numFactor));
 
-            List<Factor<Term, Poly>> den = IntStream
-                    .range(0, numExponents.length)
-                    .mapToObj(i -> denominator.get(i).setExponent(denExponents[i]))
-                    .collect(Collectors.toList());
+            List<Factor<Term, Poly>> den = new ArrayList<>();
+            int bound1 = numExponents.length;
+            for (int i = 0; i < bound1; i++) {
+                Factor<Term, Poly> termPolyFactor = denominator.get(i).setExponent(denExponents[i]);
+                den.add(termPolyFactor);
+            }
 
             Poly denConstant = fraction.denominatorConstantFactor.clone()
                     .multiply(numerator.createConstantFromTerm(minNormTerm));
@@ -665,15 +738,31 @@ public final class GroebnerMethods {
         }
 
         final List<Poly> raisedDenominator() {
-            return denominator.stream().map(p -> p.raised).collect(Collectors.toList());
+            List<Poly> list = new ArrayList<>();
+            for (Factor<Term, Poly> p : denominator) {
+                Poly raised = p.raised;
+                list.add(raised);
+            }
+            return list;
         }
 
         final List<Poly> bareDenominator() {
-            return denominator.stream().map(p -> p.factor).collect(Collectors.toList());
+            List<Poly> list = new ArrayList<>();
+            for (Factor<Term, Poly> p : denominator) {
+                Poly factor = p.factor;
+                list.add(factor);
+            }
+            return list;
         }
 
         final List<Poly> bareDenominatorNoUnits() {
-            return bareDenominator().stream().filter(p -> !p.isConstant()).collect(Collectors.toList());
+            List<Poly> list = new ArrayList<>();
+            for (Poly p : bareDenominator()) {
+                if (!p.isConstant()) {
+                    list.add(p);
+                }
+            }
+            return list;
         }
 
         final Rational<Poly> toRational(Ring<Poly> polyRing) {
