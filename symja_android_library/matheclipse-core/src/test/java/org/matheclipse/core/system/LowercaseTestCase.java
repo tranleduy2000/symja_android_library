@@ -7346,6 +7346,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialGCD() {
+		// TODO difference to MMA hamdle Extension->Automatic correctly
+		check("PolynomialGCD(x^2 - 2, x - Sqrt(2))", //
+				"-Sqrt(2)+x");
+
+		// check("PolynomialGCD(I*2,12)", "2");
+		check("PolynomialGCD(a+b*x,c+d*x)", "1");
+		check("PolynomialGCD()", "PolynomialGCD()");
+		check("PolynomialGCD(x)", "x");
+		check("PolynomialGCD(-12)", "12");
 		check("PolynomialGCD(x,x)", "x");
 
 		check("PolynomialGCD((x + 1)^3, x^3 + x, Modulus -> 2)", "(1+x)^2");
@@ -7361,7 +7370,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialLCM() {
+		// TODO difference to MMA the product is expanded out although GCD==1
+		check("PolynomialLCM(a+b*x,c+d*x)", //
+				"a*c+b*c*x+a*d*x+b*d*x^2");
+		check("PolynomialLCM()", "PolynomialLCM()");
+		check("PolynomialLCM(x)", "x");
 		check("PolynomialLCM(x,x)", "x");
+		check("PolynomialLCM(-12)", "12");
 
 		check("Expand((-1+x)*(1+x)*(1+x^2)*(1-x+x^2)*(1+x+x^2)*(1+x+x^2+x^3+x^4)*(1+x+x^2+x^3+x^4+x^5+x^6))",
 				"-1-2*x-4*x^2-6*x^3-8*x^4-9*x^5-9*x^6-7*x^7-4*x^8+4*x^10+7*x^11+9*x^12+9*x^13+8*x^\n"
@@ -7405,6 +7420,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialQuotient() {
+		check("PolynomialQuotient(a+b*x,1,x)^3", "(a+b*x)^3");
 		check("PolynomialQuotient(x^2, x + a,x)", "-a+x");
 		check("PolynomialQuotient(x^2 + x + 1, 2*x + 1, x)", "1/4+x/2");
 		check("PolynomialQuotient(x^2 + b*x + 1, a*x + 1, x)", "(-1/a+b)/a+x/a");
@@ -8639,6 +8655,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	 * </pre>
 	 */
 	public void testResultant() {
+		// check("Resultant((x - a) (x - b), (x - c) (x - d) (x - e), x)",//
+		// "(a*b+(-(-a^2*b-a*b^2+a*b*c+a*b*d+a*b*e-c*d*e)*(-a-b-(-a^2*b-a*b^2+a*b*c+a*b*d+a*b*e-c*d*e)/(a^\n" +
+		// "2+a*b+b^2-a*c-b*c-a*d-b*d+c*d-a*e-b*e+c*e+d*e)))/(a^2+a*b+b^2-a*c-b*c-a*d-b*d+c*d-a*e-b*e+c*e+d*e))*(a^\n" +
+		// "2+a*b+b^2-a*c-b*c-a*d-b*d+c*d-a*e-b*e+c*e+d*e)^2");
 		check("PolynomialRemainder(-2+x^2-2*x*y+y^2,-5+4*x-2*x^3+2*y+3*x^2*y,y)",
 				"-2+x^2+(-(-5+4*x-2*x^3)*(-2*x-(-5+4*x-2*x^3)/(2+3*x^2)))/(2+3*x^2)");
 		check("Resultant((x-y)^2-2 , y^3-5, y)", "17-60*x+12*x^2-10*x^3-6*x^4+x^6");
