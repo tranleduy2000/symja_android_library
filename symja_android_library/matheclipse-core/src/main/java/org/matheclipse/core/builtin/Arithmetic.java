@@ -3079,6 +3079,13 @@ public final class Arithmetic {
                         }
                     }
                 }
+			} else {
+				if (base.isFraction() && base.isPositive() && ((IFraction) base).isLessThan(F.C1)) {
+					IExpr o1negExpr = AbstractFunctionEvaluator.getPowerNegativeExpression(exponent, true);
+					if (o1negExpr.isPresent()) {
+						return F.Power(base.inverse(), o1negExpr);
+					}
+				}
             }
 
 			if (base.isReal() && base.isNegative() && exponent.isNumEqualRational(F.C1D2)) {
@@ -3100,11 +3107,7 @@ public final class Arithmetic {
                         // (a * b * c)^n => a^n * b^n * c^n
 						return powBase.mapThread(Power(null, exponent), 1);
                     }
-					// if (exponent.isNumber()) {
-					// final IAST f0 = astArg1;
-//
-
-					if ((base.size() > 1) && (base.first().isRealResult())) {
+					if ((base.size() > 2)) {
 						IASTAppendable filterAST = powBase.copyHead();
 						IASTAppendable restAST = powBase.copyHead();
 						powBase.forEach(new Consumer<IExpr>() {
@@ -4420,21 +4423,6 @@ public final class Arithmetic {
                 return o0.negate().times(F.Log(o1.first().inverse()));
             }
 
-            // if (o1.isPlus()) {
-            // final IAST f1 = (IAST) o1;
-            // issue#128
-            // if (o0.isMinusOne()) {
-            // return f1.mapAt(F.Times(o0, null), 2);
-            // }
-            // if (o0.isInteger() && o1.isPlus() && o1.isAST2() && (((IAST)
-            // o1).arg1().isNumericFunction())) {
-            // // Note: this doesn't work for Together() function, if we
-            // allow
-            // // o0 to be a fractional number
-            // return f1.mapAt(F.Times(o0, null), 2);
-            // }
-            // }
-
             if (o1.isPower()) {
                 IExpr power1Base = o1.base();
                 IExpr power1Exponent = o1.exponent();
@@ -4719,22 +4707,39 @@ public final class Arithmetic {
 				}
 			}
 
-			if (base2.equals(arg1)) {
+			if (arg1.equals(base2)) {
 				if (exponent2.isNumber() && !arg1.isRational()) {
                     // avoid reevaluation of a root of a rational number (example: 2*Sqrt(2) )
 					return arg1.power(exponent2.inc());
 				} else if (!exponent2.isNumber()) {
 					return arg1.power(exponent2.inc());
                 }
-				// } else if (arg1.isPlus() && power1Arg1.equals(arg1.negate()))
-                // {
-                // // Issue#128
-                // if (power1Arg2.isInteger()) {
-				// return arg1.power(power1Arg2.inc()).negate();
-                // } else if (!power1Arg2.isNumber()) {
-				// return arg1.power(power1Arg2.inc()).negate();
-                // }
-			} else if (exponent2.isFraction()) {
+			} else if (arg1.negate().equals(base2) && base2.isPositive()) {
+				if (exponent2.isNumber() && !arg1.isRational()) {
+					// avoid reevaluation of a root of a rational number (example: -2*Sqrt(2) )
+					return base2.power(exponent2.inc()).times(F.CN1);
+				} else if (!exponent2.isNumber()) {
+					return base2.power(exponent2.inc()).times(F.CN1);
+				}
+			} else if (arg1.isFraction() && base2.isFraction() && base2.isPositive()) {
+				IExpr inverse = base2.inverse();
+				IExpr o1negExpr = AbstractFunctionEvaluator.getPowerNegativeExpression(exponent2, true);
+				if (o1negExpr.isPresent()) {
+					if (arg1.equals(inverse)) {
+						return base2.power(F.Plus(F.CN1, exponent2));
+					} else if (arg1.negate().equals(inverse)) {
+						return base2.power(F.Plus(F.CN1, exponent2)).times(F.CN1);
+					}
+				} else {
+					if (arg1.equals(inverse)) {
+						return inverse.power(F.Subtract(F.C1, exponent2));
+					} else if (arg1.negate().equals(inverse)) {
+						return inverse.power(F.Subtract(F.C1, exponent2)).times(F.CN1);
+					}
+				}
+			}
+
+			if (exponent2.isFraction()) {
 				if (base2.isMinusOne()) {
 					if (arg1.isImaginaryUnit()) {
                         // I * power1Arg1 ^ power1Arg2 -> (-1) ^ (power1Arg2 + (1/2))
@@ -4746,32 +4751,6 @@ public final class Arithmetic {
                     }
                 }
 				if (arg1.isRational()) {
-                    // if (power1Arg1.isInteger()) {
-                    // // example: 1/9 * 3^(1/2) -> 1/3 * 3^(-1/2)
-                    //
-                    // // TODO implementation for complex numbers instead of
-                    // // fractions
-                    // IFraction f0 = (IFraction) arg0;
-                    // IInteger pArg1 = (IInteger) power1Arg1;
-                    // IFraction pArg2 = (IFraction) power1Arg2;
-                    // if (pArg1.isPositive()) {
-                    // if (pArg2.isPositive()) {
-                    // IInteger denominatorF0 = f0.getDenominator();
-                    // IInteger[] res = denominatorF0.divideAndRemainder(pArg1);
-                    // if (res[1].isZero()) {
-                    // return F.Times(F.fraction(f0.getNumerator(), res[0]),
-                    // F.Power(pArg1, F.Subtract(F.C1, pArg2).negate()));
-                    // }
-                    // } else {
-                    // IInteger numeratorF0 = f0.getNumerator();
-                    // IInteger[] res = numeratorF0.divideAndRemainder(pArg1);
-                    // if (res[1].isZero()) {
-                    // return F.Times(F.fraction(res[0], f0.getDenominator()),
-                    // F.Power(pArg1, pArg2.negate()));
-                    // }
-                    // }
-                    // }
-                    // } else
 					if ((base2.isRational())) {
 
 						if (exponent2.isNegative()) {

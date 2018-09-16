@@ -3883,6 +3883,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFunctionExpand() {
+		check("FunctionExpand(Log(10*E))", //
+				"1+Log(10)");
 		check("FunctionExpand(PolyGamma(-2, 1))", //
 				"1/2*(Log(2)+Log(Pi))");
 		check("FunctionExpand(PolyGamma(-3, 1))", //
@@ -5993,11 +5995,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 				+ "  m\n" + "  );$gcd(18, 21)", "3");
 
 		check("{Module({x}, x), Module({x}, x)}", //
-				"{x$24,x$25}");
+				"{x$20,x$21}");
 		check("Module({e = Expand((1 + x)^5)}, Function(x, e))", //
-				"Function(x$27,e$26)");
+				"Function(x$23,e$22)");
 		check("Module({a,b}, Block({c}, c+a))", //
-				"a$28+c");
+				"a$24+c");
 
 		if (Config.SERVER_MODE == false) {
 			check("f(x0_) :=\n" + " Module({x = x0},\n" + "  While(x > 0, x = Log(x));\n" + "  x\n" + "  );f(2.0)",
@@ -7521,6 +7523,35 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// "$Aborted");
 		// check("TimeConstrained(1^3^3^3, 10)", //
 		// "1");
+
+
+		check("2*Sqrt(2)", //
+				"2*Sqrt(2)");
+		check("-2*Sqrt(2)", //
+				"-2*Sqrt(2)");
+
+		check("(2/3)^(-m)", //
+				"(3/2)^m");
+		check("(3/2)^(-m)", //
+				"(3/2)^(-m)");
+
+ 		check("(-2/3)*(3/2)^m", //
+ 				"-(2/3)^(1-m)");
+ 		check("(2/3)*(3/2)^m", //
+ 				"(2/3)^(1-m)");
+ 		check("(-2/3)*(x)/(3/2)^m", //
+ 				"-x/(3/2)^(1+m)");
+ 		check("(-2/3)*(x)*(3/2)^m", //
+ 				"-(2/3)^(1-m)*x");
+ 		check("(2/3)*(x)/(3/2)^m", //
+ 				"x/(3/2)^(1+m)");
+ 		check("(2/3)*(x)*(3/2)^m", //
+ 				"(2/3)^(1-m)*x");
+
+		check("(2/3)^(1+m)*x", //
+				"(2/3)^(1+m)*x");
+
+
 		check("Sqrt(Pi/b)",
 				"Sqrt(1/b)*Sqrt(Pi)");
 		check("(2*x*y)^n", //
@@ -10582,7 +10613,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTimes() {
-
+		check("5/7*Sqrt(7/6)", //
+				"5/Sqrt(42)");
 		check("(Sqrt(3)*x)/Sqrt(2)", //
 				"Sqrt(3/2)*x");
 		check("(2^(3/4)*x*7^(-15/4))", //
