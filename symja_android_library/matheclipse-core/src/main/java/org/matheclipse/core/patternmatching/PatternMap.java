@@ -2,6 +2,7 @@ package org.matheclipse.core.patternmatching;
 
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
+import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -58,8 +59,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	private IExpr[] fSymbolsArray;
 
 	/**
-	 * Contains the current values of the pattern symbols. The corresponding symbol is stored in
-	 * <code>fSymbolsArray</code>.
+	 * Contains the current values of the pattern symbols. The corresponding symbol is stored in <code>fSymbolsArray</code>.
 	 */
 	private IExpr[] fPatternValuesArray;
 
@@ -82,8 +82,8 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	}
 
 	/**
-	 * Set the index of <code>fPatternSymbolsArray</code> where the <code>pattern</code> stores it's assigned value
-	 * during pattern matching.
+	 * Set the index of <code>fPatternSymbolsArray</code> where the <code>pattern</code> stores it's assigned value during pattern
+	 * matching.
 	 * 
 	 * @param pattern
 	 * @param patternIndexMap
@@ -164,8 +164,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 * 
 	 * Increments this classes pattern counter.
 	 * 
-	 * @param lhsPatternExpr
-	 *            the (left-hand-side) expression which could contain pattern objects.
+	 * @param lhsPatternExpr the (left-hand-side) expression which could contain pattern objects.
 	 * @return the priority of this pattern-matcher
 	 */
 	public int determinePatterns(final IExpr lhsPatternExpr) {
@@ -190,10 +189,8 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 * Increments this classes pattern counter.
 	 * 
 	 * @param patternIndexMap
-	 * @param lhsPatternExpr
-	 *            the (left-hand-side) expression which could contain pattern objects.
-	 * @param treeLevel
-	 *            the level of the tree where the patterns are determined
+	 * @param lhsPatternExpr  the (left-hand-side) expression which could contain pattern objects.
+	 * @param treeLevel       the level of the tree where the patterns are determined
 	 */
 	private int determinePatternsRecursive(Map<IExpr, Integer> patternIndexMap, final IAST lhsPatternExpr,
 			int treeLevel) {
@@ -202,20 +199,20 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 		}
 		int[] listEvalFlags = new int[] { IAST.NO_FLAG };
 		lhsPatternExpr.forEach(new Consumer<IExpr>() {
-			@Override
-			public void accept(IExpr x) {
-				if (x.isAST()) {
-					listEvalFlags[0] |= PatternMap.this.determinePatternsRecursive(patternIndexMap, (IAST) x, treeLevel + 1);
-					fPriority -= 11;
-				} else if (x instanceof IPatternObject) {
-					int[] result = ((IPatternObject) x).addPattern(PatternMap.this, patternIndexMap);
-					listEvalFlags[0] |= result[0];
-					fPriority -= result[1];
-				} else {
-					fPriority -= (50 - treeLevel);
-				}
-			}
-		}, 0);
+            @Override
+            public void accept(IExpr x) {
+                if (x.isAST()) {
+                    listEvalFlags[0] |= PatternMap.this.determinePatternsRecursive(patternIndexMap, (IAST) x, treeLevel + 1);
+                    fPriority -= 11;
+                } else if (x instanceof IPatternObject) {
+                    int[] result = ((IPatternObject) x).addPattern(PatternMap.this, patternIndexMap);
+                    listEvalFlags[0] |= result[0];
+                    fPriority -= result[1];
+                } else {
+                    fPriority -= (50 - treeLevel);
+                }
+            }
+        }, 0);
 		lhsPatternExpr.setEvalFlags(listEvalFlags[0]);
 		// disable flag "pattern with default value"
 		// listEvalFlags &= IAST.CONTAINS_NO_DEFAULT_PATTERN_MASK;
@@ -279,8 +276,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	/**
 	 * Return the matched value for the given symbol
 	 * 
-	 * @param symbol
-	 *            the symbol
+	 * @param symbol the symbol
 	 * @return <code>null</code> if no matched expression exists
 	 */
 	public final IExpr val(@Nonnull ISymbol symbol) {
@@ -340,6 +336,33 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 */
 	protected boolean isRuleWithoutPatterns() {
 		return fRuleWithoutPattern;
+	}
+
+	/**
+	 * Check if the substituted expression still contains a symbol of a pattern expression.
+	 *
+	 * @param substitutedExpr
+	 * @return
+	 */
+	protected boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
+		if (isAllPatternsAssigned()) {
+			return true;
+		}
+		if (fSymbolsArray != null) {
+			return substitutedExpr.isFree(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					for (int i = 0; i < fSymbolsArray.length; i++) {
+						if (fSymbolsArray[i].equals(x)) {
+							return false;
+						}
+					}
+					return true;
+				}
+			}, true);
+
+		}
+		return true;
 	}
 
 	/**
@@ -415,36 +438,38 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	}
 
 	/**
-	 * Substitute all patterns and symbols in the given expression with the current value of the corresponding internal
-	 * pattern values arrays
+	 * Substitute all patterns and symbols in the given expression with the current value of the corresponding internal pattern values
+	 * arrays
 	 * 
-	 * @param lhsPatternExpr
-	 *            left-hand-side expression which may contain pattern objects
+	 * @param lhsPatternExpr left-hand-side expression which may contain pattern objects
 	 * 
 	 * @return <code>F.NIL</code> if substitutions isn't possible
 	 */
 	protected IExpr substitutePatternOrSymbols(final IExpr lhsPatternExpr) {
 		if (fPatternValuesArray != null) {
-			IExpr result = lhsPatternExpr.replaceAll((IExpr input) -> {
-                                                             if (input instanceof IPatternObject) {
-                                                                 IPatternObject patternObject = (IPatternObject) input;
-                                                                 ISymbol sym = patternObject.getSymbol();
-                                                                 final int length = fSymbolsArray.length;
-                                                                 if (sym != null) {
-                                                                     for (int i = 0; i < length; i++) {
-                                                                         if (sym == fSymbolsArray[i]) {
-                                                                             return fPatternValuesArray[i] != null ? fPatternValuesArray[i] : F.NIL;
-                                                                         }
-                                                                     }
-                                                                 } else {
-                                                                     for (int i = 0; i < length; i++) {
-                                                                         if (patternObject == fSymbolsArray[i]) {
-                                                                             return fPatternValuesArray[i] != null ? fPatternValuesArray[i] : F.NIL;
-                                                                         }
-                                                                     }
-                                                                 }
-                                                             }
-                                                             return F.NIL;
+			IExpr result = lhsPatternExpr.replaceAll(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr input) {
+					if (input instanceof IPatternObject) {
+						IPatternObject patternObject = (IPatternObject) input;
+						ISymbol sym = patternObject.getSymbol();
+						final int length = fSymbolsArray.length;
+						if (sym != null) {
+							for (int i = 0; i < length; i++) {
+								if (sym == fSymbolsArray[i]) {
+									return fPatternValuesArray[i] != null ? fPatternValuesArray[i] : F.NIL;
+								}
+							}
+						} else {
+							for (int i = 0; i < length; i++) {
+								if (patternObject == fSymbolsArray[i]) {
+									return fPatternValuesArray[i] != null ? fPatternValuesArray[i] : F.NIL;
+								}
+							}
+						}
+					}
+					return F.NIL;
+				}
 			});
 
 			if (result.isPresent()) {

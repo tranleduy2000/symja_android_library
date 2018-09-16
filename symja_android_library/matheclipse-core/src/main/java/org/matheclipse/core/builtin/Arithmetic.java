@@ -645,18 +645,12 @@ public final class Arithmetic {
         /**
          * gives <code>vMin</code> for <code>x<min</code> and <code>vMax</code> for <code>x>max</code>.
          *
-         * @param x
-         *            the expreesion value
-         * @param min
-         *            minimum value
-         * @param max
-         *            maximum value
-         * @param vMin
-         *            value for x less than minimum
-         * @param vMax
-         *            value for x greater than minimum
-         * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x is greater than
-         *         max.
+		 * @param x    the expreesion value
+		 * @param min  minimum value
+		 * @param max  maximum value
+		 * @param vMin value for x less than minimum
+		 * @param vMax value for x greater than minimum
+		 * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x is greater than max.
          */
         private IExpr clip(IExpr x, ISignedNumber min, ISignedNumber max, IExpr vMin, IExpr vMax) {
             if (x.isReal()) {
@@ -1628,8 +1622,7 @@ public final class Arithmetic {
         /**
          * The Harmonic number at the index specified
          *
-         * @param n
-         *            the index, non-negative.
+		 * @param n the index, non-negative.
          * @return the H_1=1 for n=1, H_2=3/2 for n=2 etc. For values of n less than 1, zero is returned.
          */
         public BigFraction harmonicNumber(int n) {
@@ -1945,8 +1938,7 @@ public final class Arithmetic {
      * </p>
      * </blockquote>
      * <p>
-     * <strong>Note</strong>: the upper case identifier <code>N</code> is different from the lower case identifier
-     * <code>n</code>.
+	 * <strong>Note</strong>: the upper case identifier <code>N</code> is different from the lower case identifier <code>n</code>.
      * </p>
      * <h3>Examples</h3>
      *
@@ -2330,11 +2322,9 @@ public final class Arithmetic {
 
         /**
          *
-         * See: <a href="http://www.cs.berkeley.edu/~fateman/papers/newsimp.pdf"> Experiments in Hash-coded Algebraic
-         * Simplification</a>
+		 * See: <a href="http://www.cs.berkeley.edu/~fateman/papers/newsimp.pdf"> Experiments in Hash-coded Algebraic Simplification</a>
          *
-         * @param ast
-         *            the abstract syntax tree (AST) of the form <code>Plus(...)</code> which should be evaluated
+		 * @param ast the abstract syntax tree (AST) of the form <code>Plus(...)</code> which should be evaluated
          * @return the evaluated object or <code>null</code>, if evaluation isn't possible
          */
         @Override
@@ -2507,8 +2497,7 @@ public final class Arithmetic {
          * Compute Pochhammer's symbol (that)_n.
          *
          * @param that
-         * @param n
-         *            The number of product terms in the evaluation.
+		 * @param n    The number of product terms in the evaluation.
          * @return Gamma(that+n)/Gamma(that) = that*(that+1)*...*(that+n-1).
          */
 		public static BigFraction pochhammer(BigFraction that, final int n) {
@@ -2659,8 +2648,8 @@ public final class Arithmetic {
          * Calculate <code>interval({lower, upper}) ^ exponent</code>.
          * </p>
          * <p>
-         * See: <a href= "https://de.wikipedia.org/wiki/Intervallarithmetik#Elementare_Funktionen"> Intervallarithmetik
-         * - Elementare Funktionen</a>
+		 * See: <a href= "https://de.wikipedia.org/wiki/Intervallarithmetik#Elementare_Funktionen"> Intervallarithmetik - Elementare
+		 * Funktionen</a>
          * </p>
          *
          * @param interval
@@ -2897,10 +2886,8 @@ public final class Arithmetic {
 
         /**
          *
-         * @param arg1
-         *            a number
-         * @param arg2
-         *            must be a <code>DirectedInfinity[...]</code> expression
+		 * @param arg1 a number
+		 * @param arg2 must be a <code>DirectedInfinity[...]</code> expression
          * @return
          */
         private IExpr e2NumberDirectedInfinity(final INumber arg1, final IAST arg2) {
@@ -4379,15 +4366,17 @@ public final class Arithmetic {
                 return o0.power(F.C2);
             }
 
-            IExpr temp = F.NIL;
             if (o0.isDirectedInfinity()) {
-                temp = eInfinity((IAST) o0, o1);
+				IExpr temp = eInfinity((IAST) o0, o1);
+				if (temp.isPresent()) {
+					return temp;
+				}
             } else if (o1.isDirectedInfinity()) {
-                temp = eInfinity((IAST) o1, o0);
-            }
+				IExpr temp = eInfinity((IAST) o1, o0);
             if (temp.isPresent()) {
                 return temp;
             }
+			}
 
             if (o0.isPower()) {
                 // (x^a) * b
@@ -4406,7 +4395,7 @@ public final class Arithmetic {
                 if (o1.isPower()) {
                     IExpr power1Base = o1.base();
                     IExpr power1Exponent = o1.exponent();
-                    temp = timesPowerPower(power0Base, power0Exponent, power1Base, power1Exponent);
+					IExpr temp = timesPowerPower(power0Base, power0Exponent, power1Base, power1Exponent);
                     if (temp.isPresent()) {
                         return temp;
                     }
@@ -4426,7 +4415,7 @@ public final class Arithmetic {
             if (o1.isPower()) {
                 IExpr power1Base = o1.base();
                 IExpr power1Exponent = o1.exponent();
-                temp = timesArgPower(o0, power1Base, power1Exponent);
+				IExpr temp = timesArgPower(o0, power1Base, power1Exponent);
                 if (temp.isPresent()) {
                     return temp;
                 }

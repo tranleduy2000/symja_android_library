@@ -743,9 +743,12 @@ public class Algebra {
 				if (head != null) {
 					IASTMutable simplifyAST = (IASTMutable) F.unaryAST1(head, null);
 					IExpr coefficient;
-					rest.forEach((arg, i) -> {
+					rest.forEach(new ObjIntConsumer<IExpr>() {
+                        @Override
+                        public void accept(IExpr arg, int i) {
                             simplifyAST.set(1, arg);
                             rest.set(i, engine.evaluate(simplifyAST));
+                        }
                     });
 					for (Map.Entry<IExpr, IASTAppendable> entry : map.entrySet()) {
 						simplifyAST.set(1, entry.getValue());
@@ -2942,7 +2945,12 @@ public class Algebra {
 							IASTAppendable plusResult = F.PlusAlloc(timesAST.size() + 1);
 							plusResult.append(C1D2);
 							plusResult.appendArgs(timesAST.size(),
-									i -> Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi))));
+                                    new IntFunction<IExpr>() {
+                                        @Override
+                                        public IExpr apply(int i) {
+                                            return Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi)));
+                                        }
+                                    });
 							IAST expResult = Power(E, Times(C2, I, Pi, x2, Floor(plusResult)));
 							if (!(timesResult instanceof IASTAppendable)) {
 								timesResult = timesResult.copyAppendable();

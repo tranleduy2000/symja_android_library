@@ -2388,10 +2388,13 @@ public final class Programming {
 			java.util.ArrayList<ISymbol> moduleSymbols = new java.util.ArrayList<ISymbol>();
 			try {
 				rememberModuleVariables(intializerList, varAppend, moduleVariables, moduleSymbols, engine);
-				IExpr result = F.subst(arg2, x -> {
-						IExpr temp = moduleVariables.get(x);
-						return temp != null ? temp : F.NIL;
-				});
+				IExpr result = F.subst(arg2, new Function<IExpr, IExpr>() {
+                    @Override
+                    public IExpr apply(IExpr x) {
+                        IExpr temp = moduleVariables.get(x);
+                        return temp != null ? temp : F.NIL;
+                    }
+                });
 				if (result.isCondition()) {
 					return checkCondition(result.first(), result.second(), engine);
 				} else if (result.isModuleOrWith()) {

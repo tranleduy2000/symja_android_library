@@ -1,5 +1,7 @@
 package org.matheclipse.core.integrate.rubi;
 
+import com.duy.lambda.Predicate;
+
 import static org.matheclipse.core.expression.F.Integrate;
 import static org.matheclipse.core.expression.F.ast;
 import static org.matheclipse.core.expression.F.binaryAST2;
@@ -78,7 +80,12 @@ public class UtilityFunctionCtors {
 				return arg1.isFraction() ? F.True : F.False;
 			}
 			if (ast.size() > 2) {
-				return ast.forAll(x -> engine.evaluate(x).isFraction(), 1) ? F.True : F.False;
+				return ast.forAll(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return engine.evaluate(x).isFraction();
+					}
+				}, 1) ? F.True : F.False;
 			}
 			return F.False;
 		}
@@ -92,7 +99,12 @@ public class UtilityFunctionCtors {
 				return arg1.isInteger() ? F.True : F.False;
 			}
 			if (ast.size() > 2) {
-				return ast.forAll(x -> engine.evaluate(x).isInteger(), 1) ? F.True : F.False;
+				return ast.forAll(new Predicate<IExpr>() {
+                    @Override
+                    public boolean test(IExpr x) {
+                        return engine.evaluate(x).isInteger();
+                    }
+                }, 1) ? F.True : F.False;
 			}
 			return F.False;
 		}

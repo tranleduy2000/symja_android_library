@@ -1,5 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.BiFunction;
 import com.duy.lambda.Predicate;
 import com.google.common.cache.CacheBuilder;
 
@@ -127,7 +128,12 @@ public class Integrate extends AbstractFunctionEvaluator {
 			if (holdallAST.size() > 3) {
 				// reduce arguments by folding Integrate[fxy, x, y] to
 				// Integrate[Integrate[fxy, y], x] ...
-				return holdallAST.foldRight((x, y) -> engine.evaluate(F.Integrate(x, y)), arg1, 2);
+				return holdallAST.foldRight(new BiFunction<IExpr, IExpr, IExpr>() {
+                    @Override
+                    public IExpr apply(IExpr x, IExpr y) {
+                        return engine.evaluate(F.Integrate(x, y));
+                    }
+                }, arg1, 2);
 			}
 
 			IExpr arg2 = engine.evaluateNull(holdallAST.arg2());
