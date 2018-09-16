@@ -677,7 +677,11 @@ public class F {
 	/** DiagonalMatrix(list) - gives a matrix with the values in `list` on its diagonal and zeroes elsewhere.*/
 	public final static IBuiltInSymbol DiagonalMatrix = F.initFinalSymbol("DiagonalMatrix", ID.DiagonalMatrix);
 
-    /** DiceDissimilarity(u, v) - returns the Dice dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `(c_tf + c_ft) / (2 * c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.   */
+	/**
+	 * DiceDissimilarity(u, v) - returns the Dice dissimilarity between the two boolean 1-D lists `u` and `v`, which is
+	 * defined as `(c_tf + c_ft) / (2 * c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of
+	 * occurrences of `u(k)=i` and `v(k)=j` for `k<n`.
+	 */
 	public final static IBuiltInSymbol DiceDissimilarity = F.initFinalSymbol("DiceDissimilarity", ID.DiceDissimilarity);
 
 	/***/
@@ -698,14 +702,19 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Direction = F.initFinalSymbol("Direction", ID.Direction);
 
-    /** DiscreteDelta(n1, n2, n3, ...) - `DiscreteDelta` function returns `1` if all the `ni` are `0`. Returns `0` otherwise.*/
+	/**
+	 * DiscreteDelta(n1, n2, n3, ...) - `DiscreteDelta` function returns `1` if all the `ni` are `0`. Returns `0`
+	 * otherwise.
+	 */
 	public final static IBuiltInSymbol DiscreteDelta = F.initFinalSymbol("DiscreteDelta", ID.DiscreteDelta);
 
     /** DiscreteUniformDistribution({min, max}) - returns a discrete uniform distribution.*/
 	public final static IBuiltInSymbol DiscreteUniformDistribution = F.initFinalSymbol("DiscreteUniformDistribution",
 			ID.DiscreteUniformDistribution);
 
-    /** Discriminant(poly, var) - computes the discriminant of the polynomial `poly` with respect to the variable `var`.*/
+	/**
+	 * Discriminant(poly, var) - computes the discriminant of the polynomial `poly` with respect to the variable `var`.
+	 */
 	public final static IBuiltInSymbol Discriminant = F.initFinalSymbol("Discriminant", ID.Discriminant);
 
 	/***/
@@ -750,7 +759,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol EasterSunday = F.initFinalSymbol("EasterSunday", ID.EasterSunday);
 
-    /***/
+	/** EffectiveInterest(i, n) - returns an effective interest rate object. */
     public final static IBuiltInSymbol EffectiveInterest = F.initFinalSymbol("EffectiveInterest", ID.EffectiveInterest);
 	/** Eigenvalues(matrix) - get the numerical eigenvalues of the `matrix`.*/
 	public final static IBuiltInSymbol Eigenvalues = F.initFinalSymbol("Eigenvalues", ID.Eigenvalues);
@@ -764,7 +773,10 @@ public class F {
     /** ElementData("name", "property") - gives the value of the property for the chemical specified by name.*/
 	public final static IBuiltInSymbol ElementData = F.initFinalSymbol("ElementData", ID.ElementData);
 
-    /** Eliminate(list-of-equations, list-of-variables) - attempts to eliminate the variables from the `list-of-variables` in the `list-of-equations`.*/
+	/**
+	 * Eliminate(list-of-equations, list-of-variables) - attempts to eliminate the variables from the
+	 * `list-of-variables` in the `list-of-equations`.
+	 */
 	public final static IBuiltInSymbol Eliminate = F.initFinalSymbol("Eliminate", ID.Eliminate);
 
     /** EllipticE(z) - returns the complete elliptic integral of the second kind. */
@@ -785,10 +797,17 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol EndPackage = F.initFinalSymbol("EndPackage", ID.EndPackage);
 
-    /** Equal(x, y) - yields `True` if `x` and `y` are known to be equal, or `False` if `x` and `y` are known to be unequal.*/
+	/**
+	 * Equal(x, y) - yields `True` if `x` and `y` are known to be equal, or `False` if `x` and `y` are known to be
+	 * unequal.
+	 */
 	public final static IBuiltInSymbol Equal = F.initFinalSymbol("Equal", ID.Equal);
 
-    /** Equivalent(arg1, arg2, ...) -  Equivalence relation. `Equivalent(A, B)` is `True` iff `A` and `B` are both `True` or both `False`. Returns `True` if all of the arguments are logically equivalent. Returns `False` otherwise. `Equivalent(arg1, arg2, ...)` is equivalent to `(arg1 && arg2 && ...) || (!arg1 && !arg2 && ...)`.*/
+	/**
+	 * Equivalent(arg1, arg2, ...) - Equivalence relation. `Equivalent(A, B)` is `True` iff `A` and `B` are both `True`
+	 * or both `False`. Returns `True` if all of the arguments are logically equivalent. Returns `False` otherwise.
+	 * `Equivalent(arg1, arg2, ...)` is equivalent to `(arg1 && arg2 && ...) || (!arg1 && !arg2 && ...)`.
+	 */
 	public final static IBuiltInSymbol Equivalent = F.initFinalSymbol("Equivalent", ID.Equivalent);
 
 	/** Erf(z) - returns the error function of `z`.*/
@@ -846,10 +865,15 @@ public class F {
     /** ExpandAll(expr) - expands out all positive integer powers and products of sums in `expr`. */
 	public final static IBuiltInSymbol ExpandAll = F.initFinalSymbol("ExpandAll", ID.ExpandAll);
 
-    /** Expectation(pure-function, data-set) - returns the expected value of the `pure-function` for the given `data-set`. */
+	/**
+	 * Expectation(pure-function, data-set) - returns the expected value of the `pure-function` for the given
+	 * `data-set`.
+	 */
 	public final static IBuiltInSymbol Expectation = F.initFinalSymbol("Expectation", ID.Expectation);
 
-    /** Exponent(polynomial, x) - gives the maximum power with which `x` appears in the expanded form of `polynomial`.*/
+	/**
+	 * Exponent(polynomial, x) - gives the maximum power with which `x` appears in the expanded form of `polynomial`.
+	 */
 	public final static IBuiltInSymbol Exponent = F.initFinalSymbol("Exponent", ID.Exponent);
 
     /** ExponentialDistribution(lambda) - returns an exponential distribution.*/
@@ -893,13 +917,22 @@ public class F {
 	/** Fibonacci(n) - returns the Fibonacci number of the integer `n` */
 	public final static IBuiltInSymbol Fibonacci = F.initFinalSymbol("Fibonacci", ID.Fibonacci);
 
-    /** FindFit(list-of-data-points, function, parameters, variable) - solve a least squares problem using the Levenberg-Marquardt algorithm.*/
+	/**
+	 * FindFit(list-of-data-points, function, parameters, variable) - solve a least squares problem using the
+	 * Levenberg-Marquardt algorithm.
+	 */
 	public final static IBuiltInSymbol FindFit = F.initFinalSymbol("FindFit", ID.FindFit);
 
-    /** FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables `vars`.*/
+	/**
+	 * FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables
+	 * `vars`.
+	 */
 	public final static IBuiltInSymbol FindInstance = F.initFinalSymbol("FindInstance", ID.FindInstance);
 
-    /** FindRoot(f, {x, xmin, xmax}) - searches for a numerical root of `f` for the variable `x`, in the range `xmin` to `xmax`. */
+	/**
+	 * FindRoot(f, {x, xmin, xmax}) - searches for a numerical root of `f` for the variable `x`, in the range `xmin` to
+	 * `xmax`.
+	 */
 	public final static IBuiltInSymbol FindRoot = F.initFinalSymbol("FindRoot", ID.FindRoot);
 
 	/** First(expr) - returns the first element in `expr`.*/
@@ -908,12 +941,18 @@ public class F {
     /** Fit(list-of-data-points, degree, variable) - solve a least squares problem using the Levenberg-Marquardt algorithm.*/
 	public final static IBuiltInSymbol Fit = F.initFinalSymbol("Fit", ID.Fit);
 
-    /** FiveNum({dataset}) - the Tuckey five-number summary is a set of descriptive statistics that provide information about a `dataset`. It consists of the five most important sample percentiles:*/
+	/**
+	 * FiveNum({dataset}) - the Tuckey five-number summary is a set of descriptive statistics that provide information
+	 * about a `dataset`. It consists of the five most important sample percentiles:
+	 */
     public final static IBuiltInSymbol FiveNum = F.initFinalSymbol("FiveNum", ID.FiveNum);
 	/** FixedPoint(f, expr) - starting with `expr`, iteratively applies `f` until the result no longer changes.*/
 	public final static IBuiltInSymbol FixedPoint = F.initFinalSymbol("FixedPoint", ID.FixedPoint);
 
-    /** FixedPointList(f, expr) - starting with `expr`, iteratively applies `f` until the result no longer changes, and returns a list of all intermediate results. */
+	/**
+	 * FixedPointList(f, expr) - starting with `expr`, iteratively applies `f` until the result no longer changes, and
+	 * returns a list of all intermediate results.
+	 */
 	public final static IBuiltInSymbol FixedPointList = F.initFinalSymbol("FixedPointList", ID.FixedPointList);
 
     /** Flat - is an attribute that specifies that nested occurrences of a function should be automatically flattened.    */
@@ -934,7 +973,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol FoldList = F.initFinalSymbol("FoldList", ID.FoldList);
 
-    /** For(start, test, incr, body) - evaluates `start`, and then iteratively `body` and `incr` as long as test evaluates to `True`.*/
+	/**
+	 * For(start, test, incr, body) - evaluates `start`, and then iteratively `body` and `incr` as long as test
+	 * evaluates to `True`.
+	 */
 	public final static IBuiltInSymbol For = F.initFinalSymbol("For", ID.For);
 
 	/***/
@@ -962,13 +1004,19 @@ public class F {
     /** FrobeniusNumber({a1, ... ,aN}) - returns the Frobenius number of the nonnegative integers `{a1, ... ,aN}`*/
 	public final static IBuiltInSymbol FrobeniusNumber = F.initFinalSymbol("FrobeniusNumber", ID.FrobeniusNumber);
 
-    /** FrobeniusSolve({a1, ... ,aN}, M) - get a list of solutions for the Frobenius equation given by the list of integers `{a1, ... ,aN}` and the non-negative integer `M`.*/
+	/**
+	 * FrobeniusSolve({a1, ... ,aN}, M) - get a list of solutions for the Frobenius equation given by the list of
+	 * integers `{a1, ... ,aN}` and the non-negative integer `M`.
+	 */
 	public final static IBuiltInSymbol FrobeniusSolve = F.initFinalSymbol("FrobeniusSolve", ID.FrobeniusSolve);
 
 	/***/
 	public final static IBuiltInSymbol FromCharacterCode = F.initFinalSymbol("FromCharacterCode", ID.FromCharacterCode);
 
-    /** FromContinuedFraction({n1, n2, ...}) - return the number which represents the continued fraction list `{n1, n2, ...}`.*/
+	/**
+	 * FromContinuedFraction({n1, n2, ...}) - return the number which represents the continued fraction list `{n1, n2,
+	 * ...}`.
+	 */
 	public final static IBuiltInSymbol FromContinuedFraction = F.initFinalSymbol("FromContinuedFraction",
 			ID.FromContinuedFraction);
 
@@ -982,7 +1030,10 @@ public class F {
 	/** FullForm(expression) - shows the internal representation of the given `expression`.*/
 	public final static IBuiltInSymbol FullForm = F.initFinalSymbol("FullForm", ID.FullForm);
 
-    /** FullSimplify(expr) - works like `Simplify` but additionally tries some `FunctionExpand` rule transformations to simplify `expr`.*/
+	/**
+	 * FullSimplify(expr) - works like `Simplify` but additionally tries some `FunctionExpand` rule transformations to
+	 * simplify `expr`.
+	 */
 	public final static IBuiltInSymbol FullSimplify = F.initFinalSymbol("FullSimplify", ID.FullSimplify);
 
 	/***/
@@ -1040,7 +1091,10 @@ public class F {
 	/** GreaterEqual(x, y) - yields `True` if `x` is known to be greater than or equal to `y`.*/
 	public final static IBuiltInSymbol GreaterEqual = F.initFinalSymbol("GreaterEqual", ID.GreaterEqual);
 
-    /** GroebnerBasis({polynomial-list},{variable-list}) - returns a Gröbner basis for the `polynomial-list` and `variable-list`.*/
+	/**
+	 * GroebnerBasis({polynomial-list},{variable-list}) - returns a Gröbner basis for the `polynomial-list` and
+	 * `variable-list`.
+	 */
 	public final static IBuiltInSymbol GroebnerBasis = F.initFinalSymbol("GroebnerBasis", ID.GroebnerBasis);
 
     /** GumbelDistribution(a, b) - returns a Gumbel distribution.*/
@@ -1083,7 +1137,9 @@ public class F {
     /** HoldPattern(expr) - `HoldPattern` doesn't evaluate `expr` for pattern-matching. */
 	public final static IBuiltInSymbol HoldPattern = F.initFinalSymbol("HoldPattern", ID.HoldPattern);
 
-    /** HoldRest - is an attribute specifying that all but the first argument of a function should be left unevaluated.  */
+	/**
+	 * HoldRest - is an attribute specifying that all but the first argument of a function should be left unevaluated.
+	 */
 	public final static IBuiltInSymbol HoldRest = F.initFinalSymbol("HoldRest", ID.HoldRest);
 
 	/***/
@@ -1114,7 +1170,10 @@ public class F {
 	public final static IBuiltInSymbol HypergeometricPFQRegularized = F.initFinalSymbol("HypergeometricPFQRegularized",
 			ID.HypergeometricPFQRegularized);
 
-    /** I - Imaginary unit - internally converted to the complex number `0+1*i`. `I` represents the imaginary number `Sqrt(-1)`. `I^2` will be evaluated to `-1`.*/
+	/**
+	 * I - Imaginary unit - internally converted to the complex number `0+1*i`. `I` represents the imaginary number
+	 * `Sqrt(-1)`. `I^2` will be evaluated to `-1`.
+	 */
 	public final static IBuiltInSymbol I = F.initFinalSymbol("I", ID.I);
 
 	/***/
@@ -1129,7 +1188,11 @@ public class F {
 	/** Im(z) - returns the imaginary component of the complex number `z`.*/
 	public final static IBuiltInSymbol Im = F.initFinalSymbol("Im", ID.Im);
 
-    /** Implies(arg1, arg2) - Logical implication. `Implies(A, B)` is equivalent to `!A || B`. `Implies(expr1, expr2)` evaluates each argument in turn, returning `True` as soon as the first argument evaluates to `False`. If the first argument evaluates to `True`, `Implies` returns the second argument.*/
+	/**
+	 * Implies(arg1, arg2) - Logical implication. `Implies(A, B)` is equivalent to `!A || B`. `Implies(expr1, expr2)`
+	 * evaluates each argument in turn, returning `True` as soon as the first argument evaluates to `False`. If the
+	 * first argument evaluates to `True`, `Implies` returns the second argument.
+	 */
 	public final static IBuiltInSymbol Implies = F.initFinalSymbol("Implies", ID.Implies);
 
 	/***/
@@ -1153,7 +1216,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Information = F.initFinalSymbol("Information", ID.Information);
 
-    /** Inner(f, x, y, g) - computes a generalised inner product of `x` and `y`, using a multiplication function `f` and an addition function `g`.*/
+	/**
+	 * Inner(f, x, y, g) - computes a generalised inner product of `x` and `y`, using a multiplication function `f` and
+	 * an addition function `g`.
+	 */
 	public final static IBuiltInSymbol Inner = F.initFinalSymbol("Inner", ID.Inner);
 
 	/***/
@@ -1186,10 +1252,16 @@ public class F {
 	/** Integers - is the set of integer numbers.*/
 	public final static IBuiltInSymbol Integers = F.initFinalSymbol("Integers", ID.Integers);
 
-    /** Integrate(f, x) - integrates `f` with respect to `x`. The result does not contain the additive integration constant.*/
+	/**
+	 * Integrate(f, x) - integrates `f` with respect to `x`. The result does not contain the additive integration
+	 * constant.
+	 */
 	public final static IBuiltInSymbol Integrate = F.initFinalSymbol("Integrate", ID.Integrate);
 
-    /** InterpolatingFunction(data-list) - get the representation for the given `data-list` as piecewise `InterpolatingPolynomial`s.*/
+	/**
+	 * InterpolatingFunction(data-list) - get the representation for the given `data-list` as piecewise
+	 * `InterpolatingPolynomial`s.
+	 */
 	public final static IBuiltInSymbol InterpolatingFunction = F.initFinalSymbol("InterpolatingFunction",
 			ID.InterpolatingFunction);
 
@@ -1236,7 +1308,11 @@ public class F {
     /** InverseSeries( series ) - return the inverse series. */
 	public final static IBuiltInSymbol InverseSeries = F.initFinalSymbol("InverseSeries", ID.InverseSeries);
 
-    /** JaccardDissimilarity(u, v) - returns the Jaccard-Needham dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `(c_tf + c_ft) / (c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.*/
+	/**
+	 * JaccardDissimilarity(u, v) - returns the Jaccard-Needham dissimilarity between the two boolean 1-D lists `u` and
+	 * `v`, which is defined as `(c_tf + c_ft) / (c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of
+	 * occurrences of `u(k)=i` and `v(k)=j` for `k<n`.
+	 */
 	public final static IBuiltInSymbol JaccardDissimilarity = F.initFinalSymbol("JaccardDissimilarity",
 			ID.JaccardDissimilarity);
 
@@ -1268,8 +1344,13 @@ public class F {
     /***/
     public final static IBuiltInSymbol KnownUnitQ = F.initFinalSymbol("KnownUnitQ", ID.KnownUnitQ);
     /***/
-    public final static IBuiltInSymbol KolmogorovSmirnovTest = F.initFinalSymbol("KolmogorovSmirnovTest", ID.KolmogorovSmirnovTest);
-    /** KroneckerDelta(arg1, arg2, ... argN) - if all arguments `arg1` to `argN` are equal return `1`, otherwise return `0`. */
+	public final static IBuiltInSymbol KolmogorovSmirnovTest = F.initFinalSymbol("KolmogorovSmirnovTest",
+			ID.KolmogorovSmirnovTest);
+
+	/**
+	 * KroneckerDelta(arg1, arg2, ... argN) - if all arguments `arg1` to `argN` are equal return `1`, otherwise return
+	 * `0`.
+	 */
 	public final static IBuiltInSymbol KroneckerDelta = F.initFinalSymbol("KroneckerDelta", ID.KroneckerDelta);
 
     /** Kurtosis(list) - gives the Pearson measure of kurtosis for `list` (a measure of existing outliers). */
@@ -1314,7 +1395,9 @@ public class F {
 	/** LetterQ(expr) - tests whether `expr` is a string, which only contains letters.*/
 	public final static IBuiltInSymbol LetterQ = F.initFinalSymbol("LetterQ", ID.LetterQ);
 
-    /** Level(expr, levelspec) - gives a list of all sub-expressions of `expr` at the level(s) specified by `levelspec`.*/
+	/**
+	 * Level(expr, levelspec) - gives a list of all sub-expressions of `expr` at the level(s) specified by `levelspec`.
+	 */
 	public final static IBuiltInSymbol Level = F.initFinalSymbol("Level", ID.Level);
 
 	/** LevelQ(expr) - tests whether `expr` is a valid level specification.*/
@@ -1332,10 +1415,15 @@ public class F {
     /** LinearProgramming(coefficientsOfLinearObjectiveFunction, constraintList, constraintRelationList) - the `LinearProgramming` function provides an implementation of [George Dantzig's simplex algorithm](http://en.wikipedia.org/wiki/Simplex_algorithm) for solving linear optimization problems with linear equality and inequality constraints  and implicit non-negative variables.*/
 	public final static IBuiltInSymbol LinearProgramming = F.initFinalSymbol("LinearProgramming", ID.LinearProgramming);
 
-    /** LinearRecurrence(list1, list2, n) - solve the linear recurrence and return the generated sequence of elements.*/
+	/**
+	 * LinearRecurrence(list1, list2, n) - solve the linear recurrence and return the generated sequence of elements.
+	 */
 	public final static IBuiltInSymbol LinearRecurrence = F.initFinalSymbol("LinearRecurrence", ID.LinearRecurrence);
 
-    /** LinearSolve(matrix, right) - solves the linear equation system 'matrix . x = right' and returns one corresponding solution `x`.*/
+	/**
+	 * LinearSolve(matrix, right) - solves the linear equation system 'matrix . x = right' and returns one corresponding
+	 * solution `x`.
+	 */
 	public final static IBuiltInSymbol LinearSolve = F.initFinalSymbol("LinearSolve", ID.LinearSolve);
 
 	/***/
@@ -1353,7 +1441,9 @@ public class F {
 	/** ListQ(expr) - tests whether `expr` is a `List`.*/
 	public final static IBuiltInSymbol ListQ = F.initFinalSymbol("ListQ", ID.ListQ);
 
-    /** Listable - is an attribute specifying that a function should be automatically applied to each element of a list.*/
+	/**
+	 * Listable - is an attribute specifying that a function should be automatically applied to each element of a list.
+	 */
 	public final static IBuiltInSymbol Listable = F.initFinalSymbol("Listable", ID.Listable);
 
 	/***/
@@ -1362,10 +1452,15 @@ public class F {
 	/** Log(z) - returns the natural logarithm of `z`.*/
 	public final static IBuiltInSymbol Log = F.initFinalSymbol("Log", ID.Log);
 
-    /** Log10(z) - returns the base-`10` logarithm of `z`. `Log10(z)` will be converted to `Log(z)/Log(10)` in symbolic mode.*/
+	/**
+	 * Log10(z) - returns the base-`10` logarithm of `z`. `Log10(z)` will be converted to `Log(z)/Log(10)` in symbolic
+	 * mode.
+	 */
 	public final static IBuiltInSymbol Log10 = F.initFinalSymbol("Log10", ID.Log10);
 
-    /** Log2(z) - returns the base-`2` logarithm of `z`. `Log2(z)` will be converted to `Log(z)/Log(2)` in symbolic mode.*/
+	/**
+	 * Log2(z) - returns the base-`2` logarithm of `z`. `Log2(z)` will be converted to `Log(z)/Log(2)` in symbolic mode.
+	 */
 	public final static IBuiltInSymbol Log2 = F.initFinalSymbol("Log2", ID.Log2);
 
 	/***/
@@ -1400,7 +1495,10 @@ public class F {
     /** MangoldtLambda(n) -  the von Mangoldt function of `n`*/
 	public final static IBuiltInSymbol MangoldtLambda = F.initFinalSymbol("MangoldtLambda", ID.MangoldtLambda);
 
-    /** ManhattanDistance(u, v) - returns the Manhattan distance between `u` and `v`, which is the number of horizontal or vertical moves in the grid like Manhattan city layout to get from `u` to `v`.*/
+	/**
+	 * ManhattanDistance(u, v) - returns the Manhattan distance between `u` and `v`, which is the number of horizontal
+	 * or vertical moves in the grid like Manhattan city layout to get from `u` to `v`.
+	 */
 	public final static IBuiltInSymbol ManhattanDistance = F.initFinalSymbol("ManhattanDistance", ID.ManhattanDistance);
 
 	/***/
@@ -1415,7 +1513,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol MapAt = F.initFinalSymbol("MapAt", ID.MapAt);
 
-    /** MapIndexed(f, expr) - applies `f` to each part on the first level of `expr` and appending the elements position as a list in the second argument.*/
+	/**
+	 * MapIndexed(f, expr) - applies `f` to each part on the first level of `expr` and appending the elements position
+	 * as a list in the second argument.
+	 */
 	public final static IBuiltInSymbol MapIndexed = F.initFinalSymbol("MapIndexed", ID.MapIndexed);
 
     /** MapThread(f, {{a1, a2, ...}, {b1, b2, ...}, ...}) - returns `{f(a1, b1, ...), f(a2, b2, ...), ...}`.   */
@@ -1424,7 +1525,11 @@ public class F {
 	/** MatchQ(expr, form) - tests whether `expr` matches `form`.*/
 	public final static IBuiltInSymbol MatchQ = F.initFinalSymbol("MatchQ", ID.MatchQ);
 
-    /** MatchingDissimilarity(u, v) - returns the Matching dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `(c_tf + c_ft) / n`, where `n` is `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.*/
+	/**
+	 * MatchingDissimilarity(u, v) - returns the Matching dissimilarity between the two boolean 1-D lists `u` and `v`,
+	 * which is defined as `(c_tf + c_ft) / n`, where `n` is `len(u)` and `c_ij` is the number of occurrences of
+	 * `u(k)=i` and `v(k)=j` for `k<n`.
+	 */
 	public final static IBuiltInSymbol MatchingDissimilarity = F.initFinalSymbol("MatchingDissimilarity",
 			ID.MatchingDissimilarity);
 
@@ -1434,7 +1539,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol MatrixForm = F.initFinalSymbol("MatrixForm", ID.MatrixForm);
 
-    /** MatrixMinimalPolynomial(matrix, var) - computes the matrix minimal polynomial of a `matrix` for the variable `var`.*/
+	/**
+	 * MatrixMinimalPolynomial(matrix, var) - computes the matrix minimal polynomial of a `matrix` for the variable
+	 * `var`.
+	 */
 	public final static IBuiltInSymbol MatrixMinimalPolynomial = F.initFinalSymbol("MatrixMinimalPolynomial",
 			ID.MatrixMinimalPolynomial);
 
@@ -1505,7 +1613,10 @@ public class F {
 	/** Mod(x, m) - returns `x` modulo `m`.*/
 	public final static IBuiltInSymbol Mod = F.initFinalSymbol("Mod", ID.Mod);
 
-    /** Module({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by renaming local variables.*/
+	/**
+	 * Module({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by renaming local
+	 * variables.
+	 */
 	public final static IBuiltInSymbol Module = F.initFinalSymbol("Module", ID.Module);
 
 	/***/
@@ -1514,7 +1625,10 @@ public class F {
 	/** MoebiusMu(expr) - calculate the Möbius function.*/
 	public final static IBuiltInSymbol MoebiusMu = F.initFinalSymbol("MoebiusMu", ID.MoebiusMu);
 
-    /** MonomialList(polynomial, list-of-variables) - get the list of monomials of a `polynomial` expression, with respect to the `list-of-variables`. */
+	/**
+	 * MonomialList(polynomial, list-of-variables) - get the list of monomials of a `polynomial` expression, with
+	 * respect to the `list-of-variables`.
+	 */
 	public final static IBuiltInSymbol MonomialList = F.initFinalSymbol("MonomialList", ID.MonomialList);
 
 	/** Most(expr) - returns `expr` with the last element removed.*/
@@ -1545,13 +1659,24 @@ public class F {
 	/** NHoldRest - is an attribute that protects all but the first argument of a function from numeric evaluation.*/
 	public final static IBuiltInSymbol NHoldRest = F.initFinalSymbol("NHoldRest", ID.NHoldRest);
 
-    /** NIntegrate(f, {x,a,b}) - computes the numerical univariate real integral of `f` with respect to `x` from `a` to `b`.*/
+	/**
+	 * NIntegrate(f, {x,a,b}) - computes the numerical univariate real integral of `f` with respect to `x` from `a` to
+	 * `b`.
+	 */
 	public final static IBuiltInSymbol NIntegrate = F.initFinalSymbol("NIntegrate", ID.NIntegrate);
 
-    /** NMaximize({maximize_function, constraints}, variables_list) - the `NMaximize` function provides an implementation of [George Dantzig's simplex algorithm](http://en.wikipedia.org/wiki/Simplex_algorithm) for solving linear optimization problems with linear equality and inequality constraints and implicit non-negative variables.*/
+	/**
+	 * NMaximize({maximize_function, constraints}, variables_list) - the `NMaximize` function provides an implementation
+	 * of [George Dantzig's simplex algorithm](http://en.wikipedia.org/wiki/Simplex_algorithm) for solving linear
+	 * optimization problems with linear equality and inequality constraints and implicit non-negative variables.
+	 */
 	public final static IBuiltInSymbol NMaximize = F.initFinalSymbol("NMaximize", ID.NMaximize);
 
-    /** NMinimize({maximize_function, constraints}, variables_list) - the `NMinimize` function provides an implementation of [George Dantzig's simplex algorithm](http://en.wikipedia.org/wiki/Simplex_algorithm) for solving linear optimization problems with linear equality and inequality constraints and implicit non-negative variables.*/
+	/**
+	 * NMinimize({maximize_function, constraints}, variables_list) - the `NMinimize` function provides an implementation
+	 * of [George Dantzig's simplex algorithm](http://en.wikipedia.org/wiki/Simplex_algorithm) for solving linear
+	 * optimization problems with linear equality and inequality constraints and implicit non-negative variables.
+	 */
 	public final static IBuiltInSymbol NMinimize = F.initFinalSymbol("NMinimize", ID.NMinimize);
 
 	/** NRoots(poly) - gives the numerical roots of polynomial `poly`.*/
@@ -1567,7 +1692,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Names = F.initFinalSymbol("Names", ID.Names);
 
-    /** Nand(arg1, arg2, ...)' - Logical NAND function. It evaluates its arguments in order, giving `True` immediately if any of them are `False`, and `False` if they are all `True`.*/
+	/**
+	 * Nand(arg1, arg2, ...)' - Logical NAND function. It evaluates its arguments in order, giving `True` immediately if
+	 * any of them are `False`, and `False` if they are all `True`.
+	 */
 	public final static IBuiltInSymbol Nand = F.initFinalSymbol("Nand", ID.Nand);
 
 	/***/
@@ -1579,10 +1707,16 @@ public class F {
 	/** Nest(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns the final result.*/
 	public final static IBuiltInSymbol Nest = F.initFinalSymbol("Nest", ID.Nest);
 
-    /** NestList(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns a list of all intermediate results.*/
+	/**
+	 * NestList(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns a list of all
+	 * intermediate results.
+	 */
 	public final static IBuiltInSymbol NestList = F.initFinalSymbol("NestList", ID.NestList);
 
-    /** NestWhile(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until applying `test` on the result no longer yields `True`.*/
+	/**
+	 * NestWhile(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until applying `test` on
+	 * the result no longer yields `True`.
+	 */
 	public final static IBuiltInSymbol NestWhile = F.initFinalSymbol("NestWhile", ID.NestWhile);
 
 	/***/
@@ -1604,13 +1738,19 @@ public class F {
     /** None - is a possible value for `Span` and `Quiet`. */
 	public final static IBuiltInSymbol None = F.initFinalSymbol("None", ID.None);
 
-    /** NoneTrue({expr1, expr2, ...}, test) - returns `True` if no application of `test` to `expr1, expr2, ...` evaluates to `True`.*/
+	/**
+	 * NoneTrue({expr1, expr2, ...}, test) - returns `True` if no application of `test` to `expr1, expr2, ...` evaluates
+	 * to `True`.
+	 */
 	public final static IBuiltInSymbol NoneTrue = F.initFinalSymbol("NoneTrue", ID.NoneTrue);
 
 	/***/
 	public final static IBuiltInSymbol Nonexistent = F.initFinalSymbol("Nonexistent", ID.Nonexistent);
 
-    /** Nor(arg1, arg2, ...)' - Logical NOR function. It evaluates its arguments in order, giving `False` immediately if any of them are `True`, and `True` if they are all `False`.*/
+	/**
+	 * Nor(arg1, arg2, ...)' - Logical NOR function. It evaluates its arguments in order, giving `False` immediately if
+	 * any of them are `True`, and `True` if they are all `False`.
+	 */
 	public final static IBuiltInSymbol Nor = F.initFinalSymbol("Nor", ID.Nor);
 
     /** Norm(m, l) - computes the `l`-norm of matrix `m` (currently only works for vectors!).   */
@@ -1668,21 +1808,33 @@ public class F {
 	/** OddQ(x) - returns `True` if `x` is odd, and `False` otherwise.*/
 	public final static IBuiltInSymbol OddQ = F.initFinalSymbol("OddQ", ID.OddQ);
 
-    /** OneIdentity - is an attribute specifying that `f(x)` should be treated as equivalent to `x` in pattern matching.    */
+	/**
+	 * OneIdentity - is an attribute specifying that `f(x)` should be treated as equivalent to `x` in pattern matching.
+	 */
 	public final static IBuiltInSymbol OneIdentity = F.initFinalSymbol("OneIdentity", ID.OneIdentity);
 
 	/** Operate(p, expr) - applies `p` to the head of `expr`.*/
 	public final static IBuiltInSymbol Operate = F.initFinalSymbol("Operate", ID.Operate);
 
-    /** OptimizeExpression(function) - common subexpressions elimination for a complicated `function` by generating "dummy" variables for these subexpressions.*/
-    public final static IBuiltInSymbol OptimizeExpression = F.initFinalSymbol("OptimizeExpression", ID.OptimizeExpression);
-    /** Optional(patt, default) - is a pattern which matches `patt`, which if omitted should be replaced by `default`.*/
+	/**
+	 * OptimizeExpression(function) - common subexpressions elimination for a complicated `function` by generating
+	 * "dummy" variables for these subexpressions.
+	 */
+	public final static IBuiltInSymbol OptimizeExpression = F.initFinalSymbol("OptimizeExpression",
+			ID.OptimizeExpression);
+
+	/**
+	 * Optional(patt, default) - is a pattern which matches `patt`, which if omitted should be replaced by `default`.
+	 */
 	public final static IBuiltInSymbol Optional = F.initFinalSymbol("Optional", ID.Optional);
 
 	/***/
 	public final static IBuiltInSymbol Options = F.initFinalSymbol("Options", ID.Options);
 
-    /** Or(expr1, expr2, ...)' - `expr1 || expr2 || ...` evaluates each expression in turn, returning `True` as soon as an expression evaluates to `True`. If all expressions evaluate to `False`, `Or` returns `False`.*/
+	/**
+	 * Or(expr1, expr2, ...)' - `expr1 || expr2 || ...` evaluates each expression in turn, returning `True` as soon as
+	 * an expression evaluates to `True`. If all expressions evaluate to `False`, `Or` returns `False`.
+	 */
 	public final static IBuiltInSymbol Or = F.initFinalSymbol("Or", ID.Or);
 
 	/** Order(a, b) - is `0` if `a` equals `b`. Is `-1` or `1` according to canonical order of `a` and `b`.*/
@@ -1694,7 +1846,9 @@ public class F {
 	/** Ordering(list) - calculate the permutation list of the elements in the sorted `list`.*/
 	public final static IBuiltInSymbol Ordering = F.initFinalSymbol("Ordering", ID.Ordering);
 
-    /** Orderless - is an attribute indicating that the leaves in an expression `f(a, b, c)` can be placed in any order.    */
+	/**
+	 * Orderless - is an attribute indicating that the leaves in an expression `f(a, b, c)` can be placed in any order.
+	 */
 	public final static IBuiltInSymbol Orderless = F.initFinalSymbol("Orderless", ID.Orderless);
 
 	/***/
@@ -1742,13 +1896,22 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Pattern = F.initFinalSymbol("Pattern", ID.Pattern);
 
-    /** PatternTest(pattern, test) - constrains `pattern` to match `expr` only if the evaluation of `test(expr)` yields `True`.*/
+	/**
+	 * PatternTest(pattern, test) - constrains `pattern` to match `expr` only if the evaluation of `test(expr)` yields
+	 * `True`.
+	 */
 	public final static IBuiltInSymbol PatternTest = F.initFinalSymbol("PatternTest", ID.PatternTest);
 
-    /** PerfectNumber(n) - returns the `n`th perfect number. In number theory, a perfect number is a positive integer that is equal to the sum of its proper */
+	/**
+	 * PerfectNumber(n) - returns the `n`th perfect number. In number theory, a perfect number is a positive integer
+	 * that is equal to the sum of its proper
+	 */
 	public final static IBuiltInSymbol PerfectNumber = F.initFinalSymbol("PerfectNumber", ID.PerfectNumber);
 
-    /** PerfectNumberQ(n) - returns `True` if `n` is a perfect number. In number theory, a perfect number is a positive integer that is equal to the sum of its proper */
+	/**
+	 * PerfectNumberQ(n) - returns `True` if `n` is a perfect number. In number theory, a perfect number is a positive
+	 * integer that is equal to the sum of its proper
+	 */
 	public final static IBuiltInSymbol PerfectNumberQ = F.initFinalSymbol("PerfectNumberQ", ID.PerfectNumberQ);
 
 	/** Permutations(list) - gives all possible orderings of the items in `list`.*/
@@ -1791,7 +1954,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Polygon = F.initFinalSymbol("Polygon", ID.Polygon);
 
-    /** PolynomialExtendedGCD(p, q, x) - returns the extended GCD ('greatest common divisor') of the univariate polynomials `p` and `q`.*/
+	/**
+	 * PolynomialExtendedGCD(p, q, x) - returns the extended GCD ('greatest common divisor') of the univariate
+	 * polynomials `p` and `q`.
+	 */
 	public final static IBuiltInSymbol PolynomialExtendedGCD = F.initFinalSymbol("PolynomialExtendedGCD",
 			ID.PolynomialExtendedGCD);
 
@@ -1801,18 +1967,26 @@ public class F {
 	/** PolynomialLCM(p, q) - returns the LCM ('least common multiple') of the polynomials `p` and `q`.*/
 	public final static IBuiltInSymbol PolynomialLCM = F.initFinalSymbol("PolynomialLCM", ID.PolynomialLCM);
 
-    /** PolynomialQ(p, x) - return `True` if `p` is a polynomial for the variable `x`. Return `False` in all other cases.*/
+	/**
+	 * PolynomialQ(p, x) - return `True` if `p` is a polynomial for the variable `x`. Return `False` in all other cases.
+	 */
 	public final static IBuiltInSymbol PolynomialQ = F.initFinalSymbol("PolynomialQ", ID.PolynomialQ);
 
     /** PolynomialQuotient(p, q, x) - returns the polynomial quotient of the polynomials `p` and `q` for the variable `x`.*/
 	public final static IBuiltInSymbol PolynomialQuotient = F.initFinalSymbol("PolynomialQuotient",
 			ID.PolynomialQuotient);
 
-    /** PolynomialQuotientRemainder(p, q, x) - returns a list with the polynomial quotient and remainder of the polynomials `p` and `q` for the variable `x`.*/
+	/**
+	 * PolynomialQuotientRemainder(p, q, x) - returns a list with the polynomial quotient and remainder of the
+	 * polynomials `p` and `q` for the variable `x`.
+	 */
 	public final static IBuiltInSymbol PolynomialQuotientRemainder = F.initFinalSymbol("PolynomialQuotientRemainder",
 			ID.PolynomialQuotientRemainder);
 
-    /** PolynomialQuotient(p, q, x) - returns the polynomial remainder of the polynomials `p` and `q` for the variable `x`.*/
+	/**
+	 * PolynomialQuotient(p, q, x) - returns the polynomial remainder of the polynomials `p` and `q` for the variable
+	 * `x`.
+	 */
 	public final static IBuiltInSymbol PolynomialRemainder = F.initFinalSymbol("PolynomialRemainder",
 			ID.PolynomialRemainder);
 
@@ -1882,10 +2056,14 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Print = F.initFinalSymbol("Print", ID.Print);
 
-    /** Probability(pure-function, data-set) - returns the probability of the `pure-function` for the given `data-set`. */
+	/**
+	 * Probability(pure-function, data-set) - returns the probability of the `pure-function` for the given `data-set`.
+	 */
 	public final static IBuiltInSymbol Probability = F.initFinalSymbol("Probability", ID.Probability);
 
-    /** Product(expr, {i, imin, imax}) - evaluates the discrete product of `expr` with `i` ranging from `imin` to `imax`.*/
+	/**
+	 * Product(expr, {i, imin, imax}) - evaluates the discrete product of `expr` with `i` ranging from `imin` to `imax`.
+	 */
 	public final static IBuiltInSymbol Product = F.initFinalSymbol("Product", ID.Product);
 
 	/** ProductLog(z) - returns the value of the Lambert W function at `z`.*/
@@ -1894,7 +2072,10 @@ public class F {
 	/** Projection(vector1, vector2) - Find the orthogonal projection of `vector1` onto another `vector2`.*/
 	public final static IBuiltInSymbol Projection = F.initFinalSymbol("Projection", ID.Projection);
 
-    /** PseudoInverse(matrix) - computes the Moore-Penrose pseudoinverse of the `matrix`. If `matrix` is invertible, the pseudoinverse equals the inverse.*/
+	/**
+	 * PseudoInverse(matrix) - computes the Moore-Penrose pseudoinverse of the `matrix`. If `matrix` is invertible, the
+	 * pseudoinverse equals the inverse.
+	 */
 	public final static IBuiltInSymbol PseudoInverse = F.initFinalSymbol("PseudoInverse", ID.PseudoInverse);
 
 	/***/
@@ -1950,7 +2131,9 @@ public class F {
 	/** Rational - is the head of rational numbers.*/
 	public final static IBuiltInSymbol Rational = F.initFinalSymbol("Rational", ID.Rational);
 
-    /** Rationalize(expression) - convert numerical real or imaginary parts in (sub-)expressions into rational numbers.*/
+	/**
+	 * Rationalize(expression) - convert numerical real or imaginary parts in (sub-)expressions into rational numbers.
+	 */
 	public final static IBuiltInSymbol Rationalize = F.initFinalSymbol("Rationalize", ID.Rationalize);
 
 	/***/
@@ -1968,7 +2151,10 @@ public class F {
 	/** Reals - is the set of real numbers.*/
 	public final static IBuiltInSymbol Reals = F.initFinalSymbol("Reals", ID.Reals);
 
-    /** Reap(expr) - gives the result of evaluating `expr`, together with all values sown during this evaluation. Values sown with different tags are given in different lists.*/
+	/**
+	 * Reap(expr) - gives the result of evaluating `expr`, together with all values sown during this evaluation. Values
+	 * sown with different tags are given in different lists.
+	 */
 	public final static IBuiltInSymbol Reap = F.initFinalSymbol("Reap", ID.Reap);
 
 	/***/
@@ -2007,7 +2193,10 @@ public class F {
 	/** Rest(expr) - returns `expr` with the first element removed.*/
 	public final static IBuiltInSymbol Rest = F.initFinalSymbol("Rest", ID.Rest);
 
-    /** Resultant(polynomial1, polynomial2, var) - computes the resultant of the polynomials `polynomial1` and `polynomial2` with respect to the variable `var`.*/
+	/**
+	 * Resultant(polynomial1, polynomial2, var) - computes the resultant of the polynomials `polynomial1` and
+	 * `polynomial2` with respect to the variable `var`.
+	 */
 	public final static IBuiltInSymbol Resultant = F.initFinalSymbol("Resultant", ID.Resultant);
 
 	/** Return(expr) - aborts a function call and returns `expr`.*/
@@ -2019,7 +2208,11 @@ public class F {
 	/** Riffle(list1, list2) - insert elements of `list2` between the elements of `list1`.*/
 	public final static IBuiltInSymbol Riffle = F.initFinalSymbol("Riffle", ID.Riffle);
 
-    /** RogersTanimotoDissimilarity(u, v) - returns the Rogers-Tanimoto dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `R / (c_tt + c_ff + R)` where n is `len(u)`, `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`, and `R = 2 * (c_tf + c_ft)`.*/
+	/**
+	 * RogersTanimotoDissimilarity(u, v) - returns the Rogers-Tanimoto dissimilarity between the two boolean 1-D lists
+	 * `u` and `v`, which is defined as `R / (c_tt + c_ff + R)` where n is `len(u)`, `c_ij` is the number of occurrences
+	 * of `u(k)=i` and `v(k)=j` for `k<n`, and `R = 2 * (c_tf + c_ft)`.
+	 */
 	public final static IBuiltInSymbol RogersTanimotoDissimilarity = F.initFinalSymbol("RogersTanimotoDissimilarity",
 			ID.RogersTanimotoDissimilarity);
 
@@ -2032,7 +2225,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol RootOf = F.initFinalSymbol("RootOf", ID.RootOf);
 
-    /** Roots(polynomial-equation, var) - determine the roots of a univariate polynomial equation with respect to the variable `var`.*/
+	/**
+	 * Roots(polynomial-equation, var) - determine the roots of a univariate polynomial equation with respect to the
+	 * variable `var`.
+	 */
 	public final static IBuiltInSymbol Roots = F.initFinalSymbol("Roots", ID.Roots);
 
 	/** RotateLeft(list) - rotates the items of `list` by one item to the left.*/
@@ -2053,14 +2249,22 @@ public class F {
     /** RuleDelayed(x, y) - represents a rule replacing `x` with `y`, with `y` held unevaluated. */
 	public final static IBuiltInSymbol RuleDelayed = F.initFinalSymbol("RuleDelayed", ID.RuleDelayed);
 
-    /** RussellRaoDissimilarity(u, v) - returns the Russell-Rao dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `(n - c_tt) / c_tt` where `n` is `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.*/
+	/**
+	 * RussellRaoDissimilarity(u, v) - returns the Russell-Rao dissimilarity between the two boolean 1-D lists `u` and
+	 * `v`, which is defined as `(n - c_tt) / c_tt` where `n` is `len(u)` and `c_ij` is the number of occurrences of
+	 * `u(k)=i` and `v(k)=j` for `k<n`.
+	 */
 	public final static IBuiltInSymbol RussellRaoDissimilarity = F.initFinalSymbol("RussellRaoDissimilarity",
 			ID.RussellRaoDissimilarity);
 
 	/** SameQ(x, y) - returns `True` if `x` and `y` are structurally identical.*/
 	public final static IBuiltInSymbol SameQ = F.initFinalSymbol("SameQ", ID.SameQ);
 
-    /** SatisfiabilityCount(boolean-expr) - test whether the `boolean-expr` is satisfiable by a combination of boolean `False` and `True` values for the  variables of the boolean expression and return the number of possible combinations.*/
+	/**
+	 * SatisfiabilityCount(boolean-expr) - test whether the `boolean-expr` is satisfiable by a combination of boolean
+	 * `False` and `True` values for the variables of the boolean expression and return the number of possible
+	 * combinations.
+	 */
 	public final static IBuiltInSymbol SatisfiabilityCount = F.initFinalSymbol("SatisfiabilityCount",
 			ID.SatisfiabilityCount);
 
@@ -2068,7 +2272,10 @@ public class F {
 	public final static IBuiltInSymbol SatisfiabilityInstances = F.initFinalSymbol("SatisfiabilityInstances",
 			ID.SatisfiabilityInstances);
 
-    /** SatisfiableQ(boolean-expr, list-of-variables) - test whether the `boolean-expr` is satisfiable by a combination of boolean `False` and `True` values for the `list-of-variables`.*/
+	/**
+	 * SatisfiableQ(boolean-expr, list-of-variables) - test whether the `boolean-expr` is satisfiable by a combination
+	 * of boolean `False` and `True` values for the `list-of-variables`.
+	 */
 	public final static IBuiltInSymbol SatisfiableQ = F.initFinalSymbol("SatisfiableQ", ID.SatisfiableQ);
 
 	/** Scan(f, expr) - applies `f` to each element of `expr` and returns 'Null'.*/
@@ -2095,7 +2302,10 @@ public class F {
     /** SeriesCoefficient(expr, {x, x0, n}) - get the coefficient of `(x- x0)^n` at the point `x = x0`*/
 	public final static IBuiltInSymbol SeriesCoefficient = F.initFinalSymbol("SeriesCoefficient", ID.SeriesCoefficient);
 
-    /** SeriesData(x, x0, {coeff0, coeff1, coeff2,...}, nMin, nMax, denominator}) - internal structure of a power series at the point `x = x0` the `coeff`-i are coefficients of the power series. */
+	/**
+	 * SeriesData(x, x0, {coeff0, coeff1, coeff2,...}, nMin, nMax, denominator}) - internal structure of a power series
+	 * at the point `x = x0` the `coeff`-i are coefficients of the power series.
+	 */
 	public final static IBuiltInSymbol SeriesData = F.initFinalSymbol("SeriesData", ID.SeriesData);
 
 	/** Set(expr, value) - evaluates `value` and assigns it to `expr`.*/
@@ -2141,7 +2351,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol SinhIntegral = F.initFinalSymbol("SinhIntegral", ID.SinhIntegral);
 
-    /** Skewness(list) - gives Pearson's moment coefficient of skewness for `list` (a measure for estimating the symmetry of a distribution). */
+	/**
+	 * Skewness(list) - gives Pearson's moment coefficient of skewness for `list` (a measure for estimating the symmetry
+	 * of a distribution).
+	 */
 	public final static IBuiltInSymbol Skewness = F.initFinalSymbol("Skewness", ID.Skewness);
 
 	/** # - is a short-hand for `#1`.*/
@@ -2150,7 +2363,11 @@ public class F {
 	/** ## - is the sequence of arguments supplied to a pure function.*/
 	public final static IBuiltInSymbol SlotSequence = F.initFinalSymbol("SlotSequence", ID.SlotSequence);
 
-    /** SokalSneathDissimilarity(u, v) - returns the Sokal-Sneath dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `R / (c_tt + R)` where n is `len(u)`, `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`, and `R = 2 * (c_tf + c_ft)`.  */
+	/**
+	 * SokalSneathDissimilarity(u, v) - returns the Sokal-Sneath dissimilarity between the two boolean 1-D lists `u` and
+	 * `v`, which is defined as `R / (c_tt + R)` where n is `len(u)`, `c_ij` is the number of occurrences of `u(k)=i`
+	 * and `v(k)=j` for `k<n`, and `R = 2 * (c_tf + c_ft)`.
+	 */
 	public final static IBuiltInSymbol SokalSneathDissimilarity = F.initFinalSymbol("SokalSneathDissimilarity",
 			ID.SokalSneathDissimilarity);
 
@@ -2185,7 +2402,10 @@ public class F {
 	public final static IBuiltInSymbol SquaredEuclideanDistance = F.initFinalSymbol("SquaredEuclideanDistance",
 			ID.SquaredEuclideanDistance);
 
-    /** StandardDeviation(list) - computes the standard deviation of `list`. `list` may consist of numerical values or symbols. Numerical values may be real or complex.*/
+	/**
+	 * StandardDeviation(list) - computes the standard deviation of `list`. `list` may consist of numerical values or
+	 * symbols. Numerical values may be real or complex.
+	 */
 	public final static IBuiltInSymbol StandardDeviation = F.initFinalSymbol("StandardDeviation", ID.StandardDeviation);
 
 	/***/
@@ -2264,7 +2484,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol SurfaceGraphics = F.initFinalSymbol("SurfaceGraphics", ID.SurfaceGraphics);
 
-    /** Switch(expr, pattern1, value1, pattern2, value2, ...) - yields the first `value` for which `expr` matches the corresponding pattern.*/
+	/**
+	 * Switch(expr, pattern1, value1, pattern2, value2, ...) - yields the first `value` for which `expr` matches the
+	 * corresponding pattern.
+	 */
 	public final static IBuiltInSymbol Switch = F.initFinalSymbol("Switch", ID.Switch);
 
 	/** Symbol - is the head of symbols.*/
@@ -2305,7 +2528,10 @@ public class F {
 	/** Tanh(z) - returns the hyperbolic tangent of `z`.*/
 	public final static IBuiltInSymbol Tanh = F.initFinalSymbol("Tanh", ID.Tanh);
 
-    /** TautologyQ(boolean-expr, list-of-variables) - test whether the `boolean-expr` is satisfiable by all combinations of boolean `False` and `True` values for the `list-of-variables`.*/
+	/**
+	 * TautologyQ(boolean-expr, list-of-variables) - test whether the `boolean-expr` is satisfiable by all combinations
+	 * of boolean `False` and `True` values for the `list-of-variables`.
+	 */
 	public final static IBuiltInSymbol TautologyQ = F.initFinalSymbol("TautologyQ", ID.TautologyQ);
 
 	/***/
@@ -2395,7 +2621,10 @@ public class F {
 	/** TrigExpand(expr) - expands out trigonometric expressions in `expr`.*/
 	public final static IBuiltInSymbol TrigExpand = F.initFinalSymbol("TrigExpand", ID.TrigExpand);
 
-    /** TrigReduce(expr) - rewrites products and powers of trigonometric functions in `expr` in terms of trigonometric functions with combined arguments.*/
+	/**
+	 * TrigReduce(expr) - rewrites products and powers of trigonometric functions in `expr` in terms of trigonometric
+	 * functions with combined arguments.
+	 */
 	public final static IBuiltInSymbol TrigReduce = F.initFinalSymbol("TrigReduce", ID.TrigReduce);
 
 	/** TrigToExp(expr) - converts trigonometric functions in `expr` to exponentials.*/
@@ -2429,7 +2658,10 @@ public class F {
 
     /** UnitConvert(quantity) - convert the `quantity` to the base unit*/
     public final static IBuiltInSymbol UnitConvert = F.initFinalSymbol("UnitConvert", ID.UnitConvert);
-    /** UnitStep(expr) - returns `0`, if `expr` is less than `0` and returns `1`, if `expr` is greater equal than `0`.*/
+
+	/**
+	 * UnitStep(expr) - returns `0`, if `expr` is less than `0` and returns `1`, if `expr` is greater equal than `0`.
+	 */
 	public final static IBuiltInSymbol UnitStep = F.initFinalSymbol("UnitStep", ID.UnitStep);
 
 	/** UnitVector(position) - returns a unit vector with element `1` at the given `position`.*/
@@ -2475,7 +2707,10 @@ public class F {
 	/** Variables[expr] - gives a list of the variables that appear in the polynomial `expr`.*/
 	public final static IBuiltInSymbol Variables = F.initFinalSymbol("Variables", ID.Variables);
 
-    /** Variance(list) - computes the variance of `list`. `list` may consist of numerical values or symbols. Numerical values may be real or complex.*/
+	/**
+	 * Variance(list) - computes the variance of `list`. `list` may consist of numerical values or symbols. Numerical
+	 * values may be real or complex.
+	 */
 	public final static IBuiltInSymbol Variance = F.initFinalSymbol("Variance", ID.Variance);
 
     /** VectorAngle(u, v) - gives the angles between vectors `u` and `v`*/
@@ -2488,7 +2723,10 @@ public class F {
 	public final static IBuiltInSymbol WeibullDistribution = F.initFinalSymbol("WeibullDistribution",
 			ID.WeibullDistribution);
 
-    /** Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2` if `cond2` evaluates to `True`, etc.*/
+	/**
+	 * Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2` if `cond2`
+	 * evaluates to `True`, etc.
+	 */
 	public final static IBuiltInSymbol Which = F.initFinalSymbol("Which", ID.Which);
 
 	/** While(test, body) - evaluates `body` as long as test evaluates to `True`.*/
@@ -2497,13 +2735,20 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol White = F.initFinalSymbol("White", ID.White);
 
-    /** With({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by replacing the local variables in `expr`.*/
+	/**
+	 * With({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by replacing the
+	 * local variables in `expr`.
+	 */
 	public final static IBuiltInSymbol With = F.initFinalSymbol("With", ID.With);
 
     /** Xor(arg1, arg2, ...) - Logical XOR (exclusive OR) function. Returns `True` if an odd number of the arguments are `True` and the rest are `False`. Returns `False` if an even number of the arguments are `True` and the rest are `False`.*/
 	public final static IBuiltInSymbol Xor = F.initFinalSymbol("Xor", ID.Xor);
 
-    /** YuleDissimilarity(u, v) - returns the Yule dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as R / (c_tt * c_ff + R / 2) where n is `len(u)`, `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`, and `R = 2 * c_tf * c_ft`.*/
+	/**
+	 * YuleDissimilarity(u, v) - returns the Yule dissimilarity between the two boolean 1-D lists `u` and `v`, which is
+	 * defined as R / (c_tt * c_ff + R / 2) where n is `len(u)`, `c_ij` is the number of occurrences of `u(k)=i` and
+	 * `v(k)=j` for `k<n`, and `R = 2 * c_tf * c_ft`.
+	 */
 	public final static IBuiltInSymbol YuleDissimilarity = F.initFinalSymbol("YuleDissimilarity", ID.YuleDissimilarity);
 
 	/***/
@@ -8396,7 +8641,7 @@ public class F {
 	}
 
 	/**
-	 * Create a large integer number.
+	 * Create an integer number.
 	 * 
 	 * @param integerValue
 	 * @return
@@ -8453,7 +8698,7 @@ public class F {
 	}
 
 	/**
-	 * parses given string to an instance of {@link IExpr}
+	 * Parses a given string to an instance of {@link IExpr}
 	 *
 	 * Examples:
 	 *

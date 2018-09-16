@@ -7,7 +7,7 @@ import org.matheclipse.core.interfaces.IExpr;
  * Abstract step visitor for <code>java.util.List</code>s.
  * 
  */
-public abstract class AbstractListStepVisitor<T> implements IStepVisitor {
+public abstract class AbstractListStepVisitor<T extends IExpr> implements IStepVisitor {
 	protected final IAST list;
 	protected IExpr[] array;
 
