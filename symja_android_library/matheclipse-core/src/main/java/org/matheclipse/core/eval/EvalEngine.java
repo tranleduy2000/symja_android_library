@@ -1047,6 +1047,23 @@ public class EvalEngine implements Serializable {
 			fEvalLHSMode = evalLHSMode;
 		}
 	}
+	public IExpr evalLHSPattern(IAST ast) {
+		boolean evalLHSMode = fEvalLHSMode;
+		try {
+			fEvalLHSMode = true;
+			IExpr temp = evalAttributes(ast.topHead(),ast);
+			if (temp.isPresent()) {
+				return temp;
+			}
+		} catch (RuntimeException rex) {
+			if (Config.SHOW_STACKTRACE) {
+				rex.printStackTrace();
+			}
+		} finally {
+			fEvalLHSMode = evalLHSMode;
+		}
+		return ast;
+	}
 	/**
 	 * Evaluate an object, if evaluation is not possible return <code>F.NIL</code>.
 	 *
