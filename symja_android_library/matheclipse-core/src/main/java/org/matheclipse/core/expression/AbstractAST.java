@@ -1830,7 +1830,12 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	@Override
 	public final boolean isFree(final IExpr pattern, boolean heads) {
 		if (pattern.isSymbol() || pattern.isNumber() || pattern.isString()) {
-			return isFree(x -> x.equals(pattern), heads);
+			return isFree(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return x.equals(pattern);
+                }
+            }, heads);
 		}
 		final IPatternMatcher matcher = new PatternMatcherEvalEngine(pattern, EvalEngine.get());
 		return !isMember(matcher, heads);

@@ -1725,18 +1725,21 @@ public class Algebra {
 				// } else
 				if (expr.isTimes()) {
 					// System.out.println(ast.toString());
-					temp = ((IAST) expr).map(x -> {
-						if (x.isPlus()) {
-							return factorExpr(ast, x, varList);
-						}
-						if (x.isPower() && x.base().isPlus()) {
-							IExpr p = factorExpr(ast, x.base(), varList);
-							if (!p.equals(x.base())) {
-								return F.Power(p, x.exponent());
-							}
-						}
-						return F.NIL;
-					}, 1);
+					temp = ((IAST) expr).map(new Function<IExpr, IExpr>() {
+                        @Override
+                        public IExpr apply(IExpr x) {
+                            if (x.isPlus()) {
+                                return Factor.this.factorExpr(ast, x, varList);
+                            }
+                            if (x.isPower() && x.base().isPlus()) {
+                                IExpr p = Factor.this.factorExpr(ast, x.base(), varList);
+                                if (!p.equals(x.base())) {
+                                    return F.Power(p, x.exponent());
+                                }
+                            }
+                            return F.NIL;
+                        }
+                    }, 1);
 				} else {
 				// System.out.println("leafCount " + expr.leafCount());
 					temp = factor((IAST) expr, varList, false);
@@ -1793,7 +1796,12 @@ public class Algebra {
 				IExpr base = jas.integerPoly2Expr(entry.getKey());
 				if (entry.getValue() == 1L) {
 					if (f.isMinusOne() && base.isPlus()) {
-						base = ((IAST) base).map(x -> x.negate(), 1);
+						base = ((IAST) base).map(new Function<IExpr, IExpr>() {
+                            @Override
+                            public IExpr apply(IExpr x) {
+                                return x.negate();
+                            }
+                        }, 1);
 						f = F.C1;
 					}
 					result.append(base);
@@ -3538,7 +3546,12 @@ public class Algebra {
 										IExpr numerator = parts[0];
 										IExpr denominator = parts[1];
 										if (denominator.isPlus() && !numerator.isPlusTimesPower()) {
-											IExpr test = ((IAST) denominator).map(x -> F.Divide(x, numerator), 1);
+											IExpr test = ((IAST) denominator).map(new Function<IExpr, IExpr>() {
+                                                @Override
+                                                public IExpr apply(IExpr x) {
+                                                    return F.Divide(x, numerator);
+                                                }
+                                            }, 1);
 											temp = F.eval(F.Divide(F.C1, test));
 											count = fComplexityFunction.apply(temp);
 											if (count < minCounter) {

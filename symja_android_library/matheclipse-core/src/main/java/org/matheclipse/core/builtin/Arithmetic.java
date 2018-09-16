@@ -54,6 +54,7 @@ import org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcherPlus;
 import org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcherTimes;
 import org.matheclipse.core.patternmatching.hash.HashedPatternRulesLog;
 import org.matheclipse.core.patternmatching.hash.HashedPatternRulesTimes;
+import org.matheclipse.core.patternmatching.hash.HashedPatternRulesTimesPower;
 import org.matheclipse.core.reflection.system.rules.AbsRules;
 import org.matheclipse.core.reflection.system.rules.ConjugateRules;
 import org.matheclipse.core.reflection.system.rules.GammaRules;
@@ -452,7 +453,8 @@ public final class Arithmetic {
      *
      * <blockquote>
      * <p>
-	 * replaces numerical values in the <code>numerical-expr</code> which are close to zero with symbolic value <code>0</code>.
+	 * replaces numerical values in the <code>numerical-expr</code> which are close to zero with symbolic value
+	 * <code>0</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
@@ -506,8 +508,9 @@ public final class Arithmetic {
      *
      * <blockquote>
      * <p>
-	 * returns <code>expr</code> in the range <code>-1</code> to <code>1</code>. Returns <code>-1</code> if <code>expr</code> is less
-	 * than <code>-1</code>. Returns <code>1</code> if <code>expr</code> is greater than <code>1</code>.
+	 * returns <code>expr</code> in the range <code>-1</code> to <code>1</code>. Returns <code>-1</code> if
+	 * <code>expr</code> is less than <code>-1</code>. Returns <code>1</code> if <code>expr</code> is greater than
+	 * <code>1</code>.
      * </p>
      * </blockquote>
      *
@@ -643,12 +646,18 @@ public final class Arithmetic {
         /**
          * gives <code>vMin</code> for <code>x<min</code> and <code>vMax</code> for <code>x>max</code>.
          *
-		 * @param x    the expreesion value
-		 * @param min  minimum value
-		 * @param max  maximum value
-		 * @param vMin value for x less than minimum
-		 * @param vMax value for x greater than minimum
-		 * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x is greater than max.
+		 * @param x
+		 *            the expreesion value
+		 * @param min
+		 *            minimum value
+		 * @param max
+		 *            maximum value
+		 * @param vMin
+		 *            value for x less than minimum
+		 * @param vMax
+		 *            value for x greater than minimum
+		 * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x is greater than
+		 *         max.
          */
         private IExpr clip(IExpr x, ISignedNumber min, ISignedNumber max, IExpr vMin, IExpr vMax) {
             if (x.isReal()) {
@@ -1193,7 +1202,7 @@ public final class Arithmetic {
                 try {
                     engine.setNumericMode(false);
                     IExpr arg1 = ast.arg1();
-                    IExpr temp = engine.evalLoop(arg1);
+					IExpr temp = engine.evaluateNull(arg1);
                     if (temp.isPresent()) {
                         arg1 = temp;
                         evaled = true;
@@ -4650,7 +4659,17 @@ public final class Arithmetic {
                     F.Csc(x_), //
                     F.Tan(x_), //
                     F.Sec(x)));
-            TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
+					F.Power(F.Csc(x_), F.m_), //
+					F.Power(F.Cot(x_), F.n_DEFAULT), //
+					F.Condition(F.Times(F.Power(F.Csc(F.x), F.Plus(F.m, F.n)), F.Power(F.Cos(F.x), F.n)),
+							F.And(F.SymbolQ(F.m), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
+					F.Power(F.Sec(x_), F.m_), //
+					F.Power(F.Tan(x_), F.n_DEFAULT), //
+					F.Condition(F.Times(F.Power(F.Sec(F.x), F.Plus(F.m, F.n)), F.Power(F.Sin(F.x), F.n)),
+							F.And(F.SymbolQ(F.m), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
                     F.ProductLog(x_), //
                     F.Power(F.E, F.ProductLog(x_)), //
                     x));

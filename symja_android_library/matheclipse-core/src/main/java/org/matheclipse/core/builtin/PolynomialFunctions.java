@@ -148,6 +148,10 @@ public class PolynomialFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
+			IExpr cached = F.REMEMBER_AST_CACHE.getIfPresent(ast);
+			if (cached != null) {
+				return cached;
+			}
 
 			IExpr arg2 = ast.arg2();
 			// list of variable expressions extracted from the second argument
@@ -204,7 +208,9 @@ public class PolynomialFunctions {
 				ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, listOfVariables,
 						listOfVariables.argSize());
 				ExprPolynomial poly = ring.create(expr, true, false);
-				return poly.coefficient(expArr);
+				IExpr temp= poly.coefficient(expArr);
+				F.REMEMBER_AST_CACHE.put(ast, temp);
+				return temp;
 			} catch (RuntimeException ae) {
 				if (Config.SHOW_STACKTRACE) {
 					ae.printStackTrace();
@@ -947,6 +953,10 @@ public class PolynomialFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
+			IExpr cached = F.REMEMBER_AST_CACHE.getIfPresent(ast);
+			if (cached != null) {
+				return cached;
+			}
 
 			final IExpr form = engine.evalPattern(ast.arg2());
 			if (form.isList()) {
@@ -1022,6 +1032,7 @@ public class PolynomialFunctions {
 			// for (IExpr exponent : collector) {
 			// result.append(exponent);
 			// }
+			F.REMEMBER_AST_CACHE.put(ast, result);
 			return result;
 		}
 

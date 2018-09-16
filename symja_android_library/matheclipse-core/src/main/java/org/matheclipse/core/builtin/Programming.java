@@ -2385,10 +2385,13 @@ public final class Programming {
 			final String varAppend = "$" + moduleCounter;
 			final java.util.Map<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
 			rememberModuleVariables(intializerList, varAppend, moduleVariables, engine);
-			IExpr result = F.subst(arg2, x -> {
-                        IExpr temp = moduleVariables.get(x);
-                        return temp != null ? temp : F.NIL;
-                });
+			IExpr result = F.subst(arg2, new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x) {
+					IExpr temp = moduleVariables.get(x);
+					return temp != null ? temp : F.NIL;
+				}
+			});
 				if (result.isCondition()) {
 					return checkCondition(result.first(), result.second(), engine);
 				} else if (result.isModuleOrWith()) {

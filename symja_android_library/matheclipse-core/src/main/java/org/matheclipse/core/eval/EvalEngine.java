@@ -810,10 +810,12 @@ public class EvalEngine implements Serializable {
 
 		try {
 			// remember which local variables we use:
-			if (localVariablesList.exists(x -> {
+			if (localVariablesList.exists(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
 					if (x.isSymbol()) {
 						ISymbol blockVariableSymbol = (ISymbol) x;
-					localStackCreate(blockVariableSymbol).push(F.NIL);
+						EvalEngine.this.localStackCreate(blockVariableSymbol).push(F.NIL);
 						variables.add(blockVariableSymbol);
 					} else {
 						if (x.isAST(F.Set, 3)) {
@@ -822,8 +824,8 @@ public class EvalEngine implements Serializable {
 							if (setFun.arg1().isSymbol()) {
 								ISymbol blockVariableSymbol = (ISymbol) setFun.arg1();
 								// this evaluation step may throw an exception
-							IExpr temp = evaluate(setFun.arg2());
-							final Deque<IExpr> localVariableStack = localStackCreate(blockVariableSymbol);
+								IExpr temp = EvalEngine.this.evaluate(setFun.arg2());
+								final Deque<IExpr> localVariableStack = EvalEngine.this.localStackCreate(blockVariableSymbol);
 								localVariableStack.push(temp);
 								variables.add(blockVariableSymbol);
 							}
@@ -832,6 +834,7 @@ public class EvalEngine implements Serializable {
 						}
 					}
 					return false;
+				}
 			})) {
 						return expr;
 					}
@@ -1624,7 +1627,9 @@ public class EvalEngine implements Serializable {
 	private IAST flattenSequences(final IAST ast) {
 		IASTAppendable[] seqResult = new IASTAppendable[1];
 		seqResult[0] = F.NIL;
-		ast.forEach((x, i) -> {
+		ast.forEach(new ObjIntConsumer<IExpr>() {
+			@Override
+			public void accept(IExpr x, int i) {
 				if (x.isSequence()) {
 					IAST seq = (IAST) x;
 					if (!seqResult[0].isPresent()) {
@@ -1635,6 +1640,7 @@ public class EvalEngine implements Serializable {
 				} else if (seqResult[0].isPresent()) {
 					seqResult[0].append(x);
 				}
+			}
 		});
 		return seqResult[0];
 	}
