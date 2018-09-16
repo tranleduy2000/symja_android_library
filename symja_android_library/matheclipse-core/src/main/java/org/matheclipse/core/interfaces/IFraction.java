@@ -82,7 +82,7 @@ public interface IFraction extends IRational {
     public BigInteger toBigDenominator();
 
     /**
-     * Return the <code>org.apache.commons.math3.fraction.BigFraction</code> representation.
+     * Return the <code>org.hipparchus.fraction.BigFraction</code> representation.
      *
      * @return
      */

@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 import static org.matheclipse.core.expression.F.num;
 
 /**
- * <code>IComplexNum</code> implementation which wraps a <code>org.apache.commons.math3.complex.Complex</code> value to
+ * <code>IComplexNum</code> implementation which wraps a <code>org.hipparchus.complex.Complex</code> value to
  * represent a numeric complex floating-point number.
  */
 public class ComplexNum extends IComplexNumImpl implements IComplexNum {

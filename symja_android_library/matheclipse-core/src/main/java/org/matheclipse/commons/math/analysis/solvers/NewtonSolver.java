@@ -55,9 +55,9 @@ public class NewtonSolver extends AbstractDifferentiableUnivariateSolver {
      * @param max Upper bound for the interval.
      * @param maxEval Maximum number of evaluations.
      * @return the value where the function is zero.
-     * @throws org.apache.commons.math3.exception.MathIllegalArgumentException
+     * @throws org.hipparchus.exception.MathIllegalArgumentException
      * if the maximum evaluation count is exceeded.
-     * @throws org.apache.commons.math3.exception.MathIllegalArgumentException
+     * @throws org.hipparchus.exception.MathIllegalArgumentException
      * if {@code min >= max}.
      */
     @Override

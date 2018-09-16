@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * <code>IComplexNum</code> implementation which wraps a <code>org.apache.commons.math3.complex.Apcomplex</code> value
+ * <code>IComplexNum</code> implementation which wraps a <code>org.hipparchus.complex.Apcomplex</code> value
  * to represent a numeric complex floating-point number.
  */
 public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {

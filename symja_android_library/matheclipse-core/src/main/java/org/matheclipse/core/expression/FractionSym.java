@@ -16,7 +16,7 @@ import java.math.BigInteger;
 
 /**
  * IFraction implementation which reimplements methods of the Apache
- * <code>org.apache.commons.math3.fraction.Fraction</code> methods.
+ * <code>org.hipparchus.fraction.Fraction</code> methods.
  * 
  * @see AbstractFractionSym
  * @see BigFractionSym

@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * IFraction implementation which uses methods of the Apache <code>org.apache.commons.math3.fraction.BigFraction</code>
+ * IFraction implementation which uses methods of the Apache <code>org.hipparchus.fraction.BigFraction</code>
  * methods.
  * 
  * @see IFraction
