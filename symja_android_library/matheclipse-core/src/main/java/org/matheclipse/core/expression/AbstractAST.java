@@ -2135,15 +2135,15 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNumericFunction() {
-		ISymbol symbol = topHead();
-		if ((symbol.getAttributes() & ISymbol.NUMERICFUNCTION) == ISymbol.NUMERICFUNCTION) {
+		if (head().isSymbol()
+				&& (((ISymbol) head()).getAttributes() & ISymbol.NUMERICFUNCTION) == ISymbol.NUMERICFUNCTION) {
 			// check if all arguments are &quot;numeric&quot;
-			for (int i = 1; i < size(); i++) {
-				if (!get(i).isNumericFunction()) {
-					return false;
-				}
-			}
-			return true;
+			return forAll(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return x.isNumericFunction();
+                }
+            });
 		}
 		return false;
 	}
