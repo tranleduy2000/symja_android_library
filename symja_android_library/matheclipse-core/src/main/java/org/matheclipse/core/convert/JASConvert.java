@@ -46,8 +46,7 @@ import edu.jas.structure.UnaryFunctor;
 import edu.jas.ufd.Quotient;
 
 /**
- * Convert <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> objects from
- * and to MathEclipse objects
+ * Convert <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> objects from and to MathEclipse objects
  * 
  * 
  * @param <C>
@@ -100,15 +99,14 @@ public class JASConvert<C extends RingElem<C>> {
 			if (Config.SHOW_STACKTRACE) {
 				ae.printStackTrace();
 			}
+//			System.out.println("expr2JAS"+exprPoly.toString());
 			throw new JASConversionException();
 		}
 	}
 
 	/**
-	 * Convert the given expression into a
-	 * <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial.
-	 * <code>INum</code> double values are internally converted to IFractions
-	 * and converte into the pokynomial structure.
+	 * Convert the given expression into a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial. <code>INum</code> double
+	 * values are internally converted to IFractions and converte into the pokynomial structure.
 	 * 
 	 * @param exprPoly
 	 * @return
@@ -124,10 +122,8 @@ public class JASConvert<C extends RingElem<C>> {
 	}
 
 	/**
-	 * Convert the given expression into a
-	 * <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial.
-	 * <code>INum</code> values are internally converted to IFractions and
-	 * <code>expr2Poly</code> was called for the expression
+	 * Convert the given expression into a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial. <code>INum</code> values
+	 * are internally converted to IFractions and <code>expr2Poly</code> was called for the expression
 	 * 
 	 * @param exprPoly
 	 * @return
@@ -139,13 +135,11 @@ public class JASConvert<C extends RingElem<C>> {
 	}
 
 	/**
-	 * Convert the given expression into a
-	 * <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial
+	 * Convert the given expression into a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial
 	 * 
 	 * @param exprPoly
-	 * @param numeric2Rational
-	 *            if <code>true</code>, <code>INum</code> double values are
-	 *            converted to <code>BigRational</code> internally
+	 * @param numeric2Rational if <code>true</code>, <code>INum</code> double values are converted to <code>BigRational</code>
+	 *                         internally
 	 * 
 	 * @return
 	 * @throws ArithmeticException
@@ -256,9 +250,8 @@ public class JASConvert<C extends RingElem<C>> {
 	}
 
 	/**
-	 * BigInteger from BigRational coefficients. Represent as polynomial with
-	 * BigInteger coefficients by multiplication with the gcd of the numerators
-	 * and the lcm of the denominators of the BigRational coefficients.
+	 * BigInteger from BigRational coefficients. Represent as polynomial with BigInteger coefficients by multiplication with the gcd of
+	 * the numerators and the lcm of the denominators of the BigRational coefficients.
 	 * 
 	 * @param A
 	 *            polynomial with BigRational coefficients to be converted.
@@ -277,12 +270,10 @@ public class JASConvert<C extends RingElem<C>> {
 	}
 
 	/**
-	 * BigInteger from BigRational coefficients. Represent as polynomial with
-	 * BigInteger coefficients by multiplication with the lcm of the numerators
-	 * of the BigRational coefficients.
+	 * BigInteger from BigRational coefficients. Represent as polynomial with BigInteger coefficients by multiplication with the lcm of
+	 * the numerators of the BigRational coefficients.
 	 * 
-	 * @param A
-	 *            polynomial with BigRational coefficients to be converted.
+	 * @param A polynomial with BigRational coefficients to be converted.
 	 * @return polynomial with BigInteger coefficients.
 	 */
 	public GenPolynomial<edu.jas.arith.BigInteger> integerFromRationalCoefficients(GenPolynomial<BigRational> A) {
@@ -377,8 +368,7 @@ public class JASConvert<C extends RingElem<C>> {
 	/**
 	 * Convert a jas <code>Integral</code> into a matheclipse expression
 	 * 
-	 * @param integral
-	 *            the JAS Integral
+	 * @param integral the JAS Integral
 	 * @return
 	 */
 	public IAST integral2Expr(Integral<BigRational> integral) {
@@ -409,8 +399,7 @@ public class JASConvert<C extends RingElem<C>> {
 	/**
 	 * Convert a jas <code>LogIntegral</code> into a matheclipse expression
 	 * 
-	 * @param logIntegral
-	 *            the JAS LogIntegral
+	 * @param logIntegral the JAS LogIntegral
 	 * @return
 	 */
 
@@ -463,11 +452,9 @@ public class JASConvert<C extends RingElem<C>> {
 	}
 
 	/**
-	 * Converts a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a>
-	 * polynomial to a MathEclipse AST with head <code>Plus</code>
+	 * Converts a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial to a MathEclipse AST with head <code>Plus</code>
 	 * 
-	 * @param poly
-	 *            a JAS polynomial
+	 * @param poly     a JAS polynomial
 	 * @param variable
 	 * @return
 	 * @throws ArithmeticException
@@ -537,8 +524,7 @@ public class JASConvert<C extends RingElem<C>> {
 	/**
 	 * Convert a jas <code>Integral</code> into a matheclipse expression
 	 * 
-	 * @param integral
-	 *            the JAS Integral
+	 * @param integral the JAS Integral
 	 * @return
 	 */
 	public IAST quotIntegral2Expr(QuotIntegral<BigRational> integral) {

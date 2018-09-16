@@ -100,7 +100,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 
 	public final static Set<IExpr> DEBUG_EXPR = new HashSet<IExpr>(64);
 
-	public static boolean INTEGRATE_RULES_READ = false;
+	private static boolean INTEGRATE_RULES_READ = false;
+
 	public Integrate() {
 	}
 

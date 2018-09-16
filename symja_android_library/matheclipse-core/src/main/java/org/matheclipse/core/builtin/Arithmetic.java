@@ -4356,6 +4356,10 @@ public final class Arithmetic {
             if (o1.isOne()) {
                 return o0;
             }
+			// note not a general rule
+			// if (o0.isMinusOne() && o1.isPlus()) {
+			// return ((IAST) o1).map(x -> x.negate(), 1);
+			// }
 
             if (o0.equals(o1)) {
                 if (o0.isNumber()) {
@@ -4685,6 +4689,15 @@ public final class Arithmetic {
 					F.Coth(x_), //
 					F.Sech(x_), //
 					F.Csch(x)));
+
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
+					F.Sech(x_), //
+					F.Sinh(x_), //
+					F.Tanh(x)));
+			TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
+					F.Sech(x_), //
+					F.Cosh(x_), //
+					F.C1));
             super.setUp(newSymbol);
         }
 

@@ -14,6 +14,7 @@ import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.generic.UnaryVariable2Slot;
 import org.matheclipse.core.interfaces.ExprUtil;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IEvaluator;
@@ -38,10 +39,8 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.text.Collator;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -211,10 +210,10 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<IAST> definition() {
-		ArrayList<IAST> result = new ArrayList<IAST>();
+	public IAST definition() {
+		IASTAppendable result = F.ListAlloc();
 		if (fRulesData != null) {
-			result.addAll(fRulesData.definition());
+			result.appendAll(fRulesData.definition());
 		}
 		return result;
 	}
@@ -226,13 +225,13 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		IAST attributesList = AttributeFunctions.attributesList(this);
 		OutputFormFactory off = OutputFormFactory.get(EvalEngine.get().isRelaxedSyntax());
 		off.setIgnoreNewLine(true);
-		List<IAST> list = definition();
+		IAST list = definition();
 		buf.append("Attributes(");
 		buf.append(this.toString());
 		buf.append(")=");
 		buf.append(attributesList.toString());
 		buf.append("\n");
-		for (int i = 0; i < list.size(); i++) {
+		for (int i = 1; i < list.size(); i++) {
 			off.convert(buf, list.get(i));
 			if (i < list.size() - 1) {
 				buf.append("\n");
@@ -634,7 +633,8 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 	public boolean isNumericFunction() {
 		if (isConstant()) {
 			return true;
-		} else if (hasLocalVariableStack()) {
+		}
+		if (hasLocalVariableStack()) {
 			IExpr temp = get();
 			if (temp != null && temp.isNumericFunction()) {
 				return true;

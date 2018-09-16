@@ -144,7 +144,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      *
      * @return
      */
-    public List<IAST> definition();
+    public IAST definition();
 
     /**
      * Return the rules associated to this symbol in <code>String</code> representation
