@@ -817,13 +817,12 @@ public class Integrate extends AbstractFunctionEvaluator {
 		ISymbol head = arg1.topHead();
 		EvalEngine engine = EvalEngine.get();
 		int limit = engine.getRecursionLimit();
+		boolean newCache = false;
 		try {
 			// Issue #91
-			if ((head.getAttributes() & ISymbol.NUMERICFUNCTION) == ISymbol.NUMERICFUNCTION
-					// || INT_RUBI_FUNCTIONS.contains(head)
-					|| head.isBuiltInSymbol() || head.getSymbolName().startsWith("§")) {
-				// || head.getSymbolName().startsWith(UtilityFunctionCtors.INTEGRATE_PREFIX)) {
-				boolean newCache = false;
+//			if ((head.getAttributes() & ISymbol.NUMERICFUNCTION) == ISymbol.NUMERICFUNCTION
+//					|| head.isBuiltInSymbol() || head.getSymbolName().startsWith("§")) {
+
 				if (engine.REMEMBER_AST_CACHE != null) {
 					IExpr result = engine.REMEMBER_AST_CACHE.getIfPresent(ast);
 					if (result != null) {
@@ -866,18 +865,19 @@ public class Integrate extends AbstractFunctionEvaluator {
 					// if (secondTry.isPresent()) {
 					// return integrateByRubiRules(secondTry, F.NIL);
 					// }
+
+				}
+//			}
+		} catch (AbortException ae) {
+			if (Config.DEBUG) {
+				ae.printStackTrace();
+			}
 				} finally {
 					engine.setRecursionLimit(limit);
 					if (newCache) {
 						engine.REMEMBER_AST_CACHE = null;
 					}
 				}
-			}
-		} catch (AbortException ae) {
-			if (Config.DEBUG) {
-				ae.printStackTrace();
-			}
-		}
 		return F.NIL;
 	}
 
