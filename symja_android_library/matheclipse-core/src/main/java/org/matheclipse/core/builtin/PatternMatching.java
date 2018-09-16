@@ -80,12 +80,14 @@ public final class PatternMatching {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.head().equals(F.Blank)) {
             if (ast.isAST0()) {
                 return F.$b();
             }
             if (ast.isAST1()) {
                 return F.$b(ast.arg1());
             }
+			}
             return F.NIL;
         }
 
@@ -654,14 +656,31 @@ public final class PatternMatching {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
-            if (ast.arg1().isPattern()) {
-                IPattern patt = (IPattern) ast.arg1();
-                return F.$p(patt.getSymbol(), patt.getCondition(), ast.arg2());
+			if (ast.head().equals(F.Optional)) {
+
+				if (ast.size() == 2) {
+					IExpr arg1 = engine.evaluate(ast.arg1());
+					if (arg1.isBlank()) {
+						IPattern patt = (IPattern) arg1;
+						return F.$b(patt.getCondition(), true);
+					}
+					if (arg1.isPattern()) {
+						IPattern patt = (IPattern) arg1;
+						return F.$p(patt.getSymbol(), patt.getCondition(), true);
             }
-			if (ast.arg1().isBlank()) {
-				IPattern patt = (IPattern) ast.arg1();
-				return F.$b(patt.getCondition(), ast.arg2());
+				}
+				if (ast.size() == 3) {
+					IExpr arg1 = engine.evaluate(ast.arg1());
+					IExpr arg2 = engine.evaluate(ast.arg2());
+					if (arg1.isBlank()) {
+						IPattern patt = (IPattern) arg1;
+						return F.$b(patt.getCondition(), arg2);
+					}
+					if (arg1.isPattern()) {
+						IPattern patt = (IPattern) arg1;
+						return F.$p(patt.getSymbol(), patt.getCondition(), arg2);
+					}
+				}
 			}
             return F.NIL;
         }
@@ -680,8 +699,10 @@ public final class PatternMatching {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.head().equals(F.Pattern)) {
             Validate.checkSize(ast, 3);
 
+				if (ast.size() == 3) {
             if (ast.arg1().isSymbol()) {
                 if (ast.arg2().isBlank()) {
                     IPatternObject blank = (IPatternObject) ast.arg2();
@@ -694,6 +715,8 @@ public final class PatternMatching {
                 // // }
                 // }
             }
+				}
+			}
             return F.NIL;
         }
 
@@ -997,12 +1020,7 @@ public final class PatternMatching {
                     return F.NIL;
                 } else if (leftHandSideAST.isAST(F.Attributes, 2)) {
                     IAST symbolList = Validate.checkSymbolOrSymbolList(leftHandSideAST, 1);
-					symbolList.forEach(new Consumer<IExpr>() {
-                        @Override
-                        public void accept(IExpr x) {
-                            ((ISymbol) x).setAttributes(ISymbol.NOATTRIBUTE);
-                        }
-                    });
+					symbolList.forEach(x -> ((ISymbol) x).setAttributes(ISymbol.NOATTRIBUTE));
 					return AttributeFunctions.setSymbolsAttributes(symbolList, ast.arg2(), engine);
                 }
             }

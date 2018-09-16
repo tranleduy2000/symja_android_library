@@ -203,17 +203,15 @@ public class Integrate extends AbstractFunctionEvaluator {
 					// issue #91
 					return F.NIL;
 				}
-				// if (astArg1.isTimes()) {
-				// IAST freeTimes = F.Times();
-				// IAST restTimes = F.Times();
-				// collectFreeTerms(astArg1, x, freeTimes, restTimes);
+				// if (arg1.isTimes()) {
+				// IASTAppendable freeTimes = F.TimesAlloc(arg1.size());
+				// IASTAppendable restTimes = F.TimesAlloc(arg1.size());
+				// collectFreeTerms((IAST)arg1, x, freeTimes, restTimes);
 				// IExpr free = freeTimes.getOneIdentity(F.C1);
 				// IExpr rest = restTimes.getOneIdentity(F.C1);
 				// if (!free.isOne()) {
-				// // Integrate[free_ * rest_,x_Symbol] ->
-				// free*Integrate[rest, x] /; FreeQ[free,y]
-				// // IExpr result = integrateByRubiRules(Integrate(rest,
-				// x));
+				// // Integrate[free_ * rest_,x_Symbol] -> free*Integrate[rest, x] /; FreeQ[free,y]
+				// // IExpr result = integrateByRubiRules(Integrate(rest, x));
 				// // if (result != null) {
 				// // return Times(free, result);
 				// // }
@@ -1015,7 +1013,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * @param restTimes
 	 *            the non-polynomil terms part
 	 */
-	private static void collectFreeTerms(final IAST timesAST, ISymbol x, IASTAppendable freeTimes,
+	private static void collectFreeTerms(final IAST timesAST, IExpr x, IASTAppendable freeTimes,
 			IASTAppendable restTimes) {
 		IExpr temp;
 		for (int i = 1; i < timesAST.size(); i++) {
