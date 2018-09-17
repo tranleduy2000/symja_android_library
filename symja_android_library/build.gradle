@@ -96,3 +96,33 @@ retrolambda {
     incremental false
     jvmArgs '-noverify'
 }
+
+ext {
+
+    //For bintray and jcenter distribution
+    bintrayRepo = 'Symja7'
+    bintrayName = 'org.matheclipse.android'
+
+    publishedGroupId = 'org.matheclipse.android'
+    libraryName = 'symja7'
+    artifact = 'symja7'
+    libraryVersion = '1.0.0'
+
+    libraryDescription = 'Java computer algebra and symbolic math library'
+
+    siteUrl = 'https://github.com/tranleduy2000/symja_android_library'
+    gitUrl = 'https://github.com/tranleduy2000/symja_android_library.git'
+
+
+    developerId = 'tranleduy2000'
+    developerName = 'Duy Tran'
+    developerEmail = 'tranleduy1233@gmail.com'
+    organization = 'tranleduy2000'
+    licenseName = 'GNU GENERAL PUBLIC LICENSE, Version 3.0'
+    licenseUrl = 'https://www.gnu.org/licenses/gpl-3.0.html'
+    allLicenses = ["GNU-GPL-3.0"]
+
+}
+//These two remote files contain Bintray configuration as described above.
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'
