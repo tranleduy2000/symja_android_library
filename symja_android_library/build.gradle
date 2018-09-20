@@ -34,7 +34,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         versionCode 19
-        versionName "1.0.3"
+        versionName "Symja-v${versionCode}-${buildDate()}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -98,19 +98,21 @@ retrolambda {
 }
 
 ext {
+
     //For bintray and jcenter distribution
     bintrayRepo = 'Symja7'
-    bintrayName = 'symja7'
+    bintrayName = 'org.matheclipse.android'
 
     publishedGroupId = 'org.matheclipse.android'
     libraryName = 'symja7'
     artifact = 'symja7'
-    libraryVersion = android.defaultConfig.versionName
+    libraryVersion = '1.0.0'
 
     libraryDescription = 'Java computer algebra and symbolic math library'
 
     siteUrl = 'https://github.com/tranleduy2000/symja_android_library'
     gitUrl = 'https://github.com/tranleduy2000/symja_android_library.git'
+
 
     developerId = 'tranleduy2000'
     developerName = 'Duy Tran'
@@ -122,7 +124,5 @@ ext {
 
 }
 //These two remote files contain Bintray configuration as described above.
-//apply from: 'install.gradle'
-//apply from: 'bintray.gradle'
-apply from: 'https://raw.githubusercontent.com/numetriclabz/jcenter/master/installv.gradle'
-apply from: 'https://raw.githubusercontent.com/numetriclabz/jcenter/master/bintrayv.gradle'
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'
