@@ -46,12 +46,15 @@ public class VisitorReplaceAll extends VisitorExpr {
 
 	public VisitorReplaceAll(Map<? extends IExpr, ? extends IExpr> map, int offset) {
 		super();
-		this.fFunction = x -> {
-			IExpr subst = map.get(x);
-			if (subst != null) {
-				return subst;
+		this.fFunction = new Function<IExpr, IExpr>() {
+			@Override
+			public IExpr apply(IExpr x) {
+				IExpr subst = map.get(x);
+				if (subst != null) {
+					return subst;
+				}
+				return F.NIL;
 			}
-			return F.NIL;
 		};
 		this.fOffset = offset;
 	}

@@ -1,6 +1,5 @@
 package org.matheclipse.core.eval;
 
-import com.duy.lambda.Consumer;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
@@ -8,6 +7,7 @@ import com.google.common.cache.Cache;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
+import org.matheclipse.core.builtin.Programming;
 import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
@@ -37,7 +37,7 @@ import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.parser.ExprParserFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
-import org.matheclipse.core.patternmatching.RulesData;
+import org.matheclipse.core.visit.ModuleReplaceAll;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.io.PrintStream;
@@ -806,46 +806,27 @@ public class EvalEngine implements Serializable {
 	}
 
 	public IExpr evalBlock(final IExpr expr, final IAST localVariablesList) {
-		java.util.IdentityHashMap<ISymbol, RulesData> blockVariables = new IdentityHashMap<ISymbol, RulesData>();
+		java.util.IdentityHashMap<ISymbol, ISymbol> blockVariables = new IdentityHashMap<ISymbol, ISymbol>();
+		IExpr result = F.NIL;
 		try {
-			// remember which local variables we use:
-			if (localVariablesList.exists(x -> {
-					if (x.isSymbol()) {
-						ISymbol blockVariableSymbol = (ISymbol) x;
-					blockVariables.put(blockVariableSymbol, blockVariableSymbol.getRulesData());
-					blockVariableSymbol.setRulesData(null);
-					localStackCreate(blockVariableSymbol).push(F.NIL);
-					} else {
-						if (x.isAST(F.Set, 3)) {
-							// lhs = rhs
-							final IAST setFun = (IAST) x;
-							if (setFun.arg1().isSymbol()) {
-								ISymbol blockVariableSymbol = (ISymbol) setFun.arg1();
-								// this evaluation step may throw an exception
-							IExpr temp = evaluate(setFun.arg2());
-							blockVariables.put(blockVariableSymbol, blockVariableSymbol.getRulesData());
-							blockVariableSymbol.setRulesData(null);
-							final Deque<IExpr> localVariableStack = localStackCreate(blockVariableSymbol);
-								localVariableStack.push(temp);
-							}
+			Programming.rememberBlockVariables(localVariablesList, "", blockVariables, this);
+			result = expr.accept(new ModuleReplaceAll(blockVariables, this, ""));
+			if (result.isPresent()) {
+				result = evaluate(result);
 						} else {
-							return true;
-						}
+				result = evaluate(expr);
 					}
-					return false;
-			})) {
-						return expr;
-					}
-
-			return evaluate(expr);
 		} finally {
-			// pop all local variables from local variable stack
-			for (Map.Entry<ISymbol, RulesData> entry : blockVariables.entrySet()) {
-				ISymbol x = entry.getKey();
-				localStack(x).pop();
-				x.setRulesData(entry.getValue());
+			if (result.isPresent()) {
+				// reset local variables to global ones
+				java.util.IdentityHashMap<ISymbol, IExpr> globalVariables = new IdentityHashMap<ISymbol, IExpr>();
+				for (Map.Entry<ISymbol, ISymbol> entry : blockVariables.entrySet()) {
+					globalVariables.put(entry.getValue(), entry.getKey());
 			}
+				result = F.subst(result, globalVariables);
 		}
+	}
+		return result;
 	}
 
 	/**

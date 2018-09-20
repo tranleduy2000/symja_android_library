@@ -3996,7 +3996,19 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFunction() {
-		check("Function({x, y}, x^2 + y^3)[a, b]", "a^2+b^3");
+		check("fufufu=Function({x},Function({y},Function({z},x+y+z)))", //
+				"Function({x},Function({y},Function({z},x+y+z)))");
+		check("fufufu(a)", //
+				"Function({y$1},Function({z$1},a+y$1+z$1))");
+		check("fufufu(y)", //
+				"Function({y$2},Function({z$2},y+y$2+z$2))");
+		check("fufufu(y)[z]", //
+				"Function({z$3$4},y+z+z$3$4)");
+		check("fufufu(y)[x][z]", //
+				"x+y+z");
+
+		check("Function({x, y}, x^2 + y^3)[a, b]", //
+				"a^2+b^3");
 		check("f(x, ##, y, ##) &(a, b, c, d)", "f(x,a,b,c,d,y,a,b,c,d)");
 		check("f(x, ##2, y, ##3) &(a, b, c, d)", "f(x,b,c,d,y,c,d)");
 		check("If(# > 5, #, False) &(2)", "False");
@@ -4010,8 +4022,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FullForm(x -> y &)", "Function(Rule(x, y))");
 		check("FullForm(x -> (y &))", "Rule(x, Function(y))");
 		check("FullForm(Mod(#, 5) == 1 &)", "Function(Equal(Mod(Slot(1), 5), 1))");
-		check("FullForm(a == b && c == d &)", "Function(And(Equal(a, b), Equal(c, d)))");
-		check("FullForm(Mod(#, 3) == 1 && Mod(#, 5) == 1 &)",
+		check("FullForm(a == b && c == d &)", //
+				"Function(And(Equal(a, b), Equal(c, d)))");
+		check("FullForm(Mod(#, 3) == 1 && Mod(#, 5) == 1 &)", //
 				"Function(And(Equal(Mod(Slot(1), 3), 1), Equal(Mod(Slot(1), 5), 1)))");
 	}
 
@@ -6122,8 +6135,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("xm=10;Module({xm=xm}, xm=xm+1;xm);xm", "10");
 		check("xm=10;Module({t=xm}, xm=xm+1;t)", "10");
 		check("xm=10;Module({t=xm}, xm=xm+1;t);xm", "11");
-		check("Module({a}, Block({a}, a))", "a$6");
-		check("Module({a}, Block({}, a))", "a$7");
+		check("Module({a}, Block({a}, a))", "a$5");
+		check("Module({a}, Block({}, a))", "a$6");
 		check("t === Module({t}, t)", "False");
 		check("$g(x_) := Module({v=x},int(v,x)/;v=!=x);$g(f(x))", "$g(f(x))");
 		check("$g(x_) := Module({v=x},int1(v,x)/;v===x);$g(f(x))", "int1(f(x),f(x))");
@@ -6138,11 +6151,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 				+ "  m\n" + "  );$gcd(18, 21)", "3");
 
 		check("{Module({x}, x), Module({x}, x)}", //
-				"{x$20,x$21}");
+				"{x$18,x$19}");
 		check("Module({e = Expand((1 + x)^5)}, Function(x, e))", //
-				"Function(x$23,e$22)");
+				"Function(x$20,e$20)");
 		check("Module({a,b}, Block({c}, c+a))", //
-				"a$24+c");
+				"a$21+c");
 
 		if (Config.SERVER_MODE == false) {
 			check("f(x0_) :=\n" + " Module({x = x0},\n" + "  While(x > 0, x = Log(x));\n" + "  x\n" + "  );f(2.0)",
@@ -11621,7 +11634,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Table(With({i = j}, Hold(i)), {j, 5})", "{Hold(1),Hold(2),Hold(3),Hold(4),Hold(5)}");
 
 		check("With({y = Sin(1.0)}, Sum(y^i, {i, 0, 10}))", "5.36323");
-		check("With({e = Expand((1 + x)^5)}, Function(x, e))", "Function(x$1,1+5*x+10*x^2+10*x^3+5*x^4+x^5)");
+		check("With({e = Expand((1 + x)^5)}, Function(x, e))", //
+				"Function(x$12,1+5*x+10*x^2+10*x^3+5*x^4+x^5)");
 		check("With({e = Expand((1 + x)^5)}, Function @@ {x, e})", "Function(x,1+5*x+10*x^2+10*x^3+5*x^4+x^5)");
 
 		check("x=5;With({x = x}, Hold(x))", "Hold(5)");

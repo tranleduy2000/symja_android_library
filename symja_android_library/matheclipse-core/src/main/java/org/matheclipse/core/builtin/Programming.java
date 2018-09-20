@@ -1030,7 +1030,7 @@ public final class Programming {
 			final String varAppend = "$" + moduleCounter;
 			java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
 			rememberModuleVariables(intializerList, varAppend, moduleVariables, engine);
-				IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine));
+			IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine, varAppend));
 				if (subst.isPresent()) {
 					return engine.evaluate(subst);
 				}
@@ -1108,8 +1108,8 @@ public final class Programming {
 	 * 
 	 * <blockquote>
 	 * <p>
-	 * starting with <code>expr</code>, iteratively applies <code>f</code> <code>n</code> times and returns a list of all intermediate
-	 * results.
+	 * starting with <code>expr</code>, iteratively applies <code>f</code> <code>n</code> times and returns a list of
+	 * all intermediate results.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -2221,26 +2221,19 @@ public final class Programming {
 		 * @return
 		 */
 		private static IExpr evalWith(IAST intializerList, IExpr arg2, final EvalEngine engine) {
-			// final int moduleCounter = engine.incModuleCounter();
-			// final String varAppend = "$" + moduleCounter;
+			final int moduleCounter = engine.incModuleCounter();
+			final String varAppend = "$" + moduleCounter;
 			final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
-			// final java.util.Set<IExpr> renamedVarsSet = new HashSet<IExpr>();
-			// java.util.IdentityHashMap<ISymbol, ISymbol> renamedVars = new IdentityHashMap<ISymbol, ISymbol>();
 
 			try {
 				rememberWithVariables(intializerList, moduleVariables, engine);
-				// for (IExpr expr : renamedVarsSet) {
-				// if (expr.isSymbol()) {
-				// renamedVars.put((ISymbol) expr, F.$s(expr.toString() + varAppend));
-				// }
-				// }
-				IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine));
+				IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine, varAppend));
 				if (subst.isPresent()) {
 					return engine.evaluate(subst);
 				}
 				return arg2;
 			} finally {
-				// removeUserVariables(moduleVariables);
+				//
 			}
 		}
 
@@ -2252,10 +2245,13 @@ public final class Programming {
 	}
 
 	/**
-	 * Remember which local variable names (appended with the module counter) we use in the given <code>variablesMap</code>.
+	 * Remember which local variable names (appended with the module counter) we use in the given
+	 * <code>variablesMap</code>.
 	 * 
-	 * @param variablesList initializer variables list from the <code>Module</code> function
-	 * @param variablesMap  the resulting module variables map
+	 * @param variablesList
+	 *            initializer variables list from the <code>Module</code> function
+	 * @param variablesMap
+	 *            the resulting module variables map
 	 */
 	private static void rememberWithVariables(IAST variablesList, final java.util.Map<ISymbol, IExpr> variablesMap,
 			EvalEngine engine) {
@@ -2266,92 +2262,90 @@ public final class Programming {
 				if (setFun.arg1().isSymbol()) {
 					oldSymbol = (ISymbol) setFun.arg1();
 					IExpr rightHandSide = setFun.arg2();
-//					try {
 						IExpr temp = engine.evaluate(rightHandSide);
-						// VariablesSet.addVariables(renamedVars, temp);
 						variablesMap.put(oldSymbol, temp);
-//					} catch (MathException me) {
-//						if (Config.SHOW_STACKTRACE) {
-//							me.printStackTrace();
-//						}
-//						variablesMap.put(oldSymbol, rightHandSide);
-//					}
-
 				}
 			}
-			// }
 		}
 	}
 
 	/**
-	 * Remember which local variable names (appended with the module counter) we use in the given <code>variablesMap</code>.
+	 * Remember which local variable names (appended with the module counter) we use in the given
+	 * <code>variablesMap</code>.
 	 * 
-	 * @param variablesList initializer variables list from the <code>Module</code> function
-	 * @param varAppend     the module counter string which aer appended to the variable names.
-	 * @param variablesMap  the resulting module variables map
-	 * @param engine        the evaluation engine
+	 * @param variablesList
+	 *            initializer variables list from the <code>Module</code> function
+	 * @param varAppend
+	 *            the module counter string which aer appended to the variable names.
+	 * @param variablesMap
+	 *            the resulting module variables map
+	 * @param engine
+	 *            the evaluation engine
 	 */
-	private static void rememberBlockVariables(IAST variablesList, final java.util.Map<ISymbol, IExpr> variablesMap,
-			final EvalEngine engine) {
-		ISymbol oldSymbol;
-		ISymbol newSymbol;
-		for (int i = 1; i < variablesList.size(); i++) {
-			if (variablesList.get(i).isSymbol()) {
-				oldSymbol = (ISymbol) variablesList.get(i);
-				// if (oldSymbol.toString().equals("num")){
-				// System.out.println(variablesList.toString());
-				// }
-				newSymbol = F.Dummy(oldSymbol.toString());// , engine);
-				variablesMap.put(oldSymbol, newSymbol);
-			} else {
-				if (variablesList.get(i).isAST(F.Set, 3)) {
-					final IAST setFun = (IAST) variablesList.get(i);
-					if (setFun.arg1().isSymbol()) {
-						oldSymbol = (ISymbol) setFun.arg1();
-						newSymbol = F.Dummy(oldSymbol.toString());// , engine);
-						variablesMap.put(oldSymbol, newSymbol);
-						engine.evaluate(F.Set(newSymbol, setFun.arg2()));
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Remember which local variable names (appended with the module counter) we use in the given <code>variablesMap</code>.
-	 *
-	 * @param variablesList initializer variables list from the <code>Module</code> function
-	 * @param varAppend     the module counter string which aer appended to the variable names.
-	 * @param variablesMap  the resulting module variables map
-	 * @param engine        the evaluation engine
-	 */
-	private static void rememberModuleVariables(IAST variablesList, final String varAppend,
+	public static void rememberModuleVariables(IAST variablesList, final String varAppend,
 			final java.util.Map<ISymbol, IExpr> variablesMap, final EvalEngine engine) {
 		ISymbol oldSymbol;
 		ISymbol newSymbol;
 		for (int i = 1; i < variablesList.size(); i++) {
 			if (variablesList.get(i).isSymbol()) {
 				oldSymbol = (ISymbol) variablesList.get(i);
-				// if (oldSymbol.toString().equals("num")){
-				// System.out.println(variablesList.toString());
-				// }
-				newSymbol = F.Dummy(oldSymbol.toString() + varAppend);// , engine);
+				newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
 				variablesMap.put(oldSymbol, newSymbol);
 			} else {
 				if (variablesList.get(i).isAST(F.Set, 3)) {
 					final IAST setFun = (IAST) variablesList.get(i);
 					if (setFun.arg1().isSymbol()) {
 						oldSymbol = (ISymbol) setFun.arg1();
-						newSymbol = F.Dummy(oldSymbol.toString() + varAppend);// , engine);
+						newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
 						variablesMap.put(oldSymbol, newSymbol);
-//						try {
 						engine.evaluate(F.Set(newSymbol, setFun.arg2()));
-//						} catch (MathException me) {
-//							if (Config.SHOW_STACKTRACE) {
-//								me.printStackTrace();
-//							}
-//						}
 					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Remember which local variable names (appended with the module counter) we use in the given
+	 * <code>variablesMap</code>.
+	 *
+	 * @param variablesList
+	 *            initializer variables list from the <code>Module</code> function
+	 * @param varAppend
+	 *            the module counter string which appended to the variable names.
+	 * @param variablesMap
+	 *            the resulting module variables map
+	 * @param engine
+	 *            the evaluation engine
+	 */
+	public static void rememberBlockVariables(IAST variablesList, final String varAppend,
+			final java.util.Map<ISymbol, ISymbol> variablesMap, final EvalEngine engine) {
+		ISymbol oldSymbol;
+		ISymbol newSymbol;
+		for (int i = 1; i < variablesList.size(); i++) {
+			if (variablesList.get(i).isSymbol()) {
+				oldSymbol = (ISymbol) variablesList.get(i);
+				newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
+				variablesMap.put(oldSymbol, newSymbol);
+			} else {
+				if (variablesList.get(i).isAST(F.Set, 3)) {
+					final IAST setFun = (IAST) variablesList.get(i);
+					if (setFun.arg1().isSymbol()) {
+						oldSymbol = (ISymbol) setFun.arg1();
+						newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
+						variablesMap.put(oldSymbol, newSymbol);
+					}
+					}
+			}
+		}
+		for (int i = 1; i < variablesList.size(); i++) {
+			if (variablesList.get(i).isAST(F.Set, 3)) {
+				final IAST setFun = (IAST) variablesList.get(i);
+				if (setFun.arg1().isSymbol()) {
+					oldSymbol = (ISymbol) setFun.arg1();
+					newSymbol = (ISymbol) variablesMap.get(oldSymbol);
+					IExpr temp = F.subst(engine.evaluate(setFun.arg2()), variablesMap);
+					engine.evaluate(F.Set(newSymbol, temp));
 				}
 			}
 		}
@@ -2442,10 +2436,14 @@ public final class Programming {
 	/**
 	 * Get the <code>Part[...]</code> of an expression. If the expression is no <code>IAST</code> return the expression.
 	 * 
-	 * @param expr   the expression from which parts should be extracted
-	 * @param ast    the <code>Part[...]</code> expression
-	 * @param pos    the index position from which the sub-expressions should be extracted
-	 * @param engine the evaluation engine
+	 * @param expr
+	 *            the expression from which parts should be extracted
+	 * @param ast
+	 *            the <code>Part[...]</code> expression
+	 * @param pos
+	 *            the index position from which the sub-expressions should be extracted
+	 * @param engine
+	 *            the evaluation engine
 	 * @return
 	 */
 	public static IExpr part(final IExpr expr, final IAST ast, int pos, EvalEngine engine) {
