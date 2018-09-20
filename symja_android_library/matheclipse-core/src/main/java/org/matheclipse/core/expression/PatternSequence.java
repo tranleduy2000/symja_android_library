@@ -442,6 +442,10 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 		return fDefault;
 	}
 
+	public boolean isNullSequence() {
+		return fZeroArgsAllowed;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public boolean isFreeOfPatterns() {

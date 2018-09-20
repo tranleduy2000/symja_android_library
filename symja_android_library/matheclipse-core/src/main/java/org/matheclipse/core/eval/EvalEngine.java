@@ -37,16 +37,16 @@ import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.parser.ExprParserFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
+import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -806,17 +806,15 @@ public class EvalEngine implements Serializable {
 	}
 
 	public IExpr evalBlock(final IExpr expr, final IAST localVariablesList) {
-		final List<ISymbol> variables = new ArrayList<ISymbol>();
-
+		java.util.IdentityHashMap<ISymbol, RulesData> blockVariables = new IdentityHashMap<ISymbol, RulesData>();
 		try {
 			// remember which local variables we use:
-			if (localVariablesList.exists(new Predicate<IExpr>() {
-				@Override
-				public boolean test(IExpr x) {
+			if (localVariablesList.exists(x -> {
 					if (x.isSymbol()) {
 						ISymbol blockVariableSymbol = (ISymbol) x;
-						EvalEngine.this.localStackCreate(blockVariableSymbol).push(F.NIL);
-						variables.add(blockVariableSymbol);
+					blockVariables.put(blockVariableSymbol, blockVariableSymbol.getRulesData());
+					blockVariableSymbol.setRulesData(null);
+					localStackCreate(blockVariableSymbol).push(F.NIL);
 					} else {
 						if (x.isAST(F.Set, 3)) {
 							// lhs = rhs
@@ -824,17 +822,17 @@ public class EvalEngine implements Serializable {
 							if (setFun.arg1().isSymbol()) {
 								ISymbol blockVariableSymbol = (ISymbol) setFun.arg1();
 								// this evaluation step may throw an exception
-								IExpr temp = EvalEngine.this.evaluate(setFun.arg2());
-								final Deque<IExpr> localVariableStack = EvalEngine.this.localStackCreate(blockVariableSymbol);
+							IExpr temp = evaluate(setFun.arg2());
+							blockVariables.put(blockVariableSymbol, blockVariableSymbol.getRulesData());
+							blockVariableSymbol.setRulesData(null);
+							final Deque<IExpr> localVariableStack = localStackCreate(blockVariableSymbol);
 								localVariableStack.push(temp);
-								variables.add(blockVariableSymbol);
 							}
 						} else {
 							return true;
 						}
 					}
 					return false;
-				}
 			})) {
 						return expr;
 					}
@@ -842,14 +840,10 @@ public class EvalEngine implements Serializable {
 			return evaluate(expr);
 		} finally {
 			// pop all local variables from local variable stack
-			Consumer<ISymbol> action = new Consumer<ISymbol>() {
-				@Override
-				public void accept(ISymbol x) {
-					EvalEngine.this.localStack(x).pop();
-				}
-			};
-			for (ISymbol variable : variables) {
-				action.accept(variable);
+			for (Map.Entry<ISymbol, RulesData> entry : blockVariables.entrySet()) {
+				ISymbol x = entry.getKey();
+				localStack(x).pop();
+				x.setRulesData(entry.getValue());
 			}
 		}
 	}

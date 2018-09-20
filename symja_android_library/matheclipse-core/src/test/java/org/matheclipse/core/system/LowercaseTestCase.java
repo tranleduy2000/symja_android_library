@@ -684,8 +684,17 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"11");
 		check("xm=10;Block({xm=xm}, xm=xm+1;Print(xm));xm", //
 				"10");
+		check("Block({testVar}, testVar=2222;testVar)", //
+				"2222");
+		check("testVar=1111; Block({testVar}, testVar)", //
+				"1111");
+		check("Block({x=y,y=z,z=3}, Print({Hold(x),Hold(y),Hold(z)});{x,y,z})", //
+				"{3,3,3}");
+		check("Block({x,f}, f(0)=0;f(x_):=f(x-1)+x;f(3))",//
+				"6");
+		check("f(3)",//
+				"f(3)");
 	}
-	//
 
 	public void testBinCounts() {
 		check("BinCounts({1,2,3,4,5})", //
@@ -8792,7 +8801,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testReplaceAll() {
-		check("a + b + c /. a + c -> p", "b+p");
+		check("x_Integer /. x->xvar", //
+				"xvar_.Integer");
+		check("x__ /. x->xvar", //
+				"xvar__");
+		check("x___ /. x->xvar", //
+				"xvar___");
+		check("a + b + c /. a + c -> p",//
+				"b+p");
 		// check("g(a + b + c + d, b + d) /. g(x_ + y_, x_) -> p(x, y)", "p(b+d,a+c)");
 
 		// TODO
@@ -11618,6 +11634,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("With({f = Function(n, If(n == 0, 1, n*f(n - 1)))}, f(10))", "10*f(9)");
 		// check("Timing(Do(With({x = 5}, x;), {10^5}))", "");
 		// check("Timing(Do(Module({x = 5}, x;), {10^5}))", "");
+		check("With({x=y,y=z,z=3}, Print({Hold(x),Hold(y),Hold(z)});{x,y,z})", "{y,z,3}");
 	}
 
 	public void testXor() {

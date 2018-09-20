@@ -521,6 +521,10 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return fRulesData;
     }
 
+    public void setRulesData(RulesData rd) {
+        fRulesData = rd;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -924,15 +928,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return fRulesData.putDownRule(pmEvaluator);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final IPatternMatcher putUpRule(final ISymbol.RuleType symbol, boolean equalRule, IAST leftHandSide,
-                                           IExpr rightHandSide) {
-        return putUpRule(symbol, equalRule, leftHandSide, rightHandSide, PatternMap.DEFAULT_RULE_PRIORITY);
-    }
-
     // public Object readResolve() throws ObjectStreamException {
     // ISymbol sym = fContext.get(fSymbolName);
     // if (sym != null) {
@@ -944,6 +939,15 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     // symbol.fAttributes = fAttributes;
     // return symbol;
     // }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IPatternMatcher putUpRule(final ISymbol.RuleType symbol, boolean equalRule, IAST leftHandSide,
+                                           IExpr rightHandSide) {
+        return putUpRule(symbol, equalRule, leftHandSide, rightHandSide, PatternMap.DEFAULT_RULE_PRIORITY);
+    }
 
     /**
      * {@inheritDoc}
