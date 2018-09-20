@@ -2413,8 +2413,8 @@ public final class Programming {
 		if (engine.evalTrue(arg2)) {
 			if (arg1.isCondition()) {
 				return checkCondition(arg1.first(), arg1.second(), engine);
-			} else if (arg2.isModuleOrWith()) {
-				return checkModuleOrWithCondition(arg2.first(), arg2.second(), engine);
+			} else if (arg1.isModuleOrWith()) {
+				return checkModuleOrWithCondition(arg1.first(), arg1.second(), engine);
 			}
 			return true;
 		}
@@ -2766,8 +2766,7 @@ public final class Programming {
 	 * @param result       will be cloned if an assignment occurs and returned by this method
 	 * @param position
 	 * @param value
-	 * @param engine
-	 *            the evaluation engineF
+	 * @param engine       the evaluation engineF
 	 * @return the (cloned and value assigned) result AST from input
 	 */
 	private static IASTAppendable assignPartSpanValue(IAST expr, IExpr element, final IAST part, int partPosition,
