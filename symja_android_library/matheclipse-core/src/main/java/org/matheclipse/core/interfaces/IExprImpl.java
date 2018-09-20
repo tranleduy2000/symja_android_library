@@ -2820,6 +2820,12 @@ public abstract class IExprImpl implements IExpr {
         return accept(new VisitorReplaceAll(function));
     }
 
+    @Nullable
+    @Override
+    public IExpr replaceAll(Map<? extends IExpr, ? extends IExpr> map) {
+        return accept(new VisitorReplaceAll(map));
+    }
+
     /**
      * Replace all (sub-) expressions with the given rule set. If no substitution matches, the method returns
      * <code>null</code>.

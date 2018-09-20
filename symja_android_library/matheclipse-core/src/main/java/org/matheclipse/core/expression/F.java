@@ -853,9 +853,9 @@ public class F {
 	public final static IBuiltInSymbol Equal = F.initFinalSymbol("Equal", ID.Equal);
 
 	/**
-	 * Equivalent(arg1, arg2, ...) - Equivalence relation. `Equivalent(A, B)` is `True` iff `A` and `B` are both `True`
-	 * or both `False`. Returns `True` if all of the arguments are logically equivalent. Returns `False` otherwise.
-	 * `Equivalent(arg1, arg2, ...)` is equivalent to `(arg1 && arg2 && ...) || (!arg1 && !arg2 && ...)`.
+	 * Equivalent(arg1, arg2, ...) - Equivalence relation. `Equivalent(A, B)` is `True` iff `A` and `B` are both `True` or both `False`.
+	 * Returns `True` if all of the arguments are logically equivalent. Returns `False` otherwise. `Equivalent(arg1, arg2, ...)` is
+	 * equivalent to `(arg1 && arg2 && ...) || (!arg1 && !arg2 && ...)`.
 	 */
 	public final static IBuiltInSymbol Equivalent = F.initFinalSymbol("Equivalent", ID.Equivalent);
 
@@ -972,8 +972,7 @@ public class F {
 	public final static IBuiltInSymbol FindFit = F.initFinalSymbol("FindFit", ID.FindFit);
 
 	/**
-	 * FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables
-	 * `vars`.
+	 * FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables `vars`.
 	 */
 	public final static IBuiltInSymbol FindInstance = F.initFinalSymbol("FindInstance", ID.FindInstance);
 
@@ -1305,8 +1304,7 @@ public class F {
 	public final static IBuiltInSymbol Integrate = F.initFinalSymbol("Integrate", ID.Integrate);
 
 	/**
-	 * InterpolatingFunction(data-list) - get the representation for the given `data-list` as piecewise
-	 * `InterpolatingPolynomial`s.
+	 * InterpolatingFunction(data-list) - get the representation for the given `data-list` as piecewise `InterpolatingPolynomial`s.
 	 */
 	public final static IBuiltInSymbol InterpolatingFunction = F.initFinalSymbol("InterpolatingFunction",
 			ID.InterpolatingFunction);
@@ -1761,8 +1759,8 @@ public class F {
 	public final static IBuiltInSymbol NestList = F.initFinalSymbol("NestList", ID.NestList);
 
 	/**
-	 * NestWhile(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until applying `test` on
-	 * the result no longer yields `True`.
+	 * NestWhile(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until applying `test` on the result no
+	 * longer yields `True`.
 	 */
 	public final static IBuiltInSymbol NestWhile = F.initFinalSymbol("NestWhile", ID.NestWhile);
 
@@ -1786,8 +1784,7 @@ public class F {
 	public final static IBuiltInSymbol None = F.initFinalSymbol("None", ID.None);
 
 	/**
-	 * NoneTrue({expr1, expr2, ...}, test) - returns `True` if no application of `test` to `expr1, expr2, ...` evaluates
-	 * to `True`.
+	 * NoneTrue({expr1, expr2, ...}, test) - returns `True` if no application of `test` to `expr1, expr2, ...` evaluates to `True`.
 	 */
 	public final static IBuiltInSymbol NoneTrue = F.initFinalSymbol("NoneTrue", ID.NoneTrue);
 
@@ -3707,8 +3704,7 @@ public class F {
 	/**
 	 * Create a <code>BlankNullSequence[condition]</code> pattern object for pattern-matching and term rewriting
 	 *
-	 * @param condition
-	 *            additional condition which should be checked in pattern-matching
+	 * @param condition additional condition which should be checked in pattern-matching
 	 * @return IPattern
 	 */
 	public static PatternSequence $bns(final IExpr condition) {
@@ -3889,10 +3885,8 @@ public class F {
 	 * Create a pattern for pattern-matching and term rewriting
 	 * 
 	 * @param symbol
-	 * @param check
-	 *            additional condition which should be checked in pattern-matching
-	 * @param defaultValue
-	 *            use this <code>defaultValue</code> in pattern-matching if an argument is optional
+	 * @param check        additional condition which should be checked in pattern-matching
+	 * @param defaultValue use this <code>defaultValue</code> in pattern-matching if an argument is optional
 	 * @return IPattern
 	 */
 	public static IPattern pattern(final ISymbol symbol, final IExpr check, final IExpr defaultValue) {
@@ -8192,6 +8186,18 @@ public class F {
 	 */
 	public static IExpr subst(IExpr expr, final Function<IExpr, IExpr> function) {
 		return expr.replaceAll(function).orElse(expr);
+	}
+
+	/**
+	 * Substitute all (sub-) expressions with the given unary function. If no substitution matches, the method returns the given
+	 * <code>expr</code>.
+	 *
+	 * @param expr
+	 * @param function if the unary functions <code>apply()</code> method returns <code>null</code> the expression isn't substituted.
+	 * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted expression.
+	 */
+	public static IExpr subst(IExpr expr, final Map<? extends IExpr, ? extends IExpr> map) {
+		return expr.replaceAll(map).orElse(expr);
 	}
 
 	/**

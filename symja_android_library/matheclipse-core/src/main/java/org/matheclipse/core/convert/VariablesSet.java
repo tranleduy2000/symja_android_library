@@ -244,6 +244,10 @@ public class VariablesSet {
         return fVariablesSet.add(symbol);
     }
 
+	public boolean addAll(final Set<? extends IExpr> symbols) {
+		return fVariablesSet.addAll(symbols);
+	}
+
     /**
      * Add the variables of the given expression
      *

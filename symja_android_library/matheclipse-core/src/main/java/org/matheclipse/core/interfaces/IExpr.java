@@ -2189,6 +2189,18 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr replaceAll(final Function<IExpr, IExpr> function);
 
     /**
+     * Replace all (sub-) expressions with the given <code>java.util.Map</code>n. If no substitution matches, the method
+     * returns <code>F.NIL</code>.
+     *
+     * @param function if the unary functions <code>apply()</code> method returns <code>F.NIL</code> the expression isn't
+     *                 substituted.
+     * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
+     */
+    @Nullable
+    IExpr replaceAll(final Map<? extends IExpr, ? extends IExpr> map);
+
+
+    /**
      * Replace all (sub-) expressions with the given rule set. If no substitution matches, the method returns
      * <code>null</code>.
      *

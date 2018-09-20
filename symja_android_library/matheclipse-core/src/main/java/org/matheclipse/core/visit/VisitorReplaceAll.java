@@ -18,6 +18,8 @@ import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 
+import java.util.Map;
+
 /**
  * Replace all occurrences of expressions where the given
  * <code>function.apply()</code> method returns a non <code>F.NIL</code> value.
@@ -35,6 +37,22 @@ public class VisitorReplaceAll extends VisitorExpr {
 	public VisitorReplaceAll(Function<IExpr, IExpr> function, int offset) {
 		super();
 		this.fFunction = function;
+		this.fOffset = offset;
+	}
+
+	public VisitorReplaceAll(Map<? extends IExpr, ? extends IExpr> map) {
+		this(map, 0);
+	}
+
+	public VisitorReplaceAll(Map<? extends IExpr, ? extends IExpr> map, int offset) {
+		super();
+		this.fFunction = x -> {
+			IExpr subst = map.get(x);
+			if (subst != null) {
+				return subst;
+			}
+			return F.NIL;
+		};
 		this.fOffset = offset;
 	}
 
