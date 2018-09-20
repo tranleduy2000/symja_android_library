@@ -23,6 +23,12 @@ android {
 
 }
 
+repositories {
+    maven {
+        url  "https://dl.bintray.com/tranleduy2000/Symja7"
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -32,6 +38,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation project(':symja_android_library')
+//    implementation 'org.matheclipse.android:symja7:1.0.0'
+
     testImplementation 'org.jsoup:jsoup:1.11.2'
     implementation 'com.annimon:stream:1.2.0'
 

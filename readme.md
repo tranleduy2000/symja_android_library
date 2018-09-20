@@ -94,34 +94,26 @@ To get an idea of the kinds of expressions Symja handles, see the [tests in this
 
 ### Gradle Usage
 
-1. Download latest version from https://github.com/tranleduy2000/symja_android_library/releases
-2. Compile project using Android Studio
-- Select ``File`` -> ``New`` -> ``Module``
-- Select ``Import jar/aar package``
-- Enter path of ``*.aar`` has been downloaded and click ``Finish``
-
-3. In your submodule ``gradle`` file, add
-
-```gradle
-dependencies {
-    implementation project(':symja_android_library-release')
-}
-```
-
 ```gradle
 android {
     defaultConfig {
         multiDexEnabled true
     }
 }
+
+dependencies {
+    implementation 'org.matheclipse.android:symja7:+'
+}
 ```
 
-5. To build android app, open ``gradle.properties`` and add this line. This project required ``8GB RAM`` to build
+```gradle
+
+```
+
+To build android app, open ``gradle.properties`` and add this line. This project required ``8GB RAM`` to build
 ```
 org.gradle.jvmargs=-Xmx8192M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
 ```
-
-5. Sync project
 
 ### Github GIT
 
