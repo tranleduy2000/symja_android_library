@@ -127,8 +127,7 @@ public final class ListFunctions {
 		/**
 		 * Convert the integer position number >= 0 into an object
 		 *
-		 * @param position
-		 *            which should be converted to an object
+		 * @param position which should be converted to an object
 		 * @return
 		 */
 		T toObject(int position);
@@ -136,8 +135,7 @@ public final class ListFunctions {
 		/**
 		 * Convert the object into an integer number >= 0
 		 *
-		 * @param position
-		 *            the object which should be converted
+		 * @param position the object which should be converted
 		 * @return -1 if the conversion is not possible
 		 */
 		int toInt(T position);
@@ -1014,11 +1012,9 @@ public final class ListFunctions {
 
 			/**
 			 *
-			 * @param matcher
-			 *            the pattern-matcher
+			 * @param matcher          the pattern-matcher
 			 * @param resultCollection
-			 * @param maximumResults
-			 *            maximum number of results. -1 for for no limitation
+			 * @param maximumResults   maximum number of results. -1 for for no limitation
 			 */
 			public CasesPatternMatcherFunctor(final PatternMatcher matcher, IASTAppendable resultCollection,
 											  int maximumResults) {
@@ -1052,11 +1048,9 @@ public final class ListFunctions {
 
 			/**
 			 *
-			 * @param function
-			 *            the funtion which should determine the results
+			 * @param function         the funtion which should determine the results
 			 * @param resultCollection
-			 * @param maximumResults
-			 *            maximum number of results. -1 for for no limitation
+			 * @param maximumResults   maximum number of results. -1 for for no limitation
 			 */
 			public CasesRulesFunctor(final Function<IExpr, IExpr> function, IASTAppendable resultCollection,
 									 int maximumResults) {
@@ -1353,7 +1347,12 @@ public final class ListFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.head().equals(F.Composition)) {
-				return F.NIL;
+				return ast.remove(new Predicate<IExpr>() {
+                    @Override
+                    public boolean test(IExpr x) {
+                        return x.equals(F.Identity);
+                    }
+                });
 			}
 			if (ast.head().isAST()) {
 
@@ -1852,10 +1851,8 @@ public final class ListFunctions {
 		 * Drop (remove) the list elements according to the <code>sequenceSpecifications</code> for the list indexes.
 		 *
 		 * @param list
-		 * @param level
-		 *            recursion level
-		 * @param sequenceSpecifications
-		 *            one or more ISequence specifications
+		 * @param level                  recursion level
+		 * @param sequenceSpecifications one or more ISequence specifications
 		 * @return
 		 */
 		private static IAST drop(final IASTAppendable list, final int level, final ISequence[] sequenceSpecifications) {
@@ -1975,14 +1972,12 @@ public final class ListFunctions {
 		}
 
 		/**
-		 * Traverse all <code>list</code> element's and filter out the elements in the given <code>positions</code>
-		 * list.
+		 * Traverse all <code>list</code> element's and filter out the elements in the given <code>positions</code> list.
 		 *
 		 * @param list
 		 * @param positions
-		 * @param positionConverter
-		 *            the <code>positionConverter</code> creates an <code>int</code> value from the given position
-		 *            objects in <code>positions</code>.
+		 * @param positionConverter the <code>positionConverter</code> creates an <code>int</code> value from the given position objects in
+		 *                          <code>positions</code>.
 		 * @param headOffset
 		 */
 		private static IExpr extract(final IAST list, final IAST positions,
@@ -2221,12 +2216,9 @@ public final class ListFunctions {
 		/**
 		 * Create the (ordered) intersection set from both ASTs.
 		 *
-		 * @param ast1
-		 *            first AST set
-		 * @param ast2
-		 *            second AST set
-		 * @param result
-		 *            the AST where the elements of the union should be appended
+		 * @param ast1   first AST set
+		 * @param ast2   second AST set
+		 * @param result the AST where the elements of the union should be appended
 		 * @return
 		 */
 		public static IExpr intersection(IAST ast1, IAST ast2, final IASTAppendable result) {
@@ -3137,9 +3129,8 @@ public final class ListFunctions {
 	private final static class Position extends AbstractCoreFunctionEvaluator {
 
 		/**
-		 * Add the positions to the <code>resultCollection</code> where the matching expressions appear in
-		 * <code>list</code>. The <code>positionConverter</code> converts the <code>int</code> position into an object
-		 * for the <code>resultCollection</code>.
+		 * Add the positions to the <code>resultCollection</code> where the matching expressions appear in <code>list</code>. The
+		 * <code>positionConverter</code> converts the <code>int</code> position into an object for the <code>resultCollection</code>.
 		 *
 		 * @param list
 		 * @param prototypeList
@@ -4370,8 +4361,8 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>start</code> to <code>stop</code>,
-	 * incrementing by <code>step</code>.
+	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>start</code> to <code>stop</code>, incrementing by
+	 * <code>step</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -4456,12 +4447,9 @@ public final class ListFunctions {
 		 * Generate a table from standard iterator notation.
 		 *
 		 * @param ast
-		 * @param resultList
-		 *            the result list to which the generated expressions should be appended.
-		 * @param defaultValue
-		 *            the default value used in the iterator
-		 * @param engine
-		 *            the current evaluation engine
+		 * @param resultList   the result list to which the generated expressions should be appended.
+		 * @param defaultValue the default value used in the iterator
+		 * @param engine       the current evaluation engine
 		 * @return <code>F.NIL</code> if no evaluation is possible
 		 */
 		protected static IExpr evaluateTable(final IAST ast, final IAST resultList, IExpr defaultValue,
@@ -4513,16 +4501,12 @@ public final class ListFunctions {
 		}
 
 		/**
-		 * Evaluate only the last iterator in <code>iter</code> for <code>Sum()</code> or <code>Product()</code>
-		 * function calls.
+		 * Evaluate only the last iterator in <code>iter</code> for <code>Sum()</code> or <code>Product()</code> function calls.
 		 *
 		 * @param expr
-		 * @param iter
-		 *            the iterator function
-		 * @param resultList
-		 *            the result list to which the generated expressions should be appended.
-		 * @param defaultValue
-		 *            the default value used if the iterator is invalid
+		 * @param iter         the iterator function
+		 * @param resultList   the result list to which the generated expressions should be appended.
+		 * @param defaultValue the default value used if the iterator is invalid
 		 * @return <code>F.NIL</code> if no evaluation is possible
 		 * @see Product
 		 * @see Sum
@@ -4575,8 +4559,7 @@ public final class ListFunctions {
 		}
 
 		/**
-		 * Determine all local variables of the iterators starting with index <code>2</code> in the given
-		 * <code>ast</code>.
+		 * Determine all local variables of the iterators starting with index <code>2</code> in the given <code>ast</code>.
 		 *
 		 * @param ast
 		 * @return
@@ -4601,13 +4584,11 @@ public final class ListFunctions {
 		}
 
 		/**
-		 * Disable the <code>Reap() and Sow()</code> mode temporary and evaluate an expression for the given &quot;local
-		 * variables list&quot;. If evaluation is not possible return the input object.
+		 * Disable the <code>Reap() and Sow()</code> mode temporary and evaluate an expression for the given &quot;local variables
+		 * list&quot;. If evaluation is not possible return the input object.
 		 *
-		 * @param expr
-		 *            the expression which should be evaluated
-		 * @param localVariablesList
-		 *            a list of symbols which should be used as local variables inside the block
+		 * @param expr               the expression which should be evaluated
+		 * @param localVariablesList a list of symbols which should be used as local variables inside the block
 		 * @return the evaluated object
 		 */
 		public static IExpr evalBlockWithoutReap(IExpr expr, IAST localVariablesList) {
@@ -4819,10 +4800,8 @@ public final class ListFunctions {
 		 * Take the list elements according to the <code>sequenceSpecifications</code> for the list indexes.
 		 *
 		 * @param list
-		 * @param level
-		 *            recursion level
-		 * @param sequenceSpecifications
-		 *            one or more ISequence specifications
+		 * @param level                  recursion level
+		 * @param sequenceSpecifications one or more ISequence specifications
 		 * @return
 		 */
 		public IAST take(final IAST list, final int level, final ISequence[] sequenceSpecifications) {
@@ -5069,12 +5048,11 @@ public final class ListFunctions {
 	}
 
 	/**
-	 * Fold the list from <code>start</code> index including to <code>end</code> index excluding into the
-	 * <code>resultCollection</code>. If the <i>binaryFunction</i> returns <code>null</code>, the left element will be
-	 * added to the result list, otherwise the result will be <i>folded</i> again with the next element in the list.
+	 * Fold the list from <code>start</code> index including to <code>end</code> index excluding into the <code>resultCollection</code>.
+	 * If the <i>binaryFunction</i> returns <code>null</code>, the left element will be added to the result list, otherwise the result
+	 * will be <i>folded</i> again with the next element in the list.
 	 *
-	 * @param expr
-	 *            initial value. If <code>null</code>use first element of list as initial value.
+	 * @param expr             initial value. If <code>null</code>use first element of list as initial value.
 	 * @param list
 	 * @param start
 	 * @param end

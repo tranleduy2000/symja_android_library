@@ -17,26 +17,25 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- *
  * <p>
  * (I)nterface for the (A)bstract (S)yntax (T)ree of a given function.
  * </p>
- *
  * <p>
- * In Symja, an abstract syntax tree (AST), is a tree representation of the abstract syntactic structure of the Symja
- * source code. Each node of the tree denotes a construct occurring in the source code. The syntax is 'abstract' in the
- * sense that it does not represent every detail that appears in the real syntax. For instance, grouping parentheses are
- * implicit in the tree structure, and a syntactic construct such as a <code>Sin(x)</code> expression will be denoted by
- * an AST with 2 nodes. One node for the header <code>Sin</code> and one node for the argument <code>x</code>.
+ * <p>
+ * In Symja, an abstract syntax tree (AST), is a tree representation of the abstract syntactic structure of the Symja source code.
+ * Each node of the tree denotes a construct occurring in the source code. The syntax is 'abstract' in the sense that it does not
+ * represent every detail that appears in the real syntax. For instance, grouping parentheses are implicit in the tree structure,
+ * and a syntactic construct such as a <code>Sin(x)</code> expression will be denoted by an AST with 2 nodes. One node for the
+ * header <code>Sin</code> and one node for the argument <code>x</code>.
  * </p>
- *
+ * <p>
  * Internally an AST is represented as a list which contains
  * <ul>
- * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index
- * <code>0</code> and</li>
+ * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index <code>0</code>
+ * and</li>
  * <li>the <code>n</code> arguments of a function in the index <code>1 to n</code></li>
  * </ul>
- *
+ * <p>
  * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a>,
  * <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed acyclic graph</a>
  */
@@ -138,6 +137,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     void addEvalFlags(int i);
 
 //	public final int DEFER_AST = 0x00020000;
+
     /**
      * Create a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied) and add the
      * <code>expr</code> at the given <code>position</code>.
@@ -446,8 +446,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * the result elements for which the function returns non-null elements to the <code>0th element</code> of the
      * result array, or otherwise append it to the <code>1st element</code> of the result array.
      *
-	 * @param function
-	 *            the function which filters each argument in this AST by returning a <code>result != F.NIL</code> .
+     * @param function the function which filters each argument in this AST by returning a <code>result != F.NIL</code> .
      * @return the resulting ASTs in the 0-th and 1-st element of the array
      */
     IASTAppendable[] filter(final Function<IExpr, IExpr> function);
@@ -1027,6 +1026,14 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      *             if {@code location < 0 || >= size()}
      */
     // public IExpr remove(int location);
+
+    /**
+     * Removes all objects which satisfy the given predicate.
+     *
+     * @param predicate
+     * @return <code>F.NIL</code> if no element could be removed
+     */
+    public IASTAppendable remove(Predicate<? super IExpr> predicate);
 
     /**
      * Create a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied) and remove the

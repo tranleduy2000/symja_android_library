@@ -352,16 +352,19 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 			return true;
 		}
 		if (fSymbolsOrPattern != null) {
-			return substitutedExpr.isFree(x -> {
-				final int length = fSymbolsOrPattern.length;
-				for (int i = 0; i < length; i++) {
-					// compare object references with operator '==' here !
-					if (fSymbolsOrPattern[i] == x) {
-							return false;
-						}
-					}
-					return true;
-			}, true);
+			return substitutedExpr.isFree(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    final int length = fSymbolsOrPattern.length;
+                    for (int i = 0; i < length; i++) {
+                        // compare object references with operator '==' here !
+                        if (fSymbolsOrPattern[i] == x) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }, true);
 
 		}
 		return true;
@@ -382,9 +385,12 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 		final IExpr temp = substitutePatternOrSymbols(expr).orElse(expr);
 		final IASTMutable test = (IASTMutable) F.unaryAST1(patternTest, null);
 		if (temp.isSequence()) {
-			return ((IAST) temp).forAll((x, i) -> {
+			return ((IAST) temp).forAll(new ObjIntPredicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x, int i) {
 					test.set(1, x);
 					return engine.evalTrue(test);
+				}
 			}, 1);
 		}
 		test.set(1, temp);
@@ -443,21 +449,24 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 */
 	protected IExpr substitutePatternOrSymbols(final IExpr lhsPatternExpr) {
 		if (fSymbolsOrPatternValues != null) {
-			IExpr result = lhsPatternExpr.replaceAll(input -> {
+			IExpr result = lhsPatternExpr.replaceAll(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr input) {
 					if (input instanceof IPatternObject) {
-					IExpr symbolOrPatternObject = ((IPatternObject) input).getSymbol();
-					if (symbolOrPatternObject == null) {
-						symbolOrPatternObject = input;
-								}
-					final int length = fSymbolsOrPattern.length;
-							for (int i = 0; i < length; i++) {
-						// compare object references with operator '==' here !
-						if (symbolOrPatternObject == fSymbolsOrPattern[i]) {
-							return fSymbolsOrPatternValues[i] != null ? fSymbolsOrPatternValues[i] : F.NIL;
+						IExpr symbolOrPatternObject = ((IPatternObject) input).getSymbol();
+						if (symbolOrPatternObject == null) {
+							symbolOrPatternObject = input;
+						}
+						final int length = fSymbolsOrPattern.length;
+						for (int i = 0; i < length; i++) {
+							// compare object references with operator '==' here !
+							if (symbolOrPatternObject == fSymbolsOrPattern[i]) {
+								return fSymbolsOrPatternValues[i] != null ? fSymbolsOrPatternValues[i] : F.NIL;
 							}
 						}
 					}
 					return F.NIL;
+				}
 			});
 
 			if (result.isPresent()) {
@@ -490,19 +499,22 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 */
 	protected IExpr substituteSymbols(final IExpr rhsExpr) {
 		if (fSymbolsOrPatternValues != null) {
-			return rhsExpr.replaceAll((IExpr input) -> {
+			return rhsExpr.replaceAll(new Function<IExpr, IExpr>() {
+										  @Override
+										  public IExpr apply(IExpr input) {
 											  if (input.isSymbol()) {
 												  final ISymbol symbol = (ISymbol) input;
-					final int length = fSymbolsOrPattern.length;
+												  final int length = fSymbolsOrPattern.length;
 												  for (int i = 0; i < length; i++) {
-						// compare object references with operator '==' here !
-						if (symbol == fSymbolsOrPattern[i]) {
-							return fSymbolsOrPatternValues[i] != null ? fSymbolsOrPatternValues[i] : F.NIL;
+													  // compare object references with operator '==' here !
+													  if (symbol == fSymbolsOrPattern[i]) {
+														  return fSymbolsOrPatternValues[i] != null ? fSymbolsOrPatternValues[i] : F.NIL;
 													  }
 												  }
 											  }
 											  return F.NIL;
 										  }
+									  }
 
 			).orElse(rhsExpr);
 		}
