@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A read-eval-print loop console for Symja syntax math expressions.
- * <p>
+ *
  * See {@link MMAConsole}
  */
 public class Console {

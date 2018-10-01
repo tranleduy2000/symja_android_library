@@ -608,8 +608,8 @@ public class MMAConsole {
 	// }
 
 	/**
-	 * Get the default rules textfile name, which should be loaded at startup. This file replaces the default built-in
-	 * System.mep resource stream.
+	 * Get the default rules textfile name, which should be loaded at startup. This file replaces the default built-in System.mep
+	 * resource stream.
 	 *
 	 * @return default rules textfile name
 	 */

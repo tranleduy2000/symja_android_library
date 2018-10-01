@@ -346,10 +346,8 @@ public final class ListFunctions {
 
 		/**
 		 *
-		 * @param iter
-		 *            the current Iterator index
-		 * @param index
-		 *            index
+		 * @param iter  the current Iterator index
+		 * @param index index
 		 * @return
 		 */
 		private IExpr createGenericTable(final IIterator<IExpr> iter, final int index, final int allocationHint,
@@ -894,7 +892,6 @@ public final class ListFunctions {
 		private static IExpr arrayPadMatrixAtom(IAST matrix, int[] dim, int m, int n, IExpr atom) {
 			int columnDim = dim[1] + m + n;
 			IASTAppendable result = matrix.copyHead(dim[0] + m + n);
-			IAST row;
 			// prepend m rows
 			result.appendArgs(0, m, new IntFunction<IExpr>() {
                 @Override
@@ -2179,8 +2176,7 @@ public final class ListFunctions {
 	 * See:<br />
 	 * </p>
 	 * <ul>
-	 * <li><a href="http://en.wikipedia.org/wiki/Intersection_(set_theory)">Wikipedia - Intersection (set
-	 * theory)</a></li>
+	 * <li><a href="http://en.wikipedia.org/wiki/Intersection_(set_theory)">Wikipedia - Intersection (set theory)</a></li>
 	 * </ul>
 	 */
 	private final static class Intersection extends AbstractFunctionEvaluator {
@@ -3238,8 +3234,7 @@ public final class ListFunctions {
 	 * </blockquote>
 	 * <h3>Examples</h3>
 	 * <p>
-	 * <code>Prepend</code> is similar to <code>Append</code>, but adds <code>item</code> to the beginning of
-	 * <code>expr</code>:
+	 * <code>Prepend</code> is similar to <code>Append</code>, but adds <code>item</code> to the beginning of <code>expr</code>:
 	 * </p>
 	 *
 	 * <pre>
@@ -5012,12 +5007,9 @@ public final class ListFunctions {
 		/**
 		 * Create the (ordered) union from both ASTs.
 		 *
-		 * @param ast1
-		 *            first AST set
-		 * @param ast2
-		 *            second AST set
-		 * @param result
-		 *            the AST where the elements of the union should be appended
+		 * @param ast1   first AST set
+		 * @param ast2   second AST set
+		 * @param result the AST where the elements of the union should be appended
 		 * @return
 		 */
 		public static IExpr union(IAST ast1, IAST ast2, final IASTAppendable result) {

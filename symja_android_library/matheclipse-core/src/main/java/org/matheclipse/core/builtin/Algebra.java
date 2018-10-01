@@ -1136,8 +1136,7 @@ public class Algebra {
 			/**
 			 *
 			 * @param ast
-			 * @param evalParts
-			 *            evaluate the determined numerator and denominator parts
+			 * @param evalParts evaluate the determined numerator and denominator parts
 			 * @return
 			 */
 			private IExpr expandAST(final IAST ast, boolean evalParts) {
@@ -2481,8 +2480,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code> modulus the
-	 * <code>prime</code> integer.
+	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code> modulus the <code>prime</code>
+	 * integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -3052,14 +3051,10 @@ public class Algebra {
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1 + c*Slot1^2</code>.
 		 *
-		 * @param a
-		 *            coefficient a of the polynomial
-		 * @param b
-		 *            coefficient b of the polynomial
-		 * @param c
-		 *            coefficient c of the polynomial
-		 * @param nthRoot
-		 *            <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
+		 * @param a       coefficient a of the polynomial
+		 * @param b       coefficient b of the polynomial
+		 * @param c       coefficient c of the polynomial
+		 * @param nthRoot <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
 		 * @return
 		 */
 		private static IExpr root2(IExpr a, IExpr b, IExpr c, int nthRoot) {
@@ -4249,10 +4244,8 @@ public class Algebra {
 	 * for the given expressions <code>numeratorPolynomial</code> and <code>denominatorPolynomial</code>.
 	 *
 	 *
-	 * @param numeratorPolynomial
-	 *            a <code>BigRational</code> polynomial which could be converted to JAS polynomial
-	 * @param denominatorPolynomial
-	 *            a <code>BigRational</code> polynomial which could be converted to JAS polynomial
+	 * @param numeratorPolynomial   a <code>BigRational</code> polynomial which could be converted to JAS polynomial
+	 * @param denominatorPolynomial a <code>BigRational</code> polynomial which could be converted to JAS polynomial
 	 * @return <code>null</code> if the expressions couldn't be converted to JAS polynomials or gcd equals 1
 	 * @throws JASConversionException
 	 */
