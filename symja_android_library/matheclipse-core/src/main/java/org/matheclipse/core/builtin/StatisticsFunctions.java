@@ -748,8 +748,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			// Validate.checkSize(ast, 3);
-			// 2 args
 			return F.NIL;
 		}
 

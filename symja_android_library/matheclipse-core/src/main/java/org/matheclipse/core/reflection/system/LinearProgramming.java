@@ -10,9 +10,6 @@ import org.hipparchus.optim.linear.PivotSelectionRule;
 import org.hipparchus.optim.linear.Relationship;
 import org.hipparchus.optim.linear.SimplexSolver;
 import org.hipparchus.optim.nonlinear.scalar.GoalType;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.matheclipse.core.convert.Expr2Object;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -23,6 +20,9 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * <pre>
@@ -91,7 +91,7 @@ public class LinearProgramming extends AbstractFunctionEvaluator {
 		Validate.checkSize(ast, 4);
 		try {
 			if (ast.arg1().isList() && ast.arg2().isList() && ast.arg3().isList()) {
-				double[] arg1D = Expr2Object.toDoubleVector((IAST) ast.arg1());
+				double[] arg1D =   ast.arg1().toDoubleVector();
 				LinearObjectiveFunction f = new LinearObjectiveFunction(arg1D, 0);
 				Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
 

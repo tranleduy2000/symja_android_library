@@ -243,8 +243,9 @@ public class Product extends ListFunctions.Table implements ProductRules {
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 		newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.DELAYED_RULE_EVALUATION);
-		IAST ruleList;
-		if ((ruleList = getRuleAST()) != null) {
+		if (getRuleAST() != null) {
+			// don't call EvalEngine#addRules() here!
+			// the rules should add themselves
 //			EvalEngine.get().addRules(ruleList);
 		}
 	}

@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -34,16 +34,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class Console {
 
+	/**
+	 * 60 seconds timeout limit as the default value for Symja expression evaluation.
+	 */
+	private long fSeconds = 60;
+
     private final static int OUTPUTFORM = 0;
     private final static int JAVAFORM = 1;
     private final static int TRADITIONALFORM = 2;
     private final static int PRETTYFORM = 3;
     private final static int INPUTFORM = 4;
-    private static int COUNTER = 1;
-    /**
-     * 60 seconds timeout limit as the default value for Symja expression evaluation.
-     */
-    private long fSeconds = 60;
+
     private int fUsedForm = OUTPUTFORM;
     private ExprEvaluator fEvaluator;
     private OutputFormFactory fOutputFactory;
@@ -58,19 +59,7 @@ public class Console {
     // private File fFile;
     private String fDefaultSystemRulesFilename;
 
-    /**
-     * Create a console which appends each evaluation output in a history list.
-     */
-    public Console() {
-        fEvaluator = new ExprEvaluator(false, 100);
-        DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat decimalFormat = new DecimalFormat("0.0####", usSymbols);
-        fOutputFactory = OutputFormFactory.get(true, false, decimalFormat);
-        fEvaluator.getEvalEngine().setFileSystemEnabled(true);
-        fOutputTraditionalFactory = OutputFormFactory.get(true, false, decimalFormat);
-        fInputFactory = OutputFormFactory.get(true, false, decimalFormat);
-        fInputFactory.setQuotes(true);
-    }
+	private static int COUNTER = 1;
 
     public static void main(final String args[]) {
         F.initSymbols(null, null, true);
@@ -205,6 +194,15 @@ public class Console {
         }
     }
 
+	private String resultPrinter(String inputExpression) {
+		String outputExpression = interpreter(inputExpression);
+		if (outputExpression.length() > 0) {
+			System.out.println("Out[" + COUNTER + "]: " + outputExpression);
+			System.out.flush();
+		}
+		return outputExpression;
+	}
+
     // private void prettyPrinter(String inputExpression) {
     // System.out.println();
     // String[] outputExpression = prettyPrinter3Lines(inputExpression);
@@ -273,39 +271,24 @@ public class Console {
     // }
 
     /**
-     * @param fileContent
-     * @param extension   the file extension i.e. *.svg *.html
+	 * Create a console which appends each evaluation output in a history list.
      */
-    private static void openInBrowser(String fileContent, String extension) {
-        File temp;
-        try {
-            temp = File.createTempFile("document", ".htm");
-            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            out.write(fileContent);
-            out.close();
-
-            System.out.println(temp.toURI().toString());
-
-//            java.awt.Desktop.getDesktop().browse(temp.toURI());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+	public Console() {
+		fEvaluator = new ExprEvaluator(false, 100);
+		DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
+		DecimalFormat decimalFormat = new DecimalFormat("0.0####", usSymbols);
+		fOutputFactory = OutputFormFactory.get(true, false, decimalFormat);
+		fEvaluator.getEvalEngine().setFileSystemEnabled(true);
+		fOutputTraditionalFactory = OutputFormFactory.get(true, false, decimalFormat);
+		fInputFactory = OutputFormFactory.get(true, false, decimalFormat);
+		fInputFactory.setQuotes(true);
     }
-
-    private String resultPrinter(String inputExpression) {
-        String outputExpression = interpreter(inputExpression);
-        if (outputExpression.length() > 0) {
-            System.out.println("Out[" + COUNTER + "]: " + outputExpression);
-            System.out.flush();
-        }
-        return outputExpression;
-    }
-
 
     /**
      * Sets the arguments for the <code>main</code> method
      *
-     * @param args the arguments of the program
+	 * @param args
+	 *            the arguments of the program
      */
     private void setArgs(final String args[]) {
         String function = null;
@@ -338,14 +321,14 @@ public class Console {
                     if (function != null) {
                         StringBuilder inputExpression = new StringBuilder(1024);
                         inputExpression.append(function);
-                        inputExpression.append("(");
+						inputExpression.append('(');
                         for (int j = i + 1; j < args.length; j++) {
                             if (j != i + 1) {
                                 inputExpression.append(", ");
                             }
                             inputExpression.append(args[j]);
                         }
-                        inputExpression.append(")");
+						inputExpression.append(')');
                         String outputExpression = interpreter(inputExpression.toString());
                         if (outputExpression.length() > 0) {
                             System.out.print(outputExpression);
@@ -465,6 +448,38 @@ public class Console {
         return buf.toString();
     }
 
+	private String printResult(IExpr result) throws IOException {
+		if (result.equals(F.Null)) {
+			return "";
+		}
+		switch (fUsedForm) {
+		case JAVAFORM:
+			return result.internalJavaString(false, -1, false, true, false);
+		case TRADITIONALFORM:
+			StringBuilder traditionalBuffer = new StringBuilder();
+			fOutputTraditionalFactory.reset();
+			fOutputTraditionalFactory.convert(traditionalBuffer, result);
+			return traditionalBuffer.toString();
+		case PRETTYFORM:
+			ASCIIPrettyPrinter3 prettyBuffer = new ASCIIPrettyPrinter3();
+			prettyBuffer.convert(result);
+			System.out.println();
+			String[] outputExpression = prettyBuffer.toStringBuilder();
+			ASCIIPrettyPrinter3.prettyPrinter(System.out, outputExpression, "Out[" + COUNTER + "]: ");
+			return "";
+		case INPUTFORM:
+			StringBuilder inputBuffer = new StringBuilder();
+			fInputFactory.reset();
+			fInputFactory.convert(inputBuffer, result);
+			return inputBuffer.toString();
+		default:
+			StringBuilder strBuffer = new StringBuilder();
+			fOutputFactory.reset();
+			fOutputFactory.convert(strBuffer, result);
+			return strBuffer.toString();
+		}
+	}
+
     // private String[] prettyPrinter3Lines(final String inputExpression) {
     // IExpr result;
     //
@@ -513,44 +528,14 @@ public class Console {
     // strArray[2] = "";
     // return strArray;
     // }
-    private String printResult(IExpr result) throws IOException {
-        if (result.equals(F.Null)) {
-            return "";
-        }
-        switch (fUsedForm) {
-            case JAVAFORM:
-                return result.internalJavaString(false, -1, false, true, false);
-            case TRADITIONALFORM:
-                StringBuilder traditionalBuffer = new StringBuilder();
-                fOutputTraditionalFactory.reset();
-                fOutputTraditionalFactory.convert(traditionalBuffer, result);
-                return traditionalBuffer.toString();
-            case PRETTYFORM:
-                ASCIIPrettyPrinter3 prettyBuffer = new ASCIIPrettyPrinter3();
-                prettyBuffer.convert(result);
-                System.out.println();
-                String[] outputExpression = prettyBuffer.toStringBuilder();
-                ASCIIPrettyPrinter3.prettyPrinter(System.out, outputExpression, "Out[" + COUNTER + "]: ");
-                return "";
-            case INPUTFORM:
-                StringBuilder inputBuffer = new StringBuilder();
-                fInputFactory.reset();
-                fInputFactory.convert(inputBuffer, result);
-                return inputBuffer.toString();
-            default:
-                StringBuilder strBuffer = new StringBuilder();
-                fOutputFactory.reset();
-                fOutputFactory.convert(strBuffer, result);
-                return strBuffer.toString();
-        }
-    }
-
 
     /**
      * prints a prompt on the console but doesn't print a newline
      *
      * @param out
-     * @param prompt the prompt string to display
+	 * @param prompt
+	 *            the prompt string to display
+	 *
      */
 
     public void printPrompt(final PrintStream out, final String prompt) {
@@ -566,7 +551,7 @@ public class Console {
 
     public String readString() {
         final StringBuilder input = new StringBuilder();
-        final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")));
+		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
         boolean done = false;
 
         try {
@@ -591,6 +576,21 @@ public class Console {
         return input.toString();
     }
 
+	/**
+	 * read a string from the console. The string is terminated by a newline
+	 *
+	 * @param prompt
+	 *            the prompt string to display
+	 * @param out
+	 *            Description of Parameter
+	 * @return the input string (without the newline)
+	 */
+
+	public String readString(final PrintStream out, final String prompt) {
+		printPrompt(out, prompt);
+		return readString();
+	}
+
     /**
      * @param file
      */
@@ -606,19 +606,6 @@ public class Console {
     // }
 
     /**
-     * read a string from the console. The string is terminated by a newline
-     *
-     * @param prompt the prompt string to display
-     * @param out    Description of Parameter
-     * @return the input string (without the newline)
-     */
-
-    public String readString(final PrintStream out, final String prompt) {
-        printPrompt(out, prompt);
-        return readString();
-    }
-
-    /**
      * Get the default rules textfile name, which should be loaded at startup. This file replaces the default built-in
      * System.mep resource stream.
      *
@@ -627,6 +614,28 @@ public class Console {
     public String getDefaultSystemRulesFilename() {
         return fDefaultSystemRulesFilename;
     }
+
+	/**
+	 *
+	 * @param fileContent
+	 * @param extension
+	 *            the file extension i.e. *.svg *.html
+	 */
+	private static void openInBrowser(String fileContent, String extension) {
+		File temp;
+		try {
+			temp = File.createTempFile("document", ".htm");
+			BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+			out.write(fileContent);
+			out.close();
+
+			System.out.println(temp.toURI().toString());
+
+//			java.awt.Desktop.getDesktop().browse(temp.toURI());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
     // private static void openURL(String url) {
     // if (Desktop.isDesktopSupported()) {

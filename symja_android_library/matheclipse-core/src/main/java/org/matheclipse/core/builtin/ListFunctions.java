@@ -620,8 +620,8 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns an <code>n</code>-by-<code>m</code> matrix created by applying <code>f</code> to indices ranging from
-	 * <code>(a, b)</code> to <code>(a + n, b + m)</code>.
+	 * returns an <code>n</code>-by-<code>m</code> matrix created by applying <code>f</code> to indices ranging from <code>(a, b)</code>
+	 * to <code>(a + n, b + m)</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -631,8 +631,7 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns an expression with the specified dimensions and index origins, with head <code>h</code> (instead of
-	 * <code>List</code>).
+	 * returns an expression with the specified dimensions and index origins, with head <code>h</code> (instead of <code>List</code>).
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -1654,8 +1653,7 @@ public final class ListFunctions {
 
 			/**
 			 *
-			 * @param matcher
-			 *            the pattern-matcher
+			 * @param matcher the pattern-matcher
 			 */
 			public DeleteCasesPatternMatcherFunctor(final IPatternMatcher matcher) {
 				this.matcher = matcher;
@@ -2546,8 +2544,7 @@ public final class ListFunctions {
 	 * </p>
 	 * </blockquote>
 	 * <p>
-	 * Level 0 corresponds to the whole expression. A negative level <code>-n</code> consists of parts with depth
-	 * <code>n</code>.
+	 * Level 0 corresponds to the whole expression. A negative level <code>-n</code> consists of parts with depth <code>n</code>.
 	 * </p>
 	 * <h3>Examples</h3>
 	 * <p>
@@ -4192,8 +4189,7 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * splits <code>list</code> into collections of consecutive elements that give the same result when <code>f</code>
-	 * is applied.
+	 * splits <code>list</code> into collections of consecutive elements that give the same result when <code>f</code> is applied.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -4350,8 +4346,7 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>1</code> to <code>n</code>, returning a list
-	 * of the results.
+	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>1</code> to <code>n</code>, returning a list of the results.
 	 * </p>
 	 * </blockquote>
 	 *
