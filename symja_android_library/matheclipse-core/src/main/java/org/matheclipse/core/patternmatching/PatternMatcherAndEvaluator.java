@@ -46,10 +46,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	/**
 	 * Define a pattern-matching rule.
 	 * 
-	 * @param leftHandSide
-	 *            could contain pattern expressions for "pattern-matching"
-	 * @param rightHandSide
-	 *            the result which should be evaluated if the "pattern-matching" succeeds
+	 * @param leftHandSide  could contain pattern expressions for "pattern-matching"
+	 * @param rightHandSide the result which should be evaluated if the "pattern-matching" succeeds
 	 */
 	public PatternMatcherAndEvaluator(final IExpr leftHandSide, final IExpr rightHandSide) {
 		this(ISymbol.RuleType.SET_DELAYED, leftHandSide, rightHandSide);
@@ -58,12 +56,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	/**
 	 * ine a pattern-matching rule.
 	 * 
-	 * @param setSymbol
-	 *            the symbol which defines this pattern-matching rule (i.e. Set, SetDelayed,...)
-	 * @param leftHandSide
-	 *            could contain pattern expressions for "pattern-matching"
-	 * @param rightHandSide
-	 *            the result which should be evaluated if the "pattern-matching" succeeds
+	 * @param setSymbol     the symbol which defines this pattern-matching rule (i.e. Set, SetDelayed,...)
+	 * @param leftHandSide  could contain pattern expressions for "pattern-matching"
+	 * @param rightHandSide the result which should be evaluated if the "pattern-matching" succeeds
 	 */
 	public PatternMatcherAndEvaluator(final ISymbol.RuleType setSymbol, final IExpr leftHandSide,
 			final IExpr rightHandSide) {
@@ -340,7 +335,10 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
 	@Override
 	public String toString() {
+		if (fPatternMap == null) {
 		return getAsAST().toString();
+	}
+		return fPatternMap.toString() + "\n" + getAsAST().toString();
 	}
 
 	@Override
