@@ -10,6 +10,7 @@ import static org.matheclipse.core.expression.F.Derivative;
 import static org.matheclipse.core.expression.F.EasterSunday;
 import static org.matheclipse.core.expression.F.ElementData;
 import static org.matheclipse.core.expression.F.Eliminate;
+import static org.matheclipse.core.expression.F.ExpToTrig;
 import static org.matheclipse.core.expression.F.Export;
 import static org.matheclipse.core.expression.F.FindInstance;
 import static org.matheclipse.core.expression.F.FindRoot;
@@ -71,6 +72,7 @@ public final class FunctionDefinitions {
 		ElementData.setEvaluator(new org.matheclipse.core.data.ElementData());
 		Eliminate.setEvaluator(new org.matheclipse.core.reflection.system.Eliminate());
 		Export.setEvaluator(new org.matheclipse.core.reflection.system.Export());
+		ExpToTrig.setEvaluator(new org.matheclipse.core.reflection.system.ExpToTrig());
 		FindInstance.setEvaluator(new org.matheclipse.core.reflection.system.FindInstance());
 		FindRoot.setEvaluator(new org.matheclipse.core.reflection.system.FindRoot());
 		FrobeniusSolve.setEvaluator(new org.matheclipse.core.reflection.system.FrobeniusSolve());

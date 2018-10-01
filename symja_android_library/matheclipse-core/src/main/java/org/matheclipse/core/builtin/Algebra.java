@@ -3535,6 +3535,28 @@ public class Algebra {
 					}
 
 					try {
+						temp = F.eval(F.TrigToExp(expr));
+						count = fComplexityFunction.apply(temp);
+						if (count < minCounter) {
+							minCounter = count;
+							result = temp;
+						}
+					} catch (WrongArgumentType wat) {
+						//
+					}
+
+					try {
+						temp = F.eval(F.ExpToTrig(expr));
+						count = fComplexityFunction.apply(temp);
+						if (count < minCounter) {
+							minCounter = count;
+							result = temp;
+						}
+					} catch (WrongArgumentType wat) {
+						//
+					}
+
+					try {
 						temp = F.eval(F.Together(expr));
 						count = fComplexityFunction.apply(temp);
 						if (count < minCounter) {
@@ -4818,6 +4840,17 @@ public class Algebra {
 	// return F.NIL;
 	// }
 
+	/**
+	 * Returns an AST with head <code>Plus</code>, which contains the partial fraction decomposition of the numerator
+	 * and denominator parts.
+	 *
+	 * @param pf
+	 *            partial fraction generator
+	 * @param parts
+	 * @param variable
+	 *            a variable
+	 * @return <code>F.NIL</code> if the partial fraction decomposition wasn't constructed
+	 */
 	public static IExpr partialFractionDecompositionRational(IPartialFractionGenerator pf, IExpr[] parts,
 			IExpr variable) {
 		return partialFractionDecompositionRational(pf, parts, F.List(variable));
