@@ -157,6 +157,9 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 		if (!isConditionMatchedSequence(sequence, patternMap)) {
 			return false;
 		}
+		if (sequence.size() == 1 && !isNullSequence()) {
+			return false;
+		}
 
 		IExpr value = patternMap.getValue(this);
 		if (value != null) {

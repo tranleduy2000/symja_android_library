@@ -134,7 +134,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      *
      * @param i
      */
-    void addEvalFlags(int i);
+    IAST addEvalFlags(int i);
 
 //	public final int DEFER_AST = 0x00020000;
 

@@ -674,6 +674,41 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"0");
 	}
 
+	public void testBlankSequence() {
+		check("f(x__,y__,z__):={x,y,z}/;Print({x},{y},{z})", //
+				"");
+		check("f(a,b,c,d,e)", "f(a,b,c,d,e)");
+		// print the possible matches
+//		{a}{b}{c,d,e}
+//		{a}{b,c}{d,e}
+//		{a,b}{c}{d,e}
+//		{a}{b,c,d}{e}
+//		{a,b}{c,d}{e}
+//		{a,b,c}{d}{e}
+		System.out.println("-------------");
+		check("g(x___,y___,z___):={x,y,z}/;Print({x},{y},{z})", //
+				"");
+		check("g(a,b,c,d,e)", "g(a,b,c,d,e)");
+		// print the possible matches
+//		{}{}{a,b,c,d,e}
+//		{a}{b}{c,d,e}
+//		{}{a,b,c}{d,e}
+//		{a}{b,c}{d,e}
+//		{a,b}{c}{d,e}
+//		{a,b,c}{}{d,e}
+//		{}{a,b,c,d}{e}
+//		{a}{b,c,d}{e}
+//		{a,b}{c,d}{e}
+//		{a,b,c}{d}{e}
+//		{a,b,c,d}{}{e}
+//		{}{a,b,c,d,e}{}
+//		{a}{b,c,d,e}{}
+//		{a,b}{c,d,e}{}
+//		{a,b,c}{d,e}{}
+//		{a,b,c,d}{e}{}
+//		{a,b,c,d,e}{}{}
+	}
+
 	public void testBlock() {
 		// http://oeis.org/A005132 - Recaman's sequence
 		check("f(s_List) := Block({a = s[[-1]], len = Length@s}, Append(s, If(a > len && !MemberQ(s, a - len), a - len, a + len))); Nest(f, {0}, 70)", //
@@ -8900,8 +8935,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testReplaceList() {
 		// TODO
-		// check("ReplaceList({a, b, c, d, e, f, g}, {x__, y__, z__} :> {{x},{y},{z}})", //
-		// "{{a},{a, b},{a,b,c},{b},{b,c},{c}}");
+//		 check("ReplaceList({a, b, c, d, e, f}, {x__, y__, z__} :> {{x},{y},{z}})", //
+//		  "");
 	}
 
 	public void testReplaceTransformations() {
