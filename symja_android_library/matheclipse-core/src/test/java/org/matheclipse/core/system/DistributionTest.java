@@ -15,6 +15,8 @@ public class DistributionTest extends AbstractTestCase {
 	public void testChiSquareDistribution() {
 		check("Mean(ChiSquareDistribution(v))", //
 				"v");
+		check("StandardDeviation(ChiSquareDistribution(v))", //
+				"Sqrt(2)*Sqrt(v)");
 		check("Variance(ChiSquareDistribution(v))", //
 				"2*v");
 		check("CDF(ChiSquareDistribution(v))", //
@@ -26,6 +28,9 @@ public class DistributionTest extends AbstractTestCase {
 				"Piecewise({{GammaRegularized(v/2,0,k/2),k>0}},0)");
 		check("PDF(ChiSquareDistribution(v), k)", //
 				"Piecewise({{1/(2^(v/2)*E^(k/2)*Gamma(v/2)*k^(1-v/2)),k>0}},0)");
+		// TODO
+//		check("Skewness(ChiSquareDistribution(v))", //
+//				"");
 	}
 
 	public void testErlangDistribution() {
@@ -46,6 +51,9 @@ public class DistributionTest extends AbstractTestCase {
 	public void testFRatioDistribution() {
 		check("Mean(FRatioDistribution(n, m))", //
 				"Piecewise({{m/(-2+m),m>2}},Indeterminate)");
+		// TODO distribute Sqrt over Piecewise
+		check("StandardDeviation(FRatioDistribution(n, m))", //
+				"Sqrt(Piecewise({{(2*m^2*(-2+m+n))/((-4+m)*(-2+m)^2*n),m>4}},Indeterminate))");
 		check("Variance(FRatioDistribution(n, m))", //
 				"Piecewise({{(2*m^2*(-2+m+n))/((-4+m)*(-2+m)^2*n),m>4}},Indeterminate)");
 		check("CDF(FRatioDistribution(n, m))", //
@@ -53,6 +61,9 @@ public class DistributionTest extends AbstractTestCase {
 		check("PDF(FRatioDistribution(n, m))", //
 				"Piecewise({{(m^(m/2)*n^(n/2)*(m+n*#1)^(1/2*(-m-n)))/(Beta(n/2,m/2)*#1^(1-n/2)),#1>\n" +
 				"0}},0)&");
+		// TODO
+		// check("Skewness(FRatioDistribution(n, m))", //
+		// "");
 	}
 
 	public void testFrechetDistribution() {
