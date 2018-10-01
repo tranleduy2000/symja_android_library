@@ -1,10 +1,6 @@
 package org.matheclipse.core.expression;
 
-import java.io.ObjectStreamException;
-import java.util.Map;
 import com.duy.lambda.Predicate;
-
-import javax.annotation.Nonnull;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -15,6 +11,11 @@ import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.PatternMap;
+
+import java.io.ObjectStreamException;
+import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 /**
  * A pattern with assigned &quot;pattern name&quot; (i.e. <code>x_</code>)
@@ -80,7 +81,7 @@ public class Pattern extends Blank {
 	}
 
 	@Override
-	public int[] addPattern(PatternMap patternMap, Map<IExpr, Integer> patternIndexMap) {
+	public int[] addPattern(PatternMap patternMap, Set<IExpr> patternIndexMap) {
 		patternMap.addPattern(patternIndexMap, this);
 		int[] result = new int[2];
 		if (isPatternDefault() || isPatternOptional()) {

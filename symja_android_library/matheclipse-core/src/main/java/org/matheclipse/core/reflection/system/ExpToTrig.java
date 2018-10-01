@@ -1,5 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.Function;
+
 import org.matheclipse.core.builtin.Structure;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -37,12 +39,15 @@ public class ExpToTrig extends AbstractEvaluator {
 			}
 
 			IExpr arg1 = ast.arg1();
-			temp = arg1.replaceAll(x -> {
-				if (x.isPower() && x.base().equals(F.E)) {
-					IExpr exponent = x.exponent();
-					return F.Plus(F.Cosh(exponent), F.Sinh(exponent));
+			temp = arg1.replaceAll(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x) {
+					if (x.isPower() && x.base().equals(F.E)) {
+						IExpr exponent = x.exponent();
+						return F.Plus(F.Cosh(exponent), F.Sinh(exponent));
+					}
+					return F.NIL;
 				}
-				return F.NIL;
 			});
 			if (temp.isPresent()) {
 				return F.evalExpandAll(temp, engine);

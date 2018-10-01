@@ -1,7 +1,5 @@
 package org.matheclipse.core.expression;
 
-import java.util.Collection;
-import java.util.Map;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
@@ -20,6 +18,10 @@ import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * A concrete pattern sequence implementation (i.e. x__)
  * 
@@ -32,8 +34,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	private static final long serialVersionUID = 2773651826316158627L;
 
 	/**
-	 * @param nullAllowed
-	 *            TODO
+	 * @param nullAllowed TODO
 	 * 
 	 */
 	public static PatternSequence valueOf(final ISymbol symbol, final IExpr check, final boolean def,
@@ -84,7 +85,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	@Override
-	public int[] addPattern(PatternMap patternMap, Map<IExpr, Integer> patternIndexMap) {
+	public int[] addPattern(PatternMap patternMap, Set<IExpr> patternIndexMap) {
 		patternMap.addPattern(patternIndexMap, this);
 		// the ast contains a pattern sequence (i.e. "x__")
 		int[] result = new int[2];
@@ -309,8 +310,8 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	/**
-	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
-	 * integer as this expression is canonical less than, equal to, or greater than the specified expression.
+	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive integer as this
+	 * expression is canonical less than, equal to, or greater than the specified expression.
 	 */
 	@Override
 	public int compareTo(final IExpr expr) {

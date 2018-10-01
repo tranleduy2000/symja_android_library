@@ -1663,7 +1663,7 @@ public class Algebra {
 	 * </code>
 	 * </pre>
 	 */
-	public static class Factor extends AbstractFunctionEvaluator {
+	private static class Factor extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1679,7 +1679,6 @@ public class Algebra {
 				return result;
 			}
 			VariablesSet eVar = new VariablesSet(ast.arg1());
-			// List<IExpr> varList = r;
 			List<IExpr> varList = eVar.getVarList().copyTo();
 			IExpr expr = ast.arg1();
 			if (ast.isAST1() && !ast.arg1().isTimes() && !ast.arg1().isPower()) {
@@ -1701,7 +1700,6 @@ public class Algebra {
 				}
 			}
 
-			// ASTRange r = new ASTRange(eVar.getVarList(), 1);
 			try {
 
 				if (ast.isAST2()) {

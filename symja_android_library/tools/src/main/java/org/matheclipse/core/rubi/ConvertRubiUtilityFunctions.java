@@ -1,14 +1,6 @@
 package org.matheclipse.core.rubi;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import com.duy.lambda.Consumer;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
@@ -19,6 +11,16 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Convert the Rubi UtilityFunctions from <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - Indefinite Integration
@@ -81,7 +83,12 @@ public class ConvertRubiUtilityFunctions {
 
 			if (expr.isAST(F.CompoundExpression)) {
 				IAST ast=(IAST)expr;
-				ast.forEach(x->convertExpr(x, buffer, last, functionSet));
+				ast.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						convertExpr(x, buffer, last, functionSet);
+					}
+				});
 			} else {
 				convertExpr(expr, buffer, last, functionSet);
 			}

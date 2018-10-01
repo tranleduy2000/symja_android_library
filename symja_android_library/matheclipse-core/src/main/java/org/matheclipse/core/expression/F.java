@@ -1145,9 +1145,7 @@ public class F {
     /** HoldPattern(expr) - `HoldPattern` doesn't evaluate `expr` for pattern-matching. */
 	public final static IBuiltInSymbol HoldPattern = F.initFinalSymbol("HoldPattern", ID.HoldPattern);
 
-	/**
-	 * HoldRest - is an attribute specifying that all but the first argument of a function should be left unevaluated.
-	 */
+	/** HoldRest - is an attribute specifying that all but the first argument of a function should be left unevaluated. */
 	public final static IBuiltInSymbol HoldRest = F.initFinalSymbol("HoldRest", ID.HoldRest);
 
 	/***/
@@ -1329,9 +1327,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol JacobiZeta = F.initFinalSymbol("JacobiZeta", ID.JacobiZeta);
 
-	/**
-	 * JavaForm(expr) - returns the Symja Java form of the `expr`. In Java you can use the created Symja expressions.
-	 */
+	/** JavaForm(expr) - returns the Symja Java form of the `expr`. In Java you can use the created Symja expressions. */
 	public final static IBuiltInSymbol JavaForm = F.initFinalSymbol("JavaForm", ID.JavaForm);
 
 	/** Join(l1, l2) - concatenates the lists `l1` and `l2`.*/
@@ -1876,9 +1872,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Pattern = F.initFinalSymbol("Pattern", ID.Pattern);
 
-	/**
-	 * PatternTest(pattern, test) - constrains `pattern` to match `expr` only if the evaluation of `test(expr)` yields `True`.
-	 */
+	/** PatternTest(pattern, test) - constrains `pattern` to match `expr` only if the evaluation of `test(expr)` yields `True`. */
 	public final static IBuiltInSymbol PatternTest = F.initFinalSymbol("PatternTest", ID.PatternTest);
 
 	/**
@@ -2192,9 +2186,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol RootOf = F.initFinalSymbol("RootOf", ID.RootOf);
 
-	/**
-	 * Roots(polynomial-equation, var) - determine the roots of a univariate polynomial equation with respect to the variable `var`.
-	 */
+	/** Roots(polynomial-equation, var) - determine the roots of a univariate polynomial equation with respect to the variable `var`. */
 	public final static IBuiltInSymbol Roots = F.initFinalSymbol("Roots", ID.Roots);
 
 	/** RotateLeft(list) - rotates the items of `list` by one item to the left.*/
@@ -2354,9 +2346,7 @@ public class F {
 	/** Split(list) - splits `list` into collections of consecutive identical elements.*/
 	public final static IBuiltInSymbol Split = F.initFinalSymbol("Split", ID.Split);
 
-	/**
-	 * SplitBy(list, f) - splits `list` into collections of consecutive elements that give the same result when `f` is applied.
-	 */
+	/** SplitBy(list, f) - splits `list` into collections of consecutive elements that give the same result when `f` is applied. */
 	public final static IBuiltInSymbol SplitBy = F.initFinalSymbol("SplitBy", ID.SplitBy);
 
 	/** Sqrt(expr) - returns the square root of `expr`.*/
@@ -2612,9 +2602,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Undefined = F.initFinalSymbol("Undefined", ID.Undefined);
 
-	/**
-	 * Unequal(x, y) - yields `False` if `x` and `y` are known to be equal, or `True` if `x` and `y` are known to be unequal.
-	 */
+	/** Unequal(x, y) - yields `False` if `x` and `y` are known to be equal, or `True` if `x` and `y` are known to be unequal. */
 	public final static IBuiltInSymbol Unequal = F.initFinalSymbol("Unequal", ID.Unequal);
 
 	/***/
@@ -2631,9 +2619,7 @@ public class F {
     /** UnitConvert(quantity) - convert the `quantity` to the base unit*/
     public final static IBuiltInSymbol UnitConvert = F.initFinalSymbol("UnitConvert", ID.UnitConvert);
 
-	/**
-	 * UnitStep(expr) - returns `0`, if `expr` is less than `0` and returns `1`, if `expr` is greater equal than `0`.
-	 */
+	/** UnitStep(expr) - returns `0`, if `expr` is less than `0` and returns `1`, if `expr` is greater equal than `0`. */
 	public final static IBuiltInSymbol UnitStep = F.initFinalSymbol("UnitStep", ID.UnitStep);
 
 	/** UnitVector(position) - returns a unit vector with element `1` at the given `position`.*/

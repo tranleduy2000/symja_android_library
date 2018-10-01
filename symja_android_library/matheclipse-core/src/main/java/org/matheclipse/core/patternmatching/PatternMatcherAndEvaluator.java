@@ -1,6 +1,5 @@
 package org.matheclipse.core.patternmatching;
 
-import org.matheclipse.core.builtin.Programming;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ConditionException;
 import org.matheclipse.core.eval.exception.ReturnException;
@@ -26,6 +25,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	private static final long serialVersionUID = 2241135467123931061L;
 
 	private IExpr fRightHandSide;
+
+	private transient IExpr fReturnResult = F.NIL;
 
 	/**
 	 * Leaf count of the right-hand-side of this matcher if it's a <code>Condition()</code> or
@@ -97,6 +98,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		PatternMatcherAndEvaluator v = (PatternMatcherAndEvaluator) super.clone();
 		v.fRightHandSide = fRightHandSide;
 		v.fSetSymbol = fSetSymbol;
+		v.fReturnResult = F.NIL;
 		return v;
 	}
 
@@ -147,8 +149,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	}
 
 	/**
-	 * Check if the condition for the right-hand-sides <code>Module[], With[] or Condition[]</code> expressions
-	 * evaluates to <code>true</code>.
+	 * Check if the condition for the right-hand-sides <code>Module[], With[] or Condition[]</code> expressions evaluates to
+	 * <code>true</code>.
 	 * 
 	 * @return <code>true</code> if the right-hand-sides condition is fulfilled.
 	 */
@@ -165,13 +167,15 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		if (!patternMap.isAllPatternsAssigned()) {
 				matched = true;
 			} else {
-		IExpr substConditon = patternMap.substituteSymbols(fRightHandSide);
-		if (substConditon.isCondition()) {
-					matched = Programming.checkCondition(substConditon.first(), substConditon.second(), engine);
-				} else if (substConditon.isModule()) {
-					matched = Programming.checkModuleCondition(substConditon.first(), substConditon.second(), engine);
-				} else if (substConditon.isWith()) {
-					matched = Programming.checkWithCondition(substConditon.first(), substConditon.second(), engine);
+				IExpr rhs = patternMap.substituteSymbols(fRightHandSide);
+				try {
+					fReturnResult = engine.evaluate(rhs);
+					matched = true;
+				} catch (final ConditionException e) {
+					matched = false;
+				} catch (final ReturnException e) {
+					fReturnResult = e.getValue();
+					matched = true;
 				}
 		}
 		}
@@ -229,6 +233,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 				}
 			}
 
+				if (fReturnResult.isPresent()) {
+					return fReturnResult;
+				}
 			IExpr result = patternMap.substituteSymbols(fRightHandSide);
 			try {
 				// System.out.println(result.toString());

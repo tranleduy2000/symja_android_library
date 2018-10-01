@@ -1,8 +1,8 @@
 package org.matheclipse.core.interfaces;
 
-import java.util.Map;
-
 import org.matheclipse.core.patternmatching.PatternMap;
+
+import java.util.Set;
 
 /**
  * Interface for pattern objects (i.e. _, x_, x__)
@@ -13,13 +13,11 @@ public interface IPatternObject extends IExpr {
 	/**
 	 * Add this pattern to the given <code>patternMap</code> and <code>patternIndexMap</code>.
 	 * 
-	 * @param patternMap
-	 *            a map from a pattern to a possibly found value during pattern-matching.
-	 * @param patternIndexMap
-	 *            a map from the pattern symbol to the intern array index
+	 * @param patternMap      a map from a pattern to a possibly found value during pattern-matching.
+	 * @param patternIndexMap a map from the pattern symbol to the intern array index
 	 * @return
 	 */
-	public int[] addPattern(PatternMap patternMap, Map<IExpr, Integer> patternIndexMap);
+	public int[] addPattern(PatternMap patternMap, Set<IExpr> patternIndexMap);
 
 	/**
 	 * Check if the two left-hand-side pattern expressions are equivalent. (i.e. <code>f[x_,y_]</code> is equivalent to
@@ -50,8 +48,7 @@ public interface IPatternObject extends IExpr {
 	/**
 	 * Get the pattern-matchers index in the <code>PatternMap</code>
 	 * 
-	 * @param pm
-	 *            the PatternMap from which we determine the index.
+	 * @param pm the PatternMap from which we determine the index.
 	 * @return
 	 */
 	public int getIndex(PatternMap pm);
@@ -66,10 +63,8 @@ public interface IPatternObject extends IExpr {
 	/**
 	 * Check if this pattern object matches the given <code>expr</code>.
 	 * 
-	 * @param expr
-	 *            the expression which should be matched.
-	 * @param patternMap
-	 *            a map from a pattern to a possibly found value during pattern-matching.
+	 * @param expr       the expression which should be matched.
+	 * @param patternMap a map from a pattern to a possibly found value during pattern-matching.
 	 * 
 	 * @return
 	 */
