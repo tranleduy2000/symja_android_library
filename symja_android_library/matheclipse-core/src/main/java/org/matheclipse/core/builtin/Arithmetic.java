@@ -2660,8 +2660,8 @@ public final class Arithmetic {
          * Calculate <code>interval({lower, upper}) ^ exponent</code>.
          * </p>
          * <p>
-		 * See: <a href= "https://de.wikipedia.org/wiki/Intervallarithmetik#Elementare_Funktionen"> Intervallarithmetik - Elementare
-		 * Funktionen</a>
+		 * See: <a href= "https://de.wikipedia.org/wiki/Intervallarithmetik#Elementare_Funktionen"> Intervallarithmetik
+		 * - Elementare Funktionen</a>
          * </p>
          *
          * @param interval
@@ -2898,8 +2898,10 @@ public final class Arithmetic {
 
         /**
          *
-		 * @param arg1 a number
-		 * @param arg2 must be a <code>DirectedInfinity[...]</code> expression
+		 * @param arg1
+		 *            a number
+		 * @param arg2
+		 *            must be a <code>DirectedInfinity[...]</code> expression
          * @return
          */
         private IExpr e2NumberDirectedInfinity(final INumber arg1, final IAST arg2) {
@@ -4985,7 +4987,7 @@ public final class Arithmetic {
                     int base = iter.key();
 				IExpr exponent = iter.value();
                     if (base != 1) {
-					times1.append(F.Power(F.ZZ(base), F.Expand.of(exponent)));
+					times1.append(F.Power(F.ZZ(base), F.evalExpand(exponent)));
                     }
                 }
                 return times1;

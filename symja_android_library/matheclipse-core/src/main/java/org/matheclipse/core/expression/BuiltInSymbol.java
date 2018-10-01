@@ -233,7 +233,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 			return coreFunction.evaluate(ast, engine);
 		}
 
-		return engine.evaluate(F.ast(args, this));
+		return super.of(engine, args);
 	}
 
 	/** {@inheritDoc} */
@@ -246,8 +246,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 			return coreFunction.evalArg1Boole(args[0], engine);
 		}
 		}
-		IAST ast = F.ast(args, this);
-		return engine.evalTrue(ast);
+		return super.ofQ(engine, args);
 	}
 
 	/** {@inheritDoc} */

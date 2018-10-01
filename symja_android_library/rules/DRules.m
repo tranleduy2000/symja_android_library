@@ -22,10 +22,13 @@
   D(FresnelC(f_),x_NotListQ):=D(f,x)*Cos((Pi*f^2)/2),
   D(FresnelS(f_),x_NotListQ):=D(f,x)*Sin((Pi*f^2)/2),
   D(Gamma(f_),x_NotListQ):=D(f,x)*Gamma(f)*PolyGamma(f),
+  D(HarmonicNumber(f_),x_NotListQ):=D(f,x)*(Pi^2)/6 - HarmonicNumber(f, 2),
   D(HeavisideTheta(f_),x_NotListQ):=D(f,x)*DiracDelta(f),
   D(IntegerPart(f_),x_NotListQ):=0,
   D(InverseErf(f_),x_NotListQ):=D(f,x)*(1/2*Sqrt(Pi)*E^(InverseErf(f)^2)),
+  D(InverseErfc(f_),x_NotListQ):=D(f,x)*(-(1/2))*E^InverseErfc(f)^2*Sqrt(Pi),
   D(Log(f_),x_NotListQ):=D(f,x)*f^(-1),
+  D(LogGamma(f_),x_NotListQ):=D(f,x)*PolyGamma(0,f),
   D(LogisticSigmoid(f_),x_NotListQ):=D(f,x)*LogisticSigmoid(f)*(1-LogisticSigmoid(f)),
   D(PolyGamma(f_),x_NotListQ):=D(f,x)*PolyGamma(1,f),
   D(Cot(f_),x_NotListQ):=D(f,x)*(-1)*Csc(f)^2,
@@ -100,5 +103,6 @@
     
   
   D(BesselJ(f_, g_),x_NotListQ):= 1/2*(BesselJ(-1+f, g)-BesselJ(1+f, g))*D(g,x)+D(f,x)*Derivative(1,0)[BesselJ][f,g],
-  D(ProductLog(f_, g_),x_NotListQ):= ProductLog(f,g)*D(g,x)/(g*(1+ProductLog(f,g)))+D(f,x)*Derivative(1,0)[ProductLog][f,g] 
+  D(PolyLog(f_, g_),x_NotListQ):= (PolyLog(-1 + f, g)*D(g,x))/g + D(f,x)*Derivative(1, 0)[PolyLog][f, g],
+  D(ProductLog(f_, g_),x_NotListQ):= ProductLog(f,g)*D(g,x)/(g*(1+ProductLog(f,g)))+D(f,x)*Derivative(1,0)[ProductLog][f,g]
 }
