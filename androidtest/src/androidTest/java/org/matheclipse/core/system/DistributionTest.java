@@ -12,6 +12,27 @@ public class DistributionTest extends AbstractTestCase {
 				"{Piecewise({{1,1/4>1-x}},0),Piecewise({{1,1/2>1-x}},0),Piecewise({{1,3/4>1-x}},0)}");
 	}
 
+	public void testChiSquareDistribution() {
+		check("Mean(ChiSquareDistribution(v))", //
+				"v");
+		check("StandardDeviation(ChiSquareDistribution(v))", //
+				"Sqrt(2)*Sqrt(v)");
+		check("Variance(ChiSquareDistribution(v))", //
+				"2*v");
+		check("CDF(ChiSquareDistribution(v))", //
+				"Piecewise({{GammaRegularized(v/2,0,#1/2),#1>0}},0)&");
+		check("PDF(ChiSquareDistribution(v))", //
+				"Piecewise({{1/(2^(v/2)*E^(#1/2)*Gamma(v/2)*#1^(1-v/2)),#1>0}},0)&");
+
+		check("CDF(ChiSquareDistribution(v), k)", //
+				"Piecewise({{GammaRegularized(v/2,0,k/2),k>0}},0)");
+		check("PDF(ChiSquareDistribution(v), k)", //
+				"Piecewise({{1/(2^(v/2)*E^(k/2)*Gamma(v/2)*k^(1-v/2)),k>0}},0)");
+		// TODO
+//		check("Skewness(ChiSquareDistribution(v))", //
+//				"");
+	}
+
 	public void testErlangDistribution() {
 		check("Mean(ErlangDistribution(n, m))", //
 				"n/m");
@@ -25,6 +46,24 @@ public class DistributionTest extends AbstractTestCase {
 				"1/x");
 		check("Quantile(ExponentialDistribution(x), {1/4, 1/2, 3/4})", //
 				"{Log(4/3)/x,Log(2)/x,Log(4)/x}");
+	}
+
+	public void testFRatioDistribution() {
+		check("Mean(FRatioDistribution(n, m))", //
+				"Piecewise({{m/(-2+m),m>2}},Indeterminate)");
+		// TODO distribute Sqrt over Piecewise
+		check("StandardDeviation(FRatioDistribution(n, m))", //
+				"Sqrt(Piecewise({{(2*m^2*(-2+m+n))/((-4+m)*(-2+m)^2*n),m>4}},Indeterminate))");
+		check("Variance(FRatioDistribution(n, m))", //
+				"Piecewise({{(2*m^2*(-2+m+n))/((-4+m)*(-2+m)^2*n),m>4}},Indeterminate)");
+		check("CDF(FRatioDistribution(n, m))", //
+				"Piecewise({{BetaRegularized((n*#1)/(m+n*#1),n/2,m/2),#1>0}},0)&");
+		check("PDF(FRatioDistribution(n, m))", //
+				"Piecewise({{(m^(m/2)*n^(n/2)*(m+n*#1)^(1/2*(-m-n)))/(Beta(n/2,m/2)*#1^(1-n/2)),#1>\n" +
+				"0}},0)&");
+		// TODO
+		// check("Skewness(FRatioDistribution(n, m))", //
+		// "");
 	}
 
 	public void testFrechetDistribution() {
