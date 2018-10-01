@@ -2,7 +2,7 @@ package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.patternmatching.PatternMap;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Interface for pattern objects (i.e. _, x_, x__)
@@ -17,7 +17,7 @@ public interface IPatternObject extends IExpr {
 	 * @param patternIndexMap a map from the pattern symbol to the intern array index
 	 * @return
 	 */
-	public int[] addPattern(PatternMap patternMap, Set<IExpr> patternIndexMap);
+	public int[] addPattern(PatternMap patternMap, List<IExpr> patternIndexMap);
 
 	/**
 	 * Check if the two left-hand-side pattern expressions are equivalent. (i.e. <code>f[x_,y_]</code> is equivalent to

@@ -13,7 +13,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.PatternMap;
 
 import java.io.ObjectStreamException;
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -81,7 +81,7 @@ public class Pattern extends Blank {
 	}
 
 	@Override
-	public int[] addPattern(PatternMap patternMap, Set<IExpr> patternIndexMap) {
+	public int[] addPattern(PatternMap patternMap, List<IExpr> patternIndexMap) {
 		patternMap.addPattern(patternIndexMap, this);
 		int[] result = new int[2];
 		if (isPatternDefault() || isPatternOptional()) {

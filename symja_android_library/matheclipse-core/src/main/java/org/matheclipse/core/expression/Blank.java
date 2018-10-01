@@ -21,8 +21,8 @@ import org.matheclipse.core.visit.IVisitorLong;
 
 import java.io.ObjectStreamException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A &quot;blank pattern&quot; with no assigned &quot;pattern name&quot; (i.e. &quot;<code>_</code>&quot;)
@@ -111,7 +111,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	}
 
 	@Override
-	public int[] addPattern(PatternMap patternMap, Set<IExpr> patternIndexMap) {
+	public int[] addPattern(PatternMap patternMap, List<IExpr> patternIndexMap) {
 		patternMap.addPattern(patternIndexMap, this);
 		int[] result = new int[2];
 		if (isPatternDefault() || isPatternOptional()) {

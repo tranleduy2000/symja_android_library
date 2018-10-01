@@ -19,8 +19,8 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A concrete pattern sequence implementation (i.e. x__)
@@ -85,7 +85,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	@Override
-	public int[] addPattern(PatternMap patternMap, Set<IExpr> patternIndexMap) {
+	public int[] addPattern(PatternMap patternMap, List<IExpr> patternIndexMap) {
 		patternMap.addPattern(patternIndexMap, this);
 		// the ast contains a pattern sequence (i.e. "x__")
 		int[] result = new int[2];
