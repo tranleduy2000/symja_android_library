@@ -429,6 +429,7 @@ public class ExprEvaluator {
 		if (inputExpression != null) {
 			// F.join();
 			EvalEngine.set(engine);
+			try {
 			engine.reset();
 			fExpr = engine.parse(inputExpression);
 			if (fExpr != null) {
@@ -461,6 +462,9 @@ public class ExprEvaluator {
 					}
 					return F.Null;
 				}
+			}
+			} finally {
+				EvalEngine.remove();
 			}
 		}
 		return null;

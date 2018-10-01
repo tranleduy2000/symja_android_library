@@ -169,6 +169,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 			} else {
 				IExpr rhs = patternMap.substituteSymbols(fRightHandSide);
 				try {
+//					System.out.println(rhs.toString());
 					fReturnResult = engine.evaluate(rhs);
 					matched = true;
 				} catch (final ConditionException e) {
@@ -197,7 +198,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 				IExpr result = fRightHandSide;
 				try {
 					if (evaluate) {
-					return F.eval(result);
+						return engine.evaluate(result);
 					}
 					return result;
 				} catch (final ConditionException e) {
@@ -240,7 +241,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 			try {
 				// System.out.println(result.toString());
 				if (evaluate) {
-				result = F.eval(result);
+						result = engine.evaluate(result);
 				}
 					return result;
 			} catch (final ConditionException e) {
