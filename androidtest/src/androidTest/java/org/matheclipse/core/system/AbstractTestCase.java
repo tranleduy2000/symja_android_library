@@ -45,7 +45,7 @@ public abstract class AbstractTestCase extends TestCase {
             }
 
             // scriptEngine.put("STEPWISE",Boolean.TRUE);
-            String evaledResult = (String) evals(scriptEngine, evalString);
+            String evaledResult = evals(scriptEngine, evalString);
             if (resultLength > 0 && evaledResult.length() > resultLength) {
                 evaledResult = evaledResult.substring(0, resultLength) + "<<SHORT>>";
                 assertEquals(expectedResult, evaledResult);
@@ -167,7 +167,7 @@ public abstract class AbstractTestCase extends TestCase {
 
                 fNumericScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
                 fNumericScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
-                F.join();
+				F.await();
 
                 EvalEngine engine = EvalEngine.get();
                 engine.setRecursionLimit(256);

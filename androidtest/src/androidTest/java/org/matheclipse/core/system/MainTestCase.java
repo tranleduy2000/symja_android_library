@@ -39,14 +39,16 @@ public class MainTestCase extends AbstractTestCase {
             // scriptEngine.put("STEPWISE",Boolean.TRUE);
             scriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
             scriptEngine.put("ENABLE_HISTORY", Boolean.TRUE);
+
+            String evaledResult;
             final Throwable[] exceptions = new Throwable[1];
-            final String[] evaledResult = new String[1];
+            final String[] evaledResults = new String[1];
             ThreadGroup group = new ThreadGroup("CalculateThread");
             Thread thread = new Thread(group, new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        evaledResult[0] = (String) scriptEngine.eval(evalString);
+                        evaledResults[0] = (String) scriptEngine.eval(evalString);
                     } catch (Throwable e) {
                         exceptions[0] = e;
                     }
@@ -58,7 +60,9 @@ public class MainTestCase extends AbstractTestCase {
                 exceptions[0].printStackTrace();
                 fail(exceptions[0].getMessage());
             }
-            assertEquals(expectedResult, evaledResult[0]);
+            evaledResult = evaledResults[0];
+
+            assertEquals(expectedResult, evaledResult);
         } catch (Exception e) {
             e.printStackTrace();
             assertEquals(e.getMessage(), "");

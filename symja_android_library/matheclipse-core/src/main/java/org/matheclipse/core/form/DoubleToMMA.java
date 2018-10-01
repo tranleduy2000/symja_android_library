@@ -14,7 +14,7 @@ public class DoubleToMMA {
 
 	/**
 	 * Convert a Java <code>double</code> value into a string similar to the Mathematica output format.
-	 * 
+	 *
 	 * @param buf
 	 *            a string builder where the output should be appended
 	 * @param value
@@ -27,7 +27,11 @@ public class DoubleToMMA {
 			throws IOException {
 		String s = String.format(Locale.US, "%16.16E", value);
 		int start = s.indexOf('E');
-		int exp = Integer.parseInt(s.substring(start + 1));
+		String expStr = s.substring(start + 1);
+		if (expStr.startsWith("+")){
+			expStr = expStr.substring(1);
+		}
+		int exp = Integer.parseInt(expStr);
 		if (-exponent <= exp && exp <= exponent) {
 			DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
 			DecimalFormat format;
@@ -89,7 +93,7 @@ public class DoubleToMMA {
 
 	/**
 	 * Convert a Java <code>double</code> value into a string similar to the Mathematica output format.
-	 * 
+	 *
 	 * @param buf
 	 *            a string builder where the output should be appended
 	 * @param value
@@ -125,7 +129,7 @@ public class DoubleToMMA {
 
 	/**
 	 * Convert a Java <code>double</code> value into a string similar to the Mathematica scientific output format.
-	 * 
+	 *
 	 * @param buf
 	 *            a string builder where the output should be appended
 	 * @param value
