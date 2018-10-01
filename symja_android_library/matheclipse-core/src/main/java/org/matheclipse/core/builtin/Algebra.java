@@ -1072,8 +1072,7 @@ public class Algebra {
 	 * a^2*c^2+2*a*b*c^2+b^2*c^2+2*a^2*c*d+4*a*b*c*d+2*b^2*c*d+a^2*d^2+2*a*b*d^2+b^2*d^2+b(1+a)
 	 * </pre>
 	 * <p>
-	 * <code>Expand</code> expands out rational powers by expanding the <code>Floor()</code> part of the rational powers
-	 * number:
+	 * <code>Expand</code> expands out rational powers by expanding the <code>Floor()</code> part of the rational powers number:
 	 * </p>
 	 *
 	 * <pre>
@@ -1283,8 +1282,11 @@ public class Algebra {
 						}
 					}
 
-					try {
-						int exp = Validate.checkPowerExponent(powerAST);
+					int exp = exponent.toIntDefault(Integer.MIN_VALUE);
+					if (exp == Integer.MIN_VALUE) {
+						addExpanded(powerAST);
+						return F.NIL;
+					}
 						IAST plusAST = (IAST) base;
 						if (exp < 0) {
 							if (expandNegativePowers) {
@@ -1296,18 +1298,14 @@ public class Algebra {
 						}
 						return expandPower(plusAST, exp);
 
-					} catch (WrongArgumentType e) {
-						addExpanded(powerAST);
-						return F.NIL;
-					}
 				}
 				addExpanded(powerAST);
 				return F.NIL;
 			}
 
 			/**
-			 * Expand a polynomial power with the multinomial theorem. See
-			 * <a href= "http://en.wikipedia.org/wiki/Multinomial_theorem">Wikipedia - Multinomial theorem</a>
+			 * Expand a polynomial power with the multinomial theorem. See <a href= "http://en.wikipedia.org/wiki/Multinomial_theorem">Wikipedia
+			 * - Multinomial theorem</a>
 			 *
 			 * @param plusAST
 			 * @param n       <code>n &ge; 0</code>
@@ -2064,8 +2062,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * works like <code>Simplify</code> but additionally tries some <code>FunctionExpand</code> rule transformations to
-	 * simplify <code>expr</code>.
+	 * works like <code>Simplify</code> but additionally tries some <code>FunctionExpand</code> rule transformations to simplify
+	 * <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -3911,7 +3909,7 @@ public class Algebra {
 					return F.List(c, F.C1);
 				}
 				if (c.isTimes() && c.first().isNumber()) {
-					return F.List(c.first(), c.rest());
+				return F.List(c.first(), c.rest().getOneIdentity(F.C1));
 				}
 				return F.List(F.C1, c);
 			}
@@ -3983,8 +3981,7 @@ public class Algebra {
 
 		/**
 		 *
-		 * @param plusAST
-		 *            a <code>Plus[...]</code> expresion
+		 * @param plusAST a <code>Plus[...]</code> expresion
 		 * @return <code>null</code> couldn't be transformed by <code>ExpandAll(()</code> od <code>togetherAST()</code>
 		 */
 		private static IExpr togetherPlus(IAST plusAST) {

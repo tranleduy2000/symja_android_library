@@ -1100,9 +1100,7 @@ public class F {
 	/** GreaterEqual(x, y) - yields `True` if `x` is known to be greater than or equal to `y`.*/
 	public final static IBuiltInSymbol GreaterEqual = F.initFinalSymbol("GreaterEqual", ID.GreaterEqual);
 
-	/**
-	 * GroebnerBasis({polynomial-list},{variable-list}) - returns a Gröbner basis for the `polynomial-list` and `variable-list`.
-	 */
+	/** GroebnerBasis({polynomial-list},{variable-list}) - returns a Gröbner basis for the `polynomial-list` and `variable-list`. */
 	public final static IBuiltInSymbol GroebnerBasis = F.initFinalSymbol("GroebnerBasis", ID.GroebnerBasis);
 
     /** GumbelDistribution(a, b) - returns a Gumbel distribution.*/
@@ -1258,9 +1256,7 @@ public class F {
 	/** Integers - is the set of integer numbers.*/
 	public final static IBuiltInSymbol Integers = F.initFinalSymbol("Integers", ID.Integers);
 
-	/**
-	 * Integrate(f, x) - integrates `f` with respect to `x`. The result does not contain the additive integration constant.
-	 */
+	/** Integrate(f, x) - integrates `f` with respect to `x`. The result does not contain the additive integration constant. */
 	public final static IBuiltInSymbol Integrate = F.initFinalSymbol("Integrate", ID.Integrate);
 
 	/** InterpolatingFunction(data-list) - get the representation for the given `data-list` as piecewise `InterpolatingPolynomial`s. */
@@ -7698,28 +7694,6 @@ public class F {
 		StringBuilder buf = new StringBuilder();
 		Documentation.usageDocumentation(buf, symbolName);
 		return F.stringx(buf.toString());
-	}
-	/**
-	 * Get or create a user defined symbol which is retrieved from the evaluation engines context path.
-	 * 
-	 * @param symbolName the name of the symbol
-	 * @return the symbol object from the context path
-	 * @deprecated use {@link #symbol(String)}
-	 */
-	public static ISymbol userSymbol(final String symbolName) {
-		return symbol(symbolName, null, EvalEngine.get());
-	}
-
-	/**
-	 * Get or create a user defined symbol which is retrieved from the evaluation engines context path.
-	 * 
-	 * @param symbolName the name of the symbol
-	 * @param engine     the evaluation engine
-	 * @return the symbol object from the context path
-	 * @deprecated use {@link #symbol(String, EvalEngine)}
-	 */
-	public static ISymbol userSymbol(final String symbolName, EvalEngine engine) {
-		return symbol(symbolName, null, engine);
 	}
 
 	/**

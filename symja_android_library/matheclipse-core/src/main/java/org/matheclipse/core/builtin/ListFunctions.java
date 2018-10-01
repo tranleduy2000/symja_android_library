@@ -2034,7 +2034,7 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.size() == 2) {
+			if (ast.size() == 2 || ast.size() == 3) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				if (arg1.isAST()) {
 					final IAST sublist = (IAST) arg1;
@@ -2043,11 +2043,15 @@ public final class ListFunctions {
 						return sublist.arg1();
 					}
 				}
+				if (ast.size() == 3) {
+					return engine.evaluate(ast.arg2());
+				}
 				engine.printMessage("First: Nonatomic expression expected");
+			} else {
+				engine.printMessage("First: unexpected number of arguments");
+			}
 				return F.NIL;
 			}
-			return Validate.checkSize(ast, 2);
-		}
 	}
 
 	private final static class Fold extends AbstractCoreFunctionEvaluator {
@@ -3621,8 +3625,8 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * replaces parts <code>i</code> and <code>j</code> with <code>e1</code>, and parts <code>k</code> and
-	 * <code>l</code> with <code>e2</code>.
+	 * replaces parts <code>i</code> and <code>j</code> with <code>e1</code>, and parts <code>k</code> and <code>l</code> with
+	 * <code>e2</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -3757,13 +3761,13 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
-
+			if (ast.size() == 2) {
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isAST() && ((IAST) arg1).size() > 1) {
 				return arg1.rest();
 			}
 			engine.printMessage("Rest: Nonatomic expression expected");
+			}
 			return F.NIL;
 		}
 

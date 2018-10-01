@@ -296,8 +296,8 @@ public class RulesData implements Serializable {
 	}
 
 	/**
-	 * Create a pattern hash value for the left-hand-side expression and insert the left-hand-side as a simple pattern
-	 * rule to the <code>fSimplePatternRules</code>.
+	 * Create a pattern hash value for the left-hand-side expression and insert the left-hand-side as a simple pattern rule to the
+	 * <code>fSimplePatternRules</code>.
 	 * 
 	 * @param leftHandSide
 	 * @param pmEvaluator
@@ -313,8 +313,8 @@ public class RulesData implements Serializable {
 	}
 
 	/**
-	 * Create a pattern hash value for the left-hand-side expression and insert the left-hand-side as a simple pattern
-	 * rule to the <code>fSimplePatternRules</code>.
+	 * Create a pattern hash value for the left-hand-side expression and insert the left-hand-side as a simple pattern rule to the
+	 * <code>fSimplePatternRules</code>.
 	 * 
 	 * @param leftHandSide
 	 * @param pmEvaluator
@@ -583,7 +583,7 @@ public class RulesData implements Serializable {
 									.println(" COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
 						}
 					}
-					// if (pmEvaluator.getLHSPriority() == 2218) {
+//					if (pmEvaluator.getLHSPriority() == 6686) {
 					// System.out.println("Debug from this line");
 					// }
 					if (Config.SHOW_STACKTRACE) {
@@ -596,6 +596,10 @@ public class RulesData implements Serializable {
 						// System.out.println("Debug from this line");
 						// }
 					}
+//					System.out.println(pmEvaluator.toString());
+//					System.out.println(">>"+expr);
+
+
 					result = pmEvaluator.eval(expr, engine);
 					if (result.isPresent()) {
 						if (Config.SHOW_STACKTRACE) {

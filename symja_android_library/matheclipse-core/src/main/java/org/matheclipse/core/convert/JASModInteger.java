@@ -165,17 +165,18 @@ public class JASModInteger {
 				}
 				return result;
 			} else if (ast.isPower()) {
-				final IExpr base = ast.arg1();
+				final IExpr base = ast.base();
 				for (int i = 0; i < fVariables.size(); i++) {
 					if (fVariables.get(i).equals(base)) {
-						int exponent = -1;
-						try {
-							exponent = Validate.checkPowerExponent(ast);
-						} catch (WrongArgumentType e) {
-						}
+						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
+//						int exponent = -1;
+//						try {
+//							exponent = Validate.checkPowerExponent(ast);
+//						} catch (WrongArgumentType e) {
+//						}
 						if (exponent < 0) {
 							throw new ArithmeticException(
-									"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
+									"JASConvert:expr2Poly - invalid exponent: " + ast.exponent().toString());
 						}
 						ExpVector e = ExpVector.create(fVariables.size(), i, exponent);
 						return fPolyFactory.valueOf(e);
@@ -230,18 +231,19 @@ public class JASModInteger {
 				}
 				return result;
 			} else if (ast.isPower()) {
-				final IExpr base = ast.arg1();
+				final IExpr base = ast.base();
 				for (int i = 0; i < fVariables.size(); i++) {
 					if (fVariables.get(i).equals(base)) {
-						int exponent = -1;
-						try {
-							exponent = Validate.checkPowerExponent(ast);
-						} catch (WrongArgumentType e) {
-							//
-						}
+						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
+//						int exponent = -1;
+//						try {
+//							exponent = Validate.checkPowerExponent(ast);
+//						} catch (WrongArgumentType e) {
+//							//
+//						}
 						if (exponent < 0) {
 							throw new ArithmeticException(
-									"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
+									"JASConvert:expr2Poly - invalid exponent: " + ast.exponent().toString());
 						}
 						ExpVector e = ExpVector.create(fVariables.size(), i, exponent);
 						return fPolyFactory.getONE().multiply(e);

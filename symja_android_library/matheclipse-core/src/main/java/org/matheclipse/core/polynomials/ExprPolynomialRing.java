@@ -93,7 +93,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	/**
 	 * A default random sequence generator.
 	 */
-	protected final static Random random = ThreadLocalRandom.current();
+	protected final static ThreadLocalRandom random = ThreadLocalRandom.current();
 
 	/**
 	 * Indicator if this ring is a field.
@@ -334,12 +334,13 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 				final IExpr base = ast.base();
 				ix = ExpVectorLong.indexVar(base, getVars());
 				if (ix >= 0) {
-					int exponent = -1;
-					try {
-						exponent = Validate.checkPowerExponent(ast);
-					} catch (WrongArgumentType e) {
-						//
-					}
+					int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
+//					int exponent = -1;
+//					try {
+//						exponent = Validate.checkPowerExponent(ast);
+//					} catch (WrongArgumentType e) {
+//						//
+//					}
 					if (checkNegativeExponents && exponent < 0) {
 						throw new ArithmeticException(
 								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
@@ -583,12 +584,13 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 				IExpr base = ast.base();
 				for (int i = 1; i < vars.size(); i++) {
 					if (vars.get(i).equals(base)) {
-						int exponent = -1;
-						try {
-							exponent = Validate.checkPowerExponent(ast);
-						} catch (WrongArgumentType e) {
-							return false;
-						}
+						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
+//						int exponent = -1;
+//						try {
+//							exponent = Validate.checkPowerExponent(ast);
+//						} catch (WrongArgumentType e) {
+//							return false;
+//						}
 						if (exponent < 0) {
 							return false;
 						}

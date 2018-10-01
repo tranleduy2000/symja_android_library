@@ -32,38 +32,6 @@ public final class Validate {
 	}
 
 	/**
-	 * Get the exponent <code>int</code> value of the <code>ast</code> expressions, which is identified as a
-	 * <code>Power[&lt;something&gt;, exponent]</code> expression. The <code>int</code> value can be determined from an IInteger or INum
-	 * expression.
-	 * 
-	 * @param ast
-	 * @return the exponent <code>int</code> value of the <code>Power[&lt;something&gt;, exponent]</code> expression.
-	 * @throws WrongArgumentType
-	 */
-	public static int checkPowerExponent(final IAST ast) {
-		int result = ast.arg2().toIntDefault(Integer.MIN_VALUE);
-		if (result == Integer.MIN_VALUE) {
-		throw new WrongArgumentType(ast, ast.arg2(), 2,
-				"Trying to convert the argument into an integer exponent: " + ast.arg2());
-	}
-		return result;
-	}
-
-	/**
-	 * Get the exponent <code>long</code> value of the <code>ast</code> expressions, which is identified as a
-	 * <code>Power[&lt;something&gt;, exponent]</code> expression. The <code>long</code> value can be determined from an IInteger or
-	 * INum expression.
-	 * 
-	 * @param ast
-	 * @return the exponent <code>long</code> value of the <code>Power[&lt;something&gt;, exponent]</code> expression.
-	 * @throws WrongArgumentType
-	 */
-	public static long checkLongPowerExponent(final IAST ast) {
-		IExpr arg2 = ast.arg2();
-		return checkLongType(arg2);
-	}
-
-	/**
 	 * Check the argument, if it's a Java {@code long} value.
 	 * 
 	 * @throws WrongArgumentType
@@ -389,8 +357,7 @@ public final class Validate {
 	/**
 	 * If {@code ast.size()-1} is not odd throw a {@code WrongNumberOfArguments} exception.
 	 * 
-	 * @throws WrongNumberOfArguments
-	 *             if {@code ast.size()-1} is not odd
+	 * @throws WrongNumberOfArguments if {@code ast.size()-1} is not odd
 	 */
 	public static IAST checkOdd(IAST ast) {
 		if (((ast.argSize()) & 0x0001) == 0x0000) {
@@ -402,10 +369,8 @@ public final class Validate {
 	/**
 	 * Check if the argument at the given position is a <code>List()</code> (i.e. <code>{...}</code>) object.
 	 * 
-	 * @param position
-	 *            the position which has to be a list.
-	 * @throws WrongArgumentType
-	 *             if it's not a list.
+	 * @param position the position which has to be a list.
+	 * @throws WrongArgumentType if it's not a list.
 	 */
 	public static IAST checkListType(IAST ast, int position) {
 		if (ast.get(position).isList()) {
@@ -518,8 +483,7 @@ public final class Validate {
 	/**
 	 * Check if the argument is a symbol and has an assigned value.
 	 * 
-	 * @param expr
-	 *            the expr which has to be a symbol.
+	 * @param expr the expr which has to be a symbol.
 	 * @return <code>expr</code> if it's a Symbol
 	 * @throws WrongArgumentType if it's not a symbol.
 	 */
