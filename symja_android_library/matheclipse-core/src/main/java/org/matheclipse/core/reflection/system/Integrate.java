@@ -199,7 +199,12 @@ public class Integrate extends AbstractFunctionEvaluator {
 					return F.NIL;
 				}
 				if (arg1.isTimes()) {
-					IAST[] temp = ((IAST) arg1).filter((Predicate<IExpr>) arg -> arg.isFree(x));
+					IAST[] temp = ((IAST) arg1).filter(new Predicate<IExpr>() {
+                        @Override
+                        public boolean test(IExpr arg) {
+                            return arg.isFree(x);
+                        }
+                    });
 					IExpr free = temp[0].getOneIdentity(F.C1);
 					if (!free.isOne()) {
 						IExpr rest = temp[1].getOneIdentity(F.C1);

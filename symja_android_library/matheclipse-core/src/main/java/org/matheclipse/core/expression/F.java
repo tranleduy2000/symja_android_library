@@ -99,9 +99,10 @@ public class F {
 
 	/**
 	 * <p>
-	 * In computing, memoization or memoisation is an optimization technique used primarily to speed up computer programs by storing the
-	 * results of expensive function calls and returning the cached result when the same inputs occur again. This cache is especially
-	 * useed for recursive integer functions to remember the results of the recursive call.
+	 * In computing, memoization or memoisation is an optimization technique used primarily to speed up computer
+	 * programs by storing the results of expensive function calls and returning the cached result when the same inputs
+	 * occur again. This cache is especially useed for recursive integer functions to remember the results of the
+	 * recursive call.
 	 * </p>
 	 * 
 	 * See: <a href="https://en.wikipedia.org/wiki/Memoization">Wikipedia - Memoization</a>
@@ -146,13 +147,13 @@ public class F {
 
 	/**
 	 * <p>
-	 * The constant object <code>NIL</code> (not in list) indicates in the evaluation process that no evaluation was possible (i.e. no
-	 * further definition was found to create a new expression from the existing one).
+	 * The constant object <code>NIL</code> (not in list) indicates in the evaluation process that no evaluation was
+	 * possible (i.e. no further definition was found to create a new expression from the existing one).
 	 * </p>
 	 * <p>
-	 * Almost every modifying method in this class throws an <tt>UnsupportedOperationException</tt>, almost every predicate returns
-	 * <code>false</code>. The main method to check if the object is valid is the <code>isPresent()</code> method. The method is similar
-	 * to <code>java.util.Optional#isPresent()</code>.
+	 * Almost every modifying method in this class throws an <tt>UnsupportedOperationException</tt>, almost every
+	 * predicate returns <code>false</code>. The main method to check if the object is valid is the
+	 * <code>isPresent()</code> method. The method is similar to <code>java.util.Optional#isPresent()</code>.
 	 * </p>
 	 * 
 	 * @see java.util.Optional#isPresent
@@ -183,7 +184,10 @@ public class F {
     /** All - is a possible value for `Span` and `Quiet`. */
 	public final static IBuiltInSymbol All = F.initFinalSymbol("All", ID.All);
 
-	/** AllTrue({expr1, expr2, ...}, test) - returns `True` if all applications of `test` to `expr1, expr2, ...` evaluate to `True`. */
+	/**
+	 * AllTrue({expr1, expr2, ...}, test) - returns `True` if all applications of `test` to `expr1, expr2, ...` evaluate
+	 * to `True`.
+	 */
 	public final static IBuiltInSymbol AllTrue = F.initFinalSymbol("AllTrue", ID.AllTrue);
 
 	/** Alternatives(p1, p2, ..., p_i) - is a pattern that matches any of the patterns `p1, p2,...., p_i`. */
@@ -481,20 +485,30 @@ public class F {
 	public final static IBuiltInSymbol ChebyshevU = F.initFinalSymbol("ChebyshevU", ID.ChebyshevU);
 
 	/**
-	 * ChessboardDistance(u, v) - returns the chessboard distance (also known as Chebyshev distance) between `u` and `v`, which is the
-	 * number of moves a king on a chessboard needs to get from square `u` to square `v`.
+	 * ChessboardDistance(u, v) - returns the chessboard distance (also known as Chebyshev distance) between `u` and
+	 * `v`, which is the number of moves a king on a chessboard needs to get from square `u` to square `v`.
 	 */
 	public final static IBuiltInSymbol ChessboardDistance = F.initFinalSymbol("ChessboardDistance",
 			ID.ChessboardDistance);
 
+	/***/
+	public final static IBuiltInSymbol ChiSquareDistribution = F.initFinalSymbol("ChiSquareDistribution",
+			ID.ChiSquareDistribution);
+
     /** ChineseRemainder({a1, a2, a3,...}, {n1, n2, n3,...}) -  the chinese remainder function.*/
 	public final static IBuiltInSymbol ChineseRemainder = F.initFinalSymbol("ChineseRemainder", ID.ChineseRemainder);
 
-	/** CholeskyDecomposition(matrix) - calculate the Cholesky decomposition of a hermitian, positive definite square `matrix`. */
+	/**
+	 * CholeskyDecomposition(matrix) - calculate the Cholesky decomposition of a hermitian, positive definite square
+	 * `matrix`.
+	 */
 	public final static IBuiltInSymbol CholeskyDecomposition = F.initFinalSymbol("CholeskyDecomposition",
 			ID.CholeskyDecomposition);
 
-	/** Chop(numerical-expr) - replaces numerical values in the `numerical-expr` which are close to zero with symbolic value `0`. */
+	/**
+	 * Chop(numerical-expr) - replaces numerical values in the `numerical-expr` which are close to zero with symbolic
+	 * value `0`.
+	 */
 	public final static IBuiltInSymbol Chop = F.initFinalSymbol("Chop", ID.Chop);
 
 	/** CirclePoints(i) - gives the `i` points on the unit circle for a positive integer `i`.*/
@@ -910,6 +924,10 @@ public class F {
 
 	/** Extract(expr, list) - extracts parts of `expr` specified by `list`.*/
 	public final static IBuiltInSymbol Extract = F.initFinalSymbol("Extract", ID.Extract);
+
+	/***/
+	public final static IBuiltInSymbol FRatioDistribution = F.initFinalSymbol("FRatioDistribution",
+			ID.FRatioDistribution);
 
     /** Factor(expr) - factors the polynomial expression `expr`*/
 	public final static IBuiltInSymbol Factor = F.initFinalSymbol("Factor", ID.Factor);
@@ -6236,6 +6254,10 @@ public class F {
 
 	public static IAST InverseBetaRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return ternaryAST3(InverseBetaRegularized, a0, a1, a2);
+	}
+
+	public static IAST InverseBetaRegularized(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
+		return quaternary(InverseBetaRegularized, a0, a1, a2, a3);
 	}
 
 	public static IAST InverseErf(final IExpr a0) {
