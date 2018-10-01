@@ -21,10 +21,9 @@ import org.matheclipse.core.interfaces.ISymbol;
 import java.util.Map;
 
 /**
- * Replace all occurrences of expressions where the given
- * <code>function.apply()</code> method returns a non <code>F.NIL</code> value.
- * The visitors <code>visit()</code> methods return <code>F.NIL</code> if no
- * substitution occurred.
+ * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non
+ * <code>F.NIL</code> value. The visitors <code>visit()</code> methods return <code>F.NIL</code> if no substitution
+ * occurred.
  */
 public class VisitorReplaceAll extends VisitorExpr {
 	final Function<IExpr, IExpr> fFunction;
@@ -174,12 +173,11 @@ public class VisitorReplaceAll extends VisitorExpr {
 
 	@Override
 	protected IExpr visitAST(IAST ast) {
-		IExpr temp;
 		IASTMutable result = F.NIL;
 		int i = fOffset;
 		int size = ast.size();
 		while (i < size) {
-			temp = ast.get(i).accept(this);
+			IExpr temp = ast.get(i).accept(this);
 			if (temp.isPresent()) {
 				// something was evaluated - return a new IAST:
 				result = ast.setAtCopy(i++, temp);
@@ -189,7 +187,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 		}
 		if (result.isPresent()) {
 			while (i < size) {
-				temp = ast.get(i).accept(this);
+				IExpr temp = ast.get(i).accept(this);
 				if (temp.isPresent()) {
 					result.set(i, temp);
 				}

@@ -340,8 +340,7 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
      */
     @Override
     public boolean isSameHeadSizeGE(IExpr head, int length) {
-        int size = size();
-        return head().equals(head) && length <= size;
+        return head().equals(head) && length <= size();
     }
 
     /**

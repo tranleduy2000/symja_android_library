@@ -205,12 +205,15 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
+			if (ast.size() == 2) {
 			try {
 				return engine.evaluate(ast.arg1());
 			} catch (final ThrowException e) {
 				return e.getValue();
 			}
+		}
+			Validate.checkSize(ast, 2);
+			return F.NIL;
 		}
 
 		@Override
@@ -288,8 +291,8 @@ public final class Programming {
 	 * 
 	 * <blockquote>
 	 * <p>
-	 * places an additional constraint on <code>pattern</code> that only allows it to match if <code>expr</code>
-	 * evaluates to <code>True</code>.
+	 * places an additional constraint on <code>pattern</code> that only allows it to match if <code>expr</code> evaluates to
+	 * <code>True</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
