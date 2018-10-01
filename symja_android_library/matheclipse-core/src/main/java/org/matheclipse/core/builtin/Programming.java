@@ -1009,32 +1009,13 @@ public final class Programming {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isList()) {
-				IAST lst = (IAST) ast.arg1();
-				IExpr arg2 = ast.arg2();
-				return evalModule(lst, arg2, engine);
+				IExpr temp = moduleSubstVariables((IAST) ast.arg1(), ast.arg2(), engine);
+				if (temp.isPresent()) {
+					return engine.evaluate(temp);
+				}
 			}
 
 			return F.NIL;
-		}
-
-		/**
-		 * <code>Module[{variablesList}, rhs ]</code>
-		 * 
-		 * @param intializerList
-		 * @param arg2
-		 * @param engine
-		 * @return
-		 */
-		private static IExpr evalModule(IAST intializerList, IExpr arg2, final EvalEngine engine) {
-			final int moduleCounter = engine.incModuleCounter();
-			final String varAppend = "$" + moduleCounter;
-			java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
-			rememberModuleVariables(intializerList, varAppend, moduleVariables, engine);
-			IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine, varAppend));
-				if (subst.isPresent()) {
-					return engine.evaluate(subst);
-				}
-				return arg2;
 		}
 
 		@Override
@@ -1051,7 +1032,8 @@ public final class Programming {
 	 * 
 	 * <blockquote>
 	 * <p>
-	 * starting with <code>expr</code>, iteratively applies <code>f</code> <code>n</code> times and returns the final result.
+	 * starting with <code>expr</code>, iteratively applies <code>f</code> <code>n</code> times and returns the final
+	 * result.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -1556,8 +1538,8 @@ public final class Programming {
 	}
 
 	/**
-	 * The call <code>Quiet( expr )</code> evaluates <code>expr</code> in &quot;quiet&quot; mode (i.e. no warning messages are shown
-	 * during evaluation).
+	 * The call <code>Quiet( expr )</code> evaluates <code>expr</code> in &quot;quiet&quot; mode (i.e. no warning
+	 * messages are shown during evaluation).
 	 * 
 	 */
 	private static class Quiet extends AbstractCoreFunctionEvaluator {
@@ -1586,8 +1568,8 @@ public final class Programming {
 	 * 
 	 * <blockquote>
 	 * <p>
-	 * gives the result of evaluating <code>expr</code>, together with all values sown during this evaluation. Values sown with
-	 * different tags are given in different lists.
+	 * gives the result of evaluating <code>expr</code>, together with all values sown during this evaluation. Values
+	 * sown with different tags are given in different lists.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -1981,8 +1963,8 @@ public final class Programming {
 	 */
 	private static class Trace extends AbstractCoreFunctionEvaluator {
 		/**
-		 * Trace the evaluation steps for a given expression. The resulting trace expression list is wrapped by Hold (i.e.
-		 * <code>Hold[{...}]</code>.
+		 * Trace the evaluation steps for a given expression. The resulting trace expression list is wrapped by Hold
+		 * (i.e. <code>Hold[{...}]</code>.
 		 * 
 		 */
 		@Override
@@ -2057,8 +2039,8 @@ public final class Programming {
 	 * &gt;&gt; Which(False, a)
 	 * </pre>
 	 * <p>
-	 * If a test does not evaluate to <code>True</code> or <code>False</code>, evaluation stops and a <code>Which</code> expression
-	 * containing the remaining cases is returned:
+	 * If a test does not evaluate to <code>True</code> or <code>False</code>, evaluation stops and a <code>Which</code>
+	 * expression containing the remaining cases is returned:
 	 * </p>
 	 * 
 	 * <pre>
@@ -2150,8 +2132,6 @@ public final class Programming {
 			Validate.checkRange(ast, 2, 3);
 
 			// use EvalEngine's iterationLimit only for evaluation control
-			// final int iterationLimit = engine.getIterationLimit();
-			// int iterationCounter = 1;
 
 			// While(test, body)
 			IExpr test = ast.arg1();
@@ -2194,7 +2174,8 @@ public final class Programming {
 	 * 
 	 * <blockquote>
 	 * <p>
-	 * evaluates <code>expr</code> for the <code>list_of_local_variables</code> by replacing the local variables in <code>expr</code>.
+	 * evaluates <code>expr</code> for the <code>list_of_local_variables</code> by replacing the local variables in
+	 * <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2204,37 +2185,14 @@ public final class Programming {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isList()) {
-				IAST lst = (IAST) ast.arg1();
-				IExpr arg2 = ast.arg2();
-				return evalWith(lst, arg2, engine);
+				IExpr temp = withSubstVariables((IAST) ast.arg1(), ast.arg2(), engine);
+				if (temp.isPresent()) {
+					return engine.evaluate(temp);
+				}
+
 			}
 
 			return F.NIL;
-		}
-
-		/**
-		 * <code>Module[{variablesList}, rhs ]</code>
-		 * 
-		 * @param intializerList
-		 * @param arg2
-		 * @param engine
-		 * @return
-		 */
-		private static IExpr evalWith(IAST intializerList, IExpr arg2, final EvalEngine engine) {
-			final int moduleCounter = engine.incModuleCounter();
-			final String varAppend = "$" + moduleCounter;
-			final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
-
-			try {
-				rememberWithVariables(intializerList, moduleVariables, engine);
-				IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine, varAppend));
-				if (subst.isPresent()) {
-					return engine.evaluate(subst);
-				}
-				return arg2;
-			} finally {
-				//
-			}
 		}
 
 		@Override
@@ -2252,8 +2210,9 @@ public final class Programming {
 	 *            initializer variables list from the <code>Module</code> function
 	 * @param variablesMap
 	 *            the resulting module variables map
+	 * @return
 	 */
-	private static void rememberWithVariables(IAST variablesList, final java.util.Map<ISymbol, IExpr> variablesMap,
+	private static boolean rememberWithVariables(IAST variablesList, final java.util.Map<ISymbol, IExpr> variablesMap,
 			EvalEngine engine) {
 		ISymbol oldSymbol;
 		for (int i = 1; i < variablesList.size(); i++) {
@@ -2264,9 +2223,17 @@ public final class Programming {
 					IExpr rightHandSide = setFun.arg2();
 						IExpr temp = engine.evaluate(rightHandSide);
 						variablesMap.put(oldSymbol, temp);
+				} else {
+					engine.printMessage(
+							"With: expression requires variable with value assignment: " + setFun.toString());
+					return false;
 				}
+			} else {
+				engine.printMessage("With: assignment to variable required: " + variablesList.get(i).toString());
+				return false;
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -2282,7 +2249,7 @@ public final class Programming {
 	 * @param engine
 	 *            the evaluation engine
 	 */
-	public static void rememberModuleVariables(IAST variablesList, final String varAppend,
+	public static boolean rememberModuleVariables(IAST variablesList, final String varAppend,
 			final java.util.Map<ISymbol, IExpr> variablesMap, final EvalEngine engine) {
 		ISymbol oldSymbol;
 		ISymbol newSymbol;
@@ -2299,10 +2266,18 @@ public final class Programming {
 						newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
 						variablesMap.put(oldSymbol, newSymbol);
 						engine.evaluate(F.Set(newSymbol, setFun.arg2()));
+					} else {
+						engine.printMessage("Module: expression requires symbol variable: " + setFun.toString());
+						return false;
 					}
+				} else {
+					engine.printMessage(
+							"Module: expression requires symbol variable: " + variablesList.get(i).toString());
+					return false;
 				}
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -2352,19 +2327,6 @@ public final class Programming {
 	}
 
 	/**
-	 * Remove all <code>moduleVariables</code> from this evaluation engine.
-	 * 
-	 * @param moduleVariables
-	 */
-	private static void removeUserVariables(EvalEngine engine, java.util.ArrayList<ISymbol> moduleVariables) {
-		// remove all module variables from eval engine
-		for (ISymbol symbol : moduleVariables) {
-			engine.localStackRemove(symbol);
-			// F.removeUserSymbol(symbol.toString());
-		}
-	}
-
-	/**
 	 * Check the (possible nested) module condition in pattern matcher without evaluating a result.
 	 * 
 	 * @param arg1
@@ -2372,27 +2334,79 @@ public final class Programming {
 	 * @param engine
 	 * @return
 	 */
-	public static boolean checkModuleOrWithCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
+	public static boolean checkModuleCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
 		if (arg1.isList()) {
 			IAST intializerList = (IAST) arg1;
-			final int moduleCounter = engine.incModuleCounter();
-			final String varAppend = "$" + moduleCounter;
-			final java.util.Map<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
-			rememberModuleVariables(intializerList, varAppend, moduleVariables, engine);
-			IExpr result = F.subst(arg2, new Function<IExpr, IExpr>() {
-				@Override
-				public IExpr apply(IExpr x) {
-					IExpr temp = moduleVariables.get(x);
-					return temp != null ? temp : F.NIL;
+			IExpr result = moduleSubstVariables(intializerList, arg2, engine);
+			if (result.isCondition()) {
+				return checkCondition(result.first(), result.second(), engine);
+			} else if (result.isModule()) {
+				return checkModuleCondition(result.first(), result.second(), engine);
+			} else if (result.isWith()) {
+				return checkWithCondition(result.first(), result.second(), engine);
+			}
+			return true;
 				}
-			});
+		return true;
+	}
+
+	public static boolean checkWithCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
+		if (arg1.isList()) {
+			IAST intializerList = (IAST) arg1;
+			IExpr result = withSubstVariables(intializerList, arg2, engine);
 				if (result.isCondition()) {
 					return checkCondition(result.first(), result.second(), engine);
-				} else if (result.isModuleOrWith()) {
-					return checkModuleOrWithCondition(result.first(), result.second(), engine);
+			} else if (result.isModule()) {
+				return checkModuleCondition(result.first(), result.second(), engine);
+			} else if (result.isWith()) {
+				return checkWithCondition(result.first(), result.second(), engine);
 				}
 		}
 		return true;
+	}
+
+	/**
+	 * Substitute the variable names from the list with temporary dummy variable names in the &quot;module-block&quot;..
+	 *
+	 * @param intializerList
+	 *            list of variables which should be substituted by appending <code>$<number></code> to the variable
+	 *            names
+	 * @param moduleBlock
+	 *            the module block where the variables should be replaced with temporary variables
+	 * @param engine
+	 * @return
+	 */
+	private static IExpr moduleSubstVariables(IAST intializerList, IExpr moduleBlock, final EvalEngine engine) {
+		final int moduleCounter = engine.incModuleCounter();
+		final String varAppend = "$" + moduleCounter;
+		final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
+		if (rememberModuleVariables(intializerList, varAppend, moduleVariables, engine)) {
+			IExpr result = moduleBlock.accept(new ModuleReplaceAll(moduleVariables, engine, varAppend));
+			return result.orElse(moduleBlock);
+		}
+		return F.NIL;
+	}
+
+	/**
+	 * Substitute the variable names from the list with temporary dummy variable names in the &quot;with-block&quot;..
+	 *
+	 * @param intializerList
+	 *            list of variables which should be substituted by appending <code>$<number></code> to the variable
+	 *            names
+	 * @param withBlock
+	 *            the with block where the variables should be replaced with temporary variables
+	 * @param engine
+	 * @return
+	 */
+	private static IExpr withSubstVariables(IAST intializerList, IExpr withBlock, final EvalEngine engine) {
+		final int moduleCounter = engine.incModuleCounter();
+		final String varAppend = "$" + moduleCounter;
+		final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
+		if (rememberWithVariables(intializerList, moduleVariables, engine)) {
+			IExpr result = withBlock.accept(new ModuleReplaceAll(moduleVariables, engine, varAppend));
+			return result.orElse(withBlock);
+		}
+		return F.NIL;
 	}
 
 	/**
@@ -2407,8 +2421,10 @@ public final class Programming {
 		if (engine.evalTrue(arg2)) {
 			if (arg1.isCondition()) {
 				return checkCondition(arg1.first(), arg1.second(), engine);
-			} else if (arg1.isModuleOrWith()) {
-				return checkModuleOrWithCondition(arg1.first(), arg1.second(), engine);
+			} else if (arg1.isModule()) {
+				return checkModuleCondition(arg1.first(), arg1.second(), engine);
+			} else if (arg1.isWith()) {
+				return checkWithCondition(arg1.first(), arg1.second(), engine);
 			}
 			return true;
 		}
@@ -2504,27 +2520,6 @@ public final class Programming {
 			}
 			return result;
 		}
-		// IExpr temp = null;
-		// final IAST list = arg1;
-		// final IASTAppendable result = F.ListAlloc(list.size());
-		//
-		// for (int i = 1; i < list.size(); i++) {
-		// final IExpr listArg = list.get(i);
-		//
-		// if (p1 < ast.size()) {
-		// if (ires.isAST()) {
-		// temp = part(ires, ast, p1, engine);
-		// result.append(temp);
-		// } else {
-		// throw new WrongArgumentType(ast, arg1, pos,
-		// "Wrong argument for Part[] function. Function or list expected.");
-		// }
-		// } else {
-		// result.append(ires);
-		// }
-		//
-		// }
-		// return result;
 		throw new WrongArgumentType(ast, arg1, pos,
 				"Wrong argument for Part[] function: " + arg2.toString() + " selects no part expression.");
 	}
@@ -2737,7 +2732,8 @@ public final class Programming {
 	/**
 	 * Assign the <code>value</code> to the given position in the left-hand-side. <code>lhs[[position]] = value</code>
 	 * 
-	 * @param lhs          left-hand-side
+	 * @param lhs
+	 *            left-hand-side
 	 * @param partPosition
 	 * @param value
 	 * @return
@@ -2754,17 +2750,19 @@ public final class Programming {
 	}
 
 	/**
-	 * Call <code>assignPart(element, ast, pos, value, engine)</code> recursively and assign the result to the given position in the
-	 * result. <code>result[[position]] = resultValue</code>
+	 * Call <code>assignPart(element, ast, pos, value, engine)</code> recursively and assign the result to the given
+	 * position in the result. <code>result[[position]] = resultValue</code>
 	 * 
 	 * @param expr
 	 * @param element
 	 * @param partPosition
 	 * @param pos
-	 * @param result       will be cloned if an assignment occurs and returned by this method
+	 * @param result
+	 *            will be cloned if an assignment occurs and returned by this method
 	 * @param position
 	 * @param value
-	 * @param engine       the evaluation engineF
+	 * @param engine
+	 *            the evaluation engineF
 	 * @return the (cloned and value assigned) result AST from input
 	 */
 	private static IASTAppendable assignPartSpanValue(IAST expr, IExpr element, final IAST part, int partPosition,

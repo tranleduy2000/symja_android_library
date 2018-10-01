@@ -2075,18 +2075,19 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		if (predicate.test(this)) {
 			return true;
 		}
-		return exists(new Predicate<IExpr>() {
+		return exists(x -> x.isMember(predicate, heads), heads ? 0 : 1);
+	}
+
+	/** {@inheritDoc} */
             @Override
-            public boolean test(IExpr x) {
-                return x.isMember(predicate, heads);
-            }
-        }, heads ? 0 : 1);
+	public final boolean isModule() {
+		return size() == 3 && head().equals(F.Module);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isModuleOrWith() {
-		return size() == 3 && (head().equals(F.With) || head().equals(F.Module));
+	public final boolean isWith() {
+		return size() == 3 && head().equals(F.With);
 	}
 
 	/** {@inheritDoc} */

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.matheclipse.core.interfaces.ISymbol;
+
 public class Context implements Serializable {
 
 	private static final long serialVersionUID = 8656114325955206899L;
@@ -18,7 +20,8 @@ public class Context implements Serializable {
 	 */
 	public final static Map<String, ISymbol> PREDEFINED_SYMBOLS_MAP = new HashMap<String, ISymbol>(2053);
 
-	public final static Context DUMMY = new Context("DUMMY");
+	public final static Context DUMMY = new Context("DUMMY", null);
+
 	public final static Context SYSTEM = new Context("System", PREDEFINED_SYMBOLS_MAP);
 
 	private String contextName;

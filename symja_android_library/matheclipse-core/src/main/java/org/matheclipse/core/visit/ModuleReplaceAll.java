@@ -79,22 +79,34 @@ public class ModuleReplaceAll extends VisitorExpr {
 				return temp;
 			}
 			return F.NIL;
-		} else if (ast.isASTSizeGE(F.Block, 2) || ast.isASTSizeGE(F.Module, 2) || ast.isASTSizeGE(F.With, 2)) {
+		} else if (ast.isWith()) {
 			temp = visitNestedScope(ast, false);
 			if (temp.isPresent()) {
 				return temp;
 			}
+			return ast;
+		} else if (ast.isModule()) {
+			temp = visitNestedScope(ast, false);
+			if (temp.isPresent()) {
+				return temp;
+			}
+			return ast;
+//		} else if (ast.isASTSizeGE(F.Block, 2)) {
+//			temp = visitNestedScope(ast, false);
+//			if (temp.isPresent()) {
+//				return temp;
+//			}
+//			return F.NIL;
 		}
 
 		return visitASTModule(ast);
 	}
 
 	/**
-	 * Nested Block() Function()
+	 * Handle nested Module(), With() or Function()
 	 * 
 	 * @param ast
-	 * @param isFunction
-	 *            TODO
+	 * @param isFunction <code>ast</code> has the form <code>Function(a1, a2)</code>
 	 * @return
 	 */
 	private IAST visitNestedScope(IAST ast, boolean isFunction) {
@@ -154,7 +166,9 @@ public class ModuleReplaceAll extends VisitorExpr {
 						variables = (IdentityHashMap<ISymbol, IExpr>) fModuleVariables.clone();
 					}
 					variables.remove(symbol);
+					if (isFunction) {
 					variables.put(symbol, F.Dummy(symbol.toString() + varAppend));
+				}
 				}
 			} else {
 				if (temp.isAST(F.Set, 3)) {
@@ -167,11 +181,13 @@ public class ModuleReplaceAll extends VisitorExpr {
 								variables = (IdentityHashMap<ISymbol, IExpr>) fModuleVariables.clone();
 							}
 							variables.remove(symbol);
+							if (isFunction) {
 							variables.put(symbol, F.Dummy(symbol.toString() + varAppend));
 						}
 					}
 				}
 			}
+		}
 		}
 
 		return variables;
