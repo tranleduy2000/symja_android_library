@@ -615,7 +615,12 @@ public class DCollections {
             }
 
             static <K, V> Consumer<Entry<K, V>> entryConsumer(Consumer<? super Entry<K, V>> action) {
-                return e -> action.accept(new UnmodifiableEntry<>(e));
+                return new Consumer<Entry<K, V>>() {
+                    @Override
+                    public void accept(Entry<K, V> e) {
+                        action.accept(new UnmodifiableEntry<>(e));
+                    }
+                };
             }
 
             public void forEach(Consumer<? super Entry<K, V>> action) {
