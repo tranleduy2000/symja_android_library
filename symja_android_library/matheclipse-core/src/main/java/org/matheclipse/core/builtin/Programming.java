@@ -7,7 +7,6 @@ import com.google.common.util.concurrent.TimeLimiter;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
-import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.exception.BreakException;
@@ -35,16 +34,14 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.visit.ModuleReplaceAll;
 import org.matheclipse.parser.client.SyntaxError;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -950,7 +947,8 @@ public final class Programming {
 	 * </p>
 	 * </blockquote> </blockquote>
 	 * <p>
-	 * You might use comments (inside <code>(*</code> and <code>*)</code>) to make the branches of <code>If</code> more readable:
+	 * You might use comments (inside <code>(*</code> and <code>*)</code>) to make the branches of <code>If</code> more
+	 * readable:
 	 * </p>
 	 * 
 	 * <pre>
@@ -1817,6 +1815,8 @@ public final class Programming {
 				} catch (final SyntaxError se) {
 					String msg = se.getMessage();
 					fEngine.printMessage(msg);
+				} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
+					return F.$Aborted;
 				} catch (final RecursionLimitExceeded re) {
 					throw re;
 				} catch (final RuntimeException re) {
@@ -1836,9 +1836,10 @@ public final class Programming {
 				return F.$Aborted;
 			}
 
-//			public void cancel() {
-//				fEngine.cancel();
-//			}
+			public void cancel() {
+				fEngine.setStopRequested(true);
+			}
+
 			public void setExpr(IExpr fExpr) {
 				this.fExpr = fExpr;
 		}
@@ -1873,13 +1874,19 @@ public final class Programming {
 				engine.printMessage("TimeConstrained: " + ast.arg2().toString() + " is not a Java long value.");
 				return F.NIL;
 			}
-
-			TimeLimiter timeLimiter = SimpleTimeLimiter.create(engine.getExecutorService());// Executors.newSingleThreadExecutor());
+			final ExecutorService executor = Executors.newSingleThreadExecutor();
+			TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor);// Executors.newSingleThreadExecutor());
 			EvalControlledCallable work = new EvalControlledCallable(engine);
 
 			work.setExpr(ast.arg1());
 			try {
+				seconds = seconds > 1 ? seconds - 1 : seconds;
 				return timeLimiter.callWithTimeout(work, seconds, TimeUnit.SECONDS);
+			} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
+				if (ast.isAST3()) {
+					return ast.arg3();
+				}
+				return F.$Aborted;
 			} catch (java.util.concurrent.TimeoutException e) {
 				if (ast.isAST3()) {
 					return ast.arg3();
@@ -1899,10 +1906,24 @@ public final class Programming {
 					e.printStackTrace();
 				}
 				return F.Null;
-//			}finally {
-//				work.cancel();
+			} finally {
+				work.cancel();
+				executor.shutdown(); // Disable new tasks from being submitted
+				try {
+					// Wait a while for existing tasks to terminate
+					if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+						executor.shutdownNow(); // Cancel currently executing tasks
+						// Wait a while for tasks to respond to being cancelled
+						if (!executor.awaitTermination(2, TimeUnit.SECONDS)) {
+							engine.printMessage("TimeConstrained: pool did not terminate");
+						}
+					}
+				} catch (InterruptedException ie) {
+					// (Re-)Cancel if current thread also interrupted
+					executor.shutdownNow();
 			}
 
+		}
 		}
 
 		@Override

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -139,8 +139,8 @@ public class ExprEvaluator {
 	private IExpr fExpr;
 
 	/**
-	 * Constructor for an <code>IExpr</code> object evaluator. By default no output history for the <code>Out()</code> function is
-	 * stored in the evaluation engine. <code>$ans</code> won't get evaluate to the last result.
+	 * Constructor for an <code>IExpr</code> object evaluator. By default no output history for the <code>Out()</code>
+	 * function is stored in the evaluation engine. <code>$ans</code> won't get evaluate to the last result.
 	 * 
 	 */
 	public ExprEvaluator() {
@@ -148,27 +148,32 @@ public class ExprEvaluator {
 	}
 
 	/**
-	 * Constructor for an <code>IExpr</code> object evaluator.if <code>outListDisabled==false</code> no output history for the
-	 * <code>Out()</code> function is stored in the evaluation engine. <code>$ans</code> won't get evaluated to the last result.
+	 * Constructor for an <code>IExpr</code> object evaluator.if <code>outListDisabled==false</code> no output history
+	 * for the <code>Out()</code> function is stored in the evaluation engine. <code>$ans</code> won't get evaluated to
+	 * the last result.
 	 * 
-	 * @param outListDisabled if <code>false</code> create a <code>LastCalculationsHistory(historyCapacity)</code>, otherwise no history
-	 *                        of the last calculations will be saved and the <code>Out()</code> function (or <code>$ans</code> variable
-	 *                        or the <code>%</code> operator) will be unevaluated.
-	 * @param historyCapacity the number of last entries of the calculations which should be stored.
+	 * @param outListDisabled
+	 *            if <code>false</code> create a <code>LastCalculationsHistory(historyCapacity)</code>, otherwise no
+	 *            history of the last calculations will be saved and the <code>Out()</code> function (or
+	 *            <code>$ans</code> variable or the <code>%</code> operator) will be unevaluated.
+	 * @param historyCapacity
+	 *            the number of last entries of the calculations which should be stored.
 	 */
 	public ExprEvaluator(boolean outListDisabled, int historyCapacity) {
 		this(new EvalEngine(true), outListDisabled, historyCapacity);
 	}
 
 	/**
-	 * Constructor for an <code>IExpr</code> object evaluator. By default no output history for the <code>Out()</code> function is
-	 * stored in the evaluation engine. <code>$ans</code> won't get evaluate to the last result.
+	 * Constructor for an <code>IExpr</code> object evaluator. By default no output history for the <code>Out()</code>
+	 * function is stored in the evaluation engine. <code>$ans</code> won't get evaluate to the last result.
 	 * 
 	 * @parm engine
-	 * @param outListDisabled if <code>false</code> create a <code>LastCalculationsHistory(historyCapacity)</code>, otherwise no history
-	 *                        of the last calculations will be saved and the <code>Out()</code> function (or <code>$ans</code> variable
-	 *                        or the <code>%</code> operator) will be unevaluated.
-	 * @param historyCapacity the number of last entries of the calculations which should be stored.
+	 * @param outListDisabled
+	 *            if <code>false</code> create a <code>LastCalculationsHistory(historyCapacity)</code>, otherwise no
+	 *            history of the last calculations will be saved and the <code>Out()</code> function (or
+	 *            <code>$ans</code> variable or the <code>%</code> operator) will be unevaluated.
+	 * @param historyCapacity
+	 *            the number of last entries of the calculations which should be stored.
 	 */
 	public ExprEvaluator(EvalEngine engine, boolean outListDisabled, int historyCapacity) {
 		this.fVariableMap = new IdentityHashMap<>();
@@ -215,8 +220,8 @@ public class ExprEvaluator {
 	}
 
 	/**
-	 * Define a value for a given variable name on the <b>local variable stack</b>. The value is evaluated before it's assigned to the
-	 * local variable.
+	 * Define a value for a given variable name on the <b>local variable stack</b>. The value is evaluated before it's
+	 * assigned to the local variable.
 	 * 
 	 * @param variable
 	 * @param value
@@ -319,7 +324,8 @@ public class ExprEvaluator {
 	/**
 	 * Evaluate an expression. If evaluation is not possible return the input object.
 	 * 
-	 * @param expr the expression which should be evaluated
+	 * @param expr
+	 *            the expression which should be evaluated
 	 * @return the evaluated object
 	 */
 	public IExpr eval(final IExpr expr) {
@@ -337,7 +343,8 @@ public class ExprEvaluator {
 	/**
 	 * Evaluate an expression and test if the result is <code>F.True</code>.
 	 * 
-	 * @param expr the expression which should be evaluated
+	 * @param expr
+	 *            the expression which should be evaluated
 	 * @return <code>true</code> if the result is <code>F.True</code> otherwise return <code>false</code>
 	 */
 	public boolean isTrue(final IExpr expr) {
@@ -347,7 +354,8 @@ public class ExprEvaluator {
 	/**
 	 * Evaluate an expression and test if the result is <code>F.False</code>.
 	 * 
-	 * @param expr the expression which should be evaluated
+	 * @param expr
+	 *            the expression which should be evaluated
 	 * @return <code>true</code> if the result is <code>F.False</code> otherwise return <code>false</code>
 	 */
 	public boolean isFalse(final IExpr expr) {
@@ -403,12 +411,16 @@ public class ExprEvaluator {
 	 * Parse the given <code>expression String</code> and evaluate it to an IExpr value.
 	 * </p>
 	 * 
-	 * @param inputExpression the Symja input expression
-	 * @param timeoutDuration with timeoutUnit, the maximum length of time to wait
-	 * @param timeUnit        with timeoutDuration, the maximum length of time to wait
-	 * @param interruptible   whether to respond to thread interruption by aborting the operation and throwing InterruptedException; if
-	 *                        false, the operation is allowed to complete or time out, and the current thread's interrupt status is
-	 *                        re-asserted.
+	 * @param inputExpression
+	 *            the Symja input expression
+	 * @param timeoutDuration
+	 *            with timeoutUnit, the maximum length of time to wait
+	 * @param timeUnit
+	 *            with timeoutDuration, the maximum length of time to wait
+	 * @param interruptible
+	 *            whether to respond to thread interruption by aborting the operation and throwing InterruptedException;
+	 *            if false, the operation is allowed to complete or time out, and the current thread's interrupt status
+	 *            is re-asserted.
 	 * @return
 	 * @throws SyntaxError
 	 */
@@ -421,34 +433,49 @@ public class ExprEvaluator {
 			engine.reset();
 			fExpr = engine.parse(inputExpression);
 			if (fExpr != null) {
+					final ExecutorService executor = Executors.newSingleThreadExecutor();
 				try {
 					F.await();
-					TimeLimiter timeLimiter = SimpleTimeLimiter.create(engine.getExecutorService()); //Executors.newSingleThreadExecutor());
+						TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor); // Executors.newSingleThreadExecutor());
 					EvalCallable work = call == null ? new EvalCallable(engine) : call;
 
 					work.setExpr(fExpr);
 					return timeLimiter.callWithTimeout(work, timeoutDuration, timeUnit);
-				} catch (InterruptedException e) {
+					} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
 					return F.$Aborted;
-					// } catch (java.util.concurrent.TimeoutException e) {
-					// return F.$Aborted;
 				} catch (java.util.concurrent.TimeoutException e) {
-					Throwable t = e.getCause();
-					if (t instanceof RuntimeException) {
-						throw (RuntimeException) t;
-					}
+//						Throwable t = e.getCause();
+//						if (t instanceof RuntimeException) {
+//							throw (RuntimeException) t;
+//						}
 					return F.$Aborted;
 				} catch (com.google.common.util.concurrent.UncheckedTimeoutException e) {
-					Throwable t = e.getCause();
-					if (t instanceof RuntimeException) {
-						throw (RuntimeException) t;
-					}
+						// Throwable t = e.getCause();
+						// if (t instanceof RuntimeException) {
+						// throw (RuntimeException) t;
+						// }
 					return F.$Aborted;
 				} catch (Exception e) {
 					if (Config.SHOW_STACKTRACE) {
 						e.printStackTrace();
 					}
 					return F.Null;
+					} finally {
+						engine.setStopRequested(true);
+						executor.shutdown(); // Disable new tasks from being submitted
+						try {
+							// Wait a while for existing tasks to terminate
+							if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+								executor.shutdownNow(); // Cancel currently executing tasks
+								// Wait a while for tasks to respond to being cancelled
+								if (!executor.awaitTermination(2, TimeUnit.SECONDS)) {
+									engine.printMessage("ExprEvaluator: pool did not terminate");
+								}
+							}
+						} catch (InterruptedException ie) {
+							// (Re-)Cancel if current thread also interrupted
+							executor.shutdownNow();
+						}
 				}
 			}
 			} finally {
@@ -470,7 +497,8 @@ public class ExprEvaluator {
 	/**
 	 * Parse the given <code>inputExpression</code> String and evaluate it to a <code>double</code> value if possible.
 	 * 
-	 * @param inputExpression an input expression
+	 * @param inputExpression
+	 *            an input expression
 	 * @return <code>Double.NaN</code> if no <code>double</code> value could be evaluated
 	 * @throws SyntaxError
 	 */
@@ -492,7 +520,8 @@ public class ExprEvaluator {
 	/**
 	 * Evaluate an expression to a double value.
 	 * 
-	 * @param expr a Symja expression
+	 * @param expr
+	 *            a Symja expression
 	 * @return <code>Double.NaN</code> if no <code>double</code> value could be evaluated
 	 */
 	public double evalf(final IExpr expr) {
@@ -515,8 +544,8 @@ public class ExprEvaluator {
 	}
 
 	/**
-	 * Returns the expression value to which the specified variableName is mapped, or {@code null} if this map contains no mapping for
-	 * the variableName.
+	 * Returns the expression value to which the specified variableName is mapped, or {@code null} if this map contains
+	 * no mapping for the variableName.
 	 * 
 	 * @param variableName
 	 * @return
@@ -528,7 +557,8 @@ public class ExprEvaluator {
 	/**
 	 * Converts the <code>inputExpression</code> string into a Java Symja expression string.
 	 * 
-	 * @param inputExpression an input expression
+	 * @param inputExpression
+	 *            an input expression
 	 */
 	public String toJavaForm(final String inputExpression) throws MathException {
 		IExpr parsedExpression;
@@ -541,9 +571,11 @@ public class ExprEvaluator {
 	}
 
 	/**
-	 * Converts the inputExpression string into a Scala expression and writes the result to the given <code>Writer</code>string.
+	 * Converts the inputExpression string into a Scala expression and writes the result to the given
+	 * <code>Writer</code>string.
 	 * 
-	 * @param inputExpression an input expression
+	 * @param inputExpression
+	 *            an input expression
 	 */
 	public String toScalaForm(final String inputExpression) throws MathException {
 		IExpr parsedExpression;

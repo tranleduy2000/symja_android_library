@@ -11,6 +11,7 @@ import org.matheclipse.core.builtin.Programming;
 import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
+import org.matheclipse.core.eval.exception.TimeoutException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
@@ -49,8 +50,6 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.annotation.Nonnull;
 
@@ -127,8 +126,7 @@ public class EvalEngine implements Serializable {
 	/**
 	 * Set the thread local evaluation engine instance
 	 *
-	 * @param engine
-	 *            the evaluation engine
+	 * @param engine the evaluation engine
 	 */
 	public static void set(final EvalEngine engine) {
 		instance.set(engine);
@@ -150,8 +148,8 @@ public class EvalEngine implements Serializable {
 
 	transient long fSeconds;
 	/**
-	 * if <code>true</code> the engine evaluates in &quot;numeric&quot; mode, otherwise the engine evaluates in
-	 * &quot;symbolic&quot; mode.
+	 * if <code>true</code> the engine evaluates in &quot;numeric&quot; mode, otherwise the engine evaluates in &quot;symbolic&quot;
+	 * mode.
 	 */
 	transient boolean fNumericMode;
 
@@ -265,11 +263,6 @@ public class EvalEngine implements Serializable {
 
 	static public int MAX_THREADS_COUNT = 10;
 
-	private final static ExecutorService fExecutor = Executors.newFixedThreadPool(MAX_THREADS_COUNT);
-
-	public static ExecutorService getExecutorService() {
-		return fExecutor;
-	}
 	/**
 	 * Constructor for an evaluation engine
 	 *
@@ -615,8 +608,8 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * Evaluate an AST with only one argument (i.e. <code>head[arg1]</code>). The evaluation steps are controlled by the
-	 * header attributes.
+	 * Evaluate an AST with only one argument (i.e. <code>head[arg1]</code>). The evaluation steps are controlled by the header
+	 * attributes.
 	 *
 	 * @param ast
 	 * @return
@@ -873,12 +866,9 @@ public class EvalEngine implements Serializable {
 	 * Evaluate an expression for a local variable.
 	 *
 	 *
-	 * @param expr
-	 *            the expression which should be evaluated for the given symbol
-	 * @param symbol
-	 *            the symbol which should be evaluated as a local variable
-	 * @param localValue
-	 *            the value
+	 * @param expr       the expression which should be evaluated for the given symbol
+	 * @param symbol     the symbol which should be evaluated as a local variable
+	 * @param localValue the value
 	 */
 	public IExpr evalBlock(IExpr expr, ISymbol symbol, IExpr localValue) {
 //		Deque<IExpr> stack = localStackCreate(symbol);
@@ -1127,12 +1117,18 @@ public class EvalEngine implements Serializable {
 				fTraceStack.setUp(expr, fRecursionCounter);
 				temp = expr.evaluate(this);
 				if (temp.isPresent()) {
+					if (fStopRequested) {
+						throw TimeoutException.TIMED_OUT;
+					}
 					fTraceStack.add(expr, temp, fRecursionCounter, 0L, "Evaluation loop");
 					result = temp;
 					long iterationCounter = 1;
 					while (true) {
 						temp = result.evaluate(this);
 						if (temp.isPresent()) {
+							if (fStopRequested) {
+								throw TimeoutException.TIMED_OUT;
+							}
 							fTraceStack.add(result, temp, fRecursionCounter, iterationCounter, "Evaluation loop");
 							result = temp;
 							if (fIterationLimit >= 0 && fIterationLimit <= ++iterationCounter) {
@@ -1146,6 +1142,9 @@ public class EvalEngine implements Serializable {
 			} else {
 				temp = expr.evaluate(this);
 				if (temp.isPresent()) {
+					if (fStopRequested) {
+						throw TimeoutException.TIMED_OUT;
+					}
 					// if (temp == F.Null&&!expr.isAST(F.SetDelayed)) {
 					// System.out.println(expr.toString());
 					// }
@@ -1158,6 +1157,9 @@ public class EvalEngine implements Serializable {
 					while (true) {
 						temp = result.evaluate(this);
 						if (temp.isPresent()) {
+							if (fStopRequested) {
+								throw TimeoutException.TIMED_OUT;
+							}
 							// if (temp == F.Null&&!result.isAST(F.SetDelayed)) {
 							// System.out.println(expr.toString());
 							// }
@@ -1349,8 +1351,8 @@ public class EvalEngine implements Serializable {
 
 	/**
 	 * Evaluate the ast recursively, according to the attributes Flat, HoldAll, HoldFirst, HoldRest, Orderless to create
-	 * pattern-matching expressions directly or for the left-hand-side of a <code>Set[]</code>,
-	 * <code>SetDelayed[]</code>, <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
+	 * pattern-matching expressions directly or for the left-hand-side of a <code>Set[]</code>, <code>SetDelayed[]</code>,
+	 * <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
 	 *
 	 * @param ast
 	 * @return <code>ast</code> if no evaluation was executed.
@@ -1500,8 +1502,7 @@ public class EvalEngine implements Serializable {
 		return F.NIL;
 	}
 	/**
-	 * Evaluate the expression and return the <code>Trace[expr]</code> (i.e. all (sub-)expressions needed to calculate
-	 * the result).
+	 * Evaluate the expression and return the <code>Trace[expr]</code> (i.e. all (sub-)expressions needed to calculate the result).
 	 *
 	 * @param expr    the expression which should be evaluated.
 	 * @param matcher a filter which determines the expressions which should be traced, If the matcher is set to <code>null</code>, all
@@ -1621,11 +1622,10 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * Evaluate an object without resetting the numeric mode after the evaluation step. If evaluation is not possible
-	 * return the input object,
+	 * Evaluate an object without resetting the numeric mode after the evaluation step. If evaluation is not possible return the input
+	 * object,
 	 *
-	 * @param expr
-	 *            the object which should be evaluated
+	 * @param expr the object which should be evaluated
 	 * @return the evaluated object
 	 *
 	 */
@@ -1801,8 +1801,7 @@ public class EvalEngine implements Serializable {
 
 	/**
 	 * Check if the <code>ApfloatNum</code> number type should be used instead of the <code>Num</code> type and the
-	 * <code>ApcomplexxNum</code> number type should be used instead of the <code>ComplexNum</code> type for numeric
-	 * evaluations.
+	 * <code>ApcomplexxNum</code> number type should be used instead of the <code>ComplexNum</code> type for numeric evaluations.
 	 *
 	 * @return <code>true</code> if the required precision is greater than <code>EvalEngine.DOUBLE_PRECISION</code>
 	 * @see ApfloatNum
@@ -1832,9 +1831,8 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * Check if the appending of expressions to the history list for the <code>Out[]</code> function is enabled. If
-	 * enabled, the special variable <code>$ans</code> returns the result from the last evluation done with this
-	 * evaluation engine.
+	 * Check if the appending of expressions to the history list for the <code>Out[]</code> function is enabled. If enabled, the special
+	 * variable <code>$ans</code> returns the result from the last evluation done with this evaluation engine.
 	 *
 	 * @return
 	 */
