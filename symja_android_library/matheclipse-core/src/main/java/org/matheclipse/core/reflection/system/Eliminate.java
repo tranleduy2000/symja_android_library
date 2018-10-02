@@ -352,9 +352,18 @@ public class Eliminate extends AbstractFunctionEvaluator {
 			if (ast.isAST1()) {
 				IASTAppendable inverseFunction = InverseFunction.getUnaryInverseFunction(ast);
 				if (inverseFunction.isPresent()) {
+					if (exprWithVariable.isAbs()) {
+						if (exprWithoutVariable.isNonNegativeResult()) {
+							// example: Abs(x-1) == 1
+							inverseFunction.append(exprWithoutVariable);
+							return extractVariable(ast.arg1(), inverseFunction, predicate, variable);
+						}
+						return F.True;
+					} else {
 					// example: Sin(f(x)) == y -> f(x) == ArcSin(y)
 					inverseFunction.append(exprWithoutVariable);
 					return extractVariable(ast.arg1(), inverseFunction, predicate, variable);
+				}
 				}
 			} else {
 				int size = ast.size();
