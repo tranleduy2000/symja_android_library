@@ -336,6 +336,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcTan() {
+		check("ArcTan(-9*Sqrt(2),0)", //
+				"Pi");
 		check("ArcTan(0.7071067811865476)", //
 				"0.61548");
 		check("-ArcTan(x/(2*Sqrt(2)))/(2*Sqrt(2))", //
