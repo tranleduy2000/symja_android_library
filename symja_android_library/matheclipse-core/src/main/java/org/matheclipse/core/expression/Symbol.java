@@ -862,6 +862,11 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return engine.evalTrue(ast);
     }
 
+    @Override
+    public boolean ofQ(IExpr... args) {
+        return ofQ(EvalEngine.get(), args);
+    }
+
     /**
      * {@inheritDoc}
      */

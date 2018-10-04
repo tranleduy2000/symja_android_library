@@ -752,6 +752,12 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean ofQ(IExpr... args) {
+		return ofQ(EvalEngine.get(), args);
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public final void popLocalVariable() {
 		final Deque<IExpr> localVariableStack = EvalEngine.get().localStack(this);
 		localVariableStack.pop();
