@@ -234,6 +234,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcCos() {
+		check("ArcCos(Cos(-42))", //
+				"-42+14*Pi");
+		check("ArcCos(Cos(42))", //
+				"-42+14*Pi");
+		check("ArcCos(Cos(Pi/4))", //
+				"Pi/4");
+		check("ArcCos(Cos(5))", //
+				"-5+2*Pi");
+
 		check("ArcCos(0)", "Pi/2");
 		check("ArcCos(1)", "0");
 		check("Integrate(ArcCos(x), {x, -1, 1})", "Pi");
@@ -255,6 +264,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcCot() {
+		check("ArcCot(Cot(-42))", //
+				"-42+13*Pi");
+		check("ArcCot(Cot(42))", //
+				"42-13*Pi");
+		check("ArcCot(Cot(Pi/4))", //
+				"Pi/4");
+		check("ArcCot(Cot(5))", //
+				"5-2*Pi");
+
 		check("ArcCot(0)", "Pi/2");
 		check("ArcCot(1)", "Pi/4");
 
@@ -315,6 +333,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcSin() {
+		check("ArcSin(Sin(-42))", //
+				"42-13*Pi");
+		check("ArcSin(Sin(42))", //
+				"-42+13*Pi");
+		check("ArcSin(Sin(Pi/4))", //
+				"Pi/4");
+		check("ArcSin(Sin(5))", //
+				"5-2*Pi");
+
 		check("-3*ArcSin(x)-2*ArcCos(x)", "-Pi-ArcSin(x)");
 		check("-ArcSin(x)-2*ArcCos(x)", "-Pi/2-ArcCos(x)");
 		check("-5*ArcSin(x)-5*ArcCos(x)", "-5/2*Pi");
@@ -336,6 +363,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcTan() {
+		check("ArcTan(Tan(42))", //
+				"42-13*Pi");
+		check("ArcTan(Tan(Pi/4))", //
+				"Pi/4");
+		check("ArcTan(Re(9*Cos(5)+I*9*Sin(5)),Im(9*Cos(5)+I*9*Sin(5)))", //
+				"5-2*Pi");
 		check("ArcTan(-9*Sqrt(2),0)", //
 				"Pi");
 		check("ArcTan(0.7071067811865476)", //
@@ -4566,6 +4599,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testIm() {
+		check("Im(I*9*Sin(5))", //
+				"9*Sin(5)");
 		check("Im(3*(-2)^(3/4))", "3*2^(1/4)");
 		check("Im(3*2^(3/4))", "0");
 
@@ -5633,7 +5668,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLog() {
-		check("Log(a, 0)", "(-Infinity)/Log(a)");
+
+		check("Log(0, 0)", ///
+				"Indeterminate");
+		check("Log(0, x)", ///
+				"0");
 		check("Log(2, 0)", "-Infinity");
 		check("Log(3/4, 0)", "Infinity");
 		check("Log(-2, 0)", "(-Infinity)/(I*Pi+Log(2))");
@@ -6198,6 +6237,16 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testMod() {
+		check("Mod(5-Pi/2,Pi)", //
+				"5-3/2*Pi");
+		check("Mod(Sqrt(-113), 2)", //
+				"-I*10+I*Sqrt(113)");
+		check("Mod(Exp(Pi), 2)", //
+				"-22+E^Pi");
+		check("Mod(42,Pi)", //
+				"42-13*Pi");
+		check("Mod(-42,Pi)", //
+				"-42+14*Pi");
 		check("Mod(-10,3)", "2");
 		check("Mod(10,3)", "1");
 		check("Mod(10,-3)", "-2");
@@ -8523,7 +8572,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testQuotient() {
-		check("Quotient(13, 0)", "Quotient(13,0)");
+		check("Quotient(Sqrt(-113), 2)", //
+				"I*5");
+		check("Quotient(42,Pi)", //
+				"13");
+		check("Quotient(13, 0)", //
+				"ComplexInfinity");
 		check("Quotient(-17, 7)", "-3");
 		check("Quotient(15, -5)", "-3");
 		check("Quotient(17, 5)", "3");
@@ -8681,6 +8735,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRe() {
+		check("Re(I*9*Sin(5))", //
+				"0");
 		check("Re(3+4*I)", "3");
 		check("Re(0.5 + 2.3*I)", "0.5");
 		check("Im(0.5 + 2.3*I)", "2.3");

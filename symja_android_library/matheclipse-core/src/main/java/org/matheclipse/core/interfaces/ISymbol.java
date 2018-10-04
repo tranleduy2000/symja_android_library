@@ -238,7 +238,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     public IExpr getDefaultValue(int position);
 
     /**
-	 *
      * @return <code>null</code> if no rules are defined
      */
     public RulesData getRulesData();
