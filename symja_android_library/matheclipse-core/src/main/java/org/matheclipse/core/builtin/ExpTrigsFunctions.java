@@ -2412,7 +2412,7 @@ public class ExpTrigsFunctions {
 		IExpr z = arg1.first();
 		IExpr zRe = z.re();
 		IExpr k = F.Quotient.of(F.Subtract(zRe, F.CPiHalf), F.Pi).inc();
-		if (k.isInteger() && !k.isZero()) {
+		if (k.isInteger()) {
 			// -Pi/2 + k*Pi
 			IExpr min = F.Times.of(F.Plus(F.CN1D2, k), Pi);
 			// Pi/2 + k*Pi
@@ -2460,7 +2460,7 @@ public class ExpTrigsFunctions {
 		IExpr z = arg1.first();
 		IExpr zRe = z.re();
 		IExpr k = F.Quotient.of(F.Subtract(zRe, F.CPiHalf), F.Pi).inc();
-		if (k.isInteger() && !k.isZero()) {
+		if (k.isInteger()) {
 			// -Pi/2 + k*Pi
 			IExpr min = F.Times.of(F.Plus(F.CN1D2, k), Pi);
 			// Pi/2 + k*Pi
@@ -2500,7 +2500,7 @@ public class ExpTrigsFunctions {
 		IExpr z = arg1.first();
 		IExpr zRe = z.re();
 		IExpr k = F.Quotient.of(F.Subtract(zRe, F.Pi), F.Pi).inc();
-		if (k.isInteger() && !k.isZero()) {
+		if (k.isInteger()) {
 			// k*Pi
 			IExpr min = F.Times.of(k, Pi);
 			// (k+1)*Pi

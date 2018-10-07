@@ -234,6 +234,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcCos() {
+		check("ArcCos(Cos(-1/2))", //
+				"1/2");
+		check("ArcCos(Cos(-1))", //
+				"1");
+		check("ArcCos(Cos(1))", //
+				"1");
 		check("ArcCos(Cos(-42))", //
 				"-42+14*Pi");
 		check("ArcCos(Cos(42))", //
@@ -264,6 +270,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcCot() {
+		check("ArcCot(Cot(-1/2))", //
+				"-1/2");
+		check("ArcCot(Cot(-1))", //
+				"-1");
+		check("ArcCot(Cot(1))", //
+				"1");
 		check("ArcCot(Cot(-42))", //
 				"-42+13*Pi");
 		check("ArcCot(Cot(42))", //
@@ -333,6 +345,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcSin() {
+		check("ArcSin(Sin(-1/2))", //
+				"-1/2");
+		check("ArcSin(Sin(-1))", //
+				"-1");
+		check("ArcSin(Sin(1))", //
+				"1");
 		check("ArcSin(Sin(-42))", //
 				"42-13*Pi");
 		check("ArcSin(Sin(42))", //
@@ -4599,10 +4617,16 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testIm() {
+		check("Im(Sin(42)*Cos(43))", //
+				"0");
+		check("Im(Sin(42))", //
+				"0");
 		check("Im(I*9*Sin(5))", //
 				"9*Sin(5)");
-		check("Im(3*(-2)^(3/4))", "3*2^(1/4)");
-		check("Im(3*2^(3/4))", "0");
+		check("Im(3*(-2)^(3/4))", //
+				"3*2^(1/4)");
+		check("Im(3*2^(3/4))", //
+				"0");
 
 		check("Im(0)", "0");
 		check("Im(I)", "1");
@@ -8735,6 +8759,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRe() {
+		check("Re(Sin(42)*Cos(43))", //
+				"Cos(43)*Sin(42)");
+		check("Re(Sin(42))", //
+				"Sin(42)");
 		check("Re(I*9*Sin(5))", //
 				"0");
 		check("Re(3+4*I)", "3");
