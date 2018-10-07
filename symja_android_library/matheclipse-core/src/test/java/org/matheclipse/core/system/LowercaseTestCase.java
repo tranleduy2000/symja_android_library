@@ -63,8 +63,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testAbsArg() {
-		check("AbsArg(z)", "{Abs(z),Arg(z)}");
-		check("AbsArg(2*z)", "{2*Abs(z),Arg(2*z)}");
+		check("AbsArg(z)", //
+				"{Abs(z),Arg(z)}");
+		check("AbsArg(-2*z)", //
+				"{2*Abs(z),Arg(-z)}");
+		check("AbsArg(2*z)", //
+				"{2*Abs(z),Arg(z)}");
 		check("AbsArg({a, {b, c}})", "{{Abs(a),Arg(a)},{{Abs(b),Arg(b)},{Abs(c),Arg(c)}}}");
 		check("AbsArg({{1, -1, 0}, {0, 1}})", "{{{1,0},{1,Pi},{0,0}},{{0,0},{1,0}}}");
 
@@ -381,6 +385,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcTan() {
+		check("ArcTan(Tan(-1/2))", //
+				"-1/2");
+		check("ArcTan(Tan(-1))", //
+				"-1");
+		check("ArcTan(Tan(1))", //
+				"1");
 		check("ArcTan(Tan(42))", //
 				"42-13*Pi");
 		check("ArcTan(Tan(Pi/4))", //
@@ -458,13 +468,40 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArg() {
-
+		check("Arg(E^(-42-5*I))", //
+				"-5+2*Pi");
+		check("Arg(E^(7+I*3))", //
+				"3");
+		check("Arg(E^(I*3))", //
+				"3");
+		check("Arg(E^I)", //
+				"1");
+		check("Arg(Sqrt(z))", //
+				"Arg(z)/2");
+		check("Arg(-2*z)", //
+				"Arg(-z)");
+		check("Arg(1.3)", //
+				"0");
+		check("Arg(2*z)", //
+				"Arg(z)");
+		check("Arg(x)", //
+				"Arg(x)");
+		check("Arg(Infinity)", //
+				"0");
+		check("Arg(-Infinity)", //
+				"Pi");
+		check("Arg(2 + I*Pi)", //
+				"ArcTan(Pi/2)");
+		check("Arg(1+I*Sqrt(3))", //
+				"Pi/3");
+		check("Arg(I-Sqrt(3))", //
+				"5/6*Pi");
 		// issue #179
 		check("N(Arg(1+I*Sqrt(3)))", "1.0472");
 
 		check("Arg(Pi)", "0");
 		check("Arg(-Pi*E)", "Pi");
-		check("Arg(1.3)", "0");
+
 		check("Arg(0)", "0");
 		check("Arg(1)", "0");
 		check("Arg(-1)", "Pi");
@@ -9745,15 +9782,23 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSign() {
+		check("Sign(2+I)", //
+				"(2+I)/Sqrt(5)");
+		check("Sign(1+I*Sqrt(3))", //
+				"1/2*(1+I*Sqrt(3))");
+		check("Sign(Sqrt(3)+I)", //
+				"1/2*(I+Sqrt(3))");
+		check("Sign(1.0+I)", "0.707107+I*0.707107");
+
 		check("Sign(Indeterminate)", "Indeterminate");
-		check("Sign(2.5)", "1");
+		check("Sign(2.5)", "1.0");
 		check("Sign(-2.5)", "-1");
 		check("Sign(0.0)", "0");
 		check("Sign({-2, -1, 0, 1, 2})", "{-1,-1,0,1,1}");
 		check("Pi>E", "True");
 		check("Pi<E", "False");
 		check("Sign(1+I)", "(1+I)/Sqrt(2)");
-		check("Sign(1.0+I)", "0.707107+I*0.707107");
+
 		check("Sign(E - Pi)", "-1");
 		check("Sign(0)", "0");
 		check("Sign(I)", "I");

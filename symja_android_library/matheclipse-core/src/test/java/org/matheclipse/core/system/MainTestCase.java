@@ -1,9 +1,5 @@
 package org.matheclipse.core.system;
 
-import java.io.StringWriter;
-
-import javax.script.ScriptEngine;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.eval.EvalEngine;
@@ -11,6 +7,10 @@ import org.matheclipse.core.eval.TimeConstrainedEvaluator;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+
+import java.io.StringWriter;
+
+import javax.script.ScriptEngine;
 
 /**
  * Tests system.reflection classes
@@ -1995,7 +1995,7 @@ public class MainTestCase extends AbstractTestCase {
 	}
 
 	public void testSystem236() {
-		check("Sign(0.0)", "0");
+		check("Sign(0.0)", "0.0");
 	}
 
 	public void testSystem237() {
