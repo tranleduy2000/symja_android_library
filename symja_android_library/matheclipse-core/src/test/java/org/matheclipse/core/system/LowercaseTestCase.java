@@ -9791,7 +9791,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Sign(1.0+I)", "0.707107+I*0.707107");
 
 		check("Sign(Indeterminate)", "Indeterminate");
-		check("Sign(2.5)", "1.0");
+		check("Sign(2.5)", "1");
 		check("Sign(-2.5)", "-1");
 		check("Sign(0.0)", "0");
 		check("Sign({-2, -1, 0, 1, 2})", "{-1,-1,0,1,1}");

@@ -4,7 +4,7 @@ import com.duy.lambda.Function;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
+import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
 import org.matheclipse.core.expression.F;
@@ -35,7 +35,7 @@ import org.matheclipse.core.interfaces.ISymbol;
  * -1
  * </pre>
  */
-public class Sign extends AbstractEvaluator {
+public class Sign extends AbstractCoreFunctionEvaluator {
 
 	public Sign() {
 	}

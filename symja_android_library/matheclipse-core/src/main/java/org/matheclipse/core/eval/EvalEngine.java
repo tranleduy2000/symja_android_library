@@ -888,9 +888,12 @@ public class EvalEngine implements Serializable {
 	 * Evaluate an expression for a local variable.
 	 *
 	 *
-	 * @param expr       the expression which should be evaluated for the given symbol
-	 * @param symbol     the symbol which should be evaluated as a local variable
-	 * @param localValue the value
+	 * @param expr
+	 *            the expression which should be evaluated for the given symbol
+	 * @param symbol
+	 *            the symbol which should be evaluated as a local variable
+	 * @param localValue
+	 *            the value
 	 */
 	public IExpr evalBlock(IExpr expr, ISymbol symbol, IExpr localValue) {
 //		Deque<IExpr> stack = localStackCreate(symbol);

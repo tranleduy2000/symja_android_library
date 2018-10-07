@@ -1995,7 +1995,7 @@ public class MainTestCase extends AbstractTestCase {
 	}
 
 	public void testSystem236() {
-		check("Sign(0.0)", "0.0");
+		check("Sign(0.0)", "0");
 	}
 
 	public void testSystem237() {
