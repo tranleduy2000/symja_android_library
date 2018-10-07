@@ -547,9 +547,12 @@ public class EvalEngine implements Serializable {
 					numericMode = fNumericMode;
 					try {
 						selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-						ast.forEach(2, astSize, (x, i) -> {
-							evalArg(rlist, ast, x, i, isNumericFunction);
-						});
+						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
+                            @Override
+                            public void accept(IExpr x, int i) {
+                                EvalEngine.this.evalArg(rlist, ast, x, i, isNumericFunction);
+                            }
+                        });
 					} finally {
 						if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
 							fNumericMode = numericMode;
