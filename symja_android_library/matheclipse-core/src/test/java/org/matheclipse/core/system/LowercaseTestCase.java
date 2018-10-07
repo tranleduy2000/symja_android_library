@@ -3841,6 +3841,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testFlat() {
 		// test https://github.com/mathics/Mathics/issues/747
+    // Verified against Mathematica 11.3.0.0 by rebcabin [2018-10-07 Sun 06:31]
 		check("SetAttributes(eqv, Flat);eqv(p, q, q, p) /. eqv(x_, y_) :> {x, y}", //
 				"{eqv(p),eqv(q,q,p)}");
 
@@ -7401,10 +7402,21 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testOneIdentityOrderless() {
-		check("Table[Module[{ e = (eqv[p,q,r] /. {eqv[x_,y_] :> {x,y}}) }, ClearAll[eqv]; SetAttributes[eqv,j]; {j, First@e, Rest@e}], {j, Flatten[Table[Union[Sort/@Permutations[{Flat,Orderless,OneIdentity}, {i}]], {i,3}], 1]}]", //
+
+      // Check when substitution is defined BEFORE setting attributes.
+
+       check("Table[Module[{ e = (eqv[p,q,r] /. {eqv[x_,y_] :> {x,y}}) }, ClearAll[eqv]; SetAttributes[eqv,j]; {j, First@e, Rest@e}], {j, Flatten[Table[Union[Sort/@Permutations[{Flat,Orderless,OneIdentity}, {i}]], {i,3}], 1]}]", //
 				"{{{Flat},p,eqv(q,r)},{{OneIdentity},eqv(p),{eqv(q,r)}},{{Orderless},p,eqv(q,r)},{{Flat,OneIdentity},p,eqv(q,r)},{{Flat,Orderless},p,{eqv(q,r)}},{{OneIdentity,Orderless},eqv(p),{eqv(q,r)}},{{Flat,OneIdentity,Orderless},p,eqv(q,r)}}");
-      // github issue 89
-		check("SetAttributes(f,{Orderless,OneIdentity})", "");
+
+    // Check when substitution is defined AFTER setting attributes.
+
+		check("Table[Module[{e},ClearAll[eqv];SetAttributes[eqv,j];e=(eqv[p,q,r]/.{eqv[x_,y_]:>{x,y}});{j,First@e,Rest@e}],{j,Flatten[Table[Union[Sort/@Permutations[{Flat,Orderless,OneIdentity},{i}]],{i,3}],1]}]", //
+          "{{{Flat},eqv(p),{eqv(q,r)}},{{OneIdentity},p,eqv(q,r)},{{Orderless},p,eqv(q,r)},{{Flat,OneIdentity},p,{eqv(q,r)}},{{Flat,Orderless},eqv(p),{eqv(q,r)}},{{OneIdentity,Orderless},p,eqv(q,r)},{{Flat,OneIdentity,Orderless},p,{eqv(q,r)}}}");
+
+
+		// github issue 89
+
+		check("SetAttributes(f, {Orderless, OneIdentity})", "");
 		check("f(p, q) /. {f(x_,y_) :> {x,y}}", "{p,q}");
 		check("f(q,f(p,r)) /. {f(x_,y_) :> {x,y}}", "{q,f(p,r)}");
 	}
