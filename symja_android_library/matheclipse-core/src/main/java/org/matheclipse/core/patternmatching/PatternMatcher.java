@@ -53,16 +53,19 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 		private IAST fLHSEvalAST;
 
 		/**
-		 * The used (i.e. matched) expression indexes in the LHS evaluation expression; <code>-1</code> indicates an unused index.
+		 * The used (i.e. matched) expression indexes in the LHS evaluation expression; <code>-1</code> indicates an
+		 * unused index.
 		 */
 		private int[] fUsedIndex;
 
 		/**
-		 * Match a pattern expression against an evaluation expression, there the arguments are commutative (i.e. the head of the AST
-		 * expression has attribute <code>Orderless</code>)
+		 * Match a pattern expression against an evaluation expression, there the arguments are commutative (i.e. the
+		 * head of the AST expression has attribute <code>Orderless</code>)
 		 *
-		 * @param lhsPatternAST the pattern AST
-		 * @param lhsEvalAST    the evaluation AST
+		 * @param lhsPatternAST
+		 *            the pattern AST
+		 * @param lhsEvalAST
+		 *            the evaluation AST
 		 */
 		public OrderlessMatcher(final IAST lhsPatternAST, final IAST lhsEvalAST) {
 			this.fLHSPatternAST = lhsPatternAST;
@@ -89,7 +92,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 
 		/**
 		 *
-		 * @param lhsPosition  the position in the LHS expression which should actually be matched.
+		 * @param lhsPosition
+		 *            the position in the LHS expression which should actually be matched.
 		 * @param stackMatcher
 		 * @return
 		 */
@@ -277,8 +281,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	protected IExpr fPatternCondition;
 
 	/**
-	 * A map from a pattern to a possibly found value during pattern-matching. Will be set to <code>null</code> if the left-hand-side
-	 * pattern expression contains no pattern.
+	 * A map from a pattern to a possibly found value during pattern-matching. Will be set to <code>null</code> if the
+	 * left-hand-side pattern expression contains no pattern.
 	 */
 	protected transient PatternMap fPatternMap;
     public PatternMap getPatternMap() {
@@ -345,8 +349,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
         }
 
     /**
-	 * Check if the condition for the right-hand-sides <code>Module[] or Condition[]</code> expressions evaluates to <code>true</code>.
-	 * Override it in subclasses.
+	 * Check if the condition for the right-hand-sides <code>Module[] or Condition[]</code> expressions evaluates to
+	 * <code>true</code>. Override it in subclasses.
      *
      * @return <code>true</code>
      * @see PatternMatcherAndEvaluator#checkRHSCondition(EvalEngine)
@@ -699,7 +703,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                 // only "pure Orderless" and "FlatOrderless with same size()"
                 // will be handled here:
                 OrderlessStepVisitor visitor = new OrderlessStepVisitor(sym, lhsPatternAST, lhsEvalAST, stackMatcher,
-                        fPatternMap, (sym.hasOneIdentityAttribute())
+						fPatternMap, (sym.hasOneIdentityAttribute() || sym.hasFlatAttribute())
                         // if FLAT isn't set and the Orderless ASTs have
                         // same size ==> use OneIdentity in pattern
                         // matching
@@ -785,7 +789,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     /**
      * Precondition <code>lhsPatternAST.size() > lhsEvalAST.size()</code>.
      *
-	 * @param lhsPatternAST an AST which contains a BlankNullSequence
+	 * @param lhsPatternAST
+	 *            an AST which contains a BlankNullSequence
      * @param lhsEvalAST
      * @param engine
      * @param stackMatcher
@@ -882,9 +887,11 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     }
 
     /**
-	 * Match all sub-expressions which contain no pattern objects if possible (i.e. no Flat or Orderless expressions,...)
+	 * Match all sub-expressions which contain no pattern objects if possible (i.e. no Flat or Orderless
+	 * expressions,...)
 	 *
-	 * Distinguishes between "equally" matched list-expressions and list expressions with <code>expr.isPatternExpr()==true</code>.
+	 * Distinguishes between "equally" matched list-expressions and list expressions with
+	 * <code>expr.isPatternExpr()==true</code>.
      *
      * @param lhsPatternAST
      * @param lhsEvalAST
@@ -918,10 +925,12 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     /**
      * Match the <code>lhsPatternAST</code> with its <code>Default[]</code> values.
      *
-	 * @param symbolWithDefaultValue the symbol for getting the associated default values from
-	 * @param lhsPatternAST          left-hand-side which may contain patterns with default values
-	 * @return <code>F.NIL</code> if the given <code>lhsPatternAST</code> could not be matched or contains no pattern with default
-	 *         value.
+	 * @param symbolWithDefaultValue
+	 *            the symbol for getting the associated default values from
+	 * @param lhsPatternAST
+	 *            left-hand-side which may contain patterns with default values
+	 * @return <code>F.NIL</code> if the given <code>lhsPatternAST</code> could not be matched or contains no pattern
+	 *         with default value.
      */
     private IExpr matchDefaultArgumentsAST(ISymbol symbolWithDefaultValue, IAST lhsPatternAST) {
         IASTAppendable cloned = F.ast(lhsPatternAST.head(), lhsPatternAST.size(), false);
@@ -980,7 +989,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     /**
      * Checks if the two expressions match each other
      *
-	 * @param replaceMode TODO
+	 * @param replaceMode
+	 *            TODO
 	 *
      * @return
      */
@@ -1200,7 +1210,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
             }
 
 			FlatOrderlessStepVisitor visitor = new FlatOrderlessStepVisitor(sym, lhsPatternFinal, lhsEvalFinal,
-                    stackMatcher, fPatternMap);
+					stackMatcher, fPatternMap, sym.hasFlatAttribute());
 			MultisetPartitionsIterator iter = new MultisetPartitionsIterator(visitor, lhsPattern.argSize());
             return !iter.execute();
 		} else {
@@ -1244,8 +1254,10 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	/**
 	 * Remove parts which are "free of patterns" in <code>lhsPattern</code> and <code>lhsEval</code>.
 	 *
-	 * @param lhsPattern the expression which can contain pattern-matching objects
-	 * @param lhsEval    the expression which can contain no patterns
+	 * @param lhsPattern
+	 *            the expression which can contain pattern-matching objects
+	 * @param lhsEval
+	 *            the expression which can contain no patterns
 	 * @return <code>null</code> if the matching isn't possible.
 	 */
 	private IASTAppendable[] removeOrderless(final IAST lhsPattern, final IAST lhsEval) {
@@ -1282,8 +1294,10 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	/**
 	 * Remove parts which are "free of patterns" in <code>lhsPattern</code> and <code>lhsEval</code>.
 	 *
-	 * @param lhsPattern the expression which can contain pattern-matching objects
-	 * @param lhsEval    the expression which can contain no patterns
+	 * @param lhsPattern
+	 *            the expression which can contain pattern-matching objects
+	 * @param lhsEval
+	 *            the expression which can contain no patterns
 	 * @return <code>null</code> if the matching isn't possible.
 	 */
 	private IASTAppendable[] removeFlat(final IAST lhsPattern, final IAST lhsEval) {
@@ -1334,10 +1348,12 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     /**
      * Match the <code>lhsPatternAST</code> with its <code>Default[]</code> values.
      *
-	 * @param symbolWithDefaultValue the symbol for getting the associated default values from
-	 * @param lhsPatternAST          left-hand-side which may contain patterns with default values
-	 * @return <code>F.NIL</code> if the given <code>lhsPatternAST</code> could not be matched or contains no pattern with default
-	 *         value.
+	 * @param symbolWithDefaultValue
+	 *            the symbol for getting the associated default values from
+	 * @param lhsPatternAST
+	 *            left-hand-side which may contain patterns with default values
+	 * @return <code>F.NIL</code> if the given <code>lhsPatternAST</code> could not be matched or contains no pattern
+	 *         with default value.
      */
     private IExpr matchOptionalArgumentsAST(ISymbol symbolWithDefaultValue, IAST lhsPatternAST, IAST lhsEvalAST) {
         int lhsSize = lhsEvalAST.size();
