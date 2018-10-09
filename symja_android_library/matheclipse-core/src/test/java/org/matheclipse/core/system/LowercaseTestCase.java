@@ -4593,6 +4593,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Hold(6/8)==6/8", "Hold(6/8)==3/4");
 	}
 
+	public void testHoldAllComplete() {
+		check("ClearAll(fump); "//
+				+ "SetAttributes(fump, HoldAllComplete);"//
+				+ "fump(e_) := (Print(ToString(Unevaluated(e)) <> \" ~~>\\n\" <> ToString(e)); e); "//
+				+ "fump((42 + 3)*6)", //
+				"270");
+	}
+
 	public void testHoldForm() {
 		check("HoldForm(3*2)", //
 				"3*2");

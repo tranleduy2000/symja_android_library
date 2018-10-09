@@ -6,14 +6,12 @@ import com.duy.lambda.Function;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.Context;
-import org.matheclipse.core.expression.F;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 import org.matheclipse.core.patternmatching.RulesData;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -47,6 +45,17 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * ISymbol attribute for a function, where no argument should be evaluated
      */
     public final static int HOLDALL = HOLDFIRST | HOLDREST;
+
+    /**
+     * ISymbol attribute for a function, where no argument should be evaluated
+     */
+    public final static int HOLDCOMPLETE = HOLDALL | 0x0080;
+
+    /**
+     * ISymbol attribute for a function, where no argument should be evaluated
+     */
+    public final static int HOLDALLCOMPLETE = HOLDCOMPLETE | 0x0100;
+
     /**
      * ISymbol attribute for a function with lists as arguments
      */
@@ -242,7 +251,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public RulesData getRulesData();
 
-	public void setRulesData(RulesData rd);
+    public void setRulesData(RulesData rd);
 
     /**
      * Get the pure symbol name string

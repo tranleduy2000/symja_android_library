@@ -2021,11 +2021,11 @@ public final class Programming {
 			if (!ToggleFeature.UNEVALUATED) {
 				return F.NIL;
 			}
-
-			Validate.checkSize(ast, 2);
-			IExpr arg1 = engine.evaluate(ast.arg1());
-
-			return arg1;
+			if (ast.size() == 2) {
+				return ast.arg1();
+			}
+			engine.printMessage("Unevaluated: expected only one argument.");
+			return F.NIL;
 		}
 
 		@Override
@@ -2033,7 +2033,7 @@ public final class Programming {
 			if (!ToggleFeature.UNEVALUATED) {
 				return;
 			}
-			newSymbol.setAttributes(ISymbol.HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALLCOMPLETE);
 		}
 	}
 

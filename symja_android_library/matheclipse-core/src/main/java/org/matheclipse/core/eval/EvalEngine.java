@@ -511,13 +511,16 @@ public class EvalEngine implements Serializable {
 
 			IASTMutable[] rlist = new IASTMutable[1];
 			rlist[0] = F.NIL;
+			IExpr x = ast.arg1();
 			if ((ISymbol.HOLDFIRST & attr) == ISymbol.NOATTRIBUTE) {
 				// the HoldFirst attribute isn't set here
 				try {
+					if (!x.isAST(F.Unevaluated)) {
 					selectNumericMode(attr, ISymbol.NHOLDFIRST, localNumericMode);
-					evalArg(rlist, ast, ast.arg1(), 1, isNumericFunction);
+						evalArg(rlist, ast, x, 1, isNumericFunction);
 					if (astSize == 2 && rlist[0].isPresent()) {
 						return rlist[0];
+					}
 					}
 				} finally {
 					if ((ISymbol.NHOLDFIRST & attr) == ISymbol.NHOLDFIRST) {
@@ -527,7 +530,6 @@ public class EvalEngine implements Serializable {
 			} else {
 				// the HoldFirst attribute is set here
 				try {
-					IExpr x = ast.arg1();
 					if (x.isAST(F.Evaluate)) {
 						selectNumericMode(attr, ISymbol.NHOLDFIRST, localNumericMode);
 						evalArg(rlist, ast, x, 1, isNumericFunction);
@@ -547,10 +549,9 @@ public class EvalEngine implements Serializable {
 					numericMode = fNumericMode;
 					try {
 						selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
-                            @Override
-                            public void accept(IExpr x, int i) {
-                                EvalEngine.this.evalArg(rlist, ast, x, i, isNumericFunction);
+						ast.forEach(2, astSize, (arg, i) -> {
+							if (!arg.isAST(F.Unevaluated)) {
+								evalArg(rlist, ast, arg, i, isNumericFunction);
                             }
                         });
 					} finally {
@@ -563,12 +564,9 @@ public class EvalEngine implements Serializable {
 				numericMode = fNumericMode;
 				try {
 					selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-					ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
-						@Override
-						public void accept(IExpr x, int i) {
-							if (x.isAST(F.Evaluate)) {
-								EvalEngine.this.evalArg(rlist, ast, x, i, isNumericFunction);
-							}
+						ast.forEach(2, astSize, (arg, i) -> {
+							if (arg.isAST(F.Evaluate)) {
+								evalArg(rlist, ast, arg, i, isNumericFunction);
 						}
 					});
 					} finally {
@@ -1318,7 +1316,7 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @return <code>F.NIL</code> if no evaluation happened
 	 */
-	public IExpr evalRules(ISymbol symbol, IAST ast) {
+	public IExpr evalRules(ISymbol symbol, IAST argsAST) {
 		// if (symbol instanceof BuiltInSymbol) {
 		// try {
 		// ((BuiltInSymbol) symbol).getEvaluator().await();
@@ -1327,19 +1325,27 @@ public class EvalEngine implements Serializable {
 		// return F.NIL;
 		// }
 		// }
+		IAST ast;
+		if (argsAST.exists(x -> x.isAST(F.Unevaluated, 2))) {
+			ast = argsAST.map(x -> {
+				if (x.isAST(F.Unevaluated, 2)) {
+					return ((IAST) x).arg1();
+				}
+				return x;
+			}, 1);
+		} else {
+			ast = argsAST;
+		}
 		IExpr[] result = new IExpr[1];
 		result[0] = F.NIL;
-		if (ast.exists(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
+		if (ast.exists(x -> {
 				if (!(x instanceof IPatternObject)) {
-					result[0] = x.topHead().evalUpRule(EvalEngine.this, ast);
+				result[0] = x.topHead().evalUpRule(this, ast);
 					if (result[0].isPresent()) {
 						return true;
 					}
 				}
 				return false;
-			}
 		})) {
 			return result[0];
 		}
