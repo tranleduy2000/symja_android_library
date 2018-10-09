@@ -173,9 +173,8 @@ public final class PatternMatching {
     private static class Clear extends AbstractCoreFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-            Validate.checkRange(ast, 2);
-            Lambda.forEach(ast, new Predicate<IExpr>() {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Lambda.forEach(ast, new Predicate<IExpr>() {
                 @Override
                 public boolean test(IExpr x) {
                     return x.isSymbol();
@@ -210,10 +209,17 @@ public final class PatternMatching {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 2);
-
-            ISymbol symbol = Validate.checkSymbolType(ast, 1);
-            symbol.clearAll(engine);
+			Lambda.forEach(ast, new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return x.isSymbol();
+                }
+            }, new Consumer<IExpr>() {
+                @Override
+                public void accept(IExpr x) {
+                    ((ISymbol) x).clearAll(engine);
+                }
+            });
             return F.Null;
         }
 
