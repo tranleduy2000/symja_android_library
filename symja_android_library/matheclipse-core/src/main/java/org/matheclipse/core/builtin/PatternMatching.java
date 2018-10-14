@@ -35,12 +35,13 @@ import org.matheclipse.parser.client.ast.ASTNode;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import static org.matheclipse.core.expression.F.Rule;
@@ -353,8 +354,8 @@ public final class PatternMatching {
          * @param is
          * @return the last evaluated expression result
          */
-        protected static IExpr loadPackage(final EvalEngine engine, final Reader is) {
-            final BufferedReader r = new BufferedReader(is);
+		protected static IExpr loadPackage(final EvalEngine engine, final BufferedReader is) {
+			final BufferedReader r = is;
             Context packageContext = null;
             try {
                 final List<ASTNode> node = parseReader(r, engine);
@@ -373,7 +374,8 @@ public final class PatternMatching {
                             packageContext = engine.getContextPath().getContext(contextName);
                             ISymbol endSymbol = F.EndPackage;
                             for (int j = 2; j < ast.size(); j++) {
-                                FileReader reader = new FileReader(ast.get(j).toString());
+//								FileReader reader = new FileReader(ast.get(j).toString());
+								BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(ast.get(j).toString()), "UTF-8"));
                                 Get.loadPackage(engine, reader);
                                 reader.close();
                             }
@@ -1553,8 +1555,12 @@ public final class PatternMatching {
 		boolean packageMode = engine.isPackageMode();
 		try {
 			engine.setPackageMode(true);
-			FileReader reader = new FileReader(file);
+			// FileReader reader = new FileReader(file);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 			return Get.loadPackage(engine, reader);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			engine.printMessage("Get exception: " + e.getMessage());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			engine.printMessage("Get exception: " + e.getMessage());

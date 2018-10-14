@@ -406,7 +406,12 @@ public class ExprParser extends Scanner {
 			return temp;
 
 		} else if (fToken == TT_LIST_OPEN) {
+			fRecursionDepth++;
+			try {
 			return getList();
+			} finally {
+				fRecursionDepth--;
+			}
 		} else if (fToken >= TT_BLANK && fToken <= TT_BLANK_COLON) {
 			return getBlanks(temp);
 		} else if (fToken == TT_DIGIT) {
@@ -481,7 +486,8 @@ public class ExprParser extends Scanner {
 			break;
 		}
 
-		throwSyntaxError("Error in factor at character: '" + fCurrentChar + "' (" + fToken + ")");
+		throwSyntaxError("Error in factor at character: '" + fCurrentChar + "' (Token:" + fToken + " \\u"
+				+ Integer.toHexString(fCurrentChar | 0x10000).substring(1) + ")");
 		return null;
 	}
 
@@ -720,10 +726,11 @@ public class ExprParser extends Scanner {
 
 		final IASTAppendable function = F.ast(head);
 		fRecursionDepth++;
-		try {
+
 			getNextToken();
 
 			if (fToken == TT_ARGUMENTS_CLOSE) {
+			fRecursionDepth--;
 				getNextToken();
 				if (fToken == TT_ARGUMENTS_OPEN) {
 					return getFunctionArguments(function);
@@ -732,9 +739,7 @@ public class ExprParser extends Scanner {
 			}
 
 			getArguments(function);
-		} finally {
 			fRecursionDepth--;
-		}
 		if (fToken == TT_ARGUMENTS_CLOSE) {
 			getNextToken();
 			if (fToken == TT_ARGUMENTS_OPEN) {
@@ -754,16 +759,16 @@ public class ExprParser extends Scanner {
 	 * 
 	 */
 	private IExpr getList() throws SyntaxError {
+		fRecursionDepth++;
+		IASTAppendable function = null;
+		try {
 		getNextToken();
 
 		if (fToken == TT_LIST_CLOSE) {
 			getNextToken();
-			return F.List();
+				return F.CEmptyList;
 		}
-
-		final IASTAppendable function = F.ListAlloc(10); // fFactory.createFunction(fFactory.createSymbol(IConstantOperators.List));
-		fRecursionDepth++;
-		try {
+			function = F.ListAlloc(10);
 			getArguments(function);
 		} finally {
 			fRecursionDepth--;
@@ -1031,7 +1036,7 @@ public class ExprParser extends Scanner {
 	private IExpr parseCompoundExpressionNull(InfixExprOperator infixOperator, IExpr rhs) {
 		if (infixOperator.isOperator(";")) {
 			if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
-					|| fToken == TT_PRECEDENCE_CLOSE) {
+					|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
 				return createInfixFunction(infixOperator, rhs, F.Null);
 				// return infixOperator.createFunction(fFactory, rhs,
 				// fFactory.createSymbol("Null"));
@@ -1138,7 +1143,7 @@ public class ExprParser extends Scanner {
 							getNextToken();
 				if (infixOperator.isOperator(";")) {
 								if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
-										|| fToken == TT_PRECEDENCE_CLOSE) {
+							|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
 						ast.append(F.Null);
 									break;
 								}

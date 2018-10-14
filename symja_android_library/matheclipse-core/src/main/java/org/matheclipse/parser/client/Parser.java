@@ -442,7 +442,8 @@ public class Parser extends Scanner {
 			break;
 		}
 
-		throwSyntaxError("Error in factor at character: '" + fCurrentChar + "' (" + fToken + ")");
+		throwSyntaxError("Error in factor at character: '" + fCurrentChar + "' (Token:" + fToken + " \\u"
+				+ Integer.toHexString(fCurrentChar | 0x10000).substring(1) + ")");
 		return null;
 	}
 
@@ -523,10 +524,11 @@ public class Parser extends Scanner {
 
 		final FunctionNode function = fFactory.createAST(head);
 		fRecursionDepth++;
-		try {
+
 			getNextToken();
 
 			if (fToken == TT_ARGUMENTS_CLOSE) {
+			fRecursionDepth--;
 				getNextToken();
 				if (fToken == TT_ARGUMENTS_OPEN) {
 					return getFunctionArguments(function);
@@ -535,9 +537,8 @@ public class Parser extends Scanner {
 			}
 
 			getArguments(function);
-		} finally {
 			fRecursionDepth--;
-		}
+
 		if (fToken == TT_ARGUMENTS_CLOSE) {
 			getNextToken();
 			if (fToken == TT_ARGUMENTS_OPEN) {
@@ -601,21 +602,17 @@ public class Parser extends Scanner {
 	 */
 	private ASTNode getList() throws SyntaxError {
 		final FunctionNode function = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.List));
-
+		fRecursionDepth++;
 		getNextToken();
 
 		if (fToken == TT_LIST_CLOSE) {
+			fRecursionDepth--;
 			getNextToken();
 
 			return function;
 		}
-
-		fRecursionDepth++;
-		try {
 			getArguments(function);
-		} finally {
 			fRecursionDepth--;
-		}
 		if (fToken == TT_LIST_CLOSE) {
 			getNextToken();
 
@@ -802,7 +799,7 @@ public class Parser extends Scanner {
 	private ASTNode parseCompoundExpressionNull(InfixOperator infixOperator, ASTNode rhs) {
 		if (infixOperator.isOperator(";")) {
 			if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
-					|| fToken == TT_PRECEDENCE_CLOSE) {
+					|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
 				return infixOperator.createFunction(fFactory, rhs, fFactory.createSymbol("Null"));
 			}
 			if (fPackageMode && fRecursionDepth < 1) {
@@ -901,7 +898,7 @@ public class Parser extends Scanner {
 							getNextToken();
 							if (";".equals(infixOperatorString)) {
 								if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
-										|| fToken == TT_PRECEDENCE_CLOSE) {
+						|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
 									((FunctionNode) lhs).add(fFactory.createSymbol("Null"));
 									break;
 								}
