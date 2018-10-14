@@ -39,8 +39,6 @@ import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
-import org.matheclipse.core.patternmatching.PatternMatcher;
-import org.matheclipse.core.patternmatching.PatternMatcherEvalEngine;
 import org.matheclipse.core.reflection.system.Product;
 import org.matheclipse.core.reflection.system.Sum;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
@@ -127,7 +125,8 @@ public final class ListFunctions {
 		/**
 		 * Convert the integer position number >= 0 into an object
 		 *
-		 * @param position which should be converted to an object
+		 * @param position
+		 *            which should be converted to an object
 		 * @return
 		 */
 		T toObject(int position);
@@ -135,7 +134,8 @@ public final class ListFunctions {
 		/**
 		 * Convert the object into an integer number >= 0
 		 *
-		 * @param position the object which should be converted
+		 * @param position
+		 *            the object which should be converted
 		 * @return -1 if the conversion is not possible
 		 */
 		int toInt(T position);
@@ -618,8 +618,8 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns an <code>n</code>-by-<code>m</code> matrix created by applying <code>f</code> to indices ranging from <code>(a, b)</code>
-	 * to <code>(a + n, b + m)</code>.
+	 * returns an <code>n</code>-by-<code>m</code> matrix created by applying <code>f</code> to indices ranging from
+	 * <code>(a, b)</code> to <code>(a + n, b + m)</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -629,7 +629,8 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns an expression with the specified dimensions and index origins, with head <code>h</code> (instead of <code>List</code>).
+	 * returns an expression with the specified dimensions and index origins, with head <code>h</code> (instead of
+	 * <code>List</code>).
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -1001,18 +1002,20 @@ public final class ListFunctions {
 		}
 
 		private static class CasesPatternMatcherFunctor implements Function<IExpr, IExpr> {
-			protected final PatternMatcher matcher;
+			protected final IPatternMatcher matcher;
 			protected IASTAppendable resultCollection;
 			final int maximumResults;
 			private int resultsCounter;
 
 			/**
 			 *
-			 * @param matcher          the pattern-matcher
+			 * @param matcher
+			 *            the pattern-matcher
 			 * @param resultCollection
-			 * @param maximumResults   maximum number of results. -1 for for no limitation
+			 * @param maximumResults
+			 *            maximum number of results. -1 for for no limitation
 			 */
-			public CasesPatternMatcherFunctor(final PatternMatcher matcher, IASTAppendable resultCollection,
+			public CasesPatternMatcherFunctor(final IPatternMatcher matcher, IASTAppendable resultCollection,
 											  int maximumResults) {
 				this.matcher = matcher;
 				this.resultCollection = resultCollection;
@@ -1044,9 +1047,11 @@ public final class ListFunctions {
 
 			/**
 			 *
-			 * @param function         the funtion which should determine the results
+			 * @param function
+			 *            the funtion which should determine the results
 			 * @param resultCollection
-			 * @param maximumResults   maximum number of results. -1 for for no limitation
+			 * @param maximumResults
+			 *            maximum number of results. -1 for for no limitation
 			 */
 			public CasesRulesFunctor(final Function<IExpr, IExpr> function, IASTAppendable resultCollection,
 									 int maximumResults) {
@@ -1103,7 +1108,7 @@ public final class ListFunctions {
 					}
 
 					try {
-						final PatternMatcher matcher = new PatternMatcherEvalEngine(arg2, engine);
+						final IPatternMatcher matcher = engine.evalPatternMatcher(arg2);
 						CasesPatternMatcherFunctor cpmf = new CasesPatternMatcherFunctor(matcher, result,
 								maximumResults);
 						VisitorLevelSpecification level = new VisitorLevelSpecification(cpmf, arg3, false, engine);
@@ -1125,7 +1130,7 @@ public final class ListFunctions {
 				IAST[] results = ast.filter(function);
 				return results[0];
 			}
-			final PatternMatcher matcher = new PatternMatcherEvalEngine(pattern, engine);
+			final IPatternMatcher matcher = engine.evalPatternMatcher(pattern);
 			return ast.filter(F.ListAlloc(), matcher);
 		}
 
@@ -1555,7 +1560,7 @@ public final class ListFunctions {
 			}
 
 			public CountFunctor(final IPatternMatcher patternMatcher) {
-				this.matcher = patternMatcher; // new PatternMatcher(pattern);
+				this.matcher = patternMatcher;
 				counter = 0;
 			}
 
@@ -1650,7 +1655,8 @@ public final class ListFunctions {
 
 			/**
 			 *
-			 * @param matcher the pattern-matcher
+			 * @param matcher
+			 *            the pattern-matcher
 			 */
 			public DeleteCasesPatternMatcherFunctor(final IPatternMatcher matcher) {
 				this.matcher = matcher;
@@ -1702,7 +1708,6 @@ public final class ListFunctions {
 		}
 
 		public static IAST deleteCases(final IAST ast, final IPatternMatcher matcher) {
-			// final IPatternMatcher matcher = new PatternMatcher(pattern);
 			IAST[] results = ast.filter(matcher);
 			return results[1];
 
@@ -1846,8 +1851,10 @@ public final class ListFunctions {
 		 * Drop (remove) the list elements according to the <code>sequenceSpecifications</code> for the list indexes.
 		 *
 		 * @param list
-		 * @param level                  recursion level
-		 * @param sequenceSpecifications one or more ISequence specifications
+		 * @param level
+		 *            recursion level
+		 * @param sequenceSpecifications
+		 *            one or more ISequence specifications
 		 * @return
 		 */
 		private static IAST drop(final IASTAppendable list, final int level, final ISequence[] sequenceSpecifications) {
@@ -1967,12 +1974,14 @@ public final class ListFunctions {
 		}
 
 		/**
-		 * Traverse all <code>list</code> element's and filter out the elements in the given <code>positions</code> list.
+		 * Traverse all <code>list</code> element's and filter out the elements in the given <code>positions</code>
+		 * list.
 		 *
 		 * @param list
 		 * @param positions
-		 * @param positionConverter the <code>positionConverter</code> creates an <code>int</code> value from the given position objects in
-		 *                          <code>positions</code>.
+		 * @param positionConverter
+		 *            the <code>positionConverter</code> creates an <code>int</code> value from the given position
+		 *            objects in <code>positions</code>.
 		 * @param headOffset
 		 */
 		private static IExpr extract(final IAST list, final IAST positions,
@@ -2214,9 +2223,12 @@ public final class ListFunctions {
 		/**
 		 * Create the (ordered) intersection set from both ASTs.
 		 *
-		 * @param ast1   first AST set
-		 * @param ast2   second AST set
-		 * @param result the AST where the elements of the union should be appended
+		 * @param ast1
+		 *            first AST set
+		 * @param ast2
+		 *            second AST set
+		 * @param result
+		 *            the AST where the elements of the union should be appended
 		 * @return
 		 */
 		public static IExpr intersection(IAST ast1, IAST ast2, final IASTAppendable result) {
@@ -2544,7 +2556,8 @@ public final class ListFunctions {
 	 * </p>
 	 * </blockquote>
 	 * <p>
-	 * Level 0 corresponds to the whole expression. A negative level <code>-n</code> consists of parts with depth <code>n</code>.
+	 * Level 0 corresponds to the whole expression. A negative level <code>-n</code> consists of parts with depth
+	 * <code>n</code>.
 	 * </p>
 	 * <h3>Examples</h3>
 	 * <p>
@@ -3126,42 +3139,49 @@ public final class ListFunctions {
 	private final static class Position extends AbstractCoreFunctionEvaluator {
 
 		/**
-		 * Add the positions to the <code>resultCollection</code> where the matching expressions appear in <code>list</code>. The
-		 * <code>positionConverter</code> converts the <code>int</code> position into an object for the <code>resultCollection</code>.
+		 * Add the positions to the <code>resultCollection</code> where the matching expressions appear in
+		 * <code>list</code>. The <code>positionConverter</code> converts the <code>int</code> position into an object
+		 * for the <code>resultCollection</code>.
 		 *
-		 * @param list
+		 * @param ast
 		 * @param prototypeList
 		 * @param resultCollection
+		 * @param maxResults
+		 *            the maximum number of results which should be returned in <code>resultCollection</code>
 		 * @param level
 		 * @param matcher
 		 * @param positionConverter
 		 * @param headOffset
 		 * @return
 		 */
-		public static IAST position(final IAST list, final IAST prototypeList, final IASTAppendable resultCollection,
-									final LevelSpec level, final Predicate<? super IExpr> matcher,
+		private static IAST position(final IAST ast, final IAST prototypeList, final IASTAppendable resultCollection,
+				int maxResults, final LevelSpec level, final Predicate<? super IExpr> matcher,
 									final IPositionConverter<? extends IExpr> positionConverter, int headOffset) {
 			int minDepth = 0;
 			level.incCurrentLevel();
 			IASTAppendable clone = null;
-			final int size = list.size();
+			final int size = ast.size();
 			for (int i = headOffset; i < size; i++) {
-				if (list.get(i).isAST()) {
+				if (ast.get(i).isAST()) {
 					// clone = (INestedList<IExpr>) prototypeList.clone();
 					clone = prototypeList.copyAppendable();
 					clone.append(positionConverter.toObject(i));
-					position((IAST) list.get(i), clone, resultCollection, level, matcher, positionConverter,
-							headOffset);
+					position((IAST) ast.get(i), clone, resultCollection, Integer.MAX_VALUE, level, matcher,
+							positionConverter, headOffset);
 					if (level.getCurrentDepth() < minDepth) {
 						minDepth = level.getCurrentDepth();
 					}
 				}
-				if (matcher.test(list.get(i))) {
+				if (matcher.test(ast.get(i))) {
 					if (level.isInRange()) {
 						clone = prototypeList.copyAppendable();
 						IExpr IExpr = positionConverter.toObject(i);
 						clone.append(IExpr);
+						if (maxResults >= resultCollection.size()) {
 						resultCollection.append(clone);
+						} else {
+							break;
+						}
 					}
 				}
 			}
@@ -3170,9 +3190,20 @@ public final class ListFunctions {
 			return resultCollection;
 		}
 
-		public static IAST position(final IAST list, final IExpr pattern, final LevelSpec level, EvalEngine engine) {
-			final PatternMatcher matcher = new PatternMatcherEvalEngine(pattern, engine);
-			final PositionConverter pos = new PositionConverter();
+		/**
+		 *
+		 * @param ast
+		 * @param pattern
+		 * @param level
+		 * @param maxResults
+		 *            the maximum number of results which should be returned in the resulting <code>List</code>
+		 * @param engine
+		 * @return a <code>F.List()</code> of result positions
+		 */
+		private static IAST position(final IAST ast, final IExpr pattern, final LevelSpec level, int maxResults,
+				EvalEngine engine) {
+			final IPatternMatcher matcher = engine.evalPatternMatcher(pattern);
+			final PositionConverter positionConverter = new PositionConverter();
 
 			final IAST cloneList = List();
 			final IASTAppendable resultList = F.ListAlloc(8);
@@ -3180,7 +3211,7 @@ public final class ListFunctions {
 			if (level.isIncludeHeads()) {
 				headOffset = 0;
 			}
-			position(list, cloneList, resultList, level, matcher, pos, headOffset);
+			position(ast, cloneList, resultList, maxResults, level, matcher, positionConverter, headOffset);
 			return resultList;
 		}
 
@@ -3189,32 +3220,42 @@ public final class ListFunctions {
 			if (ast.isAST1()) {
 				return F.operatorFormAST1(ast);
 			}
-			Validate.checkRange(ast, 3, 4);
+			if (ast.size() < 3) {
+				return F.NIL;
+			}
 
+			int maxResults = Integer.MAX_VALUE;
+			if (ast.size() >= 5) {
+				maxResults = ast.arg4().toIntDefault(Integer.MIN_VALUE);
+				if (maxResults < 0) {
+					engine.printMessage("Position: non-negative integer for maximum number of objects expected.");
+					return F.NIL;
+				}
+			}
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isAST()) {
 				final IExpr arg2 = engine.evalPattern(ast.arg2());
 				if (ast.isAST2()) {
 					final LevelSpec level = new LevelSpec(0, Integer.MAX_VALUE);
-					return position((IAST) arg1, arg2, level, engine);
+					return position((IAST) arg1, arg2, level, Integer.MAX_VALUE, engine);
 				}
-				if (ast.isAST3()) {
+				if (ast.size() >= 4) {
 					final Options options = new Options(ast.topHead(), ast, 2, engine);
 					IExpr option = options.getOption("Heads");
 					if (option.isPresent()) {
 						if (option.isTrue()) {
 							final LevelSpec level = new LevelSpec(0, Integer.MAX_VALUE, true);
-							return position((IAST) arg1, arg2, level, engine);
+							return position((IAST) arg1, arg2, level, Integer.MAX_VALUE, engine);
 						}
 						if (option.isFalse()) {
 							final LevelSpec level = new LevelSpec(0, Integer.MAX_VALUE, false);
-							return position((IAST) arg1, arg2, level, engine);
+							return position((IAST) arg1, arg2, level, maxResults, engine);
 						}
 						return F.NIL;
 					}
 					final IExpr arg3 = engine.evaluate(ast.arg3());
 					final LevelSpec level = new LevelSpecification(arg3, true);
-					return position((IAST) arg1, arg2, level, engine);
+					return position((IAST) arg1, arg2, level, maxResults, engine);
 				}
 			}
 			return F.NIL;
@@ -3238,7 +3279,8 @@ public final class ListFunctions {
 	 * </blockquote>
 	 * <h3>Examples</h3>
 	 * <p>
-	 * <code>Prepend</code> is similar to <code>Append</code>, but adds <code>item</code> to the beginning of <code>expr</code>:
+	 * <code>Prepend</code> is similar to <code>Append</code>, but adds <code>item</code> to the beginning of
+	 * <code>expr</code>:
 	 * </p>
 	 *
 	 * <pre>
@@ -4188,7 +4230,8 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * splits <code>list</code> into collections of consecutive elements that give the same result when <code>f</code> is applied.
+	 * splits <code>list</code> into collections of consecutive elements that give the same result when <code>f</code>
+	 * is applied.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -4345,7 +4388,8 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>1</code> to <code>n</code>, returning a list of the results.
+	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>1</code> to <code>n</code>, returning a list
+	 * of the results.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -4355,8 +4399,8 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>start</code> to <code>stop</code>, incrementing by
-	 * <code>step</code>.
+	 * evaluates <code>expr</code> with <code>i</code> ranging from <code>start</code> to <code>stop</code>,
+	 * incrementing by <code>step</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -4441,9 +4485,12 @@ public final class ListFunctions {
 		 * Generate a table from standard iterator notation.
 		 *
 		 * @param ast
-		 * @param resultList   the result list to which the generated expressions should be appended.
-		 * @param defaultValue the default value used in the iterator
-		 * @param engine       the current evaluation engine
+		 * @param resultList
+		 *            the result list to which the generated expressions should be appended.
+		 * @param defaultValue
+		 *            the default value used in the iterator
+		 * @param engine
+		 *            the current evaluation engine
 		 * @return <code>F.NIL</code> if no evaluation is possible
 		 */
 		protected static IExpr evaluateTable(final IAST ast, final IAST resultList, IExpr defaultValue,
@@ -4495,12 +4542,16 @@ public final class ListFunctions {
 		}
 
 		/**
-		 * Evaluate only the last iterator in <code>iter</code> for <code>Sum()</code> or <code>Product()</code> function calls.
+		 * Evaluate only the last iterator in <code>iter</code> for <code>Sum()</code> or <code>Product()</code>
+		 * function calls.
 		 *
 		 * @param expr
-		 * @param iter         the iterator function
-		 * @param resultList   the result list to which the generated expressions should be appended.
-		 * @param defaultValue the default value used if the iterator is invalid
+		 * @param iter
+		 *            the iterator function
+		 * @param resultList
+		 *            the result list to which the generated expressions should be appended.
+		 * @param defaultValue
+		 *            the default value used if the iterator is invalid
 		 * @return <code>F.NIL</code> if no evaluation is possible
 		 * @see Product
 		 * @see Sum
@@ -4553,7 +4604,8 @@ public final class ListFunctions {
 		}
 
 		/**
-		 * Determine all local variables of the iterators starting with index <code>2</code> in the given <code>ast</code>.
+		 * Determine all local variables of the iterators starting with index <code>2</code> in the given
+		 * <code>ast</code>.
 		 *
 		 * @param ast
 		 * @return
@@ -4578,11 +4630,13 @@ public final class ListFunctions {
 		}
 
 		/**
-		 * Disable the <code>Reap() and Sow()</code> mode temporary and evaluate an expression for the given &quot;local variables
-		 * list&quot;. If evaluation is not possible return the input object.
+		 * Disable the <code>Reap() and Sow()</code> mode temporary and evaluate an expression for the given &quot;local
+		 * variables list&quot;. If evaluation is not possible return the input object.
 		 *
-		 * @param expr               the expression which should be evaluated
-		 * @param localVariablesList a list of symbols which should be used as local variables inside the block
+		 * @param expr
+		 *            the expression which should be evaluated
+		 * @param localVariablesList
+		 *            a list of symbols which should be used as local variables inside the block
 		 * @return the evaluated object
 		 */
 		public static IExpr evalBlockWithoutReap(IExpr expr, IAST localVariablesList) {
@@ -4794,8 +4848,10 @@ public final class ListFunctions {
 		 * Take the list elements according to the <code>sequenceSpecifications</code> for the list indexes.
 		 *
 		 * @param list
-		 * @param level                  recursion level
-		 * @param sequenceSpecifications one or more ISequence specifications
+		 * @param level
+		 *            recursion level
+		 * @param sequenceSpecifications
+		 *            one or more ISequence specifications
 		 * @return
 		 */
 		public IAST take(final IAST list, final int level, final ISequence[] sequenceSpecifications) {
@@ -5039,11 +5095,12 @@ public final class ListFunctions {
 	}
 
 	/**
-	 * Fold the list from <code>start</code> index including to <code>end</code> index excluding into the <code>resultCollection</code>.
-	 * If the <i>binaryFunction</i> returns <code>null</code>, the left element will be added to the result list, otherwise the result
-	 * will be <i>folded</i> again with the next element in the list.
+	 * Fold the list from <code>start</code> index including to <code>end</code> index excluding into the
+	 * <code>resultCollection</code>. If the <i>binaryFunction</i> returns <code>null</code>, the left element will be
+	 * added to the result list, otherwise the result will be <i>folded</i> again with the next element in the list.
 	 *
-	 * @param expr             initial value. If <code>null</code>use first element of list as initial value.
+	 * @param expr
+	 *            initial value. If <code>null</code>use first element of list as initial value.
 	 * @param list
 	 * @param start
 	 * @param end

@@ -109,6 +109,7 @@ public class PredicateQ {
 		F.QuantityQ.setEvaluator(new QuantityQ());
 		F.RealNumberQ.setEvaluator(new RealNumberQ());
 		F.SquareMatrixQ.setEvaluator(new SquareMatrixQ());
+		F.StringQ.setPredicateQ(x -> x.isString());
 		F.SymbolQ.setPredicateQ(new Predicate<IExpr>() {
 			@Override
 			public boolean test(IExpr x) {
@@ -489,7 +490,9 @@ public class PredicateQ {
 				if (arg2.isSymbol() || arg2.isNumber() || arg2.isString()) {
 					return F.bool(arg1.isFree(arg2, true));
 				}
-			final IPatternMatcher matcher = new PatternMatcherEvalEngine(arg2, engine);
+
+				// final IPatternMatcher matcher = new PatternMatcherEvalEngine(arg2, engine);
+				final IPatternMatcher matcher = engine.evalPatternMatcher(arg2);
 			if (matcher.isRuleWithoutPatterns()) {
 				// special for FreeQ(), don't implemented in MemberQ()!
 				if (arg1.isOrderlessAST() && arg2.isOrderlessAST() && arg1.head().equals(arg2.head())) {
@@ -608,8 +611,8 @@ public class PredicateQ {
 	 * 
 	 * <blockquote>
 	 * <p>
-	 * only returns <code>True</code> if <code>f(x)</code> returns <code>True</code> for each element <code>x</code> of the matrix
-	 * <code>m</code>.
+	 * only returns <code>True</code> if <code>f(x)</code> returns <code>True</code> for each element <code>x</code> of
+	 * the matrix <code>m</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>

@@ -140,18 +140,18 @@ public class AST2Expr {
 			"SinhIntegral", "Skewness", "SokalSneathDissimilarity", "Solve", "Sort", "Sow", "Span", "Split", "SplitBy",
 			"Sqrt", "SquaredEuclideanDistance", "SquareFreeQ", "SquareMatrixQ", "StandardDeviation", "StandardForm",
 			"Standardize", "StieltjesGamma", "StirlingS1", "StirlingS2", "StringDrop", "StringJoin", "StringLength",
-			"StringTake", "StruveH", "StruveL", "StudentTDistribution", "Subdivide", "Subfactorial", "Subscript",
-			"Subsuperscript", "Subsets", "Subtract", "SubtractFrom", "Sum", "Superscript", "SurfaceGraphics", "Switch",
-			"SyntaxLength", "SymbolName", "SymbolQ", "Symmetric", "SymmetricMatrixQ", "SyntaxQ", "Table", "TableForm",
-			"Take", "Tally", "Tan", "Tanh", "TautologyQ", "Taylor", "TensorDimensions", "TensorProduct", "TensorRank",
-			"TensorSymmetry", "TeXForm", "Thread", "Through", "Throw", "TimeConstrained", "Times", "TimesBy",
-			"TimeValue", "Timing", "ToCharacterCode", "ToeplitzMatrix", "Together", "ToPolarCoordinates", "ToRadicals",
-			"ToString", "Total", "ToUnicode", "Tr", "Trace", "TraditionalForm", "Transpose", "TrigExpand", "TrigReduce",
-			"TrigToExp", "TrueQ", "Tuples", "Undefined", "Unequal", "Unevaluated", "UniformDistribution", "Union",
-			"Unique", "UnitaryMatrixQ", "UnitConvert", "Unitize", "UnitStep", "UnitVector", "UnsameQ", "Unset",
-			"UpperCaseQ", "UpperTriangularize", "UpSet", "UpSetDelayed", "ValueQ", "VandermondeMatrix", "Variables",
-			"Variance", "VectorAngle", "VectorQ", "WeibullDistribution", "Which", "While", "With", "Xor",
-			"YuleDissimilarity", "ZeroSymmetric", "Zeta" };
+			"StringTake", "StringQ", "StringReplace", "StruveH", "StruveL", "StudentTDistribution", "Subdivide",
+			"Subfactorial", "Subscript", "Subsuperscript", "Subsets", "Subtract", "SubtractFrom", "Sum", "Superscript",
+			"SurfaceGraphics", "Switch", "SyntaxLength", "SymbolName", "SymbolQ", "Symmetric", "SymmetricMatrixQ",
+			"SyntaxQ", "Table", "TableForm", "Take", "Tally", "Tan", "Tanh", "TautologyQ", "Taylor", "TensorDimensions",
+			"TensorProduct", "TensorRank", "TensorSymmetry", "TeXForm", "Thread", "Through", "Throw", "TimeConstrained",
+			"Times", "TimesBy", "TimeValue", "Timing", "ToCharacterCode", "ToeplitzMatrix", "Together",
+			"ToPolarCoordinates", "ToRadicals", "ToString", "Total", "ToUnicode", "Tr", "Trace", "TraditionalForm",
+			"Transpose", "TrigExpand", "TrigReduce", "TrigToExp", "TrueQ", "Tuples", "Undefined", "Unequal",
+			"Unevaluated", "UniformDistribution", "Union", "Unique", "UnitaryMatrixQ", "UnitConvert", "Unitize",
+			"UnitStep", "UnitVector", "UnsameQ", "Unset", "UpperCaseQ", "UpperTriangularize", "UpSet", "UpSetDelayed",
+			"ValueQ", "VandermondeMatrix", "Variables", "Variance", "VectorAngle", "VectorQ", "WeibullDistribution",
+			"Which", "While", "With", "Xor", "YuleDissimilarity", "ZeroSymmetric", "Zeta" };
 
 	public static Map<String, Integer> RUBI_STATISTICS_MAP;
 

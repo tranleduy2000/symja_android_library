@@ -2232,6 +2232,12 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol StringLength = F.initFinalSymbol("StringLength", ID.StringLength);
 
+    /***/
+    public final static IBuiltInSymbol StringQ = F.initFinalSymbol("StringQ", ID.StringQ);
+
+    /***/
+    public final static IBuiltInSymbol StringReplace = F.initFinalSymbol("StringReplace", ID.StringReplace);
+
 	/***/
 	public final static IBuiltInSymbol StringTake = F.initFinalSymbol("StringTake", ID.StringTake);
 
@@ -3705,7 +3711,8 @@ public class F {
 	 * <b>Note:</b> user defined variables on the context path are defined with method <code>userSymbol()</code>
 	 * </p>
 	 * 
-	 * @param symbolName the name of the symbol
+	 * @param symbolName
+	 *            the name of the symbol
 	 * @return
 	 */
 	public static ISymbol $s(final String symbolName) {
@@ -3749,8 +3756,8 @@ public class F {
 	/**
 	 * Converts an arbitrary expression to a type that can be used inside Symja.
 	 * 
-	 * For example, it will convert Java <code>Integer</code> into instance of <code>IntegerSym</code>, <code>Double</code> into
-	 * instances of <code>Num</code>, etc.
+	 * For example, it will convert Java <code>Integer</code> into instance of <code>IntegerSym</code>,
+	 * <code>Double</code> into instances of <code>Num</code>, etc.
 	 * 
 	 * 
 	 * @param object
@@ -3762,15 +3769,17 @@ public class F {
 
 	/**
 	 * <p>
-	 * Get or create a global predefined symbol which is retrieved from the SYSTEM context map or created or retrieved from the SYSTEM
-	 * context variables map.
+	 * Get or create a global predefined symbol which is retrieved from the SYSTEM context map or created or retrieved
+	 * from the SYSTEM context variables map.
 	 * </p>
 	 * <p>
 	 * <b>Note:</b> user defined variables on the context path are defined with method <code>userSymbol()</code>
 	 * </p>
 	 * 
-	 * @param symbolName the name of the symbol
-	 * @param setEval    if <code>true</code> determine and assign the built-in evaluator object to the symbol.
+	 * @param symbolName
+	 *            the name of the symbol
+	 * @param setEval
+	 *            if <code>true</code> determine and assign the built-in evaluator object to the symbol.
 	 * @return
 	 */
 	private static ISymbol $s(final String symbolName, boolean setEval) {
@@ -4120,9 +4129,9 @@ public class F {
 		return binaryAST2(ArithmeticGeometricMean, a0, a1);
 	}
 	/**
-	 * Creates a new AST from the given <code>ast</code> and <code>head</code>. if <code>include</code> is set to <code>true </code> all
-	 * arguments from index first to last-1 are copied in the new list if <code>include</code> is set to <code> false </code> all
-	 * arguments excluded from index first to last-1 are copied in the new list
+	 * Creates a new AST from the given <code>ast</code> and <code>head</code>. if <code>include</code> is set to
+	 * <code>true </code> all arguments from index first to last-1 are copied in the new list if <code>include</code> is
+	 * set to <code> false </code> all arguments excluded from index first to last-1 are copied in the new list
 	 * 
 	 */
 	public static IAST ast(final IAST f, final IExpr head, final boolean include, final int first, final int last) {
@@ -4149,8 +4158,9 @@ public class F {
 	/**
 	 * Create a new abstract syntax tree (AST).
 	 * 
-	 * @param head the header expression of the function. If the ast represents a function like <code>f[x,y], Sin[x],...</code>, the
-	 *             <code>head</code> will be an instance of type ISymbol.
+	 * @param head
+	 *            the header expression of the function. If the ast represents a function like
+	 *            <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
 	 * 
 	 */
 	public final static IASTAppendable ast(final IExpr head) {
@@ -4183,8 +4193,10 @@ public class F {
 	 * Create a new <code>List()</code> with <code>copies</code> number of arguments, which are set to
 	 * <code>value</code>.
 	 * 
-	 * @param value  initialize all elements with <code>value</code>.
-	 * @param copies the initial capacity (i.e. number of arguments without the header element) of the list.
+	 * @param value
+	 *            initialize all elements with <code>value</code>.
+	 * @param copies
+	 *            the initial capacity (i.e. number of arguments without the header element) of the list.
 	 * @return
 	 */
 	public static IASTAppendable constantArray(final IExpr value, final int copies) {
@@ -4192,13 +4204,16 @@ public class F {
 	}
 
 	/**
-	 * Create a new abstract syntax tree (AST) with a <code>head</code> and <code>copies</code> number of arguments, which are set to
-	 * <code>value</code>.
+	 * Create a new abstract syntax tree (AST) with a <code>head</code> and <code>copies</code> number of arguments,
+	 * which are set to <code>value</code>.
 	 * 
-	 * @param head   the header expression of the function. If the ast represents a function like <code>f[x,y], Sin[x],...</code>, the
-	 *               <code>head</code> will be an instance of type ISymbol.
-	 * @param value  initialize all elements with <code>value</code>.
-	 * @param copies the initial capacity (i.e. number of arguments without the header element) of the list.
+	 * @param head
+	 *            the header expression of the function. If the ast represents a function like
+	 *            <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
+	 * @param value
+	 *            initialize all elements with <code>value</code>.
+	 * @param copies
+	 *            the initial capacity (i.e. number of arguments without the header element) of the list.
 	 * @return
 	 */
 	public static IASTAppendable constantArray(final IExpr head, final IExpr value, final int copies) {
@@ -4505,8 +4520,10 @@ public class F {
 	/**
 	 * Set real or imaginary parts of a numeric argument to zero, those absolute value is less than a delta.
 	 * 
-	 * @param arg   a numeric number
-	 * @param delta the delta for which
+	 * @param arg
+	 *            a numeric number
+	 * @param delta
+	 *            the delta for which
 	 * @return <code>arg</code> if the argument couldn't be chopped
 	 */
 	public static INumber chopNumber(INumber arg, double delta) {
@@ -4629,8 +4646,10 @@ public class F {
 	/**
 	 * Create a symbolic complex number
 	 * 
-	 * @param realPart the real double value part which should be converted to a complex number
-	 * @param imagPart the imaginary double value part which should be converted to a complex number
+	 * @param realPart
+	 *            the real double value part which should be converted to a complex number
+	 * @param imagPart
+	 *            the imaginary double value part which should be converted to a complex number
 	 * @return IFraction
 	 */
 	public static IComplex complex(final double realPart, final double imagPart) {
@@ -4640,8 +4659,10 @@ public class F {
 	/**
 	 * Create a symbolic complex number
 	 * 
-	 * @param realPart the real double value part which should be converted to a complex number
-	 * @param imagPart the imaginary double value part which should be converted to a complex number
+	 * @param realPart
+	 *            the real double value part which should be converted to a complex number
+	 * @param imagPart
+	 *            the imaginary double value part which should be converted to a complex number
 	 * @param epsilon
 	 * @return IFraction
 	 */
@@ -4713,7 +4734,8 @@ public class F {
 	/**
 	 * Create a complex numeric number with imaginary part = 0.0
 	 * 
-	 * @param r the real part of the number
+	 * @param r
+	 *            the real part of the number
 	 * @return
 	 */
 	public static IComplexNum complexNum(final double r) {
@@ -4723,8 +4745,10 @@ public class F {
 	/**
 	 * Create a complex numeric value
 	 * 
-	 * @param r real part
-	 * @param i imaginary part
+	 * @param r
+	 *            real part
+	 * @param i
+	 *            imaginary part
 	 * @return
 	 */
 	public static IComplexNum complexNum(final double r, final double i) {
@@ -5019,8 +5043,10 @@ public class F {
 	/**
 	 * The division <code>arg1 / arg2</code> will be represented by <code>arg1 * arg2^(-1)</code>.
 	 * 
-	 * @param arg1 numerator
-	 * @param arg2 denominator
+	 * @param arg1
+	 *            numerator
+	 * @param arg2
+	 *            denominator
 	 * @return
 	 */
 	public static IAST Divide(final IExpr arg1, final IExpr arg2) {
@@ -5112,7 +5138,8 @@ public class F {
 	/**
 	 * Evaluate an expression. If no evaluation was possible this method returns the given argument.
 	 * 
-	 * @param a the expression which should be evaluated
+	 * @param a
+	 *            the expression which should be evaluated
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
@@ -5123,7 +5150,8 @@ public class F {
 	/**
 	 * Parse and evaluate a string expression.
 	 *
-	 * @param str the string expression which should be parsed and evaluated
+	 * @param str
+	 *            the string expression which should be parsed and evaluated
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
@@ -5148,7 +5176,8 @@ public class F {
 	/**
 	 * Evaluate <code>Expand()</code> for the given expression. returns the given argument.
 	 * 
-	 * @param a the expression which should be evaluated
+	 * @param a
+	 *            the expression which should be evaluated
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
@@ -5173,10 +5202,11 @@ public class F {
 	}
 
 	/**
-	 * Apply <code>ExpandAll()</code> to the given expression if it's an <code>IAST</code>. If expanding wasn't possible this method
-	 * returns the given argument.
+	 * Apply <code>ExpandAll()</code> to the given expression if it's an <code>IAST</code>. If expanding wasn't possible
+	 * this method returns the given argument.
 	 * 
-	 * @param a the expression which should be evaluated
+	 * @param a
+	 *            the expression which should be evaluated
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
@@ -5185,10 +5215,11 @@ public class F {
 	}
 
 	/**
-	 * Apply <code>ExpandAll()</code> to the given expression if it's an <code>IAST</code>. If expanding wasn't possible this method
-	 * returns the given argument.
+	 * Apply <code>ExpandAll()</code> to the given expression if it's an <code>IAST</code>. If expanding wasn't possible
+	 * this method returns the given argument.
 	 * 
-	 * @param a the expression which should be evaluated
+	 * @param a
+	 *            the expression which should be evaluated
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
@@ -5209,10 +5240,11 @@ public class F {
 	}
 
 	/**
-	 * Evaluate an expression in &quot;quiet mode&quot;. If no evaluation was possible this method returns the given argument. In
-	 * &quot;quiet mode&quot; all warnings would be suppressed.
+	 * Evaluate an expression in &quot;quiet mode&quot;. If no evaluation was possible this method returns the given
+	 * argument. In &quot;quiet mode&quot; all warnings would be suppressed.
 	 * 
-	 * @param a the expression which should be evaluated
+	 * @param a
+	 *            the expression which should be evaluated
 	 * @return the evaluated expression
 	 * @see EvalEngine#evalQuiet(IExpr)
 	 * @deprecated use EvalEngine#evalQuiet();
@@ -5223,10 +5255,11 @@ public class F {
 	}
 
 	/**
-	 * Evaluate an expression in &quot;quiet mode&quot;. If evaluation is not possible return <code>null</code>. In &quot;quiet
-	 * mode&quot; all warnings would be suppressed.
+	 * Evaluate an expression in &quot;quiet mode&quot;. If evaluation is not possible return <code>null</code>. In
+	 * &quot;quiet mode&quot; all warnings would be suppressed.
 	 * 
-	 * @param expr the expression which should be evaluated
+	 * @param expr
+	 *            the expression which should be evaluated
 	 * @return the evaluated object or <code>F.NIL</code> if no evaluation was possible
 	 * @see EvalEngine#evalQuietNull(IExpr)
 	 * @deprecated use EvalEngine#evalQuietNull()
@@ -5314,11 +5347,14 @@ public class F {
 	}
 
 	/**
-	 * depending on the derived class of the given {@link Number}, the value is encoded as {@link IInteger}, {@link INum}
+	 * depending on the derived class of the given {@link Number}, the value is encoded as {@link IInteger},
+	 * {@link INum}
 	 *
-	 * @param number non-null
+	 * @param number
+	 *            non-null
 	 * @return scalar with best possible accuracy to encode given number
-	 * @throws Exception if number is null, or instance of an unsupported type
+	 * @throws Exception
+	 *             if number is null, or instance of an unsupported type
 	 */
 	public static IExpr expr(Number number) {
 		if (number instanceof Integer || //

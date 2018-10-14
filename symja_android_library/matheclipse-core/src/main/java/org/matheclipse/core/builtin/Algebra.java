@@ -44,7 +44,6 @@ import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
-import org.matheclipse.core.patternmatching.PatternMatcherEvalEngine;
 import org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcher;
 import org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcherPlus;
 import org.matheclipse.core.patternmatching.hash.HashedPatternRules;
@@ -408,8 +407,10 @@ public class Algebra {
 		 * Calculate the GCD[] of the integer factors in each element of the <code>numeratorPlus</code> expression with
 		 * the <code>denominatorInt</code>. After that return the result divided by the gcd value, if possible.
 		 *
-		 * @param numeratorPlus  a <code>Plus[...]</code> expression as the numerator
-		 * @param denominatorInt an integer value for the denominator
+		 * @param numeratorPlus
+		 *            a <code>Plus[...]</code> expression as the numerator
+		 * @param denominatorInt
+		 *            an integer value for the denominator
 		 * @return <code>null</code> if no gcd value was found
 		 */
 		private static IExpr[] cancelPlusIntegerGCD(IAST numeratorPlus, IInteger denominatorInt) {
@@ -723,7 +724,8 @@ public class Algebra {
 				IAST poly = (IAST) expr;
 				IASTAppendable rest = F.PlusAlloc(poly.size());
 
-				IPatternMatcher matcher = new PatternMatcherEvalEngine(x, engine);
+//				IPatternMatcher matcher = new PatternMatcherEvalEngine(x, engine);
+				final IPatternMatcher matcher = engine.evalPatternMatcher(x);
 				collectToMap(poly, matcher, map, rest);
 				if (listOfVariables != null && listPosition < listOfVariables.size()) {
 					// collect next pattern in sub-expressions
@@ -1087,7 +1089,8 @@ public class Algebra {
 	 * a^2*c^2+2*a*b*c^2+b^2*c^2+2*a^2*c*d+4*a*b*c*d+2*b^2*c*d+a^2*d^2+2*a*b*d^2+b^2*d^2+b(1+a)
 	 * </pre>
 	 * <p>
-	 * <code>Expand</code> expands out rational powers by expanding the <code>Floor()</code> part of the rational powers number:
+	 * <code>Expand</code> expands out rational powers by expanding the <code>Floor()</code> part of the rational powers
+	 * number:
 	 * </p>
 	 *
 	 * <pre>
@@ -1277,7 +1280,8 @@ public class Algebra {
 			}
 
 			/**
-			 * Expand <code>(a+b)^i</code> with <code>i</code> an integer number in the range Integer.MIN_VALUE to Integer.MAX_VALUE.
+			 * Expand <code>(a+b)^i</code> with <code>i</code> an integer number in the range Integer.MIN_VALUE to
+			 * Integer.MAX_VALUE.
 			 *
 			 * @param powerAST
 			 * @return
@@ -2184,10 +2188,12 @@ public class Algebra {
 		}
 
 		/**
-		 * Get the &quot;numerator form&quot; of the given function. Example: <code>Csc[x]</code> gives <code>Sin[x]</code>.
+		 * Get the &quot;numerator form&quot; of the given function. Example: <code>Csc[x]</code> gives
+		 * <code>Sin[x]</code>.
 		 *
-		 * @param function the function which should be transformed to &quot;denominator form&quot; determine the denominator by splitting
-		 *                 up functions like <code>Tan[9,Cot[], Csc[],...</code>
+		 * @param function
+		 *            the function which should be transformed to &quot;denominator form&quot; determine the denominator
+		 *            by splitting up functions like <code>Tan[9,Cot[], Csc[],...</code>
 		 * @param trig
 		 * @return
 		 */
@@ -2231,15 +2237,16 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the extended GCD ('greatest common divisor') of the univariate polynomials <code>p</code> and <code>q</code> modulus the
-	 * <code>prime</code> integer.
+	 * returns the extended GCD ('greatest common divisor') of the univariate polynomials <code>p</code> and
+	 * <code>q</code> modulus the <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 * <p>
 	 * See:
 	 * </p>
 	 * <ul>
-	 * <li><a href= "https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm#Polynomial_extended_Euclidean_algorithm">Wikipedia:
+	 * <li><a href=
+	 * "https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm#Polynomial_extended_Euclidean_algorithm">Wikipedia:
 	 * Polynomial extended Euclidean algorithm</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
@@ -2355,8 +2362,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the GCD ('greatest common divisor') of the polynomials <code>p</code> and <code>q</code> modulus the <code>prime</code>
-	 * integer.
+	 * returns the GCD ('greatest common divisor') of the polynomials <code>p</code> and <code>q</code> modulus the
+	 * <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2495,8 +2502,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code> modulus the <code>prime</code>
-	 * integer.
+	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code> modulus the
+	 * <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2606,8 +2613,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * return <code>True</code> if <code>p</code> is a polynomial for the variable <code>x</code>. Return <code>False</code> in all
-	 * other cases.
+	 * return <code>True</code> if <code>p</code> is a polynomial for the variable <code>x</code>. Return
+	 * <code>False</code> in all other cases.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2618,8 +2625,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * return <code>True</code> if <code>p</code> is a polynomial for the variables <code>x, y, ...</code> defined in the list. Return
-	 * <code>False</code> in all other cases.
+	 * return <code>True</code> if <code>p</code> is a polynomial for the variables <code>x, y, ...</code> defined in
+	 * the list. Return <code>False</code> in all other cases.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2661,7 +2668,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable <code>x</code>.
+	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable
+	 * <code>x</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2672,8 +2680,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable <code>x</code> modulus the
-	 * <code>prime</code> integer.
+	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable
+	 * <code>x</code> modulus the <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2719,8 +2727,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns a list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for the variable
-	 * <code>x</code>.
+	 * returns a list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code>
+	 * for the variable <code>x</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2731,8 +2739,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for the variable
-	 * <code>x</code> modulus the <code>prime</code> integer.
+	 * returns list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for
+	 * the variable <code>x</code> modulus the <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2825,7 +2833,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable <code>x</code>.
+	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable
+	 * <code>x</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2836,8 +2845,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable <code>x</code> modulus the
-	 * <code>prime</code> integer.
+	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable
+	 * <code>x</code> modulus the <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -3051,9 +3060,12 @@ public class Algebra {
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1</code>.
 		 *
-		 * @param a       coefficient a of the polynomial
-		 * @param b       coefficient b of the polynomial
-		 * @param nthRoot <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
+		 * @param a
+		 *            coefficient a of the polynomial
+		 * @param b
+		 *            coefficient b of the polynomial
+		 * @param nthRoot
+		 *            <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
 		 * @return
 		 */
 		private static IExpr root1(IExpr a, IExpr b, int nthRoot) {
@@ -3066,10 +3078,14 @@ public class Algebra {
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1 + c*Slot1^2</code>.
 		 *
-		 * @param a       coefficient a of the polynomial
-		 * @param b       coefficient b of the polynomial
-		 * @param c       coefficient c of the polynomial
-		 * @param nthRoot <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
+		 * @param a
+		 *            coefficient a of the polynomial
+		 * @param b
+		 *            coefficient b of the polynomial
+		 * @param c
+		 *            coefficient c of the polynomial
+		 * @param nthRoot
+		 *            <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
 		 * @return
 		 */
 		private static IExpr root2(IExpr a, IExpr b, IExpr c, int nthRoot) {
@@ -3084,11 +3100,16 @@ public class Algebra {
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1 + c*Slot1^2 + d*Slot1^3</code>.
 		 *
-		 * @param a       coefficient a of the polynomial
-		 * @param b       coefficient b of the polynomial
-		 * @param c       coefficient c of the polynomial
-		 * @param d       coefficient d of the polynomial
-		 * @param nthRoot <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
+		 * @param a
+		 *            coefficient a of the polynomial
+		 * @param b
+		 *            coefficient b of the polynomial
+		 * @param c
+		 *            coefficient c of the polynomial
+		 * @param d
+		 *            coefficient d of the polynomial
+		 * @param nthRoot
+		 *            <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
 		 * @return
 		 */
 		private static IExpr root3(IExpr a, IExpr b, IExpr c, IExpr d, int nthRoot) {
@@ -3445,8 +3466,8 @@ public class Algebra {
 		private static class SimplifyVisitor extends VisitorExpr {
 			final IsBasicExpressionVisitor isBasicAST = new IsBasicExpressionVisitor();
 			/**
-			 * This function is used to determine the “weight” of an expression. For example by counting the leafs of an expression with the
-			 * <code>IExpr#leafCountSimplify()</code> method.
+			 * This function is used to determine the “weight” of an expression. For example by counting the leafs of an
+			 * expression with the <code>IExpr#leafCountSimplify()</code> method.
 			 */
 			final Function<IExpr, Long> fComplexityFunction;
 
@@ -4267,8 +4288,10 @@ public class Algebra {
 	 * for the given expressions <code>numeratorPolynomial</code> and <code>denominatorPolynomial</code>.
 	 *
 	 *
-	 * @param numeratorPolynomial   a <code>BigRational</code> polynomial which could be converted to JAS polynomial
-	 * @param denominatorPolynomial a <code>BigRational</code> polynomial which could be converted to JAS polynomial
+	 * @param numeratorPolynomial
+	 *            a <code>BigRational</code> polynomial which could be converted to JAS polynomial
+	 * @param denominatorPolynomial
+	 *            a <code>BigRational</code> polynomial which could be converted to JAS polynomial
 	 * @return <code>null</code> if the expressions couldn't be converted to JAS polynomials or gcd equals 1
 	 * @throws JASConversionException
 	 */
