@@ -563,7 +563,7 @@ public class Parser extends Scanner {
 	final protected List<Operator> getOperator() {
 		char lastChar;
 		final int startPosition = fCurrentPosition - 1;
-		fOperatorString = fInputString.substring(startPosition, fCurrentPosition);
+		fOperatorString = new String(fInputString, startPosition, fCurrentPosition - startPosition);
 		List<Operator> list = fFactory.getOperatorList(fOperatorString);
 		List<Operator> lastList = null;
 		int lastOperatorPosition = -1;
@@ -574,7 +574,7 @@ public class Parser extends Scanner {
 		getChar();
 		while (fFactory.getOperatorCharacters().indexOf(fCurrentChar) >= 0) {
 			lastChar = fCurrentChar;
-			fOperatorString = fInputString.substring(startPosition, fCurrentPosition);
+			fOperatorString = new String(fInputString, startPosition, fCurrentPosition - startPosition);
 			list = fFactory.getOperatorList(fOperatorString);
 			if (list != null) {
 				lastList = list;
@@ -591,7 +591,7 @@ public class Parser extends Scanner {
 		}
 		final int endPosition = fCurrentPosition--;
 		fCurrentPosition = startPosition;
-		throwSyntaxError("Operator token not found: " + fInputString.substring(startPosition, endPosition - 1));
+		throwSyntaxError("Operator token not found: " + new String(fInputString, startPosition, endPosition - 1 - startPosition));
 		return null;
 	}
 
@@ -678,7 +678,7 @@ public class Parser extends Scanner {
 					getNextToken();
 
 					if (fToken == TT_ARGUMENTS_CLOSE) {
-						if (fInputString.length() > fCurrentPosition && fInputString.charAt(fCurrentPosition) == ']') {
+						if (fInputString.length > fCurrentPosition && fInputString[fCurrentPosition] == ']') {
 							throwSyntaxError("Statement (i.e. index) expected in [[ ]].");
 						}
 					}
@@ -689,8 +689,8 @@ public class Parser extends Scanner {
 				if (fToken == TT_ARGUMENTS_CLOSE) {
 					skipWhitespace();
 					// scanner-step begin: (instead of getNextToken() call):
-					if (fInputString.length() > fCurrentPosition) {
-						if (fInputString.charAt(fCurrentPosition) == ']') {
+					if (fInputString.length > fCurrentPosition) {
+						if (fInputString[fCurrentPosition] == ']') {
 							fCurrentPosition++;
 							fToken = TT_PARTCLOSE;
 						}

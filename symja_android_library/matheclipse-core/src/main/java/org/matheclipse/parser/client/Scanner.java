@@ -245,7 +245,7 @@ public abstract class Scanner {
 	/**
 	 * Current parser input string
 	 */
-	protected String fInputString;
+	protected char[] fInputString;
 
 	/**
 	 * Recursion depth for brackets.
@@ -331,7 +331,7 @@ public abstract class Scanner {
 	 */
 
 	private final char charAtPosition() {
-		return fInputString.charAt(fCurrentPosition);
+		return fInputString[fCurrentPosition];
 	}
 	/**
 	 * Verify the length of the input string and get the next character from the input string. If the current position
@@ -343,7 +343,7 @@ public abstract class Scanner {
 			getNextChar();
 			return;
 		}
-		fCurrentPosition = fInputString.length() + 1;
+		fCurrentPosition = fInputString.length + 1;
 		fCurrentChar = ' ';
 		fToken = TT_EOF;
 	}
@@ -357,7 +357,7 @@ public abstract class Scanner {
 		fCurrentPosition++;
 		try {
 			while (true) {
-				if (charAtPosition() == '*' && fInputString.charAt(fCurrentPosition + 1) == ')') {
+				if (charAtPosition() == '*' && fInputString[fCurrentPosition + 1] == ')') {
 					fCurrentPosition++;
 					fCurrentPosition++;
 					if (level == 0) {
@@ -365,7 +365,7 @@ public abstract class Scanner {
 					}
 					level--;
 					continue;
-				} else if (charAtPosition() == '(' && fInputString.charAt(fCurrentPosition + 1) == '*') {
+				} else if (charAtPosition() == '(' && fInputString[fCurrentPosition + 1] == '*') {
 					fCurrentPosition++;
 					fCurrentPosition++;
 					level++;
@@ -390,19 +390,19 @@ public abstract class Scanner {
 	 * @return
 	 */
 	private String getErrorLine() {
-		if (fInputString.length() < fCurrentPosition) {
+		if (fInputString.length < fCurrentPosition) {
 			fCurrentPosition--;
 		}
 		// read until end-of-line after the current fError
 		int eol = fCurrentPosition;
-		while (fInputString.length() > eol) {
-			fCurrentChar = fInputString.charAt(eol++);
+		while (fInputString.length > eol) {
+			fCurrentChar = fInputString[eol++];
 			if (fCurrentChar == '\n') {
 				eol--;
 				break;
 			}
 		}
-		final String line = fInputString.substring(fCurrentColumnStartPosition, eol);
+		final String line = new String(fInputString, fCurrentColumnStartPosition, eol - fCurrentColumnStartPosition);
 		return line;
 	}
 
@@ -421,8 +421,8 @@ public abstract class Scanner {
 		}
 		while (Character.isLetterOrDigit(fCurrentChar) || (fCurrentChar == '$') || (fCurrentChar == ':')) {
 			if (fCurrentChar == ':') {
-				if ((fCurrentChar == ':') && fInputString.length() > fCurrentPosition
-						&& fInputString.charAt(fCurrentPosition ) == ':') {
+				if ((fCurrentChar == ':') && fInputString.length > fCurrentPosition
+						&& fInputString[fCurrentPosition] == ':') {
 					// for Rubi identifiers integrate::PolyQ etc
 					getChar();
 					getChar();
@@ -440,11 +440,10 @@ public abstract class Scanner {
 		if (length == 1) {
 			return optimizedCurrentTokenSource1(startPosition);
 		}
-		if (length == 2 && fInputString.charAt(startPosition) == '$') {
+		if (length == 2 && fInputString[startPosition] == '$') {
 			return optimizedCurrentTokenSource2(startPosition);
 		}
-
-		return fInputString.substring(startPosition, endPosition);
+		return new String(fInputString, startPosition, endPosition - startPosition);
 	}
 
 	/**
@@ -477,15 +476,15 @@ public abstract class Scanner {
 			getChar();
 		}
 		int endPosition = fCurrentPosition--;
-		return fInputString.substring(startPosition, --endPosition);
+		return new String(fInputString, startPosition, (--endPosition) - startPosition);
 	}
 
 	private void getNextChar() {
-		fCurrentChar = fInputString.charAt(fCurrentPosition++);
+		fCurrentChar = fInputString[fCurrentPosition++];
 		if (fCurrentChar == '\\') {
 			// search next non-whitespace character
 			while (isValidPosition()) {
-				fCurrentChar = fInputString.charAt(fCurrentPosition++);
+				fCurrentChar = fInputString[fCurrentPosition++];
 				if (!Character.isWhitespace(fCurrentChar) && fCurrentChar != '\\') {
 					return;
 				}
@@ -655,7 +654,7 @@ public abstract class Scanner {
 			}
 		}
 
-		fCurrentPosition = fInputString.length() + 1;
+		fCurrentPosition = fInputString.length + 1;
 		fCurrentChar = ' ';
 		fToken = TT_EOF;
 	}
@@ -793,7 +792,7 @@ public abstract class Scanner {
 		}
 
 		int endPosition = fCurrentPosition--;
-		result[0] = fInputString.substring(startPosition, --endPosition);
+		result[0] = new String(fInputString, startPosition, (--endPosition) - startPosition);
 		result[1] = Integer.valueOf(numFormat);
 		return result;
 	}
@@ -815,7 +814,7 @@ public abstract class Scanner {
 		final StringBuilder ident = new StringBuilder();
 
 		if (isValidPosition()) {
-			fCurrentChar = fInputString.charAt(fCurrentPosition++);
+			fCurrentChar = fInputString[fCurrentPosition++];
 		} else {
 			throwSyntaxError("string - end of string not reached.");
 		}
@@ -826,7 +825,7 @@ public abstract class Scanner {
 		while (fCurrentChar != '"' && isValidPosition()) {
 			if ((fCurrentChar == '\\')) {
 				if (isValidPosition()) {
-					fCurrentChar = fInputString.charAt(fCurrentPosition++);
+					fCurrentChar = fInputString[fCurrentPosition++];
 
 					switch (fCurrentChar) {
 
@@ -853,7 +852,7 @@ public abstract class Scanner {
 				}
 
 				if (isValidPosition()) {
-					fCurrentChar = fInputString.charAt(fCurrentPosition++);
+					fCurrentChar = fInputString[fCurrentPosition++];
 				} else {
 					throwSyntaxError("string - end of string not reached.");
 				}
@@ -864,7 +863,7 @@ public abstract class Scanner {
 
 				ident.append(fCurrentChar);
 				if (isValidPosition()) {
-					fCurrentChar = fInputString.charAt(fCurrentPosition++);
+					fCurrentChar = fInputString[fCurrentPosition++];
 				} else {
 					throwSyntaxError("string - end of string not reached.");
 				}
@@ -876,7 +875,7 @@ public abstract class Scanner {
 
 	protected void initialize(final String s) throws SyntaxError {
 		initializeNullScanner();
-		fInputString = Characters.substituteCharacters(s);
+		fInputString = Characters.substituteCharacters(s).toCharArray();
 		getNextToken();
 	}
 
@@ -897,7 +896,7 @@ public abstract class Scanner {
 	 *         length.
 	 */
 	private boolean isValidPosition() {
-		return fInputString.length() > fCurrentPosition;
+		return fInputString.length > fCurrentPosition;
 	}
 
 	/**
@@ -929,8 +928,7 @@ public abstract class Scanner {
 	 */
 	final private String optimizedCurrentTokenSource1(final int startPosition) {
 		// return always the same String build only once
-
-		switch (fInputString.charAt(startPosition)) {
+		switch (fInputString[startPosition]) {
 		case 'a':
 			return string_a;
 		case 'b':
@@ -1036,7 +1034,7 @@ public abstract class Scanner {
 		case 'Z':
 			return string_Z;
 		default:
-			return fInputString.substring(startPosition, startPosition + 1);
+			return new String(fInputString, startPosition, 1);
 		}
 	}
 
@@ -1048,7 +1046,7 @@ public abstract class Scanner {
 	 */
 	final private String optimizedCurrentTokenSource2(final int startPosition) {
 		// return always the same String build only once
-		switch (fInputString.charAt(startPosition + 1)) {
+		switch (fInputString[startPosition + 1]) {
 		case 'a':
 			return var_a;
 		case 'b':
@@ -1102,7 +1100,7 @@ public abstract class Scanner {
 		case 'z':
 			return var_z;
 		default:
-			return fInputString.substring(startPosition, startPosition + 2);
+			return new String(fInputString, startPosition, 2);
 		}
 	}
 
