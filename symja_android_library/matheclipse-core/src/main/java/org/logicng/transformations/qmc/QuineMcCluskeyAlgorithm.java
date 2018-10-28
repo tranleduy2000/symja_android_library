@@ -210,7 +210,7 @@ public class QuineMcCluskeyAlgorithm {
             Formula formula = var7.next();
             Variable selector = f.variable(prefix + count++);
             formula2VarMapping.put(formula, selector);
-            minterm2Variants.put(selector, new ArrayList<>());
+            minterm2Variants.put(selector, new ArrayList<Variable>());
         }
 
         count = 0;

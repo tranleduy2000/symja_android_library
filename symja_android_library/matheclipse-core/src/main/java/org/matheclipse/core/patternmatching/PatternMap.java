@@ -189,11 +189,11 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 * @param treeLevel
 	 *            the level of the tree where the patterns are determined
 	 */
-	private int determinePatternsRecursive(List<IExpr> patternIndexMap, final IAST lhsPatternExpr, int treeLevel) {
+	private int determinePatternsRecursive(final List<IExpr> patternIndexMap, final IAST lhsPatternExpr, final int treeLevel) {
 		if (lhsPatternExpr.isAlternatives() || lhsPatternExpr.isExcept()) {
 			fRuleWithoutPattern = false;
 		}
-		int[] listEvalFlags = new int[] { IAST.NO_FLAG };
+		final int[] listEvalFlags = new int[] { IAST.NO_FLAG };
 		lhsPatternExpr.forEach(new Consumer<IExpr>() {
             @Override
             public void accept(IExpr x) {
@@ -376,7 +376,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 		System.arraycopy(patternValuesArray, 0, fSymbolsOrPatternValues, 0, fSymbolsOrPatternValues.length);
 	}
 
-	public boolean isPatternTest(IExpr expr, IExpr patternTest, EvalEngine engine) {
+	public boolean isPatternTest(IExpr expr, IExpr patternTest, final EvalEngine engine) {
 		final IExpr temp = substitutePatternOrSymbols(expr).orElse(expr);
 		final IASTMutable test = (IASTMutable) F.unaryAST1(patternTest, null);
 		if (temp.isSequence()) {

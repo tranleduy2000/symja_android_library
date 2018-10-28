@@ -29,8 +29,8 @@ public class UnitConvert {
      *
      * @param unit
    * @return operator that maps a quantity to the quantity of given unit */
-    public UnaryOperator<IExpr> to(IUnit unit) {
-        IExpr base = unitSystem.apply(IQuantityStatic.of(F.C1, unit));
+    public UnaryOperator<IExpr> to(final IUnit unit) {
+        final IExpr base = unitSystem.apply(IQuantityStatic.of(F.C1, unit));
         return new UnaryOperator<IExpr>() {
             @Override
             public IExpr apply(IExpr scalar) {

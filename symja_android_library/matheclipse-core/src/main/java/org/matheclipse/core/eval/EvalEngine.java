@@ -484,7 +484,7 @@ public class EvalEngine implements Serializable {
 			boolean numericMode = fNumericMode;
 			boolean localNumericMode = fNumericMode;
 
-			boolean isNumericFunction = (ISymbol.NUMERICFUNCTION & attr) == ISymbol.NUMERICFUNCTION;
+			final boolean isNumericFunction = (ISymbol.NUMERICFUNCTION & attr) == ISymbol.NUMERICFUNCTION;
 			boolean isNumericArgument = ast.isNumericArgument();
 			if (!fNumericMode) {
 				if (isNumericFunction && ast.isNumericArgument()) {
@@ -492,7 +492,7 @@ public class EvalEngine implements Serializable {
 					}
 				}
 
-			IASTMutable[] rlist = new IASTMutable[1];
+			final IASTMutable[] rlist = new IASTMutable[1];
 			rlist[0] = F.NIL;
 			IExpr x = ast.arg1();
 			if ((ISymbol.HOLDFIRST & attr) == ISymbol.NOATTRIBUTE) {
@@ -940,8 +940,8 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @return
 	 */
-	private IExpr evalEvaluate(IAST ast) {
-		IASTMutable[] rlist = new IASTMutable[1];
+	private IExpr evalEvaluate(final IAST ast) {
+		final IASTMutable[] rlist = new IASTMutable[1];
 		rlist[0] = F.NIL;
 		ast.forEach(1, ast.size(), new ObjIntConsumer<IExpr>() {
 			@Override
@@ -1302,7 +1302,7 @@ public class EvalEngine implements Serializable {
 		// return F.NIL;
 		// }
 		// }
-		IAST ast;
+		final IAST ast;
 		if (argsAST.exists(new Predicate<IExpr>() {
 			@Override
 			public boolean test(IExpr x) {
@@ -1321,7 +1321,7 @@ public class EvalEngine implements Serializable {
 		} else {
 			ast = argsAST;
 		}
-		IExpr[] result = new IExpr[1];
+		final IExpr[] result = new IExpr[1];
 		result[0] = F.NIL;
 		if (ast.exists(new Predicate<IExpr>() {
 			@Override
@@ -1670,7 +1670,7 @@ public class EvalEngine implements Serializable {
 	 * @return
 	 */
 	private IAST flattenSequences(final IAST ast) {
-		IASTAppendable[] seqResult = new IASTAppendable[1];
+		final IASTAppendable[] seqResult = new IASTAppendable[1];
 		seqResult[0] = F.NIL;
 		ast.forEach(new ObjIntConsumer<IExpr>() {
 			@Override
@@ -2193,7 +2193,7 @@ public class EvalEngine implements Serializable {
 	 */
 	public IASTMutable threadASTListArgs(final IASTMutable ast) {
 
-		int[] listLength = new int[] { 0 };
+		final int[] listLength = new int[] { 0 };
 		if (ast.exists(new Predicate<IExpr>() {
             @Override
             public boolean test(IExpr x) {

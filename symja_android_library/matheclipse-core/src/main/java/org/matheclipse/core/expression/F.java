@@ -8102,7 +8102,7 @@ public class F {
 		return new Symbol(name, org.matheclipse.core.expression.Context.DUMMY);
 	}
 
-	public static IBuiltInSymbol localBiFunction(final String symbolName, BiFunction<IExpr, IExpr, IExpr> function) {
+	public static IBuiltInSymbol localBiFunction(final String symbolName, final BiFunction<IExpr, IExpr, IExpr> function) {
 		IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
 		localBuittIn.setEvaluator(new AbstractCoreFunctionEvaluator() {
 			@Override
@@ -8113,7 +8113,7 @@ public class F {
 		return localBuittIn;
 	}
 
-	public static IBuiltInSymbol localFunction(final String symbolName, Function<IExpr, IExpr> function) {
+	public static IBuiltInSymbol localFunction(final String symbolName, final Function<IExpr, IExpr> function) {
 		return localFunction(symbolName, new AbstractCoreFunctionEvaluator() {
 			@Override
 			public IExpr evaluate(IAST ast, EvalEngine engine) {
@@ -8128,7 +8128,7 @@ public class F {
 		return localBuittIn;
 	}
 
-	public static IBuiltInSymbol localBiPredicate(final String symbolName, BiPredicate<IExpr, IExpr> function) {
+	public static IBuiltInSymbol localBiPredicate(final String symbolName, final BiPredicate<IExpr, IExpr> function) {
 		return localFunction(symbolName,new AbstractCoreFunctionEvaluator() {
 			@Override
 			public IExpr evaluate(IAST ast, EvalEngine engine) {
@@ -8137,7 +8137,7 @@ public class F {
 		});
 	}
 
-	public static IBuiltInSymbol localPredicate(final String symbolName, Predicate<IExpr> function) {
+	public static IBuiltInSymbol localPredicate(final String symbolName, final Predicate<IExpr> function) {
 		return localFunction(symbolName,new AbstractCoreFunctionEvaluator() {
 			@Override
 			public IExpr evaluate(IAST ast, EvalEngine engine) {

@@ -43,7 +43,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 		this(map, 0);
 	}
 
-	public VisitorReplaceAll(Map<? extends IExpr, ? extends IExpr> map, int offset) {
+	public VisitorReplaceAll(final Map<? extends IExpr, ? extends IExpr> map, int offset) {
 		super();
 		this.fFunction = new Function<IExpr, IExpr>() {
 			@Override

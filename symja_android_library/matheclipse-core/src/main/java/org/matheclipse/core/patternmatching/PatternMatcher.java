@@ -97,7 +97,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 		 * @param stackMatcher
 		 * @return
 		 */
-		public boolean matchOrderlessAST(int lhsPosition, StackMatcher stackMatcher, EvalEngine engine) {
+		public boolean matchOrderlessAST(final int lhsPosition, final StackMatcher stackMatcher, final EvalEngine engine) {
 			if (lhsPosition >= fLHSPatternAST.size()) {
 				return stackMatcher.matchRest();
 			}
@@ -105,7 +105,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 			final IExpr[] patternValues = fPatternMap.copyPattern();
 			return fLHSEvalAST.exists(new ObjIntPredicate<IExpr>() {
                 @Override
-                public boolean test(IExpr temp, int j) {
+                public boolean test(IExpr temp, final int j) {
                     if (fLHSPatternAST.forAll(new ObjIntPredicate<IExpr>() {
                         @Override
                         public boolean test(IExpr x, int i) {
@@ -217,7 +217,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
      * @return
      */
     public static boolean equivalent(final IExpr patternExpr1, final IExpr patternExpr2, final PatternMap pm1,
-                                     PatternMap pm2) {
+                                     final PatternMap pm2) {
         if (patternExpr1 == patternExpr2) {
             return true;
         }
@@ -946,9 +946,9 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 * @return <code>F.NIL</code> if the given <code>lhsPatternAST</code> could not be matched or contains no pattern
 	 *         with default value.
      */
-    private IExpr matchDefaultArgumentsAST(ISymbol symbolWithDefaultValue, IAST lhsPatternAST) {
-        IASTAppendable cloned = F.ast(lhsPatternAST.head(), lhsPatternAST.size(), false);
-        boolean[] defaultValueMatched = new boolean[]{false};
+    private IExpr matchDefaultArgumentsAST(final ISymbol symbolWithDefaultValue, IAST lhsPatternAST) {
+        final IASTAppendable cloned = F.ast(lhsPatternAST.head(), lhsPatternAST.size(), false);
+        final boolean[] defaultValueMatched = new boolean[]{false};
 		if (lhsPatternAST.exists(new ObjIntPredicate<IExpr>() {
             @Override
             public boolean test(IExpr temp, int i) {
@@ -1008,8 +1008,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 *
      * @return
      */
-    protected boolean matchExpr(IExpr lhsPatternExpr, final IExpr lhsEvalExpr, EvalEngine engine,
-			StackMatcher stackMatcher, boolean replaceMode) {
+    protected boolean matchExpr(IExpr lhsPatternExpr, final IExpr lhsEvalExpr, final EvalEngine engine,
+                                StackMatcher stackMatcher, boolean replaceMode) {
         boolean matched = false;
         if (lhsPatternExpr.isAST()) {
             IAST lhsPatternAST = (IAST) lhsPatternExpr;
@@ -1156,15 +1156,15 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 * @param stackMatcher
 	 * @return
 	 */
-	private boolean matchFlatAndFlatOrderlessAST(final ISymbol sym, IAST lhsPattern, IAST lhsEval, EvalEngine engine,
-			StackMatcher stackMatcher) {
+	private boolean matchFlatAndFlatOrderlessAST(final ISymbol sym, IAST lhsPattern, IAST lhsEval, final EvalEngine engine,
+                                                 final StackMatcher stackMatcher) {
         if ((sym.getAttributes() & ISymbol.ORDERLESS) == ISymbol.ORDERLESS) {
 			// System.out.println(lhsPatternAST.toString() + " << >> " + lhsEvalAST.toString());
 
 			if (lhsPattern.isAST1()) {
 				return matchExpr(lhsPattern.arg1(), lhsEval, engine, stackMatcher, false);
 			}
-			IExpr[] patternValues = fPatternMap.copyPattern();
+			final IExpr[] patternValues = fPatternMap.copyPattern();
 
 			IExpr temp = fPatternMap.substitutePatternOrSymbols(lhsPattern);
 			if (!temp.isPresent() && temp.isAST(lhsPattern.head())) {

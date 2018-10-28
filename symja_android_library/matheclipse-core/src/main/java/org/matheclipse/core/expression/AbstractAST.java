@@ -564,7 +564,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean contains(Object object) {
+	public boolean contains(final Object object) {
 		return exists(new Predicate<IExpr>() {
             @Override
             public boolean test(IExpr x) {
@@ -741,8 +741,8 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 	 * @param function  the function which filters each argument by returning a value which unequals <code>F.NIL</code>
 	 * @return the given <code>filterAST</code>
 	 */
-	protected IAST filterFunction(IASTAppendable filterAST, IASTAppendable restAST,
-			final Function<IExpr, IExpr> function) {
+	protected IAST filterFunction(final IASTAppendable filterAST, final IASTAppendable restAST,
+								  final Function<IExpr, IExpr> function) {
 		forEach(new Consumer<IExpr>() {
             @Override
             public void accept(IExpr x) {
@@ -759,7 +759,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public IAST filter(IASTAppendable filterAST, IASTAppendable restAST, Predicate<? super IExpr> predicate) {
+	public IAST filter(final IASTAppendable filterAST, final IASTAppendable restAST, final Predicate<? super IExpr> predicate) {
 		forEach(new Consumer<IExpr>() {
             @Override
             public void accept(IExpr x) {
@@ -775,8 +775,8 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final IAST filter(IASTAppendable filterAST, IExpr expr) {
-		EvalEngine engine = EvalEngine.get();
+	public final IAST filter(IASTAppendable filterAST, final IExpr expr) {
+		final EvalEngine engine = EvalEngine.get();
 		return filter(filterAST, new Predicate<IExpr>() {
             @Override
             public boolean test(IExpr x) {
@@ -871,7 +871,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 			@Override
-	public IAST filter(IASTAppendable filterAST, Predicate<? super IExpr> predicate) {
+	public IAST filter(final IASTAppendable filterAST, final Predicate<? super IExpr> predicate) {
 		forEach(size(), new Consumer<IExpr>() {
             @Override
             public void accept(IExpr x) {
@@ -885,8 +885,8 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public IAST filter(IASTAppendable filterAST, Predicate<? super IExpr> predicate, int maxMatches) {
-		int[] count = new int[1];
+	public IAST filter(final IASTAppendable filterAST, final Predicate<? super IExpr> predicate, final int maxMatches) {
+		final int[] count = new int[1];
 		if (count[0] >= maxMatches) {
 			return filterAST;
 		}
@@ -918,8 +918,8 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final IAST partition(ISymbol operator, Predicate<? super IExpr> predicate, IExpr init1, IExpr init2,
-			ISymbol combiner, ISymbol action) {
+	public final IAST partition(ISymbol operator, final Predicate<? super IExpr> predicate, IExpr init1, IExpr init2,
+								ISymbol combiner, ISymbol action) {
 		if (head().equals(operator)) {
 			IASTAppendable result = F.ast(action, 3, false);
 			final int size = size();
@@ -929,8 +929,8 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 			} else {
 				newSize += 4;
 			}
-			IASTAppendable yesAST = F.ast(combiner, newSize, false);
-			IASTAppendable noAST = F.ast(combiner, newSize, false);
+			final IASTAppendable yesAST = F.ast(combiner, newSize, false);
+			final IASTAppendable noAST = F.ast(combiner, newSize, false);
 			forEach(size, new Consumer<IExpr>() {
                 @Override
                 public void accept(IExpr x) {
@@ -2061,7 +2061,7 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isMember(Predicate<IExpr> predicate, boolean heads) {
+	public final boolean isMember(final Predicate<IExpr> predicate, final boolean heads) {
 		if (predicate.test(this)) {
 			return true;
 		}
@@ -2871,8 +2871,8 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, int position) {
-		EvalEngine engine = EvalEngine.get();
+	public IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, final int position) {
+		final EvalEngine engine = EvalEngine.get();
 		final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
             @Override
             public IExpr apply(IExpr x) {
@@ -2892,8 +2892,8 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 
 	/** {@inheritDoc} */
 	@Override
-	public final IASTMutable mapThread(final IAST replacement, int position) {
-		EvalEngine engine = EvalEngine.get();
+	public final IASTMutable mapThread(final IAST replacement, final int position) {
+		final EvalEngine engine = EvalEngine.get();
 		final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
             @Override
             public IExpr apply(IExpr x) {

@@ -1,7 +1,6 @@
 package ch.ethz.idsc.tensor.qty;
 
 import com.duy.lambda.BiFunction;
-import com.duy.util.DCollections;
 import com.duy.util.DMap;
 import com.duy.util.DStringJoiner;
 
@@ -11,15 +10,17 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
 /* package */ class UnitImpl implements IUnit, Serializable {
-    private final NavigableMap<String, IExpr> navigableMap;
+    private final HashMap<String, IExpr> navigableMap;
 
     UnitImpl(NavigableMap<String, IExpr> navigableMap) {
-        this.navigableMap = DCollections.unmodifiableNavigableMap(navigableMap);
+        this.navigableMap = new HashMap<>(navigableMap);
     }
 
     private static String exponentString(IExpr exponent) {
@@ -77,7 +78,7 @@ import java.util.TreeMap;
     }
 
     @Override // from Unit
-    public NavigableMap<String, IExpr> map() {
+    public Map<String, IExpr> map() {
         return navigableMap;
     }
 
