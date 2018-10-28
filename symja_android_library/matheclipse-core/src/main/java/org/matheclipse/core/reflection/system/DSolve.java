@@ -297,7 +297,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 		return new IExpr[] { m, n };
 	}
 
-	private static IExpr odeSeparable(EvalEngine engine, IExpr m, IExpr n, IExpr x, IExpr y, IExpr C_1) {
+	private static IExpr odeSeparable(EvalEngine engine, IExpr m, IExpr n, IExpr x, final IExpr y, IExpr C_1) {
 		if (n.isOne()) {
 			IExpr fxExpr = F.NIL;
 			IExpr gyExpr = F.NIL;

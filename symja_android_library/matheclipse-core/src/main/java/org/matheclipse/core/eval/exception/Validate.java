@@ -1,7 +1,5 @@
 package org.matheclipse.core.eval.exception;
 
-import java.io.IOException;
-import java.math.BigInteger;
 import com.duy.lambda.IntFunction;
 
 import org.matheclipse.core.eval.EvalEngine;
@@ -15,6 +13,9 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  * Static methods to be called at the start of the built-in <code>IFunctionEvaluator#evaluate()</code> methods to verify correct
@@ -540,7 +541,7 @@ public final class Validate {
 	/**
 	 * Check if the argument at the given position is an AST.
 	 * 
-	 * @param position the position which has to be an AST.
+	 * @param expr the position which has to be an AST.
 	 * @throws WrongArgumentType if it's not an AST.
 	 */
 	public static IAST checkASTUpRuleType(IExpr expr) {
@@ -599,7 +600,7 @@ public final class Validate {
 	public static IASTAppendable checkEquations(final IAST ast, int position) {
 		IExpr expr = ast.get(position);
 		if (expr.isList() || expr.isAnd()) {
-			IAST listOrAndAST = (IAST) expr;
+			final IAST listOrAndAST = (IAST) expr;
 			int size = listOrAndAST.size();
 			IASTAppendable termsEqualZeroList = F.ListAlloc(size);
 			return termsEqualZeroList.appendArgs(size, new IntFunction<IExpr>() {

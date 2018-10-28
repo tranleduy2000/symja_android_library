@@ -2,6 +2,14 @@ package org.matheclipse.core.integrate.rubi;
 
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
+
 import static org.matheclipse.core.expression.F.Integrate;
 import static org.matheclipse.core.expression.F.ast;
 import static org.matheclipse.core.expression.F.binaryAST2;
@@ -11,14 +19,6 @@ import static org.matheclipse.core.expression.F.quinary;
 import static org.matheclipse.core.expression.F.senary;
 import static org.matheclipse.core.expression.F.ternaryAST3;
 import static org.matheclipse.core.expression.F.unaryAST1;
-
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  * UtilityFunction constructors from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
@@ -1981,7 +1981,7 @@ public class UtilityFunctionCtors {
 	 *     Dist[u-w,v,x]]
 	 * </pre>
 	 * 
-	 * @param astTimes
+	 * @param astPlus
 	 * @return
 	 */
 	public static IExpr evalRubiDistPlus(IAST astPlus) {

@@ -1,10 +1,5 @@
 package org.matheclipse.core.reflection.system;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import com.duy.lambda.Consumer;
 
 import org.matheclipse.core.basic.Config;
@@ -26,6 +21,12 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
 import org.matheclipse.core.polynomials.ExprTermOrder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import edu.jas.arith.ModLong;
 import edu.jas.arith.ModLongRing;
@@ -124,7 +125,7 @@ public class MonomialList extends AbstractFunctionEvaluator {
 	 * Get the monomial list of a univariate polynomial.
 	 * 
 	 * @param polynomial
-	 * @param variable
+	 * @param variablesList
 	 * @param termOrder
 	 *            the JAS term ordering
 	 * @return the list of monomials of the univariate polynomial.
@@ -151,7 +152,7 @@ public class MonomialList extends AbstractFunctionEvaluator {
 	 * Get the monomial list of a univariate polynomial with coefficients reduced by a modulo value.
 	 * 
 	 * @param polynomial
-	 * @param variable
+	 * @param variablesList
 	 * @param termOrder
 	 *            the JAS term ordering
 	 * @param option

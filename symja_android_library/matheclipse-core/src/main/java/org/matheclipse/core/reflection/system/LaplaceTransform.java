@@ -43,7 +43,7 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
 		Validate.checkSize(ast, 4);
 
 		IExpr a1 = ast.arg1();
-		IExpr t = ast.arg2();
+		final IExpr t = ast.arg2();
 		IExpr s = ast.arg3();
 		if (!t.isList() && !s.isList() && !t.equals(s)) {
 			if (a1.isFree(t)) {// && a1.isAtom()) {

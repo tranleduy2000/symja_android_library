@@ -63,8 +63,8 @@ public class TrigExpand extends AbstractEvaluator {
 		/**
 		 * Expand <code>f(a+b+c+...)</code> and f a trig function.
 		 * 
-		 * @param n
-		 * @param theta
+		 * @param ast
+		 * @param plusAST
 		 * @return
 		 */
 		private IExpr expandPlus(IAST ast, IAST plusAST) {
@@ -97,8 +97,8 @@ public class TrigExpand extends AbstractEvaluator {
 		/**
 		 * Expand <code>f(n*theta)</code> and f a trig function.
 		 * 
-		 * @param n
-		 * @param theta
+		 * @param ast
+		 * @param timesAST
 		 * @return
 		 */
 		private IExpr expandTimes(IAST ast, IAST timesAST) {

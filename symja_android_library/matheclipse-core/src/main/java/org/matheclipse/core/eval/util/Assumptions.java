@@ -197,9 +197,9 @@ public class Assumptions extends AbstractAssumptions {
 	 * @param assumptions
 	 * @return
 	 */
-	private static boolean addElement(IAST element, Assumptions assumptions) {
+	private static boolean addElement(IAST element, final Assumptions assumptions) {
 		if (element.arg2().isSymbol()) {
-			ISymbol domain = (ISymbol) element.arg2();
+			final ISymbol domain = (ISymbol) element.arg2();
 			if (domain.equals(F.Algebraics) || domain.equals(F.Booleans) || domain.equals(F.Complexes)
 					|| domain.equals(F.Integers) || domain.equals(F.Primes) || domain.equals(F.Rationals)
 					|| domain.equals(F.Reals)) {
@@ -258,9 +258,9 @@ public class Assumptions extends AbstractAssumptions {
 	 * @param assumptions
 	 * @return
 	 */
-	private static boolean addDistribution(IAST element, Assumptions assumptions) {
+	private static boolean addDistribution(IAST element, final Assumptions assumptions) {
 		if (element.arg2().isAST()) {
-			IAST dist = (IAST) element.arg2();
+			final IAST dist = (IAST) element.arg2();
 
 			ISymbol head = (ISymbol) dist.head();
 			if (head instanceof IBuiltInSymbol) {
@@ -537,7 +537,6 @@ public class Assumptions extends AbstractAssumptions {
 	 * 
 	 * @param ast
 	 *            the assumptions which should be added to the <code>assumptions</code> instance.
-	 * @param assumptions
 	 * @return <code>null</code> if <code>assumptions</code> could not be added from the given expression.
 	 */
 	@Override

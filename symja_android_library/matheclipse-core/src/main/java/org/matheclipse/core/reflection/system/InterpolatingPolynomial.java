@@ -95,11 +95,11 @@ public class InterpolatingPolynomial extends AbstractEvaluator {
 
 		if (ast.arg1().isList()) {
 			final IAST list = (IAST) ast.arg1();
-			IExpr arg2 =  ast.arg2();
+			final IExpr arg2 =  ast.arg2();
 			int size = list.size();
 			if (size > 1) {
 				int n = size - 1;
-				IExpr[] xv = new IExpr[n];
+				final IExpr[] xv = new IExpr[n];
 				IExpr[] yv = new IExpr[n];
 				int[] dim = list.isMatrix();
 				if (dim != null && dim[1] == 2) {
@@ -117,10 +117,10 @@ public class InterpolatingPolynomial extends AbstractEvaluator {
 						yv[i] = list.get(i + 1);
 					}
 				}
-				IExpr[] c = computeDividedDifference(xv, yv);
+				final IExpr[] c = computeDividedDifference(xv, yv);
 
 				IASTAppendable polynomial = F.PlusAlloc(16);
-				IASTAppendable[] tempPlus = new IASTAppendable[1];
+				final IASTAppendable[] tempPlus = new IASTAppendable[1];
 				tempPlus[0] = polynomial;
 				polynomial.append(c[0]);
 				list.forEach(2, size, new ObjIntConsumer<IExpr>() {

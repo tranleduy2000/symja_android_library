@@ -220,11 +220,11 @@ public class IndexedLevel {
 		return F.NIL;
 	}
 
-	public IExpr visitAST(IAST ast, int[] indx) {
-		int[] minDepth = new int[] { 0 };
-		IASTMutable[] result = new IASTMutable[] { F.NIL };
+	public IExpr visitAST(final IAST ast, int[] indx) {
+		final int[] minDepth = new int[] { 0 };
+		final IASTMutable[] result = new IASTMutable[] { F.NIL };
 		try {
-			int size = indx.length;
+			final int size = indx.length;
 			final int[] newIndx = new int[size + 1];
 			for (int j = 0; j < size; j++) {
 				newIndx[j] = indx[j];

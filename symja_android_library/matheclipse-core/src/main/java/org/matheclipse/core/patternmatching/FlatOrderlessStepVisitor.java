@@ -35,7 +35,6 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
 	 * Convert the <code>sortedList</code> to an <code>int[]</code> array. Equal elements get the same index in the
 	 * resulting <code>int[]</code> array.
 	 * 
-	 * @param <T>
 	 * @param sortedList
 	 * @param start
 	 * @param end
@@ -44,11 +43,11 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
 	final private void toIntArray(IAST sortedList, int start, int end) {
 		multiset = new int[end - start];
 		array = new IExpr[end - start];
-		IExpr[] lastT = new IExpr[1];
+		final IExpr[] lastT = new IExpr[1];
 		lastT[0] = sortedList.get(start);
 
-		int[] index = new int[1];
-		int[] j = new int[1];
+		final int[] index = new int[1];
+		final int[] j = new int[1];
 		multiset[j[0]++] = index[0];
 		array[index[0]] = lastT[0];
 		sortedList.forEach(start + 1, end, new Consumer<IExpr>() {

@@ -551,7 +551,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
 		// return new ASTPowerSeries(n -> n < s ? F.C0 : this.getCoef(n - s), ring);
 	}
 
-	public ASTPowerSeries subtract(ASTPowerSeries b) {
+	public ASTPowerSeries subtract(final ASTPowerSeries b) {
 		return new ASTPowerSeries(new Function<Integer, IExpr>() {
             @Override
             public IExpr apply(Integer n) {
@@ -560,7 +560,7 @@ public class ASTPowerSeries extends AST implements Cloneable, Externalizable, Ra
         }, ring);
 	}
 
-	public ASTPowerSeries times(ASTPowerSeries b) {
+	public ASTPowerSeries times(final ASTPowerSeries b) {
 		Function<Integer, IExpr> g = new Function<Integer, IExpr>() {
 			@Override
 			public IExpr apply(Integer k) {
