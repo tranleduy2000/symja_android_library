@@ -86,10 +86,10 @@ public interface RealLinearOperator {
      * @throws UnsupportedOperationException if this operation is not supported
      *                                       by {@code this} operator
      */
-    default RealVector operateTranspose(final RealVector x)
-            throws MathIllegalArgumentException, UnsupportedOperationException {
-        throw new UnsupportedOperationException();
-    }
+//    default RealVector operateTranspose(final RealVector x)
+//            throws MathIllegalArgumentException, UnsupportedOperationException {
+//        throw new UnsupportedOperationException();
+//    }
 
     /**
      * Returns {@code true} if this operator supports {@link #operateTranspose(RealVector)}.
@@ -101,7 +101,7 @@ public interface RealLinearOperator {
      *
      * @return {@code false}
      */
-    default boolean isTransposable() {
-        return false;
-    }
+//    default boolean isTransposable() {
+//        return false;
+//    }
 }

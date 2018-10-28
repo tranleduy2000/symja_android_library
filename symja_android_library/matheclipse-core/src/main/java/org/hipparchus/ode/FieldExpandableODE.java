@@ -117,7 +117,7 @@ public class FieldExpandableODE<T extends RealFieldElement<T>> {
         // initialize primary equations
         int index = 0;
         final T[] primary0 = s0.getPrimaryState();
-        primary.init(t0, primary0, finalTime);
+        FieldOrdinaryDifferentialEquationDefault.init(primary, t0, primary0, finalTime);
 
         // initialize secondary equations
         while (++index < mapper.getNumberOfEquations()) {
