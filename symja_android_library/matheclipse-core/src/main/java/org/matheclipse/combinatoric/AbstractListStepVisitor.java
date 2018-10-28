@@ -1,16 +1,15 @@
 package org.matheclipse.combinatoric;
 
-import java.util.List;
-
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IExpr;
 
 /**
  * Abstract step visitor for <code>java.util.List</code>s.
  * 
  */
-public abstract class AbstractListStepVisitor<T> implements IStepVisitor {
+public abstract class AbstractListStepVisitor<T extends IExpr> implements IStepVisitor {
 	protected final IAST list;
-	protected Object[] array;
+	protected IExpr[] array;
 
 	public AbstractListStepVisitor(IAST ast) {
 		this.list = ast;
@@ -28,7 +27,7 @@ public abstract class AbstractListStepVisitor<T> implements IStepVisitor {
 	 * @return
 	 */
 	final private void toIntArray(IAST sortedList) {
-		array = new Object[sortedList.argSize()];
+		array = new IExpr[sortedList.argSize()];
 		int index = 0;
 		for (int i = 1; i < sortedList.size(); i++) {
 			array[index++] = sortedList.get(i);

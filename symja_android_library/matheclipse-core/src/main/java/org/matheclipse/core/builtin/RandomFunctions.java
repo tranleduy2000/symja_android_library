@@ -2,6 +2,7 @@
 package org.matheclipse.core.builtin;
 
 import com.duy.lambda.IntFunction;
+import com.duy.util.ThreadLocalRandom;
 
 import org.hipparchus.util.MathArrays;
 import org.matheclipse.core.eval.EvalEngine;
@@ -9,11 +10,11 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 
 import java.math.BigInteger;
-import java.util.Random;
 
 public final class RandomFunctions {
 
@@ -28,12 +29,25 @@ public final class RandomFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.size() > 0 && ast.arg1().isAST()) {
+			if (ast.size() > 1 && ast.arg1().isAST()) {
 				IAST list = (IAST) ast.arg1();
-				Random random = new Random();
+				ThreadLocalRandom random = ThreadLocalRandom.current();
 				int listSize = list.argSize();
 				int randomIndex = random.nextInt(listSize);
+				if (ast.size() == 2) {
 				return list.get(randomIndex + 1);
+			}
+				if (ast.size() == 3) {
+					int n = ast.arg2().toIntDefault(Integer.MIN_VALUE);
+					if (n > 0) {
+						IASTAppendable result = F.ListAlloc(n);
+						for (int i = 0; i < n; i++) {
+							result.append(list.get(randomIndex + 1));
+							randomIndex = random.nextInt(listSize);
+						}
+						return result;
+					}
+				}
 			}
 
 			return F.NIL;
@@ -52,7 +66,7 @@ public final class RandomFunctions {
 				BigInteger n = ((IInteger) ast.arg1()).toBigNumerator();
 				BigInteger r;
 				do {
-					r = new BigInteger(n.bitLength(), new Random());
+					r = new BigInteger(n.bitLength(), ThreadLocalRandom.current());
 				} while (r.compareTo(n) >= 0);
 				return F.integer(r);
 			}

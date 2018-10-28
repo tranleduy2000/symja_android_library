@@ -35,9 +35,6 @@ import edu.jas.util.LongIterable;
  * GenPolynomialRing generic polynomial factory implementing ExprRingFactory; Factory for n-variate ordered polynomials
  * over C. Almost immutable object, except variable names.
  *
- * @param <C>
- *            coefficient type
- * @author Heinz Kredel
  */
 
 public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
@@ -96,27 +93,13 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	/**
 	 * A default random sequence generator.
 	 */
-	protected final static Random random = ThreadLocalRandom.current();
+	protected final static ThreadLocalRandom random = ThreadLocalRandom.current();
 
 	/**
 	 * Indicator if this ring is a field.
 	 */
 	protected int isField = -1; // initially unknown
 
-	/**
-	 * Log4j logger object.
-	 */
-	private static final Logger logger = Logger.getLogger(ExprPolynomialRing.class);
-
-	/**
-	 * Count for number of polynomial creations.
-	 */
-	// public static int creations = 0;
-
-	/**
-	 * Flag to enable if preemptive interrrupt is checked.
-	 */
-	final boolean checkPreempt = PreemptStatus.isAllowed();
 
 	final boolean numericFunction;
 
@@ -351,12 +334,13 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 				final IExpr base = ast.base();
 				ix = ExpVectorLong.indexVar(base, getVars());
 				if (ix >= 0) {
-					int exponent = -1;
-					try {
-						exponent = Validate.checkPowerExponent(ast);
-					} catch (WrongArgumentType e) {
-						//
-					}
+					int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
+//					int exponent = -1;
+//					try {
+//						exponent = Validate.checkPowerExponent(ast);
+//					} catch (WrongArgumentType e) {
+//						//
+//					}
 					if (checkNegativeExponents && exponent < 0) {
 						throw new ArithmeticException(
 								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
@@ -600,12 +584,13 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 				IExpr base = ast.base();
 				for (int i = 1; i < vars.size(); i++) {
 					if (vars.get(i).equals(base)) {
-						int exponent = -1;
-						try {
-							exponent = Validate.checkPowerExponent(ast);
-						} catch (WrongArgumentType e) {
-							return false;
-						}
+						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
+//						int exponent = -1;
+//						try {
+//							exponent = Validate.checkPowerExponent(ast);
+//						} catch (WrongArgumentType e) {
+//							return false;
+//						}
 						if (exponent < 0) {
 							return false;
 						}
@@ -642,27 +627,13 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 		return false;
 	}
 
-	/**
-	 * Get the position of the <code>expr</code> in the variables list.
-	 *
-	 * @param expr
-	 * @return <code>-1</code> if the expression isn't found in the variable list.
-	 */
-	private int isVariable(final IExpr expr) {
-		for (int i = 1; i < vars.size(); i++) {
-			if (vars.get(i).equals(expr)) {
-				return i - 1;
-			}
-		}
-		return -1;
-	}
 
 	/**
 	 * Get the String representation.
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("cast")
+//	@SuppressWarnings("cast")
 	@Override
 	public String toString() {
 		String res = null;
@@ -1459,7 +1430,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 		if (coFac.isFinite()) {
 			return new GenPolynomialIterator(this);
 		}
-		logger.warn("ring of coefficients " + coFac + " is infinite, constructing iterator only over monomials");
+		// logger.warn("ring of coefficients " + coFac + " is infinite, constructing iterator only over monomials");
 		return new GenPolynomialMonomialIterator(this);
 		// throw new IllegalArgumentException("only for finite iterable
 		// coefficients implemented");

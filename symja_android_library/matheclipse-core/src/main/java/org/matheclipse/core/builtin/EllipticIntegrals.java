@@ -34,9 +34,8 @@ public class EllipticIntegrals {
 	 * See:
 	 * </p>
 	 * <ul>
-	 * <li><a href=
-	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind">Wikipedia -
-	 * Elliptic integral - Complete elliptic integral of the second kind)</a></li>
+	 * <li><a href= "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind">Wikipedia - Elliptic
+	 * integral - Complete elliptic integral of the second kind)</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
 	 *
@@ -81,6 +80,11 @@ public class EllipticIntegrals {
 					} catch (RuntimeException rex) {
 						engine.printMessage("EllipticE: " + rex.getMessage());
 					}
+				}
+				IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(z);
+				if (negExpr.isPresent()) {
+					// EllipticE(-z,m) = -EllipticE(z,m)
+					return F.Negate(F.EllipticE(negExpr, m));
 				}
 				return F.NIL;
 			}
@@ -137,8 +141,7 @@ public class EllipticIntegrals {
 	 * See:
 	 * </p>
 	 * <ul>
-	 * <li><a href=
-	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Incomplete_elliptic_integral_of_the_first_kind">Wikipedia -
+	 * <li><a href= "https://en.wikipedia.org/wiki/Elliptic_integral#Incomplete_elliptic_integral_of_the_first_kind">Wikipedia -
 	 * Elliptic integral - Incomplete elliptic integral of the first kind)</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
@@ -175,9 +178,13 @@ public class EllipticIntegrals {
 			}
 			if (m.isOne()) {
 				// Abs(Re(z)) <= Pi/2
-				if (engine.evalTrue(F.LessEqual(F.Abs(F.Re(z)), F.CPiHalf))) {
+				IExpr temp = engine.evaluate(F.Abs(F.Re(z)));
+				if (F.LessEqual.ofQ(engine, temp, F.CPiHalf)) {
 					// Log(Sec(z) + Tan(z))
 					return F.Log(F.Plus(F.Sec(z), F.Tan(z)));
+				}
+				if (F.Greater.ofQ(engine, temp, F.CPiHalf)) {
+					return F.CComplexInfinity;
 				}
 			}
 			if (z instanceof INum && m instanceof INum) {
@@ -215,6 +222,30 @@ public class EllipticIntegrals {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * EllipticK(z)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns the complete elliptic integral of the first kind.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href= "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_first_kind">Wikipedia - Elliptic
+	 * integral - Complete elliptic integral of the first kind)</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; Table(EllipticK(x+I), {x,-1.0, 1.0, 1/4})
+	 * {1.26549+I*0.16224,1.30064+I*0.18478,1.33866+I*0.21305,1.37925+I*0.24904,1.42127+I*0.29538,1.46203+I*0.35524,1.49611+I*0.43136,1.51493+I*0.52354,1.50924+I*0.62515}
+	 * </pre>
+	 */
 	private static class EllipticK extends AbstractFunctionEvaluator {
 
 		@Override
@@ -275,9 +306,8 @@ public class EllipticIntegrals {
 	 * See:
 	 * </p>
 	 * <ul>
-	 * <li><a href=
-	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_third_kind">Wikipedia -
-	 * Elliptic integral - Complete elliptic integral of the third kind</a></li>
+	 * <li><a href= "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_third_kind">Wikipedia - Elliptic
+	 * integral - Complete elliptic integral of the third kind</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
 	 *

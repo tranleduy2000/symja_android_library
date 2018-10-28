@@ -7,13 +7,13 @@ import com.google.common.util.concurrent.TimeLimiter;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
-import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.exception.BreakException;
 import org.matheclipse.core.eval.exception.ConditionException;
 import org.matheclipse.core.eval.exception.ContinueException;
 import org.matheclipse.core.eval.exception.NoEvalException;
+import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.ThrowException;
 import org.matheclipse.core.eval.exception.Validate;
@@ -33,16 +33,15 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.visit.ModuleReplaceAll;
-import org.matheclipse.parser.client.math.MathException;
+import org.matheclipse.parser.client.SyntaxError;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -203,12 +202,15 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
+			if (ast.size() == 2) {
 			try {
 				return engine.evaluate(ast.arg1());
 			} catch (final ThrowException e) {
 				return e.getValue();
 			}
+		}
+			Validate.checkSize(ast, 2);
+			return F.NIL;
 		}
 
 		@Override
@@ -387,8 +389,12 @@ public final class Programming {
 			if (!ToggleFeature.DEFER) {
 				return F.NIL;
 			}
-			// Validate.checkSize(ast, 2);
-			// IExpr arg1 = engine.evaluate(ast.arg1());
+			// IExpr arg1=ast.arg1();
+			// if (arg1.isAST()){
+			// IAST copy=(IAST)arg1.copy();
+			// copy.addEvalFlags(IAST.DEFER_AST);
+			// return copy;
+			// }
 
 			return F.NIL;
 		}
@@ -1003,40 +1009,13 @@ public final class Programming {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isList()) {
-				IAST lst = (IAST) ast.arg1();
-				IExpr arg2 = ast.arg2();
-				return evalModule(lst, arg2, engine);
+				IExpr temp = moduleSubstVariables((IAST) ast.arg1(), ast.arg2(), engine);
+				if (temp.isPresent()) {
+					return engine.evaluate(temp);
+				}
 			}
 
 			return F.NIL;
-		}
-
-		/**
-		 * <code>Module[{variablesList}, rhs ]</code>
-		 * 
-		 * @param intializerList
-		 * @param arg2
-		 * @param engine
-		 * @return
-		 */
-		private static IExpr evalModule(IAST intializerList, IExpr arg2, final EvalEngine engine) {
-			final int moduleCounter = engine.incModuleCounter();
-			final String varAppend = "$" + moduleCounter;
-			final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
-
-			try {
-				rememberModuleVariables(intializerList, varAppend, moduleVariables, engine);
-				IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine));
-				if (subst.isPresent()) {
-					// IExpr temp= engine.evaluate(subst);
-					// System.out.println(temp.toString());
-					// return temp;
-					return engine.evaluate(subst);
-				}
-				return arg2;
-			} finally {
-				// removeUserVariables(moduleVariables);
-			}
 		}
 
 		@Override
@@ -1502,7 +1481,15 @@ public final class Programming {
 					}
 					return part(arg1, ast, 2, engine);
 
+				} catch (WrappedException we) {
+					if (Config.SHOW_STACKTRACE) {
+						we.printStackTrace();
+					}
+					engine.printMessage(we.getMessage());
 				} catch (WrongArgumentType wat) {
+					if (Config.SHOW_STACKTRACE) {
+						wat.printStackTrace();
+					}
 					engine.printMessage(wat.getMessage());
 				}
 			}
@@ -1812,48 +1799,69 @@ public final class Programming {
 	 */
 	private static class TimeConstrained extends AbstractCoreFunctionEvaluator {
 
-		private static class EvalCallable implements Callable<IExpr> {
+		class EvalControlledCallable implements Callable<IExpr> {
 			private final EvalEngine fEngine;
-			private final IExpr fExpr;
+			private IExpr fExpr;
 
-			public EvalCallable(IExpr expr, EvalEngine engine) {
-				fExpr = expr;
-				fEngine = engine;
+			public EvalControlledCallable(EvalEngine engine) {
+				fEngine = engine.copy();
 			}
 
 			@Override
 			public IExpr call() throws Exception {
-				// TODO Auto-generated method stub
+				EvalEngine.set(fEngine);
+				try {
 				return fEngine.evaluate(fExpr);
+				} catch (final SyntaxError se) {
+					String msg = se.getMessage();
+					fEngine.printMessage(msg);
+				} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
+					return F.$Aborted;
+				} catch (final RecursionLimitExceeded re) {
+					throw re;
+				} catch (final RuntimeException re) {
+					if (Config.SHOW_STACKTRACE) {
+						re.printStackTrace();
+					}
+					fEngine.printMessage(re.getMessage());
+				} catch (final Exception e) {
+					fEngine.printMessage(e.getMessage());
+				} catch (final OutOfMemoryError e) {
+					fEngine.printMessage(e.getMessage());
+				} catch (final StackOverflowError e) {
+					fEngine.printMessage(e.getMessage());
+				} finally {
+					EvalEngine.remove();
+				}
+				return F.$Aborted;
 			}
 
+			public void cancel() {
+				fEngine.setStopRequested(true);
+			}
+
+			public void setExpr(IExpr fExpr) {
+				this.fExpr = fExpr;
 		}
 
+		}
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
-			if (Config.JAS_NO_THREADS) {
-				// no thread can be spawned
-				try {
-					return engine.evaluate(ast.arg1());
-				} catch (final MathException e) {
-					throw e;
-				} catch (final Throwable th) {
-					if (ast.isAST3()) {
-						return ast.arg3();
-					}
+			long s = engine.getSeconds();
+			if (s > 0 || Config.TIMECONSTRAINED_NO_THREAD) {
+				// no new thread should be spawned
+				if (ast.isAST3()) {
+					return ast.arg3();
 				}
-				return F.$Aborted;
+					return engine.evaluate(ast.arg1());
 			}
 
 			IExpr arg2 = engine.evaluate(ast.arg2());
 			long seconds = 0L;
 			try {
-				// if (ast.arg2().toString().equals("§timelimit")){
-				// arg2=F.num(5.0);
-				// }
 				if (arg2.isReal()) {
 					arg2 = ((ISignedNumber) arg2).ceilFraction();
 					seconds = ((ISignedNumber) arg2).toLong();
@@ -1866,12 +1874,19 @@ public final class Programming {
 				engine.printMessage("TimeConstrained: " + ast.arg2().toString() + " is not a Java long value.");
 				return F.NIL;
 			}
+			final ExecutorService executor = Executors.newSingleThreadExecutor();
+			TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor);// Executors.newSingleThreadExecutor());
+			EvalControlledCallable work = new EvalControlledCallable(engine);
 
-			TimeLimiter timeLimiter = SimpleTimeLimiter.create(Executors.newSingleThreadExecutor());
-			Callable<IExpr> work = new EvalCallable(ast.arg1(), engine);
-
+			work.setExpr(ast.arg1());
 			try {
+				seconds = seconds > 1 ? seconds - 1 : seconds;
 				return timeLimiter.callWithTimeout(work, seconds, TimeUnit.SECONDS);
+			} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
+				if (ast.isAST3()) {
+					return ast.arg3();
+				}
+				return F.$Aborted;
 			} catch (java.util.concurrent.TimeoutException e) {
 				if (ast.isAST3()) {
 					return ast.arg3();
@@ -1883,12 +1898,32 @@ public final class Programming {
 				}
 				return F.$Aborted;
 			} catch (Exception e) {
+				Throwable re = e.getCause();
+				if (re instanceof RecursionLimitExceeded) {
+					throw (RecursionLimitExceeded) re;
+				}
 				if (Config.DEBUG) {
 					e.printStackTrace();
 				}
 				return F.Null;
+			} finally {
+				work.cancel();
+				executor.shutdown(); // Disable new tasks from being submitted
+				try {
+					// Wait a while for existing tasks to terminate
+					if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+						executor.shutdownNow(); // Cancel currently executing tasks
+						// Wait a while for tasks to respond to being cancelled
+						if (!executor.awaitTermination(2, TimeUnit.SECONDS)) {
+							engine.printMessage("TimeConstrained: pool did not terminate");
+						}
+					}
+				} catch (InterruptedException ie) {
+					// (Re-)Cancel if current thread also interrupted
+					executor.shutdownNow();
 			}
 
+		}
 		}
 
 		@Override
@@ -1986,11 +2021,11 @@ public final class Programming {
 			if (!ToggleFeature.UNEVALUATED) {
 				return F.NIL;
 			}
-
-			Validate.checkSize(ast, 2);
-			IExpr arg1 = engine.evaluate(ast.arg1());
-
-			return arg1;
+			if (ast.size() == 2) {
+				return ast.arg1();
+			}
+			engine.printMessage("Unevaluated: expected only one argument.");
+			return F.NIL;
 		}
 
 		@Override
@@ -1998,7 +2033,7 @@ public final class Programming {
 			if (!ToggleFeature.UNEVALUATED) {
 				return;
 			}
-			newSymbol.setAttributes(ISymbol.HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALLCOMPLETE);
 		}
 	}
 
@@ -2125,8 +2160,6 @@ public final class Programming {
 			Validate.checkRange(ast, 2, 3);
 
 			// use EvalEngine's iterationLimit only for evaluation control
-			// final int iterationLimit = engine.getIterationLimit();
-			// int iterationCounter = 1;
 
 			// While(test, body)
 			IExpr test = ast.arg1();
@@ -2180,44 +2213,14 @@ public final class Programming {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isList()) {
-				IAST lst = (IAST) ast.arg1();
-				IExpr arg2 = ast.arg2();
-				return evalWith(lst, arg2, engine);
+				IExpr temp = withSubstVariables((IAST) ast.arg1(), ast.arg2(), engine);
+				if (temp.isPresent()) {
+					return engine.evaluate(temp);
+				}
+
 			}
 
 			return F.NIL;
-		}
-
-		/**
-		 * <code>Module[{variablesList}, rhs ]</code>
-		 * 
-		 * @param intializerList
-		 * @param arg2
-		 * @param engine
-		 * @return
-		 */
-		private static IExpr evalWith(IAST intializerList, IExpr arg2, final EvalEngine engine) {
-			final int moduleCounter = engine.incModuleCounter();
-			final String varAppend = "$" + moduleCounter;
-			final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
-			final java.util.Set<IExpr> renamedVarsSet = new HashSet<IExpr>();
-			final java.util.IdentityHashMap<ISymbol, ISymbol> renamedVars = new IdentityHashMap<ISymbol, ISymbol>();
-
-			try {
-				rememberWithVariables(intializerList, moduleVariables, renamedVarsSet, engine);
-				for (IExpr expr : renamedVarsSet) {
-					if (expr.isSymbol()) {
-						renamedVars.put((ISymbol) expr, F.$s(expr.toString() + varAppend));
-					}
-				}
-				IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine));
-				if (subst.isPresent()) {
-					return engine.evaluate(subst);
-				}
-				return arg2;
-			} finally {
-				// removeUserVariables(moduleVariables);
-			}
 		}
 
 		@Override
@@ -2235,36 +2238,30 @@ public final class Programming {
 	 *            initializer variables list from the <code>Module</code> function
 	 * @param variablesMap
 	 *            the resulting module variables map
+	 * @return
 	 */
-	private static void rememberWithVariables(IAST variablesList, final java.util.Map<ISymbol, IExpr> variablesMap,
-			final java.util.Set<IExpr> renamedVars, EvalEngine engine) {
+	private static boolean rememberWithVariables(IAST variablesList, final java.util.Map<ISymbol, IExpr> variablesMap,
+			EvalEngine engine) {
 		ISymbol oldSymbol;
 		for (int i = 1; i < variablesList.size(); i++) {
-			// if (variablesList.get(i).isSymbol()) {
-			// oldSymbol = (ISymbol) variablesList.get(i);
-			// newSymbol = F.userSymbol(oldSymbol.toString() + varAppend, engine);
-			// variablesMap.put(oldSymbol, newSymbol);
-			// } else {
 			if (variablesList.get(i).isAST(F.Set, 3)) {
 				final IAST setFun = (IAST) variablesList.get(i);
 				if (setFun.arg1().isSymbol()) {
 					oldSymbol = (ISymbol) setFun.arg1();
 					IExpr rightHandSide = setFun.arg2();
-					try {
 						IExpr temp = engine.evaluate(rightHandSide);
-						VariablesSet.addVariables(renamedVars, temp);
 						variablesMap.put(oldSymbol, temp);
-					} catch (MathException me) {
-						if (Config.DEBUG) {
-							me.printStackTrace();
-						}
-						variablesMap.put(oldSymbol, rightHandSide);
-					}
-
+				} else {
+					engine.printMessage(
+							"With: expression requires variable with value assignment: " + setFun.toString());
+					return false;
 				}
+			} else {
+				engine.printMessage("With: assignment to variable required: " + variablesList.get(i).toString());
+				return false;
 			}
-			// }
 		}
+		return true;
 	}
 
 	/**
@@ -2280,52 +2277,80 @@ public final class Programming {
 	 * @param engine
 	 *            the evaluation engine
 	 */
-	private static void rememberModuleVariables(IAST variablesList, final String varAppend,
+	public static boolean rememberModuleVariables(IAST variablesList, final String varAppend,
 			final java.util.Map<ISymbol, IExpr> variablesMap, final EvalEngine engine) {
 		ISymbol oldSymbol;
 		ISymbol newSymbol;
 		for (int i = 1; i < variablesList.size(); i++) {
 			if (variablesList.get(i).isSymbol()) {
 				oldSymbol = (ISymbol) variablesList.get(i);
-				// if (oldSymbol.toString().equals("num")){
-				// System.out.println(variablesList.toString());
-				// }
-				newSymbol = F.symbol(oldSymbol.toString() + varAppend, engine);
+				newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
 				variablesMap.put(oldSymbol, newSymbol);
-				// newSymbol.pushLocalVariable();
-				engine.localStackCreate(newSymbol).push(F.NIL);
 			} else {
 				if (variablesList.get(i).isAST(F.Set, 3)) {
 					final IAST setFun = (IAST) variablesList.get(i);
 					if (setFun.arg1().isSymbol()) {
 						oldSymbol = (ISymbol) setFun.arg1();
-						newSymbol = F.symbol(oldSymbol.toString() + varAppend, engine);
+						newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
 						variablesMap.put(oldSymbol, newSymbol);
-						IExpr rightHandSide = setFun.arg2();
-						try {
-							rightHandSide = engine.evaluate(rightHandSide);
-						} catch (MathException me) {
-							if (Config.DEBUG) {
-								me.printStackTrace();
-							}
-						}
-						engine.localStackCreate(newSymbol).push(rightHandSide);
-						// newSymbol.pushLocalVariable(rightHandSide);
+						engine.evaluate(F.Set(newSymbol, setFun.arg2()));
+					} else {
+						engine.printMessage("Module: expression requires symbol variable: " + setFun.toString());
+						return false;
 					}
+				} else {
+					engine.printMessage(
+							"Module: expression requires symbol variable: " + variablesList.get(i).toString());
+					return false;
 				}
 			}
 		}
+		return true;
 	}
 
 	/**
-	 * Remove all <code>moduleVariables</code> from this evaluation engine.
-	 * 
-	 * @param moduleVariables
+	 * Remember which local variable names (appended with the module counter) we use in the given
+	 * <code>variablesMap</code>.
+	 *
+	 * @param variablesList
+	 *            initializer variables list from the <code>Module</code> function
+	 * @param varAppend
+	 *            the module counter string which appended to the variable names.
+	 * @param variablesMap
+	 *            the resulting module variables map
+	 * @param engine
+	 *            the evaluation engine
 	 */
-	public static void removeUserVariables(final Map<ISymbol, ISymbol> moduleVariables) {
-		// remove all module variables from eval engine
-		for (ISymbol symbol : moduleVariables.values()) {
-			F.removeUserSymbol(symbol.toString());
+	public static void rememberBlockVariables(IAST variablesList, final String varAppend,
+			final java.util.Map<ISymbol, ISymbol> variablesMap, final EvalEngine engine) {
+		ISymbol oldSymbol;
+		ISymbol newSymbol;
+		for (int i = 1; i < variablesList.size(); i++) {
+			if (variablesList.get(i).isSymbol()) {
+				oldSymbol = (ISymbol) variablesList.get(i);
+				newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
+				variablesMap.put(oldSymbol, newSymbol);
+			} else {
+				if (variablesList.get(i).isAST(F.Set, 3)) {
+					final IAST setFun = (IAST) variablesList.get(i);
+					if (setFun.arg1().isSymbol()) {
+						oldSymbol = (ISymbol) setFun.arg1();
+						newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
+						variablesMap.put(oldSymbol, newSymbol);
+					}
+					}
+			}
+		}
+		for (int i = 1; i < variablesList.size(); i++) {
+			if (variablesList.get(i).isAST(F.Set, 3)) {
+				final IAST setFun = (IAST) variablesList.get(i);
+				if (setFun.arg1().isSymbol()) {
+					oldSymbol = (ISymbol) setFun.arg1();
+					newSymbol = (ISymbol) variablesMap.get(oldSymbol);
+					IExpr temp = F.subst(engine.evaluate(setFun.arg2()), variablesMap);
+					engine.evaluate(F.Set(newSymbol, temp));
+				}
+			}
 		}
 	}
 
@@ -2337,32 +2362,79 @@ public final class Programming {
 	 * @param engine
 	 * @return
 	 */
-	public static boolean checkModuleOrWithCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
-		if (arg1.isList()) {
-			IAST intializerList = (IAST) arg1;
-			final int moduleCounter = engine.incModuleCounter();
-			final String varAppend = "$" + moduleCounter;
-			final java.util.Map<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
+//	public static boolean checkModuleCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
+//		if (arg1.isList()) {
+//			IAST intializerList = (IAST) arg1;
+//			IExpr result = moduleSubstVariables(intializerList, arg2, engine);
+//			if (result.isCondition()) {
+//				return checkCondition(result.first(), result.second(), engine);
+//			} else if (result.isModule()) {
+//				return checkModuleCondition(result.first(), result.second(), engine);
+//			} else if (result.isWith()) {
+//				return checkWithCondition(result.first(), result.second(), engine);
+//			}
+//			return true;
+//		}
+//		return true;
+//	}
 
-			try {
-				rememberModuleVariables(intializerList, varAppend, moduleVariables, engine);
-				IExpr result = F.subst(arg2, new Function<IExpr, IExpr>() {
-					@Override
-					public IExpr apply(IExpr x) {
-						IExpr temp = moduleVariables.get(x);
-						return temp != null ? temp : F.NIL;
-					}
-				});
-				if (result.isCondition()) {
-					return checkCondition(result.first(), result.second(), engine);
-				} else if (result.isModuleOrWith()) {
-					return checkModuleOrWithCondition(result.first(), result.second(), engine);
-				}
-			} finally {
-				// removeUserVariables(moduleVariables);
-			}
+//	public static boolean checkWithCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
+//		if (arg1.isList()) {
+//			IAST intializerList = (IAST) arg1;
+//			IExpr result = withSubstVariables(intializerList, arg2, engine);
+//			if (result.isCondition()) {
+//				return checkCondition(result.first(), result.second(), engine);
+//			} else if (result.isModule()) {
+//				return checkModuleCondition(result.first(), result.second(), engine);
+//			} else if (result.isWith()) {
+//				return checkWithCondition(result.first(), result.second(), engine);
+//			}
+//		}
+//		return true;
+//	}
+
+	/**
+	 * Substitute the variable names from the list with temporary dummy variable names in the &quot;module-block&quot;..
+	 *
+	 * @param intializerList
+	 *            list of variables which should be substituted by appending <code>$<number></code> to the variable
+	 *            names
+	 * @param moduleBlock
+	 *            the module block where the variables should be replaced with temporary variables
+	 * @param engine
+	 * @return
+	 */
+	private static IExpr moduleSubstVariables(IAST intializerList, IExpr moduleBlock, final EvalEngine engine) {
+		final int moduleCounter = engine.incModuleCounter();
+		final String varAppend = "$" + moduleCounter;
+		final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
+		if (rememberModuleVariables(intializerList, varAppend, moduleVariables, engine)) {
+			IExpr result = moduleBlock.accept(new ModuleReplaceAll(moduleVariables, engine, varAppend));
+			return result.orElse(moduleBlock);
 		}
-		return true;
+		return F.NIL;
+	}
+
+	/**
+	 * Substitute the variable names from the list with temporary dummy variable names in the &quot;with-block&quot;..
+	 *
+	 * @param intializerList
+	 *            list of variables which should be substituted by appending <code>$<number></code> to the variable
+	 *            names
+	 * @param withBlock
+	 *            the with block where the variables should be replaced with temporary variables
+	 * @param engine
+	 * @return
+	 */
+	private static IExpr withSubstVariables(IAST intializerList, IExpr withBlock, final EvalEngine engine) {
+		final int moduleCounter = engine.incModuleCounter();
+		final String varAppend = "$" + moduleCounter;
+		final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
+		if (rememberWithVariables(intializerList, moduleVariables, engine)) {
+			IExpr result = withBlock.accept(new ModuleReplaceAll(moduleVariables, engine, varAppend));
+			return result.orElse(withBlock);
+		}
+		return F.NIL;
 	}
 
 	/**
@@ -2373,17 +2445,19 @@ public final class Programming {
 	 * @param engine
 	 * @return
 	 */
-	public static boolean checkCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
-		if (engine.evalTrue(arg2)) {
-			if (arg1.isCondition()) {
-				return checkCondition(arg1.first(), arg1.second(), engine);
-			} else if (arg2.isModuleOrWith()) {
-				return checkModuleOrWithCondition(arg2.first(), arg2.second(), engine);
-			}
-			return true;
-		}
-		return false;
-	}
+//	public static boolean checkCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
+//		if (engine.evalTrue(arg2)) {
+//			if (arg1.isCondition()) {
+//				return checkCondition(arg1.first(), arg1.second(), engine);
+//			} else if (arg1.isModule()) {
+//				return checkModuleCondition(arg1.first(), arg1.second(), engine);
+//			} else if (arg1.isWith()) {
+//				return checkWithCondition(arg1.first(), arg1.second(), engine);
+//			}
+//			return true;
+//		}
+//		return false;
+//	}
 
 	/**
 	 * Get the element stored at the given <code>position</code>.
@@ -2421,7 +2495,7 @@ public final class Programming {
 			return expr;
 		}
 		final IAST arg1 = (IAST) expr;
-		final IExpr arg2 = ast.get(pos);
+		final IExpr arg2 = engine.evaluate(ast.get(pos));
 		int p1 = pos + 1;
 		int[] span = arg2.isSpan(arg1.size());
 		if (span != null) {
@@ -2474,27 +2548,6 @@ public final class Programming {
 			}
 			return result;
 		}
-		// IExpr temp = null;
-		// final IAST list = arg1;
-		// final IASTAppendable result = F.ListAlloc(list.size());
-		//
-		// for (int i = 1; i < list.size(); i++) {
-		// final IExpr listArg = list.get(i);
-		//
-		// if (p1 < ast.size()) {
-		// if (ires.isAST()) {
-		// temp = part(ires, ast, p1, engine);
-		// result.append(temp);
-		// } else {
-		// throw new WrongArgumentType(ast, arg1, pos,
-		// "Wrong argument for Part[] function. Function or list expected.");
-		// }
-		// } else {
-		// result.append(ires);
-		// }
-		//
-		// }
-		// return result;
 		throw new WrongArgumentType(ast, arg1, pos,
 				"Wrong argument for Part[] function: " + arg2.toString() + " selects no part expression.");
 	}

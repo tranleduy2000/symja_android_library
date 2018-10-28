@@ -1544,12 +1544,13 @@ public abstract class IExprImpl implements IExpr {
         return false;
     }
 
-    /**
-     * Test if this expression is the Module function <code>Module[&lt;arg1&gt;, &lt;arg2&gt;]</code>
-     *
-     * @return
-     */
-    public boolean isModuleOrWith() {
+    @Override
+    public boolean isModule() {
+        return false;
+    }
+
+    @Override
+    public boolean isWith() {
         return false;
     }
 
@@ -2818,6 +2819,12 @@ public abstract class IExprImpl implements IExpr {
     @Nullable
     public IExpr replaceAll(final Function<IExpr, IExpr> function) {
         return accept(new VisitorReplaceAll(function));
+    }
+
+    @Nullable
+    @Override
+    public IExpr replaceAll(Map<? extends IExpr, ? extends IExpr> map) {
+        return accept(new VisitorReplaceAll(map));
     }
 
     /**

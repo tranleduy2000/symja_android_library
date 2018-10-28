@@ -7,13 +7,10 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.math.MathException;
 
-import java.util.stream.IntStream;
-
 /**
  * mappings between {@link IAST}, {@link Color}, and 0xAA:RR:GG:BB integer
  * <p>
  * <p>
- * functions are used in {@link ImageFormat}
  */
 public enum ColorFormat {
     ;
@@ -24,7 +21,9 @@ public enum ColorFormat {
     private static final IExpr[] LOOKUP = new IExpr[256];
 
     static {
-        IntStream.range(0, 256).forEach(index -> LOOKUP[index] = F.QQ(index, 1));
+        for (int index = 0; index < 256; index++) {
+            LOOKUP[index] = F.QQ(index, 1);
+        }
     }
     // ---
 

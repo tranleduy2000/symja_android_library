@@ -3,12 +3,13 @@ package org.matheclipse.combinatoric;
 import java.util.List;
 
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IExpr;
 
 /**
  * Abstract step visitor for multisets of type <code>T</code>.
  * 
  */
-public abstract class AbstractMultisetStepVisitor<T> extends AbstractListStepVisitor<T> {
+public abstract class AbstractMultisetStepVisitor<T extends IExpr> extends AbstractListStepVisitor<T> {
 	protected int[] multiset;
 
 	// public AbstractMultisetStepVisitor(List<? extends T> sortedList) {
@@ -41,7 +42,7 @@ public abstract class AbstractMultisetStepVisitor<T> extends AbstractListStepVis
 	 */
 	final private void toIntArray(List<? extends T> sortedList, int start, int end) {
 		multiset = new int[end - start];
-		array = new Object[end - start];
+		array = new IExpr[end - start];
 		T lastT = sortedList.get(start);
 		T currentT;
 		int index = 0;

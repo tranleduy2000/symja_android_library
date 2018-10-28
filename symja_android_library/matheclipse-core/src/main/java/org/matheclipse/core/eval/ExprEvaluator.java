@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -186,9 +186,8 @@ public class ExprEvaluator {
 	}
 
 	/**
-	 * Clear all <b>local variables</b> defined with the <code>defineVariable()</code> method for this evaluator.
-	 * <b>Note:</b> global variables assigned in scripting mode can be cleared with the <code>Clear(variable)</code>
-	 * function.
+	 * Clear all <b>local variables</b> defined with the <code>defineVariable()</code> method for this evaluator. <b>Note:</b> global
+	 * variables assigned in scripting mode can be cleared with the <code>Clear(variable)</code> function.
 	 * 
 	 * @see #defineVariable(ISymbol, IExpr)
 	 */
@@ -371,18 +370,19 @@ public class ExprEvaluator {
 	 * @throws SyntaxError
 	 */
 	public IExpr eval(final String inputExpression) {
-		// try {
 		if (inputExpression != null) {
+			try {
 			EvalEngine.set(engine);
 			engine.reset();
 			fExpr = engine.parse(inputExpression);
 			if (fExpr != null) {
 				return eval(fExpr);
 			}
-		} 
-		// } finally {
-		// EvalEngine.remove();
-		// }
+			} finally {
+				EvalEngine.remove();
+		}
+		}
+
 		return null;
 	}
 
@@ -429,32 +429,57 @@ public class ExprEvaluator {
 		if (inputExpression != null) {
 			// F.join();
 			EvalEngine.set(engine);
+			try {
 			engine.reset();
 			fExpr = engine.parse(inputExpression);
 			if (fExpr != null) {
+					final ExecutorService executor = Executors.newSingleThreadExecutor();
 				try {
 					F.await();
-					TimeLimiter timeLimiter = SimpleTimeLimiter.create(Executors.newSingleThreadExecutor());
+						TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor); // Executors.newSingleThreadExecutor());
 					EvalCallable work = call == null ? new EvalCallable(engine) : call;
 
 					work.setExpr(fExpr);
 					return timeLimiter.callWithTimeout(work, timeoutDuration, timeUnit);
-				} catch (InterruptedException e) {
+					} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
 					return F.$Aborted;
-					// } catch (java.util.concurrent.TimeoutException e) {
-					// return F.$Aborted;
+				} catch (java.util.concurrent.TimeoutException e) {
+//						Throwable t = e.getCause();
+//						if (t instanceof RuntimeException) {
+//							throw (RuntimeException) t;
+//						}
+					return F.$Aborted;
 				} catch (com.google.common.util.concurrent.UncheckedTimeoutException e) {
-					Throwable t = e.getCause();
-					if (t instanceof RuntimeException) {
-						throw (RuntimeException) t;
-					}
+						// Throwable t = e.getCause();
+						// if (t instanceof RuntimeException) {
+						// throw (RuntimeException) t;
+						// }
 					return F.$Aborted;
 				} catch (Exception e) {
-					if (Config.DEBUG) {
+					if (Config.SHOW_STACKTRACE) {
 						e.printStackTrace();
 					}
 					return F.Null;
+					} finally {
+						engine.setStopRequested(true);
+						executor.shutdown(); // Disable new tasks from being submitted
+						try {
+							// Wait a while for existing tasks to terminate
+							if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+								executor.shutdownNow(); // Cancel currently executing tasks
+								// Wait a while for tasks to respond to being cancelled
+								if (!executor.awaitTermination(2, TimeUnit.SECONDS)) {
+									engine.printMessage("ExprEvaluator: pool did not terminate");
+								}
+							}
+						} catch (InterruptedException ie) {
+							// (Re-)Cancel if current thread also interrupted
+							executor.shutdownNow();
+						}
 				}
+			}
+			} finally {
+				EvalEngine.remove();
 			}
 		}
 		return null;

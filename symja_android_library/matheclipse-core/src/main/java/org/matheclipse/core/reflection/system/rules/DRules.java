@@ -103,7 +103,7 @@ public interface DRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 0, 71 };
+  final public static int[] SIZES = { 0, 80 };
 
   final public static IAST RULES = List(
     IInit(D, SIZES),
@@ -146,9 +146,9 @@ public interface DRules {
     // D(ArcSech(f_),x_NotListQ):=(D(f,x)*(-1))/(f*Sqrt(1-f^2))
     ISetDelayed(D(ArcSech(f_),$p(x,NotListQ)),
       Times(D(f,x),CN1,Power(f,-1),Power(Plus(C1,Negate(Sqr(f))),CN1D2))),
-    // D(Ceiling(f_),x_NotListQ):=0
+    // D(Ceiling(f_),x_NotListQ):=D(f,x)*Piecewise({{0,f<Ceiling(f)}},Indeterminate)
     ISetDelayed(D(Ceiling(f_),$p(x,NotListQ)),
-      C0),
+      Times(D(f,x),Piecewise(List(List(C0,Less(f,Ceiling(f)))),Indeterminate))),
     // D(Erf(f_),x_NotListQ):=D(f,x)*2*1/(E^f^2*Sqrt(Pi))
     ISetDelayed(D(Erf(f_),$p(x,NotListQ)),
       Times(D(f,x),C2,Exp(Negate(Sqr(f))),Power(Pi,CN1D2))),
@@ -158,9 +158,12 @@ public interface DRules {
     // D(Erfi(f_),x_NotListQ):=D(f,x)*2*E^f^2/Sqrt(Pi)
     ISetDelayed(D(Erfi(f_),$p(x,NotListQ)),
       Times(D(f,x),C2,Exp(Sqr(f)),Power(Pi,CN1D2))),
-    // D(Floor(f_),x_NotListQ):=0
+    // D(ExpIntegralEi(f_),x_NotListQ):=D(f,x)*E^f/f
+    ISetDelayed(D(ExpIntegralEi(f_),$p(x,NotListQ)),
+      Times(D(f,x),Exp(f),Power(f,-1))),
+    // D(Floor(f_),x_NotListQ):=D(f,x)*Piecewise({{0,f>Floor(f)}},Indeterminate)
     ISetDelayed(D(Floor(f_),$p(x,NotListQ)),
-      C0),
+      Times(D(f,x),Piecewise(List(List(C0,Greater(f,Floor(f)))),Indeterminate))),
     // D(FractionalPart(f_),x_NotListQ):=D(f,x)*1
     ISetDelayed(D(FractionalPart(f_),$p(x,NotListQ)),
       Times(D(f,x),C1)),
@@ -173,9 +176,9 @@ public interface DRules {
     // D(Gamma(f_),x_NotListQ):=D(f,x)*Gamma(f)*PolyGamma(f)
     ISetDelayed(D(Gamma(f_),$p(x,NotListQ)),
       Times(D(f,x),Gamma(f),PolyGamma(f))),
-    // D(HarmonicNumber(f_),x_NotListQ):=D(f,x)*Pi^2/6-HarmonicNumber(f,2)
+    // D(HarmonicNumber(f_),x_NotListQ):=D(f,x)*(Pi^2/6-HarmonicNumber(f,2))
     ISetDelayed(D(HarmonicNumber(f_),$p(x,NotListQ)),
-      Plus(Times(D(f,x),QQ(1L,6L),Sqr(Pi)),Negate(HarmonicNumber(f,C2)))),
+      Times(D(f,x),Plus(Times(QQ(1L,6L),Sqr(Pi)),Negate(HarmonicNumber(f,C2))))),
     // D(HeavisideTheta(f_),x_NotListQ):=D(f,x)*DiracDelta(f)
     ISetDelayed(D(HeavisideTheta(f_),$p(x,NotListQ)),
       Times(D(f,x),DiracDelta(f))),
@@ -185,9 +188,15 @@ public interface DRules {
     // D(InverseErf(f_),x_NotListQ):=D(f,x)*1/2*Sqrt(Pi)*E^InverseErf(f)^2
     ISetDelayed(D(InverseErf(f_),$p(x,NotListQ)),
       Times(D(f,x),C1D2,Sqrt(Pi),Exp(Sqr(InverseErf(f))))),
+    // D(InverseErfc(f_),x_NotListQ):=D(f,x)*(-1/2)*E^InverseErfc(f)^2*Sqrt(Pi)
+    ISetDelayed(D(InverseErfc(f_),$p(x,NotListQ)),
+      Times(D(f,x),CN1D2,Exp(Sqr(InverseErfc(f))),Sqrt(Pi))),
     // D(Log(f_),x_NotListQ):=D(f,x)/f
     ISetDelayed(D(Log(f_),$p(x,NotListQ)),
       Times(D(f,x),Power(f,-1))),
+    // D(LogGamma(f_),x_NotListQ):=D(f,x)*PolyGamma(0,f)
+    ISetDelayed(D(LogGamma(f_),$p(x,NotListQ)),
+      Times(D(f,x),PolyGamma(C0,f))),
     // D(LogisticSigmoid(f_),x_NotListQ):=D(f,x)*LogisticSigmoid(f)*(1-LogisticSigmoid(f))
     ISetDelayed(D(LogisticSigmoid(f_),$p(x,NotListQ)),
       Times(D(f,x),LogisticSigmoid(f),Plus(C1,Negate(LogisticSigmoid(f))))),
@@ -212,12 +221,15 @@ public interface DRules {
     // D(Csch(f_),x_NotListQ):=D(f,x)*(-1)*Coth(f)*Csch(f)
     ISetDelayed(D(Csch(f_),$p(x,NotListQ)),
       Times(D(f,x),CN1,Coth(f),Csch(f))),
-    // D(Round(f_),x_NotListQ):=0
+    // D(Round(f_),x_NotListQ):=D(f,x)*Piecewise({{0,NotElement(-1/2+Re(f),Integers)&&NotElement(-1/2+Im(f),Integers)}},Indeterminate)
     ISetDelayed(D(Round(f_),$p(x,NotListQ)),
-      C0),
+      Times(D(f,x),Piecewise(List(List(C0,And(NotElement(Plus(CN1D2,Re(f)),Integers),NotElement(Plus(CN1D2,Im(f)),Integers)))),Indeterminate))),
     // D(Sin(f_),x_NotListQ):=D(f,x)*Cos(f)
     ISetDelayed(D(Sin(f_),$p(x,NotListQ)),
       Times(D(f,x),Cos(f))),
+    // D(Sinc(f_),x_NotListQ):=D(f,x)*(Cos(f)/f-Sin(f)/f^2)
+    ISetDelayed(D(Sinc(f_),$p(x,NotListQ)),
+      Times(D(f,x),Plus(Times(Power(f,-1),Cos(f)),Times(CN1,Power(f,-2),Sin(f))))),
     // D(Sinh(f_),x_NotListQ):=D(f,x)*Cosh(f)
     ISetDelayed(D(Sinh(f_),$p(x,NotListQ)),
       Times(D(f,x),Cosh(f))),
@@ -233,6 +245,18 @@ public interface DRules {
     // D(Sech(f_),x_NotListQ):=D(f,x)*(-1)*Tanh(f)*Sech(f)
     ISetDelayed(D(Sech(f_),$p(x,NotListQ)),
       Times(D(f,x),CN1,Tanh(f),Sech(f))),
+    // D(CosIntegral(f_),x_NotListQ):=D(f,x)*Cos(f)/f
+    ISetDelayed(D(CosIntegral(f_),$p(x,NotListQ)),
+      Times(D(f,x),Power(f,-1),Cos(f))),
+    // D(CoshIntegral(f_),x_NotListQ):=D(f,x)*Cosh(f)/f
+    ISetDelayed(D(CoshIntegral(f_),$p(x,NotListQ)),
+      Times(D(f,x),Power(f,-1),Cosh(f))),
+    // D(SinIntegral(f_),x_NotListQ):=D(f,x)*Sinc(f)
+    ISetDelayed(D(SinIntegral(f_),$p(x,NotListQ)),
+      Times(D(f,x),Sinc(f))),
+    // D(SinhIntegral(f_),x_NotListQ):=D(f,x)*Sinh(f)/f
+    ISetDelayed(D(SinhIntegral(f_),$p(x,NotListQ)),
+      Times(D(f,x),Power(f,-1),Sinh(f))),
     // D(ArcCos(x_),{x_,2}):=-x/(1-x^2)^(3/2)
     ISetDelayed(D(ArcCos(x_),List(x_,C2)),
       Times(CN1,x,Power(Plus(C1,Negate(Sqr(x))),QQ(-3L,2L)))),
@@ -302,13 +326,13 @@ public interface DRules {
     // D(Cos(x_),{x_,n_IntegerQ}):=Cos(x+1/2*n*Pi)/;n>=0
     ISetDelayed(D(Cos(x_),List(x_,$p(n,IntegerQ))),
       Condition(Cos(Plus(x,Times(C1D2,n,Pi))),GreaterEqual(n,C0))),
-    // D(Cot(x_),{x_,n_IntegerQ}):=-Csc(x)^2*KroneckerDelta(-1+n)+Cot(x)*KroneckerDelta(n)-n*Sum((((-1)^j*Binomial(-1+n,k))/(k+1)*2^(-2*k+n)*Binomial(2*k,j)*Sin(1/2*n*Pi+2*(-j+k)*x))/(Sin(x)^(2+2*k)*(-j+k)^(1-n)),{k,0,-1+n},{j,0,-1+k})/;n>=0
+    // D(Cot(x_),{x_,n_IntegerQ}):=-Csc(x)^2*KroneckerDelta(-1+n)+Cot(x)*KroneckerDelta(n)-n*Sum((((-1)^j*Binomial(-1+n,k))/(k+1)*Binomial(2*k,j)*Sin(1/2*n*Pi+2*(-j+k)*x))/(Sin(x)^(2+2*k)*2^(2*k-n)*(-j+k)^(1-n)),{k,0,-1+n},{j,0,-1+k})/;n>=0
     ISetDelayed(D(Cot(x_),List(x_,$p(n,IntegerQ))),
       Condition(Plus(Times(CN1,Sqr(Csc(x)),KroneckerDelta(Plus(CN1,n))),Times(Cot(x),KroneckerDelta(n)),Times(CN1,n,Sum(Times(Power(CN1,j),Power(Plus(k,C1),-1),Binomial(Plus(CN1,n),k),Power(Sin(x),Plus(CN2,Times(CN2,k))),Power(C2,Plus(Times(CN2,k),n)),Binomial(Times(C2,k),j),Power(Plus(Negate(j),k),Plus(CN1,n)),Sin(Plus(Times(C1D2,n,Pi),Times(C2,Plus(Negate(j),k),x)))),List(k,C0,Plus(CN1,n)),List(j,C0,Plus(CN1,k))))),GreaterEqual(n,C0))),
     // D(Sin(x_),{x_,n_IntegerQ}):=Sin(x+1/2*n*Pi)/;n>=0
     ISetDelayed(D(Sin(x_),List(x_,$p(n,IntegerQ))),
       Condition(Sin(Plus(x,Times(C1D2,n,Pi))),GreaterEqual(n,C0))),
-    // D(Tan(x_),{x_,n_IntegerQ}):=Tan(x)*KroneckerDelta(n)+Sec(x)^2*KroneckerDelta(-1+n)+n*Sum((((-1)^k*Binomial(-1+n,k))/(k+1)*2^(-2*k+n)*Binomial(2*k,j)*Sin(1/2*n*Pi+2*(-j+k)*x))/(Cos(x)^(2+2*k)*(-j+k)^(1-n)),{k,0,-1+n},{j,0,-1+k})/;n>=0
+    // D(Tan(x_),{x_,n_IntegerQ}):=Tan(x)*KroneckerDelta(n)+Sec(x)^2*KroneckerDelta(-1+n)+n*Sum((((-1)^k*Binomial(-1+n,k))/(k+1)*Binomial(2*k,j)*Sin(1/2*n*Pi+2*(-j+k)*x))/(Cos(x)^(2+2*k)*2^(2*k-n)*(-j+k)^(1-n)),{k,0,-1+n},{j,0,-1+k})/;n>=0
     ISetDelayed(D(Tan(x_),List(x_,$p(n,IntegerQ))),
       Condition(Plus(Times(Tan(x),KroneckerDelta(n)),Times(Sqr(Sec(x)),KroneckerDelta(Plus(CN1,n))),Times(n,Sum(Times(Power(CN1,k),Power(Plus(k,C1),-1),Binomial(Plus(CN1,n),k),Power(Cos(x),Plus(CN2,Times(CN2,k))),Power(C2,Plus(Times(CN2,k),n)),Binomial(Times(C2,k),j),Power(Plus(Negate(j),k),Plus(CN1,n)),Sin(Plus(Times(C1D2,n,Pi),Times(C2,Plus(Negate(j),k),x)))),List(k,C0,Plus(CN1,n)),List(j,C0,Plus(CN1,k))))),GreaterEqual(n,C0))),
     // D(Log(x_),{x_,n_IntegerQ}):=(-1+n)!/((-1)^(1-n)*x^n)/;n>=0
@@ -317,6 +341,9 @@ public interface DRules {
     // D(BesselJ(f_,g_),x_NotListQ):=1/2*(BesselJ(-1+f,g)-BesselJ(1+f,g))*D(g,x)+D(f,x)*Derivative(1,0)[BesselJ][f,g]
     ISetDelayed(D(BesselJ(f_,g_),$p(x,NotListQ)),
       Plus(Times(C1D2,Plus(BesselJ(Plus(CN1,f),g),Negate(BesselJ(Plus(C1,f),g))),D(g,x)),Times(D(f,x),$($(Derivative(C1,C0),BesselJ),f,g)))),
+    // D(PolyLog(f_,g_),x_NotListQ):=(D(g,x)*PolyLog(-1+f,g))/g+D(f,x)*Derivative(1,0)[PolyLog][f,g]
+    ISetDelayed(D(PolyLog(f_,g_),$p(x,NotListQ)),
+      Plus(Times(Power(g,-1),D(g,x),PolyLog(Plus(CN1,f),g)),Times(D(f,x),$($(Derivative(C1,C0),PolyLog),f,g)))),
     // D(ProductLog(f_,g_),x_NotListQ):=ProductLog(f,g)*D(g,x)/(g*(1+ProductLog(f,g)))+D(f,x)*Derivative(1,0)[ProductLog][f,g]
     ISetDelayed(D(ProductLog(f_,g_),$p(x,NotListQ)),
       Plus(Times(ProductLog(f,g),D(g,x),Power(Times(g,Plus(C1,ProductLog(f,g))),-1)),Times(D(f,x),$($(Derivative(C1,C0),ProductLog),f,g))))

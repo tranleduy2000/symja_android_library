@@ -706,7 +706,7 @@ public final class NumberTheory {
 				if (list.size() > 1) {
 					int size = list.argSize();
 					IASTAppendable resultList = F.ListAlloc(list.size());
-					IASTMutable plus = F.binaryAST2(F.Plus, F.C0, list.get(1));
+					IASTMutable plus = F.binary(F.Plus, F.C0, list.get(1));
 					IASTMutable result = plus;
 					for (int i = 2; i <= size; i++) {
 						IExpr temp;
@@ -716,7 +716,7 @@ public final class NumberTheory {
 							temp = engine.evaluate(result);
 						}
 						resultList.append(temp);
-						IASTMutable plusAST = F.binaryAST2(F.Plus, F.C0, list.get(i));
+						IASTMutable plusAST = F.binary(F.Plus, F.C0, list.get(i));
 						plus.set(1, F.Power(plusAST, F.CN1));
 						plus = plusAST;
 					}
@@ -939,9 +939,9 @@ public final class NumberTheory {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3);
 
 			int size = ast.size();
+			if (size >= 3) {
 			IExpr expr;
 			for (int i = 1; i < size - 1; i++) {
 				expr = ast.get(i);
@@ -952,6 +952,8 @@ public final class NumberTheory {
 				}
 			}
 			return F.True;
+		}
+			return F.False;
 		}
 
 		@Override
@@ -3511,6 +3513,11 @@ public final class NumberTheory {
 				}
 				return F.bool(isSquarefree(expr, varList));
 			} catch (JASConversionException e) {
+				if (Config.SHOW_STACKTRACE) {
+					e.printStackTrace();
+				}
+			} catch (RuntimeException e) {
+				// JAS may throw RuntimeExceptions
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}

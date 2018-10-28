@@ -1,5 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
+import org.matheclipse.core.builtin.Structure;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -145,12 +146,8 @@ public class ComplexExpand extends AbstractEvaluator {
 				// ((2 I) Cos[Re[x]] Sinh[Im[x]])/(Cos[2 Re[x]]-Cosh[2
 				// Im[x]])
 				return Plus(
-						Times(integer(-2L), Cosh(imX),
-								Sin(reX), Power(
-										Plus(Cos(Times(C2, reX)),
-												Times(CN1,
-														Cosh(Times(C2, imX)))),
-										CN1)),
+						Times(integer(-2L), Cosh(imX), Sin(reX),
+								Power(Plus(Cos(Times(C2, reX)), Times(CN1, Cosh(Times(C2, imX)))), CN1)),
 						Times(C2, CI, Cos(reX), Sinh(imX),
 								Power(Plus(Cos(Times(C2, reX)), Times(CN1, Cosh(Times(C2, imX)))), CN1)));
 			}
@@ -182,7 +179,10 @@ public class ComplexExpand extends AbstractEvaluator {
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkRange(ast, 1, 2);
-
+		IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
+		if (temp.isPresent()) {
+			return temp;
+		}
 		return complexExpand(ast.arg1(), engine);
 	}
 

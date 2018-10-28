@@ -65,7 +65,7 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     }
 
     public ASTSeriesData(IExpr x, IExpr x0, IAST coefficients, final int nMin, final int power, final int denominator) {
-        this(x, x0, nMin, nMin, power, denominator, new OpenIntToIExprHashMap());
+		this(x, x0, nMin, nMin, power, denominator, new OpenIntToIExprHashMap<IExpr>());
         int size = coefficients.size();
         int order = power - 1;
         int coeff;
@@ -79,11 +79,11 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     }
 
     public ASTSeriesData(IExpr x, IExpr x0, int nMin, int power, int denominator) {
-        this(x, x0, nMin, nMin, power, denominator, new OpenIntToIExprHashMap());
+		this(x, x0, nMin, nMin, power, denominator, new OpenIntToIExprHashMap<IExpr>());
     }
 
     private ASTSeriesData(IExpr x, IExpr x0, int nMin, int nMax, int power, int denominator,
-                          OpenIntToIExprHashMap vals) {
+			OpenIntToIExprHashMap<IExpr> vals) {
         super();
         this.coefficientValues = vals;
         this.x = x;
@@ -138,15 +138,14 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     }
 
     /**
-     * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this
-     * {@code HMArrayList}.
+	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this {@code HMArrayList}.
      *
      * @return a shallow copy of this {@code ArrayList}
      * @see java.lang.Cloneable
      */
     @Override
     public IAST clone() {
-        return new ASTSeriesData(x, x0, nMin, nMax, power, denominator, new OpenIntToIExprHashMap(coefficientValues));
+		return new ASTSeriesData(x, x0, nMin, nMax, power, denominator, new OpenIntToIExprHashMap<IExpr>(coefficientValues));
     }
 
     /**
@@ -256,7 +255,7 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /** {@inheritDoc} */
     @Override
     public ASTSeriesData copy() {
-        return new ASTSeriesData(x, x0, nMin, nMax, power, denominator, new OpenIntToIExprHashMap(coefficientValues));
+		return new ASTSeriesData(x, x0, nMin, nMax, power, denominator, new OpenIntToIExprHashMap<IExpr>(coefficientValues));
     }
 
     @Override
@@ -267,8 +266,8 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /**
      * Differentiation of a power series.
      *
-     * See <a href="https://en.wikipedia.org/wiki/Power_series#Differentiation_and_integration">Wikipedia: Power series
-     * - Differentiation and integration</a>
+	 * See <a href="https://en.wikipedia.org/wiki/Power_series#Differentiation_and_integration">Wikipedia: Power series -
+	 * Differentiation and integration</a>
      *
      * @param x
      * @return
@@ -280,7 +279,7 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
             }
             if (power > 0) {
                 ASTSeriesData series = new ASTSeriesData(x, x0, nMin, nMin, power - 1, denominator,
-                        new OpenIntToIExprHashMap());
+						new OpenIntToIExprHashMap<IExpr>());
                 if (nMin >= 0) {
                     if (nMin > 0) {
                         series.setCoeff(nMin - 1, this.coeff(nMin + 1).times(F.ZZ(nMin + 1)));
@@ -333,31 +332,30 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /** {@inheritDoc} */
     @Override
     public IExpr evaluate(EvalEngine engine) {
+//		if ((getEvalFlags() & IAST.DEFER_AST) == IAST.DEFER_AST) {
+//			return F.NIL;
+//		}
         return F.NIL;
     }
 
     /** {@inheritDoc} */
     @Override
     public String fullFormString() {
-        StringBuilder buf = new StringBuilder();
-        buf.append("SeriesData(");
-        buf.append(x.toString());
-        buf.append(',');
-        buf.append(x0.toString());
-        buf.append(',');
+		StringBuilder buf = new StringBuilder(128);
+		buf.append("SeriesData(").append(x.toString()).append(',').append(x0.toString()).append(',');
 
         // list of coefficients
-        buf.append("{");
+		buf.append('{');
         boolean first = true;
         for (int i = nMin; i < nMax; i++) {
             IExpr temp = coeff(i);
             if (!first) {
-                buf.append(",");
+				buf.append(',');
             }
             buf.append(temp.toString());
             first = false;
         }
-        buf.append("}");
+		buf.append('}');
 
         buf.append(',');
         buf.append(nMin);
@@ -365,7 +363,7 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
         buf.append(power);
         buf.append(',');
         buf.append(denominator);
-        buf.append(")");
+		buf.append(')');
         return buf.toString();
     }
 
@@ -448,8 +446,8 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /**
      * Integration of a power series.
      *
-     * See <a href="https://en.wikipedia.org/wiki/Power_series#Differentiation_and_integration">Wikipedia: Power series
-     * - Differentiation and integration</a>
+	 * See <a href="https://en.wikipedia.org/wiki/Power_series#Differentiation_and_integration">Wikipedia: Power series -
+	 * Differentiation and integration</a>
      *
      * @param x
      * @return
@@ -461,7 +459,7 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
             }
             if (power > 0) {
                 ASTSeriesData series = new ASTSeriesData(x, x0, nMin, nMin, power + 1, denominator,
-                        new OpenIntToIExprHashMap());
+						new OpenIntToIExprHashMap<IExpr>());
                 if (nMin + 1 > 0) {
                     for (int i = nMin + 1; i <= nMax; i++) {
                         series.setCoeff(i, this.coeff(i - 1).times(F.QQ(1, i)));
@@ -518,7 +516,7 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
 		// if (!this.x0.isZero()) {
 		// ps.setCoeff(0, this.x0);
 		// }
-		//Fix bug
+		// Fix bug
 		// // a1^(-1)
 		// ps.setCoeff(1, a1Inverse);
 		// for (int i = 2; i < maxPower; i++) {
@@ -555,7 +553,7 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
 			// System.out.println(gList.toString());
 			// }
 
-			ASTSeriesData ps = new ASTSeriesData(x, x0, nMin, nMin, power, denominator, new OpenIntToIExprHashMap());
+			ASTSeriesData ps = new ASTSeriesData(x, x0, nMin, nMin, power, denominator, new OpenIntToIExprHashMap<IExpr>());
 			if (!this.x0.isZero()) {
 				ps.setCoeff(0, this.x0);
 			}
@@ -855,8 +853,8 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /**
      * Add two power series.
      *
-     * See <a href="https://en.wikipedia.org/wiki/Power_series#Addition_and_subtraction">Wikipedia: Power series -
-     * Addition and subtraction</a>
+	 * See <a href="https://en.wikipedia.org/wiki/Power_series#Addition_and_subtraction">Wikipedia: Power series - Addition and
+	 * subtraction</a>
      *
      * @param b
      * @return
@@ -948,7 +946,7 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
         nMin = array[4].toIntDefault(0);
         power = array[5].toIntDefault(0);
         denominator = array[6].toIntDefault(0);
-        coefficientValues = new OpenIntToIExprHashMap();
+		coefficientValues = new OpenIntToIExprHashMap<IExpr>();
         IAST list = (IAST) array[3];
         int listSize = list.size();
         for (int i = 1; i < listSize; i++) {
@@ -958,7 +956,52 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
 
     @Override
     public IExpr set(int location, IExpr object) {
-        throw new UnsupportedOperationException();
+		hashValue = 0;
+		IExpr result;
+		switch (location) {
+		case 1:
+			result = x;
+			x = object;
+			return result;
+		case 2:
+			result = x0;
+			x0 = object;
+			return result;
+		case 3:
+			if (!object.isList()) {
+				throw new IndexOutOfBoundsException(
+						"SeriesData: Index[" + Integer.valueOf(location) + "] expects list of data.");
+			}
+			return arg3();
+		case 4:
+			result = F.ZZ(nMin);
+			nMin = object.toIntDefault(Integer.MIN_VALUE);
+			if (nMin == Integer.MIN_VALUE) {
+				throw new IndexOutOfBoundsException(
+						"SeriesData: Index[" + Integer.valueOf(location) + "] expects machine size integer.");
+
+			}
+			return result;
+		case 5:
+			result = F.ZZ(power);
+			power = object.toIntDefault(Integer.MIN_VALUE);
+			if (power == Integer.MIN_VALUE) {
+				throw new IndexOutOfBoundsException(
+						"SeriesData: Index[" + Integer.valueOf(location) + "] expects machine size integer.");
+
+			}
+			return result;
+		case 6:
+			result = F.ZZ(denominator);
+			denominator = object.toIntDefault(Integer.MIN_VALUE);
+			if (denominator == Integer.MIN_VALUE) {
+				throw new IndexOutOfBoundsException(
+						"SeriesData: Index[" + Integer.valueOf(location) + "] expects machine size integer.");
+			}
+			return result;
+		default:
+			throw new IndexOutOfBoundsException("Index: " + Integer.valueOf(location));
+		}
     }
 
     public void setCoeff(int k, IExpr value) {
@@ -1031,8 +1074,8 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /**
      * Subtract two power series.
      *
-     * See <a href="https://en.wikipedia.org/wiki/Power_series#Addition_and_subtraction">Wikipedia: Power series -
-     * Addition and subtraction</a>
+	 * See <a href="https://en.wikipedia.org/wiki/Power_series#Addition_and_subtraction">Wikipedia: Power series - Addition and
+	 * subtraction</a>
      *
      * @param b
      * @return
@@ -1078,8 +1121,8 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /**
      * Multiply two power series.
      *
-     * See <a href="https://en.wikipedia.org/wiki/Power_series#Multiplication_and_division">Wikipedia: Power series -
-     * Multiplication and Division</a>
+	 * See <a href="https://en.wikipedia.org/wiki/Power_series#Multiplication_and_division">Wikipedia: Power series - Multiplication and
+	 * Division</a>
      *
      * @param b
      * @return

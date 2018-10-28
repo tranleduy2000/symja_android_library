@@ -60,7 +60,6 @@ import org.matheclipse.core.reflection.system.rules.SinhRules;
 import org.matheclipse.core.reflection.system.rules.TanRules;
 import org.matheclipse.core.reflection.system.rules.TanhRules;
 
-import static org.matheclipse.core.expression.F.ArcCos;
 import static org.matheclipse.core.expression.F.ArcCot;
 import static org.matheclipse.core.expression.F.ArcCoth;
 import static org.matheclipse.core.expression.F.ArcCsc;
@@ -235,9 +234,14 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1) {
-			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
-			if (negExpr.isPresent()) {
-				return Plus(Negate(Pi), ArcCos(negExpr));
+			// don't check negative argument here - doesn't work with Rubi/MMA pattern matching
+			// IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1, false);
+			// if (negExpr.isPresent()) {
+			// return Plus(Negate(Pi), F.ArcCos(negExpr));
+			// }
+			if (arg1.isCos() && arg1.first().isPositive()) {
+				// ArcCos(Cos(z))
+				return arcCosCos(arg1);
 			}
 			return F.NIL;
 		}
@@ -379,11 +383,15 @@ public class ExpTrigsFunctions {
 		public IExpr evaluateArg1(final IExpr arg1) {
 			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
 			if (negExpr.isPresent()) {
-				return Plus(Negate(Pi), ArcCot(negExpr));
+				return Plus(Negate(ArcCot(negExpr)));
 			}
 			IExpr imPart = AbstractFunctionEvaluator.getPureImaginaryPart(arg1);
 			if (imPart.isPresent()) {
 				return F.Times(F.CNI, F.ArcCoth(imPart));
+			}
+			if (arg1.isAST(F.Cot, 2) && arg1.first().isPositive()) {
+				// ArcCot(Cot(z))
+				return arcTanArcCotInverse(arg1);
 			}
 			return F.NIL;
 		}
@@ -704,6 +712,10 @@ public class ExpTrigsFunctions {
 			if (imPart.isPresent()) {
 				return F.Times(F.CI, F.ArcSinh(imPart));
 			}
+			if (arg1.isSin() && arg1.first().isPositive()) {
+				// ArcSin(Sin(z))
+				return arcSinSin(arg1);
+			}
 			return F.NIL;
 		}
 
@@ -802,6 +814,10 @@ public class ExpTrigsFunctions {
 			if (imPart.isPresent()) {
 				return F.Times(F.CI, F.ArcTanh(imPart));
 			}
+			if (arg1.isTan() && arg1.first().isPositive()) {
+				// ArcTan(Tan(z))
+				return arcTanArcCotInverse(arg1);
+			}
 			return F.NIL;
 		}
 
@@ -816,11 +832,11 @@ public class ExpTrigsFunctions {
 				}
 				return F.CNPiHalf;
 			}
-			if (y.isZero() && x.isReal() && !x.isZero()) {
+			if (y.isZero() && x.isNumericFunction() && !x.isZero()) {
 				return F.Times(F.Subtract(F.C1, x.unitStep()), F.Pi);
 			}
 			IExpr yUnitStep = y.unitStep();
-			if (x.isNumber() && yUnitStep.isInteger()) {
+			if (x.isNumericFunction() && yUnitStep.isInteger()) {
 				if (x.re().isNegative()) {
 					return F.Plus(F.ArcTan(F.Divide(y, x)),
 							F.Times(F.Subtract(F.Times(F.C2, yUnitStep), F.C1), F.Pi));
@@ -1072,9 +1088,9 @@ public class ExpTrigsFunctions {
 						}
 					}
 
-					if (rest.equals(C1D2)) {
+					if (rest.equals(F.C1D2)||rest.equals(F.CN1D2)) {
 						// Cos(z) == Sin(Pi/2 - z)
-						return Sin(Subtract(Divide(Pi, C2), arg1));
+						return Sin(Subtract(F.CPiHalf, arg1));
 					}
 				}
 				if (parts.arg2().isIntegerResult()) {
@@ -1635,6 +1651,17 @@ public class ExpTrigsFunctions {
 			}
 			return F.NIL;
 		}
+
+		@Override
+		public IExpr e2ObjArg(IExpr o0, IExpr o1) {
+			if (o0.isZero()) {
+				if (o1.isZero()) {
+					return F.Indeterminate;
+				}
+				return F.C0;
+			}
+			return F.NIL;
+		}
 	}
 
 	/**
@@ -1962,7 +1989,11 @@ public class ExpTrigsFunctions {
 
 					if (rest.equals(C1D2)) {
 						// Sin(z) == Cos(Pi/2 - z)
-						return Cos(Subtract(Divide(Pi, C2), arg1));
+						return Cos(Subtract(F.CPiHalf, arg1));
+					}
+					if (rest.equals(F.CN1D2)) {
+						// Sin(z) == Cos(-Pi/2 - z)
+						return Negate(Cos(Subtract(F.CNPiHalf, arg1)));
 					}
 				}
 
@@ -2108,6 +2139,9 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1) {
+			if (arg1.isZero()) {
+				return F.C1;
+			}
 			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
 			if (negExpr.isPresent()) {
 				return Sinc(negExpr);
@@ -2368,6 +2402,132 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+	}
+
+	/**
+	 * Try simplifying <code>ArcTan(Tan(z))</code> or <code>ArcCot(Cot(z))</code>
+	 *
+	 * @param arg1
+	 *            is assumed to be <code>Tan(z)</code> or <code>Cot(z)</code>
+	 * @return
+	 */
+	private static IExpr arcTanArcCotInverse(final IExpr arg1) {
+		IExpr z = arg1.first();
+		IExpr zRe = z.re();
+		IExpr k = F.Quotient.of(F.Subtract(zRe, F.CPiHalf), F.Pi).inc();
+		if (k.isInteger()) {
+			// -Pi/2 + k*Pi
+			IExpr min = F.Times.of(F.Plus(F.CN1D2, k), Pi);
+			// Pi/2 + k*Pi
+			IExpr max = F.Times.of(F.Plus(F.C1D2, k), Pi);
+			// z - k*Pi
+			IAST result = F.Subtract(z, F.Times(k, F.Pi));
+			// (-(Pi/2) + k*Pi < Re(z) < Pi/2 + k*Pi
+			if (F.Less.ofQ(min, zRe) && F.Greater.ofQ(max, zRe)) {
+				// z - k*Pi
+				return result;
+			}
+
+			IExpr zIm = z.im();
+			// (Re(z) == -(Pi/2) + k*Pi && Im(z) < 0)
+			if (zIm.isNegativeResult() && F.Equal.ofQ(zRe, min)) {
+				// z - k*Pi
+				return result;
+			}
+
+			if (arg1.isTan()) { // Tan(z)
+				// (Re(z) == Pi/2 + k*Pi && Im(z) > 0)
+				if (zIm.isPositiveResult() && F.Equal.ofQ(zRe, max)) {
+					// z - k*Pi
+					return result;
+				}
+			} else { // Cot(z)
+				// (Re(z) == Pi/2 + k*Pi && Im(z) >= 0)
+				if (zIm.isNonNegativeResult() && F.Equal.ofQ(zRe, max)) {
+					// z - k*Pi
+					return result;
+				}
+			}
+		}
+		return F.NIL;
+	}
+
+	/**
+	 * Try simplifying <code>ArcSin(Sin(z))</code>
+	 *
+	 * @param arg1
+	 *            is assumed to be <code>Tan(z)</code> or <code>Cot(z)</code>
+	 * @return
+	 */
+	private static IExpr arcSinSin(final IExpr arg1) {
+		IExpr z = arg1.first();
+		IExpr zRe = z.re();
+		IExpr k = F.Quotient.of(F.Subtract(zRe, F.CPiHalf), F.Pi).inc();
+		if (k.isInteger()) {
+			// -Pi/2 + k*Pi
+			IExpr min = F.Times.of(F.Plus(F.CN1D2, k), Pi);
+			// Pi/2 + k*Pi
+			IExpr max = F.Times.of(F.Plus(F.C1D2, k), Pi);
+			// (-1)^k * (z - Pi*k)
+			IAST result = F.Times(F.Power(F.CN1, k), F.Subtract(z, F.Times(k, F.Pi)));
+			// (-(Pi/2) + k*Pi < Re(z) < Pi/2 + k*Pi
+			if (F.Less.ofQ(min, zRe) && F.Greater.ofQ(max, zRe)) {
+				// (-1)^k * (z - Pi*k)
+				return result;
+			}
+
+			IExpr zIm = z.im();
+			// (Re(z) == -(Pi/2) + k*Pi && Im(z) < 0)
+			if (zIm.isNonNegativeResult() && F.Equal.ofQ(zRe, min)) {
+				// (-1)^k * (z - Pi*k)
+				return result;
+			}
+
+			// (Re(z) == Pi/2 + k*Pi && Im(z) > 0)
+			if ((zIm.isNegativeResult() || zIm.isZero()) && F.Equal.ofQ(zRe, max)) {
+				// (-1)^k * (z - Pi*k)
+				return result;
+			}
+		}
+		return F.NIL;
+	}
+
+	/**
+	 * Try simplifying <code>ArcCos(Cos(z))</code>
+	 *
+	 * @param arg1
+	 *            is assumed to be <code>Tan(z)</code> or <code>Cot(z)</code>
+	 * @return
+	 */
+	private static IExpr arcCosCos(final IExpr arg1) {
+		IExpr z = arg1.first();
+		IExpr zRe = z.re();
+		IExpr k = F.Quotient.of(F.Subtract(zRe, F.Pi), F.Pi).inc();
+		if (k.isInteger()) {
+			// k*Pi
+			IExpr min = F.Times.of(k, Pi);
+			// (k+1)*Pi
+			IExpr max = F.Times.of(k.inc(), Pi);
+			// (-1)^k * (z - Pi*k - Pi/2) + Pi/2
+			IAST result = F.Plus(F.Times(F.Power(F.CN1, k), F.Plus(z, F.Times(F.CN1, k, F.Pi), F.CNPiHalf)), F.CPiHalf);
+
+			// (k*Pi < Re(z) < (k + 1)*Pi
+			if (F.Less.ofQ(min, zRe) && F.Greater.ofQ(max, zRe)) {
+				return result;
+			}
+
+			IExpr zIm = z.im();
+			// (Re(z) == k*Pi && Im(z) >= 0)
+			if (zIm.isNonNegativeResult() && F.Equal.ofQ(zRe, min)) {
+				return result;
+			}
+
+			// (Re(z) == (k + 1)*Pi && Im(z) <= 0)
+			if ((zIm.isNegativeResult() || zIm.isZero()) && F.Equal.ofQ(zRe, max)) {
+				return result;
+			}
+		}
+		return F.NIL;
 	}
 
 	/**

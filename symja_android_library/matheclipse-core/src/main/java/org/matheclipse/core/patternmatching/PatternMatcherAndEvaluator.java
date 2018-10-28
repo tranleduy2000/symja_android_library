@@ -1,6 +1,5 @@
 package org.matheclipse.core.patternmatching;
 
-import org.matheclipse.core.builtin.Programming;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ConditionException;
 import org.matheclipse.core.eval.exception.ReturnException;
@@ -27,6 +26,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
 	private IExpr fRightHandSide;
 
+	private transient IExpr fReturnResult = F.NIL;
+
 	/**
 	 * Leaf count of the right-hand-side of this matcher if it's a <code>Condition()</code> or
 	 * <code>Module(...,Condition()) or With(...,Condition())</code> expression.
@@ -46,10 +47,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	/**
 	 * Define a pattern-matching rule.
 	 * 
-	 * @param leftHandSide
-	 *            could contain pattern expressions for "pattern-matching"
-	 * @param rightHandSide
-	 *            the result which should be evaluated if the "pattern-matching" succeeds
+	 * @param leftHandSide  could contain pattern expressions for "pattern-matching"
+	 * @param rightHandSide the result which should be evaluated if the "pattern-matching" succeeds
 	 */
 	public PatternMatcherAndEvaluator(final IExpr leftHandSide, final IExpr rightHandSide) {
 		this(ISymbol.RuleType.SET_DELAYED, leftHandSide, rightHandSide);
@@ -58,19 +57,23 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	/**
 	 * ine a pattern-matching rule.
 	 * 
-	 * @param setSymbol
-	 *            the symbol which defines this pattern-matching rule (i.e. Set, SetDelayed,...)
-	 * @param leftHandSide
-	 *            could contain pattern expressions for "pattern-matching"
-	 * @param rightHandSide
-	 *            the result which should be evaluated if the "pattern-matching" succeeds
+	 * @param setSymbol     the symbol which defines this pattern-matching rule (i.e. Set, SetDelayed,...)
+	 * @param leftHandSide  could contain pattern expressions for "pattern-matching"
+	 * @param rightHandSide the result which should be evaluated if the "pattern-matching" succeeds
 	 */
 	public PatternMatcherAndEvaluator(final ISymbol.RuleType setSymbol, final IExpr leftHandSide,
 			final IExpr rightHandSide) {
-		super(leftHandSide);
+		this(setSymbol, leftHandSide, rightHandSide, true);
+	}
+
+	public PatternMatcherAndEvaluator(final ISymbol.RuleType setSymbol, final IExpr leftHandSide,
+			final IExpr rightHandSide, boolean initAll) {
+		super(leftHandSide, initAll);
 		fSetSymbol = setSymbol;
 		fRightHandSide = rightHandSide;
+		if (initAll) {
 		initRHSleafCountSimplify();
+	}
 	}
 
 	/**
@@ -95,6 +98,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		PatternMatcherAndEvaluator v = (PatternMatcherAndEvaluator) super.clone();
 		v.fRightHandSide = fRightHandSide;
 		v.fSetSymbol = fSetSymbol;
+		v.fReturnResult = F.NIL;
 		return v;
 	}
 
@@ -145,26 +149,39 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	}
 
 	/**
-	 * Check if the condition for the right-hand-sides <code>Module[], With[] or Condition[]</code> expressions
-	 * evaluates to <code>true</code>.
+	 * Check if the condition for the right-hand-sides <code>Module[], With[] or Condition[]</code> expressions evaluates to
+	 * <code>true</code>.
 	 * 
 	 * @return <code>true</code> if the right-hand-sides condition is fulfilled.
 	 */
 	@Override
 	public boolean checkRHSCondition(EvalEngine engine) {
-		if (!(fRightHandSide.isModuleOrWith() || fRightHandSide.isCondition())) {
+		PatternMap patternMap = getPatternMap();
+		if (patternMap.getRHSEvaluated()) {
 			return true;
 		}
-		if (!fPatternMap.isAllPatternsAssigned()) {
-			return true;
+		boolean matched = false;
+		if (!(fRightHandSide.isModule() || fRightHandSide.isWith() || fRightHandSide.isCondition())) {
+			matched = true;
+		} else {
+		if (!patternMap.isAllPatternsAssigned()) {
+				matched = true;
+			} else {
+				IExpr rhs = patternMap.substituteSymbols(fRightHandSide);
+				try {
+//					System.out.println(rhs.toString());
+					fReturnResult = engine.evaluate(rhs);
+					matched = true;
+				} catch (final ConditionException e) {
+					matched = false;
+				} catch (final ReturnException e) {
+					fReturnResult = e.getValue();
+					matched = true;
+				}
+		patternMap.setRHSEvaluated(matched);
+			}
 		}
-		IExpr substConditon = fPatternMap.substituteSymbols(fRightHandSide);
-		if (substConditon.isCondition()) {
-			return Programming.checkCondition(substConditon.first(), substConditon.second(), engine);
-		} else if (substConditon.isModuleOrWith()) {
-			return Programming.checkModuleOrWithCondition(substConditon.first(), substConditon.second(), engine);
-		}
-		return true;
+		return matched;
 	}
 
 	/** {@inheritDoc} */
@@ -174,13 +191,14 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	}
 
 	final public IExpr replace(final IExpr leftHandSide, @Nonnull EvalEngine engine, boolean evaluate) {
+		PatternMap patternMap = null;
 		if (isRuleWithoutPatterns()) {
 			// no patterns found match equally:
 			if (fLhsPatternExpr.equals(leftHandSide)) {
 				IExpr result = fRightHandSide;
 				try {
 					if (evaluate) {
-					return F.eval(result);
+						return engine.evaluate(result);
 					}
 					return result;
 				} catch (final ConditionException e) {
@@ -194,13 +212,16 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 				if (!(fLhsPatternExpr.isFlatAST() && leftHandSide.isFlatAST())) {
 					return F.NIL;
 				}
-				// TODO implement equals matching for special cases, if the AST
-				// is Orderless or Flat
+				// replaceSubExpressionOrderlessFlat() below implements equals matching for
+				// special cases, if the AST is Orderless or Flat
 			}
-		}
-
-		fPatternMap.initPattern();
-		if (matchExpr(fLhsPatternExpr, leftHandSide, engine)) {
+			if (fLhsPatternExpr.size() == leftHandSide.size()) {
+				return F.NIL;
+			}
+		} else {
+			patternMap = getPatternMap();
+		patternMap.initPattern();
+			if (matchExpr(fLhsPatternExpr, leftHandSide, engine, new StackMatcher(engine), true)) {
 
 			if (RulesData.showSteps) {
 				if (fLhsPatternExpr.head().equals(F.Integrate)) {
@@ -213,24 +234,31 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 				}
 			}
 
-			IExpr result = fPatternMap.substituteSymbols(fRightHandSide);
+				if (fReturnResult.isPresent()) {
+					return fReturnResult;
+				}
+			IExpr result = patternMap.substituteSymbols(fRightHandSide);
 			try {
 				// System.out.println(result.toString());
 				if (evaluate) {
-				result = F.eval(result);
+						result = engine.evaluate(result);
 				}
+					return result;
 			} catch (final ConditionException e) {
 				logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
 				return F.NIL;
 			} catch (final ReturnException e) {
-				result = e.getValue();
+					return e.getValue();
 			}
-			return result;
+
+			}
 		}
 
 		if (fLhsPatternExpr.isAST() && leftHandSide.isAST()) {
-			fPatternMap.initPattern();
-			return evalAST((IAST) fLhsPatternExpr, (IAST) leftHandSide, fRightHandSide, engine);
+			patternMap = getPatternMap();
+			patternMap.initPattern();
+			return replaceSubExpressionOrderlessFlat((IAST) fLhsPatternExpr, (IAST) leftHandSide, fRightHandSide,
+					engine);
 		}
 		return F.NIL;
 	}
@@ -300,7 +328,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 							if (getRHSleafCountSimplify() > pm.getRHSleafCountSimplify()) {
 								return 1;
 							}
-							return equivalentRHS(fRightHandSide, pm.fRightHandSide, fPatternMap, pm.fPatternMap);
+							return equivalentRHS(fRightHandSide, pm.fRightHandSide, getPatternMap(),
+									pm.getPatternMap());
 						}
 						return 1;
 					} else if (pm.fRightHandSide.isModuleOrWithCondition() || pm.fRightHandSide.isCondition()) {
@@ -314,7 +343,10 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
 	@Override
 	public String toString() {
+		if (fPatternMap == null) {
 		return getAsAST().toString();
+	}
+		return fPatternMap.toString() + "\n" + getAsAST().toString();
 	}
 
 	@Override

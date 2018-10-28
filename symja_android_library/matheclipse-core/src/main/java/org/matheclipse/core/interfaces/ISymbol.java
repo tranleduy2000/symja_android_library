@@ -6,14 +6,12 @@ import com.duy.lambda.Function;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.Context;
-import org.matheclipse.core.expression.F;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 import org.matheclipse.core.patternmatching.RulesData;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -47,6 +45,17 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * ISymbol attribute for a function, where no argument should be evaluated
      */
     public final static int HOLDALL = HOLDFIRST | HOLDREST;
+
+    /**
+     * ISymbol attribute for a function, where no argument should be evaluated
+     */
+    public final static int HOLDCOMPLETE = HOLDALL | 0x0080;
+
+    /**
+     * ISymbol attribute for a function, where no argument should be evaluated
+     */
+    public final static int HOLDALLCOMPLETE = HOLDCOMPLETE | 0x0100;
+
     /**
      * ISymbol attribute for a function with lists as arguments
      */
@@ -137,14 +146,14 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      *
      * @param sizes
      */
-    public void createRulesData(@Nonnull int[] sizes);
+    public RulesData createRulesData(@Nonnull int[] sizes);
 
     /**
      * Return a list of the rules associated to this symbol
      *
      * @return
      */
-    public List<IAST> definition();
+    public IAST definition();
 
     /**
      * Return the rules associated to this symbol in <code>String</code> representation
@@ -241,6 +250,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @return <code>null</code> if no rules are defined
      */
     public RulesData getRulesData();
+
+    public void setRulesData(RulesData rd);
 
     /**
      * Get the pure symbol name string
@@ -367,8 +378,17 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     public boolean ofQ(EvalEngine engine, IExpr... args);
 
     /**
-     * Get the ordinal number of this built-in symbol in the enumeration of built-in symbols.
-     * If this is no built-in symbol return <code>-1</code> (ID.UNKNOWN)
+     * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code> to a boolean
+     * value. If the result isn't a boolean value return <code>false</code>.
+     *
+     * @param args the arguments for which this function symbol should be evaluated
+     * @return if the result isn't a boolean value return <code>false</code>.
+     */
+    public boolean ofQ(IExpr... args);
+
+    /**
+     * Get the ordinal number of this built-in symbol in the enumeration of built-in symbols. If this is no built-in
+     * symbol return <code>-1</code> (ID.UNKNOWN)
      *
      * @return
      */

@@ -53,11 +53,13 @@ import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
 import org.matheclipse.core.polynomials.IPartialFractionGenerator;
 import org.matheclipse.core.polynomials.PartialFractionGenerator;
+import org.matheclipse.core.polynomials.PolynomialSubstitutions;
 import org.matheclipse.core.visit.AbstractVisitorBoolean;
 import org.matheclipse.core.visit.VisitorExpr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -105,7 +107,6 @@ import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
-
 
 public class Algebra {
 	static {
@@ -407,10 +408,8 @@ public class Algebra {
 		 * Calculate the GCD[] of the integer factors in each element of the <code>numeratorPlus</code> expression with
 		 * the <code>denominatorInt</code>. After that return the result divided by the gcd value, if possible.
 		 *
-		 * @param numeratorPlus
-		 *            a <code>Plus[...]</code> expression as the numerator
-		 * @param denominatorInt
-		 *            an integer value for the denominator
+		 * @param numeratorPlus  a <code>Plus[...]</code> expression as the numerator
+		 * @param denominatorInt an integer value for the denominator
 		 * @return <code>null</code> if no gcd value was found
 		 */
 		private static IExpr[] cancelPlusIntegerGCD(IAST numeratorPlus, IInteger denominatorInt) {
@@ -465,7 +464,7 @@ public class Algebra {
 		 * @return <code>F.NIL</code> is no evaluation was possible
 		 * @throws JASConversionException
 		 */
-		public static IExpr cancelPowerTimes(IExpr powerTimesAST) throws JASConversionException {
+		public static IExpr togetherPowerTimes(IExpr powerTimesAST) throws JASConversionException {
 			IExpr[] parts = fractionalParts(powerTimesAST, false);
 			if (parts != null && parts[0].isPlus() && parts[1].isPlus()) {
 				IAST numParts = ((IAST) parts[0]).partitionPlus(new PolynomialPredicate(), F.C0, F.C1, F.List);
@@ -482,6 +481,91 @@ public class Algebra {
 			return F.NIL;
 		}
 
+		public static IExpr cancelPowerTimes(IExpr powerTimesAST) throws JASConversionException {
+			IExpr[] parts = fractionalParts(powerTimesAST, false);
+			if (parts != null) {
+				IExpr p00 = parts[0];
+				IExpr p01 = F.C1;
+				IExpr p10 = parts[1];
+				IExpr p11 = F.C1;
+				if (p00.isPlus()) {
+					IAST numParts = ((IAST) p00).partitionPlus(new PolynomialPredicate(), F.C0, F.C1, F.List);
+					if (numParts.isPresent() && !numParts.get(1).isOne()) {
+						p00 = numParts.get(1);
+						p01 = numParts.get(2);
+					}
+				}
+
+				if (p10.isPlus()) {
+					IAST denParts = ((IAST) p10).partitionPlus(new PolynomialPredicate(), F.C0, F.C1, F.List);
+					if (denParts.isPresent() && !denParts.get(1).isOne()) {
+						p10 = denParts.get(1);
+						p11 = denParts.get(2);
+					}
+				}
+				if (!p10.isOne()) {
+					IExpr[] result = cancelGCD(p00, p10);
+					if (result != null) {
+						return F.Times(result[0], result[1], p01, F.Power(F.Times(result[2], p11), F.CN1));
+					}
+				}
+
+			}
+			return F.NIL;
+		}
+
+		public static IExpr[] cancelQuotientRemainder(final IExpr arg1, IExpr arg2, IExpr variable) {
+			IExpr[] result = new IExpr[2];
+			try {
+
+				JASConvert<BigRational> jas = new JASConvert<BigRational>(variable, BigRational.ZERO);
+				GenPolynomial<BigRational> poly1 = jas.expr2JAS(arg1, false);
+				GenPolynomial<BigRational> poly2 = jas.expr2JAS(arg2, false);
+				if (poly1.degree() > poly2.degree()) {
+					GenPolynomial<BigRational>[] divRem = poly1.quotientRemainder(poly2);
+					if (!divRem[1].isZERO()) {
+						return null;
+					}
+					result[0] = jas.rationalPoly2Expr(divRem[0]);
+					result[1] = F.C1;
+				} else {
+					GenPolynomial<BigRational>[] divRem = poly2.quotientRemainder(poly1);
+					if (!divRem[1].isZERO()) {
+						return null;
+					}
+					result[0] = F.C1;
+					result[1] = jas.rationalPoly2Expr(divRem[0]);
+				}
+				return result;
+			} catch (JASConversionException e1) {
+				try {
+					JASIExpr jas = new JASIExpr(variable, ExprRingFactory.CONST);
+					GenPolynomial<IExpr> poly1 = jas.expr2IExprJAS(arg1);
+					GenPolynomial<IExpr> poly2 = jas.expr2IExprJAS(arg2);
+					if (poly1.degree() > poly2.degree()) {
+						GenPolynomial<IExpr>[] divRem = poly1.quotientRemainder(poly2);
+						if (!divRem[1].isZERO()) {
+							return null;
+						}
+						result[0] = jas.exprPoly2Expr(divRem[0], variable);
+						result[1] = F.C1;
+					} else {
+						GenPolynomial<IExpr>[] divRem = poly2.quotientRemainder(poly1);
+						if (!divRem[1].isZERO()) {
+							return null;
+						}
+						result[0] = F.C1;
+						result[1] = jas.exprPoly2Expr(divRem[0]);
+					}
+					return result;
+				} catch (JASConversionException e) {
+					if (Config.SHOW_STACKTRACE) {
+						e.printStackTrace();
+					}
+				}
+			}
+			return null;
+		}
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
@@ -490,13 +574,60 @@ public class Algebra {
 			if (ast.isAST1() && arg1.isAtom()) {
 				return arg1;
 			}
-			IAST temp = Structure.threadPlusLogicEquationOperators(arg1, ast, 1);
+			IExpr temp = Structure.threadPlusLogicEquationOperators(arg1, ast, 1);
 			if (temp.isPresent()) {
 				return temp;
 			}
+			temp = cancelFractionPowers(engine, arg1);
+			if (temp.isPresent()) {
+				return temp;
+			}
+			temp = cancelNIL(arg1, engine);
+			if (temp.isPresent()) {
+				return temp;
+			}
+			return arg1;
+		}
+
+		private IExpr cancelFractionPowers(EvalEngine engine, IExpr arg1) {
+			IExpr temp;
+			IExpr[] parts = fractionalParts(arg1, false);
+			if (parts != null && //
+					((parts[0].isPower() && parts[0].exponent().isInteger()) //
+							|| (parts[1].isPower() && parts[1].exponent().isInteger()))) {
+				IExpr numer = parts[0];
+				int numerExponent = 1;
+				IExpr denom = parts[1];
+				int denomExponent = 1;
+				if (numer.isPower()) {
+					numerExponent = numer.exponent().toIntDefault(Integer.MIN_VALUE);
+					numer = numer.base();
+				}
+				if (denom.isPower()) {
+					denomExponent = denom.exponent().toIntDefault(Integer.MIN_VALUE);
+					denom = denom.base();
+				}
+				if (numerExponent > 0 && denomExponent > 0) {
+					temp = cancelNIL(F.Times(numer, F.Power(denom, -1)), engine);
+					if (temp.isPresent()) {
+						if (numerExponent > denomExponent) {
+							return F.Times(F.Power(temp, numerExponent - denomExponent),
+									F.Power(numer, numerExponent - denomExponent));
+						} else if (numerExponent < denomExponent) {
+							return F.Times(F.Power(temp, denomExponent - numerExponent),
+									F.Power(denom, -1 * (denomExponent - numerExponent)));
+						}
+						return F.Power(temp, numerExponent);
+					}
+				}
+			}
+			return F.NIL;
+		}
+
+		private IExpr cancelNIL(IExpr arg1, EvalEngine engine) {
 			try {
 				if (arg1.isTimes() || arg1.isPower()) {
-					IExpr result = cancelPowerTimes(arg1);
+					IExpr result = togetherPowerTimes(arg1);
 					if (result.isPresent()) {
 						return result;
 					}
@@ -516,7 +647,7 @@ public class Algebra {
 					jce.printStackTrace();
 				}
 			}
-			return arg1;
+			return F.NIL;
 		}
 
 		@Override
@@ -956,8 +1087,7 @@ public class Algebra {
 	 * a^2*c^2+2*a*b*c^2+b^2*c^2+2*a^2*c*d+4*a*b*c*d+2*b^2*c*d+a^2*d^2+2*a*b*d^2+b^2*d^2+b(1+a)
 	 * </pre>
 	 * <p>
-	 * <code>Expand</code> expands out rational powers by expanding the <code>Floor()</code> part of the rational powers
-	 * number:
+	 * <code>Expand</code> expands out rational powers by expanding the <code>Floor()</code> part of the rational powers number:
 	 * </p>
 	 *
 	 * <pre>
@@ -1017,7 +1147,14 @@ public class Algebra {
 				return (pattern != null && expression.isFree(pattern, false));
 			}
 
-			public IExpr expandAST(final IAST ast) {
+			/**
+			 *
+			 * @param ast
+			 * @param evalParts
+			 *            evaluate the determined numerator and denominator parts
+			 * @return
+			 */
+			private IExpr expandAST(final IAST ast, boolean evalParts) {
 				if (isPatternFree(ast)) {
 					return F.NIL;
 				}
@@ -1029,7 +1166,7 @@ public class Algebra {
 				} else if (ast.isTimes()) {
 					// (a+b)*(c+d)...
 
-					IExpr[] temp = fractionalPartsTimesPower(ast, false, false, false, true);
+					IExpr[] temp = fractionalPartsTimesPower(ast, false, false, false, evalParts);
 					IExpr tempExpr;
 					if (temp == null) {
 						return expandTimes(ast);
@@ -1044,7 +1181,7 @@ public class Algebra {
 							return F.NIL;
 						}
 						if (temp[1].isPower() || temp[1].isPlus()) {
-							IExpr denom = expandAST((IAST) temp[1]);
+							IExpr denom = expandAST((IAST) temp[1], evalParts);
 							if (denom.isPresent()) {
 								return PowerOp.power(denom, F.CN1);
 							}
@@ -1074,7 +1211,7 @@ public class Algebra {
 							}
 						} else {
 							if (temp[1].isPower() || temp[1].isPlus()) {
-								IExpr denom = expandAST((IAST) temp[1]);
+								IExpr denom = expandAST((IAST) temp[1], evalParts);
 								if (denom.isPresent()) {
 									temp[1] = denom;
 									evaled = true;
@@ -1116,7 +1253,7 @@ public class Algebra {
 				for (int i = 1; i < ast.size(); i++) {
 					final IExpr arg = ast.get(i);
 					if (arg.isAST()) {
-						IExpr temp = expand((IAST) arg, pattern, expandNegativePowers, false);
+						IExpr temp = expand((IAST) arg, pattern, expandNegativePowers, false, true);
 						if (temp.isPresent()) {
 							if (!result.isPresent()) {
 								result = ast.copyUntil(ast.size(), i);
@@ -1140,8 +1277,7 @@ public class Algebra {
 			}
 
 			/**
-			 * Expand <code>(a+b)^i</code> with <code>i</code> an integer number in the range Integer.MIN_VALUE to
-			 * Integer.MAX_VALUE.
+			 * Expand <code>(a+b)^i</code> with <code>i</code> an integer number in the range Integer.MIN_VALUE to Integer.MAX_VALUE.
 			 *
 			 * @param powerAST
 			 * @return
@@ -1156,13 +1292,17 @@ public class Algebra {
 							INumber floorPart = fraction.floorFraction().normalize();
 							if (!floorPart.isZero()) {
 								IFraction fractionalPart = fraction.fractionalPart();
-								return expandAST(F.Times(F.Power(base, fractionalPart), F.Power(base, floorPart)));
+								return expandAST(F.Times(F.Power(base, fractionalPart), F.Power(base, floorPart)),
+										true);
 							}
 						}
 					}
 
-					try {
-						int exp = Validate.checkPowerExponent(powerAST);
+					int exp = exponent.toIntDefault(Integer.MIN_VALUE);
+					if (exp == Integer.MIN_VALUE) {
+						addExpanded(powerAST);
+						return F.NIL;
+					}
 						IAST plusAST = (IAST) base;
 						if (exp < 0) {
 							if (expandNegativePowers) {
@@ -1174,10 +1314,6 @@ public class Algebra {
 						}
 						return expandPower(plusAST, exp);
 
-					} catch (WrongArgumentType e) {
-						addExpanded(powerAST);
-						return F.NIL;
-					}
 				}
 				addExpanded(powerAST);
 				return F.NIL;
@@ -1321,7 +1457,7 @@ public class Algebra {
 			public void evalAndExpandAST(IExpr expr1, IExpr expr2, final IASTAppendable result) {
 				IExpr arg = TimesOp.times(expr1, expr2);
 				if (arg.isAST()) {
-					appendPlus(result, expandAST((IAST) arg).orElse(arg));
+					appendPlus(result, expandAST((IAST) arg, true).orElse(arg));
 					return;
 				}
 				result.append(arg);
@@ -1422,7 +1558,7 @@ public class Algebra {
 				if (ast.size() > 2) {
 					patt = ast.arg2();
 				}
-				return expand(arg1, patt, false, true).orElse(arg1);
+				return expand(arg1, patt, false, true, true).orElse(arg1);
 			}
 
 			return ast.arg1();
@@ -1480,7 +1616,7 @@ public class Algebra {
 				patt = ast.arg2();
 			}
 			if (arg1.isAST()) {
-				return expandAll((IAST) arg1, patt, true, false, engine).orElse(arg1);
+				return expandAll((IAST) arg1, patt, true, true, engine).orElse(arg1);
 			}
 			return arg1;
 		}
@@ -1528,32 +1664,43 @@ public class Algebra {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
-			VariablesSet eVar = new VariablesSet(ast.arg1());
 
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
 				return list.mapThread(F.ListAlloc(list.size()), ast, 1);
 			}
+			IExpr result = F.REMEMBER_AST_CACHE.getIfPresent(ast);
+			if (result != null) {
+				return result;
+			}
+			VariablesSet eVar = new VariablesSet(ast.arg1());
+			List<IExpr> varList = eVar.getVarList().copyTo();
 			IExpr expr = ast.arg1();
-			if (ast.isAST1()) {
+			if (ast.isAST1() && !ast.arg1().isTimes() && !ast.arg1().isPower()) {
 				expr = F.Together.of(engine, ast.arg1());
 				if (expr.isAST()) {
 					IExpr[] parts = Algebra.getNumeratorDenominator((IAST) expr, engine);
 					if (!parts[1].isOne()) {
-						return F.Divide(F.Factor(parts[0]), F.Factor(parts[1]));
+						try {
+							IExpr numerator = factorExpr(F.Factor(parts[0]), parts[0], varList);
+							IExpr denomimator = factorExpr(F.Factor(parts[1]), parts[1], varList);
+							return F.Divide(numerator, denomimator);
+						} catch (JASConversionException e) {
+							if (Config.DEBUG) {
+								e.printStackTrace();
+							}
+							return expr;
+						}
 					}
 				}
 			}
 
-			// ASTRange r = new ASTRange(eVar.getVarList(), 1);
 			try {
-				// List<IExpr> varList = r;
-				List<IExpr> varList = eVar.getVarList().copyTo();
 
 				if (ast.isAST2()) {
 					return factorWithOption(ast, expr, varList, false, engine);
 				}
-				return factor(expr, varList, false);
+				return factorExpr(ast, expr, varList);
 
 			} catch (JASConversionException e) {
 				if (Config.DEBUG) {
@@ -1563,8 +1710,47 @@ public class Algebra {
 			return expr;
 		}
 
-		public static IExpr factor(IExpr expr, List<IExpr> varList, boolean factorSquareFree)
+		private IExpr factorExpr(final IAST ast, IExpr expr, List<IExpr> varList) {
+				if (expr.isAST()) {
+				IExpr temp;
+				// if (expr.isPower()&&expr.base().isPlus()) {
+				//// System.out.println(ast.toString());
+				// temp = factorExpr(ast, expr.base(), varList);
+				// temp = F.Power(temp, expr.exponent());
+				// } else
+				if (expr.isTimes()) {
+					// System.out.println(ast.toString());
+					temp = ((IAST) expr).map(new Function<IExpr, IExpr>() {
+                        @Override
+                        public IExpr apply(IExpr x) {
+                            if (x.isPlus()) {
+                                return Factor.this.factorExpr(ast, x, varList);
+                            }
+                            if (x.isPower() && x.base().isPlus()) {
+                                IExpr p = Factor.this.factorExpr(ast, x.base(), varList);
+                                if (!p.equals(x.base())) {
+                                    return F.Power(p, x.exponent());
+                                }
+                            }
+                            return F.NIL;
+                        }
+                    }, 1);
+				} else {
+				// System.out.println("leafCount " + expr.leafCount());
+					temp = factor((IAST) expr, varList, false);
+				}
+					F.REMEMBER_AST_CACHE.put(ast, temp);
+					return temp;
+				}
+				return expr;
+
+		}
+
+		public static IExpr factor(IAST expr, List<IExpr> varList, boolean factorSquareFree)
 				throws JASConversionException {
+			if (Config.MAX_FACTOR_LEAFCOUNT > 0 && expr.leafCount() > Config.MAX_FACTOR_LEAFCOUNT) {
+				return expr;
+			}
 			JASConvert<BigRational> jas = new JASConvert<BigRational>(varList, BigRational.ZERO);
 			GenPolynomial<BigRational> polyRat = jas.expr2JAS(expr, false);
 			if (polyRat.length() <= 1) {
@@ -1572,62 +1758,59 @@ public class Algebra {
 			}
 
 			Object[] objects = jas.factorTerms(polyRat);
+			SortedMap<GenPolynomial<edu.jas.arith.BigInteger>, Long> map;
+			try {
 			GenPolynomial<edu.jas.arith.BigInteger> poly = (GenPolynomial<edu.jas.arith.BigInteger>) objects[2];
 			FactorAbstract<edu.jas.arith.BigInteger> factorAbstract = FactorFactory
 					.getImplementation(edu.jas.arith.BigInteger.ONE);
-			SortedMap<GenPolynomial<edu.jas.arith.BigInteger>, Long> map;
 			if (factorSquareFree) {
 				map = factorAbstract.squarefreeFactors(poly);// factors(poly);
 			} else {
+					// System.out.println("Variable: " + varList.toString() + " -- " + expr.fullFormString());
+					// System.out.println(poly);
 				map = factorAbstract.factors(poly);
+			}
+			} catch (RuntimeException rex) {
+				// System.out.println("Factor failed: " + expr.toString());
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
+				}
+				return expr;
 			}
 			IASTAppendable result = F.TimesAlloc(map.size() + 1);
 			java.math.BigInteger gcd = (java.math.BigInteger) objects[0];
 			java.math.BigInteger lcm = (java.math.BigInteger) objects[1];
+			IRational f = F.C1;
 			if (!gcd.equals(java.math.BigInteger.ONE) || !lcm.equals(java.math.BigInteger.ONE)) {
-				result.append(F.fraction(gcd, lcm));
+				f = F.fraction(gcd, lcm).normalize();
 			}
 			for (SortedMap.Entry<GenPolynomial<edu.jas.arith.BigInteger>, Long> entry : map.entrySet()) {
 				if (entry.getKey().isONE() && entry.getValue().equals(1L)) {
 					continue;
 				}
+				IExpr base = jas.integerPoly2Expr(entry.getKey());
 				if (entry.getValue() == 1L) {
-					result.append(jas.integerPoly2Expr(entry.getKey()));
+					if (f.isMinusOne() && base.isPlus()) {
+						base = ((IAST) base).map(new Function<IExpr, IExpr>() {
+                            @Override
+                            public IExpr apply(IExpr x) {
+                                return x.negate();
+                            }
+                        }, 1);
+						f = F.C1;
+					}
+					result.append(base);
 				} else {
-					result.append(F.Power(jas.integerPoly2Expr(entry.getKey()), F.integer(entry.getValue())));
+					result.append(F.Power(base, F.integer(entry.getValue())));
 				}
 			}
+			if (!f.isOne()) {
+				result.append(f);
+			}
+			// System.out.println("Factor: " + expr.toString() + " ==> " + result.toString());
 			return result.getOneIdentity(F.C0);
 		}
 
-		public static IExpr factorList(IExpr expr, List<IExpr> varList, boolean factorSquareFree)
-				throws JASConversionException {
-			JASConvert<BigRational> jas = new JASConvert<BigRational>(varList, BigRational.ZERO);
-			GenPolynomial<BigRational> polyRat = jas.expr2JAS(expr, false);
-			Object[] objects = jas.factorTerms(polyRat);
-			java.math.BigInteger gcd = (java.math.BigInteger) objects[0];
-			java.math.BigInteger lcm = (java.math.BigInteger) objects[1];
-			GenPolynomial<edu.jas.arith.BigInteger> poly = (GenPolynomial<edu.jas.arith.BigInteger>) objects[2];
-			FactorAbstract<edu.jas.arith.BigInteger> factorAbstract = FactorFactory
-					.getImplementation(edu.jas.arith.BigInteger.ONE);
-			SortedMap<GenPolynomial<edu.jas.arith.BigInteger>, Long> map;
-			if (factorSquareFree) {
-				map = factorAbstract.squarefreeFactors(poly);// factors(poly);
-			} else {
-				map = factorAbstract.factors(poly);
-			}
-			IASTAppendable result = F.ListAlloc(map.size() + 1);
-			if (!gcd.equals(java.math.BigInteger.ONE) || !lcm.equals(java.math.BigInteger.ONE)) {
-				result.append(F.List(F.fraction(gcd, lcm), F.C1));
-			}
-			for (SortedMap.Entry<GenPolynomial<edu.jas.arith.BigInteger>, Long> entry : map.entrySet()) {
-				if (entry.getKey().isONE() && entry.getValue().equals(1L)) {
-					continue;
-				}
-				result.append(F.List(jas.integerPoly2Expr(entry.getKey()), F.integer(entry.getValue())));
-			}
-			return result;
-		}
 
 		/**
 		 * Factor the <code>expr</code> with the option given in <code>ast</code>.
@@ -1693,7 +1876,10 @@ public class Algebra {
 				if (ast.isAST2()) {
 					return factorWithOption(ast, expr, varList, true, engine);
 				}
-				return factor(expr, varList, true);
+				if (expr.isAST()) {
+					return factor((IAST) expr, varList, true);
+				}
+				return expr;
 
 			} catch (JASConversionException jce) {
 				// toInt() conversion failed
@@ -1751,6 +1937,39 @@ public class Algebra {
 			return F.NIL;
 		}
 
+		private static IExpr factorList(IExpr expr, List<IExpr> varList, boolean factorSquareFree)
+				throws JASConversionException {
+			JASConvert<BigRational> jas = new JASConvert<BigRational>(varList, BigRational.ZERO);
+			GenPolynomial<BigRational> polyRat = jas.expr2JAS(expr, false);
+			Object[] objects = jas.factorTerms(polyRat);
+			java.math.BigInteger gcd = (java.math.BigInteger) objects[0];
+			java.math.BigInteger lcm = (java.math.BigInteger) objects[1];
+			SortedMap<GenPolynomial<edu.jas.arith.BigInteger>, Long> map;
+			try {
+			GenPolynomial<edu.jas.arith.BigInteger> poly = (GenPolynomial<edu.jas.arith.BigInteger>) objects[2];
+			FactorAbstract<edu.jas.arith.BigInteger> factorAbstract = FactorFactory
+					.getImplementation(edu.jas.arith.BigInteger.ONE);
+				if (factorSquareFree) {
+					map = factorAbstract.squarefreeFactors(poly);// factors(poly);
+				} else {
+					map = factorAbstract.factors(poly);
+				}
+			} catch (RuntimeException rex) {
+				// JAS may throw RuntimeExceptions
+				return F.List(expr);
+			}
+			IASTAppendable result = F.ListAlloc(map.size() + 1);
+			if (!gcd.equals(java.math.BigInteger.ONE) || !lcm.equals(java.math.BigInteger.ONE)) {
+				result.append(F.List(F.fraction(gcd, lcm), F.C1));
+			}
+			for (SortedMap.Entry<GenPolynomial<edu.jas.arith.BigInteger>, Long> entry : map.entrySet()) {
+				if (entry.getKey().isONE() && entry.getValue().equals(1L)) {
+					continue;
+				}
+				result.append(F.List(jas.integerPoly2Expr(entry.getKey()), F.integer(entry.getValue())));
+			}
+			return result;
+		}
 	}
 
 	/**
@@ -1860,8 +2079,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * works like <code>Simplify</code> but additionally tries some <code>FunctionExpand</code> rule transformations to
-	 * simplify <code>expr</code>.
+	 * works like <code>Simplify</code> but additionally tries some <code>FunctionExpand</code> rule transformations to simplify
+	 * <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -1895,6 +2114,7 @@ public class Algebra {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
+			// System.out.println(ast.toString());
 			return super.evaluate(ast, engine);
 		}
 
@@ -1964,12 +2184,10 @@ public class Algebra {
 		}
 
 		/**
-		 * Get the &quot;numerator form&quot; of the given function. Example: <code>Csc[x]</code> gives
-		 * <code>Sin[x]</code>.
+		 * Get the &quot;numerator form&quot; of the given function. Example: <code>Csc[x]</code> gives <code>Sin[x]</code>.
 		 *
-		 * @param function
-		 *            the function which should be transformed to &quot;denominator form&quot; determine the denominator
-		 *            by splitting up functions like <code>Tan[9,Cot[], Csc[],...</code>
+		 * @param function the function which should be transformed to &quot;denominator form&quot; determine the denominator by splitting
+		 *                 up functions like <code>Tan[9,Cot[], Csc[],...</code>
 		 * @param trig
 		 * @return
 		 */
@@ -2002,8 +2220,7 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the extended GCD ('greatest common divisor') of the univariate polynomials <code>p</code> and
-	 * <code>q</code>.
+	 * returns the extended GCD ('greatest common divisor') of the univariate polynomials <code>p</code> and <code>q</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2014,16 +2231,15 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the extended GCD ('greatest common divisor') of the univariate polynomials <code>p</code> and
-	 * <code>q</code> modulus the <code>prime</code> integer.
+	 * returns the extended GCD ('greatest common divisor') of the univariate polynomials <code>p</code> and <code>q</code> modulus the
+	 * <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 * <p>
 	 * See:
 	 * </p>
 	 * <ul>
-	 * <li><a href=
-	 * "https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm#Polynomial_extended_Euclidean_algorithm">Wikipedia:
+	 * <li><a href= "https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm#Polynomial_extended_Euclidean_algorithm">Wikipedia:
 	 * Polynomial extended Euclidean algorithm</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
@@ -2139,8 +2355,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the GCD ('greatest common divisor') of the polynomials <code>p</code> and <code>q</code> modulus the
-	 * <code>prime</code> integer.
+	 * returns the GCD ('greatest common divisor') of the polynomials <code>p</code> and <code>q</code> modulus the <code>prime</code>
+	 * integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2148,8 +2364,17 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3);
 
+			if (ast.isAST0()) {
+				return F.NIL;
+			}
+			if (ast.isAST1()) {
+				IExpr arg1 = ast.arg1();
+				if (arg1.isNegativeResult()) {
+					return arg1.negate();
+				}
+				return arg1;
+			}
 			VariablesSet eVar = new VariablesSet();
 			eVar.addVarList(ast, 1);
 
@@ -2171,9 +2396,32 @@ public class Algebra {
 				}
 				return jas.integerPoly2Expr(poly.monic());
 			} catch (JASConversionException e) {
+				try {
+					if (eVar.size() == 0) {
+						return F.NIL;
+					}
+					IAST vars = eVar.getVarList();
+					ExprPolynomialRing ring = new ExprPolynomialRing(vars);
+					ExprPolynomial pol1 = ring.create(expr);
+					ExprPolynomial pol2;
+					// ASTRange r = new ASTRange(eVar.getVarList(), 1);
+					List<IExpr> varList = eVar.getVarList().copyTo();
+					JASIExpr jas = new JASIExpr(varList, true);
+					GenPolynomial<IExpr> p1 = jas.expr2IExprJAS(pol1);
+					GenPolynomial<IExpr> p2;
+
+					GreatestCommonDivisor<IExpr> factaory = GCDFactory.getImplementation(ExprRingFactory.CONST);
+					for (int i = 2; i < ast.size(); i++) {
+						expr = F.evalExpandAll(ast.get(i), engine);
+						p2 = jas.expr2IExprJAS(expr);
+						p1 = factaory.gcd(p1, p2);
+					}
+					return jas.exprPoly2Expr(p1);
+				} catch (RuntimeException rex) {
 				if (Config.DEBUG) {
 					e.printStackTrace();
 				}
+			}
 			}
 			return F.NIL;
 		}
@@ -2247,8 +2495,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code> modulus the
-	 * <code>prime</code> integer.
+	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code> modulus the <code>prime</code>
+	 * integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2256,7 +2504,16 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3);
+			if (ast.isAST0()) {
+				return F.NIL;
+			}
+			if (ast.isAST1()) {
+				IExpr arg1 = ast.arg1();
+				if (arg1.isNegativeResult()) {
+					return arg1.negate();
+				}
+				return arg1;
+			}
 
 			VariablesSet eVar = new VariablesSet();
 			eVar.addVarList(ast, 1);
@@ -2284,10 +2541,32 @@ public class Algebra {
 						return Algebra.factorModulus(jas, modIntegerRing, poly.monic(), false);
 						// return jas.modLongPoly2Expr(poly.monic());
 					} catch (JASConversionException e) {
+						try {
+							if (eVar.size() == 0) {
+								return F.NIL;
+							}
+							IAST vars = eVar.getVarList();
+							ExprPolynomialRing ring = new ExprPolynomialRing(vars);
+							ExprPolynomial pol1 = ring.create(expr);
+							ExprPolynomial pol2;
+							// ASTRange r = new ASTRange(eVar.getVarList(), 1);
+							List<IExpr> varList = eVar.getVarList().copyTo();
+							JASIExpr jas = new JASIExpr(varList, true);
+							GenPolynomial<IExpr> p1 = jas.expr2IExprJAS(pol1);
+							GenPolynomial<IExpr> p2;
+
+							GreatestCommonDivisor<IExpr> factaory = GCDFactory.getImplementation(ExprRingFactory.CONST);
+							for (int i = 2; i < ast.size(); i++) {
+								expr = F.evalExpandAll(ast.get(i), engine);
+								p2 = jas.expr2IExprJAS(expr);
+								p1 = factaory.lcm(p1, p2);
+							}
+							return jas.exprPoly2Expr(p1);
+						} catch (RuntimeException rex) {
 						if (Config.DEBUG) {
 							e.printStackTrace();
 						}
-						return F.NIL;
+						}
 					}
 				}
 			}
@@ -2327,8 +2606,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * return <code>True</code> if <code>p</code> is a polynomial for the variable <code>x</code>. Return
-	 * <code>False</code> in all other cases.
+	 * return <code>True</code> if <code>p</code> is a polynomial for the variable <code>x</code>. Return <code>False</code> in all
+	 * other cases.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2339,8 +2618,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * return <code>True</code> if <code>p</code> is a polynomial for the variables <code>x, y, ...</code> defined in
-	 * the list. Return <code>False</code> in all other cases.
+	 * return <code>True</code> if <code>p</code> is a polynomial for the variables <code>x, y, ...</code> defined in the list. Return
+	 * <code>False</code> in all other cases.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2352,12 +2631,18 @@ public class Algebra {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST2()) {
-				IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
-				return F.bool(temp.arg1().isPolynomial(temp.arg2().orNewList()));
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				IExpr arg2 = engine.evaluate(ast.arg2());
+				return F.bool(arg1.isPolynomial(arg2.orNewList()));
 			}
-			Validate.checkSize(ast, 3);
+			return F.False;
+			// if (ast.isAST2()) {
+			// IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
+			// return F.bool(temp.arg1().isPolynomial(temp.arg2().orNewList()));
+			// }
+			// Validate.checkSize(ast, 3);
 
-			return F.NIL;
+			// return F.NIL;
 		}
 
 		@Override
@@ -2376,8 +2661,7 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable
-	 * <code>x</code>.
+	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable <code>x</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2388,8 +2672,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable
-	 * <code>x</code> modulus the <code>prime</code> integer.
+	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable <code>x</code> modulus the
+	 * <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2397,7 +2681,7 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 4, 5);
+			if (ast.size() == 4 || ast.size() == 5) {
 			ISymbol variable = Validate.checkSymbolType(ast, 3);
 			IExpr arg1 = F.evalExpandAll(ast.arg1(), engine);
 			IExpr arg2 = F.evalExpandAll(ast.arg2(), engine);
@@ -2420,6 +2704,8 @@ public class Algebra {
 			}
 			return result[0];
 		}
+			return F.NIL;
+		}
 
 	}
 
@@ -2433,8 +2719,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns a list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code>
-	 * for the variable <code>x</code>.
+	 * returns a list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for the variable
+	 * <code>x</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2445,40 +2731,14 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for
-	 * the variable <code>x</code> modulus the <code>prime</code> integer.
+	 * returns list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for the variable
+	 * <code>x</code> modulus the <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
 	private static class PolynomialQuotientRemainder extends AbstractFunctionEvaluator {
 
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 4, 5);
-			ISymbol variable = Validate.checkSymbolType(ast, 3);
-			IExpr arg1 = F.evalExpandAll(ast.arg1(), engine);
-			IExpr arg2 = F.evalExpandAll(ast.arg2(), engine);
-
-			if (ast.size() == 5) {
-				final Options options = new Options(ast.topHead(), ast, 4, engine);
-				IExpr option = options.getOption("Modulus");
-				if (option.isReal()) {
-					IExpr[] result = quotientRemainderModInteger(arg1, arg2, variable, option);
-					if (result == null) {
-						return F.NIL;
-					}
-					return F.List(result[0], result[1]);
-				}
-				return F.NIL;
-			}
-			IExpr[] result = quotientRemainder(arg1, arg2, variable);
-			if (result == null) {
-				return F.NIL;
-			}
-			return F.List(result[0], result[1]);
-		}
-
-		public static IExpr[] quotientRemainder(final IExpr arg1, IExpr arg2, ISymbol variable) {
+		public static IExpr[] quotientRemainder(final IExpr arg1, IExpr arg2, IExpr variable) {
 
 			try {
 				JASConvert<BigRational> jas = new JASConvert<BigRational>(variable, BigRational.ZERO);
@@ -2508,6 +2768,31 @@ public class Algebra {
 			return null;
 		}
 
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkRange(ast, 4, 5);
+			ISymbol variable = Validate.checkSymbolType(ast, 3);
+			IExpr arg1 = F.evalExpandAll(ast.arg1(), engine);
+			IExpr arg2 = F.evalExpandAll(ast.arg2(), engine);
+
+			if (ast.size() == 5) {
+				final Options options = new Options(ast.topHead(), ast, 4, engine);
+				IExpr option = options.getOption("Modulus");
+				if (option.isReal()) {
+					IExpr[] result = quotientRemainderModInteger(arg1, arg2, variable, option);
+					if (result == null) {
+						return F.NIL;
+					}
+					return F.List(result[0], result[1]);
+				}
+				return F.NIL;
+			}
+			IExpr[] result = quotientRemainder(arg1, arg2, variable);
+			if (result == null) {
+				return F.NIL;
+			}
+			return F.List(result[0], result[1]);
+		}
 		public IExpr[] quotientRemainderModInteger(IExpr arg1, IExpr arg2, ISymbol variable, IExpr option) {
 			try {
 				// found "Modulus" option => use ModIntegerRing
@@ -2540,8 +2825,7 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable
-	 * <code>x</code>.
+	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable <code>x</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2552,8 +2836,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable
-	 * <code>x</code> modulus the <code>prime</code> integer.
+	 * returns the polynomial remainder of the polynomials <code>p</code> and <code>q</code> for the variable <code>x</code> modulus the
+	 * <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2767,12 +3051,9 @@ public class Algebra {
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1</code>.
 		 *
-		 * @param a
-		 *            coefficient a of the polynomial
-		 * @param b
-		 *            coefficient b of the polynomial
-		 * @param nthRoot
-		 *            <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
+		 * @param a       coefficient a of the polynomial
+		 * @param b       coefficient b of the polynomial
+		 * @param nthRoot <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
 		 * @return
 		 */
 		private static IExpr root1(IExpr a, IExpr b, int nthRoot) {
@@ -2785,14 +3066,10 @@ public class Algebra {
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1 + c*Slot1^2</code>.
 		 *
-		 * @param a
-		 *            coefficient a of the polynomial
-		 * @param b
-		 *            coefficient b of the polynomial
-		 * @param c
-		 *            coefficient c of the polynomial
-		 * @param nthRoot
-		 *            <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
+		 * @param a       coefficient a of the polynomial
+		 * @param b       coefficient b of the polynomial
+		 * @param c       coefficient c of the polynomial
+		 * @param nthRoot <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
 		 * @return
 		 */
 		private static IExpr root2(IExpr a, IExpr b, IExpr c, int nthRoot) {
@@ -2807,16 +3084,11 @@ public class Algebra {
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1 + c*Slot1^2 + d*Slot1^3</code>.
 		 *
-		 * @param a
-		 *            coefficient a of the polynomial
-		 * @param b
-		 *            coefficient b of the polynomial
-		 * @param c
-		 *            coefficient c of the polynomial
-		 * @param d
-		 *            coefficient d of the polynomial
-		 * @param nthRoot
-		 *            <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
+		 * @param a       coefficient a of the polynomial
+		 * @param b       coefficient b of the polynomial
+		 * @param c       coefficient c of the polynomial
+		 * @param d       coefficient d of the polynomial
+		 * @param nthRoot <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
 		 * @return
 		 */
 		private static IExpr root3(IExpr a, IExpr b, IExpr c, IExpr d, int nthRoot) {
@@ -3173,8 +3445,8 @@ public class Algebra {
 		private static class SimplifyVisitor extends VisitorExpr {
 			final IsBasicExpressionVisitor isBasicAST = new IsBasicExpressionVisitor();
 			/**
-			 * This function is used to determine the “weight” of an expression. For example by counting the leafs of an
-			 * expression with the <code>IExpr#leafCountSimplify()</code> method.
+			 * This function is used to determine the “weight” of an expression. For example by counting the leafs of an expression with the
+			 * <code>IExpr#leafCountSimplify()</code> method.
 			 */
 			final Function<IExpr, Long> fComplexityFunction;
 
@@ -3210,8 +3482,7 @@ public class Algebra {
 			private IExpr tryTransformations(IExpr expr) {
 				IExpr result = F.NIL;
 				if (expr.isAST()) {
-					// try ExpandAll, Together, Apart, Factor to reduce the
-					// expression
+					// try ExpandAll, Together, Apart, Factor to reduce the expression
 					long minCounter = fComplexityFunction.apply(expr);
 					IExpr temp;
 					long count;
@@ -3228,7 +3499,7 @@ public class Algebra {
 					}
 
 					try {
-						temp = F.eval(F.Together(expr));
+						temp = F.eval(F.TrigExpand(expr));
 						count = fComplexityFunction.apply(temp);
 						if (count < minCounter) {
 							minCounter = count;
@@ -3239,12 +3510,90 @@ public class Algebra {
 					}
 
 					try {
+						temp = F.eval(F.TrigToExp(expr));
+						count = fComplexityFunction.apply(temp);
+						if (count < minCounter) {
+							minCounter = count;
+							result = temp;
+						}
+					} catch (WrongArgumentType wat) {
+						//
+					}
+
+					try {
+						temp = F.eval(F.ExpToTrig(expr));
+						count = fComplexityFunction.apply(temp);
+						if (count < minCounter) {
+							minCounter = count;
+							result = temp;
+						}
+					} catch (WrongArgumentType wat) {
+						//
+					}
+
+					try {
+						temp = F.eval(F.Together(expr));
+						count = fComplexityFunction.apply(temp);
+						if (count < minCounter) {
+							minCounter = count;
+							result = temp;
+						}
+						if (fFullSimplify) {
+							if (temp.isTimes()) {
+								IExpr[] parts = Algebra.getNumeratorDenominator((IAST) temp, EvalEngine.get());
+								if (!parts[1].isOne()) {
+									try {
+										IExpr numerator = parts[0];
+										IExpr denominator = parts[1];
+										if (denominator.isPlus() && !numerator.isPlusTimesPower()) {
+											IExpr test = ((IAST) denominator).map(new Function<IExpr, IExpr>() {
+                                                @Override
+                                                public IExpr apply(IExpr x) {
+                                                    return F.Divide(x, numerator);
+                                                }
+                                            }, 1);
+											temp = F.eval(F.Divide(F.C1, test));
+											count = fComplexityFunction.apply(temp);
+											if (count < minCounter) {
+												minCounter = count;
+												result = temp;
+											}
+										}
+									} catch (JASConversionException e) {
+										if (Config.DEBUG) {
+											e.printStackTrace();
+										}
+										return expr;
+									}
+								}
+							}
+						}
+					} catch (WrongArgumentType wat) {
+						//
+					}
+
+					try {
+						// System.out.println(expr.toString());
+						// TODO: Factor is not fast enough for large expressions!
+						// Maybe restricting factoring to smaller expressions is necessary here
+						temp = F.NIL;
+						if (minCounter < 25) {
 						temp = F.eval(F.Factor(expr));
 						count = fComplexityFunction.apply(temp);
 						if (count < minCounter) {
 							minCounter = count;
 							result = temp;
 						}
+						}
+						if (fFullSimplify && (minCounter >= 25 || !temp.equals(expr))) {
+							temp = F.eval(F.FactorSquareFree(expr));
+							count = fComplexityFunction.apply(temp);
+							if (count < minCounter) {
+								minCounter = count;
+								result = temp;
+							}
+						}
+
 					} catch (WrongArgumentType wat) {
 						//
 					}
@@ -3286,7 +3635,7 @@ public class Algebra {
 					IASTAppendable basicPlus = F.PlusAlloc(ast.size());
 					IASTAppendable restPlus = F.PlusAlloc(ast.size());
 
-					ast.forEach(new com.duy.lambda.Consumer<IExpr>() {
+					ast.forEach(new Consumer<IExpr>() {
                         @Override
                         public void accept(IExpr x) {
                             if (x.accept(isBasicAST)) {
@@ -3294,7 +3643,6 @@ public class Algebra {
                             } else {
                                 restPlus.append(x);
                             }
-
                         }
                     });
 					if (basicPlus.size() > 1) {
@@ -3411,6 +3759,11 @@ public class Algebra {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2);
 
+			IExpr result = F.REMEMBER_AST_CACHE.getIfPresent(ast);
+			if (result != null) {
+				return result;
+			}
+
 			IExpr arg1 = ast.arg1();
 			IExpr assumptionExpr = F.NIL;
 			IExpr complexityFunctionHead = F.NIL;
@@ -3436,7 +3789,7 @@ public class Algebra {
 			try {
 				Function<IExpr, Long> complexityFunction = createComplexityFunction(complexityFunctionHead, engine);
 				long minCounter = complexityFunction.apply(arg1);
-				IExpr result = arg1;
+				result = arg1;
 				long count = 0L;
 				if (assumptionExpr.isPresent() && assumptionExpr.isAST()) {
 					IAssumptions assumptions = oldAssumptions;
@@ -3462,7 +3815,9 @@ public class Algebra {
 					arg1 = temp;
 				}
 
-				return simplifyStep(arg1, complexityFunction, minCounter, result);
+				temp = simplifyStep(arg1, complexityFunction, minCounter, result);
+				F.REMEMBER_AST_CACHE.put(ast, temp);
+				return temp;
 
 			} catch (ArithmeticException e) {
 				//
@@ -3579,7 +3934,7 @@ public class Algebra {
 					return F.List(c, F.C1);
 				}
 				if (c.isTimes() && c.first().isNumber()) {
-					return F.List(c.first(), c.rest());
+				return F.List(c.first(), c.rest().getOneIdentity(F.C1));
 				}
 				return F.List(F.C1, c);
 			}
@@ -3763,11 +4118,11 @@ public class Algebra {
 					if (result.isPresent()) {
 						IExpr temp = F.eval(result);
 						if (temp.isTimes() || temp.isPower()) {
-							return Cancel.cancelPowerTimes(temp).orElse(temp);
+							return Cancel.togetherPowerTimes(temp).orElse(temp);
 						}
 						return temp;
 					}
-					return Cancel.cancelPowerTimes(ast);
+					return Cancel.togetherPowerTimes(ast);
 				} catch (JASConversionException jce) {
 					if (Config.DEBUG) {
 						jce.printStackTrace();
@@ -3810,7 +4165,31 @@ public class Algebra {
 			if (list.isPresent()) {
 				return list;
 			}
+			return together(arg1, engine);
+		}
+
+		private IExpr together(IExpr arg1, EvalEngine engine) {
 			if (arg1.isPlusTimesPower()) {
+				if (arg1.isPower()) {
+					if (arg1.base().isAtom() && arg1.exponent().isAtom()) {
+						return arg1;
+					}
+					if (!arg1.exponent().isMinusOne()) {
+						if (arg1.base().isPlusTimesPower()) {
+							if (arg1.exponent().isNegative()) {
+								return F.Power(together(arg1.base().inverse(), engine), arg1.exponent().negate());
+							}
+							return F.Power(together(arg1.base(), engine), arg1.exponent());
+						}
+					}
+				} else if (arg1.isTimes()) {
+					if (arg1.first().isAtom()) {
+						IExpr times = ((IAST) arg1).removeAtClone(1).getOneIdentity(F.C0);
+						if (times.isPower()) {
+							return F.Times(arg1.first(), together(times, engine));
+						}
+					}
+				}
 				IExpr temp = togetherNull((IAST) arg1, engine).orElse(arg1);
 				if (temp.isPresent()) {
 					return reduceFactorConstant(temp, engine);
@@ -3888,10 +4267,8 @@ public class Algebra {
 	 * for the given expressions <code>numeratorPolynomial</code> and <code>denominatorPolynomial</code>.
 	 *
 	 *
-	 * @param numeratorPolynomial
-	 *            a <code>BigRational</code> polynomial which could be converted to JAS polynomial
-	 * @param denominatorPolynomial
-	 *            a <code>BigRational</code> polynomial which could be converted to JAS polynomial
+	 * @param numeratorPolynomial   a <code>BigRational</code> polynomial which could be converted to JAS polynomial
+	 * @param denominatorPolynomial a <code>BigRational</code> polynomial which could be converted to JAS polynomial
 	 * @return <code>null</code> if the expressions couldn't be converted to JAS polynomials or gcd equals 1
 	 * @throws JASConversionException
 	 */
@@ -3914,10 +4291,16 @@ public class Algebra {
 			}
 
 			IAST vars = eVar.getVarList();
+			PolynomialSubstitutions substitutions = new PolynomialSubstitutions(vars);
+			numeratorPolynomial = substitutions.replaceAll(numeratorPolynomial);
+			denominatorPolynomial = substitutions.replaceAll(denominatorPolynomial);
+			if (substitutions.substitutedVariables().size() > 0) {
+				eVar.addAll(substitutions.substitutedVariables().keySet());
+				vars = eVar.getVarList();
+			}
 			ExprPolynomialRing ring = new ExprPolynomialRing(vars);
 			ExprPolynomial pol1 = ring.create(numeratorPolynomial);
 			ExprPolynomial pol2 = ring.create(denominatorPolynomial);
-			// ASTRange r = new ASTRange(eVar.getVarList(), 1);
 			List<IExpr> varList = eVar.getVarList().copyTo();
 			JASIExpr jas = new JASIExpr(varList, true);
 			GenPolynomial<IExpr> p1 = jas.expr2IExprJAS(pol1);
@@ -3932,16 +4315,20 @@ public class Algebra {
 				result[1] = jas.exprPoly2Expr(p1);
 				result[2] = jas.exprPoly2Expr(p2);
 			} else {
-				if (JASIExpr.isInexactCoefficient(gcd)) {
-					return null;
-				}
+				// if (JASIExpr.isInexactCoefficient(gcd)) {
+				// return null;
+				// }
 				result[0] = F.C1;
 				result[1] = F.eval(jas.exprPoly2Expr(p1.divide(gcd)));
 				result[2] = F.eval(jas.exprPoly2Expr(p2.divide(gcd)));
 			}
+			IdentityHashMap<ISymbol, IExpr> substitutedVariables = substitutions.substitutedVariables();
+			result[0] = F.subst(result[0], substitutedVariables);
+			result[1] = F.subst(result[1], substitutedVariables);
+			result[2] = F.subst(result[2], substitutedVariables);
 			return result;
 		} catch (RuntimeException e) {
-			if (Config.DEBUG) {
+			if (Config.SHOW_STACKTRACE) {
 				e.printStackTrace();
 			}
 		}
@@ -3955,11 +4342,14 @@ public class Algebra {
 	 * @param patt
 	 * @param distributePlus
 	 *            TODO
+	 * @param evalParts
+	 *            evaluate the determined numerator and denominator parts
 	 * @return <code>F.NIL</code> if the expression couldn't be expanded.
 	 */
-	public static IExpr expand(final IAST ast, IExpr patt, boolean expandNegativePowers, boolean distributePlus) {
+	public static IExpr expand(final IAST ast, IExpr patt, boolean expandNegativePowers, boolean distributePlus,
+			boolean evalParts) {
 		Expand.Expander expander = new Expand.Expander(patt, expandNegativePowers, distributePlus);
-		return expander.expandAST(ast);
+		return expander.expandAST(ast, evalParts);
 	}
 
 	/**
@@ -4035,7 +4425,7 @@ public class Algebra {
         });
 
 		if (!result[0].isPresent()) {
-			temp = expand(localAST, patt, expandNegativePowers, distributePlus);
+			temp = expand(localAST, patt, expandNegativePowers, distributePlus, true);
 			if (temp.isPresent()) {
 				ExpandAll.setAllExpanded(temp, expandNegativePowers, distributePlus);
 				return temp;
@@ -4048,7 +4438,7 @@ public class Algebra {
 			ExpandAll.setAllExpanded(ast, expandNegativePowers, distributePlus);
 			return F.NIL;
 		}
-		temp = expand(result[0], patt, expandNegativePowers, distributePlus);
+		temp = expand(result[0], patt, expandNegativePowers, distributePlus, true);
 		if (temp.isPresent()) {
 			return ExpandAll.setAllExpanded(temp, expandNegativePowers, distributePlus);
 		}
@@ -4100,12 +4490,12 @@ public class Algebra {
 				result.append(F.fraction(gcd, lcm));
 			}
 		}
-		GenPolynomial<Complex<BigRational>> temp;
+//		GenPolynomial<Complex<BigRational>> temp;
 		for (SortedMap.Entry<GenPolynomial<Complex<BigRational>>, Long> entry : map.entrySet()) {
 			if (entry.getKey().isONE() && entry.getValue().equals(1L)) {
 				continue;
 			}
-			temp = entry.getKey();
+//			temp = entry.getKey();
 			result.append(F.Power(jas.complexPoly2Expr(entry.getKey()), F.integer(entry.getValue())));
 		}
 		return result;
@@ -4129,14 +4519,27 @@ public class Algebra {
 		return F.NIL;
 	}
 
+	/**
+	 *
+	 * @param jas
+	 * @param modIntegerRing
+	 * @param poly
+	 * @param factorSquareFree
+	 * @return <code>F.NIL</code> if evaluation is impossible.
+	 */
 	public static IAST factorModulus(JASModInteger jas, ModLongRing modIntegerRing, GenPolynomial<ModLong> poly,
 			boolean factorSquareFree) {
-		FactorAbstract<ModLong> factorAbstract = FactorFactory.getImplementation(modIntegerRing);
 		SortedMap<GenPolynomial<ModLong>, Long> map;
+		try {
+			FactorAbstract<ModLong> factorAbstract = FactorFactory.getImplementation(modIntegerRing);
 		if (factorSquareFree) {
 			map = factorAbstract.squarefreeFactors(poly);
 		} else {
 			map = factorAbstract.factors(poly);
+		}
+		} catch (RuntimeException rex) {
+			// JAS may throw RuntimeExceptions
+			return F.NIL;
 		}
 		IASTAppendable result = F.TimesAlloc(map.size());
 		for (SortedMap.Entry<GenPolynomial<ModLong>, Long> entry : map.entrySet()) {
@@ -4209,7 +4612,7 @@ public class Algebra {
 	 * @param trig
 	 *            try to find a trigonometric numerator/denominator form (Example: Csc[x] gives 1 / Sin[x])
 	 * @param evalParts
-	 *            evaluate the determined parts
+	 *            evaluate the determined numerator and denominator parts
 	 * @return the numerator and denominator expression and an optional fractional number (maybe <code>null</code>), if
 	 *         splitNumeratorOne is <code>true</code>.
 	 */
@@ -4417,6 +4820,17 @@ public class Algebra {
 	// return F.NIL;
 	// }
 
+	/**
+	 * Returns an AST with head <code>Plus</code>, which contains the partial fraction decomposition of the numerator
+	 * and denominator parts.
+	 *
+	 * @param pf
+	 *            partial fraction generator
+	 * @param parts
+	 * @param variable
+	 *            a variable
+	 * @return <code>F.NIL</code> if the partial fraction decomposition wasn't constructed
+	 */
 	public static IExpr partialFractionDecompositionRational(IPartialFractionGenerator pf, IExpr[] parts,
 			IExpr variable) {
 		return partialFractionDecompositionRational(pf, parts, F.List(variable));
@@ -4481,6 +4895,11 @@ public class Algebra {
 				return pf.getResult();
 			}
 		} catch (JASConversionException e) {
+			if (Config.DEBUG) {
+				e.printStackTrace();
+			}
+		} catch (RuntimeException e) {
+			// JAS may throw RuntimeExceptions
 			if (Config.DEBUG) {
 				e.printStackTrace();
 			}

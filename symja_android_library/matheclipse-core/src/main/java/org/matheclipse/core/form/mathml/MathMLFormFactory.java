@@ -472,10 +472,12 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	private final static class MMLPostfix extends AbstractConverter {
 
 		final String fOperator;
+		final int fPrecedence;
 
-		public MMLPostfix(final String operator) {
+		public MMLPostfix(final String operator, int precedence) {
 			super();
 			fOperator = operator;
+			fPrecedence = precedence;
 		}
 
 		/**
@@ -490,8 +492,14 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		public boolean convert(final StringBuilder buf, final IAST f, final int precedence) {
 			if (f.isAST1()) {
 				fFactory.tagStart(buf, "mrow");
-				fFactory.convert(buf, f.arg1(), Integer.MIN_VALUE, false);
+				if (fPrecedence <= precedence) {
+					fFactory.tag(buf, "mo", "(");
+				}
+				fFactory.convert(buf, f.arg1(), fPrecedence, false);
 				fFactory.tag(buf, "mo", fOperator);
+				if (fPrecedence <= precedence) {
+					fFactory.tag(buf, "mo", ")");
+				}
 				fFactory.tagEnd(buf, "mrow");
 				return true;
 			}
@@ -860,6 +868,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		private boolean convertTimesOperator(final StringBuilder buf, final IAST timesAST, final int precedence,
 				final boolean caller) {
 			int size = timesAST.size();
+			boolean noPrecedenceOpenCall = false;
 			if (size > 1) {
 				IExpr arg1 = timesAST.arg1();
 				if (arg1.isMinusOne()) {
@@ -869,6 +878,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 						fFactory.convert(buf, arg1, fPrecedence, false);
 					} else {
 						if (caller == MathMLFormFactory.NO_PLUS_CALL) {
+							noPrecedenceOpenCall = true;
 							fFactory.tagStart(buf, fFirstTag);
 							fFactory.tag(buf, "mo", "-");
 							if (size == 3) {
@@ -928,7 +938,9 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 					fFactory.tag(buf, "mo", fOperator);
 				}
 			}
-			precedenceClose(buf, precedence);
+			if (!noPrecedenceOpenCall) {
+				precedenceClose(buf, precedence);
+			}
 			fFactory.tagEnd(buf, fFirstTag);
 			return true;
 		}
@@ -1287,13 +1299,12 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 				}
 				// <!ENTITY ImaginaryI "&#x2148;"
 				tag(buf, "mi", "&#x2148;");
-				tagEnd(buf, "mrow");
 			} else {
 				tag(buf, "mo", "+");
 				// <!ENTITY ImaginaryI "&#x2148;"
 				tag(buf, "mi", "&#x2148;");
-				tagEnd(buf, "mrow");
 			}
+			tagEnd(buf, "mrow");
 		} else if (isImMinusOne) {
 			tagStart(buf, "mrow");
 			tag(buf, "mo", "-");
@@ -1761,14 +1772,14 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	public void convertPostfixOperator(final StringBuilder buf, final IAST list, final PostfixOperator oper,
 			final int precedence) {
 		tagStart(buf, "mrow");
-		if (oper.getPrecedence() < precedence) {
+		if (oper.getPrecedence() <= precedence) {
 			// append(buf, "(");
 			tag(buf, "mo", "(");
 		}
 		convert(buf, list.arg1(), oper.getPrecedence(), false);
 		// append(buf, oper.getOperatorString());
 		tag(buf, "mo", oper.getOperatorString());
-		if (oper.getPrecedence() < precedence) {
+		if (oper.getPrecedence() <= precedence) {
 			// append(buf, ")");
 			tag(buf, "mo", ")");
 		}
@@ -1778,14 +1789,14 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	public void convertPrefixOperator(final StringBuilder buf, final IAST list, final PrefixOperator oper,
 			final int precedence) {
 		tagStart(buf, "mrow");
-		if (oper.getPrecedence() < precedence) {
+		if (oper.getPrecedence() <= precedence) {
 			// append(buf, "(");
 			tag(buf, "mo", "(");
 		}
 		// append(buf, oper.getOperatorString());
 		tag(buf, "mo", oper.getOperatorString());
 		convert(buf, list.arg1(), oper.getPrecedence(), false);
-		if (oper.getPrecedence() < precedence) {
+		if (oper.getPrecedence() <= precedence) {
 			// append(buf, ")");
 			tag(buf, "mo", ")");
 		}
@@ -2062,8 +2073,9 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		CONVERTERS.put(F.D, new D());
 		CONVERTERS.put(F.Dot, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("Dot").getPrecedence(), "."));
 		CONVERTERS.put(F.Equal, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("Equal").getPrecedence(), "=="));
-		CONVERTERS.put(F.Factorial, new MMLPostfix("!"));
-		CONVERTERS.put(F.Factorial2, new MMLPostfix("!!"));
+		CONVERTERS.put(F.Factorial,
+				new MMLPostfix("!", ASTNodeFactory.MMA_STYLE_FACTORY.get("Factorial").getPrecedence()));
+		CONVERTERS.put(F.Factorial2, new MMLPostfix("!!", ASTNodeFactory.MMA_STYLE_FACTORY.get("Factorial2").getPrecedence()));
 		CONVERTERS.put(F.Floor, new Floor());
 		CONVERTERS.put(F.Function, new Function());
 		CONVERTERS.put(F.Greater,

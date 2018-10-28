@@ -114,9 +114,15 @@ public interface DerivativeRules {
     // ArcSech->-1/(#1*Sqrt(1-#1^2))
     Rule(ArcSech,
       Times(CN1,Power(Slot1,-1),Power(Plus(C1,Negate(Sqr(Slot1))),CN1D2))),
-    // Ceiling->0
+    // Ceiling->Piecewise({{0,#1<Ceiling(#1)}},Indeterminate)
     Rule(Ceiling,
-      C0),
+      Piecewise(List(List(C0,Less(Slot1,Ceiling(Slot1)))),Indeterminate)),
+    // EllipticE->(EllipticE(#1)-EllipticK(#1))/(2*#1)
+    Rule(EllipticE,
+      Times(C1D2,Plus(EllipticE(Slot1),Negate(EllipticK(Slot1))),Power(Slot1,-1))),
+    // EllipticK->(EllipticE(#1)-EllipticK(#1)*(1-#1))/(2*(1-#1)*#1)
+    Rule(EllipticK,
+      Times(C1D2,Power(Plus(C1,Negate(Slot1)),-1),Power(Slot1,-1),Plus(EllipticE(Slot1),Times(CN1,EllipticK(Slot1),Plus(C1,Negate(Slot1)))))),
     // Erf->2*1/(E^#1^2*Sqrt(Pi))
     Rule(Erf,
       Times(C2,Exp(Negate(Sqr(Slot1))),Power(Pi,CN1D2))),
@@ -126,9 +132,12 @@ public interface DerivativeRules {
     // Erfi->2*E^#1^2/Sqrt(Pi)
     Rule(Erfi,
       Times(C2,Exp(Sqr(Slot1)),Power(Pi,CN1D2))),
-    // Floor->0
+    // ExpIntegralEi->E^#1/#1
+    Rule(ExpIntegralEi,
+      Times(Exp(Slot1),Power(Slot1,-1))),
+    // Floor->Piecewise({{0,#1>Floor(#1)}},Indeterminate)
     Rule(Floor,
-      C0),
+      Piecewise(List(List(C0,Greater(Slot1,Floor(Slot1)))),Indeterminate)),
     // FractionalPart->1
     Rule(FractionalPart,
       C1),
@@ -153,9 +162,15 @@ public interface DerivativeRules {
     // InverseErf->1/2*Sqrt(Pi)*E^InverseErf(x)^2
     Rule(InverseErf,
       Times(C1D2,Exp(Sqr(InverseErf(x))),Sqrt(Pi))),
+    // InverseErfc->-1/2*E^InverseErfc(#1)^2*Sqrt(Pi)
+    Rule(InverseErfc,
+      Times(CN1D2,Exp(Sqr(InverseErfc(Slot1))),Sqrt(Pi))),
     // Log->1/#1
     Rule(Log,
       Power(Slot1,-1)),
+    // LogGamma->PolyGamma(0,#1)
+    Rule(LogGamma,
+      PolyGamma(C0,Slot1)),
     // LogisticSigmoid->LogisticSigmoid(#1)*(1-LogisticSigmoid(#1))
     Rule(LogisticSigmoid,
       Times(Plus(C1,Negate(LogisticSigmoid(Slot1))),LogisticSigmoid(Slot1))),
@@ -167,7 +182,7 @@ public interface DerivativeRules {
       Negate(Sqr(Csc(Slot1)))),
     // Coth->-1/Sinh(#1)^2
     Rule(Coth,
-      Negate(Power(Sinh(Slot1),-2))),
+      Negate(Sqr(Csch(Slot1)))),
     // Cos->-Sin(#1)
     Rule(Cos,
       Negate(Sin(Slot1))),
@@ -180,12 +195,15 @@ public interface DerivativeRules {
     // Csch->-Coth(#1)*Csch(#1)
     Rule(Csch,
       Times(CN1,Coth(Slot1),Csch(Slot1))),
-    // Round->0
+    // Round->Piecewise({{0,NotElement(-1/2+Re(#1),Integers)&&NotElement(-1/2+Im(#1),Integers)}},Indeterminate)
     Rule(Round,
-      C0),
+      Piecewise(List(List(C0,And(NotElement(Plus(CN1D2,Re(Slot1)),Integers),NotElement(Plus(CN1D2,Im(Slot1)),Integers)))),Indeterminate)),
     // Sin->Cos(#1)
     Rule(Sin,
       Cos(Slot1)),
+    // Sinc->-Sin(#1)/#1^2+Cos(#1)/#1
+    Rule(Sinc,
+      Plus(Times(CN1,Sin(Slot1),Power(Slot1,-2)),Times(Cos(Slot1),Power(Slot1,-1)))),
     // Sinh->Cosh(#1)
     Rule(Sinh,
       Cosh(Slot1)),
@@ -204,9 +222,15 @@ public interface DerivativeRules {
     // SinIntegral->Sinc(#1)
     Rule(SinIntegral,
       Sinc(Slot1)),
+    // SinhIntegral->Sinh(#1)/#1
+    Rule(SinhIntegral,
+      Times(Sinh(Slot1),Power(Slot1,-1))),
     // CosIntegral->Cos(#1)/#1
     Rule(CosIntegral,
-      Times(Cos(Slot1),Power(Slot1,-1)))
+      Times(Cos(Slot1),Power(Slot1,-1))),
+    // CoshIntegral->Cosh(#1)/#1
+    Rule(CoshIntegral,
+      Times(Cosh(Slot1),Power(Slot1,-1)))
   );
   final public static IAST RULES2 = List(
     // ArcSin->#1/(1-#1^2)^(3/2)
@@ -261,6 +285,9 @@ public interface DerivativeRules {
     // {Power,1,1}->#1^(-1+#2)+(Log(#1)*#2)/#1^(1-#2)
     Rule(List(Power,C1,C1),
       Plus(Power(Slot1,Plus(CN1,Slot2)),Times(Log(Slot1),Power(Slot1,Plus(CN1,Slot2)),Slot2))),
+    // {PolyLog,0,1}->PolyLog(-1+#2,#1)/#1
+    Rule(List(PolyLog,C0,C1),
+      Times(PolyLog(Plus(CN1,Slot2),Slot1),Power(Slot1,-1))),
     // {ProductLog,0,1}->ProductLog(#1,#2)/#2*(1+ProductLog(#1,#2))
     Rule(List(ProductLog,C0,C1),
       Times(ProductLog(Slot1,Slot2),Plus(C1,ProductLog(Slot1,Slot2)),Power(Slot2,-1)))

@@ -2,7 +2,7 @@ package org.matheclipse.core.polynomials;
 
 import com.duy.lambda.Function;
 
-import org.apache.log4j.Logger;
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import edu.jas.kern.PreemptingException;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
@@ -28,10 +27,7 @@ import edu.jas.structure.RingElem;
  * long entries (this will eventually be changed in the future). C can also be a non integral domain, e.g. a ModInteger,
  * i.e. it may contain zero divisors, since multiply() does now check for zeros. <b>Note:</b> multiply() now checks for
  * wrong method dispatch for GenSolvablePolynomial.
- * 
- * @param <C>
- *            coefficient type
- * @author Heinz Kredel
+ *
  */
 public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMonomial> {
 
@@ -51,9 +47,7 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 	protected final SortedMap<ExpVectorLong, IExpr> val; // do not change to
 															// TreeMap
 
-	private static final Logger logger = Logger.getLogger(ExprPolynomial.class);
-
-	private final boolean debug = logger.isDebugEnabled();
+	private final boolean debug = Config.DEBUG;
 
 	// protected GenPolynomial() { ring = null; val = null; } // don't use
 
@@ -68,12 +62,6 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 	private ExprPolynomial(ExprPolynomialRing r, TreeMap<ExpVectorLong, IExpr> t) {
 		ring = r;
 		val = t;
-		if (ring.checkPreempt) {
-			if (Thread.currentThread().isInterrupted()) {
-				logger.debug("throw PreemptingException");
-				throw new PreemptingException();
-			}
-		}
 	}
 
 	/**
@@ -197,7 +185,7 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 		if (debug) {
 			IExpr a = val.get(e);
 			if (a != null) {
-				logger.error("map entry exists " + e + " to " + a + " new " + c);
+				// logger.error("map entry exists " + e + " to " + a + " new " + c);
 			}
 		}
 		if (!c.isZero()) {
@@ -222,7 +210,7 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 				return;
 			}
 			if (!c.equals(b)) {
-				logger.error("map entry wrong " + e + " to " + c + " old " + b);
+				// logger.error("map entry wrong " + e + " to " + c + " old " + b);
 			}
 		}
 	}
@@ -241,7 +229,7 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 			if (debug) {
 				IExpr a = val.get(e);
 				if (a != null) {
-					logger.error("map entry exists " + e + " to " + a + " new " + me.getValue());
+					// logger.error("map entry exists " + e + " to " + a + " new " + me.getValue());
 				}
 			}
 			IExpr c = me.getValue();
@@ -426,7 +414,6 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 	 */
 	@Override
 	public String toScriptFactory() {
-		// Python case
 		return factory().toScript();
 	}
 
@@ -440,6 +427,12 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 		return (val.size() == 0);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @deprecated use {@link #isZero()} instead.
+	 */
+	@Deprecated
 	@Override
 	public boolean isZERO() {
 		return isZero();
@@ -527,7 +520,6 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean equals(Object B) {
 		if (B == null) {
 			return false;
@@ -1662,7 +1654,7 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 			if (debug) {
 				IExpr x = c1.remainder(s);
 				if (!x.isZero()) {
-					logger.info("divide x = " + x);
+					// logger.info("divide x = " + x);
 					throw new ArithmeticException("no exact division: " + c1 + "/" + s);
 				}
 			}
@@ -2239,7 +2231,7 @@ public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMo
 	 * 
 	 * @return val.values().iterator().
 	 */
-	public Iterator coefficientIterator() {
+	public Iterator<IExpr> coefficientIterator() {
 		return val.values().iterator();
 	}
 

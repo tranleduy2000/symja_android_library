@@ -5,7 +5,6 @@ import org.matheclipse.core.interfaces.ISymbol;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -16,22 +15,30 @@ public class Context implements Serializable {
 	/**
 	 * The map for predefined (context &quot;System&quot;) symbols
 	 */
-	public final static Map<String, ISymbol> PREDEFINED_SYMBOLS_MAP = new HashMap<String, ISymbol>(2053);
+	public final static HashMap<String, ISymbol> PREDEFINED_SYMBOLS_MAP = new HashMap<String, ISymbol>(2053);
 
-	public final static Context DUMMY = new Context("DUMMY");
+	public final static Context DUMMY = new Context("DUMMY", null);
+
 	public final static Context SYSTEM = new Context("System", PREDEFINED_SYMBOLS_MAP);
 
 	private String contextName;
 
-	private Map<String, ISymbol> symbolTable;
+	private HashMap<String, ISymbol> symbolTable;
 
 	public Context(String contextName) {
 		this(contextName, new HashMap<String, ISymbol>());
 	}
 
-	private Context(String contextName, Map<String, ISymbol> symbolTable) {
+	private Context(String contextName, HashMap<String, ISymbol> symbolTable) {
 		this.symbolTable = symbolTable;
 		this.contextName = contextName;
+	}
+
+	public Context copy() {
+		if (this == SYSTEM) {
+			return SYSTEM;
+		}
+		return new Context(contextName, (HashMap<String, ISymbol>) symbolTable.clone());
 	}
 
 	public Set<Entry<String, ISymbol>> entrySet() {
@@ -65,13 +72,21 @@ public class Context implements Serializable {
 		return 47;
 	}
 
+//	private static int counter = 0;
+
 	public ISymbol put(String key, ISymbol value) {
+//		if (!contextName.equals("System")) {
+//			counter++;
+//			if (counter > 500) {
+//				System.out.println(contextName + "`" + value);
+//			}
+//		}
 		return symbolTable.put(key, value);
 	}
 
 	private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		contextName = stream.readUTF();
-		symbolTable = (Map<String, ISymbol>) stream.readObject();
+		symbolTable = (HashMap<String, ISymbol>) stream.readObject();
 	}
 
 

@@ -12,7 +12,7 @@ import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CNI;
 import static org.matheclipse.core.expression.F.Complex;
-import static org.matheclipse.core.expression.F.Condition;
+import static org.matheclipse.core.expression.F.*;
 import static org.matheclipse.core.expression.F.Cos;
 import static org.matheclipse.core.expression.F.Cot;
 import static org.matheclipse.core.expression.F.Csc;
@@ -20,7 +20,6 @@ import static org.matheclipse.core.expression.F.DirectedInfinity;
 import static org.matheclipse.core.expression.F.Equal;
 import static org.matheclipse.core.expression.F.EvenQ;
 import static org.matheclipse.core.expression.F.Exp;
-import static org.matheclipse.core.expression.F.FreeQ;
 import static org.matheclipse.core.expression.F.Function;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
@@ -91,7 +90,7 @@ public interface PowerRules {
             ISetDelayed(Exp(Log(x_)),
                     x),
             // E^(a_*Log(x_)/;FreeQ(a,x)):=x^a
-            ISetDelayed(Exp(Condition(Times(a_,Log(x_)),FreeQ(a,x))),
+    ISetDelayed(Exp(Times(a_,Log(x_))),
                     Power(x,a)),
             // Tan(x_)^m_?(IntegerQ(#1)&&#1<0&):=Cot(x)^(-m)
             ISetDelayed(Power(Tan(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
@@ -110,6 +109,24 @@ public interface PowerRules {
                     Power(Sin(x),Negate(m))),
             // Sin(x_)^m_?(IntegerQ(#1)&&#1<0&):=Csc(x)^(-m)
             ISetDelayed(Power(Sin(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
-                    Power(Csc(x),Negate(m)))
+      Power(Csc(x),Negate(m))),
+    // Tanh(x_)^m_?(IntegerQ(#1)&&#1<0&):=Coth(x)^(-m)
+    ISetDelayed(Power(Tanh(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
+      Power(Coth(x),Negate(m))),
+    // Coth(x_)^m_?(IntegerQ(#1)&&#1<0&):=Tanh(x)^(-m)
+    ISetDelayed(Power(Coth(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
+      Power(Tanh(x),Negate(m))),
+    // Sech(x_)^m_?(IntegerQ(#1)&&#1<0&):=Cosh(x)^(-m)
+    ISetDelayed(Power(Sech(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
+      Power(Cosh(x),Negate(m))),
+    // Cosh(x_)^m_?(IntegerQ(#1)&&#1<0&):=Sech(x)^(-m)
+    ISetDelayed(Power(Cosh(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
+      Power(Sech(x),Negate(m))),
+    // Csch(x_)^m_?(IntegerQ(#1)&&#1<0&):=Sinh(x)^(-m)
+    ISetDelayed(Power(Csch(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
+      Power(Sinh(x),Negate(m))),
+    // Sinh(x_)^m_?(IntegerQ(#1)&&#1<0&):=Csch(x)^(-m)
+    ISetDelayed(Power(Sinh(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
+      Power(Csch(x),Negate(m)))
     );
 }

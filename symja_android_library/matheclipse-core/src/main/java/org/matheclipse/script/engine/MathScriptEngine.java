@@ -116,6 +116,9 @@ public class MathScriptEngine extends AbstractScriptEngine {
 			}
 
 		} catch (final AbortException e) {
+			if (Config.SHOW_STACKTRACE) {
+				e.printStackTrace();
+			}
 			try {
 				return printResult(F.$Aborted, relaxedSyntax);
 			} catch (IOException e1) {

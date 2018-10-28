@@ -225,9 +225,10 @@ public class MathMLPresentationTestCase extends TestCase {
 
 	}
 
-	// public void testMathML003() {
-	// check("I*1/2*y-I*1/2*x", "");
-	// }
+	public void testMathML003() {
+		check("a/(b*c*Log[F]*((-b*Log[F])/e)^m)", //
+				"<mfrac><mi>a</mi><mrow><mi>b</mi><mo>&#0183;</mo><mi>c</mi><mo>&#0183;</mo><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>F</mi><mo>)</mo></mrow><mo>&#0183;</mo><msup><mfrac><mrow><mo>-</mo><mi>b</mi><mo>&#0183;</mo><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>F</mi><mo>)</mo></mrow></mrow><mi>e</mi></mfrac><mi>m</mi></msup></mrow></mfrac>");
+	}
 
 	public void testCeiling() {
 		IExpr expr = EvalEngine.get().evaluate("Ceiling(f(x))");
@@ -257,6 +258,12 @@ public class MathMLPresentationTestCase extends TestCase {
 		IExpr expr = EvalEngine.get().parse("Sqrt(f(x))");
 		check(expr, //
 				"<msqrt><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow></msqrt>");
+	}
+
+	public void testFactorial() {
+		IExpr expr = EvalEngine.get().evaluate("Factorial(Factorial(x))");
+		check(expr, //
+				"<mrow><mrow><mo>(</mo><mi>x</mi><mo>!</mo><mo>)</mo></mrow><mo>!</mo></mrow>");
 	}
 
 	public void testFloor() {

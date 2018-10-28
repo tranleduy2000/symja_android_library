@@ -331,7 +331,7 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 	}
 	@Override
 	public boolean isSameHead(IExpr head) {
-		return head().equals(head);
+		return false;
 	}
 
 	@Override
@@ -360,6 +360,12 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 		return -1;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @deprecated use {@link #isZero()} instead.
+	 */
+	@Deprecated
 	@Override
 	public final boolean isZERO() {
 		return false;

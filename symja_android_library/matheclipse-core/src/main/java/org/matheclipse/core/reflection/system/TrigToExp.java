@@ -1,7 +1,9 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.BiFunction;
 import com.duy.lambda.Function;
 
+import org.matheclipse.core.builtin.Structure;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -36,7 +38,6 @@ import static org.matheclipse.core.expression.F.Sinh;
 import static org.matheclipse.core.expression.F.Tan;
 import static org.matheclipse.core.expression.F.Tanh;
 import static org.matheclipse.core.expression.F.x_;
-import static org.matheclipse.core.expression.F.y;
 import static org.matheclipse.core.expression.F.y_;
 
 /**
@@ -106,6 +107,7 @@ public class TrigToExp extends AbstractEvaluator {
 								F.Power(F.Plus(F.Exp(F.Times(F.CNI, x)), F.Exp(F.Times(F.CI, x))), -1));
 					}
 				}); // $$);
+
 		MATCHER.caseOf(ArcSec(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
@@ -154,9 +156,9 @@ public class TrigToExp extends AbstractEvaluator {
 					}
 				}); // $$);
 		MATCHER.caseOf(ArcTan(x_, y_), //
-				new Function<IExpr, IExpr>() {
+				new BiFunction<IExpr, IExpr, IExpr>() {
 					@Override
-					public IExpr apply(IExpr x) {
+					public IExpr apply(IExpr x, IExpr y) {
 						return F.Times(F.CNI,
 								F.Log(F.Times(F.Plus(x, F.Times(F.CI, y)), F.Power(F.Plus(F.Sqr(x), F.Sqr(y)), F.CN1D2))));
 					}
@@ -206,6 +208,7 @@ public class TrigToExp extends AbstractEvaluator {
 						return F.Plus(F.Times(F.CN1D2, F.Log(F.Plus(F.C1, F.Negate(x)))), F.Times(F.C1D2, F.Log(F.Plus(F.C1, x))));
 					}
 				}); // $$);
+
 		MATCHER.caseOf(Cosh(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
@@ -243,13 +246,13 @@ public class TrigToExp extends AbstractEvaluator {
 					}
 				}); // $$);
 		MATCHER.caseOf(Tanh(x_), //
-				new Function<IExpr, IExpr>() {
-					@Override
-					public IExpr apply(IExpr x) {
-						return F.Times(F.Plus(F.Negate(F.Exp(F.Negate(x))), F.Exp(x)),
-								F.Power(F.Plus(F.Exp(F.Negate(x)), F.Exp(x)), -1));
-					}
-				}); // $$);
+                new Function<IExpr, IExpr>() {
+                    @Override
+                    public IExpr apply(IExpr x) {
+                        return F.Times(F.Plus(F.Negate(F.Exp(F.Negate(x))), F.Exp(x)),
+                                F.Power(F.Plus(F.Exp(F.Negate(x)), F.Exp(x)), -1));
+                    }
+                }); // $$);
 	}
 
 	public TrigToExp() {
@@ -258,15 +261,23 @@ public class TrigToExp extends AbstractEvaluator {
 	/**
 	 * Exponential definitions for trigonometric functions
 	 *
-	 * See <a href= "http://en.wikipedia.org/wiki/List_of_trigonometric_identities#Exponential_definitions"> List of
-	 * trigonometric identities - Exponential definitions</a>,<br/>
+	 * See <a href= "http://en.wikipedia.org/wiki/List_of_trigonometric_identities#Exponential_definitions"> List of trigonometric
+	 * identities - Exponential definitions</a>,<br/>
 	 * <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">Hyperbolic function</a>
 	 */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 2);
+		if (ast.size() == 2) {
+			IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
+			if (temp.isPresent()) {
+				return temp;
+			}
+
 		IExpr arg1 = ast.arg1();
 		return MATCHER.replaceAll(arg1).orElse(arg1);
+	}
+		Validate.checkSize(ast, 2);
+		return F.NIL;
 	}
 
 	@Override

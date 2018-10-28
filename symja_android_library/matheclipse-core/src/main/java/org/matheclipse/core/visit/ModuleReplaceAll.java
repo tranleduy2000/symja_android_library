@@ -1,13 +1,15 @@
 package org.matheclipse.core.visit;
 
-import java.util.IdentityHashMap;
-
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IPattern;
+import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.util.IdentityHashMap;
 
 /**
  * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non
@@ -15,18 +17,20 @@ import org.matheclipse.core.interfaces.ISymbol;
  * occurred.
  */
 public class ModuleReplaceAll extends VisitorExpr {
-	final IdentityHashMap<ISymbol, IExpr> fModuleVariables;
+	final IdentityHashMap<ISymbol,? extends IExpr> fModuleVariables;
 	final int fOffset;
 	final EvalEngine fEngine;
+	final String moduleCounter;
 
-	public ModuleReplaceAll(IdentityHashMap<ISymbol, IExpr> moduleVariables, EvalEngine engine) {
-		this(moduleVariables, engine, 0);
+	public ModuleReplaceAll(IdentityHashMap<ISymbol, ? extends IExpr> moduleVariables, EvalEngine engine,String moduleCounter ) {
+		this(moduleVariables, engine, moduleCounter, 0);
 	}
 
-	public ModuleReplaceAll(IdentityHashMap<ISymbol, IExpr> moduleVariables, EvalEngine engine, int offset) {
+	public ModuleReplaceAll(IdentityHashMap<ISymbol, ? extends IExpr> moduleVariables, EvalEngine engine, String moduleCounter, int offset) {
 		this.fModuleVariables = moduleVariables;
 		this.fOffset = offset;
 		this.fEngine = engine;
+		this.moduleCounter = moduleCounter;
 	}
 
 	private IExpr apply(final IExpr arg) {
@@ -34,13 +38,36 @@ public class ModuleReplaceAll extends VisitorExpr {
 		return temp != null ? temp : F.NIL;
 	}
 
-	/**
-	 * 
-	 * @return <code>F.NIL</code>, if no evaluation is possible
-	 */
 	@Override
 	public IExpr visit(ISymbol element) {
 		return apply(element);
+	}
+
+	@Override
+	public IExpr visit(IPattern element) {
+		ISymbol symbol = element.getSymbol();
+		if (symbol != null) {
+			IExpr expr = apply(symbol);
+			if (expr.isPresent() && expr.isSymbol()) {
+				if (element.isPatternDefault()) {
+					return F.$p((ISymbol) expr, element.getCondition(), true);
+				}
+				return F.$p((ISymbol) expr, element.getCondition(), element.getDefaultValue());
+			}
+		}
+		return F.NIL;
+	}
+
+	@Override
+	public IExpr visit(IPatternSequence element) {
+		ISymbol symbol = element.getSymbol();
+		if (symbol != null) {
+			IExpr expr = apply(symbol);
+			if (expr.isPresent() && expr.isSymbol()) {
+				return F.$ps((ISymbol) expr, element.getCondition(), element.isDefault(), element.isNullSequence());
+			}
+		}
+		return F.NIL;
 	}
 
 	@Override
@@ -52,22 +79,34 @@ public class ModuleReplaceAll extends VisitorExpr {
 				return temp;
 			}
 			return F.NIL;
-		} else if (ast.isASTSizeGE(F.Block, 2) || ast.isASTSizeGE(F.Module, 2) || ast.isASTSizeGE(F.With, 2)) {
+		} else if (ast.isWith()) {
 			temp = visitNestedScope(ast, false);
 			if (temp.isPresent()) {
 				return temp;
 			}
+			return ast;
+		} else if (ast.isModule()) {
+			temp = visitNestedScope(ast, false);
+			if (temp.isPresent()) {
+				return temp;
+			}
+			return ast;
+//		} else if (ast.isASTSizeGE(F.Block, 2)) {
+//			temp = visitNestedScope(ast, false);
+//			if (temp.isPresent()) {
+//				return temp;
+//			}
+//			return F.NIL;
 		}
 
 		return visitASTModule(ast);
 	}
 
 	/**
-	 * Nested Block() Function()
+	 * Handle nested Module(), With() or Function()
 	 * 
 	 * @param ast
-	 * @param isFunction
-	 *            TODO
+	 * @param isFunction <code>ast</code> has the form <code>Function(a1, a2)</code>
 	 * @return
 	 */
 	private IAST visitNestedScope(IAST ast, boolean isFunction) {
@@ -82,7 +121,7 @@ public class ModuleReplaceAll extends VisitorExpr {
 		if (localVariablesList.isPresent()) {
 			IdentityHashMap<ISymbol, IExpr> variables = renamedVariables(localVariablesList, isFunction);
 			if (variables != null) {
-				visitor = new ModuleReplaceAll(variables, fEngine);
+				visitor = new ModuleReplaceAll(variables, fEngine, moduleCounter);
 			}
 		}
 		
@@ -115,8 +154,7 @@ public class ModuleReplaceAll extends VisitorExpr {
 
 	private IdentityHashMap<ISymbol, IExpr> renamedVariables(IAST localVariablesList, boolean isFunction) {
 		IdentityHashMap<ISymbol, IExpr> variables = null;
-		final int moduleCounter = fEngine.incModuleCounter();
-		final String varAppend = "$" + moduleCounter;
+		final String varAppend =   moduleCounter;
 		int size = localVariablesList.size();
 		for (int i = 1; i < size; i++) {
 			IExpr temp = localVariablesList.get(i);
@@ -128,7 +166,9 @@ public class ModuleReplaceAll extends VisitorExpr {
 						variables = (IdentityHashMap<ISymbol, IExpr>) fModuleVariables.clone();
 					}
 					variables.remove(symbol);
-					variables.put(symbol, F.$s(symbol.toString() + varAppend));
+					if (isFunction) {
+					variables.put(symbol, F.Dummy(symbol.toString() + varAppend));
+				}
 				}
 			} else {
 				if (temp.isAST(F.Set, 3)) {
@@ -141,11 +181,13 @@ public class ModuleReplaceAll extends VisitorExpr {
 								variables = (IdentityHashMap<ISymbol, IExpr>) fModuleVariables.clone();
 							}
 							variables.remove(symbol);
-							variables.put(symbol, F.$s(symbol.toString() + varAppend));
+							if (isFunction) {
+							variables.put(symbol, F.Dummy(symbol.toString() + varAppend));
 						}
 					}
 				}
 			}
+		}
 		}
 
 		return variables;

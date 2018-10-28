@@ -147,6 +147,14 @@ public interface INumber extends IExpr {
     public INumber opposite();
 
     /**
+     * Return the rational Factor of this number. For IComplex numbers check if real and imaginary parts are equal and
+     * or real part is zero.
+     *
+     * @return <code>null</code> if no factor could be extracted
+     */
+    IRational rationalFactor();
+
+    /**
      * Returns the real part of a complex number
      *
      * @return real part

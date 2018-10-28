@@ -483,9 +483,12 @@ public class PredicateQ {
 			if (ast.isAST1()) {
 				return F.operatorFormAST1(ast);
 			}
-			Validate.checkSize(ast, 3);
+			if (ast.size() == 3) {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			final IExpr arg2 = engine.evalPattern(ast.arg2());
+				if (arg2.isSymbol() || arg2.isNumber() || arg2.isString()) {
+					return F.bool(arg1.isFree(arg2, true));
+				}
 			final IPatternMatcher matcher = new PatternMatcherEvalEngine(arg2, engine);
 			if (matcher.isRuleWithoutPatterns()) {
 				// special for FreeQ(), don't implemented in MemberQ()!
@@ -496,6 +499,8 @@ public class PredicateQ {
 				}
 			}
 			return F.bool(arg1.isFree(matcher, true));
+		}
+			return F.NIL;
 		}
 	}
 
@@ -603,8 +608,8 @@ public class PredicateQ {
 	 * 
 	 * <blockquote>
 	 * <p>
-	 * only returns <code>True</code> if <code>f(x)</code> returns <code>True</code> for each element <code>x</code> of
-	 * the matrix <code>m</code>.
+	 * only returns <code>True</code> if <code>f(x)</code> returns <code>True</code> for each element <code>x</code> of the matrix
+	 * <code>m</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -682,22 +687,25 @@ public class PredicateQ {
 			if (ast.isAST1()) {
 				return F.operatorFormAST1(ast);
 			}
-			Validate.checkRange(ast, 3, 5);
 
 			boolean heads = false;
 			if (ast.size() > 3) {
 				final Options options = new Options(ast.topHead(), ast, ast.argSize(), engine);
-				// IExpr option = options.getOption("Heads");
 				if (options.isOption("Heads")) {
 					heads = true;
+				} else {
+					Validate.checkSize(ast, 4);
 				}
 			}
+			if (ast.size() == 3 || ast.size() == 4) {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			final IExpr arg2 = engine.evaluate(ast.arg2());
 			if (arg1.isAST()) {
 				return F.bool(arg1.isMember(arg2, heads));
 			}
 			return F.False;
+		}
+			return F.NIL;
 		}
 
 	}
@@ -843,8 +851,8 @@ public class PredicateQ {
 	 * </blockquote>
 	 * <p>
 	 * For very large numbers, <code>PrimeQ</code> uses
-	 * <a href="https://en.wikipedia.org/wiki/Prime_number#Primality_testing_versus_primality_proving">probabilistic
-	 * prime testing</a>, so it might be wrong sometimes<br />
+	 * <a href="https://en.wikipedia.org/wiki/Prime_number#Primality_testing_versus_primality_proving">probabilistic prime testing</a>,
+	 * so it might be wrong sometimes<br />
 	 * (a number might be composite even though <code>PrimeQ</code> says it is prime).
 	 * </p>
 	 * <p>
@@ -982,20 +990,24 @@ public class PredicateQ {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				IExpr arg1 = ast.arg1();
+				IExpr arg1 = engine.evaluate(ast.arg1());
 				if (arg1.isNumber()) {
+					if (arg1.isComplex() || arg1.isComplexNumeric()) {
+						return F.False;
+					}
 					return F.bool(arg1.isReal());
 				}
-				IExpr temp = engine.evaluate(arg1);
-				if (temp.isReal()) {
-					return F.True;
-				}
-				if (temp.isNumericFunction()) {
-					temp = engine.evalN(arg1);
-					if (temp.isReal()) {
-						return F.True;
-					}
-				}
+				// CAUTION: the following can not be used because Rubi uses another definition
+				// IExpr temp = engine.evaluate(arg1);
+				// if (temp.isReal()) {
+				// return F.True;
+				// }
+				// if (temp.isNumericFunction()) {
+				// temp = engine.evalN(arg1);
+				// if (temp.isReal()) {
+				// return F.True;
+				// }
+				// }
 				return F.False;
 			}
 			Validate.checkSize(ast, 2);
@@ -1239,8 +1251,8 @@ public class PredicateQ {
 	 * 
 	 * <blockquote>
 	 * <p>
-	 * returns <code>True</code> if <code>v</code> is a vector and <code>f(x)</code> returns <code>True</code> for each
-	 * element <code>x</code> of <code>v</code>.
+	 * returns <code>True</code> if <code>v</code> is a vector and <code>f(x)</code> returns <code>True</code> for each element
+	 * <code>x</code> of <code>v</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>

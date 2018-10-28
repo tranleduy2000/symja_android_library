@@ -218,8 +218,8 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	}
 
 	/**
-	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
-	 * integer as this expression is canonical less than, equal to, or greater than the specified expression.
+	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive integer as this
+	 * expression is canonical less than, equal to, or greater than the specified expression.
 	 */
 	@Override
 	public int compareTo(final IExpr expr) {
@@ -593,8 +593,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
 	/**
 	 *
-	 * @param n
-	 *            must be greater equal 0
+	 * @param n must be greater equal 0
 	 * @return
 	 */
 	private IComplex powPositive(final long n) {
@@ -621,6 +620,19 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		return r;
 	}
 
+	@Override
+	public IRational rationalFactor() {
+		if (fReal.isZero()) {
+			return fImaginary;
+		}
+		if (fImaginary.isZero()) {
+			return fReal;
+		}
+		if (fReal.equals(fImaginary)) {
+			return fReal;
+		}
+		return null;
+	}
 	@Override
 	public ISignedNumber re() {
 		if (fReal.denominator().isOne()) {

@@ -35,20 +35,17 @@ public class PatternMatcherAndInvoker extends PatternMatcher {
 	/**
 	 * Void constructor for Externalizable.
 	 */
+	@SuppressWarnings("unused")
 	private PatternMatcherAndInvoker() {
 		super(null);
 	}
 
 	/**
-	 * Create a pattern-matching rule which invokes the method name in the given
-	 * instance, if leftHandSide is matching.
+	 * Create a pattern-matching rule which invokes the method name in the given instance, if leftHandSide is matching.
 	 * 
-	 * @param leftHandSide
-	 *            could contain pattern expressions for "pattern-matching"
-	 * @param instance
-	 *            instance of an IFunctionEvaluator interface
-	 * @param method
-	 *            method to call
+	 * @param leftHandSide could contain pattern expressions for "pattern-matching"
+	 * @param instance     instance of an IFunctionEvaluator interface
+	 * @param method       method to call
 	 */
 	public PatternMatcherAndInvoker(final IExpr leftHandSide, IFunctionEvaluator instance, final String methodName) {
 		super(leftHandSide);
@@ -57,8 +54,7 @@ public class PatternMatcherAndInvoker extends PatternMatcher {
 	}
 
 	/**
-	 * Create a pattern-matching rule which invokes the method name in the given
-	 * instance, if leftHandSide is matching.
+	 * Create a pattern-matching rule which invokes the method name in the given instance, if leftHandSide is matching.
 	 * 
 	 * @param leftHandSide
 	 * @param instance
@@ -74,7 +70,7 @@ public class PatternMatcherAndInvoker extends PatternMatcher {
 		// ASTNode node = parser.parse(leftHandSide);
 		// IExpr lhs = AST2Expr.CONST.convert(node);
 		fLhsPatternExpr = lhs;
-		init(fLhsPatternExpr);
+		this.fLHSPriority = determinePatterns();
 		initInvoker(instance, methodName);
 	}
 
@@ -120,13 +116,14 @@ public class PatternMatcherAndInvoker extends PatternMatcher {
 			}
 			return result != null ? result : F.NIL;
 		}
-		if (fTypes.length != fPatternMap.size()) {
+		PatternMap patternMap=getPatternMap();
+		if (fTypes.length != patternMap.size()) {
 			return F.NIL;
 		}
-		fPatternMap.initPattern();
+		patternMap.initPattern();
 		if (matchExpr(fLhsPatternExpr, leftHandSide, engine)) {
 
-			List<IExpr> args = fPatternMap.getValuesAsList();
+			List<IExpr> args = patternMap.getValuesAsList();
 			try {
 				if (args != null) {
 					IExpr result = (IExpr) fMethod.invoke(fInstance, args.toArray());

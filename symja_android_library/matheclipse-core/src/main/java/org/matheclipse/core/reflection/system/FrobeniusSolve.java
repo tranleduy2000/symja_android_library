@@ -3,7 +3,6 @@ package org.matheclipse.core.reflection.system;
 import com.duy.lambda.ObjIntConsumer;
 
 import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.convert.Lists;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -83,14 +82,14 @@ public class FrobeniusSolve extends AbstractEvaluator {
 				IASTAppendable result = F.ListAlloc(8);
 				if (numberOfSolutions < 0) {
 					while ((solution = solver.take()) != null) {
-						result.append(Lists.asList((Object[]) solution));
+						result.append(F.List(solution));
 					}
 				} else {
 					while ((solution = solver.take()) != null) {
 						if (--numberOfSolutions < 0) {
 							break;
 						}
-						result.append(Lists.asList((Object[]) solution));
+						result.append(F.List(solution));
 					}
 				}
 

@@ -244,6 +244,10 @@ public class VariablesSet {
         return fVariablesSet.add(symbol);
     }
 
+	public boolean addAll(final Set<? extends IExpr> symbols) {
+		return fVariablesSet.addAll(symbols);
+	}
+
     /**
      * Add the variables of the given expression
      *
@@ -270,7 +274,7 @@ public class VariablesSet {
      * @param expression
      */
     public void addVarList(final IAST rest, int fromIndex) {
-        for (int i = 2; i < rest.size(); i++) {
+		for (int i = fromIndex; i < rest.size(); i++) {
             IExpr temp = rest.get(i);
             if (temp.isRuleAST()) {
                 return;

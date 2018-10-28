@@ -266,14 +266,6 @@ public class ExprParser extends Scanner {
 			return F.symbol(lowercaseStr, fEngine);
 		} else {
 			String lowercaseStr = nodeStr;
-			if (fRelaxedSyntax) {
-				lowercaseStr = nodeStr.toLowerCase(Locale.ENGLISH);
-				String temp = AST2Expr.PREDEFINED_SYMBOLS_MAP.get(lowercaseStr);
-				if (temp != null) {
-					lowercaseStr = temp;
-				}
-			}
-
 			if (Config.RUBI_CONVERT_SYMBOLS) {
 				Integer num = AST2Expr.RUBI_STATISTICS_MAP.get(lowercaseStr);
 				if (num == null) {
@@ -817,31 +809,31 @@ public class ExprParser extends Scanner {
 		return temp;
 	}
 
-	private static INum getReal(String str) {
-		int index = str.indexOf("*^");
-		int fExponent = 1;
-		String fFloatStr = str;
-		if (index > 0) {
-			fFloatStr = str.substring(0, index);
-			fExponent = Integer.parseInt(str.substring(index + 2));
-		}
-		if (fFloatStr.length() > 15) {
-			int precision = fFloatStr.length();
-			Apfloat apfloatValue = new Apfloat(fFloatStr, precision);
-			if (fExponent != 1) {
-				// value * 10 ^ exponent
-				return F.num(apfloatValue.multiply(ApfloatMath.pow(new Apfloat(10, precision), new Apint(fExponent))));
-			}
-			return F.num(apfloatValue);
-		}
-
-		double fDouble = Double.parseDouble(fFloatStr);
-		if (fExponent != 1) {
-			// value * 10 ^ exponent
-			fDouble = fDouble * Math.pow(10, fExponent);
-		}
-		return new NumStr(fFloatStr, fExponent);
-	}
+//	private static INum getReal(String str) {
+//		int index = str.indexOf("*^");
+//		int fExponent = 1;
+//		String fFloatStr = str;
+//		if (index > 0) {
+//			fFloatStr = str.substring(0, index);
+//			fExponent = Integer.parseInt(str.substring(index + 2));
+//		}
+//		if (fFloatStr.length() > 15) {
+//			int precision = fFloatStr.length();
+//			Apfloat apfloatValue = new Apfloat(fFloatStr, precision);
+//			if (fExponent != 1) {
+//				// value * 10 ^ exponent
+//				return F.num(apfloatValue.multiply(ApfloatMath.pow(new Apfloat(10, precision), new Apint(fExponent))));
+//			}
+//			return F.num(apfloatValue);
+//		}
+//
+//		double fDouble = Double.parseDouble(fFloatStr);
+//		if (fExponent != 1) {
+//			// value * 10 ^ exponent
+//			fDouble = fDouble * Math.pow(10, fExponent);
+//		}
+//		return new NumStr(fFloatStr, fExponent);
+//	}
 
 	protected boolean isOperatorCharacters() {
 		return fFactory.getOperatorCharacters().indexOf(fCurrentChar) >= 0;

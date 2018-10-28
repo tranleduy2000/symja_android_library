@@ -5,7 +5,6 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.EvalUtilities;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.patternmatching.PatternMatcher;
 
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CInfinity;
@@ -27,7 +26,7 @@ public class JavaFormTestCase extends AbstractTestCase {
 
 		IAST function = Sinc(Times(CI, CInfinity));
 
-		IExpr result = EvalEngine.get().evalHoldPattern(function);
+		IExpr result = EvalEngine.get().evalLHSPattern(function);
 		assertEquals(result.internalFormString(true, -1), "Sinc(DirectedInfinity(CI))");
 
 		result = util.evaluate(function);
@@ -41,7 +40,7 @@ public class JavaFormTestCase extends AbstractTestCase {
 
 		IAST function = Sinc(Times(CI, CInfinity));
 
-		IExpr result = EvalEngine.get().evalHoldPattern(function );
+		IExpr result = EvalEngine.get().evalLHSPattern(function );
 		assertEquals(result.internalJavaString(true, -1,false,true, false), "F.Sinc(F.DirectedInfinity(F.CI))");
 
 		result = util.evaluate(function);

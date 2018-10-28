@@ -1,7 +1,5 @@
 package org.matheclipse.core.expression;
 
-import java.util.Collection;
-import java.util.Map;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
@@ -20,6 +18,10 @@ import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 /**
  * A concrete pattern sequence implementation (i.e. x__)
  * 
@@ -32,8 +34,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	private static final long serialVersionUID = 2773651826316158627L;
 
 	/**
-	 * @param nullAllowed
-	 *            TODO
+	 * @param nullAllowed TODO
 	 * 
 	 */
 	public static PatternSequence valueOf(final ISymbol symbol, final IExpr check, final boolean def,
@@ -51,15 +52,16 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	 * @param numerator
 	 * @return
 	 */
-	public static PatternSequence valueOf(final ISymbol symbol, final IExpr check) {
+	public static PatternSequence valueOf(final ISymbol symbol, final IExpr check, boolean zeroArgsAllowed) {
 		PatternSequence p = new PatternSequence();
 		p.fSymbol = symbol;
 		p.fCondition = check;
+		p.fZeroArgsAllowed = zeroArgsAllowed;
 		return p;
 	}
 
-	public static PatternSequence valueOf(final ISymbol symbol) {
-		return valueOf(symbol, null);
+	public static PatternSequence valueOf(final ISymbol symbol, boolean zeroArgsAllowed) {
+		return valueOf(symbol, null, zeroArgsAllowed);
 	}
 
 	/**
@@ -83,13 +85,13 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	@Override
-	public int[] addPattern(PatternMap patternMap, Map<IExpr, Integer> patternIndexMap) {
+	public int[] addPattern(PatternMap patternMap, List<IExpr> patternIndexMap) {
 		patternMap.addPattern(patternIndexMap, this);
 		// the ast contains a pattern sequence (i.e. "x__")
 		int[] result = new int[2];
 		result[0] = IAST.CONTAINS_PATTERN_SEQUENCE;
 		result[1] = 1;
-		if (fCondition!=null) {
+		if (fCondition != null) {
 			result[1] += 2;
 		}
 		return result;
@@ -114,8 +116,8 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	/**
-	 * Check if the two left-hand-side pattern expressions are equivalent. (i.e.
-	 * <code>f[x_,y_]</code> is equivalent to <code>f[a_,b_]</code> )
+	 * Check if the two left-hand-side pattern expressions are equivalent. (i.e. <code>f[x_,y_]</code> is equivalent to
+	 * <code>f[a_,b_]</code> )
 	 * 
 	 * @param patternExpr2
 	 * @param pm1
@@ -155,13 +157,16 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 		if (!isConditionMatchedSequence(sequence, patternMap)) {
 			return false;
 		}
+		if (sequence.size() == 1 && !isNullSequence()) {
+			return false;
+		}
 
 		IExpr value = patternMap.getValue(this);
 		if (value != null) {
 			return sequence.equals(value);
 		}
 		patternMap.setValue(this, sequence);
-		return  true;
+		return true;
 	}
 
 	@Override
@@ -206,15 +211,17 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	@Override
-	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators, boolean usePrefix, boolean noSymbolPrefix) {
+	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators, boolean usePrefix,
+			boolean noSymbolPrefix) {
 		if (symbolsAsFactoryMethod) {
 			String prefix = usePrefix ? "F." : "";
 			final StringBuilder buffer = new StringBuilder();
-			buffer.append(prefix+"$ps(");
+			buffer.append(prefix + "$ps(");
 			if (fSymbol == null) {
 				buffer.append("(ISymbol)null");
 				if (fCondition != null) {
-					buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperators, usePrefix, noSymbolPrefix));
+					buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperators,
+							usePrefix, noSymbolPrefix));
 				}
 				if (fDefault) {
 					if (fCondition == null) {
@@ -225,7 +232,8 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 			} else {
 				buffer.append("\"" + fSymbol.toString() + "\"");
 				if (fCondition != null) {
-					buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperators, usePrefix, noSymbolPrefix));
+					buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperators,
+							usePrefix, noSymbolPrefix));
 				}
 				if (fDefault) {
 					buffer.append(",true");
@@ -305,9 +313,8 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	/**
-	 * Compares this expression with the specified expression for order. Returns
-	 * a negative integer, zero, or a positive integer as this expression is
-	 * canonical less than, equal to, or greater than the specified expression.
+	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive integer as this
+	 * expression is canonical less than, equal to, or greater than the specified expression.
 	 */
 	@Override
 	public int compareTo(final IExpr expr) {
@@ -439,12 +446,20 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 		return fDefault;
 	}
 
+	public boolean isNullSequence() {
+		return fZeroArgsAllowed;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public boolean isFreeOfPatterns() {
 		return false;
 	}
 
+	/** {@inheritDoc} */
+//	public boolean isFreeOfDefaultPatterns() {
+//		return true;
+//	}
 	/** {@inheritDoc} */
 	@Override
 	public final boolean isPatternExpr() {

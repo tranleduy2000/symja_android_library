@@ -18,11 +18,12 @@ import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 
+import java.util.Map;
+
 /**
- * Replace all occurrences of expressions where the given
- * <code>function.apply()</code> method returns a non <code>F.NIL</code> value.
- * The visitors <code>visit()</code> methods return <code>F.NIL</code> if no
- * substitution occurred.
+ * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non
+ * <code>F.NIL</code> value. The visitors <code>visit()</code> methods return <code>F.NIL</code> if no substitution
+ * occurred.
  */
 public class VisitorReplaceAll extends VisitorExpr {
 	final Function<IExpr, IExpr> fFunction;
@@ -35,6 +36,25 @@ public class VisitorReplaceAll extends VisitorExpr {
 	public VisitorReplaceAll(Function<IExpr, IExpr> function, int offset) {
 		super();
 		this.fFunction = function;
+		this.fOffset = offset;
+	}
+
+	public VisitorReplaceAll(Map<? extends IExpr, ? extends IExpr> map) {
+		this(map, 0);
+	}
+
+	public VisitorReplaceAll(Map<? extends IExpr, ? extends IExpr> map, int offset) {
+		super();
+		this.fFunction = new Function<IExpr, IExpr>() {
+			@Override
+			public IExpr apply(IExpr x) {
+				IExpr subst = map.get(x);
+				if (subst != null) {
+					return subst;
+				}
+				return F.NIL;
+			}
+		};
 		this.fOffset = offset;
 	}
 
@@ -98,22 +118,39 @@ public class VisitorReplaceAll extends VisitorExpr {
 		return fFunction.apply(element);
 	}
 
-	/**
-	 * 
-	 * @return <code>F.NIL</code>, if no evaluation is possible
-	 */
 	@Override
 	public IExpr visit(IPattern element) {
-		return fFunction.apply(element);
+		IExpr temp = fFunction.apply(element);
+		if (temp.isPresent()) {
+			return temp;
+		}
+		ISymbol symbol = element.getSymbol();
+		if (symbol != null) {
+			IExpr expr = fFunction.apply(symbol);
+			if (expr.isPresent() && expr.isSymbol()) {
+				if (element.isPatternDefault()) {
+					return F.$p((ISymbol) expr, element.getCondition(), true);
+				}
+				return F.$p((ISymbol) expr, element.getCondition(), element.getDefaultValue());
+			}
+		}
+		return F.NIL;
 	}
 
-	/**
-	 * 
-	 * @return <code>F.NIL</code>, if no evaluation is possible
-	 */
 	@Override
 	public IExpr visit(IPatternSequence element) {
-		return fFunction.apply(element);
+		IExpr temp = fFunction.apply(element);
+		if (temp.isPresent()) {
+			return temp;
+		}
+		ISymbol symbol = element.getSymbol();
+		if (symbol != null) {
+			IExpr expr = fFunction.apply(symbol);
+			if (expr.isPresent() && expr.isSymbol()) {
+				return F.$ps((ISymbol) expr, element.getCondition(), element.isDefault(), element.isNullSequence());
+			}
+		}
+		return F.NIL;
 	}
 
 	/**
@@ -136,12 +173,11 @@ public class VisitorReplaceAll extends VisitorExpr {
 
 	@Override
 	protected IExpr visitAST(IAST ast) {
-		IExpr temp;
 		IASTMutable result = F.NIL;
 		int i = fOffset;
 		int size = ast.size();
 		while (i < size) {
-			temp = ast.get(i).accept(this);
+			IExpr temp = ast.get(i).accept(this);
 			if (temp.isPresent()) {
 				// something was evaluated - return a new IAST:
 				result = ast.setAtCopy(i++, temp);
@@ -151,7 +187,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 		}
 		if (result.isPresent()) {
 			while (i < size) {
-				temp = ast.get(i).accept(this);
+				IExpr temp = ast.get(i).accept(this);
 				if (temp.isPresent()) {
 					result.set(i, temp);
 				}

@@ -143,7 +143,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 
 	public static IInteger valueOf(final long newnum) {
 		if (Integer.MIN_VALUE <= newnum && newnum <= Integer.MAX_VALUE) {
-			return new IntegerSym((int) newnum);
+			return valueOf((int) newnum);
 		}
 		BigIntegerSym z = new BigIntegerSym();
 		z.fBigIntValue = BigInteger.valueOf(newnum);
@@ -151,17 +151,13 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements IIntege
 	}
 
 	/**
-	 * Returns the IInteger for the specified character sequence stated in the specified radix. The characters must all
-	 * be digits of the specified radix, except the first character which may be a plus sign <code>'+'</code> or a minus
-	 * sign <code>'-'</code> .
+	 * Returns the IInteger for the specified character sequence stated in the specified radix. The characters must all be digits of the
+	 * specified radix, except the first character which may be a plus sign <code>'+'</code> or a minus sign <code>'-'</code> .
 	 *
-	 * @param integerString
-	 *            the character sequence to parse.
-	 * @param radix
-	 *            the radix to be used while parsing.
+	 * @param integerString the character sequence to parse.
+	 * @param radix         the radix to be used while parsing.
 	 * @return the corresponding large integer.
-	 * @throws NumberFormatException
-	 *             if the specified character sequence does not contain a parsable large integer.
+	 * @throws NumberFormatException if the specified character sequence does not contain a parsable large integer.
 	 */
 	public static IInteger valueOf(final String integerString, final int radix) {
 		if (integerString.length() >= 1) {

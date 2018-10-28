@@ -1,10 +1,6 @@
 package org.matheclipse.core.expression;
 
-import java.io.ObjectStreamException;
-import java.util.Map;
 import com.duy.lambda.Predicate;
-
-import javax.annotation.Nonnull;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -15,6 +11,11 @@ import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.PatternMap;
+
+import java.io.ObjectStreamException;
+import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * A pattern with assigned &quot;pattern name&quot; (i.e. <code>x_</code>)
@@ -80,10 +81,10 @@ public class Pattern extends Blank {
 	}
 
 	@Override
-	public int[] addPattern(PatternMap patternMap, Map<IExpr, Integer> patternIndexMap) {
+	public int[] addPattern(PatternMap patternMap, List<IExpr> patternIndexMap) {
 		patternMap.addPattern(patternIndexMap, this);
 		int[] result = new int[2];
-		if (isPatternDefault()) {
+		if (isPatternDefault() || isPatternOptional()) {
 			// the ast contains a pattern with default value (i.e. "x_." or
 			// "x_:")
 			result[0] = IAST.CONTAINS_DEFAULT_PATTERN;
@@ -93,7 +94,7 @@ public class Pattern extends Blank {
 			result[0] = IAST.CONTAINS_PATTERN;
 			result[1] = 6;
 		}
-		if (fCondition!=null) {
+		if (fCondition != null) {
 			result[1] += 2;
 		}
 		return result;
@@ -178,12 +179,20 @@ public class Pattern extends Blank {
 			return expr.equals(value);
 		}
 		patternMap.setValue(this, expr);
-		return  true;
+		return true;
 	}
 
 	@Override
 	public String fullFormString() {
 		StringBuilder buf = new StringBuilder();
+		if (fDefaultValue!=null||fDefault) {
+			buf.append("Optional");
+			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+				buf.append('(');
+			} else {
+				buf.append('[');
+			}
+		}
 		buf.append("Pattern");
 		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
 			buf.append('(');
@@ -207,6 +216,21 @@ public class Pattern extends Blank {
 			buf.append("]]");
 		}
 
+		if (fDefaultValue!=null) {
+			buf.append(",");
+			buf.append(fDefaultValue.fullFormString());
+			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+				buf.append(")");
+			} else {
+				buf.append("]");
+			}
+		} else if (fDefault) {
+			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+				buf.append(")");
+			} else {
+				buf.append("]");
+			}
+		}
 		return buf.toString();
 	}
 
@@ -261,23 +285,25 @@ public class Pattern extends Blank {
 	}
 
 	@Override
-	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperaators, boolean usePrefix, boolean noSymbolPrefix) {
+	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperaators,
+			boolean usePrefix, boolean noSymbolPrefix) {
 		final StringBuilder buffer = new StringBuilder();
 		String prefix = usePrefix ? "F." : "";
-		buffer.append(prefix+"$p(");
+		buffer.append(prefix + "$p(");
 		String symbolStr = fSymbol.toString();
 		char ch = symbolStr.charAt(0);
 		if (symbolStr.length() == 1 && fDefaultValue == null) {
-			if (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'G' && ch != 'D' && ch != 'E')) {
+			if (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'G' && ch != 'D' && ch != 'E') || ch == 'P'
+					|| ch == 'Q') {
 				if (!fDefault) {
 					if (fCondition == null) {
-						return prefix+symbolStr + "_";
+						return prefix + symbolStr + "_";
 					} else if (fCondition == F.Symbol) {
-						return prefix+symbolStr + "_Symbol";
+						return prefix + symbolStr + "_Symbol";
 					}
 				} else {
 					if (fCondition == null) {
-						return prefix+symbolStr + "_DEFAULT";
+						return prefix + symbolStr + "_DEFAULT";
 					}
 				}
 			}
@@ -288,11 +314,11 @@ public class Pattern extends Blank {
 				if ('a' <= ch2 && ch2 <= 'z') {
 					if (!fDefault) {
 						if (fCondition == null) {
-							return prefix+"p" + ch2 + "_";
+							return prefix + "p" + ch2 + "_";
 						}
 					} else {
 						if (fCondition == null) {
-							return prefix+"p" + ch2 + "_DEFAULT";
+							return prefix + "p" + ch2 + "_DEFAULT";
 						}
 					}
 				}
@@ -300,7 +326,7 @@ public class Pattern extends Blank {
 		}
 
 		if (symbolStr.length() == 1 && ('a' <= ch && ch <= 'z')) {
-			buffer.append(prefix+symbolStr);
+			buffer.append(prefix + symbolStr);
 		} else {
 			buffer.append("\"" + symbolStr + "\"");
 		}
@@ -310,14 +336,16 @@ public class Pattern extends Blank {
 			} else if (fCondition == F.Symbol) {
 				buffer.append(", Symbol");
 			} else {
-				buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperaators, usePrefix, noSymbolPrefix));
+				buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperaators, usePrefix,
+						noSymbolPrefix));
 			}
 		}
 		if (fDefaultValue != null) {
 			if (fCondition == null) {
 				buffer.append(", null");
 			}
-			buffer.append("," + fDefaultValue.internalJavaString(symbolsAsFactoryMethod, 0, useOperaators, usePrefix, noSymbolPrefix));
+			buffer.append("," + fDefaultValue.internalJavaString(symbolsAsFactoryMethod, 0, useOperaators, usePrefix,
+					noSymbolPrefix));
 		} else {
 			if (fDefault) {
 				buffer.append(",true");

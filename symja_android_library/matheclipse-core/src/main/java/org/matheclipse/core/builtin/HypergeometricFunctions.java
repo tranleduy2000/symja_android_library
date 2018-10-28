@@ -10,6 +10,7 @@ import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
 import org.matheclipse.core.eval.interfaces.INumeric;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -29,6 +30,8 @@ import static org.matheclipse.core.expression.F.Times;
 public class HypergeometricFunctions {
 	static {
 		F.CosIntegral.setEvaluator(new CosIntegral());
+		F.CoshIntegral.setEvaluator(new CoshIntegral());
+		F.ExpIntegralE.setEvaluator(new ExpIntegralE());
 		F.ExpIntegralEi.setEvaluator(new ExpIntegralEi());
 		F.FresnelC.setEvaluator(new FresnelC());
 		F.FresnelS.setEvaluator(new FresnelS());
@@ -38,7 +41,7 @@ public class HypergeometricFunctions {
 		F.Hypergeometric2F1.setEvaluator(new Hypergeometric2F1());
 		F.LogIntegral.setEvaluator(new LogIntegral());
 		F.SinIntegral.setEvaluator(new SinIntegral());
-		
+		F.SinhIntegral.setEvaluator(new SinhIntegral());
 	}
 
 
@@ -63,6 +66,21 @@ public class HypergeometricFunctions {
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1) {
+			if (arg1.isZero()) {
+				return F.CNInfinity;
+			}
+			if (arg1.isInfinity()) {
+				return F.C0;
+			}
+			if (arg1.isNegativeInfinity()) {
+				return F.Times(F.CI, F.Pi);
+			}
+			if (arg1.isDirectedInfinity(F.CI) || arg1.isDirectedInfinity(F.CNI)) {
+				return F.CInfinity;
+			}
+			if (arg1.isComplexInfinity()) {
+				return F.Indeterminate;
+			}
 			return F.NIL;
 		}
 
@@ -73,6 +91,68 @@ public class HypergeometricFunctions {
 		}
 	}
 
+	private static class CoshIntegral extends AbstractTrigArg1  {
+
+		@Override
+		public IExpr evaluateArg1(final IExpr arg1) {
+			if (arg1.isZero()) {
+				return F.CNInfinity;
+			}
+			if (arg1.isInfinity()) {
+				return F.CInfinity;
+			}
+			if (arg1.isNegativeInfinity()) {
+				return F.CInfinity;
+			}
+			if (arg1.isDirectedInfinity(F.CI)) {
+				return F.Times(F.CPiHalf, F.CI);
+			}
+			if (arg1.isDirectedInfinity(F.CNI)) {
+				return F.Times(F.CNPiHalf, F.CI);
+			}
+			if (arg1.isComplexInfinity()) {
+				return F.Indeterminate;
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+	}
+
+	private static class ExpIntegralE extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 3);
+
+			IExpr n = ast.arg1();
+			IExpr z = ast.arg2();
+			if (n.isZero()) {
+				// 1/(E^z*z)
+				return F.Power(F.Times(z, F.Power(F.E, z)), -1);
+			}
+			if (z.isZero()) {
+				if (n.re().greaterThan(F.C1).isTrue()) {
+					// 1/(n-1)
+					return F.Power(F.Plus(n, F.CN1), -1);
+				}
+				if (n.re().lessThan(F.C1).isTrue()) {
+					return F.CComplexInfinity;
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+	}
 	private static class ExpIntegralEi extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
 
 		@Override
@@ -505,6 +585,12 @@ public class HypergeometricFunctions {
 			if (z.isZero()) {
 				return F.C1;
 			}
+			if (a.compareTo(b)>0) {
+				IASTMutable newAST=ast.copy();
+				newAST.set(1, b);
+				newAST.set(2, a);
+				return newAST;
+			}
 			if (a.isInteger() && a.isNegative() && z.isOne()) {
 				IInteger n = (IInteger) a.negate();
 				// Pochhammer(c-b, n) / Pochhammer(c, n)
@@ -610,6 +696,66 @@ public class HypergeometricFunctions {
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1) {
+			if (arg1.isZero()) {
+				return F.C0;
+			}
+			if (arg1.isInfinity()) {
+				return F.CPiHalf;
+			}
+			if (arg1.isNegativeInfinity()) {
+				return F.CNPiHalf;
+			}
+			if (arg1.isDirectedInfinity(F.CI)) {
+				return arg1;
+			}
+			if (arg1.isComplexInfinity()) {
+				return F.Indeterminate;
+			}
+			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
+			if (negExpr.isPresent()) {
+				return Negate(F.SinIntegral(negExpr));
+			}
+			IExpr imPart = AbstractFunctionEvaluator.getPureImaginaryPart(arg1);
+			if (imPart.isPresent()) {
+				return F.Times(F.CI, F.SinhIntegral(imPart));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			super.setUp(newSymbol);
+		}
+	}
+
+	private static class SinhIntegral extends AbstractTrigArg1  {
+
+		@Override
+		public IExpr evaluateArg1(final IExpr arg1) {
+			if (arg1.isZero()) {
+				return F.C0;
+			}
+			if (arg1.isInfinity()) {
+				return F.CInfinity;
+			}
+			if (arg1.isNegativeInfinity()) {
+				return F.CNInfinity;
+			}
+			if (arg1.isDirectedInfinity(F.CI)) {
+				return F.Times(F.CI, F.CPiHalf);
+			}
+			if (arg1.isComplexInfinity()) {
+				return F.Indeterminate;
+			}
+			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
+			if (negExpr.isPresent()) {
+				return Negate(F.SinhIntegral(negExpr));
+			}
+			IExpr imPart = AbstractFunctionEvaluator.getPureImaginaryPart(arg1);
+			if (imPart.isPresent()) {
+				return F.Times(F.CI, F.SinIntegral(imPart));
+			}
 			return F.NIL;
 		}
 

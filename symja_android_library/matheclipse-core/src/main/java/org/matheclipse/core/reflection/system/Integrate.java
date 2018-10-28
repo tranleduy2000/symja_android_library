@@ -2,6 +2,7 @@ package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.Predicate;
+import com.google.common.cache.CacheBuilder;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
@@ -14,11 +15,12 @@ import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Symbol;
 import org.matheclipse.core.generic.Predicates;
-import org.matheclipse.core.integrate.rubi45.UtilityFunctionCtors;
+import org.matheclipse.core.integrate.rubi.UtilityFunctionCtors;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.polynomials.PartialFractionIntegrateGenerator;
 
 import java.util.HashSet;
@@ -30,59 +32,49 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.Monomial;
 
-import static org.matheclipse.core.expression.F.$s;
-import static org.matheclipse.core.expression.F.ArcTan;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.CN2;
 import static org.matheclipse.core.expression.F.Divide;
 import static org.matheclipse.core.expression.F.Integrate;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Log;
-import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Sqrt;
 import static org.matheclipse.core.expression.F.Times;
 
 /**
  * <pre>
  * Integrate(f, x)
  * </pre>
- *
+ * 
  * <blockquote>
  * <p>
- * integrates <code>f</code> with respect to <code>x</code>. The result does not contain the additive integration
- * constant.
+ * integrates <code>f</code> with respect to <code>x</code>. The result does not contain the additive integration constant.
  * </p>
  * </blockquote>
- *
+ * 
  * <pre>
  * Integrate(f, {x,a,b})
  * </pre>
- *
+ * 
  * <blockquote>
  * <p>
- * computes the definite integral of <code>f</code> with respect to <code>x</code> from <code>a</code> to
- * <code>b</code>.
+ * computes the definite integral of <code>f</code> with respect to <code>x</code> from <code>a</code> to <code>b</code>.
  * </p>
  * </blockquote>
  * <p>
  * See: <a href="https://en.wikipedia.org/wiki/Integral">Wikipedia: Integral</a>
  * </p>
  * <h3>Examples</h3>
- *
+ * 
  * <pre>
  * &gt;&gt; Integrate(x^2, x)
  * x^3/3
- *
+ * 
  * &gt;&gt; Integrate(Tan(x) ^ 5, x)
  * -Log(Cos(x))-Tan(x)^2/2+Tan(x)^4/4
  * </pre>
  */
 public class Integrate extends AbstractFunctionEvaluator {
+	public static RulesData INTEGRATE_RULES_DATA;
 	/**
 	 * Constructor for the singleton
 	 */
@@ -92,18 +84,17 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * Check if the internal rules are already initialized
 	 */
 	public static boolean INITIALIZED = false;
-
 	public final static Set<ISymbol> INT_RUBI_FUNCTIONS = new HashSet<ISymbol>(64);
-	public final static Set<ISymbol> INT_FUNCTIONS = new HashSet<ISymbol>(64);
 
 	public final static Set<IExpr> DEBUG_EXPR = new HashSet<IExpr>(64);
+
+	private static boolean INTEGRATE_RULES_READ = false;
 
 	public Integrate() {
 	}
 
 	@Override
 	public IExpr evaluate(final IAST holdallAST, EvalEngine engine) {
-		boolean calledRubi = false;
 		boolean evaled = false;
 		IExpr result;
 		boolean numericMode = engine.isNumericMode();
@@ -169,7 +160,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 
 			final IASTAppendable ast = holdallAST.setAtClone(1, arg1);
 			ast.set(2, arg2);
-			// if (ast.arg2().isSymbol()) {
 			final IExpr x = ast.arg2();
 
 			if (arg1.isNumber()) {
@@ -203,28 +193,25 @@ public class Integrate extends AbstractFunctionEvaluator {
 				DEBUG_EXPR.add(arg1);
 			}
 			if (arg1.isAST()) {
-				IAST fx = (IAST) arg1;
+				final IAST fx = (IAST) arg1;
 				if (fx.topHead().equals(x)) {
 					// issue #91
 					return F.NIL;
 				}
-				// if (astArg1.isTimes()) {
-				// IAST freeTimes = F.Times();
-				// IAST restTimes = F.Times();
-				// collectFreeTerms(astArg1, x, freeTimes, restTimes);
-				// IExpr free = freeTimes.getOneIdentity(F.C1);
-				// IExpr rest = restTimes.getOneIdentity(F.C1);
-				// if (!free.isOne()) {
-				// // Integrate[free_ * rest_,x_Symbol] ->
-				// free*Integrate[rest, x] /; FreeQ[free,y]
-				// // IExpr result = integrateByRubiRules(Integrate(rest,
-				// x));
-				// // if (result != null) {
-				// // return Times(free, result);
-				// // }
-				// return Times(free, Integrate(rest, x));
-				// }
-				// }
+				if (arg1.isTimes()) {
+					IAST[] temp = ((IAST) arg1).filter(new Predicate<IExpr>() {
+                        @Override
+                        public boolean test(IExpr arg) {
+                            return arg.isFree(x);
+                        }
+                    });
+					IExpr free = temp[0].getOneIdentity(F.C1);
+					if (!free.isOne()) {
+						IExpr rest = temp[1].getOneIdentity(F.C1);
+						// Integrate[free_ * rest_,x_Symbol] -> free*Integrate[rest, x] /; FreeQ[free,x]
+						return Times(free, Integrate(rest, x));
+					}
+				}
 
 				if (fx.isPower()) {
 					// base ^ exponent
@@ -235,95 +222,45 @@ public class Integrate extends AbstractFunctionEvaluator {
 							// Integrate[ 1 / x_ , x_ ] -> Log[x]
 							return Log(x);
 						}
-						// Integrate[ x_ ^n_ , x_ ] -> x^(n+1)/(n+1) /;
-						// FreeQ[n, x]
+						// Integrate[ x_ ^n_ , x_ ] -> x^(n+1)/(n+1) /; FreeQ[n, x]
 						IExpr temp = Plus(F.C1, exponent);
 						return Divide(Power(x, temp), temp);
 					}
-					if (fx.equalsAt(2, x) && fx.isFreeAt(1, x)) {
-						if (fx.arg1().isE()) {
+					if (exponent.equals(x) && base.isFree(x)) {
+						if (base.isE()) {
 							// E^x
 							return arg1;
 						}
 						// a^x / Log(a)
-						return F.Divide(fx, F.Log(fx.arg1()));
-					}
-				} else if (fx.isAST(F.Times, 3)) {
-					IExpr temp = F.NIL;
-					if (fx.first().equals(x)) {
-						temp = integrateByParts(fx.second(), x, x);
-					} else if (fx.second().equals(x)) {
-						temp = integrateByParts(fx.first(), x, x);
-					}
-					if (temp.isPresent()) {
-						return temp;
+						return F.Divide(fx, F.Log(base));
 					}
 				}
-				if (INT_FUNCTIONS.contains(fx.head())) {
-					if (fx.isAST1() && x.equals(fx.arg1())) {
-						IExpr head = fx.head();
-						IExpr temp = integrate1ArgumentFunctions(head, x);
-						if (temp.isPresent()) {
-							return temp;
-						}
-					}
-					result = integrateByRubiRules(ast, F.NIL);
+					result = integrateByRubiRules(fx, x, ast);
 					if (result.isPresent()) {
 						return result;
 					}
-				}
-				IExpr fxExpanded = F.expand(fx, true, false);
-				if (fxExpanded.isAST()) {
-					if (fxExpanded.isPlus()) {
-						if (fxExpanded != fx) {
-							if (fxExpanded.isPolynomial(x)) {
-								if (arg1.isTimes()) {
-									// deleted - Rubi seems to work w/o second try: result = integrateByRubiRules(ast,
-									// (IAST) fxExpanded);
-									result = integrateByRubiRules(ast, F.NIL);
+
+				result = callRestIntegrate(fx, x, ast);
 									if (result.isPresent()) {
 										return result;
 									}
-								}
-							}
-						}
 
-						// Integrate[a_+b_+...,x_] ->
-						// Integrate[a,x]+Integrate[b,x]+...
+			}
+			return evaled ? ast : F.NIL;
+		} finally {
+			engine.setNumericMode(numericMode);
+		}
+	}
+
+	private static IExpr callRestIntegrate(IAST arg1, final IExpr x, final IAST ast) {
+		IExpr fxExpanded = F.expand(arg1, false, false, false);
+		if (fxExpanded.isAST()) {
+			if (fxExpanded.isPlus()) {
+				// Integrate[a_+b_+...,x_] -> Integrate[a,x]+Integrate[b,x]+...
 						return ((IAST) fxExpanded).mapThread(F.Integrate(null, x), 1);
 					}
 
 					final IAST arg1AST = (IAST) fxExpanded;
-					if (arg1AST.isAST1() && x.equals(arg1AST.arg1())) {
-						IExpr head = arg1AST.head();
-						IExpr temp = integrate1ArgumentFunctions(head, x);
-						if (temp.isPresent()) {
-							return temp;
-						}
-					}
-					// if (arg1AST.isPower()) {
-					// if (x.equals(arg1AST.arg1()) && arg1AST.isFreeAt(2,
-					// x)) {
-					// IExpr i = arg1AST.arg2();
-					// if (!i.isMinusOne()) {
-					// // Integrate[x_ ^ i_IntegerQ, x_Symbol] -> 1/(i+1) *
-					// x ^(i+1)
-					// i = Plus(i, C1);
-					// return F.Times(F.Power(i, F.CN1), F.Power(x, i));
-					// }
-					// }
-					// if (x.equals(arg1AST.arg2()) && arg1AST.isFreeAt(1,
-					// x)) {
-					// if (arg1AST.equalsAt(1, F.E)) {
-					// // E^x
-					// return arg1;
-					// }
-					// // a^x / Log(a)
-					// return F.Times(arg1AST,
-					// F.Power(F.Log(arg1AST.arg1()), F.CN1));
-					//
-					// }
-					// }
 
 					if (arg1AST.isTimes()) {
 						// Integrate[a_*y_,x_Symbol] -> a*Integrate[y,x] /; FreeQ[a,x]
@@ -342,218 +279,152 @@ public class Integrate extends AbstractFunctionEvaluator {
 							return filterCollector;
 						}
 
-						IExpr temp = integrateTimesTrigFunctions(arg1AST, x);
-						if (temp.isPresent()) {
-							return temp;
-						}
+				IExpr temp = integrateTimesTrigFunctions(arg1AST, x);
+				if (temp.isPresent()) {
+					return temp;
 					}
 
-					// if (!ast.equalsAt(1, fxExpanded)) {
-					// return integrateByRubiRules(ast);
-					// }
+			}
 
 					final IExpr header = arg1AST.head();
-					if (arg1AST.size() >= 3) {
+			if (arg1AST.size() >= 3 && arg1AST.isFree(F.Integrate)) {
 						if (header == F.Times || header == F.Power) {
 							if (!arg1AST.isEvalFlagOn(IAST.IS_DECOMPOSED_PARTIAL_FRACTION) && ast.arg2().isSymbol()) {
 								IExpr[] parts = Algebra.fractionalParts(arg1, true);
 								if (parts != null) {
-									// try Rubi rules first
-									if (!parts[0].isPolynomial(x) || !parts[1].isPolynomial(x)) {
-										result = integrateByRubiRules(ast, F.NIL);
-										if (result.isPresent()) {
-											return result;
-										}
-										calledRubi = true;
-									}
 
-									IExpr apartPlus = Algebra.partialFractionDecompositionRational(
+							return Algebra.partialFractionDecompositionRational(
 											new PartialFractionIntegrateGenerator(x), parts, x);
-
-									if (apartPlus.isPresent() && !apartPlus.isAST(F.Integrate)) {
-										if (ast.equals(apartPlus)) {
-											return returnIntegrate(ast, evaled);
-										}
-										return apartPlus;
 									}
-									if (parts[0].isPolynomial(x) && parts[1].isPolynomial(x)) {
-										result = integrateByRubiRules(ast, F.NIL);
-										if (result.isPresent()) {
-											return result;
-										}
-										calledRubi = true;
-									}
-									if (arg1AST.isTimes()) {
-										result = integratePolynomialByParts(ast, arg1AST, x);
-										if (result.isPresent()) {
-											return result;
-										}
-									}
-								}
-							}
+				}
 						}
-					}
-				}
-
-				// EvalEngine engine= EvalEngine.get();
-				// engine.setIterationLimit(8);
-				if (!calledRubi) {
-					return integrateByRubiRules(ast, F.NIL);
-				}
 			}
-			// } else {
-			// IExpr fx = engine.evaluate(F.Expand(ast.arg1()));
-			// if (fx.isPlus()) {
-			// // Integrate[a_+b_+...,x_] ->
-			// // Integrate[a,x]+Integrate[b,x]+...
-			// return ((IAST) fx).mapThread(F.Integrate(null, ast.arg2()), 1);
-			// }
-			// }
-			IExpr fx = engine.evaluate(F.Expand(ast.arg1()));
-			if (fx.isPlus()) {
-				// Integrate[a_+b_+...,x_] ->
-				// Integrate[a,x]+Integrate[b,x]+...
-				return ((IAST) fx).mapThread(F.Integrate(null, ast.arg2()), 1);
-			}
-
-			return returnIntegrate(ast, evaled);
-		} finally {
-			engine.setNumericMode(numericMode);
-		}
-	}
-
-	private IExpr returnIntegrate(final IAST ast, boolean evaled) {
-		if (evaled) {
-			return ast;
 		}
 		return F.NIL;
 	}
 
-	private IExpr integrate1ArgumentFunctions(final IExpr head, final IExpr x) {
-		if (head.equals(F.ArcCos)) {
-			// x*ArcCos(x) - Sqrt(1-x^2)
-			return F.Subtract(F.Times(x, F.ArcCos(x)), F.Sqrt(F.Subtract(F.C1, F.Sqr(x))));
-		}
-		if (head.equals(F.ArcCosh)) {
-			// x*ArcCosh(x) - Sqrt(x+1) * Sqrt(x-1)
-			return F.Subtract(F.Times(x, F.ArcCosh(x)), F.Times(F.Sqrt(F.Plus(x, F.C1)), F.Sqrt(F.Plus(x, F.CN1))));
-		}
-		if (head.equals(F.ArcCot)) {
-			// x*ArcCot(x) + (1/2 * Log(1+x^2))
-			return F.Plus(F.Times(x, F.ArcCot(x)), F.Times(F.C1D2, F.Log(F.Plus(F.C1, F.Sqr(x)))));
-		}
-		if (head.equals(F.ArcCoth)) {
-			// x*ArcCoth(x) - (1/2 * Log(1-x^2))
-			return F.Plus(F.Times(x, F.ArcCoth(x)), F.Times(F.C1D2, F.Log(F.Subtract(F.C1, F.Sqr(x)))));
-		}
-		if (head.equals(F.ArcCsc)) {
-			// x*ArcCsc(x) + (Sqrt(1 - x^(-2))*x*Log(x + Sqrt(-1 + x^2))) /
-			// Sqrt(-1 + x^2)
-			return Plus(Times(x, F.ArcCsc(x)), Times(F.Sqrt(Plus(C1, Negate(Power(x, F.CN2)))), x,
-					Log(Plus(x, F.Sqrt(Plus(CN1, Power(x, C2))))), Power(F.Sqrt(Plus(CN1, Power(x, C2))), CN1)));
-		}
-		if (head.equals(F.ArcCsch)) {
-			// x*(ArcCsch(x) + (Sqrt(1 + x^(-2))*ArcSinh(x))/Sqrt(1 + x^2))
-			return Times(x, Plus(F.ArcCsch(x),
-					Times(Sqrt(Plus(C1, Power(x, CN2))), F.ArcSinh(x), Power(Sqrt(Plus(C1, Power(x, C2))), CN1))));
-		}
-		if (head.equals(F.ArcSec)) {
-			// x*ArcSec(x) - (Sqrt(1 - x^(-2))*x*Log(x + Sqrt(-1 +
-			// x^2)))/Sqrt(-1 + x^2)
-			return Plus(Times(x, F.ArcSec(x)), Times(CN1, Sqrt(Plus(C1, Times(CN1, Power(x, CN2)))), x,
-					Log(Plus(x, Sqrt(Plus(CN1, Power(x, C2))))), Power(Sqrt(Plus(CN1, Power(x, C2))), CN1)));
-		}
-		if (head.equals(F.ArcSech)) {
-			// x*ArcSech(x) - (2*Sqrt((1 - x)/(1 + x))*Sqrt(1 -
-			// x^2)*ArcSin(Sqrt(1 + x)/Sqrt(2)))/(-1 + x)
-			return Plus(Times(x, F.ArcSech(x)),
-					Times(CN1, C2, Sqrt(Times(Plus(C1, Times(CN1, x)), Power(Plus(C1, x), CN1))),
-							Sqrt(Plus(C1, Times(CN1, Power(x, C2)))),
-							F.ArcSin(Times(Sqrt(Plus(C1, x)), Power(Sqrt(C2), CN1))), Power(Plus(CN1, x), CN1)));
-		}
-		if (head.equals(F.ArcSin)) {
-			// x*ArcSin(x) + Sqrt(1-x^2)
-			return F.Plus(F.Times(x, F.ArcSin(x)), F.Sqrt(F.Subtract(F.C1, F.Sqr(x))));
-		}
-		if (head.equals(F.ArcSinh)) {
-			// x*ArcSinh(x) - Sqrt(1+x^2)
-			return F.Subtract(F.Times(x, F.ArcSinh(x)), F.Sqrt(F.Plus(F.C1, F.Sqr(x))));
-		}
-		if (head.equals(F.ArcTan)) {
-			// x*ArcTan(x) - (1/2 * Log(1+x^2))
-			return F.Subtract(F.Times(x, F.ArcTan(x)), F.Times(F.C1D2, F.Log(F.Plus(F.C1, F.Sqr(x)))));
-		}
-		if (head.equals(F.ArcTanh)) {
-			// x*ArcTanh(x) + (1/2 * Log(1-x^2))
-			return F.Plus(F.Times(x, F.ArcTanh(x)), F.Times(F.C1D2, F.Log(F.Subtract(F.C1, F.Sqr(x)))));
-		}
-		if (head.equals(F.Cos)) {
-			// Sin(x)
-			return F.Sin(x);
-		}
-		if (head.equals(F.Cosh)) {
-			// Sinh(x)
-			return F.Sinh(x);
-		}
-		if (head.equals(F.Cot)) {
-			// Log(Sin(x))
-			return F.Log(F.Sin(x));
-		}
-		if (head.equals(F.Coth)) {
-			// Log(Sinh(x))
-			return F.Log(F.Sinh(x));
-		}
-		if (head.equals(F.Csc)) {
-			// Log(Sin(x/2))-Log(Cos(x/2))
-			return F.Subtract(F.Log(F.Sin(F.Times(F.C1D2, x))), F.Log(F.Cos(F.Times(F.C1D2, x))));
-		}
-		if (head.equals(F.Csch)) {
-			// -Log(Cosh(x/2)) + Log(Sinh[x/2))
-			return Plus(Times(CN1, Log(F.Cosh(Times(C1D2, x)))), Log(F.Sinh(Times(C1D2, x))));
-		}
-		if (head.equals(F.Log)) {
-			// x*Log(x)-x
-			return F.Subtract(F.Times(x, F.Log(x)), x);
-		}
-		if (head.equals(F.Sec)) {
-			// Log( Sin(x/2)+Cos(x/2) ) - Log( Cos(x/2)-Sin(x/2) )
-			return F.Subtract(F.Log(F.Plus(F.Sin(F.Times(F.C1D2, x)), F.Cos(F.Times(F.C1D2, x)))),
-					F.Log(F.Subtract(F.Cos(F.Times(F.C1D2, x)), F.Sin(F.Times(F.C1D2, x)))));
-		}
-		if (head.equals(F.Sech)) {
-			// 2*ArcTan(Tanh(x/2))
-			return Times(C2, ArcTan(F.Tanh(Times(C1D2, x))));
-		}
-		if (head.equals(F.Sin)) {
-			// -Cos(x)
-			return F.Times(F.CN1, F.Cos(x));
-		}
-		if (head.equals(F.Sinh)) {
-			// Cosh(x)
-			return F.Cosh(x);
-		}
-		if (head.equals(F.Tan)) {
-			// -Log(Cos(x))
-			return F.Times(F.CN1, F.Log(F.Cos(x)));
-		}
-		if (head.equals(F.Tanh)) {
-			// Log(Cosh(x))
-			return F.Log(F.Cosh(x));
-		}
-		return F.NIL;
-	}
+//	private IExpr integrate1ArgumentFunctions(final IExpr head, final IExpr x) {
+//		if (head.equals(F.ArcCos)) {
+//			// x*ArcCos(x) - Sqrt(1-x^2)
+//			return F.Subtract(F.Times(x, F.ArcCos(x)), F.Sqrt(F.Subtract(F.C1, F.Sqr(x))));
+//		}
+//		if (head.equals(F.ArcCosh)) {
+//			// x*ArcCosh(x) - Sqrt(x+1) * Sqrt(x-1)
+//			return F.Subtract(F.Times(x, F.ArcCosh(x)), F.Times(F.Sqrt(F.Plus(x, F.C1)), F.Sqrt(F.Plus(x, F.CN1))));
+//		}
+//		if (head.equals(F.ArcCot)) {
+//			// x*ArcCot(x) + (1/2 * Log(1+x^2))
+//			return F.Plus(F.Times(x, F.ArcCot(x)), F.Times(F.C1D2, F.Log(F.Plus(F.C1, F.Sqr(x)))));
+//		}
+//		if (head.equals(F.ArcCoth)) {
+//			// x*ArcCoth(x) - (1/2 * Log(1-x^2))
+//			return F.Plus(F.Times(x, F.ArcCoth(x)), F.Times(F.C1D2, F.Log(F.Subtract(F.C1, F.Sqr(x)))));
+//		}
+//		if (head.equals(F.ArcCsc)) {
+//			// x*ArcCsc(x) + (Sqrt(1 - x^(-2))*x*Log(x + Sqrt(-1 + x^2))) /
+//			// Sqrt(-1 + x^2)
+//			return Plus(Times(x, F.ArcCsc(x)), Times(F.Sqrt(Plus(C1, Negate(Power(x, F.CN2)))), x,
+//					Log(Plus(x, F.Sqrt(Plus(CN1, Power(x, C2))))), Power(F.Sqrt(Plus(CN1, Power(x, C2))), CN1)));
+//		}
+//		if (head.equals(F.ArcCsch)) {
+//			// x*(ArcCsch(x) + (Sqrt(1 + x^(-2))*ArcSinh(x))/Sqrt(1 + x^2))
+//			return Times(x, Plus(F.ArcCsch(x),
+//					Times(Sqrt(Plus(C1, Power(x, CN2))), F.ArcSinh(x), Power(Sqrt(Plus(C1, Power(x, C2))), CN1))));
+//		}
+//		if (head.equals(F.ArcSec)) {
+//			// x*ArcSec(x) - (Sqrt(1 - x^(-2))*x*Log(x + Sqrt(-1 +
+//			// x^2)))/Sqrt(-1 + x^2)
+//			return Plus(Times(x, F.ArcSec(x)), Times(CN1, Sqrt(Plus(C1, Times(CN1, Power(x, CN2)))), x,
+//					Log(Plus(x, Sqrt(Plus(CN1, Power(x, C2))))), Power(Sqrt(Plus(CN1, Power(x, C2))), CN1)));
+//		}
+//		if (head.equals(F.ArcSech)) {
+//			// x*ArcSech(x) - (2*Sqrt((1 - x)/(1 + x))*Sqrt(1 -
+//			// x^2)*ArcSin(Sqrt(1 + x)/Sqrt(2)))/(-1 + x)
+//			return Plus(Times(x, F.ArcSech(x)),
+//					Times(CN1, C2, Sqrt(Times(Plus(C1, Times(CN1, x)), Power(Plus(C1, x), CN1))),
+//							Sqrt(Plus(C1, Times(CN1, Power(x, C2)))),
+//							F.ArcSin(Times(Sqrt(Plus(C1, x)), Power(Sqrt(C2), CN1))), Power(Plus(CN1, x), CN1)));
+//		}
+//		if (head.equals(F.ArcSin)) {
+//			// x*ArcSin(x) + Sqrt(1-x^2)
+//			return F.Plus(F.Times(x, F.ArcSin(x)), F.Sqrt(F.Subtract(F.C1, F.Sqr(x))));
+//		}
+//		if (head.equals(F.ArcSinh)) {
+//			// x*ArcSinh(x) - Sqrt(1+x^2)
+//			return F.Subtract(F.Times(x, F.ArcSinh(x)), F.Sqrt(F.Plus(F.C1, F.Sqr(x))));
+//		}
+//		if (head.equals(F.ArcTan)) {
+//			// x*ArcTan(x) - (1/2 * Log(1+x^2))
+//			return F.Subtract(F.Times(x, F.ArcTan(x)), F.Times(F.C1D2, F.Log(F.Plus(F.C1, F.Sqr(x)))));
+//		}
+//		if (head.equals(F.ArcTanh)) {
+//			// x*ArcTanh(x) + (1/2 * Log(1-x^2))
+//			return F.Plus(F.Times(x, F.ArcTanh(x)), F.Times(F.C1D2, F.Log(F.Subtract(F.C1, F.Sqr(x)))));
+//		}
+//		if (head.equals(F.Cos)) {
+//			// Sin(x)
+//			return F.Sin(x);
+//		}
+//		if (head.equals(F.Cosh)) {
+//			// Sinh(x)
+//			return F.Sinh(x);
+//		}
+//		if (head.equals(F.Cot)) {
+//			// Log(Sin(x))
+//			return F.Log(F.Sin(x));
+//		}
+//		if (head.equals(F.Coth)) {
+//			// Log(Sinh(x))
+//			return F.Log(F.Sinh(x));
+//		}
+//		if (head.equals(F.Csc)) {
+//			// Log(Sin(x/2))-Log(Cos(x/2))
+//			return F.Subtract(F.Log(F.Sin(F.Times(F.C1D2, x))), F.Log(F.Cos(F.Times(F.C1D2, x))));
+//		}
+//		if (head.equals(F.Csch)) {
+//			// -Log(Cosh(x/2)) + Log(Sinh[x/2))
+//			return Plus(Times(CN1, Log(F.Cosh(Times(C1D2, x)))), Log(F.Sinh(Times(C1D2, x))));
+//		}
+//		if (head.equals(F.Log)) {
+//			// x*Log(x)-x
+//			return F.Subtract(F.Times(x, F.Log(x)), x);
+//		}
+//		if (head.equals(F.Sec)) {
+//			// Log( Sin(x/2)+Cos(x/2) ) - Log( Cos(x/2)-Sin(x/2) )
+//			return F.Subtract(F.Log(F.Plus(F.Sin(F.Times(F.C1D2, x)), F.Cos(F.Times(F.C1D2, x)))),
+//					F.Log(F.Subtract(F.Cos(F.Times(F.C1D2, x)), F.Sin(F.Times(F.C1D2, x)))));
+//		}
+//		if (head.equals(F.Sech)) {
+//			// 2*ArcTan(Tanh(x/2))
+//			return Times(C2, ArcTan(F.Tanh(Times(C1D2, x))));
+//		}
+//		if (head.equals(F.Sin)) {
+//			// -Cos(x)
+//			return F.Times(F.CN1, F.Cos(x));
+//		}
+//		if (head.equals(F.Sinh)) {
+//			// Cosh(x)
+//			return F.Cosh(x);
+//		}
+//		if (head.equals(F.Tan)) {
+//			// -Log(Cos(x))
+//			return F.Times(F.CN1, F.Log(F.Cos(x)));
+//		}
+//		if (head.equals(F.Tanh)) {
+//			// Log(Cosh(x))
+//			return F.Log(F.Cosh(x));
+//		}
+//		return F.NIL;
+//	}
 
 	/**
-	 * Try using the <code>TrigReduce</code> function to get a <code>Plus(...)</code> expression which could be
-	 * integrated.
+	 * Try using the <code>TrigReduce</code> function to get a <code>Plus(...)</code> expression which could be integrated.
 	 * 
-	 * @param timesAST
-	 *            an IAST which is a <code>Times(...)</code> expression
-	 * @param arg2
-	 *            the symbol to get the indefinite integral for.
+	 * @param timesAST an IAST which is a <code>Times(...)</code> expression
+	 * @param arg2     the symbol to get the indefinite integral for.
 	 * @return <code>F.NIL</code> if no trigonometric funtion could be found.
 	 */
-	private IExpr integrateTimesTrigFunctions(final IAST timesAST, IExpr arg2) {
+	private static IExpr integrateTimesTrigFunctions(final IAST timesAST, IExpr arg2) {
 		Predicate<IExpr> isTrigFunction = Predicates.isAST(new ISymbol[] { F.Cos, F.Sin });
 		if (timesAST.isMember(isTrigFunction, false)) {
 			// use a symbol which is not in the symbols map
@@ -618,8 +489,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 	}
 
 	/**
-	 * Returns an AST with head <code>Plus</code>, which contains the partial fraction decomposition of the numerator
-	 * and denominator parts.
+	 * Returns an AST with head <code>Plus</code>, which contains the partial fraction decomposition of the numerator and denominator
+	 * parts.
 	 * 
 	 * @param parts
 	 * @param variableList
@@ -629,8 +500,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 	// {
 	// try {
 	// IAST variableList = F.List(x);
-	// IExpr exprNumerator = F.evalExpandAll(parts[0], true, false);
-	// IExpr exprDenominator = F.evalExpandAll(parts[1], true, false);
+	// IExpr exprNumerator = F.expandAll(parts[0], true, false);
+	// IExpr exprDenominator = F.expandAll(parts[1], true, false);
 	// ASTRange r = new ASTRange(variableList, 1);
 	// List<IExpr> varList = r.toList();
 	//
@@ -843,8 +714,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 	/**
 	 * See <a href="http://en.wikipedia.org/wiki/Integration_by_parts">Wikipedia- Integration by parts</a>
 	 * 
-	 * @param ast
-	 *            TODO - not used
+	 * @param ast    TODO - not used
 	 * @param arg1
 	 * @param symbol
 	 * 
@@ -865,45 +735,79 @@ public class Integrate extends AbstractFunctionEvaluator {
 	}
 
 	/**
-	 * Use the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - Symbolic Integration Rules</a> to integrate the
-	 * expression.
+	 * Use the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - Symbolic Integration Rules</a> to integrate the expression.
 	 * 
 	 * @param ast
-	 * @param secondTry
-	 *            do a second attempt with an equivalent expression
 	 * @return
 	 */
-	private static IExpr integrateByRubiRules(IAST ast, IAST secondTry) {
-		ISymbol head = ast.arg1().topHead();
+	private static IExpr integrateByRubiRules(IAST arg1, IExpr x, IAST ast) {
 		EvalEngine engine = EvalEngine.get();
 		int limit = engine.getRecursionLimit();
+		boolean quietMode = engine.isQuietMode();
+		ISymbol head = arg1.topHead();
+
+		if ((head.getAttributes() & ISymbol.NUMERICFUNCTION) == ISymbol.NUMERICFUNCTION
+				|| INT_RUBI_FUNCTIONS.contains(head) || head.getSymbolName().startsWith("§")) {
+
+		boolean newCache = false;
 		try {
-			// Issue #91
-			if ((head.getAttributes() & ISymbol.NUMERICFUNCTION) == ISymbol.NUMERICFUNCTION
-					|| INT_RUBI_FUNCTIONS.contains(head) || head.getSymbolName().startsWith("§")
-					|| head.getSymbolName().startsWith(UtilityFunctionCtors.INTEGRATE_PREFIX)) {
+
+				if (engine.REMEMBER_AST_CACHE != null) {
+					IExpr result = engine.REMEMBER_AST_CACHE.getIfPresent(ast);
+				if (result != null) {// &&engine.getRecursionCounter()>0) {
+						if (result.isPresent()) {
+							return result;
+						}
+					IExpr temp = callRestIntegrate(arg1, x, ast);
+					if (temp.isPresent()) {
+						return temp;
+					}
+//					RecursionLimitExceeded.throwIt(engine.getRecursionCounter(), ast);
+						return F.NIL;
+					}
+				} else {
+					newCache = true;
+					engine.REMEMBER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(50).build();
+				}
 				try {
+				engine.setQuietMode(true);
 					if (limit <= 0 || limit > Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT) {
 						engine.setRecursionLimit(Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT);
 					}
+
 					// System.out.println(ast.toString());
-				IExpr temp = F.Integrate.evalDownRule(EvalEngine.get(), ast);
-				if (temp.isPresent()) {
-					return temp;
-				}
-				} catch (RecursionLimitExceeded rle) {
-					engine.setRecursionLimit(limit);
-					if (secondTry.isPresent()) {
-						return integrateByRubiRules(secondTry, F.NIL);
+				engine.REMEMBER_AST_CACHE.put(ast, F.NIL);
+					IExpr temp = F.Integrate.evalDownRule(EvalEngine.get(), ast);
+					if (temp.isPresent()) {
+					engine.REMEMBER_AST_CACHE.put(ast, temp);
+						return temp;
 					}
-				} finally {
+				} catch (RecursionLimitExceeded rle) {
+					// engine.printMessage("Integrate(Rubi recursion): " + Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT
+					// + " exceeded: " + ast.toString());
+					engine.printMessage("Integrate(Rubi recursion): " + rle.getMessage());
 					engine.setRecursionLimit(limit);
+				} catch (RuntimeException rex) {
+					if (Config.SHOW_STACKTRACE) {
+						rex.printStackTrace();
+					}
+					engine.printMessage("Integrate Rubi recursion limit " + Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT
+							+ " RuntimeException: " + ast.toString());
+					engine.setRecursionLimit(limit);
+
 				}
-			}
+
 		} catch (AbortException ae) {
 			if (Config.DEBUG) {
 				ae.printStackTrace();
 			}
+				} finally {
+					engine.setRecursionLimit(limit);
+					if (newCache) {
+						engine.REMEMBER_AST_CACHE = null;
+					}
+			engine.setQuietMode(quietMode);
+				}
 		}
 		return F.NIL;
 	}
@@ -915,10 +819,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Integration_by_parts">Wikipedia- Integration by parts</a>
 	 * 
-	 * @param f
-	 *            <code>f(x)</code>
-	 * @param g
-	 *            <code>g(x)</code>
+	 * @param f <code>f(x)</code>
+	 * @param g <code>g(x)</code>
 	 * @param x
 	 * @return <code>f(x) * g(x) - Integrate(f(x) * g'(x),x )</code>
 	 */
@@ -950,15 +852,13 @@ public class Integrate extends AbstractFunctionEvaluator {
 	/**
 	 * Collect all found polynomial terms into <code>polyTimes</code> and the rest into <code>restTimes</code>.
 	 * 
-	 * @param timesAST
-	 *            an AST representing a <code>Times[...]</code> expression.
+	 * @param timesAST  an AST representing a <code>Times[...]</code> expression.
 	 * @param symbol
-	 * @param polyTimes
-	 *            the polynomial terms part
-	 * @param restTimes
-	 *            the non-polynomil terms part
+	 * @param polyTimes the polynomial terms part
+	 * @param restTimes the non-polynomil terms part
 	 */
-	private static void collectPolynomialTerms(final IAST timesAST, IExpr symbol, IASTAppendable polyTimes, IASTAppendable restTimes) {
+	private static void collectPolynomialTerms(final IAST timesAST, IExpr symbol, IASTAppendable polyTimes,
+			IASTAppendable restTimes) {
 		IExpr temp;
 		for (int i = 1; i < timesAST.size(); i++) {
 			temp = timesAST.get(i);
@@ -977,36 +877,11 @@ public class Integrate extends AbstractFunctionEvaluator {
 	}
 
 	/**
-	 * Collect all found free terms (independent of x) into <code>freeTimes</code> and the rest into
-	 * <code>restTimes</code>.
-	 * 
-	 * @param timesAST
-	 *            an AST representing a <code>Times[...]</code> expression.
-	 * @param x
-	 * @param freeTimes
-	 *            the polynomial terms part
-	 * @param restTimes
-	 *            the non-polynomil terms part
-	 */
-	private static void collectFreeTerms(final IAST timesAST, ISymbol x, IASTAppendable freeTimes, IASTAppendable restTimes) {
-		IExpr temp;
-		for (int i = 1; i < timesAST.size(); i++) {
-			temp = timesAST.get(i);
-			if (temp.isFree(x, true)) {
-				freeTimes.append(temp);
-				continue;
-			}
-			restTimes.append(temp);
-		}
-	}
-
-	@Override
-	/**
-	 * Get the rules defined for Integrate function. These rules are loaded, if the Integrate function is used the first
-	 * time.
+	 * Get the rules defined for Integrate function. These rules are loaded, if the Integrate function is used the first time.
 	 * 
 	 * @see AbstractFunctionEvaluator#setUp(ISymbol)()
 	 */
+	@Override
 	public IAST getRuleAST() {
 		// long start = System.currentTimeMillis();
 
@@ -1022,203 +897,192 @@ public class Integrate extends AbstractFunctionEvaluator {
 		return null;
 	}
 
-	public static IAST getRuleASTStatic() {
-		F.Integrate.createRulesData(new int[] { 0, 100 });
-		IASTAppendable ast = F.ast(F.List, 10000, false);
-		getRuleASTRubi45(ast);
+	public static synchronized void getRuleASTStatic() {
+		if (!INTEGRATE_RULES_READ) {
+			INTEGRATE_RULES_READ = true;
+		INTEGRATE_RULES_DATA = F.Integrate.createRulesData(new int[] { 0, 7000 });
+		getRuleASTRubi45();
 
-		// INT_FUNCTIONS.add(F.Times);
-		// INT_FUNCTIONS.add(F.Power);
-		INT_FUNCTIONS.add(F.Cos);
-		INT_FUNCTIONS.add(F.Cot);
-		INT_FUNCTIONS.add(F.Csc);
-		INT_FUNCTIONS.add(F.Sec);
-		INT_FUNCTIONS.add(F.Sin);
-		INT_FUNCTIONS.add(F.Tan);
+//			RulesData rd = F.Integrate.getRulesData();
+//			Set<IPatternMatcher> set = rd.getPatternDownRules();
+//			IPatternMatcher last = null;
+//			for (IPatternMatcher matcher : set) {
+//				System.out.print(matcher.getLHSPriority());
+//				System.out.println(" - " +matcher.determinePatterns());
+//			}
 
-		INT_FUNCTIONS.add(F.ArcCos);
-		INT_FUNCTIONS.add(F.ArcCot);
-		INT_FUNCTIONS.add(F.ArcCsc);
-		INT_FUNCTIONS.add(F.ArcSec);
-		INT_FUNCTIONS.add(F.ArcSin);
-		INT_FUNCTIONS.add(F.ArcTan);
+//			INT_FUNCTIONS.add(F.Cos);
+//			INT_FUNCTIONS.add(F.Cot);
+//			INT_FUNCTIONS.add(F.Csc);
+//			INT_FUNCTIONS.add(F.Sec);
+//			INT_FUNCTIONS.add(F.Sin);
+//			INT_FUNCTIONS.add(F.Tan);
+//
+//			INT_FUNCTIONS.add(F.ArcCos);
+//			INT_FUNCTIONS.add(F.ArcCot);
+//			INT_FUNCTIONS.add(F.ArcCsc);
+//			INT_FUNCTIONS.add(F.ArcSec);
+//			INT_FUNCTIONS.add(F.ArcSin);
+//			INT_FUNCTIONS.add(F.ArcTan);
+//
+//			INT_FUNCTIONS.add(F.Cosh);
+//			INT_FUNCTIONS.add(F.Coth);
+//			INT_FUNCTIONS.add(F.Csch);
+//			INT_FUNCTIONS.add(F.Sech);
+//			INT_FUNCTIONS.add(F.Sinh);
+//			INT_FUNCTIONS.add(F.Tanh);
+//
+//			INT_FUNCTIONS.add(F.ArcCosh);
+//			INT_FUNCTIONS.add(F.ArcCoth);
+//			INT_FUNCTIONS.add(F.ArcCsc);
+//			INT_FUNCTIONS.add(F.ArcSec);
+//			INT_FUNCTIONS.add(F.ArcSinh);
+//			INT_FUNCTIONS.add(F.ArcTanh);
 
-		INT_FUNCTIONS.add(F.Cosh);
-		INT_FUNCTIONS.add(F.Coth);
-		INT_FUNCTIONS.add(F.Csch);
-		INT_FUNCTIONS.add(F.Sech);
-		INT_FUNCTIONS.add(F.Sinh);
-		INT_FUNCTIONS.add(F.Tanh);
-
-		INT_FUNCTIONS.add(F.ArcCosh);
-		INT_FUNCTIONS.add(F.ArcCoth);
-		INT_FUNCTIONS.add(F.ArcCsc);
-		INT_FUNCTIONS.add(F.ArcSec);
-		INT_FUNCTIONS.add(F.ArcSinh);
-		INT_FUNCTIONS.add(F.ArcTanh);
-
-		ISymbol[] rubiSymbols = { F.AppellF1, F.ArcCos, F.ArcCot, F.ArcCsc, F.ArcSec, F.ArcSin, F.ArcTan, F.ArcCosh,
-				F.ArcCoth, F.ArcCsch, F.ArcSech, F.ArcSinh, F.ArcTanh, F.Cos, F.Cosh, F.CosIntegral, F.CoshIntegral,
-				F.Cot, F.Coth, F.Csc, F.Csch, F.EllipticE, F.EllipticF, F.EllipticPi, F.Erf, F.Erfc, F.Erfi, F.Exp,
-				F.ExpIntegralE, F.ExpIntegralEi, F.FresnelC, F.FresnelS, F.Gamma, F.HypergeometricPFQ,
-				F.Hypergeometric2F1, F.HurwitzZeta, F.InverseErf, F.Log, F.LogGamma, F.LogIntegral, F.Piecewise, F.Plus,
-				F.PolyGamma, F.PolyLog, F.Power, F.ProductLog, F.Sec, F.Sech, F.Sin, F.Sinc, F.Sinh, F.SinIntegral,
-				F.SinhIntegral, F.Sqrt, F.Tan, F.Tanh, F.Times, F.Zeta };
-		for (int i = 0; i < rubiSymbols.length; i++) {
-			INT_RUBI_FUNCTIONS.add(rubiSymbols[i]);
-		}
-		return ast;
+			ISymbol[] rubiSymbols = { F.Derivative, F.D };
+			for (int i = 0; i < rubiSymbols.length; i++) {
+				INT_RUBI_FUNCTIONS.add(rubiSymbols[i]);
+			}
+	}
 	}
 
-	private static void getRuleASTRubi45(IASTAppendable ast) {
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules0.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules1.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules2.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules3.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules4.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules5.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules6.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules7.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules8.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules9.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules10.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules11.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules12.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules13.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules14.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules15.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules16.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules17.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules18.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules19.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules20.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules21.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules22.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules23.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules24.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules25.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules26.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules27.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules28.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules29.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules30.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules31.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules32.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules33.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules34.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules35.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules36.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules37.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules38.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules39.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules40.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules41.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules42.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules43.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules44.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules45.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules46.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules47.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules48.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules49.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules50.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules51.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules52.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules53.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules54.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules55.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules56.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules57.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules58.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules59.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules60.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules61.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules62.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules63.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules64.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules65.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules66.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules67.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules68.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules69.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules70.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules71.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules72.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules73.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules74.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules75.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules76.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules77.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules78.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules79.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules80.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules81.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules82.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules83.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules84.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules85.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules86.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules87.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules88.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules89.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules90.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules91.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules92.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules93.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules94.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules95.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules96.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules97.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules98.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules99.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules100.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules101.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules102.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules103.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules104.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules105.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules106.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules107.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules108.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules109.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules110.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules111.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules112.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules113.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules114.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules115.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules116.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules117.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules118.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules119.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules120.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules121.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules122.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules123.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules124.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules125.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules126.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules127.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules128.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules129.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules130.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules131.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules132.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules133.RULES);
-		ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules134.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules135.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules136.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules137.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules138.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules139.RULES);
-
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules140.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules141.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules142.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules143.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules144.RULES);
-		// ast.appendArgs(org.matheclipse.core.integrate.rubi45.IntRules145.RULES);
-		// org.matheclipse.integrate.rubi45.UtilityFunctions.init();
+	private static void getRuleASTRubi45() {
+		IAST init;
+		init = org.matheclipse.core.integrate.rubi.IntRules0.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules1.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules2.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules3.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules4.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules5.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules6.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules7.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules8.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules9.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules10.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules11.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules12.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules13.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules14.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules15.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules16.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules17.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules18.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules19.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules20.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules21.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules22.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules23.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules24.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules25.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules26.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules27.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules28.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules29.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules30.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules31.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules32.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules33.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules34.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules35.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules36.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules37.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules38.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules39.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules40.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules41.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules42.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules43.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules44.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules45.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules46.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules47.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules48.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules49.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules50.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules51.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules52.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules53.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules54.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules55.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules56.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules57.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules58.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules59.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules60.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules61.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules62.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules63.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules64.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules65.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules66.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules67.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules68.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules69.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules70.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules71.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules72.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules73.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules74.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules75.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules76.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules77.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules78.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules79.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules80.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules81.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules82.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules83.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules84.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules85.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules86.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules87.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules88.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules89.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules90.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules91.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules92.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules93.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules94.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules95.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules96.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules97.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules98.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules99.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules100.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules101.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules102.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules103.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules104.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules105.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules106.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules107.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules108.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules109.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules110.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules111.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules112.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules113.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules114.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules115.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules116.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules117.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules118.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules119.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules120.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules121.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules122.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules123.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules124.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules125.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules126.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules127.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules128.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules129.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules130.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules131.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules132.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules133.RULES;
+		init = org.matheclipse.core.integrate.rubi.IntRules134.RULES;
 	}
 
 	/**
@@ -1226,23 +1090,23 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * 
 	 * @see AbstractFunctionEvaluator#setUp(ISymbol)()
 	 */
-	public static IAST getUtilityFunctionsRuleAST() {
-		return getUtilityFunctionsRuleASTRubi45();
+	public static void getUtilityFunctionsRuleAST() {
+		getUtilityFunctionsRuleASTRubi45();
 	}
 
-	private static IAST getUtilityFunctionsRuleASTRubi45() {
-		IAST ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions.RULES;
-		ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions0.RULES;
-		ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions1.RULES;
-		ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions2.RULES;
-		ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions3.RULES;
-		ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions4.RULES;
-		ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions5.RULES;
-		ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions6.RULES;
-		ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions7.RULES;
-		ast = org.matheclipse.core.integrate.rubi45.UtilityFunctions8.RULES;
-		org.matheclipse.core.integrate.rubi45.UtilityFunctions.init();
-		return ast;
+	private static void getUtilityFunctionsRuleASTRubi45() {
+		IAST ast = org.matheclipse.core.integrate.rubi.UtilityFunctions0.RULES;
+		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions1.RULES;
+		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions2.RULES;
+		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions3.RULES;
+		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions4.RULES;
+		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions5.RULES;
+		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions6.RULES;
+
+		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions7.RULES;
+		ast = org.matheclipse.core.integrate.rubi.UtilityFunctions8.RULES;
+
+		// org.matheclipse.core.integrate.rubi.UtilityFunctions.init();
 	}
 
 	@Override
@@ -1253,28 +1117,31 @@ public class Integrate extends AbstractFunctionEvaluator {
 		// if (Config.LOAD_SERIALIZED_RULES) {
 		// initSerializedRules(symbol);
 		// }
+
 		// hack for TimeConstrained time limit:
+
 		// F.ISet(F.$s("§timelimit"), F.integer(12));
-		F.ISet($s("§$timelimit"), F.integer(12));
+		F.ISet(F.$s("§simplifyflag"), F.False);
 
+		F.ISet(F.$s("§$timelimit"), F.ZZ(Config.INTEGRATE_RUBI_TIMELIMIT));
+		F.ISet(F.$s("§$showsteps"), F.False);
 		UtilityFunctionCtors.ReapList.setAttributes(ISymbol.HOLDFIRST);
-		F.ISet($s("§$trigfunctions"), F.List(F.Sin, F.Cos, F.Tan, F.Cot, F.Sec, F.Csc));
-		F.ISet($s("§$hyperbolicfunctions"), F.List(F.Sinh, F.Cosh, F.Tanh, F.Coth, F.Sech, F.Csch));
-		F.ISet($s("§$inverseTrigfunctions"), F.List(F.ArcSin, F.ArcCos, F.ArcTan, F.ArcCot, F.ArcSec, F.ArcCsc));
-		F.ISet($s("§$inversehyperbolicfunctions"),
+		F.ISet(F.$s("§$trigfunctions"), F.List(F.Sin, F.Cos, F.Tan, F.Cot, F.Sec, F.Csc));
+		F.ISet(F.$s("§$hyperbolicfunctions"), F.List(F.Sinh, F.Cosh, F.Tanh, F.Coth, F.Sech, F.Csch));
+		F.ISet(F.$s("§$inversetrigfunctions"), F.List(F.ArcSin, F.ArcCos, F.ArcTan, F.ArcCot, F.ArcSec, F.ArcCsc));
+		F.ISet(F.$s("§$inversehyperbolicfunctions"),
 				F.List(F.ArcSinh, F.ArcCosh, F.ArcTanh, F.ArcCoth, F.ArcSech, F.ArcCsch));
-		F.ISet($s("§$calculusfunctions"),
+		F.ISet(F.$s("§$calculusfunctions"),
 				F.List(F.D, Integrate, F.Sum, F.Product, F.Integrate,
-						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Unintegrable"),
-						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "CannotIntegrate"),
-						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Dif"),
-						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Subst")));
-		F.ISet($s("§$stopfunctions"),
+						F.$rubi(UtilityFunctionCtors.INTEGRATE_PREFIX + "Unintegrable"),
+						F.$rubi(UtilityFunctionCtors.INTEGRATE_PREFIX + "CannotIntegrate"),
+						F.$rubi(UtilityFunctionCtors.INTEGRATE_PREFIX + "Dif"),
+						F.$rubi(UtilityFunctionCtors.INTEGRATE_PREFIX + "Subst")));
+		F.ISet(F.$s("§$stopfunctions"),
 				F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern, F.If, F.Integrate,
-						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "Unintegrable"),
-						$s(UtilityFunctionCtors.INTEGRATE_PREFIX + "CannotIntegrate")));
-		F.ISet($s("§$heldfunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern));
-
+						F.$rubi(UtilityFunctionCtors.INTEGRATE_PREFIX + "Unintegrable"),
+						F.$rubi(UtilityFunctionCtors.INTEGRATE_PREFIX + "CannotIntegrate")));
+		F.ISet(F.$s("§$heldfunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern));
 
 		F.ISet(UtilityFunctionCtors.IntegerPowerQ, //
 				F.Function(F.And(F.SameQ(F.Head(F.Slot1), F.Power), F.IntegerQ(F.Part(F.Slot1, F.C2)))));
@@ -1289,11 +1156,11 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * 
 	 * @param symbol
 	 */
-	public static void initSerializedRules(final ISymbol symbol) {
-		if (!INITIALIZED) {
-			INITIALIZED = true;
-			AbstractFunctionEvaluator.initSerializedRules(symbol);
-		}
-	}
+	// privaze static void initSerializedRules(final ISymbol symbol) {
+	// if (!INITIALIZED) {
+	// INITIALIZED = true;
+	// AbstractFunctionEvaluator.initSerializedRules(symbol);
+	// }
+	// }
 
 }

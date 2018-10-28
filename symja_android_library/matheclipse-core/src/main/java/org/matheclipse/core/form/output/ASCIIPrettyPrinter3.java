@@ -1,7 +1,5 @@
 package org.matheclipse.core.form.output;
 
-import java.io.PrintStream;
-
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -10,6 +8,8 @@ import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
+
+import java.io.PrintStream;
 
 /**
  * ASCII pretty printer which tries to create a pretty printer ASCII form on 3 lines.
@@ -47,11 +47,11 @@ public class ASCIIPrettyPrinter3 {
 		int len = numerator.length();
 		if (denominator == null) {
 			for (int i = 0; i < len; i++) {
-				line1.append(" ");
+				line1.append(' ');
 			}
 			line2.append(numerator);
 			for (int i = 0; i < len; i++) {
-				line3.append(" ");
+				line3.append(' ');
 			}
 			fractionPrinted = false;
 			return;
@@ -185,7 +185,7 @@ public class ASCIIPrettyPrinter3 {
 				}
 			}
 
-			IExpr timesExpr = times.removeAtClone(1).getOneIdentity(F.C0);
+			IExpr timesExpr = times.rest().getOneIdentity(F.C0);
 			if (timesExpr.isTimes()) {
 				times = (IAST) timesExpr;
 			} else {

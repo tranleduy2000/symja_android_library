@@ -2075,7 +2075,7 @@ public final class BooleanFunctions {
 		private IExpr maximum(IAST list, boolean flattenedList) {
 			boolean evaled = false;
 			// int j = 1;
-			IASTAppendable f = Lambda.remove(list, new Predicate<IExpr>() {
+			IASTAppendable f = list.remove(new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
 					return x.isNegativeInfinity();
@@ -2216,7 +2216,7 @@ public final class BooleanFunctions {
 
 		private IExpr minimum(IAST list, final boolean flattenedList) {
 			boolean evaled = false;
-			IASTAppendable f = Lambda.remove(list, new Predicate<IExpr>() {
+			IASTAppendable f = list.remove(new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
 					return x.isInfinity();

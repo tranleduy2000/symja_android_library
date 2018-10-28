@@ -71,6 +71,9 @@ import edu.jas.root.ComplexRootsAbstract;
 import edu.jas.root.ComplexRootsSturm;
 import edu.jas.root.InvalidBoundaryException;
 import edu.jas.root.Rectangle;
+import edu.jas.ufd.GCDFactory;
+import edu.jas.ufd.GreatestCommonDivisor;
+import edu.jas.ufd.GreatestCommonDivisorAbstract;
 import edu.jas.ufd.Squarefree;
 import edu.jas.ufd.SquarefreeFactory;
 
@@ -145,6 +148,10 @@ public class PolynomialFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
+			IExpr cached = F.REMEMBER_AST_CACHE.getIfPresent(ast);
+			if (cached != null) {
+				return cached;
+			}
 
 			IExpr arg2 = ast.arg2();
 			// list of variable expressions extracted from the second argument
@@ -201,7 +208,9 @@ public class PolynomialFunctions {
 				ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, listOfVariables,
 						listOfVariables.argSize());
 				ExprPolynomial poly = ring.create(expr, true, false);
-				return poly.coefficient(expArr);
+				IExpr temp= poly.coefficient(expArr);
+				F.REMEMBER_AST_CACHE.put(ast, temp);
+				return temp;
 			} catch (RuntimeException ae) {
 				if (Config.SHOW_STACKTRACE) {
 					ae.printStackTrace();
@@ -886,17 +895,14 @@ public class PolynomialFunctions {
 
 				long n = poly.degree();
 				if (n >= 2L && n <= 5L) {
-					final IAST result = poly.coefficientList();
+					IAST result = poly.coefficientList();
 					IASTAppendable rules = F.ListAlloc(result.size());
-					rules.appendArgs(result.size(), 
-							new IntFunction<IExpr>() {
-								@Override
-								public IExpr apply(int i) {
-									return F.Rule(vars[i - 1], result.get(i));
-								}
-							}
-//							i -> F.Rule(vars[i - 1], result.get(i))
-							);
+					rules.appendArgs(result.size(), new IntFunction<IExpr>() {
+                        @Override
+                        public IExpr apply(int i) {
+                            return F.Rule(vars[i - 1], result.get(i));
+                        }
+                    });
 					switch ((int) n) {
 					case 2:
 						return QUADRATIC.replaceAll(rules);
@@ -947,6 +953,10 @@ public class PolynomialFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
+			IExpr cached = F.REMEMBER_AST_CACHE.getIfPresent(ast);
+			if (cached != null) {
+				return cached;
+			}
 
 			final IExpr form = engine.evalPattern(ast.arg2());
 			if (form.isList()) {
@@ -1022,6 +1032,7 @@ public class PolynomialFunctions {
 			// for (IExpr exponent : collector) {
 			// result.append(exponent);
 			// }
+			F.REMEMBER_AST_CACHE.put(ast, result);
 			return result;
 		}
 
@@ -1090,10 +1101,6 @@ public class PolynomialFunctions {
 			try {
 				// check if a is a polynomial otherwise check ArithmeticException, ClassCastException
 				ring.create(a);
-			} catch (RuntimeException ex) {
-				throw new WrongArgumentType(ast, a, 1, "Polynomial expected!");
-			}
-			try {
 				// check if b is a polynomial otherwise check ArithmeticException, ClassCastException
 				ring.create(b);
 				return F.Together(resultant(a, b, x, engine));
@@ -1102,7 +1109,7 @@ public class PolynomialFunctions {
 			}
 		}
 
-		public IExpr resultant(IExpr a, IExpr b, ISymbol x, EvalEngine engine) {
+		private IExpr resultant(IExpr a, IExpr b, ISymbol x, EvalEngine engine) {
 			IExpr aExp = F.Exponent.of(engine, a, x);
 			IExpr bExp = F.Exponent.of(engine, b, x);
 			if (b.isFree(x)) {
@@ -1122,6 +1129,47 @@ public class PolynomialFunctions {
 					resultant(b, r, x, engine));
 		}
 
+		private IExpr jasResultant(IExpr a, IExpr b, ISymbol x, EvalEngine engine) {
+			VariablesSet eVar = new VariablesSet();
+			eVar.addVarList(x);
+
+			try {
+				// ASTRange r = new ASTRange(eVar.getVarList(), 1);
+				List<IExpr> varList = eVar.getVarList().copyTo();
+				JASConvert<edu.jas.arith.BigInteger> jas = new JASConvert<edu.jas.arith.BigInteger>(varList,
+						edu.jas.arith.BigInteger.ZERO);
+				GenPolynomial<edu.jas.arith.BigInteger> poly = jas.expr2JAS(a, false);
+				GenPolynomial<edu.jas.arith.BigInteger> temp = jas.expr2JAS(b, false);
+				GreatestCommonDivisorAbstract<edu.jas.arith.BigInteger> factory = GCDFactory
+						.getImplementation(edu.jas.arith.BigInteger.ZERO);
+				poly = factory.resultant(poly, temp);
+				return jas.integerPoly2Expr(poly);
+			} catch (JASConversionException e) {
+				try {
+					if (eVar.size() == 0) {
+						return F.NIL;
+					}
+					IAST vars = eVar.getVarList();
+					ExprPolynomialRing ring = new ExprPolynomialRing(vars);
+					ExprPolynomial pol1 = ring.create(a);
+					ExprPolynomial pol2 = ring.create(b);
+					List<IExpr> varList = eVar.getVarList().copyTo();
+					JASIExpr jas = new JASIExpr(varList, true);
+					GenPolynomial<IExpr> p1 = jas.expr2IExprJAS(pol1);
+					GenPolynomial<IExpr> p2 = jas.expr2IExprJAS(pol2);
+
+					GreatestCommonDivisor<IExpr> factaory = GCDFactory.getImplementation(ExprRingFactory.CONST);
+					p1 = factaory.resultant(p1, p2);
+					return jas.exprPoly2Expr(p1);
+				} catch (RuntimeException rex) {
+					if (Config.DEBUG) {
+						e.printStackTrace();
+					}
+				}
+
+			}
+			return F.NIL;
+		}
 		// public static IExpr resultant(IAST result, IAST resultListDiff) {
 		// // create sylvester matrix
 		// IAST sylvester = F.List();
@@ -2076,8 +2124,8 @@ public class PolynomialFunctions {
 
 			EigenDecomposition ed = new EigenDecomposition(c);
 
-			final double[] realValues = ed.getRealEigenvalues();
-			final double[] imagValues = ed.getImagEigenvalues();
+			double[] realValues = ed.getRealEigenvalues();
+			double[] imagValues = ed.getImagEigenvalues();
 
 			IASTAppendable roots = F.ListAlloc(N);
 			return roots.appendArgs(0, N,
@@ -2086,9 +2134,7 @@ public class PolynomialFunctions {
 						public IExpr apply(int i) {
 							return F.chopExpr(F.complexNum(realValues[i], imagValues[i]), Config.DEFAULT_ROOTS_CHOP_DELTA);
 						}
-					}
-//					i -> F.chopExpr(F.complexNum(realValues[i], imagValues[i]), Config.DEFAULT_ROOTS_CHOP_DELTA)
-					);
+					});
 			// for (int i = 0; i < N; i++) {
 			// roots.append(F.chopExpr(F.complexNum(realValues[i], imagValues[i]),
 			// Config.DEFAULT_ROOTS_CHOP_DELTA));
@@ -2405,7 +2451,8 @@ public class PolynomialFunctions {
 			}
 			result = QuarticSolver.createSet(result);
 			return result;
-		} catch (JASConversionException e) {
+		} catch (RuntimeException rex) {
+			// JAS may throw RuntimeExceptions
 			result = rootsOfExprPolynomial(expr, variables, true);
 		}
 		if (result.isPresent()) {
