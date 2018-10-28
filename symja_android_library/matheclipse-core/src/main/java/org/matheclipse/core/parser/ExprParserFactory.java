@@ -318,7 +318,7 @@ public class ExprParserFactory implements IParserFactory {
 
 	@Override
 	public String getOperatorCharacters() {
-		return DEFAULT_OPERATOR_CHARACTERS;
+		return BASIC_OPERATOR_CHARACTERS;
 	}
 
 	/**

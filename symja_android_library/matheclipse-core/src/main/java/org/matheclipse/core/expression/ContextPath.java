@@ -141,6 +141,32 @@ public class ContextPath {
             }
         }
 
+		return symbol;
+	}
+
+	public ISymbol getSymbol(String symbolName, final Context context, boolean relaxedSyntax) {
+		String name = symbolName;
+		if (relaxedSyntax) {
+			if (symbolName.length() == 1) {
+				name = symbolName;
+			} else {
+				name = symbolName.toLowerCase(Locale.ENGLISH);
+			}
+		}
+		ISymbol symbol = context.get(name);
+		if (symbol != null) {
+			return symbol;
+		}
+
+		symbol = new Symbol(name, context);
+		context.put(name, symbol);
+		// engine.putUserVariable(name, symbol);
+		if (Config.SERVER_MODE) {
+			if (name.charAt(0) == '$') {
+				F.SYMBOL_OBSERVER.createUserSymbol(symbol);
+			}
+		}
+
         return symbol;
     }
 

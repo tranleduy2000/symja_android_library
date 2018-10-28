@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.eval.TimeConstrainedEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
@@ -50,7 +51,12 @@ public abstract class AbstractTestCase extends TestCase {
                 evaledResult = evaledResult.substring(0, resultLength) + "<<SHORT>>";
                 assertEquals(expectedResult, evaledResult);
             } else {
-                assertEquals(expectedResult, evaledResult);
+                if (!expectedResult.equals(evaledResult)) {
+                    ExprEvaluator parser = new ExprEvaluator();
+                    assertEquals(parser.parse(expectedResult), parser.parse(evaledResult));
+                } else {
+                    assertEquals(expectedResult, evaledResult);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,15 +64,16 @@ public abstract class AbstractTestCase extends TestCase {
         }
     }
 
-	public void evalString(String evalString) {
-		try {
-			// scriptEngine.put("STEPWISE",Boolean.TRUE);
-			String evaledResult = (String) fScriptEngine.eval(evalString);
-		} catch (Exception e) {
-			e.printStackTrace();
-			assertEquals("", "1");
-		}
-	}
+    public void evalString(String evalString) {
+        try {
+            // scriptEngine.put("STEPWISE",Boolean.TRUE);
+            String evaledResult = (String) fScriptEngine.eval(evalString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertEquals("", "1");
+        }
+    }
+
     public void checkNumeric(String evalString, String expectedResult) {
         check(fNumericScriptEngine, evalString, expectedResult, -1);
     }
@@ -143,7 +150,7 @@ public abstract class AbstractTestCase extends TestCase {
 
                 fNumericScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
                 fNumericScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
-				F.await();
+                F.await();
 
                 EvalEngine engine = EvalEngine.get();
                 engine.setRecursionLimit(256);

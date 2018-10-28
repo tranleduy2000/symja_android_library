@@ -241,7 +241,7 @@ public class ExprParser extends Scanner {
 		return function;
 	}
 
-	private IExpr convertSymbol(final String nodeStr) {
+	private IExpr convertSymbol(final String nodeStr, final String context) {
 		// if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
 		if (fRelaxedSyntax) {
 			if (nodeStr.length() == 1) {
@@ -249,7 +249,7 @@ public class ExprParser extends Scanner {
 					// special - convert on input
 					return F.CI;
 				}
-				return F.symbol(nodeStr, fEngine);
+				return F.symbol(nodeStr, context, null, fEngine);
 			}
 			String lowercaseStr = nodeStr.toLowerCase(Locale.ENGLISH);
 			if (lowercaseStr.equals("infinity")) {
@@ -261,9 +261,9 @@ public class ExprParser extends Scanner {
 			}
 			String temp = AST2Expr.PREDEFINED_ALIASES_MAP.get(lowercaseStr);
 			if (temp != null) {
-				return F.symbol(temp, fEngine);
+				return F.symbol(temp, context, null, fEngine);
 			}
-			return F.symbol(lowercaseStr, fEngine);
+			return F.symbol(lowercaseStr, context, null, fEngine);
 		} else {
 			String lowercaseStr = nodeStr;
 			if (Config.RUBI_CONVERT_SYMBOLS) {
@@ -282,7 +282,7 @@ public class ExprParser extends Scanner {
 				// special - convert on input
 				return F.CInfinity;
 			}
-			return F.symbol(lowercaseStr, fEngine);
+			return F.symbol(lowercaseStr, context, null, fEngine);
 		}
 	}
 
@@ -943,7 +943,7 @@ public class ExprParser extends Scanner {
 			throwSyntaxError("Invalid identifier: " + identifierContext[0] + " detected.");
 		}
 
-		final IExpr symbol = convertSymbol(identifierContext[0]);
+		final IExpr symbol = convertSymbol(identifierContext[0], identifierContext[1]);
 		// final ISymbol symbol = F.$s(identifier);
 		getNextToken();
 		return symbol;
