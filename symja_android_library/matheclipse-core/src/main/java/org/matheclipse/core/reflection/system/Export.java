@@ -1,11 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
-import javax.imageio.ImageIO;
+import com.duy.imageio.ImageIO;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -17,6 +12,11 @@ import org.matheclipse.core.expression.WL;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 import ch.ethz.idsc.tensor.io.Extension;
 import ch.ethz.idsc.tensor.io.Filename;
@@ -102,7 +102,7 @@ public class Export extends AbstractEvaluator {
 	}
 
 	/**
-	 * See the documentation of {@link CsvFormat}, {@link ImageFormat}, {@link MatlabExport}, and {@link ObjectFormat}
+	 * See the documentation of {link CsvFormat}, {@link ImageFormat}, {link MatlabExport}, and {link ObjectFormat}
 	 * for information on how tensors are encoded in the respective format.
 	 * 
 	 * @param file
@@ -116,12 +116,14 @@ public class Export extends AbstractEvaluator {
 		// Files.write(file.toPath(), (Iterable<String>) CsvFormat.of(tensor)::iterator);
 		// else
 		Extension extension = filename.extension();
-		if (extension.equals(Extension.JPG))
+		if (extension.equals(Extension.JPG)) {
 			ImageIO.write(ImageFormat.jpg(tensor), "jpg", file);
+		}
 		// else if (filename.hasExtension("m"))
 		// Files.write(file.toPath(), (Iterable<String>) MatlabExport.of(tensor)::iterator);
-		if (extension.equals(Extension.PNG))
+		if (extension.equals(Extension.PNG)) {
 			ImageIO.write(ImageFormat.of(tensor), "png", file);
+		}
 		// else if (filename.hasExtension("tensor"))
 		// object(file, tensor);
 		else
