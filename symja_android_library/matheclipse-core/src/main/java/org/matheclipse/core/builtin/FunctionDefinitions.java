@@ -3,6 +3,7 @@ package org.matheclipse.core.builtin;
 import static org.matheclipse.core.expression.F.AbsArg;
 import static org.matheclipse.core.expression.F.BesselJ;
 import static org.matheclipse.core.expression.F.ComplexExpand;
+import static org.matheclipse.core.expression.F.CreateDirectory;
 import static org.matheclipse.core.expression.F.D;
 import static org.matheclipse.core.expression.F.DSolve;
 import static org.matheclipse.core.expression.F.Default;

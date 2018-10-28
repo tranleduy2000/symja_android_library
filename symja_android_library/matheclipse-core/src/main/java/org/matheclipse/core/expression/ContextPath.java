@@ -1,6 +1,9 @@
 package org.matheclipse.core.expression;
 
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 
 import java.util.ArrayList;
