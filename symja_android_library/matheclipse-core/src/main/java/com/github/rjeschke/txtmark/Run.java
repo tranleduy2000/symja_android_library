@@ -62,41 +62,32 @@ import java.io.InputStreamReader;
  *
  * @author René Jeschke &lt;rene_jeschke@yahoo.de&gt;
  */
-public class Run
-{
+public class Run {
     /**
      * Static main.
      *
-     * @param args
-     *            Program arguments.
-     * @throws IOException
-     *             If an IO error occurred.
+     * @param args Program arguments.
+     * @throws IOException If an IO error occurred.
      */
-    public static void main(final String[] args) throws IOException
-    {
+    public static void main(final String[] args) throws IOException {
         // This is just a _hack_ ...
         BufferedReader reader = null;
-        if (args.length == 0)
-        {
+        if (args.length == 0) {
             System.err.println("No input file specified.");
             System.exit(-1);
         }
-        if (args.length > 1)
-        {
+        if (args.length > 1) {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(args[1]), "UTF-8"));
             String line = reader.readLine();
-            while (line != null && !line.startsWith("<!-- ###"))
-            {
+            while (line != null && !line.startsWith("<!-- ###")) {
                 System.out.println(line);
                 line = reader.readLine();
             }
         }
         System.out.println(Processor.process(new File(args[0])));
-        if (args.length > 1 && reader != null)
-        {
+        if (args.length > 1 && reader != null) {
             String line = reader.readLine();
-            while (line != null)
-            {
+            while (line != null) {
                 System.out.println(line);
                 line = reader.readLine();
             }

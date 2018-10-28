@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-apply plugin: 'java-library'
-apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'java'
 apply plugin: 'com.github.j2objccontrib.j2objcgradle'
+
+compileJava {
+    sourceCompatibility = '1.7'
+    targetCompatibility = '1.7'
+}
 
 sourceSets {
     main {
@@ -29,23 +33,11 @@ sourceSets {
     }
 }
 
-//sourceCompatibility JavaVersion.VERSION_1_8
-//targetCompatibility JavaVersion.VERSION_1_8
-
 dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.jsoup:jsoup:1.11.2'
 }
 
-
-retrolambda {
-    javaVersion JavaVersion.VERSION_1_7
-    defaultMethods true
-    incremental false
-    jvmArgs '-noverify'
-}
-
-// Plugin settings; put these at the bottom of the file.
 j2objcConfig {
     // Sets up libraries you depend on
     autoConfigureDeps true

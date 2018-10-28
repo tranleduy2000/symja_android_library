@@ -1,4 +1,5 @@
 package com.duy.lambda;
+
 @FunctionalInterface
 public interface DoubleFunction<R> {
 

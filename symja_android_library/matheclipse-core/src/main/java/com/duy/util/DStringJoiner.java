@@ -40,8 +40,7 @@ import java.util.Objects;
  * {@code suffix} is <code>"}"</code> and nothing has been added to the
  * {@code StringJoiner}.
  *
- * @apiNote
- * <p>The String {@code "[George:Sally:Fred]"} may be constructed as follows:
+ * @apiNote <p>The String {@code "[George:Sally:Fred]"} may be constructed as follows:
  *
  * <pre> {@code
  * StringJoiner sj = new StringJoiner(":", "[", "]");
@@ -59,11 +58,10 @@ import java.util.Objects;
  *     .map(i -> i.toString())
  *     .collect(Collectors.joining(", "));
  * }</pre>
- *
  * @see java.util.stream.Collectors#joining(CharSequence)
  * @see java.util.stream.Collectors#joining(CharSequence, CharSequence, CharSequence)
- * @since  1.8
-*/
+ * @since 1.8
+ */
 public final class DStringJoiner {
     private final String prefix;
     private final String delimiter;
@@ -94,8 +92,8 @@ public final class DStringJoiner {
      * {@code prefix} or {@code suffix} (or properties thereof) in the result,
      * unless {@code setEmptyValue} has first been called.
      *
-     * @param  delimiter the sequence of characters to be used between each
-     *         element added to the {@code StringJoiner} value
+     * @param delimiter the sequence of characters to be used between each
+     *                  element added to the {@code StringJoiner} value
      * @throws NullPointerException if {@code delimiter} is {@code null}
      */
     public DStringJoiner(CharSequence delimiter) {
@@ -110,12 +108,12 @@ public final class DStringJoiner {
      * {@code prefix + suffix} (or properties thereof) in the result, unless
      * {@code setEmptyValue} has first been called.
      *
-     * @param  delimiter the sequence of characters to be used between each
-     *         element added to the {@code StringJoiner}
-     * @param  prefix the sequence of characters to be used at the beginning
-     * @param  suffix the sequence of characters to be used at the end
+     * @param delimiter the sequence of characters to be used between each
+     *                  element added to the {@code StringJoiner}
+     * @param prefix    the sequence of characters to be used at the beginning
+     * @param suffix    the sequence of characters to be used at the end
      * @throws NullPointerException if {@code prefix}, {@code delimiter}, or
-     *         {@code suffix} is {@code null}
+     *                              {@code suffix} is {@code null}
      */
     public DStringJoiner(CharSequence delimiter,
                          CharSequence prefix,
@@ -138,15 +136,15 @@ public final class DStringJoiner {
      * called, the {@code StringJoiner} is no longer considered empty, even if
      * the element(s) added correspond to the empty {@code String}.
      *
-     * @param  emptyValue the characters to return as the value of an empty
-     *         {@code StringJoiner}
+     * @param emptyValue the characters to return as the value of an empty
+     *                   {@code StringJoiner}
      * @return this {@code StringJoiner} itself so the calls may be chained
      * @throws NullPointerException when the {@code emptyValue} parameter is
-     *         {@code null}
+     *                              {@code null}
      */
     public DStringJoiner setEmptyValue(CharSequence emptyValue) {
         this.emptyValue = DObjects.requireNonNull(emptyValue,
-            "The empty value must not be null").toString();
+                "The empty value must not be null").toString();
         return this;
     }
 
@@ -180,7 +178,7 @@ public final class DStringJoiner {
      * element of the {@code StringJoiner} value. If {@code newElement} is
      * {@code null}, then {@code "null"} is added.
      *
-     * @param  newElement The element to add
+     * @param newElement The element to add
      * @return a reference to this {@code StringJoiner}
      */
     public DStringJoiner add(CharSequence newElement) {
@@ -204,8 +202,8 @@ public final class DStringJoiner {
      *
      * @param other The {@code StringJoiner} whose contents should be merged
      *              into this one
-     * @throws NullPointerException if the other {@code StringJoiner} is null
      * @return This {@code StringJoiner}
+     * @throws NullPointerException if the other {@code StringJoiner} is null
      */
     public DStringJoiner merge(DStringJoiner other) {
         Objects.requireNonNull(other);

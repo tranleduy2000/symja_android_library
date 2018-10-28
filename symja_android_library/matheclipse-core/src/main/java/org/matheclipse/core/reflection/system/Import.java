@@ -1,8 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
 
-import com.duy.imageio.ImageIO;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.matheclipse.core.basic.Config;
@@ -28,7 +26,6 @@ import java.nio.charset.Charset;
 
 import ch.ethz.idsc.tensor.io.Extension;
 import ch.ethz.idsc.tensor.io.Filename;
-import ch.ethz.idsc.tensor.io.ImageFormat;
 
 /**
  * Import some data from file system.
@@ -109,7 +106,7 @@ public class Import extends AbstractEvaluator {
 		Extension extension = filename.extension();
 		if (extension.equals(Extension.JPG) || extension.equals(Extension.PNG)) {
 			// if (filename.hasExtension("jpg") || filename.hasExtension("png")) {
-			return ImageFormat.from(ImageIO.read(file));
+//			return ImageFormat.from(ImageIO.read(file));
 		}
 		AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
 		final Parser parser = new Parser(engine.isRelaxedSyntax(), true);

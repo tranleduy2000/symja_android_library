@@ -1,7 +1,5 @@
 package org.matheclipse.core.reflection.system;
 
-import com.duy.imageio.ImageIO;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -117,12 +115,12 @@ public class Export extends AbstractEvaluator {
 		// else
 		Extension extension = filename.extension();
 		if (extension.equals(Extension.JPG)) {
-			ImageIO.write(ImageFormat.jpg(tensor), "jpg", file);
+//			ImageIO.write(ImageFormat.jpg(tensor), "jpg", file);
 		}
 		// else if (filename.hasExtension("m"))
 		// Files.write(file.toPath(), (Iterable<String>) MatlabExport.of(tensor)::iterator);
 		if (extension.equals(Extension.PNG)) {
-			ImageIO.write(ImageFormat.of(tensor), "png", file);
+//			ImageIO.write(ImageFormat.of(tensor), "png", file);
 		}
 		// else if (filename.hasExtension("tensor"))
 		// object(file, tensor);

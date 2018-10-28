@@ -420,7 +420,7 @@ public class DMath {
      *
      * </ul>
      *
-     * @param d  starting floating-point value
+     * @param d starting floating-point value
      * @return The adjacent floating-point value closer to negative
      * infinity.
      * @since 1.8
@@ -433,7 +433,7 @@ public class DMath {
                 return -Double.MIN_VALUE;
             else
                 return Double.longBitsToDouble(Double.doubleToRawLongBits(d) +
-                        ((d > 0.0d)?-1L:+1L));
+                        ((d > 0.0d) ? -1L : +1L));
         }
     }
 }

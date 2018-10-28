@@ -43,7 +43,7 @@ public class QuantityMagnitude {
      * @return operator that extracts the value from a Quantity of unit specified by given string
      */
     public static UnaryOperator<IExpr> singleton(String string) {
-        return singleton(IUnit.of(string));
+        return singleton(IUnitStatic.of(string));
     }
 
     /**
@@ -58,7 +58,7 @@ public class QuantityMagnitude {
      * @return operator that maps a quantity to the equivalent scalar of given unit
      */
     public UnaryOperator<IExpr> in(IUnit unit) {
-        final IExpr base = unitSystem.apply(IQuantity.of(F.C1, unit));
+        final IExpr base = unitSystem.apply(IQuantityStatic.of(F.C1, unit));
 
         return new UnaryOperator<IExpr>() {
             @Override
@@ -79,6 +79,6 @@ public class QuantityMagnitude {
      * @see #in(IUnit)
      */
     public UnaryOperator<IExpr> in(String string) {
-        return in(IUnit.of(string));
+        return in(IUnitStatic.of(string));
     }
 }

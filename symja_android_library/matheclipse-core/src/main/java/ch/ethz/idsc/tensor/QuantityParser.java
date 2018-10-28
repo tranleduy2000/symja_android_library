@@ -6,7 +6,8 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
 import ch.ethz.idsc.tensor.qty.IQuantity;
-import ch.ethz.idsc.tensor.qty.IUnit;
+import ch.ethz.idsc.tensor.qty.IQuantityStatic;
+import ch.ethz.idsc.tensor.qty.IUnitStatic;
 
 public enum QuantityParser {
     ;
@@ -22,9 +23,9 @@ public enum QuantityParser {
         if (0 < index) {
             final int last = string.indexOf(IQuantity.UNIT_CLOSING_BRACKET);
             if (index < last && string.substring(last + 1).trim().isEmpty())
-                return IQuantity.of( //
+                return IQuantityStatic.of( //
                         F.fromString(string.substring(0, index)), //
-                        IUnit.of(string.substring(index + 1, last)));
+                        IUnitStatic.of(string.substring(index + 1, last)));
             throw new RuntimeException(string);
         }
         try {

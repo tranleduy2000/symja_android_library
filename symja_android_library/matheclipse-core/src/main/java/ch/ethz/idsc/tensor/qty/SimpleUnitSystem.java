@@ -83,7 +83,7 @@ public class SimpleUnitSystem implements UnitSystem {
 				// :lookup;
 				// } else {
 				IExpr temp = DObjects.isNull(lookup) //
-                        ? IQuantity.of(F.C1, format(entry)) //
+                        ? IQuantityStatic.of(F.C1, format(entry)) //
 						: lookup.isQuantity()//
 								? ((IQuantity) lookup).power(entryValue)//
 								: F.Power.of(lookup, entryValue);

@@ -14,24 +14,17 @@ public interface IUnit extends Serializable {
     /**
      * Example: cd*m*s
      */
-    static final String JOIN_DELIMITER = "*";
+    String JOIN_DELIMITER = "*";
     /**
      * Example: A*kg^-2
      */
-    static final String POWER_DELIMITER = "^";
+    String POWER_DELIMITER = "^";
     /**
      * holds the dimension-less unit ONE
      */
-    static final IUnit ONE = new UnitImpl(new TreeMap<>());
+    IUnit ONE = new UnitImpl(new TreeMap<String, IExpr>());
     // static final IUnit ONE = IUnit.of("");
 
-    /**
-     * @param string, for instance "m*s^-2"
-     * @return
-     */
-    static IUnit of(String string) {
-        return UnitHelper.MEMO.lookup(string);
-    }
 
     /**
      * function negate is equivalent to {@link #multiply(IExpr)} with factor -1

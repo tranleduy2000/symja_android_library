@@ -12,9 +12,10 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.math.MathException;
 
-import ch.ethz.idsc.tensor.qty.IQuantity;
+import ch.ethz.idsc.tensor.qty.IQuantityStatic;
 import ch.ethz.idsc.tensor.qty.IUnit;
-import ch.ethz.idsc.tensor.qty.UnitSystem;
+import ch.ethz.idsc.tensor.qty.IUnitStatic;
+import ch.ethz.idsc.tensor.qty.UnitSystemStatic;
 
 public class QuantityFunctions {
 	static {
@@ -46,14 +47,14 @@ public class QuantityFunctions {
 				if (ast.size() == 2) {
 					IExpr arg1 = engine.evaluate(ast.arg1());
 					if (arg1.isString()) {
-						return IQuantity.of(F.C1, IUnit.of(arg1.toString()));
+						return IQuantityStatic.of(F.C1, IUnitStatic.of(arg1.toString()));
 					}
 				}
 				if (ast.size() == 3) {
 					IExpr arg1 = engine.evaluate(ast.arg1());
 					IExpr arg2 = engine.evaluate(ast.arg2());
 					if (arg2.isString()) {
-						return IQuantity.of(arg1, IUnit.of(arg2.toString()));
+						return IQuantityStatic.of(arg1, IUnitStatic.of(arg2.toString()));
 					}
 				}
 			} catch (MathException e) {
@@ -107,7 +108,7 @@ public class QuantityFunctions {
 					if (arg1.isQuantity()) {
 						ch.ethz.idsc.tensor.qty.QuantityMagnitude quantityMagnitude = ch.ethz.idsc.tensor.qty.QuantityMagnitude
 								.SI();
-						IUnit unit = IUnit.of(arg2.toString());
+						IUnit unit = IUnitStatic.of(arg2.toString());
 						UnaryOperator<IExpr> suo = quantityMagnitude.in(unit);
 						return suo.apply(arg1);
 					}
@@ -155,14 +156,14 @@ public class QuantityFunctions {
 				if (ast.size() == 2) {
 					IExpr arg1 = engine.evaluate(ast.arg1());
 					if (arg1.isQuantity()) {
-						return UnitSystem.SI().apply(arg1);
+						return UnitSystemStatic.SI().apply(arg1);
 					}
 				} else if (ast.size() == 3) {
 					IExpr arg1 = engine.evaluate(ast.arg1());
 					IExpr arg2 = engine.evaluate(ast.arg2());
 					if (arg1.isQuantity()) {
 						ch.ethz.idsc.tensor.qty.UnitConvert unitConvert = ch.ethz.idsc.tensor.qty.UnitConvert.SI();
-						IUnit unit = IUnit.of(arg2.toString());
+						IUnit unit = IUnitStatic.of(arg2.toString());
 						return unitConvert.to(unit).apply(arg1);
 					}
 				}

@@ -30,11 +30,11 @@ public class UnitConvert {
      * @param unit
    * @return operator that maps a quantity to the quantity of given unit */
     public UnaryOperator<IExpr> to(IUnit unit) {
-        IExpr base = unitSystem.apply(IQuantity.of(F.C1, unit));
+        IExpr base = unitSystem.apply(IQuantityStatic.of(F.C1, unit));
         return new UnaryOperator<IExpr>() {
             @Override
             public IExpr apply(IExpr scalar) {
-                return IQuantity.of(unitSystem.apply(scalar).divide(base), unit);
+                return IQuantityStatic.of(unitSystem.apply(scalar).divide(base), unit);
             }
         };
     }

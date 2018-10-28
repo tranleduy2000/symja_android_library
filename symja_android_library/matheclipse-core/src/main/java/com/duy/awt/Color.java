@@ -38,7 +38,6 @@ exception statement from your version. */
 
 package com.duy.awt;
 
-import android.graphics.ColorSpace;
 
 import java.io.Serializable;
 
@@ -234,14 +233,6 @@ public class Color implements Serializable {
      */
     private final float falpha;
     /**
-     * The ColorSpace. Null means the default sRGB space.
-     *
-     * @serial the color space for this color
-     * @see #getColor(String)
-     * @since 1.2
-     */
-    private final ColorSpace cs;
-    /**
      * The color value, in sRGB. This may be null if the color was constructed
      * with ints; and it does not include alpha. This stores red, green, and
      * blue, in the range 0.0f - 1.0f.
@@ -313,7 +304,6 @@ public class Color implements Serializable {
 
         value = (alpha << 24) | (red << 16) | (green << 8) | blue;
         falpha = 1;
-        cs = null;
     }
 
     /**
@@ -324,7 +314,6 @@ public class Color implements Serializable {
      * adjusted to the best match of hardware capabilities.
      *
      * @param value the RGB value
-     * @see ColorModel#getRGBdefault()
      * @see #getRed()
      * @see #getGreen()
      * @see #getBlue()
@@ -361,7 +350,6 @@ public class Color implements Serializable {
             falpha = 1;
         }
         this.value = value;
-        cs = null;
     }
 
     /**
@@ -405,7 +393,6 @@ public class Color implements Serializable {
         value = convert(red, green, blue, alpha);
         frgbvalue = new float[]{red, green, blue};
         falpha = alpha;
-        cs = null;
     }
 
     /**
@@ -486,7 +473,6 @@ public class Color implements Serializable {
      * @return the RGB value
      * @see #getRGB()
      * @see #Color(int)
-     * @see ColorModel#getRGBdefault()
      */
     public static int HSBtoRGB(float hue, float saturation, float brightness) {
         if (saturation == 0)

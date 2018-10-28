@@ -44,7 +44,7 @@ import java.util.zip.GZIPInputStream;
             case BMP:
             case JPG:
             case PNG:
-                return ImageFormat.from(ImageIO.read(inputStream));
+//                return ImageFormat.from(ImageIO.read(inputStream));
 //    case VECTOR:
 //      return IAST.of(lines(inputStream).map(Scalars::fromString));
             default:

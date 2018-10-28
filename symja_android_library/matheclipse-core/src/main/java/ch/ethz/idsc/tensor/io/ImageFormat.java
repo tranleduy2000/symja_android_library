@@ -1,22 +1,10 @@
 package ch.ethz.idsc.tensor.io;
 
-import android.graphics.Bitmap;
-
-import com.duy.lambda.BiFunction;
-import com.duy.lambda.Consumer;
-
-import org.matheclipse.core.builtin.LinearAlgebra;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.img.ColorFormat;
-import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IInteger;
-
-import java.nio.ByteBuffer;
-import java.util.List;
 
 /**
- * ImageFormat uses the data alignment of {@link Bitmap}.
+ * ImageFormat uses the data alignment of {link Bitmap}.
  * <p>
  * <p>
  * The {link Dimensions} of tensors that represent native images are For grayscale: <code>height x width</code>
@@ -48,89 +36,89 @@ public enum ImageFormat {
      * @param bufferedImage
      * @return AST encoding the color values of given bufferedImage
      */
-    public static IAST from(Bitmap bufferedImage) {
+//    public static IAST from(Bitmap bufferedImage) {
 //        switch (bufferedImage.getType()) {
 //            case Bitmap.TYPE_BYTE_GRAY:
 //                return fromGrayscale(bufferedImage);
 //            default:
-        return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
-                            @Override
-                            public IExpr apply(Integer y, Integer x) {
-                                return ColorFormat.toVector(bufferedImage.getPixel(x, y));
-                            }
-                        }, //
-                bufferedImage.getHeight(), bufferedImage.getWidth());
+//        return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
+//                            @Override
+//                            public IExpr apply(Integer y, Integer x) {
+//                                return ColorFormat.toVector(bufferedImage.getPixel(x, y));
+//                            }
+//                        }, //
+//                bufferedImage.getHeight(), bufferedImage.getWidth());
 //        }
-    }
+//    }
 
     /**
      * @param ast
      * @return image of type Bitmap.TYPE_BYTE_GRAY or Bitmap.TYPE_INT_ARGB
      */
-    public static Bitmap of(IAST ast) {
-        List<Integer> dims = LinearAlgebra.dimensions(ast);
-        if (dims.size() == 2)
-            return toTYPE_BYTE_GRAY(ast, dims.get(1), dims.get(0));
-        return toTYPE_INT(ast, dims.get(1), dims.get(0), Bitmap.Config.ARGB_8888);
-    }
+//    public static Bitmap of(IAST ast) {
+//        List<Integer> dims = LinearAlgebra.dimensions(ast);
+//        if (dims.size() == 2)
+//            return toTYPE_BYTE_GRAY(ast, dims.get(1), dims.get(0));
+//        return toTYPE_INT(ast, dims.get(1), dims.get(0), Bitmap.Config.ARGB_8888);
+//    }
 
     /**
      * @param bufferedImage grayscale image with dimensions [width x height]
      * @return tensor with dimensions [height x width]
      */
-    private static IAST fromGrayscale(Bitmap bufferedImage) {
-        int bufferSize = bufferedImage.getRowBytes() * bufferedImage.getHeight();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
-        bufferedImage.copyPixelsToBuffer(byteBuffer);
-        return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
-                            @Override
-                            public IExpr apply(Integer i, Integer j) {
-                                return LOOKUP[byteBuffer.get() & 0xff];
-                            }
-                        }, //
-                bufferedImage.getHeight(), bufferedImage.getWidth());
-    }
+//    private static IAST fromGrayscale(Bitmap bufferedImage) {
+//        int bufferSize = bufferedImage.getRowBytes() * bufferedImage.getHeight();
+//        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
+//        bufferedImage.copyPixelsToBuffer(byteBuffer);
+//        return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
+//                            @Override
+//                            public IExpr apply(Integer i, Integer j) {
+//                                return LOOKUP[byteBuffer.get() & 0xff];
+//                            }
+//                        }, //
+//                bufferedImage.getHeight(), bufferedImage.getWidth());
+//    }
 
     // helper function
-    static Bitmap toTYPE_BYTE_GRAY(IAST tensor, int width, int height) {
-        Bitmap bufferedImage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        int bufferSize = bufferedImage.getRowBytes() * bufferedImage.getHeight();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
-        bufferedImage.copyPixelsToBuffer(byteBuffer);
-        byte[] bytes = byteBuffer.array();
-        tensor.forEach(new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr row) {
-                ((IAST) row).forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr number) {
-                        byteBuffer.put(((IInteger) number).byteValue());
-                    }
-                });
-            }
-        });
-        return bufferedImage;
-    }
+//    static Bitmap toTYPE_BYTE_GRAY(IAST tensor, int width, int height) {
+//        Bitmap bufferedImage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//        int bufferSize = bufferedImage.getRowBytes() * bufferedImage.getHeight();
+//        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
+//        bufferedImage.copyPixelsToBuffer(byteBuffer);
+//        byte[] bytes = byteBuffer.array();
+//        tensor.forEach(new Consumer<IExpr>() {
+//            @Override
+//            public void accept(IExpr row) {
+//                ((IAST) row).forEach(new Consumer<IExpr>() {
+//                    @Override
+//                    public void accept(IExpr number) {
+//                        byteBuffer.put(((IInteger) number).byteValue());
+//                    }
+//                });
+//            }
+//        });
+//        return bufferedImage;
+//    }
 
     // fast extraction of color information to buffered image
-    private static Bitmap toTYPE_INT(IAST ast, int width, int height, Bitmap.Config imageType) {
-        Bitmap bufferedImage = Bitmap.createBitmap(width, height, imageType);
-        int[] array = new int[width * height];
-        int[] i = new int[1];
-        ast.forEach(new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr row) {
-                ((IAST) row).forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr number) {
-                        array[i[0]++] = ((IInteger) number).intValue();
-                    }
-                });
-            }
-        });
-        bufferedImage.setPixels(array, 0, 0, 0, 0, width, height);
-        return bufferedImage;
-    }
+//    private static Bitmap toTYPE_INT(IAST ast, int width, int height, Bitmap.Config imageType) {
+//        Bitmap bufferedImage = Bitmap.createBitmap(width, height, imageType);
+//        int[] array = new int[width * height];
+//        int[] i = new int[1];
+//        ast.forEach(new Consumer<IExpr>() {
+//            @Override
+//            public void accept(IExpr row) {
+//                ((IAST) row).forEach(new Consumer<IExpr>() {
+//                    @Override
+//                    public void accept(IExpr number) {
+//                        array[i[0]++] = ((IInteger) number).intValue();
+//                    }
+//                });
+//            }
+//        });
+//        bufferedImage.setPixels(array, 0, 0, 0, 0, width, height);
+//        return bufferedImage;
+//    }
 
     /**
      * Functionality for export to jpg image format
@@ -138,11 +126,11 @@ public enum ImageFormat {
      * @param ast
      * @return image of type Bitmap.TYPE_BYTE_GRAY or Bitmap.TYPE_INT_BGR
      */
-    public static Bitmap jpg(IAST ast) {
-        List<Integer> dims = LinearAlgebra.dimensions(ast);
-        if (dims.size() == 2) {
-            return toTYPE_BYTE_GRAY(ast, dims.get(1), dims.get(0));
-        }
-        return toTYPE_INT(ast, dims.get(1), dims.get(0), Bitmap.Config.RGB_565);
-    }
+//    public static Bitmap jpg(IAST ast) {
+//        List<Integer> dims = LinearAlgebra.dimensions(ast);
+//        if (dims.size() == 2) {
+//            return toTYPE_BYTE_GRAY(ast, dims.get(1), dims.get(0));
+//        }
+//        return toTYPE_INT(ast, dims.get(1), dims.get(0), Bitmap.Config.RGB_565);
+//    }
 }
