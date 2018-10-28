@@ -1831,11 +1831,27 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testContext() {
+		check("Context(a)", //
+				"Global`");
+		check("Context()", //
+				"Global`");
+		check("Context(Context)", //
+				"System`");
 		check("{x, Global`x}", //
 				"{x,x}");
 		check("a`b`x", //
 				"a`b`x");
+	}
+	}
 
+	public void test$Context() {
+		check("$Context", //
+				"Global`");
+	}
+
+	public void test$ContextPath() {
+		check("$ContextPath", //
+				"{System`,Global`}");
 	}
 
 	public void testContinue() {
@@ -1932,6 +1948,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Cosh(1/6*Pi*I)", "Sqrt(3)/2");
 		check("Cosh(Infinity)", "Infinity");
 		check("Cosh(ComplexInfinity)", "Indeterminate");
+	}
+
+	public void testCreateDirectory() {
+//		Config.FILESYSTEM_ENABLED = true;
+//		check("CreateDirectory()", //
+//				"C:\\Users\\dev\\AppData\\Local\\Temp\\1539799359607-0");
 	}
 
 	public void testCanberraDistance() {

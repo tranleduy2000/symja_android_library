@@ -15,6 +15,8 @@ import static org.matheclipse.core.expression.F.Times;
 public class ConstantDefinitions {
 
 	static {
+		F.$Context.setEvaluator(new $Context());
+		F.$ContextPath.setEvaluator(new $ContextPath());
 		F.Catalan.setEvaluator(new Catalan());
 		F.ComplexInfinity.setEvaluator(new ComplexInfinity());
 		F.Degree.setEvaluator(new Degree());
@@ -59,6 +61,25 @@ public class ConstantDefinitions {
 			// don't set CONSTANT attribute !
 		}
 	}
+
+	private static class $Context extends AbstractSymbolEvaluator {
+
+		@Override
+		public IExpr evaluate(final ISymbol symbol) {
+			return EvalEngine.get().getContextPath().currentContext();
+		}
+
+	}
+
+	private static class $ContextPath extends AbstractSymbolEvaluator {
+
+		@Override
+		public IExpr evaluate(final ISymbol symbol) {
+			return EvalEngine.get().getContextPath().pathAsStrings();
+		}
+
+	}
+
 	/**
 	 * <blockquote>
 	 * <p>

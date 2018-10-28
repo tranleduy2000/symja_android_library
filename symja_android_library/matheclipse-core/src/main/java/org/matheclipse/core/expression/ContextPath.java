@@ -59,6 +59,27 @@ public class ContextPath {
         return null;
     }
 
+	/**
+	 * Return the context path as list of context strings.
+	 *
+	 * @return
+	 */
+	public IAST pathAsStrings() {
+		int size = path.size();
+		IASTAppendable result = F.ListAlloc(size);
+
+		int start = size - 1;
+		for (int i = 0; i < size; i++) {
+			result.append(F.stringx(path.get(i).getContextName()));
+		}
+		return result;
+	}
+
+	public IStringX currentContext() {
+		int size = path.size()-1;
+		return F.stringx(path.get(size).getContextName());
+	}
+
     public boolean setGlobalContext(Context context) {
         int size = path.size();
         int start = size - 1;
