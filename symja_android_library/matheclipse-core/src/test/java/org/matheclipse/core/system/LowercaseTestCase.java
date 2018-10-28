@@ -2,6 +2,8 @@ package org.matheclipse.core.system;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
+import org.matheclipse.core.builtin.Structure;
+import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
 
@@ -385,6 +387,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcTan() {
+		check("ArcTan(1, 0)", "0");
+		check("ArcTan(1/2, 1/2)", "Pi/4");
+		check("ArcTan(0, 1)", "Pi/2");
+		check("ArcTan(-1/2, 1/2)", "3/4*Pi");
+		check("ArcTan(-1, 0)", "Pi");
+		check("ArcTan(-1/2, -1/2)", "-3/4*Pi");
+		check("ArcTan(0, -1)", "-Pi/2");
+		check("ArcTan(1/2, -1/2)", "-Pi/4");
+
 		check("ArcTan(Tan(-1/2))", //
 				"-1/2");
 		check("ArcTan(Tan(-1))", //
@@ -429,11 +440,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ArcTan(1, -1)", "-Pi/4");
 		check("ArcTan(-1, -1)", "-3/4*Pi");
 
-		check("ArcTan(1, 0)", "0");
 		check("ArcTan(17, 0)", "0");
-		check("ArcTan(-1, 0)", "Pi");
-		check("ArcTan(0, 1)", "Pi/2");
-		check("ArcTan(0, -1)", "-Pi/2");
 		check("arctan(Infinity,y)", "0");
 		check("arctan(-Infinity,y)", "Pi*(-1+2*UnitStep(Re(y)))");
 
@@ -11941,6 +11948,25 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTrigToExp() {
+		check("Map(# == TrigToExp(#)&," //
+				+ "{ArcSinh(x), ArcCosh(x), ArcTanh(x)," //
+				+ "ArcCoth(x), ArcSech(x), ArcCsch(x)}) // TableForm", //
+				"ArcSinh(x)==Log(x+Sqrt(1+x^2))\n" + //
+						"ArcCosh(x)==Log(x+Sqrt(-1+x)*Sqrt(1+x))\n" + //
+						"ArcTanh(x)==-Log(1-x)/2+Log(1+x)/2\n" + //
+						"ArcCoth(x)==-Log(1-1/x)/2+Log(1+1/x)/2\n" + //
+						"ArcSech(x)==Log(Sqrt(-1+1/x)*Sqrt(1+1/x)+1/x)\n" + //
+						"ArcCsch(x)==Log(Sqrt(1+1/x^2)+1/x)\n");
+		check("Map(# == TrigToExp(#)&," //
+				+ "{ArcSin(x), ArcCos(x), ArcTan(x)," //
+				+ "ArcCot(x), ArcSec(x), ArcCsc(x)}) // TableForm", //
+				"ArcSin(x)==-I*Log(I*x+Sqrt(1-x^2))\n" + //
+						"ArcCos(x)==Pi/2+I*Log(I*x+Sqrt(1-x^2))\n" + //
+						"ArcTan(x)==I*1/2*Log(1-I*x)-I*1/2*Log(1+I*x)\n" + //
+						"ArcCot(x)==I*1/2*Log(1-I/x)-I*1/2*Log(1+I/x)\n" + //
+						"ArcSec(x)==Pi/2+I*Log(Sqrt(1-1/x^2)+I/x)\n" + //
+						"ArcCsc(x)==-I*Log(Sqrt(1-1/x^2)+I/x)\n" + //
+						"");
 		check("I*y+x", //
 				"x+I*y");
 		check("TrigToExp(ArcTan(x, y))", //
