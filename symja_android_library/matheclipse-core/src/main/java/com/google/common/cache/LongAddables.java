@@ -31,12 +31,12 @@ final class LongAddables {
     static {
         Supplier<LongAddable> supplier;
         try {
-            new LongAdder(); // trigger static initialization of the LongAdder class, which may fail
+            new PureJavaLongAddable(); // trigger static initialization of the LongAdder class, which may fail
             supplier =
                     new Supplier<LongAddable>() {
                         @Override
                         public LongAddable get() {
-                            return new LongAdder();
+                            return new PureJavaLongAddable();
                         }
                     };
         } catch (Throwable t) { // we really want to catch *everything*

@@ -1,22 +1,10 @@
 package ch.ethz.idsc.tensor.io;
 
-import android.graphics.Bitmap;
-
-import com.duy.lambda.BiFunction;
-import com.duy.lambda.Consumer;
-
-import org.matheclipse.core.builtin.LinearAlgebra;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.img.ColorFormat;
-import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IInteger;
-
-import java.nio.ByteBuffer;
-import java.util.List;
 
 /**
- * ImageFormat uses the data alignment of {@link Bitmap}.
+ * ImageFormat uses the data alignment of {link Bitmap}.
  * <p>
  * <p>
  * The {link Dimensions} of tensors that represent native images are For grayscale: <code>height x width</code>
@@ -92,45 +80,45 @@ public enum ImageFormat {
 //    }
 
     // helper function
-    static Bitmap toTYPE_BYTE_GRAY(IAST tensor, int width, int height) {
-        Bitmap bufferedImage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        int bufferSize = bufferedImage.getRowBytes() * bufferedImage.getHeight();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
-        bufferedImage.copyPixelsToBuffer(byteBuffer);
-        byte[] bytes = byteBuffer.array();
-        tensor.forEach(new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr row) {
-                ((IAST) row).forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr number) {
-                        byteBuffer.put(((IInteger) number).byteValue());
-                    }
-                });
-            }
-        });
-        return bufferedImage;
-    }
+//    static Bitmap toTYPE_BYTE_GRAY(IAST tensor, int width, int height) {
+//        Bitmap bufferedImage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//        int bufferSize = bufferedImage.getRowBytes() * bufferedImage.getHeight();
+//        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
+//        bufferedImage.copyPixelsToBuffer(byteBuffer);
+//        byte[] bytes = byteBuffer.array();
+//        tensor.forEach(new Consumer<IExpr>() {
+//            @Override
+//            public void accept(IExpr row) {
+//                ((IAST) row).forEach(new Consumer<IExpr>() {
+//                    @Override
+//                    public void accept(IExpr number) {
+//                        byteBuffer.put(((IInteger) number).byteValue());
+//                    }
+//                });
+//            }
+//        });
+//        return bufferedImage;
+//    }
 
     // fast extraction of color information to buffered image
-    private static Bitmap toTYPE_INT(IAST ast, int width, int height, Bitmap.Config imageType) {
-        Bitmap bufferedImage = Bitmap.createBitmap(width, height, imageType);
-        int[] array = new int[width * height];
-        int[] i = new int[1];
-        ast.forEach(new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr row) {
-                ((IAST) row).forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr number) {
-                        array[i[0]++] = ((IInteger) number).intValue();
-                    }
-                });
-            }
-        });
-        bufferedImage.setPixels(array, 0, 0, 0, 0, width, height);
-        return bufferedImage;
-    }
+//    private static Bitmap toTYPE_INT(IAST ast, int width, int height, Bitmap.Config imageType) {
+//        Bitmap bufferedImage = Bitmap.createBitmap(width, height, imageType);
+//        int[] array = new int[width * height];
+//        int[] i = new int[1];
+//        ast.forEach(new Consumer<IExpr>() {
+//            @Override
+//            public void accept(IExpr row) {
+//                ((IAST) row).forEach(new Consumer<IExpr>() {
+//                    @Override
+//                    public void accept(IExpr number) {
+//                        array[i[0]++] = ((IInteger) number).intValue();
+//                    }
+//                });
+//            }
+//        });
+//        bufferedImage.setPixels(array, 0, 0, 0, 0, width, height);
+//        return bufferedImage;
+//    }
 
     /**
      * Functionality for export to jpg image format
