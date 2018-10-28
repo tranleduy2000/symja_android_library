@@ -872,8 +872,8 @@ public class Parser extends Scanner {
 					if (postfixOperator != null && postfixOperator.getPrecedence() >= min_precedence) {
 						lhs = parsePostfixOperator(lhs, postfixOperator);
 						continue;
-					} else {
-						throwSyntaxError("Operator: " + fOperatorString + " is no infix or postfix operator.");
+						// } else {
+						// throwSyntaxError("Operator: " + fOperatorString + " is no infix or postfix operator.");
 					}
 				}
 			}

@@ -581,7 +581,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     }
 
 	@Override
-	public final int determinePatterns() {
+	public int determinePatterns() {
 		return getPatternMap().determinePatterns(fLhsPatternExpr);
     }
 
@@ -1114,7 +1114,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     private boolean matchASTExpr(IAST lhsPatternExpr, final IExpr lhsEvalExpr, EvalEngine engine,
                                  StackMatcher stackMatcher) {
         boolean matched = false;
-        IAST lhsPatternAST = (IAST) lhsPatternExpr;
+		IAST lhsPatternAST = lhsPatternExpr;
         IExpr[] patternValues = fPatternMap.copyPattern();
         try {
             matched = matchAST(lhsPatternAST, lhsEvalExpr, engine, stackMatcher);
