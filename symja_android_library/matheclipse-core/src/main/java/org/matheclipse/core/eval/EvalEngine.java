@@ -1,6 +1,7 @@
 package org.matheclipse.core.eval;
 
 import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.Function;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 import com.google.common.cache.Cache;
@@ -549,9 +550,12 @@ public class EvalEngine implements Serializable {
 					numericMode = fNumericMode;
 					try {
 						selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-						ast.forEach(2, astSize, (arg, i) -> {
-							if (!arg.isAST(F.Unevaluated)) {
-								evalArg(rlist, ast, arg, i, isNumericFunction);
+						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
+                            @Override
+                            public void accept(IExpr arg, int i) {
+                                if (!arg.isAST(F.Unevaluated)) {
+                                    EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
+                                }
                             }
                         });
 					} finally {
@@ -564,11 +568,14 @@ public class EvalEngine implements Serializable {
 				numericMode = fNumericMode;
 				try {
 					selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-						ast.forEach(2, astSize, (arg, i) -> {
-							if (arg.isAST(F.Evaluate)) {
-								evalArg(rlist, ast, arg, i, isNumericFunction);
-						}
-					});
+						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
+							@Override
+							public void accept(IExpr arg, int i) {
+								if (arg.isAST(F.Evaluate)) {
+									EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
+								}
+							}
+						});
 					} finally {
 						if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
 							fNumericMode = numericMode;
@@ -1326,26 +1333,37 @@ public class EvalEngine implements Serializable {
 		// }
 		// }
 		IAST ast;
-		if (argsAST.exists(x -> x.isAST(F.Unevaluated, 2))) {
-			ast = argsAST.map(x -> {
-				if (x.isAST(F.Unevaluated, 2)) {
-					return ((IAST) x).arg1();
+		if (argsAST.exists(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return x.isAST(F.Unevaluated, 2);
+			}
+		})) {
+			ast = argsAST.map(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x) {
+					if (x.isAST(F.Unevaluated, 2)) {
+						return ((IAST) x).arg1();
+					}
+					return x;
 				}
-				return x;
 			}, 1);
 		} else {
 			ast = argsAST;
 		}
 		IExpr[] result = new IExpr[1];
 		result[0] = F.NIL;
-		if (ast.exists(x -> {
+		if (ast.exists(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
 				if (!(x instanceof IPatternObject)) {
-				result[0] = x.topHead().evalUpRule(this, ast);
+					result[0] = x.topHead().evalUpRule(EvalEngine.this, ast);
 					if (result[0].isPresent()) {
 						return true;
 					}
 				}
 				return false;
+			}
 		})) {
 			return result[0];
 		}

@@ -212,7 +212,17 @@ public final class PatternMatching {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Lambda.forEach(ast, x -> x.isSymbol(), x -> ((ISymbol) x).clearAll(engine));
+            Lambda.forEach(ast, new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return x.isSymbol();
+                }
+            }, new Consumer<IExpr>() {
+                @Override
+                public void accept(IExpr x) {
+                    ((ISymbol) x).clearAll(engine);
+                }
+            });
             return F.Null;
         }
 

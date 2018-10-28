@@ -1,5 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.Predicate;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
@@ -55,7 +57,12 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
 				if (arg1.isTimes()) {
 					IASTAppendable result = F.TimesAlloc(arg1.size());
 					IASTAppendable rest = F.TimesAlloc(arg1.size());
-					arg1.filter(result, rest, x -> x.isFree(t));
+					arg1.filter(result, rest, new Predicate<IExpr>() {
+                        @Override
+                        public boolean test(IExpr x) {
+                            return x.isFree(t);
+                        }
+                    });
 					if (result.size() > 1) {
 						return F.Times(result.getOneIdentity(F.C1), F.LaplaceTransform(rest, t, s));
 					}

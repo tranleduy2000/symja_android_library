@@ -1,11 +1,10 @@
 package org.matheclipse.core.patternmatching;
 
-import com.duy.lambda.Consumer;
 import com.duy.lambda.Predicate;
+import com.duy.util.DCollection;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.util.ArraySet;
 import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
 import org.matheclipse.core.eval.util.OpenIntToSet;
 import org.matheclipse.core.expression.Context;
@@ -18,14 +17,11 @@ import org.matheclipse.core.visit.AbstractVisitor;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 
@@ -88,9 +84,19 @@ public class RulesData implements Serializable {
 					// the left hand side is associated with the first argument
 					// see if one of the arguments contain a pattern with default
 					// value
-					return arg1.exists(x -> x.isPatternDefault(), 1);
+					return arg1.exists(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr x) {
+							return x.isPatternDefault();
 						}
-				return lhsAST.exists(x -> x.isPatternDefault(), 2);
+					}, 1);
+						}
+				return lhsAST.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return x.isPatternDefault();
+					}
+				}, 2);
 					}
 		} else if (lhs.isPattern()) {
 			return true;
@@ -641,7 +647,6 @@ public class RulesData implements Serializable {
 	private void insertMatcher(final IPatternMatcher pmEvaluator) {
 		final int patternHash = pmEvaluator.getPatternHash();
 		final int lhsPriority = pmEvaluator.getLHSPriority();
-		// TODO use a binary search to find the first equal getLHSPriority()
 		final int size = fPatternDownRules.size();
 		for (int i = 0; i < size; i++) {
 			IPatternMatcher matcher = fPatternDownRules.get(i);
@@ -718,7 +723,12 @@ public class RulesData implements Serializable {
 		}
 
 			if (fPatternDownRules != null) {
-			return fPatternDownRules.removeIf(x -> x.equivalentLHS(pmEvaluator) == 0);
+			return DCollection.removeIf(fPatternDownRules, new Predicate<IPatternMatcher>() {
+				@Override
+				public boolean test(IPatternMatcher x) {
+					return x.equivalentLHS(pmEvaluator) == 0;
+				}
+			});
 		}
 		return false;
 	}
