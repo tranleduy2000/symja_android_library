@@ -37,9 +37,9 @@ public interface WeightedEvaluation {
      *                                      do not match, weights contain NaN, negative or infinite values, or
      *                                      weights does not include at least on positive value
      */
-    default double evaluate(double[] values, double[] weights) throws MathIllegalArgumentException {
-        return evaluate(values, weights, 0, values.length);
-    }
+//    default double evaluate(double[] values, double[] weights) throws MathIllegalArgumentException {
+//        return evaluate(values, weights, 0, values.length);
+//    }
 
     /**
      * Returns the result of evaluating the statistic over the specified entries

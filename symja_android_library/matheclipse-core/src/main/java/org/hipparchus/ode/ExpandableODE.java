@@ -123,7 +123,7 @@ public class ExpandableODE {
         // initialize primary equations
         int index = 0;
         final double[] primary0 = s0.getPrimaryState();
-        primary.init(t0, primary0, finalTime);
+        OrdinaryDifferentialEquationDefault.init(primary, t0, primary0, finalTime);
 
         // initialize secondary equations
         while (++index < mapper.getNumberOfEquations()) {

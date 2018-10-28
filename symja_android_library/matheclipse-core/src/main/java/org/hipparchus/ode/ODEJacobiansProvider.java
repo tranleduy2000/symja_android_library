@@ -19,7 +19,6 @@ package org.hipparchus.ode;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,9 +49,7 @@ public interface ODEJacobiansProvider
      * </p>
      */
     @Override
-    default List<String> getParametersNames() {
-        return Collections.emptyList();
-    }
+    List<String> getParametersNames();
 
     /**
      * {@inheritDoc}
@@ -61,9 +58,7 @@ public interface ODEJacobiansProvider
      * </p>
      */
     @Override
-    default boolean isSupported(String name) {
-        return false;
-    }
+    boolean isSupported(String name);
 
     /**
      * {@inheritDoc}
@@ -72,11 +67,8 @@ public interface ODEJacobiansProvider
      * </p>
      */
     @Override
-    default double[] computeParameterJacobian(double t, double[] y, double[] yDot,
-                                              String paramName)
-            throws MathIllegalArgumentException {
-        throw new MathIllegalArgumentException(LocalizedODEFormats.UNKNOWN_PARAMETER,
-                paramName);
-    }
+    double[] computeParameterJacobian(double t, double[] y, double[] yDot,
+                                      String paramName)
+            throws MathIllegalArgumentException;
 
 }

@@ -43,7 +43,7 @@ import java.util.Queue;
 /**
  * Base class managing common boilerplate for all integrators.
  */
-public abstract class AbstractIntegrator implements ODEIntegrator {
+public abstract class AbstractIntegrator extends ODEIntegratorImpl implements ODEIntegrator {
 
     /**
      * Default relative accuracy.

@@ -43,7 +43,8 @@ import edu.jas.util.LongIterable;
  * @author Heinz Kredel
  */
 
-public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<GenPolynomial<C>>,
+public class GenPolynomialRing<C extends RingElem<C>>
+        implements RingFactory<GenPolynomial<C>>,
         Iterable<GenPolynomial<C>> {
 
 

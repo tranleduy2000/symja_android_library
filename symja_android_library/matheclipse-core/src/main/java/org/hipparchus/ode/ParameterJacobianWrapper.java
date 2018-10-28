@@ -28,7 +28,7 @@ import java.util.Map;
  * Wrapper class to compute Jacobian matrices by finite differences for ODE
  * which do not compute them by themselves.
  */
-class ParameterJacobianWrapper implements ODEJacobiansProvider {
+class ParameterJacobianWrapper extends ODEJacobiansProviderImpl implements ODEJacobiansProvider {
 
     /**
      * ode base ordinary differential equation for which Jacobians

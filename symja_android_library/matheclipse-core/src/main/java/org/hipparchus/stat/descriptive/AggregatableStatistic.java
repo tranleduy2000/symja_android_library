@@ -19,7 +19,6 @@ package org.hipparchus.stat.descriptive;
 
 
 import org.hipparchus.exception.NullArgumentException;
-import org.hipparchus.util.MathUtils;
 
 /**
  * An interface for statistics that can aggregate results.
@@ -52,13 +51,8 @@ public interface AggregatableStatistic<T> {
      * @param others the other instances to aggregate into this instance
      * @throws NullArgumentException if either others or any instance is null
      */
-    @SuppressWarnings("unchecked")
-    default void aggregate(T... others) {
-        MathUtils.checkNotNull(others);
-        for (T other : others) {
-            aggregate(other);
-        }
-    }
+//    @SuppressWarnings("unchecked")
+//    void aggregate(T... others);
 
     /**
      * Aggregates the results from the provided instances into this instance.
@@ -71,11 +65,6 @@ public interface AggregatableStatistic<T> {
      * @param others the other instances to aggregate into this instance
      * @throws NullArgumentException if either others or any instance is null
      */
-    default void aggregate(Iterable<T> others) {
-        MathUtils.checkNotNull(others);
-        for (T other : others) {
-            aggregate(other);
-        }
-    }
+//    void aggregate(Iterable<T> others);
 
 }

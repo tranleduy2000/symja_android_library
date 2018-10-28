@@ -44,6 +44,7 @@ import org.hipparchus.util.MathUtils;
  * @param <T> the type of the field elements
  */
 public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
+        extends BracketedRealFieldUnivariateSolverImpl<T>
         implements BracketedRealFieldUnivariateSolver<T> {
 
     /**

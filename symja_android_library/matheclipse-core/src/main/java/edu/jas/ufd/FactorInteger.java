@@ -77,7 +77,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
     @SuppressWarnings("cast")
     public FactorInteger(RingFactory<BigInteger> cfac) {
         super(cfac);
-        ModularRingFactory<MOD> mcofac = (ModularRingFactory<MOD>) (Object) new ModLongRing(13, true); // hack
+        ModularRingFactory<MOD> mcofac = (ModularRingFactory<MOD>) new ModLongRing(13, true); // hack
         mfactor = FactorFactory.getImplementation(mcofac); //new FactorModular(mcofac);
         mengine = GCDFactory.getImplementation(mcofac);
         //mengine = GCDFactory.getProxy(mcofac);
@@ -257,13 +257,13 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 }
                 // initialize polynomial factory and map polynomial
                 mfac = new GenPolynomialRing<MOD>(cofac, pfac);
-                am = PolyUtil.<MOD>fromIntegerCoefficients(mfac, P);
+                am = PolyUtil.fromIntegerCoefficients(mfac, P);
                 if (!am.degreeVector().equals(degv)) { // allways true
                     logger.info("unlucky prime (deg) = " + p);
                     //System.out.println("unlucky prime (deg) = " + p);
                     continue;
                 }
-                GenPolynomial<MOD> ap = PolyUtil.<MOD>baseDeriviative(am);
+                GenPolynomial<MOD> ap = PolyUtil.baseDeriviative(am);
                 if (ap.isZERO()) {
                     logger.info("unlucky prime (a')= " + p);
                     //System.out.println("unlucky prime (a')= " + p);
@@ -304,7 +304,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         int min = Integer.MAX_VALUE;
         BitSet AD = null;
         for (int k = 0; k < TT; k++) {
-            List<ExpVector> ev = PolyUtil.<MOD>leadingExpVector(modfac[k]);
+            List<ExpVector> ev = PolyUtil.leadingExpVector(modfac[k]);
             BitSet D = factorDegrees(ev, degi);
             if (AD == null) {
                 AD = D;
@@ -357,7 +357,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             if (true && P.leadingBaseCoefficient().isONE()) {
                 long t = System.currentTimeMillis();
                 try {
-                    mlist = PolyUtil.<MOD>monic(mlist);
+                    mlist = PolyUtil.monic(mlist);
                     factors = searchFactorsMonic(P, M, mlist, AD); // does now work in all cases
                     t = System.currentTimeMillis() - t;
                     //System.out.println("monic time = " + t);
@@ -476,7 +476,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         GenPolynomial<BigInteger> PP = C, P = C;
         // lift via Hensel
         try {
-            lift = HenselUtil.<MOD>liftHenselMonic(PP, mlist, k);
+            lift = HenselUtil.liftHenselMonic(PP, mlist, k);
             //System.out.println("lift = " + lift);
         } catch (NoLiftingException e) {
             throw new RuntimeException(e);
@@ -499,11 +499,11 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             KsubSet<GenPolynomial<MOD>> ps = new KsubSet<GenPolynomial<MOD>>(lift, j);
             for (List<GenPolynomial<MOD>> flist : ps) {
                 //System.out.println("degreeSum = " + degreeSum(flist));
-                if (!D.get((int) FactorInteger.<MOD>degreeSum(flist))) {
+                if (!D.get((int) FactorInteger.degreeSum(flist))) {
                     logger.info("skipped by degree set " + D + ", deg = " + degreeSum(flist));
                     continue;
                 }
-                GenPolynomial<MOD> mtrial = Power.<GenPolynomial<MOD>>multiply(mpfac, flist);
+                GenPolynomial<MOD> mtrial = Power.multiply(mpfac, flist);
                 //GenPolynomial<MOD> mtrial = mpfac.getONE();
                 //for (int kk = 0; kk < flist.size(); kk++) {
                 //    GenPolynomial<MOD> fk = flist.get(kk);
@@ -520,14 +520,14 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 //trial = engine.basePrimitivePart( trial.multiply(ldcf) );
                 trial = engine.basePrimitivePart(trial);
                 //System.out.println("pp(trial)= " + trial);
-                if (PolyUtil.<BigInteger>baseSparsePseudoRemainder(u, trial).isZERO()) {
+                if (PolyUtil.baseSparsePseudoRemainder(u, trial).isZERO()) {
                     logger.info("successful trial = " + trial);
                     //System.out.println("trial    = " + trial);
                     //System.out.println("flist    = " + flist);
                     //trial = engine.basePrimitivePart(trial);
                     //System.out.println("pp(trial)= " + trial);
                     factors.add(trial);
-                    u = PolyUtil.<BigInteger>basePseudoDivide(u, trial); //u.divide( trial );
+                    u = PolyUtil.basePseudoDivide(u, trial); //u.divide( trial );
                     //System.out.println("u        = " + u);
                     //if (lift.removeAll(flist)) {
                     lift = removeOnce(lift, flist);
@@ -595,7 +595,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         //System.out.println("modlist  = " + mlist); // includes not ldcf
         GenPolynomialRing<MOD> mfac = ct.ring;
-        GenPolynomial<MOD> Pm = PolyUtil.<MOD>fromIntegerCoefficients(mfac, C);
+        GenPolynomial<MOD> Pm = PolyUtil.fromIntegerCoefficients(mfac, C);
         GenPolynomial<BigInteger> PP = C, P = C;
 
         // combine trial factors
@@ -611,7 +611,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             KsubSet<GenPolynomial<MOD>> ps = new KsubSet<GenPolynomial<MOD>>(mlist, j);
             for (List<GenPolynomial<MOD>> flist : ps) {
                 //System.out.println("degreeSum = " + degreeSum(flist));
-                if (!D.get((int) FactorInteger.<MOD>degreeSum(flist))) {
+                if (!D.get((int) FactorInteger.degreeSum(flist))) {
                     logger.info("skipped by degree set " + D + ", deg = " + degreeSum(flist));
                     continue;
                 }
@@ -631,7 +631,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 // lift via Hensel
                 try {
                     // ilist = HenselUtil.liftHenselQuadraticFac(PP, M, trial, cofactor);
-                    ilist = HenselUtil.<MOD>liftHenselQuadratic(PP, M, trial, cofactor);
+                    ilist = HenselUtil.liftHenselQuadratic(PP, M, trial, cofactor);
                     //ilist = HenselUtil.<MOD> liftHensel(PP, M, trial, cofactor);
                 } catch (NoLiftingException e) {
                     // no liftable factors
@@ -651,7 +651,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
 
                 itrial = engine.basePrimitivePart(itrial);
                 //System.out.println("pp(trial)= " + itrial);
-                if (PolyUtil.<BigInteger>baseSparsePseudoRemainder(u, itrial).isZERO()) {
+                if (PolyUtil.baseSparsePseudoRemainder(u, itrial).isZERO()) {
                     logger.info("successful trial = " + itrial);
                     //System.out.println("trial    = " + itrial);
                     //System.out.println("cofactor = " + icofactor);
@@ -705,7 +705,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         List<GenPolynomial<BigInteger>> topt = new ArrayList<GenPolynomial<BigInteger>>(1);
         topt.add(P);
-        OptimizedPolynomialList<BigInteger> opt = TermOrderOptimization.<BigInteger>optimizeTermOrder(pfac,
+        OptimizedPolynomialList<BigInteger> opt = TermOrderOptimization.optimizeTermOrder(pfac,
                 topt);
         P = opt.list.get(0);
         logger.info("optimized polynomial: " + P);
@@ -724,8 +724,8 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 //e.printStackTrace();
             }
         } else { // not all variables appear, remove unused variables, hack for Hensel, TODO check
-            GenPolynomial<BigInteger> pu = PolyUtil.<BigInteger>removeUnusedUpperVariables(P);
-            GenPolynomial<BigInteger> pl = PolyUtil.<BigInteger>removeUnusedLowerVariables(pu); // not useful
+            GenPolynomial<BigInteger> pu = PolyUtil.removeUnusedUpperVariables(P);
+            GenPolynomial<BigInteger> pl = PolyUtil.removeUnusedLowerVariables(pu); // not useful
             try {
                 logger.info("try factorsSquarefreeHensel: " + pl);
                 facs = factorsSquarefreeHensel(pu);
@@ -748,7 +748,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             logger.info("factorsSquarefreeHensel not applicable or failed, reverting to Kronecker for: " + P);
             facs = super.factorsSquarefree(P);
         }
-        List<GenPolynomial<BigInteger>> iopt = TermOrderOptimization.<BigInteger>permutation(iperm, pfac,
+        List<GenPolynomial<BigInteger>> iopt = TermOrderOptimization.permutation(iperm, pfac,
                 facs);
         logger.info("de-optimized polynomials: " + iopt);
         facs = normalizeFactorization(iopt);
@@ -788,15 +788,15 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
 
         // factor leading coefficient as polynomial in the lowest! variable
         GenPolynomialRing<GenPolynomial<BigInteger>> rnfac = pfac.recursive(pfac.nvar - 1);
-        GenPolynomial<GenPolynomial<BigInteger>> pr = PolyUtil.<BigInteger>recursive(rnfac, pd);
-        GenPolynomial<GenPolynomial<BigInteger>> prr = PolyUtil.<BigInteger>switchVariables(pr);
+        GenPolynomial<GenPolynomial<BigInteger>> pr = PolyUtil.recursive(rnfac, pd);
+        GenPolynomial<GenPolynomial<BigInteger>> prr = PolyUtil.switchVariables(pr);
 
         GenPolynomial<BigInteger> prrc = engine.recursiveContent(prr); // can have content wrt this variable
         List<GenPolynomial<BigInteger>> cfactors = null;
         if (!prrc.isONE()) {
-            prr = PolyUtil.<BigInteger>recursiveDivide(prr, prrc);
+            prr = PolyUtil.recursiveDivide(prr, prrc);
             GenPolynomial<BigInteger> prrcu = prrc.extendLower(pfac, 0, 0L); // since switched vars
-            pd = PolyUtil.<BigInteger>basePseudoDivide(pd, prrcu);
+            pd = PolyUtil.basePseudoDivide(pd, prrcu);
             logger.info("recursive content = " + prrc + ", new P = " + pd);
             cfactors = factorsSquarefree(prrc);
             List<GenPolynomial<BigInteger>> cff = new ArrayList<GenPolynomial<BigInteger>>(cfactors.size());
@@ -890,7 +890,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 while (doIt) {
                     logger.info("vi(" + j + ") = " + vi);
                     Vi = new BigInteger(vi);
-                    pep = PolyUtil.<BigInteger>evaluateMain(cpfac, pe, Vi);
+                    pep = PolyUtil.evaluateMain(cpfac, pe, Vi);
                     //System.out.println("pep = " + pep);
                     // check lucky evaluation point 
                     if (degp == pep.degree(cpfac.nvar - 1)) {
@@ -911,9 +911,9 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 }
                 //if ( !isMonic ) {
                 if (ccpfac.nvar >= 1) {
-                    cep = PolyUtil.<BigInteger>evaluateMain(ccpfac, ce, Vi);
+                    cep = PolyUtil.evaluateMain(ccpfac, ce, Vi);
                 } else {
-                    cei = PolyUtil.<BigInteger>evaluateMain(ccpfac.coFac, ce, Vi);
+                    cei = PolyUtil.evaluateMain(ccpfac.coFac, ce, Vi);
                 }
                 //}
                 int jj = (int) Math.round(ran + 0.52 * Math.random()); // j, random increment
@@ -1055,7 +1055,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 }
                 // adjust if pec != 1
                 pec = pecw;
-                lpx = Power.<GenPolynomial<BigInteger>>multiply(lprr.ring, lf); // test only, not used
+                lpx = Power.multiply(lprr.ring, lf); // test only, not used
                 //System.out.println("lpx = " + lpx);
                 if (!lprr.degreeVector().equals(lpx.degreeVector())) {
                     logger.info("deg(lprr) != deg(lpx): lprr = " + lprr + ", lpx = " + lpx);
@@ -1071,9 +1071,9 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                         ccpfac = ccpfac.contract(1);
                         BigInteger Vi = V.get(lprr.ring.nvar - j);
                         if (ccpfac.nvar >= 1) {
-                            lfe = PolyUtil.<BigInteger>evaluateMain(ccpfac, lfe, Vi);
+                            lfe = PolyUtil.evaluateMain(ccpfac, lfe, Vi);
                         } else {
-                            lfei = PolyUtil.<BigInteger>evaluateMain(ccpfac.coFac, lfe, Vi);
+                            lfei = PolyUtil.evaluateMain(ccpfac.coFac, lfe, Vi);
                         }
                     }
                     //System.out.println("lfe = " + lfe + ", lfei = " + lfei + ", V = " + V);
@@ -1111,8 +1111,8 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                         // adjust pe
                     }
                     if (!pec.isONE()) { // still not 1
-                        ln = new ArrayList<GenPolynomial<BigInteger>>(lf.size());
-                        un = new ArrayList<GenPolynomial<BigInteger>>(lf.size());
+                        ln = new ArrayList<>(lf.size());
+                        un = new ArrayList<>(lf.size());
                         pes = pe;
                         for (int jj = 0; jj < lf.size(); jj++) {
                             GenPolynomial<BigInteger> up = ufactors.get(jj);
@@ -1128,7 +1128,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                             un.add(up);
                             ln.add(lp);
                         }
-                        if (pes.equals(Power.<GenPolynomial<BigInteger>>multiply(pe.ring, un))) {
+                        if (pes.equals(Power.multiply(pe.ring, un))) {
                             //System.out.println("*pe  = " + pes + ", pec = " + pec);
                             //ystem.out.println("*ln  = " + ln + ", *lf = " + lf);
                             //System.out.println("*un  = " + un + ", *ufactors = " + ufactors);
@@ -1146,7 +1146,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 //    continue;
                 //}
                 logger.info("distributed factors of leading coefficient = " + lf);
-                lpx = Power.<GenPolynomial<BigInteger>>multiply(lprr.ring, lf);
+                lpx = Power.multiply(lprr.ring, lf);
                 if (!lprr.abs().equals(lpx.abs())) { // not correctly distributed
                     if (!lprr.degreeVector().equals(lpx.degreeVector())) {
                         logger.info("lprr != lpx: lprr = " + lprr + ", lpx = " + lpx);
@@ -1251,7 +1251,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 }
                 mufac = new GenPolynomialRing<MOD>(cf, ufac);
                 //System.out.println("mufac = " + mufac.toScript());
-                Pm = PolyUtil.<MOD>fromIntegerCoefficients(mufac, pe);
+                Pm = PolyUtil.fromIntegerCoefficients(mufac, pe);
                 //System.out.println("Pm = " + Pm);
                 if (!mfactor.isSquarefree(Pm)) {
                     continue;
@@ -1287,8 +1287,8 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         //System.out.println("muqfac = " + muqfac);
         GenPolynomialRing<MOD> mucpfac = new GenPolynomialRing<MOD>(muqfac, ufac);
 
-        List<GenPolynomial<MOD>> muqfactors = PolyUtil.<MOD>fromIntegerCoefficients(mucpfac, ufactors);
-        GenPolynomial<MOD> peqq = PolyUtil.<MOD>fromIntegerCoefficients(mucpfac, pe);
+        List<GenPolynomial<MOD>> muqfactors = PolyUtil.fromIntegerCoefficients(mucpfac, ufactors);
+        GenPolynomial<MOD> peqq = PolyUtil.fromIntegerCoefficients(mucpfac, pe);
         if (debug) {
             if (!mfactor.isFactorization(peqq, muqfactors)) { // should not happen
                 System.out.println("muqfactors = " + muqfactors);
@@ -1300,7 +1300,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
 
         // convert C from Z[...] to Z_q[...]
         GenPolynomialRing<MOD> qcfac = new GenPolynomialRing<MOD>(muqfac, pd.ring);
-        GenPolynomial<MOD> pq = PolyUtil.<MOD>fromIntegerCoefficients(qcfac, pd);
+        GenPolynomial<MOD> pq = PolyUtil.fromIntegerCoefficients(qcfac, pd);
         //System.out.println("pd = " + pd);
         logger.info("multivariate modulo p^k: " + pq);
 
@@ -1314,7 +1314,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         // Hensel lifting of factors
         List<GenPolynomial<MOD>> mlift;
         try {
-            mlift = HenselMultUtil.<MOD>liftHensel(pd, pq, muqfactors, V, k, lf);
+            mlift = HenselMultUtil.liftHensel(pd, pq, muqfactors, V, k, lf);
             logger.info("mlift = " + mlift);
         } catch (NoLiftingException nle) {
             //System.out.println("exception : " + nle);
@@ -1349,7 +1349,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             KsubSet<GenPolynomial<MOD>> subs = new KsubSet<GenPolynomial<MOD>>(mlift, j);
             for (List<GenPolynomial<MOD>> flist : subs) {
                 //System.out.println("degreeSum = " + degreeSum(flist));
-                GenPolynomial<MOD> mtrial = Power.<GenPolynomial<MOD>>multiply(mfac, flist);
+                GenPolynomial<MOD> mtrial = Power.multiply(mfac, flist);
                 if (mtrial.degree() > deg) { // this test is sometimes wrong
                     logger.info("degree > deg " + deg + ", degree = " + mtrial.degree());
                     //continue;
@@ -1361,10 +1361,10 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 if (debug) {
                     logger.info("trial    = " + trial); // + ", mtrial = " + mtrial);
                 }
-                if (PolyUtil.<BigInteger>baseSparsePseudoRemainder(ui, trial).isZERO()) {
+                if (PolyUtil.baseSparsePseudoRemainder(ui, trial).isZERO()) {
                     logger.info("successful trial = " + trial);
                     factors.add(trial);
-                    ui = PolyUtil.<BigInteger>basePseudoDivide(ui, trial);
+                    ui = PolyUtil.basePseudoDivide(ui, trial);
                     //System.out.println("ui        = " + ui);
                     mlift = removeOnce(mlift, flist);
                     logger.info("new mlift= " + mlift);
@@ -1433,8 +1433,8 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             return sengine.isSquarefree(P);
         }
         GenPolynomialRing<GenPolynomial<BigInteger>> rfac = pfac.recursive(1);
-        GenPolynomial<GenPolynomial<BigInteger>> Pr = PolyUtil.<BigInteger>recursive(rfac, P);
-        GenPolynomial<GenPolynomial<BigInteger>> Ps = PolyUtil.<BigInteger>recursiveDeriviative(Pr);
+        GenPolynomial<GenPolynomial<BigInteger>> Pr = PolyUtil.recursive(rfac, P);
+        GenPolynomial<GenPolynomial<BigInteger>> Ps = PolyUtil.recursiveDeriviative(Pr);
         System.out.println("Pr = " + Pr);
         System.out.println("Ps = " + Ps);
         GenPolynomial<GenPolynomial<BigInteger>> g = engine.recursiveUnivariateGcd(Pr, Ps);
@@ -1444,17 +1444,14 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         // in lowest variable
         rfac = pfac.recursive(pfac.nvar - 1);
-        Pr = PolyUtil.<BigInteger>recursive(rfac, P);
-        Pr = PolyUtil.<BigInteger>switchVariables(Pr);
-        Ps = PolyUtil.<BigInteger>recursiveDeriviative(Pr);
+        Pr = PolyUtil.recursive(rfac, P);
+        Pr = PolyUtil.switchVariables(Pr);
+        Ps = PolyUtil.recursiveDeriviative(Pr);
         System.out.println("Pr = " + Pr);
         System.out.println("Ps = " + Ps);
         g = engine.recursiveUnivariateGcd(Pr, Ps);
         System.out.println("g_1 = " + g);
-        if (!g.isONE()) {
-            return false;
-        }
-        return true;
+        return g.isONE();
     }
 
 }

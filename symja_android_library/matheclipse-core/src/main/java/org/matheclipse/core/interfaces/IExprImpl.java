@@ -39,6 +39,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import edu.jas.structure.ElemFactory;
+import edu.jas.structure.RingElemImpl;
 
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.Sqrt;
@@ -94,7 +95,7 @@ import static org.matheclipse.core.expression.F.g;
  *                                implements ISymbol, IExpr
  * </pre>
  */
-public abstract class IExprImpl implements IExpr {
+public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.

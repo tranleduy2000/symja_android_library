@@ -115,10 +115,8 @@ public interface BracketedUnivariateSolver<FUNC extends UnivariateFunction>
      * @throws MathIllegalStateException    if the allowed number of evaluations is
      *                                      exceeded.
      */
-    default Interval solveInterval(int maxEval, FUNC f, double min, double max)
-            throws MathIllegalArgumentException, MathIllegalStateException {
-        return this.solveInterval(maxEval, f, min, max, min + 0.5 * (max - min));
-    }
+    Interval solveInterval(int maxEval, FUNC f, double min, double max)
+            throws MathIllegalArgumentException, MathIllegalStateException;
 
     /**
      * Solve for a zero in the given interval and return a tolerance interval surrounding

@@ -19,7 +19,6 @@ package org.hipparchus.ode;
 
 import org.hipparchus.analysis.UnivariateFunction;
 import org.hipparchus.analysis.solvers.BracketedUnivariateSolver;
-import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.ode.events.ODEEventHandler;
@@ -248,11 +247,9 @@ public interface ODEIntegrator {
      * @throws MathIllegalStateException    if the number of functions evaluations is exceeded
      * @throws MathIllegalArgumentException if the location of an event cannot be bracketed
      */
-    default ODEStateAndDerivative integrate(OrdinaryDifferentialEquation equations,
-                                            ODEState initialState, double finalTime)
-            throws MathIllegalArgumentException, MathIllegalStateException {
-        return integrate(new ExpandableODE(equations), initialState, finalTime);
-    }
+    ODEStateAndDerivative integrate(OrdinaryDifferentialEquation equations,
+                                    ODEState initialState, double finalTime)
+            throws MathIllegalArgumentException, MathIllegalStateException;
 
     /**
      * Integrate the differential equations up to the given time.
@@ -278,30 +275,8 @@ public interface ODEIntegrator {
      * @deprecated as of 1.0, replaced with {@link #integrate(ExpandableODE, ODEState, double)}
      */
     @Deprecated
-    default double integrate(final OrdinaryDifferentialEquation equations,
-                             final double t0, final double[] y0, final double t, final double[] y)
-            throws MathIllegalArgumentException, MathIllegalStateException {
-
-        if (y0.length != equations.getDimension()) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                    y0.length, equations.getDimension());
-        }
-        if (y.length != equations.getDimension()) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                    y.length, equations.getDimension());
-        }
-
-        // prepare expandable stateful equations
-        final ExpandableODE expandableODE = new ExpandableODE(equations);
-
-        // perform integration
-        final ODEState initialState = new ODEState(t0, y0);
-        final ODEStateAndDerivative finalState = integrate(expandableODE, initialState, t);
-
-        // extract results back from the stateful equations
-        System.arraycopy(finalState.getPrimaryState(), 0, y, 0, y.length);
-        return finalState.getTime();
-
-    }
+    double integrate(final OrdinaryDifferentialEquation equations,
+                     final double t0, final double[] y0, final double t, final double[] y)
+            throws MathIllegalArgumentException, MathIllegalStateException;
 
 }

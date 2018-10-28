@@ -9,6 +9,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import edu.jas.structure.MonoidElem;
+import edu.jas.structure.MonoidElemImpl;
 import edu.jas.structure.MonoidFactory;
 import edu.jas.structure.NotInvertibleException;
 
@@ -19,7 +20,7 @@ import edu.jas.structure.NotInvertibleException;
  * @author Heinz Kredel
  */
 
-public final class Word implements MonoidElem<Word> {
+public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word> {
 
 
     /**

@@ -122,7 +122,7 @@ public class FieldExpandableODE<T extends RealFieldElement<T>> {
         // initialize secondary equations
         while (++index < mapper.getNumberOfEquations()) {
             final T[] secondary0 = s0.getSecondaryState(index);
-            components.get(index - 1).init(t0, primary0, secondary0, finalTime);
+            FieldSecondaryODEDefault.init(components.get(index - 1), t0, primary0, secondary0, finalTime);
         }
 
     }

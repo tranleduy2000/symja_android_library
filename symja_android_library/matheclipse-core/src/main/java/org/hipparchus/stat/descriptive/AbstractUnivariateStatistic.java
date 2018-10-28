@@ -24,7 +24,7 @@ import org.hipparchus.util.MathUtils;
  * Abstract base class for implementations of the
  * {@link UnivariateStatistic} interface.
  */
-public abstract class AbstractUnivariateStatistic
+public abstract class AbstractUnivariateStatistic extends UnivariateStatisticImpl
         implements UnivariateStatistic {
 
     /**

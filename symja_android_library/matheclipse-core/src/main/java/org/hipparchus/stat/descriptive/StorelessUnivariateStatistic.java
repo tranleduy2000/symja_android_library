@@ -16,12 +16,9 @@
  */
 package org.hipparchus.stat.descriptive;
 
-import org.hipparchus.exception.LocalizedCoreFormats;
-import org.hipparchus.exception.MathIllegalArgumentException;
-import org.hipparchus.util.MathArrays;
-import org.hipparchus.util.MathUtils;
-
 import com.duy.lambda.DoubleConsumer;
+
+import org.hipparchus.exception.MathIllegalArgumentException;
 
 /**
  * Extends the definition of {@link UnivariateStatistic} with
@@ -58,17 +55,8 @@ public interface StorelessUnivariateStatistic extends UnivariateStatistic, Doubl
      * @see UnivariateStatistic#evaluate(double[], int, int)
      */
     @Override
-    default double evaluate(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
-
-        if (MathArrays.verifyValues(values, begin, length)) {
-            StorelessUnivariateStatistic stat = copy();
-            stat.clear();
-            stat.incrementAll(values, begin, length);
-            return stat.getResult();
-        }
-        return Double.NaN;
-    }
+    double evaluate(final double[] values, final int begin, final int length)
+            throws MathIllegalArgumentException;
 
     /**
      * Updates the internal state of the statistic to reflect the addition of the new value.
@@ -81,9 +69,7 @@ public interface StorelessUnivariateStatistic extends UnivariateStatistic, Doubl
      * {@inheritDoc}
      */
     @Override
-    default void accept(double value) {
-        increment(value);
-    }
+    void accept(double value);
 
     /**
      * Updates the internal state of the statistic to reflect addition of
@@ -96,10 +82,7 @@ public interface StorelessUnivariateStatistic extends UnivariateStatistic, Doubl
      * @param values array holding the new values to add
      * @throws MathIllegalArgumentException if the array is null
      */
-    default void incrementAll(double[] values) throws MathIllegalArgumentException {
-        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
-        incrementAll(values, 0, values.length);
-    }
+    void incrementAll(double[] values) throws MathIllegalArgumentException;
 
 
     /**
@@ -116,16 +99,8 @@ public interface StorelessUnivariateStatistic extends UnivariateStatistic, Doubl
      * @param length the number of elements to add
      * @throws MathIllegalArgumentException if the array is null or the index
      */
-    default void incrementAll(double[] values, int start, int length)
-            throws MathIllegalArgumentException {
-
-        if (MathArrays.verifyValues(values, start, length)) {
-            int k = start + length;
-            for (int i = start; i < k; i++) {
-                increment(values[i]);
-            }
-        }
-    }
+    void incrementAll(double[] values, int start, int length)
+            throws MathIllegalArgumentException;
 
 
     /**
