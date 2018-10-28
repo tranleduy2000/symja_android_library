@@ -1,12 +1,8 @@
 package org.matheclipse.core.expression;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
-
 import org.matheclipse.core.interfaces.IDataExpr;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IExprImpl;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
@@ -18,7 +14,7 @@ import org.matheclipse.core.visit.IVisitorLong;
  * 
  * @see org.matheclipse.core.interfaces.IDataExpr
  */
-public class DataExpr implements IDataExpr {
+public class DataExpr extends IExprImpl implements IDataExpr {
 
 	/**
 	 * 
