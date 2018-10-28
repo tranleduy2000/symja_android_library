@@ -976,8 +976,8 @@ public class PolynomialFunctions {
 				collector.add(F.CNInfinity);
 			} else if (expr.isAST()) {
 				IAST arg1 = (IAST) expr;
-				final IPatternMatcher matcher = new PatternMatcherEvalEngine(form, engine);
-
+				// final IPatternMatcher matcher = new PatternMatcherEvalEngine(form, engine);
+				final IPatternMatcher matcher = engine.evalPatternMatcher(form);
 				if (arg1.isPower()) {
 					if (matcher.test(arg1.base(), engine)) {
 						collector.add(arg1.exponent());
@@ -1014,7 +1014,8 @@ public class PolynomialFunctions {
 				}
 
 			} else if (expr.isSymbol()) {
-				final PatternMatcher matcher = new PatternMatcherEvalEngine(form, engine);
+				// final PatternMatcher matcher = new PatternMatcherEvalEngine(form, engine);
+				final IPatternMatcher matcher = engine.evalPatternMatcher(form);
 				if (matcher.test(expr)) {
 					collector.add(F.C1);
 				} else {

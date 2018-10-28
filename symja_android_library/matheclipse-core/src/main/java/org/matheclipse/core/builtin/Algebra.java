@@ -2077,6 +2077,7 @@ public class Algebra {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.FLAT);
 		}
 	}
 
@@ -2367,8 +2368,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the GCD ('greatest common divisor') of the polynomials <code>p</code> and <code>q</code> modulus the <code>prime</code>
-	 * integer.
+	 * returns the GCD ('greatest common divisor') of the polynomials <code>p</code> and <code>q</code> modulus the
+	 * <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2507,8 +2508,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code> modulus the <code>prime</code>
-	 * integer.
+	 * returns the LCM ('least common multiple') of the polynomials <code>p</code> and <code>q</code> modulus the
+	 * <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -2673,7 +2674,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable <code>x</code>.
+	 * returns the polynomial quotient of the polynomials <code>p</code> and <code>q</code> for the variable
+	 * <code>x</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2731,8 +2733,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns a list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for the variable
-	 * <code>x</code>.
+	 * returns a list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code>
+	 * for the variable <code>x</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -2743,8 +2745,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for the variable
-	 * <code>x</code> modulus the <code>prime</code> integer.
+	 * returns list with the polynomial quotient and remainder of the polynomials <code>p</code> and <code>q</code> for
+	 * the variable <code>x</code> modulus the <code>prime</code> integer.
 	 * </p>
 	 * </blockquote>
 	 */
@@ -4292,8 +4294,10 @@ public class Algebra {
 	 * for the given expressions <code>numeratorPolynomial</code> and <code>denominatorPolynomial</code>.
 	 *
 	 *
-	 * @param numeratorPolynomial   a <code>BigRational</code> polynomial which could be converted to JAS polynomial
-	 * @param denominatorPolynomial a <code>BigRational</code> polynomial which could be converted to JAS polynomial
+	 * @param numeratorPolynomial
+	 *            a <code>BigRational</code> polynomial which could be converted to JAS polynomial
+	 * @param denominatorPolynomial
+	 *            a <code>BigRational</code> polynomial which could be converted to JAS polynomial
 	 * @return <code>null</code> if the expressions couldn't be converted to JAS polynomials or gcd equals 1
 	 * @throws JASConversionException
 	 */
