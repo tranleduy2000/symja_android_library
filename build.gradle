@@ -25,10 +25,14 @@ buildscript {
             url 'https://maven.google.com/'
             name 'Google'
         }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
+        classpath "gradle.plugin.com.github.j2objccontrib.j2objcgradle:j2objc-gradle:0.6.0-alpha"
     }
 }
 allprojects {
@@ -39,6 +43,9 @@ allprojects {
             url 'https://maven.google.com/'
         }
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 }
 task clean(type: Delete) {

@@ -13,4 +13,6 @@
  * limitations under the License.
  */
 
-include ':symja_android_library', ':androidtest'
+include ':symja_android_library'
+include ':androidtest'
+include ':objc'
