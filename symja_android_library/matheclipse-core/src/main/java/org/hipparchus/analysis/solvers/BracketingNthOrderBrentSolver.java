@@ -38,7 +38,7 @@ import org.hipparchus.util.Precision;
  * The given interval must bracket the root.</p>
  */
 public class BracketingNthOrderBrentSolver
-        extends AbstractUnivariateSolver
+        extends BracketedUnivariateSolverUnivariateFunction
         implements BracketedUnivariateSolver<UnivariateFunction> {
 
     /**
