@@ -2,6 +2,7 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;

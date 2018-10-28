@@ -3,7 +3,7 @@ package org.matheclipse.core.reflection.system.rules;
 import org.matheclipse.core.interfaces.IAST;
 
 import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.*;
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C1D3;
 import static org.matheclipse.core.expression.F.C1D4;
