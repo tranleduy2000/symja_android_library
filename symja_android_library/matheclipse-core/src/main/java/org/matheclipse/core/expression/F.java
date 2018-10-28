@@ -47,6 +47,7 @@ import org.matheclipse.core.builtin.StringFunctions;
 import org.matheclipse.core.builtin.Structure;
 import org.matheclipse.core.builtin.TensorFunctions;
 import org.matheclipse.core.builtin.VectorAnalysisFunctions;
+import org.matheclipse.core.builtin.WXFFunctions;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -376,6 +377,12 @@ public class F {
 	 */
 	public final static IBuiltInSymbol BinCounts = F.initFinalSymbol("BinCounts", ID.BinCounts);
 
+	/***/
+	public final static IBuiltInSymbol BinaryDeserialize = F.initFinalSymbol("BinaryDeserialize", ID.BinaryDeserialize);
+
+	/***/
+	public final static IBuiltInSymbol BinarySerialize = F.initFinalSymbol("BinarySerialize", ID.BinarySerialize);
+
     /** Binomial(n, k) - returns the binomial coefficient of the 2 integers `n` and `k`*/
 	public final static IBuiltInSymbol Binomial = F.initFinalSymbol("Binomial", ID.Binomial);
 
@@ -516,7 +523,10 @@ public class F {
 	public final static IBuiltInSymbol CholeskyDecomposition = F.initFinalSymbol("CholeskyDecomposition",
 			ID.CholeskyDecomposition);
 
-    /** Chop(numerical-expr) - replaces numerical values in the `numerical-expr` which are close to zero with symbolic value `0`.*/
+	/**
+	 * Chop(numerical-expr) - replaces numerical values in the `numerical-expr` which are close to zero with symbolic
+	 * value `0`.
+	 */
 	public final static IBuiltInSymbol Chop = F.initFinalSymbol("Chop", ID.Chop);
 
 	/** CirclePoints(i) - gives the `i` points on the unit circle for a positive integer `i`.*/
@@ -531,7 +541,10 @@ public class F {
 	/** ClearAttributes(symbol, attrib) - removes `attrib` from `symbol`'s attributes.*/
 	public final static IBuiltInSymbol ClearAttributes = F.initFinalSymbol("ClearAttributes", ID.ClearAttributes);
 
-    /** Clip(expr) - returns `expr` in the range `-1` to `1`. Returns `-1` if `expr` is less than `-1`. Returns `1` if `expr` is greater than `1`.*/
+	/**
+	 * Clip(expr) - returns `expr` in the range `-1` to `1`. Returns `-1` if `expr` is less than `-1`. Returns `1` if
+	 * `expr` is greater than `1`.
+	 */
 	public final static IBuiltInSymbol Clip = F.initFinalSymbol("Clip", ID.Clip);
 
 	/** Coefficient(polynomial, variable, exponent) - get the coefficient of `variable^exponent` in `polynomial`.*/
@@ -618,7 +631,7 @@ public class F {
 	/** ConstantArray(expr, n) - returns a list of `n` copies of `expr`.*/
 	public final static IBuiltInSymbol ConstantArray = F.initFinalSymbol("ConstantArray", ID.ConstantArray);
 
-    /***/
+	/** Context(symbol) - return the context of the given symbol. */
     public final static IBuiltInSymbol Context = F.initFinalSymbol("Context", ID.Context);
 
 	/** Continue() - continues with the next iteration in a `For`, `While`, or `Do` loop.*/
@@ -627,7 +640,10 @@ public class F {
 	/** ContinuedFraction(number) - get the continued fraction representation of `number`.*/
 	public final static IBuiltInSymbol ContinuedFraction = F.initFinalSymbol("ContinuedFraction", ID.ContinuedFraction);
 
-    /** Convergents({n1, n2, ...}) - return the list of convergents which represents the continued fraction list `{n1, n2, ...}`.*/
+	/**
+	 * Convergents({n1, n2, ...}) - return the list of convergents which represents the continued fraction list `{n1,
+	 * n2, ...}`.
+	 */
 	public final static IBuiltInSymbol Convergents = F.initFinalSymbol("Convergents", ID.Convergents);
 
 	/***/
@@ -690,7 +706,10 @@ public class F {
     /** D(f, x) - gives the partial derivative of `f` with respect to `x`. */
 	public final static IBuiltInSymbol D = F.initFinalSymbol("D", ID.D);
 
-    /** DSolve(equation, f(var), var) - attempts to solve a linear differential `equation` for the function `f(var)` and variable `var`.*/
+	/**
+	 * DSolve(equation, f(var), var) - attempts to solve a linear differential `equation` for the function `f(var)` and
+	 * variable `var`.
+	 */
 	public final static IBuiltInSymbol DSolve = F.initFinalSymbol("DSolve", ID.DSolve);
 
     /** Decrement(x) - decrements `x` by `1`, returning the original value of `x`. */
@@ -1537,7 +1556,10 @@ public class F {
 	/** Log(z) - returns the natural logarithm of `z`.*/
 	public final static IBuiltInSymbol Log = F.initFinalSymbol("Log", ID.Log);
 
-	/** Log10(z) - returns the base-`10` logarithm of `z`. `Log10(z)` will be converted to `Log(z)/Log(10)` in symbolic mode. */
+	/**
+	 * Log10(z) - returns the base-`10` logarithm of `z`. `Log10(z)` will be converted to `Log(z)/Log(10)` in symbolic
+	 * mode.
+	 */
 	public final static IBuiltInSymbol Log10 = F.initFinalSymbol("Log10", ID.Log10);
 
 	/**
@@ -1595,7 +1617,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol MapAt = F.initFinalSymbol("MapAt", ID.MapAt);
 
-    /** MapIndexed(f, expr) - applies `f` to each part on the first level of `expr` and appending the elements position as a list in the second argument.*/
+	/**
+	 * MapIndexed(f, expr) - applies `f` to each part on the first level of `expr` and appending the elements position
+	 * as a list in the second argument.
+	 */
 	public final static IBuiltInSymbol MapIndexed = F.initFinalSymbol("MapIndexed", ID.MapIndexed);
 
     /** MapThread(f, {{a1, a2, ...}, {b1, b2, ...}, ...}) - returns `{f(a1, b1, ...), f(a2, b2, ...), ...}`.   */
@@ -1701,7 +1726,10 @@ public class F {
 	/** Mod(x, m) - returns `x` modulo `m`.*/
 	public final static IBuiltInSymbol Mod = F.initFinalSymbol("Mod", ID.Mod);
 
-	/** Module({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by renaming local variables. */
+	/**
+	 * Module({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by renaming local
+	 * variables.
+	 */
 	public final static IBuiltInSymbol Module = F.initFinalSymbol("Module", ID.Module);
 
 	/***/
@@ -1710,7 +1738,10 @@ public class F {
 	/** MoebiusMu(expr) - calculate the Möbius function.*/
 	public final static IBuiltInSymbol MoebiusMu = F.initFinalSymbol("MoebiusMu", ID.MoebiusMu);
 
-    /** MonomialList(polynomial, list-of-variables) - get the list of monomials of a `polynomial` expression, with respect to the `list-of-variables`. */
+	/**
+	 * MonomialList(polynomial, list-of-variables) - get the list of monomials of a `polynomial` expression, with
+	 * respect to the `list-of-variables`.
+	 */
 	public final static IBuiltInSymbol MonomialList = F.initFinalSymbol("MonomialList", ID.MonomialList);
 
 	/** Most(expr) - returns `expr` with the last element removed.*/
@@ -1795,7 +1826,10 @@ public class F {
 	 */
 	public final static IBuiltInSymbol NestList = F.initFinalSymbol("NestList", ID.NestList);
 
-    /** NestWhile(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until applying `test` on the result no longer yields `True`.*/
+	/**
+	 * NestWhile(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until applying `test` on
+	 * the result no longer yields `True`.
+	 */
 	public final static IBuiltInSymbol NestWhile = F.initFinalSymbol("NestWhile", ID.NestWhile);
 
 	/***/
@@ -2259,6 +2293,9 @@ public class F {
 
     /***/
     public final static IBuiltInSymbol RegularExpression = F.initFinalSymbol("RegularExpression", ID.RegularExpression);
+
+	/***/
+	public final static IBuiltInSymbol Remove = F.initFinalSymbol("Remove", ID.Remove);
 
 	/***/
 	public final static IBuiltInSymbol Repeated = F.initFinalSymbol("Repeated", ID.Repeated);
@@ -3646,6 +3683,7 @@ public class F {
 			VectorAnalysisFunctions.initialize();
 			QuantityFunctions.initialize();
 			FinancialFunctions.initialize();
+			WXFFunctions.initialize();
 			ComputationalGeometryFunctions.initialize();
 
 			// initialize only the utility function rules for Integrate
