@@ -13,6 +13,7 @@ import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.NotInvertibleException;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -22,7 +23,7 @@ import edu.jas.structure.NotInvertibleException;
  * @author Heinz Kredel
  */
 
-public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational>
+public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends RingElemImpl<RealAlgebraicNumber<C>>
                 /*extends AlgebraicNumber<C>*/
         implements GcdRingElem<RealAlgebraicNumber<C>>, Rational {
 

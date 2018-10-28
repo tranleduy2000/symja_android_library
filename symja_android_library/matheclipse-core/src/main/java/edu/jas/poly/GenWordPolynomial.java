@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import edu.jas.kern.PreemptingException;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.UnaryFunctor;
 
 
@@ -31,7 +32,8 @@ import edu.jas.structure.UnaryFunctor;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public final class GenWordPolynomial<C extends RingElem<C>> implements RingElem<GenWordPolynomial<C>>,
+public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl<GenWordPolynomial<C>>
+        implements RingElem<GenWordPolynomial<C>>,
         Iterable<WordMonomial<C>> {
 
 

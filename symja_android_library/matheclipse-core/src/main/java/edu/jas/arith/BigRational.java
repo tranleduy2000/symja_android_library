@@ -19,6 +19,7 @@ import java.util.Set;
 import edu.jas.kern.Scripting;
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
 
 
@@ -30,8 +31,8 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public final class BigRational implements GcdRingElem<BigRational>, RingFactory<BigRational>, Rational,
-        Iterable<BigRational> {
+public final class BigRational extends RingElemImpl<BigRational>
+        implements GcdRingElem<BigRational>, RingFactory<BigRational>, Rational, Iterable<BigRational> {
 
 
     /**

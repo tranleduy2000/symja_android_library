@@ -19,6 +19,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.structure.BinaryFunctor;
 import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.Selector;
 import edu.jas.structure.UnaryFunctor;
 import edu.jas.util.MapEntry;
@@ -40,7 +41,8 @@ import edu.jas.util.MapEntry;
  * @author Heinz Kredel
  */
 
-public class MultiVarPowerSeries<C extends RingElem<C>> implements RingElem<MultiVarPowerSeries<C>> {
+public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<MultiVarPowerSeries<C>>
+        implements RingElem<MultiVarPowerSeries<C>> {
 
 
     /**

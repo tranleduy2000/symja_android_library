@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 
 /**
  * GenPolynomial generic polynomials implementing RingElem. n-variate ordered polynomials over C. Objects of this class
@@ -29,7 +30,7 @@ import edu.jas.structure.RingElem;
  * wrong method dispatch for GenSolvablePolynomial.
  *
  */
-public class ExprPolynomial implements RingElem<ExprPolynomial>, Iterable<ExprMonomial> {
+public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements RingElem<ExprPolynomial>, Iterable<ExprMonomial> {
 
 	/**
 	 * 

@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -18,7 +19,7 @@ import edu.jas.structure.RingElem;
  *
  * @author Heinz Kredel
  */
-public class Local<C extends RingElem<C>> implements RingElem<Local<C>>, QuotPair<C> {
+public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> implements RingElem<Local<C>>, QuotPair<C> {
 
 
     private static final Logger logger = Logger.getLogger(Local.class);
@@ -174,7 +175,7 @@ public class Local<C extends RingElem<C>> implements RingElem<Local<C>>, QuotPai
     /**
      * Is Local a constant. Not implemented.
      *
-     * @throws UnsupportedOperationException.
+     * @throws UnsupportedOperationException
      */
     public boolean isConstant() {
         throw new UnsupportedOperationException("isConstant not implemented");

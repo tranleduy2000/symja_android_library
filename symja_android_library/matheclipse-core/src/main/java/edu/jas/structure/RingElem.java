@@ -22,7 +22,7 @@ public interface RingElem<C extends RingElem<C>> extends AbelianGroupElem<C>, Mo
      * @param b other element.
      * @return gcd(this, b).
      */
-    public C gcd(C b);
+    C gcd(C b);
 
 
     /**
@@ -31,7 +31,7 @@ public interface RingElem<C extends RingElem<C>> extends AbelianGroupElem<C>, Mo
      * @param b other element.
      * @return [ gcd(this,b), c1, c2 ] with c1*this + c2*b = gcd(this,b).
      */
-    public C[] egcd(C b);
+    C[] egcd(C b);
 
 
     /**
@@ -41,9 +41,7 @@ public interface RingElem<C extends RingElem<C>> extends AbelianGroupElem<C>, Mo
      * @param b other element.
      * @return leftGcd(this, b).
      */
-    default public C leftGcd(C b) {
-        return gcd(b);
-    }
+    C leftGcd(C b);
 
 
     /**
@@ -53,8 +51,6 @@ public interface RingElem<C extends RingElem<C>> extends AbelianGroupElem<C>, Mo
      * @param b other element.
      * @return rightGcd(this, b).
      */
-    default public C rightGcd(C b) {
-        return gcd(b);
-    }
+    C rightGcd(C b);
 
 }

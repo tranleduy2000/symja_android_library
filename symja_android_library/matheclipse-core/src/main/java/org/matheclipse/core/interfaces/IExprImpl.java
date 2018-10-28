@@ -42,6 +42,7 @@ import edu.jas.structure.ElemFactory;
 
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.g;
 
 /**
  * (I)nterface for a mathematical (Expr)ession<br />
@@ -3174,4 +3175,15 @@ public abstract class IExprImpl implements IExpr {
     public IExpr variables2Slots(final Map<IExpr, IExpr> map, final Collection<IExpr> variableCollector) {
         return this;
     }
+
+    @Override
+    public IExpr leftGcd(IExpr b) {
+        return gcd(b);
+    }
+
+    @Override
+    public IExpr rightGcd(IExpr b) {
+        return gcd(b);
+    }
+
 }

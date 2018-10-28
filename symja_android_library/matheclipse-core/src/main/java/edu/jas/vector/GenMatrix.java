@@ -12,6 +12,7 @@ import java.util.List;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.AlgebraElem;
+import edu.jas.structure.AlgebraElemImpl;
 import edu.jas.structure.RingElem;
 
 
@@ -22,7 +23,7 @@ import edu.jas.structure.RingElem;
  * @author Heinz Kredel
  */
 
-public class GenMatrix<C extends RingElem<C>> implements AlgebraElem<GenMatrix<C>, C> {
+public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<C>, C> implements AlgebraElem<GenMatrix<C>, C> {
 
 
     private static final Logger logger = Logger.getLogger(GenMatrix.class);

@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -18,7 +19,7 @@ import edu.jas.structure.RingElem;
  *
  * @author Heinz Kredel
  */
-public class Quotient<C extends RingElem<C>> implements RingElem<Quotient<C>>, QuotPair<C> {
+public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> implements RingElem<Quotient<C>>, QuotPair<C> {
 
 
     private static final Logger logger = Logger.getLogger(Quotient.class);
@@ -163,7 +164,7 @@ public class Quotient<C extends RingElem<C>> implements RingElem<Quotient<C>>, Q
     /**
      * Is Quotient a constant. Not implemented.
      *
-     * @throws UnsupportedOperationException.
+     * @throws UnsupportedOperationException
      */
     public boolean isConstant() {
         throw new UnsupportedOperationException("isConstant not implemented");

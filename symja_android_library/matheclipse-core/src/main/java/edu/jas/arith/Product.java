@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RegularRingElem;
 import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
 
 
@@ -24,7 +25,8 @@ import edu.jas.structure.RingFactory;
  *
  * @author Heinz Kredel
  */
-public class Product<C extends RingElem<C>> implements RegularRingElem<Product<C>> {
+public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
+        implements RegularRingElem<Product<C>> {
 
 
     private static final Logger logger = Logger.getLogger(Product.class);

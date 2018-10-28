@@ -7,6 +7,7 @@ package edu.jas.arith;
 
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.NotInvertibleException;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -16,7 +17,7 @@ import edu.jas.structure.NotInvertibleException;
  * @see ModInteger
  */
 
-public final class ModLong implements GcdRingElem<ModLong>, Modular {
+public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<ModLong>, Modular {
 
 
     /**

@@ -15,6 +15,7 @@ import java.util.Random;
 
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.StarRingElem;
 
@@ -27,7 +28,7 @@ import edu.jas.structure.StarRingElem;
  * @author Heinz Kredel
  */
 
-public final class BigOctonion
+public final class BigOctonion extends RingElemImpl<BigOctonion>
         implements StarRingElem<BigOctonion>, GcdRingElem<BigOctonion>, RingFactory<BigOctonion> {
 
 

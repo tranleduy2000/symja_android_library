@@ -14,6 +14,7 @@ import java.util.Random;
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.NotInvertibleException;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
 
 
@@ -26,7 +27,7 @@ import edu.jas.structure.RingFactory;
  * @see java.math.BigInteger
  */
 
-public final class BigInteger
+public final class BigInteger extends RingElemImpl<BigInteger>
         implements GcdRingElem<BigInteger>, RingFactory<BigInteger>, Iterable<BigInteger>, Rational {
 
 

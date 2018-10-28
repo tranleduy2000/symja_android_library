@@ -15,6 +15,7 @@ import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.NotInvertibleException;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -24,7 +25,7 @@ import edu.jas.structure.NotInvertibleException;
  * @author Heinz Kredel
  */
 
-public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational>
+public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends RingElemImpl<ComplexAlgebraicNumber<C>>
                 /*extends AlgebraicNumber<C>*/
         implements GcdRingElem<ComplexAlgebraicNumber<C>> {
 

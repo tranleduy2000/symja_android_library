@@ -11,6 +11,7 @@ import edu.jas.kern.PrettyPrint;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPair;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -19,7 +20,8 @@ import edu.jas.structure.QuotPair;
  *
  * @author Heinz Kredel
  */
-public class Quotient<C extends GcdRingElem<C>> implements GcdRingElem<Quotient<C>>,
+public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>>
+        implements GcdRingElem<Quotient<C>>,
         QuotPair<GenPolynomial<C>> {
 
 

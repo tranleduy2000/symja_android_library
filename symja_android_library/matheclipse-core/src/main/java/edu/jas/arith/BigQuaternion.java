@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.StarRingElem;
 
 
@@ -24,7 +25,8 @@ import edu.jas.structure.StarRingElem;
  * @author Heinz Kredel
  */
 
-public /*final*/ class BigQuaternion implements StarRingElem<BigQuaternion>, GcdRingElem<BigQuaternion> {
+public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
+        implements StarRingElem<BigQuaternion>, GcdRingElem<BigQuaternion> {
 
 
     protected final static Random random = new Random();

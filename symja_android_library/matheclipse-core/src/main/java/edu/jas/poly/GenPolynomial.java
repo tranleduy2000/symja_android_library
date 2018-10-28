@@ -22,6 +22,7 @@ import edu.jas.kern.PreemptingException;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.UnaryFunctor;
 
 
@@ -44,7 +45,7 @@ import edu.jas.structure.UnaryFunctor;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public class GenPolynomial<C extends RingElem<C>>
+public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolynomial<C>>
         implements RingElem<GenPolynomial<C>>, /* not yet Polynomial<C> */
         // TODO: 10/2/2017 change
         Iterable<Monomial<C>> {

@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -18,7 +19,7 @@ import edu.jas.structure.RingElem;
  *
  * @author Heinz Kredel
  */
-public class Residue<C extends RingElem<C>> implements RingElem<Residue<C>> {
+public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> implements RingElem<Residue<C>> {
 
 
     private static final Logger logger = Logger.getLogger(Residue.class);
