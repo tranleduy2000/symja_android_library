@@ -99,8 +99,8 @@ public class VectorAnalysisFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			if ((ast.arg1().isVector() == ast.arg2().isVector()) && (ast.arg1().isVector() >= 0)) {
-				IAST vector = (IAST) ast.arg1();
-				IAST variables = (IAST) ast.arg2();
+				final IAST vector = (IAST) ast.arg1();
+				final IAST variables = (IAST) ast.arg2();
 				int size = vector.size();
 				IASTAppendable divergenceValue = F.PlusAlloc(size);
 				return divergenceValue.appendArgs(size, new IntFunction<IExpr>() {

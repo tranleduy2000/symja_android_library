@@ -1218,7 +1218,7 @@ public final class Programming {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
-			IExpr arg1 = ast.arg1();
+			final IExpr arg1 = ast.arg1();
 			return nestList(ast.arg2(), engine.evaluate(ast.arg3()), new Function<IExpr, IExpr>() {
                 @Override
                 public IExpr apply(IExpr x) {

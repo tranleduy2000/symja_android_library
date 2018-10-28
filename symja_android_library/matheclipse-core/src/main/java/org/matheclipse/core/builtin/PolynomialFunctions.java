@@ -523,7 +523,7 @@ public class PolynomialFunctions {
 				int pPowerm = n / p;
 				return cyclotomic(p, x.power(F.ZZ(pPowerm)));
 			}
-			IInteger ni = F.ZZ(n);
+			final IInteger ni = F.ZZ(n);
 			IAST divisorList = ni.divisors();
 			// Product((1 - x^d)^MoebiusMu(n/d), {d, divisorList) // Together
 			return F.Together(F.intIterator(F.Times,
@@ -895,7 +895,7 @@ public class PolynomialFunctions {
 
 				long n = poly.degree();
 				if (n >= 2L && n <= 5L) {
-					IAST result = poly.coefficientList();
+					final IAST result = poly.coefficientList();
 					IASTAppendable rules = F.ListAlloc(result.size());
 					rules.appendArgs(result.size(), new IntFunction<IExpr>() {
                         @Override
@@ -1280,7 +1280,7 @@ public class PolynomialFunctions {
 		 * @see Roots
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 			IAST variables;
 			if (ast.size() == 2) {
@@ -1298,7 +1298,7 @@ public class PolynomialFunctions {
 			if (!temp.isList()) {
 				return F.NIL;
 			}
-			IAST list = (IAST) temp;
+			final IAST list = (IAST) temp;
 			int size = list.size();
 			IASTAppendable result = F.ListAlloc(size);
 			return result.appendArgs(size, new IntFunction<IExpr>() {
@@ -1665,8 +1665,8 @@ public class PolynomialFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
-			IExpr n = ast.arg1();
-			IExpr z = ast.arg2();
+			final IExpr n = ast.arg1();
+			final IExpr z = ast.arg2();
 			if (engine.isNumericMode() && n.isNumber() && z.isNumber()) {
 				// Sin((n + 1)*ArcCos(z))/Sqrt(1 - z^2)
 				return F.Times(F.Power(F.Plus(F.C1, F.Negate(F.Sqr(z))), F.CN1D2),
@@ -2125,8 +2125,8 @@ public class PolynomialFunctions {
 
 			EigenDecomposition ed = new EigenDecomposition(c);
 
-			double[] realValues = ed.getRealEigenvalues();
-			double[] imagValues = ed.getImagEigenvalues();
+			final double[] realValues = ed.getRealEigenvalues();
+			final double[] imagValues = ed.getImagEigenvalues();
 
 			IASTAppendable roots = F.ListAlloc(N);
 			return roots.appendArgs(0, N,

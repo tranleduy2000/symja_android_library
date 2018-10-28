@@ -74,7 +74,7 @@ public class UtilityFunctionCtors {
 
 	static ISymbol FractionQ = F.$rubi(INTEGRATE_PREFIX + "FractionQ", new AbstractCoreFunctionEvaluator() {
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, final EvalEngine engine) {
 			if (ast.size() == 2) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				return arg1.isFraction() ? F.True : F.False;
@@ -93,7 +93,7 @@ public class UtilityFunctionCtors {
 
 	static ISymbol IntegersQ = F.$rubi(INTEGRATE_PREFIX + "IntegersQ", new AbstractCoreFunctionEvaluator() {
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, final EvalEngine engine) {
 			if (ast.size() == 2) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				return arg1.isInteger() ? F.True : F.False;

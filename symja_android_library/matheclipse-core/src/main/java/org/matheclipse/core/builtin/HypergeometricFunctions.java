@@ -339,11 +339,11 @@ public class HypergeometricFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
-			IExpr n = ast.arg1();
+			final IExpr n = ast.arg1();
 			if (ast.size() == 4) {
 				// GegenbauerC(n, l, z)
-				IExpr l = ast.arg2();
-				IExpr z = ast.arg3();
+				final IExpr l = ast.arg2();
+				final IExpr z = ast.arg3();
 				if (l.equals(F.C1D2)) {
 					return F.LegendreP(n, z);
 				}
@@ -383,7 +383,7 @@ public class HypergeometricFunctions {
 				return F.NIL;
 			}
 			// GegenbauerC(n, z)
-			IExpr z = ast.arg2();
+			final IExpr z = ast.arg2();
 
 			int nInt = n.toIntDefault(Integer.MIN_VALUE);
 			if (nInt > Integer.MIN_VALUE) {

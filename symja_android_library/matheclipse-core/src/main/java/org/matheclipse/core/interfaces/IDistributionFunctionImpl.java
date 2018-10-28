@@ -16,7 +16,7 @@ public abstract class IDistributionFunctionImpl extends AbstractEvaluator
     }
 
     @Override
-    public IExpr callFunction(IExpr pureFunction, IExpr x) {
+    public IExpr callFunction(final IExpr pureFunction, IExpr x) {
         if (x.isPresent()) {
             if (x.isList()) {
                 return ((IAST) x).map(new Function<IExpr, IExpr>() {

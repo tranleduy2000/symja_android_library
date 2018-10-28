@@ -1305,8 +1305,8 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
-		private static IExpr divisorSigma(IExpr arg1, IInteger n) {
-			IAST list = n.divisors();
+		private static IExpr divisorSigma(final IExpr arg1, IInteger n) {
+			final IAST list = n.divisors();
 			if (list.isList()) {
 				int size = list.size();
 				if (arg1.isOne()) {
@@ -1591,7 +1591,7 @@ public final class NumberTheory {
 			try {
 
 				// BigInteger factor = BigInteger.ONE;
-				BigInteger[] subBezouts = new BigInteger[ast.argSize()];
+				final BigInteger[] subBezouts = new BigInteger[ast.argSize()];
 				BigInteger gcd = extendedGCD(ast, subBezouts);
 				// convert the Bezout numbers to sublists
 				IASTAppendable subList = F.ListAlloc(subBezouts.length);
@@ -2895,10 +2895,10 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
-			IExpr arg1 = ast.arg1();
+			final IExpr arg1 = ast.arg1();
 			if (arg1.isZero()) {
 				return F.C1;
 			}
@@ -2985,10 +2985,10 @@ public final class NumberTheory {
 	private static class PartitionsQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
-			IExpr arg1 = ast.arg1();
+			final IExpr arg1 = ast.arg1();
 			if (arg1.isZero()) {
 				return F.C1;
 			}
@@ -3437,7 +3437,7 @@ public final class NumberTheory {
 		public IExpr evaluateArg1(final IExpr arg1) {
 			if (arg1.isInteger()) {
 				try {
-					IInteger[] roots = ((IInteger) arg1).primitiveRootList();
+					final IInteger[] roots = ((IInteger) arg1).primitiveRootList();
 					if (roots != null) {
 						int size = roots.length;
 						IASTAppendable list = F.ListAlloc(size);

@@ -182,7 +182,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the error function.
 	 * 
-	 * @see org.matheclipse.core.reflection.system.InverseErf
+	 * @see InverseErf
 	 */
 	private final static class Erf extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
 
@@ -319,7 +319,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the error function.
 	 *
-	 * @see org.matheclipse.core.reflection.system.InverseErf
+	 * @see InverseErf
 	 */
 	private final static class Erfi extends AbstractFunctionEvaluator {
 
@@ -430,7 +430,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the inverse erf.
 	 * 
-	 * @see org.matheclipse.core.reflection.system.Erf
+	 * @see Erf
 	 */
 	private final static class InverseErf extends AbstractTrigArg1 implements INumeric {
 
@@ -486,7 +486,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the inverse erf.
 	 * 
-	 * @see org.matheclipse.core.reflection.system.Erf
+	 * @see Erf
 	 */
 	private final static class InverseErfc extends AbstractTrigArg1 implements INumeric {
 
@@ -1099,7 +1099,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr e2ObjArg(IExpr s, IExpr a) {
+		public IExpr e2ObjArg(final IExpr s, IExpr a) {
 			if (a.isZero()) {
 				return Zeta(s);
 			}

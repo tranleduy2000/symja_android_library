@@ -308,9 +308,9 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) {
-		int[] minDepth = new int[] { 0 };
-		IASTMutable[] result = new IASTMutable[] { F.NIL };
+	public IExpr visit(final IASTMutable ast) {
+		final int[] minDepth = new int[] { 0 };
+		final IASTMutable[] result = new IASTMutable[] { F.NIL };
 		try {
 			fCurrentLevel++;
 			if (fIncludeHeads) {

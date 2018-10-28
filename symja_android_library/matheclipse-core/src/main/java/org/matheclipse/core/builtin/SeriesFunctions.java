@@ -443,7 +443,7 @@ public class SeriesFunctions {
             return data.mapLimit(arg1);
         }
 
-        private static IExpr powerLimit(final IAST powerAST, LimitData data) {
+        private static IExpr powerLimit(final IAST powerAST, final LimitData data) {
             // IAST rule = data.getRule();
             IExpr base = powerAST.arg1();
             IExpr exponent = powerAST.arg1();
@@ -561,7 +561,7 @@ public class SeriesFunctions {
             return F.NIL;
         }
 
-        private static IExpr timesLimit(final IAST timesAST, LimitData data) {
+        private static IExpr timesLimit(final IAST timesAST, final LimitData data) {
             IAST isFreeResult = timesAST.partitionTimes(new Predicate<IExpr>() {
                 @Override
                 public boolean test(IExpr x) {
@@ -617,7 +617,7 @@ public class SeriesFunctions {
             return data.mapLimit(timesAST);
         }
 
-        private static IExpr logLimit(final IAST logAST, LimitData data) {
+        private static IExpr logLimit(final IAST logAST, final LimitData data) {
             if (logAST.isAST2() && !logAST.isFree(data.getSymbol())) {
                 return F.NIL;
             }

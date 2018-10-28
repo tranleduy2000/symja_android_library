@@ -174,7 +174,7 @@ public final class PatternMatching {
 	private static class Clear extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Lambda.forEach(ast, new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
@@ -209,7 +209,7 @@ public final class PatternMatching {
 	private final static class ClearAll extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Lambda.forEach(ast, new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {

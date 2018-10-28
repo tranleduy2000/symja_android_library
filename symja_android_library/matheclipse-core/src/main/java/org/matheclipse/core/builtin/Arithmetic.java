@@ -1608,7 +1608,7 @@ public final class Arithmetic {
 
             IExpr arg1 = ast.arg1();
             if (ast.isAST2()) {
-                IExpr arg2 = ast.arg2();
+                final IExpr arg2 = ast.arg2();
                 if (arg2.isOne()) {
                     return F.HarmonicNumber(arg1);
                 } else {
@@ -3157,8 +3157,8 @@ public final class Arithmetic {
 						return powBase.mapThread(Power(null, exponent), 1);
                     }
 					if ((base.size() > 2)) {
-						IASTAppendable filterAST = powBase.copyHead();
-						IASTAppendable restAST = powBase.copyHead();
+						final IASTAppendable filterAST = powBase.copyHead();
+						final IASTAppendable restAST = powBase.copyHead();
 						powBase.forEach(new Consumer<IExpr>() {
                             @Override
                             public void accept(IExpr x) {

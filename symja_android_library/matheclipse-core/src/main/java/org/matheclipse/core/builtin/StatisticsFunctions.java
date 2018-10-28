@@ -653,7 +653,7 @@ public class StatisticsFunctions {
 		 * @param vector
 		 * @return
 		 */
-		private static IAST dropNonReals(EvalEngine engine, IAST vector) {
+		private static IAST dropNonReals(final EvalEngine engine, IAST vector) {
 			IAST[] filter = vector.filter(new Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {
@@ -1790,8 +1790,8 @@ public class StatisticsFunctions {
 				return F.Times(F.C1D2, F.Subtract(arg1.arg1(), arg1.arg2()),
 						F.Subtract(F.Conjugate(arg2.arg1()), F.Conjugate(arg2.arg2())));
 			}
-			IAST num1 = arg1.apply(F.Plus);
-			IExpr factor = F.integer(-1 * (arg1.size() - 2));
+			final IAST num1 = arg1.apply(F.Plus);
+			final IExpr factor = F.integer(-1 * (arg1.size() - 2));
 			IASTAppendable v1 = F.PlusAlloc(arg1.size());
 			v1.appendArgs(arg1.size(),
 					new IntFunction<IExpr>() {
@@ -2557,7 +2557,7 @@ public class StatisticsFunctions {
 			if (length > 0) {
 				IAST vector = (IAST) ast.arg1();
 				int size = vector.size();
-				IASTAppendable sum = F.PlusAlloc(size);
+				final IASTAppendable sum = F.PlusAlloc(size);
 				final IExpr mean = F.eval(F.Mean(F.Negate(vector)));
 				vector.forEach(new Consumer<IExpr>() {
 					@Override
@@ -3391,7 +3391,7 @@ public class StatisticsFunctions {
 					}
 				}
 			} else if (arg1.isDistribution() && ast.size() >= 3) {
-				IExpr function = engine.evaluate(F.Quantile(arg1));
+				final IExpr function = engine.evaluate(F.Quantile(arg1));
 				if (function.isFunction()) {
 					if (ast.arg2().isList()) {
 						return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
@@ -3435,15 +3435,15 @@ public class StatisticsFunctions {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
-				IAST dist = (IAST) ast.arg1();
+				final IAST dist = (IAST) ast.arg1();
 				if (dist.head().isSymbol()) {
 					try {
 						ISymbol head = (ISymbol) dist.head();
 						if (head instanceof IBuiltInSymbol) {
 							IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
 							if (evaluator instanceof IRandomVariate) {
-								Random random = ThreadLocalRandom.current();
-								IRandomVariate variate = (IRandomVariate) evaluator;
+								final Random random = ThreadLocalRandom.current();
+								final IRandomVariate variate = (IRandomVariate) evaluator;
 								if (ast.size() == 3) {
 									IExpr arg2 = ast.arg2();
 									if (arg2.isList()) {
@@ -4008,7 +4008,7 @@ public class StatisticsFunctions {
 
 			if (ast.arg1().isAST()) {
 				try {
-					IAST arg1 = (IAST) ast.arg1();
+					final IAST arg1 = (IAST) ast.arg1();
 					int[] matrixDimensions = arg1.isMatrix();
 					if (matrixDimensions != null) {
 						if (arg1.isRealMatrix()) {

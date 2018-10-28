@@ -831,7 +831,7 @@ public final class LinearAlgebra {
         private static IAST getDimensions(final IAST ast, int maximumLevel) {
             IAST list = (IAST) ast.arg1();
             IExpr header = list.head();
-			ArrayList<Integer> dims = dimensions(list, header, maximumLevel - 1);
+			final ArrayList<Integer> dims = dimensions(list, header, maximumLevel - 1);
             int dimsSize = dims.size();
             IASTAppendable res = F.ListAlloc(dimsSize);
 			return res.appendArgs(0, dimsSize, new IntFunction<IExpr>() {
@@ -3499,7 +3499,7 @@ public final class LinearAlgebra {
 		 *            number of columns of the matrix
 		 * @return
 		 */
-		public IAST transpose(final IAST matrix, int rows, int cols) {
+		public IAST transpose(final IAST matrix, final int rows, int cols) {
 			final IASTAppendable transposedMatrix = F.ast(F.List, cols, true);
 			transposedMatrix.setArgs(cols + 1, new IntFunction<IExpr>() {
                 @Override
@@ -3921,10 +3921,10 @@ public final class LinearAlgebra {
 	 *            the evaluation engine
 	 * @return <code>F.NIL</code> if the linear system is inconsistent and has no solution
 	 */
-	public static IAST rowReduced2List(FieldMatrix<IExpr> matrix, boolean quiet, EvalEngine engine) {
+	public static IAST rowReduced2List(FieldMatrix<IExpr> matrix, boolean quiet, final EvalEngine engine) {
 
 		int rows = matrix.getRowDimension();
-		int cols = matrix.getColumnDimension();
+		final int cols = matrix.getColumnDimension();
 		if (rows == 2 && cols == 3) {
 			IAST list = cramersRule2x3(matrix, quiet, engine);
 			if (list.isPresent()) {
@@ -3937,7 +3937,7 @@ public final class LinearAlgebra {
 			}
 		}
 		FieldReducedRowEchelonForm ref = new FieldReducedRowEchelonForm(matrix);
-		FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
+		final FieldMatrix<IExpr> rowReduced = ref.getRowReducedMatrix();
 		// System.out.println(rowReduced.toString());
 		IExpr lastVarCoefficient = rowReduced.getEntry(rows - 1, cols - 2);
 		if (lastVarCoefficient.isZero()) {
@@ -3978,8 +3978,8 @@ public final class LinearAlgebra {
 	 *            the evaluation engine
 	 * @return resultList with the appended results as list of rules
 	 */
-	public static IAST rowReduced2RulesList(FieldMatrix<IExpr> matrix, IAST listOfVariables, IASTAppendable resultList,
-			EvalEngine engine) {
+	public static IAST rowReduced2RulesList(FieldMatrix<IExpr> matrix, final IAST listOfVariables, IASTAppendable resultList,
+                                            final EvalEngine engine) {
 		int rows = matrix.getRowDimension();
 		int cols = matrix.getColumnDimension();
 		IAST smallList = null;
