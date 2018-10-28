@@ -93,7 +93,7 @@ public class RulePreprocessor {
 					expr = list.get(i);
 					if (expr.isAST(F.SetDelayed, 3)) {
 						IAST ast = (IAST) expr;
-						if (!RulesData.isComplicatedPatternRule(ast.arg1(), headerSymbols)) {
+						if (!RulesData.isComplicatedPatternRule(ast.arg1())) {
 							simpleRuleCounter++;
 						}
 					} else if (expr.isAST(F.Set, 3)) {

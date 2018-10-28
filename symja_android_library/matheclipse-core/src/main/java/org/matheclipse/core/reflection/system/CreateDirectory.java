@@ -3,7 +3,6 @@ package org.matheclipse.core.reflection.system;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -55,12 +54,16 @@ public class CreateDirectory extends AbstractEvaluator {
 		// Files.write(file.toPath(), (Iterable<String>) CsvFormat.of(tensor)::iterator);
 		// else
 		Extension extension = filename.extension();
-		if (extension.equals(Extension.JPG))
-			ImageIO.write(ImageFormat.jpg(tensor), "jpg", file);
+		if (extension.equals(Extension.JPG)) {
+			// TODO: 28-Oct-18  implement Image IO
+//			ImageIO.write(ImageFormat.jpg(tensor), "jpg", file);
+		}
 		// else if (filename.hasExtension("m"))
 		// Files.write(file.toPath(), (Iterable<String>) MatlabExport.of(tensor)::iterator);
-		if (extension.equals(Extension.PNG))
-			ImageIO.write(ImageFormat.of(tensor), "png", file);
+		if (extension.equals(Extension.PNG)) {
+			// TODO: 28-Oct-18  implement Image IO
+//			ImageIO.write(ImageFormat.of(tensor), "png", file);
+		}
 		// else if (filename.hasExtension("tensor"))
 		// object(file, tensor);
 		else

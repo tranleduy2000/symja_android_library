@@ -16,9 +16,6 @@ import javax.annotation.Nonnull;
  * Interface for the pattern matcher
  */
 public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Serializable {// Comparable<IPatternMatcher>,
-																							// Serializable {
-	public final static EquivalenceComparator EQUIVALENCE_COMPARATOR = new EquivalenceComparator();
-
 	public static class EquivalenceComparator implements Comparator<IPatternMatcher>, Serializable {
 
 		private static final long serialVersionUID = 8357661139299702326L;
@@ -31,6 +28,18 @@ public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Se
 			return o1.equivalentTo(o2);
 		}
 	}
+
+	public static class PriorityComparator implements Comparator<IPatternMatcher> {
+		@Override
+		public int compare(IPatternMatcher o1, IPatternMatcher o2) {
+			return o1.getLHSPriority() < o2.getLHSPriority() ? -1 : o1.getLHSPriority() > o2.getLHSPriority() ? 1 : 0;
+		}
+	}
+
+	// Serializable {
+	public final static EquivalenceComparator EQUIVALENCE_COMPARATOR = new EquivalenceComparator();
+
+	public final static PriorityComparator PRIORITY_COMPARATOR = new PriorityComparator();
 
 	/**
 	 * 
@@ -79,16 +88,6 @@ public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Se
 		return true;
 	}
 
-	public abstract int equivalentTo(IPatternMatcher patternMatcher);
-
-	/**
-	 * Compare the matchers for equivalence
-	 * 
-	 * @param obj
-	 * @return
-	 */
-	// public abstract int equivalent(final IPatternMatcher obj);
-
 	/**
 	 * Compare only the left-hand-side expressions in the matchers for equivalence
 	 * 
@@ -98,9 +97,20 @@ public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Se
 	public abstract int equivalentLHS(final IPatternMatcher obj);
 
 	/**
+	 * Compare the matchers for equivalence
+	 *
+	 * @param obj
+	 * @return
+	 */
+	// public abstract int equivalent(final IPatternMatcher obj);
+
+	public abstract int equivalentTo(IPatternMatcher patternMatcher);
+
+	/**
 	 * Match the given left-hand-side and return an evaluated expression
 	 * 
-	 * @param leftHandSide left-hand-side expression
+	 * @param leftHandSide
+	 *            left-hand-side expression
 	 * @param engine
 	 * @return <code>F.NIL</code> if the match wasn't successful, the evaluated expression otherwise.
 	 */
@@ -116,29 +126,24 @@ public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Se
 	}
 
 	/**
-	 * Returns the matched pattern in the order they appear in the pattern expression.
-	 * 
-	 * 
-	 * @param resultList  a list instance
-	 * @param patternExpr the expression which contains the pattern objects
-	 */
-	public abstract void getPatterns(List<IExpr> resultList, IExpr patternExpr);
-
-	/**
 	 * Get the priority of the left-and-side of this pattern-matcher. Lower values have higher priorities.
 	 * 
 	 * @return the priority
 	 */
 	public abstract int getLHSPriority();
 
+	public abstract int getPatternHash();
+
 	/**
-	 * Get the priority of the left-and-side of this pattern-matcher. Lower values have higher priorities.
+	 * Returns the matched pattern in the order they appear in the pattern expression.
 	 * 
-	 * @return the priority
+	 *
+	 * @param resultList
+	 *            a list instance
+	 * @param patternExpr
+	 *            the expression which contains the pattern objects
 	 */
-	public long getRHSleafCountSimplify() {
-		return Long.MAX_VALUE;
-	}
+	public abstract void getPatterns(List<IExpr> resultList, IExpr patternExpr);
 
 	/**
 	 * Get the "right-hand-side" of a pattern-matching rule.
@@ -149,10 +154,27 @@ public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Se
 		return F.NIL;
 	}
 
+	/**
+	 * Get the priority of the left-and-side of this pattern-matcher. Lower values have higher priorities.
+	 *
+	 * @return the priority
+	 */
+	public long getRHSleafCountSimplify() {
+		return Long.MAX_VALUE;
+	}
+
 	@Override
 	public int hashCode() {
 		return fLhsPatternExpr.hashCode();
 	}
+
+	/**
+	 * Check if <code>fPatterHash == 0 || fPatterHash == patternHash;</code>.
+	 *
+	 * @param patternHash
+	 * @return
+	 */
+	public abstract boolean isPatternHashAllowed(int patternHash);
 
 	/**
 	 * Check if the pattern-matchings left-hand-side expression contains no patterns.

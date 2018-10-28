@@ -9,8 +9,6 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.reflection.system.rules.LaplaceTransformRules;
 
-import com.duy.lambda.Predicate;
-
 /**
  * <pre>
  * LaplaceTransform(f, s, t)
@@ -42,9 +40,9 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkSize(ast, 4);
 
-		final IExpr a1 = ast.arg1();
-		final IExpr t = ast.arg2();
-		final IExpr s = ast.arg3();
+		IExpr a1 = ast.arg1();
+		IExpr t = ast.arg2();
+		IExpr s = ast.arg3();
 		if (!t.isList() && !s.isList() && !t.equals(s)) {
 			if (a1.isFree(t)) {// && a1.isAtom()) {
 				return F.Divide(a1, s);
@@ -57,23 +55,16 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
 				if (arg1.isTimes()) {
 					IASTAppendable result = F.TimesAlloc(arg1.size());
 					IASTAppendable rest = F.TimesAlloc(arg1.size());
-					arg1.filter(result, rest, new Predicate<IExpr>() {
-                        @Override
-                        public boolean test(IExpr x) {
-                            return x.isFree(t);
-                        }
-                    });
+					arg1.filter(result, rest, x -> x.isFree(t));
 					if (result.size() > 1) {
 						return F.Times(result.getOneIdentity(F.C1), F.LaplaceTransform(rest, t, s));
 					}
-				}
-				if (arg1.isPower()) {
-					IExpr n = arg1.arg2();
-					if (arg1.isPower() && arg1.arg1().equals(t) && n.isAtom() && !n.isMinusOne()) {
+				} else if (arg1.isPower() && arg1.base().equals(t)) {
+					IExpr n = arg1.exponent();
+					if (n.isAtom() && !n.isMinusOne()) {
 						return F.Divide(F.Gamma(F.Plus(F.C1, n)), F.Power(s, F.Plus(F.C1, n)));
 					}
-				}
-				if (arg1.isPlus()) {
+				} else if (arg1.isPlus()) {
 					// LaplaceTransform[a_+b_+c_,t_,s_] ->
 					// LaplaceTransform[a,t,s]+LaplaceTransform[b,t,s]+LaplaceTransform[c,t,s]
 					return arg1.mapThread(F.LaplaceTransform(F.Null, t, s), 1);
