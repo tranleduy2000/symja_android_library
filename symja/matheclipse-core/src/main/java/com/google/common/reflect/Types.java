@@ -38,7 +38,6 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.security.AccessControlException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map.Entry;
@@ -333,7 +332,9 @@ final class Types {
                     return (String) getTypeName.invoke(type);
                 } catch (NoSuchMethodException e) {
                     throw new AssertionError("Type.getTypeName should be available in Java 8");
-                } catch (InvocationTargetException | IllegalAccessException e) {
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -529,7 +530,7 @@ final class Types {
                 if (method.getDeclaringClass().equals(TypeVariableImpl.class)) {
                     try {
                         method.setAccessible(true);
-                    } catch (AccessControlException e) {
+                    } catch (Exception e) {
                         // OK: the method is accessible to us anyway. The setAccessible call is only for
                         // unusual execution environments where that might not be true.
                     }

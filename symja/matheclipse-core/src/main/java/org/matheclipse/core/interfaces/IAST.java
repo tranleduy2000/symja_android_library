@@ -1123,24 +1123,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     int size();
 
     /**
-     * Returns a sequential {@link Stream} with the specified range of the specified array as its source.
-     *
-     * @return a {@code Stream} for the internal array range
-     */
-    Stream<IExpr> stream();
-
-    /**
-     * Returns a sequential {@link Stream} with the specified range of the specified array as its source.
-     *
-     * @param startInclusive the first index to cover, inclusive
-     * @param endExclusive   index immediately past the last index to cover
-     * @return a {@code Stream} for the internal array range
-     * @throws ArrayIndexOutOfBoundsException if {@code startInclusive} is negative, {@code endExclusive} is less than {@code startInclusive}, or
-     *                                        {@code endExclusive} is greater than the array size
-     */
-    Stream<IExpr> stream(int startInclusive, int endExclusive);
-
-    /**
      * Returns an array containing all elements contained in this {@code List}.
      *
      * @return an array of the elements from this {@code List}.

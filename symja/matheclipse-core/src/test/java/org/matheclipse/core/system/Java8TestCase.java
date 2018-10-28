@@ -23,36 +23,4 @@ public class Java8TestCase extends AbstractTestCase {
     public Java8TestCase(String name) {
         super(name);
     }
-
-    public void testForeach() {
-        IAST ast = List(C10, a, b, c, d, e);
-		IASTAppendable result = F.ListAlloc();
-		ast.forEach(new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr x) {
-                result.append(x);
-            }
-        });
-        assertEquals("{10,a,b,c,d,e}", result.toString());
-    }
-
-    public void testStream001() {
-		IAST ast = List(C10, a, b, c, d, e);
-		IASTAppendable result = F.ListAlloc(2);
-		// Consumer<IExpr> action = (IExpr x) -> System.out.println(x);
-		ast.stream().forEach(new java.util.function.Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr x) {
-                result.append(x);
-            }
-        });
-		ast.stream(0, 7).forEach(new java.util.function.Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr x) {
-                result.append(x);
-            }
-        });
-		assertEquals("{10,a,b,c,d,e,List,10,a,b,c,d,e}", result.toString());
-    }
-
 }

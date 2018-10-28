@@ -27,7 +27,7 @@ import org.uncommons.maths.binary.BinaryUtils;
  * <p>This is a very fast random number generator with good statistical
  * properties (it passes the full DIEHARD suite).  This is the best RNG
  * for most experiments.  If a non-linear generator is required, use
- * the slower {@link AESCounterRNG} RNG.</p>
+ * the slower {link AESCounterRNG} RNG.</p>
  *
  * <p>This PRNG is deterministic, which can be advantageous for testing purposes
  * since the output is repeatable.  If multiple instances of this class are created

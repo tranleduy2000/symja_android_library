@@ -40,7 +40,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.RandomAccess;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * HMArrayList is an implementation of a list, backed by an array. All optional operations adding, removing, and
@@ -1026,16 +1025,6 @@ public abstract class HMArrayList extends AbstractAST implements IASTAppendable,
 	@Override
 	public int size() {
 		return lastIndex - firstIndex;
-	}
-
-	@Override
-	public Stream<IExpr> stream() {
-		return Arrays.stream(array, firstIndex + 1, lastIndex - firstIndex);
-	}
-
-	@Override
-	public Stream<IExpr> stream(int startInclusive, int endExclusive) {
-		return Arrays.stream(toArray(), firstIndex + startInclusive, firstIndex + endExclusive);
 	}
 
 	/**

@@ -22,7 +22,6 @@
 package de.lab4inf.math;
 
 import java.io.OutputStream;
-import java.security.Permission;
 import java.util.Arrays;
 import java.util.IllegalFormatConversionException;
 import java.util.logging.Formatter;
@@ -108,25 +107,12 @@ public class L4MLogger extends Logger {
      */
     protected void initialize() {
         String loggerName = getName();
-        boolean runningSandbox = false;
         // check if we are running in an applet sandbox
-        SecurityManager sm = System.getSecurityManager();
-        if (null != sm) {
-            try {
-                Permission perm = new java.util.logging.LoggingPermission("control", "");
-                sm.checkPermission(perm);
-            } catch (SecurityException e) {
-                System.out.println("L4M Logger runs in sandbox");
-                runningSandbox = true;
-            }
-        }
-        if (!runningSandbox) {
-            // do not use parent handlers but our own
-            setUseParentHandlers(false);
-            // and add the Lab4inf handler to our logger
-            addHandler(new Lab4InfHandler());
-            // register with the LogManager
-        }
+        // do not use parent handlers but our own
+        setUseParentHandlers(false);
+        // and add the Lab4inf handler to our logger
+        addHandler(new Lab4InfHandler());
+        // register with the LogManager
         LogManager manager = LogManager.getLogManager();
         Logger aLogger = manager.getLogger(loggerName);
         if (manager.getLogger(loggerName) == null) {

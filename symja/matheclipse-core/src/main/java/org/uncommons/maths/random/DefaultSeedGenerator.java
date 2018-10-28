@@ -35,7 +35,6 @@ public final class DefaultSeedGenerator implements SeedGenerator
     {
         new DevRandomSeedGenerator(),
         new RandomDotOrgSeedGenerator(),
-        new SecureRandomSeedGenerator()
     };
 
 

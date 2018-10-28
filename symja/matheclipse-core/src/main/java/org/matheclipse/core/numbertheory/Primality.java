@@ -15,10 +15,10 @@ import org.matheclipse.core.interfaces.IInteger;
 
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -64,7 +64,7 @@ public class Primality {
 		}
 	}
 
-	private final static SecureRandom random = new SecureRandom();
+	private final static Random random = new Random();
 	private final static BigInteger TWO = new BigInteger("2");
 
 	/** Just to denote that this class can't be instantied. */

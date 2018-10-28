@@ -58,7 +58,6 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Iterator;
@@ -67,7 +66,6 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Stream;
 
 public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable {
 	/**
@@ -3120,16 +3118,6 @@ public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable
 		return 1;
 	}
 
-
-	@Override
-	public Stream<IExpr> stream() {
-		return Arrays.stream(toArray(), 1, size());
-	}
-
-	@Override
-	public Stream<IExpr> stream(int startInclusive, int endExclusive) {
-		return Arrays.stream(toArray(), startInclusive, endExclusive);
-	}
 
 	@Override
 	public final IExpr timesDistributed(final IExpr that) {
