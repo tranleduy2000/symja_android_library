@@ -24,6 +24,7 @@ import org.hipparchus.analysis.solvers.FieldBracketingNthOrderBrentSolver;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.ode.events.Action;
+import org.hipparchus.ode.events.DefaultFieldODEEventHandler;
 import org.hipparchus.ode.events.FieldEventState;
 import org.hipparchus.ode.events.FieldEventState.EventOccurrence;
 import org.hipparchus.ode.events.FieldODEEventHandler;
@@ -269,7 +270,7 @@ public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> imp
 
         // initialize event handlers
         for (final FieldEventState<T> state : eventsStates) {
-            state.getEventHandler().init(s0WithDerivatives, t);
+            DefaultFieldODEEventHandler.init(state.getEventHandler(), s0WithDerivatives, t);
         }
 
         // initialize step handlers
