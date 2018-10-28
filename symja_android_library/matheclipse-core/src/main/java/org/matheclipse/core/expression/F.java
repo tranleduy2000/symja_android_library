@@ -1754,6 +1754,9 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol OutputForm = F.initFinalSymbol("OutputForm", ID.OutputForm);
 
+    /***/
+    public final static IBuiltInSymbol OutputStream = F.initFinalSymbol("OutputStream", ID.OutputStream);
+
     /** PDF(distribution, value) - returns the probability density function of `value`. */
 	public final static IBuiltInSymbol PDF = F.initFinalSymbol("PDF", ID.PDF);
 
@@ -2492,6 +2495,9 @@ public class F {
 
 	/***/
 	public final static IBuiltInSymbol Unknown = F.initFinalSymbol("Unknown", ID.Unknown);
+
+    /***/
+    public final static IBuiltInSymbol Unprotect = F.initFinalSymbol("Unprotect", ID.Unprotect);
 
 	/** UnsameQ(x, y) - returns `True` if `x` and `y` are not structurally identical.*/
 	public final static IBuiltInSymbol UnsameQ = F.initFinalSymbol("UnsameQ", ID.UnsameQ);
@@ -4199,7 +4205,8 @@ public class F {
 	/**
 	 * Create a new abstract syntax tree (AST).
 	 * 
-	 * @param head            the header expression of the function. If the ast represents a function like
+	 * @param head
+	 *            the header expression of the function. If the ast represents a function like
 	 *            <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
 	 * @param initialCapacity
 	 *            the initial capacity (i.e. number of arguments without the header element) of the list.
@@ -4218,7 +4225,8 @@ public class F {
 	}
 
 	/**
-	 * Create a new <code>List()</code> with <code>copies</code> number of arguments, which are set to <code>value</code>.
+	 * Create a new <code>List()</code> with <code>copies</code> number of arguments, which are set to
+	 * <code>value</code>.
 	 * 
 	 * @param value
 	 *            initialize all elements with <code>value</code>.
@@ -4231,8 +4239,8 @@ public class F {
 	}
 
 	/**
-	 * Create a new abstract syntax tree (AST) with a <code>head</code> and <code>copies</code> number of arguments, which are set to
-	 * <code>value</code>.
+	 * Create a new abstract syntax tree (AST) with a <code>head</code> and <code>copies</code> number of arguments,
+	 * which are set to <code>value</code>.
 	 * 
 	 * @param head
 	 *            the header expression of the function. If the ast represents a function like
@@ -5374,7 +5382,8 @@ public class F {
 	}
 
 	/**
-	 * depending on the derived class of the given {@link Number}, the value is encoded as {@link IInteger}, {@link INum}
+	 * depending on the derived class of the given {@link Number}, the value is encoded as {@link IInteger},
+	 * {@link INum}
 	 *
 	 * @param number
 	 *            non-null
@@ -5412,8 +5421,8 @@ public class F {
 	}
 
 	/**
-	 * Apply <code>Expand()</code> to the given expression if it's an <code>IAST</code>. If expanding wasn't possible this method
-	 * returns the given argument.
+	 * Apply <code>Expand()</code> to the given expression if it's an <code>IAST</code>. If expanding wasn't possible
+	 * this method returns the given argument.
 	 * 
 	 * @param a
 	 *            the expression which should be evaluated
@@ -5576,7 +5585,8 @@ public class F {
 	/**
 	 * Create a "fractional" number
 	 * 
-	 * @param value the rational value which should be converted to a fractional number
+	 * @param value
+	 *            the rational value which should be converted to a fractional number
 	 * @return IFraction
 	 */
 	public static IFraction fraction(final BigFraction value) {
@@ -5771,8 +5781,9 @@ public class F {
 	/**
 	 * Create a new abstract syntax tree (AST).
 	 * 
-	 * @param head the header expression of the function. If the ast represents a function like <code>f[x,y], Sin[x],...</code>, the
-	 *             <code>head</code> will be an instance of type ISymbol.
+	 * @param head
+	 *            the header expression of the function. If the ast represents a function like
+	 *            <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
 	 * 
 	 */
 	public final static IAST headAST0(final IExpr head) {
@@ -7419,8 +7430,10 @@ public class F {
 	/**
 	 * Create a "fractional" number
 	 * 
-	 * @param numerator    numerator of the fractional number
-	 * @param fDenominator denumerator of the fractional number
+	 * @param numerator
+	 *            numerator of the fractional number
+	 * @param fDenominator
+	 *            denumerator of the fractional number
 	 * @return IFraction
 	 */
 	public static IFraction QQ(final BigFraction frac) {
@@ -7430,8 +7443,10 @@ public class F {
 	/**
 	 * Create a "fractional" number
 	 * 
-	 * @param numerator   numerator of the fractional number
-	 * @param denominator denumerator of the fractional number
+	 * @param numerator
+	 *            numerator of the fractional number
+	 * @param denominator
+	 *            denumerator of the fractional number
 	 * @return IFraction
 	 */
 	public static IFraction QQ(final IInteger numerator, final IInteger denominator) {
@@ -7575,8 +7590,10 @@ public class F {
 	/**
 	 * Get or create a user defined symbol which is retrieved from the evaluation engines context path.
 	 * 
-	 * @param symbolName the name of the symbol
-	 * @param engine     the evaluation engine
+	 * @param symbolName
+	 *            the name of the symbol
+	 * @param engine
+	 *            the evaluation engine
 	 * @return the symbol object from the context path
 	 */
 	public static ISymbol symbol(final String symbolName, EvalEngine engine) {
@@ -8058,8 +8075,8 @@ public class F {
 	}
 
 	/**
-	 * Substitute all (sub-) expressions with the given rule set. If no substitution matches, the method returns the given
-	 * <code>expr</code>.
+	 * Substitute all (sub-) expressions with the given rule set. If no substitution matches, the method returns the
+	 * given <code>expr</code>.
 	 * 
 	 * @param expr
 	 * @param astRules
@@ -8500,7 +8517,8 @@ public class F {
 	 * "9.81[m*s^-2]" -> Quantity.of(9.81, "m*s^-2")
 	 * </pre>
 	 *
-	 * If the parsing logic encounters an inconsistency, the return type is a {@link IStringX} that holds the input string.
+	 * If the parsing logic encounters an inconsistency, the return type is a {@link IStringX} that holds the input
+	 * string.
 	 *
 	 * Scalar types that are not supported include {@link GaussScalar}.
 	 *
