@@ -1830,6 +1830,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ConstantArray(c, {3, 4})", "{{c,c,c,c},{c,c,c,c},{c,c,c,c}}");
 	}
 
+	public void testContext() {
+		check("{x, Global`x}", //
+				"{x,x}");
+		check("a`b`x", //
+				"a`b`x");
+
+	}
+
 	public void testContinue() {
 		check("For(i=1, i<=8, i=i+1, If(Mod(i,2) == 0, Continue()); Print(i))", "");
 	}
@@ -8707,7 +8715,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		String s = System.getProperty("os.name");
 		if (s.contains("Windows")) {
 			check("ProductLog(-1.5)", "-3.278373591557e-2+I*1.54964382335015");
-			check("ProductLog({0.2, 0.5, 0.8})", "{1.68915973499109e-1,3.51733711249196e-1,4.90067858801579e-1}");
+			check("ProductLog({0.2, 0.5, 0.8})", "{1.68915973499109e-1,3.51733711249195e-1,4.90067858801579e-1}");
 			check("ProductLog(2.5 + 2*I)", "1.05616796894863+I*3.5256052020787e-1");
 			check("N(ProductLog(4/10),50)", "2.9716775067313854677972696224702134190445810155014e-1");
 

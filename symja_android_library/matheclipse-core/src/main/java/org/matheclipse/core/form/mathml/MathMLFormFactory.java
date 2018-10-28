@@ -18,6 +18,7 @@ import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
+import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
@@ -1940,7 +1941,15 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 
 	@Override
 	public void convertSymbol(final StringBuilder buf, final ISymbol sym) {
+		Context context = sym.getContext();
+		if (context == Context.DUMMY) {
+			tagStart(buf, "mi");
+			buf.append(sym.getSymbolName());
+			tagEnd(buf, "mi");
+			return;
+		}
 		String headStr = sym.getSymbolName();
+		if (context.equals(Context.SYSTEM) || context.isGlobal()) {
 		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
 			String str = AST2Expr.PREDEFINED_SYMBOLS_MAP.get(headStr);
 			if (str != null) {
@@ -1950,16 +1959,29 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		final Object convertedSymbol = CONSTANT_SYMBOLS.get(headStr);
 		if (convertedSymbol == null) {
 			tagStart(buf, "mi");
-			buf.append(sym.toString());
+				buf.append(headStr);
 			tagEnd(buf, "mi");
-		} else {
+				return;
+			}
 			if (convertedSymbol instanceof Operator) {
 				((Operator) convertedSymbol).convert(buf);
-			} else {
+				return;
+			}
 				tagStart(buf, "mi");
 				buf.append(convertedSymbol.toString());
 				tagEnd(buf, "mi");
+			return;
 			}
+		if (EvalEngine.get().getContextPath().contains(context)) {
+			tagStart(buf, "mi");
+			buf.append(sym.getSymbolName());
+			tagEnd(buf, "mi");
+			return;
+		} else {
+			tagStart(buf, "mi");
+			buf.append(context.toString() + sym.getSymbolName());
+			tagEnd(buf, "mi");
+			return;
 		}
 	}
 

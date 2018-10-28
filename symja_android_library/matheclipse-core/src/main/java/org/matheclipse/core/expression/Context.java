@@ -17,9 +17,14 @@ public class Context implements Serializable {
 	 */
 	public final static HashMap<String, ISymbol> PREDEFINED_SYMBOLS_MAP = new HashMap<String, ISymbol>(2053);
 
-	public final static Context DUMMY = new Context("DUMMY", null);
+	public final static Context DUMMY = new Context("DUMMY`", null);
 
-	public final static Context SYSTEM = new Context("System", PREDEFINED_SYMBOLS_MAP);
+	// Global context should not be defined global, but per EvalENgine
+	// public final static Context GLOBAL = new Context("Global`");
+
+	public final static Context SYSTEM = new Context("System`", PREDEFINED_SYMBOLS_MAP);
+
+	public final static Context INTEGRATE = new Context("Integrate`");
 
 	private String contextName;
 
@@ -70,6 +75,10 @@ public class Context implements Serializable {
 			return contextName.hashCode();
 		}
 		return 47;
+	}
+
+	public boolean isGlobal() {
+		return contextName.equals(ContextPath.GLOBAL_CONTEXT_NAME);
 	}
 
 //	private static int counter = 0;

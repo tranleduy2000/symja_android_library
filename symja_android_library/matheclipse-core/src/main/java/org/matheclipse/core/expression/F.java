@@ -166,6 +166,12 @@ public class F {
     public final static IBuiltInSymbol $Aborted = F.initFinalSymbol("$Aborted", ID.$Aborted);
 
     /***/
+    public final static IBuiltInSymbol $Context = F.initFinalSymbol("$Context", ID.$Context);
+
+    /***/
+    public final static IBuiltInSymbol $ContextPath = F.initFinalSymbol("$ContextPath", ID.$ContextPath);
+
+    /***/
     public final static IBuiltInSymbol $DisplayFunction = F.initFinalSymbol("$DisplayFunction", ID.$DisplayFunction);
 
     /***/
@@ -198,19 +204,13 @@ public class F {
     /** All - is a possible value for `Span` and `Quiet`. */
 	public final static IBuiltInSymbol All = F.initFinalSymbol("All", ID.All);
 
-	/**
-	 * AllTrue({expr1, expr2, ...}, test) - returns `True` if all applications of `test` to `expr1, expr2, ...` evaluate
-	 * to `True`.
-	 */
+    /** AllTrue({expr1, expr2, ...}, test) - returns `True` if all applications of `test` to `expr1, expr2, ...` evaluate to `True`.*/
 	public final static IBuiltInSymbol AllTrue = F.initFinalSymbol("AllTrue", ID.AllTrue);
 
 	/** Alternatives(p1, p2, ..., p_i) - is a pattern that matches any of the patterns `p1, p2,...., p_i`. */
 	public final static IBuiltInSymbol Alternatives = F.initFinalSymbol("Alternatives", ID.Alternatives);
 
-	/**
-	 * And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as
-	 * an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.
-	 */
+    /** And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.*/
 	public final static IBuiltInSymbol And = F.initFinalSymbol("And", ID.And);
 
 	/** AngleVector(phi) - returns the point at angle `phi` on the unit circle. */
@@ -232,10 +232,7 @@ public class F {
 	public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ",
 			ID.AntisymmetricMatrixQ);
 
-	/**
-	 * AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates
-	 * to `True`.
-	 */
+    /** AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates to `True`.*/
 	public final static IBuiltInSymbol AnyTrue = F.initFinalSymbol("AnyTrue", ID.AnyTrue);
 
     /** Apart(expr) - rewrites `expr` as a sum of individual fractions. */
@@ -306,10 +303,7 @@ public class F {
 	/** 'ArrayQ(expr) - tests whether expr is a full array.*/
 	public final static IBuiltInSymbol ArrayQ = F.initFinalSymbol("ArrayQ", ID.ArrayQ);
 
-	/**
-	 * ArrayReshape(list-of-values, list-of-dimension) - returns the `list-of-values` elements reshaped as nested list
-	 * with dimensions according to the `list-of-dimension`.
-	 */
+    /** ArrayReshape(list-of-values, list-of-dimension) - returns the `list-of-values` elements reshaped as nested list with dimensions according to the `list-of-dimension`.*/
 	public final static IBuiltInSymbol ArrayReshape = F.initFinalSymbol("ArrayReshape", ID.ArrayReshape);
 
 	/***/
@@ -318,10 +312,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Assumptions = F.initFinalSymbol("Assumptions", ID.Assumptions);
 
-	/**
-	 * AtomQ(x) - is true if `x` is an atom (an object such as a number or string, which cannot be divided into
-	 * subexpressions using 'Part').
-	 */
+    /** AtomQ(x) - is true if `x` is an atom (an object such as a number or string, which cannot be divided into subexpressions using 'Part').*/
 	public final static IBuiltInSymbol AtomQ = F.initFinalSymbol("AtomQ", ID.AtomQ);
 
     /** Attributes(symbol) - returns the list of attributes which are assigned to `symbol`*/
@@ -348,10 +339,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol BeginPackage = F.initFinalSymbol("BeginPackage", ID.BeginPackage);
 
-	/**
-	 * BellB(n) - the Bell number function counts the number of different ways to partition a set that has exactly `n`
-	 * elements
-	 */
+    /** BellB(n) -  the Bell number function counts the number of different ways to partition a set that has exactly `n` elements*/
 	public final static IBuiltInSymbol BellB = F.initFinalSymbol("BellB", ID.BellB);
 
 	/** BellY(n, k, {x1, x2, ... , xN}) - the second kind of Bell polynomials (incomplete Bell polynomials).*/
@@ -630,16 +618,16 @@ public class F {
 	/** ConstantArray(expr, n) - returns a list of `n` copies of `expr`.*/
 	public final static IBuiltInSymbol ConstantArray = F.initFinalSymbol("ConstantArray", ID.ConstantArray);
 
+    /***/
+    public final static IBuiltInSymbol Context = F.initFinalSymbol("Context", ID.Context);
+
 	/** Continue() - continues with the next iteration in a `For`, `While`, or `Do` loop.*/
 	public final static IBuiltInSymbol Continue = F.initFinalSymbol("Continue", ID.Continue);
 
 	/** ContinuedFraction(number) - get the continued fraction representation of `number`.*/
 	public final static IBuiltInSymbol ContinuedFraction = F.initFinalSymbol("ContinuedFraction", ID.ContinuedFraction);
 
-	/**
-	 * Convergents({n1, n2, ...}) - return the list of convergents which represents the continued fraction list `{n1,
-	 * n2, ...}`.
-	 */
+    /** Convergents({n1, n2, ...}) - return the list of convergents which represents the continued fraction list `{n1, n2, ...}`.*/
 	public final static IBuiltInSymbol Convergents = F.initFinalSymbol("Convergents", ID.Convergents);
 
 	/***/
@@ -702,10 +690,7 @@ public class F {
     /** D(f, x) - gives the partial derivative of `f` with respect to `x`. */
 	public final static IBuiltInSymbol D = F.initFinalSymbol("D", ID.D);
 
-	/**
-	 * DSolve(equation, f(var), var) - attempts to solve a linear differential `equation` for the function `f(var)` and
-	 * variable `var`.
-	 */
+    /** DSolve(equation, f(var), var) - attempts to solve a linear differential `equation` for the function `f(var)` and variable `var`.*/
 	public final static IBuiltInSymbol DSolve = F.initFinalSymbol("DSolve", ID.DSolve);
 
     /** Decrement(x) - decrements `x` by `1`, returning the original value of `x`. */
@@ -3426,7 +3411,7 @@ public class F {
 					final EvalEngine engine = EvalEngine.get();
 					ContextPath path = engine.getContextPath();
 					try {
-						engine.setContextPath(new ContextPath("integrate`"));
+						engine.getContextPath().add(org.matheclipse.core.expression.Context.INTEGRATE);
 						org.matheclipse.core.reflection.system.Integrate.getUtilityFunctionsRuleAST();
 						// if (ruleList != null) {
 						// engine.addRules(ruleList);
@@ -4148,7 +4133,7 @@ public class F {
 				name = symbolName.toLowerCase(Locale.ENGLISH);
 			}
 		}
-		ISymbol symbol = Context.PREDEFINED_SYMBOLS_MAP.get(name);
+		ISymbol symbol = org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.get(name);
 		if (symbol != null) {
 			return symbol;
 		}
@@ -4161,7 +4146,7 @@ public class F {
 				if (SYMBOL_OBSERVER.createPredefinedSymbol(name)) {
 					// second try, because the symbol may now be added to
 					// fSymbolMap
-					ISymbol secondTry = Context.PREDEFINED_SYMBOLS_MAP.get(name);
+					ISymbol secondTry = org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.get(name);
 					if (secondTry != null) {
 						return secondTry;
 					}
@@ -4171,7 +4156,7 @@ public class F {
 					if (SYMBOL_OBSERVER.createPredefinedSymbol(name)) {
 						// second try, because the symbol may now be added to
 						// fSymbolMap
-						ISymbol secondTry = Context.PREDEFINED_SYMBOLS_MAP.get(name);
+						ISymbol secondTry = org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.get(name);
 						if (secondTry != null) {
 							return secondTry;
 						}
@@ -4214,7 +4199,7 @@ public class F {
 				name = symbolName.toLowerCase(Locale.ENGLISH);
 			}
 		}
-		ISymbol symbol = Context.PREDEFINED_SYMBOLS_MAP.get(name);
+		ISymbol symbol = org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.get(name);
 		if (symbol != null) {
 			return symbol;
 		}
@@ -4223,7 +4208,7 @@ public class F {
 				if (SYMBOL_OBSERVER.createPredefinedSymbol(name)) {
 					// second try, because the symbol may now be added to
 					// fSymbolMap
-					ISymbol secondTry = Context.PREDEFINED_SYMBOLS_MAP.get(name);
+					ISymbol secondTry = org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.get(name);
 					if (secondTry != null) {
 						return secondTry;
 					}
@@ -4233,7 +4218,7 @@ public class F {
 					if (SYMBOL_OBSERVER.createPredefinedSymbol(name)) {
 						// second try, because the symbol may now be added to
 						// fSymbolMap
-						ISymbol secondTry = Context.PREDEFINED_SYMBOLS_MAP.get(name);
+						ISymbol secondTry = org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.get(name);
 						if (secondTry != null) {
 							return secondTry;
 						}
@@ -4245,7 +4230,7 @@ public class F {
 			BuiltInDummy sym = new BuiltInDummy(name);
 			sym.setEvaluator(evaluator);
 			// engine.putUserVariable(name, symbol);
-			Context.PREDEFINED_SYMBOLS_MAP.put(name, sym);
+			org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.put(name, sym);
 			if (name.charAt(0) == '$') {
 				SYMBOL_OBSERVER.createUserSymbol(sym);
 			}
@@ -4255,7 +4240,7 @@ public class F {
 			// symbol = symbol(name);
 			BuiltInDummy sym = new BuiltInDummy(name);
 			sym.setEvaluator(evaluator);
-			Context.PREDEFINED_SYMBOLS_MAP.put(name, sym);
+			org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.put(name, sym);
 			// if (symbol.isBuiltInSymbol()) {
 			// if (!setEval) {
 			// ((IBuiltInSymbol) symbol).setEvaluator(BuiltInSymbol.DUMMY_EVALUATOR);
@@ -6231,7 +6216,7 @@ public class F {
 	 * @return
 	 */
 	public static ISymbol initFinalHiddenSymbol(final String symbolName) {
-		ISymbol temp = new Symbol(symbolName, Context.SYSTEM);
+		ISymbol temp = new Symbol(symbolName, org.matheclipse.core.expression.Context.SYSTEM);
 		HIDDEN_SYMBOLS_MAP.put(symbolName, temp);
 		return temp;
 	}
@@ -6262,7 +6247,7 @@ public class F {
 		}
 		IBuiltInSymbol temp = new BuiltInSymbol(str, ordinal);
 		BUILT_IN_SYMBOLS[ordinal] = temp;
-		Context.SYSTEM.put(str, temp);
+		org.matheclipse.core.expression.Context.SYSTEM.put(str, temp);
 		return temp;
 	}
 
@@ -7684,7 +7669,7 @@ public class F {
 	 * @return
 	 */
 	public static ISymbol predefinedSymbol(final String symbolName) {
-		ISymbol temp = Context.SYSTEM.get(symbolName);
+		ISymbol temp = org.matheclipse.core.expression.Context.SYSTEM.get(symbolName);
 		if (temp != null) {
 			return temp;
 		}
@@ -7697,8 +7682,8 @@ public class F {
 				lcSymbolName = symbolName.toLowerCase(Locale.ENGLISH);
 			}
 		}
-		temp = new Symbol(lcSymbolName, Context.SYSTEM);
-		Context.SYSTEM.put(lcSymbolName, temp);
+		temp = new Symbol(lcSymbolName, org.matheclipse.core.expression.Context.SYSTEM);
+		org.matheclipse.core.expression.Context.SYSTEM.put(lcSymbolName, temp);
 		return temp;
 	}
 
@@ -8043,7 +8028,7 @@ public class F {
 				name = symbolName.toLowerCase(Locale.ENGLISH);
 			}
 		}
-		return new Symbol(name, Context.DUMMY);
+		return new Symbol(name, org.matheclipse.core.expression.Context.DUMMY);
 	}
 
 	public static IBuiltInSymbol localBiFunction(final String symbolName, BiFunction<IExpr, IExpr, IExpr> function) {

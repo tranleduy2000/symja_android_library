@@ -444,7 +444,7 @@ public abstract class Scanner {
 		}
 		String context = "";
 		if (contextIndex > 0) {
-			context = new String(fInputString, startPosition, contextIndex - startPosition);
+			context = new String(fInputString, startPosition, contextIndex - startPosition+1);
 			startPosition = contextIndex + 1;
 		}
 		int endPosition = fCurrentPosition--;
