@@ -1,19 +1,7 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.Rule;
-import static org.matheclipse.core.expression.F.RuleDelayed;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.file.FileSystems;
-import java.util.List;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
@@ -44,6 +32,20 @@ import org.matheclipse.core.interfaces.ISymbol.RuleType;
 import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import static org.matheclipse.core.expression.F.Rule;
+import static org.matheclipse.core.expression.F.RuleDelayed;
 
 public final class PatternMatching {
 
@@ -173,7 +175,17 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Lambda.forEach(ast, x -> x.isSymbol(), x -> ((ISymbol) x).clear(engine));
+			Lambda.forEach(ast, new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isSymbol();
+				}
+			}, new Consumer<IExpr>() {
+				@Override
+				public void accept(IExpr x) {
+					((ISymbol) x).clear(engine);
+				}
+			});
 			return F.Null;
 		}
 
@@ -198,7 +210,17 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Lambda.forEach(ast, x -> x.isSymbol(), x -> ((ISymbol) x).clearAll(engine));
+			Lambda.forEach(ast, new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isSymbol();
+				}
+			}, new Consumer<IExpr>() {
+				@Override
+				public void accept(IExpr x) {
+					((ISymbol) x).clearAll(engine);
+				}
+			});
 			return F.Null;
 		}
 
@@ -460,10 +482,10 @@ public final class PatternMatching {
 					// System.out.println(file.toString());
 					return getFile(file, engine);
 				} else {
-					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
-					if (file.exists()) {
-						return getFile(file, engine);
-					}
+//					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
+//					if (file.exists()) {
+//						return getFile(file, engine);
+//					}
 				}
 
 			}
@@ -1080,7 +1102,12 @@ public final class PatternMatching {
 					return F.NIL;
 				} else if (leftHandSideAST.isAST(F.Attributes, 2)) {
 					IAST symbolList = Validate.checkSymbolOrSymbolList(leftHandSideAST, 1);
-					symbolList.forEach(x -> ((ISymbol) x).setAttributes(ISymbol.NOATTRIBUTE));
+					symbolList.forEach(new Consumer<IExpr>() {
+						@Override
+						public void accept(IExpr x) {
+							((ISymbol) x).setAttributes(ISymbol.NOATTRIBUTE);
+						}
+					});
 					return AttributeFunctions.setSymbolsAttributes(symbolList, ast.arg2(), engine);
 				}
 			}

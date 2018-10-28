@@ -2194,20 +2194,23 @@ public class EvalEngine implements Serializable {
 	public IASTMutable threadASTListArgs(final IASTMutable ast) {
 
 		int[] listLength = new int[] { 0 };
-		if (ast.exists(x -> {
-				if (x.isList()) {
-					if (listLength[0] == 0) {
-						listLength[0] = ((IAST) x).argSize();
-					} else {
-						if (listLength[0] != ((IAST) x).argSize()) {
-						printMessage("Lists of unequal lengths cannot be combined: " + ast.toString());
-							// ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
-							return true;
-						}
-					}
-				}
-				return false;
-		})) {
+		if (ast.exists(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr x) {
+                if (x.isList()) {
+                    if (listLength[0] == 0) {
+                        listLength[0] = ((IAST) x).argSize();
+                    } else {
+                        if (listLength[0] != ((IAST) x).argSize()) {
+                            EvalEngine.this.printMessage("Lists of unequal lengths cannot be combined: " + ast.toString());
+                            // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        })) {
 						return F.NIL;
 					}
 		if (listLength[0] != 0) {
