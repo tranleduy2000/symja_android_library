@@ -36,10 +36,14 @@ import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Set;
 
 public class Structure {
-
+	private final static Set<ISymbol> LOGIC_EQUATION_HEADS = new HashSet<ISymbol>(29);
+	private final static Set<ISymbol> PLUS_LOGIC_EQUATION_HEADS = new HashSet<ISymbol>(29);
+	private final static Set<ISymbol> LIST_LOGIC_EQUATION_HEADS = new HashSet<ISymbol>(29);
 	static {
 		F.Apply.setEvaluator(new Apply());
 		F.Depth.setEvaluator(new Depth());
@@ -63,6 +67,15 @@ public class Structure {
 		F.SymbolName.setEvaluator(new SymbolName());
 		F.Thread.setEvaluator(new Thread());
 		F.Through.setEvaluator(new Through());
+		ISymbol[] logicEquationHeads = { F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies, F.Equivalent, F.Equal,
+				F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual };
+		for (int i = 0; i < logicEquationHeads.length; i++) {
+			LOGIC_EQUATION_HEADS.add(logicEquationHeads[i]);
+		}
+		PLUS_LOGIC_EQUATION_HEADS.addAll(LOGIC_EQUATION_HEADS);
+		PLUS_LOGIC_EQUATION_HEADS.add(F.Plus);
+		LIST_LOGIC_EQUATION_HEADS.addAll(LOGIC_EQUATION_HEADS);
+		LIST_LOGIC_EQUATION_HEADS.add(F.List);
 	}
 
 	/**
@@ -1787,10 +1800,12 @@ public class Structure {
 
 	/**
 	 * Maps the elements of the <code>expr</code> with the cloned <code>replacement</code>. <code>replacement</code> is
-	 * an IAST where the argument at the given position will be replaced by the currently mapped element.
-	 * 
+	 * an IAST where the argument at the given position will be replaced by the currently mapped element. Thread over
+	 * the following headers:
+	 * <code>F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies, F.Equivalent, F.Equal,F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual</code>
 	 * 
 	 * @param expr
+	 *            typically the first element of <code>replacement</code> ast.
 	 * @param replacement
 	 *            an IAST there the argument at the given position is replaced by the currently mapped argument of this
 	 *            IAST.
@@ -1798,29 +1813,24 @@ public class Structure {
 	 * @return
 	 */
 	public static IAST threadLogicEquationOperators(IExpr expr, IAST replacement, int position) {
-		if (expr.isAST()) {
+		if (expr.size() > 1 && expr.isAST()) {
 			IAST ast = (IAST) expr;
-			if (ast.size() > 1) {
-				ISymbol[] logicEquationHeads = { F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies, F.Equivalent,
-						F.Equal, F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual };
-				for (int i = 0; i < logicEquationHeads.length; i++) {
-					if (ast.isAST(logicEquationHeads[i])) {
+			if (LOGIC_EQUATION_HEADS.contains(ast.head())) {
 						IASTMutable copy = replacement.setAtCopy(position, null);
 						return ast.mapThread(copy, position);
 					}
 				}
-
-			}
-		}
 		return F.NIL;
 	}
 
 	/**
 	 * Maps the elements of the <code>expr</code> with the cloned <code>replacement</code>. <code>replacement</code> is
-	 * an IAST where the argument at the given position will be replaced by the currently mapped element.
-	 * 
+	 * an IAST where the argument at the given position will be replaced by the currently mapped element. Thread over
+	 * the following headers:
+	 * <code>F.Plus, F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies, F.Equivalent, F.Equal,F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual</code>
 	 * 
 	 * @param expr
+	 *            typically the first element of <code>replacement</code> ast.
 	 * @param replacement
 	 *            an IAST there the argument at the given position is replaced by the currently mapped argument of this
 	 *            IAST.
@@ -1828,20 +1838,39 @@ public class Structure {
 	 * @return
 	 */
 	public static IAST threadPlusLogicEquationOperators(IExpr expr, IAST replacement, int position) {
-		if (expr.isAST()) {
+		if (expr.size() > 1 && expr.isAST()) {
 			IAST ast = (IAST) expr;
-			if (ast.size() > 1) {
-				ISymbol[] plusLogicEquationHeads = { F.Plus, F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies,
-						F.Equivalent, F.Equal, F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual };
-				for (int i = 0; i < plusLogicEquationHeads.length; i++) {
-					if (ast.isAST(plusLogicEquationHeads[i])) {
+			if (PLUS_LOGIC_EQUATION_HEADS.contains(ast.head())) {
+				IASTMutable copy = replacement.setAtCopy(position, null);
+				return ast.mapThread(copy, position);
+			}
+		}
+		return F.NIL;
+	}
+
+	/**
+	 * Maps the elements of the <code>expr</code> with the cloned <code>replacement</code>. <code>replacement</code> is
+	 * an IAST where the argument at the given position will be replaced by the currently mapped element. Thread over
+	 * the following headers:
+	 * <code>F.List F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies, F.Equivalent, F.Equal,F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual</code>
+	 *
+	 *
+	 * @param expr
+	 *            typically the first element of <code>replacement</code> ast.
+	 * @param replacement
+	 *            an IAST there the argument at the given position is replaced by the currently mapped argument of this
+	 *            IAST.
+	 * @param position
+	 * @return
+	 */
+	public static IAST threadListLogicEquationOperators(IExpr expr, IAST replacement, int position) {
+		if (expr.size() > 1 && expr.isAST()) {
+			IAST ast = (IAST) expr;
+			if (LIST_LOGIC_EQUATION_HEADS.contains(ast.head())) {
 						IASTMutable copy = replacement.setAtCopy(position, null);
 						return ast.mapThread(copy, position);
 					}
 				}
-
-			}
-		}
 		return F.NIL;
 	}
 

@@ -18,34 +18,22 @@ buildscript {
     repositories {
         jcenter()
         google()
-        maven {
-            url 'https://maven.fabric.io/public'
-        }
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
-        classpath "gradle.plugin.com.github.j2objccontrib.j2objcgradle:j2objc-gradle:0.6.0-alpha"
+
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
 }
 allprojects {
     repositories {
+        google()
         jcenter()
         maven { url "https://jitpack.io" }
-        maven {
-            url 'https://maven.google.com/'
-        }
         mavenCentral()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
     }
 }
 task clean(type: Delete) {
