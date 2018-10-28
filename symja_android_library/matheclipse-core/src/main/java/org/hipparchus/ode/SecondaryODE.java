@@ -63,9 +63,7 @@ public interface SecondaryODE {
      * @param secondary0 array containing the value of the secondary state vector at integration start
      * @param finalTime  target time for the integration
      */
-    default void init(double t0, double[] primary0, double[] secondary0, double finalTime) {
-        // nothing by default
-    }
+    void init(double t0, double[] primary0, double[] secondary0, double finalTime);
 
     /**
      * Compute the derivatives related to the secondary state parameters.

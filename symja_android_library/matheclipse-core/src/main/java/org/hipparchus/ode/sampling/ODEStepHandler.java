@@ -54,9 +54,7 @@ public interface ODEStepHandler {
      * @param initialState initial time, state vector and derivative
      * @param finalTime    target time for the integration
      */
-    default void init(ODEStateAndDerivative initialState, double finalTime) {
-        // nothing by default
-    }
+    void init(ODEStateAndDerivative initialState, double finalTime);
 
     /**
      * Handle the last accepted step

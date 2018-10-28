@@ -90,7 +90,9 @@ import org.hipparchus.util.Precision;
  * @see StepNormalizerBounds
  */
 
-public class FieldStepNormalizer<T extends RealFieldElement<T>> implements FieldODEStepHandler<T> {
+public class FieldStepNormalizer<T extends RealFieldElement<T>>
+        extends FieldODEStepHandlerImpl<T>
+        implements FieldODEStepHandler<T> {
 
     /**
      * Underlying step handler.
@@ -190,7 +192,7 @@ public class FieldStepNormalizer<T extends RealFieldElement<T>> implements Field
         forward = true;
 
         // initialize the underlying handler
-        handler.init(initialState, finalTime);
+        FieldODEFixedStepHandlerImpl.init(handler, initialState, finalTime);
 
     }
 

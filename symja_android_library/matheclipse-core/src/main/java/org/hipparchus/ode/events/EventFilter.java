@@ -54,7 +54,7 @@ import java.util.Arrays;
  * ODEEventHandler#g(ODEStateAndDerivative) g function} will also be reduced.</p>
  */
 
-public class EventFilter implements ODEEventHandler {
+public class EventFilter extends ODEEventHandlerImpl implements ODEEventHandler {
 
     /**
      * Number of past transformers updates stored.

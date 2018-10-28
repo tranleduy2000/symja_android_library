@@ -166,8 +166,7 @@ public interface FieldODEEventHandler<T extends RealFieldElement<T>> {
      * @return reset state (note that it does not include the derivatives, they will
      * be added automatically by the integrator afterwards)
      */
-    default FieldODEState<T> resetState(FieldODEStateAndDerivative<T> state) {
-        return state;
-    }
+    FieldODEState<T> resetState(FieldODEStateAndDerivative<T> state);
 
+    void init(FieldODEStateAndDerivative<T> s0WithDerivatives, T t);
 }

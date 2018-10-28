@@ -24,6 +24,7 @@ import org.hipparchus.ode.nonstiff.AdaptiveStepsizeIntegrator;
 import org.hipparchus.ode.nonstiff.DormandPrince853Integrator;
 import org.hipparchus.ode.sampling.ODEStateInterpolator;
 import org.hipparchus.ode.sampling.ODEStepHandler;
+import org.hipparchus.ode.sampling.ODEStepHandlerImpl;
 import org.hipparchus.util.FastMath;
 
 /**
@@ -394,7 +395,7 @@ public abstract class MultistepIntegrator extends AdaptiveStepsizeIntegrator {
     /**
      * Specialized step handler storing the first step.
      */
-    private class NordsieckInitializer implements ODEStepHandler {
+    private class NordsieckInitializer extends ODEStepHandlerImpl implements ODEStepHandler {
 
         /**
          * First steps times.

@@ -362,6 +362,12 @@ public class VariationalEquation {
             return jode.getDimension() * (jode.getDimension() + jode.getParametersNames().size());
         }
 
+
+        @Override
+        public void init(double t0, double[] primary0, double[] secondary0, double finalTime) {
+
+        }
+
         /**
          * {@inheritDoc}
          */

@@ -23,6 +23,7 @@ import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.ode.sampling.FieldODEStateInterpolator;
 import org.hipparchus.ode.sampling.FieldODEStepHandler;
+import org.hipparchus.ode.sampling.FieldODEStepHandlerImpl;
 import org.hipparchus.util.FastMath;
 
 import java.util.ArrayList;
@@ -77,6 +78,7 @@ import java.util.List;
  */
 
 public class FieldDenseOutputModel<T extends RealFieldElement<T>>
+        extends FieldODEStepHandlerImpl<T>
         implements FieldODEStepHandler<T> {
 
     /**

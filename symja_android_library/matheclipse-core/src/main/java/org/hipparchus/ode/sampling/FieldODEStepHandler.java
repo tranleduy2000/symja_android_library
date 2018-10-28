@@ -55,9 +55,7 @@ public interface FieldODEStepHandler<T extends RealFieldElement<T>> {
      * @param initialState initial time, state vector and derivative
      * @param finalTime    target time for the integration
      */
-    default void init(FieldODEStateAndDerivative<T> initialState, T finalTime) {
-        // nothing by default
-    }
+    void init(FieldODEStateAndDerivative<T> initialState, T finalTime);
 
     /**
      * Handle the last accepted step

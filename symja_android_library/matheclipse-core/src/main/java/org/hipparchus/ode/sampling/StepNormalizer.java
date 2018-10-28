@@ -88,7 +88,7 @@ import org.hipparchus.util.Precision;
  * @see StepNormalizerBounds
  */
 
-public class StepNormalizer implements ODEStepHandler {
+public class StepNormalizer extends ODEStepHandlerImpl implements ODEStepHandler {
 
     /**
      * Underlying step handler.
@@ -189,8 +189,7 @@ public class StepNormalizer implements ODEStepHandler {
         forward = true;
 
         // initialize the underlying handler
-        handler.init(initialState, finalTime);
-
+        ODEFixedStepHandlerImpl.init(handler, initialState, finalTime);
     }
 
     /**

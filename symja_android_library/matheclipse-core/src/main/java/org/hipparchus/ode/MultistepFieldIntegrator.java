@@ -26,6 +26,7 @@ import org.hipparchus.ode.nonstiff.AdaptiveStepsizeFieldIntegrator;
 import org.hipparchus.ode.nonstiff.DormandPrince853FieldIntegrator;
 import org.hipparchus.ode.sampling.FieldODEStateInterpolator;
 import org.hipparchus.ode.sampling.FieldODEStepHandler;
+import org.hipparchus.ode.sampling.FieldODEStepHandlerImpl;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
@@ -404,7 +405,9 @@ public abstract class MultistepFieldIntegrator<T extends RealFieldElement<T>>
     /**
      * Specialized step handler storing the first step.
      */
-    private class FieldNordsieckInitializer implements FieldODEStepHandler<T> {
+    private class FieldNordsieckInitializer
+            extends FieldODEStepHandlerImpl<T>
+            implements FieldODEStepHandler<T> {
 
         /**
          * First steps times.

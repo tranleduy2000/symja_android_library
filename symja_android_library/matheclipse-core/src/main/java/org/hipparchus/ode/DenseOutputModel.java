@@ -22,6 +22,7 @@ import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.ode.sampling.ODEStateInterpolator;
 import org.hipparchus.ode.sampling.ODEStepHandler;
+import org.hipparchus.ode.sampling.ODEStepHandlerImpl;
 import org.hipparchus.util.FastMath;
 
 import java.io.Serializable;
@@ -84,7 +85,8 @@ import java.util.List;
  * @see ODEStateInterpolator
  */
 
-public class DenseOutputModel implements ODEStepHandler, Serializable {
+public class DenseOutputModel extends ODEStepHandlerImpl
+        implements ODEStepHandler, Serializable {
 
     /**
      * Serializable version identifier

@@ -65,9 +65,7 @@ public interface ODEEventHandler {
      * @param initialState initial time, state vector and derivative
      * @param finalTime    target time for the integration
      */
-    default void init(ODEStateAndDerivative initialState, double finalTime) {
-        // nothing by default
-    }
+    void init(ODEStateAndDerivative initialState, double finalTime);
 
     /**
      * Compute the value of the switching function.
@@ -192,8 +190,6 @@ public interface ODEEventHandler {
      * @return reset state (note that it does not include the derivatives, they will
      * be added automatically by the integrator afterwards)
      */
-    default ODEState resetState(ODEStateAndDerivative state) {
-        return state;
-    }
+    ODEState resetState(ODEStateAndDerivative state);
 
 }
