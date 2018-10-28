@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 /*
  * Copyright (c) 2017 by Tran Le Duy
  *
@@ -16,73 +14,25 @@ import java.text.SimpleDateFormat
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
+apply plugin: 'java-library'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.github.j2objccontrib.j2objcgradle'
 
-static def buildDate() {
-    Date date = new Date();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy")
-    return dateFormat.format(date)
-}
-
-android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-
-    defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        multiDexEnabled true
-        versionCode 19
-        versionName "1.1.8"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+sourceSets {
+    main {
+        resources.srcDirs = ['src/main/resources']
+        java.srcDirs += 'matheclipse-core/src/main/java/'
     }
-
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            resources.srcDirs = ['src/main/resources']
-            java.srcDirs += 'matheclipse-core/src/main/java/'
-        }
-        test {
-            java.srcDirs += "matheclipse-core/src/test/java/"
-            java.srcDirs += "tools/src/main/java/"
-        }
-        androidTest {
-            java.srcDirs = ['matheclipse-core/src/androidTest/java/']
-        }
-    }
-
-    //avoid lint check, real binary not contains java 8
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    test {
+        java.srcDirs += "matheclipse-core/src/test/java/"
+        java.srcDirs += "tools/src/main/java/"
     }
 }
 
-repositories {
-    google()
-    jcenter()
-    mavenCentral()
-    flatDir {
-        dirs 'libs'
-    }
-}
+//sourceCompatibility JavaVersion.VERSION_1_8
+//targetCompatibility JavaVersion.VERSION_1_8
 
 dependencies {
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.jsoup:jsoup:1.11.2'
 }
@@ -95,32 +45,14 @@ retrolambda {
     jvmArgs '-noverify'
 }
 
-ext {
+// Plugin settings; put these at the bottom of the file.
+j2objcConfig {
+    // Sets up libraries you depend on
+    autoConfigureDeps true
 
-    //For bintray and jcenter distribution
-    bintrayRepo = 'Symja7'
-    bintrayName = 'org.matheclipse.android'
+    // Omit these two lines if you don't configure your Xcode project with CocoaPods
+    xcodeProjectDir '../ios'  //  suggested directory name
+    xcodeTargetsIos 'IOS-APP', 'IOS-APPTests'  // replace with your iOS targets
 
-    publishedGroupId = 'org.matheclipse.android'
-    libraryName = 'symja7'
-    artifact = 'symja7'
-    libraryVersion = '1.0.0'
-
-    libraryDescription = 'Java computer algebra and symbolic math library'
-
-    siteUrl = 'https://github.com/tranleduy2000/symja_android_library'
-    gitUrl = 'https://github.com/tranleduy2000/symja_android_library.git'
-
-
-    developerId = 'tranleduy2000'
-    developerName = 'Duy Tran'
-    developerEmail = 'tranleduy1233@gmail.com'
-    organization = 'tranleduy2000'
-    licenseName = 'GNU GENERAL PUBLIC LICENSE, Version 3.0'
-    licenseUrl = 'https://www.gnu.org/licenses/gpl-3.0.html'
-    allLicenses = ["GNU-GPL-3.0"]
-
+    finalConfigure()          // Must be last call to configuration
 }
-//These two remote files contain Bintray configuration as described above.
-apply from: 'install.gradle'
-apply from: 'bintray.gradle'
