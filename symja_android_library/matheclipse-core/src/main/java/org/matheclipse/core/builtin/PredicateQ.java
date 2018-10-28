@@ -804,10 +804,15 @@ public class PredicateQ {
 			if (expr.isNumber()) {
 				return expr.isZero();
 			}
+			// System.out.println(arg1);
+			// System.out.println();
 			if (expr.isAST()) {
 				expr = F.expandAll(expr, true, true);
 				if (expr.isZero()) {
 					return true;
+				}
+				if (Config.MAX_FACTOR_LEAFCOUNT > 0 && expr.leafCount() > Config.MAX_FACTOR_LEAFCOUNT) {
+					return false;
 				}
 				if (expr.isPlusTimesPower()) {
 					expr = engine.evaluate(expr);
@@ -859,8 +864,8 @@ public class PredicateQ {
 	 * </blockquote>
 	 * <p>
 	 * For very large numbers, <code>PrimeQ</code> uses
-	 * <a href="https://en.wikipedia.org/wiki/Prime_number#Primality_testing_versus_primality_proving">probabilistic prime testing</a>,
-	 * so it might be wrong sometimes<br />
+	 * <a href="https://en.wikipedia.org/wiki/Prime_number#Primality_testing_versus_primality_proving">probabilistic
+	 * prime testing</a>, so it might be wrong sometimes<br />
 	 * (a number might be composite even though <code>PrimeQ</code> says it is prime).
 	 * </p>
 	 * <p>
