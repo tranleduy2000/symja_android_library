@@ -31,7 +31,6 @@ import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
- *
  * (I)nterface for a mathematical (Expr)ession<br />
  *
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
@@ -83,20 +82,20 @@ import edu.jas.structure.GcdRingElem;
  */
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
 
-    int ASTID = 4096;
-    int BLANKID = 16384;
-    int COMPLEXID = 32;
-    int DOUBLECOMPLEXID = 4;
-    int DOUBLEID = 2;
-    int FRACTIONID = 16;
-    int INTEGERID = 8;
-    int METHODSYMBOLID = 8192;
-    int PATTERNID = 2048;
-    int SERIESID = 64;
-    int QUANTITYID = 128;
-
-    int STRINGID = 256;
-    int SYMBOLID = 512;
+    public final static int ASTID = 4096;
+    public final static int BLANKID = 16384;
+    public final static int COMPLEXID = 32;
+    public final static int DOUBLECOMPLEXID = 4;
+    public final static int DOUBLEID = 2;
+    public final static int FRACTIONID = 16;
+    public final static int INTEGERID = 8;
+    public final static int METHODSYMBOLID = 8192;
+    public final static int PATTERNID = 2048;
+    public final static int SERIESID = 64;
+    public final static int QUANTITYID = 128;
+    public final static int STRINGID = 256;
+    public final static int SYMBOLID = 512;
+    public final static int DATAID = 1024;
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
