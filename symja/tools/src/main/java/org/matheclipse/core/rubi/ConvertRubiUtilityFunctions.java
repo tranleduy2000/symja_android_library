@@ -76,7 +76,7 @@ public class ConvertRubiUtilityFunctions {
 		}
 	}
 
-	public static void convert(ASTNode node, StringBuffer buffer, boolean last, Set<String> functionSet) {
+	public static void convert(ASTNode node, final StringBuffer buffer, final boolean last, final Set<String> functionSet) {
 		try {
 			// convert ASTNode to an IExpr node
 			IExpr expr = new AST2Expr(false, EvalEngine.get()).convert(node);
