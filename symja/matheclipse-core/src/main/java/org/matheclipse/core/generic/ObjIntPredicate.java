@@ -13,7 +13,6 @@ import com.duy.lambda.BiPredicate;
  * @param <T> the type of the object parameter
  * @see BiPredicate
  */
-@FunctionalInterface
 public interface ObjIntPredicate<T> {
 
     /**
