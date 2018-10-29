@@ -17,6 +17,8 @@
 
 package org.hipparchus.ode;
 
+import com.duy.util.PriorityQueue;
+
 import org.hipparchus.Field;
 import org.hipparchus.RealFieldElement;
 import org.hipparchus.analysis.solvers.BracketedRealFieldUnivariateSolver;
@@ -27,10 +29,8 @@ import org.hipparchus.ode.events.Action;
 import org.hipparchus.ode.events.FieldEventState;
 import org.hipparchus.ode.events.FieldEventState.EventOccurrence;
 import org.hipparchus.ode.events.FieldODEEventHandler;
-import org.hipparchus.ode.events.FieldODEEventHandlerImpl;
 import org.hipparchus.ode.sampling.AbstractFieldODEStateInterpolator;
 import org.hipparchus.ode.sampling.FieldODEStepHandler;
-import org.hipparchus.ode.sampling.FieldODEStepHandlerImpl;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.Incrementor;
 
@@ -39,7 +39,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
