@@ -28,10 +28,10 @@ import org.matheclipse.core.interfaces.IExpr;
  * whereas <code>a.add(b)</code> throws an Exception.
  */
 public interface IQuantity extends IExpr, Comparable<IExpr> {
-    static final char UNIT_OPENING_BRACKET = '[';
-    static final char UNIT_CLOSING_BRACKET = ']';
+    char UNIT_OPENING_BRACKET = '[';
+    char UNIT_CLOSING_BRACKET = ']';
 
-    public IQuantity ofUnit(IExpr scalar);
+    IQuantity ofUnit(IExpr scalar);
 
     /**
      * @return unit of quantity without value

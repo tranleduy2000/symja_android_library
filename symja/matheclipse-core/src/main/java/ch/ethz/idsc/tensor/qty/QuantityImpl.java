@@ -106,7 +106,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	}
 
 	@Override
-	public IAST clone() throws CloneNotSupportedException {
+	public IAST clone() {
 		return new QuantityImpl(arg1, unitString, unit);
 	}
 

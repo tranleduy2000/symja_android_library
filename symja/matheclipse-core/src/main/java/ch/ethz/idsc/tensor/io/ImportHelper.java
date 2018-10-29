@@ -31,7 +31,7 @@ import java.util.zip.GZIPInputStream;
         return of(extension, inputStream);
     }
 
-    private static IAST of(Extension extension, InputStream inputStream) throws IOException {
+    private static IAST of(Extension extension, InputStream inputStream) {
         switch (extension) {
 //    case CSV:
 //      // gjoel found that {@link Files#lines(Path)} was unsuitable on Windows

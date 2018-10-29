@@ -85,7 +85,7 @@ public class SimpleUnitSystem implements UnitSystem {
 				IExpr temp = DObjects.isNull(lookup) //
                         ? IQuantityStatic.of(F.C1, format(entry)) //
 						: lookup.isQuantity()//
-								? ((IQuantity) lookup).power(entryValue)//
+								? lookup.power(entryValue)//
 								: F.Power.of(lookup, entryValue);
 				if (temp.isQuantity()) {
 					value = temp.multiply(value);
