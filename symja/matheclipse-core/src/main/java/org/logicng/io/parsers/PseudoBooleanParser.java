@@ -29,11 +29,7 @@
 package org.logicng.io.parsers;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 
 /**
@@ -88,20 +84,4 @@ public final class PseudoBooleanParser extends FormulaParser {
     this.parser.setErrorHandler(new BailErrorStrategy());
   }
 
-  @Override
-  public Formula parse(final String string) throws ParserException {
-    if (string == null || string.isEmpty())
-      return factory().verum();
-    try {
-      CharStream input = CharStreams.fromString(string);
-      this.lexer.setInputStream(input);
-      CommonTokenStream tokens = new CommonTokenStream(this.lexer);
-      this.parser.setInputStream(tokens);
-      return this.parser.formula().f;
-    } catch (ParseCancellationException e) {
-      throw new ParserException("Parse cancellation exception when parsing the formula", e);
-    } catch (LexerException e) {
-      throw new ParserException("Lexer exception when parsing the formula.", e);
-    }
-  }
 }

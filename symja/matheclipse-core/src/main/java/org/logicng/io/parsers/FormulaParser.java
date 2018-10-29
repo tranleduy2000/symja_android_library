@@ -48,15 +48,7 @@ public abstract class FormulaParser {
     this.f = f;
   }
 
-  /**
-   * Parses and returns a given string.
-   * @param string the input string
-   * @return the {@link Formula} representation of the given string
-   * @throws ParserException if there was a problem parsing the string
-   */
-  public abstract Formula parse(final String string) throws ParserException;
-
-  /**
+    /**
    * Returns the factory of this parser.
    * @return the factory of this parser
    */

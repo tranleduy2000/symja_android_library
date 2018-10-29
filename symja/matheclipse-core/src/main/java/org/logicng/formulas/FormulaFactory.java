@@ -35,7 +35,6 @@ import org.logicng.configurations.ConfigurationType;
 import org.logicng.formulas.printer.DefaultStringRepresentation;
 import org.logicng.formulas.printer.FormulaStringRepresentation;
 import org.logicng.functions.SubNodeFunction;
-import org.logicng.io.parsers.ParserException;
 import org.logicng.io.parsers.PseudoBooleanParser;
 import org.logicng.pseudobooleans.PBEncoder;
 import org.logicng.transformations.FormulaFactoryImporter;
@@ -922,16 +921,6 @@ public class FormulaFactory {
    */
   public long numberOfNodes(final Formula formula) {
     return formula.apply(this.subformulaFunction).size();
-  }
-
-  /**
-   * Parses a given string to a formula using a pseudo boolean parser.
-   * @param string a string representing the formula
-   * @return the formula
-   * @throws ParserException if the parser throws an exception
-   */
-  public Formula parse(final String string) throws ParserException {
-    return parser.parse(string);
   }
 
   /**
