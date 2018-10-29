@@ -67,7 +67,7 @@ final class SubscriberRegistry {
                     .build(
                             new CacheLoader<Class<?>, ImmutableList<Method>>() {
                                 @Override
-                                public ImmutableList<Method> load(Class<?> concreteClass) throws Exception {
+                                public ImmutableList<Method> load(Class<?> concreteClass) {
                                     return getAnnotatedMethodsNotCached(concreteClass);
                                 }
                             });

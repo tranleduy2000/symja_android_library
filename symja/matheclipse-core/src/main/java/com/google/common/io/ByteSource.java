@@ -446,7 +446,7 @@ public abstract class ByteSource {
         }
 
         @Override
-        public InputStream openBufferedStream() throws IOException {
+        public InputStream openBufferedStream() {
             return openStream();
         }
 

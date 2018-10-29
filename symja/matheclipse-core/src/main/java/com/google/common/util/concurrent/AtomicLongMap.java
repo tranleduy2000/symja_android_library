@@ -455,7 +455,7 @@ public final class AtomicLongMap<K> implements Serializable {
             return putIfAbsent(key, newValue) == 0L;
         } else {
             AtomicLong atomic = map.get(key);
-            return (atomic == null) ? false : atomic.compareAndSet(expectedOldValue, newValue);
+            return (atomic != null) && atomic.compareAndSet(expectedOldValue, newValue);
         }
     }
 }

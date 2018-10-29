@@ -150,7 +150,7 @@ public final class Multisets {
             // Support clear(), removeAll(), and retainAll() when filtering a filtered
             // collection.
             FilteredMultiset<E> filtered = (FilteredMultiset<E>) unfiltered;
-            Predicate<E> combinedPredicate = Predicates.<E>and(filtered.predicate, predicate);
+            Predicate<E> combinedPredicate = Predicates.and(filtered.predicate, predicate);
             return new FilteredMultiset<E>(filtered.unfiltered, combinedPredicate);
         }
         return new FilteredMultiset<E>(unfiltered, predicate);
@@ -795,7 +795,7 @@ public final class Multisets {
         }
 
         Set<E> createElementSet() {
-            return Collections.<E>unmodifiableSet(delegate.elementSet());
+            return Collections.unmodifiableSet(delegate.elementSet());
         }
 
         @Override
@@ -817,7 +817,7 @@ public final class Multisets {
 
         @Override
         public Iterator<E> iterator() {
-            return Iterators.<E>unmodifiableIterator(delegate.iterator());
+            return Iterators.unmodifiableIterator(delegate.iterator());
         }
 
         @Override

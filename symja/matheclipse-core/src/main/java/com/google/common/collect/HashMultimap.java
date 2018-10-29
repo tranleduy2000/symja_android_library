@@ -116,7 +116,7 @@ public final class HashMultimap<K, V> extends HashMultimapGwtSerializationDepend
      */
     @Override
     Set<V> createCollection() {
-        return Platform.<V>newHashSetWithExpectedSize(expectedValuesPerKey);
+        return Platform.newHashSetWithExpectedSize(expectedValuesPerKey);
     }
 
     /**

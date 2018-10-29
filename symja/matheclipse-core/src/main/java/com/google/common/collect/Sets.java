@@ -821,7 +821,7 @@ public final class Sets {
             // Support clear(), removeAll(), and retainAll() when filtering a filtered
             // collection.
             FilteredSet<E> filtered = (FilteredSet<E>) unfiltered;
-            Predicate<E> combinedPredicate = Predicates.<E>and(filtered.predicate, predicate);
+            Predicate<E> combinedPredicate = Predicates.and(filtered.predicate, predicate);
             return new FilteredSet<E>((Set<E>) filtered.unfiltered, combinedPredicate);
         }
 
@@ -857,7 +857,7 @@ public final class Sets {
             // Support clear(), removeAll(), and retainAll() when filtering a filtered
             // collection.
             FilteredSet<E> filtered = (FilteredSet<E>) unfiltered;
-            Predicate<E> combinedPredicate = Predicates.<E>and(filtered.predicate, predicate);
+            Predicate<E> combinedPredicate = Predicates.and(filtered.predicate, predicate);
             return new FilteredSortedSet<E>((SortedSet<E>) filtered.unfiltered, combinedPredicate);
         }
 
@@ -896,7 +896,7 @@ public final class Sets {
             // Support clear(), removeAll(), and retainAll() when filtering a filtered
             // collection.
             FilteredSet<E> filtered = (FilteredSet<E>) unfiltered;
-            Predicate<E> combinedPredicate = Predicates.<E>and(filtered.predicate, predicate);
+            Predicate<E> combinedPredicate = Predicates.and(filtered.predicate, predicate);
             return new FilteredNavigableSet<E>((NavigableSet<E>) filtered.unfiltered, combinedPredicate);
         }
 

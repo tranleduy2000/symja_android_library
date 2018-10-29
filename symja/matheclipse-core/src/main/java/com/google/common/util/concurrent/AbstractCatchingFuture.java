@@ -213,7 +213,7 @@ abstract class AbstractCatchingFuture<V, X extends Throwable, F, T>
 
         @Override
         @NullableDecl
-        V doFallback(Function<? super X, ? extends V> fallback, X cause) throws Exception {
+        V doFallback(Function<? super X, ? extends V> fallback, X cause) {
             return fallback.apply(cause);
         }
 

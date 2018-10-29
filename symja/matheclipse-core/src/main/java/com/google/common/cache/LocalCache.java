@@ -652,10 +652,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
         if (expiresAfterAccess() && (now - entry.getAccessTime() >= expireAfterAccessNanos)) {
             return true;
         }
-        if (expiresAfterWrite() && (now - entry.getWriteTime() >= expireAfterWriteNanos)) {
-            return true;
-        }
-        return false;
+        return expiresAfterWrite() && (now - entry.getWriteTime() >= expireAfterWriteNanos);
     }
 
     /**
@@ -710,9 +707,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
                 }
                 sum -= segments[i].modCount;
             }
-            if (sum != 0L) {
-                return false;
-            }
+            return sum == 0L;
         }
         return true;
     }

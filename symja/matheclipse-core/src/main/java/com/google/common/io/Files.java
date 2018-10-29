@@ -594,7 +594,7 @@ public final class Files {
      * @since 2.0
      */
     public static MappedByteBuffer map(File file, MapMode mode, long size)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         checkNotNull(file);
         checkNotNull(mode);
 

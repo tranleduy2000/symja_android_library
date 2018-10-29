@@ -866,10 +866,10 @@ public final class Multimaps {
         } else if (unfiltered instanceof FilteredKeyMultimap) {
             FilteredKeyMultimap<K, V> prev = (FilteredKeyMultimap<K, V>) unfiltered;
             return new FilteredKeyMultimap<>(
-                    prev.unfiltered, Predicates.<K>and(prev.keyPredicate, keyPredicate));
+                    prev.unfiltered, Predicates.and(prev.keyPredicate, keyPredicate));
         } else if (unfiltered instanceof FilteredMultimap) {
             FilteredMultimap<K, V> prev = (FilteredMultimap<K, V>) unfiltered;
-            return filterFiltered(prev, Maps.<K>keyPredicateOnEntries(keyPredicate));
+            return filterFiltered(prev, Maps.keyPredicateOnEntries(keyPredicate));
         } else {
             return new FilteredKeyMultimap<>(unfiltered, keyPredicate);
         }
@@ -907,10 +907,10 @@ public final class Multimaps {
         if (unfiltered instanceof FilteredKeySetMultimap) {
             FilteredKeySetMultimap<K, V> prev = (FilteredKeySetMultimap<K, V>) unfiltered;
             return new FilteredKeySetMultimap<>(
-                    prev.unfiltered(), Predicates.<K>and(prev.keyPredicate, keyPredicate));
+                    prev.unfiltered(), Predicates.and(prev.keyPredicate, keyPredicate));
         } else if (unfiltered instanceof FilteredSetMultimap) {
             FilteredSetMultimap<K, V> prev = (FilteredSetMultimap<K, V>) unfiltered;
-            return filterFiltered(prev, Maps.<K>keyPredicateOnEntries(keyPredicate));
+            return filterFiltered(prev, Maps.keyPredicateOnEntries(keyPredicate));
         } else {
             return new FilteredKeySetMultimap<>(unfiltered, keyPredicate);
         }
@@ -948,7 +948,7 @@ public final class Multimaps {
         if (unfiltered instanceof FilteredKeyListMultimap) {
             FilteredKeyListMultimap<K, V> prev = (FilteredKeyListMultimap<K, V>) unfiltered;
             return new FilteredKeyListMultimap<>(
-                    prev.unfiltered(), Predicates.<K>and(prev.keyPredicate, keyPredicate));
+                    prev.unfiltered(), Predicates.and(prev.keyPredicate, keyPredicate));
         } else {
             return new FilteredKeyListMultimap<>(unfiltered, keyPredicate);
         }
@@ -983,7 +983,7 @@ public final class Multimaps {
      */
     public static <K, V> Multimap<K, V> filterValues(
             Multimap<K, V> unfiltered, final Predicate<? super V> valuePredicate) {
-        return filterEntries(unfiltered, Maps.<V>valuePredicateOnEntries(valuePredicate));
+        return filterEntries(unfiltered, Maps.valuePredicateOnEntries(valuePredicate));
     }
 
     /**
@@ -1015,7 +1015,7 @@ public final class Multimaps {
      */
     public static <K, V> SetMultimap<K, V> filterValues(
             SetMultimap<K, V> unfiltered, final Predicate<? super V> valuePredicate) {
-        return filterEntries(unfiltered, Maps.<V>valuePredicateOnEntries(valuePredicate));
+        return filterEntries(unfiltered, Maps.valuePredicateOnEntries(valuePredicate));
     }
 
     /**
@@ -1096,7 +1096,7 @@ public final class Multimaps {
     private static <K, V> Multimap<K, V> filterFiltered(
             FilteredMultimap<K, V> multimap, Predicate<? super Entry<K, V>> entryPredicate) {
         Predicate<Entry<K, V>> predicate =
-                Predicates.<Entry<K, V>>and(multimap.entryPredicate(), entryPredicate);
+                Predicates.and(multimap.entryPredicate(), entryPredicate);
         return new FilteredEntryMultimap<>(multimap.unfiltered(), predicate);
     }
 
@@ -1109,7 +1109,7 @@ public final class Multimaps {
     private static <K, V> SetMultimap<K, V> filterFiltered(
             FilteredSetMultimap<K, V> multimap, Predicate<? super Entry<K, V>> entryPredicate) {
         Predicate<Entry<K, V>> predicate =
-                Predicates.<Entry<K, V>>and(multimap.entryPredicate(), entryPredicate);
+                Predicates.and(multimap.entryPredicate(), entryPredicate);
         return new FilteredEntrySetMultimap<>(multimap.unfiltered(), predicate);
     }
 
@@ -1789,7 +1789,7 @@ public final class Multimaps {
         @Override
         Iterator<Entry<K, V2>> entryIterator() {
             return Iterators.transform(
-                    fromMultimap.entries().iterator(), Maps.<K, V1, V2>asEntryToEntryFunction(transformer));
+                    fromMultimap.entries().iterator(), Maps.asEntryToEntryFunction(transformer));
         }
 
         @Override
@@ -1852,7 +1852,7 @@ public final class Multimaps {
         @Override
         Collection<V2> createValues() {
             return Collections2.transform(
-                    fromMultimap.entries(), Maps.<K, V1, V2>asEntryToValueFunction(transformer));
+                    fromMultimap.entries(), Maps.asEntryToValueFunction(transformer));
         }
     }
 

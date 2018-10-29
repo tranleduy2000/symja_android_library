@@ -201,7 +201,7 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
         // Hack around E not being a subtype of Comparable.
         // Unsafe, see ImmutableSortedSetFauxverideShim.
         @SuppressWarnings("unchecked")
-        Ordering<E> naturalOrder = (Ordering<E>) Ordering.<Comparable>natural();
+        Ordering<E> naturalOrder = (Ordering<E>) Ordering.natural();
         return copyOf(naturalOrder, elements);
     }
 
@@ -233,7 +233,7 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
         // Hack around E not being a subtype of Comparable.
         // Unsafe, see ImmutableSortedSetFauxverideShim.
         @SuppressWarnings("unchecked")
-        Ordering<E> naturalOrder = (Ordering<E>) Ordering.<Comparable>natural();
+        Ordering<E> naturalOrder = (Ordering<E>) Ordering.natural();
         return copyOf(naturalOrder, elements);
     }
 
@@ -252,7 +252,7 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
         // Hack around E not being a subtype of Comparable.
         // Unsafe, see ImmutableSortedSetFauxverideShim.
         @SuppressWarnings("unchecked")
-        Ordering<E> naturalOrder = (Ordering<E>) Ordering.<Comparable>natural();
+        Ordering<E> naturalOrder = (Ordering<E>) Ordering.natural();
         return copyOf(naturalOrder, elements);
     }
 

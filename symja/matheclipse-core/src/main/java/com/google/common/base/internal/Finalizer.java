@@ -114,14 +114,14 @@ public class Finalizer implements Runnable {
                 long defaultStackSize = 0;
                 thread =
                         bigThreadConstructor.newInstance(
-                                (ThreadGroup) null, finalizer, threadName, defaultStackSize, inheritThreadLocals);
+                                null, finalizer, threadName, defaultStackSize, inheritThreadLocals);
             } catch (Throwable t) {
                 logger.log(
                         Level.INFO, "Failed to create a thread without inherited thread-local values", t);
             }
         }
         if (thread == null) {
-            thread = new Thread((ThreadGroup) null, finalizer, threadName);
+            thread = new Thread(null, finalizer, threadName);
         }
         thread.setDaemon(true);
 

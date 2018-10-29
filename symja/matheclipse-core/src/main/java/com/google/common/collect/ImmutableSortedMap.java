@@ -65,7 +65,7 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
 
     private static final ImmutableSortedMap<Comparable, Object> NATURAL_EMPTY_MAP =
             new ImmutableSortedMap<>(
-                    ImmutableSortedSet.emptySet(Ordering.natural()), ImmutableList.<Object>of());
+                    ImmutableSortedSet.emptySet(Ordering.natural()), ImmutableList.of());
     // This class is never actually serialized directly, but we have to make the
     // warning go away (and suppressing would suppress for all nested classes too)
     private static final long serialVersionUID = 0;
@@ -327,7 +327,7 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
             case 0:
                 return emptyMap(comparator);
             case 1:
-                return ImmutableSortedMap.<K, V>of(
+                return ImmutableSortedMap.of(
                         comparator, entryArray[0].getKey(), entryArray[0].getValue());
             default:
                 Object[] keys = new Object[size];

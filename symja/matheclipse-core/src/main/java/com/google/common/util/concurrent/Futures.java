@@ -1388,7 +1388,7 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
             return call(
                     new Callable<Void>() {
                         @Override
-                        public Void call() throws Exception {
+                        public Void call() {
                             combiner.run();
                             return null;
                         }

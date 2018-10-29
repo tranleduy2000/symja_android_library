@@ -242,7 +242,7 @@ public class ImmutableSetMultimap<K, V> extends ImmutableMultimap<K, V>
     private static <V> ImmutableSet<V> emptySet(@NullableDecl Comparator<? super V> valueComparator) {
         return (valueComparator == null)
                 ? ImmutableSet.<V>of()
-                : ImmutableSortedSet.<V>emptySet(valueComparator);
+                : ImmutableSortedSet.emptySet(valueComparator);
     }
 
     private static <V> ImmutableSet.Builder<V> valuesBuilder(

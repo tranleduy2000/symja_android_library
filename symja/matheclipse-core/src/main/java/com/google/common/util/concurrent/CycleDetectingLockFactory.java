@@ -180,7 +180,7 @@ public class CycleDetectingLockFactory {
             new ThreadLocal<ArrayList<LockGraphNode>>() {
                 @Override
                 protected ArrayList<LockGraphNode> initialValue() {
-                    return Lists.<LockGraphNode>newArrayListWithCapacity(3);
+                    return Lists.newArrayListWithCapacity(3);
                 }
             };
     final Policy policy;
@@ -369,7 +369,7 @@ public class CycleDetectingLockFactory {
             @Override
             public void handlePotentialDeadlock(PotentialDeadlockException e) {
             }
-        };
+        }
     }
 
     /**

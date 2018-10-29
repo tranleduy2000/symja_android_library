@@ -339,7 +339,7 @@ public final class Collections2 {
         }
 
         FilteredCollection<E> createCombined(Predicate<? super E> newPredicate) {
-            return new FilteredCollection<E>(unfiltered, Predicates.<E>and(predicate, newPredicate));
+            return new FilteredCollection<E>(unfiltered, Predicates.and(predicate, newPredicate));
             // .<E> above needed to compile in JDK 5
         }
 

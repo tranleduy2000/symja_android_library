@@ -119,7 +119,7 @@ public final class Predicates {
      * as a false predicate is found.
      */
     public static <T> Predicate<T> and(Predicate<? super T> first, Predicate<? super T> second) {
-        return new AndPredicate<T>(Predicates.<T>asList(checkNotNull(first), checkNotNull(second)));
+        return new AndPredicate<T>(Predicates.asList(checkNotNull(first), checkNotNull(second)));
     }
 
     /**
@@ -151,7 +151,7 @@ public final class Predicates {
      * as soon as a true predicate is found.
      */
     public static <T> Predicate<T> or(Predicate<? super T> first, Predicate<? super T> second) {
-        return new OrPredicate<T>(Predicates.<T>asList(checkNotNull(first), checkNotNull(second)));
+        return new OrPredicate<T>(Predicates.asList(checkNotNull(first), checkNotNull(second)));
     }
 
     /**

@@ -64,7 +64,7 @@ public final class Callables {
         checkNotNull(listeningExecutorService);
         return new AsyncCallable<T>() {
             @Override
-            public ListenableFuture<T> call() throws Exception {
+            public ListenableFuture<T> call() {
                 return listeningExecutorService.submit(callable);
             }
         };

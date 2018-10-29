@@ -55,7 +55,7 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
             new ImmutableRangeSet<>(ImmutableList.<Range<Comparable<?>>>of());
 
     private static final ImmutableRangeSet<Comparable<?>> ALL =
-            new ImmutableRangeSet<>(ImmutableList.of(Range.<Comparable<?>>all()));
+            new ImmutableRangeSet<>(ImmutableList.of(Range.all()));
     private final transient ImmutableList<Range<C>> ranges;
     @LazyInit
     private transient ImmutableRangeSet<C> complement;
@@ -659,7 +659,7 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
 
             Cut<C> upperBound;
             if (positiveBoundedAbove && index == size - 1) {
-                upperBound = Cut.<C>aboveAll();
+                upperBound = Cut.aboveAll();
             } else {
                 upperBound = ranges.get(index + (positiveBoundedBelow ? 0 : 1)).lowerBound;
             }

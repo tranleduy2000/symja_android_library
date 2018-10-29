@@ -255,7 +255,7 @@ public abstract class BaseEncoding {
             }
 
             @Override
-            public int read(char[] cbuf, int off, int len) throws IOException {
+            public int read(char[] cbuf, int off, int len) {
                 throw new UnsupportedOperationException();
             }
 
@@ -286,13 +286,12 @@ public abstract class BaseEncoding {
             }
 
             @Override
-            public Appendable append(@NullableDecl CharSequence chars, int off, int len)
-                    throws IOException {
+            public Appendable append(@NullableDecl CharSequence chars, int off, int len) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public Appendable append(@NullableDecl CharSequence chars) throws IOException {
+            public Appendable append(@NullableDecl CharSequence chars) {
                 throw new UnsupportedOperationException();
             }
         };
@@ -310,7 +309,7 @@ public abstract class BaseEncoding {
             }
 
             @Override
-            public void write(char[] chars, int off, int len) throws IOException {
+            public void write(char[] chars, int off, int len) {
                 throw new UnsupportedOperationException();
             }
 

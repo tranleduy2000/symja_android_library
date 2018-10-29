@@ -714,7 +714,7 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
      * An {@code Iterator} over distinct keys in key head order.
      */
     private class DistinctKeyIterator implements Iterator<K> {
-        final Set<K> seenKeys = Sets.<K>newHashSetWithExpectedSize(keySet().size());
+        final Set<K> seenKeys = Sets.newHashSetWithExpectedSize(keySet().size());
         Node<K, V> next = head;
         @NullableDecl
         Node<K, V> current;

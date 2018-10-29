@@ -180,7 +180,7 @@ final class DirectedGraphConnections<N, V> implements GraphConnections<N, V> {
             adjacentNodeValues.remove(node);
             checkNonNegative(--predecessorCount);
         } else if (previousValue instanceof PredAndSucc) {
-            adjacentNodeValues.put((N) node, ((PredAndSucc) previousValue).successorValue);
+            adjacentNodeValues.put(node, ((PredAndSucc) previousValue).successorValue);
             checkNonNegative(--predecessorCount);
         }
     }

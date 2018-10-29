@@ -524,7 +524,7 @@ public abstract class AbstractService implements Service {
                     "shutdownWhenStartupFinishes can only be set if state is STARTING. Got %s instead.",
                     internalState);
             checkArgument(
-                    !(failure != null ^ internalState == FAILED),
+                    (failure != null) == (internalState == FAILED),
                     "A failure cause should be set if and only if the state is failed.  Got %s and %s "
                             + "instead.",
                     internalState,
