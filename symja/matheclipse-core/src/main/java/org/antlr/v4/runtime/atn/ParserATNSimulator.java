@@ -296,13 +296,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected ParserRuleContext _outerContext;
 	protected DFA _dfa;
 
-	/** Testing only! */
-	public ParserATNSimulator(ATN atn, DFA[] decisionToDFA,
-							  PredictionContextCache sharedContextCache)
-	{
-		this(null, atn, decisionToDFA, sharedContextCache);
-	}
-
 	public ParserATNSimulator(Parser parser, ATN atn,
 							  DFA[] decisionToDFA,
 							  PredictionContextCache sharedContextCache)

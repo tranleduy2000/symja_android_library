@@ -6,7 +6,7 @@ import com.duy.lambda.Predicate;
  * An expression representing a symbol (i.e. variable- constant- or function-name)
  *
  */
-public interface IBuiltInSymbol extends ISymbol {
+public interface IBuiltInSymbol extends ISymbol, IExpr {
 
     /**
      * Get the current evaluator for this symbol

@@ -158,7 +158,7 @@ public class F {
 	 * <code>isPresent()</code> method. The method is similar to <code>java.util.Optional#isPresent()</code>.
 	 * </p>
 	 */
-	public final static IASTAppendable NIL = new NILPointer();
+	public final static NILPointer NIL = new NILPointer();
 
 
     /***/
