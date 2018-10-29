@@ -160,7 +160,7 @@ public class F {
 	 * 
 	 * @see java.util.Optional#isPresent
 	 */
-	public final static NILPointer NIL = new NILPointer();
+	public final static IASTAppendable NIL = new NILPointer();
 
 
     /***/
