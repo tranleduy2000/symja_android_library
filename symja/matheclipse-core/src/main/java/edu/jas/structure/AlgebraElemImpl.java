@@ -12,7 +12,7 @@ package edu.jas.structure;
  * @param <C> scalar type
  * @author Heinz Kredel
  */
-public abstract class AlgebraElemImpl<A extends MonoidElem, C>
+public abstract class AlgebraElemImpl<A extends MonoidElem<A>, C>
         extends RingElemImpl<A> implements AlgebraElem<A, C> {
 
 }
