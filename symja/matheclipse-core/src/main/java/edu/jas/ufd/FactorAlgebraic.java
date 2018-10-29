@@ -55,7 +55,7 @@ public class FactorAlgebraic<C extends GcdRingElem<C>> extends FactorAbsolute<Al
      * @param fac algebraic number factory.
      */
     public FactorAlgebraic(AlgebraicNumberRing<C> fac) {
-        this(fac, FactorFactory.<C>getImplementation(fac.ring.coFac));
+        this(fac, FactorFactory.getImplementation(fac.ring.coFac));
     }
 
 
@@ -134,7 +134,7 @@ public class FactorAlgebraic<C extends GcdRingElem<C>> extends FactorAbsolute<Al
             ki++;
             // compute norm with x -> ( y - k x )
             ks = k;
-            res = PolyUfdUtil.<C>norm(P, ks);
+            res = PolyUfdUtil.norm(P, ks);
             //System.out.println("res = " + res);
             if (res.isZERO() || res.isConstant()) {
                 continue;
@@ -172,7 +172,7 @@ public class FactorAlgebraic<C extends GcdRingElem<C>> extends FactorAbsolute<Al
         GenPolynomial<AlgebraicNumber<C>> Ni;
         for (GenPolynomial<C> nfi : nfacs) {
             //System.out.println("nfi = " + nfi);
-            Ni = PolyUfdUtil.<C>substituteConvertToAlgebraicCoefficients(pfac, nfi, ks);
+            Ni = PolyUfdUtil.substituteConvertToAlgebraicCoefficients(pfac, nfi, ks);
             if (logger.isInfoEnabled()) {
                 logger.info("Ni = " + Ni);
                 //System.out.println("Pp = " + Pp);

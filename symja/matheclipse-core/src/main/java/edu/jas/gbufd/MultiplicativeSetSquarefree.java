@@ -107,7 +107,7 @@ public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends Multi
         if (mset.size() == 0) {
             list = engine.coPrimeSquarefree(cc, mset);
             if (ring.coFac.isField()) {
-                list = PolyUtil.<C>monic(list);
+                list = PolyUtil.monic(list);
             }
             return new MultiplicativeSetSquarefree<C>(ring, list, engine);
         }
@@ -119,7 +119,7 @@ public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends Multi
         logger.info("added to squarefree mset = " + c);
         list = engine.coPrimeSquarefree(c, mset);
         if (ring.coFac.isField()) {
-            list = PolyUtil.<C>monic(list);
+            list = PolyUtil.monic(list);
         }
         return new MultiplicativeSetSquarefree<C>(ring, list, engine);
     }

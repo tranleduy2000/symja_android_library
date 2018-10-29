@@ -48,7 +48,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
      */
     @SuppressWarnings({"cast", "unused"})
     private FactorModular() {
-        this((RingFactory<MOD>) (Object) new ModLongRing(13, true)); // hack, 13 unimportant
+        this((RingFactory<MOD>) new ModLongRing(13, true)); // hack, 13 unimportant
     }
 
 
@@ -226,7 +226,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             factors.addAll(efacs);
         }
         //System.out.println("factors  = " + factors);
-        factors = PolyUtil.<MOD>monic(factors);
+        factors = PolyUtil.monic(factors);
         SortedSet<GenPolynomial<MOD>> ss = new TreeSet<GenPolynomial<MOD>>(factors);
         //System.out.println("sorted   = " + ss);
         factors.clear();

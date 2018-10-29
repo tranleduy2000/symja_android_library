@@ -54,7 +54,7 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
         }
         QuotientRing<C> qfac = (QuotientRing<C>) fac;
         GenPolynomialRing<C> rfac = qfac.ring;
-        qengine = (SquarefreeAbstract) SquarefreeFactory.<C>getImplementation(rfac);
+        qengine = SquarefreeFactory.getImplementation(rfac);
         //qengine = new SquarefreeFiniteFieldCharP<C>(rfac.coFac);
         //qengine = new SquarefreeInfiniteRingCharP<C>( rfac.coFac );
     }
@@ -203,12 +203,12 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
         if (pfac.nvar > 1) {
             // go to recursion
             GenPolynomialRing<GenPolynomial<Quotient<C>>> rfac = pfac.recursive(1);
-            GenPolynomial<GenPolynomial<Quotient<C>>> Pr = PolyUtil.<Quotient<C>>recursive(rfac, P);
+            GenPolynomial<GenPolynomial<Quotient<C>>> Pr = PolyUtil.recursive(rfac, P);
             GenPolynomial<GenPolynomial<Quotient<C>>> Prc = recursiveUnivariateRootCharacteristic(Pr);
             if (Prc == null) {
                 return null;
             }
-            GenPolynomial<Quotient<C>> D = PolyUtil.<Quotient<C>>distribute(pfac, Prc);
+            GenPolynomial<Quotient<C>> D = PolyUtil.distribute(pfac, Prc);
             return D;
         }
         RingFactory<Quotient<C>> rf = pfac.coFac;

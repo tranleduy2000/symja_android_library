@@ -175,7 +175,7 @@ public class GroebnerBasePseudoRecParallel<C extends GcdRingElem<C>> extends
         baseCofac = rp.coFac;
         //engine = (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getImplementation( baseCofac );
         //not used: 
-        engine = GCDFactory.<C>getProxy(baseCofac);
+        engine = GCDFactory.getProxy(baseCofac);
         this.pool = pool;
     }
 

@@ -112,7 +112,7 @@ public class GBOptimized<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<
             throw new UnsupportedOperationException("implemented only for modv = 0, not " + modv);
         }
         GenPolynomialRing<C> pfac = F.get(0).ring;
-        OptimizedPolynomialList<C> opt = TermOrderOptimization.<C>optimizeTermOrder(pfac, F);
+        OptimizedPolynomialList<C> opt = TermOrderOptimization.optimizeTermOrder(pfac, F);
         List<GenPolynomial<C>> P = opt.list;
         if (debug) {
             logger.info("optimized polynomials: " + P);
@@ -125,7 +125,7 @@ public class GBOptimized<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<
         if (retPermuted || G.isEmpty()) {
             return G;
         }
-        List<GenPolynomial<C>> iopt = TermOrderOptimization.<C>permutation(iperm, pfac, G);
+        List<GenPolynomial<C>> iopt = TermOrderOptimization.permutation(iperm, pfac, G);
         if (debug) {
             logger.info("de-optimized polynomials: " + iopt);
         }

@@ -109,7 +109,7 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
             //e.printStackTrace();
         } else {
             //engine = GCDFactory.<C> getImplementation(rf);
-            engine = GCDFactory.<C>getProxy(rf);
+            engine = GCDFactory.getProxy(rf);
         }
     }
 
@@ -124,7 +124,7 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
     @Override
     public List<GenSolvablePolynomial<C>> leftGB(int modv, List<GenSolvablePolynomial<C>> F) {
         List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolynomialList.<C>castToSolvableList(engine.basePrimitivePart(PolynomialList.<C>castToList(G)));
+        G = PolynomialList.castToSolvableList(engine.basePrimitivePart(PolynomialList.castToList(G)));
         if (G.size() <= 1) {
             return G;
         }
@@ -133,7 +133,7 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
             throw new IllegalArgumentException("coefficients from a field");
         }
         PairList<C> pairlist = strategy.create(modv, ring);
-        pairlist.put(PolynomialList.<C>castToList(G));
+        pairlist.put(PolynomialList.castToList(G));
 
         Pair<C> pair;
         GenSolvablePolynomial<C> pi, pj, S, H;
@@ -253,7 +253,7 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
     @Override
     public List<GenSolvablePolynomial<C>> twosidedGB(int modv, List<GenSolvablePolynomial<C>> Fp) {
         List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(Fp);
-        G = PolynomialList.<C>castToSolvableList(engine.basePrimitivePart(PolynomialList.<C>castToList(G)));
+        G = PolynomialList.castToSolvableList(engine.basePrimitivePart(PolynomialList.castToList(G)));
         if (G.size() < 1) { // two-sided!
             return G;
         }
@@ -288,7 +288,7 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
         G = F;
         //System.out.println("G generated = " + G);
         PairList<C> pairlist = strategy.create(modv, ring);
-        pairlist.put(PolynomialList.<C>castToList(G));
+        pairlist.put(PolynomialList.castToList(G));
 
         Pair<C> pair;
         GenSolvablePolynomial<C> pi, pj, S, H;

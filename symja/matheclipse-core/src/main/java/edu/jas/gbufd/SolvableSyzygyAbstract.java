@@ -336,10 +336,10 @@ public abstract class SolvableSyzygyAbstract<C extends GcdRingElem<C>> implement
      * @return true, if Z is a list of left syzygies for F, else false.
      */
     public boolean isLeftZeroRelation(List<List<GenSolvablePolynomial<C>>> Z, List<GenSolvablePolynomial<C>> F) {
-        List<GenPolynomial<C>> Fp = PolynomialList.<C>castToList(F);
+        List<GenPolynomial<C>> Fp = PolynomialList.castToList(F);
         for (List<GenSolvablePolynomial<C>> row : Z) {
             // p has wrong type:
-            GenPolynomial<C> p = blas.scalarProduct(PolynomialList.<C>castToList(row), Fp);
+            GenPolynomial<C> p = blas.scalarProduct(PolynomialList.castToList(row), Fp);
             if (p == null) {
                 continue;
             }
@@ -361,9 +361,9 @@ public abstract class SolvableSyzygyAbstract<C extends GcdRingElem<C>> implement
      */
     public boolean isRightZeroRelation(List<List<GenSolvablePolynomial<C>>> Z,
                                        List<GenSolvablePolynomial<C>> F) {
-        List<GenPolynomial<C>> Fp = PolynomialList.<C>castToList(F);
+        List<GenPolynomial<C>> Fp = PolynomialList.castToList(F);
         for (List<GenSolvablePolynomial<C>> row : Z) {
-            List<GenPolynomial<C>> yrow = PolynomialList.<C>castToList(row);
+            List<GenPolynomial<C>> yrow = PolynomialList.castToList(row);
             // p has wrong type:
             GenPolynomial<C> p = blas.scalarProduct(Fp, yrow); // param order
             if (p == null) {

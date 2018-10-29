@@ -186,7 +186,7 @@ public class PolyUfdUtil {
         for (Map.Entry<ExpVector, GenPolynomial<BigInteger>> y : A.getMap().entrySet()) {
             ExpVector e = y.getKey();
             GenPolynomial<BigInteger> a = y.getValue();
-            GenPolynomial<C> p = PolyUtil.<C>fromIntegerCoefficients(rfac, a);
+            GenPolynomial<C> p = PolyUtil.fromIntegerCoefficients(rfac, a);
             if (!p.isZERO()) {
                 //B = B.sum( p, e ); // inefficient
                 B.doPutToMap(e, p);
@@ -301,7 +301,7 @@ public class PolyUfdUtil {
         if (Pc.isZERO()) {
             return Pc;
         }
-        Pc = PolyUtil.<C>switchVariables(Pc);
+        Pc = PolyUtil.switchVariables(Pc);
         return Pc;
     }
 
@@ -334,9 +334,9 @@ public class PolyUfdUtil {
             logger.info("x - k alpha: " + s);
         }
         // substitute, convert and switch
-        GenPolynomial<AlgebraicNumber<C>> B = PolyUtil.<AlgebraicNumber<C>>substituteMain(A, s);
-        GenPolynomial<GenPolynomial<C>> Pc = PolyUtil.<C>fromAlgebraicCoefficients(rfac, B); // Q[alpha][x]
-        Pc = PolyUtil.<C>switchVariables(Pc); // Q[x][alpha]
+        GenPolynomial<AlgebraicNumber<C>> B = PolyUtil.substituteMain(A, s);
+        GenPolynomial<GenPolynomial<C>> Pc = PolyUtil.fromAlgebraicCoefficients(rfac, B); // Q[alpha][x]
+        Pc = PolyUtil.switchVariables(Pc); // Q[x][alpha]
         return Pc;
     }
 
@@ -360,7 +360,7 @@ public class PolyUfdUtil {
             return pfac.getZERO();
         }
         // convert to Q(alpha)[x]
-        GenPolynomial<AlgebraicNumber<C>> B = PolyUtil.<C>convertToAlgebraicCoefficients(pfac, A);
+        GenPolynomial<AlgebraicNumber<C>> B = PolyUtil.convertToAlgebraicCoefficients(pfac, A);
         // setup x .+. k alpha for back substitution
         GenPolynomial<AlgebraicNumber<C>> x = pfac.univariate(0);
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) pfac.coFac;
@@ -368,7 +368,7 @@ public class PolyUfdUtil {
         AlgebraicNumber<C> ka = afac.fromInteger(k);
         GenPolynomial<AlgebraicNumber<C>> s = x.sum(ka.multiply(alpha)); // x + k alpha
         // substitute
-        GenPolynomial<AlgebraicNumber<C>> N = PolyUtil.<AlgebraicNumber<C>>substituteMain(B, s);
+        GenPolynomial<AlgebraicNumber<C>> N = PolyUtil.substituteMain(B, s);
         return N;
     }
 
@@ -401,13 +401,13 @@ public class PolyUfdUtil {
         GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, pfac);
 
         // transform minimal polynomial to bi-variate polynomial
-        GenPolynomial<GenPolynomial<C>> Ac = PolyUfdUtil.<C>introduceLowerVariable(rfac, agen);
+        GenPolynomial<GenPolynomial<C>> Ac = PolyUfdUtil.introduceLowerVariable(rfac, agen);
         //System.out.println("Ac = " + Ac.toScript());
 
         // transform to bi-variate polynomial, 
         // switching varaible sequence from Q[alpha][x] to Q[X][alpha]
-        GenPolynomial<GenPolynomial<C>> Pc = PolyUfdUtil.<C>substituteFromAlgebraicCoefficients(rfac, A, k);
-        Pc = PolyUtil.<C>monic(Pc);
+        GenPolynomial<GenPolynomial<C>> Pc = PolyUfdUtil.substituteFromAlgebraicCoefficients(rfac, A, k);
+        Pc = PolyUtil.monic(Pc);
         //System.out.println("Pc = " + Pc.toScript());
 
         GreatestCommonDivisorSubres<C> engine = new GreatestCommonDivisorSubres<C>( /*cfac.coFac*/);
@@ -446,7 +446,7 @@ public class PolyUfdUtil {
             afac.setField(false);
             return;
         }
-        Factorization<C> mf = FactorFactory.<C>getImplementation(afac.ring);
+        Factorization<C> mf = FactorFactory.getImplementation(afac.ring);
         if (mf.isIrreducible(afac.modul)) {
             afac.setField(true);
         } else {
@@ -517,7 +517,7 @@ public class PolyUfdUtil {
         if (A == null || A.get(0) == null) {
             return null;
         }
-        return ListUtil.<GenPolynomial<C>, GenPolynomial<C>>map(A, new SubstKronecker<C>(d));
+        return ListUtil.map(A, new SubstKronecker<C>(d));
     }
 
 
@@ -568,7 +568,7 @@ public class PolyUfdUtil {
      */
     public static <C extends GcdRingElem<C>> List<GenPolynomial<C>> backSubstituteKronecker(
             GenPolynomialRing<C> fac, List<GenPolynomial<C>> A, long d) {
-        return ListUtil.<GenPolynomial<C>, GenPolynomial<C>>map(A, new BackSubstKronecker<C>(fac, d));
+        return ListUtil.map(A, new BackSubstKronecker<C>(fac, d));
     }
 
 }
@@ -592,7 +592,7 @@ class SubstKronecker<C extends GcdRingElem<C>> implements UnaryFunctor<GenPolyno
         if (c == null) {
             return null;
         }
-        return PolyUfdUtil.<C>substituteKronecker(c, d);
+        return PolyUfdUtil.substituteKronecker(c, d);
     }
 }
 
@@ -620,6 +620,6 @@ class BackSubstKronecker<C extends GcdRingElem<C>> implements
         if (c == null) {
             return null;
         }
-        return PolyUfdUtil.<C>backSubstituteKronecker(fac, c, d);
+        return PolyUfdUtil.backSubstituteKronecker(fac, c, d);
     }
 }

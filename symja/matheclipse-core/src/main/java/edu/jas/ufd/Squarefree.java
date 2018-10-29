@@ -52,7 +52,7 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * @param P GenPolynomial.
      * @return squarefree(pp(P)).
      */
-    public GenPolynomial<C> squarefreePart(GenPolynomial<C> P);
+    GenPolynomial<C> squarefreePart(GenPolynomial<C> P);
 
 
     /**
@@ -61,7 +61,7 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * @param P GenPolynomial.
      * @return true if P is squarefree, else false.
      */
-    public boolean isSquarefree(GenPolynomial<C> P);
+    boolean isSquarefree(GenPolynomial<C> P);
 
 
     /**
@@ -70,7 +70,7 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * @param L list of GenPolynomial.
      * @return true if each P in L is squarefree, else false.
      */
-    public boolean isSquarefree(List<GenPolynomial<C>> L);
+    boolean isSquarefree(List<GenPolynomial<C>> L);
 
 
     /**
@@ -80,7 +80,7 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * @return [p_1 -> e_1, ..., p_k -> e_k] with P = prod_{i=1,...,k} p_i^{e_i}
      * and p_i squarefree.
      */
-    public SortedMap<GenPolynomial<C>, Long> squarefreeFactors(GenPolynomial<C> P);
+    SortedMap<GenPolynomial<C>, Long> squarefreeFactors(GenPolynomial<C> P);
 
 
     /**
@@ -90,7 +90,7 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * @param F = [p_1,...,p_k].
      * @return true if P = prod_{i=1,...,r} p_i, else false.
      */
-    public boolean isFactorization(GenPolynomial<C> P, List<GenPolynomial<C>> F);
+    boolean isFactorization(GenPolynomial<C> P, List<GenPolynomial<C>> F);
 
 
     /**
@@ -100,7 +100,7 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * @param F = [p_1 -&gt; e_1, ..., p_k -&gt; e_k].
      * @return true if P = prod_{i=1,...,k} p_i**e_i, else false.
      */
-    public boolean isFactorization(GenPolynomial<C> P, SortedMap<GenPolynomial<C>, Long> F);
+    boolean isFactorization(GenPolynomial<C> P, SortedMap<GenPolynomial<C>, Long> F);
 
 
     /**
@@ -111,7 +111,7 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * a in A there exists b in B with b|a and each b in B is
      * squarefree. B does not contain zero or constant polynomials.
      */
-    public List<GenPolynomial<C>> coPrimeSquarefree(List<GenPolynomial<C>> A);
+    List<GenPolynomial<C>> coPrimeSquarefree(List<GenPolynomial<C>> A);
 
 
     /**
@@ -123,7 +123,7 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * there exists b in P with b|a. B does not contain zero or constant
      * polynomials.
      */
-    public List<GenPolynomial<C>> coPrimeSquarefree(GenPolynomial<C> a, List<GenPolynomial<C>> P);
+    List<GenPolynomial<C>> coPrimeSquarefree(GenPolynomial<C> a, List<GenPolynomial<C>> P);
 
 
     /**
@@ -133,6 +133,6 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * @return true, if for all b != c in B gcd(b,c) = 1 and
      * each b in B is squarefree, else false.
      */
-    public boolean isCoPrimeSquarefree(List<GenPolynomial<C>> B);
+    boolean isCoPrimeSquarefree(List<GenPolynomial<C>> B);
 
 }

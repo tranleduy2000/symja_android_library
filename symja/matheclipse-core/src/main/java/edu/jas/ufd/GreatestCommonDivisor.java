@@ -46,7 +46,7 @@ public interface GreatestCommonDivisor<C extends GcdRingElem<C>> extends Seriali
      * @param P GenPolynomial.
      * @return cont(P).
      */
-    public GenPolynomial<C> content(GenPolynomial<C> P);
+    GenPolynomial<C> content(GenPolynomial<C> P);
 
 
     /**
@@ -55,7 +55,7 @@ public interface GreatestCommonDivisor<C extends GcdRingElem<C>> extends Seriali
      * @param P GenPolynomial.
      * @return pp(P).
      */
-    public GenPolynomial<C> primitivePart(GenPolynomial<C> P);
+    GenPolynomial<C> primitivePart(GenPolynomial<C> P);
 
 
     /**
@@ -65,7 +65,7 @@ public interface GreatestCommonDivisor<C extends GcdRingElem<C>> extends Seriali
      * @param S GenPolynomial.
      * @return gcd(P, S).
      */
-    public GenPolynomial<C> gcd(GenPolynomial<C> P, GenPolynomial<C> S);
+    GenPolynomial<C> gcd(GenPolynomial<C> P, GenPolynomial<C> S);
 
 
     /**
@@ -75,7 +75,7 @@ public interface GreatestCommonDivisor<C extends GcdRingElem<C>> extends Seriali
      * @param S GenPolynomial.
      * @return lcm(P, S).
      */
-    public GenPolynomial<C> lcm(GenPolynomial<C> P, GenPolynomial<C> S);
+    GenPolynomial<C> lcm(GenPolynomial<C> P, GenPolynomial<C> S);
 
 
     /**
@@ -87,7 +87,7 @@ public interface GreatestCommonDivisor<C extends GcdRingElem<C>> extends Seriali
      * @return res(P, S).
      * @throws UnsupportedOperationException if there is no implementation in the sub-class.
      */
-    public GenPolynomial<C> resultant(GenPolynomial<C> P, GenPolynomial<C> S);
+    GenPolynomial<C> resultant(GenPolynomial<C> P, GenPolynomial<C> S);
 
 
     /**
@@ -98,7 +98,7 @@ public interface GreatestCommonDivisor<C extends GcdRingElem<C>> extends Seriali
      * a in A there exists b in B with b|a. B does not contain zero or
      * constant polynomials.
      */
-    public List<GenPolynomial<C>> coPrime(List<GenPolynomial<C>> A);
+    List<GenPolynomial<C>> coPrime(List<GenPolynomial<C>> A);
 
 
     /**
@@ -107,6 +107,6 @@ public interface GreatestCommonDivisor<C extends GcdRingElem<C>> extends Seriali
      * @param A list of GenPolynomials.
      * @return true if gcd(b,c) = 1 for all b != c in B, else false.
      */
-    public boolean isCoPrime(List<GenPolynomial<C>> A);
+    boolean isCoPrime(List<GenPolynomial<C>> A);
 
 }

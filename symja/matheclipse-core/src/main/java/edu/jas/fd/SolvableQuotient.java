@@ -144,13 +144,13 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         // must reduce to lowest terms
         // not perfect, TODO 
         //GenSolvablePolynomial<C>[] gcd = PolyModUtil.<C> syzGcdCofactors(r.ring, n, d);
-        GenSolvablePolynomial<C>[] gcd = FDUtil.<C>leftGcdCofactors(r.ring, n, d);
+        GenSolvablePolynomial<C>[] gcd = FDUtil.leftGcdCofactors(r.ring, n, d);
         if (!gcd[0].isONE()) {
             logger.info("constructor: gcd = " + Arrays.toString(gcd)); // + ", " + n + ", " +d);
             n = gcd[1];
             d = gcd[2];
         }
-        gcd = FDUtil.<C>rightGcdCofactors(r.ring, n, d);
+        gcd = FDUtil.rightGcdCofactors(r.ring, n, d);
         if (!gcd[0].isONE()) {
             logger.info("constructor: gcd = " + Arrays.toString(gcd)); // + ", " + n + ", " +d);
             n = gcd[1];
@@ -235,10 +235,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
      * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
-        if (num.isZERO()) {
-            return false;
-        }
-        return true;
+        return !num.isZERO();
     }
 
 

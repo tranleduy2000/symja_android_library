@@ -52,7 +52,7 @@ public class PolyGBUtil {
         if (r == null || r.isZERO()) {
             return true;
         }
-        GroebnerBaseAbstract<C> bb = GBFactory.<C>getImplementation(r.ring.coFac);
+        GroebnerBaseAbstract<C> bb = GBFactory.getImplementation(r.ring.coFac);
         List<GenPolynomial<C>> F = new ArrayList<GenPolynomial<C>>(2);
         F.add(A);
         F.add(B);
@@ -83,20 +83,20 @@ public class PolyGBUtil {
         //System.out.println("remainder, P = " + P);
         GenPolynomialRing<C> pfac = A.get(0).ring;
         if (pfac.nvar <= 1) { // recursion base 
-            GenPolynomial<C> R = PolyUtil.<C>baseSparsePseudoRemainder(P, A.get(0));
+            GenPolynomial<C> R = PolyUtil.baseSparsePseudoRemainder(P, A.get(0));
             return R.monic();
         }
         // select polynomials according to the main variable
         GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(1);
         GenPolynomial<C> Q = A.get(0); // wrong, must eventually search polynomial
-        GenPolynomial<GenPolynomial<C>> qr = PolyUtil.<C>recursive(rfac, Q);
-        GenPolynomial<GenPolynomial<C>> pr = PolyUtil.<C>recursive(rfac, P);
+        GenPolynomial<GenPolynomial<C>> qr = PolyUtil.recursive(rfac, Q);
+        GenPolynomial<GenPolynomial<C>> pr = PolyUtil.recursive(rfac, P);
         GenPolynomial<GenPolynomial<C>> rr;
         if (qr.isONE()) {
             return P.ring.getZERO();
         }
         if (qr.degree(0) > 0) {
-            rr = PolyUtil.<C>recursiveSparsePseudoRemainder(pr, qr);
+            rr = PolyUtil.recursiveSparsePseudoRemainder(pr, qr);
             //System.out.println("remainder, pr = " + pr);
             //System.out.println("remainder, qr = " + qr);
             //System.out.println("remainder, rr = " + rr);
@@ -104,7 +104,7 @@ public class PolyGBUtil {
             rr = pr;
         }
         if (rr.degree(0) > 0) {
-            GenPolynomial<C> R = PolyUtil.<C>distribute(pfac, rr);
+            GenPolynomial<C> R = PolyUtil.distribute(pfac, rr);
             return R.monic();
             // not further reduced wrt. other variables = top-reduction only
         }
@@ -137,10 +137,10 @@ public class PolyGBUtil {
         if (pfac1.nvar <= 1) { // recursion base 
             GenPolynomial<C> a = A.get(0);
             GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(pfac.nvar - 1);
-            GenPolynomial<GenPolynomial<C>> pr = PolyUtil.<C>recursive(rfac, P);
+            GenPolynomial<GenPolynomial<C>> pr = PolyUtil.recursive(rfac, P);
             // ldcf(P,x_m) = q a + r 
-            GenPolynomial<GenPolynomial<C>> rr = PolyGBUtil.<C>coefficientPseudoRemainderBase(pr, a);
-            GenPolynomial<C> R = PolyUtil.<C>distribute(pfac, rr);
+            GenPolynomial<GenPolynomial<C>> rr = PolyGBUtil.coefficientPseudoRemainderBase(pr, a);
+            GenPolynomial<C> R = PolyUtil.distribute(pfac, rr);
             return R.monic();
         }
         // select polynomials according to the main variable
@@ -151,18 +151,18 @@ public class PolyGBUtil {
         if (debug) {
             logger.info("rfac =" + rfac);
         }
-        GenPolynomial<GenPolynomial<C>> pr = PolyUtil.<C>recursive(rfac, P);
-        GenPolynomial<GenPolynomial<GenPolynomial<C>>> pr2 = PolyUtil.<GenPolynomial<C>>recursive(rfac2, pr);
+        GenPolynomial<GenPolynomial<C>> pr = PolyUtil.recursive(rfac, P);
+        GenPolynomial<GenPolynomial<GenPolynomial<C>>> pr2 = PolyUtil.recursive(rfac2, pr);
         //System.out.println("recursion, pr2 = " + pr2);
         GenPolynomial<C> Q = A.get(0);
-        GenPolynomial<GenPolynomial<C>> qr = PolyUtil.<C>recursive(rfac1, Q);
+        GenPolynomial<GenPolynomial<C>> qr = PolyUtil.recursive(rfac1, Q);
         GenPolynomial<GenPolynomial<GenPolynomial<C>>> rr;
         if (qr.isONE()) {
             return P.ring.getZERO();
         }
         if (qr.degree(0) > 0) {
             // pseudo remainder:  ldcf(P,x_m) = a q + r 
-            rr = PolyGBUtil.<C>coefficientPseudoRemainder(pr2, qr);
+            rr = PolyGBUtil.coefficientPseudoRemainder(pr2, qr);
             //System.out.println("recursion, qr  = " + qr);
             //System.out.println("recursion, pr  = " + pr2);
             //System.out.println("recursion, rr  = " + rr);
@@ -171,8 +171,8 @@ public class PolyGBUtil {
         }
         // reduction wrt. the other variables
         List<GenPolynomial<C>> zeroDeg = zeroDegrees(A);
-        GenPolynomial<GenPolynomial<C>> Rr = PolyUtil.<GenPolynomial<C>>distribute(rfac, rr);
-        GenPolynomial<C> R = PolyUtil.<C>distribute(pfac, Rr);
+        GenPolynomial<GenPolynomial<C>> Rr = PolyUtil.distribute(rfac, rr);
+        GenPolynomial<C> R = PolyUtil.distribute(pfac, Rr);
         R = topCoefficientPseudoRemainder(zeroDeg, R);
         return R.monic();
     }
@@ -309,7 +309,7 @@ public class PolyGBUtil {
         List<GenPolynomial<C>> zeroDeg = new ArrayList<GenPolynomial<C>>(A.size());
         for (int i = 0; i < A.size(); i++) {
             GenPolynomial<C> q = A.get(i);
-            GenPolynomial<GenPolynomial<C>> fr = PolyUtil.<C>recursive(rfac, q);
+            GenPolynomial<GenPolynomial<C>> fr = PolyUtil.recursive(rfac, q);
             if (fr.degree(0) == 0) {
                 zeroDeg.add(fr.leadingBaseCoefficient());
             }
@@ -348,13 +348,13 @@ public class PolyGBUtil {
             p = r.subtract(q); // (1-t)*p
             c.add(p);
         }
-        GroebnerBaseAbstract<C> bb = GBFactory.<C>getImplementation(tfac.coFac);
+        GroebnerBaseAbstract<C> bb = GBFactory.getImplementation(tfac.coFac);
         logger.warn("intersect computing GB");
         List<GenPolynomial<C>> G = bb.GB(c);
         if (debug) {
             logger.debug("intersect GB = " + G);
         }
-        List<GenPolynomial<C>> I = PolyUtil.<C>intersect(pfac, G);
+        List<GenPolynomial<C>> I = PolyUtil.intersect(pfac, G);
         return I;
     }
 
@@ -390,7 +390,7 @@ public class PolyGBUtil {
             p = (GenSolvablePolynomial<C>) r.subtract(q); // (1-t)*p
             c.add(p);
         }
-        SolvableGroebnerBaseAbstract<C> sbb = SGBFactory.<C>getImplementation(tfac.coFac);
+        SolvableGroebnerBaseAbstract<C> sbb = SGBFactory.getImplementation(tfac.coFac);
         //new SolvableGroebnerBaseSeq<C>();
         logger.warn("intersect computing GB");
         List<GenSolvablePolynomial<C>> g = sbb.leftGB(c);
@@ -398,7 +398,7 @@ public class PolyGBUtil {
         if (debug) {
             logger.debug("intersect GB = " + g);
         }
-        List<GenSolvablePolynomial<C>> I = PolyUtil.<C>intersect(pfac, g);
+        List<GenSolvablePolynomial<C>> I = PolyUtil.intersect(pfac, g);
         return I;
     }
 

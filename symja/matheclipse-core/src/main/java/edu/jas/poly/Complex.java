@@ -219,7 +219,6 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
             } else {
                 s.append(mi.toScript()).append(" * I");
             }
-            s.append("");
         }
         return s.toString();
     }
@@ -538,10 +537,10 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
             System.out.println("this = " + this);
             System.out.println("S    = " + S);
             System.out.println("Sp   = " + Sp);
-            BigInteger tr = (BigInteger) (Object) this.re;
-            BigInteger ti = (BigInteger) (Object) this.im;
-            BigInteger sr = (BigInteger) (Object) S.re;
-            BigInteger si = (BigInteger) (Object) S.im;
+            BigInteger tr = (BigInteger) this.re;
+            BigInteger ti = (BigInteger) this.im;
+            BigInteger sr = (BigInteger) S.re;
+            BigInteger si = (BigInteger) S.im;
             BigComplex tc = new BigComplex(new BigRational(tr), new BigRational(ti));
             BigComplex sc = new BigComplex(new BigRational(sr), new BigRational(si));
             BigComplex qc = tc.divide(sc);

@@ -95,7 +95,7 @@ public class GroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends GroebnerBas
         super(red, pl);
         this.red = red;
         cofac = rf;
-        engine = GCDFactory.<C>getImplementation(rf);
+        engine = GCDFactory.getImplementation(rf);
         //not used: engine = (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getProxy( rf );
     }
 

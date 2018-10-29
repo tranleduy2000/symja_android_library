@@ -67,7 +67,7 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>> ext
         GenPolynomialRing<C> rfac = afac.ring;
         //System.out.println("rfac = " + rfac);
         //System.out.println("rfac = " + rfac.coFac);
-        aengine = SquarefreeFactory.<C>getImplementation(rfac);
+        aengine = SquarefreeFactory.getImplementation(rfac);
         //System.out.println("aengine = " + aengine);
     }
 
@@ -155,7 +155,7 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>> ext
             cp = cp.sum(pb);
         }
         GenPolynomial<AlgebraicNumber<C>> cpp = Power
-                .<GenPolynomial<AlgebraicNumber<C>>>positivePower(cp, c);
+                .positivePower(cp, c);
         if (logger.isInfoEnabled()) {
             logger.info("cp   = " + cp);
             logger.info("cp^p = " + cpp);
@@ -182,8 +182,8 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>> ext
                         throw new UnsupportedOperationException(
                                 "case multiple algebraic extensions not implemented");
                     } else if (cc instanceof Quotient && pc instanceof Quotient) {
-                        Quotient<C> ccp = (Quotient<C>) (Object) cc;
-                        Quotient<C> pcp = (Quotient<C>) (Object) pc;
+                        Quotient<C> ccp = (Quotient<C>) cc;
+                        Quotient<C> pcp = (Quotient<C>) pc;
                         if (pcp.isConstant()) {
                             //logger.error("finite field not allowed here " + afac.toScript());
                             throw new ArithmeticException("finite field not allowed here " + afac.toScript());
@@ -301,13 +301,13 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>> ext
         if (pfac.nvar > 1) {
             // go to recursion
             GenPolynomialRing<GenPolynomial<AlgebraicNumber<C>>> rfac = pfac.recursive(1);
-            GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> Pr = PolyUtil.<AlgebraicNumber<C>>recursive(
+            GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> Pr = PolyUtil.recursive(
                     rfac, P);
             GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> Prc = recursiveUnivariateRootCharacteristic(Pr);
             if (Prc == null) {
                 return null;
             }
-            GenPolynomial<AlgebraicNumber<C>> D = PolyUtil.<AlgebraicNumber<C>>distribute(pfac, Prc);
+            GenPolynomial<AlgebraicNumber<C>> D = PolyUtil.distribute(pfac, Prc);
             return D;
         }
         RingFactory<AlgebraicNumber<C>> rf = pfac.coFac;

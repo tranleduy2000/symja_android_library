@@ -343,7 +343,7 @@ public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>
             int d = aring.depth();
             if (d > depth) {
                 depth = d;
-                arr = (AlgebraicNumberRing<C>) (Object) aring;
+                arr = (AlgebraicNumberRing<C>) aring;
             }
         }
         return arr;

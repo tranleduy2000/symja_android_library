@@ -211,10 +211,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
      * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
-        if (num.isZERO()) {
-            return false;
-        }
-        return true;
+        return !num.isZERO();
     }
 
 

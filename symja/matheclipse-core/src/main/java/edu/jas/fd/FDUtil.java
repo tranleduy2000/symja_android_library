@@ -672,7 +672,7 @@ public class FDUtil {
             return P;
         }
         GenSolvablePolynomial<GenPolynomial<C>> Pr = P.rightRecursivePolynomial();
-        GenSolvablePolynomial<GenPolynomial<C>> Qr = FDUtil.<C>recursiveLeftDivide(Pr, s); // Left/Right
+        GenSolvablePolynomial<GenPolynomial<C>> Qr = FDUtil.recursiveLeftDivide(Pr, s); // Left/Right
         GenSolvablePolynomial<GenPolynomial<C>> Q = Qr.evalAsRightRecursivePolynomial();
         if (debug) {
             if (!Qr.multiplyLeft(s).equals(Pr)) {
@@ -717,7 +717,7 @@ public class FDUtil {
         if (s.isONE()) {
             return P;
         }
-        GenSolvablePolynomialRing<GenPolynomial<C>> rfac = (GenSolvablePolynomialRing<GenPolynomial<C>>) P.ring;
+        GenSolvablePolynomialRing<GenPolynomial<C>> rfac = P.ring;
         GenSolvablePolynomial<GenPolynomial<C>> onep = rfac.getONE();
         //ExpVector zero = rfac.evzero;
         GenSolvablePolynomial<GenPolynomial<C>> q = rfac.getZERO();
@@ -888,7 +888,7 @@ public class FDUtil {
             Map.Entry<ExpVector, GenPolynomial<C>> m1 = p.leadingMonomial();
             GenSolvablePolynomial<C> a = (GenSolvablePolynomial<C>) m1.getValue();
             ExpVector f = m1.getKey();
-            GenSolvablePolynomial<C> c = (GenSolvablePolynomial<C>) a.rightDivide(s);
+            GenSolvablePolynomial<C> c = a.rightDivide(s);
             if (c.isZERO()) {
                 //logger.info("something is wrong: c is zero, a = " + a + ", s = " + s);
                 throw new RuntimeException("something is wrong: c is zero, a = " + a + ", s = " + s);
@@ -956,7 +956,7 @@ public class FDUtil {
         while (!p.isZERO()) {
             ExpVector f = p.leadingExpVector();
             GenSolvablePolynomial<C> a = (GenSolvablePolynomial<C>) p.leadingBaseCoefficient();
-            GenSolvablePolynomial<C> c = (GenSolvablePolynomial<C>) a.divide(s);
+            GenSolvablePolynomial<C> c = a.divide(s);
             ///GenSolvablePolynomial<C> c = (GenSolvablePolynomial<C>) a.rightDivide(s);
             if (c.isZERO()) {
                 throw new RuntimeException("something is wrong: c is zero, a = " + a + ", s = " + s);
@@ -1031,7 +1031,7 @@ public class FDUtil {
                 s = x.signum();
             } else {
                 d = fd.leftGcd(c, x);
-                z = (GenSolvablePolynomial<C>) x.divide(d); // ??
+                z = x.divide(d); // ??
                 c = z.multiply(c); // ?? multiplyLeft
             }
         }
@@ -1168,13 +1168,13 @@ public class FDUtil {
             logger.info("leftGCD_out: " + res[0]);
         }
         GenSolvablePolynomial<C>[] nqr;
-        nqr = FDUtil.<C>rightBasePseudoQuotientRemainder(n, res[0]);
+        nqr = FDUtil.rightBasePseudoQuotientRemainder(n, res[0]);
         if (!nqr[1].isZERO()) {
             res[0] = r.getONE();
             return res;
         }
         GenSolvablePolynomial<C>[] dqr;
-        dqr = FDUtil.<C>rightBasePseudoQuotientRemainder(d, res[0]);
+        dqr = FDUtil.rightBasePseudoQuotientRemainder(d, res[0]);
         if (!dqr[1].isZERO()) {
             res[0] = r.getONE();
             return res;
@@ -1216,13 +1216,13 @@ public class FDUtil {
             logger.info("rightGCD_out: " + res[0]);
         }
         GenSolvablePolynomial<C>[] nqr;
-        nqr = FDUtil.<C>leftBasePseudoQuotientRemainder(n, res[0]);
+        nqr = FDUtil.leftBasePseudoQuotientRemainder(n, res[0]);
         if (!nqr[1].isZERO()) {
             res[0] = r.getONE();
             return res;
         }
         GenSolvablePolynomial<C>[] dqr;
-        dqr = FDUtil.<C>leftBasePseudoQuotientRemainder(d, res[0]);
+        dqr = FDUtil.leftBasePseudoQuotientRemainder(d, res[0]);
         if (!dqr[1].isZERO()) {
             res[0] = r.getONE();
             return res;

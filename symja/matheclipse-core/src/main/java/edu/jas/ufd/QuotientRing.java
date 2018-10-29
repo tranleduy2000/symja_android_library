@@ -80,7 +80,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         //             engine = null;
         //             return;
         //         }
-        engine = GCDFactory.<C>getProxy(ring.coFac);
+        engine = GCDFactory.getProxy(ring.coFac);
         logger.debug("quotient ring constructed");
     }
 
@@ -117,7 +117,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      * @return divide(n, d)
      */
     protected GenPolynomial<C> divide(GenPolynomial<C> n, GenPolynomial<C> d) {
-        return PolyUtil.<C>basePseudoDivide(n, d);
+        return PolyUtil.basePseudoDivide(n, d);
     }
 
 

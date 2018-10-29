@@ -44,7 +44,7 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
      * Constructor.
      */
     public SquarefreeRingChar0(RingFactory<C> fac) {
-        super(GCDFactory.<C>getProxy(fac));
+        super(GCDFactory.getProxy(fac));
         if (fac.isField()) {
             throw new IllegalArgumentException("fac is a field: use SquarefreeFieldChar0");
         }
@@ -85,11 +85,11 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
         if (pp.isConstant()) {
             return pp;
         }
-        GenPolynomial<C> d = PolyUtil.<C>baseDeriviative(pp);
+        GenPolynomial<C> d = PolyUtil.baseDeriviative(pp);
         d = engine.basePrimitivePart(d);
         GenPolynomial<C> g = engine.baseGcd(pp, d);
         g = engine.basePrimitivePart(g);
-        GenPolynomial<C> q = PolyUtil.<C>basePseudoDivide(pp, g);
+        GenPolynomial<C> q = PolyUtil.basePseudoDivide(pp, g);
         q = engine.basePrimitivePart(q);
         return q;
     }
@@ -135,10 +135,10 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
                 if (T0.isConstant() || T0.isZERO()) {
                     break;
                 }
-                Tp = PolyUtil.<C>baseDeriviative(T0);
+                Tp = PolyUtil.baseDeriviative(T0);
                 T = engine.baseGcd(T0, Tp);
                 T = engine.basePrimitivePart(T);
-                V = PolyUtil.<C>basePseudoDivide(T0, T);
+                V = PolyUtil.basePseudoDivide(T0, T);
                 //System.out.println("iT0 = " + T0);
                 //System.out.println("iTp = " + Tp);
                 //System.out.println("iT  = " + T);
@@ -152,11 +152,11 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
             k++;
             GenPolynomial<C> W = engine.baseGcd(T, V);
             W = engine.basePrimitivePart(W);
-            GenPolynomial<C> z = PolyUtil.<C>basePseudoDivide(V, W);
+            GenPolynomial<C> z = PolyUtil.basePseudoDivide(V, W);
             //System.out.println("W = " + W);
             //System.out.println("z = " + z);
             V = W;
-            T = PolyUtil.<C>basePseudoDivide(T, V);
+            T = PolyUtil.basePseudoDivide(T, V);
             //System.out.println("V = " + V);
             //System.out.println("T = " + T);
             if (z.degree(0) > 0) {
@@ -194,7 +194,7 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
         Pc = engine.basePrimitivePart(Pc);
         //System.out.println("Pc,bPP = " + Pc);
         if (!Pc.isONE()) {
-            pp = PolyUtil.<C>coefficientPseudoDivide(pp, Pc);
+            pp = PolyUtil.coefficientPseudoDivide(pp, Pc);
             //System.out.println("pp,sqp = " + pp);
             //GenPolynomial<C> Pr = squarefreePart(Pc);
             //Pr = engine.basePrimitivePart(Pr);
@@ -205,13 +205,13 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
             //System.out.println("Pc = " + Pc);
             return pp.multiply(Pc);
         }
-        GenPolynomial<GenPolynomial<C>> d = PolyUtil.<C>recursiveDeriviative(pp);
+        GenPolynomial<GenPolynomial<C>> d = PolyUtil.recursiveDeriviative(pp);
         //System.out.println("d = " + d);
         GenPolynomial<GenPolynomial<C>> g = engine.recursiveUnivariateGcd(pp, d);
         //System.out.println("g,rec = " + g);
         g = engine.baseRecursivePrimitivePart(g);
         //System.out.println("g,bPP = " + g);
-        GenPolynomial<GenPolynomial<C>> q = PolyUtil.<C>recursivePseudoDivide(pp, g);
+        GenPolynomial<GenPolynomial<C>> q = PolyUtil.recursivePseudoDivide(pp, g);
         q = engine.baseRecursivePrimitivePart(q);
         //System.out.println("q,bPP = " + q);
         return q.multiply(Pc);
@@ -244,7 +244,7 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
             GenPolynomial<C> lc = cfac.getONE().multiply(bcc);
             GenPolynomial<GenPolynomial<C>> pl = pfac.getONE().multiply(lc);
             sfactors.put(pl, 1L);
-            P = PolyUtil.<C>baseRecursiveDivide(P, bcc);
+            P = PolyUtil.baseRecursiveDivide(P, bcc);
         }
         // factors of content
         GenPolynomial<C> Pc = engine.recursiveContent(P);
@@ -254,7 +254,7 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
         Pc = engine.basePrimitivePart(Pc);
         //System.out.println("Pc,PP = " + Pc);
         if (!Pc.isONE()) {
-            P = PolyUtil.<C>coefficientPseudoDivide(P, Pc);
+            P = PolyUtil.coefficientPseudoDivide(P, Pc);
         }
         SortedMap<GenPolynomial<C>, Long> rsf = squarefreeFactors(Pc);
         if (logger.isInfoEnabled()) {
@@ -276,7 +276,7 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
             if (logger.isInfoEnabled()) {
                 logger.info("trailing term = " + tr);
             }
-            P = PolyUtil.<C>recursivePseudoDivide(P, tr);
+            P = PolyUtil.recursivePseudoDivide(P, tr);
             long ep = et.getVal(0); // univariate
             et = et.subst(0, 1);
             tr = pfac.valueOf(et);
@@ -295,13 +295,13 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
                 if (T0.isConstant() || T0.isZERO()) {
                     break;
                 }
-                Tp = PolyUtil.<C>recursiveDeriviative(T0);
+                Tp = PolyUtil.recursiveDeriviative(T0);
                 //System.out.println("iTp = " + Tp);
                 T = engine.recursiveUnivariateGcd(T0, Tp);
                 //System.out.println("iT = " + T);
                 T = engine.baseRecursivePrimitivePart(T);
                 //System.out.println("iT = " + T);
-                V = PolyUtil.<C>recursivePseudoDivide(T0, T);
+                V = PolyUtil.recursivePseudoDivide(T0, T);
                 //System.out.println("iT0 = " + T0);
                 //System.out.println("iV = " + V);
                 k = 0L;
@@ -313,11 +313,11 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
             k++;
             GenPolynomial<GenPolynomial<C>> W = engine.recursiveUnivariateGcd(T, V);
             W = engine.baseRecursivePrimitivePart(W);
-            GenPolynomial<GenPolynomial<C>> z = PolyUtil.<C>recursivePseudoDivide(V, W);
+            GenPolynomial<GenPolynomial<C>> z = PolyUtil.recursivePseudoDivide(V, W);
             //System.out.println("W = " + W);
             //System.out.println("z = " + z);
             V = W;
-            T = PolyUtil.<C>recursivePseudoDivide(T, V);
+            T = PolyUtil.recursivePseudoDivide(T, V);
             //System.out.println("V = " + V);
             //System.out.println("T = " + T);
             //was: if ( z.degree(0) > 0 ) {
@@ -352,13 +352,13 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
             return baseSquarefreePart(P);
         }
         GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(1);
-        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.<C>recursive(rfac, P);
+        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         GenPolynomial<C> Pc = engine.recursiveContent(Pr);
-        Pr = PolyUtil.<C>coefficientPseudoDivide(Pr, Pc);
+        Pr = PolyUtil.coefficientPseudoDivide(Pr, Pc);
         GenPolynomial<C> Ps = squarefreePart(Pc);
         GenPolynomial<GenPolynomial<C>> PP = recursiveUnivariateSquarefreePart(Pr);
         GenPolynomial<GenPolynomial<C>> PS = PP.multiply(Ps);
-        GenPolynomial<C> D = PolyUtil.<C>distribute(pfac, PS);
+        GenPolynomial<C> D = PolyUtil.distribute(pfac, PS);
         return D;
     }
 
@@ -389,13 +389,13 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
         }
         GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(1);
 
-        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.<C>recursive(rfac, P);
+        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         SortedMap<GenPolynomial<GenPolynomial<C>>, Long> PP = recursiveUnivariateSquarefreeFactors(Pr);
 
         for (Map.Entry<GenPolynomial<GenPolynomial<C>>, Long> m : PP.entrySet()) {
             Long i = m.getValue();
             GenPolynomial<GenPolynomial<C>> Dr = m.getKey();
-            GenPolynomial<C> D = PolyUtil.<C>distribute(pfac, Dr);
+            GenPolynomial<C> D = PolyUtil.distribute(pfac, Dr);
             sfactors.put(D, i);
         }
         return normalizeFactorization(sfactors);

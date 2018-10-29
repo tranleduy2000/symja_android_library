@@ -107,7 +107,7 @@ public class MultiplicativeSetCoPrime<C extends GcdRingElem<C>> extends Multipli
         if (mset.size() == 0) {
             list = engine.coPrime(cc, mset);
             if (ring.coFac.isField()) {
-                list = PolyUtil.<C>monic(list);
+                list = PolyUtil.monic(list);
             }
             return new MultiplicativeSetCoPrime<C>(ring, list, engine);
         }
@@ -119,7 +119,7 @@ public class MultiplicativeSetCoPrime<C extends GcdRingElem<C>> extends Multipli
         logger.info("added to co-prime mset = " + c);
         list = engine.coPrime(c, mset);
         if (ring.coFac.isField()) {
-            list = PolyUtil.<C>monic(list);
+            list = PolyUtil.monic(list);
         }
         return new MultiplicativeSetCoPrime<C>(ring, list, engine);
     }

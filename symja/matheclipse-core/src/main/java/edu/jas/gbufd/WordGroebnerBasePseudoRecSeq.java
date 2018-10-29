@@ -110,7 +110,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         if (!cofac.isCommutative()) {
             logger.warn("reduction not correct for " + cofac.toScript());
         }
-        engine = GCDFactory.<C>getImplementation(cofac.coFac);
+        engine = GCDFactory.getImplementation(cofac.coFac);
         //not used: engine = GCDFactory.<C>getProxy(cofac.coFac);
     }
 
@@ -383,7 +383,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
             return P;
         }
         //GenWordPolynomial<GenPolynomial<C>> pp = P.divide(d);
-        GenWordPolynomial<GenPolynomial<C>> pp = PolyUtil.<C>recursiveDivide(P, d);
+        GenWordPolynomial<GenPolynomial<C>> pp = PolyUtil.recursiveDivide(P, d);
         if (debug) {
             GenWordPolynomial<GenPolynomial<C>> p = pp.multiply(d);
             if (!p.equals(P)) {

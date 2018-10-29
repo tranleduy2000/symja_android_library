@@ -79,7 +79,7 @@ public class FactorComplex<C extends GcdRingElem<C>> extends FactorAbsolute<Comp
     public FactorComplex(ComplexRing<C> fac) {
         super(fac);
         this.afac = fac.algebraicRing();
-        this.factorAlgeb = FactorFactory.<C>getImplementation(afac);
+        this.factorAlgeb = FactorFactory.getImplementation(afac);
     }
 
 
@@ -130,7 +130,7 @@ public class FactorComplex<C extends GcdRingElem<C>> extends FactorAbsolute<Comp
         }
         //System.out.println("\nP = " + P);
         GenPolynomialRing<AlgebraicNumber<C>> pafac = new GenPolynomialRing<AlgebraicNumber<C>>(afac, pfac);
-        GenPolynomial<AlgebraicNumber<C>> A = PolyUtil.<C>algebraicFromComplex(pafac, P);
+        GenPolynomial<AlgebraicNumber<C>> A = PolyUtil.algebraicFromComplex(pafac, P);
         //System.out.println("A = " + A);
         List<GenPolynomial<AlgebraicNumber<C>>> afactors = factorAlgeb.baseFactorsSquarefree(A);
         if (debug) {
@@ -138,7 +138,7 @@ public class FactorComplex<C extends GcdRingElem<C>> extends FactorAbsolute<Comp
             logger.info("complex afactors = " + afactors);
         }
         for (GenPolynomial<AlgebraicNumber<C>> pa : afactors) {
-            GenPolynomial<Complex<C>> pc = PolyUtil.<C>complexFromAlgebraic(pfac, pa);
+            GenPolynomial<Complex<C>> pc = PolyUtil.complexFromAlgebraic(pfac, pa);
             factors.add(pc);
         }
         //System.out.println("cfactors = " + factors);

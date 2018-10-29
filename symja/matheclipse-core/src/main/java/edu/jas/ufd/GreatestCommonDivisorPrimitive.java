@@ -80,7 +80,7 @@ public class GreatestCommonDivisorPrimitive<C extends GcdRingElem<C>> extends
         }
         GenPolynomial<C> x;
         while (!r.isZERO()) {
-            x = PolyUtil.<C>baseSparsePseudoRemainder(q, r);
+            x = PolyUtil.baseSparsePseudoRemainder(q, r);
             q = r;
             r = basePrimitivePart(x);
         }
@@ -132,8 +132,8 @@ public class GreatestCommonDivisorPrimitive<C extends GcdRingElem<C>> extends
 
         GenPolynomial<C> c = gcd(a, b); // go to recursion
         //System.out.println("rgcd c = " + c);
-        r = PolyUtil.<C>recursiveDivide(r, a);
-        q = PolyUtil.<C>recursiveDivide(q, b);
+        r = PolyUtil.recursiveDivide(r, a);
+        q = PolyUtil.recursiveDivide(q, b);
         if (r.isONE()) {
             return r.multiply(c);
         }
@@ -142,7 +142,7 @@ public class GreatestCommonDivisorPrimitive<C extends GcdRingElem<C>> extends
         }
         GenPolynomial<GenPolynomial<C>> x;
         while (!r.isZERO()) {
-            x = PolyUtil.<C>recursivePseudoRemainder(q, r);
+            x = PolyUtil.recursivePseudoRemainder(q, r);
             if (logger.isInfoEnabled()) {
                 logger.info("recursivePseudoRemainder.bits = " + x.bitLength());
             }

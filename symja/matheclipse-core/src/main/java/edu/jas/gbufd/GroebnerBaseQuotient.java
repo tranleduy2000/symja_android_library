@@ -123,7 +123,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
         GenPolynomialRing<Quotient<C>> rring = F.get(0).ring;
         QuotientRing<C> cf = (QuotientRing<C>) rring.coFac;
         GenPolynomialRing<GenPolynomial<C>> iring = new GenPolynomialRing<GenPolynomial<C>>(cf.ring, rring);
-        List<GenPolynomial<GenPolynomial<C>>> Fi = PolyUfdUtil.<C>integralFromQuotientCoefficients(iring, F);
+        List<GenPolynomial<GenPolynomial<C>>> Fi = PolyUfdUtil.integralFromQuotientCoefficients(iring, F);
         //System.out.println("Fi = " + Fi);
         logger.info("#Fi = " + Fi.size());
 
@@ -131,8 +131,8 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
         //System.out.println("Gi = " + Gi);
         logger.info("#Gi = " + Gi.size());
 
-        G = PolyUfdUtil.<C>quotientFromIntegralCoefficients(rring, Gi);
-        G = PolyUtil.<Quotient<C>>monic(G);
+        G = PolyUfdUtil.quotientFromIntegralCoefficients(rring, Gi);
+        G = PolyUtil.monic(G);
         return G;
     }
 
@@ -196,8 +196,8 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
         List<GenPolynomial<GenPolynomial<C>>> Gi = bba.minimalGB(Fi);
         logger.info("#Gi = " + Gi.size());
 
-        G = PolyUfdUtil.<C>quotientFromIntegralCoefficients(rring, Gi);
-        G = PolyUtil.<Quotient<C>>monic(G);
+        G = PolyUfdUtil.quotientFromIntegralCoefficients(rring, Gi);
+        G = PolyUtil.monic(G);
         return G;
     }
 

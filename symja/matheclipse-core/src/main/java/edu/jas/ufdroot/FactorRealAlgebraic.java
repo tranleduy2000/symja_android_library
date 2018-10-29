@@ -123,11 +123,11 @@ public class FactorRealAlgebraic<C extends GcdRingElem<C> & Rational> extends
         //System.out.println("\nP = " + P);
         GenPolynomialRing<AlgebraicNumber<C>> afac = new GenPolynomialRing<AlgebraicNumber<C>>(
                 rfac.algebraic, pfac);
-        GenPolynomial<AlgebraicNumber<C>> A = PolyUtilRoot.<C>algebraicFromRealCoefficients(afac, P);
+        GenPolynomial<AlgebraicNumber<C>> A = PolyUtilRoot.algebraicFromRealCoefficients(afac, P);
         // factor A:
         List<GenPolynomial<AlgebraicNumber<C>>> afactors = factorAlgebraic.baseFactorsSquarefree(A);
         for (GenPolynomial<AlgebraicNumber<C>> a : afactors) {
-            GenPolynomial<RealAlgebraicNumber<C>> p = PolyUtilRoot.<C>realFromAlgebraicCoefficients(pfac, a);
+            GenPolynomial<RealAlgebraicNumber<C>> p = PolyUtilRoot.realFromAlgebraicCoefficients(pfac, a);
             factors.add(p);
         }
         logger.info("real algebraic factors = " + factors);

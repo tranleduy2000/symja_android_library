@@ -150,7 +150,7 @@ public class GroebnerBasePseudoParallel<C extends GcdRingElem<C>> extends Groebn
             threads = 1;
         }
         this.threads = threads;
-        engine = GCDFactory.<C>getImplementation(rf);
+        engine = GCDFactory.getImplementation(rf);
         //not used: engine = (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getProxy( rf );
         this.pool = pool;
     }

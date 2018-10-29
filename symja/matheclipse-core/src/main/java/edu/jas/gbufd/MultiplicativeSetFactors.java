@@ -112,7 +112,7 @@ public class MultiplicativeSetFactors<C extends GcdRingElem<C>> extends Multipli
         List<GenPolynomial<C>> list = engine.factorsRadical(c);
         logger.info("factorsRadical = " + list);
         if (ring.coFac.isField()) {
-            list = PolyUtil.<C>monic(list);
+            list = PolyUtil.monic(list);
         }
         List<GenPolynomial<C>> ms = new ArrayList<GenPolynomial<C>>(mset);
         for (GenPolynomial<C> p : list) {
