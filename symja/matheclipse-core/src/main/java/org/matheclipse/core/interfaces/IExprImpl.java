@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+
 
 import edu.jas.structure.ElemFactory;
 import edu.jas.structure.RingElemImpl;
@@ -1954,7 +1954,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param variable the variable of the polynomial
      * @return
      */
-    public boolean isPolynomial(@Nullable IExpr variable) {
+    public boolean isPolynomial( IExpr variable) {
         return isNumber();
     }
 
@@ -2804,7 +2804,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *                  substituted.
      * @return <code>this</code> if no substitution of a (sub-)expression was possible.
      */
-    @Nullable
+
     public IExpr replace(final Predicate<IExpr> predicate, final Function<IExpr, IExpr> function) {
         return accept(new VisitorReplaceAllLambda(predicate, function)).orElse(this);
     }
@@ -2817,12 +2817,12 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *                 substituted.
      * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
      */
-    @Nullable
+
     public IExpr replaceAll(final Function<IExpr, IExpr> function) {
         return accept(new VisitorReplaceAll(function));
     }
 
-    @Nullable
+
     @Override
     public IExpr replaceAll(Map<? extends IExpr, ? extends IExpr> map) {
         return accept(new VisitorReplaceAll(map));
@@ -2836,7 +2836,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *                 rule can contain pattern objects.
      * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
      */
-    @Nullable
+
     public IExpr replaceAll(final IAST astRules) {
         return accept(new VisitorReplaceAll(astRules));
     }

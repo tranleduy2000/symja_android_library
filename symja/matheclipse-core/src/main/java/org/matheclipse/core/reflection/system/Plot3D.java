@@ -12,7 +12,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import javax.annotation.Nonnull;
+
 
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Rule;
@@ -119,7 +119,7 @@ public class Plot3D extends AbstractEvaluator {
 	 * @return <code>F.NIL</code> is no conversion of the data into an
 	 *         <code>IExpr</code> was possible
 	 */
-	@Nonnull
+
 	public static IExpr plotArray(final double xMin, final double xMax, final double yMin, final double yMax,
 			final IExpr function, final ISymbol xVar, final ISymbol yVar, final EvalEngine engine) {
 		final double xStep = (xMax - xMin) / NUMBER_OF_DIVISIONS;

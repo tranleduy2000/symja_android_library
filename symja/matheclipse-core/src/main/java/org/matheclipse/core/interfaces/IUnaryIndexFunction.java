@@ -1,7 +1,5 @@
 package org.matheclipse.core.interfaces;
 
-import javax.annotation.Nullable;
-
 /**
  * A {@code IUnaryIndexFunction} provides a transformation of an integer and an
  * object and returns the resulting object.
@@ -32,5 +30,5 @@ public interface IUnaryIndexFunction<F1, T> {
 	 *            The first source object.
 	 * @return The resulting object.
 	 */
-	T apply(int index, @Nullable F1 from1);
+	T apply(int index,  F1 from1);
 }

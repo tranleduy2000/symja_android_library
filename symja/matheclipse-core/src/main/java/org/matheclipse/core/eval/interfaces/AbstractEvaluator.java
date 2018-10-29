@@ -5,7 +5,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * Abstract interface for built-in Symja functions. The <code>numericEval()</code> method delegates to the <code>evaluate()</code>
@@ -15,7 +15,7 @@ public abstract class AbstractEvaluator extends IFunctionEvaluatorImpl implement
 
 	/** {@inheritDoc} */
     @Override
-	public IExpr numericEval(final IAST ast, @Nonnull EvalEngine engine) {
+	public IExpr numericEval(final IAST ast,  EvalEngine engine) {
         return evaluate(ast, engine);
     }
 
@@ -30,6 +30,6 @@ public abstract class AbstractEvaluator extends IFunctionEvaluatorImpl implement
 
 	/** {@inheritDoc} */
     @Override
-	abstract public IExpr evaluate(final IAST ast, @Nonnull  EvalEngine engine);
+	abstract public IExpr evaluate(final IAST ast,   EvalEngine engine);
 
 }

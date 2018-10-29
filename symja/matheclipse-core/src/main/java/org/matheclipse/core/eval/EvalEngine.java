@@ -51,7 +51,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * The main evaluation algorithms for the .Symja computer algebra system
@@ -768,7 +768,7 @@ public class EvalEngine implements Serializable {
 	 * @param ast    the AST which should be evaluated
 	 * @return <code>F.NIL</code> if no evaluation was possible
 	 */
-	public IExpr evalAttributes(@Nonnull ISymbol symbol, @Nonnull IAST ast) {
+	public IExpr evalAttributes( ISymbol symbol,  IAST ast) {
 		IASTMutable tempAST = (IASTMutable) ast;
 		final int astSize = tempAST.size();
 		if (astSize == 2) {
@@ -1109,7 +1109,7 @@ public class EvalEngine implements Serializable {
 	 * @return the evaluated expression or <code>F.NIL</code> if evaluation isn't possible
 	 * @see EvalEngine#evalWithoutNumericReset(IExpr)
 	 */
-	public IExpr evalLoop(@Nonnull final IExpr expr) {
+	public IExpr evalLoop( final IExpr expr) {
 		if ((fRecursionLimit > 0) && (fRecursionCounter > fRecursionLimit)) {
 			if (Config.DEBUG) {
 				System.out.println(expr.toString());
@@ -1218,7 +1218,7 @@ public class EvalEngine implements Serializable {
 	 * @param expr the object which should be evaluated
 	 * @return the evaluated object
 	 */
-	public final IExpr evalPattern(@Nonnull final IExpr expr) {
+	public final IExpr evalPattern( final IExpr expr) {
 		boolean numericMode = fNumericMode;
 		try {
 			if (expr.isFreeOfPatterns()) {
@@ -1244,7 +1244,7 @@ public class EvalEngine implements Serializable {
 	 * @param expr the object which should be evaluated
 	 * @return an <code>IPatterMatcher</code> created from the given expression.
 	 */
-	public final IPatternMatcher evalPatternMatcher(@Nonnull final IExpr patternExpression) {
+	public final IPatternMatcher evalPatternMatcher( final IExpr patternExpression) {
 		IExpr temp = evalPattern(patternExpression);
 		return new PatternMatcher(temp);
 	}

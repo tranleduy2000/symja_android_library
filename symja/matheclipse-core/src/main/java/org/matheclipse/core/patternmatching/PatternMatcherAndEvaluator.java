@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import javax.annotation.Nonnull;
+
 
 public class PatternMatcherAndEvaluator extends PatternMatcher implements Externalizable {
 
@@ -203,11 +203,11 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr eval(final IExpr leftHandSide, @Nonnull EvalEngine engine) {
+	public IExpr eval(final IExpr leftHandSide,  EvalEngine engine) {
 		return replace(leftHandSide, engine, true);
 	}
 
-	final public IExpr replace(final IExpr leftHandSide, @Nonnull EvalEngine engine, boolean evaluate) {
+	final public IExpr replace(final IExpr leftHandSide,  EvalEngine engine, boolean evaluate) {
 		PatternMap patternMap = null;
 		if (isRuleWithoutPatterns()) {
 			// no patterns found match equally:

@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-import javax.annotation.Nullable;
+
 
 /**
  *
@@ -586,49 +586,49 @@ public class NumberUtil {
 		}
 	}
 
-	public static int checkPositive(@Nullable String role, int x) {
+	public static int checkPositive( String role, int x) {
 		if (x <= 0) {
 			throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
 		}
 		return x;
 	}
 
-	public static long checkPositive(@Nullable String role, long x) {
+	public static long checkPositive( String role, long x) {
 		if (x <= 0) {
 			throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
 		}
 		return x;
 	}
 
-	public static BigInteger checkPositive(@Nullable String role, BigInteger x) {
+	public static BigInteger checkPositive( String role, BigInteger x) {
 		if (x.signum() <= 0) {
 			throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
 		}
 		return x;
 	}
 
-	public static int checkNonNegative(@Nullable String role, int x) {
+	public static int checkNonNegative( String role, int x) {
 		if (x < 0) {
 			throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
 		}
 		return x;
 	}
 
-	public static long checkNonNegative(@Nullable String role, long x) {
+	public static long checkNonNegative( String role, long x) {
 		if (x < 0) {
 			throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
 		}
 		return x;
 	}
 
-	public static BigInteger checkNonNegative(@Nullable String role, BigInteger x) {
+	public static BigInteger checkNonNegative( String role, BigInteger x) {
 		if (x.signum() < 0) {
 			throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
 		}
 		return x;
 	}
 
-	public static double checkNonNegative(@Nullable String role, double x) {
+	public static double checkNonNegative( String role, double x) {
 		if (!(x >= 0)) { // not x < 0, to work with NaN.
 			throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
 		}

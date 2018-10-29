@@ -2,7 +2,7 @@ package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.expression.F;
 
-import javax.annotation.Nonnull;
+
 
 public class ExprUtil {
 	/**
@@ -12,7 +12,7 @@ public class ExprUtil {
      * @return an {@code IExpr} with a present value if the specified value is non-null, otherwise an empty
      * {@code Optional}
      */
-    public static IExpr ofNullable(@Nonnull IExpr value) {
+    public static IExpr ofNullable( IExpr value) {
         return value == null ? F.NIL : value;
     }
     

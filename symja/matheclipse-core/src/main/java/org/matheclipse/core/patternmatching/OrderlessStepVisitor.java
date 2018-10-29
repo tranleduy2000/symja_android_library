@@ -8,7 +8,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.PatternMatcher.StackMatcher;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * This visitor is used in an <code>MultisetPartitionsIterator</code> to match orderless expressions in pattern matching.
@@ -31,7 +31,7 @@ public class OrderlessStepVisitor extends FlatOrderlessStepVisitor implements IS
 	}
 
 	@Override
-	protected boolean matchSinglePartition(int[][] result, @Nonnull StackMatcher stackMatcher) {
+	protected boolean matchSinglePartition(int[][] result,  StackMatcher stackMatcher) {
 		// IAST partitionElement;
 		// if (Config.SHOW_STACKTRACE == true) {
 		// }

@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+
 
 public class Functors {
 
@@ -38,7 +38,7 @@ public class Functors {
 		}
 
 		@Override
-		@Nonnull
+
 		public IExpr apply(final IExpr arg) {
 			IExpr temp = fEqualRules.get(arg);
 			return temp != null ? temp : F.NIL;
@@ -59,14 +59,14 @@ public class Functors {
 		 *            the position which should be replaced in the <code>apply()</code> method.
 		 */
 		public RulesPatternFunctor(Map<IExpr, IExpr> equalRules, List<PatternMatcherAndEvaluator> matchers,
-				@Nonnull  EvalEngine engine) {
+				  EvalEngine engine) {
 			fEqualRules = equalRules;
 			fMatchers = matchers;
 			fEngine = engine;
 		}
 
 		@Override
-		@Nonnull
+
 		public IExpr apply(final IExpr arg) {
 			IExpr temp = fEqualRules.get(arg);
 			if (temp != null) {
@@ -101,7 +101,7 @@ public class Functors {
 	 * @return
 	 * @throws WrongArgumentType
 	 */
-	public static Function<IExpr, IExpr> rules(@Nonnull String[] strRules) throws WrongArgumentType {
+	public static Function<IExpr, IExpr> rules( String[] strRules) throws WrongArgumentType {
 		IASTAppendable astRules = F.ListAlloc(strRules.length);
 		final EvalEngine engine = EvalEngine.get();
 		ExprParser parser = new ExprParser(engine);
@@ -122,7 +122,7 @@ public class Functors {
 	 * @return
 	 * @throws WrongArgumentType
 	 */
-	public static Function<IExpr, IExpr> rules(@Nonnull IAST astRules, @Nonnull EvalEngine engine) throws WrongArgumentType {
+	public static Function<IExpr, IExpr> rules( IAST astRules,  EvalEngine engine) throws WrongArgumentType {
 		final Map<IExpr, IExpr> equalRules;
 
 		List<PatternMatcherAndEvaluator> matchers = new ArrayList<PatternMatcherAndEvaluator>();

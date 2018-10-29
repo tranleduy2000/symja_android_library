@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * The pattern matching rules associated with a symbol.
@@ -119,7 +119,7 @@ public class RulesData implements Serializable {
 		clear();
 	}
 
-	public RulesData(Context context, @Nonnull int[] sizes) {
+	public RulesData(Context context,  int[] sizes) {
 		// this.context = context;
 		clear();
 		if (sizes.length > 0) {
@@ -369,7 +369,7 @@ public class RulesData implements Serializable {
 	 * @param expr
 	 * @return <code>F.NIL</code> if no evaluation was possible
 	 */
-	public IExpr evalDownRule(final IExpr expr, @Nonnull EvalEngine engine) {
+	public IExpr evalDownRule(final IExpr expr,  EvalEngine engine) {
 		PatternMatcherEquals res;
 
 		if (Config.SHOW_PATTERN_EVAL_STEPS) {
@@ -480,7 +480,7 @@ public class RulesData implements Serializable {
 		return head.equals(F.Integrate);
 	}
 
-	public IExpr evalUpRule(final IExpr expression, @Nonnull EvalEngine engine) {
+	public IExpr evalUpRule(final IExpr expression,  EvalEngine engine) {
 		PatternMatcherEquals res;
 		if (fEqualUpRules != null) {
 			res = fEqualUpRules.get(expression);

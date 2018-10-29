@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * A map from a pattern to a possibly found value during pattern-matching.
@@ -256,7 +256,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 * @param pExpr
 	 * @return <code>null</code> if no matched expression exists
 	 */
-	public IExpr getValue(@Nonnull IPatternObject pattern) {
+	public IExpr getValue( IPatternObject pattern) {
 		ISymbol sym = pattern.getSymbol();
 		if (sym != null) {
 			return val(sym);
@@ -274,7 +274,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 *            the symbol
 	 * @return <code>null</code> if no matched expression exists
 	 */
-	public final IExpr val(@Nonnull ISymbol symbol) {
+	public final IExpr val( ISymbol symbol) {
 		int indx = get(symbol);
 		return indx >= 0 ? fSymbolsOrPatternValues[indx] : null;
 	}

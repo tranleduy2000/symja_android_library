@@ -64,7 +64,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import javax.annotation.Nonnull;
+
 
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
@@ -1239,7 +1239,7 @@ public class Algebra {
 				return F.NIL;
 			}
 
-			private IExpr addExpanded(@Nonnull IExpr expr) {
+			private IExpr addExpanded( IExpr expr) {
 				if (expandNegativePowers && !distributePlus && expr.isAST()) {
 					((IAST) expr).addEvalFlags(IAST.IS_EXPANDED);
 				}

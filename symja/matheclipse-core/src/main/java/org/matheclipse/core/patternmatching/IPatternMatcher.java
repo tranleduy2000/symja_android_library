@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * Interface for the pattern matcher
@@ -114,7 +114,7 @@ public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Se
 	 * @param engine
 	 * @return <code>F.NIL</code> if the match wasn't successful, the evaluated expression otherwise.
 	 */
-	public abstract IExpr eval(final IExpr leftHandSide, @Nonnull EvalEngine engine);
+	public abstract IExpr eval(final IExpr leftHandSide,  EvalEngine engine);
 
 	/**
 	 * Get the "left-hand-side" of a pattern-matching rule.

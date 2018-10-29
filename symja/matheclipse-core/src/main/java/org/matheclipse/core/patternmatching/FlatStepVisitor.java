@@ -9,7 +9,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.PatternMatcher.StackMatcher;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * This visitor is used in an <code>NumberPartitionsIterator</code> to match flat expressions in pattern matching.
@@ -65,7 +65,7 @@ public class FlatStepVisitor extends AbstractListStepVisitor<IExpr> {
 	 * @param stackMatcher
 	 * @return
 	 */
-	protected boolean matchSinglePartition(int[][] result, @Nonnull StackMatcher stackMatcher) {
+	protected boolean matchSinglePartition(int[][] result,  StackMatcher stackMatcher) {
 		IASTAppendable partitionElement;
 		// if (Config.SHOW_STACKTRACE == true) {
 		// }

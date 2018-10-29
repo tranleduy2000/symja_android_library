@@ -20,7 +20,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * Abstract interface for built-in Symja functions. The <code>numericEval()</code> method delegates to the
@@ -439,7 +439,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 
 	/** {@inheritDoc} */
 	@Override
-	abstract public IExpr evaluate(final IAST ast, @Nonnull EvalEngine engine);
+	abstract public IExpr evaluate(final IAST ast,  EvalEngine engine);
 
 	/**
 	 * Get the predefined rules for this function symbol.

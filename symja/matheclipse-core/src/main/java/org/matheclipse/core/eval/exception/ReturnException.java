@@ -3,7 +3,7 @@ package org.matheclipse.core.eval.exception;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
-import javax.annotation.Nonnull;
+
 
 public class ReturnException extends FlowControlException {
 	/**
@@ -21,7 +21,7 @@ public class ReturnException extends FlowControlException {
 		this(F.Null);
 	}
 
-	public ReturnException(@Nonnull final IExpr val) {
+	public ReturnException( final IExpr val) {
 		super("Return from a function definition.");
 		value = val;
 	}

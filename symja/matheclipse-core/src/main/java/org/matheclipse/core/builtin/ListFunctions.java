@@ -55,7 +55,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.annotation.Nonnull;
+
 
 import static org.matheclipse.core.expression.F.List;
 
@@ -1126,7 +1126,7 @@ public final class ListFunctions {
 			return F.List();
 		}
 
-		public static IAST cases(final IAST ast, final IExpr pattern, @Nonnull EvalEngine engine) {
+		public static IAST cases(final IAST ast, final IExpr pattern,  EvalEngine engine) {
 			if (pattern.isRuleAST()) {
 				Function<IExpr, IExpr> function = Functors.rules((IAST) pattern, engine);
 				IAST[] results = ast.filter(function);

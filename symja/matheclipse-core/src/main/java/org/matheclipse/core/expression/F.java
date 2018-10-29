@@ -83,7 +83,7 @@ import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+
 
 import ch.ethz.idsc.tensor.QuantityParser;
 import edu.jas.kern.ComputerThreads;
@@ -3889,7 +3889,7 @@ public class F {
 	 * @param symbol
 	 * @return IPattern
 	 */
-	public static IPattern $p(@Nonnull final ISymbol symbol) {
+	public static IPattern $p( final ISymbol symbol) {
 		return org.matheclipse.core.expression.Pattern.valueOf(symbol);
 	}
 
@@ -3952,7 +3952,7 @@ public class F {
 	 * @param symbolName
 	 * @return IPattern
 	 */
-	public static IPattern $p(@Nonnull final String symbolName) {
+	public static IPattern $p( final String symbolName) {
 		// if (symbolName == null) {
 		// return org.matheclipse.core.expression.Pattern.valueOf(null);
 		// }
@@ -3979,7 +3979,7 @@ public class F {
 	 *            additional condition which should be checked in pattern-matching
 	 * @return IPattern
 	 */
-	public static IPattern $p(@Nonnull final String symbolName, final IExpr check) {
+	public static IPattern $p( final String symbolName, final IExpr check) {
 		// if (symbolName == null) {
 		// return org.matheclipse.core.expression.Pattern.valueOf(null, check);
 		// }
@@ -3996,7 +3996,7 @@ public class F {
 	 *            use a default value for this pattern if necessary
 	 * @return IPattern
 	 */
-	public static IPattern $p(@Nonnull final String symbolName, final IExpr check, boolean def) {
+	public static IPattern $p( final String symbolName, final IExpr check, boolean def) {
 		return org.matheclipse.core.expression.Pattern.valueOf($s(symbolName), check, def);
 	}
 
@@ -4049,7 +4049,7 @@ public class F {
 	 *            use this <code>defaultValue</code> in pattern-matching if an argument is optional
 	 * @return IPattern
 	 */
-	public static IPattern $p(@Nonnull final String symbolName, final IExpr check, final IExpr defaultValue) {
+	public static IPattern $p( final String symbolName, final IExpr check, final IExpr defaultValue) {
 		return org.matheclipse.core.expression.Pattern.valueOf($s(symbolName), check, defaultValue);
 	}
 
@@ -6350,13 +6350,13 @@ public class F {
 	// return temp;
 	// }
 
-	public static IPattern initPredefinedPattern(@Nonnull final ISymbol symbol) {
+	public static IPattern initPredefinedPattern( final ISymbol symbol) {
 		IPattern temp = new Pattern(symbol);
 		PREDEFINED_PATTERN_MAP.put(symbol.toString(), temp);
 		return temp;
 	}
 
-	public static IPatternSequence initPredefinedPatternSequence(@Nonnull final ISymbol symbol) {
+	public static IPatternSequence initPredefinedPatternSequence( final ISymbol symbol) {
 		PatternSequence temp = PatternSequence.valueOf(symbol, false);
 		PREDEFINED_PATTERNSEQUENCE_MAP.put(symbol.toString(), temp);
 		return temp;

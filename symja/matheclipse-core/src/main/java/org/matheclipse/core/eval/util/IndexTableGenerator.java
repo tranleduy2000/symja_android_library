@@ -5,7 +5,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * Table structure generator (i.e. lists, vectors, matrices, tensors)
@@ -37,7 +37,7 @@ public class IndexTableGenerator {
 		fCurrentIndex = new int[indexArray.length];
 	}
 
-	@Nonnull
+
 	public IExpr table() {
 		if (fIndex < fIndexArray.length) {
 			final int iter = fIndexArray[fIndex];

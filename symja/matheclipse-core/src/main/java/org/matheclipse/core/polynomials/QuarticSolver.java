@@ -9,7 +9,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.annotation.Nonnull;
+
 
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
@@ -131,7 +131,7 @@ public class QuarticSolver {
 		return false;
 	}
 
-	@Nonnull
+
 	public static IAST quarticSolveN(IExpr a, IExpr b, IExpr c, IExpr d, IExpr e) {
 		return (IAST) F.evaln(quarticSolve(a, b, c, d, e));
 	}
@@ -147,7 +147,7 @@ public class QuarticSolver {
 	 * @param d
 	 * @return
 	 */
-	@Nonnull
+
 	public static IASTAppendable quarticSolve(IExpr a, IExpr b, IExpr c, IExpr d, IExpr e) {
 		if (a.isZero()) {
 			return cubicSolve(b, c, d, e, null);

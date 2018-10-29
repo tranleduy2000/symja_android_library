@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+
 
 import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
@@ -1337,7 +1337,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param variable the variable of the polynomial
      */
-    boolean isPolynomial(@Nullable IExpr variable);
+    boolean isPolynomial( IExpr variable);
 
     /**
      * Test if this expression is a polynomial of <code>maxDegree</code> (i.e. the maximum exponent <= maxDegree) for
@@ -1890,7 +1890,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *                 substituted.
      * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
      */
-    @Nullable
+
     IExpr replaceAll(final Function<IExpr, IExpr> function);
 
     /**
@@ -1901,7 +1901,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *            substituted.
      * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
      */
-    @Nullable
+
     IExpr replaceAll(final Map<? extends IExpr, ? extends IExpr> map);
 
 
@@ -1913,7 +1913,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *                 rule can contain pattern objects.
      * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
      */
-    @Nullable
+
     IExpr replaceAll(final IAST astRules);
 
     /**

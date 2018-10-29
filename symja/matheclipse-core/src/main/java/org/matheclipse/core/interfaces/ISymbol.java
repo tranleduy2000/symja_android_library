@@ -13,7 +13,7 @@ import org.matheclipse.core.patternmatching.RulesData;
 
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * An expression representing a symbol (i.e. variable- constant- or function-name)
@@ -146,7 +146,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      *
      * @param sizes
      */
-    public RulesData createRulesData(@Nonnull int[] sizes);
+    public RulesData createRulesData( int[] sizes);
 
     /**
      * Return a list of the rules associated to this symbol

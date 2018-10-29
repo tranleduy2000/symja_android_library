@@ -13,8 +13,6 @@ import org.matheclipse.core.interfaces.ISymbol;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.annotation.Nonnull;
-
 /**
  * Static methods for evaluating <code>ISymbol.FLAT, ISymbol.LISTABLE</code> and <code>ISymbol.ORDERLESS</code>
  * attributes.
@@ -49,7 +47,7 @@ public class EvalAttributes {
 	 * 
 	 * @return returns the flattened list or <code>F.NIL</code>
 	 */
-	public static IASTAppendable flatten(@Nonnull final IAST ast) {
+	public static IASTAppendable flatten( final IAST ast) {
 		if ((ast.getEvalFlags() & IAST.IS_FLATTENED) == IAST.IS_FLATTENED) {
 			// already flattened
 			return F.NIL;

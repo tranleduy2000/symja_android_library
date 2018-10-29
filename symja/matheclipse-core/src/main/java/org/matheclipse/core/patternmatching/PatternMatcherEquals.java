@@ -14,7 +14,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * Matches a given expression by simply comparing the left-hand-side expression of this pattern matcher with the
@@ -57,8 +57,8 @@ public class PatternMatcherEquals extends IPatternMatcher implements Externaliza
 	 * @param rightHandSide
 	 *            the result which should be evaluated if the "pattern-matching" succeeds
 	 */
-	public PatternMatcherEquals(final ISymbol.RuleType setSymbol, @Nonnull final IExpr leftHandSide,
-			@Nonnull final IExpr rightHandSide) {
+	public PatternMatcherEquals(final ISymbol.RuleType setSymbol,  final IExpr leftHandSide,
+			 final IExpr rightHandSide) {
 		super(leftHandSide);
 		fSetSymbol = setSymbol;
 		fRightHandSide = rightHandSide;
