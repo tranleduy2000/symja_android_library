@@ -15,7 +15,6 @@
  */
 
 apply plugin: 'java'
-apply plugin: 'com.github.j2objccontrib.j2objcgradle'
 
 compileJava {
     sourceCompatibility = '1.7'
@@ -35,16 +34,5 @@ sourceSets {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.jsoup:jsoup:1.11.2'
 }
 
-j2objcConfig {
-    // Sets up libraries you depend on
-    autoConfigureDeps true
-
-    // Omit these two lines if you don't configure your Xcode project with CocoaPods
-    xcodeProjectDir '../ios'  //  suggested directory name
-    xcodeTargetsIos 'IOS-APP', 'IOS-APPTests'  // replace with your iOS targets
-
-    finalConfigure()          // Must be last call to configuration
-}

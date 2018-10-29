@@ -23,7 +23,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
-        classpath "gradle.plugin.com.github.j2objccontrib.j2objcgradle:j2objc-gradle:0.6.0-alpha"
     }
 }
 allprojects {
@@ -32,17 +31,8 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
     }
 }
 task clean(type: Delete) {
     delete rootProject.buildDir
-}
-
-ext {
-    compileSdkVersion = 27
-    buildToolsVersion = "27.0.3"
-    minSdkVersion = 14
-    targetSdkVersion = 27
-    androidSupportVersion = '27.1.0'
 }

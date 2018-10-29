@@ -15,4 +15,3 @@
 
 include ':symja'
 include ':android'
-include ':objc'
