@@ -29,6 +29,6 @@ public interface ConvolutionStrategy
      * @return The convolved data.
      */
 
-    public DataStorage convolute(DataStorage x, DataStorage y, long resultSize)
+    DataStorage convolute(DataStorage x, DataStorage y, long resultSize)
         throws ApfloatRuntimeException;
 }

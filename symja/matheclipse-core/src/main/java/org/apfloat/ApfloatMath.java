@@ -805,7 +805,7 @@ public class ApfloatMath
      */
 
     public static Apfloat pi(long precision)
-        throws IllegalArgumentException, NumberFormatException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         ApfloatContext ctx = ApfloatContext.getContext();
         int radix = ctx.getDefaultRadix();
@@ -826,7 +826,7 @@ public class ApfloatMath
      */
 
     public static Apfloat pi(long precision, int radix)
-        throws IllegalArgumentException, NumberFormatException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision <= 0)
         {

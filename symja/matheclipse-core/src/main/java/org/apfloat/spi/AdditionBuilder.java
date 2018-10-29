@@ -23,5 +23,5 @@ public interface AdditionBuilder<T>
      * @return A suitable object for performing the addition.
      */
 
-    public AdditionStrategy<T> createAddition(int radix);
+    AdditionStrategy<T> createAddition(int radix);
 }

@@ -34,6 +34,6 @@ public interface CarryCRTStrategy
      * @return The final result with the CRT performed and the carries calculated.
      */
 
-    public DataStorage carryCRT(DataStorage resultMod0, DataStorage resultMod1, DataStorage resultMod2, long resultSize)
+    DataStorage carryCRT(DataStorage resultMod0, DataStorage resultMod1, DataStorage resultMod2, long resultSize)
         throws ApfloatRuntimeException;
 }

@@ -25,7 +25,7 @@ public interface CarryCRTBuilder<T>
      * @return A suitable object for performing the carry-CRT.
      */
 
-    public CarryCRTStrategy createCarryCRT(int radix);
+    CarryCRTStrategy createCarryCRT(int radix);
 
     /**
      * Creates an object for implementing the steps of the carry-CRT
@@ -36,5 +36,5 @@ public interface CarryCRTBuilder<T>
      * @return A suitable object for performing the carry-CRT steps.
      */
 
-    public CarryCRTStepStrategy<T> createCarryCRTSteps(int radix);
+    CarryCRTStepStrategy<T> createCarryCRTSteps(int radix);
 }

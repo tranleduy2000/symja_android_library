@@ -240,13 +240,13 @@ public class QuineMcCluskeyAlgorithm {
 
             for (int i = 0; i < mintermSelectors.size(); ++i) {
                 mintermSelector = mintermSelectors.get(i);
-                solver.add(f.clause(new Literal[]{termSelector.negate(), mintermSelector}));
+                solver.add(f.clause(termSelector.negate(), mintermSelector));
                 operands.add(mintermSelector.negate());
 
                 for (int j = i + 1; j < mintermSelectors.size(); ++j) {
                     Variable mintermSelector2 = mintermSelectors.get(j);
-                    solver.add(f.or(new Formula[]{mintermSelector.negate(), mintermSelector2}));
-                    solver.add(f.or(new Formula[]{mintermSelector2.negate(), mintermSelector}));
+                    solver.add(f.or(mintermSelector.negate(), mintermSelector2));
+                    solver.add(f.or(mintermSelector2.negate(), mintermSelector));
                 }
             }
 

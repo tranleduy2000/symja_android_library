@@ -28,7 +28,7 @@ public interface ApfloatBuilder
      * @exception java.lang.NumberFormatException If the number is not valid.
      */
 
-    public ApfloatImpl createApfloat(String value, long precision, int radix, boolean isInteger)
+    ApfloatImpl createApfloat(String value, long precision, int radix, boolean isInteger)
         throws NumberFormatException, ApfloatRuntimeException;
 
     /**
@@ -43,7 +43,7 @@ public interface ApfloatBuilder
      * @exception java.lang.NumberFormatException If the number is not valid.
      */
 
-    public ApfloatImpl createApfloat(long value, long precision, int radix)
+    ApfloatImpl createApfloat(long value, long precision, int radix)
         throws NumberFormatException, ApfloatRuntimeException;
 
     /**
@@ -58,7 +58,7 @@ public interface ApfloatBuilder
      * @exception java.lang.NumberFormatException If the number is not valid.
      */
 
-    public ApfloatImpl createApfloat(double value, long precision, int radix)
+    ApfloatImpl createApfloat(double value, long precision, int radix)
         throws NumberFormatException, ApfloatRuntimeException;
 
     /**
@@ -75,6 +75,6 @@ public interface ApfloatBuilder
      * @exception java.lang.NumberFormatException If the number is not valid.
      */
 
-    public ApfloatImpl createApfloat(PushbackReader in, long precision, int radix, boolean isInteger)
+    ApfloatImpl createApfloat(PushbackReader in, long precision, int radix, boolean isInteger)
         throws IOException, NumberFormatException, ApfloatRuntimeException;
 }

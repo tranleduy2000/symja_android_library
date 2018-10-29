@@ -753,7 +753,7 @@ public class EmpiricalDistribution extends AbstractRealDistribution {
          * {@inheritDoc}
          */
         @Override
-        public void computeStats() throws IOException {
+        public void computeStats() {
             sampleStats = new StreamingStatistics();
             for (int i = 0; i < inputArray.length; i++) {
                 sampleStats.addValue(inputArray[i]);
@@ -764,7 +764,7 @@ public class EmpiricalDistribution extends AbstractRealDistribution {
          * {@inheritDoc}
          */
         @Override
-        public void computeBinStats() throws IOException {
+        public void computeBinStats() {
             for (int i = 0; i < inputArray.length; i++) {
                 StreamingStatistics stats =
                         binStats.get(findBin(inputArray[i]));

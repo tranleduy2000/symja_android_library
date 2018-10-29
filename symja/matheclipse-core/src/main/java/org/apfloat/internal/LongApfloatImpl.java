@@ -336,15 +336,15 @@ public class LongApfloatImpl
 
         int size;
         long[] data = new long[MAX_LONG_SIZE];
-        long longBase = (long) BASE[radix];
+        long longBase = BASE[radix];
 
         if (-longBase < value) {
             size = 1;                               // Nonzero
-            data[MAX_LONG_SIZE - 1] = (long) -value;
+            data[MAX_LONG_SIZE - 1] = -value;
         } else {
             for (size = 0; value != 0; size++) {
                 long newValue = value / longBase;
-                data[MAX_LONG_SIZE - 1 - size] = (long) (newValue * longBase - value);   // Negated here
+                data[MAX_LONG_SIZE - 1 - size] = newValue * longBase - value;   // Negated here
                 value = newValue;
             }
         }
@@ -1176,7 +1176,7 @@ public class LongApfloatImpl
 
                 // Keep dividing by factor as long as dividend % factor == 0
                 // that is remove factors of the base from the divisor
-                while ((dividend - factor * (quotient = (long) (long) (dividend / factor))) == 0) {
+                while ((dividend - factor * (quotient = (long) (dividend / factor))) == 0) {
                     dividend = quotient;
                 }
             }
@@ -1485,7 +1485,7 @@ public class LongApfloatImpl
         }
 
         long value = 0,
-                longBase = (long) BASE[this.radix],
+                longBase = BASE[this.radix],
                 maxPrevious = Long.MIN_VALUE / longBase;
 
         // Number of words in integer part of the number
@@ -1502,7 +1502,7 @@ public class LongApfloatImpl
             }
             value *= longBase;
             if (i < size) {
-                value -= (long) iterator.getLong();      // Calculate value negated to handle 0x8000000000000000
+                value -= iterator.getLong();      // Calculate value negated to handle 0x8000000000000000
                 iterator.next();
             }
         }
@@ -1784,7 +1784,7 @@ public class LongApfloatImpl
         // Assert that the second array access will not be out of bounds
         long divisor = MINIMUM_FOR_DIGITS[this.radix][(int) (digits - this.precision)];
 
-        return (long) (long) (word / divisor) * divisor;
+        return (long) (word / divisor) * divisor;
     }
 
     /**
@@ -1843,7 +1843,7 @@ public class LongApfloatImpl
                         word = getLeastSignificantWord(i, word);
                     }
 
-                    long element = (long) word;
+                    long element = word;
                     hashCode += (int) element + (int) (element >>> 32);
                 }
             }
@@ -1976,7 +1976,7 @@ public class LongApfloatImpl
     private void formatWord(char[] buffer, long word) {
         int position = BASE_DIGITS[this.radix];
         while (position > 0 && word > 0) {
-            long newWord = (long) (long) (word / this.radix);
+            long newWord = (long) (word / this.radix);
             int digit = (int) (word - newWord * this.radix);
             word = newWord;
             position--;

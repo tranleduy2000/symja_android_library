@@ -635,7 +635,7 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
      */
     @Override
     public FieldVector<T> ebeDivide(FieldVector<T> v)
-            throws MathIllegalArgumentException, MathRuntimeException {
+            throws MathRuntimeException {
         try {
             return ebeDivide((ArrayFieldVector<T>) v);
         } catch (ClassCastException cce) {
@@ -726,7 +726,7 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
      */
     @Override
     public FieldVector<T> projection(FieldVector<T> v)
-            throws MathIllegalArgumentException, MathRuntimeException {
+            throws MathRuntimeException {
         return v.mapMultiply(dotProduct(v).divide(v.dotProduct(v)));
     }
 

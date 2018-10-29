@@ -69,8 +69,8 @@ public class IntNTTStepStrategy
                 getInverseNthRoot(PRIMITIVE_ROOT[modulus], length) :
                 getForwardNthRoot(PRIMITIVE_ROOT[modulus], length));
         final int scaleFactor = (isInverse ?
-                modDivide((int) 1, (int) totalTransformLength) :
-                (int) 1);
+                modDivide(1, (int) totalTransformLength) :
+                1);
 
         ParallelRunnable parallelRunnable = new ParallelRunnable(rows) {
             public Runnable getRunnable(int strideStartRow, int strideRows) {
@@ -166,9 +166,9 @@ public class IntNTTStepStrategy
         public void run() {
             int[] data = this.arrayAccess.getIntData();
             int position = this.arrayAccess.getOffset();
-            int rowFactor = modPow(this.w, (int) this.startRow);
-            int columnFactor = modPow(this.w, (int) this.startColumn);
-            int rowStartFactor = modMultiply(this.scaleFactor, modPow(rowFactor, (int) this.startColumn));
+            int rowFactor = modPow(this.w, this.startRow);
+            int columnFactor = modPow(this.w, this.startColumn);
+            int rowStartFactor = modMultiply(this.scaleFactor, modPow(rowFactor, this.startColumn));
 
             for (int i = 0; i < this.rows; i++) {
                 int factor = rowStartFactor;

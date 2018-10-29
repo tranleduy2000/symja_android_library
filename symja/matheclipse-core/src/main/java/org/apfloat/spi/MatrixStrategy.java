@@ -27,7 +27,7 @@ public interface MatrixStrategy
      * @param n2 Number of columns in the matrix.
      */
 
-    public void transpose(ArrayAccess arrayAccess, int n1, int n2)
+    void transpose(ArrayAccess arrayAccess, int n1, int n2)
         throws ApfloatRuntimeException;
 
     /**
@@ -41,7 +41,7 @@ public interface MatrixStrategy
      * @param n2 Number of columns in the matrix.
      */
 
-    public void transposeSquare(ArrayAccess arrayAccess, int n1, int n2)
+    void transposeSquare(ArrayAccess arrayAccess, int n1, int n2)
         throws ApfloatRuntimeException;
 
     /**
@@ -85,7 +85,7 @@ public interface MatrixStrategy
      * @since 1.7.0
      */
 
-    public void permuteToDoubleWidth(ArrayAccess arrayAccess, int n1, int n2)
+    void permuteToDoubleWidth(ArrayAccess arrayAccess, int n1, int n2)
         throws ApfloatRuntimeException;
 
     /**
@@ -126,6 +126,6 @@ public interface MatrixStrategy
      * @param n2 Number of columns in the matrix.
      */
 
-    public void permuteToHalfWidth(ArrayAccess arrayAccess, int n1, int n2)
+    void permuteToHalfWidth(ArrayAccess arrayAccess, int n1, int n2)
         throws ApfloatRuntimeException;
 }

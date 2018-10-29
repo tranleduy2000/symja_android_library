@@ -273,14 +273,14 @@ public class IntApfloatImpl
             }
 
             int digit = Character.digit(c, radix);
-            word *= (int) radix;
-            word += (int) digit;
+            word *= radix;
+            word += digit;
 
             if (digitSize == 1) {
                 // Last digit
                 while (digitsInBase < BASE_DIGITS[radix] - 1) {
                     // Fill last word with trailing zeros
-                    word *= (int) radix;
+                    word *= radix;
                     digitsInBase++;
                 }
             }
@@ -548,8 +548,8 @@ public class IntApfloatImpl
                     }
 
                     // Set the data
-                    word *= (int) radix;
-                    word += (int) digit;
+                    word *= radix;
+                    word += digit;
 
                     // Reallocate storage if needed; done here to prepare storing last (partial) word
                     if (actualSize == allocatedSize) {
@@ -609,7 +609,7 @@ public class IntApfloatImpl
             // Last digit
             while (digitsInBase < BASE_DIGITS[radix]) {
                 // Fill last word with trailing zeros
-                word *= (int) radix;
+                word *= radix;
                 digitsInBase++;
             }
 
@@ -852,7 +852,7 @@ public class IntApfloatImpl
                         src2 = this.dataStorage.iterator(DataStorage.READ, size - 1, 0),   // Sub-optimal: could be the same
                         dst = dataStorage.iterator(DataStorage.WRITE, size, 0);
 
-                int carry = additionStrategy.add(src1, src2, (int) 0, dst, size - 1);
+                int carry = additionStrategy.add(src1, src2, 0, dst, size - 1);
 
                 dst.setInt(carry);
                 dst.close();
@@ -860,7 +860,7 @@ public class IntApfloatImpl
                 size -= getTrailingZeros(dataStorage, size);
 
                 // Check if carry occurred
-                int carrySize = (int) carry,
+                int carrySize = carry,
                         leadingZeros = 1 - carrySize;
 
                 dataStorage = dataStorage.subsequence(leadingZeros, size - leadingZeros);
@@ -1153,7 +1153,7 @@ public class IntApfloatImpl
 
         int divisor = getMostSignificantWord(that.dataStorage);
 
-        if (divisor == (int) 1) {
+        if (divisor == 1) {
             long size = thisDataSize - getTrailingZeros(this.dataStorage, thisDataSize);
 
             dataStorage = this.dataStorage.subsequence(0, size);
@@ -1182,7 +1182,7 @@ public class IntApfloatImpl
             }
 
             // Check if the divisor was factored all the way to one by just dividing by factors of the base
-            if (dividend != (int) 1) {
+            if (dividend != 1) {
                 // Divisor does not contain only factors of the base; infinite nonzero sequence
 
                 if (basePrecision == Apfloat.INFINITE) {
@@ -1192,7 +1192,7 @@ public class IntApfloatImpl
                 size = basePrecision;
             } else {
                 // Divisor contains only factors of the base; calculate maximum sequence length
-                carry = (int) 1;
+                carry = 1;
                 DataStorage.Iterator dummy = new DataStorage.Iterator() {
                     private static final long serialVersionUID = 1L;                    public void setInt(int value) {
                     }
@@ -1220,7 +1220,7 @@ public class IntApfloatImpl
                     dst = dataStorage.iterator(DataStorage.WRITE, 0, size);
 
             // Perform actual division
-            carry = additionStrategy.divide(src, divisor, (int) 0, dst, thisDataSize);
+            carry = additionStrategy.divide(src, divisor, 0, dst, thisDataSize);
 
             // Produce the trailing sequence of digits due to inexact division
             carry = additionStrategy.divide(null, divisor, carry, dst, size - thisDataSize);
@@ -1281,7 +1281,7 @@ public class IntApfloatImpl
             dataStorage = createDataStorage(size);
             dataStorage.setSize(size);
             ArrayAccess arrayAccess = dataStorage.getArray(DataStorage.WRITE, 0, size);
-            arrayAccess.getIntData()[arrayAccess.getOffset()] = (int) 1;
+            arrayAccess.getIntData()[arrayAccess.getOffset()] = 1;
             arrayAccess.close();
 
             exponent = 1;
@@ -1305,11 +1305,11 @@ public class IntApfloatImpl
             dataStorage.setSize(size + 1);
             DataStorage.Iterator src = this.dataStorage.iterator(DataStorage.READ, size, 0),
                     dst = dataStorage.iterator(DataStorage.WRITE, size + 1, 0);
-            int carry = additionStrategy.add(src, null, (int) 1, dst, size);     // Add carry
+            int carry = additionStrategy.add(src, null, 1, dst, size);     // Add carry
             dst.setInt(carry);                      // Set leading int as overflow carry
             src.close();
             dst.close();
-            int carrySize = (int) carry;                // For adjusting size, if carry did overflow or not
+            int carrySize = carry;                // For adjusting size, if carry did overflow or not
             size -= getTrailingZeros(dataStorage, size + 1);
             dataStorage = dataStorage.subsequence(1 - carrySize, size + carrySize);
 
@@ -1518,7 +1518,7 @@ public class IntApfloatImpl
     // If this ApfloatImpl is equal to 1
     public boolean isOne()
             throws ApfloatRuntimeException {
-        return (this.sign == 1 && this.exponent == 1 && getSize() == 1 && getMostSignificantWord() == (int) 1);
+        return (this.sign == 1 && this.exponent == 1 && getSize() == 1 && getMostSignificantWord() == 1);
     }
 
     public long equalDigits(ApfloatImpl x)
@@ -1566,7 +1566,7 @@ public class IntApfloatImpl
             // Possible case this = 1.0000000, that = 0.9999999
             int value = thisIterator.getInt();                  // Check first word
 
-            if (value != (int) 1) {
+            if (value != 1) {
                 // No match
                 thisIterator.close();
                 thatIterator.close();
@@ -1580,7 +1580,7 @@ public class IntApfloatImpl
             // Possible case this = 0.9999999, that = 1.0000000
             int value = thatIterator.getInt();                  // Check first word
 
-            if (value != (int) 1) {
+            if (value != 1) {
                 // No match
                 thisIterator.close();
                 thatIterator.close();
@@ -1602,7 +1602,7 @@ public class IntApfloatImpl
             if (value == 0) {
                 // Trivial case; words are equal
                 carry = 0;
-            } else if (Math.abs(value) > (int) 1) {
+            } else if (Math.abs(value) > 1) {
                 // Mismatch found
                 if (Math.abs(value) >= base) {
                     // Deferred comparison, e.g. this = 1.0000000002, that = 0.9999999991
@@ -1613,10 +1613,10 @@ public class IntApfloatImpl
                 }
 
                 break;
-            } else if (value == (int) 1) {
+            } else if (value == 1) {
                 // Case this = 1.0000000..., that = 0.9999999...
                 carry = base;
-            } else if (value == (int) -1) {
+            } else if (value == -1) {
                 // Case this = 0.9999999..., that = 1.0000000...
                 carry = -base;
             }
@@ -1977,7 +1977,7 @@ public class IntApfloatImpl
         int position = BASE_DIGITS[this.radix];
         while (position > 0 && word > 0) {
             int newWord = (int) (long) (word / this.radix);
-            int digit = (int) (word - newWord * this.radix);
+            int digit = word - newWord * this.radix;
             word = newWord;
             position--;
             buffer[position] = Character.forDigit(digit, this.radix);

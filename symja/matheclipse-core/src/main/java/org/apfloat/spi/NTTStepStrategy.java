@@ -28,7 +28,7 @@ public interface NTTStepStrategy
      * @param modulus Index of the modulus.
      */
 
-    public void multiplyElements(ArrayAccess arrayAccess, int startRow, int startColumn, int rows, int columns, long length, long totalTransformLength, boolean isInverse, int modulus)
+    void multiplyElements(ArrayAccess arrayAccess, int startRow, int startColumn, int rows, int columns, long length, long totalTransformLength, boolean isInverse, int modulus)
         throws ApfloatRuntimeException;
 
     /**
@@ -46,7 +46,7 @@ public interface NTTStepStrategy
      * @param modulus Index of the modulus.
      */
 
-    public void transformRows(ArrayAccess arrayAccess, int length, int count, boolean isInverse, boolean permute, int modulus)
+    void transformRows(ArrayAccess arrayAccess, int length, int count, boolean isInverse, boolean permute, int modulus)
         throws ApfloatRuntimeException;
 
     /**
@@ -55,5 +55,5 @@ public interface NTTStepStrategy
      * @return The maximum transform length.
      */
 
-    public long getMaxTransformLength();
+    long getMaxTransformLength();
 }

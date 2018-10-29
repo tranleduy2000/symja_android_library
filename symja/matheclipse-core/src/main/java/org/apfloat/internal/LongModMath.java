@@ -47,7 +47,7 @@ public class LongModMath
      */
 
     public long getForwardNthRoot(long primitiveRoot, long n) {
-        return modPow(primitiveRoot, getModulus() - 1 - (getModulus() - 1) / (long) n);
+        return modPow(primitiveRoot, getModulus() - 1 - (getModulus() - 1) / n);
     }
 
     /**
@@ -61,7 +61,7 @@ public class LongModMath
      */
 
     public long getInverseNthRoot(long primitiveRoot, long n) {
-        return modPow(primitiveRoot, (getModulus() - 1) / (long) n);
+        return modPow(primitiveRoot, (getModulus() - 1) / n);
     }
 
     /**
@@ -115,7 +115,7 @@ public class LongModMath
             return modPow(a, getModulus() - 1 + n);
         }
 
-        long exponent = (long) n;
+        long exponent = n;
 
         while ((exponent & 1) == 0) {
             a = modMultiply(a, a);

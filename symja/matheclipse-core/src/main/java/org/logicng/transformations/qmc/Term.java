@@ -96,7 +96,7 @@ class Term {
             if (diffPosition == -1) {
                 return null;
             } else {
-                Tristate[] newBits = (Tristate[]) Arrays.copyOf(this.bits, this.bits.length);
+                Tristate[] newBits = Arrays.copyOf(this.bits, this.bits.length);
                 newBits[diffPosition] = Tristate.UNDEF;
                 List<Formula> newMinterms = new ArrayList<>(this.minterms);
                 newMinterms.addAll(other.minterms);
@@ -106,7 +106,7 @@ class Term {
     }
 
     Formula translateToFormula(List<Variable> varOrder) {
-        FormulaFactory f = ((Variable) varOrder.get(0)).factory();
+        FormulaFactory f = varOrder.get(0).factory();
 
         assert this.bits.length == varOrder.size();
 
@@ -114,7 +114,7 @@ class Term {
 
         for (int i = 0; i < this.bits.length; ++i) {
             if (this.bits[i] != Tristate.UNDEF) {
-                operands.add(this.bits[i] == Tristate.TRUE ? (Literal) varOrder.get(i) : ((Variable) varOrder.get(i)).negate());
+                operands.add(this.bits[i] == Tristate.TRUE ? varOrder.get(i) : varOrder.get(i).negate());
             }
         }
 

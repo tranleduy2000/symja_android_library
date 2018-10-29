@@ -19,5 +19,5 @@ public interface MatrixBuilder
      * @return A suitable object for performing the matrix operations.
      */
 
-    public MatrixStrategy createMatrix();
+    MatrixStrategy createMatrix();
 }

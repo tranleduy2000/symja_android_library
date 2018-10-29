@@ -38,7 +38,7 @@ public interface DataStorageBuilder
      * @return An empty <code>DataStorage</code> object of an appropriate type for storing <code>size</code> bytes of data.
      */
 
-    public DataStorage createDataStorage(long size)
+    DataStorage createDataStorage(long size)
         throws ApfloatRuntimeException;
 
     /**
@@ -55,7 +55,7 @@ public interface DataStorageBuilder
      * @since 1.5.1
      */
 
-    public DataStorage createCachedDataStorage(long size)
+    DataStorage createCachedDataStorage(long size)
         throws ApfloatRuntimeException;
 
     /**
@@ -76,6 +76,6 @@ public interface DataStorageBuilder
      * @since 1.5.1
      */
 
-    public DataStorage createDataStorage(DataStorage dataStorage)
+    DataStorage createDataStorage(DataStorage dataStorage)
         throws ApfloatRuntimeException;
 }

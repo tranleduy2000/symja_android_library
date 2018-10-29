@@ -251,7 +251,7 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
      */
     @Override
     public FieldVector<T> ebeDivide(FieldVector<T> v)
-            throws MathIllegalArgumentException, MathRuntimeException {
+            throws MathRuntimeException {
         checkVectorDimensions(v.getDimension());
         SparseFieldVector<T> res = new SparseFieldVector<T>(this);
         OpenIntToFieldHashMap<T>.Iterator iter = res.entries.iterator();
@@ -474,7 +474,7 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
      */
     @Override
     public FieldVector<T> projection(FieldVector<T> v)
-            throws MathIllegalArgumentException, MathRuntimeException {
+            throws MathRuntimeException {
         checkVectorDimensions(v.getDimension());
         return v.mapMultiply(dotProduct(v).divide(v.dotProduct(v)));
     }

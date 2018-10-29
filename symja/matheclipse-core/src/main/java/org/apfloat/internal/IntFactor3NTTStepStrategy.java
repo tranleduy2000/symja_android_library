@@ -74,8 +74,8 @@ public class IntFactor3NTTStepStrategy
                 getForwardNthRoot(PRIMITIVE_ROOT[modulus], length)),   // Forward/inverse n:th root
                 w3 = modPow(w, (int) power2length),                     // Forward/inverse 3rd root
                 ww = modMultiply(w, w),
-                w1 = negate(modDivide((int) 3, (int) 2)),
-                w2 = modAdd(w3, modDivide((int) 1, (int) 2));
+                w1 = negate(modDivide(3, 2)),
+                w2 = modAdd(w3, modDivide(1, 2));
 
         ParallelRunnable parallelRunnable = new ParallelRunnable(columns) {
             public Runnable getRunnable(long strideStartColumn, long strideColumns) {

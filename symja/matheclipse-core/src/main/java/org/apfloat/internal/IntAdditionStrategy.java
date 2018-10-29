@@ -47,6 +47,6 @@ public class IntAdditionStrategy
     }
 
     public Integer zero() {
-        return (int) 0;
+        return 0;
     }
 }

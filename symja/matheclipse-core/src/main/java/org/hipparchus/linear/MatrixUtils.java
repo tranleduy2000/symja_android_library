@@ -688,14 +688,13 @@ public class MatrixUtils {
      * @param instance  instance in which the field must be set up
      * @param fieldName name of the field within the class (may be private and final)
      * @param ois       stream from which the real vector should be read
-     * @throws ClassNotFoundException if a class in the stream cannot be found
      * @throws IOException            if object cannot be read from the stream
      * @see #serializeRealVector(RealVector, ObjectOutputStream)
      */
     public static void deserializeRealVector(final Object instance,
                                              final String fieldName,
                                              final ObjectInputStream ois)
-            throws ClassNotFoundException, IOException {
+            throws IOException {
         try {
 
             // read the vector data
@@ -715,12 +714,10 @@ public class MatrixUtils {
             f.set(instance, vector);
 
         } catch (NoSuchFieldException nsfe) {
-            IOException ioe = new IOException();
-            ioe.initCause(nsfe);
+            IOException ioe = new IOException(nsfe);
             throw ioe;
         } catch (IllegalAccessException iae) {
-            IOException ioe = new IOException();
-            ioe.initCause(iae);
+            IOException ioe = new IOException(iae);
             throw ioe;
         }
 
@@ -796,14 +793,13 @@ public class MatrixUtils {
      * @param instance  instance in which the field must be set up
      * @param fieldName name of the field within the class (may be private and final)
      * @param ois       stream from which the real matrix should be read
-     * @throws ClassNotFoundException if a class in the stream cannot be found
      * @throws IOException            if object cannot be read from the stream
      * @see #serializeRealMatrix(RealMatrix, ObjectOutputStream)
      */
     public static void deserializeRealMatrix(final Object instance,
                                              final String fieldName,
                                              final ObjectInputStream ois)
-            throws ClassNotFoundException, IOException {
+            throws IOException {
         try {
 
             // read the matrix data
@@ -827,12 +823,10 @@ public class MatrixUtils {
             f.set(instance, matrix);
 
         } catch (NoSuchFieldException nsfe) {
-            IOException ioe = new IOException();
-            ioe.initCause(nsfe);
+            IOException ioe = new IOException(nsfe);
             throw ioe;
         } catch (IllegalAccessException iae) {
-            IOException ioe = new IOException();
-            ioe.initCause(iae);
+            IOException ioe = new IOException(iae);
             throw ioe;
         }
     }

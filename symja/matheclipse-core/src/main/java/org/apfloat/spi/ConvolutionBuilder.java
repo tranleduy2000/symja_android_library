@@ -24,5 +24,5 @@ public interface ConvolutionBuilder
      * @return A suitable object for performing the convolution.
      */
 
-    public ConvolutionStrategy createConvolution(int radix, long size1, long size2, long resultSize);
+    ConvolutionStrategy createConvolution(int radix, long size1, long size2, long resultSize);
 }

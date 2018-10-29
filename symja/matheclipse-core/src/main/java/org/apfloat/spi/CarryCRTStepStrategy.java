@@ -37,7 +37,7 @@ public interface CarryCRTStepStrategy<T>
      * @return The carries overflowing from this block (two elements).
      */
 
-    public T crt(DataStorage resultMod0, DataStorage resultMod1, DataStorage resultMod2, DataStorage dataStorage, long size, long resultSize, long offset, long length)
+    T crt(DataStorage resultMod0, DataStorage resultMod1, DataStorage resultMod2, DataStorage dataStorage, long size, long resultSize, long offset, long length)
         throws ApfloatRuntimeException;
 
     /**
@@ -55,6 +55,6 @@ public interface CarryCRTStepStrategy<T>
      * @return The carries overflowing from this block (two elements).
      */
 
-    public T carry(DataStorage dataStorage, long size, long resultSize, long offset, long length, T results, T previousResults)
+    T carry(DataStorage dataStorage, long size, long resultSize, long offset, long length, T results, T previousResults)
         throws ApfloatRuntimeException;
 }

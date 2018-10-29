@@ -34,7 +34,7 @@ public interface NTTStrategy
      * @param modulus Number of modulus to use (in case the transform supports multiple moduli).
      */
 
-    public void transform(DataStorage dataStorage, int modulus)
+    void transform(DataStorage dataStorage, int modulus)
         throws ApfloatRuntimeException;
 
     /**
@@ -49,7 +49,7 @@ public interface NTTStrategy
      * @param totalTransformLength Total transform length; the final result elements are divided by this value.
      */
 
-    public void inverseTransform(DataStorage dataStorage, int modulus, long totalTransformLength)
+    void inverseTransform(DataStorage dataStorage, int modulus, long totalTransformLength)
         throws ApfloatRuntimeException;
 
     /**
@@ -60,5 +60,5 @@ public interface NTTStrategy
      * @return Length of the transform needed by this transform.
      */
 
-    public long getTransformLength(long size);
+    long getTransformLength(long size);
 }

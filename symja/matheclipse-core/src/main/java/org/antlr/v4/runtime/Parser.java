@@ -800,11 +800,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
             ctx = (ParserRuleContext)ctx.parent;
         }
 
-        if ( following.contains(Token.EPSILON) && symbol == Token.EOF ) {
-            return true;
-        }
+        return following.contains(Token.EPSILON) && symbol == Token.EOF;
 
-        return false;
     }
 
 	public boolean isMatchedEOF() {

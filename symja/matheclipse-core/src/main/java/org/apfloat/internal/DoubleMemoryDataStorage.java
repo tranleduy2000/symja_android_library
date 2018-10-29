@@ -71,7 +71,7 @@ public class DoubleMemoryDataStorage
                 bufferSize = ctx.getBlockSize() / 8;
 
         while (readSize > 0) {
-            int length = (int) Math.min(bufferSize, readSize);
+            int length = Math.min(bufferSize, readSize);
 
             ArrayAccess arrayAccess = dataStorage.getArray(READ, position, length);
             System.arraycopy(arrayAccess.getDoubleData(), arrayAccess.getOffset(), this.data, position, length);

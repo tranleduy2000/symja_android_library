@@ -65,9 +65,8 @@ public final class DimacsReader {
    * @param f    the formula factory
    * @return the list of formulas (clauses)
    * @throws IOException     if there was a problem reading the file
-   * @throws ParserException if there was a problem parsing the formula
    */
-  public static List<Formula> readCNF(final File file, final FormulaFactory f) throws IOException, ParserException {
+  public static List<Formula> readCNF(final File file, final FormulaFactory f) throws IOException {
     return readCNF(file, f, "v");
   }
 
@@ -112,9 +111,8 @@ public final class DimacsReader {
    * @param f        the formula factory
    * @return the list of formulas (clauses)
    * @throws IOException     if there was a problem reading the file
-   * @throws ParserException if there was a problem parsing the formula
    */
-  public static List<Formula> readCNF(final String fileName, final FormulaFactory f) throws IOException, ParserException {
+  public static List<Formula> readCNF(final String fileName, final FormulaFactory f) throws IOException {
     return readCNF(new File(fileName), f, "v");
   }
 
@@ -125,10 +123,9 @@ public final class DimacsReader {
    * @param prefix   the prefix for the variable names
    * @return the list of formulas (clauses)
    * @throws IOException     if there was a problem reading the file
-   * @throws ParserException if there was a problem parsing the formula
    */
   public static List<Formula> readCNF(final String fileName, final FormulaFactory f, final String prefix)
-          throws IOException, ParserException {
+          throws IOException {
     return readCNF(new File(fileName), f, prefix);
   }
 

@@ -222,13 +222,13 @@ class TermTable {
 
         while (var11.hasNext()) {
             s = var11.next();
-            sb.append(String.format("%s | ", new Object[]{padRight(s, columnSize)}));
+            sb.append(String.format("%s | ", padRight(s, columnSize)));
         }
 
-        sb.append(String.format("%n", new Object[0]));
+        sb.append(String.format("%n"));
 
         for (i = 0; i < this.matrixLines.size(); ++i) {
-            sb.append(String.format("%s | %s%n", new Object[]{lineHeaderStrings.get(i), this.formatMatrixLine(this.matrixLines.get(i), columnSize)}));
+            sb.append(String.format("%s | %s%n", lineHeaderStrings.get(i), this.formatMatrixLine(this.matrixLines.get(i), columnSize)));
         }
 
         return sb.toString();

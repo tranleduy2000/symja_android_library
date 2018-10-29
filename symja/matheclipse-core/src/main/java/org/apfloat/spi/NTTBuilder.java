@@ -22,7 +22,7 @@ public interface NTTBuilder
      * @return A suitable NTT object for performing the transform.
      */
 
-    public NTTStrategy createNTT(long size);
+    NTTStrategy createNTT(long size);
 
     /**
      * Creates an object for implementing the steps of a step-based
@@ -33,7 +33,7 @@ public interface NTTBuilder
      * @since 1.7.0
      */
 
-    public NTTStepStrategy createNTTSteps();
+    NTTStepStrategy createNTTSteps();
 
     /**
      * Creates an object for implementing the steps of a three-NTT
@@ -44,7 +44,7 @@ public interface NTTBuilder
      * @since 1.7.0
      */
 
-    public NTTConvolutionStepStrategy createNTTConvolutionSteps();
+    NTTConvolutionStepStrategy createNTTConvolutionSteps();
 
     /**
      * Creates an object for implementing the steps of factor-3 NTT.
@@ -54,5 +54,5 @@ public interface NTTBuilder
      * @since 1.7.0
      */
 
-    public Factor3NTTStepStrategy createFactor3NTTSteps();
+    Factor3NTTStepStrategy createFactor3NTTSteps();
 }

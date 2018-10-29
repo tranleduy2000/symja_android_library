@@ -25,9 +25,9 @@ public class InterpreterDataReader {
 	  List<String> ruleNames;
 	  List<String> channels; // Only valid for lexer grammars.
 	  List<String> modes; // ditto
-	};
-	
-	/**
+	}
+
+    /**
 	 * The structure of the data file is very simple. Everything is line based with empty lines
 	 * separating the different parts. For lexers the layout is:
 	 * token literal names:

@@ -205,7 +205,7 @@ public class RuleContext implements RuleNode {
 
 	@Override
 	public String toString() {
-		return toString((List<String>)null, (RuleContext)null);
+		return toString((List<String>)null, null);
 	}
 
 	public final String toString(Recognizer<?,?> recog) {

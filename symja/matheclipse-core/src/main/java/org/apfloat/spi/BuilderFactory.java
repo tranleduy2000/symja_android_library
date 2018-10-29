@@ -22,7 +22,7 @@ public interface BuilderFactory
      * @return An <code>ApfloatBuilder</code> object.
      */
 
-    public ApfloatBuilder getApfloatBuilder();
+    ApfloatBuilder getApfloatBuilder();
 
     /**
      * Returns a <code>DataStorageBuilder</code> object.
@@ -30,7 +30,7 @@ public interface BuilderFactory
      * @return A <code>DataStorageBuilder</code> object.
      */
 
-    public DataStorageBuilder getDataStorageBuilder();
+    DataStorageBuilder getDataStorageBuilder();
 
     /**
      * Returns an <code>AdditionBuilder</code> object.
@@ -43,7 +43,7 @@ public interface BuilderFactory
      *
      * @since 1.7.0
      */
-    public <T> AdditionBuilder<T> getAdditionBuilder(Class<T> elementType)
+    <T> AdditionBuilder<T> getAdditionBuilder(Class<T> elementType)
         throws IllegalArgumentException;
 
     /**
@@ -52,7 +52,7 @@ public interface BuilderFactory
      * @return A <code>ConvolutionBuilder</code> object.
      */
 
-    public ConvolutionBuilder getConvolutionBuilder();
+    ConvolutionBuilder getConvolutionBuilder();
 
     /**
      * Returns an <code>NTTBuilder</code> object.
@@ -60,7 +60,7 @@ public interface BuilderFactory
      * @return An <code>NTTBuilder</code> object.
      */
 
-    public NTTBuilder getNTTBuilder();
+    NTTBuilder getNTTBuilder();
 
     /**
      * Returns a <code>MatrixBuilder</code> object.
@@ -70,7 +70,7 @@ public interface BuilderFactory
      * @since 1.7.0
      */
 
-    public MatrixBuilder getMatrixBuilder();
+    MatrixBuilder getMatrixBuilder();
 
     /**
      * Returns a <code>CarryCRTBuilder</code> object.
@@ -83,7 +83,7 @@ public interface BuilderFactory
      *
      * @since 1.7.0
      */
-    public <T> CarryCRTBuilder<T> getCarryCRTBuilder(Class<T> elementArrayType)
+    <T> CarryCRTBuilder<T> getCarryCRTBuilder(Class<T> elementArrayType)
         throws IllegalArgumentException;
 
     /**
@@ -94,7 +94,7 @@ public interface BuilderFactory
      * @since 1.7.0
      */
 
-    public Class<?> getElementArrayType();
+    Class<?> getElementArrayType();
 
     /**
      * Returns the element size of the data objects created, in bytes.
@@ -104,7 +104,7 @@ public interface BuilderFactory
      * @since 1.7.0
      */
 
-    public int getElementSize();
+    int getElementSize();
 
     /**
      * Shuts down the builder factory. Clean-up tasks can be executed by this method.
@@ -113,7 +113,7 @@ public interface BuilderFactory
      * @since 1.6.2
      */
 
-    public void shutdown()
+    void shutdown()
         throws ApfloatRuntimeException;
 
 }

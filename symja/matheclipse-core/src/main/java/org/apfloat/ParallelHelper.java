@@ -22,7 +22,7 @@ class ParallelHelper
 {
     public interface ProductKernel<T extends Apcomplex>
     {
-        public void run(Queue<T> heap);
+        void run(Queue<T> heap);
     }
 
     private ParallelHelper()

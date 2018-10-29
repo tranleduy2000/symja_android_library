@@ -135,10 +135,7 @@ public class VectorialStorelessStatistic
             return false;
         }
         VectorialStorelessStatistic other = (VectorialStorelessStatistic) obj;
-        if (!Arrays.equals(stats, other.stats)) {
-            return false;
-        }
-        return true;
+        return Arrays.equals(stats, other.stats);
     }
 
 }

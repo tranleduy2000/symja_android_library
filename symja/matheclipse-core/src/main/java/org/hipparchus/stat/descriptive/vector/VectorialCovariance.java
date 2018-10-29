@@ -165,10 +165,7 @@ public class VectorialCovariance implements Serializable {
         if (!Arrays.equals(productsSums, other.productsSums)) {
             return false;
         }
-        if (!Arrays.equals(sums, other.sums)) {
-            return false;
-        }
-        return true;
+        return Arrays.equals(sums, other.sums);
     }
 
 }

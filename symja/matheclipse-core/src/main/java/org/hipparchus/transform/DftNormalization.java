@@ -51,5 +51,5 @@ public enum DftNormalization {
      * </ul>
      * which makes the transform unitary. N is the size of the data sample.
      */
-    UNITARY;
+    UNITARY
 }

@@ -26,7 +26,7 @@ public interface Factor3NTTStepStrategy
      * @param modulus Index of the modulus.
      */
 
-    public void transformColumns(DataStorage dataStorage0, DataStorage dataStorage1, DataStorage dataStorage2, long startColumn, long columns, long power2length, long length, boolean isInverse, int modulus)
+    void transformColumns(DataStorage dataStorage0, DataStorage dataStorage1, DataStorage dataStorage2, long startColumn, long columns, long power2length, long length, boolean isInverse, int modulus)
         throws ApfloatRuntimeException;
 
     /**
@@ -35,5 +35,5 @@ public interface Factor3NTTStepStrategy
      * @return The maximum transform length.
      */
 
-    public long getMaxTransformLength();
+    long getMaxTransformLength();
 }

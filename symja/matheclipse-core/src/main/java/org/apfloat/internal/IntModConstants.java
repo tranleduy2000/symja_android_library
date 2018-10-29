@@ -13,29 +13,29 @@ public interface IntModConstants {
      * Allows transform lengths upto 3*2<sup>24</sup>.
      */
 
-    public static final int MODULUS[] = {2113929217, 2013265921, 1811939329};
+    int MODULUS[] = {2113929217, 2013265921, 1811939329};
 
     /**
      * Primitive roots for the corresponding moduli.
      */
 
-    public static final int PRIMITIVE_ROOT[] = {5, 31, 13};
+    int PRIMITIVE_ROOT[] = {5, 31, 13};
 
     /**
      * Maximum transform length for the moduli.
      */
 
-    public static final long MAX_TRANSFORM_LENGTH = 50331648;
+    long MAX_TRANSFORM_LENGTH = 50331648;
 
     /**
      * Maximum bits in a power-of-two base that fits in an <code>int</code>.
      */
 
-    public static final int MAX_POWER_OF_TWO_BITS = 31;
+    int MAX_POWER_OF_TWO_BITS = 31;
 
     /**
      * Maximum power-of-two base that fits in an <code>int</code>.
      */
 
-    public static final int MAX_POWER_OF_TWO_BASE = 1 << MAX_POWER_OF_TWO_BITS;
+    int MAX_POWER_OF_TWO_BASE = 1 << MAX_POWER_OF_TWO_BITS;
 }

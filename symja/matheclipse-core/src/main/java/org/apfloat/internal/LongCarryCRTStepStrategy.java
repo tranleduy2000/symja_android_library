@@ -47,10 +47,10 @@ public class LongCarryCRTStepStrategy
 
         // Probably sub-optimal, but it's a one-time operation
 
-        BigInteger base = BigInteger.valueOf(Math.abs((long) MAX_POWER_OF_TWO_BASE)),   // In int case the base is 0x80000000
-                m0 = BigInteger.valueOf((long) MODULUS[0]),
-                m1 = BigInteger.valueOf((long) MODULUS[1]),
-                m2 = BigInteger.valueOf((long) MODULUS[2]),
+        BigInteger base = BigInteger.valueOf(Math.abs(MAX_POWER_OF_TWO_BASE)),   // In int case the base is 0x80000000
+                m0 = BigInteger.valueOf(MODULUS[0]),
+                m1 = BigInteger.valueOf(MODULUS[1]),
+                m2 = BigInteger.valueOf(MODULUS[2]),
                 m01 = m0.multiply(m1),
                 m02 = m0.multiply(m2),
                 m12 = m1.multiply(m2);

@@ -912,7 +912,7 @@ public class DfpField implements Field<Dfp> {
         /**
          * Rounds towards negative infinity.
          */
-        ROUND_FLOOR;
+        ROUND_FLOOR
 
     }
 

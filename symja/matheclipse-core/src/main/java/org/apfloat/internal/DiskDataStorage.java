@@ -444,8 +444,6 @@ public abstract class DiskDataStorage
         readArrayAccess.close();
     }
 
-    ;
-
     private void writeFromArray(ArrayAccess arrayAccess, int readPosition, long writePosition, int length)
             throws ApfloatRuntimeException {
         ArrayAccess writeArrayAccess = getArray(WRITE, writePosition, length);
@@ -534,7 +532,7 @@ public abstract class DiskDataStorage
     }
 
     private void pad(long position, long size)
-            throws IOException, ApfloatRuntimeException {
+            throws ApfloatRuntimeException {
         transferFrom(ZERO_CHANNEL, position, size);
     }
 

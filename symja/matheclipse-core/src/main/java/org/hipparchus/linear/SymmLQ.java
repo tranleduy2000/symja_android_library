@@ -270,16 +270,11 @@ public class SymmLQ
     /**
      * {@inheritDoc}
      *
-     * @throws MathIllegalArgumentException if {@link #getCheck()} is
-     *                                      {@code true}, and {@code a} or {@code m} is not self-adjoint
-     * @throws MathIllegalArgumentException if {@code m} is not
-     *                                      positive definite
-     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
      */
     @Override
     public RealVector solve(final RealLinearOperator a,
                             final RealLinearOperator m, final RealVector b) throws
-            MathIllegalArgumentException, NullArgumentException, MathIllegalStateException, MathIllegalArgumentException {
+            NullArgumentException, MathIllegalStateException, MathIllegalArgumentException {
         MathUtils.checkNotNull(a);
         final RealVector x = new ArrayRealVector(a.getColumnDimension());
         return solveInPlace(a, m, b, x, false, 0.);
@@ -338,16 +333,11 @@ public class SymmLQ
      *
      * @param x not meaningful in this implementation; should not be considered
      *          as an initial guess (<a href="#initguess">more</a>)
-     * @throws MathIllegalArgumentException if {@link #getCheck()} is
-     *                                      {@code true}, and {@code a} or {@code m} is not self-adjoint
-     * @throws MathIllegalArgumentException if {@code m} is not positive
-     *                                      definite
-     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
      */
     @Override
     public RealVector solve(final RealLinearOperator a,
                             final RealLinearOperator m, final RealVector b, final RealVector x)
-            throws MathIllegalArgumentException, NullArgumentException,
+            throws NullArgumentException,
             MathIllegalArgumentException,
             MathIllegalStateException {
         MathUtils.checkNotNull(x);
@@ -357,13 +347,10 @@ public class SymmLQ
     /**
      * {@inheritDoc}
      *
-     * @throws MathIllegalArgumentException if {@link #getCheck()} is
-     *                                      {@code true}, and {@code a} is not self-adjoint
-     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
      */
     @Override
     public RealVector solve(final RealLinearOperator a, final RealVector b)
-            throws MathIllegalArgumentException, NullArgumentException,
+            throws NullArgumentException,
             MathIllegalArgumentException, MathIllegalStateException {
         MathUtils.checkNotNull(a);
         final RealVector x = new ArrayRealVector(a.getColumnDimension());
@@ -419,13 +406,10 @@ public class SymmLQ
      *
      * @param x not meaningful in this implementation; should not be considered
      *          as an initial guess (<a href="#initguess">more</a>)
-     * @throws MathIllegalArgumentException if {@link #getCheck()} is
-     *                                      {@code true}, and {@code a} is not self-adjoint
-     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
      */
     @Override
     public RealVector solve(final RealLinearOperator a, final RealVector b,
-                            final RealVector x) throws MathIllegalArgumentException, NullArgumentException, MathIllegalArgumentException,
+                            final RealVector x) throws NullArgumentException, MathIllegalArgumentException,
             MathIllegalStateException {
         MathUtils.checkNotNull(x);
         return solveInPlace(a, null, b, x.copy(), false, 0.);
@@ -436,16 +420,11 @@ public class SymmLQ
      *
      * @param x the vector to be updated with the solution; {@code x} should
      *          not be considered as an initial guess (<a href="#initguess">more</a>)
-     * @throws MathIllegalArgumentException if {@link #getCheck()} is
-     *                                      {@code true}, and {@code a} or {@code m} is not self-adjoint
-     * @throws MathIllegalArgumentException if {@code m} is not
-     *                                      positive definite
-     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
      */
     @Override
     public RealVector solveInPlace(final RealLinearOperator a,
                                    final RealLinearOperator m, final RealVector b, final RealVector x)
-            throws MathIllegalArgumentException, NullArgumentException,
+            throws NullArgumentException,
             MathIllegalArgumentException,
             MathIllegalStateException {
         return solveInPlace(a, m, b, x, false, 0.);
@@ -555,13 +534,10 @@ public class SymmLQ
      *
      * @param x the vector to be updated with the solution; {@code x} should
      *          not be considered as an initial guess (<a href="#initguess">more</a>)
-     * @throws MathIllegalArgumentException if {@link #getCheck()} is
-     *                                      {@code true}, and {@code a} is not self-adjoint
-     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
      */
     @Override
     public RealVector solveInPlace(final RealLinearOperator a,
-                                   final RealVector b, final RealVector x) throws MathIllegalArgumentException, NullArgumentException, MathIllegalArgumentException,
+                                   final RealVector b, final RealVector x) throws NullArgumentException, MathIllegalArgumentException,
             MathIllegalStateException {
         return solveInPlace(a, null, b, x, false, 0.);
     }

@@ -81,7 +81,7 @@ public class Aprational
      */
 
     public Aprational(String value)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(value, ApfloatContext.getContext().getDefaultRadix());
     }
@@ -102,7 +102,7 @@ public class Aprational
      */
 
     public Aprational(String value, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int index = value.indexOf('/');
         if (index < 0)

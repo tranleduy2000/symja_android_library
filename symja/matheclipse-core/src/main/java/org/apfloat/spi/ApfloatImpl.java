@@ -29,7 +29,7 @@ public interface ApfloatImpl
      * @return <code>this + x</code> or <code>this - x</code> depending on the <code>subtract</code> argument.
      */
 
-    public ApfloatImpl addOrSubtract(ApfloatImpl x, boolean subtract)
+    ApfloatImpl addOrSubtract(ApfloatImpl x, boolean subtract)
         throws ApfloatRuntimeException;
 
     /**
@@ -40,7 +40,7 @@ public interface ApfloatImpl
      * @return <code>this * x</code>.
      */
 
-    public ApfloatImpl multiply(ApfloatImpl x)
+    ApfloatImpl multiply(ApfloatImpl x)
         throws ApfloatRuntimeException;
 
     /**
@@ -55,7 +55,7 @@ public interface ApfloatImpl
      * @see org.apfloat.Apfloat#isShort()
      */
 
-    public boolean isShort()
+    boolean isShort()
         throws ApfloatRuntimeException;
 
     /**
@@ -66,7 +66,7 @@ public interface ApfloatImpl
      * @return <code>this / x</code>.
      */
 
-    public ApfloatImpl divideShort(ApfloatImpl x)
+    ApfloatImpl divideShort(ApfloatImpl x)
         throws ApfloatRuntimeException;
 
     /**
@@ -75,7 +75,7 @@ public interface ApfloatImpl
      * @return This <code>ApfloatImpl</code> rounded towards zero.
      */
 
-    public ApfloatImpl absFloor()
+    ApfloatImpl absFloor()
         throws ApfloatRuntimeException;
 
     /**
@@ -84,7 +84,7 @@ public interface ApfloatImpl
      * @return This <code>ApfloatImpl</code> rounded away from zero.
      */
 
-    public ApfloatImpl absCeil()
+    ApfloatImpl absCeil()
         throws ApfloatRuntimeException;
 
     /**
@@ -95,7 +95,7 @@ public interface ApfloatImpl
      * @since 1.7.0
      */
 
-    public ApfloatImpl frac()
+    ApfloatImpl frac()
         throws ApfloatRuntimeException;
 
     /**
@@ -104,7 +104,7 @@ public interface ApfloatImpl
      * @return The radix of this <code>ApfloatImpl</code>.
      */
 
-    public int radix();
+    int radix();
 
     /**
      * Returns the precision of this <code>ApfloatImpl</code>.
@@ -112,7 +112,7 @@ public interface ApfloatImpl
      * @return The precision of this <code>ApfloatImpl</code>.
      */
 
-    public long precision();
+    long precision();
 
     /**
      * Returns the size of the mantissa of this <code>ApfloatImpl</code>.
@@ -122,7 +122,7 @@ public interface ApfloatImpl
      * @since 1.2
      */
 
-    public long size()
+    long size()
         throws ApfloatRuntimeException;
 
     /**
@@ -133,7 +133,7 @@ public interface ApfloatImpl
      * @return This <code>ApfloatImpl</code> with the specified precision.
      */
 
-    public ApfloatImpl precision(long precision)
+    ApfloatImpl precision(long precision)
         throws ApfloatRuntimeException;
 
     /**
@@ -144,7 +144,7 @@ public interface ApfloatImpl
      * @see org.apfloat.Apfloat#scale()
      */
 
-    public long scale()
+    long scale()
         throws ApfloatRuntimeException;
 
     /**
@@ -155,7 +155,7 @@ public interface ApfloatImpl
      * @see org.apfloat.Apfloat#signum()
      */
 
-    public int signum();
+    int signum();
 
     /**
      * Returns this <code>ApfloatImpl</code> negated.
@@ -163,7 +163,7 @@ public interface ApfloatImpl
      * @return <code>-this</code>.
      */
 
-    public ApfloatImpl negate()
+    ApfloatImpl negate()
         throws ApfloatRuntimeException;
 
     /**
@@ -181,7 +181,7 @@ public interface ApfloatImpl
      * @return The numeric value represented by this object after conversion to type <code>double</code>.
      */
 
-    public double doubleValue();
+    double doubleValue();
 
     /**
      * Returns the value of the this number as a <code>long</code>.
@@ -196,7 +196,7 @@ public interface ApfloatImpl
      * @return The numeric value represented by this object after conversion to type <code>long</code>.
      */
 
-    public long longValue();
+    long longValue();
 
     /**
      * Tests if this number is equal to 1.
@@ -204,7 +204,7 @@ public interface ApfloatImpl
      * @return <code>true</code> if this number is equal to one, otherwise <code>false</code>.
      */
 
-    public boolean isOne()
+    boolean isOne()
         throws ApfloatRuntimeException;
 
     /**
@@ -217,7 +217,7 @@ public interface ApfloatImpl
      * @see org.apfloat.Apfloat#equalDigits(org.apfloat.Apfloat)
      */
 
-    public long equalDigits(ApfloatImpl x)
+    long equalDigits(ApfloatImpl x)
         throws ApfloatRuntimeException;
 
     /**
@@ -230,7 +230,7 @@ public interface ApfloatImpl
      * @see org.apfloat.Apfloat#compareTo(org.apfloat.Apfloat)
      */
 
-    public int compareTo(ApfloatImpl x)
+    int compareTo(ApfloatImpl x)
         throws ApfloatRuntimeException;
 
     /**
@@ -239,7 +239,7 @@ public interface ApfloatImpl
      * @return The hash code for this <code>ApfloatImpl</code>.
      */
 
-    public int hashCode();
+    int hashCode();
 
     /**
      * Convert this <code>ApfloatImpl</code> to <code>String</code>.
@@ -251,7 +251,7 @@ public interface ApfloatImpl
      * @see org.apfloat.Apfloat#toString(boolean)
      */
 
-    public String toString(boolean pretty)
+    String toString(boolean pretty)
         throws ApfloatRuntimeException;
 
     /**
@@ -265,6 +265,6 @@ public interface ApfloatImpl
      * @see org.apfloat.Apfloat#writeTo(Writer,boolean)
      */
 
-    public void writeTo(Writer out, boolean pretty)
+    void writeTo(Writer out, boolean pretty)
         throws IOException, ApfloatRuntimeException;
 }

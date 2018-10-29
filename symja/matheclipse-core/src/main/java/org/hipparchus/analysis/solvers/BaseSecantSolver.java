@@ -277,7 +277,7 @@ public abstract class BaseSecantSolver
         /**
          * The {@link PegasusSolver <em>Pegasus</em>} method.
          */
-        PEGASUS;
+        PEGASUS
 
     }
 }

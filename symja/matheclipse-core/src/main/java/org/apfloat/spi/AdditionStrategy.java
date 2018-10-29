@@ -31,7 +31,7 @@ public interface AdditionStrategy<T>
      * @return Overflow carry bit. Propagated carry bit from the addition of the last (leftmost) word in the accessed sequence.
      */
 
-    public T add(DataStorage.Iterator src1, DataStorage.Iterator src2, T carry, DataStorage.Iterator dst, long size)
+    T add(DataStorage.Iterator src1, DataStorage.Iterator src2, T carry, DataStorage.Iterator dst, long size)
         throws ApfloatRuntimeException;
 
     /**
@@ -52,7 +52,7 @@ public interface AdditionStrategy<T>
      * @return Overflow carry bit. Propagated carry bit from the subtraction of the last (leftmost) word in the accessed sequence. The value is <code>1</code> if the carry is set, and <code>0</code> otherwise.
      */
 
-    public T subtract(DataStorage.Iterator src1, DataStorage.Iterator src2, T carry, DataStorage.Iterator dst, long size)
+    T subtract(DataStorage.Iterator src1, DataStorage.Iterator src2, T carry, DataStorage.Iterator dst, long size)
         throws ApfloatRuntimeException;
 
     /**
@@ -78,7 +78,7 @@ public interface AdditionStrategy<T>
      * @return Overflow carry word. Propagated carry word from the multiplication and addition of the last (leftmost) word in the accessed sequence.
      */
 
-    public T multiplyAdd(DataStorage.Iterator src1, DataStorage.Iterator src2, T src3, T carry, DataStorage.Iterator dst, long size)
+    T multiplyAdd(DataStorage.Iterator src1, DataStorage.Iterator src2, T src3, T carry, DataStorage.Iterator dst, long size)
         throws ApfloatRuntimeException;
 
     /**
@@ -99,7 +99,7 @@ public interface AdditionStrategy<T>
      * @return Remainder word of the propagated division of the last (rightmost) word in the accessed sequence.
      */
 
-    public T divide(DataStorage.Iterator src1, T src2, T carry, DataStorage.Iterator dst, long size)
+    T divide(DataStorage.Iterator src1, T src2, T carry, DataStorage.Iterator dst, long size)
         throws ApfloatRuntimeException;
 
     /**
@@ -108,5 +108,5 @@ public interface AdditionStrategy<T>
      * @return Zero of the correct element type.
      */
 
-    public T zero();
+    T zero();
 }

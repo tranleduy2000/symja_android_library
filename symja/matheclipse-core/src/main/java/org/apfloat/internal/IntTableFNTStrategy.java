@@ -77,7 +77,7 @@ public class IntTableFNTStrategy
 
     private void divideElements(ArrayAccess arrayAccess, int divisor)
             throws ApfloatRuntimeException {
-        int inverseFactor = modDivide((int) 1, divisor);
+        int inverseFactor = modDivide(1, divisor);
         int[] data = arrayAccess.getIntData();
         int length = arrayAccess.getLength(),
                 offset = arrayAccess.getOffset();

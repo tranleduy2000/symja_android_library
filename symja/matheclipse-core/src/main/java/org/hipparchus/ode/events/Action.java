@@ -55,6 +55,6 @@ public enum Action {
      * eventOccurred} method when the integration should go
      * on after the event ending the current step.</p>
      */
-    CONTINUE;
+    CONTINUE
 
 }

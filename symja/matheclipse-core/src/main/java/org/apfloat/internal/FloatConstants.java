@@ -13,11 +13,11 @@ public interface FloatConstants {
      * Relative cost of Karatsuba multiplication.
      */
 
-    public static final float KARATSUBA_COST_FACTOR = 6.1f;
+    float KARATSUBA_COST_FACTOR = 6.1f;
 
     /**
      * Relative cost of NTT multiplication.
      */
 
-    public static final float NTT_COST_FACTOR = 7.4f;
+    float NTT_COST_FACTOR = 7.4f;
 }

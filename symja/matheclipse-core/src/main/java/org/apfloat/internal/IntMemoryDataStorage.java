@@ -71,7 +71,7 @@ public class IntMemoryDataStorage
                 bufferSize = ctx.getBlockSize() / 4;
 
         while (readSize > 0) {
-            int length = (int) Math.min(bufferSize, readSize);
+            int length = Math.min(bufferSize, readSize);
 
             ArrayAccess arrayAccess = dataStorage.getArray(READ, position, length);
             System.arraycopy(arrayAccess.getIntData(), arrayAccess.getOffset(), this.data, position, length);

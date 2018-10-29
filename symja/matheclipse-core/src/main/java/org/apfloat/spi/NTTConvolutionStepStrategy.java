@@ -25,7 +25,7 @@ public interface NTTConvolutionStepStrategy
      * @param modulus Which modulus to use (0, 1, 2)
      */
 
-    public void multiplyInPlace(DataStorage sourceAndDestination, DataStorage source, int modulus)
+    void multiplyInPlace(DataStorage sourceAndDestination, DataStorage source, int modulus)
         throws ApfloatRuntimeException;
 
     /**
@@ -39,6 +39,6 @@ public interface NTTConvolutionStepStrategy
      * @param modulus Which modulus to use (0, 1, 2)
      */
 
-    public void squareInPlace(DataStorage sourceAndDestination, int modulus)
+    void squareInPlace(DataStorage sourceAndDestination, int modulus)
         throws ApfloatRuntimeException;
 }

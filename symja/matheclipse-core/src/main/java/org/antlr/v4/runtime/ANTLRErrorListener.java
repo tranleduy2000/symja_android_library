@@ -49,12 +49,12 @@ public interface ANTLRErrorListener {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public void syntaxError(Recognizer<?, ?> recognizer,
-                            Object offendingSymbol,
-                            int line,
-                            int charPositionInLine,
-                            String msg,
-                            RecognitionException e);
+    void syntaxError(Recognizer<?, ?> recognizer,
+                     Object offendingSymbol,
+                     int line,
+                     int charPositionInLine,
+                     String msg,
+                     RecognitionException e);
 
 	/**
 	 * This method is called by the parser when a full-context prediction

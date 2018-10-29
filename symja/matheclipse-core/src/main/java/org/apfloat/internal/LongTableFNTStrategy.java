@@ -66,7 +66,7 @@ public class LongTableFNTStrategy
 
         inverseTableFNT(arrayAccess, wTable, null);
 
-        divideElements(arrayAccess, (long) totalTransformLength);
+        divideElements(arrayAccess, totalTransformLength);
 
         arrayAccess.close();
     }

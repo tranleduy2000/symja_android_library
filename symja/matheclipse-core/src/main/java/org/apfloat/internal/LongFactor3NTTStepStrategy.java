@@ -72,7 +72,7 @@ public class LongFactor3NTTStepStrategy
         final long w = (isInverse ?
                 getInverseNthRoot(PRIMITIVE_ROOT[modulus], length) :
                 getForwardNthRoot(PRIMITIVE_ROOT[modulus], length)),   // Forward/inverse n:th root
-                w3 = modPow(w, (long) power2length),                     // Forward/inverse 3rd root
+                w3 = modPow(w, power2length),                     // Forward/inverse 3rd root
                 ww = modMultiply(w, w),
                 w1 = negate(modDivide((long) 3, (long) 2)),
                 w2 = modAdd(w3, modDivide((long) 1, (long) 2));
@@ -112,8 +112,8 @@ public class LongFactor3NTTStepStrategy
         }
 
         public void run() {
-            long tmp1 = modPow(this.w, (long) this.startColumn),
-                    tmp2 = modPow(this.ww, (long) this.startColumn);
+            long tmp1 = modPow(this.w, this.startColumn),
+                    tmp2 = modPow(this.ww, this.startColumn);
 
             DataStorage.Iterator iterator0 = this.dataStorage0.iterator(DataStorage.READ_WRITE, this.startColumn, this.startColumn + this.columns),
                     iterator1 = this.dataStorage1.iterator(DataStorage.READ_WRITE, this.startColumn, this.startColumn + this.columns),

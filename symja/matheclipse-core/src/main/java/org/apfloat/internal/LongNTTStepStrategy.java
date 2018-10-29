@@ -69,7 +69,7 @@ public class LongNTTStepStrategy
                 getInverseNthRoot(PRIMITIVE_ROOT[modulus], length) :
                 getForwardNthRoot(PRIMITIVE_ROOT[modulus], length));
         final long scaleFactor = (isInverse ?
-                modDivide((long) 1, (long) totalTransformLength) :
+                modDivide((long) 1, totalTransformLength) :
                 (long) 1);
 
         ParallelRunnable parallelRunnable = new ParallelRunnable(rows) {
