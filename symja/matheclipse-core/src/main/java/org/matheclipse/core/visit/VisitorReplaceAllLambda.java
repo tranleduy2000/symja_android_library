@@ -44,7 +44,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
@@ -53,7 +53,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
@@ -62,7 +62,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
@@ -71,7 +71,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
@@ -80,7 +80,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
@@ -89,7 +89,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
@@ -98,7 +98,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
@@ -107,7 +107,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
@@ -129,7 +129,8 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	@Override
 	protected IExpr visitAST(IAST ast) {
 		IExpr temp;
-		IASTMutable result = F.NIL;
+        //noinspection RedundantCast
+        IASTMutable result = (IASTMutable) F.NIL;
 		int i = fOffset;
 		int size = ast.size();
 		while (i < size) {

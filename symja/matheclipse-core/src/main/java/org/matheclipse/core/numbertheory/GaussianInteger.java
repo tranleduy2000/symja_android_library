@@ -35,7 +35,8 @@ public final class GaussianInteger {
 		SortedMap<ComplexSym, Integer> complexMap = new TreeMap<ComplexSym, Integer>();
 		g.gaussianFactorization2(re, im, complexMap);
 		IASTAppendable list = F.ListAlloc(complexMap.size() + 1);
-		IExpr factor = F.C1;
+		//noinspection RedundantCast,UnusedAssignment
+		IExpr factor = (IExpr) F.C1;
 		IASTAppendable ast = F.TimesAlloc(complexMap.size());
 		for (Map.Entry<ComplexSym, Integer> entry : complexMap.entrySet()) {
 			ComplexSym key = entry.getKey();

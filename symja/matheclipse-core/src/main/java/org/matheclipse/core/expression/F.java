@@ -157,10 +157,8 @@ public class F {
 	 * predicate returns <code>false</code>. The main method to check if the object is valid is the
 	 * <code>isPresent()</code> method. The method is similar to <code>java.util.Optional#isPresent()</code>.
 	 * </p>
-	 * 
-	 * @see java.util.Optional#isPresent
 	 */
-	public final static IASTAppendable NIL = new NILPointer();
+	public final static NILPointer NIL = new NILPointer();
 
 
     /***/
