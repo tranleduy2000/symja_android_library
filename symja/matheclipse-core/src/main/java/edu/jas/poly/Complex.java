@@ -389,7 +389,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
     }
 
 
-    /* arithmetic operations: conjugate, absolut value 
+    /* arithmetic operations: conjugate, absolut value
      */
 
     /**
@@ -430,7 +430,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
     }
 
 
-    /* arithmetic operations: *, inverse, / 
+    /* arithmetic operations: *, inverse, /
      */
 
 

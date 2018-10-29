@@ -362,7 +362,7 @@ public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends Solvab
      *
      * @param Pp polynomial list.
      * @param Ap polynomial.
-     * @return (nf(Ap), mf ) with respect to Pp and mf as multiplication factor
+     * @return (nf ( Ap), mf ) with respect to Pp and mf as multiplication factor
      * for Ap.
      */
     @SuppressWarnings("unchecked")
@@ -594,7 +594,7 @@ public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends Solvab
      *
      * @param Pp polynomial list.
      * @param Ap polynomial.
-     * @return (nf(Ap), mf ) with respect to Pp and mf as multiplication factor
+     * @return (nf ( Ap), mf ) with respect to Pp and mf as multiplication factor
      * for Ap. <b>Note: </b> not implemented;
      */
     public PseudoReductionEntry<C> rightNormalformFactor(List<GenSolvablePolynomial<C>> Pp,

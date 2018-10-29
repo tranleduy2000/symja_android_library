@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.Element;
+import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RegularRingElem;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
@@ -272,7 +272,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Product comparison.
      *
      * @param b Product.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     @Override
     public int compareTo(Product<C> b) {

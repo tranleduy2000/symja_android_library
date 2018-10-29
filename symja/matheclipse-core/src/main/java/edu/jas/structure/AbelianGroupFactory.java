@@ -11,7 +11,7 @@ package edu.jas.structure;
  * @author Heinz Kredel
  */
 
-public interface AbelianGroupFactory<C extends AbelianGroupElem<C>> extends ElemFactory<C> {
+public interface AbelianGroupFactory<C> extends ElemFactory<C> {
 
 
     /**

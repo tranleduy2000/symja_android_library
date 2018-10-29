@@ -285,7 +285,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Local comparison.
      *
      * @param b Local.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     @Override
     public int compareTo(Local<C> b) {

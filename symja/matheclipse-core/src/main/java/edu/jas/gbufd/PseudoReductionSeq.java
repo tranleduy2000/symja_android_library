@@ -331,7 +331,7 @@ public class PseudoReductionSeq<C extends RingElem<C>> extends ReductionAbstract
      *
      * @param Pp polynomial list.
      * @param Ap polynomial.
-     * @return (nf(Ap), mf ) with respect to Pp and mf as multiplication factor
+     * @return (nf ( Ap), mf ) with respect to Pp and mf as multiplication factor
      * for Ap.
      */
     @SuppressWarnings("unchecked")

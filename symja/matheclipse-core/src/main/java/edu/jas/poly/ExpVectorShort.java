@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 public final class ExpVectorShort extends ExpVector
-/*implements AbelianGroupElem<ExpVectorShort>*/ {
+        /*implements AbelianGroupElem<ExpVectorShort>*/ {
 
 
     /**

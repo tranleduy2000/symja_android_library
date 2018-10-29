@@ -32,7 +32,7 @@ import edu.jas.structure.RingFactory;
  */
 
 public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingFactory<GenWordPolynomial<C>>
-/*, Iterable<GenWordPolynomial<C>>*/ {
+        /*, Iterable<GenWordPolynomial<C>>*/ {
 
 
     /**

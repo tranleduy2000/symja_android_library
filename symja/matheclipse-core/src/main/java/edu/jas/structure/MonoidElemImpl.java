@@ -1,6 +1,6 @@
 package edu.jas.structure;
 
-public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidElem<C> {
+public abstract class MonoidElemImpl<C extends MonoidElem> implements MonoidElem<C> {
 
     /**
      * Quotient and remainder by division of this by S.

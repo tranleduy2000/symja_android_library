@@ -45,7 +45,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
      * GenPolynomial polynomial greatest squarefree divisor.
      *
      * @param P GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     public abstract GenPolynomial<C> baseSquarefreePart(GenPolynomial<C> P);
 
@@ -64,7 +64,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
      * GenPolynomial recursive polynomial greatest squarefree divisor.
      *
      * @param P recursive univariate GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     public abstract GenPolynomial<GenPolynomial<C>> recursiveUnivariateSquarefreePart(
             GenPolynomial<GenPolynomial<C>> P);
@@ -404,7 +404,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
      * GenPolynomial recursive polynomial greatest squarefree divisor.
      *
      * @param P recursive GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     public GenPolynomial<GenPolynomial<C>> recursiveSquarefreePart(GenPolynomial<GenPolynomial<C>> P) {
         if (P == null || P.isZERO()) {

@@ -561,7 +561,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
     }
 
 
-    /* arithmetic operations: conjugate, absolut value 
+    /* arithmetic operations: conjugate, absolut value
      */
 
     /**
@@ -627,7 +627,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
     }
 
 
-    /* arithmetic operations: *, inverse, / 
+    /* arithmetic operations: *, inverse, /
      */
 
     /**

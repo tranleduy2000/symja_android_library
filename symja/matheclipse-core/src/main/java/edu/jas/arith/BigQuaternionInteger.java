@@ -169,7 +169,7 @@ public final class BigQuaternionInteger extends BigQuaternion
      */
 
 
-    /* arithmetic operations: *, inverse, / 
+    /* arithmetic operations: *, inverse, /
      */
 
     /**
@@ -331,7 +331,7 @@ public final class BigQuaternionInteger extends BigQuaternion
      * be also an integral (Hurwitz) quaternion number.
      *
      * @param b an integral (Hurwitz) quaternion number
-     * @return [round(b**(-1)) this, this - b * (round(b**(-1)) this)].
+     * @return [round(b * * ( - 1)) this, this - b * (round(b**(-1)) this)].
      */
     public BigQuaternion[] leftQuotientAndRemainder(BigQuaternion b) {
         //System.out.println("left QR = " + this + ", " + b);

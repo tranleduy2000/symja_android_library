@@ -677,7 +677,7 @@ public abstract class SolvableSyzygyAbstract<C extends GcdRingElem<C>> implement
      * @param den SolvablePolynomial.
      * @param n   SolvablePolynomial.
      * @param d   SolvablePolynomial.
-     * @return sign((num/den)-(n/d)).
+     * @return sign(( num / den)-(n/d)).
      */
     public int compare(GenSolvablePolynomial<C> num, GenSolvablePolynomial<C> den,
                        GenSolvablePolynomial<C> n, GenSolvablePolynomial<C> d) {

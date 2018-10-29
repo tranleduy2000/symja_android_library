@@ -188,7 +188,7 @@ public class CharacteristicSetWu<C extends GcdRingElem<C>> implements Characteri
      *
      * @param P generic polynomial.
      * @param A list of generic polynomials as characteristic set.
-     * @return characteristicSetReductionCoeff(A, characteristicSetRemainder(A, P))
+     * @return characteristicSetReductionCoeff(A, characteristicSetRemainder ( A, P))
      */
     public GenPolynomial<C> characteristicSetReduction(List<GenPolynomial<C>> A, GenPolynomial<C> P) {
         if (A == null || A.isEmpty()) {

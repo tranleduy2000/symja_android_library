@@ -588,7 +588,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
     }
 
 
-    /* arithmetic operations: conjugate, absolute value 
+    /* arithmetic operations: conjugate, absolute value
      */
 
     /**
@@ -647,7 +647,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
     }
 
 
-    /* arithmetic operations: *, inverse, / 
+    /* arithmetic operations: *, inverse, /
      */
 
     /**

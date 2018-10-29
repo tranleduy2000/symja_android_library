@@ -299,7 +299,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
      * SolvableQuotient comparison.
      *
      * @param b SolvableQuotient.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     @Override
     public int compareTo(SolvableQuotient<C> b) {

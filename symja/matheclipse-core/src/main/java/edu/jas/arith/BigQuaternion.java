@@ -602,7 +602,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
 
-    /* arithmetic operations: conjugate, absolute value 
+    /* arithmetic operations: conjugate, absolute value
      */
 
     /**
@@ -670,7 +670,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
 
-    /* arithmetic operations: *, inverse, / 
+    /* arithmetic operations: *, inverse, /
      */
 
     /**

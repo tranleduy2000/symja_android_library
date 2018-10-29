@@ -257,7 +257,7 @@ public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>
      * Comparison.
      *
      * @param facs factors container.
-     * @return sign(this.poly-facs.poly) lexicographic &gt;
+     * @return sign(this.poly - facs.poly) lexicographic &gt;
      * sign(afac.modul-facs.afac.modul) lexicographic &gt;
      * afactors.compareTo(facs.afactors) lexicographic &gt;
      * arfactors[i].compareTo(facs.arfactors[i])

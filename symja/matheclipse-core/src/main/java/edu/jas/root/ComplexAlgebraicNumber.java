@@ -26,7 +26,7 @@ import edu.jas.structure.RingElemImpl;
  */
 
 public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends RingElemImpl<ComplexAlgebraicNumber<C>>
-                /*extends AlgebraicNumber<C>*/
+        /*extends AlgebraicNumber<C>*/
         implements GcdRingElem<ComplexAlgebraicNumber<C>> {
 
 
@@ -189,7 +189,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * ComplexAlgebraicNumber comparison.
      *
      * @param b ComplexAlgebraicNumber.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     @Override
     public int compareTo(ComplexAlgebraicNumber<C> b) {

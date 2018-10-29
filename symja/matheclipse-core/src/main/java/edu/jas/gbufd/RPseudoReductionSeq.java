@@ -145,7 +145,7 @@ public class RPseudoReductionSeq<C extends RegularRingElem<C>> extends RReductio
      *
      * @param Pp polynomial list.
      * @param Ap polynomial.
-     * @return (nf(Ap), mf ) with respect to Pp and mf as multiplication factor
+     * @return (nf ( Ap), mf ) with respect to Pp and mf as multiplication factor
      * for Ap.
      */
     @SuppressWarnings("cast")

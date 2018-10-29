@@ -631,7 +631,7 @@ public class GenSolvablePolynomialRing<C extends RingElem<C>> extends GenPolynom
      *
      * @param modv number of module variables.
      * @param e    the exponent of the variables.
-     * @return List(X_1^e, ..., X_n^e) a list of univariate polynomials.
+     * @return List(X_1 ^ e, ..., X_n ^ e) a list of univariate polynomials.
      */
     @Override
     public List<GenSolvablePolynomial<C>> univariateList(int modv, long e) {

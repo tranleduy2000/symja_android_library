@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.Element;
+import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
 
 

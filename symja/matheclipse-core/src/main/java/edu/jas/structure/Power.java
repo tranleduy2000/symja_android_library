@@ -359,7 +359,7 @@ public class Power<C extends RingElem<C>> {
      *
      * @param A   list of elements (a_0,...,a_k).
      * @param fac ring factory.
-     * @return prod(i=0, ...k) a_i.
+     * @return prod(i = 0, ...k) a_i.
      */
     public static <C extends RingElem<C>> C multiply(RingFactory<C> fac, List<C> A) {
         return multiply((MonoidFactory<C>) fac, A);
@@ -370,7 +370,7 @@ public class Power<C extends RingElem<C>> {
      *
      * @param A   list of elements (a_0,...,a_k).
      * @param fac monoid factory.
-     * @return prod(i=0, ...k) a_i.
+     * @return prod(i = 0, ...k) a_i.
      */
     public static <C extends MonoidElem<C>> C multiply(MonoidFactory<C> fac, List<C> A) {
         if (fac == null) {
@@ -391,7 +391,7 @@ public class Power<C extends RingElem<C>> {
      *
      * @param A   list of elements (a_0,...,a_k).
      * @param fac ring factory.
-     * @return sum(i=0, ...k) a_i.
+     * @return sum(i = 0, ...k) a_i.
      */
     public static <C extends RingElem<C>> C sum(RingFactory<C> fac, List<C> A) {
         return sum((AbelianGroupFactory<C>) fac, A);
@@ -402,7 +402,7 @@ public class Power<C extends RingElem<C>> {
      *
      * @param A   list of elements (a_0,...,a_k).
      * @param fac monoid factory.
-     * @return sum(i=0, ...k) a_i.
+     * @return sum(i = 0, ...k) a_i.
      */
     public static <C extends AbelianGroupElem<C>> C sum(AbelianGroupFactory<C> fac, List<C> A) {
         if (fac == null) {

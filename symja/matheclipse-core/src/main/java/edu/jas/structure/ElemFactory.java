@@ -19,7 +19,7 @@ import java.util.Random;
  * @author Heinz Kredel
  */
 
-public interface ElemFactory<C extends Element<C>> extends Serializable {
+public interface ElemFactory<C> extends Serializable {
 
 
     /**

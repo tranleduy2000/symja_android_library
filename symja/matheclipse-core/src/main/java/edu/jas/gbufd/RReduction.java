@@ -74,7 +74,7 @@ public interface RReduction<C extends RegularRingElem<C>> extends Reduction<C> {
      * Reduced boolean closure, compute BC(A) for all A in F.
      *
      * @param F polynomial list.
-     * @return red(bc(F)) = bc(red(F)).
+     * @return red(bc ( F)) = bc(red(F)).
      */
     List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F);
 
@@ -84,7 +84,7 @@ public interface RReduction<C extends RegularRingElem<C>> extends Reduction<C> {
      *
      * @param A polynomial.
      * @param F polynomial list.
-     * @return red(bc(A)).
+     * @return red(bc ( A)).
      */
     List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F,
                                                  GenPolynomial<C> A);

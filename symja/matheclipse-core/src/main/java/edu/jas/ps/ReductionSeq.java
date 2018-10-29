@@ -26,7 +26,7 @@ import edu.jas.structure.RingElem;
  */
 
 public class ReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
-/*todo: extends ReductionAbstract<C>*/ {
+        /*todo: extends ReductionAbstract<C>*/ {
 
 
     private static final Logger logger = Logger.getLogger(ReductionSeq.class);

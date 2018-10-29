@@ -1108,7 +1108,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
      * @param e exponent for P.
      * @param F list of univariate GenPolynomials from a partial fraction
      *          computation.
-     * @return (F0 + sum( Fi / P^i)) * P^e.
+     * @return (F0 + sum ( Fi / P ^ i)) * P^e.
      */
     public GenPolynomial<C> basePartialFractionValue(GenPolynomial<C> P, int e, List<GenPolynomial<C>> F) {
         if (P == null || F == null || e == 0) {

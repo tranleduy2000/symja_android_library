@@ -50,7 +50,7 @@ public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
      * GenPolynomial greatest squarefree divisor.
      *
      * @param P GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     GenPolynomial<C> squarefreePart(GenPolynomial<C> P);
 

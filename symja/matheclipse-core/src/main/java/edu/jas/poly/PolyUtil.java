@@ -1827,7 +1827,7 @@ public class PolyUtil {
      * @param cfac coefficent polynomial ring factory.
      * @param A    recursive polynomial to be evaluated.
      * @param a    value to evaluate at.
-     * @return A(x_1, ..., x_{n-1}, a).
+     * @return A(x_1, ..., x_ { n - 1 }, a).
      */
     public static <C extends RingElem<C>> GenPolynomial<C> evaluateMainRecursive(GenPolynomialRing<C> cfac,
                                                                                  GenPolynomial<GenPolynomial<C>> A, C a) {
@@ -1872,7 +1872,7 @@ public class PolyUtil {
      * @param cfac coefficent polynomial ring factory.
      * @param A    distributed polynomial to be evaluated.
      * @param a    value to evaluate at.
-     * @return A(x_1, ..., x_{n-1}, a).
+     * @return A(x_1, ..., x_ { n - 1 }, a).
      */
     public static <C extends RingElem<C>> GenPolynomial<C> evaluateMain(GenPolynomialRing<C> cfac,
                                                                         GenPolynomial<C> A, C a) {
@@ -1895,7 +1895,7 @@ public class PolyUtil {
      * @param cfac coefficent ring factory.
      * @param L    list of univariate polynomials to be evaluated.
      * @param a    value to evaluate at.
-     * @return list(A( x_1, ..., x_{n-1}, a) ) for A in L.
+     * @return list(A ( x_1, ..., x_ { n - 1 }, a) ) for A in L.
      */
     public static <C extends RingElem<C>> List<GenPolynomial<C>> evaluateMain(GenPolynomialRing<C> cfac,
                                                                               List<GenPolynomial<C>> L, C a) {
@@ -1954,7 +1954,7 @@ public class PolyUtil {
      * @param cfac coefficent ring factory.
      * @param L    list of univariate polynomial to be evaluated.
      * @param a    value to evaluate at.
-     * @return list(A( a) ) for A in L.
+     * @return list(A ( a) ) for A in L.
      */
     public static <C extends RingElem<C>> List<C> evaluateMain(RingFactory<C> cfac, List<GenPolynomial<C>> L,
                                                                C a) {
@@ -1978,7 +1978,7 @@ public class PolyUtil {
      *             x_{k+1}, ..., x_n] factory.
      * @param A    polynomial to be evaluated.
      * @param a    value to evaluate at.
-     * @return A(x_1, ..., x_{k-1}, a, x_{k+1}, ..., x_n).
+     * @return A(x_1, ..., x_ { k - 1 }, a, x_ { k + 1 }, ..., x_n).
      */
     public static <C extends RingElem<C>> GenPolynomial<C> evaluate(GenPolynomialRing<C> cfac,
                                                                     GenPolynomialRing<GenPolynomial<C>> rfac, GenPolynomialRing<GenPolynomial<C>> nfac,

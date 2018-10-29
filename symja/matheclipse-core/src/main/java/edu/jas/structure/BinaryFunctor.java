@@ -14,7 +14,7 @@ package edu.jas.structure;
  * @author Heinz Kredel
  */
 
-public interface BinaryFunctor<C1 extends Element<C1>, C2 extends Element<C2>, D extends Element<D>> {
+public interface BinaryFunctor<C1, C2, D> {
 
 
     /**

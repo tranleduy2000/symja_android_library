@@ -20,8 +20,8 @@ import java.util.TreeMap;
 
 import edu.jas.kern.PreemptingException;
 import edu.jas.kern.PrettyPrint;
-import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.Element;
+import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.UnaryFunctor;
@@ -578,7 +578,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * GenPolynomial comparison.
      *
      * @param b GenPolynomial.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     public int compareTo(GenPolynomial<C> b) {
         if (b == null) {
@@ -625,7 +625,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
     /**
      * GenPolynomial signum.
      *
-     * @return sign(ldcf(this)).
+     * @return sign(ldcf ( this)).
      */
     public int signum() {
         if (this.isZERO()) {
@@ -2431,7 +2431,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * polynomials over fields.
      *
      * @param e exponent.
-     * @return this(x**e)
+     * @return this(x * * e)
      */
     public GenPolynomial<C> inflate(long e) {
         if (e == 1) {

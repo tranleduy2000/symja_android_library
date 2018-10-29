@@ -180,7 +180,7 @@ public class Interval<C extends RingElem<C> & Rational> implements Serializable 
     /**
      * Rational middle point.
      *
-     * @return (left+right)/2;
+     * @return (left + right)/2;
      */
     public BigRational rationalMiddle() {
         BigRational m = left.getRational().sum(right.getRational());
@@ -193,7 +193,7 @@ public class Interval<C extends RingElem<C> & Rational> implements Serializable 
     /**
      * Middle point.
      *
-     * @return (left+right)/2;
+     * @return (left + right)/2;
      */
     public C middle() {
         C m = left.sum(right);

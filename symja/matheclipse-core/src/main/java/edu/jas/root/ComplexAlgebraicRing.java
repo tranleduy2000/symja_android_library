@@ -33,7 +33,7 @@ import edu.jas.structure.RingFactory;
  */
 
 public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
-                /*extends AlgebraicNumberRing<C>*/
+        /*extends AlgebraicNumberRing<C>*/
         implements RingFactory<ComplexAlgebraicNumber<C>> {
 
 
@@ -129,8 +129,8 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      *
      * @param e epsilon.
      */
-    public synchronized void setEps(BigRational e) {
-        this.eps = e; //algebraic.ring.coFac.parse(e.toString()).getRe();
+    public synchronized void setEps(C e) {
+        setEps(e.getRational());
     }
 
     /**
@@ -138,8 +138,8 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      *
      * @param e epsilon.
      */
-    public synchronized void setEps(C e) {
-        setEps(e.getRational());
+    public synchronized void setEps(BigRational e) {
+        this.eps = e; //algebraic.ring.coFac.parse(e.toString()).getRe();
     }
 
     /**

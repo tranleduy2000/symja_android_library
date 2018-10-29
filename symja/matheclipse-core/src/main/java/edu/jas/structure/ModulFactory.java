@@ -15,7 +15,7 @@ import java.util.List;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public interface ModulFactory<M extends ModulElem<M, C>, C extends RingElem<C>> extends
+public interface ModulFactory<M, C> extends
         AbelianGroupFactory<M> {
 
 

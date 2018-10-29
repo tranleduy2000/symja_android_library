@@ -240,7 +240,7 @@ public class WordPseudoReductionSeq<C extends RingElem<C>> extends WordReduction
      *
      * @param Pp polynomial list.
      * @param Ap polynomial.
-     * @return (nf(Ap), mf ) with respect to Pp and mf as multiplication factor
+     * @return (nf ( Ap), mf ) with respect to Pp and mf as multiplication factor
      * for Ap.
      */
     public WordPseudoReductionEntry<C> normalformFactor(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {

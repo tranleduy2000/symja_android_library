@@ -160,14 +160,14 @@ public class GenPolynomialTokenizer {
      * @param s String. Syntax:
      *          <p>
      *          <pre>
-     *          (n1,...,nk)
-     *                     </pre>
+     *                   (n1,...,nk)
+     *                              </pre>
      *          <p>
      *          or
      *          <p>
      *          <pre>
-     *          (n1 ... nk)
-     *                     </pre>
+     *                   (n1 ... nk)
+     *                              </pre>
      *          <p>
      *          parenthesis are optional.
      * @return array of variable names found in s.
