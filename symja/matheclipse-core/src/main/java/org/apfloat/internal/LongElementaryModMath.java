@@ -2,22 +2,22 @@ package org.apfloat.internal;
 
 /**
  * Elementary modulo arithmetic functions for <code>long</code> data.<p>
- *
+ * <p>
  * Modular addition and subtraction are trivial, when the modulus is less
  * than 2<sup>63</sup> and overflow can be detected easily.<p>
- *
+ * <p>
  * Modular multiplication is more complicated, and since it is usually
  * the single most time consuming operation in the whole program execution,
  * the very core of the Number Theoretic Transform (NTT), it should be
  * carefully optimized.<p>
- *
+ * <p>
  * The algorithm for multiplying two <code>long</code>s and taking the
  * remainder is not entirely obvious. The basic problem is to get the
  * full 128-bit result of multiplying two 64-bit integers. It would be
  * possible to do this by splitting the arguments to high and low 32-bit
  * words and performing four multiplications. The performance of this
  * solution would be not very good.<p>
- *
+ * <p>
  * Another approach is to use <code>long</code>s only for getting the lowest
  * 64 bits of the result. Casting the operands to <code>double</code> and
  * multiplying as floating-point numbers, we can get the highest (roughly) 52
@@ -28,17 +28,17 @@ package org.apfloat.internal;
  * actually prevent getting even 52 of the top bits accurately, and actually
  * only 57 bits can be used in the multiplication operands. This is the
  * approach chosen in this implementation.<p>
- *
+ * <p>
  * The first observation is that since the modulus is practically
  * constant, it should be more efficient to calculate (once) the inverse
  * of the modulus, and then subsequently multiply by the inverse modulus
  * instead of dividing by the modulus.<p>
- *
+ * <p>
  * The second observation is that to get the remainder of the division,
  * we don't necessarily need the actual result of the division (we just
  * want the remainder). So, we should discard the topmost 50 bits of the
  * full 114-bit result whenever possible, to save a few operations.<p>
- *
+ * <p>
  * The basic approach is to get an approximation of <code>a * b / modulus</code>
  * (using floating-point operands, that is <code>double</code>s). The approximation
  * should be within +1 or -1 of the correct result. We first calculate
@@ -52,18 +52,19 @@ package org.apfloat.internal;
  * It is then easy to detect the case when the approximate division was off by one (and the
  * remainder is <code>&#177;modulus</code> off) as the final step of the algorithm.
  *
- * @version 1.0
  * @author Mikko Tommila
+ * @version 1.0
  */
 
-public class LongElementaryModMath
-{
+public class LongElementaryModMath {
+    private long modulus;
+    private double inverseModulus;
+
     /**
      * Default constructor.
      */
 
-    public LongElementaryModMath()
-    {
+    public LongElementaryModMath() {
     }
 
     /**
@@ -71,12 +72,10 @@ public class LongElementaryModMath
      *
      * @param a First operand.
      * @param b Second operand.
-     *
      * @return <code>a * b % modulus</code>
      */
 
-    public final long modMultiply(long a, long b)
-    {
+    public final long modMultiply(long a, long b) {
         long r = a * b - this.modulus * (long) ((double) a * (double) b * this.inverseModulus);
         r -= this.modulus * (int) ((double) r * this.inverseModulus);
 
@@ -91,12 +90,10 @@ public class LongElementaryModMath
      *
      * @param a First operand.
      * @param b Second operand.
-     *
      * @return <code>(a + b) % modulus</code>
      */
 
-    public final long modAdd(long a, long b)
-    {
+    public final long modAdd(long a, long b) {
         long r = a + b;
 
         return (r >= this.modulus ? r - this.modulus : r);
@@ -107,12 +104,10 @@ public class LongElementaryModMath
      *
      * @param a First operand.
      * @param b Second operand.
-     *
      * @return <code>(a - b + modulus) % modulus</code>
      */
 
-    public final long modSubtract(long a, long b)
-    {
+    public final long modSubtract(long a, long b) {
         long r = a - b;
 
         return (r < 0 ? r + this.modulus : r);
@@ -124,8 +119,7 @@ public class LongElementaryModMath
      * @return The modulus.
      */
 
-    public final long getModulus()
-    {
+    public final long getModulus() {
         return this.modulus;
     }
 
@@ -135,12 +129,8 @@ public class LongElementaryModMath
      * @param modulus The modulus.
      */
 
-    public final void setModulus(long modulus)
-    {
+    public final void setModulus(long modulus) {
         this.inverseModulus = 1.0 / modulus;
         this.modulus = modulus;
     }
-
-    private long modulus;
-    private double inverseModulus;
 }

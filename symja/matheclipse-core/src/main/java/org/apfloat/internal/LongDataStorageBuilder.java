@@ -6,39 +6,33 @@ import org.apfloat.spi.DataStorage;
 /**
  * Default data storage creation strategy for the <code>long</code> data type.
  *
+ * @author Mikko Tommila
+ * @version 1.7.0
  * @see LongMemoryDataStorage
  * @see LongDiskDataStorage
- *
- * @version 1.7.0
- * @author Mikko Tommila
  */
 
 public class LongDataStorageBuilder
-    extends AbstractDataStorageBuilder
-{
+        extends AbstractDataStorageBuilder {
     /**
      * Default constructor.
      */
 
-    public LongDataStorageBuilder()
-    {
+    public LongDataStorageBuilder() {
     }
 
     protected DataStorage createCachedDataStorage()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return new LongMemoryDataStorage();
     }
 
     protected DataStorage createNonCachedDataStorage()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return new LongDiskDataStorage();
     }
 
     protected boolean isCached(DataStorage dataStorage)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return (dataStorage instanceof LongMemoryDataStorage);
     }
 }

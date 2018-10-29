@@ -9,11 +9,11 @@ import org.apfloat.spi.Util;
 
 /**
  * Abstract base class for creating convolutions of suitable type for the specified length.<p>
- *
+ * <p>
  * Based on a work estimate, depending on the operand sizes and implementation-dependent
  * factors, the O(n<sup>2</sup>) long multiplication, Karatsuba multiplication and
  * the NTT algorithms are chosen e.g. as follows:<p>
- *
+ * <p>
  * <table border="1">
  * <tr><th>size1</th><th>size2</th><th>Algorithm</th></tr>
  * <tr><td>16</td><td>16</td><td>Long</td></tr>
@@ -32,52 +32,41 @@ import org.apfloat.spi.Util;
  * <tr><td>512</td><td>4294967296</td><td>NTT</td></tr>
  * </table>
  *
- * @since 1.7.0
- * @version 1.7.0
  * @author Mikko Tommila
+ * @version 1.7.0
+ * @since 1.7.0
  */
 
 public abstract class AbstractConvolutionBuilder
-    implements ConvolutionBuilder
-{
+        implements ConvolutionBuilder {
+    private static final double LOG2_3 = Math.log(3.0) / Math.log(2.0);
+
     /**
      * Subclass constructor.
      */
 
-    protected AbstractConvolutionBuilder()
-    {
+    protected AbstractConvolutionBuilder() {
     }
 
-    public ConvolutionStrategy createConvolution(int radix, long size1, long size2, long resultSize)
-    {
+    public ConvolutionStrategy createConvolution(int radix, long size1, long size2, long resultSize) {
         long minSize = Math.min(size1, size2),
-             maxSize = Math.max(size1, size2),
-             totalSize = size1 + size2;
+                maxSize = Math.max(size1, size2),
+                totalSize = size1 + size2;
 
-        if (minSize == 1)
-        {
+        if (minSize == 1) {
             return createShortConvolutionStrategy(radix);
-        }
-        else if (minSize <= getKaratsubaCutoffPoint())
-        {
+        } else if (minSize <= getKaratsubaCutoffPoint()) {
             return createMediumConvolutionStrategy(radix);
-        }
-        else
-        {
+        } else {
             float mediumCost = (float) minSize * maxSize,
-                  karatsubaCost = getKaratsubaCostFactor() * (float) Math.pow((double) minSize, LOG2_3) * maxSize / minSize,
-                  nttCost = getNTTCostFactor() * totalSize * Util.log2down(totalSize);
+                    karatsubaCost = getKaratsubaCostFactor() * (float) Math.pow((double) minSize, LOG2_3) * maxSize / minSize,
+                    nttCost = getNTTCostFactor() * totalSize * Util.log2down(totalSize);
 
-            if (mediumCost <= Math.min(karatsubaCost, nttCost))
-            {
+            if (mediumCost <= Math.min(karatsubaCost, nttCost)) {
                 return createMediumConvolutionStrategy(radix);
-            }
-            else if (karatsubaCost <= nttCost)
-            {
+            } else if (karatsubaCost <= nttCost) {
                 return createKaratsubaConvolutionStrategy(radix);
-            }
-            else
-            {
+            } else {
                 ApfloatContext ctx = ApfloatContext.getContext();
                 NTTBuilder nttBuilder = ctx.getBuilderFactory().getNTTBuilder();
                 NTTStrategy nttStrategy = nttBuilder.createNTT(totalSize);
@@ -93,7 +82,6 @@ public abstract class AbstractConvolutionBuilder
      * medium-length convolution strategy should be used instead.
      *
      * @return The Karatsuba convolution cutoff point.
-     *
      * @since 1.7.0
      */
 
@@ -105,7 +93,6 @@ public abstract class AbstractConvolutionBuilder
      * convolution strategy for the given data lengths.
      *
      * @return The Karatsuba convolution cost factor.
-     *
      * @since 1.7.0
      */
 
@@ -117,7 +104,6 @@ public abstract class AbstractConvolutionBuilder
      * convolution strategy for the given data lengths.
      *
      * @return The NTT convolution cost factor.
-     *
      * @since 1.7.0
      */
 
@@ -128,9 +114,7 @@ public abstract class AbstractConvolutionBuilder
      * data set is one.
      *
      * @param radix The radix that will be used.
-     *
      * @return A new short-length convolution strategy.
-     *
      * @since 1.7.0
      */
 
@@ -141,9 +125,7 @@ public abstract class AbstractConvolutionBuilder
      * of the data sets is relatively small (but more than one).
      *
      * @param radix The radix that will be used.
-     *
      * @return A new medium-length convolution strategy.
-     *
      * @since 1.7.0
      */
 
@@ -153,9 +135,7 @@ public abstract class AbstractConvolutionBuilder
      * Create a Karatsuba convolution strategy.
      *
      * @param radix The radix that will be used.
-     *
      * @return A new Karatsuba convolution strategy.
-     *
      * @since 1.7.0
      */
 
@@ -164,15 +144,11 @@ public abstract class AbstractConvolutionBuilder
     /**
      * Create a 3-NTT convolution strategy.
      *
-     * @param radix The radix that will be used.
+     * @param radix       The radix that will be used.
      * @param nttStrategy The underlying NTT strategy.
-     *
      * @return A new 3-NTT convolution strategy.
-     *
      * @since 1.7.0
      */
 
     protected abstract ConvolutionStrategy createThreeNTTConvolutionStrategy(int radix, NTTStrategy nttStrategy);
-
-    private static final double LOG2_3 = Math.log(3.0) / Math.log(2.0);
 }

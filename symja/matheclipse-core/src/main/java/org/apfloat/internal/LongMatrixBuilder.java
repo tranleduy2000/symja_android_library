@@ -7,26 +7,23 @@ import org.apfloat.spi.MatrixStrategy;
  * Creates matrix operations objects, for the
  * <code>long</code> type.
  *
- * @since 1.7.0
- * @version 1.7.0
  * @author Mikko Tommila
+ * @version 1.7.0
+ * @since 1.7.0
  */
 
 public class LongMatrixBuilder
-    implements MatrixBuilder
-{
+        implements MatrixBuilder {
+    private static MatrixStrategy matrixStrategy = new LongMatrixStrategy();
+
     /**
      * Default constructor.
      */
 
-    public LongMatrixBuilder()
-    {
+    public LongMatrixBuilder() {
     }
 
-    public MatrixStrategy createMatrix()
-    {
+    public MatrixStrategy createMatrix() {
         return LongMatrixBuilder.matrixStrategy;
     }
-
-    private static MatrixStrategy matrixStrategy = new LongMatrixStrategy();
 }

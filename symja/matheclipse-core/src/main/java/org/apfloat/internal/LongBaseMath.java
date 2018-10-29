@@ -1,30 +1,33 @@
 package org.apfloat.internal;
 
-import java.io.Serializable;
-
 import org.apfloat.ApfloatRuntimeException;
 import org.apfloat.spi.DataStorage;
-import static org.apfloat.internal.LongRadixConstants.*;
+
+import java.io.Serializable;
+
+import static org.apfloat.internal.LongRadixConstants.BASE;
 
 /**
  * Mathematical operations on numbers in a base.
  * Implementation for the <code>long</code> type.
  *
- * @version 1.6
  * @author Mikko Tommila
+ * @version 1.6
  */
 
 public class LongBaseMath
-    implements Serializable
-{
+        implements Serializable {
+    private static final long serialVersionUID = -6469225916787810664L;
+    private int radix;
+    private double inverseBase;
+
     /**
      * Creates a base math using the specified radix.
      *
      * @param radix The radix that will be used.
      */
 
-    public LongBaseMath(int radix)
-    {
+    public LongBaseMath(int radix) {
         this.radix = radix;
         this.inverseBase = 1.0 / BASE[radix];
     }
@@ -34,38 +37,32 @@ public class LongBaseMath
      * of <code>src1</code> and <code>src2</code> and stores the result to
      * <code>dst</code>. <code>src2</code> may be <code>null</code>, in
      * which case it is ignored (only the carry is propagated).<p>
-     *
+     * <p>
      * Essentially calculates <code>dst[i] = src1[i] + src2[i]</code>.
      *
-     * @param src1 First source data sequence. Can be <code>null</code>, in which case it's ignored.
-     * @param src2 Second source data sequence. Can be <code>null</code>, in which case it's ignored.
+     * @param src1  First source data sequence. Can be <code>null</code>, in which case it's ignored.
+     * @param src2  Second source data sequence. Can be <code>null</code>, in which case it's ignored.
      * @param carry Input carry bit. This is added to the first (rightmost) word in the accessed sequence.
-     * @param dst Destination data sequence.
-     * @param size Number of elements to process.
-     *
+     * @param dst   Destination data sequence.
+     * @param size  Number of elements to process.
      * @return Overflow carry bit. Propagated carry bit from the addition of the last (leftmost) word in the accessed sequence.
      */
 
     public long baseAdd(DataStorage.Iterator src1, DataStorage.Iterator src2, long carry, DataStorage.Iterator dst, long size)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         assert (src1 == null || src1 != src2);
 
         boolean sameDst = (src1 == dst || src2 == dst);
         long base = BASE[this.radix];
 
-        for (long i = 0; i < size; i++)
-        {
+        for (long i = 0; i < size; i++) {
             long result = (src1 == null ? 0 : src1.getLong()) + carry +
-                          (src2 == null ? 0 : src2.getLong());
+                    (src2 == null ? 0 : src2.getLong());
 
-            if (result >= base)
-            {
+            if (result >= base) {
                 result -= base;
                 carry = 1;
-            }
-            else
-            {
+            } else {
                 carry = 0;
             }
 
@@ -85,38 +82,32 @@ public class LongBaseMath
      * <code>dst</code>. <code>src1</code> and <code>src2</code> may be
      * <code>null</code>, in which case they are ignored (the values are assumed
      * to be zero and only the carry is propagated).<p>
-     *
+     * <p>
      * Essentially calculates <code>dst[i] = src1[i] - src2[i]</code>.
      *
-     * @param src1 First source data sequence. Can be <code>null</code>, in which case the input values are assumed to be zero.
-     * @param src2 Second source data sequence. Can be <code>null</code>, in which case it's ignored, or can be the same as <code>dst</code>.
+     * @param src1  First source data sequence. Can be <code>null</code>, in which case the input values are assumed to be zero.
+     * @param src2  Second source data sequence. Can be <code>null</code>, in which case it's ignored, or can be the same as <code>dst</code>.
      * @param carry Input carry bit. This is subtracted from the first (rightmost) word in the accessed sequence.
-     * @param dst Destination data sequence.
-     * @param size Number of elements to process.
-     *
+     * @param dst   Destination data sequence.
+     * @param size  Number of elements to process.
      * @return Overflow carry bit. Propagated carry bit from the subtraction of the last (leftmost) word in the accessed sequence. The value is <code>1</code> if the carry is set, and <code>0</code> otherwise.
      */
 
     public long baseSubtract(DataStorage.Iterator src1, DataStorage.Iterator src2, long carry, DataStorage.Iterator dst, long size)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         assert (src1 == null || src1 != src2);
         assert (src2 != dst);
 
         long base = BASE[this.radix];
 
-        for (long i = 0; i < size; i++)
-        {
+        for (long i = 0; i < size; i++) {
             long result = (src1 == null ? 0 : src1.getLong()) - carry -
-                          (src2 == null ? 0 : src2.getLong());
+                    (src2 == null ? 0 : src2.getLong());
 
-            if (result < 0)
-            {
+            if (result < 0) {
                 result += base;
                 carry = 1;
-            }
-            else
-            {
+            } else {
                 carry = 0;
             }
 
@@ -136,35 +127,32 @@ public class LongBaseMath
      * words in <code>src2</code>, and stores the result to <code>dst</code>.
      * <code>src2</code> may be <code>null</code>, in which case it is ignored
      * (the values are assumed to be zero).<p>
-     *
+     * <p>
      * Assumes that the result from the addition doesn't overflow the upper
      * result word (to larger than the base). This is the case e.g. when using
      * this method to perform an arbitrary precision multiplication.<p>
-     *
+     * <p>
      * Essentially calculates <code>dst[i] = src1[i] * src3 + src2[i]</code>.
      *
-     * @param src1 First source data sequence.
-     * @param src2 Second source data sequence. Can be <code>null</code>, in which case it's ignored, or can be the same as <code>dst</code>.
-     * @param src3 Multiplicand. All elements of <code>src1</code> are multiplied by this value.
+     * @param src1  First source data sequence.
+     * @param src2  Second source data sequence. Can be <code>null</code>, in which case it's ignored, or can be the same as <code>dst</code>.
+     * @param src3  Multiplicand. All elements of <code>src1</code> are multiplied by this value.
      * @param carry Input carry word. This is added to the first (rightmost) word in the accessed sequence.
-     * @param dst Destination data sequence.
-     * @param size Number of elements to process.
-     *
+     * @param dst   Destination data sequence.
+     * @param size  Number of elements to process.
      * @return Overflow carry word. Propagated carry word from the multiplication and addition of the last (leftmost) word in the accessed sequence.
      */
 
     public long baseMultiplyAdd(DataStorage.Iterator src1, DataStorage.Iterator src2, long src3, long carry, DataStorage.Iterator dst, long size)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         assert (src1 != src2);
         assert (src1 != dst);
 
         long base = BASE[this.radix];
 
-        for (long i = 0; i < size; i++)
-        {
+        for (long i = 0; i < size; i++) {
             long a = src1.getLong(),
-                 b = src3;
+                    b = src3;
 
             carry += (src2 == null ? 0 : src2.getLong());
             long tmp = a * b + carry;
@@ -174,23 +162,19 @@ public class LongBaseMath
             carry += tmp2;
             tmp -= tmp2 * base;
 
-            if (tmp >= base)
-            {
+            if (tmp >= base) {
                 tmp -= base;
                 carry++;
             }
-            if (tmp >= base)
-            {
+            if (tmp >= base) {
                 tmp -= base;
                 carry++;
             }
-            if (tmp < 0)
-            {
+            if (tmp < 0) {
                 tmp += base;
                 carry--;
             }
-            if (tmp < 0)
-            {
+            if (tmp < 0) {
                 tmp += base;
                 carry--;
             }
@@ -211,54 +195,47 @@ public class LongBaseMath
      * <code>dst</code>. <code>src1</code> may be <code>null</code>,
      * in which case it is ignored (the values are assumed to be
      * zero and only the carry division is propagated).<p>
-     *
+     * <p>
      * Essentially calculates <code>dst[i] = src1[i] / src2</code>.
      *
-     * @param src1 First source data sequence. Can be <code>null</code>, in which case the input values are assumed to be zero.
-     * @param src2 Divisor. All elements of <code>src1</code> are divided by this value.
+     * @param src1  First source data sequence. Can be <code>null</code>, in which case the input values are assumed to be zero.
+     * @param src2  Divisor. All elements of <code>src1</code> are divided by this value.
      * @param carry Input carry word. Used as the upper word for the division of the first input element. This should be the remainder word returned from the previous block processed.
-     * @param dst Destination data sequence.
-     * @param size Number of elements to process.
-     *
+     * @param dst   Destination data sequence.
+     * @param size  Number of elements to process.
      * @return Remainder word of the propagated division of the last (rightmost) word in the accessed sequence.
      */
 
     public long baseDivide(DataStorage.Iterator src1, long src2, long carry, DataStorage.Iterator dst, long size)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         assert (src1 != dst);
 
         long base = BASE[this.radix];
 
         double inverseDivisor = 1.0 / src2;
 
-        for (long i = 0; i < size; i++)
-        {
+        for (long i = 0; i < size; i++) {
             long a = (src1 == null ? 0 : src1.getLong()),
-                 tmp = carry * base + a,
-                 result = (long) (((double) carry * (double) base + (double) a) * inverseDivisor);
+                    tmp = carry * base + a,
+                    result = (long) (((double) carry * (double) base + (double) a) * inverseDivisor);
             carry = tmp - result * src2;
             int tmp2 = (int) ((double) carry * inverseDivisor);
             result += tmp2;
             carry -= tmp2 * src2;
 
-            if (carry >= src2)
-            {
+            if (carry >= src2) {
                 carry -= src2;
                 result++;
             }
-            if (carry >= src2)
-            {
+            if (carry >= src2) {
                 carry -= src2;
                 result++;
             }
-            if (carry < 0)
-            {
+            if (carry < 0) {
                 carry += src2;
                 result--;
             }
-            if (carry < 0)
-            {
+            if (carry < 0) {
                 carry += src2;
                 result--;
             }
@@ -271,9 +248,4 @@ public class LongBaseMath
 
         return carry;
     }
-
-    private static final long serialVersionUID = -6469225916787810664L;
-
-    private int radix;
-    private double inverseBase;
 }

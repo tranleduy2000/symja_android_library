@@ -10,24 +10,21 @@ import org.apfloat.spi.Util;
  * Abstract base class for creating Number Theoretic Transforms suitable for the
  * specified length, based on available memory configured in the {@link ApfloatContext}.
  *
- * @since 1.7.0
- * @version 1.7.0
  * @author Mikko Tommila
+ * @version 1.7.0
+ * @since 1.7.0
  */
 
 public abstract class AbstractNTTBuilder
-    implements NTTBuilder
-{
+        implements NTTBuilder {
     /**
      * Subclass constructor.
      */
 
-    protected AbstractNTTBuilder()
-    {
+    protected AbstractNTTBuilder() {
     }
 
-    public NTTStrategy createNTT(long size)
-    {
+    public NTTStrategy createNTT(long size) {
         ApfloatContext ctx = ApfloatContext.getContext();
         BuilderFactory builderFactory = ctx.getBuilderFactory();
         int cacheSize = ctx.getCacheL1Size() / builderFactory.getElementSize();
@@ -38,31 +35,24 @@ public abstract class AbstractNTTBuilder
 
         size = Util.round23up(size);        // Round up to the nearest power of two or three times a power of two
         long power2size = (size & -size);   // Power-of-two factor of the above
-        if (size != power2size)
-        {
+        if (size != power2size) {
             // A factor of three will be used, so the power-of-two part is one third of the whole transform length
             useFactor3 = true;
         }
 
         // Select transform for the power-of-two part
-        if (power2size <= cacheSize / 2)
-        {
+        if (power2size <= cacheSize / 2) {
             // The whole transform plus w-table fits into the cache, so use the simplest approach
             nttStrategy = createSimpleFNTStrategy();
-        }
-        else if (power2size <= maxMemoryBlockSize && power2size <= Integer.MAX_VALUE)
-        {
+        } else if (power2size <= maxMemoryBlockSize && power2size <= Integer.MAX_VALUE) {
             // The whole transform fits into the available main memory, so use a six-step in-memory approach
             nttStrategy = createSixStepFNTStrategy();
-        }
-        else
-        {
+        } else {
             // The whole transform won't fit into available memory, so use a two-pass disk based approach
             nttStrategy = createTwoPassFNTStrategy();
         }
 
-        if (useFactor3)
-        {
+        if (useFactor3) {
             // Allow using a factor of three in any of the above selected transforms
             nttStrategy = createFactor3NTTStrategy(nttStrategy);
         }
@@ -98,7 +88,6 @@ public abstract class AbstractNTTBuilder
      * Create a factor-3 NTT strategy on top of another NTT strategy.
      *
      * @param nttStrategy The underlying factor-2 NTT strategy.
-     *
      * @return A new factor-3 NTT strategy.
      */
 

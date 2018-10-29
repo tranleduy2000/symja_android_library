@@ -1,27 +1,32 @@
 package org.apfloat.internal;
 
-import static org.apfloat.internal.DoubleModConstants.*;
-import static org.apfloat.internal.DoubleRadixConstants.*;
+import static org.apfloat.internal.DoubleModConstants.MAX_POWER_OF_TWO_BASE;
+import static org.apfloat.internal.DoubleModConstants.MAX_POWER_OF_TWO_BITS;
+import static org.apfloat.internal.DoubleRadixConstants.BASE;
 
 /**
  * Basic arithmetic for calculating the Chinese Remainder
  * Theorem. Works for the <code>double</code> type.
  *
- * @version 1.6
  * @author Mikko Tommila
+ * @version 1.6
  */
 
 public class DoubleCRTMath
-    extends DoubleBaseMath
-{
+        extends DoubleBaseMath {
+    private static final long serialVersionUID = -8414531999881223922L;
+    private static final long BASE_MASK = (1L << MAX_POWER_OF_TWO_BITS) - 1;
+    private static final double INVERSE_2_64 = 1.0 / 18446744073709551616.0;
+    private long base;
+    private double inverseBase;
+
     /**
      * Creates a carry-CRT math using the specified radix.
      *
      * @param radix The radix that will be used.
      */
 
-    public DoubleCRTMath(int radix)
-    {
+    public DoubleCRTMath(int radix) {
         super(radix);
         this.base = (long) BASE[radix];
         this.inverseBase = 1.0 / BASE[radix];
@@ -31,15 +36,14 @@ public class DoubleCRTMath
      * Multiplies two words by one word to produce a result of three words.
      * Most significant word is stored first.
      *
-     * @param src Source array, first multiplicand.
+     * @param src    Source array, first multiplicand.
      * @param factor Second multiplicand.
-     * @param dst Destination array.
+     * @param dst    Destination array.
      */
 
-    public final void multiply(double[] src, double factor, double[] dst)
-    {
+    public final void multiply(double[] src, double factor, double[] dst) {
         long tmp = (long) src[1] * (long) factor,
-             carry = (long) ((src[1] * factor + (double) (tmp & 0x8000000000000000L)) * INVERSE_2_64);
+                carry = (long) ((src[1] * factor + (double) (tmp & 0x8000000000000000L)) * INVERSE_2_64);
         carry = (carry << 64 - MAX_POWER_OF_TWO_BITS) | (tmp >>> MAX_POWER_OF_TWO_BITS);
 
         dst[2] = (double) (tmp & BASE_MASK);    // = tmp % MAX_POWER_OF_TWO_BASE
@@ -58,23 +62,19 @@ public class DoubleCRTMath
      *
      * @param src1 First operand.
      * @param src2 Second operand.
-     *
      * @return Less than zero if <code>src1 < src2</code>, greater than zero if <code>src1 > src2</code> and zero if <code>src1 == src2</code>.
      */
 
-    public final double compare(double[] src1, double[] src2)
-    {
+    public final double compare(double[] src1, double[] src2) {
         double result = src1[0] - src2[0];
 
-        if (result != 0)
-        {
+        if (result != 0) {
             return result;
         }
 
         result = src1[1] - src2[1];
 
-        if (result != 0)
-        {
+        if (result != 0) {
             return result;
         }
 
@@ -84,16 +84,14 @@ public class DoubleCRTMath
     /**
      * Adds three words. Most significant word is stored first.
      *
-     * @param src First operand.
+     * @param src    First operand.
      * @param srcDst Second operand, and destination of the operation.
-     *
      * @return Overflow carry bit.
      */
 
-    public final double add(double[] src, double[] srcDst)
-    {
+    public final double add(double[] src, double[] srcDst) {
         double result = srcDst[2] + src[2],
-               carry = (result >= MAX_POWER_OF_TWO_BASE ? 1 : 0);
+                carry = (result >= MAX_POWER_OF_TWO_BASE ? 1 : 0);
         result = (result >= MAX_POWER_OF_TWO_BASE ? result - MAX_POWER_OF_TWO_BASE : result);
 
         srcDst[2] = result;
@@ -116,14 +114,13 @@ public class DoubleCRTMath
     /**
      * Subtracts three words. Most significant word is stored first.
      *
-     * @param src First operand.
+     * @param src    First operand.
      * @param srcDst Second operand, and destination of the operation.
      */
 
-    public final void subtract(double[] src, double[] srcDst)
-    {
+    public final void subtract(double[] src, double[] srcDst) {
         double result = srcDst[2] - src[2],
-               carry = (result < 0 ? 1 : 0);
+                carry = (result < 0 ? 1 : 0);
         result = (result < 0 ? result + MAX_POWER_OF_TWO_BASE : result);
 
         srcDst[2] = result;
@@ -145,23 +142,19 @@ public class DoubleCRTMath
      * Divides three words by the base to produce two words. Most significant word is stored first.
      *
      * @param srcDst Source and destination of the operation.
-     *
      * @return Remainder of the division.
      */
 
-    public final double divide(double[] srcDst)
-    {
+    public final double divide(double[] srcDst) {
         long tmp = ((long) srcDst[0] << MAX_POWER_OF_TWO_BITS) + (long) srcDst[1],
-             result = (long) ((srcDst[0] * MAX_POWER_OF_TWO_BASE + srcDst[1]) * this.inverseBase),
-             carry = tmp - result * this.base;          // = tmp % divisor
+                result = (long) ((srcDst[0] * MAX_POWER_OF_TWO_BASE + srcDst[1]) * this.inverseBase),
+                carry = tmp - result * this.base;          // = tmp % divisor
 
-        if (carry >= this.base)
-        {
+        if (carry >= this.base) {
             carry -= this.base;
             result++;
         }
-        if (carry < 0)
-        {
+        if (carry < 0) {
             carry += this.base;
             result--;
         }
@@ -173,13 +166,11 @@ public class DoubleCRTMath
         result = (long) (((double) carry * MAX_POWER_OF_TWO_BASE + srcDst[2]) * this.inverseBase);
         carry = tmp - result * this.base;               // = tmp % divisor
 
-        if (carry >= this.base)
-        {
+        if (carry >= this.base) {
             carry -= this.base;
             result++;
         }
-        if (carry < 0)
-        {
+        if (carry < 0) {
             carry += this.base;
             result--;
         }
@@ -188,12 +179,4 @@ public class DoubleCRTMath
 
         return (double) carry;
     }
-
-    private static final long serialVersionUID = -8414531999881223922L;
-
-    private static final long BASE_MASK = (1L << MAX_POWER_OF_TWO_BITS) - 1;
-    private static final double INVERSE_2_64 = 1.0 / 18446744073709551616.0;
-
-    private long base;
-    private double inverseBase;
 }

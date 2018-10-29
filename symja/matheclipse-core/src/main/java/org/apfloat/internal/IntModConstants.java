@@ -3,24 +3,23 @@ package org.apfloat.internal;
 /**
  * Constants needed for various modular arithmetic operations for the <code>int</code> type.
  *
- * @version 1.0
  * @author Mikko Tommila
+ * @version 1.0
  */
 
-public interface IntModConstants
-{
+public interface IntModConstants {
     /**
      * Moduli to be used in number theoretic transforms.
      * Allows transform lengths upto 3*2<sup>24</sup>.
      */
 
-    public static final int MODULUS[] = { 2113929217, 2013265921, 1811939329 };
+    public static final int MODULUS[] = {2113929217, 2013265921, 1811939329};
 
     /**
      * Primitive roots for the corresponding moduli.
      */
 
-    public static final int PRIMITIVE_ROOT[] = { 5, 31, 13 };
+    public static final int PRIMITIVE_ROOT[] = {5, 31, 13};
 
     /**
      * Maximum transform length for the moduli.

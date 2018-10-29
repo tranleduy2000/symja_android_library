@@ -3,13 +3,12 @@ package org.apfloat.internal;
 /**
  * Constants needed for various algorithms for the <code>long</code> type.
  *
- * @since 1.4
- * @version 1.4
  * @author Mikko Tommila
+ * @version 1.4
+ * @since 1.4
  */
 
-public interface LongConstants
-{
+public interface LongConstants {
     /**
      * Relative cost of Karatsuba multiplication.
      */

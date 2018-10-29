@@ -1,66 +1,56 @@
 package org.apfloat.internal;
 
-import org.apfloat.spi.NTTStrategy;
-import org.apfloat.spi.NTTStepStrategy;
 import org.apfloat.spi.Factor3NTTStepStrategy;
 import org.apfloat.spi.NTTConvolutionStepStrategy;
+import org.apfloat.spi.NTTStepStrategy;
+import org.apfloat.spi.NTTStrategy;
 
 /**
  * Creates Number Theoretic Transforms for the
  * <code>long</code> type.
  *
+ * @author Mikko Tommila
+ * @version 1.7.0
  * @see LongTableFNTStrategy
  * @see SixStepFNTStrategy
  * @see TwoPassFNTStrategy
  * @see Factor3NTTStrategy
- *
- * @version 1.7.0
- * @author Mikko Tommila
  */
 
 public class LongNTTBuilder
-    extends AbstractNTTBuilder
-{
+        extends AbstractNTTBuilder {
     /**
      * Default constructor.
      */
 
-    public LongNTTBuilder()
-    {
+    public LongNTTBuilder() {
     }
 
-    public NTTStepStrategy createNTTSteps()
-    {
+    public NTTStepStrategy createNTTSteps() {
         return new LongNTTStepStrategy();
     }
 
-    public NTTConvolutionStepStrategy createNTTConvolutionSteps()
-    {
+    public NTTConvolutionStepStrategy createNTTConvolutionSteps() {
         return new LongNTTConvolutionStepStrategy();
     }
 
-    public Factor3NTTStepStrategy createFactor3NTTSteps()
-    {
+    public Factor3NTTStepStrategy createFactor3NTTSteps() {
         return new LongFactor3NTTStepStrategy();
     }
 
-    protected NTTStrategy createSimpleFNTStrategy()
-    {
+    protected NTTStrategy createSimpleFNTStrategy() {
         return new LongTableFNTStrategy();
     }
 
-    protected NTTStrategy createSixStepFNTStrategy()
-    {
+    protected NTTStrategy createSixStepFNTStrategy() {
         return new SixStepFNTStrategy();
     }
 
-    protected NTTStrategy createTwoPassFNTStrategy()
-    {
+    protected NTTStrategy createTwoPassFNTStrategy() {
         return new TwoPassFNTStrategy();
     }
 
-    protected NTTStrategy createFactor3NTTStrategy(NTTStrategy nttStrategy)
-    {
+    protected NTTStrategy createFactor3NTTStrategy(NTTStrategy nttStrategy) {
         return new Factor3NTTStrategy(nttStrategy);
     }
 }

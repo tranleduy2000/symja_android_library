@@ -87,16 +87,6 @@ public interface BuilderFactory
         throws IllegalArgumentException;
 
     /**
-     * Returns the element type of the data objects created.
-     *
-     * @return The element type of the data objects created.
-     *
-     * @since 1.7.0
-     */
-
-    public Class<?> getElementType();
-
-    /**
      * Returns the element array type of the data objects created.
      *
      * @return The element array type of the data objects created.

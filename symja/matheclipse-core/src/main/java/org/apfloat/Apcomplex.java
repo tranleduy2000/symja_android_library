@@ -1,7 +1,6 @@
 package org.apfloat;
 
 import java.io.Serializable;
-import java.io.PushbackReader;
 import java.io.Writer;
 import java.io.IOException;
 import java.util.Formattable;
@@ -155,56 +154,6 @@ public class Apcomplex
 
         this.real = new Apfloat(value.substring(1, index).trim());
         this.imag = new Apfloat(value.substring(index + 1, value.length() - 1).trim());
-    }
-
-    /**
-     * Reads an apcomplex from a reader. The constructor stops reading
-     * at the first character it doesn't understand. The reader must thus
-     * be a <code>PushbackReader</code> so that the invalid character can
-     * be returned back to the stream.<p>
-     *
-     * The input must be of one of the formats<p>
-     *
-     * <code>realPart</code><br>
-     * <code>"(" [whitespace] realPart [whitespace] ")"</code><br>
-     * <code>"(" [whitespace] realPart [whitespace] "," [whitespace] imaginaryPart [whitespace] ")"</code><br>
-     *
-     * @param in The input stream.
-     *
-     * @exception java.io.IOException In case of I/O error reading from the stream.
-     * @exception java.lang.NumberFormatException If the number is invalid.
-     */
-
-    public Apcomplex(PushbackReader in)
-        throws IOException, NumberFormatException, ApfloatRuntimeException
-    {
-        if (!ApfloatHelper.readMatch(in, '('))
-        {
-            this.real = new Apfloat(in);
-            this.imag = ZERO;
-            return;
-        }
-
-        ApfloatHelper.extractWhitespace(in);
-        this.real = new Apfloat(in);
-        ApfloatHelper.extractWhitespace(in);
-
-        if (ApfloatHelper.readMatch(in, ','))
-        {
-            ApfloatHelper.extractWhitespace(in);
-            this.imag = new Apfloat(in);
-        }
-        else
-        {
-            this.imag = ZERO;
-        }
-
-        ApfloatHelper.extractWhitespace(in);
-
-        if (!ApfloatHelper.readMatch(in, ')'))
-        {
-            throw new NumberFormatException("Missing end parenthesis");
-        }
     }
 
     /**

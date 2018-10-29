@@ -1,14 +1,16 @@
 package org.apfloat;
 
-import java.math.BigInteger;
-import java.math.BigDecimal;
-import java.io.PushbackReader;
-import java.io.Writer;
-import java.io.IOException;
-import java.util.Formatter;
-import static java.util.FormattableFlags.*;
-
 import org.apfloat.spi.ApfloatImpl;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Formatter;
+
+import static java.util.FormattableFlags.ALTERNATE;
+import static java.util.FormattableFlags.LEFT_JUSTIFY;
+import static java.util.FormattableFlags.UPPERCASE;
 
 /**
  * Arbitrary precision floating-point number class.<p>
@@ -93,7 +95,7 @@ public class Apfloat
      */
 
     public Apfloat(String value, long precision)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, false));
     }
@@ -117,7 +119,7 @@ public class Apfloat
      */
 
     public Apfloat(String value, long precision, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, radix, false));
     }
@@ -150,7 +152,7 @@ public class Apfloat
      */
 
     public Apfloat(long value, long precision)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision));
     }
@@ -168,7 +170,7 @@ public class Apfloat
      */
 
     public Apfloat(long value, long precision, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, radix));
     }
@@ -202,7 +204,7 @@ public class Apfloat
      */
 
     public Apfloat(float value, long precision)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision));
     }
@@ -220,7 +222,7 @@ public class Apfloat
      */
 
     public Apfloat(float value, long precision, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, radix));
     }
@@ -254,7 +256,7 @@ public class Apfloat
      */
 
     public Apfloat(double value, long precision)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision));
     }
@@ -272,76 +274,9 @@ public class Apfloat
      */
 
     public Apfloat(double value, long precision, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, radix));
-    }
-
-    /**
-     * Reads an apfloat from a stream using default precision and radix.
-     * The stream needs to be a <code>PushbackReader</code>,
-     * as the first invalid character is pushed back to the stream.<p>
-     *
-     * Note that since only a pushback buffer of one character is used,
-     * the number read may still not be valid. For example, if the stream
-     * contains <code>"-#"</code> or <code>"1.5e#"</code> (here <code>'#'</code>
-     * is the first invalid character), the number is actually not valid, and
-     * only the character <code>'#'</code> would be put back to the stream.<p>
-     *
-     * The precision is determined similarly as in the {@link #Apfloat(String)}
-     * constructor that is as the number of digits read from the stream.
-     *
-     * @param in The stream to read from
-     *
-     * @exception java.io.IOException If an I/O error occurs accessing the stream.
-     * @exception java.lang.NumberFormatException If the number is not valid.
-     */
-
-    public Apfloat(PushbackReader in)
-        throws IOException, NumberFormatException, ApfloatRuntimeException
-    {
-        this(ApfloatHelper.createApfloat(in, false));
-    }
-
-    /**
-     * Reads an apfloat from a stream using the specified precision.
-     * The default radix is used.
-     *
-     * @param in The stream to read from
-     * @param precision The precision of the number.
-     *
-     * @exception java.io.IOException If an I/O error occurs accessing the stream.
-     * @exception java.lang.NumberFormatException If the number is not valid.
-     * @exception java.lang.IllegalArgumentException In case the precision is invalid.
-     *
-     * @see #Apfloat(PushbackReader)
-     */
-
-    public Apfloat(PushbackReader in, long precision)
-        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
-    {
-        this(ApfloatHelper.createApfloat(in, precision, false));
-    }
-
-    /**
-     * Reads an apfloat from a stream using the specified precision
-     * and radix.
-     *
-     * @param in The stream to read from
-     * @param precision The precision of the number.
-     * @param radix The radix of the number.
-     *
-     * @exception java.io.IOException If an I/O error occurs accessing the stream.
-     * @exception java.lang.NumberFormatException If the number is not valid.
-     * @exception java.lang.IllegalArgumentException In case the precision is invalid.
-     *
-     * @see #Apfloat(PushbackReader)
-     */
-
-    public Apfloat(PushbackReader in, long precision, int radix)
-        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
-    {
-        this(ApfloatHelper.createApfloat(in, precision, radix, false));
     }
 
     /**
@@ -372,27 +307,9 @@ public class Apfloat
      */
 
     public Apfloat(BigInteger value, long precision)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision));
-    }
-
-    /**
-     * Constructs an apfloat from a <code>BigInteger</code> with
-     * the specified precision and radix.
-     *
-     * @param value The value of the number.
-     * @param precision The precision of the number.
-     * @param radix The radix of the number.
-     *
-     * @exception java.lang.NumberFormatException If the radix is not valid.
-     * @exception java.lang.IllegalArgumentException In case the precision is invalid.
-     */
-
-    public Apfloat(BigInteger value, long precision, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
-    {
-        this(ApfloatHelper.createApfloat(value, precision, radix));
     }
 
     /**

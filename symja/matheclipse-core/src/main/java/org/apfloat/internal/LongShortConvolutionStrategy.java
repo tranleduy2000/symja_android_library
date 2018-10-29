@@ -2,26 +2,27 @@ package org.apfloat.internal;
 
 import org.apfloat.ApfloatContext;
 import org.apfloat.ApfloatRuntimeException;
-import org.apfloat.spi.ConvolutionStrategy;
-import org.apfloat.spi.DataStorageBuilder;
-import org.apfloat.spi.DataStorage;
 import org.apfloat.spi.ArrayAccess;
+import org.apfloat.spi.ConvolutionStrategy;
+import org.apfloat.spi.DataStorage;
+import org.apfloat.spi.DataStorageBuilder;
 
 /**
  * Short convolution strategy.
  * Performs a simple multiplication when the size of one operand is 1.
  *
- * @version 1.1
  * @author Mikko Tommila
+ * @version 1.1
  */
 
 public class LongShortConvolutionStrategy
-    extends LongBaseMath
-    implements ConvolutionStrategy
-{
+        extends LongBaseMath
+        implements ConvolutionStrategy {
     // Implementation notes:
     // - Assumes that the operands have been already truncated to match resultSize (the resultSize argument is ignored)
     // - This class shouldn't be converted to a single class using generics because the performance impact is noticeable
+
+    private static final long serialVersionUID = 1971685561366493327L;
 
     /**
      * Creates a convolution strategy using the specified radix.
@@ -29,23 +30,18 @@ public class LongShortConvolutionStrategy
      * @param radix The radix that will be used.
      */
 
-    public LongShortConvolutionStrategy(int radix)
-    {
+    public LongShortConvolutionStrategy(int radix) {
         super(radix);
     }
 
     public DataStorage convolute(DataStorage x, DataStorage y, long resultSize)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         DataStorage shortStorage, longStorage, resultStorage;
 
-        if (x.getSize() > 1)
-        {
+        if (x.getSize() > 1) {
             shortStorage = y;
             longStorage = x;
-        }
-        else
-        {
+        } else {
             shortStorage = x;
             longStorage = y;
         }
@@ -64,7 +60,7 @@ public class LongShortConvolutionStrategy
         resultStorage.setSize(size);
 
         DataStorage.Iterator src = longStorage.iterator(DataStorage.READ, size - 1, 0),
-                             dst = resultStorage.iterator(DataStorage.WRITE, size, 0);
+                dst = resultStorage.iterator(DataStorage.WRITE, size, 0);
 
         long carry = baseMultiplyAdd(src, null, factor, 0, dst, size - 1);
         dst.setLong(carry);
@@ -72,6 +68,4 @@ public class LongShortConvolutionStrategy
 
         return resultStorage;
     }
-
-    private static final long serialVersionUID = 1971685561366493327L;
 }

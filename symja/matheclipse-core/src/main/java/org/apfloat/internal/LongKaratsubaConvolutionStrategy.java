@@ -2,8 +2,8 @@ package org.apfloat.internal;
 
 import org.apfloat.ApfloatContext;
 import org.apfloat.ApfloatRuntimeException;
-import org.apfloat.spi.DataStorageBuilder;
 import org.apfloat.spi.DataStorage;
+import org.apfloat.spi.DataStorageBuilder;
 
 /**
  * Convolution strategy using the Karatsuba algorithm.
@@ -16,23 +16,23 @@ import org.apfloat.spi.DataStorage;
  * size. For very large numbers, the transform-based convolution algorithms
  * are faster.
  *
- * @since 1.4
- * @version 1.4
  * @author Mikko Tommila
+ * @version 1.4
+ * @since 1.4
  */
 
 public class LongKaratsubaConvolutionStrategy
-    extends LongMediumConvolutionStrategy
-{
+        extends LongMediumConvolutionStrategy {
     /**
      * Cut-off point for Karatsuba / basic convolution.<p>
-     *
+     * <p>
      * Convolutions where the shorter number is at most this long
      * are calculated using the basic O(n<sup>2</sup>) algorithm
      * i.e. <code>super.convolute()</code>.
      */
 
     public static final int CUTOFF_POINT = 15;
+    private static final long serialVersionUID = -4812398042499004749L;
 
     /**
      * Creates a convolution strategy using the specified radix.
@@ -40,58 +40,50 @@ public class LongKaratsubaConvolutionStrategy
      * @param radix The radix that will be used.
      */
 
-    public LongKaratsubaConvolutionStrategy(int radix)
-    {
+    public LongKaratsubaConvolutionStrategy(int radix) {
         super(radix);
     }
 
     public DataStorage convolute(DataStorage x, DataStorage y, long resultSize)
-        throws ApfloatRuntimeException
-    {
-        if (Math.min(x.getSize(), y.getSize()) <= CUTOFF_POINT)
-        {
+            throws ApfloatRuntimeException {
+        if (Math.min(x.getSize(), y.getSize()) <= CUTOFF_POINT) {
             // The numbers are too short for Karatsuba to have any advantage, fall back to O(n^2) algorithm
             return super.convolute(x, y, resultSize);
         }
 
         DataStorage shortStorage, longStorage;
 
-        if (x.getSize() > y.getSize())
-        {
+        if (x.getSize() > y.getSize()) {
             shortStorage = y;
             longStorage = x;
-        }
-        else
-        {
+        } else {
             shortStorage = x;
             longStorage = y;
         }
 
         long shortSize = shortStorage.getSize(),
-             longSize = longStorage.getSize(),
-             size = shortSize + longSize,
-             halfSize = longSize + 1 >> 1,      // Split point for recursion, round up
-             x1size = longSize - halfSize,
-             x2size = halfSize,
-             y1size = shortSize - halfSize;     // y2size = halfSize
+                longSize = longStorage.getSize(),
+                size = shortSize + longSize,
+                halfSize = longSize + 1 >> 1,      // Split point for recursion, round up
+                x1size = longSize - halfSize,
+                x2size = halfSize,
+                y1size = shortSize - halfSize;     // y2size = halfSize
 
         ApfloatContext ctx = ApfloatContext.getContext();
         DataStorageBuilder dataStorageBuilder = ctx.getBuilderFactory().getDataStorageBuilder();
         DataStorage resultStorage = dataStorageBuilder.createDataStorage(size * 8);
         resultStorage.setSize(size);
 
-        if (y1size <= 0)
-        {
+        if (y1size <= 0) {
             // The shorter number is half of the longer number or less, use simplified algorithm
             DataStorage.Iterator dst = resultStorage.iterator(DataStorage.WRITE, size, 0),
-                                 src1 = null;
+                    src1 = null;
             long carry = 0;
             long i = longSize,
-                 xSize;
+                    xSize;
 
             // Calculate sub-results in blocks of size shortSize
-            do
-            {
+            do {
                 xSize = Math.min(i, shortSize);
                 x = longStorage.subsequence(i - xSize, xSize);
                 y = shortStorage;
@@ -114,14 +106,12 @@ public class LongKaratsubaConvolutionStrategy
             carry = baseAdd(src1, null, carry, dst, xSize);
 
             assert (carry == 0);
-        }
-        else
-        {
+        } else {
             // The numbers are roughly equal size (shorter is more than half of the longer), use Karatsuba algorithm
             DataStorage x1 = longStorage.subsequence(0, x1size),
-                        x2 = longStorage.subsequence(x1size, x2size),
-                        y1 = shortStorage.subsequence(0, y1size),
-                        y2 = shortStorage.subsequence(y1size, halfSize);
+                    x2 = longStorage.subsequence(x1size, x2size),
+                    y1 = shortStorage.subsequence(0, y1size),
+                    y2 = shortStorage.subsequence(y1size, halfSize);
 
             // Calculate a = x1 + x2
             DataStorage a = add(x1, x2);
@@ -139,10 +129,9 @@ public class LongKaratsubaConvolutionStrategy
             subtract(c, b);
 
             long cSize = c.getSize(),
-                 c1size = cSize - halfSize;
+                    c1size = cSize - halfSize;
 
-            if (c1size > x1size + y1size)
-            {
+            if (c1size > x1size + y1size) {
                 // We know that the top one or two words of c are zero
                 // Omit them to avoid later having c1size > x1size + y1size
                 long zeros = c1size - x1size - y1size;
@@ -161,9 +150,9 @@ public class LongKaratsubaConvolutionStrategy
 
             // Add the sub-results a + b + c together
             DataStorage.Iterator src1 = a.iterator(DataStorage.READ, x1size + y1size, 0),
-                                 src2 = b.iterator(DataStorage.READ, 2 * halfSize, 0),
-                                 src3 = c.iterator(DataStorage.READ, cSize, 0),
-                                 dst = resultStorage.iterator(DataStorage.WRITE, size, 0);
+                    src2 = b.iterator(DataStorage.READ, 2 * halfSize, 0),
+                    src3 = c.iterator(DataStorage.READ, cSize, 0),
+                    dst = resultStorage.iterator(DataStorage.WRITE, size, 0);
 
             long carry = 0;
             carry = baseAdd(src2, null, carry, dst, halfSize);
@@ -178,10 +167,9 @@ public class LongKaratsubaConvolutionStrategy
     }
 
     // Return x1 + x2
-    private DataStorage add(DataStorage x1, DataStorage x2)
-    {
+    private DataStorage add(DataStorage x1, DataStorage x2) {
         long x1size = x1.getSize(),
-             x2size = x2.getSize();
+                x2size = x2.getSize();
 
         assert (x1size <= x2size);
 
@@ -194,15 +182,14 @@ public class LongKaratsubaConvolutionStrategy
 
         // Calculate x1 + x2
         DataStorage.Iterator src1 = x1.iterator(DataStorage.READ, x1size, 0),
-                             src2 = x2.iterator(DataStorage.READ, x2size, 0),
-                             dst = resultStorage.iterator(DataStorage.WRITE, size, 0);
+                src2 = x2.iterator(DataStorage.READ, x2size, 0),
+                dst = resultStorage.iterator(DataStorage.WRITE, size, 0);
 
         long carry = 0;
         carry = baseAdd(src1, src2, carry, dst, x1size);
         carry = baseAdd(src2, null, carry, dst, x2size - x1size);
         baseAdd(null, null, carry, dst, 1);         // Set carry digit to the top word
-        if (carry == 0)
-        {
+        if (carry == 0) {
             resultStorage = resultStorage.subsequence(1, size - 1);     // Omit zero top word
         }
 
@@ -210,16 +197,15 @@ public class LongKaratsubaConvolutionStrategy
     }
 
     // x1 -= x2
-    private void subtract(DataStorage x1, DataStorage x2)
-    {
+    private void subtract(DataStorage x1, DataStorage x2) {
         long x1size = x1.getSize(),
-             x2size = x2.getSize();
+                x2size = x2.getSize();
 
         assert (x1size >= x2size);
 
         DataStorage.Iterator src1 = x1.iterator(DataStorage.READ_WRITE, x1size, 0),
-                             src2 = x2.iterator(DataStorage.READ, x2size, 0),
-                             dst = src1;
+                src2 = x2.iterator(DataStorage.READ, x2size, 0),
+                dst = src1;
 
         long carry = 0;
         carry = baseSubtract(src1, src2, carry, dst, x2size);
@@ -228,8 +214,7 @@ public class LongKaratsubaConvolutionStrategy
         assert (carry == 0);
     }
 
-    private boolean isZero(DataStorage x, long index)
-    {
+    private boolean isZero(DataStorage x, long index) {
         DataStorage.Iterator i = x.iterator(DataStorage.READ, index, index + 1);
 
         long data = i.getLong();
@@ -237,6 +222,4 @@ public class LongKaratsubaConvolutionStrategy
 
         return data == 0;
     }
-
-    private static final long serialVersionUID = -4812398042499004749L;
 }

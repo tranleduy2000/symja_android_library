@@ -1,55 +1,82 @@
 package org.apfloat.internal;
 
-import java.io.ObjectInputStream;
-import java.io.PushbackReader;
-import java.io.Writer;
-import java.io.StringWriter;
-import java.io.IOException;
-
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatContext;
 import org.apfloat.ApfloatRuntimeException;
 import org.apfloat.InfiniteExpansionException;
 import org.apfloat.OverflowException;
-import org.apfloat.spi.ApfloatImpl;
-import org.apfloat.spi.DataStorageBuilder;
-import org.apfloat.spi.DataStorage;
-import org.apfloat.spi.ArrayAccess;
 import org.apfloat.spi.AdditionBuilder;
 import org.apfloat.spi.AdditionStrategy;
+import org.apfloat.spi.ApfloatImpl;
+import org.apfloat.spi.ArrayAccess;
 import org.apfloat.spi.ConvolutionBuilder;
 import org.apfloat.spi.ConvolutionStrategy;
+import org.apfloat.spi.DataStorage;
+import org.apfloat.spi.DataStorageBuilder;
 import org.apfloat.spi.Util;
-import static org.apfloat.spi.RadixConstants.*;
-import static org.apfloat.internal.LongRadixConstants.*;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.PushbackReader;
+import java.io.StringWriter;
+import java.io.Writer;
+
+import static org.apfloat.internal.LongRadixConstants.BASE;
+import static org.apfloat.internal.LongRadixConstants.BASE_DIGITS;
+import static org.apfloat.internal.LongRadixConstants.MAX_EXPONENT;
+import static org.apfloat.internal.LongRadixConstants.MINIMUM_FOR_DIGITS;
+import static org.apfloat.spi.RadixConstants.RADIX_FACTORS;
 
 /**
  * Immutable apfloat implementation class for the
  * <code>long</code> data element type.<p>
- *
+ * <p>
  * The associated {@link DataStorage} is assumed to be immutable also.
  * This way performance can be improved by sharing the data storage between
  * different <code>ApfloatImpl</code>'s and by only varying the
  * <code>ApfloatImpl</code> specific fields, like sign, precision and exponent.<p>
- *
+ * <p>
  * This implementation doesn't necessarily store any extra digits for added
  * precision, so the last digit of any operation may be inaccurate.
  *
- * @version 1.8.0
  * @author Mikko Tommila
+ * @version 1.8.0
  */
 
 public class LongApfloatImpl
-    extends LongBaseMath
-    implements ApfloatImpl
-{
+        extends LongBaseMath
+        implements ApfloatImpl {
+    private static final DataStorage.Iterator ZERO_ITERATOR =
+            new DataStorage.Iterator() {
+                private static final long serialVersionUID = 1L;
+
+                public long getLong() {
+                    return 0;
+                }
+
+                public void next() {
+                }
+            };
+    private static final long serialVersionUID = -2151344673641680085L;
+    private static final int UNDEFINED = 0x80000000;
+    private static final int MAX_LONG_SIZE = 4;
+    private static final int MAX_DOUBLE_SIZE = 4;
+    private int sign;
+    private long precision;
+    private long exponent;
+    private DataStorage dataStorage;
+    private int radix;
+    private int hashCode = 0;
+    private int initialDigits = UNDEFINED;
+    private volatile long leastZeros = UNDEFINED;
+    private volatile long size = 0;
+
     // Implementation notes:
     // - The dataStorage must never contain leading zeros or trailing zeros
     // - If precision is reduced then the dataStorage can contain trailing zeros (physically in the middle)
     // - The dataStorage should not be unnecessarily subsequenced if precision is reduced e.g. to allow autoconvolution
     // - Precision is in digits but exponent is in base units
-    private LongApfloatImpl(int sign, long precision, long exponent, DataStorage dataStorage, int radix)
-    {
+    private LongApfloatImpl(int sign, long precision, long exponent, DataStorage dataStorage, int radix) {
         super(radix);
 
         assert (sign == 0 || sign == -1 || sign == 1);
@@ -71,17 +98,15 @@ public class LongApfloatImpl
     /**
      * Create a new <code>LongApfloatImpl</code> instance from a String.
      *
-     * @param value The string to be parsed to a number.
+     * @param value     The string to be parsed to a number.
      * @param precision The precision of the number (in digits of the radix).
-     * @param radix The radix in which the number is created.
+     * @param radix     The radix in which the number is created.
      * @param isInteger Specifies if the number to be parsed from the string is to be treated as an integer or not.
-     *
-     * @exception java.lang.NumberFormatException If the number is not valid.
+     * @throws java.lang.NumberFormatException If the number is not valid.
      */
 
     public LongApfloatImpl(String value, long precision, int radix, boolean isInteger)
-        throws NumberFormatException, ApfloatRuntimeException
-    {
+            throws NumberFormatException, ApfloatRuntimeException {
         super(checkRadix(radix));
 
         assert (precision == Apfloat.DEFAULT || precision > 0);
@@ -92,51 +117,37 @@ public class LongApfloatImpl
         this.sign = 1;
 
         int startIndex = -1,
-            pointIndex = -1,
-            expIndex = -1,
-            leadingZeros = 0,
-            trailingZeros = 0,
-            digitSize = 0;
+                pointIndex = -1,
+                expIndex = -1,
+                leadingZeros = 0,
+                trailingZeros = 0,
+                digitSize = 0;
 
         // Scan through the string looking for various things
-        for (int i = 0; i < value.length(); i++)
-        {
+        for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
             int digit = Character.digit(c, radix);
 
             // Note that checking for a valid digit takes place before checking for e or E in the string
-            if (digit == -1)
-            {
-                if (i == 0 && (c == '-' || c == '+'))
-                {
+            if (digit == -1) {
+                if (i == 0 && (c == '-' || c == '+')) {
                     // Get sign
                     this.sign = (c == '-' ? -1 : 1);
-                }
-                else if (!isInteger && c == '.' && pointIndex == -1)
-                {
+                } else if (!isInteger && c == '.' && pointIndex == -1) {
                     // Mark decimal point location
                     pointIndex = digitSize;
-                }
-                else if (!isInteger && (c == 'e' || c == 'E') && expIndex == -1)
-                {
+                } else if (!isInteger && (c == 'e' || c == 'E') && expIndex == -1) {
                     // Mark index after which the exponent is specified
                     expIndex = i;
                     break;
-                }
-                else
-                {
+                } else {
                     throw new NumberFormatException("Invalid character: " + c + " at position " + i);
                 }
-            }
-            else
-            {
-                if (leadingZeros == digitSize && digit == 0)
-                {
+            } else {
+                if (leadingZeros == digitSize && digit == 0) {
                     // Increase number of leading zeros
                     leadingZeros++;
-                }
-                else if (startIndex == -1)
-                {
+                } else if (startIndex == -1) {
                     // Mark index where the significant digits start
                     startIndex = i;
                 }
@@ -144,13 +155,10 @@ public class LongApfloatImpl
                 // Increase number of digits
                 digitSize++;
 
-                if (digit == 0)
-                {
+                if (digit == 0) {
                     // Increase number of trailing zeros
                     trailingZeros++;
-                }
-                else
-                {
+                } else {
                     // Reset number of trailing zeros
                     trailingZeros = 0;
                 }
@@ -158,14 +166,12 @@ public class LongApfloatImpl
         }
 
         // Check if no digits were specified
-        if (digitSize == 0)
-        {
+        if (digitSize == 0) {
             throw new NumberFormatException("No digits");
         }
 
         // Check if this number is zero
-        if (startIndex == -1)
-        {
+        if (startIndex == -1) {
             this.sign = 0;
             this.precision = Apfloat.INFINITE;
             this.exponent = 0;
@@ -175,8 +181,7 @@ public class LongApfloatImpl
         }
 
         // Default precision is number of significant digits, if not specified
-        if (precision == Apfloat.DEFAULT)
-        {
+        if (precision == Apfloat.DEFAULT) {
             assert (!isInteger);
             precision = digitSize - leadingZeros;
         }
@@ -186,26 +191,19 @@ public class LongApfloatImpl
         int integerSize = (pointIndex >= 0 ? pointIndex : digitSize) - leadingZeros;
 
         // Read exponent as specified in string
-        if (expIndex >= 0)
-        {
+        if (expIndex >= 0) {
             // Thanks to Charles Oliver Nutter for finding this bug
             String expString = value.substring(expIndex + 1);
-            if (expString.startsWith("+"))
-            {
+            if (expString.startsWith("+")) {
                 expString = expString.substring(1);
             }
 
-            try
-            {
+            try {
                 this.exponent = Long.parseLong(expString);
-            }
-            catch (NumberFormatException nfe)
-            {
+            } catch (NumberFormatException nfe) {
                 throw new NumberFormatException("Invalid exponent: " + expString);
             }
-        }
-        else
-        {
+        } else {
             this.exponent = 0;
         }
 
@@ -213,12 +211,9 @@ public class LongApfloatImpl
         int slack = BASE_DIGITS[radix];
 
         // Check for overflow in exponent, roughly
-        if (integerSize >= -slack && this.exponent >= Long.MAX_VALUE - integerSize - slack)
-        {
+        if (integerSize >= -slack && this.exponent >= Long.MAX_VALUE - integerSize - slack) {
             throw new NumberFormatException("Exponent overflow");
-        }
-        else if (integerSize <= slack && this.exponent <= Long.MIN_VALUE - integerSize + slack)
-        {
+        } else if (integerSize <= slack && this.exponent <= Long.MIN_VALUE - integerSize + slack) {
             // Underflow
             this.sign = 0;
             this.precision = Apfloat.INFINITE;
@@ -235,12 +230,9 @@ public class LongApfloatImpl
         long baseExp = (this.exponent + (this.exponent > 0 ? BASE_DIGITS[radix] - 1 : 0)) / BASE_DIGITS[radix];
 
         // Check for overflow in exponent as represented in base units
-        if (baseExp > MAX_EXPONENT[this.radix])
-        {
+        if (baseExp > MAX_EXPONENT[this.radix]) {
             throw new OverflowException("Overflow");
-        }
-        else if (baseExp < -MAX_EXPONENT[this.radix])
-        {
+        } else if (baseExp < -MAX_EXPONENT[this.radix]) {
             // Underflow
             this.sign = 0;
             this.precision = Apfloat.INFINITE;
@@ -274,11 +266,9 @@ public class LongApfloatImpl
         DataStorage.Iterator iterator = this.dataStorage.iterator(DataStorage.WRITE, 0, size);
 
         // Set the data
-        for (int i = startIndex; digitSize > 0; i++)
-        {
+        for (int i = startIndex; digitSize > 0; i++) {
             char c = value.charAt(i);
-            if (c == '.')
-            {
+            if (c == '.') {
                 continue;
             }
 
@@ -286,19 +276,16 @@ public class LongApfloatImpl
             word *= (long) radix;
             word += (long) digit;
 
-            if (digitSize == 1)
-            {
+            if (digitSize == 1) {
                 // Last digit
-                while (digitsInBase < BASE_DIGITS[radix] - 1)
-                {
+                while (digitsInBase < BASE_DIGITS[radix] - 1) {
                     // Fill last word with trailing zeros
                     word *= (long) radix;
                     digitsInBase++;
                 }
             }
 
-            if (++digitsInBase == BASE_DIGITS[radix])
-            {
+            if (++digitsInBase == BASE_DIGITS[radix]) {
                 // Word is full, write word
                 digitsInBase = 0;
                 iterator.setLong(word);
@@ -317,33 +304,26 @@ public class LongApfloatImpl
     /**
      * Create a new <code>LongApfloatImpl</code> instance from a <code>long</code>.
      *
-     * @param value The value of the number.
+     * @param value     The value of the number.
      * @param precision The precision of the number (in digits of the radix).
-     * @param radix The radix in which the number is created.
-     *
-     * @exception java.lang.NumberFormatException If the number is not valid.
+     * @param radix     The radix in which the number is created.
+     * @throws java.lang.NumberFormatException If the number is not valid.
      */
 
     public LongApfloatImpl(long value, long precision, int radix)
-        throws NumberFormatException, ApfloatRuntimeException
-    {
+            throws NumberFormatException, ApfloatRuntimeException {
         super(checkRadix(radix));
 
         assert (precision > 0);
 
         this.radix = radix;
 
-        if (value > 0)
-        {
+        if (value > 0) {
             this.sign = 1;
             value = -value;         // Calculate here as negative to handle 0x8000000000000000
-        }
-        else if (value < 0)
-        {
+        } else if (value < 0) {
             this.sign = -1;
-        }
-        else
-        {
+        } else {
             this.sign = 0;
             this.precision = Apfloat.INFINITE;
             this.exponent = 0;
@@ -358,15 +338,11 @@ public class LongApfloatImpl
         long[] data = new long[MAX_LONG_SIZE];
         long longBase = (long) BASE[radix];
 
-        if (-longBase < value)
-        {
+        if (-longBase < value) {
             size = 1;                               // Nonzero
             data[MAX_LONG_SIZE - 1] = (long) -value;
-        }
-        else
-        {
-            for (size = 0; value != 0; size++)
-            {
+        } else {
+            for (size = 0; value != 0; size++) {
                 long newValue = value / longBase;
                 data[MAX_LONG_SIZE - 1 - size] = (long) (newValue * longBase - value);   // Negated here
                 value = newValue;
@@ -377,14 +353,12 @@ public class LongApfloatImpl
 
         // Check if precision in longs is less than size; truncate size if so
         long basePrecision = getBasePrecision(precision, getDigits(data[MAX_LONG_SIZE - size]));
-        if (basePrecision < size)
-        {
+        if (basePrecision < size) {
             size = (int) basePrecision;
         }
 
         // Remove trailing zeros from data
-        while (data[MAX_LONG_SIZE - 1 - (int) this.exponent + size] == 0)
-        {
+        while (data[MAX_LONG_SIZE - 1 - (int) this.exponent + size] == 0) {
             size--;
         }
 
@@ -401,36 +375,28 @@ public class LongApfloatImpl
     /**
      * Create a new <code>LongApfloatImpl</code> instance from a <code>double</code>.
      *
-     * @param value The value of the number.
+     * @param value     The value of the number.
      * @param precision The precision of the number (in digits of the radix).
-     * @param radix The radix in which the number is created.
-     *
-     * @exception java.lang.NumberFormatException If the number is not valid.
+     * @param radix     The radix in which the number is created.
+     * @throws java.lang.NumberFormatException If the number is not valid.
      */
 
     public LongApfloatImpl(double value, long precision, int radix)
-        throws NumberFormatException, ApfloatRuntimeException
-    {
+            throws NumberFormatException, ApfloatRuntimeException {
         super(checkRadix(radix));
 
-        if (Double.isInfinite(value) || Double.isNaN(value))
-        {
+        if (Double.isInfinite(value) || Double.isNaN(value)) {
             throw new NumberFormatException(value + " is not a valid number");
         }
 
         this.radix = radix;
 
-        if (value > 0)
-        {
+        if (value > 0) {
             this.sign = 1;
-        }
-        else if (value < 0)
-        {
+        } else if (value < 0) {
             this.sign = -1;
             value = -value;
-        }
-        else
-        {
+        } else {
             this.sign = 0;
             this.precision = Apfloat.INFINITE;
             this.exponent = 0;
@@ -447,31 +413,25 @@ public class LongApfloatImpl
 
         this.exponent = (long) Math.floor(Math.log(value) / Math.log(doubleBase));
         // Avoid overflow in intermediate value
-        if (this.exponent > 0)
-        {
+        if (this.exponent > 0) {
             value *= Math.pow(doubleBase, (double) -this.exponent);
-        }
-        else if (this.exponent < 0)
-        {
+        } else if (this.exponent < 0) {
             value *= Math.pow(doubleBase, (double) (-this.exponent - MAX_DOUBLE_SIZE));
             value *= Math.pow(doubleBase, (double) MAX_DOUBLE_SIZE);
         }
         this.exponent++;
 
-        if (value < 1.0)
-        {
+        if (value < 1.0) {
             // Round-off error in case the input was very close but just under the base, e.g. 9.999999999999996E-10
             value = 1.0;
         }
 
-        for (size = 0; size < MAX_DOUBLE_SIZE && value > 0.0; size++)
-        {
+        for (size = 0; size < MAX_DOUBLE_SIZE && value > 0.0; size++) {
             double tmp = Math.floor(value);
 
             assert (tmp <= doubleBase);
 
-            if (tmp == doubleBase)
-            {
+            if (tmp == doubleBase) {
                 // Round-off error e.g. in case of the number being exactly 1/radix
                 tmp -= 1.0;
             }
@@ -483,14 +443,12 @@ public class LongApfloatImpl
 
         // Check if precision in longs is less than size; truncate size if so
         long basePrecision = getBasePrecision(precision, getDigits(data[0]));
-        if (basePrecision < size)
-        {
+        if (basePrecision < size) {
             size = (int) basePrecision;
         }
 
         // Remove trailing zeros from data
-        while (data[size - 1] == 0)
-        {
+        while (data[size - 1] == 0) {
             size--;
         }
 
@@ -504,36 +462,9 @@ public class LongApfloatImpl
         this.dataStorage.setReadOnly();
     }
 
-    private static long readExponent(PushbackReader in)
-        throws IOException, NumberFormatException
-    {
-        StringBuilder buffer = new StringBuilder(20);
-        int input;
-
-        for (long i = 0; (input = in.read()) != -1; i++)
-        {
-            char c = (char) input;
-            int digit = Character.digit(c, 10);         // Exponent is always in base 10
-
-            if (i == 0 && c == '-' ||
-                digit != -1)
-            {
-                buffer.append(c);
-            }
-            else
-            {
-                // Stop at first invalid character and put it back
-                in.unread(input);
-                break;
-            }
-        }
-
-        return Long.parseLong(buffer.toString());
-    }
-
     /**
      * Create a new <code>LongApfloatImpl</code> instance reading from a stream.<p>
-     *
+     * <p>
      * Implementation note: this constructor calls the <code>in</code> stream's
      * single-character <code>read()</code> method. If the underlying stream doesn't
      * explicitly implement this method in some efficient way, but simply inherits it
@@ -541,18 +472,16 @@ public class LongApfloatImpl
      * <code>Reader</code> method creates a <code>new char[1]</code> on every call to
      * <code>read()</code>.
      *
-     * @param in The stream to read from.
+     * @param in        The stream to read from.
      * @param precision The precision of the number (in digits of the radix).
-     * @param radix The radix in which the number is created.
+     * @param radix     The radix in which the number is created.
      * @param isInteger Specifies if the number to be parsed from the stream is to be treated as an integer or not.
-     *
-     * @exception java.io.IOException If an I/O error occurs accessing the stream.
-     * @exception java.lang.NumberFormatException If the number is not valid.
+     * @throws java.io.IOException             If an I/O error occurs accessing the stream.
+     * @throws java.lang.NumberFormatException If the number is not valid.
      */
 
     public LongApfloatImpl(PushbackReader in, long precision, int radix, boolean isInteger)
-        throws IOException, NumberFormatException, ApfloatRuntimeException
-    {
+            throws IOException, NumberFormatException, ApfloatRuntimeException {
         super(checkRadix(radix));
 
         assert (precision == Apfloat.DEFAULT || precision > 0);
@@ -565,8 +494,8 @@ public class LongApfloatImpl
         // Allocate a maximum memory block, since we don't know how much data to expect
         ApfloatContext ctx = ApfloatContext.getContext();
         long initialSize = ctx.getMemoryThreshold() / 8,
-             previousAllocatedSize = 0,
-             allocatedSize = initialSize;
+                previousAllocatedSize = 0,
+                allocatedSize = initialSize;
         this.dataStorage = createDataStorage(initialSize);
         this.dataStorage.setSize(initialSize);
 
@@ -580,55 +509,40 @@ public class LongApfloatImpl
 
         int input;
         long actualSize = 0,
-             startIndex = -1,
-             pointIndex = -1,
-             leadingZeros = 0,
-             trailingZeros = 0,
-             digitSize = 0;
+                startIndex = -1,
+                pointIndex = -1,
+                leadingZeros = 0,
+                trailingZeros = 0,
+                digitSize = 0;
 
         // Scan through the string looking for various things
-        for (long i = 0; (input = in.read()) != -1; i++)
-        {
+        for (long i = 0; (input = in.read()) != -1; i++) {
             char c = (char) input;
             int digit = Character.digit(c, radix);
 
             // Note that checking for a valid digit takes place before checking for e or E in the string
-            if (digit == -1)
-            {
-                if (i == 0 && (c == '-' || c == '+'))
-                {
+            if (digit == -1) {
+                if (i == 0 && (c == '-' || c == '+')) {
                     // Get sign
                     this.sign = (c == '-' ? -1 : 1);
-                }
-                else if (!isInteger && c == '.' && pointIndex == -1)
-                {
+                } else if (!isInteger && c == '.' && pointIndex == -1) {
                     // Mark decimal point location
                     pointIndex = digitSize;
-                }
-                else if (!isInteger && digitSize > 0 && (c == 'e' || c == 'E'))
-                {
+                } else if (!isInteger && digitSize > 0 && (c == 'e' || c == 'E')) {
                     // Read the exponent and stop
                     this.exponent = readExponent(in);
                     break;
-                }
-                else
-                {
+                } else {
                     // Stop at first invalid character and put it back
                     in.unread(input);
                     break;
                 }
-            }
-            else
-            {
-                if (leadingZeros == digitSize && digit == 0)
-                {
+            } else {
+                if (leadingZeros == digitSize && digit == 0) {
                     // Increase number of leading zeros
                     leadingZeros++;
-                }
-                else
-                {
-                    if (startIndex == -1)
-                    {
+                } else {
+                    if (startIndex == -1) {
                         // Mark index where the significant digits start
                         startIndex = i;
                     }
@@ -638,10 +552,8 @@ public class LongApfloatImpl
                     word += (long) digit;
 
                     // Reallocate storage if needed; done here to prepare storing last (partial) word
-                    if (actualSize == allocatedSize)
-                    {
-                        if (actualSize == initialSize)
-                        {
+                    if (actualSize == allocatedSize) {
+                        if (actualSize == initialSize) {
                             // Maximum memory block size exceeded; prepare to allocate anything
                             DataStorage dataStorage = createDataStorage(Long.MAX_VALUE / 8);
                             dataStorage.copyFrom(this.dataStorage, actualSize);
@@ -654,8 +566,7 @@ public class LongApfloatImpl
                         iterator = this.dataStorage.iterator(DataStorage.WRITE, previousAllocatedSize, allocatedSize);
                     }
 
-                    if (++digitsInBase == BASE_DIGITS[radix])
-                    {
+                    if (++digitsInBase == BASE_DIGITS[radix]) {
                         // Word is full, write word
                         digitsInBase = 0;
                         iterator.setLong(word);
@@ -668,13 +579,10 @@ public class LongApfloatImpl
                 // Increase number of digits
                 digitSize++;
 
-                if (digit == 0)
-                {
+                if (digit == 0) {
                     // Increase number of trailing zeros
                     trailingZeros++;
-                }
-                else
-                {
+                } else {
                     // Reset number of trailing zeros
                     trailingZeros = 0;
                 }
@@ -682,14 +590,12 @@ public class LongApfloatImpl
         }
 
         // Check if no digits were specified
-        if (digitSize == 0)
-        {
+        if (digitSize == 0) {
             throw new NumberFormatException("No digits");
         }
 
         // Check if this number is zero
-        if (startIndex == -1)
-        {
+        if (startIndex == -1) {
             this.sign = 0;
             this.precision = Apfloat.INFINITE;
             this.exponent = 0;
@@ -699,11 +605,9 @@ public class LongApfloatImpl
         }
 
         // Handle last word
-        if (digitsInBase > 0 && word != 0)
-        {
+        if (digitsInBase > 0 && word != 0) {
             // Last digit
-            while (digitsInBase < BASE_DIGITS[radix])
-            {
+            while (digitsInBase < BASE_DIGITS[radix]) {
                 // Fill last word with trailing zeros
                 word *= (long) radix;
                 digitsInBase++;
@@ -717,8 +621,7 @@ public class LongApfloatImpl
         iterator.close();
 
         // Default precision is number of significant digits, if not specified
-        if (precision == Apfloat.DEFAULT)
-        {
+        if (precision == Apfloat.DEFAULT) {
             assert (!isInteger);
             precision = digitSize - leadingZeros;
         }
@@ -731,12 +634,9 @@ public class LongApfloatImpl
         int slack = BASE_DIGITS[radix];
 
         // Check for overflow in exponent, roughly
-        if (integerSize >= -slack && this.exponent >= Long.MAX_VALUE - integerSize - slack)
-        {
+        if (integerSize >= -slack && this.exponent >= Long.MAX_VALUE - integerSize - slack) {
             throw new NumberFormatException("Exponent overflow");
-        }
-        else if (integerSize <= slack && this.exponent <= Long.MIN_VALUE - integerSize + slack)
-        {
+        } else if (integerSize <= slack && this.exponent <= Long.MIN_VALUE - integerSize + slack) {
             // Underflow
             this.sign = 0;
             this.precision = Apfloat.INFINITE;
@@ -753,12 +653,9 @@ public class LongApfloatImpl
         long baseExp = (this.exponent - (this.exponent < 0 ? BASE_DIGITS[radix] - 1 : 0)) / BASE_DIGITS[radix];
 
         // Check for overflow in exponent as represented in base units
-        if (baseExp > MAX_EXPONENT[this.radix])
-        {
+        if (baseExp > MAX_EXPONENT[this.radix]) {
             throw new OverflowException("Overflow");
-        }
-        else if (baseExp < -MAX_EXPONENT[this.radix])
-        {
+        } else if (baseExp < -MAX_EXPONENT[this.radix]) {
             // Underflow
             this.sign = 0;
             this.precision = Apfloat.INFINITE;
@@ -788,13 +685,11 @@ public class LongApfloatImpl
 
         this.dataStorage.setReadOnly();
 
-        if (bias != 0)
-        {
+        if (bias != 0) {
             // Shift by bias
             long factor = 1;
 
-            for (int i = 0; i < bias; i++)
-            {
+            for (int i = 0; i < bias; i++) {
                 factor *= radix;
             }
 
@@ -806,18 +701,37 @@ public class LongApfloatImpl
         }
     }
 
+    private static long readExponent(PushbackReader in)
+            throws IOException, NumberFormatException {
+        StringBuilder buffer = new StringBuilder(20);
+        int input;
+
+        for (long i = 0; (input = in.read()) != -1; i++) {
+            char c = (char) input;
+            int digit = Character.digit(c, 10);         // Exponent is always in base 10
+
+            if (i == 0 && c == '-' ||
+                    digit != -1) {
+                buffer.append(c);
+            } else {
+                // Stop at first invalid character and put it back
+                in.unread(input);
+                break;
+            }
+        }
+
+        return Long.parseLong(buffer.toString());
+    }
+
     // Returns number of trailing zeros before specified index
     private static long getTrailingZeros(DataStorage dataStorage, long index)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         long count = 0;
 
         DataStorage.Iterator iterator = dataStorage.iterator(DataStorage.READ, index, 0);
 
-        while (iterator.hasNext())
-        {
-            if (iterator.getLong() != 0)
-            {
+        while (iterator.hasNext()) {
+            if (iterator.getLong() != 0) {
                 iterator.close();
                 break;
             }
@@ -831,16 +745,13 @@ public class LongApfloatImpl
 
     // Returns number of leading zeros starting from specified index
     private static long getLeadingZeros(DataStorage dataStorage, long index)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         long count = 0;
 
         DataStorage.Iterator iterator = dataStorage.iterator(DataStorage.READ, index, dataStorage.getSize());
 
-        while (iterator.hasNext())
-        {
-            if (iterator.getLong() != 0)
-            {
+        while (iterator.hasNext()) {
+            if (iterator.getLong() != 0) {
                 iterator.close();
                 break;
             }
@@ -852,18 +763,57 @@ public class LongApfloatImpl
         return count;
     }
 
+    private static void writeZeros(Writer out, long count)
+            throws IOException {
+        for (long i = 0; i < count; i++) {
+            out.write('0');
+        }
+    }
+
+    private static int checkRadix(int radix)
+            throws NumberFormatException {
+        if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX) {
+            throw new NumberFormatException("Invalid radix " + radix + "; radix must be between " + Character.MIN_RADIX + " and " + Character.MAX_RADIX);
+        }
+
+        return radix;
+    }
+
+    // Get the most significant word of the specified data storage
+    private static long getMostSignificantWord(DataStorage dataStorage)
+            throws ApfloatRuntimeException {
+        long msw;
+
+        ArrayAccess arrayAccess = dataStorage.getArray(DataStorage.READ, 0, 1);
+        msw = arrayAccess.getLongData()[arrayAccess.getOffset()];
+        arrayAccess.close();
+
+        return msw;
+    }
+
+    // Gets a new data storage for specified size
+    private static DataStorage createDataStorage(long size)
+            throws ApfloatRuntimeException {
+        ApfloatContext ctx = ApfloatContext.getContext();
+        DataStorageBuilder dataStorageBuilder = ctx.getBuilderFactory().getDataStorageBuilder();
+        return dataStorageBuilder.createDataStorage(size * 8);
+    }
+
+    // Gets I/O block size in longs
+    private static int getBlockSize() {
+        ApfloatContext ctx = ApfloatContext.getContext();
+        return ctx.getBlockSize() / 8;
+    }
+
     public ApfloatImpl addOrSubtract(ApfloatImpl x, boolean subtract)
-        throws ApfloatRuntimeException
-    {
-        if (!(x instanceof LongApfloatImpl))
-        {
+            throws ApfloatRuntimeException {
+        if (!(x instanceof LongApfloatImpl)) {
             throw new ImplementationMismatchException("Wrong operand type: " + x.getClass().getName());
         }
 
         LongApfloatImpl that = (LongApfloatImpl) x;
 
-        if (this.radix != that.radix)
-        {
+        if (this.radix != that.radix) {
             throw new RadixMismatchException("Cannot use numbers with different radixes: " + this.radix + " and " + that.radix);
         }
 
@@ -879,19 +829,15 @@ public class LongApfloatImpl
 
         int sign;
         long exponent,
-             precision;
+                precision;
         DataStorage dataStorage;
 
-        if (this == that)
-        {
-            if (reallySubtract)
-            {
+        if (this == that) {
+            if (reallySubtract) {
                 // x - x = 0
 
                 return zero();
-            }
-            else
-            {
+            } else {
                 // x + x = 2 * x
 
                 sign = this.sign;
@@ -903,8 +849,8 @@ public class LongApfloatImpl
                 dataStorage.setSize(size);
 
                 DataStorage.Iterator src1 = this.dataStorage.iterator(DataStorage.READ, size - 1, 0),
-                                     src2 = this.dataStorage.iterator(DataStorage.READ, size - 1, 0),   // Sub-optimal: could be the same
-                                     dst = dataStorage.iterator(DataStorage.WRITE, size, 0);
+                        src2 = this.dataStorage.iterator(DataStorage.READ, size - 1, 0),   // Sub-optimal: could be the same
+                        dst = dataStorage.iterator(DataStorage.WRITE, size, 0);
 
                 long carry = additionStrategy.add(src1, src2, (long) 0, dst, size - 1);
 
@@ -915,75 +861,58 @@ public class LongApfloatImpl
 
                 // Check if carry occurred
                 int carrySize = (int) carry,
-                    leadingZeros = 1 - carrySize;
+                        leadingZeros = 1 - carrySize;
 
                 dataStorage = dataStorage.subsequence(leadingZeros, size - leadingZeros);
                 exponent += carrySize;
 
-                if (this.exponent == MAX_EXPONENT[this.radix] && carrySize > 0)
-                {
+                if (this.exponent == MAX_EXPONENT[this.radix] && carrySize > 0) {
                     throw new OverflowException("Overflow");
                 }
 
                 if (precision != Apfloat.INFINITE &&
-                    (carrySize > 0 || getInitialDigits(dataStorage) > getInitialDigits()))
-                {
+                        (carrySize > 0 || getInitialDigits(dataStorage) > getInitialDigits())) {
                     // Carry overflow for most significant digit; number of significant digits increases by one
                     precision++;
                 }
             }
-        }
-        else
-        {
+        } else {
             // Now this != that
 
             int comparison;
-            if (scale() > that.scale())
-            {
+            if (scale() > that.scale()) {
                 comparison = 1;
-            }
-            else if (scale() < that.scale())
-            {
+            } else if (scale() < that.scale()) {
                 comparison = -1;
-            }
-            else if (reallySubtract)
-            {
+            } else if (reallySubtract) {
                 comparison = compareMantissaTo(that);           // Might be sub-optimal, but a more efficient algorithm would be complicated
-            }
-            else
-            {
+            } else {
                 comparison = 1;                                 // Add equally big numbers; arbitrarily choose one
             }
 
             LongApfloatImpl big,
-                               small;
+                    small;
 
-            if (comparison > 0)
-            {
+            if (comparison > 0) {
                 big = this;
                 small = that;
                 sign = this.sign;
-            }
-            else if (comparison < 0)
-            {
+            } else if (comparison < 0) {
                 big = that;
                 small = this;
                 sign = realThatSign;
-            }
-            else
-            {
+            } else {
                 // x - x = 0
                 return zero();
             }
 
             long scaleDifference = big.scale() - small.scale(),
-                 exponentDifference,
-                 size,
-                 bigSize,
-                 smallSize;
+                    exponentDifference,
+                    size,
+                    bigSize,
+                    smallSize;
 
-            if (scaleDifference < 0)
-            {
+            if (scaleDifference < 0) {
                 // Small number is completely insignificantly small compared to big
                 precision = big.precision;
                 exponent = big.exponent;
@@ -991,9 +920,7 @@ public class LongApfloatImpl
                 smallSize = 0;
                 size = bigSize;
                 exponentDifference = bigSize;
-            }
-            else
-            {
+            } else {
                 precision = Math.min(big.precision, Util.ifFinite(small.precision, scaleDifference + small.precision)); // Detects overflow also
                 long basePrecision = Math.min(MAX_EXPONENT[this.radix], getBasePrecision(precision, big.getInitialDigits()));
                 exponent = big.exponent;
@@ -1009,83 +936,63 @@ public class LongApfloatImpl
             dataStorage.setSize(dstSize);
 
             DataStorage.Iterator src1 = big.dataStorage.iterator(DataStorage.READ, bigSize, 0),
-                                 src2 = small.dataStorage.iterator(DataStorage.READ, smallSize, 0),
-                                 dst = dataStorage.iterator(DataStorage.WRITE, dstSize, 0);
+                    src2 = small.dataStorage.iterator(DataStorage.READ, smallSize, 0),
+                    dst = dataStorage.iterator(DataStorage.WRITE, dstSize, 0);
 
             long carry = 0;
 
             // big:       XXXXXXXX               XXXX
             // small:         XXXXXXXX        or         XXXX
             // This part:         XXXX                   XXXX
-            if (size > bigSize)
-            {
+            if (size > bigSize) {
                 long blockSize = Math.min(size - bigSize, smallSize);
-                if (reallySubtract)
-                {
+                if (reallySubtract) {
                     carry = additionStrategy.subtract(null, src2, carry, dst, blockSize);
-                }
-                else
-                {
+                } else {
                     carry = additionStrategy.add(null, src2, carry, dst, blockSize);
                 }
             }
             // big:        XXXXXXXXXXXX
             // small:          XXXX
             // This part:          XXXX
-            else if (size > exponentDifference + smallSize)
-            {
+            else if (size > exponentDifference + smallSize) {
                 long blockSize = size - exponentDifference - smallSize;
-                if (reallySubtract)
-                {
+                if (reallySubtract) {
                     carry = additionStrategy.subtract(src1, null, carry, dst, blockSize);
-                }
-                else
-                {
+                } else {
                     carry = additionStrategy.add(src1, null, carry, dst, blockSize);
                 }
             }
             // big:        XXXX
             // small:              XXXX
             // This part:      XXXX
-            if (exponentDifference > bigSize)
-            {
+            if (exponentDifference > bigSize) {
                 long blockSize = exponentDifference - bigSize;
-                if (reallySubtract)
-                {
+                if (reallySubtract) {
                     carry = additionStrategy.subtract(null, null, carry, dst, blockSize);
-                }
-                else
-                {
+                } else {
                     carry = additionStrategy.add(null, null, carry, dst, blockSize);
                 }
             }
             // big:        XXXXXXXX               XXXXXXXXXXXX
             // small:          XXXXXXXX        or     XXXX
             // This part:      XXXX                   XXXX
-            else if (bigSize > exponentDifference)
-            {
+            else if (bigSize > exponentDifference) {
                 long blockSize = Math.min(bigSize - exponentDifference, smallSize);
-                if (reallySubtract)
-                {
+                if (reallySubtract) {
                     carry = additionStrategy.subtract(src1, src2, carry, dst, blockSize);
-                }
-                else
-                {
+                } else {
                     carry = additionStrategy.add(src1, src2, carry, dst, blockSize);
                 }
             }
             // big:        XXXXXXXX               XXXXXXXXXXXX           XXXX
             // small:          XXXXXXXX        or     XXXX            or         XXXX
             // This part:  XXXX                   XXXX                   XXXX
-            if (exponentDifference > 0)
-            {
+            if (exponentDifference > 0) {
                 long blockSize = Math.min(bigSize, exponentDifference);
-                if (reallySubtract)
-                {
+                if (reallySubtract) {
                     carry = additionStrategy.subtract(src1, null, carry, dst, blockSize);
-                }
-                else
-                {
+                } else {
                     carry = additionStrategy.add(src1, null, carry, dst, blockSize);
                 }
             }
@@ -1096,20 +1003,16 @@ public class LongApfloatImpl
 
             long leadingZeros;
 
-            if (reallySubtract)
-            {
+            if (reallySubtract) {
                 // Get denormalization
                 leadingZeros = getLeadingZeros(dataStorage, 0);
 
                 assert (leadingZeros <= size);
-            }
-            else
-            {
+            } else {
                 // Check if carry occurred up to and including most significant word
                 leadingZeros = (carry == 0 ? 1 : 0);
 
-                if (this.exponent == MAX_EXPONENT[this.radix] && leadingZeros == 0)
-                {
+                if (this.exponent == MAX_EXPONENT[this.radix] && leadingZeros == 0) {
                     throw new OverflowException("Overflow");
                 }
             }
@@ -1119,18 +1022,15 @@ public class LongApfloatImpl
             dataStorage = dataStorage.subsequence(leadingZeros, dstSize - leadingZeros);
             exponent += 1 - leadingZeros;
 
-            if (exponent < -MAX_EXPONENT[this.radix])
-            {
+            if (exponent < -MAX_EXPONENT[this.radix]) {
                 // Underflow
                 return zero();
             }
 
-            if (precision != Apfloat.INFINITE)
-            {
+            if (precision != Apfloat.INFINITE) {
                 // If scale of number changes, the number of significant digits changes accordingly
                 long scaleChange = (1 - leadingZeros) * BASE_DIGITS[this.radix] + getInitialDigits(dataStorage) - big.getInitialDigits();
-                if (-scaleChange >= precision)
-                {
+                if (-scaleChange >= precision) {
                     // All significant digits were lost anyway, due to trailing garbage digits
                     return zero();
                 }
@@ -1145,51 +1045,44 @@ public class LongApfloatImpl
     }
 
     public ApfloatImpl multiply(ApfloatImpl x)
-        throws ApfloatRuntimeException
-    {
-        if (!(x instanceof LongApfloatImpl))
-        {
+            throws ApfloatRuntimeException {
+        if (!(x instanceof LongApfloatImpl)) {
             throw new ImplementationMismatchException("Wrong operand type: " + x.getClass().getName());
         }
 
         LongApfloatImpl that = (LongApfloatImpl) x;
 
-        if (this.radix != that.radix)
-        {
+        if (this.radix != that.radix) {
             throw new RadixMismatchException("Cannot multiply numbers with different radixes: " + this.radix + " and " + that.radix);
         }
 
         int sign = this.sign * that.sign;
 
-        if (sign == 0)
-        {
+        if (sign == 0) {
             return zero();
         }
 
         long exponent = this.exponent + that.exponent;
 
-        if (exponent > MAX_EXPONENT[this.radix])
-        {
+        if (exponent > MAX_EXPONENT[this.radix]) {
             throw new OverflowException("Overflow");
-        }
-        else if (exponent < -MAX_EXPONENT[this.radix])
-        {
+        } else if (exponent < -MAX_EXPONENT[this.radix]) {
             // Underflow
             return zero();
         }
 
         long precision = Math.min(this.precision, that.precision),
-             basePrecision = getBasePrecision(precision, 0),            // Round up
-             thisSize = getSize(),
-             thatSize = that.getSize(),
-             size = Math.min(Util.ifFinite(basePrecision, basePrecision + 1), thisSize + thatSize),     // Reserve one extra word for carry
-             thisDataSize = Math.min(thisSize, basePrecision),
-             thatDataSize = Math.min(thatSize, basePrecision);
+                basePrecision = getBasePrecision(precision, 0),            // Round up
+                thisSize = getSize(),
+                thatSize = that.getSize(),
+                size = Math.min(Util.ifFinite(basePrecision, basePrecision + 1), thisSize + thatSize),     // Reserve one extra word for carry
+                thisDataSize = Math.min(thisSize, basePrecision),
+                thatDataSize = Math.min(thatSize, basePrecision);
 
         DataStorage thisDataStorage = this.dataStorage.subsequence(0, thisDataSize),
-                    thatDataStorage = (this.dataStorage == that.dataStorage ?
-                                       thisDataStorage :                                                // Enable auto-convolution
-                                       that.dataStorage.subsequence(0, thatDataSize));
+                thatDataStorage = (this.dataStorage == that.dataStorage ?
+                        thisDataStorage :                                                // Enable auto-convolution
+                        that.dataStorage.subsequence(0, thatDataSize));
 
         ApfloatContext ctx = ApfloatContext.getContext();
         ConvolutionBuilder convolutionBuilder = ctx.getBuilderFactory().getConvolutionBuilder();
@@ -1203,8 +1096,7 @@ public class LongApfloatImpl
 
         exponent -= leadingZeros;
 
-        if (exponent < -MAX_EXPONENT[this.radix])
-        {
+        if (exponent < -MAX_EXPONENT[this.radix]) {
             // Underflow
             return zero();
         }
@@ -1223,23 +1115,19 @@ public class LongApfloatImpl
     }
 
     public boolean isShort()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return (this.sign == 0 || getSize() == 1);
     }
 
     public ApfloatImpl divideShort(ApfloatImpl x)
-        throws ApfloatRuntimeException
-    {
-        if (!(x instanceof LongApfloatImpl))
-        {
+            throws ApfloatRuntimeException {
+        if (!(x instanceof LongApfloatImpl)) {
             throw new ImplementationMismatchException("Wrong operand type: " + x.getClass().getName());
         }
 
         LongApfloatImpl that = (LongApfloatImpl) x;
 
-        if (this.radix != that.radix)
-        {
+        if (this.radix != that.radix) {
             throw new RadixMismatchException("Cannot divide numbers with different radixes: " + this.radix + " and " + that.radix);
         }
 
@@ -1250,32 +1138,26 @@ public class LongApfloatImpl
 
         long exponent = this.exponent - that.exponent + 1;
 
-        if (exponent > MAX_EXPONENT[this.radix])
-        {
+        if (exponent > MAX_EXPONENT[this.radix]) {
             throw new OverflowException("Overflow");
-        }
-        else if (exponent < -MAX_EXPONENT[this.radix])
-        {
+        } else if (exponent < -MAX_EXPONENT[this.radix]) {
             // Underflow
             return zero();
         }
 
         long precision = Math.min(this.precision, that.precision),
-             basePrecision = getBasePrecision(),
-             thisDataSize = Math.min(getSize(), basePrecision);
+                basePrecision = getBasePrecision(),
+                thisDataSize = Math.min(getSize(), basePrecision);
 
         DataStorage dataStorage;
 
         long divisor = getMostSignificantWord(that.dataStorage);
 
-        if (divisor == (long) 1)
-        {
+        if (divisor == (long) 1) {
             long size = thisDataSize - getTrailingZeros(this.dataStorage, thisDataSize);
 
             dataStorage = this.dataStorage.subsequence(0, size);
-        }
-        else
-        {
+        } else {
             ApfloatContext ctx = ApfloatContext.getContext();
             AdditionBuilder<Long> additionBuilder = ctx.getBuilderFactory().getAdditionBuilder(Long.TYPE);
             AdditionStrategy<Long> additionStrategy = additionBuilder.createAddition(this.radix);
@@ -1288,44 +1170,40 @@ public class LongApfloatImpl
 
             // Check that the factorization of the divisor consists entirely of factors of the base
             // E.g. if base is 10=2*5 then the divisor should be 2^n*5^m
-            for (int i = 0; i < RADIX_FACTORS[this.radix].length; i++)
-            {
+            for (int i = 0; i < RADIX_FACTORS[this.radix].length; i++) {
                 long factor = RADIX_FACTORS[this.radix][i],
                         quotient;
 
                 // Keep dividing by factor as long as dividend % factor == 0
                 // that is remove factors of the base from the divisor
-                while ((dividend - factor * (quotient = (long) (long) (dividend / factor))) == 0)
-                {
+                while ((dividend - factor * (quotient = (long) (long) (dividend / factor))) == 0) {
                     dividend = quotient;
                 }
             }
 
             // Check if the divisor was factored all the way to one by just dividing by factors of the base
-            if (dividend != (long) 1)
-            {
+            if (dividend != (long) 1) {
                 // Divisor does not contain only factors of the base; infinite nonzero sequence
 
-                if (basePrecision == Apfloat.INFINITE)
-                {
+                if (basePrecision == Apfloat.INFINITE) {
                     throw new InfiniteExpansionException("Cannot perform inexact division to infinite precision");
                 }
 
                 size = basePrecision;
-            }
-            else
-            {
+            } else {
                 // Divisor contains only factors of the base; calculate maximum sequence length
                 carry = (long) 1;
-                DataStorage.Iterator dummy = new DataStorage.Iterator()
-                {
-                    public void setLong(long value) {}
-                    public void next() {}
-                    private static final long serialVersionUID = 1L;
+                DataStorage.Iterator dummy = new DataStorage.Iterator() {
+                    private static final long serialVersionUID = 1L;                    public void setLong(long value) {
+                    }
+
+                    public void next() {
+                    }
+
+
                 };
                 long sequenceSize;
-                for (sequenceSize = 0; carry != 0; sequenceSize++)
-                {
+                for (sequenceSize = 0; carry != 0; sequenceSize++) {
                     carry = additionStrategy.divide(null, divisor, carry, dummy, 1);
                 }
 
@@ -1339,7 +1217,7 @@ public class LongApfloatImpl
             dataStorage.setSize(size);
 
             DataStorage.Iterator src = this.dataStorage.iterator(DataStorage.READ, 0, thisDataSize),
-                                 dst = dataStorage.iterator(DataStorage.WRITE, 0, size);
+                    dst = dataStorage.iterator(DataStorage.WRITE, 0, size);
 
             // Perform actual division
             carry = additionStrategy.divide(src, divisor, (long) 0, dst, thisDataSize);
@@ -1355,8 +1233,7 @@ public class LongApfloatImpl
             dataStorage = dataStorage.subsequence(leadingZeros, size - leadingZeros);
             exponent -= leadingZeros;
 
-            if (exponent < -MAX_EXPONENT[this.radix])
-            {
+            if (exponent < -MAX_EXPONENT[this.radix]) {
                 // Underflow
                 return zero();
             }
@@ -1368,14 +1245,12 @@ public class LongApfloatImpl
     }
 
     public ApfloatImpl absFloor()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         if (this.sign == 0 ||
-            this.exponent >= this.dataStorage.getSize())        // Is integer already, with no extra hidden trailing digits
+                this.exponent >= this.dataStorage.getSize())        // Is integer already, with no extra hidden trailing digits
         {
             return precision(Apfloat.INFINITE);
-        }
-        else if (this.exponent <= 0)                            // Is less than one in absolute value
+        } else if (this.exponent <= 0)                            // Is less than one in absolute value
         {
             return zero();
         }
@@ -1391,10 +1266,8 @@ public class LongApfloatImpl
     }
 
     public ApfloatImpl absCeil()
-        throws ApfloatRuntimeException
-    {
-        if (this.sign == 0)
-        {
+            throws ApfloatRuntimeException {
+        if (this.sign == 0) {
             return this;
         }
 
@@ -1402,8 +1275,7 @@ public class LongApfloatImpl
         DataStorage dataStorage;
         DataStorage.Iterator iterator = null;
 
-        if (this.exponent <= 0)
-        {
+        if (this.exponent <= 0) {
             // Number is < 1 but > 0; result is one
             int size = 1;
             dataStorage = createDataStorage(size);
@@ -1413,19 +1285,15 @@ public class LongApfloatImpl
             arrayAccess.close();
 
             exponent = 1;
-        }
-        else if (getSize() <= this.exponent ||          // Check if the fractional part is nonzero
-                 findMismatch(iterator = getZeroPaddedIterator(this.exponent, getSize()), ZERO_ITERATOR, getSize() - this.exponent) < 0)
-        {
+        } else if (getSize() <= this.exponent ||          // Check if the fractional part is nonzero
+                findMismatch(iterator = getZeroPaddedIterator(this.exponent, getSize()), ZERO_ITERATOR, getSize() - this.exponent) < 0) {
             // Fractional part is zero; the result is the number itself (to infinite precision)
             long size = Math.min(this.dataStorage.getSize(), this.exponent);
             size -= getTrailingZeros(this.dataStorage, size);
             dataStorage = this.dataStorage.subsequence(0, size);        // Ensure truncation
 
             exponent = this.exponent;
-        }
-        else
-        {
+        } else {
             // Fractional part is nonzero; round up
 
             ApfloatContext ctx = ApfloatContext.getContext();
@@ -1436,7 +1304,7 @@ public class LongApfloatImpl
             dataStorage = createDataStorage(size + 1);     // Reserve room for carry overflow
             dataStorage.setSize(size + 1);
             DataStorage.Iterator src = this.dataStorage.iterator(DataStorage.READ, size, 0),
-                                 dst = dataStorage.iterator(DataStorage.WRITE, size + 1, 0);
+                    dst = dataStorage.iterator(DataStorage.WRITE, size + 1, 0);
             long carry = additionStrategy.add(src, null, (long) 1, dst, size);     // Add carry
             dst.setLong(carry);                      // Set leading long as overflow carry
             src.close();
@@ -1448,8 +1316,7 @@ public class LongApfloatImpl
             exponent = this.exponent + carrySize;
         }
 
-        if (iterator != null)
-        {
+        if (iterator != null) {
             iterator.close();
         }
 
@@ -1461,10 +1328,9 @@ public class LongApfloatImpl
     }
 
     public ApfloatImpl frac()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         if (this.sign == 0 ||
-            this.exponent <= 0)                                 // Is less than one in absolute value already
+                this.exponent <= 0)                                 // Is less than one in absolute value already
         {
             return this;
         }
@@ -1475,8 +1341,7 @@ public class LongApfloatImpl
 
         long size = this.dataStorage.getSize() - this.exponent; // Size of fractional part, now that getSize() > this.exponent
         long leadingZeros = getLeadingZeros(this.dataStorage, this.exponent);
-        if (this.exponent + leadingZeros >= getSize())
-        {
+        if (this.exponent + leadingZeros >= getSize()) {
             // All significant digits were lost, only trailing garbage digits
             return zero();
         }
@@ -1484,18 +1349,14 @@ public class LongApfloatImpl
         DataStorage dataStorage = this.dataStorage.subsequence(this.exponent + leadingZeros, size - leadingZeros);
 
         long precision;
-        if (this.precision != Apfloat.INFINITE)
-        {
+        if (this.precision != Apfloat.INFINITE) {
             // Precision is reduced as the integer part is omitted, plus any leading zeros
             precision = this.precision - getInitialDigits() - (this.exponent + leadingZeros) * BASE_DIGITS[this.radix] + getInitialDigits(dataStorage);
-            if (precision <= 0)
-            {
+            if (precision <= 0) {
                 // All significant digits were lost anyway, only trailing garbage digits
                 return zero();
             }
-        }
-        else
-        {
+        } else {
             precision = Apfloat.INFINITE;
         }
 
@@ -1506,28 +1367,23 @@ public class LongApfloatImpl
         return apfloatImpl;
     }
 
-    private ApfloatImpl zero()
-    {
+    private ApfloatImpl zero() {
         return new LongApfloatImpl(0, Apfloat.INFINITE, 0, null, this.radix);
     }
 
-    public int radix()
-    {
+    public int radix() {
         return this.radix;
     }
 
-    public long precision()
-    {
+    public long precision() {
         return this.precision;
     }
 
     public long size()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         assert (this.dataStorage != null);
 
-        if (this.size == 0)
-        {
+        if (this.size == 0) {
             // Writes and reads of volatile long values are always atomic so multiple threads can read and write this at the same time
             this.size = getInitialDigits() + (getSize() - 1) * BASE_DIGITS[this.radix] - getLeastZeros();
         }
@@ -1537,10 +1393,8 @@ public class LongApfloatImpl
 
     // Get number of trailing zeros
     private long getLeastZeros()
-        throws ApfloatRuntimeException
-    {
-        if (this.leastZeros == UNDEFINED)
-        {
+            throws ApfloatRuntimeException {
+        if (this.leastZeros == UNDEFINED) {
             // Cache the value
             // NOTE: This is not synchronized; it's OK if multiple threads set this at the same time
             // Writes and reads of volatile long values are always atomic so multiple threads can read and write this at the same time
@@ -1549,8 +1403,7 @@ public class LongApfloatImpl
             word = getLeastSignificantWord(index, word);
 
             long leastZeros = 0;
-            if (word == 0)
-            {
+            if (word == 0) {
                 // Usually the last word is nonzero but in case precision was later changed, it might be zero
                 long trailingZeros = getTrailingZeros(this.dataStorage, index) + 1;
                 index -= trailingZeros;
@@ -1562,8 +1415,7 @@ public class LongApfloatImpl
 
             assert (word != 0);
 
-            while (word % this.radix == 0)
-            {
+            while (word % this.radix == 0) {
                 leastZeros++;
                 word /= this.radix;
             }
@@ -1573,53 +1425,43 @@ public class LongApfloatImpl
         return this.leastZeros;
     }
 
-    public ApfloatImpl precision(long precision)
-    {
-        if (this.sign == 0 || precision == this.precision)
-        {
+    public ApfloatImpl precision(long precision) {
+        if (this.sign == 0 || precision == this.precision) {
             return this;
-        }
-        else
-        {
+        } else {
             return new LongApfloatImpl(this.sign, precision, this.exponent, this.dataStorage, this.radix);
         }
     }
 
     public long scale()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         assert (this.dataStorage != null);
 
         return (this.exponent - 1) * BASE_DIGITS[this.radix] + getInitialDigits();
     }
 
-    public int signum()
-    {
+    public int signum() {
         return this.sign;
     }
 
     public ApfloatImpl negate()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return new LongApfloatImpl(-this.sign, this.precision, this.exponent, this.dataStorage, this.radix);
     }
 
-    public double doubleValue()
-    {
-        if (this.sign == 0)
-        {
+    public double doubleValue() {
+        if (this.sign == 0) {
             return 0.0;
         }
 
         double value = 0.0,
-               doubleBase = (double) BASE[this.radix];
+                doubleBase = (double) BASE[this.radix];
 
         int size = (int) Math.min(MAX_DOUBLE_SIZE, getSize());
 
         DataStorage.Iterator iterator = this.dataStorage.iterator(DataStorage.READ, size, 0);
 
-        while (iterator.hasNext())
-        {
+        while (iterator.hasNext()) {
             value += (double) iterator.getLong();
             value /= doubleBase;
             iterator.next();
@@ -1627,77 +1469,61 @@ public class LongApfloatImpl
 
         // If the end result fits in a double, any intermediate calculation must not overflow
         // Note that 1/BASE <= value < 1
-        if (this.exponent > 0)
-        {
+        if (this.exponent > 0) {
             return this.sign * value * Math.pow((double) BASE[this.radix], (double) (this.exponent - 1)) * BASE[this.radix];
-        }
-        else
-        {
+        } else {
             return this.sign * value * Math.pow((double) BASE[this.radix], (double) this.exponent);
         }
     }
 
-    public long longValue()
-    {
-        if (this.sign == 0 || this.exponent <= 0)
-        {
+    public long longValue() {
+        if (this.sign == 0 || this.exponent <= 0) {
             return 0;
-        }
-        else if (this.exponent > MAX_LONG_SIZE)
-        {
+        } else if (this.exponent > MAX_LONG_SIZE) {
             // Overflow for sure
             return (this.sign > 0 ? Long.MAX_VALUE : Long.MIN_VALUE);
         }
 
         long value = 0,
-             longBase = (long) BASE[this.radix],
-             maxPrevious = Long.MIN_VALUE / longBase;
+                longBase = (long) BASE[this.radix],
+                maxPrevious = Long.MIN_VALUE / longBase;
 
         // Number of words in integer part of the number
         int size = (int) Math.min(this.exponent, getSize());
 
         DataStorage.Iterator iterator = this.dataStorage.iterator(DataStorage.READ, 0, size);
 
-        for (int i = 0; i < (int) this.exponent; i++)
-        {
-            if (value < maxPrevious)
-            {
+        for (int i = 0; i < (int) this.exponent; i++) {
+            if (value < maxPrevious) {
                 // Overflow
                 value = 0;
                 iterator.close();
                 break;
             }
             value *= longBase;
-            if (i < size)
-            {
+            if (i < size) {
                 value -= (long) iterator.getLong();      // Calculate value negated to handle 0x8000000000000000
                 iterator.next();
             }
         }
 
-        if (value == Long.MIN_VALUE || value >= 0)
-        {
+        if (value == Long.MIN_VALUE || value >= 0) {
             // Overflow
             return (this.sign > 0 ? Long.MAX_VALUE : Long.MIN_VALUE);
-        }
-        else
-        {
+        } else {
             return -this.sign * value;
         }
     }
 
     // If this ApfloatImpl is equal to 1
     public boolean isOne()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return (this.sign == 1 && this.exponent == 1 && getSize() == 1 && getMostSignificantWord() == (long) 1);
     }
 
     public long equalDigits(ApfloatImpl x)
-        throws ApfloatRuntimeException
-    {
-        if (!(x instanceof LongApfloatImpl))
-        {
+            throws ApfloatRuntimeException {
+        if (!(x instanceof LongApfloatImpl)) {
             throw new ImplementationMismatchException("Wrong operand type: " + x.getClass().getName());
         }
 
@@ -1706,20 +1532,17 @@ public class LongApfloatImpl
         if (this.sign == 0 && that.sign == 0)           // Both are zero
         {
             return Apfloat.INFINITE;
-        }
-        else if (this.sign != that.sign)                // No match
+        } else if (this.sign != that.sign)                // No match
         {
             return 0;
-        }
-        else if (this.radix != that.radix)
-        {
+        } else if (this.radix != that.radix) {
             throw new RadixMismatchException("Cannot compare values with different radixes: " + this.radix + " and " + that.radix);
         }
 
         long thisScale = scale(),
-             thatScale = that.scale(),
-             minScale = Math.min(thisScale, thatScale),
-             maxScale = Math.max(thisScale, thatScale);
+                thatScale = that.scale(),
+                minScale = Math.min(thisScale, thatScale),
+                maxScale = Math.max(thisScale, thatScale);
 
         if (maxScale - 1 > minScale)                    // No match
         {
@@ -1728,24 +1551,22 @@ public class LongApfloatImpl
 
         // Need to compare mantissas
         long thisSize = getSize(),
-             thatSize = that.getSize(),
-             size = Math.max(thisSize, thatSize);
+                thatSize = that.getSize(),
+                size = Math.max(thisSize, thatSize);
         DataStorage.Iterator thisIterator = getZeroPaddedIterator(0, thisSize),
-                             thatIterator = that.getZeroPaddedIterator(0, thatSize);
+                thatIterator = that.getZeroPaddedIterator(0, thatSize);
 
         long index,
-             result = Math.min(this.precision, that.precision);         // If mantissas are identical
+                result = Math.min(this.precision, that.precision);         // If mantissas are identical
         int lastMatchingDigits = -1;                                    // Will be used for deferred comparison hanging in last word, e.g. this = 1.000000000, that = 0.999999999
         long carry,
                 base = BASE[this.radix];
 
-        if (this.exponent > that.exponent)
-        {
+        if (this.exponent > that.exponent) {
             // Possible case this = 1.0000000, that = 0.9999999
             long value = thisIterator.getLong();                  // Check first word
 
-            if (value != (long) 1)
-            {
+            if (value != (long) 1) {
                 // No match
                 thisIterator.close();
                 thatIterator.close();
@@ -1755,14 +1576,11 @@ public class LongApfloatImpl
 
             carry = base;
             thisIterator.next();
-        }
-        else if (this.exponent < that.exponent)
-        {
+        } else if (this.exponent < that.exponent) {
             // Possible case this = 0.9999999, that = 1.0000000
             long value = thatIterator.getLong();                  // Check first word
 
-            if (value != (long) 1)
-            {
+            if (value != (long) 1) {
                 // No match
                 thisIterator.close();
                 thatIterator.close();
@@ -1772,46 +1590,33 @@ public class LongApfloatImpl
 
             carry = -base;
             thatIterator.next();
-        }
-        else
-        {
+        } else {
             // Trivial case, e.g. this = 111234, that = 111567
             carry = 0;
         }
 
         // Calculate this - that, stopping at first difference
-        for (index = 0; index < size; index++)
-        {
+        for (index = 0; index < size; index++) {
             long value = thisIterator.getLong() - thatIterator.getLong() + carry;
 
-            if (value == 0)
-            {
+            if (value == 0) {
                 // Trivial case; words are equal
                 carry = 0;
-            }
-            else if (Math.abs(value) > (long) 1)
-            {
+            } else if (Math.abs(value) > (long) 1) {
                 // Mismatch found
-                if (Math.abs(value) >= base)
-                {
+                if (Math.abs(value) >= base) {
                     // Deferred comparison, e.g. this = 1.0000000002, that = 0.9999999991
                     lastMatchingDigits = -1;
-                }
-                else
-                {
+                } else {
                     // Any trivial cases and e.g. this = 1.0000000001, that = 0.9999999992
                     lastMatchingDigits = BASE_DIGITS[this.radix] - getDigits(Math.abs(value));
                 }
 
                 break;
-            }
-            else if (value == (long) 1)
-            {
+            } else if (value == (long) 1) {
                 // Case this = 1.0000000..., that = 0.9999999...
                 carry = base;
-            }
-            else if (value == (long) -1)
-            {
+            } else if (value == (long) -1) {
                 // Case this = 0.9999999..., that = 1.0000000...
                 carry = -base;
             }
@@ -1823,8 +1628,8 @@ public class LongApfloatImpl
         if (index < size || carry != 0)                 // Mismatch found
         {
             long initialMatchingDigits = (this.exponent == that.exponent ?
-                                          Math.min(getInitialDigits(), that.getInitialDigits()) :       // Normal case, e.g. this = 10, that = 5
-                                          BASE_DIGITS[this.radix]);                                     // Special case, e.g. this = 1.0, that = 0.9
+                    Math.min(getInitialDigits(), that.getInitialDigits()) :       // Normal case, e.g. this = 10, that = 5
+                    BASE_DIGITS[this.radix]);                                     // Special case, e.g. this = 1.0, that = 0.9
 
             // Note that this works even if index == 0
             long middleMatchingDigits = (index - 1) * BASE_DIGITS[this.radix];                          // This is correct even if exponents are different
@@ -1843,37 +1648,26 @@ public class LongApfloatImpl
     }
 
     public int compareTo(ApfloatImpl x)
-        throws ApfloatRuntimeException
-    {
-        if (!(x instanceof LongApfloatImpl))
-        {
+            throws ApfloatRuntimeException {
+        if (!(x instanceof LongApfloatImpl)) {
             throw new ImplementationMismatchException("Wrong operand type: " + x.getClass().getName());
         }
 
         LongApfloatImpl that = (LongApfloatImpl) x;
 
-        if (this.sign == 0 && that.sign == 0)
-        {
+        if (this.sign == 0 && that.sign == 0) {
             return 0;
-        }
-        else if (this.sign < that.sign)                 // Now we know that not both are zero
+        } else if (this.sign < that.sign)                 // Now we know that not both are zero
         {
             return -1;
-        }
-        else if (this.sign > that.sign)
-        {
+        } else if (this.sign > that.sign) {
             return 1;
-        }
-        else if (this.radix != that.radix)
-        {
+        } else if (this.radix != that.radix) {
             throw new RadixMismatchException("Cannot compare values with different radixes: " + this.radix + " and " + that.radix);
-        }
-        else if (scale() < that.scale())                // Now we know that both have same sign (which is not zero)
+        } else if (scale() < that.scale())                // Now we know that both have same sign (which is not zero)
         {
             return -this.sign;
-        }
-        else if (scale() > that.scale())
-        {
+        } else if (scale() > that.scale()) {
             return this.sign;
         }
 
@@ -1885,27 +1679,23 @@ public class LongApfloatImpl
     // least significant word is correctly truncated with getLeastSignificantWord(),
     // after that the iterator returns zeros only
     private DataStorage.Iterator getZeroPaddedIterator(final long start, final long end)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         final DataStorage.Iterator iterator = this.dataStorage.iterator(DataStorage.READ, start, end);
 
-        return new DataStorage.Iterator()
-        {
+        return new DataStorage.Iterator() {
+            private static final long serialVersionUID = 1L;
+            private long index = start;
+
             public long getLong()
-                throws ApfloatRuntimeException
-            {
+                    throws ApfloatRuntimeException {
                 long value;
 
-                if (this.index < end)
-                {
+                if (this.index < end) {
                     value = iterator.getLong();
-                    if (this.index == end - 1)
-                    {
+                    if (this.index == end - 1) {
                         value = getLeastSignificantWord(this.index, value);
                     }
-                }
-                else
-                {
+                } else {
                     value = 0;
                 }
 
@@ -1913,36 +1703,28 @@ public class LongApfloatImpl
             }
 
             public void next()
-                throws ApfloatRuntimeException
-            {
-                if (this.index < end)
-                {
+                    throws ApfloatRuntimeException {
+                if (this.index < end) {
                     iterator.next();
                     this.index++;
                 }
             }
 
             public void close()
-                throws ApfloatRuntimeException
-            {
+                    throws ApfloatRuntimeException {
                 iterator.close();
             }
-
-            private static final long serialVersionUID = 1L;
-
-            private long index = start;
         };
     }
 
     // Compare absolute values of mantissas
     private int compareMantissaTo(LongApfloatImpl that)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         long thisSize = getSize(),
-             thatSize = that.getSize(),
-             size = Math.max(thisSize, thatSize);
+                thatSize = that.getSize(),
+                size = Math.max(thisSize, thatSize);
         DataStorage.Iterator thisIterator = getZeroPaddedIterator(0, thisSize),
-                             thatIterator = that.getZeroPaddedIterator(0, thatSize);
+                thatIterator = that.getZeroPaddedIterator(0, thatSize);
         int result = 0;
 
         long index = findMismatch(thisIterator, thatIterator, size);
@@ -1952,12 +1734,9 @@ public class LongApfloatImpl
             long thisValue = thisIterator.getLong(),
                     thatValue = thatIterator.getLong();
 
-            if (thisValue < thatValue)
-            {
+            if (thisValue < thatValue) {
                 result = -1;
-            }
-            else if (thisValue > thatValue)
-            {
+            } else if (thisValue > thatValue) {
                 result = 1;
             }
         }
@@ -1971,15 +1750,12 @@ public class LongApfloatImpl
     // Returns index of first mismatching long, or -1 if mantissas are equal
     // Iterators are left to point to the mismatching words
     private long findMismatch(DataStorage.Iterator thisIterator, DataStorage.Iterator thatIterator, long size)
-        throws ApfloatRuntimeException
-    {
-        for (long index = 0; index < size; index++)
-        {
+            throws ApfloatRuntimeException {
+        for (long index = 0; index < size; index++) {
             long thisValue = thisIterator.getLong(),
                     thatValue = thatIterator.getLong();
 
-            if (thisValue != thatValue)
-            {
+            if (thisValue != thatValue) {
                 return index;
             }
 
@@ -1993,18 +1769,15 @@ public class LongApfloatImpl
 
     // Truncate insignificant digits from the last long of the number
     private long getLeastSignificantWord(long index, long word)
-        throws ApfloatRuntimeException
-    {
-        if (this.precision == Apfloat.INFINITE)
-        {
+            throws ApfloatRuntimeException {
+        if (this.precision == Apfloat.INFINITE) {
             return word;
         }
 
         // Total digits including the specified index
         long digits = getInitialDigits() + index * BASE_DIGITS[this.radix];
 
-        if (this.precision >= digits)
-        {
+        if (this.precision >= digits) {
             return word;
         }
 
@@ -2018,72 +1791,55 @@ public class LongApfloatImpl
      * Compares this object to the specified object.
      *
      * @param obj The object to compare with.
-     *
      * @return <code>true</code> if the objects are equal; <code>false</code> otherwise.
      */
 
-    public boolean equals(Object obj)
-    {
-        if (!(obj instanceof ApfloatImpl))
-        {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ApfloatImpl)) {
             return false;
         }
 
         ApfloatImpl thatImpl = (ApfloatImpl) obj;
 
         // Special comparisons against Apfloat.ZERO and Apfloat.ONE work regardless of radix or implementation class
-        if (signum() == 0 && thatImpl.signum() == 0)
-        {
+        if (signum() == 0 && thatImpl.signum() == 0) {
             return true;
-        }
-        else if (isOne() && thatImpl.isOne())
-        {
+        } else if (isOne() && thatImpl.isOne()) {
             return true;
         }
 
-        if (!(obj instanceof LongApfloatImpl))
-        {
+        if (!(obj instanceof LongApfloatImpl)) {
             return false;
         }
 
         LongApfloatImpl that = (LongApfloatImpl) obj;
 
-        if (this.radix != that.radix)
-        {
+        if (this.radix != that.radix) {
             // Limitation: cannot compare values with different radixes
             return false;
-        }
-        else if (this.sign != that.sign ||
-                 scale()   != that.scale())
-        {
+        } else if (this.sign != that.sign ||
+                scale() != that.scale()) {
             return false;
-        }
-        else
-        {
+        } else {
             // Need to compare mantissas
             return compareMantissaTo(that) == 0;
         }
     }
 
-    public int hashCode()
-    {
-        if (this.hashCode == 0)
-        {
+    public int hashCode() {
+        if (this.hashCode == 0) {
             // Cache the value
             // NOTE: This is not synchronized; it's OK if multiple threads set this at the same time
             int hashCode = 1 + this.sign + (int) this.exponent + (int) (this.exponent >>> 32);
 
-            if (this.dataStorage != null)
-            {
+            if (this.dataStorage != null) {
                 long size = getSize();
 
                 // Scan through log(size) scattered words in the mantissa
-                for (long i = 0; i < size; i = i + i + 1)
-                {
+                for (long i = 0; i < size; i = i + i + 1) {
                     long word = getWord(i);
 
-                    if (i == size - 1)
-                    {
+                    if (i == size - 1) {
                         word = getLeastSignificantWord(i, word);
                     }
 
@@ -2099,34 +1855,24 @@ public class LongApfloatImpl
     }
 
     public String toString(boolean pretty)
-        throws ApfloatRuntimeException
-    {
-        if (this.sign == 0)
-        {
+            throws ApfloatRuntimeException {
+        if (this.sign == 0) {
             return "0";
         }
 
         long size = getSize() * BASE_DIGITS[this.radix],    // This is a rounded up value
-             length;
-        if (pretty)
-        {
-             long scale = scale();
-             if (scale <= 0)
-             {
-                 length = 2 - scale + size;         // Format is 0.xxxx or 0.0000xxx
-             }
-             else if (size > scale)
-             {
-                 length = 1 + size;                 // Format is x.xxx
-             }
-             else
-             {
-                 length = scale;                    // Format is xxxx or xxxx0000
-             }
-             length += (this.sign < 0 ? 1 : 0);     // Room for minus sign
-        }
-        else
-        {
+                length;
+        if (pretty) {
+            long scale = scale();
+            if (scale <= 0) {
+                length = 2 - scale + size;         // Format is 0.xxxx or 0.0000xxx
+            } else if (size > scale) {
+                length = 1 + size;                 // Format is x.xxx
+            } else {
+                length = scale;                    // Format is xxxx or xxxx0000
+            }
+            length += (this.sign < 0 ? 1 : 0);     // Room for minus sign
+        } else {
             length = size + 24;     // Sign, "0.", "e", exponent sign and 19 digits of exponent
         }
 
@@ -2137,12 +1883,9 @@ public class LongApfloatImpl
 
         StringWriter writer = new StringWriter((int) length);
 
-        try
-        {
+        try {
             writeTo(writer, pretty);
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new ApfloatInternalException("Unexpected I/O error writing to StringWriter", ioe);
         }
 
@@ -2153,89 +1896,63 @@ public class LongApfloatImpl
         return value;
     }
 
-    private static void writeZeros(Writer out, long count)
-        throws IOException
-    {
-        for (long i = 0; i < count; i++)
-        {
-            out.write('0');
-        }
-    }
-
     public void writeTo(Writer out, boolean pretty)
-        throws IOException, ApfloatRuntimeException
-    {
-        if (this.sign == 0)
-        {
+            throws IOException, ApfloatRuntimeException {
+        if (this.sign == 0) {
             out.write('0');
             return;
         }
 
-        if (this.sign < 0)
-        {
+        if (this.sign < 0) {
             out.write('-');
         }
 
         long integerDigits,                 // Number of digits to write before the decimal point
-             exponent;                      // Exponent to print
+                exponent;                      // Exponent to print
 
-        if (pretty)
-        {
-            if (this.exponent <= 0)
-            {
+        if (pretty) {
+            if (this.exponent <= 0) {
                 out.write("0.");            // Output is 0.xxxx
                 writeZeros(out, -scale());  // Print leading zeros after decimal point before first nonzero digit
                 integerDigits = -1;         // Decimal point is already written
-            }
-            else
-            {
+            } else {
                 integerDigits = scale();    // Decimal point location
             }
             exponent = 0;                   // Do not print exponent
-        }
-        else
-        {
+        } else {
             integerDigits = 1;              // Always write as x.xxxey
             exponent = scale() - 1;         // Print exponent
         }
 
         boolean leftPadZeros = false;       // If the written base unit should be left-padded with zeros
         long size = getSize(),
-             digitsToWrite = Math.min(this.precision, getInitialDigits() + (size - 1) * BASE_DIGITS[this.radix]),
-             digitsWritten = 0,
-             trailingZeros = 0;
+                digitsToWrite = Math.min(this.precision, getInitialDigits() + (size - 1) * BASE_DIGITS[this.radix]),
+                digitsWritten = 0,
+                trailingZeros = 0;
         DataStorage.Iterator iterator = this.dataStorage.iterator(DataStorage.READ, 0, size);
         char[] buffer = new char[BASE_DIGITS[this.radix]];
 
-        while (size > 0)
-        {
+        while (size > 0) {
             int start = (leftPadZeros ? 0 : BASE_DIGITS[this.radix] - getInitialDigits()),
-                digits = (int) Math.min(digitsToWrite, BASE_DIGITS[this.radix] - start);
+                    digits = (int) Math.min(digitsToWrite, BASE_DIGITS[this.radix] - start);
 
             formatWord(buffer, iterator.getLong());
 
-            for (int i = 0; i < digits; i++)
-            {
+            for (int i = 0; i < digits; i++) {
                 int c = buffer[start + i];
-                if (c == '0')
-                {
+                if (c == '0') {
                     trailingZeros++;
                     digitsToWrite--;
-                }
-                else
-                {
-                    while (trailingZeros > 0)
-                    {
-                        if (digitsWritten == integerDigits)
-                        {
+                } else {
+                    while (trailingZeros > 0) {
+                        if (digitsWritten == integerDigits) {
                             out.write('.');
                         }
                         out.write('0');
                         digitsWritten++;
                         trailingZeros--;
                     }
-                    if (digitsWritten == integerDigits)
-                    {
+                    if (digitsWritten == integerDigits) {
                         out.write('.');
                     }
                     out.write(c);
@@ -2249,29 +1966,25 @@ public class LongApfloatImpl
             size--;
         }
 
-        if (!pretty && exponent != 0)
-        {
+        if (!pretty && exponent != 0) {
             out.write("e" + exponent);
         }
 
         writeZeros(out, integerDigits - digitsWritten); // If format is xxxx0000
     }
 
-    private void formatWord(char[] buffer, long word)
-    {
+    private void formatWord(char[] buffer, long word) {
         int position = BASE_DIGITS[this.radix];
-        while (position > 0 && word > 0)
-        {
+        while (position > 0 && word > 0) {
             long newWord = (long) (long) (word / this.radix);
-            int digit = (int) (word -  newWord * this.radix);
+            int digit = (int) (word - newWord * this.radix);
             word = newWord;
             position--;
             buffer[position] = Character.forDigit(digit, this.radix);
         }
 
         // Left pad zeros
-        while (position > 0)
-        {
+        while (position > 0) {
             position--;
             buffer[position] = '0';
         }
@@ -2279,51 +1992,23 @@ public class LongApfloatImpl
 
     // Effective size, in longs
     private long getSize()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         assert (this.dataStorage != null);
 
         return Math.min(getBasePrecision(),
-                        this.dataStorage.getSize());
-    }
-
-    private static int checkRadix(int radix)
-        throws NumberFormatException
-    {
-        if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX)
-        {
-            throw new NumberFormatException("Invalid radix " + radix + "; radix must be between " + Character.MIN_RADIX + " and " + Character.MAX_RADIX);
-        }
-
-        return radix;
+                this.dataStorage.getSize());
     }
 
     // Get the most significant word of this number
     private long getMostSignificantWord()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return getMostSignificantWord(this.dataStorage);
-    }
-
-    // Get the most significant word of the specified data storage
-    private static long getMostSignificantWord(DataStorage dataStorage)
-        throws ApfloatRuntimeException
-    {
-        long msw;
-
-        ArrayAccess arrayAccess = dataStorage.getArray(DataStorage.READ, 0, 1);
-        msw = arrayAccess.getLongData()[arrayAccess.getOffset()];
-        arrayAccess.close();
-
-        return msw;
     }
 
     // Get number of digits in the most significant word
     private int getInitialDigits()
-        throws ApfloatRuntimeException
-    {
-        if (this.initialDigits == UNDEFINED)
-        {
+            throws ApfloatRuntimeException {
+        if (this.initialDigits == UNDEFINED) {
             // Cache the value
             // NOTE: This is not synchronized; it's OK if multiple threads set this at the same time
             this.initialDigits = getDigits(getMostSignificantWord());
@@ -2334,21 +2019,18 @@ public class LongApfloatImpl
 
     // Get number of digits in the most significant word of specified data
     private int getInitialDigits(DataStorage dataStorage)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return getDigits(getMostSignificantWord(dataStorage));
     }
 
     // Gets the number of digits in the specified long and this number's radix
-    private int getDigits(long x)
-    {
+    private int getDigits(long x) {
         assert (x > 0);
 
         long[] minimums = MINIMUM_FOR_DIGITS[this.radix];
         int i = minimums.length;
 
-        while (x < minimums[--i])
-        {
+        while (x < minimums[--i]) {
         }
 
         return i + 1;
@@ -2356,27 +2038,21 @@ public class LongApfloatImpl
 
     // Gets the precision in longs
     private long getBasePrecision()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return getBasePrecision(this.precision, getInitialDigits());
     }
 
     // Gets the precision in longs, based on specified precision (in digits),
     // number of digits in most significant word and this number's radix
-    private long getBasePrecision(long precision, int mswDigits)
-    {
-        if (precision == Apfloat.INFINITE)
-        {
+    private long getBasePrecision(long precision, int mswDigits) {
+        if (precision == Apfloat.INFINITE) {
             return Apfloat.INFINITE;
-        }
-        else
-        {
+        } else {
             return (precision + BASE_DIGITS[this.radix] - mswDigits - 1) / BASE_DIGITS[this.radix] + 1;
         }
     }
 
-    private long getWord(long index)
-    {
+    private long getWord(long index) {
         ArrayAccess arrayAccess = this.dataStorage.getArray(DataStorage.READ, index, 1);
         long word = arrayAccess.getLongData()[arrayAccess.getOffset()];
         arrayAccess.close();
@@ -2385,49 +2061,8 @@ public class LongApfloatImpl
     }
 
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException
-    {
+            throws IOException, ClassNotFoundException {
         this.leastZeros = UNDEFINED;
         in.defaultReadObject();
     }
-
-    // Gets a new data storage for specified size
-    private static DataStorage createDataStorage(long size)
-        throws ApfloatRuntimeException
-    {
-        ApfloatContext ctx = ApfloatContext.getContext();
-        DataStorageBuilder dataStorageBuilder = ctx.getBuilderFactory().getDataStorageBuilder();
-        return dataStorageBuilder.createDataStorage(size * 8);
-    }
-
-    // Gets I/O block size in longs
-    private static int getBlockSize()
-    {
-        ApfloatContext ctx = ApfloatContext.getContext();
-        return ctx.getBlockSize() / 8;
-    }
-
-    private static final DataStorage.Iterator ZERO_ITERATOR =
-    new DataStorage.Iterator()
-    {
-        public long getLong() { return 0; }
-        public void next() { }
-        private static final long serialVersionUID = 1L;
-    };
-
-    private static final long serialVersionUID = -2151344673641680085L;
-
-    private static final int UNDEFINED = 0x80000000;
-    private static final int MAX_LONG_SIZE = 4;
-    private static final int MAX_DOUBLE_SIZE = 4;
-
-    private int sign;
-    private long precision;
-    private long exponent;
-    private DataStorage dataStorage;
-    private int radix;
-    private int hashCode = 0;
-    private int initialDigits = UNDEFINED;
-    private volatile long leastZeros = UNDEFINED;
-    private volatile long size = 0;
 }

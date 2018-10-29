@@ -1,70 +1,94 @@
 package org.apfloat.internal;
 
+import org.apfloat.ApfloatRuntimeException;
+import org.apfloat.spi.ArrayAccess;
+import org.apfloat.spi.DataStorage;
+
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
-import org.apfloat.ApfloatRuntimeException;
-import org.apfloat.spi.DataStorage;
-import org.apfloat.spi.ArrayAccess;
-
 /**
  * Disk-based data storage for the <code>int</code> element type.
  *
- * @version 1.8.0
  * @author Mikko Tommila
+ * @version 1.8.0
  */
 
 public class IntDiskDataStorage
-    extends DiskDataStorage
-{
+        extends DiskDataStorage {
+    private static final long serialVersionUID = -1540087135754114721L;
+
     /**
      * Default constructor.
      */
 
     public IntDiskDataStorage()
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
     }
 
     /**
      * Subsequence constructor.
      *
      * @param intDiskDataStorage The originating data storage.
-     * @param offset The subsequence starting position.
-     * @param length The subsequence length.
+     * @param offset             The subsequence starting position.
+     * @param length             The subsequence length.
      */
 
-    protected IntDiskDataStorage(IntDiskDataStorage intDiskDataStorage, long offset, long length)
-    {
+    protected IntDiskDataStorage(IntDiskDataStorage intDiskDataStorage, long offset, long length) {
         super(intDiskDataStorage, offset, length);
     }
 
     protected DataStorage implSubsequence(long offset, long length)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         return new IntDiskDataStorage(this, offset + getOffset(), length);
     }
 
+    protected ArrayAccess implGetArray(int mode, long offset, int length)
+            throws ApfloatRuntimeException {
+        return new IntDiskArrayAccess(mode, getOffset() + offset, length);
+    }
+
+    protected ArrayAccess createArrayAccess(int mode, int startColumn, int columns, int rows) {
+        return new MemoryArrayAccess(mode, new int[columns * rows], startColumn, columns, rows);
+    }
+
+    protected ArrayAccess createTransposedArrayAccess(int mode, int startColumn, int columns, int rows) {
+        return new TransposedMemoryArrayAccess(mode, new int[columns * rows], startColumn, columns, rows);
+    }
+
+    public Iterator iterator(int mode, long startPosition, long endPosition)
+            throws IllegalArgumentException, IllegalStateException, ApfloatRuntimeException {
+        if ((mode & READ_WRITE) == 0) {
+            throw new IllegalArgumentException("Illegal mode: " + mode);
+        }
+        return new BlockIterator(mode, startPosition, endPosition);
+    }
+
+    protected int getUnitSize() {
+        return 4;
+    }
+
     private class IntDiskArrayAccess
-        extends IntMemoryArrayAccess
-    {
+            extends IntMemoryArrayAccess {
+        private static final long serialVersionUID = -88509093904437138L;
+        private int mode;
+        private long fileOffset;
+
         // fileOffset is absolute position in file
         public IntDiskArrayAccess(int mode, long fileOffset, int length)
-            throws ApfloatRuntimeException
-        {
+                throws ApfloatRuntimeException {
             super(new int[length], 0, length);
             this.mode = mode;
             this.fileOffset = fileOffset;
 
-            if ((mode & READ) != 0)
-            {
+            if ((mode & READ) != 0) {
                 final int[] array = getIntData();
-                WritableByteChannel out = new WritableByteChannel()
-                {
-                    public int write(ByteBuffer buffer)
-                    {
+                WritableByteChannel out = new WritableByteChannel() {
+                    private int readPosition = 0;
+
+                    public int write(ByteBuffer buffer) {
                         IntBuffer src = buffer.asIntBuffer();
                         int readLength = src.remaining();
 
@@ -76,10 +100,12 @@ public class IntDiskDataStorage
                         return readLength * 4;
                     }
 
-                    public void close() {}
-                    public boolean isOpen() { return true; }
+                    public void close() {
+                    }
 
-                    private int readPosition = 0;
+                    public boolean isOpen() {
+                        return true;
+                    }
                 };
 
                 transferTo(out, fileOffset * 4, (long) length * 4);
@@ -87,15 +113,13 @@ public class IntDiskDataStorage
         }
 
         public void close()
-            throws ApfloatRuntimeException
-        {
-            if ((this.mode & WRITE) != 0 && getData() != null)
-            {
+                throws ApfloatRuntimeException {
+            if ((this.mode & WRITE) != 0 && getData() != null) {
                 final int[] array = getIntData();
-                ReadableByteChannel in = new ReadableByteChannel()
-                {
-                    public int read(ByteBuffer buffer)
-                    {
+                ReadableByteChannel in = new ReadableByteChannel() {
+                    private int writePosition = 0;
+
+                    public int read(ByteBuffer buffer) {
                         IntBuffer dst = buffer.asIntBuffer();
                         int writeLength = dst.remaining();
 
@@ -107,10 +131,12 @@ public class IntDiskDataStorage
                         return writeLength * 4;
                     }
 
-                    public void close() {}
-                    public boolean isOpen() { return true; }
+                    public void close() {
+                    }
 
-                    private int writePosition = 0;
+                    public boolean isOpen() {
+                        return true;
+                    }
                 };
 
                 transferFrom(in, this.fileOffset * 4, (long) array.length * 4);
@@ -118,34 +144,17 @@ public class IntDiskDataStorage
 
             super.close();
         }
-
-        private static final long serialVersionUID = -88509093904437138L;
-
-        private int mode;
-        private long fileOffset;
-    }
-
-    protected ArrayAccess implGetArray(int mode, long offset, int length)
-        throws ApfloatRuntimeException
-    {
-        return new IntDiskArrayAccess(mode, getOffset() + offset, length);
-    }
-
-    protected ArrayAccess createArrayAccess(int mode, int startColumn, int columns, int rows)
-    {
-        return new MemoryArrayAccess(mode, new int[columns * rows], startColumn, columns, rows);
-    }
-
-    protected ArrayAccess createTransposedArrayAccess(int mode, int startColumn, int columns, int rows)
-    {
-        return new TransposedMemoryArrayAccess(mode, new int[columns * rows], startColumn, columns, rows);
     }
 
     private class MemoryArrayAccess
-        extends IntMemoryArrayAccess
-    {
-        public MemoryArrayAccess(int mode, int[] data, int startColumn, int columns, int rows)
-        {
+            extends IntMemoryArrayAccess {
+        private static final long serialVersionUID = 7690849230285450035L;
+        private int mode,
+                startColumn,
+                columns,
+                rows;
+
+        public MemoryArrayAccess(int mode, int[] data, int startColumn, int columns, int rows) {
             super(data, 0, data.length);
             this.mode = mode;
             this.startColumn = startColumn;
@@ -154,28 +163,23 @@ public class IntDiskDataStorage
         }
 
         public void close()
-            throws ApfloatRuntimeException
-        {
-            if ((this.mode & WRITE) != 0 && getData() != null)
-            {
+                throws ApfloatRuntimeException {
+            if ((this.mode & WRITE) != 0 && getData() != null) {
                 setArray(this, this.startColumn, this.columns, this.rows);
             }
             super.close();
         }
-
-        private static final long serialVersionUID = 7690849230285450035L;
-
-        private int mode,
-                    startColumn,
-                    columns,
-                    rows;
     }
 
     private class TransposedMemoryArrayAccess
-        extends IntMemoryArrayAccess
-    {
-        public TransposedMemoryArrayAccess(int mode, int[] data, int startColumn, int columns, int rows)
-        {
+            extends IntMemoryArrayAccess {
+        private static final long serialVersionUID = 2990517367865486151L;
+        private int mode,
+                startColumn,
+                columns,
+                rows;
+
+        public TransposedMemoryArrayAccess(int mode, int[] data, int startColumn, int columns, int rows) {
             super(data, 0, data.length);
             this.mode = mode;
             this.startColumn = startColumn;
@@ -184,37 +188,31 @@ public class IntDiskDataStorage
         }
 
         public void close()
-            throws ApfloatRuntimeException
-        {
-            if ((this.mode & WRITE) != 0 && getData() != null)
-            {
+                throws ApfloatRuntimeException {
+            if ((this.mode & WRITE) != 0 && getData() != null) {
                 setTransposedArray(this, this.startColumn, this.columns, this.rows);
             }
             super.close();
         }
-
-        private static final long serialVersionUID = 2990517367865486151L;
-
-        private int mode,
-                    startColumn,
-                    columns,
-                    rows;
     }
 
     private class BlockIterator
-        extends AbstractIterator
-    {
+            extends AbstractIterator {
+        private static final long serialVersionUID = 4187202582650284101L;
+        private ArrayAccess arrayAccess;
+        private int[] data;
+        private int offset,
+                remaining;
+
         public BlockIterator(int mode, long startPosition, long endPosition)
-            throws IllegalArgumentException, IllegalStateException, ApfloatRuntimeException
-        {
+                throws IllegalArgumentException, IllegalStateException, ApfloatRuntimeException {
             super(mode, startPosition, endPosition);
             this.arrayAccess = null;
             this.remaining = 0;
         }
 
         public void next()
-            throws IllegalStateException, ApfloatRuntimeException
-        {
+                throws IllegalStateException, ApfloatRuntimeException {
             checkLength();
 
             assert (this.remaining > 0);
@@ -224,8 +222,7 @@ public class IntDiskDataStorage
             this.offset += getIncrement();
             this.remaining--;
 
-            if (this.remaining == 0)
-            {
+            if (this.remaining == 0) {
                 close();
             }
 
@@ -233,26 +230,22 @@ public class IntDiskDataStorage
         }
 
         public int getInt()
-            throws IllegalStateException, ApfloatRuntimeException
-        {
+                throws IllegalStateException, ApfloatRuntimeException {
             checkGet();
             checkAvailable();
             return this.data[this.offset];
         }
 
         public void setInt(int value)
-            throws IllegalStateException, ApfloatRuntimeException
-        {
+                throws IllegalStateException, ApfloatRuntimeException {
             checkSet();
             checkAvailable();
             this.data[this.offset] = value;
         }
 
         public <T> T get(Class<T> type)
-            throws UnsupportedOperationException, IllegalStateException
-        {
-            if (!(type.equals(Integer.TYPE)))
-            {
+                throws UnsupportedOperationException, IllegalStateException {
+            if (!(type.equals(Integer.TYPE))) {
                 throw new UnsupportedOperationException("Unsupported data type " + type.getCanonicalName() + ", the only supported type is int");
             }
             @SuppressWarnings("unchecked")
@@ -261,14 +254,11 @@ public class IntDiskDataStorage
         }
 
         public <T> void set(Class<T> type, T value)
-            throws UnsupportedOperationException, IllegalArgumentException, IllegalStateException
-        {
-            if (!(type.equals(Integer.TYPE)))
-            {
+                throws UnsupportedOperationException, IllegalArgumentException, IllegalStateException {
+            if (!(type.equals(Integer.TYPE))) {
                 throw new UnsupportedOperationException("Unsupported data type " + type.getCanonicalName() + ", the only supported type is int");
             }
-            if (!(value instanceof Integer))
-            {
+            if (!(value instanceof Integer)) {
                 throw new IllegalArgumentException("Unsupported value type " + value.getClass().getCanonicalName() + ", the only supported type is Integer");
             }
             setInt((Integer) value);
@@ -280,10 +270,8 @@ public class IntDiskDataStorage
          */
 
         public void close()
-            throws ApfloatRuntimeException
-        {
-            if (this.arrayAccess != null)
-            {
+                throws ApfloatRuntimeException {
+            if (this.arrayAccess != null) {
                 this.data = null;
                 this.arrayAccess.close();
                 this.arrayAccess = null;
@@ -291,10 +279,8 @@ public class IntDiskDataStorage
         }
 
         private void checkAvailable()
-            throws ApfloatRuntimeException
-        {
-            if (this.arrayAccess == null)
-            {
+                throws ApfloatRuntimeException {
+            if (this.arrayAccess == null) {
                 boolean isForward = (getIncrement() > 0);
                 int length = (int) Math.min(getLength(), getBlockSize() / 4);
                 long offset = (isForward ? getPosition() : getPosition() - length + 1);
@@ -305,29 +291,5 @@ public class IntDiskDataStorage
                 this.remaining = length;
             }
         }
-
-        private static final long serialVersionUID = 4187202582650284101L;
-
-        private ArrayAccess arrayAccess;
-        private int[] data;
-        private int offset,
-                    remaining;
     }
-
-    public Iterator iterator(int mode, long startPosition, long endPosition)
-        throws IllegalArgumentException, IllegalStateException, ApfloatRuntimeException
-    {
-        if ((mode & READ_WRITE) == 0)
-        {
-            throw new IllegalArgumentException("Illegal mode: " + mode);
-        }
-        return new BlockIterator(mode, startPosition, endPosition);
-    }
-
-    protected int getUnitSize()
-    {
-        return 4;
-    }
-
-    private static final long serialVersionUID = -1540087135754114721L;
 }

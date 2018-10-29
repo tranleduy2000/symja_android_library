@@ -1,45 +1,41 @@
 package org.apfloat.internal;
 
 import org.apfloat.ApfloatRuntimeException;
-import org.apfloat.spi.NTTStrategy;
-import org.apfloat.spi.DataStorage;
 import org.apfloat.spi.ArrayAccess;
+import org.apfloat.spi.DataStorage;
+import org.apfloat.spi.NTTStrategy;
 import org.apfloat.spi.Util;
-import static org.apfloat.internal.IntModConstants.*;
+
+import static org.apfloat.internal.IntModConstants.MAX_TRANSFORM_LENGTH;
+import static org.apfloat.internal.IntModConstants.MODULUS;
 
 /**
  * Fast Number Theoretic Transform strategy that uses lookup tables
  * for powers of n:th root of unity and permutation indexes.<p>
- *
+ * <p>
  * All access to this class must be externally synchronized.
  *
- * @version 1.7.0
  * @author Mikko Tommila
+ * @version 1.7.0
  */
 
 public class IntTableFNTStrategy
-    extends IntTableFNT
-    implements NTTStrategy
-{
+        extends IntTableFNT
+        implements NTTStrategy {
     /**
      * Default constructor.
      */
 
-    public IntTableFNTStrategy()
-    {
+    public IntTableFNTStrategy() {
     }
 
     public void transform(DataStorage dataStorage, int modulus)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         long length = dataStorage.getSize();            // Transform length n
 
-        if (length > MAX_TRANSFORM_LENGTH)
-        {
+        if (length > MAX_TRANSFORM_LENGTH) {
             throw new TransformLengthExceededException("Maximum transform length exceeded: " + length + " > " + MAX_TRANSFORM_LENGTH);
-        }
-        else if (length > Integer.MAX_VALUE)
-        {
+        } else if (length > Integer.MAX_VALUE) {
             throw new ApfloatInternalException("Maximum array length exceeded: " + length);
         }
 
@@ -54,16 +50,12 @@ public class IntTableFNTStrategy
     }
 
     public void inverseTransform(DataStorage dataStorage, int modulus, long totalTransformLength)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         long length = dataStorage.getSize();            // Transform length n
 
-        if (Math.max(length, totalTransformLength) > MAX_TRANSFORM_LENGTH)
-        {
+        if (Math.max(length, totalTransformLength) > MAX_TRANSFORM_LENGTH) {
             throw new TransformLengthExceededException("Maximum transform length exceeded: " + Math.max(length, totalTransformLength) + " > " + MAX_TRANSFORM_LENGTH);
-        }
-        else if (length > Integer.MAX_VALUE)
-        {
+        } else if (length > Integer.MAX_VALUE) {
             throw new ApfloatInternalException("Maximum array length exceeded: " + length);
         }
 
@@ -79,21 +71,18 @@ public class IntTableFNTStrategy
         arrayAccess.close();
     }
 
-    public long getTransformLength(long size)
-    {
+    public long getTransformLength(long size) {
         return Util.round2up(size);
     }
 
     private void divideElements(ArrayAccess arrayAccess, int divisor)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         int inverseFactor = modDivide((int) 1, divisor);
         int[] data = arrayAccess.getIntData();
         int length = arrayAccess.getLength(),
-            offset = arrayAccess.getOffset();
+                offset = arrayAccess.getOffset();
 
-        for (int i = 0; i < length; i++)
-        {
+        for (int i = 0; i < length; i++) {
             data[i + offset] = modMultiply(data[i + offset], inverseFactor);
         }
     }

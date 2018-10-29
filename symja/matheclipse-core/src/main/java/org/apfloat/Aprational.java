@@ -1,15 +1,15 @@
 package org.apfloat;
 
-import java.math.BigInteger;
-import java.io.PushbackReader;
-import java.io.Writer;
-import java.io.IOException;
-import java.lang.ref.SoftReference;
-import java.util.Formatter;
-import static java.util.FormattableFlags.*;
-
 import org.apfloat.spi.ApfloatImpl;
-import static org.apfloat.spi.RadixConstants.*;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.ref.SoftReference;
+import java.math.BigInteger;
+import java.util.Formatter;
+
+import static java.util.FormattableFlags.LEFT_JUSTIFY;
+import static org.apfloat.spi.RadixConstants.RADIX_FACTORS;
 
 /**
  * Arbitrary precision rational number class. An aprational consists of
@@ -121,64 +121,6 @@ public class Aprational
     }
 
     /**
-     * Reads an aprational from a reader. The default radix is used. The constructor
-     * stops reading at the first character it doesn't understand. The reader must
-     * thus be a <code>PushbackReader</code> so that the invalid character can be
-     * returned back to the stream.<p>
-     *
-     * The input must be of one of the formats<p>
-     *
-     * <code>integer [whitespace]</code><br>
-     * <code>numerator [whitespace] "/" [whitespace] denominator</code><br>
-     *
-     * @param in The input stream.
-     *
-     * @exception java.io.IOException In case of I/O error reading the stream.
-     * @exception java.lang.NumberFormatException In case the number is invalid.
-     * @exception java.lang.IllegalArgumentException In case the denominator is zero.
-     */
-
-    public Aprational(PushbackReader in)
-        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
-    {
-        this(in, ApfloatContext.getContext().getDefaultRadix());
-    }
-
-    /**
-     * Reads an aprational from a reader. The specified radix is used.
-     *
-     * @param in The input stream.
-     * @param radix The radix to be used.
-     *
-     * @exception java.io.IOException In case of I/O error reading the stream.
-     * @exception java.lang.NumberFormatException In case the number is invalid.
-     * @exception java.lang.IllegalArgumentException In case the denominator is zero.
-     *
-     * @see #Aprational(PushbackReader)
-     */
-
-    public Aprational(PushbackReader in, int radix)
-        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
-    {
-        this.numerator = new Apint(in, radix);
-
-        ApfloatHelper.extractWhitespace(in);
-
-        if (!ApfloatHelper.readMatch(in, '/'))
-        {
-            this.denominator = ONES[radix];
-            return;
-        }
-
-        ApfloatHelper.extractWhitespace(in);
-        this.denominator = new Apint(in, radix);
-
-        checkDenominator();
-
-        reduce();
-    }
-
-    /**
      * Constructs an aprational from a <code>BigInteger</code>.
      * The default radix is used.
      *
@@ -190,20 +132,6 @@ public class Aprational
     {
         this.numerator = new Apint(value);
         this.denominator = ONE;
-    }
-
-    /**
-     * Constructs an aprational from a <code>BigInteger</code> using the specified radix.
-     *
-     * @param value The numerator of the number.
-     * @param radix The radix of the number.
-     */
-
-    public Aprational(BigInteger value, int radix)
-        throws ApfloatRuntimeException
-    {
-        this.numerator = new Apint(value, radix);
-        this.denominator = ONES[radix];
     }
 
     /**

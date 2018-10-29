@@ -1,9 +1,9 @@
 package org.apfloat.internal;
 
-import java.util.Map;
-import java.util.HashMap;
-
 import org.apfloat.ApfloatRuntimeException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Message passing helper class for parallel codes.
@@ -12,22 +12,19 @@ import org.apfloat.ApfloatRuntimeException;
  *
  * @param <K> The receiver type for this message passer.
  * @param <V> The message type for this message passer.
- *
- * @since 1.6
- * @version 1.6
  * @author Mikko Tommila
+ * @version 1.6
+ * @since 1.6
  */
 
-public class MessagePasser<K, V>
-{
+public class MessagePasser<K, V> {
     private Map<K, V> messages;
 
     /**
      * Default constructor.
      */
 
-    public MessagePasser()
-    {
+    public MessagePasser() {
         this.messages = new HashMap<K, V>();
     }
 
@@ -35,11 +32,10 @@ public class MessagePasser<K, V>
      * Send a message.
      *
      * @param receiver The receiver.
-     * @param message The message. Must not be <code>null</code>.
+     * @param message  The message. Must not be <code>null</code>.
      */
 
-    public synchronized void sendMessage(K receiver, V message)
-    {
+    public synchronized void sendMessage(K receiver, V message) {
         assert (message != null);
         assert (!this.messages.containsKey(receiver));
 
@@ -52,12 +48,10 @@ public class MessagePasser<K, V>
      * Get a message if one is available. This method will not block.
      *
      * @param receiver The receiver.
-     *
      * @return The message, or <code>null</code> if none is available.
      */
 
-    public synchronized V getMessage(K receiver)
-    {
+    public synchronized V getMessage(K receiver) {
         V message = this.messages.remove(receiver);
 
         return message;
@@ -67,22 +61,16 @@ public class MessagePasser<K, V>
      * Receive a message. This method will block until a message is available.
      *
      * @param receiver The receiver.
-     *
      * @return The message.
      */
 
     public synchronized V receiveMessage(K receiver)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         V message;
-        while ((message = this.messages.remove(receiver)) == null)
-        {
-            try
-            {
+        while ((message = this.messages.remove(receiver)) == null) {
+            try {
                 wait();
-            }
-            catch (InterruptedException ie)
-            {
+            } catch (InterruptedException ie) {
                 throw new ApfloatInternalException("Wait for received message interrupted", ie);
             }
         }

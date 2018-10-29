@@ -1,18 +1,21 @@
 package org.apfloat;
 
-import java.math.BigInteger;
-import java.math.BigDecimal;
+import org.apfloat.spi.ApfloatBuilder;
+import org.apfloat.spi.ApfloatImpl;
+import org.apfloat.spi.Util;
+
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Writer;
-import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
-import org.apfloat.spi.ApfloatBuilder;
-import org.apfloat.spi.ApfloatImpl;
-import org.apfloat.spi.Util;
-import static org.apfloat.spi.RadixConstants.*;
+import static org.apfloat.spi.RadixConstants.DOUBLE_PRECISION;
+import static org.apfloat.spi.RadixConstants.FLOAT_PRECISION;
+import static org.apfloat.spi.RadixConstants.LONG_PRECISION;
 
 /**
  * Various utility methods related to apfloats.
@@ -36,14 +39,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(String value, long precision, boolean isInteger)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix, isInteger);
     }
 
     public static ApfloatImpl createApfloat(String value, long precision, int radix, boolean isInteger)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision != Apfloat.DEFAULT)
         {
@@ -67,14 +70,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(long value, long precision)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(long value, long precision, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         precision = (precision == Apfloat.DEFAULT ? Apfloat.INFINITE : precision);
         checkPrecision(precision);
@@ -97,14 +100,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(float value, long precision)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(float value, long precision, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         precision = (precision == Apfloat.DEFAULT ? getFloatPrecision(radix) : precision);
         checkPrecision(precision);
@@ -120,14 +123,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(double value, long precision)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(double value, long precision, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         precision = (precision == Apfloat.DEFAULT ? getDoublePrecision(radix) : precision);
         checkPrecision(precision);
@@ -141,22 +144,8 @@ class ApfloatHelper
         return factory.createApfloat(value, precision, radix);
     }
 
-    public static ApfloatImpl createApfloat(PushbackReader in, boolean isInteger)
-        throws IOException, NumberFormatException, ApfloatRuntimeException
-    {
-        int radix = getDefaultRadix();
-        return implCreateApfloat(in, Apfloat.DEFAULT, radix, isInteger);
-    }
-
-    public static ApfloatImpl createApfloat(PushbackReader in, long precision, boolean isInteger)
-        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
-    {
-        int radix = getDefaultRadix();
-        return createApfloat(in, precision, radix, isInteger);
-    }
-
     public static ApfloatImpl createApfloat(PushbackReader in, long precision, int radix, boolean isInteger)
-        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IOException, IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision != Apfloat.DEFAULT)
         {
@@ -180,14 +169,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(BigInteger value, long precision)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(BigInteger value, long precision, int radix)
-        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision != Apfloat.DEFAULT)
         {

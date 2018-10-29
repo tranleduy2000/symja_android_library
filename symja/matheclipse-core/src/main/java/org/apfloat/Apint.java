@@ -1,15 +1,15 @@
 package org.apfloat;
 
-import java.math.BigInteger;
-import java.io.PushbackReader;
-import java.io.Writer;
+import org.apfloat.spi.ApfloatImpl;
+
 import java.io.IOException;
+import java.io.Writer;
+import java.math.BigInteger;
+import java.util.FormatFlagsConversionMismatchException;
 import java.util.Formatter;
-import static java.util.FormattableFlags.*;
-import java.util.FormatFlagsConversionMismatchException ;
 import java.util.IllegalFormatPrecisionException;
 
-import org.apfloat.spi.ApfloatImpl;
+import static java.util.FormattableFlags.ALTERNATE;
 
 /**
  * Arbitrary precision integer class.<p>
@@ -105,37 +105,6 @@ public class Apint
     }
 
     /**
-     * Reads an apint from a stream using the default radix.
-     *
-     * @param in The stream to read from
-     *
-     * @exception java.io.IOException If an I/O error occurs accessing the stream.
-     * @exception java.lang.NumberFormatException If the number is not valid.
-     */
-
-    public Apint(PushbackReader in)
-        throws IOException, NumberFormatException, ApfloatRuntimeException
-    {
-        this.value = new Apfloat(ApfloatHelper.createApfloat(in, INFINITE, true));
-    }
-
-    /**
-     * Reads an apint from a stream using the specified radix.
-     *
-     * @param in The stream to read from
-     * @param radix The radix of the number.
-     *
-     * @exception java.io.IOException If an I/O error occurs accessing the stream.
-     * @exception java.lang.NumberFormatException If the number is not valid.
-     */
-
-    public Apint(PushbackReader in, int radix)
-        throws IOException, NumberFormatException, ApfloatRuntimeException
-    {
-        this.value = new Apfloat(ApfloatHelper.createApfloat(in, INFINITE, radix, true));
-    }
-
-    /**
      * Constructs an apint from a <code>BigInteger</code>. The default radix is used.
      *
      * @param value The value of the number.
@@ -147,21 +116,6 @@ public class Apint
         throws NumberFormatException, ApfloatRuntimeException
     {
         this.value = new Apfloat(value);
-    }
-
-    /**
-     * Constructs an apint from a <code>BigInteger</code> using the specified radix.
-     *
-     * @param value The value of the number.
-     * @param radix The radix of the number.
-     *
-     * @exception java.lang.NumberFormatException If the radix is not valid.
-     */
-
-    public Apint(BigInteger value, int radix)
-        throws NumberFormatException, ApfloatRuntimeException
-    {
-        this.value = new Apfloat(value, INFINITE, radix);
     }
 
     /**

@@ -3,13 +3,12 @@ package org.apfloat.internal;
 /**
  * Constants needed for various algorithms for the <code>int</code> type.
  *
- * @since 1.4
- * @version 1.4
  * @author Mikko Tommila
+ * @version 1.4
+ * @since 1.4
  */
 
-public interface IntConstants
-{
+public interface IntConstants {
     /**
      * Relative cost of Karatsuba multiplication.
      */

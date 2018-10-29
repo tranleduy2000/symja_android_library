@@ -3,19 +3,17 @@ package org.apfloat.internal;
 /**
  * Modulo arithmetic functions for <code>int</code> data.
  *
- * @version 1.0
  * @author Mikko Tommila
+ * @version 1.0
  */
 
 public class IntModMath
-    extends IntElementaryModMath
-{
+        extends IntElementaryModMath {
     /**
      * Default constructor.
      */
 
-    public IntModMath()
-    {
+    public IntModMath() {
     }
 
     /**
@@ -23,17 +21,14 @@ public class IntModMath
      *
      * @param w The n:th root of unity modulo the current modulus.
      * @param n The table length (= transform length).
-     *
      * @return Table of <code>table[i]=w<sup>i</sup> mod m</code>, i = 0, ..., n-1.
      */
 
-    public final int[] createWTable(int w, int n)
-    {
+    public final int[] createWTable(int w, int n) {
         int[] wTable = new int[n];
         int wTemp = 1;
 
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             wTable[i] = wTemp;
             wTemp = modMultiply(wTemp, w);
         }
@@ -43,33 +38,29 @@ public class IntModMath
 
     /**
      * Get forward n:th root of unity. This is <code>w</code>.<p>
-     *
+     * <p>
      * Assumes that the modulus is prime.
      *
      * @param primitiveRoot Primitive root of the modulus.
-     * @param n The transform length.
-     *
+     * @param n             The transform length.
      * @return Forward n:th root of unity.
      */
 
-    public int getForwardNthRoot(int primitiveRoot, long n)
-    {
+    public int getForwardNthRoot(int primitiveRoot, long n) {
         return modPow(primitiveRoot, getModulus() - 1 - (getModulus() - 1) / (int) n);
     }
 
     /**
      * Get inverse n:th root of unity. This is <code>w<sup>-1</sup></code>.<p>
-     *
+     * <p>
      * Assumes that the modulus is prime.
      *
      * @param primitiveRoot Primitive root of the modulus.
-     * @param n The transform length.
-     *
+     * @param n             The transform length.
      * @return Inverse n:th root of unity.
      */
 
-    public int getInverseNthRoot(int primitiveRoot, long n)
-    {
+    public int getInverseNthRoot(int primitiveRoot, long n) {
         return modPow(primitiveRoot, (getModulus() - 1) / (int) n);
     }
 
@@ -77,12 +68,10 @@ public class IntModMath
      * Modular inverse, that is <code>1 / a</code>. Assumes that the modulus is prime.
      *
      * @param a The operand.
-     *
      * @return <code>a<sup>-1</sup> mod m</code>.
      */
 
-    public final int modInverse(int a)
-    {
+    public final int modInverse(int a) {
         return modPow(a, getModulus() - 2);
     }
 
@@ -91,12 +80,10 @@ public class IntModMath
      *
      * @param a The dividend.
      * @param b The divisor.
-     *
      * @return <code>a*b<sup>-1</sup> mod m</code>.
      */
 
-    public final int modDivide(int a, int b)
-    {
+    public final int modDivide(int a, int b) {
         return modMultiply(a, modInverse(b));
     }
 
@@ -104,12 +91,10 @@ public class IntModMath
      * Modular negation.
      *
      * @param a The argument.
-     *
      * @return <code>-a mod m</code>.
      */
 
-    public final int negate(int a)
-    {
+    public final int negate(int a) {
         return (a == 0 ? 0 : getModulus() - a);
     }
 
@@ -118,38 +103,30 @@ public class IntModMath
      *
      * @param a The base.
      * @param n The exponent.
-     *
      * @return <code>a<sup>n</sup> mod m</code>.
      */
 
-    public final int modPow(int a, int n)
-    {
+    public final int modPow(int a, int n) {
         assert (a != 0 || n != 0);
 
-        if (n == 0)
-        {
+        if (n == 0) {
             return 1;
-        }
-        else if (n < 0)
-        {
+        } else if (n < 0) {
             return modPow(a, getModulus() - 1 + n);
         }
 
         long exponent = (long) n;
 
-        while ((exponent & 1) == 0)
-        {
+        while ((exponent & 1) == 0) {
             a = modMultiply(a, a);
             exponent >>= 1;
         }
 
         int r = a;
 
-        while ((exponent >>= 1) > 0)
-        {
+        while ((exponent >>= 1) > 0) {
             a = modMultiply(a, a);
-            if ((exponent & 1) != 0)
-            {
+            if ((exponent & 1) != 0) {
                 r = modMultiply(r, a);
             }
         }

@@ -1,17 +1,17 @@
 package org.apfloat.internal;
 
+import org.apfloat.ApfloatContext;
+import org.apfloat.ApfloatRuntimeException;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import org.apfloat.ApfloatContext;
-import org.apfloat.ApfloatRuntimeException;
-
 /**
  * Class for running <code>ParallelRunnable</code> objects in parallel using
  * multiple threads.<p>
- *
+ * <p>
  * The ParallelRunner assumes that the current {@link ApfloatContext} returns an
  * <code>ExecutorService</code> that is limited to a number of threads that is
  * one less than the number of processors. This way, when also the current thread
@@ -19,15 +19,16 @@ import org.apfloat.ApfloatRuntimeException;
  * maximized but only so that no more threads are actively executing than the
  * number of processors.
  *
- * @since 1.1
- * @version 1.8.0
  * @author Mikko Tommila
+ * @version 1.8.0
+ * @since 1.1
  */
 
-public class ParallelRunner
-{
-    private ParallelRunner()
-    {
+public class ParallelRunner {
+    // Implemented as a List because the assumption is that the number of concurrent tasks is very small
+    private static Queue<ParallelRunnable> tasks = new ConcurrentLinkedQueue<ParallelRunnable>();
+
+    private ParallelRunner() {
     }
 
     /**
@@ -41,20 +42,16 @@ public class ParallelRunner
      */
 
     public static void runParallel(ParallelRunnable parallelRunnable)
-        throws ApfloatRuntimeException
-    {
+            throws ApfloatRuntimeException {
         ApfloatContext ctx = ApfloatContext.getContext();
         int numberOfProcessors = ctx.getNumberOfProcessors();
 
         ParallelRunner.tasks.add(parallelRunnable);
-        try
-        {
-            if (numberOfProcessors > 1)
-            {
+        try {
+            if (numberOfProcessors > 1) {
                 ExecutorService executorService = ctx.getExecutorService();
 
-                for (int i = 0; i < numberOfProcessors - 1; i++)
-                {
+                for (int i = 0; i < numberOfProcessors - 1; i++) {
                     // Process the task also in other threads
                     executorService.execute(parallelRunnable);
                 }
@@ -62,9 +59,7 @@ public class ParallelRunner
 
             // Also process the task in the current thread, until it is finished
             parallelRunnable.run();
-        }
-        finally
-        {
+        } finally {
             ParallelRunner.tasks.remove(parallelRunnable);
         }
     }
@@ -76,25 +71,17 @@ public class ParallelRunner
      * @param future The Future to wait for.
      */
 
-    public static void wait(Future<?> future)
-    {
-        while (!future.isDone())
-        {
+    public static void wait(Future<?> future) {
+        while (!future.isDone()) {
             // Try and get any running task
             ParallelRunnable parallelRunnable = ParallelRunner.tasks.peek();
-            if (parallelRunnable != null)
-            {
+            if (parallelRunnable != null) {
                 // Steal a minimal amount of work while we wait
                 parallelRunnable.runBatch();
-            }
-            else
-            {
+            } else {
                 // Actually idle - give up the rest of the CPU time slice
                 Thread.yield();
             }
         }
     }
-
-    // Implemented as a List because the assumption is that the number of concurrent tasks is very small
-    private static Queue<ParallelRunnable> tasks = new ConcurrentLinkedQueue<ParallelRunnable>();
 }

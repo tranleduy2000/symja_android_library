@@ -1,8 +1,8 @@
 package org.apfloat.internal;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apfloat.spi.Util;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Abstract class for a <code>Runnable</code> that can be run in parallel by
@@ -12,20 +12,24 @@ import org.apfloat.spi.Util;
  * completed until all batches are completed, i.e. the {@link #run()} method
  * only returns when all batches are completed.
  *
- * @since 1.1
- * @version 1.8.0
  * @author Mikko Tommila
+ * @version 1.8.0
+ * @since 1.1
  */
 
 public abstract class ParallelRunnable
-    implements Runnable
-{
+        implements Runnable {
+    private static final int MINIMUM_BATCH_SIZE = 16;
+    private long length;
+    private long preferredBatchSize;
+    private AtomicLong started;
+    private AtomicLong completed;
+
     /**
      * Subclass constructor.
      */
 
-    protected ParallelRunnable(long length)
-    {
+    protected ParallelRunnable(long length) {
         // Set the batch size to be some balanced value with respect to the batch size and the number of batches
         this.preferredBatchSize = Util.sqrt4down(length);
         this.length = length;
@@ -39,16 +43,14 @@ public abstract class ParallelRunnable
      * threads in parallel.
      */
 
-    public final void run()
-    {
+    public final void run() {
         // Run batches as long as there are any available
-        while (runBatch());
+        while (runBatch()) ;
 
         // Wait until all batches are completed (the above only says all batches were started)
         // Note that accessing this atomic variable also ensures that memory writes in other
         // threads have happened-before we get here and see that the task is completed
-        while (this.completed.get() < this.length)
-        {
+        while (this.completed.get() < this.length) {
             Thread.yield();     // Do not waste time
         }
     }
@@ -58,23 +60,20 @@ public abstract class ParallelRunnable
      * actually acquired and run, <code>false</code> if all batches were
      * already started and none could be run. This method can be used by any
      * thread to steal and complete a minimal amount of work.<p>
-     *
+     * <p>
      * Note that if a batch could not be run, it does not mean that all of
      * the batches are already completed - some could still be running.
      *
      * @return If a batch was actually run.
      */
 
-    public final boolean runBatch()
-    {
+    public final boolean runBatch() {
         boolean isRun = false;
-        if (this.started.get() < this.length)
-        {
+        if (this.started.get() < this.length) {
             long batchSize = Math.max(MINIMUM_BATCH_SIZE, getPreferredBatchSize());
             long startValue = this.started.getAndAdd(batchSize);
             long length = Math.min(batchSize, this.length - startValue);
-            if (length > 0)
-            {
+            if (length > 0) {
                 Runnable runnable = getRunnable(startValue, length);
                 runnable.run();
                 // This ensures that all memory writes in the Runnable happen-before other threads can see that the batch was completed
@@ -89,13 +88,11 @@ public abstract class ParallelRunnable
      * Get the Runnable object for strides which fit in an <code>int</code>.
      *
      * @param startValue The starting value for the stride.
-     * @param length The length of the stride.
-     *
+     * @param length     The length of the stride.
      * @return The Runnable object for the specified stride.
      */
 
-    protected Runnable getRunnable(int startValue, int length)
-    {
+    protected Runnable getRunnable(int startValue, int length) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -103,19 +100,15 @@ public abstract class ParallelRunnable
      * Get the Runnable object for strides which fit only in a <code>long</code>.
      *
      * @param startValue The starting value for the stride.
-     * @param length The length of the stride.
-     *
+     * @param length     The length of the stride.
      * @return The Runnable object for the specified stride.
      */
 
-    protected Runnable getRunnable(long startValue, long length)
-    {
+    protected Runnable getRunnable(long startValue, long length) {
         if (startValue <= Integer.MAX_VALUE - length)   // Avoid overflow
         {
             return getRunnable((int) startValue, (int) length);
-        }
-        else
-        {
+        } else {
             throw new UnsupportedOperationException("Not implemented");
         }
     }
@@ -124,19 +117,10 @@ public abstract class ParallelRunnable
      * Get the preferred batch size.
      *
      * @return The preferred batch size.
-     *
      * @since 1.7.0
      */
 
-    protected long getPreferredBatchSize()
-    {
+    protected long getPreferredBatchSize() {
         return this.preferredBatchSize;
     }
-
-    private static final int MINIMUM_BATCH_SIZE = 16;
-
-    private long length;
-    private long preferredBatchSize;
-    private AtomicLong started;
-    private AtomicLong completed;
 }

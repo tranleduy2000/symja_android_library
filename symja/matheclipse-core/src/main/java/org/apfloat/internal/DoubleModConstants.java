@@ -3,24 +3,23 @@ package org.apfloat.internal;
 /**
  * Constants needed for various modular arithmetic operations for the <code>double</code> type.
  *
- * @version 1.0
  * @author Mikko Tommila
+ * @version 1.0
  */
 
-public interface DoubleModConstants
-{
+public interface DoubleModConstants {
     /**
      * Moduli to be used in number theoretic transforms.
      * Allows transform lengths upto 3*2<sup>43</sup>.
      */
 
-    public static final double MODULUS[] = { 1952732650930177.0, 1899956092796929.0, 1636073302130689.0 };
+    public static final double MODULUS[] = {1952732650930177.0, 1899956092796929.0, 1636073302130689.0};
 
     /**
      * Primitive roots for the corresponding moduli.
      */
 
-    public static final double PRIMITIVE_ROOT[] = { 5.0, 7.0, 17.0 };
+    public static final double PRIMITIVE_ROOT[] = {5.0, 7.0, 17.0};
 
     /**
      * Maximum transform length for the moduli.
