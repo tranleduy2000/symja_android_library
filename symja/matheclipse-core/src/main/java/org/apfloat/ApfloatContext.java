@@ -1169,8 +1169,7 @@ public class ApfloatContext
     }
 
     // At system exit, run garbage collection and finalization to clean up temporary files
-    private static class CleanupThread
-            extends Thread {
+    private static class CleanupThread extends Thread {
         private BuilderFactory builderFactory;
 
         public CleanupThread() {
@@ -1179,9 +1178,6 @@ public class ApfloatContext
 
         public void run() {
             ApfloatMath.cleanUp();      // Clear references to static cached apfloats
-            System.gc();
-            System.gc();
-            System.runFinalization();
             this.builderFactory.shutdown();
         }
 
