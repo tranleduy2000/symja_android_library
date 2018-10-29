@@ -183,8 +183,8 @@ public abstract class UnicodeEscaper extends Escaper {
      * <p>
      * <p><b>Note:</b> When implementing an escaper it is a good idea to override this method for
      * efficiency by inlining the implementation of {@link #nextEscapeIndex(CharSequence, int, int)}
-     * directly. Doing this for {@link com.google.common.net.PercentEscaper} more than doubled the
-     * performance for unescaped strings (as measured by {@link CharEscapersBenchmark}).
+     * directly. Doing this for {link com.google.common.net.PercentEscaper} more than doubled the
+     * performance for unescaped strings (as measured by {link CharEscapersBenchmark}).
      *
      * @param string the literal string to be escaped
      * @return the escaped form of {@code string}
@@ -213,7 +213,7 @@ public abstract class UnicodeEscaper extends Escaper {
      * should either continue to validate the correctness of any surrogate characters encountered or
      * provide a clear warning to users that your escaper does not validate its input.
      * <p>
-     * <p>See {@link com.google.common.net.PercentEscaper} for an example.
+     * <p>See {link com.google.common.net.PercentEscaper} for an example.
      *
      * @param csq   a sequence of characters
      * @param start the index of the first character to be scanned
