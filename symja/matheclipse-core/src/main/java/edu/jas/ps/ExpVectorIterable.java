@@ -156,7 +156,7 @@ class ExpVectorIterator implements Iterator<ExpVector> {
         LongIterable li = new LongIterable();
         li.setNonNegativeIterator();
         li.setUpperBound(totalDegree);
-        List<LongIterable> tlist = new ArrayList<LongIterable>(nv);
+        List<LongIterable> tlist = new ArrayList<>(nv);
         for (int i = 0; i < nv; i++) {
             tlist.add(li); // can reuse li
         }
@@ -208,7 +208,7 @@ class ExpVectorIterator implements Iterator<ExpVector> {
         LongIterable li = new LongIterable();
         li.setNonNegativeIterator();
         li.setUpperBound(totalDegree);
-        List<LongIterable> tlist = new ArrayList<LongIterable>(nvar);
+        List<LongIterable> tlist = new ArrayList<>(nvar);
         for (int i = 0; i < nvar; i++) {
             tlist.add(li); // can reuse li
         }

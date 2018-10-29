@@ -40,7 +40,7 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
      * @return a Sturm sequence for f.
      */
     public List<GenPolynomial<C>> sturmSequence(GenPolynomial<C> f) {
-        List<GenPolynomial<C>> S = new ArrayList<GenPolynomial<C>>();
+        List<GenPolynomial<C>> S = new ArrayList<>();
         if (f == null || f.isZERO()) {
             return S;
         }
@@ -62,7 +62,7 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
             return S;
         }
         // make squarefree
-        List<GenPolynomial<C>> Sp = new ArrayList<GenPolynomial<C>>(S.size());
+        List<GenPolynomial<C>> Sp = new ArrayList<>(S.size());
         for (GenPolynomial<C> p : S) {
             p = p.divide(F);
             Sp.add(p);
@@ -80,23 +80,23 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
     @SuppressWarnings("cast")
     @Override
     public List<Interval<C>> realRoots(GenPolynomial<C> f) {
-        List<Interval<C>> R = new ArrayList<Interval<C>>();
+        List<Interval<C>> R = new ArrayList<>();
         if (f == null || f.isConstant()) {
             return R;
         }
         if (f.isZERO()) {
             C z = f.ring.coFac.getZERO();
-            R.add(new Interval<C>(z));
+            R.add(new Interval<>(z));
             return R;
         }
         if (f.degree(0) == 1L) {
             C z = f.monic().trailingBaseCoefficient().negate();
-            R.add(new Interval<C>(z));
+            R.add(new Interval<>(z));
             return R;
         }
         GenPolynomial<C> F = f;
         C M = realRootBound(F); // M != 0, since >= 2
-        Interval<C> iv = new Interval<C>(M.negate(), M);
+        Interval<C> iv = new Interval<>(M.negate(), M);
         //System.out.println("iv = " + iv);
         List<GenPolynomial<C>> S = sturmSequence(F);
         //System.out.println("S = " + S);
@@ -119,7 +119,7 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
      * @return a list of isolating intervals for the real roots of f in I.
      */
     public List<Interval<C>> realRoots(Interval<C> iv, List<GenPolynomial<C>> S) {
-        List<Interval<C>> R = new ArrayList<Interval<C>>();
+        List<Interval<C>> R = new ArrayList<>();
         GenPolynomial<C> f = S.get(0); // squarefree part
         if (f.isZERO()) {
             C z = f.leadingBaseCoefficient();
@@ -127,7 +127,7 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
                 throw new IllegalArgumentException(
                         "root not in interval: f = " + f + ", iv = " + iv + ", z = " + z);
             }
-            Interval<C> iv1 = new Interval<C>(z);
+            Interval<C> iv1 = new Interval<>(z);
             R.add(iv1);
             return R;
         }
@@ -141,7 +141,7 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
                 return R;
                 //throw new IllegalArgumentException("root not in interval: f = " + f + ", iv = " + iv + ", z = " + z);
             }
-            Interval<C> iv1 = new Interval<C>(z);
+            Interval<C> iv1 = new Interval<>(z);
             R.add(iv1);
             return R;
         }
@@ -162,8 +162,8 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
         C c = bisectionPoint(iv, f);
         //System.out.println("c = " + c);
         // recursion on both sub-intervals
-        Interval<C> iv1 = new Interval<C>(iv.left, c);
-        Interval<C> iv2 = new Interval<C>(c, iv.right);
+        Interval<C> iv1 = new Interval<>(iv.left, c);
+        Interval<C> iv2 = new Interval<>(c, iv.right);
         List<Interval<C>> R1 = realRoots(iv1, S);
         //System.out.println("R1 = " + R1);
         if (debug) {
@@ -199,10 +199,10 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
         while (iv1.right.equals(iv2.left)) {
             C d1 = bisectionPoint(iv1, f);
             C d2 = bisectionPoint(iv2, f);
-            Interval<C> iv11 = new Interval<C>(iv1.left, d1);
-            Interval<C> iv12 = new Interval<C>(d1, iv1.right);
-            Interval<C> iv21 = new Interval<C>(iv2.left, d2);
-            Interval<C> iv22 = new Interval<C>(d2, iv2.right);
+            Interval<C> iv11 = new Interval<>(iv1.left, d1);
+            Interval<C> iv12 = new Interval<>(d1, iv1.right);
+            Interval<C> iv21 = new Interval<>(iv2.left, d2);
+            Interval<C> iv22 = new Interval<>(d2, iv2.right);
 
             boolean b11 = signChange(iv11, f);
             boolean b12 = signChange(iv12, f); // TODO check unnecessary
@@ -348,11 +348,11 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
             }
             C c = v.left.sum(v.right);
             c = c.divide(two);
-            Interval<C> im = new Interval<C>(c, v.right);
+            Interval<C> im = new Interval<>(c, v.right);
             if (signChange(im, f)) {
                 v = im;
             } else {
-                v = new Interval<C>(v.left, c);
+                v = new Interval<>(v.left, c);
             }
         }
         // return v;
@@ -374,11 +374,11 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
         if (!iv.contains(zero)) {
             return iv;
         }
-        Interval<C> vn = new Interval<C>(iv.left, zero);
+        Interval<C> vn = new Interval<>(iv.left, zero);
         if (realRootCount(vn, S) == 1) {
             return vn;
         }
-        vn = new Interval<C>(zero, iv.right);
+        vn = new Interval<>(zero, iv.right);
         return vn;
     }
 

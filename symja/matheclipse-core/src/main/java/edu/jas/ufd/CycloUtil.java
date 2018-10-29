@@ -84,7 +84,7 @@ public class CycloUtil {
         }
         GenPolynomial<BigInteger> q = pfac.univariate(0).subtract(pfac.getONE());
         //System.out.println("q = " + q);
-        List<GenPolynomial<BigInteger>> H = new ArrayList<GenPolynomial<BigInteger>>();
+        List<GenPolynomial<BigInteger>> H = new ArrayList<>();
         H.add(q);
 
         SortedMap<Long, Integer> fac = PrimeInteger.factors(n);
@@ -95,7 +95,7 @@ public class CycloUtil {
             //H.extend(Q)
             long p = m.getKey();
             int k = m.getValue();
-            List<GenPolynomial<BigInteger>> Q = new ArrayList<GenPolynomial<BigInteger>>();
+            List<GenPolynomial<BigInteger>> Q = new ArrayList<>();
             for (GenPolynomial<BigInteger> h : H) {
                 GenPolynomial<BigInteger> g = h.inflate(p).divide(h);
                 Q.add(g);
@@ -106,7 +106,7 @@ public class CycloUtil {
             //    Q = [ dup_inflate(q, p, K) for q in Q ]
             //    H.extend(Q)
             for (int i = 1; i < k; i++) {
-                List<GenPolynomial<BigInteger>> P = new ArrayList<GenPolynomial<BigInteger>>();
+                List<GenPolynomial<BigInteger>> P = new ArrayList<>();
                 for (GenPolynomial<BigInteger> h : Q) {
                     GenPolynomial<BigInteger> g = h.inflate(p);
                     P.add(g);
@@ -127,7 +127,7 @@ public class CycloUtil {
      * @return list of factors of cyclotomic polynomial p or emtpy list.
      */
     public static List<GenPolynomial<BigInteger>> cyclotomicFactors(GenPolynomial<BigInteger> p) {
-        List<GenPolynomial<BigInteger>> H = new ArrayList<GenPolynomial<BigInteger>>();
+        List<GenPolynomial<BigInteger>> H = new ArrayList<>();
         long n = p.degree();
         if (n <= 0) {
             return H;
@@ -156,7 +156,7 @@ public class CycloUtil {
         //       if h not in F:
         //          H.append(h)
         //return H                         
-        H = new ArrayList<GenPolynomial<BigInteger>>();
+        H = new ArrayList<>();
         List<GenPolynomial<BigInteger>> F2 = cyclotomicDecompose(pfac, 2L * n);
         for (GenPolynomial<BigInteger> h : F2) {
             if (!F.contains(h)) {

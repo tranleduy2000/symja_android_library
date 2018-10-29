@@ -72,8 +72,8 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
      */
     @SuppressWarnings("unchecked")
     public Rectangle(Complex<C> sw, Complex<C> ne) {
-        this(new Complex<C>(sw.ring, sw.getRe(), ne.getIm()), sw,
-                new Complex<C>(sw.ring, ne.getRe(), sw.getIm()), ne);
+        this(new Complex<>(sw.ring, sw.getRe(), ne.getIm()), sw,
+                new Complex<>(sw.ring, ne.getRe(), sw.getIm()), ne);
     }
 
 
@@ -169,9 +169,9 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
      */
     public Rectangle<C> exchangeNW(Complex<C> c) {
         Complex<C> d = getSE();
-        Complex<C> sw = new Complex<C>(c.factory(), c.getRe(), d.getIm());
-        Complex<C> ne = new Complex<C>(c.factory(), d.getRe(), c.getIm());
-        return new Rectangle<C>(c, sw, d, ne);
+        Complex<C> sw = new Complex<>(c.factory(), c.getRe(), d.getIm());
+        Complex<C> ne = new Complex<>(c.factory(), d.getRe(), c.getIm());
+        return new Rectangle<>(c, sw, d, ne);
     }
 
 
@@ -183,9 +183,9 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
      */
     public Rectangle<C> exchangeSW(Complex<C> c) {
         Complex<C> d = getNE();
-        Complex<C> nw = new Complex<C>(c.factory(), c.getRe(), d.getIm());
-        Complex<C> se = new Complex<C>(c.factory(), d.getRe(), c.getIm());
-        return new Rectangle<C>(nw, c, se, d);
+        Complex<C> nw = new Complex<>(c.factory(), c.getRe(), d.getIm());
+        Complex<C> se = new Complex<>(c.factory(), d.getRe(), c.getIm());
+        return new Rectangle<>(nw, c, se, d);
     }
 
 
@@ -197,9 +197,9 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
      */
     public Rectangle<C> exchangeSE(Complex<C> c) {
         Complex<C> d = getNW();
-        Complex<C> sw = new Complex<C>(c.factory(), d.getRe(), c.getIm());
-        Complex<C> ne = new Complex<C>(c.factory(), c.getRe(), d.getIm());
-        return new Rectangle<C>(d, sw, c, ne);
+        Complex<C> sw = new Complex<>(c.factory(), d.getRe(), c.getIm());
+        Complex<C> ne = new Complex<>(c.factory(), c.getRe(), d.getIm());
+        return new Rectangle<>(d, sw, c, ne);
     }
 
 
@@ -211,9 +211,9 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
      */
     public Rectangle<C> exchangeNE(Complex<C> c) {
         Complex<C> d = getSW();
-        Complex<C> nw = new Complex<C>(c.factory(), d.getRe(), c.getIm());
-        Complex<C> se = new Complex<C>(c.factory(), c.getRe(), d.getIm());
-        return new Rectangle<C>(nw, d, se, c);
+        Complex<C> nw = new Complex<>(c.factory(), d.getRe(), c.getIm());
+        Complex<C> se = new Complex<>(c.factory(), c.getRe(), d.getIm());
+        return new Rectangle<>(nw, d, se, c);
     }
 
 
@@ -272,7 +272,7 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
         // 0 <= rr, ri <= 1
         rr = rr.multiply(dr);
         ri = ri.multiply(di);
-        Complex<C> rp = new Complex<C>(sw.factory(), rr, ri);
+        Complex<C> rp = new Complex<>(sw.factory(), rr, ri);
         //System.out.println("rp = " + rp);
         rp = sw.sum(rp);
         return rp;
@@ -285,7 +285,7 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
      * @return a copy of this.
      */
     public Rectangle<C> copy() {
-        return new Rectangle<C>(corners);
+        return new Rectangle<>(corners);
     }
 
 
@@ -303,7 +303,7 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
         Rectangle<C> a = null;
         try {
             a = (Rectangle<C>) b;
-        } catch (ClassCastException e) {
+        } catch (ClassCastException ignored) {
         }
         for (int i = 0; i < 4; i++) {
             if (!corners[i].equals(a.corners[i])) {
@@ -343,7 +343,7 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
         m = m.divide(two);
         r = corners[1].getRe().sum(r);
         m = corners[1].getIm().sum(m);
-        return new Complex<C>(corners[0].factory(), r, m);
+        return new Complex<>(corners[0].factory(), r, m);
     }
 
 
@@ -356,8 +356,8 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
         Complex<C> cm = getCenter();
         BigRational rs = cm.getRe().getRational();
         BigRational ms = cm.getIm().getRational();
-        ComplexRing<BigRational> cf = new ComplexRing<BigRational>(rs.factory());
-        Complex<BigRational> c = new Complex<BigRational>(cf, rs, ms);
+        ComplexRing<BigRational> cf = new ComplexRing<>(rs.factory());
+        Complex<BigRational> c = new Complex<>(cf, rs, ms);
         return c;
     }
 
@@ -371,8 +371,8 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
         Complex<BigRational> rc = getRationalCenter();
         BigDecimal rd = new BigDecimal(rc.getRe());
         BigDecimal md = new BigDecimal(rc.getIm());
-        ComplexRing<BigDecimal> cf = new ComplexRing<BigDecimal>(rd.factory());
-        Complex<BigDecimal> c = new Complex<BigDecimal>(cf, rd, md);
+        ComplexRing<BigDecimal> cf = new ComplexRing<>(rd.factory());
+        Complex<BigDecimal> c = new Complex<>(cf, rd, md);
         return c;
     }
 

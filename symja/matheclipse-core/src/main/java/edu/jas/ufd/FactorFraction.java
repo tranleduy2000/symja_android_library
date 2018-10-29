@@ -107,7 +107,7 @@ public class FactorFraction<C extends GcdRingElem<C>,
         if (F.size() <= 1) { // x/1
             return true;
         } else if (F.size() == 2) { // x/1, 1/y
-            List<D> pp = new ArrayList<D>(F.keySet());
+            List<D> pp = new ArrayList<>(F.keySet());
             D f = pp.get(0);
             D g = pp.get(1);
             return (f.numerator().isONE() && g.denominator().isONE()) || (g.numerator().isONE() && f.denominator().isONE());
@@ -137,7 +137,7 @@ public class FactorFraction<C extends GcdRingElem<C>,
      */
     public SortedMap<D, Long> factors(D P) {
         // D == QuotPair<GenPolynomial<C>>
-        SortedMap<D, Long> facs = new TreeMap<D, Long>();
+        SortedMap<D, Long> facs = new TreeMap<>();
         if (P == null) {
             return facs;
         }

@@ -72,7 +72,7 @@ public class SquarefreeFactory {
      * @return squarefree factorization algorithm implementation.
      */
     public static SquarefreeAbstract<ModInteger> getImplementation(ModIntegerRing fac) {
-        return new SquarefreeFiniteFieldCharP<ModInteger>(fac);
+        return new SquarefreeFiniteFieldCharP<>(fac);
     }
 
 
@@ -84,7 +84,7 @@ public class SquarefreeFactory {
      * @return squarefree factorization algorithm implementation.
      */
     public static SquarefreeAbstract<ModLong> getImplementation(ModLongRing fac) {
-        return new SquarefreeFiniteFieldCharP<ModLong>(fac);
+        return new SquarefreeFiniteFieldCharP<>(fac);
     }
 
 
@@ -96,7 +96,7 @@ public class SquarefreeFactory {
      * @return squarefree factorization algorithm implementation.
      */
     public static SquarefreeAbstract<BigInteger> getImplementation(BigInteger fac) {
-        return new SquarefreeRingChar0<BigInteger>(fac);
+        return new SquarefreeRingChar0<>(fac);
     }
 
 
@@ -108,7 +108,7 @@ public class SquarefreeFactory {
      * @return squarefree factorization algorithm implementation.
      */
     public static SquarefreeAbstract<BigRational> getImplementation(BigRational fac) {
-        return new SquarefreeFieldChar0<BigRational>(fac);
+        return new SquarefreeFieldChar0<>(fac);
     }
 
 
@@ -125,12 +125,12 @@ public class SquarefreeFactory {
         PolyUfdUtil.ensureFieldProperty(fac);
         if (fac.isField()) {
             if (fac.characteristic().signum() == 0) {
-                return new SquarefreeFieldChar0<AlgebraicNumber<C>>(fac);
+                return new SquarefreeFieldChar0<>(fac);
             }
             if (fac.isFinite()) {
-                return new SquarefreeFiniteFieldCharP<AlgebraicNumber<C>>(fac);
+                return new SquarefreeFiniteFieldCharP<>(fac);
             }
-            return new SquarefreeInfiniteAlgebraicFieldCharP<C>(fac);
+            return new SquarefreeInfiniteAlgebraicFieldCharP<>(fac);
         }
         throw new ArithmeticException("eventually no integral domain " + fac.getClass().getName());
     }
@@ -147,9 +147,9 @@ public class SquarefreeFactory {
     public static <C extends GcdRingElem<C>> SquarefreeAbstract<Quotient<C>> getImplementation(
             QuotientRing<C> fac) {
         if (fac.characteristic().signum() == 0) {
-            return new SquarefreeFieldChar0<Quotient<C>>(fac);
+            return new SquarefreeFieldChar0<>(fac);
         }
-        return new SquarefreeInfiniteFieldCharP<C>(fac);
+        return new SquarefreeInfiniteFieldCharP<>(fac);
     }
 
 
@@ -178,21 +178,21 @@ public class SquarefreeFactory {
             GenPolynomialRing<C> fac) {
         if (fac.characteristic().signum() == 0) {
             if (fac.coFac.isField()) {
-                return new SquarefreeFieldChar0<C>(fac.coFac);
+                return new SquarefreeFieldChar0<>(fac.coFac);
             }
-            return new SquarefreeRingChar0<C>(fac.coFac);
+            return new SquarefreeRingChar0<>(fac.coFac);
         }
         if (fac.coFac.isFinite()) {
-            return new SquarefreeFiniteFieldCharP<C>(fac.coFac);
+            return new SquarefreeFiniteFieldCharP<>(fac.coFac);
         }
         Object ocfac = fac.coFac;
         SquarefreeAbstract saq = null;
         if (ocfac instanceof QuotientRing) {
             QuotientRing<C> qf = (QuotientRing<C>) ocfac;
-            saq = new SquarefreeInfiniteFieldCharP<C>(qf);
+            saq = new SquarefreeInfiniteFieldCharP<>(qf);
         } else if (ocfac instanceof AlgebraicNumberRing) {
             AlgebraicNumberRing<C> af = (AlgebraicNumberRing<C>) ocfac;
-            saq = new SquarefreeInfiniteAlgebraicFieldCharP<C>(af);
+            saq = new SquarefreeInfiniteAlgebraicFieldCharP<>(af);
         }
         if (saq == null) {
             throw new IllegalArgumentException("no squarefree factorization " + fac.coFac);
@@ -220,13 +220,13 @@ public class SquarefreeFactory {
         GenPolynomialRing pfac = null;
         Object ofac = fac;
         if (ofac instanceof BigInteger) {
-            ufd = new SquarefreeRingChar0<C>(fac);
+            ufd = new SquarefreeRingChar0<>(fac);
         } else if (ofac instanceof BigRational) {
-            ufd = new SquarefreeFieldChar0<C>(fac);
+            ufd = new SquarefreeFieldChar0<>(fac);
         } else if (ofac instanceof ModIntegerRing) {
-            ufd = new SquarefreeFiniteFieldCharP<C>(fac);
+            ufd = new SquarefreeFiniteFieldCharP<>(fac);
         } else if (ofac instanceof ModLongRing) {
-            ufd = new SquarefreeFiniteFieldCharP<C>(fac);
+            ufd = new SquarefreeFiniteFieldCharP<>(fac);
         } else if (ofac instanceof AlgebraicNumberRing) {
             afac = (AlgebraicNumberRing) ofac;
             //ofac = afac.ring.coFac;
@@ -241,16 +241,16 @@ public class SquarefreeFactory {
         } else if (fac.isField()) {
             //System.out.println("fac_field = " + fac);
             if (fac.characteristic().signum() == 0) {
-                ufd = new SquarefreeFieldChar0<C>(fac);
+                ufd = new SquarefreeFieldChar0<>(fac);
             } else {
                 if (fac.isFinite()) {
-                    ufd = new SquarefreeFiniteFieldCharP<C>(fac);
+                    ufd = new SquarefreeFiniteFieldCharP<>(fac);
                 } else {
                     ufd = new SquarefreeInfiniteFieldCharP/*raw*/(fac);
                 }
             }
         } else if (fac.characteristic().signum() == 0) {
-            ufd = new SquarefreeRingChar0<C>(fac);
+            ufd = new SquarefreeRingChar0<>(fac);
         } else {
             throw new IllegalArgumentException("no squarefree factorization implementation for "
                     + fac.getClass().getName());

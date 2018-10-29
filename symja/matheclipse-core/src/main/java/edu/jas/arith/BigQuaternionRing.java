@@ -89,7 +89,7 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
      * @see edu.jas.structure.ElemFactory#generators()
      */
     public List<BigQuaternion> generators() {
-        List<BigQuaternion> g = new ArrayList<BigQuaternion>(4);
+        List<BigQuaternion> g = new ArrayList<>(4);
         g.add(getONE());
         g.add(I);
         g.add(J);
@@ -270,7 +270,7 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
         BigRational half = BigRational.HALF;
         // Lipschitz integer units
         List<BigQuaternion> units = generators();
-        List<BigQuaternion> u = new ArrayList<BigQuaternion>(units);
+        List<BigQuaternion> u = new ArrayList<>(units);
         for (BigQuaternion ue : u) {
             units.add(ue.negate());
         }

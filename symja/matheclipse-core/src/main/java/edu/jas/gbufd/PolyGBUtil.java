@@ -53,7 +53,7 @@ public class PolyGBUtil {
             return true;
         }
         GroebnerBaseAbstract<C> bb = GBFactory.getImplementation(r.ring.coFac);
-        List<GenPolynomial<C>> F = new ArrayList<GenPolynomial<C>>(2);
+        List<GenPolynomial<C>> F = new ArrayList<>(2);
         F.add(A);
         F.add(B);
         List<GenPolynomial<C>> G = bb.GB(F);
@@ -222,7 +222,7 @@ public class PolyGBUtil {
                 f = f.subtract(e);
                 r = r.multiply(cc); // coeff cc
                 h = A.multiply(pl, f); // coeff ac
-                hr = new GenPolynomial<GenPolynomial<GenPolynomial<C>>>(pfac, h, g);
+                hr = new GenPolynomial<>(pfac, h, g);
                 r = r.subtract(hr);
             } else {
                 r = r.multiply(cc);
@@ -280,7 +280,7 @@ public class PolyGBUtil {
                 f = f.subtract(e);
                 r = r.multiply(cc); // coeff cc
                 h = A.multiply(pl, f); // coeff ac
-                hr = new GenPolynomial<GenPolynomial<C>>(pfac, h, g);
+                hr = new GenPolynomial<>(pfac, h, g);
                 r = r.subtract(hr);
             } else {
                 r = r.multiply(cc);
@@ -306,7 +306,7 @@ public class PolyGBUtil {
         }
         GenPolynomialRing<C> pfac = A.get(0).ring;
         GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(1);
-        List<GenPolynomial<C>> zeroDeg = new ArrayList<GenPolynomial<C>>(A.size());
+        List<GenPolynomial<C>> zeroDeg = new ArrayList<>(A.size());
         for (int i = 0; i < A.size(); i++) {
             GenPolynomial<C> q = A.get(i);
             GenPolynomial<GenPolynomial<C>> fr = PolyUtil.recursive(rfac, q);
@@ -335,7 +335,7 @@ public class PolyGBUtil {
             return A;
         }
         int s = A.size() + B.size();
-        List<GenPolynomial<C>> c = new ArrayList<GenPolynomial<C>>(s);
+        List<GenPolynomial<C>> c = new ArrayList<>(s);
         GenPolynomialRing<C> tfac = pfac.extend(1);
         // term order is also adjusted
         for (GenPolynomial<C> p : A) {
@@ -377,7 +377,7 @@ public class PolyGBUtil {
             return A;
         }
         int s = A.size() + B.size();
-        List<GenSolvablePolynomial<C>> c = new ArrayList<GenSolvablePolynomial<C>>(s);
+        List<GenSolvablePolynomial<C>> c = new ArrayList<>(s);
         GenSolvablePolynomialRing<C> tfac = pfac.extend(1);
         // term order is also adjusted
         for (GenSolvablePolynomial<C> p : A) {
@@ -429,11 +429,11 @@ public class PolyGBUtil {
             return res;
         }
         // divide
-        List<GenSolvablePolynomial<C>> Q = new ArrayList<GenSolvablePolynomial<C>>(1);
+        List<GenSolvablePolynomial<C>> Q = new ArrayList<>(1);
         Q.add(r.getZERO());
-        List<GenSolvablePolynomial<C>> D = new ArrayList<GenSolvablePolynomial<C>>(1);
+        List<GenSolvablePolynomial<C>> D = new ArrayList<>(1);
         D.add(d);
-        SolvableReductionAbstract<C> sred = new SolvableReductionSeq<C>();
+        SolvableReductionAbstract<C> sred = new SolvableReductionSeq<>();
         res[1] = sred.rightNormalform(Q, D, n); // left
         res[0] = Q.get(0);
         return res;

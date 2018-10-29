@@ -66,7 +66,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
      * @param cf coefficient ring.
      */
     public GreatestCommonDivisorAbstract(RingFactory<C> cf) {
-        this(cf, new SolvableSyzygySeq<C>(cf));
+        this(cf, new SolvableSyzygySeq<>(cf));
     }
 
 
@@ -916,7 +916,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         if (A == null || A.isEmpty()) {
             return A;
         }
-        List<GenSolvablePolynomial<C>> B = new ArrayList<GenSolvablePolynomial<C>>(A.size());
+        List<GenSolvablePolynomial<C>> B = new ArrayList<>(A.size());
         // make a coprime to rest of list
         GenSolvablePolynomial<C> a = A.get(0);
         //System.out.println("a = " + a);
@@ -969,7 +969,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         if (A == null || A.isEmpty()) {
             return A;
         }
-        List<GenSolvablePolynomial<C>> B = new ArrayList<GenSolvablePolynomial<C>>();
+        List<GenSolvablePolynomial<C>> B = new ArrayList<>();
         // make a co-prime to rest of list
         for (GenSolvablePolynomial<C> a : A) {
             //System.out.println("a = " + a);
@@ -994,7 +994,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         if (a == null || a.isZERO() || a.isConstant()) {
             return P;
         }
-        List<GenSolvablePolynomial<C>> B = new ArrayList<GenSolvablePolynomial<C>>(P.size() + 1);
+        List<GenSolvablePolynomial<C>> B = new ArrayList<>(P.size() + 1);
         // make a coprime to elements of the list P
         for (int i = 0; i < P.size(); i++) {
             GenSolvablePolynomial<C> b = P.get(i);

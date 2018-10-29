@@ -161,7 +161,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
-        List<GenPolynomial<BigInteger>> factors = new ArrayList<GenPolynomial<BigInteger>>();
+        List<GenPolynomial<BigInteger>> factors = new ArrayList<>();
         if (P.isZERO()) {
             return factors;
         }
@@ -256,7 +256,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                     continue;
                 }
                 // initialize polynomial factory and map polynomial
-                mfac = new GenPolynomialRing<MOD>(cofac, pfac);
+                mfac = new GenPolynomialRing<>(cofac, pfac);
                 am = PolyUtil.fromIntegerCoefficients(mfac, P);
                 if (!am.degreeVector().equals(degv)) { // allways true
                     logger.info("unlucky prime (deg) = " + p);
@@ -354,7 +354,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             if (debug) {
                 logger.info("lifting shortest from " + mlist);
             }
-            if (true && P.leadingBaseCoefficient().isONE()) {
+            if (P.leadingBaseCoefficient().isONE()) {
                 long t = System.currentTimeMillis();
                 try {
                     mlist = PolyUtil.monic(mlist);
@@ -446,7 +446,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         if (pfac.nvar != 1) { // todo assert
             throw new IllegalArgumentException("polynomial ring not univariate");
         }
-        List<GenPolynomial<BigInteger>> factors = new ArrayList<GenPolynomial<BigInteger>>(F.size());
+        List<GenPolynomial<BigInteger>> factors = new ArrayList<>(F.size());
         List<GenPolynomial<MOD>> mlist = F;
         List<GenPolynomial<MOD>> lift;
 
@@ -496,7 +496,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         //System.out.println("ldcf = " + ldcf); 
         for (int j = 1; j <= dl; j++) {
             //System.out.println("j = " + j + ", dl = " + dl + ", lift = " + lift); 
-            KsubSet<GenPolynomial<MOD>> ps = new KsubSet<GenPolynomial<MOD>>(lift, j);
+            KsubSet<GenPolynomial<MOD>> ps = new KsubSet<>(lift, j);
             for (List<GenPolynomial<MOD>> flist : ps) {
                 //System.out.println("degreeSum = " + degreeSum(flist));
                 if (!D.get((int) FactorInteger.degreeSum(flist))) {
@@ -576,7 +576,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         if (pfac.nvar != 1) { // todo assert
             throw new IllegalArgumentException("polynomial ring not univariate");
         }
-        List<GenPolynomial<BigInteger>> factors = new ArrayList<GenPolynomial<BigInteger>>(F.size());
+        List<GenPolynomial<BigInteger>> factors = new ArrayList<>(F.size());
         List<GenPolynomial<MOD>> mlist = F;
 
         MOD nf = null;
@@ -608,7 +608,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         HenselApprox<MOD> ilist = null;
         for (int j = 1; j <= dl; j++) {
             //System.out.println("j = " + j + ", dl = " + dl + ", ilist = " + ilist); 
-            KsubSet<GenPolynomial<MOD>> ps = new KsubSet<GenPolynomial<MOD>>(mlist, j);
+            KsubSet<GenPolynomial<MOD>> ps = new KsubSet<>(mlist, j);
             for (List<GenPolynomial<MOD>> flist : ps) {
                 //System.out.println("degreeSum = " + degreeSum(flist));
                 if (!D.get((int) FactorInteger.degreeSum(flist))) {
@@ -703,7 +703,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         if (pfac.nvar <= 1) {
             return baseFactorsSquarefree(P);
         }
-        List<GenPolynomial<BigInteger>> topt = new ArrayList<GenPolynomial<BigInteger>>(1);
+        List<GenPolynomial<BigInteger>> topt = new ArrayList<>(1);
         topt.add(P);
         OptimizedPolynomialList<BigInteger> opt = TermOrderOptimization.optimizeTermOrder(pfac,
                 topt);
@@ -729,7 +729,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             try {
                 logger.info("try factorsSquarefreeHensel: " + pl);
                 facs = factorsSquarefreeHensel(pu);
-                List<GenPolynomial<BigInteger>> fs = new ArrayList<GenPolynomial<BigInteger>>(facs.size());
+                List<GenPolynomial<BigInteger>> fs = new ArrayList<>(facs.size());
                 GenPolynomialRing<BigInteger> pf = P.ring;
                 GenPolynomialRing<BigInteger> pfu = pu.ring;
                 for (GenPolynomial<BigInteger> p : facs) {
@@ -773,7 +773,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         if (pfac.nvar == 1) {
             return baseFactorsSquarefree(P);
         }
-        List<GenPolynomial<BigInteger>> factors = new ArrayList<GenPolynomial<BigInteger>>();
+        List<GenPolynomial<BigInteger>> factors = new ArrayList<>();
         if (P.isZERO()) {
             return factors;
         }
@@ -799,7 +799,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             pd = PolyUtil.basePseudoDivide(pd, prrcu);
             logger.info("recursive content = " + prrc + ", new P = " + pd);
             cfactors = factorsSquarefree(prrc);
-            List<GenPolynomial<BigInteger>> cff = new ArrayList<GenPolynomial<BigInteger>>(cfactors.size());
+            List<GenPolynomial<BigInteger>> cff = new ArrayList<>(cfactors.size());
             for (GenPolynomial<BigInteger> fs : cfactors) {
                 GenPolynomial<BigInteger> fsp = fs.extendLower(pfac, 0, 0L); // since switched vars
                 cff.add(fsp);
@@ -816,7 +816,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         SortedMap<GenPolynomial<BigInteger>, Long> lfactors = factors(lprr);
         //System.out.println("lfactors = " + lfactors);
-        List<GenPolynomial<BigInteger>> lfacs = new ArrayList<GenPolynomial<BigInteger>>(lfactors.keySet());
+        List<GenPolynomial<BigInteger>> lfacs = new ArrayList<>(lfactors.keySet());
         logger.info("leading coefficient factors = " + lfacs);
 
         // search evaluation point and evaluate
@@ -827,13 +827,13 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         List<GenPolynomial<BigInteger>> ce = lfacs;
         List<GenPolynomial<BigInteger>> cep = null;
         List<BigInteger> cei = null;
-        List<BigInteger> dei = new ArrayList<BigInteger>();
+        List<BigInteger> dei = new ArrayList<>();
         BigInteger pec = null;
         BigInteger pecw = null;
         BigInteger ped = null;
 
         List<GenPolynomial<BigInteger>> ufactors = null;
-        List<TrialParts> tParts = new ArrayList<TrialParts>();
+        List<TrialParts> tParts = new ArrayList<>();
         List<GenPolynomial<BigInteger>> lf = null;
         GenPolynomial<BigInteger> lpx = null;
         List<GenPolynomial<BigInteger>> ln = null;
@@ -842,7 +842,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
 
         List<BigInteger> V = null;
         long evStart = 0L; //3L * 5L;
-        List<Long> Evs = new ArrayList<Long>(pfac.nvar + 1); // Evs(0), Evs(1) unused
+        List<Long> Evs = new ArrayList<>(pfac.nvar + 1); // Evs(0), Evs(1) unused
         for (int j = 0; j <= pfac.nvar; j++) {
             Evs.add(evStart);
         }
@@ -864,7 +864,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             }
             //System.out.println("-------------------------------------------- Evs = " + Evs);
             notLucky = false;
-            V = new ArrayList<BigInteger>();
+            V = new ArrayList<>();
             cpfac = pfac;
             pe = pd;
             ccpfac = lprr.ring;
@@ -951,7 +951,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 }
                 //System.out.println("lfacs = " + lfacs + ", cei = " + cei + ", ped = " + ped + ", pecw = " + pecw);
                 // test Wang's condition
-                dei = new ArrayList<BigInteger>();
+                dei = new ArrayList<>();
                 dei.add(pec.multiply(ped).abs()); // .abs()
                 int i = 1;
                 for (BigInteger ci : cei) {
@@ -1015,7 +1015,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             //System.out.println("pecw     = " + pecw);
 
             // determine leading coefficient polynomials for factors
-            lf = new ArrayList<GenPolynomial<BigInteger>>();
+            lf = new ArrayList<>();
             lpx = lprr.ring.getONE();
             for (int i = 0; i < ufactors.size(); i++) {
                 lf.add(lprr.ring.getONE());
@@ -1078,8 +1078,8 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                     }
                     //System.out.println("lfe = " + lfe + ", lfei = " + lfei + ", V = " + V);
 
-                    ln = new ArrayList<GenPolynomial<BigInteger>>(lf.size());
-                    un = new ArrayList<GenPolynomial<BigInteger>>(lf.size());
+                    ln = new ArrayList<>(lf.size());
+                    un = new ArrayList<>(lf.size());
                     for (int jj = 0; jj < lf.size(); jj++) {
                         GenPolynomial<BigInteger> up = ufactors.get(jj);
                         BigInteger ui = up.leadingBaseCoefficient();
@@ -1249,7 +1249,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                 if (nf.isZERO()) {
                     continue;
                 }
-                mufac = new GenPolynomialRing<MOD>(cf, ufac);
+                mufac = new GenPolynomialRing<>(cf, ufac);
                 //System.out.println("mufac = " + mufac.toScript());
                 Pm = PolyUtil.fromIntegerCoefficients(mufac, pe);
                 //System.out.println("Pm = " + Pm);
@@ -1285,7 +1285,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             muqfac = (ModularRingFactory) new ModIntegerRing(q.getVal());
         }
         //System.out.println("muqfac = " + muqfac);
-        GenPolynomialRing<MOD> mucpfac = new GenPolynomialRing<MOD>(muqfac, ufac);
+        GenPolynomialRing<MOD> mucpfac = new GenPolynomialRing<>(muqfac, ufac);
 
         List<GenPolynomial<MOD>> muqfactors = PolyUtil.fromIntegerCoefficients(mucpfac, ufactors);
         GenPolynomial<MOD> peqq = PolyUtil.fromIntegerCoefficients(mucpfac, pe);
@@ -1299,7 +1299,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         logger.info("univariate modulo p^k: " + peqq + " = " + muqfactors);
 
         // convert C from Z[...] to Z_q[...]
-        GenPolynomialRing<MOD> qcfac = new GenPolynomialRing<MOD>(muqfac, pd.ring);
+        GenPolynomialRing<MOD> qcfac = new GenPolynomialRing<>(muqfac, pd.ring);
         GenPolynomial<MOD> pq = PolyUtil.fromIntegerCoefficients(qcfac, pd);
         //System.out.println("pd = " + pd);
         logger.info("multivariate modulo p^k: " + pq);
@@ -1321,11 +1321,6 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
             //nle.printStackTrace();
             //mlift = new ArrayList<GenPolynomial<MOD>>();
             throw new RuntimeException(nle);
-        } catch (ArithmeticException aex) {
-            //System.out.println("exception : " + aex);
-            //aex.printStackTrace();
-            //mlift = new ArrayList<GenPolynomial<MOD>>();
-            throw aex;
         }
         if (mlift.size() <= 1) { // irreducible mod I, p^k, can this happen?
             logger.info("modular lift size == 1: " + mlift);
@@ -1346,7 +1341,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         GenPolynomial<BigInteger> ui = pd;
         for (int j = 1; j <= dl; j++) {
             //System.out.println("j = " + j + ", dl = " + dl + ", mlift = " + mlift); 
-            KsubSet<GenPolynomial<MOD>> subs = new KsubSet<GenPolynomial<MOD>>(mlift, j);
+            KsubSet<GenPolynomial<MOD>> subs = new KsubSet<>(mlift, j);
             for (List<GenPolynomial<MOD>> flist : subs) {
                 //System.out.println("degreeSum = " + degreeSum(flist));
                 GenPolynomial<MOD> mtrial = Power.multiply(mfac, flist);

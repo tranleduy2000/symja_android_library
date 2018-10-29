@@ -80,7 +80,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      * Create from numerator.
      */
     public Local<C> create(C n) {
-        return new Local<C>(this, n);
+        return new Local<>(this, n);
     }
 
 
@@ -88,7 +88,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      * Create from numerator, denominator pair.
      */
     public Local<C> create(C n, C d) {
-        return new Local<C>(this, n, d);
+        return new Local<>(this, n, d);
     }
 
 
@@ -110,7 +110,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      * @return a copy of c.
      */
     public Local<C> copy(Local<C> c) {
-        return new Local<C>(c.ring, c.num, c.den, true);
+        return new Local<>(c.ring, c.num, c.den, true);
     }
 
 
@@ -120,7 +120,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      * @return 0 as Local.
      */
     public Local<C> getZERO() {
-        return new Local<C>(this, ring.getZERO());
+        return new Local<>(this, ring.getZERO());
     }
 
 
@@ -130,7 +130,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      * @return 1 as Local.
      */
     public Local<C> getONE() {
-        return new Local<C>(this, ring.getONE());
+        return new Local<>(this, ring.getONE());
     }
 
 
@@ -142,10 +142,10 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      */
     public List<Local<C>> generators() {
         List<? extends C> rgens = ring.generators();
-        List<Local<C>> gens = new ArrayList<Local<C>>(rgens.size() - 1);
+        List<Local<C>> gens = new ArrayList<>(rgens.size() - 1);
         for (C c : rgens) {
             if (!c.isONE()) {
-                gens.add(new Local<C>(this, c));
+                gens.add(new Local<>(this, c));
             }
         }
         return gens;
@@ -206,7 +206,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      * @return a Local.
      */
     public Local<C> fromInteger(java.math.BigInteger a) {
-        return new Local<C>(this, ring.fromInteger(a));
+        return new Local<>(this, ring.fromInteger(a));
     }
 
 
@@ -217,7 +217,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      * @return a Local.
      */
     public Local<C> fromInteger(long a) {
-        return new Local<C>(this, ring.fromInteger(a));
+        return new Local<>(this, ring.fromInteger(a));
     }
 
 
@@ -297,7 +297,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
             s = ring.random(n);
             s = s.remainder(ideal);
         }
-        return new Local<C>(this, r, s, false);
+        return new Local<>(this, r, s, false);
     }
 
 
@@ -317,7 +317,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
             s = ring.random(n, rnd);
             s = s.remainder(ideal);
         }
-        return new Local<C>(this, r, s, false);
+        return new Local<>(this, r, s, false);
     }
 
 
@@ -329,7 +329,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      */
     public Local<C> parse(String s) {
         C x = ring.parse(s);
-        return new Local<C>(this, x);
+        return new Local<>(this, x);
     }
 
 
@@ -341,7 +341,7 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
      */
     public Local<C> parse(Reader r) {
         C x = ring.parse(r);
-        return new Local<C>(this, x);
+        return new Local<>(this, x);
     }
 
 }

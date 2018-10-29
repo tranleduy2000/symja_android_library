@@ -50,7 +50,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @param a value GenPolynomial<C>.
      */
     public ComplexAlgebraicNumber(ComplexAlgebraicRing<C> r, GenPolynomial<Complex<C>> a) {
-        number = new AlgebraicNumber<Complex<C>>(r.algebraic, a);
+        number = new AlgebraicNumber<>(r.algebraic, a);
         ring = r;
     }
 
@@ -97,7 +97,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      */
     @Override
     public ComplexAlgebraicNumber<C> copy() {
-        return new ComplexAlgebraicNumber<C>(ring, number);
+        return new ComplexAlgebraicNumber<>(ring, number);
     }
 
 
@@ -261,7 +261,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      */
     public ComplexAlgebraicNumber<C> abs() {
         if (this.signum() < 0) {
-            return new ComplexAlgebraicNumber<C>(ring, number.negate());
+            return new ComplexAlgebraicNumber<>(ring, number.negate());
         }
         return this;
     }
@@ -274,7 +274,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this+S.
      */
     public ComplexAlgebraicNumber<C> sum(ComplexAlgebraicNumber<C> S) {
-        return new ComplexAlgebraicNumber<C>(ring, number.sum(S.number));
+        return new ComplexAlgebraicNumber<>(ring, number.sum(S.number));
     }
 
 
@@ -285,7 +285,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this+c.
      */
     public ComplexAlgebraicNumber<C> sum(GenPolynomial<Complex<C>> c) {
-        return new ComplexAlgebraicNumber<C>(ring, number.sum(c));
+        return new ComplexAlgebraicNumber<>(ring, number.sum(c));
     }
 
 
@@ -296,7 +296,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this+c.
      */
     public ComplexAlgebraicNumber<C> sum(AlgebraicNumber<Complex<C>> c) {
-        return new ComplexAlgebraicNumber<C>(ring, number.sum(c));
+        return new ComplexAlgebraicNumber<>(ring, number.sum(c));
     }
 
 
@@ -307,7 +307,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this+c.
      */
     public ComplexAlgebraicNumber<C> sum(Complex<C> c) {
-        return new ComplexAlgebraicNumber<C>(ring, number.sum(c));
+        return new ComplexAlgebraicNumber<>(ring, number.sum(c));
     }
 
 
@@ -318,7 +318,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @see edu.jas.structure.RingElem#negate()
      */
     public ComplexAlgebraicNumber<C> negate() {
-        return new ComplexAlgebraicNumber<C>(ring, number.negate());
+        return new ComplexAlgebraicNumber<>(ring, number.negate());
     }
 
 
@@ -329,7 +329,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this-S.
      */
     public ComplexAlgebraicNumber<C> subtract(ComplexAlgebraicNumber<C> S) {
-        return new ComplexAlgebraicNumber<C>(ring, number.subtract(S.number));
+        return new ComplexAlgebraicNumber<>(ring, number.subtract(S.number));
     }
 
 
@@ -352,7 +352,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @see edu.jas.structure.RingElem#inverse()
      */
     public ComplexAlgebraicNumber<C> inverse() {
-        return new ComplexAlgebraicNumber<C>(ring, number.inverse());
+        return new ComplexAlgebraicNumber<>(ring, number.inverse());
     }
 
 
@@ -363,7 +363,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this - (this/S)*S.
      */
     public ComplexAlgebraicNumber<C> remainder(ComplexAlgebraicNumber<C> S) {
-        return new ComplexAlgebraicNumber<C>(ring, number.remainder(S.number));
+        return new ComplexAlgebraicNumber<>(ring, number.remainder(S.number));
     }
 
 
@@ -385,7 +385,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this*S.
      */
     public ComplexAlgebraicNumber<C> multiply(ComplexAlgebraicNumber<C> S) {
-        return new ComplexAlgebraicNumber<C>(ring, number.multiply(S.number));
+        return new ComplexAlgebraicNumber<>(ring, number.multiply(S.number));
     }
 
 
@@ -396,7 +396,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this*c.
      */
     public ComplexAlgebraicNumber<C> multiply(Complex<C> c) {
-        return new ComplexAlgebraicNumber<C>(ring, number.multiply(c));
+        return new ComplexAlgebraicNumber<>(ring, number.multiply(c));
     }
 
 
@@ -407,7 +407,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this*c.
      */
     public ComplexAlgebraicNumber<C> multiply(GenPolynomial<Complex<C>> c) {
-        return new ComplexAlgebraicNumber<C>(ring, number.multiply(c));
+        return new ComplexAlgebraicNumber<>(ring, number.multiply(c));
     }
 
 
@@ -417,7 +417,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return this with monic value part.
      */
     public ComplexAlgebraicNumber<C> monic() {
-        return new ComplexAlgebraicNumber<C>(ring, number.monic());
+        return new ComplexAlgebraicNumber<>(ring, number.monic());
     }
 
 
@@ -428,7 +428,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return gcd(this, S).
      */
     public ComplexAlgebraicNumber<C> gcd(ComplexAlgebraicNumber<C> S) {
-        return new ComplexAlgebraicNumber<C>(ring, number.gcd(S.number));
+        return new ComplexAlgebraicNumber<>(ring, number.gcd(S.number));
     }
 
 
@@ -442,9 +442,9 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
     public ComplexAlgebraicNumber<C>[] egcd(ComplexAlgebraicNumber<C> S) {
         AlgebraicNumber<Complex<C>>[] aret = number.egcd(S.number);
         ComplexAlgebraicNumber<C>[] ret = new ComplexAlgebraicNumber[3];
-        ret[0] = new ComplexAlgebraicNumber<C>(ring, aret[0]);
-        ret[1] = new ComplexAlgebraicNumber<C>(ring, aret[1]);
-        ret[2] = new ComplexAlgebraicNumber<C>(ring, aret[2]);
+        ret[0] = new ComplexAlgebraicNumber<>(ring, aret[0]);
+        ret[1] = new ComplexAlgebraicNumber<>(ring, aret[1]);
+        ret[2] = new ComplexAlgebraicNumber<>(ring, aret[2]);
         return ret;
     }
 
@@ -482,8 +482,8 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
             Complex<C> ev = ring.engine.complexRectangleMagnitude(v, ring.algebraic.modul, number.val); //, ring.eps);
             BigRational er = ev.getRe().getRational();
             BigRational ei = ev.getIm().getRational();
-            ComplexRing<BigRational> cr = new ComplexRing<BigRational>(er.factory());
-            return new Complex<BigRational>(cr, er, ei);
+            ComplexRing<BigRational> cr = new ComplexRing<>(er.factory());
+            return new Complex<>(cr, er, ei);
         } catch (InvalidBoundaryException e) { // should not happen
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -498,8 +498,8 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      */
     public Complex<BigDecimal> decimalMagnitude() {
         Complex<BigRational> cr = magnitude();
-        ComplexRing<BigDecimal> dr = new ComplexRing<BigDecimal>(BigDecimal.ZERO);
-        return new Complex<BigDecimal>(dr, new BigDecimal(cr.getRe()), new BigDecimal(cr.getIm()));
+        ComplexRing<BigDecimal> dr = new ComplexRing<>(BigDecimal.ZERO);
+        return new Complex<>(dr, new BigDecimal(cr.getRe()), new BigDecimal(cr.getIm()));
     }
 
 }

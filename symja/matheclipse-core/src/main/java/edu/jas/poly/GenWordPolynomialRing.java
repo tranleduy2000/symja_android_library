@@ -83,10 +83,10 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
     public GenWordPolynomialRing(RingFactory<C> cf, WordFactory wf) {
         coFac = cf;
         alphabet = wf;
-        ZERO = new GenWordPolynomial<C>(this);
+        ZERO = new GenWordPolynomial<>(this);
         C coeff = coFac.getONE();
         wone = wf.getONE();
-        ONE = new GenWordPolynomial<C>(this, coeff, wone);
+        ONE = new GenWordPolynomial<>(this, coeff, wone);
     }
 
 
@@ -139,7 +139,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * @return a clone of this.
      */
     public GenWordPolynomialRing<C> copy() {
-        return new GenWordPolynomialRing<C>(coFac, this);
+        return new GenWordPolynomialRing<>(coFac, this);
     }
 
 
@@ -349,7 +349,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * @return a GenWordPolynomial&lt;C&gt;.
      */
     public GenWordPolynomial<C> valueOf(C a) {
-        return new GenWordPolynomial<C>(this, a);
+        return new GenWordPolynomial<>(this, a);
     }
 
 
@@ -383,7 +383,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * @return a GenWordPolynomial&lt;C&gt;.
      */
     public GenWordPolynomial<C> valueOf(C a, Word e) {
-        return new GenWordPolynomial<C>(this, a, e);
+        return new GenWordPolynomial<>(this, a, e);
     }
 
 
@@ -395,7 +395,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * @return a GenWordPolynomial&lt;C&gt;.
      */
     public GenWordPolynomial<C> valueOf(C a, ExpVector e) {
-        return new GenWordPolynomial<C>(this, a, alphabet.valueOf(e));
+        return new GenWordPolynomial<>(this, a, alphabet.valueOf(e));
     }
 
 
@@ -431,7 +431,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * @return a GenWordPolynomial&lt;C&gt; list.
      */
     public List<GenWordPolynomial<C>> valueOf(List<GenPolynomial<C>> A) {
-        List<GenWordPolynomial<C>> B = new ArrayList<GenWordPolynomial<C>>(A.size());
+        List<GenWordPolynomial<C>> B = new ArrayList<>(A.size());
         if (A.isEmpty()) {
             return B;
         }
@@ -450,7 +450,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * @return a GenWordPolynomial&lt;C&gt;.
      */
     public GenWordPolynomial<C> fromInteger(long a) {
-        return new GenWordPolynomial<C>(this, coFac.fromInteger(a), wone);
+        return new GenWordPolynomial<>(this, coFac.fromInteger(a), wone);
     }
 
 
@@ -462,7 +462,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * @return a GenWordPolynomial&lt;C&gt;.
      */
     public GenWordPolynomial<C> fromInteger(BigInteger a) {
-        return new GenWordPolynomial<C>(this, coFac.fromInteger(a), wone);
+        return new GenWordPolynomial<>(this, coFac.fromInteger(a), wone);
     }
 
 
@@ -533,7 +533,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * @return a copy of c.
      */
     public GenWordPolynomial<C> copy(GenWordPolynomial<C> c) {
-        return new GenWordPolynomial<C>(this, c.val);
+        return new GenWordPolynomial<>(this, c.val);
     }
 
 
@@ -561,7 +561,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
     @SuppressWarnings("unchecked")
     public GenWordPolynomial<C> parse(Reader r) {
         if (alphabet.length() <= 4) { // todo, hack for commuative like cases
-            GenPolynomialRing<C> cr = new GenPolynomialRing<C>(coFac, alphabet.getVars());
+            GenPolynomialRing<C> cr = new GenPolynomialRing<>(coFac, alphabet.getVars());
             GenPolynomialTokenizer pt = new GenPolynomialTokenizer(cr, r);
             GenPolynomial<C> p = null;
             try {
@@ -627,7 +627,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      */
     public List<GenWordPolynomial<C>> commute(int i) {
         int n = alphabet.length();
-        List<GenWordPolynomial<C>> pols = new ArrayList<GenWordPolynomial<C>>(n - 1);
+        List<GenWordPolynomial<C>> pols = new ArrayList<>(n - 1);
         for (int j = 0; j < n; j++) {
             if (i != j) {
                 pols.add(commute(i, j));
@@ -644,7 +644,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      */
     public List<GenWordPolynomial<C>> commute() {
         int n = alphabet.length();
-        List<GenWordPolynomial<C>> pols = new ArrayList<GenWordPolynomial<C>>(n * (n - 1));
+        List<GenWordPolynomial<C>> pols = new ArrayList<>(n * (n - 1));
         for (int i = 0; i < n; i++) {
             pols.addAll(commute(i));
         }
@@ -659,7 +659,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      */
     public List<GenWordPolynomial<C>> univariateList() {
         int n = alphabet.length();
-        List<GenWordPolynomial<C>> pols = new ArrayList<GenWordPolynomial<C>>(n);
+        List<GenWordPolynomial<C>> pols = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             GenWordPolynomial<C> p = univariate(i);
             pols.add(p);
@@ -676,7 +676,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      */
     public List<GenWordPolynomial<C>> getGenerators() {
         List<GenWordPolynomial<C>> univs = univariateList();
-        List<GenWordPolynomial<C>> gens = new ArrayList<GenWordPolynomial<C>>(univs.size() + 1);
+        List<GenWordPolynomial<C>> gens = new ArrayList<>(univs.size() + 1);
         gens.add(getONE());
         gens.addAll(univs);
         return gens;
@@ -692,7 +692,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
     public List<GenWordPolynomial<C>> generators() {
         List<C> cogens = coFac.generators();
         List<GenWordPolynomial<C>> univs = univariateList();
-        List<GenWordPolynomial<C>> gens = new ArrayList<GenWordPolynomial<C>>(univs.size() + cogens.size());
+        List<GenWordPolynomial<C>> gens = new ArrayList<>(univs.size() + cogens.size());
         for (C c : cogens) {
             gens.add(getONE().multiply(c));
         }

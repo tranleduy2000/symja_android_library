@@ -87,8 +87,8 @@ class CartesianProductLongIterator implements Iterator<List<Long>> {
         }
         this.comps = comps;
         this.upperBound = ub;
-        current = new ArrayList<Long>(comps.size());
-        compit = new ArrayList<LongIterator>(comps.size());
+        current = new ArrayList<>(comps.size());
+        compit = new ArrayList<>(comps.size());
         empty = false;
         for (LongIterable ci : comps) {
             LongIterator it = (LongIterator) ci.iterator();
@@ -143,7 +143,7 @@ class CartesianProductLongIterator implements Iterator<List<Long>> {
         if (empty) {
             throw new NoSuchElementException("invalid call of next()");
         }
-        List<Long> res = new ArrayList<Long>(current);
+        List<Long> res = new ArrayList<>(current);
         //int waist = 0;
         while (true) {
             // search iterator which hasNext

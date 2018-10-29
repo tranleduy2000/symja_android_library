@@ -147,7 +147,7 @@ public class BasicLinAlg<C extends RingElem<C>> implements Serializable {
         if (b == null) {
             return a;
         }
-        List<C> V = new ArrayList<C>(a.size());
+        List<C> V = new ArrayList<>(a.size());
         Iterator<C> it = a.iterator();
         Iterator<C> jt = b.iterator();
         while (it.hasNext() && jt.hasNext()) {
@@ -194,7 +194,7 @@ public class BasicLinAlg<C extends RingElem<C>> implements Serializable {
      * @return the scalar product of p and F.
      */
     public List<C> scalarProduct(C p, List<C> F) {
-        List<C> V = new ArrayList<C>(F.size());
+        List<C> V = new ArrayList<>(F.size());
         for (C pi : F) {
             if (p != null) {
                 pi = p.multiply(pi);
@@ -215,7 +215,7 @@ public class BasicLinAlg<C extends RingElem<C>> implements Serializable {
      * @return the scalar product of F and p.
      */
     public List<C> scalarProduct(List<C> F, C p) {
-        List<C> V = new ArrayList<C>(F.size());
+        List<C> V = new ArrayList<>(F.size());
         for (C pi : F) {
             if (pi != null) {
                 pi = pi.multiply(p);

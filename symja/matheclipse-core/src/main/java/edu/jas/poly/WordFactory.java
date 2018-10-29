@@ -182,13 +182,13 @@ public final class WordFactory implements MonoidFactory<Word> {
         if (v == null) {
             return s.toString();
         }
-        for (int i = 0; i < v.length; i++) {
+        for (String aV : v) {
             //String a = v[i];
             //if ( a.length() != 1 ) {
             //    //logger.error("v[i] not single letter "+ a);
             //    a  = a.substring(0,1);
             //}
-            s.append(v[i]);
+            s.append(aV);
         }
         return s.toString();
     }
@@ -233,8 +233,8 @@ public final class WordFactory implements MonoidFactory<Word> {
      * @return true, if all variables have length 1, else false.
      */
     public static boolean isSingleLetters(String[] v) {
-        for (int i = 0; i < v.length; i++) {
-            if (v[i].length() != 1) {
+        for (String aV : v) {
+            if (aV.length() != 1) {
                 return false;
             }
         }
@@ -414,7 +414,7 @@ public final class WordFactory implements MonoidFactory<Word> {
      */
     public List<Word> generators() {
         int len = alphabet.length();
-        List<Word> gens = new ArrayList<Word>(len);
+        List<Word> gens = new ArrayList<>(len);
         //gens.add(ONE); not a word generator
         // todo
         for (int i = 0; i < len; i++) {
@@ -566,8 +566,7 @@ public final class WordFactory implements MonoidFactory<Word> {
      */
     public String translate(String[] v) {
         StringBuffer s = new StringBuffer();
-        for (int i = 0; i < v.length; i++) {
-            String a = v[i];
+        for (String a : v) {
             int k = indexOf(translation, a);
             if (k < 0) {
                 System.out.println("t = " + Arrays.toString(translation));

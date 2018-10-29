@@ -72,7 +72,7 @@ public class OrderedSyzPairlist<C extends RingElem<C>> extends OrderedPairlist<C
      */
     @Override
     public PairList<C> create(GenPolynomialRing<C> r) {
-        return new OrderedSyzPairlist<C>(r);
+        return new OrderedSyzPairlist<>(r);
     }
 
 
@@ -84,7 +84,7 @@ public class OrderedSyzPairlist<C extends RingElem<C>> extends OrderedPairlist<C
      */
     @Override
     public PairList<C> create(int m, GenPolynomialRing<C> r) {
-        return new OrderedSyzPairlist<C>(m, r);
+        return new OrderedSyzPairlist<>(m, r);
     }
 
 
@@ -108,7 +108,7 @@ public class OrderedSyzPairlist<C extends RingElem<C>> extends OrderedPairlist<C
         red.add(redi);
         P.add(p);
         // remove from existing pairs:
-        List<ExpVector> es = new ArrayList<ExpVector>();
+        List<ExpVector> es = new ArrayList<>();
         for (Map.Entry<ExpVector, LinkedList<Pair<C>>> me : pairlist.entrySet()) {
             ExpVector g = me.getKey();
             if (moduleVars > 0) {
@@ -119,7 +119,7 @@ public class OrderedSyzPairlist<C extends RingElem<C>> extends OrderedPairlist<C
             ExpVector ge = g.lcm(e);
             LinkedList<Pair<C>> ll = me.getValue();
             if (g.compareTo(ge) == 0) {
-                LinkedList<Pair<C>> lle = new LinkedList<Pair<C>>();
+                LinkedList<Pair<C>> lle = new LinkedList<>();
                 for (Pair<C> pair : ll) {
                     ExpVector eil = pair.pi.leadingExpVector().lcm(e);
                     if (g.compareTo(eil) == 0) {
@@ -150,7 +150,7 @@ public class OrderedSyzPairlist<C extends RingElem<C>> extends OrderedPairlist<C
             }
         }
         // generate new pairs:
-        SortedMap<ExpVector, LinkedList<Pair<C>>> npl = new TreeMap<ExpVector, LinkedList<Pair<C>>>(
+        SortedMap<ExpVector, LinkedList<Pair<C>>> npl = new TreeMap<>(
                 ring.tord.getAscendComparator());
         for (int j = 0; j < ps; j++) {
             GenPolynomial<C> pj = P.get(j);
@@ -162,12 +162,12 @@ public class OrderedSyzPairlist<C extends RingElem<C>> extends OrderedPairlist<C
                 }
             }
             ExpVector g = e.lcm(f);
-            Pair<C> pair = new Pair<C>(pj, p, j, ps);
+            Pair<C> pair = new Pair<>(pj, p, j, ps);
             //System.out.println("pair.new      = " + pair);
             //multiple pairs under same keys -> list of pairs
             LinkedList<Pair<C>> xl = npl.get(g);
             if (xl == null) {
-                xl = new LinkedList<Pair<C>>();
+                xl = new LinkedList<>();
             }
             //xl.addLast( pair ); // first or last ?
             xl.addFirst(pair); // first or last ? better for d- e-GBs
@@ -175,7 +175,7 @@ public class OrderedSyzPairlist<C extends RingElem<C>> extends OrderedPairlist<C
         }
         //System.out.println("npl.new      = " + npl.keySet());
         // skip by divisibility:
-        es = new ArrayList<ExpVector>(npl.size());
+        es = new ArrayList<>(npl.size());
         for (ExpVector eil : npl.keySet()) {
             for (ExpVector ejl : npl.keySet()) {
                 if (eil.compareTo(ejl) == 0) {
@@ -195,7 +195,7 @@ public class OrderedSyzPairlist<C extends RingElem<C>> extends OrderedPairlist<C
         }
         // skip by criterion 4:
         if (useCriterion4) {
-            es = new ArrayList<ExpVector>(npl.size());
+            es = new ArrayList<>(npl.size());
             for (Map.Entry<ExpVector, LinkedList<Pair<C>>> me : npl.entrySet()) {
                 ExpVector ei = me.getKey();
                 LinkedList<Pair<C>> exl = me.getValue(); //npl.get( ei );

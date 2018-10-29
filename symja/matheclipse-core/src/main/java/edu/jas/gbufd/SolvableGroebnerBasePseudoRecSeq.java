@@ -127,7 +127,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         cofac = (GenPolynomialRing<C>) rf;
         if (!cofac.isCommutative()) {
             logger.warn("right reduction not correct for " + cofac.toScript());
-            engine = new GreatestCommonDivisorFake<C>();
+            engine = new GreatestCommonDivisorFake<>();
             // TODO check that also coeffTable is empty for recursive solvable poly ring
         } else {
             //engine = GCDFactory.<C> getImplementation(cofac.coFac);
@@ -229,7 +229,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         }
         // remove top reducible polynomials
         GenSolvablePolynomial<GenPolynomial<C>> a;
-        List<GenSolvablePolynomial<GenPolynomial<C>>> F = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(
+        List<GenSolvablePolynomial<GenPolynomial<C>>> F = new ArrayList<>(
                 G.size());
         while (G.size() > 0) {
             a = G.remove(0);
@@ -238,7 +238,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenSolvablePolynomial<GenPolynomial<C>>> ff;
-                    ff = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(G);
+                    ff = new ArrayList<>(G);
                     ff.addAll(F);
                     a = sredRec.leftNormalformRecursive(ff, a);
                     if (!a.isZERO()) {
@@ -295,7 +295,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         List<GenSolvablePolynomial<GenPolynomial<C>>> X;
         X = PolynomialList.castToSolvableList(ring.generators(modv));
         logger.info("right multipliers = " + X);
-        List<GenSolvablePolynomial<GenPolynomial<C>>> F = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(
+        List<GenSolvablePolynomial<GenPolynomial<C>>> F = new ArrayList<>(
                 G.size() * (1 + X.size()));
         F.addAll(G);
         GenSolvablePolynomial<GenPolynomial<C>> p, x, q;
@@ -442,8 +442,8 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         }
         GenSolvablePolynomialRing<GenPolynomial<C>> pring = F.get(0).ring;
         List<GenSolvablePolynomial<GenPolynomial<C>>> G = leftGB(modv, F);
-        PolynomialList<GenPolynomial<C>> Fp = new PolynomialList<GenPolynomial<C>>(pring, F);
-        PolynomialList<GenPolynomial<C>> Gp = new PolynomialList<GenPolynomial<C>>(pring, G);
+        PolynomialList<GenPolynomial<C>> Fp = new PolynomialList<>(pring, F);
+        PolynomialList<GenPolynomial<C>> Gp = new PolynomialList<>(pring, G);
         return Fp.compareTo(Gp) == 0;
     }
 
@@ -465,7 +465,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         //List<GenSolvablePolynomial<C>> X = generateUnivar( modv, Fp );
         List<GenSolvablePolynomial<GenPolynomial<C>>> X, Y;
         X = PolynomialList.castToSolvableList(ring.generators()); // todo use? modv
-        Y = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>();
+        Y = new ArrayList<>();
         for (GenSolvablePolynomial<GenPolynomial<C>> x : X) {
             if (x.isConstant()) {
                 Y.add(x);
@@ -474,7 +474,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         X = Y;
         X.addAll(ring.univariateList(modv));
         logger.info("right multipliers = " + X);
-        List<GenSolvablePolynomial<GenPolynomial<C>>> F = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(
+        List<GenSolvablePolynomial<GenPolynomial<C>>> F = new ArrayList<>(
                 Fp.size() * (1 + X.size()));
         F.addAll(Fp);
         GenSolvablePolynomial<GenPolynomial<C>> p, x, pi, pj, s, h;

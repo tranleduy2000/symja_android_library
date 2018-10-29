@@ -101,7 +101,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
         logger.info("#bcF-#F = " + (bcF.size() - F.size()));
         F = bcF;
         /* normalize input */
-        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>();
+        List<GenPolynomial<C>> G = new ArrayList<>();
         OrderedRPairlist<C> pairlist = null;
         for (GenPolynomial<C> p : F) {
             if (!p.isZERO()) {
@@ -114,7 +114,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
                 }
                 G.add(p); // G.add( 0, p ); //reverse list
                 if (pairlist == null) {
-                    pairlist = new OrderedRPairlist<C>(modv, p.ring);
+                    pairlist = new OrderedRPairlist<>(modv, p.ring);
                 }
                 // putOne not required
                 pairlist.put(p);
@@ -217,7 +217,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
             return Gp;
         }
         // remove zero polynomials
-        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>(Gp.size());
+        List<GenPolynomial<C>> G = new ArrayList<>(Gp.size());
         for (GenPolynomial<C> a : Gp) {
             if (a != null && !a.isZERO()) { // always true in GB()
                 a = a.abs(); // already positive in GB
@@ -228,14 +228,14 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
         logger.info("minGB start with " + G.size());
         GenPolynomial<C> a, b;
         List<GenPolynomial<C>> F;
-        F = new ArrayList<GenPolynomial<C>>(G.size());
+        F = new ArrayList<>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             b = a;
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
                 // try to drop polynomial
                 List<GenPolynomial<C>> ff;
-                ff = new ArrayList<GenPolynomial<C>>(G);
+                ff = new ArrayList<>(G);
                 ff.addAll(F);
                 a = red.normalform(ff, a);
                 if (a.isZERO()) {
@@ -287,9 +287,9 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
         }
         /* stratify: collect polynomials with equal leading terms */
         ExpVector e, f;
-        F = new ArrayList<GenPolynomial<C>>(G.size());
+        F = new ArrayList<>(G.size());
         List<GenPolynomial<C>> ff;
-        ff = new ArrayList<GenPolynomial<C>>(G);
+        ff = new ArrayList<>(G);
         for (int i = 0; i < ff.size(); i++) {
             a = ff.get(i);
             if (a == null || a.isZERO()) {
@@ -331,7 +331,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
             return Gp;
         }
         // remove zero polynomials
-        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>(Gp.size());
+        List<GenPolynomial<C>> G = new ArrayList<>(Gp.size());
         for (GenPolynomial<C> a : Gp) {
             if (a != null && !a.isZERO()) { // always true in GB()
                 // already positive a = a.abs();
@@ -345,7 +345,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
         GenPolynomial<C> a, b;
         List<GenPolynomial<C>> F;
         List<GenPolynomial<C>> bcH;
-        F = new ArrayList<GenPolynomial<C>>(G.size());
+        F = new ArrayList<>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             b = a;
@@ -353,7 +353,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
                 // drop polynomial
                 if (logger.isInfoEnabled()) {
                     List<GenPolynomial<C>> ff;
-                    ff = new ArrayList<GenPolynomial<C>>(G);
+                    ff = new ArrayList<>(G);
                     ff.addAll(F);
                     a = red.normalform(ff, a);
                     if (!a.isZERO()) {
@@ -400,7 +400,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
             a = engine.basePrimitivePart(a); // not a.monic() since no field
             if (red.isBooleanClosed(a)) {
                 List<GenPolynomial<C>> ff;
-                ff = new ArrayList<GenPolynomial<C>>(G);
+                ff = new ArrayList<>(G);
                 ff.add(a);
                 if (isGB(ff)) {
                     System.out.println("minGB reduced " + b + " to " + a);
@@ -428,7 +428,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
             }
         }
         // make abs if possible
-        F = new ArrayList<GenPolynomial<C>>(G.size());
+        F = new ArrayList<>(G.size());
         for (GenPolynomial<C> p : G) {
             a = p.abs();
             F.add(a);
@@ -439,7 +439,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
         //}
         // stratify: collect polynomials with equal leading terms
         ExpVector e, f;
-        F = new ArrayList<GenPolynomial<C>>(G.size());
+        F = new ArrayList<>(G.size());
         for (int i = 0; i < G.size(); i++) {
             a = G.get(i);
             if (a == null || a.isZERO()) {
@@ -463,13 +463,13 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
         G = F;
 
         // info on boolean algebra element blocks
-        Map<C, List<GenPolynomial<C>>> bd = new TreeMap<C, List<GenPolynomial<C>>>();
+        Map<C, List<GenPolynomial<C>>> bd = new TreeMap<>();
         for (GenPolynomial<C> p : G) {
             C cf = p.leadingBaseCoefficient();
             cf = cf.idempotent();
             List<GenPolynomial<C>> block = bd.get(cf);
             if (block == null) {
-                block = new ArrayList<GenPolynomial<C>>();
+                block = new ArrayList<>();
             }
             block.add(p);
             bd.put(cf, block);

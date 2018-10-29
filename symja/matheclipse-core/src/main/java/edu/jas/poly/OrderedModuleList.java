@@ -103,7 +103,7 @@ public class OrderedModuleList<C extends RingElem<C>> extends ModuleList<C> {
                 s[i++] = p;
             }
             Arrays.sort(s, cmp);
-            return new ArrayList<List<GenPolynomial<C>>>(Arrays.asList(s));
+            return new ArrayList<>(Arrays.asList(s));
         } catch (ClassCastException ok) {
             System.out.println("Warning: polynomials not sorted");
         }

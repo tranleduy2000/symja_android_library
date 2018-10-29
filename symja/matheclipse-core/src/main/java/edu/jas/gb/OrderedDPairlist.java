@@ -48,7 +48,7 @@ public class OrderedDPairlist<C extends RingElem<C>>
      */
     public OrderedDPairlist(int m, GenPolynomialRing<C> r) {
         super(m, r);
-        dreduction = new DReductionSeq<C>();
+        dreduction = new DReductionSeq<>();
     }
 
 
@@ -58,7 +58,7 @@ public class OrderedDPairlist<C extends RingElem<C>>
      * @param r polynomial ring.
      */
     public PairList<C> create(GenPolynomialRing<C> r) {
-        return new OrderedDPairlist<C>(r);
+        return new OrderedDPairlist<>(r);
     }
 
 
@@ -69,7 +69,7 @@ public class OrderedDPairlist<C extends RingElem<C>>
      * @param r polynomial ring.
      */
     public PairList<C> create(int m, GenPolynomialRing<C> r) {
-        return new OrderedDPairlist<C>(m, r);
+        return new OrderedDPairlist<>(m, r);
     }
 
 

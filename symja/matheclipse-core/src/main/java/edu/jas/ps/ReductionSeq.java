@@ -163,14 +163,14 @@ public class ReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
         if (!Ap.ring.coFac.isField()) {
             throw new IllegalArgumentException("coefficients not from a field");
         }
-        List<MultiVarPowerSeries<C>> P = new ArrayList<MultiVarPowerSeries<C>>(Pp.size());
+        List<MultiVarPowerSeries<C>> P = new ArrayList<>(Pp.size());
         synchronized (Pp) {
             P.addAll(Pp);
         }
-        ArrayList<ExpVector> htl = new ArrayList<ExpVector>(P.size());
-        ArrayList<C> lbc = new ArrayList<C>(P.size());
-        ArrayList<MultiVarPowerSeries<C>> p = new ArrayList<MultiVarPowerSeries<C>>(P.size());
-        ArrayList<Long> ecart = new ArrayList<Long>(P.size());
+        ArrayList<ExpVector> htl = new ArrayList<>(P.size());
+        ArrayList<C> lbc = new ArrayList<>(P.size());
+        ArrayList<MultiVarPowerSeries<C>> p = new ArrayList<>(P.size());
+        ArrayList<Long> ecart = new ArrayList<>(P.size());
         Map.Entry<ExpVector, C> m;
         //int j = 0;
         for (int i = 0; i < P.size(); i++) {
@@ -203,7 +203,7 @@ public class ReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
                 logger.debug("e = " + e.toString(Ap.ring.vars));
             }
             // search ps with ht(ps) | ht(S)
-            List<Integer> li = new ArrayList<Integer>();
+            List<Integer> li = new ArrayList<>();
             int i;
             for (i = 0; i < htl.size(); i++) {
                 if (e.multipleOf(htl.get(i))) {
@@ -312,8 +312,8 @@ public class ReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
             return P;
         }
         //StandardBaseSeq<C> std = new StandardBaseSeq<C>();
-        List<MultiVarPowerSeries<C>> R = new ArrayList<MultiVarPowerSeries<C>>(P.size());
-        List<MultiVarPowerSeries<C>> S = new ArrayList<MultiVarPowerSeries<C>>(P);
+        List<MultiVarPowerSeries<C>> R = new ArrayList<>(P.size());
+        List<MultiVarPowerSeries<C>> S = new ArrayList<>(P);
         for (MultiVarPowerSeries<C> a : P) {
             //S.remove(a);
             //if ( !std.isSTD(S) ) {

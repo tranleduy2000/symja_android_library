@@ -126,7 +126,7 @@ public class StringUtil {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < stack.length; i++) {
             String s = stack[i].toString();
-            if (s.indexOf("selectStackTrace") >= 0) {
+            if (s.contains("selectStackTrace")) {
                 continue;
             }
             if (s.matches(expr)) {

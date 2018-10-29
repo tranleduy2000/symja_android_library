@@ -32,7 +32,7 @@ class MiReducerServer<C extends RingElem<C>> implements Runnable {
     MiReducerServer(List<GenPolynomial<C>> G, GenPolynomial<C> p) {
         this.G = G;
         H = p;
-        red = new ReductionPar<C>();
+        red = new ReductionPar<>();
     }
 
 
@@ -44,7 +44,7 @@ class MiReducerServer<C extends RingElem<C>> implements Runnable {
     public GenPolynomial<C> getNF() {
         try {
             done.acquire(); //done.P();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
         return H;
     }
@@ -84,7 +84,7 @@ class MiReducerClient<C extends RingElem<C>> implements Runnable {
     MiReducerClient(List<GenPolynomial<C>> G, GenPolynomial<C> p) {
         this.G = G;
         H = p;
-        red = new ReductionPar<C>();
+        red = new ReductionPar<>();
     }
 
 

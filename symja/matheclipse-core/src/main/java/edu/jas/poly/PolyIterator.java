@@ -54,7 +54,7 @@ public class PolyIterator<C extends RingElem<C>>
      * @return next monomial.
      */
     public Monomial<C> next() {
-        return new Monomial<C>(ms.next());
+        return new Monomial<>(ms.next());
     }
 
 

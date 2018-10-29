@@ -114,7 +114,7 @@ public class MultiplicativeSetFactors<C extends GcdRingElem<C>> extends Multipli
         if (ring.coFac.isField()) {
             list = PolyUtil.monic(list);
         }
-        List<GenPolynomial<C>> ms = new ArrayList<GenPolynomial<C>>(mset);
+        List<GenPolynomial<C>> ms = new ArrayList<>(mset);
         for (GenPolynomial<C> p : list) {
             if (!p.isConstant() && !p.isZERO()) {
                 if (!mset.contains(p)) {
@@ -123,7 +123,7 @@ public class MultiplicativeSetFactors<C extends GcdRingElem<C>> extends Multipli
                 }
             }
         }
-        return new MultiplicativeSetFactors<C>(ring, ms, engine);
+        return new MultiplicativeSetFactors<>(ring, ms, engine);
     }
 
 
@@ -135,7 +135,7 @@ public class MultiplicativeSetFactors<C extends GcdRingElem<C>> extends Multipli
      */
     @Override
     public MultiplicativeSetFactors<C> replace(List<GenPolynomial<C>> L) {
-        MultiplicativeSetFactors<C> ms = new MultiplicativeSetFactors<C>(ring);
+        MultiplicativeSetFactors<C> ms = new MultiplicativeSetFactors<>(ring);
         if (L == null || L.size() == 0) {
             return ms;
         }

@@ -295,7 +295,7 @@ public class WordReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
         if (Ap == null || Ap.isZERO()) {
             return Ap;
         }
-        List<GenWordPolynomial<C>> lrow = new ArrayList<GenWordPolynomial<C>>(Pp.size());
+        List<GenWordPolynomial<C>> lrow = new ArrayList<>(Pp.size());
         for (int i = 0; i < Pp.size(); i++) {
             lrow.add(Ap.ring.getZERO());
         }
@@ -422,7 +422,7 @@ public class WordReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
         if (Ap == null || Ap.isZERO()) {
             return Ap;
         }
-        List<GenWordPolynomial<C>> lrow = new ArrayList<GenWordPolynomial<C>>(Pp.size());
+        List<GenWordPolynomial<C>> lrow = new ArrayList<>(Pp.size());
         for (int i = 0; i < Pp.size(); i++) {
             lrow.add(Ap.ring.getZERO());
         }

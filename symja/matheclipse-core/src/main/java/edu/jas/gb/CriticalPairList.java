@@ -65,8 +65,8 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
     public CriticalPairList(int m, GenPolynomialRing<C> r) {
         super(m, r);
         Comparator<AbstractPair<C>> cpc;
-        cpc = new CriticalPairComparator<C>(ring.tord);
-        pairlist = new TreeSet<CriticalPair<C>>(cpc);
+        cpc = new CriticalPairComparator<>(ring.tord);
+        pairlist = new TreeSet<>(cpc);
         recordCount = 0;
     }
 
@@ -77,7 +77,7 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
      * @param r polynomial ring.
      */
     public PairList<C> create(GenPolynomialRing<C> r) {
-        return new CriticalPairList<C>(r);
+        return new CriticalPairList<>(r);
     }
 
 
@@ -88,7 +88,7 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
      * @param r polynomial ring.
      */
     public PairList<C> create(int m, GenPolynomialRing<C> r) {
-        return new CriticalPairList<C>(m, r);
+        return new CriticalPairList<>(m, r);
     }
 
 
@@ -114,7 +114,7 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
                 }
             }
             ExpVector g = e.lcm(f);
-            CriticalPair<C> pair = new CriticalPair<C>(g, pj, p, j, len);
+            CriticalPair<C> pair = new CriticalPair<>(g, pj, p, j, len);
             //System.out.println("put pair = " + pair );
             pairlist.add(pair);
         }
@@ -151,7 +151,7 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         if (cp == null) {
             return null;
         }
-        return new Pair<C>(cp.pi, cp.pj, cp.i, cp.j);
+        return new Pair<>(cp.pi, cp.pj, cp.i, cp.j);
     }
 
 
@@ -293,7 +293,7 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
      */
     public synchronized List<CriticalPair<C>> inWork() {
         List<CriticalPair<C>> iw;
-        iw = new ArrayList<CriticalPair<C>>();
+        iw = new ArrayList<>();
         if (oneInGB) {
             return iw;
         }
@@ -318,7 +318,7 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         if (oneInGB) {
             return num;
         }
-        List<CriticalPair<C>> rem = new ArrayList<CriticalPair<C>>();
+        List<CriticalPair<C>> rem = new ArrayList<>();
         for (CriticalPair<C> pair : pairlist) {
             if (pair.getReductum() != null) {
                 rem.add(pair);

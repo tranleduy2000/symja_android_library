@@ -202,9 +202,9 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
         if (F == null || F.isEmpty()) {
             throw new IllegalArgumentException("null or empty F not allowed");
         }
-        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>();
-        List<List<GenPolynomial<C>>> F2G = new ArrayList<List<GenPolynomial<C>>>();
-        List<List<GenPolynomial<C>>> G2F = new ArrayList<List<GenPolynomial<C>>>();
+        List<GenPolynomial<C>> G = new ArrayList<>();
+        List<List<GenPolynomial<C>>> F2G = new ArrayList<>();
+        List<List<GenPolynomial<C>>> G2F = new ArrayList<>();
         PairList<C> pairlist = null;
         boolean oneInGB = false;
         int len = F.size();
@@ -227,11 +227,10 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
         }
         GenPolynomial<C> mone = ring.getONE(); //.negate();
         int k = 0;
-        ListIterator<GenPolynomial<C>> it = F.listIterator();
-        while (it.hasNext()) {
-            p = it.next();
+        for (GenPolynomial<C> aF : F) {
+            p = aF;
             if (p.length() > 0) {
-                row = new ArrayList<GenPolynomial<C>>(nzlen);
+                row = new ArrayList<>(nzlen);
                 for (int j = 0; j < nzlen; j++) {
                     row.add(null);
                 }
@@ -267,7 +266,7 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
         if (len <= 1 || oneInGB) {
             // adjust F2G
             for (GenPolynomial<C> f : F) {
-                row = new ArrayList<GenPolynomial<C>>(G.size());
+                row = new ArrayList<>(G.size());
                 for (int j = 0; j < G.size(); j++) {
                     row.add(null);
                 }
@@ -277,7 +276,7 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
                 }
                 F2G.add(row);
             }
-            exgb = new ExtendedGB<C>(F, G, F2G, G2F);
+            exgb = new ExtendedGB<>(F, G, F2G, G2F);
             //System.out.println("exgb 1 = " + exgb);
             return exgb;
         }
@@ -304,7 +303,7 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
                 logger.info("j, pj    = " + j + ", " + pj);
             }
 
-            rows = new ArrayList<GenPolynomial<C>>(G.size());
+            rows = new ArrayList<>(G.size());
             for (int m = 0; m < G.size(); m++) {
                 rows.add(null);
             }
@@ -321,7 +320,7 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
                 logger.debug("ht(S) = " + S.leadingExpVector());
             }
 
-            rowh = new ArrayList<GenPolynomial<C>>(G.size());
+            rowh = new ArrayList<>(G.size());
             for (int m = 0; m < G.size(); m++) {
                 rowh.add(null);
             }
@@ -338,7 +337,7 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
                 logger.debug("ht(H) = " + H.leadingExpVector());
             }
 
-            row = new ArrayList<GenPolynomial<C>>(G.size() + 1);
+            row = new ArrayList<>(G.size() + 1);
             for (int m = 0; m < G.size(); m++) {
                 x = rows.get(m);
                 if (x != null) {
@@ -386,12 +385,12 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
             G2F.add(row);
         }
         if (debug) {
-            exgb = new ExtendedGB<C>(F, G, F2G, G2F);
+            exgb = new ExtendedGB<>(F, G, F2G, G2F);
             logger.info("exgb unnorm = " + exgb);
         }
         G2F = normalizeMatrix(F.size(), G2F);
         if (debug) {
-            exgb = new ExtendedGB<C>(F, G, F2G, G2F);
+            exgb = new ExtendedGB<>(F, G, F2G, G2F);
             logger.info("exgb nonmin = " + exgb);
             boolean t2 = isReductionMatrix(exgb);
             logger.info("exgb t2 = " + t2);
@@ -403,7 +402,7 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
         logger.info("" + pairlist);
         // setup matrices F and F2G
         for (GenPolynomial<C> f : F) {
-            row = new ArrayList<GenPolynomial<C>>(G.size());
+            row = new ArrayList<>(G.size());
             for (int m = 0; m < G.size(); m++) {
                 row.add(null);
             }
@@ -413,7 +412,7 @@ public class GroebnerBaseSeq<C extends RingElem<C>>
             }
             F2G.add(row);
         }
-        exgb = new ExtendedGB<C>(F, G, F2G, G2F);
+        exgb = new ExtendedGB<>(F, G, F2G, G2F);
         if (debug) {
             logger.info("exgb nonmin = " + exgb);
             boolean t2 = isReductionMatrix(exgb);

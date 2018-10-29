@@ -119,7 +119,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      */
     @Override
     public Residue<C> copy() {
-        return new Residue<C>(ring, val);
+        return new Residue<>(ring, val);
     }
 
 
@@ -277,7 +277,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * @see edu.jas.structure.RingElem#abs()
      */
     public Residue<C> abs() {
-        return new Residue<C>(ring, val.abs());
+        return new Residue<>(ring, val.abs());
     }
 
 
@@ -288,7 +288,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * @return this+S.
      */
     public Residue<C> sum(Residue<C> S) {
-        return new Residue<C>(ring, val.sum(S.val));
+        return new Residue<>(ring, val.sum(S.val));
     }
 
 
@@ -299,7 +299,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * @see edu.jas.structure.RingElem#negate()
      */
     public Residue<C> negate() {
-        return new Residue<C>(ring, val.negate());
+        return new Residue<>(ring, val.negate());
     }
 
 
@@ -321,7 +321,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * @return this-S.
      */
     public Residue<C> subtract(Residue<C> S) {
-        return new Residue<C>(ring, val.subtract(S.val));
+        return new Residue<>(ring, val.subtract(S.val));
     }
 
 
@@ -360,11 +360,11 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
             }
             isunit = 1;
             C x = egcd[1];
-            return new Residue<C>(ring, x);
+            return new Residue<>(ring, x);
         }
         if (val.isUnit()) {
             C x = val.inverse();
-            return new Residue<C>(ring, x);
+            return new Residue<>(ring, x);
         }
         System.out.println("isunit = " + isunit + ", isUnit() = " + this.isUnit());
         throw new NotInvertibleException("element not invertible (!gcd)" + this);
@@ -379,7 +379,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      */
     public Residue<C> remainder(Residue<C> S) {
         C x = val.remainder(S.val);
-        return new Residue<C>(ring, x);
+        return new Residue<>(ring, x);
     }
 
 
@@ -401,7 +401,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * @return this*S.
      */
     public Residue<C> multiply(Residue<C> S) {
-        return new Residue<C>(ring, val.multiply(S.val));
+        return new Residue<>(ring, val.multiply(S.val));
     }
 
 

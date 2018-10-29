@@ -147,7 +147,7 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
         if (Ap == null || Ap.isEmpty()) {
             return Ap;
         }
-        ArrayList<GenSolvablePolynomial<C>> red = new ArrayList<GenSolvablePolynomial<C>>();
+        ArrayList<GenSolvablePolynomial<C>> red = new ArrayList<>();
         for (GenSolvablePolynomial<C> A : Ap) {
             A = leftNormalform(Pp, A);
             red.add(A);
@@ -163,7 +163,7 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
      * @return a list P of solvable polynomials which are in normalform wrt. P.
      */
     public List<GenSolvablePolynomial<C>> leftIrreducibleSet(List<GenSolvablePolynomial<C>> Pp) {
-        ArrayList<GenSolvablePolynomial<C>> P = new ArrayList<GenSolvablePolynomial<C>>();
+        ArrayList<GenSolvablePolynomial<C>> P = new ArrayList<>();
         for (GenSolvablePolynomial<C> a : Pp) {
             if (a.length() != 0) {
                 a = a.monic();
@@ -195,7 +195,7 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
             } else {
                 f = a.leadingExpVector();
                 if (f.signum() == 0) {
-                    P = new ArrayList<GenSolvablePolynomial<C>>();
+                    P = new ArrayList<>();
                     P.add(a.monic());
                     return P;
                 }

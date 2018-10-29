@@ -55,12 +55,12 @@ public class KsubSet<E> implements
      */
     public Iterator<List<E>> iterator() {
         if (k == 0) {
-            return new ZeroSubSetIterator<E>(set);
+            return new ZeroSubSetIterator<>(set);
         }
         if (k == 1) {
-            return new OneSubSetIterator<E>(set);
+            return new OneSubSetIterator<>(set);
         }
-        return new KsubSetIterator<E>(set, k);
+        return new KsubSetIterator<>(set, k);
     }
 
 }
@@ -107,13 +107,13 @@ class KsubSetIterator<E> implements Iterator<List<E>> {
         iter = this.set.iterator();
         current = iter.next();
         //System.out.println("current = " + current);
-        rest = new LinkedList<E>(this.set);
+        rest = new LinkedList<>(this.set);
         rest.remove(0);
         //System.out.println("rest = " + rest);
         if (k == 2) {
-            recIter = new OneSubSetIterator<E>(rest);
+            recIter = new OneSubSetIterator<>(rest);
         } else {
-            recIter = new KsubSetIterator<E>(rest, k - 1);
+            recIter = new KsubSetIterator<>(rest, k - 1);
         }
     }
 
@@ -135,7 +135,7 @@ class KsubSetIterator<E> implements Iterator<List<E>> {
      */
     public List<E> next() {
         if (recIter.hasNext()) {
-            List<E> next = new LinkedList<E>(recIter.next());
+            List<E> next = new LinkedList<>(recIter.next());
             next.add(0, current);
             return next;
         }
@@ -148,9 +148,9 @@ class KsubSetIterator<E> implements Iterator<List<E>> {
                 throw new NoSuchElementException("invalid call of next()");
             }
             if (k == 2) {
-                recIter = new OneSubSetIterator<E>(rest);
+                recIter = new OneSubSetIterator<>(rest);
             } else {
-                recIter = new KsubSetIterator<E>(rest, k - 1);
+                recIter = new KsubSetIterator<>(rest, k - 1);
             }
             return this.next(); // retry
         }
@@ -219,7 +219,7 @@ class OneSubSetIterator<E> implements Iterator<List<E>> {
      * @return next subset.
      */
     public List<E> next() {
-        List<E> next = new LinkedList<E>();
+        List<E> next = new LinkedList<>();
         next.add(iter.next());
         return next;
     }
@@ -275,7 +275,7 @@ class ZeroSubSetIterator<E> implements Iterator<List<E>> {
      * @return next subset.
      */
     public List<E> next() {
-        List<E> next = new LinkedList<E>();
+        List<E> next = new LinkedList<>();
         hasNext = false;
         return next;
     }

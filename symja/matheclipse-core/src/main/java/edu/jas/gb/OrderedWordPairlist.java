@@ -64,12 +64,12 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
      */
     public OrderedWordPairlist(GenWordPolynomialRing<C> r) {
         ring = r;
-        P = new ArrayList<GenWordPolynomial<C>>();
-        pairlist = new TreeMap<Word, LinkedList<WordPair<C>>>(ring.alphabet.getAscendComparator());
-        red = new ArrayList<BitSet>();
+        P = new ArrayList<>();
+        pairlist = new TreeMap<>(ring.alphabet.getAscendComparator());
+        red = new ArrayList<>();
         putCount = 0;
         remCount = 0;
-        reduction = new WordReductionSeq<C>();
+        reduction = new WordReductionSeq<>();
     }
 
 
@@ -79,7 +79,7 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
      * @param r word polynomial ring.
      */
     public WordPairList<C> create(GenWordPolynomialRing<C> r) {
-        return new OrderedWordPairlist<C>(r);
+        return new OrderedWordPairlist<>(r);
     }
 
 
@@ -130,12 +130,12 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
             g = f.lcm(e);
             //System.out.println("g(f,g) = " + g);
             if (g != null) {
-                WordPair<C> pair = new WordPair<C>(pj, p, j, l);
+                WordPair<C> pair = new WordPair<>(pj, p, j, l);
                 //System.out.println("pair.new      = " + pair);
                 //multiple pairs under same keys -> list of pairs
                 LinkedList<WordPair<C>> xl = pairlist.get(g);
                 if (xl == null) {
-                    xl = new LinkedList<WordPair<C>>();
+                    xl = new LinkedList<>();
                 }
                 //xl.addLast( pair ); // first or last ?
                 xl.addFirst(pair); // first or last ? better for d- e-GBs
@@ -147,12 +147,12 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
             g = e.lcm(f);
             //System.out.println("g(e,f) = " + g);
             if (g != null) {
-                WordPair<C> pair = new WordPair<C>(p, pj, l, j);
+                WordPair<C> pair = new WordPair<>(p, pj, l, j);
                 //System.out.println("pair.new      = " + pair);
                 //multiple pairs under same keys -> list of pairs
                 LinkedList<WordPair<C>> xl = pairlist.get(g);
                 if (xl == null) {
-                    xl = new LinkedList<WordPair<C>>();
+                    xl = new LinkedList<>();
                 }
                 //xl.addLast( pair ); // first or last ?
                 xl.addFirst(pair); // first or last ? better for d- e-GBs

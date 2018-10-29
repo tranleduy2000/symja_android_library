@@ -109,7 +109,7 @@ public class GBProxy<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
         }
         // parallel case
         List<GenPolynomial<C>> G = null;
-        List<Callable<List<GenPolynomial<C>>>> cs = new ArrayList<Callable<List<GenPolynomial<C>>>>(2);
+        List<Callable<List<GenPolynomial<C>>>> cs = new ArrayList<>(2);
         cs.add(new Callable<List<GenPolynomial<C>>>() {
 
 

@@ -76,7 +76,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
      * @param coeffTable indicator for coeffTable.
      */
     public RelationTable(GenSolvablePolynomialRing<C> r, boolean coeffTable) {
-        table = new HashMap<List<Integer>, List>();
+        table = new HashMap<>();
         ring = r;
         if (ring == null) {
             throw new IllegalArgumentException("RelationTable no ring");
@@ -134,7 +134,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     Map<ExpVectorPair, GenPolynomial<C>> fromListDeg2(List a) {
-        Map<ExpVectorPair, GenPolynomial<C>> tex = new HashMap<ExpVectorPair, GenPolynomial<C>>();
+        Map<ExpVectorPair, GenPolynomial<C>> tex = new HashMap<>();
         Iterator ait = a.iterator();
         while (ait.hasNext()) {
             ExpVectorPair ae = (ExpVectorPair) ait.next();
@@ -569,7 +569,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
         if (p.isONE()) {
             throw new IllegalArgumentException("product of polynomials may not be one: " + p);
         }
-        GenSolvablePolynomial<C> sp = new GenSolvablePolynomial<C>(ring, p.val);
+        GenSolvablePolynomial<C> sp = new GenSolvablePolynomial<>(ring, p.val);
         update(E, F, sp);
     }
 
@@ -589,7 +589,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
         if (p.isONE()) {
             throw new IllegalArgumentException("product of polynomials may not be one: " + p);
         }
-        GenSolvablePolynomial<C> sp = new GenSolvablePolynomial<C>(ring, p.val);
+        GenSolvablePolynomial<C> sp = new GenSolvablePolynomial<>(ring, p.val);
         update(e, f, sp);
     }
 
@@ -627,10 +627,10 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
                     GenWordPolynomial<C> pc = cofac.valueOf(f);
                     c = (C) pc;
                 }
-                p = new GenSolvablePolynomial<C>(ring, c, e);
+                p = new GenSolvablePolynomial<>(ring, c, e);
                 //System.out.println("pc = " + pc + ", p = " + p);
             }
-            return new TableRelation<C>(null, null, p);
+            return new TableRelation<>(null, null, p);
         }
         // no distinction between coefficient f or polynomial f
         ExpVectorPair evp = new ExpVectorPair(e, f);
@@ -659,7 +659,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
                             logger.info("found relation = " + e + " .*. " + f + " = " + p);
                         }
                     }
-                    return new TableRelation<C>(ep, fp, p);
+                    return new TableRelation<>(ep, fp, p);
                 }
             }
         }
@@ -678,12 +678,12 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
     protected List<Integer> makeKey(ExpVector e, ExpVector f) {
         int[] de = e.dependencyOnVariables();
         int[] df = f.dependencyOnVariables();
-        List<Integer> key = new ArrayList<Integer>(de.length + df.length);
-        for (int i = 0; i < de.length; i++) {
-            key.add(Integer.valueOf(de[i]));
+        List<Integer> key = new ArrayList<>(de.length + df.length);
+        for (int aDe : de) {
+            key.add(aDe);
         }
-        for (int i = 0; i < df.length; i++) {
-            key.add(Integer.valueOf(df[i]));
+        for (int aDf : df) {
+            key.add(aDf);
         }
         return key;
     }
@@ -699,8 +699,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
         if (table == null || table.isEmpty()) {
             return s;
         }
-        for (Iterator<List> it = table.values().iterator(); it.hasNext(); ) {
-            List list = it.next();
+        for (List list : table.values()) {
             s += list.size() / 2;
         }
         return s;
@@ -742,7 +741,6 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
                 this.update(ex, fx, px);
             }
         }
-        return;
     }
 
 
@@ -788,7 +786,6 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
                 this.update(ec, fc, pc);
             }
         }
-        return;
     }
 
 
@@ -843,7 +840,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
                         ExpVector g = mce.getKey();
                         GenPolynomial<C> q = mce.getValue();
                         C cq = (C) q;
-                        GenSolvablePolynomial<C> qp = new GenSolvablePolynomial<C>(ring, cq, g);
+                        GenSolvablePolynomial<C> qp = new GenSolvablePolynomial<>(ring, cq, g);
                         qr = (GenSolvablePolynomial<C>) qr.sum(qp);
                     }
                     if (coeffTable) {
@@ -864,7 +861,6 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
                 }
             }
         }
-        return;
     }
 
 
@@ -944,7 +940,6 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
                 }
             }
         }
-        return;
     }
 
 
@@ -955,7 +950,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
      */
     @SuppressWarnings({"unchecked", "cast"})
     public List<GenSolvablePolynomial<C>> relationList() {
-        List<GenSolvablePolynomial<C>> rels = new ArrayList<GenSolvablePolynomial<C>>();
+        List<GenSolvablePolynomial<C>> rels = new ArrayList<>();
         //C one = ring.getONECoefficient();
         for (Map.Entry<List<Integer>, List> me : table.entrySet()) {
             //List<Integer> k = me.getKey();
@@ -1001,7 +996,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
      */
     //@SuppressWarnings("unchecked")
     public void addSolvRelations(List<GenSolvablePolynomial<C>> rel) {
-        PolynomialList<C> Prel = new PolynomialList<C>(ring, rel);
+        PolynomialList<C> Prel = new PolynomialList<>(ring, rel);
         addRelations(Prel.getList());
     }
 
@@ -1041,7 +1036,6 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
             }
             update(e, f, P);
         }
-        return;
     }
 
 }

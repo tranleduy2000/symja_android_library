@@ -293,7 +293,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * @see edu.jas.structure.ElemFactory#generators()
      */
     public List<BigDecimalComplex> generators() {
-        List<BigDecimalComplex> g = new ArrayList<BigDecimalComplex>(2);
+        List<BigDecimalComplex> g = new ArrayList<>(2);
         g.add(getONE());
         g.add(getIMAG());
         return g;

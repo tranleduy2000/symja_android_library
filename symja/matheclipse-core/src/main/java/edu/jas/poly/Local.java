@@ -189,7 +189,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      */
     @Override
     public Local<C> copy() {
-        return new Local<C>(ring, num, den, true);
+        return new Local<>(ring, num, den, true);
     }
 
 
@@ -340,7 +340,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * @see edu.jas.structure.RingElem#abs()
      */
     public Local<C> abs() {
-        return new Local<C>(ring, num.abs(), den, true);
+        return new Local<>(ring, num.abs(), den, true);
     }
 
 
@@ -357,7 +357,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
         C n = num.multiply(S.den);
         n = n.sum(den.multiply(S.num));
         C d = den.multiply(S.den);
-        return new Local<C>(ring, n, d, false);
+        return new Local<>(ring, n, d, false);
     }
 
 
@@ -368,7 +368,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * @see edu.jas.structure.RingElem#negate()
      */
     public Local<C> negate() {
-        return new Local<C>(ring, num.negate(), den, true);
+        return new Local<>(ring, num.negate(), den, true);
     }
 
 
@@ -396,7 +396,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
         C n = num.multiply(S.den);
         n = n.subtract(den.multiply(S.num));
         C d = den.multiply(S.den);
-        return new Local<C>(ring, n, d, false);
+        return new Local<>(ring, n, d, false);
     }
 
 
@@ -422,7 +422,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
             return this;
         }
         if (isUnit()) {
-            return new Local<C>(ring, den, num, true);
+            return new Local<>(ring, den, num, true);
         }
         throw new ArithmeticException("element not invertible " + this);
     }
@@ -477,7 +477,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
         }
         C n = num.multiply(S.num);
         C d = den.multiply(S.den);
-        return new Local<C>(ring, n, d, false);
+        return new Local<>(ring, n, d, false);
     }
 
 

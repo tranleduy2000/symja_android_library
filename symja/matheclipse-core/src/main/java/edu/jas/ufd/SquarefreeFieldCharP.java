@@ -144,7 +144,7 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
      */
     @Override
     public SortedMap<GenPolynomial<C>, Long> baseSquarefreeFactors(GenPolynomial<C> A) {
-        SortedMap<GenPolynomial<C>, Long> sfactors = new TreeMap<GenPolynomial<C>, Long>();
+        SortedMap<GenPolynomial<C>, Long> sfactors = new TreeMap<>();
         if (A == null || A.isZERO()) {
             return sfactors;
         }
@@ -311,7 +311,7 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
     @Override
     public SortedMap<GenPolynomial<GenPolynomial<C>>, Long> recursiveUnivariateSquarefreeFactors(
             GenPolynomial<GenPolynomial<C>> P) {
-        SortedMap<GenPolynomial<GenPolynomial<C>>, Long> sfactors = new TreeMap<GenPolynomial<GenPolynomial<C>>, Long>();
+        SortedMap<GenPolynomial<GenPolynomial<C>>, Long> sfactors = new TreeMap<>();
         if (P == null || P.isZERO()) {
             return sfactors;
         }
@@ -492,7 +492,7 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
         if (pfac.nvar <= 1) {
             return baseSquarefreeFactors(P);
         }
-        SortedMap<GenPolynomial<C>, Long> sfactors = new TreeMap<GenPolynomial<C>, Long>();
+        SortedMap<GenPolynomial<C>, Long> sfactors = new TreeMap<>();
         if (P.isZERO()) {
             return sfactors;
         }
@@ -526,7 +526,7 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
         if (coeff == null) {
             return null;
         }
-        SortedMap<C, Long> factors = new TreeMap<C, Long>();
+        SortedMap<C, Long> factors = new TreeMap<>();
         RingFactory<C> cfac = (RingFactory<C>) coeff.factory();
         if (aCoFac != null) {
             AlgebraicNumber<C> an = (AlgebraicNumber<C>) coeff;

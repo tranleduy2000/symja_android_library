@@ -113,7 +113,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      */
     @Override
     public UnivPowerSeries<C> copy() {
-        return new UnivPowerSeries<C>(ring, lazyCoeffs);
+        return new UnivPowerSeries<>(ring, lazyCoeffs);
     }
 
 
@@ -298,7 +298,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return this - leading monomial.
      */
     public UnivPowerSeries<C> reductum() {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override
@@ -316,7 +316,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return new power series.
      */
     public UnivPowerSeries<C> prepend(final C h) {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override
@@ -337,7 +337,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return new power series with coefficient(i) = old.coefficient(i-k).
      */
     public UnivPowerSeries<C> shift(final int k) {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override
@@ -358,7 +358,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return new power series with selected coefficients.
      */
     public UnivPowerSeries<C> select(final Selector<? super C> sel) {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override
@@ -381,7 +381,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return new power series with shifted selected coefficients.
      */
     public UnivPowerSeries<C> shiftSelect(final Selector<? super C> sel) {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             int pos = 0;
@@ -409,7 +409,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return new power series with coefficients f(this(i)).
      */
     public UnivPowerSeries<C> map(final UnaryFunctor<? super C, C> f) {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override
@@ -429,7 +429,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      */
     public <C2 extends RingElem<C2>> UnivPowerSeries<C> zip(final BinaryFunctor<? super C, ? super C2, C> f,
                                                             final UnivPowerSeries<C2> ps) {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override
@@ -469,7 +469,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return this * c.
      */
     public UnivPowerSeries<C> multiply(C c) {
-        return map(new Multiply<C>(c));
+        return map(new Multiply<>(c));
     }
 
 
@@ -690,7 +690,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return this * ps.
      */
     public UnivPowerSeries<C> multiply(final UnivPowerSeries<C> ps) {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override
@@ -716,7 +716,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return ps with this * ps = 1.
      */
     public UnivPowerSeries<C> inverse() {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override
@@ -814,7 +814,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return differentiate(this).
      */
     public UnivPowerSeries<C> differentiate() {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override
@@ -834,7 +834,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * @return integrate(this).
      */
     public UnivPowerSeries<C> integrate(final C c) {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+        return new UnivPowerSeries<>(ring, new Coefficients<C>() {
 
 
             @Override

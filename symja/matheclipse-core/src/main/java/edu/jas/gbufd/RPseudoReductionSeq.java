@@ -154,7 +154,7 @@ public class RPseudoReductionSeq<C extends RegularRingElem<C>> extends RReductio
             return null;
         }
         C mfac = Ap.ring.getONECoefficient();
-        PseudoReductionEntry<C> pf = new PseudoReductionEntry<C>(Ap, mfac);
+        PseudoReductionEntry<C> pf = new PseudoReductionEntry<>(Ap, mfac);
         if (Pp == null || Pp.isEmpty()) {
             return pf;
         }
@@ -242,7 +242,7 @@ public class RPseudoReductionSeq<C extends RegularRingElem<C>> extends RReductio
                 S = S.reductum();
             }
         }
-        pf = new PseudoReductionEntry<C>(R, mfac); //.abs(); // not monic if not boolean closed
+        pf = new PseudoReductionEntry<>(R, mfac); //.abs(); // not monic if not boolean closed
         return pf;
     }
 

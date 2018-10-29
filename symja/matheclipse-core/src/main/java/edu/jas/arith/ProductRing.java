@@ -154,7 +154,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
      * @return a copy of c.
      */
     public Product<C> copy(Product<C> c) {
-        return new Product<C>(c.ring, c.val, c.isunit);
+        return new Product<>(c.ring, c.val, c.isunit);
     }
 
 
@@ -164,7 +164,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
      * @return 0 as Product.
      */
     public Product<C> getZERO() {
-        return new Product<C>(this);
+        return new Product<>(this);
     }
 
 
@@ -174,7 +174,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
      * @return 1 as Product.
      */
     public Product<C> getONE() {
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        SortedMap<Integer, C> elem = new TreeMap<>();
         if (nCopies != 0) {
             for (int i = 0; i < nCopies; i++) {
                 elem.put(i, ring.getONE());
@@ -186,7 +186,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
                 i++;
             }
         }
-        return new Product<C>(this, elem, 1);
+        return new Product<>(this, elem, 1);
     }
 
 
@@ -197,7 +197,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
      * @see edu.jas.structure.ElemFactory#generators()
      */
     public List<Product<C>> generators() {
-        List<Product<C>> gens = new ArrayList<Product<C>>(/*nCopies*ring.generators.size()*/);
+        List<Product<C>> gens = new ArrayList<>(/*nCopies*ring.generators.size()*/);
         int n = nCopies;
         if (n == 0) {
             n = ringList.size();
@@ -207,9 +207,9 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
             RingFactory<C> f = getFactory(i);
             List<? extends C> rgens = f.generators();
             for (C c : rgens) {
-                SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+                SortedMap<Integer, C> elem = new TreeMap<>();
                 elem.put(i, c);
-                Product<C> g = new Product<C>(this, elem);
+                Product<C> g = new Product<>(this, elem);
                 //g = g.fillOne();
                 gens.add(g);
             }
@@ -228,14 +228,14 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
         if (i < 0 || i >= length()) {
             throw new IllegalArgumentException("index out of bounds " + i);
         }
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        SortedMap<Integer, C> elem = new TreeMap<>();
         if (nCopies != 0) {
             elem.put(i, ring.getONE());
         } else {
             RingFactory<C> f = ringList.get(i);
             elem.put(i, f.getONE());
         }
-        return new Product<C>(this, elem, 1);
+        return new Product<>(this, elem, 1);
     }
 
 
@@ -357,7 +357,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
      * @return a Product.
      */
     public Product<C> fromInteger(java.math.BigInteger a) {
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        SortedMap<Integer, C> elem = new TreeMap<>();
         if (nCopies != 0) {
             C c = ring.fromInteger(a);
             for (int i = 0; i < nCopies; i++) {
@@ -370,7 +370,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
                 i++;
             }
         }
-        return new Product<C>(this, elem);
+        return new Product<>(this, elem);
     }
 
 
@@ -542,7 +542,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
      * @return a random product element v.
      */
     public Product<C> random(int n, float q, Random rnd) {
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        SortedMap<Integer, C> elem = new TreeMap<>();
         float d;
         if (nCopies != 0) {
             for (int i = 0; i < nCopies; i++) {
@@ -567,7 +567,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
                 i++;
             }
         }
-        return new Product<C>(this, elem);
+        return new Product<>(this, elem);
     }
 
 
@@ -590,7 +590,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
      * @return next Product from r.
      */
     public Product<C> parse(Reader r) {
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        SortedMap<Integer, C> elem = new TreeMap<>();
         if (nCopies != 0) {
             for (int i = 0; i < nCopies; i++) {
                 elem.put(i, ring.parse(r));
@@ -602,7 +602,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
                 i++;
             }
         }
-        return new Product<C>(this, elem);
+        return new Product<>(this, elem);
     }
 
 }

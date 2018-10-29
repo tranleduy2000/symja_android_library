@@ -86,7 +86,7 @@ public class Interval<C extends RingElem<C> & Rational> implements Serializable 
      * @return a copy of this.
      */
     public Interval<C> copy() {
-        return new Interval<C>(left, right);
+        return new Interval<>(left, right);
     }
 
 

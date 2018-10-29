@@ -74,7 +74,7 @@ public class FactorFactory {
      * @return factorization algorithm implementation.
      */
     public static FactorAbstract<ModInteger> getImplementation(ModIntegerRing fac) {
-        return new FactorModular<ModInteger>(fac);
+        return new FactorModular<>(fac);
     }
 
 
@@ -86,7 +86,7 @@ public class FactorFactory {
      * @return factorization algorithm implementation.
      */
     public static FactorAbstract<ModLong> getImplementation(ModLongRing fac) {
-        return new FactorModular<ModLong>(fac);
+        return new FactorModular<>(fac);
     }
 
 
@@ -130,7 +130,7 @@ public class FactorFactory {
      */
     public static <C extends GcdRingElem<C>> FactorAbstract<AlgebraicNumber<C>> getImplementation(
             AlgebraicNumberRing<C> fac) {
-        return new FactorAlgebraic<C>(fac);
+        return new FactorAlgebraic<>(fac);
     }
 
 
@@ -144,7 +144,7 @@ public class FactorFactory {
      */
     public static <C extends GcdRingElem<C>> FactorAbstract<Complex<C>> getImplementation(
             ComplexRing<C> fac) {
-        return new FactorComplex<C>(fac);
+        return new FactorComplex<>(fac);
     }
 
 
@@ -158,7 +158,7 @@ public class FactorFactory {
      */
     public static <C extends GcdRingElem<C>> FactorAbstract<Quotient<C>> getImplementation(
             QuotientRing<C> fac) {
-        return new FactorQuotient<C>(fac);
+        return new FactorQuotient<>(fac);
     }
 
 

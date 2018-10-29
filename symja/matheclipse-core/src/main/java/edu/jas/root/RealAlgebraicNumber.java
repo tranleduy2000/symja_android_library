@@ -48,7 +48,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @param a value GenPolynomial<C>.
      */
     public RealAlgebraicNumber(RealAlgebraicRing<C> r, GenPolynomial<C> a) {
-        number = new AlgebraicNumber<C>(r.algebraic, a);
+        number = new AlgebraicNumber<>(r.algebraic, a);
         ring = r;
     }
 
@@ -95,7 +95,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      */
     @Override
     public RealAlgebraicNumber<C> copy() {
-        return new RealAlgebraicNumber<C>(ring, number);
+        return new RealAlgebraicNumber<>(ring, number);
     }
 
 
@@ -270,7 +270,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      */
     public RealAlgebraicNumber<C> abs() {
         if (this.signum() < 0) {
-            return new RealAlgebraicNumber<C>(ring, number.negate());
+            return new RealAlgebraicNumber<>(ring, number.negate());
         }
         return this;
     }
@@ -283,7 +283,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return this+S.
      */
     public RealAlgebraicNumber<C> sum(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber<C>(ring, number.sum(S.number));
+        return new RealAlgebraicNumber<>(ring, number.sum(S.number));
     }
 
 
@@ -294,7 +294,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return this+c.
      */
     public RealAlgebraicNumber<C> sum(GenPolynomial<C> c) {
-        return new RealAlgebraicNumber<C>(ring, number.sum(c));
+        return new RealAlgebraicNumber<>(ring, number.sum(c));
     }
 
 
@@ -305,7 +305,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return this+c.
      */
     public RealAlgebraicNumber<C> sum(C c) {
-        return new RealAlgebraicNumber<C>(ring, number.sum(c));
+        return new RealAlgebraicNumber<>(ring, number.sum(c));
     }
 
 
@@ -316,7 +316,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @see edu.jas.structure.RingElem#negate()
      */
     public RealAlgebraicNumber<C> negate() {
-        return new RealAlgebraicNumber<C>(ring, number.negate());
+        return new RealAlgebraicNumber<>(ring, number.negate());
     }
 
 
@@ -379,7 +379,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return this-S.
      */
     public RealAlgebraicNumber<C> subtract(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber<C>(ring, number.subtract(S.number));
+        return new RealAlgebraicNumber<>(ring, number.subtract(S.number));
     }
 
 
@@ -402,7 +402,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @see edu.jas.structure.RingElem#inverse()
      */
     public RealAlgebraicNumber<C> inverse() {
-        return new RealAlgebraicNumber<C>(ring, number.inverse());
+        return new RealAlgebraicNumber<>(ring, number.inverse());
     }
 
 
@@ -413,7 +413,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return this - (this/S)*S.
      */
     public RealAlgebraicNumber<C> remainder(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber<C>(ring, number.remainder(S.number));
+        return new RealAlgebraicNumber<>(ring, number.remainder(S.number));
     }
 
 
@@ -435,7 +435,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return this*S.
      */
     public RealAlgebraicNumber<C> multiply(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber<C>(ring, number.multiply(S.number));
+        return new RealAlgebraicNumber<>(ring, number.multiply(S.number));
     }
 
 
@@ -446,7 +446,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return this*c.
      */
     public RealAlgebraicNumber<C> multiply(C c) {
-        return new RealAlgebraicNumber<C>(ring, number.multiply(c));
+        return new RealAlgebraicNumber<>(ring, number.multiply(c));
     }
 
 
@@ -457,7 +457,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return this*c.
      */
     public RealAlgebraicNumber<C> multiply(GenPolynomial<C> c) {
-        return new RealAlgebraicNumber<C>(ring, number.multiply(c));
+        return new RealAlgebraicNumber<>(ring, number.multiply(c));
     }
 
 
@@ -467,7 +467,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return this with monic value part.
      */
     public RealAlgebraicNumber<C> monic() {
-        return new RealAlgebraicNumber<C>(ring, number.monic());
+        return new RealAlgebraicNumber<>(ring, number.monic());
     }
 
 
@@ -478,7 +478,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @return gcd(this, S).
      */
     public RealAlgebraicNumber<C> gcd(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber<C>(ring, number.gcd(S.number));
+        return new RealAlgebraicNumber<>(ring, number.gcd(S.number));
     }
 
 
@@ -492,9 +492,9 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
     public RealAlgebraicNumber<C>[] egcd(RealAlgebraicNumber<C> S) {
         AlgebraicNumber<C>[] aret = number.egcd(S.number);
         RealAlgebraicNumber<C>[] ret = new RealAlgebraicNumber[3];
-        ret[0] = new RealAlgebraicNumber<C>(ring, aret[0]);
-        ret[1] = new RealAlgebraicNumber<C>(ring, aret[1]);
-        ret[2] = new RealAlgebraicNumber<C>(ring, aret[2]);
+        ret[0] = new RealAlgebraicNumber<>(ring, aret[0]);
+        ret[1] = new RealAlgebraicNumber<>(ring, aret[1]);
+        ret[2] = new RealAlgebraicNumber<>(ring, aret[2]);
         return ret;
     }
 

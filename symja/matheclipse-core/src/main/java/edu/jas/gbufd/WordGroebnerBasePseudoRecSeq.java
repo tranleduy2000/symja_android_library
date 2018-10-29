@@ -233,7 +233,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
             return Gp;
         }
         // remove zero polynomials
-        List<GenWordPolynomial<GenPolynomial<C>>> G = new ArrayList<GenWordPolynomial<GenPolynomial<C>>>(
+        List<GenWordPolynomial<GenPolynomial<C>>> G = new ArrayList<>(
                 Gp.size());
         for (GenWordPolynomial<GenPolynomial<C>> a : Gp) {
             if (a != null && !a.isZERO()) { // always true in GB()
@@ -247,7 +247,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         // remove top reducible polynomials
         GenWordPolynomial<GenPolynomial<C>> a;
         List<GenWordPolynomial<GenPolynomial<C>>> F;
-        F = new ArrayList<GenWordPolynomial<GenPolynomial<C>>>(G.size());
+        F = new ArrayList<>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
@@ -255,7 +255,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenWordPolynomial<GenPolynomial<C>>> ff;
-                    ff = new ArrayList<GenWordPolynomial<GenPolynomial<C>>>(G);
+                    ff = new ArrayList<>(G);
                     ff.addAll(F);
                     a = redRec.normalformRecursive(ff, a);
                     if (!a.isZERO()) {
@@ -405,7 +405,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         if (F == null || F.isEmpty()) {
             return F;
         }
-        List<GenWordPolynomial<GenPolynomial<C>>> Pp = new ArrayList<GenWordPolynomial<GenPolynomial<C>>>(
+        List<GenWordPolynomial<GenPolynomial<C>>> Pp = new ArrayList<>(
                 F.size());
         for (GenWordPolynomial<GenPolynomial<C>> f : F) {
             GenWordPolynomial<GenPolynomial<C>> p = recursivePrimitivePart(f);

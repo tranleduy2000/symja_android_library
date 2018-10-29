@@ -175,7 +175,7 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
      */
     @SuppressWarnings({"cast", "unchecked"})
     public List<Rectangle<C>> complexRoots(GenPolynomial<Complex<C>> a) {
-        List<Rectangle<C>> roots = new ArrayList<Rectangle<C>>();
+        List<Rectangle<C>> roots = new ArrayList<>();
         if (a.isConstant() || a.isZERO()) {
             return roots;
         }
@@ -191,11 +191,11 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
                 logger.info("rootBound = " + M);
             }
             Complex<C>[] corner = (Complex<C>[]) new Complex[4];
-            corner[0] = new Complex<C>(cr, M1.negate(), M); // nw
-            corner[1] = new Complex<C>(cr, M1.negate(), M1.negate()); // sw
-            corner[2] = new Complex<C>(cr, M, M1.negate()); // se
-            corner[3] = new Complex<C>(cr, M, M); // ne
-            Rectangle<C> rect = new Rectangle<C>(corner);
+            corner[0] = new Complex<>(cr, M1.negate(), M); // nw
+            corner[1] = new Complex<>(cr, M1.negate(), M1.negate()); // sw
+            corner[2] = new Complex<>(cr, M, M1.negate()); // se
+            corner[3] = new Complex<>(cr, M, M); // ne
+            Rectangle<C> rect = new Rectangle<>(corner);
             try {
                 List<Rectangle<C>> rs = complexRoots(rect, p);
                 long e = me.getValue(); // sa.get(p);
@@ -255,10 +255,10 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
 
                     Complex<C>[] cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
                     // cp[0] fix
-                    cp[1] = new Complex<C>(cr, cp[1].getRe(), center.getIm());
+                    cp[1] = new Complex<>(cr, cp[1].getRe(), center.getIm());
                     cp[2] = center;
-                    cp[3] = new Complex<C>(cr, center.getRe(), cp[3].getIm());
-                    Rectangle<C> nw = new Rectangle<C>(cp);
+                    cp[3] = new Complex<>(cr, center.getRe(), cp[3].getIm());
+                    Rectangle<C> nw = new Rectangle<>(cp);
                     w = complexRootCount(nw, a);
                     if (w == 1) {
                         root = nw;
@@ -267,11 +267,11 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
                     }
 
                     cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
-                    cp[0] = new Complex<C>(cr, cp[0].getRe(), center.getIm());
+                    cp[0] = new Complex<>(cr, cp[0].getRe(), center.getIm());
                     // cp[1] fix
-                    cp[2] = new Complex<C>(cr, center.getRe(), cp[2].getIm());
+                    cp[2] = new Complex<>(cr, center.getRe(), cp[2].getIm());
                     cp[3] = center;
-                    Rectangle<C> sw = new Rectangle<C>(cp);
+                    Rectangle<C> sw = new Rectangle<>(cp);
                     w = complexRootCount(sw, a);
                     //System.out.println("#swr = " + w); 
                     if (w == 1) {
@@ -282,10 +282,10 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
 
                     cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
                     cp[0] = center;
-                    cp[1] = new Complex<C>(cr, center.getRe(), cp[1].getIm());
+                    cp[1] = new Complex<>(cr, center.getRe(), cp[1].getIm());
                     // cp[2] fix
-                    cp[3] = new Complex<C>(cr, cp[3].getRe(), center.getIm());
-                    Rectangle<C> se = new Rectangle<C>(cp);
+                    cp[3] = new Complex<>(cr, cp[3].getRe(), center.getIm());
+                    Rectangle<C> se = new Rectangle<>(cp);
                     w = complexRootCount(se, a);
                     //System.out.println("#ser = " + w); 
                     if (w == 1) {
@@ -295,11 +295,11 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
                     }
 
                     cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
-                    cp[0] = new Complex<C>(cr, center.getRe(), cp[0].getIm());
+                    cp[0] = new Complex<>(cr, center.getRe(), cp[0].getIm());
                     cp[1] = center;
-                    cp[2] = new Complex<C>(cr, cp[2].getRe(), center.getIm());
+                    cp[2] = new Complex<>(cr, cp[2].getRe(), center.getIm());
                     // cp[3] fix
-                    Rectangle<C> ne = new Rectangle<C>(cp);
+                    Rectangle<C> ne = new Rectangle<>(cp);
                     w = complexRootCount(ne, a);
                     //System.out.println("#ner = " + w); 
                     if (w == 1) {
@@ -337,7 +337,7 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
     public List<Rectangle<C>> complexRoots(GenPolynomial<Complex<C>> a, BigRational len) {
         ComplexRing<C> cr = (ComplexRing<C>) a.ring.coFac;
         SortedMap<GenPolynomial<Complex<C>>, Long> sa = engine.squarefreeFactors(a);
-        List<Rectangle<C>> roots = new ArrayList<Rectangle<C>>();
+        List<Rectangle<C>> roots = new ArrayList<>();
         for (Map.Entry<GenPolynomial<Complex<C>>, Long> me : sa.entrySet()) {
             GenPolynomial<Complex<C>> p = me.getKey();
             Complex<C> Mb = rootBound(p);
@@ -347,14 +347,14 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
                 logger.info("rootBound = " + M);
             }
             Complex<C>[] corner = (Complex<C>[]) new Complex[4];
-            corner[0] = new Complex<C>(cr, M1.negate(), M); // nw
-            corner[1] = new Complex<C>(cr, M1.negate(), M1.negate()); // sw
-            corner[2] = new Complex<C>(cr, M, M1.negate()); // se
-            corner[3] = new Complex<C>(cr, M, M); // ne
-            Rectangle<C> rect = new Rectangle<C>(corner);
+            corner[0] = new Complex<>(cr, M1.negate(), M); // nw
+            corner[1] = new Complex<>(cr, M1.negate(), M1.negate()); // sw
+            corner[2] = new Complex<>(cr, M, M1.negate()); // se
+            corner[3] = new Complex<>(cr, M, M); // ne
+            Rectangle<C> rect = new Rectangle<>(corner);
             try {
                 List<Rectangle<C>> rs = complexRoots(rect, p);
-                List<Rectangle<C>> rf = new ArrayList<Rectangle<C>>(rs.size());
+                List<Rectangle<C>> rf = new ArrayList<>(rs.size());
                 for (Rectangle<C> r : rs) {
                     Rectangle<C> rr = complexRootRefinement(r, p, len);
                     rf.add(rr);
@@ -432,19 +432,19 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
         Complex<C> sw = rt.getSW();
         BigDecimal swr = new BigDecimal(sw.getRe().getRational());
         BigDecimal swi = new BigDecimal(sw.getIm().getRational());
-        Complex<BigDecimal> ll = new Complex<BigDecimal>(cr, swr, swi);
+        Complex<BigDecimal> ll = new Complex<>(cr, swr, swi);
         Complex<C> ne = rt.getNE();
         BigDecimal ner = new BigDecimal(ne.getRe().getRational());
         BigDecimal nei = new BigDecimal(ne.getIm().getRational());
-        Complex<BigDecimal> ur = new Complex<BigDecimal>(cr, ner, nei);
+        Complex<BigDecimal> ur = new Complex<>(cr, ner, nei);
 
         BigDecimal e = new BigDecimal(eps.getRational());
-        Complex<BigDecimal> q = new Complex<BigDecimal>(cr, new BigDecimal("0.25"));
+        Complex<BigDecimal> q = new Complex<>(cr, new BigDecimal("0.25"));
         e = e.multiply(d.norm().getRe()); // relative error
         //System.out.println("e  = " + e);
 
         // polynomials with decimal coefficients
-        GenPolynomialRing<Complex<BigDecimal>> dfac = new GenPolynomialRing<Complex<BigDecimal>>(cr, f.ring);
+        GenPolynomialRing<Complex<BigDecimal>> dfac = new GenPolynomialRing<>(cr, f.ring);
         GenPolynomial<Complex<BigDecimal>> df = PolyUtil.complexDecimalFromRational(dfac, f);
         GenPolynomial<Complex<C>> fp = PolyUtil.baseDeriviative(f);
         GenPolynomial<Complex<BigDecimal>> dfp = PolyUtil.complexDecimalFromRational(dfac, fp);
@@ -542,7 +542,7 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
                     Complex<C> sr = rt.randomPoint();
                     BigDecimal srr = new BigDecimal(sr.getRe().getRational());
                     BigDecimal sri = new BigDecimal(sr.getIm().getRational());
-                    Complex<BigDecimal> sd = new Complex<BigDecimal>(cr, srr, sri);
+                    Complex<BigDecimal> sd = new Complex<>(cr, srr, sri);
                     d = sd;
                     x = cr.getZERO();
                     logger.info("trying new random starting point " + d);
@@ -579,7 +579,7 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
     public List<Complex<BigDecimal>> approximateRoots(GenPolynomial<Complex<C>> a, BigRational eps) {
         ComplexRing<C> cr = (ComplexRing<C>) a.ring.coFac;
         SortedMap<GenPolynomial<Complex<C>>, Long> sa = engine.squarefreeFactors(a);
-        List<Complex<BigDecimal>> roots = new ArrayList<Complex<BigDecimal>>();
+        List<Complex<BigDecimal>> roots = new ArrayList<>();
         for (Map.Entry<GenPolynomial<Complex<C>>, Long> me : sa.entrySet()) {
             GenPolynomial<Complex<C>> p = me.getKey();
             List<Complex<BigDecimal>> rf = null;
@@ -588,9 +588,9 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
                 tc = tc.negate();
                 BigDecimal rr = new BigDecimal(tc.getRe().getRational());
                 BigDecimal ri = new BigDecimal(tc.getIm().getRational());
-                ComplexRing<BigDecimal> crf = new ComplexRing<BigDecimal>(rr);
-                Complex<BigDecimal> r = new Complex<BigDecimal>(crf, rr, ri);
-                rf = new ArrayList<Complex<BigDecimal>>(1);
+                ComplexRing<BigDecimal> crf = new ComplexRing<>(rr);
+                Complex<BigDecimal> r = new Complex<>(crf, rr, ri);
+                rf = new ArrayList<>(1);
                 rf.add(r);
             } else {
                 Complex<C> Mb = rootBound(p);
@@ -600,18 +600,18 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
                     logger.info("rootBound = " + M);
                 }
                 Complex<C>[] corner = (Complex<C>[]) new Complex[4];
-                corner[0] = new Complex<C>(cr, M1.negate(), M); // nw
-                corner[1] = new Complex<C>(cr, M1.negate(), M1.negate()); // sw
-                corner[2] = new Complex<C>(cr, M, M1.negate()); // se
-                corner[3] = new Complex<C>(cr, M, M); // ne
-                Rectangle<C> rect = new Rectangle<C>(corner);
+                corner[0] = new Complex<>(cr, M1.negate(), M); // nw
+                corner[1] = new Complex<>(cr, M1.negate(), M1.negate()); // sw
+                corner[2] = new Complex<>(cr, M, M1.negate()); // se
+                corner[3] = new Complex<>(cr, M, M); // ne
+                Rectangle<C> rect = new Rectangle<>(corner);
                 List<Rectangle<C>> rs = null;
                 try {
                     rs = complexRoots(rect, p);
                 } catch (InvalidBoundaryException e) {
                     throw new RuntimeException("this should never happen " + e);
                 }
-                rf = new ArrayList<Complex<BigDecimal>>(rs.size());
+                rf = new ArrayList<>(rs.size());
                 for (Rectangle<C> r : rs) {
                     Complex<BigDecimal> rr = null;
                     while (rr == null) {

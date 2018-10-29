@@ -90,8 +90,8 @@ public class ReductionPar<C extends RingElem<C>> extends ReductionAbstract<C> {
             e = m.getKey();
             a = m.getValue();
             //System.out.println("S.e = " + e);
-            for (int i = 0; i < P.length; i++) {
-                p = P[i];
+            for (GenPolynomial<C> aP : P) {
+                p = aP;
                 f = p.leadingExpVector();
                 if (f != null) {
                     mt = e.multipleOf(f);
@@ -188,8 +188,8 @@ public class ReductionPar<C extends RingElem<C>> extends ReductionAbstract<C> {
             m = S.leadingMonomial();
             e = m.getKey();
             a = m.getValue();
-            for (int i = 0; i < P.length; i++) {
-                p = P[i];
+            for (GenPolynomial<C> aP : P) {
+                p = aP;
                 f = p.leadingExpVector();
                 if (f != null) {
                     mt = e.multipleOf(f);

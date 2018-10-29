@@ -256,7 +256,7 @@ public class WordGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends WordGro
         if (F == null || F.isEmpty()) {
             return F;
         }
-        List<GenWordPolynomial<C>> Pp = new ArrayList<GenWordPolynomial<C>>(F.size());
+        List<GenWordPolynomial<C>> Pp = new ArrayList<>(F.size());
         for (GenWordPolynomial<C> f : F) {
             GenWordPolynomial<C> p = basePrimitivePart(f);
             Pp.add(p);

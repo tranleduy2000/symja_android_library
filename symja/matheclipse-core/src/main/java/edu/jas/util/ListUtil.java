@@ -40,9 +40,9 @@ public class ListUtil {
         }
         List<D> nl;
         if (list instanceof ArrayList) {
-            nl = new ArrayList<D>(list.size());
+            nl = new ArrayList<>(list.size());
         } else if (list instanceof LinkedList) {
-            nl = new LinkedList<D>();
+            nl = new LinkedList<>();
         } else {
             throw new RuntimeException("list type not implemented");
         }
@@ -65,26 +65,26 @@ public class ListUtil {
         if (A == null) {
             return null;
         }
-        List<List<C>> T = new ArrayList<List<C>>(A.size());
+        List<List<C>> T = new ArrayList<>(A.size());
         if (A.size() == 0) {
             return T;
         }
         if (A.size() == 1) {
             List<C> Ap = A.get(0);
             for (C a : Ap) {
-                List<C> Tp = new ArrayList<C>(1);
+                List<C> Tp = new ArrayList<>(1);
                 Tp.add(a);
                 T.add(Tp);
             }
             return T;
         }
-        List<List<C>> Ap = new ArrayList<List<C>>(A);
+        List<List<C>> Ap = new ArrayList<>(A);
         List<C> f = Ap.remove(0);
         List<List<C>> Tp = tupleFromList(Ap);
         //System.out.println("Tp = " + Tp);
         for (C a : f) {
             for (List<C> tp : Tp) {
-                List<C> ts = new ArrayList<C>();
+                List<C> ts = new ArrayList<>();
                 ts.add(a);
                 ts.addAll(tp);
                 T.add(ts);
@@ -102,7 +102,7 @@ public class ListUtil {
      * @return list (e, ..., e) of length n
      */
     public static <C> List<C> fill(int n, C e) {
-        List<C> r = new ArrayList<C>(n);
+        List<C> r = new ArrayList<>(n);
         for (int m = 0; m < n; m++) {
             r.add(e);
         }

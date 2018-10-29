@@ -188,7 +188,7 @@ public class RingFactoryTokenizer {
             st = st.substring(0, st.length() - 1);
         }
         st = st.replaceAll(",", " ");
-        List<String> sl = new ArrayList<String>();
+        List<String> sl = new ArrayList<>();
         Scanner sc = new Scanner(st);
         while (sc.hasNext()) {
             String sn = sc.next();
@@ -327,7 +327,7 @@ public class RingFactoryTokenizer {
      * @throws IOException
      */
     public String[] nextVariableList() throws IOException {
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         int tt;
         tt = tok.nextToken();
         //System.out.println("vList tok = " + tok);
@@ -434,7 +434,7 @@ public class RingFactoryTokenizer {
                 int vr = rfv.length;
                 BigInteger bi = new BigInteger();
                 TermOrder to = new TermOrder(TermOrder.INVLEX);
-                GenPolynomialRing<BigInteger> pcf = new GenPolynomialRing<BigInteger>(bi, vr, to, rfv);
+                GenPolynomialRing<BigInteger> pcf = new GenPolynomialRing<>(bi, vr, to, rfv);
                 coeff = new QuotientRing(pcf);
                 ct = coeffType.RatFunc;
             } else if (tok.sval.equalsIgnoreCase("ModFunc")) {
@@ -462,7 +462,7 @@ public class RingFactoryTokenizer {
                 int vr = rfv.length;
                 BigRational bi = new BigRational();
                 TermOrder to = new TermOrder(TermOrder.INVLEX);
-                GenPolynomialRing<BigRational> pcf = new GenPolynomialRing<BigRational>(bi, vr, to, rfv);
+                GenPolynomialRing<BigRational> pcf = new GenPolynomialRing<>(bi, vr, to, rfv);
                 coeff = pcf;
                 ct = coeffType.IntFunc;
             } else if (tok.sval.equalsIgnoreCase("AN")) {
@@ -515,12 +515,12 @@ public class RingFactoryTokenizer {
                     if (tcfac instanceof ModIntegerRing) {
                         GenPolynomial<ModInteger> gfmod;
                         gfmod = (GenPolynomial<ModInteger>) mod;
-                        coeff = new AlgebraicNumberRing<ModInteger>(gfmod);
+                        coeff = new AlgebraicNumberRing<>(gfmod);
                         ct = coeffType.ANmod;
                     } else {
                         GenPolynomial<BigRational> anmod;
                         anmod = (GenPolynomial<BigRational>) mod;
-                        coeff = new AlgebraicNumberRing<BigRational>(anmod);
+                        coeff = new AlgebraicNumberRing<>(anmod);
                         ct = coeffType.ANrat;
                     }
                     if (debug) {
@@ -558,7 +558,7 @@ public class RingFactoryTokenizer {
      * @throws IOException
      */
     public long[] nextWeightList() throws IOException {
-        List<Long> l = new ArrayList<Long>();
+        List<Long> l = new ArrayList<>();
         long e;
         char first;
         int tt;
@@ -575,7 +575,7 @@ public class RingFactoryTokenizer {
                     first = tok.sval.charAt(0);
                     if (digit(first)) {
                         e = Long.parseLong(tok.sval);
-                        l.add(Long.valueOf(e));
+                        l.add(e);
                         //System.out.println("w: " + e);
                     }
                 }
@@ -605,7 +605,7 @@ public class RingFactoryTokenizer {
      * @throws IOException
      */
     public long[][] nextWeightArray() throws IOException {
-        List<long[]> l = new ArrayList<long[]>();
+        List<long[]> l = new ArrayList<>();
         long[][] w = null;
         long[] e;
         char first;
@@ -829,7 +829,6 @@ public class RingFactoryTokenizer {
         if (debug) {
             logger.info("table = " + table);
         }
-        return;
     }
 
 

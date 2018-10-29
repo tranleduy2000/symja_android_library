@@ -123,7 +123,7 @@ public class DecimalRoots<C extends GcdRingElem<C> & Rational> implements Serial
      * @return a copy of this.
      */
     public DecimalRoots<C> copy() {
-        return new DecimalRoots<C>(p, cp, real, complex);
+        return new DecimalRoots<>(p, cp, real, complex);
     }
 
 

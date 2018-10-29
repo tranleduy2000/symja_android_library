@@ -68,7 +68,7 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
      * @return a resolution of M.
      */
     public List<ResPart<C>> resolution(ModuleList<C> M) {
-        List<ResPart<C>> R = new ArrayList<ResPart<C>>();
+        List<ResPart<C>> R = new ArrayList<>();
         ModuleList<C> MM = M;
         ModuleList<C> GM;
         ModuleList<C> Z;
@@ -77,7 +77,7 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
         while (true) {
             GM = bb.GB(MM);
             Z = zeroRelations(GM);
-            R.add(new ResPart<C>(MM, GM, Z));
+            R.add(new ResPart<>(MM, GM, Z));
             if (Z == null || Z.list == null || Z.list.size() == 0) {
                 break;
             }
@@ -105,11 +105,11 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
         //assert cf == F.ring.coFac;
         G = bb.GB(F.list);
         Z = zeroRelations(G);
-        Gl = new PolynomialList<C>(F.ring, G);
-        Zm = new ModuleList<C>(F.ring, Z);
+        Gl = new PolynomialList<>(F.ring, G);
+        Zm = new ModuleList<>(F.ring, Z);
 
         List R = resolution(Zm); //// <ResPart<C>|ResPolPart<C>>
-        R.add(0, new ResPolPart<C>(F, Gl, Zm));
+        R.add(0, new ResPolPart<>(F, Gl, Zm));
         return R;
     }
 
@@ -131,10 +131,10 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
         //G = bb.GB(F.list);
         Z = zeroRelationsArbitrary(F.list);
         //Gl = new PolynomialList<C>(F.ring, F.list);
-        Zm = new ModuleList<C>(F.ring, Z);
+        Zm = new ModuleList<>(F.ring, Z);
 
         List R = resolutionArbitrary(Zm); //// <ResPart<C>|ResPolPart<C>>
-        R.add(0, new ResPolPart<C>(F, Gl, Zm));
+        R.add(0, new ResPolPart<>(F, Gl, Zm));
         return R;
     }
 
@@ -146,14 +146,14 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
      * @return a resolution of M.
      */
     public List<ResPart<C>> resolutionArbitrary(ModuleList<C> M) {
-        List<ResPart<C>> R = new ArrayList<ResPart<C>>();
+        List<ResPart<C>> R = new ArrayList<>();
         ModuleList<C> MM = M;
         ModuleList<C> GM = null;
         ModuleList<C> Z;
         while (true) {
             //GM = bb.GB(MM);
             Z = zeroRelationsArbitrary(MM);
-            R.add(new ResPart<C>(MM, GM, Z));
+            R.add(new ResPart<>(MM, GM, Z));
             if (Z == null || Z.list == null || Z.list.size() == 0) {
                 break;
             }
@@ -172,7 +172,7 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
      */
     public List<List<GenPolynomial<C>>> zeroRelationsArbitrary(int modv, List<GenPolynomial<C>> F) {
         if (F == null) {
-            return new ArrayList<List<GenPolynomial<C>>>();
+            return new ArrayList<>();
             //return zeroRelations(modv, F);
         }
         if (F.size() <= 1) {
@@ -194,7 +194,7 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
 
         List<List<GenPolynomial<C>>> sg = zeroRelations(modv, G);
         GenPolynomialRing<C> ring = G.get(0).ring;
-        ModuleList<C> S = new ModuleList<C>(ring, sg);
+        ModuleList<C> S = new ModuleList<>(ring, sg);
         if (debug) {
             logger.debug("syz = " + S);
             if (!isZeroRelation(sg, G)) {
@@ -202,14 +202,14 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
             }
         }
         List<List<GenPolynomial<C>>> sf;
-        sf = new ArrayList<List<GenPolynomial<C>>>(sg.size());
+        sf = new ArrayList<>(sg.size());
         //List<GenPolynomial<C>> row;
         for (List<GenPolynomial<C>> r : sg) {
             Iterator<GenPolynomial<C>> it = r.iterator();
             Iterator<List<GenPolynomial<C>>> jt = G2F.iterator();
 
             List<GenPolynomial<C>> rf;
-            rf = new ArrayList<GenPolynomial<C>>(lenf);
+            rf = new ArrayList<>(lenf);
             for (int m = 0; m < lenf; m++) {
                 rf.add(ring.getZERO());
             }
@@ -232,13 +232,13 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
             sf.add(rf);
         }
         List<List<GenPolynomial<C>>> M;
-        M = new ArrayList<List<GenPolynomial<C>>>(lenf);
+        M = new ArrayList<>(lenf);
         for (List<GenPolynomial<C>> r : F2G) {
             Iterator<GenPolynomial<C>> it = r.iterator();
             Iterator<List<GenPolynomial<C>>> jt = G2F.iterator();
 
             List<GenPolynomial<C>> rf;
-            rf = new ArrayList<GenPolynomial<C>>(lenf);
+            rf = new ArrayList<>(lenf);
             for (int m = 0; m < lenf; m++) {
                 rf.add(ring.getZERO());
             }
@@ -277,11 +277,11 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
         */
         int sflen = sf.size();
         List<List<GenPolynomial<C>>> M2;
-        M2 = new ArrayList<List<GenPolynomial<C>>>(lenf);
+        M2 = new ArrayList<>(lenf);
         int i = 0;
         for (List<GenPolynomial<C>> ri : M) {
             List<GenPolynomial<C>> r2i;
-            r2i = new ArrayList<GenPolynomial<C>>(ri.size());
+            r2i = new ArrayList<>(ri.size());
             int j = 0;
             for (GenPolynomial<C> rij : ri) {
                 GenPolynomial<C> p = null;
@@ -302,9 +302,9 @@ public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
             i++;
         }
         if (debug) {
-            ModuleList<C> M2L = new ModuleList<C>(ring, M2);
+            ModuleList<C> M2L = new ModuleList<>(ring, M2);
             logger.debug("syz M2L = " + M2L);
-            ModuleList<C> SF = new ModuleList<C>(ring, sf);
+            ModuleList<C> SF = new ModuleList<>(ring, sf);
             logger.debug("syz sf = " + SF);
             logger.debug("#syz " + sflen + ", " + sf.size());
             if (!isZeroRelation(sf, F)) {

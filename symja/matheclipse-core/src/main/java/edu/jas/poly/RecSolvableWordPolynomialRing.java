@@ -163,11 +163,11 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
                                          String[] v, RelationTable<GenWordPolynomial<C>> rt) {
         super(cf, n, t, v, rt);
         //if (rt == null) { // handled in super }
-        coeffTable = new RelationTable<GenWordPolynomial<C>>(this, true);
-        ZERO = new RecSolvableWordPolynomial<C>(this);
+        coeffTable = new RelationTable<>(this, true);
+        ZERO = new RecSolvableWordPolynomial<>(this);
         GenWordPolynomial<C> coeff = coFac.getONE();
         //evzero = ExpVector.create(nvar); // from super
-        ONE = new RecSolvableWordPolynomial<C>(this, coeff, evzero);
+        ONE = new RecSolvableWordPolynomial<>(this, coeff, evzero);
     }
 
 
@@ -351,7 +351,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
                         p = Xk.multiply(Xj).multiply(Xi);
                         q = Xk.multiply(Xj.multiply(Xi));
                         if (!p.equals(q)) {
-                            if (true || debug) {
+                            if (true) {
                                 logger.info("Xk = " + Xk + ", Xj = " + Xj + ", Xi = " + Xi);
                                 logger.info("p = ( Xk * Xj ) * Xi = " + p);
                                 logger.info("q = Xk * ( Xj * Xi ) = " + q);
@@ -378,7 +378,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvableWordPolynomial<C> valueOf(GenWordPolynomial<C> a) {
-        return new RecSolvableWordPolynomial<C>(this, a);
+        return new RecSolvableWordPolynomial<>(this, a);
     }
 
 
@@ -404,7 +404,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvableWordPolynomial<C> valueOf(GenWordPolynomial<C> a, ExpVector e) {
-        return new RecSolvableWordPolynomial<C>(this, a, e);
+        return new RecSolvableWordPolynomial<>(this, a, e);
     }
 
 
@@ -417,7 +417,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvableWordPolynomial<C> fromInteger(long a) {
-        return new RecSolvableWordPolynomial<C>(this, coFac.fromInteger(a), evzero);
+        return new RecSolvableWordPolynomial<>(this, coFac.fromInteger(a), evzero);
     }
 
 
@@ -430,7 +430,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvableWordPolynomial<C> fromInteger(BigInteger a) {
-        return new RecSolvableWordPolynomial<C>(this, coFac.fromInteger(a), evzero);
+        return new RecSolvableWordPolynomial<>(this, coFac.fromInteger(a), evzero);
     }
 
 
@@ -512,7 +512,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      * @return a copy of c.
      */
     public RecSolvableWordPolynomial<C> copy(RecSolvableWordPolynomial<C> c) {
-        return new RecSolvableWordPolynomial<C>(this, c.val);
+        return new RecSolvableWordPolynomial<>(this, c.val);
     }
 
 
@@ -541,7 +541,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         RecSolvableWordPolynomial<C> p = null;
         try {
             GenSolvablePolynomial<GenWordPolynomial<C>> s = pt.nextSolvablePolynomial();
-            p = new RecSolvableWordPolynomial<C>(this, s);
+            p = new RecSolvableWordPolynomial<>(this, s);
         } catch (IOException e) {
             logger.error(e.toString() + " parse " + this);
             p = ZERO;
@@ -627,7 +627,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      */
     //todo Override
     public List<RecSolvableWordPolynomial<C>> recUnivariateList(int modv, long e) {
-        List<RecSolvableWordPolynomial<C>> pols = new ArrayList<RecSolvableWordPolynomial<C>>(nvar);
+        List<RecSolvableWordPolynomial<C>> pols = new ArrayList<>(nvar);
         int nm = nvar - modv;
         for (int i = 0; i < nm; i++) {
             RecSolvableWordPolynomial<C> p = univariate(modv, nm - 1 - i, e);
@@ -671,7 +671,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     @Override
     public RecSolvableWordPolynomialRing<C> extend(int i) {
         GenSolvablePolynomialRing<GenWordPolynomial<C>> pfac = super.extend(i);
-        RecSolvableWordPolynomialRing<C> spfac = new RecSolvableWordPolynomialRing<C>(pfac.coFac, pfac.nvar,
+        RecSolvableWordPolynomialRing<C> spfac = new RecSolvableWordPolynomialRing<>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars, pfac.table);
         //spfac.table.extend(this.table); // pfac.table
         spfac.coeffTable.extend(this.coeffTable);
@@ -690,7 +690,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     @Override
     public RecSolvableWordPolynomialRing<C> extend(String[] vs) {
         GenSolvablePolynomialRing<GenWordPolynomial<C>> pfac = super.extend(vs);
-        RecSolvableWordPolynomialRing<C> spfac = new RecSolvableWordPolynomialRing<C>(pfac.coFac, pfac.nvar,
+        RecSolvableWordPolynomialRing<C> spfac = new RecSolvableWordPolynomialRing<>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars, pfac.table);
         //spfac.table.extend(this.table); // pfac.table??
         spfac.coeffTable.extend(this.coeffTable);
@@ -708,7 +708,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     @Override
     public RecSolvableWordPolynomialRing<C> contract(int i) {
         GenPolynomialRing<GenWordPolynomial<C>> pfac = super.contract(i);
-        RecSolvableWordPolynomialRing<C> spfac = new RecSolvableWordPolynomialRing<C>(pfac.coFac, pfac.nvar,
+        RecSolvableWordPolynomialRing<C> spfac = new RecSolvableWordPolynomialRing<>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars);
         spfac.table.contract(this.table);
         spfac.coeffTable.contract(this.coeffTable);
@@ -736,7 +736,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     @Override
     public RecSolvableWordPolynomialRing<C> reverse(boolean partial) {
         GenPolynomialRing<GenWordPolynomial<C>> pfac = super.reverse(partial);
-        RecSolvableWordPolynomialRing<C> spfac = new RecSolvableWordPolynomialRing<C>(pfac.coFac, pfac.nvar,
+        RecSolvableWordPolynomialRing<C> spfac = new RecSolvableWordPolynomialRing<>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars);
         spfac.partial = partial;
         spfac.table.reverse(this.table);

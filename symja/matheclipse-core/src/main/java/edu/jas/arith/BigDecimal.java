@@ -231,7 +231,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
      * @see edu.jas.structure.ElemFactory#generators()
      */
     public List<BigDecimal> generators() {
-        List<BigDecimal> g = new ArrayList<BigDecimal>(1);
+        List<BigDecimal> g = new ArrayList<>(1);
         g.add(getONE());
         return g;
     }

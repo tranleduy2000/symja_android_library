@@ -67,13 +67,13 @@ public class ExtendedGB<C extends RingElem<C>> {
         PolynomialList<C> P;
         ModuleList<C> M;
         StringBuffer s = new StringBuffer("ExtendedGB: \n\n");
-        P = new PolynomialList<C>(ring, F);
+        P = new PolynomialList<>(ring, F);
         s.append("F = " + P + "\n\n");
-        P = new PolynomialList<C>(ring, G);
+        P = new PolynomialList<>(ring, G);
         s.append("G = " + P + "\n\n");
-        M = new ModuleList<C>(ring, F2G);
+        M = new ModuleList<>(ring, F2G);
         s.append("F2G = " + M + "\n\n");
-        M = new ModuleList<C>(ring, G2F);
+        M = new ModuleList<>(ring, G2F);
         s.append("G2F = " + M + "\n");
         return s.toString();
     }

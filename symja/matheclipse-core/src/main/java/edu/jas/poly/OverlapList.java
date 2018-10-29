@@ -26,7 +26,7 @@ public class OverlapList implements Serializable {
      * Constructor.
      */
     public OverlapList() {
-        ols = new ArrayList<Overlap>();
+        ols = new ArrayList<>();
     }
 
 

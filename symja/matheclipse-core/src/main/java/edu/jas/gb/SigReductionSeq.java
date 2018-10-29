@@ -46,7 +46,7 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
      * Constructor.
      */
     public SigReductionSeq() {
-        red = new ReductionSeq<C>();
+        red = new ReductionSeq<>();
     }
 
 
@@ -331,7 +331,7 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
                 sigma = sigma.multiply(ac);
             }
         }
-        return new SigPoly<C>(sigma, a);
+        return new SigPoly<>(sigma, a);
     }
 
 
@@ -407,7 +407,7 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
                 a = a.multiply(ac);
             }
         }
-        return new SigPoly<C>(sigma, a);
+        return new SigPoly<>(sigma, a);
     }
 
 
@@ -418,7 +418,7 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
      * @return the polynomials in F.
      */
     public List<GenPolynomial<C>> polys(List<SigPoly<C>> F) {
-        List<GenPolynomial<C>> ff = new ArrayList<GenPolynomial<C>>();
+        List<GenPolynomial<C>> ff = new ArrayList<>();
         for (SigPoly<C> p : F) {
             if (!p.poly.isZERO()) {
                 ff.add(p.poly);
@@ -435,7 +435,7 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
      * @return the signatures in F.
      */
     public List<GenPolynomial<C>> sigmas(List<SigPair<C>> F) {
-        List<GenPolynomial<C>> ff = new ArrayList<GenPolynomial<C>>();
+        List<GenPolynomial<C>> ff = new ArrayList<>();
         for (SigPair<C> p : F) {
             ff.add(p.sigma);
         }
@@ -472,8 +472,8 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
      */
     public List<SigPair<C>>[] minDegSubset(List<SigPair<C>> F) {
         long mdeg = minimalSigDegree(F);
-        List<SigPair<C>> ff = new ArrayList<SigPair<C>>();
-        List<SigPair<C>> pp = new ArrayList<SigPair<C>>();
+        List<SigPair<C>> ff = new ArrayList<>();
+        List<SigPair<C>> pp = new ArrayList<>();
         for (SigPair<C> p : F) {
             //if (p.sigma.totalDegree() == mdeg) {
             if (p.sigma.degree() == mdeg) {

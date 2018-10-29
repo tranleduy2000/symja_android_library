@@ -198,7 +198,7 @@ public final class BigRational extends RingElemImpl<BigRational>
             String sn = s.substring(0, i);
             String sd = s.substring(i + 1, s.length());
             BigRational r;
-            if (s.indexOf(".") < 0) { // all integers
+            if (!s.contains(".")) { // all integers
                 n = new BigInteger(sn);
                 d = new BigInteger(sd);
                 r = RNRED(n, d);
@@ -209,7 +209,6 @@ public final class BigRational extends RingElemImpl<BigRational>
             }
             num = r.num;
             den = r.den;
-            return;
         }
     }
 
@@ -347,7 +346,6 @@ public final class BigRational extends RingElemImpl<BigRational>
         MathContext mc = new MathContext(NL);
         BigDecimal d = new BigDecimal(R, mc);
         System.out.print(d.toString());
-        return;
     }
 
     /**
@@ -480,7 +478,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * @see edu.jas.structure.ElemFactory#generators()
      */
     public List<BigRational> generators() {
-        List<BigRational> g = new ArrayList<BigRational>(1);
+        List<BigRational> g = new ArrayList<>(1);
         g.add(getONE());
         return g;
     }
@@ -1345,8 +1343,8 @@ class BigRationalIterator implements Iterator<BigRational> {
         num.setNonNegativeIterator();
         denit = den.iterator();
         numit = num.iterator();
-        denlist = new ArrayList<edu.jas.arith.BigInteger>();
-        numlist = new ArrayList<edu.jas.arith.BigInteger>();
+        denlist = new ArrayList<>();
+        numlist = new ArrayList<>();
         edu.jas.arith.BigInteger unused = denit.next(); // skip zero denominator
         unused = numit.next();
         if (unused == null) { // use for findbugs
@@ -1451,7 +1449,7 @@ class BigRationalUniqueIterator implements Iterator<BigRational> {
      */
     public BigRationalUniqueIterator(Iterator<BigRational> rit) {
         ratit = rit;
-        unique = new HashSet<BigRational>();
+        unique = new HashSet<>();
     }
 
 

@@ -65,7 +65,7 @@ public class OrderedMinPairlist<C extends RingElem<C>> extends OrderedPairlist<C
      * @param r polynomial ring.
      */
     public PairList<C> create(GenPolynomialRing<C> r) {
-        return new OrderedMinPairlist<C>(r);
+        return new OrderedMinPairlist<>(r);
     }
 
 
@@ -76,7 +76,7 @@ public class OrderedMinPairlist<C extends RingElem<C>> extends OrderedPairlist<C
      * @param r polynomial ring.
      */
     public PairList<C> create(int m, GenPolynomialRing<C> r) {
-        return new OrderedMinPairlist<C>(m, r);
+        return new OrderedMinPairlist<>(m, r);
     }
 
 
@@ -108,7 +108,7 @@ public class OrderedMinPairlist<C extends RingElem<C>> extends OrderedPairlist<C
             }
             ExpVector g = e.lcm(f);
             //System.out.println("g  = " + g);  
-            Pair<C> pair = new Pair<C>(pj, p, j, l);
+            Pair<C> pair = new Pair<>(pj, p, j, l);
             boolean c = true;
             if (useCriterion4) {
                 c = reduction.criterion4(pair.pi, pair.pj, g);
@@ -126,7 +126,7 @@ public class OrderedMinPairlist<C extends RingElem<C>> extends OrderedPairlist<C
             //multiple pairs under same keys -> list of pairs
             LinkedList<Pair<C>> xl = pairlist.get(g);
             if (xl == null) {
-                xl = new LinkedList<Pair<C>>();
+                xl = new LinkedList<>();
             }
             //xl.addLast( pair ); // first or last ?
             xl.addFirst(pair); // first or last ? better for d- e-GBs

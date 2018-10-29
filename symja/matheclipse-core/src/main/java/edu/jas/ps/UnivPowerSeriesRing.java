@@ -127,7 +127,7 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         this.coFac = cofac;
         this.truncate = truncate;
         this.var = name;
-        this.ONE = new UnivPowerSeries<C>(this, new Coefficients<C>() {
+        this.ONE = new UnivPowerSeries<>(this, new Coefficients<C>() {
 
 
             @Override
@@ -138,7 +138,7 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
                 return coFac.getZERO();
             }
         });
-        this.ZERO = new UnivPowerSeries<C>(this, new Coefficients<C>() {
+        this.ZERO = new UnivPowerSeries<>(this, new Coefficients<C>() {
 
 
             @Override
@@ -157,7 +157,7 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
      */
     // Cannot be a static method because a power series ring is required.
     public UnivPowerSeries<C> fixPoint(UnivPowerSeriesMap<C> map) {
-        UnivPowerSeries<C> ps1 = new UnivPowerSeries<C>(this);
+        UnivPowerSeries<C> ps1 = new UnivPowerSeries<>(this);
         UnivPowerSeries<C> ps2 = map.map(ps1);
         ps1.lazyCoeffs = ps2.lazyCoeffs;
         return ps2;
@@ -264,9 +264,9 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
      */
     public List<UnivPowerSeries<C>> generators() {
         List<C> rgens = coFac.generators();
-        List<UnivPowerSeries<C>> gens = new ArrayList<UnivPowerSeries<C>>(rgens.size());
+        List<UnivPowerSeries<C>> gens = new ArrayList<>(rgens.size());
         for (final C cg : rgens) {
-            UnivPowerSeries<C> g = new UnivPowerSeries<C>(this, new Coefficients<C>() {
+            UnivPowerSeries<C> g = new UnivPowerSeries<>(this, new Coefficients<C>() {
 
 
                 @Override
@@ -439,7 +439,7 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
      * @return GenPolynomialRing&lt;C&gt;.
      */
     public GenPolynomialRing<C> polyRing() {
-        return new GenPolynomialRing<C>(coFac, 1, new String[]{var});
+        return new GenPolynomialRing<>(coFac, 1, new String[]{var});
     }
 
 
@@ -459,12 +459,12 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         if (a.ring.nvar != 1) {
             throw new IllegalArgumentException("only for univariate polynomials");
         }
-        HashMap<Integer, C> cache = new HashMap<Integer, C>(a.length());
+        HashMap<Integer, C> cache = new HashMap<>(a.length());
         for (Monomial<C> m : a) {
             long e = m.exponent().getVal(0);
             cache.put((int) e, m.coefficient());
         }
-        return new UnivPowerSeries<C>(this, new Coefficients<C>(cache) {
+        return new UnivPowerSeries<>(this, new Coefficients<C>(cache) {
 
 
             @Override
@@ -530,7 +530,7 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
      * @return a random power series.
      */
     public UnivPowerSeries<C> random(final int k, final float d, final Random rnd) {
-        return new UnivPowerSeries<C>(this, new Coefficients<C>() {
+        return new UnivPowerSeries<>(this, new Coefficients<C>() {
 
 
             @Override
@@ -556,7 +556,7 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
      * @return a generated power series.
      */
     public UnivPowerSeries<C> generate(final IntFunction<C> gener) {
-        return new UnivPowerSeries<C>(this, new Coefficients<C>() {
+        return new UnivPowerSeries<>(this, new Coefficients<C>() {
 
 
             @Override
@@ -576,7 +576,7 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
      * @return a copy of c.
      */
     public UnivPowerSeries<C> copy(UnivPowerSeries<C> c) {
-        return new UnivPowerSeries<C>(this, c.lazyCoeffs);
+        return new UnivPowerSeries<>(this, c.lazyCoeffs);
     }
 
 
@@ -610,7 +610,7 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
      * @return Taylor series of f.
      */
     public UnivPowerSeries<C> seriesOfTaylor(final TaylorFunction<C> f, final C a) {
-        return new UnivPowerSeries<C>(this, new Coefficients<C>() {
+        return new UnivPowerSeries<>(this, new Coefficients<C>() {
 
 
             TaylorFunction<C> der = f;

@@ -80,7 +80,7 @@ public class GreatestCommonDivisorHensel<MOD extends GcdRingElem<MOD> & Modular>
      */
     public GreatestCommonDivisorHensel(boolean quadratic) {
         this.quadratic = quadratic;
-        iufd = new GreatestCommonDivisorSubres<BigInteger>();
+        iufd = new GreatestCommonDivisorSubres<>();
         ufd = this; //iufd;
     }
 
@@ -196,7 +196,7 @@ public class GreatestCommonDivisorHensel<MOD extends GcdRingElem<MOD> & Modular>
                 continue;
             }
             // initialize polynomial factory and map polynomials
-            mfac = new GenPolynomialRing<MOD>(cofac, fac.nvar, fac.tord, fac.getVars());
+            mfac = new GenPolynomialRing<>(cofac, fac.nvar, fac.tord, fac.getVars());
             qm = PolyUtil.fromIntegerCoefficients(mfac, q);
             if (!qm.degreeVector().equals(qdegv)) {
                 continue;
@@ -438,7 +438,7 @@ public class GreatestCommonDivisorHensel<MOD extends GcdRingElem<MOD> & Modular>
             //System.out.println("cofac = " + cofac);
 
             // search evaluation points and evaluate
-            List<BigInteger> V = new ArrayList<BigInteger>(P.ring.nvar);
+            List<BigInteger> V = new ArrayList<>(P.ring.nvar);
             GenPolynomialRing<BigInteger> ckfac = dfac;
             GenPolynomial<BigInteger> qe = qd;
             GenPolynomial<BigInteger> re = rd;
@@ -621,7 +621,7 @@ public class GreatestCommonDivisorHensel<MOD extends GcdRingElem<MOD> & Modular>
             } else {
                 muqfac = (ModularRingFactory) new ModIntegerRing(qp.getVal(), true); // nearly a field
             }
-            GenPolynomialRing<MOD> mucpfac = new GenPolynomialRing<MOD>(muqfac, ckfac);
+            GenPolynomialRing<MOD> mucpfac = new GenPolynomialRing<>(muqfac, ckfac);
             //System.out.println("mucpfac = " + mucpfac.toScript());
             if (muqfac.fromInteger(ge.getVal()).isZERO()) {
                 continue;
@@ -644,7 +644,7 @@ public class GreatestCommonDivisorHensel<MOD extends GcdRingElem<MOD> & Modular>
             logger.info("univariate modulo p^k: " + cm + ", " + hm);
 
             // convert C from Z[...] to Z_q[...]
-            GenPolynomialRing<MOD> qcfac = new GenPolynomialRing<MOD>(muqfac, dfac);
+            GenPolynomialRing<MOD> qcfac = new GenPolynomialRing<>(muqfac, dfac);
             GenPolynomial<MOD> uq = PolyUtil.fromIntegerCoefficients(qcfac, ui);
             if (!ui.leadingExpVector().equals(uq.leadingExpVector())) {
                 logger.info("ev(ui) = " + ui.leadingExpVector() + ", ev(uq) = " + uq.leadingExpVector());
@@ -652,10 +652,10 @@ public class GreatestCommonDivisorHensel<MOD extends GcdRingElem<MOD> & Modular>
             }
             logger.info("multivariate modulo p^k: " + uq);
 
-            List<GenPolynomial<MOD>> F = new ArrayList<GenPolynomial<MOD>>(2);
+            List<GenPolynomial<MOD>> F = new ArrayList<>(2);
             F.add(cm);
             F.add(hm);
-            List<GenPolynomial<BigInteger>> G = new ArrayList<GenPolynomial<BigInteger>>(2);
+            List<GenPolynomial<BigInteger>> G = new ArrayList<>(2);
             G.add(lui.ring.getONE()); //lui: lui.ring.getONE()); // TODO 
             G.add(lui.ring.getONE()); //lh: lui);
             List<GenPolynomial<MOD>> lift;

@@ -178,7 +178,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
      */
     @Override
     public Quotient<C> copy() {
-        return new Quotient<C>(ring, num, den, true);
+        return new Quotient<>(ring, num, den, true);
     }
 
 
@@ -311,7 +311,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
      * @see edu.jas.structure.RingElem#abs()
      */
     public Quotient<C> abs() {
-        return new Quotient<C>(ring, num.abs(), den, true);
+        return new Quotient<>(ring, num.abs(), den, true);
     }
 
 
@@ -328,7 +328,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         C n = num.multiply(S.den);
         n = n.sum(den.multiply(S.num));
         C d = den.multiply(S.den);
-        return new Quotient<C>(ring, n, d, false);
+        return new Quotient<>(ring, n, d, false);
     }
 
 
@@ -339,7 +339,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
      * @see edu.jas.structure.RingElem#negate()
      */
     public Quotient<C> negate() {
-        return new Quotient<C>(ring, num.negate(), den, true);
+        return new Quotient<>(ring, num.negate(), den, true);
     }
 
 
@@ -367,7 +367,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         C n = num.multiply(S.den);
         n = n.subtract(den.multiply(S.num));
         C d = den.multiply(S.den);
-        return new Quotient<C>(ring, n, d, false);
+        return new Quotient<>(ring, n, d, false);
     }
 
 
@@ -389,7 +389,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
      * @see edu.jas.structure.RingElem#inverse()
      */
     public Quotient<C> inverse() {
-        return new Quotient<C>(ring, den, num, true);
+        return new Quotient<>(ring, den, num, true);
     }
 
 
@@ -439,7 +439,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         }
         C n = num.multiply(S.num);
         C d = den.multiply(S.den);
-        return new Quotient<C>(ring, n, d, false);
+        return new Quotient<>(ring, n, d, false);
     }
 
 

@@ -114,7 +114,7 @@ public class DGroebnerBaseSeq<C extends RingElem<C>> extends GroebnerBaseAbstrac
             return G;
         }
         GenPolynomialRing<C> ring = G.get(0).ring;
-        OrderedDPairlist<C> pairlist = new OrderedDPairlist<C>(modv, ring);
+        OrderedDPairlist<C> pairlist = new OrderedDPairlist<>(modv, ring);
         pairlist.put(G);
         /*
           int l = G.size();

@@ -109,7 +109,7 @@ public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends Multi
             if (ring.coFac.isField()) {
                 list = PolyUtil.monic(list);
             }
-            return new MultiplicativeSetSquarefree<C>(ring, list, engine);
+            return new MultiplicativeSetSquarefree<>(ring, list, engine);
         }
         GenPolynomial<C> c = removeFactors(cc);
         if (c.isConstant()) {
@@ -121,7 +121,7 @@ public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends Multi
         if (ring.coFac.isField()) {
             list = PolyUtil.monic(list);
         }
-        return new MultiplicativeSetSquarefree<C>(ring, list, engine);
+        return new MultiplicativeSetSquarefree<>(ring, list, engine);
     }
 
 
@@ -133,7 +133,7 @@ public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends Multi
      */
     @Override
     public MultiplicativeSetSquarefree<C> replace(List<GenPolynomial<C>> L) {
-        MultiplicativeSetSquarefree<C> ms = new MultiplicativeSetSquarefree<C>(ring);
+        MultiplicativeSetSquarefree<C> ms = new MultiplicativeSetSquarefree<>(ring);
         if (L == null || L.size() == 0) {
             return ms;
         }

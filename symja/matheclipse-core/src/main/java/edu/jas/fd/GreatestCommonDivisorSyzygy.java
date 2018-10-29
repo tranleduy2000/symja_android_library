@@ -93,10 +93,10 @@ public class GreatestCommonDivisorSyzygy<C extends GcdRingElem<C>> extends Great
         if (S.isConstant()) {
             return P.ring.getONE();
         }
-        List<GenSolvablePolynomial<C>> A = new ArrayList<GenSolvablePolynomial<C>>(2);
+        List<GenSolvablePolynomial<C>> A = new ArrayList<>(2);
         A.add(P);
         A.add(S);
-        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<C>();
+        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<>();
         logger.warn("left syzGcd computing GB: " + A);
         List<GenSolvablePolynomial<C>> G = sbb.rightGB(A); //not: leftGB, not: sbb.twosidedGB(A);
         if (debug) {
@@ -131,10 +131,10 @@ public class GreatestCommonDivisorSyzygy<C extends GcdRingElem<C>> extends Great
         if (S.isConstant()) {
             return P.ring.getONE();
         }
-        List<GenSolvablePolynomial<C>> A = new ArrayList<GenSolvablePolynomial<C>>(2);
+        List<GenSolvablePolynomial<C>> A = new ArrayList<>(2);
         A.add(P);
         A.add(S);
-        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<C>();
+        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<>();
         logger.warn("left syzGcd computing GB: " + A);
         List<GenSolvablePolynomial<C>> G = sbb.leftGB(A); //not: sbb.twosidedGB(A);
         if (debug) {
@@ -174,11 +174,11 @@ public class GreatestCommonDivisorSyzygy<C extends GcdRingElem<C>> extends Great
         if (S.isConstant()) {
             return P.ring.getONE();
         }
-        List<GenSolvablePolynomial<GenPolynomial<C>>> A = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(
+        List<GenSolvablePolynomial<GenPolynomial<C>>> A = new ArrayList<>(
                 2);
         A.add(P);
         A.add(S);
-        SolvableGroebnerBaseAbstract<GenPolynomial<C>> sbb = new SolvableGroebnerBaseSeq<GenPolynomial<C>>();
+        SolvableGroebnerBaseAbstract<GenPolynomial<C>> sbb = new SolvableGroebnerBaseSeq<>();
         logger.warn("left syzGcd computing GB: " + A);
         // will not work, not field
         List<GenSolvablePolynomial<GenPolynomial<C>>> G = sbb.rightGB(A); //not: leftGB, not: sbb.twosidedGB(A);
@@ -219,11 +219,11 @@ public class GreatestCommonDivisorSyzygy<C extends GcdRingElem<C>> extends Great
         if (S.isConstant()) {
             return P.ring.getONE();
         }
-        List<GenSolvablePolynomial<GenPolynomial<C>>> A = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(
+        List<GenSolvablePolynomial<GenPolynomial<C>>> A = new ArrayList<>(
                 2);
         A.add(P);
         A.add(S);
-        SolvableGroebnerBaseAbstract<GenPolynomial<C>> sbb = new SolvableGroebnerBaseSeq<GenPolynomial<C>>();
+        SolvableGroebnerBaseAbstract<GenPolynomial<C>> sbb = new SolvableGroebnerBaseSeq<>();
         logger.warn("right syzGcd computing GB: " + A);
         // will not work, not field
         List<GenSolvablePolynomial<GenPolynomial<C>>> G = sbb.leftGB(A); //not: sbb.twosidedGB(A);

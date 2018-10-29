@@ -167,7 +167,7 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
         ModLong m21 = m2.ring.fromInteger(m1.ring.modul);
         ModLong mi1 = m21.inverse();
 
-        List<ModLong> L = new ArrayList<ModLong>();
+        List<ModLong> L = new ArrayList<>();
         for (ModLong a : L1) {
             for (ModLong b : L2) {
                 ModLong c = m.chineseRemainder(a, mi1, b);
@@ -269,7 +269,7 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
      * @see edu.jas.structure.ElemFactory#generators()
      */
     public List<ModLong> generators() {
-        List<ModLong> g = new ArrayList<ModLong>(1);
+        List<ModLong> g = new ArrayList<>(1);
         g.add(getONE());
         return g;
     }

@@ -110,7 +110,6 @@ public class WeylRelationsIterated<C extends RingElem<C>> implements RelationGen
         if (logger.isDebugEnabled()) {
             logger.debug("\nWeyl relations = " + table);
         }
-        return;
     }
 
 }

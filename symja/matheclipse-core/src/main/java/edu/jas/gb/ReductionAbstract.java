@@ -259,7 +259,7 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         if (Ap == null || Ap.isEmpty()) {
             return Ap;
         }
-        ArrayList<GenPolynomial<C>> red = new ArrayList<GenPolynomial<C>>();
+        ArrayList<GenPolynomial<C>> red = new ArrayList<>();
         for (GenPolynomial<C> A : Ap) {
             A = normalform(Pp, A);
             red.add(A);
@@ -370,7 +370,7 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
             return true;
         }
         GenPolynomial<C> Ap;
-        List<GenPolynomial<C>> P = new LinkedList<GenPolynomial<C>>(Pp);
+        List<GenPolynomial<C>> P = new LinkedList<>(Pp);
         int s = P.size();
         for (int i = 0; i < s; i++) {
             Ap = P.remove(i);
@@ -391,7 +391,7 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
      * with ideal(Pp) = ideal(P).
      */
     public List<GenPolynomial<C>> irreducibleSet(List<GenPolynomial<C>> Pp) {
-        ArrayList<GenPolynomial<C>> P = new ArrayList<GenPolynomial<C>>();
+        ArrayList<GenPolynomial<C>> P = new ArrayList<>();
         for (GenPolynomial<C> a : Pp) {
             if (a.length() != 0) {
                 a = a.monic();
@@ -427,7 +427,7 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
             } else {
                 f = a.leadingExpVector();
                 if (f.signum() == 0) {
-                    P = new ArrayList<GenPolynomial<C>>();
+                    P = new ArrayList<>();
                     P.add(a.monic());
                     return P;
                 }

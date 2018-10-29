@@ -76,7 +76,7 @@ public class GroebnerBaseF5zSigSeqIter<C extends RingElem<C>> extends GroebnerBa
      */
     @Override
     List<SigPair<C>> pruneP(List<SigPair<C>> P, List<ExpVector> syz) {
-        List<SigPair<C>> res = new ArrayList<SigPair<C>>(P.size());
+        List<SigPair<C>> res = new ArrayList<>(P.size());
         for (SigPair<C> p : P) {
             ExpVector f = p.sigma.leadingExpVector();
             if (f == null) {
@@ -109,7 +109,7 @@ public class GroebnerBaseF5zSigSeqIter<C extends RingElem<C>> extends GroebnerBa
      */
     @Override
     List<SigPair<C>> pruneS(List<SigPair<C>> S, List<ExpVector> syz, List<SigPoly<C>> done, List<SigPoly<C>> G) {
-        List<SigPair<C>> res = new ArrayList<SigPair<C>>(S.size());
+        List<SigPair<C>> res = new ArrayList<>(S.size());
         for (SigPair<C> p : S) {
             if (p.sigma.isZERO()) {
                 continue;
@@ -167,7 +167,7 @@ public class GroebnerBaseF5zSigSeqIter<C extends RingElem<C>> extends GroebnerBa
      */
     @Override
     List<ExpVector> initializeSyz(List<GenPolynomial<C>> F, List<SigPoly<C>> G) {
-        List<ExpVector> P = new ArrayList<ExpVector>();
+        List<ExpVector> P = new ArrayList<>();
         for (GenPolynomial<C> p : F) {
             if (p.isZERO()) {
                 continue;
@@ -191,7 +191,6 @@ public class GroebnerBaseF5zSigSeqIter<C extends RingElem<C>> extends GroebnerBa
             //logger.info("update_syz, sigma = " + r.sigma);
             syz.add(r.sigma.leadingExpVector());
         }
-        return;
     }
 
 }

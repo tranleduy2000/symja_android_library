@@ -81,26 +81,26 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         rows = r;
         cols = c;
         blocksize = s;
-        ArrayList<C> z = new ArrayList<C>(cols);
+        ArrayList<C> z = new ArrayList<>(cols);
         for (int i = 0; i < cols; i++) {
             z.add(coFac.getZERO());
         }
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(rows);
         for (int i = 0; i < rows; i++) {
-            m.add(new ArrayList<C>(z)); // z.clone();
+            m.add(new ArrayList<>(z)); // z.clone();
         }
-        ZERO = new GenMatrix<C>(this, m);
-        m = new ArrayList<ArrayList<C>>(rows);
+        ZERO = new GenMatrix<>(this, m);
+        m = new ArrayList<>(rows);
         C one = coFac.getONE();
         ArrayList<C> v;
         for (int i = 0; i < rows; i++) {
             if (i < cols) {
-                v = new ArrayList<C>(z); // z.clone();
+                v = new ArrayList<>(z); // z.clone();
                 v.set(i, one);
                 m.add(v);
             }
         }
-        ONE = new GenMatrix<C>(this, m);
+        ONE = new GenMatrix<>(this, m);
         logger.info(rows + " x " + cols + " with blocksize " + blocksize + " matrix ring over "
                 + coFac.toScript() + " constructed");
     }
@@ -169,7 +169,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
      */
     public List<GenMatrix<C>> generators() {
         List<C> rgens = coFac.generators();
-        List<GenMatrix<C>> gens = new ArrayList<GenMatrix<C>>(rows * cols * rgens.size());
+        List<GenMatrix<C>> gens = new ArrayList<>(rows * cols * rgens.size());
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 for (C el : rgens) {
@@ -278,7 +278,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         if (rows == cols) {
             return this;
         }
-        return new GenMatrixRing<C>(coFac, cols, rows, blocksize);
+        return new GenMatrixRing<>(coFac, cols, rows, blocksize);
     }
 
 
@@ -298,7 +298,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         if (rows == other.rows && cols == other.cols) {
             return this;
         }
-        return new GenMatrixRing<C>(coFac, rows, other.cols, blocksize);
+        return new GenMatrixRing<>(coFac, rows, other.cols, blocksize);
     }
 
 
@@ -338,7 +338,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         if (om.size() > rows) {
             throw new IllegalArgumentException("size v > rows " + om + " > " + rows);
         }
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(rows);
         for (int i = 0; i < rows; i++) {
             List<C> ov = om.get(i);
             ArrayList<C> v;
@@ -348,7 +348,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
                 if (ov.size() > cols) {
                     throw new IllegalArgumentException("size v > cols " + ov + " > " + cols);
                 }
-                v = new ArrayList<C>(cols);
+                v = new ArrayList<>(cols);
                 v.addAll(ov);
                 // pad with zeros if required:
                 for (int j = v.size(); j < cols; j++) {
@@ -357,7 +357,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
             }
             m.add(v);
         }
-        return new GenMatrix<C>(this, m);
+        return new GenMatrix<>(this, m);
     }
 
 
@@ -403,9 +403,9 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
      * @return a random element.
      */
     public GenMatrix<C> random(int k, float q, Random random) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(rows);
         for (int i = 0; i < rows; i++) {
-            ArrayList<C> v = new ArrayList<C>(cols);
+            ArrayList<C> v = new ArrayList<>(cols);
             for (int j = 0; j < cols; j++) {
                 C e;
                 if (random.nextFloat() < q) {
@@ -417,7 +417,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
             }
             m.add(v);
         }
-        return new GenMatrix<C>(this, m);
+        return new GenMatrix<>(this, m);
     }
 
 
@@ -441,9 +441,9 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
      * @return a random element.
      */
     public GenMatrix<C> randomUpper(int k, float q, Random random) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(rows);
         for (int i = 0; i < rows; i++) {
-            ArrayList<C> v = new ArrayList<C>(cols);
+            ArrayList<C> v = new ArrayList<>(cols);
             for (int j = 0; j < cols; j++) {
                 C e = coFac.getZERO();
                 if (j >= i) {
@@ -455,7 +455,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
             }
             m.add(v);
         }
-        return new GenMatrix<C>(this, m);
+        return new GenMatrix<>(this, m);
     }
 
 
@@ -479,9 +479,9 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
      * @return a random element.
      */
     public GenMatrix<C> randomLower(int k, float q, Random random) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(rows);
         for (int i = 0; i < rows; i++) {
-            ArrayList<C> v = new ArrayList<C>(cols);
+            ArrayList<C> v = new ArrayList<>(cols);
             for (int j = 0; j < cols; j++) {
                 C e = coFac.getZERO();
                 if (j <= i) {
@@ -493,7 +493,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
             }
             m.add(v);
         }
-        return new GenMatrix<C>(this, m);
+        return new GenMatrix<>(this, m);
     }
 
 
@@ -518,16 +518,16 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
      * @return the generated matrix.
      */
     public GenMatrix<C> generate(BiFunction<Integer, Integer, C> gener) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(rows);
         for (int i = 0; i < rows; i++) {
-            ArrayList<C> v = new ArrayList<C>(cols);
+            ArrayList<C> v = new ArrayList<>(cols);
             for (int j = 0; j < cols; j++) {
                 C e = gener.apply(i, j);
                 v.add(e);
             }
             m.add(v);
         }
-        return new GenMatrix<C>(this, m);
+        return new GenMatrix<>(this, m);
     }
 
 
@@ -543,10 +543,10 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         if (i >= 0) {
             s = s.substring(i + 1);
         }
-        ArrayList<ArrayList<C>> mat = new ArrayList<ArrayList<C>>(rows);
+        ArrayList<ArrayList<C>> mat = new ArrayList<>(rows);
         ArrayList<C> v;
         GenVector<C> vec;
-        GenVectorModul<C> vmod = new GenVectorModul<C>(coFac, cols);
+        GenVectorModul<C> vmod = new GenVectorModul<>(coFac, cols);
         String e;
         int j;
         do {
@@ -575,7 +575,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
                 break;
             }
         } while (i >= 0);
-        return new GenMatrix<C>(this, mat);
+        return new GenMatrix<>(this, mat);
     }
 
 

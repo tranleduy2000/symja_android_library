@@ -82,10 +82,10 @@ public class SGCDFactory {
     public static GreatestCommonDivisorAbstract<ModLong> getImplementation(ModLongRing fac) {
         GreatestCommonDivisorAbstract<ModLong> ufd;
         if (fac.isField()) {
-            ufd = new GreatestCommonDivisorSimple<ModLong>(fac);
+            ufd = new GreatestCommonDivisorSimple<>(fac);
             return ufd;
         }
-        ufd = new GreatestCommonDivisorPrimitive<ModLong>(fac);
+        ufd = new GreatestCommonDivisorPrimitive<>(fac);
         return ufd;
     }
 
@@ -98,13 +98,13 @@ public class SGCDFactory {
      */
     public static GreatestCommonDivisorAbstract<ModLong> getProxy(ModLongRing fac) {
         GreatestCommonDivisorAbstract<ModLong> ufd1, ufd2;
-        ufd1 = new GreatestCommonDivisorPrimitive<ModLong>(fac);
+        ufd1 = new GreatestCommonDivisorPrimitive<>(fac);
         if (fac.isField()) {
-            ufd2 = new GreatestCommonDivisorSimple<ModLong>(fac);
+            ufd2 = new GreatestCommonDivisorSimple<>(fac);
         } else {
-            ufd2 = new GreatestCommonDivisorSyzygy<ModLong>(fac);
+            ufd2 = new GreatestCommonDivisorSyzygy<>(fac);
         }
-        return new SGCDParallelProxy<ModLong>(fac, ufd1, ufd2);
+        return new SGCDParallelProxy<>(fac, ufd1, ufd2);
     }
 
 
@@ -117,10 +117,10 @@ public class SGCDFactory {
     public static GreatestCommonDivisorAbstract<ModInteger> getImplementation(ModIntegerRing fac) {
         GreatestCommonDivisorAbstract<ModInteger> ufd;
         if (fac.isField()) {
-            ufd = new GreatestCommonDivisorSimple<ModInteger>(fac);
+            ufd = new GreatestCommonDivisorSimple<>(fac);
             return ufd;
         }
-        ufd = new GreatestCommonDivisorPrimitive<ModInteger>(fac);
+        ufd = new GreatestCommonDivisorPrimitive<>(fac);
         return ufd;
     }
 
@@ -133,13 +133,13 @@ public class SGCDFactory {
      */
     public static GreatestCommonDivisorAbstract<ModInteger> getProxy(ModIntegerRing fac) {
         GreatestCommonDivisorAbstract<ModInteger> ufd1, ufd2;
-        ufd1 = new GreatestCommonDivisorPrimitive<ModInteger>(fac);
+        ufd1 = new GreatestCommonDivisorPrimitive<>(fac);
         if (fac.isField()) {
-            ufd2 = new GreatestCommonDivisorSimple<ModInteger>(fac);
+            ufd2 = new GreatestCommonDivisorSimple<>(fac);
         } else {
-            ufd2 = new GreatestCommonDivisorSyzygy<ModInteger>(fac);
+            ufd2 = new GreatestCommonDivisorSyzygy<>(fac);
         }
-        return new SGCDParallelProxy<ModInteger>(fac, ufd1, ufd2);
+        return new SGCDParallelProxy<>(fac, ufd1, ufd2);
     }
 
 
@@ -153,9 +153,9 @@ public class SGCDFactory {
     public static GreatestCommonDivisorAbstract<BigInteger> getImplementation(BigInteger fac) {
         GreatestCommonDivisorAbstract<BigInteger> ufd;
         if (true) {
-            ufd = new GreatestCommonDivisorPrimitive<BigInteger>(fac);
+            ufd = new GreatestCommonDivisorPrimitive<>(fac);
         } else {
-            ufd = new GreatestCommonDivisorSimple<BigInteger>(fac);
+            ufd = new GreatestCommonDivisorSimple<>(fac);
         }
         return ufd;
     }
@@ -172,9 +172,9 @@ public class SGCDFactory {
             throw new IllegalArgumentException("fac == null not supported");
         }
         GreatestCommonDivisorAbstract<BigInteger> ufd1, ufd2;
-        ufd1 = new GreatestCommonDivisorPrimitive<BigInteger>(fac);
-        ufd2 = new GreatestCommonDivisorSyzygy<BigInteger>(fac);
-        return new SGCDParallelProxy<BigInteger>(fac, ufd1, ufd2);
+        ufd1 = new GreatestCommonDivisorPrimitive<>(fac);
+        ufd2 = new GreatestCommonDivisorSyzygy<>(fac);
+        return new SGCDParallelProxy<>(fac, ufd1, ufd2);
     }
 
 
@@ -189,7 +189,7 @@ public class SGCDFactory {
             throw new IllegalArgumentException("fac == null not supported");
         }
         GreatestCommonDivisorAbstract<BigRational> ufd;
-        ufd = new GreatestCommonDivisorPrimitive<BigRational>(fac);
+        ufd = new GreatestCommonDivisorPrimitive<>(fac);
         return ufd;
     }
 
@@ -205,9 +205,9 @@ public class SGCDFactory {
             throw new IllegalArgumentException("fac == null not supported");
         }
         GreatestCommonDivisorAbstract<BigRational> ufd1, ufd2;
-        ufd1 = new GreatestCommonDivisorPrimitive<BigRational>(fac);
-        ufd2 = new GreatestCommonDivisorSimple<BigRational>(fac);
-        return new SGCDParallelProxy<BigRational>(fac, ufd1, ufd2);
+        ufd1 = new GreatestCommonDivisorPrimitive<>(fac);
+        ufd2 = new GreatestCommonDivisorSimple<>(fac);
+        return new SGCDParallelProxy<>(fac, ufd1, ufd2);
     }
 
 
@@ -224,26 +224,26 @@ public class SGCDFactory {
         logger.debug("fac = " + fac.getClass().getName());
         Object ofac = fac;
         if (ofac instanceof BigInteger) {
-            ufd = new GreatestCommonDivisorPrimitive<C>(fac);
+            ufd = new GreatestCommonDivisorPrimitive<>(fac);
         } else if (ofac instanceof ModIntegerRing) {
             if (fac.isField()) {
-                ufd = new GreatestCommonDivisorSimple<C>(fac);
+                ufd = new GreatestCommonDivisorSimple<>(fac);
             } else {
-                ufd = new GreatestCommonDivisorPrimitive<C>(fac);
+                ufd = new GreatestCommonDivisorPrimitive<>(fac);
             }
         } else if (ofac instanceof ModLongRing) {
             if (fac.isField()) {
-                ufd = new GreatestCommonDivisorSimple<C>(fac);
+                ufd = new GreatestCommonDivisorSimple<>(fac);
             } else {
-                ufd = new GreatestCommonDivisorPrimitive<C>(fac);
+                ufd = new GreatestCommonDivisorPrimitive<>(fac);
             }
         } else if (ofac instanceof BigRational) {
-            ufd = new GreatestCommonDivisorSimple<C>(fac);
+            ufd = new GreatestCommonDivisorSimple<>(fac);
         } else {
             if (fac.isField()) {
-                ufd = new GreatestCommonDivisorSimple<C>(fac);
+                ufd = new GreatestCommonDivisorSimple<>(fac);
             } else {
-                ufd = new GreatestCommonDivisorPrimitive<C>(fac);
+                ufd = new GreatestCommonDivisorPrimitive<>(fac);
             }
         }
         logger.debug("implementation = " + ufd);
@@ -268,24 +268,24 @@ public class SGCDFactory {
         logger.debug("fac = " + fac.getClass().getName());
         Object ofac = fac;
         if (ofac instanceof BigInteger) {
-            ufd = new SGCDParallelProxy<C>(fac, new GreatestCommonDivisorSimple<C>(fac),
-                    new GreatestCommonDivisorPrimitive<C>(fac));
+            ufd = new SGCDParallelProxy<>(fac, new GreatestCommonDivisorSimple<>(fac),
+                    new GreatestCommonDivisorPrimitive<>(fac));
         } else if (ofac instanceof ModIntegerRing) {
-            ufd = new SGCDParallelProxy<C>(fac, new GreatestCommonDivisorSimple<C>(fac),
-                    new GreatestCommonDivisorPrimitive<C>(fac));
+            ufd = new SGCDParallelProxy<>(fac, new GreatestCommonDivisorSimple<>(fac),
+                    new GreatestCommonDivisorPrimitive<>(fac));
         } else if (ofac instanceof ModLongRing) {
-            ufd = new SGCDParallelProxy<C>(fac, new GreatestCommonDivisorSimple<C>(fac),
-                    new GreatestCommonDivisorPrimitive<C>(fac));
+            ufd = new SGCDParallelProxy<>(fac, new GreatestCommonDivisorSimple<>(fac),
+                    new GreatestCommonDivisorPrimitive<>(fac));
         } else if (ofac instanceof BigRational) {
-            ufd = new SGCDParallelProxy<C>(fac, new GreatestCommonDivisorPrimitive<C>(fac),
-                    new GreatestCommonDivisorSimple<C>(fac));
+            ufd = new SGCDParallelProxy<>(fac, new GreatestCommonDivisorPrimitive<>(fac),
+                    new GreatestCommonDivisorSimple<>(fac));
         } else {
             if (fac.isField()) {
-                ufd = new SGCDParallelProxy<C>(fac, new GreatestCommonDivisorSimple<C>(fac),
-                        new GreatestCommonDivisorPrimitive<C>(fac));
+                ufd = new SGCDParallelProxy<>(fac, new GreatestCommonDivisorSimple<>(fac),
+                        new GreatestCommonDivisorPrimitive<>(fac));
             } else {
-                ufd = new SGCDParallelProxy<C>(fac, new GreatestCommonDivisorSyzygy<C>(fac),
-                        new GreatestCommonDivisorPrimitive<C>(fac));
+                ufd = new SGCDParallelProxy<>(fac, new GreatestCommonDivisorSyzygy<>(fac),
+                        new GreatestCommonDivisorPrimitive<>(fac));
             }
         }
         logger.debug("ufd = " + ufd);

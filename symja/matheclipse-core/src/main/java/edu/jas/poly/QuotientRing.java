@@ -63,7 +63,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      * Create from numerator.
      */
     public Quotient<C> create(C n) {
-        return new Quotient<C>(this, n);
+        return new Quotient<>(this, n);
     }
 
 
@@ -71,7 +71,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      * Create from numerator, denominator pair.
      */
     public Quotient<C> create(C n, C d) {
-        return new Quotient<C>(this, n, d);
+        return new Quotient<>(this, n, d);
     }
 
 
@@ -93,7 +93,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      * @return a copy of c.
      */
     public Quotient<C> copy(Quotient<C> c) {
-        return new Quotient<C>(c.ring, c.num, c.den, true);
+        return new Quotient<>(c.ring, c.num, c.den, true);
     }
 
 
@@ -103,7 +103,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      * @return 0 as Quotient.
      */
     public Quotient<C> getZERO() {
-        return new Quotient<C>(this, ring.getZERO());
+        return new Quotient<>(this, ring.getZERO());
     }
 
 
@@ -113,7 +113,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      * @return 1 as Quotient.
      */
     public Quotient<C> getONE() {
-        return new Quotient<C>(this, ring.getONE());
+        return new Quotient<>(this, ring.getONE());
     }
 
 
@@ -125,9 +125,9 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      */
     public List<Quotient<C>> generators() {
         List<? extends C> rgens = ring.generators();
-        List<Quotient<C>> gens = new ArrayList<Quotient<C>>(rgens.size());
+        List<Quotient<C>> gens = new ArrayList<>(rgens.size());
         for (C c : rgens) {
-            gens.add(new Quotient<C>(this, c));
+            gens.add(new Quotient<>(this, c));
         }
         return gens;
     }
@@ -180,7 +180,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      * @return a Quotient.
      */
     public Quotient<C> fromInteger(java.math.BigInteger a) {
-        return new Quotient<C>(this, ring.fromInteger(a));
+        return new Quotient<>(this, ring.fromInteger(a));
     }
 
 
@@ -191,7 +191,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      * @return a Quotient.
      */
     public Quotient<C> fromInteger(long a) {
-        return new Quotient<C>(this, ring.fromInteger(a));
+        return new Quotient<>(this, ring.fromInteger(a));
     }
 
 
@@ -263,7 +263,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
         while (s.isZERO()) {
             s = ring.random(n);
         }
-        return new Quotient<C>(this, r, s, false);
+        return new Quotient<>(this, r, s, false);
     }
 
 
@@ -280,7 +280,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
         while (s.isZERO()) {
             s = ring.random(n, rnd);
         }
-        return new Quotient<C>(this, r, s, false);
+        return new Quotient<>(this, r, s, false);
     }
 
 
@@ -292,7 +292,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      */
     public Quotient<C> parse(String s) {
         C x = ring.parse(s);
-        return new Quotient<C>(this, x);
+        return new Quotient<>(this, x);
     }
 
 
@@ -307,7 +307,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
         if (debug) {
             logger.debug("x = " + x);
         }
-        return new Quotient<C>(this, x);
+        return new Quotient<>(this, x);
     }
 
 }

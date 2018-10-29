@@ -57,9 +57,9 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      */
     public GenMatrix(GenMatrixRing<C> r, List<List<C>> m) {
         ring = r;
-        matrix = new ArrayList<ArrayList<C>>(r.rows);
+        matrix = new ArrayList<>(r.rows);
         for (List<C> row : m) {
-            ArrayList<C> nr = new ArrayList<C>(row);
+            ArrayList<C> nr = new ArrayList<>(row);
             matrix.add(nr);
         }
         logger.info(ring.rows + " x " + ring.cols + " matrix constructed");
@@ -77,7 +77,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
             throw new IllegalArgumentException("Empty r or m not allowed, r = " + r + ", m = " + m);
         }
         ring = r;
-        matrix = new ArrayList<ArrayList<C>>(m);
+        matrix = new ArrayList<>(m);
         logger.info(ring.rows + " x " + ring.cols + " matrix constructed");
     }
 
@@ -228,13 +228,13 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
     @SuppressWarnings("unchecked")
     public GenMatrix<C> copy() {
         //return ring.copy(this);
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         ArrayList<C> v;
         for (ArrayList<C> val : matrix) {
-            v = new ArrayList<C>(val); // val.clone();
+            v = new ArrayList<>(val); // val.clone();
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -387,11 +387,11 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      */
     public GenMatrix<C> sum(GenMatrix<C> b) {
         ArrayList<ArrayList<C>> om = b.matrix;
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         int i = 0;
         for (ArrayList<C> val : matrix) {
             ArrayList<C> ov = om.get(i++);
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            ArrayList<C> v = new ArrayList<>(ring.cols);
             int j = 0;
             for (C c : val) {
                 C e = c.sum(ov.get(j++));
@@ -399,7 +399,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
             }
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -410,11 +410,11 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      */
     public GenMatrix<C> subtract(GenMatrix<C> b) {
         ArrayList<ArrayList<C>> om = b.matrix;
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         int i = 0;
         for (ArrayList<C> val : matrix) {
             ArrayList<C> ov = om.get(i++);
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            ArrayList<C> v = new ArrayList<>(ring.cols);
             int j = 0;
             for (C c : val) {
                 C e = c.subtract(ov.get(j++));
@@ -422,7 +422,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
             }
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -432,17 +432,17 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      * @return -this
      */
     public GenMatrix<C> negate() {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         //int i = 0;
         for (ArrayList<C> val : matrix) {
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            ArrayList<C> v = new ArrayList<>(ring.cols);
             for (C c : val) {
                 C e = c.negate();
                 v.add(e);
             }
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -465,17 +465,17 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      * @return this*s
      */
     public GenMatrix<C> scalarMultiply(C s) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         //int i = 0;
         for (ArrayList<C> val : matrix) {
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            ArrayList<C> v = new ArrayList<>(ring.cols);
             for (C c : val) {
                 C e = c.multiply(s);
                 v.add(e);
             }
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -485,17 +485,17 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      * @return s*this
      */
     public GenMatrix<C> leftScalarMultiply(C s) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         //int i = 0;
         for (ArrayList<C> val : matrix) {
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            ArrayList<C> v = new ArrayList<>(ring.cols);
             for (C c : val) {
                 C e = s.multiply(c);
                 v.add(e);
             }
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -506,11 +506,11 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      */
     public GenMatrix<C> linearCombination(C s, GenMatrix<C> b, C t) {
         ArrayList<ArrayList<C>> om = b.matrix;
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         int i = 0;
         for (ArrayList<C> val : matrix) {
             ArrayList<C> ov = om.get(i++);
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            ArrayList<C> v = new ArrayList<>(ring.cols);
             int j = 0;
             for (C c : val) {
                 C c1 = c.multiply(s);
@@ -520,7 +520,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
             }
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -531,11 +531,11 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      */
     public GenMatrix<C> linearCombination(GenMatrix<C> b, C t) {
         ArrayList<ArrayList<C>> om = b.matrix;
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         int i = 0;
         for (ArrayList<C> val : matrix) {
             ArrayList<C> ov = om.get(i++);
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            ArrayList<C> v = new ArrayList<>(ring.cols);
             int j = 0;
             for (C c : val) {
                 C c2 = ov.get(j++).multiply(t);
@@ -544,7 +544,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
             }
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -556,11 +556,11 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      */
     public GenMatrix<C> linearCombination(C t, GenMatrix<C> b) {
         ArrayList<ArrayList<C>> om = b.matrix;
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         int i = 0;
         for (ArrayList<C> val : matrix) {
             ArrayList<C> ov = om.get(i++);
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            ArrayList<C> v = new ArrayList<>(ring.cols);
             int j = 0;
             for (C c : val) {
                 C c2 = t.multiply(ov.get(j++));
@@ -569,7 +569,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
             }
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -581,11 +581,11 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      */
     public GenMatrix<C> leftLinearCombination(C s, C t, GenMatrix<C> b) {
         ArrayList<ArrayList<C>> om = b.matrix;
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<ArrayList<C>> m = new ArrayList<>(ring.rows);
         int i = 0;
         for (ArrayList<C> val : matrix) {
             ArrayList<C> ov = om.get(i++);
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            ArrayList<C> v = new ArrayList<>(ring.cols);
             int j = 0;
             for (C c : val) {
                 C c1 = s.multiply(c);
@@ -595,7 +595,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
             }
             m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<>(ring, m);
     }
 
 
@@ -663,7 +663,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
 
             }
         }
-        return new GenMatrix<C>(pr, p);
+        return new GenMatrix<>(pr, p);
     }
 
 
@@ -692,7 +692,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
                 (p.get(i)).set(j, c); // C[i][j] = c;
             }
         }
-        return new GenMatrix<C>(pr, p);
+        return new GenMatrix<>(pr, p);
     }
 
 

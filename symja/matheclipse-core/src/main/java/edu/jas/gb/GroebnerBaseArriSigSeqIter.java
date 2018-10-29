@@ -78,7 +78,7 @@ public class GroebnerBaseArriSigSeqIter<C extends RingElem<C>> extends GroebnerB
                 .subtract(A.poly.leadingExpVector());
         GenPolynomial<C> sp = SPolynomial(A, B);
         GenPolynomial<C> sig = sp.ring.valueOf(e);
-        return new SigPair<C>(sig, new SigPoly<C>(sig, sp), B, G);
+        return new SigPair<>(sig, new SigPoly<>(sig, sp), B, G);
     }
 
 
@@ -94,7 +94,7 @@ public class GroebnerBaseArriSigSeqIter<C extends RingElem<C>> extends GroebnerB
     @Override
     SigPair<C> newPair(GenPolynomial<C> s, SigPoly<C> A, SigPoly<C> B, List<SigPoly<C>> G) {
         GenPolynomial<C> sp = SPolynomial(A, B);
-        return new SigPair<C>(s, new SigPoly<C>(s, sp), B, G);
+        return new SigPair<>(s, new SigPoly<>(s, sp), B, G);
     }
 
 
@@ -121,7 +121,7 @@ public class GroebnerBaseArriSigSeqIter<C extends RingElem<C>> extends GroebnerB
      */
     @Override
     List<SigPair<C>> pruneP(List<SigPair<C>> P, List<ExpVector> syz) {
-        List<SigPair<C>> res = new ArrayList<SigPair<C>>(P.size());
+        List<SigPair<C>> res = new ArrayList<>(P.size());
         for (SigPair<C> p : P) {
             ExpVector f = p.sigma.leadingExpVector();
             if (f == null) {
@@ -154,7 +154,7 @@ public class GroebnerBaseArriSigSeqIter<C extends RingElem<C>> extends GroebnerB
      */
     @Override
     List<SigPair<C>> pruneS(List<SigPair<C>> S, List<ExpVector> syz, List<SigPoly<C>> done, List<SigPoly<C>> G) {
-        List<SigPair<C>> res = new ArrayList<SigPair<C>>(S.size());
+        List<SigPair<C>> res = new ArrayList<>(S.size());
         for (SigPair<C> p : S) {
             ExpVector f = p.sigma.leadingExpVector();
             if (f == null) {
@@ -220,7 +220,7 @@ public class GroebnerBaseArriSigSeqIter<C extends RingElem<C>> extends GroebnerB
      */
     @Override
     List<ExpVector> initializeSyz(List<GenPolynomial<C>> F, List<SigPoly<C>> G) {
-        List<ExpVector> P = new ArrayList<ExpVector>();
+        List<ExpVector> P = new ArrayList<>();
         for (GenPolynomial<C> p : F) {
             if (p.isZERO()) {
                 continue;
@@ -243,7 +243,6 @@ public class GroebnerBaseArriSigSeqIter<C extends RingElem<C>> extends GroebnerB
         if (r.poly.isZERO() && !r.sigma.isZERO()) {
             syz.add(r.sigma.leadingExpVector());
         }
-        return;
     }
 
 }

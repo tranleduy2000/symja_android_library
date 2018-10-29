@@ -101,7 +101,7 @@ public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements
         if (A == null) {
             return A;
         }
-        List<GenWordPolynomial<C>> N = new ArrayList<GenWordPolynomial<C>>(A.size());
+        List<GenWordPolynomial<C>> N = new ArrayList<>(A.size());
         if (A.isEmpty()) {
             return N;
         }
@@ -136,7 +136,7 @@ public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements
         if (pfac.alphabet.length() <= 0) {
             return -1;
         }
-        Set<String> v = new HashSet<String>(); // for non reduced GBs
+        Set<String> v = new HashSet<>(); // for non reduced GBs
         for (GenWordPolynomial<C> p : F) {
             if (p.isZERO()) {
                 continue;
@@ -170,7 +170,7 @@ public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements
      * @return a list of the degrees of univariate head terms.
      */
     public List<Long> univariateDegrees(List<GenWordPolynomial<C>> A) {
-        List<Long> ud = new ArrayList<Long>();
+        List<Long> ud = new ArrayList<>();
         if (A == null || A.size() == 0) {
             return ud;
         }
@@ -178,7 +178,7 @@ public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements
         if (pfac.alphabet.length() <= 0) {
             return ud;
         }
-        SortedMap<String, Long> v = new TreeMap<String, Long>(); // for non reduced GBs
+        SortedMap<String, Long> v = new TreeMap<>(); // for non reduced GBs
         for (GenWordPolynomial<C> p : A) {
             Word e = p.leadingWord();
             if (e == null) {
@@ -261,7 +261,7 @@ public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements
             return Gp;
         }
         // remove zero polynomials
-        List<GenWordPolynomial<C>> G = new ArrayList<GenWordPolynomial<C>>(Gp.size());
+        List<GenWordPolynomial<C>> G = new ArrayList<>(Gp.size());
         for (GenWordPolynomial<C> a : Gp) {
             if (a != null && !a.isZERO()) { // always true in GB()
                 // already positive a = a.abs();
@@ -274,7 +274,7 @@ public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements
         // remove top reducible polynomials
         GenWordPolynomial<C> a;
         List<GenWordPolynomial<C>> F;
-        F = new ArrayList<GenWordPolynomial<C>>(G.size());
+        F = new ArrayList<>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
@@ -282,7 +282,7 @@ public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenWordPolynomial<C>> ff;
-                    ff = new ArrayList<GenWordPolynomial<C>>(G);
+                    ff = new ArrayList<>(G);
                     ff.addAll(F);
                     a = red.normalform(ff, a);
                     if (!a.isZERO()) {
@@ -340,8 +340,8 @@ public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements
             }
         }
         // test for top reducible polynomials
-        List<GenWordPolynomial<C>> G = new ArrayList<GenWordPolynomial<C>>(Gp);
-        List<GenWordPolynomial<C>> F = new ArrayList<GenWordPolynomial<C>>(G.size());
+        List<GenWordPolynomial<C>> G = new ArrayList<>(Gp);
+        List<GenWordPolynomial<C>> F = new ArrayList<>(G.size());
         while (G.size() > 0) {
             GenWordPolynomial<C> a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {

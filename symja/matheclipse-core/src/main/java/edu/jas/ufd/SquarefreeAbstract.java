@@ -173,7 +173,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         if (A == null || A.isEmpty()) {
             return A;
         }
-        List<GenPolynomial<C>> S = new ArrayList<GenPolynomial<C>>();
+        List<GenPolynomial<C>> S = new ArrayList<>();
         for (GenPolynomial<C> g : A) {
             SortedMap<GenPolynomial<C>, Long> sm = squarefreeFactors(g);
             S.addAll(sm.keySet());
@@ -234,13 +234,13 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         if (F == null || F.size() <= 1) {
             return F;
         }
-        List<GenPolynomial<C>> Fp = new ArrayList<GenPolynomial<C>>(F.keySet());
+        List<GenPolynomial<C>> Fp = new ArrayList<>(F.keySet());
         GenPolynomial<C> f0 = Fp.get(0);
         if (f0.ring.characteristic().signum() != 0) { // only ordered coefficients
             return F;
         }
         long e0 = F.get(f0);
-        SortedMap<GenPolynomial<C>, Long> Sp = new TreeMap<GenPolynomial<C>, Long>();
+        SortedMap<GenPolynomial<C>, Long> Sp = new TreeMap<>();
         for (int i = 1; i < Fp.size(); i++) {
             GenPolynomial<C> fi = Fp.get(i);
             long ei = F.get(fi);
@@ -436,7 +436,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
     public SortedMap<GenPolynomial<GenPolynomial<C>>, Long> recursiveSquarefreeFactors(
             GenPolynomial<GenPolynomial<C>> P) {
         SortedMap<GenPolynomial<GenPolynomial<C>>, Long> factors;
-        factors = new TreeMap<GenPolynomial<GenPolynomial<C>>, Long>();
+        factors = new TreeMap<>();
         if (P == null || P.isZERO()) {
             return factors;
         }
@@ -475,7 +475,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         if (D == null || A == null) {
             throw new IllegalArgumentException("null A or D not allowed");
         }
-        List<List<GenPolynomial<C>>> pf = new ArrayList<List<GenPolynomial<C>>>(D.size() + 1);
+        List<List<GenPolynomial<C>>> pf = new ArrayList<>(D.size() + 1);
         if (D.size() == 0) {
             return pf;
         }
@@ -485,19 +485,19 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
                 //GenPolynomial<C> d = me.getKey();
                 long e = me.getValue(); //D.get(d);
                 int e1 = (int) e + 1;
-                List<GenPolynomial<C>> fi = new ArrayList<GenPolynomial<C>>(e1);
+                List<GenPolynomial<C>> fi = new ArrayList<>(e1);
                 for (int i = 0; i < e1; i++) {
                     fi.add(A);
                 }
                 pf.add(fi);
             }
-            List<GenPolynomial<C>> fi = new ArrayList<GenPolynomial<C>>(1);
+            List<GenPolynomial<C>> fi = new ArrayList<>(1);
             fi.add(A);
             pf.add(0, fi);
             return pf;
         }
         // A != 0, D != empty
-        List<GenPolynomial<C>> Dp = new ArrayList<GenPolynomial<C>>(D.size());
+        List<GenPolynomial<C>> Dp = new ArrayList<>(D.size());
         for (Map.Entry<GenPolynomial<C>, Long> me : D.entrySet()) {
             GenPolynomial<C> d = me.getKey();
             long e = me.getValue(); //D.get(d);
@@ -507,7 +507,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         List<GenPolynomial<C>> F = engine.basePartialFraction(A, Dp);
         //System.out.println("fraction list = " + F.size());
         GenPolynomial<C> A0 = F.remove(0);
-        List<GenPolynomial<C>> fi = new ArrayList<GenPolynomial<C>>(1);
+        List<GenPolynomial<C>> fi = new ArrayList<>(1);
         fi.add(A0);
         pf.add(fi);
         int i = 0;
@@ -544,7 +544,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         if (D.isEmpty() || F.isEmpty()) {
             return false;
         }
-        List<GenPolynomial<C>> Dp = new ArrayList<GenPolynomial<C>>(D.size());
+        List<GenPolynomial<C>> Dp = new ArrayList<>(D.size());
         for (Map.Entry<GenPolynomial<C>, Long> me : D.entrySet()) {
             GenPolynomial<C> d = me.getKey();
             long e = me.getValue(); // D.get(d);
@@ -559,7 +559,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         boolean t;
         GenPolynomial<C> A0 = fi.get(0);
         //System.out.println("A0 = " + A0);
-        List<GenPolynomial<C>> Qp = new ArrayList<GenPolynomial<C>>(D.size() + 1);
+        List<GenPolynomial<C>> Qp = new ArrayList<>(D.size() + 1);
         Qp.add(A0);
 
         //         List<GenPolynomial<C>> Fp = engine.basePartialFraction(A,Dp);

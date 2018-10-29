@@ -61,7 +61,7 @@ public final class PrimeList implements Iterable<java.math.BigInteger> {
                 if (SMALL_LIST != null) {
                     val = SMALL_LIST;
                 } else {
-                    val = new ArrayList<java.math.BigInteger>(50);
+                    val = new ArrayList<>(50);
                     addSmall();
                     SMALL_LIST = val;
                 }
@@ -70,7 +70,7 @@ public final class PrimeList implements Iterable<java.math.BigInteger> {
                 if (LOW_LIST != null) {
                     val = LOW_LIST;
                 } else {
-                    val = new ArrayList<java.math.BigInteger>(50);
+                    val = new ArrayList<>(50);
                     addLow();
                     LOW_LIST = val;
                 }
@@ -80,7 +80,7 @@ public final class PrimeList implements Iterable<java.math.BigInteger> {
                 if (MEDIUM_LIST != null) {
                     val = MEDIUM_LIST;
                 } else {
-                    val = new ArrayList<java.math.BigInteger>(50);
+                    val = new ArrayList<>(50);
                     addMedium();
                     MEDIUM_LIST = val;
                 }
@@ -89,7 +89,7 @@ public final class PrimeList implements Iterable<java.math.BigInteger> {
                 if (LARGE_LIST != null) {
                     val = LARGE_LIST;
                 } else {
-                    val = new ArrayList<java.math.BigInteger>(50);
+                    val = new ArrayList<>(50);
                     addLarge();
                     LARGE_LIST = val;
                 }
@@ -98,7 +98,7 @@ public final class PrimeList implements Iterable<java.math.BigInteger> {
                 if (MERSENNE_LIST != null) {
                     val = MERSENNE_LIST;
                 } else {
-                    val = new ArrayList<java.math.BigInteger>(50);
+                    val = new ArrayList<>(50);
                     addMersenne();
                     MERSENNE_LIST = val;
                 }

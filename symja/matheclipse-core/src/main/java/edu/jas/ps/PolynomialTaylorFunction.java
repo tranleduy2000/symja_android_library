@@ -79,7 +79,7 @@ public class PolynomialTaylorFunction<C extends RingElem<C>> implements TaylorFu
      */
     @Override
     public TaylorFunction<C> deriviative() {
-        return new PolynomialTaylorFunction<C>(PolyUtil.baseDeriviative(pol));
+        return new PolynomialTaylorFunction<>(PolyUtil.baseDeriviative(pol));
     }
 
 
@@ -103,7 +103,7 @@ public class PolynomialTaylorFunction<C extends RingElem<C>> implements TaylorFu
         GenPolynomial<C> p = pol;
         long f = 1L;
         if (i.signum() == 0 || pol.isZERO()) {
-            return new PolynomialTaylorFunction<C>(p, f);
+            return new PolynomialTaylorFunction<>(p, f);
         }
         for (int j = 0; j < i.length(); j++) {
             long e = i.getVal(j);
@@ -115,12 +115,12 @@ public class PolynomialTaylorFunction<C extends RingElem<C>> implements TaylorFu
                 p = PolyUtil.baseDeriviative(p, jl);
                 f *= (k + 1);
                 if (p.isZERO()) {
-                    return new PolynomialTaylorFunction<C>(p, f);
+                    return new PolynomialTaylorFunction<>(p, f);
                 }
             }
         }
         //System.out.println("i = " + i + ", f = " + f + ", der = " + p);
-        return new PolynomialTaylorFunction<C>(p, f);
+        return new PolynomialTaylorFunction<>(p, f);
     }
 
 
