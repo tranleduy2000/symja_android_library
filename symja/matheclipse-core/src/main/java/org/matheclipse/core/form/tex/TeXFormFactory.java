@@ -7,6 +7,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.util.Iterator;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.NILPointer;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -882,7 +883,7 @@ public class TeXFormFactory {
 		private boolean convertTimesOperator(final StringBuilder buf, final IAST timesAST, final int precedence,
 				final int caller) {
 			int size = timesAST.size();
-			IExpr arg1 = (IExpr) F.NIL;
+			IExpr arg1 = new NILPointer();
 			if (size > 1) {
 				arg1 = timesAST.arg1();
 				if (arg1.isMinusOne()) {

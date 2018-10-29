@@ -11,7 +11,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 
-import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +41,7 @@ public final class NILPointer extends IASTAppendableImpl {
 	 *
 	 * @see F#NIL
 	 */
-	NILPointer() {
+    public NILPointer() {
 	}
 
 	@Override
@@ -165,7 +164,7 @@ public final class NILPointer extends IASTAppendableImpl {
 
 	@Override
 	public boolean equals(final Object obj) {
-		return this == obj;
+		return this == obj || obj instanceof NILPointer;
 	}
 
 	@Override
@@ -386,10 +385,6 @@ public final class NILPointer extends IASTAppendableImpl {
 	@Override
 	public final <X extends Throwable> IExpr orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
 		throw exceptionSupplier.get();
-	}
-
-	private Object readResolve() throws ObjectStreamException {
-		return F.NIL;
 	}
 
 	@Override
