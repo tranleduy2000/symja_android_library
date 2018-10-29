@@ -61,14 +61,9 @@ public enum ResourceData {
     public static Properties properties(String string) {
         try {
             InputStream inputStream = new ByteArrayInputStream(CONTENT.getBytes());
-            try {
-                return ImportHelper.properties(inputStream);
-            } finally {
-                inputStream.close();
-            }
+            return ImportHelper.properties(inputStream);
         } catch (Exception exception) {
-            // ---
+            throw new RuntimeException(exception);
         }
-        return null;
     }
 }
