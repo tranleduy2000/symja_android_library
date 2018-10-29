@@ -45,7 +45,7 @@ import edu.jas.structure.RingFactory;
  *
  * @param <C> coefficient type.
  * @author Heinz Kredel
- *         will be deprecated use QLRSolvablePolynomialRing
+ * will be deprecated use QLRSolvablePolynomialRing
  */
 
 public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
@@ -618,7 +618,7 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
      *
      * @param modv number of module variables.
      * @param e    the exponent of the variables.
-     * @return List(X_1^e, ..., X_n^e) a list of univariate polynomials.
+     * @return List(X_1 ^ e, ..., X_n ^ e) a list of univariate polynomials.
      */
     //todo Override
     public List<QuotSolvablePolynomial<C>> recUnivariateList(int modv, long e) {

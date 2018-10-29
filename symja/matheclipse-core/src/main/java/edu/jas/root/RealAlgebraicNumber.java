@@ -24,7 +24,7 @@ import edu.jas.structure.RingElemImpl;
  */
 
 public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends RingElemImpl<RealAlgebraicNumber<C>>
-                /*extends AlgebraicNumber<C>*/
+        /*extends AlgebraicNumber<C>*/
         implements GcdRingElem<RealAlgebraicNumber<C>>, Rational {
 
 

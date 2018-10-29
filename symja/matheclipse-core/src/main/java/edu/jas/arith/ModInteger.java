@@ -85,7 +85,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements GcdRin
      *
      * @param A ModInteger.
      * @param B ModInteger.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     public static int MICOMP(ModInteger A, ModInteger B) {
         if (A == null)
@@ -356,7 +356,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements GcdRin
      * ModInteger comparison.
      *
      * @param b ModInteger.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     @Override
     public int compareTo(ModInteger b) {

@@ -982,7 +982,7 @@ public class GenPolynomialRing<C extends RingElem<C>>
      *
      * @param modv number of module variables.
      * @param e    the exponent of the variables.
-     * @return List(X_1^e, ..., X_n^e) a list of univariate polynomials.
+     * @return List(X_1 ^ e, ..., X_n ^ e) a list of univariate polynomials.
      */
     public List<? extends GenPolynomial<C>> univariateList(int modv, long e) {
         List<GenPolynomial<C>> pols = new ArrayList<GenPolynomial<C>>(nvar);

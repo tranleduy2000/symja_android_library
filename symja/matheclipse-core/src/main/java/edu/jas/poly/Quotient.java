@@ -256,7 +256,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
      * Quotient comparison.
      *
      * @param b Quotient.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     @Override
     public int compareTo(Quotient<C> b) {

@@ -171,7 +171,7 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
      * Monomial comparison.
      *
      * @param S Monomial.
-     * @return SIGN(this-S).
+     * @return SIGN(this - S).
      */
     @Override
     public int compareTo(Monomial<C> S) {

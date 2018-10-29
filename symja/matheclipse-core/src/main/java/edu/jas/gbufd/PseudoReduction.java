@@ -27,7 +27,7 @@ public interface PseudoReduction<C extends RingElem<C>> extends Reduction<C> {
      *
      * @param Pp polynomial list.
      * @param Ap polynomial.
-     * @return (nf(Ap), mf ) with respect to Pp and mf as multiplication factor
+     * @return (nf ( Ap), mf ) with respect to Pp and mf as multiplication factor
      * for Ap.
      */
     PseudoReductionEntry<C> normalformFactor(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap);

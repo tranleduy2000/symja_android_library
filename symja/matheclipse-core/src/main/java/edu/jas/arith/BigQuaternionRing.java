@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.RingFactory;
 import edu.jas.structure.Element;
+import edu.jas.structure.RingFactory;
 
 // import java.math.BigInteger;
 

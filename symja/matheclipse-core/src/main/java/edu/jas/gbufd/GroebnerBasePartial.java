@@ -107,7 +107,7 @@ public class GroebnerBasePartial<C extends GcdRingElem<C>> extends GroebnerBaseA
      *
      * @param aname variables for the full polynomial ring.
      * @param ename variables for the elimination ring, subseteq aname.
-     * @return perm({vars \ ename}, ename)
+     * @return perm({ vars \ ename }, ename)
      */
     public static List<Integer> getPermutation(String[] aname, String[] ename) {
         if (aname == null || ename == null) {

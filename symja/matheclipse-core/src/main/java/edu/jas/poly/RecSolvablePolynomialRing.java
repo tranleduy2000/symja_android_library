@@ -632,7 +632,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      *
      * @param modv number of module variables.
      * @param e    the exponent of the variables.
-     * @return List(X_1^e, ..., X_n^e) a list of univariate polynomials.
+     * @return List(X_1 ^ e, ..., X_n ^ e) a list of univariate polynomials.
      */
     //todo Override
     public List<RecSolvablePolynomial<C>> recUnivariateList(int modv, long e) {

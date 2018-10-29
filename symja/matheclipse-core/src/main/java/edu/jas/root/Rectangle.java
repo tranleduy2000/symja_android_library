@@ -408,7 +408,7 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
     /**
      * Rational Length.
      *
-     * @return rational(|ne-sw|**2);
+     * @return rational(| ne - sw | * * 2);
      */
     public BigRational rationalLength() {
         //BigRational r = new BigRational(length().toString());

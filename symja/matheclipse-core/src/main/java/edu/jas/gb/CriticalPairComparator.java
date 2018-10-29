@@ -61,7 +61,7 @@ public class CriticalPairComparator<C extends RingElem<C>>
                s = 0;
            }
             */
-           /* ok */
+            /* ok */
             if (p1.j > p2.j) {
                 s = -1;
             } else if (p1.j < p2.j) {
@@ -73,7 +73,7 @@ public class CriticalPairComparator<C extends RingElem<C>>
             } else {
                 s = 0;
             }
-           /* */
+            /* */
         }
         return s;
     }

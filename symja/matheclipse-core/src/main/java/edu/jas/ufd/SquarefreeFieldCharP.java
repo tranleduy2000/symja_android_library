@@ -113,7 +113,7 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
      * GenPolynomial polynomial greatest squarefree divisor.
      *
      * @param P GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     @Override
     public GenPolynomial<C> baseSquarefreePart(GenPolynomial<C> P) {
@@ -275,7 +275,7 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
      * divisor.
      *
      * @param P recursive univariate GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     @Override
     public GenPolynomial<GenPolynomial<C>> recursiveUnivariateSquarefreePart(GenPolynomial<GenPolynomial<C>> P) {
@@ -446,7 +446,7 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
      * GenPolynomial greatest squarefree divisor.
      *
      * @param P GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     @Override
     public GenPolynomial<C> squarefreePart(GenPolynomial<C> P) {

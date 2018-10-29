@@ -86,7 +86,7 @@ public class SocketChannel {
      */
     @Override
     public String toString() {
-        return "socketChannel(" +  ")";
+        return "socketChannel(" + ")";
     }
 
 }

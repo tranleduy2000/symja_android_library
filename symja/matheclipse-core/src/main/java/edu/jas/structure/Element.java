@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @author Heinz Kredel
  */
 
-public interface Element<C extends Element<C>> extends Comparable<C>, Serializable {
+public interface Element<C> extends Comparable<C>, Serializable {
 
 
     /**

@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 public final class ExpVectorByte extends ExpVector
-/*implements AbelianGroupElem<ExpVectorByte>*/ {
+        /*implements AbelianGroupElem<ExpVectorByte>*/ {
 
 
     /**

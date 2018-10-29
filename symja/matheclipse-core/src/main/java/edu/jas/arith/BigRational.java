@@ -296,7 +296,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      *
      * @param R BigRational.
      * @param S BigRational.
-     * @return SIGN(R-S).
+     * @return SIGN(R - S).
      */
     public static int RNCOMP(BigRational R, BigRational S) {
         if (R == null)
@@ -808,7 +808,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Rational number comparison.
      *
      * @param S BigRational.
-     * @return SIGN(this-S).
+     * @return SIGN(this - S).
      */
     @Override
     public int compareTo(BigRational S) {

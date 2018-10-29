@@ -109,7 +109,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param iv root isolating interval for f, with f(left) * f(right) &lt; 0.
      * @param f  univariate polynomial, non-zero.
      * @param g  univariate polynomial, gcd(f,g) == 1.
-     * @return sign(g(v)), with v a new interval contained in iv such that g(v)
+     * @return sign(g ( v)), with v a new interval contained in iv such that g(v)
      * != 0.
      */
     int realSign(Interval<C> iv, GenPolynomial<C> f, GenPolynomial<C> g);

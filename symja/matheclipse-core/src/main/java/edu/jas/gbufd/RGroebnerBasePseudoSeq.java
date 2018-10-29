@@ -321,9 +321,9 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
 
 
     /*
-     * Minimal ordered Groebner basis. 
-     * @param Gp a Groebner base. 
-     * @return a reduced Groebner base of Gp. 
+     * Minimal ordered Groebner basis.
+     * @param Gp a Groebner base.
+     * @return a reduced Groebner base of Gp.
      * TODO: use primitivePart
      */
     List<GenPolynomial<C>> minimalGBtesting(List<GenPolynomial<C>> Gp) {

@@ -11,7 +11,7 @@ package edu.jas.structure;
  * @author Heinz Kredel
  */
 
-public interface RingFactory<C extends RingElem<C>> extends AbelianGroupFactory<C>, MonoidFactory<C> {
+public interface RingFactory<C> extends AbelianGroupFactory<C>, MonoidFactory<C> {
 
 
     /**

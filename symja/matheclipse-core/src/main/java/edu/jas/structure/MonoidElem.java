@@ -12,7 +12,7 @@ package edu.jas.structure;
  * @author Heinz Kredel
  */
 
-public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
+public interface MonoidElem<C> extends Element<C> {
 
 
     /**

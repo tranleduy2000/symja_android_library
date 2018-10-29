@@ -574,7 +574,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
     }
 
 
-    /* arithmetic operations: conjugate, absolut value 
+    /* arithmetic operations: conjugate, absolut value
      */
 
     /**
@@ -643,7 +643,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
     }
 
 
-    /* arithmetic operations: *, inverse, / 
+    /* arithmetic operations: *, inverse, /
      */
 
     /**

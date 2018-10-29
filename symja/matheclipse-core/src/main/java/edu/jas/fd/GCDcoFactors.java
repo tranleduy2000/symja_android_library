@@ -261,7 +261,7 @@ public class GCDcoFactors<C extends GcdRingElem<C>> implements Serializable {
      * Comparison.
      *
      * @param facs gcd co-factors container.
-     * @return sign(this.polyA-facs.polyA) lexicographic &gt;
+     * @return sign(this.polyA - facs.polyA) lexicographic &gt;
      * sign(this.polyB-facs.polyB) lexicographic &gt;
      * sign(this.coA-facs.coA) lexicographic &gt;
      * sign(this.coB-facs.coB) lexicographic &gt;

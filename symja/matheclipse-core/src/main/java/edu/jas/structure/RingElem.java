@@ -13,7 +13,7 @@ package edu.jas.structure;
  * @author Heinz Kredel
  */
 
-public interface RingElem<C extends RingElem<C>> extends AbelianGroupElem<C>, MonoidElem<C> {
+public interface RingElem<C> extends AbelianGroupElem<C>, MonoidElem<C> {
 
 
     /**

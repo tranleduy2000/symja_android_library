@@ -13,7 +13,7 @@ package edu.jas.structure;
  * @param D result element type
  * @author Heinz Kredel
  */
-public interface QuotPairFactory<C extends RingElem<C>, D extends RingElem<D>> {
+public interface QuotPairFactory<C, D> {
 
 
     /**

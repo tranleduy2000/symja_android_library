@@ -104,7 +104,7 @@ public final class PrimeInteger {
         int i, c = 0;
         while (true) {
             switch (c) {
-            /* mark multiples of d for d=3 and d=6n-/+1 with d**2<=m2 */
+                /* mark multiples of d for d=3 and d=6n-/+1 with d**2<=m2 */
                 case 2:
                     d += 2;
                     c = 3;

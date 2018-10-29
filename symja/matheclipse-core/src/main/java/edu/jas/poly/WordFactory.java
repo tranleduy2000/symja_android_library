@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.MonoidFactory;
 import edu.jas.structure.Element;
+import edu.jas.structure.MonoidFactory;
 
 
 /**

@@ -1,6 +1,6 @@
 package edu.jas.structure;
 
-public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidElem<C> {
+public abstract class MonoidElemImpl<C extends MonoidElem> implements MonoidElem<C> {
 
     /**
      * Quotient and remainder by division of this by S.
@@ -97,7 +97,7 @@ public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidE
     @SuppressWarnings("unchecked")
     public C power(long n) {
         //System.out.println("this = " + this + ", n = " + n);
-        return Power.power((MonoidFactory<C>) factory(), (C) this, n);
+        return (C) Power.power((MonoidFactory<MonoidElem>) factory(), (C) this, n);
     }
 
 }

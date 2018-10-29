@@ -654,7 +654,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
      * Reduced boolean closure, compute BC(A) for all A in F.
      *
      * @param F polynomial list.
-     * @return red(bc(F)) = bc(red(F)).
+     * @return red(bc ( F)) = bc(red(F)).
      */
     public List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F) {
         if (F == null || F.size() == 0) {
@@ -694,7 +694,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
      *
      * @param A polynomial.
      * @param F polynomial list.
-     * @return red(bc(A)).
+     * @return red(bc ( A)).
      */
     public List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F, GenPolynomial<C> A) {
         List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>();

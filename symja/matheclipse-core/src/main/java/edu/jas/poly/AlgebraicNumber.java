@@ -221,7 +221,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * AlgebraicNumber comparison.
      *
      * @param b AlgebraicNumber.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     @Override
     public int compareTo(AlgebraicNumber<C> b) {

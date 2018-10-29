@@ -222,7 +222,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Residue comparison.
      *
      * @param b Residue.
-     * @return sign(this-b), 0 means that this and b are equivalent in this
+     * @return sign(this - b), 0 means that this and b are equivalent in this
      * residue class ring.
      */
     @Override

@@ -12,7 +12,7 @@ package edu.jas.structure;
  * @author Heinz Kredel
  */
 
-public interface StarRingElem<C extends StarRingElem<C>> extends RingElem<C> {
+public interface StarRingElem<C> extends RingElem<C> {
 
 
     /**

@@ -36,9 +36,9 @@ public class ComputerThreads {
 
     // private static final boolean debug = logger.isInfoEnabled(); //logger.isInfoEnabled();
     /*
-      * Core number of threads.
-      * N_CPUS x 1.5, x 2, x 2.5, min 3, ?.
-      */
+     * Core number of threads.
+     * N_CPUS x 1.5, x 2, x 2.5, min 3, ?.
+     */
     public static final int N_THREADS = (N_CPUS < 3 ? 3 : N_CPUS + N_CPUS / 2);
     private static final Logger logger = Logger.getLogger(ComputerThreads.class);
     /**
@@ -68,8 +68,8 @@ public class ComputerThreads {
 
 
     /*
-      * Saturation policy.
-      */
+     * Saturation policy.
+     */
     //public static final RejectedExecutionHandler REH = new ThreadPoolExecutor.CallerRunsPolicy();
     //public static final RejectedExecutionHandler REH = new ThreadPoolExecutor.AbortPolicy();
 

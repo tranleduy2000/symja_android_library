@@ -24,7 +24,7 @@ import edu.jas.structure.RingElem;
  */
 
 public class StandardBaseSeq<C extends RingElem<C>>
-/*todo: extends StandardBaseAbstract<C>*/ {
+        /*todo: extends StandardBaseAbstract<C>*/ {
 
 
     private static final Logger logger = Logger.getLogger(StandardBaseSeq.class);

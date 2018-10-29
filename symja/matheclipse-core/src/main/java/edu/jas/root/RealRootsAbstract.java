@@ -337,7 +337,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
      *           with iv such that g(iv) != 0.
      * @param f  univariate polynomial, non-zero.
      * @param g  univariate polynomial, gcd(f,g) == 1.
-     * @return sign(g(iv)) .
+     * @return sign(g ( iv)) .
      */
     public int realIntervalSign(Interval<C> iv, GenPolynomial<C> f, GenPolynomial<C> g) {
         if (g == null || g.isZERO()) {
@@ -364,7 +364,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
      * @param iv root isolating interval for f, with f(left) * f(right) &lt; 0.
      * @param f  univariate polynomial, non-zero.
      * @param g  univariate polynomial, gcd(f,g) == 1.
-     * @return sign(g(v)), with v a new interval contained in iv such that g(v)
+     * @return sign(g ( v)), with v a new interval contained in iv such that g(v)
      * != 0.
      */
     public int realSign(Interval<C> iv, GenPolynomial<C> f, GenPolynomial<C> g) {

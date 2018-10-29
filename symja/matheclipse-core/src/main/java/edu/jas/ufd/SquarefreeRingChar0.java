@@ -70,7 +70,7 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
      * GenPolynomial polynomial greatest squarefree divisor.
      *
      * @param P GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     @Override
     public GenPolynomial<C> baseSquarefreePart(GenPolynomial<C> P) {
@@ -176,7 +176,7 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
      * divisor.
      *
      * @param P recursive univariate GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     @Override
     public GenPolynomial<GenPolynomial<C>> recursiveUnivariateSquarefreePart(GenPolynomial<GenPolynomial<C>> P) {
@@ -337,7 +337,7 @@ public class SquarefreeRingChar0<C extends GcdRingElem<C>> extends SquarefreeAbs
      * GenPolynomial greatest squarefree divisor.
      *
      * @param P GenPolynomial.
-     * @return squarefree(pp(P)).
+     * @return squarefree(pp ( P)).
      */
     @Override
     public GenPolynomial<C> squarefreePart(GenPolynomial<C> P) {

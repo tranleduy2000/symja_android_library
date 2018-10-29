@@ -14,8 +14,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import edu.jas.kern.PreemptingException;
-import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.Element;
+import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.UnaryFunctor;
@@ -514,7 +514,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * GenWordPolynomial comparison.
      *
      * @param b GenWordPolynomial.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     public int compareTo(GenWordPolynomial<C> b) {
         if (b == null) {
@@ -556,7 +556,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
     /**
      * GenWordPolynomial signum.
      *
-     * @return sign(ldcf(this)).
+     * @return sign(ldcf ( this)).
      */
     public int signum() {
         if (this.isZERO()) {

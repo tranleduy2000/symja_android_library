@@ -254,7 +254,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
      * ModLong comparison.
      *
      * @param b ModLong.
-     * @return sign(this-b).
+     * @return sign(this - b).
      */
     @Override
     public int compareTo(ModLong b) {

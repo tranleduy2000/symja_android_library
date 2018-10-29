@@ -12,7 +12,7 @@ package edu.jas.structure;
  * @param <C> scalar type
  * @author Heinz Kredel
  */
-public interface AlgebraElem<A extends AlgebraElem<A, C>, C extends RingElem<C>> extends RingElem<A> {
+public interface AlgebraElem<A, C> extends RingElem<A> {
 
 
     /**
