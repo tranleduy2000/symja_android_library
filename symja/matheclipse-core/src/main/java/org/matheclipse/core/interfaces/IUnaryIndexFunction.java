@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
  * @param <T>
  *            the type of the resulting object
  */
-@FunctionalInterface
+
 public interface IUnaryIndexFunction<F1, T> {
 
 	/**

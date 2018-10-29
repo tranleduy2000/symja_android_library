@@ -1,6 +1,6 @@
 package com.duy.lambda;
 
-@FunctionalInterface
+
 public interface BiConsumer<T, U> {
 
     /**

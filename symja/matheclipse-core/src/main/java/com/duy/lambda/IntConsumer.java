@@ -36,7 +36,7 @@ package com.duy.lambda;
  * @see Consumer
  * @since 1.8
  */
-@FunctionalInterface
+
 public interface IntConsumer {
 
     /**

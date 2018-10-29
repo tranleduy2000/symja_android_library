@@ -26,8 +26,6 @@ public class PatternMatchingTestCase extends TestCase {
 
 	protected EvalUtilities util;
 
-	protected static boolean DEBUG = true;
-
 	public PatternMatchingTestCase(String name) {
 		super(name);
 	}

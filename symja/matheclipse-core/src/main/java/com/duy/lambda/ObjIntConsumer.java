@@ -14,7 +14,7 @@ package com.duy.lambda;
  * @see com.duy.lambda.BiConsumer
  * @since 1.8
  */
-@FunctionalInterface
+
 public interface ObjIntConsumer<T> {
 
     /**
