@@ -47,7 +47,7 @@ import java.util.Set;
  *
  * 
  */
-public abstract class HMArrayList extends AbstractAST implements IASTAppendable, Cloneable, Serializable, RandomAccess {
+public abstract class HMArrayList extends IASTAppendableImpl implements Cloneable, Serializable, RandomAccess {
 
 	private static final long serialVersionUID = 8683452581122892189L;
 

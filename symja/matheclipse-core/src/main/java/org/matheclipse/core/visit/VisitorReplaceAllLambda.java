@@ -129,8 +129,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	@Override
 	protected IExpr visitAST(IAST ast) {
 		IExpr temp;
-        //noinspection RedundantCast
-        IASTMutable result = (IASTMutable) F.NIL;
+        IASTMutable result = F.NIL;
 		int i = fOffset;
 		int size = ast.size();
 		while (i < size) {

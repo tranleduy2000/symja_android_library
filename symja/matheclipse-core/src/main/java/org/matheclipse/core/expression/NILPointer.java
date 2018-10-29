@@ -25,11 +25,11 @@ import java.util.Set;
  * returns <code>false</code>. The main method to check if the object is valid is the <code>isPresent()</code> method.
  * The method is designed similar to <code>java.util.Optional#isPresent()</code>.
  * </p>
- * 
+ *
  * @see org.matheclipse.core.expression.F#NIL
  * @see java.util.Optional#isPresent
  */
-public final class NILPointer extends AbstractAST implements IASTAppendable {
+public final class NILPointer extends IASTAppendableImpl {
 
 	private static final long serialVersionUID = -3552302876858011292L;
 
@@ -39,10 +39,10 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 	 * The class <code>NILPointer</code> implements the constant object <code>F#NIL</code> (not in list), which
 	 * indicates in the evaluation process that no evaluation was possible (i.e. no further definition was found to
 	 * create a new expression from the existing one).
-	 * 
+	 *
 	 * @see F#NIL
 	 */
-	protected NILPointer() {
+	NILPointer() {
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 	public int argSize() {
 		return SIZE - 1;
 	}
-	
+
 	@Override
 	public Set<IExpr> asSet() {
 		throw new UnsupportedOperationException();
@@ -205,7 +205,7 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 	@Override
 	public void ifAppendable(Consumer<? super IASTAppendable> consumer) {
 	}
-	
+
 	@Override
 	public void ifPresent(Consumer<? super IExpr> consumer) {
 	}
@@ -214,7 +214,7 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 	public void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction) {
 		emptyAction.run();
 	}
-	
+
 	@Override
 	public boolean isAbs() {
 		return false;
@@ -399,7 +399,7 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 
 	/**
 	 * Removes the objects in the specified range from the start to the end, but not including the end index.
-	 * 
+	 *
 	 * @param start
 	 *            the index at which to start removing.
 	 * @param end
@@ -414,7 +414,7 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 
 	/**
 	 * Replaces the element at the specified location in this {@code ArrayList} with the specified object.
-	 * 
+	 *
 	 * @param location
 	 *            the index at which to put the specified object.
 	 * @param object
@@ -430,7 +430,7 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 
 	/**
 	 * Returns the number of elements in this {@code ArrayList}.
-	 * 
+	 *
 	 * @return the number of elements in this {@code ArrayList}.
 	 */
 	@Override
@@ -440,7 +440,7 @@ public final class NILPointer extends AbstractAST implements IASTAppendable {
 
 	/**
 	 * Returns a new array containing all elements contained in this {@code ArrayList}.
-	 * 
+	 *
 	 * @return an array of the elements from this {@code ArrayList}
 	 */
 	@Override
