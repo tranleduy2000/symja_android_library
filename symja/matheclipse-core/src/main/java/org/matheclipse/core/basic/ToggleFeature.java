@@ -40,7 +40,7 @@ public class ToggleFeature {
 	/**
 	 * If <code>true</code>, enable experimental Quantity functions
 	 */
-	public static boolean QUANTITY = true;
+	public static boolean QUANTITY = false;
 	/**
 	 * If <code>true</code>, enable experimental financial functions
 	 */
