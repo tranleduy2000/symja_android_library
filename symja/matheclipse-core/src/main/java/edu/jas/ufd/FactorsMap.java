@@ -11,7 +11,7 @@ import java.util.SortedMap;
 
 import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -21,7 +21,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public class FactorsMap<C extends RingElem<C>> implements Serializable {
+public class FactorsMap<C extends GcdRingElem<C>> implements Serializable {
 
 
     /**

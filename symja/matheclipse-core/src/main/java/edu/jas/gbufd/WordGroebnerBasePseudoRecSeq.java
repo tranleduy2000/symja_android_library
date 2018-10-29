@@ -20,7 +20,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.GenWordPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -35,7 +35,7 @@ import edu.jas.ufd.GreatestCommonDivisorAbstract;
  * @author Heinz Kredel
  */
 
-public class WordGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
+public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         WordGroebnerBaseAbstract<GenPolynomial<C>> {
 
 
@@ -105,12 +105,12 @@ public class WordGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
                                         WordPseudoReductionSeq<GenPolynomial<C>> red, WordPairList<GenPolynomial<C>> pl) {
         super(red, pl);
         this.red = red;
-        redRec = (WordPseudoReduction<C>) red;
+        redRec = (WordPseudoReduction<C>) (WordPseudoReduction) red;
         cofac = (GenPolynomialRing<C>) rf;
         if (!cofac.isCommutative()) {
             logger.warn("reduction not correct for " + cofac.toScript());
         }
-        engine = GCDFactory.getImplementation(cofac.coFac);
+        engine = GCDFactory.<C>getImplementation(cofac.coFac);
         //not used: engine = GCDFactory.<C>getProxy(cofac.coFac);
     }
 
@@ -383,7 +383,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
             return P;
         }
         //GenWordPolynomial<GenPolynomial<C>> pp = P.divide(d);
-        GenWordPolynomial<GenPolynomial<C>> pp = PolyUtil.recursiveDivide(P, d);
+        GenWordPolynomial<GenPolynomial<C>> pp = PolyUtil.<C>recursiveDivide(P, d);
         if (debug) {
             GenWordPolynomial<GenPolynomial<C>> p = pp.multiply(d);
             if (!p.equals(P)) {

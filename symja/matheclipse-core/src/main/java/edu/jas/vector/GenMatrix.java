@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.jas.kern.PrettyPrint;
-import edu.jas.structure.elem.AlgebraElem;
-import edu.jas.structure.elem.AlgebraElemImpl;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.AlgebraElem;
+import edu.jas.structure.AlgebraElemImpl;
+import edu.jas.structure.Element;
+import edu.jas.structure.RingElem;
 
 
 /**

@@ -5,8 +5,6 @@
 package edu.jas.structure;
 
 
-import edu.jas.structure.elem.RingElem;
-
 /**
  * Non-commutative ring element interface. Defines right divide and right remainder.
  *

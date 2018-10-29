@@ -9,7 +9,7 @@ package edu.jas.gbmod;
 
 import edu.jas.gb.SolvableGroebnerBaseAbstract;
 import edu.jas.gbufd.SGBFactory;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -22,7 +22,7 @@ import edu.jas.structure.RingFactory;
  * @deprecated use respective methods from SolvableGroebnerBaseParallel
  */
 @Deprecated
-public class ModSolvableGroebnerBasePar<C extends RingElem<C>> extends ModSolvableGroebnerBaseSeq<C> {
+public class ModSolvableGroebnerBasePar<C extends GcdRingElem<C>> extends ModSolvableGroebnerBaseSeq<C> {
 
 
     //private static final Logger logger = Logger.getLogger(ModSolvableGroebnerBasePar.class);

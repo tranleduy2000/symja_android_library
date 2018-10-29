@@ -22,7 +22,7 @@ import edu.jas.poly.PolyUtil;
 import edu.jas.poly.PolynomialList;
 import edu.jas.poly.TermOrder;
 import edu.jas.poly.TermOrderByName;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -39,7 +39,7 @@ import edu.jas.structure.RingFactory;
  * @see edu.jas.application.GBAlgorithmBuilder
  * @see GBFactory
  */
-public class GroebnerBaseWalk<C extends RingElem<C>> extends GroebnerBaseAbstract<C> {
+public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GroebnerBaseWalk.class);
@@ -82,7 +82,7 @@ public class GroebnerBaseWalk<C extends RingElem<C>> extends GroebnerBaseAbstrac
      * @param coFac coefficient ring of polynomial ring.
      */
     public GroebnerBaseWalk(RingFactory<C> coFac) {
-        this(GBFactory.getImplementation(coFac));
+        this(GBFactory.<C>getImplementation(coFac));
     }
 
 
@@ -93,7 +93,7 @@ public class GroebnerBaseWalk<C extends RingElem<C>> extends GroebnerBaseAbstrac
      * @param t1    start term order.
      */
     public GroebnerBaseWalk(RingFactory<C> coFac, TermOrder t1) {
-        this(GBFactory.getImplementation(coFac), t1);
+        this(GBFactory.<C>getImplementation(coFac), t1);
     }
 
 
@@ -143,7 +143,7 @@ public class GroebnerBaseWalk<C extends RingElem<C>> extends GroebnerBaseAbstrac
      */
     public List<GenPolynomial<C>> GB(int modv, List<GenPolynomial<C>> F) {
         List<GenPolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolyUtil.monic(G);
+        G = PolyUtil.<C>monic(G);
         if (G == null || G.size() == 0) {
             return G;
         }
@@ -168,7 +168,7 @@ public class GroebnerBaseWalk<C extends RingElem<C>> extends GroebnerBaseAbstrac
 
         // compute graded / start term order Groebner base
         if (sgb == null) {
-            sgb = GBFactory.getImplementation(pfac.coFac, strategy);
+            sgb = GBFactory.<C>getImplementation(pfac.coFac, strategy);
         }
         List<GenPolynomial<C>> Gp = sgb.GB(modv, Fp);
         logger.info("graded / start GB = " + Gp);

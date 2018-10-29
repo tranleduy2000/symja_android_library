@@ -16,7 +16,7 @@ import java.util.Random;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.Monomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 

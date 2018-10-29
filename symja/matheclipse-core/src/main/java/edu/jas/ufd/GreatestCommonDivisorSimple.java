@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -21,7 +21,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends GreatestCommonDivisorAbstract<C> {
+public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GreatestCommonDivisorSimple.class);
@@ -91,7 +91,7 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
         //System.out.println("q = " + q);
         //System.out.println("r = " + r);
         while (!r.isZERO()) {
-            x = PolyUtil.baseSparsePseudoRemainder(q, r);
+            x = PolyUtil.<C>baseSparsePseudoRemainder(q, r);
             q = r;
             if (field) {
                 r = x.monic();
@@ -145,8 +145,8 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
             logger.debug("degrees: e = " + e + ", f = " + f);
         }
         if (field) {
-            r = PolyUtil.monic(r);
-            q = PolyUtil.monic(q);
+            r = PolyUtil.<C>monic(r);
+            q = PolyUtil.<C>monic(q);
         } else {
             r = r.abs();
             q = q.abs();
@@ -156,8 +156,8 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
 
         GenPolynomial<C> c = gcd(a, b); // go to recursion
         //System.out.println("rgcd c = " + c);
-        r = PolyUtil.recursiveDivide(r, a);
-        q = PolyUtil.recursiveDivide(q, b);
+        r = PolyUtil.<C>recursiveDivide(r, a);
+        q = PolyUtil.<C>recursiveDivide(q, b);
         if (r.isONE()) {
             return r.multiply(c);
         }
@@ -166,13 +166,13 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
         }
         GenPolynomial<GenPolynomial<C>> x;
         while (!r.isZERO()) {
-            x = PolyUtil.recursivePseudoRemainder(q, r);
+            x = PolyUtil.<C>recursivePseudoRemainder(q, r);
             if (logger.isInfoEnabled()) {
                 logger.info("recursivePseudoRemainder.bits = " + x.bitLength());
             }
             q = r;
             if (field) {
-                r = PolyUtil.monic(x);
+                r = PolyUtil.<C>monic(x);
             } else {
                 r = x;
             }
@@ -237,7 +237,7 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
             if (field) {
                 x = q.remainder(r);
             } else {
-                x = PolyUtil.baseSparsePseudoRemainder(q, r);
+                x = PolyUtil.<C>baseSparsePseudoRemainder(q, r);
                 //System.out.println("x_s = " + x + ", lbcf(r) = " + r.leadingBaseCoefficient());
             }
             if (x.isZERO()) {
@@ -323,7 +323,7 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
         GenPolynomial<C> c = cofac.getONE();
         long g;
         do {
-            x = PolyUtil.recursiveSparsePseudoRemainder(q, r);
+            x = PolyUtil.<C>recursiveSparsePseudoRemainder(q, r);
             //x = PolyUtil.<C>recursiveDensePseudoRemainder(q,r);
             if (x.isZERO()) {
                 return x;

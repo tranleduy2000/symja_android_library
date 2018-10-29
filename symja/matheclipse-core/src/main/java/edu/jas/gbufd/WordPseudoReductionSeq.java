@@ -15,7 +15,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.Word;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

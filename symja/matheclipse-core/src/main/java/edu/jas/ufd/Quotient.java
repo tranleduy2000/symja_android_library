@@ -9,10 +9,9 @@ import org.apache.log4j.Logger;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPair;
-import edu.jas.structure.elem.RingElemImpl;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -21,8 +20,8 @@ import edu.jas.structure.elem.RingElemImpl;
  *
  * @author Heinz Kredel
  */
-public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
-        implements RingElem<Quotient<C>>,
+public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>>
+        implements GcdRingElem<Quotient<C>>,
         QuotPair<GenPolynomial<C>> {
 
 
@@ -131,7 +130,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public QuotientRing<C> factory() {
         return ring;
@@ -173,7 +172,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Is Quotient zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         return num.isZERO();
@@ -184,7 +183,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Is Quotient one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         return num.equals(den);
@@ -195,10 +194,13 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Is Quotient a unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see RingElem#isUnit()
+     * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
-        return !num.isZERO();
+        if (num.isZERO()) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -234,7 +236,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -253,7 +255,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -331,7 +333,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Quotient absolute value.
      *
      * @return the absolute value of this.
-     * @see RingElem#abs()
+     * @see edu.jas.structure.RingElem#abs()
      */
     public Quotient<C> abs() {
         return new Quotient<C>(ring, num.abs(), den, true);
@@ -405,7 +407,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Quotient negate.
      *
      * @return -this.
-     * @see RingElem#negate()
+     * @see edu.jas.structure.RingElem#negate()
      */
     public Quotient<C> negate() {
         return new Quotient<C>(ring, num.negate(), den, true);
@@ -416,7 +418,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Quotient signum.
      *
      * @return signum(this).
-     * @see RingElem#signum()
+     * @see edu.jas.structure.RingElem#signum()
      */
     public int signum() {
         // assume sign(den) > 0
@@ -450,7 +452,7 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>>
      * Quotient inverse.
      *
      * @return S with S = 1/this.
-     * @see RingElem#inverse()
+     * @see edu.jas.structure.RingElem#inverse()
      */
     public Quotient<C> inverse() {
         if (num.isZERO()) {

@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -19,7 +19,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public class GreatestCommonDivisorPrimitive<C extends RingElem<C>> extends
+public class GreatestCommonDivisorPrimitive<C extends GcdRingElem<C>> extends
         GreatestCommonDivisorAbstract<C> {
 
 
@@ -80,7 +80,7 @@ public class GreatestCommonDivisorPrimitive<C extends RingElem<C>> extends
         }
         GenPolynomial<C> x;
         while (!r.isZERO()) {
-            x = PolyUtil.baseSparsePseudoRemainder(q, r);
+            x = PolyUtil.<C>baseSparsePseudoRemainder(q, r);
             q = r;
             r = basePrimitivePart(x);
         }
@@ -132,8 +132,8 @@ public class GreatestCommonDivisorPrimitive<C extends RingElem<C>> extends
 
         GenPolynomial<C> c = gcd(a, b); // go to recursion
         //System.out.println("rgcd c = " + c);
-        r = PolyUtil.recursiveDivide(r, a);
-        q = PolyUtil.recursiveDivide(q, b);
+        r = PolyUtil.<C>recursiveDivide(r, a);
+        q = PolyUtil.<C>recursiveDivide(q, b);
         if (r.isONE()) {
             return r.multiply(c);
         }
@@ -142,7 +142,7 @@ public class GreatestCommonDivisorPrimitive<C extends RingElem<C>> extends
         }
         GenPolynomial<GenPolynomial<C>> x;
         while (!r.isZERO()) {
-            x = PolyUtil.recursivePseudoRemainder(q, r);
+            x = PolyUtil.<C>recursivePseudoRemainder(q, r);
             if (logger.isInfoEnabled()) {
                 logger.info("recursivePseudoRemainder.bits = " + x.bitLength());
             }

@@ -33,8 +33,8 @@ import edu.jas.gbufd.GroebnerBaseWalk;
 import edu.jas.kern.ComputerThreads;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingFactory;
 import edu.jas.ufd.Quotient;
 import edu.jas.ufd.QuotientRing;
 
@@ -107,7 +107,7 @@ import edu.jas.ufd.QuotientRing;
  * @see GBFactory
  */
 
-public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
+public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializable {
 
 
     private static final Logger logger = Logger.getLogger(GBAlgorithmBuilder.class);
@@ -170,7 +170,7 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
             strategy = new OrderedPairlist<C>();
         } else {
             if (algo == null) { // or overwrite?
-                algo = GBFactory.getImplementation(ring.coFac, strategy);
+                algo = GBFactory.<C>getImplementation(ring.coFac, strategy);
             }
         }
         this.algo = algo; // null accepted
@@ -183,7 +183,7 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
      * @param fac the commutative polynomial ring.
      * @return GBAlgorithmBuilder object.
      */
-    public static <C extends RingElem<C>> GBAlgorithmBuilder<C> polynomialRing(GenPolynomialRing<C> fac) {
+    public static <C extends GcdRingElem<C>> GBAlgorithmBuilder<C> polynomialRing(GenPolynomialRing<C> fac) {
         return new GBAlgorithmBuilder<C>(fac);
     }
 
@@ -195,9 +195,9 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
     public GroebnerBaseAbstract<C> build() {
         if (algo == null) {
             if (strategy == null) { // should not happen
-                algo = GBFactory.getImplementation(ring.coFac);
+                algo = GBFactory.<C>getImplementation(ring.coFac);
             } else {
-                algo = GBFactory.getImplementation(ring.coFac, strategy);
+                algo = GBFactory.<C>getImplementation(ring.coFac, strategy);
             }
         }
         return algo;
@@ -255,7 +255,7 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
      */
     public GBAlgorithmBuilder<C> optimize(boolean rP) {
         if (algo == null) {
-            algo = GBFactory.getImplementation(ring.coFac, strategy);
+            algo = GBFactory.<C>getImplementation(ring.coFac, strategy);
         }
         GroebnerBaseAbstract<C> bb = new GBOptimized<C>(algo, rP);
         return new GBAlgorithmBuilder<C>(ring, bb, strategy);
@@ -273,19 +273,19 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
         if (algo != null) {
             logger.warn("selected algorithm ignored: " + algo + ", use fractionFree before");
         }
-        if (ring.coFac instanceof BigRational) {
-            BigRational cf = (BigRational) ring.coFac;
+        if (((Object) ring.coFac) instanceof BigRational) {
+            BigRational cf = (BigRational) (Object) ring.coFac;
             PairList<BigRational> sty = (PairList) strategy;
             GroebnerBaseAbstract<BigRational> bb = GBFactory.getImplementation(cf, GBFactory.Algo.ffgb, sty);
-            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) bb;
+            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) (GroebnerBaseAbstract) bb;
             return new GBAlgorithmBuilder<C>(ring, cbb, strategy);
         }
-        if (ring.coFac instanceof QuotientRing) {
-            QuotientRing<C> cf = (QuotientRing<C>) ring.coFac;
+        if (((Object) ring.coFac) instanceof QuotientRing) {
+            QuotientRing<C> cf = (QuotientRing<C>) (Object) ring.coFac;
             PairList<Quotient<C>> sty = (PairList) strategy;
-            GroebnerBaseAbstract<Quotient<C>> bb = GBFactory.getImplementation(cf, GBFactory.Algo.ffgb,
+            GroebnerBaseAbstract<Quotient<C>> bb = GBFactory.<C>getImplementation(cf, GBFactory.Algo.ffgb,
                     sty);
-            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) bb;
+            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) (GroebnerBaseAbstract) bb;
             return new GBAlgorithmBuilder<C>(ring, cbb, strategy);
         }
         logger.warn("no fraction free algorithm implemented for " + ring);
@@ -314,16 +314,16 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
         if (strategy != null) {
             logger.warn("strategie " + strategy + " ignored");
         }
-        if (ring.coFac instanceof BigInteger) {
-            BigInteger cf = (BigInteger) ring.coFac;
+        if (((Object) ring.coFac) instanceof BigInteger) {
+            BigInteger cf = (BigInteger) (Object) ring.coFac;
             GroebnerBaseAbstract<BigInteger> bb = GBFactory.getImplementation(cf, a);
-            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) bb;
+            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) (GroebnerBaseAbstract) bb;
             return new GBAlgorithmBuilder<C>(ring, cbb);
         }
-        if (ring.coFac instanceof GenPolynomial) {
-            GenPolynomialRing<C> cf = (GenPolynomialRing) ring.coFac;
-            GroebnerBaseAbstract<GenPolynomial<C>> bb = GBFactory.getImplementation(cf, a);
-            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) bb;
+        if (((Object) ring.coFac) instanceof GenPolynomial) {
+            GenPolynomialRing<C> cf = (GenPolynomialRing) (Object) ring.coFac;
+            GroebnerBaseAbstract<GenPolynomial<C>> bb = GBFactory.<C>getImplementation(cf, a);
+            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) (GroebnerBaseAbstract) bb;
             return new GBAlgorithmBuilder<C>(ring, cbb);
         }
         logger.warn("no domain algorithm implemented for " + ring);
@@ -357,14 +357,14 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
             return this;
         }
         if (algo == null) {
-            algo = GBFactory.getImplementation(ring.coFac, strategy);
+            algo = GBFactory.<C>getImplementation(ring.coFac, strategy);
         }
         if (algo instanceof GroebnerBaseSeqIter) { // iterative requested
             GroebnerBaseAbstract<C> bb;
-            bb = new GroebnerBaseParIter<C>(threads, strategy);
+            bb = (GroebnerBaseAbstract) new GroebnerBaseParIter<C>(threads, strategy);
             GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
             return new GBAlgorithmBuilder<C>(ring, pbb, strategy);
-        } else if (ring.coFac instanceof BigRational) {
+        } else if (((RingFactory) ring.coFac) instanceof BigRational) {
             GroebnerBaseAbstract<C> bb;
             if (algo instanceof GroebnerBaseRational) { // fraction free requested
                 PairList<BigInteger> pli;
@@ -377,11 +377,11 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
                 }
                 bb = (GroebnerBaseAbstract) new GroebnerBaseRational<BigRational>(threads, pli);
             } else {
-                bb = new GroebnerBaseParallel<C>(threads, strategy);
+                bb = (GroebnerBaseAbstract) new GroebnerBaseParallel<C>(threads, strategy);
             }
             GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
             return new GBAlgorithmBuilder<C>(ring, pbb, strategy);
-        } else if (ring.coFac instanceof QuotientRing) {
+        } else if (((RingFactory) ring.coFac) instanceof QuotientRing) {
             GroebnerBaseAbstract<C> bb;
             if (algo instanceof GroebnerBaseQuotient) { // fraction free requested
                 PairList<GenPolynomial<C>> pli;
@@ -395,7 +395,7 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
                 QuotientRing<C> fac = (QuotientRing) ring.coFac;
                 bb = (GroebnerBaseAbstract) new GroebnerBaseQuotient<C>(threads, fac, pli); // pl not possible
             } else {
-                bb = new GroebnerBaseParallel<C>(threads, strategy);
+                bb = (GroebnerBaseAbstract) new GroebnerBaseParallel<C>(threads, strategy);
             }
             GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
             return new GBAlgorithmBuilder<C>(ring, pbb);
@@ -403,7 +403,7 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
             GroebnerBaseAbstract<C> bb = new GroebnerBaseParallel<C>(threads, strategy);
             GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
             return new GBAlgorithmBuilder<C>(ring, pbb, strategy);
-        } else if (ring.coFac.getONE() instanceof RingElem) {
+        } else if (ring.coFac.getONE() instanceof GcdRingElem) {
             GroebnerBaseAbstract<C> bb = new GroebnerBasePseudoParallel<C>(threads, ring.coFac, strategy);
             GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
             return new GBAlgorithmBuilder<C>(ring, pbb, strategy);
@@ -573,7 +573,7 @@ public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     public String toScript() {
         // Python case

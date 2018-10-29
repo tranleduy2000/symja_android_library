@@ -5,8 +5,6 @@
 package edu.jas.structure;
 
 
-import edu.jas.structure.elem.MonoidElem;
-
 /**
  * Monoid factory interface. Defines get one and tests for associativity and
  * commutativity.

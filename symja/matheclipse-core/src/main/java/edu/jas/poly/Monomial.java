@@ -7,8 +7,8 @@ package edu.jas.poly;
 import java.util.Map;
 
 import edu.jas.structure.ElemFactory;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.Element;
+import edu.jas.structure.RingElem;
 
 
 /**

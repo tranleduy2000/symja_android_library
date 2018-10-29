@@ -17,7 +17,7 @@ import java.util.Random;
 
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.ModulFactory;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 

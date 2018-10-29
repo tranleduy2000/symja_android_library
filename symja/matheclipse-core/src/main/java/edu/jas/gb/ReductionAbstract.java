@@ -15,7 +15,7 @@ import java.util.Map;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.Monomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

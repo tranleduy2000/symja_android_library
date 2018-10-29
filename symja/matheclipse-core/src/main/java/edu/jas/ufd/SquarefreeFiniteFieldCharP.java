@@ -16,7 +16,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.Monomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.Power;
 import edu.jas.structure.RingFactory;
 
@@ -27,7 +27,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class SquarefreeFiniteFieldCharP<C extends RingElem<C>> extends SquarefreeFieldCharP<C> {
+public class SquarefreeFiniteFieldCharP<C extends GcdRingElem<C>> extends SquarefreeFieldCharP<C> {
 
 
     private static final Logger logger = Logger.getLogger(SquarefreeFiniteFieldCharP.class);
@@ -102,7 +102,7 @@ public class SquarefreeFiniteFieldCharP<C extends RingElem<C>> extends Squarefre
             BigInteger p = new BigInteger(aCoFac.characteristic());
             BigInteger q = p.power(d - 1); //Power.<BigInteger> positivePower(p, d - 1);
             //System.out.println("p**(d-1) = " + q);
-            r = Power.positivePower(r, q.getVal()); // r.power(q.getVal());
+            r = Power.<C>positivePower(r, q.getVal()); // r.power(q.getVal());
             //System.out.println("r**q = " + r);
             return r;
         }

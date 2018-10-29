@@ -9,7 +9,7 @@ import java.util.List;
 
 import edu.jas.gb.Reduction;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RegularRingElem;
+import edu.jas.structure.RegularRingElem;
 
 
 /**

@@ -7,9 +7,6 @@ package edu.jas.structure;
 
 import java.util.List;
 
-import edu.jas.structure.elem.ModulElem;
-import edu.jas.structure.elem.RingElem;
-
 
 /**
  * Module factory interface. Defines conversion from list and sparse random.

@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -37,7 +37,7 @@ import edu.jas.structure.elem.RingElem;
  * @see GCDFactory#getImplementation
  */
 
-public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializable {
+public interface GreatestCommonDivisor<C extends GcdRingElem<C>> extends Serializable {
 
 
     /**
@@ -46,7 +46,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param P GenPolynomial.
      * @return cont(P).
      */
-    GenPolynomial<C> content(GenPolynomial<C> P);
+    public GenPolynomial<C> content(GenPolynomial<C> P);
 
 
     /**
@@ -55,7 +55,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param P GenPolynomial.
      * @return pp(P).
      */
-    GenPolynomial<C> primitivePart(GenPolynomial<C> P);
+    public GenPolynomial<C> primitivePart(GenPolynomial<C> P);
 
 
     /**
@@ -65,7 +65,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param S GenPolynomial.
      * @return gcd(P, S).
      */
-    GenPolynomial<C> gcd(GenPolynomial<C> P, GenPolynomial<C> S);
+    public GenPolynomial<C> gcd(GenPolynomial<C> P, GenPolynomial<C> S);
 
 
     /**
@@ -75,7 +75,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param S GenPolynomial.
      * @return lcm(P, S).
      */
-    GenPolynomial<C> lcm(GenPolynomial<C> P, GenPolynomial<C> S);
+    public GenPolynomial<C> lcm(GenPolynomial<C> P, GenPolynomial<C> S);
 
 
     /**
@@ -87,7 +87,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @return res(P, S).
      * @throws UnsupportedOperationException if there is no implementation in the sub-class.
      */
-    GenPolynomial<C> resultant(GenPolynomial<C> P, GenPolynomial<C> S);
+    public GenPolynomial<C> resultant(GenPolynomial<C> P, GenPolynomial<C> S);
 
 
     /**
@@ -98,7 +98,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * a in A there exists b in B with b|a. B does not contain zero or
      * constant polynomials.
      */
-    List<GenPolynomial<C>> coPrime(List<GenPolynomial<C>> A);
+    public List<GenPolynomial<C>> coPrime(List<GenPolynomial<C>> A);
 
 
     /**
@@ -107,6 +107,6 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param A list of GenPolynomials.
      * @return true if gcd(b,c) = 1 for all b != c in B, else false.
      */
-    boolean isCoPrime(List<GenPolynomial<C>> A);
+    public boolean isCoPrime(List<GenPolynomial<C>> A);
 
 }

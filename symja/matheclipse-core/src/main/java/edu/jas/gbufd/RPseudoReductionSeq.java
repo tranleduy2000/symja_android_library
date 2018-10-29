@@ -12,7 +12,7 @@ import java.util.Map;
 
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RegularRingElem;
+import edu.jas.structure.RegularRingElem;
 
 
 /**

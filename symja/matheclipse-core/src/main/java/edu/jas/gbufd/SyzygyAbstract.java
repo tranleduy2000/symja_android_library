@@ -17,7 +17,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.ModuleList;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.vector.BasicLinAlg;
 import edu.jas.vector.GenVector;
 import edu.jas.vector.GenVectorModul;
@@ -30,7 +30,7 @@ import edu.jas.vector.GenVectorModul;
  * @author Heinz Kredel
  */
 
-public abstract class SyzygyAbstract<C extends RingElem<C>> implements Syzygy<C> {
+public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy<C> {
 
 
     private static final Logger logger = Logger.getLogger(SyzygyAbstract.class);

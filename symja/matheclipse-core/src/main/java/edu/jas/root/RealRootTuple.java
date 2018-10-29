@@ -12,7 +12,7 @@ import java.util.List;
 import edu.jas.arith.BigDecimal;
 import edu.jas.arith.BigRational;
 import edu.jas.arith.Rational;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -21,7 +21,7 @@ import edu.jas.structure.elem.RingElem;
  * @param <C> coefficient type.
  * @author Heinz Kredel
  */
-public class RealRootTuple<C extends RingElem<C> & Rational> implements Serializable {
+public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Serializable {
 
 
     /**

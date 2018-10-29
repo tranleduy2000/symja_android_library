@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -19,7 +19,7 @@ import edu.jas.structure.elem.RingElem;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public interface CharacteristicSet<C extends RingElem<C>> extends Serializable {
+public interface CharacteristicSet<C extends GcdRingElem<C>> extends Serializable {
 
 
     /**
@@ -28,7 +28,7 @@ public interface CharacteristicSet<C extends RingElem<C>> extends Serializable {
      * @param A list of generic polynomials.
      * @return charSet(A) with at most one polynomial per main variable.
      */
-    List<GenPolynomial<C>> characteristicSet(List<GenPolynomial<C>> A);
+    public List<GenPolynomial<C>> characteristicSet(List<GenPolynomial<C>> A);
 
 
     /**
@@ -37,7 +37,7 @@ public interface CharacteristicSet<C extends RingElem<C>> extends Serializable {
      * @param A list of generic polynomials.
      * @return true, if A is (at least a simple) characteristic set, else false.
      */
-    boolean isCharacteristicSet(List<GenPolynomial<C>> A);
+    public boolean isCharacteristicSet(List<GenPolynomial<C>> A);
 
 
     /**
@@ -49,6 +49,6 @@ public interface CharacteristicSet<C extends RingElem<C>> extends Serializable {
      * @return characteristicSetRemainder(A, P) or
      * characteristicSetReductionCoeff(A,characteristicSetRemainder(A,P)) depending on the algorithm.
      */
-    GenPolynomial<C> characteristicSetReduction(List<GenPolynomial<C>> A, GenPolynomial<C> P);
+    public GenPolynomial<C> characteristicSetReduction(List<GenPolynomial<C>> A, GenPolynomial<C> P);
 
 }

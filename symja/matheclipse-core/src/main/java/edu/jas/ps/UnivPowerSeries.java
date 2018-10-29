@@ -9,9 +9,9 @@ import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.structure.BinaryFunctor;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
-import edu.jas.structure.elem.RingElemImpl;
+import edu.jas.structure.Element;
+import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.Selector;
 import edu.jas.structure.UnaryFunctor;
 

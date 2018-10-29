@@ -2,12 +2,10 @@
  * $Id$
  */
 
-package edu.jas.structure.elem;
+package edu.jas.structure;
 
 
 import java.util.List;
-
-import edu.jas.structure.AbelianGroupElem;
 
 
 /**

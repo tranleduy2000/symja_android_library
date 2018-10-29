@@ -23,7 +23,7 @@ import java.util.Set;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
 import edu.jas.structure.RingFactory;
-import edu.jas.structure.elem.Element;
+import edu.jas.structure.Element;
 import edu.jas.util.CartesianProduct;
 import edu.jas.util.CartesianProductInfinite;
 import edu.jas.util.LongIterable;

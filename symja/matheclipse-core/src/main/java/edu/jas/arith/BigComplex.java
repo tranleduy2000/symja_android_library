@@ -14,9 +14,8 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
-import edu.jas.structure.elem.RingElemImpl;
+import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.StarRingElem;
 
@@ -28,7 +27,7 @@ import edu.jas.structure.StarRingElem;
  *
  * @author Heinz Kredel
  */
-public final class BigComplex extends RingElemImpl<BigComplex> implements StarRingElem<BigComplex>, RingElem<BigComplex>,
+public final class BigComplex extends RingElemImpl<BigComplex> implements StarRingElem<BigComplex>, GcdRingElem<BigComplex>,
         RingFactory<BigComplex> {
 
 
@@ -270,7 +269,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public BigComplex factory() {
         return this;
@@ -438,7 +437,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -490,7 +489,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -502,7 +501,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * Is Complex number zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         return re.isZERO() && im.isZERO();
@@ -512,7 +511,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * Is Complex number one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         return re.isONE() && im.isZERO();
@@ -531,7 +530,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * Is Complex unit element.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see RingElem#isUnit()
+     * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
         return (!isZERO());
@@ -587,7 +586,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      *
      * @return 0 if this is equal to 0; 1 if re > 0, or re == 0 and im > 0; -1
      * if re < 0, or re == 0 and im < 0
-     * @see RingElem#signum()
+     * @see edu.jas.structure.RingElem#signum()
      */
     public int signum() {
         int s = re.signum();
@@ -621,7 +620,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * Complex number negative.
      *
      * @return -this.
-     * @see RingElem#negate()
+     * @see edu.jas.structure.RingElem#negate()
      */
     public BigComplex negate() {
         return new BigComplex(re.negate(), im.negate());
@@ -657,7 +656,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * Complex number absolute value.
      *
      * @return |this|^2. Note: The square root is not jet implemented.
-     * @see RingElem#abs()
+     * @see edu.jas.structure.RingElem#abs()
      */
     public BigComplex abs() {
         BigComplex n = norm();
@@ -681,7 +680,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * Complex number inverse.
      *
      * @return S with S*this = 1.
-     * @see RingElem#inverse()
+     * @see edu.jas.structure.RingElem#inverse()
      */
     public BigComplex inverse() {
         BigRational a = norm().re.inverse();

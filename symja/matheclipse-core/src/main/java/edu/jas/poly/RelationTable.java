@@ -17,7 +17,7 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import edu.jas.kern.PrettyPrint;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

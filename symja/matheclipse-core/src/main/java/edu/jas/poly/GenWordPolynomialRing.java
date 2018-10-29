@@ -18,8 +18,8 @@ import java.util.Random;
 
 import edu.jas.kern.PreemptStatus;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.Element;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 

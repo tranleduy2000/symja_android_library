@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -24,7 +24,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends GreatestCommonDivisorAbstract<C> {
+public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GreatestCommonDivisorSimple.class);
@@ -105,7 +105,7 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
         //System.out.println("baseGCD: q = " + q);
         //System.out.println("baseGCD: r = " + r);
         while (!r.isZERO()) {
-            x = FDUtil.leftBaseSparsePseudoRemainder(q, r);
+            x = FDUtil.<C>leftBaseSparsePseudoRemainder(q, r);
             q = r;
             if (field) {
                 r = x.monic();
@@ -183,7 +183,7 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
         //System.out.println("baseGCD: q = " + q);
         //System.out.println("baseGCD: r = " + r);
         while (!r.isZERO()) {
-            x = FDUtil.rightBaseSparsePseudoRemainder(q, r);
+            x = FDUtil.<C>rightBaseSparsePseudoRemainder(q, r);
             q = r;
             if (field) {
                 r = x.monic();
@@ -246,15 +246,15 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
             logger.debug("degrees: e = " + e + ", f = " + f);
         }
         if (field) {
-            r = PolyUtil.monic(r);
-            q = PolyUtil.monic(q);
+            r = PolyUtil.<C>monic(r);
+            q = PolyUtil.<C>monic(q);
         } else {
             r = (GenSolvablePolynomial<GenPolynomial<C>>) r.abs();
             q = (GenSolvablePolynomial<GenPolynomial<C>>) q.abs();
         }
         GenSolvablePolynomial<C> a = rightRecursiveContent(r);
         ///rs = FDUtil.<C> recursiveDivideRightEval(r, a);  
-        rs = FDUtil.recursiveLeftDivide(r, a);
+        rs = FDUtil.<C>recursiveLeftDivide(r, a);
         //rs = FDUtil.<C> recursiveRightDivide(r, a);
         if (debug) {
             logger.info("recCont a = " + a + ", r = " + r);
@@ -273,7 +273,7 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
         r = rs;
         GenSolvablePolynomial<C> b = rightRecursiveContent(q);
         ///qs = FDUtil.<C> recursiveDivideRightEval(q, b);  
-        qs = FDUtil.recursiveLeftDivide(q, b);
+        qs = FDUtil.<C>recursiveLeftDivide(q, b);
         //qs = FDUtil.<C> recursiveRightDivide(q, b);
         if (debug) {
             logger.info("recCont b = " + b + ", q = " + q);
@@ -305,10 +305,10 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
             logger.info("gcd-loop, start: q = " + q + ", r = " + r);
         }
         while (!r.isZERO()) {
-            x = FDUtil.recursiveSparsePseudoRemainder(q, r);
+            x = FDUtil.<C>recursiveSparsePseudoRemainder(q, r);
             q = r;
             if (field) {
-                r = PolyUtil.monic(x);
+                r = PolyUtil.<C>monic(x);
             } else {
                 r = x;
             }
@@ -318,12 +318,12 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
         }
         if (debug) {
             logger.info("gcd(div) = " + q + ", rs = " + rs + ", qs = " + qs);
-            rp = FDUtil.recursiveSparsePseudoRemainder(rs, q);
-            qp = FDUtil.recursiveSparsePseudoRemainder(qs, q);
+            rp = FDUtil.<C>recursiveSparsePseudoRemainder(rs, q);
+            qp = FDUtil.<C>recursiveSparsePseudoRemainder(qs, q);
             if (!qp.isZERO() || !rp.isZERO()) {
                 logger.info("gcd(div): rem(r,g) = " + rp + ", rem(q,g) = " + qp);
-                rp = FDUtil.recursivePseudoQuotient(rs, q);
-                qp = FDUtil.recursivePseudoQuotient(qs, q);
+                rp = FDUtil.<C>recursivePseudoQuotient(rs, q);
+                qp = FDUtil.<C>recursivePseudoQuotient(qs, q);
                 logger.info("gcd(div): r/g = " + rp + ", q/g = " + qp);
                 throw new RuntimeException("recGcd, div: not divisible");
             }
@@ -385,14 +385,14 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
             logger.debug("RI-degrees: e = " + e + ", f = " + f);
         }
         if (field) {
-            r = PolyUtil.monic(r);
-            q = PolyUtil.monic(q);
+            r = PolyUtil.<C>monic(r);
+            q = PolyUtil.<C>monic(q);
         } else {
             r = (GenSolvablePolynomial<GenPolynomial<C>>) r.abs();
             q = (GenSolvablePolynomial<GenPolynomial<C>>) q.abs();
         }
         GenSolvablePolynomial<C> a = leftRecursiveContent(r);
-        rs = FDUtil.recursiveRightDivide(r, a);
+        rs = FDUtil.<C>recursiveRightDivide(r, a);
         //no: rs = FDUtil.<C> recursiveLeftDivide(r, a);
         //no: rs = FDUtil.<C> recursiveRightPseudoQuotient(r, a);
         if (debug) {
@@ -409,7 +409,7 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
         }
         r = rs;
         GenSolvablePolynomial<C> b = leftRecursiveContent(q);
-        qs = FDUtil.recursiveRightDivide(q, b);
+        qs = FDUtil.<C>recursiveRightDivide(q, b);
         if (debug) {
             logger.info("RI-recCont b = " + b + ", q = " + q);
             logger.info("RI-recCont q/b = " + qs + ", q%b = " + q.subtract(qs.multiplyLeft(b)));
@@ -437,10 +437,10 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
             logger.info("RI-gcd-loop, start: q = " + q + ", r = " + r);
         }
         while (!r.isZERO()) {
-            x = FDUtil.recursiveRightSparsePseudoRemainder(q, r);
+            x = FDUtil.<C>recursiveRightSparsePseudoRemainder(q, r);
             q = r;
             if (field) {
-                r = PolyUtil.monic(x);
+                r = PolyUtil.<C>monic(x);
             } else {
                 r = x;
             }
@@ -450,12 +450,12 @@ public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends Greatest
         }
         if (debug) {
             logger.info("RI-gcd(div) = " + q + ", rs = " + rs + ", qs = " + qs);
-            rp = FDUtil.recursiveRightSparsePseudoRemainder(rs, q);
-            qp = FDUtil.recursiveRightSparsePseudoRemainder(qs, q);
+            rp = FDUtil.<C>recursiveRightSparsePseudoRemainder(rs, q);
+            qp = FDUtil.<C>recursiveRightSparsePseudoRemainder(qs, q);
             if (!qp.isZERO() || !rp.isZERO()) {
                 logger.info("RI-gcd(div): rem(r,g) = " + rp + ", rem(q,g) = " + qp);
-                rp = FDUtil.recursivePseudoQuotient(rs, q);
-                qp = FDUtil.recursivePseudoQuotient(qs, q);
+                rp = FDUtil.<C>recursivePseudoQuotient(rs, q);
+                qp = FDUtil.<C>recursivePseudoQuotient(qs, q);
                 logger.info("RI-gcd(div): r/g = " + rp + ", q/g = " + qp);
                 //logger.info("gcd(div): rp*g = " + rp.multiply(q) + ", qp*g = " + qp.multiply(q));
                 throw new RuntimeException("recGcd, div: not divisible");

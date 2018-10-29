@@ -24,7 +24,7 @@ import edu.jas.poly.OrderedPolynomialList;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.PolynomialList;
 import edu.jas.poly.TermOrder;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.vector.BasicLinAlg;
 

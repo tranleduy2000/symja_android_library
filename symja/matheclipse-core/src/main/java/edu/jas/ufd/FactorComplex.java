@@ -17,7 +17,7 @@ import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -32,7 +32,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class FactorComplex<C extends RingElem<C>> extends FactorAbsolute<Complex<C>> {
+public class FactorComplex<C extends GcdRingElem<C>> extends FactorAbsolute<Complex<C>> {
 
 
     private static final Logger logger = Logger.getLogger(FactorComplex.class);
@@ -79,7 +79,7 @@ public class FactorComplex<C extends RingElem<C>> extends FactorAbsolute<Complex
     public FactorComplex(ComplexRing<C> fac) {
         super(fac);
         this.afac = fac.algebraicRing();
-        this.factorAlgeb = FactorFactory.getImplementation(afac);
+        this.factorAlgeb = FactorFactory.<C>getImplementation(afac);
     }
 
 
@@ -130,7 +130,7 @@ public class FactorComplex<C extends RingElem<C>> extends FactorAbsolute<Complex
         }
         //System.out.println("\nP = " + P);
         GenPolynomialRing<AlgebraicNumber<C>> pafac = new GenPolynomialRing<AlgebraicNumber<C>>(afac, pfac);
-        GenPolynomial<AlgebraicNumber<C>> A = PolyUtil.algebraicFromComplex(pafac, P);
+        GenPolynomial<AlgebraicNumber<C>> A = PolyUtil.<C>algebraicFromComplex(pafac, P);
         //System.out.println("A = " + A);
         List<GenPolynomial<AlgebraicNumber<C>>> afactors = factorAlgeb.baseFactorsSquarefree(A);
         if (debug) {
@@ -138,7 +138,7 @@ public class FactorComplex<C extends RingElem<C>> extends FactorAbsolute<Complex
             logger.info("complex afactors = " + afactors);
         }
         for (GenPolynomial<AlgebraicNumber<C>> pa : afactors) {
-            GenPolynomial<Complex<C>> pc = PolyUtil.complexFromAlgebraic(pfac, pa);
+            GenPolynomial<Complex<C>> pc = PolyUtil.<C>complexFromAlgebraic(pfac, pa);
             factors.add(pc);
         }
         //System.out.println("cfactors = " + factors);

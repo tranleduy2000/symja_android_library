@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -20,7 +20,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializable {
+public interface GreatestCommonDivisor<C extends GcdRingElem<C>> extends Serializable {
 
 
     /**
@@ -31,7 +31,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @return gcd(P, S) with P = P'*gcd(P,S)*p and S = S'*gcd(P,S)*s, where
      * deg_main(p) = deg_main(s) == 0.
      */
-    GenSolvablePolynomial<C> leftGcd(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S);
+    public GenSolvablePolynomial<C> leftGcd(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S);
 
 
     /**
@@ -42,7 +42,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @return gcd(P, S) with P = p*gcd(P,S)*P' and S = s*gcd(P,S)*S', where
      * deg_main(p) = deg_main(s) == 0.
      */
-    GenSolvablePolynomial<C> rightGcd(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S);
+    public GenSolvablePolynomial<C> rightGcd(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S);
 
 
     /**
@@ -52,7 +52,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param S GenSolvablePolynomial.
      * @return lcm(P, S) with lcm(P,S) = P'*P = S'*S.
      */
-    GenSolvablePolynomial<C> leftLcm(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S);
+    public GenSolvablePolynomial<C> leftLcm(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S);
 
 
     /**
@@ -62,7 +62,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param S GenSolvablePolynomial.
      * @return lcm(P, S) with lcm(P,S) = P*P' = S*S'.
      */
-    GenSolvablePolynomial<C> rightLcm(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S);
+    public GenSolvablePolynomial<C> rightLcm(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S);
 
 
     /**
@@ -71,7 +71,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param P GenSolvablePolynomial.
      * @return cont(P) with pp(P)*cont(P) = P.
      */
-    GenSolvablePolynomial<C> rightContent(GenSolvablePolynomial<C> P);
+    public GenSolvablePolynomial<C> rightContent(GenSolvablePolynomial<C> P);
 
 
     /**
@@ -80,7 +80,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param P GenSolvablePolynomial.
      * @return pp(P) with pp(P)*cont(P) = P.
      */
-    GenSolvablePolynomial<C> rightPrimitivePart(GenSolvablePolynomial<C> P);
+    public GenSolvablePolynomial<C> rightPrimitivePart(GenSolvablePolynomial<C> P);
 
 
     /**
@@ -89,7 +89,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param P GenSolvablePolynomial.
      * @return cont(P) with cont(P)*pp(P) = P.
      */
-    GenSolvablePolynomial<C> leftContent(GenSolvablePolynomial<C> P);
+    public GenSolvablePolynomial<C> leftContent(GenSolvablePolynomial<C> P);
 
 
     /**
@@ -98,7 +98,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param P GenSolvablePolynomial.
      * @return pp(P) with cont(P)*pp(P) = P.
      */
-    GenSolvablePolynomial<C> leftPrimitivePart(GenSolvablePolynomial<C> P);
+    public GenSolvablePolynomial<C> leftPrimitivePart(GenSolvablePolynomial<C> P);
 
 
     /**
@@ -109,7 +109,7 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * non-constant a in A there exists b in B with b|a. B does not
      * contain zero or constant polynomials.
      */
-    List<GenSolvablePolynomial<C>> leftCoPrime(List<GenSolvablePolynomial<C>> A);
+    public List<GenSolvablePolynomial<C>> leftCoPrime(List<GenSolvablePolynomial<C>> A);
 
 
     /**
@@ -118,6 +118,6 @@ public interface GreatestCommonDivisor<C extends RingElem<C>> extends Serializab
      * @param A list of GenSolvablePolynomials.
      * @return true if leftGcd(b,c) = 1 for all b != c in B, else false.
      */
-    boolean isLeftCoPrime(List<GenSolvablePolynomial<C>> A);
+    public boolean isLeftCoPrime(List<GenSolvablePolynomial<C>> A);
 
 }

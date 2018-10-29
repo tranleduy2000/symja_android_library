@@ -26,8 +26,9 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.TermOrderOptimization;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.Power;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.util.KsubSet;
 
@@ -39,7 +40,7 @@ import edu.jas.util.KsubSet;
  * @param <MOD>
  * @author Heinz Kredel
  */
-public class FactorInteger<MOD extends RingElem<MOD> & Modular> extends FactorAbstract<BigInteger> {
+public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends FactorAbstract<BigInteger> {
 
 
     private static final Logger logger = Logger.getLogger(FactorInteger.class);

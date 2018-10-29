@@ -25,7 +25,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.Monomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.Power;
 import edu.jas.structure.RingFactory;
 
@@ -37,7 +37,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class SquarefreeInfiniteAlgebraicFieldCharP<C extends RingElem<C>> extends
+public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>> extends
         SquarefreeFieldCharP<AlgebraicNumber<C>> {
 
 
@@ -67,7 +67,7 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends RingElem<C>> extend
         GenPolynomialRing<C> rfac = afac.ring;
         //System.out.println("rfac = " + rfac);
         //System.out.println("rfac = " + rfac.coFac);
-        aengine = SquarefreeFactory.getImplementation(rfac);
+        aengine = SquarefreeFactory.<C>getImplementation(rfac);
         //System.out.println("aengine = " + aengine);
     }
 
@@ -155,7 +155,7 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends RingElem<C>> extend
             cp = cp.sum(pb);
         }
         GenPolynomial<AlgebraicNumber<C>> cpp = Power
-                .positivePower(cp, c);
+                .<GenPolynomial<AlgebraicNumber<C>>>positivePower(cp, c);
         if (logger.isInfoEnabled()) {
             logger.info("cp   = " + cp);
             logger.info("cp^p = " + cpp);
@@ -182,8 +182,8 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends RingElem<C>> extend
                         throw new UnsupportedOperationException(
                                 "case multiple algebraic extensions not implemented");
                     } else if (cc instanceof Quotient && pc instanceof Quotient) {
-                        Quotient<C> ccp = (Quotient<C>) cc;
-                        Quotient<C> pcp = (Quotient<C>) pc;
+                        Quotient<C> ccp = (Quotient<C>) (Object) cc;
+                        Quotient<C> pcp = (Quotient<C>) (Object) pc;
                         if (pcp.isConstant()) {
                             //logger.error("finite field not allowed here " + afac.toScript());
                             throw new ArithmeticException("finite field not allowed here " + afac.toScript());
@@ -301,13 +301,13 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends RingElem<C>> extend
         if (pfac.nvar > 1) {
             // go to recursion
             GenPolynomialRing<GenPolynomial<AlgebraicNumber<C>>> rfac = pfac.recursive(1);
-            GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> Pr = PolyUtil.recursive(
+            GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> Pr = PolyUtil.<AlgebraicNumber<C>>recursive(
                     rfac, P);
             GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> Prc = recursiveUnivariateRootCharacteristic(Pr);
             if (Prc == null) {
                 return null;
             }
-            GenPolynomial<AlgebraicNumber<C>> D = PolyUtil.distribute(pfac, Prc);
+            GenPolynomial<AlgebraicNumber<C>> D = PolyUtil.<AlgebraicNumber<C>>distribute(pfac, Prc);
             return D;
         }
         RingFactory<AlgebraicNumber<C>> rf = pfac.coFac;

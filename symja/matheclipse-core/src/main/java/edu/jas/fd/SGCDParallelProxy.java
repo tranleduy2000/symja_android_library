@@ -18,7 +18,7 @@ import edu.jas.kern.ComputerThreads;
 import edu.jas.kern.PreemptingException;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -31,7 +31,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class SGCDParallelProxy<C extends RingElem<C>> extends GreatestCommonDivisorAbstract<C> {
+public class SGCDParallelProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(SGCDParallelProxy.class);

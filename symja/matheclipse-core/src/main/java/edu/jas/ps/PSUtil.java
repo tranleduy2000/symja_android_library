@@ -7,7 +7,7 @@ package edu.jas.ps;
 
 import java.util.List;
 
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.UnaryFunctor;
 import edu.jas.util.ListUtil;
 

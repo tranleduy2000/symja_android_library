@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.QuotPairFactory;
 
@@ -28,8 +28,8 @@ import edu.jas.structure.QuotPairFactory;
  * @author Heinz Kredel
  */
 
-public class FactorFraction<C extends RingElem<C>,
-        D extends RingElem<D> & QuotPair<GenPolynomial<C>>> {
+public class FactorFraction<C extends GcdRingElem<C>,
+        D extends GcdRingElem<D> & QuotPair<GenPolynomial<C>>> {
 
 
     private static final Logger logger = Logger.getLogger(FactorFraction.class);
@@ -62,7 +62,7 @@ public class FactorFraction<C extends RingElem<C>,
      * @param fac coefficient quotient ring factory.
      */
     public FactorFraction(QuotPairFactory<GenPolynomial<C>, D> fac) {
-        this(fac, FactorFactory.getImplementation(((GenPolynomialRing<C>) fac.pairFactory()).coFac));
+        this(fac, FactorFactory.<C>getImplementation(((GenPolynomialRing<C>) fac.pairFactory()).coFac));
     }
 
 
@@ -110,7 +110,10 @@ public class FactorFraction<C extends RingElem<C>,
             List<D> pp = new ArrayList<D>(F.keySet());
             D f = pp.get(0);
             D g = pp.get(1);
-            return (f.numerator().isONE() && g.denominator().isONE()) || (g.numerator().isONE() && f.denominator().isONE());
+            if ((f.numerator().isONE() && g.denominator().isONE()) || (g.numerator().isONE() && f.denominator().isONE())) {
+                return true;
+            }
+            return false;
         } else if (F.size() > 2) {
             return false;
         }

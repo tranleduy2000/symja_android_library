@@ -13,10 +13,9 @@ import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.Complex;
 import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.elem.RingElemImpl;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -26,9 +25,9 @@ import edu.jas.structure.elem.RingElemImpl;
  * @author Heinz Kredel
  */
 
-public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends RingElemImpl<ComplexAlgebraicNumber<C>>
+public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends RingElemImpl<ComplexAlgebraicNumber<C>>
                 /*extends AlgebraicNumber<C>*/
-        implements RingElem<ComplexAlgebraicNumber<C>> {
+        implements GcdRingElem<ComplexAlgebraicNumber<C>> {
 
 
     /**
@@ -84,7 +83,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public ComplexAlgebraicRing<C> factory() {
         return ring;
@@ -94,7 +93,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
     /**
      * Copy this.
      *
-     * @see Element#copy()
+     * @see edu.jas.structure.Element#copy()
      */
     @Override
     public ComplexAlgebraicNumber<C> copy() {
@@ -106,7 +105,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      * Is ComplexAlgebraicNumber zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         return number.isZERO();
@@ -117,7 +116,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      * Is ComplexAlgebraicNumber one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         return number.isONE();
@@ -128,7 +127,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      * Is ComplexAlgebraicNumber unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see RingElem#isUnit()
+     * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
         return number.isUnit();
@@ -164,7 +163,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -177,7 +176,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -258,7 +257,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      * ComplexAlgebraicNumber absolute value.
      *
      * @return the absolute value of this.
-     * @see RingElem#abs()
+     * @see edu.jas.structure.RingElem#abs()
      */
     public ComplexAlgebraicNumber<C> abs() {
         if (this.signum() < 0) {
@@ -316,7 +315,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      * ComplexAlgebraicNumber negate.
      *
      * @return -this.
-     * @see RingElem#negate()
+     * @see edu.jas.structure.RingElem#negate()
      */
     public ComplexAlgebraicNumber<C> negate() {
         return new ComplexAlgebraicNumber<C>(ring, number.negate());
@@ -350,7 +349,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      *
      * @return S with S = 1/this if defined.
      * @throws NotInvertibleException if the element is not invertible.
-     * @see RingElem#inverse()
+     * @see edu.jas.structure.RingElem#inverse()
      */
     public ComplexAlgebraicNumber<C> inverse() {
         return new ComplexAlgebraicNumber<C>(ring, number.inverse());
@@ -454,7 +453,7 @@ public class ComplexAlgebraicNumber<C extends RingElem<C> & Rational> extends Ri
      * ComplexAlgebraicNumber signum.
      *
      * @return signum(this).
-     * @see RingElem#signum()
+     * @see edu.jas.structure.RingElem#signum()
      */
     public int signum() {
         try {

@@ -5,8 +5,6 @@
 package edu.jas.structure;
 
 
-import edu.jas.structure.elem.RingElem;
-
 /**
  * Value factory interface. Defines constructor from value.
  *

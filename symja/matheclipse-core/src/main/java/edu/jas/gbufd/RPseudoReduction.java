@@ -5,7 +5,7 @@
 package edu.jas.gbufd;
 
 
-import edu.jas.structure.elem.RegularRingElem;
+import edu.jas.structure.RegularRingElem;
 
 
 /**

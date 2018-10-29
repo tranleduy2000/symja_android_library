@@ -7,8 +7,8 @@ package edu.jas.arith;
 
 import org.apache.log4j.Logger;
 
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.Element;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -22,7 +22,7 @@ import edu.jas.structure.elem.RingElem;
  */
 
 public final class BigQuaternionInteger extends BigQuaternion
-// implements StarRingElem<BigQuaternion>, RingElem<BigQuaternion>
+// implements StarRingElem<BigQuaternion>, GcdRingElem<BigQuaternion> 
 {
 
 

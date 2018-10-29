@@ -14,7 +14,7 @@ import java.util.TreeMap;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -24,7 +24,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public abstract class SquarefreeAbstract<C extends RingElem<C>> implements Squarefree<C> {
+public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Squarefree<C> {
 
 
     /**
@@ -379,9 +379,9 @@ public abstract class SquarefreeAbstract<C extends RingElem<C>> implements Squar
             GenPolynomialRing<C> cf = (GenPolynomialRing<C>) P.ring.coFac;
             GreatestCommonDivisorAbstract<C> engine = GCDFactory.getProxy(cf.coFac);
             GenPolynomial<GenPolynomial<C>> Pp = engine.recursivePrimitivePart(P);
-            Pp = PolyUtil.monic(Pp);
+            Pp = PolyUtil.<C>monic(Pp);
             GenPolynomial<GenPolynomial<C>> tp = engine.recursivePrimitivePart(t);
-            tp = PolyUtil.monic(tp);
+            tp = PolyUtil.<C>monic(tp);
             f = Pp.equals(tp) || Pp.equals(tp.negate());
             if (f) {
                 return f;
@@ -418,10 +418,10 @@ public abstract class SquarefreeAbstract<C extends RingElem<C>> implements Squar
         RingFactory<GenPolynomial<C>> rrfac = rfac.coFac;
         GenPolynomialRing<C> cfac = (GenPolynomialRing<C>) rrfac;
         GenPolynomialRing<C> dfac = cfac.extend(rfac.nvar);
-        GenPolynomial<C> Pd = PolyUtil.distribute(dfac, P);
+        GenPolynomial<C> Pd = PolyUtil.<C>distribute(dfac, P);
         GenPolynomial<C> Dd = squarefreePart(Pd);
         // convert to recursive
-        GenPolynomial<GenPolynomial<C>> C = PolyUtil.recursive(rfac, Dd);
+        GenPolynomial<GenPolynomial<C>> C = PolyUtil.<C>recursive(rfac, Dd);
         return C;
     }
 
@@ -448,13 +448,13 @@ public abstract class SquarefreeAbstract<C extends RingElem<C>> implements Squar
         RingFactory<GenPolynomial<C>> rrfac = rfac.coFac;
         GenPolynomialRing<C> cfac = (GenPolynomialRing<C>) rrfac;
         GenPolynomialRing<C> dfac = cfac.extend(rfac.nvar);
-        GenPolynomial<C> Pd = PolyUtil.distribute(dfac, P);
+        GenPolynomial<C> Pd = PolyUtil.<C>distribute(dfac, P);
         SortedMap<GenPolynomial<C>, Long> dfacs = squarefreeFactors(Pd);
         // convert to recursive
         for (Map.Entry<GenPolynomial<C>, Long> Dm : dfacs.entrySet()) {
             GenPolynomial<C> Dd = Dm.getKey();
             Long e = Dm.getValue();
-            GenPolynomial<GenPolynomial<C>> C = PolyUtil.recursive(rfac, Dd);
+            GenPolynomial<GenPolynomial<C>> C = PolyUtil.<C>recursive(rfac, Dd);
             factors.put(C, e);
         }
         return factors;

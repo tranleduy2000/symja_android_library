@@ -9,9 +9,6 @@ import org.apache.log4j.Logger;
 
 import java.util.List;
 
-import edu.jas.structure.elem.MonoidElem;
-import edu.jas.structure.elem.RingElem;
-
 
 /**
  * Power class to compute powers of RingElem.

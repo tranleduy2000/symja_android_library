@@ -11,8 +11,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 
-import edu.jas.structure.elem.Element;
-
 
 /**
  * Element factory interface. Defines embedding of integers, parsing and random

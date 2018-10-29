@@ -5,8 +5,6 @@
 package edu.jas.structure;
 
 
-import edu.jas.structure.elem.RingElem;
-
 /**
  * Ring factory interface. Defines test for field and query of characteristic.
  *

@@ -8,7 +8,7 @@ package edu.jas.poly;
 import java.util.Iterator;
 import java.util.Map;
 
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

@@ -3,7 +3,7 @@ package edu.jas.gbufd;
 import java.io.Serializable;
 
 import edu.jas.poly.ModuleList;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 /**
  * Container for module resolution components.

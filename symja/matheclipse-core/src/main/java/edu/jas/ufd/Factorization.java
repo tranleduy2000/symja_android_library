@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -44,7 +44,7 @@ import edu.jas.structure.elem.RingElem;
  * @see FactorFactory#getImplementation
  */
 
-public interface Factorization<C extends RingElem<C>> extends Serializable {
+public interface Factorization<C extends GcdRingElem<C>> extends Serializable {
 
 
     /**
@@ -53,7 +53,7 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @param P GenPolynomial.
      * @return true if P is irreducible, else false.
      */
-    boolean isIrreducible(GenPolynomial<C> P);
+    public boolean isIrreducible(GenPolynomial<C> P);
 
 
     /**
@@ -62,7 +62,7 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @param P GenPolynomial.
      * @return true if P is reducible, else false.
      */
-    boolean isReducible(GenPolynomial<C> P);
+    public boolean isReducible(GenPolynomial<C> P);
 
 
     /**
@@ -71,7 +71,7 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @param P GenPolynomial.
      * @return true if P is squarefree, else false.
      */
-    boolean isSquarefree(GenPolynomial<C> P);
+    public boolean isSquarefree(GenPolynomial<C> P);
 
 
     /**
@@ -80,7 +80,7 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @param P squarefree and primitive! or monic! GenPolynomial.
      * @return [p_1, ..., p_k] with P = prod_{i=1,...,r} p_i.
      */
-    List<GenPolynomial<C>> factorsSquarefree(GenPolynomial<C> P);
+    public List<GenPolynomial<C>> factorsSquarefree(GenPolynomial<C> P);
 
 
     /**
@@ -89,7 +89,7 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @param P GenPolynomial.
      * @return [p_1 -&gt; e_1, ..., p_k -&gt; e_k] with P = prod_{i=1,...,k} p_i**e_i.
      */
-    SortedMap<GenPolynomial<C>, Long> factors(GenPolynomial<C> P);
+    public SortedMap<GenPolynomial<C>, Long> factors(GenPolynomial<C> P);
 
 
     /**
@@ -98,7 +98,7 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @param P GenPolynomial.
      * @return [p_1, ..., p_k] with P = prod_{i=1,...,k} p_i**{e_i} for some e_i.
      */
-    List<GenPolynomial<C>> factorsRadical(GenPolynomial<C> P);
+    public List<GenPolynomial<C>> factorsRadical(GenPolynomial<C> P);
 
 
     /**
@@ -107,7 +107,7 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @param P GenPolynomial.
      * @return squarefree(P).
      */
-    GenPolynomial<C> squarefreePart(GenPolynomial<C> P);
+    public GenPolynomial<C> squarefreePart(GenPolynomial<C> P);
 
 
     /**
@@ -117,7 +117,7 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @return [p_1 -&gt; e_1, ..., p_k -&gt; e_k] with P = prod_{i=1,...,k} p_i^{e_i}
      * and p_i squarefree.
      */
-    SortedMap<GenPolynomial<C>, Long> squarefreeFactors(GenPolynomial<C> P);
+    public SortedMap<GenPolynomial<C>, Long> squarefreeFactors(GenPolynomial<C> P);
 
 
     /**
@@ -127,7 +127,7 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @param F = [p_1,...,p_k].
      * @return true if P = prod_{i=1,...,r} p_i, else false.
      */
-    boolean isFactorization(GenPolynomial<C> P, List<GenPolynomial<C>> F);
+    public boolean isFactorization(GenPolynomial<C> P, List<GenPolynomial<C>> F);
 
 
     /**
@@ -137,6 +137,6 @@ public interface Factorization<C extends RingElem<C>> extends Serializable {
      * @param F = [p_1 -&gt; e_1, ..., p_k -&gt; e_k].
      * @return true if P = prod_{i=1,...,k} p_i**e_i , else false.
      */
-    boolean isFactorization(GenPolynomial<C> P, SortedMap<GenPolynomial<C>, Long> F);
+    public boolean isFactorization(GenPolynomial<C> P, SortedMap<GenPolynomial<C>, Long> F);
 
 }

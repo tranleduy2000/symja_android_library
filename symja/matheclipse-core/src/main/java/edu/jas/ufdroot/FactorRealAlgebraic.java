@@ -17,7 +17,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.root.PolyUtilRoot;
 import edu.jas.root.RealAlgebraicNumber;
 import edu.jas.root.RealAlgebraicRing;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.ufd.FactorAbstract;
 import edu.jas.ufd.FactorFactory;
 
@@ -37,7 +37,7 @@ import edu.jas.ufd.FactorFactory;
  * @author Heinz Kredel
  */
 
-public class FactorRealAlgebraic<C extends RingElem<C> & Rational> extends
+public class FactorRealAlgebraic<C extends GcdRingElem<C> & Rational> extends
         FactorAbstract<RealAlgebraicNumber<C>> {
 
 
@@ -123,11 +123,11 @@ public class FactorRealAlgebraic<C extends RingElem<C> & Rational> extends
         //System.out.println("\nP = " + P);
         GenPolynomialRing<AlgebraicNumber<C>> afac = new GenPolynomialRing<AlgebraicNumber<C>>(
                 rfac.algebraic, pfac);
-        GenPolynomial<AlgebraicNumber<C>> A = PolyUtilRoot.algebraicFromRealCoefficients(afac, P);
+        GenPolynomial<AlgebraicNumber<C>> A = PolyUtilRoot.<C>algebraicFromRealCoefficients(afac, P);
         // factor A:
         List<GenPolynomial<AlgebraicNumber<C>>> afactors = factorAlgebraic.baseFactorsSquarefree(A);
         for (GenPolynomial<AlgebraicNumber<C>> a : afactors) {
-            GenPolynomial<RealAlgebraicNumber<C>> p = PolyUtilRoot.realFromAlgebraicCoefficients(pfac, a);
+            GenPolynomial<RealAlgebraicNumber<C>> p = PolyUtilRoot.<C>realFromAlgebraicCoefficients(pfac, a);
             factors.add(p);
         }
         logger.info("real algebraic factors = " + factors);

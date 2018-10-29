@@ -16,7 +16,7 @@ import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.Overlap;
 import edu.jas.poly.OverlapList;
 import edu.jas.poly.Word;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

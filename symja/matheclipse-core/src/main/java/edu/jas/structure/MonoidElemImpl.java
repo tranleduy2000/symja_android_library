@@ -1,63 +1,6 @@
-/*
- * $Id$
- */
+package edu.jas.structure;
 
-package edu.jas.structure.elem;
-
-
-/**
- * Monoid element interface. Defines the multiplicative methods.
- *
- * @param <C> element type
- * @author Heinz Kredel
- */
-
-public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
-
-
-    /**
-     * Test if this is one.
-     *
-     * @return true if this is 1, else false.
-     */
-    boolean isONE();
-
-
-    /**
-     * Test if this is a unit. I.e. there exists x with this.multiply(x).isONE()
-     * == true.
-     *
-     * @return true if this is a unit, else false.
-     */
-    boolean isUnit();
-
-
-    /**
-     * Multiply this with S.
-     *
-     * @param S
-     * @return this * S.
-     */
-    C multiply(C S);
-
-
-    /**
-     * Divide this by S.
-     *
-     * @param S
-     * @return this / S.
-     */
-    C divide(C S);
-
-
-    /**
-     * Remainder after division of this by S.
-     *
-     * @param S
-     * @return this - (this / S) * S.
-     */
-    C remainder(C S);
-
+public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidElem<C> {
 
     /**
      * Quotient and remainder by division of this by S.
@@ -66,7 +9,9 @@ public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
      * @return [this/S, this - (this/S)*S].
      */
     @SuppressWarnings("unchecked")
-    C[] quotientRemainder(C S);
+    public C[] quotientRemainder(C S) {
+        return (C[]) new MonoidElem[]{divide(S), remainder(S)};
+    }
 
 
     /**
@@ -76,7 +21,9 @@ public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
      * @param a element.
      * @return right, with a * right = this
      */
-    C rightDivide(C a);
+    public C rightDivide(C a) {
+        return divide(a);
+    }
 
 
     /**
@@ -86,7 +33,9 @@ public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
      * @param a element.
      * @return left, with left * a = this
      */
-    C leftDivide(C a);
+    public C leftDivide(C a) {
+        return divide(a);
+    }
 
 
     /**
@@ -96,7 +45,9 @@ public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
      * @param a element.
      * @return r = this - a * (1/right), where a * right = this.
      */
-    C rightRemainder(C a);
+    public C rightRemainder(C a) {
+        return remainder(a);
+    }
 
 
     /**
@@ -106,8 +57,9 @@ public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
      * @param a element.
      * @return r = this - (1/left) * a, where left * a = this.
      */
-    C leftRemainder(C a);
-
+    public C leftRemainder(C a) {
+        return remainder(a);
+    }
 
     /**
      * Two-sided division.
@@ -117,8 +69,12 @@ public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
      * @return [left, right], with left * a * right = this
      */
     @SuppressWarnings("unchecked")
-    C[] twosidedDivide(C a);
-
+    public C[] twosidedDivide(C a) {
+        C[] ret = (C[]) new MonoidElem[2];
+        ret[0] = divide(a);
+        ret[1] = ((MonoidFactory<C>) factory()).getONE();
+        return ret;
+    }
 
     /**
      * Two-sided remainder.
@@ -127,17 +83,9 @@ public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
      * @param a element.
      * @return r = this - (a/left) * a * (a/right), where left * a * right = this.
      */
-    C twosidedRemainder(C a);
-
-
-    /**
-     * Inverse of this. Some implementing classes will throw
-     * NotInvertibleException if the element is not invertible.
-     *
-     * @return x with this * x = 1, if it exists.
-     */
-    C inverse(); /*throws NotInvertibleException*/
-
+    public C twosidedRemainder(C a) {
+        return remainder(a);
+    }
 
     /**
      * Power of this to the n-th.
@@ -147,6 +95,9 @@ public interface MonoidElem<C extends MonoidElem<C>> extends Element<C> {
      * Java 8 only
      */
     @SuppressWarnings("unchecked")
-    C power(long n);
+    public C power(long n) {
+        //System.out.println("this = " + this + ", n = " + n);
+        return Power.power((MonoidFactory<C>) factory(), (C) this, n);
+    }
 
 }

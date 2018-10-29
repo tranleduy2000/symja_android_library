@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.jas.kern.PrettyPrint;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.ModulElem;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.Element;
+import edu.jas.structure.ModulElem;
+import edu.jas.structure.RingElem;
 
 
 /**

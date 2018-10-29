@@ -7,7 +7,7 @@ package edu.jas.poly;
 
 import java.io.Serializable;
 
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

@@ -16,7 +16,7 @@ import edu.jas.kern.StringUtil;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPairFactory;
 import edu.jas.structure.RingFactory;
 
@@ -29,7 +29,7 @@ import edu.jas.structure.RingFactory;
  *
  * @author Heinz Kredel
  */
-public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient<C>>,
+public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quotient<C>>,
         QuotPairFactory<GenPolynomial<C>, Quotient<C>> {
 
 
@@ -80,7 +80,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
         //             engine = null;
         //             return;
         //         }
-        engine = GCDFactory.getProxy(ring.coFac);
+        engine = GCDFactory.<C>getProxy(ring.coFac);
         logger.debug("quotient ring constructed");
     }
 
@@ -117,7 +117,7 @@ public class QuotientRing<C extends RingElem<C>> implements RingFactory<Quotient
      * @return divide(n, d)
      */
     protected GenPolynomial<C> divide(GenPolynomial<C> n, GenPolynomial<C> d) {
-        return PolyUtil.basePseudoDivide(n, d);
+        return PolyUtil.<C>basePseudoDivide(n, d);
     }
 
 

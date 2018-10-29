@@ -7,7 +7,7 @@ package edu.jas.poly;
 
 import java.util.List;
 
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

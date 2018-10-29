@@ -15,7 +15,7 @@ import edu.jas.gb.PairList;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.ufd.PolyUfdUtil;
 import edu.jas.ufd.Quotient;
 import edu.jas.ufd.QuotientRing;
@@ -29,7 +29,7 @@ import edu.jas.ufd.QuotientRing;
  * @author Heinz Kredel
  */
 
-public class GroebnerBaseQuotient<C extends RingElem<C>> extends GroebnerBaseAbstract<Quotient<C>> {
+public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<Quotient<C>> {
 
 
     private static final Logger logger = Logger.getLogger(GroebnerBaseQuotient.class);
@@ -123,7 +123,7 @@ public class GroebnerBaseQuotient<C extends RingElem<C>> extends GroebnerBaseAbs
         GenPolynomialRing<Quotient<C>> rring = F.get(0).ring;
         QuotientRing<C> cf = (QuotientRing<C>) rring.coFac;
         GenPolynomialRing<GenPolynomial<C>> iring = new GenPolynomialRing<GenPolynomial<C>>(cf.ring, rring);
-        List<GenPolynomial<GenPolynomial<C>>> Fi = PolyUfdUtil.integralFromQuotientCoefficients(iring, F);
+        List<GenPolynomial<GenPolynomial<C>>> Fi = PolyUfdUtil.<C>integralFromQuotientCoefficients(iring, F);
         //System.out.println("Fi = " + Fi);
         logger.info("#Fi = " + Fi.size());
 
@@ -131,8 +131,8 @@ public class GroebnerBaseQuotient<C extends RingElem<C>> extends GroebnerBaseAbs
         //System.out.println("Gi = " + Gi);
         logger.info("#Gi = " + Gi.size());
 
-        G = PolyUfdUtil.quotientFromIntegralCoefficients(rring, Gi);
-        G = PolyUtil.monic(G);
+        G = PolyUfdUtil.<C>quotientFromIntegralCoefficients(rring, Gi);
+        G = PolyUtil.<Quotient<C>>monic(G);
         return G;
     }
 
@@ -196,8 +196,8 @@ public class GroebnerBaseQuotient<C extends RingElem<C>> extends GroebnerBaseAbs
         List<GenPolynomial<GenPolynomial<C>>> Gi = bba.minimalGB(Fi);
         logger.info("#Gi = " + Gi.size());
 
-        G = PolyUfdUtil.quotientFromIntegralCoefficients(rring, Gi);
-        G = PolyUtil.monic(G);
+        G = PolyUfdUtil.<C>quotientFromIntegralCoefficients(rring, Gi);
+        G = PolyUtil.<Quotient<C>>monic(G);
         return G;
     }
 

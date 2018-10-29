@@ -15,7 +15,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import edu.jas.arith.BigInteger;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.vector.BasicLinAlg;
 
 

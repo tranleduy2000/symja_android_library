@@ -16,7 +16,7 @@ import edu.jas.arith.ModLongRing;
 import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -120,9 +120,9 @@ public class SquarefreeFactory {
      * @param <C> coefficient type, e.g. BigRational, ModInteger.
      * @return squarefree factorization algorithm implementation.
      */
-    public static <C extends RingElem<C>> SquarefreeAbstract<AlgebraicNumber<C>> getImplementation(
+    public static <C extends GcdRingElem<C>> SquarefreeAbstract<AlgebraicNumber<C>> getImplementation(
             AlgebraicNumberRing<C> fac) {
-        PolyUfdUtil.ensureFieldProperty(fac);
+        PolyUfdUtil.<C>ensureFieldProperty(fac);
         if (fac.isField()) {
             if (fac.characteristic().signum() == 0) {
                 return new SquarefreeFieldChar0<AlgebraicNumber<C>>(fac);
@@ -144,7 +144,7 @@ public class SquarefreeFactory {
      * @param <C> coefficient type, e.g. BigRational, ModInteger.
      * @return squarefree factorization algorithm implementation.
      */
-    public static <C extends RingElem<C>> SquarefreeAbstract<Quotient<C>> getImplementation(
+    public static <C extends GcdRingElem<C>> SquarefreeAbstract<Quotient<C>> getImplementation(
             QuotientRing<C> fac) {
         if (fac.characteristic().signum() == 0) {
             return new SquarefreeFieldChar0<Quotient<C>>(fac);
@@ -161,7 +161,7 @@ public class SquarefreeFactory {
      * @param <C> coefficient type, e.g. BigRational, ModInteger.
      * @return squarefree factorization algorithm implementation.
      */
-    public static <C extends RingElem<C>> SquarefreeAbstract<C> getImplementation(GenPolynomialRing<C> fac) {
+    public static <C extends GcdRingElem<C>> SquarefreeAbstract<C> getImplementation(GenPolynomialRing<C> fac) {
         return getImplementationPoly(fac);
     }
 
@@ -174,7 +174,7 @@ public class SquarefreeFactory {
      * @return squarefree factorization algorithm implementation.
      */
     @SuppressWarnings("cast")
-    protected static <C extends RingElem<C>> SquarefreeAbstract<C> getImplementationPoly(
+    protected static <C extends GcdRingElem<C>> SquarefreeAbstract<C> getImplementationPoly(
             GenPolynomialRing<C> fac) {
         if (fac.characteristic().signum() == 0) {
             if (fac.coFac.isField()) {
@@ -211,7 +211,7 @@ public class SquarefreeFactory {
      * @return squarefree factorization algorithm implementation.
      */
     @SuppressWarnings("cast")
-    public static <C extends RingElem<C>> SquarefreeAbstract<C> getImplementation(RingFactory<C> fac) {
+    public static <C extends GcdRingElem<C>> SquarefreeAbstract<C> getImplementation(RingFactory<C> fac) {
         //logger.info("fac = " + fac.getClass().getName());
         //System.out.println("fac_o = " + fac.getClass().getName());
         SquarefreeAbstract/*raw type<C>*/ufd = null;

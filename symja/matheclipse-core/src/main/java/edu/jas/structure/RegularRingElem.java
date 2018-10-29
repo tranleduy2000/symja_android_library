@@ -2,7 +2,7 @@
  * $Id$
  */
 
-package edu.jas.structure.elem;
+package edu.jas.structure;
 
 
 /**
@@ -13,7 +13,7 @@ package edu.jas.structure.elem;
  * @author Heinz Kredel
  */
 
-public interface RegularRingElem<C extends RegularRingElem<C>> extends RingElem<C> {
+public interface RegularRingElem<C extends RegularRingElem<C>> extends GcdRingElem<C> {
 
 
     /* Get component. 

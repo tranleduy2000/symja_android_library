@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.jas.poly.ExpVector;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

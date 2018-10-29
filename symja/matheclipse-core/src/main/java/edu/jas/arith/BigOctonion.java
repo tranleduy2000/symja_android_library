@@ -14,9 +14,8 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
-import edu.jas.structure.elem.RingElemImpl;
+import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.StarRingElem;
 
@@ -30,7 +29,7 @@ import edu.jas.structure.StarRingElem;
  */
 
 public final class BigOctonion extends RingElemImpl<BigOctonion>
-        implements StarRingElem<BigOctonion>, RingElem<BigOctonion>, RingFactory<BigOctonion> {
+        implements StarRingElem<BigOctonion>, GcdRingElem<BigOctonion>, RingFactory<BigOctonion> {
 
 
     private final static Random random = new Random();
@@ -288,7 +287,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public BigOctonion factory() {
         return this;
@@ -465,7 +464,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -496,7 +495,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -512,7 +511,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * Is BigOctonion number zero.
      *
      * @return true if this is 0, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         return or.isZERO() && oi.isZERO();
@@ -522,7 +521,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * Is BigOctonion number one.
      *
      * @return true if this is 1, else false.
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         return or.isONE() && oi.isZERO();
@@ -541,7 +540,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * Is BigOctonion unit element.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see RingElem#isUnit()
+     * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
         return !isZERO();
@@ -598,7 +597,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      *
      * @return 0 if this is equal to 0; 1 if or > 0, or or == 0 and oi > 0; -1
      * if or < 0, or or == 0 and oi < 0.
-     * @see RingElem#signum()
+     * @see edu.jas.structure.RingElem#signum()
      */
     public int signum() {
         int s = or.signum();
@@ -632,7 +631,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * BigOctonion number negative.
      *
      * @return -this.
-     * @see RingElem#negate()
+     * @see edu.jas.structure.RingElem#negate()
      */
     public BigOctonion negate() {
         return new BigOctonion(or.negate(), oi.negate());
@@ -668,7 +667,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * Octonion number absolute value.
      *
      * @return |this|^2. <b>Note:</b> The square root is not jet implemented.
-     * @see RingElem#abs()
+     * @see edu.jas.structure.RingElem#abs()
      */
     public BigOctonion abs() {
         BigOctonion n = norm();
@@ -697,7 +696,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * BigOctonion inverse.
      *
      * @return S with S * this = 1.
-     * @see RingElem#inverse()
+     * @see edu.jas.structure.RingElem#inverse()
      */
     public BigOctonion inverse() {
         BigRational a = norm().or.re;

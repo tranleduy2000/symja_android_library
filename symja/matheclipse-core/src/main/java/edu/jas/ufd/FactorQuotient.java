@@ -12,7 +12,7 @@ import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -23,7 +23,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public class FactorQuotient<C extends RingElem<C>> extends FactorAbstract<Quotient<C>> {
+public class FactorQuotient<C extends GcdRingElem<C>> extends FactorAbstract<Quotient<C>> {
 
 
     private static final Logger logger = Logger.getLogger(FactorQuotient.class);
@@ -52,7 +52,7 @@ public class FactorQuotient<C extends RingElem<C>> extends FactorAbstract<Quotie
      * @param fac coefficient quotient ring factory.
      */
     public FactorQuotient(QuotientRing<C> fac) {
-        this(fac, FactorFactory.getImplementation(fac.ring.coFac));
+        this(fac, FactorFactory.<C>getImplementation(fac.ring.coFac));
     }
 
 
@@ -111,7 +111,7 @@ public class FactorQuotient<C extends RingElem<C>> extends FactorAbstract<Quotie
         QuotientRing<C> qi = (QuotientRing<C>) pfac.coFac;
         GenPolynomialRing<C> ci = qi.ring;
         GenPolynomialRing<GenPolynomial<C>> ifac = new GenPolynomialRing<GenPolynomial<C>>(ci, pfac);
-        GenPolynomial<GenPolynomial<C>> Pi = PolyUfdUtil.integralFromQuotientCoefficients(ifac, Pr);
+        GenPolynomial<GenPolynomial<C>> Pi = PolyUfdUtil.<C>integralFromQuotientCoefficients(ifac, Pr);
         //System.out.println("Pi = " + Pi);
 
         // factor in C[x_1,...,x_n][y_1,...,y_m]
@@ -123,7 +123,7 @@ public class FactorQuotient<C extends RingElem<C>> extends FactorAbstract<Quotie
             factors.add(P);
             return factors;
         }
-        List<GenPolynomial<Quotient<C>>> qfacts = PolyUfdUtil.quotientFromIntegralCoefficients(pfac,
+        List<GenPolynomial<Quotient<C>>> qfacts = PolyUfdUtil.<C>quotientFromIntegralCoefficients(pfac,
                 irfacts);
         //System.out.println("qfacts = " + qfacts);
         //qfacts = PolyUtil.monic(qfacts);

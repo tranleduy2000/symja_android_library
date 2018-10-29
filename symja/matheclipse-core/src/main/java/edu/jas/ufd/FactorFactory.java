@@ -18,7 +18,7 @@ import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.Complex;
 import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -128,7 +128,7 @@ public class FactorFactory {
      * @param <C> coefficient type, e.g. BigRational, ModInteger.
      * @return factorization algorithm implementation.
      */
-    public static <C extends RingElem<C>> FactorAbstract<AlgebraicNumber<C>> getImplementation(
+    public static <C extends GcdRingElem<C>> FactorAbstract<AlgebraicNumber<C>> getImplementation(
             AlgebraicNumberRing<C> fac) {
         return new FactorAlgebraic<C>(fac);
     }
@@ -142,7 +142,7 @@ public class FactorFactory {
      * @param <C> coefficient type, e.g. BigRational, ModInteger.
      * @return factorization algorithm implementation.
      */
-    public static <C extends RingElem<C>> FactorAbstract<Complex<C>> getImplementation(
+    public static <C extends GcdRingElem<C>> FactorAbstract<Complex<C>> getImplementation(
             ComplexRing<C> fac) {
         return new FactorComplex<C>(fac);
     }
@@ -156,7 +156,7 @@ public class FactorFactory {
      * @param <C> coefficient type, e.g. BigRational, ModInteger.
      * @return factorization algorithm implementation.
      */
-    public static <C extends RingElem<C>> FactorAbstract<Quotient<C>> getImplementation(
+    public static <C extends GcdRingElem<C>> FactorAbstract<Quotient<C>> getImplementation(
             QuotientRing<C> fac) {
         return new FactorQuotient<C>(fac);
     }
@@ -170,7 +170,7 @@ public class FactorFactory {
      * @param <C> coefficient type, e.g. BigRational, ModInteger.
      * @return factorization algorithm implementation.
      */
-    public static <C extends RingElem<C>> FactorAbstract<C> getImplementation(GenPolynomialRing<C> fac) {
+    public static <C extends GcdRingElem<C>> FactorAbstract<C> getImplementation(GenPolynomialRing<C> fac) {
         return getImplementation(fac.coFac);
     }
 
@@ -184,7 +184,7 @@ public class FactorFactory {
      * @return factorization algorithm implementation.
      */
     @SuppressWarnings({"unchecked", "cast"})
-    public static <C extends RingElem<C>> FactorAbstract<C> getImplementation(RingFactory<C> fac) {
+    public static <C extends GcdRingElem<C>> FactorAbstract<C> getImplementation(RingFactory<C> fac) {
         logger.info("factor factory = " + fac.getClass().getName());
         //System.out.println("fac_o_ufd = " + fac.getClass().getName());
         FactorAbstract/*raw type<C>*/ ufd = null;

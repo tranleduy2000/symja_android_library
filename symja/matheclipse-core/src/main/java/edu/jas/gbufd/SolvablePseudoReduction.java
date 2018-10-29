@@ -10,7 +10,7 @@ import java.util.List;
 import edu.jas.gb.SolvableReduction;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

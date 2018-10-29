@@ -14,7 +14,7 @@ import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -24,7 +24,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public class Factors<C extends RingElem<C>> implements Comparable<Factors<C>>, Serializable {
+public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>, Serializable {
 
 
     /**
@@ -343,7 +343,7 @@ public class Factors<C extends RingElem<C>> implements Comparable<Factors<C>>, S
             int d = aring.depth();
             if (d > depth) {
                 depth = d;
-                arr = (AlgebraicNumberRing<C>) aring;
+                arr = (AlgebraicNumberRing<C>) (Object) aring;
             }
         }
         return arr;

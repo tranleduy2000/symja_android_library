@@ -5,10 +5,9 @@
 package edu.jas.arith;
 
 
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.elem.RingElemImpl;
+import edu.jas.structure.RingElemImpl;
 
 
 /**
@@ -18,7 +17,7 @@ import edu.jas.structure.elem.RingElemImpl;
  * @see ModInteger
  */
 
-public final class ModLong extends RingElemImpl<ModLong> implements RingElem<ModLong>, Modular {
+public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<ModLong>, Modular {
 
 
     /**
@@ -117,7 +116,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public ModLongRing factory() {
         return ring;
@@ -178,7 +177,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Is ModLong number zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         return val == 0L;
@@ -189,7 +188,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Is ModLong number one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         return val == 1L;
@@ -200,7 +199,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Is ModLong number a unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see RingElem#isUnit()
+     * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
         if (isZERO()) {
@@ -229,7 +228,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -242,7 +241,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -299,7 +298,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * ModLong absolute value.
      *
      * @return the absolute value of this.
-     * @see RingElem#abs()
+     * @see edu.jas.structure.RingElem#abs()
      */
     public ModLong abs() {
         return new ModLong(ring, (val < 0 ? -val : val));
@@ -310,7 +309,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * ModLong negative.
      *
      * @return -this.
-     * @see RingElem#negate()
+     * @see edu.jas.structure.RingElem#negate()
      */
     public ModLong negate() {
         return new ModLong(ring, -val);
@@ -321,7 +320,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * ModLong signum.
      *
      * @return signum(this).
-     * @see RingElem#signum()
+     * @see edu.jas.structure.RingElem#signum()
      */
     public int signum() {
         if (val > 0L) {
@@ -369,7 +368,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      *
      * @return S with S=1/this if defined.
      * @throws NotInvertibleException if the element is not invertible.
-     * @see RingElem#inverse()
+     * @see edu.jas.structure.RingElem#inverse()
      */
     public ModLong inverse() /*throws NotInvertibleException*/ {
         try {

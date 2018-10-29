@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.structure.QuotPairFactory;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 

@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import edu.jas.structure.elem.Element;
+import edu.jas.structure.Element;
 
 /**
  * ExpVectorLong implements exponent vectors for polynomials using arrays of long as storage unit. This class is used by

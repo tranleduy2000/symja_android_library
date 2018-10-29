@@ -11,7 +11,7 @@ import java.util.List;
 import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -22,7 +22,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public class PartialFraction<C extends RingElem<C>> implements Serializable {
+public class PartialFraction<C extends GcdRingElem<C>> implements Serializable {
 
 
     /**

@@ -15,8 +15,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.RecSolvablePolynomial;
 import edu.jas.poly.TableRelation;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -31,7 +30,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public class QuotSolvablePolynomial<C extends RingElem<C>> extends
+public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         GenSolvablePolynomial<SolvableQuotient<C>> {
 
 
@@ -109,7 +108,7 @@ public class QuotSolvablePolynomial<C extends RingElem<C>> extends
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     @Override
     public QuotSolvablePolynomialRing<C> factory() {

@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import edu.jas.kern.ComputerThreads;
 import edu.jas.kern.PreemptingException;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -27,7 +27,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public class GCDProxy<C extends RingElem<C>> extends GreatestCommonDivisorAbstract<C> {
+public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbstract<C> {
 
 
     //       implements GreatestCommonDivisor<C> {

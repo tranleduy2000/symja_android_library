@@ -16,7 +16,7 @@ import edu.jas.arith.Rational;
 import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -28,7 +28,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class RealAlgebraicRing<C extends RingElem<C> & Rational>
+public class RealAlgebraicRing<C extends GcdRingElem<C> & Rational>
                 /*extends AlgebraicNumberRing<C>*/
         implements RingFactory<RealAlgebraicNumber<C>> {
 

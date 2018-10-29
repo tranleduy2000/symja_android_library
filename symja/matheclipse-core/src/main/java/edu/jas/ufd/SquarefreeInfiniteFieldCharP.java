@@ -16,7 +16,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.Monomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -26,7 +26,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class SquarefreeInfiniteFieldCharP<C extends RingElem<C>> extends SquarefreeFieldCharP<Quotient<C>> {
+public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends SquarefreeFieldCharP<Quotient<C>> {
 
 
     private static final Logger logger = Logger.getLogger(SquarefreeInfiniteFieldCharP.class);
@@ -54,7 +54,7 @@ public class SquarefreeInfiniteFieldCharP<C extends RingElem<C>> extends Squaref
         }
         QuotientRing<C> qfac = (QuotientRing<C>) fac;
         GenPolynomialRing<C> rfac = qfac.ring;
-        qengine = SquarefreeFactory.getImplementation(rfac);
+        qengine = (SquarefreeAbstract) SquarefreeFactory.<C>getImplementation(rfac);
         //qengine = new SquarefreeFiniteFieldCharP<C>(rfac.coFac);
         //qengine = new SquarefreeInfiniteRingCharP<C>( rfac.coFac );
     }
@@ -203,12 +203,12 @@ public class SquarefreeInfiniteFieldCharP<C extends RingElem<C>> extends Squaref
         if (pfac.nvar > 1) {
             // go to recursion
             GenPolynomialRing<GenPolynomial<Quotient<C>>> rfac = pfac.recursive(1);
-            GenPolynomial<GenPolynomial<Quotient<C>>> Pr = PolyUtil.recursive(rfac, P);
+            GenPolynomial<GenPolynomial<Quotient<C>>> Pr = PolyUtil.<Quotient<C>>recursive(rfac, P);
             GenPolynomial<GenPolynomial<Quotient<C>>> Prc = recursiveUnivariateRootCharacteristic(Pr);
             if (Prc == null) {
                 return null;
             }
-            GenPolynomial<Quotient<C>> D = PolyUtil.distribute(pfac, Prc);
+            GenPolynomial<Quotient<C>> D = PolyUtil.<Quotient<C>>distribute(pfac, Prc);
             return D;
         }
         RingFactory<Quotient<C>> rf = pfac.coFac;

@@ -18,9 +18,9 @@ import java.util.TreeMap;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
-import edu.jas.structure.elem.RingElemImpl;
+import edu.jas.structure.Element;
+import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 
 /**
  * GenPolynomial generic polynomials implementing RingElem. n-variate ordered polynomials over C. Objects of this class

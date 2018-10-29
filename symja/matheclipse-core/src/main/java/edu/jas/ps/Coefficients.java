@@ -8,7 +8,7 @@ package edu.jas.ps;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

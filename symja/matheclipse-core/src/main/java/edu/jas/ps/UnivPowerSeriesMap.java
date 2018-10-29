@@ -5,7 +5,7 @@
 package edu.jas.ps;
 
 
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 
 /**

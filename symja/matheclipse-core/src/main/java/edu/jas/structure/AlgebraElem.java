@@ -2,7 +2,7 @@
  * $Id$
  */
 
-package edu.jas.structure.elem;
+package edu.jas.structure;
 
 
 /**

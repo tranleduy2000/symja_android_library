@@ -5,8 +5,6 @@
 package edu.jas.structure;
 
 
-import edu.jas.structure.elem.RingElem;
-
 /**
  * Star ring element interface. Defines norm and conjugation.
  *

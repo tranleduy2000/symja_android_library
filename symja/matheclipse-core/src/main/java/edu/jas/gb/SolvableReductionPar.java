@@ -10,7 +10,7 @@ import java.util.Map;
 
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 
 // import org.apache.log4j.Logger;
 

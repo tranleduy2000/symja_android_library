@@ -18,7 +18,7 @@ import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.UnaryFunctor;
 
@@ -46,13 +46,13 @@ public class PolyUtilRoot {
      * @param A    polynomial with C coefficients to be converted.
      * @return polynomial with RealAlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends RingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertToAlgebraicCoefficients(
+    public static <C extends GcdRingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertToAlgebraicCoefficients(
             GenPolynomialRing<RealAlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         RealAlgebraicRing<C> afac = (RealAlgebraicRing<C>) pfac.coFac;
         if (debug) {
             logger.info("afac = " + afac);
         }
-        return PolyUtil.map(pfac, A, new CoeffToReAlg<C>(afac));
+        return PolyUtil.<C, RealAlgebraicNumber<C>>map(pfac, A, new CoeffToReAlg<C>(afac));
     }
 
 
@@ -66,10 +66,10 @@ public class PolyUtilRoot {
      * @param A     polynomial with C coefficients to be converted.
      * @return polynomial with RealAlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends RingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertToRecAlgebraicCoefficients(
+    public static <C extends GcdRingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertToRecAlgebraicCoefficients(
             int depth, GenPolynomialRing<RealAlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         RealAlgebraicRing<C> afac = (RealAlgebraicRing<C>) pfac.coFac;
-        return PolyUtil.map(pfac, A, new CoeffToRecReAlg<C>(depth, afac));
+        return PolyUtil.<C, RealAlgebraicNumber<C>>map(pfac, A, new CoeffToRecReAlg<C>(depth, afac));
     }
 
 
@@ -82,10 +82,10 @@ public class PolyUtilRoot {
      *             coefficients to be converted.
      * @return polynomial with RealAlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends RingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertRecursiveToAlgebraicCoefficients(
+    public static <C extends GcdRingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertRecursiveToAlgebraicCoefficients(
             GenPolynomialRing<RealAlgebraicNumber<C>> pfac, GenPolynomial<GenPolynomial<C>> A) {
         RealAlgebraicRing<C> afac = (RealAlgebraicRing<C>) pfac.coFac;
-        return PolyUtil.map(pfac, A, new PolyToReAlg<C>(afac));
+        return PolyUtil.<GenPolynomial<C>, RealAlgebraicNumber<C>>map(pfac, A, new PolyToReAlg<C>(afac));
     }
 
 
@@ -98,10 +98,10 @@ public class PolyUtilRoot {
      *             converted.
      * @return polynomial with AlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends RingElem<C> & Rational> GenPolynomial<AlgebraicNumber<C>> algebraicFromRealCoefficients(
+    public static <C extends GcdRingElem<C> & Rational> GenPolynomial<AlgebraicNumber<C>> algebraicFromRealCoefficients(
             GenPolynomialRing<AlgebraicNumber<C>> afac, GenPolynomial<RealAlgebraicNumber<C>> A) {
         AlgebraicNumberRing<C> cfac = (AlgebraicNumberRing<C>) afac.coFac;
-        return PolyUtil.map(afac, A,
+        return PolyUtil.<RealAlgebraicNumber<C>, AlgebraicNumber<C>>map(afac, A,
                 new AlgFromRealCoeff<C>(cfac));
     }
 
@@ -115,10 +115,10 @@ public class PolyUtilRoot {
      *             converted.
      * @return polynomial with RealAlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends RingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> realFromAlgebraicCoefficients(
+    public static <C extends GcdRingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> realFromAlgebraicCoefficients(
             GenPolynomialRing<RealAlgebraicNumber<C>> rfac, GenPolynomial<AlgebraicNumber<C>> A) {
         RealAlgebraicRing<C> cfac = (RealAlgebraicRing<C>) rfac.coFac;
-        return PolyUtil.map(rfac, A,
+        return PolyUtil.<AlgebraicNumber<C>, RealAlgebraicNumber<C>>map(rfac, A,
                 new RealFromAlgCoeff<C>(cfac));
     }
 
@@ -131,10 +131,10 @@ public class PolyUtilRoot {
      * @param A    polynomial with C coefficients to be converted.
      * @return polynomial with RealAlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends RingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertToRealCoefficients(
+    public static <C extends GcdRingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertToRealCoefficients(
             GenPolynomialRing<RealAlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         RealAlgebraicRing<C> afac = (RealAlgebraicRing<C>) pfac.coFac;
-        return PolyUtil.map(pfac, A, new CoeffToReal<C>(afac));
+        return PolyUtil.<C, RealAlgebraicNumber<C>>map(pfac, A, new CoeffToReal<C>(afac));
     }
 
 
@@ -146,10 +146,10 @@ public class PolyUtilRoot {
      * @param A    polynomial with C coefficients to be converted.
      * @return polynomial with ComplexAlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends RingElem<C> & Rational> GenPolynomial<ComplexAlgebraicNumber<C>> convertToComplexCoefficients(
+    public static <C extends GcdRingElem<C> & Rational> GenPolynomial<ComplexAlgebraicNumber<C>> convertToComplexCoefficients(
             GenPolynomialRing<ComplexAlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         ComplexAlgebraicRing<C> afac = (ComplexAlgebraicRing<C>) pfac.coFac;
-        return PolyUtil.map(pfac, A, new CoeffToComplex<C>(afac));
+        return PolyUtil.<C, ComplexAlgebraicNumber<C>>map(pfac, A, new CoeffToComplex<C>(afac));
     }
 
 
@@ -161,10 +161,10 @@ public class PolyUtilRoot {
      * @param A    polynomial with C coefficients to be converted.
      * @return polynomial with ComplexAlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends RingElem<C> & Rational> GenPolynomial<ComplexAlgebraicNumber<C>> convertToComplexCoefficientsFromComplex(
+    public static <C extends GcdRingElem<C> & Rational> GenPolynomial<ComplexAlgebraicNumber<C>> convertToComplexCoefficientsFromComplex(
             GenPolynomialRing<ComplexAlgebraicNumber<C>> pfac, GenPolynomial<Complex<C>> A) {
         ComplexAlgebraicRing<C> afac = (ComplexAlgebraicRing<C>) pfac.coFac;
-        return PolyUtil.map(pfac, A,
+        return PolyUtil.<Complex<C>, ComplexAlgebraicNumber<C>>map(pfac, A,
                 new CoeffToComplexFromComplex<C>(afac));
     }
 
@@ -176,7 +176,7 @@ public class PolyUtilRoot {
      * @param f univariate polynomial.
      * @return f with complex coefficients
      */
-    public static <C extends RingElem<C> & Rational>
+    public static <C extends GcdRingElem<C> & Rational>
     GenPolynomial<Complex<C>> complexFromAny(GenPolynomial<C> f) {
         if (f.ring.coFac instanceof ComplexRing) {
             throw new IllegalArgumentException("f already has ComplexRing coefficients " + f.ring);
@@ -187,7 +187,7 @@ public class PolyUtilRoot {
         }
         ComplexRing<C> cr = new ComplexRing<C>(f.ring.coFac);
         GenPolynomialRing<Complex<C>> fac = new GenPolynomialRing<Complex<C>>(cr, f.ring);
-        GenPolynomial<Complex<C>> fc = PolyUtil.complexFromAny(fac, f);
+        GenPolynomial<Complex<C>> fc = PolyUtil.<C>complexFromAny(fac, f);
         return fc;
     }
 }
@@ -196,7 +196,7 @@ public class PolyUtilRoot {
 /**
  * Polynomial to algebraic functor.
  */
-class PolyToReAlg<C extends RingElem<C> & Rational>
+class PolyToReAlg<C extends GcdRingElem<C> & Rational>
         implements UnaryFunctor<GenPolynomial<C>, RealAlgebraicNumber<C>> {
 
 
@@ -223,7 +223,7 @@ class PolyToReAlg<C extends RingElem<C> & Rational>
 /**
  * Coefficient to algebraic functor.
  */
-class CoeffToReAlg<C extends RingElem<C> & Rational> implements UnaryFunctor<C, RealAlgebraicNumber<C>> {
+class CoeffToReAlg<C extends GcdRingElem<C> & Rational> implements UnaryFunctor<C, RealAlgebraicNumber<C>> {
 
 
     final protected RealAlgebraicRing<C> afac;
@@ -254,7 +254,7 @@ class CoeffToReAlg<C extends RingElem<C> & Rational> implements UnaryFunctor<C, 
 /**
  * Coefficient to recursive algebraic functor.
  */
-class CoeffToRecReAlg<C extends RingElem<C> & Rational>
+class CoeffToRecReAlg<C extends GcdRingElem<C> & Rational>
         implements UnaryFunctor<C, RealAlgebraicNumber<C>> {
 
 
@@ -278,7 +278,7 @@ class CoeffToRecReAlg<C extends RingElem<C> & Rational>
             if (!(rf instanceof RealAlgebraicRing)) {
                 throw new IllegalArgumentException("fac depth to low");
             }
-            afac = (RealAlgebraicRing<C>) rf;
+            afac = (RealAlgebraicRing<C>) (Object) rf;
             lfac.add(afac);
         }
     }
@@ -296,7 +296,7 @@ class CoeffToRecReAlg<C extends RingElem<C> & Rational>
         for (int i = lfac.size() - 2; i >= 0; i--) {
             af = lfac.get(i);
             zero = af.algebraic.ring.getZERO();
-            ac = (C) an;
+            ac = (C) (Object) an;
             an = new RealAlgebraicNumber<C>(af, zero.sum(ac));
         }
         return an;
@@ -307,7 +307,7 @@ class CoeffToRecReAlg<C extends RingElem<C> & Rational>
 /**
  * Coefficient to algebraic from real algebraic functor.
  */
-class AlgFromRealCoeff<C extends RingElem<C> & Rational>
+class AlgFromRealCoeff<C extends GcdRingElem<C> & Rational>
         implements UnaryFunctor<RealAlgebraicNumber<C>, AlgebraicNumber<C>> {
 
 
@@ -334,7 +334,7 @@ class AlgFromRealCoeff<C extends RingElem<C> & Rational>
 /**
  * Coefficient to real algebriac from algebraic functor.
  */
-class RealFromAlgCoeff<C extends RingElem<C> & Rational>
+class RealFromAlgCoeff<C extends GcdRingElem<C> & Rational>
         implements UnaryFunctor<AlgebraicNumber<C>, RealAlgebraicNumber<C>> {
 
 
@@ -361,7 +361,7 @@ class RealFromAlgCoeff<C extends RingElem<C> & Rational>
 /**
  * Coefficient to real algebraic functor.
  */
-class CoeffToReal<C extends RingElem<C> & Rational> implements UnaryFunctor<C, RealAlgebraicNumber<C>> {
+class CoeffToReal<C extends GcdRingElem<C> & Rational> implements UnaryFunctor<C, RealAlgebraicNumber<C>> {
 
 
     final protected RealAlgebraicRing<C> rfac;
@@ -392,7 +392,7 @@ class CoeffToReal<C extends RingElem<C> & Rational> implements UnaryFunctor<C, R
 /**
  * Coefficient to complex algebraic functor.
  */
-class CoeffToComplex<C extends RingElem<C> & Rational>
+class CoeffToComplex<C extends GcdRingElem<C> & Rational>
         implements UnaryFunctor<C, ComplexAlgebraicNumber<C>> {
 
 
@@ -428,7 +428,7 @@ class CoeffToComplex<C extends RingElem<C> & Rational>
 /**
  * Coefficient to complex algebraic from complex functor.
  */
-class CoeffToComplexFromComplex<C extends RingElem<C> & Rational>
+class CoeffToComplexFromComplex<C extends GcdRingElem<C> & Rational>
         implements UnaryFunctor<Complex<C>, ComplexAlgebraicNumber<C>> {
 
 

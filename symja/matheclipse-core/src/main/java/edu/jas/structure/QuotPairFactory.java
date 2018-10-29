@@ -5,8 +5,6 @@
 package edu.jas.structure;
 
 
-import edu.jas.structure.elem.RingElem;
-
 /**
  * Quotient pair factory interface. Defines constructors from numerators and
  * denominators.

@@ -19,7 +19,7 @@ import edu.jas.gb.PairList;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -38,7 +38,7 @@ import edu.jas.util.ThreadPool;
  * @see GBFactory
  */
 
-public class GroebnerBasePseudoRecParallel<C extends RingElem<C>> extends
+public class GroebnerBasePseudoRecParallel<C extends GcdRingElem<C>> extends
         GroebnerBaseAbstract<GenPolynomial<C>> {
 
 
@@ -165,7 +165,7 @@ public class GroebnerBasePseudoRecParallel<C extends RingElem<C>> extends
             logger.warn("parallel GB should use parallel aware reduction");
         }
         this.red = red;
-        this.redRec = (PseudoReduction<C>) red;
+        this.redRec = (PseudoReduction<C>) (PseudoReduction) red;
         cofac = rf;
         if (threads < 1) {
             threads = 1;
@@ -175,7 +175,7 @@ public class GroebnerBasePseudoRecParallel<C extends RingElem<C>> extends
         baseCofac = rp.coFac;
         //engine = (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getImplementation( baseCofac );
         //not used: 
-        engine = GCDFactory.getProxy(baseCofac);
+        engine = GCDFactory.<C>getProxy(baseCofac);
         this.pool = pool;
     }
 
@@ -408,7 +408,7 @@ public class GroebnerBasePseudoRecParallel<C extends RingElem<C>> extends
 /**
  * Pseudo GB Reducing worker threads.
  */
-class PseudoReducerRec<C extends RingElem<C>> implements Runnable {
+class PseudoReducerRec<C extends GcdRingElem<C>> implements Runnable {
 
 
     private static final Logger logger = Logger.getLogger(PseudoReducerRec.class);
@@ -541,7 +541,7 @@ class PseudoReducerRec<C extends RingElem<C>> implements Runnable {
 /**
  * Pseudo Reducing worker threads for minimal GB.
  */
-class PseudoMiReducerRec<C extends RingElem<C>> implements Runnable {
+class PseudoMiReducerRec<C extends GcdRingElem<C>> implements Runnable {
 
 
     private static final Logger logger = Logger.getLogger(PseudoMiReducerRec.class);

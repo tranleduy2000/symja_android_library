@@ -5,8 +5,6 @@
 package edu.jas.structure;
 
 
-import edu.jas.structure.elem.RingElem;
-
 /**
  * Quotient pair interface. Defines selectors for numerator and denominator.
  *

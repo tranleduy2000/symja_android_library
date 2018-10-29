@@ -17,7 +17,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -29,7 +29,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public class SolvablePseudoReductionSeq<C extends RingElem<C>> extends SolvableReductionAbstract<C>
+public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends SolvableReductionAbstract<C>
         implements SolvablePseudoReduction<C> {
 
 
@@ -69,7 +69,7 @@ public class SolvablePseudoReductionSeq<C extends RingElem<C>> extends SolvableR
         }
         int l = P.length;
         ExpVector[] htl = new ExpVector[l];
-        //C[] lbc = (C[]) new RingElem[l];
+        //C[] lbc = (C[]) new GcdRingElem[l];
         GenSolvablePolynomial<C>[] p = new GenSolvablePolynomial[l];
         int i;
         int j = 0;
@@ -219,9 +219,9 @@ public class SolvablePseudoReductionSeq<C extends RingElem<C>> extends SolvableR
                 GenPolynomial<C> ap = a;
                 if (commCoeff) {
                     GenPolynomial<C> c = Q.leadingBaseCoefficient();
-                    if (!c.isConstant() && PolyUtil.baseSparsePseudoRemainder(a, c).isZERO()) {
+                    if (!c.isConstant() && PolyUtil.<C>baseSparsePseudoRemainder(a, c).isZERO()) {
                         //a = a.divide(c);
-                        b = PolyUtil.basePseudoDivide(a, c);
+                        b = PolyUtil.<C>basePseudoDivide(a, c);
                         if (a.equals(b.multiply(c))) {
                             S = S.subtractMultiple(b, Q);
                         } else {
@@ -279,7 +279,7 @@ public class SolvablePseudoReductionSeq<C extends RingElem<C>> extends SolvableR
         }
         int l = P.length;
         ExpVector[] htl = new ExpVector[l];
-        //C[] lbc = (C[]) new RingElem[l];
+        //C[] lbc = (C[]) new GcdRingElem[l];
         GenSolvablePolynomial<C>[] p = new GenSolvablePolynomial[l];
         Map.Entry<ExpVector, C> m;
         int j = 0;
@@ -386,7 +386,7 @@ public class SolvablePseudoReductionSeq<C extends RingElem<C>> extends SolvableR
         }
         int l = P.length;
         ExpVector[] htl = new ExpVector[l];
-        //C[] lbc = (C[]) new RingElem[l];
+        //C[] lbc = (C[]) new GcdRingElem[l]; 
         GenSolvablePolynomial<C>[] p = new GenSolvablePolynomial[l];
         int i;
         int j = 0;
@@ -480,7 +480,7 @@ public class SolvablePseudoReductionSeq<C extends RingElem<C>> extends SolvableR
         }
         int l = P.length;
         ExpVector[] htl = new ExpVector[l];
-        //C[] lbc = (C[]) new RingElem[l];
+        //C[] lbc = (C[]) new GcdRingElem[l];
         GenSolvablePolynomial<C>[] p = new GenSolvablePolynomial[l];
         int i;
         int j = 0;

@@ -19,7 +19,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPairFactory;
 import edu.jas.structure.RingFactory;
 
@@ -30,7 +30,7 @@ import edu.jas.structure.RingFactory;
  *
  * @author Heinz Kredel
  */
-public class SolvableQuotientRing<C extends RingElem<C>> implements RingFactory<SolvableQuotient<C>>,
+public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFactory<SolvableQuotient<C>>,
         QuotPairFactory<GenPolynomial<C>, SolvableQuotient<C>> {
     // should be QuotPairFactory<GenSolvablePolynomial<C>
 
@@ -139,7 +139,7 @@ public class SolvableQuotientRing<C extends RingElem<C>> implements RingFactory<
      * @return list of generators for the algebraic structure.
      */
     public List<SolvableQuotient<C>> generators() {
-        List<GenSolvablePolynomial<C>> pgens = PolynomialList.castToSolvableList(ring.generators());
+        List<GenSolvablePolynomial<C>> pgens = PolynomialList.<C>castToSolvableList(ring.generators());
         List<SolvableQuotient<C>> gens = new ArrayList<SolvableQuotient<C>>(pgens.size() * 2 - 1);
         GenSolvablePolynomial<C> one = ring.getONE();
         for (GenSolvablePolynomial<C> p : pgens) {

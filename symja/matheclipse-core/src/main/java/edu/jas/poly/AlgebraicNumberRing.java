@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.Scripting;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.util.CartesianProduct;
 import edu.jas.util.CartesianProductInfinite;

@@ -12,9 +12,8 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
-import edu.jas.structure.elem.RingElemImpl;
+import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
 
 
@@ -28,7 +27,7 @@ import edu.jas.structure.RingFactory;
  */
 
 public final class BigDecimal extends RingElemImpl<BigDecimal>
-        implements RingElem<BigDecimal>, RingFactory<BigDecimal> {
+        implements GcdRingElem<BigDecimal>, RingFactory<BigDecimal> {
 
 
     public static final MathContext DEFAULT_CONTEXT = MathContext.DECIMAL64; //32; //64; //128;
@@ -219,7 +218,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public BigDecimal factory() {
         return this;
@@ -347,7 +346,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
      * Is BigDecimal number zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         if (EXACT_EQUAL) {
@@ -360,7 +359,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     /**
      * Is BigDecimal number one.
      *
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         if (EXACT_EQUAL) {
@@ -373,7 +372,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     /**
      * Is BigDecimal number unit.
      *
-     * @see RingElem#isUnit()
+     * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
         return (!isZERO());
@@ -407,7 +406,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -420,7 +419,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -547,7 +546,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     /**
      * Absolute value of this.
      *
-     * @see RingElem#abs()
+     * @see edu.jas.structure.RingElem#abs()
      */
     public BigDecimal abs() {
         return new BigDecimal(val.abs(), context);
@@ -565,7 +564,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     /**
      * signum.
      *
-     * @see RingElem#signum()
+     * @see edu.jas.structure.RingElem#signum()
      */
     public int signum() {
         return val.signum();
@@ -597,7 +596,7 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     /**
      * Integer inverse. R is a non-zero integer. S=1/R if defined else 0.
      *
-     * @see RingElem#inverse()
+     * @see edu.jas.structure.RingElem#inverse()
      */
     public BigDecimal inverse() {
         return ONE.divide(this);

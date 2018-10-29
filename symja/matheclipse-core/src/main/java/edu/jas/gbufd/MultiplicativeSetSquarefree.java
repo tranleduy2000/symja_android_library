@@ -12,7 +12,7 @@ import java.util.List;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.ufd.SquarefreeAbstract;
 import edu.jas.ufd.SquarefreeFactory;
 
@@ -24,7 +24,7 @@ import edu.jas.ufd.SquarefreeFactory;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public class MultiplicativeSetSquarefree<C extends RingElem<C>> extends MultiplicativeSet<C> {
+public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends MultiplicativeSet<C> {
 
 
     private static final Logger logger = Logger.getLogger(MultiplicativeSetSquarefree.class);
@@ -107,7 +107,7 @@ public class MultiplicativeSetSquarefree<C extends RingElem<C>> extends Multipli
         if (mset.size() == 0) {
             list = engine.coPrimeSquarefree(cc, mset);
             if (ring.coFac.isField()) {
-                list = PolyUtil.monic(list);
+                list = PolyUtil.<C>monic(list);
             }
             return new MultiplicativeSetSquarefree<C>(ring, list, engine);
         }
@@ -119,7 +119,7 @@ public class MultiplicativeSetSquarefree<C extends RingElem<C>> extends Multipli
         logger.info("added to squarefree mset = " + c);
         list = engine.coPrimeSquarefree(c, mset);
         if (ring.coFac.isField()) {
-            list = PolyUtil.monic(list);
+            list = PolyUtil.<C>monic(list);
         }
         return new MultiplicativeSetSquarefree<C>(ring, list, engine);
     }

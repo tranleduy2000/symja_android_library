@@ -18,10 +18,10 @@ import java.util.Random;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.QuotPairFactory;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -42,8 +42,8 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class QLRSolvablePolynomialRing<C extends RingElem<C> & QuotPair<GenPolynomial<D>>,
-        D extends RingElem<D>>
+public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPolynomial<D>>,
+        D extends GcdRingElem<D>>
         extends GenSolvablePolynomialRing<C> {
 
 
@@ -249,7 +249,7 @@ public class QLRSolvablePolynomialRing<C extends RingElem<C> & QuotPair<GenPolyn
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -320,7 +320,10 @@ public class QLRSolvablePolynomialRing<C extends RingElem<C> & QuotPair<GenPolyn
         //if ( ! table.equals(oring.table) ) { // done in super
         //    return false;
         //}
-        return polCoeff.coeffTable.equals(oring.polCoeff.coeffTable);
+        if (!polCoeff.coeffTable.equals(oring.polCoeff.coeffTable)) {
+            return false;
+        }
+        return true;
     }
 
 

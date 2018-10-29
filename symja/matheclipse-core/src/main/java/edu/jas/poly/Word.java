@@ -8,9 +8,9 @@ package edu.jas.poly;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.MonoidElem;
-import edu.jas.structure.elem.MonoidElemImpl;
+import edu.jas.structure.Element;
+import edu.jas.structure.MonoidElem;
+import edu.jas.structure.MonoidElemImpl;
 import edu.jas.structure.MonoidFactory;
 import edu.jas.structure.NotInvertibleException;
 

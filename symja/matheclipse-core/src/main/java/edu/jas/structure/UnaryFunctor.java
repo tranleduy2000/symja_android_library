@@ -5,8 +5,6 @@
 package edu.jas.structure;
 
 
-import edu.jas.structure.elem.Element;
-
 /**
  * Unary functor interface.
  *

@@ -11,7 +11,7 @@ import edu.jas.arith.BigInteger;
 import edu.jas.arith.Modular;
 import edu.jas.arith.ModularRingFactory;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 
 
 /**
@@ -21,7 +21,7 @@ import edu.jas.structure.elem.RingElem;
  * @author Heinz Kredel
  */
 
-public class HenselApprox<MOD extends RingElem<MOD> & Modular> implements Serializable {
+public class HenselApprox<MOD extends GcdRingElem<MOD> & Modular> implements Serializable {
 
 
     /**

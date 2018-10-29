@@ -21,9 +21,9 @@ import java.util.TreeMap;
 import edu.jas.kern.PreemptingException;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.elem.Element;
-import edu.jas.structure.elem.RingElem;
-import edu.jas.structure.elem.RingElemImpl;
+import edu.jas.structure.Element;
+import edu.jas.structure.RingElem;
+import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.UnaryFunctor;
 
 

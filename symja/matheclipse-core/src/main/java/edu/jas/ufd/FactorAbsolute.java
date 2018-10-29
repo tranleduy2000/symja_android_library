@@ -18,7 +18,7 @@ import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -35,7 +35,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public abstract class FactorAbsolute<C extends RingElem<C>> extends FactorAbstract<C> {
+public abstract class FactorAbsolute<C extends GcdRingElem<C>> extends FactorAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(FactorAbsolute.class);
@@ -273,14 +273,14 @@ public abstract class FactorAbsolute<C extends RingElem<C>> extends FactorAbstra
         GenPolynomialRing<AlgebraicNumber<C>> pafac = new GenPolynomialRing<AlgebraicNumber<C>>(afac,
                 aP.ring.nvar, aP.ring.tord, /*old*/vars);
         // convert to K(alpha)
-        GenPolynomial<AlgebraicNumber<C>> Pa = PolyUtil.convertToAlgebraicCoefficients(pafac, P);
+        GenPolynomial<AlgebraicNumber<C>> Pa = PolyUtil.<C>convertToAlgebraicCoefficients(pafac, P);
         if (logger.isInfoEnabled()) {
             logger.info("P over K(alpha) = " + Pa);
             //logger.info("P over K(alpha) = " + Pa.toScript()); 
             //System.out.println("P in K(alpha) = " + Pa);
         }
         // factor over K(alpha)
-        FactorAbstract<AlgebraicNumber<C>> engine = FactorFactory.getImplementation(afac);
+        FactorAbstract<AlgebraicNumber<C>> engine = FactorFactory.<C>getImplementation(afac);
         //System.out.println("K(alpha) engine = " + engine);
         List<GenPolynomial<AlgebraicNumber<C>>> factors = engine.baseFactorsSquarefree(Pa);
         //System.out.println("factors = " + factors);
@@ -297,7 +297,7 @@ public abstract class FactorAbsolute<C extends RingElem<C>> extends FactorAbstra
             } else {
                 //System.out.println("fi.deg > 1 = " + fi);
                 FactorAbsolute<AlgebraicNumber<C>> aengine = (FactorAbsolute<AlgebraicNumber<C>>) FactorFactory
-                        .getImplementation(afac);
+                        .<C>getImplementation(afac);
                 Factors<AlgebraicNumber<C>> fif = aengine.baseFactorsAbsoluteIrreducible(fi);
                 //System.out.println("fif = " + fif);
                 facar.add(fif);
@@ -427,7 +427,7 @@ public abstract class FactorAbsolute<C extends RingElem<C>> extends FactorAbstra
         //System.out.println("factors       = " + fact);
         GenPolynomial<AlgebraicNumber<C>> Pa = afacs.apoly;
 
-        GenPolynomial<AlgebraicNumber<C>> Aa = PolyUtil.convertToRecAlgebraicCoefficients(1, Pa.ring, A);
+        GenPolynomial<AlgebraicNumber<C>> Aa = PolyUtil.<C>convertToRecAlgebraicCoefficients(1, Pa.ring, A);
 
 
         GreatestCommonDivisorAbstract<AlgebraicNumber<C>> aengine = GCDFactory.getProxy(afacs.afac);
@@ -454,7 +454,7 @@ public abstract class FactorAbsolute<C extends RingElem<C>> extends FactorAbstra
             System.out.println("faf = " + faf);
             List<GenPolynomial<AlgebraicNumber<AlgebraicNumber<C>>>> fafact = faf.getFactors();
             GenPolynomial<AlgebraicNumber<AlgebraicNumber<C>>> Aaa = PolyUtil
-                    .convertToRecAlgebraicCoefficients(1, faf.apoly.ring, an);
+                    .<AlgebraicNumber<C>>convertToRecAlgebraicCoefficients(1, faf.apoly.ring, an);
 
             GreatestCommonDivisorAbstract<AlgebraicNumber<AlgebraicNumber<C>>> aaengine = GCDFactory
                     .getImplementation(faf.afac);
@@ -644,7 +644,7 @@ public abstract class FactorAbsolute<C extends RingElem<C>> extends FactorAbstra
             String[] vn = new String[]{pfac.getVars()[pfac.nvar - 1]};
             GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(nfac, 1,
                     pfac.tord, vn);
-            GenPolynomial<GenPolynomial<C>> upr = PolyUtil.recursive(rfac, up);
+            GenPolynomial<GenPolynomial<C>> upr = PolyUtil.<C>recursive(rfac, up);
             //System.out.println("upr = " + upr);
             GenPolynomial<C> ep;
             do {
@@ -653,7 +653,7 @@ public abstract class FactorAbsolute<C extends RingElem<C>> extends FactorAbstra
                 }
                 C r = cf.fromInteger(rp); //cf.random(rp);
                 //System.out.println("r   = " + r);
-                ep = PolyUtil.evaluateMainRecursive(nfac, upr, r);
+                ep = PolyUtil.<C>evaluateMainRecursive(nfac, upr, r);
                 //System.out.println("ep  = " + ep);
                 rp++;
             } while (!isSquarefree(ep) /*todo: || ep.degree() <= 1*/); // max deg
@@ -714,10 +714,10 @@ public abstract class FactorAbsolute<C extends RingElem<C>> extends FactorAbstra
         //System.out.println("pafac = " + pafac);
         // convert to K(alpha)
         GenPolynomial<AlgebraicNumber<C>> Pa = PolyUtil
-                .convertToRecAlgebraicCoefficients(depth, pafac, P);
+                .<C>convertToRecAlgebraicCoefficients(depth, pafac, P);
         //System.out.println("Pa = " + Pa);
         // factor over K(alpha)
-        FactorAbstract<AlgebraicNumber<C>> engine = FactorFactory.getImplementation(afac);
+        FactorAbstract<AlgebraicNumber<C>> engine = FactorFactory.<C>getImplementation(afac);
         afactors = engine.factorsSquarefree(Pa);
         if (debug) {
             logger.info("K(alpha) factors multi = " + afactors);

@@ -15,7 +15,7 @@ import edu.jas.gb.ReductionAbstract;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.elem.RegularRingElem;
+import edu.jas.structure.RegularRingElem;
 
 
 /**

@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -21,7 +21,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends GreatestCommonDivisorAbstract<C> {
+public class GreatestCommonDivisorSubres<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GreatestCommonDivisorSubres.class);
@@ -43,7 +43,7 @@ public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends Greatest
      */
     @Deprecated
     public GenPolynomial<C> basePseudoRemainder(GenPolynomial<C> P, GenPolynomial<C> S) {
-        return PolyUtil.baseDensePseudoRemainder(P, S);
+        return PolyUtil.<C>baseDensePseudoRemainder(P, S);
     }
 
 
@@ -61,7 +61,7 @@ public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends Greatest
     @Deprecated
     public GenPolynomial<GenPolynomial<C>> recursivePseudoRemainder(GenPolynomial<GenPolynomial<C>> P,
                                                                     GenPolynomial<GenPolynomial<C>> S) {
-        return PolyUtil.recursiveDensePseudoRemainder(P, S);
+        return PolyUtil.<C>recursiveDensePseudoRemainder(P, S);
     }
 
 
@@ -121,7 +121,7 @@ public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends Greatest
         while (!r.isZERO()) {
             long delta = q.degree(0) - r.degree(0);
             //System.out.println("delta    = " + delta);
-            x = PolyUtil.baseDensePseudoRemainder(q, r);
+            x = PolyUtil.<C>baseDensePseudoRemainder(q, r);
             q = r;
             if (!x.isZERO()) {
                 z = g.multiply(h.power(delta)); //power(P.ring.coFac, h, delta));
@@ -185,8 +185,8 @@ public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends Greatest
 
         GenPolynomial<C> c = gcd(a, b); // go to recursion
         //System.out.println("rgcd c = " + c);
-        r = PolyUtil.recursiveDivide(r, a);
-        q = PolyUtil.recursiveDivide(q, b);
+        r = PolyUtil.<C>recursiveDivide(r, a);
+        q = PolyUtil.<C>recursiveDivide(q, b);
         if (r.isONE()) {
             return r.multiply(c);
         }
@@ -200,17 +200,17 @@ public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends Greatest
         while (!r.isZERO()) {
             long delta = q.degree(0) - r.degree(0);
             //System.out.println("rgcd delta = " + delta);
-            x = PolyUtil.recursiveDensePseudoRemainder(q, r);
+            x = PolyUtil.<C>recursiveDensePseudoRemainder(q, r);
             if (logger.isInfoEnabled()) {
                 logger.info("recursiveDensePseudoRemainder.bits = " + x.bitLength());
             }
             q = r;
             if (!x.isZERO()) {
                 z = g.multiply(h.power(delta)); //power(P.ring.coFac, h, delta));
-                r = PolyUtil.recursiveDivide(x, z);
+                r = PolyUtil.<C>recursiveDivide(x, z);
                 g = q.leadingBaseCoefficient();
                 z = g.power(delta); //power(P.ring.coFac, g, delta);
-                h = PolyUtil.basePseudoDivide(z, h.power(delta - 1)); // power(P.ring.coFac, h, delta - 1)
+                h = PolyUtil.<C>basePseudoDivide(z, h.power(delta - 1)); // power(P.ring.coFac, h, delta - 1)
             } else {
                 r = x;
             }
@@ -272,7 +272,7 @@ public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends Greatest
             if ((q.degree(0) % 2 != 0) && (r.degree(0) % 2 != 0)) {
                 s = -s;
             }
-            x = PolyUtil.baseDensePseudoRemainder(q, r);
+            x = PolyUtil.<C>baseDensePseudoRemainder(q, r);
             //System.out.println("x  = " + x);
             q = r;
             if (x.degree(0) > 0) {
@@ -335,8 +335,8 @@ public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends Greatest
         q = q.abs();
         GenPolynomial<C> a = recursiveContent(r);
         GenPolynomial<C> b = recursiveContent(q);
-        r = PolyUtil.recursiveDivide(r, a);
-        q = PolyUtil.recursiveDivide(q, b);
+        r = PolyUtil.<C>recursiveDivide(r, a);
+        q = PolyUtil.<C>recursiveDivide(q, b);
         RingFactory<GenPolynomial<C>> cofac = P.ring.coFac;
         GenPolynomial<C> g = cofac.getONE();
         GenPolynomial<C> h = cofac.getONE();
@@ -359,21 +359,21 @@ public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends Greatest
             if ((q.degree(0) % 2 != 0) && (r.degree(0) % 2 != 0)) {
                 s = -s;
             }
-            x = PolyUtil.recursiveDensePseudoRemainder(q, r);
+            x = PolyUtil.<C>recursiveDensePseudoRemainder(q, r);
             //System.out.println("x  = " + x);
             q = r;
             if (x.degree(0) > 0) {
                 z = g.multiply(h.power(delta)); //power(P.ring.coFac, h, delta));
-                r = PolyUtil.recursiveDivide(x, z);
+                r = PolyUtil.<C>recursiveDivide(x, z);
                 g = q.leadingBaseCoefficient();
                 z = g.power(delta); //power(cofac, g, delta);
-                h = PolyUtil.basePseudoDivide(z, h.power(delta - 1)); //power(cofac, h, delta - 1));
+                h = PolyUtil.<C>basePseudoDivide(z, h.power(delta - 1)); //power(cofac, h, delta - 1));
             } else {
                 r = x;
             }
         }
         z = r.leadingBaseCoefficient().power(q.degree(0)); //power(cofac, r.leadingBaseCoefficient(), q.degree(0));
-        h = PolyUtil.basePseudoDivide(z, h.power(q.degree() - 1)); //power(cofac, h, q.degree(0) - 1));
+        h = PolyUtil.<C>basePseudoDivide(z, h.power(q.degree() - 1)); //power(cofac, h, q.degree(0) - 1));
         z = h.multiply(t);
         if (s < 0) {
             z = z.negate();
@@ -402,7 +402,7 @@ public class GreatestCommonDivisorSubres<C extends RingElem<C>> extends Greatest
         }
         C a = P.leadingBaseCoefficient();
         a = a.inverse();
-        GenPolynomial<C> Pp = PolyUtil.baseDeriviative(P);
+        GenPolynomial<C> Pp = PolyUtil.<C>baseDeriviative(P);
         GenPolynomial<C> res = baseResultant(P, Pp);
         GenPolynomial<C> disc = res.multiply(a);
         long n = P.degree(0);

@@ -7,9 +7,6 @@ package edu.jas.structure;
 
 import java.util.List;
 
-import edu.jas.structure.elem.AlgebraElem;
-import edu.jas.structure.elem.RingElem;
-
 
 /**
  * Algebra factory interface. Defines conversion from list of lists and sparse
