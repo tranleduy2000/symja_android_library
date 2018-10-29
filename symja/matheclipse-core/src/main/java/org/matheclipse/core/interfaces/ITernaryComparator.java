@@ -13,5 +13,5 @@ public interface ITernaryComparator  {
 	 * @param arg2
 	 * @return
 	 */
-	IExpr.COMPARE_TERNARY compareTernary(IExpr arg1, IExpr arg2);
+	COMPARE_TERNARY compareTernary(IExpr arg1, IExpr arg2);
 }

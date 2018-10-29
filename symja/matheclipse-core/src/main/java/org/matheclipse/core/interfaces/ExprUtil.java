@@ -3,7 +3,7 @@ package org.matheclipse.core.interfaces;
 import javax.annotation.Nonnull;
 
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IExpr.COMPARE_TERNARY;
+import org.matheclipse.core.interfaces.COMPARE_TERNARY;
 
 public class ExprUtil {
 	/**

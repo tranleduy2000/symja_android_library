@@ -32,9 +32,9 @@ import edu.jas.structure.GcdRingElem;
 
 /**
  * (I)nterface for a mathematical (Expr)ession<br />
- *
+ * <p>
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
- *
+ * <p>
  * <pre>
  * java.lang.Object
  *    |--- java.util.AbstractCollection
@@ -82,58 +82,43 @@ import edu.jas.structure.GcdRingElem;
  */
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
 
-    public final static int ASTID = 4096;
-    public final static int BLANKID = 16384;
-    public final static int COMPLEXID = 32;
-    public final static int DOUBLECOMPLEXID = 4;
-    public final static int DOUBLEID = 2;
-    public final static int FRACTIONID = 16;
-    public final static int INTEGERID = 8;
-    public final static int METHODSYMBOLID = 8192;
-    public final static int PATTERNID = 2048;
-    public final static int SERIESID = 64;
-    public final static int QUANTITYID = 128;
-    public final static int STRINGID = 256;
-    public final static int SYMBOLID = 512;
-    public final static int DATAID = 1024;
+    int ASTID = 4096;
+    int BLANKID = 16384;
+    int COMPLEXID = 32;
+    int DOUBLECOMPLEXID = 4;
+    int DOUBLEID = 2;
+    int FRACTIONID = 16;
+    int INTEGERID = 8;
+    int METHODSYMBOLID = 8192;
+    int PATTERNID = 2048;
+    int SERIESID = 64;
+    int QUANTITYID = 128;
+    int STRINGID = 256;
+    int SYMBOLID = 512;
+    int DATAID = 1024;
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
-     *
-     * @param that
-     * @return
      */
     IExpr $div(final IExpr that);
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
-     *
-     * @param that
-     * @return
      */
     IExpr $minus(final IExpr that);
 
     /**
      * Operator overloading for Scala operator <code>+</code>. Calls <code>plus(that)</code>.
-     *
-     * @param that
-     * @return
      */
     IExpr $plus(final IExpr that);
 
     /**
      * Operator overloading for Scala operator <code>*</code>. Calls <code>times(that)</code>.
-     *
-     * @param that
-     * @return
      */
     IExpr $times(final IExpr that);
 
     /**
      * Operator overloading for Scala operator <code>^</code>. Calls <code>power(that)</code>.
-     *
-     * @param that
-     * @return
      */
     IExpr $up(final IExpr that);
 
@@ -142,33 +127,21 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Accept a visitor with return type T
-     *
-     * @param visitor
-     * @return
      */
     <T> T accept(IVisitor<T> visitor);
 
     /**
      * Accept a visitor with return type <code>boolean</code>
-     *
-     * @param visitor
-     * @return
      */
     boolean accept(IVisitorBoolean visitor);
 
     /**
      * Accept a visitor with return type <code>int</code>
-     *
-     * @param visitor
-     * @return
      */
     int accept(IVisitorInt visitor);
 
     /**
      * Accept a visitor with return type <code>long</code>
-     *
-     * @param visitor
-     * @return
      */
     long accept(IVisitorLong visitor);
 
@@ -204,8 +177,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Get the first element of this <code>Power(base, exponent)</code> expression.
-     *
-     * @return
      */
     IExpr base();
 
@@ -248,7 +219,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Return <code>negate()</code> if <code>number.sign() < 0</code>, otherwise return <code>this</code>
      *
      * @param number
-     * @return
      */
     IExpr copySign(ISignedNumber number);
 
@@ -256,8 +226,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Returns an <code>IExpr</code> whose value is <code>(this - 1)</code>. Calculates
      * <code>F.eval(F.Subtract(this, C1))</code> in the common case and uses a specialized implementation for derived
      * number classes.
-     *
-     * @return
      */
     IExpr dec();
 
@@ -265,9 +233,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Returns an <code>IExpr</code> whose value is <code>(this / that)</code>. Calculates
      * <code>F.eval(F.Times(this, F.Power(that, F.CN1)))</code> in the common case and uses a specialized implementation
      * for derived number classes.
-     *
-     * @param that
-     * @return
      */
     @Override
     IExpr divide(IExpr that);
@@ -281,7 +246,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param position the position in the <code>IAST</code> which should be tested for equality
      * @param expr     the expression which should be tested for equality
-     * @return
      */
     boolean equalsAt(int position, final IExpr expr);
 
@@ -293,7 +257,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <li>return F.NIL if the comparison is undetermined (i.e. could not be evaluated)</li>
      * </ul>
      *
-     * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
     IExpr equalTo(IExpr that);
@@ -340,8 +303,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Get the second element of this <code>Power(base, exponent)</code> expression.
-     *
-     * @return
      */
     IExpr exponent();
 
@@ -368,8 +329,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Return the <code>FullForm()</code> of this expression
-     *
-     * @return
      */
     String fullFormString();
 
@@ -380,7 +339,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Get the element at the specified <code>index</code> if this object is of type <code>IAST</code>.
      *
      * @param index
-     * @return
      */
     IExpr getAt(final int index);
 
@@ -391,7 +349,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Evaluate Greater, if both arguments are real numbers
      *
      * @param a1
-     * @return
      */
     IExpr greater(final IExpr a1);
 
@@ -399,7 +356,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Evaluate GreaterEqual, if both arguments are real numbers
      *
      * @param a1
-     * @return
      */
     IExpr greaterEqual(final IExpr a1);
 
@@ -411,7 +367,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <li>return F.NIL if the comparison is undetermined (i.e. could not be evaluated)</li>
      * </ul>
      *
-     * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
     IExpr greaterEqualThan(IExpr that);
@@ -424,7 +379,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <li>return F.NIL if the comparison is undetermined (i.e. could not be evaluated)</li>
      * </ul>
      *
-     * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
     IExpr greaterThan(IExpr that);
@@ -457,7 +411,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * otherwise do nothing.
      *
      * @param consumer block to be executed if this expression unequals <code>F.NIL</code>
-     * @see java.util.Optional#ifPresent(com.duy.lambda.Consumer)
      */
     void ifPresent(Consumer<? super IExpr> consumer);
 
@@ -481,8 +434,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Returns an <code>IExpr</code> whose value is <code>(this + 1)</code>. Calculates
      * <code>F.eval(F.Plus(this, C1))</code> in the common case and uses a specialized implementation for derived number
      * classes.
-     *
-     * @return
      */
     IExpr inc();
 
@@ -529,80 +480,58 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression is the function <code>Abs[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isAbs();
 
     /**
      * Test if this expression and all subexpressions are already expanded i.e. all <code>Plus, Times, Power</code>
      * (sub-)expressions are expanded.
-     *
-     * @return
      */
     boolean isAllExpanded();
 
     /**
      * Test if this expression is the <code>Alternatives</code> function
      * <code>Alternatives[&lt;pattern1&gt;, &lt;pattern2&gt;, ...]</code>
-     *
-     * @return
      */
     boolean isAlternatives();
 
     /**
      * Test if this expression is the <code>HoldPattern</code> function <code>HoldPattern[&lt;expression&gt;]</code>
-     *
-     * @return
      */
     boolean isHoldPattern();
 
     /**
      * Test if this expression is the function <code>And[&lt;arg&gt;,...]</code>
-     *
-     * @return
      */
     boolean isAnd();
 
     /**
      * Test if this expression is the function <code>ArcCos[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isArcCos();
 
     /**
      * Test if this expression is the function <code>ArcCosh[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isArcCosh();
 
     /**
      * Test if this expression is the function <code>ArcSin[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isArcSin();
 
     /**
      * Test if this expression is the function <code>ArcSinh[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isArcSinh();
 
     /**
      * Test if this expression is the function <code>ArcTan[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isArcTan();
 
     /**
      * Test if this expression is the function <code>ArcTanh[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isArcTanh();
 
@@ -611,22 +540,17 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * position <code>0</code> and some optional <b>argument elements</b> at the index positions <code>1..n</code>.
      * Therefore this expression is no <b>atomic expression</b>.
      *
-     * @return
      * @see #isAtom()
      */
     boolean isAST();
 
     /**
      * Test if this expression is a distribution AST (i.e. NormalDistribution(), PoissonDistribution(),...)
-     *
-     * @return
      */
     boolean isDistribution();
 
     /**
      * Test if this expression is a discrete distribution AST (i.e. BinomialDistribution(), PoissonDistribution(),...)
-     *
-     * @return
      */
     boolean isDiscreteDistribution();
 
@@ -636,7 +560,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Therefore this expression is not an <b>atomic expression</b>.
      *
      * @param header the header element at position 0, which should be tested
-     * @return
      * @see #isAtom()
      */
     boolean isAST(IExpr header);
@@ -648,7 +571,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param header the header element at position 0, which should be tested
      * @param length the size the AST expression must have (<b>inclusive head element</b>)
-     * @return
      * @see #isAtom()
      */
     boolean isAST(IExpr header, int length);
@@ -662,7 +584,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param length the size the AST expression must have
      * @param args   the arguments of this AST which should be tested, if they are equal, a <code>null</code> value
      *               argument skips the equals check.
-     * @return
      * @see #isAtom()
      */
     boolean isAST(IExpr header, int length, IExpr... args);
@@ -675,7 +596,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param header    the header element at position 0, which should be tested
      * @param minLength the minimum size the AST expression must have
      * @param maxLength the maximum size the AST expression must have
-     * @return
      * @see #isAtom()
      */
     boolean isAST(IExpr header, int minLength, int maxLength);
@@ -696,7 +616,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * </p>
      *
      * @param headerStr string representation of the <b>header element</b> at index position <code>0</code>
-     * @return
      * @see #isAtom()
      */
     boolean isAST(String headerStr);
@@ -709,7 +628,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param headerStr string representation of the <b>header element</b> at index position <code>0</code>
      * @param length    the size the AST expression must have
-     * @return
      * @see #isAtom()
      */
     boolean isAST(String headerStr, int length);
@@ -719,7 +637,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * position <code>0</code> and no <b>argument elements</b>. Therefore this expression is no <b>atomic
      * expression</b>.
      *
-     * @return
      * @see #isAtom()
      */
     boolean isAST0();
@@ -729,7 +646,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * position <code>0</code> and one <b>argument element</b> at the index position <code>1</code>. Therefore this
      * expression is no <b>atomic expression</b>.
      *
-     * @return
      * @see #isAtom()
      */
     boolean isAST1();
@@ -739,7 +655,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * position <code>0</code> and two <b>argument elements</b> at the index positions <code>1, 2</code>. Therefore this
      * expression is no <b>atomic expression</b>.
      *
-     * @return
      * @see #isAtom()
      */
     boolean isAST2();
@@ -749,7 +664,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * position <code>0</code> and three <b>argument elements</b> at the index positions <code>1, 2, 3</code>. Therefore
      * this expression is no <b>atomic expression</b>.
      *
-     * @return
      * @see #isAtom()
      */
     boolean isAST3();
@@ -762,64 +676,47 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param header the header element at position 0, which should be tested
      * @param length the size the AST expression must have
-     * @return
      * @see #isAtom()
      */
     boolean isASTSizeGE(IExpr header, int length);
 
     /**
      * Test if this expression is an atomic expression (i.e. no AST expression)
-     *
-     * @return
      */
     boolean isAtom();
 
     /**
      * Test if this expression is a <code>Blank[]</code> object
-     *
-     * @return
      */
     boolean isBlank();
 
     /**
      * Test if this expression is a symbol (instanceof IBuiltInSymbol)
-     *
-     * @return
      */
     boolean isBuiltInSymbol();
 
     /**
      * Test if this expression is a symbolic complex number (i.e. <code>instanceof IComplex</code>)
-     *
-     * @return
      */
     boolean isComplex();
 
     /**
      * Test if this expression is representing ComplexInfinity (i.e. DirectedInfinity[])
-     *
-     * @return
      */
     boolean isComplexInfinity();
 
     /**
      * Test if this expression is a numeric complex number (i.e. <code>instanceof IComplexNum</code>)
-     *
-     * @return
      */
     boolean isComplexNumeric();
 
     /**
      * Test if this expression is the Condition function <code>Condition[&lt;arg1&gt;, &lt;arg2&gt;]</code>
-     *
-     * @return
      */
     boolean isCondition();
 
     /**
      * Test if this expression is the function <code>Conjugate[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isConjugate();
 
@@ -827,7 +724,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression is a symbol with attribute <code>Constant</code>. Therefore numbers return
      * <code>false</code> for this method!
      *
-     * @return
      * @see #isRealResult()
      * @see #isNumericFunction()
      */
@@ -836,29 +732,21 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements
      * <code>ICoreFunctionEvaluator</code> (see package <code>org.matheclipse.core.builtin.function</code>).
-     *
-     * @return
      */
     boolean isCoreFunctionSymbol();
 
     /**
      * Test if this expression is the function <code>Cos[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isCos();
 
     /**
      * Test if this expression is the function <code>Cosh[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isCosh();
 
     /**
      * Test if this expression is the function <code>Defer[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isDefer();
 
@@ -906,8 +794,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is representing a DirectedInfinity (i.e. <code>Infinity->DirectedInfinity[1]</code>,
      * <code>-Infinity->DirectedInfinity[-1]</code>, <code>ComplexInfinity->DirectedInfinity[]</code>)
-     *
-     * @return
      */
     boolean isDirectedInfinity();
 
@@ -916,7 +802,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>-Infinity->DirectedInfinity[-1]</code>, <code>ComplexInfinity->DirectedInfinity[]</code>)
      *
      * @param x
-     * @return
      */
     boolean isDirectedInfinity(IExpr x);
 
@@ -926,45 +811,33 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <p>
      * <br>
      * See <a href="http://en.wikipedia.org/wiki/E_%28mathematical_constant%29">e (mathematical constant)</a>
-     *
-     * @return
      */
     boolean isE();
 
     /**
      * Test if this expression is the function <code>Equal[&lt;arg1&gt;, &lt;arg2&gt;]</code>
-     *
-     * @return
      */
     boolean isEqual();
 
     /**
      * Test if this expression is an exact number. I.e. an instance of type <code>IRational</code> or
      * <code>IComplex</code>.
-     *
-     * @return
      */
     boolean isExactNumber();
 
     /**
      * Test if this expression is the <code>Except</code> function <code>Except[&lt;pattern1&gt;]</code> or
      * <code>Except[&lt;pattern1&gt;, &lt;pattern2&gt;]</code>
-     *
-     * @return
      */
     boolean isExcept();
 
     /**
      * Test if this expression is already expanded i.e. <code>Plus, Times, Power</code> expression is expanded.
-     *
-     * @return
      */
     boolean isExpanded();
 
     /**
      * Test if this expression equals the symbol "False"
-     *
-     * @return
      */
     boolean isFalse();
 
@@ -975,15 +848,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>Flat</code> functions are <code>Dot[], Plus[] or Times[]</code>. Therefore this expression is no <b>atomic
      * expression</b>.
      *
-     * @return
      * @see #isAtom()
      */
     boolean isFlatAST();
 
     /**
      * Test if this expression is a fractional number, but no integer number.
-     *
-     * @return
      */
     boolean isFraction();
 
@@ -992,7 +862,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * match the given pattern. Calls <code>isFree(pattern, true)</code>.
      *
      * @param pattern a pattern-matching expression
-     * @return
      */
     boolean isFree(IExpr pattern);
 
@@ -1003,7 +872,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param pattern a pattern-matching expression
      * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and not the
      *                <code>Head[]</code> element.
-     * @return
      */
     boolean isFree(IExpr pattern, boolean heads);
 
@@ -1014,7 +882,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param predicate a unary predicate
      * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested and not the
      *                  <code>Head[]</code> element.
-     * @return
      */
     boolean isFree(Predicate<IExpr> predicate, boolean heads);
 
@@ -1023,7 +890,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * ASTs with a head which match the given pattern.
      *
      * @param pattern a pattern-matching expression
-     * @return
      */
     boolean isFreeAST(IExpr pattern);
 
@@ -1032,7 +898,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * ASTs with a head which match the given predicate.
      *
      * @param predicate a unary predicate
-     * @return
      */
     boolean isFreeAST(Predicate<IExpr> predicate);
 
@@ -1046,8 +911,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression is a <code>Function( arg1 )</code> expression with at least 1 argument.
-     *
-     * @return
      */
     boolean isFunction();
 
@@ -1071,44 +934,32 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression is th symbol <code>Hold</code> or <code>HoldForm</code>
-     *
-     * @return
      */
     boolean isHoldOrHoldFormOrDefer();
 
     /**
      * Test if this expression is representing <code>I</code>.
-     *
-     * @return
      */
     boolean isImaginaryUnit();
 
     /**
      * Test if this expression is representing <code>Indeterminate</code>
-     *
-     * @return
      */
     boolean isIndeterminate();
 
     /**
      * Test if this expression is an inexact number. I.e. an instance of type <code>INum</code> or
      * <code>IComplexNum</code>.
-     *
-     * @return
      */
     boolean isInexactNumber();
 
     /**
      * Test if this expression is representing <code>Infinity</code> (i.e. <code>Infinity->DirectedInfinity[1]</code>)
-     *
-     * @return
      */
     boolean isInfinity();
 
     /**
      * Test if this expression is a integer number
-     *
-     * @return
      */
     boolean isInteger();
 
@@ -1131,23 +982,17 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is an interval expression with one or more <code>List[min, max]</code> arguments
      * <code>Interval[{min1, max1}, {min2, max2}, ...]</code> which represent the union of the interval ranges.
-     *
-     * @return
      */
     boolean isInterval();
 
     /**
      * Test if this expression is an interval expression with one <code>List[min, max]</code> argument
      * <code>Interval[{min, max}]</code>
-     *
-     * @return
      */
     boolean isInterval1();
 
     /**
      * Test if this expression is a Quantity(a,unit) expression.
-     *
-     * @return
      */
     boolean isQuantity();
 
@@ -1162,15 +1007,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression is a list (i.e. an AST with head List)
-     *
-     * @return
      */
     boolean isList();
 
     /**
      * Test if this expression is a list of lists
      *
-     * @return
      * @see #isList()
      * @see #isMatrix(boolean)
      * @see #isVector()
@@ -1180,7 +1022,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is a list of rules (head Rule or RuleDelayed)
      *
-     * @return
      * @see #isList()
      * @see #isMatrix(boolean)
      * @see #isVector()
@@ -1189,8 +1030,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression is the function <code>Log[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isLog();
 
@@ -1206,8 +1045,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is a machine-precision (Java double type) real or complex number. I.e. an instance of
      * type <code>Num</code> or <code>ComplexNum</code>.
-     *
-     * @return
      */
     boolean isMachineNumber();
 
@@ -1237,7 +1074,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param pattern a pattern-matching expression
      * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and not the
      *                <code>Head[]</code> element.
-     * @return
      */
     boolean isMember(IExpr pattern, boolean heads);
 
@@ -1248,28 +1084,21 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param predicate a unary predicate
      * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested and not the
      *                  <code>Head[]</code> element.
-     * @return
      */
     boolean isMember(Predicate<IExpr> predicate, boolean heads);
 
     /**
      * Test if this expression equals <code>-1</code> in symbolic or numeric mode.
-     *
-     * @return
      */
     boolean isMinusOne();
 
     /**
      * Test if this expression is the Module function <code>Module[&lt;arg1&gt;, &lt;arg2&gt;]</code>
-     *
-     * @return
      */
     boolean isModule();
 
     /**
      * Test if this expression is the With function <code>With[&lt;arg1&gt;, &lt;arg2&gt;]</code>
-     *
-     * @return
      */
     boolean isWith();
 
@@ -1286,16 +1115,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression is representing <code>-I</code>.
-     *
-     * @return
      */
     boolean isNegativeImaginaryUnit();
 
     /**
      * Test if this expression is representing <code>-Infinity</code> (i.e.
      * <code>-Infinity->DirectedInfinity[-1]</code>)
-     *
-     * @return
      */
     boolean isNegativeInfinity();
 
@@ -1328,40 +1153,28 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression unequals <code>0</code> and is a numeric complex value or is assumed to be a negative or
      * positive value.
-     *
-     * @return
      */
     boolean isNonZeroComplexResult();
 
     /**
      * Test if this expression unequals <code>0</code> and is a numeric real value or is assumed to be a negative or
      * positive value.
-     *
-     * @return
      */
     boolean isNonZeroRealResult();
 
     /**
      * Test if this expression is the function <code>Not[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isNot();
 
     /**
      * Test if this expression is a number. I.e. an instance of type <code>INumber</code>.
-     *
-     * @return
      */
     boolean isNumber();
 
     /**
      * Check if this expression equals an <code>IInteger</code> value. The value of an <code>INum</code> or the value of
      * an <code>IInteger</code> object can be equal to <code>value</code>.
-     *
-     * @param value
-     * @return
-     * @throws ArithmeticException
      */
     boolean isNumEqualInteger(IInteger value) throws ArithmeticException;
 
@@ -1369,9 +1182,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Check if this expression equals an <code>IRational</code> value. The value of an <code>IInteger</code>,
      * <code>IFraction</code> or the value of an <code>INum</code> object can be equal to <code>value</code>.
      *
-     * @param value
-     * @return
-     * @throws ArithmeticException
      * @see #isRational()
      */
     boolean isNumEqualRational(IRational value) throws ArithmeticException;
@@ -1379,16 +1189,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is a numeric number (i.e. an instance of type <code>INum</code> or type
      * <code>IComplexNum</code>.
-     *
-     * @return
      */
     boolean isNumeric();
 
     /**
      * Test if this expression is a numeric number (i.e. an instance of type <code>INum</code> or type
      * <code>IComplexNum</code>), an <code>ASTRealVector</code> or an <code>ASTRealMatrix</code>.
-     *
-     * @return
      */
     boolean isNumericArgument();
 
@@ -1413,15 +1219,11 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Check if this expression represents an <code>int</code> value. The value of an <code>INum</code> object can be an
      * <code>int</code> value.
-     *
-     * @return
      */
     boolean isNumIntValue();
 
     /**
      * Test if this expression equals <code>1</code> in symbolic or numeric mode.
-     *
-     * @return
      */
     boolean isOne();
 
@@ -1440,15 +1242,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * exactly <b>one argument</b> at the index position <code>1</code>. Examples for <code>OneIdentity</code> functions
      * are <code>Plus[] or Times[]</code>. Therefore this expression is no <b>atomic expression</b>.
      *
-     * @return
      * @see #isAtom()
      */
     boolean isOneIdentityAST1();
 
     /**
      * Test if this expression is the function <code>Or[&lt;arg&gt;,...]</code>
-     *
-     * @return
      */
     boolean isOr();
 
@@ -1459,54 +1258,41 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>Orderless</code> functions are <code>Plus[] or Times[]</code>. Therefore this expression is no <b>atomic
      * expression</b>.
      *
-     * @return
      * @see #isAtom()
      */
     boolean isOrderlessAST();
 
     /**
      * Test if this expression is a <code>Pattern[symbol]</code> object
-     *
-     * @return
      */
     boolean isPattern();
 
     /**
      * Return <code>true</code>, if the expression is a pattern object with an associated  value (for example
      * <code>0</code> is the  value for the addition expression <code>x_+y_.</code>)
-     *
-     * @return
      */
     boolean isPatternDefault();
 
     /**
      * Test if this expression or a subexpression is a pattern object. Used in pattern-matching; checks flags in
      * <code>IAST</code> with flag <code>IAST.CONTAINS_PATTERN_EXPR</code>.
-     *
-     * @return
      */
     boolean isPatternExpr();
 
     /**
      * Return <code>true</code>, if the expression is a pattern object with an associated optional value (for example
      * <code>value</code> is the  value for the expression <code>f[x_, y_:value]</code>)
-     *
-     * @return
      */
     boolean isPatternOptional();
 
     /**
      * Test if this expression is a pattern sequence object
-     *
-     * @return
      */
     boolean isPatternSequence(boolean testNullSequence);
 
     /**
      * Test if this expression is the <code>Except</code> function <code>Except[&lt;pattern1&gt;]</code> or
      * <code>Except[&lt;pattern1&gt;, &lt;pattern2&gt;]</code>
-     *
-     * @return
      */
     boolean isPatternTest();
 
@@ -1516,23 +1302,17 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <p>
      * <br>
      * See <a href="http://en.wikipedia.org/wiki/Pi">Pi</a>
-     *
-     * @return
      */
     boolean isPi();
 
     /**
      * Test if this expression is the addition function <code>Plus[&lt;arg1&gt;, &lt;arg2&gt;, ...]</code> with at least
      * 2 arguments.
-     *
-     * @return
      */
     boolean isPlus();
 
     /**
      * Test if this expression is a <code>Plus, Power or Times</code> function.
-     *
-     * @return
      */
     boolean isPlusTimesPower();
 
@@ -1556,7 +1336,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>Symbol</code> expression.
      *
      * @param variable the variable of the polynomial
-     * @return
      */
     boolean isPolynomial(@Nullable IExpr variable);
 
@@ -1566,7 +1345,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param variable  the variable of the polynomial
      * @param maxDegree the maximum degree of the polynomial; maxDegree must be greater 0
-     * @return
      */
     boolean isPolynomialOfMaxDegree(ISymbol variable, long maxDegree);
 
@@ -1589,8 +1367,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression is the function <code>Power[&lt;arg1&gt;, &lt;arg2&gt;]</code>
-     *
-     * @return
      */
     boolean isPower();
 
@@ -1606,7 +1382,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is a rational number, i.e. integer or fraction number.
      *
-     * @return
      * @see #isNumEqualRational(IRational)
      */
     boolean isRational();
@@ -1624,14 +1399,11 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression equals the rational number <code>value</code> in symbolic or numeric mode.
      *
      * @param value the rational number
-     * @return
      */
     boolean isRationalValue(IRational value);
 
     /**
      * Test if this expression is a signed number. I.e. an instance of type <code>ISignedNumber</code>.
-     *
-     * @return
      */
     boolean isReal();
 
@@ -1639,16 +1411,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is a real matrix (i.e. an ASTRealMatrix) or a <code>List[List[...],...,List[...]]</code>
      * matrix with elements of type <code>org.matheclipse.core.expression.Num</code>.
-     *
-     * @return
      */
     boolean isRealMatrix();
 
     /**
      * Test if this expression is a number with no imaginary component. I.e. an instance of type <code>IRational</code>
      * or <code>INum</code>.
-     *
-     * @return
      */
     boolean isRealNumber();
 
@@ -1664,49 +1432,34 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is a real vector (i.e. an ASTRealVector) or a <code>List[...]</code> with elements of
      * type <code>org.matheclipse.core.expression.Num</code>.
-     *
-     * @return
      */
     boolean isRealVector();
 
     /**
      * Test if this expression is of the form <code>Rule[&lt;arg1&gt;, &lt;arg2&gt;]</code>.
-     *
-     * @return
      */
     boolean isRule();
 
     /**
      * Test if this expression is of the form <code>Rule[&lt;arg1&gt;, &lt;arg2&gt;]</code> or
      * <code>RuleDelayed[&lt;arg1&gt;, &lt;arg2&gt;]</code>.
-     *
-     * @return
      */
     boolean isRuleAST();
 
     /**
      * Test if this expression is of the form <code>RuleDelayed[&lt;arg1&gt;, &lt;arg2&gt;]</code>.
-     *
-     * @return
      */
     boolean isRuleDelayed();
 
     /**
      * Test if this expression equals the given expression. If the compared expressions are of the same numeric type,
      * they are equal to a given EPSILON
-     *
-     * @param expression
-     * @return
      */
     boolean isSame(IExpr expression);
 
     /**
      * Test if this expression equals the given expression. If the compared expressions are of the same numeric type,
      * they are equal to a given EPSILON
-     *
-     * @param expression
-     * @param epsilon
-     * @return
      */
     boolean isSame(IExpr expression, double epsilon);
 
@@ -1714,16 +1467,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the
      * size of the list is greater or equal <code>length</code>.
      *
-     * @param head   object to compare with element at location <code>0</code>
-     * @param length
-     * @return
+     * @param head object to compare with element at location <code>0</code>
      */
     boolean isSameHeadSizeGE(IExpr head, int length);
 
     /**
      * Test if this expression is a sequence (i.e. an AST with head Sequence)
-     *
-     * @return
      */
     boolean isSequence();
 
@@ -1731,7 +1480,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression is a signed real number. I.e. an instance of type <code>IFraction</code> for exact number
      * values or <code>INum</code> for approximated numbers.
      *
-     * @return
      * @deprecated use {@link #isReal()};
      */
     boolean isSignedNumber();
@@ -1739,44 +1487,32 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements the
      * <code>ISignedNumberConstant</code> interface (see package <code>org.matheclipse.core.builtin.constant</code>).
-     *
-     * @return
      */
     boolean isRealConstant();
 
     /**
      * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements the
      * <code>ISignedNumberConstant</code> interface (see package <code>org.matheclipse.core.builtin.constant</code>).
-     *
-     * @return
      */
     boolean isSignedNumberConstant();
 
     /**
      * Test if this expression is the function <code>Sin[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isSin();
 
     /**
      * Test if this expression is the function <code>Sinh[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isSinh();
 
     /**
      * Test if this expression is the function <code>Slot[&lt;integer-value&gt;]</code> (i.e. #1, #2, #3,....)
-     *
-     * @return
      */
     boolean isSlot();
 
     /**
      * Test if this expression is the function <code>SlotSequence[&lt;integer-value&gt;]</code>
-     *
-     * @return
      */
     boolean isSlotSequence();
 
@@ -1791,44 +1527,32 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression is a string (instanceof IStringX)
-     *
-     * @return
      */
     boolean isString();
 
     /**
      * Test if this expression is a symbol (instanceof ISymbol)
-     *
-     * @return
      */
     boolean isSymbol();
 
     /**
      * Test if this expression is a symbol (instanceof ISymbol) or a pattern object (instanceof IPatternObject)
-     *
-     * @return
      */
     boolean isSymbolOrPattern();
 
     /**
      * Test if this expression is the function <code>TAn[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isTan();
 
     /**
      * Test if this expression is the function <code>Tanh[&lt;arg&gt;]</code>
-     *
-     * @return
      */
     boolean isTanh();
 
     /**
      * Test if this expression is the multiplication function <code>Times[&lt;arg1&gt;, &lt;arg2&gt;, ...]</code> with
      * at least 2 arguments.
-     *
-     * @return
      */
     boolean isTimes();
 
@@ -1849,15 +1573,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Returns <code>true</code>, if this symbol or ast expression is bound to a value (i.e. the evaluation returns an
      * <i>assigned</i> value).
-     *
-     * @return
      */
     boolean isValue();
 
     /**
      * Test if this expression is a symbol which doesn't has attribute <code>Constant</code>.
      *
-     * @return
      * @see #isConstant()
      * @see #isSymbol()
      */
@@ -1874,8 +1595,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression equals <code>0</code> in symbolic or numeric mode.
-     *
-     * @return
      */
     boolean isZero();
 
@@ -1890,8 +1609,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Count the number of leaves of this expression.
-     *
-     * @return
      */
     long leafCount();
 
@@ -1899,8 +1616,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Count the number of leaves of this expression; for integer numbers in exact integer, fractional and complex
      * numbers count the digits of the integers. This function is used in <code>Simplify</code> as the
      * &quot;complexity function&quot;.
-     *
-     * @return
      */
     long leafCountSimplify();
 
@@ -1908,7 +1623,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Evaluate Less, if both arguments are real numbers
      *
      * @param a1
-     * @return
      */
     IExpr less(final IExpr a1);
 
@@ -1916,7 +1630,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Evaluate LessEqual, if both arguments are real numbers
      *
      * @param a1
-     * @return
      */
     IExpr lessEqual(final IExpr a1);
 
@@ -1928,7 +1641,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <li>return F.NIL if the comparison is undetermined (i.e. could not be evaluated)</li>
      * </ul>
      *
-     * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
     IExpr lessEqualThan(IExpr that);
@@ -1941,7 +1653,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <li>return F.NIL if the comparison is undetermined (i.e. could not be evaluated)</li>
      * </ul>
      *
-     * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
     IExpr lessThan(IExpr that);
@@ -1966,9 +1677,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Returns an <code>IExpr</code> whose value is <code>(this - that)</code>. Calculates
      * <code>F.eval(F.Plus(this, F.Times(F.CN1, that)))</code> in the common case and uses a specialized implementation
      * for derived number classes.
-     *
-     * @param that
-     * @return
      */
     IExpr minus(final IExpr that);
 
@@ -1977,8 +1685,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Additional multiply method which works like <code>times()</code> to fulfill groovy's method signature
      *
-     * @param that
-     * @return
      * @see IExpr#times(IExpr)
      */
     @Override
@@ -1996,7 +1702,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Additional negative method, which works like opposite to fulfill groovy's method signature
      *
-     * @return
      * @see #opposite()
      */
     IExpr negative();
@@ -2019,7 +1724,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>F.eval(F.Times(F.CN1, this))</code> in the common case and uses a specialized implementation for derived
      * number classes.
      *
-     * @return
      * @see #negative()
      */
     IExpr opposite();
@@ -2029,7 +1733,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * implement this method returns <code>that</code> if <code>that!=null</code> or <code>this</code> if
      * <code>that==null</code>
      *
-     * @param that
      * @return <code>that</code> if <code>that!=null</code> or <code>this</code> in all other cases.
      * @see NILPointer#optional(IExpr)
      */
@@ -2040,7 +1743,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Return <code>this</code> if <code>this</code> unequals <code>F.NIL</code> , otherwise return <code>other</code>.
      *
-     * @param other
      * @return <code>this</code> if <code>this</code> unequals <code>F.NIL</code>, otherwise return <code>other</code>.
      * @see java.util.Optional#orElse(Object)
      */
@@ -2144,9 +1846,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Returns an <code>IExpr</code> whose value is <code>(this + that)</code>. Calculates
      * <code>F.eval(F.Plus(this, that))</code> in the common case and uses a specialized implementation for derived
      * number classes.
-     *
-     * @param that
-     * @return
      */
     IExpr plus(final IExpr that);
 
@@ -2155,7 +1854,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>F.eval(F.Power(this, that))</code> in the common case and uses a specialized implementation for derived
      * number classes.
      *
-     * @param that
      * @return <code>(this ^ that)</code>
      */
     IExpr power(final IExpr that);
@@ -2199,8 +1897,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Replace all (sub-) expressions with the given <code>java.util.Map</code>n. If no substitution matches, the method
      * returns <code>F.NIL</code>.
      *
-     * @param function if the unary functions <code>apply()</code> method returns <code>F.NIL</code> the expression isn't
-     *                 substituted.
+     * @param map if the unary functions <code>apply()</code> method returns <code>F.NIL</code> the expression isn't
+     *            substituted.
      * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
      */
     @Nullable
@@ -2250,9 +1948,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Repeatedly replace all (sub-) expressions with the given visitor. If no substitution matches, the method returns
      * <code>this</code>.
-     *
-     * @param visitor
-     * @return
      */
     IExpr replaceRepeated(VisitorReplaceAll visitor);
 
@@ -2400,7 +2095,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <li>return F.NIL if the comparison is undetermined (i.e. could not be evaluated)</li>
      * </ul>
      *
-     * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
     IExpr unequalTo(IExpr that);
@@ -2427,7 +2121,4 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     String toString();
 
-    enum COMPARE_TERNARY {
-        TRUE, FALSE, UNDEFINED
-    }
 }
