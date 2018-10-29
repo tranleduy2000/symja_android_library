@@ -15,7 +15,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.Word;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -321,8 +321,8 @@ public class WordPseudoReductionSeq<C extends RingElem<C>> extends WordReduction
                     logger.info("redRec divideWord: e = " + e + ", fl = " + fl + ", fr = " + fr);
                 }
                 GenPolynomial<C> c = lbc[i];
-                if (PolyUtil.<C>baseSparsePseudoRemainder(a, c).isZERO()) {
-                    b = PolyUtil.<C>basePseudoDivide(a, c);
+                if (PolyUtil.baseSparsePseudoRemainder(a, c).isZERO()) {
+                    b = PolyUtil.basePseudoDivide(a, c);
                     Q = p[i].multiply(b, fl, cone, fr);
                 } else {
                     R = R.multiply(c);

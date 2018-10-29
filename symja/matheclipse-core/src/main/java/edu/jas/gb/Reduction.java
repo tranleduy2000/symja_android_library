@@ -10,7 +10,7 @@ import java.util.List;
 
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -31,7 +31,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param Bp polynomial.
      * @return spol(Ap, Bp) the S-polynomial of Ap and Bp.
      */
-    public GenPolynomial<C> SPolynomial(GenPolynomial<C> Ap, GenPolynomial<C> Bp);
+    GenPolynomial<C> SPolynomial(GenPolynomial<C> Ap, GenPolynomial<C> Bp);
 
 
     /**
@@ -44,8 +44,8 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param Bp a polynomial.
      * @return Spol(Ap, Bp), the S-Polynomial for Ap and Bp.
      */
-    public GenPolynomial<C> SPolynomial(List<GenPolynomial<C>> S, int i, GenPolynomial<C> Ap, int j,
-                                        GenPolynomial<C> Bp);
+    GenPolynomial<C> SPolynomial(List<GenPolynomial<C>> S, int i, GenPolynomial<C> Ap, int j,
+                                 GenPolynomial<C> Bp);
 
 
     /**
@@ -56,7 +56,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param B    polynomial.
      * @return true if the module S-polynomial(i,j) is required.
      */
-    public boolean moduleCriterion(int modv, GenPolynomial<C> A, GenPolynomial<C> B);
+    boolean moduleCriterion(int modv, GenPolynomial<C> A, GenPolynomial<C> B);
 
 
     /**
@@ -67,7 +67,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param ej   ExpVector.
      * @return true if the module S-polynomial(i,j) is required.
      */
-    public boolean moduleCriterion(int modv, ExpVector ei, ExpVector ej);
+    boolean moduleCriterion(int modv, ExpVector ei, ExpVector ej);
 
 
     /**
@@ -78,7 +78,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param e = lcm(ht(A),ht(B))
      * @return true if the S-polynomial(i,j) is required, else false.
      */
-    public boolean criterion4(GenPolynomial<C> A, GenPolynomial<C> B, ExpVector e);
+    boolean criterion4(GenPolynomial<C> A, GenPolynomial<C> B, ExpVector e);
 
 
     /**
@@ -88,7 +88,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param B polynomial.
      * @return true if the S-polynomial(i,j) is required, else false.
      */
-    public boolean criterion4(GenPolynomial<C> A, GenPolynomial<C> B);
+    boolean criterion4(GenPolynomial<C> A, GenPolynomial<C> B);
 
 
     /**
@@ -99,7 +99,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param e  = lcm(ei,ej)
      * @return true if the S-polynomial(i,j) is required, else false.
      */
-    public boolean criterion4(ExpVector ei, ExpVector ej, ExpVector e);
+    boolean criterion4(ExpVector ei, ExpVector ej, ExpVector e);
 
 
     /**
@@ -109,7 +109,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param P polynomial list.
      * @return true if A is top reducible with respect to P.
      */
-    public boolean isTopReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A);
+    boolean isTopReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A);
 
 
     /**
@@ -119,7 +119,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param P polynomial list.
      * @return true if A is reducible with respect to P.
      */
-    public boolean isReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A);
+    boolean isReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A);
 
 
     /**
@@ -129,7 +129,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param P polynomial list.
      * @return true if A is in normalform with respect to P.
      */
-    public boolean isNormalform(List<GenPolynomial<C>> P, GenPolynomial<C> A);
+    boolean isNormalform(List<GenPolynomial<C>> P, GenPolynomial<C> A);
 
 
     /**
@@ -138,7 +138,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param Pp polynomial list.
      * @return true if each A in Pp is in normalform with respect to Pp\{A}.
      */
-    public boolean isNormalform(List<GenPolynomial<C>> Pp);
+    boolean isNormalform(List<GenPolynomial<C>> Pp);
 
 
     /**
@@ -148,7 +148,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param P polynomial list.
      * @return nf(A) with respect to P.
      */
-    public GenPolynomial<C> normalform(List<GenPolynomial<C>> P, GenPolynomial<C> A);
+    GenPolynomial<C> normalform(List<GenPolynomial<C>> P, GenPolynomial<C> A);
 
 
     /**
@@ -158,7 +158,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param Pp polynomial list.
      * @return list of nf(a) with respect to Pp for all a in Ap.
      */
-    public List<GenPolynomial<C>> normalform(List<GenPolynomial<C>> Pp, List<GenPolynomial<C>> Ap);
+    List<GenPolynomial<C>> normalform(List<GenPolynomial<C>> Pp, List<GenPolynomial<C>> Ap);
 
 
     /**
@@ -169,8 +169,8 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @param Ap  a polynomial.
      * @return nf(Pp, Ap), the normal form of Ap wrt. Pp.
      */
-    public GenPolynomial<C> normalform(List<GenPolynomial<C>> row, List<GenPolynomial<C>> Pp,
-                                       GenPolynomial<C> Ap);
+    GenPolynomial<C> normalform(List<GenPolynomial<C>> row, List<GenPolynomial<C>> Pp,
+                                GenPolynomial<C> Ap);
 
 
     /**
@@ -180,7 +180,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @return a list P of polynomials which are in normalform wrt. P and with
      * ideal(Pp) = ideal(P).
      */
-    public List<GenPolynomial<C>> irreducibleSet(List<GenPolynomial<C>> Pp);
+    List<GenPolynomial<C>> irreducibleSet(List<GenPolynomial<C>> Pp);
 
 
     /**
@@ -193,7 +193,7 @@ public interface Reduction<C extends RingElem<C>> extends Serializable {
      * @return true, if Np + sum( row[i]*Pp[i] ) == Ap, else false.
      */
 
-    public boolean isReductionNF(List<GenPolynomial<C>> row, List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap,
-                                 GenPolynomial<C> Np);
+    boolean isReductionNF(List<GenPolynomial<C>> row, List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap,
+                          GenPolynomial<C> Np);
 
 }

@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.Element;
+
 /**
  * Binary functor interface.
  *
@@ -22,6 +24,6 @@ public interface BinaryFunctor<C1 extends Element<C1>, C2 extends Element<C2>, D
      *
      * @return evaluated element.
      */
-    public D eval(C1 c1, C2 c2);
+    D eval(C1 c1, C2 c2);
 
 }

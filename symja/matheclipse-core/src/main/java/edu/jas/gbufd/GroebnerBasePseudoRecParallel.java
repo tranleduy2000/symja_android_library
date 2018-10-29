@@ -19,7 +19,7 @@ import edu.jas.gb.PairList;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -165,7 +165,7 @@ public class GroebnerBasePseudoRecParallel<C extends RingElem<C>> extends
             logger.warn("parallel GB should use parallel aware reduction");
         }
         this.red = red;
-        this.redRec = (PseudoReduction<C>) (PseudoReduction) red;
+        this.redRec = (PseudoReduction<C>) red;
         cofac = rf;
         if (threads < 1) {
             threads = 1;
@@ -175,7 +175,7 @@ public class GroebnerBasePseudoRecParallel<C extends RingElem<C>> extends
         baseCofac = rp.coFac;
         //engine = (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getImplementation( baseCofac );
         //not used: 
-        engine = GCDFactory.<C>getProxy(baseCofac);
+        engine = GCDFactory.getProxy(baseCofac);
         this.pool = pool;
     }
 

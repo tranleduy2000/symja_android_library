@@ -15,7 +15,7 @@ import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -121,10 +121,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
      */
     public boolean containsFactory(RingFactory<C> rf) {
         if (nCopies != 0) {
-            if (ring.equals(rf)) {
-                return true;
-            }
-            return false; // misleading
+            return ring.equals(rf);
         }
         return ringList.contains(rf);
     }
@@ -464,9 +461,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
         }
         ProductRing<C> a = (ProductRing<C>) b;
         if (nCopies != 0) {
-            if (nCopies != a.nCopies || !ring.equals(a.ring)) {
-                return false;
-            }
+            return nCopies == a.nCopies && ring.equals(a.ring);
         } else {
             if (ringList.size() != a.ringList.size()) {
                 return false;

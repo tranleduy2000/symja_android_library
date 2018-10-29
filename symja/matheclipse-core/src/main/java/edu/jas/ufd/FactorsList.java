@@ -10,7 +10,7 @@ import java.util.List;
 
 import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**

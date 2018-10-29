@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.jas.kern.Scripting;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.vector.GenVector;
 import edu.jas.vector.GenVectorModul;
 
@@ -54,7 +54,7 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
      */
     public ModuleList(GenPolynomialRing<C> r, List<List<GenPolynomial<C>>> l) {
         ring = r;
-        list = ModuleList.<C>padCols(r, l);
+        list = ModuleList.padCols(r, l);
         if (list == null) {
             rows = -1;
             cols = -1;
@@ -76,7 +76,7 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
      * @param l list of list of solvable polynomials.
      */
     public ModuleList(GenSolvablePolynomialRing<C> r, List<List<GenSolvablePolynomial<C>>> l) {
-        this(r, ModuleList.<C>castToList(l));
+        this(r, ModuleList.castToList(l));
     }
 
 
@@ -87,7 +87,7 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
      * @param l list of vectors of polynomials.
      */
     public ModuleList(GenVectorModul<GenPolynomial<C>> r, List<GenVector<GenPolynomial<C>>> l) {
-        this((GenPolynomialRing<C>) r.coFac, ModuleList.<C>vecToList(l));
+        this((GenPolynomialRing<C>) r.coFac, ModuleList.vecToList(l));
     }
 
     /**
@@ -206,10 +206,7 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
         // compare sorted lists
         List otl = OrderedModuleList.sort(ring, list);
         List oml = OrderedModuleList.sort(ring, ml.list);
-        if (!otl.equals(oml)) {
-            return false;
-        }
-        return true;
+        return otl.equals(oml);
     }
 
     /**

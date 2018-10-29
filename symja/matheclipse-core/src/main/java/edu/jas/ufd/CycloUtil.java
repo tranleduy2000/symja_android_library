@@ -247,10 +247,7 @@ public class CycloUtil {
         //System.out.println("G = " + G + ", G^2==f: " + G.multiply(G).equals(f));
         //if dup_sqr(G, K) == F and dup_cyclotomic_p(G, K):
         //   return True
-        if (G.multiply(G).equals(f) && isCyclotomicPolynomial(G)) {
-            return true;
-        }
-        return false;
+        return G.multiply(G).equals(f) && isCyclotomicPolynomial(G);
     }
 
 }

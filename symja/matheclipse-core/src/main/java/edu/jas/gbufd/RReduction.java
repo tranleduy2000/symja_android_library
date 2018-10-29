@@ -9,7 +9,7 @@ import java.util.List;
 
 import edu.jas.gb.Reduction;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RegularRingElem;
+import edu.jas.structure.elem.RegularRingElem;
 
 
 /**
@@ -31,7 +31,7 @@ public interface RReduction<C extends RegularRingElem<C>> extends Reduction<C> {
      * @param P polynomial list.
      * @return true if A is string top reducible with respect to P.
      */
-    public boolean isStrongTopReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A);
+    boolean isStrongTopReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A);
 
 
     /**
@@ -40,7 +40,7 @@ public interface RReduction<C extends RegularRingElem<C>> extends Reduction<C> {
      * @param A polynomial.
      * @return true if A is boolean closed, else false.
      */
-    public boolean isBooleanClosed(GenPolynomial<C> A);
+    boolean isBooleanClosed(GenPolynomial<C> A);
 
 
     /**
@@ -49,7 +49,7 @@ public interface RReduction<C extends RegularRingElem<C>> extends Reduction<C> {
      * @param F polynomial list.
      * @return true if F is boolean closed, else false.
      */
-    public boolean isBooleanClosed(List<GenPolynomial<C>> F);
+    boolean isBooleanClosed(List<GenPolynomial<C>> F);
 
 
     /**
@@ -58,7 +58,7 @@ public interface RReduction<C extends RegularRingElem<C>> extends Reduction<C> {
      * @param A polynomial.
      * @return bc(A).
      */
-    public GenPolynomial<C> booleanClosure(GenPolynomial<C> A);
+    GenPolynomial<C> booleanClosure(GenPolynomial<C> A);
 
 
     /**
@@ -67,7 +67,7 @@ public interface RReduction<C extends RegularRingElem<C>> extends Reduction<C> {
      * @param A polynomial.
      * @return br(A) = A - bc(A).
      */
-    public GenPolynomial<C> booleanRemainder(GenPolynomial<C> A);
+    GenPolynomial<C> booleanRemainder(GenPolynomial<C> A);
 
 
     /**
@@ -76,7 +76,7 @@ public interface RReduction<C extends RegularRingElem<C>> extends Reduction<C> {
      * @param F polynomial list.
      * @return red(bc(F)) = bc(red(F)).
      */
-    public List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F);
+    List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F);
 
 
     /**
@@ -86,8 +86,8 @@ public interface RReduction<C extends RegularRingElem<C>> extends Reduction<C> {
      * @param F polynomial list.
      * @return red(bc(A)).
      */
-    public List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F,
-                                                        GenPolynomial<C> A);
+    List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F,
+                                                 GenPolynomial<C> A);
 
 
 }

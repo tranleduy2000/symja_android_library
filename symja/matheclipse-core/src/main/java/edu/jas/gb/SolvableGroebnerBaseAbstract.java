@@ -20,7 +20,7 @@ import edu.jas.poly.ModuleList;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.PolynomialList;
 import edu.jas.poly.TermOrder;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.vector.BasicLinAlg;
 
@@ -907,7 +907,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
      * @return -1, 0 or 1 if dimension(this) &eq; -1, 0 or &ge; 1.
      */
     public int commonZeroTest(List<GenSolvablePolynomial<C>> A) {
-        List<GenPolynomial<C>> cA = PolynomialList.<C>castToList(A);
+        List<GenPolynomial<C>> cA = PolynomialList.castToList(A);
         return cbb.commonZeroTest(cA);
     }
 
@@ -919,7 +919,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
      * @return a list of the degrees of univariate head terms.
      */
     public List<Long> univariateDegrees(List<GenSolvablePolynomial<C>> A) {
-        List<GenPolynomial<C>> cA = PolynomialList.<C>castToList(A);
+        List<GenPolynomial<C>> cA = PolynomialList.castToList(A);
         return cbb.univariateDegrees(cA);
     }
 
@@ -990,7 +990,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
             X = pfac.univariate(i, ll);
             XP = sred.leftNormalform(G, X);
             //System.out.println("XP = " + XP);
-            GenSolvablePolynomial<GenPolynomial<C>> XPp = PolyUtil.<C>toRecursive(rfac, XP);
+            GenSolvablePolynomial<GenPolynomial<C>> XPp = PolyUtil.toRecursive(rfac, XP);
             GenSolvablePolynomial<GenPolynomial<C>> XPs = (GenSolvablePolynomial<GenPolynomial<C>>) XPp
                     .sum(P);
             ls = new ArrayList<GenPolynomial<C>>(XPs.getMap().values());
@@ -1008,8 +1008,8 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
                 }
                 cpfac = cpfac.extend(1);
                 rfac = new GenSolvablePolynomialRing<GenPolynomial<C>>(cpfac, pfac);
-                P = PolyUtil.<C>extendCoefficients(rfac, P, 0, 0L);
-                XPp = PolyUtil.<C>extendCoefficients(rfac, XPp, 0, 1L);
+                P = PolyUtil.extendCoefficients(rfac, P, 0, 0L);
+                XPp = PolyUtil.extendCoefficients(rfac, XPp, 0, 1L);
                 P = (GenSolvablePolynomial<GenPolynomial<C>>) P.sum(XPp);
             }
         } while (z != 0); // && ll <= 5 && !XP.isZERO()

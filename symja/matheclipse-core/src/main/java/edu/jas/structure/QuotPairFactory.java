@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.RingElem;
+
 /**
  * Quotient pair factory interface. Defines constructors from numerators and
  * denominators.
@@ -19,18 +21,18 @@ public interface QuotPairFactory<C extends RingElem<C>, D extends RingElem<D>> {
     /**
      * Create from numerator.
      */
-    public D create(C n);
+    D create(C n);
 
 
     /**
      * Create from numerator, denominator pair.
      */
-    public D create(C n, C d);
+    D create(C n, C d);
 
 
     /**
      * Factory for base elements.
      */
-    public RingFactory<C> pairFactory();
+    RingFactory<C> pairFactory();
 
 }

@@ -13,7 +13,7 @@ import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisor;
@@ -73,7 +73,7 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         }
         rect = r;
         A = p;
-        GreatestCommonDivisor<Complex<C>> ufd = GCDFactory.<Complex<C>>getImplementation(A.ring.coFac);
+        GreatestCommonDivisor<Complex<C>> ufd = GCDFactory.getImplementation(A.ring.coFac);
         polys = (GenPolynomial<Complex<C>>[]) new GenPolynomial[5];
 
         Complex<C>[] corner = rect.corners;
@@ -81,8 +81,8 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
             Complex<C> t = corner[i + 1].subtract(corner[i]);
             GenPolynomial<Complex<C>> tp = A.ring.univariate(0, 1L).multiply(t);
             //System.out.println("t = " + t);
-            GenPolynomial<Complex<C>> pc = PolyUtil.<Complex<C>>seriesOfTaylor(A, corner[i]);
-            pc = PolyUtil.<Complex<C>>substituteUnivariate(pc, tp);
+            GenPolynomial<Complex<C>> pc = PolyUtil.seriesOfTaylor(A, corner[i]);
+            pc = PolyUtil.substituteUnivariate(pc, tp);
             GenPolynomial<Complex<C>> gcd = ufd.gcd(A, pc);
             if (!gcd.isONE()) {
                 //System.out.println("A = " + A);
@@ -148,7 +148,7 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
      * @return real part for polynomial i.
      */
     public GenPolynomial<C> getRealPart(int i) {
-        GenPolynomial<C> f = PolyUtil.<C>realPartFromComplex(rfac, polys[i]);
+        GenPolynomial<C> f = PolyUtil.realPartFromComplex(rfac, polys[i]);
         return f;
     }
 
@@ -160,7 +160,7 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
      * @return imaginary part for polynomial i.
      */
     public GenPolynomial<C> getImagPart(int i) {
-        GenPolynomial<C> g = PolyUtil.<C>imaginaryPartFromComplex(rfac, polys[i]);
+        GenPolynomial<C> g = PolyUtil.imaginaryPartFromComplex(rfac, polys[i]);
         return g;
     }
 

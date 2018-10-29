@@ -7,10 +7,10 @@ package edu.jas.poly;
 
 import org.apache.log4j.Logger;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.QuotPair;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.RingElemImpl;
 
 
 /**
@@ -118,8 +118,8 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
         }
         // must reduce to lowest terms
         if (n instanceof RingElem && d instanceof RingElem) {
-            RingElem ng = (RingElem) n;
-            RingElem dg = (RingElem) d;
+            RingElem ng = n;
+            RingElem dg = d;
             C gcd = (C) ng.gcd(dg);
             if (debug) {
                 logger.info("gcd = " + gcd);
@@ -145,7 +145,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public LocalRing<C> factory() {
         return ring;
@@ -197,7 +197,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Is Local zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return num.isZERO();
@@ -208,7 +208,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Is Local one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return num.equals(den);
@@ -219,7 +219,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Is Local unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         if (isunit > 0) {
@@ -259,7 +259,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -272,7 +272,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -337,7 +337,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Local absolute value.
      *
      * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public Local<C> abs() {
         return new Local<C>(ring, num.abs(), den, true);
@@ -365,7 +365,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Local negate.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public Local<C> negate() {
         return new Local<C>(ring, num.negate(), den, true);
@@ -376,7 +376,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Local signum.
      *
      * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         return num.signum();
@@ -415,7 +415,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * Local inverse.
      *
      * @return S with S = 1/this if defined.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public Local<C> inverse() {
         if (isONE()) {

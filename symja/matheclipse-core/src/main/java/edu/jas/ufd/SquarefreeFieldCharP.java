@@ -17,7 +17,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -71,7 +71,7 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
      */
     @SuppressWarnings("unchecked")
     public SquarefreeFieldCharP(RingFactory<C> fac) {
-        super(GCDFactory.<C>getProxy(fac));
+        super(GCDFactory.getProxy(fac));
         if (!fac.isField()) {
             //throw new IllegalArgumentException("fac must be a field: "  + fac.toScript());
             logger.warn("fac should be a field: " + fac.toScript());
@@ -206,10 +206,10 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
                 if (T0.isConstant() || T0.isZERO()) {
                     break;
                 }
-                Tp = PolyUtil.<C>baseDeriviative(T0);
+                Tp = PolyUtil.baseDeriviative(T0);
                 T = engine.baseGcd(T0, Tp);
                 T = T.monic();
-                V = PolyUtil.<C>basePseudoDivide(T0, T);
+                V = PolyUtil.basePseudoDivide(T0, T);
                 //System.out.println("iT0 = " + T0);
                 //System.out.println("iTp = " + Tp);
                 //System.out.println("iT  = " + T);
@@ -234,18 +234,18 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
             }
             k++;
             if (mp != 0L && k % mp == 0L) {
-                T = PolyUtil.<C>basePseudoDivide(T, V);
+                T = PolyUtil.basePseudoDivide(T, V);
                 System.out.println("k = " + k);
                 //System.out.println("T = " + T);
                 k++;
             }
             GenPolynomial<C> W = engine.baseGcd(T, V);
             W = W.monic();
-            GenPolynomial<C> z = PolyUtil.<C>basePseudoDivide(V, W);
+            GenPolynomial<C> z = PolyUtil.basePseudoDivide(V, W);
             //System.out.println("W = " + W);
             //System.out.println("z = " + z);
             V = W;
-            T = PolyUtil.<C>basePseudoDivide(T, V);
+            T = PolyUtil.basePseudoDivide(T, V);
             //System.out.println("V = " + V);
             //System.out.println("T = " + T);
             if (z.degree(0) > 0) {
@@ -297,7 +297,7 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
         for (GenPolynomial<GenPolynomial<C>> sp : factors.keySet()) {
             s = s.multiply(sp);
         }
-        return PolyUtil.<C>monic(s);
+        return PolyUtil.monic(s);
     }
 
 
@@ -343,7 +343,7 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
         }
         Pc = Pc.monic();
         if (!Pc.isONE()) {
-            P = PolyUtil.<C>coefficientPseudoDivide(P, Pc);
+            P = PolyUtil.coefficientPseudoDivide(P, Pc);
         }
         SortedMap<GenPolynomial<C>, Long> rsf = squarefreeFactors(Pc);
         if (logger.isInfoEnabled()) {
@@ -365,7 +365,7 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
             if (logger.isInfoEnabled()) {
                 logger.info("trailing term = " + tr);
             }
-            P = PolyUtil.<C>recursivePseudoDivide(P, tr);
+            P = PolyUtil.recursivePseudoDivide(P, tr);
             long ep = et.getVal(0); // univariate
             et = et.subst(0, 1);
             tr = pfac.valueOf(et);
@@ -386,10 +386,10 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
                 if (T0.isConstant() || T0.isZERO()) {
                     break;
                 }
-                Tp = PolyUtil.<C>recursiveDeriviative(T0);
+                Tp = PolyUtil.recursiveDeriviative(T0);
                 T = engine.recursiveUnivariateGcd(T0, Tp);
-                T = PolyUtil.<C>monic(T);
-                V = PolyUtil.<C>recursivePseudoDivide(T0, T);
+                T = PolyUtil.monic(T);
+                V = PolyUtil.recursivePseudoDivide(T0, T);
                 //System.out.println("iT0 = " + T0);
                 //System.out.println("iTp = " + Tp);
                 //System.out.println("iT = " + T);
@@ -413,23 +413,23 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
             }
             k++;
             if (mp != 0L && k % mp == 0L) {
-                T = PolyUtil.<C>recursivePseudoDivide(T, V);
+                T = PolyUtil.recursivePseudoDivide(T, V);
                 System.out.println("k = " + k);
                 //System.out.println("T = " + T);
                 k++;
             }
             GenPolynomial<GenPolynomial<C>> W = engine.recursiveUnivariateGcd(T, V);
-            W = PolyUtil.<C>monic(W);
-            GenPolynomial<GenPolynomial<C>> z = PolyUtil.<C>recursivePseudoDivide(V, W);
+            W = PolyUtil.monic(W);
+            GenPolynomial<GenPolynomial<C>> z = PolyUtil.recursivePseudoDivide(V, W);
             //System.out.println("W = " + W);
             //System.out.println("z = " + z);
             V = W;
-            T = PolyUtil.<C>recursivePseudoDivide(T, V);
+            T = PolyUtil.recursivePseudoDivide(T, V);
             //System.out.println("V = " + V);
             //System.out.println("T = " + T);
             //was: if ( z.degree(0) > 0 ) {
             if (!z.isONE() && !z.isZERO()) {
-                z = PolyUtil.<C>monic(z);
+                z = PolyUtil.monic(z);
                 logger.info("z,put = " + z);
                 sfactors.put(z, (e * k));
             }
@@ -501,12 +501,12 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
             return sfactors;
         }
         GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(1);
-        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.<C>recursive(rfac, P);
+        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         SortedMap<GenPolynomial<GenPolynomial<C>>, Long> PP = recursiveUnivariateSquarefreeFactors(Pr);
         for (Map.Entry<GenPolynomial<GenPolynomial<C>>, Long> m : PP.entrySet()) {
             Long i = m.getValue();
             GenPolynomial<GenPolynomial<C>> Dr = m.getKey();
-            GenPolynomial<C> D = PolyUtil.<C>distribute(pfac, Dr);
+            GenPolynomial<C> D = PolyUtil.distribute(pfac, Dr);
             sfactors.put(D, i);
         }
         return sfactors;
@@ -529,7 +529,7 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
         SortedMap<C, Long> factors = new TreeMap<C, Long>();
         RingFactory<C> cfac = (RingFactory<C>) coeff.factory();
         if (aCoFac != null) {
-            AlgebraicNumber<C> an = (AlgebraicNumber<C>) (Object) coeff;
+            AlgebraicNumber<C> an = (AlgebraicNumber<C>) coeff;
             if (cfac.isFinite()) {
                 SquarefreeFiniteFieldCharP<C> reng = (SquarefreeFiniteFieldCharP) SquarefreeFactory
                         .getImplementation(cfac);
@@ -545,14 +545,14 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
                 for (Map.Entry<AlgebraicNumber<C>, Long> me : rfactors.entrySet()) {
                     AlgebraicNumber<C> c = me.getKey();
                     if (!c.isONE()) {
-                        C cr = (C) (Object) c;
+                        C cr = (C) c;
                         Long rk = me.getValue(); // rfactors.get(c);
                         factors.put(cr, rk);
                     }
                 }
             }
         } else if (qCoFac != null) {
-            Quotient<C> q = (Quotient<C>) (Object) coeff;
+            Quotient<C> q = (Quotient<C>) coeff;
             SquarefreeInfiniteFieldCharP<C> reng = (SquarefreeInfiniteFieldCharP) SquarefreeFactory
                     .getImplementation(cfac);
             SortedMap<Quotient<C>, Long> rfactors = reng.squarefreeFactors(q);
@@ -560,7 +560,7 @@ public abstract class SquarefreeFieldCharP<C extends RingElem<C>> extends Square
             for (Map.Entry<Quotient<C>, Long> me : rfactors.entrySet()) {
                 Quotient<C> c = me.getKey();
                 if (!c.isONE()) {
-                    C cr = (C) (Object) c;
+                    C cr = (C) c;
                     Long rk = me.getValue(); //rfactors.get(c);
                     factors.put(cr, rk);
                 }

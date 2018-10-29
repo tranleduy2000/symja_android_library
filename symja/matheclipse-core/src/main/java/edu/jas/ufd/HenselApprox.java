@@ -11,7 +11,7 @@ import edu.jas.arith.BigInteger;
 import edu.jas.arith.Modular;
 import edu.jas.arith.ModularRingFactory;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**

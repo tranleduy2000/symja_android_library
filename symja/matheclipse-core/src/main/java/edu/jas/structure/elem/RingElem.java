@@ -2,8 +2,10 @@
  * $Id$
  */
 
-package edu.jas.structure;
+package edu.jas.structure.elem;
 
+
+import edu.jas.structure.AbelianGroupElem;
 
 /**
  * Ring element interface. Combines additive and multiplicative methods. Adds

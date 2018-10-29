@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.jas.poly.ExpVector;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -157,7 +157,7 @@ public class StandardBaseSeq<C extends RingElem<C>>
      */
     public List<MultiVarPowerSeries<C>> STD(int modv, List<MultiVarPowerSeries<C>> F) {
         List<MultiVarPowerSeries<C>> G = normalizeZerosOnes(F);
-        G = PSUtil.<C>monic(G);
+        G = PSUtil.monic(G);
         if (G.size() <= 1) {
             return G;
         }

@@ -14,7 +14,7 @@ import java.util.Map;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -353,10 +353,7 @@ public class DReductionSeq<C extends RingElem<C>> extends ReductionAbstract<C> i
             C a = A.leadingBaseCoefficient();
             C b = B.leadingBaseCoefficient();
             C d = a.gcd(b);
-            if (d.isONE()) { // disjoint hc
-                //System.out.println("d1 = " + d + ", a = " + a + ", b = " + b);
-                return false; // can skip pair
-            }
+            return !d.isONE();
         }
         return true; //! ( s == 0 );
     }
@@ -389,9 +386,7 @@ public class DReductionSeq<C extends RingElem<C>> extends ReductionAbstract<C> i
             C a = A.leadingBaseCoefficient();
             C b = B.leadingBaseCoefficient();
             C d = a.gcd(b);
-            if (d.isONE()) { // disjoint hc
-                return false; // can skip pair
-            }
+            return !d.isONE();
         }
         return true; //! ( s == 0 );
     }

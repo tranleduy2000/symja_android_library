@@ -125,7 +125,7 @@ public class ChannelFactory extends Thread {
     /**
      * Get a new socket channel from a server socket.
      */
-    public SocketChannel getChannel() throws InterruptedException {
+    public SocketChannel getChannel() {
         // return (SocketChannel)buf.get();
 //        if (srv == null) {
 //            if (srvrun) {

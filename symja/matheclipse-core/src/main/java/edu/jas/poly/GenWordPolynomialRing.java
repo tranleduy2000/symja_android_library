@@ -18,7 +18,8 @@ import java.util.Random;
 
 import edu.jas.kern.PreemptStatus;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -167,7 +168,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -210,10 +211,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
         if (!coFac.equals(oring.coFac)) {
             return false;
         }
-        if (!alphabet.equals(oring.alphabet)) {
-            return false;
-        }
-        return true;
+        return alphabet.equals(oring.alphabet);
     }
 
 

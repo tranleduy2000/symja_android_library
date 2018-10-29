@@ -23,7 +23,8 @@ import edu.jas.arith.ModIntegerRing;
 import edu.jas.kern.PreemptStatus;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.util.CartesianProduct;
 import edu.jas.util.CartesianProductInfinite;
@@ -347,8 +348,8 @@ public class GenPolynomialRing<C extends RingElem<C>>
                 //res = "IntFunc" + "{" + cs + "( " + rf.varsToString() + " )" + " } ";
                 res = "IntFunc" + "( " + rf.toString() + " )";
             }
-            if (((Object) coFac) instanceof ModIntegerRing) {
-                ModIntegerRing mn = (ModIntegerRing) ((Object) coFac);
+            if (coFac instanceof ModIntegerRing) {
+                ModIntegerRing mn = (ModIntegerRing) coFac;
                 res = "Mod " + mn.getModul() + " ";
             }
             if (res == null) {
@@ -378,8 +379,8 @@ public class GenPolynomialRing<C extends RingElem<C>>
                 //res = "IntFunc{ " + cs + "( " + rf.varsToString() + " )" + " } ";
                 res = "IntFunc" + "( " + rf.toString() + " )";
             }
-            if (((Object) coFac) instanceof ModIntegerRing) {
-                ModIntegerRing mn = (ModIntegerRing) ((Object) coFac);
+            if (coFac instanceof ModIntegerRing) {
+                ModIntegerRing mn = (ModIntegerRing) coFac;
                 res = "Mod " + mn.getModul() + " ";
             }
             //res += ", " + nvar + ", " + tord.toString() + ", " + varsToString() + ", " + partial + " ]";
@@ -392,7 +393,7 @@ public class GenPolynomialRing<C extends RingElem<C>>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -465,10 +466,7 @@ public class GenPolynomialRing<C extends RingElem<C>>
             return false;
         }
         // same variables required ?
-        if (!Arrays.deepEquals(vars, oring.vars)) {
-            return false;
-        }
-        return true;
+        return Arrays.deepEquals(vars, oring.vars);
     }
 
     /**

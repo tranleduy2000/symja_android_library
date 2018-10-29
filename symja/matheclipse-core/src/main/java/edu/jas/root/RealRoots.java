@@ -11,7 +11,7 @@ import java.util.List;
 import edu.jas.arith.BigRational;
 import edu.jas.arith.Rational;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -29,7 +29,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param f univariate polynomial.
      * @return M such that -M &lt; root(f) &gt; M.
      */
-    public C realRootBound(GenPolynomial<C> f);
+    C realRootBound(GenPolynomial<C> f);
 
 
     /**
@@ -38,7 +38,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param f univariate polynomial.
      * @return a list of isolating intervalls for the real roots of f.
      */
-    public List<Interval<C>> realRoots(GenPolynomial<C> f);
+    List<Interval<C>> realRoots(GenPolynomial<C> f);
 
 
     /**
@@ -48,7 +48,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param eps requested intervals length.
      * @return a list of isolating intervals v such that |v| &lt; eps.
      */
-    public List<Interval<C>> realRoots(GenPolynomial<C> f, C eps);
+    List<Interval<C>> realRoots(GenPolynomial<C> f, C eps);
 
 
     /**
@@ -58,7 +58,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param eps requested intervals length.
      * @return a list of isolating intervals v such that |v| &lt; eps.
      */
-    public List<Interval<C>> realRoots(GenPolynomial<C> f, BigRational eps);
+    List<Interval<C>> realRoots(GenPolynomial<C> f, BigRational eps);
 
 
     /**
@@ -68,7 +68,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param f  univariate polynomial.
      * @return true if f(left) * f(right) &lt; 0, else false
      */
-    public boolean signChange(Interval<C> iv, GenPolynomial<C> f);
+    boolean signChange(Interval<C> iv, GenPolynomial<C> f);
 
 
     /**
@@ -78,7 +78,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param f  univariate polynomial.
      * @return number of real roots of f in I.
      */
-    public long realRootCount(Interval<C> iv, GenPolynomial<C> f);
+    long realRootCount(Interval<C> iv, GenPolynomial<C> f);
 
 
     /**
@@ -89,7 +89,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param eps requested interval length.
      * @return a new interval v such that |v| &lt; eps.
      */
-    public Interval<C> refineInterval(Interval<C> iv, GenPolynomial<C> f, BigRational eps);
+    Interval<C> refineInterval(Interval<C> iv, GenPolynomial<C> f, BigRational eps);
 
 
     /**
@@ -100,7 +100,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param eps requested intervals length.
      * @return a list of new intervals v such that |v| &lt; eps.
      */
-    public List<Interval<C>> refineIntervals(List<Interval<C>> V, GenPolynomial<C> f, BigRational eps);
+    List<Interval<C>> refineIntervals(List<Interval<C>> V, GenPolynomial<C> f, BigRational eps);
 
 
     /**
@@ -112,7 +112,7 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @return sign(g(v)), with v a new interval contained in iv such that g(v)
      * != 0.
      */
-    public int realSign(Interval<C> iv, GenPolynomial<C> f, GenPolynomial<C> g);
+    int realSign(Interval<C> iv, GenPolynomial<C> f, GenPolynomial<C> g);
 
 
     /**
@@ -124,6 +124,6 @@ public interface RealRoots<C extends RingElem<C> & Rational> extends Serializabl
      * @param eps length limit for interval length.
      * @return g(iv).
      */
-    public C realMagnitude(Interval<C> iv, GenPolynomial<C> f, GenPolynomial<C> g, BigRational eps);
+    C realMagnitude(Interval<C> iv, GenPolynomial<C> f, GenPolynomial<C> g, BigRational eps);
 
 }

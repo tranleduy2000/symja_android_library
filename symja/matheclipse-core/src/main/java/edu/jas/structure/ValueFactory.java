@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.RingElem;
+
 /**
  * Value factory interface. Defines constructor from value.
  *
@@ -18,12 +20,12 @@ public interface ValueFactory<C extends RingElem<C>, D extends RingElem<D>> {
     /**
      * Create from value.
      */
-    public D create(C n);
+    D create(C n);
 
 
     /**
      * Factory for value elements.
      */
-    public RingFactory<C> valueFactory();
+    RingFactory<C> valueFactory();
 
 }

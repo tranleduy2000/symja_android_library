@@ -9,7 +9,7 @@ package edu.jas.gbmod;
 
 import edu.jas.gb.SolvableGroebnerBaseAbstract;
 import edu.jas.gbufd.SGBFactory;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 

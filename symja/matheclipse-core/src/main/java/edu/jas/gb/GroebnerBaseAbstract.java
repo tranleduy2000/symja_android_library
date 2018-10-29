@@ -24,7 +24,7 @@ import edu.jas.poly.OrderedPolynomialList;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.PolynomialList;
 import edu.jas.poly.TermOrder;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.vector.BasicLinAlg;
 
@@ -834,7 +834,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         }
         //logger.info("G in  = " + G);
         //Collections.reverse(G); // test
-        G = OrderedPolynomialList.<C>sort(G); // better performance
+        G = OrderedPolynomialList.sort(G); // better performance
         List<Long> ud = univariateDegrees(G);
         if (ud.size() <= i) {
             //logger.info("univ pol, ud = " + ud);
@@ -890,7 +890,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
             if (debug) {
                 logger.info("XP = " + XP);
             }
-            GenPolynomial<GenPolynomial<C>> XPp = PolyUtil.<C>toRecursive(rfac, XP);
+            GenPolynomial<GenPolynomial<C>> XPp = PolyUtil.toRecursive(rfac, XP);
             GenPolynomial<GenPolynomial<C>> XPs = XPp.sum(P);
             ls = new ArrayList<GenPolynomial<C>>(XPs.getMap().values());
             //System.out.println("ls,1 = " + ls);
@@ -907,8 +907,8 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
                 }
                 cpfac = cpfac.extend(1);
                 rfac = new GenPolynomialRing<GenPolynomial<C>>(cpfac, pfac);
-                P = PolyUtil.<C>extendCoefficients(rfac, P, 0, 0L);
-                XPp = PolyUtil.<C>extendCoefficients(rfac, XPp, 0, 1L);
+                P = PolyUtil.extendCoefficients(rfac, P, 0, 0L);
+                XPp = PolyUtil.extendCoefficients(rfac, XPp, 0, 1L);
                 P = P.sum(XPp);
             }
         } while (z != 0); // && ll <= 5 && !XP.isZERO()

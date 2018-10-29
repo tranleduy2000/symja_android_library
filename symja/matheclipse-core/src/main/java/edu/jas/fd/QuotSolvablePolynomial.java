@@ -15,7 +15,8 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.RecSolvablePolynomial;
 import edu.jas.poly.TableRelation;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -108,7 +109,7 @@ public class QuotSolvablePolynomial<C extends RingElem<C>> extends
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     @Override
     public QuotSolvablePolynomialRing<C> factory() {

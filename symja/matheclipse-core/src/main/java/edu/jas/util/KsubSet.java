@@ -255,10 +255,7 @@ class ZeroSubSetIterator<E> implements Iterator<List<E>> {
      * @param set generating set (ignored).
      */
     public ZeroSubSetIterator(List<E> set) {
-        hasNext = true;
-        if (set == null || set.size() == 0) {
-            hasNext = false;
-        }
+        hasNext = set != null && set.size() != 0;
     }
 
 

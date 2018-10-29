@@ -23,7 +23,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.TermOrderOptimization;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.util.KsubSet;
 
@@ -75,9 +75,9 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
      * @param cfac coefficient ring factory.
      */
     public FactorAbstract(RingFactory<C> cfac) {
-        engine = GCDFactory.<C>getProxy(cfac);
+        engine = GCDFactory.getProxy(cfac);
         //engine = GCDFactory.<C> getImplementation(cfac);
-        sengine = SquarefreeFactory.<C>getImplementation(cfac);
+        sengine = SquarefreeFactory.getImplementation(cfac);
     }
 
     /**
@@ -169,7 +169,7 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
         }
         List<GenPolynomial<C>> topt = new ArrayList<GenPolynomial<C>>(1);
         topt.add(P);
-        OptimizedPolynomialList<C> opt = TermOrderOptimization.<C>optimizeTermOrder(pfac, topt);
+        OptimizedPolynomialList<C> opt = TermOrderOptimization.optimizeTermOrder(pfac, topt);
         P = opt.list.get(0);
         logger.info("optimized polynomial: " + P);
         List<Integer> iperm = TermOrderOptimization.inversePermutation(opt.perm);
@@ -182,7 +182,7 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
             logger.info("do.full factorsSquarefreeKronecker: " + P);
             facs = factorsSquarefreeKronecker(P);
         } else { // not all variables appear, remove unused variables
-            GenPolynomial<C> pu = PolyUtil.<C>removeUnusedUpperVariables(P);
+            GenPolynomial<C> pu = PolyUtil.removeUnusedUpperVariables(P);
             //GenPolynomial<C> pl = PolyUtil.<C> removeUnusedLowerVariables(pu); // not useful after optimize
             logger.info("do.sparse factorsSquarefreeKronecker: " + pu);
             facs = factorsSquarefreeKronecker(pu); // pl
@@ -197,7 +197,7 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
             //System.out.println("fs = " + fs);
             facs = fs;
         }
-        List<GenPolynomial<C>> iopt = TermOrderOptimization.<C>permutation(iperm, pfac, facs);
+        List<GenPolynomial<C>> iopt = TermOrderOptimization.permutation(iperm, pfac, facs);
         logger.info("de-optimized polynomials: " + iopt);
         facs = normalizeFactorization(iopt);
         return facs;
@@ -243,7 +243,7 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
             return factors;
         }
         long d = P.degree() + 1L;
-        GenPolynomial<C> kr = PolyUfdUtil.<C>substituteKronecker(P, d);
+        GenPolynomial<C> kr = PolyUfdUtil.substituteKronecker(P, d);
         GenPolynomialRing<C> ufac = kr.ring;
         ufac.setVars(ufac.newVars("zz")); // side effects
         logger.info("deg(subs(P,d=" + d + ")) = " + kr.degree(0) + ", original degrees: " + P.degreeVector());
@@ -300,7 +300,7 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
                 for (int k = 0; k < flist.size(); k++) {
                     utrial = utrial.multiply(flist.get(k));
                 }
-                GenPolynomial<C> trial = PolyUfdUtil.<C>backSubstituteKronecker(pfac, utrial, d);
+                GenPolynomial<C> trial = PolyUfdUtil.backSubstituteKronecker(pfac, utrial, d);
                 ti++;
                 if (ti % 2000 == 0) {
                     System.out.print("ti(" + ti + ") ");
@@ -323,13 +323,13 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
                     System.out.println("u     = " + u);
                     System.out.println("trial = " + trial);
                 }
-                GenPolynomial<C> rem = PolyUtil.<C>baseSparsePseudoRemainder(u, trial);
+                GenPolynomial<C> rem = PolyUtil.baseSparsePseudoRemainder(u, trial);
                 //System.out.println(" rem = " + rem);
                 if (rem.isZERO()) {
                     logger.info("trial = " + trial);
                     //System.out.println("trial = " + trial);
                     factors.add(trial);
-                    u = PolyUtil.<C>basePseudoDivide(u, trial); //u = u.divide( trial );
+                    u = PolyUtil.basePseudoDivide(u, trial); //u = u.divide( trial );
                     evl = u.leadingExpVector();
                     evt = u.trailingExpVector();
                     if (u.isConstant()) {
@@ -704,7 +704,7 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
         GenPolynomialRing<GenPolynomial<C>> pfac = P.ring;
         GenPolynomialRing<C> qi = (GenPolynomialRing<C>) pfac.coFac;
         GenPolynomialRing<C> ifac = qi.extend(pfac.getVars());
-        GenPolynomial<C> Pi = PolyUtil.<C>distribute(ifac, P);
+        GenPolynomial<C> Pi = PolyUtil.distribute(ifac, P);
         //System.out.println("Pi = " + Pi);
 
         C ldcf = Pi.leadingBaseCoefficient();
@@ -728,7 +728,7 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
             r = r.multiply(ldcf);
             ifacts.add(0, r);
         }
-        List<GenPolynomial<GenPolynomial<C>>> rfacts = PolyUtil.<C>recursive(pfac, ifacts);
+        List<GenPolynomial<GenPolynomial<C>>> rfacts = PolyUtil.recursive(pfac, ifacts);
         //System.out.println("rfacts = " + rfacts);
         if (logger.isDebugEnabled()) {
             logger.info("recfacts = " + rfacts);
@@ -761,7 +761,7 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
         }
         GenPolynomialRing<C> qi = (GenPolynomialRing<C>) pfac.coFac;
         GenPolynomialRing<C> ifac = qi.extend(pfac.getVars());
-        GenPolynomial<C> Pi = PolyUtil.<C>distribute(ifac, P);
+        GenPolynomial<C> Pi = PolyUtil.distribute(ifac, P);
         //System.out.println("Pi = " + Pi);
 
         C ldcf = Pi.leadingBaseCoefficient();
@@ -784,7 +784,7 @@ public abstract class FactorAbstract<C extends RingElem<C>> implements Factoriza
         for (Map.Entry<GenPolynomial<C>, Long> me : dfacts.entrySet()) {
             GenPolynomial<C> f = me.getKey();
             Long E = me.getValue(); //dfacts.get(f);
-            GenPolynomial<GenPolynomial<C>> rp = PolyUtil.<C>recursive(pfac, f);
+            GenPolynomial<GenPolynomial<C>> rp = PolyUtil.recursive(pfac, f);
             factors.put(rp, E);
         }
         //System.out.println("rfacts = " + rfacts);

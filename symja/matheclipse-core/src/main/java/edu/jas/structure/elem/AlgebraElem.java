@@ -2,7 +2,7 @@
  * $Id$
  */
 
-package edu.jas.structure;
+package edu.jas.structure.elem;
 
 
 /**
@@ -21,7 +21,7 @@ public interface AlgebraElem<A extends AlgebraElem<A, C>, C extends RingElem<C>>
      * @param s scalar
      * @return this * s.
      */
-    public A scalarMultiply(C s);
+    A scalarMultiply(C s);
 
 
     /**
@@ -32,7 +32,7 @@ public interface AlgebraElem<A extends AlgebraElem<A, C>, C extends RingElem<C>>
      * @param s scalar
      * @return a * b + this * s.
      */
-    public A linearCombination(C a, A b, C s);
+    A linearCombination(C a, A b, C s);
 
 
     /**
@@ -42,6 +42,6 @@ public interface AlgebraElem<A extends AlgebraElem<A, C>, C extends RingElem<C>>
      * @param s scalar
      * @return b + this * s.
      */
-    public A linearCombination(A b, C s);
+    A linearCombination(A b, C s);
 
 }

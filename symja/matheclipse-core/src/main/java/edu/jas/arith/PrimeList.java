@@ -27,7 +27,6 @@ public final class PrimeList implements Iterable<java.math.BigInteger> {
      */
     private volatile static List<java.math.BigInteger> SMALL_LIST = null;
 
-    ;
     private volatile static List<java.math.BigInteger> LOW_LIST = null;
     private volatile static List<java.math.BigInteger> MEDIUM_LIST = null;
     private volatile static List<java.math.BigInteger> LARGE_LIST = null;
@@ -392,7 +391,7 @@ public final class PrimeList implements Iterable<java.math.BigInteger> {
     /**
      * Range of probable primes.
      */
-    public static enum Range {
+    public enum Range {
         small, low, medium, large, mersenne
     }
 

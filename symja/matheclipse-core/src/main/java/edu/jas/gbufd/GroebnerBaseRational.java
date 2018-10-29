@@ -124,8 +124,8 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
         //System.out.println("Gi = " + Gi);
         logger.info("#Gi = " + Gi.size());
 
-        G = PolyUtil.<BigRational>fromIntegerCoefficients(rring, Gi);
-        G = PolyUtil.<BigRational>monic(G);
+        G = PolyUtil.fromIntegerCoefficients(rring, Gi);
+        G = PolyUtil.monic(G);
         return G;
     }
 
@@ -189,8 +189,8 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
         List<GenPolynomial<BigInteger>> Gi = bba.minimalGB(Fi);
         logger.info("#Gi = " + Gi.size());
 
-        G = PolyUtil.<BigRational>fromIntegerCoefficients(rring, Gi);
-        G = PolyUtil.<BigRational>monic(G);
+        G = PolyUtil.fromIntegerCoefficients(rring, Gi);
+        G = PolyUtil.monic(G);
         return G;
     }
 

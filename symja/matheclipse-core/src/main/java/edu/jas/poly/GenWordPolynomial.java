@@ -15,8 +15,9 @@ import java.util.TreeMap;
 
 import edu.jas.kern.PreemptingException;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.elem.RingElemImpl;
 import edu.jas.structure.UnaryFunctor;
 
 
@@ -156,7 +157,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public GenWordPolynomialRing<C> factory() {
         return ring;
@@ -190,7 +191,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      */
     public SortedMap<Word, C> getMap() {
         // return val;
-        return Collections.<Word, C>unmodifiableSortedMap(val);
+        return Collections.unmodifiableSortedMap(val);
     }
 
 
@@ -325,7 +326,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -384,7 +385,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -397,7 +398,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Is GenWordPolynomial&lt;C&gt; zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return (val.size() == 0);
@@ -408,7 +409,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Is GenWordPolynomial&lt;C&gt; one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         if (val.size() != 1) {
@@ -426,7 +427,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Is GenWordPolynomial&lt;C&gt; a unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         if (val.size() != 1) {
@@ -451,10 +452,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
             return false;
         }
         C c = val.get(ring.wone);
-        if (c == null) {
-            return false;
-        }
-        return true;
+        return c != null;
     }
 
 

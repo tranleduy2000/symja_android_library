@@ -9,7 +9,7 @@ import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.ModuleList;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -25,7 +25,7 @@ public interface ModGroebnerBase<C extends RingElem<C>> {
     /**
      * Module Groebner base test.
      */
-    public boolean isGB(int modv, List<GenPolynomial<C>> F);
+    boolean isGB(int modv, List<GenPolynomial<C>> F);
 
 
     /**
@@ -34,13 +34,13 @@ public interface ModGroebnerBase<C extends RingElem<C>> {
      * @param M a module basis.
      * @return true, if M is a Groebner base, else false.
      */
-    public boolean isGB(ModuleList<C> M);
+    boolean isGB(ModuleList<C> M);
 
 
     /**
      * Groebner base using pairlist class.
      */
-    public List<GenPolynomial<C>> GB(int modv, List<GenPolynomial<C>> F);
+    List<GenPolynomial<C>> GB(int modv, List<GenPolynomial<C>> F);
 
 
     /**
@@ -49,6 +49,6 @@ public interface ModGroebnerBase<C extends RingElem<C>> {
      * @param M a module basis.
      * @return GB(M), a Groebner base of M.
      */
-    public ModuleList<C> GB(ModuleList<C> M);
+    ModuleList<C> GB(ModuleList<C> M);
 
 }

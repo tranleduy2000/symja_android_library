@@ -16,7 +16,7 @@ import java.util.TreeMap;
 import edu.jas.gb.Pair;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RegularRingElem;
+import edu.jas.structure.elem.RegularRingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -78,7 +78,7 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
         super(red);
         this.red = red;
         cofac = rf;
-        engine = GCDFactory.<C>getImplementation(rf);
+        engine = GCDFactory.getImplementation(rf);
         // not used: engine =
         // (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getProxy( rf );
     }

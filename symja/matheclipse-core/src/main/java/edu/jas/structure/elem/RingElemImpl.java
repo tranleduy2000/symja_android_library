@@ -1,4 +1,4 @@
-package edu.jas.structure;
+package edu.jas.structure.elem;
 
 public abstract class RingElemImpl<C extends RingElem<C>>
          extends MonoidElemImpl<C> implements RingElem<C> {

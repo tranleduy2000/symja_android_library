@@ -8,8 +8,9 @@ package edu.jas.poly;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import edu.jas.structure.MonoidElem;
-import edu.jas.structure.MonoidElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.MonoidElem;
+import edu.jas.structure.elem.MonoidElemImpl;
 import edu.jas.structure.MonoidFactory;
 import edu.jas.structure.NotInvertibleException;
 
@@ -95,7 +96,7 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public MonoidFactory<Word> factory() {
         return mono;
@@ -179,14 +180,14 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
         if (val.length() == 0) {
             return "";
         }
-        StringBuffer s = new StringBuffer("");
+        StringBuffer s = new StringBuffer();
         if (mono.translation == null) {
             for (int i = 0; i < length(); i++) {
                 if (i != 0) {
@@ -202,7 +203,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
                 s.append(mono.transVar(getVal(i)));
             }
         }
-        s.append("");
         return s.toString();
     }
 
@@ -211,7 +211,7 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {

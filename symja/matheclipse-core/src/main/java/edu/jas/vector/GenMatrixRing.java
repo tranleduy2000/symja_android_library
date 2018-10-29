@@ -19,7 +19,7 @@ import java.util.Random;
 
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.AlgebraFactory;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -210,10 +210,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         if (cols != omod.cols) {
             return false;
         }
-        if (!coFac.equals(omod.coFac)) {
-            return false;
-        }
-        return true;
+        return coFac.equals(omod.coFac);
     }
 
 

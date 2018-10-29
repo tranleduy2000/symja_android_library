@@ -11,6 +11,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 
+import edu.jas.structure.elem.Element;
+
 
 /**
  * Element factory interface. Defines embedding of integers, parsing and random
@@ -27,7 +29,7 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      *
      * @return list of generators for the algebraic structure.
      */
-    public List<C> generators();
+    List<C> generators();
 
 
     /**
@@ -35,7 +37,7 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      *
      * @return true if this structure is finite, else false.
      */
-    public boolean isFinite();
+    boolean isFinite();
 
 
     /**
@@ -44,7 +46,7 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      * @param a long
      * @return element corresponding to a.
      */
-    public C fromInteger(long a);
+    C fromInteger(long a);
 
 
     /**
@@ -53,7 +55,7 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      * @param a java.math.BigInteger.
      * @return element corresponding to a.
      */
-    public C fromInteger(BigInteger a);
+    C fromInteger(BigInteger a);
 
 
     /**
@@ -62,7 +64,7 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      * @param n
      * @return a random element.
      */
-    public C random(int n);
+    C random(int n);
 
 
     /**
@@ -72,7 +74,7 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      * @param random is a source for random bits.
      * @return a random element.
      */
-    public C random(int n, Random random);
+    C random(int n, Random random);
 
 
     /**
@@ -81,7 +83,7 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      * @param c
      * @return a copy of c.
      */
-    public C copy(C c);
+    C copy(C c);
 
 
     /**
@@ -90,7 +92,7 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      * @param s String.
      * @return a Element corresponding to s.
      */
-    public C parse(String s);
+    C parse(String s);
 
 
     /**
@@ -99,7 +101,7 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      * @param r Reader.
      * @return the next Element found on r.
      */
-    public C parse(Reader r);
+    C parse(Reader r);
 
 
     /**
@@ -107,6 +109,6 @@ public interface ElemFactory<C extends Element<C>> extends Serializable {
      *
      * @return script compatible representation for this ElemFactory.
      */
-    public String toScript();
+    String toScript();
 
 }

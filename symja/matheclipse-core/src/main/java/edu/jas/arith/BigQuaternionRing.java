@@ -14,6 +14,7 @@ import java.util.Random;
 
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.RingFactory;
+import edu.jas.structure.elem.Element;
 
 // import java.math.BigInteger;
 
@@ -217,7 +218,7 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {

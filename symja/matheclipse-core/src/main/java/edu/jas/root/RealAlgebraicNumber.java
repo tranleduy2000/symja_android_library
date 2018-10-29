@@ -11,9 +11,10 @@ import edu.jas.arith.Rational;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.RingElemImpl;
 
 
 /**
@@ -81,7 +82,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public RealAlgebraicRing<C> factory() {
         return ring;
@@ -91,7 +92,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
     /**
      * Copy this.
      *
-     * @see edu.jas.structure.Element#copy()
+     * @see Element#copy()
      */
     @Override
     public RealAlgebraicNumber<C> copy() {
@@ -114,7 +115,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      * Is RealAlgebraicNumber zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return number.isZERO();
@@ -125,7 +126,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      * Is RealAlgebraicNumber one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return number.isONE();
@@ -136,7 +137,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      * Is RealAlgebraicNumber unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         return number.isUnit();
@@ -172,7 +173,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -185,7 +186,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -266,7 +267,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      * RealAlgebraicNumber absolute value.
      *
      * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public RealAlgebraicNumber<C> abs() {
         if (this.signum() < 0) {
@@ -313,7 +314,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      * RealAlgebraicNumber negate.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public RealAlgebraicNumber<C> negate() {
         return new RealAlgebraicNumber<C>(ring, number.negate());
@@ -324,7 +325,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      * RealAlgebraicNumber signum. <b>Note: </b> Modifies ring.root eventually.
      *
      * @return real signum(this).
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         Interval<C> v = ring.engine.invariantSignInterval(ring.root, ring.algebraic.modul, number.val);
@@ -399,7 +400,7 @@ public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingE
      *
      * @return S with S = 1/this if defined.
      * @throws NotInvertibleException if the element is not invertible.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public RealAlgebraicNumber<C> inverse() {
         return new RealAlgebraicNumber<C>(ring, number.inverse());

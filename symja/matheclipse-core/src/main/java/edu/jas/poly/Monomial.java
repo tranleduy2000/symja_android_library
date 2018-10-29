@@ -7,8 +7,8 @@ package edu.jas.poly;
 import java.util.Map;
 
 import edu.jas.structure.ElemFactory;
-import edu.jas.structure.Element;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -98,7 +98,7 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
     /**
      * Script representation of Monomial.
      *
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -119,7 +119,7 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -132,7 +132,7 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
      * Get the corresponding element factory.
      *
      * @return null, factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public ElemFactory<Monomial<C>> factory() {
         return null; // TODO

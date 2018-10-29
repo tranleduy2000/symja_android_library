@@ -16,7 +16,7 @@ import edu.jas.gb.WordPair;
 import edu.jas.gb.WordPairList;
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.GenWordPolynomialRing;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 

@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.MonoidElem;
+
 /**
  * Monoid factory interface. Defines get one and tests for associativity and
  * commutativity.
@@ -20,7 +22,7 @@ public interface MonoidFactory<C extends MonoidElem<C>> extends ElemFactory<C> {
      *
      * @return 1.
      */
-    public C getONE();
+    C getONE();
 
 
     /**
@@ -28,7 +30,7 @@ public interface MonoidFactory<C extends MonoidElem<C>> extends ElemFactory<C> {
      *
      * @return true if this monoid is commutative, else false.
      */
-    public boolean isCommutative();
+    boolean isCommutative();
 
 
     /**
@@ -36,7 +38,7 @@ public interface MonoidFactory<C extends MonoidElem<C>> extends ElemFactory<C> {
      *
      * @return true if this monoid is associative, else false.
      */
-    public boolean isAssociative();
+    boolean isAssociative();
 
 
 }

@@ -13,9 +13,10 @@ import edu.jas.kern.PrettyPrint;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.QuotPair;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.RingElemImpl;
 
 
 /**
@@ -144,13 +145,13 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
         // must reduce to lowest terms
         // not perfect, TODO 
         //GenSolvablePolynomial<C>[] gcd = PolyModUtil.<C> syzGcdCofactors(r.ring, n, d);
-        GenSolvablePolynomial<C>[] gcd = FDUtil.<C>leftGcdCofactors(r.ring, n, d);
+        GenSolvablePolynomial<C>[] gcd = FDUtil.leftGcdCofactors(r.ring, n, d);
         if (!gcd[0].isONE()) {
             logger.info("constructor: gcd = " + Arrays.toString(gcd)); // + ", " + n + ", " +d);
             n = gcd[1];
             d = gcd[2];
         }
-        gcd = FDUtil.<C>rightGcdCofactors(r.ring, n, d);
+        gcd = FDUtil.rightGcdCofactors(r.ring, n, d);
         if (!gcd[0].isONE()) {
             logger.info("constructor: gcd = " + Arrays.toString(gcd)); // + ", " + n + ", " +d);
             n = gcd[1];
@@ -168,7 +169,7 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public SolvableQuotientRing<C> factory() {
         return ring;
@@ -210,7 +211,7 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * Is SolvableQuotient zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return num.isZERO();
@@ -221,7 +222,7 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * Is SolvableQuotient one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return num.compareTo(den) == 0;
@@ -232,13 +233,10 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * Is SolvableQuotient a unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
-        if (num.isZERO()) {
-            return false;
-        }
-        return true;
+        return !num.isZERO();
     }
 
 
@@ -274,7 +272,7 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -290,7 +288,7 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -426,7 +424,7 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * SolvableQuotient absolute value.
      *
      * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public SolvableQuotient<C> abs() {
         return new SolvableQuotient<C>(ring, (GenSolvablePolynomial<C>) num.abs(), den, true);
@@ -490,7 +488,7 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * SolvableQuotient negate.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public SolvableQuotient<C> negate() {
         return new SolvableQuotient<C>(ring, (GenSolvablePolynomial<C>) num.negate(), den, true);
@@ -501,7 +499,7 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * SolvableQuotient signum.
      *
      * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         // assume sign(den) > 0
@@ -535,7 +533,7 @@ public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<Solvab
      * SolvableQuotient inverse.
      *
      * @return S with S = 1/this.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public SolvableQuotient<C> inverse() {
         if (num.isZERO()) {

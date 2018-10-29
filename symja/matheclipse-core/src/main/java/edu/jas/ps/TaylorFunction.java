@@ -8,7 +8,7 @@ package edu.jas.ps;
 import java.util.List;
 
 import edu.jas.poly.ExpVector;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -26,7 +26,7 @@ public interface TaylorFunction<C extends RingElem<C>> {
      *
      * @return factorial coefficient.
      */
-    public long getFacul();
+    long getFacul();
 
 
     /**
@@ -34,7 +34,7 @@ public interface TaylorFunction<C extends RingElem<C>> {
      *
      * @return true if this is 0, else false.
      */
-    public boolean isZERO();
+    boolean isZERO();
 
 
     /**
@@ -42,7 +42,7 @@ public interface TaylorFunction<C extends RingElem<C>> {
      *
      * @return deriviative of this.
      */
-    public TaylorFunction<C> deriviative();
+    TaylorFunction<C> deriviative();
 
 
     /**
@@ -51,7 +51,7 @@ public interface TaylorFunction<C extends RingElem<C>> {
      * @param i exponent vector.
      * @return partial deriviative of this with respect to all variables.
      */
-    public TaylorFunction<C> deriviative(ExpVector i);
+    TaylorFunction<C> deriviative(ExpVector i);
 
 
     /**
@@ -60,7 +60,7 @@ public interface TaylorFunction<C extends RingElem<C>> {
      * @param a element.
      * @return this(a).
      */
-    public C evaluate(C a);
+    C evaluate(C a);
 
 
     /**
@@ -69,6 +69,6 @@ public interface TaylorFunction<C extends RingElem<C>> {
      * @param a tuple of elements.
      * @return this(a).
      */
-    public C evaluate(List<C> a);
+    C evaluate(List<C> a);
 
 }

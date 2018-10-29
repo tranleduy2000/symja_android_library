@@ -11,7 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -115,7 +116,7 @@ public class RecSolvableWordPolynomial<C extends RingElem<C>> extends
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     @Override
     public RecSolvableWordPolynomialRing<C> factory() {

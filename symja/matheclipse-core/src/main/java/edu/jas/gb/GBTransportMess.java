@@ -8,7 +8,7 @@ package edu.jas.gb;
 import java.io.Serializable;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**

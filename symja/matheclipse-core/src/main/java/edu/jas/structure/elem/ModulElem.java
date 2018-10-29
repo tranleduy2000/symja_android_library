@@ -2,10 +2,12 @@
  * $Id$
  */
 
-package edu.jas.structure;
+package edu.jas.structure.elem;
 
 
 import java.util.List;
+
+import edu.jas.structure.AbelianGroupElem;
 
 
 /**
@@ -24,7 +26,7 @@ public interface ModulElem<M extends ModulElem<M, C>, C extends RingElem<C>> ext
      * @param s scalar
      * @return this * s.
      */
-    public M scalarMultiply(C s);
+    M scalarMultiply(C s);
 
 
     /**
@@ -35,7 +37,7 @@ public interface ModulElem<M extends ModulElem<M, C>, C extends RingElem<C>> ext
      * @param s scalar
      * @return a * b + this * s.
      */
-    public M linearCombination(C a, M b, C s);
+    M linearCombination(C a, M b, C s);
 
 
     /**
@@ -45,7 +47,7 @@ public interface ModulElem<M extends ModulElem<M, C>, C extends RingElem<C>> ext
      * @param s scalar
      * @return b + this * s.
      */
-    public M linearCombination(M b, C s);
+    M linearCombination(M b, C s);
 
 
     /**
@@ -54,7 +56,7 @@ public interface ModulElem<M extends ModulElem<M, C>, C extends RingElem<C>> ext
      * @param b module element
      * @return this * b, a scalar.
      */
-    public C scalarProduct(M b);
+    C scalarProduct(M b);
 
 
     /**
@@ -64,6 +66,6 @@ public interface ModulElem<M extends ModulElem<M, C>, C extends RingElem<C>> ext
      * @param b list of module elements
      * @return this * b, a list of scalars, a module element.
      */
-    public M scalarProduct(List<M> b);
+    M scalarProduct(List<M> b);
 
 }

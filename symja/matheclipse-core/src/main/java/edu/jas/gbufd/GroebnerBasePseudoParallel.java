@@ -18,7 +18,7 @@ import edu.jas.gb.Pair;
 import edu.jas.gb.PairList;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -150,7 +150,7 @@ public class GroebnerBasePseudoParallel<C extends RingElem<C>> extends GroebnerB
             threads = 1;
         }
         this.threads = threads;
-        engine = GCDFactory.<C>getImplementation(rf);
+        engine = GCDFactory.getImplementation(rf);
         //not used: engine = (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getProxy( rf );
         this.pool = pool;
     }

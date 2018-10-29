@@ -11,7 +11,7 @@ import java.util.List;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.ModuleList;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -31,7 +31,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F a Groebner base.
      * @return leftSyz(F), a basis for the left module of syzygies for F.
      */
-    public List<List<GenSolvablePolynomial<C>>> leftZeroRelations(List<GenSolvablePolynomial<C>> F);
+    List<List<GenSolvablePolynomial<C>>> leftZeroRelations(List<GenSolvablePolynomial<C>> F);
 
 
     /**
@@ -41,7 +41,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F    a Groebner base.
      * @return leftSyz(F), a basis for the left module of syzygies for F.
      */
-    public List<List<GenSolvablePolynomial<C>>> leftZeroRelations(int modv, List<GenSolvablePolynomial<C>> F);
+    List<List<GenSolvablePolynomial<C>>> leftZeroRelations(int modv, List<GenSolvablePolynomial<C>> F);
 
 
     /**
@@ -50,7 +50,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param M a Groebner base.
      * @return leftSyz(M), a basis for the left module of syzygies for M.
      */
-    public ModuleList<C> leftZeroRelations(ModuleList<C> M);
+    ModuleList<C> leftZeroRelations(ModuleList<C> M);
 
 
     /**
@@ -60,7 +60,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F a polynomial list.
      * @return true, if Z is a list of left syzygies for F, else false.
      */
-    public boolean isLeftZeroRelation(List<List<GenSolvablePolynomial<C>>> Z, List<GenSolvablePolynomial<C>> F);
+    boolean isLeftZeroRelation(List<List<GenSolvablePolynomial<C>>> Z, List<GenSolvablePolynomial<C>> F);
 
 
     /**
@@ -70,8 +70,8 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F a polynomial list.
      * @return true, if Z is a list of right syzygies for F, else false.
      */
-    public boolean isRightZeroRelation(List<List<GenSolvablePolynomial<C>>> Z,
-                                       List<GenSolvablePolynomial<C>> F);
+    boolean isRightZeroRelation(List<List<GenSolvablePolynomial<C>>> Z,
+                                List<GenSolvablePolynomial<C>> F);
 
 
     /**
@@ -81,7 +81,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F a module list.
      * @return true, if Z is a list of left syzygies for F, else false.
      */
-    public boolean isLeftZeroRelation(ModuleList<C> Z, ModuleList<C> F);
+    boolean isLeftZeroRelation(ModuleList<C> Z, ModuleList<C> F);
 
 
     /**
@@ -91,7 +91,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F a module list.
      * @return true, if Z is a list of right syzygies for F, else false.
      */
-    public boolean isRightZeroRelation(ModuleList<C> Z, ModuleList<C> F);
+    boolean isRightZeroRelation(ModuleList<C> Z, ModuleList<C> F);
 
 
     /**
@@ -100,7 +100,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param M a module list of a Groebner basis.
      * @return a resolution of M.
      */
-    public List<SolvResPart<C>> resolution(ModuleList<C> M);
+    List<SolvResPart<C>> resolution(ModuleList<C> M);
 
 
     /**
@@ -109,7 +109,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F a polynomial list of a Groebner basis.
      * @return a resolution of F.
      */
-    public List/*<SolvResPart<C>|SolvResPolPart<C>>*/resolution(PolynomialList<C> F);
+    List/*<SolvResPart<C>|SolvResPolPart<C>>*/resolution(PolynomialList<C> F);
 
 
     /**
@@ -118,7 +118,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param M a module list of an arbitrary basis.
      * @return a resolution of M.
      */
-    public List<SolvResPart<C>> resolutionArbitrary(ModuleList<C> M);
+    List<SolvResPart<C>> resolutionArbitrary(ModuleList<C> M);
 
 
     /**
@@ -127,7 +127,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F a polynomial list of an arbitrary basis.
      * @return a resolution of F.
      */
-    public List/*<SolvResPart<C>|SolvResPolPart<C>>*/resolutionArbitrary(PolynomialList<C> F);
+    List/*<SolvResPart<C>|SolvResPolPart<C>>*/resolutionArbitrary(PolynomialList<C> F);
 
 
     /**
@@ -136,7 +136,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F a solvable polynomial list.
      * @return syz(F), a basis for the module of left syzygies for F.
      */
-    public List<List<GenSolvablePolynomial<C>>> leftZeroRelationsArbitrary(List<GenSolvablePolynomial<C>> F);
+    List<List<GenSolvablePolynomial<C>>> leftZeroRelationsArbitrary(List<GenSolvablePolynomial<C>> F);
 
 
     /**
@@ -146,8 +146,8 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F    a solvable polynomial list.
      * @return syz(F), a basis for the module of left syzygies for F.
      */
-    public List<List<GenSolvablePolynomial<C>>> leftZeroRelationsArbitrary(int modv,
-                                                                           List<GenSolvablePolynomial<C>> F);
+    List<List<GenSolvablePolynomial<C>>> leftZeroRelationsArbitrary(int modv,
+                                                                    List<GenSolvablePolynomial<C>> F);
 
 
     /**
@@ -156,7 +156,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param M an arbitrary base.
      * @return leftSyz(M), a basis for the left module of syzygies for M.
      */
-    public ModuleList<C> leftZeroRelationsArbitrary(ModuleList<C> M);
+    ModuleList<C> leftZeroRelationsArbitrary(ModuleList<C> M);
 
 
     /**
@@ -165,7 +165,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F a solvable polynomial list.
      * @return syz(F), a basis for the module of right syzygies for F.
      */
-    public List<List<GenSolvablePolynomial<C>>> rightZeroRelationsArbitrary(List<GenSolvablePolynomial<C>> F);
+    List<List<GenSolvablePolynomial<C>>> rightZeroRelationsArbitrary(List<GenSolvablePolynomial<C>> F);
 
 
     /**
@@ -175,8 +175,8 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param F    a solvable polynomial list.
      * @return syz(F), a basis for the module of right syzygies for F.
      */
-    public List<List<GenSolvablePolynomial<C>>> rightZeroRelationsArbitrary(int modv,
-                                                                            List<GenSolvablePolynomial<C>> F);
+    List<List<GenSolvablePolynomial<C>>> rightZeroRelationsArbitrary(int modv,
+                                                                     List<GenSolvablePolynomial<C>> F);
 
 
     /**
@@ -187,8 +187,8 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param oc = [p,q] two solvable polynomials
      * @return true if p*a = q*b, else false
      */
-    public boolean isLeftOreCond(GenSolvablePolynomial<C> a, GenSolvablePolynomial<C> b,
-                                 GenSolvablePolynomial<C>[] oc);
+    boolean isLeftOreCond(GenSolvablePolynomial<C> a, GenSolvablePolynomial<C> b,
+                          GenSolvablePolynomial<C>[] oc);
 
 
     /**
@@ -199,8 +199,8 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param oc = [p,q] two solvable polynomials
      * @return true if a*p = b*q, else false
      */
-    public boolean isRightOreCond(GenSolvablePolynomial<C> a, GenSolvablePolynomial<C> b,
-                                  GenSolvablePolynomial<C>[] oc);
+    boolean isRightOreCond(GenSolvablePolynomial<C> a, GenSolvablePolynomial<C> b,
+                           GenSolvablePolynomial<C>[] oc);
 
 
     /**
@@ -211,7 +211,7 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param b solvable polynomial
      * @return [p, q] with p*a = q*b
      */
-    public GenSolvablePolynomial<C>[] leftOreCond(GenSolvablePolynomial<C> a, GenSolvablePolynomial<C> b);
+    GenSolvablePolynomial<C>[] leftOreCond(GenSolvablePolynomial<C> a, GenSolvablePolynomial<C> b);
 
 
     /**
@@ -222,6 +222,6 @@ public interface SolvableSyzygy<C extends RingElem<C>> extends Serializable {
      * @param b solvable polynomial
      * @return [p, q] with a*p = b*q
      */
-    public GenSolvablePolynomial<C>[] rightOreCond(GenSolvablePolynomial<C> a, GenSolvablePolynomial<C> b);
+    GenSolvablePolynomial<C>[] rightOreCond(GenSolvablePolynomial<C> a, GenSolvablePolynomial<C> b);
 
 }

@@ -13,7 +13,7 @@ import edu.jas.arith.Rational;
 import edu.jas.poly.Complex;
 import edu.jas.poly.ComplexRing;
 import edu.jas.structure.ElemFactory;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -92,7 +92,7 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
      */
     @SuppressWarnings("cast")
     public Rectangle(Complex<C> nw, Complex<C> sw, Complex<C> se, Complex<C> ne) {
-        this((Complex<C>[]) new Complex[]{nw, sw, se, ne});
+        this(new Complex[]{nw, sw, se, ne});
     }
 
 

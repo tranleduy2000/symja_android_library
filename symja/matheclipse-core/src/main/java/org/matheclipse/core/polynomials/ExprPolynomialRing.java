@@ -23,6 +23,7 @@ import java.util.Set;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
 import edu.jas.structure.RingFactory;
+import edu.jas.structure.elem.Element;
 import edu.jas.util.CartesianProduct;
 import edu.jas.util.CartesianProductInfinite;
 import edu.jas.util.LongIterable;
@@ -703,7 +704,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 * Get a scripting compatible string representation.
 	 *
 	 * @return script compatible representation for this Element.
-	 * @see edu.jas.structure.Element#toScript()
+	 * @see Element#toScript()
 	 */
 	@Override
 	public String toScript() {

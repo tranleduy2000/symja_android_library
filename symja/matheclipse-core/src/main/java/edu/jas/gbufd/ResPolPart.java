@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import edu.jas.poly.ModuleList;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 /**
  * Container for polynomial resolution components.

@@ -16,7 +16,7 @@ import edu.jas.arith.ModLongRing;
 import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -122,7 +122,7 @@ public class SquarefreeFactory {
      */
     public static <C extends RingElem<C>> SquarefreeAbstract<AlgebraicNumber<C>> getImplementation(
             AlgebraicNumberRing<C> fac) {
-        PolyUfdUtil.<C>ensureFieldProperty(fac);
+        PolyUfdUtil.ensureFieldProperty(fac);
         if (fac.isField()) {
             if (fac.characteristic().signum() == 0) {
                 return new SquarefreeFieldChar0<AlgebraicNumber<C>>(fac);

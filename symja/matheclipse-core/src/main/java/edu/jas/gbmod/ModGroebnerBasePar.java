@@ -7,7 +7,7 @@ package edu.jas.gbmod;
 
 import edu.jas.gb.GroebnerBaseAbstract;
 import edu.jas.gbufd.GBFactory;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 

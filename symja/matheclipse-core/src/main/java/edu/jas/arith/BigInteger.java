@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.RingElemImpl;
 import edu.jas.structure.RingFactory;
 
 
@@ -303,7 +304,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public BigInteger factory() {
         return this;
@@ -429,7 +430,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      * Is BigInteger number zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return val.signum() == 0; //equals(java.math.BigInteger.ZERO);
@@ -438,7 +439,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
     /**
      * Is BigInteger number one.
      *
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return val.equals(java.math.BigInteger.ONE);
@@ -447,7 +448,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
     /**
      * Is BigInteger number unit.
      *
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         return (this.isONE() || this.negate().isONE());
@@ -467,7 +468,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -479,7 +480,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -525,7 +526,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
     /**
      * Absolute value of this.
      *
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public BigInteger abs() {
         return new BigInteger(val.abs());
@@ -541,7 +542,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
     /**
      * signum.
      *
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         return val.signum();
@@ -571,7 +572,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      * Integer inverse. R is a non-zero integer. S=1/R if defined else throws
      * not invertible exception.
      *
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public BigInteger inverse() {
         if (this.isONE() || this.negate().isONE()) {

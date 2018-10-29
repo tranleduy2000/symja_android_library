@@ -21,8 +21,9 @@ import java.util.TreeMap;
 import edu.jas.kern.PreemptingException;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.elem.RingElemImpl;
 import edu.jas.structure.UnaryFunctor;
 
 
@@ -158,7 +159,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public GenPolynomialRing<C> factory() {
         return ring;
@@ -192,7 +193,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      */
     public SortedMap<ExpVector, C> getMap() {
         // return val;
-        return Collections.<ExpVector, C>unmodifiableSortedMap(val);
+        return Collections.unmodifiableSortedMap(val);
     }
 
 
@@ -388,7 +389,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -445,7 +446,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -458,7 +459,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Is GenPolynomial&lt;C&gt; zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return val.isEmpty();
@@ -469,7 +470,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Is GenPolynomial&lt;C&gt; one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         if (val.size() != 1) {
@@ -487,7 +488,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Is GenPolynomial&lt;C&gt; a unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         if (val.size() != 1) {
@@ -512,10 +513,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             return false;
         }
         C c = val.get(ring.evzero);
-        if (c == null) {
-            return false;
-        }
-        return true;
+        return c != null;
     }
 
 

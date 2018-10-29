@@ -7,7 +7,7 @@ package edu.jas.ps;
 
 import java.io.Serializable;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**

@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.RingElem;
+
 /**
  * Ring factory interface. Defines test for field and query of characteristic.
  *
@@ -20,7 +22,7 @@ public interface RingFactory<C extends RingElem<C>> extends AbelianGroupFactory<
      *
      * @return true if it is known that this ring is a field, else false.
      */
-    public boolean isField();
+    boolean isField();
 
 
     /**
@@ -28,6 +30,6 @@ public interface RingFactory<C extends RingElem<C>> extends AbelianGroupFactory<
      *
      * @return characteristic of this ring.
      */
-    public java.math.BigInteger characteristic();
+    java.math.BigInteger characteristic();
 
 }

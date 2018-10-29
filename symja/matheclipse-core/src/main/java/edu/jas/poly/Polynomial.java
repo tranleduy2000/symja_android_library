@@ -8,7 +8,7 @@ package edu.jas.poly;
 import java.util.Iterator;
 import java.util.Map;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -27,7 +27,7 @@ public interface Polynomial<C extends RingElem<C>>
      *
      * @return first map entry.
      */
-    public Map.Entry<ExpVector, C> leadingMonomial();
+    Map.Entry<ExpVector, C> leadingMonomial();
 
 
     /**
@@ -35,7 +35,7 @@ public interface Polynomial<C extends RingElem<C>>
      *
      * @return first exponent.
      */
-    public ExpVector leadingExpVector();
+    ExpVector leadingExpVector();
 
 
     /**
@@ -43,7 +43,7 @@ public interface Polynomial<C extends RingElem<C>>
      *
      * @return first coefficient.
      */
-    public C leadingBaseCoefficient();
+    C leadingBaseCoefficient();
 
 
     /**
@@ -51,7 +51,7 @@ public interface Polynomial<C extends RingElem<C>>
      *
      * @return coefficient of constant term.
      */
-    public C trailingBaseCoefficient();
+    C trailingBaseCoefficient();
 
 
     /**
@@ -59,7 +59,7 @@ public interface Polynomial<C extends RingElem<C>>
      *
      * @return this - leading monomial.
      */
-    public Polynomial<C> reductum();
+    Polynomial<C> reductum();
 
 
     /**
@@ -71,7 +71,7 @@ public interface Polynomial<C extends RingElem<C>>
      * @param k    exponent for x_j.
      * @return extended polynomial.
      */
-    public Polynomial<C> extend(PolynomialRing<C> pfac, int j, long k);
+    Polynomial<C> extend(PolynomialRing<C> pfac, int j, long k);
 
 
     /**
@@ -82,7 +82,7 @@ public interface Polynomial<C extends RingElem<C>>
      * @return Map of exponents and contracted polynomials.
      * <b>Note:</b> could return SortedMap
      */
-    public Map<ExpVector, Polynomial<C>> contract(PolynomialRing<C> pfac);
+    Map<ExpVector, Polynomial<C>> contract(PolynomialRing<C> pfac);
 
 
     /**
@@ -90,7 +90,7 @@ public interface Polynomial<C extends RingElem<C>>
      *
      * @return polynomial with reversed variables.
      */
-    public Polynomial<C> reverse(PolynomialRing<C> oring);
+    Polynomial<C> reverse(PolynomialRing<C> oring);
 
 
     /**
@@ -98,7 +98,7 @@ public interface Polynomial<C extends RingElem<C>>
      *
      * @return val.values().iterator().
      */
-    public Iterator<C> coefficientIterator();
+    Iterator<C> coefficientIterator();
 
 
     /**
@@ -106,7 +106,7 @@ public interface Polynomial<C extends RingElem<C>>
      *
      * @return val.keySet().iterator().
      */
-    public Iterator<ExpVector> exponentIterator();
+    Iterator<ExpVector> exponentIterator();
 
 
     /**
@@ -114,7 +114,7 @@ public interface Polynomial<C extends RingElem<C>>
      *
      * @return a PolyIterator.
      */
-    public Iterator<Monomial<C>> monomialIterator();
+    Iterator<Monomial<C>> monomialIterator();
 
 
 }

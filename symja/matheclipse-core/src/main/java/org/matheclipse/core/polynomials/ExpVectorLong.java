@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import edu.jas.structure.elem.Element;
+
 /**
  * ExpVectorLong implements exponent vectors for polynomials using arrays of long as storage unit. This class is used by
  * ExpVectorLong internally, there is no need to use this class directly.
@@ -517,7 +519,7 @@ public final class ExpVectorLong {
 	 * Get a scripting compatible string representation.
 	 * 
 	 * @return script compatible representation for this Element.
-	 * @see edu.jas.structure.Element#toScript()
+	 * @see Element#toScript()
 	 */
 	public String toScript() {
 		return toScript(stdVars());
@@ -527,7 +529,7 @@ public final class ExpVectorLong {
 	 * Get a scripting compatible string representation.
 	 * 
 	 * @return script compatible representation for this Element.
-	 * @see edu.jas.structure.Element#toScript()
+	 * @see Element#toScript()
 	 */
 	public String toScript(IAST vars) {
 		// Python case

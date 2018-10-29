@@ -5,7 +5,7 @@
 package edu.jas.poly;
 
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -24,6 +24,6 @@ public interface RelationGenerator<C extends RingElem<C>> {
      *
      * @param ring solvable polynomial ring factory.
      */
-    public abstract void generate(GenSolvablePolynomialRing<C> ring);
+    void generate(GenSolvablePolynomialRing<C> ring);
 
 }

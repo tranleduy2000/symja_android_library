@@ -9,8 +9,9 @@ import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.structure.BinaryFunctor;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.elem.RingElemImpl;
 import edu.jas.structure.Selector;
 import edu.jas.structure.UnaryFunctor;
 
@@ -98,7 +99,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public UnivPowerSeriesRing<C> factory() {
         return ring;
@@ -185,12 +186,12 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
         // Python case
-        StringBuffer sb = new StringBuffer("");
+        StringBuffer sb = new StringBuffer();
         UnivPowerSeries<C> s = this;
         String var = ring.var;
         //System.out.println("cache = " + s.coeffCache);
@@ -241,7 +242,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -616,7 +617,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * Is power series zero. <b>Note: </b> compare only up to truncate.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return (compareTo(ring.ZERO) == 0);
@@ -627,7 +628,7 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
      * Is power series one. <b>Note: </b> compare only up to truncate.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return (compareTo(ring.ONE) == 0);

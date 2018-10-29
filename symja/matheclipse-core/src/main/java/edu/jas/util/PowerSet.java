@@ -67,8 +67,6 @@ class PowerSetIterator<E> implements Iterator<List<E>> {
     Mode mode;
     private PowerSetIterator<E> recIter;
 
-    ;
-
 
     /**
      * PowerSetIterator constructor.

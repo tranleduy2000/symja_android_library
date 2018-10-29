@@ -17,7 +17,7 @@ import java.util.Random;
 
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.ModulFactory;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -149,10 +149,7 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
         if (cols != omod.cols) {
             return false;
         }
-        if (!coFac.equals(omod.coFac)) {
-            return false;
-        }
-        return true;
+        return coFac.equals(omod.coFac);
     }
 
 

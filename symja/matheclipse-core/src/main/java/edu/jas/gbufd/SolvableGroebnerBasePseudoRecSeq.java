@@ -22,7 +22,7 @@ import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -120,8 +120,8 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
     @SuppressWarnings({"cast", "unchecked"})
     public SolvableGroebnerBasePseudoRecSeq(RingFactory<GenPolynomial<C>> rf, SolvablePseudoReduction<C> red,
                                             PairList<GenPolynomial<C>> pl) {
-        super((SolvablePseudoReduction<GenPolynomial<C>>) (SolvablePseudoReduction) red, pl);
-        this.sred = (SolvablePseudoReduction<GenPolynomial<C>>) (SolvablePseudoReduction) red;
+        super((SolvablePseudoReduction<GenPolynomial<C>>) red, pl);
+        this.sred = (SolvablePseudoReduction<GenPolynomial<C>>) red;
         sredRec = red;
         //this.red = sred;
         cofac = (GenPolynomialRing<C>) rf;
@@ -132,7 +132,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
         } else {
             //engine = GCDFactory.<C> getImplementation(cofac.coFac);
             //
-            engine = GCDFactory.<C>getProxy(cofac.coFac);
+            engine = GCDFactory.getProxy(cofac.coFac);
         }
     }
 
@@ -148,8 +148,8 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
     public List<GenSolvablePolynomial<GenPolynomial<C>>> leftGB(int modv,
                                                                 List<GenSolvablePolynomial<GenPolynomial<C>>> F) {
         List<GenSolvablePolynomial<GenPolynomial<C>>> G = normalizeZerosOnes(F);
-        G = PolynomialList.<GenPolynomial<C>>castToSolvableList(PolyUtil.<C>monicRec(engine
-                .recursivePrimitivePart(PolynomialList.<GenPolynomial<C>>castToList(G))));
+        G = PolynomialList.castToSolvableList(PolyUtil.monicRec(engine
+                .recursivePrimitivePart(PolynomialList.castToList(G))));
         if (G.size() <= 1) {
             return G;
         }
@@ -158,7 +158,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
             throw new IllegalArgumentException("coefficients from a field");
         }
         PairList<GenPolynomial<C>> pairlist = strategy.create(modv, ring);
-        pairlist.put(PolynomialList.<GenPolynomial<C>>castToList(G));
+        pairlist.put(PolynomialList.castToList(G));
         logger.info("leftGB start " + pairlist);
 
         Pair<GenPolynomial<C>> pair;
@@ -193,7 +193,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
                 logger.info("ht(H) = " + H.leadingExpVector() + ", #(H) = " + H.length());
             }
             H = (GenSolvablePolynomial<GenPolynomial<C>>) engine.recursivePrimitivePart(H);
-            H = PolyUtil.<C>monic(H);
+            H = PolyUtil.monic(H);
             if (H.isConstant()) {
                 G.clear();
                 G.add(H);
@@ -262,7 +262,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
             //System.out.println("doing " + a.length());
             a = sredRec.leftNormalformRecursive(G, a);
             a = (GenSolvablePolynomial<GenPolynomial<C>>) engine.recursivePrimitivePart(a); //a.monic(); not possible
-            a = PolyUtil.<C>monic(a);
+            a = PolyUtil.monic(a);
             G.add(a); // adds as last
             i++;
         }
@@ -281,8 +281,8 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
     public List<GenSolvablePolynomial<GenPolynomial<C>>> twosidedGB(int modv,
                                                                     List<GenSolvablePolynomial<GenPolynomial<C>>> Fp) {
         List<GenSolvablePolynomial<GenPolynomial<C>>> G = normalizeZerosOnes(Fp);
-        G = PolynomialList.<GenPolynomial<C>>castToSolvableList(PolyUtil.<C>monicRec(engine
-                .recursivePrimitivePart(PolynomialList.<GenPolynomial<C>>castToList(G))));
+        G = PolynomialList.castToSolvableList(PolyUtil.monicRec(engine
+                .recursivePrimitivePart(PolynomialList.castToList(G))));
         if (G.size() < 1) { // two-sided!
             return G;
         }
@@ -310,7 +310,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
                 q = sredRec.leftNormalformRecursive(F, q);
                 if (!q.isZERO()) {
                     q = (GenSolvablePolynomial<GenPolynomial<C>>) engine.recursivePrimitivePart(q);
-                    q = PolyUtil.<C>monic(q);
+                    q = PolyUtil.monic(q);
                     F.add(q);
                 }
             }
@@ -318,7 +318,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
         G = F;
         //System.out.println("G generated = " + G);
         PairList<GenPolynomial<C>> pairlist = strategy.create(modv, ring);
-        pairlist.put(PolynomialList.<GenPolynomial<C>>castToList(G));
+        pairlist.put(PolynomialList.castToList(G));
         logger.info("twosidedGB start " + pairlist);
 
         Pair<GenPolynomial<C>> pair;
@@ -355,7 +355,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
             }
 
             H = (GenSolvablePolynomial<GenPolynomial<C>>) engine.recursivePrimitivePart(H);
-            H = PolyUtil.<C>monic(H);
+            H = PolyUtil.monic(H);
             if (H.isONE()) {
                 G.clear();
                 G.add(H);
@@ -376,7 +376,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
                     p = sredRec.leftNormalformRecursive(G, p);
                     if (!p.isZERO()) {
                         p = (GenSolvablePolynomial<GenPolynomial<C>>) engine.recursivePrimitivePart(p);
-                        p = PolyUtil.<C>monic(p);
+                        p = PolyUtil.monic(p);
                         if (p.isONE()) {
                             G.clear();
                             G.add(p);

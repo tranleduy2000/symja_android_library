@@ -20,7 +20,7 @@ import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.UnaryFunctor;
 import edu.jas.ufd.Squarefree;
@@ -57,7 +57,7 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
         if (!(cf instanceof ComplexRing)) {
             throw new IllegalArgumentException("cf not supported coefficients " + cf);
         }
-        engine = SquarefreeFactory.<Complex<C>>getImplementation(cf);
+        engine = SquarefreeFactory.getImplementation(cf);
     }
 
 
@@ -139,7 +139,7 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
             Mc = M1c;
         }
         //System.out.println("M = " + M);
-        Complex<C> B = PolyUtil.<Complex<C>>evaluateMain(f.ring.coFac, fa, Mc);
+        Complex<C> B = PolyUtil.evaluateMain(f.ring.coFac, fa, Mc);
         //System.out.println("B = " + B);
         return B.getRe();
     }
@@ -445,22 +445,22 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
 
         // polynomials with decimal coefficients
         GenPolynomialRing<Complex<BigDecimal>> dfac = new GenPolynomialRing<Complex<BigDecimal>>(cr, f.ring);
-        GenPolynomial<Complex<BigDecimal>> df = PolyUtil.<C>complexDecimalFromRational(dfac, f);
-        GenPolynomial<Complex<C>> fp = PolyUtil.<Complex<C>>baseDeriviative(f);
-        GenPolynomial<Complex<BigDecimal>> dfp = PolyUtil.<C>complexDecimalFromRational(dfac, fp);
+        GenPolynomial<Complex<BigDecimal>> df = PolyUtil.complexDecimalFromRational(dfac, f);
+        GenPolynomial<Complex<C>> fp = PolyUtil.baseDeriviative(f);
+        GenPolynomial<Complex<BigDecimal>> dfp = PolyUtil.complexDecimalFromRational(dfac, fp);
 
         // Newton Raphson iteration: x_{n+1} = x_n - f(x_n)/f'(x_n)
         int i = 0;
         final int MITER = 50;
         int dir = -1;
         while (i++ < MITER) {
-            Complex<BigDecimal> fx = PolyUtil.<Complex<BigDecimal>>evaluateMain(cr, df, d); // f(d)
+            Complex<BigDecimal> fx = PolyUtil.evaluateMain(cr, df, d); // f(d)
             //BigDecimal fs = fx.norm().getRe();
             //System.out.println("fs = " + fs);
             if (fx.isZERO()) {
                 return d;
             }
-            Complex<BigDecimal> fpx = PolyUtil.<Complex<BigDecimal>>evaluateMain(cr, dfp, d); // f'(d)
+            Complex<BigDecimal> fpx = PolyUtil.evaluateMain(cr, dfp, d); // f'(d)
             if (fpx.isZERO()) {
                 throw new NoConvergenceException("zero deriviative should not happen");
             }
@@ -679,7 +679,7 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
         if (f == null || f.isZERO() || f.isConstant()) { // ?
             return v;
         }
-        GenPolynomial<Complex<C>> gp = PolyUtil.<Complex<C>>baseDeriviative(g);
+        GenPolynomial<Complex<C>> gp = PolyUtil.baseDeriviative(g);
         //System.out.println("g  = " + g);
         //System.out.println("gp = " + gp);
         BigRational B = magnitudeBound(rect, gp).getRational();
@@ -724,7 +724,7 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
         RingFactory<Complex<C>> cfac = f.ring.coFac;
         //System.out.println("cfac = " + cfac + " : " + cfac.getClass());
         Complex<C> c = rect.getCenter();
-        Complex<C> ev = PolyUtil.<Complex<C>>evaluateMain(cfac, g, c);
+        Complex<C> ev = PolyUtil.evaluateMain(cfac, g, c);
         return ev;
     }
 

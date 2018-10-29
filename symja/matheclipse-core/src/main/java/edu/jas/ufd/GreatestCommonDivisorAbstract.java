@@ -13,7 +13,7 @@ import java.util.List;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -178,7 +178,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         if (d.isONE()) {
             return P;
         }
-        GenPolynomial<GenPolynomial<C>> pp = PolyUtil.<C>recursiveDivide(P, d);
+        GenPolynomial<GenPolynomial<C>> pp = PolyUtil.recursiveDivide(P, d);
         return pp;
     }
 
@@ -253,7 +253,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         if (d.isONE()) {
             return P;
         }
-        GenPolynomial<GenPolynomial<C>> pp = PolyUtil.<C>baseRecursiveDivide(P, d);
+        GenPolynomial<GenPolynomial<C>> pp = PolyUtil.baseRecursiveDivide(P, d);
         return pp;
     }
 
@@ -282,11 +282,11 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         RingFactory<GenPolynomial<C>> rrfac = rfac.coFac;
         GenPolynomialRing<C> cfac = (GenPolynomialRing<C>) rrfac;
         GenPolynomialRing<C> dfac = cfac.extend(rfac.nvar);
-        GenPolynomial<C> Pd = PolyUtil.<C>distribute(dfac, P);
-        GenPolynomial<C> Sd = PolyUtil.<C>distribute(dfac, S);
+        GenPolynomial<C> Pd = PolyUtil.distribute(dfac, P);
+        GenPolynomial<C> Sd = PolyUtil.distribute(dfac, S);
         GenPolynomial<C> Dd = gcd(Pd, Sd);
         // convert to recursive
-        GenPolynomial<GenPolynomial<C>> C = PolyUtil.<C>recursive(rfac, Dd);
+        GenPolynomial<GenPolynomial<C>> C = PolyUtil.recursive(rfac, Dd);
         return C;
     }
 
@@ -323,7 +323,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         GenPolynomialRing<C> cfac = pfac.contract(1);
         GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, 1);
 
-        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.<C>recursive(rfac, P);
+        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         GenPolynomial<C> D = recursiveContent(Pr);
         return D;
     }
@@ -349,10 +349,10 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         GenPolynomialRing<C> cfac = pfac.contract(1);
         GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, 1);
 
-        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.<C>recursive(rfac, P);
+        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         GenPolynomial<GenPolynomial<C>> PP = recursivePrimitivePart(Pr);
 
-        GenPolynomial<C> D = PolyUtil.<C>distribute(pfac, PP);
+        GenPolynomial<C> D = PolyUtil.distribute(pfac, PP);
         return D;
     }
 
@@ -421,10 +421,10 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         } else {
             rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, 1);
         }
-        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.<C>recursive(rfac, P);
-        GenPolynomial<GenPolynomial<C>> Sr = PolyUtil.<C>recursive(rfac, S);
+        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
+        GenPolynomial<GenPolynomial<C>> Sr = PolyUtil.recursive(rfac, S);
         GenPolynomial<GenPolynomial<C>> Dr = recursiveUnivariateGcd(Pr, Sr);
-        GenPolynomial<C> D = PolyUtil.<C>distribute(pfac, Dr);
+        GenPolynomial<C> D = PolyUtil.distribute(pfac, Dr);
         return D;
     }
 
@@ -445,7 +445,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         }
         GenPolynomial<C> C = gcd(P, S);
         GenPolynomial<C> A = P.multiply(S);
-        return PolyUtil.<C>basePseudoDivide(A, C);
+        return PolyUtil.basePseudoDivide(A, C);
     }
 
 
@@ -521,10 +521,10 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         GenPolynomialRing<GenPolynomial<C>> rfac = P.ring;
         GenPolynomialRing<C> cfac = (GenPolynomialRing<C>) rfac.coFac;
         GenPolynomialRing<C> dfac = cfac.extend(rfac.getVars());
-        GenPolynomial<C> Pp = PolyUtil.<C>distribute(dfac, P);
-        GenPolynomial<C> Sp = PolyUtil.<C>distribute(dfac, S);
+        GenPolynomial<C> Pp = PolyUtil.distribute(dfac, P);
+        GenPolynomial<C> Sp = PolyUtil.distribute(dfac, S);
         GenPolynomial<C> res = resultant(Pp, Sp);
-        GenPolynomial<GenPolynomial<C>> Rr = PolyUtil.<C>recursive(rfac, res);
+        GenPolynomial<GenPolynomial<C>> Rr = PolyUtil.recursive(rfac, res);
         return Rr;
     }
 
@@ -555,11 +555,11 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         GenPolynomialRing<C> cfac = pfac.contract(1);
         GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, 1);
 
-        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.<C>recursive(rfac, P);
-        GenPolynomial<GenPolynomial<C>> Sr = PolyUtil.<C>recursive(rfac, S);
+        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
+        GenPolynomial<GenPolynomial<C>> Sr = PolyUtil.recursive(rfac, S);
 
         GenPolynomial<GenPolynomial<C>> Dr = recursiveUnivariateResultant(Pr, Sr);
-        GenPolynomial<C> D = PolyUtil.<C>distribute(pfac, Dr);
+        GenPolynomial<C> D = PolyUtil.distribute(pfac, Dr);
         return D;
     }
 
@@ -585,12 +585,12 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
                 GenPolynomial<C> b = A.get(i);
                 GenPolynomial<C> g = gcd(a, b).abs();
                 if (!g.isONE()) {
-                    a = PolyUtil.<C>basePseudoDivide(a, g);
-                    b = PolyUtil.<C>basePseudoDivide(b, g);
+                    a = PolyUtil.basePseudoDivide(a, g);
+                    b = PolyUtil.basePseudoDivide(b, g);
                     GenPolynomial<C> gp = gcd(a, g).abs();
                     while (!gp.isONE()) {
-                        a = PolyUtil.<C>basePseudoDivide(a, gp);
-                        g = PolyUtil.<C>basePseudoDivide(g, gp);
+                        a = PolyUtil.basePseudoDivide(a, gp);
+                        g = PolyUtil.basePseudoDivide(g, gp);
                         B.add(g); // gcd(a,g) == 1
                         g = gp;
                         gp = gcd(a, gp).abs();
@@ -659,13 +659,13 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
             GenPolynomial<C> b = P.get(i);
             GenPolynomial<C> g = gcd(a, b).abs();
             if (!g.isONE()) {
-                a = PolyUtil.<C>basePseudoDivide(a, g);
-                b = PolyUtil.<C>basePseudoDivide(b, g);
+                a = PolyUtil.basePseudoDivide(a, g);
+                b = PolyUtil.basePseudoDivide(b, g);
                 // make g co-prime to new a, g is co-prime to c != b in P, B
                 GenPolynomial<C> gp = gcd(a, g).abs();
                 while (!gp.isONE()) {
-                    a = PolyUtil.<C>basePseudoDivide(a, gp);
-                    g = PolyUtil.<C>basePseudoDivide(g, gp);
+                    a = PolyUtil.basePseudoDivide(a, gp);
+                    g = PolyUtil.basePseudoDivide(g, gp);
                     if (!g.isZERO() && !g.isConstant() /*&& !B.contains(g)*/) {
                         B.add(g); // gcd(a,g) == 1 and gcd(g,c) == 1 for c != b in P, B
                     }
@@ -675,8 +675,8 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
                 // make new g co-prime to new b
                 gp = gcd(b, g).abs();
                 while (!gp.isONE()) {
-                    b = PolyUtil.<C>basePseudoDivide(b, gp);
-                    g = PolyUtil.<C>basePseudoDivide(g, gp);
+                    b = PolyUtil.basePseudoDivide(b, gp);
+                    g = PolyUtil.basePseudoDivide(g, gp);
                     if (!g.isZERO() && !g.isConstant() /*&& !B.contains(g)*/) {
                         B.add(g); // gcd(a,g) == 1 and gcd(g,c) == 1 for c != b in P, B
                     }
@@ -749,7 +749,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
             }
             boolean divides = false;
             for (GenPolynomial<C> p : P) {
-                GenPolynomial<C> a = PolyUtil.<C>baseSparsePseudoRemainder(q, p);
+                GenPolynomial<C> a = PolyUtil.baseSparsePseudoRemainder(q, p);
                 if (a.isZERO()) { // p divides q
                     divides = true;
                     break;
@@ -780,7 +780,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         ret[0] = hegcd[0];
         ret[1] = hegcd[1];
         GenPolynomial<C> x = hegcd[0].subtract(hegcd[1].multiply(P));
-        GenPolynomial<C>[] qr = PolyUtil.<C>basePseudoQuotientRemainder(x, S);
+        GenPolynomial<C>[] qr = PolyUtil.basePseudoQuotientRemainder(x, S);
         // assert qr[1].isZERO() 
         ret[2] = qr[0];
         return ret;
@@ -821,7 +821,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         GenPolynomial<C> c1 = P.ring.getONE().copy();
         GenPolynomial<C> d1 = P.ring.getZERO().copy();
         while (!r.isZERO()) {
-            GenPolynomial<C>[] qr = PolyUtil.<C>basePseudoQuotientRemainder(q, r);
+            GenPolynomial<C>[] qr = PolyUtil.basePseudoQuotientRemainder(q, r);
             //q.divideAndRemainder(r);
             q = qr[0];
             GenPolynomial<C> x = c1.subtract(q.multiply(d1));
@@ -856,7 +856,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
     public GenPolynomial<C>[] baseGcdDiophant(GenPolynomial<C> P, GenPolynomial<C> S, GenPolynomial<C> c) {
         GenPolynomial<C>[] egcd = baseExtendedGcd(P, S);
         GenPolynomial<C> g = egcd[0];
-        GenPolynomial<C>[] qr = PolyUtil.<C>basePseudoQuotientRemainder(c, g);
+        GenPolynomial<C>[] qr = PolyUtil.basePseudoQuotientRemainder(c, g);
         if (!qr[1].isZERO()) {
             throw new ArithmeticException("not solvable, r = " + qr[1] + ", c = " + c + ", g = " + g);
         }
@@ -864,7 +864,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         GenPolynomial<C> a = egcd[1].multiply(q);
         GenPolynomial<C> b = egcd[2].multiply(q);
         if (!a.isZERO() && a.degree(0) >= S.degree(0)) {
-            qr = PolyUtil.<C>basePseudoQuotientRemainder(a, S);
+            qr = PolyUtil.basePseudoQuotientRemainder(a, S);
             a = qr[1];
             b = b.sum(P.multiply(qr[0]));
         }
@@ -904,7 +904,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         ret[1] = null;
         ret[2] = null;
         GenPolynomial<C> ps = P.multiply(S);
-        GenPolynomial<C>[] qr = PolyUtil.<C>basePseudoQuotientRemainder(A, ps);
+        GenPolynomial<C>[] qr = PolyUtil.basePseudoQuotientRemainder(A, ps);
         ret[0] = qr[0];
         GenPolynomial<C> r = qr[1];
         GenPolynomial<C>[] diop = baseGcdDiophant(S, P, r); // switch arguments
@@ -919,12 +919,12 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
         ret[1] = diop[0];
         ret[2] = diop[1];
         if (ret[1].degree(0) >= P.degree(0)) {
-            qr = PolyUtil.<C>basePseudoQuotientRemainder(ret[1], P);
+            qr = PolyUtil.basePseudoQuotientRemainder(ret[1], P);
             ret[0] = ret[0].sum(qr[0]);
             ret[1] = qr[1];
         }
         if (ret[2].degree(0) >= S.degree(0)) {
-            qr = PolyUtil.<C>basePseudoQuotientRemainder(ret[2], S);
+            qr = PolyUtil.basePseudoQuotientRemainder(ret[2], S);
             ret[0] = ret[0].sum(qr[0]);
             ret[2] = qr[1];
         }
@@ -953,14 +953,14 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
             return pf;
         }
         if (e == 1) {
-            GenPolynomial<C>[] qr = PolyUtil.<C>basePseudoQuotientRemainder(A, P);
+            GenPolynomial<C>[] qr = PolyUtil.basePseudoQuotientRemainder(A, P);
             pf.add(qr[0]);
             pf.add(qr[1]);
             return pf;
         }
         GenPolynomial<C> a = A;
         for (int j = e; j > 0; j--) {
-            GenPolynomial<C>[] qr = PolyUtil.<C>basePseudoQuotientRemainder(a, P);
+            GenPolynomial<C>[] qr = PolyUtil.basePseudoQuotientRemainder(a, P);
             a = qr[0];
             pf.add(0, qr[1]);
         }
@@ -1000,7 +1000,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>> imple
                 Dp.add(d);
             }
         }
-        GenPolynomial<C>[] qr = PolyUtil.<C>basePseudoQuotientRemainder(A, P.multiply(d1));
+        GenPolynomial<C>[] qr = PolyUtil.basePseudoQuotientRemainder(A, P.multiply(d1));
         GenPolynomial<C> A0 = qr[0];
         GenPolynomial<C> r = qr[1];
         if (D.size() == 1) {

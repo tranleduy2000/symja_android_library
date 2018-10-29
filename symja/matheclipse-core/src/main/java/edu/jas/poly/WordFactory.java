@@ -18,6 +18,7 @@ import java.util.Random;
 
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.MonoidFactory;
+import edu.jas.structure.elem.Element;
 
 
 /**
@@ -247,10 +248,7 @@ public final class WordFactory implements MonoidFactory<Word> {
      * @see edu.jas.structure.ElemFactory#isFinite()
      */
     public boolean isFinite() {
-        if (alphabet.length() == 0) {
-            return true;
-        }
-        return false;
+        return alphabet.length() == 0;
     }
 
     /**
@@ -259,10 +257,7 @@ public final class WordFactory implements MonoidFactory<Word> {
      * @return true if this monoid is commutative, else false.
      */
     public boolean isCommutative() {
-        if (alphabet.length() == 0) {
-            return true;
-        }
-        return false;
+        return alphabet.length() == 0;
     }
 
     /**
@@ -381,7 +376,7 @@ public final class WordFactory implements MonoidFactory<Word> {
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {

@@ -13,7 +13,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -73,11 +73,11 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
         RingFactory<GenPolynomial<MOD>> rrfac = rfac.coFac;
         GenPolynomialRing<MOD> cfac = (GenPolynomialRing<MOD>) rrfac;
         GenPolynomialRing<MOD> dfac = cfac.extend(rfac.nvar);
-        GenPolynomial<MOD> Pd = PolyUtil.<MOD>distribute(dfac, P);
-        GenPolynomial<MOD> Sd = PolyUtil.<MOD>distribute(dfac, S);
+        GenPolynomial<MOD> Pd = PolyUtil.distribute(dfac, P);
+        GenPolynomial<MOD> Sd = PolyUtil.distribute(dfac, S);
         GenPolynomial<MOD> Dd = gcd(Pd, Sd);
         // convert to recursive
-        GenPolynomial<GenPolynomial<MOD>> C = PolyUtil.<MOD>recursive(rfac, Dd);
+        GenPolynomial<GenPolynomial<MOD>> C = PolyUtil.recursive(rfac, Dd);
         return C;
     }
 
@@ -107,8 +107,8 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
         long f = S.degree(fac.nvar - 1);
         if (e == 0 && f == 0) {
             GenPolynomialRing<GenPolynomial<MOD>> rfac = fac.recursive(1);
-            GenPolynomial<MOD> Pc = PolyUtil.<MOD>recursive(rfac, P).leadingBaseCoefficient();
-            GenPolynomial<MOD> Sc = PolyUtil.<MOD>recursive(rfac, S).leadingBaseCoefficient();
+            GenPolynomial<MOD> Pc = PolyUtil.recursive(rfac, P).leadingBaseCoefficient();
+            GenPolynomial<MOD> Sc = PolyUtil.recursive(rfac, S).leadingBaseCoefficient();
             GenPolynomial<MOD> r = gcd(Pc, Sc);
             return r.extend(fac, 0, 0L);
         }
@@ -143,24 +143,24 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
         // convert polynomials
         GenPolynomial<GenPolynomial<MOD>> qr;
         GenPolynomial<GenPolynomial<MOD>> rr;
-        qr = PolyUtil.<MOD>recursive(rfac, q);
-        rr = PolyUtil.<MOD>recursive(rfac, r);
+        qr = PolyUtil.recursive(rfac, q);
+        rr = PolyUtil.recursive(rfac, r);
 
         // compute univariate contents and primitive parts
         GenPolynomial<MOD> a = recursiveContent(rr);
         GenPolynomial<MOD> b = recursiveContent(qr);
         // gcd of univariate coefficient contents
         GenPolynomial<MOD> c = gcd(a, b);
-        rr = PolyUtil.<MOD>recursiveDivide(rr, a);
-        qr = PolyUtil.<MOD>recursiveDivide(qr, b);
+        rr = PolyUtil.recursiveDivide(rr, a);
+        qr = PolyUtil.recursiveDivide(qr, b);
         if (rr.isONE()) {
             rr = rr.multiply(c);
-            r = PolyUtil.<MOD>distribute(fac, rr);
+            r = PolyUtil.distribute(fac, rr);
             return r;
         }
         if (qr.isONE()) {
             qr = qr.multiply(c);
-            q = PolyUtil.<MOD>distribute(fac, qr);
+            q = PolyUtil.distribute(fac, qr);
             return q;
         }
         // compute normalization factor
@@ -170,8 +170,8 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
         // compute degrees and degree vectors
         ExpVector rdegv = rr.degreeVector();
         ExpVector qdegv = qr.degreeVector();
-        long rd0 = PolyUtil.<MOD>coeffMaxDegree(rr);
-        long qd0 = PolyUtil.<MOD>coeffMaxDegree(qr);
+        long rd0 = PolyUtil.coeffMaxDegree(rr);
+        long qd0 = PolyUtil.coeffMaxDegree(qr);
         long cd0 = cc.degree(0);
         long G = (rd0 >= qd0 ? rd0 : qd0) + cd0;
 
@@ -202,16 +202,16 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
                 //throw new ArithmeticException("prime list exhausted");
             }
             // map normalization factor
-            MOD nf = PolyUtil.<MOD>evaluateMain(cofac, cc, d);
+            MOD nf = PolyUtil.evaluateMain(cofac, cc, d);
             if (nf.isZERO()) {
                 continue;
             }
             // map polynomials
-            qm = PolyUtil.<MOD>evaluateFirstRec(ufac, mfac, qr, d);
+            qm = PolyUtil.evaluateFirstRec(ufac, mfac, qr, d);
             if (qm.isZERO() || !qm.degreeVector().equals(qdegv)) {
                 continue;
             }
-            rm = PolyUtil.<MOD>evaluateFirstRec(ufac, mfac, rr, d);
+            rm = PolyUtil.evaluateFirstRec(ufac, mfac, rr, d);
             if (rm.isZERO() || !rm.degreeVector().equals(rdegv)) {
                 continue;
             }
@@ -265,7 +265,7 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
                 wdegv = wdegv.gcd(mdegv); //EVGCD(wdegv,mdegv);
             }
             // interpolate
-            mi = PolyUtil.<MOD>evaluateMain(cofac, M, d);
+            mi = PolyUtil.evaluateMain(cofac, M, d);
             mi = mi.inverse(); // mod p
             cp = PolyUtil.interpolate(rfac, cp, M, mi, cm, d);
             mn = ufac.getONE().multiply(d);
@@ -284,7 +284,7 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
         // remove normalization
         cp = recursivePrimitivePart(cp).abs();
         cp = cp.multiply(c);
-        q = PolyUtil.<MOD>distribute(fac, cp);
+        q = PolyUtil.distribute(fac, cp);
         return q;
     }
 
@@ -343,8 +343,8 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
         long f = S.degree(fac.nvar - 1);
         if (e == 0 && f == 0) {
             GenPolynomialRing<GenPolynomial<MOD>> rfac = fac.recursive(1);
-            GenPolynomial<MOD> Pc = PolyUtil.<MOD>recursive(rfac, P).leadingBaseCoefficient();
-            GenPolynomial<MOD> Sc = PolyUtil.<MOD>recursive(rfac, S).leadingBaseCoefficient();
+            GenPolynomial<MOD> Pc = PolyUtil.recursive(rfac, P).leadingBaseCoefficient();
+            GenPolynomial<MOD> Sc = PolyUtil.recursive(rfac, S).leadingBaseCoefficient();
             GenPolynomial<MOD> r = resultant(Pc, Sc);
             return r.extend(fac, 0, 0L);
         }
@@ -373,15 +373,15 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
         GenPolynomialRing<MOD> ufac = (GenPolynomialRing<MOD>) rfac.coFac;
 
         // convert polynomials
-        GenPolynomial<GenPolynomial<MOD>> qr = PolyUtil.<MOD>recursive(rfac, q);
-        GenPolynomial<GenPolynomial<MOD>> rr = PolyUtil.<MOD>recursive(rfac, r);
+        GenPolynomial<GenPolynomial<MOD>> qr = PolyUtil.recursive(rfac, q);
+        GenPolynomial<GenPolynomial<MOD>> rr = PolyUtil.recursive(rfac, r);
 
         // compute degrees and degree vectors
         ExpVector qdegv = qr.degreeVector();
         ExpVector rdegv = rr.degreeVector();
 
-        long qd0 = PolyUtil.<MOD>coeffMaxDegree(qr);
-        long rd0 = PolyUtil.<MOD>coeffMaxDegree(rr);
+        long qd0 = PolyUtil.coeffMaxDegree(qr);
+        long rd0 = PolyUtil.coeffMaxDegree(rr);
         qd0 = (qd0 == 0 ? 1 : qd0);
         rd0 = (rd0 == 0 ? 1 : rd0);
         long qd1 = qr.degree();
@@ -418,7 +418,7 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
                 //throw new ArithmeticException("prime list exhausted");
             }
             // map polynomials
-            qm = PolyUtil.<MOD>evaluateFirstRec(ufac, mfac, qr, d);
+            qm = PolyUtil.evaluateFirstRec(ufac, mfac, qr, d);
             //logger.info("qr(" + d + ") = " + qm + ", qr = " + qr);
             if (qm.isZERO() || !qm.degreeVector().equals(qdegv)) {
                 if (debug) {
@@ -426,7 +426,7 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
                 }
                 continue;
             }
-            rm = PolyUtil.<MOD>evaluateFirstRec(ufac, mfac, rr, d);
+            rm = PolyUtil.evaluateFirstRec(ufac, mfac, rr, d);
             //logger.info("rr(" + d + ") = " + rm + ", rr = " + rr);
             if (rm.isZERO() || !rm.degreeVector().equals(rdegv)) {
                 if (debug) {
@@ -445,7 +445,7 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
                 cp = rfac.getZERO();
             }
             // interpolate
-            mi = PolyUtil.<MOD>evaluateMain(cofac, M, d);
+            mi = PolyUtil.evaluateMain(cofac, M, d);
             mi = mi.inverse(); // mod p
             cp = PolyUtil.interpolate(rfac, cp, M, mi, cm, d);
             //logger.info("cp = " + cp);
@@ -462,7 +462,7 @@ public class GreatestCommonDivisorModEval<MOD extends RingElem<MOD> & Modular>
             //logger.info("M  = " + M);
         }
         // distribute
-        q = PolyUtil.<MOD>distribute(fac, cp);
+        q = PolyUtil.distribute(fac, cp);
         return q;
     }
 

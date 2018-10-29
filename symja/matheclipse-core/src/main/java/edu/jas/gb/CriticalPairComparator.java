@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import edu.jas.poly.TermOrder;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**

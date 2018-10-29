@@ -19,6 +19,6 @@ public interface Rational {
      *
      * @return a BigRational approximation of this.
      */
-    public BigRational getRational();
+    BigRational getRational();
 
 }

@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.jas.kern.PrettyPrint;
-import edu.jas.structure.ModulElem;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.ModulElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -86,7 +87,7 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -111,7 +112,7 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -124,7 +125,7 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public GenVectorModul<C> factory() {
         return modul;
@@ -165,10 +166,7 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         if (!modul.equals(ovec.modul)) {
             return false;
         }
-        if (!val.equals(ovec.val)) {
-            return false;
-        }
-        return true;
+        return val.equals(ovec.val);
     }
 
 

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.Scripting;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.util.CartesianProduct;
 import edu.jas.util.CartesianProductInfinite;
@@ -470,7 +470,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      * @return S, with S(c) == c and S(A) == a.
      */
     public AlgebraicNumber<C> interpolate(AlgebraicNumber<C> c, C ci, C am, C a) {
-        C b = PolyUtil.<C>evaluateMain(ring.coFac /*a*/, c.val, am);
+        C b = PolyUtil.evaluateMain(ring.coFac /*a*/, c.val, am);
         // c mod a.modul
         // c( tbcf(a.modul) ) if deg(a.modul)==1
         C d = a.subtract(b); // a-c mod a.modul
@@ -497,7 +497,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         int depth = 1;
         RingFactory<C> cf = arr.ring.coFac;
         if (cf instanceof AlgebraicNumberRing) {
-            arr = (AlgebraicNumberRing<C>) (Object) cf;
+            arr = (AlgebraicNumberRing<C>) cf;
             depth += arr.depth();
         }
         return depth;
@@ -526,7 +526,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         AlgebraicNumberRing<C> arr = this;
         RingFactory<C> cf = arr.ring.coFac;
         if (cf instanceof AlgebraicNumberRing) {
-            arr = (AlgebraicNumberRing<C>) (Object) cf;
+            arr = (AlgebraicNumberRing<C>) cf;
             if (degree == 0L) {
                 degree = arr.totalExtensionDegree();
             } else {

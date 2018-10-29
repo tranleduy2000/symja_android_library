@@ -10,7 +10,7 @@ import java.util.List;
 import edu.jas.gb.WordReduction;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenWordPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -32,7 +32,7 @@ public interface WordPseudoReduction<C extends RingElem<C>> extends WordReductio
      * @return (nf(Ap), mf ) with respect to Pp and mf as multiplication factor
      * for Ap.
      */
-    public WordPseudoReductionEntry<C> normalformFactor(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
+    WordPseudoReductionEntry<C> normalformFactor(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
 
 
     /**
@@ -42,7 +42,7 @@ public interface WordPseudoReduction<C extends RingElem<C>> extends WordReductio
      * @param Pp recursive polynomial list.
      * @return nf(Ap) with respect to Pp.
      */
-    public GenWordPolynomial<GenPolynomial<C>> normalformRecursive(
+    GenWordPolynomial<GenPolynomial<C>> normalformRecursive(
             List<GenWordPolynomial<GenPolynomial<C>>> Pp, GenWordPolynomial<GenPolynomial<C>> Ap);
 
 

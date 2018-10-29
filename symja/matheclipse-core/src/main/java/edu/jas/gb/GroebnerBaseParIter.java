@@ -18,7 +18,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OrderedPolynomialList;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.util.Terminator;
 import edu.jas.util.ThreadPool;
 
@@ -182,12 +182,12 @@ public class GroebnerBaseParIter<C extends RingElem<C>> extends GroebnerBaseAbst
      */
     public List<GenPolynomial<C>> GB(int modv, List<GenPolynomial<C>> F) {
         List<GenPolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolyUtil.<C>monic(G);
+        G = PolyUtil.monic(G);
         if (G.size() <= 1) {
             return G;
         }
         // sort, no reverse
-        G = OrderedPolynomialList.<C>sort(G);
+        G = OrderedPolynomialList.sort(G);
         //no: Collections.reverse(G);
         logger.info("G-sort = " + G);
 

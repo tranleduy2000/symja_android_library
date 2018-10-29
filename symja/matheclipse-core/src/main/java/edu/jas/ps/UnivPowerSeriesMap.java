@@ -5,7 +5,7 @@
 package edu.jas.ps;
 
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -24,6 +24,6 @@ public interface UnivPowerSeriesMap<C extends RingElem<C>> {
      *
      * @return new power series resulting from mapping elements of ps.
      */
-    public UnivPowerSeries<C> map(UnivPowerSeries<C> ps);
+    UnivPowerSeries<C> map(UnivPowerSeries<C> ps);
 
 }

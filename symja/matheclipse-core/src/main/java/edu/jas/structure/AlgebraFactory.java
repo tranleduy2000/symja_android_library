@@ -7,6 +7,9 @@ package edu.jas.structure;
 
 import java.util.List;
 
+import edu.jas.structure.elem.AlgebraElem;
+import edu.jas.structure.elem.RingElem;
+
 
 /**
  * Algebra factory interface. Defines conversion from list of lists and sparse
@@ -25,7 +28,7 @@ public interface AlgebraFactory<A extends AlgebraElem<A, C>, C extends RingElem<
      * @param m list of list of ring elements.
      * @return a matrix with the elements from m.
      */
-    public A fromList(List<List<C>> m);
+    A fromList(List<List<C>> m);
 
 
     /**
@@ -35,6 +38,6 @@ public interface AlgebraFactory<A extends AlgebraElem<A, C>, C extends RingElem<
      * @param q fraction of non zero elements.
      * @return a random matrix.
      */
-    public A random(int k, float q);
+    A random(int k, float q);
 
 }

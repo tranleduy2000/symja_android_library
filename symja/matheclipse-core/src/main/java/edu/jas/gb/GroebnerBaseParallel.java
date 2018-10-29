@@ -17,7 +17,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.util.Terminator;
 import edu.jas.util.ThreadPool;
 
@@ -178,7 +178,7 @@ public class GroebnerBaseParallel<C extends RingElem<C>> extends GroebnerBaseAbs
      */
     public List<GenPolynomial<C>> GB(int modv, List<GenPolynomial<C>> F) {
         List<GenPolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolyUtil.<C>monic(G);
+        G = PolyUtil.monic(G);
         if (G.size() <= 1) {
             return G;
         }

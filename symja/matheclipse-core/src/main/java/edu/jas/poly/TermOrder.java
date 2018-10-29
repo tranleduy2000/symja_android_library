@@ -1381,10 +1381,7 @@ public final class TermOrder implements Serializable {
      */
     public boolean isSplit() {
         //System.out.println("isSplit: " + evend2 + " == " + evbeg2);
-        if (evend2 == evbeg2 || evend1 == Integer.MAX_VALUE) {
-            return false;
-        }
-        return true;
+        return evend2 != evbeg2 && evend1 != Integer.MAX_VALUE;
     }
 
     /**
@@ -1523,10 +1520,7 @@ public final class TermOrder implements Serializable {
         if (!t) {
             return t;
         }
-        if (!Arrays.deepEquals(weight, b.weight)) {
-            return false;
-        }
-        return true;
+        return Arrays.deepEquals(weight, b.weight);
     }
 
     /**

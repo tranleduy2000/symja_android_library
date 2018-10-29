@@ -8,7 +8,7 @@ package edu.jas.poly;
 import java.util.List;
 import java.util.Random;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -28,7 +28,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      *
      * @return the number of variables.
      */
-    public int numberOfVariables();
+    int numberOfVariables();
 
 
     /**
@@ -36,7 +36,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      *
      * @return vars.
      */
-    public String[] getVars();
+    String[] getVars();
 
 
     /**
@@ -48,7 +48,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      * @param q density of nozero exponents.
      * @return a random polynomial.
      */
-    public Polynomial<C> random(int k, int l, int d, float q);
+    Polynomial<C> random(int k, int l, int d, float q);
 
 
     /**
@@ -61,7 +61,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      * @param rnd is a source for random bits.
      * @return a random polynomial.
      */
-    public Polynomial<C> random(int k, int l, int d, float q, Random rnd);
+    Polynomial<C> random(int k, int l, int d, float q, Random rnd);
 
 
     /**
@@ -70,7 +70,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      * @param i the index of the variable.
      * @return X_i as univariate polynomial.
      */
-    public Polynomial<C> univariate(int i);
+    Polynomial<C> univariate(int i);
 
 
     /**
@@ -80,7 +80,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      * @param e the exponent of the variable.
      * @return X_i^e as univariate polynomial.
      */
-    public Polynomial<C> univariate(int i, long e);
+    Polynomial<C> univariate(int i, long e);
 
 
     /**
@@ -88,7 +88,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      *
      * @return List(X_1, ..., X_n) a list of univariate polynomials.
      */
-    public List<? extends Polynomial<C>> univariateList();
+    List<? extends Polynomial<C>> univariateList();
 
 
     /**
@@ -98,7 +98,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      * @param i number of variables to extend.
      * @return extended polynomial ring factory.
      */
-    public PolynomialRing<C> extend(int i);
+    PolynomialRing<C> extend(int i);
 
 
     /**
@@ -108,7 +108,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      * @param i number of variables to remove.
      * @return contracted polynomial ring factory.
      */
-    public PolynomialRing<C> contract(int i);
+    PolynomialRing<C> contract(int i);
 
 
     /**
@@ -116,7 +116,7 @@ public interface PolynomialRing<C extends RingElem<C>>
      *
      * @return polynomial ring factory with reversed variables.
      */
-    public PolynomialRing<C> reverse();
+    PolynomialRing<C> reverse();
 
 
 }

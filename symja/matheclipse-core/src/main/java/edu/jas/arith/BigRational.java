@@ -18,8 +18,9 @@ import java.util.Set;
 
 import edu.jas.kern.Scripting;
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.elem.RingElemImpl;
 import edu.jas.structure.RingFactory;
 
 
@@ -467,7 +468,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public BigRational factory() {
         return this;
@@ -601,7 +602,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -636,7 +637,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -732,7 +733,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Is BigRational zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return num.signum() == 0; //equals(BigInteger.ZERO);
@@ -742,7 +743,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Is BigRational one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return num.equals(den);
@@ -752,7 +753,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Is BigRational unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         return !isZERO();
@@ -795,7 +796,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Rational number absolute value.
      *
      * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public BigRational abs() {
         if (this.signum() >= 0) {
@@ -859,7 +860,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Rational number inverse.
      *
      * @return 1/this.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public BigRational inverse() {
         BigInteger R1 = num;
@@ -880,7 +881,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * Rational number negative.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public BigRational negate() {
         BigInteger n = num.negate();
@@ -1033,7 +1034,7 @@ public final class BigRational extends RingElemImpl<BigRational>
     /**
      * Rational number sign.
      *
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         return num.signum();

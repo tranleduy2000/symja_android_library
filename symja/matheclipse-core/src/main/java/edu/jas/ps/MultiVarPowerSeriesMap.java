@@ -5,7 +5,7 @@
 package edu.jas.ps;
 
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -24,6 +24,6 @@ public interface MultiVarPowerSeriesMap<C extends RingElem<C>> {
      *
      * @return new power series resulting from mapping elements of ps.
      */
-    public MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> ps);
+    MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> ps);
 
 }

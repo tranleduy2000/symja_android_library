@@ -18,8 +18,9 @@ import java.util.TreeMap;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.elem.RingElemImpl;
 
 /**
  * GenPolynomial generic polynomials implementing RingElem. n-variate ordered polynomials over C. Objects of this class
@@ -136,7 +137,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Get the corresponding element factory.
 	 * 
 	 * @return factory for this Element.
-	 * @see edu.jas.structure.Element#factory()
+	 * @see Element#factory()
 	 */
 	@Override
 	public ExprPolynomialRing factory() {
@@ -356,7 +357,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Get a scripting compatible string representation.
 	 * 
 	 * @return script compatible representation for this Element.
-	 * @see edu.jas.structure.Element#toScript()
+	 * @see Element#toScript()
 	 */
 	@Override
 	public String toScript() {
@@ -411,7 +412,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Get a scripting compatible string representation of the factory.
 	 * 
 	 * @return script compatible representation for this ElemFactory.
-	 * @see edu.jas.structure.Element#toScriptFactory()
+	 * @see Element#toScriptFactory()
 	 */
 	@Override
 	public String toScriptFactory() {
@@ -422,7 +423,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Is GenPolynomial&lt;C&gt; zero.
 	 * 
 	 * @return If this is 0 then true is returned, else false.
-	 * @see edu.jas.structure.RingElem#isZero()
+	 * @see RingElem#isZero()
 	 */
 	public boolean isZero() {
 		return (val.size() == 0);
@@ -443,7 +444,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Is GenPolynomial&lt;C&gt; one.
 	 * 
 	 * @return If this is 1 then true is returned, else false.
-	 * @see edu.jas.structure.RingElem#isOne()
+	 * @see RingElem#isOne()
 	 */
 	public boolean isOne() {
 		if (val.size() != 1) {
@@ -465,7 +466,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Is GenPolynomial&lt;C&gt; a unit.
 	 * 
 	 * @return If this is a unit then true is returned, else false.
-	 * @see edu.jas.structure.RingElem#isUnit()
+	 * @see RingElem#isUnit()
 	 */
 	@Override
 	public boolean isUnit() {

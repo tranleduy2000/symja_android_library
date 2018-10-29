@@ -13,9 +13,10 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RegularRingElem;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RegularRingElem;
+import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.elem.RingElemImpl;
 import edu.jas.structure.RingFactory;
 
 
@@ -106,7 +107,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public ProductRing<C> factory() {
         return ring;
@@ -128,7 +129,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Is Product zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return val.size() == 0;
@@ -139,7 +140,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Is Product one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         if (val.size() != ring.length()) {
@@ -161,10 +162,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * false.
      */
     public boolean isFull() {
-        if (val.size() != ring.length()) {
-            return false;
-        }
-        return true;
+        return val.size() == ring.length();
     }
 
 
@@ -172,7 +170,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Is Product unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         if (isunit > 0) {
@@ -227,7 +225,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -261,7 +259,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -363,7 +361,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Product absolute value.
      *
      * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public Product<C> abs() {
         SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
@@ -414,7 +412,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Product negate.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public Product<C> negate() {
         SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
@@ -431,7 +429,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Product signum.
      *
      * @return signum of first non-zero component.
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         if (val.size() == 0) {
@@ -457,7 +455,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Product quasi-inverse.
      *
      * @return S with S = 1/this if defined.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public Product<C> inverse() {
         if (this.isZERO()) {

@@ -10,7 +10,7 @@ import java.io.Serializable;
 import edu.jas.arith.BigDecimal;
 import edu.jas.arith.BigRational;
 import edu.jas.arith.Rational;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 

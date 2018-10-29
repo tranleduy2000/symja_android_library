@@ -9,7 +9,7 @@ import java.util.List;
 
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.GenWordPolynomialRing;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -26,14 +26,14 @@ public interface WordPairList<C extends RingElem<C>> {
      *
      * @param r word polynomial ring.
      */
-    public WordPairList<C> create(GenWordPolynomialRing<C> r);
+    WordPairList<C> create(GenWordPolynomialRing<C> r);
 
 
     /**
      * toString.
      */
     @Override
-    public String toString();
+    String toString();
 
 
     /**
@@ -42,7 +42,7 @@ public interface WordPairList<C extends RingElem<C>> {
      * @param p word polynomial.
      * @return the index of the added word polynomial.
      */
-    public int put(GenWordPolynomial<C> p);
+    int put(GenWordPolynomial<C> p);
 
 
     /**
@@ -51,7 +51,7 @@ public interface WordPairList<C extends RingElem<C>> {
      * @param F word polynomial list.
      * @return the index of the last added word polynomial.
      */
-    public int put(List<GenWordPolynomial<C>> F);
+    int put(List<GenWordPolynomial<C>> F);
 
 
     /**
@@ -59,7 +59,7 @@ public interface WordPairList<C extends RingElem<C>> {
      *
      * @return the index of the last polynomial.
      */
-    public int putOne();
+    int putOne();
 
 
     /**
@@ -68,7 +68,7 @@ public interface WordPairList<C extends RingElem<C>> {
      *
      * @return the next pair if one exists, otherwise null.
      */
-    public WordPair<C> removeNext();
+    WordPair<C> removeNext();
 
 
     /**
@@ -76,7 +76,7 @@ public interface WordPairList<C extends RingElem<C>> {
      *
      * @return true if a next pair could exist, otherwise false.
      */
-    public boolean hasNext();
+    boolean hasNext();
 
 
     /**
@@ -84,7 +84,7 @@ public interface WordPairList<C extends RingElem<C>> {
      *
      * @return the word polynomial list.
      */
-    public List<GenWordPolynomial<C>> getList();
+    List<GenWordPolynomial<C>> getList();
 
 
     /**
@@ -92,7 +92,7 @@ public interface WordPairList<C extends RingElem<C>> {
      *
      * @return the number of calls to put.
      */
-    public int putCount();
+    int putCount();
 
 
     /**
@@ -100,6 +100,6 @@ public interface WordPairList<C extends RingElem<C>> {
      *
      * @return the number of non null pairs delivered.
      */
-    public int remCount();
+    int remCount();
 
 }

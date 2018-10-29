@@ -29,8 +29,7 @@ import edu.jas.gb.ReductionSeq;
 import edu.jas.kern.ComputerThreads;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.Quotient;
 import edu.jas.ufd.QuotientRing;
@@ -82,8 +81,6 @@ public class GBFactory {
      */
     protected GBFactory() {
     }
-
-    ;
 
     /**
      * Determine suitable implementation of GB algorithms, no factory case.
@@ -476,7 +473,7 @@ public class GBFactory {
             }
             GenPolynomialRing<C> rofac = (GenPolynomialRing<C>) ofac;
             GroebnerBaseAbstract<GenPolynomial<C>> bbr = new GroebnerBasePseudoRecSeq<C>(rofac, pli); // not pl
-            bba = (GroebnerBaseAbstract) bbr;
+            bba = bbr;
         } else if (ofac instanceof ProductRing) {
             ProductRing pfac = (ProductRing) ofac;
             if (pfac.onlyFields()) {
@@ -514,7 +511,7 @@ public class GBFactory {
     public static <C extends RingElem<C>> // interface RingElem not sufficient
     GroebnerBaseAbstract<C> getProxy(RingFactory<C> fac, PairList<C> pl) {
         if (ComputerThreads.NO_THREADS) {
-            return GBFactory.<C>getImplementation(fac, pl);
+            return GBFactory.getImplementation(fac, pl);
         }
         logger.debug("fac = " + fac.getClass().getName());
         int th = (ComputerThreads.N_CPUS > 2 ? ComputerThreads.N_CPUS - 1 : 2);
@@ -564,7 +561,7 @@ public class GBFactory {
      * Algorithm indicators: igb = integerGB, egb = e-GB, dgb = d-GB, qgb =
      * fraction coefficients GB, ffgb = fraction free GB.
      */
-    public static enum Algo {
+    public enum Algo {
         igb, egb, dgb, qgb, ffgb
     }
 

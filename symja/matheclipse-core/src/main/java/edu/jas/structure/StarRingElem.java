@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.RingElem;
+
 /**
  * Star ring element interface. Defines norm and conjugation.
  *
@@ -20,7 +22,7 @@ public interface StarRingElem<C extends StarRingElem<C>> extends RingElem<C> {
      *
      * @return conj(this).
      */
-    public C conjugate();
+    C conjugate();
 
 
     /**
@@ -28,6 +30,6 @@ public interface StarRingElem<C extends StarRingElem<C>> extends RingElem<C> {
      *
      * @return norm(this).
      */
-    public C norm();
+    C norm();
 
 }

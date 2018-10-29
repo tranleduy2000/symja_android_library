@@ -13,7 +13,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.TermOrderOptimization;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -112,7 +112,7 @@ public class GBOptimized<C extends RingElem<C>> extends GroebnerBaseAbstract<C> 
             throw new UnsupportedOperationException("implemented only for modv = 0, not " + modv);
         }
         GenPolynomialRing<C> pfac = F.get(0).ring;
-        OptimizedPolynomialList<C> opt = TermOrderOptimization.<C>optimizeTermOrder(pfac, F);
+        OptimizedPolynomialList<C> opt = TermOrderOptimization.optimizeTermOrder(pfac, F);
         List<GenPolynomial<C>> P = opt.list;
         if (debug) {
             logger.info("optimized polynomials: " + P);
@@ -125,7 +125,7 @@ public class GBOptimized<C extends RingElem<C>> extends GroebnerBaseAbstract<C> 
         if (retPermuted || G.isEmpty()) {
             return G;
         }
-        List<GenPolynomial<C>> iopt = TermOrderOptimization.<C>permutation(iperm, pfac, G);
+        List<GenPolynomial<C>> iopt = TermOrderOptimization.permutation(iperm, pfac, G);
         if (debug) {
             logger.info("de-optimized polynomials: " + iopt);
         }

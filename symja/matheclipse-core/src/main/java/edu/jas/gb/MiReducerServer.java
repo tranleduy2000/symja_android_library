@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 /**
  * Distributed server reducing worker threads for minimal GB Not jet distributed

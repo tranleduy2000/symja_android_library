@@ -300,10 +300,7 @@ public class ThreadPool {
                 x++;
             }
         }
-        if ((j + x) > n) {
-            return true;
-        }
-        return false;
+        return (j + x) > n;
     }
 
 }

@@ -15,7 +15,7 @@ import java.util.Map;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.Monomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -166,10 +166,7 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         if (modv == 0) {
             return true;
         }
-        if (ei.invLexCompareTo(ej, 0, modv) != 0) {
-            return false; // skip pair
-        }
-        return true;
+        return ei.invLexCompareTo(ej, 0, modv) == 0;
     }
 
 

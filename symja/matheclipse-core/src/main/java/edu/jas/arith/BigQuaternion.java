@@ -10,8 +10,9 @@ import org.apache.log4j.Logger;
 import java.util.List;
 import java.util.Random;
 
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.elem.RingElemImpl;
 import edu.jas.structure.StarRingElem;
 
 
@@ -338,7 +339,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public BigQuaternionRing factory() {
         return ring;
@@ -421,7 +422,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -480,7 +481,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -492,7 +493,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * Is BigQuaternion number zero.
      *
      * @return true if this is 0, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return re.isZERO() && im.isZERO() && jm.isZERO() && km.isZERO();
@@ -506,7 +507,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * Is BigQuaternion number one.
      *
      * @return true if this is 1, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return re.isONE() && im.isZERO() && jm.isZERO() && km.isZERO();
@@ -525,7 +526,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * Is BigQuaternion unit element.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         //if (ring.integral) { not meaningful to test
@@ -611,7 +612,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      *
      * @return 0 if this is equal to 0; 1 if re > 0, or re == 0 and im > 0, or
      * ...; -1 if re < 0, or re == 0 and im < 0, or ...
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         int s = re.signum();
@@ -654,7 +655,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * BigQuaternion number negative.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public BigQuaternion negate() {
         return new BigQuaternion(ring, re.negate(), im.negate(), jm.negate(), km.negate());
@@ -692,7 +693,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * Quaternion number absolute value.
      *
      * @return |this|^2. Note: The square root is not jet implemented.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public BigQuaternion abs() {
         BigQuaternion n = norm();
@@ -749,7 +750,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * BigQuaternion inverse.
      *
      * @return S with S * this = this * S = 1.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public BigQuaternion inverse() {
         BigRational a = norm().re.inverse();

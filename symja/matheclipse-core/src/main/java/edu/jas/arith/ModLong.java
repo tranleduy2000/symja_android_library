@@ -5,9 +5,10 @@
 package edu.jas.arith;
 
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.RingElemImpl;
 
 
 /**
@@ -116,7 +117,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public ModLongRing factory() {
         return ring;
@@ -177,7 +178,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Is ModLong number zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return val == 0L;
@@ -188,7 +189,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Is ModLong number one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return val == 1L;
@@ -199,7 +200,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Is ModLong number a unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         if (isZERO()) {
@@ -228,7 +229,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -241,7 +242,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -298,7 +299,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * ModLong absolute value.
      *
      * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public ModLong abs() {
         return new ModLong(ring, (val < 0 ? -val : val));
@@ -309,7 +310,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * ModLong negative.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public ModLong negate() {
         return new ModLong(ring, -val);
@@ -320,7 +321,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      * ModLong signum.
      *
      * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         if (val > 0L) {
@@ -368,7 +369,7 @@ public final class ModLong extends RingElemImpl<ModLong> implements RingElem<Mod
      *
      * @return S with S=1/this if defined.
      * @throws NotInvertibleException if the element is not invertible.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public ModLong inverse() /*throws NotInvertibleException*/ {
         try {

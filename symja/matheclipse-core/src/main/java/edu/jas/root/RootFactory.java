@@ -18,7 +18,7 @@ import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.ufd.FactorAbstract;
 import edu.jas.ufd.FactorFactory;
 import edu.jas.ufd.SquarefreeAbstract;
@@ -47,8 +47,8 @@ public class RootFactory {
         GenPolynomialRing<RealAlgebraicNumber<C>> rfac = new GenPolynomialRing<RealAlgebraicNumber<C>>(rr,
                 f.factory());
         GenPolynomial<RealAlgebraicNumber<C>> p;
-        p = PolyUtilRoot.<C>convertToRealCoefficients(rfac, f);
-        RealAlgebraicNumber<C> a = PolyUtil.<RealAlgebraicNumber<C>>evaluateMain(rr, p, r);
+        p = PolyUtilRoot.convertToRealCoefficients(rfac, f);
+        RealAlgebraicNumber<C> a = PolyUtil.evaluateMain(rr, p, r);
         return a.isZERO();
     }
 
@@ -62,7 +62,7 @@ public class RootFactory {
     public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbers(
             GenPolynomial<C> f) {
         RealRoots<C> rr = new RealRootsSturm<C>();
-        SquarefreeAbstract<C> engine = SquarefreeFactory.<C>getImplementation(f.ring.coFac);
+        SquarefreeAbstract<C> engine = SquarefreeFactory.getImplementation(f.ring.coFac);
         Map<GenPolynomial<C>, Long> SF = engine.squarefreeFactors(f);
         //Set<GenPolynomial<C>> S = SF.keySet();
         List<RealAlgebraicNumber<C>> list = new ArrayList<RealAlgebraicNumber<C>>();
@@ -92,7 +92,7 @@ public class RootFactory {
     public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbers(
             GenPolynomial<C> f, BigRational eps) {
         RealRoots<C> rr = new RealRootsSturm<C>();
-        SquarefreeAbstract<C> engine = SquarefreeFactory.<C>getImplementation(f.ring.coFac);
+        SquarefreeAbstract<C> engine = SquarefreeFactory.getImplementation(f.ring.coFac);
         Map<GenPolynomial<C>, Long> SF = engine.squarefreeFactors(f);
         //Set<GenPolynomial<C>> S = SF.keySet();
         List<RealAlgebraicNumber<C>> list = new ArrayList<RealAlgebraicNumber<C>>();
@@ -122,7 +122,7 @@ public class RootFactory {
     public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersField(
             GenPolynomial<C> f) {
         RealRoots<C> rr = new RealRootsSturm<C>();
-        FactorAbstract<C> engine = FactorFactory.<C>getImplementation(f.ring.coFac);
+        FactorAbstract<C> engine = FactorFactory.getImplementation(f.ring.coFac);
         Map<GenPolynomial<C>, Long> SF = engine.baseFactors(f);
         //Set<GenPolynomial<C>> S = SF.keySet();
         List<RealAlgebraicNumber<C>> list = new ArrayList<RealAlgebraicNumber<C>>();
@@ -152,7 +152,7 @@ public class RootFactory {
     public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersField(
             GenPolynomial<C> f, BigRational eps) {
         RealRoots<C> rr = new RealRootsSturm<C>();
-        FactorAbstract<C> engine = FactorFactory.<C>getImplementation(f.ring.coFac);
+        FactorAbstract<C> engine = FactorFactory.getImplementation(f.ring.coFac);
         Map<GenPolynomial<C>, Long> SF = engine.baseFactors(f);
         //Set<GenPolynomial<C>> S = SF.keySet();
         List<RealAlgebraicNumber<C>> list = new ArrayList<RealAlgebraicNumber<C>>();
@@ -228,8 +228,8 @@ public class RootFactory {
         GenPolynomialRing<ComplexAlgebraicNumber<C>> cfac = new GenPolynomialRing<ComplexAlgebraicNumber<C>>(
                 cr, f.factory());
         GenPolynomial<ComplexAlgebraicNumber<C>> p;
-        p = PolyUtilRoot.<C>convertToComplexCoefficients(cfac, f);
-        ComplexAlgebraicNumber<C> a = PolyUtil.<ComplexAlgebraicNumber<C>>evaluateMain(cr, p, r);
+        p = PolyUtilRoot.convertToComplexCoefficients(cfac, f);
+        ComplexAlgebraicNumber<C> a = PolyUtil.evaluateMain(cr, p, r);
         return a.isZERO();
     }
 
@@ -247,8 +247,8 @@ public class RootFactory {
         GenPolynomialRing<ComplexAlgebraicNumber<C>> cfac = new GenPolynomialRing<ComplexAlgebraicNumber<C>>(
                 cr, f.factory());
         GenPolynomial<ComplexAlgebraicNumber<C>> p;
-        p = PolyUtilRoot.<C>convertToComplexCoefficientsFromComplex(cfac, f);
-        ComplexAlgebraicNumber<C> a = PolyUtil.<ComplexAlgebraicNumber<C>>evaluateMain(cr, p, r);
+        p = PolyUtilRoot.convertToComplexCoefficientsFromComplex(cfac, f);
+        ComplexAlgebraicNumber<C> a = PolyUtil.evaluateMain(cr, p, r);
         return a.isZERO();
     }
 
@@ -312,7 +312,7 @@ public class RootFactory {
         Rectangle<C> rec = new Rectangle<C>(sw, ne);
         //System.out.println("refined rectangle " + rec);
         ComplexRoots<C> ceng = c.ring.engine; //new ComplexRootsSturm<C>(); 
-        GenPolynomial<Complex<C>> p = PolyUtilRoot.<C>complexFromAny(f);
+        GenPolynomial<Complex<C>> p = PolyUtilRoot.complexFromAny(f);
         try {
             z = ceng.complexRootCount(rec, p);
         } catch (InvalidBoundaryException e) {
@@ -321,10 +321,7 @@ public class RootFactory {
             z = 0;
         }
         //System.out.println("complexRootCount: " + z);
-        if (z != 1) {
-            return false;
-        }
-        return true;
+        return z == 1;
     }
 
 
@@ -341,9 +338,7 @@ public class RootFactory {
                                                                            Complex<BigDecimal> c, BigDecimal r, BigRational eps) {
         BigDecimal e = new BigDecimal(eps);
         if (c.getIm().abs().compareTo(e) <= 0) {
-            if (c.getRe().subtract(r).abs().compareTo(e) <= 0) {
-                return true;
-            }
+            return c.getRe().subtract(r).abs().compareTo(e) <= 0;
         }
         return false;
     }
@@ -359,7 +354,7 @@ public class RootFactory {
             GenPolynomial<Complex<C>> f) {
         ComplexRoots<C> cr = new ComplexRootsSturm<C>(f.ring.coFac);
         SquarefreeAbstract<Complex<C>> engine = SquarefreeFactory
-                .<Complex<C>>getImplementation(f.ring.coFac);
+                .getImplementation(f.ring.coFac);
         Map<GenPolynomial<Complex<C>>, Long> SF = engine.squarefreeFactors(f);
         //Set<GenPolynomial<Complex<C>>> S = SF.keySet();
         List<ComplexAlgebraicNumber<C>> list = new ArrayList<ComplexAlgebraicNumber<C>>();
@@ -390,7 +385,7 @@ public class RootFactory {
             GenPolynomial<Complex<C>> f, BigRational eps) {
         ComplexRoots<C> cr = new ComplexRootsSturm<C>(f.ring.coFac);
         SquarefreeAbstract<Complex<C>> engine = SquarefreeFactory
-                .<Complex<C>>getImplementation(f.ring.coFac);
+                .getImplementation(f.ring.coFac);
         Map<GenPolynomial<Complex<C>>, Long> SF = engine.squarefreeFactors(f);
         //Set<GenPolynomial<Complex<C>>> S = SF.keySet();
         List<ComplexAlgebraicNumber<C>> list = new ArrayList<ComplexAlgebraicNumber<C>>();
@@ -425,7 +420,7 @@ public class RootFactory {
      */
     public static <C extends RingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbers(
             GenPolynomial<C> f) {
-        GenPolynomial<Complex<C>> fc = PolyUtilRoot.<C>complexFromAny(f);
+        GenPolynomial<Complex<C>> fc = PolyUtilRoot.complexFromAny(f);
         return complexAlgebraicNumbersComplex(fc);
     }
 
@@ -439,7 +434,7 @@ public class RootFactory {
      */
     public static <C extends RingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbers(
             GenPolynomial<C> f, BigRational eps) {
-        GenPolynomial<Complex<C>> fc = PolyUtilRoot.<C>complexFromAny(f);
+        GenPolynomial<Complex<C>> fc = PolyUtilRoot.complexFromAny(f);
         return complexAlgebraicNumbersComplex(fc, eps);
     }
 
@@ -598,7 +593,7 @@ public class RootFactory {
         RealRootsAbstract<C> rengine = new RealRootsSturm<C>();
         List<BigDecimal> rl = rengine.approximateRoots(f, eps);
 
-        GenPolynomial<Complex<C>> fc = PolyUtilRoot.<C>complexFromAny(f);
+        GenPolynomial<Complex<C>> fc = PolyUtilRoot.complexFromAny(f);
         ComplexRootsAbstract<C> cengine = new ComplexRootsSturm<C>(fc.ring.coFac);
         List<Complex<BigDecimal>> cl = cengine.approximateRoots(fc, eps);
 

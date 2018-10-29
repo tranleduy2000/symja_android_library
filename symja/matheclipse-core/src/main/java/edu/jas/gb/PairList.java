@@ -10,7 +10,7 @@ import java.util.List;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -27,7 +27,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @param r polynomial ring.
      */
-    public PairList<C> create(GenPolynomialRing<C> r);
+    PairList<C> create(GenPolynomialRing<C> r);
 
 
     /**
@@ -36,14 +36,14 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      * @param m number of module variables.
      * @param r polynomial ring.
      */
-    public PairList<C> create(int m, GenPolynomialRing<C> r);
+    PairList<C> create(int m, GenPolynomialRing<C> r);
 
 
     /**
      * toString.
      */
     @Override
-    public String toString();
+    String toString();
 
 
     /**
@@ -52,7 +52,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      * @param p polynomial.
      * @return the index of the added polynomial.
      */
-    public int put(GenPolynomial<C> p);
+    int put(GenPolynomial<C> p);
 
 
     /**
@@ -61,7 +61,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      * @param F polynomial list.
      * @return the index of the last added polynomial.
      */
-    public int put(List<GenPolynomial<C>> F);
+    int put(List<GenPolynomial<C>> F);
 
 
     /**
@@ -69,7 +69,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @return the index of the last polynomial.
      */
-    public int putOne();
+    int putOne();
 
 
     /**
@@ -78,7 +78,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @return the next pair if one exists, otherwise null.
      */
-    public Pair<C> removeNext();
+    Pair<C> removeNext();
 
 
     /**
@@ -86,7 +86,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @return true if a next pair could exist, otherwise false.
      */
-    public boolean hasNext();
+    boolean hasNext();
 
 
     /**
@@ -94,7 +94,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @return size of the polynomial list.
      */
-    public int size();
+    int size();
 
 
     /**
@@ -102,7 +102,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @return the polynomial list.
      */
-    public List<GenPolynomial<C>> getList();
+    List<GenPolynomial<C>> getList();
 
 
     /**
@@ -110,7 +110,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @param F the polynomial list.
      */
-    public void setList(List<GenPolynomial<C>> F);
+    void setList(List<GenPolynomial<C>> F);
 
 
     /**
@@ -118,7 +118,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @return the number of calls to put.
      */
-    public int putCount();
+    int putCount();
 
 
     /**
@@ -126,7 +126,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @return the number of non null pairs delivered.
      */
-    public int remCount();
+    int remCount();
 
 
     /**
@@ -134,7 +134,7 @@ public interface PairList<C extends RingElem<C>> extends Serializable {
      *
      * @return true if the S-polynomial(i,j) is required.
      */
-    public boolean criterion3(int i, int j, ExpVector eij);
+    boolean criterion3(int i, int j, ExpVector eij);
 
 }
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 import edu.jas.gb.Reduction;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -30,7 +30,7 @@ public interface PseudoReduction<C extends RingElem<C>> extends Reduction<C> {
      * @return (nf(Ap), mf ) with respect to Pp and mf as multiplication factor
      * for Ap.
      */
-    public PseudoReductionEntry<C> normalformFactor(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap);
+    PseudoReductionEntry<C> normalformFactor(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap);
 
     /**
      * Normalform recursive.
@@ -39,6 +39,6 @@ public interface PseudoReduction<C extends RingElem<C>> extends Reduction<C> {
      * @param Pp recursive polynomial list.
      * @return nf(Ap) with respect to Pp.
      */
-    public GenPolynomial<GenPolynomial<C>> normalformRecursive(List<GenPolynomial<GenPolynomial<C>>> Pp, GenPolynomial<GenPolynomial<C>> Ap);
+    GenPolynomial<GenPolynomial<C>> normalformRecursive(List<GenPolynomial<GenPolynomial<C>>> Pp, GenPolynomial<GenPolynomial<C>> Ap);
 
 }

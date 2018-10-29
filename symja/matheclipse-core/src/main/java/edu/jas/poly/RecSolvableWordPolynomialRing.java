@@ -17,7 +17,8 @@ import java.util.Random;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -206,7 +207,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -265,10 +266,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         //if ( ! table.equals(oring.table) ) { // done in super
         //    return false;
         //}
-        if (!coeffTable.equals(oring.coeffTable)) {
-            return false;
-        }
-        return true;
+        return coeffTable.equals(oring.coeffTable);
     }
 
 

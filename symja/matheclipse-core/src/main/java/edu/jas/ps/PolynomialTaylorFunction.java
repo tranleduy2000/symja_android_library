@@ -10,7 +10,7 @@ import java.util.List;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -79,7 +79,7 @@ public class PolynomialTaylorFunction<C extends RingElem<C>> implements TaylorFu
      */
     @Override
     public TaylorFunction<C> deriviative() {
-        return new PolynomialTaylorFunction<C>(PolyUtil.<C>baseDeriviative(pol));
+        return new PolynomialTaylorFunction<C>(PolyUtil.baseDeriviative(pol));
     }
 
 
@@ -112,7 +112,7 @@ public class PolynomialTaylorFunction<C extends RingElem<C>> implements TaylorFu
             }
             int jl = i.length() - 1 - j;
             for (long k = 0; k < e; k++) {
-                p = PolyUtil.<C>baseDeriviative(p, jl);
+                p = PolyUtil.baseDeriviative(p, jl);
                 f *= (k + 1);
                 if (p.isZERO()) {
                     return new PolynomialTaylorFunction<C>(p, f);
@@ -132,7 +132,7 @@ public class PolynomialTaylorFunction<C extends RingElem<C>> implements TaylorFu
      */
     @Override
     public C evaluate(C a) {
-        return PolyUtil.<C>evaluateMain(pol.ring.coFac, pol, a);
+        return PolyUtil.evaluateMain(pol.ring.coFac, pol, a);
     }
 
 
@@ -143,7 +143,7 @@ public class PolynomialTaylorFunction<C extends RingElem<C>> implements TaylorFu
      * @return this(a).
      */
     public C evaluate(List<C> a) {
-        return PolyUtil.<C>evaluateAll(pol.ring.coFac, pol, a);
+        return PolyUtil.evaluateAll(pol.ring.coFac, pol, a);
     }
 
 }

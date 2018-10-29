@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.Element;
+
 /**
  * Unary functor interface.
  *
@@ -21,6 +23,6 @@ public interface UnaryFunctor<C extends Element<C>, D extends Element<D>> {
      *
      * @return evaluated element.
      */
-    public D eval(C c);
+    D eval(C c);
 
 }

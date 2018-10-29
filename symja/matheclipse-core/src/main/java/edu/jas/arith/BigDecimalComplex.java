@@ -14,8 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.elem.RingElemImpl;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.StarRingElem;
 
@@ -280,7 +281,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public BigDecimalComplex factory() {
         return this;
@@ -449,7 +450,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -501,7 +502,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -513,7 +514,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * Is Complex number zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return re.isZERO() && im.isZERO();
@@ -523,7 +524,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * Is Complex number one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return re.isONE() && im.isZERO();
@@ -542,7 +543,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * Is Complex unit element.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         return (!isZERO());
@@ -602,7 +603,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      *
      * @return 0 if this is equal to 0; 1 if re &gt; 0, or re == 0 and im &gt;
      * 0; -1 if re &lt; 0, or re == 0 and im &lt; 0
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         int s = re.signum();
@@ -636,7 +637,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * Complex number negative.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public BigDecimalComplex negate() {
         return new BigDecimalComplex(re.negate(), im.negate());
@@ -674,7 +675,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * Complex number absolute value.
      *
      * @return |this|.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public BigDecimalComplex abs() {
         if (im.isZERO()) {
@@ -703,7 +704,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * Complex number inverse.
      *
      * @return S with S*this = 1.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public BigDecimalComplex inverse() {
         BigDecimal a = norm().re.inverse();

@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -102,8 +102,8 @@ public class OrderedModuleList<C extends RingElem<C>> extends ModuleList<C> {
             for (List<GenPolynomial<C>> p : l) {
                 s[i++] = p;
             }
-            Arrays.<List<GenPolynomial<C>>>sort(s, cmp);
-            return new ArrayList<List<GenPolynomial<C>>>(Arrays.<List<GenPolynomial<C>>>asList(s));
+            Arrays.sort(s, cmp);
+            return new ArrayList<List<GenPolynomial<C>>>(Arrays.asList(s));
         } catch (ClassCastException ok) {
             System.out.println("Warning: polynomials not sorted");
         }
@@ -127,12 +127,7 @@ public class OrderedModuleList<C extends RingElem<C>> extends ModuleList<C> {
             ml = (OrderedModuleList<C>) m;
         } catch (ClassCastException ignored) {
         }
-        if (ml == null) {
-            return false;
-        }
-        // compare sorted lists
-        // done already in super.equals()
-        return true;
+        return ml != null;
     }
 
     /**

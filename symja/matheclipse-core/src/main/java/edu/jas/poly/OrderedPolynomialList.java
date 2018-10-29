@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -98,8 +98,8 @@ public class OrderedPolynomialList<C extends RingElem<C>> extends PolynomialList
             for (GenPolynomial<C> p : L) {
                 s[i++] = p;
             }
-            Arrays.<GenPolynomial<C>>sort(s, cmp);
-            return new ArrayList<GenPolynomial<C>>(Arrays.<GenPolynomial<C>>asList(s));
+            Arrays.sort(s, cmp);
+            return new ArrayList<GenPolynomial<C>>(Arrays.asList(s));
         } catch (ClassCastException ok) {
             System.out.println("Warning: polynomials not sorted");
         }
@@ -141,8 +141,8 @@ public class OrderedPolynomialList<C extends RingElem<C>> extends PolynomialList
             for (GenPolynomial<C> p : L) {
                 s[i++] = p;
             }
-            Arrays.<GenPolynomial<C>>sort(s, cmp);
-            return new ArrayList<GenPolynomial<C>>(Arrays.<GenPolynomial<C>>asList(s));
+            Arrays.sort(s, cmp);
+            return new ArrayList<GenPolynomial<C>>(Arrays.asList(s));
         } catch (ClassCastException ok) {
             System.out.println("Warning: polynomials not sorted");
         }
@@ -165,12 +165,7 @@ public class OrderedPolynomialList<C extends RingElem<C>> extends PolynomialList
             pl = (OrderedPolynomialList<C>) p;
         } catch (ClassCastException ignored) {
         }
-        if (pl == null) {
-            return false;
-        }
-        // compare sorted lists
-        // done already in super.equals()
-        return true;
+        return pl != null;
     }
 
     /**

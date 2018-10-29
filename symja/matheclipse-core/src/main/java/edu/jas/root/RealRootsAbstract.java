@@ -17,7 +17,7 @@ import edu.jas.arith.Rational;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.UnaryFunctor;
 
@@ -127,12 +127,12 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         }
         //System.out.println("M = " + M);
         RingFactory<C> cfac = f.ring.coFac;
-        C B = PolyUtil.<C>evaluateMain(cfac, fa, M);
+        C B = PolyUtil.evaluateMain(cfac, fa, M);
         // works also without this case, only for optimization 
         // to use rational number interval end points
         // can fail if real root is in interval [r,r+1] 
         // for too low precision or too big r, since r is approximation
-        if ((Object) B instanceof RealAlgebraicNumber) {
+        if (B instanceof RealAlgebraicNumber) {
             RealAlgebraicNumber Br = (RealAlgebraicNumber) B;
             BigRational r = Br.magnitude();
             B = cfac.fromInteger(r.numerator()).divide(cfac.fromInteger(r.denominator()));
@@ -160,7 +160,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         if (f.isZERO() || f.isConstant()) {
             return c;
         }
-        C m = PolyUtil.<C>evaluateMain(cfac, f, c);
+        C m = PolyUtil.evaluateMain(cfac, f, c);
         while (m.isZERO()) {
             C d = iv.left.sum(c);
             d = d.divide(two);
@@ -172,7 +172,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
                 }
             }
             c = d;
-            m = PolyUtil.<C>evaluateMain(cfac, f, c);
+            m = PolyUtil.evaluateMain(cfac, f, c);
             //System.out.println("c = " + c);
         }
         //System.out.println("c = " + c);
@@ -226,8 +226,8 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
             return false;
         }
         RingFactory<C> cfac = f.ring.coFac;
-        C l = PolyUtil.<C>evaluateMain(cfac, f, iv.left);
-        C r = PolyUtil.<C>evaluateMain(cfac, f, iv.right);
+        C l = PolyUtil.evaluateMain(cfac, f, iv.left);
+        C r = PolyUtil.evaluateMain(cfac, f, iv.right);
         return l.signum() * r.signum() < 0;
     }
 
@@ -283,7 +283,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
             c = c.divide(two);
             //System.out.println("c = " + c);
             //c = RootUtil.<C>bisectionPoint(v,f);
-            if (PolyUtil.<C>evaluateMain(cfac, f, c).isZERO()) {
+            if (PolyUtil.evaluateMain(cfac, f, c).isZERO()) {
                 v = new Interval<C>(c, c);
                 break;
             }
@@ -352,7 +352,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         RingFactory<C> cfac = f.ring.coFac;
         C c = iv.left.sum(iv.right);
         c = c.divide(cfac.fromInteger(2));
-        C ev = PolyUtil.<C>evaluateMain(cfac, g, c);
+        C ev = PolyUtil.evaluateMain(cfac, g, c);
         //System.out.println("ev = " + ev);
         return ev.signum();
     }
@@ -404,7 +404,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         if (f == null || f.isZERO() || f.isConstant()) { // ?
             return v;
         }
-        GenPolynomial<C> gp = PolyUtil.<C>baseDeriviative(g);
+        GenPolynomial<C> gp = PolyUtil.baseDeriviative(g);
         //System.out.println("g  = " + g);
         //System.out.println("gp = " + gp);
         C B = magnitudeBound(iv, gp);
@@ -448,8 +448,8 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         //    C ev = PolyUtil.<C> evaluateMain(cfac, g, c);
         //    return ev;
         //}
-        C evl = PolyUtil.<C>evaluateMain(cfac, g, iv.left);
-        C evr = PolyUtil.<C>evaluateMain(cfac, g, iv.right);
+        C evl = PolyUtil.evaluateMain(cfac, g, iv.left);
+        C evr = PolyUtil.evaluateMain(cfac, g, iv.right);
         C ev = evl;
         if (evl.compareTo(evr) <= 0) {
             ev = evr;
@@ -510,20 +510,20 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         BigDecimal dc = BigDecimal.ONE;
         // polynomials with decimal coefficients
         GenPolynomialRing<BigDecimal> dfac = new GenPolynomialRing<BigDecimal>(dc, f.ring);
-        GenPolynomial<BigDecimal> df = PolyUtil.<C>decimalFromRational(dfac, f);
-        GenPolynomial<C> fp = PolyUtil.<C>baseDeriviative(f);
-        GenPolynomial<BigDecimal> dfp = PolyUtil.<C>decimalFromRational(dfac, fp);
+        GenPolynomial<BigDecimal> df = PolyUtil.decimalFromRational(dfac, f);
+        GenPolynomial<C> fp = PolyUtil.baseDeriviative(f);
+        GenPolynomial<BigDecimal> dfp = PolyUtil.decimalFromRational(dfac, fp);
 
         // Newton Raphson iteration: x_{n+1} = x_n - f(x_n)/f'(x_n)
         int i = 0;
         final int MITER = 50;
         int dir = 0;
         while (i++ < MITER) {
-            BigDecimal fx = PolyUtil.<BigDecimal>evaluateMain(dc, df, d); // f(d)
+            BigDecimal fx = PolyUtil.evaluateMain(dc, df, d); // f(d)
             if (fx.isZERO()) {
                 return d;
             }
-            BigDecimal fpx = PolyUtil.<BigDecimal>evaluateMain(dc, dfp, d); // f'(d)
+            BigDecimal fpx = PolyUtil.evaluateMain(dc, dfp, d); // f'(d)
             if (fpx.isZERO()) {
                 throw new NoConvergenceException("zero deriviative should not happen");
             }
@@ -619,9 +619,9 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         BigDecimal dc = BigDecimal.ONE;
         // polynomials with decimal coefficients
         GenPolynomialRing<BigDecimal> dfac = new GenPolynomialRing<BigDecimal>(dc, f.ring);
-        GenPolynomial<BigDecimal> df = PolyUtil.<C>decimalFromRational(dfac, f);
-        GenPolynomial<C> fp = PolyUtil.<C>baseDeriviative(f);
-        GenPolynomial<BigDecimal> dfp = PolyUtil.<C>decimalFromRational(dfac, fp);
+        GenPolynomial<BigDecimal> df = PolyUtil.decimalFromRational(dfac, f);
+        GenPolynomial<C> fp = PolyUtil.baseDeriviative(f);
+        GenPolynomial<BigDecimal> dfp = PolyUtil.decimalFromRational(dfac, fp);
         //
         return isApproximateRoot(x, df, dfp, e);
     }
@@ -647,13 +647,13 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         }
         BigDecimal dc = BigDecimal.ONE; // only for clarity
         // f(x)
-        BigDecimal fx = PolyUtil.<BigDecimal>evaluateMain(dc, f, x);
+        BigDecimal fx = PolyUtil.evaluateMain(dc, f, x);
         //System.out.println("fx    = " + fx);
         if (fx.isZERO()) {
             return true;
         }
         // f'(x)
-        BigDecimal fpx = PolyUtil.<BigDecimal>evaluateMain(dc, fp, x); // f'(d)
+        BigDecimal fpx = PolyUtil.evaluateMain(dc, fp, x); // f'(d)
         //System.out.println("fpx   = " + fpx);
         if (fpx.isZERO()) {
             return false;
@@ -692,9 +692,9 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         BigDecimal dc = BigDecimal.ONE;
         // polynomials with decimal coefficients
         GenPolynomialRing<BigDecimal> dfac = new GenPolynomialRing<BigDecimal>(dc, f.ring);
-        GenPolynomial<BigDecimal> df = PolyUtil.<C>decimalFromRational(dfac, f);
-        GenPolynomial<C> fp = PolyUtil.<C>baseDeriviative(f);
-        GenPolynomial<BigDecimal> dfp = PolyUtil.<C>decimalFromRational(dfac, fp);
+        GenPolynomial<BigDecimal> df = PolyUtil.decimalFromRational(dfac, f);
+        GenPolynomial<C> fp = PolyUtil.baseDeriviative(f);
+        GenPolynomial<BigDecimal> dfp = PolyUtil.decimalFromRational(dfac, fp);
         for (BigDecimal x : R) {
             if (!isApproximateRoot(x, df, dfp, e)) {
                 return false;

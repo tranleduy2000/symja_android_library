@@ -17,7 +17,7 @@ import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.util.Terminator;
 import edu.jas.util.ThreadPool;
 
@@ -170,7 +170,7 @@ public class SolvableGroebnerBaseParallel<C extends RingElem<C>> extends Solvabl
      */
     public List<GenSolvablePolynomial<C>> leftGB(int modv, List<GenSolvablePolynomial<C>> F) {
         List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolynomialList.castToSolvableList(PolyUtil.<C>monic(PolynomialList.castToList(G)));
+        G = PolynomialList.castToSolvableList(PolyUtil.monic(PolynomialList.castToList(G)));
         if (G.size() <= 1) {
             return G;
         }
@@ -302,7 +302,7 @@ public class SolvableGroebnerBaseParallel<C extends RingElem<C>> extends Solvabl
     @SuppressWarnings("unchecked")
     public List<GenSolvablePolynomial<C>> twosidedGB(int modv, List<GenSolvablePolynomial<C>> Fp) {
         List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(Fp);
-        G = PolynomialList.castToSolvableList(PolyUtil.<C>monic(PolynomialList.castToList(G)));
+        G = PolynomialList.castToSolvableList(PolyUtil.monic(PolynomialList.castToList(G)));
         if (G.size() < 1) { // 0 not 1
             return G;
         }

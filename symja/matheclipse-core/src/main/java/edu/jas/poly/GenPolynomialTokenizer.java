@@ -31,7 +31,7 @@ import edu.jas.arith.BigRational;
 import edu.jas.arith.ModInteger;
 import edu.jas.arith.ModIntegerRing;
 import edu.jas.arith.ModLongRing;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -62,13 +62,10 @@ public class GenPolynomialTokenizer {
     private RingFactory fac;
     private coeffType parsedCoeff = coeffType.BigRat;
 
-    ;
     private GenPolynomialRing pfac;
     @SuppressWarnings("unused")
     private polyType parsedPoly = polyType.PolBigRat;
     private GenSolvablePolynomialRing spfac;
-
-    ;
 
 
     /**
@@ -1610,12 +1607,12 @@ public class GenPolynomialTokenizer {
     }
 
 
-    private static enum coeffType {
+    private enum coeffType {
         BigRat, BigInt, ModInt, BigC, BigQ, BigO, BigD, ANrat, ANmod, IntFunc
     }
 
 
-    private static enum polyType {
+    private enum polyType {
         PolBigRat, PolBigInt, PolModInt, PolBigC, PolBigD, PolBigQ, PolBigO, PolANrat, PolANmod, PolIntFunc
     }
 

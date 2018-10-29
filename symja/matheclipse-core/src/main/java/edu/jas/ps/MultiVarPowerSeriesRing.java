@@ -20,7 +20,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.Monomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.UnaryFunctor;
 import edu.jas.util.ListUtil;
@@ -280,10 +280,7 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         if (!coFac.equals(a.coFac)) {
             return false;
         }
-        if (Arrays.deepEquals(vars, a.vars)) {
-            return true;
-        }
-        return false;
+        return Arrays.deepEquals(vars, a.vars);
     }
 
 
@@ -626,7 +623,7 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
      * @return a list of MultiVarPowerSeries&lt;C&gt;.
      */
     public List<MultiVarPowerSeries<C>> fromPolynomial(List<GenPolynomial<C>> A) {
-        return ListUtil.<GenPolynomial<C>, MultiVarPowerSeries<C>>map(A,
+        return ListUtil.map(A,
                 new UnaryFunctor<GenPolynomial<C>, MultiVarPowerSeries<C>>() {
 
 

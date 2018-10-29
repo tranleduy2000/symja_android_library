@@ -12,7 +12,8 @@ import java.util.Random;
 import edu.jas.arith.BigInteger;
 import edu.jas.structure.AbelianGroupElem;
 import edu.jas.structure.AbelianGroupFactory;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -54,8 +55,6 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * Stored bitLength.
      */
     transient protected long blen = -1;
-
-    ;
 
 
     /**
@@ -571,7 +570,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public AbelianGroupFactory<ExpVector> factory() {
         throw new UnsupportedOperationException("no factory implemented for ExpVector");
@@ -759,7 +758,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -770,7 +769,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     // @Override
     public String toScript(String[] vars) {
@@ -814,7 +813,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -1237,7 +1236,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
     /**
      * Storage representation of exponent arrays.
      */
-    public static enum StorUnit {
+    public enum StorUnit {
         LONG, INT, SHORT, BYTE
     }
 

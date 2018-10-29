@@ -19,7 +19,7 @@ public interface Modular {
      *
      * @return a BigInteger of this.
      */
-    public BigInteger getInteger();
+    BigInteger getInteger();
 
 
     /**
@@ -27,6 +27,6 @@ public interface Modular {
      *
      * @return a symmetric BigInteger of this.
      */
-    public BigInteger getSymmetricInteger();
+    BigInteger getSymmetricInteger();
 
 }

@@ -8,7 +8,7 @@ package edu.jas.ufd;
 import org.apache.log4j.Logger;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**

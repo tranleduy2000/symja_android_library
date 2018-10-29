@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.RingElem;
+
 /**
  * Value interface. Defines selector for value.
  *
@@ -17,12 +19,12 @@ public interface Value<C extends RingElem<C>> {
     /**
      * Value getter.
      */
-    public C value();
+    C value();
 
 
     /**
      * Test if element type is constant.
      */
-    public boolean isConstant();
+    boolean isConstant();
 
 }

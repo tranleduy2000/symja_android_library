@@ -11,9 +11,9 @@ import edu.jas.arith.BigComplex;
 import edu.jas.arith.BigDecimal;
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
+import edu.jas.structure.elem.RingElemImpl;
 import edu.jas.structure.StarRingElem;
 
 
@@ -137,7 +137,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public ComplexRing<C> factory() {
         return ring;
@@ -167,7 +167,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
     /**
      * Copy this.
      *
-     * @see edu.jas.structure.Element#copy()
+     * @see Element#copy()
      */
     @Override
     public Complex<C> copy() {
@@ -194,7 +194,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -219,7 +219,6 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
             } else {
                 s.append(mi.toScript()).append(" * I");
             }
-            s.append("");
         }
         return s.toString();
     }
@@ -229,7 +228,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -242,7 +241,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * Is Complex number zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return re.isZERO() && im.isZERO();
@@ -253,7 +252,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * Is Complex number one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return re.isONE() && im.isZERO();
@@ -274,7 +273,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * Is Complex unit element.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         if (isZERO()) {
@@ -343,7 +342,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      *
      * @return 0 if this is equal to 0; 1 if re > 0, or re == 0 and im > 0; -1
      * if re < 0, or re == 0 and im < 0
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         int s = re.signum();
@@ -383,7 +382,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * Complex number negative.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public Complex<C> negate() {
         return new Complex<C>(ring, re.negate(), im.negate());
@@ -421,7 +420,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * Complex number absolute value.
      *
      * @return |this|^2. <b>Note:</b> The square root is not jet implemented.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public Complex<C> abs() {
         Complex<C> n = norm();
@@ -451,7 +450,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * Complex number inverse.
      *
      * @return S with S*this = 1, if it is defined.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public Complex<C> inverse() {
         C a = norm().re.inverse();
@@ -538,10 +537,10 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
             System.out.println("this = " + this);
             System.out.println("S    = " + S);
             System.out.println("Sp   = " + Sp);
-            BigInteger tr = (BigInteger) (Object) this.re;
-            BigInteger ti = (BigInteger) (Object) this.im;
-            BigInteger sr = (BigInteger) (Object) S.re;
-            BigInteger si = (BigInteger) (Object) S.im;
+            BigInteger tr = (BigInteger) this.re;
+            BigInteger ti = (BigInteger) this.im;
+            BigInteger sr = (BigInteger) S.re;
+            BigInteger si = (BigInteger) S.im;
             BigComplex tc = new BigComplex(new BigRational(tr), new BigRational(ti));
             BigComplex sc = new BigComplex(new BigRational(sr), new BigRational(si));
             BigComplex qc = tc.divide(sc);

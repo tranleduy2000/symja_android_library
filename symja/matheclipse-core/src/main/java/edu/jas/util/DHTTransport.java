@@ -25,8 +25,6 @@ public abstract class DHTTransport<K, V> implements Serializable {
     static long ertime = 0L; // encode plain raw
     static long drtime = 0L; // decode plain raw
 
-    ;
-
 
     /**
      * protected constructor.
@@ -69,7 +67,7 @@ public abstract class DHTTransport<K, V> implements Serializable {
     }
 
 
-    public static enum Stor { // storage and transport class
+    public enum Stor { // storage and transport class
         marshal, plain
     }
 
@@ -85,7 +83,7 @@ class DHTTransportTerminate<K, V> extends DHTTransport<K, V> {
     /**
      * Get the key from this DHTTransport Container.
      */
-    public K key() throws IOException, ClassNotFoundException {
+    public K key() {
         throw new UnsupportedOperationException("this should not happen");
     }
 
@@ -93,7 +91,7 @@ class DHTTransportTerminate<K, V> extends DHTTransport<K, V> {
     /**
      * Get the value from this DHTTransport Container.
      */
-    public V value() throws IOException, ClassNotFoundException {
+    public V value() {
         throw new UnsupportedOperationException("this should not happen");
     }
 
@@ -109,7 +107,7 @@ class DHTTransportClear<K, V> extends DHTTransport<K, V> {
     /**
      * Get the key from this DHTTransport Container.
      */
-    public K key() throws IOException, ClassNotFoundException {
+    public K key() {
         throw new UnsupportedOperationException("this should not happen");
     }
 
@@ -117,7 +115,7 @@ class DHTTransportClear<K, V> extends DHTTransport<K, V> {
     /**
      * Get the value from this DHTTransport Container.
      */
-    public V value() throws IOException, ClassNotFoundException {
+    public V value() {
         throw new UnsupportedOperationException("this should not happen");
     }
 
@@ -143,7 +141,7 @@ class DHTTransportPlain<K, V> extends DHTTransport<K, V> {
      * @param key
      * @param value
      */
-    public DHTTransportPlain(K key, V value) throws IOException {
+    public DHTTransportPlain(K key, V value) {
         this.key = key;
         this.value = value;
     }
@@ -152,7 +150,7 @@ class DHTTransportPlain<K, V> extends DHTTransport<K, V> {
     /**
      * Get the key from this DHTTransport Container.
      */
-    public K key() throws IOException, ClassNotFoundException {
+    public K key() {
         return this.key;
     }
 
@@ -160,7 +158,7 @@ class DHTTransportPlain<K, V> extends DHTTransport<K, V> {
     /**
      * Get the value from this DHTTransport Container.
      */
-    public V value() throws IOException, ClassNotFoundException {
+    public V value() {
         return this.value;
     }
 

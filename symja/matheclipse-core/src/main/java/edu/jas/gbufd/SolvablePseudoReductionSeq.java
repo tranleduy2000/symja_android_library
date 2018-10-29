@@ -17,7 +17,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -219,9 +219,9 @@ public class SolvablePseudoReductionSeq<C extends RingElem<C>> extends SolvableR
                 GenPolynomial<C> ap = a;
                 if (commCoeff) {
                     GenPolynomial<C> c = Q.leadingBaseCoefficient();
-                    if (!c.isConstant() && PolyUtil.<C>baseSparsePseudoRemainder(a, c).isZERO()) {
+                    if (!c.isConstant() && PolyUtil.baseSparsePseudoRemainder(a, c).isZERO()) {
                         //a = a.divide(c);
-                        b = PolyUtil.<C>basePseudoDivide(a, c);
+                        b = PolyUtil.basePseudoDivide(a, c);
                         if (a.equals(b.multiply(c))) {
                             S = S.subtractMultiple(b, Q);
                         } else {

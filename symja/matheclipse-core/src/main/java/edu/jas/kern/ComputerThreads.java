@@ -96,10 +96,7 @@ public class ComputerThreads {
         if (pool == null) {
             return false;
         }
-        if (pool.isTerminated() || pool.isShutdown()) {
-            return false;
-        }
-        return true;
+        return !pool.isTerminated() && !pool.isShutdown();
     }
 
 

@@ -17,7 +17,8 @@ import java.util.Random;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -239,7 +240,7 @@ public class GenSolvablePolynomialRing<C extends RingElem<C>> extends GenPolynom
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -290,10 +291,7 @@ public class GenSolvablePolynomialRing<C extends RingElem<C>> extends GenPolynom
             return false;
         }
         // check same base relations
-        if (!table.equals(oring.table)) {
-            return false;
-        }
-        return true;
+        return table.equals(oring.table);
     }
 
 
@@ -795,7 +793,7 @@ public class GenSolvablePolynomialRing<C extends RingElem<C>> extends GenPolynom
         // main relations
         List<GenPolynomial<GenPolynomial<C>>> rl = (List<GenPolynomial<GenPolynomial<C>>>) (List) PolynomialList
                 .castToList(table.relationList());
-        List<GenPolynomial<C>> rld = PolyUtil.<C>distribute(pfac, rl);
+        List<GenPolynomial<C>> rld = PolyUtil.distribute(pfac, rl);
         pfac.table.addRelations(rld);
         //System.out.println("pfac = " + pfac.toScript());
         // coeffTable not avaliable here

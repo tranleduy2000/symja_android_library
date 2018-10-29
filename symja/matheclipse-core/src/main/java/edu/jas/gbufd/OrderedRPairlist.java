@@ -15,7 +15,7 @@ import edu.jas.gb.Pair;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.RegularRingElem;
+import edu.jas.structure.elem.RegularRingElem;
 
 /**
  * Pair list management for R-Groebner bases.

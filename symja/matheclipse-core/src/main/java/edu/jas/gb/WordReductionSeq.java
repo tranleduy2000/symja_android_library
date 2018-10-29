@@ -13,7 +13,7 @@ import java.util.Map;
 
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.Word;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**

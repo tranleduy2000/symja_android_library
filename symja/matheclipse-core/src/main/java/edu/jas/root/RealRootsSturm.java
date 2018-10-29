@@ -14,7 +14,7 @@ import edu.jas.arith.BigRational;
 import edu.jas.arith.Rational;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -50,7 +50,7 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
         }
         GenPolynomial<C> F = f;
         S.add(F);
-        GenPolynomial<C> G = PolyUtil.<C>baseDeriviative(f);
+        GenPolynomial<C> G = PolyUtil.baseDeriviative(f);
         while (!G.isZERO()) {
             GenPolynomial<C> r = F.remainder(G);
             F = G;
@@ -102,7 +102,7 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
         //System.out.println("S = " + S);
         //System.out.println("f_S = " + S.get(0));
         List<Interval<C>> Rp = realRoots(iv, S);
-        if (logger.isInfoEnabled() && !(((Object) f.ring.coFac) instanceof BigRational)) {
+        if (logger.isInfoEnabled() && !(f.ring.coFac instanceof BigRational)) {
             //logger.info("realRoots bound: " + iv);
             logger.info("realRoots: " + Rp);
         }
@@ -251,9 +251,9 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
         GenPolynomial<C> f = S.get(0); // squarefree part
         //System.out.println("iv = " + iv);
         RingFactory<C> cfac = f.ring.coFac;
-        List<C> l = PolyUtil.<C>evaluateMain(cfac, S, iv.left);
-        List<C> r = PolyUtil.<C>evaluateMain(cfac, S, iv.right);
-        long v = RootUtil.<C>signVar(l) - RootUtil.<C>signVar(r);
+        List<C> l = PolyUtil.evaluateMain(cfac, S, iv.left);
+        List<C> r = PolyUtil.evaluateMain(cfac, S, iv.right);
+        long v = RootUtil.signVar(l) - RootUtil.signVar(r);
         //System.out.println("v = " + v);
         if (v < 0L) {
             v = -v;

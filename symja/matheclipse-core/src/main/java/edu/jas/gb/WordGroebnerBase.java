@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import edu.jas.poly.GenWordPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -29,7 +29,7 @@ public interface WordGroebnerBase<C extends RingElem<C>> extends Serializable {
      * @param F word polynomial list.
      * @return true, if F is a Groebner base, else false.
      */
-    public boolean isGB(List<GenWordPolynomial<C>> F);
+    boolean isGB(List<GenWordPolynomial<C>> F);
 
 
     /**
@@ -38,7 +38,7 @@ public interface WordGroebnerBase<C extends RingElem<C>> extends Serializable {
      * @param F word polynomial list.
      * @return GB(F) a non-commutative Groebner base of F.
      */
-    public List<GenWordPolynomial<C>> GB(List<GenWordPolynomial<C>> F);
+    List<GenWordPolynomial<C>> GB(List<GenWordPolynomial<C>> F);
 
 
     /**
@@ -47,6 +47,6 @@ public interface WordGroebnerBase<C extends RingElem<C>> extends Serializable {
      * @param Gp a Word Groebner base.
      * @return a reduced Word Groebner base of Gp.
      */
-    public List<GenWordPolynomial<C>> minimalGB(List<GenWordPolynomial<C>> Gp);
+    List<GenWordPolynomial<C>> minimalGB(List<GenWordPolynomial<C>> Gp);
 
 }

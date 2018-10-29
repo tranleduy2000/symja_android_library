@@ -11,7 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -112,7 +113,7 @@ public class RecSolvablePolynomial<C extends RingElem<C>> extends GenSolvablePol
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     @Override
     public RecSolvablePolynomialRing<C> factory() {
@@ -744,7 +745,7 @@ public class RecSolvablePolynomial<C extends RingElem<C>> extends GenSolvablePol
         if (!(this instanceof RecSolvablePolynomial)) {
             return this;
         }
-        RecSolvablePolynomialRing<C> rfac = (RecSolvablePolynomialRing<C>) ring;
+        RecSolvablePolynomialRing<C> rfac = ring;
         if (rfac.coeffTable.isEmpty()) {
             return this;
         }
@@ -786,13 +787,13 @@ public class RecSolvablePolynomial<C extends RingElem<C>> extends GenSolvablePol
         if (!(this instanceof RecSolvablePolynomial)) {
             return this;
         }
-        RecSolvablePolynomialRing<C> rfac = (RecSolvablePolynomialRing<C>) ring;
+        RecSolvablePolynomialRing<C> rfac = ring;
         if (rfac.coeffTable.isEmpty()) {
             return this;
         }
         RecSolvablePolynomial<C> q = rfac.getZERO();
         RecSolvablePolynomial<C> s;
-        RecSolvablePolynomial<C> r = (RecSolvablePolynomial<C>) this;
+        RecSolvablePolynomial<C> r = this;
         for (Map.Entry<ExpVector, GenPolynomial<C>> y : r.getMap().entrySet()) {
             ExpVector f = y.getKey();
             GenPolynomial<C> a = y.getValue();
@@ -832,15 +833,15 @@ public class RecSolvablePolynomial<C extends RingElem<C>> extends GenSolvablePol
         if (!(R instanceof RecSolvablePolynomial)) {
             return false;
         }
-        RecSolvablePolynomialRing<C> rfac = (RecSolvablePolynomialRing<C>) ring;
+        RecSolvablePolynomialRing<C> rfac = ring;
         if (rfac.coeffTable.isEmpty()) {
             RecSolvablePolynomialRing<C> rf = (RecSolvablePolynomialRing<C>) R.ring;
             return rf.coeffTable.isEmpty();
         }
-        RecSolvablePolynomial<C> p = (RecSolvablePolynomial<C>) this;
+        RecSolvablePolynomial<C> p = this;
         RecSolvablePolynomial<C> q = (RecSolvablePolynomial<C>) R.evalAsRightRecursivePolynomial();
-        p = (RecSolvablePolynomial<C>) PolyUtil.<C>monic(p);
-        q = (RecSolvablePolynomial<C>) PolyUtil.<C>monic(q);
+        p = (RecSolvablePolynomial<C>) PolyUtil.monic(p);
+        q = (RecSolvablePolynomial<C>) PolyUtil.monic(q);
         return p.equals(q);
     }
 

@@ -19,7 +19,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.TermOrder;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -151,7 +151,7 @@ public class GroebnerBaseFGLM<C extends RingElem<C>> extends GroebnerBaseAbstrac
         }
         // compute graded term order Groebner base
         if (sgb == null) {
-            sgb = GBFactory.<C>getImplementation(pfac.coFac, strategy);
+            sgb = GBFactory.getImplementation(pfac.coFac, strategy);
         }
         List<GenPolynomial<C>> Gp = sgb.GB(modv, Fp);
         logger.info("graded GB = " + Gp);
@@ -227,7 +227,7 @@ public class GroebnerBaseFGLM<C extends RingElem<C>> extends GroebnerBaseAbstrac
             //System.out.println("t = " + t);
             h = red.normalform(groebnerBasis, t);
             //System.out.println("Zwischennormalform h = " + h.toString());
-            hh = PolyUtil.<C>toRecursive(rfac, h);
+            hh = PolyUtil.toRecursive(rfac, h);
             p = hh.sum(q);
             List<GenPolynomial<C>> Cf = new ArrayList<GenPolynomial<C>>(p.getMap().values());
             Cf = red.irreducibleSet(Cf);
@@ -241,10 +241,10 @@ public class GroebnerBaseFGLM<C extends RingElem<C>> extends GroebnerBaseAbstrac
                 redTerms.add(t); //add current t to list of reduced terms
                 cpfac = addIndeterminate(cpfac);
                 rfac = new GenPolynomialRing<GenPolynomial<C>>(cpfac, ring);
-                hh = PolyUtil.<C>toRecursive(rfac, h);
+                hh = PolyUtil.toRecursive(rfac, h);
                 GenPolynomial<GenPolynomial<C>> Yt = rfac.getZERO().sum(cpfac.univariate(0));
                 GenPolynomial<GenPolynomial<C>> Yth = hh.multiply(Yt);
-                q = PolyUtil.<C>extendCoefficients(rfac, q, 0, 0L);
+                q = PolyUtil.extendCoefficients(rfac, q, 0, 0L);
                 q = Yth.sum(q);
             } else { // z=0 --> one solution
                 GenPolynomial<C> g = ufac.getZERO();

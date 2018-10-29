@@ -7,7 +7,7 @@ package edu.jas.ps;
 
 import java.util.List;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.UnaryFunctor;
 import edu.jas.util.ListUtil;
 
@@ -29,7 +29,7 @@ public class PSUtil {
      * @return list of power series with leading coefficient 1.
      */
     public static <C extends RingElem<C>> List<MultiVarPowerSeries<C>> monic(List<MultiVarPowerSeries<C>> L) {
-        return ListUtil.<MultiVarPowerSeries<C>, MultiVarPowerSeries<C>>map(L,
+        return ListUtil.map(L,
                 new UnaryFunctor<MultiVarPowerSeries<C>, MultiVarPowerSeries<C>>() {
 
 
@@ -51,7 +51,7 @@ public class PSUtil {
      * @return list of univariate power series with leading coefficient 1.
      */
     public static <C extends RingElem<C>> List<UnivPowerSeries<C>> monicUniv(List<UnivPowerSeries<C>> L) {
-        return ListUtil.<UnivPowerSeries<C>, UnivPowerSeries<C>>map(L,
+        return ListUtil.map(L,
                 new UnaryFunctor<UnivPowerSeries<C>, UnivPowerSeries<C>>() {
 
 

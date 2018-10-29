@@ -15,7 +15,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import edu.jas.arith.BigInteger;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.vector.BasicLinAlg;
 
 
@@ -269,7 +269,7 @@ public class TermOrderOptimization {
         }
         List<T> pl = new ArrayList<T>(L.size());
         for (Integer i : P) {
-            pl.add(L.get((int) i));
+            pl.add(L.get(i));
         }
         return pl;
     }
@@ -488,10 +488,10 @@ public class TermOrderOptimization {
             sring = (GenSolvablePolynomialRing<GenPolynomial<C>>) ring;
             psring = new GenSolvablePolynomialRing<GenPolynomial<C>>(pFac, sring);
             List<GenPolynomial<GenPolynomial<C>>> ir = PolynomialList
-                    .<GenPolynomial<C>>castToList(sring.table.relationList());
+                    .castToList(sring.table.relationList());
             ir = permutationOnCoefficients(perm, psring, ir);
             psring.addRelations(ir);
-            pring = (GenPolynomialRing<GenPolynomial<C>>) psring;
+            pring = psring;
         } else {
             pring = new GenPolynomialRing<GenPolynomial<C>>(pFac, ring);
         }
@@ -579,10 +579,10 @@ public class TermOrderOptimization {
             sring = (GenSolvablePolynomialRing<GenPolynomial<C>>) ring;
             psring = new GenSolvablePolynomialRing<GenPolynomial<C>>(pFac, sring);
             List<GenPolynomial<GenPolynomial<C>>> ir = PolynomialList
-                    .<GenPolynomial<C>>castToList(sring.table.relationList());
+                    .castToList(sring.table.relationList());
             ir = permutationOnCoefficients(perm, psring, ir);
             psring.addRelations(ir);
-            pring = (GenPolynomialRing<GenPolynomial<C>>) psring;
+            pring = psring;
         } else {
             pring = new GenPolynomialRing<GenPolynomial<C>>(pFac, ring);
         }

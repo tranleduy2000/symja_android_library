@@ -17,7 +17,8 @@ import java.util.Random;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -192,12 +193,12 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
     public static <C extends RingElem<C>> // must be static because of types
     GenSolvablePolynomialRing<C> distribute(RecSolvablePolynomialRing<C> rf) {
         // setup solvable polynomial ring
-        GenSolvablePolynomialRing<C> fring = (GenSolvablePolynomialRing<C>) (GenSolvablePolynomialRing) rf;
+        GenSolvablePolynomialRing<C> fring = (GenSolvablePolynomialRing<C>) rf;
         GenSolvablePolynomialRing<C> pfd = fring.distribute();
         // add coefficient relations:
-        List<GenPolynomial<GenPolynomial<C>>> rl = (List<GenPolynomial<GenPolynomial<C>>>) (List) PolynomialList
+        List<GenPolynomial<GenPolynomial<C>>> rl = (List<GenPolynomial<GenPolynomial<C>>>) PolynomialList
                 .castToList(rf.coeffTable.relationList());
-        List<GenPolynomial<C>> rld = PolyUtil.<C>distribute(pfd, rl);
+        List<GenPolynomial<C>> rld = PolyUtil.distribute(pfd, rl);
         pfd.table.addRelations(rld);
         //System.out.println("pfd = " + pfd.toScript());
         return pfd;
@@ -224,7 +225,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -282,10 +283,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
         //if ( ! table.equals(oring.table) ) { // done in super
         //    return false;
         //}
-        if (!coeffTable.equals(oring.coeffTable)) {
-            return false;
-        }
-        return true;
+        return coeffTable.equals(oring.coeffTable);
     }
 
     /**

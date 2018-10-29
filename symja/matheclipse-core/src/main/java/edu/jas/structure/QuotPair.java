@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.RingElem;
+
 /**
  * Quotient pair interface. Defines selectors for numerator and denominator.
  *
@@ -17,18 +19,18 @@ public interface QuotPair<C extends RingElem<C>> {
     /**
      * Numerator.
      */
-    public C numerator();
+    C numerator();
 
 
     /**
      * Denominator.
      */
-    public C denominator();
+    C denominator();
 
 
     /**
      * Test if element type is constant.
      */
-    public boolean isConstant();
+    boolean isConstant();
 
 }

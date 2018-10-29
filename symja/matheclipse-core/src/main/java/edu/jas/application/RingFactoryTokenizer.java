@@ -66,13 +66,10 @@ public class RingFactoryTokenizer {
     private RingFactory fac;
     private coeffType parsedCoeff = coeffType.BigRat;
 
-    ;
     private GenPolynomialRing pfac;
     @SuppressWarnings("unused")
     private polyType parsedPoly = polyType.PolBigRat;
     private GenSolvablePolynomialRing spfac;
-
-    ;
 
 
     /**
@@ -930,12 +927,12 @@ public class RingFactoryTokenizer {
     //}
 
 
-    private static enum coeffType {
+    private enum coeffType {
         BigRat, BigInt, ModInt, BigC, BigQ, BigD, ANrat, ANmod, RatFunc, ModFunc, IntFunc
     }
 
 
-    private static enum polyType {
+    private enum polyType {
         PolBigRat, PolBigInt, PolModInt, PolBigC, PolBigD, PolBigQ, PolANrat, PolANmod, PolRatFunc, PolModFunc, PolIntFunc
     }
 

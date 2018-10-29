@@ -9,7 +9,7 @@ import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.ModuleList;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -32,7 +32,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param F polynomial list.
      * @return true, if F is a Groebner base, else false.
      */
-    public boolean isGB(List<GenPolynomial<C>> F);
+    boolean isGB(List<GenPolynomial<C>> F);
 
 
     /**
@@ -42,7 +42,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param F    polynomial list.
      * @return true, if F is a Groebner base, else false.
      */
-    public boolean isGB(int modv, List<GenPolynomial<C>> F);
+    boolean isGB(int modv, List<GenPolynomial<C>> F);
 
 
     /**
@@ -51,7 +51,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param F polynomial list.
      * @return GB(F) a Groebner base of F.
      */
-    public List<GenPolynomial<C>>
+    List<GenPolynomial<C>>
     GB(List<GenPolynomial<C>> F);
 
 
@@ -62,7 +62,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param F    polynomial list.
      * @return GB(F) a Groebner base of F.
      */
-    public List<GenPolynomial<C>>
+    List<GenPolynomial<C>>
     GB(int modv,
        List<GenPolynomial<C>> F);
 
@@ -73,7 +73,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param M a module basis.
      * @return true, if M is a Groebner base, else false.
      */
-    public boolean isGB(ModuleList<C> M);
+    boolean isGB(ModuleList<C> M);
 
 
     /**
@@ -82,7 +82,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param M a module basis.
      * @return GB(M), a Groebner base of M.
      */
-    public ModuleList<C> GB(ModuleList<C> M);
+    ModuleList<C> GB(ModuleList<C> M);
 
 
     /**
@@ -91,7 +91,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param F polynomial list.
      * @return a container for a Groebner base G of F together with back-and-forth transformations.
      */
-    public ExtendedGB<C>
+    ExtendedGB<C>
     extGB(List<GenPolynomial<C>> F);
 
 
@@ -102,7 +102,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param F    polynomial list.
      * @return a container for a Groebner base G of F together with back-and-forth transformations.
      */
-    public ExtendedGB<C>
+    ExtendedGB<C>
     extGB(int modv,
           List<GenPolynomial<C>> F);
 
@@ -113,7 +113,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param Gp a Groebner base.
      * @return a reduced Groebner base of Gp.
      */
-    public List<GenPolynomial<C>>
+    List<GenPolynomial<C>>
     minimalGB(List<GenPolynomial<C>> Gp);
 
 
@@ -123,7 +123,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param exgb an ExtendedGB container.
      * @return true, if exgb contains a reduction matrix, else false.
      */
-    public boolean
+    boolean
     isReductionMatrix(ExtendedGB<C> exgb);
 
 
@@ -136,7 +136,7 @@ public interface GroebnerBase<C extends RingElem<C>>
      * @param Mg a possible reduction matrix.
      * @return true, if Mg and Mf are reduction matrices, else false.
      */
-    public boolean
+    boolean
     isReductionMatrix(List<GenPolynomial<C>> F,
                       List<GenPolynomial<C>> G,
                       List<List<GenPolynomial<C>>> Mf,

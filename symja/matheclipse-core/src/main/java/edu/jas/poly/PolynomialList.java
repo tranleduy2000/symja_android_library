@@ -15,7 +15,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import edu.jas.kern.Scripting;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -58,7 +58,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
      * @param l list of solvable polynomials.
      */
     public PolynomialList(GenSolvablePolynomialRing<C> r, List<GenSolvablePolynomial<C>> l) {
-        this(r, PolynomialList.<C>castToList(l));
+        this(r, PolynomialList.castToList(l));
     }
 
     /**
@@ -104,7 +104,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
         slist = new ArrayList<List<GenSolvablePolynomial<C>>>(list.size());
         List<GenSolvablePolynomial<C>> s;
         for (List<GenPolynomial<C>> p : list) {
-            s = PolynomialList.<C>castToSolvableList(p);
+            s = PolynomialList.castToSolvableList(p);
             slist.add(s);
         }
         return slist;
@@ -151,7 +151,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
         }
         list = new ArrayList<List<GenPolynomial<C>>>(slist.size());
         for (List<? extends GenPolynomial<C>> p : slist) {
-            list.add(PolynomialList.<C>castToList(p));
+            list.add(PolynomialList.castToList(p));
         }
         return list;
     }
@@ -201,8 +201,8 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
             si = list.size();
         }
         int s = 0;
-        List<GenPolynomial<C>> l1 = OrderedPolynomialList.<C>sort(ring, list);
-        List<GenPolynomial<C>> l2 = OrderedPolynomialList.<C>sort(ring, L.list);
+        List<GenPolynomial<C>> l1 = OrderedPolynomialList.sort(ring, list);
+        List<GenPolynomial<C>> l2 = OrderedPolynomialList.sort(ring, L.list);
         for (int i = 0; i < si; i++) {
             GenPolynomial<C> a = l1.get(i);
             GenPolynomial<C> b = l2.get(i);

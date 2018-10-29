@@ -19,7 +19,7 @@ public interface AbelianGroupFactory<C extends AbelianGroupElem<C>> extends Elem
      *
      * @return 0.
      */
-    public C getZERO();
+    C getZERO();
 
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.Word;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -31,7 +31,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param Bp word polynomial.
      * @return list of all spol(Ap,Bp) the S-polynomials of Ap and Bp.
      */
-    public List<GenWordPolynomial<C>> SPolynomials(GenWordPolynomial<C> Ap, GenWordPolynomial<C> Bp);
+    List<GenWordPolynomial<C>> SPolynomials(GenWordPolynomial<C> Ap, GenWordPolynomial<C> Bp);
 
 
     /**
@@ -47,8 +47,8 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param r2 word.
      * @return list of all spol(Ap,Bp) the S-polynomials of Ap and Bp.
      */
-    public GenWordPolynomial<C> SPolynomial(C a, Word l1, GenWordPolynomial<C> A, Word r1, C b, Word l2,
-                                            GenWordPolynomial<C> B, Word r2);
+    GenWordPolynomial<C> SPolynomial(C a, Word l1, GenWordPolynomial<C> A, Word r1, C b, Word l2,
+                                     GenWordPolynomial<C> B, Word r2);
 
 
     /**
@@ -58,7 +58,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param P polynomial list.
      * @return true if A is top reducible with respect to P.
      */
-    public boolean isTopReducible(List<GenWordPolynomial<C>> P, GenWordPolynomial<C> A);
+    boolean isTopReducible(List<GenWordPolynomial<C>> P, GenWordPolynomial<C> A);
 
 
     /**
@@ -68,7 +68,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param P polynomial list.
      * @return true if A is reducible with respect to P.
      */
-    public boolean isReducible(List<GenWordPolynomial<C>> P, GenWordPolynomial<C> A);
+    boolean isReducible(List<GenWordPolynomial<C>> P, GenWordPolynomial<C> A);
 
 
     /**
@@ -78,7 +78,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param P polynomial list.
      * @return true if A is in normalform with respect to P.
      */
-    public boolean isNormalform(List<GenWordPolynomial<C>> P, GenWordPolynomial<C> A);
+    boolean isNormalform(List<GenWordPolynomial<C>> P, GenWordPolynomial<C> A);
 
 
     /**
@@ -87,7 +87,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param Pp polynomial list.
      * @return true if each A in Pp is in normalform with respect to Pp\{A}.
      */
-    public boolean isNormalform(List<GenWordPolynomial<C>> Pp);
+    boolean isNormalform(List<GenWordPolynomial<C>> Pp);
 
 
     /**
@@ -97,7 +97,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param P polynomial list.
      * @return nf(A) with respect to P.
      */
-    public GenWordPolynomial<C> normalform(List<GenWordPolynomial<C>> P, GenWordPolynomial<C> A);
+    GenWordPolynomial<C> normalform(List<GenWordPolynomial<C>> P, GenWordPolynomial<C> A);
 
 
     /**
@@ -107,7 +107,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param Pp polynomial list.
      * @return list of nf(a) with respect to Pp for all a in Ap.
      */
-    public List<GenWordPolynomial<C>> normalform(List<GenWordPolynomial<C>> Pp, List<GenWordPolynomial<C>> Ap);
+    List<GenWordPolynomial<C>> normalform(List<GenWordPolynomial<C>> Pp, List<GenWordPolynomial<C>> Ap);
 
 
     /**
@@ -119,8 +119,8 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param Ap   a polynomial.
      * @return nf(Pp, Ap), the normal form of Ap wrt. Pp.
      */
-    public GenWordPolynomial<C> normalform(List<GenWordPolynomial<C>> lrow, List<GenWordPolynomial<C>> rrow,
-                                           List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
+    GenWordPolynomial<C> normalform(List<GenWordPolynomial<C>> lrow, List<GenWordPolynomial<C>> rrow,
+                                    List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
 
 
     /**
@@ -130,7 +130,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param Ap a polynomial.
      * @return nf(Pp, Ap), the left normal form of Ap wrt. Pp.
      */
-    public GenWordPolynomial<C> leftNormalform(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
+    GenWordPolynomial<C> leftNormalform(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
 
 
     /**
@@ -141,8 +141,8 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param Ap   a polynomial.
      * @return nf(Pp, Ap), the left normal form of Ap wrt. Pp.
      */
-    public GenWordPolynomial<C> leftNormalform(List<GenWordPolynomial<C>> lrow,
-                                               List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
+    GenWordPolynomial<C> leftNormalform(List<GenWordPolynomial<C>> lrow,
+                                        List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
 
 
     /**
@@ -152,7 +152,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @return a list P of polynomials which are in normalform wrt. P and with
      * ideal(Pp) = ideal(P).
      */
-    public List<GenWordPolynomial<C>> irreducibleSet(List<GenWordPolynomial<C>> Pp);
+    List<GenWordPolynomial<C>> irreducibleSet(List<GenWordPolynomial<C>> Pp);
 
 
     /**
@@ -165,8 +165,8 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param Np   nf(Pp,Ap), a normal form of Ap wrt. Pp.
      * @return true, if Np + sum( row[i]*Pp[i] ) == Ap, else false.
      */
-    public boolean isReductionNF(List<GenWordPolynomial<C>> lrow, List<GenWordPolynomial<C>> rrow,
-                                 List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap, GenWordPolynomial<C> Np);
+    boolean isReductionNF(List<GenWordPolynomial<C>> lrow, List<GenWordPolynomial<C>> rrow,
+                          List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap, GenWordPolynomial<C> Np);
 
 
     /**
@@ -176,7 +176,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param Ap a polynomial.
      * @return nf(Pp, Ap), the right normal form of Ap wrt. Pp.
      */
-    public GenWordPolynomial<C> rightNormalform(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
+    GenWordPolynomial<C> rightNormalform(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
 
 
     /**
@@ -187,7 +187,7 @@ public interface WordReduction<C extends RingElem<C>> extends Serializable {
      * @param Ap   a polynomial.
      * @return nf(Pp, Ap), the right normal form of Ap wrt. Pp.
      */
-    public GenWordPolynomial<C> rightNormalform(List<GenWordPolynomial<C>> rrow,
-                                                List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
+    GenWordPolynomial<C> rightNormalform(List<GenWordPolynomial<C>> rrow,
+                                         List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap);
 
 }

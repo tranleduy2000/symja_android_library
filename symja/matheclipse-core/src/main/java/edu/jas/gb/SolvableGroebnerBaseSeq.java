@@ -17,7 +17,7 @@ import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -86,7 +86,7 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
     @SuppressWarnings("unchecked")
     public List<GenSolvablePolynomial<C>> leftGB(int modv, List<GenSolvablePolynomial<C>> F) {
         List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolynomialList.castToSolvableList(PolyUtil.<C>monic(PolynomialList.castToList(G)));
+        G = PolynomialList.castToSolvableList(PolyUtil.monic(PolynomialList.castToList(G)));
         if (G.size() <= 1) {
             return G;
         }
@@ -331,8 +331,8 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
             c = c.inverse();
             H = H.multiply(c);
             // 1*c*row, leads to wrong method dispatch:
-            row = PolynomialList.<C>castToSolvableList(blas.scalarProduct(mone.multiply(c),
-                    PolynomialList.<C>castToList(row)));
+            row = PolynomialList.castToSolvableList(blas.scalarProduct(mone.multiply(c),
+                    PolynomialList.castToList(row)));
             row.set(G.size(), mone);
             if (H.isONE()) {
                 // pairlist.record( pair, H );
@@ -393,7 +393,7 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
     @SuppressWarnings("unchecked")
     public List<GenSolvablePolynomial<C>> twosidedGB(int modv, List<GenSolvablePolynomial<C>> Fp) {
         List<GenSolvablePolynomial<C>> F = normalizeZerosOnes(Fp);
-        F = PolynomialList.castToSolvableList(PolyUtil.<C>monic(PolynomialList.castToList(F)));
+        F = PolynomialList.castToSolvableList(PolyUtil.monic(PolynomialList.castToList(F)));
         if (F.size() < 1) { // 0 not 1
             return F;
         }
@@ -572,9 +572,9 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
                     //System.out.println("k, a = " + k + ", " + a);
                     if (a != null && !a.isZERO()) { // a*row + nrow, leads to wrong method dispatch
                         List<GenPolynomial<C>> yrow = blas.scalarProduct(a,
-                                PolynomialList.<C>castToList(row));
-                        yrow = blas.vectorAdd(yrow, PolynomialList.<C>castToList(nrow));
-                        xrow = PolynomialList.<C>castToSolvableList(yrow);
+                                PolynomialList.castToList(row));
+                        yrow = blas.vectorAdd(yrow, PolynomialList.castToList(nrow));
+                        xrow = PolynomialList.castToSolvableList(yrow);
                         N.set(j, xrow);
                     }
                 }
@@ -742,7 +742,7 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
     @SuppressWarnings("unchecked")
     public List<GenSolvablePolynomial<C>> rightGB(int modv, List<GenSolvablePolynomial<C>> F) {
         List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolynomialList.castToSolvableList(PolyUtil.<C>monic(PolynomialList.castToList(G)));
+        G = PolynomialList.castToSolvableList(PolyUtil.monic(PolynomialList.castToList(G)));
         if (G.size() <= 1) {
             return G;
         }

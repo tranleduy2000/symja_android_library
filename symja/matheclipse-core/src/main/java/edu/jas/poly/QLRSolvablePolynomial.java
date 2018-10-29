@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.RingFactory;
 
@@ -111,7 +112,7 @@ public class QLRSolvablePolynomial<C extends RingElem<C> & QuotPair<GenPolynomia
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     @Override
     public QLRSolvablePolynomialRing<C, D> factory() {

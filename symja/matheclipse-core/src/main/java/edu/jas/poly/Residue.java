@@ -7,10 +7,10 @@ package edu.jas.poly;
 
 import org.apache.log4j.Logger;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.RingElemImpl;
 
 
 /**
@@ -105,7 +105,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public ResidueRing<C> factory() {
         return ring;
@@ -115,7 +115,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
     /**
      * Copy this.
      *
-     * @see edu.jas.structure.Element#copy()
+     * @see Element#copy()
      */
     @Override
     public Residue<C> copy() {
@@ -127,7 +127,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Is Residue zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return val.equals(ring.ring.getZERO());
@@ -138,7 +138,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Is Residue one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return val.equals(ring.ring.getONE());
@@ -149,7 +149,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Is Residue unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     @SuppressWarnings("unchecked")
     public boolean isUnit() {
@@ -162,8 +162,8 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
         // val.isUnit() already tested
         // not jet known
         if (val instanceof RingElem && ring.modul instanceof RingElem) {
-            RingElem v = (RingElem) val;
-            RingElem m = (RingElem) ring.modul;
+            RingElem v = val;
+            RingElem m = ring.modul;
             C gcd = (C) v.gcd(m);
             if (debug) {
                 logger.info("gcd = " + gcd);
@@ -196,7 +196,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -209,7 +209,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -274,7 +274,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Residue absolute value.
      *
      * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public Residue<C> abs() {
         return new Residue<C>(ring, val.abs());
@@ -296,7 +296,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Residue negate.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public Residue<C> negate() {
         return new Residue<C>(ring, val.negate());
@@ -307,7 +307,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Residue signum.
      *
      * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         return val.signum();
@@ -340,7 +340,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * Residue inverse.
      *
      * @return S with S = 1/this if defined.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     @SuppressWarnings("unchecked")
     public Residue<C> inverse() {
@@ -348,8 +348,8 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
             throw new NotInvertibleException("element not invertible (0) " + this);
         }
         if (val instanceof RingElem && ring.modul instanceof RingElem) {
-            RingElem v = (RingElem) val;
-            RingElem m = (RingElem) ring.modul;
+            RingElem v = val;
+            RingElem m = ring.modul;
             C[] egcd = (C[]) v.egcd(m);
             if (debug) {
                 logger.info("egcd = " + egcd[0] + ", f = " + egcd[1]);

@@ -22,7 +22,7 @@ import edu.jas.arith.ModularRingFactory;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.Power;
 import edu.jas.structure.RingFactory;
 
@@ -48,7 +48,7 @@ public class FactorModular<MOD extends RingElem<MOD> & Modular> extends FactorAb
      */
     @SuppressWarnings({"cast", "unused"})
     private FactorModular() {
-        this((RingFactory<MOD>) (Object) new ModLongRing(13, true)); // hack, 13 unimportant
+        this((RingFactory<MOD>) new ModLongRing(13, true)); // hack, 13 unimportant
     }
 
 
@@ -226,7 +226,7 @@ public class FactorModular<MOD extends RingElem<MOD> & Modular> extends FactorAb
             factors.addAll(efacs);
         }
         //System.out.println("factors  = " + factors);
-        factors = PolyUtil.<MOD>monic(factors);
+        factors = PolyUtil.monic(factors);
         SortedSet<GenPolynomial<MOD>> ss = new TreeSet<GenPolynomial<MOD>>(factors);
         //System.out.println("sorted   = " + ss);
         factors.clear();

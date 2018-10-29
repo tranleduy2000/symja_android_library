@@ -15,7 +15,7 @@ import edu.jas.gb.ReductionAbstract;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.RegularRingElem;
+import edu.jas.structure.elem.RegularRingElem;
 
 
 /**
@@ -309,10 +309,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
             C a = A.leadingBaseCoefficient();
             C b = B.leadingBaseCoefficient();
             C d = a.multiply(b);
-            if (d.isZERO()) { // a guess
-                //System.out.println("d1 = " + d + ", a = " + a + ", b = " + b);
-                return false; // can skip pair
-            }
+            return !d.isZERO();
         }
         return true; //! ( s == 0 );
     }
@@ -345,9 +342,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
             C a = A.leadingBaseCoefficient();
             C b = B.leadingBaseCoefficient();
             C d = a.multiply(b);
-            if (d.isZERO()) { // a guess
-                return false; // can skip pair
-            }
+            return !d.isZERO();
         }
         return true; //! ( s == 0 );
     }
@@ -530,10 +525,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
         C i = a.idempotent();
         GenPolynomial<C> B = A.multiply(i);
         // better run idemAnd on coefficients
-        if (A.equals(B)) {
-            return true;
-        }
-        return false;
+        return A.equals(B);
     }
 
 

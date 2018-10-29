@@ -5,9 +5,10 @@
 package edu.jas.arith;
 
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.RingElemImpl;
 
 
 /**
@@ -160,7 +161,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      *
      * @param A is a non-zero integer.
      * @return S with S=1/A if defined.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public static ModInteger MIINV(ModInteger A) {
         if (A == null)
@@ -229,7 +230,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public ModIntegerRing factory() {
         return ring;
@@ -285,7 +286,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      * Is ModInteger number zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return val.signum() == 0;
@@ -295,7 +296,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      * Is ModInteger number one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return val.equals(java.math.BigInteger.ONE);
@@ -305,7 +306,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      * Is ModInteger number a unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         if (isZERO()) {
@@ -332,7 +333,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -344,7 +345,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -395,7 +396,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      * ModInteger absolute value.
      *
      * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public ModInteger abs() {
         return new ModInteger(ring, val.abs());
@@ -405,7 +406,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      * ModInteger negative.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public ModInteger negate() {
         return new ModInteger(ring, val.negate());
@@ -415,7 +416,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      * ModInteger signum.
      *
      * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         return val.signum();
@@ -457,7 +458,7 @@ public final class ModInteger extends RingElemImpl<ModInteger> implements RingEl
      *
      * @return S with S=1/this if defined.
      * @throws NotInvertibleException if the element is not invertible.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public ModInteger inverse() /*throws NotInvertibleException*/ {
         try {

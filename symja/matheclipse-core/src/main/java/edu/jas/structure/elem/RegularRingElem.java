@@ -2,7 +2,7 @@
  * $Id$
  */
 
-package edu.jas.structure;
+package edu.jas.structure.elem;
 
 
 /**
@@ -30,7 +30,7 @@ public interface RegularRingElem<C extends RegularRingElem<C>> extends RingElem<
      * @return If every component is non zero, then true is returned, else
      * false.
      */
-    public boolean isFull();
+    boolean isFull();
 
 
     /**
@@ -39,7 +39,7 @@ public interface RegularRingElem<C extends RegularRingElem<C>> extends RingElem<
      * @return If this is a idempotent element then true is returned, else
      * false.
      */
-    public boolean isIdempotent();
+    boolean isIdempotent();
 
 
     /**
@@ -47,7 +47,7 @@ public interface RegularRingElem<C extends RegularRingElem<C>> extends RingElem<
      *
      * @return S with this*S = this.
      */
-    public C idempotent();
+    C idempotent();
 
 
     /**
@@ -55,7 +55,7 @@ public interface RegularRingElem<C extends RegularRingElem<C>> extends RingElem<
      *
      * @return 1-this.idempotent().
      */
-    public C idemComplement();
+    C idemComplement();
 
 
     /**
@@ -64,7 +64,7 @@ public interface RegularRingElem<C extends RegularRingElem<C>> extends RingElem<
      * @param S Product.
      * @return this.idempotent() and S.idempotent().
      */
-    public C idempotentAnd(C S);
+    C idempotentAnd(C S);
 
 
     /**
@@ -73,7 +73,7 @@ public interface RegularRingElem<C extends RegularRingElem<C>> extends RingElem<
      * @param S Product.
      * @return this.idempotent() or S.idempotent().
      */
-    public C idempotentOr(C S);
+    C idempotentOr(C S);
 
 
     /**
@@ -82,7 +82,7 @@ public interface RegularRingElem<C extends RegularRingElem<C>> extends RingElem<
      * @param S Product.
      * @return fill this with S.idempotent().
      */
-    public C fillIdempotent(C S);
+    C fillIdempotent(C S);
 
 
     /**
@@ -90,6 +90,6 @@ public interface RegularRingElem<C extends RegularRingElem<C>> extends RingElem<
      *
      * @return fill this with one.
      */
-    public C fillOne();
+    C fillOne();
 
 }

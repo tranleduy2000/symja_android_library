@@ -12,7 +12,7 @@ import java.util.List;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
 
@@ -107,7 +107,7 @@ public class MultiplicativeSetCoPrime<C extends RingElem<C>> extends Multiplicat
         if (mset.size() == 0) {
             list = engine.coPrime(cc, mset);
             if (ring.coFac.isField()) {
-                list = PolyUtil.<C>monic(list);
+                list = PolyUtil.monic(list);
             }
             return new MultiplicativeSetCoPrime<C>(ring, list, engine);
         }
@@ -119,7 +119,7 @@ public class MultiplicativeSetCoPrime<C extends RingElem<C>> extends Multiplicat
         logger.info("added to co-prime mset = " + c);
         list = engine.coPrime(c, mset);
         if (ring.coFac.isField()) {
-            list = PolyUtil.<C>monic(list);
+            list = PolyUtil.monic(list);
         }
         return new MultiplicativeSetCoPrime<C>(ring, list, engine);
     }

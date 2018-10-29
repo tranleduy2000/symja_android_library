@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import edu.jas.kern.ComputerThreads;
 import edu.jas.kern.PreemptingException;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**

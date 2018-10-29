@@ -19,7 +19,7 @@ import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.TermOrder;
 import edu.jas.poly.TermOrderOptimization;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -394,11 +394,11 @@ public class GroebnerBasePartial<C extends RingElem<C>> extends GroebnerBaseAbst
         // compute permutation (in reverse sorting)
         List<Integer> perm = partialPermutation(vars, pvars);
 
-        GenPolynomialRing<C> pfac = TermOrderOptimization.<C>permutation(perm, fac);
+        GenPolynomialRing<C> pfac = TermOrderOptimization.permutation(perm, fac);
         if (logger.isInfoEnabled()) {
             logger.info("pfac = " + pfac);
         }
-        List<GenPolynomial<C>> ppolys = TermOrderOptimization.<C>permutation(perm, pfac, F);
+        List<GenPolynomial<C>> ppolys = TermOrderOptimization.permutation(perm, pfac, F);
         //System.out.println("ppolys = " + ppolys);
 
         int cl = fac.nvar - pvars.length; // > 0
@@ -413,7 +413,7 @@ public class GroebnerBasePartial<C extends RingElem<C>> extends GroebnerBaseAbst
         }
         //System.out.println("rfac = " + rfac);
 
-        List<GenPolynomial<GenPolynomial<C>>> Fr = PolyUtil.<C>recursive(rfac, ppolys);
+        List<GenPolynomial<GenPolynomial<C>>> Fr = PolyUtil.recursive(rfac, ppolys);
         //System.out.println("\nFr = " + Fr);
 
         if (true) {
@@ -452,11 +452,11 @@ public class GroebnerBasePartial<C extends RingElem<C>> extends GroebnerBaseAbst
         //System.out.println("pGB, perm   = " + perm);
         //System.out.println("pGB, perm,1 = " + getPermutation(vars, xvars));
 
-        GenPolynomialRing<C> pfac = TermOrderOptimization.<C>permutation(perm, fac);
+        GenPolynomialRing<C> pfac = TermOrderOptimization.permutation(perm, fac);
         if (logger.isInfoEnabled()) {
             logger.info("pfac = " + pfac);
         }
-        List<GenPolynomial<C>> ppolys = TermOrderOptimization.<C>permutation(perm, pfac, F);
+        List<GenPolynomial<C>> ppolys = TermOrderOptimization.permutation(perm, pfac, F);
         //System.out.println("ppolys = " + ppolys);
 
         int cl = fac.nvar - pvars.length;
@@ -479,7 +479,7 @@ public class GroebnerBasePartial<C extends RingElem<C>> extends GroebnerBaseAbst
         }
         //System.out.println("rfac = " + rfac);
 
-        List<GenPolynomial<GenPolynomial<C>>> Fr = PolyUtil.<C>recursive(rfac, ppolys);
+        List<GenPolynomial<GenPolynomial<C>>> Fr = PolyUtil.recursive(rfac, ppolys);
         //System.out.println("\nFr = " + Fr);
 
         if (true) {
@@ -488,7 +488,7 @@ public class GroebnerBasePartial<C extends RingElem<C>> extends GroebnerBaseAbst
         List<GenPolynomial<GenPolynomial<C>>> Gr = rbb.GB(Fr);
         //System.out.println("\nGr = " + Gr);
 
-        List<GenPolynomial<C>> G = PolyUtil.<C>distribute(pfac, Gr);
+        List<GenPolynomial<C>> G = PolyUtil.distribute(pfac, Gr);
         //System.out.println("\nG = " + G);
 
         OptimizedPolynomialList<C> pgb = new OptimizedPolynomialList<C>(perm, pfac, G);
@@ -520,11 +520,11 @@ public class GroebnerBasePartial<C extends RingElem<C>> extends GroebnerBaseAbst
         List<Integer> perm = partialPermutation(vars, evars, pvars);
         //System.out.println("perm = " + perm);
 
-        GenPolynomialRing<C> pfac = TermOrderOptimization.<C>permutation(perm, fac);
+        GenPolynomialRing<C> pfac = TermOrderOptimization.permutation(perm, fac);
         if (logger.isInfoEnabled()) {
             logger.info("pfac = " + pfac);
         }
-        List<GenPolynomial<C>> ppolys = TermOrderOptimization.<C>permutation(perm, pfac, F);
+        List<GenPolynomial<C>> ppolys = TermOrderOptimization.permutation(perm, pfac, F);
         //System.out.println("ppolys = " + ppolys);
 
         int cl = fac.nvar - evars.length - pvars.length;
@@ -574,7 +574,7 @@ public class GroebnerBasePartial<C extends RingElem<C>> extends GroebnerBaseAbst
                 uvars);
         //System.out.println("rfac = " + rfac);
 
-        List<GenPolynomial<GenPolynomial<C>>> Fr = PolyUtil.<C>recursive(rfac, ppolys);
+        List<GenPolynomial<GenPolynomial<C>>> Fr = PolyUtil.recursive(rfac, ppolys);
         if (logger.isInfoEnabled()) {
             logger.info("rfac = " + rfac);
             logger.info("Fr   = " + Fr);
@@ -586,7 +586,7 @@ public class GroebnerBasePartial<C extends RingElem<C>> extends GroebnerBaseAbst
         List<GenPolynomial<GenPolynomial<C>>> Gr = rbb.GB(Fr);
         //System.out.println("\nGr = " + Gr);
 
-        List<GenPolynomial<C>> G = PolyUtil.<C>distribute(pfac, Gr);
+        List<GenPolynomial<C>> G = PolyUtil.distribute(pfac, Gr);
         //System.out.println("\nG = " + G);
 
         OptimizedPolynomialList<C> pgb = new OptimizedPolynomialList<C>(perm, pfac, G);

@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -219,7 +220,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -252,10 +253,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
             return false;
         }
         ComplexRing<C> a = (ComplexRing<C>) b;
-        if (!ring.equals(a.ring)) {
-            return false;
-        }
-        return true;
+        return ring.equals(a.ring);
     }
 
 

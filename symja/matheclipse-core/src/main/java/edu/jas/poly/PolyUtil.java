@@ -24,9 +24,8 @@ import edu.jas.arith.ModularRingFactory;
 import edu.jas.arith.Product;
 import edu.jas.arith.ProductRing;
 import edu.jas.arith.Rational;
-import edu.jas.structure.Element;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.UnaryFunctor;
 import edu.jas.util.ListUtil;
@@ -128,7 +127,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> List<GenPolynomial<GenPolynomial<C>>> recursive(
             GenPolynomialRing<GenPolynomial<C>> rfac, List<GenPolynomial<C>> L) {
-        return ListUtil.<GenPolynomial<C>, GenPolynomial<GenPolynomial<C>>>map(L, new DistToRec<C>(rfac));
+        return ListUtil.map(L, new DistToRec<C>(rfac));
     }
 
 
@@ -143,7 +142,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> List<GenPolynomial<C>> distribute(GenPolynomialRing<C> dfac,
                                                                             List<GenPolynomial<GenPolynomial<C>>> L) {
-        return ListUtil.<GenPolynomial<GenPolynomial<C>>, GenPolynomial<C>>map(L, new RecToDist<C>(dfac));
+        return ListUtil.map(L, new RecToDist<C>(dfac));
     }
 
 
@@ -158,7 +157,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C> & Modular> GenPolynomial<BigInteger> integerFromModularCoefficients(
             GenPolynomialRing<BigInteger> fac, GenPolynomial<C> A) {
-        return PolyUtil.<C, BigInteger>map(fac, A, new ModSymToInt<C>());
+        return PolyUtil.map(fac, A, new ModSymToInt<C>());
     }
 
 
@@ -174,12 +173,12 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C> & Modular> List<GenPolynomial<BigInteger>> integerFromModularCoefficients(
             final GenPolynomialRing<BigInteger> fac, List<GenPolynomial<C>> L) {
-        return ListUtil.<GenPolynomial<C>, GenPolynomial<BigInteger>>map(L,
+        return ListUtil.map(L,
                 new UnaryFunctor<GenPolynomial<C>, GenPolynomial<BigInteger>>() {
 
 
                     public GenPolynomial<BigInteger> eval(GenPolynomial<C> c) {
-                        return PolyUtil.<C>integerFromModularCoefficients(fac, c);
+                        return PolyUtil.integerFromModularCoefficients(fac, c);
                     }
                 });
     }
@@ -195,7 +194,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C> & Modular> GenPolynomial<BigInteger> integerFromModularCoefficientsPositive(
             GenPolynomialRing<BigInteger> fac, GenPolynomial<C> A) {
-        return PolyUtil.<C, BigInteger>map(fac, A, new ModToInt<C>());
+        return PolyUtil.map(fac, A, new ModToInt<C>());
     }
 
 
@@ -230,7 +229,7 @@ public class PolyUtil {
         if (s < 0) {
             c = c.negate();
         }
-        return PolyUtil.<BigRational, BigInteger>map(fac, A, new RatToInt(c));
+        return PolyUtil.map(fac, A, new RatToInt(c));
     }
 
 
@@ -286,7 +285,7 @@ public class PolyUtil {
         }
         result[0] = gcd;
         result[1] = lcm;
-        result[2] = PolyUtil.<BigRational, BigInteger>map(fac, A, new RatToIntFactor(gcd, lcm));
+        result[2] = PolyUtil.map(fac, A, new RatToIntFactor(gcd, lcm));
         return result;
     }
 
@@ -303,7 +302,7 @@ public class PolyUtil {
      */
     public static List<GenPolynomial<BigInteger>> integerFromRationalCoefficients(
             GenPolynomialRing<BigInteger> fac, List<GenPolynomial<BigRational>> L) {
-        return ListUtil.<GenPolynomial<BigRational>, GenPolynomial<BigInteger>>map(L, new RatToIntPoly(fac));
+        return ListUtil.map(L, new RatToIntPoly(fac));
     }
 
 
@@ -318,7 +317,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> GenPolynomial<C> fromIntegerCoefficients(GenPolynomialRing<C> fac,
                                                                                    GenPolynomial<BigInteger> A) {
-        return PolyUtil.<BigInteger, C>map(fac, A, new FromInteger<C>(fac.coFac));
+        return PolyUtil.map(fac, A, new FromInteger<C>(fac.coFac));
     }
 
 
@@ -334,7 +333,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> List<GenPolynomial<C>> fromIntegerCoefficients(
             GenPolynomialRing<C> fac, List<GenPolynomial<BigInteger>> L) {
-        return ListUtil.<GenPolynomial<BigInteger>, GenPolynomial<C>>map(L, new FromIntegerPoly<C>(fac));
+        return ListUtil.map(L, new FromIntegerPoly<C>(fac));
     }
 
 
@@ -347,7 +346,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C> & Rational> GenPolynomial<BigDecimal> decimalFromRational(
             GenPolynomialRing<BigDecimal> fac, GenPolynomial<C> A) {
-        return PolyUtil.<C, BigDecimal>map(fac, A, new RatToDec<C>());
+        return PolyUtil.map(fac, A, new RatToDec<C>());
     }
 
 
@@ -360,7 +359,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C> & Rational> GenPolynomial<Complex<BigDecimal>> complexDecimalFromRational(
             GenPolynomialRing<Complex<BigDecimal>> fac, GenPolynomial<Complex<C>> A) {
-        return PolyUtil.<Complex<C>, Complex<BigDecimal>>map(fac, A, new CompRatToDec<C>(fac.coFac));
+        return PolyUtil.map(fac, A, new CompRatToDec<C>(fac.coFac));
     }
 
 
@@ -373,7 +372,7 @@ public class PolyUtil {
      */
     public static GenPolynomial<BigRational> realPart(GenPolynomialRing<BigRational> fac,
                                                       GenPolynomial<BigComplex> A) {
-        return PolyUtil.<BigComplex, BigRational>map(fac, A, new RealPart());
+        return PolyUtil.map(fac, A, new RealPart());
     }
 
 
@@ -386,7 +385,7 @@ public class PolyUtil {
      */
     public static GenPolynomial<BigRational> imaginaryPart(GenPolynomialRing<BigRational> fac,
                                                            GenPolynomial<BigComplex> A) {
-        return PolyUtil.<BigComplex, BigRational>map(fac, A, new ImagPart());
+        return PolyUtil.map(fac, A, new ImagPart());
     }
 
 
@@ -399,7 +398,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> GenPolynomial<C> realPartFromComplex(GenPolynomialRing<C> fac,
                                                                                GenPolynomial<Complex<C>> A) {
-        return PolyUtil.<Complex<C>, C>map(fac, A, new RealPartComplex<C>());
+        return PolyUtil.map(fac, A, new RealPartComplex<C>());
     }
 
 
@@ -412,7 +411,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> GenPolynomial<C> imaginaryPartFromComplex(GenPolynomialRing<C> fac,
                                                                                     GenPolynomial<Complex<C>> A) {
-        return PolyUtil.<Complex<C>, C>map(fac, A, new ImagPartComplex<C>());
+        return PolyUtil.map(fac, A, new ImagPartComplex<C>());
     }
 
 
@@ -425,7 +424,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> GenPolynomial<Complex<C>> toComplex(
             GenPolynomialRing<Complex<C>> fac, GenPolynomial<C> A) {
-        return PolyUtil.<C, Complex<C>>map(fac, A, new ToComplex<C>(fac.coFac));
+        return PolyUtil.map(fac, A, new ToComplex<C>(fac.coFac));
     }
 
 
@@ -438,7 +437,7 @@ public class PolyUtil {
      */
     public static GenPolynomial<BigComplex> complexFromRational(GenPolynomialRing<BigComplex> fac,
                                                                 GenPolynomial<BigRational> A) {
-        return PolyUtil.<BigRational, BigComplex>map(fac, A, new RatToCompl());
+        return PolyUtil.map(fac, A, new RatToCompl());
     }
 
 
@@ -452,7 +451,7 @@ public class PolyUtil {
     public static <C extends RingElem<C>> GenPolynomial<Complex<C>> complexFromAny(
             GenPolynomialRing<Complex<C>> fac, GenPolynomial<C> A) {
         ComplexRing<C> cr = (ComplexRing<C>) fac.coFac;
-        return PolyUtil.<C, Complex<C>>map(fac, A, new AnyToComplex<C>(cr));
+        return PolyUtil.map(fac, A, new AnyToComplex<C>(cr));
     }
 
 
@@ -466,7 +465,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> GenPolynomial<GenPolynomial<C>> fromAlgebraicCoefficients(
             GenPolynomialRing<GenPolynomial<C>> rfac, GenPolynomial<AlgebraicNumber<C>> A) {
-        return PolyUtil.<AlgebraicNumber<C>, GenPolynomial<C>>map(rfac, A, new AlgToPoly<C>());
+        return PolyUtil.map(rfac, A, new AlgToPoly<C>());
     }
 
 
@@ -481,7 +480,7 @@ public class PolyUtil {
     public static <C extends RingElem<C>> GenPolynomial<AlgebraicNumber<C>> convertToAlgebraicCoefficients(
             GenPolynomialRing<AlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) pfac.coFac;
-        return PolyUtil.<C, AlgebraicNumber<C>>map(pfac, A, new CoeffToAlg<C>(afac));
+        return PolyUtil.map(pfac, A, new CoeffToAlg<C>(afac));
     }
 
 
@@ -498,7 +497,7 @@ public class PolyUtil {
     public static <C extends RingElem<C>> GenPolynomial<AlgebraicNumber<C>> convertToRecAlgebraicCoefficients(
             int depth, GenPolynomialRing<AlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) pfac.coFac;
-        return PolyUtil.<C, AlgebraicNumber<C>>map(pfac, A, new CoeffToRecAlg<C>(depth, afac));
+        return PolyUtil.map(pfac, A, new CoeffToRecAlg<C>(depth, afac));
     }
 
 
@@ -514,7 +513,7 @@ public class PolyUtil {
     public static <C extends RingElem<C>> GenPolynomial<AlgebraicNumber<C>> convertRecursiveToAlgebraicCoefficients(
             GenPolynomialRing<AlgebraicNumber<C>> pfac, GenPolynomial<GenPolynomial<C>> A) {
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) pfac.coFac;
-        return PolyUtil.<GenPolynomial<C>, AlgebraicNumber<C>>map(pfac, A, new PolyToAlg<C>(afac));
+        return PolyUtil.map(pfac, A, new PolyToAlg<C>(afac));
     }
 
 
@@ -529,7 +528,7 @@ public class PolyUtil {
     public static <C extends RingElem<C>> GenPolynomial<Complex<C>> complexFromAlgebraic(
             GenPolynomialRing<Complex<C>> fac, GenPolynomial<AlgebraicNumber<C>> A) {
         ComplexRing<C> cfac = (ComplexRing<C>) fac.coFac;
-        return PolyUtil.<AlgebraicNumber<C>, Complex<C>>map(fac, A, new AlgebToCompl<C>(cfac));
+        return PolyUtil.map(fac, A, new AlgebToCompl<C>(cfac));
     }
 
 
@@ -543,7 +542,7 @@ public class PolyUtil {
     public static <C extends RingElem<C>> GenPolynomial<AlgebraicNumber<C>> algebraicFromComplex(
             GenPolynomialRing<AlgebraicNumber<C>> fac, GenPolynomial<Complex<C>> A) {
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) fac.coFac;
-        return PolyUtil.<Complex<C>, AlgebraicNumber<C>>map(fac, A, new ComplToAlgeb<C>(afac));
+        return PolyUtil.map(fac, A, new ComplToAlgeb<C>(afac));
     }
 
 
@@ -655,7 +654,7 @@ public class PolyUtil {
      * @return list of polynomials with leading coefficient 1.
      */
     public static <C extends RingElem<C>> List<GenPolynomial<C>> monic(List<GenPolynomial<C>> L) {
-        return ListUtil.<GenPolynomial<C>, GenPolynomial<C>>map(L,
+        return ListUtil.map(L,
                 new UnaryFunctor<GenPolynomial<C>, GenPolynomial<C>>() {
 
 
@@ -677,7 +676,7 @@ public class PolyUtil {
      * @return list of word polynomials with leading coefficient 1.
      */
     public static <C extends RingElem<C>> List<GenWordPolynomial<C>> wordMonic(List<GenWordPolynomial<C>> L) {
-        return ListUtil.<GenWordPolynomial<C>, GenWordPolynomial<C>>map(L,
+        return ListUtil.map(L,
                 new UnaryFunctor<GenWordPolynomial<C>, GenWordPolynomial<C>>() {
 
 
@@ -700,7 +699,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> List<GenPolynomial<GenPolynomial<C>>> monicRec(
             List<GenPolynomial<GenPolynomial<C>>> L) {
-        return ListUtil.<GenPolynomial<GenPolynomial<C>>, GenPolynomial<GenPolynomial<C>>>map(L,
+        return ListUtil.map(L,
                 new UnaryFunctor<GenPolynomial<GenPolynomial<C>>, GenPolynomial<GenPolynomial<C>>>() {
 
 
@@ -708,7 +707,7 @@ public class PolyUtil {
                         if (c == null) {
                             return null;
                         }
-                        return PolyUtil.<C>monic(c);
+                        return PolyUtil.monic(c);
                     }
                 });
     }
@@ -722,7 +721,7 @@ public class PolyUtil {
      * @return list of leading exponent vectors.
      */
     public static <C extends RingElem<C>> List<ExpVector> leadingExpVector(List<GenPolynomial<C>> L) {
-        return ListUtil.<GenPolynomial<C>, ExpVector>map(L, new UnaryFunctor<GenPolynomial<C>, ExpVector>() {
+        return ListUtil.map(L, new UnaryFunctor<GenPolynomial<C>, ExpVector>() {
 
 
             public ExpVector eval(GenPolynomial<C> c) {
@@ -1215,10 +1214,7 @@ public class PolyUtil {
         C lcm = p.divide(gcd);
         C ap = lcm.divide(a);
         C bp = lcm.divide(b);
-        if (P.multiply(ap).equals(rhs.multiply(bp))) {
-            return true;
-        }
-        return false;
+        return P.multiply(ap).equals(rhs.multiply(bp));
     }
 
 
@@ -1247,7 +1243,7 @@ public class PolyUtil {
         for (Map.Entry<ExpVector, GenPolynomial<C>> m1 : P.getMap().entrySet()) {
             GenPolynomial<C> c1 = m1.getValue();
             ExpVector e1 = m1.getKey();
-            GenPolynomial<C> c = PolyUtil.<C>basePseudoDivide(c1, s);
+            GenPolynomial<C> c = PolyUtil.basePseudoDivide(c1, s);
             if (!c.isZERO()) {
                 pv.put(e1, c); // or m1.setValue( c )
             } else {
@@ -1287,7 +1283,7 @@ public class PolyUtil {
         for (Map.Entry<Word, GenPolynomial<C>> m1 : P.getMap().entrySet()) {
             GenPolynomial<C> c1 = m1.getValue();
             Word e1 = m1.getKey();
-            GenPolynomial<C> c = PolyUtil.<C>basePseudoDivide(c1, s);
+            GenPolynomial<C> c = PolyUtil.basePseudoDivide(c1, s);
             if (!c.isZERO()) {
                 pv.put(e1, c); // or m1.setValue( c )
             } else {
@@ -1327,7 +1323,7 @@ public class PolyUtil {
         for (Map.Entry<ExpVector, GenPolynomial<C>> m1 : P.getMap().entrySet()) {
             GenPolynomial<C> c1 = m1.getValue();
             ExpVector e1 = m1.getKey();
-            GenPolynomial<C> c = PolyUtil.<C>coefficientBasePseudoDivide(c1, s);
+            GenPolynomial<C> c = PolyUtil.coefficientBasePseudoDivide(c1, s);
             if (!c.isZERO()) {
                 pv.put(e1, c); // or m1.setValue( c )
             } else {
@@ -1391,7 +1387,7 @@ public class PolyUtil {
                 f = f.subtract(e);
                 GenPolynomial<C> x = c; //test basePseudoRemainder(a,c);
                 if (x.isZERO()) {
-                    GenPolynomial<C> y = PolyUtil.<C>basePseudoDivide(a, c);
+                    GenPolynomial<C> y = PolyUtil.basePseudoDivide(a, c);
                     h = S.multiply(y, f); // coeff a
                 } else {
                     r = r.multiply(c); // coeff a c
@@ -1487,9 +1483,9 @@ public class PolyUtil {
             if (f.multipleOf(e)) {
                 GenPolynomial<C> a = r.leadingBaseCoefficient();
                 f = f.subtract(e);
-                GenPolynomial<C> x = PolyUtil.<C>baseSparsePseudoRemainder(a, c);
+                GenPolynomial<C> x = PolyUtil.baseSparsePseudoRemainder(a, c);
                 if (x.isZERO() && !c.isConstant()) {
-                    GenPolynomial<C> y = PolyUtil.<C>basePseudoDivide(a, c);
+                    GenPolynomial<C> y = PolyUtil.basePseudoDivide(a, c);
                     q = q.sum(y, f);
                     h = S.multiply(y, f); // coeff a
                 } else {
@@ -1550,10 +1546,7 @@ public class PolyUtil {
         GenPolynomial<C> a = P.leadingBaseCoefficient();
         rhs = q.multiply(S).sum(r);
         GenPolynomial<C> b = rhs.leadingBaseCoefficient();
-        if (P.multiply(b).equals(rhs.multiply(a))) {
-            return true;
-        }
-        return false;
+        return P.multiply(b).equals(rhs.multiply(a));
     }
 
 
@@ -1890,7 +1883,7 @@ public class PolyUtil {
             throw new IllegalArgumentException("evaluateMain number of variabes mismatch");
         }
         GenPolynomial<GenPolynomial<C>> Ap = recursive(rfac, A);
-        return PolyUtil.<C>evaluateMainRecursive(cfac, Ap, a);
+        return PolyUtil.evaluateMainRecursive(cfac, Ap, a);
     }
 
 
@@ -1905,7 +1898,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> List<GenPolynomial<C>> evaluateMain(GenPolynomialRing<C> cfac,
                                                                               List<GenPolynomial<C>> L, C a) {
-        return ListUtil.<GenPolynomial<C>, GenPolynomial<C>>map(L, new EvalMainPol<C>(cfac, a));
+        return ListUtil.map(L, new EvalMainPol<C>(cfac, a));
     }
 
 
@@ -1964,7 +1957,7 @@ public class PolyUtil {
      */
     public static <C extends RingElem<C>> List<C> evaluateMain(RingFactory<C> cfac, List<GenPolynomial<C>> L,
                                                                C a) {
-        return ListUtil.<GenPolynomial<C>, C>map(L, new EvalMain<C>(cfac, a));
+        return ListUtil.map(L, new EvalMain<C>(cfac, a));
     }
 
 
@@ -2199,21 +2192,21 @@ public class PolyUtil {
             return f;
         }
         GenPolynomial<C> s = fac.getZERO();
-        C fa = PolyUtil.<C>evaluateMain(fac.coFac, f, a);
+        C fa = PolyUtil.evaluateMain(fac.coFac, f, a);
         s = s.sum(fa);
         long n = 1;
         long i = 0;
-        GenPolynomial<C> g = PolyUtil.<C>baseDeriviative(f);
+        GenPolynomial<C> g = PolyUtil.baseDeriviative(f);
         //GenPolynomial<C> p = fac.getONE();
         while (!g.isZERO()) {
             i++;
             n *= i;
-            fa = PolyUtil.<C>evaluateMain(fac.coFac, g, a);
+            fa = PolyUtil.evaluateMain(fac.coFac, g, a);
             GenPolynomial<C> q = fac.univariate(0, i); //p;
             q = q.multiply(fa);
             q = q.divide(fac.fromInteger(n));
             s = s.sum(q);
-            g = PolyUtil.<C>baseDeriviative(g);
+            g = PolyUtil.baseDeriviative(g);
         }
         //System.out.println("s = " + s);
         return s;
@@ -2249,12 +2242,12 @@ public class PolyUtil {
             GenPolynomial<C> x = av.get(e);
             if (x != null) {
                 av.remove(e);
-                c = PolyUtil.<C>interpolate(cfac, x, M, mi, y, am);
+                c = PolyUtil.interpolate(cfac, x, M, mi, y, am);
                 if (!c.isZERO()) { // 0 cannot happen
                     sv.put(e, c);
                 }
             } else {
-                c = PolyUtil.<C>interpolate(cfac, cfac.getZERO(), M, mi, y, am);
+                c = PolyUtil.interpolate(cfac, cfac.getZERO(), M, mi, y, am);
                 if (!c.isZERO()) { // 0 cannot happen
                     sv.put(e, c); // c != null
                 }
@@ -2264,7 +2257,7 @@ public class PolyUtil {
         for (Map.Entry<ExpVector, GenPolynomial<C>> me : av.entrySet()) { // rest of av
             ExpVector e = me.getKey();
             GenPolynomial<C> x = me.getValue(); //av.get(e); // assert x != null
-            c = PolyUtil.<C>interpolate(cfac, x, M, mi, bfac.getZERO(), am);
+            c = PolyUtil.interpolate(cfac, x, M, mi, bfac.getZERO(), am);
             if (!c.isZERO()) { // 0 cannot happen
                 sv.put(e, c); // c != null
             }
@@ -2288,7 +2281,7 @@ public class PolyUtil {
     public static <C extends RingElem<C>> GenPolynomial<C> interpolate(GenPolynomialRing<C> fac,
                                                                        GenPolynomial<C> A, GenPolynomial<C> M, C mi, C a, C am) {
         GenPolynomial<C> s;
-        C b = PolyUtil.<C>evaluateMain(fac.coFac, A, am);
+        C b = PolyUtil.evaluateMain(fac.coFac, A, am);
         // A mod a.modul
         C d = a.subtract(b); // a-A mod a.modul
         if (d.isZERO()) {
@@ -2688,10 +2681,10 @@ public class PolyUtil {
     @SuppressWarnings("cast")
     public static <C extends RingElem<C>> List<GenSolvablePolynomial<C>> intersect(
             GenSolvablePolynomialRing<C> R, List<GenSolvablePolynomial<C>> F) {
-        List<GenPolynomial<C>> Fp = PolynomialList.<C>castToList(F);
-        GenPolynomialRing<C> Rp = (GenPolynomialRing<C>) R;
+        List<GenPolynomial<C>> Fp = PolynomialList.castToList(F);
+        GenPolynomialRing<C> Rp = R;
         List<GenPolynomial<C>> H = intersect(Rp, Fp);
-        return PolynomialList.<C>castToSolvableList(H);
+        return PolynomialList.castToSolvableList(H);
     }
 
 
@@ -2900,7 +2893,7 @@ class DistToRec<C extends RingElem<C>>
         if (c == null) {
             return fac.getZERO();
         }
-        return PolyUtil.<C>recursive(fac, c);
+        return PolyUtil.recursive(fac, c);
     }
 }
 
@@ -2924,7 +2917,7 @@ class RecToDist<C extends RingElem<C>>
         if (c == null) {
             return fac.getZERO();
         }
-        return PolyUtil.<C>distribute(fac, c);
+        return PolyUtil.distribute(fac, c);
     }
 }
 
@@ -3125,7 +3118,7 @@ class FromIntegerPoly<D extends RingElem<D>>
         if (c == null) {
             return ring.getZERO();
         }
-        return PolyUtil.<BigInteger, D>map(ring, c, fi);
+        return PolyUtil.map(ring, c, fi);
     }
 }
 
@@ -3468,7 +3461,7 @@ class CoeffToRecAlg<C extends RingElem<C>> implements UnaryFunctor<C, AlgebraicN
             if (!(rf instanceof AlgebraicNumberRing)) {
                 throw new IllegalArgumentException("fac depth to low");
             }
-            afac = (AlgebraicNumberRing<C>) (Object) rf;
+            afac = (AlgebraicNumberRing<C>) rf;
             lfac.add(afac);
         }
     }
@@ -3486,7 +3479,7 @@ class CoeffToRecAlg<C extends RingElem<C>> implements UnaryFunctor<C, AlgebraicN
         for (int i = lfac.size() - 2; i >= 0; i--) {
             af = lfac.get(i);
             zero = af.ring.getZERO();
-            ac = (C) (Object) an;
+            ac = (C) an;
             an = new AlgebraicNumber<C>(af, zero.sum(ac));
         }
         return an;
@@ -3516,7 +3509,7 @@ class EvalMain<C extends RingElem<C>> implements UnaryFunctor<GenPolynomial<C>, 
         if (c == null) {
             return cfac.getZERO();
         }
-        return PolyUtil.<C>evaluateMain(cfac, c, a);
+        return PolyUtil.evaluateMain(cfac, c, a);
     }
 }
 
@@ -3543,6 +3536,6 @@ class EvalMainPol<C extends RingElem<C>> implements UnaryFunctor<GenPolynomial<C
         if (c == null) {
             return cfac.getZERO();
         }
-        return PolyUtil.<C>evaluateMain(cfac, c, a);
+        return PolyUtil.evaluateMain(cfac, c, a);
     }
 }

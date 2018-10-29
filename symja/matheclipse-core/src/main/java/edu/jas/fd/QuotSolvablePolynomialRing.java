@@ -28,7 +28,8 @@ import edu.jas.poly.RecSolvablePolynomial;
 import edu.jas.poly.RecSolvablePolynomialRing;
 import edu.jas.poly.RelationTable;
 import edu.jas.poly.TermOrder;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -248,7 +249,7 @@ public class QuotSolvablePolynomialRing<C extends RingElem<C>> extends
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -307,10 +308,7 @@ public class QuotSolvablePolynomialRing<C extends RingElem<C>> extends
         //if ( ! table.equals(oring.table) ) { // done in super
         //    return false;
         //}
-        if (!polCoeff.coeffTable.equals(oring.polCoeff.coeffTable)) {
-            return false;
-        }
-        return true;
+        return polCoeff.coeffTable.equals(oring.polCoeff.coeffTable);
     }
 
 

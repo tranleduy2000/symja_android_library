@@ -2,10 +2,12 @@
  * $Id$
  */
 
-package edu.jas.structure;
+package edu.jas.structure.elem;
 
 
 import java.io.Serializable;
+
+import edu.jas.structure.ElemFactory;
 
 
 /**
@@ -27,7 +29,7 @@ public interface Element<C extends Element<C>> extends Comparable<C>, Serializab
      *
      * @return Creates and returns a copy of this Element.
      */
-    public C copy();
+    C copy();
 
 
     /**
@@ -36,7 +38,7 @@ public interface Element<C extends Element<C>> extends Comparable<C>, Serializab
      * @param b
      * @return true if this is equal to b, else false.
      */
-    public boolean equals(Object b);
+    boolean equals(Object b);
 
 
     /**
@@ -44,7 +46,7 @@ public interface Element<C extends Element<C>> extends Comparable<C>, Serializab
      *
      * @return the hashCode.
      */
-    public int hashCode();
+    int hashCode();
 
 
     /**
@@ -54,7 +56,7 @@ public interface Element<C extends Element<C>> extends Comparable<C>, Serializab
      * @param b
      * @return 0 if this is equal to b, -1 if this is less then b, else +1.
      */
-    public int compareTo(C b);
+    int compareTo(C b);
 
 
     /**
@@ -62,7 +64,7 @@ public interface Element<C extends Element<C>> extends Comparable<C>, Serializab
      *
      * @return factory for this Element.
      */
-    public ElemFactory<C> factory();
+    ElemFactory<C> factory();
 
 
     /**
@@ -70,7 +72,7 @@ public interface Element<C extends Element<C>> extends Comparable<C>, Serializab
      *
      * @return script compatible representation for this Element.
      */
-    public String toScript();
+    String toScript();
 
 
     /**
@@ -78,6 +80,6 @@ public interface Element<C extends Element<C>> extends Comparable<C>, Serializab
      *
      * @return script compatible representation for this ElemFactory.
      */
-    public String toScriptFactory();
+    String toScriptFactory();
 
 }

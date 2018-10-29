@@ -16,7 +16,7 @@ import java.util.Random;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.Monomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -218,10 +218,7 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         if (!coFac.equals(a.coFac)) {
             return false;
         }
-        if (!var.equals(a.var)) {
-            return false;
-        }
-        return true;
+        return var.equals(a.var);
     }
 
 

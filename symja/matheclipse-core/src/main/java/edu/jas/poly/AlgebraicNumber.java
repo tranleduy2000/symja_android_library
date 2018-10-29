@@ -6,10 +6,10 @@ package edu.jas.poly;
 
 
 import edu.jas.kern.PrettyPrint;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElem;
-import edu.jas.structure.RingElemImpl;
+import edu.jas.structure.elem.RingElemImpl;
 
 
 /**
@@ -86,7 +86,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     public AlgebraicNumberRing<C> factory() {
         return ring;
@@ -96,7 +96,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
     /**
      * Copy this.
      *
-     * @see edu.jas.structure.Element#copy()
+     * @see Element#copy()
      */
     @Override
     public AlgebraicNumber<C> copy() {
@@ -108,7 +108,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * Is AlgebraicNumber zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
+     * @see RingElem#isZERO()
      */
     public boolean isZERO() {
         return val.equals(ring.ring.getZERO());
@@ -119,7 +119,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * Is AlgebraicNumber one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
+     * @see RingElem#isONE()
      */
     public boolean isONE() {
         return val.equals(ring.ring.getONE());
@@ -130,7 +130,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * Is AlgebraicNumber unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
+     * @see RingElem#isUnit()
      */
     public boolean isUnit() {
         if (isunit > 0) {
@@ -195,7 +195,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
+     * @see Element#toScript()
      */
     @Override
     public String toScript() {
@@ -208,7 +208,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
+     * @see Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -273,7 +273,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * AlgebraicNumber absolute value.
      *
      * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @see RingElem#abs()
      */
     public AlgebraicNumber<C> abs() {
         return new AlgebraicNumber<C>(ring, val.abs());
@@ -317,7 +317,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * AlgebraicNumber negate.
      *
      * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
+     * @see RingElem#negate()
      */
     public AlgebraicNumber<C> negate() {
         return new AlgebraicNumber<C>(ring, val.negate());
@@ -328,7 +328,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * AlgebraicNumber signum.
      *
      * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
+     * @see RingElem#signum()
      */
     public int signum() {
         return val.signum();
@@ -362,7 +362,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      *
      * @return S with S = 1/this if defined.
      * @throws NotInvertibleException if the element is not invertible.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     public AlgebraicNumber<C> inverse() {
         try {

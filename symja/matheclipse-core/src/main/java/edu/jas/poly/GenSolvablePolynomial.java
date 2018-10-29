@@ -12,7 +12,8 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
 
 
 // import edu.jas.application.ResidueSolvablePolynomial;
@@ -100,7 +101,7 @@ public class GenSolvablePolynomial<C extends RingElem<C>> extends GenPolynomial<
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     @Override
     public GenSolvablePolynomialRing<C> factory() {

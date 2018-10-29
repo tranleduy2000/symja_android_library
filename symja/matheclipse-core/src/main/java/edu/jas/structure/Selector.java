@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import edu.jas.structure.elem.RingElem;
+
 /**
  * Selector interface.
  *
@@ -20,6 +22,6 @@ public interface Selector<C extends RingElem<C>> {
      *
      * @return true, if the element is selected, otherwise false.
      */
-    public boolean select(C c);
+    boolean select(C c);
 
 }

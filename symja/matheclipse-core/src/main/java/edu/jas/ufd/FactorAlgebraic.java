@@ -14,7 +14,7 @@ import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -55,7 +55,7 @@ public class FactorAlgebraic<C extends RingElem<C>> extends FactorAbsolute<Algeb
      * @param fac algebraic number factory.
      */
     public FactorAlgebraic(AlgebraicNumberRing<C> fac) {
-        this(fac, FactorFactory.<C>getImplementation(fac.ring.coFac));
+        this(fac, FactorFactory.getImplementation(fac.ring.coFac));
     }
 
 
@@ -134,7 +134,7 @@ public class FactorAlgebraic<C extends RingElem<C>> extends FactorAbsolute<Algeb
             ki++;
             // compute norm with x -> ( y - k x )
             ks = k;
-            res = PolyUfdUtil.<C>norm(P, ks);
+            res = PolyUfdUtil.norm(P, ks);
             //System.out.println("res = " + res);
             if (res.isZERO() || res.isConstant()) {
                 continue;
@@ -172,7 +172,7 @@ public class FactorAlgebraic<C extends RingElem<C>> extends FactorAbsolute<Algeb
         GenPolynomial<AlgebraicNumber<C>> Ni;
         for (GenPolynomial<C> nfi : nfacs) {
             //System.out.println("nfi = " + nfi);
-            Ni = PolyUfdUtil.<C>substituteConvertToAlgebraicCoefficients(pfac, nfi, ks);
+            Ni = PolyUfdUtil.substituteConvertToAlgebraicCoefficients(pfac, nfi, ks);
             if (logger.isInfoEnabled()) {
                 logger.info("Ni = " + Ni);
                 //System.out.println("Pp = " + Pp);

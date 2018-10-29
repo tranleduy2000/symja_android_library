@@ -25,7 +25,7 @@ import edu.jas.gb.SolvableReductionSeq;
 import edu.jas.kern.ComputerThreads;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.QuotPairFactory;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.ValueFactory;
@@ -518,7 +518,7 @@ public class SGBFactory {
             GenPolynomialRing<C> rofac = (GenPolynomialRing<C>) ofac;
             SolvableGroebnerBaseAbstract<GenPolynomial<C>> bbr = new SolvableGroebnerBasePseudoRecSeq<C>(
                     rofac, pli); // not pl
-            bba = (SolvableGroebnerBaseAbstract) bbr;
+            bba = bbr;
             //} else if (ofac instanceof ProductRing) {
             //    ProductRing pfac = (ProductRing) ofac;
             //    if (pfac.onlyFields()) {
@@ -559,7 +559,7 @@ public class SGBFactory {
     public static <C extends RingElem<C>> // interface RingElem not sufficient
     SolvableGroebnerBaseAbstract<C> getProxy(RingFactory<C> fac, PairList<C> pl) {
         if (ComputerThreads.NO_THREADS) {
-            return SGBFactory.<C>getImplementation(fac, pl);
+            return SGBFactory.getImplementation(fac, pl);
         }
         if (debug) {
             logger.debug("proxy fac = " + fac.getClass().getName());

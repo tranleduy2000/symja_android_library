@@ -16,7 +16,7 @@ import edu.jas.poly.Complex;
 import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 // import java.util.Arrays;
@@ -65,9 +65,9 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
             logger.info("sturmSeq = " + S);
         }
         RingFactory<C> cfac = f.ring.coFac;
-        List<C> l = PolyUtil.<C>evaluateMain(cfac, S, a);
-        List<C> r = PolyUtil.<C>evaluateMain(cfac, S, b);
-        long v = RootUtil.<C>signVar(l) - RootUtil.<C>signVar(r);
+        List<C> l = PolyUtil.evaluateMain(cfac, S, a);
+        List<C> r = PolyUtil.evaluateMain(cfac, S, b);
+        long v = RootUtil.signVar(l) - RootUtil.signVar(r);
         //System.out.println("v = " + v);
         //         if (v < 0L) {
         //             v = -v;
@@ -89,9 +89,9 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
         List<GenPolynomial<C>> S = sturmSequence(f, g);
         //System.out.println("S = " + S);
         RingFactory<C> cfac = f.ring.coFac;
-        List<C> l = PolyUtil.<C>evaluateMain(cfac, S, a);
-        List<C> r = PolyUtil.<C>evaluateMain(cfac, S, b);
-        long v = RootUtil.<C>signVar(l) - RootUtil.<C>signVar(r);
+        List<C> l = PolyUtil.evaluateMain(cfac, S, a);
+        List<C> r = PolyUtil.evaluateMain(cfac, S, b);
+        long v = RootUtil.signVar(l) - RootUtil.signVar(r);
         //System.out.println("v = " + v);
 
         long d = f.degree(0);
@@ -161,7 +161,7 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
         //System.out.println("complexRootCount: rl = " + rl + ", il = " + il);
         // only linear polynomials have zero length intervals
         if (rl.isZERO() && il.isZERO()) {
-            Complex<C> e = PolyUtil.<Complex<C>>evaluateMain(a.ring.coFac, a, rect.getSW());
+            Complex<C> e = PolyUtil.evaluateMain(a.ring.coFac, a, rect.getSW());
             if (e.isZERO()) {
                 return 1;
             }
@@ -473,7 +473,6 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
             System.out.println("rectangle, il = " + il + ", iu = " + iu);
             if (complexRootCount(il, f) == 1) {
                 rn = il;
-                ;
             } else { // complexRootCount(iu,f) == 1
                 rn = iu;
             }

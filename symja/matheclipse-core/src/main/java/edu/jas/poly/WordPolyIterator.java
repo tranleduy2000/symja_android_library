@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**

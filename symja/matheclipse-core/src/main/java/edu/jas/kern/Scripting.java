@@ -16,11 +16,8 @@ public class Scripting {
 
     private static Lang script = Lang.Python;
 
-    ;
     private static CAS cas = CAS.JAS;
     private static int precision = -1; // == fraction output
-
-    ;
 
 
     protected Scripting() {
@@ -90,12 +87,12 @@ public class Scripting {
     }
 
 
-    public static enum Lang {
+    public enum Lang {
         Python, Ruby
     }
 
 
-    public static enum CAS {
+    public enum CAS {
         JAS, Math, Sage, Singular
     }
 

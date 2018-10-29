@@ -7,6 +7,9 @@ package edu.jas.arith;
 
 import org.apache.log4j.Logger;
 
+import edu.jas.structure.elem.Element;
+import edu.jas.structure.elem.RingElem;
+
 
 /**
  * Integer BigQuaternion class based on BigRational implementing the RingElem
@@ -173,7 +176,7 @@ public final class BigQuaternionInteger extends BigQuaternion
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see Element#factory()
      */
     @Override
     public BigQuaternionRing factory() {
@@ -194,7 +197,7 @@ public final class BigQuaternionInteger extends BigQuaternion
      * BigQuaternion inverse.
      *
      * @return S with S * this = this * S = 1.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @see RingElem#inverse()
      */
     @Override
     public BigQuaternion inverse() {

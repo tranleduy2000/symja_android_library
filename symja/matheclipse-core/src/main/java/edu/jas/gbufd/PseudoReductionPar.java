@@ -15,7 +15,7 @@ import edu.jas.gb.ReductionAbstract;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -301,12 +301,12 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
                 }
                 GenPolynomial<C> c = P[i].leadingBaseCoefficient();
                 //if (a.remainder(c).isZERO()) { //c.isUnit() ) {
-                if (PolyUtil.<C>baseSparsePseudoRemainder(a, c).isZERO()) {
+                if (PolyUtil.baseSparsePseudoRemainder(a, c).isZERO()) {
                     if (debug) {
                         logger.info("red c = " + c);
                     }
                     //a = a.divide(c);
-                    GenPolynomial<C> b = PolyUtil.<C>basePseudoDivide(a, c);
+                    GenPolynomial<C> b = PolyUtil.basePseudoDivide(a, c);
                     GenPolynomial<GenPolynomial<C>> Sp = S.subtractMultiple(b, f, P[i]);
                     if (e.equals(Sp.leadingExpVector())) { // TODO: avoid
                         //throw new RuntimeException("degree not descending");

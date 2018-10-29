@@ -14,7 +14,7 @@ import edu.jas.arith.ModIntegerRing;
 import edu.jas.arith.ModLong;
 import edu.jas.arith.ModLongRing;
 import edu.jas.kern.ComputerThreads;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -265,7 +265,7 @@ public class GCDFactory {
     @SuppressWarnings("unchecked")
     public static <C extends RingElem<C>> GreatestCommonDivisorAbstract<C> getProxy(RingFactory<C> fac) {
         if (ComputerThreads.NO_THREADS) { // hack for Google app engine
-            return GCDFactory.<C>getImplementation(fac);
+            return GCDFactory.getImplementation(fac);
         }
         GreatestCommonDivisorAbstract/*raw type<C>*/ufd;
         logger.debug("fac = " + fac.getClass().getName());

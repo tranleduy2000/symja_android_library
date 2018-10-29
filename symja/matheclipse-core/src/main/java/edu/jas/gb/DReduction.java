@@ -7,7 +7,7 @@ package edu.jas.gb;
 import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -29,8 +29,8 @@ public interface DReduction<C extends RingElem<C>>
      * @param Bp polynomial.
      * @return gpol(Ap, Bp) the g-polynomial of Ap and Bp.
      */
-    public GenPolynomial<C> GPolynomial(GenPolynomial<C> Ap,
-                                        GenPolynomial<C> Bp);
+    GenPolynomial<C> GPolynomial(GenPolynomial<C> Ap,
+                                 GenPolynomial<C> Bp);
 
 
     /**
@@ -43,7 +43,7 @@ public interface DReduction<C extends RingElem<C>>
      * @param Bp a polynomial.
      * @return gpol(Ap, Bp), the g-Polynomial for Ap and Bp.
      */
-    public GenPolynomial<C>
+    GenPolynomial<C>
     GPolynomial(List<GenPolynomial<C>> S,
                 int i,
                 GenPolynomial<C> Ap,

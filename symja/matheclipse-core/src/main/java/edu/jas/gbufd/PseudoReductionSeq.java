@@ -14,7 +14,7 @@ import edu.jas.gb.ReductionAbstract;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -109,7 +109,7 @@ public class PseudoReductionSeq<C extends RingElem<C>> extends ReductionAbstract
                 f = e.subtract(htl[i]);
                 //logger.info("red div = " + e);
                 @SuppressWarnings("cast")
-                C c = (C) lbc[i];
+                C c = lbc[i];
                 if (a.remainder(c).isZERO()) { //c.isUnit() ) {
                     b = a.divide(c);
                     GenPolynomial<C> Sp = S.subtractMultiple(b, f, p[i]);
@@ -202,14 +202,14 @@ public class PseudoReductionSeq<C extends RingElem<C>> extends ReductionAbstract
                     logger.info("red div = " + f);
                     //logger.info("red a = " + a);
                 }
-                GenPolynomial<C> c = (GenPolynomial<C>) lbc[i];
+                GenPolynomial<C> c = lbc[i];
                 //if (a.remainder(c).isZERO()) { //c.isUnit() ) {
-                if (PolyUtil.<C>baseSparsePseudoRemainder(a, c).isZERO()) { //c.isUnit() ) {
+                if (PolyUtil.baseSparsePseudoRemainder(a, c).isZERO()) { //c.isUnit() ) {
                     if (debug) {
                         logger.info("red c = " + c);
                     }
                     //a = a.divide(c);
-                    b = PolyUtil.<C>basePseudoDivide(a, c);
+                    b = PolyUtil.basePseudoDivide(a, c);
                     GenPolynomial<GenPolynomial<C>> Sp = S.subtractMultiple(b, f, p[i]);
                     if (e.equals(Sp.leadingExpVector())) { // TODO: avoid
                         //throw new RuntimeException("degree not descending");

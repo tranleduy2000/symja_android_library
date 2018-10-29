@@ -12,7 +12,7 @@ import java.util.List;
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.GenWordPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.RingElem;
+import edu.jas.structure.elem.RingElem;
 
 
 /**
@@ -70,7 +70,7 @@ public class WordGroebnerBaseSeq<C extends RingElem<C>> extends WordGroebnerBase
     @Override
     public List<GenWordPolynomial<C>> GB(List<GenWordPolynomial<C>> F) {
         List<GenWordPolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolyUtil.<C>wordMonic(G);
+        G = PolyUtil.wordMonic(G);
         if (G.size() <= 1) {
             return G;
         }
