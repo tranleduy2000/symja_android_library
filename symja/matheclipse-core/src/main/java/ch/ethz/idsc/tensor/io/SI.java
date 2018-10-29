@@ -17,7 +17,7 @@ public class SI {
             "# cd\n" +
             "\n" +
             "# SI derived units with special names and symbols\n" +
-            "rad=1\n" +
+            "#rad=1\n" +
             "Hz =1[s^-1]\n" +
             "N  =1[m*kg*s^-2]\n" +
             "Pa =1[m^-1*kg*s^-2]\n" +
@@ -46,8 +46,10 @@ public class SI {
             "\n" +
             "# helper units\n" +
             "# 0.017453292519943295769236907684886127134428718885417`34\n" +
-            "deg=0.017453292519943295\n" +
-            "\n" +
+            "#deg=0.017453292519943295\n" +
+            "deg=Pi/180[rad]\n" +
+            "degree=Pi/180[rad]\n" +
+            "grad=Pi/180[rad]\n" +
             "# ---\n" +
             "\n" +
             "km =1000[m]\n" +
@@ -136,5 +138,5 @@ public class SI {
             "\n" +
             "# ---\n" +
             "\n" +
-            "knots=463/900[m*s^-1]\n";
+            "knots=463/900[m*s^-1]";
 }
