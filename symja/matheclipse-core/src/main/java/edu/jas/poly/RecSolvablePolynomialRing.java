@@ -196,7 +196,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
         GenSolvablePolynomialRing<C> fring = (GenSolvablePolynomialRing<C>) rf;
         GenSolvablePolynomialRing<C> pfd = fring.distribute();
         // add coefficient relations:
-        List<GenPolynomial<GenPolynomial<C>>> rl = (List<GenPolynomial<GenPolynomial<C>>>) PolynomialList
+        List<GenPolynomial<GenPolynomial<C>>> rl = PolynomialList
                 .castToList(rf.coeffTable.relationList());
         List<GenPolynomial<C>> rld = PolyUtil.distribute(pfd, rl);
         pfd.table.addRelations(rld);

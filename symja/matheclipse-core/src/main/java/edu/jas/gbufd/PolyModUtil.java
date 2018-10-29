@@ -61,7 +61,7 @@ public class PolyModUtil {
         A.add(n);
         List<GenSolvablePolynomial<C>> B = new ArrayList<GenSolvablePolynomial<C>>(1);
         B.add(d);
-        List<GenSolvablePolynomial<C>> c = PolyGBUtil.<C>intersect(r, A, B);
+        List<GenSolvablePolynomial<C>> c = PolyGBUtil.intersect(r, A, B);
         //if (c.size() != 1) {
         // SolvableSyzygyAbstract<C> sz = new SolvableSyzygyAbstract<C>();
         // GenSolvablePolynomial<C>[] oc = sz.leftOreCond(n,d);
@@ -209,18 +209,18 @@ public class PolyModUtil {
     public static <C extends GcdRingElem<C>> GenSolvablePolynomial<C>[] syzGcdCofactors(
             GenSolvablePolynomialRing<C> r, GenSolvablePolynomial<C> n, GenSolvablePolynomial<C> d) {
         GenSolvablePolynomial<C>[] res = (GenSolvablePolynomial<C>[]) new GenSolvablePolynomial[3];
-        res[0] = PolyModUtil.<C>syzGcd(r, n, d);
+        res[0] = PolyModUtil.syzGcd(r, n, d);
         res[1] = n;
         res[2] = d;
         if (res[0].isONE()) {
             return res;
         }
-        GenSolvablePolynomial<C>[] nqr = PolyGBUtil.<C>quotientRemainder(n, res[0]);
+        GenSolvablePolynomial<C>[] nqr = PolyGBUtil.quotientRemainder(n, res[0]);
         if (!nqr[1].isZERO()) {
             res[0] = r.getONE();
             return res;
         }
-        GenSolvablePolynomial<C>[] dqr = PolyGBUtil.<C>quotientRemainder(d, res[0]);
+        GenSolvablePolynomial<C>[] dqr = PolyGBUtil.quotientRemainder(d, res[0]);
         if (!dqr[1].isZERO()) {
             res[0] = r.getONE();
             return res;
@@ -245,7 +245,7 @@ public class PolyModUtil {
         A.add(n);
         List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>(1);
         B.add(d);
-        List<GenPolynomial<C>> c = PolyGBUtil.<C>intersect(r, A, B);
+        List<GenPolynomial<C>> c = PolyGBUtil.intersect(r, A, B);
         if (c.size() != 1) {
             logger.warn("lcm not uniqe: " + c);
             //throw new RuntimeException("lcm not uniqe: " + c);
@@ -279,7 +279,7 @@ public class PolyModUtil {
         }
         GenPolynomial<C> p = n.multiply(d);
         GenPolynomial<C> lcm = syzLcm(r, n, d);
-        GenPolynomial<C> gcd = PolyUtil.<C>basePseudoDivide(p, lcm);
+        GenPolynomial<C> gcd = PolyUtil.basePseudoDivide(p, lcm);
         return gcd;
     }
 

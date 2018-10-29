@@ -38,7 +38,7 @@ public abstract class DHTTransport<K, V> implements Serializable {
      * @param key
      * @param value
      */
-    public static <K, V> DHTTransport<K, V> create(K key, V value) throws IOException {
+    public static <K, V> DHTTransport<K, V> create(K key, V value) {
         switch (stor) {
             case plain:
                 return new DHTTransportPlain<K, V>(key, value);

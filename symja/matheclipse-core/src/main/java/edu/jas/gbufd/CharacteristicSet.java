@@ -28,7 +28,7 @@ public interface CharacteristicSet<C extends GcdRingElem<C>> extends Serializabl
      * @param A list of generic polynomials.
      * @return charSet(A) with at most one polynomial per main variable.
      */
-    public List<GenPolynomial<C>> characteristicSet(List<GenPolynomial<C>> A);
+    List<GenPolynomial<C>> characteristicSet(List<GenPolynomial<C>> A);
 
 
     /**
@@ -37,7 +37,7 @@ public interface CharacteristicSet<C extends GcdRingElem<C>> extends Serializabl
      * @param A list of generic polynomials.
      * @return true, if A is (at least a simple) characteristic set, else false.
      */
-    public boolean isCharacteristicSet(List<GenPolynomial<C>> A);
+    boolean isCharacteristicSet(List<GenPolynomial<C>> A);
 
 
     /**
@@ -49,6 +49,6 @@ public interface CharacteristicSet<C extends GcdRingElem<C>> extends Serializabl
      * @return characteristicSetRemainder(A, P) or
      * characteristicSetReductionCoeff(A,characteristicSetRemainder(A,P)) depending on the algorithm.
      */
-    public GenPolynomial<C> characteristicSetReduction(List<GenPolynomial<C>> A, GenPolynomial<C> P);
+    GenPolynomial<C> characteristicSetReduction(List<GenPolynomial<C>> A, GenPolynomial<C> P);
 
 }

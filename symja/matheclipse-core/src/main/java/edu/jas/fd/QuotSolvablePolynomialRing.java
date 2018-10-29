@@ -308,10 +308,7 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         //if ( ! table.equals(oring.table) ) { // done in super
         //    return false;
         //}
-        if (!polCoeff.coeffTable.equals(oring.polCoeff.coeffTable)) {
-            return false;
-        }
-        return true;
+        return polCoeff.coeffTable.equals(oring.polCoeff.coeffTable);
     }
 
 

@@ -122,7 +122,7 @@ public class SquarefreeFactory {
      */
     public static <C extends GcdRingElem<C>> SquarefreeAbstract<AlgebraicNumber<C>> getImplementation(
             AlgebraicNumberRing<C> fac) {
-        PolyUfdUtil.<C>ensureFieldProperty(fac);
+        PolyUfdUtil.ensureFieldProperty(fac);
         if (fac.isField()) {
             if (fac.characteristic().signum() == 0) {
                 return new SquarefreeFieldChar0<AlgebraicNumber<C>>(fac);

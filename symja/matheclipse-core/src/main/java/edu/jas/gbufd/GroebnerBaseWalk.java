@@ -82,7 +82,7 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
      * @param coFac coefficient ring of polynomial ring.
      */
     public GroebnerBaseWalk(RingFactory<C> coFac) {
-        this(GBFactory.<C>getImplementation(coFac));
+        this(GBFactory.getImplementation(coFac));
     }
 
 
@@ -93,7 +93,7 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
      * @param t1    start term order.
      */
     public GroebnerBaseWalk(RingFactory<C> coFac, TermOrder t1) {
-        this(GBFactory.<C>getImplementation(coFac), t1);
+        this(GBFactory.getImplementation(coFac), t1);
     }
 
 
@@ -143,7 +143,7 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
      */
     public List<GenPolynomial<C>> GB(int modv, List<GenPolynomial<C>> F) {
         List<GenPolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolyUtil.<C>monic(G);
+        G = PolyUtil.monic(G);
         if (G == null || G.size() == 0) {
             return G;
         }
@@ -168,7 +168,7 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
 
         // compute graded / start term order Groebner base
         if (sgb == null) {
-            sgb = GBFactory.<C>getImplementation(pfac.coFac, strategy);
+            sgb = GBFactory.getImplementation(pfac.coFac, strategy);
         }
         List<GenPolynomial<C>> Gp = sgb.GB(modv, Fp);
         logger.info("graded / start GB = " + Gp);

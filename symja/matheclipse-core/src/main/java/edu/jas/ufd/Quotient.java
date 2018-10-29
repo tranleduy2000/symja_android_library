@@ -197,10 +197,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
      * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
-        if (num.isZERO()) {
-            return false;
-        }
-        return true;
+        return !num.isZERO();
     }
 
 

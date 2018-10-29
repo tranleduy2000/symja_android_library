@@ -139,7 +139,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      * @return list of generators for the algebraic structure.
      */
     public List<SolvableQuotient<C>> generators() {
-        List<GenSolvablePolynomial<C>> pgens = PolynomialList.<C>castToSolvableList(ring.generators());
+        List<GenSolvablePolynomial<C>> pgens = PolynomialList.castToSolvableList(ring.generators());
         List<SolvableQuotient<C>> gens = new ArrayList<SolvableQuotient<C>>(pgens.size() * 2 - 1);
         GenSolvablePolynomial<C> one = ring.getONE();
         for (GenSolvablePolynomial<C> p : pgens) {

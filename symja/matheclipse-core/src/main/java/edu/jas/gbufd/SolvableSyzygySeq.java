@@ -233,9 +233,9 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
                     continue;
                 }
                 // pi has wrong type:
-                List<GenPolynomial<C>> pi = blas.scalarProduct(si, PolynomialList.<C>castToList(ai));
+                List<GenPolynomial<C>> pi = blas.scalarProduct(si, PolynomialList.castToList(ai));
                 //System.out.println("pi = " + pi);
-                rf = PolynomialList.<C>castToSolvableList(blas.vectorAdd(PolynomialList.<C>castToList(rf),
+                rf = PolynomialList.castToSolvableList(blas.vectorAdd(PolynomialList.castToList(rf),
                         pi));
             }
             if (it.hasNext() || jt.hasNext()) {
@@ -272,9 +272,9 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
                     continue;
                 }
                 //pi has wrong type, should be: List<GenSolvablePolynomial<C>>
-                List<GenPolynomial<C>> pi = blas.scalarProduct(si, PolynomialList.<C>castToList(ai));
+                List<GenPolynomial<C>> pi = blas.scalarProduct(si, PolynomialList.castToList(ai));
                 //System.out.println("pi = " + pi);
-                rf = PolynomialList.<C>castToSolvableList(blas.vectorAdd(PolynomialList.<C>castToList(rf),
+                rf = PolynomialList.castToSolvableList(blas.vectorAdd(PolynomialList.castToList(rf),
                         pi));
             }
             if (it.hasNext() || jt.hasNext()) {
@@ -322,7 +322,7 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
                 j++;
             }
             M2.add(r2i);
-            if (!blas.isZero(PolynomialList.<C>castToList(r2i))) {
+            if (!blas.isZero(PolynomialList.castToList(r2i))) {
                 sf.add(r2i);
             }
             i++;
@@ -558,7 +558,7 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
         }
         //wrong: blas.scalarProduct(G2,exgb.G2F.get(m));
         GenSolvablePolynomial<C> min2 = (GenSolvablePolynomial<C>) blas.scalarProduct(
-                PolynomialList.<C>castToList(exgb.G2F.get(m)), PolynomialList.<C>castToList(G2));
+                PolynomialList.castToList(exgb.G2F.get(m)), PolynomialList.castToList(G2));
         logger.info("min(den): " + min + ", min(num): " + min2 + ", m = " + m + ", " + exgb.G2F.get(m));
         // opposite order
         GenSolvablePolynomial<C> n = min2; // nominator
