@@ -585,7 +585,6 @@ public abstract class DiskDataStorage
                 getRandomAccessFile().setLength(size);
             } catch (IOException ioe) {
                 // Probably out of disk space - run garbage collection and process reference queue to delete unused files, then retry
-                System.gc();
                 forceFreeFileStorage();
                 getRandomAccessFile().setLength(size);
             }
