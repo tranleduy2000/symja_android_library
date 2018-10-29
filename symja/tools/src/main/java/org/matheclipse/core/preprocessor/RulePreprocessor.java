@@ -2,11 +2,9 @@ package org.matheclipse.core.preprocessor;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.util.ArraySet;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.patternmatching.RulesData;
 
@@ -82,7 +80,6 @@ public class RulePreprocessor {
 	private static void convertExpr(IExpr expr, String rulePostfix, final PrintWriter out, String symbolName) {
 		boolean last;
 		StringBuilder buffer = new StringBuilder();
-		ArraySet<ISymbol> headerSymbols = new ArraySet<ISymbol>();
 		if (expr.isAST()) {
 			IAST list = (IAST) expr;
 			if (symbolName != null) {
