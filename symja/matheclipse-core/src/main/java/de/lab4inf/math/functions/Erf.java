@@ -68,7 +68,6 @@ public class Erf extends L4MFunction {
     static final double SQRPI = 1. / PI_SQRT;
     static final double X_INF = Double.MAX_VALUE;
 
-    ;
     static final double X_MIN = Double.MIN_VALUE;
     // private static final double X_NEG = -9.38241396824444;
     static final double X_NEG = -sqrt(log(X_INF / 2));
@@ -376,7 +375,7 @@ public class Erf extends L4MFunction {
     /**
      * Enumeration to switch between the Cody (the default) and the  A&amp;ST algorithm.
      */
-    public static enum Type {
+    public enum Type {
         AS("erf is using A&S 7.1.5/7.1.26 with error 1.E-7"), CODY("erf is using W.J. Cody algorithm");
         private final String msg;
 

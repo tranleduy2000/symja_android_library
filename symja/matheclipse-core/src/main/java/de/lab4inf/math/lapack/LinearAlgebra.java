@@ -3128,12 +3128,8 @@ public final class LinearAlgebra extends L4MObject {
             // all eigenvalues are positive
             return true;
         }
-        if (max < 0) {
-            // all eigenvalues are negative
-            return true;
-        }
+        return max < 0;
         // exact result is not known by this method...
-        return false;
     }
 
     /**

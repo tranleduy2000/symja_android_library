@@ -46,14 +46,14 @@ public interface Solver {
      *
      * @return the shouldThrowSingular
      */
-    public boolean isShouldThrowSingular();
+    boolean isShouldThrowSingular();
 
     /**
      * If set to true a numerical singular diagonal element forces an exception.
      *
      * @param throwSingular flag indicating exception throwing
      */
-    public void setShouldThrowSingular(boolean throwSingular);
+    void setShouldThrowSingular(boolean throwSingular);
 
     /*************  single precision calculus   ***********************************/
     /**

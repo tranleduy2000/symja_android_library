@@ -57,8 +57,6 @@ public class FirstOrderSystemSolver extends RKFSolver implements FirstOrderOdeSy
         this(Solver.RungeKuttaFehlberg);
     }
 
-    ;
-
     /**
      * Solve the set of equations using the given solver method.
      *
@@ -270,7 +268,7 @@ public class FirstOrderSystemSolver extends RKFSolver implements FirstOrderOdeSy
      * Enumeration of possible methods.
      * Default is adaptive Runge-Kutta-Fehlberg.
      */
-    public static enum Solver {
+    public enum Solver {
         /**
          * Flag for Runge-Kutta method.
          */

@@ -255,6 +255,5 @@ public class IncompleteGamma extends L4MFunction {
         }
     }
 
-    ;
 }
  

@@ -955,8 +955,6 @@ public abstract class GenericFitter extends L4MObject implements DataFitter {
         } while (!hasConverged(a, ao, eps, ++n, MAX_ITERATIONS));
     }
 
-    ;
-
     /**
      * If the algorithm begins to converge the penalty factor is reduced.
      *

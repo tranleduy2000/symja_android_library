@@ -721,8 +721,6 @@ public final class ProbabilityDistribution extends L4MObject {
         return y;
     }
 
-    ;
-
     /**
      * Calculate the cumulative student t-distribution with n degrees of freedom.
      *
@@ -828,8 +826,6 @@ public final class ProbabilityDistribution extends L4MObject {
         x = quantile(x, fct);
         return x;
     }
-
-    ;
 
     /**
      * Internal helper for the continued fraction of the normal CDF

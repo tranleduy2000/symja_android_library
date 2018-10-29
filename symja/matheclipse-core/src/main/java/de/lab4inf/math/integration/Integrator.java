@@ -58,7 +58,6 @@ public final class Integrator extends L4MObject implements de.lab4inf.math.Integ
      */
     private static final double EPS = 1.E-8;
 
-    ;
     /**
      * minimal number of interval splits.
      */

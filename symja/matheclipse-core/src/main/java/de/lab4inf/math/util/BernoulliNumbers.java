@@ -66,8 +66,6 @@ public final class BernoulliNumbers {
     private BernoulliNumbers() {
     }
 
-    ;
-
     /**
      * Return the Bernoulli number B(n).
      *

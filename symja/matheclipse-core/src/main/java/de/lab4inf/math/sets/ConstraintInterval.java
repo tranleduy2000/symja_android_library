@@ -88,7 +88,7 @@ public class ConstraintInterval extends IntervalNumber {
     @Override
     public Interval clone() {
         //return new ConstraintInterval(this);
-        return (Interval) super.clone();
+        return super.clone();
     }
 
     /**

@@ -318,10 +318,7 @@ public abstract class L4MObject {
             return false;
         } else if (this == obj) {
             return true;
-        } else if (getClass() == obj.getClass()) {
-            return true;
-        }
-        return false;
+        } else return getClass() == obj.getClass();
     }
 
     /*

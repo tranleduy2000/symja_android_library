@@ -441,7 +441,6 @@ public final class CarlsonIntegral extends L4MObject {
             default:
                 throw new IllegalArgumentException("unkown mod: " + mod);
         }
-        ;
         return rf(1 - m, 1);
     }
 
@@ -474,7 +473,6 @@ public final class CarlsonIntegral extends L4MObject {
             default:
                 throw new IllegalArgumentException("unkown mod: " + mod);
         }
-        ;
         return 2 * rg(1 - m, 1);
     }
 

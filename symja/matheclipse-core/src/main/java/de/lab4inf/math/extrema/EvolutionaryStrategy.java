@@ -39,7 +39,7 @@ public enum EvolutionaryStrategy {
 
     private final String type;
 
-    private EvolutionaryStrategy(final String type) {
+    EvolutionaryStrategy(final String type) {
         this.type = type;
     }
 
