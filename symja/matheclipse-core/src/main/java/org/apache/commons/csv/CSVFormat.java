@@ -17,18 +17,6 @@
 
 package org.apache.commons.csv;
 
-import static org.apache.commons.csv.Constants.BACKSLASH;
-import static org.apache.commons.csv.Constants.COMMA;
-import static org.apache.commons.csv.Constants.COMMENT;
-import static org.apache.commons.csv.Constants.EMPTY;
-import static org.apache.commons.csv.Constants.CR;
-import static org.apache.commons.csv.Constants.CRLF;
-import static org.apache.commons.csv.Constants.DOUBLE_QUOTE_CHAR;
-import static org.apache.commons.csv.Constants.LF;
-import static org.apache.commons.csv.Constants.PIPE;
-import static org.apache.commons.csv.Constants.SP;
-import static org.apache.commons.csv.Constants.TAB;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,14 +25,24 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.apache.commons.csv.Constants.BACKSLASH;
+import static org.apache.commons.csv.Constants.COMMA;
+import static org.apache.commons.csv.Constants.COMMENT;
+import static org.apache.commons.csv.Constants.CR;
+import static org.apache.commons.csv.Constants.CRLF;
+import static org.apache.commons.csv.Constants.DOUBLE_QUOTE_CHAR;
+import static org.apache.commons.csv.Constants.EMPTY;
+import static org.apache.commons.csv.Constants.LF;
+import static org.apache.commons.csv.Constants.PIPE;
+import static org.apache.commons.csv.Constants.SP;
+import static org.apache.commons.csv.Constants.TAB;
 
 /**
  * Specifies the format of a CSV file and parses input.
@@ -963,23 +961,6 @@ public final class CSVFormat implements Serializable {
     }
 
     /**
-     * Prints to the specified output.
-     *
-     * <p>
-     * See also {@link CSVPrinter}.
-     * </p>
-     *
-     * @param out
-     *            the output.
-     * @return a printer to an output.
-     * @throws IOException
-     *             thrown if the optional header cannot be printed.
-     */
-    public CSVPrinter print(final Appendable out) throws IOException {
-        return new CSVPrinter(out, this);
-    }
-
-    /**
      * Prints to the {@link System#out}.
      *
      * <p>
@@ -1015,26 +996,6 @@ public final class CSVFormat implements Serializable {
     public CSVPrinter print(final File out, Charset charset) throws IOException {
         // The writer will be closed when close() is called.
         return new CSVPrinter(new OutputStreamWriter(new FileOutputStream(out), charset), this);
-    }
-
-    /**
-     * Prints to the specified output.
-     *
-     * <p>
-     * See also {@link CSVPrinter}.
-     * </p>
-     *
-     * @param out
-     *            the output.
-     * @param charset
-     *            A charset.
-     * @return a printer to an output.
-     * @throws IOException
-     *             thrown if the optional header cannot be printed.
-     * @since 1.5
-     */
-    public CSVPrinter print(final Path out, Charset charset) throws IOException {
-        return print(Files.newBufferedWriter(out, charset));
     }
 
     /**
