@@ -126,12 +126,4 @@ public interface BuilderFactory
     public void shutdown()
         throws ApfloatRuntimeException;
 
-    /**
-     * Do garbage collection and related things such as empty any reference queues.
-     *
-     * @since 1.6.2
-     */
-
-    public void gc()
-        throws ApfloatRuntimeException;
 }

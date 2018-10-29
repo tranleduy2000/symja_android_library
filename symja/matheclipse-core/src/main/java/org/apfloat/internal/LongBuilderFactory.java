@@ -100,15 +100,6 @@ public class LongBuilderFactory
         DiskDataStorage.cleanUp();
     }
 
-    public void gc()
-        throws ApfloatRuntimeException
-    {
-        System.gc();
-        System.gc();
-        System.runFinalization();
-        DiskDataStorage.gc();
-    }
-
     private static ApfloatBuilder apfloatBuilder = new LongApfloatBuilder();
     private static DataStorageBuilder dataStorageBuilder = new LongDataStorageBuilder();
     private static AdditionBuilder<Long> additionBuilder = new LongAdditionBuilder();

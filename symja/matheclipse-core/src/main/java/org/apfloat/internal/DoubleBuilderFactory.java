@@ -100,15 +100,6 @@ public class DoubleBuilderFactory
         DiskDataStorage.cleanUp();
     }
 
-    public void gc()
-        throws ApfloatRuntimeException
-    {
-        System.gc();
-        System.gc();
-        System.runFinalization();
-        DiskDataStorage.gc();
-    }
-
     private static ApfloatBuilder apfloatBuilder = new DoubleApfloatBuilder();
     private static DataStorageBuilder dataStorageBuilder = new DoubleDataStorageBuilder();
     private static AdditionBuilder<Double> additionBuilder = new DoubleAdditionBuilder();

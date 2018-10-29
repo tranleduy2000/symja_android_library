@@ -100,15 +100,6 @@ public class FloatBuilderFactory
         DiskDataStorage.cleanUp();
     }
 
-    public void gc()
-        throws ApfloatRuntimeException
-    {
-        System.gc();
-        System.gc();
-        System.runFinalization();
-        DiskDataStorage.gc();
-    }
-
     private static ApfloatBuilder apfloatBuilder = new FloatApfloatBuilder();
     private static DataStorageBuilder dataStorageBuilder = new FloatDataStorageBuilder();
     private static AdditionBuilder<Float> additionBuilder = new FloatAdditionBuilder();
