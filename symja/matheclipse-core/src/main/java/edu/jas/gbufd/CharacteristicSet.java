@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -19,7 +19,7 @@ import edu.jas.structure.GcdRingElem;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public interface CharacteristicSet<C extends GcdRingElem<C>> extends Serializable {
+public interface CharacteristicSet<C extends RingElem<C>> extends Serializable {
 
 
     /**

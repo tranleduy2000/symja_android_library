@@ -12,7 +12,7 @@ import java.util.List;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.ModuleList;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -22,7 +22,7 @@ import edu.jas.structure.GcdRingElem;
  * @deprecated use respective methods from GroebnerBaseAbstract
  */
 @Deprecated
-public abstract class ModGroebnerBaseAbstract<C extends GcdRingElem<C>> implements ModGroebnerBase<C> {
+public abstract class ModGroebnerBaseAbstract<C extends RingElem<C>> implements ModGroebnerBase<C> {
 
 
     private static final Logger logger = Logger.getLogger(ModGroebnerBaseAbstract.class);

@@ -12,7 +12,7 @@ package edu.jas.structure;
  * @author Heinz Kredel
  */
 
-public interface AbelianGroupElem<C extends AbelianGroupElem<C>> extends Element<C> {
+public interface AbelianGroupElem<C extends Element<C>> extends Element<C> {
 
 
     /**

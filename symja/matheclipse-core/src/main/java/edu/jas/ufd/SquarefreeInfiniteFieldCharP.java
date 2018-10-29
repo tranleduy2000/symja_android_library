@@ -16,7 +16,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.Monomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -26,7 +26,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends SquarefreeFieldCharP<Quotient<C>> {
+public class SquarefreeInfiniteFieldCharP<C extends RingElem<C>> extends SquarefreeFieldCharP<Quotient<C>> {
 
 
     private static final Logger logger = Logger.getLogger(SquarefreeInfiniteFieldCharP.class);

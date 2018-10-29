@@ -17,7 +17,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -43,7 +43,7 @@ public class PolyModUtil {
      * @param d second solvable polynomial.
      * @return lcm(n, d)
      */
-    public static <C extends GcdRingElem<C>> GenSolvablePolynomial<C> syzLcm(GenSolvablePolynomialRing<C> r,
+    public static <C extends RingElem<C>> GenSolvablePolynomial<C> syzLcm(GenSolvablePolynomialRing<C> r,
                                                                              GenSolvablePolynomial<C> n, GenSolvablePolynomial<C> d) {
         if (n.isZERO()) {
             return n;
@@ -98,7 +98,7 @@ public class PolyModUtil {
      * @param d second solvable polynomial.
      * @return gcd(n, d)
      */
-    public static <C extends GcdRingElem<C>> GenSolvablePolynomial<C> syzGcd(GenSolvablePolynomialRing<C> r,
+    public static <C extends RingElem<C>> GenSolvablePolynomial<C> syzGcd(GenSolvablePolynomialRing<C> r,
                                                                              GenSolvablePolynomial<C> n, GenSolvablePolynomial<C> d) {
         return syzLeftGcd(r, n, d);
     }
@@ -112,7 +112,7 @@ public class PolyModUtil {
      * @param d second solvable polynomial.
      * @return gcd(n, d)
      */
-    public static <C extends GcdRingElem<C>> GenSolvablePolynomial<C> syzLeftGcd(
+    public static <C extends RingElem<C>> GenSolvablePolynomial<C> syzLeftGcd(
             GenSolvablePolynomialRing<C> r, GenSolvablePolynomial<C> n, GenSolvablePolynomial<C> d) {
 
         if (n.isZERO()) {
@@ -158,7 +158,7 @@ public class PolyModUtil {
      * @param d second solvable polynomial.
      * @return gcd(n, d)
      */
-    public static <C extends GcdRingElem<C>> GenSolvablePolynomial<C> syzRightGcd(
+    public static <C extends RingElem<C>> GenSolvablePolynomial<C> syzRightGcd(
             GenSolvablePolynomialRing<C> r, GenSolvablePolynomial<C> n, GenSolvablePolynomial<C> d) {
 
         if (n.isZERO()) {
@@ -206,7 +206,7 @@ public class PolyModUtil {
      * @return [ g=gcd(n,d), n/g, d/g ]
      */
     @SuppressWarnings({"unchecked", "cast"})
-    public static <C extends GcdRingElem<C>> GenSolvablePolynomial<C>[] syzGcdCofactors(
+    public static <C extends RingElem<C>> GenSolvablePolynomial<C>[] syzGcdCofactors(
             GenSolvablePolynomialRing<C> r, GenSolvablePolynomial<C> n, GenSolvablePolynomial<C> d) {
         GenSolvablePolynomial<C>[] res = (GenSolvablePolynomial<C>[]) new GenSolvablePolynomial[3];
         res[0] = PolyModUtil.<C>syzGcd(r, n, d);
@@ -239,7 +239,7 @@ public class PolyModUtil {
      * @param d second polynomial.
      * @return lcm(n, d)
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<C> syzLcm(GenPolynomialRing<C> r,
+    public static <C extends RingElem<C>> GenPolynomial<C> syzLcm(GenPolynomialRing<C> r,
                                                                      GenPolynomial<C> n, GenPolynomial<C> d) {
         List<GenPolynomial<C>> A = new ArrayList<GenPolynomial<C>>(1);
         A.add(n);
@@ -263,7 +263,7 @@ public class PolyModUtil {
      * @param d second polynomial.
      * @return gcd(n, d)
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<C> syzGcd(GenPolynomialRing<C> r,
+    public static <C extends RingElem<C>> GenPolynomial<C> syzGcd(GenPolynomialRing<C> r,
                                                                      GenPolynomial<C> n, GenPolynomial<C> d) {
         if (n.isZERO()) {
             return d;

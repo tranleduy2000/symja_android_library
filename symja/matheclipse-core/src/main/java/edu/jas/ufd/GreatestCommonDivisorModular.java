@@ -18,7 +18,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -29,7 +29,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class GreatestCommonDivisorModular<MOD extends GcdRingElem<MOD> & Modular> extends
+public class GreatestCommonDivisorModular<MOD extends RingElem<MOD> & Modular> extends
         GreatestCommonDivisorAbstract<BigInteger> {
 
 

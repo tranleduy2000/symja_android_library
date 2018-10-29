@@ -18,7 +18,7 @@ import java.util.Random;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.QuotPairFactory;
 import edu.jas.structure.RingElem;
@@ -42,8 +42,8 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPolynomial<D>>,
-        D extends GcdRingElem<D>>
+public class QLRSolvablePolynomialRing<C extends RingElem<C> & QuotPair<GenPolynomial<D>>,
+        D extends RingElem<D>>
         extends GenSolvablePolynomialRing<C> {
 
 

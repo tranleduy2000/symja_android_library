@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
@@ -20,7 +20,7 @@ import edu.jas.structure.RingFactory;
 
 /**
  * BigInteger class to make java.math.BigInteger available with RingElem
- * respectively the GcdRingElem interface. Objects of this class are immutable.
+ * respectively the RingElem interface. Objects of this class are immutable.
  * The SAC2 static methods are also provided.
  *
  * @author Heinz Kredel
@@ -28,7 +28,7 @@ import edu.jas.structure.RingFactory;
  */
 
 public final class BigInteger extends RingElemImpl<BigInteger>
-        implements GcdRingElem<BigInteger>, RingFactory<BigInteger>, Iterable<BigInteger>, Rational {
+        implements RingElem<BigInteger>, RingFactory<BigInteger>, Iterable<BigInteger>, Rational {
 
 
     /**

@@ -18,7 +18,7 @@ import edu.jas.gb.Pair;
 import edu.jas.gb.PairList;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -37,7 +37,7 @@ import edu.jas.util.ThreadPool;
  * @see GBFactory
  */
 
-public class GroebnerBasePseudoParallel<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
+public class GroebnerBasePseudoParallel<C extends RingElem<C>> extends GroebnerBaseAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GroebnerBasePseudoParallel.class);
@@ -335,7 +335,7 @@ public class GroebnerBasePseudoParallel<C extends GcdRingElem<C>> extends Groebn
 /**
  * Pseudo GB Reducing worker threads.
  */
-class PseudoReducer<C extends GcdRingElem<C>> implements Runnable {
+class PseudoReducer<C extends RingElem<C>> implements Runnable {
 
 
     private static final Logger logger = Logger.getLogger(PseudoReducer.class);
@@ -468,7 +468,7 @@ class PseudoReducer<C extends GcdRingElem<C>> implements Runnable {
 /**
  * Pseudo Reducing worker threads for minimal GB.
  */
-class PseudoMiReducer<C extends GcdRingElem<C>> implements Runnable {
+class PseudoMiReducer<C extends RingElem<C>> implements Runnable {
 
 
     private static final Logger logger = Logger.getLogger(PseudoMiReducer.class);

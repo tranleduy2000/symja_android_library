@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -44,7 +44,7 @@ import edu.jas.structure.GcdRingElem;
  * @see FactorFactory#getImplementation
  */
 
-public interface Factorization<C extends GcdRingElem<C>> extends Serializable {
+public interface Factorization<C extends RingElem<C>> extends Serializable {
 
 
     /**

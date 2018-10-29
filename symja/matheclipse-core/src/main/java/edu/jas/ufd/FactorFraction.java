@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.QuotPairFactory;
 
@@ -28,8 +28,8 @@ import edu.jas.structure.QuotPairFactory;
  * @author Heinz Kredel
  */
 
-public class FactorFraction<C extends GcdRingElem<C>,
-        D extends GcdRingElem<D> & QuotPair<GenPolynomial<C>>> {
+public class FactorFraction<C extends RingElem<C>,
+        D extends RingElem<D> & QuotPair<GenPolynomial<C>>> {
 
 
     private static final Logger logger = Logger.getLogger(FactorFraction.class);

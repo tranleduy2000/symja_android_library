@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -22,7 +22,7 @@ import edu.jas.structure.GcdRingElem;
  * @author Heinz Kredel
  */
 
-public class Integral<C extends GcdRingElem<C>> implements Serializable {
+public class Integral<C extends RingElem<C>> implements Serializable {
 
 
     /**

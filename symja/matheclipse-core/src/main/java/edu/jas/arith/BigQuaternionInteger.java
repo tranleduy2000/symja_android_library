@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
  */
 
 public final class BigQuaternionInteger extends BigQuaternion
-// implements StarRingElem<BigQuaternion>, GcdRingElem<BigQuaternion> 
+// implements StarRingElem<BigQuaternion>, RingElem<BigQuaternion>
 {
 
 

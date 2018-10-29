@@ -23,7 +23,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.TermOrderOptimization;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.util.KsubSet;
 
@@ -40,7 +40,7 @@ import edu.jas.util.KsubSet;
  * @see FactorFactory
  */
 
-public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factorization<C> {
+public abstract class FactorAbstract<C extends RingElem<C>> implements Factorization<C> {
 
 
     private static final Logger logger = Logger.getLogger(FactorAbstract.class);

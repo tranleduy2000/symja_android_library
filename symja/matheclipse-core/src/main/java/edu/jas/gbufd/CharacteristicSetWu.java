@@ -15,7 +15,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OrderedPolynomialList;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
 
@@ -27,7 +27,7 @@ import edu.jas.ufd.GreatestCommonDivisorAbstract;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public class CharacteristicSetWu<C extends GcdRingElem<C>> implements CharacteristicSet<C> {
+public class CharacteristicSetWu<C extends RingElem<C>> implements CharacteristicSet<C> {
 
 
     private static final Logger logger = Logger.getLogger(CharacteristicSetWu.class);

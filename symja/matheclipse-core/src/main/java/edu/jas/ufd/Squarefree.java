@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -43,7 +43,7 @@ import edu.jas.structure.GcdRingElem;
  * @see edu.jas.ufd.SquarefreeFactory#getImplementation
  */
 
-public interface Squarefree<C extends GcdRingElem<C>> extends Serializable {
+public interface Squarefree<C extends RingElem<C>> extends Serializable {
 
 
     /**

@@ -7,7 +7,7 @@ package edu.jas.poly;
 
 import org.apache.log4j.Logger;
 
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
@@ -161,9 +161,9 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
         }
         // val.isUnit() already tested
         // not jet known
-        if (val instanceof GcdRingElem && ring.modul instanceof GcdRingElem) {
-            GcdRingElem v = (GcdRingElem) val;
-            GcdRingElem m = (GcdRingElem) ring.modul;
+        if (val instanceof RingElem && ring.modul instanceof RingElem) {
+            RingElem v = (RingElem) val;
+            RingElem m = (RingElem) ring.modul;
             C gcd = (C) v.gcd(m);
             if (debug) {
                 logger.info("gcd = " + gcd);
@@ -347,9 +347,9 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
         if (isunit == 0) {
             throw new NotInvertibleException("element not invertible (0) " + this);
         }
-        if (val instanceof GcdRingElem && ring.modul instanceof GcdRingElem) {
-            GcdRingElem v = (GcdRingElem) val;
-            GcdRingElem m = (GcdRingElem) ring.modul;
+        if (val instanceof RingElem && ring.modul instanceof RingElem) {
+            RingElem v = (RingElem) val;
+            RingElem m = (RingElem) ring.modul;
             C[] egcd = (C[]) v.egcd(m);
             if (debug) {
                 logger.info("egcd = " + egcd[0] + ", f = " + egcd[1]);

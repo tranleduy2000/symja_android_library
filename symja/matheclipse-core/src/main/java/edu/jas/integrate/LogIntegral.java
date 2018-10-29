@@ -11,7 +11,7 @@ import java.util.List;
 import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -22,7 +22,7 @@ import edu.jas.structure.GcdRingElem;
  * @author Heinz Kredel
  */
 
-public class LogIntegral<C extends GcdRingElem<C>> implements Serializable {
+public class LogIntegral<C extends RingElem<C>> implements Serializable {
 
 
     /**

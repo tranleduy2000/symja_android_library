@@ -8,7 +8,7 @@ package edu.jas.ufd;
 import org.apache.log4j.Logger;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -18,7 +18,7 @@ import edu.jas.structure.GcdRingElem;
  * @author Heinz Kredel
  */
 
-public class GreatestCommonDivisorFake<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbstract<C> {
+public class GreatestCommonDivisorFake<C extends RingElem<C>> extends GreatestCommonDivisorAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GreatestCommonDivisorFake.class);

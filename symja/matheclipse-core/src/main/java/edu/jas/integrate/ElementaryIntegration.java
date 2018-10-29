@@ -16,7 +16,7 @@ import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.FactorAbstract;
 import edu.jas.ufd.FactorFactory;
@@ -40,7 +40,7 @@ import edu.jas.ufd.SquarefreeFactory;
  * @author Heinz Kredel
  */
 
-public class ElementaryIntegration<C extends GcdRingElem<C>> {
+public class ElementaryIntegration<C extends RingElem<C>> {
 
 
     private static final Logger logger = Logger.getLogger(ElementaryIntegration.class);

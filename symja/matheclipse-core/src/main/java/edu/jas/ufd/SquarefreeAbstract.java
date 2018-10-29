@@ -14,7 +14,7 @@ import java.util.TreeMap;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -24,7 +24,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Squarefree<C> {
+public abstract class SquarefreeAbstract<C extends RingElem<C>> implements Squarefree<C> {
 
 
     /**

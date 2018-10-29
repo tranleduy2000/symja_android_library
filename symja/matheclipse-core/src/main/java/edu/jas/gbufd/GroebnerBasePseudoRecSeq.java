@@ -18,7 +18,7 @@ import edu.jas.gb.PairList;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -36,7 +36,7 @@ import edu.jas.ufd.GreatestCommonDivisorAbstract;
  * @see GBFactory
  */
 
-public class GroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
+public class GroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
         GroebnerBaseAbstract<GenPolynomial<C>> {
 
 

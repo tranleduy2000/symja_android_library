@@ -7,7 +7,7 @@ package edu.jas.poly;
 
 import org.apache.log4j.Logger;
 
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
@@ -106,9 +106,9 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
             return;
         }
         // must reduce to lowest terms
-        if (n instanceof GcdRingElem && d instanceof GcdRingElem) {
-            GcdRingElem ng = (GcdRingElem) n;
-            GcdRingElem dg = (GcdRingElem) d;
+        if (n instanceof RingElem && d instanceof RingElem) {
+            RingElem ng = (RingElem) n;
+            RingElem dg = (RingElem) d;
             C gcd = (C) ng.gcd(dg);
             if (debug) {
                 logger.info("gcd = " + gcd);
@@ -471,8 +471,8 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         if (this.isZERO()) {
             return b;
         }
-        if (num instanceof GcdRingElem && den instanceof GcdRingElem && b.num instanceof GcdRingElem
-                && b.den instanceof GcdRingElem) {
+        if (num instanceof RingElem && den instanceof RingElem && b.num instanceof RingElem
+                && b.den instanceof RingElem) {
             return ring.getONE();
         }
         throw new UnsupportedOperationException("gcd not implemented " + num.getClass().getName());
@@ -500,8 +500,8 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
             ret[0] = b;
             return ret;
         }
-        if (num instanceof GcdRingElem && den instanceof GcdRingElem && b.num instanceof GcdRingElem
-                && b.den instanceof GcdRingElem) {
+        if (num instanceof RingElem && den instanceof RingElem && b.num instanceof RingElem
+                && b.den instanceof RingElem) {
             Quotient<C> two = ring.fromInteger(2);
             ret[0] = ring.getONE();
             ret[1] = (this.multiply(two)).inverse();

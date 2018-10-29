@@ -19,7 +19,7 @@ import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.RecSolvablePolynomial;
 import edu.jas.poly.RecSolvablePolynomialRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.StarRingElem;
 import edu.jas.ufd.GCDFactory;
@@ -32,7 +32,7 @@ import edu.jas.ufd.GCDFactory;
  * @author Heinz Kredel
  */
 
-public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
+public abstract class GreatestCommonDivisorAbstract<C extends RingElem<C>>
         implements GreatestCommonDivisor<C> {
 
 
@@ -1245,7 +1245,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         if (a == null || a.isZERO() || b == null || b.isZERO()) {
             throw new IllegalArgumentException("a and b must be non zero");
         }
-        C[] oc = (C[]) new GcdRingElem[2];
+        C[] oc = (C[]) new RingElem[2];
         if (a instanceof GenSolvablePolynomial && b instanceof GenSolvablePolynomial) {
             GenSolvablePolynomial ap = (GenSolvablePolynomial) a;
             GenSolvablePolynomial bp = (GenSolvablePolynomial) b;
@@ -1372,7 +1372,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         if (a == null || a.isZERO() || b == null || b.isZERO()) {
             throw new IllegalArgumentException("a and b must be non zero");
         }
-        C[] oc = (C[]) new GcdRingElem[2];
+        C[] oc = (C[]) new RingElem[2];
         if (a instanceof GenSolvablePolynomial && b instanceof GenSolvablePolynomial) {
             GenSolvablePolynomial ap = (GenSolvablePolynomial) a;
             GenSolvablePolynomial bp = (GenSolvablePolynomial) b;

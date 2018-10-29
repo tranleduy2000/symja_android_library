@@ -11,7 +11,7 @@ import edu.jas.gbufd.SolvableSyzygyAbstract;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -24,7 +24,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class GreatestCommonDivisorLR<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbstract<C> {
+public class GreatestCommonDivisorLR<C extends RingElem<C>> extends GreatestCommonDivisorAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GreatestCommonDivisorLR.class);

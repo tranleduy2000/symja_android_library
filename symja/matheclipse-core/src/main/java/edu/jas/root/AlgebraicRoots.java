@@ -12,7 +12,7 @@ import edu.jas.arith.Rational;
 import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.Complex;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -22,7 +22,7 @@ import edu.jas.structure.GcdRingElem;
  * @param <C> coefficient type.
  * @author Heinz Kredel
  */
-public class AlgebraicRoots<C extends GcdRingElem<C> & Rational> implements Serializable {
+public class AlgebraicRoots<C extends RingElem<C> & Rational> implements Serializable {
 
 
     /**

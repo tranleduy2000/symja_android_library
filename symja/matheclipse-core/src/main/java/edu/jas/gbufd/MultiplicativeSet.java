@@ -13,7 +13,7 @@ import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -22,7 +22,7 @@ import edu.jas.structure.GcdRingElem;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public class MultiplicativeSet<C extends GcdRingElem<C>> implements Serializable {
+public class MultiplicativeSet<C extends RingElem<C>> implements Serializable {
 
 
     private static final Logger logger = Logger.getLogger(MultiplicativeSet.class);

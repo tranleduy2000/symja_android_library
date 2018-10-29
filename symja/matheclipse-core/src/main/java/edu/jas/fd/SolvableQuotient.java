@@ -13,7 +13,7 @@ import edu.jas.kern.PrettyPrint;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.RingElemImpl;
 
@@ -25,8 +25,8 @@ import edu.jas.structure.RingElemImpl;
  *
  * @author Heinz Kredel
  */
-public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<SolvableQuotient<C>>
-        implements GcdRingElem<SolvableQuotient<C>>,
+public class SolvableQuotient<C extends RingElem<C>> extends RingElemImpl<SolvableQuotient<C>>
+        implements RingElem<SolvableQuotient<C>>,
         QuotPair<GenPolynomial<C>> {
     // should be QuotPair<GenSolvablePolynomial<C>
 

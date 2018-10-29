@@ -17,7 +17,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -29,7 +29,7 @@ import edu.jas.structure.GcdRingElem;
  * @author Heinz Kredel
  */
 
-public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends SolvableReductionAbstract<C>
+public class SolvablePseudoReductionSeq<C extends RingElem<C>> extends SolvableReductionAbstract<C>
         implements SolvablePseudoReduction<C> {
 
 
@@ -69,7 +69,7 @@ public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends Solvab
         }
         int l = P.length;
         ExpVector[] htl = new ExpVector[l];
-        //C[] lbc = (C[]) new GcdRingElem[l];
+        //C[] lbc = (C[]) new RingElem[l];
         GenSolvablePolynomial<C>[] p = new GenSolvablePolynomial[l];
         int i;
         int j = 0;
@@ -279,7 +279,7 @@ public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends Solvab
         }
         int l = P.length;
         ExpVector[] htl = new ExpVector[l];
-        //C[] lbc = (C[]) new GcdRingElem[l];
+        //C[] lbc = (C[]) new RingElem[l];
         GenSolvablePolynomial<C>[] p = new GenSolvablePolynomial[l];
         Map.Entry<ExpVector, C> m;
         int j = 0;
@@ -386,7 +386,7 @@ public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends Solvab
         }
         int l = P.length;
         ExpVector[] htl = new ExpVector[l];
-        //C[] lbc = (C[]) new GcdRingElem[l]; 
+        //C[] lbc = (C[]) new RingElem[l];
         GenSolvablePolynomial<C>[] p = new GenSolvablePolynomial[l];
         int i;
         int j = 0;
@@ -480,7 +480,7 @@ public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends Solvab
         }
         int l = P.length;
         ExpVector[] htl = new ExpVector[l];
-        //C[] lbc = (C[]) new GcdRingElem[l];
+        //C[] lbc = (C[]) new RingElem[l];
         GenSolvablePolynomial<C>[] p = new GenSolvablePolynomial[l];
         int i;
         int j = 0;

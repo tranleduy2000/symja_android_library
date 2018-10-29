@@ -18,7 +18,7 @@ import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.ufd.FactorAbstract;
 import edu.jas.ufd.FactorFactory;
 import edu.jas.ufd.SquarefreeAbstract;
@@ -41,7 +41,7 @@ public class RootFactory {
      * @param r real algebraic number.
      * @return true, if f(r) == 0, else false;
      */
-    public static <C extends GcdRingElem<C> & Rational> boolean isRoot(GenPolynomial<C> f,
+    public static <C extends RingElem<C> & Rational> boolean isRoot(GenPolynomial<C> f,
                                                                        RealAlgebraicNumber<C> r) {
         RealAlgebraicRing<C> rr = r.factory();
         GenPolynomialRing<RealAlgebraicNumber<C>> rfac = new GenPolynomialRing<RealAlgebraicNumber<C>>(rr,
@@ -59,7 +59,7 @@ public class RootFactory {
      * @param f univariate polynomial.
      * @return a list of different real algebraic numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbers(
+    public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbers(
             GenPolynomial<C> f) {
         RealRoots<C> rr = new RealRootsSturm<C>();
         SquarefreeAbstract<C> engine = SquarefreeFactory.<C>getImplementation(f.ring.coFac);
@@ -89,7 +89,7 @@ public class RootFactory {
      * @param eps rational precision.
      * @return a list of different real algebraic numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbers(
+    public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbers(
             GenPolynomial<C> f, BigRational eps) {
         RealRoots<C> rr = new RealRootsSturm<C>();
         SquarefreeAbstract<C> engine = SquarefreeFactory.<C>getImplementation(f.ring.coFac);
@@ -119,7 +119,7 @@ public class RootFactory {
      * @param f univariate polynomial.
      * @return a list of different real algebraic numbers from a field.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersField(
+    public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersField(
             GenPolynomial<C> f) {
         RealRoots<C> rr = new RealRootsSturm<C>();
         FactorAbstract<C> engine = FactorFactory.<C>getImplementation(f.ring.coFac);
@@ -149,7 +149,7 @@ public class RootFactory {
      * @param eps rational precision.
      * @return a list of different real algebraic numbers from a field.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersField(
+    public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersField(
             GenPolynomial<C> f, BigRational eps) {
         RealRoots<C> rr = new RealRootsSturm<C>();
         FactorAbstract<C> engine = FactorFactory.<C>getImplementation(f.ring.coFac);
@@ -179,7 +179,7 @@ public class RootFactory {
      * @param f univariate irreducible polynomial.
      * @return a list of different real algebraic numbers from a field.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersIrred(
+    public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersIrred(
             GenPolynomial<C> f) {
         RealRoots<C> rr = new RealRootsSturm<C>();
         List<RealAlgebraicNumber<C>> list = new ArrayList<RealAlgebraicNumber<C>>();
@@ -200,7 +200,7 @@ public class RootFactory {
      * @param eps rational precision.
      * @return a list of different real algebraic numbers from a field.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersIrred(
+    public static <C extends RingElem<C> & Rational> List<RealAlgebraicNumber<C>> realAlgebraicNumbersIrred(
             GenPolynomial<C> f, BigRational eps) {
         RealRoots<C> rr = new RealRootsSturm<C>();
         List<RealAlgebraicNumber<C>> list = new ArrayList<RealAlgebraicNumber<C>>();
@@ -222,7 +222,7 @@ public class RootFactory {
      * @param r complex algebraic number.
      * @return true, if f(r) == 0, else false;
      */
-    public static <C extends GcdRingElem<C> & Rational> boolean isRoot(GenPolynomial<C> f,
+    public static <C extends RingElem<C> & Rational> boolean isRoot(GenPolynomial<C> f,
                                                                        ComplexAlgebraicNumber<C> r) {
         ComplexAlgebraicRing<C> cr = r.factory();
         GenPolynomialRing<ComplexAlgebraicNumber<C>> cfac = new GenPolynomialRing<ComplexAlgebraicNumber<C>>(
@@ -241,7 +241,7 @@ public class RootFactory {
      * @param r complex algebraic number.
      * @return true, if f(r) == 0, else false;
      */
-    public static <C extends GcdRingElem<C> & Rational> boolean isRootComplex(GenPolynomial<Complex<C>> f,
+    public static <C extends RingElem<C> & Rational> boolean isRootComplex(GenPolynomial<Complex<C>> f,
                                                                               ComplexAlgebraicNumber<C> r) {
         ComplexAlgebraicRing<C> cr = r.factory();
         GenPolynomialRing<ComplexAlgebraicNumber<C>> cfac = new GenPolynomialRing<ComplexAlgebraicNumber<C>>(
@@ -261,7 +261,7 @@ public class RootFactory {
      * @param r real algebraic number.
      * @return true, if f(c) == 0 and c == r, else false;
      */
-    public static <C extends GcdRingElem<C> & Rational> boolean isRealRoot(GenPolynomial<C> f,
+    public static <C extends RingElem<C> & Rational> boolean isRealRoot(GenPolynomial<C> f,
                                                                            ComplexAlgebraicNumber<C> c, RealAlgebraicNumber<C> r) {
         boolean t = isRoot(f, c) && isRoot(f, r);
         if (!t) {
@@ -337,7 +337,7 @@ public class RootFactory {
      * @param eps desired precision.
      * @return true, if f(c) == 0 and c == r, else false;
      */
-    public static <C extends GcdRingElem<C> & Rational> boolean isRealRoot(GenPolynomial<C> f,
+    public static <C extends RingElem<C> & Rational> boolean isRealRoot(GenPolynomial<C> f,
                                                                            Complex<BigDecimal> c, BigDecimal r, BigRational eps) {
         BigDecimal e = new BigDecimal(eps);
         if (c.getIm().abs().compareTo(e) <= 0) {
@@ -355,7 +355,7 @@ public class RootFactory {
      * @param f univariate polynomial.
      * @return a list of different complex algebraic numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbersComplex(
+    public static <C extends RingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbersComplex(
             GenPolynomial<Complex<C>> f) {
         ComplexRoots<C> cr = new ComplexRootsSturm<C>(f.ring.coFac);
         SquarefreeAbstract<Complex<C>> engine = SquarefreeFactory
@@ -386,7 +386,7 @@ public class RootFactory {
      * @param eps rational precision.
      * @return a list of different complex algebraic numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbersComplex(
+    public static <C extends RingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbersComplex(
             GenPolynomial<Complex<C>> f, BigRational eps) {
         ComplexRoots<C> cr = new ComplexRootsSturm<C>(f.ring.coFac);
         SquarefreeAbstract<Complex<C>> engine = SquarefreeFactory
@@ -423,7 +423,7 @@ public class RootFactory {
      * @param f univariate (rational) polynomial.
      * @return a list of different complex algebraic numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbers(
+    public static <C extends RingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbers(
             GenPolynomial<C> f) {
         GenPolynomial<Complex<C>> fc = PolyUtilRoot.<C>complexFromAny(f);
         return complexAlgebraicNumbersComplex(fc);
@@ -437,7 +437,7 @@ public class RootFactory {
      * @param eps rational precision.
      * @return a list of different complex algebraic numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbers(
+    public static <C extends RingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> complexAlgebraicNumbers(
             GenPolynomial<C> f, BigRational eps) {
         GenPolynomial<Complex<C>> fc = PolyUtilRoot.<C>complexFromAny(f);
         return complexAlgebraicNumbersComplex(fc, eps);
@@ -452,7 +452,7 @@ public class RootFactory {
      * @param r list of real algebraic numbers.
      * @return c minus the real roots from r
      */
-    public static <C extends GcdRingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> filterOutRealRoots(
+    public static <C extends RingElem<C> & Rational> List<ComplexAlgebraicNumber<C>> filterOutRealRoots(
             GenPolynomial<C> f, List<ComplexAlgebraicNumber<C>> c, List<RealAlgebraicNumber<C>> r) {
         if (c.isEmpty()) {
             return c;
@@ -493,7 +493,7 @@ public class RootFactory {
      * @param eps desired precision.
      * @return c minus the real roots from r
      */
-    public static <C extends GcdRingElem<C> & Rational> List<Complex<BigDecimal>> filterOutRealRoots(
+    public static <C extends RingElem<C> & Rational> List<Complex<BigDecimal>> filterOutRealRoots(
             GenPolynomial<C> f, List<Complex<BigDecimal>> c, List<BigDecimal> r, BigRational eps) {
         if (c.isEmpty()) {
             return c;
@@ -531,7 +531,7 @@ public class RootFactory {
      * @param f univariate polynomial.
      * @return container of real and complex algebraic numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> AlgebraicRoots<C> algebraicRoots(GenPolynomial<C> f) {
+    public static <C extends RingElem<C> & Rational> AlgebraicRoots<C> algebraicRoots(GenPolynomial<C> f) {
         List<RealAlgebraicNumber<C>> rl = realAlgebraicNumbers(f);
         List<ComplexAlgebraicNumber<C>> cl = complexAlgebraicNumbers(f);
         GenPolynomial<Complex<C>> cf = null;
@@ -551,7 +551,7 @@ public class RootFactory {
      * @return container of real and complex algebraic numbers which are roots
      * of unity.
      */
-    public static <C extends GcdRingElem<C> & Rational> AlgebraicRoots<C> rootsOfUnity(AlgebraicRoots<C> ar) {
+    public static <C extends RingElem<C> & Rational> AlgebraicRoots<C> rootsOfUnity(AlgebraicRoots<C> ar) {
         List<RealAlgebraicNumber<C>> rl = new ArrayList<RealAlgebraicNumber<C>>();
         for (RealAlgebraicNumber<C> r : ar.real) {
             if (r.isRootOfUnity()) {
@@ -575,7 +575,7 @@ public class RootFactory {
      * @param a   container of real and complex algebraic numbers.
      * @param eps desired precision for root intervals and rectangles.
      */
-    public static <C extends GcdRingElem<C> & Rational> void rootRefine(AlgebraicRoots<C> a,
+    public static <C extends RingElem<C> & Rational> void rootRefine(AlgebraicRoots<C> a,
                                                                         BigRational eps) {
         for (RealAlgebraicNumber<C> r : a.real) {
             r.ring.refineRoot(eps);
@@ -594,7 +594,7 @@ public class RootFactory {
      * @param eps desired precision.
      * @return container of real and complex decimal numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> DecimalRoots<C> decimalRoots(GenPolynomial<C> f, BigRational eps) {
+    public static <C extends RingElem<C> & Rational> DecimalRoots<C> decimalRoots(GenPolynomial<C> f, BigRational eps) {
         RealRootsAbstract<C> rengine = new RealRootsSturm<C>();
         List<BigDecimal> rl = rengine.approximateRoots(f, eps);
 
@@ -614,7 +614,7 @@ public class RootFactory {
      * @param eps desired precision.
      * @return container of real and complex decimal numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> DecimalRoots<C> decimalRoots(AlgebraicRoots<C> ar, BigRational eps) {
+    public static <C extends RingElem<C> & Rational> DecimalRoots<C> decimalRoots(AlgebraicRoots<C> ar, BigRational eps) {
         //no: rootRefine(ar, eps);
         RealRootsAbstract<C> rengine = new RealRootsSturm<C>();
         List<BigDecimal> rl = new ArrayList<BigDecimal>(ar.real.size());

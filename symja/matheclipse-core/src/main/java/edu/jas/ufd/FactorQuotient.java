@@ -12,7 +12,7 @@ import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -23,7 +23,7 @@ import edu.jas.structure.GcdRingElem;
  * @author Heinz Kredel
  */
 
-public class FactorQuotient<C extends GcdRingElem<C>> extends FactorAbstract<Quotient<C>> {
+public class FactorQuotient<C extends RingElem<C>> extends FactorAbstract<Quotient<C>> {
 
 
     private static final Logger logger = Logger.getLogger(FactorQuotient.class);

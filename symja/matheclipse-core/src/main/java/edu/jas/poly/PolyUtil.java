@@ -25,7 +25,7 @@ import edu.jas.arith.Product;
 import edu.jas.arith.ProductRing;
 import edu.jas.arith.Rational;
 import edu.jas.structure.Element;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.UnaryFunctor;
@@ -449,7 +449,7 @@ public class PolyUtil {
      * @param A   polynomial with RingElem coefficients to be converted.
      * @return polynomial with Complex coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<Complex<C>> complexFromAny(
+    public static <C extends RingElem<C>> GenPolynomial<Complex<C>> complexFromAny(
             GenPolynomialRing<Complex<C>> fac, GenPolynomial<C> A) {
         ComplexRing<C> cr = (ComplexRing<C>) fac.coFac;
         return PolyUtil.<C, Complex<C>>map(fac, A, new AnyToComplex<C>(cr));
@@ -464,7 +464,7 @@ public class PolyUtil {
      * @param A    polynomial with AlgebraicNumber coefficients to be converted.
      * @return polynomial with type GenPolynomial&lt;C&gt; coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<GenPolynomial<C>> fromAlgebraicCoefficients(
+    public static <C extends RingElem<C>> GenPolynomial<GenPolynomial<C>> fromAlgebraicCoefficients(
             GenPolynomialRing<GenPolynomial<C>> rfac, GenPolynomial<AlgebraicNumber<C>> A) {
         return PolyUtil.<AlgebraicNumber<C>, GenPolynomial<C>>map(rfac, A, new AlgToPoly<C>());
     }
@@ -478,7 +478,7 @@ public class PolyUtil {
      * @param A    polynomial with C coefficients to be converted.
      * @return polynomial with AlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<AlgebraicNumber<C>> convertToAlgebraicCoefficients(
+    public static <C extends RingElem<C>> GenPolynomial<AlgebraicNumber<C>> convertToAlgebraicCoefficients(
             GenPolynomialRing<AlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) pfac.coFac;
         return PolyUtil.<C, AlgebraicNumber<C>>map(pfac, A, new CoeffToAlg<C>(afac));
@@ -495,7 +495,7 @@ public class PolyUtil {
      * @param A     polynomial with C coefficients to be converted.
      * @return polynomial with AlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<AlgebraicNumber<C>> convertToRecAlgebraicCoefficients(
+    public static <C extends RingElem<C>> GenPolynomial<AlgebraicNumber<C>> convertToRecAlgebraicCoefficients(
             int depth, GenPolynomialRing<AlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) pfac.coFac;
         return PolyUtil.<C, AlgebraicNumber<C>>map(pfac, A, new CoeffToRecAlg<C>(depth, afac));
@@ -511,7 +511,7 @@ public class PolyUtil {
      *             coefficients to be converted.
      * @return polynomial with AlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<AlgebraicNumber<C>> convertRecursiveToAlgebraicCoefficients(
+    public static <C extends RingElem<C>> GenPolynomial<AlgebraicNumber<C>> convertRecursiveToAlgebraicCoefficients(
             GenPolynomialRing<AlgebraicNumber<C>> pfac, GenPolynomial<GenPolynomial<C>> A) {
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) pfac.coFac;
         return PolyUtil.<GenPolynomial<C>, AlgebraicNumber<C>>map(pfac, A, new PolyToAlg<C>(afac));
@@ -526,7 +526,7 @@ public class PolyUtil {
      *            converted.
      * @return polynomial with Complex coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<Complex<C>> complexFromAlgebraic(
+    public static <C extends RingElem<C>> GenPolynomial<Complex<C>> complexFromAlgebraic(
             GenPolynomialRing<Complex<C>> fac, GenPolynomial<AlgebraicNumber<C>> A) {
         ComplexRing<C> cfac = (ComplexRing<C>) fac.coFac;
         return PolyUtil.<AlgebraicNumber<C>, Complex<C>>map(fac, A, new AlgebToCompl<C>(cfac));
@@ -540,7 +540,7 @@ public class PolyUtil {
      * @param A   polynomial with Complex coefficients to be converted.
      * @return polynomial with AlgebraicNumber coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<AlgebraicNumber<C>> algebraicFromComplex(
+    public static <C extends RingElem<C>> GenPolynomial<AlgebraicNumber<C>> algebraicFromComplex(
             GenPolynomialRing<AlgebraicNumber<C>> fac, GenPolynomial<Complex<C>> A) {
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) fac.coFac;
         return PolyUtil.<Complex<C>, AlgebraicNumber<C>>map(fac, A, new ComplToAlgeb<C>(afac));
@@ -2437,7 +2437,7 @@ public class PolyUtil {
      * @param L    list of polynomials to be represented.
      * @return Product represenation of L in the polynomial ring pfac.
      */
-    public static <C extends GcdRingElem<C>> List<GenPolynomial<Product<C>>> toProductGen(
+    public static <C extends RingElem<C>> List<GenPolynomial<Product<C>>> toProductGen(
             GenPolynomialRing<Product<C>> pfac, List<GenPolynomial<C>> L) {
 
         List<GenPolynomial<Product<C>>> list = new ArrayList<GenPolynomial<Product<C>>>();
@@ -2460,7 +2460,7 @@ public class PolyUtil {
      * @param A    polynomial to be represented.
      * @return Product represenation of A in the polynomial ring pfac.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<Product<C>> toProductGen(
+    public static <C extends RingElem<C>> GenPolynomial<Product<C>> toProductGen(
             GenPolynomialRing<Product<C>> pfac, GenPolynomial<C> A) {
 
         GenPolynomial<Product<C>> P = pfac.getZERO().copy();
@@ -2489,7 +2489,7 @@ public class PolyUtil {
      * @param c    coefficient to be represented.
      * @return Product represenation of c in the ring pfac.
      */
-    public static <C extends GcdRingElem<C>> Product<C> toProductGen(ProductRing<C> pfac, C c) {
+    public static <C extends RingElem<C>> Product<C> toProductGen(ProductRing<C> pfac, C c) {
 
         SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         for (int i = 0; i < pfac.length(); i++) {
@@ -3262,7 +3262,7 @@ class RatToCompl implements UnaryFunctor<BigRational, BigComplex> {
 /**
  * Any ring element to generic complex functor.
  */
-class AnyToComplex<C extends GcdRingElem<C>> implements UnaryFunctor<C, Complex<C>> {
+class AnyToComplex<C extends RingElem<C>> implements UnaryFunctor<C, Complex<C>> {
 
 
     final protected ComplexRing<C> cfac;
@@ -3296,7 +3296,7 @@ class AnyToComplex<C extends GcdRingElem<C>> implements UnaryFunctor<C, Complex<
 /**
  * Algebraic to generic complex functor.
  */
-class AlgebToCompl<C extends GcdRingElem<C>> implements UnaryFunctor<AlgebraicNumber<C>, Complex<C>> {
+class AlgebToCompl<C extends RingElem<C>> implements UnaryFunctor<AlgebraicNumber<C>, Complex<C>> {
 
 
     final protected ComplexRing<C> cfac;
@@ -3338,7 +3338,7 @@ class AlgebToCompl<C extends GcdRingElem<C>> implements UnaryFunctor<AlgebraicNu
 /**
  * Ceneric complex to algebraic number functor.
  */
-class ComplToAlgeb<C extends GcdRingElem<C>> implements UnaryFunctor<Complex<C>, AlgebraicNumber<C>> {
+class ComplToAlgeb<C extends RingElem<C>> implements UnaryFunctor<Complex<C>, AlgebraicNumber<C>> {
 
 
     final protected AlgebraicNumberRing<C> afac;
@@ -3373,7 +3373,7 @@ class ComplToAlgeb<C extends GcdRingElem<C>> implements UnaryFunctor<Complex<C>,
 /**
  * Algebraic to polynomial functor.
  */
-class AlgToPoly<C extends GcdRingElem<C>> implements UnaryFunctor<AlgebraicNumber<C>, GenPolynomial<C>> {
+class AlgToPoly<C extends RingElem<C>> implements UnaryFunctor<AlgebraicNumber<C>, GenPolynomial<C>> {
 
 
     public GenPolynomial<C> eval(AlgebraicNumber<C> c) {
@@ -3388,7 +3388,7 @@ class AlgToPoly<C extends GcdRingElem<C>> implements UnaryFunctor<AlgebraicNumbe
 /**
  * Polynomial to algebriac functor.
  */
-class PolyToAlg<C extends GcdRingElem<C>> implements UnaryFunctor<GenPolynomial<C>, AlgebraicNumber<C>> {
+class PolyToAlg<C extends RingElem<C>> implements UnaryFunctor<GenPolynomial<C>, AlgebraicNumber<C>> {
 
 
     final protected AlgebraicNumberRing<C> afac;
@@ -3414,7 +3414,7 @@ class PolyToAlg<C extends GcdRingElem<C>> implements UnaryFunctor<GenPolynomial<
 /**
  * Coefficient to algebriac functor.
  */
-class CoeffToAlg<C extends GcdRingElem<C>> implements UnaryFunctor<C, AlgebraicNumber<C>> {
+class CoeffToAlg<C extends RingElem<C>> implements UnaryFunctor<C, AlgebraicNumber<C>> {
 
 
     final protected AlgebraicNumberRing<C> afac;
@@ -3445,7 +3445,7 @@ class CoeffToAlg<C extends GcdRingElem<C>> implements UnaryFunctor<C, AlgebraicN
 /**
  * Coefficient to recursive algebriac functor.
  */
-class CoeffToRecAlg<C extends GcdRingElem<C>> implements UnaryFunctor<C, AlgebraicNumber<C>> {
+class CoeffToRecAlg<C extends RingElem<C>> implements UnaryFunctor<C, AlgebraicNumber<C>> {
 
 
     final protected List<AlgebraicNumberRing<C>> lfac;

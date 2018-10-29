@@ -28,7 +28,6 @@ import edu.jas.poly.RecSolvablePolynomial;
 import edu.jas.poly.RecSolvablePolynomialRing;
 import edu.jas.poly.RelationTable;
 import edu.jas.poly.TermOrder;
-import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
@@ -48,7 +47,7 @@ import edu.jas.structure.RingFactory;
  *         will be deprecated use QLRSolvablePolynomialRing
  */
 
-public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
+public class QuotSolvablePolynomialRing<C extends RingElem<C>> extends
         GenSolvablePolynomialRing<SolvableQuotient<C>> {
 
 

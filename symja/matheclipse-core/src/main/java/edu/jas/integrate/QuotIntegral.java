@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.ufd.Quotient;
 import edu.jas.ufd.QuotientRing;
 
@@ -24,7 +24,7 @@ import edu.jas.ufd.QuotientRing;
  * @author Heinz Kredel
  */
 
-public class QuotIntegral<C extends GcdRingElem<C>> implements Serializable {
+public class QuotIntegral<C extends RingElem<C>> implements Serializable {
 
 
     /**

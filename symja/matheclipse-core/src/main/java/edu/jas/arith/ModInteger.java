@@ -5,20 +5,20 @@
 package edu.jas.arith;
 
 
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElemImpl;
 
 
 /**
- * ModInteger class with GcdRingElem interface. Objects of this class are
+ * ModInteger class with RingElem interface. Objects of this class are
  * immutable. The SAC2 static methods are also provided.
  *
  * @author Heinz Kredel
  * @see java.math.BigInteger
  */
 
-public final class ModInteger extends RingElemImpl<ModInteger> implements GcdRingElem<ModInteger>, Modular {
+public final class ModInteger extends RingElemImpl<ModInteger> implements RingElem<ModInteger>, Modular {
 
 
     /**

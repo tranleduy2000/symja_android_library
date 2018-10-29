@@ -20,7 +20,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElem;
 
 
@@ -47,7 +47,7 @@ public class PolyGBUtil {
      * @param r generic polynomial.
      * @return true if res(A,B) isContained in ideal(A,B), else false.
      */
-    public static <C extends GcdRingElem<C>> boolean isResultant(GenPolynomial<C> A, GenPolynomial<C> B,
+    public static <C extends RingElem<C>> boolean isResultant(GenPolynomial<C> A, GenPolynomial<C> B,
                                                                  GenPolynomial<C> r) {
         if (r == null || r.isZERO()) {
             return true;
@@ -326,7 +326,7 @@ public class PolyGBUtil {
      * @param B    list of polynomials
      * @return generators for (A \cap B)
      */
-    public static <C extends GcdRingElem<C>> List<GenPolynomial<C>> intersect(GenPolynomialRing<C> pfac,
+    public static <C extends RingElem<C>> List<GenPolynomial<C>> intersect(GenPolynomialRing<C> pfac,
                                                                               List<GenPolynomial<C>> A, List<GenPolynomial<C>> B) {
         if (A == null || A.isEmpty()) { // (0)
             return B;
@@ -367,7 +367,7 @@ public class PolyGBUtil {
      * @param B    list of polynomials
      * @return generators for (A \cap B)
      */
-    public static <C extends GcdRingElem<C>> List<GenSolvablePolynomial<C>> intersect(
+    public static <C extends RingElem<C>> List<GenSolvablePolynomial<C>> intersect(
             GenSolvablePolynomialRing<C> pfac, List<GenSolvablePolynomial<C>> A,
             List<GenSolvablePolynomial<C>> B) {
         if (A == null || A.isEmpty()) { // (0)
@@ -411,7 +411,7 @@ public class PolyGBUtil {
      * @return [ n/d, n - (n/d)*d ]
      */
     @SuppressWarnings("cast")
-    public static <C extends GcdRingElem<C>> GenSolvablePolynomial<C>[] quotientRemainder(
+    public static <C extends RingElem<C>> GenSolvablePolynomial<C>[] quotientRemainder(
             GenSolvablePolynomial<C> n, GenSolvablePolynomial<C> d) {
         GenSolvablePolynomial<C>[] res = (GenSolvablePolynomial<C>[]) new GenSolvablePolynomial[2];
         if (d.isZERO()) {

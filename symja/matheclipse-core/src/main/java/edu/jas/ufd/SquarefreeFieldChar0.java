@@ -15,7 +15,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -25,7 +25,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAbstract<C> {
+public class SquarefreeFieldChar0<C extends RingElem<C>> extends SquarefreeAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(SquarefreeFieldChar0.class);

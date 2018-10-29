@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -24,7 +24,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbstract<C> {
+public class GreatestCommonDivisorSimple<C extends RingElem<C>> extends GreatestCommonDivisorAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GreatestCommonDivisorSimple.class);

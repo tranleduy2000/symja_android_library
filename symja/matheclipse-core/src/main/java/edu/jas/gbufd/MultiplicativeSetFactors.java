@@ -13,7 +13,7 @@ import java.util.List;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.ufd.FactorAbstract;
 import edu.jas.ufd.FactorFactory;
 
@@ -25,7 +25,7 @@ import edu.jas.ufd.FactorFactory;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public class MultiplicativeSetFactors<C extends GcdRingElem<C>> extends MultiplicativeSet<C> {
+public class MultiplicativeSetFactors<C extends RingElem<C>> extends MultiplicativeSet<C> {
 
 
     private static final Logger logger = Logger.getLogger(MultiplicativeSetFactors.class);

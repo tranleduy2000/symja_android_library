@@ -16,7 +16,7 @@ import edu.jas.gb.WordPair;
 import edu.jas.gb.WordPairList;
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.GenWordPolynomialRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -29,7 +29,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class WordGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends WordGroebnerBaseAbstract<C> {
+public class WordGroebnerBasePseudoSeq<C extends RingElem<C>> extends WordGroebnerBaseAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(WordGroebnerBasePseudoSeq.class);

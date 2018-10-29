@@ -18,7 +18,7 @@ import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -35,7 +35,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public abstract class FactorAbsolute<C extends GcdRingElem<C>> extends FactorAbstract<C> {
+public abstract class FactorAbsolute<C extends RingElem<C>> extends FactorAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(FactorAbsolute.class);

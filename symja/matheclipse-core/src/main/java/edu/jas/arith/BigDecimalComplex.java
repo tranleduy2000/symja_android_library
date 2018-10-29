@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.StarRingElem;
@@ -28,7 +28,7 @@ import edu.jas.structure.StarRingElem;
  */
 public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
         implements StarRingElem<BigDecimalComplex>,
-        GcdRingElem<BigDecimalComplex>, RingFactory<BigDecimalComplex> {
+        RingElem<BigDecimalComplex>, RingFactory<BigDecimalComplex> {
 
 
     /**

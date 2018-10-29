@@ -11,7 +11,7 @@ import edu.jas.arith.Rational;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElemImpl;
 
@@ -23,9 +23,9 @@ import edu.jas.structure.RingElemImpl;
  * @author Heinz Kredel
  */
 
-public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends RingElemImpl<RealAlgebraicNumber<C>>
+public class RealAlgebraicNumber<C extends RingElem<C> & Rational> extends RingElemImpl<RealAlgebraicNumber<C>>
                 /*extends AlgebraicNumber<C>*/
-        implements GcdRingElem<RealAlgebraicNumber<C>>, Rational {
+        implements RingElem<RealAlgebraicNumber<C>>, Rational {
 
 
     /**

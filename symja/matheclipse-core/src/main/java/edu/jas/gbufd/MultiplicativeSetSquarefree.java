@@ -12,7 +12,7 @@ import java.util.List;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.ufd.SquarefreeAbstract;
 import edu.jas.ufd.SquarefreeFactory;
 
@@ -24,7 +24,7 @@ import edu.jas.ufd.SquarefreeFactory;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends MultiplicativeSet<C> {
+public class MultiplicativeSetSquarefree<C extends RingElem<C>> extends MultiplicativeSet<C> {
 
 
     private static final Logger logger = Logger.getLogger(MultiplicativeSetSquarefree.class);

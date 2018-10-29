@@ -5,7 +5,7 @@
 package edu.jas.arith;
 
 
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.NotInvertibleException;
 
 
@@ -20,13 +20,13 @@ import edu.jas.structure.NotInvertibleException;
 public class ModularNotInvertibleException extends NotInvertibleException {
 
 
-    public final GcdRingElem f; // = f1 * f2
+    public final RingElem f; // = f1 * f2
 
 
-    public final GcdRingElem f1;
+    public final RingElem f1;
 
 
-    public final GcdRingElem f2;
+    public final RingElem f2;
 
 
     public ModularNotInvertibleException() {
@@ -56,7 +56,7 @@ public class ModularNotInvertibleException extends NotInvertibleException {
      * @param f1 gcd ring element.
      * @param f2 gcd ring element.
      */
-    public ModularNotInvertibleException(GcdRingElem f, GcdRingElem f1, GcdRingElem f2) {
+    public ModularNotInvertibleException(RingElem f, RingElem f1, RingElem f2) {
         super("ModularNotInvertibleException");
         this.f = f;
         this.f1 = f1;
@@ -71,7 +71,7 @@ public class ModularNotInvertibleException extends NotInvertibleException {
      * @param f1 gcd ring element.
      * @param f2 gcd ring element.
      */
-    public ModularNotInvertibleException(String c, GcdRingElem f, GcdRingElem f1, GcdRingElem f2) {
+    public ModularNotInvertibleException(String c, RingElem f, RingElem f1, RingElem f2) {
         super(c);
         this.f = f;
         this.f1 = f1;
@@ -86,7 +86,7 @@ public class ModularNotInvertibleException extends NotInvertibleException {
      * @param f1 gcd ring element.
      * @param f2 gcd ring element.
      */
-    public ModularNotInvertibleException(String c, Throwable t, GcdRingElem f, GcdRingElem f1, GcdRingElem f2) {
+    public ModularNotInvertibleException(String c, Throwable t, RingElem f, RingElem f1, RingElem f2) {
         super(c, t);
         this.f = f;
         this.f1 = f1;
@@ -101,7 +101,7 @@ public class ModularNotInvertibleException extends NotInvertibleException {
      * @param f1 gcd ring element.
      * @param f2 gcd ring element.
      */
-    public ModularNotInvertibleException(Throwable t, GcdRingElem f, GcdRingElem f1, GcdRingElem f2) {
+    public ModularNotInvertibleException(Throwable t, RingElem f, RingElem f1, RingElem f2) {
         super("ModularNotInvertibleException", t);
         this.f = f;
         this.f1 = f1;

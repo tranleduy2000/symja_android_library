@@ -20,7 +20,7 @@ import edu.jas.poly.AlgebraicNumberRing;
 import edu.jas.poly.Complex;
 import edu.jas.poly.ComplexRing;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -32,7 +32,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
+public class ComplexAlgebraicRing<C extends RingElem<C> & Rational>
                 /*extends AlgebraicNumberRing<C>*/
         implements RingFactory<ComplexAlgebraicNumber<C>> {
 

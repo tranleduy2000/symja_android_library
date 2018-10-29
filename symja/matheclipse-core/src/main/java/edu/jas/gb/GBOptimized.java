@@ -13,7 +13,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.TermOrderOptimization;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -22,7 +22,7 @@ import edu.jas.structure.GcdRingElem;
  * @author Heinz Kredel
  */
 
-public class GBOptimized<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
+public class GBOptimized<C extends RingElem<C>> extends GroebnerBaseAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GBOptimized.class);

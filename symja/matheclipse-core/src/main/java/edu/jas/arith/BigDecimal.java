@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.RingFactory;
 
@@ -27,7 +27,7 @@ import edu.jas.structure.RingFactory;
  */
 
 public final class BigDecimal extends RingElemImpl<BigDecimal>
-        implements GcdRingElem<BigDecimal>, RingFactory<BigDecimal> {
+        implements RingElem<BigDecimal>, RingFactory<BigDecimal> {
 
 
     public static final MathContext DEFAULT_CONTEXT = MathContext.DECIMAL64; //32; //64; //128;

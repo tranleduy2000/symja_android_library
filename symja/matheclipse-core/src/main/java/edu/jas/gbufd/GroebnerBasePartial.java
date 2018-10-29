@@ -19,7 +19,7 @@ import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.TermOrder;
 import edu.jas.poly.TermOrderOptimization;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -33,7 +33,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class GroebnerBasePartial<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
+public class GroebnerBasePartial<C extends RingElem<C>> extends GroebnerBaseAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GroebnerBasePartial.class);

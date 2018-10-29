@@ -28,7 +28,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import edu.jas.structure.ElemFactory;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 /**
  * (I)nterface for a mathematical (Expr)ession<br />
@@ -80,7 +80,7 @@ import edu.jas.structure.GcdRingElem;
  *                                implements ISymbol, IExpr
  * </pre>
  */
-public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
+public interface IExpr extends Comparable<IExpr>, RingElem<IExpr>, Serializable, FieldElement<IExpr> {
 
     int ASTID = 4096;
     int BLANKID = 16384;

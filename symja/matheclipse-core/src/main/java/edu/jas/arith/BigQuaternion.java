@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import java.util.List;
 import java.util.Random;
 
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.StarRingElem;
 
@@ -26,7 +26,7 @@ import edu.jas.structure.StarRingElem;
  */
 
 public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
-        implements StarRingElem<BigQuaternion>, GcdRingElem<BigQuaternion> {
+        implements StarRingElem<BigQuaternion>, RingElem<BigQuaternion> {
 
 
     protected final static Random random = new Random();

@@ -19,7 +19,7 @@ import edu.jas.gb.SolvableGroebnerBaseAbstract;
 import edu.jas.poly.GenSolvablePolynomial;
 import edu.jas.poly.GenSolvablePolynomialRing;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -39,7 +39,7 @@ import edu.jas.ufd.GreatestCommonDivisorFake;
  * @see GBFactory
  */
 
-public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends SolvableGroebnerBaseAbstract<C> {
+public class SolvableGroebnerBasePseudoSeq<C extends RingElem<C>> extends SolvableGroebnerBaseAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(SolvableGroebnerBasePseudoSeq.class);

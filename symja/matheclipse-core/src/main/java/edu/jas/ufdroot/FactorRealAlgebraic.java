@@ -17,7 +17,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.root.PolyUtilRoot;
 import edu.jas.root.RealAlgebraicNumber;
 import edu.jas.root.RealAlgebraicRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.ufd.FactorAbstract;
 import edu.jas.ufd.FactorFactory;
 
@@ -37,7 +37,7 @@ import edu.jas.ufd.FactorFactory;
  * @author Heinz Kredel
  */
 
-public class FactorRealAlgebraic<C extends GcdRingElem<C> & Rational> extends
+public class FactorRealAlgebraic<C extends RingElem<C> & Rational> extends
         FactorAbstract<RealAlgebraicNumber<C>> {
 
 

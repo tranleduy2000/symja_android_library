@@ -20,7 +20,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.structure.UnaryFunctor;
@@ -52,7 +52,7 @@ public class PolyUfdUtil {
      * @param A   polynomial with rational function coefficients to be converted.
      * @return polynomial with integral polynomial coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<GenPolynomial<C>> integralFromQuotientCoefficients(
+    public static <C extends RingElem<C>> GenPolynomial<GenPolynomial<C>> integralFromQuotientCoefficients(
             GenPolynomialRing<GenPolynomial<C>> fac, GenPolynomial<Quotient<C>> A) {
         GenPolynomial<GenPolynomial<C>> B = fac.getZERO().copy();
         if (A == null || A.isZERO()) {
@@ -101,7 +101,7 @@ public class PolyUfdUtil {
      *            converted.
      * @return list of polynomials with integral polynomial coefficients.
      */
-    public static <C extends GcdRingElem<C>> List<GenPolynomial<GenPolynomial<C>>> integralFromQuotientCoefficients(
+    public static <C extends RingElem<C>> List<GenPolynomial<GenPolynomial<C>>> integralFromQuotientCoefficients(
             GenPolynomialRing<GenPolynomial<C>> fac, Collection<GenPolynomial<Quotient<C>>> L) {
         if (L == null) {
             return null;
@@ -123,7 +123,7 @@ public class PolyUfdUtil {
      *            converted.
      * @return polynomial with type Quotient<C> coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<Quotient<C>> quotientFromIntegralCoefficients(
+    public static <C extends RingElem<C>> GenPolynomial<Quotient<C>> quotientFromIntegralCoefficients(
             GenPolynomialRing<Quotient<C>> fac, GenPolynomial<GenPolynomial<C>> A) {
         GenPolynomial<Quotient<C>> B = fac.getZERO().copy();
         if (A == null || A.isZERO()) {
@@ -153,7 +153,7 @@ public class PolyUfdUtil {
      *            converted.
      * @return list of polynomials with type Quotient<C> coefficients.
      */
-    public static <C extends GcdRingElem<C>> List<GenPolynomial<Quotient<C>>> quotientFromIntegralCoefficients(
+    public static <C extends RingElem<C>> List<GenPolynomial<Quotient<C>>> quotientFromIntegralCoefficients(
             GenPolynomialRing<Quotient<C>> fac, Collection<GenPolynomial<GenPolynomial<C>>> L) {
         if (L == null) {
             return null;
@@ -292,7 +292,7 @@ public class PolyUfdUtil {
      * @param A    polynomial to be extended.
      * @return polynomial with type GenPolynomial&lt;C&gt; coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<GenPolynomial<C>> introduceLowerVariable(
+    public static <C extends RingElem<C>> GenPolynomial<GenPolynomial<C>> introduceLowerVariable(
             GenPolynomialRing<GenPolynomial<C>> rfac, GenPolynomial<C> A) {
         if (A == null || rfac == null) {
             return null;
@@ -315,7 +315,7 @@ public class PolyUfdUtil {
      * @param k    for (y-k x) substitution.
      * @return polynomial with type GenPolynomial&lt;C&gt; coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<GenPolynomial<C>> substituteFromAlgebraicCoefficients(
+    public static <C extends RingElem<C>> GenPolynomial<GenPolynomial<C>> substituteFromAlgebraicCoefficients(
             GenPolynomialRing<GenPolynomial<C>> rfac, GenPolynomial<AlgebraicNumber<C>> A, long k) {
         if (A == null || rfac == null) {
             return null;
@@ -351,7 +351,7 @@ public class PolyUfdUtil {
      * @param k    for (y-k x) substitution.
      * @return polynomial with AlgebraicNumber&lt;C&gt; coefficients.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<AlgebraicNumber<C>> substituteConvertToAlgebraicCoefficients(
+    public static <C extends RingElem<C>> GenPolynomial<AlgebraicNumber<C>> substituteConvertToAlgebraicCoefficients(
             GenPolynomialRing<AlgebraicNumber<C>> pfac, GenPolynomial<C> A, long k) {
         if (A == null || pfac == null) {
             return null;
@@ -380,7 +380,7 @@ public class PolyUfdUtil {
      * @param k for (y - k x) substitution.
      * @return norm(A) = res_x(A(x,y),m(x)) in GenPolynomialRing&lt;C&gt;.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<C> norm(GenPolynomial<AlgebraicNumber<C>> A, long k) {
+    public static <C extends RingElem<C>> GenPolynomial<C> norm(GenPolynomial<AlgebraicNumber<C>> A, long k) {
         if (A == null) {
             return null;
         }
@@ -427,7 +427,7 @@ public class PolyUfdUtil {
      * @param A polynomial from GenPolynomial&lt;AlgebraicNumber&lt;C&gt;&gt;.
      * @return norm(A) = resultant_x( A(x,y), m(x) ) in K[y].
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<C> norm(GenPolynomial<AlgebraicNumber<C>> A) {
+    public static <C extends RingElem<C>> GenPolynomial<C> norm(GenPolynomial<AlgebraicNumber<C>> A) {
         return norm(A, 0L);
     }
 
@@ -438,7 +438,7 @@ public class PolyUfdUtil {
      *
      * @param afac algebraic number ring.
      */
-    public static <C extends GcdRingElem<C>> void ensureFieldProperty(AlgebraicNumberRing<C> afac) {
+    public static <C extends RingElem<C>> void ensureFieldProperty(AlgebraicNumberRing<C> afac) {
         if (afac.getField() != -1) {
             return;
         }
@@ -462,7 +462,7 @@ public class PolyUfdUtil {
      * @param A polynomial to be converted.
      * @return a univariate polynomial.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<C> substituteKronecker(GenPolynomial<C> A) {
+    public static <C extends RingElem<C>> GenPolynomial<C> substituteKronecker(GenPolynomial<C> A) {
         if (A == null) {
             return A;
         }
@@ -478,7 +478,7 @@ public class PolyUfdUtil {
      * @param A polynomial to be converted.
      * @return a univariate polynomial.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<C> substituteKronecker(GenPolynomial<C> A, long d) {
+    public static <C extends RingElem<C>> GenPolynomial<C> substituteKronecker(GenPolynomial<C> A, long d) {
         if (A == null) {
             return A;
         }
@@ -512,7 +512,7 @@ public class PolyUfdUtil {
      * @param A list of polynomials to be converted.
      * @return a list of univariate polynomials.
      */
-    public static <C extends GcdRingElem<C>> List<GenPolynomial<C>> substituteKronecker(
+    public static <C extends RingElem<C>> List<GenPolynomial<C>> substituteKronecker(
             List<GenPolynomial<C>> A, int d) {
         if (A == null || A.get(0) == null) {
             return null;
@@ -529,7 +529,7 @@ public class PolyUfdUtil {
      * @param fac result polynomial factory.
      * @return a multivariate polynomial.
      */
-    public static <C extends GcdRingElem<C>> GenPolynomial<C> backSubstituteKronecker(
+    public static <C extends RingElem<C>> GenPolynomial<C> backSubstituteKronecker(
             GenPolynomialRing<C> fac, GenPolynomial<C> A, long d) {
         if (A == null) {
             return A;
@@ -566,7 +566,7 @@ public class PolyUfdUtil {
      * @param fac result polynomial factory.
      * @return a list of multivariate polynomials.
      */
-    public static <C extends GcdRingElem<C>> List<GenPolynomial<C>> backSubstituteKronecker(
+    public static <C extends RingElem<C>> List<GenPolynomial<C>> backSubstituteKronecker(
             GenPolynomialRing<C> fac, List<GenPolynomial<C>> A, long d) {
         return ListUtil.<GenPolynomial<C>, GenPolynomial<C>>map(A, new BackSubstKronecker<C>(fac, d));
     }
@@ -577,7 +577,7 @@ public class PolyUfdUtil {
 /**
  * Kronecker substitutuion functor.
  */
-class SubstKronecker<C extends GcdRingElem<C>> implements UnaryFunctor<GenPolynomial<C>, GenPolynomial<C>> {
+class SubstKronecker<C extends RingElem<C>> implements UnaryFunctor<GenPolynomial<C>, GenPolynomial<C>> {
 
 
     final long d;
@@ -600,7 +600,7 @@ class SubstKronecker<C extends GcdRingElem<C>> implements UnaryFunctor<GenPolyno
 /**
  * Kronecker back substitutuion functor.
  */
-class BackSubstKronecker<C extends GcdRingElem<C>> implements
+class BackSubstKronecker<C extends RingElem<C>> implements
         UnaryFunctor<GenPolynomial<C>, GenPolynomial<C>> {
 
 

@@ -15,7 +15,7 @@ import edu.jas.gb.PairList;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.ufd.PolyUfdUtil;
 import edu.jas.ufd.Quotient;
 import edu.jas.ufd.QuotientRing;
@@ -29,7 +29,7 @@ import edu.jas.ufd.QuotientRing;
  * @author Heinz Kredel
  */
 
-public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<Quotient<C>> {
+public class GroebnerBaseQuotient<C extends RingElem<C>> extends GroebnerBaseAbstract<Quotient<C>> {
 
 
     private static final Logger logger = Logger.getLogger(GroebnerBaseQuotient.class);

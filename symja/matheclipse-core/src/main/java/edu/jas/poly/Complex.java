@@ -11,7 +11,7 @@ import edu.jas.arith.BigComplex;
 import edu.jas.arith.BigDecimal;
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.StarRingElem;
@@ -25,7 +25,7 @@ import edu.jas.structure.StarRingElem;
  * @author Heinz Kredel
  */
 public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
-        implements StarRingElem<Complex<C>>, GcdRingElem<Complex<C>> {
+        implements StarRingElem<Complex<C>>, RingElem<Complex<C>> {
 
 
     private static final Logger logger = Logger.getLogger(Complex.class);

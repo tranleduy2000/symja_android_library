@@ -33,7 +33,7 @@ import edu.jas.gbufd.GroebnerBaseWalk;
 import edu.jas.kern.ComputerThreads;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.Quotient;
 import edu.jas.ufd.QuotientRing;
@@ -107,7 +107,7 @@ import edu.jas.ufd.QuotientRing;
  * @see GBFactory
  */
 
-public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializable {
+public class GBAlgorithmBuilder<C extends RingElem<C>> implements Serializable {
 
 
     private static final Logger logger = Logger.getLogger(GBAlgorithmBuilder.class);
@@ -183,7 +183,7 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
      * @param fac the commutative polynomial ring.
      * @return GBAlgorithmBuilder object.
      */
-    public static <C extends GcdRingElem<C>> GBAlgorithmBuilder<C> polynomialRing(GenPolynomialRing<C> fac) {
+    public static <C extends RingElem<C>> GBAlgorithmBuilder<C> polynomialRing(GenPolynomialRing<C> fac) {
         return new GBAlgorithmBuilder<C>(fac);
     }
 
@@ -403,7 +403,7 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
             GroebnerBaseAbstract<C> bb = new GroebnerBaseParallel<C>(threads, strategy);
             GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
             return new GBAlgorithmBuilder<C>(ring, pbb, strategy);
-        } else if (ring.coFac.getONE() instanceof GcdRingElem) {
+        } else if (ring.coFac.getONE() instanceof RingElem) {
             GroebnerBaseAbstract<C> bb = new GroebnerBasePseudoParallel<C>(threads, ring.coFac, strategy);
             GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
             return new GBAlgorithmBuilder<C>(ring, pbb, strategy);

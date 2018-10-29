@@ -22,7 +22,7 @@ import edu.jas.ps.PolynomialTaylorFunction;
 import edu.jas.ps.TaylorFunction;
 import edu.jas.ps.UnivPowerSeries;
 import edu.jas.ps.UnivPowerSeriesRing;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -53,7 +53,7 @@ public class HenselMultUtil {
      * @param k desired approximation exponent p^k.
      * @return [s, t] with s A' + t B' = C mod p^k, with A' = B, B' = A.
      */
-    public static <MOD extends GcdRingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftDiophant(
+    public static <MOD extends RingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftDiophant(
             GenPolynomial<MOD> A, GenPolynomial<MOD> B, GenPolynomial<MOD> C, List<MOD> V, long d,
             long k) throws NoLiftingException {
         GenPolynomialRing<MOD> pkfac = C.ring;
@@ -221,7 +221,7 @@ public class HenselMultUtil {
      * @return [s_1, ..., s_n] with sum_i s_i A_i' = C mod p^k, with Ai' =
      * prod_{j!=i} A_j.
      */
-    public static <MOD extends GcdRingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftDiophant(
+    public static <MOD extends RingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftDiophant(
             List<GenPolynomial<MOD>> A, GenPolynomial<MOD> C, List<MOD> V, long d, long k)
             throws NoLiftingException {
         GenPolynomialRing<MOD> pkfac = C.ring;
@@ -415,7 +415,7 @@ public class HenselMultUtil {
      * @param L  = [g_0,...,g_{n-1}] list of lifted modular polynomials.
      * @return true if C = prod_{0,...,n-1} g_i mod p^k, else false.
      */
-    public static <MOD extends GcdRingElem<MOD> & Modular> boolean isHenselLift(GenPolynomial<BigInteger> C,
+    public static <MOD extends RingElem<MOD> & Modular> boolean isHenselLift(GenPolynomial<BigInteger> C,
                                                                                 GenPolynomial<MOD> Cp, List<GenPolynomial<MOD>> F, List<GenPolynomial<MOD>> L) {
         boolean t = true;
         GenPolynomialRing<MOD> qfac = L.get(0).ring;
@@ -455,7 +455,7 @@ public class HenselMultUtil {
      * @param k  desired approximation exponent p^k.
      * @return [g'_1,..., g'_n] with prod_i g'_i = Cp mod p^k.
      */
-    public static <MOD extends GcdRingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftHenselMonic(
+    public static <MOD extends RingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftHenselMonic(
             GenPolynomial<BigInteger> C, GenPolynomial<MOD> Cp, List<GenPolynomial<MOD>> F,
             List<BigInteger> V, long k) throws NoLiftingException {
         GenPolynomialRing<MOD> pkfac = Cp.ring;
@@ -662,7 +662,7 @@ public class HenselMultUtil {
      * @param G  list of leading coefficients of the factors of C.
      * @return [g'_1,..., g'_n] with prod_i g'_i = Cp mod p^k.
      */
-    public static <MOD extends GcdRingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftHensel(
+    public static <MOD extends RingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftHensel(
             GenPolynomial<BigInteger> C, GenPolynomial<MOD> Cp, List<GenPolynomial<MOD>> F,
             List<BigInteger> V, long k, List<GenPolynomial<BigInteger>> G)
             throws NoLiftingException {
@@ -924,7 +924,7 @@ public class HenselMultUtil {
      * @return [c_1, ..., c_n] with prod_i c_i = C mod p^k.
      */
     @SuppressWarnings("unchecked")
-    public static <MOD extends GcdRingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftHenselFull(
+    public static <MOD extends RingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftHenselFull(
             GenPolynomial<BigInteger> C, List<GenPolynomial<MOD>> F, List<BigInteger> V, long k,
             List<GenPolynomial<BigInteger>> G) throws NoLiftingException {
         if (F == null || F.size() == 0) {

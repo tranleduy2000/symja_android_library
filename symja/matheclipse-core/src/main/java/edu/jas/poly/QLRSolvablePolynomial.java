@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.QuotPair;
 import edu.jas.structure.RingFactory;
 
@@ -31,7 +31,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolynomial<D>>, D extends GcdRingElem<D>>
+public class QLRSolvablePolynomial<C extends RingElem<C> & QuotPair<GenPolynomial<D>>, D extends RingElem<D>>
         extends GenSolvablePolynomial<C> {
 
 

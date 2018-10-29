@@ -20,7 +20,7 @@ import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.GenWordPolynomial;
 import edu.jas.poly.GenWordPolynomialRing;
 import edu.jas.poly.PolyUtil;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.ufd.GCDFactory;
 import edu.jas.ufd.GreatestCommonDivisorAbstract;
@@ -35,7 +35,7 @@ import edu.jas.ufd.GreatestCommonDivisorAbstract;
  * @author Heinz Kredel
  */
 
-public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
+public class WordGroebnerBasePseudoRecSeq<C extends RingElem<C>> extends
         WordGroebnerBaseAbstract<GenPolynomial<C>> {
 
 

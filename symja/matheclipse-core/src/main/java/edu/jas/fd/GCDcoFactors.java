@@ -8,7 +8,7 @@ package edu.jas.fd;
 import java.io.Serializable;
 
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -19,7 +19,7 @@ import edu.jas.structure.GcdRingElem;
  * @author Heinz Kredel
  */
 
-public class GCDcoFactors<C extends GcdRingElem<C>> implements Serializable {
+public class GCDcoFactors<C extends RingElem<C>> implements Serializable {
 
 
     /**

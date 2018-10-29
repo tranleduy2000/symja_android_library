@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import edu.jas.kern.ComputerThreads;
 import edu.jas.kern.PreemptingException;
 import edu.jas.poly.GenSolvablePolynomial;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 
 
 /**
@@ -25,7 +25,7 @@ import edu.jas.structure.GcdRingElem;
  * @author Heinz Kredel
  */
 
-public class SGBProxy<C extends GcdRingElem<C>> extends SolvableGroebnerBaseAbstract<C> {
+public class SGBProxy<C extends RingElem<C>> extends SolvableGroebnerBaseAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(SGBProxy.class);

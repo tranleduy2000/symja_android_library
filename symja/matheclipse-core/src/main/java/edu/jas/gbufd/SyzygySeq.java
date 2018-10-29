@@ -17,7 +17,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.ModuleList;
 import edu.jas.poly.PolynomialList;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -28,7 +28,7 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class SyzygySeq<C extends GcdRingElem<C>> extends SyzygyAbstract<C> {
+public class SyzygySeq<C extends RingElem<C>> extends SyzygyAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(SyzygySeq.class);

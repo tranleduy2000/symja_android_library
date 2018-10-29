@@ -19,7 +19,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
 import edu.jas.poly.TermOrder;
-import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
 
@@ -32,7 +32,7 @@ import edu.jas.structure.RingFactory;
  * @see edu.jas.application.GBAlgorithmBuilder
  * @see GBFactory
  */
-public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
+public class GroebnerBaseFGLM<C extends RingElem<C>> extends GroebnerBaseAbstract<C> {
 
 
     private static final Logger logger = Logger.getLogger(GroebnerBaseFGLM.class);
