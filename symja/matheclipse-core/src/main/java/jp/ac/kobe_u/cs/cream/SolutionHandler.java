@@ -21,6 +21,6 @@ public interface SolutionHandler {
      * @param solver the solver
      * @param solution the solution or <tt>null</tt> at the end of search
      */
-    public void solved(Solver solver, Solution solution);
+    void solved(Solver solver, Solution solution);
 
 }

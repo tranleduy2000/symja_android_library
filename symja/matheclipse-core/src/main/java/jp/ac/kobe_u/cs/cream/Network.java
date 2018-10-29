@@ -198,7 +198,7 @@ public class Network implements Cloneable {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder s = new StringBuilder("");
+		StringBuilder s = new StringBuilder();
 		if (objective != null) {
 			s.append("Objective: ").append(objective.getName())
 			 .append('=').append(objective.getDomain())

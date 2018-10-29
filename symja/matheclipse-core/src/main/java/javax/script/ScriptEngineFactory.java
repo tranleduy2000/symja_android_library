@@ -30,14 +30,14 @@ public interface ScriptEngineFactory {
      *
      * @return The name of the engine implementation.
      */
-    public String getEngineName();
+    String getEngineName();
 
     /**
      * Returns the version of the <code>ScriptEngine</code>.
      *
      * @return The <code>ScriptEngine</code> implementation version.
      */
-    public String getEngineVersion();
+    String getEngineVersion();
 
 
     /**
@@ -48,7 +48,7 @@ public interface ScriptEngineFactory {
      *
      * @return The list of extensions.
      */
-    public List<String> getExtensions();
+    List<String> getExtensions();
 
 
     /**
@@ -59,7 +59,7 @@ public interface ScriptEngineFactory {
      *
      * @return The list of mime types.
      */
-    public List<String> getMimeTypes();
+    List<String> getMimeTypes();
 
     /**
      * Returns an immutable list of  short names for the <code>ScriptEngine</code>, which may be used to
@@ -67,7 +67,7 @@ public interface ScriptEngineFactory {
      * For instance, an implementation based on the Mozilla Rhino Javascript engine might
      * return list containing {&quot;javascript&quot;, &quot;rhino&quot;}.
      */
-    public List<String> getNames();
+    List<String> getNames();
 
     /**
      * Returns the name of the scripting langauge supported by this
@@ -75,7 +75,7 @@ public interface ScriptEngineFactory {
      *
      * @return The name of the supported language.
      */
-    public String getLanguageName();
+    String getLanguageName();
 
     /**
      * Returns the version of the scripting language supported by this
@@ -83,7 +83,7 @@ public interface ScriptEngineFactory {
      *
      * @return The version of the supported language.
      */
-    public String getLanguageVersion();
+    String getLanguageVersion();
 
     /**
      * Returns the value of an attribute whose meaning may be implementation-specific.
@@ -125,7 +125,7 @@ public interface ScriptEngineFactory {
      * @return The value for the given parameter. Returns <code>null</code> if no
      * value is assigned to the key.
      */
-    public Object getParameter(String key);
+    Object getParameter(String key);
 
     /**
      * Returns a String which can be used to invoke a method of a  Java object using the syntax
@@ -160,7 +160,7 @@ public interface ScriptEngineFactory {
      * @param args names of the arguments in the method call.
      * @return The String used to invoke the method in the syntax of the scripting language.
      */
-    public String getMethodCallSyntax(String obj, String m, String... args);
+    String getMethodCallSyntax(String obj, String m, String... args);
 
     /**
      * Returns a String that can be used as a statement to display the specified String  using
@@ -176,7 +176,7 @@ public interface ScriptEngineFactory {
      * @param toDisplay The String to be displayed by the returned statement.
      * @return The string used to display the String in the syntax of the scripting language.
      */
-    public String getOutputStatement(String toDisplay);
+    String getOutputStatement(String toDisplay);
 
 
     /**
@@ -200,7 +200,7 @@ public interface ScriptEngineFactory {
      * @return The Program
      */
 
-    public String getProgram(String... statements);
+    String getProgram(String... statements);
 
     /**
      * Returns an instance of the <code>ScriptEngine</code> associated with this
@@ -209,5 +209,5 @@ public interface ScriptEngineFactory {
      *
      * @return A new <code>ScriptEngine</code> instance.
      */
-    public ScriptEngine getScriptEngine();
+    ScriptEngine getScriptEngine();
 }

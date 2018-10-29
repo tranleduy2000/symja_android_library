@@ -449,12 +449,8 @@ public abstract class Solver implements Runnable {
 		if (!running) {
 			// Failure
 			return false;
-		} else if (!ready) {
-			// Timeout
-			return false;
-		}
-		return true;
-	}
+		} else return ready;
+    }
 
 	/**
 	 * Resumes the execution of the solver.
@@ -639,8 +635,7 @@ public abstract class Solver implements Runnable {
 	public synchronized Solution findBest(long timeout) {
 		clearBest();
 		for (start(timeout); waitNext(); resume()) {
-			;
-		}
+        }
 		stop();
 		return getBestSolution();
 	}

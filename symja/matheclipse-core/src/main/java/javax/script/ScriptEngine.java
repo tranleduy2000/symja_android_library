@@ -35,25 +35,25 @@ public interface ScriptEngine  {
      * Reserved key for a named value that passes
      * an array of positional arguments to a script.
      */
-    public static final String ARGV="javax.script.argv";
+    String ARGV="javax.script.argv";
     
     /**
      * Reserved key for a named value that is
      * the name of the file being executed.
      */
-    public static final String FILENAME = "javax.script.filename";
+    String FILENAME = "javax.script.filename";
     
     /**
      * Reserved key for a named value that is
      * the name of the <code>ScriptEngine</code> implementation.
      */
-    public static final String ENGINE = "javax.script.engine";
+    String ENGINE = "javax.script.engine";
     
     /**
      * Reserved key for a named value that identifies
      * the version of the <code>ScriptEngine</code> implementation.
      */
-    public static final String ENGINE_VERSION = "javax.script.engine_version";
+    String ENGINE_VERSION = "javax.script.engine_version";
     
     /**
      * Reserved key for a named value that identifies
@@ -61,19 +61,19 @@ public interface ScriptEngine  {
      * <code>ScriptEngineManager</code> to locate a <code>ScriptEngine</code>
      * with a given name in the <code>getEngineByName</code> method.
      */
-    public static final String NAME = "javax.script.name";
+    String NAME = "javax.script.name";
     
     /**
      * Reserved key for a named value that is
      * the full name of Scripting Language supported by the implementation.
      */
-    public static final String LANGUAGE = "javax.script.language";
+    String LANGUAGE = "javax.script.language";
     
     /**
      * Reserved key for the named value that identifies
      * the version of the scripting language supported by the implementation.
      */
-    public static final String LANGUAGE_VERSION ="javax.script.language_version";
+    String LANGUAGE_VERSION ="javax.script.language_version";
     
     
     /**
@@ -100,7 +100,7 @@ public interface ScriptEngine  {
      * implementations.
      * @throws NullPointerException if either argument is null.
      */
-    public Object eval(String script, ScriptContext context) throws ScriptException;
+    Object eval(String script, ScriptContext context) throws ScriptException;
     
     
     /**
@@ -116,7 +116,7 @@ public interface ScriptEngine  {
      * @throws ScriptException if an error occurrs in script.
      * @throws NullPointerException if either argument is null.
      */
-    public Object eval(Reader reader, ScriptContext context) throws ScriptException;
+    Object eval(Reader reader, ScriptContext context) throws ScriptException;
     
     /**
      * Executes the specified script.  The default <code>ScriptContext</code> for the <code>ScriptEngine</code>
@@ -129,7 +129,7 @@ public interface ScriptEngine  {
      * @throws ScriptException if error occurrs in script.
      * @throws NullPointerException if the argument is null.
      */
-    public Object eval(String script) throws ScriptException;
+    Object eval(String script) throws ScriptException;
     
     /**
      * Same as <code>eval(String)</code> except that the source of the script is
@@ -142,7 +142,7 @@ public interface ScriptEngine  {
      * @throws ScriptException if an error occurrs in script.
      * @throws NullPointerException if the argument is null.
      */
-    public Object eval(Reader reader) throws ScriptException;
+    Object eval(Reader reader) throws ScriptException;
     
     /**
      * Executes the script using the <code>Bindings</code> argument as the <code>ENGINE_SCOPE</code>
@@ -161,7 +161,7 @@ public interface ScriptEngine  {
      * @throws ScriptException if an error occurrs in script.
      * @throws NullPointerException if either argument is null.
      */
-    public Object eval(String script, Bindings n) throws ScriptException;
+    Object eval(String script, Bindings n) throws ScriptException;
 
     /**
      * Same as <code>eval(String, Bindings)</code> except that the source of the script
@@ -175,7 +175,7 @@ public interface ScriptEngine  {
      * @throws ScriptException if an error occurrs.
      * @throws NullPointerException if either argument is null.
      */
-    public Object eval(Reader reader, Bindings n) throws ScriptException;
+    Object eval(Reader reader, Bindings n) throws ScriptException;
 
 
 
@@ -191,7 +191,7 @@ public interface ScriptEngine  {
      * @throws NullPointerException if key is null.
      * @throws IllegalArgumentException if key is empty.
      */
-    public void put(String key, Object value);
+    void put(String key, Object value);
     
     
     /**
@@ -206,7 +206,7 @@ public interface ScriptEngine  {
      * @throws NullPointerException if key is null.
      * @throws IllegalArgumentException if key is empty.
      */
-    public Object get(String key);
+    Object get(String key);
     
     
     /**
@@ -238,7 +238,7 @@ public interface ScriptEngine  {
      * @throws IllegalArgumentException if specified scope is invalid
      *
      */
-    public Bindings getBindings(int scope);
+    Bindings getBindings(int scope);
 
 
     /**
@@ -247,7 +247,7 @@ public interface ScriptEngine  {
      *
      * @return The default <code>ScriptContext</code> of the <code>ScriptEngine</code>.
      */
-    public ScriptContext getContext();
+    ScriptContext getContext();
     
     /**
      * Sets the default <code>ScriptContext</code> of the <code>ScriptEngine</code> whose Bindings, Reader
@@ -257,12 +257,12 @@ public interface ScriptEngine  {
      * the <code>ScriptEngine</code>.
      * @throws NullPointerException if context is null.
      */
-    public void setContext(ScriptContext context);
+    void setContext(ScriptContext context);
     
     /**
      * Returns a <code>ScriptEngineFactory</code> for the class to which this <code>ScriptEngine</code> belongs.
      *
      * @return The <code>ScriptEngineFactory</code>
      */
-    public ScriptEngineFactory getFactory();
+    ScriptEngineFactory getFactory();
 }

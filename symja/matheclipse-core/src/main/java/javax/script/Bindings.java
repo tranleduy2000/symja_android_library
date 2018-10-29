@@ -28,7 +28,7 @@ public interface Bindings extends Map<String, Object> {
      * @throws NullPointerException     if the name is null.
      * @throws IllegalArgumentException if the name is empty String.
      */
-    public Object put(String name, Object value);
+    Object put(String name, Object value);
 
     /**
      * Adds all the mappings in a given <code>Map</code> to this <code>Bindings</code>.
@@ -37,7 +37,7 @@ public interface Bindings extends Map<String, Object> {
      * @throws NullPointerException     if toMerge map is null or if some key in the map is null.
      * @throws IllegalArgumentException if some key in the map is an empty String.
      */
-    public void putAll(Map<? extends String, ? extends Object> toMerge);
+    void putAll(Map<? extends String, ? extends Object> toMerge);
 
     /**
      * Returns <tt>true</tt> if this map contains a mapping for the specified
@@ -53,7 +53,7 @@ public interface Bindings extends Map<String, Object> {
      * @throws ClassCastException       if key is not String
      * @throws IllegalArgumentException if key is empty String
      */
-    public boolean containsKey(Object key);
+    boolean containsKey(Object key);
 
     /**
      * Returns the value to which this map maps the specified key.  Returns
@@ -75,7 +75,7 @@ public interface Bindings extends Map<String, Object> {
      * @throws ClassCastException       if key is not String
      * @throws IllegalArgumentException if key is empty String
      */
-    public Object get(Object key);
+    Object get(Object key);
 
     /**
      * Removes the mapping for this key from this map if it is present
@@ -98,5 +98,5 @@ public interface Bindings extends Map<String, Object> {
      * @throws ClassCastException       if key is not String
      * @throws IllegalArgumentException if key is empty String
      */
-    public Object remove(Object key);
+    Object remove(Object key);
 }
