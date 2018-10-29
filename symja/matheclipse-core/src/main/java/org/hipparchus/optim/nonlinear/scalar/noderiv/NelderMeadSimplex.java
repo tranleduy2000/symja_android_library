@@ -16,10 +16,10 @@
  */
 package org.hipparchus.optim.nonlinear.scalar.noderiv;
 
-import java.util.Comparator;
-
 import org.hipparchus.analysis.MultivariateFunction;
 import org.hipparchus.optim.PointValuePair;
+
+import java.util.Comparator;
 
 /**
  * This class implements the Nelder-Mead simplex algorithm.

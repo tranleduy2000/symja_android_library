@@ -1,8 +1,5 @@
 package org.matheclipse.core.reflection.system;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
@@ -12,6 +9,9 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.DerivativeRules;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <pre>

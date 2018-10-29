@@ -1,11 +1,11 @@
 package org.apfloat;
 
+import org.apfloat.spi.Util;
+
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Queue;
 import java.util.PriorityQueue;
-
-import org.apfloat.spi.Util;
+import java.util.Queue;
 
 /**
  * Various mathematical functions for arbitrary precision complex numbers.

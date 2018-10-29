@@ -1,10 +1,5 @@
 package org.matheclipse.core.form.mathml;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.text.NumberFormat;
-import java.util.HashMap;
-
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.matheclipse.core.basic.Config;
@@ -37,6 +32,11 @@ import org.matheclipse.parser.client.operator.ASTNodeFactory;
 import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.PostfixOperator;
 import org.matheclipse.parser.client.operator.PrefixOperator;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.text.NumberFormat;
+import java.util.HashMap;
 
 /**
  * Generates MathML presentation output

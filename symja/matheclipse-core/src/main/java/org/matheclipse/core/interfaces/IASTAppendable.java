@@ -1,10 +1,10 @@
 package org.matheclipse.core.interfaces;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.duy.lambda.Consumer;
 import com.duy.lambda.IntFunction;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 

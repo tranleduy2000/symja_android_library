@@ -16,8 +16,6 @@
  */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
-import java.util.Arrays;
-
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.linear.ArrayRealVector;
 import org.hipparchus.linear.RealMatrix;
@@ -27,6 +25,8 @@ import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresProblem.Ev
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.Incrementor;
 import org.hipparchus.util.Precision;
+
+import java.util.Arrays;
 
 
 /**

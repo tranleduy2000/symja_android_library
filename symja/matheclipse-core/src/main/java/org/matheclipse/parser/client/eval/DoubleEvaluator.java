@@ -15,10 +15,6 @@
  */
 package org.matheclipse.parser.client.eval;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import com.duy.lambda.DoubleBinaryOperator;
 import com.duy.lambda.DoubleSupplier;
 import com.duy.lambda.DoubleUnaryOperator;
@@ -31,6 +27,11 @@ import org.matheclipse.parser.client.ast.NumberNode;
 import org.matheclipse.parser.client.ast.SymbolNode;
 import org.matheclipse.parser.client.math.ArithmeticMathException;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Evaluate math expressions to <code>double</code> numbers.

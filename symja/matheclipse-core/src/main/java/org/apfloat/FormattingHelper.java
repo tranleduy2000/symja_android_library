@@ -1,11 +1,11 @@
 package org.apfloat;
 
 import java.io.Closeable;
-import java.io.Flushable;
-import java.io.Writer;
 import java.io.FilterWriter;
-import java.io.StringWriter;
+import java.io.Flushable;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.DecimalFormatSymbols;
 import java.util.Formatter;
 import java.util.Locale;

@@ -1,5 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.Consumer;
+
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.optim.OptimizationData;
 import org.hipparchus.optim.PointValuePair;
@@ -23,7 +25,6 @@ import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.duy.lambda.Consumer;
 
 /**
  * <pre>

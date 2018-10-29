@@ -7,7 +7,6 @@ package edu.jas.gbufd;
 
 import org.apache.log4j.Logger;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,6 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.ModuleList;
 import edu.jas.poly.PolynomialList;
 import edu.jas.structure.GcdRingElem;
-import edu.jas.structure.RingElem;
 import edu.jas.vector.BasicLinAlg;
 import edu.jas.vector.GenVector;
 import edu.jas.vector.GenVectorModul;

@@ -1,12 +1,12 @@
 package org.matheclipse.core.eval;
 
-import java.io.Writer;
-import java.text.NumberFormat;
-
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.mathml.MathMLFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
+
+import java.io.Writer;
+import java.text.NumberFormat;
 
 /**
  * Convert an expression into presentation MathML output

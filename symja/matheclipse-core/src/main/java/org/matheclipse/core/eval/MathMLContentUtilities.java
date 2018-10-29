@@ -1,10 +1,10 @@
 package org.matheclipse.core.eval;
 
-import java.io.Writer;
-
 import org.matheclipse.core.form.mathml.MathMLContentFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
+
+import java.io.Writer;
 
 /**
  * Convert an expression into content MathML output

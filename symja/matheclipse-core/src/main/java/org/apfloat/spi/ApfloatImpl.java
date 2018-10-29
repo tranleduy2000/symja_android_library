@@ -1,10 +1,10 @@
 package org.apfloat.spi;
 
+import org.apfloat.ApfloatRuntimeException;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
-import java.io.IOException;
-
-import org.apfloat.ApfloatRuntimeException;
 
 /**
  * Interface for apfloat implementations. An <code>ApfloatImpl</code> implements all of the

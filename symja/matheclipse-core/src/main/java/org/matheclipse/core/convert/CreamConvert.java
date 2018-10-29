@@ -1,9 +1,5 @@
 package org.matheclipse.core.convert;
 
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -11,6 +7,10 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 import jp.ac.kobe_u.cs.cream.DefaultSolver;
 import jp.ac.kobe_u.cs.cream.IntVariable;

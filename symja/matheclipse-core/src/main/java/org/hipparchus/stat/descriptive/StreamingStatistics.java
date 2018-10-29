@@ -16,6 +16,8 @@
  */
 package org.hipparchus.stat.descriptive;
 
+import com.duy.lambda.DoubleConsumer;
+
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.descriptive.moment.GeometricMean;
 import org.hipparchus.stat.descriptive.moment.Mean;
@@ -32,7 +34,6 @@ import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
 
 import java.io.Serializable;
-import com.duy.lambda.DoubleConsumer;
 
 /**
  * Computes summary statistics for a stream of data values added using the

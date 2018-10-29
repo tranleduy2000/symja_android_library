@@ -1,5 +1,7 @@
 package org.matheclipse.core.eval.util;
 
+import com.duy.lambda.Predicate;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -7,12 +9,9 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import com.duy.lambda.Predicate;
-
 import edu.jas.poly.TermOrder;
 import edu.jas.poly.TermOrderByName;
 
-import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Options;
 import static org.matheclipse.core.expression.F.ReplaceAll;
 

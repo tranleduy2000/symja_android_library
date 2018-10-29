@@ -1,7 +1,6 @@
 package org.apfloat;
 
 import java.math.RoundingMode;
-
 import java.util.Arrays;
 import java.util.Comparator;
 

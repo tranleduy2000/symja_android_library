@@ -1,10 +1,32 @@
 package org.matheclipse.core.integrate.rubi;
 
 
-import static org.matheclipse.core.expression.F.*;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.*;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctions.*;
 import org.matheclipse.core.interfaces.IAST;
+
+import static org.matheclipse.core.expression.F.*;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Coeff;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Dist;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.EqQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ExpandToSum;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Expon;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.GtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IGtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ILtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Int;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IntegersQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LinearMatchQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LinearQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NeQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NegQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.PolyQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.PosQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.QuadraticMatchQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.QuadraticQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Rt;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Simp;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Subst;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Unintegrable;
 
 /** 
  * IndefiniteIntegrationRules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -

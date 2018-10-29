@@ -1,6 +1,17 @@
 package org.matheclipse.core.numbertheory;
 
+import org.matheclipse.core.expression.ComplexSym;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IInteger;
+
 import java.math.BigInteger;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 //<XMP>
 //Gaussian Integer factorization applet
 //
@@ -11,16 +22,6 @@ import java.math.BigInteger;
 //the written consent from the author. Otherwise it can be used freely
 //except that you have to write somewhere in the code this header.
 //
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.matheclipse.core.expression.ComplexSym;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IInteger;
 
 public final class GaussianInteger {
 

@@ -1,7 +1,6 @@
 package org.apfloat.spi;
 
 import org.apfloat.ApfloatRuntimeException;
-import org.apfloat.spi.DataStorage;
 
 /**
  * Generic addition strategy. Also subtraction, "short" multiplication and

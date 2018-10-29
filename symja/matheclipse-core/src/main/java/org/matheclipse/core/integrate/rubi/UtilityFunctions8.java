@@ -1,10 +1,67 @@
 package org.matheclipse.core.integrate.rubi;
 
 
-import static org.matheclipse.core.expression.F.*;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.*;
-
 import org.matheclipse.core.interfaces.IAST;
+
+import static org.matheclipse.core.expression.F.*;
+import static org.matheclipse.core.expression.F.Integer;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.AllNegTermQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.AtomBaseQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.BinomialQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.CalculusQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Coeff;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ComplexNumberQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.DerivativeDivides;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Dist;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Divides;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.EasyDQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.EqQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.F;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FixIntRule;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FixIntRules;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FixRhsIntRule;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FreeFactors;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FreeTerms;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.G;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.GtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.H;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Int;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IntSum;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IntTerm;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.J;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.KnownCotangentIntegrandQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.KnownSecantIntegrandQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.KnownSineIntegrandQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.KnownTangentIntegrandQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.KnownTrigIntegrandQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LinearQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NegQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NegSumBaseQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NonfreeFactors;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NonfreeTerms;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NthRoot;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.PiecewiseLinearQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.PosQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.PowerQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ProductOfLinearPowersQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ProductQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.RationalFunctionExponents;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.RationalFunctionQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.RemoveContent;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Rt;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.RtAux;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.RuleName;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Simp;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SomeNegTermQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SplitProduct;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SplitSum;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SumBaseQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SumQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.TogetherSimplify;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.TrigSquare;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.TrigSquareQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.UnifyInertTrigFunction;
 /** 
  * UtilityFunctions rules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
  * rule-based integrator</a>.

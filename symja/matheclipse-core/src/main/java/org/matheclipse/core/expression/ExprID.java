@@ -1,7 +1,5 @@
 package org.matheclipse.core.expression;
 
-import java.io.ObjectStreamException;
-
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IExprImpl;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -9,6 +7,8 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+
+import java.io.ObjectStreamException;
 
 /**
  * The ExprID class holds an index for the <code>F.GLOBAL_IDS[]</code> array of predefined constant expressions. The

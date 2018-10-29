@@ -12,16 +12,17 @@ import org.hipparchus.linear.RealVector;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
-//import org.matheclipse.commons.math.linear.Array2DRowFieldMatrix;
-//import org.matheclipse.commons.math.linear.ArrayFieldVector;
-//import org.matheclipse.commons.math.linear.FieldMatrix;
-//import org.matheclipse.commons.math.linear.FieldVector;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
+//import org.matheclipse.commons.math.linear.Array2DRowFieldMatrix;
+//import org.matheclipse.commons.math.linear.ArrayFieldVector;
+//import org.matheclipse.commons.math.linear.FieldMatrix;
+//import org.matheclipse.commons.math.linear.FieldVector;
 
 /**
  * Conversions between an IExpr object and misc other object class types

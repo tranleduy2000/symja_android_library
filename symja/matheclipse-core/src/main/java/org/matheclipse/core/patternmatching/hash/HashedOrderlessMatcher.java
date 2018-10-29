@@ -1,5 +1,7 @@
 package org.matheclipse.core.patternmatching.hash;
 
+import com.duy.lambda.Predicate;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.util.OpenIntToList;
 import org.matheclipse.core.expression.F;
@@ -9,7 +11,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.visit.HashValueVisitor;
 
 import java.util.List;
-import com.duy.lambda.Predicate;
 
 /**
  * Match two arguments of an <code>Orderless</code> AST into a new resulting expression.

@@ -28,12 +28,12 @@
  */
 package org.matheclipse.core.frobenius;
 
+import org.matheclipse.core.interfaces.IInteger;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-
-import org.matheclipse.core.interfaces.IInteger;
 
 /**
  * 

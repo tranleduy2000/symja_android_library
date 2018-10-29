@@ -1,8 +1,8 @@
 package org.apfloat.spi;
 
-import java.io.Serializable;
-
 import org.apfloat.ApfloatRuntimeException;
+
+import java.io.Serializable;
 
 /**
  * Generic data storage class.<p>

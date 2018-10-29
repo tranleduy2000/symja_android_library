@@ -7,6 +7,8 @@ package edu.jas.vector;
 
 // import java.io.IOException;
 
+import com.duy.lambda.BiFunction;
+
 import org.apache.log4j.Logger;
 
 import java.io.Reader;
@@ -14,7 +16,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import com.duy.lambda.BiFunction;
 
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.AlgebraFactory;

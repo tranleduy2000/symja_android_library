@@ -1,8 +1,8 @@
 package org.apfloat;
 
-import java.math.RoundingMode;
-
 import org.apfloat.spi.Util;
+
+import java.math.RoundingMode;
 
 /**
  * Fixed-precision mathematical functions for floating-point numbers.<p>

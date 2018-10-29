@@ -1,10 +1,10 @@
 package org.matheclipse.core.polynomials;
 
+import org.matheclipse.core.interfaces.IExpr;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
-
-import org.matheclipse.core.interfaces.IExpr;
 
 /**
  * Iterator over monomials of a polynomial. Adaptor for val.entrySet().iterator().

@@ -1,10 +1,10 @@
 package org.matheclipse.core.integrate.rubi;
 
 
+import org.matheclipse.core.interfaces.IAST;
+
 import static org.matheclipse.core.expression.F.*;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.*;
-
-import org.matheclipse.core.interfaces.IAST;
 /** 
  * UtilityFunctions rules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
  * rule-based integrator</a>.

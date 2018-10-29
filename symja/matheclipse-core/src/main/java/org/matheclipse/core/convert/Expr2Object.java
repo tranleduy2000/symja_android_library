@@ -1,8 +1,8 @@
 package org.matheclipse.core.convert;
 
-import org.hipparchus.util.OpenIntToDoubleHashMap;
-import java.math.RoundingMode;
+import com.google.common.math.DoubleMath;
 
+import org.hipparchus.util.OpenIntToDoubleHashMap;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -11,7 +11,7 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import com.google.common.math.DoubleMath;
+import java.math.RoundingMode;
 
 public class Expr2Object {
 	/**

@@ -1,7 +1,27 @@
 package org.matheclipse.core.data;
 
-import static org.matheclipse.core.expression.F.*;
 import org.matheclipse.core.interfaces.IAST;
+
+import static org.matheclipse.core.expression.F.$str;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C10;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C3;
+import static org.matheclipse.core.expression.F.C4;
+import static org.matheclipse.core.expression.F.C5;
+import static org.matheclipse.core.expression.F.C6;
+import static org.matheclipse.core.expression.F.C7;
+import static org.matheclipse.core.expression.F.C8;
+import static org.matheclipse.core.expression.F.C9;
+import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Missing;
+import static org.matheclipse.core.expression.F.NotApplicable;
+import static org.matheclipse.core.expression.F.NotAvailable;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.Unknown;
+import static org.matheclipse.core.expression.F.ZZ;
+import static org.matheclipse.core.expression.F.num;
 
 /**
  *  

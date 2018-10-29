@@ -1,10 +1,11 @@
 package org.matheclipse.core.generic;
 
-import java.io.Serializable;
-import java.util.Comparator;
 import com.duy.lambda.BiPredicate;
 
 import org.matheclipse.core.interfaces.IExpr;
+
+import java.io.Serializable;
+import java.util.Comparator;
 
 public class Comparators {
 	/**

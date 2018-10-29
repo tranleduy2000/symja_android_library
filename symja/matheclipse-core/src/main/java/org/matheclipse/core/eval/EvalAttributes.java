@@ -1,10 +1,5 @@
 package org.matheclipse.core.eval;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
-import javax.annotation.Nonnull;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.Comparators;
@@ -14,6 +9,11 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+import javax.annotation.Nonnull;
 
 /**
  * Static methods for evaluating <code>ISymbol.FLAT, ISymbol.LISTABLE</code> and <code>ISymbol.ORDERLESS</code>

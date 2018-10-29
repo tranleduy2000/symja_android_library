@@ -1,8 +1,8 @@
 package org.matheclipse.core.reflection.system;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.IntFunction;
+import com.duy.lambda.ObjIntConsumer;
 
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.builtin.PolynomialFunctions;
@@ -16,9 +16,9 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import com.duy.lambda.Consumer;
-import com.duy.lambda.IntFunction;
-import com.duy.lambda.ObjIntConsumer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * Try to solve a set of equations (i.e. <code>Equal[...]</code> expressions).

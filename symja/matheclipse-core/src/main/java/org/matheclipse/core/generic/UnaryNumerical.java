@@ -1,6 +1,5 @@
 package org.matheclipse.core.generic;
 
-import java.util.Deque;
 import com.duy.lambda.Function;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -14,6 +13,8 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.util.Deque;
 
 /**
  * Unary numerical function for functions like Plot

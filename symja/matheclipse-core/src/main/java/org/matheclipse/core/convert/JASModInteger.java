@@ -1,13 +1,8 @@
 package org.matheclipse.core.convert;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.exception.JASConversionException;
-import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -16,6 +11,10 @@ import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.jas.arith.BigRational;
 import edu.jas.arith.ModLong;

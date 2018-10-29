@@ -16,13 +16,13 @@
  */
 package org.matheclipse.core.eval.util;
 
+import org.matheclipse.core.interfaces.IExpr;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
-
-import org.matheclipse.core.interfaces.IExpr;
 
 /**
  * Open addressed map from int to IExpr.

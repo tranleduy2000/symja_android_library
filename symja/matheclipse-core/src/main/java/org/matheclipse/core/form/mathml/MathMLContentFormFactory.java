@@ -1,8 +1,5 @@
 package org.matheclipse.core.form.mathml;
 
-import java.text.NumberFormat;
-import java.util.HashMap;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalAttributes;
@@ -16,6 +13,9 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
+
+import java.text.NumberFormat;
+import java.util.HashMap;
 
 /**
  * Generates MathML presentation output

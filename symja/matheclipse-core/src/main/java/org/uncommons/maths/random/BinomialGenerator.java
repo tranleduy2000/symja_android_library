@@ -15,11 +15,12 @@
 // ============================================================================
 package org.uncommons.maths.random;
 
-import java.util.Random;
 import org.uncommons.maths.binary.BinaryUtils;
 import org.uncommons.maths.binary.BitString;
 import org.uncommons.maths.number.ConstantGenerator;
 import org.uncommons.maths.number.NumberGenerator;
+
+import java.util.Random;
 
 /**
  * Discrete random sequence that follows a

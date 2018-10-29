@@ -1,11 +1,11 @@
 package org.matheclipse.core.expression;
 
+import org.matheclipse.core.interfaces.IExpr;
+
 import java.io.Reader;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
-
-import org.matheclipse.core.interfaces.IExpr;
 
 import edu.jas.structure.RingFactory;
 

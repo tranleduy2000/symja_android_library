@@ -1,10 +1,67 @@
 package org.matheclipse.core.integrate.rubi;
 
 
-import static org.matheclipse.core.expression.F.*;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.*;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctions.*;
 import org.matheclipse.core.interfaces.IAST;
+
+import static org.matheclipse.core.expression.F.$;
+import static org.matheclipse.core.expression.F.$s;
+import static org.matheclipse.core.expression.F.And;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CI;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.Condition;
+import static org.matheclipse.core.expression.F.Cos;
+import static org.matheclipse.core.expression.F.CosIntegral;
+import static org.matheclipse.core.expression.F.Cosh;
+import static org.matheclipse.core.expression.F.CoshIntegral;
+import static org.matheclipse.core.expression.F.F_;
+import static org.matheclipse.core.expression.F.FreeQ;
+import static org.matheclipse.core.expression.F.HypergeometricPFQ;
+import static org.matheclipse.core.expression.F.IIntegrate;
+import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.MemberQ;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Sin;
+import static org.matheclipse.core.expression.F.SinIntegral;
+import static org.matheclipse.core.expression.F.Sinh;
+import static org.matheclipse.core.expression.F.SinhIntegral;
+import static org.matheclipse.core.expression.F.Sqr;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.a;
+import static org.matheclipse.core.expression.F.a_;
+import static org.matheclipse.core.expression.F.a_DEFAULT;
+import static org.matheclipse.core.expression.F.b;
+import static org.matheclipse.core.expression.F.b_DEFAULT;
+import static org.matheclipse.core.expression.F.c;
+import static org.matheclipse.core.expression.F.c_DEFAULT;
+import static org.matheclipse.core.expression.F.d;
+import static org.matheclipse.core.expression.F.d_DEFAULT;
+import static org.matheclipse.core.expression.F.e;
+import static org.matheclipse.core.expression.F.e_DEFAULT;
+import static org.matheclipse.core.expression.F.f;
+import static org.matheclipse.core.expression.F.f_DEFAULT;
+import static org.matheclipse.core.expression.F.m;
+import static org.matheclipse.core.expression.F.m_;
+import static org.matheclipse.core.expression.F.m_DEFAULT;
+import static org.matheclipse.core.expression.F.n;
+import static org.matheclipse.core.expression.F.n_DEFAULT;
+import static org.matheclipse.core.expression.F.x;
+import static org.matheclipse.core.expression.F.x_;
+import static org.matheclipse.core.expression.F.x_Symbol;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Dist;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.F;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IGtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ILtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Int;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NeQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Simp;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Subst;
 
 /** 
  * IndefiniteIntegrationRules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -

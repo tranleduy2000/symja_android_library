@@ -2,9 +2,6 @@ package org.matheclipse.core.polynomials;
 
 import com.duy.util.ThreadLocalRandom;
 
-import org.apache.log4j.Logger;
-import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.Predicates;
@@ -23,7 +20,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import edu.jas.kern.PreemptStatus;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
 import edu.jas.structure.RingFactory;

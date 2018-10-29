@@ -1,8 +1,5 @@
 package org.matheclipse.core.reflection.system;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matheclipse.core.convert.JASConvert;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.JASConversionException;
@@ -13,6 +10,9 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.jas.application.GBAlgorithmBuilder;
 import edu.jas.arith.BigInteger;

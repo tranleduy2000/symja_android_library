@@ -1,10 +1,11 @@
 package org.apfloat;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import org.apfloat.spi.Util;
-import static org.apfloat.spi.RadixConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.apfloat.spi.RadixConstants.LONG_DIGITS;
 
 /**
  * Helper class for radix conversion.

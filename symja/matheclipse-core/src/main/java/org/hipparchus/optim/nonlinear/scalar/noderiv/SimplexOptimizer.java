@@ -16,8 +16,6 @@
  */
 package org.hipparchus.optim.nonlinear.scalar.noderiv;
 
-import java.util.Comparator;
-
 import org.hipparchus.analysis.MultivariateFunction;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathRuntimeException;
@@ -28,6 +26,8 @@ import org.hipparchus.optim.PointValuePair;
 import org.hipparchus.optim.SimpleValueChecker;
 import org.hipparchus.optim.nonlinear.scalar.GoalType;
 import org.hipparchus.optim.nonlinear.scalar.MultivariateOptimizer;
+
+import java.util.Comparator;
 
 /**
  * This class implements simplex-based direct search optimization.

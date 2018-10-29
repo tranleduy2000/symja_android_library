@@ -1,8 +1,5 @@
 package org.matheclipse.core.form.mathml;
 
-import java.text.NumberFormat;
-import java.util.HashMap;
-
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
@@ -10,6 +7,9 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.text.NumberFormat;
+import java.util.HashMap;
 
 /**
  * Abstract Factory for generating MathML output

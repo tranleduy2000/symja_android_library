@@ -1,11 +1,12 @@
 package org.apfloat;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
-import java.io.IOException;
 import java.util.Formattable;
 import java.util.Formatter;
-import static java.util.FormattableFlags.*;
+
+import static java.util.FormattableFlags.LEFT_JUSTIFY;
 
 /**
  * Arbitrary precision complex number class. An apcomplex consists of

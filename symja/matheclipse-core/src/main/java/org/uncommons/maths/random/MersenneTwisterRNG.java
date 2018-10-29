@@ -15,9 +15,10 @@
 // ============================================================================
 package org.uncommons.maths.random;
 
+import org.uncommons.maths.binary.BinaryUtils;
+
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
-import org.uncommons.maths.binary.BinaryUtils;
 
 /**
  * <p>Random number generator based on the

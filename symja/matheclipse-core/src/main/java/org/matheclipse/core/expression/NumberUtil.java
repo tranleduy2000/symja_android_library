@@ -1,17 +1,17 @@
 package org.matheclipse.core.expression;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-
-import javax.annotation.Nullable;
+import com.google.common.math.DoubleMath;
 
 import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 
-import com.google.common.math.DoubleMath;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
+import javax.annotation.Nullable;
 
 /**
  *

@@ -1,9 +1,9 @@
 package org.apfloat.spi;
 
-import java.io.PushbackReader;
-import java.io.IOException;
-
 import org.apfloat.ApfloatRuntimeException;
+
+import java.io.IOException;
+import java.io.PushbackReader;
 
 /**
  * An ApfloatBuilder contains factory methods to create

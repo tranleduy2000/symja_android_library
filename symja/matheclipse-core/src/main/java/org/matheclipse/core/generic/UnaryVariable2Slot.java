@@ -1,15 +1,16 @@
 package org.matheclipse.core.generic;
 
-import static org.matheclipse.core.expression.F.Slot;
-
-import java.util.Collection;
-import java.util.Map;
 import com.duy.lambda.Function;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import java.util.Collection;
+import java.util.Map;
+
+import static org.matheclipse.core.expression.F.Slot;
 
 public class UnaryVariable2Slot implements Function<IExpr, IExpr> {
 	final private Map<IExpr, IExpr> fMap;

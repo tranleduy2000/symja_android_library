@@ -43,7 +43,6 @@ import edu.jas.structure.RingElemImpl;
 
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.Sqrt;
-import static org.matheclipse.core.expression.F.g;
 
 /**
  * (I)nterface for a mathematical (Expr)ession<br />

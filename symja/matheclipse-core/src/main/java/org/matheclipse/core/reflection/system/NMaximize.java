@@ -6,14 +6,14 @@ import org.hipparchus.optim.linear.LinearObjectiveFunction;
 import org.hipparchus.optim.linear.NonNegativeConstraint;
 import org.hipparchus.optim.linear.PivotSelectionRule;
 import org.hipparchus.optim.nonlinear.scalar.GoalType;
-import java.util.List;
-
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+
+import java.util.List;
 
 /**
  * <pre>

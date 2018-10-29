@@ -1,20 +1,20 @@
 package org.apfloat;
 
+import org.apfloat.spi.Util;
+
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.Hashtable;
-import java.util.Queue;
+import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.apfloat.spi.Util;
 
 /**
  * Various mathematical functions for arbitrary precision floating-point numbers.<p>

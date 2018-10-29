@@ -28,7 +28,6 @@
 
 package org.logicng.io.parsers;
 
-import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 
 /**

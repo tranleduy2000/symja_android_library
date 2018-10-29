@@ -13,18 +13,21 @@ import org.matheclipse.core.patternmatching.Matcher;
 
 import static org.matheclipse.core.expression.F.Beta;
 import static org.matheclipse.core.expression.F.ChebyshevT;
-import static org.matheclipse.core.expression.F.*;
+import static org.matheclipse.core.expression.F.ChebyshevU;
 import static org.matheclipse.core.expression.F.Factorial;
 import static org.matheclipse.core.expression.F.a;
 import static org.matheclipse.core.expression.F.a_;
 import static org.matheclipse.core.expression.F.b;
 import static org.matheclipse.core.expression.F.b_;
 import static org.matheclipse.core.expression.F.k;
+import static org.matheclipse.core.expression.F.m;
 import static org.matheclipse.core.expression.F.m_;
 import static org.matheclipse.core.expression.F.n;
 import static org.matheclipse.core.expression.F.n_;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
+import static org.matheclipse.core.expression.F.y;
+import static org.matheclipse.core.expression.F.y_;
 import static org.matheclipse.core.expression.F.z;
 import static org.matheclipse.core.expression.F.z_;
 

@@ -16,6 +16,8 @@
  */
 package org.matheclipse.core.polynomials;
 
+import com.duy.lambda.IntFunction;
+
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.util.FastMath;
 import org.matheclipse.core.expression.F;
@@ -25,7 +27,6 @@ import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.duy.lambda.IntFunction;
 
 /**
  * A collection of static methods that operate on or return polynomials.

@@ -1,5 +1,14 @@
 package org.matheclipse.core.expression;
 
+import com.duy.lambda.DoubleUnaryOperator;
+import com.duy.lambda.Function;
+import com.duy.lambda.Predicate;
+
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IExpr;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -8,15 +17,6 @@ import java.io.ObjectStreamException;
 import java.util.HashMap;
 import java.util.RandomAccess;
 import java.util.Set;
-import com.duy.lambda.DoubleUnaryOperator;
-import com.duy.lambda.Function;
-import com.duy.lambda.Predicate;
-
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IASTMutable;
-import org.matheclipse.core.interfaces.IExpr;
 
 public class ASTPowerSeries extends AST implements Cloneable, Externalizable, RandomAccess {
 

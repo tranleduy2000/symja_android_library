@@ -1,8 +1,5 @@
 package org.matheclipse.core.eval;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
@@ -11,6 +8,9 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
+
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 /**
  * Evaluate a Symja expression

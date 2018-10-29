@@ -15,9 +15,10 @@
 // ============================================================================
 package org.uncommons.maths.random;
 
-import java.util.Random;
 import org.uncommons.maths.number.ConstantGenerator;
 import org.uncommons.maths.number.NumberGenerator;
+
+import java.util.Random;
 
 /**
  * Continuous random sequence that follows an

@@ -1,8 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.google.common.io.Files;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -12,7 +10,8 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
 
-import com.google.common.io.Files;
+import java.io.File;
+import java.io.IOException;
 
 import ch.ethz.idsc.tensor.io.Extension;
 import ch.ethz.idsc.tensor.io.Filename;

@@ -1,8 +1,8 @@
 package org.apfloat.spi;
 
-import java.io.Serializable;
-
 import org.apfloat.ApfloatRuntimeException;
+
+import java.io.Serializable;
 
 /**
  * The <code>ArrayAccess</code> class simulates a <code>C</code> language pointer.

@@ -1,9 +1,9 @@
 package org.matheclipse.core.eval.exception;
 
-import javax.annotation.Nonnull;
-
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
+
+import javax.annotation.Nonnull;
 
 public class ReturnException extends FlowControlException {
 	/**

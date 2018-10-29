@@ -1,5 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.IntFunction;
+
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -14,7 +16,6 @@ import org.matheclipse.core.interfaces.IStringX;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.duy.lambda.IntFunction;
 
 public class Names extends AbstractFunctionEvaluator {
 

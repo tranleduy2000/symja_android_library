@@ -1,7 +1,5 @@
 package org.matheclipse.core.eval;
 
-import java.io.ByteArrayOutputStream;
-
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -11,6 +9,8 @@ import org.matheclipse.core.reflection.system.NIntegrate;
 import org.matheclipse.parser.client.ast.ASTNode;
 import org.matheclipse.parser.client.eval.DoubleVariable;
 import org.matheclipse.parser.client.math.MathException;
+
+import java.io.ByteArrayOutputStream;
 
 public class MathUtils {
 	public static Double[][] rom;

@@ -1,5 +1,7 @@
 package org.matheclipse.core.eval;
 
+import com.duy.lambda.IntFunction;
+
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -11,8 +13,6 @@ import org.matheclipse.parser.client.ast.SymbolNode;
 import org.matheclipse.parser.client.eval.DoubleEvaluator;
 import org.matheclipse.parser.client.eval.IDoubleCallbackFunction;
 import org.matheclipse.parser.client.math.MathException;
-
-import com.duy.lambda.IntFunction;
 
 /**
  * A call back function which could be used in <code>DoubleEvaluator</code>, for evaluating Symja numerical functions.

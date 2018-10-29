@@ -1,12 +1,11 @@
 package org.matheclipse.core.eval.util;
 
-import javax.annotation.Nonnull;
-
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
+import javax.annotation.Nonnull;
 
 /**
  * Table structure generator (i.e. lists, vectors, matrices, tensors)

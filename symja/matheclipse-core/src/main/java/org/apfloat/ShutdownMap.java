@@ -1,7 +1,7 @@
 package org.apfloat;
 
-import java.util.Map;
 import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Set;
 
 /**

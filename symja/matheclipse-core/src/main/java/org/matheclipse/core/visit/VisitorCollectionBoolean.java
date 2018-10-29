@@ -1,10 +1,11 @@
 package org.matheclipse.core.visit;
 
+import com.duy.lambda.Consumer;
+
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.Collection;
-import com.duy.lambda.Consumer;
 
 abstract public class VisitorCollectionBoolean<T extends IExpr> extends AbstractVisitorBoolean {
 	protected int fHeadOffset;

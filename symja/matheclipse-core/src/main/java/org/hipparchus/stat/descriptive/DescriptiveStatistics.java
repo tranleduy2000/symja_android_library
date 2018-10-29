@@ -16,6 +16,8 @@
  */
 package org.hipparchus.stat.descriptive;
 
+import com.duy.lambda.DoubleConsumer;
+
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -35,7 +37,6 @@ import org.hipparchus.util.ResizableDoubleArray;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import com.duy.lambda.DoubleConsumer;
 
 
 /**

@@ -1,8 +1,8 @@
 package org.apfloat;
 
-import static org.apfloat.spi.RadixConstants.*;
-
 import org.apfloat.spi.Util;
+
+import static org.apfloat.spi.RadixConstants.DOUBLE_PRECISION;
 
 /**
  * Helper class for Lambert W function.

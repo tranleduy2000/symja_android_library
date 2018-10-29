@@ -1,9 +1,9 @@
 package org.matheclipse.combinatoric;
 
-import java.util.List;
-
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+
+import java.util.List;
 
 /**
  * Abstract step visitor for multisets of type <code>T</code>.

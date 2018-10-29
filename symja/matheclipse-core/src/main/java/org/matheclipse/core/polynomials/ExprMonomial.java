@@ -1,8 +1,8 @@
 package org.matheclipse.core.polynomials;
 
-import java.util.Map;
-
 import org.matheclipse.core.interfaces.IExpr;
+
+import java.util.Map;
 
 /**
  * Monomial class. Represents pairs of exponent vectors and coefficients.

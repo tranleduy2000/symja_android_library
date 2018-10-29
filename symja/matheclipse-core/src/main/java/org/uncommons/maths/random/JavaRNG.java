@@ -15,8 +15,9 @@
 // ============================================================================
 package org.uncommons.maths.random;
 
-import java.util.Random;
 import org.uncommons.maths.binary.BinaryUtils;
+
+import java.util.Random;
 
 /**
  * <p>This is the default {@link Random JDK RNG} extended

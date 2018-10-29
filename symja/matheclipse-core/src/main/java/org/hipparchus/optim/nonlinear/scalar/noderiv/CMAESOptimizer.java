@@ -17,10 +17,6 @@
 
 package org.hipparchus.optim.nonlinear.scalar.noderiv;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -35,6 +31,10 @@ import org.hipparchus.optim.nonlinear.scalar.GoalType;
 import org.hipparchus.optim.nonlinear.scalar.MultivariateOptimizer;
 import org.hipparchus.random.RandomGenerator;
 import org.hipparchus.util.FastMath;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * An implementation of the active Covariance Matrix Adaptation Evolution Strategy (CMA-ES)
