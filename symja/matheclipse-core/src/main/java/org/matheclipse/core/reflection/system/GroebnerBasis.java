@@ -101,7 +101,7 @@ public class GroebnerBasis extends AbstractFunctionEvaluator {
 				return F.NIL;
 			}
 			varList.add((ISymbol) listOfVariables.get(i));
-			pvars[i - 1] = ((ISymbol) listOfVariables.get(i)).toString();
+			pvars[i - 1] = listOfVariables.get(i).toString();
 		}
 
 		List<GenPolynomial<BigRational>> polyList = new ArrayList<GenPolynomial<BigRational>>(
@@ -174,7 +174,7 @@ public class GroebnerBasis extends AbstractFunctionEvaluator {
 			return F.NIL;
 		}
 		GroebnerBaseAbstract<BigRational> engine = GBAlgorithmBuilder
-				.<BigRational>polynomialRing(jas.getPolynomialRingFactory()).fractionFree().syzygyPairlist().build();
+				.polynomialRing(jas.getPolynomialRingFactory()).fractionFree().syzygyPairlist().build();
 		List<GenPolynomial<BigRational>> opl = engine.GB(polyList);
 		IASTAppendable resultList = F.ListAlloc(opl.size()+rest.size());
 		// convert rational to integer coefficients and add

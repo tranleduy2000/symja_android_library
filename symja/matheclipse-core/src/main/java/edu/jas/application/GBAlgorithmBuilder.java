@@ -9,16 +9,12 @@ import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 
-import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
 import edu.jas.gb.GBOptimized;
-import edu.jas.gb.GBProxy;
 import edu.jas.gb.GroebnerBaseAbstract;
 import edu.jas.gb.GroebnerBaseArriSigSeqIter;
 import edu.jas.gb.GroebnerBaseF5zSigSeqIter;
 import edu.jas.gb.GroebnerBaseGGVSigSeqIter;
-import edu.jas.gb.GroebnerBaseParIter;
-import edu.jas.gb.GroebnerBaseParallel;
 import edu.jas.gb.GroebnerBaseSeqIter;
 import edu.jas.gb.OrderedMinPairlist;
 import edu.jas.gb.OrderedPairlist;
@@ -26,12 +22,7 @@ import edu.jas.gb.OrderedSyzPairlist;
 import edu.jas.gb.PairList;
 import edu.jas.gbufd.GBFactory;
 import edu.jas.gbufd.GroebnerBaseFGLM;
-import edu.jas.gbufd.GroebnerBasePseudoParallel;
-import edu.jas.gbufd.GroebnerBaseQuotient;
-import edu.jas.gbufd.GroebnerBaseRational;
 import edu.jas.gbufd.GroebnerBaseWalk;
-import edu.jas.kern.ComputerThreads;
-import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.ufd.Quotient;
@@ -288,126 +279,6 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
             return new GBAlgorithmBuilder<C>(ring, cbb, strategy);
         }
         logger.warn("no fraction free algorithm implemented for " + ring);
-        return this;
-    }
-
-
-    /**
-     * Request e-GB algorithm.
-     *
-     * @return GBAlgorithmBuilder object.
-     */
-    public GBAlgorithmBuilder<C> euclideanDomain() {
-        return domainAlgorithm(GBFactory.Algo.egb);
-    }
-
-
-    /**
-     * Request d-, e- or i-GB algorithm.
-     *
-     * @param a algorithm from GBFactory.Algo.
-     * @return GBAlgorithmBuilder object.
-     */
-    @SuppressWarnings({"cast", "unchecked"})
-    public GBAlgorithmBuilder<C> domainAlgorithm(GBFactory.Algo a) {
-        if (strategy != null) {
-            logger.warn("strategie " + strategy + " ignored");
-        }
-        if (ring.coFac instanceof BigInteger) {
-            BigInteger cf = (BigInteger) ring.coFac;
-            GroebnerBaseAbstract<BigInteger> bb = GBFactory.getImplementation(cf, a);
-            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) bb;
-            return new GBAlgorithmBuilder<C>(ring, cbb);
-        }
-        if (ring.coFac instanceof GenPolynomial) {
-            GenPolynomialRing<C> cf = (GenPolynomialRing) ring.coFac;
-            GroebnerBaseAbstract<GenPolynomial<C>> bb = GBFactory.getImplementation(cf, a);
-            GroebnerBaseAbstract<C> cbb = (GroebnerBaseAbstract<C>) (GroebnerBaseAbstract) bb;
-            return new GBAlgorithmBuilder<C>(ring, cbb);
-        }
-        logger.warn("no domain algorithm implemented for " + ring);
-        return this;
-    }
-
-
-    /**
-     * Request parallel algorithm. Additionaly run a parallel algorithm via
-     * GBProxy.
-     *
-     * @return GBAlgorithmBuilder object.
-     */
-    @SuppressWarnings("unchecked")
-    public GBAlgorithmBuilder<C> parallel() {
-        return parallel(ComputerThreads.N_CPUS);
-    }
-
-
-    /**
-     * Request parallel algorithm. Additionaly run a parallel algorithm via
-     * GBProxy.
-     *
-     * @param threads number of threads requested.
-     * @return GBAlgorithmBuilder object.
-     */
-    @SuppressWarnings({"cast", "unchecked"})
-    public GBAlgorithmBuilder<C> parallel(int threads) {
-        if (ComputerThreads.NO_THREADS) {
-            logger.warn("parallel algorithms disabled");
-            return this;
-        }
-        if (algo == null) {
-            algo = GBFactory.getImplementation(ring.coFac, strategy);
-        }
-        if (algo instanceof GroebnerBaseSeqIter) { // iterative requested
-            GroebnerBaseAbstract<C> bb;
-            bb = new GroebnerBaseParIter<C>(threads, strategy);
-            GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
-            return new GBAlgorithmBuilder<C>(ring, pbb, strategy);
-        } else if (ring.coFac instanceof BigRational) {
-            GroebnerBaseAbstract<C> bb;
-            if (algo instanceof GroebnerBaseRational) { // fraction free requested
-                PairList<BigInteger> pli;
-                if (strategy instanceof OrderedMinPairlist) {
-                    pli = new OrderedMinPairlist<BigInteger>();
-                } else if (strategy instanceof OrderedSyzPairlist) {
-                    pli = new OrderedSyzPairlist<BigInteger>();
-                } else {
-                    pli = new OrderedPairlist<BigInteger>();
-                }
-                bb = (GroebnerBaseAbstract) new GroebnerBaseRational<BigRational>(threads, pli);
-            } else {
-                bb = new GroebnerBaseParallel<C>(threads, strategy);
-            }
-            GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
-            return new GBAlgorithmBuilder<C>(ring, pbb, strategy);
-        } else if (ring.coFac instanceof QuotientRing) {
-            GroebnerBaseAbstract<C> bb;
-            if (algo instanceof GroebnerBaseQuotient) { // fraction free requested
-                PairList<GenPolynomial<C>> pli;
-                if (strategy instanceof OrderedMinPairlist) {
-                    pli = new OrderedMinPairlist<GenPolynomial<C>>();
-                } else if (strategy instanceof OrderedSyzPairlist) {
-                    pli = new OrderedSyzPairlist<GenPolynomial<C>>();
-                } else {
-                    pli = new OrderedPairlist<GenPolynomial<C>>();
-                }
-                QuotientRing<C> fac = (QuotientRing) ring.coFac;
-                bb = (GroebnerBaseAbstract) new GroebnerBaseQuotient<C>(threads, fac, pli); // pl not possible
-            } else {
-                bb = new GroebnerBaseParallel<C>(threads, strategy);
-            }
-            GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
-            return new GBAlgorithmBuilder<C>(ring, pbb);
-        } else if (ring.coFac.isField()) {
-            GroebnerBaseAbstract<C> bb = new GroebnerBaseParallel<C>(threads, strategy);
-            GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
-            return new GBAlgorithmBuilder<C>(ring, pbb, strategy);
-        } else if (ring.coFac.getONE() instanceof GcdRingElem) {
-            GroebnerBaseAbstract<C> bb = new GroebnerBasePseudoParallel<C>(threads, ring.coFac, strategy);
-            GroebnerBaseAbstract<C> pbb = new GBProxy<C>(algo, bb);
-            return new GBAlgorithmBuilder<C>(ring, pbb, strategy);
-        }
-        logger.warn("no parallel algorithm implemented for " + ring);
         return this;
     }
 

@@ -50,31 +50,10 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
     /**
      * Constructor.
      *
-     * @param threads the number of parallel threads.
-     */
-    public GroebnerBaseRational(int threads) {
-        this(new GroebnerBasePseudoParallel<BigInteger>(threads, new BigInteger()));
-    }
-
-
-    /**
-     * Constructor.
-     *
      * @param pl pair selection strategy
      */
     public GroebnerBaseRational(PairList<BigInteger> pl) {
         this(new GroebnerBasePseudoSeq<BigInteger>(new BigInteger(), pl));
-    }
-
-
-    /**
-     * Constructor.
-     *
-     * @param threads the number of parallel threads.
-     * @param pl      pair selection strategy
-     */
-    public GroebnerBaseRational(int threads, PairList<BigInteger> pl) {
-        this(new GroebnerBasePseudoParallel<BigInteger>(threads, new BigInteger(), pl));
     }
 
 

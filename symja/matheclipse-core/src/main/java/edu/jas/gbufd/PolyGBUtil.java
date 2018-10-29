@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.jas.gb.GroebnerBaseAbstract;
-import edu.jas.gb.SolvableGroebnerBaseAbstract;
 import edu.jas.gb.SolvableReductionAbstract;
 import edu.jas.gb.SolvableReductionSeq;
 import edu.jas.poly.ExpVector;
@@ -355,50 +354,6 @@ public class PolyGBUtil {
             logger.debug("intersect GB = " + G);
         }
         List<GenPolynomial<C>> I = PolyUtil.intersect(pfac, G);
-        return I;
-    }
-
-
-    /**
-     * Intersection. Generators for the intersection of ideals.
-     *
-     * @param pfac solvable polynomial ring
-     * @param A    list of polynomials
-     * @param B    list of polynomials
-     * @return generators for (A \cap B)
-     */
-    public static <C extends GcdRingElem<C>> List<GenSolvablePolynomial<C>> intersect(
-            GenSolvablePolynomialRing<C> pfac, List<GenSolvablePolynomial<C>> A,
-            List<GenSolvablePolynomial<C>> B) {
-        if (A == null || A.isEmpty()) { // (0)
-            return B;
-        }
-        if (B == null || B.isEmpty()) { // (0)
-            return A;
-        }
-        int s = A.size() + B.size();
-        List<GenSolvablePolynomial<C>> c = new ArrayList<GenSolvablePolynomial<C>>(s);
-        GenSolvablePolynomialRing<C> tfac = pfac.extend(1);
-        // term order is also adjusted
-        for (GenSolvablePolynomial<C> p : A) {
-            p = (GenSolvablePolynomial<C>) p.extend(tfac, 0, 1L); // t*p
-            c.add(p);
-        }
-        for (GenSolvablePolynomial<C> p : B) {
-            GenSolvablePolynomial<C> q = (GenSolvablePolynomial<C>) p.extend(tfac, 0, 1L);
-            GenSolvablePolynomial<C> r = (GenSolvablePolynomial<C>) p.extend(tfac, 0, 0L);
-            p = (GenSolvablePolynomial<C>) r.subtract(q); // (1-t)*p
-            c.add(p);
-        }
-        SolvableGroebnerBaseAbstract<C> sbb = SGBFactory.getImplementation(tfac.coFac);
-        //new SolvableGroebnerBaseSeq<C>();
-        logger.warn("intersect computing GB");
-        List<GenSolvablePolynomial<C>> g = sbb.leftGB(c);
-        //List<GenSolvablePolynomial<C>> g = sbb.twosidedGB(c);
-        if (debug) {
-            logger.debug("intersect GB = " + g);
-        }
-        List<GenSolvablePolynomial<C>> I = PolyUtil.intersect(pfac, g);
         return I;
     }
 
