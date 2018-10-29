@@ -90,7 +90,7 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
      * @return a copy of c.
      */
     public Residue<C> copy(Residue<C> c) {
-        return new Residue<>(c.ring, c.val);
+        return new Residue<C>(c.ring, c.val);
     }
 
 
@@ -100,7 +100,7 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
      * @return 0 as Residue.
      */
     public Residue<C> getZERO() {
-        return new Residue<>(this, ring.getZERO());
+        return new Residue<C>(this, ring.getZERO());
     }
 
 
@@ -110,7 +110,7 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
      * @return 1 as Residue.
      */
     public Residue<C> getONE() {
-        Residue<C> one = new Residue<>(this, ring.getONE());
+        Residue<C> one = new Residue<C>(this, ring.getONE());
         if (one.isZERO()) {
             logger.warn("one is zero, so all residues are 0");
         }
@@ -126,9 +126,9 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
      */
     public List<Residue<C>> generators() {
         List<? extends C> rgens = ring.generators();
-        List<Residue<C>> gens = new ArrayList<>(rgens.size());
+        List<Residue<C>> gens = new ArrayList<Residue<C>>(rgens.size());
         for (C c : rgens) {
-            gens.add(new Residue<>(this, c));
+            gens.add(new Residue<C>(this, c));
         }
         return gens;
     }
@@ -188,7 +188,7 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
      * @return a Residue.
      */
     public Residue<C> fromInteger(java.math.BigInteger a) {
-        return new Residue<>(this, ring.fromInteger(a));
+        return new Residue<C>(this, ring.fromInteger(a));
     }
 
 
@@ -199,7 +199,7 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
      * @return a Residue.
      */
     public Residue<C> fromInteger(long a) {
-        return new Residue<>(this, ring.fromInteger(a));
+        return new Residue<C>(this, ring.fromInteger(a));
     }
 
 
@@ -272,7 +272,7 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
     public Residue<C> random(int n) {
         C x = ring.random(n);
         // x = x.sum( ring.getONE() );
-        return new Residue<>(this, x);
+        return new Residue<C>(this, x);
     }
 
 
@@ -286,7 +286,7 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
     public Residue<C> random(int n, Random rnd) {
         C x = ring.random(n, rnd);
         // x = x.sum( ring.getONE() );
-        return new Residue<>(this, x);
+        return new Residue<C>(this, x);
     }
 
 
@@ -298,7 +298,7 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
      */
     public Residue<C> parse(String s) {
         C x = ring.parse(s);
-        return new Residue<>(this, x);
+        return new Residue<C>(this, x);
     }
 
 
@@ -310,7 +310,7 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
      */
     public Residue<C> parse(Reader r) {
         C x = ring.parse(r);
-        return new Residue<>(this, x);
+        return new Residue<C>(this, x);
     }
 
 }

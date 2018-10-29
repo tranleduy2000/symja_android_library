@@ -105,7 +105,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
         if (!isred) {
             // must reduce to lowest terms
             GenPolynomial<C> gcd = ring.gcd(n, d);
-            if (debug) {
+            if (false || debug) {
                 logger.info("gcd = " + gcd);
             }
             //GenPolynomial<C> gcd = ring.ring.getONE();
@@ -164,7 +164,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
      */
     @Override
     public Quotient<C> copy() {
-        return new Quotient<>(ring, num, den, true);
+        return new Quotient<C>(ring, num, den, true);
     }
 
 
@@ -333,7 +333,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
      * @see edu.jas.structure.RingElem#abs()
      */
     public Quotient<C> abs() {
-        return new Quotient<>(ring, num.abs(), den, true);
+        return new Quotient<C>(ring, num.abs(), den, true);
     }
 
 
@@ -353,21 +353,21 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
         GenPolynomial<C> n;
         if (den.isONE() && S.den.isONE()) {
             n = num.sum(S.num);
-            return new Quotient<>(ring, n);
+            return new Quotient<C>(ring, n);
         }
         if (den.isONE()) {
             n = num.multiply(S.den);
             n = n.sum(S.num);
-            return new Quotient<>(ring, n, S.den, false);
+            return new Quotient<C>(ring, n, S.den, false);
         }
         if (S.den.isONE()) {
             n = S.num.multiply(den);
             n = n.sum(num);
-            return new Quotient<>(ring, n, den, false);
+            return new Quotient<C>(ring, n, den, false);
         }
         if (den.compareTo(S.den) == 0) {
             n = num.sum(S.num);
-            return new Quotient<>(ring, n, den, false);
+            return new Quotient<C>(ring, n, den, false);
         }
         GenPolynomial<C> d;
         GenPolynomial<C> sd;
@@ -396,7 +396,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
             }
         }
         d = dd.multiply(sd);
-        return new Quotient<>(ring, n, d, true);
+        return new Quotient<C>(ring, n, d, true);
     }
 
 
@@ -407,7 +407,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
      * @see edu.jas.structure.RingElem#negate()
      */
     public Quotient<C> negate() {
-        return new Quotient<>(ring, num.negate(), den, true);
+        return new Quotient<C>(ring, num.negate(), den, true);
     }
 
 
@@ -455,7 +455,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
         if (num.isZERO()) {
             throw new ArithmeticException("element not invertible " + this);
         }
-        return new Quotient<>(ring, den, num, true);
+        return new Quotient<C>(ring, den, num, true);
     }
 
 
@@ -506,7 +506,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
         GenPolynomial<C> n;
         if (den.isONE() && S.den.isONE()) {
             n = num.multiply(S.num);
-            return new Quotient<>(ring, n, den, true);
+            return new Quotient<C>(ring, n, den, true);
         }
         GenPolynomial<C> g;
         GenPolynomial<C> d;
@@ -515,19 +515,19 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
             n = ring.divide(num, g);
             d = ring.divide(S.den, g);
             n = n.multiply(S.num);
-            return new Quotient<>(ring, n, d, true);
+            return new Quotient<C>(ring, n, d, true);
         }
         if (S.den.isONE()) {
             g = ring.gcd(S.num, den);
             n = ring.divide(S.num, g);
             d = ring.divide(den, g);
             n = n.multiply(num);
-            return new Quotient<>(ring, n, d, true);
+            return new Quotient<C>(ring, n, d, true);
         }
         if (den.compareTo(S.den) == 0) { // correct ?
             d = den.multiply(den);
             n = num.multiply(S.num);
-            return new Quotient<>(ring, n, d, true);
+            return new Quotient<C>(ring, n, d, true);
         }
         GenPolynomial<C> f;
         GenPolynomial<C> sd;
@@ -540,7 +540,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
         sn = ring.divide(S.num, f);
         n = n.multiply(sn);
         d = d.multiply(sd);
-        return new Quotient<>(ring, n, d, true);
+        return new Quotient<C>(ring, n, d, true);
     }
 
 
@@ -567,10 +567,10 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
             d = ring.divide(d, gcd);
         }
         if (this.isONE()) {
-            return new Quotient<>(ring, b, d, true);
+            return new Quotient<C>(ring, b, d, true);
         }
         GenPolynomial<C> n = num.multiply(b);
-        return new Quotient<>(ring, n, d, true);
+        return new Quotient<C>(ring, n, d, true);
     }
 
 
@@ -591,7 +591,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
             return this;
         }
         GenPolynomial<C> n = num.multiply(b);
-        return new Quotient<>(ring, n, den, true);
+        return new Quotient<C>(ring, n, den, true);
     }
 
 
@@ -612,7 +612,7 @@ public class Quotient<C extends GcdRingElem<C>> extends RingElemImpl<Quotient<C>
         //lbc = lbc.abs();
         GenPolynomial<C> n = num.multiply(lbc);
         //GenPolynomial<C> d = den.multiply(lbc);
-        return new Quotient<>(ring, n, den, true);
+        return new Quotient<C>(ring, n, den, true);
     }
 
 

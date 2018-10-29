@@ -82,7 +82,7 @@ public class FactorAlgebraic<C extends GcdRingElem<C>> extends FactorAbsolute<Al
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
-        List<GenPolynomial<AlgebraicNumber<C>>> factors = new ArrayList<>();
+        List<GenPolynomial<AlgebraicNumber<C>>> factors = new ArrayList<GenPolynomial<AlgebraicNumber<C>>>();
         if (P.isZERO()) {
             return factors;
         }

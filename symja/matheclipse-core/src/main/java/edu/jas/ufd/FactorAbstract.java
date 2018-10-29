@@ -89,7 +89,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
      * <b>Note:</b> not available in java.util.
      */
     static <T> List<T> removeOnce(List<T> a, List<T> b) {
-        List<T> res = new ArrayList<>();
+        List<T> res = new ArrayList<T>();
         res.addAll(a);
         for (T e : b) {
             @SuppressWarnings("unused")
@@ -167,7 +167,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         if (pfac.nvar <= 1) {
             return baseFactorsSquarefree(P);
         }
-        List<GenPolynomial<C>> topt = new ArrayList<>(1);
+        List<GenPolynomial<C>> topt = new ArrayList<GenPolynomial<C>>(1);
         topt.add(P);
         OptimizedPolynomialList<C> opt = TermOrderOptimization.optimizeTermOrder(pfac, topt);
         P = opt.list.get(0);
@@ -186,7 +186,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
             //GenPolynomial<C> pl = PolyUtil.<C> removeUnusedLowerVariables(pu); // not useful after optimize
             logger.info("do.sparse factorsSquarefreeKronecker: " + pu);
             facs = factorsSquarefreeKronecker(pu); // pl
-            List<GenPolynomial<C>> fs = new ArrayList<>(facs.size());
+            List<GenPolynomial<C>> fs = new ArrayList<GenPolynomial<C>>(facs.size());
             GenPolynomialRing<C> pf = P.ring;
             //GenPolynomialRing<C> pfu = pu.ring;
             for (GenPolynomial<C> p : facs) {
@@ -234,7 +234,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         if (pfac.nvar == 1) {
             return baseFactorsSquarefree(P);
         }
-        List<GenPolynomial<C>> factors = new ArrayList<>();
+        List<GenPolynomial<C>> factors = new ArrayList<GenPolynomial<C>>();
         if (P.isZERO()) {
             return factors;
         }
@@ -257,7 +257,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         }
 
         // factor Kronecker polynomial
-        List<GenPolynomial<C>> ulist = new ArrayList<>();
+        List<GenPolynomial<C>> ulist = new ArrayList<GenPolynomial<C>>();
         // kr might not be squarefree so complete factor univariate
         SortedMap<GenPolynomial<C>, Long> slist = baseFactors(kr);
         if (debug && !isFactorization(kr, slist)) {
@@ -364,7 +364,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
      * e_i.
      */
     public List<GenPolynomial<C>> baseFactorsRadical(GenPolynomial<C> P) {
-        return new ArrayList<>(baseFactors(P).keySet());
+        return new ArrayList<GenPolynomial<C>>(baseFactors(P).keySet());
     }
 
 
@@ -380,7 +380,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
             throw new IllegalArgumentException(this.getClass().getName() + " P != null");
         }
         GenPolynomialRing<C> pfac = P.ring;
-        SortedMap<GenPolynomial<C>, Long> factors = new TreeMap<>(pfac.getComparator());
+        SortedMap<GenPolynomial<C>, Long> factors = new TreeMap<GenPolynomial<C>, Long>(pfac.getComparator());
         if (P.isZERO()) {
             return factors;
         }
@@ -413,7 +413,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         }
         SortedMap<GenPolynomial<C>, Long> facs = sengine.baseSquarefreeFactors(P);
         if (facs == null || facs.size() == 0) {
-            facs = new TreeMap<>();
+            facs = new TreeMap<GenPolynomial<C>, Long>();
             facs.put(P, 1L);
         }
         if (logger.isInfoEnabled()
@@ -474,7 +474,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
      * e_i.
      */
     public List<GenPolynomial<C>> factorsRadical(GenPolynomial<C> P) {
-        return new ArrayList<>(factors(P).keySet());
+        return new ArrayList<GenPolynomial<C>>(factors(P).keySet());
     }
 
 
@@ -486,12 +486,12 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
      * for all p in L.
      */
     public List<GenPolynomial<C>> factorsRadical(List<GenPolynomial<C>> L) {
-        SortedSet<GenPolynomial<C>> facs = new TreeSet<>();
+        SortedSet<GenPolynomial<C>> facs = new TreeSet<GenPolynomial<C>>();
         for (GenPolynomial<C> p : L) {
             List<GenPolynomial<C>> fs = factorsRadical(p);
             facs.addAll(fs);
         }
-        return new ArrayList<>(facs);
+        return new ArrayList<GenPolynomial<C>>(facs);
     }
 
 
@@ -510,7 +510,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         if (pfac.nvar == 1) {
             return baseFactors(P);
         }
-        SortedMap<GenPolynomial<C>, Long> factors = new TreeMap<>(pfac.getComparator());
+        SortedMap<GenPolynomial<C>, Long> factors = new TreeMap<GenPolynomial<C>, Long>(pfac.getComparator());
         if (P.isZERO()) {
             return factors;
         }
@@ -539,7 +539,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         }
         SortedMap<GenPolynomial<C>, Long> facs = sengine.squarefreeFactors(P);
         if (facs == null || facs.size() == 0) {
-            facs = new TreeMap<>();
+            facs = new TreeMap<GenPolynomial<C>, Long>();
             facs.put(P, 1L);
             throw new RuntimeException("this should not happen, facs is empty: " + facs);
         }
@@ -693,7 +693,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
-        List<GenPolynomial<GenPolynomial<C>>> factors = new ArrayList<>();
+        List<GenPolynomial<GenPolynomial<C>>> factors = new ArrayList<GenPolynomial<GenPolynomial<C>>>();
         if (P.isZERO()) {
             return factors;
         }
@@ -750,7 +750,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
             throw new IllegalArgumentException(this.getClass().getName() + " P != null");
         }
         GenPolynomialRing<GenPolynomial<C>> pfac = P.ring;
-        SortedMap<GenPolynomial<GenPolynomial<C>>, Long> factors = new TreeMap<>(
+        SortedMap<GenPolynomial<GenPolynomial<C>>, Long> factors = new TreeMap<GenPolynomial<GenPolynomial<C>>, Long>(
                 pfac.getComparator());
         if (P.isZERO()) {
             return factors;
@@ -806,7 +806,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         if (F == null || F.size() <= 1) {
             return F;
         }
-        List<GenPolynomial<C>> Fp = new ArrayList<>(F.size());
+        List<GenPolynomial<C>> Fp = new ArrayList<GenPolynomial<C>>(F.size());
         GenPolynomial<C> f0 = F.get(0);
         for (int i = 1; i < F.size(); i++) {
             GenPolynomial<C> fi = F.get(i);

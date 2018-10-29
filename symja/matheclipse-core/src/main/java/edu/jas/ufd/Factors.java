@@ -281,8 +281,8 @@ public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>
         }
         GenPolynomialRing<AlgebraicNumber<C>> ar = afactors.get(0).ring;
         GenPolynomialRing<AlgebraicNumber<C>> br = facs.afactors.get(0).ring;
-        PolynomialList<AlgebraicNumber<C>> ap = new PolynomialList<>(ar, afactors);
-        PolynomialList<AlgebraicNumber<C>> bp = new PolynomialList<>(br, facs.afactors);
+        PolynomialList<AlgebraicNumber<C>> ap = new PolynomialList<AlgebraicNumber<C>>(ar, afactors);
+        PolynomialList<AlgebraicNumber<C>> bp = new PolynomialList<AlgebraicNumber<C>>(br, facs.afactors);
         s = ap.compareTo(bp);
         //System.out.println("s3 = " + s); 
         if (s != 0) {
@@ -356,7 +356,7 @@ public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>
      * @return list of algebraic factors
      */
     public List<GenPolynomial<AlgebraicNumber<C>>> getFactors() {
-        List<GenPolynomial<AlgebraicNumber<C>>> af = new ArrayList<>();
+        List<GenPolynomial<AlgebraicNumber<C>>> af = new ArrayList<GenPolynomial<AlgebraicNumber<C>>>();
         if (afac == null) {
             return af;
         }

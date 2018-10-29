@@ -48,19 +48,19 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
     public GenVectorModul(RingFactory<C> b, int s) {
         coFac = b;
         cols = s;
-        ArrayList<C> z = new ArrayList<>(cols);
+        ArrayList<C> z = new ArrayList<C>(cols);
         for (int i = 0; i < cols; i++) {
             z.add(coFac.getZERO());
         }
-        ZERO = new GenVector<>(this, z);
-        BASIS = new ArrayList<>(cols);
+        ZERO = new GenVector<C>(this, z);
+        BASIS = new ArrayList<GenVector<C>>(cols);
         List<C> cgens = coFac.generators();
         ArrayList<C> v;
         for (int i = 0; i < cols; i++) {
             for (C g : cgens) {
-                v = new ArrayList<>(z);// z.clone();
+                v = new ArrayList<C>(z);// z.clone();
                 v.set(i, g);
-                BASIS.add(new GenVector<>(this, v));
+                BASIS.add(new GenVector<C>(this, v));
             }
         }
         logger.info(cols + " module over " + coFac + "constructed");
@@ -204,13 +204,13 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
         if (v.size() > cols) {
             throw new IllegalArgumentException("size v > cols " + v + " > " + cols);
         }
-        List<C> r = new ArrayList<>(cols);
+        List<C> r = new ArrayList<C>(cols);
         r.addAll(v);
         // pad with zeros if required:
         for (int i = r.size(); i < cols; i++) {
             r.add(coFac.getZERO());
         }
-        return new GenVector<>(this, r);
+        return new GenVector<C>(this, r);
     }
 
 
@@ -258,7 +258,7 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
      * @return a random element.
      */
     public GenVector<C> random(int k, float q, Random random) {
-        List<C> r = new ArrayList<>(cols);
+        List<C> r = new ArrayList<C>(cols);
         for (int i = 0; i < cols; i++) {
             if (random.nextFloat() < q) {
                 r.add(coFac.random(k));
@@ -266,7 +266,7 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
                 r.add(coFac.getZERO());
             }
         }
-        return new GenVector<>(this, r);
+        return new GenVector<C>(this, r);
     }
 
 
@@ -299,7 +299,7 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
         if (i >= 0) {
             s = s.substring(0, i);
         }
-        List<C> vec = new ArrayList<>(cols);
+        List<C> vec = new ArrayList<C>(cols);
         String e;
         C c;
         do {
@@ -315,7 +315,7 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
             c = coFac.parse(s);
             vec.add(c);
         }
-        return new GenVector<>(this, vec);
+        return new GenVector<C>(this, vec);
     }
 
 

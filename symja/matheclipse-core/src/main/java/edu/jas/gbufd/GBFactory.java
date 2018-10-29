@@ -90,7 +90,7 @@ public class GBFactory {
      */
     public static <C extends GcdRingElem<C>> GroebnerBaseAbstract<C> getImplementation() {
         logger.warn("no coefficent factory given, assuming field coeffcients");
-        GroebnerBaseAbstract<C> bba = new GroebnerBaseSeq<>();
+        GroebnerBaseAbstract<C> bba = new GroebnerBaseSeq<C>();
         return bba;
     }
 
@@ -114,9 +114,9 @@ public class GBFactory {
     public static GroebnerBaseAbstract<ModLong> getImplementation(ModLongRing fac, PairList<ModLong> pl) {
         GroebnerBaseAbstract<ModLong> bba;
         if (fac.isField()) {
-            bba = new GroebnerBaseSeq<>(pl);
+            bba = new GroebnerBaseSeq<ModLong>(pl);
         } else {
-            bba = new GroebnerBasePseudoSeq<>(fac, pl);
+            bba = new GroebnerBasePseudoSeq<ModLong>(fac, pl);
         }
         return bba;
     }
@@ -142,9 +142,9 @@ public class GBFactory {
                                                                      PairList<ModInteger> pl) {
         GroebnerBaseAbstract<ModInteger> bba;
         if (fac.isField()) {
-            bba = new GroebnerBaseSeq<>(pl);
+            bba = new GroebnerBaseSeq<ModInteger>(pl);
         } else {
-            bba = new GroebnerBasePseudoSeq<>(fac, pl);
+            bba = new GroebnerBasePseudoSeq<ModInteger>(fac, pl);
         }
         return bba;
     }
@@ -194,13 +194,13 @@ public class GBFactory {
         GroebnerBaseAbstract<BigInteger> bba;
         switch (a) {
             case igb:
-                bba = new GroebnerBasePseudoSeq<>(fac, pl);
+                bba = new GroebnerBasePseudoSeq<BigInteger>(fac, pl);
                 break;
             case egb:
-                bba = new EGroebnerBaseSeq<>(); // pl not suitable
+                bba = new EGroebnerBaseSeq<BigInteger>(); // pl not suitable
                 break;
             case dgb:
-                bba = new DGroebnerBaseSeq<>(); // pl not suitable
+                bba = new DGroebnerBaseSeq<BigInteger>(); // pl not suitable
                 break;
             default:
                 throw new IllegalArgumentException("algorithm not available for BigInteger " + a);
@@ -254,18 +254,18 @@ public class GBFactory {
         GroebnerBaseAbstract<BigRational> bba;
         switch (a) {
             case qgb:
-                bba = new GroebnerBaseSeq<>(pl);
+                bba = new GroebnerBaseSeq<BigRational>(pl);
                 break;
             case ffgb:
                 PairList<BigInteger> pli;
                 if (pl instanceof OrderedMinPairlist) {
-                    pli = new OrderedMinPairlist<>();
+                    pli = new OrderedMinPairlist<BigInteger>();
                 } else if (pl instanceof OrderedSyzPairlist) {
-                    pli = new OrderedSyzPairlist<>();
+                    pli = new OrderedSyzPairlist<BigInteger>();
                 } else {
-                    pli = new OrderedPairlist<>();
+                    pli = new OrderedPairlist<BigInteger>();
                 }
-                bba = new GroebnerBaseRational<>(pli); // pl not possible
+                bba = new GroebnerBaseRational<BigRational>(pli); // pl not possible
                 break;
             default:
                 throw new IllegalArgumentException("algorithm not available for " + fac.toScriptFactory()
@@ -326,18 +326,18 @@ public class GBFactory {
         GroebnerBaseAbstract<Quotient<C>> bba;
         switch (a) {
             case qgb:
-                bba = new GroebnerBaseSeq<>(new ReductionSeq<Quotient<C>>(), pl);
+                bba = new GroebnerBaseSeq<Quotient<C>>(new ReductionSeq<Quotient<C>>(), pl);
                 break;
             case ffgb:
                 PairList<GenPolynomial<C>> pli;
                 if (pl instanceof OrderedMinPairlist) {
-                    pli = new OrderedMinPairlist<>();
+                    pli = new OrderedMinPairlist<GenPolynomial<C>>();
                 } else if (pl instanceof OrderedSyzPairlist) {
-                    pli = new OrderedSyzPairlist<>();
+                    pli = new OrderedSyzPairlist<GenPolynomial<C>>();
                 } else {
-                    pli = new OrderedPairlist<>();
+                    pli = new OrderedPairlist<GenPolynomial<C>>();
                 }
-                bba = new GroebnerBaseQuotient<>(fac, pli); // pl not possible
+                bba = new GroebnerBaseQuotient<C>(fac, pli); // pl not possible
                 break;
             default:
                 throw new IllegalArgumentException("algorithm not available for Quotient " + a);
@@ -399,19 +399,19 @@ public class GBFactory {
         GroebnerBaseAbstract<GenPolynomial<C>> bba;
         switch (a) {
             case igb:
-                bba = new GroebnerBasePseudoRecSeq<>(fac, pl);
+                bba = new GroebnerBasePseudoRecSeq<C>(fac, pl);
                 break;
             case egb:
                 if (fac.nvar > 1 || !fac.coFac.isField()) {
                     throw new IllegalArgumentException("coefficients not univariate or not over a field" + fac);
                 }
-                bba = new EGroebnerBaseSeq<>(); // pl not suitable
+                bba = new EGroebnerBaseSeq<GenPolynomial<C>>(); // pl not suitable
                 break;
             case dgb:
                 if (fac.nvar > 1 || !fac.coFac.isField()) {
                     throw new IllegalArgumentException("coefficients not univariate or not over a field" + fac);
                 }
-                bba = new DGroebnerBaseSeq<>(); // pl not suitable
+                bba = new DGroebnerBaseSeq<GenPolynomial<C>>(); // pl not suitable
                 break;
             default:
                 throw new IllegalArgumentException("algorithm not available for GenPolynomial<C> " + a);
@@ -429,9 +429,9 @@ public class GBFactory {
             ProductRing<C> fac) {
         GroebnerBaseAbstract<Product<C>> bba;
         if (fac.onlyFields()) {
-            bba = new RGroebnerBaseSeq<>();
+            bba = new RGroebnerBaseSeq<Product<C>>();
         } else {
-            bba = new RGroebnerBasePseudoSeq<>(fac);
+            bba = new RGroebnerBasePseudoSeq<Product<C>>(fac);
         }
         return bba;
     }
@@ -459,21 +459,21 @@ public class GBFactory {
     GroebnerBaseAbstract<C> getImplementation(RingFactory<C> fac, PairList<C> pl) {
         logger.debug("fac = " + fac.getClass().getName());
         if (fac.isField()) {
-            return new GroebnerBaseSeq<>(pl);
+            return new GroebnerBaseSeq<C>(pl);
         }
         GroebnerBaseAbstract bba = null;
         Object ofac = fac;
         if (ofac instanceof GenPolynomialRing) {
             PairList<GenPolynomial<C>> pli;
             if (pl instanceof OrderedMinPairlist) {
-                pli = new OrderedMinPairlist<>();
+                pli = new OrderedMinPairlist<GenPolynomial<C>>();
             } else if (pl instanceof OrderedSyzPairlist) {
-                pli = new OrderedSyzPairlist<>();
+                pli = new OrderedSyzPairlist<GenPolynomial<C>>();
             } else {
-                pli = new OrderedPairlist<>();
+                pli = new OrderedPairlist<GenPolynomial<C>>();
             }
             GenPolynomialRing<C> rofac = (GenPolynomialRing<C>) ofac;
-            GroebnerBaseAbstract<GenPolynomial<C>> bbr = new GroebnerBasePseudoRecSeq<>(rofac, pli); // not pl
+            GroebnerBaseAbstract<GenPolynomial<C>> bbr = new GroebnerBasePseudoRecSeq<C>(rofac, pli); // not pl
             bba = bbr;
         } else if (ofac instanceof ProductRing) {
             ProductRing pfac = (ProductRing) ofac;
@@ -483,7 +483,7 @@ public class GBFactory {
                 bba = new RGroebnerBasePseudoSeq<Product<C>>(pfac);
             }
         } else {
-            bba = new GroebnerBasePseudoSeq<>(fac, pl);
+            bba = new GroebnerBasePseudoSeq<C>(fac, pl);
         }
         logger.debug("bba = " + bba.getClass().getName());
         return bba;
@@ -517,9 +517,9 @@ public class GBFactory {
         logger.debug("fac = " + fac.getClass().getName());
         int th = (ComputerThreads.N_CPUS > 2 ? ComputerThreads.N_CPUS - 1 : 2);
         if (fac.isField()) {
-            GroebnerBaseAbstract<C> e1 = new GroebnerBaseSeq<>(pl);
-            GroebnerBaseAbstract<C> e2 = new GroebnerBaseParallel<>(th, pl);
-            return new GBProxy<>(e1, e2);
+            GroebnerBaseAbstract<C> e1 = new GroebnerBaseSeq<C>(pl);
+            GroebnerBaseAbstract<C> e2 = new GroebnerBaseParallel<C>(th, pl);
+            return new GBProxy<C>(e1, e2);
         } else if (fac.characteristic().signum() == 0) {
             if (fac instanceof GenPolynomialRing) {
                 GenPolynomialRing pfac = (GenPolynomialRing) fac;
@@ -528,9 +528,9 @@ public class GBFactory {
                 GroebnerBaseAbstract e2 = new GroebnerBasePseudoRecParallel<C>(th, pfac, ppl);
                 return new GBProxy<C>(e1, e2);
             }
-            GroebnerBaseAbstract<C> e1 = new GroebnerBasePseudoSeq<>(fac, pl);
-            GroebnerBaseAbstract<C> e2 = new GroebnerBasePseudoParallel<>(th, fac, pl);
-            return new GBProxy<>(e1, e2);
+            GroebnerBaseAbstract<C> e1 = new GroebnerBasePseudoSeq<C>(fac, pl);
+            GroebnerBaseAbstract<C> e2 = new GroebnerBasePseudoParallel<C>(th, fac, pl);
+            return new GBProxy<C>(e1, e2);
         }
         return getImplementation(fac, pl);
     }
@@ -550,9 +550,9 @@ public class GBFactory {
         }
         logger.debug("fac = " + fac.getClass().getName());
         int th = (ComputerThreads.N_CPUS > 2 ? ComputerThreads.N_CPUS - 1 : 2);
-        OrderedPairlist<GenPolynomial<C>> ppl = new OrderedPairlist<>();
-        GroebnerBaseAbstract<GenPolynomial<C>> e1 = new GroebnerBasePseudoRecSeq<>(fac, ppl);
-        GroebnerBaseAbstract<GenPolynomial<C>> e2 = new GroebnerBasePseudoRecParallel<>(th, fac, ppl);
+        OrderedPairlist<GenPolynomial<C>> ppl = new OrderedPairlist<GenPolynomial<C>>();
+        GroebnerBaseAbstract<GenPolynomial<C>> e1 = new GroebnerBasePseudoRecSeq<C>(fac, ppl);
+        GroebnerBaseAbstract<GenPolynomial<C>> e2 = new GroebnerBasePseudoRecParallel<C>(th, fac, ppl);
         //return new GBProxy<GenPolynomial<C>>(e1, e2);
         return new GBProxy(e1, e2);
     }

@@ -86,7 +86,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
      */
     public QuotIntegral<C> integrate(Quotient<C> r) {
         Integral<C> integral = integrate(r.num, r.den);
-        return new QuotIntegral<>(r.ring, integral);
+        return new QuotIntegral<C>(r.ring, integral);
     }
 
 
@@ -103,11 +103,11 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
             throw new IllegalArgumentException("zero or null not allowed");
         }
         if (a.isZERO()) {
-            return new Integral<>(a, d, a);
+            return new Integral<C>(a, d, a);
         }
         if (d.isONE()) {
             GenPolynomial<C> pi = PolyUtil.baseIntegral(a);
-            return new Integral<>(a, d, pi);
+            return new Integral<C>(a, d, pi);
         }
         GenPolynomialRing<C> pfac = d.ring;
         if (pfac.nvar > 1) {
@@ -140,10 +140,10 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
             logger.debug("log = " + log);
         }
         if (log.size() == 0) {
-            return new Integral<>(a, d, pi, rat);
+            return new Integral<C>(a, d, pi, rat);
         }
 
-        List<LogIntegral<C>> logi = new ArrayList<>(log.size() / 2);
+        List<LogIntegral<C>> logi = new ArrayList<LogIntegral<C>>(log.size() / 2);
         for (int i = 0; i < log.size(); i++) {
             GenPolynomial<C> ln = log.get(i++);
             GenPolynomial<C> ld = log.get(i);
@@ -153,7 +153,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
         if (debug) {
             logger.debug("logi = " + logi);
         }
-        return new Integral<>(a, d, pi, rat, logi);
+        return new Integral<C>(a, d, pi, rat, logi);
     }
 
 
@@ -177,8 +177,8 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
         // get squarefree decomposition
         SortedMap<GenPolynomial<C>, Long> sfactors = sqf.squarefreeFactors(d);
 
-        List<GenPolynomial<C>> D = new ArrayList<>(sfactors.keySet());
-        List<GenPolynomial<C>> DP = new ArrayList<>();
+        List<GenPolynomial<C>> D = new ArrayList<GenPolynomial<C>>(sfactors.keySet());
+        List<GenPolynomial<C>> DP = new ArrayList<GenPolynomial<C>>();
         for (GenPolynomial<C> f : D) {
             long e = sfactors.get(f);
             GenPolynomial<C> dp = f.power(e); //Power.<GenPolynomial<C>> positivePower(f, e);
@@ -191,8 +191,8 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
         List<GenPolynomial<C>> Ai = ufd.basePartialFraction(a, DP);
         //System.out.println("Ai:     " + Ai);
 
-        List<GenPolynomial<C>> G = new ArrayList<>();
-        List<GenPolynomial<C>> H = new ArrayList<>();
+        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>();
+        List<GenPolynomial<C>> H = new ArrayList<GenPolynomial<C>>();
         H.add(Ai.remove(0)); // P
 
         GenPolynomialRing<C> fac = d.ring;
@@ -253,16 +253,16 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
         if (!pfac.coFac.isField()) {
             throw new IllegalArgumentException("only for field coefficients " + pfac);
         }
-        List<C> cfactors = new ArrayList<>();
-        List<GenPolynomial<C>> cdenom = new ArrayList<>();
-        List<AlgebraicNumber<C>> afactors = new ArrayList<>();
-        List<GenPolynomial<AlgebraicNumber<C>>> adenom = new ArrayList<>();
+        List<C> cfactors = new ArrayList<C>();
+        List<GenPolynomial<C>> cdenom = new ArrayList<GenPolynomial<C>>();
+        List<AlgebraicNumber<C>> afactors = new ArrayList<AlgebraicNumber<C>>();
+        List<GenPolynomial<AlgebraicNumber<C>>> adenom = new ArrayList<GenPolynomial<AlgebraicNumber<C>>>();
 
         // P linear
         if (P.degree(0) <= 1) {
             cfactors.add(A.leadingBaseCoefficient());
             cdenom.add(P);
-            return new LogIntegral<>(A, P, cfactors, cdenom, afactors, adenom);
+            return new LogIntegral<C>(A, P, cfactors, cdenom, afactors, adenom);
         }
         List<GenPolynomial<C>> Pfac = irr.baseFactorsSquarefree(P);
         //System.out.println("\nPfac = " + Pfac);
@@ -289,7 +289,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
             afactors.addAll(pf.afactors);
             adenom.addAll(pf.adenom);
         }
-        return new LogIntegral<>(A, P, cfactors, cdenom, afactors, adenom);
+        return new LogIntegral<C>(A, P, cfactors, cdenom, afactors, adenom);
     }
 
 
@@ -313,16 +313,16 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
         if (!pfac.coFac.isField()) {
             throw new IllegalArgumentException("only for field coefficients " + pfac);
         }
-        List<C> cfactors = new ArrayList<>();
-        List<GenPolynomial<C>> cdenom = new ArrayList<>();
-        List<AlgebraicNumber<C>> afactors = new ArrayList<>();
-        List<GenPolynomial<AlgebraicNumber<C>>> adenom = new ArrayList<>();
+        List<C> cfactors = new ArrayList<C>();
+        List<GenPolynomial<C>> cdenom = new ArrayList<GenPolynomial<C>>();
+        List<AlgebraicNumber<C>> afactors = new ArrayList<AlgebraicNumber<C>>();
+        List<GenPolynomial<AlgebraicNumber<C>>> adenom = new ArrayList<GenPolynomial<AlgebraicNumber<C>>>();
 
         // P linear
         if (P.degree(0) <= 1) {
             cfactors.add(A.leadingBaseCoefficient());
             cdenom.add(P);
-            return new LogIntegral<>(A, P, cfactors, cdenom, afactors, adenom);
+            return new LogIntegral<C>(A, P, cfactors, cdenom, afactors, adenom);
         }
 
         // deriviative
@@ -333,12 +333,12 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
 
         // Q[t]
         String[] vars = new String[]{"t"};
-        GenPolynomialRing<C> cfac = new GenPolynomialRing<>(pfac.coFac, 1, pfac.tord, vars);
+        GenPolynomialRing<C> cfac = new GenPolynomialRing<C>(pfac.coFac, 1, pfac.tord, vars);
         GenPolynomial<C> t = cfac.univariate(0);
         //System.out.println("t = " + t);
 
         // Q[x][t]
-        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<>(pfac, cfac); // sic
+        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(pfac, cfac); // sic
         //System.out.println("rfac = " + rfac.toScript());
 
         // transform polynomials to bi-variate polynomial
@@ -359,7 +359,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
         GenPolynomial<GenPolynomial<C>> At = Ac.subtract(tc.multiply(Pcp));
         //System.out.println("At = " + At);
 
-        GreatestCommonDivisorSubres<C> engine = new GreatestCommonDivisorSubres<>();
+        GreatestCommonDivisorSubres<C> engine = new GreatestCommonDivisorSubres<C>();
         // = GCDFactory.<C>getImplementation( cfac.coFac );
         GreatestCommonDivisorAbstract<AlgebraicNumber<C>> aengine = null;
 
@@ -384,14 +384,14 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
             String[] unused = pfac.setVars(vars);
             r = pfac.copy(r); // hack to exchange the variables
             //System.out.println("r(z_) = " + r);
-            AlgebraicNumberRing<C> afac = new AlgebraicNumberRing<>(r, true); // since irreducible
+            AlgebraicNumberRing<C> afac = new AlgebraicNumberRing<C>(r, true); // since irreducible
             logger.debug("afac = " + afac.toScript());
             AlgebraicNumber<C> a = afac.getGenerator();
             //no: a = a.negate();
             //System.out.println("a = " + a);
 
             // K(alpha)[x]
-            GenPolynomialRing<AlgebraicNumber<C>> pafac = new GenPolynomialRing<>(afac,
+            GenPolynomialRing<AlgebraicNumber<C>> pafac = new GenPolynomialRing<AlgebraicNumber<C>>(afac,
                     Pc.ring);
             //System.out.println("pafac = " + pafac.toScript());
 
@@ -432,7 +432,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
             }
             // todo: eventually implement special cases deg = 3, 4
         }
-        return new LogIntegral<>(A, P, cfactors, cdenom, afactors, adenom);
+        return new LogIntegral<C>(A, P, cfactors, cdenom, afactors, adenom);
     }
 
 
@@ -447,14 +447,14 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
         GenPolynomial<C> den = r.den;
         GenPolynomial<C> nump = PolyUtil.baseDeriviative(num);
         if (den.isONE()) {
-            return new Quotient<>(r.ring, nump, den);
+            return new Quotient<C>(r.ring, nump, den);
         }
         GenPolynomial<C> denp = PolyUtil.baseDeriviative(den);
 
         GenPolynomial<C> n = den.multiply(nump).subtract(num.multiply(denp));
         GenPolynomial<C> d = den.multiply(den);
 
-        Quotient<C> der = new Quotient<>(r.ring, n, d);
+        Quotient<C> der = new Quotient<C>(r.ring, n, d);
         return der;
     }
 
@@ -477,7 +477,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
             return r.equals(i);
         }
         for (LogIntegral<C> li : ri.logarithm) {
-            Quotient<C> q = new Quotient<>(qr, li.num, li.den);
+            Quotient<C> q = new Quotient<C>(qr, li.num, li.den);
             i = i.sum(q);
         }
         boolean t = r.equals(i);
@@ -501,33 +501,33 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
      * @return true, if rl is an integral, else false.
      */
     public boolean isIntegral(LogIntegral<C> rl) {
-        QuotientRing<C> qr = new QuotientRing<>(rl.den.ring);
-        Quotient<C> r = new Quotient<>(qr, rl.num, rl.den);
+        QuotientRing<C> qr = new QuotientRing<C>(rl.den.ring);
+        Quotient<C> r = new Quotient<C>(qr, rl.num, rl.den);
 
         Quotient<C> i = qr.getZERO();
         int j = 0;
         for (GenPolynomial<C> d : rl.cdenom) {
             GenPolynomial<C> dp = PolyUtil.baseDeriviative(d);
             dp = dp.multiply(rl.cfactors.get(j++));
-            Quotient<C> f = new Quotient<>(qr, dp, d);
+            Quotient<C> f = new Quotient<C>(qr, dp, d);
             i = i.sum(f);
         }
         if (rl.afactors.size() == 0) {
             return r.equals(i);
         }
         r = r.subtract(i);
-        QuotientRing<AlgebraicNumber<C>> aqr = new QuotientRing<>(rl.adenom.get(0).ring);
+        QuotientRing<AlgebraicNumber<C>> aqr = new QuotientRing<AlgebraicNumber<C>>(rl.adenom.get(0).ring);
         Quotient<AlgebraicNumber<C>> ai = aqr.getZERO();
 
         GenPolynomial<AlgebraicNumber<C>> aqn = PolyUtil.convertToAlgebraicCoefficients(aqr.ring, r.num);
         GenPolynomial<AlgebraicNumber<C>> aqd = PolyUtil.convertToAlgebraicCoefficients(aqr.ring, r.den);
-        Quotient<AlgebraicNumber<C>> ar = new Quotient<>(aqr, aqn, aqd);
+        Quotient<AlgebraicNumber<C>> ar = new Quotient<AlgebraicNumber<C>>(aqr, aqn, aqd);
 
         j = 0;
         for (GenPolynomial<AlgebraicNumber<C>> d : rl.adenom) {
             GenPolynomial<AlgebraicNumber<C>> dp = PolyUtil.baseDeriviative(d);
             dp = dp.multiply(rl.afactors.get(j++));
-            Quotient<AlgebraicNumber<C>> f = new Quotient<>(aqr, dp, d);
+            Quotient<AlgebraicNumber<C>> f = new Quotient<AlgebraicNumber<C>>(aqr, dp, d);
             ai = ai.sum(f);
         }
         boolean t = ar.equals(ai);

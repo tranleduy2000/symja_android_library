@@ -61,7 +61,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      */
     public SolvableQuotientRing(GenSolvablePolynomialRing<C> r) {
         ring = r;
-        engine = new SolvableSyzygySeq<>(ring.coFac);
+        engine = new SolvableSyzygySeq<C>(ring.coFac);
         logger.debug("quotient ring constructed");
     }
 
@@ -79,7 +79,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      */
     @SuppressWarnings("unchecked")
     public SolvableQuotient<C> create(GenPolynomial<C> n) {
-        return new SolvableQuotient<>(this, (GenSolvablePolynomial<C>) n);
+        return new SolvableQuotient<C>(this, (GenSolvablePolynomial<C>) n);
     }
 
 
@@ -88,7 +88,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      */
     @SuppressWarnings("unchecked")
     public SolvableQuotient<C> create(GenPolynomial<C> n, GenPolynomial<C> d) {
-        return new SolvableQuotient<>(this, (GenSolvablePolynomial<C>) n, (GenSolvablePolynomial<C>) d);
+        return new SolvableQuotient<C>(this, (GenSolvablePolynomial<C>) n, (GenSolvablePolynomial<C>) d);
     }
 
 
@@ -109,7 +109,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      * @return a copy of c.
      */
     public SolvableQuotient<C> copy(SolvableQuotient<C> c) {
-        return new SolvableQuotient<>(c.ring, c.num, c.den, true);
+        return new SolvableQuotient<C>(c.ring, c.num, c.den, true);
     }
 
 
@@ -119,7 +119,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      * @return 0 as SolvableQuotient.
      */
     public SolvableQuotient<C> getZERO() {
-        return new SolvableQuotient<>(this, ring.getZERO());
+        return new SolvableQuotient<C>(this, ring.getZERO());
     }
 
 
@@ -129,7 +129,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      * @return 1 as SolvableQuotient.
      */
     public SolvableQuotient<C> getONE() {
-        return new SolvableQuotient<>(this, ring.getONE());
+        return new SolvableQuotient<C>(this, ring.getONE());
     }
 
 
@@ -140,13 +140,13 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      */
     public List<SolvableQuotient<C>> generators() {
         List<GenSolvablePolynomial<C>> pgens = PolynomialList.castToSolvableList(ring.generators());
-        List<SolvableQuotient<C>> gens = new ArrayList<>(pgens.size() * 2 - 1);
+        List<SolvableQuotient<C>> gens = new ArrayList<SolvableQuotient<C>>(pgens.size() * 2 - 1);
         GenSolvablePolynomial<C> one = ring.getONE();
         for (GenSolvablePolynomial<C> p : pgens) {
-            SolvableQuotient<C> q = new SolvableQuotient<>(this, p);
+            SolvableQuotient<C> q = new SolvableQuotient<C>(this, p);
             gens.add(q);
             if (!p.isONE()) {
-                q = new SolvableQuotient<>(this, one, p);
+                q = new SolvableQuotient<C>(this, one, p);
                 gens.add(q);
             }
         }
@@ -226,7 +226,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      * @return a SolvableQuotient.
      */
     public SolvableQuotient<C> fromInteger(java.math.BigInteger a) {
-        return new SolvableQuotient<>(this, ring.fromInteger(a));
+        return new SolvableQuotient<C>(this, ring.fromInteger(a));
     }
 
 
@@ -237,7 +237,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
      * @return a SolvableQuotient.
      */
     public SolvableQuotient<C> fromInteger(long a) {
-        return new SolvableQuotient<>(this, ring.fromInteger(a));
+        return new SolvableQuotient<C>(this, ring.fromInteger(a));
     }
 
 
@@ -308,7 +308,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         do {
             s = ring.random(n).monic();
         } while (s.isZERO());
-        return new SolvableQuotient<>(this, r, s, false);
+        return new SolvableQuotient<C>(this, r, s, false);
     }
 
 
@@ -327,7 +327,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         do {
             s = ring.random(k, l, d, q).monic();
         } while (s.isZERO());
-        return new SolvableQuotient<>(this, r, s, false);
+        return new SolvableQuotient<C>(this, r, s, false);
     }
 
 
@@ -344,7 +344,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         do {
             s = ring.random(n, rnd).monic();
         } while (s.isZERO());
-        return new SolvableQuotient<>(this, r, s, false);
+        return new SolvableQuotient<C>(this, r, s, false);
     }
 
 
@@ -367,13 +367,13 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         i = s.indexOf("|");
         if (i < 0) {
             GenSolvablePolynomial<C> n = ring.parse(s);
-            return new SolvableQuotient<>(this, n);
+            return new SolvableQuotient<C>(this, n);
         }
         String s1 = s.substring(0, i);
         String s2 = s.substring(i + 1);
         GenSolvablePolynomial<C> n = ring.parse(s1);
         GenSolvablePolynomial<C> d = ring.parse(s2);
-        return new SolvableQuotient<>(this, n, d);
+        return new SolvableQuotient<C>(this, n, d);
     }
 
 

@@ -97,7 +97,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      * Create from numerator.
      */
     public Quotient<C> create(GenPolynomial<C> n) {
-        return new Quotient<>(this, n);
+        return new Quotient<C>(this, n);
     }
 
 
@@ -105,7 +105,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      * Create from numerator, denominator pair.
      */
     public Quotient<C> create(GenPolynomial<C> n, GenPolynomial<C> d) {
-        return new Quotient<>(this, n, d);
+        return new Quotient<C>(this, n, d);
     }
 
 
@@ -155,7 +155,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      * @return a copy of c.
      */
     public Quotient<C> copy(Quotient<C> c) {
-        return new Quotient<>(c.ring, c.num, c.den, true);
+        return new Quotient<C>(c.ring, c.num, c.den, true);
     }
 
 
@@ -165,7 +165,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      * @return 0 as Quotient.
      */
     public Quotient<C> getZERO() {
-        return new Quotient<>(this, ring.getZERO());
+        return new Quotient<C>(this, ring.getZERO());
     }
 
 
@@ -175,7 +175,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      * @return 1 as Quotient.
      */
     public Quotient<C> getONE() {
-        return new Quotient<>(this, ring.getONE());
+        return new Quotient<C>(this, ring.getONE());
     }
 
 
@@ -187,9 +187,9 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      */
     public List<Quotient<C>> generators() {
         List<GenPolynomial<C>> pgens = ring.generators();
-        List<Quotient<C>> gens = new ArrayList<>(pgens.size());
+        List<Quotient<C>> gens = new ArrayList<Quotient<C>>(pgens.size());
         for (GenPolynomial<C> p : pgens) {
-            Quotient<C> q = new Quotient<>(this, p);
+            Quotient<C> q = new Quotient<C>(this, p);
             gens.add(q);
         }
         return gens;
@@ -243,7 +243,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      * @return a Quotient.
      */
     public Quotient<C> fromInteger(java.math.BigInteger a) {
-        return new Quotient<>(this, ring.fromInteger(a));
+        return new Quotient<C>(this, ring.fromInteger(a));
     }
 
 
@@ -254,7 +254,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      * @return a Quotient.
      */
     public Quotient<C> fromInteger(long a) {
-        return new Quotient<>(this, ring.fromInteger(a));
+        return new Quotient<C>(this, ring.fromInteger(a));
     }
 
 
@@ -331,7 +331,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         while (s.isZERO()) {
             s = ring.random(n).monic();
         }
-        return new Quotient<>(this, r, s, false);
+        return new Quotient<C>(this, r, s, false);
     }
 
 
@@ -350,7 +350,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         while (s.isZERO()) {
             s = ring.random(k, l, d, q).monic();
         }
-        return new Quotient<>(this, r, s, false);
+        return new Quotient<C>(this, r, s, false);
     }
 
 
@@ -367,7 +367,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         while (s.isZERO()) {
             s = ring.random(n, rnd).monic();
         }
-        return new Quotient<>(this, r, s, false);
+        return new Quotient<C>(this, r, s, false);
     }
 
 
@@ -390,13 +390,13 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         i = s.indexOf("|");
         if (i < 0) {
             GenPolynomial<C> n = ring.parse(s);
-            return new Quotient<>(this, n);
+            return new Quotient<C>(this, n);
         }
         String s1 = s.substring(0, i);
         String s2 = s.substring(i + 1);
         GenPolynomial<C> n = ring.parse(s1);
         GenPolynomial<C> d = ring.parse(s2);
-        return new Quotient<>(this, n, d);
+        return new Quotient<C>(this, n, d);
     }
 
 

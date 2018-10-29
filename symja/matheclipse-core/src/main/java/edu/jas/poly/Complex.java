@@ -171,7 +171,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      */
     @Override
     public Complex<C> copy() {
-        return new Complex<>(ring, re, im);
+        return new Complex<C>(ring, re, im);
     }
 
 
@@ -363,7 +363,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * @return this+B.
      */
     public Complex<C> sum(Complex<C> B) {
-        return new Complex<>(ring, re.sum(B.re), im.sum(B.im));
+        return new Complex<C>(ring, re.sum(B.re), im.sum(B.im));
     }
 
 
@@ -374,7 +374,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * @return this-B.
      */
     public Complex<C> subtract(Complex<C> B) {
-        return new Complex<>(ring, re.subtract(B.re), im.subtract(B.im));
+        return new Complex<C>(ring, re.subtract(B.re), im.subtract(B.im));
     }
 
 
@@ -385,7 +385,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * @see edu.jas.structure.RingElem#negate()
      */
     public Complex<C> negate() {
-        return new Complex<>(ring, re.negate(), im.negate());
+        return new Complex<C>(ring, re.negate(), im.negate());
     }
 
 
@@ -398,7 +398,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * @return the complex conjugate of this.
      */
     public Complex<C> conjugate() {
-        return new Complex<>(ring, re, im.negate());
+        return new Complex<C>(ring, re, im.negate());
     }
 
 
@@ -412,7 +412,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
         // this.conjugate().multiply(this);
         C v = re.multiply(re);
         v = v.sum(im.multiply(im));
-        return new Complex<>(ring, v);
+        return new Complex<C>(ring, v);
     }
 
 
@@ -441,7 +441,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * @return this*B.
      */
     public Complex<C> multiply(Complex<C> B) {
-        return new Complex<>(ring, re.multiply(B.re).subtract(im.multiply(B.im)), re.multiply(B.im).sum(
+        return new Complex<C>(ring, re.multiply(B.re).subtract(im.multiply(B.im)), re.multiply(B.im).sum(
                 im.multiply(B.re)));
     }
 
@@ -454,7 +454,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      */
     public Complex<C> inverse() {
         C a = norm().re.inverse();
-        return new Complex<>(ring, re.multiply(a), im.multiply(a.negate()));
+        return new Complex<C>(ring, re.multiply(a), im.multiply(a.negate()));
     }
 
 
@@ -524,7 +524,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
                 qi = qi.sum(one);
             }
         }
-        Sp = new Complex<>(ring, qr, qi);
+        Sp = new Complex<C>(ring, qr, qi);
         Complex<C> Rp = this.subtract(Sp.multiply(S));
         if (debug && n.compareTo(Rp.norm().re) < 0) {
             System.out.println("n = " + n);
@@ -620,7 +620,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
             return ret;
         }
         if (ring.isField()) {
-            Complex<C> half = new Complex<>(ring, ring.ring.fromInteger(1).divide(ring.ring.fromInteger(2)));
+            Complex<C> half = new Complex<C>(ring, ring.ring.fromInteger(1).divide(ring.ring.fromInteger(2)));
             ret[0] = ring.getONE();
             ret[1] = this.inverse().multiply(half);
             ret[2] = S.inverse().multiply(half);

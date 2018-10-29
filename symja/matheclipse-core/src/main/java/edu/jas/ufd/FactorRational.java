@@ -62,7 +62,7 @@ public class FactorRational extends FactorAbsolute<BigRational> {
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
-        List<GenPolynomial<BigRational>> factors = new ArrayList<>();
+        List<GenPolynomial<BigRational>> factors = new ArrayList<GenPolynomial<BigRational>>();
         if (P.isZERO()) {
             return factors;
         }
@@ -81,7 +81,7 @@ public class FactorRational extends FactorAbsolute<BigRational> {
             Pr = Pr.monic();
         }
         BigInteger bi = BigInteger.ONE;
-        GenPolynomialRing<BigInteger> ifac = new GenPolynomialRing<>(bi, pfac);
+        GenPolynomialRing<BigInteger> ifac = new GenPolynomialRing<BigInteger>(bi, pfac);
         GenPolynomial<BigInteger> Pi = PolyUtil.integerFromRationalCoefficients(ifac, Pr);
         if (debug) {
             logger.info("Pi = " + Pi);
@@ -123,7 +123,7 @@ public class FactorRational extends FactorAbsolute<BigRational> {
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
-        List<GenPolynomial<BigRational>> factors = new ArrayList<>();
+        List<GenPolynomial<BigRational>> factors = new ArrayList<GenPolynomial<BigRational>>();
         if (P.isZERO()) {
             return factors;
         }
@@ -142,7 +142,7 @@ public class FactorRational extends FactorAbsolute<BigRational> {
             Pr = Pr.monic();
         }
         BigInteger bi = BigInteger.ONE;
-        GenPolynomialRing<BigInteger> ifac = new GenPolynomialRing<>(bi, pfac);
+        GenPolynomialRing<BigInteger> ifac = new GenPolynomialRing<BigInteger>(bi, pfac);
         GenPolynomial<BigInteger> Pi = PolyUtil.integerFromRationalCoefficients(ifac, Pr);
         if (debug) {
             logger.info("Pi = " + Pi);
@@ -186,7 +186,7 @@ public class FactorRational extends FactorAbsolute<BigRational> {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
         GenPolynomialRing<BigRational> pfac = P.ring;
-        SortedMap<GenPolynomial<BigRational>, Long> factors = new TreeMap<>(pfac.getComparator());
+        SortedMap<GenPolynomial<BigRational>, Long> factors = new TreeMap<GenPolynomial<BigRational>, Long>(pfac.getComparator());
         if (P.isZERO()) {
             return factors;
         }
@@ -199,7 +199,7 @@ public class FactorRational extends FactorAbsolute<BigRational> {
         }
         GenPolynomial<BigRational> Pr = P;
         BigInteger bi = BigInteger.ONE;
-        GenPolynomialRing<BigInteger> ifac = new GenPolynomialRing<>(bi, pfac);
+        GenPolynomialRing<BigInteger> ifac = new GenPolynomialRing<BigInteger>(bi, pfac);
         GenPolynomial<BigInteger> Pi = PolyUtil.integerFromRationalCoefficients(ifac, Pr);
         if (debug) {
             logger.info("Pi = " + Pi);

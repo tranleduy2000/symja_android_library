@@ -62,7 +62,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
         GenPolynomial<C>[] P = new GenPolynomial[0];
         List<GenPolynomial<C>> Ppp;
         synchronized (Pp) {
-            Ppp = new ArrayList<>(Pp); // sic
+            Ppp = new ArrayList<GenPolynomial<C>>(Pp); // sic
         }
         P = Ppp.toArray(P);
         int ll = Ppp.size();
@@ -75,7 +75,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
                 //System.out.println("Pp.size() = " + Pp.size() + ", ll = " + ll);
                 //long t = System.currentTimeMillis();
                 synchronized (Pp) {
-                    Ppp = new ArrayList<>(Pp); // sic
+                    Ppp = new ArrayList<GenPolynomial<C>>(Pp); // sic
                 }
                 P = Ppp.toArray(P);
                 ll = Ppp.size();
@@ -139,7 +139,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
             return null;
         }
         C mfac = Ap.ring.getONECoefficient();
-        PseudoReductionEntry<C> pf = new PseudoReductionEntry<>(Ap, mfac);
+        PseudoReductionEntry<C> pf = new PseudoReductionEntry<C>(Ap, mfac);
         if (Pp == null || Pp.isEmpty()) {
             return pf;
         }
@@ -149,7 +149,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
         GenPolynomial<C>[] P = new GenPolynomial[0];
         List<GenPolynomial<C>> Ppp;
         synchronized (Pp) {
-            Ppp = new ArrayList<>(Pp); // sic
+            Ppp = new ArrayList<GenPolynomial<C>>(Pp); // sic
         }
         P = Ppp.toArray(P);
         int l = Ppp.size();
@@ -163,7 +163,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
             if (Pp.size() != l) {
                 //long t = System.currentTimeMillis();
                 synchronized (Pp) {
-                    Ppp = new ArrayList<>(Pp);
+                    Ppp = new ArrayList<GenPolynomial<C>>(Pp);
                 }
                 P = Ppp.toArray(P);
                 l = Ppp.size();
@@ -210,7 +210,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
         if (logger.isInfoEnabled()) {
             logger.info("multiplicative factor = " + mfac);
         }
-        pf = new PseudoReductionEntry<>(R, mfac);
+        pf = new PseudoReductionEntry<C>(R, mfac);
         return pf;
     }
 
@@ -251,7 +251,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
         GenPolynomial<GenPolynomial<C>>[] P = new GenPolynomial[0];
         List<GenPolynomial<GenPolynomial<C>>> Ppp;
         synchronized (Pp) {
-            Ppp = new ArrayList<>(Pp); // sic
+            Ppp = new ArrayList<GenPolynomial<GenPolynomial<C>>>(Pp); // sic
         }
         P = Ppp.toArray(P);
         int ll = Ppp.size();
@@ -264,7 +264,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
                 //System.out.println("Pp.size() = " + Pp.size() + ", ll = " + ll);
                 //long t = System.currentTimeMillis();
                 synchronized (Pp) {
-                    Ppp = new ArrayList<>(Pp); // sic
+                    Ppp = new ArrayList<GenPolynomial<GenPolynomial<C>>>(Pp); // sic
                 }
                 P = Ppp.toArray(P);
                 ll = Ppp.size();

@@ -188,7 +188,7 @@ public class GenPolynomialTokenizer {
             st = st.substring(0, st.length() - 1);
         }
         st = st.replaceAll(",", " ");
-        List<String> sl = new ArrayList<>();
+        List<String> sl = new ArrayList<String>();
         Scanner sc = new Scanner(st);
         while (sc.hasNext()) {
             String sn = sc.next();
@@ -233,7 +233,7 @@ public class GenPolynomialTokenizer {
         st = st.replaceAll("\\^", " ");
         //System.out.println("st = " + st);
 
-        Set<String> sl = new TreeSet<>();
+        Set<String> sl = new TreeSet<String>();
         Scanner sc = new Scanner(st);
         while (sc.hasNext()) {
             String sn = sc.next();
@@ -772,7 +772,7 @@ public class GenPolynomialTokenizer {
      * @throws IOException
      */
     public String[] nextVariableList() throws IOException {
-        List<String> l = new ArrayList<>();
+        List<String> l = new ArrayList<String>();
         int tt;
         tt = tok.nextToken();
         //System.out.println("vList tok = " + tok);
@@ -884,7 +884,7 @@ public class GenPolynomialTokenizer {
                 int vr = rfv.length;
                 BigRational bi = new BigRational();
                 TermOrder to = new TermOrder(TermOrder.INVLEX);
-                GenPolynomialRing<BigRational> pcf = new GenPolynomialRing<>(bi, vr, to, rfv);
+                GenPolynomialRing<BigRational> pcf = new GenPolynomialRing<BigRational>(bi, vr, to, rfv);
                 coeff = pcf;
                 ct = coeffType.IntFunc;
             } else if (tok.sval.equalsIgnoreCase("AN")) {
@@ -945,12 +945,12 @@ public class GenPolynomialTokenizer {
                     if (tcfac instanceof ModIntegerRing) {
                         GenPolynomial<ModInteger> gfmod;
                         gfmod = (GenPolynomial<ModInteger>) mod;
-                        coeff = new AlgebraicNumberRing<>(gfmod);
+                        coeff = new AlgebraicNumberRing<ModInteger>(gfmod);
                         ct = coeffType.ANmod;
                     } else {
                         GenPolynomial<BigRational> anmod;
                         anmod = (GenPolynomial<BigRational>) mod;
-                        coeff = new AlgebraicNumberRing<>(anmod);
+                        coeff = new AlgebraicNumberRing<BigRational>(anmod);
                         ct = coeffType.ANrat;
                     }
                     if (debug) {
@@ -987,7 +987,7 @@ public class GenPolynomialTokenizer {
      * @throws IOException
      */
     public long[] nextWeightList() throws IOException {
-        List<Long> l = new ArrayList<>();
+        List<Long> l = new ArrayList<Long>();
         long e;
         char first;
         int tt;
@@ -1004,7 +1004,7 @@ public class GenPolynomialTokenizer {
                     first = tok.sval.charAt(0);
                     if (digit(first)) {
                         e = Long.parseLong(tok.sval);
-                        l.add(e);
+                        l.add(Long.valueOf(e));
                         //System.out.println("w: " + e);
                     }
                 }
@@ -1033,7 +1033,7 @@ public class GenPolynomialTokenizer {
      * @throws IOException
      */
     public long[][] nextWeightArray() throws IOException {
-        List<long[]> l = new ArrayList<>();
+        List<long[]> l = new ArrayList<long[]>();
         long[] e;
         char first;
         int tt;
@@ -1213,7 +1213,7 @@ public class GenPolynomialTokenizer {
      */
     public List<GenPolynomial> nextPolynomialList() throws IOException {
         GenPolynomial a;
-        List<GenPolynomial> L = new ArrayList<>();
+        List<GenPolynomial> L = new ArrayList<GenPolynomial>();
         int tt;
         tt = tok.nextToken();
         if (tt == StreamTokenizer.TT_EOF)
@@ -1255,7 +1255,7 @@ public class GenPolynomialTokenizer {
      * @throws IOException
      */
     public List<List<GenPolynomial>> nextSubModuleList() throws IOException {
-        List<List<GenPolynomial>> L = new ArrayList<>();
+        List<List<GenPolynomial>> L = new ArrayList<List<GenPolynomial>>();
         int tt;
         tt = tok.nextToken();
         if (tt == StreamTokenizer.TT_EOF)
@@ -1333,6 +1333,7 @@ public class GenPolynomialTokenizer {
         if (debug) {
             logger.info("table = " + table);
         }
+        return;
     }
 
     /**
@@ -1428,9 +1429,9 @@ public class GenPolynomialTokenizer {
 
         GenPolynomial p;
         GenSolvablePolynomial ps;
-        List<GenSolvablePolynomial> sp = new ArrayList<>(s.size());
-        for (GenPolynomial value : s) {
-            p = value;
+        List<GenSolvablePolynomial> sp = new ArrayList<GenSolvablePolynomial>(s.size());
+        for (Iterator<GenPolynomial> it = s.iterator(); it.hasNext(); ) {
+            p = it.next();
             ps = new GenSolvablePolynomial(spfac, p.val);
             //System.out.println("ps = " + ps);
             sp.add(ps);
@@ -1520,7 +1521,7 @@ public class GenPolynomialTokenizer {
      * @throws IOException
      */
     public List<List<GenSolvablePolynomial>> nextSolvableSubModuleList() throws IOException {
-        List<List<GenSolvablePolynomial>> L = new ArrayList<>();
+        List<List<GenSolvablePolynomial>> L = new ArrayList<List<GenSolvablePolynomial>>();
         int tt;
         tt = tok.nextToken();
         if (tt == StreamTokenizer.TT_EOF)

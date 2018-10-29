@@ -102,14 +102,14 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
      */
     public GroebnerBaseAbstract(Reduction<C> red, PairList<C> pl) {
         if (red == null) {
-            red = new ReductionSeq<>();
+            red = new ReductionSeq<C>();
         }
         this.red = red;
         if (pl == null) {
-            pl = new OrderedPairlist<>();
+            pl = new OrderedPairlist<C>();
         }
         this.strategy = pl;
-        blas = new BasicLinAlg<>();
+        blas = new BasicLinAlg<GenPolynomial<C>>();
     }
 
 
@@ -134,7 +134,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         if (A == null) {
             return A;
         }
-        List<GenPolynomial<C>> N = new ArrayList<>(A.size());
+        List<GenPolynomial<C>> N = new ArrayList<GenPolynomial<C>>(A.size());
         if (A.isEmpty()) {
             return N;
         }
@@ -284,8 +284,8 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         }
         GenPolynomialRing<C> pring = F.get(0).ring;
         List<GenPolynomial<C>> G = GB(modv, F);
-        PolynomialList<C> Fp = new PolynomialList<>(pring, F);
-        PolynomialList<C> Gp = new PolynomialList<>(pring, G);
+        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
+        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
         return Fp.compareTo(Gp) == 0;
     }
 
@@ -305,7 +305,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
             return -1;
         }
         //int uht = 0;
-        Set<Integer> v = new HashSet<>(); // for non reduced GBs
+        Set<Integer> v = new HashSet<Integer>(); // for non reduced GBs
         for (GenPolynomial<C> p : F) {
             if (p.isZERO()) {
                 continue;
@@ -381,7 +381,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         PolynomialList<C> F = M.getPolynomialList();
         int modv = M.cols;
         List<GenPolynomial<C>> G = GB(modv, F.list);
-        F = new PolynomialList<>(F.ring, G);
+        F = new PolynomialList<C>(F.ring, G);
         N = F.getModuleList(modv);
         return N;
     }
@@ -423,7 +423,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
             return Gp;
         }
         // remove zero polynomials
-        List<GenPolynomial<C>> G = new ArrayList<>(Gp.size());
+        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>(Gp.size());
         for (GenPolynomial<C> a : Gp) {
             if (a != null && !a.isZERO()) { // always true in GB()
                 // already positive a = a.abs();
@@ -436,7 +436,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         // remove top reducible polynomials
         GenPolynomial<C> a;
         List<GenPolynomial<C>> F;
-        F = new ArrayList<>(G.size());
+        F = new ArrayList<GenPolynomial<C>>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
@@ -444,7 +444,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenPolynomial<C>> ff;
-                    ff = new ArrayList<>(G);
+                    ff = new ArrayList<GenPolynomial<C>>(G);
                     ff.addAll(F);
                     a = red.normalform(ff, a);
                     if (!a.isZERO()) {
@@ -503,8 +503,8 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
             }
         }
         // test for top reducible polynomials
-        List<GenPolynomial<C>> G = new ArrayList<>(Gp);
-        List<GenPolynomial<C>> F = new ArrayList<>(G.size());
+        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>(Gp);
+        List<GenPolynomial<C>> F = new ArrayList<GenPolynomial<C>>(G.size());
         while (G.size() > 0) {
             GenPolynomial<C> a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
@@ -601,12 +601,12 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         if (M.size() == 0) {
             return M;
         }
-        List<List<GenPolynomial<C>>> N = new ArrayList<>();
-        List<List<GenPolynomial<C>>> K = new ArrayList<>();
+        List<List<GenPolynomial<C>>> N = new ArrayList<List<GenPolynomial<C>>>();
+        List<List<GenPolynomial<C>>> K = new ArrayList<List<GenPolynomial<C>>>();
         int len = M.get(M.size() - 1).size(); // longest row
         // pad / extend rows
         for (List<GenPolynomial<C>> row : M) {
-            List<GenPolynomial<C>> nrow = new ArrayList<>(row);
+            List<GenPolynomial<C>> nrow = new ArrayList<GenPolynomial<C>>(row);
             for (int i = row.size(); i < len; i++) {
                 nrow.add(null);
             }
@@ -647,7 +647,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         // truncate 
         N.clear();
         for (List<GenPolynomial<C>> row : K) {
-            List<GenPolynomial<C>> tr = new ArrayList<>();
+            List<GenPolynomial<C>> tr = new ArrayList<GenPolynomial<C>>();
             for (int i = 0; i < flen; i++) {
                 tr.add(row.get(i));
             }
@@ -671,21 +671,21 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
             return null; //new ExtendedGB<C>(null,Gp,null,M);
         }
         if (Gp.size() <= 1) {
-            return new ExtendedGB<>(null, Gp, null, M);
+            return new ExtendedGB<C>(null, Gp, null, M);
         }
         List<GenPolynomial<C>> G;
         List<GenPolynomial<C>> F;
-        G = new ArrayList<>(Gp);
-        F = new ArrayList<>(Gp.size());
+        G = new ArrayList<GenPolynomial<C>>(Gp);
+        F = new ArrayList<GenPolynomial<C>>(Gp.size());
 
         List<List<GenPolynomial<C>>> Mg;
         List<List<GenPolynomial<C>>> Mf;
-        Mg = new ArrayList<>(M.size());
-        Mf = new ArrayList<>(M.size());
+        Mg = new ArrayList<List<GenPolynomial<C>>>(M.size());
+        Mf = new ArrayList<List<GenPolynomial<C>>>(M.size());
         List<GenPolynomial<C>> row;
         for (List<GenPolynomial<C>> r : M) {
             // must be copied also
-            row = new ArrayList<>(r);
+            row = new ArrayList<GenPolynomial<C>>(r);
             Mg.add(row);
         }
         row = null;
@@ -696,8 +696,8 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         GenPolynomial<C> p;
         boolean mt;
         ListIterator<GenPolynomial<C>> it;
-        ArrayList<Integer> ix = new ArrayList<>();
-        ArrayList<Integer> jx = new ArrayList<>();
+        ArrayList<Integer> ix = new ArrayList<Integer>();
+        ArrayList<Integer> jx = new ArrayList<Integer>();
         int k = 0;
         //System.out.println("flen, Gp, M = " + flen + ", " + Gp.size() + ", " + M.size() );
         while (G.size() > 0) {
@@ -744,7 +744,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
             }
         }
         if (F.size() <= 1 || fix == -1) {
-            return new ExtendedGB<>(null, F, null, Mf);
+            return new ExtendedGB<C>(null, F, null, Mf);
         }
         // must return, since extended normalform has not correct order of polys
         /*
@@ -772,7 +772,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         }
         // does Mf need renormalization?
         */
-        return new ExtendedGB<>(null, F, null, Mf);
+        return new ExtendedGB<C>(null, F, null, Mf);
     }
 
 
@@ -783,7 +783,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
      * @return a list of the degrees of univariate head terms.
      */
     public List<Long> univariateDegrees(List<GenPolynomial<C>> A) {
-        List<Long> ud = new ArrayList<>();
+        List<Long> ud = new ArrayList<Long>();
         if (A == null || A.size() == 0) {
             return ud;
         }
@@ -792,7 +792,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
             return ud;
         }
         //int uht = 0;
-        Map<Integer, Long> v = new TreeMap<>(); // for non reduced GBs
+        Map<Integer, Long> v = new TreeMap<Integer, Long>(); // for non reduced GBs
         for (GenPolynomial<C> p : A) {
             ExpVector e = p.leadingExpVector();
             if (e == null) {
@@ -857,11 +857,11 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         GenPolynomialRing<C> pfac = G.get(0).ring;
         RingFactory<C> cfac = pfac.coFac;
         String var = pfac.getVars()[pfac.nvar - 1 - i];
-        GenPolynomialRing<C> ufac = new GenPolynomialRing<>(cfac, 1, new TermOrder(TermOrder.INVLEX),
+        GenPolynomialRing<C> ufac = new GenPolynomialRing<C>(cfac, 1, new TermOrder(TermOrder.INVLEX),
                 new String[]{var});
 
-        GenPolynomialRing<C> cpfac = new GenPolynomialRing<>(cfac, ll, new TermOrder(TermOrder.INVLEX));
-        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<>(cpfac, pfac);
+        GenPolynomialRing<C> cpfac = new GenPolynomialRing<C>(cfac, ll, new TermOrder(TermOrder.INVLEX));
+        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cpfac, pfac);
         GenPolynomial<GenPolynomial<C>> P = rfac.getZERO();
         for (int k = 0; k < ll; k++) {
             GenPolynomial<GenPolynomial<C>> Pp = rfac.univariate(i, k);
@@ -892,7 +892,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
             }
             GenPolynomial<GenPolynomial<C>> XPp = PolyUtil.toRecursive(rfac, XP);
             GenPolynomial<GenPolynomial<C>> XPs = XPp.sum(P);
-            ls = new ArrayList<>(XPs.getMap().values());
+            ls = new ArrayList<GenPolynomial<C>>(XPs.getMap().values());
             //System.out.println("ls,1 = " + ls);
             ls = red.irreducibleSet(ls);
             z = commonZeroTest(ls);
@@ -906,7 +906,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
                             "univariate polynomial degree greater than vector space dimansion");
                 }
                 cpfac = cpfac.extend(1);
-                rfac = new GenPolynomialRing<>(cpfac, pfac);
+                rfac = new GenPolynomialRing<GenPolynomial<C>>(cpfac, pfac);
                 P = PolyUtil.extendCoefficients(rfac, P, 0, 0L);
                 XPp = PolyUtil.extendCoefficients(rfac, XPp, 0, 1L);
                 P = P.sum(XPp);

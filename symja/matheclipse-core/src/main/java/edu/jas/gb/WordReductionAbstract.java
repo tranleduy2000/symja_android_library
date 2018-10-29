@@ -51,7 +51,7 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
      * @return list of all spol(Ap,Bp) the S-polynomials of Ap and Bp.
      */
     public List<GenWordPolynomial<C>> SPolynomials(GenWordPolynomial<C> Ap, GenWordPolynomial<C> Bp) {
-        List<GenWordPolynomial<C>> sp = new ArrayList<>();
+        List<GenWordPolynomial<C>> sp = new ArrayList<GenWordPolynomial<C>>();
         if (Bp == null || Bp.isZERO()) {
             if (Ap == null) {
                 sp.add(Bp);
@@ -139,7 +139,7 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
         if (Ap == null || Ap.isEmpty()) {
             return Ap;
         }
-        ArrayList<GenWordPolynomial<C>> red = new ArrayList<>();
+        ArrayList<GenWordPolynomial<C>> red = new ArrayList<GenWordPolynomial<C>>();
         for (GenWordPolynomial<C> A : Ap) {
             A = normalform(Pp, A);
             red.add(A);
@@ -250,7 +250,7 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
             return true;
         }
         GenWordPolynomial<C> Ap;
-        List<GenWordPolynomial<C>> P = new LinkedList<>(Pp);
+        List<GenWordPolynomial<C>> P = new LinkedList<GenWordPolynomial<C>>(Pp);
         int s = P.size();
         for (int i = 0; i < s; i++) {
             Ap = P.remove(i);
@@ -271,7 +271,7 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
      * with ideal(Pp) = ideal(P).
      */
     public List<GenWordPolynomial<C>> irreducibleSet(List<GenWordPolynomial<C>> Pp) {
-        ArrayList<GenWordPolynomial<C>> P = new ArrayList<>();
+        ArrayList<GenWordPolynomial<C>> P = new ArrayList<GenWordPolynomial<C>>();
         for (GenWordPolynomial<C> a : Pp) {
             if (a.length() != 0) {
                 a = a.monic();
@@ -307,7 +307,7 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
             } else {
                 f = a.leadingWord();
                 if (f.signum() == 0) {
-                    P = new ArrayList<>();
+                    P = new ArrayList<GenWordPolynomial<C>>();
                     P.add(a.monic());
                     return P;
                 }

@@ -68,7 +68,7 @@ public class StandardBaseSeq<C extends RingElem<C>>
         if (A == null) {
             return A;
         }
-        List<MultiVarPowerSeries<C>> N = new ArrayList<>(A.size());
+        List<MultiVarPowerSeries<C>> N = new ArrayList<MultiVarPowerSeries<C>>(A.size());
         if (A.isEmpty()) {
             return N;
         }
@@ -165,7 +165,7 @@ public class StandardBaseSeq<C extends RingElem<C>>
         if (!ring.coFac.isField()) {
             throw new IllegalArgumentException("coefficients not from a field");
         }
-        OrderedPairlist<C> pairlist = new OrderedPairlist<>(modv, ring); //strategy.create( modv, ring );
+        OrderedPairlist<C> pairlist = new OrderedPairlist<C>(modv, ring); //strategy.create( modv, ring ); 
         pairlist.put(G);
 
         /*
@@ -274,7 +274,7 @@ public class StandardBaseSeq<C extends RingElem<C>>
             return Gp;
         }
         // remove zero power series
-        List<MultiVarPowerSeries<C>> G = new ArrayList<>(Gp.size());
+        List<MultiVarPowerSeries<C>> G = new ArrayList<MultiVarPowerSeries<C>>(Gp.size());
         for (MultiVarPowerSeries<C> a : Gp) {
             if (a != null && !a.isZERO()) { // always true in GB()
                 // make positive a = a.abs(); ?
@@ -287,14 +287,14 @@ public class StandardBaseSeq<C extends RingElem<C>>
         }
         // remove top reducible power series
         MultiVarPowerSeries<C> a;
-        List<MultiVarPowerSeries<C>> F = new ArrayList<>(G.size());
+        List<MultiVarPowerSeries<C>> F = new ArrayList<MultiVarPowerSeries<C>>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
                 // drop power series 
                 if (debug) {
                     System.out.println("dropped " + a);
-                    List<MultiVarPowerSeries<C>> ff = new ArrayList<>(G);
+                    List<MultiVarPowerSeries<C>> ff = new ArrayList<MultiVarPowerSeries<C>>(G);
                     ff.addAll(F);
                     a = red.normalform(ff, a);
                     if (!a.isZERO()) {

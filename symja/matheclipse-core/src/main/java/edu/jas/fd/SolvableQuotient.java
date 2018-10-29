@@ -202,7 +202,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
      */
     @Override
     public SolvableQuotient<C> copy() {
-        return new SolvableQuotient<>(ring, num, den, true);
+        return new SolvableQuotient<C>(ring, num, den, true);
     }
 
 
@@ -393,7 +393,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
             return this;
         }
         GenSolvablePolynomial<C>[] oc = ring.engine.rightOreCond(num, den);
-        return new SolvableQuotient<>(ring, oc[1], oc[0], true); // reversed, true is wrong but okay
+        return new SolvableQuotient<C>(ring, oc[1], oc[0], true); // reversed, true is wrong but okay
     }
 
 
@@ -426,7 +426,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
      * @see edu.jas.structure.RingElem#abs()
      */
     public SolvableQuotient<C> abs() {
-        return new SolvableQuotient<>(ring, (GenSolvablePolynomial<C>) num.abs(), den, true);
+        return new SolvableQuotient<C>(ring, (GenSolvablePolynomial<C>) num.abs(), den, true);
     }
 
 
@@ -446,7 +446,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         GenSolvablePolynomial<C> n, d, n1, n2;
         if (den.isONE() && S.den.isONE()) {
             n = (GenSolvablePolynomial<C>) num.sum(S.num);
-            return new SolvableQuotient<>(ring, n, den, true);
+            return new SolvableQuotient<C>(ring, n, den, true);
         }
         /* wrong:
         if (den.isONE()) {
@@ -465,7 +465,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
             //n1 = den.multiply(S.num);
             //n2 = S.den.multiply(num);
             n = (GenSolvablePolynomial<C>) num.sum(S.num);
-            return new SolvableQuotient<>(ring, n, den, false);
+            return new SolvableQuotient<C>(ring, n, den, false);
         }
         // general case
         GenSolvablePolynomial<C>[] oc = ring.engine.leftOreCond(den, S.den);
@@ -479,7 +479,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         n = (GenSolvablePolynomial<C>) n1.sum(n2);
         //System.out.println("n = " + n);
         //System.out.println("d = " + d);
-        return new SolvableQuotient<>(ring, n, d, false);
+        return new SolvableQuotient<C>(ring, n, d, false);
     }
 
 
@@ -490,7 +490,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
      * @see edu.jas.structure.RingElem#negate()
      */
     public SolvableQuotient<C> negate() {
-        return new SolvableQuotient<>(ring, (GenSolvablePolynomial<C>) num.negate(), den, true);
+        return new SolvableQuotient<C>(ring, (GenSolvablePolynomial<C>) num.negate(), den, true);
     }
 
 
@@ -538,7 +538,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         if (num.isZERO()) {
             throw new ArithmeticException("element not invertible " + this);
         }
-        return new SolvableQuotient<>(ring, den, num, true);
+        return new SolvableQuotient<C>(ring, den, num, true);
     }
 
 
@@ -590,7 +590,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         GenSolvablePolynomial<C> n, d;
         if (den.isONE() && S.den.isONE()) {
             n = num.multiply(S.num);
-            return new SolvableQuotient<>(ring, n, den, true);
+            return new SolvableQuotient<C>(ring, n, den, true);
         }
         /* wrong:
         if (den.isONE()) { 
@@ -616,7 +616,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
             System.out.println("oc[0] num =mult= oc[1] S.den: (" + oc[0] + ") (" + num + ") = (" + oc[1]
                     + ") (" + S.den + ")");
         }
-        return new SolvableQuotient<>(ring, n, d, false);
+        return new SolvableQuotient<C>(ring, n, d, false);
     }
 
 
@@ -637,7 +637,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
             return this;
         }
         GenSolvablePolynomial<C> n = num.multiply(b);
-        return new SolvableQuotient<>(ring, n, den, false);
+        return new SolvableQuotient<C>(ring, n, den, false);
     }
 
 
@@ -658,7 +658,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
             return this;
         }
         GenSolvablePolynomial<C> n = num.multiply(b);
-        return new SolvableQuotient<>(ring, n, den, false);
+        return new SolvableQuotient<C>(ring, n, den, false);
     }
 
 
@@ -676,7 +676,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
             return this;
         }
         GenSolvablePolynomial<C> n = num.multiply(e);
-        return new SolvableQuotient<>(ring, n, den, false);
+        return new SolvableQuotient<C>(ring, n, den, false);
     }
 
 
@@ -697,7 +697,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         //lbc = lbc.abs();
         GenSolvablePolynomial<C> n = num.multiply(lbc);
         //GenSolvablePolynomial<C> d = (GenSolvablePolynomial<C>) den.multiply(lbc);
-        return new SolvableQuotient<>(ring, n, den, true);
+        return new SolvableQuotient<C>(ring, n, den, true);
     }
 
 

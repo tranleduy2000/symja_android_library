@@ -284,14 +284,14 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
             //System.out.println("c = " + c);
             //c = RootUtil.<C>bisectionPoint(v,f);
             if (PolyUtil.evaluateMain(cfac, f, c).isZERO()) {
-                v = new Interval<>(c, c);
+                v = new Interval<C>(c, c);
                 break;
             }
-            Interval<C> iv1 = new Interval<>(v.left, c);
+            Interval<C> iv1 = new Interval<C>(v.left, c);
             if (signChange(iv1, f)) {
                 v = iv1;
             } else {
-                v = new Interval<>(c, v.right);
+                v = new Interval<C>(c, v.right);
             }
         }
         return v;
@@ -310,7 +310,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         if (f == null || f.isZERO() || f.isConstant() || eps == null) {
             return V;
         }
-        List<Interval<C>> IV = new ArrayList<>();
+        List<Interval<C>> IV = new ArrayList<Interval<C>>();
         for (Interval<C> v : V) {
             Interval<C> iv = refineInterval(v, f, eps);
             IV.add(iv);
@@ -416,11 +416,11 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         while (B.multiply(v.length()).getRational().compareTo(eps) >= 0) {
             C c = v.left.sum(v.right);
             c = c.divide(two);
-            Interval<C> im = new Interval<>(c, v.right);
+            Interval<C> im = new Interval<C>(c, v.right);
             if (signChange(im, f)) {
                 v = im;
             } else {
-                v = new Interval<>(v.left, c);
+                v = new Interval<C>(v.left, c);
             }
             //System.out.println("v = " + v.toDecimal());
         }
@@ -509,7 +509,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         //System.out.println("e     = " + e);
         BigDecimal dc = BigDecimal.ONE;
         // polynomials with decimal coefficients
-        GenPolynomialRing<BigDecimal> dfac = new GenPolynomialRing<>(dc, f.ring);
+        GenPolynomialRing<BigDecimal> dfac = new GenPolynomialRing<BigDecimal>(dc, f.ring);
         GenPolynomial<BigDecimal> df = PolyUtil.decimalFromRational(dfac, f);
         GenPolynomial<C> fp = PolyUtil.baseDeriviative(f);
         GenPolynomial<BigDecimal> dfp = PolyUtil.decimalFromRational(dfac, fp);
@@ -577,7 +577,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
      */
     public List<BigDecimal> approximateRoots(GenPolynomial<C> f, BigRational eps) {
         List<Interval<C>> iv = realRoots(f);
-        List<BigDecimal> roots = new ArrayList<>(iv.size());
+        List<BigDecimal> roots = new ArrayList<BigDecimal>(iv.size());
         for (Interval<C> i : iv) {
             BigDecimal r = null; //approximateRoot(i, f, eps); roots.add(r);
             while (r == null) {
@@ -618,7 +618,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         e = e.multiply(new BigDecimal("1000")); // relax
         BigDecimal dc = BigDecimal.ONE;
         // polynomials with decimal coefficients
-        GenPolynomialRing<BigDecimal> dfac = new GenPolynomialRing<>(dc, f.ring);
+        GenPolynomialRing<BigDecimal> dfac = new GenPolynomialRing<BigDecimal>(dc, f.ring);
         GenPolynomial<BigDecimal> df = PolyUtil.decimalFromRational(dfac, f);
         GenPolynomial<C> fp = PolyUtil.baseDeriviative(f);
         GenPolynomial<BigDecimal> dfp = PolyUtil.decimalFromRational(dfac, fp);
@@ -691,7 +691,7 @@ public abstract class RealRootsAbstract<C extends RingElem<C> & Rational> implem
         e = e.multiply(new BigDecimal("1000")); // relax
         BigDecimal dc = BigDecimal.ONE;
         // polynomials with decimal coefficients
-        GenPolynomialRing<BigDecimal> dfac = new GenPolynomialRing<>(dc, f.ring);
+        GenPolynomialRing<BigDecimal> dfac = new GenPolynomialRing<BigDecimal>(dc, f.ring);
         GenPolynomial<BigDecimal> df = PolyUtil.decimalFromRational(dfac, f);
         GenPolynomial<C> fp = PolyUtil.baseDeriviative(f);
         GenPolynomial<BigDecimal> dfp = PolyUtil.decimalFromRational(dfac, fp);

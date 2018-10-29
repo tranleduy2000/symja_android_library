@@ -84,7 +84,7 @@ public class GroebnerBaseSigSeqIter<C extends RingElem<C>> extends GroebnerBaseA
         G = OrderedPolynomialList.sortDegree(G);
         //no: Collections.reverse(G);
         logger.info("G-sort = " + G);
-        List<GenPolynomial<C>> Gp = new ArrayList<>();
+        List<GenPolynomial<C>> Gp = new ArrayList<GenPolynomial<C>>();
         for (GenPolynomial<C> p : G) {
             if (debug) {
                 logger.info("p = " + p);
@@ -113,7 +113,7 @@ public class GroebnerBaseSigSeqIter<C extends RingElem<C>> extends GroebnerBaseA
      * @return GB(G, f) a Groebner base of G+(f).
      */
     public List<GenPolynomial<C>> GB(int modv, List<GenPolynomial<C>> G, GenPolynomial<C> f) {
-        List<GenPolynomial<C>> F = new ArrayList<>(G);
+        List<GenPolynomial<C>> F = new ArrayList<GenPolynomial<C>>(G);
         GenPolynomial<C> g = f.monic();
         if (F.isEmpty()) {
             F.add(g);
@@ -135,15 +135,15 @@ public class GroebnerBaseSigSeqIter<C extends RingElem<C>> extends GroebnerBaseA
             throw new UnsupportedOperationException("motv != 0 not implemented");
         }
         // add signatures
-        List<SigPoly<C>> Gs = new ArrayList<>();
+        List<SigPoly<C>> Gs = new ArrayList<SigPoly<C>>();
         for (GenPolynomial<C> p : F) {
-            Gs.add(new SigPoly<>(ring.getZERO(), p));
+            Gs.add(new SigPoly<C>(ring.getZERO(), p));
         }
-        SigPoly<C> gs = new SigPoly<>(ring.getONE(), g);
+        SigPoly<C> gs = new SigPoly<C>(ring.getONE(), g);
         Gs.add(gs);
         //logger.info("Gs = " + Gs);
         // construct critical pair list
-        List<SigPair<C>> pairlist = new ArrayList<>();
+        List<SigPair<C>> pairlist = new ArrayList<SigPair<C>>();
         for (SigPoly<C> p : Gs) {
             if (p.equals(gs)) {
                 continue;
@@ -153,7 +153,7 @@ public class GroebnerBaseSigSeqIter<C extends RingElem<C>> extends GroebnerBaseA
         logger.info("start " + pairlist.size());
 
         List<ExpVector> syz = initializeSyz(F, Gs);
-        List<SigPoly<C>> done = new ArrayList<>();
+        List<SigPoly<C>> done = new ArrayList<SigPoly<C>>();
 
         SigPair<C> pair;
         //SigPoly<C> pi, pj;
@@ -183,7 +183,7 @@ public class GroebnerBaseSigSeqIter<C extends RingElem<C>> extends GroebnerBaseA
                 }
                 //logger.info("pair.full = " + pair);
                 S = SPolynomial(pair);
-                SigPoly<C> Ss = new SigPoly<>(pair.sigma, S);
+                SigPoly<C> Ss = new SigPoly<C>(pair.sigma, S);
                 if (S.isZERO()) {
                     updateSyz(syz, Ss);
                     done.add(Ss);
@@ -313,7 +313,7 @@ public class GroebnerBaseSigSeqIter<C extends RingElem<C>> extends GroebnerBaseA
     SigPair<C> newPair(SigPoly<C> A, SigPoly<C> B, List<SigPoly<C>> G) {
         ExpVector e = A.poly.leadingExpVector().lcm(B.poly.leadingExpVector())
                 .subtract(A.poly.leadingExpVector());
-        return new SigPair<>(e, A, B, G);
+        return new SigPair<C>(e, A, B, G);
     }
 
 
@@ -327,7 +327,7 @@ public class GroebnerBaseSigSeqIter<C extends RingElem<C>> extends GroebnerBaseA
      * @return signature pair according to algorithm.
      */
     SigPair<C> newPair(GenPolynomial<C> s, SigPoly<C> A, SigPoly<C> B, List<SigPoly<C>> G) {
-        return new SigPair<>(s, A, B, G);
+        return new SigPair<C>(s, A, B, G);
     }
 
 
@@ -388,7 +388,7 @@ public class GroebnerBaseSigSeqIter<C extends RingElem<C>> extends GroebnerBaseA
         if (debug) {
             logger.debug("unused " + G + " " + F);
         }
-        List<ExpVector> P = new ArrayList<>();
+        List<ExpVector> P = new ArrayList<ExpVector>();
         return P;
     }
 
@@ -404,6 +404,7 @@ public class GroebnerBaseSigSeqIter<C extends RingElem<C>> extends GroebnerBaseA
         if (debug) {
             logger.debug("unused " + syz + " " + r);
         }
+        return;
     }
 
 }

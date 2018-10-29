@@ -47,7 +47,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
      * @param rf quotient coefficient ring factory.
      */
     public GroebnerBaseQuotient(QuotientRing<C> rf) {
-        this(new GroebnerBasePseudoRecSeq<>(rf.ring));
+        this(new GroebnerBasePseudoRecSeq<C>(rf.ring));
     }
 
 
@@ -58,7 +58,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
      * @param rf      quotient coefficient ring factory.
      */
     public GroebnerBaseQuotient(int threads, QuotientRing<C> rf) {
-        this(new GroebnerBasePseudoRecParallel<>(threads, rf.ring));
+        this(new GroebnerBasePseudoRecParallel<C>(threads, rf.ring));
     }
 
 
@@ -69,7 +69,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
      * @param pl pair selection strategy (for fraction parts).
      */
     public GroebnerBaseQuotient(QuotientRing<C> rf, PairList<GenPolynomial<C>> pl) {
-        this(new GroebnerBasePseudoRecSeq<>(rf.ring, pl));
+        this(new GroebnerBasePseudoRecSeq<C>(rf.ring, pl));
     }
 
 
@@ -81,7 +81,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
      * @param pl      pair selection strategy (for fraction parts).
      */
     public GroebnerBaseQuotient(int threads, QuotientRing<C> rf, PairList<GenPolynomial<C>> pl) {
-        this(new GroebnerBasePseudoRecParallel<>(threads, rf.ring, pl));
+        this(new GroebnerBasePseudoRecParallel<C>(threads, rf.ring, pl));
     }
 
 
@@ -122,7 +122,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
         }
         GenPolynomialRing<Quotient<C>> rring = F.get(0).ring;
         QuotientRing<C> cf = (QuotientRing<C>) rring.coFac;
-        GenPolynomialRing<GenPolynomial<C>> iring = new GenPolynomialRing<>(cf.ring, rring);
+        GenPolynomialRing<GenPolynomial<C>> iring = new GenPolynomialRing<GenPolynomial<C>>(cf.ring, rring);
         List<GenPolynomial<GenPolynomial<C>>> Fi = PolyUfdUtil.integralFromQuotientCoefficients(iring, F);
         //System.out.println("Fi = " + Fi);
         logger.info("#Fi = " + Fi.size());
@@ -149,7 +149,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
             return Gp;
         }
         // remove zero polynomials
-        List<GenPolynomial<Quotient<C>>> G = new ArrayList<>(Gp.size());
+        List<GenPolynomial<Quotient<C>>> G = new ArrayList<GenPolynomial<Quotient<C>>>(Gp.size());
         for (GenPolynomial<Quotient<C>> a : Gp) {
             if (a != null && !a.isZERO()) { // always true in GB()
                 // already positive a = a.abs();
@@ -162,7 +162,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
         // remove top reducible polynomials
         GenPolynomial<Quotient<C>> a;
         List<GenPolynomial<Quotient<C>>> F;
-        F = new ArrayList<>(G.size());
+        F = new ArrayList<GenPolynomial<Quotient<C>>>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
@@ -170,7 +170,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenPolynomial<Quotient<C>>> ff;
-                    ff = new ArrayList<>(G);
+                    ff = new ArrayList<GenPolynomial<Quotient<C>>>(G);
                     ff.addAll(F);
                     a = red.normalform(ff, a);
                     if (!a.isZERO()) {
@@ -189,7 +189,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
         // reduce remaining polynomials
         GenPolynomialRing<Quotient<C>> rring = G.get(0).ring;
         QuotientRing<C> cf = (QuotientRing<C>) rring.coFac;
-        GenPolynomialRing<GenPolynomial<C>> iring = new GenPolynomialRing<>(cf.ring, rring);
+        GenPolynomialRing<GenPolynomial<C>> iring = new GenPolynomialRing<GenPolynomial<C>>(cf.ring, rring);
         List<GenPolynomial<GenPolynomial<C>>> Fi = PolyUfdUtil.integralFromQuotientCoefficients(iring, F);
         logger.info("#Fi = " + Fi.size());
 

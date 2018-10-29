@@ -301,7 +301,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      */
     public List<BigOctonion> generators() {
         List<BigQuaternion> qg = or.ring.generators();
-        List<BigOctonion> g = new ArrayList<>(qg.size() * 2);
+        List<BigOctonion> g = new ArrayList<BigOctonion>(qg.size() * 2);
         for (BigQuaternion q : qg) {
             g.add(new BigOctonion(q));
             g.add(new BigOctonion(or.ring.ZERO, q));

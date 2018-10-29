@@ -53,7 +53,7 @@ public class CartesianProduct<E> implements Iterable<List<E>> {
      * @return iterables taken from lists.
      */
     static <E> List<Iterable<E>> listToIterable(List<List<E>> comp) {
-        List<Iterable<E>> iter = new ArrayList<>(comp.size());
+        List<Iterable<E>> iter = new ArrayList<Iterable<E>>(comp.size());
         for (List<E> list : comp) {
             iter.add(list);
         }
@@ -66,7 +66,7 @@ public class CartesianProduct<E> implements Iterable<List<E>> {
      * @return an iterator.
      */
     public Iterator<List<E>> iterator() {
-        return new CartesianProductIterator<>(comps);
+        return new CartesianProductIterator<E>(comps);
     }
 
 
@@ -106,8 +106,8 @@ class CartesianProductIterator<E> implements Iterator<List<E>> {
             throw new IllegalArgumentException("null comps not allowed");
         }
         this.comps = comps;
-        current = new ArrayList<>(comps.size());
-        compit = new ArrayList<>(comps.size());
+        current = new ArrayList<E>(comps.size());
+        compit = new ArrayList<Iterator<E>>(comps.size());
         empty = false;
         for (Iterable<E> ci : comps) {
             Iterator<E> it = ci.iterator();
@@ -142,7 +142,7 @@ class CartesianProductIterator<E> implements Iterator<List<E>> {
         if (empty) {
             throw new NoSuchElementException("invalid call of next()");
         }
-        List<E> res = new ArrayList<>(current);
+        List<E> res = new ArrayList<E>(current);
         // search iterator which hasNext
         int i = compit.size() - 1;
         for (; i >= 0; i--) {

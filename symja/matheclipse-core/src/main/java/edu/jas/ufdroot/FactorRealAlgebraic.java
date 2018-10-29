@@ -101,7 +101,7 @@ public class FactorRealAlgebraic<C extends GcdRingElem<C> & Rational> extends
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
-        List<GenPolynomial<RealAlgebraicNumber<C>>> factors = new ArrayList<>();
+        List<GenPolynomial<RealAlgebraicNumber<C>>> factors = new ArrayList<GenPolynomial<RealAlgebraicNumber<C>>>();
         if (P.isZERO()) {
             return factors;
         }
@@ -121,7 +121,7 @@ public class FactorRealAlgebraic<C extends GcdRingElem<C> & Rational> extends
             factors.add(pfac.getONE().multiply(ldcf));
         }
         //System.out.println("\nP = " + P);
-        GenPolynomialRing<AlgebraicNumber<C>> afac = new GenPolynomialRing<>(
+        GenPolynomialRing<AlgebraicNumber<C>> afac = new GenPolynomialRing<AlgebraicNumber<C>>(
                 rfac.algebraic, pfac);
         GenPolynomial<AlgebraicNumber<C>> A = PolyUtilRoot.algebraicFromRealCoefficients(afac, P);
         // factor A:

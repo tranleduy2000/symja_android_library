@@ -97,7 +97,7 @@ public abstract class MonoidElemImpl<C extends MonoidElem> implements MonoidElem
     @SuppressWarnings("unchecked")
     public C power(long n) {
         //System.out.println("this = " + this + ", n = " + n);
-        return (C) Power.power((MonoidFactory<MonoidElem>) factory(), this, n);
+        return (C) Power.power((MonoidFactory<MonoidElem>) factory(), (C) this, n);
     }
 
 }

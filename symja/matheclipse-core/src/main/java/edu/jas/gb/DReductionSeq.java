@@ -488,7 +488,7 @@ public class DReductionSeq<C extends RingElem<C>> extends ReductionAbstract<C> i
      */
     @Override
     public List<GenPolynomial<C>> irreducibleSet(List<GenPolynomial<C>> Pp) {
-        ArrayList<GenPolynomial<C>> P = new ArrayList<>();
+        ArrayList<GenPolynomial<C>> P = new ArrayList<GenPolynomial<C>>();
         if (Pp == null) {
             return null;
         }

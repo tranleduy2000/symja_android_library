@@ -282,7 +282,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * @see edu.jas.structure.ElemFactory#generators()
      */
     public List<BigComplex> generators() {
-        List<BigComplex> g = new ArrayList<>(2);
+        List<BigComplex> g = new ArrayList<BigComplex>(2);
         g.add(getONE());
         g.add(getIMAG());
         return g;

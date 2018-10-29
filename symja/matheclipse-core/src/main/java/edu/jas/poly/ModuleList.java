@@ -113,10 +113,10 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
                 }
             }
         }
-        List<List<GenPolynomial<C>>> norm = new ArrayList<>(rs);
+        List<List<GenPolynomial<C>>> norm = new ArrayList<List<GenPolynomial<C>>>(rs);
         for (List<GenPolynomial<C>> row : l) {
             if (row != null) {
-                List<GenPolynomial<C>> rn = new ArrayList<>(row);
+                List<GenPolynomial<C>> rn = new ArrayList<GenPolynomial<C>>(row);
                 while (rn.size() < mcols) {
                     rn.add(ring.getZERO());
                 }
@@ -140,9 +140,9 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
         if (slist == null) {
             return list;
         }
-        list = new ArrayList<>(slist.size());
+        list = new ArrayList<List<GenPolynomial<C>>>(slist.size());
         for (List<GenSolvablePolynomial<C>> srow : slist) {
-            List<GenPolynomial<C>> row = new ArrayList<>(srow.size());
+            List<GenPolynomial<C>> row = new ArrayList<GenPolynomial<C>>(srow.size());
             for (GenSolvablePolynomial<C> s : srow) {
                 row.add(s);
             }
@@ -163,7 +163,7 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
         if (vlist == null) {
             return list;
         }
-        list = new ArrayList<>(vlist.size());
+        list = new ArrayList<List<GenPolynomial<C>>>(vlist.size());
         for (GenVector<GenPolynomial<C>> srow : vlist) {
             List<GenPolynomial<C>> row = srow.val;
             list.add(row);
@@ -350,11 +350,11 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
 
         List<GenPolynomial<C>> pols = null;
         if (list == null) { // rows < 0
-            return new PolynomialList<>(pfac, pols);
+            return new PolynomialList<C>(pfac, pols);
         }
-        pols = new ArrayList<>(rows);
+        pols = new ArrayList<GenPolynomial<C>>(rows);
         if (rows == 0) { // nothing to do
-            return new PolynomialList<>(pfac, pols);
+            return new PolynomialList<C>(pfac, pols);
         }
 
         GenPolynomial<C> zero = pfac.getZERO();
@@ -370,7 +370,7 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
             }
             pols.add(ext);
         }
-        return new PolynomialList<>(pfac, pols);
+        return new PolynomialList<C>(pfac, pols);
     }
 
     /**
@@ -385,9 +385,9 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
         if (list == null) {
             return slist;
         }
-        slist = new ArrayList<>(list.size());
+        slist = new ArrayList<List<GenSolvablePolynomial<C>>>(list.size());
         for (List<GenPolynomial<C>> row : list) {
-            List<GenSolvablePolynomial<C>> srow = new ArrayList<>(row.size());
+            List<GenSolvablePolynomial<C>> srow = new ArrayList<GenSolvablePolynomial<C>>(row.size());
             for (GenPolynomial<C> p : row) {
                 if (!(p instanceof GenSolvablePolynomial)) {
                     throw new RuntimeException("no solvable polynomial " + p);

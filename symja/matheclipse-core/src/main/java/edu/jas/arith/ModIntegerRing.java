@@ -128,7 +128,7 @@ public final class ModIntegerRing implements ModularRingFactory<ModInteger>, Ite
         ModInteger m21 = m2.ring.fromInteger(m1.ring.modul);
         ModInteger mi1 = m21.inverse();
 
-        List<ModInteger> L = new ArrayList<>();
+        List<ModInteger> L = new ArrayList<ModInteger>();
         for (ModInteger a : L1) {
             for (ModInteger b : L2) {
                 ModInteger c = m.chineseRemainder(a, mi1, b);
@@ -221,7 +221,7 @@ public final class ModIntegerRing implements ModularRingFactory<ModInteger>, Ite
      * @see edu.jas.structure.ElemFactory#generators()
      */
     public List<ModInteger> generators() {
-        List<ModInteger> g = new ArrayList<>(1);
+        List<ModInteger> g = new ArrayList<ModInteger>(1);
         g.add(getONE());
         return g;
     }

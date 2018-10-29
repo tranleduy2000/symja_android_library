@@ -57,9 +57,9 @@ public class PolyModUtil {
         if (d.isONE()) {
             return n;
         }
-        List<GenSolvablePolynomial<C>> A = new ArrayList<>(1);
+        List<GenSolvablePolynomial<C>> A = new ArrayList<GenSolvablePolynomial<C>>(1);
         A.add(n);
-        List<GenSolvablePolynomial<C>> B = new ArrayList<>(1);
+        List<GenSolvablePolynomial<C>> B = new ArrayList<GenSolvablePolynomial<C>>(1);
         B.add(d);
         List<GenSolvablePolynomial<C>> c = PolyGBUtil.intersect(r, A, B);
         //if (c.size() != 1) {
@@ -133,10 +133,10 @@ public class PolyModUtil {
             logger.warn("skipping GB computation: degs = " + n.totalDegree() + ", " + d.totalDegree());
             return r.getONE();
         }
-        List<GenSolvablePolynomial<C>> A = new ArrayList<>(2);
+        List<GenSolvablePolynomial<C>> A = new ArrayList<GenSolvablePolynomial<C>>(2);
         A.add(n);
         A.add(d);
-        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<>();
+        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<C>();
         logger.warn("left syzGcd computing GB: " + A);
         List<GenSolvablePolynomial<C>> G = sbb.rightGB(A); //not: leftGB, not: sbb.twosidedGB(A);
         if (debug) {
@@ -179,10 +179,10 @@ public class PolyModUtil {
             logger.warn("skipping GB computation: degs = " + n.totalDegree() + ", " + d.totalDegree());
             return r.getONE();
         }
-        List<GenSolvablePolynomial<C>> A = new ArrayList<>(2);
+        List<GenSolvablePolynomial<C>> A = new ArrayList<GenSolvablePolynomial<C>>(2);
         A.add(n);
         A.add(d);
-        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<>();
+        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<C>();
         logger.warn("right syzGcd computing GB: " + A);
         List<GenSolvablePolynomial<C>> G = sbb.leftGB(A); // not: sbb.twosidedGB(A);
         if (debug) {
@@ -241,9 +241,9 @@ public class PolyModUtil {
      */
     public static <C extends GcdRingElem<C>> GenPolynomial<C> syzLcm(GenPolynomialRing<C> r,
                                                                      GenPolynomial<C> n, GenPolynomial<C> d) {
-        List<GenPolynomial<C>> A = new ArrayList<>(1);
+        List<GenPolynomial<C>> A = new ArrayList<GenPolynomial<C>>(1);
         A.add(n);
-        List<GenPolynomial<C>> B = new ArrayList<>(1);
+        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>(1);
         B.add(d);
         List<GenPolynomial<C>> c = PolyGBUtil.intersect(r, A, B);
         if (c.size() != 1) {

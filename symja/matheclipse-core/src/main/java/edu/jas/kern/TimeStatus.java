@@ -122,7 +122,7 @@ public class TimeStatus {
                 if (t) {
                     return;
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
             }
         }
         if (msg == null) {

@@ -113,7 +113,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
         if (F == null || F.isEmpty()) {
             return F;
         }
-        List<GenPolynomial<C>> Pp = new ArrayList<>(F.size());
+        List<GenPolynomial<C>> Pp = new ArrayList<GenPolynomial<C>>(F.size());
         for (GenPolynomial<C> f : F) {
             GenPolynomial<C> p = basePrimitivePart(f);
             Pp.add(p);
@@ -194,7 +194,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
         if (F == null || F.isEmpty()) {
             return F;
         }
-        List<GenPolynomial<GenPolynomial<C>>> Pp = new ArrayList<>(F.size());
+        List<GenPolynomial<GenPolynomial<C>>> Pp = new ArrayList<GenPolynomial<GenPolynomial<C>>>(F.size());
         for (GenPolynomial<GenPolynomial<C>> f : F) {
             GenPolynomial<GenPolynomial<C>> p = recursivePrimitivePart(f);
             Pp.add(p);
@@ -321,7 +321,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
 
         }
         GenPolynomialRing<C> cfac = pfac.contract(1);
-        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<>(cfac, 1);
+        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, 1);
 
         GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         GenPolynomial<C> D = recursiveContent(Pr);
@@ -347,7 +347,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
             return basePrimitivePart(P);
         }
         GenPolynomialRing<C> cfac = pfac.contract(1);
-        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<>(cfac, 1);
+        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, 1);
 
         GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         GenPolynomial<GenPolynomial<C>> PP = recursivePrimitivePart(Pr);
@@ -417,9 +417,9 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
         GenPolynomialRing<GenPolynomial<C>> rfac;
         if (pfac.getVars() != null && pfac.getVars().length > 0) {
             String[] v = new String[]{pfac.getVars()[pfac.nvar - 1]};
-            rfac = new GenPolynomialRing<>(cfac, 1, v);
+            rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, 1, v);
         } else {
-            rfac = new GenPolynomialRing<>(cfac, 1);
+            rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, 1);
         }
         GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         GenPolynomial<GenPolynomial<C>> Sr = PolyUtil.recursive(rfac, S);
@@ -553,7 +553,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
             return baseResultant(P, S);
         }
         GenPolynomialRing<C> cfac = pfac.contract(1);
-        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<>(cfac, 1);
+        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, 1);
 
         GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         GenPolynomial<GenPolynomial<C>> Sr = PolyUtil.recursive(rfac, S);
@@ -576,7 +576,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
         if (A == null || A.isEmpty()) {
             return A;
         }
-        List<GenPolynomial<C>> B = new ArrayList<>(A.size());
+        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>(A.size());
         // make a coprime to rest of list
         GenPolynomial<C> a = A.get(0);
         //System.out.println("a = " + a);
@@ -629,7 +629,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
         if (A == null || A.isEmpty()) {
             return A;
         }
-        List<GenPolynomial<C>> B = new ArrayList<>();
+        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>();
         // make a co-prime to rest of list
         for (GenPolynomial<C> a : A) {
             //System.out.println("a = " + a);
@@ -653,7 +653,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
         if (a == null || a.isZERO() || a.isConstant()) {
             return P;
         }
-        List<GenPolynomial<C>> B = new ArrayList<>(P.size() + 1);
+        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>(P.size() + 1);
         // make a coprime to elements of the list P
         for (int i = 0; i < P.size(); i++) {
             GenPolynomial<C> b = P.get(i);
@@ -945,7 +945,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
         if (A == null || P == null || e == 0) {
             throw new IllegalArgumentException("null A, P or e = 0 not allowed");
         }
-        List<GenPolynomial<C>> pf = new ArrayList<>(e);
+        List<GenPolynomial<C>> pf = new ArrayList<GenPolynomial<C>>(e);
         if (A.isZERO()) {
             for (int i = 0; i < e; i++) {
                 pf.add(A);
@@ -981,7 +981,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
         if (D == null || A == null) {
             throw new IllegalArgumentException("null A or D not allowed");
         }
-        List<GenPolynomial<C>> pf = new ArrayList<>(D.size() + 1);
+        List<GenPolynomial<C>> pf = new ArrayList<GenPolynomial<C>>(D.size() + 1);
         if (A.isZERO() || D.size() == 0) {
             pf.add(A);
             for (int i = 0; i < D.size(); i++) {
@@ -989,7 +989,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
             }
             return pf;
         }
-        List<GenPolynomial<C>> Dp = new ArrayList<>(D.size() - 1);
+        List<GenPolynomial<C>> Dp = new ArrayList<GenPolynomial<C>>(D.size() - 1);
         GenPolynomial<C> P = A.ring.getONE();
         GenPolynomial<C> d1 = null;
         for (GenPolynomial<C> d : D) {
@@ -1043,7 +1043,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>> im
         for (GenPolynomial<C> d : D) {
             P = P.multiply(d);
         }
-        List<GenPolynomial<C>> Fp = new ArrayList<>(F);
+        List<GenPolynomial<C>> Fp = new ArrayList<GenPolynomial<C>>(F);
         GenPolynomial<C> A0 = Fp.remove(0).multiply(P);
         //System.out.println("A0 = " + A0);
         int j = 0;

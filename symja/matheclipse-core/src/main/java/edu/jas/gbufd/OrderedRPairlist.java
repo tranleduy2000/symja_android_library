@@ -50,7 +50,7 @@ public class OrderedRPairlist<C extends RegularRingElem<C>>
      */
     public OrderedRPairlist(int m, GenPolynomialRing<C> r) {
         super(m, r);
-        rreduction = new RReductionSeq<>();
+        rreduction = new RReductionSeq<C>();
     }
 
 

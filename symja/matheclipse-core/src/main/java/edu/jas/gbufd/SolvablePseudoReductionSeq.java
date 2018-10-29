@@ -185,7 +185,7 @@ public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends Solvab
         if (commCoeff) {
             ssy = null;
         } else {
-            ssy = new SolvableSyzygySeq<>(((GenPolynomialRing<C>) ring.coFac).coFac);
+            ssy = new SolvableSyzygySeq<C>(((GenPolynomialRing<C>) ring.coFac).coFac);
         }
         GenSolvablePolynomial<GenPolynomial<C>> R = Ap.ring.getZERO().copy();
         GenSolvablePolynomial<GenPolynomial<C>> Q = null;
@@ -372,7 +372,7 @@ public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends Solvab
             return null;
         }
         C mfac = Ap.ring.getONECoefficient();
-        PseudoReductionEntry<C> pf = new PseudoReductionEntry<>(Ap, mfac);
+        PseudoReductionEntry<C> pf = new PseudoReductionEntry<C>(Ap, mfac);
         if (Pp == null || Pp.isEmpty()) {
             return pf;
         }
@@ -451,7 +451,7 @@ public class SolvablePseudoReductionSeq<C extends GcdRingElem<C>> extends Solvab
         if (logger.isDebugEnabled()) {
             logger.info("multiplicative factor = " + mfac);
         }
-        pf = new PseudoReductionEntry<>(R, mfac);
+        pf = new PseudoReductionEntry<C>(R, mfac);
         return pf;
     }
 

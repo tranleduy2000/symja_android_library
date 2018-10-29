@@ -17,7 +17,9 @@ import edu.jas.gb.OrderedMinPairlist;
 import edu.jas.gb.OrderedPairlist;
 import edu.jas.gb.OrderedSyzPairlist;
 import edu.jas.gb.PairList;
+import edu.jas.gb.SGBProxy;
 import edu.jas.gb.SolvableGroebnerBaseAbstract;
+import edu.jas.gb.SolvableGroebnerBaseParallel;
 import edu.jas.gb.SolvableGroebnerBaseSeq;
 import edu.jas.gb.SolvableReductionSeq;
 import edu.jas.kern.ComputerThreads;
@@ -93,7 +95,7 @@ public class SGBFactory {
      */
     public static <C extends GcdRingElem<C>> SolvableGroebnerBaseAbstract<C> getImplementation() {
         logger.warn("no coefficent factory given, assuming field coeffcients");
-        SolvableGroebnerBaseAbstract<C> bba = new SolvableGroebnerBaseSeq<>();
+        SolvableGroebnerBaseAbstract<C> bba = new SolvableGroebnerBaseSeq<C>();
         return bba;
     }
 
@@ -120,9 +122,9 @@ public class SGBFactory {
                                                                           PairList<ModLong> pl) {
         SolvableGroebnerBaseAbstract<ModLong> bba;
         if (fac.isField()) {
-            bba = new SolvableGroebnerBaseSeq<>(pl);
+            bba = new SolvableGroebnerBaseSeq<ModLong>(pl);
         } else {
-            bba = new SolvableGroebnerBasePseudoSeq<>(fac, pl);
+            bba = new SolvableGroebnerBasePseudoSeq<ModLong>(fac, pl);
         }
         return bba;
     }
@@ -150,9 +152,9 @@ public class SGBFactory {
                                                                              PairList<ModInteger> pl) {
         SolvableGroebnerBaseAbstract<ModInteger> bba;
         if (fac.isField()) {
-            bba = new SolvableGroebnerBaseSeq<>(pl);
+            bba = new SolvableGroebnerBaseSeq<ModInteger>(pl);
         } else {
-            bba = new SolvableGroebnerBasePseudoSeq<>(fac, pl);
+            bba = new SolvableGroebnerBasePseudoSeq<ModInteger>(fac, pl);
         }
         return bba;
     }
@@ -207,7 +209,7 @@ public class SGBFactory {
         SolvableGroebnerBaseAbstract<BigInteger> bba;
         switch (a) {
             case igb:
-                bba = new SolvableGroebnerBasePseudoSeq<>(fac, pl);
+                bba = new SolvableGroebnerBasePseudoSeq<BigInteger>(fac, pl);
                 break;
             case egb:
                 throw new UnsupportedOperationException("egb algorithm not available for BigInteger " + a);
@@ -270,7 +272,7 @@ public class SGBFactory {
         SolvableGroebnerBaseAbstract<BigRational> bba;
         switch (a) {
             case qgb:
-                bba = new SolvableGroebnerBaseSeq<>(pl);
+                bba = new SolvableGroebnerBaseSeq<BigRational>(pl);
                 break;
             case ffgb:
                 throw new UnsupportedOperationException("ffgb algorithm not available for BigRational " + a);
@@ -350,7 +352,7 @@ public class SGBFactory {
         }
         switch (a) {
             case qgb:
-                bba = new SolvableGroebnerBaseSeq<>(new SolvableReductionSeq<Quotient<C>>(), pl);
+                bba = new SolvableGroebnerBaseSeq<Quotient<C>>(new SolvableReductionSeq<Quotient<C>>(), pl);
                 break;
             case ffgb:
                 throw new UnsupportedOperationException("ffgb algorithm not available for " + a);
@@ -428,7 +430,7 @@ public class SGBFactory {
         SolvableGroebnerBaseAbstract<GenPolynomial<C>> bba;
         switch (a) {
             case igb:
-                bba = new SolvableGroebnerBasePseudoRecSeq<>(fac, pl);
+                bba = new SolvableGroebnerBasePseudoRecSeq<C>(fac, pl);
                 break;
             case egb:
                 throw new UnsupportedOperationException("egb algorithm not available for " + a);
@@ -494,27 +496,27 @@ public class SGBFactory {
             logger.debug("fac = " + fac.getClass().getName()); // + ", fac = " + fac.toScript());
         }
         if (fac.isField()) {
-            return new SolvableGroebnerBaseSeq<>(pl);
+            return new SolvableGroebnerBaseSeq<C>(pl);
         }
         if (fac instanceof ValueFactory) {
-            return new SolvableGroebnerBasePseudoSeq<>(fac, pl);
+            return new SolvableGroebnerBasePseudoSeq<C>(fac, pl);
         }
         if (fac instanceof QuotPairFactory) {
-            return new SolvableGroebnerBaseSeq<>(pl);
+            return new SolvableGroebnerBaseSeq<C>(pl);
         }
         SolvableGroebnerBaseAbstract bba = null;
         Object ofac = fac;
         if (ofac instanceof GenPolynomialRing) {
             PairList<GenPolynomial<C>> pli;
             if (pl instanceof OrderedMinPairlist) {
-                pli = new OrderedMinPairlist<>();
+                pli = new OrderedMinPairlist<GenPolynomial<C>>();
             } else if (pl instanceof OrderedSyzPairlist) {
-                pli = new OrderedSyzPairlist<>();
+                pli = new OrderedSyzPairlist<GenPolynomial<C>>();
             } else {
-                pli = new OrderedPairlist<>();
+                pli = new OrderedPairlist<GenPolynomial<C>>();
             }
             GenPolynomialRing<C> rofac = (GenPolynomialRing<C>) ofac;
-            SolvableGroebnerBaseAbstract<GenPolynomial<C>> bbr = new SolvableGroebnerBasePseudoRecSeq<>(
+            SolvableGroebnerBaseAbstract<GenPolynomial<C>> bbr = new SolvableGroebnerBasePseudoRecSeq<C>(
                     rofac, pli); // not pl
             bba = bbr;
             //} else if (ofac instanceof ProductRing) {
@@ -525,7 +527,7 @@ public class SGBFactory {
             //        bba = new RSolvableGroebnerBasePseudoSeq<Product<C>>(pfac);
             //    }
         } else {
-            bba = new SolvableGroebnerBasePseudoSeq<>(fac, pl);
+            bba = new SolvableGroebnerBasePseudoSeq<C>(fac, pl);
         }
         logger.info("bba = " + bba.getClass().getName());
         return bba;
@@ -540,7 +542,62 @@ public class SGBFactory {
      * @return GB proxy algorithm implementation.
      */
     public static <C extends GcdRingElem<C>> // interface RingElem not sufficient 
-    SolvableGroebnerBaseAbstract<GenPolynomial<C>>getProxy (GenPolynomialRing<C> fac) {
+    SolvableGroebnerBaseAbstract<C> getProxy(RingFactory<C> fac) {
+        return getProxy(fac, new OrderedPairlist<C>());
+    }
+
+
+    /**
+     * Determine suitable parallel/concurrent implementation of GB algorithms if
+     * possible.
+     *
+     * @param fac RingFactory&lt;C&gt;.
+     * @param pl  pair selection strategy
+     * @return GB proxy algorithm implementation.
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <C extends GcdRingElem<C>> // interface RingElem not sufficient 
+    SolvableGroebnerBaseAbstract<C> getProxy(RingFactory<C> fac, PairList<C> pl) {
+        if (ComputerThreads.NO_THREADS) {
+            return SGBFactory.getImplementation(fac, pl);
+        }
+        if (debug) {
+            logger.debug("proxy fac = " + fac.getClass().getName());
+        }
+        int th = (ComputerThreads.N_CPUS > 2 ? ComputerThreads.N_CPUS - 1 : 2);
+        if (fac.isField()) {
+            SolvableGroebnerBaseAbstract<C> e1 = new SolvableGroebnerBaseSeq<C>(pl);
+            SolvableGroebnerBaseAbstract<C> e2 = new SolvableGroebnerBaseParallel<C>(th, pl);
+            return new SGBProxy<C>(e1, e2);
+        } else if (fac.characteristic().signum() == 0) {
+            if (fac instanceof GenPolynomialRing) {
+                GenPolynomialRing pfac = (GenPolynomialRing) fac;
+                OrderedPairlist ppl = new OrderedPairlist<GenPolynomial<C>>();
+                SolvableGroebnerBaseAbstract e1 = new SolvableGroebnerBasePseudoRecSeq<C>(pfac, ppl);
+                logger.warn("no parallel version available, returning sequential version");
+                return e1;
+                //SolvableGroebnerBaseAbstract e2 = new SolvableGroebnerBasePseudoRecParallel<C>(th, pfac, ppl);
+                //return new SGBProxy<C>(e1, e2);
+            }
+            SolvableGroebnerBaseAbstract<C> e1 = new SolvableGroebnerBasePseudoSeq<C>(fac, pl);
+            logger.warn("no parallel version available, returning sequential version");
+            return e1;
+            //SolvableGroebnerBaseAbstract<C> e2 = new SolvableGroebnerBasePseudoParallel<C>(th, fac, pl);
+            //return new SGBProxy<C>(e1, e2);
+        }
+        return getImplementation(fac, pl);
+    }
+
+
+    /**
+     * Determine suitable parallel/concurrent implementation of GB algorithms if
+     * possible.
+     *
+     * @param fac RingFactory&lt;C&gt;.
+     * @return GB proxy algorithm implementation.
+     */
+    public static <C extends GcdRingElem<C>> // interface RingElem not sufficient 
+    SolvableGroebnerBaseAbstract<GenPolynomial<C>> getProxy(GenPolynomialRing<C> fac) {
         if (ComputerThreads.NO_THREADS) {
             //return SGBFactory.<GenPolynomial<C>> getImplementation(fac);
             return SGBFactory.getImplementation(fac);
@@ -549,8 +606,8 @@ public class SGBFactory {
             logger.debug("fac = " + fac.getClass().getName());
         }
         //int th = (ComputerThreads.N_CPUS > 2 ? ComputerThreads.N_CPUS - 1 : 2);
-        OrderedPairlist<GenPolynomial<C>> ppl = new OrderedPairlist<>();
-        SolvableGroebnerBaseAbstract<GenPolynomial<C>> e1 = new SolvableGroebnerBasePseudoRecSeq<>(fac, ppl);
+        OrderedPairlist<GenPolynomial<C>> ppl = new OrderedPairlist<GenPolynomial<C>>();
+        SolvableGroebnerBaseAbstract<GenPolynomial<C>> e1 = new SolvableGroebnerBasePseudoRecSeq<C>(fac, ppl);
         logger.warn("no parallel version available, returning sequential version");
         return e1;
         //SolvableGroebnerBaseAbstract<GenPolynomial<C>> e2 = new SolvableGroebnerBasePseudoRecParallel<C>(th, fac, ppl);

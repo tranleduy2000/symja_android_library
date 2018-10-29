@@ -121,7 +121,7 @@ public class RGroebnerBaseSeq<C extends RegularRingElem<C>> extends GroebnerBase
         logger.info("#bcF-#F = " + (bcF.size() - F.size()));
         F = bcF;
         /* normalize input */
-        List<GenPolynomial<C>> G = new ArrayList<>();
+        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>();
         OrderedRPairlist<C> pairlist = null;
         for (GenPolynomial<C> p : F) {
             if (!p.isZERO()) {
@@ -133,7 +133,7 @@ public class RGroebnerBaseSeq<C extends RegularRingElem<C>> extends GroebnerBase
                 }
                 G.add(p); //G.add( 0, p ); //reverse list
                 if (pairlist == null) {
-                    pairlist = new OrderedRPairlist<>(modv, p.ring);
+                    pairlist = new OrderedRPairlist<C>(modv, p.ring);
                 }
                 // putOne not required
                 pairlist.put(p);
@@ -234,7 +234,7 @@ public class RGroebnerBaseSeq<C extends RegularRingElem<C>> extends GroebnerBase
             return Gp;
         }
         // remove zero polynomials
-        List<GenPolynomial<C>> G = new ArrayList<>(Gp.size());
+        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>(Gp.size());
         for (GenPolynomial<C> a : Gp) {
             if (a != null && !a.isZERO()) { // always true in GB()
                 // already positive a = a.abs();
@@ -248,7 +248,7 @@ public class RGroebnerBaseSeq<C extends RegularRingElem<C>> extends GroebnerBase
         GenPolynomial<C> a, b;
         List<GenPolynomial<C>> F;
         List<GenPolynomial<C>> bcH;
-        F = new ArrayList<>(G.size());
+        F = new ArrayList<GenPolynomial<C>>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             b = a;
@@ -256,7 +256,7 @@ public class RGroebnerBaseSeq<C extends RegularRingElem<C>> extends GroebnerBase
                 // drop polynomial 
                 if (logger.isInfoEnabled()) {
                     List<GenPolynomial<C>> ff;
-                    ff = new ArrayList<>(G);
+                    ff = new ArrayList<GenPolynomial<C>>(G);
                     ff.addAll(F);
                     a = red.normalform(ff, a);
                     if (!a.isZERO()) { // happens
@@ -300,7 +300,7 @@ public class RGroebnerBaseSeq<C extends RegularRingElem<C>> extends GroebnerBase
             el++;
         }
         // make monic if possible
-        F = new ArrayList<>(G.size());
+        F = new ArrayList<GenPolynomial<C>>(G.size());
         for (GenPolynomial<C> p : G) {
             a = p.monic().abs();
             if (p.length() != a.length()) {
@@ -313,7 +313,7 @@ public class RGroebnerBaseSeq<C extends RegularRingElem<C>> extends GroebnerBase
 
         /* stratify: collect polynomials with equal leading terms */
         ExpVector e, f;
-        F = new ArrayList<>(G.size());
+        F = new ArrayList<GenPolynomial<C>>(G.size());
         for (int i = 0; i < G.size(); i++) {
             a = G.get(i);
             if (a == null || a.isZERO()) {

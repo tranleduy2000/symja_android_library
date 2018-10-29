@@ -109,7 +109,7 @@ public class MultiplicativeSetCoPrime<C extends GcdRingElem<C>> extends Multipli
             if (ring.coFac.isField()) {
                 list = PolyUtil.monic(list);
             }
-            return new MultiplicativeSetCoPrime<>(ring, list, engine);
+            return new MultiplicativeSetCoPrime<C>(ring, list, engine);
         }
         GenPolynomial<C> c = removeFactors(cc);
         if (c.isConstant()) {
@@ -121,7 +121,7 @@ public class MultiplicativeSetCoPrime<C extends GcdRingElem<C>> extends Multipli
         if (ring.coFac.isField()) {
             list = PolyUtil.monic(list);
         }
-        return new MultiplicativeSetCoPrime<>(ring, list, engine);
+        return new MultiplicativeSetCoPrime<C>(ring, list, engine);
     }
 
 
@@ -133,7 +133,7 @@ public class MultiplicativeSetCoPrime<C extends GcdRingElem<C>> extends Multipli
      */
     @Override
     public MultiplicativeSetCoPrime<C> replace(List<GenPolynomial<C>> L) {
-        MultiplicativeSetCoPrime<C> ms = new MultiplicativeSetCoPrime<>(ring);
+        MultiplicativeSetCoPrime<C> ms = new MultiplicativeSetCoPrime<C>(ring);
         if (L == null || L.size() == 0) {
             return ms;
         }

@@ -94,7 +94,7 @@ public class GroebnerBaseSeqIter<C extends RingElem<C>> extends GroebnerBaseAbst
         G = OrderedPolynomialList.sort(G);
         //no: Collections.reverse(G);
         logger.info("G-sort = " + G);
-        List<GenPolynomial<C>> Gp = new ArrayList<>();
+        List<GenPolynomial<C>> Gp = new ArrayList<GenPolynomial<C>>();
         for (GenPolynomial<C> p : G) {
             if (debug) {
                 logger.info("p = " + p);
@@ -124,7 +124,7 @@ public class GroebnerBaseSeqIter<C extends RingElem<C>> extends GroebnerBaseAbst
      * @return GB(G, f) a Groebner base of G+(f).
      */
     public List<GenPolynomial<C>> GB(int modv, List<GenPolynomial<C>> G, GenPolynomial<C> f) {
-        List<GenPolynomial<C>> F = new ArrayList<>(G);
+        List<GenPolynomial<C>> F = new ArrayList<GenPolynomial<C>>(G);
         GenPolynomial<C> g = f.monic();
         if (F.isEmpty()) {
             F.add(g);

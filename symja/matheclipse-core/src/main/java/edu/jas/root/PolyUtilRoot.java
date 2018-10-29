@@ -52,7 +52,7 @@ public class PolyUtilRoot {
         if (debug) {
             logger.info("afac = " + afac);
         }
-        return PolyUtil.map(pfac, A, new CoeffToReAlg<>(afac));
+        return PolyUtil.map(pfac, A, new CoeffToReAlg<C>(afac));
     }
 
 
@@ -69,7 +69,7 @@ public class PolyUtilRoot {
     public static <C extends GcdRingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertToRecAlgebraicCoefficients(
             int depth, GenPolynomialRing<RealAlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         RealAlgebraicRing<C> afac = (RealAlgebraicRing<C>) pfac.coFac;
-        return PolyUtil.map(pfac, A, new CoeffToRecReAlg<>(depth, afac));
+        return PolyUtil.map(pfac, A, new CoeffToRecReAlg<C>(depth, afac));
     }
 
 
@@ -85,7 +85,7 @@ public class PolyUtilRoot {
     public static <C extends GcdRingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertRecursiveToAlgebraicCoefficients(
             GenPolynomialRing<RealAlgebraicNumber<C>> pfac, GenPolynomial<GenPolynomial<C>> A) {
         RealAlgebraicRing<C> afac = (RealAlgebraicRing<C>) pfac.coFac;
-        return PolyUtil.map(pfac, A, new PolyToReAlg<>(afac));
+        return PolyUtil.map(pfac, A, new PolyToReAlg<C>(afac));
     }
 
 
@@ -102,7 +102,7 @@ public class PolyUtilRoot {
             GenPolynomialRing<AlgebraicNumber<C>> afac, GenPolynomial<RealAlgebraicNumber<C>> A) {
         AlgebraicNumberRing<C> cfac = (AlgebraicNumberRing<C>) afac.coFac;
         return PolyUtil.map(afac, A,
-                new AlgFromRealCoeff<>(cfac));
+                new AlgFromRealCoeff<C>(cfac));
     }
 
 
@@ -119,7 +119,7 @@ public class PolyUtilRoot {
             GenPolynomialRing<RealAlgebraicNumber<C>> rfac, GenPolynomial<AlgebraicNumber<C>> A) {
         RealAlgebraicRing<C> cfac = (RealAlgebraicRing<C>) rfac.coFac;
         return PolyUtil.map(rfac, A,
-                new RealFromAlgCoeff<>(cfac));
+                new RealFromAlgCoeff<C>(cfac));
     }
 
 
@@ -134,7 +134,7 @@ public class PolyUtilRoot {
     public static <C extends GcdRingElem<C> & Rational> GenPolynomial<RealAlgebraicNumber<C>> convertToRealCoefficients(
             GenPolynomialRing<RealAlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         RealAlgebraicRing<C> afac = (RealAlgebraicRing<C>) pfac.coFac;
-        return PolyUtil.map(pfac, A, new CoeffToReal<>(afac));
+        return PolyUtil.map(pfac, A, new CoeffToReal<C>(afac));
     }
 
 
@@ -149,7 +149,7 @@ public class PolyUtilRoot {
     public static <C extends GcdRingElem<C> & Rational> GenPolynomial<ComplexAlgebraicNumber<C>> convertToComplexCoefficients(
             GenPolynomialRing<ComplexAlgebraicNumber<C>> pfac, GenPolynomial<C> A) {
         ComplexAlgebraicRing<C> afac = (ComplexAlgebraicRing<C>) pfac.coFac;
-        return PolyUtil.map(pfac, A, new CoeffToComplex<>(afac));
+        return PolyUtil.map(pfac, A, new CoeffToComplex<C>(afac));
     }
 
 
@@ -165,7 +165,7 @@ public class PolyUtilRoot {
             GenPolynomialRing<ComplexAlgebraicNumber<C>> pfac, GenPolynomial<Complex<C>> A) {
         ComplexAlgebraicRing<C> afac = (ComplexAlgebraicRing<C>) pfac.coFac;
         return PolyUtil.map(pfac, A,
-                new CoeffToComplexFromComplex<>(afac));
+                new CoeffToComplexFromComplex<C>(afac));
     }
 
 
@@ -185,8 +185,8 @@ public class PolyUtilRoot {
             throw new UnsupportedOperationException(
                     "unsupported ComplexAlgebraicRing coefficients " + f.ring);
         }
-        ComplexRing<C> cr = new ComplexRing<>(f.ring.coFac);
-        GenPolynomialRing<Complex<C>> fac = new GenPolynomialRing<>(cr, f.ring);
+        ComplexRing<C> cr = new ComplexRing<C>(f.ring.coFac);
+        GenPolynomialRing<Complex<C>> fac = new GenPolynomialRing<Complex<C>>(cr, f.ring);
         GenPolynomial<Complex<C>> fc = PolyUtil.complexFromAny(fac, f);
         return fc;
     }
@@ -215,7 +215,7 @@ class PolyToReAlg<C extends GcdRingElem<C> & Rational>
         if (c == null) {
             return afac.getZERO();
         }
-        return new RealAlgebraicNumber<>(afac, c);
+        return new RealAlgebraicNumber<C>(afac, c);
     }
 }
 
@@ -246,7 +246,7 @@ class CoeffToReAlg<C extends GcdRingElem<C> & Rational> implements UnaryFunctor<
         if (c == null) {
             return afac.getZERO();
         }
-        return new RealAlgebraicNumber<>(afac, zero.sum(c));
+        return new RealAlgebraicNumber<C>(afac, zero.sum(c));
     }
 }
 
@@ -271,7 +271,7 @@ class CoeffToRecReAlg<C extends GcdRingElem<C> & Rational>
         }
         RealAlgebraicRing<C> afac = fac;
         this.depth = depth;
-        lfac = new ArrayList<>(this.depth);
+        lfac = new ArrayList<RealAlgebraicRing<C>>(this.depth);
         lfac.add(fac);
         for (int i = 1; i < this.depth; i++) {
             RingFactory<C> rf = afac.algebraic.ring.coFac;
@@ -292,12 +292,12 @@ class CoeffToRecReAlg<C extends GcdRingElem<C> & Rational>
         C ac = c;
         RealAlgebraicRing<C> af = lfac.get(lfac.size() - 1);
         GenPolynomial<C> zero = af.algebraic.ring.getZERO();
-        RealAlgebraicNumber<C> an = new RealAlgebraicNumber<>(af, zero.sum(ac));
+        RealAlgebraicNumber<C> an = new RealAlgebraicNumber<C>(af, zero.sum(ac));
         for (int i = lfac.size() - 2; i >= 0; i--) {
             af = lfac.get(i);
             zero = af.algebraic.ring.getZERO();
             ac = (C) an;
-            an = new RealAlgebraicNumber<>(af, zero.sum(ac));
+            an = new RealAlgebraicNumber<C>(af, zero.sum(ac));
         }
         return an;
     }
@@ -353,7 +353,7 @@ class RealFromAlgCoeff<C extends GcdRingElem<C> & Rational>
         if (c == null) {
             return rfac.getZERO();
         }
-        return new RealAlgebraicNumber<>(rfac, c);
+        return new RealAlgebraicNumber<C>(rfac, c);
     }
 }
 
@@ -384,7 +384,7 @@ class CoeffToReal<C extends GcdRingElem<C> & Rational> implements UnaryFunctor<C
         if (c == null) {
             return rfac.getZERO();
         }
-        return new RealAlgebraicNumber<>(rfac, zero.sum(c));
+        return new RealAlgebraicNumber<C>(rfac, zero.sum(c));
     }
 }
 
@@ -420,7 +420,7 @@ class CoeffToComplex<C extends GcdRingElem<C> & Rational>
         if (c == null) {
             return cfac.getZERO();
         }
-        return new ComplexAlgebraicNumber<>(cfac, zero.sum(new Complex<>(cr, c)));
+        return new ComplexAlgebraicNumber<C>(cfac, zero.sum(new Complex<C>(cr, c)));
     }
 }
 
@@ -456,6 +456,6 @@ class CoeffToComplexFromComplex<C extends GcdRingElem<C> & Rational>
         if (c == null) {
             return cfac.getZERO();
         }
-        return new ComplexAlgebraicNumber<>(cfac, zero.sum(c));
+        return new ComplexAlgebraicNumber<C>(cfac, zero.sum(c));
     }
 }

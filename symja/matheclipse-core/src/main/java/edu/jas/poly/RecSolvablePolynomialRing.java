@@ -163,11 +163,11 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
                                      RelationTable<GenPolynomial<C>> rt) {
         super(cf, n, t, v, rt);
         //if (rt == null) { // handled in super }
-        coeffTable = new RelationTable<>(this, true);
-        ZERO = new RecSolvablePolynomial<>(this);
+        coeffTable = new RelationTable<GenPolynomial<C>>(this, true);
+        ZERO = new RecSolvablePolynomial<C>(this);
         GenPolynomial<C> coeff = coFac.getONE();
         //evzero = ExpVector.create(nvar); // from super
-        ONE = new RecSolvablePolynomial<>(this, coeff, evzero);
+        ONE = new RecSolvablePolynomial<C>(this, coeff, evzero);
     }
 
 
@@ -359,7 +359,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
                     p = Xk.multiply(Xj).multiply(Xi);
                     q = Xk.multiply(Xj.multiply(Xi));
                     if (!p.equals(q)) {
-                        if (true) {
+                        if (true || debug) {
                             logger.info("Xk = " + Xk + ", Xj = " + Xj + ", Xi = " + Xi);
                             logger.info("p = ( Xk * Xj ) * Xi = " + p);
                             logger.info("q = Xk * ( Xj * Xi ) = " + q);
@@ -380,7 +380,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvablePolynomial<C> valueOf(GenPolynomial<C> a) {
-        return new RecSolvablePolynomial<>(this, a);
+        return new RecSolvablePolynomial<C>(this, a);
     }
 
     /**
@@ -391,7 +391,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvablePolynomial<C> valueOf(ExpVector e) {
-        return new RecSolvablePolynomial<>(this, coFac.getONE(), e);
+        return new RecSolvablePolynomial<C>(this, coFac.getONE(), e);
     }
 
     /**
@@ -404,7 +404,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvablePolynomial<C> valueOf(GenPolynomial<C> a, ExpVector e) {
-        return new RecSolvablePolynomial<>(this, a, e);
+        return new RecSolvablePolynomial<C>(this, a, e);
     }
 
     /**
@@ -416,7 +416,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvablePolynomial<C> fromInteger(long a) {
-        return new RecSolvablePolynomial<>(this, coFac.fromInteger(a), evzero);
+        return new RecSolvablePolynomial<C>(this, coFac.fromInteger(a), evzero);
     }
 
     /**
@@ -428,7 +428,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvablePolynomial<C> fromInteger(BigInteger a) {
-        return new RecSolvablePolynomial<>(this, coFac.fromInteger(a), evzero);
+        return new RecSolvablePolynomial<C>(this, coFac.fromInteger(a), evzero);
     }
 
     /**
@@ -505,7 +505,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      * @return a copy of c.
      */
     public RecSolvablePolynomial<C> copy(RecSolvablePolynomial<C> c) {
-        return new RecSolvablePolynomial<>(this, c.val);
+        return new RecSolvablePolynomial<C>(this, c.val);
     }
 
     /**
@@ -532,7 +532,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
         RecSolvablePolynomial<C> p = null;
         try {
             GenSolvablePolynomial<GenPolynomial<C>> s = pt.nextSolvablePolynomial();
-            p = new RecSolvablePolynomial<>(this, s);
+            p = new RecSolvablePolynomial<C>(this, s);
         } catch (IOException e) {
             logger.error(e.toString() + " parse " + this);
             p = ZERO;
@@ -636,7 +636,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      */
     //todo Override
     public List<RecSolvablePolynomial<C>> recUnivariateList(int modv, long e) {
-        List<RecSolvablePolynomial<C>> pols = new ArrayList<>(nvar);
+        List<RecSolvablePolynomial<C>> pols = new ArrayList<RecSolvablePolynomial<C>>(nvar);
         int nm = nvar - modv;
         for (int i = 0; i < nm; i++) {
             RecSolvablePolynomial<C> p = univariate(modv, nm - 1 - i, e);
@@ -655,7 +655,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
     @Override
     public RecSolvablePolynomialRing<C> extend(int i) {
         GenSolvablePolynomialRing<GenPolynomial<C>> pfac = super.extend(i);
-        RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<>(pfac.coFac, pfac.nvar,
+        RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<C>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars, pfac.table);
         //spfac.table.extend(this.table); // pfac.table
         spfac.coeffTable.extend(this.coeffTable);
@@ -673,7 +673,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
     @Override
     public RecSolvablePolynomialRing<C> extend(String[] vs) {
         GenSolvablePolynomialRing<GenPolynomial<C>> pfac = super.extend(vs);
-        RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<>(pfac.coFac, pfac.nvar,
+        RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<C>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars, pfac.table);
         //spfac.table.extend(this.table); // pfac.table??
         spfac.coeffTable.extend(this.coeffTable);
@@ -690,7 +690,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
     @Override
     public RecSolvablePolynomialRing<C> contract(int i) {
         GenPolynomialRing<GenPolynomial<C>> pfac = super.contract(i);
-        RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<>(pfac.coFac, pfac.nvar,
+        RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<C>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars);
         spfac.table.contract(this.table);
         spfac.coeffTable.contract(this.coeffTable);
@@ -716,7 +716,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
     @Override
     public RecSolvablePolynomialRing<C> reverse(boolean partial) {
         GenPolynomialRing<GenPolynomial<C>> pfac = super.reverse(partial);
-        RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<>(pfac.coFac, pfac.nvar,
+        RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<C>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars);
         spfac.partial = partial;
         spfac.table.reverse(this.table);

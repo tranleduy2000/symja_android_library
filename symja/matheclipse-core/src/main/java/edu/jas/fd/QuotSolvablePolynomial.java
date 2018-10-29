@@ -123,7 +123,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
      */
     @Override
     public QuotSolvablePolynomial<C> copy() {
-        return new QuotSolvablePolynomial<>(ring, this.val);
+        return new QuotSolvablePolynomial<C>(ring, this.val);
     }
 
 
@@ -203,7 +203,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                 //QuotSolvablePolynomial<C> Cs;
                 QuotSolvablePolynomial<C> qp;
                 if (ring.polCoeff.coeffTable.isEmpty() || b.isConstant() || e.isZERO()) { // symmetric
-                    Cps = new QuotSolvablePolynomial<>(ring, b, e);
+                    Cps = new QuotSolvablePolynomial<C>(ring, b, e);
                     if (debug)
                         logger.info("symmetric coeff: b = " + b + ", e = " + e);
                 } else { // unsymmetric
@@ -212,26 +212,26 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                     // compute e * b as ( e * 1/b.den ) * b.num
                     if (b.den.isONE()) { // recursion base
                         // recursive polynomial coefficient multiplication : e * b.num
-                        RecSolvablePolynomial<C> rsp1 = new RecSolvablePolynomial<>(ring.polCoeff, e);
-                        RecSolvablePolynomial<C> rsp2 = new RecSolvablePolynomial<>(ring.polCoeff, b.num);
+                        RecSolvablePolynomial<C> rsp1 = new RecSolvablePolynomial<C>(ring.polCoeff, e);
+                        RecSolvablePolynomial<C> rsp2 = new RecSolvablePolynomial<C>(ring.polCoeff, b.num);
                         RecSolvablePolynomial<C> rsp3 = rsp1.multiply(rsp2);
                         QuotSolvablePolynomial<C> rsp = ring.fromPolyCoefficients(rsp3);
                         Cps = rsp;
                     } else { // b.den != 1
                         if (debug)
                             logger.info("coeff-num: Cps = " + Cps + ", num = " + b.num + ", den = " + b.den);
-                        Cps = new QuotSolvablePolynomial<>(ring, b.ring.getONE(), e);
+                        Cps = new QuotSolvablePolynomial<C>(ring, b.ring.getONE(), e);
 
                         // coefficient multiplication with 1/den: 
                         QuotSolvablePolynomial<C> qv = Cps;
-                        SolvableQuotient<C> qden = new SolvableQuotient<>(b.ring, b.den); // den/1
+                        SolvableQuotient<C> qden = new SolvableQuotient<C>(b.ring, b.den); // den/1
                         //System.out.println("qv = " + qv + ", den = " + den);
                         // recursion with den==1:
                         QuotSolvablePolynomial<C> v = qv.multiply(qden);
                         QuotSolvablePolynomial<C> vl = qv.multiplyLeft(qden);
                         //System.out.println("v = " + v + ", vl = " + vl + ", qden = " + qden);
                         QuotSolvablePolynomial<C> vr = (QuotSolvablePolynomial<C>) v.subtract(vl);
-                        SolvableQuotient<C> qdeni = new SolvableQuotient<>(b.ring, b.ring.ring.getONE(),
+                        SolvableQuotient<C> qdeni = new SolvableQuotient<C>(b.ring, b.ring.ring.getONE(),
                                 b.den);
                         //System.out.println("vr = " + vr + ", qdeni = " + qdeni);
                         // recursion with smaller head term:
@@ -242,7 +242,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                         Cps = qp;
 
                         if (!b.num.isONE()) {
-                            SolvableQuotient<C> qnum = new SolvableQuotient<>(b.ring, b.num); // num/1
+                            SolvableQuotient<C> qnum = new SolvableQuotient<C>(b.ring, b.num); // num/1
                             // recursion with den == 1:
                             Cps = Cps.multiply(qnum);
                         }
@@ -259,7 +259,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                         logger.info("symmetric poly: b = " + b + ", e = " + e);
                     ExpVector g = e.sum(f);
                     if (Cps.isConstant()) {
-                        Ds = new QuotSolvablePolynomial<>(ring, Cps.leadingBaseCoefficient(), g); // symmetric!
+                        Ds = new QuotSolvablePolynomial<C>(ring, Cps.leadingBaseCoefficient(), g); // symmetric!
                     } else {
                         Ds = Cps.shift(f); // symmetric
                     }
@@ -296,9 +296,9 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                             TableRelation<SolvableQuotient<C>> rel = ring.table.lookup(g2, f2);
                             if (debug)
                                 logger.info("poly, g  = " + g + ", f  = " + f + ", rel = " + rel);
-                            Ds = new QuotSolvablePolynomial<>(ring, rel.p); //ring.copy(rel.p);
+                            Ds = new QuotSolvablePolynomial<C>(ring, rel.p); //ring.copy(rel.p);
                             if (rel.f != null) {
-                                D2 = new QuotSolvablePolynomial<>(ring, one, rel.f);
+                                D2 = new QuotSolvablePolynomial<C>(ring, one, rel.f);
                                 Ds = Ds.multiply(D2);
                                 if (rel.e == null) {
                                     g4 = g2;
@@ -308,17 +308,17 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                                 ring.table.update(g4, f2, Ds);
                             }
                             if (rel.e != null) {
-                                D1 = new QuotSolvablePolynomial<>(ring, one, rel.e);
+                                D1 = new QuotSolvablePolynomial<C>(ring, one, rel.e);
                                 Ds = D1.multiply(Ds);
                                 ring.table.update(g2, f2, Ds);
                             }
                             if (!f1.isZERO()) {
-                                D2 = new QuotSolvablePolynomial<>(ring, one, f1);
+                                D2 = new QuotSolvablePolynomial<C>(ring, one, f1);
                                 Ds = Ds.multiply(D2);
                                 //ring.table.update(?,f1,Ds)
                             }
                             if (!g1.isZERO()) {
-                                D1 = new QuotSolvablePolynomial<>(ring, one, g1);
+                                D1 = new QuotSolvablePolynomial<C>(ring, one, g1);
                                 Ds = D1.multiply(Ds);
                                 //ring.table.update(e1,?,Ds)
                             }
@@ -378,7 +378,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         if (b.isONE()) {
             return this;
         }
-        Cp = new QuotSolvablePolynomial<>(ring, b, ring.evzero);
+        Cp = new QuotSolvablePolynomial<C>(ring, b, ring.evzero);
         return multiply(Cp);
     }
 
@@ -403,8 +403,8 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         if (b.isONE() && c.isONE()) {
             return this;
         }
-        Cp = new QuotSolvablePolynomial<>(ring, b, ring.evzero);
-        QuotSolvablePolynomial<C> Dp = new QuotSolvablePolynomial<>(ring, c, ring.evzero);
+        Cp = new QuotSolvablePolynomial<C>(ring, b, ring.evzero);
+        QuotSolvablePolynomial<C> Dp = new QuotSolvablePolynomial<C>(ring, c, ring.evzero);
         return multiply(Cp, Dp);
     }
 
@@ -463,7 +463,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         if (b.isONE() && e.isZERO()) {
             return this;
         }
-        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<>(ring, b, e);
+        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
         return multiply(Cp);
     }
 
@@ -491,8 +491,8 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         if (b.isONE() && e.isZERO() && c.isONE() && f.isZERO()) {
             return this;
         }
-        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<>(ring, b, e);
-        QuotSolvablePolynomial<C> Dp = new QuotSolvablePolynomial<>(ring, c, f);
+        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
+        QuotSolvablePolynomial<C> Dp = new QuotSolvablePolynomial<C>(ring, c, f);
         return multiply(Cp, Dp);
     }
 
@@ -510,7 +510,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         if (b == null || b.isZERO()) {
             return ring.getZERO();
         }
-        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<>(ring, b, e);
+        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
         return Cp.multiply(this);
     }
 
@@ -527,7 +527,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
             return this;
         }
         SolvableQuotient<C> b = ring.getONECoefficient();
-        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<>(ring, b, e);
+        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
         return Cp.multiply(this);
     }
 

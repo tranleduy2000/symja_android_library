@@ -51,7 +51,7 @@ public class QuotIntegral<C extends GcdRingElem<C>> implements Serializable {
      * @param ri integral.
      */
     public QuotIntegral(Integral<C> ri) {
-        this(new QuotientRing<>(ri.den.ring), ri);
+        this(new QuotientRing<C>(ri.den.ring), ri);
     }
 
 
@@ -62,7 +62,7 @@ public class QuotIntegral<C extends GcdRingElem<C>> implements Serializable {
      * @param ri integral.
      */
     public QuotIntegral(QuotientRing<C> r, Integral<C> ri) {
-        this(new Quotient<>(r, ri.num, ri.den), ri.pol, ri.rational, ri.logarithm);
+        this(new Quotient<C>(r, ri.num, ri.den), ri.pol, ri.rational, ri.logarithm);
     }
 
 
@@ -90,14 +90,14 @@ public class QuotIntegral<C extends GcdRingElem<C>> implements Serializable {
                         List<LogIntegral<C>> log) {
         quot = r;
         QuotientRing<C> qr = r.ring;
-        rational = new ArrayList<>();
+        rational = new ArrayList<Quotient<C>>();
         if (!p.isZERO()) {
-            rational.add(new Quotient<>(qr, p));
+            rational.add(new Quotient<C>(qr, p));
         }
         for (int i = 0; i < rat.size(); i++) {
             GenPolynomial<C> rn = rat.get(i++);
             GenPolynomial<C> rd = rat.get(i);
-            rational.add(new Quotient<>(qr, rn, rd));
+            rational.add(new Quotient<C>(qr, rn, rd));
         }
         logarithm = log;
     }

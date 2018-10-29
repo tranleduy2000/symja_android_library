@@ -93,7 +93,7 @@ public class FactorQuotient<C extends GcdRingElem<C>> extends FactorAbstract<Quo
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
         //System.out.println("factorsSquarefree, P = " + P);
-        List<GenPolynomial<Quotient<C>>> factors = new ArrayList<>();
+        List<GenPolynomial<Quotient<C>>> factors = new ArrayList<GenPolynomial<Quotient<C>>>();
         if (P.isZERO()) {
             return factors;
         }
@@ -110,7 +110,7 @@ public class FactorQuotient<C extends GcdRingElem<C>> extends FactorAbstract<Quo
         }
         QuotientRing<C> qi = (QuotientRing<C>) pfac.coFac;
         GenPolynomialRing<C> ci = qi.ring;
-        GenPolynomialRing<GenPolynomial<C>> ifac = new GenPolynomialRing<>(ci, pfac);
+        GenPolynomialRing<GenPolynomial<C>> ifac = new GenPolynomialRing<GenPolynomial<C>>(ci, pfac);
         GenPolynomial<GenPolynomial<C>> Pi = PolyUfdUtil.integralFromQuotientCoefficients(ifac, Pr);
         //System.out.println("Pi = " + Pi);
 

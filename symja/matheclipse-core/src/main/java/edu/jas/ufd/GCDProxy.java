@@ -99,7 +99,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
         GenPolynomial<C> g = null;
         //Callable<GenPolynomial<C>> c0;
         //Callable<GenPolynomial<C>> c1;
-        List<Callable<GenPolynomial<C>>> cs = new ArrayList<>(2);
+        List<Callable<GenPolynomial<C>>> cs = new ArrayList<Callable<GenPolynomial<C>>>(2);
         cs.add(new Callable<GenPolynomial<C>>() {
 
 
@@ -186,7 +186,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
         GenPolynomial<GenPolynomial<C>> g = null;
         //Callable<GenPolynomial<GenPolynomial<C>>> c0;
         //Callable<GenPolynomial<GenPolynomial<C>>> c1;
-        List<Callable<GenPolynomial<GenPolynomial<C>>>> cs = new ArrayList<>(
+        List<Callable<GenPolynomial<GenPolynomial<C>>>> cs = new ArrayList<Callable<GenPolynomial<GenPolynomial<C>>>>(
                 2);
         cs.add(new Callable<GenPolynomial<GenPolynomial<C>>>() {
 
@@ -271,7 +271,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
         GenPolynomial<C> g = null;
         //Callable<GenPolynomial<C>> c0;
         //Callable<GenPolynomial<C>> c1;
-        List<Callable<GenPolynomial<C>>> cs = new ArrayList<>(2);
+        List<Callable<GenPolynomial<C>>> cs = new ArrayList<Callable<GenPolynomial<C>>>(2);
         cs.add(new Callable<GenPolynomial<C>>() {
 
 
@@ -357,7 +357,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
         GenPolynomial<C> g = null;
         //Callable<GenPolynomial<C>> c0;
         //Callable<GenPolynomial<C>> c1;
-        List<Callable<GenPolynomial<C>>> cs = new ArrayList<>(2);
+        List<Callable<GenPolynomial<C>>> cs = new ArrayList<Callable<GenPolynomial<C>>>(2);
         cs.add(new Callable<GenPolynomial<C>>() {
 
 
@@ -444,7 +444,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
         GenPolynomial<GenPolynomial<C>> g = null;
         //Callable<GenPolynomial<GenPolynomial<C>>> c0;
         //Callable<GenPolynomial<GenPolynomial<C>>> c1;
-        List<Callable<GenPolynomial<GenPolynomial<C>>>> cs = new ArrayList<>(
+        List<Callable<GenPolynomial<GenPolynomial<C>>>> cs = new ArrayList<Callable<GenPolynomial<GenPolynomial<C>>>>(
                 2);
         cs.add(new Callable<GenPolynomial<GenPolynomial<C>>>() {
 
@@ -529,7 +529,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
         GenPolynomial<C> g = null;
         //Callable<GenPolynomial<C>> c0;
         //Callable<GenPolynomial<C>> c1;
-        List<Callable<GenPolynomial<C>>> cs = new ArrayList<>(2);
+        List<Callable<GenPolynomial<C>>> cs = new ArrayList<Callable<GenPolynomial<C>>>(2);
         cs.add(new Callable<GenPolynomial<C>>() {
 
 

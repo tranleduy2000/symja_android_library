@@ -115,7 +115,7 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
      * @return a Sturm sequence for f and g.
      */
     public List<GenPolynomial<C>> sturmSequence(GenPolynomial<C> f, GenPolynomial<C> g) {
-        List<GenPolynomial<C>> S = new ArrayList<>();
+        List<GenPolynomial<C>> S = new ArrayList<GenPolynomial<C>>();
         if (f == null || f.isZERO()) {
             return S;
         }
@@ -137,7 +137,7 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
             return S;
         }
         // make squarefree
-        List<GenPolynomial<C>> Sp = new ArrayList<>(S.size());
+        List<GenPolynomial<C>> Sp = new ArrayList<GenPolynomial<C>>(S.size());
         for (GenPolynomial<C> p : S) {
             p = p.divide(F);
             Sp.add(p);
@@ -194,7 +194,7 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
                 Complex<C> sw = rect.getSW();
                 Complex<C> ne = rect.getNE();
                 C delta = sw.ring.ring.getONE(); //parse("1"); // works since linear polynomial
-                Complex<C> cd = new Complex<>(sw.ring, delta/*, 0*/);
+                Complex<C> cd = new Complex<C>(sw.ring, delta/*, 0*/);
                 sw = sw.subtract(cd);
                 ne = ne.sum(cd);
                 rect = rect.exchangeSW(sw);
@@ -211,7 +211,7 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
                 Complex<C> sw = rect.getSW();
                 Complex<C> ne = rect.getNE();
                 C delta = sw.ring.ring.getONE(); //parse("1"); // works since linear polynomial
-                Complex<C> cd = new Complex<>(sw.ring, sw.ring.ring.getZERO(), delta);
+                Complex<C> cd = new Complex<C>(sw.ring, sw.ring.ring.getZERO(), delta);
                 sw = sw.subtract(cd);
                 ne = ne.sum(cd);
                 rect = rect.exchangeSW(sw);
@@ -234,7 +234,7 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
      */
     public long windingNumber(Rectangle<C> rect, GenPolynomial<Complex<C>> A)
             throws InvalidBoundaryException {
-        Boundary<C> bound = new Boundary<>(rect, A); // throws InvalidBoundaryException
+        Boundary<C> bound = new Boundary<C>(rect, A); // throws InvalidBoundaryException
         ComplexRing<C> cr = (ComplexRing<C>) A.ring.coFac;
         RingFactory<C> cf = cr.ring;
         C zero = cf.getZERO();
@@ -264,7 +264,7 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
     public List<Rectangle<C>> complexRoots(Rectangle<C> rect, GenPolynomial<Complex<C>> a)
             throws InvalidBoundaryException {
         ComplexRing<C> cr = (ComplexRing<C>) a.ring.coFac;
-        List<Rectangle<C>> roots = new ArrayList<>();
+        List<Rectangle<C>> roots = new ArrayList<Rectangle<C>>();
         if (a.isConstant() || a.isZERO()) {
             return roots;
         }
@@ -302,10 +302,10 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
                 Complex<C>[] cp = (Complex<C>[]) copyOfComplex(rect.corners, 4);
                 // (Complex<C>[]) new Complex[4];  cp[0] = rect.corners[0];
                 // cp[0] fix
-                cp[1] = new Complex<>(cr, cp[1].getRe(), center.getIm());
+                cp[1] = new Complex<C>(cr, cp[1].getRe(), center.getIm());
                 cp[2] = center;
-                cp[3] = new Complex<>(cr, center.getRe(), cp[3].getIm());
-                Rectangle<C> nw = new Rectangle<>(cp);
+                cp[3] = new Complex<C>(cr, center.getRe(), cp[3].getIm());
+                Rectangle<C> nw = new Rectangle<C>(cp);
                 //System.out.println("nw = " + nw); 
                 List<Rectangle<C>> nwr = complexRoots(nw, a);
                 //System.out.println("#nwr = " + nwr.size()); 
@@ -316,11 +316,11 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
                 }
 
                 cp = (Complex<C>[]) copyOfComplex(rect.corners, 4);
-                cp[0] = new Complex<>(cr, cp[0].getRe(), center.getIm());
+                cp[0] = new Complex<C>(cr, cp[0].getRe(), center.getIm());
                 // cp[1] fix
-                cp[2] = new Complex<>(cr, center.getRe(), cp[2].getIm());
+                cp[2] = new Complex<C>(cr, center.getRe(), cp[2].getIm());
                 cp[3] = center;
-                Rectangle<C> sw = new Rectangle<>(cp);
+                Rectangle<C> sw = new Rectangle<C>(cp);
                 //System.out.println("sw = " + sw); 
                 List<Rectangle<C>> swr = complexRoots(sw, a);
                 //System.out.println("#swr = " + swr.size()); 
@@ -332,10 +332,10 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
 
                 cp = (Complex<C>[]) copyOfComplex(rect.corners, 4);
                 cp[0] = center;
-                cp[1] = new Complex<>(cr, center.getRe(), cp[1].getIm());
+                cp[1] = new Complex<C>(cr, center.getRe(), cp[1].getIm());
                 // cp[2] fix
-                cp[3] = new Complex<>(cr, cp[3].getRe(), center.getIm());
-                Rectangle<C> se = new Rectangle<>(cp);
+                cp[3] = new Complex<C>(cr, cp[3].getRe(), center.getIm());
+                Rectangle<C> se = new Rectangle<C>(cp);
                 //System.out.println("se = " + se); 
                 List<Rectangle<C>> ser = complexRoots(se, a);
                 //System.out.println("#ser = " + ser.size()); 
@@ -346,11 +346,11 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
                 }
 
                 cp = (Complex<C>[]) copyOfComplex(rect.corners, 4);
-                cp[0] = new Complex<>(cr, center.getRe(), cp[0].getIm());
+                cp[0] = new Complex<C>(cr, center.getRe(), cp[0].getIm());
                 cp[1] = center;
-                cp[2] = new Complex<>(cr, cp[2].getRe(), center.getIm());
+                cp[2] = new Complex<C>(cr, cp[2].getRe(), center.getIm());
                 // cp[3] fix
-                Rectangle<C> ne = new Rectangle<>(cp);
+                Rectangle<C> ne = new Rectangle<C>(cp);
                 //System.out.println("ne = " + ne); 
                 List<Rectangle<C>> ner = complexRoots(ne, a);
                 //System.out.println("#ner = " + ner.size()); 
@@ -437,8 +437,8 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
         ComplexRing<C> cr = zero.ring;
         Complex<C> sw = rect.getSW();
         Complex<C> ne = rect.getNE();
-        Interval<C> ir = new Interval<>(sw.getRe(), ne.getRe());
-        Interval<C> ii = new Interval<>(sw.getIm(), ne.getIm());
+        Interval<C> ir = new Interval<C>(sw.getRe(), ne.getRe());
+        Interval<C> ii = new Interval<C>(sw.getIm(), ne.getIm());
         System.out.println("intervals, ir = " + ir + ", ii = " + ii);
         if (!(ir.contains(zero.getRe()) || ii.contains(zero.getIm()))) {
             // !rect.contains(zero) not correct
@@ -448,10 +448,10 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
         Rectangle<C> rn = rect;
         // shrink real part
         if (ir.contains(zero.getRe())) {
-            Complex<C> sw0 = new Complex<>(cr, zero.getRe(), sw.getIm());
-            Complex<C> ne0 = new Complex<>(cr, zero.getRe(), ne.getIm());
-            Rectangle<C> rl = new Rectangle<>(sw, ne0);
-            Rectangle<C> rr = new Rectangle<>(sw0, ne);
+            Complex<C> sw0 = new Complex<C>(cr, zero.getRe(), sw.getIm());
+            Complex<C> ne0 = new Complex<C>(cr, zero.getRe(), ne.getIm());
+            Rectangle<C> rl = new Rectangle<C>(sw, ne0);
+            Rectangle<C> rr = new Rectangle<C>(sw0, ne);
             System.out.println("rectangle, rl = " + rl + ", rr = " + rr);
             if (complexRootCount(rr, f) == 1) {
                 rn = rr;
@@ -463,13 +463,13 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
         // shrink imaginary part
         sw = rn.getSW();
         ne = rn.getNE();
-        ii = new Interval<>(sw.getIm(), ne.getIm());
+        ii = new Interval<C>(sw.getIm(), ne.getIm());
         System.out.println("interval, ii = " + ii);
         if (ii.contains(zero.getIm())) {
-            Complex<C> sw1 = new Complex<>(cr, sw.getRe(), zero.getIm());
-            Complex<C> ne1 = new Complex<>(cr, ne.getRe(), zero.getIm());
-            Rectangle<C> iu = new Rectangle<>(sw1, ne);
-            Rectangle<C> il = new Rectangle<>(sw, ne1);
+            Complex<C> sw1 = new Complex<C>(cr, sw.getRe(), zero.getIm());
+            Complex<C> ne1 = new Complex<C>(cr, ne.getRe(), zero.getIm());
+            Rectangle<C> iu = new Rectangle<C>(sw1, ne);
+            Rectangle<C> il = new Rectangle<C>(sw, ne1);
             System.out.println("rectangle, il = " + il + ", iu = " + iu);
             if (complexRootCount(il, f) == 1) {
                 rn = il;

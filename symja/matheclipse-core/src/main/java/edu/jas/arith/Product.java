@@ -121,7 +121,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      */
     @Override
     public Product<C> copy() {
-        return new Product<>(ring, val, isunit);
+        return new Product<C>(ring, val, isunit);
     }
 
 
@@ -347,13 +347,13 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      */
     public Product<C> extend(int i, int j) {
         RingFactory<C> rf = ring.getFactory(j);
-        SortedMap<Integer, C> elem = new TreeMap<>(val);
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>(val);
         C v = val.get(i);
         C w = rf.copy(v); // valueOf
         if (!w.isZERO()) {
             elem.put(j, w);
         }
-        return new Product<>(ring, elem, isunit);
+        return new Product<C>(ring, elem, isunit);
     }
 
 
@@ -364,13 +364,13 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * @see RingElem#abs()
      */
     public Product<C> abs() {
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         for (Map.Entry<Integer, C> e : val.entrySet()) {
             Integer i = e.getKey();
             C v = e.getValue().abs();
             elem.put(i, v);
         }
-        return new Product<>(ring, elem, isunit);
+        return new Product<C>(ring, elem, isunit);
     }
 
 
@@ -387,7 +387,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         if (this.isZERO()) {
             return S;
         }
-        SortedMap<Integer, C> elem = new TreeMap<>(val); // clone
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>(val); // clone
         SortedMap<Integer, C> sel = S.val;
         for (Map.Entry<Integer, C> is : sel.entrySet()) {
             Integer i = is.getKey();
@@ -404,7 +404,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 elem.put(i, y);
             }
         }
-        return new Product<>(ring, elem);
+        return new Product<C>(ring, elem);
     }
 
 
@@ -415,13 +415,13 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * @see RingElem#negate()
      */
     public Product<C> negate() {
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         for (Map.Entry<Integer, C> me : val.entrySet()) {
             Integer i = me.getKey();
             C v = me.getValue().negate();
             elem.put(i, v);
         }
-        return new Product<>(ring, elem, isunit);
+        return new Product<C>(ring, elem, isunit);
     }
 
 
@@ -462,7 +462,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
             return this;
         }
         int isu = 0;
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         for (Map.Entry<Integer, C> me : val.entrySet()) {
             Integer i = me.getKey();
             C x = me.getValue(); // is non zero
@@ -477,7 +477,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 isu = 1;
             }
         }
-        return new Product<>(ring, elem, isu);
+        return new Product<C>(ring, elem, isu);
     }
 
 
@@ -490,13 +490,13 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         if (this.isZERO()) {
             return this;
         }
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         for (Integer i : val.keySet()) {
             RingFactory<C> f = ring.getFactory(i);
             C x = f.getONE();
             elem.put(i, x);
         }
-        return new Product<>(ring, elem, 1);
+        return new Product<C>(ring, elem, 1);
     }
 
 
@@ -510,7 +510,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
             return ring.getONE();
         }
         int isu = 0;
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         for (int i = 0; i < ring.length(); i++) {
             C v = val.get(i);
             if (v == null) {
@@ -520,7 +520,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 isu = 1;
             }
         }
-        return new Product<>(ring, elem, isu);
+        return new Product<C>(ring, elem, isu);
     }
 
 
@@ -535,7 +535,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
             return this;
         }
         int isu = 0;
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         for (int i = 0; i < ring.length(); i++) {
             C v = val.get(i);
             C w = S.val.get(i);
@@ -546,7 +546,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 isu = 1;
             }
         }
-        return new Product<>(ring, elem, isu);
+        return new Product<C>(ring, elem, isu);
     }
 
 
@@ -561,7 +561,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
             return this;
         }
         int isu = 0;
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         for (int i = 0; i < ring.length(); i++) {
             C v = val.get(i);
             C w = S.val.get(i);
@@ -572,7 +572,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 isu = 1;
             }
         }
-        return new Product<>(ring, elem, isu);
+        return new Product<C>(ring, elem, isu);
     }
 
 
@@ -586,7 +586,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         if (S.isZERO()) {
             return this;
         }
-        SortedMap<Integer, C> elem = new TreeMap<>(val);
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>(val);
         for (int i = 0; i < ring.length(); i++) {
             C v = elem.get(i);
             if (v != null) {
@@ -599,7 +599,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 elem.put(i, x);
             }
         }
-        return new Product<>(ring, elem, isunit);
+        return new Product<C>(ring, elem, isunit);
     }
 
 
@@ -615,7 +615,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         if (this.isZERO()) {
             return ring.getONE();
         }
-        SortedMap<Integer, C> elem = new TreeMap<>(val);
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>(val);
         for (int i = 0; i < ring.length(); i++) {
             C v = elem.get(i);
             if (v != null) {
@@ -625,7 +625,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
             C x = f.getONE();
             elem.put(i, x);
         }
-        return new Product<>(ring, elem, isunit);
+        return new Product<C>(ring, elem, isunit);
     }
 
 
@@ -645,7 +645,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         if (this.isZERO()) {
             return this;
         }
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         SortedMap<Integer, C> sel = S.val;
         for (Map.Entry<Integer, C> me : val.entrySet()) {
             Integer i = me.getKey();
@@ -665,7 +665,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 }
             }
         }
-        return new Product<>(ring, elem);
+        return new Product<C>(ring, elem);
     }
 
 
@@ -685,7 +685,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         if (this.isZERO()) {
             return this;
         }
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         SortedMap<Integer, C> sel = S.val;
         for (Map.Entry<Integer, C> me : val.entrySet()) {
             Integer i = me.getKey();
@@ -698,7 +698,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 }
             }
         }
-        return new Product<>(ring, elem);
+        return new Product<C>(ring, elem);
     }
 
 
@@ -729,7 +729,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         if (this.isZERO()) {
             return this;
         }
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         SortedMap<Integer, C> sel = S.val;
         for (Map.Entry<Integer, C> me : val.entrySet()) {
             Integer i = me.getKey();
@@ -742,7 +742,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 }
             }
         }
-        return new Product<>(ring, elem);
+        return new Product<C>(ring, elem);
     }
 
 
@@ -753,7 +753,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * @return this*c.
      */
     public Product<C> multiply(C c) {
-        SortedMap<Integer, C> elem = new TreeMap<>();
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         for (Map.Entry<Integer, C> me : val.entrySet()) {
             Integer i = me.getKey();
             C v = me.getValue().multiply(c);
@@ -761,7 +761,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 elem.put(i, v);
             }
         }
-        return new Product<>(ring, elem);
+        return new Product<C>(ring, elem);
     }
 
 
@@ -778,7 +778,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         if (this.isZERO()) {
             return S;
         }
-        SortedMap<Integer, C> elem = new TreeMap<>(val); // clone
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>(val); // clone
         SortedMap<Integer, C> sel = S.val;
         for (Map.Entry<Integer, C> is : sel.entrySet()) {
             Integer i = is.getKey();
@@ -795,7 +795,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 elem.put(i, y);
             }
         }
-        return new Product<>(ring, elem);
+        return new Product<C>(ring, elem);
     }
 
 
@@ -819,9 +819,9 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
             ret[0] = S;
             return ret;
         }
-        SortedMap<Integer, C> elem = new TreeMap<>(val); // clone
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>(val); // clone
         SortedMap<Integer, C> elem1 = this.idempotent().val; // init with 1
-        SortedMap<Integer, C> elem2 = new TreeMap<>(); // zero
+        SortedMap<Integer, C> elem2 = new TreeMap<Integer, C>(); // zero
         SortedMap<Integer, C> sel = S.val;
         for (Map.Entry<Integer, C> is : sel.entrySet()) {
             Integer i = is.getKey();
@@ -841,9 +841,9 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
                 elem2.put(i, ring.getFactory(i).getONE());
             }
         }
-        ret[0] = new Product<>(ring, elem);
-        ret[1] = new Product<>(ring, elem1);
-        ret[2] = new Product<>(ring, elem2);
+        ret[0] = new Product<C>(ring, elem);
+        ret[1] = new Product<C>(ring, elem1);
+        ret[2] = new Product<C>(ring, elem2);
         return ret;
     }
 

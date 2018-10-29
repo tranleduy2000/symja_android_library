@@ -67,7 +67,7 @@ public class SquarefreeFiniteFieldCharP<C extends GcdRingElem<C>> extends Square
         //if ( c.signum() == 0 ) {
         //    return null;
         //}
-        SortedMap<C, Long> root = new TreeMap<>();
+        SortedMap<C, Long> root = new TreeMap<C, Long>();
         if (p.isZERO()) {
             return root;
         }
@@ -129,7 +129,7 @@ public class SquarefreeFiniteFieldCharP<C extends GcdRingElem<C>> extends Square
         if (c.signum() == 0) {
             return null;
         }
-        SortedMap<GenPolynomial<C>, Long> root = new TreeMap<>();
+        SortedMap<GenPolynomial<C>, Long> root = new TreeMap<GenPolynomial<C>, Long>();
         if (P.isZERO()) {
             return root;
         }

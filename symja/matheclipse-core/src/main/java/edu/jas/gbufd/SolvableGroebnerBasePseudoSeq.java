@@ -102,7 +102,7 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
         cofac = rf;
         if (!cofac.isCommutative()) {
             logger.warn("right reduction not correct for " + cofac.toScript());
-            engine = new GreatestCommonDivisorFake<>(); // only for Ore conditions
+            engine = new GreatestCommonDivisorFake<C>(); // only for Ore conditions
             // TODO check that also coeffTable is empty for recursive solvable poly ring
             //System.out.println("stack trace = "); 
             //Exception e = new RuntimeException("get stack trace");
@@ -202,7 +202,7 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
         }
         // remove top reducible polynomials
         GenSolvablePolynomial<C> a;
-        List<GenSolvablePolynomial<C>> F = new ArrayList<>(G.size());
+        List<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             if (sred.isTopReducible(G, a) || sred.isTopReducible(F, a)) {
@@ -210,7 +210,7 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenSolvablePolynomial<C>> ff;
-                    ff = new ArrayList<>(G);
+                    ff = new ArrayList<GenSolvablePolynomial<C>>(G);
                     ff.addAll(F);
                     a = sred.leftNormalform(ff, a);
                     if (!a.isZERO()) {
@@ -266,7 +266,7 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
         List<GenSolvablePolynomial<C>> X;
         X = PolynomialList.castToSolvableList(ring.generators(modv));
         logger.info("right multipliers = " + X);
-        List<GenSolvablePolynomial<C>> F = new ArrayList<>(G.size() * (1 + X.size()));
+        List<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>(G.size() * (1 + X.size()));
         F.addAll(G);
         logger.info("right multipy: F = " + F);
         GenSolvablePolynomial<C> p, x, q;

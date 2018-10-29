@@ -80,16 +80,16 @@ public class OrderedPairlist<C extends RingElem<C>> implements PairList<C> {
     public OrderedPairlist(int m, GenPolynomialRing<C> r) {
         moduleVars = m;
         ring = r;
-        P = new ArrayList<>();
-        pairlist = new TreeMap<>(ring.tord.getAscendComparator());
+        P = new ArrayList<GenPolynomial<C>>();
+        pairlist = new TreeMap<ExpVector, LinkedList<Pair<C>>>(ring.tord.getAscendComparator());
         //pairlist = new TreeMap( to.getSugarComparator() );
-        red = new ArrayList<>();
+        red = new ArrayList<BitSet>();
         putCount = 0;
         remCount = 0;
         if (!ring.isCommutative()) {//ring instanceof GenSolvablePolynomialRing ) {
             useCriterion4 = false;
         }
-        reduction = new ReductionSeq<>();
+        reduction = new ReductionSeq<C>();
     }
 
 
@@ -99,7 +99,7 @@ public class OrderedPairlist<C extends RingElem<C>> implements PairList<C> {
      * @param r polynomial ring.
      */
     public PairList<C> create(GenPolynomialRing<C> r) {
-        return new OrderedPairlist<>(r);
+        return new OrderedPairlist<C>(r);
     }
 
 
@@ -110,7 +110,7 @@ public class OrderedPairlist<C extends RingElem<C>> implements PairList<C> {
      * @param r polynomial ring.
      */
     public PairList<C> create(int m, GenPolynomialRing<C> r) {
-        return new OrderedPairlist<>(m, r);
+        return new OrderedPairlist<C>(m, r);
     }
 
 
@@ -156,12 +156,12 @@ public class OrderedPairlist<C extends RingElem<C>> implements PairList<C> {
                 }
             }
             ExpVector g = e.lcm(f);
-            Pair<C> pair = new Pair<>(pj, p, j, l);
+            Pair<C> pair = new Pair<C>(pj, p, j, l);
             //System.out.println("pair.new      = " + pair);
             //multiple pairs under same keys -> list of pairs
             LinkedList<Pair<C>> xl = pairlist.get(g);
             if (xl == null) {
-                xl = new LinkedList<>();
+                xl = new LinkedList<Pair<C>>();
             }
             //xl.addLast( pair ); // first or last ?
             xl.addFirst(pair); // first or last ? better for d- e-GBs

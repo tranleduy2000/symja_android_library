@@ -80,7 +80,7 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
      * @return Creates and returns a copy of this Element.
      */
     public Monomial<C> copy() {
-        return new Monomial<>(e, c);
+        return new Monomial<C>(e, c);
     }
 
 

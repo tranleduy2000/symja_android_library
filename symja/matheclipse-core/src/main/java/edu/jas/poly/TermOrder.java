@@ -1818,9 +1818,9 @@ public final class TermOrder implements Serializable {
                 long[] wi = weight[i];
                 long max = 0;
                 // long min = Long.MAX_VALUE;
-                for (long aWi : wi) {
-                    if (aWi > max)
-                        max = aWi;
+                for (int j = 0; j < wi.length; j++) {
+                    if (wi[j] > max)
+                        max = wi[j];
                     //if ( wi[j] < min ) min = wi[j];
                 }
                 max++;
@@ -1861,10 +1861,10 @@ public final class TermOrder implements Serializable {
                 long[] wi = weight[i];
                 //long max = 0;
                 long min = Long.MAX_VALUE;
-                for (long aWi : wi) {
+                for (int j = 0; j < wi.length; j++) {
                     //if ( wi[j] > max ) max = wi[j];
-                    if (aWi < min)
-                        min = aWi;
+                    if (wi[j] < min)
+                        min = wi[j];
                 }
                 //max++;
                 long[] wj = new long[wi.length + k];

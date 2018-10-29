@@ -61,7 +61,7 @@ public class PolyUfdUtil {
         GenPolynomial<C> c = null;
         GenPolynomial<C> d;
         GenPolynomial<C> x;
-        GreatestCommonDivisor<C> ufd = new GreatestCommonDivisorSubres<>();
+        GreatestCommonDivisor<C> ufd = new GreatestCommonDivisorSubres<C>();
         int s = 0;
         // lcm of denominators
         for (Quotient<C> y : A.getMap().values()) {
@@ -106,7 +106,7 @@ public class PolyUfdUtil {
         if (L == null) {
             return null;
         }
-        List<GenPolynomial<GenPolynomial<C>>> list = new ArrayList<>(L.size());
+        List<GenPolynomial<GenPolynomial<C>>> list = new ArrayList<GenPolynomial<GenPolynomial<C>>>(L.size());
         for (GenPolynomial<Quotient<C>> p : L) {
             list.add(integralFromQuotientCoefficients(fac, p));
         }
@@ -134,7 +134,7 @@ public class PolyUfdUtil {
         for (Map.Entry<ExpVector, GenPolynomial<C>> y : A.getMap().entrySet()) {
             ExpVector e = y.getKey();
             GenPolynomial<C> a = y.getValue();
-            Quotient<C> p = new Quotient<>(qfac, a); // can not be zero
+            Quotient<C> p = new Quotient<C>(qfac, a); // can not be zero
             if (!p.isZERO()) {
                 //B = B.sum( p, e ); // inefficient
                 B.doPutToMap(e, p);
@@ -158,7 +158,7 @@ public class PolyUfdUtil {
         if (L == null) {
             return null;
         }
-        List<GenPolynomial<Quotient<C>>> list = new ArrayList<>(L.size());
+        List<GenPolynomial<Quotient<C>>> list = new ArrayList<GenPolynomial<Quotient<C>>>(L.size());
         for (GenPolynomial<GenPolynomial<C>> p : L) {
             list.add(quotientFromIntegralCoefficients(fac, p));
         }
@@ -212,7 +212,7 @@ public class PolyUfdUtil {
         if (L == null) {
             return K;
         }
-        K = new ArrayList<>(L.size());
+        K = new ArrayList<GenPolynomial<GenPolynomial<C>>>(L.size());
         if (L.size() == 0) {
             return K;
         }
@@ -272,7 +272,7 @@ public class PolyUfdUtil {
         if (L == null) {
             return K;
         }
-        K = new ArrayList<>(L.size());
+        K = new ArrayList<GenPolynomial<GenPolynomial<BigInteger>>>(L.size());
         if (L.isEmpty()) {
             return K;
         }
@@ -398,7 +398,7 @@ public class PolyUfdUtil {
         if (!ldcf.isONE()) {
             A = A.monic();
         }
-        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<>(cfac, pfac);
+        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, pfac);
 
         // transform minimal polynomial to bi-variate polynomial
         GenPolynomial<GenPolynomial<C>> Ac = PolyUfdUtil.introduceLowerVariable(rfac, agen);
@@ -410,7 +410,7 @@ public class PolyUfdUtil {
         Pc = PolyUtil.monic(Pc);
         //System.out.println("Pc = " + Pc.toScript());
 
-        GreatestCommonDivisorSubres<C> engine = new GreatestCommonDivisorSubres<>( /*cfac.coFac*/);
+        GreatestCommonDivisorSubres<C> engine = new GreatestCommonDivisorSubres<C>( /*cfac.coFac*/);
         // = (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getImplementation( cfac.coFac );
 
         GenPolynomial<GenPolynomial<C>> Rc = engine.recursiveUnivariateResultant(Pc, Ac);
@@ -483,7 +483,7 @@ public class PolyUfdUtil {
             return A;
         }
         RingFactory<C> cfac = A.ring.coFac;
-        GenPolynomialRing<C> ufac = new GenPolynomialRing<>(cfac, 1);
+        GenPolynomialRing<C> ufac = new GenPolynomialRing<C>(cfac, 1);
         GenPolynomial<C> B = ufac.getZERO().copy();
         if (A.isZERO()) {
             return B;
@@ -568,7 +568,7 @@ public class PolyUfdUtil {
      */
     public static <C extends GcdRingElem<C>> List<GenPolynomial<C>> backSubstituteKronecker(
             GenPolynomialRing<C> fac, List<GenPolynomial<C>> A, long d) {
-        return ListUtil.map(A, new BackSubstKronecker<>(fac, d));
+        return ListUtil.map(A, new BackSubstKronecker<C>(fac, d));
     }
 
 }

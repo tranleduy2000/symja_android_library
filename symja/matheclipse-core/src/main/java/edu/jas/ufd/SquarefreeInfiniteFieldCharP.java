@@ -75,7 +75,7 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
-        SortedMap<Quotient<C>, Long> factors = new TreeMap<>();
+        SortedMap<Quotient<C>, Long> factors = new TreeMap<Quotient<C>, Long>();
         if (P.isZERO()) {
             return factors;
         }
@@ -92,7 +92,7 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
             //System.out.println("nfac = " + nfac);
             for (Map.Entry<GenPolynomial<C>, Long> me : nfac.entrySet()) {
                 GenPolynomial<C> nfp = me.getKey();
-                Quotient<C> nf = new Quotient<>(pfac, nfp);
+                Quotient<C> nf = new Quotient<C>(pfac, nfp);
                 factors.put(nf, me.getValue()); //nfac.get(nfp));
             }
         }
@@ -106,7 +106,7 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
         //System.out.println("dfac = " + dfac);
         for (Map.Entry<GenPolynomial<C>, Long> me : dfac.entrySet()) {
             GenPolynomial<C> dfp = me.getKey();
-            Quotient<C> df = new Quotient<>(pfac, one, dfp);
+            Quotient<C> df = new Quotient<C>(pfac, one, dfp);
             factors.put(df, me.getValue()); //dfac.get(dfp));
         }
         if (factors.size() == 0) {
@@ -131,7 +131,7 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
         if (c.signum() == 0) {
             return null;
         }
-        SortedMap<Quotient<C>, Long> root = new TreeMap<>();
+        SortedMap<Quotient<C>, Long> root = new TreeMap<Quotient<C>, Long>();
         if (P.isZERO()) {
             return root;
         }

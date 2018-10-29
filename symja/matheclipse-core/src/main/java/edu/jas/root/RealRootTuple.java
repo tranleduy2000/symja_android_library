@@ -111,7 +111,7 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
      * @return a random point contained in this real root tuple.
      */
     public List<C> randomPoint() {
-        List<C> tp = new ArrayList<>(tuple.size());
+        List<C> tp = new ArrayList<C>(tuple.size());
         for (RealAlgebraicNumber<C> r : tuple) {
             C rp = r.ring.root.randomPoint();
             tp.add(rp);
@@ -129,6 +129,7 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
         for (RealAlgebraicNumber<C> r : tuple) {
             r.ring.refineRoot(eps);
         }
+        return;
     }
 
 
@@ -138,7 +139,7 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
      * @return a copy of this.
      */
     public RealRootTuple<C> copy() {
-        return new RealRootTuple<>(new ArrayList<>(tuple));
+        return new RealRootTuple<C>(new ArrayList<RealAlgebraicNumber<C>>(tuple));
     }
 
 
@@ -153,7 +154,7 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
         RealRootTuple<C> a = null;
         try {
             a = (RealRootTuple<C>) b;
-        } catch (ClassCastException ignored) {
+        } catch (ClassCastException e) {
         }
         if (a == null) {
             return false;
@@ -179,7 +180,7 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
      * @return list of coordinate points.
      */
     public List<BigRational> getRational() {
-        List<BigRational> center = new ArrayList<>(tuple.size());
+        List<BigRational> center = new ArrayList<BigRational>(tuple.size());
         for (RealAlgebraicNumber<C> rr : tuple) {
             BigRational r = rr.getRational();
             center.add(r);
@@ -194,7 +195,7 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
      * @return list of coordinate points.
      */
     public List<BigDecimal> decimalMagnitude() {
-        List<BigDecimal> center = new ArrayList<>(tuple.size());
+        List<BigDecimal> center = new ArrayList<BigDecimal>(tuple.size());
         for (RealAlgebraicNumber<C> rr : tuple) {
             BigDecimal r = rr.decimalMagnitude();
             center.add(r);

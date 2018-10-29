@@ -111,7 +111,7 @@ public final class ExpVectorInteger extends ExpVector
     public ExpVectorInteger(String s) throws NumberFormatException {
         super();
         // first format = (1,2,3,4,5,6,7)
-        List<Integer> exps = new ArrayList<>();
+        List<Integer> exps = new ArrayList<Integer>();
         s = s.trim();
         int b = s.indexOf('(');
         int e = s.indexOf(')', b + 1);
@@ -123,13 +123,13 @@ public final class ExpVectorInteger extends ExpVector
             while ((k = s.indexOf(',', b)) >= 0) {
                 teil = s.substring(b, k);
                 a = Integer.parseInt(teil);
-                exps.add(a);
+                exps.add(Integer.valueOf(a));
                 b = k + 1;
             }
             if (b <= e) {
                 teil = s.substring(b, e);
                 a = Integer.parseInt(teil);
-                exps.add(a);
+                exps.add(Integer.valueOf(a));
             }
             int length = exps.size();
             val = new int[length];
@@ -551,11 +551,11 @@ public final class ExpVectorInteger extends ExpVector
     public int signum() {
         int t = 0;
         int[] u = val;
-        for (int anU : u) {
-            if (anU < 0) {
+        for (int i = 0; i < u.length; i++) {
+            if (u[i] < 0) {
                 return -1;
             }
-            if (anU > 0) {
+            if (u[i] > 0) {
                 t = 1;
             }
         }
@@ -573,8 +573,8 @@ public final class ExpVectorInteger extends ExpVector
     public long totalDeg() {
         long t = 0;
         int[] u = val; // U.val;
-        for (int anU : u) {
-            t += anU;
+        for (int i = 0; i < u.length; i++) {
+            t += u[i];
         }
         return t;
         //return EVTDEG(this);
@@ -590,9 +590,9 @@ public final class ExpVectorInteger extends ExpVector
     public long maxDeg() {
         long t = 0;
         int[] u = val;
-        for (int anU : u) {
-            if (anU > t) {
-                t = anU;
+        for (int i = 0; i < u.length; i++) {
+            if (u[i] > t) {
+                t = u[i];
             }
         }
         return t;
@@ -613,7 +613,8 @@ public final class ExpVectorInteger extends ExpVector
         }
         long t = 0;
         int[] u = val;
-        for (long[] wj : w) {
+        for (int j = 0; j < w.length; j++) {
+            long[] wj = w[j];
             for (int i = 0; i < u.length; i++) {
                 t += wj[i] * u[i];
             }
@@ -687,8 +688,8 @@ public final class ExpVectorInteger extends ExpVector
      */
     public int dependentVariables() {
         int l = 0;
-        for (int aVal : val) {
-            if (aVal > 0) {
+        for (int i = 0; i < val.length; i++) {
+            if (val[i] > 0) {
                 l++;
             }
         }
@@ -1156,7 +1157,8 @@ public final class ExpVectorInteger extends ExpVector
         if (t == 0) {
             return t;
         }
-        for (long[] wk : w) {
+        for (int k = 0; k < w.length; k++) {
+            long[] wk = w[k];
             long up = 0;
             long vp = 0;
             for (int j = i; j < u.length; j++) {
@@ -1208,7 +1210,8 @@ public final class ExpVectorInteger extends ExpVector
         if (t == 0) {
             return t;
         }
-        for (long[] wk : w) {
+        for (int k = 0; k < w.length; k++) {
+            long[] wk = w[k];
             long up = 0;
             long vp = 0;
             for (int j = i; j < end; j++) {

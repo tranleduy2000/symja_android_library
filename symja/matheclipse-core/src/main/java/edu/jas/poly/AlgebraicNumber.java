@@ -100,7 +100,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      */
     @Override
     public AlgebraicNumber<C> copy() {
-        return new AlgebraicNumber<>(ring, val);
+        return new AlgebraicNumber<C>(ring, val);
     }
 
 
@@ -276,7 +276,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * @see edu.jas.structure.RingElem#abs()
      */
     public AlgebraicNumber<C> abs() {
-        return new AlgebraicNumber<>(ring, val.abs());
+        return new AlgebraicNumber<C>(ring, val.abs());
     }
 
 
@@ -287,7 +287,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * @return this+S.
      */
     public AlgebraicNumber<C> sum(AlgebraicNumber<C> S) {
-        return new AlgebraicNumber<>(ring, val.sum(S.val));
+        return new AlgebraicNumber<C>(ring, val.sum(S.val));
     }
 
 
@@ -298,7 +298,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * @return this+c.
      */
     public AlgebraicNumber<C> sum(GenPolynomial<C> c) {
-        return new AlgebraicNumber<>(ring, val.sum(c));
+        return new AlgebraicNumber<C>(ring, val.sum(c));
     }
 
 
@@ -309,7 +309,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * @return this+c.
      */
     public AlgebraicNumber<C> sum(C c) {
-        return new AlgebraicNumber<>(ring, val.sum(c));
+        return new AlgebraicNumber<C>(ring, val.sum(c));
     }
 
 
@@ -320,7 +320,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * @see edu.jas.structure.RingElem#negate()
      */
     public AlgebraicNumber<C> negate() {
-        return new AlgebraicNumber<>(ring, val.negate());
+        return new AlgebraicNumber<C>(ring, val.negate());
     }
 
 
@@ -342,7 +342,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * @return this-S.
      */
     public AlgebraicNumber<C> subtract(AlgebraicNumber<C> S) {
-        return new AlgebraicNumber<>(ring, val.subtract(S.val));
+        return new AlgebraicNumber<C>(ring, val.subtract(S.val));
     }
 
 
@@ -366,7 +366,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      */
     public AlgebraicNumber<C> inverse() {
         try {
-            return new AlgebraicNumber<>(ring, val.modInverse(ring.modul));
+            return new AlgebraicNumber<C>(ring, val.modInverse(ring.modul));
         } catch (AlgebraicNotInvertibleException e) {
             //System.out.println(e);
             throw e;
@@ -394,7 +394,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
             return ring.getZERO();
         }
         GenPolynomial<C> x = val.remainder(S.val);
-        return new AlgebraicNumber<>(ring, x);
+        return new AlgebraicNumber<C>(ring, x);
     }
 
 
@@ -417,7 +417,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      */
     public AlgebraicNumber<C> multiply(AlgebraicNumber<C> S) {
         GenPolynomial<C> x = val.multiply(S.val);
-        return new AlgebraicNumber<>(ring, x);
+        return new AlgebraicNumber<C>(ring, x);
     }
 
 
@@ -429,7 +429,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      */
     public AlgebraicNumber<C> multiply(C c) {
         GenPolynomial<C> x = val.multiply(c);
-        return new AlgebraicNumber<>(ring, x);
+        return new AlgebraicNumber<C>(ring, x);
     }
 
 
@@ -441,7 +441,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      */
     public AlgebraicNumber<C> multiply(GenPolynomial<C> c) {
         GenPolynomial<C> x = val.multiply(c);
-        return new AlgebraicNumber<>(ring, x);
+        return new AlgebraicNumber<C>(ring, x);
     }
 
 
@@ -451,7 +451,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
      * @return this with monic value part.
      */
     public AlgebraicNumber<C> monic() {
-        return new AlgebraicNumber<>(ring, val.monic());
+        return new AlgebraicNumber<C>(ring, val.monic());
     }
 
 
@@ -471,7 +471,7 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
         if (isUnit() || S.isUnit()) {
             return ring.getONE();
         }
-        return new AlgebraicNumber<>(ring, val.gcd(S.val));
+        return new AlgebraicNumber<C>(ring, val.gcd(S.val));
     }
 
 
@@ -539,9 +539,9 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
             r = qr[1];
         }
         //System.out.println("q = " + q + "\n c1 = " + c1 + "\n c2 = " + c2);
-        ret[0] = new AlgebraicNumber<>(ring, q);
-        ret[1] = new AlgebraicNumber<>(ring, c1);
-        ret[2] = new AlgebraicNumber<>(ring, c2);
+        ret[0] = new AlgebraicNumber<C>(ring, q);
+        ret[1] = new AlgebraicNumber<C>(ring, c1);
+        ret[2] = new AlgebraicNumber<C>(ring, c2);
         return ret;
     }
 

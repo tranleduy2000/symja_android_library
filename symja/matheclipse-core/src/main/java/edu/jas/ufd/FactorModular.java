@@ -73,7 +73,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P != null");
         }
-        SortedMap<Long, GenPolynomial<MOD>> facs = new TreeMap<>();
+        SortedMap<Long, GenPolynomial<MOD>> facs = new TreeMap<Long, GenPolynomial<MOD>>();
         if (P.isZERO()) {
             return facs;
         }
@@ -90,7 +90,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         GenPolynomial<MOD> h = x;
         GenPolynomial<MOD> f = P;
         GenPolynomial<MOD> g;
-        Power<GenPolynomial<MOD>> pow = new Power<>(pfac);
+        Power<GenPolynomial<MOD>> pow = new Power<GenPolynomial<MOD>>(pfac);
         long d = 0;
         while (d + 1 <= f.degree(0) / 2) {
             d++;
@@ -120,7 +120,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P != null");
         }
-        List<GenPolynomial<MOD>> facs = new ArrayList<>();
+        List<GenPolynomial<MOD>> facs = new ArrayList<GenPolynomial<MOD>>();
         if (P.isZERO()) {
             return facs;
         }
@@ -146,7 +146,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         GenPolynomial<MOD> h;
         GenPolynomial<MOD> f = P;
         //GreatestCommonDivisor<MOD> engine = GCDFactory.<MOD> getImplementation(pfac.coFac);
-        Power<GenPolynomial<MOD>> pow = new Power<>(pfac);
+        Power<GenPolynomial<MOD>> pow = new Power<GenPolynomial<MOD>>(pfac);
         GenPolynomial<MOD> g = null;
         int degi = (int) deg; //f.degree(0);
         //System.out.println("deg = " + deg);
@@ -195,7 +195,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
-        List<GenPolynomial<MOD>> factors = new ArrayList<>();
+        List<GenPolynomial<MOD>> factors = new ArrayList<GenPolynomial<MOD>>();
         if (P.isZERO()) {
             return factors;
         }
@@ -227,7 +227,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         //System.out.println("factors  = " + factors);
         factors = PolyUtil.monic(factors);
-        SortedSet<GenPolynomial<MOD>> ss = new TreeSet<>(factors);
+        SortedSet<GenPolynomial<MOD>> ss = new TreeSet<GenPolynomial<MOD>>(factors);
         //System.out.println("sorted   = " + ss);
         factors.clear();
         factors.addAll(ss);

@@ -86,7 +86,7 @@ public class RootUtil {
         }
         if (k < 0) {
             C mid = fac.parse(iv);
-            return new Interval<>(mid);
+            return new Interval<C>(mid);
         }
         //System.out.println("k  = " + k + ", len = " + iv.length());
         String ls = iv.substring(0, k).trim();
@@ -97,7 +97,7 @@ public class RootUtil {
         if (debug) {
             logger.debug("Interval: left = " + left + ", right = " + right);
         }
-        return new Interval<>(left, right);
+        return new Interval<C>(left, right);
     }
 
 
@@ -128,7 +128,7 @@ public class RootUtil {
         }
         if (k < 0) {
             Complex<C> mid = fac.parse(iv);
-            return new Rectangle<>(mid);
+            return new Rectangle<C>(mid);
         }
         //System.out.println("k  = " + k + ", len = " + iv.length());
         String ls = iv.substring(0, k).trim();
@@ -139,7 +139,7 @@ public class RootUtil {
         if (debug) {
             logger.debug("Rectangle: sw = " + sw + ", ne = " + ne);
         }
-        return new Rectangle<>(sw, ne);
+        return new Rectangle<C>(sw, ne);
     }
 
 }

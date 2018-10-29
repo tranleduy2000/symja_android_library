@@ -44,7 +44,7 @@ public class CharacteristicSetWu<C extends GcdRingElem<C>> implements Characteri
      * @return charSetWu(A).
      */
     public List<GenPolynomial<C>> characteristicSet(List<GenPolynomial<C>> A) {
-        List<GenPolynomial<C>> S = new ArrayList<>();
+        List<GenPolynomial<C>> S = new ArrayList<GenPolynomial<C>>();
         if (A == null || A.isEmpty()) {
             return S;
         }
@@ -58,8 +58,8 @@ public class CharacteristicSetWu<C extends GcdRingElem<C>> implements Characteri
         }
         // sort polynomials according to the main variable
         GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(1);
-        List<GenPolynomial<GenPolynomial<C>>> positiveDeg = new ArrayList<>();
-        List<GenPolynomial<C>> zeroDeg = new ArrayList<>();
+        List<GenPolynomial<GenPolynomial<C>>> positiveDeg = new ArrayList<GenPolynomial<GenPolynomial<C>>>();
+        List<GenPolynomial<C>> zeroDeg = new ArrayList<GenPolynomial<C>>();
         for (GenPolynomial<C> f : A) {
             if (f.isZERO()) {
                 continue;
@@ -80,9 +80,9 @@ public class CharacteristicSetWu<C extends GcdRingElem<C>> implements Characteri
             return S;
         }
         // do pseudo division wrt. the main variable
-        OrderedPolynomialList<GenPolynomial<C>> opl = new OrderedPolynomialList<>(rfac,
+        OrderedPolynomialList<GenPolynomial<C>> opl = new OrderedPolynomialList<GenPolynomial<C>>(rfac,
                 positiveDeg);
-        List<GenPolynomial<GenPolynomial<C>>> pd = new ArrayList<>(opl.list);
+        List<GenPolynomial<GenPolynomial<C>>> pd = new ArrayList<GenPolynomial<GenPolynomial<C>>>(opl.list);
         Collections.reverse(pd); // change OrderedPolynomialList to avoid
         if (debug) {
             logger.info("positive degrees: " + pd);
@@ -159,7 +159,7 @@ public class CharacteristicSetWu<C extends GcdRingElem<C>> implements Characteri
         }
         // select polynomials according to the main variable
         GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(1);
-        List<GenPolynomial<C>> zeroDeg = new ArrayList<>();
+        List<GenPolynomial<C>> zeroDeg = new ArrayList<GenPolynomial<C>>();
         int positiveDeg = 0;
         for (GenPolynomial<C> f : A) {
             if (f.isZERO()) {

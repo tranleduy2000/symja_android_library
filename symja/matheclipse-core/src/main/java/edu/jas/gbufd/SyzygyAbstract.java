@@ -55,8 +55,8 @@ public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy
      * Constructor.
      */
     public SyzygyAbstract() {
-        red = new ReductionSeq<>();
-        blas = new BasicLinAlg<>();
+        red = new ReductionSeq<C>();
+        blas = new BasicLinAlg<GenPolynomial<C>>();
     }
 
 
@@ -79,7 +79,7 @@ public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy
      * @return syz(F), a basis for the module of syzygies for F.
      */
     public List<List<GenPolynomial<C>>> zeroRelations(int modv, List<GenPolynomial<C>> F) {
-        List<List<GenPolynomial<C>>> Z = new ArrayList<>();
+        List<List<GenPolynomial<C>>> Z = new ArrayList<List<GenPolynomial<C>>>();
         if (F == null) {
             return Z;
         }
@@ -88,7 +88,7 @@ public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy
         while (mfac == null && i < F.size()) {
             GenPolynomial<C> p = F.get(i);
             if (p != null) {
-                mfac = new GenVectorModul<>(p.ring, F.size());
+                mfac = new GenVectorModul<GenPolynomial<C>>(p.ring, F.size());
             }
         }
         if (mfac == null) {
@@ -108,7 +108,7 @@ public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy
      * @return syz(v), a basis for the module of syzygies for v.
      */
     public List<List<GenPolynomial<C>>> zeroRelations(int modv, GenVector<GenPolynomial<C>> v) {
-        List<List<GenPolynomial<C>>> Z = new ArrayList<>();
+        List<List<GenPolynomial<C>>> Z = new ArrayList<List<GenPolynomial<C>>>();
         GenVectorModul<GenPolynomial<C>> mfac = v.modul;
         List<GenPolynomial<C>> F = v.val;
         GenVector<GenPolynomial<C>> S = mfac.getZERO();
@@ -169,11 +169,11 @@ public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy
         int modv = M.cols; // > 0  
         //System.out.println("modv = " + modv);
         List<List<GenPolynomial<C>>> G = zeroRelations(modv, F.list);
-        List<List<GenPolynomial<C>>> Z = new ArrayList<>();
+        List<List<GenPolynomial<C>>> Z = new ArrayList<List<GenPolynomial<C>>>();
         for (int i = 0; i < G.size(); i++) {
             //F = new PolynomialList(F.ring,(List)G.get(i));
             List<GenPolynomial<C>> Gi = G.get(i);
-            List<GenPolynomial<C>> Zi = new ArrayList<>();
+            List<GenPolynomial<C>> Zi = new ArrayList<GenPolynomial<C>>();
             // System.out.println("\nG("+i+") = " + G.get(i));
             for (int j = 0; j < Gi.size(); j++) {
                 //System.out.println("\nG("+i+","+j+") = " + Gi.get(j));
@@ -197,7 +197,7 @@ public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy
             //System.out.println("\nZ("+i+") = " + Zi);
             Z.add(Zi);
         }
-        N = new ModuleList<>(M.ring, Z);
+        N = new ModuleList<C>(M.ring, Z);
         //System.out.println("\n\nN = " + N);
         return N;
     }
@@ -284,11 +284,11 @@ public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy
         int modv = M.cols; // > 0  
         //System.out.println("modv = " + modv);
         List<List<GenPolynomial<C>>> G = zeroRelationsArbitrary(modv, F.list);
-        List<List<GenPolynomial<C>>> Z = new ArrayList<>();
+        List<List<GenPolynomial<C>>> Z = new ArrayList<List<GenPolynomial<C>>>();
         for (int i = 0; i < G.size(); i++) {
             //F = new PolynomialList(F.ring,(List)G.get(i));
             List<GenPolynomial<C>> Gi = G.get(i);
-            List<GenPolynomial<C>> Zi = new ArrayList<>();
+            List<GenPolynomial<C>> Zi = new ArrayList<GenPolynomial<C>>();
             // System.out.println("\nG("+i+") = " + G.get(i));
             for (int j = 0; j < Gi.size(); j++) {
                 //System.out.println("\nG("+i+","+j+") = " + Gi.get(j));
@@ -312,7 +312,7 @@ public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy
             //System.out.println("\nZ("+i+") = " + Zi);
             Z.add(Zi);
         }
-        N = new ModuleList<>(M.ring, Z);
+        N = new ModuleList<C>(M.ring, Z);
         //System.out.println("\n\nN = " + N);
         return N;
     }

@@ -175,7 +175,7 @@ public class AlgebraicRoots<C extends GcdRingElem<C> & Rational> implements Seri
      * @return a copy of this.
      */
     public AlgebraicRoots<C> copy() {
-        return new AlgebraicRoots<>(p, cp, real, complex);
+        return new AlgebraicRoots<C>(p, cp, real, complex);
     }
 
 
@@ -218,7 +218,7 @@ public class AlgebraicRoots<C extends GcdRingElem<C> & Rational> implements Seri
      * @return algebraic ring of roots.
      */
     public AlgebraicNumberRing<C> getAlgebraicRing() {
-        AlgebraicNumberRing<C> anr = new AlgebraicNumberRing<>(p);
+        AlgebraicNumberRing<C> anr = new AlgebraicNumberRing<C>(p);
         return anr;
     }
 }

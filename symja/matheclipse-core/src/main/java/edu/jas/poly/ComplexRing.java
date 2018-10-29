@@ -60,9 +60,9 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      */
     public List<Complex<C>> generators() {
         List<C> gens = ring.generators();
-        List<Complex<C>> g = new ArrayList<>(gens.size() + 1);
+        List<Complex<C>> g = new ArrayList<Complex<C>>(gens.size() + 1);
         for (C x : gens) {
-            Complex<C> cx = new Complex<>(this, x);
+            Complex<C> cx = new Complex<C>(this, x);
             g.add(cx);
         }
         g.add(getIMAG());
@@ -76,10 +76,10 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      * @return algebraic number ring. not jet possible.
      */
     public AlgebraicNumberRing<C> algebraicRing() {
-        GenPolynomialRing<C> pfac = new GenPolynomialRing<>(ring, 1, new TermOrder(TermOrder.INVLEX),
+        GenPolynomialRing<C> pfac = new GenPolynomialRing<C>(ring, 1, new TermOrder(TermOrder.INVLEX),
                 new String[]{"I"});
         GenPolynomial<C> I = pfac.univariate(0, 2L).sum(pfac.getONE());
-        AlgebraicNumberRing<C> afac = new AlgebraicNumberRing<>(I, ring.isField()); // must indicate field
+        AlgebraicNumberRing<C> afac = new AlgebraicNumberRing<C>(I, ring.isField()); // must indicate field
         return afac;
     }
 
@@ -102,7 +102,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      * @return a copy of c.
      */
     public Complex<C> copy(Complex<C> c) {
-        return new Complex<>(this, c.re, c.im);
+        return new Complex<C>(this, c.re, c.im);
     }
 
 
@@ -112,7 +112,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      * @return 0 as Complex&lt;C&gt;.
      */
     public Complex<C> getZERO() {
-        return new Complex<>(this);
+        return new Complex<C>(this);
     }
 
 
@@ -122,7 +122,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      * @return 1 as Complex&lt;C&gt;.
      */
     public Complex<C> getONE() {
-        return new Complex<>(this, ring.getONE());
+        return new Complex<C>(this, ring.getONE());
     }
 
 
@@ -132,7 +132,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      * @return i as Complex&lt;C&gt;.
      */
     public Complex<C> getIMAG() {
-        return new Complex<>(this, ring.getZERO(), ring.getONE());
+        return new Complex<C>(this, ring.getZERO(), ring.getONE());
     }
 
 
@@ -183,7 +183,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      * @return a Complex&lt;C&gt;.
      */
     public Complex<C> fromInteger(BigInteger a) {
-        return new Complex<>(this, ring.fromInteger(a));
+        return new Complex<C>(this, ring.fromInteger(a));
     }
 
 
@@ -194,7 +194,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      * @return a Complex&lt;C&gt;.
      */
     public Complex<C> fromInteger(long a) {
-        return new Complex<>(this, ring.fromInteger(a));
+        return new Complex<C>(this, ring.fromInteger(a));
     }
 
 
@@ -296,7 +296,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
     public Complex<C> random(int n, Random rnd) {
         C r = ring.random(n, rnd);
         C i = ring.random(n, rnd);
-        return new Complex<>(this, r, i);
+        return new Complex<C>(this, r, i);
     }
 
 
@@ -307,7 +307,7 @@ public class ComplexRing<C extends RingElem<C>> implements RingFactory<Complex<C
      * @return Complex<C> from s.
      */
     public Complex<C> parse(String s) {
-        return new Complex<>(this, s);
+        return new Complex<C>(this, s);
     }
 
 

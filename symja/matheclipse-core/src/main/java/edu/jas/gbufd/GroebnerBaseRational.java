@@ -43,7 +43,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
      * Constructor.
      */
     public GroebnerBaseRational() {
-        this(new GroebnerBasePseudoSeq<>(new BigInteger()));
+        this(new GroebnerBasePseudoSeq<BigInteger>(new BigInteger()));
     }
 
 
@@ -53,7 +53,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
      * @param threads the number of parallel threads.
      */
     public GroebnerBaseRational(int threads) {
-        this(new GroebnerBasePseudoParallel<>(threads, new BigInteger()));
+        this(new GroebnerBasePseudoParallel<BigInteger>(threads, new BigInteger()));
     }
 
 
@@ -63,7 +63,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
      * @param pl pair selection strategy
      */
     public GroebnerBaseRational(PairList<BigInteger> pl) {
-        this(new GroebnerBasePseudoSeq<>(new BigInteger(), pl));
+        this(new GroebnerBasePseudoSeq<BigInteger>(new BigInteger(), pl));
     }
 
 
@@ -74,7 +74,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
      * @param pl      pair selection strategy
      */
     public GroebnerBaseRational(int threads, PairList<BigInteger> pl) {
-        this(new GroebnerBasePseudoParallel<>(threads, new BigInteger(), pl));
+        this(new GroebnerBasePseudoParallel<BigInteger>(threads, new BigInteger(), pl));
     }
 
 
@@ -115,7 +115,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
         }
         GenPolynomialRing<BigRational> rring = F.get(0).ring;
         BigInteger cf = new BigInteger();
-        GenPolynomialRing<BigInteger> iring = new GenPolynomialRing<>(cf, rring);
+        GenPolynomialRing<BigInteger> iring = new GenPolynomialRing<BigInteger>(cf, rring);
         List<GenPolynomial<BigInteger>> Fi = PolyUtil.integerFromRationalCoefficients(iring, F);
         //System.out.println("Fi = " + Fi);
         logger.info("#Fi = " + Fi.size());
@@ -142,7 +142,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
             return Gp;
         }
         // remove zero polynomials
-        List<GenPolynomial<BigRational>> G = new ArrayList<>(Gp.size());
+        List<GenPolynomial<BigRational>> G = new ArrayList<GenPolynomial<BigRational>>(Gp.size());
         for (GenPolynomial<BigRational> a : Gp) {
             if (a != null && !a.isZERO()) { // always true in GB()
                 // already positive a = a.abs();
@@ -155,7 +155,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
         // remove top reducible polynomials
         GenPolynomial<BigRational> a;
         List<GenPolynomial<BigRational>> F;
-        F = new ArrayList<>(G.size());
+        F = new ArrayList<GenPolynomial<BigRational>>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
@@ -163,7 +163,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenPolynomial<BigRational>> ff;
-                    ff = new ArrayList<>(G);
+                    ff = new ArrayList<GenPolynomial<BigRational>>(G);
                     ff.addAll(F);
                     a = red.normalform(ff, a);
                     if (!a.isZERO()) {
@@ -182,7 +182,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
         // reduce remaining polynomials
         GenPolynomialRing<BigRational> rring = G.get(0).ring;
         BigInteger cf = new BigInteger();
-        GenPolynomialRing<BigInteger> iring = new GenPolynomialRing<>(cf, rring);
+        GenPolynomialRing<BigInteger> iring = new GenPolynomialRing<BigInteger>(cf, rring);
         List<GenPolynomial<BigInteger>> Fi = PolyUtil.integerFromRationalCoefficients(iring, F);
         logger.info("#Fi = " + Fi.size());
 

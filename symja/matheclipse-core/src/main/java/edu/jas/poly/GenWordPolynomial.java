@@ -170,7 +170,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * @return copy of this.
      */
     public GenWordPolynomial<C> copy() {
-        return new GenWordPolynomial<>(ring, this.val);
+        return new GenWordPolynomial<C>(ring, this.val);
     }
 
 
@@ -301,7 +301,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
                     s.append("( ");
                 }
                 String cs = c.toString();
-                if (cs.contains("+") || cs.contains("-")) {
+                if (cs.indexOf("+") >= 0 || cs.indexOf("-") >= 0) {
                     s.append("( " + cs + " )");
                 } else {
                     s.append(cs);
@@ -360,7 +360,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
                     s.append("( ");
                 }
                 String cs = c.toScript();
-                if (cs.contains("+") || cs.contains("-")) {
+                if (cs.indexOf("+") >= 0 || cs.indexOf("-") >= 0) {
                     s.append("( " + cs + " )");
                 } else {
                     s.append(cs);
@@ -672,7 +672,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
         Word lt = ai.next();
         lt = ai.next(); // size > 1
         SortedMap<Word, C> red = val.tailMap(lt);
-        return new GenWordPolynomial<>(ring, red);
+        return new GenWordPolynomial<C>(ring, red);
     }
 
 
@@ -1604,7 +1604,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * @return a PolyIterator.
      */
     public Iterator<WordMonomial<C>> iterator() {
-        return new WordPolyIterator<>(val);
+        return new WordPolyIterator<C>(val);
     }
 
 

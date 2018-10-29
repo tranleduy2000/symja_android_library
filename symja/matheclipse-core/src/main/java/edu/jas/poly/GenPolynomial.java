@@ -172,7 +172,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * @return copy of this.
      */
     public GenPolynomial<C> copy() {
-        return new GenPolynomial<>(ring, this.val);
+        return new GenPolynomial<C>(ring, this.val);
     }
 
 
@@ -336,7 +336,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
                     if (!c.isONE() || e.isZERO()) {
                         String cs = c.toString();
                         //if (c instanceof GenPolynomial || c instanceof AlgebraicNumber) {
-                        if (cs.contains("-") || cs.contains("+")) {
+                        if (cs.indexOf("-") >= 0 || cs.indexOf("+") >= 0) {
                             s.append("( ");
                             s.append(cs);
                             s.append(" )");
@@ -420,7 +420,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             }
             ExpVector e = m.getKey();
             String cs = c.toScript();
-            boolean parenthesis = (cs.contains("-") || cs.contains("+"));
+            boolean parenthesis = (cs.indexOf("-") >= 0 || cs.indexOf("+") >= 0);
             if (!c.isONE() || e.isZERO()) {
                 if (parenthesis) {
                     s.append("( ");
@@ -949,7 +949,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * @return list of u-v, where u = lt() and v != u in this.
      */
     public List<ExpVector> deltaExpVectors() {
-        List<ExpVector> de = new ArrayList<>(val.size());
+        List<ExpVector> de = new ArrayList<ExpVector>(val.size());
         if (val.isEmpty()) {
             return de;
         }
@@ -973,7 +973,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * @return list of u-v, where v != u in this.expVectors.
      */
     public List<ExpVector> deltaExpVectors(ExpVector u) {
-        List<ExpVector> de = new ArrayList<>(val.size());
+        List<ExpVector> de = new ArrayList<ExpVector>(val.size());
         if (val.isEmpty()) {
             return de;
         }
@@ -1148,6 +1148,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
                 nv.put(e, y);
             }
         }
+        return;
     }
 
 
@@ -1173,6 +1174,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         } else {
             nv.put(e, a);
         }
+        return;
     }
 
 
@@ -2256,7 +2258,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
     public Map<ExpVector, GenPolynomial<C>> contract(GenPolynomialRing<C> pfac) {
         GenPolynomial<C> zero = pfac.getZERO(); //not pfac.coFac;
         TermOrder t = new TermOrder(TermOrder.INVLEX);
-        Map<ExpVector, GenPolynomial<C>> B = new TreeMap<>(
+        Map<ExpVector, GenPolynomial<C>> B = new TreeMap<ExpVector, GenPolynomial<C>>(
                 t.getAscendComparator());
         if (this.isZERO()) {
             return B;
@@ -2482,7 +2484,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * @return a PolyIterator.
      */
     public Iterator<Monomial<C>> iterator() {
-        return new PolyIterator<>(val);
+        return new PolyIterator<C>(val);
     }
 
 

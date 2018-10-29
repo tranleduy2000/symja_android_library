@@ -107,7 +107,7 @@ public class FactorComplex<C extends GcdRingElem<C>> extends FactorAbsolute<Comp
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P == null");
         }
-        List<GenPolynomial<Complex<C>>> factors = new ArrayList<>();
+        List<GenPolynomial<Complex<C>>> factors = new ArrayList<GenPolynomial<Complex<C>>>();
         if (P.isZERO()) {
             return factors;
         }
@@ -129,7 +129,7 @@ public class FactorComplex<C extends GcdRingElem<C>> extends FactorAbsolute<Comp
             factors.add(pfac.getONE().multiply(ldcf));
         }
         //System.out.println("\nP = " + P);
-        GenPolynomialRing<AlgebraicNumber<C>> pafac = new GenPolynomialRing<>(afac, pfac);
+        GenPolynomialRing<AlgebraicNumber<C>> pafac = new GenPolynomialRing<AlgebraicNumber<C>>(afac, pfac);
         GenPolynomial<AlgebraicNumber<C>> A = PolyUtil.algebraicFromComplex(pafac, P);
         //System.out.println("A = " + A);
         List<GenPolynomial<AlgebraicNumber<C>>> afactors = factorAlgeb.baseFactorsSquarefree(A);

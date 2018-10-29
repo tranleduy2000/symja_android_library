@@ -75,7 +75,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
         if (list == null) {
             return slist;
         }
-        slist = new ArrayList<>(list.size());
+        slist = new ArrayList<GenSolvablePolynomial<C>>(list.size());
         GenSolvablePolynomial<C> s;
         for (GenPolynomial<C> p : list) {
             if (!(p instanceof GenSolvablePolynomial)) {
@@ -101,7 +101,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
         if (list == null) {
             return slist;
         }
-        slist = new ArrayList<>(list.size());
+        slist = new ArrayList<List<GenSolvablePolynomial<C>>>(list.size());
         List<GenSolvablePolynomial<C>> s;
         for (List<GenPolynomial<C>> p : list) {
             s = PolynomialList.castToSolvableList(p);
@@ -126,7 +126,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
         if (slist == null) {
             return list;
         }
-        list = new ArrayList<>(slist.size());
+        list = new ArrayList<GenPolynomial<C>>(slist.size());
         for (GenPolynomial<C> p : slist) {
             list.add(p);
         }
@@ -149,7 +149,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
         if (slist == null) {
             return list;
         }
-        list = new ArrayList<>(slist.size());
+        list = new ArrayList<List<GenPolynomial<C>>>(slist.size());
         for (List<? extends GenPolynomial<C>> p : slist) {
             list.add(PolynomialList.castToList(p));
         }
@@ -162,7 +162,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
      * @return a copy of this.
      */
     public PolynomialList<C> copy() {
-        return new PolynomialList<>(ring, new ArrayList<>(list));
+        return new PolynomialList<C>(ring, new ArrayList<GenPolynomial<C>>(list));
     }
 
     /**
@@ -341,15 +341,15 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
 
         List<List<GenPolynomial<C>>> vecs = null;
         if (list == null) {
-            return new ModuleList<>(pfac, vecs);
+            return new ModuleList<C>(pfac, vecs);
         }
         int rows = list.size();
-        vecs = new ArrayList<>(rows);
+        vecs = new ArrayList<List<GenPolynomial<C>>>(rows);
         if (rows == 0) { // nothing to do
-            return new ModuleList<>(pfac, vecs);
+            return new ModuleList<C>(pfac, vecs);
         }
 
-        ArrayList<GenPolynomial<C>> zr = new ArrayList<>(i - 1);
+        ArrayList<GenPolynomial<C>> zr = new ArrayList<GenPolynomial<C>>(i - 1);
         GenPolynomial<C> zero = pfac.getZERO();
         for (int j = 0; j < i; j++) {
             zr.add(j, zero);
@@ -359,7 +359,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
             if (p != null) {
                 Map<ExpVector, GenPolynomial<C>> r = p.contract(pfac);
                 //System.out.println("r = " + r );
-                List<GenPolynomial<C>> row = new ArrayList<>(zr); //zr.clone();
+                List<GenPolynomial<C>> row = new ArrayList<GenPolynomial<C>>(zr); //zr.clone();
                 for (Map.Entry<ExpVector, GenPolynomial<C>> me : r.entrySet()) {
                     ExpVector e = me.getKey();
                     int[] dov = e.dependencyOnVariables();
@@ -378,7 +378,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
                 vecs.add(row);
             }
         }
-        return new ModuleList<>(pfac, vecs);
+        return new ModuleList<C>(pfac, vecs);
     }
 
     /**
@@ -470,12 +470,12 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
      */
     public PolynomialList<C> homogenize() {
         GenPolynomialRing<C> pfac = ring.extend(1);
-        List<GenPolynomial<C>> hom = new ArrayList<>(list.size());
+        List<GenPolynomial<C>> hom = new ArrayList<GenPolynomial<C>>(list.size());
         for (GenPolynomial<C> p : list) {
             GenPolynomial<C> h = p.homogenize(pfac);
             hom.add(h);
         }
-        return new PolynomialList<>(pfac, hom);
+        return new PolynomialList<C>(pfac, hom);
     }
 
 
@@ -486,12 +486,12 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
      */
     public PolynomialList<C> deHomogenize() {
         GenPolynomialRing<C> pfac = ring.contract(1);
-        List<GenPolynomial<C>> dehom = new ArrayList<>(list.size());
+        List<GenPolynomial<C>> dehom = new ArrayList<GenPolynomial<C>>(list.size());
         for (GenPolynomial<C> p : list) {
             GenPolynomial<C> h = p.deHomogenize(pfac);
             dehom.add(h);
         }
-        return new PolynomialList<>(pfac, dehom);
+        return new PolynomialList<C>(pfac, dehom);
     }
 
 
@@ -522,7 +522,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
      * @return list of u-v, where u = lt() and v != u in p in list.
      */
     public SortedSet<ExpVector> deltaExpVectors() {
-        SortedSet<ExpVector> de = new TreeSet<>(ring.tord.getAscendComparator());
+        SortedSet<ExpVector> de = new TreeSet<ExpVector>(ring.tord.getAscendComparator());
         if (list.isEmpty()) {
             return de;
         }
@@ -541,7 +541,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
      * @return list of u-v, where u in mark and v != u in p.expVectors in list.
      */
     public SortedSet<ExpVector> deltaExpVectors(List<ExpVector> mark) {
-        SortedSet<ExpVector> de = new TreeSet<>(ring.tord.getAscendComparator());
+        SortedSet<ExpVector> de = new TreeSet<ExpVector>(ring.tord.getAscendComparator());
         if (list.isEmpty()) {
             return de;
         }
@@ -568,7 +568,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
      * @return list of polynomials with terms of maximal weight degree.
      */
     public List<GenPolynomial<C>> leadingWeightPolynomials() {
-        List<GenPolynomial<C>> lw = new ArrayList<>(list.size());
+        List<GenPolynomial<C>> lw = new ArrayList<GenPolynomial<C>>(list.size());
         if (list.isEmpty()) {
             return lw;
         }

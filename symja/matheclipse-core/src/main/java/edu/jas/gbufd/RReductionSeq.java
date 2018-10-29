@@ -460,7 +460,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
      */
     @Override
     public List<GenPolynomial<C>> irreducibleSet(List<GenPolynomial<C>> Pp) {
-        ArrayList<GenPolynomial<C>> P = new ArrayList<>();
+        ArrayList<GenPolynomial<C>> P = new ArrayList<GenPolynomial<C>>();
         if (Pp == null) {
             return null;
         }
@@ -635,7 +635,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
         if (F == null || F.size() == 0) {
             return F;
         }
-        List<GenPolynomial<C>> B = new ArrayList<>(F.size());
+        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>(F.size());
         for (GenPolynomial<C> a : F) {
             if (a == null) {
                 continue;
@@ -660,7 +660,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
         if (F == null || F.size() == 0) {
             return F;
         }
-        List<GenPolynomial<C>> B = new ArrayList<>(F);
+        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>(F);
         GenPolynomial<C> a;
         GenPolynomial<C> b;
         GenPolynomial<C> c;
@@ -697,7 +697,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
      * @return red(bc ( A)).
      */
     public List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F, GenPolynomial<C> A) {
-        List<GenPolynomial<C>> B = new ArrayList<>();
+        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>();
         if (A == null || A.isZERO()) {
             return B;
         }

@@ -99,7 +99,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      * @return a copy of c.
      */
     public AlgebraicNumber<C> copy(AlgebraicNumber<C> c) {
-        return new AlgebraicNumber<>(this, c.val);
+        return new AlgebraicNumber<C>(this, c.val);
     }
 
 
@@ -109,7 +109,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      * @return 0 as AlgebraicNumber.
      */
     public AlgebraicNumber<C> getZERO() {
-        return new AlgebraicNumber<>(this, ring.getZERO());
+        return new AlgebraicNumber<C>(this, ring.getZERO());
     }
 
 
@@ -119,7 +119,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      * @return 1 as AlgebraicNumber.
      */
     public AlgebraicNumber<C> getONE() {
-        return new AlgebraicNumber<>(this, ring.getONE());
+        return new AlgebraicNumber<C>(this, ring.getONE());
     }
 
 
@@ -129,7 +129,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      * @return alpha as AlgebraicNumber.
      */
     public AlgebraicNumber<C> getGenerator() {
-        return new AlgebraicNumber<>(this, ring.univariate(0));
+        return new AlgebraicNumber<C>(this, ring.univariate(0));
     }
 
 
@@ -141,9 +141,9 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      */
     public List<AlgebraicNumber<C>> generators() {
         List<GenPolynomial<C>> gc = ring.generators();
-        List<AlgebraicNumber<C>> gens = new ArrayList<>(gc.size());
+        List<AlgebraicNumber<C>> gens = new ArrayList<AlgebraicNumber<C>>(gc.size());
         for (GenPolynomial<C> g : gc) {
-            gens.add(new AlgebraicNumber<>(this, g));
+            gens.add(new AlgebraicNumber<C>(this, g));
         }
         return gens;
     }
@@ -226,6 +226,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         } else {
             isField = 0;
         }
+        return;
     }
 
     /**
@@ -246,7 +247,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      */
     public AlgebraicNumber<C> fillFromInteger(java.math.BigInteger a) {
         if (characteristic().signum() == 0) {
-            return new AlgebraicNumber<>(this, ring.fromInteger(a));
+            return new AlgebraicNumber<C>(this, ring.fromInteger(a));
         }
         java.math.BigInteger p = characteristic();
         java.math.BigInteger b = a;
@@ -263,7 +264,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
             t = t.multiply(x);
             b = q;
         } while (!b.equals(java.math.BigInteger.ZERO));
-        AlgebraicNumber<C> an = new AlgebraicNumber<>(this, v);
+        AlgebraicNumber<C> an = new AlgebraicNumber<C>(this, v);
         logger.info("fill(" + a + ") = " + v + ", mod: " + an);
         //RuntimeException e = new RuntimeException("hihihi");
         //e.printStackTrace();
@@ -289,7 +290,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      * @return a AlgebraicNumber.
      */
     public AlgebraicNumber<C> fromInteger(java.math.BigInteger a) {
-        return new AlgebraicNumber<>(this, ring.fromInteger(a));
+        return new AlgebraicNumber<C>(this, ring.fromInteger(a));
     }
 
 
@@ -300,7 +301,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      * @return a AlgebraicNumber.
      */
     public AlgebraicNumber<C> fromInteger(long a) {
-        return new AlgebraicNumber<>(this, ring.fromInteger(a));
+        return new AlgebraicNumber<C>(this, ring.fromInteger(a));
         //         if ( characteristic().signum() == 0 ) {
         //         }
         //         return fromInteger( new java.math.BigInteger(""+a) );
@@ -384,7 +385,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      */
     public AlgebraicNumber<C> random(int n) {
         GenPolynomial<C> x = ring.random(n).monic();
-        return new AlgebraicNumber<>(this, x);
+        return new AlgebraicNumber<C>(this, x);
     }
 
 
@@ -397,7 +398,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      */
     public AlgebraicNumber<C> random(int n, Random rnd) {
         GenPolynomial<C> x = ring.random(n, rnd).monic();
-        return new AlgebraicNumber<>(this, x);
+        return new AlgebraicNumber<C>(this, x);
     }
 
 
@@ -409,7 +410,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      */
     public AlgebraicNumber<C> parse(String s) {
         GenPolynomial<C> x = ring.parse(s);
-        return new AlgebraicNumber<>(this, x);
+        return new AlgebraicNumber<C>(this, x);
     }
 
 
@@ -421,7 +422,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      */
     public AlgebraicNumber<C> parse(Reader r) {
         GenPolynomial<C> x = ring.parse(r);
-        return new AlgebraicNumber<>(this, x);
+        return new AlgebraicNumber<C>(this, x);
     }
 
 
@@ -441,19 +442,19 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
                 System.out.println("AlgebraicNumber error " + c + ", " + a);
             }
         }
-        AlgebraicNumber<C> b = new AlgebraicNumber<>(a.ring, c.val);
+        AlgebraicNumber<C> b = new AlgebraicNumber<C>(a.ring, c.val);
         // c mod a.modul
         // c( tbcf(a.modul) ) if deg(a.modul)==1
         AlgebraicNumber<C> d = a.subtract(b); // a-c mod a.modul
         if (d.isZERO()) {
-            return new AlgebraicNumber<>(this, c.val);
+            return new AlgebraicNumber<C>(this, c.val);
         }
         b = d.multiply(ci); // b = (a-c)*ci mod a.modul
         // (c.modul*b)+c mod this.modul = c mod c.modul = 
         // (c.modul*ci*(a-c)+c) mod a.modul = a mod a.modul
         GenPolynomial<C> s = c.ring.modul.multiply(b.val);
         s = s.sum(c.val);
-        return new AlgebraicNumber<>(this, s);
+        return new AlgebraicNumber<C>(this, s);
     }
 
 
@@ -474,14 +475,14 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         // c( tbcf(a.modul) ) if deg(a.modul)==1
         C d = a.subtract(b); // a-c mod a.modul
         if (d.isZERO()) {
-            return new AlgebraicNumber<>(this, c.val);
+            return new AlgebraicNumber<C>(this, c.val);
         }
         b = d.multiply(ci); // b = (a-c)*ci mod a.modul
         // (c.modul*b)+c mod this.modul = c mod c.modul = 
         // (c.modul*ci*(a-c)+c) mod a.modul = a mod a.modul
         GenPolynomial<C> s = c.ring.modul.multiply(b);
         s = s.sum(c.val);
-        return new AlgebraicNumber<>(this, s);
+        return new AlgebraicNumber<C>(this, s);
     }
 
 
@@ -543,7 +544,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
      * @return a iterator over all algebraic numbers in this ring.
      */
     public Iterator<AlgebraicNumber<C>> iterator() {
-        return new AlgebraicNumberIterator<>(this);
+        return new AlgebraicNumberIterator<C>(this);
     }
 
 }
@@ -580,7 +581,7 @@ class AlgebraicNumberIterator<C extends RingElem<C>> implements Iterator<Algebra
         this.aring = aring;
         long d = aring.modul.degree(0);
         //System.out.println("d = " + d);
-        powers = new ArrayList<>((int) d);
+        powers = new ArrayList<GenPolynomial<C>>((int) d);
         for (long j = d - 1; j >= 0L; j--) {
             powers.add(aring.ring.univariate(0, j));
         }
@@ -588,16 +589,16 @@ class AlgebraicNumberIterator<C extends RingElem<C>> implements Iterator<Algebra
         if (!(cf instanceof Iterable)) {
             throw new IllegalArgumentException("only for iterable coefficients implemented");
         }
-        List<Iterable<C>> comps = new ArrayList<>((int) d);
+        List<Iterable<C>> comps = new ArrayList<Iterable<C>>((int) d);
         Iterable<C> cfi = (Iterable<C>) cf;
         for (long j = 0L; j < d; j++) {
             comps.add(cfi);
         }
         if (cf.isFinite()) {
-            CartesianProduct<C> tuples = new CartesianProduct<>(comps);
+            CartesianProduct<C> tuples = new CartesianProduct<C>(comps);
             iter = tuples.iterator();
         } else {
-            CartesianProductInfinite<C> tuples = new CartesianProductInfinite<>(comps);
+            CartesianProductInfinite<C> tuples = new CartesianProductInfinite<C>(comps);
             iter = tuples.iterator();
         }
         if (logger.isInfoEnabled()) {
@@ -633,7 +634,7 @@ class AlgebraicNumberIterator<C extends RingElem<C>> implements Iterator<Algebra
             }
             pol = pol.sum(f.multiply(c));
         }
-        return new AlgebraicNumber<>(aring, pol);
+        return new AlgebraicNumber<C>(aring, pol);
     }
 
 

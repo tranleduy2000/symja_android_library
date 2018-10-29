@@ -38,7 +38,7 @@ public class GreatestCommonDivisorModEval<MOD extends GcdRingElem<MOD> & Modular
      * Modular gcd algorithm to use.
      */
     protected final GreatestCommonDivisorAbstract<MOD> mufd
-            = new GreatestCommonDivisorSimple<>();
+            = new GreatestCommonDivisorSimple<MOD>();
     // not okay = new GreatestCommonDivisorPrimitive<MOD>();
     // not okay = new GreatestCommonDivisorSubres<MOD>();
 
@@ -135,7 +135,7 @@ public class GreatestCommonDivisorModEval<MOD extends GcdRingElem<MOD> & Modular
             logger.warn("cofac is not a field: " + cofac);
         }
         GenPolynomialRing<GenPolynomial<MOD>> rfac = fac.recursive(fac.nvar - 1);
-        GenPolynomialRing<MOD> mfac = new GenPolynomialRing<>(cofac, rfac);
+        GenPolynomialRing<MOD> mfac = new GenPolynomialRing<MOD>(cofac, rfac);
         GenPolynomialRing<MOD> ufac = (GenPolynomialRing<MOD>) rfac.coFac;
         //GenPolynomialRing<MOD> mfac = new GenPolynomialRing<MOD>(cofac, fac.nvar - 1, fac.tord);
         //GenPolynomialRing<MOD> ufac = new GenPolynomialRing<MOD>(cofac, 1, fac.tord);
@@ -369,7 +369,7 @@ public class GreatestCommonDivisorModEval<MOD extends GcdRingElem<MOD> & Modular
             logger.warn("cofac is not a field: " + cofac);
         }
         GenPolynomialRing<GenPolynomial<MOD>> rfac = fac.recursive(fac.nvar - 1);
-        GenPolynomialRing<MOD> mfac = new GenPolynomialRing<>(cofac, rfac);
+        GenPolynomialRing<MOD> mfac = new GenPolynomialRing<MOD>(cofac, rfac);
         GenPolynomialRing<MOD> ufac = (GenPolynomialRing<MOD>) rfac.coFac;
 
         // convert polynomials

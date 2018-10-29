@@ -78,14 +78,14 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
      * @return a resolution of M.
      */
     public List<SolvResPart<C>> resolution(ModuleList<C> M) {
-        List<SolvResPart<C>> R = new ArrayList<>();
+        List<SolvResPart<C>> R = new ArrayList<SolvResPart<C>>();
         ModuleList<C> MM = M;
         ModuleList<C> GM;
         ModuleList<C> Z;
         while (true) {
             GM = sbb.leftGB(MM);
             Z = leftZeroRelations(GM);
-            R.add(new SolvResPart<>(MM, GM, Z));
+            R.add(new SolvResPart<C>(MM, GM, Z));
             if (Z == null || Z.list == null || Z.list.size() == 0) {
                 break;
             }
@@ -110,11 +110,11 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
 
         G = sbb.leftGB(F.castToSolvableList());
         Z = leftZeroRelations(G);
-        Gl = new PolynomialList<>((GenSolvablePolynomialRing<C>) F.ring, G);
-        Zm = new ModuleList<>((GenSolvablePolynomialRing<C>) F.ring, Z);
+        Gl = new PolynomialList<C>((GenSolvablePolynomialRing<C>) F.ring, G);
+        Zm = new ModuleList<C>((GenSolvablePolynomialRing<C>) F.ring, Z);
 
         List R = resolution(Zm);
-        R.add(0, new SolvResPolPart<>(F, Gl, Zm));
+        R.add(0, new SolvResPolPart<C>(F, Gl, Zm));
         return R;
     }
 
@@ -126,14 +126,14 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
      * @return a resolution of M.
      */
     public List<SolvResPart<C>> resolutionArbitrary(ModuleList<C> M) {
-        List<SolvResPart<C>> R = new ArrayList<>();
+        List<SolvResPart<C>> R = new ArrayList<SolvResPart<C>>();
         ModuleList<C> MM = M;
         ModuleList<C> GM = null;
         ModuleList<C> Z;
         while (true) {
             //GM = sbb.leftGB(MM);
             Z = leftZeroRelationsArbitrary(MM);
-            R.add(new SolvResPart<>(MM, GM, Z));
+            R.add(new SolvResPart<C>(MM, GM, Z));
             if (Z == null || Z.list == null || Z.list.size() == 0) {
                 break;
             }
@@ -157,10 +157,10 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
         //List<GenSolvablePolynomial<C>> G = sbb.leftGB( F.castToSolvableList() );
         //Gl = new PolynomialList<C>((GenSolvablePolynomialRing<C>)F.ring, G);
         Z = leftZeroRelationsArbitrary(F.castToSolvableList());
-        Zm = new ModuleList<>((GenSolvablePolynomialRing<C>) F.ring, Z);
+        Zm = new ModuleList<C>((GenSolvablePolynomialRing<C>) F.ring, Z);
 
         List R = resolutionArbitrary(Zm);
-        R.add(0, new SolvResPolPart<>(F, Gl, Zm));
+        R.add(0, new SolvResPolPart<C>(F, Gl, Zm));
         return R;
     }
 
@@ -199,7 +199,7 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
 
         List<List<GenSolvablePolynomial<C>>> sg = leftZeroRelations(modv, G);
         GenSolvablePolynomialRing<C> ring = G.get(0).ring;
-        ModuleList<C> S = new ModuleList<>(ring, sg);
+        ModuleList<C> S = new ModuleList<C>(ring, sg);
         if (debug) {
             logger.info("syz = " + S);
         }
@@ -212,7 +212,7 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
         }
 
         List<List<GenSolvablePolynomial<C>>> sf;
-        sf = new ArrayList<>(sg.size());
+        sf = new ArrayList<List<GenSolvablePolynomial<C>>>(sg.size());
         //List<GenPolynomial<C>> row;
 
         for (List<GenSolvablePolynomial<C>> r : sg) {
@@ -220,7 +220,7 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
             Iterator<List<GenSolvablePolynomial<C>>> jt = G2F.iterator();
 
             List<GenSolvablePolynomial<C>> rf;
-            rf = new ArrayList<>(lenf);
+            rf = new ArrayList<GenSolvablePolynomial<C>>(lenf);
             for (int m = 0; m < lenf; m++) {
                 rf.add(ring.getZERO());
             }
@@ -253,13 +253,13 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
         }
 
         List<List<GenSolvablePolynomial<C>>> M;
-        M = new ArrayList<>(lenf);
+        M = new ArrayList<List<GenSolvablePolynomial<C>>>(lenf);
         for (List<GenSolvablePolynomial<C>> r : F2G) {
             Iterator<GenSolvablePolynomial<C>> it = r.iterator();
             Iterator<List<GenSolvablePolynomial<C>>> jt = G2F.iterator();
 
             List<GenSolvablePolynomial<C>> rf;
-            rf = new ArrayList<>(lenf);
+            rf = new ArrayList<GenSolvablePolynomial<C>>(lenf);
             for (int m = 0; m < lenf; m++) {
                 rf.add(ring.getZERO());
             }
@@ -303,11 +303,11 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
         */
         int sflen = sf.size();
         List<List<GenSolvablePolynomial<C>>> M2;
-        M2 = new ArrayList<>(lenf);
+        M2 = new ArrayList<List<GenSolvablePolynomial<C>>>(lenf);
         int i = 0;
         for (List<GenSolvablePolynomial<C>> ri : M) {
             List<GenSolvablePolynomial<C>> r2i;
-            r2i = new ArrayList<>(ri.size());
+            r2i = new ArrayList<GenSolvablePolynomial<C>>(ri.size());
             int j = 0;
             for (GenSolvablePolynomial<C> rij : ri) {
                 GenSolvablePolynomial<C> p = null;
@@ -327,13 +327,13 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
             }
             i++;
         }
-        ModuleList<C> M2L = new ModuleList<>(ring, M2);
+        ModuleList<C> M2L = new ModuleList<C>(ring, M2);
         if (debug) {
             logger.debug("syz M2L = " + M2L);
         }
 
         if (debug) {
-            ModuleList<C> SF = new ModuleList<>(ring, sf);
+            ModuleList<C> SF = new ModuleList<C>(ring, sf);
             logger.debug("syz sf = " + SF);
             logger.debug("#syz " + sflen + ", " + sf.size());
         }
@@ -391,7 +391,7 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
             return oc;
         }
         logger.info("computing left Ore condition: " + a + ", " + b);
-        List<GenSolvablePolynomial<C>> F = new ArrayList<>(2);
+        List<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>(2);
         F.add(a);
         F.add(b);
         List<List<GenSolvablePolynomial<C>>> Gz = leftZeroRelationsArbitrary(F);
@@ -471,7 +471,7 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
             return oc;
         }
         logger.info("computing right Ore condition: " + a + ", " + b);
-        List<GenSolvablePolynomial<C>> F = new ArrayList<>(2);
+        List<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>(2);
         F.add(a);
         F.add(b);
         List<List<GenSolvablePolynomial<C>>> Gz = rightZeroRelationsArbitrary(F);
@@ -526,15 +526,15 @@ public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyA
         //GenSolvablePolynomialRing<C> pfac = a.ring;
         oc = rightOreCond(a, b);
         logger.info("oc = " + Arrays.toString(oc)); // + ", a = " + a + ", b = " + b);
-        List<GenSolvablePolynomial<C>> F = new ArrayList<>(oc.length);
+        List<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>(oc.length);
         // opposite order and undo negation
         F.add((GenSolvablePolynomial<C>) oc[1].negate());
         F.add(oc[0]);
         //logger.info("F = " + F);
         List<List<GenSolvablePolynomial<C>>> Gz = leftZeroRelationsArbitrary(F);
         //logger.info("Gz: " + Gz);
-        List<GenSolvablePolynomial<C>> G1 = new ArrayList<>(Gz.size());
-        List<GenSolvablePolynomial<C>> G2 = new ArrayList<>(Gz.size());
+        List<GenSolvablePolynomial<C>> G1 = new ArrayList<GenSolvablePolynomial<C>>(Gz.size());
+        List<GenSolvablePolynomial<C>> G2 = new ArrayList<GenSolvablePolynomial<C>>(Gz.size());
         for (List<GenSolvablePolynomial<C>> ll : Gz) {
             if (!ll.get(0).isZERO()) { // && !ll.get(1).isZERO()
                 G1.add(ll.get(0)); // denominators

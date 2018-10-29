@@ -97,7 +97,7 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         // setup factory for real and imaginary parts
         ComplexRing<C> cr = (ComplexRing<C>) A.ring.coFac;
         RingFactory<C> cf = cr.ring;
-        rfac = new GenPolynomialRing<>(cf, A.ring);
+        rfac = new GenPolynomialRing<C>(cf, A.ring);
     }
 
 
@@ -115,7 +115,7 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         // setup factory for real and imaginary parts
         ComplexRing<C> cr = (ComplexRing<C>) A.ring.coFac;
         RingFactory<C> cf = cr.ring;
-        rfac = new GenPolynomialRing<>(cf, A.ring);
+        rfac = new GenPolynomialRing<C>(cf, A.ring);
     }
 
 
@@ -171,7 +171,7 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
      * @return a copy of this.
      */
     public Boundary<C> copy() {
-        return new Boundary<>(rect, A, polys);
+        return new Boundary<C>(rect, A, polys);
     }
 
 
@@ -186,7 +186,7 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         Boundary<C> a = null;
         try {
             a = (Boundary<C>) b;
-        } catch (ClassCastException ignored) {
+        } catch (ClassCastException e) {
         }
         if (a == null) {
             return false;

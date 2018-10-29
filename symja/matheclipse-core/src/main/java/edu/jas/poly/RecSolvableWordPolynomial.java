@@ -131,7 +131,7 @@ public class RecSolvableWordPolynomial<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvableWordPolynomial<C> copy() {
-        return new RecSolvableWordPolynomial<>(ring, this.val);
+        return new RecSolvableWordPolynomial<C>(ring, this.val);
     }
 
 
@@ -243,7 +243,7 @@ public class RecSolvableWordPolynomial<C extends RingElem<C>> extends
                         if (debug)
                             logger.info("coeff, crel = " + crel.p);
                         //System.out.println("coeff, e  = " + e + ", g = " + g + ", crel = " + crel);
-                        Cs = new RecSolvableWordPolynomial<>(ring, crel.p);
+                        Cs = new RecSolvableWordPolynomial<C>(ring, crel.p);
                         // rest of multiplication and update relations
                         if (crel.f != null) { // process remaining right power
                             //GenWordPolynomial<C> c2 = b.ring.getONE().multiply(crel.f);
@@ -330,7 +330,7 @@ public class RecSolvableWordPolynomial<C extends RingElem<C>> extends
                             TableRelation<GenWordPolynomial<C>> rel = ring.table.lookup(g2, f2);
                             if (debug)
                                 logger.info("poly, g  = " + g + ", f  = " + f + ", rel = " + rel);
-                            Ds = new RecSolvableWordPolynomial<>(ring, rel.p); //ring.copy(rel.p);
+                            Ds = new RecSolvableWordPolynomial<C>(ring, rel.p); //ring.copy(rel.p);
                             if (rel.f != null) {
                                 D2 = ring.valueOf(rel.f); //new RecSolvableWordPolynomial<C>(ring, one, rel.f);
                                 Ds = Ds.multiply(D2);

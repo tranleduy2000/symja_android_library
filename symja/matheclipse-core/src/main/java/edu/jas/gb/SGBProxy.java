@@ -109,7 +109,7 @@ public class SGBProxy<C extends GcdRingElem<C>> extends SolvableGroebnerBaseAbst
         }
         // parallel case
         List<GenSolvablePolynomial<C>> G = null;
-        List<Callable<List<GenSolvablePolynomial<C>>>> cs = new ArrayList<>(
+        List<Callable<List<GenSolvablePolynomial<C>>>> cs = new ArrayList<Callable<List<GenSolvablePolynomial<C>>>>(
                 2);
         cs.add(new Callable<List<GenSolvablePolynomial<C>>>() {
 
@@ -184,7 +184,7 @@ public class SGBProxy<C extends GcdRingElem<C>> extends SolvableGroebnerBaseAbst
         }
         // parallel case
         List<GenSolvablePolynomial<C>> G = null;
-        List<Callable<List<GenSolvablePolynomial<C>>>> cs = new ArrayList<>(
+        List<Callable<List<GenSolvablePolynomial<C>>>> cs = new ArrayList<Callable<List<GenSolvablePolynomial<C>>>>(
                 2);
         cs.add(new Callable<List<GenSolvablePolynomial<C>>>() {
 
@@ -259,7 +259,7 @@ public class SGBProxy<C extends GcdRingElem<C>> extends SolvableGroebnerBaseAbst
         }
         // parallel case
         List<GenSolvablePolynomial<C>> G = null;
-        List<Callable<List<GenSolvablePolynomial<C>>>> cs = new ArrayList<>(
+        List<Callable<List<GenSolvablePolynomial<C>>>> cs = new ArrayList<Callable<List<GenSolvablePolynomial<C>>>>(
                 2);
         cs.add(new Callable<List<GenSolvablePolynomial<C>>>() {
 

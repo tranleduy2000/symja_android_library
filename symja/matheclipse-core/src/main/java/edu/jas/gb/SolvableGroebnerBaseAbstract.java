@@ -97,11 +97,11 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
      * @param pl   pair selection strategy
      */
     public SolvableGroebnerBaseAbstract(SolvableReduction<C> sred, PairList<C> pl) {
-        this.red = new ReductionSeq<>();
+        this.red = new ReductionSeq<C>();
         this.sred = sred;
         this.strategy = pl;
-        blas = new BasicLinAlg<>();
-        cbb = new GroebnerBaseSeq<>();
+        blas = new BasicLinAlg<GenPolynomial<C>>();
+        cbb = new GroebnerBaseSeq<C>();
     }
 
 
@@ -118,7 +118,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         if (A == null) {
             return A;
         }
-        List<GenSolvablePolynomial<C>> N = new ArrayList<>(A.size());
+        List<GenSolvablePolynomial<C>> N = new ArrayList<GenSolvablePolynomial<C>>(A.size());
         if (A.isEmpty()) {
             return N;
         }
@@ -235,8 +235,8 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         }
         GenSolvablePolynomialRing<C> pring = F.get(0).ring;
         List<GenSolvablePolynomial<C>> G = leftGB(modv, F);
-        PolynomialList<C> Fp = new PolynomialList<>(pring, F);
-        PolynomialList<C> Gp = new PolynomialList<>(pring, G);
+        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
+        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
         return Fp.compareTo(Gp) == 0;
     }
 
@@ -271,7 +271,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         List<GenSolvablePolynomial<C>> X;
         X = PolynomialList.castToSolvableList(ring.generators(modv));
         logger.info("right multipliers = " + X);
-        List<GenSolvablePolynomial<C>> F = new ArrayList<>(Fp.size() * (1 + X.size()));
+        List<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>(Fp.size() * (1 + X.size()));
         F.addAll(Fp);
         GenSolvablePolynomial<C> p, q, x, pi, pj, s, h;
         for (int i = 0; i < Fp.size(); i++) {
@@ -338,8 +338,8 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         }
         GenSolvablePolynomialRing<C> pring = F.get(0).ring;
         List<GenSolvablePolynomial<C>> G = twosidedGB(modv, F);
-        PolynomialList<C> Fp = new PolynomialList<>(pring, F);
-        PolynomialList<C> Gp = new PolynomialList<>(pring, G);
+        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
+        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
         return Fp.compareTo(Gp) == 0;
     }
 
@@ -417,8 +417,8 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         }
         GenSolvablePolynomialRing<C> pring = F.get(0).ring;
         List<GenSolvablePolynomial<C>> G = rightGB(modv, F);
-        PolynomialList<C> Fp = new PolynomialList<>(pring, F);
-        PolynomialList<C> Gp = new PolynomialList<>(pring, G);
+        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
+        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
         return Fp.compareTo(Gp) == 0;
     }
 
@@ -466,7 +466,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
      * @return leftGBmi(F) a minimal left Groebner base of Gp.
      */
     public List<GenSolvablePolynomial<C>> leftMinimalGB(List<GenSolvablePolynomial<C>> Gp) {
-        ArrayList<GenSolvablePolynomial<C>> G = new ArrayList<>();
+        ArrayList<GenSolvablePolynomial<C>> G = new ArrayList<GenSolvablePolynomial<C>>();
         ListIterator<GenSolvablePolynomial<C>> it = Gp.listIterator();
         for (GenSolvablePolynomial<C> a : Gp) {
             // a = (SolvablePolynomial) it.next();
@@ -482,7 +482,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         ExpVector e;
         ExpVector f;
         GenSolvablePolynomial<C> a, p;
-        ArrayList<GenSolvablePolynomial<C>> F = new ArrayList<>();
+        ArrayList<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>();
         boolean mt;
 
         while (G.size() > 0) {
@@ -513,7 +513,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
             return G;
         }
 
-        F = new ArrayList<>();
+        F = new ArrayList<GenSolvablePolynomial<C>>();
         while (G.size() > 0) {
             a = G.remove(0);
             // System.out.println("doing " + a.length());
@@ -532,7 +532,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
      * @return rightGBmi(F) a minimal right Groebner base of Gp.
      */
     public List<GenSolvablePolynomial<C>> rightMinimalGB(List<GenSolvablePolynomial<C>> Gp) {
-        ArrayList<GenSolvablePolynomial<C>> G = new ArrayList<>();
+        ArrayList<GenSolvablePolynomial<C>> G = new ArrayList<GenSolvablePolynomial<C>>();
         ListIterator<GenSolvablePolynomial<C>> it = Gp.listIterator();
         for (GenSolvablePolynomial<C> a : Gp) {
             if (a.length() != 0) { // always true
@@ -546,7 +546,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         ExpVector e;
         ExpVector f;
         GenSolvablePolynomial<C> a, p;
-        ArrayList<GenSolvablePolynomial<C>> F = new ArrayList<>();
+        ArrayList<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>();
         boolean mt;
 
         while (G.size() > 0) {
@@ -577,7 +577,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
             return G;
         }
 
-        F = new ArrayList<>();
+        F = new ArrayList<GenSolvablePolynomial<C>>();
         while (G.size() > 0) {
             a = G.remove(0);
             // System.out.println("doing " + a.length());
@@ -629,7 +629,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         //System.out.println("reversed ring = " + rring);
         GenSolvablePolynomial<C> q;
         List<GenSolvablePolynomial<C>> rF;
-        rF = new ArrayList<>(F.size());
+        rF = new ArrayList<GenSolvablePolynomial<C>>(F.size());
         for (GenSolvablePolynomial<C> p : F) {
             if (p != null) {
                 q = (GenSolvablePolynomial<C>) p.reverse(rring);
@@ -637,7 +637,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
             }
         }
         if (logger.isInfoEnabled()) {
-            PolynomialList<C> pl = new PolynomialList<>(rring, rF);
+            PolynomialList<C> pl = new PolynomialList<C>(rring, rF);
             logger.info("reversed problem = " + pl.toScript());
         }
         List<GenSolvablePolynomial<C>> rG = leftGB(modv, rF);
@@ -651,7 +651,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         }
         //System.out.println("reversed left GB = " + rG);
         ring = rring.reverse(true); // true
-        G = new ArrayList<>(rG.size());
+        G = new ArrayList<GenSolvablePolynomial<C>>(rG.size());
         for (GenSolvablePolynomial<C> p : rG) {
             if (p != null) {
                 q = (GenSolvablePolynomial<C>) p.reverse(ring);
@@ -711,7 +711,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         GenSolvablePolynomialRing<C> sring = (GenSolvablePolynomialRing<C>) F.ring;
         int modv = M.cols;
         List<GenSolvablePolynomial<C>> G = leftGB(modv, F.castToSolvableList());
-        F = new PolynomialList<>(sring, G);
+        F = new PolynomialList<C>(sring, G);
         if (debug) {
             logger.info("G left +++++++++++++++++++ \n" + F);
         }
@@ -758,7 +758,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         GenSolvablePolynomialRing<C> sring = (GenSolvablePolynomialRing<C>) F.ring;
         int modv = M.cols;
         List<GenSolvablePolynomial<C>> G = twosidedGB(modv, F.castToSolvableList());
-        F = new PolynomialList<>(sring, G);
+        F = new PolynomialList<C>(sring, G);
         N = F.getModuleList(modv);
         return N;
     }
@@ -811,16 +811,16 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         GenSolvablePolynomialRing<C> rring = sring.reverse(true); //true
         sring = rring.reverse(true); // true
 
-        List<List<GenSolvablePolynomial<C>>> nlist = new ArrayList<>(M.rows);
+        List<List<GenSolvablePolynomial<C>>> nlist = new ArrayList<List<GenSolvablePolynomial<C>>>(M.rows);
         for (List<GenSolvablePolynomial<C>> row : mlist) {
-            List<GenSolvablePolynomial<C>> nrow = new ArrayList<>(row.size());
+            List<GenSolvablePolynomial<C>> nrow = new ArrayList<GenSolvablePolynomial<C>>(row.size());
             for (GenSolvablePolynomial<C> elem : row) {
                 GenSolvablePolynomial<C> nelem = (GenSolvablePolynomial<C>) elem.reverse(rring);
                 nrow.add(nelem);
             }
             nlist.add(nrow);
         }
-        ModuleList<C> rM = new ModuleList<>(rring, nlist);
+        ModuleList<C> rM = new ModuleList<C>(rring, nlist);
         if (debug) {
             logger.info("rM -------------------- \n" + rM);
         }
@@ -830,16 +830,16 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
             logger.info("isLeftGB(rMg) ---------- " + isLeftGB(rMg));
         }
         mlist = rMg.castToSolvableList();
-        nlist = new ArrayList<>(rMg.rows);
+        nlist = new ArrayList<List<GenSolvablePolynomial<C>>>(rMg.rows);
         for (List<GenSolvablePolynomial<C>> row : mlist) {
-            List<GenSolvablePolynomial<C>> nrow = new ArrayList<>(row.size());
+            List<GenSolvablePolynomial<C>> nrow = new ArrayList<GenSolvablePolynomial<C>>(row.size());
             for (GenSolvablePolynomial<C> elem : row) {
                 GenSolvablePolynomial<C> nelem = (GenSolvablePolynomial<C>) elem.reverse(sring);
                 nrow.add(nelem);
             }
             nlist.add(nrow);
         }
-        ModuleList<C> Mg = new ModuleList<>(sring, nlist);
+        ModuleList<C> Mg = new ModuleList<C>(sring, nlist);
         if (debug) {
             logger.info("Mg -------------------- \n" + Mg);
             logger.info("isRightGB(Mg) --------- " + isRightGB(Mg));
@@ -960,8 +960,8 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         GenSolvablePolynomialRing<C> pfac = G.get(0).ring;
         RingFactory<C> cfac = pfac.coFac;
 
-        GenPolynomialRing<C> cpfac = new GenPolynomialRing<>(cfac, ll, new TermOrder(TermOrder.INVLEX));
-        GenSolvablePolynomialRing<GenPolynomial<C>> rfac = new GenSolvablePolynomialRing<>(
+        GenPolynomialRing<C> cpfac = new GenPolynomialRing<C>(cfac, ll, new TermOrder(TermOrder.INVLEX));
+        GenSolvablePolynomialRing<GenPolynomial<C>> rfac = new GenSolvablePolynomialRing<GenPolynomial<C>>(
                 cpfac, pfac); // relations
         GenSolvablePolynomial<GenPolynomial<C>> P = rfac.getZERO();
         for (int k = 0; k < ll; k++) {
@@ -975,7 +975,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
             logger.info("univariate construction, deg_*(G) = " + ud);
             //throw new RuntimeException("check");
         }
-        GroebnerBaseAbstract<C> bbc = new GroebnerBaseSeq<>();
+        GroebnerBaseAbstract<C> bbc = new GroebnerBaseSeq<C>();
         GenSolvablePolynomial<C> X;
         GenSolvablePolynomial<C> XP;
         // solve system of linear equations for the coefficients of the univariate polynomial
@@ -993,7 +993,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
             GenSolvablePolynomial<GenPolynomial<C>> XPp = PolyUtil.toRecursive(rfac, XP);
             GenSolvablePolynomial<GenPolynomial<C>> XPs = (GenSolvablePolynomial<GenPolynomial<C>>) XPp
                     .sum(P);
-            ls = new ArrayList<>(XPs.getMap().values());
+            ls = new ArrayList<GenPolynomial<C>>(XPs.getMap().values());
             //System.out.println("ls,1 = " + ls);
             ls = red.irreducibleSet(ls);
             z = bbc.commonZeroTest(ls);
@@ -1007,7 +1007,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
                             "univariate polynomial degree greater than vector space dimansion");
                 }
                 cpfac = cpfac.extend(1);
-                rfac = new GenSolvablePolynomialRing<>(cpfac, pfac);
+                rfac = new GenSolvablePolynomialRing<GenPolynomial<C>>(cpfac, pfac);
                 P = PolyUtil.extendCoefficients(rfac, P, 0, 0L);
                 XPp = PolyUtil.extendCoefficients(rfac, XPp, 0, 1L);
                 P = (GenSolvablePolynomial<GenPolynomial<C>>) P.sum(XPp);
@@ -1015,7 +1015,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         } while (z != 0); // && ll <= 5 && !XP.isZERO()
         // construct result polynomial
         String var = pfac.getVars()[pfac.nvar - 1 - i];
-        GenSolvablePolynomialRing<C> ufac = new GenSolvablePolynomialRing<>(cfac, 1, new TermOrder(
+        GenSolvablePolynomialRing<C> ufac = new GenSolvablePolynomialRing<C>(cfac, 1, new TermOrder(
                 TermOrder.INVLEX), new String[]{var});
         GenSolvablePolynomial<C> pol = ufac.univariate(0, ll);
         for (GenPolynomial<C> pc : ls) {
@@ -1049,7 +1049,7 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
      * in ideal_left(G)
      */
     public List<GenSolvablePolynomial<C>> constructUnivariate(List<GenSolvablePolynomial<C>> G) {
-        List<GenSolvablePolynomial<C>> univs = new ArrayList<>();
+        List<GenSolvablePolynomial<C>> univs = new ArrayList<GenSolvablePolynomial<C>>();
         if (G == null || G.isEmpty()) {
             return univs;
         }

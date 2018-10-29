@@ -131,20 +131,20 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         if (F == null || F.size() == 0) {
             return F;
         }
-        List<GenPolynomial<C>> G = new ArrayList<>();
+        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>();
         if (F.size() <= 1) {
             GenPolynomial<C> p = F.get(0).monic();
             G.add(p);
             return G;
         }
         // convert to graded term order
-        List<GenPolynomial<C>> Fp = new ArrayList<>(F.size());
+        List<GenPolynomial<C>> Fp = new ArrayList<GenPolynomial<C>>(F.size());
         GenPolynomialRing<C> pfac = F.get(0).ring;
         if (!pfac.coFac.isField()) {
             throw new IllegalArgumentException("coefficients not from a field: " + pfac.coFac);
         }
         TermOrder tord = new TermOrder(TermOrder.IGRLEX);
-        GenPolynomialRing<C> gfac = new GenPolynomialRing<>(pfac.coFac, pfac.nvar, tord, pfac.getVars());
+        GenPolynomialRing<C> gfac = new GenPolynomialRing<C>(pfac.coFac, pfac.nvar, tord, pfac.getVars());
         for (GenPolynomial<C> p : F) {
             GenPolynomial<C> g = gfac.copy(p); // change term order
             Fp.add(g);
@@ -199,13 +199,13 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
 
         TermOrder invlex = new TermOrder(TermOrder.INVLEX);
         //Polynomial ring of newGB with invlex order
-        GenPolynomialRing<C> ufac = new GenPolynomialRing<>(cfac, numberOfVariables, invlex,
+        GenPolynomialRing<C> ufac = new GenPolynomialRing<C>(cfac, numberOfVariables, invlex,
                 ArrayOfVariables);
 
         //Local Lists
-        List<GenPolynomial<C>> newGB = new ArrayList<>(); //Instantiate the return list of polynomials
-        List<GenPolynomial<C>> H = new ArrayList<>(); //Instantiate a help list of polynomials
-        List<GenPolynomial<C>> redTerms = new ArrayList<>();//Instantiate the return list of reduced terms
+        List<GenPolynomial<C>> newGB = new ArrayList<GenPolynomial<C>>(); //Instantiate the return list of polynomials
+        List<GenPolynomial<C>> H = new ArrayList<GenPolynomial<C>>(); //Instantiate a help list of polynomials
+        List<GenPolynomial<C>> redTerms = new ArrayList<GenPolynomial<C>>();//Instantiate the return list of reduced terms
 
         //Local Polynomials
         GenPolynomial<C> t = ring.ONE; //Create ONE polynom of original polynomial ring
@@ -217,7 +217,7 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         //create new indeterminate Y1
         int indeterminates = 1; //Number of indeterminates, starting with Y1
         GenPolynomialRing<C> cpfac = createRingOfIndeterminates(ring, indeterminates);
-        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<>(cpfac, ring);
+        GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cpfac, ring);
         GenPolynomial<GenPolynomial<C>> q = rfac.getZERO().sum(cpfac.univariate(0));
 
         //Main while loop
@@ -229,7 +229,7 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
             //System.out.println("Zwischennormalform h = " + h.toString());
             hh = PolyUtil.toRecursive(rfac, h);
             p = hh.sum(q);
-            List<GenPolynomial<C>> Cf = new ArrayList<>(p.getMap().values());
+            List<GenPolynomial<C>> Cf = new ArrayList<GenPolynomial<C>>(p.getMap().values());
             Cf = red.irreducibleSet(Cf);
             //System.out.println("Cf = " + Cf);
             //System.out.println("Current Polynomial ring in Y_n: " + rfac.toString());
@@ -240,7 +240,7 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
                 indeterminates++; //then, increase number of indeterminates by one
                 redTerms.add(t); //add current t to list of reduced terms
                 cpfac = addIndeterminate(cpfac);
-                rfac = new GenPolynomialRing<>(cpfac, ring);
+                rfac = new GenPolynomialRing<GenPolynomial<C>>(cpfac, ring);
                 hh = PolyUtil.toRecursive(rfac, h);
                 GenPolynomial<GenPolynomial<C>> Yt = rfac.getZERO().sum(cpfac.univariate(0));
                 GenPolynomial<GenPolynomial<C>> Yth = hh.multiply(Yt);
@@ -297,8 +297,8 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         //not ok: if ( G == null || G.size() == 0 ) ...
         GenPolynomialRing<C> ring = t.ring;
         int numberOfVariables = ring.nvar;
-        GenPolynomial<C> u = new GenPolynomial<>(ring, t.leadingBaseCoefficient(), t.leadingExpVector()); //HeadTerm of of input polynomial
-        ReductionSeq<C> redHelp = new ReductionSeq<>(); // Create instance of ReductionSeq to use method isReducible
+        GenPolynomial<C> u = new GenPolynomial<C>(ring, t.leadingBaseCoefficient(), t.leadingExpVector()); //HeadTerm of of input polynomial
+        ReductionSeq<C> redHelp = new ReductionSeq<C>(); // Create instance of ReductionSeq to use method isReducible
         //not ok: if ( redHelp.isTopReducible(G,u) ) ...
         for (int i = numberOfVariables - 1; i >= 0; i--) { // Walk through all variables, starting with least w.r.t to lex-order
             GenPolynomial<C> x = ring.univariate(i); // Create Linear Polynomial X_i
@@ -326,7 +326,7 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         int numberOfVariables = ring.nvar; //Number of Variables of the given Polynomial Ring
         long[] degrees = new long[numberOfVariables]; //Array for the degree-limits for the reduced terms
 
-        List<GenPolynomial<C>> terms = new ArrayList<>(); //Instantiate the return object
+        List<GenPolynomial<C>> terms = new ArrayList<GenPolynomial<C>>(); //Instantiate the return object
         for (GenPolynomial<C> g : groebnerBasis) { //For each polynomial of G
             if (g.isONE()) {
                 terms.clear();
@@ -350,12 +350,12 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
             }
         }
         terms.add(ring.ONE); //Add the one-polynomial of the ring to the list of reduced terms
-        ReductionSeq<C> s = new ReductionSeq<>(); //Create instance of ReductionSeq to use method isReducible
+        ReductionSeq<C> s = new ReductionSeq<C>(); //Create instance of ReductionSeq to use method isReducible
 
         //Main Algorithm
         for (int i = 0; i < numberOfVariables; i++) {
             GenPolynomial<C> x = ring.univariate(i); //Create  Linear Polynomial X_i
-            List<GenPolynomial<C>> S = new ArrayList<>(terms); //Copy all entries of return list "terms" into list "S"
+            List<GenPolynomial<C>> S = new ArrayList<GenPolynomial<C>>(terms); //Copy all entries of return list "terms" into list "S"
             for (GenPolynomial<C> t : S) {
                 for (int l = 1; l <= degrees[i]; l++) {
                     t = t.multiply(x); //Multiply current element t with Linear Polynomial X_i
@@ -384,7 +384,7 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
             stringIndeterminates[j - 1] = ("Y" + j);
         }
         TermOrder invlex = new TermOrder(TermOrder.INVLEX);
-        GenPolynomialRing<C> cpfac = new GenPolynomialRing<>(cfac, indeterminates, invlex,
+        GenPolynomialRing<C> cpfac = new GenPolynomialRing<C>(cfac, indeterminates, invlex,
                 stringIndeterminates);
         return cpfac;
     }

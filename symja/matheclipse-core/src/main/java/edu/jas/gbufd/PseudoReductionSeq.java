@@ -340,7 +340,7 @@ public class PseudoReductionSeq<C extends RingElem<C>> extends ReductionAbstract
             return null;
         }
         C mfac = Ap.ring.getONECoefficient();
-        PseudoReductionEntry<C> pf = new PseudoReductionEntry<>(Ap, mfac);
+        PseudoReductionEntry<C> pf = new PseudoReductionEntry<C>(Ap, mfac);
         if (Pp == null || Pp.isEmpty()) {
             return pf;
         }
@@ -414,7 +414,7 @@ public class PseudoReductionSeq<C extends RingElem<C>> extends ReductionAbstract
         if (logger.isInfoEnabled()) {
             logger.info("multiplicative factor = " + mfac);
         }
-        pf = new PseudoReductionEntry<>(R, mfac);
+        pf = new PseudoReductionEntry<C>(R, mfac);
         return pf;
     }
 

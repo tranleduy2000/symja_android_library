@@ -69,9 +69,9 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @param root isolating rectangle for a complex root.
      */
     public ComplexAlgebraicRing(GenPolynomial<Complex<C>> m, Rectangle<C> root) {
-        algebraic = new AlgebraicNumberRing<>(m);
+        algebraic = new AlgebraicNumberRing<Complex<C>>(m);
         this.root = root;
-        engine = new ComplexRootsSturm<>(m.ring.coFac);
+        engine = new ComplexRootsSturm<C>(m.ring.coFac);
         if (m.ring.characteristic().signum() > 0) {
             throw new IllegalArgumentException("characteristic not zero");
         }
@@ -185,7 +185,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return a copy of c.
      */
     public ComplexAlgebraicNumber<C> copy(ComplexAlgebraicNumber<C> c) {
-        return new ComplexAlgebraicNumber<>(this, c.number);
+        return new ComplexAlgebraicNumber<C>(this, c.number);
     }
 
 
@@ -195,7 +195,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return 0 as ComplexAlgebraicNumber.
      */
     public ComplexAlgebraicNumber<C> getZERO() {
-        return new ComplexAlgebraicNumber<>(this, algebraic.getZERO());
+        return new ComplexAlgebraicNumber<C>(this, algebraic.getZERO());
     }
 
 
@@ -205,7 +205,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return 1 as ComplexAlgebraicNumber.
      */
     public ComplexAlgebraicNumber<C> getONE() {
-        return new ComplexAlgebraicNumber<>(this, algebraic.getONE());
+        return new ComplexAlgebraicNumber<C>(this, algebraic.getONE());
     }
 
 
@@ -217,7 +217,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
     public ComplexAlgebraicNumber<C> getIMAG() {
         ComplexRing<C> cr = (ComplexRing<C>) algebraic.ring.coFac;
         Complex<C> I = cr.getIMAG();
-        return new ComplexAlgebraicNumber<>(this, algebraic.getZERO().sum(I));
+        return new ComplexAlgebraicNumber<C>(this, algebraic.getZERO().sum(I));
     }
 
 
@@ -227,7 +227,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return alpha as ComplexAlgebraicNumber.
      */
     public ComplexAlgebraicNumber<C> getGenerator() {
-        return new ComplexAlgebraicNumber<>(this, algebraic.getGenerator());
+        return new ComplexAlgebraicNumber<C>(this, algebraic.getGenerator());
     }
 
 
@@ -239,7 +239,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      */
     public List<ComplexAlgebraicNumber<C>> generators() {
         List<AlgebraicNumber<Complex<C>>> agens = algebraic.generators();
-        List<ComplexAlgebraicNumber<C>> gens = new ArrayList<>(agens.size());
+        List<ComplexAlgebraicNumber<C>> gens = new ArrayList<ComplexAlgebraicNumber<C>>(agens.size());
         for (AlgebraicNumber<Complex<C>> a : agens) {
             gens.add(getZERO().sum(a.getVal()));
         }
@@ -304,7 +304,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return a ComplexAlgebraicNumber.
      */
     public ComplexAlgebraicNumber<C> fromInteger(java.math.BigInteger a) {
-        return new ComplexAlgebraicNumber<>(this, algebraic.fromInteger(a));
+        return new ComplexAlgebraicNumber<C>(this, algebraic.fromInteger(a));
     }
 
 
@@ -315,7 +315,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return a ComplexAlgebraicNumber.
      */
     public ComplexAlgebraicNumber<C> fromInteger(long a) {
-        return new ComplexAlgebraicNumber<>(this, algebraic.fromInteger(a));
+        return new ComplexAlgebraicNumber<C>(this, algebraic.fromInteger(a));
     }
 
 
@@ -384,7 +384,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return a random integer mod modul.
      */
     public ComplexAlgebraicNumber<C> random(int n) {
-        return new ComplexAlgebraicNumber<>(this, algebraic.random(n));
+        return new ComplexAlgebraicNumber<C>(this, algebraic.random(n));
     }
 
 
@@ -396,7 +396,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return a random integer mod modul.
      */
     public ComplexAlgebraicNumber<C> random(int n, Random rnd) {
-        return new ComplexAlgebraicNumber<>(this, algebraic.random(n, rnd));
+        return new ComplexAlgebraicNumber<C>(this, algebraic.random(n, rnd));
     }
 
 
@@ -407,7 +407,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return ComplexAlgebraicNumber from s.
      */
     public ComplexAlgebraicNumber<C> parse(String s) {
-        return new ComplexAlgebraicNumber<>(this, algebraic.parse(s));
+        return new ComplexAlgebraicNumber<C>(this, algebraic.parse(s));
     }
 
 
@@ -418,7 +418,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * @return next ComplexAlgebraicNumber from r.
      */
     public ComplexAlgebraicNumber<C> parse(Reader r) {
-        return new ComplexAlgebraicNumber<>(this, algebraic.parse(r));
+        return new ComplexAlgebraicNumber<C>(this, algebraic.parse(r));
     }
 
 }

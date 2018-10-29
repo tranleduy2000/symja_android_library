@@ -141,8 +141,8 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
     @SuppressWarnings("unchecked")
     public GenVector<C> copy() {
         //return modul.copy(this);
-        ArrayList<C> av = new ArrayList<>(val);
-        return new GenVector<>(modul, av);
+        ArrayList<C> av = new ArrayList<C>(val);
+        return new GenVector<C>(modul, av);
     }
 
 
@@ -222,13 +222,13 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      */
     public GenVector<C> sum(GenVector<C> b) {
         List<C> oval = b.val;
-        ArrayList<C> a = new ArrayList<>(modul.cols);
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
         int i = 0;
         for (C c : val) {
             C e = c.sum(oval.get(i++));
             a.add(e);
         }
-        return new GenVector<>(modul, a);
+        return new GenVector<C>(modul, a);
     }
 
 
@@ -240,13 +240,13 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      */
     public GenVector<C> subtract(GenVector<C> b) {
         List<C> oval = b.val;
-        ArrayList<C> a = new ArrayList<>(modul.cols);
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
         int i = 0;
         for (C c : val) {
             C e = c.subtract(oval.get(i++));
             a.add(e);
         }
-        return new GenVector<>(modul, a);
+        return new GenVector<C>(modul, a);
     }
 
 
@@ -256,12 +256,12 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      * @return -this
      */
     public GenVector<C> negate() {
-        ArrayList<C> a = new ArrayList<>(modul.cols);
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
         for (C c : val) {
             C e = c.negate();
             a.add(e);
         }
-        return new GenVector<>(modul, a);
+        return new GenVector<C>(modul, a);
     }
 
 
@@ -285,12 +285,12 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      * @return this*s
      */
     public GenVector<C> scalarMultiply(C s) {
-        ArrayList<C> a = new ArrayList<>(modul.cols);
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
         for (C c : val) {
             C e = c.multiply(s);
             a.add(e);
         }
-        return new GenVector<>(modul, a);
+        return new GenVector<C>(modul, a);
     }
 
 
@@ -301,12 +301,12 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      * @return s*this
      */
     public GenVector<C> leftScalarMultiply(C s) {
-        ArrayList<C> a = new ArrayList<>(modul.cols);
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
         for (C c : val) {
             C e = s.multiply(c);
             a.add(e);
         }
-        return new GenVector<>(modul, a);
+        return new GenVector<C>(modul, a);
     }
 
 
@@ -320,7 +320,7 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      */
     public GenVector<C> linearCombination(C s, GenVector<C> b, C t) {
         List<C> oval = b.val;
-        ArrayList<C> a = new ArrayList<>(modul.cols);
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
         int i = 0;
         for (C c : val) {
             C c1 = c.multiply(s);
@@ -328,7 +328,7 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
             C e = c1.sum(c2);
             a.add(e);
         }
-        return new GenVector<>(modul, a);
+        return new GenVector<C>(modul, a);
     }
 
 
@@ -341,14 +341,14 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      */
     public GenVector<C> linearCombination(GenVector<C> b, C t) {
         List<C> oval = b.val;
-        ArrayList<C> a = new ArrayList<>(modul.cols);
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
         int i = 0;
         for (C c : val) {
             C c2 = oval.get(i++).multiply(t);
             C e = c.sum(c2);
             a.add(e);
         }
-        return new GenVector<>(modul, a);
+        return new GenVector<C>(modul, a);
     }
 
 
@@ -362,14 +362,14 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      */
     public GenVector<C> linearCombination(C t, GenVector<C> b) {
         List<C> oval = b.val;
-        ArrayList<C> a = new ArrayList<>(modul.cols);
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
         int i = 0;
         for (C c : val) {
             C c2 = t.multiply(oval.get(i++));
             C e = c.sum(c2);
             a.add(e);
         }
-        return new GenVector<>(modul, a);
+        return new GenVector<C>(modul, a);
     }
 
 
@@ -384,7 +384,7 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
      */
     public GenVector<C> leftLinearCombination(C s, C t, GenVector<C> b) {
         List<C> oval = b.val;
-        ArrayList<C> a = new ArrayList<>(modul.cols);
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
         int i = 0;
         for (C c : val) {
             C c1 = s.multiply(c);
@@ -392,7 +392,7 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
             C e = c1.sum(c2);
             a.add(e);
         }
-        return new GenVector<>(modul, a);
+        return new GenVector<C>(modul, a);
     }
 
 

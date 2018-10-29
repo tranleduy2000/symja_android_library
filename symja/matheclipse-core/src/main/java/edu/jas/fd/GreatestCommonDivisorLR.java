@@ -73,7 +73,7 @@ public class GreatestCommonDivisorLR<C extends GcdRingElem<C>> extends GreatestC
         }
         GCDcoFactors<C> ret;
         if (P.isZERO() || S.isZERO()) {
-            ret = new GCDcoFactors<>(this, P, S, P, S, ring.getONE(), ring.getONE());
+            ret = new GCDcoFactors<C>(this, P, S, P, S, ring.getONE(), ring.getONE());
             return ret;
         }
         // compute on coefficients
@@ -115,11 +115,11 @@ public class GreatestCommonDivisorLR<C extends GcdRingElem<C>> extends GreatestC
         }
         // compute on main variable
         if (p.isONE()) {
-            ret = new GCDcoFactors<>(this, P, S, p, s, ring.valueOf(contPS), ring.getONE());
+            ret = new GCDcoFactors<C>(this, P, S, p, s, ring.valueOf(contPS), ring.getONE());
             return ret;
         }
         if (s.isONE()) {
-            ret = new GCDcoFactors<>(this, P, S, p, s, ring.valueOf(contPS), ring.getONE());
+            ret = new GCDcoFactors<C>(this, P, S, p, s, ring.valueOf(contPS), ring.getONE());
             return ret;
         }
         boolean field = ring.coFac.isField();
@@ -204,7 +204,7 @@ public class GreatestCommonDivisorLR<C extends GcdRingElem<C>> extends GreatestC
             }
             //System.out.println("isField: " + field);
         }
-        ret = new GCDcoFactors<>(this, P, S, p1, s1, ring.valueOf(contPS), q);
+        ret = new GCDcoFactors<C>(this, P, S, p1, s1, ring.valueOf(contPS), q);
         return ret;
     }
 
@@ -228,7 +228,7 @@ public class GreatestCommonDivisorLR<C extends GcdRingElem<C>> extends GreatestC
         }
         GCDcoFactors<C> ret;
         if (P.isZERO() || S.isZERO()) {
-            ret = new GCDcoFactors<>(this, P, S, P, S, ring.getONE(), ring.getONE());
+            ret = new GCDcoFactors<C>(this, P, S, P, S, ring.getONE(), ring.getONE());
             return ret;
         }
         // compute on coefficients
@@ -268,11 +268,11 @@ public class GreatestCommonDivisorLR<C extends GcdRingElem<C>> extends GreatestC
         }
         // compute on main variable
         if (p.isONE()) {
-            ret = new GCDcoFactors<>(this, P, S, p, s, ring.getONE(), ring.valueOf(contPS));
+            ret = new GCDcoFactors<C>(this, P, S, p, s, ring.getONE(), ring.valueOf(contPS));
             return ret;
         }
         if (s.isONE()) {
-            ret = new GCDcoFactors<>(this, P, S, p, s, ring.getONE(), ring.valueOf(contPS));
+            ret = new GCDcoFactors<C>(this, P, S, p, s, ring.getONE(), ring.valueOf(contPS));
             return ret;
         }
         boolean field = ring.coFac.isField();
@@ -337,7 +337,7 @@ public class GreatestCommonDivisorLR<C extends GcdRingElem<C>> extends GreatestC
             }
             //System.out.println("isField: " + field);
         }
-        ret = new GCDcoFactors<>(this, P, S, p1, s1, q, ring.valueOf(contPS));
+        ret = new GCDcoFactors<C>(this, P, S, p1, s1, q, ring.valueOf(contPS));
         return ret;
     }
 

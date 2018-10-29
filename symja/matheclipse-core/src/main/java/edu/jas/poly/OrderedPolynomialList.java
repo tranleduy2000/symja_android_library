@@ -99,7 +99,7 @@ public class OrderedPolynomialList<C extends RingElem<C>> extends PolynomialList
                 s[i++] = p;
             }
             Arrays.sort(s, cmp);
-            return new ArrayList<>(Arrays.asList(s));
+            return new ArrayList<GenPolynomial<C>>(Arrays.asList(s));
         } catch (ClassCastException ok) {
             System.out.println("Warning: polynomials not sorted");
         }
@@ -142,7 +142,7 @@ public class OrderedPolynomialList<C extends RingElem<C>> extends PolynomialList
                 s[i++] = p;
             }
             Arrays.sort(s, cmp);
-            return new ArrayList<>(Arrays.asList(s));
+            return new ArrayList<GenPolynomial<C>>(Arrays.asList(s));
         } catch (ClassCastException ok) {
             System.out.println("Warning: polynomials not sorted");
         }

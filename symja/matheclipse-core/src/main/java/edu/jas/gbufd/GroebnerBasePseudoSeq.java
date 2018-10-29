@@ -234,7 +234,7 @@ public class GroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends GroebnerBas
         // remove top reducible polynomials
         GenPolynomial<C> a;
         List<GenPolynomial<C>> F;
-        F = new ArrayList<>(G.size());
+        F = new ArrayList<GenPolynomial<C>>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
@@ -242,7 +242,7 @@ public class GroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends GroebnerBas
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenPolynomial<C>> ff;
-                    ff = new ArrayList<>(G);
+                    ff = new ArrayList<GenPolynomial<C>>(G);
                     ff.addAll(F);
                     a = red.normalform(ff, a);
                     if (!a.isZERO()) {

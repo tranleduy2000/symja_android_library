@@ -209,9 +209,9 @@ public class MultiplicativeSet<C extends GcdRingElem<C>> implements Serializable
         }
         List<GenPolynomial<C>> list;
         if (mset.size() == 0) {
-            list = new ArrayList<>(1);
+            list = new ArrayList<GenPolynomial<C>>(1);
             list.add(cc);
-            return new MultiplicativeSet<>(ring, list);
+            return new MultiplicativeSet<C>(ring, list);
         }
         GenPolynomial<C> c = removeFactors(cc);
         if (c.isConstant()) {
@@ -226,9 +226,9 @@ public class MultiplicativeSet<C extends GcdRingElem<C>> implements Serializable
         } else {
             logger.info("added to mset = " + c);
         }
-        list = new ArrayList<>(mset);
+        list = new ArrayList<GenPolynomial<C>>(mset);
         list.add(c);
-        return new MultiplicativeSet<>(ring, list);
+        return new MultiplicativeSet<C>(ring, list);
     }
 
 
@@ -240,7 +240,7 @@ public class MultiplicativeSet<C extends GcdRingElem<C>> implements Serializable
      * sub-classes.
      */
     public MultiplicativeSet<C> replace(List<GenPolynomial<C>> L) {
-        MultiplicativeSet<C> ms = new MultiplicativeSet<>(ring);
+        MultiplicativeSet<C> ms = new MultiplicativeSet<C>(ring);
         if (L == null || L.size() == 0) {
             return ms;
         }
@@ -300,7 +300,7 @@ public class MultiplicativeSet<C extends GcdRingElem<C>> implements Serializable
         if (mset.size() == 0) {
             return L;
         }
-        List<GenPolynomial<C>> M = new ArrayList<>(L.size());
+        List<GenPolynomial<C>> M = new ArrayList<GenPolynomial<C>>(L.size());
         for (GenPolynomial<C> p : L) {
             p = removeFactors(p);
             // nono, really: if ( !p.isConstant() ) {

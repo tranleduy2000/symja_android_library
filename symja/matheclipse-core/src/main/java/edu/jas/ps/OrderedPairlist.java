@@ -62,13 +62,13 @@ public class OrderedPairlist<C extends RingElem<C>> {
     public OrderedPairlist(int m, MultiVarPowerSeriesRing<C> r) {
         moduleVars = m;
         ring = r;
-        P = new ArrayList<>();
-        pairlist = new TreeMap<>(ring.polyRing().tord.getAscendComparator());
+        P = new ArrayList<MultiVarPowerSeries<C>>();
+        pairlist = new TreeMap<ExpVector, LinkedList<Pair<C>>>(ring.polyRing().tord.getAscendComparator());
         //pairlist = new TreeMap<ExpVector, LinkedList<Pair<C>>>(ring.polyRing().tord.getDescendComparator());
-        red = new ArrayList<>();
+        red = new ArrayList<BitSet>();
         putCount = 0;
         remCount = 0;
-        reduction = new ReductionSeq<>();
+        reduction = new ReductionSeq<C>();
     }
 
 
@@ -111,7 +111,7 @@ public class OrderedPairlist<C extends RingElem<C>> {
                 }
             }
             ExpVector g = e.lcm(f);
-            Pair<C> pair = new Pair<>(pj, p, j, l);
+            Pair<C> pair = new Pair<C>(pj, p, j, l);
             // redi = (BitSet)red.get(j);
             ///if ( j < l ) redi.set( l );
             // System.out.println("bitset."+j+" = " + redi );  
@@ -119,7 +119,7 @@ public class OrderedPairlist<C extends RingElem<C>> {
             //multiple pairs under same keys -> list of pairs
             LinkedList<Pair<C>> xl = pairlist.get(g);
             if (xl == null) {
-                xl = new LinkedList<>();
+                xl = new LinkedList<Pair<C>>();
             }
             //xl.addLast( pair ); // first or last ?
             xl.addFirst(pair); // first or last ? better for d- e-GBs

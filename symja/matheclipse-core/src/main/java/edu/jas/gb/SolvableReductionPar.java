@@ -92,8 +92,8 @@ public class SolvableReductionPar<C extends RingElem<C>> extends SolvableReducti
             m = S.leadingMonomial();
             e = m.getKey();
             a = m.getValue();
-            for (GenSolvablePolynomial<C> aP : P) {
-                p = aP;
+            for (int i = 0; i < P.length; i++) {
+                p = P[i];
                 f = p.leadingExpVector();
                 if (f != null) {
                     mt = e.multipleOf(f);
@@ -192,8 +192,8 @@ public class SolvableReductionPar<C extends RingElem<C>> extends SolvableReducti
             m = S.leadingMonomial();
             e = m.getKey();
             a = m.getValue();
-            for (GenSolvablePolynomial<C> aP : P) {
-                p = aP;
+            for (int i = 0; i < P.length; i++) {
+                p = P[i];
                 f = p.leadingExpVector();
                 if (f != null) {
                     mt = e.multipleOf(f);

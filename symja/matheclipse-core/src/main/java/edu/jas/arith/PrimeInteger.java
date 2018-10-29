@@ -159,7 +159,7 @@ public final class PrimeInteger {
         }
         //if (ms <= 1) {
         //}
-        List<Long> po = new ArrayList<>(l);
+        List<Long> po = new ArrayList<Long>(l);
         if (l == 0) {
             return po;
         }
@@ -374,7 +374,7 @@ public final class PrimeInteger {
             throw new UnsupportedOperationException("factors(long) only for longs less than BETA: " + BETA);
         }
         long ML, PL, AL, BL, CL, MLP, RL, SL;
-        SortedMap<Long, Integer> F = new TreeMap<>();
+        SortedMap<Long, Integer> F = new TreeMap<Long, Integer>();
         SortedMap<Long, Integer> FP = null;
         // search small prime factors
         ML = smallPrimeDivisors(n, F); // , F, ML
@@ -484,7 +484,7 @@ public final class PrimeInteger {
         if (n > BETA) {
             throw new UnsupportedOperationException("factors(long) only for longs less than BETA: " + BETA);
         }
-        SortedMap<Long, Integer> F = new TreeMap<>();
+        SortedMap<Long, Integer> F = new TreeMap<Long, Integer>();
         factorsPollardRho(n, F);
         return F;
     }
@@ -559,7 +559,7 @@ public final class PrimeInteger {
         //List<Long> SMPRM = smallPrimes(2, 500); //SMPRM;
         List<Long> PP;
 
-        List<Map.Entry<Long, Integer>> FP = new ArrayList<>(F.entrySet());
+        List<Map.Entry<Long, Integer>> FP = new ArrayList<Map.Entry<Long, Integer>>(F.entrySet());
         QL1 = 1L; //SACI.IONE;
         PL1 = 1L;
         int i = 0;
@@ -710,13 +710,13 @@ public final class PrimeInteger {
         ModLongRing ring = new ModLongRing(m);
         ModLong am = ring.fromInteger(a);
         MLP = (int) (m / 2L);
-        S = new ArrayList<>();
+        S = new ArrayList<ModLong>();
         for (int i = 0; i <= MLP; i++) {
             SL = ring.fromInteger(i);
             SL = SL.multiply(SL); //SACM.MDPROD( ML, IL, IL );
             S.add(SL);
         }
-        L = new TreeSet<>();
+        L = new TreeSet<ModLong>();
         SP = S;
         for (int i = MLP; i >= 0; i -= 1) {
             SL = SP.get(i);
@@ -731,7 +731,7 @@ public final class PrimeInteger {
                 }
             }
         }
-        Lp = new ArrayList<>(L);
+        Lp = new ArrayList<ModLong>(L);
         return Lp;
     }
 
@@ -792,7 +792,7 @@ public final class PrimeInteger {
                 }
             }
         }
-        L = new ArrayList<>();
+        L = new ArrayList<ModLong>();
         ModLongRing ring = new ModLongRing(ML);
         ModLongRing ring2;
         if (ML == 4L) {
@@ -811,7 +811,7 @@ public final class PrimeInteger {
             ML1 = 3L;
             ring2 = new ModLongRing(ML1);
             KL1 = 1L;
-            L1 = new ArrayList<>();
+            L1 = new ArrayList<ModLong>();
             L1.add(ring2.fromInteger(0));
         } else {
             ML1 = 27L;
@@ -835,7 +835,7 @@ public final class PrimeInteger {
             ring2 = new ModLongRing(ML1);
             J1Y = (AL2 - 1L);
             J2Y = (6L - AL2);
-            L1 = new ArrayList<>();
+            L1 = new ArrayList<ModLong>();
             L1.add(ring2.fromInteger(J1Y));
             L1.add(ring2.fromInteger(J2Y));
             KL1 = 2L;
@@ -856,9 +856,9 @@ public final class PrimeInteger {
         //System.out.println("FRESL: L = " + L + ", ring = " + ring.toScript());
 
         // moduli 7,11,13.
-        L1 = new ArrayList<>();
-        M = new ArrayList<>(3);
-        H = new ArrayList<>(3);
+        L1 = new ArrayList<ModLong>();
+        M = new ArrayList<Long>(3);
+        H = new ArrayList<Long>(3);
         //M = MASSTOR.COMPi( 7, MASSTOR.COMPi( 11, 13 ) );
         M.add(7L);
         M.add(11L);
@@ -899,7 +899,7 @@ public final class PrimeInteger {
      * @return list of units of Z sub 210.
      */
     public static List<Long> getUZ210() {
-        List<Long> UZ = new ArrayList<>();
+        List<Long> UZ = new ArrayList<Long>();
         java.math.BigInteger z210 = java.math.BigInteger.valueOf(210);
         //for (int i = 209; i >= 1; i -= 2) {
         for (long i = 1; i <= 209; i += 2) {
@@ -921,7 +921,7 @@ public final class PrimeInteger {
      */
     public static SortedMap<java.math.BigInteger, Integer> factors(java.math.BigInteger n) {
         java.math.BigInteger b = java.math.BigInteger.valueOf(BETA);
-        SortedMap<java.math.BigInteger, Integer> F = new TreeMap<>();
+        SortedMap<java.math.BigInteger, Integer> F = new TreeMap<java.math.BigInteger, Integer>();
         if (n.compareTo(b) > 0) {
             n = smallPrimeDivisors(n, F);
             if (n.compareTo(b) > 0) {

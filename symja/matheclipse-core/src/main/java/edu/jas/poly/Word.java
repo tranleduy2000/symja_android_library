@@ -435,7 +435,7 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
      * @return sorted map of letters and the number of its occurences.
      */
     public SortedMap<String, Integer> dependencyOnVariables() {
-        SortedMap<String, Integer> map = new TreeMap<>();
+        SortedMap<String, Integer> map = new TreeMap<String, Integer>();
         for (int i = 0; i < val.length(); i++) {
             String s = String.valueOf(val.charAt(i));
             Integer n = map.get(s);

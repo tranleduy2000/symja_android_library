@@ -83,8 +83,8 @@ public class GroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
      * @param rf coefficient ring factory.
      */
     public GroebnerBasePseudoRecSeq(RingFactory<GenPolynomial<C>> rf) {
-        this(new PseudoReductionSeq<GenPolynomial<C>>(), rf, new OrderedPairlist<>(
-                new GenPolynomialRing<>(rf, 1))); // 1=hack
+        this(new PseudoReductionSeq<GenPolynomial<C>>(), rf, new OrderedPairlist<GenPolynomial<C>>(
+                new GenPolynomialRing<GenPolynomial<C>>(rf, 1))); // 1=hack
     }
 
 
@@ -257,7 +257,7 @@ public class GroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         // remove top reducible polynomials
         GenPolynomial<GenPolynomial<C>> a;
         List<GenPolynomial<GenPolynomial<C>>> F;
-        F = new ArrayList<>(G.size());
+        F = new ArrayList<GenPolynomial<GenPolynomial<C>>>(G.size());
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
@@ -265,7 +265,7 @@ public class GroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenPolynomial<GenPolynomial<C>>> ff;
-                    ff = new ArrayList<>(G);
+                    ff = new ArrayList<GenPolynomial<GenPolynomial<C>>>(G);
                     ff.addAll(F);
                     a = redRec.normalformRecursive(ff, a);
                     if (!a.isZERO()) {

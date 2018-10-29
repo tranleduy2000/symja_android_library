@@ -316,7 +316,7 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      * @see edu.jas.structure.ElemFactory#generators()
      */
     public List<BigInteger> generators() {
-        List<BigInteger> g = new ArrayList<>(1);
+        List<BigInteger> g = new ArrayList<BigInteger>(1);
         g.add(getONE());
         return g;
     }

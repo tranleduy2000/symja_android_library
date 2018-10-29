@@ -54,7 +54,7 @@ public class WordPolyIterator<C extends RingElem<C>>
      * @return next monomial.
      */
     public WordMonomial<C> next() {
-        return new WordMonomial<>(ms.next());
+        return new WordMonomial<C>(ms.next());
     }
 
 

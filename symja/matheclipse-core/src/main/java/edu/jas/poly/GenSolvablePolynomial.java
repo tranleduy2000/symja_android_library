@@ -116,7 +116,7 @@ public class GenSolvablePolynomial<C extends RingElem<C>> extends GenPolynomial<
      */
     @Override
     public GenSolvablePolynomial<C> copy() {
-        return new GenSolvablePolynomial<>(ring, this.val);
+        return new GenSolvablePolynomial<C>(ring, this.val);
     }
 
 
