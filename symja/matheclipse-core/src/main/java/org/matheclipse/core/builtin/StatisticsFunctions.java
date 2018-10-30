@@ -585,7 +585,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		private static IExpr binCounts(IAST vector, final IExpr arg2, EvalEngine engine) {
-			INum dxNum = F.CD1;
+			INum dxNum = F.oneDouble();
 			int dx = 1;
 			int xMin = 0;
 			int xMax = Integer.MIN_VALUE;

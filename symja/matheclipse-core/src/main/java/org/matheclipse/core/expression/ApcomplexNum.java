@@ -10,6 +10,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IComplexNumImpl;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -274,7 +275,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 	}
 
 	@Override
-	public Num abs() {
+	public INum abs() {
 		return Num.valueOf(dabs());
 	}
 

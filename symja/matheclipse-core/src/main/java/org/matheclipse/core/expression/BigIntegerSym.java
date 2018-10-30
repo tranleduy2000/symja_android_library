@@ -11,6 +11,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -698,7 +699,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	}
 
 	@Override
-	public Num numValue() {
+	public INum numValue() {
 		return Num.valueOf(doubleValue());
 	}
 

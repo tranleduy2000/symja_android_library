@@ -12,6 +12,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -32,7 +33,7 @@ import java.util.TreeSet;
  * @see AbstractIntegerSym
  * @see BigIntegerSym
  */
-public class IntegerSym extends AbstractIntegerSym implements IExpr, IInteger {
+public class IntegerSym extends AbstractIntegerSym implements IInteger {
 
 	/**
 	 * 
@@ -769,7 +770,7 @@ public class IntegerSym extends AbstractIntegerSym implements IExpr, IInteger {
 	}
 
 	@Override
-	public Num numValue() {
+	public INum numValue() {
 		return Num.valueOf(doubleValue());
 	}
 

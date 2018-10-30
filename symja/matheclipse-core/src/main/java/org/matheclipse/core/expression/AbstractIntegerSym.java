@@ -11,6 +11,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IRational;
+import org.matheclipse.core.interfaces.IRationalImpl;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.numbertheory.Primality;
@@ -34,7 +35,7 @@ import edu.jas.arith.PrimeInteger;
  * @see BigIntegerSym
  *
  */
-public abstract class AbstractIntegerSym extends IIntegerImpl implements Externalizable {
+public abstract class AbstractIntegerSym extends IRationalImpl implements IInteger, Externalizable {
 	static final int low = -128;
 	static final int high = 128;
 	static final IntegerSym cache[];
@@ -137,7 +138,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements Externa
 		return new BigIntegerSym(bigInteger);
 	}
 
-	public static IntegerSym valueOf(final int newnum) {
+	public static IInteger valueOf(final int newnum) {
 		return (newnum >= low && newnum <= high) ? cache[newnum + (-low)] : new IntegerSym(newnum);
 	}
 
@@ -449,7 +450,7 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements Externa
 		}
 		for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
 			int key = entry.getKey();
-			AbstractIntegerSym is = valueOf(key);
+			IInteger is = valueOf(key);
 			for (int i = 0; i < entry.getValue(); i++) {
 				result.append(is);
 			}
@@ -879,4 +880,38 @@ public abstract class AbstractIntegerSym extends IIntegerImpl implements Externa
 	public byte[] toByteArray() {
 		return toBigNumerator().toByteArray();
 	}
+
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public abstract IInteger abs();
+
+	@Override
+	public IInteger div(int that) {
+		if (that == 1) {
+			return this;
+		}
+		return div(F.ZZ(that));
+	}
+
+	@Override
+	public IInteger mod(int that) {
+		if (that == 1) {
+			return F.C0;
+		}
+		return mod(F.ZZ(that));
+	}
+
+	/**
+	 * Multiply this integer with value
+	 *
+	 * @param value
+	 * @return
+	 */
+	@Override
+	public abstract IInteger multiply(int value);
+
+
 }

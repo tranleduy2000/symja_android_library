@@ -544,7 +544,7 @@ public class ApfloatNum extends INumImpl implements INum {
 	}
 
 	@Override
-	public Num numValue() {
+	public INum numValue() {
 		return Num.valueOf(doubleValue());
 	}
 

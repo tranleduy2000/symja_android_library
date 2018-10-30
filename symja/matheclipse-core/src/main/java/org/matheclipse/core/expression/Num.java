@@ -42,7 +42,7 @@ public class Num extends INumImpl implements INum {
 	 *            a double value.
 	 * @return a {@code Double} instance representing {@code d}.
 	 */
-	public static Num valueOf(final double d) {
+	public static INum valueOf(final double d) {
 		int i = (int) d;
 		if (i > (-2) && i < 2) {
 			switch (i) {
@@ -229,7 +229,7 @@ public class Num extends INumImpl implements INum {
 
 	/** {@inheritDoc} */
 	@Override
-	public Num abs() {
+	public INum abs() {
 		return valueOf(Math.abs(fDouble));
 	}
 

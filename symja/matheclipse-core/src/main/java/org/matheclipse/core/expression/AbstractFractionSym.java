@@ -16,6 +16,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IFractionImpl;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -487,7 +488,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	}
 
 	@Override
-	public Num numValue() {
+	public INum numValue() {
 		return Num.valueOf(doubleValue());
 	}
 

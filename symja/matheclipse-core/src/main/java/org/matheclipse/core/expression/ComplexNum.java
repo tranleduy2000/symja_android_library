@@ -324,7 +324,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 	}
 
 	@Override
-	public Num abs() {
+	public INum abs() {
 		return Num.valueOf(dabs());
 	}
 

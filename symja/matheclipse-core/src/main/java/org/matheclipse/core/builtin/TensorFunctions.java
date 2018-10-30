@@ -124,7 +124,7 @@ public class TensorFunctions {
 				IAST list = (IAST) ast.arg1();
 				IAST dims = (IAST) ast.arg2();
 				int[] dimension = Validate.checkListOfInts(dims, 1, Integer.MAX_VALUE);
-				IExpr padding = F.C0;
+				IExpr padding = F.zeroInteger();
 				if (ast.size() == 4) {
 					padding = ast.arg3();
 				}
