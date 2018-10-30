@@ -32,31 +32,34 @@ import org.logicng.formulas.FormulaFactory;
 
 /**
  * Super class for a formula parser.
+ *
  * @version 1.2
  * @since 1.2
  */
 public abstract class FormulaParser {
 
-  private final FormulaFactory f;
-
-  /**
-   * Constructor.
-   * @param f the formula factory
-   */
-  public FormulaParser(FormulaFactory f) {
-    this.f = f;
-  }
+    private final FormulaFactory f;
 
     /**
-   * Returns the factory of this parser.
-   * @return the factory of this parser
-   */
-  public FormulaFactory factory() {
-    return this.f;
-  }
+     * Constructor.
+     *
+     * @param f the formula factory
+     */
+    public FormulaParser(FormulaFactory f) {
+        this.f = f;
+    }
 
-  @Override
-  public String toString() {
-    return this.getClass().getSimpleName();
-  }
+    /**
+     * Returns the factory of this parser.
+     *
+     * @return the factory of this parser
+     */
+    public FormulaFactory factory() {
+        return this.f;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }

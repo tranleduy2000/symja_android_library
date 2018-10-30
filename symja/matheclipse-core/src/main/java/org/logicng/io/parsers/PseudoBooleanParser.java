@@ -61,27 +61,29 @@ import org.logicng.formulas.FormulaFactory;
  * <p>
  * A valid pseudo Boolean expression is of the form {@code c_1 * l_1 + ... + c_n * l_n R k} where the {@code c_i} are coefficients,
  * {@code l_i} are literals, and {@code R} is one of {@code =, >, >=, <, <=}.
+ *
  * @version 1.2
  * @since 1.0
  */
 public final class PseudoBooleanParser extends FormulaParser {
 
-  private final PseudoBooleanLexer lexer;
-  private final LogicNGPseudoBooleanParser parser;
+    private final PseudoBooleanLexer lexer;
+    private final LogicNGPseudoBooleanParser parser;
 
-  /**
-   * Constructs a new parser for pseudo boolean formulas.
-   * @param f the formula factory
-   */
-  public PseudoBooleanParser(final FormulaFactory f) {
-    super(f);
-    this.lexer = new PseudoBooleanLexer(null);
-    CommonTokenStream tokens = new CommonTokenStream(this.lexer);
-    this.parser = new LogicNGPseudoBooleanParser(tokens);
-    this.parser.setFormulaFactory(f);
-    this.lexer.removeErrorListeners();
-    this.parser.removeErrorListeners();
-    this.parser.setErrorHandler(new BailErrorStrategy());
-  }
+    /**
+     * Constructs a new parser for pseudo boolean formulas.
+     *
+     * @param f the formula factory
+     */
+    public PseudoBooleanParser(final FormulaFactory f) {
+        super(f);
+        this.lexer = new PseudoBooleanLexer(null);
+        CommonTokenStream tokens = new CommonTokenStream(this.lexer);
+        this.parser = new LogicNGPseudoBooleanParser(tokens);
+        this.parser.setFormulaFactory(f);
+        this.lexer.removeErrorListeners();
+        this.parser.removeErrorListeners();
+        this.parser.setErrorHandler(new BailErrorStrategy());
+    }
 
 }

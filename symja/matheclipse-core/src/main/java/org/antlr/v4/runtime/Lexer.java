@@ -10,16 +10,14 @@ import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
 
-import java.util.ArrayList;
 import java.util.EmptyStackException;
-import java.util.List;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
  *  uses simplified match() and error recovery mechanisms in the interest
  *  of speed.
  */
-public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
+public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	implements TokenSource
 {
 	public static final int DEFAULT_MODE = 0;
@@ -334,19 +332,6 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	@Deprecated
 	public String[] getTokenNames() {
 		return null;
-	}
-
-	/** Return a list of all Token objects in input char stream.
-	 *  Forces load of all tokens. Does not include EOF token.
-	 */
-	public List<? extends Token> getAllTokens() {
-		List<Token> tokens = new ArrayList<Token>();
-		Token t = nextToken();
-		while ( t.getType()!=Token.EOF ) {
-			tokens.add(t);
-			t = nextToken();
-		}
-		return tokens;
 	}
 
 	public void recover(LexerNoViableAltException e) {

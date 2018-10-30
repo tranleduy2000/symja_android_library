@@ -54,38 +54,39 @@ import org.logicng.formulas.Variable;
 
 /**
  * Encodes that at most one variable is assigned value true.  Uses the Ladder/Regular encoding.
+ *
  * @version 1.1
  * @since 1.0
  */
 final class CCAMOLadder implements CCAtMostOne {
 
-  /**
-   * Constructs the naive AMO encoder.
-   */
-  CCAMOLadder() {
-  }
-
-  @Override
-  public void build(final EncodingResult result, final Variable... vars) {
-    result.reset();
-    final Variable[] seqAuxiliary = new Variable[vars.length - 1];
-    for (int i = 0; i < vars.length - 1; i++)
-      seqAuxiliary[i] = result.newVariable();
-    for (int i = 0; i < vars.length; i++) {
-      if (i == 0)
-        result.addClause(vars[0].negate(), seqAuxiliary[0]);
-      else if (i == vars.length - 1)
-        result.addClause(vars[i].negate(), seqAuxiliary[i - 1].negate());
-      else {
-        result.addClause(vars[i].negate(), seqAuxiliary[i]);
-        result.addClause(seqAuxiliary[i - 1].negate(), seqAuxiliary[i]);
-        result.addClause(vars[i].negate(), seqAuxiliary[i - 1].negate());
-      }
+    /**
+     * Constructs the naive AMO encoder.
+     */
+    CCAMOLadder() {
     }
-  }
 
-  @Override
-  public String toString() {
-    return this.getClass().getSimpleName();
-  }
+    @Override
+    public void build(final EncodingResult result, final Variable... vars) {
+        result.reset();
+        final Variable[] seqAuxiliary = new Variable[vars.length - 1];
+        for (int i = 0; i < vars.length - 1; i++)
+            seqAuxiliary[i] = result.newVariable();
+        for (int i = 0; i < vars.length; i++) {
+            if (i == 0)
+                result.addClause(vars[0].negate(), seqAuxiliary[0]);
+            else if (i == vars.length - 1)
+                result.addClause(vars[i].negate(), seqAuxiliary[i - 1].negate());
+            else {
+                result.addClause(vars[i].negate(), seqAuxiliary[i]);
+                result.addClause(seqAuxiliary[i - 1].negate(), seqAuxiliary[i]);
+                result.addClause(vars[i].negate(), seqAuxiliary[i - 1].negate());
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }

@@ -36,31 +36,33 @@ import org.logicng.formulas.Variable;
  * <p></p>
  * This variable is used, if the result is added directly to a solver.  In this case no variable on the factory has
  * to be created.
+ *
  * @version 1.3
  * @since 1.1
  */
 final class EncodingAuxiliaryVariable extends Variable {
 
-  final boolean negated;
+    final boolean negated;
 
-  /**
-   * Constructs a new auxiliary variable
-   * @param name    the literal name
-   * @param negated {@code true} if the variables is negated, {@code false} otherwise
-   */
-  EncodingAuxiliaryVariable(String name, boolean negated) {
-    super(name, null);
-    this.negated = negated;
-  }
+    /**
+     * Constructs a new auxiliary variable
+     *
+     * @param name    the literal name
+     * @param negated {@code true} if the variables is negated, {@code false} otherwise
+     */
+    EncodingAuxiliaryVariable(String name, boolean negated) {
+        super(name, null);
+        this.negated = negated;
+    }
 
 
-  @Override
-  public Literal negate() {
-    return new EncodingAuxiliaryVariable(this.name(), !this.negated);
-  }
+    @Override
+    public Literal negate() {
+        return new EncodingAuxiliaryVariable(this.name(), !this.negated);
+    }
 
-  @Override
-  public String toString() {
-    return name();
-  }
+    @Override
+    public String toString() {
+        return name();
+    }
 }

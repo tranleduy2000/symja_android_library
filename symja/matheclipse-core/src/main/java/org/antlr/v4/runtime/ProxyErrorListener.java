@@ -30,7 +30,7 @@ public class ProxyErrorListener implements ANTLRErrorListener {
 	}
 
 	@Override
-	public void syntaxError(Recognizer<?, ?> recognizer,
+	public void syntaxError(Recognizer<?> recognizer,
 							Object offendingSymbol,
 							int line,
 							int charPositionInLine,

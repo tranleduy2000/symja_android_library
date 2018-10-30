@@ -35,24 +35,27 @@ import org.logicng.formulas.FormulaFactory;
 /**
  * An interface for a proposition in LogicNG.  A proposition is a collection of formulas with a additional information
  * like a textual description or a user-provided object.
+ *
  * @version 1.0
  * @since 1.0
  */
 public abstract class Proposition {
 
-  /**
-   * Returns the formulas of this constraint.
-   * @return the formulas of this constraint
-   */
-  public abstract ImmutableFormulaList formulas();
+    /**
+     * Returns the formulas of this constraint.
+     *
+     * @return the formulas of this constraint
+     */
+    public abstract ImmutableFormulaList formulas();
 
-  /**
-   * Returns the formula of this proposition.
-   * @param f the formula factory
-   * @return the formula of this proposition
-   */
-  public Formula formula(final FormulaFactory f) {
-    return this.formulas().formula(f);
-  }
+    /**
+     * Returns the formula of this proposition.
+     *
+     * @param f the formula factory
+     * @return the formula of this proposition
+     */
+    public Formula formula(final FormulaFactory f) {
+        return this.formulas().formula(f);
+    }
 
 }

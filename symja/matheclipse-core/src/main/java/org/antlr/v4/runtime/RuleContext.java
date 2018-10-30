@@ -208,7 +208,7 @@ public class RuleContext implements RuleNode {
 		return toString((List<String>)null, null);
 	}
 
-	public final String toString(Recognizer<?,?> recog) {
+	public final String toString(Recognizer<?> recog) {
 		return toString(recog, ParserRuleContext.EMPTY);
 	}
 
@@ -217,7 +217,7 @@ public class RuleContext implements RuleNode {
 	}
 
 	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(Recognizer<?,?> recog, RuleContext stop) {
+	public String toString(Recognizer<?> recog, RuleContext stop) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
 		return toString(ruleNamesList, stop);

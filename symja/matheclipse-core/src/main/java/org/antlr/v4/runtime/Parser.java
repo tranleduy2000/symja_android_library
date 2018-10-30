@@ -15,7 +15,6 @@ import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.atn.ProfilingATNSimulator;
 import org.antlr.v4.runtime.atn.RuleTransition;
-import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -32,7 +31,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
-public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
+public abstract class Parser extends Recognizer<ParserATNSimulator> {
 	public class TraceListener implements ParseTreeListener {
 		@Override
 		public void enterEveryRule(ParserRuleContext ctx) {
@@ -798,8 +797,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return -1;
 	}
 
-	public ParserRuleContext getRuleContext() { return _ctx; }
-
 	/** Return List&lt;String&gt; of the rule names in your parser instance
 	 *  leading up to a call to the current rule.  You could override if
 	 *  you want more details such as the file/line info of where
@@ -822,38 +819,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			p = p.parent;
 		}
 		return stack;
-	}
-
-	/** For debugging and other purposes. */
-	public List<String> getDFAStrings() {
-		synchronized (_interp.decisionToDFA) {
-			List<String> s = new ArrayList<String>();
-			for (int d = 0; d < _interp.decisionToDFA.length; d++) {
-				DFA dfa = _interp.decisionToDFA[d];
-				s.add( dfa.toString(getVocabulary()) );
-			}
-			return s;
-		}
-    }
-
-	/** For debugging and other purposes. */
-	public void dumpDFA() {
-		synchronized (_interp.decisionToDFA) {
-			boolean seenOne = false;
-			for (int d = 0; d < _interp.decisionToDFA.length; d++) {
-				DFA dfa = _interp.decisionToDFA[d];
-				if ( !dfa.states.isEmpty() ) {
-					if ( seenOne ) System.out.println();
-					System.out.println("Decision " + dfa.decision + ":");
-					System.out.print(dfa.toString(getVocabulary()));
-					seenOne = true;
-				}
-			}
-		}
-    }
-
-	public String getSourceName() {
-		return _input.getSourceName();
 	}
 
 	@Override

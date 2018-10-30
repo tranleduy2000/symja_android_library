@@ -645,17 +645,17 @@ public abstract class PredictionContext {
 		}
 	}
 
-	public String toString(Recognizer<?,?> recog) {
+	public String toString(Recognizer<?> recog) {
 		return toString();
 //		return toString(recog, ParserRuleContext.EMPTY);
 	}
 
-	public String[] toStrings(Recognizer<?, ?> recognizer, int currentState) {
+	public String[] toStrings(Recognizer<?> recognizer, int currentState) {
 		return toStrings(recognizer, EMPTY, currentState);
 	}
 
 	// FROM SAM
-	public String[] toStrings(Recognizer<?, ?> recognizer, PredictionContext stop, int currentState) {
+	public String[] toStrings(Recognizer<?> recognizer, PredictionContext stop, int currentState) {
 		List<String> result = new ArrayList<String>();
 
 		outer:

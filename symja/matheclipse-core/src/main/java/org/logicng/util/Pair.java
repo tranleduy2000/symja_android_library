@@ -32,6 +32,7 @@ import com.duy.util.DObjects;
 
 /**
  * Data structure for a pair.
+ *
  * @param <A> the type parameter of the first entry
  * @param <B> the type parameter of the second entry
  * @version 1.2
@@ -39,53 +40,56 @@ import com.duy.util.DObjects;
  */
 public class Pair<A, B> {
 
-  protected final A a;
-  protected final B b;
+    protected final A a;
+    protected final B b;
 
-  /**
-   * Constructs a new pair.
-   * @param a the first entry
-   * @param b the second entry
-   */
-  public Pair(final A a, final B b) {
-    this.a = a;
-    this.b = b;
-  }
-
-  /**
-   * Returns the first entry of this pair.
-   * @return the first entry
-   */
-  public A first() {
-    return a;
-  }
-
-  /**
-   * Returns the second entry of this pair.
-   * @return the second entry
-   */
-  public B second() {
-    return b;
-  }
-
-  @Override
-  public int hashCode() {
-    return DObjects.hash(a, b);
-  }
-
-  @Override
-  public boolean equals(final Object other) {
-    if (this == other)
-      return true;
-    if (other instanceof Pair) {
-      Pair o = (Pair) other;
-      return DObjects.equals(b, o.b) && DObjects.equals(a, o.a);
+    /**
+     * Constructs a new pair.
+     *
+     * @param a the first entry
+     * @param b the second entry
+     */
+    public Pair(final A a, final B b) {
+        this.a = a;
+        this.b = b;
     }
-    return false;
-  }
 
-  @Override
-  public String toString() {
-    return String.format("<%s, %s>", a, b);
-  }
+    /**
+     * Returns the first entry of this pair.
+     *
+     * @return the first entry
+     */
+    public A first() {
+        return a;
+    }
+
+    /**
+     * Returns the second entry of this pair.
+     *
+     * @return the second entry
+     */
+    public B second() {
+        return b;
+    }
+
+    @Override
+    public int hashCode() {
+        return DObjects.hash(a, b);
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other)
+            return true;
+        if (other instanceof Pair) {
+            Pair o = (Pair) other;
+            return DObjects.equals(b, o.b) && DObjects.equals(a, o.a);
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("<%s, %s>", a, b);
+    }
 }

@@ -30,27 +30,30 @@ package org.logicng.datastructures;
 
 /**
  * A tristate constant.  This constant can have three different values: {@code TRUE}, {@code FALSE}, and {@code UNDEF}.
+ *
  * @version 1.0
  * @since 1.0
  */
 public enum Tristate {
-  TRUE, FALSE, UNDEF;
+    TRUE, FALSE, UNDEF;
 
-  /**
-   * Returns the negation of a tristate constant.
-   * @param l the tristate constant
-   * @return the negation of the tristate constant
-   */
-  public static Tristate negate(final Tristate l) {
-    return l == FALSE ? TRUE : (l == TRUE ? FALSE : UNDEF);
-  }
+    /**
+     * Returns the negation of a tristate constant.
+     *
+     * @param l the tristate constant
+     * @return the negation of the tristate constant
+     */
+    public static Tristate negate(final Tristate l) {
+        return l == FALSE ? TRUE : (l == TRUE ? FALSE : UNDEF);
+    }
 
-  /**
-   * Constructs a tristate constant from an ordinary Boolean value.
-   * @param b the Boolean value
-   * @return the tristate constant
-   */
-  public static Tristate fromBool(boolean b) {
-    return b ? TRUE : FALSE;
-  }
+    /**
+     * Constructs a tristate constant from an ordinary Boolean value.
+     *
+     * @param b the Boolean value
+     * @return the tristate constant
+     */
+    public static Tristate fromBool(boolean b) {
+        return b ? TRUE : FALSE;
+    }
 }

@@ -33,15 +33,17 @@ import org.logicng.formulas.Variable;
 
 /**
  * The interface for at-most-one (AMO) cardinality constraints.
+ *
  * @version 1.1
  * @since 1.0
  */
 interface CCAtMostOne {
 
-  /**
-   * Builds a cardinality constraint of the form {@code var_1 + var_2 + ... + var_n <= 1}.
-   * @param result the result for the encoding
-   * @param vars   the variables {@code var_1 ... var_n}
-   */
-  void build(final EncodingResult result, final Variable... vars);
+    /**
+     * Builds a cardinality constraint of the form {@code var_1 + var_2 + ... + var_n <= 1}.
+     *
+     * @param result the result for the encoding
+     * @param vars   the variables {@code var_1 ... var_n}
+     */
+    void build(final EncodingResult result, final Variable... vars);
 }

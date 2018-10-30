@@ -32,36 +32,38 @@ import org.logicng.datastructures.Assignment;
 
 /**
  * Boolean constant "True".
+ *
  * @version 1.0
  * @since 1.0
  */
 public final class CTrue extends Constant {
 
-  /**
-   * Constructor.
-   * @param factory the factory which created this instance
-   */
-  CTrue(final FormulaFactory factory) {
-    super(FType.TRUE, factory);
-  }
+    /**
+     * Constructor.
+     *
+     * @param factory the factory which created this instance
+     */
+    CTrue(final FormulaFactory factory) {
+        super(FType.TRUE, factory);
+    }
 
-  @Override
-  public boolean evaluate(final Assignment assignment) {
-    return true;
-  }
+    @Override
+    public boolean evaluate(final Assignment assignment) {
+        return true;
+    }
 
-  @Override
-  public Constant negate() {
-    return f.falsum();
-  }
+    @Override
+    public Constant negate() {
+        return f.falsum();
+    }
 
-  @Override
-  public int hashCode() {
-    return 42;
-  }
+    @Override
+    public int hashCode() {
+        return 42;
+    }
 
-  @Override
-  public boolean equals(final Object other) {
-    return other instanceof CTrue;
-  }
+    @Override
+    public boolean equals(final Object other) {
+        return other instanceof CTrue;
+    }
 }

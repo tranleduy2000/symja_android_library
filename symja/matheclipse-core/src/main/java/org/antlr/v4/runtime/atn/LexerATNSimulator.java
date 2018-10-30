@@ -158,10 +158,6 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		int predict = execATN(input, next);
 
-		if ( debug ) {
-			System.out.format(Locale.getDefault(), "DFA after matchATN: %s\n", decisionToDFA[old_mode].toLexerString());
-		}
-
 		return predict;
 	}
 

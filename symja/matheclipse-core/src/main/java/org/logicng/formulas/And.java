@@ -45,52 +45,54 @@ import static org.logicng.formulas.cache.TransformationCacheEntry.FACTORIZED_CNF
  * - does not contain duplicates
  * - does not contain complementary literals
  * - does not contain constants
+ *
  * @version 1.0
  * @since 1.0
  */
 public final class And extends NAryOperator {
 
-  /**
-   * Constructor.
-   * @param operands the stream of operands
-   * @param f        the factory which created this instance
-   * @param isCNF    is {@code true} if the formula is in CNF, {@code false} otherwise
-   */
-  And(final LinkedHashSet<? extends Formula> operands, final FormulaFactory f, boolean isCNF) {
-    super(FType.AND, operands, f);
-    if (isCNF) {
-      this.setPredicateCacheEntry(IS_CNF, true);
-      this.setTransformationCacheEntry(FACTORIZED_CNF, this);
-    } else
-      this.setPredicateCacheEntry(IS_CNF, false);
-  }
-
-  @Override
-  public boolean evaluate(final Assignment assignment) {
-    for (Formula op : operands)
-      if (!op.evaluate(assignment))
-        return false;
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    return hashCode(31);
-  }
-
-  @Override
-  public boolean equals(final Object other) {
-    if (other == this)
-      return true;
-    if (other instanceof Formula && this.f == ((Formula) other).f)
-      return false; // the same formula factory would have produced a == object
-    if (other instanceof And) { // this is not really efficient... but should not be done anyway!
-      final LinkedHashSet<Formula> thisOps = new LinkedHashSet<>(this.operands.length);
-      Collections.addAll(thisOps, this.operands);
-      final LinkedHashSet<Formula> otherOps = new LinkedHashSet<>(((And) other).operands.length);
-      Collections.addAll(otherOps, ((And) other).operands);
-      return thisOps.equals(otherOps);
+    /**
+     * Constructor.
+     *
+     * @param operands the stream of operands
+     * @param f        the factory which created this instance
+     * @param isCNF    is {@code true} if the formula is in CNF, {@code false} otherwise
+     */
+    And(final LinkedHashSet<? extends Formula> operands, final FormulaFactory f, boolean isCNF) {
+        super(FType.AND, operands, f);
+        if (isCNF) {
+            this.setPredicateCacheEntry(IS_CNF, true);
+            this.setTransformationCacheEntry(FACTORIZED_CNF, this);
+        } else
+            this.setPredicateCacheEntry(IS_CNF, false);
     }
-    return false;
-  }
+
+    @Override
+    public boolean evaluate(final Assignment assignment) {
+        for (Formula op : operands)
+            if (!op.evaluate(assignment))
+                return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode(31);
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (other == this)
+            return true;
+        if (other instanceof Formula && this.f == ((Formula) other).f)
+            return false; // the same formula factory would have produced a == object
+        if (other instanceof And) { // this is not really efficient... but should not be done anyway!
+            final LinkedHashSet<Formula> thisOps = new LinkedHashSet<>(this.operands.length);
+            Collections.addAll(thisOps, this.operands);
+            final LinkedHashSet<Formula> otherOps = new LinkedHashSet<>(((And) other).operands.length);
+            Collections.addAll(otherOps, ((And) other).operands);
+            return thisOps.equals(otherOps);
+        }
+        return false;
+    }
 }

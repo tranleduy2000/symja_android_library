@@ -34,32 +34,33 @@ import org.logicng.formulas.Variable;
 /**
  * Encodes that exactly 'rhs' variables are assigned value true.  Uses the cardinality network
  * encoding due to Asín, Nieuwenhuis, Oliveras, and Rodríguez-Carbonell .
+ *
  * @version 1.1
  * @since 1.1
  */
 final class CCEXKCardinalityNetwork implements CCAtMostK {
 
-  private final CCCardinalityNetworks cardinalityNetwork;
+    private final CCCardinalityNetworks cardinalityNetwork;
 
-  /**
-   * Constructs a new cardinality encoder.
-   */
-  CCEXKCardinalityNetwork() {
-    this.cardinalityNetwork = new CCCardinalityNetworks();
-  }
+    /**
+     * Constructs a new cardinality encoder.
+     */
+    CCEXKCardinalityNetwork() {
+        this.cardinalityNetwork = new CCCardinalityNetworks();
+    }
 
-  @Override
-  public void build(final EncodingResult result, final Variable[] vars, int rhs) {
-    cardinalityNetwork.buildEXK(result, vars, rhs);
-  }
+    @Override
+    public void build(final EncodingResult result, final Variable[] vars, int rhs) {
+        cardinalityNetwork.buildEXK(result, vars, rhs);
+    }
 
-  @Override
-  public CCIncrementalData incrementalData() {
-    return cardinalityNetwork.incrementalData();
-  }
+    @Override
+    public CCIncrementalData incrementalData() {
+        return cardinalityNetwork.incrementalData();
+    }
 
-  @Override
-  public String toString() {
-    return this.getClass().getSimpleName();
-  }
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }

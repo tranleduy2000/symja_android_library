@@ -384,7 +384,6 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			int alt = execATN(dfa, s0, input, index, outerContext);
-			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getVocabulary()));
 			return alt;
 		}
 		finally {
@@ -2079,10 +2078,6 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			from.edges[t+1] = to; // connect
-		}
-
-		if ( debug ) {
-			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getVocabulary():VocabularyImpl.EMPTY_VOCABULARY));
 		}
 
 		return to;

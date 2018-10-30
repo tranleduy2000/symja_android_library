@@ -32,22 +32,25 @@ import org.logicng.formulas.Formula;
 
 /**
  * A handler for factorization methods (CNF, DNF).
+ *
  * @version 1.0
  * @since 1.0
  */
 public interface FactorizationHandler {
 
-  /**
-   * This method is called every time a distribution is performed.
-   * @return whether the factorization should be continued or not
-   */
-  boolean performedDistribution();
+    /**
+     * This method is called every time a distribution is performed.
+     *
+     * @return whether the factorization should be continued or not
+     */
+    boolean performedDistribution();
 
-  /**
-   * This method is called every time a new clause is created.
-   * @param clause the clause
-   * @return whether the factorization should be continued or not
-   */
-  boolean createdClause(final Formula clause);
+    /**
+     * This method is called every time a new clause is created.
+     *
+     * @param clause the clause
+     * @return whether the factorization should be continued or not
+     */
+    boolean createdClause(final Formula clause);
 
 }

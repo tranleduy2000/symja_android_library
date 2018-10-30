@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
+public abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
 	private static final Map<Vocabulary, Map<String, Integer>> tokenTypeMapCache =

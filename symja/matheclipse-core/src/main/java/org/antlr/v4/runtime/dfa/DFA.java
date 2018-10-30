@@ -173,28 +173,12 @@ public class DFA {
 	@Override
 	public String toString() { return toString(VocabularyImpl.EMPTY_VOCABULARY); }
 
-	/**
-	 * @deprecated Use {@link #toString(Vocabulary)} instead.
-	 */
-	@Deprecated
-	public String toString(String[] tokenNames) {
-		if ( s0==null ) return "";
-		DFASerializer serializer = new DFASerializer(this,tokenNames);
-		return serializer.toString();
-	}
-
 	public String toString(Vocabulary vocabulary) {
 		if (s0 == null) {
 			return "";
 		}
 
 		DFASerializer serializer = new DFASerializer(this, vocabulary);
-		return serializer.toString();
-	}
-
-	public String toLexerString() {
-		if ( s0==null ) return "";
-		DFASerializer serializer = new LexerDFASerializer(this);
 		return serializer.toString();
 	}
 

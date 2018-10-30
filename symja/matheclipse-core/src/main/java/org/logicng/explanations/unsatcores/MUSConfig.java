@@ -33,60 +33,64 @@ import org.logicng.configurations.ConfigurationType;
 
 /**
  * The configuration object for the MUS generation.
+ *
  * @version 1.2
  * @since 1.1
  */
 public final class MUSConfig extends Configuration {
 
-  /**
-   * The algorithm for the MUS generation.
-   */
-  public enum Algorithm {
-    DELETION, PLAIN_INSERTION
-  }
-
-  final Algorithm algorithm;
-
-  /**
-   * Constructs a new configuration with a given type.
-   * @param builder the builder
-   */
-  public MUSConfig(final Builder builder) {
-    super(ConfigurationType.MUS);
-    this.algorithm = builder.algorithm;
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("MUSConfig{\n");
-    sb.append("algorithm=").append(this.algorithm).append("\n");
-    sb.append("}\n");
-    return sb.toString();
-  }
-
-  /**
-   * The builder for a MUS configuration.
-   */
-  public static class Builder {
-
-    private Algorithm algorithm = Algorithm.DELETION;
+    final Algorithm algorithm;
 
     /**
-     * Sets the algorithm for the MUS generation. The default value is {@code DELETION}.
-     * @param algorithm the algorithm for the MUS generation
-     * @return the builder
+     * Constructs a new configuration with a given type.
+     *
+     * @param builder the builder
      */
-    public Builder algorithm(final Algorithm algorithm) {
-      this.algorithm = algorithm;
-      return this;
+    public MUSConfig(final Builder builder) {
+        super(ConfigurationType.MUS);
+        this.algorithm = builder.algorithm;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("MUSConfig{\n");
+        sb.append("algorithm=").append(this.algorithm).append("\n");
+        sb.append("}\n");
+        return sb.toString();
     }
 
     /**
-     * Builds the configuration.
-     * @return the configuration.
+     * The algorithm for the MUS generation.
      */
-    public MUSConfig build() {
-      return new MUSConfig(this);
+    public enum Algorithm {
+        DELETION, PLAIN_INSERTION
     }
-  }
+
+    /**
+     * The builder for a MUS configuration.
+     */
+    public static class Builder {
+
+        private Algorithm algorithm = Algorithm.DELETION;
+
+        /**
+         * Sets the algorithm for the MUS generation. The default value is {@code DELETION}.
+         *
+         * @param algorithm the algorithm for the MUS generation
+         * @return the builder
+         */
+        public Builder algorithm(final Algorithm algorithm) {
+            this.algorithm = algorithm;
+            return this;
+        }
+
+        /**
+         * Builds the configuration.
+         *
+         * @return the configuration.
+         */
+        public MUSConfig build() {
+            return new MUSConfig(this);
+        }
+    }
 }

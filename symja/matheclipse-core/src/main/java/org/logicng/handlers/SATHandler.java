@@ -30,24 +30,26 @@ package org.logicng.handlers;
 
 /**
  * Interface for a handler for SAT solvers.
+ *
  * @version 1.0
  * @since 1.0
  */
 public interface SATHandler {
 
-  /**
-   * This method is called every time a conflict is found.
-   * @return whether SAT solving should be continued or not
-   */
-  boolean detectedConflict();
+    /**
+     * This method is called every time a conflict is found.
+     *
+     * @return whether SAT solving should be continued or not
+     */
+    boolean detectedConflict();
 
-  /**
-   * This method is called when the SAT solver starts solving.
-   */
-  void startedSolving();
+    /**
+     * This method is called when the SAT solver starts solving.
+     */
+    void startedSolving();
 
-  /**
-   * This method is called when the SAT solver finished solving.
-   */
-  void finishedSolving();
+    /**
+     * This method is called when the SAT solver finished solving.
+     */
+    void finishedSolving();
 }

@@ -45,175 +45,178 @@ import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
 
 /**
  * Super class for Boolean n-ary operators.
+ *
  * @version 1.1
  * @since 1.0
  */
 public abstract class NAryOperator extends Formula {
 
-  protected final Formula[] operands;
-  private volatile int hashCode;
+    protected final Formula[] operands;
+    private volatile int hashCode;
 
-  /**
-   * Constructor.
-   * @param type     the operator's type
-   * @param operands the list of operands
-   * @param f        the factory which created this instance
-   */
-  NAryOperator(final FType type, final Collection<? extends Formula> operands, final FormulaFactory f) {
-    super(type, f);
-    this.operands = operands.toArray(new Formula[operands.size()]);
-    this.hashCode = 0;
-  }
-
-  @Override
-  public long numberOfAtoms() {
-    if (this.numberOfAtoms != -1)
-      return this.numberOfAtoms;
-    this.numberOfAtoms = 0;
-    for (final Formula f : this.operands)
-      this.numberOfAtoms += f.numberOfAtoms();
-    return this.numberOfAtoms;
-  }
-
-  @Override
-  public long numberOfNodes() {
-    if (this.numberOfNodes != -1)
-      return this.numberOfNodes;
-    this.numberOfNodes = 1;
-    for (final Formula f : this.operands)
-      this.numberOfNodes += f.numberOfNodes();
-    return this.numberOfNodes;
-  }
-
-  @Override
-  public int numberOfOperands() {
-    return operands.length;
-  }
-
-  @Override
-  public boolean isAtomicFormula() {
-    return false;
-  }
-
-  @Override
-  public SortedSet<Variable> variables() {
-    if (this.variables == null) {
-      final SortedSet<Variable> set = new TreeSet<>();
-      for (final Formula op : this.operands)
-        set.addAll(op.variables());
-      this.variables = Collections.unmodifiableSortedSet(set);
+    /**
+     * Constructor.
+     *
+     * @param type     the operator's type
+     * @param operands the list of operands
+     * @param f        the factory which created this instance
+     */
+    NAryOperator(final FType type, final Collection<? extends Formula> operands, final FormulaFactory f) {
+        super(type, f);
+        this.operands = operands.toArray(new Formula[operands.size()]);
+        this.hashCode = 0;
     }
-    return this.variables;
-  }
 
-  @Override
-  public SortedSet<Literal> literals() {
-    final SortedSet<Literal> set = new TreeSet<>();
-    for (final Formula op : this.operands)
-      set.addAll(op.literals());
-    return Collections.unmodifiableSortedSet(set);
-  }
-
-  @Override
-  public boolean containsVariable(final Variable variable) {
-    for (final Formula op : this.operands)
-      if (op.containsVariable(variable))
-        return true;
-    return false;
-  }
-
-  @Override
-  public Formula restrict(final Assignment assignment) {
-    final LinkedHashSet<Formula> nops = new LinkedHashSet<>();
-    for (final Formula op : this.operands)
-      nops.add(op.restrict(assignment));
-    return f.naryOperator(type, nops);
-  }
-
-  @Override
-  public boolean containsNode(final Formula formula) {
-    if (this.equals(formula))
-      return true;
-    if (this.type != formula.type) {
-      for (final Formula op : this.operands)
-        if (op.containsNode(formula))
-          return true;
-      return false;
+    @Override
+    public long numberOfAtoms() {
+        if (this.numberOfAtoms != -1)
+            return this.numberOfAtoms;
+        this.numberOfAtoms = 0;
+        for (final Formula f : this.operands)
+            this.numberOfAtoms += f.numberOfAtoms();
+        return this.numberOfAtoms;
     }
-    final List<Formula> fOps = new ArrayList<>(formula.numberOfOperands());
-    for (final Formula op : formula)
-      fOps.add(op);
-    for (Formula op : this.operands) {
-      fOps.remove(op);
-      if (op.containsNode(formula))
-        return true;
+
+    @Override
+    public long numberOfNodes() {
+        if (this.numberOfNodes != -1)
+            return this.numberOfNodes;
+        this.numberOfNodes = 1;
+        for (final Formula f : this.operands)
+            this.numberOfNodes += f.numberOfNodes();
+        return this.numberOfNodes;
     }
-    return fOps.isEmpty();
-  }
 
-  @Override
-  public Formula substitute(final Substitution substitution) {
-    final LinkedHashSet<Formula> nops = new LinkedHashSet<>();
-    for (final Formula op : this.operands)
-      nops.add(op.substitute(substitution));
-    return f.naryOperator(type, nops);
-  }
-
-  @Override
-  public Formula negate() {
-    return f.not(this);
-  }
-
-  @Override
-  public Formula nnf() {
-    Formula nnf = this.transformationCache.get(NNF);
-    if (nnf == null) {
-      final LinkedHashSet<Formula> nops = new LinkedHashSet<>();
-      for (final Formula op : this.operands)
-        nops.add(op.nnf());
-      nnf = f.naryOperator(type, nops);
-      this.transformationCache.put(NNF, nnf);
+    @Override
+    public int numberOfOperands() {
+        return operands.length;
     }
-    return nnf;
-  }
 
-  /**
-   * Helper method for generating the hashcode.
-   * @param shift shift value
-   * @return hashcode
-   */
-  protected int hashCode(int shift) {
-    if (this.hashCode == 0) {
-      int temp = 1;
-      for (Formula formula : this.operands)
-        temp += formula.hashCode();
-      temp *= shift;
-      this.hashCode = temp;
+    @Override
+    public boolean isAtomicFormula() {
+        return false;
     }
-    return this.hashCode;
-  }
 
-  @Override
-  public Iterator<Formula> iterator() {
-    return new Iterator<Formula>() {
-      private int i;
+    @Override
+    public SortedSet<Variable> variables() {
+        if (this.variables == null) {
+            final SortedSet<Variable> set = new TreeSet<>();
+            for (final Formula op : this.operands)
+                set.addAll(op.variables());
+            this.variables = Collections.unmodifiableSortedSet(set);
+        }
+        return this.variables;
+    }
 
-      @Override
-      public boolean hasNext() {
-        return i < operands.length;
-      }
+    @Override
+    public SortedSet<Literal> literals() {
+        final SortedSet<Literal> set = new TreeSet<>();
+        for (final Formula op : this.operands)
+            set.addAll(op.literals());
+        return Collections.unmodifiableSortedSet(set);
+    }
 
-      @Override
-      public Formula next() {
-        if (i == operands.length)
-          throw new NoSuchElementException();
-        return operands[i++];
-      }
+    @Override
+    public boolean containsVariable(final Variable variable) {
+        for (final Formula op : this.operands)
+            if (op.containsVariable(variable))
+                return true;
+        return false;
+    }
 
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-    };
-  }
+    @Override
+    public Formula restrict(final Assignment assignment) {
+        final LinkedHashSet<Formula> nops = new LinkedHashSet<>();
+        for (final Formula op : this.operands)
+            nops.add(op.restrict(assignment));
+        return f.naryOperator(type, nops);
+    }
+
+    @Override
+    public boolean containsNode(final Formula formula) {
+        if (this.equals(formula))
+            return true;
+        if (this.type != formula.type) {
+            for (final Formula op : this.operands)
+                if (op.containsNode(formula))
+                    return true;
+            return false;
+        }
+        final List<Formula> fOps = new ArrayList<>(formula.numberOfOperands());
+        for (final Formula op : formula)
+            fOps.add(op);
+        for (Formula op : this.operands) {
+            fOps.remove(op);
+            if (op.containsNode(formula))
+                return true;
+        }
+        return fOps.isEmpty();
+    }
+
+    @Override
+    public Formula substitute(final Substitution substitution) {
+        final LinkedHashSet<Formula> nops = new LinkedHashSet<>();
+        for (final Formula op : this.operands)
+            nops.add(op.substitute(substitution));
+        return f.naryOperator(type, nops);
+    }
+
+    @Override
+    public Formula negate() {
+        return f.not(this);
+    }
+
+    @Override
+    public Formula nnf() {
+        Formula nnf = this.transformationCache.get(NNF);
+        if (nnf == null) {
+            final LinkedHashSet<Formula> nops = new LinkedHashSet<>();
+            for (final Formula op : this.operands)
+                nops.add(op.nnf());
+            nnf = f.naryOperator(type, nops);
+            this.transformationCache.put(NNF, nnf);
+        }
+        return nnf;
+    }
+
+    /**
+     * Helper method for generating the hashcode.
+     *
+     * @param shift shift value
+     * @return hashcode
+     */
+    protected int hashCode(int shift) {
+        if (this.hashCode == 0) {
+            int temp = 1;
+            for (Formula formula : this.operands)
+                temp += formula.hashCode();
+            temp *= shift;
+            this.hashCode = temp;
+        }
+        return this.hashCode;
+    }
+
+    @Override
+    public Iterator<Formula> iterator() {
+        return new Iterator<Formula>() {
+            private int i;
+
+            @Override
+            public boolean hasNext() {
+                return i < operands.length;
+            }
+
+            @Override
+            public Formula next() {
+                if (i == operands.length)
+                    throw new NoSuchElementException();
+                return operands[i++];
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
 }

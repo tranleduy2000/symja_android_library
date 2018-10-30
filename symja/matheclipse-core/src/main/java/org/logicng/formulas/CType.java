@@ -30,13 +30,14 @@ package org.logicng.formulas;
 
 /**
  * Comparison types for pseudo-Boolean constraints.
+ *
  * @version 1.0
  * @since 1.0
  */
 public enum CType {
-  EQ,
-  GT,
-  GE,
-  LT,
-  LE
+    EQ,
+    GT,
+    GE,
+    LT,
+    LE
 }

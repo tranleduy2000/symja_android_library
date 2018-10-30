@@ -41,190 +41,196 @@ import java.util.TreeSet;
  * Boolean literals.
  * <p>
  * A literal is a positive or negative variable.
+ *
  * @version 1.1
  * @since 1.0
  */
 public class Literal extends Formula implements Comparable<Literal> {
 
-  private static final Iterator<Formula> ITERATOR = new Iterator<Formula>() {
-    @Override
-    public boolean hasNext() {
-      return false;
+    private static final Iterator<Formula> ITERATOR = new Iterator<Formula>() {
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public Formula next() {
+            throw new NoSuchElementException();
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    };
+
+    private final String name;
+    private final boolean phase;
+    private final SortedSet<Literal> literals;
+    private final Variable var;
+    private volatile Literal negated;
+    private volatile int hashCode;
+
+    /**
+     * Constructor.
+     *
+     * @param name  the literal name
+     * @param phase the phase of the literal
+     * @param f     the factory which created this literal
+     */
+    Literal(final String name, boolean phase, final FormulaFactory f) {
+        super(FType.LITERAL, f);
+        this.name = name;
+        this.phase = phase;
+        this.var = phase ? (Variable) this : (Variable) this.negate();
+        this.variables = Collections.unmodifiableSortedSet(new TreeSet<>(Collections.singletonList(var)));
+        this.literals = Collections.unmodifiableSortedSet(new TreeSet<>(Collections.singletonList(this)));
     }
 
     @Override
-    public Formula next() {
-      throw new NoSuchElementException();
+    public FormulaFactory factory() {
+        return this.f;
     }
 
     @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
+    public long numberOfAtoms() {
+        return 1L;
     }
-  };
 
-  private final String name;
-  private final boolean phase;
-  private final SortedSet<Literal> literals;
-  private final Variable var;
-  private volatile Literal negated;
-  private volatile int hashCode;
-
-  /**
-   * Constructor.
-   * @param name  the literal name
-   * @param phase the phase of the literal
-   * @param f     the factory which created this literal
-   */
-  Literal(final String name, boolean phase, final FormulaFactory f) {
-    super(FType.LITERAL, f);
-    this.name = name;
-    this.phase = phase;
-    this.var = phase ? (Variable) this : (Variable) this.negate();
-    this.variables = Collections.unmodifiableSortedSet(new TreeSet<>(Collections.singletonList(var)));
-    this.literals = Collections.unmodifiableSortedSet(new TreeSet<>(Collections.singletonList(this)));
-  }
-
-  @Override
-  public FormulaFactory factory() {
-    return this.f;
-  }
-
-  @Override
-  public long numberOfAtoms() {
-    return 1L;
-  }
-
-  @Override
-  public long numberOfNodes() {
-    return 1L;
-  }
-
-  @Override
-  public int numberOfOperands() {
-    return 0;
-  }
-
-  @Override
-  public boolean isAtomicFormula() {
-    return true;
-  }
-
-  @Override
-  public SortedSet<Variable> variables() {
-    return this.variables;
-  }
-
-  @Override
-  public SortedSet<Literal> literals() {
-    return this.literals;
-  }
-
-  @Override
-  public boolean containsVariable(final Variable variable) {
-    return variable.name().equals(this.name);
-  }
-
-  @Override
-  public boolean evaluate(final Assignment assignment) {
-    return assignment.evaluateLit(this);
-  }
-
-  @Override
-  public Formula restrict(final Assignment assignment) {
-    final Formula res = assignment.restrictLit(this);
-    return res != null ? res : this;
-  }
-
-  @Override
-  public boolean containsNode(final Formula formula) {
-    return this.equals(formula);
-  }
-
-  @Override
-  public Formula substitute(final Substitution substitution) {
-    final Formula subst = substitution.getSubstitution(this.variable());
-    return subst == null ? this : (phase ? subst : subst.negate());
-  }
-
-  @Override
-  public Literal negate() {
-    if (this.negated != null)
-      return negated;
-    this.negated = f.literal(this.name, !this.phase);
-    return this.negated;
-  }
-
-  @Override
-  public Formula nnf() {
-    return this;
-  }
-
-  /**
-   * Returns the name of the literal.
-   * @return the name of the literal
-   */
-  public String name() {
-    return this.name;
-  }
-
-  /**
-   * Returns the phase of the literal.
-   * @return the phase of the literal.
-   */
-  public boolean phase() {
-    return this.phase;
-  }
-
-  /**
-   * Returns a positive version of this literal (aka a variable).
-   * @return a positive version of this literal
-   */
-  public Variable variable() {
-    return this.var;
-  }
-
-  /**
-   * Returns a negative version of this literal.
-   * @return a negative version of this literal
-   */
-  public Literal negative() {
-    return this.phase ? this.negate() : this;
-  }
-
-  @Override
-  public int hashCode() {
-    final int result = this.hashCode;
-    if (result == 0)
-      this.hashCode = this.name.hashCode() ^ (this.phase ? 1 : 0);
-    return this.hashCode;
-  }
-
-  @Override
-  public boolean equals(final Object other) {
-    if (other == this)
-      return true;
-    if (other instanceof Formula && this.f == ((Formula) other).f)
-      return false; // the same formula factory would have produced a == object
-    if (other instanceof Literal) {
-      Literal otherLit = (Literal) other;
-      return this.phase == otherLit.phase && this.name.equals(otherLit.name);
+    @Override
+    public long numberOfNodes() {
+        return 1L;
     }
-    return false;
-  }
 
-  @Override
-  public int compareTo(final Literal lit) {
-    if (this == lit)
-      return 0;
-    int res = this.name.compareTo(lit.name);
-    if (res == 0 && this.phase != lit.phase)
-      return this.phase ? -1 : 1;
-    return res;
-  }
+    @Override
+    public int numberOfOperands() {
+        return 0;
+    }
 
-  @Override
-  public Iterator<Formula> iterator() {
-    return ITERATOR;
-  }
+    @Override
+    public boolean isAtomicFormula() {
+        return true;
+    }
+
+    @Override
+    public SortedSet<Variable> variables() {
+        return this.variables;
+    }
+
+    @Override
+    public SortedSet<Literal> literals() {
+        return this.literals;
+    }
+
+    @Override
+    public boolean containsVariable(final Variable variable) {
+        return variable.name().equals(this.name);
+    }
+
+    @Override
+    public boolean evaluate(final Assignment assignment) {
+        return assignment.evaluateLit(this);
+    }
+
+    @Override
+    public Formula restrict(final Assignment assignment) {
+        final Formula res = assignment.restrictLit(this);
+        return res != null ? res : this;
+    }
+
+    @Override
+    public boolean containsNode(final Formula formula) {
+        return this.equals(formula);
+    }
+
+    @Override
+    public Formula substitute(final Substitution substitution) {
+        final Formula subst = substitution.getSubstitution(this.variable());
+        return subst == null ? this : (phase ? subst : subst.negate());
+    }
+
+    @Override
+    public Literal negate() {
+        if (this.negated != null)
+            return negated;
+        this.negated = f.literal(this.name, !this.phase);
+        return this.negated;
+    }
+
+    @Override
+    public Formula nnf() {
+        return this;
+    }
+
+    /**
+     * Returns the name of the literal.
+     *
+     * @return the name of the literal
+     */
+    public String name() {
+        return this.name;
+    }
+
+    /**
+     * Returns the phase of the literal.
+     *
+     * @return the phase of the literal.
+     */
+    public boolean phase() {
+        return this.phase;
+    }
+
+    /**
+     * Returns a positive version of this literal (aka a variable).
+     *
+     * @return a positive version of this literal
+     */
+    public Variable variable() {
+        return this.var;
+    }
+
+    /**
+     * Returns a negative version of this literal.
+     *
+     * @return a negative version of this literal
+     */
+    public Literal negative() {
+        return this.phase ? this.negate() : this;
+    }
+
+    @Override
+    public int hashCode() {
+        final int result = this.hashCode;
+        if (result == 0)
+            this.hashCode = this.name.hashCode() ^ (this.phase ? 1 : 0);
+        return this.hashCode;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (other == this)
+            return true;
+        if (other instanceof Formula && this.f == ((Formula) other).f)
+            return false; // the same formula factory would have produced a == object
+        if (other instanceof Literal) {
+            Literal otherLit = (Literal) other;
+            return this.phase == otherLit.phase && this.name.equals(otherLit.name);
+        }
+        return false;
+    }
+
+    @Override
+    public int compareTo(final Literal lit) {
+        if (this == lit)
+            return 0;
+        int res = this.name.compareTo(lit.name);
+        if (res == 0 && this.phase != lit.phase)
+            return this.phase ? -1 : 1;
+        return res;
+    }
+
+    @Override
+    public Iterator<Formula> iterator() {
+        return ITERATOR;
+    }
 }

@@ -37,19 +37,21 @@ import java.util.List;
 
 /**
  * Abstract super class for MUS computation algorithms.
+ *
  * @version 1.3
  * @since 1.1
  */
 abstract class MUSAlgorithm {
 
-  /**
-   * Computes a MUS for the given propositions.
-   * @param propositions the propositions
-   * @param f            the formula factory
-   * @param config       the MUS configuration
-   * @param <T>          the type of the MUSes propositions
-   * @return the MUS
-   */
-  public abstract <T extends Proposition> UNSATCore computeMUS(final List<T> propositions, final FormulaFactory f,
-                                                               final MUSConfig config);
+    /**
+     * Computes a MUS for the given propositions.
+     *
+     * @param propositions the propositions
+     * @param f            the formula factory
+     * @param config       the MUS configuration
+     * @param <T>          the type of the MUSes propositions
+     * @return the MUS
+     */
+    public abstract <T extends Proposition> UNSATCore computeMUS(final List<T> propositions, final FormulaFactory f,
+                                                                 final MUSConfig config);
 }

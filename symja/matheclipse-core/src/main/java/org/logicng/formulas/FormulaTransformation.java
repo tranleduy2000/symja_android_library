@@ -30,16 +30,18 @@ package org.logicng.formulas;
 
 /**
  * A transformation on a formula.
+ *
  * @version 1.0
  * @since 1.0
  */
 public interface FormulaTransformation {
 
-  /**
-   * Returns the transformed formula.
-   * @param formula the input formula
-   * @param cache   indicated whether the result (and associated predicates) should be cached in the formula's cache.
-   * @return the transformed formula
-   */
-  Formula apply(Formula formula, boolean cache);
+    /**
+     * Returns the transformed formula.
+     *
+     * @param formula the input formula
+     * @param cache   indicated whether the result (and associated predicates) should be cached in the formula's cache.
+     * @return the transformed formula
+     */
+    Formula apply(Formula formula, boolean cache);
 }

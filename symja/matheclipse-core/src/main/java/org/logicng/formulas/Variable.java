@@ -32,17 +32,19 @@ package org.logicng.formulas;
  * Boolean variables.
  * <p>
  * A variable is a shortcut for a positive literal.
+ *
  * @version 1.0
  * @since 1.0
  */
 public class Variable extends Literal {
 
-  /**
-   * Constructor.
-   * @param name the literal name
-   * @param f    the factory which created this literal
-   */
-  protected Variable(final String name, FormulaFactory f) {
-    super(name, true, f);
-  }
+    /**
+     * Constructor.
+     *
+     * @param name the literal name
+     * @param f    the factory which created this literal
+     */
+    protected Variable(final String name, FormulaFactory f) {
+        super(name, true, f);
+    }
 }

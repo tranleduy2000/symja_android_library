@@ -36,63 +36,67 @@ import java.util.Map;
 
 /**
  * A Boolean substitution.
+ *
  * @version 1.0
  * @since 1.0
  */
 public class Substitution {
 
-  protected final Map<Variable, Formula> subst;
+    protected final Map<Variable, Formula> subst;
 
-  /**
-   * Constructs a new empty substitution.
-   */
-  public Substitution() {
-    this.subst = new HashMap<>();
-  }
+    /**
+     * Constructs a new empty substitution.
+     */
+    public Substitution() {
+        this.subst = new HashMap<>();
+    }
 
-  /**
-   * Returns the number of mappings in this substitution.
-   * @return the number of mappings in this substitution
-   */
-  public int size() {
-    return subst.size();
-  }
+    /**
+     * Returns the number of mappings in this substitution.
+     *
+     * @return the number of mappings in this substitution
+     */
+    public int size() {
+        return subst.size();
+    }
 
-  /**
-   * Adds a mapping from variable to formula to this substitution.
-   * <p>
-   * If there is already a mapping for this variable, it will be overwritten.
-   * @param variable the variable
-   * @param formula  the formula
-   */
-  public void addMapping(final Variable variable, final Formula formula) {
-    subst.put(variable, formula);
-  }
+    /**
+     * Adds a mapping from variable to formula to this substitution.
+     * <p>
+     * If there is already a mapping for this variable, it will be overwritten.
+     *
+     * @param variable the variable
+     * @param formula  the formula
+     */
+    public void addMapping(final Variable variable, final Formula formula) {
+        subst.put(variable, formula);
+    }
 
-  /**
-   * Returns a formula for a given variable.  If there is no mapping for this variable, {@code null} is returned.
-   * @param variable the variable
-   * @return an formula of {@code null}
-   */
-  public Formula getSubstitution(final Variable variable) {
-    Formula res = subst.get(variable);
-    if (res == null)
-      return null;
-    return res;
-  }
+    /**
+     * Returns a formula for a given variable.  If there is no mapping for this variable, {@code null} is returned.
+     *
+     * @param variable the variable
+     * @return an formula of {@code null}
+     */
+    public Formula getSubstitution(final Variable variable) {
+        Formula res = subst.get(variable);
+        if (res == null)
+            return null;
+        return res;
+    }
 
-  @Override
-  public int hashCode() {
-    return subst.hashCode();
-  }
+    @Override
+    public int hashCode() {
+        return subst.hashCode();
+    }
 
-  @Override
-  public boolean equals(final Object other) {
-    return other != null && (this == other || (this.getClass() == other.getClass() && this.subst.equals(((Substitution) other).subst)));
-  }
+    @Override
+    public boolean equals(final Object other) {
+        return other != null && (this == other || (this.getClass() == other.getClass() && this.subst.equals(((Substitution) other).subst)));
+    }
 
-  @Override
-  public String toString() {
-    return "Substitution" + subst;
-  }
+    @Override
+    public String toString() {
+        return "Substitution" + subst;
+    }
 }
