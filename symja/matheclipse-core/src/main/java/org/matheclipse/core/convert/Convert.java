@@ -50,7 +50,7 @@ public class Convert {
 		if (currInRow.isAST0()) {
 			// special case 0-Matrix
 			IExpr[][] array = new IExpr[0][0];
-			return new Array2DRowFieldMatrix<IExpr>(array, false);
+			return new Array2DRowFieldMatrix<>(array, false);
 		}
 		final int rowSize = listMatrix.argSize();
 		final int colSize = currInRow.argSize();
@@ -101,7 +101,7 @@ public class Convert {
 		final IExpr[][] elements = new IExpr[rowSize][colSize + 1];
 		for (int i = 1; i < rowSize + 1; i++) {
 			currInRow = (IAST) listMatrix.get(i);
-			if (currInRow.head() != F.List || colSize != currInRow.argSize()) {
+			if (!currInRow.head().equals(F.List) || colSize != currInRow.argSize()) {
 				return null;
 			}
 			for (int j = 1; j < colSize + 1; j++) {
