@@ -17,7 +17,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
 
-public class GetTest extends TestCase {
+public class GetTestSingleRun extends TestCase {
 
 	private final static String VECTOR_ANALYSIS = "(* ::Package:: *)\n" + "\n"
 			+ "(* :Title: Three-Dimensional Vector Analysis *)\n" + "\n" + "(* :Summary:\n"
