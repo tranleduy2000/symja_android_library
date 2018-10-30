@@ -45,7 +45,7 @@ public class DecisionInfo {
 	 * implementation that provides precise results from
 	 * {@link System#nanoTime()}, and perform profiling in a separate process
 	 * which is warmed up by parsing the input prior to profiling. If desired,
-	 * call {@link ATNSimulator#clearDFA} to reset the DFA cache to its initial
+	 * call {link ATNSimulator#clearDFA} to reset the DFA cache to its initial
 	 * state before starting the profiling measurement pass.</p>
 	 */
 	public long timeInPrediction;

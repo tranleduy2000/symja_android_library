@@ -7,10 +7,8 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.UUID;
 
 public abstract class ATNSimulator {
@@ -75,25 +73,6 @@ public abstract class ATNSimulator {
 
 	public abstract void reset();
 
-	/**
-	 * Clear the DFA cache used by the current instance. Since the DFA cache may
-	 * be shared by multiple ATN simulators, this method may affect the
-	 * performance (but not accuracy) of other parsers which are being used
-	 * concurrently.
-	 *
-	 * @throws UnsupportedOperationException if the current instance does not
-	 * support clearing the DFA.
-	 *
-	 * @since 4.3
-	 */
-	public void clearDFA() {
-		throw new UnsupportedOperationException("This ATN simulator does not support clearing the DFA.");
-	}
-
-	public PredictionContextCache getSharedContextCache() {
-		return sharedContextCache;
-	}
-
 	public PredictionContext getCachedContext(PredictionContext context) {
 		if ( sharedContextCache==null ) return context;
 
@@ -104,75 +83,6 @@ public abstract class ATNSimulator {
 													  sharedContextCache,
 													  visited);
 		}
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#checkCondition(boolean)} instead.
-	 */
-	@Deprecated
-	public static void checkCondition(boolean condition) {
-		new ATNDeserializer().checkCondition(condition);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#checkCondition(boolean, String)} instead.
-	 */
-	@Deprecated
-	public static void checkCondition(boolean condition, String message) {
-		new ATNDeserializer().checkCondition(condition, message);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toInt} instead.
-	 */
-	@Deprecated
-	public static int toInt(char c) {
-		return ATNDeserializer.toInt(c);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toInt32} instead.
-	 */
-	@Deprecated
-	public static int toInt32(char[] data, int offset) {
-		return ATNDeserializer.toInt32(data, offset);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toLong} instead.
-	 */
-	@Deprecated
-	public static long toLong(char[] data, int offset) {
-		return ATNDeserializer.toLong(data, offset);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toUUID} instead.
-	 */
-	@Deprecated
-	public static UUID toUUID(char[] data, int offset) {
-		return ATNDeserializer.toUUID(data, offset);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#edgeFactory} instead.
-	 */
-	@Deprecated
-
-	public static Transition edgeFactory(ATN atn,
-										 int type, int src, int trg,
-										 int arg1, int arg2, int arg3,
-										 List<IntervalSet> sets)
-	{
-		return new ATNDeserializer().edgeFactory(atn, type, trg, arg1, arg2, arg3, sets);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#stateFactory} instead.
-	 */
-	@Deprecated
-	public static ATNState stateFactory(int type, int ruleIndex) {
-		return new ATNDeserializer().stateFactory(type, ruleIndex);
 	}
 
 }

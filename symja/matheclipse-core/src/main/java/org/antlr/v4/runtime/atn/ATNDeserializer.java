@@ -157,7 +157,6 @@ public class ATNDeserializer {
 		return SUPPORTED_UUIDS.indexOf(actualUuid) >= featureIndex;
 	}
 
-	@SuppressWarnings("deprecation")
 	public ATN deserialize(char[] data) {
 		data = data.clone();
 

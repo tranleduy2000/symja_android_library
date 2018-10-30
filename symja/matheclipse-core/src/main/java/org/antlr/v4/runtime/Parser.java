@@ -9,12 +9,9 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSimulator;
-import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ParseInfo;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.atn.ProfilingATNSimulator;
-import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -700,15 +697,6 @@ public abstract class Parser extends Recognizer<ParserATNSimulator> {
 		}
 	}
 
-	public ParserRuleContext getInvokingContext(int ruleIndex) {
-		ParserRuleContext p = _ctx;
-		while ( p!=null ) {
-			if ( p.getRuleIndex() == ruleIndex ) return p;
-			p = (ParserRuleContext)p.parent;
-		}
-		return null;
-	}
-
 	public ParserRuleContext getContext() {
 		return _ctx;
 	}
@@ -722,56 +710,6 @@ public abstract class Parser extends Recognizer<ParserATNSimulator> {
 		return precedence >= _precedenceStack.peek();
 	}
 
-	public boolean inContext(String context) {
-		// TODO: useful in parser?
-		return false;
-	}
-
-	/**
-	 * Checks whether or not {@code symbol} can follow the current state in the
-	 * ATN. The behavior of this method is equivalent to the following, but is
-	 * implemented such that the complete context-sensitive follow set does not
-	 * need to be explicitly constructed.
-	 *
-	 * <pre>
-	 * return getExpectedTokens().contains(symbol);
-	 * </pre>
-	 *
-	 * @param symbol the symbol type to check
-	 * @return {@code true} if {@code symbol} can follow the current state in
-	 * the ATN, otherwise {@code false}.
-	 */
-    public boolean isExpectedToken(int symbol) {
-//   		return getInterpreter().atn.nextTokens(_ctx);
-        ATN atn = getInterpreter().atn;
-		ParserRuleContext ctx = _ctx;
-        ATNState s = atn.states.get(getState());
-        IntervalSet following = atn.nextTokens(s);
-        if (following.contains(symbol)) {
-            return true;
-        }
-//        System.out.println("following "+s+"="+following);
-        if ( !following.contains(Token.EPSILON) ) return false;
-
-        while ( ctx!=null && ctx.invokingState>=0 && following.contains(Token.EPSILON) ) {
-            ATNState invokingState = atn.states.get(ctx.invokingState);
-            RuleTransition rt = (RuleTransition)invokingState.transition(0);
-            following = atn.nextTokens(rt.followState);
-            if (following.contains(symbol)) {
-                return true;
-            }
-
-            ctx = (ParserRuleContext)ctx.parent;
-        }
-
-        return following.contains(Token.EPSILON) && symbol == Token.EOF;
-
-    }
-
-	public boolean isMatchedEOF() {
-		return matchedEOF;
-	}
-
 	/**
 	 * Computes the set of input symbols which could follow the current parser
 	 * state and context, as given by {@link #getState} and {@link #getContext},
@@ -783,19 +721,6 @@ public abstract class Parser extends Recognizer<ParserATNSimulator> {
 		return getATN().getExpectedTokens(getState(), getContext());
 	}
 
-
-    public IntervalSet getExpectedTokensWithinCurrentRule() {
-        ATN atn = getInterpreter().atn;
-        ATNState s = atn.states.get(getState());
-   		return atn.nextTokens(s);
-   	}
-
-	/** Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. */
-	public int getRuleIndex(String ruleName) {
-		Integer ruleIndex = getRuleIndexMap().get(ruleName);
-		if ( ruleIndex!=null ) return ruleIndex;
-		return -1;
-	}
 
 	/** Return List&lt;String&gt; of the rule names in your parser instance
 	 *  leading up to a call to the current rule.  You could override if
@@ -828,25 +753,6 @@ public abstract class Parser extends Recognizer<ParserATNSimulator> {
 			return new ParseInfo((ProfilingATNSimulator)interp);
 		}
 		return null;
-	}
-
-	/**
-	 * @since 4.3
-	 */
-	public void setProfile(boolean profile) {
-		ParserATNSimulator interp = getInterpreter();
-		PredictionMode saveMode = interp.getPredictionMode();
-		if ( profile ) {
-			if ( !(interp instanceof ProfilingATNSimulator) ) {
-				setInterpreter(new ProfilingATNSimulator(this));
-			}
-		}
-		else if ( interp instanceof ProfilingATNSimulator ) {
-			ParserATNSimulator sim =
-				new ParserATNSimulator(this, getATN(), interp.decisionToDFA, interp.getSharedContextCache());
-			setInterpreter(sim);
-		}
-		getInterpreter().setPredictionMode(saveMode);
 	}
 
 	/** During a parse is sometimes useful to listen in on the rule entry and exit
