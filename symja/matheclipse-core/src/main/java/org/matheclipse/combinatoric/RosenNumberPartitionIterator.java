@@ -101,7 +101,8 @@ public class RosenNumberPartitionIterator extends ReadOnlyIterator<int[]> {
 			while (a[i] == n - k + i) {
 				i--;
 			}
-			final int t = ++a[i] - i++;
+			final int t = ++a[i] - i;
+			i++;
 			int j = i;
 			while (j < k) {
 				a[j] = t + j++;
