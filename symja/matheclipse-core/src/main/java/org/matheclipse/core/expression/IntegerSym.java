@@ -32,7 +32,7 @@ import java.util.TreeSet;
  * @see AbstractIntegerSym
  * @see BigIntegerSym
  */
-public class IntegerSym extends AbstractIntegerSym {
+public class IntegerSym extends AbstractIntegerSym implements IExpr, IInteger {
 
 	/**
 	 * 
