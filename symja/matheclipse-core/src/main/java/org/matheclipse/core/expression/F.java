@@ -7298,6 +7298,10 @@ public class F {
 		return AST.newInstance(intialArgumentsCapacity, head);
 	}
 
+	public static IASTMutable NIL(){
+		return NIL;
+	}
+
 	public static IAST NMaximize(final IExpr a0, final IExpr a1) {
 		return binaryAST2(NMaximize, a0, a1);
 	}

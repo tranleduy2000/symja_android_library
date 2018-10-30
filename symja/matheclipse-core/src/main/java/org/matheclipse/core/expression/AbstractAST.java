@@ -67,7 +67,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public abstract class AbstractAST extends IASTMutableImpl implements IASTMutable {
+public abstract class AbstractAST extends IASTMutableImpl {
 	/**
 	 * The enumeration map which possibly maps the properties (keys) to a user defined object.
 	 *
