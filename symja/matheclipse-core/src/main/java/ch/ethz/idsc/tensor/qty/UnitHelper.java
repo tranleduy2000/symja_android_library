@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
             // lazy initialization
             ENGINE = new EvalEngine(false);
         }
-        IExpr value = F.NIL;
+        IExpr value = F.nilPtr();
         String key = string.trim();
         NavigableMap<String, IExpr> map = new TreeMap<>();
         if (key.length() == 0) {
