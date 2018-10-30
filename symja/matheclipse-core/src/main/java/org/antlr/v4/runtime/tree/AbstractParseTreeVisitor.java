@@ -44,7 +44,7 @@ public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T>
 
 			ParseTree c = node.getChild(i);
 			T childResult = c.accept(this);
-			result = aggregateResult(result, childResult);
+			result = aggregateResult(childResult);
 		}
 
 		return result;
@@ -97,16 +97,12 @@ public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T>
 	 * {@link #visitChildren} will return the result of the last child visited
 	 * (or return the initial value if the node has no children).</p>
 	 *
-	 * @param aggregate The previous aggregate value. In the default
-	 * implementation, the aggregate value is initialized to
-	 * {@link #defaultResult}, which is passed as the {@code aggregate} argument
-	 * to this method after the first child node is visited.
 	 * @param nextResult The result of the immediately preceeding call to visit
 	 * a child node.
 	 *
 	 * @return The updated aggregate result.
 	 */
-	protected T aggregateResult(T aggregate, T nextResult) {
+	protected T aggregateResult(T nextResult) {
 		return nextResult;
 	}
 

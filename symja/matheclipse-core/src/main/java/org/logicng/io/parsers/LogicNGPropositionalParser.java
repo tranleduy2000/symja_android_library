@@ -24,7 +24,6 @@ import org.logicng.formulas.FormulaFactory;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class LogicNGPropositionalParser extends Parser {
 	static { RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION); }
 

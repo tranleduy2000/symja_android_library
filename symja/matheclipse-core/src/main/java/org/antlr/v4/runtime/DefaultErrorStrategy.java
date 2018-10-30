@@ -22,7 +22,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 * error". This is used to suppress reporting multiple error messages while
 	 * attempting to recover from a detected syntax error.
 	 *
-	 * @see #inErrorRecoveryMode
+	 * @see ANTLRErrorStrategy#inErrorRecoveryMode
 	 */
 	protected boolean errorRecoveryMode = false;
 
@@ -76,7 +76,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean inErrorRecoveryMode(Parser recognizer) {
+	public boolean inErrorRecoveryMode() {
 		return errorRecoveryMode;
 	}
 
@@ -127,7 +127,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	{
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
-		if (inErrorRecoveryMode(recognizer)) {
+		if (inErrorRecoveryMode()) {
 //			System.err.print("[SPURIOUS] ");
 			return; // don't report spurious errors
 		}
@@ -231,7 +231,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
 //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
 		// If already recovering, don't try to sync
-		if (inErrorRecoveryMode(recognizer)) {
+		if (inErrorRecoveryMode()) {
 			return;
 		}
 
@@ -363,7 +363,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 * @param recognizer the parser instance
 	 */
 	protected void reportUnwantedToken(Parser recognizer) {
-		if (inErrorRecoveryMode(recognizer)) {
+		if (inErrorRecoveryMode()) {
 			return;
 		}
 
@@ -395,7 +395,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 * @param recognizer the parser instance
 	 */
 	protected void reportMissingToken(Parser recognizer) {
-		if (inErrorRecoveryMode(recognizer)) {
+		if (inErrorRecoveryMode()) {
 			return;
 		}
 

@@ -26,11 +26,6 @@ public class ATNDeserializationOptions {
 		this.generateRuleBypassTransitions = false;
 	}
 
-	public ATNDeserializationOptions(ATNDeserializationOptions options) {
-		this.verifyATN = options.verifyATN;
-		this.generateRuleBypassTransitions = options.generateRuleBypassTransitions;
-	}
-
 
 	public static ATNDeserializationOptions getDefaultOptions() {
 		return defaultOptions;
@@ -46,11 +41,6 @@ public class ATNDeserializationOptions {
 
 	public final boolean isVerifyATN() {
 		return verifyATN;
-	}
-
-	public final void setVerifyATN(boolean verifyATN) {
-		throwIfReadOnly();
-		this.verifyATN = verifyATN;
 	}
 
 	public final boolean isGenerateRuleBypassTransitions() {

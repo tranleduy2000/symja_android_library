@@ -12,9 +12,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /** */
 public class ATN {
@@ -39,9 +37,6 @@ public class ATN {
 	 */
 	public RuleStopState[] ruleToStopState;
 
-
-	public final Map<String, TokensStartState> modeNameToStartState =
-		new LinkedHashMap<String, TokensStartState>();
 
 	/**
 	 * The type of the ATN.
@@ -106,10 +101,6 @@ public class ATN {
 		}
 
 		states.add(state);
-	}
-
-	public void removeState(ATNState state) {
-		states.set(state.stateNumber, null); // just free mem, don't shift states in list
 	}
 
 	public int defineDecisionState(DecisionState s) {

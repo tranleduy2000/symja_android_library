@@ -95,11 +95,10 @@ public interface ANTLRErrorStrategy {
 	 * {@link ParserRuleContext#addErrorNode(ErrorNode)} instead of
 	 * {@link Parser#createTerminalNode(ParserRuleContext, Token)}.
 	 *
-	 * @param recognizer the parser instance
 	 * @return {@code true} if the parser is currently recovering from a parse
 	 * error, otherwise {@code false}
 	 */
-	boolean inErrorRecoveryMode(Parser recognizer);
+	boolean inErrorRecoveryMode();
 
 	/**
 	 * This method is called by when the parser successfully matches an input

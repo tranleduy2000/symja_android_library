@@ -329,7 +329,7 @@ public class ATNDeserializer {
 			int arg1 = toInt(data[p+3]);
 			int arg2 = toInt(data[p+4]);
 			int arg3 = toInt(data[p+5]);
-			Transition trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
+			Transition trans = edgeFactory(atn, ttype, trg, arg1, arg2, arg3, sets);
 //			System.out.println("EDGE "+trans.getClass().getSimpleName()+" "+
 //							   src+"->"+trg+
 //					   " "+Transition.serializationNames[ttype]+
@@ -697,9 +697,9 @@ public class ATNDeserializer {
 
 
 	protected Transition edgeFactory(ATN atn,
-										 int type, int src, int trg,
-										 int arg1, int arg2, int arg3,
-										 List<IntervalSet> sets)
+									 int type, int trg,
+									 int arg1, int arg2, int arg3,
+									 List<IntervalSet> sets)
 	{
 		ATNState target = atn.states.get(trg);
 		switch (type) {

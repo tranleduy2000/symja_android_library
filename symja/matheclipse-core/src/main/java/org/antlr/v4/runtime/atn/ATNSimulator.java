@@ -172,7 +172,7 @@ public abstract class ATNSimulator {
 										 int arg1, int arg2, int arg3,
 										 List<IntervalSet> sets)
 	{
-		return new ATNDeserializer().edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
+		return new ATNDeserializer().edgeFactory(atn, type, trg, arg1, arg2, arg3, sets);
 	}
 
 	/**

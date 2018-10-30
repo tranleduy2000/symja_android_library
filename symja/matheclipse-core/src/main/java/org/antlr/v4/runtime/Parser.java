@@ -24,8 +24,6 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
-import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
-import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -458,39 +456,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
-	/**
-	 * The preferred method of getting a tree pattern. For example, here's a
-	 * sample use:
-	 *
-	 * <pre>
-	 * ParseTree t = parser.expr();
-	 * ParseTreePattern p = parser.compileParseTreePattern("&lt;ID&gt;+0", MyParser.RULE_expr);
-	 * ParseTreeMatch m = p.match(t);
-	 * String id = m.get("ID");
-	 * </pre>
-	 */
-	public ParseTreePattern compileParseTreePattern(String pattern, int patternRuleIndex) {
-		if ( getTokenStream()!=null ) {
-			TokenSource tokenSource = getTokenStream().getTokenSource();
-			if ( tokenSource instanceof Lexer ) {
-				Lexer lexer = (Lexer)tokenSource;
-				return compileParseTreePattern(pattern, patternRuleIndex, lexer);
-			}
-		}
-		throw new UnsupportedOperationException("Parser can't discover a lexer to use");
-	}
-
-	/**
-	 * The same as {@link #compileParseTreePattern(String, int)} but specify a
-	 * {@link Lexer} rather than trying to deduce it from this parser.
-	 */
-	public ParseTreePattern compileParseTreePattern(String pattern, int patternRuleIndex,
-													Lexer lexer)
-	{
-		ParseTreePatternMatcher m = new ParseTreePatternMatcher(lexer, this);
-		return m.compile(pattern, patternRuleIndex);
-	}
-
 
 	public ANTLRErrorStrategy getErrorHandler() {
 		return _errHandler;
@@ -572,7 +537,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
 		if (_buildParseTrees || hasListener) {
-			if ( _errHandler.inErrorRecoveryMode(this) ) {
+			if ( _errHandler.inErrorRecoveryMode() ) {
 				ErrorNode node = _ctx.addErrorNode(createErrorNode(_ctx,o));
 				if (_parseListeners != null) {
 					for (ParseTreeListener listener : _parseListeners) {

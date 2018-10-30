@@ -35,10 +35,6 @@ public class Array2DHashSet<T> implements Set<T> {
 		this(null, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
 	}
 
-	public Array2DHashSet(AbstractEqualityComparator<? super T> comparator) {
-		this(comparator, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
-	}
-
 	public Array2DHashSet(AbstractEqualityComparator<? super T> comparator, int initialCapacity, int initialBucketCapacity) {
 		if (comparator == null) {
 			comparator = ObjectEqualityComparator.INSTANCE;
@@ -403,26 +399,6 @@ public class Array2DHashSet<T> implements Set<T> {
 			}
 		}
 		buf.append('}');
-		return buf.toString();
-	}
-
-	public String toTableString() {
-		StringBuilder buf = new StringBuilder();
-		for (T[] bucket : buckets) {
-			if ( bucket==null ) {
-				buf.append("null\n");
-				continue;
-			}
-			buf.append('[');
-			boolean first = true;
-			for (T o : bucket) {
-				if ( first ) first=false;
-				else buf.append(" ");
-				if ( o==null ) buf.append("_");
-				else buf.append(o.toString());
-			}
-			buf.append("]\n");
-		}
 		return buf.toString();
 	}
 
