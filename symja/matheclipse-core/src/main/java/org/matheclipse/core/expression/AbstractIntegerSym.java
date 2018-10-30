@@ -34,7 +34,7 @@ import edu.jas.arith.PrimeInteger;
  * @see BigIntegerSym
  *
  */
-public abstract class AbstractIntegerSym extends IIntegerImpl implements IInteger, Externalizable {
+public abstract class AbstractIntegerSym extends IIntegerImpl implements Externalizable {
 	static final int low = -128;
 	static final int high = 128;
 	static final IntegerSym cache[];

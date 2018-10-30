@@ -140,7 +140,7 @@ public class FunctionExpand extends AbstractEvaluator {
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkRange(ast, 2, 3);
 		IExpr arg1 = ast.arg1();
-		IExpr assumptionExpr = F.NIL;
+		IExpr assumptionExpr = F.nilPtr();
 		if (ast.size() > 2) {
 			IExpr arg2 = ast.arg2();
 

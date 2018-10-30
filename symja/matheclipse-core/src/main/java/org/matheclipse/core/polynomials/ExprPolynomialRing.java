@@ -205,7 +205,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 *
 	 * @param cf
 	 *            factory for coefficients of type C.
-	 * @param v
+	 * @param listOfVariables
 	 *            names for the variables.
 	 * @param n
 	 *            number of variables.
@@ -437,7 +437,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	private static Map<IExpr, IExpr> createTimesSub(final IAST ast, IExpr x, Map<IExpr, IExpr> coefficientMap,
 			IASTAppendable restList) {
-				IExpr mainExponent = F.NIL;
+				IExpr mainExponent = F.nilPtr();
 				IExpr expr;
 				IASTAppendable times = F.TimesAlloc(ast.size());
 				for (int i = 1; i < ast.size(); i++) {
@@ -471,7 +471,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	public static Map<IExpr, IExpr> createTimes(final IAST ast, IExpr x, Map<IExpr, IExpr> coefficientMap,
 			IASTAppendable restList) {
-		IExpr mainExponent = F.NIL;
+		IExpr mainExponent = F.nilPtr();
 		IExpr expr;
 		IASTAppendable times = F.TimesAlloc(ast.size());
 		for (int i = 1; i < ast.size(); i++) {
@@ -537,7 +537,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 *
 	 * @param expression
 	 *            the expression which should be checked if it's a polynomial
-	 * @param coefficient
+	 * param coefficient
 	 *            set to <code>true</code> if called by the <code>Coefficient()</code> function
 	 * @return <code>true</code> if the given expression is a polynomial
 	 */

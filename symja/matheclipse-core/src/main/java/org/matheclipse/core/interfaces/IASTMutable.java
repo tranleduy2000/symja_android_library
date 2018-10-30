@@ -28,7 +28,7 @@ import com.duy.lambda.IntFunction;
  * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a>,
  * <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed acyclic graph</a>
  */
-public interface IASTMutable extends IAST, IExpr {
+public interface IASTMutable extends IAST {
 
     /**
      * Replaces the element at the specified location in this {@code IAST} with the specified object. This operation

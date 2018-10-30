@@ -33,7 +33,7 @@ import java.util.List;
  * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a>,
  * <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed acyclic graph</a>
  */
-public interface IASTAppendable extends IASTMutable, IExpr {
+public interface IASTAppendable extends IASTMutable {
 
 	/**
 	 * Adds the specified expression at the end of this {@code List}.

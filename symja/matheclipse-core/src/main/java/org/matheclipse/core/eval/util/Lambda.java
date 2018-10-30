@@ -156,7 +156,7 @@ public class Lambda {
 	}
 
 	private static IExpr testMap(IAST ast, Predicate<IExpr> predicate, Function<IExpr, IExpr> function) {
-		IASTAppendable result = F.NIL;
+		IASTAppendable result = F.nilPtr();
 		int size = ast.size();
 		for (int i = 1; i < size; i++) {
 			IExpr temp = ast.get(i);
