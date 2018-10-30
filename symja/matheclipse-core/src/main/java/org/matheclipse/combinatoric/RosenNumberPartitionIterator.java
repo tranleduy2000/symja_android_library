@@ -101,6 +101,7 @@ public class RosenNumberPartitionIterator extends ReadOnlyIterator<int[]> {
 			while (a[i] == n - k + i) {
 				i--;
 			}
+			//Fix error: unsequenced modification and access to variable
 			final int t = ++a[i] - i;
 			i++;
 			int j = i;
