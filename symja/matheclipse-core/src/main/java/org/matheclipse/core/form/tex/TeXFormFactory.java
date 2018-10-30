@@ -883,7 +883,7 @@ public class TeXFormFactory {
 		private boolean convertTimesOperator(final StringBuilder buf, final IAST timesAST, final int precedence,
 				final int caller) {
 			int size = timesAST.size();
-			IExpr arg1 = new NILPointer();
+			IExpr arg1 = F.nilPtr();
 			if (size > 1) {
 				arg1 = timesAST.arg1();
 				if (arg1.isMinusOne()) {

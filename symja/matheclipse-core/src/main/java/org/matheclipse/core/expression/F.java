@@ -158,7 +158,7 @@ public class F {
 	 * <code>isPresent()</code> method. The method is similar to <code>java.util.Optional#isPresent()</code>.
 	 * </p>
 	 */
-	public final static NILPointer NIL = new NILPointer();
+	public final static INilPointer NIL = new NILPointer();
 
 
     /***/
@@ -7298,7 +7298,7 @@ public class F {
 		return AST.newInstance(intialArgumentsCapacity, head);
 	}
 
-	public static IASTMutable NIL(){
+	public static INilPointer nilPtr(){
 		return NIL;
 	}
 
@@ -7467,6 +7467,10 @@ public class F {
 	 */
 	public static IAST OddQ(final IExpr x) {
 		return unaryAST1(OddQ, x);
+	}
+
+	public static IInteger one(){
+		return C1;
 	}
 
 	public static IAST Optional(final IExpr a0, final IExpr a1) {

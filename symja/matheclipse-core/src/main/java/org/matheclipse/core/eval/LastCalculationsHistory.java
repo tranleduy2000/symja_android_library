@@ -92,7 +92,7 @@ public class LastCalculationsHistory implements Serializable {
 	 */
 	public IExpr entry(int index) {
 		IExpr temp = get(index);
-		return temp == null ? F.NIL : temp;
+		return temp == null ? F.nilPtr() : temp;
 	}
 	public int size() {
 		return fOutHistory.length;

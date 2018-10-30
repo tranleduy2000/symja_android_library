@@ -578,7 +578,7 @@ public class Assumptions extends AbstractAssumptions {
 	@Override
 	final public IAST distribution(IExpr expr) {
 		IAST dist = distributionsMap.get(expr);
-		return (dist == null) ? F.NIL : dist;
+		return (dist == null) ? F.nilPtr() : dist;
 	}
 	/**
 	 * Map for storing the domain of an expression

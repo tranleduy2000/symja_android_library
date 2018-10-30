@@ -175,27 +175,4 @@ public class Lambda {
 		return result;
 	}
 
-	private static IExpr testMap2(IAST list, Predicate<IExpr> predicate, Function<IExpr, IExpr> function1,
-			Function<IExpr, IExpr> function2) {
-		IASTAppendable result = F.NIL;
-		int size = list.size();
-		for (int i = 1; i < size; i++) {
-			IExpr temp = list.get(i);
-			if (predicate.test(temp)) {
-				if (!result.isPresent()) {
-					result = list.copyAppendable();
-					for (int j = 0; j < i; j++) {
-						result.set(j, function2.apply(temp));
-					}
-				}
-				result.set(i, function1.apply(temp));
-				continue;
-			}
-			if (result != null) {
-				result.set(i, function2.apply(temp));
-			}
-		}
-
-		return result;
-	}
 }

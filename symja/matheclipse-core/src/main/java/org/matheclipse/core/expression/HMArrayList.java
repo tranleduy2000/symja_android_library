@@ -846,7 +846,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	/** {@inheritDoc} */
 	@Override
 	public final IAST map(final Function<IExpr, IExpr> function, final int startOffset) {
-		IASTMutable result = F.NIL;
+		IASTMutable result = F.nilPtr();
 		int i = firstIndex + startOffset;
 		int j = startOffset;
 		while (i < lastIndex) {

@@ -28,7 +28,7 @@ import java.util.Set;
  * @see org.matheclipse.core.expression.F#NIL
  * @see java.util.Optional#isPresent
  */
-public final class NILPointer extends IASTAppendableImpl {
+public final class NILPointer extends IASTAppendableImpl implements INilPointer {
 
 	private static final long serialVersionUID = -3552302876858011292L;
 
@@ -41,7 +41,7 @@ public final class NILPointer extends IASTAppendableImpl {
 	 *
 	 * @see F#NIL
 	 */
-    public NILPointer() {
+    protected NILPointer() {
 	}
 
 	@Override

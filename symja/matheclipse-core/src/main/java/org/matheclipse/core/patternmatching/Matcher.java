@@ -11,6 +11,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
@@ -158,7 +159,7 @@ public class Matcher implements Function<IExpr, IExpr> {
 		}
 
 		@Override
-		IExpr evalMethod() {
+		IBuiltInSymbol evalMethod() {
 			PatternMap pm=getPatternMap();
 			IExpr arg1 = pm.getValue(0);
 			IExpr arg2 = pm.getValue(1);
@@ -206,7 +207,7 @@ public class Matcher implements Function<IExpr, IExpr> {
 		}
 
 		@Override
-		IExpr evalMethod() {
+		IBuiltInSymbol evalMethod() {
 			PatternMap pm=getPatternMap();
 			IExpr arg1 = pm.getValue(0);
 			return fRightHandSide.test(arg1) ? F.True : F.False;
