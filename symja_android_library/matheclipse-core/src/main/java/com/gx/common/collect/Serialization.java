@@ -21,7 +21,6 @@ import com.gx.common.annotations.GwtIncompatible;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
@@ -183,39 +182,4 @@ final class Serialization {
         }
     }
 
-    // Secret sauce for setting final fields; don't make it public.
-    static <T> FieldSetter<T> getFieldSetter(final Class<T> clazz, String fieldName) {
-        try {
-            Field field = clazz.getDeclaredField(fieldName);
-            return new FieldSetter<T>(field);
-        } catch (NoSuchFieldException e) {
-            throw new AssertionError(e); // programmer error
-        }
-    }
-
-    // Secret sauce for setting final fields; don't make it public.
-    static final class FieldSetter<T> {
-        private final Field field;
-
-        private FieldSetter(Field field) {
-            this.field = field;
-            field.setAccessible(true);
-        }
-
-        void set(T instance, Object value) {
-            try {
-                field.set(instance, value);
-            } catch (IllegalAccessException impossible) {
-                throw new AssertionError(impossible);
-            }
-        }
-
-        void set(T instance, int value) {
-            try {
-                field.set(instance, value);
-            } catch (IllegalAccessException impossible) {
-                throw new AssertionError(impossible);
-            }
-        }
-    }
 }

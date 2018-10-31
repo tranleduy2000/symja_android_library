@@ -167,9 +167,6 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
         GenPolynomial<GenPolynomial<C>> x;
         while (!r.isZERO()) {
             x = PolyUtil.recursivePseudoRemainder(q, r);
-            if (logger.isInfoEnabled()) {
-                logger.info("recursivePseudoRemainder.bits = " + x.bitLength());
-            }
             q = r;
             if (field) {
                 r = PolyUtil.monic(x);

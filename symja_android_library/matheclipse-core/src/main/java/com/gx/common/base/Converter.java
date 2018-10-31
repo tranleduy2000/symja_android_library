@@ -63,7 +63,7 @@ import static com.gx.common.base.Preconditions.checkNotNull;
  * <p>Getting a converter:
  * <p>
  * <ul>
- * <li>Use a provided converter implementation, such as {@link Enums#stringConverter}, {@link
+ * <li>Use a provided converter implementation, such as {link Enums#stringConverter}, {@link
  * com.gx.common.primitives.Ints#stringConverter Ints.stringConverter} or the {@linkplain
  * #reverse reverse} views of these.
  * <li>Convert between specific preset values using {@link

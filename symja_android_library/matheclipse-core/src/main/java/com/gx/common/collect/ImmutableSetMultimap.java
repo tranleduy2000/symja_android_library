@@ -29,8 +29,6 @@ import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -245,13 +243,6 @@ public class ImmutableSetMultimap<K, V> extends ImmutableMultimap<K, V>
                 : ImmutableSortedSet.emptySet(valueComparator);
     }
 
-    private static <V> ImmutableSet.Builder<V> valuesBuilder(
-            @NullableDecl Comparator<? super V> valueComparator) {
-        return (valueComparator == null)
-                ? new ImmutableSet.Builder<V>()
-                : new ImmutableSortedSet.Builder<V>(valueComparator);
-    }
-
     /**
      * Returns an immutable set of the values for the given key. If no mappings in the multimap have
      * the provided key, an empty immutable set is returned. The values are in the same order as the
@@ -340,50 +331,6 @@ public class ImmutableSetMultimap<K, V> extends ImmutableMultimap<K, V>
         return emptySet instanceof ImmutableSortedSet
                 ? ((ImmutableSortedSet<V>) emptySet).comparator()
                 : null;
-    }
-
-    @GwtIncompatible // java.io.ObjectInputStream
-    // Serialization type safety is at the caller's mercy.
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        Comparator<Object> valueComparator = (Comparator<Object>) stream.readObject();
-        int keyCount = stream.readInt();
-        if (keyCount < 0) {
-            throw new InvalidObjectException("Invalid key count " + keyCount);
-        }
-        ImmutableMap.Builder<Object, ImmutableSet<Object>> builder = ImmutableMap.builder();
-        int tmpSize = 0;
-
-        for (int i = 0; i < keyCount; i++) {
-            Object key = stream.readObject();
-            int valueCount = stream.readInt();
-            if (valueCount <= 0) {
-                throw new InvalidObjectException("Invalid value count " + valueCount);
-            }
-
-            ImmutableSet.Builder<Object> valuesBuilder = valuesBuilder(valueComparator);
-            for (int j = 0; j < valueCount; j++) {
-                valuesBuilder.add(stream.readObject());
-            }
-            ImmutableSet<Object> valueSet = valuesBuilder.build();
-            if (valueSet.size() != valueCount) {
-                throw new InvalidObjectException("Duplicate key-value pairs exist for key " + key);
-            }
-            builder.put(key, valueSet);
-            tmpSize += valueCount;
-        }
-
-        ImmutableMap<Object, ImmutableSet<Object>> tmpMap;
-        try {
-            tmpMap = builder.build();
-        } catch (IllegalArgumentException e) {
-            throw (InvalidObjectException) new InvalidObjectException(e.getMessage()).initCause(e);
-        }
-
-        FieldSettersHolder.MAP_FIELD_SETTER.set(this, tmpMap);
-        FieldSettersHolder.SIZE_FIELD_SETTER.set(this, tmpSize);
-        SetFieldSettersHolder.EMPTY_SET_FIELD_SETTER.set(this, emptySet(valueComparator));
     }
 
     /**
@@ -553,9 +500,4 @@ public class ImmutableSetMultimap<K, V> extends ImmutableMultimap<K, V>
         }
     }
 
-    @GwtIncompatible // java serialization
-    private static final class SetFieldSettersHolder {
-        static final Serialization.FieldSetter<ImmutableSetMultimap> EMPTY_SET_FIELD_SETTER =
-                Serialization.getFieldSetter(ImmutableSetMultimap.class, "emptySet");
-    }
 }

@@ -26,8 +26,6 @@ import com.gx.j2objc.annotations.RetainedWith;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Comparator;
@@ -278,42 +276,6 @@ public class ImmutableListMultimap<K, V> extends ImmutableMultimap<K, V>
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
         Serialization.writeMultimap(this, stream);
-    }
-
-    @GwtIncompatible // java.io.ObjectInputStream
-    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        int keyCount = stream.readInt();
-        if (keyCount < 0) {
-            throw new InvalidObjectException("Invalid key count " + keyCount);
-        }
-        ImmutableMap.Builder<Object, ImmutableList<Object>> builder = ImmutableMap.builder();
-        int tmpSize = 0;
-
-        for (int i = 0; i < keyCount; i++) {
-            Object key = stream.readObject();
-            int valueCount = stream.readInt();
-            if (valueCount <= 0) {
-                throw new InvalidObjectException("Invalid value count " + valueCount);
-            }
-
-            ImmutableList.Builder<Object> valuesBuilder = ImmutableList.builder();
-            for (int j = 0; j < valueCount; j++) {
-                valuesBuilder.add(stream.readObject());
-            }
-            builder.put(key, valuesBuilder.build());
-            tmpSize += valueCount;
-        }
-
-        ImmutableMap<Object, ImmutableList<Object>> tmpMap;
-        try {
-            tmpMap = builder.build();
-        } catch (IllegalArgumentException e) {
-            throw (InvalidObjectException) new InvalidObjectException(e.getMessage()).initCause(e);
-        }
-
-        FieldSettersHolder.MAP_FIELD_SETTER.set(this, tmpMap);
-        FieldSettersHolder.SIZE_FIELD_SETTER.set(this, tmpSize);
     }
 
     /**

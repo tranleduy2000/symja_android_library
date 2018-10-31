@@ -18,7 +18,6 @@ import com.gx.common.annotations.GwtCompatible;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import java.lang.ref.WeakReference;
 import java.util.Locale;
 import java.util.ServiceConfigurationError;
 import java.util.logging.Level;
@@ -47,11 +46,6 @@ final class Platform {
 
     static CharMatcher precomputeCharMatcher(CharMatcher matcher) {
         return matcher.precomputedInternal();
-    }
-
-    static <T extends Enum<T>> Optional<T> getEnumIfPresent(Class<T> enumClass, String value) {
-        WeakReference<? extends Enum<?>> ref = Enums.getEnumConstants(enumClass).get(value);
-        return ref == null ? Optional.<T>absent() : Optional.of(enumClass.cast(ref.get()));
     }
 
     static String formatCompact4Digits(double value) {

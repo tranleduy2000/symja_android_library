@@ -765,28 +765,4 @@ class SimplexTableau implements Serializable {
                 tableau.hashCode();
     }
 
-    /**
-     * Serialize the instance.
-     *
-     * @param oos stream where object should be written
-     * @throws IOException if object cannot be written to stream
-     */
-    private void writeObject(ObjectOutputStream oos)
-            throws IOException {
-        oos.defaultWriteObject();
-        MatrixUtils.serializeRealMatrix(tableau, oos);
-    }
-
-    /**
-     * Deserialize the instance.
-     *
-     * @param ois stream from which the object should be read
-     * @throws ClassNotFoundException if a class in the stream cannot be found
-     * @throws IOException            if object cannot be read from the stream
-     */
-    private void readObject(ObjectInputStream ois)
-            throws ClassNotFoundException, IOException {
-        ois.defaultReadObject();
-        MatrixUtils.deserializeRealMatrix(this, "tableau", ois);
-    }
 }

@@ -122,9 +122,7 @@ public class GreatestCommonDivisorPrimitive<C extends GcdRingElem<C>> extends
             q = P;
             r = S;
         }
-        if (debug) {
-            logger.debug("degrees: e = " + e + ", f = " + f);
-        }
+
         r = r.abs();
         q = q.abs();
         GenPolynomial<C> a = recursiveContent(r);
@@ -143,9 +141,6 @@ public class GreatestCommonDivisorPrimitive<C extends GcdRingElem<C>> extends
         GenPolynomial<GenPolynomial<C>> x;
         while (!r.isZERO()) {
             x = PolyUtil.recursivePseudoRemainder(q, r);
-            if (logger.isInfoEnabled()) {
-                logger.info("recursivePseudoRemainder.bits = " + x.bitLength());
-            }
             q = r;
             r = recursivePrimitivePart(x);
         }

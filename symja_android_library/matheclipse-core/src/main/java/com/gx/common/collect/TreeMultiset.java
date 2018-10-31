@@ -24,9 +24,6 @@ import com.gx.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
@@ -517,34 +514,6 @@ public final class TreeMultiset<E> extends AbstractSortedMultiset<E> implements 
                 rootReference,
                 range.intersect(GeneralRange.downTo(comparator(), lowerBound, boundType)),
                 header);
-    }
-
-    /**
-     * @serialData the comparator, the number of distinct elements, the first element, its count, the
-     * second element, its count, and so on
-     */
-    @GwtIncompatible // java.io.ObjectOutputStream
-    private void writeObject(ObjectOutputStream stream) throws IOException {
-        stream.defaultWriteObject();
-        stream.writeObject(elementSet().comparator());
-        Serialization.writeMultiset(this, stream);
-    }
-
-    @GwtIncompatible // java.io.ObjectInputStream
-    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        @SuppressWarnings("unchecked")
-        // reading data stored by writeObject
-                Comparator<? super E> comparator = (Comparator<? super E>) stream.readObject();
-        Serialization.getFieldSetter(AbstractSortedMultiset.class, "comparator").set(this, comparator);
-        Serialization.getFieldSetter(TreeMultiset.class, "range")
-                .set(this, GeneralRange.all(comparator));
-        Serialization.getFieldSetter(TreeMultiset.class, "rootReference")
-                .set(this, new Reference<AvlNode<E>>());
-        AvlNode<E> header = new AvlNode<E>(null, 1);
-        Serialization.getFieldSetter(TreeMultiset.class, "header").set(this, header);
-        successor(header, header);
-        Serialization.populateMultiset(this, stream);
     }
 
     /*

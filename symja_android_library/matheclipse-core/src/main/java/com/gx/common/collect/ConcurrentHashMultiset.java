@@ -19,7 +19,6 @@ package com.gx.common.collect;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.common.annotations.VisibleForTesting;
-import com.gx.common.collect.Serialization.FieldSetter;
 import com.gx.common.math.IntMath;
 import com.gx.common.primitives.Ints;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
@@ -27,9 +26,6 @@ import com.gx.j2objc.annotations.WeakOuter;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
@@ -553,29 +549,6 @@ public final class ConcurrentHashMultiset<E> extends AbstractMultiset<E> impleme
     @Override
     public void clear() {
         countMap.clear();
-    }
-
-    /**
-     * @serialData the ConcurrentMap of elements and their counts.
-     */
-    private void writeObject(ObjectOutputStream stream) throws IOException {
-        stream.defaultWriteObject();
-        stream.writeObject(countMap);
-    }
-
-    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        @SuppressWarnings("unchecked") // reading data stored by writeObject
-                ConcurrentMap<E, Integer> deserializedCountMap =
-                (ConcurrentMap<E, Integer>) stream.readObject();
-        FieldSettersHolder.COUNT_MAP_FIELD_SETTER.set(this, deserializedCountMap);
-    }
-
-    // This constant allows the deserialization code to set a final field. This holder class
-    // makes sure it is not initialized unless an instance is deserialized.
-    private static class FieldSettersHolder {
-        static final FieldSetter<ConcurrentHashMultiset> COUNT_MAP_FIELD_SETTER =
-                Serialization.getFieldSetter(ConcurrentHashMultiset.class, "countMap");
     }
 
     @WeakOuter

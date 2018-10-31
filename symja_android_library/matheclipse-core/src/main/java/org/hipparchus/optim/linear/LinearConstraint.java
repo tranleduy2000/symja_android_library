@@ -17,12 +17,8 @@
 package org.hipparchus.optim.linear;
 
 import org.hipparchus.linear.ArrayRealVector;
-import org.hipparchus.linear.MatrixUtils;
 import org.hipparchus.linear.RealVector;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -220,28 +216,4 @@ public class LinearConstraint implements Serializable {
                 coefficients.hashCode();
     }
 
-    /**
-     * Serialize the instance.
-     *
-     * @param oos stream where object should be written
-     * @throws IOException if object cannot be written to stream
-     */
-    private void writeObject(ObjectOutputStream oos)
-            throws IOException {
-        oos.defaultWriteObject();
-        MatrixUtils.serializeRealVector(coefficients, oos);
-    }
-
-    /**
-     * Deserialize the instance.
-     *
-     * @param ois stream from which the object should be read
-     * @throws ClassNotFoundException if a class in the stream cannot be found
-     * @throws IOException            if object cannot be read from the stream
-     */
-    private void readObject(ObjectInputStream ois)
-            throws ClassNotFoundException, IOException {
-        ois.defaultReadObject();
-        MatrixUtils.deserializeRealVector(this, "coefficients", ois);
-    }
 }

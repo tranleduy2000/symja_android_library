@@ -75,72 +75,6 @@ public abstract class CharSource {
     }
 
     /**
-     * Concatenates multiple {@link CharSource} instances into a single source. Streams returned from
-     * the source will contain the concatenated data from the streams of the underlying sources.
-     * <p>
-     * <p>Only one underlying stream will be open at a time. Closing the concatenated stream will
-     * close the open underlying stream.
-     *
-     * @param sources the sources to concatenate
-     * @return a {@code CharSource} containing the concatenated data
-     * @since 15.0
-     */
-    public static CharSource concat(Iterable<? extends CharSource> sources) {
-        return new ConcatenatedCharSource(sources);
-    }
-
-    /**
-     * Concatenates multiple {@link CharSource} instances into a single source. Streams returned from
-     * the source will contain the concatenated data from the streams of the underlying sources.
-     * <p>
-     * <p>Only one underlying stream will be open at a time. Closing the concatenated stream will
-     * close the open underlying stream.
-     * <p>
-     * <p>Note: The input {@code Iterator} will be copied to an {@code ImmutableList} when this method
-     * is called. This will fail if the iterator is infinite and may cause problems if the iterator
-     * eagerly fetches data for each source when iterated (rather than producing sources that only
-     * load data through their streams). Prefer using the {@link #concat(Iterable)} overload if
-     * possible.
-     *
-     * @param sources the sources to concatenate
-     * @return a {@code CharSource} containing the concatenated data
-     * @throws NullPointerException if any of {@code sources} is {@code null}
-     * @since 15.0
-     */
-    public static CharSource concat(Iterator<? extends CharSource> sources) {
-        return concat(ImmutableList.copyOf(sources));
-    }
-
-    /**
-     * Concatenates multiple {@link CharSource} instances into a single source. Streams returned from
-     * the source will contain the concatenated data from the streams of the underlying sources.
-     * <p>
-     * <p>Only one underlying stream will be open at a time. Closing the concatenated stream will
-     * close the open underlying stream.
-     *
-     * @param sources the sources to concatenate
-     * @return a {@code CharSource} containing the concatenated data
-     * @throws NullPointerException if any of {@code sources} is {@code null}
-     * @since 15.0
-     */
-    public static CharSource concat(CharSource... sources) {
-        return concat(ImmutableList.copyOf(sources));
-    }
-
-    /**
-     * Returns a view of the given character sequence as a {@link CharSource}. The behavior of the
-     * returned {@code CharSource} and any {@code Reader} instances created by it is unspecified if
-     * the {@code charSequence} is mutated while it is being read, so don't do that.
-     *
-     * @since 15.0 (since 14.0 as {@code CharStreams.asCharSource(String)})
-     */
-    public static CharSource wrap(CharSequence charSequence) {
-        return charSequence instanceof String
-                ? new StringCharSource((String) charSequence)
-                : new CharSequenceCharSource(charSequence);
-    }
-
-    /**
      * Returns an immutable {@link CharSource} that contains no characters.
      *
      * @since 15.0
@@ -570,57 +504,6 @@ public abstract class CharSource {
         @Override
         public String toString() {
             return "CharSource.empty()";
-        }
-    }
-
-    private static final class ConcatenatedCharSource extends CharSource {
-
-        private final Iterable<? extends CharSource> sources;
-
-        ConcatenatedCharSource(Iterable<? extends CharSource> sources) {
-            this.sources = checkNotNull(sources);
-        }
-
-        @Override
-        public Reader openStream() throws IOException {
-            return new MultiReader(sources.iterator());
-        }
-
-        @Override
-        public boolean isEmpty() throws IOException {
-            for (CharSource source : sources) {
-                if (!source.isEmpty()) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public Optional<Long> lengthIfKnown() {
-            long result = 0L;
-            for (CharSource source : sources) {
-                Optional<Long> lengthIfKnown = source.lengthIfKnown();
-                if (!lengthIfKnown.isPresent()) {
-                    return Optional.absent();
-                }
-                result += lengthIfKnown.get();
-            }
-            return Optional.of(result);
-        }
-
-        @Override
-        public long length() throws IOException {
-            long result = 0L;
-            for (CharSource source : sources) {
-                result += source.length();
-            }
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return "CharSource.concat(" + sources + ")";
         }
     }
 
