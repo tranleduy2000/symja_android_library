@@ -33,7 +33,6 @@ public final class DefaultSeedGenerator implements SeedGenerator
     /** Delegate generators. */
     private static final SeedGenerator[] GENERATORS = new SeedGenerator[]
     {
-        new DevRandomSeedGenerator(),
         new RandomDotOrgSeedGenerator(),
     };
 
