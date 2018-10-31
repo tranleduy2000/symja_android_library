@@ -20,8 +20,6 @@ package org.apache.commons.csv;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static org.apache.commons.csv.Constants.CR;
 import static org.apache.commons.csv.Constants.LF;
@@ -317,23 +315,4 @@ public final class CSVPrinter implements Flushable, Closeable {
         }
     }
 
-    /**
-     * Prints all the objects in the given JDBC result set.
-     *
-     * @param resultSet
-     *            result set the values to print.
-     * @throws IOException
-     *             If an I/O error occurs
-     * @throws SQLException
-     *             if a database access error occurs
-     */
-    public void printRecords(final ResultSet resultSet) throws SQLException, IOException {
-        final int columnCount = resultSet.getMetaData().getColumnCount();
-        while (resultSet.next()) {
-            for (int i = 1; i <= columnCount; i++) {
-                print(resultSet.getObject(i));
-            }
-            println();
-        }
-    }
 }

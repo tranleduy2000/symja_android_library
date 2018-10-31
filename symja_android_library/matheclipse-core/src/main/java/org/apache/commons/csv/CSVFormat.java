@@ -17,17 +17,10 @@
 
 package org.apache.commons.csv;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -956,44 +949,6 @@ public final class CSVFormat implements Serializable {
     }
 
     /**
-     * Prints to the {@link System#out}.
-     *
-     * <p>
-     * See also {@link CSVPrinter}.
-     * </p>
-     *
-     * @return a printer to {@link System#out}.
-     * @throws IOException
-     *             thrown if the optional header cannot be printed.
-     * @since 1.5
-     */
-    public CSVPrinter printer() throws IOException {
-        return new CSVPrinter(System.out, this);
-    }
-
-    /**
-     * Prints to the specified output.
-     *
-     * <p>
-     * See also {@link CSVPrinter}.
-     * </p>
-     *
-     * @param out
-     *            the output.
-     * @param charset
-     *            A charset.
-     * @return a printer to an output.
-     * @throws IOException
-     *             thrown if the optional header cannot be printed.
-     * @since 1.5
-     */
-    @SuppressWarnings("resource")
-    public CSVPrinter print(final File out, Charset charset) throws IOException {
-        // The writer will be closed when close() is called.
-        return new CSVPrinter(new OutputStreamWriter(new FileOutputStream(out), charset), this);
-    }
-
-    /**
      * Prints the {@code value} as the next value on the line to {@code out}. The value will be escaped or encapsulated
      * as needed. Useful when one wants to avoid creating CSVPrinters.
      *
@@ -1492,112 +1447,6 @@ public final class CSVFormat implements Serializable {
      */
     public CSVFormat withFirstRecordAsHeader() {
         return withHeader().withSkipHeaderRecord();
-    }
-
-    /**
-     * Returns a new {@code CSVFormat} with the header of the format defined by the enum class.
-     *
-     * <p>
-     * Example:
-     * </p>
-     * <pre>
-     * public enum Header {
-     *     Name, Email, Phone
-     * }
-     *
-     * CSVFormat format = aformat.withHeader(Header.class);
-     * </pre>
-     * <p>
-     * The header is also used by the {@link CSVPrinter}.
-     * </p>
-     *
-     * @param headerEnum
-     *            the enum defining the header, {@code null} if disabled, empty if parsed automatically, user specified
-     *            otherwise.
-     *
-     * @return A new CSVFormat that is equal to this but with the specified header
-     * @see #withHeader(String...)
-     * @see #withSkipHeaderRecord(boolean)
-     * @since 1.3
-     */
-    public CSVFormat withHeader(final Class<? extends Enum<?>> headerEnum) {
-        String[] header = null;
-        if (headerEnum != null) {
-            final Enum<?>[] enumValues = headerEnum.getEnumConstants();
-            header = new String[enumValues.length];
-            for (int i = 0; i < enumValues.length; i++) {
-                header[i] = enumValues[i].name();
-            }
-        }
-        return withHeader(header);
-    }
-
-    /**
-     * Returns a new {@code CSVFormat} with the header of the format set from the result set metadata. The header can
-     * either be parsed automatically from the input file with:
-     *
-     * <pre>
-     * CSVFormat format = aformat.withHeader();
-     * </pre>
-     *
-     * or specified manually with:
-     *
-     * <pre>
-     * CSVFormat format = aformat.withHeader(resultSet);
-     * </pre>
-     * <p>
-     * The header is also used by the {@link CSVPrinter}.
-     * </p>
-     *
-     * @param resultSet
-     *            the resultSet for the header, {@code null} if disabled, empty if parsed automatically, user specified
-     *            otherwise.
-     *
-     * @return A new CSVFormat that is equal to this but with the specified header
-     * @throws SQLException
-     *             SQLException if a database access error occurs or this method is called on a closed result set.
-     * @since 1.1
-     */
-    public CSVFormat withHeader(final ResultSet resultSet) throws SQLException {
-        return withHeader(resultSet != null ? resultSet.getMetaData() : null);
-    }
-
-    /**
-     * Returns a new {@code CSVFormat} with the header of the format set from the result set metadata. The header can
-     * either be parsed automatically from the input file with:
-     *
-     * <pre>
-     * CSVFormat format = aformat.withHeader();
-     * </pre>
-     *
-     * or specified manually with:
-     *
-     * <pre>
-     * CSVFormat format = aformat.withHeader(metaData);
-     * </pre>
-     * <p>
-     * The header is also used by the {@link CSVPrinter}.
-     * </p>
-     *
-     * @param metaData
-     *            the metaData for the header, {@code null} if disabled, empty if parsed automatically, user specified
-     *            otherwise.
-     *
-     * @return A new CSVFormat that is equal to this but with the specified header
-     * @throws SQLException
-     *             SQLException if a database access error occurs or this method is called on a closed result set.
-     * @since 1.1
-     */
-    public CSVFormat withHeader(final ResultSetMetaData metaData) throws SQLException {
-        String[] labels = null;
-        if (metaData != null) {
-            final int columnCount = metaData.getColumnCount();
-            labels = new String[columnCount];
-            for (int i = 0; i < columnCount; i++) {
-                labels[i] = metaData.getColumnLabel(i + 1);
-            }
-        }
-        return withHeader(labels);
     }
 
     /**
