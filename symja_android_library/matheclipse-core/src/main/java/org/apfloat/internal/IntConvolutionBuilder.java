@@ -14,7 +14,6 @@ import static org.apfloat.internal.IntConstants.NTT_COST_FACTOR;
  * @see IntShortConvolutionStrategy
  * @see IntMediumConvolutionStrategy
  * @see IntKaratsubaConvolutionStrategy
- * @see ThreeNTTConvolutionStrategy
  */
 
 public class IntConvolutionBuilder

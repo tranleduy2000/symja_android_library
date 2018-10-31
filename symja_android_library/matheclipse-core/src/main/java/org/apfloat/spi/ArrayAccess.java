@@ -81,48 +81,6 @@ public abstract class ArrayAccess
     }
 
     /**
-     * Returns the array of this array access as a <code>long[]</code>.
-     *
-     * @return The backing array of this array access.
-     *
-     * @exception UnsupportedOperationException In case the backing array can't be presented as <code>long[]</code>.
-     */
-
-    public long[] getLongData()
-        throws UnsupportedOperationException, ApfloatRuntimeException
-    {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /**
-     * Returns the array of this array access as a <code>float[]</code>.
-     *
-     * @return The backing array of this array access.
-     *
-     * @exception UnsupportedOperationException In case the backing array can't be presented as <code>float[]</code>.
-     */
-
-    public float[] getFloatData()
-        throws UnsupportedOperationException, ApfloatRuntimeException
-    {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /**
-     * Returns the array of this array access as a <code>double[]</code>.
-     *
-     * @return The backing array of this array access.
-     *
-     * @exception UnsupportedOperationException In case the backing array can't be presented as <code>double[]</code>.
-     */
-
-    public double[] getDoubleData()
-        throws UnsupportedOperationException, ApfloatRuntimeException
-    {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /**
      * Returns the offset of the access segment within the backing array.
      *
      * @return The starting index within the backing array that is allowed to be accessed.

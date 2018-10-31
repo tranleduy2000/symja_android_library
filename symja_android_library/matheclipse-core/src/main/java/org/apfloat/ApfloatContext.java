@@ -1,7 +1,6 @@
 package org.apfloat;
 
 import org.apfloat.internal.IntBuilderFactory;
-import org.apfloat.internal.LongBuilderFactory;
 import org.apfloat.spi.BuilderFactory;
 import org.apfloat.spi.FilenameGenerator;
 import org.apfloat.spi.Util;
@@ -274,10 +273,6 @@ public class ApfloatContext
         int blockSize = Util.round2down((int) Math.min(memoryThreshold, Integer.MAX_VALUE));
 
         // Guess if we are using a 32-bit or 64-bit platform
-        String elementType = (totalMemory >= 4L << 30 ? "Long" : "Int");
-        String builderFactoryClassName = elementType.equals("Long") ?
-                LongBuilderFactory.class.getName() : IntBuilderFactory.class.getName();
-        ApfloatContext.defaultProperties.setProperty(BUILDER_FACTORY, builderFactoryClassName);
         ApfloatContext.defaultProperties.setProperty(DEFAULT_RADIX, "10");
         ApfloatContext.defaultProperties.setProperty(MAX_MEMORY_BLOCK_SIZE, String.valueOf(maxMemoryBlockSize));
         ApfloatContext.defaultProperties.setProperty(CACHE_L1_SIZE, "8192");
@@ -328,7 +323,7 @@ public class ApfloatContext
             throws ApfloatConfigurationException {
         this.properties = (Properties) ApfloatContext.defaultProperties.clone();
         this.properties.putAll(properties);
-
+        setBuilderFactory(new IntBuilderFactory());
         setProperties(this.properties);
     }
 
@@ -512,7 +507,6 @@ public class ApfloatContext
      */
 
     public void setBuilderFactory(BuilderFactory builderFactory) {
-        this.properties.setProperty(BUILDER_FACTORY, builderFactory.getClass().getName());
         this.builderFactory = builderFactory;
 
         if (this.cleanupThread != null) {
@@ -956,9 +950,7 @@ public class ApfloatContext
     public void setProperty(String propertyName, String propertyValue)
             throws ApfloatConfigurationException {
         try {
-            if (propertyName.equals(BUILDER_FACTORY)) {
-                setBuilderFactory((BuilderFactory) Class.forName(propertyValue).newInstance());
-            } else if (propertyName.equals(DEFAULT_RADIX)) {
+            if (propertyName.equals(DEFAULT_RADIX)) {
                 setDefaultRadix(Integer.parseInt(propertyValue));
             } else if (propertyName.equals(MAX_MEMORY_BLOCK_SIZE)) {
                 setMaxMemoryBlockSize(Long.parseLong(propertyValue));
