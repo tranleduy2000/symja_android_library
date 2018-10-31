@@ -2,8 +2,8 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.common.util.concurrent.TimeLimiter;
+import com.gx.common.util.concurrent.SimpleTimeLimiter;
+import com.gx.common.util.concurrent.TimeLimiter;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
@@ -1960,7 +1960,7 @@ public final class Programming {
 					return ast.arg3();
 				}
 				return F.$Aborted;
-			} catch (com.google.common.util.concurrent.UncheckedTimeoutException e) {
+			} catch (com.gx.common.util.concurrent.UncheckedTimeoutException e) {
 				if (ast.isAST3()) {
 					return ast.arg3();
 				}

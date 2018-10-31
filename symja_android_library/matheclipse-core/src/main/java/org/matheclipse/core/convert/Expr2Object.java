@@ -1,6 +1,6 @@
 package org.matheclipse.core.convert;
 
-import com.google.common.math.DoubleMath;
+import com.gx.common.math.DoubleMath;
 
 import org.hipparchus.util.OpenIntToDoubleHashMap;
 import org.matheclipse.core.eval.exception.WrongArgumentType;

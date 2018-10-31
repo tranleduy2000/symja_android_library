@@ -1,6 +1,6 @@
 package org.matheclipse.core.expression;
 
-import com.google.common.math.DoubleMath;
+import com.gx.common.math.DoubleMath;
 
 import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.interfaces.IExpr;

@@ -2,8 +2,8 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
-import com.google.common.math.BigIntegerMath;
-import com.google.common.math.LongMath;
+import com.gx.common.math.BigIntegerMath;
+import com.gx.common.math.LongMath;
 
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.CombinatoricsUtils;

@@ -1,7 +1,7 @@
 package org.matheclipse.core.eval;
 
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.common.util.concurrent.TimeLimiter;
+import com.gx.common.util.concurrent.SimpleTimeLimiter;
+import com.gx.common.util.concurrent.TimeLimiter;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.F;
@@ -447,7 +447,7 @@ public class ExprEvaluator {
 //							throw (RuntimeException) t;
 //						}
 					return F.$Aborted;
-				} catch (com.google.common.util.concurrent.UncheckedTimeoutException e) {
+				} catch (com.gx.common.util.concurrent.UncheckedTimeoutException e) {
 						// Throwable t = e.getCause();
 						// if (t instanceof RuntimeException) {
 						// throw (RuntimeException) t;

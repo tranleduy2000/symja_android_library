@@ -1,7 +1,7 @@
 package org.matheclipse.core.basic;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.gx.common.cache.Cache;
+import com.gx.common.cache.CacheBuilder;
 
 import org.hipparchus.util.Precision;
 import org.matheclipse.core.eval.EvalEngine;
@@ -195,7 +195,7 @@ public class Config {
 	 * An object that creates new threads on demand. Using thread factories removes hardwiring of calls to new Thread, enabling
 	 * applications to use special thread subclasses, priorities, etc.
 	 *
-	 * For example <code>com.google.appengine.api.ThreadManager.currentRequestThreadFactory()</code> can be used on Google appengine.
+	 * For example <code>com.gx.appengine.api.ThreadManager.currentRequestThreadFactory()</code> can be used on Google appengine.
 	 *
 	 */
 	public static java.util.concurrent.ThreadFactory THREAD_FACTORY = null;

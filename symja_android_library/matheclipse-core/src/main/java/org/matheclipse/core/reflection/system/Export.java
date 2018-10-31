@@ -76,12 +76,12 @@ public class Export extends AbstractEvaluator {
 					}
 				} else if (format.equals("Data")) {
 					File file = new File(arg1.toString());
-					com.google.common.io.Files.write(arg2.toString(), file, Charset.defaultCharset());
+					com.gx.common.io.Files.write(arg2.toString(), file, Charset.defaultCharset());
 					return arg1;
 				} else if (format.equals("WXF")) {
 					File file = new File(arg1.toString());
 					byte[] bArray = WL.serialize(arg2);
-					com.google.common.io.Files.write(bArray, file);
+					com.gx.common.io.Files.write(bArray, file);
 					return arg1;
 				}
 

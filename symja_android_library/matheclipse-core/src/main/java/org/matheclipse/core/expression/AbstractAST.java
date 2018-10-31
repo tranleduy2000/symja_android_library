@@ -6,8 +6,8 @@ import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.gx.common.cache.Cache;
+import com.gx.common.cache.CacheBuilder;
 
 import org.hipparchus.complex.Complex;
 import org.hipparchus.linear.Array2DRowRealMatrix;

@@ -3,7 +3,7 @@ package org.matheclipse.core.builtin;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
-import com.google.common.math.LongMath;
+import com.gx.common.math.LongMath;
 
 import org.hipparchus.analysis.solvers.LaguerreSolver;
 import org.hipparchus.linear.Array2DRowRealMatrix;

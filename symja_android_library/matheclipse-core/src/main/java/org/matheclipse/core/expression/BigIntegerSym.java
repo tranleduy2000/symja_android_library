@@ -1,6 +1,6 @@
 package org.matheclipse.core.expression;
 
-import com.google.common.math.BigIntegerMath;
+import com.gx.common.math.BigIntegerMath;
 
 import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.builtin.Combinatoric.Subsets;

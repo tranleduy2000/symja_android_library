@@ -7,7 +7,7 @@ import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
-import com.google.common.math.LongMath;
+import com.gx.common.math.LongMath;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Combinatoric.Permutations;

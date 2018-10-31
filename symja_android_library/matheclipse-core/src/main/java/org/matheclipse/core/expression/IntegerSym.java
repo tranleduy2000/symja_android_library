@@ -1,7 +1,7 @@
 package org.matheclipse.core.expression;
 
-import com.google.common.math.IntMath;
-import com.google.common.math.LongMath;
+import com.gx.common.math.IntMath;
+import com.gx.common.math.LongMath;
 
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.util.ArithmeticUtils;

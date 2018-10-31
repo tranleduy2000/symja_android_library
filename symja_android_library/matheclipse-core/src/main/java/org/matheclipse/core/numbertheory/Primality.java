@@ -1,7 +1,7 @@
 package org.matheclipse.core.numbertheory;
 
-import com.google.common.math.BigIntegerMath;
-import com.google.common.math.LongMath;
+import com.gx.common.math.BigIntegerMath;
+import com.gx.common.math.LongMath;
 
 import org.matheclipse.combinatoric.KSubsets;
 import org.matheclipse.combinatoric.KSubsets.KSubsetsList;

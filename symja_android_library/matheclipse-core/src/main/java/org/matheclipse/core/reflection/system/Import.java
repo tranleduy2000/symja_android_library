@@ -81,7 +81,7 @@ public class Import extends AbstractEvaluator {
 					return of(file, engine);
 				} else if (format.equals("WXF")) {
 					File file = new File(fileName);
-					byte[] byteArray = com.google.common.io.Files.toByteArray(file);
+					byte[] byteArray = com.gx.common.io.Files.toByteArray(file);
 					return WL.deserialize(byteArray);
 				}
 
@@ -110,7 +110,7 @@ public class Import extends AbstractEvaluator {
 		}
 		AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
 		final Parser parser = new Parser(engine.isRelaxedSyntax(), true);
-		String str = com.google.common.io.Files.toString(file, Charset.defaultCharset());
+		String str = com.gx.common.io.Files.toString(file, Charset.defaultCharset());
 		final ASTNode node = parser.parse(str);
 		return ast2Expr.convert(node);
 	}
