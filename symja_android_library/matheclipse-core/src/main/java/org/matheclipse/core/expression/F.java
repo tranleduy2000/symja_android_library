@@ -322,10 +322,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Assumptions = F.initFinalSymbol("Assumptions", ID.Assumptions);
 
-	/**
-	 * AtomQ(x) - is true if `x` is an atom (an object such as a number or string, which cannot be divided into
-	 * subexpressions using 'Part').
-	 */
+    /** AtomQ(x) - is true if `x` is an atom (an object such as a number or string, which cannot be divided into subexpressions using 'Part').*/
 	public final static IBuiltInSymbol AtomQ = F.initFinalSymbol("AtomQ", ID.AtomQ);
 
     /** Attributes(symbol) - returns the list of attributes which are assigned to `symbol`*/
@@ -352,10 +349,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol BeginPackage = F.initFinalSymbol("BeginPackage", ID.BeginPackage);
 
-	/**
-	 * BellB(n) - the Bell number function counts the number of different ways to partition a set that has exactly `n`
-	 * elements
-	 */
+    /** BellB(n) -  the Bell number function counts the number of different ways to partition a set that has exactly `n` elements*/
 	public final static IBuiltInSymbol BellB = F.initFinalSymbol("BellB", ID.BellB);
 
 	/** BellY(n, k, {x1, x2, ... , xN}) - the second kind of Bell polynomials (incomplete Bell polynomials).*/
@@ -386,10 +380,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol BetaRegularized = F.initFinalSymbol("BetaRegularized", ID.BetaRegularized);
 
-	/**
-	 * BinCounts(list, width-of-bin) - count the number of elements, if `list`, is divided into successive bins with
-	 * width `width-of-bin`.
-	 */
+    /** BinCounts(list, width-of-bin) - count the number of elements, if `list`, is divided into successive bins with width `width-of-bin`.*/
 	public final static IBuiltInSymbol BinCounts = F.initFinalSymbol("BinCounts", ID.BinCounts);
 
 	/***/
@@ -419,31 +410,19 @@ public class F {
     /** Block({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables`*/
 	public final static IBuiltInSymbol Block = F.initFinalSymbol("Block", ID.Block);
 
-	/**
-	 * Boole(expr) - returns `1` if `expr` evaluates to `True`; returns `0` if `expr` evaluates to `False`; and gives no
-	 * result otherwise.
-	 */
+    /** Boole(expr) - returns `1` if `expr` evaluates to `True`; returns `0` if `expr` evaluates to `False`; and gives no result otherwise.*/
 	public final static IBuiltInSymbol Boole = F.initFinalSymbol("Boole", ID.Boole);
 
-	/**
-	 * BooleanConvert(logical-expr) - convert the `logical-expr` to [disjunctive normal
-	 * form](https://en.wikipedia.org/wiki/Disjunctive_normal_form)
-	 */
+    /** BooleanConvert(logical-expr) - convert the `logical-expr` to [disjunctive normal form](https://en.wikipedia.org/wiki/Disjunctive_normal_form)*/
 	public final static IBuiltInSymbol BooleanConvert = F.initFinalSymbol("BooleanConvert", ID.BooleanConvert);
 
-	/**
-	 * BooleanMinimize(expr) - minimizes a boolean function with the [Quine McCluskey
-	 * algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm)
-	 */
+    /** BooleanMinimize(expr) - minimizes a boolean function with the [Quine McCluskey algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm)*/
 	public final static IBuiltInSymbol BooleanMinimize = F.initFinalSymbol("BooleanMinimize", ID.BooleanMinimize);
 
 	/** BooleanQ(expr) - returns `True` if `expr` is either `True` or `False`.*/
 	public final static IBuiltInSymbol BooleanQ = F.initFinalSymbol("BooleanQ", ID.BooleanQ);
 
-	/**
-	 * BooleanTable(logical-expr, variables) - generate [truth values](https://en.wikipedia.org/wiki/Truth_table) from
-	 * the `logical-expr`
-	 */
+    /** BooleanTable(logical-expr, variables) - generate [truth values](https://en.wikipedia.org/wiki/Truth_table) from the `logical-expr`*/
 	public final static IBuiltInSymbol BooleanTable = F.initFinalSymbol("BooleanTable", ID.BooleanTable);
 
 	/** BooleanVariables(logical-expr) - gives a list of the boolean variables that appear in the `logical-expr`.*/
@@ -465,10 +444,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol CForm = F.initFinalSymbol("CForm", ID.CForm);
 
-	/**
-	 * CanberraDistance(u, v) - returns the canberra distance between `u` and `v`, which is a weighted version of the
-	 * Manhattan distance.
-	 */
+    /** CanberraDistance(u, v) - returns the canberra distance between `u` and `v`, which is a weighted version of the Manhattan distance.*/
 	public final static IBuiltInSymbol CanberraDistance = F.initFinalSymbol("CanberraDistance", ID.CanberraDistance);
 
 	/** Cancel(expr) - cancels out common factors in numerators and denominators.*/
@@ -631,10 +607,7 @@ public class F {
 	/** ContinuedFraction(number) - get the continued fraction representation of `number`.*/
 	public final static IBuiltInSymbol ContinuedFraction = F.initFinalSymbol("ContinuedFraction", ID.ContinuedFraction);
 
-	/**
-	 * Convergents({n1, n2, ...}) - return the list of convergents which represents the continued fraction list `{n1,
-	 * n2, ...}`.
-	 */
+    /** Convergents({n1, n2, ...}) - return the list of convergents which represents the continued fraction list `{n1, n2, ...}`.*/
 	public final static IBuiltInSymbol Convergents = F.initFinalSymbol("Convergents", ID.Convergents);
 
 	/***/
@@ -976,50 +949,30 @@ public class F {
 	/** Fibonacci(n) - returns the Fibonacci number of the integer `n` */
 	public final static IBuiltInSymbol Fibonacci = F.initFinalSymbol("Fibonacci", ID.Fibonacci);
 
-	/**
-	 * FindFit(list-of-data-points, function, parameters, variable) - solve a least squares problem using the
-	 * Levenberg-Marquardt algorithm.
-	 */
+    /** FindFit(list-of-data-points, function, parameters, variable) - solve a least squares problem using the Levenberg-Marquardt algorithm.*/
 	public final static IBuiltInSymbol FindFit = F.initFinalSymbol("FindFit", ID.FindFit);
 
-	/**
-	 * FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables
-	 * `vars`.
-	 */
+    /** FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables `vars`.*/
 	public final static IBuiltInSymbol FindInstance = F.initFinalSymbol("FindInstance", ID.FindInstance);
 
-	/**
-	 * FindRoot(f, {x, xmin, xmax}) - searches for a numerical root of `f` for the variable `x`, in the range `xmin` to
-	 * `xmax`.
-	 */
+    /** FindRoot(f, {x, xmin, xmax}) - searches for a numerical root of `f` for the variable `x`, in the range `xmin` to `xmax`. */
 	public final static IBuiltInSymbol FindRoot = F.initFinalSymbol("FindRoot", ID.FindRoot);
 
 	/** First(expr) - returns the first element in `expr`.*/
 	public final static IBuiltInSymbol First = F.initFinalSymbol("First", ID.First);
 
-	/**
-	 * Fit(list-of-data-points, degree, variable) - solve a least squares problem using the Levenberg-Marquardt
-	 * algorithm.
-	 */
+    /** Fit(list-of-data-points, degree, variable) - solve a least squares problem using the Levenberg-Marquardt algorithm.*/
 	public final static IBuiltInSymbol Fit = F.initFinalSymbol("Fit", ID.Fit);
 
-	/**
-	 * FiveNum({dataset}) - the Tuckey five-number summary is a set of descriptive statistics that provide information
-	 * about a `dataset`. It consists of the five most important sample percentiles:
-	 */
+    /** FiveNum({dataset}) - the Tuckey five-number summary is a set of descriptive statistics that provide information about a `dataset`. It consists of the five most important sample percentiles:*/
     public final static IBuiltInSymbol FiveNum = F.initFinalSymbol("FiveNum", ID.FiveNum);
 	/** FixedPoint(f, expr) - starting with `expr`, iteratively applies `f` until the result no longer changes.*/
 	public final static IBuiltInSymbol FixedPoint = F.initFinalSymbol("FixedPoint", ID.FixedPoint);
 
-	/**
-	 * FixedPointList(f, expr) - starting with `expr`, iteratively applies `f` until the result no longer changes, and
-	 * returns a list of all intermediate results.
-	 */
+    /** FixedPointList(f, expr) - starting with `expr`, iteratively applies `f` until the result no longer changes, and returns a list of all intermediate results. */
 	public final static IBuiltInSymbol FixedPointList = F.initFinalSymbol("FixedPointList", ID.FixedPointList);
 
-	/**
-	 * Flat - is an attribute that specifies that nested occurrences of a function should be automatically flattened.
-	 */
+    /** Flat - is an attribute that specifies that nested occurrences of a function should be automatically flattened.    */
 	public final static IBuiltInSymbol Flat = F.initFinalSymbol("Flat", ID.Flat);
 
 	/** Flatten(expr) - flattens out nested lists in `expr`.*/
@@ -1037,10 +990,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol FoldList = F.initFinalSymbol("FoldList", ID.FoldList);
 
-	/**
-	 * For(start, test, incr, body) - evaluates `start`, and then iteratively `body` and `incr` as long as test
-	 * evaluates to `True`.
-	 */
+    /** For(start, test, incr, body) - evaluates `start`, and then iteratively `body` and `incr` as long as test evaluates to `True`.*/
 	public final static IBuiltInSymbol For = F.initFinalSymbol("For", ID.For);
 
 	/***/
@@ -1068,19 +1018,13 @@ public class F {
     /** FrobeniusNumber({a1, ... ,aN}) - returns the Frobenius number of the nonnegative integers `{a1, ... ,aN}`*/
 	public final static IBuiltInSymbol FrobeniusNumber = F.initFinalSymbol("FrobeniusNumber", ID.FrobeniusNumber);
 
-	/**
-	 * FrobeniusSolve({a1, ... ,aN}, M) - get a list of solutions for the Frobenius equation given by the list of
-	 * integers `{a1, ... ,aN}` and the non-negative integer `M`.
-	 */
+    /** FrobeniusSolve({a1, ... ,aN}, M) - get a list of solutions for the Frobenius equation given by the list of integers `{a1, ... ,aN}` and the non-negative integer `M`.*/
 	public final static IBuiltInSymbol FrobeniusSolve = F.initFinalSymbol("FrobeniusSolve", ID.FrobeniusSolve);
 
 	/***/
 	public final static IBuiltInSymbol FromCharacterCode = F.initFinalSymbol("FromCharacterCode", ID.FromCharacterCode);
 
-	/**
-	 * FromContinuedFraction({n1, n2, ...}) - return the number which represents the continued fraction list `{n1, n2,
-	 * ...}`.
-	 */
+    /** FromContinuedFraction({n1, n2, ...}) - return the number which represents the continued fraction list `{n1, n2, ...}`.*/
 	public final static IBuiltInSymbol FromContinuedFraction = F.initFinalSymbol("FromContinuedFraction",
 			ID.FromContinuedFraction);
 
@@ -1094,10 +1038,7 @@ public class F {
 	/** FullForm(expression) - shows the internal representation of the given `expression`.*/
 	public final static IBuiltInSymbol FullForm = F.initFinalSymbol("FullForm", ID.FullForm);
 
-	/**
-	 * FullSimplify(expr) - works like `Simplify` but additionally tries some `FunctionExpand` rule transformations to
-	 * simplify `expr`.
-	 */
+    /** FullSimplify(expr) - works like `Simplify` but additionally tries some `FunctionExpand` rule transformations to simplify `expr`.*/
 	public final static IBuiltInSymbol FullSimplify = F.initFinalSymbol("FullSimplify", ID.FullSimplify);
 
 	/***/
@@ -1207,9 +1148,7 @@ public class F {
     /** HoldPattern(expr) - `HoldPattern` doesn't evaluate `expr` for pattern-matching. */
 	public final static IBuiltInSymbol HoldPattern = F.initFinalSymbol("HoldPattern", ID.HoldPattern);
 
-	/**
-	 * HoldRest - is an attribute specifying that all but the first argument of a function should be left unevaluated.
-	 */
+    /** HoldRest - is an attribute specifying that all but the first argument of a function should be left unevaluated.  */
 	public final static IBuiltInSymbol HoldRest = F.initFinalSymbol("HoldRest", ID.HoldRest);
 
 	/***/

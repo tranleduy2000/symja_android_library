@@ -438,6 +438,7 @@ public class EvalEngine implements Serializable {
 
 	public void cancel() {
 		fLocalVariableStackMap = null;
+		fContext = Context.SYSTEM;
 		fContextPath = null;
 		fErrorPrintStream = null;
 		fFileSystemEnabled = false;
@@ -496,10 +497,14 @@ public class EvalEngine implements Serializable {
 	 * @param result0
 	 *            store the result of the evaluation in the i-th argument of the ast in <code>result0[0]</code>.
 	 *            <code>result0[0]</code> should be <code>F.NIL</code> if no evaluation occured.
-	 * @param ast               the original <code>ast</code> for whixh the arguments should be evaluated
-	 * @param arg               the i-th argument of <code>ast</code>
-	 * @param i                 <code>arg</code> is the i-th argument of <code>ast</code>
-	 * @param isNumericFunction if <code>true</code> the <code>NumericFunction</code> attribute is set for the <code>ast</code>'s head
+	 * @param ast
+	 *            the original <code>ast</code> for whixh the arguments should be evaluated
+	 * @param arg
+	 *            the i-th argument of <code>ast</code>
+	 * @param i
+	 *            <code>arg</code> is the i-th argument of <code>ast</code>
+	 * @param isNumericFunction
+	 *            if <code>true</code> the <code>NumericFunction</code> attribute is set for the <code>ast</code>'s head
 	 */
 	private void evalArg(IASTMutable[] result0, final IAST ast, IExpr arg, int i, boolean isNumericFunction) {
 		IExpr temp = evalLoop(arg);

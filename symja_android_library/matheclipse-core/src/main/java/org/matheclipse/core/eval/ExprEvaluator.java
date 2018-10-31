@@ -186,8 +186,9 @@ public class ExprEvaluator {
 	}
 
 	/**
-	 * Clear all <b>local variables</b> defined with the <code>defineVariable()</code> method for this evaluator. <b>Note:</b> global
-	 * variables assigned in scripting mode can be cleared with the <code>Clear(variable)</code> function.
+	 * Clear all <b>local variables</b> defined with the <code>defineVariable()</code> method for this evaluator.
+	 * <b>Note:</b> global variables assigned in scripting mode can be cleared with the <code>Clear(variable)</code>
+	 * function.
 	 * 
 	 * @see #defineVariable(ISymbol, IExpr)
 	 */

@@ -200,7 +200,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -222,7 +222,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -276,7 +276,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -343,7 +343,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -411,7 +411,7 @@ public final class Programming {
 			if (!ToggleFeature.DEFER) {
 				return;
 			}
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 	}
 
@@ -576,7 +576,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 	}
 
@@ -672,7 +672,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -792,7 +792,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -900,7 +900,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -991,7 +991,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -1052,7 +1052,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -1111,7 +1111,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 	}
 
@@ -1173,7 +1173,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 	}
 
@@ -1273,7 +1273,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 	}
 
@@ -1625,7 +1625,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 	}
 
@@ -1670,7 +1670,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -1779,7 +1779,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -1856,7 +1856,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -1996,7 +1996,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 	}
 
@@ -2017,7 +2017,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 	}
 
@@ -2035,7 +2035,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -2078,7 +2078,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -2101,7 +2101,7 @@ public final class Programming {
 			if (!ToggleFeature.UNEVALUATED) {
 				return;
 			}
-			newSymbol.setAttributes(HOLDALLCOMPLETE);
+			newSymbol.setAttributes(ISymbol.HOLDALLCOMPLETE);
 		}
 	}
 
@@ -2181,7 +2181,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -2258,7 +2258,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -2293,7 +2293,7 @@ public final class Programming {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
-			newSymbol.setAttributes(HOLDALL);
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
