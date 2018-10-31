@@ -65,7 +65,7 @@ import edu.jas.ufd.QuotientRing;
  * c = engine.GB(A);
  * </pre>
  * @see edu.jas.gb.GroebnerBase
- * @see edu.jas.application.GBAlgorithmBuilder
+
  */
 
 public class GBFactory {

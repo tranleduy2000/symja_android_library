@@ -116,14 +116,6 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
 
 
     /**
-     * Constructor not for use.
-     */
-    protected GBAlgorithmBuilder() {
-        throw new IllegalArgumentException("do not use this constructor");
-    }
-
-
-    /**
      * Constructor.
      *
      * @param ring the polynomial ring.
@@ -173,8 +165,8 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
      * @param fac the commutative polynomial ring.
      * @return GBAlgorithmBuilder object.
      */
-    public static <C extends GcdRingElem<C>> GBAlgorithmBuilder<C> polynomialRing(GenPolynomialRing<C> fac) {
-        return new GBAlgorithmBuilder<C>(fac);
+    public static  GBAlgorithmBuilder<BigRational> polynomialRing(GenPolynomialRing<BigRational> fac) {
+        return new GBAlgorithmBuilder<>(fac);
     }
 
     /**

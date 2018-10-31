@@ -32,7 +32,7 @@ import edu.jas.ufd.GreatestCommonDivisorAbstract;
  *
  * @param <C> base coefficient type
  * @author Heinz Kredel
- * @see edu.jas.application.GBAlgorithmBuilder
+
  * @see GBFactory
  */
 

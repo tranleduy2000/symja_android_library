@@ -20,6 +20,7 @@ import edu.jas.arith.BigRational;
 import edu.jas.gb.GroebnerBaseAbstract;
 import edu.jas.gbufd.GroebnerBasePartial;
 import edu.jas.poly.GenPolynomial;
+import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.OrderedPolynomialList;
 import edu.jas.poly.TermOrder;
@@ -173,14 +174,17 @@ public class GroebnerBasis extends AbstractFunctionEvaluator {
 		if (polyList.size() == 0) {
 			return F.NIL;
 		}
+		GenPolynomialRing<BigRational> polynomialRingFactory = jas.getPolynomialRingFactory();
 		GroebnerBaseAbstract<BigRational> engine = GBAlgorithmBuilder
-				.polynomialRing(jas.getPolynomialRingFactory()).fractionFree().syzygyPairlist().build();
+				.polynomialRing(polynomialRingFactory).fractionFree().syzygyPairlist().build();
 		List<GenPolynomial<BigRational>> opl = engine.GB(polyList);
 		IASTAppendable resultList = F.ListAlloc(opl.size()+rest.size());
 		// convert rational to integer coefficients and add
 		// polynomial to result list
 		for (GenPolynomial<BigRational> p : opl) {
-			resultList.append(jas.integerPoly2Expr((GenPolynomial<BigInteger>) jas.factorTerms(p)[2]));
+			Object[] objects = jas.factorTerms(p);
+			GenPolynomial<BigInteger> object = (GenPolynomial<BigInteger>) objects[2];
+			resultList.append(jas.integerPoly2Expr(object));
 		}
 		for (int i = 1; i < rest.size(); i++) {
 			resultList.append(rest.get(i));

@@ -66,7 +66,7 @@ import edu.jas.ufd.QuotientRing;
  * </pre>
  * @see edu.jas.gb.GroebnerBase
  * @see edu.jas.gb.SolvableGroebnerBase
- * @see edu.jas.application.GBAlgorithmBuilder
+
  */
 
 public class SGBFactory {

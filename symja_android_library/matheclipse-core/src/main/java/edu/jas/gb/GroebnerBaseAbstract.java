@@ -35,7 +35,7 @@ import edu.jas.vector.BasicLinAlg;
  *
  * @param <C> coefficient type
  * @author Heinz Kredel
- * @see edu.jas.application.GBAlgorithmBuilder
+
  * @see edu.jas.gbufd.GBFactory
  */
 

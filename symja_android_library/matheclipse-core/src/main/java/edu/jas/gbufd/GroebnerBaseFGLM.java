@@ -29,7 +29,7 @@ import edu.jas.structure.RingFactory;
  *
  * @param <C> coefficient type
  * @author Jan Suess
- * @see edu.jas.application.GBAlgorithmBuilder
+
  * @see GBFactory
  */
 public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {

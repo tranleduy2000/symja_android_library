@@ -36,7 +36,7 @@ import edu.jas.structure.RingFactory;
  *
  * @param <C> coefficient type
  * @author Heinz Kredel
- * @see edu.jas.application.GBAlgorithmBuilder
+
  * @see GBFactory
  */
 public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
