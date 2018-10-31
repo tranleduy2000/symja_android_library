@@ -18,7 +18,6 @@ import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.common.base.Charsets;
 import com.gx.common.base.MoreObjects;
-import com.gx.common.collect.Lists;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
 
 import java.io.IOException;
@@ -26,7 +25,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import static com.gx.common.base.Preconditions.checkArgument;
 import static com.gx.common.base.Preconditions.checkNotNull;
@@ -89,58 +87,6 @@ public final class Resources {
      */
     public static String toString(URL url, Charset charset) throws IOException {
         return asCharSource(url, charset).read();
-    }
-
-    /**
-     * Streams lines from a URL, stopping when our callback returns false, or we have read all of the
-     * lines.
-     *
-     * @param url      the URL to read from
-     * @param charset  the charset used to decode the input stream; see {@link Charsets} for helpful
-     *                 predefined constants
-     * @param callback the LineProcessor to use to handle the lines
-     * @return the output of processing the lines
-     * @throws IOException if an I/O error occurs
-     */
-    @CanIgnoreReturnValue // some processors won't return a useful result
-    public static <T> T readLines(URL url, Charset charset, LineProcessor<T> callback)
-            throws IOException {
-        return asCharSource(url, charset).readLines(callback);
-    }
-
-    /**
-     * Reads all of the lines from a URL. The lines do not include line-termination characters, but do
-     * include other leading and trailing whitespace.
-     * <p>
-     * <p>This method returns a mutable {@code List}. For an {@code ImmutableList}, use {@code
-     * Resources.asCharSource(url, charset).readLines()}.
-     *
-     * @param url     the URL to read from
-     * @param charset the charset used to decode the input stream; see {@link Charsets} for helpful
-     *                predefined constants
-     * @return a mutable {@link List} containing all the lines
-     * @throws IOException if an I/O error occurs
-     */
-    public static List<String> readLines(URL url, Charset charset) throws IOException {
-        // don't use asCharSource(url, charset).readLines() because that returns
-        // an immutable list, which would change the behavior of this method
-        return readLines(
-                url,
-                charset,
-                new LineProcessor<List<String>>() {
-                    final List<String> result = Lists.newArrayList();
-
-                    @Override
-                    public boolean processLine(String line) {
-                        result.add(line);
-                        return true;
-                    }
-
-                    @Override
-                    public List<String> getResult() {
-                        return result;
-                    }
-                });
     }
 
     /**

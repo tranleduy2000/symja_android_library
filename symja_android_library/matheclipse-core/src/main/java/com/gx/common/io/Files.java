@@ -16,47 +16,29 @@ package com.gx.common.io;
 
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
-import com.gx.common.base.Joiner;
 import com.gx.common.base.Optional;
 import com.gx.common.base.Predicate;
-import com.gx.common.base.Splitter;
 import com.gx.common.collect.ImmutableSet;
-import com.gx.common.collect.Lists;
 import com.gx.common.collect.TreeTraverser;
 import com.gx.common.graph.SuccessorsFunction;
 import com.gx.common.graph.Traverser;
-import com.gx.errorprone.annotations.CanIgnoreReturnValue;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
-import static com.gx.common.base.Preconditions.checkArgument;
 import static com.gx.common.base.Preconditions.checkNotNull;
 import static com.gx.common.io.FileWriteMode.APPEND;
 
 /**
  * Provides utility methods for working with {@linkplain File files}.
  * <p>
- * <p>{@link java.nio.file.Path} users will find similar utilities in {@link MoreFiles} and the
- * JDK's {@link java.nio.file.Files} class.
  *
  * @author Chris Nokleberg
  * @author Colin Decker
@@ -91,41 +73,6 @@ public final class Files {
             };
 
     private Files() {
-    }
-
-    /**
-     * Returns a buffered reader that reads from a file using the given character set.
-     * <p>
-     * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link
-     * java.nio.file.Files#newBufferedReader(java.nio.file.Path, Charset)}.
-     *
-     * @param file    the file to read from
-     * @param charset the charset used to decode the input stream; see {@link StandardCharsets} for
-     *                helpful predefined constants
-     * @return the buffered reader
-     */
-    public static BufferedReader newReader(File file, Charset charset) throws FileNotFoundException {
-        checkNotNull(file);
-        checkNotNull(charset);
-        return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
-    }
-
-    /**
-     * Returns a buffered writer that writes to a file using the given character set.
-     * <p>
-     * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link
-     * java.nio.file.Files#newBufferedWriter(java.nio.file.Path, Charset,
-     * java.nio.file.OpenOption...)}.
-     *
-     * @param file    the file to write to
-     * @param charset the charset used to encode the output stream; see {@link StandardCharsets} for
-     *                helpful predefined constants
-     * @return the buffered writer
-     */
-    public static BufferedWriter newWriter(File file, Charset charset) throws FileNotFoundException {
-        checkNotNull(file);
-        checkNotNull(charset);
-        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset));
     }
 
     /**
@@ -230,44 +177,6 @@ public final class Files {
     @Deprecated
     public static void write(CharSequence from, File to, Charset charset) throws IOException {
         asCharSink(to, charset).write(from);
-    }
-
-    /**
-     * Copies all bytes from a file to an output stream.
-     * <p>
-     * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link
-     * java.nio.file.Files#copy(java.nio.file.Path, OutputStream)}.
-     *
-     * @param from the source file
-     * @param to   the output stream
-     * @throws IOException if an I/O error occurs
-     */
-    public static void copy(File from, OutputStream to) throws IOException {
-        asByteSource(from).copyTo(to);
-    }
-
-    /**
-     * Copies all the bytes from one file to another.
-     * <p>
-     * <p>Copying is not an atomic operation - in the case of an I/O error, power loss, process
-     * termination, or other problems, {@code to} may not be a complete copy of {@code from}. If you
-     * need to guard against those conditions, you should employ other file-level synchronization.
-     * <p>
-     * <p><b>Warning:</b> If {@code to} represents an existing file, that file will be overwritten
-     * with the contents of {@code from}. If {@code to} and {@code from} refer to the <i>same</i>
-     * file, the contents of that file will be deleted.
-     * <p>
-     * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link
-     * java.nio.file.Files#copy(java.nio.file.Path, java.nio.file.Path, java.nio.file.CopyOption...)}.
-     *
-     * @param from the source file
-     * @param to   the destination file
-     * @throws IOException              if an I/O error occurs
-     * @throws IllegalArgumentException if {@code from.equals(to)}
-     */
-    public static void copy(File from, File to) throws IOException {
-        checkArgument(!from.equals(to), "Source %s and destination %s must be different", from, to);
-        asByteSource(from).copyTo(asByteSink(to));
     }
 
     /**
@@ -406,308 +315,6 @@ public final class Files {
         if (!parent.isDirectory()) {
             throw new IOException("Unable to create parent directories of " + file);
         }
-    }
-
-    /**
-     * Moves a file from one path to another. This method can rename a file and/or move it to a
-     * different directory. In either case {@code to} must be the target path for the file itself; not
-     * just the new name for the file or the path to the new parent directory.
-     * <p>
-     * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link java.nio.file.Files#move}.
-     *
-     * @param from the source file
-     * @param to   the destination file
-     * @throws IOException              if an I/O error occurs
-     * @throws IllegalArgumentException if {@code from.equals(to)}
-     */
-    public static void move(File from, File to) throws IOException {
-        checkNotNull(from);
-        checkNotNull(to);
-        checkArgument(!from.equals(to), "Source %s and destination %s must be different", from, to);
-
-        if (!from.renameTo(to)) {
-            copy(from, to);
-            if (!from.delete()) {
-                if (!to.delete()) {
-                    throw new IOException("Unable to delete " + to);
-                }
-                throw new IOException("Unable to delete " + from);
-            }
-        }
-    }
-
-    /**
-     * Reads the first line from a file. The line does not include line-termination characters, but
-     * does include other leading and trailing whitespace.
-     *
-     * @param file    the file to read from
-     * @param charset the charset used to decode the input stream; see {@link StandardCharsets} for
-     *                helpful predefined constants
-     * @return the first line, or null if the file is empty
-     * @throws IOException if an I/O error occurs
-     * @deprecated Prefer {@code asCharSource(file, charset).readFirstLine()}. This method is
-     * scheduled to be removed in January 2019.
-     */
-    @Deprecated
-    public static String readFirstLine(File file, Charset charset) throws IOException {
-        return asCharSource(file, charset).readFirstLine();
-    }
-
-    /**
-     * Reads all of the lines from a file. The lines do not include line-termination characters, but
-     * do include other leading and trailing whitespace.
-     * <p>
-     * <p>This method returns a mutable {@code List}. For an {@code ImmutableList}, use {@code
-     * Files.asCharSource(file, charset).readLines()}.
-     * <p>
-     * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link
-     * java.nio.file.Files#readAllLines(java.nio.file.Path, Charset)}.
-     *
-     * @param file    the file to read from
-     * @param charset the charset used to decode the input stream; see {@link StandardCharsets} for
-     *                helpful predefined constants
-     * @return a mutable {@link List} containing all the lines
-     * @throws IOException if an I/O error occurs
-     */
-    public static List<String> readLines(File file, Charset charset) throws IOException {
-        // don't use asCharSource(file, charset).readLines() because that returns
-        // an immutable list, which would change the behavior of this method
-        return asCharSource(file, charset)
-                .readLines(
-                        new LineProcessor<List<String>>() {
-                            final List<String> result = Lists.newArrayList();
-
-                            @Override
-                            public boolean processLine(String line) {
-                                result.add(line);
-                                return true;
-                            }
-
-                            @Override
-                            public List<String> getResult() {
-                                return result;
-                            }
-                        });
-    }
-
-    /**
-     * Streams lines from a {@link File}, stopping when our callback returns false, or we have read
-     * all of the lines.
-     *
-     * @param file     the file to read from
-     * @param charset  the charset used to decode the input stream; see {@link StandardCharsets} for
-     *                 helpful predefined constants
-     * @param callback the {@link LineProcessor} to use to handle the lines
-     * @return the output of processing the lines
-     * @throws IOException if an I/O error occurs
-     * @deprecated Prefer {@code asCharSource(file, charset).readLines(callback)}. This method is
-     * scheduled to be removed in January 2019.
-     */
-    @Deprecated
-    @CanIgnoreReturnValue // some processors won't return a useful result
-    public static <T> T readLines(File file, Charset charset, LineProcessor<T> callback)
-            throws IOException {
-        return asCharSource(file, charset).readLines(callback);
-    }
-
-    /**
-     * Process the bytes of a file.
-     * <p>
-     * <p>(If this seems too complicated, maybe you're looking for {@link #toByteArray}.)
-     *
-     * @param file      the file to read
-     * @param processor the object to which the bytes of the file are passed.
-     * @return the result of the byte processor
-     * @throws IOException if an I/O error occurs
-     * @deprecated Prefer {@code asByteSource(file).read(processor)}. This method is scheduled to be
-     * removed in January 2019.
-     */
-    @Deprecated
-    @CanIgnoreReturnValue // some processors won't return a useful result
-    public static <T> T readBytes(File file, ByteProcessor<T> processor) throws IOException {
-        return asByteSource(file).read(processor);
-    }
-
-    /**
-     * Fully maps a file read-only in to memory as per {@link
-     * FileChannel#map(MapMode, long, long)}.
-     * <p>
-     * <p>Files are mapped from offset 0 to its length.
-     * <p>
-     * <p>This only works for files ≤ {@link Integer#MAX_VALUE} bytes.
-     *
-     * @param file the file to map
-     * @return a read-only buffer reflecting {@code file}
-     * @throws FileNotFoundException if the {@code file} does not exist
-     * @throws IOException           if an I/O error occurs
-     * @see FileChannel#map(MapMode, long, long)
-     * @since 2.0
-     */
-    public static MappedByteBuffer map(File file) throws IOException {
-        checkNotNull(file);
-        return map(file, MapMode.READ_ONLY);
-    }
-
-    /**
-     * Fully maps a file in to memory as per {@link
-     * FileChannel#map(MapMode, long, long)} using the requested {@link
-     * MapMode}.
-     * <p>
-     * <p>Files are mapped from offset 0 to its length.
-     * <p>
-     * <p>This only works for files ≤ {@link Integer#MAX_VALUE} bytes.
-     *
-     * @param file the file to map
-     * @param mode the mode to use when mapping {@code file}
-     * @return a buffer reflecting {@code file}
-     * @throws FileNotFoundException if the {@code file} does not exist
-     * @throws IOException           if an I/O error occurs
-     * @see FileChannel#map(MapMode, long, long)
-     * @since 2.0
-     */
-    public static MappedByteBuffer map(File file, MapMode mode) throws IOException {
-        checkNotNull(file);
-        checkNotNull(mode);
-        if (!file.exists()) {
-            throw new FileNotFoundException(file.toString());
-        }
-        return map(file, mode, file.length());
-    }
-
-    /**
-     * Maps a file in to memory as per {@link FileChannel#map(MapMode,
-     * long, long)} using the requested {@link MapMode}.
-     * <p>
-     * <p>Files are mapped from offset 0 to {@code size}.
-     * <p>
-     * <p>If the mode is {@link MapMode#READ_WRITE} and the file does not exist, it will be created
-     * with the requested {@code size}. Thus this method is useful for creating memory mapped files
-     * which do not yet exist.
-     * <p>
-     * <p>This only works for files ≤ {@link Integer#MAX_VALUE} bytes.
-     *
-     * @param file the file to map
-     * @param mode the mode to use when mapping {@code file}
-     * @return a buffer reflecting {@code file}
-     * @throws IOException if an I/O error occurs
-     * @see FileChannel#map(MapMode, long, long)
-     * @since 2.0
-     */
-    public static MappedByteBuffer map(File file, MapMode mode, long size)
-            throws IOException {
-        checkNotNull(file);
-        checkNotNull(mode);
-
-        Closer closer = Closer.create();
-        try {
-            RandomAccessFile raf =
-                    closer.register(new RandomAccessFile(file, mode == MapMode.READ_ONLY ? "r" : "rw"));
-            return map(raf, mode, size);
-        } catch (Throwable e) {
-            throw closer.rethrow(e);
-        } finally {
-            closer.close();
-        }
-    }
-
-    private static MappedByteBuffer map(RandomAccessFile raf, MapMode mode, long size)
-            throws IOException {
-        Closer closer = Closer.create();
-        try {
-            FileChannel channel = closer.register(raf.getChannel());
-            return channel.map(mode, 0, size);
-        } catch (Throwable e) {
-            throw closer.rethrow(e);
-        } finally {
-            closer.close();
-        }
-    }
-
-    /**
-     * Returns the lexically cleaned form of the path name, <i>usually</i> (but not always) equivalent
-     * to the original. The following heuristics are used:
-     * <p>
-     * <ul>
-     * <li>empty string becomes .
-     * <li>. stays as .
-     * <li>fold out ./
-     * <li>fold out ../ when possible
-     * <li>collapse multiple slashes
-     * <li>delete trailing slashes (unless the path is just "/")
-     * </ul>
-     * <p>
-     * <p>These heuristics do not always match the behavior of the filesystem. In particular, consider
-     * the path {@code a/../b}, which {@code simplifyPath} will change to {@code b}. If {@code a} is a
-     * symlink to {@code x}, {@code a/../b} may refer to a sibling of {@code x}, rather than the
-     * sibling of {@code a} referred to by {@code b}.
-     *
-     * @since 11.0
-     */
-    public static String simplifyPath(String pathname) {
-        checkNotNull(pathname);
-        if (pathname.length() == 0) {
-            return ".";
-        }
-
-        // split the path apart
-        Iterable<String> components = Splitter.on('/').omitEmptyStrings().split(pathname);
-        List<String> path = new ArrayList<>();
-
-        // resolve ., .., and //
-        for (String component : components) {
-            switch (component) {
-                case ".":
-                    continue;
-                case "..":
-                    if (path.size() > 0 && !path.get(path.size() - 1).equals("..")) {
-                        path.remove(path.size() - 1);
-                    } else {
-                        path.add("..");
-                    }
-                    break;
-                default:
-                    path.add(component);
-                    break;
-            }
-        }
-
-        // put it back together
-        String result = Joiner.on('/').join(path);
-        if (pathname.charAt(0) == '/') {
-            result = "/" + result;
-        }
-
-        while (result.startsWith("/../")) {
-            result = result.substring(3);
-        }
-        if (result.equals("/..")) {
-            result = "/";
-        } else if ("".equals(result)) {
-            result = ".";
-        }
-
-        return result;
-    }
-
-    /**
-     * Returns the <a href="http://en.wikipedia.org/wiki/Filename_extension">file extension</a> for
-     * the given file name, or the empty string if the file has no extension. The result does not
-     * include the '{@code .}'.
-     * <p>
-     * <p><b>Note:</b> This method simply returns everything after the last '{@code .}' in the file's
-     * name as determined by {@link File#getName}. It does not account for any filesystem-specific
-     * behavior that the {@link File} API does not already account for. For example, on NTFS it will
-     * report {@code "txt"} as the extension for the filename {@code "foo.exe:.txt"} even though NTFS
-     * will drop the {@code ":.txt"} part of the name when the file is actually created on the
-     * filesystem due to NTFS's <a href="https://goo.gl/vTpJi4">Alternate Data Streams</a>.
-     *
-     * @since 11.0
-     */
-    public static String getFileExtension(String fullName) {
-        checkNotNull(fullName);
-        String fileName = new File(fullName).getName();
-        int dotIndex = fileName.lastIndexOf('.');
-        return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
     }
 
     /**

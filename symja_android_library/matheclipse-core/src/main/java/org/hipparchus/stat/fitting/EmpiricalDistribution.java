@@ -34,12 +34,7 @@ import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathUtils;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,11 +99,6 @@ public class EmpiricalDistribution extends AbstractRealDistribution {
      * Default bin count
      */
     public static final int DEFAULT_BIN_COUNT = 1000;
-
-    /**
-     * Character set for file input
-     */
-    private static final String FILE_CHARSET = "US-ASCII";
 
     /**
      * Serializable version identifier
@@ -231,38 +221,6 @@ public class EmpiricalDistribution extends AbstractRealDistribution {
         }
         loaded = true;
 
-    }
-
-    /**
-     * Computes the empirical distribution from the input file.
-     * <p>
-     * <p>The input file <i>must</i> be an ASCII text file containing one
-     * valid numeric entry per line.</p>
-     *
-     * @param file the input file
-     * @throws IOException           if an IO error occurs
-     * @throws NullArgumentException if file is null
-     */
-    public void load(File file) throws IOException, NullArgumentException {
-        MathUtils.checkNotNull(file);
-        Charset charset = Charset.forName(FILE_CHARSET);
-        InputStream is = new FileInputStream(file);
-        BufferedReader in = new BufferedReader(new InputStreamReader(is, charset));
-        try {
-            DataAdapter da = new StreamDataAdapter(in);
-            da.computeStats();
-            // new adapter for second pass
-            is = new FileInputStream(file);
-            in = new BufferedReader(new InputStreamReader(is, charset));
-            fillBinStats(new StreamDataAdapter(in));
-            loaded = true;
-        } finally {
-            try {
-                in.close();
-            } catch (IOException ex) { //NOPMD
-                // ignore
-            }
-        }
     }
 
     /**

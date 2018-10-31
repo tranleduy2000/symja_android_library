@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.gx.common.base.Preconditions.checkNotNull;
 import static com.gx.common.base.Preconditions.checkPositionIndexes;
@@ -184,27 +182,6 @@ public final class CharStreams {
             copy(r, sb);
         }
         return sb;
-    }
-
-    /**
-     * Reads all of the lines from a {@link Readable} object. The lines do not include
-     * line-termination characters, but do include other leading and trailing whitespace.
-     * <p>
-     * <p>Does not close the {@code Readable}. If reading files or resources you should use the {@link
-     * Files#readLines} and {@link Resources#readLines} methods.
-     *
-     * @param r the object to read from
-     * @return a mutable {@link List} containing all the lines
-     * @throws IOException if an I/O error occurs
-     */
-    public static List<String> readLines(Readable r) throws IOException {
-        List<String> result = new ArrayList<>();
-        LineReader lineReader = new LineReader(r);
-        String line;
-        while ((line = lineReader.readLine()) != null) {
-            result.add(line);
-        }
-        return result;
     }
 
     /**
