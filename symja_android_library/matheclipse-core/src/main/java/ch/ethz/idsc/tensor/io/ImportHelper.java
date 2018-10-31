@@ -7,7 +7,6 @@ import org.matheclipse.core.reflection.system.Import;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.zip.GZIPInputStream;
 
 
 /**
@@ -24,10 +23,10 @@ import java.util.zip.GZIPInputStream;
      */
     static IAST of(Filename filename, InputStream inputStream) throws IOException {
         Extension extension = filename.extension();
-        if (extension.equals(Extension.GZ))
-            try (GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream)) {
-                return of(filename.truncate().extension(), gzipInputStream);
-            }
+//        if (extension.equals(Extension.GZ))
+//            try (GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream)) {
+//                return of(filename.truncate().extension(), gzipInputStream);
+//            }
         return of(extension, inputStream);
     }
 
