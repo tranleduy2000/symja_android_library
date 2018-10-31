@@ -3,6 +3,7 @@ package org.matheclipse.core.expression;
 import org.matheclipse.core.interfaces.ISymbol;
 
 import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -17,12 +18,15 @@ public class Context implements Serializable {
 	 */
 	public final static HashMap<String, ISymbol> PREDEFINED_SYMBOLS_MAP = new HashMap<String, ISymbol>(2053);
 
-	public final static Context DUMMY = new Context("DUMMY`", null);
+	public final static String DUMMY_CONTEXT_NAME = "DUMMY`";
+
+	public final static Context DUMMY = new Context(DUMMY_CONTEXT_NAME, null);
 
 	// Global context should not be defined global, but per EvalENgine
 	// public final static Context GLOBAL = new Context("Global`");
+	public final static String SYSTEM_CONTEXT_NAME = "System`";
 
-	public final static Context SYSTEM = new Context("System`", PREDEFINED_SYMBOLS_MAP);
+	public final static Context SYSTEM = new Context(SYSTEM_CONTEXT_NAME, PREDEFINED_SYMBOLS_MAP);
 
 	// public final static Context INTEGRATE = new Context("Integrate`");
 
@@ -32,6 +36,8 @@ public class Context implements Serializable {
 	private String contextName;
 
 	private HashMap<String, ISymbol> symbolTable;
+
+	public final static String GLOBAL_CONTEXT_NAME = "Global`";
 
 	public Context(String contextName) {
 		this(contextName, new HashMap<String, ISymbol>());
@@ -74,14 +80,11 @@ public class Context implements Serializable {
 
 	@Override
 	public int hashCode() {
-		if (contextName != null) {
-			return contextName.hashCode();
-		}
-		return 47;
+		return 47 + contextName.hashCode();
 	}
 
 	public boolean isGlobal() {
-		return contextName.equals(ContextPath.GLOBAL_CONTEXT_NAME);
+		return contextName.equals(Context.GLOBAL_CONTEXT_NAME);
 	}
 
 	// private static int counter = 0;
@@ -113,6 +116,15 @@ public class Context implements Serializable {
 	@Override
 	public String toString() {
 		return contextName;
+	}
+
+	private Object readResolve() throws ObjectStreamException {
+		if (contextName.equals(DUMMY_CONTEXT_NAME)) {
+			return DUMMY;
+		} else if (contextName.equals(SYSTEM_CONTEXT_NAME)) {
+			return SYSTEM;
+		}
+		return this;
 	}
 
 	private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {

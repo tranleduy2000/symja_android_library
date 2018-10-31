@@ -469,9 +469,11 @@ public class Num extends INumImpl implements INum {
 		return F.isZero(fDouble);
 	}
 
-	/**
-	 * @return
-	 */
+	@Override
+	public long leafCountSimplify() {
+		return 2;
+	}
+
 	public double log() {
 		return Math.log(fDouble);
 	}

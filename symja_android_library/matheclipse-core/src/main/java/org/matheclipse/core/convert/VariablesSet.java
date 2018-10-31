@@ -141,7 +141,9 @@ public class VariablesSet {
 					fCollection.add(list);
 				}
 			} else {
+				if (!list.isNumericFunction()) {
 				fCollection.add(list);
+			}
 			}
 			return true;
 		}
@@ -172,14 +174,17 @@ public class VariablesSet {
 				fCollection.add(((ASTSeriesData) list).getX());
 				return true;
 			}
-			if (list.head().isVariable()&&list.forAll(new Predicate<IExpr>() {
-                @Override
-                public boolean test(IExpr x) {
-                    return x.isInteger();
-                }
-            })) {
+			IExpr head = list.head();
+			if (head.isVariable() && list.forAll(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isInteger();
+				}
+			})) {
+				if (!list.isNumericFunction()) {
 				fCollection.add(list);
 				return true;
+			}
 			}
 			return super.visit(list);
 		}

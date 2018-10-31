@@ -635,7 +635,64 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testAttributes() {
-		check("Attributes(Plus)", "{Flat,Listable,OneIdentity,Orderless,NumericFunction}");
+		check("Attributes(fun) = {ReadProtected, Protected}",//
+				"{ReadProtected,Protected}");
+		check("Attributes(Plus)", //
+				"{Flat,Listable,OneIdentity,Orderless,NumericFunction}");
+	}
+
+	public void testBeginPackage() {
+		check("BeginPackage(\"test`\")", //
+				"");
+		check("Context( )", //
+				"test`");
+		check("$ContextPath", //
+				"{test`,System`}");
+		check("testit::usage = \"testit(x) gives x^2\"", //
+				"testit(x) gives x^2");
+		check("testit(x_) :=  x^2 ", //
+				"");
+		check("testit(12)", //
+				"144");
+		check("EndPackage( )", //
+				"");
+		check("$ContextPath", //
+				"{test`,System`,Global`}");
+		check("Context( )", //
+				"Global`");
+		// print usage message in console
+		check("?testit", //
+				"");
+		check("testit(12)", //
+				"144");
+	}
+
+	public void testBegin() {
+		check("Begin(\"mytest`\")", //
+				"");
+		check("Context( )", //
+				"mytest`");
+		check("$ContextPath", //
+				"{System`,Global`}");
+		check("testit::usage = \"testit(x) gives x^2\"", //
+				"testit(x) gives x^2");
+		check("testit(x_) :=  x^2 ", //
+				"");
+		check("testit(12)", //
+				"144");
+		check("End( )", //
+				"mytest`");
+		check("$ContextPath", //
+				"{System`,Global`}");
+		check("Context( )", //
+				"Global`");
+		// print usage message in console
+		check("?mytest`testit", //
+				"");
+		check("mytest`testit(12)", //
+				"144");
+		check("testit(12)", //
+				"testit(12)");
 	}
 
 	public void testBellB() {
@@ -6431,11 +6488,21 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testMessageName() {
-		// Set[MessageName(f,"usage"),"text")
-		check("f::usage=\"text\"", //
-				"text");
-//		check("?f::usage", //
-//				"text");
+		// Set[MessageName(f,"usage"),"A usage message")
+		check("f::usage=\"A usage message\"", //
+				"A usage message");
+		// print "A usage message" on the console. Evaluation returns Null (i.e. no output)
+		check("Information(f)", //
+				"");
+		check("Information(Sin)", //
+				"");
+		check("Information(Sin, LongForm->False)", //
+				"");
+		// print "A usage message" on the console. Evaluation returns Null (i.e. no output)
+		check("?f", //
+				"");
+		check("??Sin;??Cos", //
+				"");
 	}
 
 	public void testMin() {
@@ -8780,14 +8847,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ProductLog(E)", "1");
 
 		String s = System.getProperty("os.name");
-//		if (s.contains("Windows")) {
-//			check("ProductLog(-1.5)", "-3.278373591557e-2+I*1.54964382335015");
-//			check("ProductLog({0.2, 0.5, 0.8})", "{1.68915973499109e-1,3.51733711249196e-1,4.90067858801579e-1}");
-//			check("ProductLog(2.5 + 2*I)", "1.05616796894863+I*3.5256052020787e-1");
-//			check("N(ProductLog(4/10),50)", "2.9716775067313854677972696224702134190445810155014e-1");
-//
-//			check("N(ProductLog(-1),20)", "-3.181315052047641353e-1+I*1.3372357014306894089");
-//		}
+		if (s.contains("Windows")) {
+			check("ProductLog(-1.5)", "-3.278373591557e-2+I*1.54964382335015");
+			check("ProductLog({0.2, 0.5, 0.8})", "{1.68915973499109e-1,3.51733711249196e-1,4.90067858801579e-1}");
+			check("ProductLog(2.5 + 2*I)", "1.05616796894863+I*3.5256052020787e-1");
+			check("N(ProductLog(4/10),50)", "2.9716775067313854677972696224702134190445810155014e-1");
+
+			check("N(ProductLog(-1),20)", "-3.181315052047641353e-1+I*1.3372357014306894089");
+		}
 
 		check("ProductLog(-Pi/2)", "I*1/2*Pi");
 		check("ProductLog(-1/E)", "-1");

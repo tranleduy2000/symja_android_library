@@ -1,5 +1,6 @@
 package org.matheclipse.core.expression;
 
+import com.duy.annotations.Nonnull;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.basic.Config;
@@ -23,11 +24,14 @@ import java.util.List;
  */
 public class Pattern extends Blank {
 
-	public static IPattern valueOf( final ISymbol symbol) {
+	public static IPattern valueOf(@Nonnull final ISymbol symbol) {
+		if (symbol.getContext().equals(Context.DUMMY)) {
 		IPattern value = F.PREDEFINED_PATTERN_MAP.get(symbol.toString());
 		if (value != null) {
 			return value;
 		}
+		}
+
 		return new Pattern(symbol);
 	}
 
@@ -36,18 +40,18 @@ public class Pattern extends Blank {
 	 * @param numerator
 	 * @return
 	 */
-	public static IPattern valueOf( final ISymbol symbol, final IExpr check) {
+	public static IPattern valueOf(@Nonnull final ISymbol symbol, final IExpr check) {
 		return new Pattern(symbol, check);
 	}
 
 	/**
 	 * 
 	 */
-	public static IPattern valueOf( final ISymbol symbol, final IExpr check, final boolean def) {
+	public static IPattern valueOf(@Nonnull final ISymbol symbol, final IExpr check, final boolean def) {
 		return new Pattern(symbol, check, def);
 	}
 
-	public static IPattern valueOf( final ISymbol symbol, final IExpr check, final IExpr defaultValue) {
+	public static IPattern valueOf(@Nonnull final ISymbol symbol, final IExpr check, final IExpr defaultValue) {
 		return new Pattern(symbol, check, defaultValue);
 	}
 
@@ -59,23 +63,23 @@ public class Pattern extends Blank {
 	final ISymbol fSymbol;
 
 	/** package private */
-	Pattern( final ISymbol symbol) {
+	Pattern(@Nonnull final ISymbol symbol) {
 		this(symbol, null, false);
 	}
 
 	/** package private */
-	Pattern( final ISymbol symbol, IExpr condition) {
+	Pattern(@Nonnull final ISymbol symbol, IExpr condition) {
 		this(symbol, condition, false);
 	}
 
 	/** package private */
-	public Pattern( final ISymbol symbol, IExpr condition, boolean def) {
+	public Pattern(@Nonnull final ISymbol symbol, IExpr condition, boolean def) {
 		super(condition, def);
 		fSymbol = symbol;
 	}
 
 	/** package private */
-	public Pattern( final ISymbol symbol, IExpr condition, IExpr defaultValue) {
+	public Pattern(@Nonnull final ISymbol symbol, IExpr condition, IExpr defaultValue) {
 		super(condition, defaultValue);
 		fSymbol = symbol;
 	}

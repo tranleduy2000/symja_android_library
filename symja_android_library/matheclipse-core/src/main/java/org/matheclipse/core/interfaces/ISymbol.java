@@ -1,5 +1,6 @@
 package org.matheclipse.core.interfaces;
 
+import com.duy.annotations.Nonnull;
 import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.Function;
 
@@ -12,7 +13,6 @@ import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 import org.matheclipse.core.patternmatching.RulesData;
 
 import java.io.IOException;
-
 
 
 /**
@@ -59,7 +59,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     /**
      * ISymbol attribute for a function with lists as arguments
      */
-    public final static int LISTABLE = 0x0080;
+    public final static int LISTABLE = 0x0200;
     /**
      * ISymbol attribute for a function, where the first argument should not be evaluated numerically
      */
@@ -98,9 +98,17 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public final static int FLATORDERLESS = FLAT | ORDERLESS;
     /**
+     * ISymbol attribute for a symbol where no rule definition should be possible
+     */
+    public final static int PROTECTED = 0x8000;
+    /**
+     * ISymbol attribute for a symbol where the definition shouldn't be displayed
+     */
+    public final static int READPROTECTED = 0x10000;
+    /**
      * ISymbol attribute to indicate that a symbols evaluation should be printed to Console with System.out.println();
      */
-    public final static int DELAYED_RULE_EVALUATION = 0x00010000;
+    public final static int DELAYED_RULE_EVALUATION = 0x00020000;
 
     /**
      * Add the attributes to the existing attributes bit-set.
@@ -139,14 +147,14 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
 
     /**
      * Create internal rules data structure with precalculated sizes
-     * <p>
+     *
      * <ul>
      * <li>index 0 - number of equal rules in <code>RULES</code></li>
      * </ul>
      *
      * @param sizes
      */
-    public RulesData createRulesData( int[] sizes);
+    public RulesData createRulesData(@Nonnull int[] sizes);
 
     /**
      * Return a list of the rules associated to this symbol
@@ -432,6 +440,10 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public IPatternMatcher putDownRule(final RuleType setSymbol, boolean equalRule, IExpr leftHandSide,
                                        IExpr rightHandSide, boolean packageMode);
+
+    public IExpr evalMessage(EvalEngine engine, String messageName);
+
+    public void putMessage(final RuleType setSymbol, String messageName, IStringX message);
 
     /**
      * Associate a new rule with the given priority to this symbol.<br/>

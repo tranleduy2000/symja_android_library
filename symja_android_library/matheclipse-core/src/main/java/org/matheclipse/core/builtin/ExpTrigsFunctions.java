@@ -1247,8 +1247,8 @@ public class ExpTrigsFunctions {
 					// period (n/m)*Pi
 					IFraction f = (IFraction) parts.arg2();
 					IInteger[] divRem = f.divideAndRemainder();
-					if (!divRem[0].isZero()) {
 						IFraction rest = F.fraction(divRem[1], f.denominator());
+					if (!divRem[0].isZero()) {
 						if (divRem[0].isEven()) {
 							return Csc(Plus(parts.arg1(), Times(rest, Pi)));
 						} else {
@@ -1256,9 +1256,9 @@ public class ExpTrigsFunctions {
 						}
 					}
 
-					if (f.equals(C1D2)) {
+					if (rest.equals(C1D2) || rest.equals(F.CN1D2)) {
 						// Csc(z) == Sec(Pi/2 - z)
-						return Sec(Subtract(Divide(Pi, C2), arg1));
+						return Sec(Subtract(F.CPiHalf, arg1));
 					}
 				}
 
@@ -1809,8 +1809,8 @@ public class ExpTrigsFunctions {
 					// period (n/m)*Pi
 					IFraction f = (IFraction) parts.arg2();
 					IInteger[] divRem = f.divideAndRemainder();
+					IFraction rest = F.fraction(divRem[1], f.denominator());
 					if (!divRem[0].isZero()) {
-						IFraction rest = F.fraction(divRem[1], f.denominator());
 						if (divRem[0].isEven()) {
 							return Sec(Plus(parts.arg1(), Times(rest, Pi)));
 						} else {
@@ -1818,7 +1818,10 @@ public class ExpTrigsFunctions {
 						}
 					}
 
-					if (f.equals(C1D2)) {
+					if (rest.equals(F.CN1D2)) {
+						return Csc(parts.arg1());
+					}
+					if (rest.equals(C1D2)) {
 						return Times(CN1, Csc(parts.arg1()));
 					}
 				}

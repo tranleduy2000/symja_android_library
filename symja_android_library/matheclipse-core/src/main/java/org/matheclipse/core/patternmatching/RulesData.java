@@ -12,6 +12,7 @@ import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.AbstractVisitor;
 
@@ -108,6 +109,8 @@ public class RulesData implements Serializable {
 	}
 
 	private OpenIntToIExprHashMap<IExpr> fDefaultValues;
+
+	private Map<String, IStringX> fMessages;
 
 	private Map<IExpr, PatternMatcherEquals> fEqualDownRules;
 
@@ -520,6 +523,16 @@ public class RulesData implements Serializable {
 			return null;
 		}
 		return fDefaultValues.get(pos);
+	}
+
+	/**
+	 * @return Returns the equalRules.
+	 */
+	final public Map<String, IStringX> getMessages() {
+		if (fMessages == null) {
+			fMessages = new HashMap<String, IStringX>();
+		}
+		return fMessages;
 	}
 
 	/**

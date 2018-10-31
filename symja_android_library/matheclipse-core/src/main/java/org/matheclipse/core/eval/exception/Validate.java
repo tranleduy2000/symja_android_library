@@ -541,7 +541,7 @@ public final class Validate {
 	/**
 	 * Check if the argument at the given position is an AST.
 	 * 
-	 * @param expr the position which has to be an AST.
+	 * @param position the position which has to be an AST.
 	 * @throws WrongArgumentType if it's not an AST.
 	 */
 	public static IAST checkASTUpRuleType(IExpr expr) {

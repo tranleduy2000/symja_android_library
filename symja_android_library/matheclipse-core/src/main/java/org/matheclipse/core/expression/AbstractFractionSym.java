@@ -447,7 +447,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 
 	@Override
 	public long leafCountSimplify() {
-		return 1 + numerator().integerLength(F.C10) + denominator().integerLength(F.C10);
+		return 1 + numerator().leafCountSimplify() + denominator().leafCountSimplify();
 	}
 
 	@Override

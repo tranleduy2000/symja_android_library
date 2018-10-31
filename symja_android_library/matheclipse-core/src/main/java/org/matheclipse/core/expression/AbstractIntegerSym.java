@@ -152,11 +152,14 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	}
 
 	/**
-	 * Returns the IInteger for the specified character sequence stated in the specified radix. The characters must all be digits of the
-	 * specified radix, except the first character which may be a plus sign <code>'+'</code> or a minus sign <code>'-'</code> .
+	 * Returns the IInteger for the specified character sequence stated in the specified radix. The characters must all
+	 * be digits of the specified radix, except the first character which may be a plus sign <code>'+'</code> or a minus
+	 * sign <code>'-'</code> .
 	 *
-	 * @param integerString the character sequence to parse.
-	 * @param radix         the radix to be used while parsing.
+	 * @param integerString
+	 *            the character sequence to parse.
+	 * @param radix
+	 *            the radix to be used while parsing.
 	 * @return the corresponding large integer.
 	 * @throws NumberFormatException if the specified character sequence does not contain a parsable large integer.
 	 */
@@ -629,7 +632,10 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 
 	@Override
 	public long leafCountSimplify() {
-		return integerLength(F.C10);
+		if (isZero()) {
+			return 1;
+		}
+		return integerLength(F.C10) + (isPositive() ? 0 : 1);
 	}
 
 	/**
@@ -882,6 +888,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	}
 
 
+	//Implemetion default method IInteger
 	/**
 	 * {@inheritDoc}
 	 */

@@ -14,8 +14,11 @@ import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ICreatePatternMatcher;
+import org.matheclipse.core.eval.interfaces.ISetEvaluator;
 import org.matheclipse.core.eval.util.Lambda;
+import org.matheclipse.core.eval.util.Options;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.ContextPath;
 import org.matheclipse.core.expression.F;
@@ -23,6 +26,8 @@ import org.matheclipse.core.form.Documentation;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IBuiltInSymbol;
+import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternObject;
@@ -42,6 +47,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.FileSystems;
 import java.util.List;
 
 import static org.matheclipse.core.expression.F.Rule;
@@ -50,6 +56,10 @@ import static org.matheclipse.core.expression.F.RuleDelayed;
 public final class PatternMatching {
 
 	static {
+		F.BeginPackage.setEvaluator(new BeginPackage());
+		F.EndPackage.setEvaluator(new EndPackage());
+		F.Begin.setEvaluator(new Begin());
+		F.End.setEvaluator(new End());
 		F.Blank.setEvaluator(Blank.CONST);
 		F.BlankSequence.setEvaluator(BlankSequence.CONST);
 		F.BlankNullSequence.setEvaluator(BlankNullSequence.CONST);
@@ -75,6 +85,79 @@ public final class PatternMatching {
 		F.Unset.setEvaluator(new Unset());
 		F.UpSet.setEvaluator(new UpSet());
 		F.UpSetDelayed.setEvaluator(new UpSetDelayed());
+	}
+
+	public static class Begin extends AbstractCoreFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.size() > 1) {
+				String contextName = Validate.checkContextName(ast, 1);
+				engine.begin(contextName);
+				return F.Null;
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
+	}
+
+	public static class BeginPackage extends AbstractFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.size() > 1) {
+				String contextName = Validate.checkContextName(ast, 1);
+				engine.beginPackage(contextName);
+				if (Config.isFileSystemEnabled(engine)) {
+					try {
+						for (int j = 2; j < ast.size(); j++) {
+							// FileReader reader = new FileReader(ast.get(j).toString());
+							BufferedReader reader = new BufferedReader(
+									new InputStreamReader(new FileInputStream(ast.get(j).toString()), "UTF-8"));
+							Get.loadPackage(engine, reader);
+							reader.close();
+						}
+					} catch (IOException e) {
+						if (Config.SHOW_STACKTRACE) {
+							e.printStackTrace();
+						}
+					}
+				}
+				return F.Null;
+			}
+			return F.NIL;
+		}
+
+	}
+
+	public static class End extends AbstractCoreFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Context context = engine.end();
+			return F.stringx(context.getContextName());
+		}
+
+		@Override
+		public void setUp(ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
+	}
+
+	public static class EndPackage extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			engine.endPackage();
+			return F.Null;
+		}
+
+		@Override
+		public void setUp(ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
+
 	}
 
 	public static class Blank extends AbstractCoreFunctionEvaluator {
@@ -238,7 +321,7 @@ public final class PatternMatching {
 				return F.stringx(((ISymbol) ast.first()).getContext().getContextName());
 			}
 			if (ast.isAST0()) {
-				return EvalEngine.get().getContextPath().currentContext();
+				return F.stringx(EvalEngine.get().getContext().getContextName());
 			}
 			return F.NIL;
 		}
@@ -380,38 +463,7 @@ public final class PatternMatching {
 			try {
 				final List<ASTNode> node = parseReader(r, engine);
 
-				IExpr temp;
-				int i = 0;
-				AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
-				IExpr result = F.Null;
-				while (i < node.size()) {
-					temp = ast2Expr.convert(node.get(i++));
-					if (temp.isAST()) {
-						IAST ast = (IAST) temp;
-						IExpr head = temp.head();
-						if (head.equals(F.BeginPackage) && ast.size() >= 2) {
-							String contextName = Validate.checkContextName(ast, 1);
-							packageContext = engine.getContextPath().getContext(contextName);
-							ISymbol endSymbol = F.EndPackage;
-							for (int j = 2; j < ast.size(); j++) {
-								// FileReader reader = new FileReader(ast.get(j).toString());
-								BufferedReader reader = new BufferedReader(
-										new InputStreamReader(new FileInputStream(ast.get(j).toString()), "UTF-8"));
-								Get.loadPackage(engine, reader);
-								reader.close();
-							}
-							i = addContextToPath(new ContextPath(packageContext), node, i, engine, endSymbol);
-							continue;
-						} else if (head.equals(F.Begin) && ast.size() >= 2) {
-							String contextName = Validate.checkContextName(ast, 1);
-							ISymbol endSymbol = F.End;
-							i = addContextToPath(new ContextPath(contextName), node, i, engine, endSymbol);
-							continue;
-						}
-					}
-					result = engine.evaluate(temp);
-				}
-				return result;
+				return evaluatePackage(node, engine);
 			} catch (final Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -482,10 +534,10 @@ public final class PatternMatching {
 					// System.out.println(file.toString());
 					return getFile(file, engine);
 				} else {
-//					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
-//					if (file.exists()) {
-//						return getFile(file, engine);
-//					}
+					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
+					if (file.exists()) {
+						return getFile(file, engine);
+					}
 				}
 
 			}
@@ -634,7 +686,16 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
+
+			if (ast.size() == 2 || ast.size() == 3) {
+				boolean longForm = true;
+				if (ast.size() == 3) {
+					final Options options = new Options(ast.topHead(), ast, 2, engine);
+					IExpr option = options.getOption("LongForm");
+					if (option.isFalse()) {
+						longForm = false;
+					}
+				}
 
 			ISymbol symbol = null;
 			if (!ast.arg1().isSymbol()) {
@@ -653,14 +714,32 @@ public final class PatternMatching {
 			} else {
 				stream = s;
 			}
-			// IExpr temp = engine.evaluate(F.MessageName(symbol, F.usage));
+
+				// Set[MessageName(f,"usage"),"text")
+				IExpr temp = symbol.evalMessage(engine, "usage");
+				if (temp.isPresent()) {
+					s.println(temp.toString());
+				}
+				if (longForm) {
+					Documentation.printDocumentation(s, symbol.getSymbolName());
+
+					IAST function = F.Attributes(symbol);
+					temp = engine.evaluate(F.Attributes(symbol));
+					if (temp.isPresent()) {
+						s.println(function.toString() + " = " + temp.toString());
+					}
+				}
+
+				// IExpr temp = engine.evaluate(F.MessageName(symbol, F.stringx("usage")));
 			// if (temp.isPresent()) {
 			// stream.println(temp.toString());
 			// }
-			if (!Documentation.printDocumentation(stream, symbol.getSymbolName())) {
-
-			}
+				// if (!Documentation.printDocumentation(stream, symbol.getSymbolName())) {
+				//
+				// }
 			return F.Null;
+		}
+			return F.NIL;
 		}
 
 		@Override
@@ -1052,67 +1131,20 @@ public final class PatternMatching {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			final IExpr leftHandSide = ast.arg1();
-			IExpr rightHandSide = ast.arg2();
+			final IExpr head = leftHandSide.head();
+			if (head.isBuiltInSymbol()) {
 			if (leftHandSide.isAST()) {
-				IAST leftHandSideAST = (IAST) leftHandSide;
-				if (leftHandSideAST.isAST(F.Part) && leftHandSideAST.size() > 1) {
-					IAST part = leftHandSideAST;
-					if (part.arg1().isSymbol()) {
-						ISymbol symbol = (ISymbol) part.arg1();
-						RulesData rd = symbol.getRulesData();
-						if (rd == null) {
-							engine.printMessage("Set: no value defined for symbol '" + symbol.toString()
-									+ "' in Part() expression.");
-						} else {
-							try {
-								IExpr temp = symbol.getRulesData().evalDownRule(symbol, engine);
-								if (!temp.isPresent()) {
-									engine.printMessage("Set: no value defined for symbol '" + symbol.toString()
-											+ "' in Part() expression.");
-								} else {
-									if (rightHandSide.isList()) {
-										IExpr res = Programming.assignPart(temp, part, 2, (IAST) rightHandSide, 1,
-												engine);
-										symbol.putDownRule(RuleType.SET, true, symbol, res, false);
-										return rightHandSide;
-									} else {
-										IExpr res = Programming.assignPart(temp, part, 2, rightHandSide, engine);
-										symbol.putDownRule(RuleType.SET, true, symbol, res, false);
-										return rightHandSide;
-									}
-								}
-							} catch (RuntimeException npe) {
-								engine.printMessage("Set: wrong argument for Part[] function: " + part.toString()
-										+ " selects no part expression.");
-							}
-						}
-					}
-
-				} else if (leftHandSideAST.isList()) {
-					// thread over lists
-					try {
-						rightHandSide = engine.evaluate(rightHandSide);
-					} catch (final ReturnException e) {
-						rightHandSide = e.getValue();
-					}
-					IExpr temp = engine.threadASTListArgs((IASTMutable) F.Set(leftHandSideAST, rightHandSide));
+					IBuiltInSymbol symbol = (IBuiltInSymbol) head;
+					IEvaluator eval = symbol.getEvaluator();
+					if (eval instanceof ISetEvaluator) {
+						IExpr temp = ((ISetEvaluator) eval).evaluateSet(leftHandSide, ast.arg2(), engine);
 					if (temp.isPresent()) {
-						return engine.evaluate(temp);
+							return temp;
 					}
-					return F.NIL;
-				} else if (leftHandSideAST.isAST(F.Attributes, 2)) {
-					IAST symbolList = Validate.checkSymbolOrSymbolList(leftHandSideAST, 1);
-					symbolList.forEach(new Consumer<IExpr>() {
-						@Override
-						public void accept(IExpr x) {
-							((ISymbol) x).setAttributes(ISymbol.NOATTRIBUTE);
 						}
-					});
-					return AttributeFunctions.setSymbolsAttributes(symbolList, ast.arg2(), engine);
 				}
 			}
-			Object[] result;
-			result = createPatternMatcher(leftHandSide, rightHandSide, engine.isPackageMode(), engine);
+			Object[] result = createPatternMatcher(leftHandSide, ast.arg2(), engine.isPackageMode(), engine);
 			return (IExpr) result[1];
 		}
 
@@ -1121,7 +1153,7 @@ public final class PatternMatching {
 				final EvalEngine engine) throws RuleCreationError {
 
 			if (leftHandSide.isAST()) {
-				leftHandSide = engine.evalLHSPattern((IAST) leftHandSide);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
 			}
 			try {
 				rightHandSide = engine.evaluate(rightHandSide);
@@ -1129,6 +1161,21 @@ public final class PatternMatching {
 				// System.out.println("Condition[] in right-hand-side of Set[]");
 			} catch (final ReturnException e) {
 				rightHandSide = e.getValue();
+			}
+			if (leftHandSide.isAST()) {
+				if (leftHandSide.isAST(F.MessageName, 3) && leftHandSide.first().isSymbol()) {
+					// Set[MessageName(f,"usage"),"text")
+					ISymbol symbol = (ISymbol) leftHandSide.first();
+					String messageName = leftHandSide.second().toString();
+					IStringX message;
+					if (rightHandSide instanceof IStringX) {
+						message = (IStringX) rightHandSide;
+					} else {
+						message = F.stringx(rightHandSide.toString());
+					}
+					symbol.putMessage(RuleType.SET, messageName, message);
+					return new Object[] { null, message };
+				}
 			}
 
 			return setDownRule(leftHandSide, rightHandSide, packageMode);
@@ -1215,7 +1262,7 @@ public final class PatternMatching {
 				final EvalEngine engine) throws RuleCreationError {
 			if (leftHandSide.isAST()
 					&& (((IAST) leftHandSide).getEvalFlags() & IAST.IS_FLATTENED_OR_SORTED_MASK) == IAST.NO_FLAG) {
-				leftHandSide = engine.evalLHSPattern((IAST) leftHandSide);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
 			}
 			return setDelayedDownRule(leftHandSide, rightHandSide, packageMode);
 		}
@@ -1432,7 +1479,7 @@ public final class PatternMatching {
 				throws RuleCreationError {
 
 			if (leftHandSide.isAST()) {
-				leftHandSide = engine.evalLHSPattern((IAST) leftHandSide);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
 			}
 			removeRule(leftHandSide, packageMode);
 		}
@@ -1497,7 +1544,7 @@ public final class PatternMatching {
 			final Object[] result = new Object[2];
 
 			if (leftHandSide.isAST()) {
-				leftHandSide = engine.evalLHSPattern((IAST) leftHandSide);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
 			}
 			try {
 				rightHandSide = engine.evaluate(rightHandSide);
@@ -1554,7 +1601,7 @@ public final class PatternMatching {
 
 			if (leftHandSide.isAST()
 					&& (((IAST) leftHandSide).getEvalFlags() & IAST.IS_FLATTENED_OR_SORTED_MASK) == IAST.NO_FLAG) {
-				leftHandSide = engine.evalLHSPattern((IAST) leftHandSide);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
 			}
 			result[0] = null;
 			result[1] = rightHandSide;
@@ -1582,6 +1629,41 @@ public final class PatternMatching {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
+	}
+
+	public static IExpr evaluatePackage(final List<ASTNode> node, final EvalEngine engine) {
+		IExpr temp;
+		int i = 0;
+		AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
+		IExpr result = F.Null;
+		while (i < node.size()) {
+			temp = ast2Expr.convert(node.get(i++));
+			// if (temp.isAST()) {
+			// IAST ast = (IAST) temp;
+			// IExpr head = ast.head();
+			// if (ast.isASTSizeGE(F.BeginPackage, 2)) {
+			// String contextName = Validate.checkContextName(ast, 1);
+			// packageContext = engine.getContextPath().getContext(contextName);
+			// ISymbol endSymbol = F.EndPackage;
+			// for (int j = 2; j < ast.size(); j++) {
+			// // FileReader reader = new FileReader(ast.get(j).toString());
+			// BufferedReader reader = new BufferedReader(
+			// new InputStreamReader(new FileInputStream(ast.get(j).toString()), "UTF-8"));
+			// Get.loadPackage(engine, reader);
+			// reader.close();
+			// }
+			// i = addContextToPath(new ContextPath(packageContext), node, i, engine, endSymbol);
+			// continue;
+			// } else if (head.equals(F.Begin) && ast.size() >= 2) {
+			// String contextName = Validate.checkContextName(ast, 1);
+			// ISymbol endSymbol = F.End;
+			// i = addContextToPath(new ContextPath(contextName), node, i, engine, endSymbol);
+			// continue;
+			// }
+			// }
+			result = engine.evaluate(temp);
+		}
+		return result;
 	}
 
 	public static IExpr getFile(File file, EvalEngine engine) {

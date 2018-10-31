@@ -21,6 +21,7 @@ import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
+import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbolImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
@@ -800,6 +801,13 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 			fRulesData = new RulesData(EvalEngine.get().getContext());
 		}
 		return fRulesData.putDownRule(pmEvaluator);
+	}
+
+	public IExpr evalMessage(EvalEngine engine, String messageName) {
+		return F.NIL;
+	}
+
+	public void putMessage(final RuleType setSymbol, String messageName, IStringX message) {
 	}
 
 	/** {@inheritDoc} */

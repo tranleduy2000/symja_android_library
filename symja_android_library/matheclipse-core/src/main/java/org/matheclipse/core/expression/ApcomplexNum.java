@@ -326,6 +326,11 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 		return fApcomplex.hashCode();
 	}
 
+	@Override
+	public long leafCountSimplify() {
+		return 5;
+	}
+
 	/**
 	 * @param that
 	 * @return

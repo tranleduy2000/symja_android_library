@@ -371,16 +371,13 @@ public class ExprEvaluator {
 	 */
 	public IExpr eval(final String inputExpression) {
 		if (inputExpression != null) {
-			try {
 			EvalEngine.set(engine);
 			engine.reset();
 			fExpr = engine.parse(inputExpression);
 			if (fExpr != null) {
 				return eval(fExpr);
 			}
-			} finally {
-				EvalEngine.remove();
-		}
+			// call EvalEngine.remove() at the end of the thread if necessary
 		}
 
 		return null;
