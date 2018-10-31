@@ -1,1 +1,0 @@
-@SuppressWarnings({"ResultOfMethodCallIgnored", "JavaDoc"})
