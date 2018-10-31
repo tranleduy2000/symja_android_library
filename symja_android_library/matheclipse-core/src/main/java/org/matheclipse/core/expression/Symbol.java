@@ -678,11 +678,10 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         if (Character.isUpperCase(fSymbolName.charAt(0))) {
             String alias = F.PREDEFINED_INTERNAL_FORM_STRINGS.get(fSymbolName);
             if (alias != null) {
-                if (alias.contains("::")) {
-                    if (Config.RUBI_CONVERT_SYMBOLS) {
-                        return "$rubi(\"" + alias + "\")";
+                if (Config.RUBI_CONVERT_SYMBOLS) {
+                if (alias.startsWith("Rubi`")) {
+                        return "$rubi(\"" + alias.substring(5) + "\")";
                     }
-                    return "$s(\"" + alias + "\")";
                 }
                 return alias;
             }

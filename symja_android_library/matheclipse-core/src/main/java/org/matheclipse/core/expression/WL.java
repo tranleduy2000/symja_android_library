@@ -1,5 +1,6 @@
 package org.matheclipse.core.expression;
 
+import org.apfloat.Apfloat;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
 import org.matheclipse.core.basic.Config;
@@ -114,6 +115,27 @@ public class WL {
 					bigIntegerString.append(ch);
 				}
 				return F.ZZ(new BigInteger(bigIntegerString.toString()));
+			case WXF_CONSTANTS.BigReal:
+				length = parseLength();// (int) array[position++];
+				StringBuilder brStr = new StringBuilder();
+				for (int i = 0; i < length; i++) {
+					brStr.append((char) array[position++]);
+				}
+				String s = brStr.toString();
+				// decimal 96 / hex 60 / character `
+				int index = s.indexOf(0x60);
+				if (index > 0) {
+					String numStr = s.substring(0, index);
+					String precString = s.substring(index + 1);
+					// decimal 46 / hex 2E / character .
+					index = precString.indexOf(0x2E);
+					if (index > 0) {
+						int prec = Integer.parseInt(precString.substring(0, index));
+						Apfloat af = new Apfloat(numStr, prec, 10);
+						return F.num(af);
+					}
+				}
+				break;
 			case WXF_CONSTANTS.Real64:
 				double real64 = parseDouble();
 				return F.num(real64);
@@ -269,6 +291,9 @@ public class WL {
 				writeAST2(F.Rational, ((IRational) arg1).numerator(), ((IRational) arg1).denominator());
 				return;
 			case IExpr.DOUBLEID:
+//				if (arg1 instanceof ApfloatNum) {
+//
+//				}
 				stream.write(WL.WXF_CONSTANTS.Real64);
 				writeDouble(((INum) arg1).doubleValue());
 				return;
@@ -345,6 +370,12 @@ public class WL {
 					}
 				}
 				return;
+			case IExpr.QUANTITYID:
+				writeQuantity(arg1);
+				return;
+			case IExpr.SERIESID:
+				writeSeriesData(arg1);
+				return;
 			}
 		}
 
@@ -381,6 +412,22 @@ public class WL {
 			}
 		}
 
+		private void writeQuantity(IExpr arg1) throws IOException {
+			IAST ast = (IAST) arg1;
+			stream.write(WL.WXF_CONSTANTS.Function);
+			stream.write(varintBytes(ast.argSize()));
+			for (int i = 0; i < ast.size(); i++) {
+				write(ast.get(i));
+			}
+		}
+		private void writeSeriesData(IExpr arg1) throws IOException {
+			ASTSeriesData ast = (ASTSeriesData) arg1;
+			stream.write(WL.WXF_CONSTANTS.Function);
+			stream.write(varintBytes(ast.argSize()));
+			for (int i = 0; i < ast.size(); i++) {
+				write(ast.get(i));
+			}
+		}
 		private void writeAST0(IExpr head) throws IOException {
 			stream.write(WL.WXF_CONSTANTS.Function);
 			stream.write(0);
@@ -414,17 +461,17 @@ public class WL {
 			stream.write((byte) (l >> 56 & 0x00000000000000ff));
 		}
 		
-//		private void writePackedDouble(double d) {
-//			long l = Double.doubleToRawLongBits(d);
-//			stream.write((byte) (l & 0x00000000000000ff));
-//			stream.write((byte) (l >> 8 & 0x00000000000000ff));
-//			stream.write((byte) (l >> 16 & 0x00000000000000ff));
-//			stream.write((byte) (l >> 24 & 0x00000000000000ff));
-//			stream.write((byte) (l >> 32 & 0x00000000000000ff));
-//			stream.write((byte) (l >> 40 & 0x00000000000000ff));
-//			stream.write((byte) (l >> 48 & 0x00000000000000ff));
-//			stream.write((byte) (l >> 56 & 0x00000000000000ff));
-//		}
+		// private void writePackedDouble(double d) {
+		// long l = Double.doubleToRawLongBits(d);
+		// stream.write((byte) (l & 0x00000000000000ff));
+		// stream.write((byte) (l >> 8 & 0x00000000000000ff));
+		// stream.write((byte) (l >> 16 & 0x00000000000000ff));
+		// stream.write((byte) (l >> 24 & 0x00000000000000ff));
+		// stream.write((byte) (l >> 32 & 0x00000000000000ff));
+		// stream.write((byte) (l >> 40 & 0x00000000000000ff));
+		// stream.write((byte) (l >> 48 & 0x00000000000000ff));
+		// stream.write((byte) (l >> 56 & 0x00000000000000ff));
+		// }
 
 		private void writeInteger(IExpr arg1) throws IOException {
 			IInteger s = (IInteger) arg1;

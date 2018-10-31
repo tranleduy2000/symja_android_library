@@ -26,7 +26,6 @@ import static org.matheclipse.core.expression.F.FreeQ;
 import static org.matheclipse.core.expression.F.Head;
 import static org.matheclipse.core.expression.F.I;
 import static org.matheclipse.core.expression.F.If;
-import static org.matheclipse.core.expression.F.Integrate;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.MatchQ;
 import static org.matheclipse.core.expression.F.MemberQ;
@@ -47,7 +46,6 @@ import static org.matheclipse.core.expression.F.f;
 import static org.matheclipse.core.expression.F.fraction;
 import static org.matheclipse.core.expression.F.v;
 import static org.matheclipse.core.expression.F.x;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.AbortRubi;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ActivateTrig;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ContentFactor;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.DeactivateTrig;
@@ -328,19 +326,12 @@ public class RubiIntegrationTest extends AbstractTestCase {
 		check(ast, "5/3");
 	}
 
-	public void testRubi010() {
-		IAST ast;
-		ast = AbortRubi(Integrate);
-		// throws AbortException
-		check(ast, "Abort evaluation.\n" + "");
-
-	}
 
 	public void testRubi011() {
 		IAST ast;
 		// DeactivateTrig(Sin(a+b*x)^3,x)
 		ast = DeactivateTrig(Power(Sin(Plus(a, Times(b, x))), C3), x);
-		check(ast, "Integrate`§sin[a+b*x]^3");
+		check(ast, "Rubi`§sin[a+b*x]^3");
 	}
 
 	public void testRubi012() {
@@ -409,7 +400,7 @@ public class RubiIntegrationTest extends AbstractTestCase {
 	}
 
 	// Integrate(1/(a_.+b_.*x_+c_.*x_^2),x_Symbol) :=
-	// Integrate::Dist(-2,integrate::subst(Integrate(1/integrate::simp(b^2+(-1)*4*a*c-x^
+	// rubi`Dist(-2,integrate::subst(Integrate(1/integrate::simp(b^2+(-1)*4*a*c-x^
 	// 2,x),x),x,b+2*c*x),x)/;FreeQ({a,b,c},x)&&integrate::neq(b^2+(-1)*4*a*c,0)
 	// >>> Integrate(1/(3+2*x+x^2),x) >>>> 0
 	public void testRubi020() {

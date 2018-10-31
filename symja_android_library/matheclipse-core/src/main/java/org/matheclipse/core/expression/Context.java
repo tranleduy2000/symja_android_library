@@ -24,7 +24,10 @@ public class Context implements Serializable {
 
 	public final static Context SYSTEM = new Context("System`", PREDEFINED_SYMBOLS_MAP);
 
-	public final static Context INTEGRATE = new Context("Integrate`");
+	// public final static Context INTEGRATE = new Context("Integrate`");
+
+	public final static String RUBI_STR = "Rubi`";
+	public final static Context RUBI = new Context(RUBI_STR);
 
 	private String contextName;
 
@@ -81,15 +84,15 @@ public class Context implements Serializable {
 		return contextName.equals(ContextPath.GLOBAL_CONTEXT_NAME);
 	}
 
-//	private static int counter = 0;
+	// private static int counter = 0;
 
 	public ISymbol put(String key, ISymbol value) {
-//		if (!contextName.equals("System")) {
-//			counter++;
-//			if (counter > 500) {
-//				System.out.println(contextName + "`" + value);
-//			}
-//		}
+		// if (!contextName.equals("System")) {
+		// counter++;
+		// if (counter > 500) {
+		// System.out.println(contextName + "`" + value);
+		// }
+		// }
 		return symbolTable.put(key, value);
 	}
 

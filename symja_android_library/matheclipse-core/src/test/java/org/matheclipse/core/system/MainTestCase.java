@@ -3,7 +3,6 @@ package org.matheclipse.core.system;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.eval.TimeConstrainedEvaluator;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
@@ -39,12 +38,7 @@ public class MainTestCase extends AbstractTestCase {
             scriptEngine.put("ENABLE_HISTORY", Boolean.TRUE);
 
             String evaledResult = (String) scriptEngine.eval(evalString);
-            if (!evaledResult.equals(expectedResult)) {
-                ExprEvaluator parser = new ExprEvaluator();
-                assertEquals(parser.parse(evaledResult), parser.parse(expectedResult));
-            } else {
                 assertEquals(expectedResult, evaledResult);
-            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1532,15 +1526,15 @@ public class MainTestCase extends AbstractTestCase {
                 "Integrate(1/(-7+x+x^5),x)");
 
 
-        check("integrate::PolyQ(x/(2*Sqrt(2)),x,1)", //
+		check("Rubi`PolyQ(x/(2*Sqrt(2)),x,1)", //
                 "True");
-        check("integrate::PolyQ((2+2*x)/(2*Sqrt(2)),x)", //
+		check("Rubi`PolyQ((2+2*x)/(2*Sqrt(2)),x)", //
                 "True");
-//		check("integrate::PolyQ(2+2 *x,x,1)", //
+//		check("Rubi`PolyQ(2+2 *x,x,1)", //
 //				"True");
-//		check("integrate::PolyQ(-(ArcTan((1+x)/Sqrt(2))/(2 Sqrt(2))),x )", //
+//		check("Rubi`PolyQ(-(ArcTan((1+x)/Sqrt(2))/(2 Sqrt(2))),x )", //
 //				"True");
-        check("integrate::substaux(-ArcTan(x/(2*Sqrt(2)))/(2*Sqrt(2)),x,2+2*x,True)", //
+		check("Rubi`substaux(-ArcTan(x/(2*Sqrt(2)))/(2*Sqrt(2)),x,2+2*x,True)", //
                 "-ArcTan((1+x)/Sqrt(2))/(2*Sqrt(2))");
         check("Integrate((x^2+2*x+3)^(-1),x)", //
                 "ArcTan((1+x)/Sqrt(2))/Sqrt(2)");
@@ -1550,7 +1544,7 @@ public class MainTestCase extends AbstractTestCase {
         check("Integrate(Log(x)*x^2,x)", //
                 "-x^3/9+1/3*x^3*Log(x)");
         check("Integrate((x^2+1)*Log(x),x)", //
-                "-x-x^3/9+1/3*(3*x+x^3)*Log(x)");
+				"-(3*x+x^3/3)/3+1/3*(3*x+x^3)*Log(x)");
         check("Simplify(D(ArcTan((2*x-1)*3^(-1/2))*3^(-1/2)+1/6*Log(x^2-x+1)-1/3*Log(x+1),x))", "x/(1+x^3)");
 
         check("Integrate(x/(x^3+1),x)", //
@@ -1574,7 +1568,7 @@ public class MainTestCase extends AbstractTestCase {
         check("Simplify(1/2*(2*x+2)*(1/2)^(1/2))", //
                 "(1+x)/Sqrt(2)");
         check("Simplify(Integrate((8*x+1)/(x^2+x+1)^2,x))", //
-                "(-5-2*x)/(1+x+x^2)");
+				"-(5+2*x)/(1+x+x^2)");
 
         check("Apart(1/(x^3+1))", //
                 "1/(3+3*x)-(-2+x)/(3-3*x+3*x^2)");
@@ -1605,7 +1599,7 @@ public class MainTestCase extends AbstractTestCase {
         check("D(2*E^x-Gamma(3,-x),x)", //
                 "2*E^x-E^x*x^2");
         check("Integrate((x^2+1)*Log(x),x)", //
-                "-x-x^3/9+1/3*(3*x+x^3)*Log(x)");
+				"-(3*x+x^3/3)/3+1/3*(3*x+x^3)*Log(x)");
         check("D(-x-Gamma(2,-3*Log(x))/9+x*Log(x),x)", //
                 "Log(x)+x^2*Log(x)");
 
@@ -3190,7 +3184,7 @@ public class MainTestCase extends AbstractTestCase {
         check("D(1/3*(-3*ArcTan((2*x+1)*3^(-1/2))*3^(-1/2)-1/2*Log(x^2-x+1))+1/3*Log(x+1), x)", //
                 "1/(3*(1+x))+1/3*(-(-1+2*x)/(2*(1-x+x^2))+2/(-1-(1+2*x)^2/3))");
         check("Simplify(D(Integrate(1/(x^3 + 1), x), x))", //
-                "(1-x)/(2+2*x^3)");
+				"(1-x)/(2*(1+x^3))");
         // check("Apart((1+(1/x))/(1+(2/x)))","");
         // check("FullForm((1+(1/x))/(1+(2/x)))","");
         // check("Simplify((1+(1/x))/(1+(2/x)))","");

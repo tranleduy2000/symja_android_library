@@ -1,5 +1,6 @@
 package org.matheclipse.core.patternmatching;
 
+import com.duy.annotations.Nonnull;
 import com.duy.lambda.Predicate;
 import com.duy.util.DCollection;
 
@@ -119,7 +120,7 @@ public class RulesData implements Serializable {
 		clear();
 	}
 
-	public RulesData(Context context,  int[] sizes) {
+	public RulesData(Context context, @Nonnull int[] sizes) {
 		// this.context = context;
 		clear();
 		if (sizes.length > 0) {
@@ -369,7 +370,7 @@ public class RulesData implements Serializable {
 	 * @param expr
 	 * @return <code>F.NIL</code> if no evaluation was possible
 	 */
-	public IExpr evalDownRule(final IExpr expr,  EvalEngine engine) {
+	public IExpr evalDownRule(final IExpr expr, @Nonnull EvalEngine engine) {
 		PatternMatcherEquals res;
 
 		if (Config.SHOW_PATTERN_EVAL_STEPS) {
@@ -412,7 +413,7 @@ public class RulesData implements Serializable {
 										" COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
 						}
 					}
-//					if (pmEvaluator.getLHSPriority() == 6686) {
+						// if (pmEvaluator.getLHSPriority() == 6686) {
 					// System.out.println("Debug from this line");
 					// }
 					if (Config.SHOW_STACKTRACE) {
@@ -425,8 +426,8 @@ public class RulesData implements Serializable {
 						// System.out.println("Debug from this line");
 						// }
 					}
-//					System.out.println(pmEvaluator.toString());
-//					System.out.println(">>"+expr);
+						// System.out.println(pmEvaluator.toString());
+						// System.out.println(">>"+expr);
 
 
 					result = pmEvaluator.eval(expr, engine);
@@ -466,7 +467,7 @@ public class RulesData implements Serializable {
 
 	private boolean isShowSteps(IPatternMatcher pmEvaluator) {
 		IExpr head = pmEvaluator.getLHS().head();
-		if (head.toString().toLowerCase().contains("integrate::")) {
+		if (head.isSymbol() && ((ISymbol) head).getContext().equals(Context.RUBI)) {
 			return true;
 		}
 		return head.equals(F.Integrate);
@@ -474,13 +475,10 @@ public class RulesData implements Serializable {
 
 	private boolean isShowPriority(IPatternMatcher pmEvaluator) {
 		IExpr head = pmEvaluator.getLHS().head();
-		// if (head.toString().toLowerCase().contains("integrate::")) {
-		// return true;
-		// }
 		return head.equals(F.Integrate);
 	}
 
-	public IExpr evalUpRule(final IExpr expression,  EvalEngine engine) {
+	public IExpr evalUpRule(final IExpr expression, @Nonnull EvalEngine engine) {
 		PatternMatcherEquals res;
 		if (fEqualUpRules != null) {
 			res = fEqualUpRules.get(expression);

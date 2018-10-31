@@ -1,5 +1,6 @@
 package org.matheclipse.core.expression;
 
+import com.duy.annotations.Nonnull;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Function;
@@ -82,8 +83,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
-
-
 
 import ch.ethz.idsc.tensor.QuantityParser;
 import edu.jas.kern.ComputerThreads;
@@ -3468,7 +3467,7 @@ public class F {
 					final EvalEngine engine = EvalEngine.get();
 					ContextPath path = engine.getContextPath();
 					try {
-						engine.getContextPath().add(org.matheclipse.core.expression.Context.INTEGRATE);
+						engine.getContextPath().add(org.matheclipse.core.expression.Context.RUBI);
 						org.matheclipse.core.reflection.system.Integrate.getUtilityFunctionsRuleAST();
 						// if (ruleList != null) {
 						// engine.addRules(ruleList);
@@ -3887,7 +3886,7 @@ public class F {
 	 * @param symbol
 	 * @return IPattern
 	 */
-	public static IPattern $p( final ISymbol symbol) {
+	public static IPattern $p(@Nonnull final ISymbol symbol) {
 		return org.matheclipse.core.expression.Pattern.valueOf(symbol);
 	}
 
@@ -3950,7 +3949,7 @@ public class F {
 	 * @param symbolName
 	 * @return IPattern
 	 */
-	public static IPattern $p( final String symbolName) {
+	public static IPattern $p(@Nonnull final String symbolName) {
 		// if (symbolName == null) {
 		// return org.matheclipse.core.expression.Pattern.valueOf(null);
 		// }
@@ -3977,7 +3976,7 @@ public class F {
 	 *            additional condition which should be checked in pattern-matching
 	 * @return IPattern
 	 */
-	public static IPattern $p( final String symbolName, final IExpr check) {
+	public static IPattern $p(@Nonnull final String symbolName, final IExpr check) {
 		// if (symbolName == null) {
 		// return org.matheclipse.core.expression.Pattern.valueOf(null, check);
 		// }
@@ -3994,7 +3993,7 @@ public class F {
 	 *            use a default value for this pattern if necessary
 	 * @return IPattern
 	 */
-	public static IPattern $p( final String symbolName, final IExpr check, boolean def) {
+	public static IPattern $p(@Nonnull final String symbolName, final IExpr check, boolean def) {
 		return org.matheclipse.core.expression.Pattern.valueOf($s(symbolName), check, def);
 	}
 
@@ -4268,59 +4267,16 @@ public class F {
 				name = symbolName.toLowerCase(Locale.ENGLISH);
 			}
 		}
-		ISymbol symbol = org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.get(name);
+		ISymbol symbol = org.matheclipse.core.expression.Context.RUBI.get(name);
 		if (symbol != null) {
 			return symbol;
 		}
-		if (Config.SERVER_MODE) {
-			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
-				if (SYMBOL_OBSERVER.createPredefinedSymbol(name)) {
-					// second try, because the symbol may now be added to
-					// fSymbolMap
-					ISymbol secondTry = org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.get(name);
-					if (secondTry != null) {
-						return secondTry;
-					}
-				}
-			} else {
-				if (Character.isUpperCase(name.charAt(0))) {
-					if (SYMBOL_OBSERVER.createPredefinedSymbol(name)) {
-						// second try, because the symbol may now be added to
-						// fSymbolMap
-						ISymbol secondTry = org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.get(name);
-						if (secondTry != null) {
-							return secondTry;
-						}
-					}
-				}
-			}
-			// symbol = new BuiltInSymbol(name);
-			// symbol = symbol(name, EvalEngine.get());
-			BuiltInDummy sym = new BuiltInDummy(name);
-			sym.setEvaluator(evaluator);
-			// engine.putUserVariable(name, symbol);
-			org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.put(name, sym);
-			if (name.charAt(0) == '$') {
-				SYMBOL_OBSERVER.createUserSymbol(sym);
-			}
-			return sym;
-		} else {
-			// symbol = new BuiltInSymbol(name);
-			// symbol = symbol(name);
-			BuiltInDummy sym = new BuiltInDummy(name);
-			sym.setEvaluator(evaluator);
-			org.matheclipse.core.expression.Context.PREDEFINED_SYMBOLS_MAP.put(name, sym);
-			// if (symbol.isBuiltInSymbol()) {
-			// if (!setEval) {
-			// ((IBuiltInSymbol) symbol).setEvaluator(BuiltInSymbol.DUMMY_EVALUATOR);
-			// } else {
-			// ((IBuiltInSymbol) symbol).getEvaluator();
-			// }
-			// }
-			return sym;
+		BuiltInRubi bSymbol = new BuiltInRubi(name);
+		bSymbol.setEvaluator(evaluator);
+		org.matheclipse.core.expression.Context.RUBI.put(name, bSymbol);
+		return bSymbol;
 		}
 
-	}
 	/**
 	 * Create a string expression
 	 * 
@@ -5899,6 +5855,10 @@ public class F {
 		return unaryAST1(Factor, a0);
 	}
 
+	public static IAST FactorTerms(final IExpr a0) {
+		return unaryAST1(FactorTerms, a0);
+	}
+
 	public static IAST Factorial(final IExpr a0) {
 		return unaryAST1(Factorial, a0);
 	}
@@ -6348,13 +6308,13 @@ public class F {
 	// return temp;
 	// }
 
-	public static IPattern initPredefinedPattern( final ISymbol symbol) {
+	public static IPattern initPredefinedPattern(@Nonnull final ISymbol symbol) {
 		IPattern temp = new Pattern(symbol);
 		PREDEFINED_PATTERN_MAP.put(symbol.toString(), temp);
 		return temp;
 	}
 
-	public static IPatternSequence initPredefinedPatternSequence( final ISymbol symbol) {
+	public static IPatternSequence initPredefinedPatternSequence(@Nonnull final ISymbol symbol) {
 		PatternSequence temp = PatternSequence.valueOf(symbol, false);
 		PREDEFINED_PATTERNSEQUENCE_MAP.put(symbol.toString(), temp);
 		return temp;

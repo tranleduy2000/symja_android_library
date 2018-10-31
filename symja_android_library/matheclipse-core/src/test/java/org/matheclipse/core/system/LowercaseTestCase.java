@@ -2,8 +2,6 @@ package org.matheclipse.core.system;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
-import org.matheclipse.core.builtin.Structure;
-import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
 
@@ -776,34 +774,34 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"");
 		check("f(a,b,c,d,e)", "f(a,b,c,d,e)");
 		// print the possible matches
-//		{a}{b}{c,d,e}
-//		{a}{b,c}{d,e}
-//		{a,b}{c}{d,e}
-//		{a}{b,c,d}{e}
-//		{a,b}{c,d}{e}
-//		{a,b,c}{d}{e}
+		// {a}{b}{c,d,e}
+		// {a}{b,c}{d,e}
+		// {a,b}{c}{d,e}
+		// {a}{b,c,d}{e}
+		// {a,b}{c,d}{e}
+		// {a,b,c}{d}{e}
 		System.out.println("-------------");
 		check("g(x___,y___,z___):={x,y,z}/;Print({x},{y},{z})", //
 				"");
 		check("g(a,b,c,d,e)", "g(a,b,c,d,e)");
 		// print the possible matches
-//		{}{}{a,b,c,d,e}
-//		{a}{b}{c,d,e}
-//		{}{a,b,c}{d,e}
-//		{a}{b,c}{d,e}
-//		{a,b}{c}{d,e}
-//		{a,b,c}{}{d,e}
-//		{}{a,b,c,d}{e}
-//		{a}{b,c,d}{e}
-//		{a,b}{c,d}{e}
-//		{a,b,c}{d}{e}
-//		{a,b,c,d}{}{e}
-//		{}{a,b,c,d,e}{}
-//		{a}{b,c,d,e}{}
-//		{a,b}{c,d,e}{}
-//		{a,b,c}{d,e}{}
-//		{a,b,c,d}{e}{}
-//		{a,b,c,d,e}{}{}
+		// {}{}{a,b,c,d,e}
+		// {a}{b}{c,d,e}
+		// {}{a,b,c}{d,e}
+		// {a}{b,c}{d,e}
+		// {a,b}{c}{d,e}
+		// {a,b,c}{}{d,e}
+		// {}{a,b,c,d}{e}
+		// {a}{b,c,d}{e}
+		// {a,b}{c,d}{e}
+		// {a,b,c}{d}{e}
+		// {a,b,c,d}{}{e}
+		// {}{a,b,c,d,e}{}
+		// {a}{b,c,d,e}{}
+		// {a,b}{c,d,e}{}
+		// {a,b,c}{d,e}{}
+		// {a,b,c,d}{e}{}
+		// {a,b,c,d,e}{}{}
 	}
 
 	public void testBlock() {
@@ -1653,7 +1651,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Collect(a*x^4 + b*x^4 + 2*a^2*x - 3*b*x + x - 7, x)", "-7+(1+2*a^2-3*b)*x+(a+b)*x^4");
 		check("Collect((1 + a + x)^4, x)",
 				"1+4*a+6*a^2+4*a^3+a^4+(4+12*a+12*a^2+4*a^3)*x+(6+12*a+6*a^2)*x^2+(4+4*a)*x^3+x^4");
-		check("Collect((1 + a + x)^4, x, Simplify)", "(1+a)^4+4*(1+a)^3*x+6*(1+a)^2*x^2+(4+4*a)*x^3+x^4");
+		check("Collect((1 + a + x)^4, x, Simplify)", //
+				"(1+a)^4+4*(1+a)^3*x+6*(1+a)^2*x^2+4*(1+a)*x^3+x^4");
 
 		check("Collect(a*x + b*y + c*x, x)", "(a+c)*x+b*y");
 		check("Collect((x + y + z + 1)^4, {x, y})",
@@ -1919,6 +1918,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("Cos(3/4*Pi+2*x)", //
 		// "");
 
+		check("Cos(e - Pi/2 + f*x)", //
+				"Sin(e+f*x)");
 		check("Cos(-1/2*E+z)", //
 				"Cos(E/2-z)");
 		check("Cos(-Pi/2+z)", //
@@ -1957,9 +1958,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCreateDirectory() {
-//		Config.FILESYSTEM_ENABLED = true;
-//		check("CreateDirectory()", //
-//				"C:\\Users\\dev\\AppData\\Local\\Temp\\1539799359607-0");
+		// Config.FILESYSTEM_ENABLED = true;
+		// check("CreateDirectory()", //
+		// "C:\\Users\\dev\\AppData\\Local\\Temp\\1539799359607-0");
 	}
 
 	public void testCanberraDistance() {
@@ -2061,6 +2062,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCsc() {
+		check("Csc(e - Pi/2 + f*x)", //
+				"-Sec(e+f*x)");
 		check("Csc(x)^m*Cot(x)", //
 				"Cos(x)*Csc(x)^(1+m)");
 		check("Csc(x)^m*Cot(x)^3", //
@@ -3663,6 +3666,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFactorTerms() {
+		// check("Expand((3 + 2 x)^2*(x + 2 y)^2)",//
+		// "9*x^2+12*x^3+4*x^4+36*x*y+48*x^2*y+16*x^3*y+36*y^2+48*x*y^2+16*x^2*y^2");
+		// check("FactorTerms(9*x^2+12*x^3+4*x^4+36*x*y+48*x^2*y+16*x^3*y+36*y^2+48*x*y^2+16*x^2*y^2, y)",//
+		// "");
+		check("FactorTerms(100*Log(2))", //
+				"100*Log(2)");
+		check("FactorTerms(-136+40*Sqrt(17))", //
+				"8*(-17+5*Sqrt(17))");
+		// TODO create simpler form
 		check("FactorTerms(2*a*x^2*y + 2*x^2*y + 4*a*x^2 + 4*x^2 + 4*a^2*y^2 + 4*a*y^2 + 8*a^2*y + 2*a*y - 6*y - 12*a- 12, x)", //
 				"(x+Sqrt(48+96*a+48*a^2+48*y+64*a*y-16*a^2*y-32*a^3*y+12*y^2-8*a*y^2-52*a^2*y^2\n"
 						+ "-32*a^3*y^2-8*a*y^3-16*a^2*y^3-8*a^3*y^3)/(4+4*a+2*y+2*a*y))*(x-Sqrt(48+96*a+48*a^\n"
@@ -6418,6 +6430,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423,9689,\n" + "9941}");
 	}
 
+	public void testMessageName() {
+		// Set[MessageName(f,"usage"),"text")
+		check("f::usage=\"text\"", //
+				"text");
+//		check("?f::usage", //
+//				"text");
+	}
+
 	public void testMin() {
 		check("Min(Interval({1,2}))", "1");
 
@@ -8988,10 +9008,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRandomVariate() {
-//		check("RandomVariate(FrechetDistribution(0.5,0.6), {10})", //
-//				"{288.7521,2.9714,0.403198,2.0156,0.21531,0.0399206,0.665026,1.49444,434.9269,118.3019}");
-//		check("RandomVariate(GumbelDistribution(0.5,0.6), {10})", //
-//				"{0.983572,1.01258,1.02586,0.351624,0.674945,0.549278,0.173217,0.464434,-0.335133,-0.151538}");
+		// check("RandomVariate(FrechetDistribution(0.5,0.6), {10})", //
+		// "{288.7521,2.9714,0.403198,2.0156,0.21531,0.0399206,0.665026,1.49444,434.9269,118.3019}");
+		// check("RandomVariate(GumbelDistribution(0.5,0.6), {10})", //
+		// "{0.983572,1.01258,1.02586,0.351624,0.674945,0.549278,0.173217,0.464434,-0.335133,-0.151538}");
 		// check("RandomVariate(GammaDistribution(0.5,0.6), {10})", //
 		// "{0.08716,0.39611,0.04844,0.03546,0.57366,0.02071,0.01487,1.65639,0.75104,0.05348}");
 		// check("RandomVariate(UniformDistribution({1,3}), {2})", //
@@ -9355,8 +9375,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testReplaceList() {
 		// TODO
-//		 check("ReplaceList({a, b, c, d, e, f}, {x__, y__, z__} :> {{x},{y},{z}})", //
-//		  "");
+		// check("ReplaceList({a, b, c, d, e, f}, {x__, y__, z__} :> {{x},{y},{z}})", //
+		// "");
 	}
 
 	public void testReplaceTransformations() {
@@ -9939,6 +9959,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSec() {
+		check("Sec(e - Pi/2 + f*x)", //
+				"Csc(e+f*x)");
 		check("Sec(e+f*x)^m*Tan(e+f*x)^2", //
 				"Sec(e+f*x)^(2+m)*Sin(e+f*x)^2");
 		check("Sec(e+f*x)^m*Tan(e+f*x)", //
@@ -10113,6 +10135,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSimplify() {
+		check("Simplify(-136+40*Sqrt(17))", //
+				"8*(-17+5*Sqrt(17))");
+		check("Simplify(Sqrt(17)/(5+Sqrt(17)))", //
+				"8*(-17+5*Sqrt(17))");
+
 		// check("Simplify(Cos(b*x)/(-Cos(b*x)/x^2-CosIntegral(b*x)/x^2))", //
 		// "(x^2*Cos(b*x))/(-Cos(b*x)-CosIntegral(b*x))");
 		check("Together(-Cos(b*x)/x^2+(-b*Sin(b*x))/x)", //
@@ -10120,8 +10147,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Simplify(-Cos(b*x)/x^2+(-b*Sin(b*x))/x)", //
 				"(-Cos(b*x)-b*x*Sin(b*x))/x^2");
 
-		check("Simplify(-(b/(2*Sqrt(c))+Sqrt(c)*x)^24+(a+b*x+c*x^2)^12)",
-				"-(b+2*c*x)^24/(16777216*c^12)+(a+b*x+c*x^2)^12");
+		check("Simplify(-(b/(2*Sqrt(c))+Sqrt(c)*x)^24+(a+b*x+c*x^2)^12)", "-(b/2+c*x)^24/c^12+(a+b*x+c*x^2)^12");
 		check("Simplify(-ArcTan((1+x)/Sqrt(2))/(2*Sqrt(2)))", //
 				"-ArcTan((1+x)/Sqrt(2))/(2*Sqrt(2))");
 		check("Simplify(1 + 1/GoldenRatio - GoldenRatio)", //
@@ -10131,7 +10157,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("complexity(x_) := 2*Count(x, _Abs, {0, 10}) + LeafCount(x)", "");
 		check("Simplify(Abs(x), x<0, ComplexityFunction->complexity)", "-x");
 
-		check("Simplify(100*Log(2))", "100*Log(2)");
+		check("Simplify(100*Log(2))", //
+				"100*Log(2)");
 		check("Simplify(2*Sin(x)^2 + 2*Cos(x)^2)", "2");
 		check("Simplify(f(x))", "f(x)");
 		check("Simplify(a*x^2+b*x^2)", "(a+b)*x^2");
@@ -10150,8 +10177,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSin() {
-//		check("Sin(Quantity(90,\"Degree\"))",
-//				"");
+		// check("Sin(Quantity(90,\"Degree\"))",
+		// "");
+		check("Sin(e - Pi/2 + f*x)", //
+				"-Cos(e+f*x)");
 		check("Sin( -3/x+x )", //
 				"-Sin(3/x-x)");
 		check("Sin((-3+x^2)/x)", //
@@ -11014,7 +11043,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("Sum(c*(i-j+1), {j,i+1,n}, {i,1,n})",
 				"c*n*(-i+n)-1/2*c*n*(-i+n)*(1+i+n)+c*(1/2*n*(-i+n)+1/2*(-i+n)*n^2)");
-		check("Simplify(1/2*c*(n-i)*n^2-1/2*c*n*(n+i+1)*(n-i)+3/2*c*n*(n-i))", "-c*i*n+1/2*c*i^2*n+c*n^2-1/2*c*i*n^2");
+		check("Simplify(1/2*c*(n-i)*n^2-1/2*c*n*(n+i+1)*(n-i)+3/2*c*n*(n-i))", //
+				"1/2*(-2*c*i*n+c*i^2*n+2*c*n^2-c*i*n^2)");
 
 		check("Sum(c*(n-1), {j,i,n-1})", //
 				"-c*(-i+n)+c*n*(-i+n)");
@@ -11139,6 +11169,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSymbolName() {
+		check("Context(x)", "Global`");
 		check("SymbolName(x)", "x");
 		// TODO allow contexts
 		// check("SymbolName(a`b`x)", "x");
@@ -12174,6 +12205,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testUpSet() {
+		check("ParameterRanges[Cartesian]^=Null;Null", //
+				"");
+		check("ParameterRanges[Cartesian]^=Null;Null", //
+				"");
 		check("$f($abc(0))^=100;$f($abc(0))", "100");
 	}
 
@@ -12188,20 +12223,34 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testVariables() {
-		check("Variables(x + f(x)+Pi*E)", "{x,f(x)}");
-		check("Variables(x^0.3 + f(x)+Pi*E)", "{x^0.3,f(x)}");
-		check("Variables(Sin(x) + Cos(x))", "{Cos(x),Sin(x)}");
-		check("Variables({a + b*x, c*y^2 + x/2})", "{a,b,c,x,y}");
-		check("Variables((x + y)^2 + 3*z^2 - y*z + 7)", "{x,y,z}");
-		check("Variables((a - b)/(x + y) - 2/z)", "{a,b,x,y,z}");
-		check("Variables(Sqrt(x + y - z^2) + (-2*t)^(2/3))", "{t,x,y,z}");
+		check("Variables(x + f(x)+Pi*E)", //
+				"{x,f(x)}");
+		check("Variables(x^0.3 + f(x)+Pi*E)", //
+				"{x^0.3,f(x)}");
+		check("Variables(Sin(x) + Cos(x))", //
+				"{Cos(x),Sin(x)}");
+		check("Variables({a + b*x, c*y^2 + x/2})", //
+				"{a,b,c,x,y}");
+		check("Variables((x + y)^2 + 3*z^2 - y*z + 7)", //
+				"{x,y,z}");
+		check("Variables((a - b)/(x + y) - 2/z)", //
+				"{a,b,x,y,z}");
+		check("Variables(Sqrt(x + y - z^2) + (-2*t)^(2/3))", //
+				"{t,x,y,z}");
 		check("Variables(y + x*z)", "{x,y,z}");
 
-		check("Variables(a*x^2 + b*x + c)", "{a,b,c,x}");
-		check("Variables({a + b*x, c*y^2 + x/2})", "{a,b,c,x,y}");
-		check("Variables(x + Sin(y))", "{x,Sin(y)}");
-		check("Variables(E^x)", "{}");
-		check("Variables(a^x)", "{a^x}");
+		check("Variables(a*x^2 + b*x + c)", //
+				"{a,b,c,x}");
+		check("Variables({a + b*x, c*y^2 + x/2})", //
+				"{a,b,c,x,y}");
+		check("Variables(x + Sin(y))", //
+				"{x,Sin(y)}");
+		check("Variables(x + Sin(10))", //
+				"{x}");
+		check("Variables(E^x)", //
+				"{}");
+		check("Variables(a^x)", //
+				"{a^x}");
 	}
 
 	public void testVariance() {
