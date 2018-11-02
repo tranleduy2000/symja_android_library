@@ -16,7 +16,6 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.VisitorExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <pre>
@@ -49,7 +48,7 @@ public class Rationalize extends AbstractFunctionEvaluator {
 		}
 
 		@Override
-		public IExpr visit(IASTMutable ast) throws MathException {
+		public IExpr visit(IASTMutable ast) {
 			if (ast.isNumericFunction()) {
 				ISignedNumber signedNumber = ast.evalReal();
 				if (signedNumber != null) {
@@ -89,7 +88,7 @@ public class Rationalize extends AbstractFunctionEvaluator {
 		 * @return <code>F.NIL</code>, if no evaluation is possible
 		 */
 		@Override
-		public IExpr visit(ISymbol element) throws MathException {
+		public IExpr visit(ISymbol element) {
 			if (element.isNumericFunction()) {
 				ISignedNumber signedNumber = element.evalReal();
 				if (signedNumber != null) {
@@ -104,7 +103,7 @@ public class Rationalize extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkRange(ast, 2, 3);
 
 		IExpr arg1 = ast.arg1();

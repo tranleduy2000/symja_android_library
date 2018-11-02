@@ -9,7 +9,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.UnsupportedEncodingException;
 
@@ -19,7 +18,7 @@ public class FromCharacterCode extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (ast.size() != 2) {
 			return F.NIL;
 		}

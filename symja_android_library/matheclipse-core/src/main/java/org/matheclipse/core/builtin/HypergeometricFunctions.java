@@ -17,7 +17,6 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.Hypergeometric0F1Rules;
 import org.matheclipse.core.reflection.system.rules.Hypergeometric2F1Rules;
-import org.matheclipse.parser.client.math.MathException;
 
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C2;
@@ -127,7 +126,7 @@ public class HypergeometricFunctions {
 	private static class ExpIntegralE extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			IExpr n = ast.arg1();
@@ -338,7 +337,7 @@ public class HypergeometricFunctions {
 	private final static class GegenbauerC extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 			final IExpr n = ast.arg1();
 			if (ast.size() == 4) {
@@ -462,7 +461,7 @@ public class HypergeometricFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			IExpr b = ast.arg1();
@@ -495,7 +494,7 @@ public class HypergeometricFunctions {
 	private static class Hypergeometric1F1 extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
 			IExpr a = ast.arg1();
@@ -576,7 +575,7 @@ public class HypergeometricFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 5);
 
 			IExpr a = ast.arg1();

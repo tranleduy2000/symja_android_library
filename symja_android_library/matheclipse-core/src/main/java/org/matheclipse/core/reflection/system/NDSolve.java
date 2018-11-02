@@ -15,7 +15,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * See: <a href="https://en.wikipedia.org/wiki/Ordinary_differential_equation"> Wikipedia:Ordinary differential
@@ -69,7 +68,7 @@ public class NDSolve extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (!ToggleFeature.DSOLVE) {
 			return F.NIL;
 		}

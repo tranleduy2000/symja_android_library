@@ -9,7 +9,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 public abstract class AbstractAssumptions implements IAssumptions {
 
@@ -393,7 +392,7 @@ public abstract class AbstractAssumptions implements IAssumptions {
 		return null;
 	}
 
-	public static boolean isNegativeResult(IAST ast) throws MathException {
+	public static boolean isNegativeResult(IAST ast) {
 		ISignedNumber e = ast.evalReal();
 		if (e != null) {
 			return e.isNegative();
@@ -449,7 +448,7 @@ public abstract class AbstractAssumptions implements IAssumptions {
 		return false;
 	}
 
-	public static boolean isNonNegativeResult(IAST ast) throws MathException {
+	public static boolean isNonNegativeResult(IAST ast) {
 		ISignedNumber e = ast.evalReal();
 		if (e != null) {
 			return !e.isNegative();
@@ -513,7 +512,7 @@ public abstract class AbstractAssumptions implements IAssumptions {
 		return false;
 	}
 
-	public static boolean isPositiveResult(IAST ast) throws MathException {
+	public static boolean isPositiveResult(IAST ast) {
 		ISignedNumber e = ast.evalReal();
 		if (e != null) {
 			return e.isPositive();

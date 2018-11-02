@@ -1,7 +1,5 @@
 package org.matheclipse.core.interfaces;
 
-import org.matheclipse.parser.client.math.MathException;
-
 import java.util.Iterator;
 
 /**
@@ -13,14 +11,14 @@ public interface IIterator<E> extends Iterator<E> {
      *
      * @return
      */
-    boolean setUp() throws MathException;
+    boolean setUp();
 
     /**
      * Set up this iterator.
      *
      * @return
      */
-    boolean setUpThrow() throws MathException;
+    boolean setUpThrow();
 
     /**
      * Get a hint of how much iterations probably will occurr.

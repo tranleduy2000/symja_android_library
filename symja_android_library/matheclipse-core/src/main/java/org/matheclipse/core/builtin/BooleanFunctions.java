@@ -20,7 +20,6 @@ import org.matheclipse.core.convert.LogicFormula;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
@@ -43,7 +42,6 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ITernaryComparator;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.util.List;
 import java.util.Map;
@@ -99,7 +97,7 @@ public final class BooleanFunctions {
 	private static class AllTrue extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isAST()) {
@@ -127,7 +125,7 @@ public final class BooleanFunctions {
 
 			if (!list.forAll(new Predicate<IExpr>() {
 				@Override
-				public boolean test(IExpr x) throws MathException {
+				public boolean test(IExpr x) {
 					IExpr temp = engine.evaluate(F.unaryAST1(head, x));
 					if (temp.isTrue()) {
 						return true;
@@ -184,7 +182,7 @@ public final class BooleanFunctions {
 	private static class And extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				return F.True;
 			}
@@ -317,7 +315,7 @@ public final class BooleanFunctions {
 	private static class AnyTrue extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isAST()) {
@@ -344,7 +342,7 @@ public final class BooleanFunctions {
 			final IASTAppendable logicalOr = F.Or();
 			if (list.exists(new Predicate<IExpr>() {
 				@Override
-				public boolean test(IExpr x) throws MathException {
+				public boolean test(IExpr x) {
 					return anyTrueArgument(x, head, logicalOr, engine);
 				}
 			})) {
@@ -353,7 +351,7 @@ public final class BooleanFunctions {
 			return logicalOr.isAST0() ? F.False : logicalOr;
 		}
 
-		private static boolean anyTrueArgument(IExpr x, IExpr head, IASTAppendable resultCollector, EvalEngine engine) throws MathException {
+		private static boolean anyTrueArgument(IExpr x, IExpr head, IASTAppendable resultCollector, EvalEngine engine) {
 			IExpr temp = engine.evaluate(F.unaryAST1(head, x));
 			if (temp.isTrue()) {
 				return true;
@@ -394,7 +392,7 @@ public final class BooleanFunctions {
 	private static class Boole extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isSymbol()) {
@@ -469,7 +467,7 @@ public final class BooleanFunctions {
 		// }
 		//
 		// @Override
-		// protected IExpr visitAST(IAST ast) throws MathException {
+		// protected IExpr visitAST(IAST ast) {
 		// if (ast.isNot()) {
 		// if (ast.arg1().isAST()) {
 		// IAST notArg1 = (IAST) ast.arg1();
@@ -528,7 +526,7 @@ public final class BooleanFunctions {
 		// }
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			// BooleanConvertVisitor bcVisitor = new BooleanConvertVisitor();
@@ -557,7 +555,7 @@ public final class BooleanFunctions {
 		 * @param engine
 		 * @return <code>null</code> if no or wrong method is defined as option
 		 */
-		private static FormulaTransformation transformation(final IAST ast, EvalEngine engine) throws IllegalArgument {
+		private static FormulaTransformation transformation(final IAST ast, EvalEngine engine) {
 			int size = ast.argSize();
 			if (size > 1 && ast.get(size).isString()) {
 				IStringX arg2 = (IStringX) ast.arg2();
@@ -598,7 +596,7 @@ public final class BooleanFunctions {
 	private static class BooleanMinimize extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			FormulaFactory factory = new FormulaFactory();
@@ -676,7 +674,7 @@ public final class BooleanFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			IAST variables;
@@ -714,7 +712,7 @@ public final class BooleanFunctions {
 		/**
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			return booleanVariables(ast.arg1());
@@ -872,7 +870,7 @@ public final class BooleanFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 2) {
 				COMPARE_TERNARY b = COMPARE_TERNARY.UNDEFINED;
 				if (ast.isAST2()) {
@@ -915,7 +913,7 @@ public final class BooleanFunctions {
 		 * @param engine
 		 * @return
 		 */
-		protected COMPARE_TERNARY prepareCompare(final IExpr arg1, final IExpr arg2, EvalEngine engine) throws MathException {
+		protected COMPARE_TERNARY prepareCompare(final IExpr arg1, final IExpr arg2, EvalEngine engine) {
 			if (arg1.isIndeterminate() || arg2.isIndeterminate()) {
 				return COMPARE_TERNARY.FALSE;
 			}
@@ -1052,7 +1050,7 @@ public final class BooleanFunctions {
 	private final static class Equivalent extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0() || ast.isAST1()) {
 				return F.True;
 			}
@@ -1120,7 +1118,7 @@ public final class BooleanFunctions {
 
 	private final static class Exists extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			boolean evaled = false;
@@ -1169,7 +1167,7 @@ public final class BooleanFunctions {
 
 	private final static class ForAll extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			boolean evaled = false;
@@ -1303,7 +1301,7 @@ public final class BooleanFunctions {
 		 * @return
 		 */
 		private static COMPARE_TERNARY compareGreaterIntervalTernary(final IExpr lower0, final IExpr upper0,
-				final IExpr lower1, final IExpr upper1) throws MathException {
+				final IExpr lower1, final IExpr upper1) {
 			if (lower0.greaterThan(upper1).isTrue()) {
 				return COMPARE_TERNARY.TRUE;
 			} else {
@@ -1316,7 +1314,7 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) throws MathException {
+		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
 			// don't compare strings
 			if (a0.isReal()) {
 				if (a1.isReal()) {
@@ -1381,7 +1379,7 @@ public final class BooleanFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// Validate.checkRange(ast, 3);
 			if (ast.size() <= 2) {
 				return F.True;
@@ -1452,7 +1450,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		private COMPARE_TERNARY prepareCompare(IExpr a0, IExpr a1, EvalEngine engine) throws MathException {
+		private COMPARE_TERNARY prepareCompare(IExpr a0, IExpr a1, EvalEngine engine) {
 			if (!a0.isReal() && a0.isNumericFunction()) {
 				a0 = engine.evalN(a0);
 			} else if (a1.isNumeric() && a0.isRational()) {
@@ -1467,7 +1465,7 @@ public final class BooleanFunctions {
 			return compareTernary(a0, a1);
 		}
 
-		public COMPARE_TERNARY prepareCompare(final IExpr o0, final IExpr o1) throws MathException {
+		public COMPARE_TERNARY prepareCompare(final IExpr o0, final IExpr o1) {
 			return prepareCompare(o0, o1, EvalEngine.get());
 		}
 
@@ -1486,7 +1484,7 @@ public final class BooleanFunctions {
 		 *            right-hand-side of the comparator expression
 		 * @return the simplified comparator expression or <code>null</code> if no simplification was found
 		 */
-		protected IExpr simplifyCompare(IExpr a1, IExpr a2) throws MathException {
+		protected IExpr simplifyCompare(IExpr a1, IExpr a2) {
 			return simplifyCompare(a1, a2, F.Greater, F.Less, true);
 		}
 
@@ -1507,7 +1505,7 @@ public final class BooleanFunctions {
 		 * @return the simplified comparator expression or <code>F.NIL</code> if no simplification was found
 		 */
 		final protected IExpr simplifyCompare(IExpr a1, IExpr a2, IBuiltInSymbol originalHead,
-				IBuiltInSymbol oppositeHead, boolean setTrue) throws MathException {
+				IBuiltInSymbol oppositeHead, boolean setTrue) {
 			IExpr lhs;
 			IExpr rhs;
 			boolean useOppositeHeader = false;
@@ -1638,13 +1636,13 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		protected IExpr simplifyCompare(IExpr a1, IExpr a2) throws MathException {
+		protected IExpr simplifyCompare(IExpr a1, IExpr a2) {
 			return simplifyCompare(a1, a2, F.GreaterEqual, F.LessEqual, true);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) throws MathException {
+		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
 			if (a0.equals(a1)) {
 				return COMPARE_TERNARY.TRUE;
 			}
@@ -1686,7 +1684,7 @@ public final class BooleanFunctions {
 	 */
 	private final static class Implies extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			boolean evaled = false;
@@ -1749,7 +1747,7 @@ public final class BooleanFunctions {
 			return -2;
 		}
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
 				return F.True;
 			}
@@ -1905,13 +1903,13 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		protected IExpr simplifyCompare(IExpr a1, IExpr a2) throws MathException {
+		protected IExpr simplifyCompare(IExpr a1, IExpr a2) {
 			return simplifyCompare(a1, a2, F.Less, F.Greater, false);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) throws MathException {
+		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
 			// swap arguments
 			return super.compareTernary(a1, a0);
 		}
@@ -1979,13 +1977,13 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		protected IExpr simplifyCompare(IExpr a1, IExpr a2) throws MathException {
+		protected IExpr simplifyCompare(IExpr a1, IExpr a2) {
 			return simplifyCompare(a1, a2, F.LessEqual, F.GreaterEqual, false);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) throws MathException {
+		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
 			// don't compare strings
 			if (a0.equals(a1)) {
 				return COMPARE_TERNARY.TRUE;
@@ -2048,7 +2046,7 @@ public final class BooleanFunctions {
 	private static class Max extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 1);
 
 			if (ast.isAST0()) {
@@ -2072,7 +2070,7 @@ public final class BooleanFunctions {
 			return maximum(ast, false);
 		}
 
-		private IExpr maximum(IAST list, boolean flattenedList) throws MathException {
+		private IExpr maximum(IAST list, boolean flattenedList) {
 			boolean evaled = false;
 			// int j = 1;
 			IASTAppendable f = list.remove(new Predicate<IExpr>() {
@@ -2190,7 +2188,7 @@ public final class BooleanFunctions {
 	 */
 	private static class Min extends AbstractFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 1);
 
 			if (ast.isAST0()) {
@@ -2214,7 +2212,7 @@ public final class BooleanFunctions {
 			return minimum(ast, false);
 		}
 
-		private IExpr minimum(IAST list, final boolean flattenedList) throws MathException {
+		private IExpr minimum(IAST list, final boolean flattenedList) {
 			boolean evaled = false;
 			IASTAppendable f = list.remove(new Predicate<IExpr>() {
 				@Override
@@ -2308,7 +2306,7 @@ public final class BooleanFunctions {
 	private final static class Nand extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				return F.False;
 			}
@@ -2384,7 +2382,7 @@ public final class BooleanFunctions {
 	private static class Negative extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			IExpr arg1 = ast.arg1();
 			if (arg1.isReal()) {
@@ -2454,7 +2452,7 @@ public final class BooleanFunctions {
 	private static class NoneTrue extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isAST()) {
@@ -2481,7 +2479,7 @@ public final class BooleanFunctions {
 			final IASTAppendable logicalNor = F.ast(F.Nor);
 			if (list.exists(new Predicate<IExpr>() {
 				@Override
-				public boolean test(IExpr x) throws MathException {
+				public boolean test(IExpr x) {
 					return noneTrueArgument(x, head, logicalNor, engine);
 				}
 			})) {
@@ -2491,7 +2489,7 @@ public final class BooleanFunctions {
 		}
 
 		private static boolean noneTrueArgument(IExpr x, IExpr head, IASTAppendable resultCollector,
-				EvalEngine engine) throws MathException {
+				EvalEngine engine) {
 			IExpr temp = engine.evaluate(F.unaryAST1(head, x));
 			if (temp.isTrue()) {
 				return true;
@@ -2527,7 +2525,7 @@ public final class BooleanFunctions {
 	private final static class NonNegative extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -2571,7 +2569,7 @@ public final class BooleanFunctions {
 	private final static class NonPositive extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -2619,7 +2617,7 @@ public final class BooleanFunctions {
 	private static class Nor extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				return F.True;
 			}
@@ -2763,7 +2761,7 @@ public final class BooleanFunctions {
 	private static class Or extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				return F.False;
 			}
@@ -2888,7 +2886,7 @@ public final class BooleanFunctions {
 	private final static class Positive extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -2946,7 +2944,7 @@ public final class BooleanFunctions {
 	 */
 	private final static class SameQ extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 1) {
 				IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
 				return F.bool(!temp.existsLeft(new BiPredicate<IExpr, IExpr>() {
@@ -2994,7 +2992,7 @@ public final class BooleanFunctions {
 	private final static class SatisfiabilityCount extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 
 			IAST userDefinedVariables;
@@ -3081,7 +3079,7 @@ public final class BooleanFunctions {
 	private final static class SatisfiabilityInstances extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 
 			IAST userDefinedVariables;
@@ -3144,7 +3142,7 @@ public final class BooleanFunctions {
 	private final static class SatisfiableQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 
 			IASTMutable userDefinedVariables;
@@ -3263,7 +3261,7 @@ public final class BooleanFunctions {
 	private static class TautologyQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			IASTMutable userDefinedVariables;
@@ -3372,7 +3370,7 @@ public final class BooleanFunctions {
 	private static class TrueQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			return F.bool(ast.equalsAt(1, F.True));
@@ -3458,7 +3456,7 @@ public final class BooleanFunctions {
 	private final static class Unequal extends Equal {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 2) {
 				COMPARE_TERNARY b = COMPARE_TERNARY.UNDEFINED;
 				if (ast.isAST2()) {
@@ -3523,7 +3521,7 @@ public final class BooleanFunctions {
 	private final static class UnsameQ extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 1) {
 				IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
 				if (ast.isAST2()) {
@@ -3594,7 +3592,7 @@ public final class BooleanFunctions {
 	private static class Xor extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() == 1) {
 				return F.False;
 			}
@@ -3664,7 +3662,7 @@ public final class BooleanFunctions {
 	 *            second argument
 	 * @return <code>F.NIL</code> or the simplified expression, if equality couldn't be determined.
 	 */
-	public static IExpr equalNull(final IExpr a1, final IExpr a2, EvalEngine engine) throws MathException {
+	public static IExpr equalNull(final IExpr a1, final IExpr a2, EvalEngine engine) {
 		COMPARE_TERNARY b;
 		IExpr arg1 = F.expandAll(a1, true, true);
 		IExpr arg2 = F.expandAll(a2, true, true);
@@ -3689,7 +3687,7 @@ public final class BooleanFunctions {
 	 *            second argument
 	 * @return <code>F.NIL</code> or the simplified expression, if equality couldn't be determined.
 	 */
-	public static IExpr unequalNull(IExpr a1, IExpr a2, EvalEngine engine) throws MathException {
+	public static IExpr unequalNull(IExpr a1, IExpr a2, EvalEngine engine) {
 		COMPARE_TERNARY b;
 		IExpr arg1 = F.expandAll(a1, true, true);
 		IExpr arg2 = F.expandAll(a2, true, true);

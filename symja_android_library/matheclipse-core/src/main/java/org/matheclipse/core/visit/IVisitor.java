@@ -10,7 +10,6 @@ import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * A visitor which could be used in the
@@ -22,24 +21,24 @@ import org.matheclipse.parser.client.math.MathException;
  */
 public interface IVisitor<T> {
 
-	public abstract T visit(IInteger element) throws MathException;
+	public abstract T visit(IInteger element);
 
-	public abstract T visit(IFraction element) throws MathException;
+	public abstract T visit(IFraction element);
 
-	public abstract T visit(IComplex element) throws MathException;
+	public abstract T visit(IComplex element);
 
-	public abstract T visit(INum element) throws MathException;
+	public abstract T visit(INum element);
 
-	public abstract T visit(IComplexNum element) throws MathException;
+	public abstract T visit(IComplexNum element);
 
-	public abstract T visit(ISymbol element) throws MathException;
+	public abstract T visit(ISymbol element);
 
-	public abstract T visit(IPattern element) throws MathException;
+	public abstract T visit(IPattern element);
 
-	public abstract T visit(IPatternSequence element) throws MathException;
+	public abstract T visit(IPatternSequence element);
 	
-	public abstract T visit(IStringX element) throws MathException;
+	public abstract T visit(IStringX element);
 
-	public abstract T visit(IASTMutable ast) throws MathException;
+	public abstract T visit(IASTMutable ast);
 
 }

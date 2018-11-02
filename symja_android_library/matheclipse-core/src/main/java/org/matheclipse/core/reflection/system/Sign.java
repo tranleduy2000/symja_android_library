@@ -16,7 +16,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <pre>
@@ -61,7 +60,7 @@ public class Sign extends AbstractCoreFunctionEvaluator {
 	 * 
 	 */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkSize(ast, 2);
 
 		// IExpr arg1 = ast.arg1();

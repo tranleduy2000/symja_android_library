@@ -1,7 +1,6 @@
 package org.matheclipse.core.builtin;
 
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
@@ -11,7 +10,6 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 public class EllipticIntegrals {
 	static { 
@@ -49,7 +47,7 @@ public class EllipticIntegrals {
 	private static class EllipticE extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws IllegalArgument {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr z = ast.arg1();
@@ -156,7 +154,7 @@ public class EllipticIntegrals {
 	private static class EllipticF extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			IExpr z = ast.arg1();
@@ -251,7 +249,7 @@ public class EllipticIntegrals {
 	private static class EllipticK extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws IllegalArgument {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			IExpr m = ast.arg1();
@@ -321,7 +319,7 @@ public class EllipticIntegrals {
 	private static class EllipticPi extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws IllegalArgument {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			IExpr n = ast.arg1();
@@ -393,7 +391,7 @@ public class EllipticIntegrals {
 	private static class JacobiZeta extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			IExpr z = ast.arg1();
 			IExpr m = ast.arg2();
 			if (m.isZero()) {

@@ -10,7 +10,6 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.VisitorExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 import static org.matheclipse.core.expression.F.Abs;
 import static org.matheclipse.core.expression.F.C2;
@@ -72,7 +71,7 @@ public class ComplexExpand extends AbstractEvaluator {
 		}
 
 		@Override
-		public IExpr visit(IASTMutable ast) throws MathException {
+		public IExpr visit(IASTMutable ast) {
 			if (ast.isTimes()) {
 				IExpr expanded = F.evalExpand(ast);
 				if (expanded.isPlus()) {
@@ -178,7 +177,7 @@ public class ComplexExpand extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkRange(ast, 1, 2);
 		IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
 		if (temp.isPresent()) {

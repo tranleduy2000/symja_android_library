@@ -8,7 +8,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.util.IdentityHashMap;
 
@@ -40,12 +39,12 @@ public class ModuleReplaceAll extends VisitorExpr {
 	}
 
 	@Override
-	public IExpr visit(ISymbol element) throws MathException {
+	public IExpr visit(ISymbol element) {
 		return apply(element);
 	}
 
 	@Override
-	public IExpr visit(IPattern element) throws MathException {
+	public IExpr visit(IPattern element) {
 		ISymbol symbol = element.getSymbol();
 		if (symbol != null) {
 			IExpr expr = apply(symbol);
@@ -72,7 +71,7 @@ public class ModuleReplaceAll extends VisitorExpr {
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) throws MathException {
+	public IExpr visit(IASTMutable ast) {
 		IAST temp;
 		if (ast.isASTSizeGE(F.Function, 2)) {
 			temp = visitNestedScope(ast, true);

@@ -77,7 +77,6 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.PatternMap;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -7784,7 +7783,7 @@ public class F {
 		IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
 		localBuittIn.setEvaluator(new AbstractCoreFunctionEvaluator() {
 			@Override
-			public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+			public IExpr evaluate(IAST ast, EvalEngine engine) {
 				return function.apply(ast.arg1(), ast.arg2());
 			}
 		});
@@ -7794,7 +7793,7 @@ public class F {
 	public static IBuiltInSymbol localFunction(final String symbolName, final Function<IExpr, IExpr> function) {
 		return localFunction(symbolName, new AbstractCoreFunctionEvaluator() {
 			@Override
-			public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+			public IExpr evaluate(IAST ast, EvalEngine engine) {
 				return function.apply(ast.arg1());
 			}
 		});
@@ -7809,7 +7808,7 @@ public class F {
 	public static IBuiltInSymbol localBiPredicate(final String symbolName, final BiPredicate<IExpr, IExpr> function) {
 		return localFunction(symbolName,new AbstractCoreFunctionEvaluator() {
 			@Override
-			public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+			public IExpr evaluate(IAST ast, EvalEngine engine) {
 				return F.bool(function.test(ast.arg1(), ast.arg2()));
 			}
 		});
@@ -7818,7 +7817,7 @@ public class F {
 	public static IBuiltInSymbol localPredicate(final String symbolName, final Predicate<IExpr> function) {
 		return localFunction(symbolName,new AbstractCoreFunctionEvaluator() {
 			@Override
-			public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+			public IExpr evaluate(IAST ast, EvalEngine engine) {
 				return F.bool(function.test(ast.arg1()));
 			}
 		});

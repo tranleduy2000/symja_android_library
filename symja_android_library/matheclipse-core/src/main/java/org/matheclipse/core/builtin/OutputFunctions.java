@@ -15,7 +15,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.HornerScheme;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.StringWriter;
 
@@ -36,7 +35,7 @@ public final class OutputFunctions {
 	private static class CForm extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			// CFormUtilities texUtil = new CFormUtilities(engine, engine.isRelaxedSyntax());
@@ -79,7 +78,7 @@ public final class OutputFunctions {
 
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			return F.stringx(engine.evaluate(ast.arg1()).fullFormString());
@@ -93,7 +92,7 @@ public final class OutputFunctions {
 	private static class TableForm extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				if (arg1.isList()) {
@@ -134,7 +133,7 @@ public final class OutputFunctions {
 	private static class HoldForm extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			return F.NIL;
 		}
 
@@ -185,7 +184,7 @@ public final class OutputFunctions {
 	private static class HornerForm extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -222,7 +221,7 @@ public final class OutputFunctions {
 	private static class InputForm extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
@@ -283,7 +282,7 @@ public final class OutputFunctions {
 	private static class JavaForm extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
@@ -319,7 +318,7 @@ public final class OutputFunctions {
 	private static class MathMLForm extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			MathMLUtilities mathMLUtil = new MathMLUtilities(engine, false, engine.isRelaxedSyntax());
@@ -355,7 +354,7 @@ public final class OutputFunctions {
 	private static class TeXForm extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			TeXUtilities texUtil = new TeXUtilities(engine, engine.isRelaxedSyntax());

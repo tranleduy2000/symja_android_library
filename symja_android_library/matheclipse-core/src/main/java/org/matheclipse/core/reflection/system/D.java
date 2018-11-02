@@ -17,7 +17,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.DRules;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <pre>
@@ -283,7 +282,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 		if (ast.size() < 3) {
 			return F.NIL;
 		}

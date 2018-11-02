@@ -8,7 +8,6 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
@@ -162,13 +161,13 @@ public class Structure {
 	private final static class Apply extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws IllegalArgument {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
 			final IASTAppendable evaledAST = ast.copyAppendable();
 			evaledAST.setArgs(evaledAST.size(), new IntFunction<IExpr>() {
                 @Override
-                public IExpr apply(int i) throws MathException {
+                public IExpr apply(int i) {
                     return engine.evaluate(evaledAST.get(i));
                 }
             });
@@ -194,11 +193,11 @@ public class Structure {
 		}
 
 		public static IExpr evalApply(final IExpr arg1, IExpr arg2, IAST evaledAST, int lastIndex, boolean heads,
-									  EvalEngine engine) throws IllegalArgument {
+									  EvalEngine engine) {
 			VisitorLevelSpecification level = null;
 			com.duy.lambda.Function<IExpr, IExpr> af = new com.duy.lambda.Function<IExpr, IExpr>() {
 				@Override
-				public IExpr apply(IExpr x) throws MathException {
+				public IExpr apply(IExpr x) {
 					return x.isAST() ? ((IAST) x).setAtCopy(0, arg1) : F.NIL;
 				}
 			};
@@ -278,7 +277,7 @@ public class Structure {
 	private final static class Depth extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -448,7 +447,7 @@ public class Structure {
 	private final static class Flatten extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2);
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
@@ -516,7 +515,7 @@ public class Structure {
 	private final static class FlattenAt extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3);
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
@@ -557,7 +556,7 @@ public class Structure {
 	private final static class Function extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.head().equals(F.Function)) {
 				IExpr temp = engine.evalHoldPattern(ast, true, false);
 				if (temp.isPresent() && !temp.equals(ast)) {
@@ -592,7 +591,7 @@ public class Structure {
 
 						return arg2.replaceAll(new com.duy.lambda.Function<IExpr, IExpr>() {
 							@Override
-							public IExpr apply(IExpr x) throws MathException {
+							public IExpr apply(IExpr x) {
 								IExpr temp = getRulesMap(symbolSlots, ast).get(x);
 								return temp != null ? temp : F.NIL;
 							}
@@ -648,7 +647,7 @@ public class Structure {
 	 */
 	private static class Head extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				return engine.evaluate(ast.arg1()).head();
 			}
@@ -797,7 +796,7 @@ public class Structure {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			return F.integer(engine.evaluate(ast.arg1()).leafCount());
@@ -860,7 +859,7 @@ public class Structure {
 	 */
 	private static class Map extends AbstractFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
 			int lastIndex = ast.argSize();
@@ -883,14 +882,14 @@ public class Structure {
 				if (lastIndex == 3) {
 					level = new VisitorLevelSpecification(new com.duy.lambda.Function<IExpr, IExpr>() {
 						@Override
-						public IExpr apply(IExpr x) throws MathException {
+						public IExpr apply(IExpr x) {
 							return F.unaryAST1(arg1, x);
 						}
 					}, ast.get(lastIndex), heads, engine);
 				} else {
 					level = new VisitorLevelSpecification(new com.duy.lambda.Function<IExpr, IExpr>() {
 						@Override
-						public IExpr apply(IExpr x) throws MathException {
+						public IExpr apply(IExpr x) {
 							return F.unaryAST1(arg1, x);
 						}
 					}, 1, heads);
@@ -907,14 +906,14 @@ public class Structure {
 	private static class MapAll extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3);
 
 			final IExpr arg1 = ast.arg1();
 			final VisitorLevelSpecification level;
 			level = new VisitorLevelSpecification(new com.duy.lambda.Function<IExpr, IExpr>() {
 				@Override
-				public IExpr apply(IExpr x) throws MathException {
+				public IExpr apply(IExpr x) {
 					return F.unaryAST1(arg1, x);
 				}
 			}, 0,
@@ -929,7 +928,7 @@ public class Structure {
 	private static class MapAt extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
 			final IExpr arg2 = ast.arg2();
@@ -982,7 +981,7 @@ public class Structure {
 	private final static class MapIndexed extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			int lastIndex = ast.argSize();
@@ -1140,7 +1139,7 @@ public class Structure {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			if (ast.arg2().isAST()) {
@@ -1205,7 +1204,7 @@ public class Structure {
 		 * @see org.matheclipse.core.interfaces.IExpr#compareTo(IExpr)
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			final int cp = ast.arg1().compareTo(ast.arg2());
@@ -1241,7 +1240,7 @@ public class Structure {
 	 */
 	private final static class OrderedQ extends AbstractFunctionEvaluator implements Predicate<IAST> {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			return F.bool(test(((IAST) ast.arg1())));
 		}
@@ -1333,7 +1332,7 @@ public class Structure {
 	private final static class Operate extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			int headDepth = 1;
@@ -1393,7 +1392,7 @@ public class Structure {
 	private final static class Quit extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 1);
 			return F.Null;
 		}
@@ -1439,7 +1438,7 @@ public class Structure {
 	private final static class Scan extends Map {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
 			int lastIndex = ast.argSize();
@@ -1462,7 +1461,7 @@ public class Structure {
 					final IASTAppendable result = F.ListAlloc(10);
 					com.duy.lambda.Function<IExpr, IExpr> sf = new com.duy.lambda.Function<IExpr, IExpr>() {
 						@Override
-						public IExpr apply(IExpr x) throws MathException {
+						public IExpr apply(IExpr x) {
 							IAST a = F.unaryAST1(arg1, x);
 							result.append(a);
 							return F.NIL;
@@ -1475,7 +1474,7 @@ public class Structure {
 					arg2.accept(level);
 					result.forEach(result.size(), new Consumer<IExpr>() {
 						@Override
-						public void accept(IExpr x) throws MathException {
+						public void accept(IExpr x) {
 							engine.evaluate(x);
 						}
 					});
@@ -1487,7 +1486,7 @@ public class Structure {
 					if (arg2.isAST()) {
 						engine.evaluate(((IAST) arg2).map(new com.duy.lambda.Function<IExpr, IExpr>() {
 							@Override
-							public IExpr apply(IExpr x) throws MathException {
+							public IExpr apply(IExpr x) {
 								return F.unaryAST1(arg1, x);
 							}
 						}, 1));
@@ -1534,7 +1533,7 @@ public class Structure {
 	private static class Sort extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
@@ -1593,7 +1592,7 @@ public class Structure {
 	private static class Symbol extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isString()) {
@@ -1625,7 +1624,7 @@ public class Structure {
 	private static class SymbolName extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isSymbol()) {
@@ -1679,7 +1678,7 @@ public class Structure {
 	private final static class Thread extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			if (!(ast.arg1().isAST())) {
@@ -1771,7 +1770,7 @@ public class Structure {
 	private static class Through extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {

@@ -19,7 +19,6 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigInteger;
 
@@ -78,7 +77,7 @@ public class IntegerFunctions {
 	private static class BitLength extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isInteger()) {
@@ -174,7 +173,7 @@ public class IntegerFunctions {
 		 * 
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			try {
@@ -192,7 +191,7 @@ public class IntegerFunctions {
 			return F.NIL;
 		}
 
-		public IExpr evalCeiling(IExpr arg1) throws MathException {
+		public IExpr evalCeiling(IExpr arg1) {
 			if (arg1.isNumber()) {
 				return ((INumber) arg1).ceilFraction();
 			}
@@ -270,7 +269,7 @@ public class IntegerFunctions {
 	private static class IntegerDigits extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 			IInteger base = F.C10;
 			int padLeftZeros = 0;
@@ -343,7 +342,7 @@ public class IntegerFunctions {
 	private static class IntegerExponent extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 			IInteger base = F.C10;
 			if (ast.isAST2()) {
@@ -463,7 +462,7 @@ public class IntegerFunctions {
 		 * functions</a>
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			try {
@@ -481,7 +480,7 @@ public class IntegerFunctions {
 			return F.NIL;
 		}
 
-		public IExpr evalFloor(IExpr arg1) throws MathException {
+		public IExpr evalFloor(IExpr arg1) {
 			if (arg1.isNumber()) {
 				return ((INumber) arg1).floorFraction();
 			}
@@ -535,7 +534,7 @@ public class IntegerFunctions {
 	private static class FractionalPart extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -602,7 +601,7 @@ public class IntegerFunctions {
 	private static class FromDigits extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 			IExpr base = F.C10;
 			if (ast.size() >= 3) {
@@ -732,7 +731,7 @@ public class IntegerFunctions {
 	private static class IntegerLength extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isInteger()) {
@@ -788,7 +787,7 @@ public class IntegerFunctions {
 	private static class IntegerPart extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			try {
@@ -864,7 +863,7 @@ public class IntegerFunctions {
 		 * 
 		 * See: <a href="http://en.wikipedia.org/wiki/Modular_arithmetic">Wikipedia - Modular arithmetic</a>
 		 */
-		public IExpr e2ObjArg(final IExpr o0, final IExpr o1) throws MathException {
+		public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
 			if (o1.isZero()) {
 					EvalEngine.get().printMessage("Mod: Modulus 0 encountered");
 					return F.Indeterminate;
@@ -935,7 +934,7 @@ public class IntegerFunctions {
 	private static class PowerMod extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
 			if (ast.exists(new Predicate<IExpr>() {
@@ -1003,7 +1002,7 @@ public class IntegerFunctions {
 	 */
 	private static class Quotient extends AbstractArg2 {
 
-		public IExpr e2ObjArg(final IExpr o0, final IExpr o1) throws MathException {
+		public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
 			if (o1.isZero()) {
 				EvalEngine.get().printMessage("Quotient: division by zero");
 				return F.CComplexInfinity;
@@ -1066,7 +1065,7 @@ public class IntegerFunctions {
 	private static class QuotientRemainder extends AbstractArg2 {
 
 		@Override
-		public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
+		public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
 			try {
 				if (i1.isZero()) {
 					EvalEngine.get().printMessage("QuotientRemainder: division by zero");
@@ -1147,7 +1146,7 @@ public class IntegerFunctions {
 		 * functions</a>
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			try {
@@ -1221,7 +1220,7 @@ public class IntegerFunctions {
 		 * Unit step <code>1</code> for all x greater equal <code>0</code>. <code>0</code> in all other cases,
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			int size = ast.size();
 			if (size > 1) {
 				for (int i = 1; i < size; i++) {

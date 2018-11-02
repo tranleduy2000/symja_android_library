@@ -14,7 +14,6 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 import static org.matheclipse.core.expression.F.Divide;
 import static org.matheclipse.core.expression.F.Less;
@@ -194,7 +193,7 @@ public class Iterator {
 		}
 
 		@Override
-		public boolean setUp() throws MathException {
+		public boolean setUp() {
 			if (variable != null) {
 				variable.pushLocalVariable();
 			}

@@ -9,7 +9,6 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 public class VectorAnalysisFunctions {
 	static {
@@ -46,7 +45,7 @@ public class VectorAnalysisFunctions {
 	private static final class Curl extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			if (ast.arg1().isVector() >= 3) {
 				if (ast.arg2().isVector() == 3) {
@@ -97,7 +96,7 @@ public class VectorAnalysisFunctions {
 	private static final class Div extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			if ((ast.arg1().isVector() == ast.arg2().isVector()) && (ast.arg1().isVector() >= 0)) {
 				final IAST vector = (IAST) ast.arg1();
@@ -120,7 +119,7 @@ public class VectorAnalysisFunctions {
 	private static final class Grad extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			IExpr function = ast.arg1();
 			if (ast.arg2().isVector() > 0) {

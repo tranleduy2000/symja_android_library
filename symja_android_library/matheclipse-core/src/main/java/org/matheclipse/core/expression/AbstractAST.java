@@ -56,7 +56,6 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -762,7 +761,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public IAST filter(final IASTAppendable filterAST, final IASTAppendable restAST, final Predicate<? super IExpr> predicate) throws MathException {
+	public IAST filter(final IASTAppendable filterAST, final IASTAppendable restAST, final Predicate<? super IExpr> predicate) {
 		forEach(new Consumer<IExpr>() {
             @Override
             public void accept(IExpr x) {
@@ -2118,13 +2117,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isNegativeResult() throws MathException {
+	public boolean isNegativeResult() {
 		return AbstractAssumptions.isNegativeResult(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isNonNegativeResult() throws MathException {
+	public boolean isNonNegativeResult() {
 		return AbstractAssumptions.isNonNegativeResult(this);
 	}
 
@@ -2896,7 +2895,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		final EvalEngine engine = EvalEngine.get();
 		final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
             @Override
-            public IExpr apply(IExpr x) throws MathException {
+            public IExpr apply(IExpr x) {
                 return engine.evaluate(replacement.setAtCopy(position, x));
             }
         };
@@ -2917,7 +2916,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		final EvalEngine engine = EvalEngine.get();
 		final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
             @Override
-            public IExpr apply(IExpr x) throws MathException {
+            public IExpr apply(IExpr x) {
                 return engine.evaluate(replacement.setAtCopy(position, x));
             }
         };
@@ -3150,7 +3149,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		if (this.isPlus()) {
 			IAST plus = this.map(new Function<IExpr, IExpr>() {
                 @Override
-                public IExpr apply(IExpr x) throws MathException {
+                public IExpr apply(IExpr x) {
                     return x.times(that);
                 }
             }, 1);

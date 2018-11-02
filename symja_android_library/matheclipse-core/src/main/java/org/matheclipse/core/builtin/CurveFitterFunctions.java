@@ -107,7 +107,7 @@ public class CurveFitterFunctions {
 			}
 
 			@Override
-			public double[] gradient(double t, double... parameters) throws MathException {
+			public double[] gradient(double t, double... parameters) {
 				createSubstitutionRules(t, parameters);
 				final double[] gradient = new double[parameters.length];
 				for (int i = 0; i < parameters.length; i++) {
@@ -118,7 +118,7 @@ public class CurveFitterFunctions {
 
 			/** {@inheritDoc} */
 			@Override
-			public double value(final double t, final double... parameters) throws MathIllegalArgumentException, MathException {
+			public double value(final double t, final double... parameters) throws MathIllegalArgumentException {
 				createSubstitutionRules(t, parameters);
 				return engine.evalDouble(F.subst(function, listOfRules));
 			}
@@ -175,7 +175,7 @@ public class CurveFitterFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			return numericEval(ast, engine);
 		}
 
@@ -186,7 +186,7 @@ public class CurveFitterFunctions {
 		 * @param initialGuess
 		 * @return <code>F.NIL</code> if the list of symbols couldn't be determined
 		 */
-		protected static IAST initialGuess(IAST listOfSymbolsOrPairs, double[] initialGuess) throws MathException {
+		protected static IAST initialGuess(IAST listOfSymbolsOrPairs, double[] initialGuess) {
 			IASTAppendable newListOfSymbols = F.ListAlloc(listOfSymbolsOrPairs.size());
 			for (int i = 1; i < listOfSymbolsOrPairs.size(); i++) {
 				IExpr temp = listOfSymbolsOrPairs.get(i);
@@ -225,7 +225,7 @@ public class CurveFitterFunctions {
 		}
 
 		@Override
-		public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+		public IExpr numericEval(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 5);
 
 			if (ast.arg1().isList() && ast.arg3().isList() && ast.arg4().isSymbol()) {
@@ -284,7 +284,7 @@ public class CurveFitterFunctions {
 	private static class Fit extends FindFit {
 
 		@Override
-		public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+		public IExpr numericEval(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
 			if (ast.arg1().isList() && ast.arg2().isReal() && ast.arg3().isSymbol()) {

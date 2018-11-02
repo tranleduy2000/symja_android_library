@@ -62,7 +62,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 *             if the <code>expr</code> is not a <i>level specification</i>
 	 */
 	public VisitorLevelSpecification(final Function<IExpr, IExpr> function, final IExpr unevaledLevelExpr,
-			boolean includeHeads, final EvalEngine engine) throws MathException {
+			boolean includeHeads, final EvalEngine engine) {
 		IExpr levelExpr = engine.evaluate(unevaledLevelExpr);
 		fFromLevel = fToLevel = -1;
 		fFromDepth = fToDepth = 0;
@@ -234,7 +234,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * 
 	 */
 	@Override
-	public IExpr visit(IInteger element) throws MathException {
+	public IExpr visit(IInteger element) {
 		return visitAtom( element);
 	}
 
@@ -242,7 +242,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * 
 	 */
 	@Override
-	public IExpr visit(IFraction element) throws MathException {
+	public IExpr visit(IFraction element) {
 		return visitAtom( element);
 	}
 
@@ -250,7 +250,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * 
 	 */
 	@Override
-	public IExpr visit(IComplex element) throws MathException {
+	public IExpr visit(IComplex element) {
 		return visitAtom( element);
 	}
 
@@ -258,7 +258,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * 
 	 */
 	@Override
-	public IExpr visit(INum element) throws MathException {
+	public IExpr visit(INum element) {
 		return visitAtom( element);
 	}
 
@@ -266,7 +266,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * 
 	 */
 	@Override
-	public IExpr visit(IComplexNum element) throws MathException {
+	public IExpr visit(IComplexNum element) {
 		return visitAtom( element);
 	}
 
@@ -274,7 +274,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * 
 	 */
 	@Override
-	public IExpr visit(ISymbol element) throws MathException {
+	public IExpr visit(ISymbol element) {
 		return visitAtom( element);
 	}
 
@@ -282,7 +282,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * 
 	 */
 	@Override
-	public IExpr visit(IPattern element) throws MathException {
+	public IExpr visit(IPattern element) {
 		return visitAtom( element);
 	}
 
@@ -290,7 +290,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * 
 	 */
 	@Override
-	public IExpr visit(IPatternSequence element) throws MathException {
+	public IExpr visit(IPatternSequence element) {
 		return visitAtom( element);
 	}
 
@@ -298,17 +298,17 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 * 
 	 */
 	@Override
-	public IExpr visit(IStringX element) throws MathException {
+	public IExpr visit(IStringX element) {
 		return visitAtom( element);
 	}
 
-	protected final IExpr visitAtom(IExpr element) throws MathException {
+	protected final IExpr visitAtom(IExpr element) {
 		fCurrentDepth = -1;
 		return isInRange(fCurrentLevel, -1) ? fFunction.apply(element) : F.NIL;
 	}
 
 	@Override
-	public IExpr visit(final IASTMutable ast) throws MathException {
+	public IExpr visit(final IASTMutable ast) {
 		final int[] minDepth = new int[] { 0 };
 		final IASTMutable[] result = new IASTMutable[] { F.NIL };
 		try {

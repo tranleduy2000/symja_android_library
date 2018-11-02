@@ -5,12 +5,10 @@ import org.hipparchus.linear.RealMatrix;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 
@@ -18,7 +16,7 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		FieldMatrix<IExpr> matrix;
 		Validate.checkSize(ast, 2);
 
@@ -49,7 +47,7 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+	public IExpr numericEval(final IAST ast, EvalEngine engine) {
 		RealMatrix matrix;
 		Validate.checkSize(ast, 2);
 
@@ -99,5 +97,5 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 	 *            the matrix which contains numeric values
 	 * @return
 	 */
-	public abstract RealMatrix realMatrixEval(RealMatrix matrix) throws IllegalArgument;
+	public abstract RealMatrix realMatrixEval(RealMatrix matrix);
 }

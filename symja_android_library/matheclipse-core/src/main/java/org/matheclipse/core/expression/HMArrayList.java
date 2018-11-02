@@ -29,7 +29,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -644,7 +643,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 	/** {@inheritDoc} */
 	@Override
-	public final IAST filter(IASTAppendable filterAST, IASTAppendable restAST, Predicate<? super IExpr> predicate) throws MathException {
+	public final IAST filter(IASTAppendable filterAST, IASTAppendable restAST, Predicate<? super IExpr> predicate) {
 		for (int i = firstIndex + 1; i < lastIndex; i++) {
 			IExpr temp = array[i];
 			if (predicate.test(temp)) {
@@ -894,7 +893,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 		final EvalEngine engine = EvalEngine.get();
 		final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
             @Override
-            public IExpr apply(IExpr x) throws MathException {
+            public IExpr apply(IExpr x) {
                 IAST a = replacement.setAtCopy(position, x);
                 return engine.evaluate(a);
             }

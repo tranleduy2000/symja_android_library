@@ -19,7 +19,6 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractArg2;
@@ -50,7 +49,6 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.QuantileRules;
 import org.matheclipse.core.reflection.system.rules.StandardDeviationRules;
-import org.matheclipse.parser.client.math.MathException;
 import org.uncommons.maths.random.BinomialGenerator;
 import org.uncommons.maths.random.DiscreteUniformGenerator;
 import org.uncommons.maths.random.ExponentialGenerator;
@@ -123,7 +121,7 @@ public class StatisticsFunctions {
 		 *            the distribution
 		 * @return sample generated using the given random generator
 		 */
-		IExpr randomVariate(Random random, IAST distribution) throws MathException;
+		IExpr randomVariate(Random random, IAST distribution);
 	}
 
 	/**
@@ -340,7 +338,7 @@ public class StatisticsFunctions {
 	private static class CDF extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// 1 or 2 arguments
 			if (ast.size() == 2 || ast.size() == 3) {
 				try {
@@ -456,7 +454,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
@@ -518,7 +516,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			if (dist.isAST1()) {
 				double p = dist.arg1().evalDouble();
 				if (0 <= p && p <= 1) {
@@ -565,7 +563,7 @@ public class StatisticsFunctions {
 	private final static class BinCounts extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			try {
@@ -586,7 +584,7 @@ public class StatisticsFunctions {
 			}
 			return F.NIL;
 		}
-		private static IExpr binCounts(IAST vector, final IExpr arg2, EvalEngine engine) throws MathException {
+		private static IExpr binCounts(IAST vector, final IExpr arg2, EvalEngine engine) {
 			INum dxNum = F.oneDouble();
 			int dx = 1;
 			int xMin = 0;
@@ -658,7 +656,7 @@ public class StatisticsFunctions {
 		private static IAST dropNonReals(final EvalEngine engine, IAST vector) {
 			IAST[] filter = vector.filter(new Function<IExpr, IExpr>() {
 				@Override
-				public IExpr apply(IExpr x) throws MathException {
+				public IExpr apply(IExpr x) {
 					if (x.isReal()) {
 						return x;
 					}
@@ -752,7 +750,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDiscreteDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			return F.NIL;
 		}
 
@@ -814,7 +812,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			if (dist.isAST2()) {
 				int n = dist.arg1().toIntDefault(-1);
 				if (n > 0) {
@@ -855,7 +853,7 @@ public class StatisticsFunctions {
 	private final static class CentralMoment extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
@@ -875,7 +873,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// 1 or 3 args
 			return F.NIL;
 		}
@@ -967,7 +965,7 @@ public class StatisticsFunctions {
 	private final static class Correlation extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			IExpr a = ast.arg1();
 			IExpr b = ast.arg2();
@@ -1015,7 +1013,7 @@ public class StatisticsFunctions {
 	private final static class FiveNum extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			int size = ast.arg1().isVector();
 			if (size >= 0) {
@@ -1046,7 +1044,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			return F.NIL;
 		}
 
@@ -1155,7 +1153,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
@@ -1233,7 +1231,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
@@ -1258,7 +1256,7 @@ public class StatisticsFunctions {
 			implements IDistribution, IRandomVariate, IVariance, IPDF, ICDF {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// 2 or 4 arguments
 			return F.NIL;
 		}
@@ -1330,7 +1328,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			if (dist.isAST2()) {
 				//
 				ISignedNumber a = dist.arg1().evalReal();
@@ -1397,7 +1395,7 @@ public class StatisticsFunctions {
 	private static class GeometricMean extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			IAST arg1 = Validate.checkASTType(ast, 1);
 			if (arg1.isRealVector()) {
@@ -1410,7 +1408,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+		public IExpr numericEval(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			double[] values = ast.getAST(1).toDoubleVector();
@@ -1421,7 +1419,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDiscreteDistribution, IPDF, IVariance {// , IRandomVariate
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
@@ -1491,7 +1489,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// 0 or 2 args
 			return F.NIL;
 		}
@@ -1566,7 +1564,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
@@ -1591,7 +1589,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDiscreteDistribution, IPDF, IVariance {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 			return F.NIL;
 		}
@@ -1745,7 +1743,7 @@ public class StatisticsFunctions {
 	private final static class Covariance extends AbstractMatrix1Expr {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 			if (ast.size() == 2) {
 				return super.evaluate(ast, engine);
@@ -1811,7 +1809,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+		public IExpr numericEval(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 			if (ast.size() == 2) {
 				return super.numericEval(ast, engine);
@@ -1859,7 +1857,7 @@ public class StatisticsFunctions {
 			implements IDiscreteDistribution, IVariance, ICDF, IPDF, IRandomVariate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
@@ -1944,7 +1942,7 @@ public class StatisticsFunctions {
 
 
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			IExpr[] minMax = minmax(dist);
 			if (minMax != null) {
 				int min = minMax[0].toIntDefault(Integer.MIN_VALUE);
@@ -1984,7 +1982,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
@@ -2110,7 +2108,7 @@ public class StatisticsFunctions {
 		// return value;
 		// }
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			if (ast.size() == 3) {
 				try {
@@ -2178,7 +2176,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
@@ -2240,7 +2238,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			if (dist.isAST1()) {
 				if (dist.arg1().isReal() && dist.arg1().isPositiveResult()) {
 					double rate = dist.arg1().evalDouble();
@@ -2259,7 +2257,7 @@ public class StatisticsFunctions {
 	// private final static class KolmogorovSmirnovTest extends AbstractFunctionEvaluator {
 	//
 	// @Override
-	// public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	// public IExpr evaluate(final IAST ast, EvalEngine engine) {
 	// if (ast.isAST1()) {
 	// double[] arg1Values = ast.arg1().toDoubleVector();
 	// org.hipparchus.stat.inference.KolmogorovSmirnovTest test = new
@@ -2323,7 +2321,7 @@ public class StatisticsFunctions {
 	private final static class Kurtosis extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
@@ -2365,7 +2363,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
@@ -2538,7 +2536,7 @@ public class StatisticsFunctions {
 	private final static class MeanDeviation extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			int[] dim = ast.arg1().isMatrix();
@@ -2549,7 +2547,7 @@ public class StatisticsFunctions {
 				IAST matrix = (IAST) ast.arg1();
 				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 					@Override
-					public IExpr apply(IExpr x) throws MathException {
+					public IExpr apply(IExpr x) {
 						return F.MeanDeviation(x);
 					}
 				});
@@ -2658,7 +2656,7 @@ public class StatisticsFunctions {
 				IAST matrix = (IAST) arg1;
 				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 					@Override
-					public IExpr apply(IExpr x) throws MathException {
+					public IExpr apply(IExpr x) {
 						return F.Median(x);
 					}
 				});
@@ -2693,7 +2691,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
@@ -2857,7 +2855,7 @@ public class StatisticsFunctions {
 			implements IDistribution, IVariance, IRandomVariate, IPDF, ICDF {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// 0 or 2 args are allowed
 			return F.NIL;
 		}
@@ -2943,7 +2941,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			if (dist.isAST0()) {
 				return F.num(random.nextGaussian());
 			}
@@ -2989,7 +2987,7 @@ public class StatisticsFunctions {
 	private static class Probability extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			if (ast.size() == 3) {
 				try {
@@ -3110,7 +3108,7 @@ public class StatisticsFunctions {
 	private static class PDF extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// 1 or 2 arguments
 
 			if (ast.size() == 2 || ast.size() == 3) {
@@ -3175,7 +3173,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDiscreteDistribution, IPDF, IVariance, IRandomVariate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
@@ -3239,7 +3237,7 @@ public class StatisticsFunctions {
 
 
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			if (dist.isAST1()) {
 				double mean = dist.arg1().evalDouble();
 				return F.ZZ(new PoissonGenerator(mean, random).nextValue());
@@ -3289,7 +3287,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 
 			IExpr arg1 = ast.arg1();
@@ -3301,7 +3299,7 @@ public class StatisticsFunctions {
 				IAST matrix = (IAST) arg1;
 				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 					@Override
-					public IExpr apply(IExpr x) throws MathException {
+					public IExpr apply(IExpr x) {
 						return ast.setAtClone(1, x);
 					}
 				});
@@ -3398,7 +3396,7 @@ public class StatisticsFunctions {
 					if (ast.arg2().isList()) {
 						return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
 							@Override
-							public IExpr apply(IExpr x) throws MathException {
+							public IExpr apply(IExpr x) {
 								return F.unaryAST1(function, x);
 							}
 						}, 1);
@@ -3433,7 +3431,7 @@ public class StatisticsFunctions {
 	private final static class RandomVariate extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
@@ -3549,7 +3547,7 @@ public class StatisticsFunctions {
 	private final static class Rescale extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 			IExpr x = ast.arg1();
 			if (ast.size() == 2 && x.isList()) {
@@ -3583,7 +3581,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
-		private static IExpr rescale(IExpr x, IExpr min, IExpr max, EvalEngine engine) throws MathException {
+		private static IExpr rescale(IExpr x, IExpr min, IExpr max, EvalEngine engine) {
 			IExpr sum = engine.evaluate(F.Subtract(max, min));
 			return engine.evaluate(F.Plus(F.Times(F.CN1, F.Power(sum, -1), min), F.Times(F.Power(sum, -1), x)));
 		}
@@ -3614,7 +3612,7 @@ public class StatisticsFunctions {
 	private final static class Skewness extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
@@ -3692,7 +3690,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isList()) {
@@ -3705,7 +3703,7 @@ public class StatisticsFunctions {
 					IAST matrix = arg1;
 					return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 						@Override
-						public IExpr apply(IExpr x) throws MathException {
+						public IExpr apply(IExpr x) {
 							return F.StandardDeviation(x);
 						}
 					});
@@ -3723,7 +3721,7 @@ public class StatisticsFunctions {
 	private final static class Standardize extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			IExpr arg1 = ast.arg1();
 
@@ -3754,7 +3752,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// 1 or 3 args
 			return F.NIL;
 		}
@@ -3844,7 +3842,7 @@ public class StatisticsFunctions {
 			implements IDistribution, IVariance, ICDF, IPDF, IRandomVariate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
@@ -3934,7 +3932,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr randomVariate(Random random, IAST dist) throws MathException {
+		public IExpr randomVariate(Random random, IAST dist) {
 			IExpr[] minMax = minmax(dist);
 			if (minMax != null) {
 				ISignedNumber min = minMax[0].evalReal();
@@ -4005,7 +4003,7 @@ public class StatisticsFunctions {
 	private final static class Variance extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isAST()) {
@@ -4097,7 +4095,7 @@ public class StatisticsFunctions {
 			implements ICDF, IDistribution, IPDF, IVariance {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// 2 or 3 args
 			return F.NIL;
 		}

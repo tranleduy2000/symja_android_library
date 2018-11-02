@@ -15,9 +15,7 @@ import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.PlusOp;
-import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractArg12;
 import org.matheclipse.core.eval.interfaces.AbstractArg2;
@@ -61,7 +59,6 @@ import org.matheclipse.core.reflection.system.rules.AbsRules;
 import org.matheclipse.core.reflection.system.rules.ConjugateRules;
 import org.matheclipse.core.reflection.system.rules.GammaRules;
 import org.matheclipse.core.reflection.system.rules.PowerRules;
-import org.matheclipse.parser.client.math.MathException;
 
 import ch.ethz.idsc.tensor.qty.IQuantity;
 
@@ -333,7 +330,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 3);
             ISymbol sym = Validate.checkSymbolType(ast, 1);
             IExpr arg2 = engine.evaluate(ast.arg2());
@@ -398,7 +395,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 2);
 
 			IExpr result = F.NIL;
@@ -519,7 +516,7 @@ public final class Arithmetic {
         public final static double DEFAULT_CHOP_DELTA = 1.0e-10;
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 2, 3);
 
             IExpr arg1 = ast.arg1();
@@ -625,7 +622,7 @@ public final class Arithmetic {
     private final static class Clip extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 2, 4);
 
             IExpr x = ast.first();
@@ -670,7 +667,7 @@ public final class Arithmetic {
             return F.NIL;
         }
 
-        private IExpr clip(IExpr x) throws MathException {
+        private IExpr clip(IExpr x) {
             if (x.isReal()) {
                 ISignedNumber real = (ISignedNumber) x;
                 if (real.isGreaterThan(F.C1)) {
@@ -710,7 +707,7 @@ public final class Arithmetic {
 		 * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x is greater than
 		 *         max.
          */
-        private IExpr clip(IExpr x, ISignedNumber min, ISignedNumber max, IExpr vMin, IExpr vMax) throws MathException {
+        private IExpr clip(IExpr x, ISignedNumber min, ISignedNumber max, IExpr vMin, IExpr vMax) {
             if (x.isReal()) {
                 ISignedNumber real = (ISignedNumber) x;
                 if (real.isGreaterThan(max)) {
@@ -820,7 +817,7 @@ public final class Arithmetic {
     private final static class Complex extends AbstractCoreFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 3);
 
             try {
@@ -885,7 +882,7 @@ public final class Arithmetic {
     private final static class ConditionalExpression extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 3);
 
             IExpr arg2 = engine.evaluate(ast.arg2());
@@ -976,7 +973,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+        public IExpr numericEval(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 2);
             IExpr arg1 = ast.arg1();
             return evaluateArg1(arg1);
@@ -1081,7 +1078,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 2);
             IExpr symbol = ast.arg1();
             if (symbol.isSymbol() && ((ISymbol) symbol).hasAssignedSymbolValue()) {
@@ -1110,7 +1107,7 @@ public final class Arithmetic {
 	private static class Differences extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 			IExpr arg1 = ast.arg1();
 			if (ast.size() == 2 && arg1.isList()) {
@@ -1192,7 +1189,7 @@ public final class Arithmetic {
     private static class Divide extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 3);
             // arg1 * arg2^(-1)
             return F.Divide(ast.arg1(), ast.arg2());
@@ -1244,7 +1241,7 @@ public final class Arithmetic {
     private final static class DirectedInfinity extends AbstractCoreFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 1, 2);
 
             if (ast.isAST1()) {
@@ -1426,7 +1423,7 @@ public final class Arithmetic {
 		}
 
 		@Override
-		public IExpr e1DblComArg(final IComplexNum c) throws WrongArgumentType {
+		public IExpr e1DblComArg(final IComplexNum c) {
 			if (pComplex == null) {
 				// lazy initialization
 				pComplex = new org.hipparchus.complex.Complex[p.length];
@@ -1463,7 +1460,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 2, 3);
             if (ast.size() != 3) {
                 return unaryOperator(ast.arg1());
@@ -1554,7 +1551,7 @@ public final class Arithmetic {
     private final static class GCD extends AbstractArgMultiple {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             if (ast.isAST0()) {
                 return F.C0;
             } else if (ast.isAST1()) {
@@ -1575,7 +1572,7 @@ public final class Arithmetic {
          *
          */
         @Override
-        public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
+        public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
             return i0.gcd(i1);
         }
 
@@ -1606,7 +1603,7 @@ public final class Arithmetic {
     private final static class HarmonicNumber extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 2, 3);
 
             IExpr arg1 = ast.arg1();
@@ -1733,7 +1730,7 @@ public final class Arithmetic {
     private final static class Im extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 2);
 
             IExpr arg1 = ast.arg1();
@@ -1892,7 +1889,7 @@ public final class Arithmetic {
     private final static class LCM extends AbstractArgMultiple {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 2);
 
             if (ast.isAST1()) {
@@ -1908,12 +1905,12 @@ public final class Arithmetic {
          *
          */
         @Override
-        public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
+        public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
             return i0.lcm(i1);
         }
 
         @Override
-        public IExpr e2ObjArg(final IExpr o0, final IExpr o1) throws MathException {
+        public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
             if (o0.isZero()) {
                 return o0;
             }
@@ -1965,7 +1962,7 @@ public final class Arithmetic {
     private final static class Minus extends AbstractCoreFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             if (ast.size() == 2) {
                 IExpr arg1 = engine.evaluate(ast.arg1());
                 return F.Times(F.CN1, arg1);
@@ -2019,12 +2016,12 @@ public final class Arithmetic {
     private static class N extends AbstractCoreFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             return numericEval(ast, engine);
         }
 
         @Override
-        public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+        public IExpr numericEval(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 2, 3);
 
             final boolean numericMode = engine.isNumericMode();
@@ -2104,7 +2101,7 @@ public final class Arithmetic {
     private final static class Piecewise extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 2, 3);
 
             IExpr arg1 = ast.arg1();
@@ -2308,7 +2305,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
+        public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
             return i0.add(i1);
         }
 
@@ -2390,7 +2387,7 @@ public final class Arithmetic {
          * @return the evaluated object or <code>null</code>, if evaluation isn't possible
          */
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             int size = ast.size();
             if (size == 1) {
                 return F.C0;
@@ -2428,7 +2425,7 @@ public final class Arithmetic {
 
         /** {@inheritDoc} */
         @Override
-        public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+        public IExpr numericEval(final IAST ast, EvalEngine engine) {
             IExpr temp = evalNumericMode(ast);
             if (temp.isPresent()) {
                 return temp;
@@ -2505,7 +2502,7 @@ public final class Arithmetic {
     private final static class Pochhammer extends AbstractArg2 {// implements PochhammerRules {
 
         @Override
-        public IExpr e2ObjArg(final IExpr a, final IExpr n) throws MathException {
+        public IExpr e2ObjArg(final IExpr a, final IExpr n) {
             if (n.isZero()) {
                 return F.C1;
             }
@@ -2782,7 +2779,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2DblArg(final INum base, final INum exponent) throws IllegalArgument {
+        public IExpr e2DblArg(final INum base, final INum exponent) {
             if (base.isZero()) {
                 if (exponent.isNegative()) {
                     EvalEngine.get().printMessage("Infinite expression 0^(negative number)");
@@ -2993,7 +2990,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2ObjArg(final IExpr base, final IExpr exponent) throws MathException {
+        public IExpr e2ObjArg(final IExpr base, final IExpr exponent) {
             if (exponent.isDirectedInfinity()) {
                 IExpr temp = evalDirectedInfinityArg2(base, (IAST) exponent);
                 if (temp.isPresent()) {
@@ -3330,7 +3327,7 @@ public final class Arithmetic {
                         resultAST = timesAST.copyAppendable();
 						resultAST.map(resultAST, new Function<IExpr, IExpr>() {
                             @Override
-                            public IExpr apply(IExpr x) throws MathException {
+                            public IExpr apply(IExpr x) {
                                 return F.Power(x, arg2);
                             }
                         });
@@ -3352,7 +3349,7 @@ public final class Arithmetic {
          *            the exponent of the 0-Power expression
          * @return
          */
-        private IExpr powerZeroArg1(final IExpr exponent) throws MathException {
+        private IExpr powerZeroArg1(final IExpr exponent) {
             EvalEngine engine = EvalEngine.get();
             if (exponent.isZero()) {
                 // 0^0
@@ -3510,7 +3507,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             int size = ast.size();
             if (size == 1) {
                 return F.C1;
@@ -3532,7 +3529,7 @@ public final class Arithmetic {
     private final static class Precision extends AbstractCoreFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             if (ast.size() == 2) {
                 IExpr arg1 = engine.evaluate(ast.arg1());
                 if (arg1 instanceof INum) {
@@ -3669,7 +3666,7 @@ public final class Arithmetic {
     private final static class Rational extends AbstractCoreFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 3);
 
             try {
@@ -3816,7 +3813,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 2);
 
             IExpr arg1 = ast.arg1();
@@ -3932,7 +3929,7 @@ public final class Arithmetic {
      */
     private static class Surd extends AbstractArg2 implements INumeric {
         @Override
-        public IExpr e2ApfloatArg(final ApfloatNum af0, final ApfloatNum af1) throws IllegalArgument {
+        public IExpr e2ApfloatArg(final ApfloatNum af0, final ApfloatNum af1) {
             if (af1.isZero()) {
                 EvalEngine ee = EvalEngine.get();
                 ee.printMessage("Surd(a,b) division by zero");
@@ -3945,7 +3942,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2DblArg(INum d0, INum d1) throws IllegalArgument {
+        public IExpr e2DblArg(INum d0, INum d1) {
             double val = d0.doubleValue();
             double r = d1.doubleValue();
             double result = doubleSurd(val, r);
@@ -3956,7 +3953,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2ObjArg(final IExpr base, final IExpr root) throws IllegalArgument {
+        public IExpr e2ObjArg(final IExpr base, final IExpr root) {
             if (base.isNumber() && root.isInteger()) {
                 EvalEngine ee = EvalEngine.get();
                 if (base.isComplex() || base.isComplexNumeric()) {
@@ -3992,14 +3989,14 @@ public final class Arithmetic {
         }
 
         @Override
-        public double evalReal(double[] stack, int top, int size) throws IllegalArgument {
+        public double evalReal(double[] stack, int top, int size) {
             if (size != 2) {
                 throw new UnsupportedOperationException();
             }
             return doubleSurd(stack[top - 1], stack[top]);
         }
 
-        private static double doubleSurd(double val, double r) throws IllegalArgument {
+        private static double doubleSurd(double val, double r) {
             if (r == 0.0d) {
                 EvalEngine ee = EvalEngine.get();
                 ee.printMessage("Surd(a,b) division by zero");
@@ -4023,7 +4020,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 3);
             IExpr base = ast.arg1();
             IExpr arg2 = engine.evaluateNonNumeric(ast.arg2());
@@ -4114,7 +4111,7 @@ public final class Arithmetic {
     private static class Subtract extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 3);
             // arg1 + (-1)*arg2
             return F.Subtract(ast.arg1(), ast.arg2());
@@ -4394,12 +4391,12 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
+        public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
             return i0.multiply(i1);
         }
 
         @Override
-        public IExpr e2ObjArg(final IExpr o0, final IExpr o1) throws MathException {
+        public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
 
             if (o0.isZero()) {
 				if (o1.isQuantity()) {
@@ -4684,7 +4681,7 @@ public final class Arithmetic {
 
         /** {@inheritDoc} */
         @Override
-        public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+        public IExpr numericEval(final IAST ast, EvalEngine engine) {
             IExpr temp = evalNumericMode(ast);
             if (temp.isPresent()) {
                 return temp;
@@ -4807,7 +4804,7 @@ public final class Arithmetic {
 		 * @param exponent2
          * @return
          */
-		private IExpr timesArgPower(final IExpr arg1, IExpr base2, IExpr exponent2) throws MathException {
+		private IExpr timesArgPower(final IExpr arg1, IExpr base2, IExpr exponent2) {
 			if (arg1.isExactNumber() && base2.isRational() && exponent2.isNegative() && exponent2.isFraction()) {
 				// arg0_ * base2_ ^exponent2_ /; expoennt2 negative fraction; base rational; arg1 IRational or IComplex
 				IRational rat = ((INumber) arg1).rationalFactor();
@@ -4948,7 +4945,7 @@ public final class Arithmetic {
          * @param power1Arg2
          * @return
          */
-	private static IExpr timesPowerPower(IExpr power0Arg1, IExpr power0Arg2, IExpr power1Arg1, IExpr power1Arg2) throws MathException {
+	private static IExpr timesPowerPower(IExpr power0Arg1, IExpr power0Arg2, IExpr power1Arg1, IExpr power1Arg2) {
             if (power0Arg2.isNumber()) {
                 if (power1Arg2.isNumber()) {
                     if (power0Arg1.equals(power1Arg1)) {

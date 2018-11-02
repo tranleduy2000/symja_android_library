@@ -11,7 +11,6 @@ import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 import org.matheclipse.core.patternmatching.RulesData;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.IOException;
 
@@ -366,7 +365,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @param args   the arguments for which this function symbol should be evaluated
      * @return
      */
-    public IExpr of(EvalEngine engine, IExpr... args) throws MathException;
+    public IExpr of(EvalEngine engine, IExpr... args);
 
     /**
      * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
@@ -384,7 +383,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @param args   the arguments for which this function symbol should be evaluated
      * @return if the result isn't a boolean value return <code>false</code>.
      */
-    public boolean ofQ(EvalEngine engine, IExpr... args) throws MathException;
+    public boolean ofQ(EvalEngine engine, IExpr... args);
 
     /**
      * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code> to a boolean

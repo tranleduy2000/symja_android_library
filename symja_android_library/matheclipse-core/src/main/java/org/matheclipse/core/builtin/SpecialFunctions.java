@@ -32,7 +32,6 @@ import org.matheclipse.core.reflection.system.rules.ProductLogRules;
 import org.matheclipse.core.reflection.system.rules.StieltjesGammaRules;
 import org.matheclipse.core.reflection.system.rules.StruveHRules;
 import org.matheclipse.core.reflection.system.rules.StruveLRules;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigDecimal;
 
@@ -85,7 +84,7 @@ public class SpecialFunctions {
 	private static class Beta extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			if (ast.size() == 4) {
@@ -145,7 +144,7 @@ public class SpecialFunctions {
 	private static class BetaRegularized extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
 			IExpr z = ast.arg1();
@@ -240,7 +239,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() == 3) {
 				return F.Subtract(F.Erf(ast.arg2()), F.Erf(ast.arg1()));
 			}
@@ -325,7 +324,7 @@ public class SpecialFunctions {
 	private final static class Erfi extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			IExpr z = ast.arg1();
@@ -368,7 +367,7 @@ public class SpecialFunctions {
 	private static class GammaRegularized extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 			
 			IExpr a = ast.arg1();
@@ -414,7 +413,7 @@ public class SpecialFunctions {
 	private static class HypergeometricPFQRegularized extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			return F.NIL;
@@ -547,7 +546,7 @@ public class SpecialFunctions {
 	private static class InverseBetaRegularized extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 4, 5);
 
 			if (ast.isAST3()) {
@@ -589,7 +588,7 @@ public class SpecialFunctions {
 	private static class InverseGammaRegularized extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			IExpr a = ast.arg1();
@@ -683,7 +682,7 @@ public class SpecialFunctions {
 	private static class PolyGamma extends AbstractFunctionEvaluator implements PolyGammaRules {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -721,7 +720,7 @@ public class SpecialFunctions {
 		 * zeta_functions.py</a>
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -866,7 +865,7 @@ public class SpecialFunctions {
 	private static class StieltjesGamma extends AbstractFunctionEvaluator implements StieltjesGammaRules {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -912,7 +911,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -997,7 +996,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			IExpr arg1 = ast.arg1();

@@ -8,7 +8,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 public class InterpolatingFunction extends AbstractEvaluator {
 
@@ -16,7 +15,7 @@ public class InterpolatingFunction extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (ast.head().isAST()) {
 			if (ast.isAST1() && ast.arg1().isReal()) {
 				final IAST function = (IAST) ast.head();

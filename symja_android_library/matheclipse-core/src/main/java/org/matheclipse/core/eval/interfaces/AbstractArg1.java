@@ -16,7 +16,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Evaluate a function with 1 argument.
@@ -24,7 +23,7 @@ import org.matheclipse.parser.client.math.MathException;
 public abstract class AbstractArg1 extends AbstractFunctionEvaluator {
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkSize(ast, 2);
 
 		final IExpr arg1 = ast.arg1();

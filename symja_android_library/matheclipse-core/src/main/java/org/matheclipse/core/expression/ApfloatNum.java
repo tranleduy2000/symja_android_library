@@ -18,7 +18,6 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -506,7 +505,7 @@ public class ApfloatNum extends INumImpl implements INum {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) throws MathException {
+	public <T> T accept(IVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 

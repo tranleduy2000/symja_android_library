@@ -28,7 +28,6 @@ import org.matheclipse.core.polynomials.ExprPolynomialRing;
 import org.matheclipse.core.polynomials.PartialFractionGenerator;
 import org.matheclipse.core.reflection.system.rules.LimitRules;
 import org.matheclipse.core.reflection.system.rules.SeriesCoefficientRules;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -159,7 +158,7 @@ public class SeriesFunctions {
          * @param evalExpr
          * @return
          */
-        private static IExpr evalLimit(final IExpr expr, LimitData data, boolean evalExpr) throws MathException {
+        private static IExpr evalLimit(final IExpr expr, LimitData data, boolean evalExpr) {
             IExpr expression = expr;
             if (evalExpr) {
                 IExpr result = F.evalQuiet(expression);
@@ -241,7 +240,7 @@ public class SeriesFunctions {
          *            the limits data definition
          * @return
          */
-        private static IExpr lHospitalesRule(IExpr numerator, IExpr denominator, LimitData data) throws MathException {
+        private static IExpr lHospitalesRule(IExpr numerator, IExpr denominator, LimitData data) {
             EvalEngine engine = EvalEngine.get();
             ISymbol x = data.getSymbol();
             try {
@@ -376,7 +375,7 @@ public class SeriesFunctions {
          *            the limit data definition
          * @return <code>F.NIL</code> if no limit found
          */
-        private static IExpr numeratorDenominatorLimit(final IExpr numerator, final IExpr denominator, LimitData data) throws MathException {
+        private static IExpr numeratorDenominatorLimit(final IExpr numerator, final IExpr denominator, LimitData data) {
             IExpr numValue;
             IExpr denValue;
             IExpr limit = data.getLimitValue();
@@ -543,7 +542,7 @@ public class SeriesFunctions {
          *            (the datas limit must be Infinity or -Infinity)
          * @return <code>F.NIL</code> if the substitution didn't succeed.
          */
-        private static IExpr substituteInfinity(final IAST arg1, LimitData data) throws MathException {
+        private static IExpr substituteInfinity(final IAST arg1, LimitData data) {
             ISymbol x = data.getSymbol();
             IExpr y = F.Power(x, F.CN1); // substituting by 1/x
             IExpr temp = F.evalQuiet(F.subst(arg1, x, y));
@@ -562,7 +561,7 @@ public class SeriesFunctions {
             return F.NIL;
         }
 
-        private static IExpr timesLimit(final IAST timesAST, final LimitData data) throws MathException {
+        private static IExpr timesLimit(final IAST timesAST, final LimitData data) {
             IAST isFreeResult = timesAST.partitionTimes(new Predicate<IExpr>() {
                 @Override
                 public boolean test(IExpr x) {
@@ -661,7 +660,7 @@ public class SeriesFunctions {
          * Limit of a function. See <a href="http://en.wikipedia.org/wiki/List_of_limits">List of Limits</a>
          */
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkRange(ast, 3, 4);
 
 			IExpr arg1 = ast.arg1();
@@ -752,7 +751,7 @@ public class SeriesFunctions {
      */
     private final static class Normal extends AbstractFunctionEvaluator {
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             Validate.checkSize(ast, 2);
 
             IExpr arg1 = ast.arg1();
@@ -793,7 +792,7 @@ public class SeriesFunctions {
      */
     private final static class ComposeSeries extends AbstractFunctionEvaluator {
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             if (ast.size() > 2) {
                 if (ast.arg1() instanceof ASTSeriesData) {
                     ASTSeriesData result = (ASTSeriesData) ast.arg1();
@@ -833,7 +832,7 @@ public class SeriesFunctions {
      */
     private final static class InverseSeries extends AbstractFunctionEvaluator {
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             if (ast.isAST1() && (ast.arg1() instanceof ASTSeriesData)) {
 
                 ASTSeriesData ps = (ASTSeriesData) ast.arg1();
@@ -867,7 +866,7 @@ public class SeriesFunctions {
     private final static class Series extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             if (ast.isAST2() && (ast.arg2().isVector() == 3)) {
 
                 IExpr function = ast.arg1();
@@ -906,7 +905,7 @@ public class SeriesFunctions {
          * @return
          */
 		private static ASTSeriesData seriesData(final IExpr function, IExpr x, IExpr x0, final int n,
-                                       EvalEngine engine) throws MathException {
+                                       EvalEngine engine) {
 			if (function.isFree(x) || function.equals(x)) {
 				Map<IExpr, IExpr> coefficientMap = new HashMap<IExpr, IExpr>();
 				IASTAppendable rest = F.PlusAlloc(4);
@@ -954,7 +953,7 @@ public class SeriesFunctions {
             }
             return ps;
         }
-		private static ASTSeriesData timesSeriesData(IAST timesAST, IExpr x, IExpr x0, final int n, EvalEngine engine) throws MathException {
+		private static ASTSeriesData timesSeriesData(IAST timesAST, IExpr x, IExpr x0, final int n, EvalEngine engine) {
 			Map<IExpr, IExpr> coefficientMap = new HashMap<IExpr, IExpr>();
 			IASTAppendable rest = F.PlusAlloc(4);
 			coefficientMap = new HashMap<IExpr, IExpr>();
@@ -1026,7 +1025,7 @@ public class SeriesFunctions {
 		}
 
 		private static ASTSeriesData plusSeriesData(final IAST plusAST, IExpr x, IExpr x0, final int n,
-				EvalEngine engine) throws MathException {
+				EvalEngine engine) {
 			Map<IExpr, IExpr> coefficientMap = new HashMap<IExpr, IExpr>();
 			IASTAppendable rest = F.PlusAlloc(4);
 
@@ -1066,7 +1065,7 @@ public class SeriesFunctions {
 		}
 
 		private static ASTSeriesData powerSeriesData(final IExpr powerAST, IExpr x, IExpr x0, final int n,
-				EvalEngine engine) throws MathException {
+				EvalEngine engine) {
 			IExpr base = powerAST.base();
 			IExpr exponent = powerAST.exponent();
 			if (base.isFree(x)) {
@@ -1166,7 +1165,7 @@ public class SeriesFunctions {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
             if (ast.isAST2() && (ast.arg2().isVector() == 3)) {
 
                 IExpr function = ast.arg1();
@@ -1256,7 +1255,7 @@ public class SeriesFunctions {
          * @return
          */
         public IExpr polynomialSeriesCoefficient(IExpr univariatePolynomial, IExpr x, IExpr x0, IExpr n,
-                                                 final IAST seriesTemplate, EvalEngine engine) throws MathException {
+                                                 final IAST seriesTemplate, EvalEngine engine) {
             try {
 				// if (!x0.isZero()) {
                     Map<IExpr, IExpr> coefficientMap = new HashMap<IExpr, IExpr>();
@@ -1385,7 +1384,7 @@ public class SeriesFunctions {
     private final static class SeriesData extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			int denominator = 1;
 			if (ast.size() == 6 || ast.size() == 7) {
                 if (ast.arg1().isNumber()) {

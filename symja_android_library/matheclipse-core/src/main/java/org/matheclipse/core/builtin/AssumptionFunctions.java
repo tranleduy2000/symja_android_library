@@ -15,7 +15,6 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 public class AssumptionFunctions {
 	static {
@@ -28,7 +27,7 @@ public class AssumptionFunctions {
 	private final static class Arrays extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			if (ast.size() == 2 && ast.arg1().isAST()) {
 				return F.Arrays((IAST) ast.arg1());
@@ -71,7 +70,7 @@ public class AssumptionFunctions {
 	private static class Element extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			final IExpr arg2 = engine.evaluate(ast.arg2());
@@ -155,7 +154,7 @@ public class AssumptionFunctions {
 	private static class NotElement extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			final IExpr arg2 = engine.evaluate(ast.arg2());
@@ -207,7 +206,7 @@ public class AssumptionFunctions {
 	private static class Refine extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.size() == 3) {
@@ -234,7 +233,7 @@ public class AssumptionFunctions {
 		}
 	}
 
-	public static IExpr refineAssumptions(final IExpr expr, IAssumptions assumptions, EvalEngine engine) throws MathException {
+	public static IExpr refineAssumptions(final IExpr expr, IAssumptions assumptions, EvalEngine engine) {
 		IAssumptions oldAssumptions=engine.getAssumptions();
 		try {
 			engine.setAssumptions(assumptions);

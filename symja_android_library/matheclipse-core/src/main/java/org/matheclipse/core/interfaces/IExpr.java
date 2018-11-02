@@ -19,7 +19,6 @@ import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 import org.matheclipse.core.visit.VisitorReplaceAll;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -129,7 +128,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Accept a visitor with return type T
      */
-    <T> T accept(IVisitor<T> visitor) throws MathException;
+    <T> T accept(IVisitor<T> visitor);
 
     /**
      * Accept a visitor with return type <code>boolean</code>
@@ -236,7 +235,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * for derived number classes.
      */
     @Override
-    IExpr divide(IExpr that) throws MathException;
+    IExpr divide(IExpr that);
 
 
     IExpr[] egcd(IExpr b);
@@ -267,7 +266,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return <code>null</code> if the conversion is not possible.
      */
-    Complex evalComplex() throws WrongArgumentType;
+    Complex evalComplex();
 
     /**
      * Evaluate the expression to a Java <code>double</code> value. If the conversion to a double value is not possible,
@@ -275,21 +274,21 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return this expression converted to a Java <code>double</code> value.
      */
-    double evalDouble() throws MathException;
+    double evalDouble();
 
     /**
      * Evaluate the expression to a <code>INumber</code> value.
      *
      * @return <code>null</code> if the conversion is not possible.
      */
-    INumber evalNumber() throws MathException;
+    INumber evalNumber();
 
     /**
      * Evaluate the expression to a <code>ISignedNumber</code> value.
      *
      * @return <code>null</code> if the conversion is not possible.
      */
-    ISignedNumber evalReal() throws MathException;
+    ISignedNumber evalReal();
 
     /**
      * Evaluate an expression
@@ -300,7 +299,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     IExpr evaluate(EvalEngine engine);
 
-    IExpr evaluateHead(IAST ast, EvalEngine engine) throws MathException;
+    IExpr evaluateHead(IAST ast, EvalEngine engine);
 
     /**
      * Get the second element of this <code>Power(base, exponent)</code> expression.
@@ -351,14 +350,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param a1
      */
-    IExpr greater(final IExpr a1) throws MathException;
+    IExpr greater(final IExpr a1);
 
     /**
      * Evaluate GreaterEqual, if both arguments are real numbers
      *
      * @param a1
      */
-    IExpr greaterEqual(final IExpr a1) throws MathException;
+    IExpr greaterEqual(final IExpr a1);
 
     /**
      * Compare if <code>this >= that</code:
@@ -370,7 +369,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return <code>F.True, F.False or F.NIL</code
      */
-    IExpr greaterEqualThan(IExpr that) throws MathException;
+    IExpr greaterEqualThan(IExpr that);
 
     /**
      * Compare if <code>this > that</code:
@@ -382,7 +381,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return <code>F.True, F.False or F.NIL</code
      */
-    IExpr greaterThan(IExpr that) throws MathException;
+    IExpr greaterThan(IExpr that);
 
     /**
      * If this object is an instance of <code>IAST</code> get the first element (offset 0) of the <code>IAST</code> list
@@ -413,7 +412,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param consumer block to be executed if this expression unequals <code>F.NIL</code>
      */
-    void ifPresent(Consumer<? super IExpr> consumer) throws MathException;
+    void ifPresent(Consumer<? super IExpr> consumer);
 
     /**
      * If a value is present, performs the given <code>consumer</code> with the value, otherwise performs the given
@@ -422,7 +421,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param consumer    the action to be performed, if a value is present
      * @param emptyAction the empty-based action to be performed, if no value is present
      */
-    void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction) throws MathException;
+    void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction);
 
     /**
      * Return the imaginary part of this expression if possible. Otherwise return <code>Im(this)</code>.
@@ -1131,7 +1130,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>true</code>, if the given expression is a negative function or value.
      * @see #isRealResult()
      */
-    boolean isNegativeResult() throws MathException;
+    boolean isNegativeResult();
 
     /**
      * Check if the expression is a negative signed expression. This method is used in output forms of
@@ -1149,7 +1148,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>true</code>, if the given expression is a non-negative function or value.
      * @see #isRealResult()
      */
-    boolean isNonNegativeResult() throws MathException;
+    boolean isNonNegativeResult();
 
     /**
      * Test if this expression unequals <code>0</code> and is a numeric complex value or is assumed to be a negative or
@@ -1944,7 +1943,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *                 rule can contain pattern objects.
      * @return <code>this</code> if no substitution of a (sub-)expression was possible.
      */
-    IExpr replaceRepeated(final IAST astRules) throws WrongArgumentType;
+    IExpr replaceRepeated(final IAST astRules);
 
     /**
      * Repeatedly replace all (sub-) expressions with the given visitor. If no substitution matches, the method returns
@@ -2011,7 +2010,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr sqrt();
 
     @Override
-    IExpr subtract(IExpr that) throws MathException;
+    IExpr subtract(IExpr that);
 
     @Override
     IExpr sum(final IExpr that);
@@ -2024,7 +2023,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param that the multiplier expression
      * @return <code>(this * that)</code>
      */
-    IExpr times(final IExpr that) throws MathException;
+    IExpr times(final IExpr that);
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this * that)</code>. Calculates
@@ -2034,7 +2033,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param that the multiplier expression
      * @return <code>(this * that)</code>
      */
-    IExpr timesDistributed(final IExpr that) throws MathException;
+    IExpr timesDistributed(final IExpr that);
 
     /**
      * Convert this object into a <code>double[]</code> matrix.

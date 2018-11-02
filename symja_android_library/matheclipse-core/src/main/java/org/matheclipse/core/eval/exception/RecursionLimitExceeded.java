@@ -31,7 +31,7 @@ public class RecursionLimitExceeded extends MathException {
 		return "Recursion limit " + fLimit + " exceeded at: " + StringFunctions.inputForm(fExpr, true);
 	}
 
-	public static void throwIt(final int limit, final IExpr expr) throws RecursionLimitExceeded {
+	public static void throwIt(final int limit, final IExpr expr) {
 		// HeapContext.enter();
 		// try {
 		throw new RecursionLimitExceeded(limit, expr);// .copy());

@@ -12,7 +12,6 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.util.List;
 
@@ -68,7 +67,7 @@ public class NMaximize extends NMinimize {
 	}
 
 	@Override
-	public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+	public IExpr numericEval(final IAST ast, EvalEngine engine) {
 		Validate.checkSize(ast, 3);
 
 		if (ast.arg1().isList() && ast.arg2().isList()) {

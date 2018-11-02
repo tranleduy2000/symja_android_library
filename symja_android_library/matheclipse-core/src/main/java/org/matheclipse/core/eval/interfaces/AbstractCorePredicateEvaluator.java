@@ -7,7 +7,6 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Abstract interface for built-in Symja functions. The <code>numericEval()</code> method delegates to the
@@ -27,14 +26,14 @@ public abstract class AbstractCorePredicateEvaluator extends AbstractCoreFunctio
 	 * @param engine
 	 * @return
 	 */
-	abstract public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) throws MathException;
+	abstract public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine);
 
-	public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine, Options options) throws MathException {
+	public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine, Options options) {
 		return false;
 	}
 	/** {@inheritDoc} */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (ast.size() >= 2) {
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isList()) {

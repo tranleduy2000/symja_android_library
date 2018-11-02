@@ -31,7 +31,6 @@ import org.matheclipse.core.visit.VisitorReplaceAll;
 import org.matheclipse.core.visit.VisitorReplaceAllLambda;
 import org.matheclipse.core.visit.VisitorReplacePart;
 import org.matheclipse.core.visit.VisitorReplaceSlots;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.util.Collection;
 import java.util.List;
@@ -319,7 +318,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @return
      */
     @Override
-    public IExpr divide(IExpr that) throws MathException {
+    public IExpr divide(IExpr that) {
         if (that.isOne()) {
             return this;
         }
@@ -372,7 +371,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *
      * @return <code>null</code> if the conversion is not possible.
      */
-    public Complex evalComplex() throws WrongArgumentType {
+    public Complex evalComplex() {
         if (isNumber()) {
             return ((INumber) this).complexNumValue().complexValue();
         }
@@ -385,7 +384,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *
      * @return this expression converted to a Java <code>double</code> value.
      */
-    public double evalDouble() throws MathException {
+    public double evalDouble() {
         return EvalEngine.get().evalDouble(this);
     }
 
@@ -394,7 +393,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *
      * @return <code>null</code> if the conversion is not possible.
      */
-    public INumber evalNumber() throws MathException {
+    public INumber evalNumber() {
         if (isNumber()) {
             return (INumber) EvalEngine.get().evalN(this);
         }
@@ -406,7 +405,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *
      * @return <code>null</code> if the conversion is not possible.
      */
-    public ISignedNumber evalReal() throws MathException {
+    public ISignedNumber evalReal() {
         if (isReal()) {
             return (ISignedNumber) EvalEngine.get().evalN(this);
         }
@@ -424,7 +423,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return F.NIL;
     }
 
-    public IExpr evaluateHead(IAST ast, EvalEngine engine) throws MathException {
+    public IExpr evaluateHead(IAST ast, EvalEngine engine) {
         IExpr result = engine.evalLoop(this);
         if (result.isPresent()) {
             // set the new evaluated header !
@@ -499,7 +498,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param a1
      * @return
      */
-    public IExpr greater(final IExpr a1) throws MathException {
+    public IExpr greater(final IExpr a1) {
         if (isReal() && a1.isReal()) {
             return ((ISignedNumber) this).isGreaterThan(((ISignedNumber) a1)) ? F.True : F.False;
         }
@@ -513,7 +512,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param a1
      * @return
      */
-    public IExpr greaterEqual(final IExpr a1) throws MathException {
+    public IExpr greaterEqual(final IExpr a1) {
         if (isReal() && a1.isReal()) {
             return ((ISignedNumber) this).isLessThan(((ISignedNumber) a1)) ? F.False : F.True;
         }
@@ -532,7 +531,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
-    public IExpr greaterEqualThan(IExpr that) throws MathException {
+    public IExpr greaterEqualThan(IExpr that) {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_GREATER_EQUAL.prepareCompare(this, that);
         return ExprUtil.convertToExpr(temp);
     }
@@ -548,7 +547,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param that
      * @return <code>F.True, F.False or F.NIL</code
      */
-    public IExpr greaterThan(IExpr that) throws MathException {
+    public IExpr greaterThan(IExpr that) {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_GREATER.prepareCompare(this, that);
         return ExprUtil.convertToExpr(temp);
     }
@@ -581,7 +580,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param consumer block to be executed if this expression unequals <code>F.NIL</code>
      * @see java.util.Optional#ifPresent(com.duy.lambda.Consumer)
      */
-    public void ifPresent(Consumer<? super IExpr> consumer) throws MathException {
+    public void ifPresent(Consumer<? super IExpr> consumer) {
         consumer.accept(this);
     }
 
@@ -592,7 +591,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param consumer    the action to be performed, if a value is present
      * @param emptyAction the empty-based action to be performed, if no value is present
      */
-    public void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction) throws MathException {
+    public void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction) {
         consumer.accept(this);
     }
 
@@ -1596,7 +1595,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @return <code>true</code>, if the given expression is a negative function or value.
      * @see #isRealResult()
      */
-    public boolean isNegativeResult() throws MathException {
+    public boolean isNegativeResult() {
         return AbstractAssumptions.assumeNegative(this);
     }
 
@@ -1643,7 +1642,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @return <code>true</code>, if the given expression is a non-negative function or value.
      * @see #isRealResult()
      */
-    public boolean isNonNegativeResult() throws MathException {
+    public boolean isNonNegativeResult() {
         return AbstractAssumptions.assumeNonNegative(this);
     }
 
@@ -2806,7 +2805,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @return <code>this</code> if no substitution of a (sub-)expression was possible.
      */
 
-    public IExpr replace(final Predicate<IExpr> predicate, final Function<IExpr, IExpr> function) throws MathException {
+    public IExpr replace(final Predicate<IExpr> predicate, final Function<IExpr, IExpr> function) {
         return accept(new VisitorReplaceAllLambda(predicate, function)).orElse(this);
     }
 
@@ -2873,7 +2872,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *                 rule can contain pattern objects.
      * @return <code>this</code> if no substitution of a (sub-)expression was possible.
      */
-    public IExpr replaceRepeated(final IAST astRules) throws WrongArgumentType {
+    public IExpr replaceRepeated(final IAST astRules) {
         return replaceRepeated(new VisitorReplaceAll(astRules));
     }
 
@@ -3004,7 +3003,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     @Override
-    public IExpr subtract(IExpr that) throws MathException {
+    public IExpr subtract(IExpr that) {
         if (that.isZero()) {
             return this;
         }
@@ -3028,7 +3027,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param that the multiplier expression
      * @return <code>(this * that)</code>
      */
-    public IExpr times(final IExpr that) throws MathException {
+    public IExpr times(final IExpr that) {
         if (that.isZero()) {
             return F.C0;
         }
@@ -3050,7 +3049,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param that the multiplier expression
      * @return <code>(this * that)</code>
      */
-    public IExpr timesDistributed(final IExpr that) throws MathException {
+    public IExpr timesDistributed(final IExpr that) {
         return times(that);
     }
 

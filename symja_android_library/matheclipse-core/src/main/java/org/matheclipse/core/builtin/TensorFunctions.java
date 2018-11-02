@@ -14,7 +14,6 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,7 +117,7 @@ public class TensorFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			if (ast.arg1().isList() && ast.arg2().isList()) {
@@ -160,7 +159,7 @@ public class TensorFunctions {
 		 *
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST() && ast.arg2().isAST()) {
@@ -202,7 +201,7 @@ public class TensorFunctions {
 		 * @return correlation of kernel with tensor
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST() && ast.arg2().isAST()) {
@@ -337,7 +336,7 @@ public class TensorFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 
 			if (ast.arg1().isAST()) {
@@ -378,7 +377,7 @@ public class TensorFunctions {
 	private static class TensorDimensions extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			if (ast.arg1().isList()) {
 				// same as Dimensions for List structures
@@ -395,7 +394,7 @@ public class TensorFunctions {
 	private static class TensorSymmetry extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 			if (ast.arg1().isAST()) {
 				IAST tensor = (IAST) ast.arg1();
@@ -502,7 +501,7 @@ public class TensorFunctions {
 	private static class TensorProduct extends AbstractNonOrderlessArgMultiple {
 
 		@Override
-		public IExpr e2ObjArg(final IExpr o0, final IExpr o1) throws MathException {
+		public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
 			if (o0.isList() && o1.isList()) {
 				// TODO
 				// IAST tensor1 = (IAST) o0;
@@ -518,7 +517,7 @@ public class TensorFunctions {
 		}
 
 		@Override
-		public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+		public IExpr numericEval(final IAST ast, EvalEngine engine) {
 			return evaluate(ast, engine);
 		}
 
@@ -532,7 +531,7 @@ public class TensorFunctions {
 	private static class TensorRank extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();

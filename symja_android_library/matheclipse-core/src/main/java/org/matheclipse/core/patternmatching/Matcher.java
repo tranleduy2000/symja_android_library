@@ -23,7 +23,6 @@ import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.AbstractVisitor;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * The Matcher defines a pattern matching rule set.
@@ -38,7 +37,7 @@ public class Matcher implements Function<IExpr, IExpr> {
 		}
 
 		@Override
-		public IExpr visit(IASTMutable ast) throws MathException {
+		public IExpr visit(IASTMutable ast) {
 			IAST list = ast;
 			boolean evaled = false;
 			IExpr temp = matcher.apply(list);
@@ -111,7 +110,7 @@ public class Matcher implements Function<IExpr, IExpr> {
 		}
 
 		@Override
-		public IExpr visit(IPattern element) throws MathException {
+		public IExpr visit(IPattern element) {
 			return matcher.apply(element);
 		}
 
@@ -126,7 +125,7 @@ public class Matcher implements Function<IExpr, IExpr> {
 		}
 
 		@Override
-		public IExpr visit(ISymbol element) throws MathException {
+		public IExpr visit(ISymbol element) {
 			return matcher.apply(element);
 		}
 
@@ -177,7 +176,7 @@ public class Matcher implements Function<IExpr, IExpr> {
 		}
 
 		@Override
-		IExpr evalMethod() throws MathException {
+		IExpr evalMethod() {
 			PatternMap pm=getPatternMap();
 			IExpr arg1 = pm.getValue(0);
 			return fRightHandSide.apply(arg1);
@@ -208,7 +207,7 @@ public class Matcher implements Function<IExpr, IExpr> {
 		}
 
 		@Override
-		IBuiltInSymbol evalMethod() throws MathException {
+		IBuiltInSymbol evalMethod() {
 			PatternMap pm=getPatternMap();
 			IExpr arg1 = pm.getValue(0);
 			return fRightHandSide.test(arg1) ? F.True : F.False;

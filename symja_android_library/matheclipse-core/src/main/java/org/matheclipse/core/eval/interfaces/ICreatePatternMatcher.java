@@ -2,7 +2,6 @@ package org.matheclipse.core.eval.interfaces;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * 
@@ -17,5 +16,5 @@ public interface ICreatePatternMatcher {
 	 * @param packageMode TODO
 	 * @return
 	 */
-	public Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode, final EvalEngine engine) throws MathException;
+	public Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode, final EvalEngine engine);
 }

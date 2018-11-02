@@ -12,7 +12,6 @@ import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.convert.CreamConvert;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
@@ -26,7 +25,6 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -415,7 +413,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		 * @param arg1
 		 * @return
 		 */
-		private IExpr rewriteInverseFunction(IAST ast, IExpr arg1) throws MathException {
+		private IExpr rewriteInverseFunction(IAST ast, IExpr arg1) {
 			if (ast.isAbs()) {
 				return fEngine.evaluate(
 						F.Expand(F.Times(F.Subtract(ast.arg1(), F.Times(F.CN1, arg1)), F.Subtract(ast.arg1(), arg1))));
@@ -449,7 +447,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		 * @param position
 		 * @return <code>F.NIL</code> if no inverse function was found, otherwise return the rewritten expression
 		 */
-		private IExpr rewriteInverseFunction(IAST plusAST, int position) throws MathException {
+		private IExpr rewriteInverseFunction(IAST plusAST, int position) {
 			IAST ast = (IAST) plusAST.get(position);
 			IExpr plus = plusAST.removeAtClone(position).getOneIdentity(F.C0);
 			if (ast.isAbs()) {
@@ -470,7 +468,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		 * Try to rewrite a <code>Plus(...,f(x), ...)</code> function which contains an invertable function argument
 		 * <code>f(x)</code>.
 		 */
-		private IExpr rewritePlusWithInverseFunctions(IAST plusAST) throws MathException {
+		private IExpr rewritePlusWithInverseFunctions(IAST plusAST) {
 			IExpr expr;
 			for (int i = 1; i < plusAST.size(); i++) {
 				expr = plusAST.get(i);
@@ -510,7 +508,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		 * Try to rewrite a <code>Times(...,f(x), ...)</code> expression which may contain an invertable function
 		 * argument <code>f(x)</code> as subexpression.
 		 */
-		private IExpr rewriteTimesWithInverseFunctions(IAST times) throws MathException {
+		private IExpr rewriteTimesWithInverseFunctions(IAST times) {
 			IASTAppendable result = F.NIL;
 			int j = 1;
 			// remove constant sub-expressions from Times() expression
@@ -538,7 +536,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		 * If possible simplify the numerator expression. After that analyze the numerator expression, if it has linear,
 		 * polynomial or other form.
 		 */
-		protected void simplifyAndAnalyze() throws MathException {
+		protected void simplifyAndAnalyze() {
 			IExpr temp = F.NIL;
 			if (fNumerator.isPlus()) {
 				temp = rewritePlusWithInverseFunctions((IAST) fNumerator);
@@ -641,7 +639,7 @@ public class Solve extends AbstractFunctionEvaluator {
 	 */
 	protected static IASTAppendable analyzeSublist(ArrayList<ExprAnalyzer> analyzerList, IAST variables,
 			IASTAppendable resultList, int maximumNumberOfResults, IASTAppendable matrix, IASTAppendable vector,
-			EvalEngine engine) throws NoSolution, MathException {
+			EvalEngine engine) throws NoSolution {
 		ExprAnalyzer exprAnalyzer;
 		Collections.sort(analyzerList);
 		int currEquation = 0;
@@ -758,7 +756,7 @@ public class Solve extends AbstractFunctionEvaluator {
 	 * @return
 	 */
 	private static ArrayList<ExprAnalyzer> substituteRulesInSubAnalyzerList(IAST kListOfSolveRules,
-			ArrayList<ExprAnalyzer> analyzerList, int position, IAST variables, EvalEngine engine) throws MathException {
+			ArrayList<ExprAnalyzer> analyzerList, int position, IAST variables, EvalEngine engine) {
 		ExprAnalyzer exprAnalyzer;
 		ArrayList<ExprAnalyzer> subAnalyzerList = new ArrayList<ExprAnalyzer>();
 		for (int i = position; i < analyzerList.size(); i++) {
@@ -785,7 +783,7 @@ public class Solve extends AbstractFunctionEvaluator {
 	 * @param fListOfVariables
 	 * @return
 	 */
-	private static IAST rootsOfUnivariatePolynomial(ExprAnalyzer exprAnalyzer, EvalEngine engine) throws MathException {
+	private static IAST rootsOfUnivariatePolynomial(ExprAnalyzer exprAnalyzer, EvalEngine engine) {
 		IExpr numerator = exprAnalyzer.getNumerator();
 		IExpr denominator = exprAnalyzer.getDenominator();
 		// try to solve the expr for a symbol in the symbol set
@@ -839,7 +837,7 @@ public class Solve extends AbstractFunctionEvaluator {
 	 *            evaluate <code>Together[expr]</code> before determining numerator and denominator of the expression.
 	 * @return <code>List[numerator, denominator]</code>
 	 */
-	private static IAST splitNumeratorDenominator(IAST expr, EvalEngine engine, boolean evalTogether) throws MathException {
+	private static IAST splitNumeratorDenominator(IAST expr, EvalEngine engine, boolean evalTogether) {
 		IExpr numerator, denominator;
 		if (evalTogether) {
 			numerator = Algebra.together(expr, engine);
@@ -858,7 +856,7 @@ public class Solve extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkRange(ast, 3, 4);
 
 		try {
@@ -1029,7 +1027,7 @@ public class Solve extends AbstractFunctionEvaluator {
 	 *         <code>F.NIL</code> if the equations are not solvable by this algorithm.
 	 */
 	protected IAST solveEquations(IAST termsEqualZeroList, IAST inequationsList, IAST variables,
-			int maximumNumberOfResults, EvalEngine engine) throws MathException {
+			int maximumNumberOfResults, EvalEngine engine) {
 		try {
 			IAST list = GroebnerBasis.solveGroebnerBasis(termsEqualZeroList, variables);
 			if (list.isPresent()) {
@@ -1122,7 +1120,7 @@ public class Solve extends AbstractFunctionEvaluator {
 	 * @return
 	 */
 	private IAST solveTimesEquationsRecursively(IAST termsEqualZeroList, IAST inequationsList, IAST variables,
-			EvalEngine engine) throws MathException {
+			EvalEngine engine) {
 		Set<IExpr> subSolutionSet = new TreeSet<IExpr>();
 		for (int i = 1; i < termsEqualZeroList.size(); i++) {
 			if (termsEqualZeroList.get(i).isTimes()) {

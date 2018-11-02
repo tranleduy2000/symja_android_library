@@ -8,7 +8,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Greatest common divisor
@@ -24,7 +23,7 @@ public class GCD extends AbstractArgMultiple {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (ast.isAST0()) {
 			return F.C0;
 		} else if (ast.isAST1()) {
@@ -45,7 +44,7 @@ public class GCD extends AbstractArgMultiple {
 	 * 
 	 */
 	@Override
-	public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
+	public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
 		return i0.gcd(i1);
 	}
 

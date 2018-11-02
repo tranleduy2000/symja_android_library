@@ -4,7 +4,6 @@ import org.matheclipse.core.form.tex.TeXFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.Writer;
 
@@ -41,7 +40,7 @@ public class TeXUtilities {
 	 * @param inputExpression
 	 * @param out
 	 */
-	synchronized public void toTeX(final String inputExpression, final Writer out) throws MathException {
+	synchronized public void toTeX(final String inputExpression, final Writer out) {
 		IExpr parsedExpression = null;
 		if (inputExpression != null) {
 			try {
@@ -61,7 +60,7 @@ public class TeXUtilities {
 	 * @param objectExpression
 	 * @param out
 	 */
-	synchronized public void toTeX(final IExpr objectExpression, final Writer out) throws MathException {
+	synchronized public void toTeX(final IExpr objectExpression, final Writer out) {
 		final StringBuilder buf = new StringBuilder();
 
 		if (objectExpression != null) {

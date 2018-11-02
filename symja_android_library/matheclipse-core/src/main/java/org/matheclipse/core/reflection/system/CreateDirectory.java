@@ -9,7 +9,6 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class CreateDirectory extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (Config.isFileSystemEnabled(engine)) {
 			if (ast.isAST0()) {
 				File tempDir = Files.createTempDir();

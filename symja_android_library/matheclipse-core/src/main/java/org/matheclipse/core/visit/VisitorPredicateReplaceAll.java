@@ -7,7 +7,6 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non
@@ -36,7 +35,7 @@ public class VisitorPredicateReplaceAll extends VisitorReplaceAll {
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) throws MathException {
+	public IExpr visit(IASTMutable ast) {
 		if (fPredicate.test(ast)) {
 			return visitAST(ast);
 		}

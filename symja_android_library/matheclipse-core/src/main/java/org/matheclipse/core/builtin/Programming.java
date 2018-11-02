@@ -12,7 +12,6 @@ import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.exception.BreakException;
 import org.matheclipse.core.eval.exception.ConditionException;
 import org.matheclipse.core.eval.exception.ContinueException;
-import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.NoEvalException;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.exception.ReturnException;
@@ -38,7 +37,6 @@ import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.visit.ModuleReplaceAll;
 import org.matheclipse.parser.client.SyntaxError;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -53,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import static org.matheclipse.core.expression.F.Divide;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.interfaces.ISymbol.HOLDALL;
+import static org.matheclipse.core.interfaces.ISymbol.HOLDALLCOMPLETE;
 import static org.matheclipse.core.interfaces.ISymbol.RuleType;
 
 public final class Programming {
@@ -116,7 +115,7 @@ public final class Programming {
 	private final static class Abort extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				throw AbortException.ABORTED;
 			}
@@ -153,7 +152,7 @@ public final class Programming {
 	private final static class Break extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				throw BreakException.CONST;
 			}
@@ -188,7 +187,7 @@ public final class Programming {
 	 */
 	private final static class Block extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isList()) {
@@ -209,7 +208,7 @@ public final class Programming {
 	private final static class Catch extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
 			try {
 				return engine.evaluate(ast.arg1());
@@ -230,7 +229,7 @@ public final class Programming {
 
 	private static class Compile extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (!ToggleFeature.COMPILE) {
 				return F.NIL;
 			}
@@ -261,12 +260,12 @@ public final class Programming {
 	private final static class CompoundExpression extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			if (ast.size() > 1) {
 				final IExpr[] result = { F.Null };
 				ast.forEach(new Consumer<IExpr>() {
 					@Override
-					public void accept(IExpr x) throws MathException {
+					public void accept(IExpr x) {
 						result[0] = engine.evaluate(x);
 					}
 				});
@@ -328,7 +327,7 @@ public final class Programming {
 	private final static class Condition extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST2()) {
 				if (engine.evalTrue(ast.arg2())) {
 					return engine.evaluate(ast.arg1());
@@ -372,7 +371,7 @@ public final class Programming {
 	private final static class Continue extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				throw ContinueException.CONST;
 			}
@@ -393,7 +392,7 @@ public final class Programming {
 	 */
 	private static class Defer extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (!ToggleFeature.DEFER) {
 				return F.NIL;
 			}
@@ -522,7 +521,7 @@ public final class Programming {
 				fIndex = 0;
 			}
 
-			public IExpr doIt(IExpr input) throws MathException {
+			public IExpr doIt(IExpr input) {
 				if (fIndex < fIterList.size()) {
 					final IIterator<IExpr> iter = fIterList.get(fIndex);
 					if (iter.setUp()) {
@@ -555,7 +554,7 @@ public final class Programming {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 3);
 			try {
 				final List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
@@ -628,7 +627,7 @@ public final class Programming {
 	private final static class FixedPoint extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			try {
@@ -746,7 +745,7 @@ public final class Programming {
 	private final static class FixedPointList extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			try {
@@ -854,7 +853,7 @@ public final class Programming {
 	private final static class For extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 4, 5);
 			// use EvalEngine's iterationLimit only for evaluation control
 			// final int iterationLimit = engine.getIterationLimit();
@@ -966,7 +965,7 @@ public final class Programming {
 	private final static class If extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 5);
 
 			final IExpr temp = engine.evaluate(ast.arg1());
@@ -1000,11 +999,11 @@ public final class Programming {
 	private final static class ListFunction extends AbstractFunctionEvaluator implements ISetEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			return F.NIL;
 		}
 
-		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine) throws MathException {
+		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine) {
 			if (leftHandSide.isList()) {
 				// thread over lists
 				try {
@@ -1038,7 +1037,7 @@ public final class Programming {
 		 *
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isList()) {
@@ -1082,19 +1081,19 @@ public final class Programming {
 	private final static class Nest extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
 			return evaluateNest(ast, engine);
 		}
 
-		public static IExpr evaluateNest(final IAST ast, EvalEngine engine) throws MathException {
+		public static IExpr evaluateNest(final IAST ast, EvalEngine engine) {
 			IExpr arg3 = engine.evaluate(ast.arg3());
 			if (arg3.isInteger()) {
 				final int n = Validate.checkIntType(arg3);
 				return nest(ast.arg2(), n, new Function<IExpr, IExpr>() {
 					@Override
-					public IExpr apply(IExpr x) throws MathException {
+					public IExpr apply(IExpr x) {
 						return F.unaryAST1(ast.arg1(), x);
 					}
 				}, engine);
@@ -1102,7 +1101,7 @@ public final class Programming {
 			return F.NIL;
 		}
 
-		public static IExpr nest(final IExpr expr, final int n, final Function<IExpr, IExpr> fn, EvalEngine engine) throws MathException {
+		public static IExpr nest(final IExpr expr, final int n, final Function<IExpr, IExpr> fn, EvalEngine engine) {
 			IExpr temp = expr;
 			for (int i = 0; i < n; i++) {
 				temp = engine.evaluate(fn.apply(temp));
@@ -1140,20 +1139,20 @@ public final class Programming {
 	private final static class NestList extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
 			return evaluateNestList(ast, F.ListAlloc(), engine);
 		}
 
-		public static IExpr evaluateNestList(final IAST ast, final IASTAppendable resultList, EvalEngine engine) throws MathException {
+		public static IExpr evaluateNestList(final IAST ast, final IASTAppendable resultList, EvalEngine engine) {
 			IExpr arg3 = engine.evaluate(ast.arg3());
 			if (arg3.isInteger()) {
 				final int n = Validate.checkIntType(arg3);
 				final IExpr arg1 = ast.arg1();
 				nestList(ast.arg2(), n, new Function<IExpr, IExpr>() {
 					@Override
-					public IExpr apply(IExpr x) throws MathException {
+					public IExpr apply(IExpr x) {
 						return F.unaryAST1(arg1, x);
 					}
 				}, resultList, engine);
@@ -1163,7 +1162,7 @@ public final class Programming {
 		}
 
 		public static void nestList(final IExpr expr, final int n, final Function<IExpr, IExpr> fn,
-				final IASTAppendable resultList, EvalEngine engine) throws MathException {
+				final IASTAppendable resultList, EvalEngine engine) {
 			IExpr temp = expr;
 			resultList.append(temp);
 			for (int i = 0; i < n; i++) {
@@ -1222,19 +1221,19 @@ public final class Programming {
 	private final static class NestWhile extends NestWhileList {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
 			return nestWhile(ast.arg2(), engine.evaluate(ast.arg3()), new Function<IExpr, IExpr>() {
 				@Override
-				public IExpr apply(IExpr x) throws MathException {
+				public IExpr apply(IExpr x) {
 					return F.unaryAST1(ast.arg1(), x);
 				}
 			}, engine);
 		}
 
 		public static IExpr nestWhile(final IExpr expr, final IExpr test, final Function<IExpr, IExpr> fn,
-				EvalEngine engine) throws MathException {
+				EvalEngine engine) {
 			IExpr temp = expr;
 			while (engine.evalTrue(F.unaryAST1(test, temp))) {
 				temp = engine.evaluate(fn.apply(temp));
@@ -1248,13 +1247,13 @@ public final class Programming {
 	private static class NestWhileList extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 4);
 
 			final IExpr arg1 = ast.arg1();
 			return nestList(ast.arg2(), engine.evaluate(ast.arg3()), new Function<IExpr, IExpr>() {
                 @Override
-                public IExpr apply(IExpr x) throws MathException {
+                public IExpr apply(IExpr x) {
                     return F.unaryAST1(arg1, x);
                 }
             }, F.ListAlloc(), engine);
@@ -1262,7 +1261,7 @@ public final class Programming {
 		}
 
 		public static IAST nestList(final IExpr expr, final IExpr test, final Function<IExpr, IExpr> fn,
-				final IASTAppendable resultList, EvalEngine engine) throws MathException {
+				final IASTAppendable resultList, EvalEngine engine) {
 			IExpr temp = expr;
 			while (engine.evalTrue(F.unaryAST1(test, temp))) {
 				resultList.append(temp);
@@ -1471,7 +1470,7 @@ public final class Programming {
 	private final static class Part extends AbstractCoreFunctionEvaluator implements ISetEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() >= 3) {
 				try {
 					IExpr arg1 = engine.evalLoop(ast.arg1());
@@ -1529,7 +1528,7 @@ public final class Programming {
 			return F.NIL;
 		}
 
-		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine) throws MathException {
+		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine) {
 			if (leftHandSide.size() > 1) {
 				IAST part = (IAST) leftHandSide;
 				if (part.arg1().isSymbol()) {
@@ -1570,7 +1569,7 @@ public final class Programming {
 	private static class Print extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			final PrintStream s = engine.getOutPrintStream();
 			final PrintStream stream;
 			if (s == null) {
@@ -1582,7 +1581,7 @@ public final class Programming {
 			final OutputFormFactory out = OutputFormFactory.get();
 			ast.forEach(new Consumer<IExpr>() {
 				@Override
-				public void accept(IExpr x) throws MathException {
+				public void accept(IExpr x) {
 					IExpr temp = engine.evaluate(x);
 					if (temp instanceof IStringX) {
 						buf.append(temp.toString());
@@ -1613,7 +1612,7 @@ public final class Programming {
 	 */
 	private static class Quiet extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 			boolean quietMode = engine.isQuietMode();
 			try {
@@ -1651,7 +1650,7 @@ public final class Programming {
 	private final static class Reap extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			IASTAppendable oldList = engine.getReapList();
@@ -1723,7 +1722,7 @@ public final class Programming {
 	private final static class Return extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				throw new ReturnException();
 			}
@@ -1767,7 +1766,7 @@ public final class Programming {
 	private final static class Sow extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			IASTAppendable reapList = engine.getReapList();
@@ -1837,7 +1836,7 @@ public final class Programming {
 	private final static class Switch extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// Validate.checkRange(ast, 4);
 			if ((ast.size() & 0x0001) != 0x0000) {
 				engine.printMessage("Switch: number of arguments must be odd");
@@ -1916,7 +1915,7 @@ public final class Programming {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 3, 4);
 
 			long s = engine.getSeconds();
@@ -2008,7 +2007,7 @@ public final class Programming {
 	private static class Timing extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			final long begin = System.currentTimeMillis();
@@ -2025,7 +2024,7 @@ public final class Programming {
 	private final static class Throw extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				throw new ThrowException(engine.evaluate(ast.arg1()));
 			}
@@ -2065,7 +2064,7 @@ public final class Programming {
 		 * 
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			final IExpr temp = ast.arg1();
@@ -2086,7 +2085,7 @@ public final class Programming {
 
 	private static class Unevaluated extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (!ToggleFeature.UNEVALUATED) {
 				return F.NIL;
 			}
@@ -2156,7 +2155,7 @@ public final class Programming {
 	private final static class Which extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			// Validate.checkEven(ast);
 			if (((ast.argSize()) & 0x0001) == 0x0001) {
 				engine.printMessage("Which: number of arguments must be evaen");
@@ -2225,7 +2224,7 @@ public final class Programming {
 	private final static class While extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			// use EvalEngine's iterationLimit only for evaluation control
@@ -2278,7 +2277,7 @@ public final class Programming {
 	 */
 	private final static class With extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isList()) {
@@ -2310,7 +2309,7 @@ public final class Programming {
 	 * @return
 	 */
 	private static boolean rememberWithVariables(IAST variablesList, final java.util.Map<ISymbol, IExpr> variablesMap,
-			EvalEngine engine) throws MathException {
+			EvalEngine engine) {
 		ISymbol oldSymbol;
 		for (int i = 1; i < variablesList.size(); i++) {
 			if (variablesList.get(i).isAST(F.Set, 3)) {
@@ -2347,7 +2346,7 @@ public final class Programming {
 	 *            the evaluation engine
 	 */
 	public static boolean rememberModuleVariables(IAST variablesList, final String varAppend,
-			final java.util.Map<ISymbol, IExpr> variablesMap, final EvalEngine engine) throws MathException {
+			final java.util.Map<ISymbol, IExpr> variablesMap, final EvalEngine engine) {
 		ISymbol oldSymbol;
 		ISymbol newSymbol;
 		for (int i = 1; i < variablesList.size(); i++) {
@@ -2391,7 +2390,7 @@ public final class Programming {
 	 *            the evaluation engine
 	 */
 	public static void rememberBlockVariables(IAST variablesList, final String varAppend,
-			final java.util.Map<ISymbol, ISymbol> variablesMap, final EvalEngine engine) throws MathException {
+			final java.util.Map<ISymbol, ISymbol> variablesMap, final EvalEngine engine) {
 		ISymbol oldSymbol;
 		ISymbol newSymbol;
 		for (int i = 1; i < variablesList.size(); i++) {
@@ -2495,7 +2494,7 @@ public final class Programming {
 	 * @param engine
 	 * @return
 	 */
-	private static IExpr withSubstVariables(IAST intializerList, IExpr withBlock, final EvalEngine engine) throws MathException {
+	private static IExpr withSubstVariables(IAST intializerList, IExpr withBlock, final EvalEngine engine) {
 		final int moduleCounter = engine.incModuleCounter();
 		final String varAppend = "$" + moduleCounter;
 		final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
@@ -2559,7 +2558,7 @@ public final class Programming {
 	 *            the evaluation engine
 	 * @return
 	 */
-	public static IExpr part(final IExpr expr, final IAST ast, int pos, EvalEngine engine) throws MathException {
+	public static IExpr part(final IExpr expr, final IAST ast, int pos, EvalEngine engine) {
 		if (!expr.isAST() || pos >= ast.size()) {
 			return expr;
 		}
@@ -2622,7 +2621,7 @@ public final class Programming {
 	}
 
 	private static IExpr spanPart(final IAST ast, int pos, IAST arg1, final IExpr arg2, int start, int last, int step,
-			int p1, EvalEngine engine) throws MathException {
+			int p1, EvalEngine engine) {
 		IASTAppendable result = arg1.copyHead();
 
 		if (step < 0 && start >= last) {
@@ -2641,7 +2640,7 @@ public final class Programming {
 	}
 
 	public static IExpr assignPart(final IExpr assignedExpr, final IAST part, int partPosition, IExpr value,
-			EvalEngine engine) throws MathException {
+			EvalEngine engine) {
 		if (!assignedExpr.isAST() || partPosition >= part.size()) {
 			return value;
 		}
@@ -2726,7 +2725,7 @@ public final class Programming {
 	}
 
 	public static IExpr assignPart(final IExpr assignedExpr, final IAST part, int partPosition, IAST rhs, int rhsPos,
-			EvalEngine engine) throws MathException {
+			EvalEngine engine) {
 		if (!assignedExpr.isAST() || partPosition >= part.size()) {
 			return assignedExpr;
 		}
@@ -2835,7 +2834,7 @@ public final class Programming {
 	 * @param value
 	 * @return
 	 */
-	private static IExpr assignPartValue(IAST lhs, int partPosition, IExpr value) throws WrappedException {
+	private static IExpr assignPartValue(IAST lhs, int partPosition, IExpr value) {
 		if (partPosition < 0) {
 			partPosition = lhs.size() + partPosition;
 		}
@@ -2863,7 +2862,7 @@ public final class Programming {
 	 * @return the (cloned and value assigned) result AST from input
 	 */
 	private static IASTAppendable assignPartSpanValue(IAST expr, IExpr element, final IAST part, int partPosition,
-			IASTAppendable result, int position, IExpr value, EvalEngine engine) throws MathException {
+			IASTAppendable result, int position, IExpr value, EvalEngine engine) {
 		IExpr resultValue = assignPart(element, part, partPosition, value, engine);
 		if (resultValue.isPresent()) {
 			if (!result.isPresent()) {

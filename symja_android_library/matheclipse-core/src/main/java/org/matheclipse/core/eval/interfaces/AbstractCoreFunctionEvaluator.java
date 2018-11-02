@@ -4,7 +4,6 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Abstract interface for built-in Symja functions. The
@@ -15,7 +14,7 @@ public abstract class AbstractCoreFunctionEvaluator extends  ICoreFunctionEvalua
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
+	public IExpr numericEval(final IAST ast, EvalEngine engine) {
 		return evaluate(ast, engine);
 	}
 
@@ -30,6 +29,6 @@ public abstract class AbstractCoreFunctionEvaluator extends  ICoreFunctionEvalua
 
 	/** {@inheritDoc} */
 	@Override
-	abstract public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException;
+	abstract public IExpr evaluate(final IAST ast, EvalEngine engine);
 
 }

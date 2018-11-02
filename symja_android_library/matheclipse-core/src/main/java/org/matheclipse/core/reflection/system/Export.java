@@ -10,7 +10,6 @@ import org.matheclipse.core.expression.WL;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,7 +30,7 @@ public class Export extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (Config.isFileSystemEnabled(engine)) {
 			Validate.checkRange(ast, 3, 4);
 

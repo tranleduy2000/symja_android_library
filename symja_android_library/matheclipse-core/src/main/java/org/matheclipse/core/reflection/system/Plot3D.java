@@ -11,7 +11,8 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
+
+
 
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Rule;
@@ -35,7 +36,7 @@ public class Plot3D extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		// ISymbol optionsArray[] = new ISymbol[] { f.BoxRatios, f.PlotRange };
 		if ((ast.size() >= 4) && ast.get(2).isList() && ast.get(3).isList()) {
 			try {

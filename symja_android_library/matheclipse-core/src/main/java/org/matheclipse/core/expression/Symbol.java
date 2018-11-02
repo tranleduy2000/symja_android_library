@@ -32,7 +32,6 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -841,7 +840,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public IExpr of(EvalEngine engine, IExpr... args) throws MathException {
+    public IExpr of(EvalEngine engine, IExpr... args) {
         IAST ast = F.ast(args, this);
         return engine.evaluate(ast);
     }
@@ -858,7 +857,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public boolean ofQ(EvalEngine engine, IExpr... args) throws MathException {
+    public boolean ofQ(EvalEngine engine, IExpr... args) {
         IAST ast = F.ast(args, this);
         return engine.evalTrue(ast);
     }

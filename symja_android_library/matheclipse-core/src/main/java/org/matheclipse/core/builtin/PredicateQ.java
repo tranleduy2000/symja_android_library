@@ -18,7 +18,6 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
-import org.matheclipse.parser.client.math.MathException;
 
 public class PredicateQ {
 
@@ -251,7 +250,7 @@ public class PredicateQ {
 		 *            an optional <code>Predicate</code> which would be applied to all elements which aren't lists.
 		 * @return <code>-1</code> if the expression isn't a full array.
 		 */
-		private static int determineDepth(final IExpr expr, int depth, Predicate<IExpr> predicate) throws MathException {
+		private static int determineDepth(final IExpr expr, int depth, Predicate<IExpr> predicate) {
 			int resultDepth = depth;
 			if (expr.isList()) {
 				IAST ast = (IAST) expr;
@@ -301,7 +300,7 @@ public class PredicateQ {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 2, 4);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -353,7 +352,7 @@ public class PredicateQ {
 	private static class DigitQ extends AbstractCorePredicateEvaluator implements Predicate<IExpr> {
 
 		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) throws MathException {
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
 			if (arg1 instanceof IStringX) {
 				return test(arg1);
 			}
@@ -402,7 +401,7 @@ public class PredicateQ {
 	private static class EvenQ extends AbstractCorePredicateEvaluator implements Predicate<IExpr> {
 
 		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) throws MathException {
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
 			return arg1.isInteger() && ((IInteger) arg1).isEven();
 		}
 
@@ -486,7 +485,7 @@ public class PredicateQ {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				return F.operatorFormAST1(ast);
 			}
@@ -578,7 +577,7 @@ public class PredicateQ {
 
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				return F.operatorFormAST1(ast);
 			}
@@ -631,7 +630,7 @@ public class PredicateQ {
 	private static class MatrixQ extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -692,7 +691,7 @@ public class PredicateQ {
 	private static class MemberQ extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				return F.operatorFormAST1(ast);
 			}
@@ -743,7 +742,7 @@ public class PredicateQ {
 	private static class OddQ extends AbstractCorePredicateEvaluator implements Predicate<IExpr> {
 
 		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) throws MathException {
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
 			return arg1.isInteger() && ((IInteger) arg1).isOdd();
 		}
 
@@ -762,7 +761,7 @@ public class PredicateQ {
 	private static class QuantityQ extends AbstractCorePredicateEvaluator implements Predicate<IExpr> {
 
 		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) throws MathException {
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
 			return arg1.isQuantity();
 		}
 
@@ -800,7 +799,7 @@ public class PredicateQ {
 
 
 		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) throws MathException {
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
 			IExpr expr = arg1;
 			if (expr.isNumber()) {
 				return expr.isZero();
@@ -924,7 +923,7 @@ public class PredicateQ {
 
 
 		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) throws MathException {
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
 			if (!arg1.isInteger()) {
 				return false;
 			}
@@ -936,7 +935,7 @@ public class PredicateQ {
 		 * <code>GaussianIntegers->True</code> is set.
 		 */
 		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine, Options options) throws MathException {
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine, Options options) {
 			IExpr option = options.getOption("GaussianIntegers");
 			if (!option.isTrue()) {
 				return evalArg1Boole(arg1, engine);
@@ -1002,7 +1001,7 @@ public class PredicateQ {
 	 */
 	private static class RealNumberQ extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				if (arg1.isNumber()) {
@@ -1052,7 +1051,7 @@ public class PredicateQ {
 	private static class SquareMatrixQ extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			if (ast.isAST1()) {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -1100,7 +1099,7 @@ public class PredicateQ {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -1148,7 +1147,7 @@ public class PredicateQ {
 
 
 		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) throws MathException {
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
 			return arg1.isString() ? ExprParser.test(arg1.toString(), engine) : false;
 			}
 
@@ -1179,7 +1178,7 @@ public class PredicateQ {
 
 
 		@Override
-		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) throws MathException {
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine) {
 			if (!(arg1 instanceof IStringX)) {
 				throw new WrongArgumentType(null, arg1, 1);
 			}
@@ -1231,7 +1230,7 @@ public class PredicateQ {
 		 * Returns <code>True</code> if the 1st argument is an atomic object; <code>False</code> otherwise
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 
 				// don't eval first argument
@@ -1279,7 +1278,7 @@ public class PredicateQ {
 	private static class VectorQ extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			Validate.checkRange(ast, 2, 3);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());

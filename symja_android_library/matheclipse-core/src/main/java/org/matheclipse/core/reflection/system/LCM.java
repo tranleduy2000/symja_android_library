@@ -8,7 +8,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Least common multiple
@@ -25,7 +24,7 @@ public class LCM extends AbstractArgMultiple {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkRange(ast, 2);
 
 		if (ast.isAST1()) {
@@ -41,12 +40,12 @@ public class LCM extends AbstractArgMultiple {
 	 * 
 	 */
 	@Override
-	public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
+	public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
 		return i0.lcm(i1);
 	}
 
 	@Override
-	public IExpr e2ObjArg(final IExpr o0, final IExpr o1) throws MathException {
+	public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
 		if (o0.isZero()) {
 			return o0;
 		}

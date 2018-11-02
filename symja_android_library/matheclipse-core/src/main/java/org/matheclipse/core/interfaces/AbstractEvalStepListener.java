@@ -1,7 +1,5 @@
 package org.matheclipse.core.interfaces;
 
-import org.matheclipse.parser.client.math.MathException;
-
 /**
  * An abstract listener which could listen to the <code>EvalEngine#evalLoop()</code> steps, to implement an evaluation trace or a
  * step by step evaluation.
@@ -14,7 +12,7 @@ public abstract class AbstractEvalStepListener extends IEvalStepListenerImpl imp
      * {@inheritDoc}
      */
     @Override
-    public abstract void add(IExpr inputExpr, IExpr resultExpr, int recursionDepth, long iterationCounter, String hint) throws MathException;
+    public abstract void add(IExpr inputExpr, IExpr resultExpr, int recursionDepth, long iterationCounter, String hint);
 
     /**
      * {@inheritDoc}

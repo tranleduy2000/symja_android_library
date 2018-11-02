@@ -2,15 +2,6 @@ package org.matheclipse.core.integrate.rubi;
 
 import com.duy.lambda.Predicate;
 
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
-
 import static org.matheclipse.core.expression.F.Integrate;
 import static org.matheclipse.core.expression.F.ast;
 import static org.matheclipse.core.expression.F.binaryAST2;
@@ -20,6 +11,14 @@ import static org.matheclipse.core.expression.F.quinary;
 import static org.matheclipse.core.expression.F.senary;
 import static org.matheclipse.core.expression.F.ternaryAST3;
 import static org.matheclipse.core.expression.F.unaryAST1;
+
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  * UtilityFunction constructors from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
@@ -63,7 +62,7 @@ public class UtilityFunctionCtors {
 
 	static ISymbol FalseQ = F.$rubi("FalseQ", new AbstractCoreFunctionEvaluator() {
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
 				return engine.evaluate(ast.arg1()).isFalse() ? F.True : F.False;
 			}
@@ -111,7 +110,7 @@ public class UtilityFunctionCtors {
 
 	static ISymbol ComplexNumberQ = F.$rubi("ComplexNumberQ", new AbstractCoreFunctionEvaluator() {
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				return arg1.isComplex() || arg1.isComplexNumeric() ? F.True : F.False;
@@ -122,7 +121,7 @@ public class UtilityFunctionCtors {
 
 	static ISymbol PowerQ = F.$rubi("PowerQ", new AbstractCoreFunctionEvaluator() {
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				return arg1.head().equals(F.Power) ? F.True : F.False;
@@ -133,7 +132,7 @@ public class UtilityFunctionCtors {
 
 	static ISymbol ProductQ = F.$rubi("ProductQ", new AbstractCoreFunctionEvaluator() {
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				return arg1.head().equals(F.Times) ? F.True : F.False;
@@ -144,7 +143,7 @@ public class UtilityFunctionCtors {
 
 	static ISymbol SumQ = F.$rubi("SumQ", new AbstractCoreFunctionEvaluator() {
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				return arg1.head().equals(F.Plus) ? F.True : F.False;
@@ -154,7 +153,7 @@ public class UtilityFunctionCtors {
 	});
 	static ISymbol NonsumQ = F.$rubi("NonsumQ", new AbstractCoreFunctionEvaluator() {
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() == 2) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				return arg1.head().equals(F.Plus) ? F.False : F.True;

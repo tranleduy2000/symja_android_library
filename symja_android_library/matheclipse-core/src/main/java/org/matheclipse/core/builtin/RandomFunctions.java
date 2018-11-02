@@ -13,7 +13,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigInteger;
 
@@ -29,7 +28,7 @@ public final class RandomFunctions {
 	private static class RandomChoice extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 1 && ast.arg1().isAST()) {
 				IAST list = (IAST) ast.arg1();
 				ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -59,7 +58,7 @@ public final class RandomFunctions {
 	private static class RandomInteger extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isInteger()) {
@@ -80,7 +79,7 @@ public final class RandomFunctions {
 	private static class RandomReal extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				// RandomReal() gives a double value between 0.0 and 1.0
 				double r = Math.random();
@@ -99,7 +98,7 @@ public final class RandomFunctions {
 	private static class RandomSample extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isAST()) {

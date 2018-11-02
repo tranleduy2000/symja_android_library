@@ -12,7 +12,6 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.polynomials.PartialFractionGenerator;
 import org.matheclipse.core.reflection.system.rules.InverseLaplaceTransformRules;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <pre>
@@ -47,7 +46,7 @@ public class InverseLaplaceTransform extends AbstractFunctionEvaluator implement
 	 * 
 	 */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkSize(ast, 4);
 
 		final IExpr a1 = ast.arg1();

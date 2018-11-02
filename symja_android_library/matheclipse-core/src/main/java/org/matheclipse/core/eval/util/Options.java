@@ -8,7 +8,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 import edu.jas.poly.TermOrder;
 import edu.jas.poly.TermOrderByName;
@@ -40,7 +39,7 @@ public class Options {
 	 * @param startIndex
 	 *            the index from which tolook for options defined in <code>currentOptionsList</code>
 	 */
-	public Options(final ISymbol symbol, final IAST currentOptionsList, final int startIndex, final EvalEngine engine) throws MathException {
+	public Options(final ISymbol symbol, final IAST currentOptionsList, final int startIndex, final EvalEngine engine) {
 		fEngine = engine;
 		// get the List of pre-defined options:
 		final IExpr temp = fEngine.evaluate(Options(symbol));

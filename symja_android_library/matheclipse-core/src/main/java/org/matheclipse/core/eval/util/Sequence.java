@@ -57,7 +57,7 @@ public class Sequence extends ListSizeSequence {
 		return sequArray;
 	}
 
-	private static int getASTFrom(final IAST lst) throws WrongArgumentType {
+	private static int getASTFrom(final IAST lst) {
 		if ((lst.size() > 1) && !(lst.arg1().isReal())) {
 			throw new WrongArgumentType(lst, lst.arg1(), 1);
 		}
@@ -67,7 +67,7 @@ public class Sequence extends ListSizeSequence {
 		return 0;
 	}
 
-	private static int getASTTo(final IAST lst) throws WrongArgumentType {
+	private static int getASTTo(final IAST lst) {
 		if ((lst.isAST1()) && (lst.arg1().isReal())) {
 			return ((ISignedNumber) lst.arg1()).toInt();
 		}

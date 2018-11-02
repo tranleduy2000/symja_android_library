@@ -1,6 +1,5 @@
 package org.matheclipse.core.eval;
 
-import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.interfaces.INumeric;
 import org.matheclipse.core.eval.interfaces.ISignedNumberConstant;
 import org.matheclipse.core.expression.F;
@@ -38,7 +37,7 @@ public class DoubleStackEvaluator {
 		throw new UnsupportedOperationException("EvalDouble#evalSymbol() - no value assigned for symbol: " + symbol);
 	}
 
-	public static double evalAST(double[] stack, final int top, final IAST ast) throws IllegalArgument {
+	public static double evalAST(double[] stack, final int top, final IAST ast) {
 		if (ast.head().isBuiltInSymbol()) {
 			final IBuiltInSymbol symbol = (IBuiltInSymbol) ast.head();
 			final IEvaluator module = ((IBuiltInSymbol) symbol).getEvaluator();
@@ -63,7 +62,7 @@ public class DoubleStackEvaluator {
 		throw new UnsupportedOperationException("EvalDouble#evalAST(): " + ast);
 	}
 
-	public static double eval(final double[] stack, final int top, final IExpr expr) throws IllegalArgument {
+	public static double eval(final double[] stack, final int top, final IExpr expr) {
 		if (expr instanceof IAST) {
 			return evalAST(stack, top, (IAST) expr);
 		}
