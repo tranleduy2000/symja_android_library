@@ -18,6 +18,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.ObjectStreamException;
 import java.util.Collection;
@@ -84,7 +85,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public <T> T accept(IVisitor<T> visitor) throws MathException {
 		return visitor.visit(this);
 	}
 

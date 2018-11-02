@@ -1,6 +1,7 @@
 package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.expression.F;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Created by Duy on 2/20/2018.
@@ -44,7 +45,7 @@ public abstract class INumberImpl extends IExprImpl implements INumber {
      * @deprecated use abs()
      */
     @Deprecated
-    public IExpr eabs() {
+    public IExpr eabs() throws MathException {
         return abs();
     }
 

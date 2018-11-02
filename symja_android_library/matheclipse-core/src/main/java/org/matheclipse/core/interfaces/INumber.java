@@ -2,6 +2,7 @@ package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ComplexNum;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Implemented by all number interfaces
@@ -14,7 +15,7 @@ public interface INumber extends IExpr {
      * @return
      */
     @Override
-    public IExpr abs();
+    public IExpr abs() throws MathException;
 
     /**
      * Get a <code>Apcomplex</code> number wrapped into an <code>ApcomplexNum</code> object.
@@ -52,7 +53,7 @@ public interface INumber extends IExpr {
      * @return
      */
     @Override
-    public IExpr complexArg();
+    public IExpr complexArg() throws MathException;
 
     /**
      * Get a <code>ComplexNum</code> number bject.
@@ -80,7 +81,7 @@ public interface INumber extends IExpr {
      * @deprecated use abs()
      */
     @Deprecated
-    IExpr eabs();
+    IExpr eabs() throws MathException;
 
     /**
      * Check if this number equals the given <code>int</code> number?

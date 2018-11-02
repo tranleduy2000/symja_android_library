@@ -52,6 +52,8 @@ import org.matheclipse.core.builtin.WXFFunctions;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.RuleCreationError;
+import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
@@ -4652,7 +4654,7 @@ public class F {
 		return binaryAST2(Colon, a0, a1);
 	}
 
-	public static int compareTo(IExpr a, IExpr b) throws UnsupportedOperationException {
+	public static int compareTo(IExpr a, IExpr b) throws UnsupportedOperationException, MathException {
 		if (a instanceof ISignedNumber && b instanceof ISignedNumber) {
 			return a.compareTo(b);
 		}
@@ -4665,7 +4667,7 @@ public class F {
 				"compareTo() - first or second argument could not be converted into a signed number.");
 	}
 
-	public static int compareTo(IExpr a, Integer i) throws UnsupportedOperationException {
+	public static int compareTo(IExpr a, Integer i) throws UnsupportedOperationException, MathException {
 		if (a instanceof ISignedNumber) {
 			return a.compareTo(integer(i.longValue()));
 		}
@@ -4677,7 +4679,7 @@ public class F {
 				"compareTo() - first argument could not be converted into a signed number.");
 	}
 
-	public static int compareTo(IExpr a, java.math.BigInteger i) throws UnsupportedOperationException {
+	public static int compareTo(IExpr a, java.math.BigInteger i) throws UnsupportedOperationException, MathException {
 		if (a instanceof ISignedNumber) {
 			return a.compareTo(integer(i));
 		}
@@ -4689,7 +4691,7 @@ public class F {
 				"compareTo() - first argument could not be converted into a signed number.");
 	}
 
-	public static int compareTo(Integer i, IExpr b) throws UnsupportedOperationException {
+	public static int compareTo(Integer i, IExpr b) throws UnsupportedOperationException, MathException {
 		if (b instanceof ISignedNumber) {
 			return integer(i.longValue()).compareTo(b);
 		}
@@ -4701,7 +4703,7 @@ public class F {
 				"compareTo() - second argument could not be converted into a signed number.");
 	}
 
-	public static int compareTo(java.math.BigInteger i, IExpr b) throws UnsupportedOperationException {
+	public static int compareTo(java.math.BigInteger i, IExpr b) throws UnsupportedOperationException, MathException {
 		if (b instanceof ISignedNumber) {
 			return integer(i).compareTo(b);
 		}
@@ -5213,7 +5215,7 @@ public class F {
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
-	public static IExpr eval(IExpr a) {
+	public static IExpr eval(IExpr a) throws MathException {
 		return EvalEngine.get().evaluate(a);
 	}
 
@@ -5225,7 +5227,7 @@ public class F {
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
-	public static IExpr eval(String str) {
+	public static IExpr eval(String str) throws MathException {
 		return EvalEngine.get().evaluate(str);
 	}
 	/**
@@ -5237,7 +5239,7 @@ public class F {
 	 * @deprecated
 	 */
 	@Deprecated
-	private static IExpr eval(final ISymbol head, final IExpr a0) {
+	private static IExpr eval(final ISymbol head, final IExpr a0) throws MathException {
 		final IASTAppendable ast = ast(head);
 		ast.append(a0);
 		return EvalEngine.get().evaluate(ast);
@@ -5251,7 +5253,7 @@ public class F {
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
-	public static IExpr evalExpand(IExpr a) {
+	public static IExpr evalExpand(IExpr a) throws MathException {
 		IExpr result = EvalEngine.get().evaluate(a);
 		if (result.isAST()) {
 			IAST ast = (IAST) result;
@@ -5280,7 +5282,7 @@ public class F {
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
-	public static IExpr evalExpandAll(IExpr a) {
+	public static IExpr evalExpandAll(IExpr a) throws MathException {
 		return evalExpandAll(a, EvalEngine.get());
 	}
 
@@ -5293,7 +5295,7 @@ public class F {
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
-	public static IExpr evalExpandAll(IExpr a, EvalEngine engine) {
+	public static IExpr evalExpandAll(IExpr a, EvalEngine engine) throws MathException {
 		return engine.evaluate(ExpandAll(a));
 	}
 
@@ -5305,7 +5307,7 @@ public class F {
 	 * @deprecated use EvalEngine.get().evalN() instead
 	 */
 	@Deprecated
-	public static IExpr evaln(final IExpr a0) {
+	public static IExpr evaln(final IExpr a0) throws MathException {
 		return eval(N, a0);
 	}
 
@@ -5320,7 +5322,7 @@ public class F {
 	 * @deprecated use EvalEngine#evalQuiet();
 	 */
 	@Deprecated
-	public static IExpr evalQuiet(IExpr a) {
+	public static IExpr evalQuiet(IExpr a) throws MathException {
 		return EvalEngine.get().evalQuiet(a);
 	}
 
@@ -5335,7 +5337,7 @@ public class F {
 	 * @deprecated use EvalEngine#evalQuietNull()
 	 */
 	@Deprecated
-	public static IExpr evalQuietNull(IExpr a) {
+	public static IExpr evalQuietNull(IExpr a)throws MathException {
 		return EvalEngine.get().evalQuietNull(a);
 	}
 
@@ -5504,7 +5506,7 @@ public class F {
 	 * @return the evaluated expression
 	 * @see EvalEngine#evaluate(IExpr)
 	 */
-	public static IExpr expandAll(IExpr a, boolean expandNegativePowers, boolean distributePlus) {
+	public static IExpr expandAll(IExpr a, boolean expandNegativePowers, boolean distributePlus) throws MathException {
 		if (a.isAST()) {
 			EvalEngine engine = EvalEngine.get();
 			IAST ast = engine.evalFlatOrderlessAttributesRecursive((IAST) a);
@@ -6210,14 +6212,14 @@ public class F {
 	 * @return
 	 */
 	public static IAST intIterator(ISymbol head, final Function<IExpr, IExpr> function, final int from, final int to,
-			final int step) {
+			final int step) throws MathException {
 		IASTAppendable result = F.ast(head, to - from + 1, false);
 		for (int i = from; i <= to; i += step) {
 			result.append(function.apply(F.ZZ(i)));
 		}
 		return result;
 	}
-	public static IAST intIterator(ISymbol head, final Function<IExpr, IExpr> function, final IAST list) {
+	public static IAST intIterator(ISymbol head, final Function<IExpr, IExpr> function, final IAST list) throws MathException {
 		IASTAppendable result = F.ast(head, list.size(), false);
 		for (int i = 1; i < list.size(); i++) {
 			result.append(function.apply(list.get(i)));
@@ -6273,7 +6275,7 @@ public class F {
 	 *            right-hand-side of the assignment
 	 * @return <code>F.NIL</code>
 	 */
-	public static IAST ISet(final IExpr lhs, final IExpr rhs) {
+	public static IAST ISet(final IExpr lhs, final IExpr rhs) throws RuleCreationError {
 		if (lhs.isAST()) {
 			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
 		}
@@ -6292,14 +6294,14 @@ public class F {
 	 *            right-hand-side of the assignment
 	 * @return <code>F.NIL</code>
 	 */
-	public static IAST ISetDelayed(final IExpr lhs, final IExpr rhs) {
+	public static IAST ISetDelayed(final IExpr lhs, final IExpr rhs) throws RuleCreationError {
 		if (lhs.isAST()) {
 			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
 		}
 		PatternMatching.setDelayedDownRule(PatternMap.DEFAULT_RULE_PRIORITY, lhs, rhs, true);
 		return F.NIL;
 	}
-	public static IAST ISetDelayed(int priority,final IExpr lhs, final IExpr rhs) {
+	public static IAST ISetDelayed(int priority,final IExpr lhs, final IExpr rhs) throws RuleCreationError {
 		if (lhs.isAST()) {
 			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
 		}
@@ -6939,7 +6941,7 @@ public class F {
 	 *            the expression which should be negated.
 	 * @return
 	 */
-	public static IExpr Negate(final IExpr x) {
+	public static IExpr Negate(final IExpr x) throws MathException {
 		if (x.isNumber()) {
 			return x.negate();
 		}
@@ -7387,7 +7389,7 @@ public class F {
 		return binaryAST2(Power, a0, a1);
 	}
 
-	public static IExpr Power(final IExpr a0, final long exp) {
+	public static IExpr Power(final IExpr a0, final long exp) throws MathException {
 		if (a0.isNumber()) {
 			if (exp > 0L) {
 				return a0.power(exp);
@@ -7467,7 +7469,7 @@ public class F {
 	 * @param to
 	 * @return
 	 */
-	public static IAST product(final Function<IExpr, IExpr> function, final int from, final int to) {
+	public static IAST product(final Function<IExpr, IExpr> function, final int from, final int to) throws MathException {
 		return intIterator(F.Times, function, from, to, 1);
 	}
 
@@ -8127,7 +8129,7 @@ public class F {
 	 * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted
 	 *         expression.
 	 */
-	public static IExpr subs(final IExpr expr, final IExpr x, final IExpr y) {
+	public static IExpr subs(final IExpr expr, final IExpr x, final IExpr y) throws MathException {
 		return expr.replaceAll(F.Rule(x, y)).orElse(expr);
 	}
 
@@ -8142,7 +8144,7 @@ public class F {
 	 * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted
 	 *         expression.
 	 */
-	public static IExpr subst(IExpr expr, final Function<IExpr, IExpr> function) {
+	public static IExpr subst(IExpr expr, final Function<IExpr, IExpr> function) throws MathException {
 		return expr.replaceAll(function).orElse(expr);
 	}
 
@@ -8157,7 +8159,7 @@ public class F {
 	 * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted
 	 *         expression.
 	 */
-	public static IExpr subst(IExpr expr, final Map<? extends IExpr, ? extends IExpr> map) {
+	public static IExpr subst(IExpr expr, final Map<? extends IExpr, ? extends IExpr> map) throws MathException {
 		return expr.replaceAll(map).orElse(expr);
 	}
 
@@ -8172,7 +8174,7 @@ public class F {
 	 * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted
 	 *         expression.
 	 */
-	public static IExpr subst(IExpr expr, final IAST list) {
+	public static IExpr subst(IExpr expr, final IAST list) throws MathException {
 		if (list.isListOfLists()) {
 			IExpr result = expr;
 			for (IExpr subList : list) {
@@ -8193,7 +8195,7 @@ public class F {
 	 * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted
 	 *         expression.
 	 */
-	public static IExpr subst(IExpr expr, IExpr subExpr, IExpr replacementExpr) {
+	public static IExpr subst(IExpr expr, IExpr subExpr, IExpr replacementExpr) throws MathException {
 		return expr.replaceAll(Functors.rules(Rule(subExpr, replacementExpr), EvalEngine.get())).orElse(expr);
 	}
 
@@ -8233,7 +8235,7 @@ public class F {
 	 * @param iMax
 	 * @return
 	 */
-	public static IAST sum(final Function<IExpr, IExpr> function, final int iMin, final int iMax) {
+	public static IAST sum(final Function<IExpr, IExpr> function, final int iMin, final int iMax) throws MathException {
 		return intIterator(F.Plus, function, iMin, iMax, 1);
 	}
 
@@ -8246,7 +8248,7 @@ public class F {
 	 * @param iStep
 	 * @return
 	 */
-	public static IAST sum(final Function<IExpr, IExpr> function, final int iMin, final int iMax, final int iStep) {
+	public static IAST sum(final Function<IExpr, IExpr> function, final int iMin, final int iMax, final int iStep) throws MathException {
 		return intIterator(F.Plus, function, iMin, iMax, iStep);
 	}
 
@@ -8587,7 +8589,7 @@ public class F {
 	 *            the number of elements of the vector.
 	 * @return
 	 */
-	public static IAST vector(IntFunction<? extends IExpr> iFunction, int n) {
+	public static IAST vector(IntFunction<? extends IExpr> iFunction, int n) throws MathException {
 		IASTAppendable matrix = F.ListAlloc(n);
 		for (int i = 0; i < n; i++) {
 			matrix.append(iFunction.apply(i));

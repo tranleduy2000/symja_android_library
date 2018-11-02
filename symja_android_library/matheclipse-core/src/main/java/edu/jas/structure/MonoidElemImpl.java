@@ -97,7 +97,7 @@ public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidE
      * Java 8 only
      */
     @SuppressWarnings("unchecked")
-    public C power(long n) {
+    public C power(long n) throws MathException {
         //System.out.println("this = " + this + ", n = " + n);
         return Power.power((MonoidFactory<C>) factory(), (C) this, n);
     }

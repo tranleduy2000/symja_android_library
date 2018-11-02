@@ -19,6 +19,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.Externalizable;
 import java.math.BigInteger;
@@ -232,7 +233,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public <T> T accept(IVisitor<T> visitor) throws MathException {
 		return visitor.visit(this);
 	}
 
@@ -717,7 +718,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	}
 
 	@Override
-	public IExpr plus(final IExpr that) {
+	public IExpr plus(final IExpr that) throws MathException {
 		if (isZero()) {
 			return that;
 		}
@@ -863,7 +864,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	}
 
 	@Override
-	public IExpr times(final IExpr that) {
+	public IExpr times(final IExpr that) throws MathException {
 		if (isZero()) {
 			return F.C0;
 		}

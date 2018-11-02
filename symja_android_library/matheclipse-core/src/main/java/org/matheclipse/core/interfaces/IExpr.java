@@ -101,30 +101,30 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
      */
-    IExpr $div(final IExpr that);
+    IExpr $div(final IExpr that) throws MathException;
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
      */
-    IExpr $minus(final IExpr that);
+    IExpr $minus(final IExpr that) throws MathException;
 
     /**
      * Operator overloading for Scala operator <code>+</code>. Calls <code>plus(that)</code>.
      */
-    IExpr $plus(final IExpr that);
+    IExpr $plus(final IExpr that) throws MathException;
 
     /**
      * Operator overloading for Scala operator <code>*</code>. Calls <code>times(that)</code>.
      */
-    IExpr $times(final IExpr that);
+    IExpr $times(final IExpr that) throws MathException;
 
     /**
      * Operator overloading for Scala operator <code>^</code>. Calls <code>power(that)</code>.
      */
-    IExpr $up(final IExpr that);
+    IExpr $up(final IExpr that) throws MathException;
 
     @Override
-    IExpr abs();
+    IExpr abs() throws MathException;
 
     /**
      * Accept a visitor with return type T
@@ -147,7 +147,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     long accept(IVisitorLong visitor);
 
     @Override
-    IExpr add(IExpr that);
+    IExpr add(IExpr that) throws MathException;
 
     IExpr and(final IExpr that);
 
@@ -193,14 +193,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return the argument of a complex number
      */
-    IExpr complexArg();
+    IExpr complexArg() throws MathException;
 
     /**
      * Conjugate this (complex-) number.
      *
      * @return the conjugate complex number
      */
-    IExpr conjugate();
+    IExpr conjugate() throws MathException;
 
 
     /**
@@ -221,14 +221,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param number
      */
-    IExpr copySign(ISignedNumber number);
+    IExpr copySign(ISignedNumber number) throws MathException;
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this - 1)</code>. Calculates
      * <code>F.eval(F.Subtract(this, C1))</code> in the common case and uses a specialized implementation for derived
      * number classes.
      */
-    IExpr dec();
+    IExpr dec() throws MathException;
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this / that)</code>. Calculates
@@ -429,14 +429,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return real part
      */
-    IExpr im();
+    IExpr im() throws MathException;
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this + 1)</code>. Calculates
      * <code>F.eval(F.Plus(this, C1))</code> in the common case and uses a specialized implementation for derived number
      * classes.
      */
-    IExpr inc();
+    IExpr inc() throws MathException;
 
     /**
      * Return the internal Java form of this expression.
@@ -477,7 +477,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>ONE / this</code>.
      */
     @Override
-    IExpr inverse();
+    IExpr inverse() throws MathException;
 
     /**
      * Test if this expression is the function <code>Abs[&lt;arg&gt;]</code>
@@ -884,7 +884,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested and not the
      *                  <code>Head[]</code> element.
      */
-    boolean isFree(Predicate<IExpr> predicate, boolean heads);
+    boolean isFree(Predicate<IExpr> predicate, boolean heads) throws MathException;
 
     /**
      * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the expression itself, aren't
@@ -1076,7 +1076,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and not the
      *                <code>Head[]</code> element.
      */
-    boolean isMember(IExpr pattern, boolean heads);
+    boolean isMember(IExpr pattern, boolean heads) throws MathException;
 
     /**
      * Returns <code>true</code>, if <b>at least one of the elements</b> in the subexpressions or the expression itself,
@@ -1086,7 +1086,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested and not the
      *                  <code>Head[]</code> element.
      */
-    boolean isMember(Predicate<IExpr> predicate, boolean heads);
+    boolean isMember(Predicate<IExpr> predicate, boolean heads) throws MathException;
 
     /**
      * Test if this expression equals <code>-1</code> in symbolic or numeric mode.
@@ -1155,13 +1155,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression unequals <code>0</code> and is a numeric complex value or is assumed to be a negative or
      * positive value.
      */
-    boolean isNonZeroComplexResult();
+    boolean isNonZeroComplexResult() throws MathException;
 
     /**
      * Test if this expression unequals <code>0</code> and is a numeric real value or is assumed to be a negative or
      * positive value.
      */
-    boolean isNonZeroRealResult();
+    boolean isNonZeroRealResult() throws MathException;
 
     /**
      * Test if this expression is the function <code>Not[&lt;arg&gt;]</code>
@@ -1625,14 +1625,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param a1
      */
-    IExpr less(final IExpr a1);
+    IExpr less(final IExpr a1) throws MathException;
 
     /**
      * Evaluate LessEqual, if both arguments are real numbers
      *
      * @param a1
      */
-    IExpr lessEqual(final IExpr a1);
+    IExpr lessEqual(final IExpr a1) throws MathException;
 
     /**
      * Compare if <code>this <= that</code:
@@ -1644,7 +1644,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return <code>F.True, F.False or F.NIL</code
      */
-    IExpr lessEqualThan(IExpr that);
+    IExpr lessEqualThan(IExpr that) throws MathException;
 
     /**
      * Compare if <code>this < that</code:
@@ -1656,7 +1656,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return <code>F.True, F.False or F.NIL</code
      */
-    IExpr lessThan(IExpr that);
+    IExpr lessThan(IExpr that) throws MathException;
 
     /**
      * If this is a linear expression return the addedn at index 0 and the multiplicant at index 1
@@ -1679,7 +1679,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>F.eval(F.Plus(this, F.Times(F.CN1, that)))</code> in the common case and uses a specialized implementation
      * for derived number classes.
      */
-    IExpr minus(final IExpr that);
+    IExpr minus(final IExpr that) throws MathException;
 
     IExpr mod(final IExpr that);
 
@@ -1689,23 +1689,23 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see IExpr#times(IExpr)
      */
     @Override
-    IExpr multiply(final IExpr that);
+    IExpr multiply(final IExpr that) throws MathException;
 
     @Override
-    IExpr multiply(int n);
+    IExpr multiply(int n) throws MathException;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    IExpr negate();
+    IExpr negate() throws MathException;
 
     /**
      * Additional negative method, which works like opposite to fulfill groovy's method signature
      *
      * @see #opposite()
      */
-    IExpr negative();
+    IExpr negative() throws MathException;
 
     /**
      * Converts a special expression (like a series) into a standard expression.
@@ -1727,7 +1727,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @see #negative()
      */
-    IExpr opposite();
+    IExpr opposite() throws MathException;
 
     /**
      * The <code>ExprNull.NIL#optional()</code> method always returns <code>that</code>. All other objects which
@@ -1848,7 +1848,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>F.eval(F.Plus(this, that))</code> in the common case and uses a specialized implementation for derived
      * number classes.
      */
-    IExpr plus(final IExpr that);
+    IExpr plus(final IExpr that) throws MathException;
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this ^ that)</code>. Calculates
@@ -1857,7 +1857,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return <code>(this ^ that)</code>
      */
-    IExpr power(final IExpr that);
+    IExpr power(final IExpr that) throws MathException;
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this ^ n)</code>. Calculates
@@ -1868,7 +1868,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>(this ^ n)</code>
      */
     @Override
-    IExpr power(final long n);
+    IExpr power(final long n) throws MathException;
 
     /**
      * Return the real part of this expression if possible. Otherwise return <code>Re(this)</code>.
@@ -1878,7 +1878,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr re();
 
     @Override
-    IExpr reciprocal() throws MathRuntimeException;
+    IExpr reciprocal() throws MathRuntimeException, MathException;
 
 
     IExpr remainder(IExpr that);
@@ -1892,7 +1892,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
      */
 
-    IExpr replaceAll(final Function<IExpr, IExpr> function);
+    IExpr replaceAll(final Function<IExpr, IExpr> function) throws MathException;
 
     /**
      * Replace all (sub-) expressions with the given <code>java.util.Map</code>n. If no substitution matches, the method
@@ -1903,7 +1903,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
      */
 
-    IExpr replaceAll(final Map<? extends IExpr, ? extends IExpr> map);
+    IExpr replaceAll(final Map<? extends IExpr, ? extends IExpr> map) throws MathException;
 
 
     /**
@@ -1915,7 +1915,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
      */
 
-    IExpr replaceAll(final IAST astRules);
+    IExpr replaceAll(final IAST astRules) throws MathException;
 
     /**
      * Replace all subexpressions with the given rule set. A rule must contain the position of the subexpression which
@@ -1924,7 +1924,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param astRules rules of the form <code>position-&gt;y</code> or <code>{position1-&gt;b, position2-&gt;d}</code>
      * @return <code>F.NIL</code> if no substitution of a subexpression was possible.
      */
-    IExpr replacePart(final IAST astRules);
+    IExpr replacePart(final IAST astRules) throws MathException;
 
     /**
      * Repeatedly replace all (sub-) expressions with the given unary function. If no substitution matches, the method
@@ -1934,7 +1934,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *                 substituted.
      * @return <code>this</code> if no substitution of a (sub-)expression was possible.
      */
-    IExpr replaceRepeated(final Function<IExpr, IExpr> function);
+    IExpr replaceRepeated(final Function<IExpr, IExpr> function) throws MathException;
 
     /**
      * Repeatedly replace all (sub-) expressions with the given rule set. If no substitution matches, the method returns
@@ -1944,13 +1944,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *                 rule can contain pattern objects.
      * @return <code>this</code> if no substitution of a (sub-)expression was possible.
      */
-    IExpr replaceRepeated(final IAST astRules) throws WrongArgumentType;
+    IExpr replaceRepeated(final IAST astRules) throws MathException;
 
     /**
      * Repeatedly replace all (sub-) expressions with the given visitor. If no substitution matches, the method returns
      * <code>this</code>.
      */
-    IExpr replaceRepeated(VisitorReplaceAll visitor);
+    IExpr replaceRepeated(VisitorReplaceAll visitor) throws MathException;
 
     /**
      * <p>
@@ -1966,7 +1966,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @deprecated use org.matheclipse.core.eval.util.Lambda#replaceSlots() instead
      */
     @Deprecated
-    IExpr replaceSlots(final IAST slotsList);
+    IExpr replaceSlots(final IAST slotsList) throws MathException;
 
     /**
      * Get the rest of the elements of this <code>AST</code> list. Return <code>F.NIL</code> if this object isn't an
@@ -2014,7 +2014,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr subtract(IExpr that) throws MathException;
 
     @Override
-    IExpr sum(final IExpr that);
+    IExpr sum(final IExpr that) throws MathException;
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this * that)</code>. Calculates
@@ -2100,7 +2100,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     IExpr unequalTo(IExpr that);
 
-    IExpr unitStep();
+    IExpr unitStep() throws MathException;
 
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>upper</code> value. If this is a

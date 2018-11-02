@@ -7,6 +7,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.ObjectStreamException;
 
@@ -61,7 +62,7 @@ public class ExprID extends IExprImpl implements IExpr {
 	}
 
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public <T> T accept(IVisitor<T> visitor) throws MathException {
 		return null;
 	}
 

@@ -25,6 +25,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigInteger;
 
@@ -224,7 +225,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public <T> T accept(IVisitor<T> visitor) throws MathException {
 		return visitor.visit(this);
 	}
 
@@ -502,7 +503,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	 * @return
 	 */
 	@Override
-	public IExpr plus(final IExpr that) {
+	public IExpr plus(final IExpr that) throws MathException {
 		if (that instanceof IFraction) {
 			return this.add((IFraction) that).normalize();
 		}
@@ -614,7 +615,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr times(final IExpr that) {
+	public IExpr times(final IExpr that) throws MathException {
 		if (that instanceof IFraction) {
 			return this.mul((IFraction) that).normalize();
 		}

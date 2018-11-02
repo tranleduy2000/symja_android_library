@@ -18,6 +18,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -280,7 +281,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 	}
 
 	@Override
-	public IExpr complexArg() {
+	public IExpr complexArg() throws MathException {
 		return F.num(ApcomplexMath.arg(fApcomplex));
 	}
 
@@ -360,7 +361,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 	 * @return
 	 */
 	@Override
-	public IExpr plus(final IExpr that) {
+	public IExpr plus(final IExpr that) throws MathException {
 		if (that instanceof ApcomplexNum) {
 			return valueOf(fApcomplex.add(((ApcomplexNum) that).fApcomplex));
 		}
@@ -400,7 +401,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 	 * @return
 	 */
 	@Override
-	public IExpr times(final IExpr that) {
+	public IExpr times(final IExpr that) throws MathException {
 		if (that instanceof ApcomplexNum) {
 			return valueOf(fApcomplex.multiply(((ApcomplexNum) that).fApcomplex));
 		}
@@ -476,7 +477,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public <T> T accept(IVisitor<T> visitor) throws MathException {
 		return visitor.visit(this);
 	}
 

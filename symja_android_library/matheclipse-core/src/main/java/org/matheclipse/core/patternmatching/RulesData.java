@@ -15,6 +15,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.AbstractVisitor;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -155,7 +156,7 @@ public class RulesData implements Serializable {
 	 *            the visitor whch manipulates the IAST objects
 	 * @return
 	 */
-	public IAST accept(AbstractVisitor visitor) {
+	public IAST accept(AbstractVisitor visitor) throws MathException {
 		Iterator<IExpr> iter;
 		IExpr key;
 		PatternMatcherEquals pmEquals;

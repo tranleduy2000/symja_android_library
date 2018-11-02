@@ -191,7 +191,7 @@ public class ApfloatNum extends INumImpl implements INum {
 	}
 
 	@Override
-	public IExpr plus(final IExpr that) {
+	public IExpr plus(final IExpr that) throws MathException {
 		if (that instanceof ApfloatNum) {
 			return add((ApfloatNum) that);
 		}
@@ -320,7 +320,7 @@ public class ApfloatNum extends INumImpl implements INum {
 	}
 
 	@Override
-	public IExpr times(final IExpr that) {
+	public IExpr times(final IExpr that) throws MathException {
 		if (that instanceof ApfloatNum) {
 			return multiply((ApfloatNum) that);
 		}

@@ -7,6 +7,7 @@ import org.hipparchus.complex.Complex;
 import org.hipparchus.exception.NullArgumentException;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IComplexNumImpl;
 import org.matheclipse.core.interfaces.IExpr;
@@ -18,6 +19,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigDecimal;
 
@@ -122,7 +124,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public <T> T accept(IVisitor<T> visitor) throws MathException {
 		return visitor.visit(this);
 	}
 
@@ -329,7 +331,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 	}
 
 	@Override
-	public IExpr complexArg() {
+	public IExpr complexArg() throws MathException {
 		return num(Math.atan2(imDoubleValue(), reDoubleValue()));
 	}
 
@@ -575,7 +577,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 	 * @return
 	 */
 	@Override
-	public IExpr plus(final IExpr that) {
+	public IExpr plus(final IExpr that) throws MathException {
 		if (that instanceof ComplexNum) {
 			return newInstance(fComplex.add(((ComplexNum) that).fComplex));
 		}
@@ -595,7 +597,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 	}
 
 	@Override
-	public IComplexNum pow(final IComplexNum val) {
+	public IComplexNum pow(final IComplexNum val) throws IllegalArgument {
 		if (Complex.equals(fComplex, Complex.ZERO, Config.DOUBLE_EPSILON)) {
 			ISignedNumber sn = val.re();
 			if (sn.isNegative()) {
@@ -662,7 +664,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 	 * @return
 	 */
 	@Override
-	public IExpr times(final IExpr that) {
+	public IExpr times(final IExpr that) throws MathException {
 		if (that instanceof ComplexNum) {
 			return newInstance(fComplex.multiply(((ComplexNum) that).fComplex));
 		}

@@ -36,7 +36,7 @@ public interface FieldElement<T> {
      * @return a new element representing this + a
      * @throws NullArgumentException if {@code a} is {@code null}.
      */
-    T add(T a) throws NullArgumentException;
+    T add(T a) throws NullArgumentException, MathException;
 
     /**
      * Compute this - a.
@@ -52,7 +52,7 @@ public interface FieldElement<T> {
      *
      * @return the opposite of {@code this}.
      */
-    T negate();
+    T negate() throws MathException;
 
     /**
      * Compute n &times; this. Multiplication by an integer number is defined
@@ -64,7 +64,7 @@ public interface FieldElement<T> {
      * @param n Number of times {@code this} must be added to itself.
      * @return A new element representing n &times; this.
      */
-    T multiply(int n);
+    T multiply(int n) throws MathException;
 
     /**
      * Compute this &times; a.
@@ -73,7 +73,7 @@ public interface FieldElement<T> {
      * @return a new element representing this &times; a
      * @throws NullArgumentException if {@code a} is {@code null}.
      */
-    T multiply(T a) throws NullArgumentException;
+    T multiply(T a) throws NullArgumentException, MathException;
 
     /**
      * Compute this &divide; a.
@@ -91,7 +91,7 @@ public interface FieldElement<T> {
      * @return the inverse of {@code this}.
      * @throws MathRuntimeException if {@code this} is zero
      */
-    T reciprocal() throws MathRuntimeException;
+    T reciprocal() throws MathRuntimeException, MathException;
 
     /**
      * Get the {@link Field} to which the instance belongs.
