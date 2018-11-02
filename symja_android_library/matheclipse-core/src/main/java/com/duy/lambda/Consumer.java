@@ -1,5 +1,7 @@
 package com.duy.lambda;
 
+import org.matheclipse.parser.client.math.MathException;
+
 public interface Consumer<T> {
 
     /**
@@ -7,5 +9,5 @@ public interface Consumer<T> {
      *
      * @param t the input argument
      */
-    void accept(T t);
+    void accept(T t) throws MathException;
 }

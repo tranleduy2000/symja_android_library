@@ -29,6 +29,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <pre>
@@ -155,7 +156,7 @@ public class FindRoot extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkRange(ast, 3);
 
 		String method = "Newton";

@@ -20,6 +20,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.NonNegativeIntegerExpected;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrappedException;
@@ -47,6 +48,7 @@ import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -158,7 +160,7 @@ public final class LinearAlgebra {
     private final static class ArrayDepth extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 2);
 
             if (ast.arg1().isAST()) {
@@ -197,7 +199,7 @@ public final class LinearAlgebra {
     private final static class BrayCurtisDistance extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             if (ast.size() != 3) {
                 throw new WrongNumberOfArguments(ast, 2, ast.argSize());
             }
@@ -309,7 +311,7 @@ public final class LinearAlgebra {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 3);
             int[] dimensions = ast.arg1().isMatrix();
             if (dimensions != null && dimensions[0] == dimensions[1]) {
@@ -390,7 +392,7 @@ public final class LinearAlgebra {
     private final static class CholeskyDecomposition extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 2);
 
             RealMatrix matrix;
@@ -533,7 +535,7 @@ public final class LinearAlgebra {
     private final static class Cross extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, Integer.MAX_VALUE);
 
             IExpr arg1 = ast.arg1();
@@ -602,7 +604,7 @@ public final class LinearAlgebra {
     private static class DesignMatrix extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 4);
             IExpr m = ast.arg1();
             IExpr f = ast.arg2();
@@ -690,7 +692,7 @@ public final class LinearAlgebra {
     private static class Diagonal extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             final int[] dim = ast.arg1().isMatrix();
@@ -753,7 +755,7 @@ public final class LinearAlgebra {
     private static class DiagonalMatrix extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             if (ast.arg1().isAST()) {
@@ -843,7 +845,7 @@ public final class LinearAlgebra {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             int maximumLevel = Integer.MAX_VALUE;
@@ -915,7 +917,7 @@ public final class LinearAlgebra {
     private static class Dot extends AbstractNonOrderlessArgMultiple {
 
         @Override
-        public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
+        public IExpr e2ObjArg(final IExpr o0, final IExpr o1) throws MathException {
 
             IExpr temp = numericalDot(o0, o1);
             if (temp.isPresent()) {
@@ -1050,7 +1052,7 @@ public final class LinearAlgebra {
         }
 
         @Override
-        public IExpr numericEval(final IAST ast, EvalEngine engine) {
+        public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
             return evaluate(ast, engine);
         }
 
@@ -1087,7 +1089,7 @@ public final class LinearAlgebra {
     private static class Eigenvalues extends AbstractMatrix1Expr {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             if (ast.size() == 2) {
                 FieldMatrix<IExpr> matrix;
                 try {
@@ -1189,7 +1191,7 @@ public final class LinearAlgebra {
     private static class Eigenvectors extends AbstractMatrix1Expr {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             if (ast.size() == 2) {
                 FieldMatrix<IExpr> matrix;
                 try {
@@ -1302,7 +1304,7 @@ public final class LinearAlgebra {
     private final static class EuclideanDistance extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 3);
             IExpr arg1 = ast.arg1();
             IExpr arg2 = ast.arg2();
@@ -1353,7 +1355,7 @@ public final class LinearAlgebra {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 2);
 
             if (ast.arg1().isInteger()) {
@@ -1400,7 +1402,7 @@ public final class LinearAlgebra {
     private static class HilbertMatrix extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             int rowSize = 0;
@@ -1443,7 +1445,7 @@ public final class LinearAlgebra {
     private static class IdentityMatrix extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 2);
 
             if (ast.arg1().isInteger()) {
@@ -1572,7 +1574,7 @@ public final class LinearAlgebra {
             }
         }
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 4, 5);
 
 			if (ast.arg2().isAST() && ast.arg3().isAST()) {
@@ -1652,7 +1654,7 @@ public final class LinearAlgebra {
         }
 
         @Override
-        public RealMatrix realMatrixEval(RealMatrix matrix) {
+        public RealMatrix realMatrixEval(RealMatrix matrix) throws IllegalArgument {
             final org.hipparchus.linear.LUDecomposition lu = new org.hipparchus.linear.LUDecomposition(matrix);
             DecompositionSolver solver = lu.getSolver();
             if (!solver.isNonSingular()) {
@@ -1683,7 +1685,7 @@ public final class LinearAlgebra {
     private static class JacobiMatrix extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 3);
 
             if (ast.arg1().isVector() >= 0) {
@@ -1750,7 +1752,7 @@ public final class LinearAlgebra {
     private static class LeastSquares extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 3);
 
             if (ast.arg1().isMatrix() != null && ast.arg2().isVector() >= 0) {
@@ -1852,7 +1854,7 @@ public final class LinearAlgebra {
     private static class LinearSolve extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 3);
 
 			final int[] matrixDims = ast.arg1().isMatrix();
@@ -2021,7 +2023,7 @@ public final class LinearAlgebra {
 		 * @param engine
 		 * @return
 		 */
-		private IExpr eval3x3Matrix(FieldMatrix<IExpr> matrix, FieldVector<IExpr> vector, EvalEngine engine) {
+		private IExpr eval3x3Matrix(FieldMatrix<IExpr> matrix, FieldVector<IExpr> vector, EvalEngine engine) throws MathException {
 			IASTAppendable result = F.ListAlloc(matrix.getColumnDimension());
 			IExpr a = matrix.getEntry(0, 0);
 			IExpr b = matrix.getEntry(0, 1);
@@ -2081,7 +2083,7 @@ public final class LinearAlgebra {
     private static class LowerTriangularize extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             int[] dim = ast.arg1().isMatrix();
@@ -2136,7 +2138,7 @@ public final class LinearAlgebra {
     private static class LUDecomposition extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 2);
 
             FieldMatrix<IExpr> matrix;
@@ -2211,7 +2213,7 @@ public final class LinearAlgebra {
     private final static class ManhattanDistance extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             if (ast.size() != 3) {
                 throw new WrongNumberOfArguments(ast, 2, ast.argSize());
             }
@@ -2282,7 +2284,7 @@ public final class LinearAlgebra {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 3);
             int[] dimensions = ast.arg1().isMatrix();
             if (dimensions != null && dimensions[0] == dimensions[1] && dimensions[0] > 0) {
@@ -2344,7 +2346,7 @@ public final class LinearAlgebra {
     private final static class MatrixPower extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 3);
 
             FieldMatrix<IExpr> matrix;
@@ -2447,7 +2449,7 @@ public final class LinearAlgebra {
     private final static class MatrixRank extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             FieldMatrix<IExpr> matrix;
             try {
                 Validate.checkSize(ast, 2);
@@ -2561,7 +2563,7 @@ public final class LinearAlgebra {
     private final static class Norm extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             IExpr arg1 = ast.arg1();
@@ -2576,7 +2578,7 @@ public final class LinearAlgebra {
                     if (p.isInfinity()) {
                         return vector.map(F.Max, new Function<IExpr, IExpr>() {
                             @Override
-                            public IExpr apply(IExpr x) {
+                            public IExpr apply(IExpr x) throws MathException {
                                 return F.Abs(x);
                             }
                         });
@@ -2592,7 +2594,7 @@ public final class LinearAlgebra {
                             }
                             return F.Power(vector.map(F.Plus, new Function<IExpr, IExpr>() {
                                 @Override
-                                public IExpr apply(IExpr x) {
+                                public IExpr apply(IExpr x) throws MathException {
                                     return F.Power(F.Abs(x), p);
                                 }
                             }), p.inverse());
@@ -2602,7 +2604,7 @@ public final class LinearAlgebra {
                 }
                 return F.Sqrt(vector.map(F.Plus, new Function<IExpr, IExpr>() {
                     @Override
-                    public IExpr apply(IExpr x) {
+                    public IExpr apply(IExpr x) throws MathException {
                         return F.Sqr(F.Abs(x));
                     }
                 }));
@@ -2668,7 +2670,7 @@ public final class LinearAlgebra {
     private final static class Normalize extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             IExpr normFunction = F.Norm;
@@ -2738,7 +2740,7 @@ public final class LinearAlgebra {
     private static class NullSpace extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             FieldMatrix<IExpr> matrix;
             boolean togetherMode = engine.isTogetherMode();
             try {
@@ -2790,7 +2792,7 @@ public final class LinearAlgebra {
             }
         });
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
             IExpr arg1 = ast.arg1();
             int[] dim = arg1.isMatrix();
@@ -2857,7 +2859,7 @@ public final class LinearAlgebra {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 3, 4);
             int dim1 = ast.arg1().isVector();
             int dim2 = ast.arg2().isVector();
@@ -2939,7 +2941,7 @@ public final class LinearAlgebra {
         protected final static PseudoInverse CONST = new PseudoInverse();
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             return numericEval(ast, engine);
         }
 
@@ -2983,7 +2985,7 @@ public final class LinearAlgebra {
     private static class QRDecomposition extends AbstractMatrix1Expr {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             // FieldMatrix<IExpr> matrix;
             try {
 
@@ -3076,7 +3078,7 @@ public final class LinearAlgebra {
     private static class RowReduce extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             FieldMatrix<IExpr> matrix;
             boolean togetherMode = engine.isTogetherMode();
             try {
@@ -3166,7 +3168,7 @@ public final class LinearAlgebra {
     private final static class SingularValueDecomposition extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 2);
 
             RealMatrix matrix;
@@ -3256,7 +3258,7 @@ public final class LinearAlgebra {
     private static class ToeplitzMatrix extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 2);
 
             if (ast.arg1().isAST()) {
@@ -3321,7 +3323,7 @@ public final class LinearAlgebra {
     private static class Tr extends AbstractEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             // TODO generalize for tensors
@@ -3464,7 +3466,7 @@ public final class LinearAlgebra {
         }
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.size() == 3) {
@@ -3563,7 +3565,7 @@ public final class LinearAlgebra {
     private final static class UnitVector extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             if (ast.isAST2()) {
@@ -3600,7 +3602,7 @@ public final class LinearAlgebra {
     private static class UpperTriangularize extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkRange(ast, 2, 3);
 
             int[] dim = ast.arg1().isMatrix();
@@ -3653,7 +3655,7 @@ public final class LinearAlgebra {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 2);
             if (ast.arg1().isList()) {
                 final IAST lst = (IAST) ast.arg1();
@@ -3714,7 +3716,7 @@ public final class LinearAlgebra {
     private static class VectorAngle extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
             Validate.checkSize(ast, 3);
             IExpr arg1 = ast.arg1();
             IExpr arg2 = ast.arg2();

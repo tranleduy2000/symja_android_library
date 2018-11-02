@@ -10,6 +10,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.reflection.system.rules.LaplaceTransformRules;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <pre>
@@ -39,7 +40,7 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 4);
 
 		IExpr a1 = ast.arg1();

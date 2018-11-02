@@ -6,6 +6,7 @@ package edu.jas.ufd;
 
 
 import org.apache.log4j.Logger;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class HenselUtil {
     @SuppressWarnings("unchecked")
     public static <MOD extends GcdRingElem<MOD> & Modular> HenselApprox<MOD> liftHensel(
             GenPolynomial<BigInteger> C, BigInteger M, GenPolynomial<MOD> A, GenPolynomial<MOD> B,
-            GenPolynomial<MOD> S, GenPolynomial<MOD> T) throws NoLiftingException {
+            GenPolynomial<MOD> S, GenPolynomial<MOD> T) throws NoLiftingException, MathException {
         if (C == null || C.isZERO()) {
             return new HenselApprox<MOD>(C, C, A, B);
         }
@@ -219,7 +220,7 @@ public class HenselUtil {
     @SuppressWarnings("unchecked")
     public static <MOD extends GcdRingElem<MOD> & Modular> HenselApprox<MOD> liftHensel(
             GenPolynomial<BigInteger> C, BigInteger M, GenPolynomial<MOD> A, GenPolynomial<MOD> B)
-            throws NoLiftingException {
+            throws NoLiftingException, MathException {
         if (C == null || C.isZERO()) {
             return new HenselApprox<MOD>(C, C, A, B);
         }
@@ -265,7 +266,7 @@ public class HenselUtil {
     @SuppressWarnings("unchecked")
     public static <MOD extends GcdRingElem<MOD> & Modular> HenselApprox<MOD> liftHenselQuadratic(
             GenPolynomial<BigInteger> C, BigInteger M, GenPolynomial<MOD> A, GenPolynomial<MOD> B,
-            GenPolynomial<MOD> S, GenPolynomial<MOD> T) throws NoLiftingException {
+            GenPolynomial<MOD> S, GenPolynomial<MOD> T) throws NoLiftingException, MathException {
         if (C == null || C.isZERO()) {
             return new HenselApprox<MOD>(C, C, A, B);
         }
@@ -490,7 +491,7 @@ public class HenselUtil {
     @SuppressWarnings("unchecked")
     public static <MOD extends GcdRingElem<MOD> & Modular> HenselApprox<MOD> liftHenselQuadratic(
             GenPolynomial<BigInteger> C, BigInteger M, GenPolynomial<MOD> A, GenPolynomial<MOD> B)
-            throws NoLiftingException {
+            throws NoLiftingException, MathException {
         if (C == null || C.isZERO()) {
             return new HenselApprox<MOD>(C, C, A, B);
         }
@@ -533,7 +534,7 @@ public class HenselUtil {
     @SuppressWarnings("unchecked")
     public static <MOD extends GcdRingElem<MOD> & Modular> HenselApprox<MOD> liftHenselQuadraticFac(
             GenPolynomial<BigInteger> C, BigInteger M, GenPolynomial<MOD> A, GenPolynomial<MOD> B)
-            throws NoLiftingException {
+            throws NoLiftingException, MathException {
         if (C == null || C.isZERO()) {
             throw new IllegalArgumentException("C must be nonzero");
         }
@@ -579,7 +580,7 @@ public class HenselUtil {
     @SuppressWarnings("unchecked")
     public static <MOD extends GcdRingElem<MOD> & Modular> HenselApprox<MOD> liftHenselQuadraticFac(
             GenPolynomial<BigInteger> C, BigInteger M, GenPolynomial<MOD> A, GenPolynomial<MOD> B,
-            GenPolynomial<MOD> S, GenPolynomial<MOD> T) throws NoLiftingException {
+            GenPolynomial<MOD> S, GenPolynomial<MOD> T) throws NoLiftingException, MathException {
         //System.out.println("*** version for factorization *** ");
         //GenPolynomial<BigInteger>[] AB = new GenPolynomial[2];
         if (C == null || C.isZERO()) {
@@ -1571,7 +1572,7 @@ public class HenselUtil {
     @SuppressWarnings("unchecked")
     public static <MOD extends GcdRingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftHenselMonic(
             GenPolynomial<BigInteger> C, List<GenPolynomial<MOD>> F, long k)
-            throws NoLiftingException {
+            throws NoLiftingException, MathException {
         if (C == null || C.isZERO() || F == null || F.size() == 0) {
             throw new IllegalArgumentException("C must be nonzero and F must be nonempty");
         }

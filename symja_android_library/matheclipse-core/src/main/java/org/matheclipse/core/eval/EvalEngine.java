@@ -41,6 +41,7 @@ import org.matheclipse.core.parser.ExprParserFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.visit.ModuleReplaceAll;
+import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.io.PrintStream;
@@ -506,7 +507,7 @@ public class EvalEngine implements Serializable {
 	 * @param isNumericFunction
 	 *            if <code>true</code> the <code>NumericFunction</code> attribute is set for the <code>ast</code>'s head
 	 */
-	private void evalArg(IASTMutable[] result0, final IAST ast, IExpr arg, int i, boolean isNumericFunction) {
+	private void evalArg(IASTMutable[] result0, final IAST ast, IExpr arg, int i, boolean isNumericFunction) throws MathException {
 		IExpr temp = evalLoop(arg);
 		if (temp.isPresent()) {
 			if (!result0[0].isPresent()) {
@@ -532,7 +533,7 @@ public class EvalEngine implements Serializable {
 	 * @param attr
 	 * @return
 	 */
-	public IASTMutable evalArgs(final IAST ast, final int attr) {
+	public IASTMutable evalArgs(final IAST ast, final int attr) throws MathException {
 		final int astSize = ast.size();
 		if (astSize > 1) {
 			boolean numericMode = fNumericMode;
@@ -587,7 +588,7 @@ public class EvalEngine implements Serializable {
 						selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
 						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
                             @Override
-                            public void accept(IExpr arg, int i) {
+                            public void accept(IExpr arg, int i) throws MathException {
                                 if (!arg.isAST(F.Unevaluated)) {
                                     EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
                                 }
@@ -605,7 +606,7 @@ public class EvalEngine implements Serializable {
 					selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
 						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
 							@Override
-							public void accept(IExpr arg, int i) {
+							public void accept(IExpr arg, int i) throws MathException {
 								if (arg.isAST(F.Evaluate)) {
 									EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
 								}
@@ -635,7 +636,7 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @return <code>F.NIL</code> if no evaluation happened
 	 */
-	public final IExpr evalAST(IAST ast) {
+	public final IExpr evalAST(IAST ast) throws MathException {
 		final IExpr head = ast.head();
 		if (head.isCoreFunctionSymbol()) {
 			IExpr temp = evalEvaluate(ast);
@@ -674,7 +675,7 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @return
 	 */
-	private IExpr evalASTArg1(final IAST ast) {
+	private IExpr evalASTArg1(final IAST ast) throws MathException {
 		// special case ast.isAST1()
 		// head == ast[0] --- arg1 == ast[1]
 		IExpr result = ast.head().evaluateHead(ast, this);
@@ -759,7 +760,7 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @return <code>F.NIL</code> if no evaluation happened
 	 */
-	private IExpr evalASTBuiltinFunction(final ISymbol symbol, final IAST ast) {
+	private IExpr evalASTBuiltinFunction(final ISymbol symbol, final IAST ast) throws MathException {
 		final int attr = symbol.getAttributes();
 		if (fEvalLHSMode) {
 			if ((ISymbol.HOLDALL & attr) == ISymbol.HOLDALL) {
@@ -824,7 +825,7 @@ public class EvalEngine implements Serializable {
 	 *            the AST which should be evaluated
 	 * @return <code>F.NIL</code> if no evaluation was possible
 	 */
-	public IExpr evalAttributes(@Nonnull ISymbol symbol, @Nonnull IAST ast) {
+	public IExpr evalAttributes(@Nonnull ISymbol symbol, @Nonnull IAST ast) throws MathException {
 		IASTMutable tempAST = (IASTMutable) ast;
 		final int astSize = tempAST.size();
 		if (astSize == 2) {
@@ -900,7 +901,7 @@ public class EvalEngine implements Serializable {
 
 	}
 
-	public IExpr evalBlock(final IExpr expr, final IAST localVariablesList) {
+	public IExpr evalBlock(final IExpr expr, final IAST localVariablesList) throws MathException {
 		java.util.IdentityHashMap<ISymbol, ISymbol> blockVariables = new IdentityHashMap<ISymbol, ISymbol>();
 		IExpr result = F.NIL;
 		try {
@@ -935,7 +936,7 @@ public class EvalEngine implements Serializable {
 	 * @param localValue
 	 *            the value
 	 */
-	public IExpr evalBlock(IExpr expr, ISymbol symbol, IExpr localValue) {
+	public IExpr evalBlock(IExpr expr, ISymbol symbol, IExpr localValue) throws MathException {
 //		Deque<IExpr> stack = localStackCreate(symbol);
 //		try {
 //			stack.push(localValue);
@@ -979,7 +980,7 @@ public class EvalEngine implements Serializable {
 	 * @see #evaluate(IExpr)
 	 * @throws WrongArgumentType
 	 */
-	final public double evalDouble(final IExpr expr) {
+	final public double evalDouble(final IExpr expr) throws MathException {
 		if (expr.isReal()) {
 			return ((ISignedNumber) expr).doubleValue();
 		}
@@ -1003,10 +1004,10 @@ public class EvalEngine implements Serializable {
 		rlist[0] = F.NIL;
 		ast.forEach(1, ast.size(), new ObjIntConsumer<IExpr>() {
 			@Override
-			public void accept(IExpr x, int i) {
+			public void accept(IExpr x, int i) throws MathException {
 				if (x.isAST(F.Evaluate)) {
-					EvalEngine.this.evalArg(rlist, ast, x, i, false);
-				}
+				    EvalEngine.this.evalArg(rlist, ast, x, i, false);
+                }
 			}
 		});
 		return rlist[0];
@@ -1114,7 +1115,7 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @return <code>ast</code> if no evaluation was executed.
 	 */
-	public IExpr evalHoldPattern(IAST ast) {
+	public IExpr evalHoldPattern(IAST ast) throws MathException {
 		return evalHoldPattern(ast, false, false);
 	}
 
@@ -1130,7 +1131,7 @@ public class EvalEngine implements Serializable {
 	 *            TODO
 	 * @return <code>ast</code> if no evaluation was executed.
 	 */
-	public IExpr evalHoldPattern(IAST ast, boolean noEvaluation, boolean evalNumericFunction) {
+	public IExpr evalHoldPattern(IAST ast, boolean noEvaluation, boolean evalNumericFunction) throws MathException {
 		boolean evalLHSMode = fEvalLHSMode;
 		try {
 			fEvalLHSMode = true;
@@ -1143,7 +1144,7 @@ public class EvalEngine implements Serializable {
 			fEvalLHSMode = evalLHSMode;
 		}
 	}
-	public IExpr evalLHSPattern(IAST ast) {
+	public IExpr evalLHSPattern(IAST ast) throws MathException {
 		boolean evalLHSMode = fEvalLHSMode;
 		boolean numericMode = fNumericMode;
 		try {
@@ -1171,7 +1172,7 @@ public class EvalEngine implements Serializable {
 	 * @return the evaluated expression or <code>F.NIL</code> if evaluation isn't possible
 	 * @see EvalEngine#evalWithoutNumericReset(IExpr)
 	 */
-	public IExpr evalLoop(@Nonnull final IExpr expr) {
+	public IExpr evalLoop(@Nonnull final IExpr expr) throws MathException {
 		if ((fRecursionLimit > 0) && (fRecursionCounter > fRecursionLimit)) {
 			if (Config.DEBUG) {
 				System.out.println(expr.toString());
@@ -1263,7 +1264,7 @@ public class EvalEngine implements Serializable {
 	 * @return
 	 * @see #evaluate(IExpr)
 	 */
-	final public IExpr evalN(final IExpr expr) {
+	final public IExpr evalN(final IExpr expr) throws MathException {
 		return evaluate(F.N(expr));
 	}
 
@@ -1322,7 +1323,7 @@ public class EvalEngine implements Serializable {
 	 * @return the evaluated object
 	 * @see EvalEngine#evalWithoutNumericReset(IExpr)
 	 */
-	public final IExpr evalQuiet(final IExpr expr) {
+	public final IExpr evalQuiet(final IExpr expr) throws MathException {
 		boolean quiet = isQuietMode();
 		try {
 			setQuietMode(true);
@@ -1341,7 +1342,7 @@ public class EvalEngine implements Serializable {
 	 * @return the evaluated object or <code>F.NUIL</code> if no evaluation was possible
 	 * @see EvalEngine#evalWithoutNumericReset(IExpr)
 	 */
-	public final IExpr evalQuietNull(final IExpr expr) {
+	public final IExpr evalQuietNull(final IExpr expr) throws MathException {
 		boolean quiet = isQuietMode();
 		try {
 			setQuietMode(true);
@@ -1358,7 +1359,7 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @return <code>F.NIL</code> if no evaluation happened
 	 */
-	public IExpr evalRules(ISymbol symbol, IAST argsAST) {
+	public IExpr evalRules(ISymbol symbol, IAST argsAST) throws MathException {
 		// if (symbol instanceof BuiltInSymbol) {
 		// try {
 		// ((BuiltInSymbol) symbol).getEvaluator().await();
@@ -1376,7 +1377,7 @@ public class EvalEngine implements Serializable {
 		})) {
 			ast = argsAST.map(new Function<IExpr, IExpr>() {
 				@Override
-				public IExpr apply(IExpr x) {
+				public IExpr apply(IExpr x) throws MathException {
 					if (x.isAST(F.Unevaluated, 2)) {
 						return ((IAST) x).arg1();
 					}
@@ -1407,7 +1408,7 @@ public class EvalEngine implements Serializable {
 	}
 
 	private IASTMutable evalSetAttributeArg(IAST ast, int i, IAST argI, IASTMutable resultList, boolean noEvaluation,
-			int level) {
+			int level) throws MathException {
 		IExpr expr = evalSetAttributesRecursive(argI, noEvaluation, true, level + 1);
 		if (expr != argI && expr.isPresent()) {
 			if (resultList.isPresent()) {
@@ -1450,7 +1451,7 @@ public class EvalEngine implements Serializable {
 	 * @deprecated use evalHoldPattern
 	 */
 	@Deprecated
-	public IExpr evalSetAttributes(IAST ast) {
+	public IExpr evalSetAttributes(IAST ast) throws MathException {
 		return evalHoldPattern(ast, false, false);
 	}
 
@@ -1466,10 +1467,10 @@ public class EvalEngine implements Serializable {
 	 * @deprecated use evalHoldPattern
 	 */
 	@Deprecated
-	public IExpr evalSetAttributes(IAST ast, boolean noEvaluation) {
+	public IExpr evalSetAttributes(IAST ast, boolean noEvaluation) throws MathException {
 		return evalHoldPattern(ast, noEvaluation, false);
 	}
-	private IExpr evalSetAttributesRecursive(IAST ast, boolean noEvaluation, boolean evalNumericFunction, int level) {
+	private IExpr evalSetAttributesRecursive(IAST ast, boolean noEvaluation, boolean evalNumericFunction, int level) throws MathException {
 		if (ast.isAST(F.Literal, 2)) {
 			return ast.arg1();
 		}
@@ -1554,7 +1555,7 @@ public class EvalEngine implements Serializable {
 	 * @param level
 	 * @return <code>ast</code> if no evaluation was possible
 	 */
-	private IExpr evalSetOrderless(IAST ast, final int attr, boolean noEvaluation, int level) {
+	private IExpr evalSetOrderless(IAST ast, final int attr, boolean noEvaluation, int level) throws MathException {
 		if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
 			EvalAttributes.sort((IASTMutable) ast);
 			if (level > 0 && !noEvaluation && ast.isFreeOfPatterns()) {
@@ -1607,7 +1608,7 @@ public class EvalEngine implements Serializable {
 	 *            <code>F.List()</code> will be used.
 	 * @return
 	 */
-	public final IAST evalTrace(final IExpr expr, Predicate<IExpr> matcher, IAST list) {
+	public final IAST evalTrace(final IExpr expr, Predicate<IExpr> matcher, IAST list) throws MathException {
 		IAST traceList = F.List();
 		try {
 			beginTrace(matcher, list);
@@ -1652,7 +1653,7 @@ public class EvalEngine implements Serializable {
 	 *            the object which should be evaluated
 	 * @return the evaluated object
 	 */
-	public final IExpr evaluate(final IExpr expr) {
+	public final IExpr evaluate(final IExpr expr) throws MathException {
 		boolean numericMode = fNumericMode;
 		try {
 			return evalWithoutNumericReset(expr);
@@ -1671,7 +1672,7 @@ public class EvalEngine implements Serializable {
 	 * @throws org.matheclipse.parser.client.SyntaxError
 	 *             if a parsing error occurs
 	 */
-	final public IExpr evaluate(String expression) {
+	final public IExpr evaluate(String expression) throws MathException {
 		return evaluate(parse(expression));
 	}
 
@@ -1686,7 +1687,7 @@ public class EvalEngine implements Serializable {
 	 * @throws org.matheclipse.parser.client.SyntaxError
 	 *             if a parsing error occurs
 	 */
-	final public IExpr evaluate(String expression, boolean explicitTimes) {
+	final public IExpr evaluate(String expression, boolean explicitTimes) throws MathException {
 		return evaluate(parse(expression, explicitTimes));
 	}
 	/**
@@ -1697,7 +1698,7 @@ public class EvalEngine implements Serializable {
 	 *            the object which should be evaluated
 	 * @return the evaluated object
 	 */
-	public final IExpr evaluateNonNumeric(final IExpr expr) {
+	public final IExpr evaluateNonNumeric(final IExpr expr) throws MathException {
 		boolean numericMode = fNumericMode;
 		try {
 			fNumericMode = false;
@@ -1717,7 +1718,7 @@ public class EvalEngine implements Serializable {
 	 *            the object which should be evaluated
 	 * @return the evaluated object or <code>F.NIL</code> if no evaluation was possible
 	 */
-	public final IExpr evaluateNull(final IExpr expr) {
+	public final IExpr evaluateNull(final IExpr expr) throws MathException {
 		boolean numericMode = fNumericMode;
 		try {
 			return evalLoopExpr(expr);
@@ -1735,11 +1736,11 @@ public class EvalEngine implements Serializable {
 	 * @return the evaluated object
 	 *
 	 */
-	public final IExpr evalWithoutNumericReset(final IExpr expr) {
+	public final IExpr evalWithoutNumericReset(final IExpr expr) throws MathException {
 		return evalLoopExpr(expr).orElse(expr);
 	}
 
-	public final IExpr evalLoopExpr(final IExpr expr) {
+	public final IExpr evalLoopExpr(final IExpr expr) throws MathException {
 		return evalLoop(expr);
 	}
 
@@ -2043,7 +2044,7 @@ public class EvalEngine implements Serializable {
 	 * @throws org.matheclipse.parser.client.SyntaxError
 	 *             if a parsing error occurs
 	 */
-	final public IExpr parse(String expression) {
+	final public IExpr parse(String expression) throws SyntaxError {
 		return parse(expression, Config.EXPLICIT_TIMES_OPERATOR);
 		// final ExprParser parser = new ExprParser(this, fRelaxedSyntax);
 		// return parser.parse(expression);
@@ -2061,7 +2062,7 @@ public class EvalEngine implements Serializable {
 	 *             if a parsing error occurs
 	 */
 
-	final public IExpr parse(String expression, boolean explicitTimes) {
+	final public IExpr parse(String expression, boolean explicitTimes) throws SyntaxError {
 		final ExprParser parser = new ExprParser(this, ExprParserFactory.RELAXED_STYLE_FACTORY, fRelaxedSyntax, false,
 				explicitTimes);
 		return parser.parse(expression);
@@ -2073,7 +2074,7 @@ public class EvalEngine implements Serializable {
 	 * @param str
 	 *            the message which should be printed
 	 */
-	public void printMessage(String str) {
+	public void printMessage(String str) throws IllegalArgument {
 		if (!isQuietMode()) {
 			PrintStream stream = getErrorPrintStream();
 			if (stream == null) {
@@ -2305,7 +2306,7 @@ public class EvalEngine implements Serializable {
 		final int[] listLength = new int[] { 0 };
 		if (ast.exists(new Predicate<IExpr>() {
             @Override
-            public boolean test(IExpr x) {
+            public boolean test(IExpr x) throws IllegalArgument {
                 if (x.isList()) {
                     if (listLength[0] == 0) {
                         listLength[0] = ((IAST) x).argSize();

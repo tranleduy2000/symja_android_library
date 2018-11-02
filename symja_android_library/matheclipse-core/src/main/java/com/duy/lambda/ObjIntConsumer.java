@@ -1,5 +1,7 @@
 package com.duy.lambda;
 
+import org.matheclipse.parser.client.math.MathException;
+
 /**
  * Represents an operation that accepts an object-valued and a
  * {@code int}-valued argument, and returns no result.  This is the
@@ -23,5 +25,5 @@ public interface ObjIntConsumer<T> {
      * @param t     the first input argument
      * @param value the second input argument
      */
-    void accept(T t, int value);
+    void accept(T t, int value) throws MathException;
 }

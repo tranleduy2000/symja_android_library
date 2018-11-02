@@ -10,6 +10,7 @@ import org.matheclipse.core.expression.NumberUtil;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Get the specified history line fro the <code>EvalEngine's</code> history list. <br />
@@ -53,7 +54,7 @@ public class Out extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkRange(ast, 1, 2);
 
 		if (ast.isAST0()) {

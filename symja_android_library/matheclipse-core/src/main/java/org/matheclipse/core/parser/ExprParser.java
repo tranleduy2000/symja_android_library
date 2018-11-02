@@ -124,7 +124,7 @@ public class ExprParser extends Scanner {
 	private final EvalEngine fEngine;
 
 	protected IParserFactory fFactory;
-	public ExprParser(final EvalEngine engine) {
+	public ExprParser(final EvalEngine engine) throws SyntaxError {
 		this(engine, ExprParserFactory.MMA_STYLE_FACTORY, engine.isRelaxedSyntax(), false,
 				Config.EXPLICIT_TIMES_OPERATOR);
 	}
@@ -136,7 +136,7 @@ public class ExprParser extends Scanner {
 	 *            if <code>true</code>, use '('...')' as brackets for arguments
 	 * @throws SyntaxError
 	 */
-	public ExprParser(final EvalEngine engine, final boolean relaxedSyntax) throws SyntaxError {
+	public ExprParser(final EvalEngine engine, final boolean relaxedSyntax) {
 		this(engine, ExprParserFactory.MMA_STYLE_FACTORY, relaxedSyntax);
 	}
 
@@ -154,12 +154,12 @@ public class ExprParser extends Scanner {
 	 *            if <code>true</code>, use '('...')' as brackets for arguments
 	 * @throws SyntaxError
 	 */
-	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax) throws SyntaxError {
+	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax) {
 		this(engine, factory, relaxedSyntax, false, Config.EXPLICIT_TIMES_OPERATOR);
 	}
 
 	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax, boolean packageMode,
-			boolean explicitTimes) throws SyntaxError {
+			boolean explicitTimes) {
 		super(packageMode, explicitTimes);
 		this.fRelaxedSyntax = relaxedSyntax;
 		this.fFactory = factory;

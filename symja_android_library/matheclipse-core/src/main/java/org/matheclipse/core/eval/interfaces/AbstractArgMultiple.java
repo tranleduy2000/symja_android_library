@@ -14,6 +14,7 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcher;
 import org.matheclipse.core.patternmatching.hash.HashedPatternRules;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  *
@@ -21,7 +22,7 @@ import org.matheclipse.core.patternmatching.hash.HashedPatternRules;
 public abstract class AbstractArgMultiple extends AbstractArg2 {
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 
 		if (ast.isAST2()) {
 			IExpr temp = binaryOperator(ast.arg1(), ast.arg2());
@@ -150,7 +151,7 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 	}
 
 	@Override
-	public IExpr binaryOperator(final IExpr o0, final IExpr o1) {
+	public IExpr binaryOperator(final IExpr o0, final IExpr o1) throws MathException {
 		IExpr result = F.NIL;
 		if (o0 instanceof INum) {
 			// use specialized methods for numeric mode
@@ -273,5 +274,5 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 	}
 
 	@Override
-	public abstract IExpr e2IntArg(final IInteger i0, final IInteger i1);
+	public abstract IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException;
 }

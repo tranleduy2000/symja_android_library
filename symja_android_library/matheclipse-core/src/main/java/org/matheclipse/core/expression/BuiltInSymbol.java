@@ -15,6 +15,7 @@ import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -33,7 +34,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
 		/** {@inheritDoc} */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.isAST1()) {
 				return predicate.test(engine.evaluate(ast.arg1())) ? F.True : F.False;
 			}
@@ -42,7 +43,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		}
 
 		@Override
-		public boolean evalArg1Boole(IExpr arg1, EvalEngine engine) {
+		public boolean evalArg1Boole(IExpr arg1, EvalEngine engine) throws MathException {
 			return predicate.test(engine.evaluate(arg1));
 		}
 
@@ -225,7 +226,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr of(EvalEngine engine, IExpr... args) {
+	public IExpr of(EvalEngine engine, IExpr... args) throws MathException {
 		if (fEvaluator instanceof ICoreFunctionEvaluator) {
 			// evaluate a core function (without no rule definitions)
 			final ICoreFunctionEvaluator coreFunction = (ICoreFunctionEvaluator) getEvaluator();
@@ -238,7 +239,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean ofQ(EvalEngine engine, IExpr... args) {
+	public boolean ofQ(EvalEngine engine, IExpr... args) throws MathException {
 		if (args.length == 1) {
 			if (fEvaluator instanceof AbstractCorePredicateEvaluator) {
 			// evaluate a core function (without no rule definitions)

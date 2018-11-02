@@ -6,6 +6,7 @@ import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Get the default value for a symbol (i.e. <code>1</code> is the default value for <code>Times</code>, <code>0</code> is the
@@ -17,7 +18,7 @@ public class Default extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkRange(ast, 2, 4);
 		ISymbol symbol = Validate.checkSymbolType(ast, 1);
 

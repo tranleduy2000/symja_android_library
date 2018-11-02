@@ -1,5 +1,7 @@
 package edu.jas.structure;
 
+import org.matheclipse.parser.client.math.MathException;
+
 public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidElem<C> {
 
     /**
@@ -9,7 +11,7 @@ public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidE
      * @return [this/S, this - (this/S)*S].
      */
     @SuppressWarnings("unchecked")
-    public C[] quotientRemainder(C S) {
+    public C[] quotientRemainder(C S) throws MathException {
         return (C[]) new MonoidElem[]{divide(S), remainder(S)};
     }
 
@@ -21,7 +23,7 @@ public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidE
      * @param a element.
      * @return right, with a * right = this
      */
-    public C rightDivide(C a) {
+    public C rightDivide(C a) throws MathException {
         return divide(a);
     }
 
@@ -33,7 +35,7 @@ public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidE
      * @param a element.
      * @return left, with left * a = this
      */
-    public C leftDivide(C a) {
+    public C leftDivide(C a) throws MathException {
         return divide(a);
     }
 
@@ -69,7 +71,7 @@ public abstract class MonoidElemImpl<C extends MonoidElem<C>> implements MonoidE
      * @return [left, right], with left * a * right = this
      */
     @SuppressWarnings("unchecked")
-    public C[] twosidedDivide(C a) {
+    public C[] twosidedDivide(C a) throws MathException {
         C[] ret = (C[]) new MonoidElem[2];
         ret[0] = divide(a);
         ret[1] = ((MonoidFactory<C>) factory()).getONE();

@@ -14,6 +14,7 @@ import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Visit every node of an <code>IExpr</code> expression.
@@ -28,7 +29,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IInteger element) {
+	public IExpr visit(IInteger element) throws MathException {
 		return F.NIL;
 	}
 
@@ -37,7 +38,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IFraction element) {
+	public IExpr visit(IFraction element) throws MathException {
 		return F.NIL;
 	}
 
@@ -46,7 +47,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IComplex element) {
+	public IExpr visit(IComplex element) throws MathException {
 		return F.NIL;
 	}
 
@@ -55,7 +56,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(INum element) {
+	public IExpr visit(INum element) throws MathException {
 		return F.NIL;
 	}
 
@@ -64,7 +65,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IComplexNum element) {
+	public IExpr visit(IComplexNum element) throws MathException {
 		return F.NIL;
 	}
 
@@ -73,7 +74,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(ISymbol element) {
+	public IExpr visit(ISymbol element) throws MathException {
 		return F.NIL;
 	}
 
@@ -82,7 +83,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IPattern element) {
+	public IExpr visit(IPattern element) throws MathException {
 		return F.NIL;
 	}
 
@@ -91,7 +92,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IPatternSequence element) {
+	public IExpr visit(IPatternSequence element) throws MathException {
 		return F.NIL;
 	}
 
@@ -100,7 +101,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IStringX element) {
+	public IExpr visit(IStringX element) throws MathException {
 		return F.NIL;
 	}
 
@@ -139,7 +140,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IASTMutable ast) {
+	public IExpr visit(IASTMutable ast) throws MathException {
 		IExpr temp = F.NIL;
 		switch (ast.size()) {
 		case 1:
@@ -164,7 +165,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 *         subexpressions, or <code>F.NIL</code>, if no evaluation is
 	 *         possible
 	 */
-	protected IExpr visitAST(IAST ast) {
+	protected IExpr visitAST(IAST ast) throws MathException {
 		IExpr temp;
 		IASTAppendable result = F.NIL;
 		int i = 1;

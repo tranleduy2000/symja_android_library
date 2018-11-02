@@ -1,6 +1,7 @@
 package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.eval.exception.NoEvalException;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Created by Duy on 2/20/2018.
@@ -12,7 +13,7 @@ public abstract class IIteratorImpl<E> implements IIterator<E> {
      *
      * @return
      */
-    public boolean setUp() {
+    public boolean setUp() throws MathException {
         return true;
     }
 
@@ -21,7 +22,7 @@ public abstract class IIteratorImpl<E> implements IIterator<E> {
      *
      * @return
      */
-    public boolean setUpThrow() {
+    public boolean setUpThrow() throws MathException {
         boolean result = setUp();
         if (!isSetIterator() && !isNumericFunction()) {
             throw NoEvalException.CONST;

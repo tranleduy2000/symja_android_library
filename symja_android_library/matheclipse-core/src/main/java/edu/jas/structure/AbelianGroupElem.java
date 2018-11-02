@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import org.matheclipse.parser.client.math.MathException;
+
 /**
  * Abelian group element interface. Defines the additive methods.
  *
@@ -49,7 +51,7 @@ public interface AbelianGroupElem<C> extends Element<C> {
      * @param S
      * @return this - S.
      */
-    C subtract(C S);
+    C subtract(C S) throws MathException;
 
 
     /**

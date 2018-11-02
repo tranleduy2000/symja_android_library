@@ -2,6 +2,7 @@ package org.matheclipse.core.eval.interfaces;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <p>
@@ -11,5 +12,5 @@ import org.matheclipse.core.interfaces.IExpr;
  */
 public interface ISetEvaluator extends IFunctionEvaluator {
 	
-	 IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine);
+	 IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine) throws MathException;
 }

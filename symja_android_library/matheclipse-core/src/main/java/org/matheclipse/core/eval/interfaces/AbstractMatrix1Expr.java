@@ -9,6 +9,7 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
 
@@ -16,7 +17,7 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 2);
 
 		FieldMatrix<IExpr> matrix;
@@ -54,7 +55,7 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
 	public abstract IExpr matrixEval(FieldMatrix<IExpr> matrix);
 
 	@Override
-	public IExpr numericEval(final IAST ast, EvalEngine engine) {
+	public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 2);
 
 		RealMatrix matrix;

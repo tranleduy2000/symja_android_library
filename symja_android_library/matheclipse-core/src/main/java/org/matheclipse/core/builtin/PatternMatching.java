@@ -7,6 +7,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ConditionException;
+import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.RuleCreationError;
 import org.matheclipse.core.eval.exception.Validate;
@@ -34,7 +35,9 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbol.RuleType;
 import org.matheclipse.parser.client.Parser;
+import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.ast.ASTNode;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -86,7 +89,7 @@ public final class PatternMatching {
 
 	public static class Begin extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.size() > 1) {
 				String contextName = Validate.checkContextName(ast, 1);
 				engine.begin(contextName);
@@ -103,7 +106,7 @@ public final class PatternMatching {
 
 	public static class BeginPackage extends AbstractFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.size() > 1) {
 				String contextName = Validate.checkContextName(ast, 1);
 				engine.beginPackage(contextName);
@@ -131,7 +134,7 @@ public final class PatternMatching {
 
 	public static class End extends AbstractCoreFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Context context = engine.end();
 			return F.stringx(context.getContextName());
 		}
@@ -145,7 +148,7 @@ public final class PatternMatching {
 	public static class EndPackage extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			engine.endPackage();
 			return F.Null;
 		}
@@ -161,7 +164,7 @@ public final class PatternMatching {
 		public final static Blank CONST = new Blank();
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.head().equals(F.Blank)) {
 				if (ast.isAST0()) {
 					return F.$b();
@@ -183,7 +186,7 @@ public final class PatternMatching {
 		public final static BlankSequence CONST = new BlankSequence();
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.head().equals(F.BlankSequence)) {
 				if (ast.isAST0()) {
 					return F.$ps((ISymbol) null);
@@ -205,7 +208,7 @@ public final class PatternMatching {
 		public final static BlankNullSequence CONST = new BlankNullSequence();
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.head().equals(F.BlankNullSequence)) {
 				if (ast.isAST0()) {
 					return F.$ps((ISymbol) null, true);
@@ -254,7 +257,7 @@ public final class PatternMatching {
 	private static class Clear extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
 			Lambda.forEach(ast, new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
@@ -289,7 +292,7 @@ public final class PatternMatching {
 	private final static class ClearAll extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
 			Lambda.forEach(ast, new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
@@ -313,7 +316,7 @@ public final class PatternMatching {
 	private static class ContextFunction extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.isAST1() && ast.first().isSymbol()) {
 				return F.stringx(((ISymbol) ast.first()).getContext().getContextName());
 			}
@@ -363,7 +366,7 @@ public final class PatternMatching {
 	private static class Definition extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			ISymbol symbol = Validate.checkSymbolType(ast, 1);
 
@@ -394,7 +397,7 @@ public final class PatternMatching {
 	private static class Evaluate extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.size() == 2) {
 				return engine.evaluate(ast.arg1());
 			}
@@ -416,7 +419,7 @@ public final class PatternMatching {
 	private static class Get extends AbstractFunctionEvaluator {
 
 		private static int addContextToPath(ContextPath contextPath, final List<ASTNode> node, int i,
-				final EvalEngine engine, ISymbol endSymbol) {
+				final EvalEngine engine, ISymbol endSymbol) throws MathException {
 			ContextPath path = engine.getContextPath();
 			try {
 				engine.setContextPath(contextPath);
@@ -496,7 +499,7 @@ public final class PatternMatching {
 		 * @throws IOException
 		 */
 		public static List<ASTNode> parseReader(final BufferedReader reader, final EvalEngine engine)
-				throws IOException {
+                throws IOException, SyntaxError {
 			String record;
 			StringBuilder builder = new StringBuilder(2048);
 			if ((record = reader.readLine()) != null) {
@@ -517,7 +520,7 @@ public final class PatternMatching {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (Config.isFileSystemEnabled(engine)) {
 				Validate.checkSize(ast, 2);
 
@@ -568,7 +571,7 @@ public final class PatternMatching {
 	private static class Hold extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			return F.NIL;
 		}
 
@@ -644,7 +647,7 @@ public final class PatternMatching {
 	private static class HoldPattern extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.size() == 2) {
 				IExpr arg1 = ast.arg1();
 				if (arg1.isAST()) {
@@ -668,7 +671,7 @@ public final class PatternMatching {
 	private static class Identity extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2);
 
 			return ast.arg1();
@@ -683,7 +686,7 @@ public final class PatternMatching {
 	private static class Information extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 
 			if (ast.size() == 2 || ast.size() == 3) {
 				boolean longForm = true;
@@ -753,7 +756,7 @@ public final class PatternMatching {
 	private static class MessageName extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			// Here we only validate the arguments
@@ -810,7 +813,7 @@ public final class PatternMatching {
 		public final static Optional CONST = new Optional();
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.head().equals(F.Optional)) {
 
 				if (ast.size() == 2) {
@@ -850,7 +853,7 @@ public final class PatternMatching {
 		public final static Pattern CONST = new Pattern();
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.head().equals(F.Pattern)) {
 				if (ast.size() == 3) {
 					if (ast.arg1().isSymbol()) {
@@ -892,7 +895,7 @@ public final class PatternMatching {
 	private static final class Put extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (Config.isFileSystemEnabled(engine)) {
 				Validate.checkRange(ast, 3);
 
@@ -959,7 +962,7 @@ public final class PatternMatching {
 	private final static class Rule extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isAST()) {
@@ -999,7 +1002,7 @@ public final class PatternMatching {
 	private final static class RuleDelayed extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isAST()) {
@@ -1126,7 +1129,7 @@ public final class PatternMatching {
 	private final static class Set extends AbstractCoreFunctionEvaluator implements ICreatePatternMatcher {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			final IExpr leftHandSide = ast.arg1();
 			final IExpr head = leftHandSide.head();
@@ -1148,7 +1151,7 @@ public final class PatternMatching {
 
 		@Override
 		public Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
-				final EvalEngine engine) throws RuleCreationError {
+				final EvalEngine engine) throws MathException {
 
 			if (leftHandSide.isAST()) {
 				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
@@ -1245,7 +1248,7 @@ public final class PatternMatching {
 		// public final static SetDelayed CONST = new SetDelayed();
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			final IExpr leftHandSide = ast.arg1();
 			final IExpr rightHandSide = ast.arg2();
@@ -1272,7 +1275,7 @@ public final class PatternMatching {
 
 	}
 
-	public static Object[] setDownRule(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
+	public static Object[] setDownRule(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) throws RuleCreationError {
 		final Object[] result = new Object[] { null, rightHandSide };
 		if (leftHandSide.isAST()) {
 			final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
@@ -1293,7 +1296,7 @@ public final class PatternMatching {
 		throw new RuleCreationError(leftHandSide);
 	}
 
-	public static Object[] setDelayedDownRule(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
+	public static Object[] setDelayedDownRule(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) throws RuleCreationError {
 		final Object[] result = new Object[] { null, rightHandSide };
 		if (leftHandSide.isAST()) {
 			final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
@@ -1321,7 +1324,7 @@ public final class PatternMatching {
 	// packageMode) ;
 	// }
 
-	public static void setDelayedDownRule(int priority, IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
+	public static void setDelayedDownRule(int priority, IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) throws RuleCreationError {
 		if (leftHandSide.isAST()) {
 			final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
 
@@ -1375,7 +1378,7 @@ public final class PatternMatching {
 	private static class Unique extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 1, 2);
 
 			final int moduleCounter = engine.incModuleCounter();
@@ -1459,7 +1462,7 @@ public final class PatternMatching {
 	private final static class Unset extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			final IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isList()) {
@@ -1474,7 +1477,7 @@ public final class PatternMatching {
 		}
 
 		public void removePatternMatcher(IExpr leftHandSide, boolean packageMode, EvalEngine engine)
-				throws RuleCreationError {
+                throws MathException {
 
 			if (leftHandSide.isAST()) {
 				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
@@ -1482,7 +1485,7 @@ public final class PatternMatching {
 			removeRule(leftHandSide, packageMode);
 		}
 
-		public void removeRule(IExpr leftHandSide, boolean packageMode) {
+		public void removeRule(IExpr leftHandSide, boolean packageMode) throws RuleCreationError, IllegalArgument {
 			if (leftHandSide.isAST()) {
 				final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
 				if (!lhsSymbol.removeRule(ISymbol.RuleType.SET, false, leftHandSide, packageMode)) {
@@ -1502,7 +1505,7 @@ public final class PatternMatching {
 			throw new RuleCreationError(leftHandSide);
 		}
 
-		private void printAssignmentNotFound(final IExpr leftHandSide) {
+		private void printAssignmentNotFound(final IExpr leftHandSide) throws IllegalArgument {
 			EvalEngine.get().printMessage("Assignment not found for: " + leftHandSide.toString());
 		}
 
@@ -1516,7 +1519,7 @@ public final class PatternMatching {
 	private final static class UpSet extends AbstractCoreFunctionEvaluator implements ICreatePatternMatcher {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			final IExpr leftHandSide = ast.arg1();
 			IExpr rightHandSide = ast.arg2();
@@ -1538,7 +1541,7 @@ public final class PatternMatching {
 
 		@Override
 		public Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
-				EvalEngine engine) throws RuleCreationError {
+				EvalEngine engine) throws MathException {
 			final Object[] result = new Object[2];
 
 			if (leftHandSide.isAST()) {
@@ -1582,7 +1585,7 @@ public final class PatternMatching {
 	private final static class UpSetDelayed extends AbstractCoreFunctionEvaluator implements ICreatePatternMatcher {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			final IExpr leftHandSide = ast.arg1();
 			final IExpr rightHandSide = ast.arg2();
@@ -1629,7 +1632,7 @@ public final class PatternMatching {
 
 	}
 
-	public static IExpr evaluatePackage(final List<ASTNode> node, final EvalEngine engine) {
+	public static IExpr evaluatePackage(final List<ASTNode> node, final EvalEngine engine) throws MathException {
 		IExpr temp;
 		int i = 0;
 		AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
@@ -1664,7 +1667,7 @@ public final class PatternMatching {
 		return result;
 	}
 
-	public static IExpr getFile(File file, EvalEngine engine) {
+	public static IExpr getFile(File file, EvalEngine engine) throws IllegalArgument {
 		boolean packageMode = engine.isPackageMode();
 		try {
 			engine.setPackageMode(true);

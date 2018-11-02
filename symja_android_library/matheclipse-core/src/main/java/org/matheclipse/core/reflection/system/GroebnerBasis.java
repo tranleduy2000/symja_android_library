@@ -10,6 +10,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class GroebnerBasis extends AbstractFunctionEvaluator {
 	 * </ul>
 	 */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		if (ast.size() >= 3) {
 
 			if (ast.arg1().isVector() < 0 || ast.arg2().isVector() < 0) {

@@ -125,7 +125,7 @@ public class Convert {
 	 */
 	@Deprecated
 	public static RealMatrix list2RealMatrix(final IAST listMatrix)
-			throws ClassCastException, IndexOutOfBoundsException {
+			throws ClassCastException, IndexOutOfBoundsException, WrongArgumentType {
 		if (listMatrix == null) {
 			return null;
 		}
@@ -161,7 +161,7 @@ public class Convert {
 	 */
 	@Deprecated
 	public static RealVector list2RealVector(final IAST listVector)
-			throws ClassCastException, IndexOutOfBoundsException {
+			throws ClassCastException, IndexOutOfBoundsException, WrongArgumentType {
 		if (listVector instanceof ASTRealVector) {
 			return ((ASTRealVector) listVector).getRealVector();
 		}

@@ -25,6 +25,7 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.Matcher;
 import org.matheclipse.core.visit.AbstractVisitorBoolean;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -259,7 +260,7 @@ public class Eliminate extends AbstractFunctionEvaluator {
 	 * @param position
 	 * @return
 	 */
-	private static IAST checkEquations(final IAST ast, int position, EvalEngine engine) {
+	private static IAST checkEquations(final IAST ast, int position, EvalEngine engine) throws WrongArgumentType {
 		IExpr arg = ast.get(position);
 		if (arg.isList()) {
 			IAST list = (IAST) arg;
@@ -295,7 +296,7 @@ public class Eliminate extends AbstractFunctionEvaluator {
 	 *            the variable which should be eliminated.
 	 * @return <code>F.NIL</code> if we can't find an equation for the given <code>variable</code>.
 	 */
-	private static IExpr eliminateAnalyze(IAST equalAST, IExpr variable) {
+	private static IExpr eliminateAnalyze(IAST equalAST, IExpr variable) throws MathException {
 		if (equalAST.isEqual()) {
 			IExpr arg1 = equalAST.arg1();
 			IExpr arg2 = equalAST.arg2();
@@ -343,7 +344,7 @@ public class Eliminate extends AbstractFunctionEvaluator {
 	 * @return <code>F.NIL</code> if we can't find an equation for the given <code>variable</code>.
 	 */
 	private static IExpr extractVariable(IExpr exprWithVariable, IExpr exprWithoutVariable, Predicate<IExpr> predicate,
-			IExpr variable) {
+			IExpr variable) throws MathException {
 		if (exprWithVariable.equals(variable)) {
 			return exprWithoutVariable;
 		}
@@ -512,7 +513,7 @@ public class Eliminate extends AbstractFunctionEvaluator {
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 3);
 		try {
 			IAST vars = Validate.checkSymbolOrSymbolList(ast, 2);

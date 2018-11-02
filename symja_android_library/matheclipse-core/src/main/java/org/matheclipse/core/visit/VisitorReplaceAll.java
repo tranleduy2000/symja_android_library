@@ -3,6 +3,7 @@ package org.matheclipse.core.visit;
 import com.duy.lambda.Function;
 
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.Functors;
 import org.matheclipse.core.interfaces.IAST;
@@ -17,6 +18,7 @@ import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.Map;
 
@@ -47,7 +49,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 		super();
 		this.fFunction = new Function<IExpr, IExpr>() {
 			@Override
-			public IExpr apply(IExpr x) {
+			public IExpr apply(IExpr x) throws MathException {
 				IExpr subst = map.get(x);
 				if (subst != null) {
 					return subst;
@@ -58,18 +60,18 @@ public class VisitorReplaceAll extends VisitorExpr {
 		this.fOffset = offset;
 	}
 
-	public VisitorReplaceAll(IAST ast) {
+	public VisitorReplaceAll(IAST ast) throws WrongArgumentType {
 		this(ast, 0);
 	}
 
-	public VisitorReplaceAll(IAST ast, int offset) {
+	public VisitorReplaceAll(IAST ast, int offset) throws WrongArgumentType {
 		super();
 		this.fFunction = Functors.rules(ast, EvalEngine.get());
 		this.fOffset = offset;
 	}
 
 	@Override
-	public IExpr visit(IInteger element) {
+	public IExpr visit(IInteger element) throws MathException {
 		return fFunction.apply(element);
 	}
 
@@ -78,7 +80,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IFraction element) {
+	public IExpr visit(IFraction element) throws MathException {
 		return fFunction.apply(element);
 	}
 
@@ -87,7 +89,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IComplex element) {
+	public IExpr visit(IComplex element) throws MathException {
 		return fFunction.apply(element);
 	}
 
@@ -96,7 +98,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(INum element) {
+	public IExpr visit(INum element) throws MathException {
 		return fFunction.apply(element);
 	}
 
@@ -105,7 +107,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IComplexNum element) {
+	public IExpr visit(IComplexNum element) throws MathException {
 		return fFunction.apply(element);
 	}
 
@@ -114,12 +116,12 @@ public class VisitorReplaceAll extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(ISymbol element) {
+	public IExpr visit(ISymbol element) throws MathException {
 		return fFunction.apply(element);
 	}
 
 	@Override
-	public IExpr visit(IPattern element) {
+	public IExpr visit(IPattern element) throws MathException {
 		IExpr temp = fFunction.apply(element);
 		if (temp.isPresent()) {
 			return temp;
@@ -138,7 +140,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 	}
 
 	@Override
-	public IExpr visit(IPatternSequence element) {
+	public IExpr visit(IPatternSequence element) throws MathException {
 		IExpr temp = fFunction.apply(element);
 		if (temp.isPresent()) {
 			return temp;
@@ -158,12 +160,12 @@ public class VisitorReplaceAll extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IStringX element) {
+	public IExpr visit(IStringX element) throws MathException {
 		return fFunction.apply(element);
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) {
+	public IExpr visit(IASTMutable ast) throws MathException {
 		IExpr temp = fFunction.apply(ast);
 		if (temp.isPresent()) {
 			return temp;
@@ -172,7 +174,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 	}
 
 	@Override
-	protected IExpr visitAST(IAST ast) {
+	protected IExpr visitAST(IAST ast) throws MathException {
 		IASTMutable result = F.NIL;
 		int i = fOffset;
 		int size = ast.size();

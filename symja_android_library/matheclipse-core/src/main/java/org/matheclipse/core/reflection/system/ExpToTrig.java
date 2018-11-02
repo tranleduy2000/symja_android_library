@@ -10,6 +10,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <pre>
@@ -30,7 +31,7 @@ public class ExpToTrig extends AbstractEvaluator {
 	 * <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">Hyperbolic function</a>
 	 */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 
 		if (ast.size() == 2) {
 			IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
@@ -41,7 +42,7 @@ public class ExpToTrig extends AbstractEvaluator {
 			IExpr arg1 = ast.arg1();
 			temp = arg1.replaceAll(new Function<IExpr, IExpr>() {
 				@Override
-				public IExpr apply(IExpr x) {
+				public IExpr apply(IExpr x) throws MathException {
 					if (x.isPower() && x.base().equals(F.E)) {
 						IExpr exponent = x.exponent();
 						return F.Plus(F.Cosh(exponent), F.Sinh(exponent));

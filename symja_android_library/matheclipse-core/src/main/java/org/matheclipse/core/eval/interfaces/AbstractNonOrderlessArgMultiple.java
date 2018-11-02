@@ -6,6 +6,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  *
@@ -21,7 +22,7 @@ public class AbstractNonOrderlessArgMultiple extends AbstractArg2 {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		int size = ast.size();
 		if (size == 3) {
 			return binaryOperator(ast.arg1(), ast.arg2());

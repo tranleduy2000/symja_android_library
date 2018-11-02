@@ -5,6 +5,7 @@ import org.matheclipse.core.eval.exception.ConditionException;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 public abstract class AbstractPatternMatcherMethod extends PatternMatcher {
 
@@ -41,7 +42,7 @@ public abstract class AbstractPatternMatcherMethod extends PatternMatcher {
 		return super.hashCode() * 73;
 	}
 
-	abstract IExpr evalMethod();
+	abstract IExpr evalMethod() throws MathException;
 
 	/** {@inheritDoc} */
 	@Override

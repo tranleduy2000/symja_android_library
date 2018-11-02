@@ -152,12 +152,12 @@ public class VisitorRemoveLevelSpecification extends VisitorLevelSpecification {
 	}
 
 	@Override
-	public IExpr visit(ISymbol element) {
+	public IExpr visit(ISymbol element) throws MathException {
 		return visitAtom( element);
 	}
 
 	@Override
-	public IExpr visit(IPattern element) {
+	public IExpr visit(IPattern element) throws MathException {
 		return visitAtom( element);
 	}
 

@@ -1,6 +1,8 @@
 package com.duy.lambda;
 
 
+import org.matheclipse.parser.client.math.MathException;
+
 public interface Function<T, R> {
 
     /**
@@ -9,5 +11,5 @@ public interface Function<T, R> {
      * @param t the function argument
      * @return the function result
      */
-    R apply(T t);
+    R apply(T t) throws MathException;
 }

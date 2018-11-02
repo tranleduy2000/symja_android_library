@@ -5,11 +5,13 @@ import com.duy.lambda.Function;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 public class FinancialFunctions {
 
@@ -25,7 +27,7 @@ public class FinancialFunctions {
 	private static class Annuity extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3, 4);
 			return F.NIL;
 		}
@@ -35,7 +37,7 @@ public class FinancialFunctions {
 	private static class AnnuityDue extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3, 4);
 			return F.NIL;
 		}
@@ -45,7 +47,7 @@ public class FinancialFunctions {
 	private static class EffectiveInterest extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 			final IExpr a = ast.arg1();
 			if (ast.size() == 2) {
@@ -53,7 +55,7 @@ public class FinancialFunctions {
 				if (dim >= 0) {
 					IAST l = ((IAST) a).map(new Function<IExpr, IExpr>() {
 						@Override
-						public IExpr apply(IExpr x) {
+						public IExpr apply(IExpr x) throws MathException {
 							return x.inc();
 						}
 					}, 1);
@@ -69,7 +71,7 @@ public class FinancialFunctions {
 				if (dim >= 0) {
 					return ((IAST) a).map(new Function<IExpr, IExpr>() {
 						@Override
-						public IExpr apply(IExpr x) {
+						public IExpr apply(IExpr x) throws IllegalArgument {
 							return EffectiveInterest.this.effectiveInterestFormula(x, b);
 						}
 					}, 1);
@@ -79,7 +81,7 @@ public class FinancialFunctions {
 			return F.NIL;
 		}
 
-		private IExpr effectiveInterestFormula(IExpr a, IExpr b) {
+		private IExpr effectiveInterestFormula(IExpr a, IExpr b) throws IllegalArgument {
 			if (b.isZero()) {
 				return
 				// [$ -1 + E^a $]
@@ -94,7 +96,7 @@ public class FinancialFunctions {
 	private static class TimeValue extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 4);
 			IExpr a = ast.arg1();
 			IExpr b = ast.arg2();

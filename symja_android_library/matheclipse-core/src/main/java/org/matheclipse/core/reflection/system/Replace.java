@@ -13,6 +13,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * <pre>
@@ -55,7 +56,7 @@ public class Replace extends AbstractEvaluator {
 		 * @return the expression created by the replacements or <code>null</code> if no replacement occurs
 		 */
 		@Override
-		public IExpr apply(IExpr input) {
+		public IExpr apply(IExpr input) throws MathException {
 			if (rules.isList()) {
 				for (IExpr element : (IAST) rules) {
 					if (element.isRuleAST()) {
@@ -89,7 +90,7 @@ public class Replace extends AbstractEvaluator {
 
 	}
 
-	private static IExpr replaceExpr(final IAST ast, IExpr arg1, IExpr rules, final EvalEngine engine) {
+	private static IExpr replaceExpr(final IAST ast, IExpr arg1, IExpr rules, final EvalEngine engine) throws MathException {
 		if (rules.isListOfLists()) {
 			IAST rulesList = (IAST) rules;
 			IASTAppendable result = F.ListAlloc(rulesList.size());
@@ -141,7 +142,7 @@ public class Replace extends AbstractEvaluator {
 	}
 
 	private static IExpr replaceExprWithLevelSpecification(final IAST ast, IExpr arg1, IExpr rules,
-			IExpr exprLevelSpecification, EvalEngine engine) {
+			IExpr exprLevelSpecification, EvalEngine engine) throws MathException {
 		// use replaceFunction#setRule() method to set the current rules which
 		// are initialized with null
 		ReplaceFunction replaceFunction = new ReplaceFunction(ast, null, engine);
@@ -184,7 +185,7 @@ public class Replace extends AbstractEvaluator {
 	 * @param rule
 	 * @return
 	 */
-	private static IExpr replaceRule(IExpr arg1, IAST rule, EvalEngine engine) {
+	private static IExpr replaceRule(IExpr arg1, IAST rule, EvalEngine engine) throws MathException {
 		Function<IExpr, IExpr> function = Functors.rules(rule, engine);
 		IExpr temp = function.apply(arg1);
 		if (temp.isPresent()) {
@@ -197,7 +198,7 @@ public class Replace extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		if (ast.isAST1()) {
 			return F.operatorFormAST1(ast);
 		}

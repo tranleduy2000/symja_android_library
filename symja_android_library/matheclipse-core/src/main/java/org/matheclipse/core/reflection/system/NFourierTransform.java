@@ -13,6 +13,7 @@ import org.matheclipse.core.generic.UnaryNumerical;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 public class NFourierTransform extends AbstractFunctionEvaluator {
 
@@ -20,7 +21,7 @@ public class NFourierTransform extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkRange(ast, 4, 5);
 
 		IExpr expr = ast.arg1();

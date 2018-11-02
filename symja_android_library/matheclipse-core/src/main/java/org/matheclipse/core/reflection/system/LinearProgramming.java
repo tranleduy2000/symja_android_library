@@ -20,6 +20,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -81,13 +82,13 @@ public class LinearProgramming extends AbstractFunctionEvaluator {
 	 * linear optimization problems with linear equality and inequality constraints.
 	 */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		// switch to numeric calculation
 		return numericEval(ast, engine);
 	}
 
 	@Override
-	public IExpr numericEval(final IAST ast, EvalEngine engine) {
+	public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 4);
 		try {
 			if (ast.arg1().isList() && ast.arg2().isList() && ast.arg3().isList()) {

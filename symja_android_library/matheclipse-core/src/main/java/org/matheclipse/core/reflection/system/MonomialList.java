@@ -21,6 +21,7 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
 import org.matheclipse.core.polynomials.ExprTermOrder;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,7 @@ public class MonomialList extends AbstractFunctionEvaluator {
 	 * See <a href="http://en.wikipedia.org/wiki/Monomial">Wikipedia - Monomial<a/>
 	 */
 	@Override
-	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
 		Validate.checkRange(ast, 2, 5);
 
 		IExpr expr = F.evalExpandAll(ast.arg1(), engine);

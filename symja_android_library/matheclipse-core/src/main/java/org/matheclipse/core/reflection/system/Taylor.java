@@ -7,6 +7,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Power series expansion with Taylor formula
@@ -16,7 +17,7 @@ public class Taylor extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		if (ast.isAST2() && (ast.arg2().isVector() == 3)) {
 
 			IAST list = (IAST) ast.arg2();

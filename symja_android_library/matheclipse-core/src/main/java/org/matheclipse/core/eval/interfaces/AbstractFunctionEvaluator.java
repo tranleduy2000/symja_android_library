@@ -11,6 +11,7 @@ import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -426,7 +427,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 
 	/** {@inheritDoc} */
 	@Override
-	abstract public IExpr evaluate(final IAST ast,  EvalEngine engine);
+	abstract public IExpr evaluate(final IAST ast,  EvalEngine engine) throws MathException;
 
 	/**
 	 * Get the predefined rules for this function symbol.

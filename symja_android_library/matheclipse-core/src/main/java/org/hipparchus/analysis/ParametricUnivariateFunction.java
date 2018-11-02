@@ -17,6 +17,8 @@
 
 package org.hipparchus.analysis;
 
+import org.matheclipse.parser.client.math.MathException;
+
 /**
  * An interface representing a real function that depends on one independent
  * variable plus some extra parameters.
@@ -29,7 +31,7 @@ public interface ParametricUnivariateFunction {
      * @param parameters Function parameters.
      * @return the value.
      */
-    double value(double x, double... parameters);
+    double value(double x, double... parameters) throws MathException;
 
     /**
      * Compute the gradient of the function with respect to its parameters.
@@ -38,5 +40,5 @@ public interface ParametricUnivariateFunction {
      * @param parameters Function parameters.
      * @return the value.
      */
-    double[] gradient(double x, double... parameters);
+    double[] gradient(double x, double... parameters) throws MathException;
 }

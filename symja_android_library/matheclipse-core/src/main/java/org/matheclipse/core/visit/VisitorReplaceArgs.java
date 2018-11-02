@@ -6,6 +6,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Replace all occurrences of expressions with the slot at that position in the AST list.
@@ -21,7 +22,7 @@ public class VisitorReplaceArgs extends VisitorExpr {
 	}
 
 	@Override
-	public IExpr visit(ISymbol element) {
+	public IExpr visit(ISymbol element) throws MathException {
 		for (int i = 1; i < astSlots.size(); i++) {
 			if (astSlots.get(i).equals(element)) {
 				return F.Slot(F.ZZ(i));
@@ -31,7 +32,7 @@ public class VisitorReplaceArgs extends VisitorExpr {
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) {
+	public IExpr visit(IASTMutable ast) throws MathException {
 		IExpr temp;
 		IASTAppendable result = F.NIL;
 		int size = ast.size();

@@ -20,6 +20,7 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.AbstractVisitor;
 import org.matheclipse.core.visit.VisitorExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.HashMap;
 
@@ -113,7 +114,7 @@ public class Share extends AbstractFunctionEvaluator {
 		 * @return <code>F.NIL</code>, if no evaluation is possible
 		 */
 		@Override
-		public IExpr visit(ISymbol element) {
+		public IExpr visit(ISymbol element) throws MathException {
 			return null;
 		}
 
@@ -122,7 +123,7 @@ public class Share extends AbstractFunctionEvaluator {
 		 * @return <code>F.NIL</code>, if no evaluation is possible
 		 */
 		@Override
-		public IExpr visit(IPattern element) {
+		public IExpr visit(IPattern element) throws MathException {
 			return null;
 		}
 
@@ -145,7 +146,7 @@ public class Share extends AbstractFunctionEvaluator {
 		}
 
 		@Override
-		public IExpr visit(IASTMutable ast) {
+		public IExpr visit(IASTMutable ast) throws MathException {
 			IExpr temp = fFunction.apply(ast);
 			if (temp != null) {
 				return temp;
@@ -154,7 +155,7 @@ public class Share extends AbstractFunctionEvaluator {
 		}
 
 		@Override
-		protected IExpr visitAST(IAST ast) {
+		protected IExpr visitAST(IAST ast) throws MathException {
 			IExpr temp;
 			boolean evaled = false;
 			int i = fOffset;
@@ -179,7 +180,7 @@ public class Share extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 2);
 
 		if (ast.arg1().isAST()) {

@@ -14,6 +14,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.Arrays;
 
@@ -39,7 +40,7 @@ public class Plot extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		if ((ast.size() >= 3) && (ast.size() <= 4) && ast.arg2().isList()) {
 			try {
 				final IAST rangeList = (IAST) ast.arg2();

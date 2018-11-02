@@ -9,6 +9,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.DerivativeRules;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -128,7 +129,7 @@ public class Derivative extends AbstractFunctionEvaluator implements DerivativeR
 	}
 
 	@Override
-	public IExpr evaluate(IAST ast, EvalEngine engine) {
+	public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
 		IAST[] derivativeAST = ast.isDerivative();
 		if (derivativeAST != null) {
 			IAST derivativeHead = derivativeAST[0];

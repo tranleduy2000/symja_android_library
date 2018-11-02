@@ -13,6 +13,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.VisitorPlusTimesPowerReplaceAll;
+import org.matheclipse.parser.client.math.MathException;
 
 import static org.matheclipse.core.expression.F.Binomial;
 import static org.matheclipse.core.expression.F.C1D2;
@@ -301,7 +302,7 @@ public class TrigExpand extends AbstractEvaluator {
 	 * <a href="http://en.wikipedia.org/wiki/List_of_trigonometric_identities" >List of trigonometric identities</a>
 	 */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 2);
 
 		IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);

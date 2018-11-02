@@ -9,6 +9,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.HornerScheme;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Generate the horner scheme for univariate polynomials. See: <a
@@ -25,7 +26,7 @@ public class Horner extends AbstractFunctionEvaluator {
 
 	@Override
 	@Deprecated
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 2);
 
 		if (ast.arg1().isAST()) {

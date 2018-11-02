@@ -15,6 +15,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -199,7 +200,7 @@ public final class Combinatoric {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3);
 			List<IAST> la = new ArrayList<IAST>(ast.argSize());
 			for (int i = 1; i < ast.size(); i++) {
@@ -221,7 +222,7 @@ public final class Combinatoric {
 	private final static class DiceDissimilarity extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			int dim1 = ast.arg1().isVector();
@@ -403,7 +404,7 @@ public final class Combinatoric {
 
 		/** {@inheritDoc} */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			IntRangeSpec range = IntRangeSpec.createNonNegative(ast, 2);
@@ -457,7 +458,7 @@ public final class Combinatoric {
 	private static class JaccardDissimilarity extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			int dim1 = ast.arg1().isVector();
@@ -507,7 +508,7 @@ public final class Combinatoric {
 
 		/** {@inheritDoc} */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			if (ast.arg1().isAST() && ast.arg2().isInteger()) {
 				final IAST listArg0 = (IAST) ast.arg1();
@@ -789,7 +790,7 @@ public final class Combinatoric {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			if (ast.arg1().isAST() && ast.arg2().isInteger()) {
 				final IAST listArg0 = (IAST) ast.arg1();
@@ -808,7 +809,7 @@ public final class Combinatoric {
 	private final static class MatchingDissimilarity extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			int dim1 = ast.arg1().isVector();
@@ -863,7 +864,7 @@ public final class Combinatoric {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3, 4);
 
 			if (ast.arg1().isAST()) {
@@ -1127,7 +1128,7 @@ public final class Combinatoric {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
@@ -1189,7 +1190,7 @@ public final class Combinatoric {
 	private final static class RogersTanimotoDissimilarity extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			int dim1 = ast.arg1().isVector();
@@ -1247,7 +1248,7 @@ public final class Combinatoric {
 	private final static class RussellRaoDissimilarity extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			int dim1 = ast.arg1().isVector();
@@ -1300,7 +1301,7 @@ public final class Combinatoric {
 	private final static class SokalSneathDissimilarity extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			int dim1 = ast.arg1().isVector();
@@ -1433,7 +1434,7 @@ public final class Combinatoric {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 1, 3);
 			if (ast.isAST0()) {
 				return F.NIL;
@@ -1489,7 +1490,7 @@ public final class Combinatoric {
 	private final static class Tuples extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -1578,7 +1579,7 @@ public final class Combinatoric {
 	private final static class YuleDissimilarity extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			int dim1 = ast.arg1().isVector();

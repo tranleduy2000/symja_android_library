@@ -1,6 +1,7 @@
 package org.matheclipse.core.eval.interfaces;
 
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
@@ -17,13 +18,14 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Evaluate a function with 2 arguments.
  */
 public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 
-	public IExpr binaryOperator(final IExpr o0, final IExpr o1) {
+	public IExpr binaryOperator(final IExpr o0, final IExpr o1) throws MathException {
 		IExpr result = F.NIL;
 		if (o0.isNumber() && o1.isNumber()) {
 			result = e2NumericArg(o0, o1);
@@ -95,7 +97,7 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
-	private IExpr e2NumericArg(final IExpr o0, final IExpr o1) {
+	private IExpr e2NumericArg(final IExpr o0, final IExpr o1) throws MathException {
 		IExpr result = F.NIL;
 		if (o0 instanceof ApcomplexNum) {
 			if (o1.isNumber()) {
@@ -171,11 +173,11 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
-	public IExpr e2ApfloatArg(final ApfloatNum af0, final ApfloatNum af1) {
+	public IExpr e2ApfloatArg(final ApfloatNum af0, final ApfloatNum af1) throws IllegalArgument {
 		return F.NIL;
 	}
 
-	public IExpr e2DblArg(final INum d0, final INum d1) {
+	public IExpr e2DblArg(final INum d0, final INum d1) throws IllegalArgument {
 		return F.NIL;
 	}
 
@@ -199,7 +201,7 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
-	public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
+	public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
 		return F.NIL;
 	}
 
@@ -210,7 +212,7 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 	 * @param o1
 	 * @return <code>F#NIL</code> if no evaluation is possible.
 	 */
-	public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
+	public IExpr e2ObjArg(final IExpr o0, final IExpr o1) throws MathException {
 		return F.NIL;
 	}
 
@@ -227,7 +229,7 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 3);
 
 		return binaryOperator(ast.arg1(), ast.arg2());

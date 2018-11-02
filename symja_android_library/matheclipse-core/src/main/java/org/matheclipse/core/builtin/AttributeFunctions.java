@@ -12,6 +12,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 public class AttributeFunctions {
 	static {
@@ -40,7 +41,7 @@ public class AttributeFunctions {
 	private final static class Attributes extends AbstractCoreFunctionEvaluator implements ISetEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isSymbol()) {
@@ -50,7 +51,7 @@ public class AttributeFunctions {
 			return F.NIL;
 		}
 
-		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine) {
+		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine) throws MathException {
 			if (leftHandSide.isAST(F.Attributes, 2)) {
 				IExpr temp=engine.evaluate(F.SetAttributes(leftHandSide.first(), rightHandSide));
 				if (temp.equals(F.Null) ) {
@@ -95,7 +96,7 @@ public class AttributeFunctions {
 	private final static class ClearAttributes extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isSymbol()) {
@@ -126,7 +127,7 @@ public class AttributeFunctions {
 		 * @param engine
 		 * @return
 		 */
-		private IExpr clearAttributes(final ISymbol sym, IExpr attributes, EvalEngine engine) {
+		private IExpr clearAttributes(final ISymbol sym, IExpr attributes, EvalEngine engine) throws RuleCreationError {
 			if (!engine.isPackageMode()) {
 				if (Config.SERVER_MODE && (sym.toString().charAt(0) != '$')) {
 					throw new RuleCreationError(sym);
@@ -250,7 +251,7 @@ public class AttributeFunctions {
 	private final static class SetAttributes extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isSymbol()) {
@@ -273,7 +274,7 @@ public class AttributeFunctions {
 		 * @param engine
 		 * @return
 		 */
-		private static IExpr addAttributes(final ISymbol sym, IExpr attributes, EvalEngine engine) {
+		private static IExpr addAttributes(final ISymbol sym, IExpr attributes, EvalEngine engine) throws RuleCreationError {
 			if (!engine.isPackageMode()) {
 				if (Config.SERVER_MODE && (sym.toString().charAt(0) != '$')) {
 					throw new RuleCreationError(sym);
@@ -435,7 +436,7 @@ public class AttributeFunctions {
 		return result;
 	}
 
-	static IExpr setSymbolsAttributes(IAST listOfSymbols, IExpr attributes, EvalEngine engine) {
+	static IExpr setSymbolsAttributes(IAST listOfSymbols, IExpr attributes, EvalEngine engine) throws MathException {
 		attributes = engine.evaluate(attributes);
 		for (int i = 1; i < listOfSymbols.size(); i++) {
 			if (listOfSymbols.get(i).isSymbol()) {

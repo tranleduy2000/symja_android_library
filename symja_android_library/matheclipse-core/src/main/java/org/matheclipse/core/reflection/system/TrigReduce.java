@@ -12,6 +12,7 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcher;
 import org.matheclipse.core.visit.VisitorExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C2;
@@ -67,7 +68,7 @@ public class TrigReduce extends AbstractEvaluator {
 		}
 
 		@Override
-		public IExpr visit(IASTMutable ast) {
+		public IExpr visit(IASTMutable ast) throws MathException {
 			if (ast.isTimes()) {
 				IAST result = ORDERLESS_MATCHER.evaluate(ast, fEngine);
 				if (result.isPresent()) {
@@ -103,7 +104,7 @@ public class TrigReduce extends AbstractEvaluator {
 	 * >List of trigonometric identities - Product-to-sum and sum-to-product identities</a>
 	 */
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 2);
 		IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
 		if (temp.isPresent()) {

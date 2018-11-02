@@ -12,6 +12,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Base class for functions with 1 argument (i.e. Sin, Cos...) with Attributes <i>Listable</i> and
@@ -21,14 +22,14 @@ import org.matheclipse.core.interfaces.INum;
 public abstract class AbstractTrigArg1 extends AbstractArg1 {
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 2);
 
 		return evaluateArg1(ast.arg1());
 	}
 
 	@Override
-	public IExpr numericEval(final IAST ast, EvalEngine engine) {
+	public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 2);
 		IExpr arg1 = ast.arg1();
 		if (arg1 instanceof INum) {

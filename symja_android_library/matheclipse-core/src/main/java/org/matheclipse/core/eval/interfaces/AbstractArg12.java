@@ -4,6 +4,7 @@ import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
@@ -19,13 +20,14 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Evaluate a function with 1 or 2 arguments.
  */
 public abstract class AbstractArg12 extends AbstractFunctionEvaluator {
 
-	public IExpr unaryOperator(final IExpr arg0) {
+	public IExpr unaryOperator(final IExpr arg0) throws WrongArgumentType {
 		IExpr result = e1ObjArg(arg0);
 
 		if (result.isPresent()) {
@@ -78,7 +80,7 @@ public abstract class AbstractArg12 extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
-	public IExpr e1DblComArg(final IComplexNum c) {
+	public IExpr e1DblComArg(final IComplexNum c) throws WrongArgumentType {
 		return F.NIL;
 	}
 
@@ -110,7 +112,7 @@ public abstract class AbstractArg12 extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
-	public IExpr binaryOperator(final IExpr o0, final IExpr o1) {
+	public IExpr binaryOperator(final IExpr o0, final IExpr o1) throws MathException {
 		IExpr result = F.NIL;
 		if (o0 instanceof ApcomplexNum) {
 			if (o1.isNumber()) {
@@ -279,11 +281,11 @@ public abstract class AbstractArg12 extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
-	public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
+	public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
 		return F.NIL;
 	}
 
-	public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
+	public IExpr e2ObjArg(final IExpr o0, final IExpr o1) throws MathException {
 		return F.NIL;
 	}
 
@@ -300,7 +302,7 @@ public abstract class AbstractArg12 extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkRange(ast, 2, 3);
 		if (ast.size() != 3) {
 			return unaryOperator(ast.arg1());

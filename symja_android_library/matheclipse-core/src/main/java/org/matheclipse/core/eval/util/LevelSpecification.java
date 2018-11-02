@@ -40,7 +40,7 @@ public class LevelSpecification extends LevelSpec {
 	 *           if the expr is not a <i>level specification</i>
 	 * @see
 	 */
-	public LevelSpecification(final IExpr expr, boolean includeHeads) {
+	public LevelSpecification(final IExpr expr, boolean includeHeads) throws MathException {
 		super(0, includeHeads);
 		fFromLevel = fToLevel = -1;
 		fFromDepth = fToDepth = 0;

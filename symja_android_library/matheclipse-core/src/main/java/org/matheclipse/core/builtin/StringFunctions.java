@@ -18,6 +18,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -42,7 +43,7 @@ public final class StringFunctions {
 	private static class FromCharacterCode extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.size() != 2) {
 				return F.NIL;
 			}
@@ -118,7 +119,7 @@ public final class StringFunctions {
 	private static class LetterQ extends AbstractFunctionEvaluator implements Predicate<IExpr> {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				throw new WrongNumberOfArguments(ast, 1, ast.argSize());
@@ -153,7 +154,7 @@ public final class StringFunctions {
 	private static class LowerCaseQ extends AbstractFunctionEvaluator implements Predicate<IExpr> {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				throw new WrongArgumentType(ast, ast.arg1(), 1);
@@ -184,7 +185,7 @@ public final class StringFunctions {
 	private static class StringDrop extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isString()) {
@@ -204,7 +205,7 @@ public final class StringFunctions {
 	private static class StringJoin extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3);
 
 			StringBuilder buf = new StringBuilder();
@@ -228,7 +229,7 @@ public final class StringFunctions {
 	private static class StringLength extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isString()) {
@@ -246,7 +247,7 @@ public final class StringFunctions {
 	private static class StringReplace extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.size() == 3) {
 				if (!ast.arg1().isString()) {
 					return F.NIL;
@@ -284,7 +285,7 @@ public final class StringFunctions {
 	private static class StringTake extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isString()) {
@@ -304,7 +305,7 @@ public final class StringFunctions {
 	private static class SyntaxLength extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				return F.NIL;
@@ -324,7 +325,7 @@ public final class StringFunctions {
 	private static class ToCharacterCode extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				return F.NIL;
@@ -358,7 +359,7 @@ public final class StringFunctions {
 	private static class ToString extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isString()) {
@@ -373,7 +374,7 @@ public final class StringFunctions {
 		private final static String UNICODE_PREFIX = "\\u";
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				return F.NIL;

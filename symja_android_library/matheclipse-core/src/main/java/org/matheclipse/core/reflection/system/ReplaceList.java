@@ -14,11 +14,12 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 public class ReplaceList extends AbstractEvaluator {
 
 	private static IAST replaceExpr(final IAST ast, IExpr arg1, IExpr rules, IASTAppendable result, int maxNumberOfResults,
-			final EvalEngine engine) {
+			final EvalEngine engine) throws MathException {
 		if (rules.isList()) {
 			for (IExpr element : (IAST) rules) {
 				if (element.isRuleAST()) {
@@ -59,7 +60,7 @@ public class ReplaceList extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		if (!ToggleFeature.REPLACE_LIST) {
 			return F.NIL;
 		}

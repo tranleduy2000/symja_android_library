@@ -15,6 +15,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -505,7 +506,7 @@ public class NSolve extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 3);
 		final IAST vars = Validate.checkSymbolOrSymbolList(ast, 2);
 		final IAST termsEqualZeroList = Validate.checkEquations(ast, 1);

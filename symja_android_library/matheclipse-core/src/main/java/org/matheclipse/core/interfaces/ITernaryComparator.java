@@ -1,5 +1,7 @@
 package org.matheclipse.core.interfaces;
 
+import org.matheclipse.parser.client.math.MathException;
+
 public interface ITernaryComparator  {
 
 	/**
@@ -13,5 +15,5 @@ public interface ITernaryComparator  {
 	 * @param arg2
 	 * @return
 	 */
-	COMPARE_TERNARY compareTernary(IExpr arg1, IExpr arg2);
+	COMPARE_TERNARY compareTernary(IExpr arg1, IExpr arg2) throws MathException;
 }

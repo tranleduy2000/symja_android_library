@@ -5,6 +5,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 
@@ -81,7 +82,7 @@ public class VisitorReplacePart extends AbstractVisitor {
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) {
+	public IExpr visit(IASTMutable ast) throws MathException {
 		return visitIndex(ast, 0);
 	}
 

@@ -22,7 +22,7 @@ public class CoreCallbackFunction implements IDoubleCallbackFunction {
 	public final static CoreCallbackFunction CONST = new CoreCallbackFunction();
 
 	@Override
-	public double evaluate(DoubleEvaluator doubleEngine, FunctionNode functionNode,final double[] args) {
+	public double evaluate(DoubleEvaluator doubleEngine, FunctionNode functionNode,final double[] args) throws MathException {
 		ASTNode node = functionNode.getNode(0);
 		if (node instanceof SymbolNode) {
 			AST2Expr ast2Expr = new AST2Expr();

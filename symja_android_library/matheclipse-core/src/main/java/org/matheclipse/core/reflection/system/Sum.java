@@ -16,6 +16,7 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IIterator;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.SumRules;
+import org.matheclipse.parser.client.math.MathException;
 
 import static org.matheclipse.core.expression.F.BernoulliB;
 import static org.matheclipse.core.expression.F.Binomial;
@@ -141,7 +142,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkRange(ast, 3);
 
 		IExpr arg1 = ast.arg1();

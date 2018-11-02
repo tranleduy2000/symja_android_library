@@ -55,7 +55,7 @@ public class IndexedLevel {
 	 *             if the <code>expr</code> is not a <i>level specification</i>
 	 */
 	public IndexedLevel(final BiFunction<IExpr, IExpr, IExpr> function, final IExpr unevaledLevelExpr,
-			boolean includeHeads, final EvalEngine engine) {
+			boolean includeHeads, final EvalEngine engine) throws MathException {
 		IExpr levelExpr = engine.evaluate(unevaledLevelExpr);
 		fFromLevel = fToLevel = -1;
 		fFromDepth = fToDepth = 0;

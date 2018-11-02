@@ -9,6 +9,7 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.generic.ObjIntPredicate;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -460,7 +461,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param predicate the predicate which filters each argument in this <code>AST</code>
      * @return the <code>filterAST</code>
      */
-    IAST filter(IASTAppendable filterAST, IASTAppendable restAST, Predicate<? super IExpr> predicate);
+    IAST filter(IASTAppendable filterAST, IASTAppendable restAST, Predicate<? super IExpr> predicate) throws MathException;
 
     /**
      * Select all elements by applying the <code>Predicates.isTrue(expr)</code> predicate to each argument in this

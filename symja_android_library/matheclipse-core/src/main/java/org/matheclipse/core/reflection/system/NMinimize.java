@@ -22,6 +22,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,13 +79,13 @@ public class NMinimize extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		// switch to numeric calculation
 		return numericEval(ast, engine);
 	}
 
 	@Override
-	public IExpr numericEval(final IAST ast, EvalEngine engine) {
+	public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 3);
 
 		if (ast.arg1().isList() && ast.arg2().isList()) {

@@ -7,6 +7,7 @@ import org.matheclipse.core.interfaces.AbstractEvalStepListener;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.Stack;
 
@@ -49,7 +50,7 @@ final public class TraceStack extends AbstractEvalStepListener {
 	 * @param expr
 	 *            an expression
 	 */
-	public void add(IExpr expr) {
+	public void add(IExpr expr) throws MathException {
 		if (fMatcher != null) {
 			if (fMatcher.test(expr.head())) {
 				fTraceList.append(F.HoldForm(expr));
@@ -66,7 +67,7 @@ final public class TraceStack extends AbstractEvalStepListener {
 	 * @param expr
 	 *            an expression
 	 */
-	public void addIfEmpty(IExpr expr) {
+	public void addIfEmpty(IExpr expr) throws MathException {
 		if (fTraceList.isAST0()) {
 			add(expr);
 		}
@@ -85,7 +86,7 @@ final public class TraceStack extends AbstractEvalStepListener {
 	}
 
 	@Override
-	public void add(IExpr inputExpr, IExpr resultExpr, int recursionDepth, long iterationCounter, String hint) {
+	public void add(IExpr inputExpr, IExpr resultExpr, int recursionDepth, long iterationCounter, String hint) throws MathException {
 		if (iterationCounter == 0L) {
 			addIfEmpty(inputExpr);
 			add(resultExpr);

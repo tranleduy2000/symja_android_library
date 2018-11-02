@@ -4,6 +4,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Common interface for built-in Symja functions.
@@ -51,7 +52,7 @@ public interface IFunctionEvaluator extends IEvaluator {
 	 * @see IAST#arg2()
 	 * @see IAST#arg3()
 	 */
-	public IExpr evaluate(IAST ast, EvalEngine engine);
+	public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException;
 
 	/**
 	 * <p>
@@ -93,6 +94,6 @@ public interface IFunctionEvaluator extends IEvaluator {
 	 * @see IAST#arg2()
 	 * @see IAST#arg3()
 	 */
-	public IExpr numericEval(IAST ast, EvalEngine engine);
+	public IExpr numericEval(IAST ast, EvalEngine engine) throws MathException;
 
 }

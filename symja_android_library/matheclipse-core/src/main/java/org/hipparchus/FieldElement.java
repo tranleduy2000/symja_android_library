@@ -18,6 +18,7 @@ package org.hipparchus;
 
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.exception.NullArgumentException;
+import org.matheclipse.parser.client.math.MathException;
 
 
 /**
@@ -44,7 +45,7 @@ public interface FieldElement<T> {
      * @return a new element representing this - a
      * @throws NullArgumentException if {@code a} is {@code null}.
      */
-    T subtract(T a) throws NullArgumentException;
+    T subtract(T a) throws NullArgumentException, MathException;
 
     /**
      * Returns the additive inverse of {@code this} element.
@@ -82,7 +83,7 @@ public interface FieldElement<T> {
      * @throws NullArgumentException if {@code a} is {@code null}.
      * @throws MathRuntimeException  if {@code a} is zero
      */
-    T divide(T a) throws NullArgumentException, MathRuntimeException;
+    T divide(T a) throws NullArgumentException, MathRuntimeException, MathException;
 
     /**
      * Returns the multiplicative inverse of {@code this} element.

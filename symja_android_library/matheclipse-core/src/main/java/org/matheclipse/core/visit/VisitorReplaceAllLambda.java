@@ -16,6 +16,7 @@ import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non
@@ -39,7 +40,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	@Override
-	public IExpr visit(IInteger element) {
+	public IExpr visit(IInteger element) throws MathException {
 		return fPredicate.test(element) ? fFunction.apply(element) : F.NIL;
 	}
 
@@ -48,7 +49,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IFraction element) {
+	public IExpr visit(IFraction element) throws MathException {
 		return fPredicate.test(element) ? fFunction.apply(element) : F.NIL;
 	}
 
@@ -57,7 +58,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IComplex element) {
+	public IExpr visit(IComplex element) throws MathException {
 		return fPredicate.test(element) ? fFunction.apply(element) : F.NIL;
 	}
 
@@ -66,7 +67,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(INum element) {
+	public IExpr visit(INum element) throws MathException {
 		return fPredicate.test(element) ? fFunction.apply(element) : F.NIL;
 	}
 
@@ -75,7 +76,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IComplexNum element) {
+	public IExpr visit(IComplexNum element) throws MathException {
 		return fPredicate.test(element) ? fFunction.apply(element) : F.NIL;
 	}
 
@@ -84,7 +85,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(ISymbol element) {
+	public IExpr visit(ISymbol element) throws MathException {
 		return fPredicate.test(element) ? fFunction.apply(element) : F.NIL;
 	}
 
@@ -93,7 +94,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IPattern element) {
+	public IExpr visit(IPattern element) throws MathException {
 		return fPredicate.test(element) ? fFunction.apply(element) : F.NIL;
 	}
 
@@ -102,7 +103,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IPatternSequence element) {
+	public IExpr visit(IPatternSequence element) throws MathException {
 		return fPredicate.test(element) ? fFunction.apply(element) : F.NIL;
 	}
 
@@ -111,12 +112,12 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IStringX element) {
+	public IExpr visit(IStringX element) throws MathException {
 		return fPredicate.test(element) ? fFunction.apply(element) : F.NIL;
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) {
+	public IExpr visit(IASTMutable ast) throws MathException {
 		if (fPredicate.test(ast)) {
 			IExpr temp = fFunction.apply(ast);
 			if (temp.isPresent()) {
@@ -127,7 +128,7 @@ public class VisitorReplaceAllLambda extends VisitorExpr {
 	}
 
 	@Override
-	protected IExpr visitAST(IAST ast) {
+	protected IExpr visitAST(IAST ast) throws MathException {
 		IExpr temp;
         IASTMutable result = F.nilPtr();
 		int i = fOffset;

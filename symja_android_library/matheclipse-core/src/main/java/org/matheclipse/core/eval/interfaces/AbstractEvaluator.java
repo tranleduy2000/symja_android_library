@@ -4,7 +4,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-
+import org.matheclipse.parser.client.math.MathException;
 
 
 /**
@@ -15,7 +15,7 @@ public abstract class AbstractEvaluator extends IFunctionEvaluatorImpl implement
 
 	/** {@inheritDoc} */
     @Override
-	public IExpr numericEval(final IAST ast,  EvalEngine engine) {
+	public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
         return evaluate(ast, engine);
     }
 
@@ -30,6 +30,6 @@ public abstract class AbstractEvaluator extends IFunctionEvaluatorImpl implement
 
 	/** {@inheritDoc} */
     @Override
-	abstract public IExpr evaluate(final IAST ast,   EvalEngine engine);
+	abstract public IExpr evaluate(final IAST ast,   EvalEngine engine) throws MathException;
 
 }

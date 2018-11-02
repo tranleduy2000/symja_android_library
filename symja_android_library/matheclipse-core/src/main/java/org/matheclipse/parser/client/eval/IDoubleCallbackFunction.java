@@ -16,6 +16,7 @@
 package org.matheclipse.parser.client.eval;
 
 import org.matheclipse.parser.client.ast.FunctionNode;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * A call back function which could be used in <code>DoubleEvaluator</code>, for
@@ -24,5 +25,5 @@ import org.matheclipse.parser.client.ast.FunctionNode;
  */
 
 public interface IDoubleCallbackFunction {
-	public double evaluate(DoubleEvaluator engine, FunctionNode function, double[] args);
+	public double evaluate(DoubleEvaluator engine, FunctionNode function, double[] args) throws MathException;
 }

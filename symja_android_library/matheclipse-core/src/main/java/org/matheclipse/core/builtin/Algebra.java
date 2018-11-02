@@ -56,6 +56,7 @@ import org.matheclipse.core.polynomials.PartialFractionGenerator;
 import org.matheclipse.core.polynomials.PolynomialSubstitutions;
 import org.matheclipse.core.visit.AbstractVisitorBoolean;
 import org.matheclipse.core.visit.VisitorExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -261,7 +262,7 @@ public class Algebra {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			final IExpr arg1 = ast.arg1();
@@ -372,7 +373,7 @@ public class Algebra {
 													   final IInteger gcd) {
 			numeratorPlus.forEach(new ObjIntConsumer<IExpr>() {
                 @Override
-                public void accept(IExpr x, int i) {
+                public void accept(IExpr x, int i) throws WrongArgumentType {
                     if (x.isInteger()) {
                         numeratorPlus.set(i, ((IInteger) x).div(gcd));
                     } else if (x.isTimes() && x.first().isInteger()) {
@@ -567,7 +568,7 @@ public class Algebra {
 			return null;
 		}
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -670,7 +671,7 @@ public class Algebra {
 	private static class Collect extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3, 4);
 			try {
 				IExpr head = null;
@@ -717,7 +718,7 @@ public class Algebra {
 		 * @return
 		 */
 		private IExpr collectSingleVariable(IExpr expr, IExpr x, final IAST listOfVariables, final int listPosition,
-											IExpr head, final EvalEngine engine) {
+											IExpr head, final EvalEngine engine) throws MathException {
 			if (expr.isAST()) {
 				Map<IExpr, IASTAppendable> map = new HashMap<IExpr, IASTAppendable>();
 				IAST poly = (IAST) expr;
@@ -746,7 +747,7 @@ public class Algebra {
 					IExpr coefficient;
 					rest.forEach(new ObjIntConsumer<IExpr>() {
                         @Override
-                        public void accept(IExpr arg, int i) {
+                        public void accept(IExpr arg, int i) throws MathException {
                             simplifyAST.set(1, arg);
                             rest.set(i, engine.evaluate(simplifyAST));
                         }
@@ -907,7 +908,7 @@ public class Algebra {
 	private static class Denominator extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			boolean trig = false;
@@ -995,7 +996,7 @@ public class Algebra {
 	private final static class Distribute extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 6);
 
 			IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
@@ -1549,7 +1550,7 @@ public class Algebra {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
@@ -1610,7 +1611,7 @@ public class Algebra {
 	private static class ExpandAll extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -1664,7 +1665,7 @@ public class Algebra {
 	private static class Factor extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 
@@ -1713,7 +1714,7 @@ public class Algebra {
 			return expr;
 		}
 
-		private IExpr factorExpr(final IAST ast, IExpr expr, final List<IExpr> varList) {
+		private IExpr factorExpr(final IAST ast, IExpr expr, final List<IExpr> varList) throws JASConversionException {
 				if (expr.isAST()) {
 				IExpr temp;
 				// if (expr.isPower()&&expr.base().isPlus()) {
@@ -1725,7 +1726,7 @@ public class Algebra {
 					// System.out.println(ast.toString());
 					temp = ((IAST) expr).map(new Function<IExpr, IExpr>() {
                         @Override
-                        public IExpr apply(IExpr x) {
+                        public IExpr apply(IExpr x) throws JASConversionException {
                             if (x.isPlus()) {
                                 return Factor.this.factorExpr(ast, x, varList);
                             }
@@ -1796,7 +1797,7 @@ public class Algebra {
 					if (f.isMinusOne() && base.isPlus()) {
 						base = ((IAST) base).map(new Function<IExpr, IExpr>() {
                             @Override
-                            public IExpr apply(IExpr x) {
+                            public IExpr apply(IExpr x) throws MathException {
                                 return x.negate();
                             }
                         }, 1);
@@ -1862,7 +1863,7 @@ public class Algebra {
 	private static class FactorSquareFree extends Factor {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			VariablesSet eVar = new VariablesSet(ast.arg1());
@@ -1912,7 +1913,7 @@ public class Algebra {
 	private static class FactorSquareFreeList extends Factor {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			VariablesSet eVar = new VariablesSet(ast.arg1());
@@ -1999,7 +2000,7 @@ public class Algebra {
 	private static class FactorTerms extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr temp = Structure.threadListLogicEquationOperators(ast.arg1(), ast, 1);
@@ -2093,7 +2094,7 @@ public class Algebra {
 		 * @param engine
 		 * @return <code>F.NIL</code> if the factor couldn't be found
 		 */
-		private static IExpr factorTermsPlus(IAST plus, EvalEngine engine) {
+		private static IExpr factorTermsPlus(IAST plus, EvalEngine engine) throws MathException {
 			IExpr temp;
 			IRational gcd1 = null;
 			if (plus.arg1().isRational()) {
@@ -2172,7 +2173,7 @@ public class Algebra {
 	private static class FullSimplify extends Simplify {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 			// System.out.println(ast.toString());
 			return super.evaluate(ast, engine);
@@ -2212,7 +2213,7 @@ public class Algebra {
 	private static class Numerator extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			boolean trig = false;
@@ -2317,7 +2318,7 @@ public class Algebra {
 	private static class PolynomialExtendedGCD extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 4, 5);
 
 			ISymbol x = Validate.checkSymbolType(ast, 3);
@@ -2427,7 +2428,7 @@ public class Algebra {
 	private static class PolynomialGCD extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 
 			if (ast.isAST0()) {
 				return F.NIL;
@@ -2567,7 +2568,7 @@ public class Algebra {
 	private static class PolynomialLCM extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.isAST0()) {
 				return F.NIL;
 			}
@@ -2693,7 +2694,7 @@ public class Algebra {
 		 * Returns <code>True</code> if the given expression is a polynomial object; <code>False</code> otherwise
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.isAST2()) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				IExpr arg2 = engine.evaluate(ast.arg2());
@@ -2745,7 +2746,7 @@ public class Algebra {
 	private static class PolynomialQuotient extends PolynomialQuotientRemainder {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.size() == 4 || ast.size() == 5) {
 			ISymbol variable = Validate.checkSymbolType(ast, 3);
 			IExpr arg1 = F.evalExpandAll(ast.arg1(), engine);
@@ -2834,7 +2835,7 @@ public class Algebra {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 4, 5);
 			ISymbol variable = Validate.checkSymbolType(ast, 3);
 			IExpr arg1 = F.evalExpandAll(ast.arg1(), engine);
@@ -2910,7 +2911,7 @@ public class Algebra {
 	private static class PolynomialRemainder extends PolynomialQuotientRemainder {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 4, 5);
 			ISymbol variable = Validate.checkSymbolType(ast, 3);
 			IExpr arg1 = F.evalExpandAll(ast.arg1(), engine);
@@ -3082,7 +3083,7 @@ public class Algebra {
 
 		/** {@inheritDoc} */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 			if (ast.arg1().isAST()) {
 				boolean assumptions = false;
@@ -3266,7 +3267,7 @@ public class Algebra {
 			// D[a_+b_+c_,x_] -> D[a,x]+D[b,x]+D[c,x]
 			// return listArg1.mapThread(F.D(F.Null, x), 1);
 			@Override
-			public IExpr visit(IASTMutable ast) {
+			public IExpr visit(IASTMutable ast) throws MathException {
 				if (!ast.isAST(F.Root)) {
 					IAST cloned = replacement.setAtClone(1, null);
 					return ast.mapThread(cloned, 1);
@@ -3277,7 +3278,7 @@ public class Algebra {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.size() >= 2) {
 				IExpr arg1 = ast.arg1();
 				IExpr temp = Structure.threadLogicEquationOperators(arg1, ast, 1);
@@ -3368,7 +3369,7 @@ public class Algebra {
 	private static class Root extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
 			return ToRadicals.rootToRadicals(ast, 2);
 		}
 
@@ -3538,7 +3539,7 @@ public class Algebra {
 				fFullSimplify = fullSimplify;
 			}
 
-			private IExpr tryExpandAllTransformation(IAST plusAST, IExpr test) {
+			private IExpr tryExpandAllTransformation(IAST plusAST, IExpr test) throws MathException {
 				IExpr result = F.NIL;
 				long minCounter = fComplexityFunction.apply(plusAST);
 				IExpr temp;
@@ -3557,7 +3558,7 @@ public class Algebra {
 				return result;
 			}
 
-			private IExpr tryTransformations(IExpr expr) {
+			private IExpr tryTransformations(IExpr expr) throws MathException {
 				IExpr result = F.NIL;
 				if (expr.isAST()) {
 					// try ExpandAll, Together, Apart, Factor to reduce the expression
@@ -3637,7 +3638,7 @@ public class Algebra {
 										if (denominator.isPlus() && !numerator.isPlusTimesPower()) {
 											IExpr test = ((IAST) denominator).map(new Function<IExpr, IExpr>() {
                                                 @Override
-                                                public IExpr apply(IExpr x) {
+                                                public IExpr apply(IExpr x) throws MathException {
                                                     return F.Divide(x, numerator);
                                                 }
                                             }, 1);
@@ -3703,7 +3704,7 @@ public class Algebra {
 			}
 
 			@Override
-			public IExpr visit(IASTMutable ast) {
+			public IExpr visit(IASTMutable ast) throws MathException {
 				IExpr result = F.NIL;
 				IExpr temp = visitAST(ast);
 				if (temp.isPresent()) {
@@ -3863,7 +3864,7 @@ public class Algebra {
 				return result;
 			}
 
-			private IExpr reduceNumberFactor(IASTMutable ast) {
+			private IExpr reduceNumberFactor(IASTMutable ast) throws MathException {
 				IExpr temp;
 					IASTAppendable basicTimes = F.TimesAlloc(ast.size());
 					IASTAppendable restTimes = F.TimesAlloc(ast.size());
@@ -3908,7 +3909,7 @@ public class Algebra {
 				return F.NIL;
 			}
 
-			private IExpr tryExpandAll(IAST ast, IExpr temp, IExpr arg1, int i) {
+			private IExpr tryExpandAll(IAST ast, IExpr temp, IExpr arg1, int i) throws MathException {
 				IExpr expandedAst = tryExpandAllTransformation((IAST) temp, F.Times(arg1, temp));
 				if (expandedAst.isPresent()) {
 					IASTAppendable result = F.TimesAlloc(ast.size());
@@ -3922,7 +3923,7 @@ public class Algebra {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2);
 
 			IExpr result = F.REMEMBER_AST_CACHE.getIfPresent(ast);
@@ -3994,7 +3995,7 @@ public class Algebra {
 		}
 
 		private IExpr simplifyStep(IExpr arg1, Function<IExpr, Long> complexityFunction, long minCounter,
-				IExpr result) {
+				IExpr result) throws MathException {
 			long count;
 			IExpr temp;
 			temp = arg1.accept(new SimplifyVisitor(complexityFunction, isFullSimplifyMode()));
@@ -4036,7 +4037,7 @@ public class Algebra {
 				final IExpr head = complexityFunctionHead;
 				complexityFunction = new Function<IExpr, Long>() {
                     @Override
-                    public Long apply(IExpr x) {
+                    public Long apply(IExpr x) throws MathException {
                         IExpr temp = engine.evaluate(F.unaryAST1(head, x));
                         if (temp.isInteger() && !temp.isNegative()) {
                             return ((IInteger) temp).toLong();
@@ -4153,7 +4154,7 @@ public class Algebra {
 		 * @param ast
 		 * @return <code>F.NIL</code> couldn't be transformed by <code>ExpandAll(()</code> od <code>togetherAST()</code>
 		 */
-		private static IExpr togetherNull(IAST ast, EvalEngine engine) {
+		private static IExpr togetherNull(IAST ast, EvalEngine engine) throws MathException {
 			boolean evaled = false;
 			IExpr temp = expandAll(ast, null, true, false, engine);
 			if (!temp.isPresent()) {
@@ -4302,7 +4303,7 @@ public class Algebra {
 			return F.NIL;
 		}
 
-		private static IASTMutable togetherPower(final IAST ast, IASTMutable result, EvalEngine engine) {
+		private static IASTMutable togetherPower(final IAST ast, IASTMutable result, EvalEngine engine) throws MathException {
 			if (ast.arg1().isAST()) {
 				IExpr temp = togetherNull((IAST) ast.arg1(), engine);
 				if (temp.isPresent()) {
@@ -4326,7 +4327,7 @@ public class Algebra {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -4403,7 +4404,7 @@ public class Algebra {
 	private static class Variables extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			return VariablesSet.getVariables(ast.arg1());
@@ -4534,7 +4535,7 @@ public class Algebra {
 	 * @return <code>F.NIL</code> if the expression couldn't be expanded.
 	 */
 	public static IExpr expandAll(final IAST ast, final IExpr patt, final boolean expandNegativePowers, final boolean distributePlus,
-								  final EvalEngine engine) {
+								  final EvalEngine engine) throws MathException {
 		if (patt != null && ast.isFree(patt, true)) {
 			return F.NIL;
 		}
@@ -4570,7 +4571,7 @@ public class Algebra {
 		final IAST localASTFinal = localAST;
 		localAST.forEach(new ObjIntConsumer<IExpr>() {
             @Override
-            public void accept(final IExpr x, int i) {
+            public void accept(final IExpr x, int i) throws MathException {
                 if (x.isAST()) {
                     IExpr t = expandAll((IAST) x, patt, expandNegativePowers, distributePlus, engine);
                     if (t.isPresent()) {

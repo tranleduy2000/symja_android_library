@@ -10,6 +10,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.Matcher;
+import org.matheclipse.parser.client.math.MathException;
 
 import static org.matheclipse.core.expression.F.Beta;
 import static org.matheclipse.core.expression.F.ChebyshevT;
@@ -137,7 +138,7 @@ public class FunctionExpand extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		Validate.checkRange(ast, 2, 3);
 		IExpr arg1 = ast.arg1();
 		IExpr assumptionExpr = F.nilPtr();

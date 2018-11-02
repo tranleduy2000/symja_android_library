@@ -18,6 +18,7 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.ast.ASTNode;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.File;
 import java.io.FileReader;
@@ -37,7 +38,7 @@ public class Import extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		if (Config.isFileSystemEnabled(engine)) {
 			Validate.checkRange(ast, 2, 3);
 

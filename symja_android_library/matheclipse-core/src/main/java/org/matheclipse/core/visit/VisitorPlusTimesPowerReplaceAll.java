@@ -6,6 +6,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non
@@ -23,7 +24,7 @@ public class VisitorPlusTimesPowerReplaceAll extends VisitorReplaceAll {
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) {
+	public IExpr visit(IASTMutable ast) throws MathException {
 		if (ast.isPlusTimesPower()) {
 			return visitAST(ast);
 		}
@@ -35,7 +36,7 @@ public class VisitorPlusTimesPowerReplaceAll extends VisitorReplaceAll {
 	}
 
 	@Override
-	protected IExpr visitAST(IAST ast) {
+	protected IExpr visitAST(IAST ast) throws MathException {
 		if (ast.isPower()) {
 
 		}

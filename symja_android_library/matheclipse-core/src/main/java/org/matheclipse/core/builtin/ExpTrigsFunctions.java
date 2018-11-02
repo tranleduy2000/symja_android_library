@@ -59,6 +59,7 @@ import org.matheclipse.core.reflection.system.rules.SincRules;
 import org.matheclipse.core.reflection.system.rules.SinhRules;
 import org.matheclipse.core.reflection.system.rules.TanRules;
 import org.matheclipse.core.reflection.system.rules.TanhRules;
+import org.matheclipse.parser.client.math.MathException;
 
 import static org.matheclipse.core.expression.F.ArcCot;
 import static org.matheclipse.core.expression.F.ArcCoth;
@@ -139,7 +140,7 @@ public class ExpTrigsFunctions {
 	private final static class AngleVector extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.first();
@@ -191,7 +192,7 @@ public class ExpTrigsFunctions {
 	private final static class ArcCos extends AbstractTrigArg1 implements INumeric, ArcCosRules, DoubleUnaryOperator {
 
 		@Override
-		public double applyAsDouble(double operand) {
+		public double applyAsDouble(double operand) throws ComplexResultException {
 			double val = Math.acos(operand);
 			if (Double.isNaN(val)) {
 				throw new ComplexResultException("ArcCos(NaN)");
@@ -416,7 +417,7 @@ public class ExpTrigsFunctions {
 	private final static class ArcCoth extends AbstractTrigArg1 implements ArcCothRules, DoubleUnaryOperator {
 
 		@Override
-		public double applyAsDouble(double operand) {
+		public double applyAsDouble(double operand) throws ComplexResultException {
 			if (F.isZero(operand)) {
 				throw new ComplexResultException("ArcCoth(0)");
 			}
@@ -658,7 +659,7 @@ public class ExpTrigsFunctions {
 	private final static class ArcSin extends AbstractTrigArg1 implements INumeric, ArcSinRules, DoubleUnaryOperator {
 
 		@Override
-		public double applyAsDouble(double operand) {
+		public double applyAsDouble(double operand) throws ComplexResultException {
 			double val = Math.asin(operand);
 			if (Double.isNaN(val)) {
 				throw new ComplexResultException("");
@@ -974,7 +975,7 @@ public class ExpTrigsFunctions {
 
 	private static class CirclePoints extends AbstractFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isReal()) {
@@ -1532,7 +1533,7 @@ public class ExpTrigsFunctions {
 	private final static class Haversine extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			return F.Power(F.Sin(F.C1D2.times(ast.arg1())), F.C2);
 		}
@@ -1547,7 +1548,7 @@ public class ExpTrigsFunctions {
 	private final static class InverseHaversine extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			return F.Times(F.C2, F.ArcSin(F.Sqrt(ast.arg1())));
@@ -1673,7 +1674,7 @@ public class ExpTrigsFunctions {
 	private final static class LogisticSigmoid extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			IExpr arg1 = ast.arg1();
 			if (arg1.isZero()) {
@@ -2019,7 +2020,7 @@ public class ExpTrigsFunctions {
 		 *            is assumed to be an interval
 		 * @return
 		 */
-		private static IExpr evalInterval(final IExpr arg1) {
+		private static IExpr evalInterval(final IExpr arg1) throws MathException {
 			IExpr l = arg1.lower();
 			IExpr u = arg1.upper();
 			if (l.isReal() && u.isReal()) {

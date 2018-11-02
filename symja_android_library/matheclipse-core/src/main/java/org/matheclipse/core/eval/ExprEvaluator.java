@@ -4,6 +4,7 @@ import com.gx.common.util.concurrent.SimpleTimeLimiter;
 import com.gx.common.util.concurrent.TimeLimiter;
 
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -206,7 +207,7 @@ public class ExprEvaluator {
 	 * @param variable
 	 * @param value
 	 */
-	public ISymbol defineVariable(ISymbol variable) {
+	public ISymbol defineVariable(ISymbol variable) throws MathException {
 		return defineVariable(variable, null);
 	}
 
@@ -216,7 +217,7 @@ public class ExprEvaluator {
 	 * @param variable
 	 * @param value
 	 */
-	public ISymbol defineVariable(ISymbol variable, double value) {
+	public ISymbol defineVariable(ISymbol variable, double value) throws MathException {
 		return defineVariable(variable, F.num(value));
 	}
 
@@ -227,7 +228,7 @@ public class ExprEvaluator {
 	 * @param variable
 	 * @param value
 	 */
-	public ISymbol defineVariable(ISymbol variable, IExpr value) {
+	public ISymbol defineVariable(ISymbol variable, IExpr value) throws MathException {
 		variable.pushLocalVariable();
 		if (value != null) {
 			// this evaluation step may throw an exception
@@ -245,7 +246,7 @@ public class ExprEvaluator {
 	 * @param variableName
 	 * @param value
 	 */
-	public ISymbol defineVariable(String variableName) {
+	public ISymbol defineVariable(String variableName) throws MathException {
 		return defineVariable(F.symbol(variableName, engine), null);
 	}
 
@@ -255,7 +256,7 @@ public class ExprEvaluator {
 	 * @param variableName
 	 * @param value
 	 */
-	public void defineVariable(String variableName, boolean value) {
+	public void defineVariable(String variableName, boolean value) throws MathException {
 		defineVariable(F.symbol(variableName, engine), value ? F.True : F.False);
 	}
 
@@ -265,7 +266,7 @@ public class ExprEvaluator {
 	 * @param variableName
 	 * @param value
 	 */
-	public ISymbol defineVariable(String variableName, double value) {
+	public ISymbol defineVariable(String variableName, double value) throws MathException {
 		return defineVariable(F.symbol(variableName, engine), F.num(value));
 	}
 
@@ -275,7 +276,7 @@ public class ExprEvaluator {
 	 * @param variableName
 	 * @param value
 	 */
-	public ISymbol defineVariable(String variableName, IExpr value) {
+	public ISymbol defineVariable(String variableName, IExpr value) throws MathException {
 		return defineVariable(F.symbol(variableName, engine), value);
 	}
 
@@ -285,7 +286,7 @@ public class ExprEvaluator {
 	 * @deprecated use eval()
 	 */
 	@Deprecated
-	public final IExpr evaluate() {
+	public final IExpr evaluate() throws MathException {
 		return eval();
 	}
 
@@ -295,7 +296,7 @@ public class ExprEvaluator {
 	 * @deprecated use eval()
 	 */
 	@Deprecated
-	public final IExpr evaluate(final IExpr expr) {
+	public final IExpr evaluate(final IExpr expr) throws MathException {
 		return eval(expr);
 	}
 
@@ -305,7 +306,7 @@ public class ExprEvaluator {
 	 * @deprecated use eval()
 	 */
 	@Deprecated
-	public final IExpr evaluate(final String inputExpression) {
+	public final IExpr evaluate(final String inputExpression) throws MathException {
 		return eval(inputExpression);
 	}
 
@@ -315,7 +316,7 @@ public class ExprEvaluator {
 	 * @return
 	 * @throws SyntaxError
 	 */
-	public IExpr eval() {
+	public IExpr eval() throws MathException {
 		if (fExpr == null) {
 			throw new SyntaxError(0, 0, 0, " ", "No parser input defined", 1);
 		}
@@ -329,7 +330,7 @@ public class ExprEvaluator {
 	 *            the expression which should be evaluated
 	 * @return the evaluated object
 	 */
-	public IExpr eval(final IExpr expr) {
+	public IExpr eval(final IExpr expr) throws MathException {
 		fExpr = expr;
 		// F.join();
 		EvalEngine.set(engine);
@@ -348,7 +349,7 @@ public class ExprEvaluator {
 	 *            the expression which should be evaluated
 	 * @return <code>true</code> if the result is <code>F.True</code> otherwise return <code>false</code>
 	 */
-	public boolean isTrue(final IExpr expr) {
+	public boolean isTrue(final IExpr expr) throws MathException {
 		return eval(expr).isTrue();
 	}
 
@@ -359,7 +360,7 @@ public class ExprEvaluator {
 	 *            the expression which should be evaluated
 	 * @return <code>true</code> if the result is <code>F.False</code> otherwise return <code>false</code>
 	 */
-	public boolean isFalse(final IExpr expr) {
+	public boolean isFalse(final IExpr expr) throws MathException {
 		return eval(expr).isFalse();
 	}
 
@@ -370,7 +371,7 @@ public class ExprEvaluator {
 	 * @return
 	 * @throws SyntaxError
 	 */
-	public IExpr eval(final String inputExpression) {
+	public IExpr eval(final String inputExpression) throws MathException {
 		if (inputExpression != null) {
 			EvalEngine.set(engine);
 			engine.reset();
@@ -391,7 +392,7 @@ public class ExprEvaluator {
 	 * @return
 	 * @throws SyntaxError
 	 */
-	public IExpr parse(final String inputExpression) {
+	public IExpr parse(final String inputExpression) throws SyntaxError {
 		// try {
 		if (inputExpression != null) {
 			EvalEngine.set(engine);
@@ -423,7 +424,7 @@ public class ExprEvaluator {
 	 * @throws SyntaxError
 	 */
 	public IExpr evaluateWithTimeout(final String inputExpression, long timeoutDuration, TimeUnit timeUnit,
-			boolean interruptible, EvalCallable call) {
+			boolean interruptible, EvalCallable call) throws SyntaxError, IllegalArgument {
 		if (inputExpression != null) {
 			// F.join();
 			EvalEngine.set(engine);
@@ -434,12 +435,12 @@ public class ExprEvaluator {
 					final ExecutorService executor = Executors.newSingleThreadExecutor();
 				try {
 					F.await();
-						TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor); // Executors.newSingleThreadExecutor());
+					TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor); // Executors.newSingleThreadExecutor());
 					EvalCallable work = call == null ? new EvalCallable(engine) : call;
 
 					work.setExpr(fExpr);
 					return timeLimiter.callWithTimeout(work, timeoutDuration, timeUnit);
-					} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
+				} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
 					return F.$Aborted;
 				} catch (java.util.concurrent.TimeoutException e) {
 //						Throwable t = e.getCause();
@@ -488,7 +489,7 @@ public class ExprEvaluator {
 	 * @deprecated use evalf(inputExpression)
 	 */
 	@Deprecated
-	public double evaluateDouble(final String inputExpression) {
+	public double evaluateDouble(final String inputExpression) throws MathException {
 		return evalf(inputExpression);
 	}
 
@@ -500,7 +501,7 @@ public class ExprEvaluator {
 	 * @return <code>Double.NaN</code> if no <code>double</code> value could be evaluated
 	 * @throws SyntaxError
 	 */
-	public double evalf(final String inputExpression) {
+	public double evalf(final String inputExpression) throws MathException {
 		if (inputExpression != null) {
 			EvalEngine.set(engine);
 			engine.reset();
@@ -522,7 +523,7 @@ public class ExprEvaluator {
 	 *            a Symja expression
 	 * @return <code>Double.NaN</code> if no <code>double</code> value could be evaluated
 	 */
-	public double evalf(final IExpr expr) {
+	public double evalf(final IExpr expr) throws MathException {
 		EvalEngine.set(engine);
 		engine.reset();
 		IExpr temp = eval(F.N(expr));

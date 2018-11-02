@@ -5,6 +5,7 @@ import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 public class AbortRubi extends AbstractFunctionEvaluator {
 
@@ -13,7 +14,7 @@ public class AbortRubi extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(IAST ast, EvalEngine engine) {
+	public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
 		throw new AbortException();
 	}
 

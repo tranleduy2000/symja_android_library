@@ -154,7 +154,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			try {
@@ -226,7 +226,7 @@ public final class NumberTheory {
 
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.isAST1()) {
@@ -633,7 +633,7 @@ public final class NumberTheory {
 		 *
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			if (ast.arg1().isList() && ast.arg2().isList()) {
 				try {
@@ -698,7 +698,7 @@ public final class NumberTheory {
 	private final static class Convergents extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isList()) {
@@ -801,7 +801,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -938,7 +938,7 @@ public final class NumberTheory {
 		 * See <a href="http://en.wikipedia.org/wiki/Coprime">Wikipedia:Coprime</a>
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 
 			int size = ast.size();
 			if (size >= 3) {
@@ -965,7 +965,7 @@ public final class NumberTheory {
 	private static class CubeRoot extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			IExpr n = ast.arg1();
 			if (n.isNumericFunction()) {
@@ -1012,7 +1012,7 @@ public final class NumberTheory {
 	private static class DiracDelta extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			int size = ast.size();
 			IASTAppendable result = F.NIL;
 			if (size > 1) {
@@ -1071,7 +1071,7 @@ public final class NumberTheory {
 	private static class DiscreteDelta extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			int size = ast.size();
 			if (size > 1) {
 				IExpr arg1 = ast.arg1();
@@ -1161,7 +1161,7 @@ public final class NumberTheory {
 	private static class Divisible extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isList()) {
@@ -1290,7 +1290,7 @@ public final class NumberTheory {
 	private static class DivisorSigma extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -1574,7 +1574,7 @@ public final class NumberTheory {
 		 * 
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3);
 			IExpr arg;
 			for (int i = 1; i < ast.size(); i++) {
@@ -1923,7 +1923,7 @@ public final class NumberTheory {
 
 		@Override
 		// public IExpr evaluateArg1(final IExpr arg1) {
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			if (ast.size() >= 2 && ast.size() <= 3) {
 				IExpr arg1 = ast.arg1();
 				if (ast.size() == 2) {
@@ -2048,7 +2048,7 @@ public final class NumberTheory {
 	private static class FrobeniusNumber extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			BigInteger[] array = Validate.checkListOfBigIntegers(ast.arg1(), true);
@@ -2091,7 +2091,7 @@ public final class NumberTheory {
 		 * @see org.matheclipse.core.reflection.system.ContinuedFraction
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 			if (!ast.arg1().isList()) {
 				throw new WrongNumberOfArguments(ast, 1, ast.argSize());
@@ -2151,7 +2151,7 @@ public final class NumberTheory {
 	private static class JacobiSymbol extends AbstractArg2 {
 
 		@Override
-		public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
+		public IExpr e2IntArg(final IInteger i0, final IInteger i1) throws MathException {
 			try {
 				if (i0.isNegative() || i1.isNegative()) {
 					// not defined for negative arguments
@@ -2194,7 +2194,7 @@ public final class NumberTheory {
 	private static class KroneckerDelta extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			int size = ast.size();
 			if (size == 1) {
 				return F.C1;
@@ -2245,7 +2245,7 @@ public final class NumberTheory {
 	private static class LinearRecurrence extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 4);
 
 			IExpr arg1 = ast.arg1();
@@ -2332,7 +2332,7 @@ public final class NumberTheory {
 	private static class LiouvilleLambda extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -2424,7 +2424,7 @@ public final class NumberTheory {
 	private static class MangoldtLambda extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -2527,7 +2527,7 @@ public final class NumberTheory {
 	private static class MersennePrimeExponentQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -2673,7 +2673,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 1);
 
 			if (ast.isAST1()) {
@@ -2739,7 +2739,7 @@ public final class NumberTheory {
 	private static class MultiplicativeOrder extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isInteger() && ast.arg2().isInteger()) {
@@ -2804,7 +2804,7 @@ public final class NumberTheory {
 	private static class NextPrime extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			if (ast.isAST1() && ast.arg1().isInteger()) {
@@ -2895,7 +2895,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			final IExpr arg1 = ast.arg1();
@@ -2985,7 +2985,7 @@ public final class NumberTheory {
 	private static class PartitionsQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			final IExpr arg1 = ast.arg1();
@@ -3134,7 +3134,7 @@ public final class NumberTheory {
 	private static class PerfectNumberQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -3198,7 +3198,7 @@ public final class NumberTheory {
 	private static class Prime extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isInteger()) {
@@ -3229,7 +3229,7 @@ public final class NumberTheory {
 	private static class PrimePi extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -3308,7 +3308,7 @@ public final class NumberTheory {
 	private static class PrimeOmega extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -3376,7 +3376,7 @@ public final class NumberTheory {
 	private static class PrimePowerQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
@@ -3395,7 +3395,7 @@ public final class NumberTheory {
 	private static class PrimitiveRoot extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -3484,7 +3484,7 @@ public final class NumberTheory {
 	private final static class SquareFreeQ extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 
 			VariablesSet eVar = new VariablesSet(ast.arg1());
@@ -3666,7 +3666,7 @@ public final class NumberTheory {
 
 		/** {@inheritDoc} */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			IExpr nArg1 = ast.arg1();
@@ -3722,7 +3722,7 @@ public final class NumberTheory {
 
 		/** {@inheritDoc} */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			try {
@@ -3878,7 +3878,7 @@ public final class NumberTheory {
 	private static class Unitize extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			int size = ast.size();
 			if (size == 2) {
 				IExpr arg1 = ast.arg1();

@@ -172,7 +172,7 @@ public class FindFit extends AbstractFunctionEvaluator {
 		return result;
 	}
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 		return numericEval(ast, engine);
 	}
 
@@ -205,7 +205,7 @@ public class FindFit extends AbstractFunctionEvaluator {
 		return newListOfSymbols;
 	}
 	@Override
-	public IExpr numericEval(final IAST ast, EvalEngine engine) {
+	public IExpr numericEval(final IAST ast,  EvalEngine engine) throws MathException {
 		Validate.checkSize(ast, 5);
 
 		if (ast.arg1().isList() && ast.arg3().isList() && ast.arg4().isSymbol()) {

@@ -17,6 +17,7 @@ import org.matheclipse.core.convert.JASModInteger;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrappedException;
@@ -46,14 +47,13 @@ import org.matheclipse.core.polynomials.QuarticSolver;
 import org.matheclipse.core.reflection.system.MonomialList;
 import org.matheclipse.core.reflection.system.rules.LegendrePRules;
 import org.matheclipse.core.reflection.system.rules.LegendreQRules;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
-
 
 import edu.jas.arith.BigRational;
 import edu.jas.arith.ModLong;
@@ -144,7 +144,7 @@ public class PolynomialFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3, 4);
 			IExpr cached = F.REMEMBER_AST_CACHE.getIfPresent(ast);
 			if (cached != null) {
@@ -228,7 +228,7 @@ public class PolynomialFunctions {
 	 */
 	private static class CoefficientList extends AbstractFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			IExpr expr = F.evalExpandAll(ast.arg1(), engine).normal();
 			IAST list = Validate.checkSymbolOrSymbolList(ast, 2);
@@ -303,7 +303,7 @@ public class PolynomialFunctions {
 	 */
 	private static class CoefficientRules extends AbstractFunctionEvaluator {
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 5);
 
 			IExpr expr = F.evalExpandAll(ast.arg1(), engine);
@@ -464,7 +464,7 @@ public class PolynomialFunctions {
 	final private static class Cyclotomic extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			int n = ast.arg1().toIntDefault(-1);
@@ -880,7 +880,7 @@ public class PolynomialFunctions {
 		private ISymbol[] vars = { F.a, F.b, F.c, F.d, F.e, F.f };
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			IExpr arg2 = ast.arg2();
 			if (!arg2.isSymbol()) {
@@ -949,7 +949,7 @@ public class PolynomialFunctions {
 	private static class Exponent extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3, 4);
 			IExpr cached = F.REMEMBER_AST_CACHE.getIfPresent(ast);
 			if (cached != null) {
@@ -1089,7 +1089,7 @@ public class PolynomialFunctions {
 	private static class Resultant extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 4);
 			// TODO allow multinomials
 			IExpr arg3 = Validate.checkSymbolType(ast, 3);
@@ -1278,7 +1278,7 @@ public class PolynomialFunctions {
 		 * @see Roots
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 2, 3);
 			IAST variables;
 			if (ast.size() == 2) {
@@ -1301,7 +1301,7 @@ public class PolynomialFunctions {
 			IASTAppendable result = F.ListAlloc(size);
 			return result.appendArgs(size, new IntFunction<IExpr>() {
                 @Override
-                public IExpr apply(int i) {
+                public IExpr apply(int i) throws MathException {
                     return engine.evalN(list.get(i));
                 }
             });
@@ -1432,7 +1432,7 @@ public class PolynomialFunctions {
 	private static class RootIntervals extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 2);
 
 			return croots(ast.arg1(), false);
@@ -1535,7 +1535,7 @@ public class PolynomialFunctions {
 		 * <a href="http://en.wikipedia.org/wiki/Quartic_function">Quartic function</a>
 		 */
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			IExpr arg1 = ast.arg1();
@@ -1601,7 +1601,7 @@ public class PolynomialFunctions {
 	final private static class ChebyshevT extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			IExpr n = ast.arg1();
 			IExpr z = ast.arg2();
@@ -1661,7 +1661,7 @@ public class PolynomialFunctions {
 	final private static class ChebyshevU extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 			final IExpr n = ast.arg1();
 			final IExpr z = ast.arg2();
@@ -1749,7 +1749,7 @@ public class PolynomialFunctions {
 	final private static class BellY extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 4);
 			if (ast.arg2().isInteger() && ast.arg2().isInteger()) {
 				int n = ast.arg1().toIntDefault(Integer.MIN_VALUE);
@@ -1809,7 +1809,7 @@ public class PolynomialFunctions {
 	final private static class HermiteH extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkSize(ast, 3);
 
 			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
@@ -1847,7 +1847,7 @@ public class PolynomialFunctions {
 	final private static class LaguerreL extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3, 4);
 			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
 			if (degree != Integer.MIN_VALUE) {
@@ -1908,7 +1908,7 @@ public class PolynomialFunctions {
 	final private static class LegendreP extends AbstractFunctionEvaluator implements LegendrePRules {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3, 4);
 
 			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
@@ -1951,7 +1951,7 @@ public class PolynomialFunctions {
 	final static class LegendreQ extends AbstractFunctionEvaluator implements LegendreQRules {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) throws MathException {
 			Validate.checkRange(ast, 3, 4);
 
 			return F.NIL;
@@ -1989,7 +1989,7 @@ public class PolynomialFunctions {
 	 * @param variable
 	 * @return <code>null</code> if the list couldn't be evaluated.
 	 */
-	private static double[] coefficients(IExpr polynomial, final ISymbol variable) throws JASConversionException {
+	private static double[] coefficients(IExpr polynomial, final ISymbol variable) throws MathException {
 		try {
 			ExprPolynomialRing ring = new ExprPolynomialRing(F.List(variable));
 			ExprPolynomial poly = ring.create(polynomial);
@@ -2031,7 +2031,7 @@ public class PolynomialFunctions {
 		}
 		return F.NIL;
 	}
-	public static IAST roots(final IExpr arg1, IAST variables, EvalEngine engine) {
+	public static IAST roots(final IExpr arg1, IAST variables, EvalEngine engine) throws MathException {
 		if (variables.size() != 2) {
 			// factor only possible for univariate polynomials
 			engine.printMessage("NRoots: factorization only possible for univariate polynomials");
@@ -2075,7 +2075,7 @@ public class PolynomialFunctions {
 		return F.NIL;
 	}
 
-	protected static IAST roots(final IExpr arg1, boolean numericSolutions, IAST variables, EvalEngine engine) {
+	protected static IAST roots(final IExpr arg1, boolean numericSolutions, IAST variables, EvalEngine engine) throws MathException {
 
 		IExpr expr = evalExpandAll(arg1, engine);
 
@@ -2105,7 +2105,7 @@ public class PolynomialFunctions {
 	 * @return the roots of the polynomial
 	 */
 
-	public static IAST findRoots(double... coefficients) {
+	public static IAST findRoots(double... coefficients) throws WrappedException {
 		int N = coefficients.length - 1;
 
 		// Construct the companion matrix
@@ -2385,7 +2385,7 @@ public class PolynomialFunctions {
 	 * @return <code>F.NIL</code> if no evaluation was possible.
 	 */
 	public static IAST rootsOfVariable(final IExpr expr, final IExpr denominator, final IAST variables,
-			boolean numericSolutions, EvalEngine engine) {
+			boolean numericSolutions, EvalEngine engine) throws MathException {
 		IASTAppendable result = F.NIL;
 		// ASTRange r = new ASTRange(variables, 1);
 		// List<IExpr> varList = r;

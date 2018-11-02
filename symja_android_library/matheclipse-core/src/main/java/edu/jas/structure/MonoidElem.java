@@ -5,6 +5,8 @@
 package edu.jas.structure;
 
 
+import org.matheclipse.parser.client.math.MathException;
+
 /**
  * Monoid element interface. Defines the multiplicative methods.
  *
@@ -47,7 +49,7 @@ public interface MonoidElem<C> extends Element<C> {
      * @param S
      * @return this / S.
      */
-    C divide(C S);
+    C divide(C S) throws MathException;
 
 
     /**
@@ -66,7 +68,7 @@ public interface MonoidElem<C> extends Element<C> {
      * @return [this/S, this - (this/S)*S].
      */
     @SuppressWarnings("unchecked")
-    C[] quotientRemainder(C S);
+    C[] quotientRemainder(C S) throws MathException;
 
 
     /**
@@ -76,7 +78,7 @@ public interface MonoidElem<C> extends Element<C> {
      * @param a element.
      * @return right, with a * right = this
      */
-    C rightDivide(C a);
+    C rightDivide(C a) throws MathException;
 
 
     /**
@@ -86,7 +88,7 @@ public interface MonoidElem<C> extends Element<C> {
      * @param a element.
      * @return left, with left * a = this
      */
-    C leftDivide(C a);
+    C leftDivide(C a) throws MathException;
 
 
     /**
@@ -117,7 +119,7 @@ public interface MonoidElem<C> extends Element<C> {
      * @return [left, right], with left * a * right = this
      */
     @SuppressWarnings("unchecked")
-    C[] twosidedDivide(C a);
+    C[] twosidedDivide(C a) throws MathException;
 
 
     /**

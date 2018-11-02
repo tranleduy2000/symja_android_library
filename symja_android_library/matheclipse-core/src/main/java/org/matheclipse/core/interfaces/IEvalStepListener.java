@@ -1,6 +1,7 @@
 package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.polynomials.ExprPolynomial;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * A listener which could listen to the <code>EvalEngine#evalLoop()</code>
@@ -52,7 +53,7 @@ public interface IEvalStepListener {
      *                         set with the <code>setHint()</code> method.
      * @see IEvalStepListener#setHint(String)
      */
-    void add(IExpr inputExpr, IExpr resultExpr, int recursionDepth, long iterationCounter, String hint);
+    void add(IExpr inputExpr, IExpr resultExpr, int recursionDepth, long iterationCounter, String hint) throws MathException;
 
     /**
      * Solve a polynomial with degree &lt;= 2.

@@ -6,6 +6,7 @@ package edu.jas.poly;
 
 
 import org.apache.log4j.Logger;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1769,7 +1770,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * @param s coefficient.
      * @return s**(-1) * this.
      */
-    public GenPolynomial<C> divide(C s) {
+    public GenPolynomial<C> divide(C s) throws MathException {
         if (s == null || s.isZERO()) {
             throw new ArithmeticException("division by zero");
         }
@@ -1807,7 +1808,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * @param s coefficient.
      * @return this * s**(-1).
      */
-    public GenPolynomial<C> rightDivideCoeff(C s) {
+    public GenPolynomial<C> rightDivideCoeff(C s) throws MathException {
         if (s == null || s.isZERO()) {
             throw new ArithmeticException("division by zero");
         }
@@ -1845,7 +1846,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * @param s coefficient.
      * @return s**(-1) * this.
      */
-    public GenPolynomial<C> leftDivideCoeff(C s) {
+    public GenPolynomial<C> leftDivideCoeff(C s) throws MathException {
         if (s == null || s.isZERO()) {
             throw new ArithmeticException("division by zero");
         }

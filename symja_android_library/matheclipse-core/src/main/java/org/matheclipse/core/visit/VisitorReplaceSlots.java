@@ -6,6 +6,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Replace all occurrences of Slot[] expressions.
@@ -44,7 +45,7 @@ public class VisitorReplaceSlots extends VisitorExpr {
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) {
+	public IExpr visit(IASTMutable ast) throws MathException {
 		if (ast.isSlot() && ast.arg1() instanceof IntegerSym) {
 			return getSlot((IntegerSym) ast.arg1());
 		}
@@ -52,7 +53,7 @@ public class VisitorReplaceSlots extends VisitorExpr {
 	}
 
 	@Override
-	protected IExpr visitAST(IAST ast) {
+	protected IExpr visitAST(IAST ast) throws MathException {
 		IExpr temp;
 		IASTAppendable result = F.NIL;
 		int i = 0;

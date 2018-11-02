@@ -35,7 +35,7 @@ public class CreamConvert {
 	// return F.NIL;
 	// }
 
-	public Network expr2Cream(final IAST list, final IAST variables) throws ClassCastException {
+	public Network expr2Cream(final IAST list, final IAST variables) throws ClassCastException, WrongArgumentType {
 		// Create a constraint network
 		Network net = new Network();
 		for (int i = 1; i < variables.size(); i++) {
@@ -73,7 +73,7 @@ public class CreamConvert {
 		return net;
 	}
 
-	private IntVariable integerVariable(Network net, IExpr expr) throws ArithmeticException {
+	private IntVariable integerVariable(Network net, IExpr expr) throws ArithmeticException, WrongArgumentType {
 		if (expr instanceof ISymbol) {
 			return map.get(expr);
 		}
@@ -133,7 +133,7 @@ public class CreamConvert {
 		return map;
 	}
 
-	public  IAST integerSolve(final IAST list, final IAST variables) {
+	public  IAST integerSolve(final IAST list, final IAST variables) throws WrongArgumentType {
 		final IASTAppendable result = F.ListAlloc();
 		
 		Solver solver = new DefaultSolver( expr2Cream(list, variables));
