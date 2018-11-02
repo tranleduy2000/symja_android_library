@@ -1,7 +1,5 @@
 package org.matheclipse.core.interfaces;
 
-import org.matheclipse.core.eval.exception.IllegalArgument;
-
 /**
  * Created by Duy on 2/20/2018.
  */
@@ -14,7 +12,7 @@ public abstract class IComplexNumImpl extends INumberImpl implements IComplexNum
 
     public abstract IComplexNum multiply(IComplexNum val);
 
-    public abstract IComplexNum pow(IComplexNum val) throws IllegalArgument;
+    public abstract IComplexNum pow(IComplexNum val);
 
     @Override
     public long leafCount() {

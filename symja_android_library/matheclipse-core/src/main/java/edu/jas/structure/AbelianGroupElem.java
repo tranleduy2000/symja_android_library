@@ -39,7 +39,7 @@ public interface AbelianGroupElem<C> extends Element<C> {
      * @param S
      * @return this + S.
      */
-    C sum(C S) throws MathException;
+    C sum(C S);
 
 
     //public <T extends C> T sum(T S);
@@ -59,7 +59,7 @@ public interface AbelianGroupElem<C> extends Element<C> {
      *
      * @return - this.
      */
-    C negate() throws MathException;
+    C negate();
 
 
     /**
@@ -67,6 +67,6 @@ public interface AbelianGroupElem<C> extends Element<C> {
      *
      * @return |this|.
      */
-    C abs() throws MathException;
+    C abs();
 
 }

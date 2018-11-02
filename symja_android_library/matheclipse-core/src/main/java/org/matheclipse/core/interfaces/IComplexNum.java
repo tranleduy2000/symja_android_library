@@ -1,7 +1,5 @@
 package org.matheclipse.core.interfaces;
 
-import org.matheclipse.core.eval.exception.IllegalArgument;
-
 /**
  *
  */
@@ -31,7 +29,7 @@ public interface IComplexNum extends INumber {
 
     public IComplexNum multiply(IComplexNum val);
 
-    public IComplexNum pow(IComplexNum val) throws IllegalArgument;
+    public IComplexNum pow(IComplexNum val);
 
     public long precision();
 }

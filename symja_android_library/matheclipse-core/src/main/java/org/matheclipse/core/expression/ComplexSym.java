@@ -18,7 +18,6 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigInteger;
 
@@ -120,7 +119,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	}
 
 	@Override
-	public IExpr complexArg() throws MathException {
+	public IExpr complexArg() {
 		// ic == ( x + I * y )
 		IRational x = getRealPart();
 		IRational y = getImaginaryPart();
@@ -162,7 +161,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) throws MathException {
+	public <T> T accept(IVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -558,7 +557,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	}
 
 	@Override
-	public IExpr plus(final IExpr that) throws MathException {
+	public IExpr plus(final IExpr that) {
 		if (that instanceof ComplexSym) {
 			return this.add((ComplexSym) that);
 		}
@@ -643,7 +642,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	}
 
 	@Override
-	public IExpr times(final IExpr that) throws MathException {
+	public IExpr times(final IExpr that) {
 		if (that instanceof ComplexSym) {
 			return multiply((ComplexSym) that);
 		}

@@ -19,7 +19,6 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -89,7 +88,7 @@ public class Num extends INumImpl implements INum {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) throws MathException {
+	public <T> T accept(IVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -532,7 +531,7 @@ public class Num extends INumImpl implements INum {
 	}
 
 	@Override
-	public IExpr plus(final IExpr that) throws MathException {
+	public IExpr plus(final IExpr that) {
 		if (that instanceof ApfloatNum) {
 			return add(ApfloatNum.valueOf(fDouble, ((ApfloatNum) that).fApfloat.precision()));
 		}
@@ -614,7 +613,7 @@ public class Num extends INumImpl implements INum {
 	}
 
 	@Override
-	public IExpr times(final IExpr that) throws MathException {
+	public IExpr times(final IExpr that) {
 		if (that instanceof ApfloatNum) {
 			return multiply(ApfloatNum.valueOf(fDouble, ((ApfloatNum) that).fApfloat.precision()));
 		}

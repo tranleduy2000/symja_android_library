@@ -1,7 +1,6 @@
 package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.expression.ApfloatNum;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Interface for "rational" numbers (i.e. IInteger, IFraction or INum)
@@ -26,7 +25,7 @@ public interface ISignedNumber extends INumber {
      * {@inheritDoc}
      */
     @Override
-    IExpr complexArg() throws MathException;
+    IExpr complexArg();
 
     /**
      * {@inheritDoc}

@@ -206,7 +206,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	}
 
 	@Override
-	public IExpr im() throws MathException {
+	public IExpr im() {
 		return ofUnit(F.Im.of(arg1));
 	}
 

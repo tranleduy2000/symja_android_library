@@ -75,7 +75,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public <T> T accept(IVisitor<T> visitor) throws MathException {
+    public <T> T accept(IVisitor<T> visitor) {
         return visitor.visit(this);
     }
 

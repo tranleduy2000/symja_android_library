@@ -21,7 +21,6 @@ import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -466,7 +465,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
      * @return <code>F.NIL</code> if no match was found.
      */
 	protected IExpr replaceSubExpressionOrderlessFlat(final IAST lhsPatternAST, final IAST lhsEvalAST,
-			final IExpr rhsExpr, EvalEngine engine) throws MathException {
+			final IExpr rhsExpr, EvalEngine engine) {
         if (lhsPatternAST.size() < lhsEvalAST.size()) {
             if (lhsPatternAST.isOrderlessAST() && lhsPatternAST.isFlatAST()) {
 				if (!matchExpr(lhsPatternAST.head(), lhsEvalAST.head(), engine, new StackMatcher(engine), false)) {

@@ -1,7 +1,6 @@
 package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.expression.F;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  * Created by Duy on 2/20/2018.
@@ -71,7 +70,7 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
      * {@inheritDoc}
      */
     @Override
-    public IExpr complexArg() throws MathException {
+    public IExpr complexArg() {
         if (sign() < 0) {
             return F.Pi;
         }

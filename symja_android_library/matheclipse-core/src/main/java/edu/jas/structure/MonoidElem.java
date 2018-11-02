@@ -40,7 +40,7 @@ public interface MonoidElem<C> extends Element<C> {
      * @param S
      * @return this * S.
      */
-    C multiply(C S) throws MathException;
+    C multiply(C S);
 
 
     /**
@@ -138,7 +138,7 @@ public interface MonoidElem<C> extends Element<C> {
      *
      * @return x with this * x = 1, if it exists.
      */
-    C inverse() throws MathException; /*throws NotInvertibleException*/
+    C inverse(); /*throws NotInvertibleException*/
 
 
     /**
@@ -149,6 +149,6 @@ public interface MonoidElem<C> extends Element<C> {
      * Java 8 only
      */
     @SuppressWarnings("unchecked")
-    C power(long n) throws MathException;
+    C power(long n);
 
 }
