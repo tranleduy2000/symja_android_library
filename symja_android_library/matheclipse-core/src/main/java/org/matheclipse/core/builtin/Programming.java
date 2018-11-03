@@ -663,9 +663,6 @@ public final class Programming {
 
                         //j2objc changed: objc can not modify value with in expression
                         --iterations;
-                        System.out.println("iterations = " + iterations);
-                        System.out.println("current = " + current);
-                        System.out.println("last = " + last);
                     } while ((!current.isSame(last)) && (iterations > 0));
 				}
 				return current;
@@ -789,9 +786,6 @@ public final class Programming {
 
                         //j2objc changed: objc can not modify value with in expression
                         --iterations;
-                        System.out.println("iterations = " + iterations);
-                        System.out.println("current = " + current);
-                        System.out.println("last = " + last);
 					} while ((!current.isSame(last)) && (iterations > 0));
 				}
 				return list;

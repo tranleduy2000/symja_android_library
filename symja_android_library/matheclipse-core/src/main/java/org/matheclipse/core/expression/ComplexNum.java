@@ -30,7 +30,7 @@ import static org.matheclipse.core.expression.F.num;
 public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -6033055105824482264L;
 
@@ -87,7 +87,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	/**
 	 * Be cautious with this method, no new internal couble complex is created
-	 * 
+	 *
 	 * @param value
 	 *            a double complex numeric value
 	 * @return
@@ -383,7 +383,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 				NumberUtil.toLong(Math.floor(fComplex.getImaginary())));
 	}
 
-	
+
 	public Complex getCMComplex() {
 		return new Complex(fComplex.getReal(), fComplex.getImaginary());
 	}
@@ -596,7 +596,9 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	@Override
 	public IComplexNum pow(final IComplexNum val) {
-		if (Complex.equals(fComplex, Complex.ZERO, Config.DOUBLE_EPSILON)) {
+		//j2objc changed: compare two double value with DOUBLE_EPSILON give false result although
+		//it same value
+		if (Complex.equals(fComplex, Complex.ZERO, Config.DOUBLE_TOLERANCE)) {
 			ISignedNumber sn = val.re();
 			if (sn.isNegative()) {
 				EvalEngine.get().printMessage("Infinite expression 0^(negative number)");
@@ -617,7 +619,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 	}
 
 
-	
+
 	/**
 	 * Returns a {@code Complex} whose value is {@code (this - subtrahend)}. Uses the definitional formula
 	 * <p>

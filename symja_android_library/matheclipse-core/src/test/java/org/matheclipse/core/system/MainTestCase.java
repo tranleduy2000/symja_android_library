@@ -2772,7 +2772,7 @@ public class MainTestCase extends AbstractTestCase {
     public void testSystem390() {
         check("Apply((1 + 1/#) &, 10)", "11/10");
         check("FixedPoint((1 + 1/#) &, 10, 3)", "32/21");
-        checkNumeric("FixedPoint((Cos(#))&,0.8)", "0.7390851332151607");
+        checkNumeric("FixedPoint((Cos(#))&,0.8)", "0.7390851332151603");
     }
 
     public void testSystem391() {

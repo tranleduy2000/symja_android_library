@@ -291,7 +291,7 @@ public class Num extends INumImpl implements INum {
 		return F.integer(NumberUtil.toLong(Math.floor(fDouble)));
 	}
 
-	
+
 	/** {@inheritDoc} */
 	@Override
 	public ISignedNumber im() {
@@ -457,11 +457,7 @@ public class Num extends INumImpl implements INum {
 
 	@Override
 	public boolean isSame(IExpr expression, double epsilon) {
-		System.out.println("expression = " + expression);
-		System.out.println(expression instanceof Num);
 		if (expression instanceof Num) {
-			System.out.println("Num.isSame");
-			System.out.println(F.isZero(fDouble - ((Num) expression).fDouble, epsilon));
 			return F.isZero(fDouble - ((Num) expression).fDouble, epsilon);
 		}
 		return false;
@@ -569,7 +565,7 @@ public class Num extends INumImpl implements INum {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.matheclipse.parser.interfaces.IDouble#pow(org.matheclipse.parser. interfaces .IDouble)
 	 */
 	@Override
@@ -592,7 +588,7 @@ public class Num extends INumImpl implements INum {
 	public int sign() {
 		return (int) Math.signum(fDouble);
 	}
- 
+
 	/**
 	 * @return
 	 */
