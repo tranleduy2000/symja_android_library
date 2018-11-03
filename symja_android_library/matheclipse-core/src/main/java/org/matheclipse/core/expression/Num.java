@@ -29,7 +29,7 @@ import java.math.RoundingMode;
  */
 public class Num extends INumImpl implements INum {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 188084692735007429L;
 
@@ -457,7 +457,11 @@ public class Num extends INumImpl implements INum {
 
 	@Override
 	public boolean isSame(IExpr expression, double epsilon) {
+		System.out.println("expression = " + expression);
+		System.out.println(expression instanceof Num);
 		if (expression instanceof Num) {
+			System.out.println("Num.isSame");
+			System.out.println(F.isZero(fDouble - ((Num) expression).fDouble, epsilon));
 			return F.isZero(fDouble - ((Num) expression).fDouble, epsilon);
 		}
 		return false;
