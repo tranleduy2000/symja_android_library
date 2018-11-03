@@ -18,7 +18,7 @@ public class CombinatoricTestCase extends AbstractTestCase {
         super(name);
     }
 
-    public static void testRosenNumberPartitionIterator() {
+    public void testRosenNumberPartitionIterator() {
         RosenNumberPartitionIterator i = new RosenNumberPartitionIterator(10, 4);
         StringBuilder buf = new StringBuilder(256);
         while (i.hasNext()) {
