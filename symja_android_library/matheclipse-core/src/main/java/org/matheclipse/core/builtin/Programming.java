@@ -654,7 +654,6 @@ public final class Programming {
 				}
 				if (iterations > 0) {
 					IExpr last;
-                    --iterations;
                     do {
 						last = current;
 						current = engine.evaluate(F.Apply(f, F.List(current)));
@@ -662,7 +661,7 @@ public final class Programming {
 						// IterationLimitExceeded.throwIt(iterationCounter, ast);
 						// }
 
-                        //j2objc changed: can not modify value with in expression
+                        //j2objc changed: objc can not modify value with in expression
                         --iterations;
                     } while ((!current.isSame(last)) && (iterations > 0));
 				}
@@ -777,7 +776,6 @@ public final class Programming {
 				}
 				if (iterations > 0) {
 					IExpr last;
-					--iterations;
 					do {
 						last = current;
 						current = engine.evaluate(F.Apply(f, F.List(current)));
@@ -786,7 +784,7 @@ public final class Programming {
 						// IterationLimitExceeded.throwIt(iterationCounter, ast);
 						// }
 
-                        //j2objc changed: can not modify value with in expression
+                        //j2objc changed: objc can not modify value with in expression
                         --iterations;
 					} while ((!current.isSame(last)) && (iterations > 0));
 				}
