@@ -687,7 +687,7 @@ public class RubiIntegrationTest extends AbstractTestCase {
 
 	public void testFraction001() {
 		check("ExpandAll(-(2-x)^(-1)*x^(-2))", //
-				"1/(-2*x^2+x^3)");
+				"-1/(2*x^2-x^3)");
 		check("integrate(1/(-2*x^2+x^3),x)", //
 				"1/(2*x)-Log(x)/4+Log(-8+4*x)/4");
 		check("integrate(1/(x^2*(x-2)),x)", //
@@ -744,32 +744,50 @@ public class RubiIntegrationTest extends AbstractTestCase {
 
 	public void testIssue110() {
 
-		check("D(-Log(-1+x),x)", "1/(1-x)");
-		check("Together(-1/(-1+x))", "1/(1-x)");
+		check("D(-Log(-1+x),x)", //
+				"-1/(-1+x)");
+		check("Together(-1/(-1+x))", //
+				"-1/(-1+x)");
 		check("Integrate(1/(x-1), x)", //
 				"Log(1-x)");
-		check("Integrate(1/(1-x), x)", "-Log(1-x)");
-		check("Integrate(1/(42-x), x)", "-Log(42-x)");
+		check("Integrate(1/(1-x), x)", //
+				"-Log(1-x)");
+		check("Integrate(1/(42-x), x)", //
+				"-Log(42-x)");
 
 		check("Integrate(1/(I-x), x)", //
 				"-Log(I-x)");
 		check("Integrate(1/(x-I), x)", //
 				"Log(I-x)");
-
-		check("D(-Log(-1+x),x)", "1/(1-x)");
+		check("D(-Log(-1+x),x)", //
+				"-1/(-1+x)");
 	}
 
 	public void testGithub21() {
-		check("Integrate(4/(1-3*(x)) + 1/2*Sqrt((x)) - 5,x)", //
-				"-5*x+x^(3/2)/3-4/3*Log(1-3*x)");
-
-		// TODO Sort/Orderless problem in Simplify?
+		// check("Integrate(4/(1-3*(x)) + 1/2*Sqrt((x)) - 5,x)", //
+		// "-5*x+x^(3/2)/3-4/3*Log(1-3*x)");
+		//
+		// // TODO Sort/Orderless problem in Simplify?
+		check("OrderedQ({1-3*x,x})", //
+				"True");
+		check("OrderedQ({x,1-3*x})", //
+				"False");
+		check("OrderedQ({Sqrt(x)/2, 4/(1-3*x)})", //
+				"False");
+		check("OrderedQ({4/(1-3*x), Sqrt(x)/2})", //
+				"True");
+		check("OrderedQ({Sqrt(x)/2, -4/(-1+3*x)})", //
+				"True");
+		check("OrderedQ({-4/(-1+3*x), Sqrt(x)/2})", //
+				"False");
 		check("-5+4/(1-3*x)+Sqrt(x)/2", //
 				"-5+4/(1-3*x)+Sqrt(x)/2");
 		check("-5+Sqrt(x)/2+4/(1-3*x)", //
 				"-5+4/(1-3*x)+Sqrt(x)/2");
-		check("Simplify(D(-5*x+x^(3/2)/3-4/3*Log(1/3-x),x))", //
-				"-5+Sqrt(x)/2+4/(1-3*x)");
+		check("-5+Sqrt(x)/2-4/(-1+3*x)", //
+				"-5+Sqrt(x)/2-4/(-1+3*x)");
+		check("Simplify(-5+4/3*1/(1/3-x)+Sqrt(x)/2)", //
+				"-5+Sqrt(x)/2-4/(-1+3*x)");
 		check("PowerExpand(ln(3*(1/3-x)))", //
 				"Log(3)+Log(1/3-x)");
 	}

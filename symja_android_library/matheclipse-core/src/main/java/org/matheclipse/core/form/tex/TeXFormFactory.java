@@ -7,7 +7,6 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.util.Iterator;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.NILPointer;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -843,7 +842,7 @@ public class TeXFormFactory {
 		 */
 		public boolean convertTimesFraction(final StringBuilder buf, final IAST f, final int precedence,
 				final int caller) {
-			IExpr[] parts = Algebra.fractionalPartsTimesPower(f, false, true, false, false);
+			IExpr[] parts = Algebra.fractionalPartsTimesPower(f, false, true, false, false, false);
 			if (parts == null) {
 				convertTimesOperator(buf, f, precedence, caller);
 				return true;
@@ -883,6 +882,7 @@ public class TeXFormFactory {
 		private boolean convertTimesOperator(final StringBuilder buf, final IAST timesAST, final int precedence,
 				final int caller) {
 			int size = timesAST.size();
+			//j2objc changed: can not assign NIL
 			IExpr arg1 = F.nilPtr();
 			if (size > 1) {
 				arg1 = timesAST.arg1();

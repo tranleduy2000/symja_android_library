@@ -547,7 +547,7 @@ public class SeriesFunctions {
             IExpr y = F.Power(x, F.CN1); // substituting by 1/x
             IExpr temp = F.evalQuiet(F.subst(arg1, x, y));
             if (temp.isTimes()) {
-                IExpr[] parts = Algebra.fractionalPartsTimesPower((IAST) temp, false, false, true, true);
+				IExpr[] parts = Algebra.fractionalPartsTimesPower((IAST) temp, false, false, true, true, true);
                 if (parts != null) {
                     if (!parts[1].isOne()) { // denominator != 1
                         LimitData ndData = new LimitData(x, F.C0, F.Rule(x, F.C0), data.getDirection());
@@ -561,8 +561,8 @@ public class SeriesFunctions {
             return F.NIL;
         }
 
-        private static IExpr timesLimit(final IAST timesAST, final LimitData data) {
-            IAST isFreeResult = timesAST.partitionTimes(new Predicate<IExpr>() {
+		private static IExpr timesLimit(final IAST timesAST, final LimitData data) {
+			IAST isFreeResult = timesAST.partitionTimes(new Predicate<IExpr>() {
                 @Override
                 public boolean test(IExpr x) {
                     return x.isFree(data.getSymbol(), true);
@@ -571,7 +571,7 @@ public class SeriesFunctions {
             if (!isFreeResult.get(1).isOne()) {
                 return F.Times(isFreeResult.get(1), data.limit(isFreeResult.get(2)));
             }
-            IExpr[] parts = Algebra.fractionalPartsTimesPower(timesAST, false, false, true, true);
+			IExpr[] parts = Algebra.fractionalPartsTimesPower(timesAST, false, false, true, true, true);
             if (parts != null) {
 
                 IExpr numerator = parts[0];
@@ -938,8 +938,31 @@ public class SeriesFunctions {
 				for (int i = 0; i <= end; i++) {
 					ps.setCoeff(i, engine.evaluate(F.subst(temp, F.Rule(power, F.ZZ(i)))));
                 }
+				return ps;
+			} else {
+				int end = n;
+				if (n < 0) {
+					end = 0;
+				}
+				temp = engine.evaluate(F.SeriesCoefficient(function, F.List(x, x0, F.C0)));
+				if (temp.isFree(F.SeriesCoefficient)) {
+					boolean evaled = true;
+					ASTSeriesData ps = new ASTSeriesData(x, x0, end + 1, end + denominator, denominator);
+					ps.setCoeff(0, temp);
+					for (int i = 1; i <= end; i++) {
+						temp = engine.evaluate(F.SeriesCoefficient(function, F.List(x, x0, F.ZZ(i))));
+						if (temp.isFree(F.SeriesCoefficient)) {
+							ps.setCoeff(i, temp);
+						} else {
+							evaled = false;
+							break;
+						}
+					}
+					if (evaled) {
                 return ps;
             }
+				}
+			}
             ASTSeriesData ps = new ASTSeriesData(x, x0, 0, n + denominator, denominator);
             IExpr derivedFunction = function;
             for (int i = 0; i <= n; i++) {
@@ -1200,11 +1223,13 @@ public class SeriesFunctions {
                                         F.C0);
                             }
                         }
+						if (!x0.isZero()) {
                         IExpr exp = function.exponent();
                         return F.Piecewise(
                                 F.List(F.List(F.Times(F.Power(x0, F.Plus(exp, n.negate())), F.Binomial(exp, n)),
                                         F.GreaterEqual(n, F.C0))),
                                 F.C0);
+						}
                     } else if (function.exponent().equals(x) && function.base().isFree(x)) {
                         // b^x with b is free of x
                         IExpr b = function.base();

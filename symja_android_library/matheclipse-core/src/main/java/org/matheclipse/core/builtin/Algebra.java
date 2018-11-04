@@ -1168,7 +1168,7 @@ public class Algebra {
 				} else if (ast.isTimes()) {
 					// (a+b)*(c+d)...
 
-					IExpr[] temp = fractionalPartsTimesPower(ast, false, false, false, evalParts);
+					IExpr[] temp = fractionalPartsTimesPower(ast, false, false, false, evalParts, true);
 					IExpr tempExpr;
 					if (temp == null) {
 						return expandTimes(ast);
@@ -4812,11 +4812,13 @@ public class Algebra {
 	 *            try to find a trigonometric numerator/denominator form (Example: Csc[x] gives 1 / Sin[x])
 	 * @param evalParts
 	 *            evaluate the determined numerator and denominator parts
+	 * @param negateNumerDenom
+	 *            negate numerator and denominator, if they are both negative
 	 * @return the numerator and denominator expression and an optional fractional number (maybe <code>null</code>), if
 	 *         splitNumeratorOne is <code>true</code>.
 	 */
 	public static IExpr[] fractionalPartsTimesPower(final IAST timesPower, boolean splitNumeratorOne,
-			boolean splitFractionalNumbers, boolean trig, boolean evalParts) {
+			boolean splitFractionalNumbers, boolean trig, boolean evalParts, boolean negateNumerDenom) {
 		if (timesPower.isPower()) {
 			IExpr[] parts = Apart.fractionalPartsPower(timesPower, trig);
 			if (parts != null) {
@@ -4903,7 +4905,7 @@ public class Algebra {
 				result[0] = numerator.getOneIdentity(F.C1);
 				result[1] = denominator.getOneIdentity(F.C1);
 			}
-			if (result[0].isNegative() && result[1].isPlus() && ((IAST) result[1]).isAST2()) {
+			if (negateNumerDenom && result[0].isNegative() && result[1].isPlus() && ((IAST) result[1]).isAST2()) {
 				// negate numerator and denominator:
 				result[0] = result[0].negate();
 				result[1] = result[1].negate();
@@ -4937,7 +4939,7 @@ public class Algebra {
 		if (arg.isAST()) {
 			IAST ast = (IAST) arg;
 			if (arg.isTimes()) {
-				parts = fractionalPartsTimesPower(ast, false, true, trig, true);
+				parts = fractionalPartsTimesPower(ast, false, true, trig, true, true);
 			} else if (arg.isPower()) {
 				parts = Apart.fractionalPartsPower(ast, trig);
 				if (parts == null) {
