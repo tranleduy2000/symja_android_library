@@ -5,6 +5,7 @@
 package edu.jas.gb;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -140,7 +141,7 @@ public class EReductionSeq<C extends RingElem<C>> extends DReductionSeq<C> imple
      * @param Pp polynomial list.
      * @return e-nf(Ap) with respect to Pp.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     @Override
     public GenPolynomial<C> normalform(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap) {
         if (Pp == null || Pp.isEmpty()) {

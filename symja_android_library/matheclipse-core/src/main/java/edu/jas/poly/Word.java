@@ -8,7 +8,6 @@ package edu.jas.poly;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import edu.jas.structure.Element;
 import edu.jas.structure.MonoidElem;
 import edu.jas.structure.MonoidElemImpl;
 import edu.jas.structure.MonoidFactory;
@@ -91,17 +90,35 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         }
     }
 
+    /**
+     * String dependency on letters.
+     *
+     * @param v string.
+     * @return sorted map of letters and the number of its occurences.
+     */
+    public static SortedMap<String, Integer> histogram(String v) {
+        SortedMap<String, Integer> map = new TreeMap<String, Integer>();
+        for (int i = 0; i < v.length(); i++) {
+            String s = String.valueOf(v.charAt(i));
+            Integer n = map.get(s);
+            if (n == null) {
+                n = 0;
+            }
+            n = n + 1;
+            map.put(s, n);
+        }
+        return map;
+    }
 
     /**
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public MonoidFactory<Word> factory() {
         return mono;
     }
-
 
     /**
      * Copy this.
@@ -113,7 +130,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return new Word(mono, val, false);
     }
 
-
     /**
      * Get the word String.
      *
@@ -122,7 +138,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
     /*package*/String getVal() {
         return val;
     }
-
 
     /**
      * Get the letter at position i.
@@ -134,7 +149,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return val.charAt(i);
     }
 
-
     /**
      * Get the length of this word.
      *
@@ -143,7 +157,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
     public int length() {
         return val.length();
     }
-
 
     /**
      * Get the string representation.
@@ -175,12 +188,11 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return s.toString();
     }
 
-
     /**
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -206,19 +218,17 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return s.toString();
     }
 
-
     /**
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
         // Python case
         return mono.toString();
     }
-
 
     /**
      * Comparison with any other object.
@@ -233,10 +243,9 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         Word b = (Word) B;
         // mono == b.mono ??
         int t = this.compareTo(b);
-        //System.out.println("equals: this = " + this + " B = " + B + " t = " + t);
+        //System.out.println("equals: this = " + this.val + " b = " + b.val + " t = " + t);
         return (0 == t);
     }
-
 
     /**
      * hashCode.
@@ -251,7 +260,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return hash;
     }
 
-
     /**
      * Is Word one.
      *
@@ -261,7 +269,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return val.isEmpty();
     }
 
-
     /**
      * Is Word unit.
      *
@@ -270,7 +277,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
     public boolean isUnit() {
         return isONE();
     }
-
 
     /**
      * Word multiplication.
@@ -282,7 +288,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return new Word(mono, this.val + V.val, false);
     }
 
-
     /**
      * Word divide.
      *
@@ -293,7 +298,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return divideLeft(V);
     }
 
-
     /**
      * Word divide left.
      *
@@ -302,14 +306,13 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
      */
     public Word divideLeft(Word V) {
         Word[] ret = divideWord(V, false);
-        // TODO: fail if both non zero?
+        // fail if right is non zero
         if (!ret[1].isONE()) {
             throw new IllegalArgumentException("not simple left dividable: left = " + ret[0] + ", right = "
                     + ret[1] + ", use divideWord");
         }
         return ret[0];
     }
-
 
     /**
      * Word divide right.
@@ -319,14 +322,13 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
      */
     public Word divideRight(Word V) {
         Word[] ret = divideWord(V, true);
-        // TODO: fail if both non zero?
+        // fail if left is non zero
         if (!ret[0].isONE()) {
             throw new IllegalArgumentException("not simple right dividable: left = " + ret[0] + ", right = "
                     + ret[1] + ", use divideWord");
         }
         return ret[1];
     }
-
 
     /**
      * Word divide with prefix and suffix.
@@ -364,7 +366,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return ret;
     }
 
-
     /**
      * Word remainder.
      *
@@ -379,7 +380,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return V;
     }
 
-
     /**
      * Quotient and remainder by division of this by S.
      *
@@ -389,7 +389,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
     public Word[] quotientRemainder(Word S) {
         return new Word[]{divide(S), remainder(S)};
     }
-
 
     /**
      * Word inverse.
@@ -402,7 +401,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         }
         throw new NotInvertibleException("not inversible " + this);
     }
-
 
     /**
      * Word signum.
@@ -418,7 +416,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return i;
     }
 
-
     /**
      * Word degree.
      *
@@ -428,26 +425,14 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return val.length();
     }
 
-
     /**
      * Word dependency on letters.
      *
      * @return sorted map of letters and the number of its occurences.
      */
     public SortedMap<String, Integer> dependencyOnVariables() {
-        SortedMap<String, Integer> map = new TreeMap<String, Integer>();
-        for (int i = 0; i < val.length(); i++) {
-            String s = String.valueOf(val.charAt(i));
-            Integer n = map.get(s);
-            if (n == null) {
-                n = 0;
-            }
-            n = n + 1;
-            map.put(s, n);
-        }
-        return map;
+        return histogram(val);
     }
-
 
     /**
      * Word leading exponent vector.
@@ -528,20 +513,18 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
 
 
     /**
-     * Word compareTo. Uses
-     * <p>
-     * <pre>
-     * String.compareTo
-     * </pre>
-     * <p>
-     * .
+     * Word compareTo. Uses <code>String.compareTo</code>.
      *
      * @param V other word.
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
     @Override
     public int compareTo(Word V) {
-        return this.val.compareTo(V.val);
+        if (mono == V.mono) {
+            return val.compareTo(V.val);
+        }
+        //System.out.println("compareTo: mono " + mono + ", V = " + V.mono);
+        return toString().compareTo(V.toString());
     }
 
 

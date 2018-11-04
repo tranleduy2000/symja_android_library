@@ -118,6 +118,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      */
     public boolean isZERO() {
         return number.isZERO();
+        //return magnitude().isZERO();
     }
 
 
@@ -210,7 +211,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
         if (s != 0) {
             return s;
         }
-        s = this.subtract(b).signum(); // TODO
+        s = this.subtract(b).signum(); // avoid subtract if possible
         //System.out.println("s_real = " + s);
         return s;
     }
@@ -423,6 +424,7 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
      * @param S a RealAlgebraicNumber
      * @return [this/S, this - (this/S)*S].
      */
+    @SuppressWarnings("unchecked")
     public RealAlgebraicNumber<C>[] quotientRemainder(RealAlgebraicNumber<C> S) {
         return new RealAlgebraicNumber[]{divide(S), remainder(S)};
     }

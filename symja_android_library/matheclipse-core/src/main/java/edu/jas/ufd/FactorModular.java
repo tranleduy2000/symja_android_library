@@ -5,6 +5,7 @@
 package edu.jas.ufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
     /**
      * No argument constructor, do not use.
      */
-    @SuppressWarnings({"cast", "unused"})
+    @SuppressWarnings({"unchecked", "unused"})
     private FactorModular() {
         this((RingFactory<MOD>) new ModLongRing(13, true)); // hack, 13 unimportant
     }
@@ -79,7 +80,8 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         GenPolynomialRing<MOD> pfac = P.ring;
         if (pfac.nvar > 1) {
-            throw new IllegalArgumentException(this.getClass().getName() + " only for univariate polynomials");
+            throw new IllegalArgumentException(
+                    this.getClass().getName() + " only for univariate polynomials");
         }
         ModularRingFactory<MOD> mr = (ModularRingFactory<MOD>) pfac.coFac;
         java.math.BigInteger m = mr.getIntegerModul().getVal();
@@ -126,7 +128,8 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         GenPolynomialRing<MOD> pfac = P.ring;
         if (pfac.nvar > 1) {
-            throw new IllegalArgumentException(this.getClass().getName() + " only for univariate polynomials");
+            throw new IllegalArgumentException(
+                    this.getClass().getName() + " only for univariate polynomials");
         }
         if (P.degree(0) == deg) {
             facs.add(P);
@@ -150,7 +153,7 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         GenPolynomial<MOD> g = null;
         int degi = (int) deg; //f.degree(0);
         //System.out.println("deg = " + deg);
-        BigInteger di = (new BigInteger(m)).power(deg); //Power.<BigInteger> positivePower(new BigInteger(m), deg);
+        BigInteger di = (new BigInteger(m)).power(deg);
         //System.out.println("di = " + di);
         java.math.BigInteger d = di.getVal(); //.longValue()-1;
         //System.out.println("d = " + d);
@@ -205,7 +208,8 @@ public class FactorModular<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         GenPolynomialRing<MOD> pfac = P.ring;
         if (pfac.nvar > 1) {
-            throw new IllegalArgumentException(this.getClass().getName() + " only for univariate polynomials");
+            throw new IllegalArgumentException(
+                    this.getClass().getName() + " only for univariate polynomials");
         }
         if (!P.leadingBaseCoefficient().isONE()) {
             throw new IllegalArgumentException("ldcf(P) != 1: " + P);

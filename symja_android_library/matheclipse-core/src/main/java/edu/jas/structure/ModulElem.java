@@ -15,7 +15,7 @@ import java.util.List;
  * @param <C> scalar type
  * @author Heinz Kredel
  */
-public interface ModulElem<M, C> extends AbelianGroupElem<M> {
+public interface ModulElem<M extends ModulElem<M, C>, C extends RingElem<C>> extends AbelianGroupElem<M> {
 
 
     /**

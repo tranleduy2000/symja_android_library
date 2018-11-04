@@ -37,7 +37,7 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
      *
      * @param c array of corners.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     /*package*/ Rectangle(Complex<C>[] c) {
         if (c.length < 5) {
             corners = (Complex<C>[]) new Complex[5];
@@ -79,7 +79,7 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
 
     /**
      * Constructor.
-     * <p>
+     *
      * <pre>
      *  nw|0 ne|3
      *  sw|1 se|2
@@ -90,7 +90,7 @@ public class Rectangle<C extends RingElem<C> & Rational> implements Serializable
      * @param se corner.
      * @param ne corner.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public Rectangle(Complex<C> nw, Complex<C> sw, Complex<C> se, Complex<C> ne) {
         this(new Complex[]{nw, sw, se, ne});
     }

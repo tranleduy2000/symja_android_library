@@ -5,6 +5,7 @@
 package edu.jas.gbufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import edu.jas.ufd.GreatestCommonDivisorFake;
  *
  * @param <C> coefficient type
  * @author Heinz Kredel
-
+ * @see edu.jas.application.GBAlgorithmBuilder
  * @see GBFactory
  */
 
@@ -131,7 +132,6 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
             // TODO check that also coeffTable is empty for recursive solvable poly ring
         } else {
             //engine = GCDFactory.<C> getImplementation(cofac.coFac);
-            //
             engine = GCDFactory.getProxy(cofac.coFac);
         }
     }
@@ -154,7 +154,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
             return G;
         }
         GenSolvablePolynomialRing<GenPolynomial<C>> ring = G.get(0).ring;
-        if (ring.coFac.isField()) { // TODO remove 
+        if (ring.coFac.isField()) { // remove ? 
             throw new IllegalArgumentException("coefficients from a field");
         }
         PairList<GenPolynomial<C>> pairlist = strategy.create(modv, ring);
@@ -288,7 +288,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         }
         //System.out.println("G = " + G);
         GenSolvablePolynomialRing<GenPolynomial<C>> ring = G.get(0).ring; // assert != null
-        if (ring.coFac.isField()) { // TODO remove
+        if (ring.coFac.isField()) { // remove ?
             throw new IllegalArgumentException("coefficients from a field");
         }
         // add also coefficient generators
@@ -464,7 +464,7 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         GenSolvablePolynomialRing<GenPolynomial<C>> ring = Fp.get(0).ring; // assert != null
         //List<GenSolvablePolynomial<C>> X = generateUnivar( modv, Fp );
         List<GenSolvablePolynomial<GenPolynomial<C>>> X, Y;
-        X = PolynomialList.castToSolvableList(ring.generators()); // todo use? modv
+        X = PolynomialList.castToSolvableList(ring.generators()); // modv used below
         Y = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>();
         for (GenSolvablePolynomial<GenPolynomial<C>> x : X) {
             if (x.isConstant()) {

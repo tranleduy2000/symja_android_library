@@ -5,6 +5,7 @@
 package edu.jas.fd;
 
 
+
 import org.apache.log4j.Logger;
 
 import edu.jas.arith.BigInteger;
@@ -38,7 +39,7 @@ import edu.jas.structure.RingFactory;
  * time will be two times the time of the fastest algorithm
  * implementation. On systems with more than two CPUs the computing time
  * will be the time of the fastest algorithm implementation.
- * <p>
+ *
  * <pre>
  *        GreatestCommonDivisor&lt;CT&gt; engine;
  *        engine = SGCDFactory.&lt;CT&gt; getImplementation(cofac);
@@ -48,7 +49,7 @@ import edu.jas.structure.RingFactory;
  * <p>
  * For example, if the coefficient type is <code>BigInteger</code>, the
  * usage looks like
- * <p>
+ *
  * <pre>
  *        BigInteger cofac = new BigInteger();
  *        GreatestCommonDivisor&lt;BigInteger&gt; engine;

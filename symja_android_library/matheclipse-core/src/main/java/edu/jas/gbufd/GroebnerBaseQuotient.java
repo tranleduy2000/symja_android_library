@@ -5,6 +5,7 @@
 package edu.jas.gbufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -39,6 +40,16 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
 
 
     public final GroebnerBaseAbstract<GenPolynomial<C>> bba;
+
+
+    /**
+     * Constructor.
+     *
+     * @param rf quotient coefficient ring factory.
+     */
+    public GroebnerBaseQuotient(QuotientRing<C> rf) {
+        this(new GroebnerBasePseudoRecSeq<C>(rf.ring));
+    }
 
 
     /**

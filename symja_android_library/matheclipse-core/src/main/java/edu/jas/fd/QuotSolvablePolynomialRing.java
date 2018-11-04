@@ -5,6 +5,7 @@
 package edu.jas.fd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -491,7 +492,7 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         SolvableQuotient<C> a;
         // add random coeffs and exponents
         for (int i = 0; i < l; i++) {
-            e = ExpVector.EVRAND(nvar, d, q, rnd);
+            e = ExpVector.random(nvar, d, q, rnd);
             a = coFac.random(k, rnd);
             r = (QuotSolvablePolynomial<C>) r.sum(a, e);
             // somewhat inefficient but clean
@@ -591,11 +592,9 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
      *
      * @return List(X_1, ..., X_n) a list of univariate polynomials.
      */
-    //todo Override
-    @SuppressWarnings("unchecked")
-    public List<QuotSolvablePolynomial<C>> recUnivariateList() {
-        //return castToSolvableList( super.univariateList() );
-        return (List<QuotSolvablePolynomial<C>>) (Object) univariateList(0, 1L);
+    @Override
+    public List<QuotSolvablePolynomial<C>> univariateList() {
+        return univariateList(0, 1L);
     }
 
 
@@ -605,10 +604,9 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
      * @param modv number of module variables.
      * @return List(X_1, ..., X_n) a list of univariate polynomials.
      */
-    //todo Override
-    @SuppressWarnings("unchecked")
-    public List<QuotSolvablePolynomial<C>> recUnivariateList(int modv) {
-        return (List<QuotSolvablePolynomial<C>>) (Object) univariateList(modv, 1L);
+    @Override
+    public List<QuotSolvablePolynomial<C>> univariateList(int modv) {
+        return univariateList(modv, 1L);
     }
 
 
@@ -620,8 +618,8 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
      * @param e    the exponent of the variables.
      * @return List(X_1 ^ e, ..., X_n ^ e) a list of univariate polynomials.
      */
-    //todo Override
-    public List<QuotSolvablePolynomial<C>> recUnivariateList(int modv, long e) {
+    @Override
+    public List<QuotSolvablePolynomial<C>> univariateList(int modv, long e) {
         List<QuotSolvablePolynomial<C>> pols = new ArrayList<QuotSolvablePolynomial<C>>(nvar);
         int nm = nvar - modv;
         for (int i = 0; i < nm; i++) {
@@ -630,30 +628,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         }
         return pols;
     }
-
-
-    /*
-     * Generate list of univariate polynomials in all variables with given exponent.
-     * @param modv number of module variables.
-     * @param e the exponent of the variables.
-     * @return List(X_1^e,...,X_n^e) a list of univariate polynomials.
-     @Override
-     public List<QuotSolvablePolynomial<C>> univariateList(int modv, long e) {
-     List<GenPolynomial<C>> pol = super.univariateList(modv,e);
-     UnaryFunctor<GenPolynomial<C>,QuotSolvablePolynomial<C>> fc 
-     = new UnaryFunctor<GenPolynomial<C>,QuotSolvablePolynomial<C>>() {
-     public QuotSolvablePolynomial<C> eval(GenPolynomial<C> p) {
-     if ( ! (p instanceof QuotSolvablePolynomial) ) {
-     throw new RuntimeException("no solvable polynomial "+p);
-     }
-     return (QuotSolvablePolynomial<C>) p;
-     }
-     };
-     List<QuotSolvablePolynomial<C>> pols 
-     = ListUtil.<GenPolynomial<C>,QuotSolvablePolynomial<C>>map(this,pol,fc);
-     return pols;
-     }
-    */
 
 
     /**
@@ -665,7 +639,53 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
      */
     @Override
     public QuotSolvablePolynomialRing<C> extend(int i) {
-        GenPolynomialRing<SolvableQuotient<C>> pfac = super.extend(i);
+        return extend(i, false);
+    }
+
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by i.
+     *
+     * @param i   number of variables to extend.
+     * @param top true for TOP term order, false for POT term order.
+     * @return extended solvable polynomial ring factory.
+     */
+    @Override
+    public QuotSolvablePolynomialRing<C> extend(int i, boolean top) {
+        GenPolynomialRing<SolvableQuotient<C>> pfac = super.extend(i, top);
+        QuotSolvablePolynomialRing<C> spfac = new QuotSolvablePolynomialRing<C>(pfac.coFac, pfac.nvar,
+                pfac.tord, pfac.getVars());
+        spfac.table.extend(this.table);
+        spfac.polCoeff.coeffTable.extend(this.polCoeff.coeffTable);
+        return spfac;
+    }
+
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by i.
+     *
+     * @param vn names for extended variables.
+     * @return extended solvable polynomial ring factory.
+     */
+    @Override
+    public QuotSolvablePolynomialRing<C> extend(String[] vn) {
+        return extend(vn, false);
+    }
+
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by i.
+     *
+     * @param vn  names for extended variables.
+     * @param top true for TOP term order, false for POT term order.
+     * @return extended solvable polynomial ring factory.
+     */
+    @Override
+    public QuotSolvablePolynomialRing<C> extend(String[] vn, boolean top) {
+        GenPolynomialRing<SolvableQuotient<C>> pfac = super.extend(vn, top);
         QuotSolvablePolynomialRing<C> spfac = new QuotSolvablePolynomialRing<C>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.getVars());
         spfac.table.extend(this.table);

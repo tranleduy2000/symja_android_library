@@ -3,7 +3,8 @@
  */
 
 package edu.jas.poly;
-// todo: move to edu.jas.poly
+
+
 
 import org.apache.log4j.Logger;
 
@@ -207,6 +208,7 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
      * @param v  names for the variables.
      * @param rt solvable multiplication relations.
      */
+    @SuppressWarnings("unchecked")
     public QLRSolvablePolynomialRing(RingFactory<C> cf, int n, TermOrder t, String[] v,
                                      RelationTable<C> rt) {
         super(cf, n, t, v, rt);
@@ -538,7 +540,7 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         C a;
         // add random coeffs and exponents
         for (int i = 0; i < l; i++) {
-            e = ExpVector.EVRAND(nvar, d, q, rnd);
+            e = ExpVector.random(nvar, d, q, rnd);
             a = coFac.random(k, rnd);
             r = (QLRSolvablePolynomial<C, D>) r.sum(a, e);
             // somewhat inefficient but clean
@@ -641,11 +643,9 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
      *
      * @return List(X_1, ..., X_n) a list of univariate polynomials.
      */
-    //todo Override
-    @SuppressWarnings("unchecked")
-    public List<QLRSolvablePolynomial<C, D>> recUnivariateList() {
-        //return castToSolvableList( super.univariateList() );
-        return (List<QLRSolvablePolynomial<C, D>>) (Object) univariateList(0, 1L);
+    @Override
+    public List<QLRSolvablePolynomial<C, D>> univariateList() {
+        return univariateList(0, 1L);
     }
 
 
@@ -655,10 +655,9 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
      * @param modv number of module variables.
      * @return List(X_1, ..., X_n) a list of univariate polynomials.
      */
-    //todo Override
-    @SuppressWarnings("unchecked")
-    public List<QLRSolvablePolynomial<C, D>> recUnivariateList(int modv) {
-        return (List<QLRSolvablePolynomial<C, D>>) (Object) univariateList(modv, 1L);
+    @Override
+    public List<QLRSolvablePolynomial<C, D>> univariateList(int modv) {
+        return univariateList(modv, 1L);
     }
 
 
@@ -670,8 +669,8 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
      * @param e    the exponent of the variables.
      * @return List(X_1 ^ e, ..., X_n ^ e) a list of univariate polynomials.
      */
-    //todo Override
-    public List<QLRSolvablePolynomial<C, D>> recUnivariateList(int modv, long e) {
+    @Override
+    public List<QLRSolvablePolynomial<C, D>> univariateList(int modv, long e) {
         List<QLRSolvablePolynomial<C, D>> pols = new ArrayList<QLRSolvablePolynomial<C, D>>(nvar);
         int nm = nvar - modv;
         for (int i = 0; i < nm; i++) {
@@ -680,30 +679,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         }
         return pols;
     }
-
-
-    /*
-     * Generate list of univariate polynomials in all variables with given exponent.
-     * @param modv number of module variables.
-     * @param e the exponent of the variables.
-     * @return List(X_1^e,...,X_n^e) a list of univariate polynomials.
-     @Override
-     public List<QLRSolvablePolynomial<C,D>> univariateList(int modv, long e) {
-     List<GenPolynomial<C>> pol = super.univariateList(modv,e);
-     UnaryFunctor<GenPolynomial<C>,QLRSolvablePolynomial<C,D>> fc 
-     = new UnaryFunctor<GenPolynomial<C>,QLRSolvablePolynomial<C,D>>() {
-     public QLRSolvablePolynomial<C,D> eval(GenPolynomial<C> p) {
-     if ( ! (p instanceof QLRSolvablePolynomial) ) {
-     throw new RuntimeException("no solvable polynomial "+p);
-     }
-     return (QLRSolvablePolynomial<C,D>) p;
-     }
-     };
-     List<QLRSolvablePolynomial<C,D>> pols 
-     = ListUtil.<GenPolynomial<C>,QLRSolvablePolynomial<C,D>>map(this,pol,fc);
-     return pols;
-     }
-    */
 
 
     /**
@@ -715,9 +690,57 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
      */
     @Override
     public QLRSolvablePolynomialRing<C, D> extend(int i) {
-        GenPolynomialRing<C> pfac = super.extend(i);
+        return extend(i, false);
+    }
+
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by i.
+     *
+     * @param i   number of variables to extend.
+     * @param top true for TOP term order, false for POT term order.
+     * @return extended solvable polynomial ring factory.
+     */
+    @Override
+    public QLRSolvablePolynomialRing<C, D> extend(int i, boolean top) {
+        GenPolynomialRing<C> pfac = super.extend(i, top);
         QLRSolvablePolynomialRing<C, D> spfac = new QLRSolvablePolynomialRing<C, D>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.getVars());
+        spfac.table.extend(this.table);
+        spfac.polCoeff.coeffTable.extend(this.polCoeff.coeffTable);
+        return spfac;
+    }
+
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by length(vn). New variables commute with the exiting
+     * variables.
+     *
+     * @param vn names for extended variables.
+     * @return extended polynomial ring factory.
+     */
+    @Override
+    public QLRSolvablePolynomialRing<C, D> extend(String[] vn) {
+        return extend(vn, false);
+    }
+
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by length(vn). New variables commute with the exiting
+     * variables.
+     *
+     * @param vn  names for extended variables.
+     * @param top true for TOP term order, false for POT term order.
+     * @return extended polynomial ring factory.
+     */
+    @Override
+    public QLRSolvablePolynomialRing<C, D> extend(String[] vn, boolean top) {
+        GenPolynomialRing<C> pfac = super.extend(vn, top);
+        QLRSolvablePolynomialRing<C, D> spfac = new QLRSolvablePolynomialRing<C, D>(pfac.coFac, pfac.nvar,
+                pfac.tord, pfac.vars);
         spfac.table.extend(this.table);
         spfac.polCoeff.coeffTable.extend(this.polCoeff.coeffTable);
         return spfac;

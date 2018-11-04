@@ -18,7 +18,6 @@ import edu.jas.poly.AlgebraicNumber;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.structure.BinaryFunctor;
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.Selector;
@@ -132,7 +131,7 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public MultiVarPowerSeriesRing<C> factory() {
         return ring;
@@ -221,7 +220,7 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -276,7 +275,7 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -1084,7 +1083,7 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
      * Is power series zero. <b>Note: </b> compare only up to truncate.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         return (signum() == 0);
@@ -1095,7 +1094,7 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
      * Is power series one. <b>Note: </b> compare only up to truncate.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         if (!leadingCoefficient().isONE()) {
@@ -1353,6 +1352,7 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
      * @param S a MultiVarPowerSeries
      * @return [this/S, this - (this/S)*S].
      */
+    @SuppressWarnings("unchecked")
     public MultiVarPowerSeries<C>[] quotientRemainder(MultiVarPowerSeries<C> S) {
         return new MultiVarPowerSeries[]{divide(S), remainder(S)};
     }

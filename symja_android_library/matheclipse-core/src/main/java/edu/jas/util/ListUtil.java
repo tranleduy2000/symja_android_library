@@ -6,6 +6,7 @@ package edu.jas.util;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -107,6 +108,36 @@ public class ListUtil {
             r.add(e);
         }
         return r;
+    }
+
+
+    /**
+     * Test two iterables for equal contents and sequence.
+     *
+     * @param a iterable
+     * @param b iterable
+     * @return true, if a equals b in sequence and content, else false.
+     */
+    public static <C> boolean equals(Iterable<C> a, Iterable<C> b) {
+        Iterator<C> ai = a.iterator();
+        Iterator<C> bi = b.iterator();
+        while (ai.hasNext() && bi.hasNext()) {
+            C aa = ai.next();
+            C ba = bi.next();
+            if (!aa.equals(ba)) {
+                System.out.println("aa != ba: " + aa + " != " + ba);
+                return false;
+            }
+        }
+        if (ai.hasNext()) {
+            System.out.println("aa: " + ai.next());
+            return false;
+        }
+        if (bi.hasNext()) {
+            System.out.println("ba: " + bi.next());
+            return false;
+        }
+        return true;
     }
 
 }

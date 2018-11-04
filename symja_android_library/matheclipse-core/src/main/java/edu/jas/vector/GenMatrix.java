@@ -13,7 +13,6 @@ import java.util.List;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.AlgebraElem;
 import edu.jas.structure.AlgebraElemImpl;
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 
 
@@ -164,7 +163,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -199,7 +198,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -212,7 +211,7 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public GenMatrixRing<C> factory() {
         return ring;

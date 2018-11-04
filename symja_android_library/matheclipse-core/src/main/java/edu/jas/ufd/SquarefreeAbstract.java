@@ -5,6 +5,9 @@
 package edu.jas.ufd;
 
 
+
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +28,9 @@ import edu.jas.structure.RingFactory;
  */
 
 public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Squarefree<C> {
+
+
+    private static final Logger logger = Logger.getLogger(SquarefreeAbstract.class);
 
 
     /**
@@ -105,11 +111,6 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
             Ps = engine.basePrimitivePart(Ps);
         }
         boolean f = Ps.equals(S);
-        //if (!f) {
-        //System.out.println("\nisSquarefree: " + f);
-        //System.out.println("S  = " + S);
-        //System.out.println("P  = " + P);
-        //}
         return f;
     }
 
@@ -143,9 +144,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         GenPolynomial<GenPolynomial<C>> S = recursiveUnivariateSquarefreePart(P);
         boolean f = P.equals(S);
         if (!f) {
-            System.out.println("\nisSquarefree: " + f);
-            System.out.println("S = " + S);
-            System.out.println("P = " + P);
+            logger.info("not Squarefree, S != P: " + P + " != " + S);
         }
         return f;
     }
@@ -278,10 +277,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         }
         boolean f = P.equals(t) || P.equals(t.negate());
         if (!f) {
-            System.out.println("\nfactorization(list): " + f);
-            System.out.println("F = " + F);
-            System.out.println("P = " + P);
-            System.out.println("t = " + t);
+            logger.info("no factorization(list): F = " + F + ", P = " + P + ", t = " + t);
         }
         return f;
     }
@@ -322,25 +318,20 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         GenPolynomial<C> t = P.ring.getONE();
         for (Map.Entry<GenPolynomial<C>, Long> me : F.entrySet()) {
             GenPolynomial<C> f = me.getKey();
-            Long E = me.getValue(); // F.get(f);
+            Long E = me.getValue();
             long e = E.longValue();
-            GenPolynomial<C> g = f.power(e); //Power.<GenPolynomial<C>> positivePower(f, e);
+            GenPolynomial<C> g = f.power(e);
             t = t.multiply(g);
         }
         boolean f = P.equals(t) || P.equals(t.negate());
         if (!f) {
-            //System.out.println("P = " + P);
-            //System.out.println("t = " + t);
             P = P.monic();
             t = t.monic();
             f = P.equals(t) || P.equals(t.negate());
             if (f) {
                 return f;
             }
-            System.out.println("\nfactorization(map): " + f);
-            System.out.println("F = " + F);
-            System.out.println("P = " + P);
-            System.out.println("t = " + t);
+            logger.info("no factorization(map): F = " + F + ", P = " + P + ", t = " + t);
             //RuntimeException e = new RuntimeException("fac-map");
             //e.printStackTrace();
             //throw e;
@@ -369,13 +360,11 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
             GenPolynomial<GenPolynomial<C>> f = me.getKey();
             Long E = me.getValue(); // F.get(f);
             long e = E.longValue();
-            GenPolynomial<GenPolynomial<C>> g = f.power(e); //Power.<GenPolynomial<GenPolynomial<C>>> positivePower(f, e);
+            GenPolynomial<GenPolynomial<C>> g = f.power(e);
             t = t.multiply(g);
         }
         boolean f = P.equals(t) || P.equals(t.negate());
         if (!f) {
-            //System.out.println("P = " + P);
-            //System.out.println("t = " + t);
             GenPolynomialRing<C> cf = (GenPolynomialRing<C>) P.ring.coFac;
             GreatestCommonDivisorAbstract<C> engine = GCDFactory.getProxy(cf.coFac);
             GenPolynomial<GenPolynomial<C>> Pp = engine.recursivePrimitivePart(P);
@@ -386,12 +375,8 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
             if (f) {
                 return f;
             }
-            System.out.println("\nfactorization(map): " + f);
-            System.out.println("F  = " + F);
-            System.out.println("P  = " + P);
-            System.out.println("t  = " + t);
-            System.out.println("Pp = " + Pp);
-            System.out.println("tp = " + tp);
+            logger.info("no factorization(map): F  = " + F + ", P  = " + P + ", t  = " + t
+                    + ", Pp = " + Pp + ", tp = " + tp);
             //RuntimeException e = new RuntimeException("fac-map");
             //e.printStackTrace();
             //throw e;
@@ -482,8 +467,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         //List<GenPolynomial<C>> fi;
         if (A.isZERO()) {
             for (Map.Entry<GenPolynomial<C>, Long> me : D.entrySet()) {
-                //GenPolynomial<C> d = me.getKey();
-                long e = me.getValue(); //D.get(d);
+                long e = me.getValue();
                 int e1 = (int) e + 1;
                 List<GenPolynomial<C>> fi = new ArrayList<GenPolynomial<C>>(e1);
                 for (int i = 0; i < e1; i++) {
@@ -501,7 +485,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         for (Map.Entry<GenPolynomial<C>, Long> me : D.entrySet()) {
             GenPolynomial<C> d = me.getKey();
             long e = me.getValue(); //D.get(d);
-            GenPolynomial<C> f = d.power(e); //Power.<GenPolynomial<C>> positivePower(d, e);
+            GenPolynomial<C> f = d.power(e);
             Dp.add(f);
         }
         List<GenPolynomial<C>> F = engine.basePartialFraction(A, Dp);
@@ -513,7 +497,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         int i = 0;
         for (Map.Entry<GenPolynomial<C>, Long> me : D.entrySet()) { // assume fixed sequence order
             GenPolynomial<C> d = me.getKey();
-            long e = me.getValue(); // D.get(d);
+            long e = me.getValue();
             int ei = (int) e;
             GenPolynomial<C> gi = F.get(i); // assume fixed sequence order
             List<GenPolynomial<C>> Fi = engine.basePartialFraction(gi, d, ei);
@@ -548,12 +532,12 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         for (Map.Entry<GenPolynomial<C>, Long> me : D.entrySet()) {
             GenPolynomial<C> d = me.getKey();
             long e = me.getValue(); // D.get(d);
-            GenPolynomial<C> f = d.power(e); //Power.<GenPolynomial<C>> positivePower(d, e);
+            GenPolynomial<C> f = d.power(e);
             Dp.add(f);
         }
         List<GenPolynomial<C>> fi = F.get(0);
         if (fi.size() != 1) {
-            System.out.println("size(fi) != 1 " + fi);
+            logger.info("size(fi) != 1 " + fi);
             return false;
         }
         boolean t;
@@ -578,7 +562,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         int i = 0;
         for (Map.Entry<GenPolynomial<C>, Long> me : D.entrySet()) { // assume fixed sequence order
             GenPolynomial<C> d = me.getKey();
-            long e = me.getValue(); // D.get(d);
+            long e = me.getValue();
             int ei = (int) e;
             List<GenPolynomial<C>> Fi = F.get(i + 1); // assume fixed sequence order
 
@@ -619,7 +603,6 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         if (P == null) {
             return null;
         }
-        // just for the moment: TODO
         C s = null;
         SortedMap<C, Long> factors = squarefreeFactors(P);
         //logger.info("sqfPart,factors = " + factors);
@@ -659,7 +642,7 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
                     factors.put(cr, rk);
                 }
             }
-
+    
         return factors;
     }
     */

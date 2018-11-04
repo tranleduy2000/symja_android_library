@@ -5,6 +5,7 @@
 package edu.jas.ufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import edu.jas.poly.GenPolynomial;
@@ -167,6 +168,9 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
         GenPolynomial<GenPolynomial<C>> x;
         while (!r.isZERO()) {
             x = PolyUtil.recursivePseudoRemainder(q, r);
+            if (logger.isDebugEnabled()) {
+                logger.info("recursivePseudoRemainder.bits = " + x.bitLength());
+            }
             q = r;
             if (field) {
                 r = PolyUtil.monic(x);
@@ -204,10 +208,10 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
             return P.ring.getONE();
         }
         if (e == 0) {
-            return P.power(f); //Power.<GenPolynomial<C>> power(P.ring,P,f);
+            return P.power(f);
         }
         if (f == 0) {
-            return S.power(e); //Power.<GenPolynomial<C>> power(S.ring,S,e);
+            return S.power(e);
         }
         GenPolynomial<C> q;
         GenPolynomial<C> r;
@@ -294,10 +298,10 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
             return P.ring.getONE().multiply(t);
         }
         if (e == 0) {
-            return P.power(f); //Power.<GenPolynomial<GenPolynomial<C>>> power(P.ring,P,f);
+            return P.power(f);
         }
         if (f == 0) {
-            return S.power(e); //Power.<GenPolynomial<GenPolynomial<C>>> power(S.ring,S,e);
+            return S.power(e);
         }
         GenPolynomial<GenPolynomial<C>> q;
         GenPolynomial<GenPolynomial<C>> r;

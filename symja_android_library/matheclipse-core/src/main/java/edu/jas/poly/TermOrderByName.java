@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -12,14 +13,14 @@ import java.util.List;
 
 /**
  * Term order names for ordered polynomials. Defines names for the most used
- * term orders: graded and lexicographical orders. For the definitions see for
+ * term orders: graded and lexicographical orders. For the definitions @see for
  * example the articles <a href="http://doi.acm.org/10.1145/43882.43887">Kredel
  * "Admissible term orderings used in computer algebra systems"</a> and
  * <a href="http://doi.acm.org/10.1145/70936.70941">Sit,
  * "Some comments on term-ordering in Gr&ouml;bner basis computations"</a>. Not
  * all algorithms may work with all term orders since not all are well-founded,
  * so watch your step.
- * <p>
+ *
  * <b>Note:</b> Variables in printed JAS polynomial <b>(low, ..., medium, ...,
  * high)</b> Variables in other CAS polynomial <b>(high, ..., medium, ...,
  * low)</b> with <b>low</b> &lt; <b>medium</b> &lt; <b>high</b>. Example: for

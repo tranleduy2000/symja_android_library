@@ -16,7 +16,7 @@ import java.util.List;
  * @param <C> coefficient type
  * @author Heinz Kredel
  */
-public interface AlgebraFactory<A, C> extends RingFactory<A> {
+public interface AlgebraFactory<A extends AlgebraElem<A, C>, C extends RingElem<C>> extends RingFactory<A> {
 
 
     /**

@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import edu.jas.structure.GcdRingElem;
@@ -389,6 +390,7 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
      * @param S a Residue
      * @return [this/S, this - (this/S)*S].
      */
+    @SuppressWarnings("unchecked")
     public Residue<C>[] quotientRemainder(Residue<C> S) {
         return new Residue[]{divide(S), remainder(S)};
     }

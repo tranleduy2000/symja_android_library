@@ -14,7 +14,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import edu.jas.kern.PreemptingException;
-import edu.jas.structure.Element;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
@@ -157,7 +156,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public GenWordPolynomialRing<C> factory() {
         return ring;
@@ -326,7 +325,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -385,7 +384,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -398,7 +397,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Is GenWordPolynomial&lt;C&gt; zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         return (val.size() == 0);
@@ -409,7 +408,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Is GenWordPolynomial&lt;C&gt; one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         if (val.size() != 1) {
@@ -427,7 +426,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
      * Is GenWordPolynomial&lt;C&gt; a unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see RingElem#isUnit()
+     * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
         if (val.size() != 1) {
@@ -939,7 +938,7 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
         if (this.isZERO()) {
             return this;
         }
-        assert (ring.alphabet == S.ring.alphabet);
+        assert (ring.alphabet == S.ring.alphabet) : " " + ring + " != " + S.ring;
         GenWordPolynomial<C> p = ring.getZERO().copy();
         SortedMap<Word, C> pv = p.val;
         for (Map.Entry<Word, C> m1 : val.entrySet()) {
@@ -1625,6 +1624,41 @@ public final class GenWordPolynomial<C extends RingElem<C>> extends RingElemImpl
             }
         }
         return n;
+    }
+
+
+    /**
+     * GenWordPolynomial contraction.
+     *
+     * @param fac GenWordPolynomialRing.
+     * @return this contracted to fac ring, if this in fac ring, null else.
+     */
+    public GenWordPolynomial<C> contract(GenWordPolynomialRing<C> fac) {
+        if (fac == null) {
+            throw new IllegalArgumentException("fac ring may not be null");
+        }
+        GenWordPolynomial<C> S = fac.getZERO();
+        if (this.isZERO()) {
+            return S;
+        }
+        WordFactory wfac = fac.alphabet;
+        //eventually: assert (ring.alphabet.isSubFactory(fac.alphabet));
+        S = S.copy();
+        SortedMap<Word, C> sv = S.val;
+        SortedMap<Word, C> nv = this.val;
+        for (Map.Entry<Word, C> me : nv.entrySet()) {
+            Word e = me.getKey();
+            Word ec = wfac.contract(e);
+            if (ec == null) { // not contractable
+                return fac.getZERO(); // or null?
+            }
+            C y = me.getValue();
+            if (sv.get(ec) != null) { // todo can be removed
+                throw new RuntimeException("x != null: should not happen " + sv.get(ec));
+            }
+            sv.put(ec, y);
+        }
+        return S;
     }
 
 }

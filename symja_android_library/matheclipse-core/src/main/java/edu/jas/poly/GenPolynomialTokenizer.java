@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -28,6 +29,7 @@ import edu.jas.arith.BigOctonion;
 import edu.jas.arith.BigQuaternion;
 import edu.jas.arith.BigQuaternionRing;
 import edu.jas.arith.BigRational;
+import edu.jas.arith.ModIntRing;
 import edu.jas.arith.ModInteger;
 import edu.jas.arith.ModIntegerRing;
 import edu.jas.arith.ModLongRing;
@@ -116,7 +118,6 @@ public class GenPolynomialTokenizer {
      */
     @SuppressWarnings("unchecked")
     public GenPolynomialTokenizer(Reader r) {
-        //BasicConfigurator.configure();
         vars = null;
         tord = new TermOrder();
         nvars = 1;
@@ -158,13 +159,13 @@ public class GenPolynomialTokenizer {
      * Parse variable list from String.
      *
      * @param s String. Syntax:
-     *          <p>
+     *
      *          <pre>
      *                   (n1,...,nk)
      *                              </pre>
      *          <p>
      *          or
-     *          <p>
+     *
      *          <pre>
      *                   (n1 ... nk)
      *                              </pre>
@@ -373,7 +374,7 @@ public class GenPolynomialTokenizer {
      * Parsing method for GenPolynomial. Syntax depends also on the syntax of
      * the coefficients, as the respective parser is used. Basic term/monomial
      * syntax:
-     * <p>
+     *
      * <pre>
      * ... coefficient variable**exponent ... variable^exponent + ... - ....
      * </pre>
@@ -409,8 +410,7 @@ public class GenPolynomialTokenizer {
         ExpVector e;
         int ix;
         long ie;
-        //boolean done = false;
-        while (true) { //!done
+        while (true) {
             // next input. determine next action
             tt = tok.nextToken();
             //System.out.println("while tt = " + tok);
@@ -587,7 +587,6 @@ public class GenPolynomialTokenizer {
                                 logger.info("coeff " + r);
                             //if (r.isONE() || r.isZERO()) {
                             //logger.error("Unknown varibable " + tok.sval);
-                            //done = true;
                             //break;
                             //throw new InvalidExpressionException("recursively unknown variable " + tok.sval);
                             //}
@@ -627,8 +626,6 @@ public class GenPolynomialTokenizer {
 
                 default: //skip
             }
-            //if (done)
-            //    break; // unknown variable
             if (tt == StreamTokenizer.TT_EOF)
                 break;
             // complete polynomial
@@ -660,14 +657,15 @@ public class GenPolynomialTokenizer {
         if (debug)
             logger.debug("b = " + b);
         a = a.sum(b);
-        logger.debug("a = " + a);
+        if (debug)
+            logger.debug("a = " + a);
         // b = a1;
         return a;
     }
 
     /**
      * Parsing method for exponent (of variable). Syntax:
-     * <p>
+     *
      * <pre>
      * ^long | **long
      * </pre>
@@ -714,7 +712,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for comments. Syntax:
-     * <p>
+     *
      * <pre>
      * (* comment *) | /_* comment *_/
      * </pre>
@@ -761,7 +759,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for variable list. Syntax:
-     * <p>
+     *
      * <pre>
      * (a, b c, de)
      * </pre>
@@ -803,7 +801,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for coefficient ring. Syntax:
-     * <p>
+     *
      * <pre>
      * Rat | Q | Int | Z | Mod modul | Complex | C | D | Quat | AN[ (var) ( poly ) ] | AN[ modul (var) ( poly ) ] | IntFunc (var_list)
      * </pre>
@@ -859,7 +857,11 @@ public class GenPolynomialTokenizer {
                         BigInteger mo = new BigInteger(tok.sval);
                         BigInteger lm = new BigInteger(ModLongRing.MAX_LONG); //wrong: Long.MAX_VALUE);
                         if (mo.compareTo(lm) < 0) {
-                            coeff = new ModLongRing(mo.getVal());
+                            if (mo.compareTo(new BigInteger(ModIntRing.MAX_INT)) < 0) {
+                                coeff = new ModIntRing(mo.getVal());
+                            } else {
+                                coeff = new ModLongRing(mo.getVal());
+                            }
                         } else {
                             coeff = new ModIntegerRing(mo.getVal());
                         }
@@ -875,9 +877,9 @@ public class GenPolynomialTokenizer {
                     tt = tok.nextToken();
                 }
             } else if (tok.sval.equalsIgnoreCase("RatFunc") || tok.sval.equalsIgnoreCase("ModFunc")) {
-                //logger.error("RatFunc and ModFunc can no more be read, see edu.jas.application.RingFactoryTokenizer.");
+                //logger.error("RatFunc and ModFunc can no more be read, @see edu.jas.application.RingFactoryTokenizer.");
                 throw new InvalidExpressionException(
-                        "RatFunc and ModFunc can no more be read, see edu.jas.application.RingFactoryTokenizer.");
+                        "RatFunc and ModFunc can no more be read, @see edu.jas.application.RingFactoryTokenizer.");
             } else if (tok.sval.equalsIgnoreCase("IntFunc")) {
                 String[] rfv = nextVariableList();
                 //System.out.println("rfv = " + rfv.length + " " + rfv[0]);
@@ -978,7 +980,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for weight list. Syntax:
-     * <p>
+     *
      * <pre>
      * (w1, w2, w3, ..., wn)
      * </pre>
@@ -1024,7 +1026,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for weight array. Syntax:
-     * <p>
+     *
      * <pre>
      * ( (w11, ...,w1n), ..., (wm1, ..., wmn) )
      * </pre>
@@ -1077,7 +1079,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for split index. Syntax:
-     * <p>
+     *
      * <pre>
      * |i|
      * </pre>
@@ -1150,7 +1152,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for term order name. Syntax:
-     * <p>
+     *
      * <pre>
      * L | IL | LEX | G | IG | GRLEX | W(weights) | '|'split index'|'
      * </pre>
@@ -1203,7 +1205,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for polynomial list. Syntax:
-     * <p>
+     *
      * <pre>
      * ( p1, p2, p3, ..., pn )
      * </pre>
@@ -1246,7 +1248,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for submodule list. Syntax:
-     * <p>
+     *
      * <pre>
      * ( ( p11, p12, p13, ..., p1n ), ..., ( pm1, pm2, pm3, ..., pmn ) )
      * </pre>
@@ -1284,7 +1286,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for solvable polynomial relation table. Syntax:
-     * <p>
+     *
      * <pre>
      * ( p_1, p_2, p_3, ..., p_{n+1}, p_{n+2}, p_{n+3} )
      * </pre>
@@ -1338,7 +1340,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for polynomial set. Syntax:
-     * <p>
+     *
      * <pre>
      * coeffRing varList termOrderName polyList
      * </pre>
@@ -1375,7 +1377,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for module set. Syntax:
-     * <p>
+     *
      * <pre>
      * coeffRing varList termOrderName moduleList
      * </pre>
@@ -1413,7 +1415,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for solvable polynomial list. Syntax:
-     * <p>
+     *
      * <pre>
      * ( p1, p2, p3, ..., pn )
      * </pre>
@@ -1460,7 +1462,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for solvable polynomial set. Syntax:
-     * <p>
+     *
      * <pre>
      * varList termOrderName relationTable polyList
      * </pre>
@@ -1512,7 +1514,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for solvable submodule list. Syntax:
-     * <p>
+     *
      * <pre>
      * ( ( p11, p12, p13, ..., p1n ), ..., ( pm1, pm2, pm3, ..., pmn ) )
      * </pre>
@@ -1550,7 +1552,7 @@ public class GenPolynomialTokenizer {
 
     /**
      * Parsing method for solvable module set. Syntax:
-     * <p>
+     *
      * <pre>
      * varList termOrderName relationTable moduleList
      * </pre>

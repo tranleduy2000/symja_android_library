@@ -5,6 +5,7 @@
 package edu.jas.root;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -107,6 +108,7 @@ public class RootUtil {
      * @param s String, syntax: [south-west, north-east] or [mid].
      * @return Interval from s.
      */
+    @SuppressWarnings("unchecked")
     public static <C extends RingElem<C> & Rational> Rectangle<C> parseRectangle(RingFactory<Complex<C>> fac,
                                                                                  String s) {
         int r = s.length();
@@ -134,8 +136,25 @@ public class RootUtil {
         String ls = iv.substring(0, k).trim();
         String rs = iv.substring(k + 1, iv.length()).trim();
         //System.out.println("ls = " + ls + ", rs = " + rs);
-        Complex<C> sw = fac.parse(ls);
-        Complex<C> ne = fac.parse(rs);
+        Object osw = fac.parse(ls);
+        Object one = fac.parse(rs);
+        //System.out.println("osw = " + osw + ", one = " + one);
+        Complex<C> sw;
+        Complex<C> ne;
+        if (osw instanceof Complex) {
+            sw = (Complex<C>) osw;
+            ne = (Complex<C>) one;
+        } else if (osw instanceof ComplexAlgebraicNumber) {
+            ComplexAlgebraicNumber csw = (ComplexAlgebraicNumber) osw;
+            ComplexAlgebraicNumber cne = (ComplexAlgebraicNumber) one;
+            //System.out.println("csw::ring = " + csw.ring.algebraic.toScript());
+            sw = (Complex<C>) csw.magnitude();
+            ne = (Complex<C>) cne.magnitude();
+        } else {
+            sw = fac.getONE().negate();
+            ne = fac.getONE();
+        }
+        //System.out.println("sw = " + sw + ", ne = " + ne);
         if (debug) {
             logger.debug("Rectangle: sw = " + sw + ", ne = " + ne);
         }

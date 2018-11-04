@@ -5,6 +5,7 @@
 package edu.jas.ufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import edu.jas.kern.StringUtil;
 import edu.jas.kern.TimeStatus;
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
@@ -212,11 +212,17 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
      */
     @Override
     public List<GenPolynomial<C>> factorsSquarefree(GenPolynomial<C> P) {
-        if (logger.isInfoEnabled()) {
-            logger.info(StringUtil.selectStackTrace("edu\\.jas.*"));
+        if (P != null && P.ring.nvar > 1) {
+            logger.warn("no multivariate factorization for " + P.ring.toScript() + ": falling back to Kronecker algorithm");
+            //if (P.ring.characteristic().signum() == 0) {
+            //    throw new IllegalArgumentException(this.getClass().getName() + " P.ring.characteristic().signum() == 0");
+            //}
         }
+        //if (logger.isInfoEnabled()) {
+        //    logger.info(StringUtil.selectStackTrace("edu\\.jas.*"));
+        //}
         return factorsSquarefreeKronecker(P);
-        //return factorsSquarefreeOptimize(P);
+        //return factorsSquarefreeOptimize(P); // test only
     }
 
     /**
@@ -261,8 +267,8 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         // kr might not be squarefree so complete factor univariate
         SortedMap<GenPolynomial<C>, Long> slist = baseFactors(kr);
         if (debug && !isFactorization(kr, slist)) {
-            System.out.println("kr    = " + kr);
-            System.out.println("slist = " + slist);
+            logger.warn("kr    = " + kr);
+            logger.warn("slist = " + slist);
             throw new ArithmeticException("no factorization");
         }
         for (Map.Entry<GenPolynomial<C>, Long> me : slist.entrySet()) {
@@ -293,7 +299,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         ExpVector evt = u.trailingExpVector();
         //System.out.println("deg = " + deg);
         for (int j = 1; j <= dl; j++) {
-            KsubSet<GenPolynomial<C>> ps = new KsubSet<>(ulist, j);
+            KsubSet<GenPolynomial<C>> ps = new KsubSet<GenPolynomial<C>>(ulist, j);
             for (List<GenPolynomial<C>> flist : ps) {
                 //System.out.println("flist = " + flist);
                 GenPolynomial<C> utrial = ufac.getONE();
@@ -303,7 +309,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
                 GenPolynomial<C> trial = PolyUfdUtil.backSubstituteKronecker(pfac, utrial, d);
                 ti++;
                 if (ti % 2000 == 0) {
-                    System.out.print("ti(" + ti + ") ");
+                    logger.warn("ti(" + ti + ") ");
                     TimeStatus.checkTime(ti + " % 2000 == 0");
                 }
                 if (!evl.multipleOf(trial.leadingExpVector())) {
@@ -317,11 +323,11 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
                 }
                 trial = trial.monic();
                 if (ti % 15000 == 0) {
-                    System.out.println("\ndl   = " + dl + ", deg(u) = " + deg);
-                    System.out.println("ulist = " + ulist);
-                    System.out.println("kr    = " + kr);
-                    System.out.println("u     = " + u);
-                    System.out.println("trial = " + trial);
+                    logger.warn("\ndl   = " + dl + ", deg(u) = " + deg);
+                    logger.warn("ulist = " + ulist);
+                    logger.warn("kr    = " + kr);
+                    logger.warn("u     = " + u);
+                    logger.warn("trial = " + trial);
                 }
                 GenPolynomial<C> rem = PolyUtil.baseSparsePseudoRemainder(u, trial);
                 //System.out.println(" rem = " + rem);
@@ -519,7 +525,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
             return factors;
         }
         C c;
-        if (pfac.coFac.isField()) { // pfac.characteristic().signum() > 0
+        if (pfac.coFac.isField()) {
             c = P.leadingBaseCoefficient();
         } else {
             c = engine.baseContent(P);
@@ -535,7 +541,28 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
             P = P.divide(c); // make base primitive or base monic
         }
         if (logger.isInfoEnabled()) {
-            logger.info("squarefree mfacs P = " + P);
+            logger.info("base primitive part P = " + P);
+        }
+        GenPolynomial<C>[] cpp = engine.contentPrimitivePart(P);
+        GenPolynomial<C> pc = cpp[0];
+        if (!pc.isONE()) {
+            SortedMap<GenPolynomial<C>, Long> rec = factors(pc); // recursion
+            for (Map.Entry<GenPolynomial<C>, Long> me : rec.entrySet()) {
+                GenPolynomial<C> g = me.getKey();
+                Long d = me.getValue();
+                GenPolynomial<C> pn = g.extend(pfac, 0, 0L);
+                factors.put(pn, d);
+            }
+            if (logger.isInfoEnabled()) {
+                logger.info("content factors = " + factors);
+            }
+        }
+        P = cpp[1];
+        if (logger.isInfoEnabled()) {
+            logger.info("primitive part P = " + P);
+        }
+        if (P.isONE()) {
+            return factors;
         }
         SortedMap<GenPolynomial<C>, Long> facs = sengine.squarefreeFactors(P);
         if (facs == null || facs.size() == 0) {

@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -18,7 +19,6 @@ import java.util.Random;
 
 import edu.jas.kern.PreemptStatus;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
@@ -168,7 +168,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -190,6 +190,32 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
         s.append(alphabet.toScript());
         s.append(")");
         return s.toString();
+    }
+
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by i.
+     *
+     * @param i number of variables to extend.
+     * @return extended word polynomial ring factory.
+     */
+    public GenWordPolynomialRing<C> extend(int i) {
+        // add module variable names
+        String[] v = GenPolynomialRing.newVars("t", i);
+        return extend(v);
+    }
+
+
+    /**
+     * Extend variables. Extend number of variables by length(vn).
+     *
+     * @param vn names for extended variables.
+     * @return extended polynomial ring factory.
+     */
+    public GenWordPolynomialRing<C> extend(String[] vn) {
+        WordFactory wfe = alphabet.extend(vn);
+        return new GenWordPolynomialRing<C>(coFac, wfe);
     }
 
 
@@ -424,6 +450,30 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
 
 
     /**
+     * Get a GenWordPolynomial&lt;C&gt; element from a GenWordPolynomial&lt;C&gt;.
+     *
+     * @param a GenWordPolynomial.
+     * @return a GenWordPolynomial&lt;C&gt;.
+     */
+    public GenWordPolynomial<C> valueOf(GenWordPolynomial<C> a) {
+        if (a.isZERO()) {
+            return getZERO();
+        }
+        if (a.isONE()) {
+            return getONE();
+        }
+        GenWordPolynomial<C> p = this.getZERO().copy();
+        for (Map.Entry<Word, C> m : a.val.entrySet()) {
+            C c = m.getValue();
+            Word e = m.getKey();
+            Word w = alphabet.valueOf(e);
+            p.doPutToMap(w, c);
+        }
+        return p;
+    }
+
+
+    /**
      * Get a list of GenWordPolynomial&lt;C&gt; element from a list of
      * GenPolynomial&lt;C&gt;.
      *
@@ -563,7 +613,7 @@ public final class GenWordPolynomialRing<C extends RingElem<C>> implements RingF
         if (alphabet.length() <= 4) { // todo, hack for commuative like cases
             GenPolynomialRing<C> cr = new GenPolynomialRing<C>(coFac, alphabet.getVars());
             GenPolynomialTokenizer pt = new GenPolynomialTokenizer(cr, r);
-            GenPolynomial<C> p = null;
+            GenPolynomial<C> p = cr.getZERO();
             try {
                 p = pt.nextPolynomial();
             } catch (IOException e) {

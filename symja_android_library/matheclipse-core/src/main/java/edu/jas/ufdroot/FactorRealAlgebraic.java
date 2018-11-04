@@ -5,6 +5,7 @@
 package edu.jas.ufdroot;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import edu.jas.ufd.FactorFactory;
  * Real algebraic number coefficients factorization algorithms. This class
  * implements factorization methods for polynomials over real algebraic numbers
  * from package
- * <p>
+ *
  * <pre>
  * edu.jas.root
  * </pre>

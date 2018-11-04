@@ -5,6 +5,7 @@
 package edu.jas.arith;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import edu.jas.structure.StarRingElem;
  * BigQuaternion class based on BigRational implementing the RingElem interface
  * and with the familiar MAS static method names. Objects of this class are
  * immutable. The integer quaternion methods are implemented after
- * https://de.wikipedia.org/wiki/Hurwitzquaternion see also
+ * https://de.wikipedia.org/wiki/Hurwitzquaternion @see also
  * https://en.wikipedia.org/wiki/Hurwitz_quaternion
  *
  * @author Heinz Kredel
@@ -680,7 +681,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
      * @see edu.jas.structure.StarRingElem#norm()
      */
     public BigQuaternion norm() {
-        // this.conjugate().multiply(this);
+        // this.multiply(this.conjugate());
         BigRational v = re.multiply(re);
         v = v.sum(im.multiply(im));
         v = v.sum(jm.multiply(jm));
@@ -691,14 +692,14 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     /**
      * Quaternion number absolute value.
      *
-     * @return |this|^2. Note: The square root is not jet implemented.
+     * @return |this|.
      * @see edu.jas.structure.RingElem#abs()
      */
     public BigQuaternion abs() {
         BigQuaternion n = norm();
-        logger.error("abs() square root missing");
-        // n = n.sqrt();
-        return n;
+        BigRational r = Roots.sqrt(n.re);
+        //logger.error("abs() square root missing");
+        return new BigQuaternion(ring, r);
     }
 
     /**

@@ -21,7 +21,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Determines a true or false value for a given input; a pre-Java-8 version of {@link
- * java.util.function.Predicate java.util.function.Predicate}.
+ * com.duy.lambda.Predicate com.duy.lambda.Predicate}.
  * <p>
  * <p>The {@link Predicates} class provides common predicates and related utilities.
  * <p>
@@ -30,15 +30,15 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * <p>
  * <h3>For Java 8+ users</h3>
  * <p>
- * <p>This interface is now a legacy type. Use {@code java.util.function.Predicate} (or the
+ * <p>This interface is now a legacy type. Use {@code com.duy.lambda.Predicate} (or the
  * appropriate primitive specialization such as {@code IntPredicate}) instead whenever possible.
  * Otherwise, at least reduce <i>explicit</i> dependencies on this type by using lambda expressions
  * or method references instead of classes, leaving your code easier to migrate in the future.
  * <p>
  * <p>To use a reference of this type (say, named {@code guavaPredicate}) in a context where {@code
- * java.util.function.Predicate} is expected, use the method reference {@code
+ * com.duy.lambda.Predicate} is expected, use the method reference {@code
  * guavaPredicate::apply}. For the other direction, use {@code javaUtilPredicate::test}. A future
- * version of this interface will be made to <i>extend</i> {@code java.util.function.Predicate}, so
+ * version of this interface will be made to <i>extend</i> {@code com.duy.lambda.Predicate}, so
  * that conversion will be necessary in only one direction. At that time, this interface will be
  * officially discouraged.
  *

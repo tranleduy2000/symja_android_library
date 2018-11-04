@@ -12,7 +12,7 @@ package edu.jas.structure;
  * @author Heinz Kredel
  */
 
-public interface Selector<C> {
+public interface Selector<C extends RingElem<C>> {
 
 
     /**

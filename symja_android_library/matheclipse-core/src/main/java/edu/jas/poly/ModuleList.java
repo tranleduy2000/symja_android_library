@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
@@ -223,6 +224,40 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
     }
 
     /**
+     * Test if list is empty.
+     *
+     * @return true if this is empty, alse false.
+     */
+    public boolean isEmpty() {
+        if (list == null) {
+            return true;
+        }
+        return rows <= 0;
+    }
+
+    /**
+     * Test all elements are zero.
+     *
+     * @return true if all elements are zero, alse false.
+     */
+    public boolean isZERO() {
+        if (list == null) {
+            return true;
+        }
+        if (rows <= 0) {
+            return true;
+        }
+        for (List<GenPolynomial<C>> row : list) {
+            for (GenPolynomial<C> oa : row) {
+                if (!oa.isZERO()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * String representation of the module list.
      *
      * @see Object#toString()
@@ -344,10 +379,31 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
      * @see edu.jas.poly.PolynomialList
      */
     public PolynomialList<C> getPolynomialList() {
-        GenPolynomialRing<C> pfac = ring.extend(cols);
+        return getPolynomialList(false);
+    }
+
+    /**
+     * Get PolynomialList. Embed module in a polynomial ring.
+     *
+     * @param top true for TOP term order, false for POT term order.
+     * @return polynomial list corresponding to this.
+     * @see edu.jas.poly.PolynomialList
+     */
+    public PolynomialList<C> getPolynomialList(boolean top) {
+        GenPolynomialRing<C> pfac = ring.extend(cols, top);
         logger.debug("extended ring = " + pfac);
         //System.out.println("extended ring = " + pfac);
+        return getPolynomialList(pfac);
+    }
 
+    /**
+     * Get PolynomialList. Embed module in a polynomial ring.
+     *
+     * @param pfac polynomial ring.
+     * @return polynomial list corresponding to pfac and this.
+     * @see edu.jas.poly.PolynomialList
+     */
+    public PolynomialList<C> getPolynomialList(GenPolynomialRing<C> pfac) {
         List<GenPolynomial<C>> pols = null;
         if (list == null) { // rows < 0
             return new PolynomialList<C>(pfac, pols);
@@ -356,7 +412,6 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
         if (rows == 0) { // nothing to do
             return new PolynomialList<C>(pfac, pols);
         }
-
         GenPolynomial<C> zero = pfac.getZERO();
         GenPolynomial<C> d = null;
         for (List<GenPolynomial<C>> r : list) {

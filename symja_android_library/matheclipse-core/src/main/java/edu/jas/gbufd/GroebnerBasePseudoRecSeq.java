@@ -5,6 +5,7 @@
 package edu.jas.gbufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import edu.jas.ufd.GreatestCommonDivisorAbstract;
  *
  * @param <C> base coefficient type
  * @author Heinz Kredel
-
+ * @see edu.jas.application.GBAlgorithmBuilder
  * @see GBFactory
  */
 
@@ -107,7 +108,7 @@ public class GroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
      * @param rf  coefficient ring factory.
      * @param pl  pair selection strategy
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public GroebnerBasePseudoRecSeq(PseudoReduction<GenPolynomial<C>> red, RingFactory<GenPolynomial<C>> rf,
                                     PairList<GenPolynomial<C>> pl) {
         super(red, pl);
@@ -137,43 +138,11 @@ public class GroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
             return G;
         }
         GenPolynomialRing<GenPolynomial<C>> ring = G.get(0).ring;
-        if (ring.coFac.isField()) { // TODO remove
+        if (ring.coFac.isField()) { // remove ?
             throw new IllegalArgumentException("coefficients from a field");
         }
         PairList<GenPolynomial<C>> pairlist = strategy.create(modv, ring);
         pairlist.put(G);
-
-        /*
-        GenPolynomial<GenPolynomial<C>> p;
-        List<GenPolynomial<GenPolynomial<C>>> G = new ArrayList<GenPolynomial<GenPolynomial<C>>>();
-        PairList<GenPolynomial<C>> pairlist = null;
-        int l = F.size();
-        ListIterator<GenPolynomial<GenPolynomial<C>>> it = F.listIterator();
-        while (it.hasNext()) {
-            p = it.next();
-            if (p.length() > 0) {
-                p = engine.recursivePrimitivePart(p); //p.monic();
-                p = p.abs();
-                if (p.isConstant()) {
-                    G.clear();
-                    G.add(p);
-                    return G; // since no threads are activated
-                }
-                G.add(p);
-                if (pairlist == null) {
-                    //pairlist = new OrderedPairlist<GenPolynomial<C>>(modv, p.ring);
-                    pairlist = strategy.create(modv, p.ring);
-                }
-                // putOne not required
-                pairlist.put(p);
-            } else {
-                l--;
-            }
-        }
-        if (l <= 1) {
-            return G; // since no threads are activated
-        }
-        */
 
         Pair<GenPolynomial<C>> pair;
         GenPolynomial<GenPolynomial<C>> pi, pj, S, H;
@@ -238,19 +207,6 @@ public class GroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
     @Override
     public List<GenPolynomial<GenPolynomial<C>>> minimalGB(List<GenPolynomial<GenPolynomial<C>>> Gp) {
         List<GenPolynomial<GenPolynomial<C>>> G = normalizeZerosOnes(Gp);
-        /*
-        if (Gp == null || Gp.size() <= 1) {
-            return Gp;
-        }
-        // remove zero polynomials
-        List<GenPolynomial<GenPolynomial<C>>> G = new ArrayList<GenPolynomial<GenPolynomial<C>>>(Gp.size());
-        for (GenPolynomial<GenPolynomial<C>> a : Gp) {
-            if (a != null && !a.isZERO()) { // always true in GB()
-                // already positive a = a.abs();
-                G.add(a);
-            }
-        }
-        */
         if (G.size() <= 1) {
             return G;
         }

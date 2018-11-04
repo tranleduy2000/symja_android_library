@@ -5,6 +5,7 @@
 package edu.jas.fd;
 
 
+
 import org.apache.log4j.Logger;
 
 import edu.jas.gbufd.SolvableSyzygyAbstract;

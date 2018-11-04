@@ -34,4 +34,8 @@ public class Logger {
     public void error(String message) {
 
     }
+
+    public boolean isWarnEnabled() {
+        return false;
+    }
 }

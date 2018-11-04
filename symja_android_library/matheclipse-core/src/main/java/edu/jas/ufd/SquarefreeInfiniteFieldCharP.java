@@ -5,6 +5,7 @@
 package edu.jas.ufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -26,7 +27,8 @@ import edu.jas.structure.RingFactory;
  * @author Heinz Kredel
  */
 
-public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends SquarefreeFieldCharP<Quotient<C>> {
+public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>>
+        extends SquarefreeFieldCharP<Quotient<C>> {
 
 
     private static final Logger logger = Logger.getLogger(SquarefreeInfiniteFieldCharP.class);
@@ -45,7 +47,7 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
     /**
      * Constructor.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public SquarefreeInfiniteFieldCharP(RingFactory<Quotient<C>> fac) {
         super(fac);
         // isFinite() predicate now present
@@ -178,7 +180,7 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
             //System.out.println("q = " + q + ", e = " + e);
             if (e >= k) {
                 e = e / cl;
-                //q = Power.<Quotient<C>> positivePower(q, e);
+                //q = q.power(e);
                 root.put(q, e);
             } else { // constant case
                 root.put(q, e);
@@ -214,8 +216,8 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
         RingFactory<Quotient<C>> rf = pfac.coFac;
         if (rf.characteristic().signum() != 1) {
             // basePthRoot not possible
-            throw new IllegalArgumentException(P.getClass().getName() + " only for ModInteger polynomials "
-                    + rf);
+            throw new IllegalArgumentException(
+                    P.getClass().getName() + " only for ModInteger polynomials " + rf);
         }
         long mp = rf.characteristic().longValue();
         GenPolynomial<Quotient<C>> d = pfac.getZERO().copy();
@@ -238,7 +240,7 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
                 Quotient<C> rp = me.getKey();
                 long gl = me.getValue(); // sm.get(rp);
                 if (gl > 1) {
-                    rp = rp.power(gl); //Power.<Quotient<C>> positivePower(rp, gl);
+                    rp = rp.power(gl);
                 }
                 r = r.multiply(rp);
             }
@@ -296,7 +298,7 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
                 //System.out.println("gl = " + gl);
                 Quotient<C> re = rp;
                 if (gl > 1) {
-                    re = rp.power(gl); //Power.<Quotient<C>> positivePower(rp, gl);
+                    re = rp.power(gl);
                 }
                 //System.out.println("re = " + re);
                 r = r.multiply(re);
@@ -327,8 +329,8 @@ public class SquarefreeInfiniteFieldCharP<C extends GcdRingElem<C>> extends Squa
         GenPolynomialRing<GenPolynomial<Quotient<C>>> pfac = P.ring;
         if (pfac.nvar > 1) {
             // basePthRoot not possible by return type
-            throw new IllegalArgumentException(P.getClass().getName()
-                    + " only for univariate recursive polynomials");
+            throw new IllegalArgumentException(
+                    P.getClass().getName() + " only for univariate recursive polynomials");
         }
         RingFactory<GenPolynomial<Quotient<C>>> rf = pfac.coFac;
         if (rf.characteristic().signum() != 1) {

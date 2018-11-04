@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.util.Random;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
@@ -207,7 +207,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -496,7 +496,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         GenWordPolynomial<C> a;
         // add random coeffs and exponents
         for (int i = 0; i < l; i++) {
-            e = ExpVector.EVRAND(nvar, d, q, rnd);
+            e = ExpVector.random(nvar, d, q, rnd);
             a = coFac.random(k, rnd);
             r = (RecSolvableWordPolynomial<C>) r.sum(a, e);
             // somewhat inefficient but clean
@@ -596,11 +596,10 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      *
      * @return List(X_1, ..., X_n) a list of univariate polynomials.
      */
-    //todo Override
-    @SuppressWarnings("unchecked")
-    public List<RecSolvableWordPolynomial<C>> recUnivariateList() {
+    @Override
+    public List<RecSolvableWordPolynomial<C>> univariateList() {
         //return castToSolvableList( super.univariateList() );
-        return (List<RecSolvableWordPolynomial<C>>) (Object) univariateList(0, 1L);
+        return univariateList(0, 1L);
     }
 
 
@@ -610,10 +609,9 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      * @param modv number of module variables.
      * @return List(X_1, ..., X_n) a list of univariate polynomials.
      */
-    //todo Override
-    @SuppressWarnings("unchecked")
-    public List<RecSolvableWordPolynomial<C>> recUnivariateList(int modv) {
-        return (List<RecSolvableWordPolynomial<C>>) (Object) univariateList(modv, 1L);
+    @Override
+    public List<RecSolvableWordPolynomial<C>> univariateList(int modv) {
+        return univariateList(modv, 1L);
     }
 
 
@@ -625,8 +623,8 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
      * @param e    the exponent of the variables.
      * @return List(X_1 ^ e, ..., X_n ^ e) a list of univariate polynomials.
      */
-    //todo Override
-    public List<RecSolvableWordPolynomial<C>> recUnivariateList(int modv, long e) {
+    @Override
+    public List<RecSolvableWordPolynomial<C>> univariateList(int modv, long e) {
         List<RecSolvableWordPolynomial<C>> pols = new ArrayList<RecSolvableWordPolynomial<C>>(nvar);
         int nm = nvar - modv;
         for (int i = 0; i < nm; i++) {
@@ -635,30 +633,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         }
         return pols;
     }
-
-
-    /*
-     * Generate list of univariate polynomials in all variables with given exponent.
-     * @param modv number of module variables.
-     * @param e the exponent of the variables.
-     * @return List(X_1^e,...,X_n^e) a list of univariate polynomials.
-     @Override
-     public List<RecSolvableWordPolynomial<C>> univariateList(int modv, long e) {
-        List<GenPolynomial<C>> pol = super.univariateList(modv,e);
-        UnaryFunctor<GenPolynomial<C>,RecSolvableWordPolynomial<C>> fc 
-          = new UnaryFunctor<GenPolynomial<C>,RecSolvableWordPolynomial<C>>() {
-               public RecSolvableWordPolynomial<C> eval(GenPolynomial<C> p) {
-                  if ( ! (p instanceof RecSolvableWordPolynomial) ) {
-                      throw new RuntimeException("no solvable polynomial "+p);
-                  }
-                  return (RecSolvableWordPolynomial<C>) p;
-               }
-            };
-        List<RecSolvableWordPolynomial<C>> pols 
-           = ListUtil.<GenPolynomial<C>,RecSolvableWordPolynomial<C>>map(this,pol,fc);
-        return pols;
-     }
-     */
 
 
     /**

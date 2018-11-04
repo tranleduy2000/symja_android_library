@@ -5,6 +5,7 @@
 package edu.jas.gbufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -308,7 +309,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
                     //a = a.divide(c);
                     GenPolynomial<C> b = PolyUtil.basePseudoDivide(a, c);
                     GenPolynomial<GenPolynomial<C>> Sp = S.subtractMultiple(b, f, P[i]);
-                    if (e.equals(Sp.leadingExpVector())) { // TODO: avoid
+                    if (e.equals(Sp.leadingExpVector())) { // TODO: avoid if possible
                         //throw new RuntimeException("degree not descending");
                         logger.info("degree not descending: S = " + S + ", Sp = " + Sp);
                         R = R.multiply(c);

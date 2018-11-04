@@ -40,7 +40,7 @@ public class ReductionPar<C extends RingElem<C>> extends ReductionAbstract<C> {
      * @param Pp polynomial list, concurrent modification allowed.
      * @return nf(Ap) with respect to Pp.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public GenPolynomial<C> normalform(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap) {
         if (Pp == null || Pp.isEmpty()) {
             return Ap;
@@ -143,7 +143,7 @@ public class ReductionPar<C extends RingElem<C>> extends ReductionAbstract<C> {
      *           table, concurrent modification allowed.
      * @return nf(Ap) with respect to Pp.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public GenPolynomial<C> normalform(Map<Integer, GenPolynomial<C>> mp, GenPolynomial<C> Ap) {
         if (mp == null || mp.isEmpty()) {
             return Ap;

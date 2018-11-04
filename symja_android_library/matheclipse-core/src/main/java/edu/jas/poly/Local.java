@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import edu.jas.structure.GcdRingElem;
@@ -451,6 +452,7 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
      * @param S a Local
      * @return [this/S, this - (this/S)*S].
      */
+    @SuppressWarnings("unchecked")
     public Local<C>[] quotientRemainder(Local<C> S) {
         return new Local[]{divide(S), remainder(S)};
     }

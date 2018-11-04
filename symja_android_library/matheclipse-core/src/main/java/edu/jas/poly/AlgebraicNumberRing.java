@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Reader;
@@ -28,7 +29,6 @@ import edu.jas.util.CartesianProductInfinite;
  */
 
 public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<AlgebraicNumber<C>>,
-// TODO: 10/2/2017 change
         Iterable<AlgebraicNumber<C>> {
 
 

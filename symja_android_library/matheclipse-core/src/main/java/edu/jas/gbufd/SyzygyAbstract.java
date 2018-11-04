@@ -5,8 +5,10 @@
 package edu.jas.gbufd;
 
 
+
 import org.apache.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.ModuleList;
 import edu.jas.poly.PolynomialList;
 import edu.jas.structure.GcdRingElem;
+import edu.jas.structure.RingElem;
 import edu.jas.vector.BasicLinAlg;
 import edu.jas.vector.GenVector;
 import edu.jas.vector.GenVectorModul;
@@ -320,4 +323,92 @@ public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy
 }
 
 
+/**
+ * Container for module resolution components.
+ *
+ * @param <C> coefficient type
+ */
+class ResPart<C extends RingElem<C>> implements Serializable {
 
+
+    public final ModuleList<C> module;
+
+
+    public final ModuleList<C> GB;
+
+
+    public final ModuleList<C> syzygy;
+
+
+    /**
+     * ResPart.
+     *
+     * @param m a module list.
+     * @param g a module list GB.
+     * @param z a syzygy module list.
+     */
+    public ResPart(ModuleList<C> m, ModuleList<C> g, ModuleList<C> z) {
+        module = m;
+        GB = g;
+        syzygy = z;
+    }
+
+
+    /**
+     * toString.
+     */
+    @Override
+    public String toString() {
+        StringBuffer s = new StringBuffer("ResPart(\n");
+        s.append("module = " + module);
+        s.append("\n GB = " + GB);
+        s.append("\n syzygy = " + syzygy);
+        s.append(")");
+        return s.toString();
+    }
+}
+
+
+/**
+ * Container for polynomial resolution components.
+ */
+class ResPolPart<C extends RingElem<C>> implements Serializable {
+
+
+    public final PolynomialList<C> ideal;
+
+
+    public final PolynomialList<C> GB;
+
+
+    public final ModuleList<C> syzygy;
+
+
+    /**
+     * ResPolPart.
+     *
+     * @param m a polynomial list.
+     * @param g a polynomial list GB.
+     * @param z a syzygy module list.
+     */
+    public ResPolPart(PolynomialList<C> m, PolynomialList<C> g, ModuleList<C> z) {
+        ideal = m;
+        GB = g;
+        syzygy = z;
+    }
+
+
+    /**
+     * toString.
+     */
+    @Override
+    public String toString() {
+        StringBuffer s = new StringBuffer("ResPolPart(\n");
+        s.append("ideal = " + ideal);
+        s.append("\n GB = " + GB);
+        s.append("\n syzygy = " + syzygy);
+        s.append(")");
+        return s.toString();
+    }
+
+}

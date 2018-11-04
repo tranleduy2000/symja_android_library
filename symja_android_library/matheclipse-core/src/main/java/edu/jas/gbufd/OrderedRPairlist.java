@@ -4,6 +4,7 @@
 
 package edu.jas.gbufd;
 
+
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -56,7 +57,7 @@ public class OrderedRPairlist<C extends RegularRingElem<C>>
 
     /**
      * Remove the next required pair from the pairlist and reduction matrix.
-     * Appy the criterions 3 and 4 to see if the S-polynomial is required.
+     * Appy the criterions 3 and 4 to @see if the S-polynomial is required.
      *
      * @return the next pair if one exists, otherwise null.
      */

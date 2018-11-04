@@ -18,7 +18,7 @@ import edu.jas.structure.RingElem;
  *
  * @param <C> coefficient type
  * @author Heinz Kredel
-
+ * @see edu.jas.application.GBAlgorithmBuilder
  * @see edu.jas.gbufd.GBFactory
  */
 

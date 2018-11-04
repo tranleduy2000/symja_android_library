@@ -5,17 +5,15 @@
 package edu.jas.arith;
 
 
-import org.apache.log4j.Logger;
 
-import edu.jas.structure.Element;
-import edu.jas.structure.RingElem;
+import org.apache.log4j.Logger;
 
 
 /**
  * Integer BigQuaternion class based on BigRational implementing the RingElem
  * interface and with the familiar MAS static method names. Objects of this
  * class are immutable. The integer quaternion methods are implemented after
- * https://de.wikipedia.org/wiki/Hurwitzquaternion see also
+ * https://de.wikipedia.org/wiki/Hurwitzquaternion @see also
  * https://en.wikipedia.org/wiki/Hurwitz_quaternion
  *
  * @author Heinz Kredel
@@ -176,7 +174,7 @@ public final class BigQuaternionInteger extends BigQuaternion
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     @Override
     public BigQuaternionRing factory() {
@@ -194,10 +192,23 @@ public final class BigQuaternionInteger extends BigQuaternion
     }
 
     /**
+     * Quaternion number absolute value.
+     *
+     * @return |this|**2. Note: returns the norm(this).
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public BigQuaternion abs() {
+        BigQuaternion n = norm();
+        //BigRational r = Roots.sqrt(n.re);
+        logger.error("abs() square root missing");
+        return n;
+    }
+
+    /**
      * BigQuaternion inverse.
      *
      * @return S with S * this = this * S = 1.
-     * @see RingElem#inverse()
+     * @see edu.jas.structure.RingElem#inverse()
      */
     @Override
     public BigQuaternion inverse() {

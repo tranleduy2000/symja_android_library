@@ -5,9 +5,11 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +18,8 @@ import java.util.TreeMap;
 
 import edu.jas.arith.BigInteger;
 import edu.jas.structure.RingElem;
-import edu.jas.vector.BasicLinAlg;
+import edu.jas.vector.GenVector;
+import edu.jas.vector.GenVectorModul;
 
 
 /**
@@ -112,17 +115,18 @@ public class TermOrderOptimization {
         if (L == null) {
             throw new IllegalArgumentException("list must be non null");
         }
-        BasicLinAlg<GenPolynomial<BigInteger>> blas = new BasicLinAlg<GenPolynomial<BigInteger>>();
-        List<GenPolynomial<BigInteger>> dem = null;
+        GenVectorModul<GenPolynomial<BigInteger>> vmblas = null;
+        GenVector<GenPolynomial<BigInteger>> vdem = null;
         for (GenPolynomial<C> p : L) {
             List<GenPolynomial<BigInteger>> dm = degreeMatrix(p);
-            if (dem == null) {
-                dem = dm;
+            if (vdem == null) {
+                vmblas = new GenVectorModul<GenPolynomial<BigInteger>>(dm.get(0).ring, dm.size());
+                vdem = new GenVector<GenPolynomial<BigInteger>>(vmblas, dm);
             } else {
-                dem = blas.vectorAdd(dem, dm);
+                vdem = vdem.sum(new GenVector<GenPolynomial<BigInteger>>(vmblas, dm));
             }
         }
-        return dem;
+        return vdem.val;
     }
 
 
@@ -137,17 +141,18 @@ public class TermOrderOptimization {
         if (L == null) {
             throw new IllegalArgumentException("list must not be null");
         }
-        BasicLinAlg<GenPolynomial<BigInteger>> blas = new BasicLinAlg<GenPolynomial<BigInteger>>();
-        List<GenPolynomial<BigInteger>> dem = null;
+        GenVectorModul<GenPolynomial<BigInteger>> vmblas = null;
+        GenVector<GenPolynomial<BigInteger>> vdem = null;
         for (GenPolynomial<GenPolynomial<C>> p : L) {
             List<GenPolynomial<BigInteger>> dm = degreeMatrixOfCoefficients(p);
-            if (dem == null) {
-                dem = dm;
+            if (vdem == null) {
+                vmblas = new GenVectorModul<GenPolynomial<BigInteger>>(dm.get(0).ring, dm.size());
+                vdem = new GenVector<GenPolynomial<BigInteger>>(vmblas, dm);
             } else {
-                dem = blas.vectorAdd(dem, dm);
+                vdem = vdem.sum(new GenVector<GenPolynomial<BigInteger>>(vmblas, dm));
             }
         }
-        return dem;
+        return vdem.val;
     }
 
 
@@ -275,27 +280,28 @@ public class TermOrderOptimization {
     }
 
 
-    /*
+    /**
      * Permutation of an array. Compiles, but does not work, requires JDK 1.6 to
      * work.
+     *
      * @param a array.
      * @param P permutation.
      * @return P(a).
-    @SuppressWarnings({ "unchecked", "cast" })
+     */
+    @SuppressWarnings({"unchecked", "cast"})
     public static <T> T[] arrayPermutation(List<Integer> P, T[] a) {
         if (a == null || a.length <= 1) {
             return a;
         }
-        T[] b = (T[]) new Object[a.length]; // jdk 1.5 
-        //T[] b = Arrays.<T>copyOf( a, a.length ); // jdk 1.6, works
+        //T[] b = (T[]) new Object[a.length]; // jdk 1.5 
+        T[] b = Arrays.copyOf(a, a.length); // jdk 1.6, works
         int j = 0;
         for (Integer i : P) {
-            b[j] = a[(int) i];
+            b[j] = a[i];
             j++;
         }
         return b;
     }
-     */
 
 
     /**
@@ -341,6 +347,29 @@ public class TermOrderOptimization {
         List<GenPolynomial<C>> K = new ArrayList<GenPolynomial<C>>(L.size());
         for (GenPolynomial<C> a : L) {
             GenPolynomial<C> b = permutation(P, R, a);
+            K.add(b);
+        }
+        return K;
+    }
+
+
+    /**
+     * Permutation of solvable polynomial exponent vectors.
+     *
+     * @param L list of solvable polynomials.
+     * @param R solvable polynomial ring.
+     * @param P permutation, must be compatible with the commutator relations.
+     * @return P(L).
+     */
+    public static <C extends RingElem<C>> List<GenSolvablePolynomial<C>> permutation(List<Integer> P,
+                                                                                     GenSolvablePolynomialRing<C> R, List<GenSolvablePolynomial<C>> L) {
+        if (L == null || L.size() == 0) {
+            return L;
+        }
+        List<GenSolvablePolynomial<C>> K = new ArrayList<GenSolvablePolynomial<C>>(L.size());
+        for (GenSolvablePolynomial<C> a : L) {
+            GenSolvablePolynomial<C> b;
+            b = (GenSolvablePolynomial<C>) permutation(P, R, a);
             K.add(b);
         }
         return K;

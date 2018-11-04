@@ -5,6 +5,7 @@
 package edu.jas.gbufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import edu.jas.arith.BigInteger;
@@ -46,26 +47,26 @@ import edu.jas.ufd.QuotientRing;
  * returns an object of a class which implements the
  * <code>GroebnerBase</code> interface, more precisely an object of
  * abstract class <code>GroebnerBaseAbstract</code>.
- * <p>
+ *
  * <pre>
  *
- * GroebnerBase&lt;CT&gt; engine;
- * engine = GBFactory.&lt;CT&gt; getImplementation(cofac);
- * c = engine.GB(A);
- * </pre>
+ *        GroebnerBase&lt;CT&gt; engine;
+ *        engine = GBFactory.&lt;CT&gt; getImplementation(cofac);
+ *        c = engine.GB(A);
+ *        </pre>
  * <p>
  * For example, if the coefficient type is BigInteger, the usage looks
  * like
- * <p>
+ *
  * <pre>
  *
- * BigInteger cofac = new BigInteger();
- * GroebnerBase&lt;BigInteger&gt; engine;
- * engine = GBFactory.getImplementation(cofac);
- * c = engine.GB(A);
- * </pre>
+ *        BigInteger cofac = new BigInteger();
+ *        GroebnerBase&lt;BigInteger&gt; engine;
+ *        engine = GBFactory.getImplementation(cofac);
+ *        c = engine.GB(A);
+ *        </pre>
  * @see edu.jas.gb.GroebnerBase
-
+ * @see edu.jas.application.GBAlgorithmBuilder
  */
 
 public class GBFactory {
@@ -174,7 +175,8 @@ public class GBFactory {
      * @param pl  pair selection strategy
      * @return GB algorithm implementation.
      */
-    public static GroebnerBaseAbstract<BigInteger> getImplementation(BigInteger fac, PairList<BigInteger> pl) {
+    public static GroebnerBaseAbstract<BigInteger> getImplementation(BigInteger fac,
+                                                                     PairList<BigInteger> pl) {
         return getImplementation(fac, Algo.igb, pl);
     }
 
@@ -265,10 +267,23 @@ public class GBFactory {
                 bba = new GroebnerBaseRational<BigRational>(pli); // pl not possible
                 break;
             default:
-                throw new IllegalArgumentException("algorithm not available for " + fac.toScriptFactory()
-                        + ", Algo = " + a);
+                throw new IllegalArgumentException(
+                        "algorithm not available for " + fac.toScriptFactory() + ", Algo = " + a);
         }
         return bba;
+    }
+
+    /**
+     * Determine suitable implementation of GB algorithms, case Quotient
+     * coefficients.
+     *
+     * @param fac QuotientRing.
+     * @param pl  pair selection strategy
+     * @return GB algorithm implementation.
+     */
+    public static <C extends GcdRingElem<C>> GroebnerBaseAbstract<Quotient<C>> getImplementation(
+            QuotientRing<C> fac, PairList<Quotient<C>> pl) {
+        return getImplementation(fac, Algo.qgb, pl);
     }
 
     /**
@@ -302,20 +317,6 @@ public class GBFactory {
                 throw new IllegalArgumentException("algorithm not available for Quotient " + a);
         }
         return bba;
-    }
-
-    /**
-     * Determine suitable implementation of GB algorithms, case (recursive)
-     * polynomial.
-     *
-     * @param fac GenPolynomialRing&lt;C&gt;.
-     * @param a   algorithm, a = igb or egb, dgb if fac is univariate over a
-     *            field.
-     * @return GB algorithm implementation.
-     */
-    public static <C extends GcdRingElem<C>> GroebnerBaseAbstract<GenPolynomial<C>> getImplementation(
-            GenPolynomialRing<C> fac, Algo a) {
-        return getImplementation(fac, a, new OrderedPairlist<GenPolynomial<C>>());
     }
 
     /**
@@ -401,7 +402,7 @@ public class GBFactory {
      * @param pl  pair selection strategy
      * @return GB algorithm implementation.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public static <C extends GcdRingElem<C>> // interface RingElem not sufficient
     GroebnerBaseAbstract<C> getImplementation(RingFactory<C> fac, PairList<C> pl) {
         logger.debug("fac = " + fac.getClass().getName());

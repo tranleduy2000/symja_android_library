@@ -5,6 +5,7 @@
 package edu.jas.gb;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -144,7 +145,7 @@ public class DReductionSeq<C extends RingElem<C>> extends ReductionAbstract<C> i
      * @param Pp polynomial list.
      * @return d-nf(Ap) with respect to Pp.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public GenPolynomial<C> normalform(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap) {
         if (Pp == null || Pp.isEmpty()) {
             return Ap;

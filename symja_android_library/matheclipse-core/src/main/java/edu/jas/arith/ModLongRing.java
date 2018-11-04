@@ -104,8 +104,8 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
     public ModLongRing(java.math.BigInteger m) {
         this(m.longValue());
         if (MAX_LONG.compareTo(m) < 0) { // m > max
-            System.out.println("modul to large for long " + m + ",max=" + MAX_LONG);
-            throw new IllegalArgumentException("modul to large for long " + m);
+            //System.out.println("modul to large for long " + m + ",max=" + MAX_LONG);
+            throw new IllegalArgumentException("modul to large for long " + m + ", max=" + MAX_LONG);
         }
     }
 
@@ -120,8 +120,8 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
     public ModLongRing(java.math.BigInteger m, boolean isField) {
         this(m.longValue(), isField);
         if (MAX_LONG.compareTo(m) < 0) { // m > max
-            System.out.println("modul to large for long " + m + ",max=" + MAX_LONG);
-            throw new IllegalArgumentException("modul to large for long " + m);
+            //System.out.println("modul to large for long " + m + ",max=" + MAX_LONG);
+            throw new IllegalArgumentException("modul to large for long " + m + ", max=" + MAX_LONG);
         }
     }
 
@@ -149,12 +149,11 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
     }
 
     /**
-     * Modular digit list chinese remainder algorithm.  m1 and m2 are
-     * positive beta-integers, with GCD(m1,m2)=1 and m=m1*m2 less than
-     * beta.  L1 and L2 are lists of elements of Z(m1) and Z(m2)
-     * respectively.  L is a list of all a in Z(m) such that a is
-     * congruent to a1 modulo m1 and a is congruent to a2 modulo m2
-     * with a1 in L1 and a2 in L2.  This is a factory method. Assert
+     * Modular digit list chinese remainder algorithm. m1 and m2 are positive
+     * beta-integers, with GCD(m1,m2)=1 and m=m1*m2 less than beta. L1 and L2
+     * are lists of elements of Z(m1) and Z(m2) respectively. L is a list of all
+     * a in Z(m) such that a is congruent to a1 modulo m1 and a is congruent to
+     * a2 modulo m2 with a1 in L1 and a2 in L2. This is a factory method. Assert
      * c.modul >= a.modul and c.modul * a.modul = this.modul.
      *
      * @param m1 ModLong.
@@ -375,7 +374,7 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
         if (isField()) {
             return "GFL(" + modul + ")";
         }
-        return "ZL(" + modul + ")";
+        return "ZML(" + modul + ")";
     }
 
     /**

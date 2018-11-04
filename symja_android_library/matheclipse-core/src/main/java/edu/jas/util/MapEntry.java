@@ -15,7 +15,7 @@ import java.util.Map;
  * @see java.util.AbstractMap.SimpleImmutableEntry in JDK 1.6.
  */
 
-public class MapEntry<K, V> implements Map.Entry<K, V> {
+public final class MapEntry<K, V> implements Map.Entry<K, V> {
 
 
     final K key;

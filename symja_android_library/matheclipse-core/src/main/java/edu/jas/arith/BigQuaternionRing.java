@@ -5,6 +5,7 @@
 package edu.jas.arith;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Reader;
@@ -12,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import edu.jas.kern.Scripting;
 import edu.jas.kern.StringUtil;
-import edu.jas.structure.Element;
 import edu.jas.structure.RingFactory;
 
 // import java.math.BigInteger;
@@ -218,13 +219,19 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
-        // Python case
         StringBuffer s = new StringBuffer("BigQuaternionRing(");
-        s.append(integral);
+        switch (Scripting.getLang()) {
+            case Ruby:
+                s.append((integral ? ",true" : ",false"));
+                break;
+            case Python:
+            default:
+                s.append((integral ? ",True" : ",False"));
+        }
         s.append(")");
         return s.toString();
     }

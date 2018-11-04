@@ -4,6 +4,7 @@
 
 package edu.jas.gb;
 
+
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -75,7 +76,7 @@ public class OrderedDPairlist<C extends RingElem<C>>
 
     /**
      * Remove the next required pair from the pairlist and reduction matrix.
-     * The results of the application of the criterions 3 and 4 to see if the S-polynomial
+     * The results of the application of the criterions 3 and 4 to @see if the S-polynomial
      * is required are recorded in the Pair.
      *
      * @return the next pair if one exists, otherwise null.

@@ -5,13 +5,13 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 
 
@@ -116,7 +116,7 @@ public class RecSolvableWordPolynomial<C extends RingElem<C>> extends
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     @Override
     public RecSolvableWordPolynomialRing<C> factory() {
@@ -415,7 +415,7 @@ public class RecSolvableWordPolynomial<C extends RingElem<C>> extends
      * @param b coefficient polynomial.
      * @return this*b, where * is coefficient multiplication.
      */
-    //todo @Override, @NoOverride
+    // cannot @Override
     //public RecSolvableWordPolynomial<C> multiply(GenWordPolynomial<C> b) {
     //public GenSolvablePolynomial<GenWordPolynomial<C>> multiply(GenWordPolynomial<C> b) {
     public RecSolvableWordPolynomial<C> recMultiply(GenWordPolynomial<C> b) {
@@ -423,7 +423,7 @@ public class RecSolvableWordPolynomial<C extends RingElem<C>> extends
         if (b == null || b.isZERO()) {
             return Cp;
         }
-        Cp = ring.valueOf(b); //new RecSolvableWordPolynomial<C>(ring, b, ring.evzero);
+        Cp = new RecSolvableWordPolynomial<C>(ring, b, ring.evzero);
         return multiply(Cp);
     }
 

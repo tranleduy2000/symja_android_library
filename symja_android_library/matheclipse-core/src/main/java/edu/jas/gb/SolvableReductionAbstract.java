@@ -5,6 +5,7 @@
 package edu.jas.gb;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -14,6 +15,9 @@ import java.util.Map;
 
 import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenSolvablePolynomial;
+import edu.jas.poly.GenSolvablePolynomialRing;
+import edu.jas.poly.ModuleList;
+import edu.jas.poly.PolynomialList;
 import edu.jas.structure.RingElem;
 
 
@@ -153,6 +157,49 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
             red.add(A);
         }
         return red;
+    }
+
+
+    /**
+     * Module left normalform set.
+     *
+     * @param Ap module list.
+     * @param Pp module list.
+     * @return list of left-nf(a) with respect to Pp for all a in Ap.
+     */
+    public ModuleList<C> leftNormalform(ModuleList<C> Pp, ModuleList<C> Ap) {
+        return leftNormalform(Pp, Ap, false);
+    }
+
+
+    /**
+     * Module left normalform set.
+     *
+     * @param Ap  module list.
+     * @param Pp  module list.
+     * @param top true for TOP term order, false for POT term order.
+     * @return list of left-nf(a) with respect to Pp for all a in Ap.
+     */
+    public ModuleList<C> leftNormalform(ModuleList<C> Pp, ModuleList<C> Ap, boolean top) {
+        if (Pp == null || Pp.isEmpty()) {
+            return Ap;
+        }
+        if (Ap == null || Ap.isEmpty()) {
+            return Ap;
+        }
+        GenSolvablePolynomialRing<C> sring = (GenSolvablePolynomialRing<C>) Pp.ring;
+        int modv = Pp.cols;
+        GenSolvablePolynomialRing<C> pfac = sring.extend(modv, top);
+        logger.debug("extended ring = " + pfac.toScript());
+        //System.out.println("extended ring = " + pfac.toScript());
+        PolynomialList<C> P = Pp.getPolynomialList(pfac);
+        PolynomialList<C> A = Ap.getPolynomialList(pfac);
+        //System.out.println("P = " + P.toScript());
+
+        List<GenSolvablePolynomial<C>> red = leftNormalform(P.castToSolvableList(), A.castToSolvableList());
+        PolynomialList<C> Fr = new PolynomialList<C>(pfac, red);
+        ModuleList<C> Nr = Fr.getModuleList(modv);
+        return Nr;
     }
 
 

@@ -5,10 +5,13 @@
 package edu.jas.ufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
+import edu.jas.arith.ModInt;
+import edu.jas.arith.ModIntRing;
 import edu.jas.arith.ModInteger;
 import edu.jas.arith.ModIntegerRing;
 import edu.jas.arith.ModLong;
@@ -34,7 +37,7 @@ import edu.jas.structure.RingFactory;
  * <code>getImplementation()</code>, it returns an object of a class
  * which extends the <code>FactorAbstract</code> class which implements
  * the <code>Factorization</code> interface.
- * <p>
+ *
  * <pre>
  *        Factorization&lt;CT&gt; engine;
  *        engine = FactorFactory.&lt;CT&gt; getImplementation(cofac);
@@ -43,7 +46,7 @@ import edu.jas.structure.RingFactory;
  * <p>
  * For example, if the coefficient type is BigInteger, the usage looks
  * like
- * <p>
+ *
  * <pre>
  *        BigInteger cofac = new BigInteger();
  *        Factorization&lt;BigInteger&gt; engine;
@@ -87,6 +90,18 @@ public class FactorFactory {
      */
     public static FactorAbstract<ModLong> getImplementation(ModLongRing fac) {
         return new FactorModular<ModLong>(fac);
+    }
+
+
+    /**
+     * Determine suitable implementation of factorization algorithm, case
+     * ModInteger.
+     *
+     * @param fac ModIntegerRing.
+     * @return factorization algorithm implementation.
+     */
+    public static FactorAbstract<ModInt> getImplementation(ModIntRing fac) {
+        return new FactorModular<ModInt>(fac);
     }
 
 
@@ -183,7 +198,7 @@ public class FactorFactory {
      * @param fac RingFactory&lt;C&gt;.
      * @return factorization algorithm implementation.
      */
-    @SuppressWarnings({"unchecked", "cast"})
+    @SuppressWarnings("unchecked")
     public static <C extends GcdRingElem<C>> FactorAbstract<C> getImplementation(RingFactory<C> fac) {
         logger.info("factor factory = " + fac.getClass().getName());
         //System.out.println("fac_o_ufd = " + fac.getClass().getName());
@@ -200,6 +215,8 @@ public class FactorFactory {
         } else if (ofac instanceof ModIntegerRing) {
             ufd = new FactorModular(fac);
         } else if (ofac instanceof ModLongRing) {
+            ufd = new FactorModular(fac);
+        } else if (ofac instanceof ModIntRing) {
             ufd = new FactorModular(fac);
         } else if (ofac instanceof ComplexRing) {
             cfac = (ComplexRing<C>) ofac;

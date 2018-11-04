@@ -5,6 +5,7 @@
 package edu.jas.arith;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Reader;
@@ -657,7 +658,7 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
      * @see edu.jas.structure.StarRingElem#norm()
      */
     public BigOctonion norm() {
-        // this.conjugate().multiply(this);
+        // this.multiply(this.conjugate());
         BigQuaternion v = or.norm();
         v = v.sum(oi.norm());
         return new BigOctonion(v);
@@ -666,14 +667,14 @@ public final class BigOctonion extends RingElemImpl<BigOctonion>
     /**
      * Octonion number absolute value.
      *
-     * @return |this|^2. <b>Note:</b> The square root is not jet implemented.
+     * @return |this|.
      * @see edu.jas.structure.RingElem#abs()
      */
     public BigOctonion abs() {
         BigOctonion n = norm();
-        logger.error("abs() square root missing");
-        // n = n.sqrt();
-        return n;
+        BigRational r = Roots.sqrt(n.or.re);
+        //logger.error("abs() square root missing");
+        return new BigOctonion(new BigQuaternion(n.or.ring, r));
     }
 
     /**

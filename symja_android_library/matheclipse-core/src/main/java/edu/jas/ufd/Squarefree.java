@@ -25,7 +25,7 @@ import edu.jas.structure.GcdRingElem;
  * <code>getImplementation()</code>, it returns an object of a class
  * which extends the <code>SquarefreeAbstract</code> class which
  * implements the <code>Squarefree</code> interface.
- * <p>
+ *
  * <pre>
  * Squarefree&lt;CT&gt; engine;
  * engine = SquarefreeFactory.&lt;CT&gt; getImplementation(cofac);
@@ -33,7 +33,7 @@ import edu.jas.structure.GcdRingElem;
  * </pre>
  * <p>
  * For example, if the coefficient type is BigInteger, the usage looks like
- * <p>
+ *
  * <pre>
  * BigInteger cofac = new BigInteger();
  * Squarefree&lt;BigInteger&gt; engine;

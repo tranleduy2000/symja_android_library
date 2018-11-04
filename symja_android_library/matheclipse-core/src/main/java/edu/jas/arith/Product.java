@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import edu.jas.structure.Element;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RegularRingElem;
 import edu.jas.structure.RingElem;
@@ -107,7 +106,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public ProductRing<C> factory() {
         return ring;
@@ -129,7 +128,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Is Product zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         return val.size() == 0;
@@ -140,7 +139,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Is Product one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         if (val.size() != ring.length()) {
@@ -170,7 +169,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Is Product unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see RingElem#isUnit()
+     * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
         if (isunit > 0) {
@@ -225,7 +224,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -259,7 +258,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -361,7 +360,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Product absolute value.
      *
      * @return the absolute value of this.
-     * @see RingElem#abs()
+     * @see edu.jas.structure.RingElem#abs()
      */
     public Product<C> abs() {
         SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
@@ -412,7 +411,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Product negate.
      *
      * @return -this.
-     * @see RingElem#negate()
+     * @see edu.jas.structure.RingElem#negate()
      */
     public Product<C> negate() {
         SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
@@ -429,7 +428,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Product signum.
      *
      * @return signum of first non-zero component.
-     * @see RingElem#signum()
+     * @see edu.jas.structure.RingElem#signum()
      */
     public int signum() {
         if (val.size() == 0) {
@@ -455,7 +454,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * Product quasi-inverse.
      *
      * @return S with S = 1/this if defined.
-     * @see RingElem#inverse()
+     * @see edu.jas.structure.RingElem#inverse()
      */
     public Product<C> inverse() {
         if (this.isZERO()) {
@@ -708,6 +707,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * @param S a product
      * @return [this/S, this - (this/S)*S].
      */
+    @SuppressWarnings("unchecked")
     public Product<C>[] quotientRemainder(Product<C> S) {
         return new Product[]{divide(S), remainder(S)};
     }
@@ -805,7 +805,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
      * @param S other element.
      * @return [ gcd(this,S), c1, c2 ] with c1*this + c2*b = gcd(this,S).
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public Product<C>[] egcd(Product<C> S) {
         Product<C>[] ret = (Product<C>[]) new Product[3];
         ret[0] = null;

@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
@@ -231,6 +232,18 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
         h = ring.hashCode();
         h = 37 * h + (list == null ? 0 : list.hashCode());
         return h;
+    }
+
+    /**
+     * Test if list is empty.
+     *
+     * @return true if this is empty, alse false.
+     */
+    public boolean isEmpty() {
+        if (list == null) {
+            return true;
+        }
+        return list.isEmpty();
     }
 
     /**

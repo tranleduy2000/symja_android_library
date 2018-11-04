@@ -5,6 +5,7 @@
 package edu.jas.ufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -144,7 +145,8 @@ public class HenselMultUtil {
             //System.out.println("\ne = " + e + " -------------------------------------- " + pkfac.nvar);
             GenPolynomial<GenPolynomial<MOD>> Epr = PolyUtil.recursive(qrfac, Ep);
             //System.out.println("Epr   = " + Epr);
-            UnivPowerSeriesRing<GenPolynomial<MOD>> psfac = new UnivPowerSeriesRing<GenPolynomial<MOD>>(qrfac);
+            UnivPowerSeriesRing<GenPolynomial<MOD>> psfac = new UnivPowerSeriesRing<GenPolynomial<MOD>>(
+                    qrfac);
             //System.out.println("psfac = " + psfac);
             TaylorFunction<GenPolynomial<MOD>> F = new PolynomialTaylorFunction<GenPolynomial<MOD>>(Epr);
             //System.out.println("F     = " + F);
@@ -161,8 +163,8 @@ public class HenselMultUtil {
             List<GenPolynomial<MOD>> S = HenselMultUtil.liftDiophant(Ap, Bp, cm, Vp, d, k);
             //System.out.println("S    = " + S);
             if (!ckfac.coFac.equals(S.get(0).ring.coFac)) {
-                throw new IllegalArgumentException("ckfac != pkfac: " + ckfac.coFac + " != "
-                        + S.get(0).ring.coFac);
+                throw new IllegalArgumentException(
+                        "ckfac != pkfac: " + ckfac.coFac + " != " + S.get(0).ring.coFac);
             }
             if (pkfac.nvar == 2 && !HenselUtil.isDiophantLift(Ap, Bp, S.get(1), S.get(0), cm)) {
                 //System.out.println("isDiophantLift: false");
@@ -335,7 +337,8 @@ public class HenselMultUtil {
             //System.out.println("\ne = " + e + " -------------------------------------- " + pkfac.nvar);
             GenPolynomial<GenPolynomial<MOD>> Epr = PolyUtil.recursive(qrfac, Ep);
             //System.out.println("Epr   = " + Epr);
-            UnivPowerSeriesRing<GenPolynomial<MOD>> psfac = new UnivPowerSeriesRing<GenPolynomial<MOD>>(qrfac);
+            UnivPowerSeriesRing<GenPolynomial<MOD>> psfac = new UnivPowerSeriesRing<GenPolynomial<MOD>>(
+                    qrfac);
             //System.out.println("psfac = " + psfac);
             TaylorFunction<GenPolynomial<MOD>> F = new PolynomialTaylorFunction<GenPolynomial<MOD>>(Epr);
             //System.out.println("F     = " + F);
@@ -354,8 +357,8 @@ public class HenselMultUtil {
             List<GenPolynomial<MOD>> S = HenselMultUtil.liftDiophant(Ap, cm, Vp, d, k);
             //System.out.println("S    = " + S);
             if (!ckfac.coFac.equals(S.get(0).ring.coFac)) {
-                throw new IllegalArgumentException("ckfac != pkfac: " + ckfac.coFac + " != "
-                        + S.get(0).ring.coFac);
+                throw new IllegalArgumentException(
+                        "ckfac != pkfac: " + ckfac.coFac + " != " + S.get(0).ring.coFac);
             }
             if (pkfac.nvar == 2 && !HenselUtil.isDiophantLift(Ap, S, cm)) {
                 //System.out.println("isDiophantLift: false");
@@ -415,6 +418,7 @@ public class HenselMultUtil {
      * @param L  = [g_0,...,g_{n-1}] list of lifted modular polynomials.
      * @return true if C = prod_{0,...,n-1} g_i mod p^k, else false.
      */
+    @SuppressWarnings("unused")
     public static <MOD extends GcdRingElem<MOD> & Modular> boolean isHenselLift(GenPolynomial<BigInteger> C,
                                                                                 GenPolynomial<MOD> Cp, List<GenPolynomial<MOD>> F, List<GenPolynomial<MOD>> L) {
         boolean t = true;
@@ -571,8 +575,8 @@ public class HenselMultUtil {
 
             String[] mn = new String[]{pkfac.getVars()[pkfac.nvar - 1]};
             ckfac = pkfac.contract(1);
-            GenPolynomialRing<GenPolynomial<MOD>> pkrfac = new GenPolynomialRing<GenPolynomial<MOD>>(ckfac,
-                    1, mn);
+            GenPolynomialRing<GenPolynomial<MOD>> pkrfac = new GenPolynomialRing<GenPolynomial<MOD>>(ckfac, 1,
+                    mn);
             //System.out.println("pkrfac = " + pkrfac.toScript());
 
             for (int e = 1; e <= deg && !Ep.isZERO(); e++) {
@@ -599,7 +603,7 @@ public class HenselMultUtil {
                 List<GenPolynomial<MOD>> Ud = HenselMultUtil.liftDiophant(U1, cm, Vh, d, k);
                 //System.out.println("Ud = " + Ud);
 
-                mon = mon.multiply(xv); // Power.<GenPolynomial<MOD>> power(pkfac,xv,e);
+                mon = mon.multiply(xv);
                 //System.out.println("mon  = " + mon);
                 //List<GenPolynomial<MOD>> Sd = new ArrayList<GenPolynomial<MOD>>(Ud.size());
                 int i = 0;
@@ -664,8 +668,7 @@ public class HenselMultUtil {
      */
     public static <MOD extends GcdRingElem<MOD> & Modular> List<GenPolynomial<MOD>> liftHensel(
             GenPolynomial<BigInteger> C, GenPolynomial<MOD> Cp, List<GenPolynomial<MOD>> F,
-            List<BigInteger> V, long k, List<GenPolynomial<BigInteger>> G)
-            throws NoLiftingException {
+            List<BigInteger> V, long k, List<GenPolynomial<BigInteger>> G) throws NoLiftingException {
         GenPolynomialRing<MOD> pkfac = Cp.ring;
         long d = C.degree();
         //System.out.println("C = " + C);
@@ -845,7 +848,7 @@ public class HenselMultUtil {
                 List<GenPolynomial<MOD>> Ud = HenselMultUtil.liftDiophant(U1, cm, Vh, d, k);
                 //System.out.println("Ud = " + Ud);
 
-                mon = mon.multiply(xv); // Power.<GenPolynomial<MOD>> power(pkfac,xv,e);
+                mon = mon.multiply(xv);
                 //System.out.println("mon  = " + mon);
                 //List<GenPolynomial<MOD>> Sd = new ArrayList<GenPolynomial<MOD>>(Ud.size());
                 int i = 0;
@@ -937,7 +940,7 @@ public class HenselMultUtil {
         ModularRingFactory<MOD> pcfac = (ModularRingFactory<MOD>) cfac;
         //System.out.println("pcfac = " + pcfac);
         BigInteger p = pcfac.getIntegerModul();
-        BigInteger q = p.power(k); //Power.positivePower(p, k);
+        BigInteger q = p.power(k);
         ModularRingFactory<MOD> mcfac;
         if (ModLongRing.MAX_LONG.compareTo(q.getVal()) > 0) {
             mcfac = (ModularRingFactory) new ModLongRing(q.getVal());
@@ -1020,7 +1023,7 @@ public class HenselMultUtil {
         if (gi0.isONE()) {
             U1 = HenselUtil.liftHenselMonic(Ci, F, k);
         } else {
-            U1 = HenselUtil.liftHensel(Ci, F, k, gi0); // GI0 TODO ??
+            U1 = HenselUtil.liftHensel(Ci, F, k, gi0); // gi0 TODO ??
         }
         logger.info("univariate lift: Ci = " + Ci + ", F = " + F + ", U1 = " + U1);
         //System.out.println("U1.fac = " + U1.get(0).ring);

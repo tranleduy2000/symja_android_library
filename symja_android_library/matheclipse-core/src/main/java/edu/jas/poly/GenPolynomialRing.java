@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -23,7 +24,6 @@ import edu.jas.arith.ModIntegerRing;
 import edu.jas.kern.PreemptStatus;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 import edu.jas.util.CartesianProduct;
@@ -44,8 +44,7 @@ import edu.jas.util.LongIterable;
  * @author Heinz Kredel
  */
 
-public class GenPolynomialRing<C extends RingElem<C>>
-        implements RingFactory<GenPolynomial<C>>,
+public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<GenPolynomial<C>>,
         Iterable<GenPolynomial<C>> {
 
 
@@ -393,7 +392,7 @@ public class GenPolynomialRing<C extends RingElem<C>>
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -750,7 +749,7 @@ public class GenPolynomialRing<C extends RingElem<C>>
         C a;
         // add l random coeffs and exponents
         for (int i = 0; i < l; i++) {
-            e = ExpVector.EVRAND(nvar, d, q, rnd);
+            e = ExpVector.random(nvar, d, q, rnd);
             a = coFac.random(k, rnd);
             r = r.sum(a, e); // somewhat inefficient but clean
             //System.out.println("e = " + e + " a = " + a);
@@ -1002,9 +1001,21 @@ public class GenPolynomialRing<C extends RingElem<C>>
      * @return extended polynomial ring factory.
      */
     public GenPolynomialRing<C> extend(int i) {
+        return extend(i, false);
+    }
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by i.
+     *
+     * @param i   number of variables to extend.
+     * @param top true for TOP term order, false for POT term order.
+     * @return extended polynomial ring factory.
+     */
+    public GenPolynomialRing<C> extend(int i, boolean top) {
         // add module variable names
         String[] v = newVars("e", i);
-        return extend(v);
+        return extend(v, top);
     }
 
     /**
@@ -1015,6 +1026,18 @@ public class GenPolynomialRing<C extends RingElem<C>>
      * @return extended polynomial ring factory.
      */
     public GenPolynomialRing<C> extend(String[] vn) {
+        return extend(vn, false);
+    }
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by length(vn).
+     *
+     * @param vn  names for extended variables.
+     * @param top true for TOP term order, false for POT term order.
+     * @return extended polynomial ring factory.
+     */
+    public GenPolynomialRing<C> extend(String[] vn, boolean top) {
         if (vn == null || vars == null) {
             throw new IllegalArgumentException("vn and vars may not be null");
         }
@@ -1026,8 +1049,7 @@ public class GenPolynomialRing<C extends RingElem<C>>
         for (int k = 0; k < vn.length; k++) {
             v[vars.length + k] = vn[k];
         }
-
-        TermOrder to = tord.extend(nvar, i);
+        TermOrder to = tord.extend(nvar, i, top);
         GenPolynomialRing<C> pfac = new GenPolynomialRing<C>(coFac, nvar + i, to, v);
         return pfac;
     }
@@ -1115,7 +1137,7 @@ public class GenPolynomialRing<C extends RingElem<C>>
      *
      * @return distributive polynomial ring factory.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public GenPolynomialRing<C> distribute() {
         if (!(coFac instanceof GenPolynomialRing)) {
             return this;
@@ -1297,7 +1319,7 @@ class GenPolynomialIterator<C extends RingElem<C>> implements Iterator<GenPolyno
         ring = fac;
         LongIterable li = new LongIterable();
         li.setNonNegativeIterator();
-        List<Iterable<Long>> tlist = new ArrayList<>(ring.nvar);
+        List<Iterable<Long>> tlist = new ArrayList<Iterable<Long>>(ring.nvar);
         for (int i = 0; i < ring.nvar; i++) {
             tlist.add(li);
         }

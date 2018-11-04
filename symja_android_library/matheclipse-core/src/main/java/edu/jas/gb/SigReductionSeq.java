@@ -493,10 +493,10 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
     /**
      * Sort signature polynomials according to the degree its signatures.
      *
-     * @param list list of signature polynomials.
+     * @param F list of signature polynomials.
      * @return list of signature polynomials sorted by degree of sigma.
      */
-    public List<SigPair<C>> sortSigma(List<SigPair<C>> list) {
+    public List<SigPair<C>> sortSigma(List<SigPair<C>> F) {
         //Comparator<SigPair<C>> sigcmp = Comparator.comparing(SigPair::getSigma::degree);
         ToLongFunction<SigPair<C>> function = new ToLongFunction<SigPair<C>>() {
             @Override
@@ -509,7 +509,7 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
 //                .sorted(sigcmp)
 //                .collect(Collectors.toList());
 
-        List<SigPair<C>> ff = new ArrayList<>(list);
+        List<SigPair<C>> ff = new ArrayList<>(F);
         Collections.sort(ff, sigcmp);
 
         return ff;

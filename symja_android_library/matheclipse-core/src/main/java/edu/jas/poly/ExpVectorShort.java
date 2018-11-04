@@ -31,7 +31,7 @@ public final class ExpVectorShort extends ExpVector
      */
     public static final long minShort = (long) Short.MIN_VALUE / 2;
     /**
-     * The data structure is an array of longs.
+     * The data structure is an array of short.
      */
     /*package*/final short[] val;
 
@@ -391,7 +391,7 @@ public final class ExpVectorShort extends ExpVector
      */
     @Override
     public boolean equals(Object B) {
-        if (!(B instanceof ExpVectorShort)) {
+        if (!(B instanceof ExpVectorShort) || B == null) {
             return false;
         }
         ExpVectorShort b = (ExpVectorShort) B;
@@ -598,6 +598,24 @@ public final class ExpVectorShort extends ExpVector
         }
         return t;
         //return EVMDEG(this);
+    }
+
+
+    /**
+     * ExpVector minimal degree.
+     *
+     * @return minimal exponent.
+     */
+    @Override
+    public long minDeg() {
+        long t = Short.MAX_VALUE;
+        short[] u = val;
+        for (int i = 0; i < u.length; i++) {
+            if (u[i] < t) {
+                t = u[i];
+            }
+        }
+        return t;
     }
 
 

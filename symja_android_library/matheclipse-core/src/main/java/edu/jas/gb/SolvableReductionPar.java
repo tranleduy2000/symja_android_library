@@ -43,7 +43,7 @@ public class SolvableReductionPar<C extends RingElem<C>> extends SolvableReducti
      * @param Pp solvable polynomial list.
      * @return left-nf(Ap) with respect to Pp.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public GenSolvablePolynomial<C> leftNormalform(List<GenSolvablePolynomial<C>> Pp,
                                                    GenSolvablePolynomial<C> Ap) {
         if (Pp == null || Pp.isEmpty()) {
@@ -143,7 +143,7 @@ public class SolvableReductionPar<C extends RingElem<C>> extends SolvableReducti
      * @param Pp solvable polynomial list.
      * @return right-nf(Ap) with respect to Pp.
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public GenSolvablePolynomial<C> rightNormalform(List<GenSolvablePolynomial<C>> Pp,
                                                     GenSolvablePolynomial<C> Ap) {
         if (Pp == null || Pp.isEmpty()) {

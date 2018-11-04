@@ -5,6 +5,7 @@
 package edu.jas.gbufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import edu.jas.arith.BigInteger;
@@ -46,7 +47,7 @@ import edu.jas.ufd.QuotientRing;
  * which implements the <code>SolvableGroebnerBase</code> interface, more
  * precisely an object of abstract class
  * <code>SolvableGroebnerBaseAbstract</code>.
- * <p>
+ *
  * <pre>
  *
  * SolvableGroebnerBase&lt;CT&gt; engine;
@@ -56,7 +57,7 @@ import edu.jas.ufd.QuotientRing;
  * <p>
  * For example, if the coefficient type is BigInteger, the usage looks
  * like
- * <p>
+ *
  * <pre>
  *
  * BigInteger cofac = new BigInteger();
@@ -66,7 +67,7 @@ import edu.jas.ufd.QuotientRing;
  * </pre>
  * @see edu.jas.gb.GroebnerBase
  * @see edu.jas.gb.SolvableGroebnerBase
-
+ * @see edu.jas.application.GBAlgorithmBuilder
  */
 
 public class SGBFactory {
@@ -75,7 +76,7 @@ public class SGBFactory {
     private static final Logger logger = Logger.getLogger(SGBFactory.class);
 
 
-    private static boolean debug = logger.isDebugEnabled();
+    private static final boolean debug = logger.isDebugEnabled();
 
 
     /**

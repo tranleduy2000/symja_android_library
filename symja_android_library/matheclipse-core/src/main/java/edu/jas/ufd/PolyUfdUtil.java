@@ -5,6 +5,7 @@
 package edu.jas.ufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import edu.jas.poly.ExpVector;
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.PolyUtil;
+import edu.jas.poly.TermOrderByName;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
@@ -240,13 +242,47 @@ public class PolyUfdUtil {
         if (A == null || A.isZERO()) {
             return B;
         }
+        java.math.BigInteger gcd = null;
+        java.math.BigInteger lcm = null;
+        int sLCM = 0;
+        int sGCD = 0;
+        // lcm of all denominators
+        for (GenPolynomial<BigRational> av : A.getMap().values()) {
+            for (BigRational y : av.getMap().values()) {
+                java.math.BigInteger numerator = y.numerator();
+                java.math.BigInteger denominator = y.denominator();
+                // lcm = lcm(lcm,x)
+                if (lcm == null) {
+                    lcm = denominator;
+                    sLCM = denominator.signum();
+                } else {
+                    java.math.BigInteger d = lcm.gcd(denominator);
+                    lcm = lcm.multiply(denominator.divide(d));
+                }
+                // gcd = gcd(gcd,x)
+                if (gcd == null) {
+                    gcd = numerator;
+                    sGCD = numerator.signum();
+                } else {
+                    gcd = gcd.gcd(numerator);
+                }
+            }
+            //System.out.println("gcd = " + gcd + ", lcm = " + lcm);
+        }
+        if (sLCM < 0) {
+            lcm = lcm.negate();
+        }
+        if (sGCD < 0) {
+            gcd = gcd.negate();
+        }
+        //System.out.println("gcd** = " + gcd + ", lcm = " + lcm);
         RingFactory<GenPolynomial<BigInteger>> cfac = fac.coFac;
         GenPolynomialRing<BigInteger> rfac = (GenPolynomialRing<BigInteger>) cfac;
         for (Map.Entry<ExpVector, GenPolynomial<BigRational>> y : A.getMap().entrySet()) {
             ExpVector e = y.getKey();
             GenPolynomial<BigRational> a = y.getValue();
-            // TODO: check/fix common denominator
-            GenPolynomial<BigInteger> p = PolyUtil.integerFromRationalCoefficients(rfac, a);
+            // common denominator over all coefficients
+            GenPolynomial<BigInteger> p = PolyUtil.integerFromRationalCoefficients(rfac, gcd, lcm, a);
             if (!p.isZERO()) {
                 //B = B.sum( p, e ); // inefficient
                 B.doPutToMap(e, p);
@@ -452,6 +488,61 @@ public class PolyUfdUtil {
         } else {
             afac.setField(false);
         }
+    }
+
+
+    /**
+     * Construct a random irreducible univariate polynomial of degree d.
+     *
+     * @param cfac   coefficient ring.
+     * @param degree of random polynomial.
+     * @return irreducible univariate polynomial.
+     */
+    public static <C extends GcdRingElem<C>>
+    GenPolynomial<C> randomIrreduciblePolynomial(RingFactory<C> cfac, int degree) {
+        if (!cfac.isField()) {
+            throw new IllegalArgumentException("coefficient ring must be a field " + cfac);
+        }
+        GenPolynomialRing<C> ring = new GenPolynomialRing<C>(cfac, 1, TermOrderByName.INVLEX);
+        Factorization<C> eng = FactorFactory.getImplementation(ring);
+        GenPolynomial<C> mod = ring.getZERO();
+        int k = cfac.characteristic().bitLength(); // log
+        if (k < 3) {
+            k = 7;
+        }
+        int l = degree / 2 + 2;
+        int d = degree + 1;
+        float q = 0.55f;
+        for (; ; ) {
+            mod = ring.random(k, l, d, q).monic();
+            if (mod.degree() != degree) {
+                mod = mod.sum(ring.univariate(0, degree));
+            }
+            if (mod.trailingBaseCoefficient().isZERO()) {
+                mod = mod.sum(ring.getONE());
+            }
+            //System.out.println("algebriacNumberField: mod = " + mod + ", k = " + k);
+            if (eng.isIrreducible(mod)) {
+                break;
+            }
+        }
+        return mod;
+    }
+
+
+    /**
+     * Construct an algebraic number field of degree d. Uses a random
+     * irreducible polynomial of degree d as modulus of the algebraic number ring.
+     *
+     * @param cfac   coefficient ring.
+     * @param degree of random polynomial.
+     * @return algebraic number field.
+     */
+    public static <C extends GcdRingElem<C>>
+    AlgebraicNumberRing<C> algebriacNumberField(RingFactory<C> cfac, int degree) {
+        GenPolynomial<C> mod = randomIrreduciblePolynomial(cfac, degree);
+        AlgebraicNumberRing<C> afac = new AlgebraicNumberRing<C>(mod, true);
+        return afac;
     }
 
 

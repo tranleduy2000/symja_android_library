@@ -5,6 +5,7 @@
 package edu.jas.root;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Reader;
@@ -47,13 +48,13 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      */
     public final AlgebraicNumberRing<Complex<C>> algebraic;
     /**
-     * Complex root computation engine.
-     */
-    public final ComplexRootsSturm<C> engine;
-    /**
      * Epsilon of the isolating rectangle for a complex root.
      */
     protected BigRational eps;
+    /**
+     * Complex root computation engine.
+     */
+    protected ComplexRootsSturm<C> engine = null;
     /**
      * Isolating rectangle for a complex root. <b>Note: </b> interval may shrink
      * eventually.
@@ -71,13 +72,13 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
     public ComplexAlgebraicRing(GenPolynomial<Complex<C>> m, Rectangle<C> root) {
         algebraic = new AlgebraicNumberRing<Complex<C>>(m);
         this.root = root;
-        engine = new ComplexRootsSturm<C>(m.ring.coFac);
         if (m.ring.characteristic().signum() > 0) {
             throw new IllegalArgumentException("characteristic not zero");
         }
         BigRational e = new BigRational(10L); //m.ring.coFac.fromInteger(10L).getRe();
         e = e.power(-PRECISION / 2); //Power.positivePower(e, PRECISION);
         eps = e; //BigRational.ONE; // initially
+        ensureEngine();
     }
 
 
@@ -151,11 +152,22 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
 
 
     /**
+     * Ensure engine is initialized.
+     */
+    public synchronized void ensureEngine() {
+        if (engine == null) {
+            engine = new ComplexRootsSturm<C>(algebraic.ring.coFac);
+        }
+    }
+
+
+    /**
      * Refine root.
      *
      * @param e epsilon.
      */
     public synchronized void refineRoot(BigRational e) {
+        ensureEngine();
         try {
             root = engine.complexRootRefinement(root, algebraic.modul, e);
         } catch (InvalidBoundaryException e1) {

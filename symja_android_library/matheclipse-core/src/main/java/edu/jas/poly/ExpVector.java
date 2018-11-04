@@ -12,7 +12,6 @@ import java.util.Random;
 import edu.jas.arith.BigInteger;
 import edu.jas.structure.AbelianGroupElem;
 import edu.jas.structure.AbelianGroupFactory;
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
@@ -69,7 +68,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      *
      * @param n length of exponent vector.
      */
-    public static ExpVector create(int n) {
+    public final static ExpVector create(int n) {
         switch (storunit) {
             case INT:
                 return new ExpVectorInteger(n);
@@ -91,7 +90,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param i index of exponent to be set.
      * @param e exponent to be set.
      */
-    public static ExpVector create(int n, int i, long e) {
+    public final static ExpVector create(int n, int i, long e) {
         switch (storunit) {
             case INT:
                 return new ExpVectorInteger(n, i, e);
@@ -111,7 +110,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      *
      * @param v internal representation array.
      */
-    public static ExpVector create(long[] v) {
+    public final static ExpVector create(long[] v) {
         switch (storunit) {
             case INT:
                 return new ExpVectorInteger(v);
@@ -132,7 +131,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      *
      * @param s String representation.
      */
-    public static ExpVector create(String s) {
+    public final static ExpVector create(String s) {
         switch (storunit) {
             case INT:
                 return new ExpVectorInteger(s);
@@ -152,7 +151,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      *
      * @param v collection of exponents.
      */
-    public static ExpVector create(Collection<Long> v) {
+    public final static ExpVector create(Collection<Long> v) {
         long[] w = new long[v.size()];
         int i = 0;
         for (Long k : v) {
@@ -168,7 +167,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @return string representation of the variables.
      * @see java.util.Arrays#toString()
      */
-    public static String varsToString(String[] vars) {
+    public final static String varsToString(String[] vars) {
         if (vars == null) {
             return "null";
         }
@@ -189,7 +188,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param n size of names array
      * @return standard names.
      */
-    public static String[] STDVARS(int n) {
+    public final static String[] STDVARS(int n) {
         return STDVARS("x", n);
     }
 
@@ -201,7 +200,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param prefix name prefix.
      * @return vatiable names.
      */
-    public static String[] STDVARS(String prefix, int n) {
+    public final static String[] STDVARS(String prefix, int n) {
         String[] vars = new String[n];
         if (prefix == null || prefix.length() == 0) {
             prefix = "x";
@@ -218,7 +217,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param U
      * @return abs(U).
      */
-    public static ExpVector EVABS(ExpVector U) {
+    public final static ExpVector EVABS(ExpVector U) {
         return U.abs();
     }
 
@@ -228,7 +227,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param U
      * @return -U.
      */
-    public static ExpVector EVNEG(ExpVector U) {
+    public final static ExpVector EVNEG(ExpVector U) {
         return U.negate();
     }
 
@@ -239,7 +238,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return U+V.
      */
-    public static ExpVector EVSUM(ExpVector U, ExpVector V) {
+    public final static ExpVector EVSUM(ExpVector U, ExpVector V) {
         return U.sum(V);
     }
 
@@ -250,7 +249,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return U-V.
      */
-    public static ExpVector EVDIF(ExpVector U, ExpVector V) {
+    public final static ExpVector EVDIF(ExpVector U, ExpVector V) {
         return U.subtract(V);
     }
 
@@ -262,7 +261,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param d new exponent.
      * @return substituted ExpVector.
      */
-    public static ExpVector EVSU(ExpVector U, int i, long d) {
+    public final static ExpVector EVSU(ExpVector U, int i, long d) {
         return U.subst(i, d);
     }
 
@@ -274,8 +273,8 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param q density of nozero exponents.
      * @return random ExpVector.
      */
-    public static ExpVector EVRAND(int r, long k, float q) {
-        return EVRAND(r, k, q, random);
+    public final static ExpVector EVRAND(int r, long k, float q) {
+        return random(r, k, q, random);
     }
 
     /**
@@ -287,7 +286,32 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param rnd is a source for random bits.
      * @return random ExpVector.
      */
-    public static ExpVector EVRAND(int r, long k, float q, Random rnd) {
+    public final static ExpVector EVRAND(int r, long k, float q, Random rnd) {
+        return random(r, k, q, rnd);
+    }
+
+    /**
+     * Generate a random ExpVector.
+     *
+     * @param r length of new ExpVector.
+     * @param k maximal degree in each exponent.
+     * @param q density of nozero exponents.
+     * @return random ExpVector.
+     */
+    public final static ExpVector random(int r, long k, float q) {
+        return random(r, k, q, random);
+    }
+
+    /**
+     * Generate a random ExpVector.
+     *
+     * @param r   length of new ExpVector.
+     * @param k   maximal degree in each exponent.
+     * @param q   density of nozero exponents.
+     * @param rnd is a source for random bits.
+     * @return random ExpVector.
+     */
+    public final static ExpVector random(int r, long k, float q, Random rnd) {
         long[] w = new long[r];
         long e;
         float f;
@@ -307,38 +331,13 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
     }
 
     /**
-     * Generate a random ExpVector.
-     *
-     * @param r length of new ExpVector.
-     * @param k maximal degree in each exponent.
-     * @param q density of nozero exponents.
-     * @return random ExpVector.
-     */
-    public static ExpVector random(int r, long k, float q) {
-        return EVRAND(r, k, q, random);
-    }
-
-    /**
-     * Generate a random ExpVector.
-     *
-     * @param r   length of new ExpVector.
-     * @param k   maximal degree in each exponent.
-     * @param q   density of nozero exponents.
-     * @param rnd is a source for random bits.
-     * @return random ExpVector.
-     */
-    public static ExpVector random(int r, long k, float q, Random rnd) {
-        return EVRAND(r, k, q, rnd);
-    }
-
-    /**
      * ExpVector sign.
      *
      * @param U
      * @return 0 if U is zero, -1 if some entry is negative, 1 if no entry is
      * negativ and at least one entry is positive.
      */
-    public static int EVSIGN(ExpVector U) {
+    public final static int EVSIGN(ExpVector U) {
         return U.signum();
     }
 
@@ -348,7 +347,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param U
      * @return sum of all exponents.
      */
-    public static long EVTDEG(ExpVector U) {
+    public final static long EVTDEG(ExpVector U) {
         return U.totalDeg();
     }
 
@@ -358,8 +357,18 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param U
      * @return maximal exponent.
      */
-    public static long EVMDEG(ExpVector U) {
+    public final static long EVMDEG(ExpVector U) {
         return U.maxDeg();
+    }
+
+    /**
+     * ExpVector minimal degree.
+     *
+     * @param U
+     * @return minimal exponent.
+     */
+    public final static long EVMINDEG(ExpVector U) {
+        return U.minDeg();
     }
 
     /**
@@ -369,7 +378,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param U
      * @return weighted sum of all exponents.
      */
-    public static long EVWDEG(long[][] w, ExpVector U) {
+    public final static long EVWDEG(long[][] w, ExpVector U) {
         return U.weightDeg(w);
     }
 
@@ -380,7 +389,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return component wise maximum of U and V.
      */
-    public static ExpVector EVLCM(ExpVector U, ExpVector V) {
+    public final static ExpVector EVLCM(ExpVector U, ExpVector V) {
         return U.lcm(V);
     }
 
@@ -391,7 +400,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return component wise minimum of U and V.
      */
-    public static ExpVector EVGCD(ExpVector U, ExpVector V) {
+    public final static ExpVector EVGCD(ExpVector U, ExpVector V) {
         return U.gcd(V);
     }
 
@@ -401,7 +410,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param U
      * @return array of indices where U has positive exponents.
      */
-    public static int[] EVDOV(ExpVector U) {
+    public final static int[] EVDOV(ExpVector U) {
         return U.dependencyOnVariables();
     }
 
@@ -413,7 +422,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return true if U is a multiple of V, else false.
      */
-    public static boolean EVMT(ExpVector U, ExpVector V) {
+    public final static boolean EVMT(ExpVector U, ExpVector V) {
         return U.multipleOf(V);
     }
 
@@ -424,7 +433,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVILCP(ExpVector U, ExpVector V) {
+    public final static int EVILCP(ExpVector U, ExpVector V) {
         return U.invLexCompareTo(V);
     }
 
@@ -438,7 +447,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param end
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVILCP(ExpVector U, ExpVector V, int begin, int end) {
+    public final static int EVILCP(ExpVector U, ExpVector V, int begin, int end) {
         return U.invLexCompareTo(V, begin, end);
     }
 
@@ -449,7 +458,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVIGLC(ExpVector U, ExpVector V) {
+    public final static int EVIGLC(ExpVector U, ExpVector V) {
         return U.invGradCompareTo(V);
     }
 
@@ -463,7 +472,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param end
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVIGLC(ExpVector U, ExpVector V, int begin, int end) {
+    public final static int EVIGLC(ExpVector U, ExpVector V, int begin, int end) {
         return U.invGradCompareTo(V, begin, end);
     }
 
@@ -474,7 +483,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVRILCP(ExpVector U, ExpVector V) {
+    public final static int EVRILCP(ExpVector U, ExpVector V) {
         return U.revInvLexCompareTo(V);
     }
 
@@ -488,7 +497,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param end
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVRILCP(ExpVector U, ExpVector V, int begin, int end) {
+    public final static int EVRILCP(ExpVector U, ExpVector V, int begin, int end) {
         return U.revInvLexCompareTo(V, begin, end);
     }
 
@@ -499,7 +508,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVRIGLC(ExpVector U, ExpVector V) {
+    public final static int EVRIGLC(ExpVector U, ExpVector V) {
         return U.revInvGradCompareTo(V);
     }
 
@@ -513,7 +522,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param end
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVRIGLC(ExpVector U, ExpVector V, int begin, int end) {
+    public final static int EVRIGLC(ExpVector U, ExpVector V, int begin, int end) {
         return U.revInvGradCompareTo(V, begin, end);
     }
 
@@ -524,7 +533,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVITDEGLC(ExpVector U, ExpVector V) {
+    public final static int EVITDEGLC(ExpVector U, ExpVector V) {
         return U.invTdegCompareTo(V);
     }
 
@@ -535,7 +544,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVRLITDEGC(ExpVector U, ExpVector V) {
+    public final static int EVRLITDEGC(ExpVector U, ExpVector V) {
         return U.revLexInvTdegCompareTo(V);
     }
 
@@ -547,7 +556,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param V
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVIWLC(long[][] w, ExpVector U, ExpVector V) {
+    public final static int EVIWLC(long[][] w, ExpVector U, ExpVector V) {
         return U.invWeightCompareTo(w, V);
     }
 
@@ -562,7 +571,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @param end
      * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
      */
-    public static int EVIWLC(long[][] w, ExpVector U, ExpVector V, int begin, int end) {
+    public final static int EVIWLC(long[][] w, ExpVector U, ExpVector V, int begin, int end) {
         return U.invWeightCompareTo(w, V, begin, end);
     }
 
@@ -570,7 +579,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public AbelianGroupFactory<ExpVector> factory() {
         throw new UnsupportedOperationException("no factory implemented for ExpVector");
@@ -758,7 +767,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -769,7 +778,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     // @Override
     public String toScript(String[] vars) {
@@ -813,7 +822,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -876,7 +885,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
             if (ai.isZERO()) {
                 return ai;
             }
-            C pi = ai.power(ei); //Power.<C> positivePower(ai, ei);
+            C pi = ai.power(ei);
             c = c.multiply(pi);
         }
         return c;
@@ -889,7 +898,7 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      */
     @Override
     public boolean equals(Object B) {
-        if (!(B instanceof ExpVector)) {
+        if (!(B instanceof ExpVector) || B == null) {
             return false;
         }
         ExpVector b = (ExpVector) B;
@@ -1046,6 +1055,13 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @return maximal exponent.
      */
     public abstract long maxDeg();
+
+    /**
+     * ExpVector minimal degree.
+     *
+     * @return minimal exponent.
+     */
+    public abstract long minDeg();
 
     /**
      * ExpVector weighted degree.

@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import edu.jas.arith.BigComplex;
@@ -409,7 +410,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
      * @see edu.jas.structure.StarRingElem#norm()
      */
     public Complex<C> norm() {
-        // this.conjugate().multiply(this);
+        // this.multiply(this.conjugate());
         C v = re.multiply(re);
         v = v.sum(im.multiply(im));
         return new Complex<C>(ring, v);

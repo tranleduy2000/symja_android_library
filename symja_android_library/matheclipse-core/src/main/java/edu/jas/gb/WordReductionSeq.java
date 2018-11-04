@@ -5,6 +5,7 @@
 package edu.jas.gb;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -222,7 +223,7 @@ public class WordReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
                 }
                 C c = lbc[i];
                 b = a.divide(c);
-                if (e.isONE()) { // TODO
+                if (e.isONE()) { // todo simplify multiply
                     lc = cone;
                     rc = b;
                 } else {

@@ -13,7 +13,7 @@ package edu.jas.structure;
  * @author Heinz Kredel
  */
 
-public interface RegularRingElem<C> extends GcdRingElem<C> {
+public interface RegularRingElem<C extends RegularRingElem<C>> extends GcdRingElem<C> {
 
 
     /* Get component. 

@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.util.Random;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
 
@@ -196,7 +196,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
         GenSolvablePolynomialRing<C> fring = (GenSolvablePolynomialRing<C>) rf;
         GenSolvablePolynomialRing<C> pfd = fring.distribute();
         // add coefficient relations:
-        List<GenPolynomial<GenPolynomial<C>>> rl = PolynomialList
+        List<GenPolynomial<GenPolynomial<C>>> rl = (List<GenPolynomial<GenPolynomial<C>>>) PolynomialList
                 .castToList(rf.coeffTable.relationList());
         List<GenPolynomial<C>> rld = PolyUtil.distribute(pfd, rl);
         pfd.table.addRelations(rld);
@@ -225,7 +225,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -490,7 +490,7 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
         GenPolynomial<C> a;
         // add random coeffs and exponents
         for (int i = 0; i < l; i++) {
-            e = ExpVector.EVRAND(nvar, d, q, rnd);
+            e = ExpVector.random(nvar, d, q, rnd);
             a = coFac.random(k, rnd);
             r = (RecSolvablePolynomial<C>) r.sum(a, e);
             // somewhat inefficient but clean
@@ -583,11 +583,10 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      *
      * @return List(X_1, ..., X_n) a list of univariate polynomials.
      */
-    //todo Override
-    @SuppressWarnings("unchecked")
-    public List<RecSolvablePolynomial<C>> recUnivariateList() {
+    @Override
+    public List<RecSolvablePolynomial<C>> univariateList() {
         //return castToSolvableList( super.univariateList() );
-        return (List<RecSolvablePolynomial<C>>) (Object) univariateList(0, 1L);
+        return univariateList(0, 1L);
     }
 
     /**
@@ -596,35 +595,10 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      * @param modv number of module variables.
      * @return List(X_1, ..., X_n) a list of univariate polynomials.
      */
-    //todo Override
-    @SuppressWarnings("unchecked")
-    public List<RecSolvablePolynomial<C>> recUnivariateList(int modv) {
-        return (List<RecSolvablePolynomial<C>>) (Object) univariateList(modv, 1L);
+    @Override
+    public List<RecSolvablePolynomial<C>> univariateList(int modv) {
+        return univariateList(modv, 1L);
     }
-
-
-    /*
-     * Generate list of univariate polynomials in all variables with given exponent.
-     * @param modv number of module variables.
-     * @param e the exponent of the variables.
-     * @return List(X_1^e,...,X_n^e) a list of univariate polynomials.
-     @Override
-     public List<RecSolvablePolynomial<C>> univariateList(int modv, long e) {
-     List<GenPolynomial<C>> pol = super.univariateList(modv,e);
-     UnaryFunctor<GenPolynomial<C>,RecSolvablePolynomial<C>> fc 
-     = new UnaryFunctor<GenPolynomial<C>,RecSolvablePolynomial<C>>() {
-     public RecSolvablePolynomial<C> eval(GenPolynomial<C> p) {
-     if ( ! (p instanceof RecSolvablePolynomial) ) {
-     throw new RuntimeException("no solvable polynomial "+p);
-     }
-     return (RecSolvablePolynomial<C>) p;
-     }
-     };
-     List<RecSolvablePolynomial<C>> pols 
-     = ListUtil.<GenPolynomial<C>,RecSolvablePolynomial<C>>map(this,pol,fc);
-     return pols;
-     }
-    */
 
     /**
      * Generate list of univariate polynomials in all variables with given
@@ -634,8 +608,8 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      * @param e    the exponent of the variables.
      * @return List(X_1 ^ e, ..., X_n ^ e) a list of univariate polynomials.
      */
-    //todo Override
-    public List<RecSolvablePolynomial<C>> recUnivariateList(int modv, long e) {
+    @Override
+    public List<RecSolvablePolynomial<C>> univariateList(int modv, long e) {
         List<RecSolvablePolynomial<C>> pols = new ArrayList<RecSolvablePolynomial<C>>(nvar);
         int nm = nvar - modv;
         for (int i = 0; i < nm; i++) {
@@ -654,7 +628,20 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvablePolynomialRing<C> extend(int i) {
-        GenSolvablePolynomialRing<GenPolynomial<C>> pfac = super.extend(i);
+        return extend(i, false);
+    }
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by i.
+     *
+     * @param i   number of variables to extend.
+     * @param top true for TOP term order, false for POT term order.
+     * @return extended solvable polynomial ring factory.
+     */
+    @Override
+    public RecSolvablePolynomialRing<C> extend(int i, boolean top) {
+        GenSolvablePolynomialRing<GenPolynomial<C>> pfac = super.extend(i, top);
         RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<C>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars, pfac.table);
         //spfac.table.extend(this.table); // pfac.table
@@ -672,10 +659,24 @@ public class RecSolvablePolynomialRing<C extends RingElem<C>> extends
      */
     @Override
     public RecSolvablePolynomialRing<C> extend(String[] vs) {
-        GenSolvablePolynomialRing<GenPolynomial<C>> pfac = super.extend(vs);
+        return extend(vs, false);
+    }
+
+    /**
+     * Extend variables. Used e.g. in module embedding. Extend number of
+     * variables by length(vn). New variables commute with the exiting
+     * variables.
+     *
+     * @param vs  names for extended variables.
+     * @param top true for TOP term order, false for POT term order.
+     * @return extended polynomial ring factory.
+     */
+    @Override
+    public RecSolvablePolynomialRing<C> extend(String[] vs, boolean top) {
+        GenSolvablePolynomialRing<GenPolynomial<C>> pfac = super.extend(vs, top);
         RecSolvablePolynomialRing<C> spfac = new RecSolvablePolynomialRing<C>(pfac.coFac, pfac.nvar,
                 pfac.tord, pfac.vars, pfac.table);
-        //spfac.table.extend(this.table); // pfac.table??
+        //spfac.table.extend(this.table); // is in pfac.table
         spfac.coeffTable.extend(this.coeffTable);
         return spfac;
     }

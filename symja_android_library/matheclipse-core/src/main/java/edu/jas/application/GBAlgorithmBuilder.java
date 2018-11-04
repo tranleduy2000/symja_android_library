@@ -5,6 +5,7 @@
 package edu.jas.application;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
@@ -72,7 +73,7 @@ import edu.jas.ufd.QuotientRing;
  * </ul>
  * Finally call the method <code>build()</code> to obtain an
  * implementaton of class <code>GroebnerBaseAbstract</code>. For example
- * <p>
+ *
  * <pre>
  *
  * GenPolynomialRing&lt;C&gt; pf = new GenPolynomialRing&lt;C&gt;(cofac, vars);
@@ -83,7 +84,7 @@ import edu.jas.ufd.QuotientRing;
  * <p>
  * For example, if the coefficient type is BigRational, the usage looks
  * like
- * <p>
+ *
  * <pre>
  *
  * GenPolynomialRing&lt;BigRational&gt; pf = new GenPolynomialRing&lt;BigRational&gt;(cofac, vars);
@@ -91,7 +92,7 @@ import edu.jas.ufd.QuotientRing;
  * engine = GBAlgorithmBuilder.&lt;BigRational&gt; polynomialRing(pf).fractionFree().parallel().optimize().build();
  * c = engine.GB(A);
  * </pre>
- * <p>
+ *
  * <b>Note:</b> Not all combinations are meanigful
  * @see edu.jas.gb.GroebnerBase
  * @see GBFactory
@@ -165,8 +166,8 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
      * @param fac the commutative polynomial ring.
      * @return GBAlgorithmBuilder object.
      */
-    public static  GBAlgorithmBuilder<BigRational> polynomialRing(GenPolynomialRing<BigRational> fac) {
-        return new GBAlgorithmBuilder<>(fac);
+    public static <C extends GcdRingElem<C>> GBAlgorithmBuilder<C> polynomialRing(GenPolynomialRing<C> fac) {
+        return new GBAlgorithmBuilder<C>(fac);
     }
 
     /**
@@ -329,7 +330,7 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
             bb = new GroebnerBaseSeqIter<C>(strategy);
             // if (algo instanceof GBProxy) ... assemble parallel todo
             if (algo != null) {
-                logger.warn("algo " + algo + " ignored for " + bb);
+                logger.warn("algorithm " + algo + " ignored for " + bb);
             }
             return new GBAlgorithmBuilder<C>(ring, bb, strategy);
         }
@@ -350,7 +351,7 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
             bb = new GroebnerBaseF5zSigSeqIter<C>();
             // if (algo instanceof GBProxy) ... assemble parallel todo
             if (algo != null) {
-                logger.warn("algo " + algo + " ignored for " + bb);
+                logger.warn("algorithm " + algo + " ignored for " + bb);
             }
             if (strategy != null) {
                 logger.warn("strategy " + strategy + " ignored for " + bb);
@@ -374,7 +375,7 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
             bb = new GroebnerBaseGGVSigSeqIter<C>();
             // if (algo instanceof GBProxy) ... assemble parallel todo
             if (algo != null) {
-                logger.warn("algo " + algo + " ignored for " + bb);
+                logger.warn("algorithm " + algo + " ignored for " + bb);
             }
             if (strategy != null) {
                 logger.warn("strategy " + strategy + " ignored for " + bb);
@@ -398,7 +399,7 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
             bb = new GroebnerBaseArriSigSeqIter<C>();
             // if (algo instanceof GBProxy) ... assemble parallel todo
             if (algo != null) {
-                logger.warn("algo " + algo + " ignored for " + bb);
+                logger.warn("algorithm " + algo + " ignored for " + bb);
             }
             if (strategy != null) {
                 logger.warn("strategy " + strategy + " ignored for " + bb);

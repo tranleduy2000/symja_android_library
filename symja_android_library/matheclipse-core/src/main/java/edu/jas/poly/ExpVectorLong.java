@@ -382,7 +382,7 @@ public final class ExpVectorLong extends ExpVector
      */
     @Override
     public boolean equals(Object B) {
-        if (!(B instanceof ExpVectorLong)) {
+        if (!(B instanceof ExpVectorLong) || B == null) {
             return false;
         }
         ExpVectorLong b = (ExpVectorLong) B;
@@ -557,6 +557,24 @@ public final class ExpVectorLong extends ExpVector
         long[] u = val;
         for (int i = 0; i < u.length; i++) {
             if (u[i] > t) {
+                t = u[i];
+            }
+        }
+        return t;
+    }
+
+
+    /**
+     * ExpVector minimal degree.
+     *
+     * @return minimal exponent.
+     */
+    @Override
+    public long minDeg() {
+        long t = Long.MAX_VALUE;
+        long[] u = val;
+        for (int i = 0; i < u.length; i++) {
+            if (u[i] < t) {
                 t = u[i];
             }
         }

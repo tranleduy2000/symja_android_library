@@ -373,6 +373,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @param S a ComplexAlgebraicNumber
      * @return [this/S, this - (this/S)*S].
      */
+    @SuppressWarnings("unchecked")
     public ComplexAlgebraicNumber<C>[] quotientRemainder(ComplexAlgebraicNumber<C> S) {
         return new ComplexAlgebraicNumber[]{divide(S), remainder(S)};
     }
@@ -456,6 +457,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @see edu.jas.structure.RingElem#signum()
      */
     public int signum() {
+        ring.ensureEngine();
         try {
             Rectangle<C> v = ring.engine.invariantRectangle(ring.root, ring.algebraic.modul, number.val);
             ring.setRoot(v);
@@ -474,6 +476,7 @@ public class ComplexAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends
      * @return |this| as complex rational number.
      */
     public Complex<BigRational> magnitude() {
+        ring.ensureEngine();
         try {
             Rectangle<C> v = ring.engine.invariantMagnitudeRectangle(ring.root, ring.algebraic.modul,
                     number.val, ring.getEps());

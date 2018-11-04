@@ -11,7 +11,7 @@ package edu.jas.structure;
  * @param C base element type
  * @author Heinz Kredel
  */
-public interface Value<C> {
+public interface Value<C extends RingElem<C>> {
 
 
     /**

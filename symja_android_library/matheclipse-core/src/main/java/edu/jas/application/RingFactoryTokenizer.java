@@ -25,6 +25,7 @@ import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigQuaternion;
 import edu.jas.arith.BigQuaternionRing;
 import edu.jas.arith.BigRational;
+import edu.jas.arith.ModIntRing;
 import edu.jas.arith.ModInteger;
 import edu.jas.arith.ModIntegerRing;
 import edu.jas.arith.ModLongRing;
@@ -120,7 +121,6 @@ public class RingFactoryTokenizer {
      */
     @SuppressWarnings("unchecked")
     public RingFactoryTokenizer(Reader r) {
-        //BasicConfigurator.configure();
         vars = null;
         tord = new TermOrder();
         nvars = 1;
@@ -158,13 +158,13 @@ public class RingFactoryTokenizer {
      * Parse variable list from String.
      *
      * @param s String. Syntax:
-     *          <p>
+     *
      *          <pre>
      *                   (n1,...,nk)
      *                              </pre>
      *          <p>
      *          or
-     *          <p>
+     *
      *          <pre>
      *                   (n1 ... nk)
      *                              </pre>
@@ -316,7 +316,7 @@ public class RingFactoryTokenizer {
 
     /**
      * Parsing method for variable list. Syntax:
-     * <p>
+     *
      * <pre>
      * (a, b c, de)
      * </pre>
@@ -359,7 +359,7 @@ public class RingFactoryTokenizer {
 
     /**
      * Parsing method for coefficient ring. Syntax:
-     * <p>
+     *
      * <pre>
      * Rat | Q | Int | Z | Mod modul | Complex | C | D | Quat |
      * AN[ (var) ( poly ) | AN[ modul (var) ( poly ) ] |
@@ -413,7 +413,11 @@ public class RingFactoryTokenizer {
                         BigInteger mo = new BigInteger(tok.sval);
                         BigInteger lm = new BigInteger(ModLongRing.MAX_LONG); //wrong: Long.MAX_VALUE);
                         if (mo.compareTo(lm) < 0) {
-                            coeff = new ModLongRing(mo.getVal());
+                            if (mo.compareTo(new BigInteger(ModIntRing.MAX_INT)) < 0) {
+                                coeff = new ModIntRing(mo.getVal());
+                            } else {
+                                coeff = new ModLongRing(mo.getVal());
+                            }
                         } else {
                             coeff = new ModIntegerRing(mo.getVal());
                         }
@@ -549,7 +553,7 @@ public class RingFactoryTokenizer {
 
     /**
      * Parsing method for weight list. Syntax:
-     * <p>
+     *
      * <pre>
      * (w1, w2, w3, ..., wn)
      * </pre>
@@ -596,7 +600,7 @@ public class RingFactoryTokenizer {
 
     /**
      * Parsing method for weight array. Syntax:
-     * <p>
+     *
      * <pre>
      * ( (w11, ...,w1n), ..., (wm1, ..., wmn) )
      * </pre>
@@ -651,7 +655,7 @@ public class RingFactoryTokenizer {
 
     /**
      * Parsing method for split index. Syntax:
-     * <p>
+     *
      * <pre>
      * |i|
      * </pre>
@@ -725,7 +729,7 @@ public class RingFactoryTokenizer {
 
     /**
      * Parsing method for term order name. Syntax:
-     * <p>
+     *
      * <pre>
      * L | IL | LEX | G | IG | GRLEX | W(weights) | '|'split index'|'
      * </pre>
@@ -777,7 +781,7 @@ public class RingFactoryTokenizer {
 
     /**
      * Parsing method for solvable polynomial relation table. Syntax:
-     * <p>
+     *
      * <pre>
      * ( p_1, p_2, p_3, ..., p_{n+1}, p_{n+2}, p_{n+3} )
      * </pre>
@@ -835,7 +839,7 @@ public class RingFactoryTokenizer {
 
     /**
      * Parsing method for polynomial ring. Syntax:
-     * <p>
+     *
      * <pre>
      * coeffRing varList termOrderName polyList
      * </pre>
@@ -870,7 +874,7 @@ public class RingFactoryTokenizer {
 
     /**
      * Parsing method for solvable polynomial ring. Syntax:
-     * <p>
+     *
      * <pre>
      * varList termOrderName relationTable polyList
      * </pre>

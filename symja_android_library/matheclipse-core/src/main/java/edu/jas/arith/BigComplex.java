@@ -5,6 +5,7 @@
 package edu.jas.arith;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Reader;
@@ -646,7 +647,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      * @see edu.jas.structure.StarRingElem#norm()
      */
     public BigComplex norm() {
-        // this.conjugate().multiply(this);
+        // this.multiply(this.conjugate());
         BigRational v = re.multiply(re);
         v = v.sum(im.multiply(im));
         return new BigComplex(v);
@@ -655,14 +656,14 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
     /**
      * Complex number absolute value.
      *
-     * @return |this|^2. Note: The square root is not jet implemented.
+     * @return |this|.
      * @see edu.jas.structure.RingElem#abs()
      */
     public BigComplex abs() {
         BigComplex n = norm();
-        logger.error("abs() square root missing");
-        // n = n.sqrt();
-        return n;
+        BigRational r = Roots.sqrt(n.re);
+        //logger.error("abs() square root missing " + r);
+        return new BigComplex(r);
     }
 
     /**

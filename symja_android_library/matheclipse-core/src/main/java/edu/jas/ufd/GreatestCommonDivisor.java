@@ -20,7 +20,7 @@ import edu.jas.structure.GcdRingElem;
  * @usage To create classes that implement this interface use the
  * GreatestCommonDivisorFactory. It will select an appropriate
  * implementation based on the types of polynomial coefficients CT.
- * <p>
+ *
  * <pre>
  * GreatestCommonDivisor&lt;CT&gt; engine = GCDFactory.&lt;CT&gt; getImplementation(cofac);
  * c = engine.gcd(a, b);
@@ -28,7 +28,7 @@ import edu.jas.structure.GcdRingElem;
  * <p>
  * For example, if the coefficient type is BigInteger, the usage looks
  * like
- * <p>
+ *
  * <pre>
  * BigInteger cofac = new BigInteger();
  * GreatestCommonDivisor&lt;BigInteger&gt; engine = GCDFactory.getImplementation(cofac);

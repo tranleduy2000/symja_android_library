@@ -5,6 +5,7 @@
 package edu.jas.gbufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
      * @param red Reduction engine
      * @param pl  pair selection strategy
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings("unchecked")
     public WordGroebnerBasePseudoRecSeq(RingFactory<GenPolynomial<C>> rf,
                                         WordPseudoReductionSeq<GenPolynomial<C>> red, WordPairList<GenPolynomial<C>> pl) {
         super(red, pl);

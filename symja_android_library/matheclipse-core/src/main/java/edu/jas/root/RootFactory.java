@@ -337,9 +337,23 @@ public class RootFactory {
     public static <C extends GcdRingElem<C> & Rational> boolean isRealRoot(GenPolynomial<C> f,
                                                                            Complex<BigDecimal> c, BigDecimal r, BigRational eps) {
         BigDecimal e = new BigDecimal(eps);
-        if (c.getIm().abs().compareTo(e) <= 0) {
-            return c.getRe().subtract(r).abs().compareTo(e) <= 0;
+        if (c.getIm().abs().compareTo(e) > 0) {
+            return false;
         }
+        if (c.getRe().subtract(r).abs().compareTo(e) > 0) {
+            return false;
+        }
+        GenPolynomialRing<Complex<C>> cfac = new GenPolynomialRing<Complex<C>>(
+                new ComplexRing<C>(f.ring.coFac), f.ring);
+        GenPolynomial<Complex<C>> cf = PolyUtil.complexFromAny(cfac, f);
+        ComplexRing<BigDecimal> cd = new ComplexRing<BigDecimal>(e);
+        GenPolynomialRing<Complex<BigDecimal>> rfac = new GenPolynomialRing<Complex<BigDecimal>>(cd, cf.ring);
+        GenPolynomial<Complex<BigDecimal>> cdf = PolyUtil.complexDecimalFromRational(rfac, cf);
+        Complex<BigDecimal> z = PolyUtil.evaluateMain(cd, cdf, c);
+        if (z.isZERO()) {
+            return true;
+        }
+        System.out.println("z != 0: " + z);
         return false;
     }
 
@@ -589,7 +603,8 @@ public class RootFactory {
      * @param eps desired precision.
      * @return container of real and complex decimal numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> DecimalRoots<C> decimalRoots(GenPolynomial<C> f, BigRational eps) {
+    public static <C extends GcdRingElem<C> & Rational> DecimalRoots<C> decimalRoots(GenPolynomial<C> f,
+                                                                                     BigRational eps) {
         RealRootsAbstract<C> rengine = new RealRootsSturm<C>();
         List<BigDecimal> rl = rengine.approximateRoots(f, eps);
 
@@ -602,6 +617,7 @@ public class RootFactory {
         return ar;
     }
 
+
     /**
      * Roots as real and complex decimal numbers.
      *
@@ -609,7 +625,8 @@ public class RootFactory {
      * @param eps desired precision.
      * @return container of real and complex decimal numbers.
      */
-    public static <C extends GcdRingElem<C> & Rational> DecimalRoots<C> decimalRoots(AlgebraicRoots<C> ar, BigRational eps) {
+    public static <C extends GcdRingElem<C> & Rational> DecimalRoots<C> decimalRoots(AlgebraicRoots<C> ar,
+                                                                                     BigRational eps) {
         //no: rootRefine(ar, eps);
         RealRootsAbstract<C> rengine = new RealRootsSturm<C>();
         List<BigDecimal> rl = new ArrayList<BigDecimal>(ar.real.size());

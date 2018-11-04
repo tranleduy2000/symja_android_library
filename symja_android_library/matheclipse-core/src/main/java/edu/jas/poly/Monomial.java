@@ -1,3 +1,4 @@
+
 /*
  * $Id$
  */
@@ -98,7 +99,7 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
     /**
      * Script representation of Monomial.
      *
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -108,7 +109,9 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
         StringBuffer sb = new StringBuffer();
         if (!c.isONE()) {
             sb.append(c.toScript());
-            sb.append(" * ");
+            if (e.signum() != 0) {
+                sb.append(" * ");
+            }
         }
         sb.append(e.toScript());
         return sb.toString();
@@ -119,7 +122,7 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -132,7 +135,7 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
      * Get the corresponding element factory.
      *
      * @return null, factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public ElemFactory<Monomial<C>> factory() {
         return null; // TODO
@@ -145,6 +148,7 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
      * @see Object#equals(Object)
      */
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(Object B) {
         if (!(B instanceof Monomial)) {
             return false;

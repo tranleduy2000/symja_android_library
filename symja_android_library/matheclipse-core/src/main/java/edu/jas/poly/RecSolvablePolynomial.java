@@ -5,13 +5,13 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 
 
@@ -113,7 +113,7 @@ public class RecSolvablePolynomial<C extends RingElem<C>> extends GenSolvablePol
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     @Override
     public RecSolvablePolynomialRing<C> factory() {
@@ -414,7 +414,7 @@ public class RecSolvablePolynomial<C extends RingElem<C>> extends GenSolvablePol
      * @param b coefficient polynomial.
      * @return this*b, where * is coefficient multiplication.
      */
-    //todo @Override, @NoOverride
+    // cannot @Override
     //public RecSolvablePolynomial<C> multiply(GenPolynomial<C> b) {
     //public GenSolvablePolynomial<GenPolynomial<C>> multiply(GenPolynomial<C> b) {
     public RecSolvablePolynomial<C> recMultiply(GenPolynomial<C> b) {

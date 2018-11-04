@@ -5,6 +5,7 @@
 package edu.jas.integrate;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -68,12 +69,19 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
 
 
     /**
+     * Flag for irreducible input to integrateLogPart.
+     */
+    public boolean irredLogPart = true;
+
+
+    /**
      * Constructor.
      */
     public ElementaryIntegration(RingFactory<C> br) {
         ufd = GCDFactory.getProxy(br);
         sqf = SquarefreeFactory.getImplementation(br);
         irr = /*(FactorAbsolute<C>)*/FactorFactory.getImplementation(br);
+        irredLogPart = true;
     }
 
 
@@ -147,7 +155,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
         for (int i = 0; i < log.size(); i++) {
             GenPolynomial<C> ln = log.get(i++);
             GenPolynomial<C> ld = log.get(i);
-            LogIntegral<C> pf = integrateLogPart(ln, ld);
+            LogIntegral<C> pf = integrateLogPartPrepare(ln, ld);
             logi.add(pf);
         }
         if (debug) {
@@ -165,7 +173,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
      * @return [ [ gn_i, gd_i ], [ h0, hn_j, hd_j ] ] such that integrate(a/d) =
      * sum_i(gn_i/gd_i) + integrate(h0) + sum_j( integrate(hn_j/hd_j) )
      */
-    @SuppressWarnings("cast")
+    @SuppressWarnings({"unchecked", "cast"})
     public List<GenPolynomial<C>>[] integrateHermite(GenPolynomial<C> a, GenPolynomial<C> d) {
         if (d == null || d.isZERO()) {
             throw new IllegalArgumentException("d == null or d == 0");
@@ -209,7 +217,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
                 GenPolynomial<C>[] BC = ufd.baseGcdDiophant(DV_dx, v, Aik);
                 GenPolynomial<C> b = BC[0];
                 GenPolynomial<C> c = BC[1];
-                GenPolynomial<C> vj = v.power(j); //Power.<GenPolynomial<C>> positivePower(v, j);
+                GenPolynomial<C> vj = v.power(j);
                 G.add(b); // B
                 G.add(vj); // v^j
                 Ak = fac.fromInteger(-j).multiply(c).subtract(PolyUtil.baseDeriviative(b));
@@ -231,14 +239,17 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
 
 
     /**
-     * Univariate GenPolynomial integration of the logaritmic part,
-     * Rothstein-Trager algorithm.
+     * Univariate GenPolynomial integration of the logaritmic part, eventual
+     * preparation for irreducible factorization of P.
      *
      * @param A univariate GenPolynomial, deg(A) < deg(P).
      * @param P univariate squarefree GenPolynomial, gcd(A,P) == 1.
      * @return logarithmic part container.
      */
-    public LogIntegral<C> integrateLogPart(GenPolynomial<C> A, GenPolynomial<C> P) {
+    public LogIntegral<C> integrateLogPartPrepare(GenPolynomial<C> A, GenPolynomial<C> P) {
+        if (!irredLogPart) {
+            return integrateLogPart(A, P);
+        }
         if (P == null || P.isZERO()) {
             throw new IllegalArgumentException(" P == null or P == 0");
         }
@@ -283,7 +294,7 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
                 cdenom.add(pi);
                 continue;
             }
-            LogIntegral<C> pf = integrateLogPartIrreducible(ai, pi);
+            LogIntegral<C> pf = integrateLogPart(ai, pi);
             cfactors.addAll(pf.cfactors);
             cdenom.addAll(pf.cdenom);
             afactors.addAll(pf.afactors);
@@ -298,10 +309,11 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
      * Rothstein-Trager algorithm.
      *
      * @param A univariate GenPolynomial, deg(A) < deg(P).
-     * @param P univariate irreducible GenPolynomial. // gcd(A,P) == 1 automatic
+     * @param P univariate squarefree or irreducible GenPolynomial. // gcd(A,P)
+     *          == 1 automatic
      * @return logarithmic part container.
      */
-    public LogIntegral<C> integrateLogPartIrreducible(GenPolynomial<C> A, GenPolynomial<C> P) {
+    public LogIntegral<C> integrateLogPart(GenPolynomial<C> A, GenPolynomial<C> P) {
         if (P == null || P.isZERO()) {
             throw new IllegalArgumentException("P == null or P == 0");
         }
@@ -416,20 +428,13 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
                 //System.out.println("warning constant gcd ignored");
                 continue;
             }
+            // If a is equal to zero
+            if (a.isZERO()) {
+                continue;
+            }
             afactors.add(a);
             adenom.add(Ga);
             // special quadratic case
-            if (P.degree(0) == 2 && Ga.degree(0) == 1) {
-                GenPolynomial<AlgebraicNumber<C>>[] qra = PolyUtil
-                        .basePseudoQuotientRemainder(Pa, Ga);
-                GenPolynomial<AlgebraicNumber<C>> Qa = qra[0];
-                if (!qra[1].isZERO()) {
-                    throw new ArithmeticException("remainder not zero");
-                }
-                //System.out.println("Qa = " + Qa);
-                afactors.add(a.negate());
-                adenom.add(Qa);
-            }
             // todo: eventually implement special cases deg = 3, 4
         }
         return new LogIntegral<C>(A, P, cfactors, cdenom, afactors, adenom);
@@ -503,7 +508,6 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
     public boolean isIntegral(LogIntegral<C> rl) {
         QuotientRing<C> qr = new QuotientRing<C>(rl.den.ring);
         Quotient<C> r = new Quotient<C>(qr, rl.num, rl.den);
-
         Quotient<C> i = qr.getZERO();
         int j = 0;
         for (GenPolynomial<C> d : rl.cdenom) {
@@ -522,7 +526,6 @@ public class ElementaryIntegration<C extends GcdRingElem<C>> {
         GenPolynomial<AlgebraicNumber<C>> aqn = PolyUtil.convertToAlgebraicCoefficients(aqr.ring, r.num);
         GenPolynomial<AlgebraicNumber<C>> aqd = PolyUtil.convertToAlgebraicCoefficients(aqr.ring, r.den);
         Quotient<AlgebraicNumber<C>> ar = new Quotient<AlgebraicNumber<C>>(aqr, aqn, aqd);
-
         j = 0;
         for (GenPolynomial<AlgebraicNumber<C>> d : rl.adenom) {
             GenPolynomial<AlgebraicNumber<C>> dp = PolyUtil.baseDeriviative(d);

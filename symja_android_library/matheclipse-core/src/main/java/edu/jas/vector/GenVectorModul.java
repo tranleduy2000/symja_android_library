@@ -7,6 +7,7 @@ package edu.jas.vector;
 
 // import java.io.IOException;
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Reader;

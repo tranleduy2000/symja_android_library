@@ -11,7 +11,7 @@ import edu.jas.structure.RingElem;
 /**
  * E-Groebner Base sequential algorithm. Nearly empty class, only the
  * e-reduction is used instead of d-reduction. <b>Note:</b> Minimal reduced GBs
- * are again unique. see BWK, section 10.1.
+ * are again unique. @see BWK, section 10.1.
  *
  * @param <C> coefficient type
  * @author Heinz Kredel

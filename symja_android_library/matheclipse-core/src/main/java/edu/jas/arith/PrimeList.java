@@ -55,7 +55,7 @@ public final class PrimeList implements Iterable<java.math.BigInteger> {
      * @param r size range for primes.
      */
     public PrimeList(Range r) {
-        // initialize with some known primes, see knuth (2,390)
+        // initialize with some known primes, @see knuth (2,390)
         switch (r) {
             case small:
                 if (SMALL_LIST != null) {

@@ -5,6 +5,7 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.TreeMap;
 
 import edu.jas.arith.BigComplex;
 import edu.jas.arith.BigDecimal;
+import edu.jas.arith.BigDecimalComplex;
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
 import edu.jas.arith.ModInteger;
@@ -24,10 +26,12 @@ import edu.jas.arith.ModularRingFactory;
 import edu.jas.arith.Product;
 import edu.jas.arith.ProductRing;
 import edu.jas.arith.Rational;
+import edu.jas.arith.Roots;
 import edu.jas.structure.Element;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingFactory;
+import edu.jas.structure.StarRingElem;
 import edu.jas.structure.UnaryFunctor;
 import edu.jas.util.ListUtil;
 
@@ -107,9 +111,6 @@ public class PolyUtil {
                 C b = x.getValue();
                 ExpVector g = e.combine(f);
                 assert (Cm.get(g) == null);
-                //if ( Cm.get(g) != null ) { // todo assert, done
-                //   throw new RuntimeException("PolyUtil debug error");
-                //}
                 Cm.put(g, b);
             }
         }
@@ -284,10 +285,31 @@ public class PolyUtil {
         if (sGCD < 0) {
             gcd = gcd.negate();
         }
+        //System.out.println("gcd* = " + gcd + ", lcm = " + lcm);
         result[0] = gcd;
         result[1] = lcm;
         result[2] = PolyUtil.map(fac, A, new RatToIntFactor(gcd, lcm));
         return result;
+    }
+
+
+    /**
+     * BigInteger from BigRational coefficients. Represent as polynomial with
+     * BigInteger coefficients by multiplication with the gcd of the numerators
+     * and the lcm of the denominators of the BigRational coefficients. <br />
+     *
+     * @param fac result polynomial factory.
+     * @param gcd of rational coefficient numerators.
+     * @param lcm of rational coefficient denominators.
+     * @param A   polynomial with BigRational coefficients to be converted.
+     * @return polynomial with BigInteger coefficients.
+     */
+    public static GenPolynomial<BigInteger> integerFromRationalCoefficients(GenPolynomialRing<BigInteger> fac,
+                                                                            java.math.BigInteger gcd, java.math.BigInteger lcm,
+                                                                            GenPolynomial<BigRational> A) {
+        //System.out.println("gcd = " + gcd + ", lcm = " + lcm);
+        GenPolynomial<BigInteger> Ai = PolyUtil.map(fac, A, new RatToIntFactor(gcd, lcm));
+        return Ai;
     }
 
 
@@ -1248,10 +1270,10 @@ public class PolyUtil {
             if (!c.isZERO()) {
                 pv.put(e1, c); // or m1.setValue( c )
             } else {
-                System.out.println("rDiv, P  = " + P);
-                System.out.println("rDiv, c1 = " + c1);
-                System.out.println("rDiv, s  = " + s);
-                System.out.println("rDiv, c  = " + c);
+                logger.warn("rDiv, P  = " + P);
+                logger.warn("rDiv, c1 = " + c1);
+                logger.warn("rDiv, s  = " + s);
+                logger.warn("rDiv, c  = " + c);
                 throw new RuntimeException("something is wrong");
             }
         }
@@ -1288,10 +1310,10 @@ public class PolyUtil {
             if (!c.isZERO()) {
                 pv.put(e1, c); // or m1.setValue( c )
             } else {
-                System.out.println("rDiv, P  = " + P);
-                System.out.println("rDiv, c1 = " + c1);
-                System.out.println("rDiv, s  = " + s);
-                System.out.println("rDiv, c  = " + c);
+                logger.warn("rDiv, P  = " + P);
+                logger.warn("rDiv, c1 = " + c1);
+                logger.warn("rDiv, s  = " + s);
+                logger.warn("rDiv, c  = " + c);
                 throw new RuntimeException("something is wrong");
             }
         }
@@ -1328,9 +1350,9 @@ public class PolyUtil {
             if (!c.isZERO()) {
                 pv.put(e1, c); // or m1.setValue( c )
             } else {
-                System.out.println("pu, c1 = " + c1);
-                System.out.println("pu, s  = " + s);
-                System.out.println("pu, c  = " + c);
+                logger.warn("pu, c1 = " + c1);
+                logger.warn("pu, s  = " + s);
+                logger.warn("pu, c  = " + c);
                 throw new RuntimeException("something is wrong");
             }
         }
@@ -1578,12 +1600,12 @@ public class PolyUtil {
                 GenPolynomial<C> x = c1.remainder(s);
                 if (!x.isZERO()) {
                     logger.info("divide x = " + x);
-                    throw new ArithmeticException(" no exact division: " + c1 + "/" + s);
+                    throw new ArithmeticException("no exact division: " + c1 + "/" + s);
                 }
             }
             if (c.isZERO()) {
-                System.out.println(" no exact division: " + c1 + "/" + s);
-                //throw new ArithmeticException(" no exact division: " + c1 + "/" + s);
+                //logger.warn("no exact division: " + c1 + "/" + s);
+                throw new ArithmeticException("no exact division: " + c1 + "/" + s);
             } else {
                 pv.put(e, c); // or m1.setValue( c )
             }
@@ -1619,12 +1641,12 @@ public class PolyUtil {
                 C x = c1.remainder(s);
                 if (!x.isZERO()) {
                     logger.info("divide x = " + x);
-                    throw new ArithmeticException(" no exact division: " + c1 + "/" + s);
+                    throw new ArithmeticException("no exact division: " + c1 + "/" + s);
                 }
             }
             if (c.isZERO()) {
-                System.out.println(" no exact division: " + c1 + "/" + s);
-                //throw new ArithmeticException(" no exact division: " + c1 + "/" + s);
+                //logger.warn("no exact division: " + c1 + "/" + s);
+                throw new ArithmeticException("no exact division: " + c1 + "/" + s);
             } else {
                 pv.put(e, c); // or m1.setValue( c )
             }
@@ -1821,6 +1843,55 @@ public class PolyUtil {
 
 
     /**
+     * Absoulte norm. Square root of the sum of the squared coefficients.
+     *
+     * @param p GenPolynomial
+     * @return sqrt(sum < sub > i < / sub > | c < sub > i < / sub > | < sup > 2 < / sup >).
+     */
+    @SuppressWarnings("unchecked")
+    public static <C extends RingElem<C>> C absNorm(GenPolynomial<C> p) {
+        if (p == null) {
+            return null;
+        }
+        C a = p.ring.getZEROCoefficient();
+        if (a instanceof StarRingElem) {
+            //System.out.println("StarRingElem case");
+            for (C c : p.val.values()) {
+                @SuppressWarnings("unchecked")
+                C n = (C) ((StarRingElem) c).norm();
+                a = a.sum(n);
+            }
+        } else {
+            for (C c : p.val.values()) {
+                C n = c.multiply(c);
+                a = a.sum(n);
+            }
+        }
+        // compute square root if possible
+        // todo refactor for sqrt in RingElem (?)
+        if (a instanceof BigRational) {
+            BigRational b = (BigRational) a;
+            a = (C) Roots.sqrt(b);
+        } else if (a instanceof BigComplex) {
+            BigComplex b = (BigComplex) a;
+            a = (C) Roots.sqrt(b);
+        } else if (a instanceof BigInteger) {
+            BigInteger b = (BigInteger) a;
+            a = (C) Roots.sqrt(b);
+        } else if (a instanceof BigDecimal) {
+            BigDecimal b = (BigDecimal) a;
+            a = (C) Roots.sqrt(b);
+        } else if (a instanceof BigDecimalComplex) {
+            BigDecimalComplex b = (BigDecimalComplex) a;
+            a = (C) Roots.sqrt(b);
+        } else {
+            logger.error("no square root implemented for " + a.toScriptFactory());
+        }
+        return a;
+    }
+
+
+    /**
      * Evaluate at main variable.
      *
      * @param <C>  coefficient type.
@@ -1834,7 +1905,7 @@ public class PolyUtil {
         if (A == null || A.isZERO()) {
             return cfac.getZERO();
         }
-        if (A.ring.nvar != 1) { // todo assert
+        if (A.ring.nvar != 1) {
             throw new IllegalArgumentException("evaluateMain no univariate polynomial");
         }
         if (a == null || a.isZERO()) {
@@ -1916,7 +1987,7 @@ public class PolyUtil {
         if (A == null || A.isZERO()) {
             return cfac.getZERO();
         }
-        if (A.ring.nvar != 1) { // todo assert
+        if (A.ring.nvar != 1) {
             throw new IllegalArgumentException("evaluateMain no univariate polynomial");
         }
         if (a == null || a.isZERO()) {
@@ -1983,7 +2054,7 @@ public class PolyUtil {
     public static <C extends RingElem<C>> GenPolynomial<C> evaluate(GenPolynomialRing<C> cfac,
                                                                     GenPolynomialRing<GenPolynomial<C>> rfac, GenPolynomialRing<GenPolynomial<C>> nfac,
                                                                     GenPolynomialRing<C> dfac, GenPolynomial<C> A, C a) {
-        if (rfac.nvar != 1) { // todo assert
+        if (rfac.nvar != 1) {
             throw new IllegalArgumentException("evaluate coefficient ring not univariate");
         }
         if (A == null || A.isZERO()) {
@@ -2690,6 +2761,40 @@ public class PolyUtil {
 
 
     /**
+     * Intersection. Intersection of a list of word polynomials with a
+     * word polynomial ring. The polynomial ring must be a contraction
+     * of the polynomial ring of the list of polynomials,
+     *
+     * @param R word polynomial ring
+     * @param F list of word polynomials
+     * @return R \cap F
+     */
+    public static <C extends RingElem<C>> List<GenWordPolynomial<C>> intersect(GenWordPolynomialRing<C> R,
+                                                                               List<GenWordPolynomial<C>> F) {
+        if (F == null || F.isEmpty()) {
+            return F;
+        }
+        GenWordPolynomialRing<C> pfac = F.get(0).ring;
+        assert pfac.alphabet.isSubFactory(R.alphabet) : "pfac=" + pfac.alphabet + ", R=" + R.alphabet;
+        List<GenWordPolynomial<C>> H = new ArrayList<GenWordPolynomial<C>>(F.size());
+        for (GenWordPolynomial<C> p : F) {
+            if (p == null || p.isZERO()) {
+                continue;
+            }
+            GenWordPolynomial<C> m = p.contract(R);
+            if (logger.isDebugEnabled()) {
+                logger.debug("intersect contract m = " + m);
+            }
+            if (!m.isZERO()) {
+                H.add(m);
+            }
+        }
+        // throw new RuntimeException("contract(pfac) != R");
+        return H;
+    }
+
+
+    /**
      * Remove all upper variables which do not occur in polynomial.
      *
      * @param p polynomial.
@@ -2718,8 +2823,7 @@ public class PolyUtil {
         GenPolynomialRing<C> facr = fac.contract(n);
         Map<ExpVector, GenPolynomial<C>> mpr = p.contract(facr);
         if (mpr.size() != 1) {
-            System.out.println(
-                    "upper ex, l = " + l + ", r = " + r + ", p = " + p + ", fac = " + fac.toScript());
+            logger.warn("upper ex, l = " + l + ", r = " + r + ", p = " + p + ", fac = " + fac.toScript());
             throw new RuntimeException("this should not happen " + mpr);
         }
         GenPolynomial<C> pr = mpr.values().iterator().next();
@@ -2760,8 +2864,7 @@ public class PolyUtil {
         GenPolynomialRing<GenPolynomial<C>> rfac = fac.recursive(n);
         GenPolynomial<GenPolynomial<C>> mpr = recursive(rfac, p);
         if (mpr.length() != p.length()) {
-            System.out.println(
-                    "lower ex, l = " + l + ", r = " + r + ", p = " + p + ", fac = " + fac.toScript());
+            logger.warn("lower ex, l = " + l + ", r = " + r + ", p = " + p + ", fac = " + fac.toScript());
             throw new RuntimeException("this should not happen " + mpr);
         }
         RingFactory<C> cf = fac.coFac;
@@ -2995,7 +3098,7 @@ class RatToInt implements UnaryFunctor<BigRational, BigInteger> {
 
 
 /**
- *  * Conversion of BigRational to BigInteger. result = (num/gcd)*(lcm/denom).  
+ * Conversion of BigRational to BigInteger. result = (num/gcd)*(lcm/denom).
  */
 class RatToIntFactor implements UnaryFunctor<BigRational, BigInteger> {
 

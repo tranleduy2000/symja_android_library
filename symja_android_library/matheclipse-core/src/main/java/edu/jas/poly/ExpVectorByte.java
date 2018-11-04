@@ -31,7 +31,7 @@ public final class ExpVectorByte extends ExpVector
      */
     public static final long minByte = (long) Byte.MIN_VALUE / 2;
     /**
-     * The data structure is an array of longs.
+     * The data structure is an array of byte.
      */
     /*package*/final byte[] val;
 
@@ -390,7 +390,7 @@ public final class ExpVectorByte extends ExpVector
      */
     @Override
     public boolean equals(Object B) {
-        if (!(B instanceof ExpVectorByte)) {
+        if (!(B instanceof ExpVectorByte) || B == null) {
             return false;
         }
         ExpVectorByte b = (ExpVectorByte) B;
@@ -597,6 +597,24 @@ public final class ExpVectorByte extends ExpVector
         }
         return t;
         //return EVMDEG(this);
+    }
+
+
+    /**
+     * ExpVector minimal degree.
+     *
+     * @return minimal exponent.
+     */
+    @Override
+    public long minDeg() {
+        long t = Byte.MAX_VALUE;
+        byte[] u = val;
+        for (int i = 0; i < u.length; i++) {
+            if (u[i] < t) {
+                t = u[i];
+            }
+        }
+        return t;
     }
 
 

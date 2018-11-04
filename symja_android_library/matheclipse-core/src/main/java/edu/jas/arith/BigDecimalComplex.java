@@ -5,6 +5,7 @@
 package edu.jas.arith;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Reader;
@@ -131,6 +132,17 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
         //int j = sr.indexOf("+");
         re = new BigDecimal(sr.trim());
         im = new BigDecimal(si.trim());
+    }
+
+
+    /**
+     * The constructor creates a BigDecimalComplex object from a BigComplex
+     * object.
+     *
+     * @param a rational BigComplex.
+     */
+    public BigDecimalComplex(BigComplex a) {
+        this(new BigDecimal(a.re), new BigDecimal(a.im));
     }
 
     /**
@@ -662,7 +674,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      * @see edu.jas.structure.StarRingElem#norm()
      */
     public BigDecimalComplex norm() {
-        // this.conjugate().multiply(this);
+        // this.multiply(this.conjugate());
         BigDecimal v = re.multiply(re);
         if (!im.isZERO()) {
             v = v.sum(im.multiply(im));

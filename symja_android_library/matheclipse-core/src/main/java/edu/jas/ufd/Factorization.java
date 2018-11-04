@@ -25,7 +25,7 @@ import edu.jas.structure.GcdRingElem;
  * <code>getImplementation()</code>, it returns an object of a class
  * which extends the <code>FactorAbstract</code> class which implements
  * the <code>Factorization</code> interface.
- * <p>
+ *
  * <pre>
  * Factorization&lt;CT&gt; engine;
  * engine = FactorFactory.&lt;CT&gt; getImplementation(cofac);
@@ -34,7 +34,7 @@ import edu.jas.structure.GcdRingElem;
  * <p>
  * For example, if the coefficient type is BigInteger, the usage looks
  * like
- * <p>
+ *
  * <pre>
  * BigInteger cofac = new BigInteger();
  * Factorization&lt;BigInteger&gt; engine;

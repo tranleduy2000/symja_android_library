@@ -5,6 +5,7 @@
 package edu.jas.ps;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public class OrderedPairlist<C extends RingElem<C>> {
 
     /**
      * Remove the next required pair from the pairlist and reduction matrix.
-     * Apply the criterions 3 and 4 to see if the S-power-series is required.
+     * Apply the criterions 3 and 4 to @see if the S-power-series is required.
      *
      * @return the next pair if one exists, otherwise null.
      */

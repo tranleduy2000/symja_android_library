@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
+import edu.jas.arith.ModInt;
+import edu.jas.arith.ModIntRing;
 import edu.jas.arith.ModInteger;
 import edu.jas.arith.ModIntegerRing;
 import edu.jas.arith.ModLong;
@@ -38,25 +40,25 @@ import edu.jas.structure.RingFactory;
  * time will be two times the time of the fastest algorithm
  * implmentation. On systems with more than two CPUs the computing time
  * will be the time of the fastest algorithm implmentation.
- * <p>
+ *
  * <pre>
- * GreatestCommonDivisor&lt;CT&gt; engine;
- * engine = GCDFactory.&lt;CT&gt; getImplementation(cofac);
- * or engine = GCDFactory.&lt;CT&gt; getProxy(cofac);
- * c = engine.gcd(a, b);
- * </pre>
+ *        GreatestCommonDivisor&lt;CT&gt; engine;
+ *        engine = GCDFactory.&lt;CT&gt; getImplementation(cofac);
+ *        or engine = GCDFactory.&lt;CT&gt; getProxy(cofac);
+ *        c = engine.gcd(a, b);
+ *        </pre>
  * <p>
- * For example, if the coefficient type is
- * <code>BigInteger</code>, the usage looks like
- * <p>
+ * For example, if the coefficient type is <code>BigInteger</code>, the
+ * usage looks like
+ *
  * <pre>
- * BigInteger cofac = new BigInteger();
- * GreatestCommonDivisor&lt;BigInteger&gt; engine;
- * engine = GCDFactory.getImplementation(cofac);
- * or engine = GCDFactory.getProxy(cofac);
- * c = engine.gcd(a, b);
- * </pre>
- * <p>
+ *        BigInteger cofac = new BigInteger();
+ *        GreatestCommonDivisor&lt;BigInteger&gt; engine;
+ *        engine = GCDFactory.getImplementation(cofac);
+ *        or engine = GCDFactory.getProxy(cofac);
+ *        c = engine.gcd(a, b);
+ *        </pre>
+ *
  * <b>Todo:</b> Base decision also on degree vectors and number of
  * variables of polynomials. Incorporate also number of CPUs / threads
  * available (done with <code>GCDProxy</code>).
@@ -227,7 +229,7 @@ public class GCDFactory {
     @SuppressWarnings("unchecked")
     public static <C extends GcdRingElem<C>> GreatestCommonDivisorAbstract<C> getImplementation(
             RingFactory<C> fac) {
-        GreatestCommonDivisorAbstract/*raw type<C>*/ufd;
+        GreatestCommonDivisorAbstract/*raw type<C>*/ ufd;
         logger.debug("fac = " + fac.getClass().getName());
         Object ofac = fac;
         if (ofac instanceof BigInteger) {
@@ -240,6 +242,9 @@ public class GCDFactory {
         } else if (ofac instanceof ModLongRing) {
             ufd = new GreatestCommonDivisorModEval<ModLong>();
             //ufd = new GreatestCommonDivisorSimple<ModLong>();
+        } else if (ofac instanceof ModIntRing) {
+            ufd = new GreatestCommonDivisorModEval<ModInt>();
+            //ufd = new GreatestCommonDivisorSimple<ModInt>();
         } else if (ofac instanceof BigRational) {
             ufd = new GreatestCommonDivisorSubres<BigRational>();
         } else {
@@ -267,21 +272,24 @@ public class GCDFactory {
         if (ComputerThreads.NO_THREADS) { // hack for Google app engine
             return GCDFactory.getImplementation(fac);
         }
-        GreatestCommonDivisorAbstract/*raw type<C>*/ufd;
+        GreatestCommonDivisorAbstract/*raw type<C>*/ ufd;
         logger.debug("fac = " + fac.getClass().getName());
         Object ofac = fac;
         if (ofac instanceof BigInteger) {
             ufd = new GCDProxy<BigInteger>(new GreatestCommonDivisorSubres<BigInteger>(),
                     new GreatestCommonDivisorModular<ModInteger>());
         } else if (ofac instanceof ModIntegerRing) {
-            ufd = new GCDProxy<ModInteger>(new GreatestCommonDivisorSimple<ModInteger>(), // Subres
+            ufd = new GCDProxy<ModInteger>(new GreatestCommonDivisorSimple<ModInteger>(), // or Subres
                     new GreatestCommonDivisorModEval<ModInteger>());
         } else if (ofac instanceof ModLongRing) {
-            ufd = new GCDProxy<ModLong>(new GreatestCommonDivisorSimple<ModLong>(), // Subres
+            ufd = new GCDProxy<ModLong>(new GreatestCommonDivisorSimple<ModLong>(), // or Subres
                     new GreatestCommonDivisorModEval<ModLong>());
+        } else if (ofac instanceof ModIntRing) {
+            ufd = new GCDProxy<ModInt>(new GreatestCommonDivisorSimple<ModInt>(), // or Subres
+                    new GreatestCommonDivisorModEval<ModInt>());
         } else if (ofac instanceof BigRational) {
             ufd = new GCDProxy<BigRational>(new GreatestCommonDivisorSubres<BigRational>(),
-                    new GreatestCommonDivisorSimple<BigRational>());
+                    new GreatestCommonDivisorPrimitive<BigRational>()); //Simple
         } else {
             if (fac.isField()) {
                 ufd = new GCDProxy<C>(new GreatestCommonDivisorSimple<C>(),

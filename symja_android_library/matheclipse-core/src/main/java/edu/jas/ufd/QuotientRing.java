@@ -5,6 +5,7 @@
 package edu.jas.ufd;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.Reader;
@@ -294,6 +295,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
      * @see Object#equals(Object)
      */
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(Object b) {
         if (b == null) {
             return false;

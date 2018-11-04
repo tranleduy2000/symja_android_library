@@ -5,9 +5,12 @@
 package edu.jas.poly;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -18,11 +21,11 @@ import java.util.TreeMap;
 
 import edu.jas.kern.PreemptingException;
 import edu.jas.kern.PrettyPrint;
-import edu.jas.structure.Element;
 import edu.jas.structure.NotInvertibleException;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
 import edu.jas.structure.UnaryFunctor;
+import edu.jas.util.MapEntry;
 
 
 /**
@@ -46,7 +49,6 @@ import edu.jas.structure.UnaryFunctor;
  */
 public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolynomial<C>>
         implements RingElem<GenPolynomial<C>>, /* not yet Polynomial<C> */
-        // TODO: 10/2/2017 change
         Iterable<Monomial<C>> {
 
 
@@ -154,10 +156,25 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
 
 
     /**
+     * Constructor for GenPolynomial.
+     *
+     * @param r polynomial ring factory.
+     * @param v some Map from ExpVector to coefficients.
+     */
+    protected GenPolynomial(GenPolynomialRing<C> r, Map<ExpVector, C> v) {
+        this(r);
+        if (v.size() > 0) {
+            GenPolynomialRing.creations++;
+            val.putAll(v); // todo check no zero coefficients and val is empty
+        }
+    }
+
+
+    /**
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
-     * @see Element#factory()
+     * @see edu.jas.structure.Element#factory()
      */
     public GenPolynomialRing<C> factory() {
         return ring;
@@ -387,7 +404,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Get a scripting compatible string representation.
      *
      * @return script compatible representation for this Element.
-     * @see Element#toScript()
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
     public String toScript() {
@@ -444,7 +461,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Get a scripting compatible string representation of the factory.
      *
      * @return script compatible representation for this ElemFactory.
-     * @see Element#toScriptFactory()
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
     public String toScriptFactory() {
@@ -457,7 +474,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Is GenPolynomial&lt;C&gt; zero.
      *
      * @return If this is 0 then true is returned, else false.
-     * @see RingElem#isZERO()
+     * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
         return val.isEmpty();
@@ -468,7 +485,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Is GenPolynomial&lt;C&gt; one.
      *
      * @return If this is 1 then true is returned, else false.
-     * @see RingElem#isONE()
+     * @see edu.jas.structure.RingElem#isONE()
      */
     public boolean isONE() {
         if (val.size() != 1) {
@@ -486,7 +503,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Is GenPolynomial&lt;C&gt; a unit.
      *
      * @return If this is a unit then true is returned, else false.
-     * @see RingElem#isUnit()
+     * @see edu.jas.structure.RingElem#isUnit()
      */
     public boolean isUnit() {
         if (val.size() != 1) {
@@ -654,8 +671,10 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         if (val.isEmpty()) {
             return null;
         }
-        Iterator<Map.Entry<ExpVector, C>> ai = val.entrySet().iterator();
-        return ai.next();
+        //Iterator<Map.Entry<ExpVector, C>> ai = val.entrySet().iterator();
+        //return ai.next();
+        ExpVector e = val.firstKey();
+        return new MapEntry<ExpVector, C>(e, val.get(e));
     }
 
 
@@ -796,6 +815,27 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
 
 
     /**
+     * Minimal degree.
+     * <b>Author:</b> Youssef Elbarbary
+     *
+     * @return minimal degree in any variables.
+     */
+    public long degreeMin() {
+        if (val.isEmpty()) {
+            return -1L; // 0 or -1 ?;
+        }
+        long deg = Long.MAX_VALUE;
+        for (ExpVector e : val.keySet()) {
+            long d = e.minDeg();
+            if (d < deg) {
+                deg = d;
+            }
+        }
+        return deg;
+    }
+
+
+    /**
      * Total degree.
      *
      * @return total degree in any variables.
@@ -850,7 +890,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         }
         long[][] w = ring.tord.getWeight();
         long maxw = weightDegree();
-        GenPolynomial<C> wp = ring.getZERO().copy(); //new GenPolynomial<C>(ring);
+        GenPolynomial<C> wp = ring.getZERO().copy();
         for (Map.Entry<ExpVector, C> m : val.entrySet()) {
             ExpVector e = m.getKey();
             long d = e.weightDeg(w);
@@ -1026,22 +1066,22 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      */
     //public <T extends GenPolynomial<C>> T sum(T /*GenPolynomial<C>*/ S) {
     public GenPolynomial<C> sum(GenPolynomial<C> S) {
-        if (S == null) {
-            return this;
-        }
-        if (S.isZERO()) {
+        if (S == null || S.isZERO()) {
             return this;
         }
         if (this.isZERO()) {
             return S;
         }
+        if (this.length() < (3 * S.length()) / 5) {
+            return S.sum(this); // performance
+        }
         assert (ring.nvar == S.ring.nvar);
-        GenPolynomial<C> n = this.copy(); //new GenPolynomial<C>(ring, val); 
+        GenPolynomial<C> n = this.copy();
         SortedMap<ExpVector, C> nv = n.val;
         SortedMap<ExpVector, C> sv = S.val;
         for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
             ExpVector e = me.getKey();
-            C y = me.getValue(); //sv.get(e); // assert y != null
+            C y = me.getValue(); // assert y != null
             C x = nv.get(e);
             if (x != null) {
                 x = x.sum(y);
@@ -1073,7 +1113,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         if (a.isZERO()) {
             return this;
         }
-        GenPolynomial<C> n = this.copy(); //new GenPolynomial<C>(ring, val); 
+        GenPolynomial<C> n = this.copy();
         SortedMap<ExpVector, C> nv = n.val;
         //if ( nv.size() == 0 ) { nv.put(e,a); return n; }
         C x = nv.get(e);
@@ -1133,7 +1173,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         SortedMap<ExpVector, C> sv = S.val;
         for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
             ExpVector e = me.getKey();
-            C y = me.getValue(); //sv.get(e); // assert y != null
+            C y = me.getValue(); // assert y != null
             C x = nv.get(e);
             if (x != null) {
                 x = x.sum(y);
@@ -1203,12 +1243,12 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             return S.negate();
         }
         assert (ring.nvar == S.ring.nvar);
-        GenPolynomial<C> n = this.copy(); //new GenPolynomial<C>(ring, val); 
+        GenPolynomial<C> n = this.copy();
         SortedMap<ExpVector, C> nv = n.val;
         SortedMap<ExpVector, C> sv = S.val;
         for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
             ExpVector e = me.getKey();
-            C y = me.getValue(); //sv.get(e); // assert y != null
+            C y = me.getValue(); // assert y != null
             C x = nv.get(e);
             if (x != null) {
                 x = x.subtract(y);
@@ -1504,18 +1544,32 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
 
 
     /**
+     * GenPolynomial negation, alternative implementation.
+     *
+     * @return -this.
+     */
+    public GenPolynomial<C> negateAlt() {
+        GenPolynomial<C> n = ring.getZERO().copy();
+        SortedMap<ExpVector, C> v = n.val;
+        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
+            C x = m.getValue(); // != null, 0
+            v.put(m.getKey(), x.negate());
+        }
+        return n;
+    }
+
+
+    /**
      * GenPolynomial negation.
      *
      * @return -this.
      */
     public GenPolynomial<C> negate() {
-        GenPolynomial<C> n = ring.getZERO().copy();
-        //new GenPolynomial<C>(ring, ring.getZERO().val);
+        GenPolynomial<C> n = this.copy();
         SortedMap<ExpVector, C> v = n.val;
-        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
+        for (Map.Entry<ExpVector, C> m : v.entrySet()) {
             C x = m.getValue(); // != null, 0
-            v.put(m.getKey(), x.negate());
-            // or m.setValue( x.negate() ) if this cloned 
+            m.setValue(x.negate()); // okay
         }
         return n;
     }
@@ -1613,7 +1667,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             ExpVector e = m.getKey();
             C c = a.multiply(s); // check non zero if not domain
             if (!c.isZERO()) {
-                pv.put(e, c); // or m1.setValue( c )
+                pv.put(e, c); // not m1.setValue( c )
             }
         }
         return p;
@@ -1794,7 +1848,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             if (c.isZERO()) {
                 throw new ArithmeticException("no exact division: " + c1 + "/" + s + ", in " + this);
             }
-            pv.put(e, c); // or m1.setValue( c )
+            pv.put(e, c); // not m1.setValue( c )
         }
         return p;
     }
@@ -1832,7 +1886,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             if (c.isZERO()) {
                 throw new ArithmeticException("no exact division: " + c1 + "/" + s + ", in " + this);
             }
-            pv.put(e, c); // or m1.setValue( c )
+            pv.put(e, c); // not m1.setValue( c )
         }
         return p;
     }
@@ -1870,7 +1924,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             if (c.isZERO()) {
                 throw new ArithmeticException("no exact division: " + c1 + "/" + s + ", in " + this);
             }
-            pv.put(e, c); // or m1.setValue( c )
+            pv.put(e, c); // not m1.setValue( c )
         }
         return p;
     }
@@ -1905,11 +1959,12 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             ExpVector f = r.leadingExpVector();
             if (f.multipleOf(e)) {
                 C a = r.leadingBaseCoefficient();
-                f = f.subtract(e);
+                ExpVector g = f.subtract(e);
                 a = a.multiply(ci);
-                q = q.sum(a, f);
-                h = S.multiply(a, f);
+                q = q.sum(a, g);
+                h = S.multiply(a, g);
                 r = r.subtract(h);
+                assert (!f.equals(r.leadingExpVector())) : "leadingExpVector not descending: " + f;
             } else {
                 break;
             }
@@ -1975,11 +2030,12 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             ExpVector f = r.leadingExpVector();
             if (f.multipleOf(e)) {
                 C a = r.leadingBaseCoefficient();
-                f = f.subtract(e);
+                ExpVector g = f.subtract(e);
                 //logger.info("red div = " + e);
                 a = a.multiply(ci);
-                h = S.multiply(a, f);
+                h = S.multiply(a, g);
                 r = r.subtract(h);
+                assert (!f.equals(r.leadingExpVector())) : "leadingExpVector not descending: " + f;
             } else {
                 break;
             }
@@ -2490,21 +2546,74 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * Map a unary function to the coefficients.
      *
      * @param f evaluation functor.
-     * @return new polynomial with coefficients f(this(e)).
+     * @return new polynomial with coefficients f(this.coefficients).
      */
     public GenPolynomial<C> map(final UnaryFunctor<? super C, C> f) {
         GenPolynomial<C> n = ring.getZERO().copy();
         SortedMap<ExpVector, C> nv = n.val;
-        for (Monomial<C> m : this) {
+        for (Map.Entry<ExpVector, C> m : this.val.entrySet()) {
             //logger.info("m = " + m);
-            C c = f.eval(m.c);
+            C c = f.eval(m.getValue());
             if (c != null && !c.isZERO()) {
-                nv.put(m.e, c);
+                nv.put(m.getKey(), c);
             }
         }
         return n;
     }
 
+
+    /*
+     * Map a unary function to the coefficients.
+     * @param f evaluation functor.
+     * @return new polynomial with coefficients f(this.coefficients).
+     */
+    GenPolynomial<C> mapWrong(final UnaryFunctor<? super C, C> f) {
+        GenPolynomial<C> n = this.copy();
+        SortedMap<ExpVector, C> nv = n.val;
+        for (Map.Entry<ExpVector, C> m : nv.entrySet()) {
+            //logger.info("m = " + m);
+            C c = f.eval(m.getValue());
+            if (c != null && !c.isZERO()) {
+                m.setValue(c); // not okay
+            } else {
+                // not possible nv.remove(m.getKey());
+            }
+        }
+        return n;
+    }
+
+
+    /**
+     * Returns the number of bits in the representation of this polynomial.
+     *
+     * @return number of bits in the representation of this polynomial,
+     * including sign bits.
+     */
+    public long bitLength() {
+        if (blen < 0L) {
+            long n = 0L;
+            for (Monomial<C> m : this) {
+                n += m.e.bitLength();
+                //n += m.c.bitLength(); // TODO add bitLength to Element
+                try { // hack
+                    Method method = m.c.getClass().getMethod("bitLength", (Class<?>[]) null);
+                    n += (Long) method.invoke(m.c, (Object[]) null);
+                } catch (NoSuchMethodException e) {
+                    logger.error("Exception, class: " + m.c.getClass());
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
+                    logger.error("Exception, class: " + m.c.getClass());
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e) {
+                    logger.error("Exception, class: " + m.c.getClass());
+                    throw new RuntimeException(e);
+                }
+            }
+            blen = n;
+            //System.out.println("bitLength(poly) = " + blen);
+        }
+        return blen;
+    }
 
     //private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     //    out.defaultWriteObject();

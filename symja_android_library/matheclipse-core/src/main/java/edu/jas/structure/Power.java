@@ -5,6 +5,7 @@
 package edu.jas.structure;
 
 
+
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -141,6 +142,24 @@ public class Power<C extends RingElem<C>> {
             }
         } while (i > 0);
         return p;
+    }
+
+
+    /**
+     * power of a to the n-th.
+     *
+     * @param a   element.
+     * @param n   integer exponent.
+     * @param fac ring factory.
+     * @return a^n, with 0^0 = 0 and a^{-n} = {1/a}^n.
+     */
+    @SuppressWarnings("unchecked")
+    public static <C extends RingElem<C>> C power(RingFactory<C> fac, C a, long n) {
+        if (a == null || a.isZERO()) {
+            return a;
+        }
+        //return a;
+        return (C) Power.<MonoidElem>power((MonoidFactory) fac, a, n);
     }
 
 
@@ -398,6 +417,29 @@ public class Power<C extends RingElem<C>> {
             res = res.sum(a);
         }
         return res;
+    }
+
+    /**
+     * power of a to the n-th.
+     *
+     * @param a element.
+     * @param n integer exponent.
+     * @return a^n, with 0^0 = 0.
+     */
+    public C power(C a, long n) {
+        return power(fac, a, n);
+    }
+
+    /**
+     * power of a to the n-th mod m.
+     *
+     * @param a element.
+     * @param n integer exponent.
+     * @param m modulus.
+     * @return a^n mod m, with 0^0 = 0.
+     */
+    public C modPower(C a, long n, C m) {
+        return modPower(fac, a, n, m);
     }
 
     /**
