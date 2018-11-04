@@ -4187,43 +4187,71 @@ public class Algebra {
 			final IASTAppendable denominator = F.ast(F.Times, plusAST.size(), false);
 			final boolean[] evaled = new boolean[1];
 			plusAST.forEach(new ObjIntConsumer<IExpr>() {
-                @Override
-                public void accept(IExpr x, int i) {
-                    IExpr[] fractionalParts = fractionalParts(x, false);
-                    if (fractionalParts != null) {
-                        numerator.append(i, fractionalParts[0]);
-                        IExpr temp = fractionalParts[1];
-                        if (!temp.isOne()) {
-                            evaled[0] = true;
-                        }
-                        denominator.append(i, temp);
-                    } else {
-                        numerator.append(i, x);
-                        denominator.append(i, F.C1);
-                    }
+				@Override
+				public void accept(IExpr x, int i) {
+					// IExpr[] fractionalParts = fractionalPartsRational(x);
+					// if (fractionalParts != null) {
+					// numerator.append(i, fractionalParts[0]);
+					// IExpr temp = fractionalParts[1];
+					// if (!temp.isOne()) {
+					// evaled[0] = true;
+					// }
+					// denominator.append(i, temp);
+					// } else {
+					// numerator.append(i, x);
+					// denominator.append(i, F.C1);
+					// }
+					if (x.isFraction()) {
+						numerator.append(i, ((IFraction) x).numerator());
+						denominator.append(i, ((IFraction) x).denominator());
+					} else if (x.isComplex()) {
+						IRational re = ((IComplex) x).getRealPart();
+						IRational im = ((IComplex) x).getImaginaryPart();
+						if (re.isFraction() || im.isFraction()) {
+							numerator.append(i, re.numerator().times(im.denominator())
+									.add(im.numerator().times(re.denominator()).times(F.CI)));
+							denominator.append(i, re.denominator().times(im.denominator()));
+						} else {
+							numerator.append(i, x);
+							denominator.append(i, F.C1);
+						}
+					} else {
+						IExpr[] fractionalParts = fractionalParts(x, false);
+						if (fractionalParts != null) {
+							numerator.append(i, fractionalParts[0]);
+							IExpr temp = fractionalParts[1];
+							if (!temp.isOne()) {
+								evaled[0] = true;
+							}
+							denominator.append(i, temp);
+						} else {
+							numerator.append(i, x);
+							denominator.append(i, F.C1);
+						}
 
-                }
-            });
+					}
+				}
+			});
 			if (!evaled[0]) {
 				return F.NIL;
 			}
 			numerator.forEach(new ObjIntConsumer<IExpr>() {
-                @Override
-                public void accept(IExpr x, int i) {
-                    IASTAppendable ni = F.TimesAlloc(plusAST.argSize());
-                    ni.append(x);
-                    for (int j = 1; j < plusAST.size(); j++) {
-                        if (i == j) {
-                            continue;
-                        }
-                        IExpr temp = denominator.get(j);
-                        if (!temp.isOne()) {
-                            ni.append(temp);
-                        }
-                    }
-                    numerator.set(i, ni.getOneIdentity(F.C1));
-                }
-            });
+				@Override
+				public void accept(IExpr x, int i) {
+					IASTAppendable ni = F.TimesAlloc(plusAST.argSize());
+					ni.append(x);
+					for (int j = 1; j < plusAST.size(); j++) {
+						if (i == j) {
+							continue;
+						}
+						IExpr temp = denominator.get(j);
+						if (!temp.isOne()) {
+							ni.append(temp);
+						}
+					}
+					numerator.set(i, ni.getOneIdentity(F.C1));
+				}
+			});
 			int i = 1;
 			while (denominator.size() > i) {
 				if (denominator.get(i).isOne()) {
@@ -5091,6 +5119,17 @@ public class Algebra {
 			parts[0] = fr.numerator();
 			parts[1] = fr.denominator();
 			return parts;
+		} else if (arg.isComplex()) {
+			IRational re = ((IComplex) arg).getRealPart();
+			IRational im = ((IComplex) arg).getImaginaryPart();
+			if (re.isFraction() || im.isFraction()) {
+				IExpr[] parts = new IExpr[2];
+				parts[0] = re.numerator().times(im.denominator())
+						.add(im.numerator().times(re.denominator()).times(F.CI));
+				parts[1] = re.denominator().times(im.denominator());
+				return parts;
+			}
+			return null;
 		}
 		return fractionalParts(arg, false);
 	}
