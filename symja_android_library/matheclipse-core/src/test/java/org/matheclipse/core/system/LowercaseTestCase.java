@@ -3939,6 +3939,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FixedPoint(#+1 &, 1, 20)", "21");
 		check("FixedPoint(f, x, 0)", "x");
 		check("FixedPoint(f, x, -1)", "FixedPoint(f,x,-1)");
+		//j2objc change: use DOUBLE_TOLERANCE to compare
 		checkNumeric("FixedPoint(Cos, 1.0, Infinity)", "0.7390851332151603");
 
 		checkNumeric("FixedPoint((# + 2/#)/2 &, 1.)", "1.414213562373095");
