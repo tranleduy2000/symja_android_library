@@ -8,7 +8,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -21,9 +20,9 @@ public class Show2SVG {
 //	}
 
 	private static final DecimalFormatSymbols US_SYNBOLS = new DecimalFormatSymbols(Locale.US);
-	private static final DecimalFormat FORMATTER = new DecimalFormat("0.0####", US_SYNBOLS);
+	protected static final DecimalFormat FORMATTER = new DecimalFormat("0.0####", US_SYNBOLS);
 
-	private static void elementDimension(IAST ast, Dimensions2D dim) throws IOException {
+	private static void elementDimension(IAST ast, Dimensions2D dim) {
 		for (int i = 1; i < ast.size(); i++) {
 			if (ast.get(i).isSymbol()) {
 				//
@@ -37,7 +36,7 @@ public class Show2SVG {
 		}
 	}
 
-	private static void elementToSVG(IAST ast, Appendable buf, Dimensions2D dim) throws IOException {
+	private static void elementToSVG(IAST ast, StringBuilder buf, Dimensions2D dim) {
 		for (int i = 1; i < ast.size(); i++) {
 			if (ast.get(i).isSymbol()) {
 				dim.setColorRGB(ast.get(i).toString());
@@ -51,32 +50,14 @@ public class Show2SVG {
 		}
 	}
 
-	private static void graphics3dToSVG(IAST ast, Appendable buf) throws IOException {
-		EvalEngine engine = EvalEngine.get();
-		IAST numericAST = (IAST) engine.evalN(ast);
-		int width = 400;
-		int height = 200;
-		Dimensions2D dim = new Dimensions2D(width, height);
-		buf.append("<graphics3d data=\"");
-		try {
-			for (int i = 1; i < numericAST.size(); i++) {
-				if (numericAST.get(i).isASTSizeGE(F.Line, 2)) {
-					lineToSVG(numericAST.getAST(i), buf, dim);
-				}
-			}
-		} finally {
-			buf.append("\" />");
-		}
-	}
-
-	private static void graphicsToSVG(IAST ast, Appendable buf) throws IOException {
+	public static void graphicsToSVG(IAST ast, StringBuilder buf) {
 		EvalEngine engine = EvalEngine.get();
 		IAST numericAST = (IAST) engine.evalN(ast);
 		Dimensions2D dim = new Dimensions2D(350, 350);
 		if (numericAST.size() > 2) {
 			final Options options = new Options(numericAST.topHead(), numericAST, 2, engine);
 			IExpr option = options.getOption("PlotRange");
-			if (option.isListOfLists() && ((IAST) option).size() == 3) {
+			if (option.isListOfLists() && option.size() == 3) {
 				IAST list = (IAST) option;
 				dim.setPlotRange(list.getAST(1), list.getAST(2));
 			}
@@ -161,15 +142,15 @@ public class Show2SVG {
 			IExpr point;
 			for (int i = 0; i < numberOfPoints; i++) {
 				point = pointList.get(i + 1);
-				if (point.isList() && ((IAST) point).isAST2()) {
-					x[i] = ((ISignedNumber) ((IAST) point).arg1()).doubleValue();
+				if (point.isList() && point.isAST2()) {
+					x[i] = ((ISignedNumber) point.first()).doubleValue();
 					if (x[i] < xMin) {
 						xMin = x[i];
 					}
 					if (x[i] > xMax) {
 						xMax = x[i];
 					}
-					y[i] = ((ISignedNumber) ((IAST) point).arg2()).doubleValue();
+					y[i] = ((ISignedNumber) point.second()).doubleValue();
 					if (y[i] < yMin) {
 						yMin = y[i];
 					}
@@ -182,7 +163,7 @@ public class Show2SVG {
 		}
 	}
 
-	private static void lineToSVG(IAST ast, Appendable buf, Dimensions2D dim) throws IOException {
+	private static void lineToSVG(IAST ast, StringBuilder buf, Dimensions2D dim) {
 		try {
 			if (ast.arg1().isList()) {
 				buf.append("<polyline points=\"");
@@ -202,8 +183,8 @@ public class Show2SVG {
 				for (int i = 0; i < numberOfPoints; i++) {
 					point = pointList.get(i + 1);
 					if (point.isList() && ((IAST) point).isAST2()) {
-						x[i] = ((ISignedNumber) ((IAST) point).arg1()).doubleValue();
-						y[i] = ((ISignedNumber) ((IAST) point).arg2()).doubleValue();
+						x[i] = ((ISignedNumber) point.first()).doubleValue();
+						y[i] = ((ISignedNumber) point.second()).doubleValue();
 					}
 				}
 				double xAxisScalingFactor = width / (xMax - xMin);
@@ -227,7 +208,7 @@ public class Show2SVG {
 		}
 	}
 
-	private static void pointDimension(IAST ast, Dimensions2D dim) throws IOException {
+	private static void pointDimension(IAST ast, Dimensions2D dim) {
 		if (ast.size() == 2) {
 			IExpr arg1 = ast.arg1();
 			if (arg1.isListOfLists()) {
@@ -254,7 +235,7 @@ public class Show2SVG {
 				y1 + Config.DOUBLE_EPSILON);
 	}
 
-	private static void pointToSVG(IAST ast, Appendable buf, Dimensions2D dim) throws IOException {
+	private static void pointToSVG(IAST ast, StringBuilder buf, Dimensions2D dim) {
 
 		if (ast.size() == 2) {
 			IExpr arg1 = ast.arg1();
@@ -274,7 +255,7 @@ public class Show2SVG {
 
 	}
 
-	private static void singlePointToSVG(IAST point, Appendable buf, Dimensions2D dim) throws IOException {
+	private static void singlePointToSVG(IAST point, StringBuilder buf, Dimensions2D dim) {
 		try {
 			double xMin = dim.xMin;
 			double yMax = dim.yMax;
@@ -312,7 +293,7 @@ public class Show2SVG {
 		}
 	}
 
-	private static void rectangleDimension(IAST ast, Dimensions2D dim) throws IOException {
+	private static void rectangleDimension(IAST ast, Dimensions2D dim) {
 		if (ast.size() == 2) {
 			if (ast.arg1().isAST(F.List, 3)) {
 				IAST list1 = (IAST) ast.arg1();
@@ -337,7 +318,7 @@ public class Show2SVG {
 		}
 	}
 
-	private static void rectangleToSVG(IAST ast, Appendable buf, Dimensions2D dim) throws IOException {
+	private static void rectangleToSVG(IAST ast, StringBuilder buf, Dimensions2D dim) {
 		try {
 			int width = dim.width;
 			int height = dim.height;
@@ -401,12 +382,11 @@ public class Show2SVG {
 		}
 	}
 
-	public static void toSVG(IAST ast, Appendable buf) throws IOException {
-
+	public static void toSVG(IAST ast, StringBuilder buf) {
 		if (ast.size() > 1 && ast.get(1).isASTSizeGE(F.Graphics, 2)) {
 			graphicsToSVG(ast.getAST(1), buf);
 		} else if (ast.size() > 1 && ast.get(1).isASTSizeGE(F.Graphics3D, 2)) {
-			graphics3dToSVG(ast.getAST(1), buf);
+			Show3D2ThreeJS.graphics3dToSVG(ast.getAST(1), buf);
 		}
 	}
 }

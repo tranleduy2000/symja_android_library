@@ -5,9 +5,10 @@ import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.form.Documentation;
 import org.matheclipse.core.form.output.ASCIIPrettyPrinter3;
 import org.matheclipse.core.form.output.OutputFormFactory;
+import org.matheclipse.core.graphics.Show2SVG;
+import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.Scanner;
 import org.matheclipse.parser.client.SyntaxError;
@@ -473,6 +474,32 @@ public class Console {
 			fInputFactory.convert(inputBuffer, result);
 			return inputBuffer.toString();
 		default:
+		    //Android changed: package java.awt not available
+//			if (Desktop.isDesktopSupported()) {
+//				IExpr outExpr = result;
+//				if (result.isAST(F.Graphics)) {// || result.isAST(F.Graphics3D)) {
+//					outExpr = F.Show(outExpr);
+//				}
+//				if (outExpr.isASTSizeGE(F.Show, 2)) {
+//					try {
+//						IAST show = (IAST) outExpr;
+//						if (show.size() > 1 && show.get(1).isASTSizeGE(F.Graphics, 2)) {
+//							StringBuilder stw = new StringBuilder();
+//							Show2SVG.graphicsToSVG(show.getAST(1), stw);
+//							File temp = File.createTempFile("tempfile", ".svg");
+//							BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+//							bw.write(stw.toString());
+//							bw.close();
+//							Desktop.getDesktop().open(temp);
+//							return temp.toString();
+//						}
+//					} catch (Exception ex) {
+//						if (Config.SHOW_STACKTRACE) {
+//							ex.printStackTrace();
+//						}
+//					}
+//				}
+//			}
 			StringBuilder strBuffer = new StringBuilder();
 			fOutputFactory.reset();
 			fOutputFactory.convert(strBuffer, result);
@@ -631,6 +658,7 @@ public class Console {
 
 			System.out.println(temp.toURI().toString());
 
+			//Android changed: android don't have package: java.awt
 //			java.awt.Desktop.getDesktop().browse(temp.toURI());
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -7,11 +7,16 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.ASCIIPrettyPrinter3;
 import org.matheclipse.core.form.output.OutputFormFactory;
+import org.matheclipse.core.graphics.Show2SVG;
+import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -538,6 +543,33 @@ public class MMAConsole {
 			fInputFactory.convert(inputBuffer, result);
 			return inputBuffer.toString();
 		default:
+			//Android changed: java.awt not available
+//			if (Desktop.isDesktopSupported()) {
+//				IExpr outExpr = result;
+//				if (result.isAST(F.Graphics)) {// || result.isAST(F.Graphics3D)) {
+//					outExpr = F.Show(outExpr);
+//				}
+//				if (outExpr.isASTSizeGE(F.Show, 2)) {
+//					try {
+//						IAST show = (IAST) outExpr;
+//						if (show.size() > 1 && show.get(1).isASTSizeGE(F.Graphics, 2)) {
+//							StringBuilder stw = new StringBuilder();
+//							Show2SVG.graphicsToSVG(show.getAST(1), stw);
+//							File temp = File.createTempFile("tempfile", ".svg");
+//							BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+//							bw.write(stw.toString());
+//							bw.close();
+//							Desktop.getDesktop().open(temp);
+//							return temp.toString();
+//						}
+//					} catch (Exception ex) {
+//						if (Config.SHOW_STACKTRACE) {
+//							ex.printStackTrace();
+//						}
+//					}
+//				}
+//			}
+
 		StringBuilder strBuffer = new StringBuilder();
 		fOutputFactory.reset();
 		fOutputFactory.convert(strBuffer, result);

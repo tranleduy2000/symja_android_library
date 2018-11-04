@@ -4,8 +4,6 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.ISignedNumber;
 
-import java.io.IOException;
-
 public class Dimensions2D {
 
 	public Color color;
@@ -36,7 +34,7 @@ public class Dimensions2D {
 		this.axes = false;
 	}
 
-	public void getColorRGB(Appendable buf) throws IOException {
+	public void getColorRGB(StringBuilder buf) {
 		float[] rgb = color.getRGBColorComponents(null);
 		buf.append(Float.toString(rgb[0] * 100));
 		buf.append("%, ");
