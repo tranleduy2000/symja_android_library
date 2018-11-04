@@ -199,8 +199,6 @@ public class EvalEngine implements Serializable {
 
 	transient Stack<ContextPath> fContextPathStack;
 
-	transient Context fContext;
-
 	transient ContextPath fContextPath;
 
 	protected int fRecursionLimit;
@@ -378,7 +376,6 @@ public class EvalEngine implements Serializable {
 		engine.REMEMBER_AST_CACHE = REMEMBER_AST_CACHE;
 		engine.fAnswer = fAnswer;
 		engine.fAssumptions = fAssumptions;
-		engine.fContext = fContext;
 		engine.fContextPath = fContextPath.copy();
 		engine.fErrorPrintStream = fErrorPrintStream;
 		engine.fEvalLHSMode = fEvalLHSMode;
@@ -411,6 +408,8 @@ public class EvalEngine implements Serializable {
 	}
 
 	public void begin(String contextName) {
+		fContextPathStack.push(fContextPath);
+		fContextPath = fContextPath.copy();
 		Context packageContext = fContextPath.getContext(contextName);
 		setContext(packageContext);
 	}
@@ -419,26 +418,31 @@ public class EvalEngine implements Serializable {
 		fContextPathStack.push(fContextPath);
 		Context packageContext = fContextPath.getContext(contextName);
 		setContextPath(new ContextPath(packageContext));
-		setContext(packageContext);
 	}
 
 	public Context end() {
-		Context packageContext = fContext;
-		setContext(fContextPath.last());
-		return packageContext;
+		if (fContextPathStack.size() > 0) {
+			ContextPath p = fContextPath;
+			Context c = fContextPath.currentContext();
+			fContextPath = fContextPathStack.pop();
+			fContextPath.synchronize(p);
+			return c;
+		}
+		return null;
 	}
 
 	public void endPackage() {
 		if (fContextPathStack.size() > 0) {
+			ContextPath p = fContextPath;
+			Context c = fContextPath.currentContext();
 			fContextPath = fContextPathStack.pop();
-			fContextPath.add(0, fContext);
-			fContext = fContextPath.last();
+			fContextPath.synchronize(p);
+			fContextPath.add(0, c);
 		}
 	}
 
 	public void cancel() {
 		fLocalVariableStackMap = null;
-		fContext = Context.SYSTEM;
 		fContextPath = null;
 		fErrorPrintStream = null;
 		fFileSystemEnabled = false;
@@ -1791,7 +1795,7 @@ public class EvalEngine implements Serializable {
 	}
 
 	public final Context getContext() {
-		return fContext;
+		return fContextPath.currentContext();
 	}
 
 	public ContextPath getContextPath() {
@@ -1904,8 +1908,7 @@ public class EvalEngine implements Serializable {
 		fSeconds = 0;
 		fModifiedVariablesList = null;
 		fContextPathStack = new Stack<ContextPath>();
-		fContextPath = new ContextPath();
-		fContext = fContextPath.last();
+		fContextPath = ContextPath.initialContext();
 		fLocalVariableStackMap=null;
 		REMEMBER_AST_CACHE = null;
 	}
@@ -2126,7 +2129,7 @@ public class EvalEngine implements Serializable {
 	}
 
 	public void setContext(Context context) {
-		this.fContext = context;
+		this.fContextPath.setCurrentContext(context);
 	}
 
 	public void setErrorPrintStream(final PrintStream errorPrintStream) {

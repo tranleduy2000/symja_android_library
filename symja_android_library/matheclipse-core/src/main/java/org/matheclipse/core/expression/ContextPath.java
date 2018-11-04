@@ -8,47 +8,36 @@ import org.matheclipse.core.interfaces.ISymbol;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class ContextPath {
-    public final Map<String, Context> fContextMap;
-    List<Context> path = new ArrayList<Context>();
+public final class ContextPath {
+	private HashMap<String, Context> fContextMap;
+	private ArrayList<Context> path = new ArrayList<Context>();
+	private Context fContext;
 
-	private ContextPath(List<Context> path) {
-		fContextMap = new HashMap<String, Context>(17);
-		this.path.add(Context.SYSTEM);
-		this.fContextMap.put(Context.SYSTEM.getContextName(), Context.SYSTEM);
-		// don't put RUBI on the context path
-				fContextMap.put(Context.RUBI.getContextName(), Context.RUBI);
-		// fContextMap.put(Context.DUMMY.getContextName(), Context.DUMMY);
-		for (int i = 1; i < path.size(); i++) {
-			// Start at index 1 because SYSTEM is already set!
-			this.path.add(path.get(i).copy());
-		}
+	private ContextPath() {
+		// for copy() method
 	}
 
-    public ContextPath() {
-		fContextMap = new HashMap<String, Context>(17);
-		path.add(Context.SYSTEM);
-		fContextMap.put(Context.SYSTEM.getContextName(), Context.SYSTEM);
+	/**
+	 * Get the initial context(s) for an evaluation engine.
+	 *
+	 * @return
+	 */
+	public static ContextPath initialContext() {
+		ContextPath cp = new ContextPath();
+		cp.fContextMap = new HashMap<String, Context>(17);
+		cp.path.add(Context.SYSTEM);
+		cp.fContextMap.put(Context.SYSTEM.getContextName(), Context.SYSTEM);
 		// don't put RUBI on the context path
-		fContextMap.put(Context.RUBI.getContextName(), Context.RUBI);
+		cp.fContextMap.put(Context.RUBI.getContextName(), Context.RUBI);
 		// fContextMap.put(Context.DUMMY.getContextName(), Context.DUMMY);
 		Context global = new Context(Context.GLOBAL_CONTEXT_NAME);
-		path.add(global);
-		fContextMap.put(Context.GLOBAL_CONTEXT_NAME, global);
-    }
-
-    public ContextPath(String contextName) {
-        fContextMap = new HashMap<String, Context>(17);
-		path.add(getContext(contextName));
-        path.add(Context.SYSTEM);
-        fContextMap.put(Context.SYSTEM.getContextName(), Context.SYSTEM);
-		// don't put RUBI on the context path
-		fContextMap.put(Context.RUBI.getContextName(), Context.RUBI);
-		// fContextMap.put(Context.DUMMY.getContextName(), Context.DUMMY);
+		cp.path.add(global);
+		cp.fContextMap.put(Context.GLOBAL_CONTEXT_NAME, global);
+		cp.fContext = global;
+		return cp;
     }
 
     public ContextPath(Context context) {
@@ -59,23 +48,19 @@ public class ContextPath {
 		// don't put RUBI on the context path
 				fContextMap.put(Context.RUBI.getContextName(), Context.RUBI);
 		// fContextMap.put(Context.DUMMY.getContextName(), Context.DUMMY);
-
+		fContext = context;
     }
 
 	public ContextPath copy() {
-		return new ContextPath(path);
+		ContextPath cp = new ContextPath();
+		cp.fContextMap = (HashMap<String, Context>) fContextMap.clone();
+		cp.path = (ArrayList<Context>) path.clone();
+		cp.fContext = fContext;
+		return cp;
 	}
 
     public Context getGlobalContext() {
-        int size = path.size();
-        int start = size - 1;
-        for (int i = start; i >= 0; i--) {
-            Context temp = path.get(i);
-			if (temp.getContextName().equals(Context.GLOBAL_CONTEXT_NAME)) {
-                return temp;
-            }
-        }
-        return null;
+		return fContextMap.get(Context.GLOBAL_CONTEXT_NAME);
     }
 
 	/**
@@ -94,9 +79,16 @@ public class ContextPath {
 		return result;
 	}
 
-	public IStringX currentContext() {
-		int size = path.size()-1;
-		return F.stringx(path.get(size).getContextName());
+	public IStringX currentContextString() {
+		return F.stringx(fContext.getContextName());
+	}
+
+	public Context currentContext() {
+		return fContext;
+	}
+
+	public void setCurrentContext(Context context) {
+		fContext = context;
 	}
 
     public boolean setGlobalContext(Context context) {
@@ -137,10 +129,6 @@ public class ContextPath {
     public Context get(int index) {
         return path.get(index);
     }
-
-	public Context last() {
-		return path.get(path.size() - 1);
-	}
 
 	public ISymbol symbol(String symbolName, Context newContext, boolean relaxedSyntax) {
         String name = symbolName;
@@ -232,6 +220,24 @@ public class ContextPath {
     public Context remove(int index) {
         return path.remove(index);
     }
+
+	/**
+	 * Synchronize the contexts back to this context map.
+	 *
+	 * @param path
+	 * @return
+	 */
+	public void synchronize(ContextPath path) {
+		Context c = path.fContext;
+		if (!fContextMap.containsKey(c.getContextName())) {
+			fContextMap.put(c.getContextName(), c);
+		}
+		for (Map.Entry<String, Context> entry : path.fContextMap.entrySet()) {
+			if (!fContextMap.containsKey(entry.getKey())) {
+				fContextMap.put(entry.getKey(), entry.getValue());
+			}
+		}
+	}
 
     public Context set(int index, Context element) {
         return path.set(index, element);

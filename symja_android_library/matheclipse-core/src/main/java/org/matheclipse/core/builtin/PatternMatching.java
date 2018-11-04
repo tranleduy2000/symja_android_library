@@ -133,6 +133,10 @@ public final class PatternMatching {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Context context = engine.end();
+			if (context==null) {
+				//j2objc changed: incompatible type
+				return F.nilPtr();
+			}
 			return F.stringx(context.getContextName());
 		}
 
@@ -531,7 +535,7 @@ public final class PatternMatching {
 					// System.out.println(file.toString());
 					return getFile(file, engine);
 				} else {
-					//Java 8 not have FileSystems.getDefault()
+					//Java 7 not have FileSystems.getDefault()
 //					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
 //					if (file.exists()) {
 //						return getFile(file, engine);
