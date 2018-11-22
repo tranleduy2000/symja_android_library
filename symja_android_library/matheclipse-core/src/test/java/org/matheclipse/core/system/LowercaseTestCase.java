@@ -7427,7 +7427,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				+ "{0, 0, -1},\n" + "{1, 2, 1}})", "{{-2,1,0}}");
 		check("NullSpace({{1,2,3},{4,5,6},{7,8,9}})", "{{1,-2,1}}");
 		check("NullSpace({{1,1,0,1,5},{1,0,0,2,2},{0,0,1,4,-1},{0,0,0,0,0}})", "{{-2,1,-4,1,0},\n" + " {-2,-3,1,0,1}}");
-		check("NullSpace({{a,b,c}," + "{c,b,a}})", "{{1,(-a-c)/b,1}}");
+		check("NullSpace({{a,b,c}," + "{c,b,a}})", //
+				"{{1,(-a-c)/b,1}}");
 		check("NullSpace({{1,2,3}," + "{5,6,7}," + "{9,10,11}})", "{{1,-2,1}}");
 		check("NullSpace({{1,2,3,4}," //
 				+ "{5,6,7,8}," //
@@ -8375,9 +8376,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPossibleZeroQ() {
-		check("PossibleZeroQ(2^(2*I) - 2^(-2*I) - 2*I*Sin(Log(4)))", "True");
-		check("PossibleZeroQ(E^Pi - Pi^E)", "False");
-		check("PossibleZeroQ((E + Pi)^2 - E^2 - Pi^2 - 2*E*Pi)", "True");
+		check("PossibleZeroQ(2^(2*I) - 2^(-2*I) - 2*I*Sin(Log(4)))", //
+				"True");
+		check("PossibleZeroQ(E^Pi - Pi^E)",//
+				"False");
+		check("PossibleZeroQ((E + Pi)^2 - E^2 - Pi^2 - 2*E*Pi)", //
+				"True");
 		check("PossibleZeroQ(E^(I*Pi/4) - (-1)^(1/4))", "True");
 		check("PossibleZeroQ((x + 1)*(x - 1) - x^2 + 1)", "True");
 		check("PossibleZeroQ(1/x + 1/y - (x + y)/(x*y))", "True");
@@ -8389,7 +8393,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// "$Aborted");
 		// check("TimeConstrained(1^3^3^3, 10)", //
 		// "1");
-
+		check(" 2^(2*I) - 2^(-2*I) - 2*I*Sin(Log(4)) ", //
+				"0");
 		check("2*Sqrt(2)", //
 				"2*Sqrt(2)");
 		check("-2*Sqrt(2)", //
