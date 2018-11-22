@@ -120,7 +120,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public boolean isLocked(boolean packageMode) {
-        return !packageMode && fContext == Context.SYSTEM; // fSymbolName.charAt(0) != '$';
+        return !packageMode && (fContext == Context.SYSTEM || fContext == Context.RUBI);
     }
 
     /**
@@ -128,7 +128,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public boolean isLocked() {
-        return !EvalEngine.get().isPackageMode() && fContext == Context.SYSTEM; // fSymbolName.charAt(0) != '$';
+        return !EvalEngine.get().isPackageMode() && (fContext == Context.SYSTEM || fContext == Context.RUBI);
     }
 
     /**
@@ -994,10 +994,16 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         fSymbolName = stream.readUTF();
         fAttributes = stream.read();
-        fContext = (Context) stream.readObject();
-        if (fContext == null) {
+        int contextNumber = stream.readInt();
+        if (contextNumber == 1) {
             fContext = Context.SYSTEM;
+        } else if (contextNumber == 2) {
+            fContext = Context.RUBI;
+        } else if (contextNumber == 3) {
+            fContext = Context.DUMMY;
         } else {
+            String contextName = stream.readUTF();
+            fContext = EvalEngine.get().getContextPath().getContext(contextName);
             boolean hasDownRulesData = stream.readBoolean();
             if (hasDownRulesData) {
                 fRulesData = new RulesData(EvalEngine.get().getContext());
@@ -1166,9 +1172,14 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         stream.writeUTF(fSymbolName);
         stream.write(fAttributes);
         if (fContext.equals(Context.SYSTEM)) {
-            stream.writeObject(null);
+            stream.writeInt(1);
+        } else if (fContext.equals(Context.RUBI)) {
+            stream.writeInt(2);
+        } else if (fContext.equals(Context.DUMMY)) {
+            stream.writeInt(3);
         } else {
-            stream.writeObject(fContext);
+            stream.writeInt(0);
+            stream.writeUTF(fContext.getContextName());
             if (fRulesData == null) {
                 stream.writeBoolean(false);
             } else {
