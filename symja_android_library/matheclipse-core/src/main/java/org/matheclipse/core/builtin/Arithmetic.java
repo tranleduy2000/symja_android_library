@@ -1037,6 +1037,13 @@ public final class Arithmetic {
             } else if (arg1.isAST(F.Zeta, 3) && arg1.first().isReal() && arg1.second().isReal()) {
                 return F.Zeta(F.Conjugate(arg1.first()), F.Conjugate(arg1.second()));
             }
+			if (arg1.isNumericFunction()) {
+				IExpr im = arg1.im();
+				if (im.isFree(F.Re) && im.isFree(F.Im)) {
+					// arg1 - 2 * im * I
+					return F.Subtract(arg1, F.Times(F.C2, F.CI, im));
+				}
+			}
             return F.NIL;
         }
 
@@ -4023,7 +4030,7 @@ public final class Arithmetic {
             }
             if (val < 0.0d) {
                 double root = Math.floor(r);
-				if (Double.isFinite(r) && Double.compare(r, root) == 0) {
+				if (DDouble.isFinite(r) && Double.compare(r, root) == 0) {
                     // integer type
                     int iRoot = (int) root;
                     if ((iRoot & 0x0001) == 0x0000) {
