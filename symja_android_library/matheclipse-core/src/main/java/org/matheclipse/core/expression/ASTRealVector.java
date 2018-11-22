@@ -57,10 +57,8 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	 * 
 	 * Returns a new ASTRealVector where each element is mapped by the given function.
 	 *
-	 * @param astVector
-	 *            an AST which could be converted into <code>double[]</code>
-	 * @param function
-	 *            Function to apply to each entry.
+	 * @param astVector an AST which could be converted into <code>double[]</code>
+	 * @param function  Function to apply to each entry.
 	 * @return a new vector.
 	 */
 	public static ASTRealVector map(final IAST astVector, DoubleUnaryOperator function) {
@@ -88,10 +86,8 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	/**
 	 * 
 	 * 
-	 * @param vector
-	 *            the vector which should be wrapped in this object.
-	 * @param deepCopy
-	 *            TODO
+	 * @param vector   the vector which should be wrapped in this object.
+	 * @param deepCopy TODO
 	 */
 	public ASTRealVector(RealVector vector, boolean deepCopy) {
 		if (deepCopy) {
@@ -104,8 +100,7 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	/**
 	 * Adds the objects in the specified collection to this {@code ArrayList}.
 	 * 
-	 * @param collection
-	 *            the collection of objects.
+	 * @param collection the collection of objects.
 	 * @return {@code true} if this {@code ArrayList} is modified, {@code false} otherwise.
 	 */
 	// @Override
@@ -120,16 +115,13 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	// }
 
 	/**
-	 * Inserts the objects in the specified collection at the specified location in this List. The objects are added in
-	 * the order they are returned from the collection's iterator.
+	 * Inserts the objects in the specified collection at the specified location in this List. The objects are added in the order they
+	 * are returned from the collection's iterator.
 	 * 
-	 * @param location
-	 *            the index at which to insert.
-	 * @param collection
-	 *            the collection of objects.
+	 * @param location   the index at which to insert.
+	 * @param collection the collection of objects.
 	 * @return {@code true} if this {@code ArrayList} is modified, {@code false} otherwise.
-	 * @throws IndexOutOfBoundsException
-	 *             when {@code location < 0 || > size()}
+	 * @throws IndexOutOfBoundsException when {@code location < 0 || > size()}
 	 */
 	// @Override
 	// public boolean appendAll(int location, Collection<? extends IExpr> collection) {
@@ -165,8 +157,7 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	/**
 	 * Adds the specified object at the end of this {@code ArrayList}.
 	 * 
-	 * @param object
-	 *            the object to add.
+	 * @param object the object to add.
 	 * @return always true
 	 */
 	// @Override
@@ -176,16 +167,13 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	// }
 
 	/**
-	 * Inserts the specified object into this {@code ArrayList} at the specified location. The object is inserted before
-	 * any previous element at the specified location. If the location is equal to the size of this {@code ArrayList},
-	 * the object is added at the end.
+	 * Inserts the specified object into this {@code ArrayList} at the specified location. The object is inserted before any previous
+	 * element at the specified location. If the location is equal to the size of this {@code ArrayList}, the object is added at the
+	 * end.
 	 * 
-	 * @param location
-	 *            the index at which to insert the object.
-	 * @param object
-	 *            the object to add.
-	 * @throws IndexOutOfBoundsException
-	 *             when {@code location < 0 || > size()}
+	 * @param location the index at which to insert the object.
+	 * @param object   the object to add.
+	 * @throws IndexOutOfBoundsException when {@code location < 0 || > size()}
 	 */
 	// @Override
 	// public void append(int location, IExpr object) {
@@ -194,10 +182,9 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	// }
 
 	/**
-	 * Get the first argument (i.e. the second element of the underlying list structure) of the <code>AST</code>
-	 * function (i.e. get(1) ). <br />
-	 * <b>Example:</b> for the AST representing the expression <code>Sin(x)</code>, <code>arg1()</code> returns
-	 * <code>x</code>.
+	 * Get the first argument (i.e. the second element of the underlying list structure) of the <code>AST</code> function (i.e. get(1)
+	 * ). <br />
+	 * <b>Example:</b> for the AST representing the expression <code>Sin(x)</code>, <code>arg1()</code> returns <code>x</code>.
 	 * 
 	 * @return the first argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -208,10 +195,10 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	}
 
 	/**
-	 * Get the second argument (i.e. the third element of the underlying list structure) of the <code>AST</code>
-	 * function (i.e. get(2) ). <br />
-	 * <b>Example:</b> for the AST representing the expression <code>x^y</code> (i.e. <code>Power(x, y)</code>),
-	 * <code>arg2()</code> returns <code>y</code>.
+	 * Get the second argument (i.e. the third element of the underlying list structure) of the <code>AST</code> function (i.e. get(2)
+	 * ). <br />
+	 * <b>Example:</b> for the AST representing the expression <code>x^y</code> (i.e. <code>Power(x, y)</code>), <code>arg2()</code>
+	 * returns <code>y</code>.
 	 * 
 	 * @return the second argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -222,10 +209,9 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	}
 
 	/**
-	 * Get the third argument (i.e. the fourth element of the underlying list structure) of the <code>AST</code>
-	 * function (i.e. get(3) ).<br />
-	 * <b>Example:</b> for the AST representing the expression <code>f(a, b, c)</code>, <code>arg3()</code> returns
-	 * <code>c</code>.
+	 * Get the third argument (i.e. the fourth element of the underlying list structure) of the <code>AST</code> function (i.e. get(3)
+	 * ).<br />
+	 * <b>Example:</b> for the AST representing the expression <code>f(a, b, c)</code>, <code>arg3()</code> returns <code>c</code>.
 	 * 
 	 * @return the third argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -236,10 +222,9 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	}
 
 	/**
-	 * Get the fourth argument (i.e. the fifth element of the underlying list structure) of the <code>AST</code>
-	 * function (i.e. get(4) ).<br />
-	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d)</code>, <code>arg4()</code> returns
-	 * <code>d</code>.
+	 * Get the fourth argument (i.e. the fifth element of the underlying list structure) of the <code>AST</code> function (i.e. get(4)
+	 * ).<br />
+	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d)</code>, <code>arg4()</code> returns <code>d</code>.
 	 * 
 	 * @return the fourth argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -250,10 +235,10 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	}
 
 	/**
-	 * Get the fifth argument (i.e. the sixth element of the underlying list structure) of the <code>AST</code> function
-	 * (i.e. get(5) ).<br />
-	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d, e)</code>, <code>arg5()</code>
-	 * returns <code>e</code> .
+	 * Get the fifth argument (i.e. the sixth element of the underlying list structure) of the <code>AST</code> function (i.e. get(5)
+	 * ).<br />
+	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d, e)</code>, <code>arg5()</code> returns <code>e</code>
+	 * .
 	 * 
 	 * @return the fifth argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -287,8 +272,7 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	// }
 
 	/**
-	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this
-	 * {@code HMArrayList}.
+	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this {@code HMArrayList}.
 	 * 
 	 * @return a shallow copy of this {@code ArrayList}
 	 * @see java.lang.Cloneable
@@ -403,25 +387,25 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	/** {@inheritDoc} */
 	@Override
 	public boolean isAST0() {
-		return false;
+		return size() == 1;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean isAST1() {
-		return false;
+		return size() == 2;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean isAST2() {
-		return false;
+		return size() == 3;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean isAST3() {
-		return false;
+		return size() == 4;
 	}
 
 	/** {@inheritDoc} */
@@ -476,11 +460,9 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	/**
 	 * Removes the object at the specified location from this list.
 	 * 
-	 * @param location
-	 *            the index of the object to remove.
+	 * @param location the index of the object to remove.
 	 * @return the removed object.
-	 * @throws IndexOutOfBoundsException
-	 *             when {@code location < 0 || >= size()}
+	 * @throws IndexOutOfBoundsException when {@code location < 0 || >= size()}
 	 */
 	// @Override
 	// public IExpr remove(int location) {
@@ -491,12 +473,9 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	/**
 	 * Removes the objects in the specified range from the start to the end, but not including the end index.
 	 * 
-	 * @param start
-	 *            the index at which to start removing.
-	 * @param end
-	 *            the index one after the end of the range to remove.
-	 * @throws IndexOutOfBoundsException
-	 *             when {@code start < 0, start > end} or {@code end > size()}
+	 * @param start the index at which to start removing.
+	 * @param end   the index one after the end of the range to remove.
+	 * @throws IndexOutOfBoundsException when {@code start < 0, start > end} or {@code end > size()}
 	 */
 	// protected void removeRange(int start, int end) {
 	// hashValue = 0;
@@ -506,13 +485,10 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	/**
 	 * Replaces the element at the specified location in this {@code ArrayList} with the specified object.
 	 * 
-	 * @param location
-	 *            the index at which to put the specified object.
-	 * @param object
-	 *            the object to add.
+	 * @param location the index at which to put the specified object.
+	 * @param object   the object to add.
 	 * @return the previous element at the index.
-	 * @throws IndexOutOfBoundsException
-	 *             when {@code location < 0 || >= size()}
+	 * @throws IndexOutOfBoundsException when {@code location < 0 || >= size()}
 	 */
 	@Override
 	public IExpr set(int location, IExpr object) {
