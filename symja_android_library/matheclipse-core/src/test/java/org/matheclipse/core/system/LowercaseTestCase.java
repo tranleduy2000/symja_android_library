@@ -44,9 +44,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testAbs() {
-		check("Abs(-x)", "Abs(x)");
-		check("Abs(Conjugate(z))", "Abs(z)");
-		check("Abs(3*a*b*c)", "3*Abs(a*b*c)");
+		check("Abs(1/2*x)", //
+				"Abs(x)/2");
+		check("Abs(1/2*E^(\\[ImaginaryJ]*\\[Pi]/4))", //
+				"1/2");
+		check("Abs(-x^(a + b))", //
+				"Abs(x^(a+b))");
+		check("Abs(-x)", //
+				"Abs(x)");
+		check("Abs(Conjugate(z))", //
+				"Abs(z)");
+		check("Abs(3*a*b*c)", //
+				"3*Abs(a*b*c)");
 		// check("Abs(x^(-3))", "1/Abs(x)^3");
 
 		check("Abs((1+I)/Sqrt(2))", "1");
@@ -4909,6 +4918,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testIm() {
+		check("Im(I*x+y)", //
+				"Im(y)+Re(x)");
+		check("Im(I*x)", //
+				"Re(x)");
+		check("Im(I*Pi/4)", //
+				"Pi/4");
+		check("Im(E^(I*Pi/4))", //
+				"1/Sqrt(2)");
 		check("Im(E^(I*3))", //
 				"Sin(3)");
 		check("Im(Sin(42)*Cos(43))", //
@@ -9270,6 +9287,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRe() {
+		check("Re(I*Pi/4 )", //
+				"0");
+		check("Re(E^(I*Pi/4))", //
+				"1/Sqrt(2)");
 		check("Re(Sin(42)*Cos(43))", //
 				"Cos(43)*Sin(42)");
 		check("Re(Sin(42))", //

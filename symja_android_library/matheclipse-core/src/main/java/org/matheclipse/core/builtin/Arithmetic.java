@@ -280,6 +280,15 @@ public final class Arithmetic {
             if (arg1.isPower() && arg1.exponent().isReal()) {
                 return F.Power(F.Abs(arg1.base()), arg1.exponent());
             }
+			if (arg1.isNumericFunction()) {
+				IExpr re = arg1.re();
+				if (re.isFree(F.Re) && re.isFree(F.Im)) {
+					IExpr im = arg1.im();
+					if (im.isFree(F.Re) && im.isFree(F.Im)) {
+						return F.Sqrt(F.Plus(F.Sqr(re), F.Sqr(im)));
+					}
+				}
+			}
             return F.NIL;
         }
 
@@ -1776,21 +1785,21 @@ public final class Arithmetic {
                 return ((IAST) arg1).mapThread((IAST) F.Im(null), 1);
             }
             if (arg1.isPower()) {
-                IExpr x = arg1.base();
-                if (x.isRealResult()) {
+				IExpr base = arg1.base();
+				if (base.isRealResult()) {
                     // test for x^(a+I*b)
                     IExpr exponent = arg1.exponent();
                     if (exponent.isNumber()) {
                         // (x^2)^(a/2)*E^(-b*Arg[x])*Sin[a*Arg[x]+1/2*b*Log[x^2]]
                         IExpr a = exponent.re();
                         IExpr b = exponent.im();
-                        return imPowerComplex(x, a, b);
+						return imPowerComplex(base, a, b);
                     }
                     if (exponent.isNumericFunction()) {
                         // (x^2)^(a/2)*E^(-b*Arg[x])*Sin[a*Arg[x]+1/2*b*Log[x^2]]
                         IExpr a = engine.evaluate(F.Re(exponent));
                         IExpr b = engine.evaluate(F.Im(exponent));
-                        return imPowerComplex(x, a, b);
+						return imPowerComplex(base, a, b);
                     }
                 }
             }
@@ -3345,7 +3354,7 @@ public final class Arithmetic {
 					if (temp.exponent().isMinusOne()) {
                     resultAST.set(i, temp.base());
                 } else {
-						resultAST.set(i, F.Power(temp.base(), temp.exponent().multiply(arg2)));
+						resultAST.set(i, F.Power(temp.base(), temp.exponent().times(arg2)));
                     }
                 }
             }
@@ -3816,7 +3825,7 @@ public final class Arithmetic {
                     // return rePowerComplex(x, ((INumber) exponent).re(), ((INumber) exponent).im());
                     // }
                     // (x^2)^(a/2)*E^(-b*Arg[x])*Cos[a*Arg[x]+1/2*b*Log[x^2]]
-                    return rePowerComplex(x, exponent.re(), exponent.im());
+					return rePowerComplex(base, exponent.re(), exponent.im());
                 }
             }
             return F.NIL;
@@ -4014,7 +4023,7 @@ public final class Arithmetic {
             }
             if (val < 0.0d) {
                 double root = Math.floor(r);
-                if (DDouble.isFinite(r) && Double.compare(r, root) == 0) {
+				if (Double.isFinite(r) && Double.compare(r, root) == 0) {
                     // integer type
                     int iRoot = (int) root;
                     if ((iRoot & 0x0001) == 0x0000) {
