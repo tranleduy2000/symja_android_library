@@ -192,29 +192,33 @@ public class Structure {
 			return evalApply(arg1, arg2, evaledAST, lastIndex, heads, engine);
 		}
 
-		public static IExpr evalApply(final IExpr arg1, IExpr arg2, IAST evaledAST, int lastIndex, boolean heads,
+		public static IExpr evalApply(final IExpr f, IExpr expr, IAST evaledAST, int lastIndex, boolean heads,
 									  EvalEngine engine) {
-			VisitorLevelSpecification level = null;
+
 			com.duy.lambda.Function<IExpr, IExpr> af = new com.duy.lambda.Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {
-					return x.isAST() ? ((IAST) x).setAtCopy(0, arg1) : F.NIL;
+					return x.isAST() ? ((IAST) x).setAtCopy(0, f) : F.NIL;
 				}
 			};
 			try {
+			VisitorLevelSpecification level = null;
 				if (lastIndex == 3) {
 					level = new VisitorLevelSpecification(af, evaledAST.get(lastIndex), heads, engine);
 				} else {
 					level = new VisitorLevelSpecification(af, 0);
 				}
 
-				if (!arg2.isAtom()) {
-					return arg2.accept(level).orElse(arg2);
-				} else if (evaledAST.isAST2()) {
-					if (arg1.isFunction()) {
-						return F.unaryAST1(arg1, arg2);
+				if (!expr.isAtom()) {
+					return expr.accept(level).orElse(expr);
+				} else {
+					// arg2 is an Atom to which the head f couldn't be applied
+					if (evaledAST.size() >= 3) {
+						if (f.isFunction()) {
+							return F.unaryAST1(f, expr);
 					}
-					return arg2;
+						return expr;
+					}
 				}
 			} catch (final MathException e) {
 				engine.printMessage(e.getMessage());
