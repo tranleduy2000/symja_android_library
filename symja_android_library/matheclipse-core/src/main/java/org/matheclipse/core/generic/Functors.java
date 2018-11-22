@@ -1,5 +1,6 @@
 package org.matheclipse.core.generic;
 
+import com.duy.annotations.Nonnull;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
@@ -13,6 +14,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.patternmatching.PatternMatcherAndEvaluator;
+import org.matheclipse.core.patternmatching.PatternMatcherList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ public class Functors {
 		}
 
 		@Override
-
+		@Nonnull
 		public IExpr apply(final IExpr arg) {
 			IExpr temp = fEqualRules.get(arg);
 			return temp != null ? temp : F.NIL;
@@ -59,14 +61,14 @@ public class Functors {
 		 *            the position which should be replaced in the <code>apply()</code> method.
 		 */
 		public RulesPatternFunctor(Map<IExpr, IExpr> equalRules, List<PatternMatcherAndEvaluator> matchers,
-				  EvalEngine engine) {
+				@Nonnull EvalEngine engine) {
 			fEqualRules = equalRules;
 			fMatchers = matchers;
 			fEngine = engine;
 		}
 
 		@Override
-
+		@Nonnull
 		public IExpr apply(final IExpr arg) {
 			IExpr temp = fEqualRules.get(arg);
 			if (temp != null) {
@@ -101,7 +103,7 @@ public class Functors {
 	 * @return
 	 * @throws WrongArgumentType
 	 */
-	public static Function<IExpr, IExpr> rules( String[] strRules) throws WrongArgumentType {
+	public static Function<IExpr, IExpr> rules(@Nonnull String[] strRules) throws WrongArgumentType {
 		IASTAppendable astRules = F.ListAlloc(strRules.length);
 		final EvalEngine engine = EvalEngine.get();
 		ExprParser parser = new ExprParser(engine);
@@ -122,7 +124,8 @@ public class Functors {
 	 * @return
 	 * @throws WrongArgumentType
 	 */
-	public static Function<IExpr, IExpr> rules( IAST astRules,  EvalEngine engine) throws WrongArgumentType {
+	public static Function<IExpr, IExpr> rules(@Nonnull IAST astRules, @Nonnull EvalEngine engine)
+			throws WrongArgumentType {
 		final Map<IExpr, IExpr> equalRules;
 
 		List<PatternMatcherAndEvaluator> matchers = new ArrayList<PatternMatcherAndEvaluator>();
@@ -162,6 +165,42 @@ public class Functors {
 		return rules(equalRules);
 	}
 
+	public static PatternMatcherList listRules(@Nonnull IAST astRules, @Nonnull EvalEngine engine)
+			throws WrongArgumentType {
+		final Map<IExpr, IExpr> equalRules;
+		if (astRules.isList()) {
+			if (astRules.size() > 1) {
+				// assuming multiple rules in a list
+				IAST rule;
+				int argsSize = astRules.argSize();
+				if (argsSize <= 5) {
+					equalRules = new OpenFixedSizeMap<IExpr, IExpr>(argsSize * 3 - 1);
+				} else {
+					equalRules = new HashMap<IExpr, IExpr>();
+				}
+
+				for (final IExpr expr : astRules) {
+					if (expr.isRuleAST()) {
+						rule = (IAST) expr;
+						return createPatternMatcherList(equalRules, rule);
+					} else {
+						throw new WrongArgumentType(astRules, astRules, -1, "Rule expression (x->y) expected: ");
+					}
+				}
+			} else {
+				equalRules = new HashMap<IExpr, IExpr>();
+			}
+		} else {
+			if (astRules.isRuleAST()) {
+				equalRules = new OpenFixedSizeMap<IExpr, IExpr>(3);
+				return createPatternMatcherList(equalRules, astRules);
+			} else {
+				throw new WrongArgumentType(astRules, astRules, -1, "Rule expression (x->y) expected: ");
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * A predicate to determine if an expression is an instance of <code>IPattern</code> or
 	 * <code>IPatternSequence</code>.
@@ -199,6 +238,28 @@ public class Functors {
 						evalOneIdentity(rule.arg2())));
 			}
 		}
+	}
+
+	private static PatternMatcherList createPatternMatcherList(Map<IExpr, IExpr> equalRules, IAST rule) {
+		if (rule.arg1().isFree(PATTERNQ_PREDICATE, true)) {
+			IExpr temp = equalRules.get(rule.arg1());
+			if (temp == null) {
+				if (rule.arg1().isOrderlessAST() || rule.arg1().isFlatAST()) {
+					if (rule.isRuleDelayed()) {
+						return new PatternMatcherList(ISymbol.RuleType.SET_DELAYED, rule.arg1(), rule.arg2());
+					}
+					return new PatternMatcherList(ISymbol.RuleType.SET, rule.arg1(), evalOneIdentity(rule.arg2()));
+				}
+				equalRules.put(rule.arg1(), rule.arg2());
+			}
+		} else {
+			if (rule.isRuleDelayed()) {
+				return new PatternMatcherList(ISymbol.RuleType.SET_DELAYED, rule.arg1(), rule.arg2());
+			} else {
+				return new PatternMatcherList(ISymbol.RuleType.SET, rule.arg1(), evalOneIdentity(rule.arg2()));
+			}
+		}
+		return null;
 	}
 
 	/**
