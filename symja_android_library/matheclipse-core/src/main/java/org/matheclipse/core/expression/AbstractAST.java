@@ -2641,12 +2641,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @deprecated use {@link #isZero()} instead.
 	 */
-	@Deprecated
-	@Override
-	public boolean isZERO() {
-		return isZero();
-		// return PredicateQ.possibleZeroQ(this, EvalEngine.get());
-	}
+//	@Deprecated
+//	@Override
+//	public boolean isZERO() {
+//		return isZero();
+//	}
 
 	/**
 	 * Returns an iterator over the elements in this <code>IAST</code> starting with offset <b>1</b>.
@@ -3006,8 +3005,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 
 	/**
-	 * Associates the specified value with the specified property in the associated <code>EnumMap<PROPERTY, Object></code> map. If the
-	 * map previously contained a mapping for this key, the old value is replaced.
+	 * Associates the specified value with the specified property in the associated
+	 * <code>EnumMap<PROPERTY, Object></code> map. If the map previously contained a mapping for this key, the old value
+	 * is replaced.
 	 *
 	 * @param key
 	 * @param value

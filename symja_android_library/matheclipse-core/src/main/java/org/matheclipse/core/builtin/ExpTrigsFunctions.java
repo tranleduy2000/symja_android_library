@@ -992,7 +992,7 @@ public class ExpTrigsFunctions {
 								new ObjIntConsumer<IExpr>() {
 									@Override
 									public void accept(IExpr x, int j) {
-										result.append(F.AngleVector(F.Plus(start, F.ZZ(j).multiply(angle))));
+										result.append(F.AngleVector(F.Plus(start, F.ZZ(j).times(angle))));
 									}
 
 								});

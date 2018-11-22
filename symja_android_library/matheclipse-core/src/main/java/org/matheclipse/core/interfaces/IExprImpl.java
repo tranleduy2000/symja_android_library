@@ -36,8 +36,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-
-
 import edu.jas.structure.ElemFactory;
 import edu.jas.structure.RingElemImpl;
 
@@ -1954,7 +1952,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @param variable the variable of the polynomial
      * @return
      */
-    public boolean isPolynomial( IExpr variable) {
+    public boolean isPolynomial(IExpr variable) {
         return isNumber();
     }
 
@@ -2363,7 +2361,10 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Deprecated
     @Override
     public boolean isZERO() {
-        return isZero();
+        if (isNumber()) {
+            return isZero();
+        }
+        return F.PossibleZeroQ.ofQ(this);
     }
 
     /**
@@ -2498,12 +2499,77 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public IExpr multiply(final IExpr that) {
+        // if (isZero()) {
+        // return this;
+        // }
+        // if (that.isZero()) {
+        // return that;
+        // }
+        // if (isOne()) {
+        // return that;
+        // }
+        // if (that.isOne()) {
+        // return this;
+        // }
+        // if (isPlus() && !that.isPlus()) {
+        // if (that.isAtom() || (that.isPower() && that.base().isAtom())) {
+        // IExpr temp = ((IAST) this).mapThread(F.binaryAST2(F.Times, null, that), 1);
+        // return EvalEngine.get().evaluate(temp);
+        // }
+        // } else if (!isPlus() && that.isPlus()) {
+        // if (isAtom() || (isPower() && base().isAtom())) {
+        // IExpr temp = ((IAST) that).mapThread(F.binaryAST2(F.Times, this, null), 2);
+        // return EvalEngine.get().evaluate(temp);
+        // }
+        // }
         return times(that);
     }
 
     @Override
     public IExpr multiply(int n) {
+        if (isPlus()) {
+            return F.evalExpand(times(F.integer(n)));
+        }
         return times(F.integer(n));
+    }
+    /**
+     * Multiply <code>this * that</code>. If oneof the arguments is a <code>Plus</code> expression, distribute the other
+     * expression other <code>Plus</code>.
+     *
+     * @param that
+     * @return
+     */
+    @Override
+    public IExpr multiplyDistributed(final IExpr that) {
+        if (isZero()) {
+            return this;
+        }
+        if (that.isZero()) {
+            return that;
+        }
+        if (isOne()) {
+            return that;
+        }
+        if (that.isOne()) {
+            return this;
+        }
+        if (isPlus()) {
+            if (that.isPlus()) {
+                IExpr temp = ((IAST) this).map(new Function<IExpr, IExpr>() {
+                    @Override
+                    public IExpr apply(IExpr x) {
+                        return x.multiplyDistributed(that);
+                    }
+                }, 1);
+                return EvalEngine.get().evaluate(temp);
+            }
+            IExpr temp = ((IAST) this).mapThread(F.binaryAST2(F.Times, null, that), 1);
+            return EvalEngine.get().evaluate(temp);
+        } else if (that.isPlus()) {
+            IExpr temp = ((IAST) that).mapThread(F.binaryAST2(F.Times, this, null), 2);
+            return EvalEngine.get().evaluate(temp);
+        }
+        return times(that);
     }
 
     /**
@@ -2758,14 +2824,14 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
             INumber x = r;
 
             while ((exp >>= 1) > 0) {
-                x = (INumber) x.multiply(x);
+				x = (INumber) x.times(x);
                 if ((exp & 1) != 0) {
-                    r = (INumber) r.multiply(x);
+					r = (INumber) r.times(x);
                 }
             }
 
             while (b2pow-- > 0) {
-                r = (INumber) r.multiply(r);
+				r = (INumber) r.times(r);
             }
             if (n < 0) {
                 return r.inverse();

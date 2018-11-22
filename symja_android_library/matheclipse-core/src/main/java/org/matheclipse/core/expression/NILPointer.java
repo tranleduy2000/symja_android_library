@@ -11,6 +11,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 
+import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -362,9 +363,7 @@ public final class NILPointer extends IASTAppendableImpl implements INilPointer 
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @deprecated use {@link #isZero()} instead.
 	 */
-	@Deprecated
 	@Override
 	public final boolean isZERO() {
 		return false;
@@ -385,6 +384,10 @@ public final class NILPointer extends IASTAppendableImpl implements INilPointer 
 	@Override
 	public final <X extends Throwable> IExpr orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
 		throw exceptionSupplier.get();
+	}
+
+	private Object readResolve() throws ObjectStreamException {
+		return F.NIL;
 	}
 
 	@Override

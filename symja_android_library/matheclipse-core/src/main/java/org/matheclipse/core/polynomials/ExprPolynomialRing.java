@@ -205,7 +205,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 *
 	 * @param cf
 	 *            factory for coefficients of type C.
-	 * @param listOfVariables
+	 * @param v
 	 *            names for the variables.
 	 * @param n
 	 *            number of variables.
@@ -704,7 +704,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 * Get a scripting compatible string representation.
 	 *
 	 * @return script compatible representation for this Element.
-	 * @see Element#toScript()
+	 * @see edu.jas.structure.Element#toScript()
 	 */
 	@Override
 	public String toScript() {
@@ -1575,7 +1575,7 @@ class GenPolynomialIterator implements Iterator<ExprPolynomial> {
 		int i = 0;
 		for (ExpVectorLong f : powers) {
 			IExpr c = coeffs.get(i++);
-			if (c.isZero()) {
+			if (c.isZERO()) {
 				continue;
 			}
 			if (pol.val.get(f) != null) {
@@ -1675,7 +1675,7 @@ class GenPolynomialMonomialIterator implements Iterator<ExprPolynomial> {
 
 		List<IExpr> ec = iter.next();
 		IExpr c = ec.get(1);
-		while (c.isZero()) { // zero already done in first next
+		while (c.isZERO()) { // zero already done in first next
 			ec = iter.next();
 			c = ec.get(1);
 		}

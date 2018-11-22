@@ -585,6 +585,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		private static IExpr binCounts(IAST vector, final IExpr arg2, EvalEngine engine) {
+			//j2objc changed: can't assign variable with static variable
 			INum dxNum = F.oneDouble();
 			int dx = 1;
 			int xMin = 0;
@@ -1240,7 +1241,7 @@ public class StatisticsFunctions {
 					double reference = random.nextDouble();
 					double uniform = reference == NEXTDOWNONE ? reference : Math.nextUp(reference);
 					uniform = -Math.log(uniform);
-					return m.multiply(F.Power.of(F.num(uniform), n.reciprocal().negate()));
+					return m.times(F.Power.of(F.num(uniform), n.reciprocal().negate()));
 				}
 			}
 			return F.NIL;
@@ -1573,7 +1574,7 @@ public class StatisticsFunctions {
 					double reference = random.nextDouble();
 					double uniform = reference == NEXTDOWNONE ? reference : Math.nextUp(reference);
 					uniform = -Math.log(uniform);
-					return m.add(n.multiply(F.Log(F.num(uniform))));
+					return m.add(n.times(F.Log(F.num(uniform))));
 				}
 			}
 			return F.NIL;

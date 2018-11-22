@@ -4477,7 +4477,7 @@ public final class Arithmetic {
                 }
 			} else if (o0.isQuantity()) {
 				IQuantity q = (IQuantity) o0;
-				return q.multiply(o1);
+				return q.times(o1);
             } else if (o0.isNegative() && o1.isLog() && o1.first().isFraction() && o0.isReal()) {
                 // -<number> * Log(<fraction>) -> <number> * Log(<fraction>.inverse())
                 return o0.negate().times(F.Log(o1.first().inverse()));
@@ -4502,7 +4502,7 @@ public final class Arithmetic {
                 }
 			} else if (o1.isQuantity()) {
 				IQuantity q = (IQuantity) o1;
-				return q.multiply(o0);
+				return q.times(o0);
             } else if (o1 instanceof ASTSeriesData) {
                 return ((ASTSeriesData) o1).times(o0);
             }

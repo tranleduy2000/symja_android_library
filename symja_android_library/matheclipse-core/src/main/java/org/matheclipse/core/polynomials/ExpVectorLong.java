@@ -179,7 +179,7 @@ public final class ExpVectorLong {
 	 * 
 	 * @return If this has all elements 0 then true is returned, else false.
 	 */
-	public boolean isZero() {
+	public boolean isZERO() {
 		return (0 == this.signum());
 	}
 
@@ -519,7 +519,7 @@ public final class ExpVectorLong {
 	 * Get a scripting compatible string representation.
 	 * 
 	 * @return script compatible representation for this Element.
-	 * @see Element#toScript()
+	 * @see edu.jas.structure.Element#toScript()
 	 */
 	public String toScript() {
 		return toScript(stdVars());
@@ -529,7 +529,7 @@ public final class ExpVectorLong {
 	 * Get a scripting compatible string representation.
 	 * 
 	 * @return script compatible representation for this Element.
-	 * @see Element#toScript()
+	 * @see edu.jas.structure.Element#toScript()
 	 */
 	public String toScript(IAST vars) {
 		// Python case

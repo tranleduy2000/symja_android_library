@@ -3343,7 +3343,6 @@ public final class LinearAlgebra {
                                 tr.set(i, ((IAST) x).get(i));
                             }
                         }
-                        // (x, i) -> tr.set(i, ((IAST) x).get(i))
                 );
                 return tr;
             }
@@ -3358,7 +3357,6 @@ public final class LinearAlgebra {
                                 tr.set(i, x);
                             }
                         }
-                        // (x, i) -> tr.set(i, x)
                 );
                 return tr;
             }
@@ -3627,7 +3625,7 @@ public final class LinearAlgebra {
      * <pre>
      * VandermondeMatrix(n)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * gives the Vandermonde matrix with <code>n</code> rows and columns.
@@ -3640,7 +3638,7 @@ public final class LinearAlgebra {
      * <li><a href="http://en.wikipedia.org/wiki/Vandermonde_matrix">Wikipedia - Vandermonde matrix</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; VandermondeMatrix({a,b,c})
      * {{1,a,a^2},
@@ -3689,14 +3687,14 @@ public final class LinearAlgebra {
      * <pre>
      * VectorAngle(u, v)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * gives the angles between vectors <code>u</code> and <code>v</code>
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; VectorAngle({1, 0}, {0, 1})
      * Pi/2
@@ -3830,7 +3828,7 @@ public final class LinearAlgebra {
 		// 2x2 matrix
 		IExpr[] row1 = matrix.getRow(0);
 		IExpr[] row2 = matrix.getRow(1);
-		return F.evalExpand(row1[0].multiply(row2[1]).subtract((row1[1].multiply(row2[0]))));
+		return F.evalExpand(row1[0].times(row2[1]).subtract((row1[1].times(row2[0]))));
 	}
 
 	/**
@@ -3846,11 +3844,9 @@ public final class LinearAlgebra {
 		IExpr[] row1 = matrix.getRow(0);
 		IExpr[] row2 = matrix.getRow(1);
 		IExpr[] row3 = matrix.getRow(2);
-		return F.evalExpand(row1[0].multiply(row2[1].multiply(row3[2]))
-				.subtract((row1[0].multiply(row2[2].multiply(row3[1]))))
-				.subtract((row1[1].multiply(row2[0].multiply(row3[2]))))
-				.plus((row1[1].multiply(row2[2].multiply(row3[0])))).plus((row1[2].multiply(row2[0].multiply(row3[1]))))
-				.subtract((row1[2].multiply(row2[1].multiply(row3[0])))));
+		return F.evalExpand(row1[0].times(row2[1].times(row3[2])).subtract((row1[0].times(row2[2].times(row3[1]))))
+				.subtract((row1[1].times(row2[0].times(row3[2])))).plus((row1[1].times(row2[2].times(row3[0]))))
+				.plus((row1[2].times(row2[0].times(row3[1])))).subtract((row1[2].times(row2[1].times(row3[0])))));
 	}
 
 	/**

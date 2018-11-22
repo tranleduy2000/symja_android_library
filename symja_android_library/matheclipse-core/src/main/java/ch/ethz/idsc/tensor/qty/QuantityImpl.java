@@ -106,7 +106,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	}
 
 	@Override
-	public IAST clone() {
+	public IAST clone() throws CloneNotSupportedException {
 		return new QuantityImpl(arg1, unitString, unit);
 	}
 
@@ -318,9 +318,9 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	public IExpr times(IExpr scalar) {
 		if (scalar instanceof IQuantity) {
 			IQuantity quantity = (IQuantity) scalar;
-			return of(arg1.multiply(quantity.value()), unit.add(quantity.unit()));
+			return of(arg1.times(quantity.value()), unit.add(quantity.unit()));
 		}
-		return ofUnit(arg1.multiply(scalar));
+		return ofUnit(arg1.times(scalar));
 	}
 
 	public IExpr n() {
@@ -332,6 +332,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 		return ofUnit(arg1.negate());
 	}
 
+	@Override
 	public IQuantity ofUnit(IExpr scalar) {
 		return new QuantityImpl(scalar, unitString, unit);
 	}

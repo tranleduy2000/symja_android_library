@@ -88,7 +88,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 */
 	public ExprPolynomial(ExprPolynomialRing r, IExpr c, ExpVectorLong e) {
 		this(r);
-		if (!c.isZero()) {
+		if (!c.isZERO()) {
 			val.put(e, c);
 		}
 	}
@@ -137,7 +137,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Get the corresponding element factory.
 	 * 
 	 * @return factory for this Element.
-	 * @see Element#factory()
+	 * @see edu.jas.structure.Element#factory()
 	 */
 	@Override
 	public ExprPolynomialRing factory() {
@@ -190,7 +190,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 				// logger.error("map entry exists " + e + " to " + a + " new " + c);
 			}
 		}
-		if (!c.isZero()) {
+		if (!c.isZERO()) {
 			val.put(e, c);
 		}
 	}
@@ -235,7 +235,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 				}
 			}
 			IExpr c = me.getValue();
-			if (!c.isZero()) {
+			if (!c.isZERO()) {
 				val.put(e, c);
 			}
 		}
@@ -301,7 +301,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 						}
 					}
 					ExpVectorLong e = m.getKey();
-					if (!c.isOne() || e.isZero()) {
+					if (!c.isOne() || e.isZERO()) {
 						String cs = c.toString();
 						// if (c instanceof GenPolynomial || c instanceof
 						// AlgebraicNumber) {
@@ -341,7 +341,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 						}
 					}
 					ExpVectorLong e = m.getKey();
-					if (!c.isOne() || e.isZero()) {
+					if (!c.isOne() || e.isZERO()) {
 						s.append(c.toString());
 						s.append(" ");
 					}
@@ -357,11 +357,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Get a scripting compatible string representation.
 	 * 
 	 * @return script compatible representation for this Element.
-	 * @see Element#toScript()
+	 * @see edu.jas.structure.Element#toScript()
 	 */
 	@Override
 	public String toScript() {
-		if (isZero()) {
+		if (isZERO()) {
 			return "0";
 		}
 		StringBuilder s = new StringBuilder();
@@ -388,7 +388,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			ExpVectorLong e = m.getKey();
 			String cs = c.toScript();
 			boolean parenthesis = (cs.indexOf("-") >= 0 || cs.indexOf("+") >= 0);
-			if (!c.isOne() || e.isZero()) {
+			if (!c.isOne() || e.isZERO()) {
 				if (parenthesis) {
 					s.append("( ");
 				}
@@ -396,7 +396,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 				if (parenthesis) {
 					s.append(" )");
 				}
-				if (!e.isZero()) {
+				if (!e.isZERO()) {
 					s.append(" * ");
 				}
 			}
@@ -412,7 +412,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Get a scripting compatible string representation of the factory.
 	 * 
 	 * @return script compatible representation for this ElemFactory.
-	 * @see Element#toScriptFactory()
+	 * @see edu.jas.structure.Element#toScriptFactory()
 	 */
 	@Override
 	public String toScriptFactory() {
@@ -423,7 +423,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Is GenPolynomial&lt;C&gt; zero.
 	 * 
 	 * @return If this is 0 then true is returned, else false.
-	 * @see RingElem#isZero()
+	 * @see edu.jas.structure.RingElem#isZERO()
 	 */
 	public boolean isZero() {
 		return (val.size() == 0);
@@ -432,9 +432,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @deprecated use {@link #isZero()} instead.
 	 */
-	@Deprecated
 	@Override
 	public boolean isZERO() {
 		return isZero();
@@ -444,7 +442,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Is GenPolynomial&lt;C&gt; one.
 	 * 
 	 * @return If this is 1 then true is returned, else false.
-	 * @see RingElem#isOne()
+	 * @see edu.jas.structure.RingElem#isOne()
 	 */
 	public boolean isOne() {
 		if (val.size() != 1) {
@@ -466,7 +464,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * Is GenPolynomial&lt;C&gt; a unit.
 	 * 
 	 * @return If this is a unit then true is returned, else false.
-	 * @see RingElem#isUnit()
+	 * @see edu.jas.structure.RingElem#isUnit()
 	 */
 	@Override
 	public boolean isUnit() {
@@ -605,7 +603,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	@Override
 	@Deprecated
 	public int signum() {
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return 0;
 		}
 		ExpVectorLong t = val.firstKey();
@@ -914,10 +912,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (S == null) {
 			return this;
 		}
-		if (S.isZero()) {
+		if (S.isZERO()) {
 			return this;
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return S;
 		}
 		assert (ring.nvar == S.ring.nvar);
@@ -930,7 +928,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr x = nv.get(e);
 			if (x != null) {
 				x = x.add(y);
-				if (!x.isZero()) {
+				if (!x.isZERO()) {
 					nv.put(e, x);
 				} else {
 					nv.remove(e);
@@ -955,7 +953,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (a == null) {
 			return this;
 		}
-		if (a.isZero()) {
+		if (a.isZERO()) {
 			return this;
 		}
 		ExprPolynomial n = this.copy(); // new GenPolynomial(ring, val);
@@ -964,7 +962,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		IExpr x = nv.get(e);
 		if (x != null) {
 			x = x.add(a);
-			if (!x.isZero()) {
+			if (!x.isZERO()) {
 				nv.put(e, x);
 			} else {
 				nv.remove(e);
@@ -993,10 +991,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            GenPolynomial.
 	 */
 	public void doAddTo(ExprPolynomial S) {
-		if (S == null || S.isZero()) {
+		if (S == null || S.isZERO()) {
 			return;
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			this.val.putAll(S.val);
 			return;
 		}
@@ -1009,7 +1007,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr x = nv.get(e);
 			if (x != null) {
 				x = x.add(y);
-				if (!x.isZero()) {
+				if (!x.isZERO()) {
 					nv.put(e, x);
 				} else {
 					nv.remove(e);
@@ -1030,14 +1028,14 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            exponent.
 	 */
 	public void doAddTo(IExpr a, ExpVectorLong e) {
-		if (a == null || a.isZero()) {
+		if (a == null || a.isZERO()) {
 			return;
 		}
 		SortedMap<ExpVectorLong, IExpr> nv = this.val;
 		IExpr x = nv.get(e);
 		if (x != null) {
 			x = x.add(a);
-			if (!x.isZero()) {
+			if (!x.isZERO()) {
 				nv.put(e, x);
 			} else {
 				nv.remove(e);
@@ -1070,10 +1068,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (S == null) {
 			return this;
 		}
-		if (S.isZero()) {
+		if (S.isZERO()) {
 			return this;
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return S.negate();
 		}
 		assert (ring.nvar == S.ring.nvar);
@@ -1086,7 +1084,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr x = nv.get(e);
 			if (x != null) {
 				x = x.subtract(y);
-				if (!x.isZero()) {
+				if (!x.isZERO()) {
 					nv.put(e, x);
 				} else {
 					nv.remove(e);
@@ -1108,7 +1106,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return this - a x<sup>e</sup>.
 	 */
 	public ExprPolynomial subtract(IExpr a, ExpVectorLong e) {
-		if (a == null || a.isZero()) {
+		if (a == null || a.isZERO()) {
 			return this;
 		}
 		ExprPolynomial n = this.copy();
@@ -1116,7 +1114,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		IExpr x = nv.get(e);
 		if (x != null) {
 			x = x.subtract(a);
-			if (!x.isZero()) {
+			if (!x.isZERO()) {
 				nv.put(e, x);
 			} else {
 				nv.remove(e);
@@ -1148,13 +1146,13 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return this - a S.
 	 */
 	public ExprPolynomial subtractMultiple(IExpr a, ExprPolynomial S) {
-		if (a == null || a.isZero()) {
+		if (a == null || a.isZERO()) {
 			return this;
 		}
-		if (S == null || S.isZero()) {
+		if (S == null || S.isZERO()) {
 			return this;
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return S.multiply(a.negate());
 		}
 		assert (ring.nvar == S.ring.nvar);
@@ -1168,12 +1166,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr x = nv.get(f);
 			if (x != null) {
 				x = x.subtract(y);
-				if (!x.isZero()) {
+				if (!x.isZERO()) {
 					nv.put(f, x);
 				} else {
 					nv.remove(f);
 				}
-			} else if (!y.isZero()) {
+			} else if (!y.isZERO()) {
 				nv.put(f, y.negate());
 			}
 		}
@@ -1192,13 +1190,13 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return this - a x<sup>e</sup> S.
 	 */
 	public ExprPolynomial subtractMultiple(IExpr a, ExpVectorLong e, ExprPolynomial S) {
-		if (a == null || a.isZero()) {
+		if (a == null || a.isZERO()) {
 			return this;
 		}
-		if (S == null || S.isZero()) {
+		if (S == null || S.isZERO()) {
 			return this;
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return S.multiply(a.negate(), e);
 		}
 		assert (ring.nvar == S.ring.nvar);
@@ -1213,12 +1211,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr x = nv.get(f);
 			if (x != null) {
 				x = x.subtract(y);
-				if (!x.isZero()) {
+				if (!x.isZERO()) {
 					nv.put(f, x);
 				} else {
 					nv.remove(f);
 				}
-			} else if (!y.isZero()) {
+			} else if (!y.isZERO()) {
 				nv.put(f, y.negate());
 			}
 		}
@@ -1240,10 +1238,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (a == null || S == null) {
 			return this.multiply(b);
 		}
-		if (a.isZero() || S.isZero()) {
+		if (a.isZERO() || S.isZERO()) {
 			return this.multiply(b);
 		}
-		if (this.isZero() || b == null || b.isZero()) {
+		if (this.isZERO() || b == null || b.isZERO()) {
 			return S.multiply(a.negate()); // left?
 		}
 		if (b.isOne()) {
@@ -1261,12 +1259,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr x = nv.get(f);
 			if (x != null) {
 				x = x.subtract(y);
-				if (!x.isZero()) {
+				if (!x.isZERO()) {
 					nv.put(f, x);
 				} else {
 					nv.remove(f);
 				}
-			} else if (!y.isZero()) {
+			} else if (!y.isZERO()) {
 				nv.put(f, y.negate());
 			}
 		}
@@ -1290,10 +1288,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (a == null || S == null) {
 			return this.multiply(b);
 		}
-		if (a.isZero() || S.isZero()) {
+		if (a.isZERO() || S.isZERO()) {
 			return this.multiply(b);
 		}
-		if (this.isZero() || b == null || b.isZero()) {
+		if (this.isZERO() || b == null || b.isZERO()) {
 			return S.multiply(a.negate(), e);
 		}
 		if (b.isOne()) {
@@ -1311,12 +1309,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr x = nv.get(f);
 			if (x != null) {
 				x = x.subtract(y);
-				if (!x.isZero()) {
+				if (!x.isZERO()) {
 					nv.put(f, x);
 				} else {
 					nv.remove(f);
 				}
-			} else if (!y.isZero()) {
+			} else if (!y.isZERO()) {
 				nv.put(f, y.negate());
 			}
 		}
@@ -1342,13 +1340,13 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (a == null || S == null) {
 			return this.multiply(b, g);
 		}
-		if (a.isZero() || S.isZero()) {
+		if (a.isZERO() || S.isZERO()) {
 			return this.multiply(b, g);
 		}
-		if (this.isZero() || b == null || b.isZero()) {
+		if (this.isZERO() || b == null || b.isZERO()) {
 			return S.multiply(a.negate(), e);
 		}
-		if (b.isOne() && g.isZero()) {
+		if (b.isOne() && g.isZERO()) {
 			return subtractMultiple(a, e, S);
 		}
 		assert (ring.nvar == S.ring.nvar);
@@ -1363,12 +1361,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr x = nv.get(f);
 			if (x != null) {
 				x = x.subtract(y);
-				if (!x.isZero()) {
+				if (!x.isZERO()) {
 					nv.put(f, x);
 				} else {
 					nv.remove(f);
 				}
-			} else if (!y.isZero()) {
+			} else if (!y.isZERO()) {
 				nv.put(f, y.negate());
 			}
 		}
@@ -1447,10 +1445,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (S == null) {
 			return ring.getZero();
 		}
-		if (S.isZero()) {
+		if (S.isZERO()) {
 			return ring.getZero();
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return this;
 		}
 		assert (ring.nvar == S.ring.nvar);
@@ -1472,14 +1470,14 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 				IExpr c2 = m2.getValue();
 				ExpVectorLong e2 = m2.getKey();
 				IExpr c = c1.multiply(c2); // check non zero if not domain
-				if (!c.isZero()) {
+				if (!c.isZERO()) {
 					ExpVectorLong e = e1.sum(e2);
 					IExpr c0 = pv.get(e);
 					if (c0 == null) {
 						pv.put(e, c);
 					} else {
 						c0 = c0.add(c);
-						if (!c0.isZero()) {
+						if (!c0.isZERO()) {
 							pv.put(e, c0);
 						} else {
 							pv.remove(e);
@@ -1502,10 +1500,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (s == null) {
 			return ring.getZero();
 		}
-		if (s.isZero()) {
+		if (s.isZERO()) {
 			return ring.getZero();
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return this;
 		}
 		// if (this instanceof GenSolvablePolynomial) {
@@ -1521,7 +1519,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr c1 = m1.getValue();
 			ExpVectorLong e1 = m1.getKey();
 			IExpr c = c1.multiply(s); // check non zero if not domain
-			if (!c.isZero()) {
+			if (!c.isZERO()) {
 				pv.put(e1, c); // or m1.setValue( c )
 			}
 		}
@@ -1535,7 +1533,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return monic(this).
 	 */
 	public ExprPolynomial monic() {
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return this;
 		}
 		IExpr lc = leadingBaseCoefficient();
@@ -1560,10 +1558,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (s == null) {
 			return ring.getZero();
 		}
-		if (s.isZero()) {
+		if (s.isZERO()) {
 			return ring.getZero();
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return this;
 		}
 		// if (this instanceof GenSolvablePolynomial) {
@@ -1579,7 +1577,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr c1 = m1.getValue();
 			ExpVectorLong e1 = m1.getKey();
 			IExpr c = c1.multiply(s); // check non zero if not domain
-			if (!c.isZero()) {
+			if (!c.isZERO()) {
 				ExpVectorLong e2 = e1.sum(e);
 				pv.put(e2, c);
 			}
@@ -1596,7 +1594,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 */
 	public ExprPolynomial multiply(ExpVectorLong e) {
 		// assert e != null. This is never allowed.
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return this;
 		}
 		// if (this instanceof GenSolvablePolynomial) {
@@ -1639,10 +1637,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return this/s.
 	 */
 	public ExprPolynomial divide(IExpr s) {
-		if (s == null || s.isZero()) {
+		if (s == null || s.isZERO()) {
 			throw new ArithmeticException("division by zero");
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return this;
 		}
 		// C t = s.inverse();
@@ -1655,12 +1653,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr c = c1.divide(s);
 			if (debug) {
 				IExpr x = c1.remainder(s);
-				if (!x.isZero()) {
+				if (!x.isZERO()) {
 					// logger.info("divide x = " + x);
 					throw new ArithmeticException("no exact division: " + c1 + "/" + s);
 				}
 			}
-			if (c.isZero()) {
+			if (c.isZERO()) {
 				throw new ArithmeticException("no exact division: " + c1 + "/" + s + ", in " + this);
 			}
 			pv.put(e, c); // or m1.setValue( c )
@@ -1680,7 +1678,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 */
 	@Override
 	public ExprPolynomial[] quotientRemainder(ExprPolynomial S) {
-		if (S == null || S.isZero()) {
+		if (S == null || S.isZERO()) {
 			throw new ArithmeticException("division by zero");
 		}
 		IExpr c = S.leadingBaseCoefficient();
@@ -1693,15 +1691,21 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		ExprPolynomial h;
 		ExprPolynomial q = ring.getZero().copy();
 		ExprPolynomial r = this.copy();
-		while (!r.isZero()) {
+		while (!r.isZERO()) {
 			ExpVectorLong f = r.leadingExpVectorLong();
 			if (f.multipleOf(e)) {
 				IExpr a = r.leadingBaseCoefficient();
-				f = f.subtract(e);
-				a = a.multiply(ci);
-				q = q.sum(a, f);
-				h = S.multiply(a, f);
+				ExpVectorLong g = f.subtract(e);
+				a = a.multiplyDistributed(ci);
+				q = q.sum(a, g);
+				h = S.multiply(a, g);
 				r = r.subtract(h);
+//				IExpr a = r.leadingBaseCoefficient();
+//				f = f.subtract(e);
+//				a = a.multiply(ci);
+//				q = q.sum(a, f);
+//				h = S.multiply(a, f);
+//				r = r.subtract(h);
 			} else {
 				break;
 			}
@@ -1771,7 +1775,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		// GenSolvablePolynomial<C> Sp = (GenSolvablePolynomial<C>) S;
 		// return T.quotientRemainder(Sp)[1];
 		// }
-		if (S == null || S.isZero()) {
+		if (S == null || S.isZERO()) {
 			throw new ArithmeticException("division by zero");
 		}
 		IExpr c = S.leadingBaseCoefficient();
@@ -1783,13 +1787,13 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		ExpVectorLong e = S.leadingExpVectorLong();
 		ExprPolynomial h;
 		ExprPolynomial r = this.copy();
-		while (!r.isZero()) {
+		while (!r.isZERO()) {
 			ExpVectorLong f = r.leadingExpVectorLong();
 			if (f.multipleOf(e)) {
 				IExpr a = r.leadingBaseCoefficient();
 				f = f.subtract(e);
 				// logger.info("red div = " + e);
-				a = a.multiply(ci);
+				a = a.multiplyDistributed(ci);
 				h = S.multiply(a, f);
 				r = r.subtract(h);
 			} else {
@@ -1808,10 +1812,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 */
 	@Override
 	public ExprPolynomial gcd(ExprPolynomial S) {
-		if (S == null || S.isZero()) {
+		if (S == null || S.isZERO()) {
 			return this;
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return S;
 		}
 		if (ring.nvar != 1) {
@@ -1820,7 +1824,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		ExprPolynomial x;
 		ExprPolynomial q = this;
 		ExprPolynomial r = S;
-		while (!r.isZero()) {
+		while (!r.isZERO()) {
 			x = q.remainder(r);
 			q = r;
 			r = x;
@@ -1841,13 +1845,13 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		ret[0] = null;
 		ret[1] = null;
 		ret[2] = null;
-		if (S == null || S.isZero()) {
+		if (S == null || S.isZERO()) {
 			ret[0] = this;
 			ret[1] = this.ring.getOne();
 			ret[2] = this.ring.getZero();
 			return ret;
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			ret[0] = S;
 			ret[1] = this.ring.getZero();
 			ret[2] = this.ring.getOne();
@@ -1876,7 +1880,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		ExprPolynomial d2 = ring.getOne().copy();
 		ExprPolynomial x1;
 		ExprPolynomial x2;
-		while (!r.isZero()) {
+		while (!r.isZERO()) {
 			qr = q.quotientRemainder(r);
 			q = qr[0];
 			x1 = c1.subtract(q.multiply(d1));
@@ -1914,12 +1918,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		ExprPolynomial[] ret = new ExprPolynomial[2];
 		ret[0] = null;
 		ret[1] = null;
-		if (S == null || S.isZero()) {
+		if (S == null || S.isZERO()) {
 			ret[0] = this;
 			ret[1] = this.ring.getOne();
 			return ret;
 		}
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			ret[0] = S;
 			return ret;
 		}
@@ -1932,7 +1936,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		ExprPolynomial c1 = ring.getOne().copy();
 		ExprPolynomial d1 = ring.getZero().copy();
 		ExprPolynomial x1;
-		while (!r.isZero()) {
+		while (!r.isZERO()) {
 			qr = q.quotientRemainder(r);
 			q = qr[0];
 			x1 = c1.subtract(q.multiply(d1));
@@ -1974,7 +1978,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return a with with a*this = 1 mod m.
 	 */
 	public ExprPolynomial modInverse(ExprPolynomial m) {
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			throw new NotInvertibleException("zero is not invertible");
 		}
 		ExprPolynomial[] hegcd = this.hegcd(m);
@@ -1983,7 +1987,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			throw new AlgebraicNotInvertibleException("element not invertible, gcd != 1", m, a, m.divide(a));
 		}
 		ExprPolynomial b = hegcd[1];
-		if (b.isZero()) { // when m divides this, e.g. m.isUnit()
+		if (b.isZERO()) { // when m divides this, e.g. m.isUnit()
 			throw new NotInvertibleException("element not invertible, divisible by modul");
 		}
 		return b;
@@ -2005,7 +2009,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return this;
 		}
 		ExprPolynomial Cp = pfac.getZero().copy();
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return Cp;
 		}
 		int i = pfac.nvar - ring.nvar;
@@ -2037,7 +2041,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return this;
 		}
 		ExprPolynomial Cp = pfac.getZero().copy();
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return Cp;
 		}
 		int i = pfac.nvar - ring.nvar;
@@ -2061,10 +2065,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 */
 	public Map<ExpVectorLong, ExprPolynomial> contract(ExprPolynomialRing pfac) {
 		ExprPolynomial zero = pfac.getZero(); // not pfac.coFac;
-		ExprTermOrder t = ExprTermOrderByName.Lexicographic;// new
+		ExprTermOrder t = ExprTermOrderByName.INVLEX;// new
 															// ExprTermOrder(ExprTermOrder.INVLEX);
 		Map<ExpVectorLong, ExprPolynomial> B = new TreeMap<ExpVectorLong, ExprPolynomial>(t.getAscendComparator());
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return B;
 		}
 		int i = ring.nvar - pfac.nvar;
@@ -2096,7 +2100,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		Map<ExpVectorLong, ExprPolynomial> ms = contract(pfac);
 		ExprPolynomial c = pfac.getZero();
 		for (Map.Entry<ExpVectorLong, ExprPolynomial> m : ms.entrySet()) {
-			if (m.getKey().isZero()) {
+			if (m.getKey().isZERO()) {
 				c = m.getValue();
 			} else {
 				throw new RuntimeException("wrong coefficient contraction " + m + ", pol =  " + c);
@@ -2127,7 +2131,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		}
 		int j = pfac.nvar - 1 - i;
 		ExprPolynomial Cp = pfac.getZero().copy();
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return Cp;
 		}
 		Map<ExpVectorLong, IExpr> C = Cp.val; // getMap();
@@ -2154,7 +2158,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			throw new UnsupportedOperationException("case with same ring not implemented");
 		}
 		ExprPolynomial Cp = pfac.getZero().copy();
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return Cp;
 		}
 		long deg = totalDegree();
@@ -2183,7 +2187,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			throw new UnsupportedOperationException("case with same ring not implemented");
 		}
 		ExprPolynomial Cp = pfac.getZero().copy();
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return Cp;
 		}
 		Map<ExpVectorLong, IExpr> C = Cp.val; // getMap();
@@ -2204,7 +2208,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 */
 	public ExprPolynomial reverse(ExprPolynomialRing oring) {
 		ExprPolynomial Cp = oring.getZero().copy();
-		if (this.isZero()) {
+		if (this.isZERO()) {
 			return Cp;
 		}
 		int k = -1;
@@ -2269,7 +2273,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		for (ExprMonomial m : this) {
 			// logger.info("m = " + m);
 			IExpr c = f.apply(m.c);
-			if (c != null && !c.isZero()) {
+			if (c != null && !c.isZERO()) {
 				nv.put(m.e, c);
 			}
 		}

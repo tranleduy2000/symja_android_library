@@ -1693,6 +1693,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     @Override
     IExpr multiply(int n);
 
+    IExpr multiplyDistributed(IExpr that);
+
     /**
      * {@inheritDoc}
      */

@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Properties;
 
 /** reference implementation of {@link UnitSystem} with emphasis on simplicity */
@@ -85,18 +84,18 @@ public class SimpleUnitSystem implements UnitSystem {
 				IExpr temp = DObjects.isNull(lookup) //
                         ? IQuantityStatic.of(F.C1, format(entry)) //
 						: lookup.isQuantity()//
-								? lookup.power(entryValue)//
+								? ((IQuantity) lookup).power(entryValue)//
 								: F.Power.of(lookup, entryValue);
 				if (temp.isQuantity()) {
-					value = temp.multiply(value);
+					value = temp.times(value);
 				} else {
-					value = value.multiply(temp);
+					value = value.times(temp);
 				}
 				// }
             }
             return value;
         }
-        return Objects.requireNonNull(scalar);
+        return DObjects.requireNonNull(scalar);
     }
 
     @Override // from UnitSystem
