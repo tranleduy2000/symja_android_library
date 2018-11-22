@@ -188,13 +188,15 @@ public final class Programming {
 	private final static class Block extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
-
+			if (ast.size() == 3) {
 			if (ast.arg1().isList()) {
 				final IAST blockVariablesList = (IAST) ast.arg1();
 				return engine.evalBlock(ast.arg2(), blockVariablesList);
 			}
 
+			return F.NIL;
+		}
+			Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
 
@@ -555,22 +557,24 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			Validate.checkRange(ast, 3);
+			if (ast.size() >= 3) {
 			try {
 				final List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
-				ast.forEach(2, ast.size(), new Consumer<IExpr>() {
-
-					@Override
-					public void accept(IExpr x) {
-						iterList.add(Iterator.create((IAST) x, engine));
-					}
-				});
+					ast.forEach(2, ast.size(), new Consumer<IExpr>() {
+						@Override
+						public void accept(IExpr x) {
+							iterList.add(Iterator.create((IAST) x, engine));
+						}
+					});
 				final DoIterator generator = new DoIterator(iterList, engine);
 				return generator.doIt(ast.arg1());
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
 			} catch (final NoEvalException e) {
 			}
+			return F.NIL;
+		}
+			Validate.checkRange(ast, 3);
 			return F.NIL;
 		}
 
@@ -860,7 +864,7 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 4, 5);
+			if (ast.size() >= 4 && ast.size() <= 5) {
 			// use EvalEngine's iterationLimit only for evaluation control
 			// final int iterationLimit = engine.getIterationLimit();
 			// int iterationCounter = 1;
@@ -902,6 +906,9 @@ public final class Programming {
 					}
 				}
 			}
+		}
+			Validate.checkRange(ast, 4, 5);
+			return F.NIL;
 		}
 
 		@Override
@@ -972,8 +979,7 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3, 5);
-
+			if (ast.size() >= 3 && ast.size() <= 5) {
 			final IExpr temp = engine.evaluate(ast.arg1());
 
 			if (temp.isFalse()) {
@@ -992,6 +998,9 @@ public final class Programming {
 				return ast.arg4();
 			}
 
+			return F.NIL;
+		}
+			Validate.checkRange(ast, 3, 5);
 			return F.NIL;
 		}
 
@@ -1044,15 +1053,16 @@ public final class Programming {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
-
+			if (ast.isAST2()) {
 			if (ast.arg1().isList()) {
 				IExpr temp = moduleSubstVariables((IAST) ast.arg1(), ast.arg2(), engine);
 				if (temp.isPresent()) {
 					return engine.evaluate(temp);
 				}
 			}
-
+				return F.NIL;
+			}
+			Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
 
@@ -1619,7 +1629,7 @@ public final class Programming {
 	private static class Quiet extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
+			if (ast.isAST1()) {
 			boolean quietMode = engine.isQuietMode();
 			try {
 				engine.setQuietMode(true);
@@ -1627,6 +1637,9 @@ public final class Programming {
 			} finally {
 				engine.setQuietMode(quietMode);
 			}
+		}
+			Validate.checkSize(ast, 2);
+			return F.NIL;
 		}
 
 		@Override
@@ -1657,8 +1670,7 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
-
+			if (ast.isAST1()) {
 			IASTAppendable oldList = engine.getReapList();
 			try {
 				IASTAppendable reapList = F.ListAlloc(10);
@@ -1671,7 +1683,9 @@ public final class Programming {
 			} finally {
 				engine.setReapList(oldList);
 			}
-
+			}
+			Validate.checkSize(ast, 2);
+			return F.NIL;
 		}
 
 		@Override
@@ -1773,14 +1787,16 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
-
+			if (ast.isAST1()) {
 			IASTAppendable reapList = engine.getReapList();
 			IExpr expr = engine.evaluate(ast.arg1());
 			if (reapList != null) {
 				reapList.append(expr);
 			}
 			return expr;
+		}
+			Validate.checkSize(ast, 2);
+			return F.NIL;
 		}
 
 		@Override
@@ -1843,7 +1859,6 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			// Validate.checkRange(ast, 4);
 			if ((ast.size() & 0x0001) != 0x0000) {
 				engine.printMessage("Switch: number of arguments must be odd");
 			}
@@ -2162,7 +2177,6 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			// Validate.checkEven(ast);
 			if (((ast.argSize()) & 0x0001) == 0x0001) {
 				engine.printMessage("Which: number of arguments must be evaen");
 			}
@@ -2231,17 +2245,12 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
-
+			if (ast.size() >= 2 && ast.size() <= 3) {
 			// use EvalEngine's iterationLimit only for evaluation control
 
 			// While(test, body)
 			IExpr test = ast.arg1();
-			IExpr body = F.Null;
-			if (ast.isAST2()) {
-				body = ast.arg2();
-			}
-
+				IExpr body = ast.isAST2() ? ast.arg2() : F.Null;
 			while (engine.evaluate(test).isTrue()) {
 				try {
 					if (ast.isAST2()) {
@@ -2260,6 +2269,9 @@ public final class Programming {
 			}
 
 			return F.Null;
+		}
+			Validate.checkRange(ast, 2, 3);
+			return F.NIL;
 		}
 
 		@Override
@@ -2284,8 +2296,7 @@ public final class Programming {
 	private final static class With extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
-
+			if (ast.size() == 3) {
 			if (ast.arg1().isList()) {
 				IExpr temp = withSubstVariables((IAST) ast.arg1(), ast.arg2(), engine);
 				if (temp.isPresent()) {
@@ -2294,6 +2305,9 @@ public final class Programming {
 
 			}
 
+				return F.NIL;
+			}
+			Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
 

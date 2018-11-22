@@ -9272,6 +9272,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("RandomVariate(DiscreteUniformDistribution({1, 5}) )", "3");
 	}
 
+	public void testRandomSample() {
+		// check("RandomSample(f(1,2,3,4,5),3)", //
+		// "f(3,4,1)");
+		// check("RandomSample(f(1,2,3,4,5))", //
+		// "f(3,4,5,1,2)");
+	}
+
 	public void testRange() {
 		check("Range(5.0)", //
 				"{1,2,3,4,5}");
