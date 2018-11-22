@@ -161,7 +161,7 @@ public final class PatternMatching {
 
 	}
 
-	public static class Blank extends AbstractCoreFunctionEvaluator {
+	public final static class Blank extends AbstractCoreFunctionEvaluator {
 		public final static Blank CONST = new Blank();
 
 		@Override
@@ -967,7 +967,7 @@ public final class PatternMatching {
 			Validate.checkSize(ast, 3);
 			IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isAST()) {
-				leftHandSide = engine.evalLHSPattern((IAST) leftHandSide);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
 			} else {
 				leftHandSide = engine.evaluate(leftHandSide);
 			}
@@ -1007,7 +1007,7 @@ public final class PatternMatching {
 			Validate.checkSize(ast, 3);
 			IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isAST()) {
-				leftHandSide = engine.evalLHSPattern((IAST) leftHandSide);
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
 			} else {
 				leftHandSide = engine.evaluate(leftHandSide);
 			}

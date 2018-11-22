@@ -101,7 +101,7 @@
   D(Log(x_), {x_, n_IntegerQ}) := ((-1)^(n - 1)*(n - 1)!)/x^n
     /; n >= 0,
     
-  
+  D(ArcTan(f_, g_),x_NotListQ):= ((-g*D(f,x)+f*D(g,x))/(f^2 + g^2)),
   D(BesselJ(f_, g_),x_NotListQ):= 1/2*(BesselJ(-1+f, g)-BesselJ(1+f, g))*D(g,x)+D(f,x)*Derivative(1,0)[BesselJ][f,g],
   D(PolyLog(f_, g_),x_NotListQ):= (PolyLog(-1 + f, g)*D(g,x))/g + D(f,x)*Derivative(1, 0)[PolyLog][f, g],
   D(ProductLog(f_, g_),x_NotListQ):= ProductLog(f,g)*D(g,x)/(g*(1+ProductLog(f,g)))+D(f,x)*Derivative(1,0)[ProductLog][f,g]

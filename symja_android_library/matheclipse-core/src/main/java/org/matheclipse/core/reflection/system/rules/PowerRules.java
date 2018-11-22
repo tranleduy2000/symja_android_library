@@ -23,6 +23,7 @@ import static org.matheclipse.core.expression.F.DirectedInfinity;
 import static org.matheclipse.core.expression.F.Equal;
 import static org.matheclipse.core.expression.F.EvenQ;
 import static org.matheclipse.core.expression.F.Exp;
+import static org.matheclipse.core.expression.F.FreeQ;
 import static org.matheclipse.core.expression.F.Function;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
@@ -70,7 +71,7 @@ public interface PowerRules {
      * <li>index 0 - number of equal rules in <code>RULES</code></li>
      * </ul>
      */
-    final public static int[] SIZES = { 4, 10 };
+  final public static int[] SIZES = { 4, 16 };
 
     final public static IAST RULES = List(
             IInit(Power, SIZES),
@@ -96,7 +97,7 @@ public interface PowerRules {
             ISetDelayed(Exp(Log(x_)),
                     x),
             // E^(a_*Log(x_)/;FreeQ(a,x)):=x^a
-    ISetDelayed(Exp(Times(a_,Log(x_))),
+    ISetDelayed(Exp(Condition(Times(a_,Log(x_)),FreeQ(a,x))),
                     Power(x,a)),
             // Tan(x_)^m_?(IntegerQ(#1)&&#1<0&):=Cot(x)^(-m)
             ISetDelayed(Power(Tan(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
