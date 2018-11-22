@@ -84,7 +84,7 @@ public final class PatternMatching {
 		F.UpSetDelayed.setEvaluator(new UpSetDelayed());
 	}
 
-	public static class Begin extends AbstractCoreFunctionEvaluator {
+	private final static class Begin extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 1) {
@@ -101,7 +101,7 @@ public final class PatternMatching {
 		}
 	}
 
-	public static class BeginPackage extends AbstractFunctionEvaluator {
+	private final static class BeginPackage extends AbstractFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 1) {
@@ -129,7 +129,7 @@ public final class PatternMatching {
 
 	}
 
-	public static class End extends AbstractCoreFunctionEvaluator {
+	private final static class End extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Context context = engine.end();
@@ -146,7 +146,7 @@ public final class PatternMatching {
 		}
 	}
 
-	public static class EndPackage extends AbstractCoreFunctionEvaluator {
+	private final static class EndPackage extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -183,7 +183,7 @@ public final class PatternMatching {
 		}
 	}
 
-	public static class BlankSequence extends AbstractCoreFunctionEvaluator {
+	private final static class BlankSequence extends AbstractCoreFunctionEvaluator {
 		public final static BlankSequence CONST = new BlankSequence();
 
 		@Override
@@ -205,7 +205,7 @@ public final class PatternMatching {
 		}
 	}
 
-	public static class BlankNullSequence extends AbstractCoreFunctionEvaluator {
+	private final static class BlankNullSequence extends AbstractCoreFunctionEvaluator {
 		public final static BlankNullSequence CONST = new BlankNullSequence();
 
 		@Override
@@ -255,7 +255,7 @@ public final class PatternMatching {
 	 * a
 	 * </pre>
 	 */
-	private static class Clear extends AbstractCoreFunctionEvaluator {
+	private final static class Clear extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
@@ -314,7 +314,7 @@ public final class PatternMatching {
 		}
 	}
 
-	private static class ContextFunction extends AbstractCoreFunctionEvaluator {
+	private final static class ContextFunction extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -364,7 +364,7 @@ public final class PatternMatching {
 	 * {a=2}
 	 * </pre>
 	 */
-	private static class Definition extends AbstractCoreFunctionEvaluator {
+	private final static class Definition extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -395,7 +395,7 @@ public final class PatternMatching {
 
 	}
 
-	private static class Evaluate extends AbstractCoreFunctionEvaluator {
+	private final static class Evaluate extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -417,7 +417,7 @@ public final class PatternMatching {
 	 * Get[{&lt;file name&gt;}}
 	 * 
 	 */
-	private static class Get extends AbstractFunctionEvaluator {
+	private final static class Get extends AbstractFunctionEvaluator {
 
 		private static int addContextToPath(ContextPath contextPath, final List<ASTNode> node, int i,
 				final EvalEngine engine, ISymbol endSymbol) {
@@ -569,7 +569,7 @@ public final class PatternMatching {
 	 * Hold(3*2)
 	 * </pre>
 	 */
-	private static class Hold extends AbstractCoreFunctionEvaluator {
+	private final static class Hold extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -645,7 +645,7 @@ public final class PatternMatching {
 	 * {x,y,z}
 	 * </pre>
 	 */
-	private static class HoldPattern extends AbstractCoreFunctionEvaluator {
+	private final static class HoldPattern extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -669,7 +669,7 @@ public final class PatternMatching {
 
 	}
 
-	private static class Identity extends AbstractCoreFunctionEvaluator {
+	private final static class Identity extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -684,7 +684,7 @@ public final class PatternMatching {
 		}
 	}
 
-	private static class Information extends AbstractCoreFunctionEvaluator {
+	private final static class Information extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -754,7 +754,7 @@ public final class PatternMatching {
 	 * MessageName[{&lt;file name&gt;}}
 	 * 
 	 */
-	private static class MessageName extends AbstractFunctionEvaluator {
+	private final static class MessageName extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -850,7 +850,7 @@ public final class PatternMatching {
 		}
 	}
 
-	public static class Pattern extends AbstractCoreFunctionEvaluator {
+	public final static class Pattern extends AbstractCoreFunctionEvaluator {
 		public final static Pattern CONST = new Pattern();
 
 		@Override
@@ -893,7 +893,7 @@ public final class PatternMatching {
 	 * Put[{&lt;file name&gt;}}
 	 * 
 	 */
-	private static final class Put extends AbstractFunctionEvaluator {
+	private final  static class Put extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1376,7 +1376,7 @@ public final class PatternMatching {
 	 * a1
 	 * </pre>
 	 */
-	private static class Unique extends AbstractCoreFunctionEvaluator {
+	private final  static class Unique extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
