@@ -1,5 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.annotations.Nonnull;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalEngine;
@@ -11,8 +13,6 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISymbol;
-
-
 
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Rule;
@@ -75,8 +75,8 @@ public class Plot3D extends AbstractEvaluator {
 					// double y1d = 10.0f;
 					// double params[] = {ad, bd, cd, dd, -10.0, 10.0};
 
-					temp = plotArray(xMinD, xMaxD, yMinD, yMaxD, ast.get(1), (ISymbol) lst1.get(1),
-							(ISymbol) lst2.get(1), engine);
+					temp = plotArray(xMinD, xMaxD, yMinD, yMaxD, ast.arg1(), (ISymbol) lst1.arg1(),
+							(ISymbol) lst2.arg1(), engine);
 					graphics.append(temp);
 
 					final IASTAppendable options = F.ListAlloc();
@@ -119,7 +119,7 @@ public class Plot3D extends AbstractEvaluator {
 	 * @return <code>F.NIL</code> is no conversion of the data into an
 	 *         <code>IExpr</code> was possible
 	 */
-
+	@Nonnull
 	public static IExpr plotArray(final double xMin, final double xMax, final double yMin, final double yMax,
 			final IExpr function, final ISymbol xVar, final ISymbol yVar, final EvalEngine engine) {
 		final double xStep = (xMax - xMin) / NUMBER_OF_DIVISIONS;

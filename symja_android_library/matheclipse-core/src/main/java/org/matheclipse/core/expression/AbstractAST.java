@@ -58,6 +58,7 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Iterator;
@@ -249,12 +250,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 
 	private static int compareToASTIncreasingArg1(final IAST lhsAST, final IExpr arg1, IInteger value) {
-		int cp = lhsAST.get(1).compareTo(arg1);
+		int cp = lhsAST.arg1().compareTo(arg1);
 		if (cp != 0) {
 			return cp;
 		}
 		if (lhsAST.size() >= 2) {
-			cp = lhsAST.get(2).compareTo(value);
+			cp = lhsAST.arg2().compareTo(value);
 			if (cp != 0) {
 				return cp;
 			}
@@ -1095,7 +1096,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @param index
 	 * @return
-	 * @throws WrongArgumentType if the cast is not possible
+	 * @throws WrongArgumentType
+	 *             if the cast is not possible
 	 */
 	@Override
 	public final IInteger getInt(int index) {
@@ -1127,7 +1129,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @param index
 	 * @return
-	 * @throws WrongArgumentType if the cast is not possible
+	 * @throws WrongArgumentType
+	 *             if the cast is not possible
 	 */
 	@Override
 	public final INumber getNumber(int index) {
@@ -3140,6 +3143,16 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return 1;
 	}
 
+	//Android changed: Java 7 isn't support Stream API
+//	@Override
+//	public Stream<IExpr> stream() {
+//		return Arrays.stream(toArray(), 1, size());
+//	}
+//
+//	@Override
+//	public Stream<IExpr> stream(int startInclusive, int endExclusive) {
+//		return Arrays.stream(toArray(), startInclusive, endExclusive);
+//	}
 
 	@Override
 	public final IExpr timesDistributed(final IExpr that) {

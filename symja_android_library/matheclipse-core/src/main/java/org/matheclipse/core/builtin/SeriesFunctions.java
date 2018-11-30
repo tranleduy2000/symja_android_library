@@ -470,8 +470,8 @@ public class SeriesFunctions {
                                                                  }, F.C1, F.C1,
                         F.List);
                 if (!isFreeResult.get(2).isOne()) {
-                    return F.Times(F.Power(isFreeResult.get(1), exponent),
-                            data.limit(F.Power(isFreeResult.get(2), exponent)));
+					return F.Times(F.Power(isFreeResult.arg1(), exponent),
+							data.limit(F.Power(isFreeResult.arg2(), exponent)));
                 }
             }
             if (powerAST.arg2().isNumericFunction()) {
@@ -579,8 +579,8 @@ public class SeriesFunctions {
                     return x.isFree(data.getSymbol(), true);
                 }
             }, F.C1, F.C1, F.List);
-            if (!isFreeResult.get(1).isOne()) {
-                return F.Times(isFreeResult.get(1), data.limit(isFreeResult.get(2)));
+			if (!isFreeResult.arg1().isOne()) {
+				return F.Times(isFreeResult.arg1(), data.limit(isFreeResult.get(2)));
             }
 			IExpr[] parts = Algebra.fractionalPartsTimesPower(timesAST, false, false, true, true, true);
             if (parts != null) {
@@ -628,7 +628,7 @@ public class SeriesFunctions {
             return data.mapLimit(timesAST);
         }
 
-        private static IExpr logLimit(final IAST logAST, final LimitData data) {
+		private static IExpr logLimit(final IAST logAST, final LimitData data) {
             if (logAST.isAST2() && !logAST.isFree(data.getSymbol())) {
                 return F.NIL;
             }
@@ -637,15 +637,15 @@ public class SeriesFunctions {
                 IAST arg1 = logAST.setAtClone(1, firstArg.base());
                 return F.Times(firstArg.exponent(), data.limit(arg1));
             } else if (firstArg.isTimes()) {
-                IAST isFreeResult = firstArg.partitionTimes(new Predicate<IExpr>() {
+				IAST isFreeResult = firstArg.partitionTimes(new Predicate<IExpr>() {
                     @Override
                     public boolean test(IExpr x) {
                         return x.isFree(data.getSymbol(), true);
                     }
                 }, F.C1, F.C1, F.List);
-                if (!isFreeResult.get(1).isOne()) {
-                    IAST arg1 = logAST.setAtClone(1, isFreeResult.get(1));
-                    IAST arg2 = logAST.setAtClone(1, isFreeResult.get(2));
+				if (!isFreeResult.arg1().isOne()) {
+					IAST arg1 = logAST.setAtClone(1, isFreeResult.arg1());
+					IAST arg2 = logAST.setAtClone(1, isFreeResult.arg2());
                     return F.Plus(arg1, data.limit(arg2));
                 }
             }

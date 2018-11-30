@@ -587,6 +587,7 @@ public class MMAConsole {
 
 	public String readString(final PrintStream out) {
 		final StringBuilder input = new StringBuilder();
+		//Android Changed: Java 7 doesn't have UTF-8 field, use Charset.forName instead
 		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")));
 		boolean done = false;
 
