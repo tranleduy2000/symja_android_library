@@ -736,7 +736,10 @@ public class F {
     /** D(f, x) - gives the partial derivative of `f` with respect to `x`. */
 	public final static IBuiltInSymbol D = F.initFinalSymbol("D", ID.D);
 
-    /** DSolve(equation, f(var), var) - attempts to solve a linear differential `equation` for the function `f(var)` and variable `var`.*/
+	/**
+	 * DSolve(equation, f(var), var) - attempts to solve a linear differential `equation` for the function `f(var)` and
+	 * variable `var`.
+	 */
 	public final static IBuiltInSymbol DSolve = F.initFinalSymbol("DSolve", ID.DSolve);
 
     /** Decrement(x) - decrements `x` by `1`, returning the original value of `x`. */
@@ -1581,7 +1584,11 @@ public class F {
 	/** MatchQ(expr, form) - tests whether `expr` matches `form`.*/
 	public final static IBuiltInSymbol MatchQ = F.initFinalSymbol("MatchQ", ID.MatchQ);
 
-    /** MatchingDissimilarity(u, v) - returns the Matching dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `(c_tf + c_ft) / n`, where `n` is `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.*/
+	/**
+	 * MatchingDissimilarity(u, v) - returns the Matching dissimilarity between the two boolean 1-D lists `u` and `v`,
+	 * which is defined as `(c_tf + c_ft) / n`, where `n` is `len(u)` and `c_ij` is the number of occurrences of
+	 * `u(k)=i` and `v(k)=j` for `k<n`.
+	 */
 	public final static IBuiltInSymbol MatchingDissimilarity = F.initFinalSymbol("MatchingDissimilarity",
 			ID.MatchingDissimilarity);
 
@@ -1589,9 +1596,15 @@ public class F {
 	public final static IBuiltInSymbol MathMLForm = F.initFinalSymbol("MathMLForm", ID.MathMLForm);
 
 	/***/
+	public final static IBuiltInSymbol MatrixExp = F.initFinalSymbol("MatrixExp", ID.MatrixExp);
+
+	/***/
 	public final static IBuiltInSymbol MatrixForm = F.initFinalSymbol("MatrixForm", ID.MatrixForm);
 
-    /** MatrixMinimalPolynomial(matrix, var) - computes the matrix minimal polynomial of a `matrix` for the variable `var`.*/
+	/**
+	 * MatrixMinimalPolynomial(matrix, var) - computes the matrix minimal polynomial of a `matrix` for the variable
+	 * `var`.
+	 */
 	public final static IBuiltInSymbol MatrixMinimalPolynomial = F.initFinalSymbol("MatrixMinimalPolynomial",
 			ID.MatrixMinimalPolynomial);
 
@@ -1631,7 +1644,10 @@ public class F {
     /** MersennePrimeExponent(n) - returns the  `n`th mersenne prime exponent. `2^n - 1` must be a prime number. */
     public final static IBuiltInSymbol MersennePrimeExponent = F.initFinalSymbol("MersennePrimeExponent", ID.MersennePrimeExponent);
 
-    /** MersennePrimeExponentQ(n) - returns `True` if `2^n - 1` is a prime number. Currently `0 <= n <= 45` can be computed in reasonable time.*/
+	/**
+	 * MersennePrimeExponentQ(n) - returns `True` if `2^n - 1` is a prime number. Currently `0 <= n <= 45` can be
+	 * computed in reasonable time.
+	 */
 	public final static IBuiltInSymbol MersennePrimeExponentQ = F.initFinalSymbol("MersennePrimeExponentQ",
 			ID.MersennePrimeExponentQ);
 

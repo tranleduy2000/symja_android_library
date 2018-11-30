@@ -113,6 +113,7 @@ public final class LinearAlgebra {
         F.LUDecomposition.setEvaluator(new LUDecomposition());
         F.ManhattanDistance.setEvaluator(new ManhattanDistance());
         F.MatrixMinimalPolynomial.setEvaluator(new MatrixMinimalPolynomial());
+		F.MatrixExp.setEvaluator(new MatrixExp());
         F.MatrixPower.setEvaluator(new MatrixPower());
         F.MatrixRank.setEvaluator(new MatrixRank());
         F.Norm.setEvaluator(new Norm());
@@ -2251,6 +2252,20 @@ public final class LinearAlgebra {
 
     }
 
+	private static class MatrixExp extends AbstractFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.size() == 2) {
+				int[] dim = ast.arg1().isMatrix();
+				if (dim != null && dim[0] == dim[1]) {
+					IAST matrix = (IAST) ast.arg1();
+					final int n = dim[0];
+				}
+			}
+			return F.NIL;
+		}
+	}
+
     /**
      * <pre>
      * MatrixMinimalPolynomial(matrix, var)
@@ -2276,10 +2291,6 @@ public final class LinearAlgebra {
      * </pre>
      */
     private static class MatrixMinimalPolynomial extends AbstractFunctionEvaluator {
-
-        public MatrixMinimalPolynomial() {
-            super();
-        }
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -2426,7 +2437,7 @@ public final class LinearAlgebra {
      * <li><a href= "https://en.wikipedia.org/wiki/Rank_%28linear_algebra%29">Wikipedia - Rank (linear algebra</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; MatrixRank({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})
      * 2
@@ -2546,7 +2557,7 @@ public final class LinearAlgebra {
      * The second argument of Norm, 0.5, should be a symbol, Infinity, or an integer or real number not less than 1 for
      * vector p-norms; or 1, 2, Infinity, or &ldquo;Frobenius&rdquo; for matrix norms.
      * </p>
-     * <p>
+	 *
      * <pre>
 	 * &gt;&gt; Norm({x, y}, 0.5)
      * Norm({x, y}, 0.5)
@@ -2961,14 +2972,14 @@ public final class LinearAlgebra {
      * <pre>
      * QRDecomposition(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the QR decomposition of the <code>matrix</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; QRDecomposition({{1, 2}, {3, 4}, {5, 6}})
      * {
@@ -3111,7 +3122,7 @@ public final class LinearAlgebra {
      * <pre>
      * SingularValueDecomposition(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * calculates the singular value decomposition for the <code>matrix</code>.
@@ -3129,7 +3140,7 @@ public final class LinearAlgebra {
      * decomposition</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; SingularValueDecomposition({{1.5, 2.0}, {2.5, 3.0}})
      * {
@@ -3143,7 +3154,7 @@ public final class LinearAlgebra {
      * <p>
      * Symbolic SVD is not implemented, performing numerically.
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; SingularValueDecomposition({{3/2, 2}, {5/2, 3}})
      * {
@@ -3157,7 +3168,7 @@ public final class LinearAlgebra {
      * <p>
      * Argument {1, {2}} at position 1 is not a non-empty rectangular matrix.
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; SingularValueDecomposition({1, {2}})
      * SingularValueDecomposition({1, {2}})
@@ -3201,14 +3212,14 @@ public final class LinearAlgebra {
      * <pre>
      * SquaredEuclideanDistance(u, v)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns squared the euclidean distance between <code>u$</code> and <code>v</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; SquaredEuclideanDistance({-1, -1}, {1, 1})
      * 8
@@ -3290,7 +3301,7 @@ public final class LinearAlgebra {
      * <pre>
      * Tr(matrix)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * computes the trace of the <code>matrix</code>.
@@ -3304,7 +3315,7 @@ public final class LinearAlgebra {
      * </li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Tr({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})
      * 15
@@ -3312,7 +3323,7 @@ public final class LinearAlgebra {
      * <p>
      * Symbolic trace:
      * </p>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Tr({{a, b, c}, {d, e, f}, {g, h, i}})
      * a+e+i
@@ -3373,7 +3384,7 @@ public final class LinearAlgebra {
      * <pre>
      * Transpose(m)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * transposes rows and columns in the matrix <code>m</code>.
@@ -3386,7 +3397,7 @@ public final class LinearAlgebra {
      * <li><a href="https://en.wikipedia.org/wiki/Transpose">Wikipedia - Transpose</a></li>
      * </ul>
      * <h3>Examples</h3>
-     * <p>
+	 *
      * <pre>
      * &gt;&gt; Transpose({{1, 2, 3}, {4, 5, 6}})
      * {{1, 4}, {2, 5}, {3, 6}}

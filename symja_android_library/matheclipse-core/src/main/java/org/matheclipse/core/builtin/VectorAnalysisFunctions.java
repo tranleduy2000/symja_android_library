@@ -15,6 +15,7 @@ public class VectorAnalysisFunctions {
 		F.Curl.setEvaluator(new Curl());
 		F.Div.setEvaluator(new Div());
 		F.Grad.setEvaluator(new Grad());
+		F.RotationMatrix.setEvaluator(new RotationMatrix());
 	}
 
 	/**
