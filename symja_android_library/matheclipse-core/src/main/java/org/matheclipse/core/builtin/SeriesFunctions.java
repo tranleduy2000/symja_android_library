@@ -580,7 +580,7 @@ public class SeriesFunctions {
                 }
             }, F.C1, F.C1, F.List);
 			if (!isFreeResult.arg1().isOne()) {
-				return F.Times(isFreeResult.arg1(), data.limit(isFreeResult.get(2)));
+				return F.Times(isFreeResult.arg1(), data.limit(isFreeResult.arg2()));
             }
 			IExpr[] parts = Algebra.fractionalPartsTimesPower(timesAST, false, false, true, true, true);
             if (parts != null) {
