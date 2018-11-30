@@ -189,6 +189,12 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public IExpr evalUpRule(EvalEngine engine, IExpr expression);
 
+    IAST f(IExpr arg1);
+
+    IAST f(IExpr arg1, IExpr arg2);
+
+    IAST f(IExpr arg1, IExpr arg2, IExpr arg3);
+
     /**
      * Get the topmost value from the local variable stack
      *
