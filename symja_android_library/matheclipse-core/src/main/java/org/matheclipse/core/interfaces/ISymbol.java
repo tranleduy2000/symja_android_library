@@ -569,7 +569,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     public boolean writeRules(java.io.ObjectOutputStream stream) throws java.io.IOException;
 
     public static enum RuleType {
-        SET, SET_DELAYED, UPSET, UPSET_DELAYED;
+        SET, SET_DELAYED, TAGSET, TAGSET_DELAYED, UPSET, UPSET_DELAYED;
     }
 
 

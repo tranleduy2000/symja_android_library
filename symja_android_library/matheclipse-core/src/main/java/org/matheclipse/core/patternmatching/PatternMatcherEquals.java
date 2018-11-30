@@ -1,5 +1,7 @@
 package org.matheclipse.core.patternmatching;
 
+import com.duy.annotations.Nonnull;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.ExprUtil;
@@ -57,8 +59,8 @@ public class PatternMatcherEquals extends IPatternMatcher implements Externaliza
 	 * @param rightHandSide
 	 *            the result which should be evaluated if the "pattern-matching" succeeds
 	 */
-	public PatternMatcherEquals(final ISymbol.RuleType setSymbol,  final IExpr leftHandSide,
-			 final IExpr rightHandSide) {
+	public PatternMatcherEquals(final ISymbol.RuleType setSymbol, @Nonnull final IExpr leftHandSide,
+			@Nonnull final IExpr rightHandSide) {
 		super(leftHandSide);
 		fSetSymbol = setSymbol;
 		fRightHandSide = rightHandSide;
@@ -118,6 +120,12 @@ public class PatternMatcherEquals extends IPatternMatcher implements Externaliza
 		}
 		if (fSetSymbol == ISymbol.RuleType.UPSET) {
 			return F.UpSet;
+		}
+		if (fSetSymbol == ISymbol.RuleType.TAGSET_DELAYED) {
+			return F.TagSetDelayed;
+		}
+		if (fSetSymbol == ISymbol.RuleType.TAGSET) {
+			return F.TagSet;
 		}
 		return null;
 	}

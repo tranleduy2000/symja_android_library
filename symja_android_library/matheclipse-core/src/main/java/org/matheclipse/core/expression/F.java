@@ -214,10 +214,7 @@ public class F {
 	/** Alternatives(p1, p2, ..., p_i) - is a pattern that matches any of the patterns `p1, p2,...., p_i`. */
 	public final static IBuiltInSymbol Alternatives = F.initFinalSymbol("Alternatives", ID.Alternatives);
 
-	/**
-	 * And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as
-	 * an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.
-	 */
+    /** And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.*/
 	public final static IBuiltInSymbol And = F.initFinalSymbol("And", ID.And);
 
 	/** AngleVector(phi) - returns the point at angle `phi` on the unit circle. */
@@ -2243,6 +2240,7 @@ public class F {
 	/** RotateRight(list) - rotates the items of `list` by one item to the right.*/
 	public final static IBuiltInSymbol RotateRight = F.initFinalSymbol("RotateRight", ID.RotateRight);
 
+    /** RotationMatrix(theta) - yields a rotation matrix for the angle `theta`.*/
 	public final static IBuiltInSymbol RotationMatrix = F.initFinalSymbol("RotationMatrix", ID.RotationMatrix);
 
 	/** Round(expr) - round a given `expr` to nearest integer.*/
@@ -2500,6 +2498,13 @@ public class F {
 
     /***/
     public final static IBuiltInSymbol TableForm = F.initFinalSymbol("TableForm", ID.TableForm);
+
+    /***/
+    public final static IBuiltInSymbol TagSet = F.initFinalSymbol("TagSet", ID.TagSet);
+
+    /***/
+    public final static IBuiltInSymbol TagSetDelayed = F.initFinalSymbol("TagSetDelayed", ID.TagSetDelayed);
+
 	/** Take(expr, n) - returns `expr` with all but the first `n` leaves removed.*/
 	public final static IBuiltInSymbol Take = F.initFinalSymbol("Take", ID.Take);
 
@@ -2556,7 +2561,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Timing = F.initFinalSymbol("Timing", ID.Timing);
 
-	/***/
+    /** ToCharacterCode(string) - converts `string` into a list of corresponding integer numbers.*/
 	public final static IBuiltInSymbol ToCharacterCode = F.initFinalSymbol("ToCharacterCode", ID.ToCharacterCode);
 
 	/** ToPolarCoordinates({x, y}) - return the polar coordinates for the cartesian coordinates `{x, y}`.*/
@@ -2566,7 +2571,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol ToRadicals = F.initFinalSymbol("ToRadicals", ID.ToRadicals);
 
-	/***/
+    /** ToString(expr) - converts `expr` into a string.*/
 	public final static IBuiltInSymbol ToString = F.initFinalSymbol("ToString", ID.ToString);
 
 	/***/
@@ -4510,7 +4515,7 @@ public class F {
 	 * @param a1
 	 * @return
 	 */
-	public final static IAST binaryAST2(final IExpr head, final IExpr a0, final IExpr a1) {
+	public final static IASTMutable binaryAST2(final IExpr head, final IExpr a0, final IExpr a1) {
 		return new AST2(head, a0, a1);
 	}
 
@@ -8400,6 +8405,14 @@ public class F {
 		return binaryAST2(Table, a0, a1);
 	}
 
+	public static IASTMutable TagSet(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(TagSet, a0, a1, a2);
+	}
+
+	public static IASTMutable TagSetDelayed(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(TagSetDelayed, a0, a1, a2);
+	}
+
 	public static IAST Take(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Take, a0, a1);
 	}
@@ -8428,7 +8441,7 @@ public class F {
 		return unaryAST1(TeXForm, a0);
 	}
 
-	public final static IAST ternary(final IExpr head, final IExpr a0, final IExpr a1, final IExpr a2) {
+	public final static IASTMutable ternary(final IExpr head, final IExpr a0, final IExpr a1, final IExpr a2) {
 		return new AST(new IExpr[] { head, a0, a1, a2 });
 	}
 
@@ -8441,7 +8454,7 @@ public class F {
 	 * @param a2
 	 * @return
 	 */
-	public final static IAST ternaryAST3(final IExpr head, final IExpr a0, final IExpr a1, final IExpr a2) {
+	public final static IASTMutable ternaryAST3(final IExpr head, final IExpr a0, final IExpr a1, final IExpr a2) {
 		return new AST3(head, a0, a1, a2);
 	}
 
@@ -8585,7 +8598,7 @@ public class F {
 	 * @param a0
 	 * @return
 	 */
-	public final static IAST unaryAST1(final IExpr head, final IExpr a0) {
+	public final static IASTMutable unaryAST1(final IExpr head, final IExpr a0) {
 		return new AST1(head, a0);
 	}
 

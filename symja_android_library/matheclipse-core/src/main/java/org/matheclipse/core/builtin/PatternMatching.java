@@ -78,6 +78,8 @@ public final class PatternMatching {
 		F.RuleDelayed.setEvaluator(new RuleDelayed());
 		F.Set.setEvaluator(new Set());
 		F.SetDelayed.setEvaluator(new SetDelayed());
+		F.TagSet.setEvaluator(new TagSet());
+		F.TagSetDelayed.setEvaluator(new TagSetDelayed());
 		F.Unique.setEvaluator(new Unique());
 		F.Unset.setEvaluator(new Unset());
 		F.UpSet.setEvaluator(new UpSet());
@@ -1127,7 +1129,7 @@ public final class PatternMatching {
 	 * {{1, t, u}, {4, y, z}, {7, 8, 9}}
 	 * </pre>
 	 */
-	private final static class Set extends AbstractCoreFunctionEvaluator implements ICreatePatternMatcher {
+	private final static class Set extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1150,8 +1152,7 @@ public final class PatternMatching {
 			return (IExpr) result[1];
 		}
 
-		@Override
-		public Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
+		private static Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
 				final EvalEngine engine) throws RuleCreationError {
 
 			if (leftHandSide.isAST()) {
@@ -1244,7 +1245,7 @@ public final class PatternMatching {
 	 * f(-3)
 	 * </pre>
 	 */
-	private final static class SetDelayed extends AbstractCoreFunctionEvaluator implements ICreatePatternMatcher {
+	private final static class SetDelayed extends AbstractCoreFunctionEvaluator  {
 
 		// public final static SetDelayed CONST = new SetDelayed();
 
@@ -1259,8 +1260,7 @@ public final class PatternMatching {
 			return F.Null;
 		}
 
-		@Override
-		public Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
+		private static Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
 				final EvalEngine engine) throws RuleCreationError {
 			if (leftHandSide.isAST()
 					&& (((IAST) leftHandSide).getEvalFlags() & IAST.IS_FLATTENED_OR_SORTED_MASK) == IAST.NO_FLAG) {
@@ -1344,6 +1344,107 @@ public final class PatternMatching {
 			return;
 		}
 		throw new RuleCreationError(leftHandSide);
+	}
+
+	private final static class TagSet extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 4);
+
+			IExpr arg1 = ast.arg1();
+			if (arg1.isSymbol() && !arg1.isBuiltInSymbol()) {
+				ISymbol symbol = (ISymbol) arg1;
+				final IExpr leftHandSide = ast.arg2();
+				IExpr rightHandSide = ast.arg3();
+				if (leftHandSide.isList()) {
+					// thread over lists
+					try {
+						rightHandSide = engine.evaluate(rightHandSide);
+					} catch (final ReturnException e) {
+						rightHandSide = e.getValue();
+					}
+					IExpr temp = engine.threadASTListArgs((IASTMutable) F.TagSet(symbol, leftHandSide, rightHandSide));
+					if (temp.isPresent()) {
+						return engine.evaluate(temp);
+					}
+				}
+				Object[] result = createPatternMatcher(symbol, leftHandSide, rightHandSide, false, engine);
+				return (IExpr) result[1];
+			}
+			return F.NIL;
+		}
+
+		private static Object[] createPatternMatcher(ISymbol tagSetSymbol, IExpr leftHandSide, IExpr rightHandSide,
+				boolean packageMode, EvalEngine engine) throws RuleCreationError {
+			final Object[] result = new Object[2];
+
+			if (leftHandSide.isAST()) {
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
+			}
+			try {
+				rightHandSide = engine.evaluate(rightHandSide);
+			} catch (final ConditionException e) {
+				System.out.println("Condition[] in right-hand-side of UpSet[]");
+			} catch (final ReturnException e) {
+				rightHandSide = e.getValue();
+			}
+
+			result[0] = null; // IPatternMatcher
+			result[1] = rightHandSide;
+
+			IAST lhsAST = Validate.checkASTUpRuleType(leftHandSide);
+			result[0] = tagSetSymbol.putUpRule(ISymbol.RuleType.TAGSET, false, lhsAST, rightHandSide);
+			return result;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
+
+	}
+
+	private final static class TagSetDelayed extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			Validate.checkSize(ast, 4);
+
+			IExpr arg1 = ast.arg1();
+			if (arg1.isSymbol() && !arg1.isBuiltInSymbol()) {
+				ISymbol symbol = (ISymbol) arg1;
+				final IExpr leftHandSide = ast.arg2();
+				final IExpr rightHandSide = ast.arg3();
+
+				createPatternMatcher(symbol, leftHandSide, rightHandSide, false, engine);
+
+				return F.Null;
+			}
+			return F.NIL;
+		}
+
+		private static Object[] createPatternMatcher(ISymbol lhsSymbol, IExpr leftHandSide, IExpr rightHandSide,
+				boolean packageMode, EvalEngine engine) throws RuleCreationError {
+			final Object[] result = new Object[2];
+
+			if (leftHandSide.isAST()
+					&& (((IAST) leftHandSide).getEvalFlags() & IAST.IS_FLATTENED_OR_SORTED_MASK) == IAST.NO_FLAG) {
+				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
+			}
+			result[0] = null;
+			result[1] = rightHandSide;
+
+			IAST lhsAST = Validate.checkASTUpRuleType(leftHandSide);
+			result[0] = lhsSymbol.putUpRule(ISymbol.RuleType.TAGSET_DELAYED, false, lhsAST, rightHandSide);
+			return result;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
+
 	}
 
 	/**
@@ -1517,7 +1618,7 @@ public final class PatternMatching {
 
 	}
 
-	private final static class UpSet extends AbstractCoreFunctionEvaluator implements ICreatePatternMatcher {
+	private final static class UpSet extends AbstractCoreFunctionEvaluator   {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1540,8 +1641,7 @@ public final class PatternMatching {
 			return (IExpr) result[1];
 		}
 
-		@Override
-		public Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
+		private static Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
 				EvalEngine engine) throws RuleCreationError {
 			final Object[] result = new Object[2];
 
@@ -1583,7 +1683,7 @@ public final class PatternMatching {
 
 	}
 
-	private final static class UpSetDelayed extends AbstractCoreFunctionEvaluator implements ICreatePatternMatcher {
+	private final static class UpSetDelayed extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1596,8 +1696,7 @@ public final class PatternMatching {
 			return F.Null;
 		}
 
-		@Override
-		public Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
+		private static Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
 				EvalEngine engine) throws RuleCreationError {
 			final Object[] result = new Object[2];
 
