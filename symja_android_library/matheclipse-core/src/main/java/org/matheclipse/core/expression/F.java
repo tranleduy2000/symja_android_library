@@ -49,6 +49,7 @@ import org.matheclipse.core.builtin.Structure;
 import org.matheclipse.core.builtin.TensorFunctions;
 import org.matheclipse.core.builtin.VectorAnalysisFunctions;
 import org.matheclipse.core.builtin.WXFFunctions;
+import org.matheclipse.core.builtin.WindowFunctions;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -204,13 +205,19 @@ public class F {
     /** All - is a possible value for `Span` and `Quiet`. */
 	public final static IBuiltInSymbol All = F.initFinalSymbol("All", ID.All);
 
-    /** AllTrue({expr1, expr2, ...}, test) - returns `True` if all applications of `test` to `expr1, expr2, ...` evaluate to `True`.*/
+	/**
+	 * AllTrue({expr1, expr2, ...}, test) - returns `True` if all applications of `test` to `expr1, expr2, ...` evaluate
+	 * to `True`.
+	 */
 	public final static IBuiltInSymbol AllTrue = F.initFinalSymbol("AllTrue", ID.AllTrue);
 
 	/** Alternatives(p1, p2, ..., p_i) - is a pattern that matches any of the patterns `p1, p2,...., p_i`. */
 	public final static IBuiltInSymbol Alternatives = F.initFinalSymbol("Alternatives", ID.Alternatives);
 
-    /** And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.*/
+	/**
+	 * And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as
+	 * an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.
+	 */
 	public final static IBuiltInSymbol And = F.initFinalSymbol("And", ID.And);
 
 	/** AngleVector(phi) - returns the point at angle `phi` on the unit circle. */
@@ -232,7 +239,10 @@ public class F {
 	public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ",
 			ID.AntisymmetricMatrixQ);
 
-    /** AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates to `True`.*/
+	/**
+	 * AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates
+	 * to `True`.
+	 */
 	public final static IBuiltInSymbol AnyTrue = F.initFinalSymbol("AnyTrue", ID.AnyTrue);
 
     /** Apart(expr) - rewrites `expr` as a sum of individual fractions. */
@@ -303,7 +313,10 @@ public class F {
 	/** 'ArrayQ(expr) - tests whether expr is a full array.*/
 	public final static IBuiltInSymbol ArrayQ = F.initFinalSymbol("ArrayQ", ID.ArrayQ);
 
-    /** ArrayReshape(list-of-values, list-of-dimension) - returns the `list-of-values` elements reshaped as nested list with dimensions according to the `list-of-dimension`.*/
+	/**
+	 * ArrayReshape(list-of-values, list-of-dimension) - returns the `list-of-values` elements reshaped as nested list
+	 * with dimensions according to the `list-of-dimension`.
+	 */
 	public final static IBuiltInSymbol ArrayReshape = F.initFinalSymbol("ArrayReshape", ID.ArrayReshape);
 
 	/***/
@@ -312,7 +325,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Assumptions = F.initFinalSymbol("Assumptions", ID.Assumptions);
 
-    /** AtomQ(x) - is true if `x` is an atom (an object such as a number or string, which cannot be divided into subexpressions using 'Part').*/
+	/**
+	 * AtomQ(x) - is true if `x` is an atom (an object such as a number or string, which cannot be divided into
+	 * subexpressions using 'Part').
+	 */
 	public final static IBuiltInSymbol AtomQ = F.initFinalSymbol("AtomQ", ID.AtomQ);
 
     /** Attributes(symbol) - returns the list of attributes which are assigned to `symbol`*/
@@ -342,7 +358,10 @@ public class F {
     /** BeginPackage("<context-name>") - start a new package definition*/
 	public final static IBuiltInSymbol BeginPackage = F.initFinalSymbol("BeginPackage", ID.BeginPackage);
 
-    /** BellB(n) -  the Bell number function counts the number of different ways to partition a set that has exactly `n` elements*/
+	/**
+	 * BellB(n) - the Bell number function counts the number of different ways to partition a set that has exactly `n`
+	 * elements
+	 */
 	public final static IBuiltInSymbol BellB = F.initFinalSymbol("BellB", ID.BellB);
 
 	/** BellY(n, k, {x1, x2, ... , xN}) - the second kind of Bell polynomials (incomplete Bell polynomials).*/
@@ -373,7 +392,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol BetaRegularized = F.initFinalSymbol("BetaRegularized", ID.BetaRegularized);
 
-    /** BinCounts(list, width-of-bin) - count the number of elements, if `list`, is divided into successive bins with width `width-of-bin`.*/
+	/**
+	 * BinCounts(list, width-of-bin) - count the number of elements, if `list`, is divided into successive bins with
+	 * width `width-of-bin`.
+	 */
 	public final static IBuiltInSymbol BinCounts = F.initFinalSymbol("BinCounts", ID.BinCounts);
 
 	/***/
@@ -412,19 +434,31 @@ public class F {
     /** Block({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables`*/
 	public final static IBuiltInSymbol Block = F.initFinalSymbol("Block", ID.Block);
 
-    /** Boole(expr) - returns `1` if `expr` evaluates to `True`; returns `0` if `expr` evaluates to `False`; and gives no result otherwise.*/
+	/**
+	 * Boole(expr) - returns `1` if `expr` evaluates to `True`; returns `0` if `expr` evaluates to `False`; and gives no
+	 * result otherwise.
+	 */
 	public final static IBuiltInSymbol Boole = F.initFinalSymbol("Boole", ID.Boole);
 
-    /** BooleanConvert(logical-expr) - convert the `logical-expr` to [disjunctive normal form](https://en.wikipedia.org/wiki/Disjunctive_normal_form)*/
+	/**
+	 * BooleanConvert(logical-expr) - convert the `logical-expr` to [disjunctive normal
+	 * form](https://en.wikipedia.org/wiki/Disjunctive_normal_form)
+	 */
 	public final static IBuiltInSymbol BooleanConvert = F.initFinalSymbol("BooleanConvert", ID.BooleanConvert);
 
-    /** BooleanMinimize(expr) - minimizes a boolean function with the [Quine McCluskey algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm)*/
+	/**
+	 * BooleanMinimize(expr) - minimizes a boolean function with the [Quine McCluskey
+	 * algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm)
+	 */
 	public final static IBuiltInSymbol BooleanMinimize = F.initFinalSymbol("BooleanMinimize", ID.BooleanMinimize);
 
 	/** BooleanQ(expr) - returns `True` if `expr` is either `True` or `False`.*/
 	public final static IBuiltInSymbol BooleanQ = F.initFinalSymbol("BooleanQ", ID.BooleanQ);
 
-    /** BooleanTable(logical-expr, variables) - generate [truth values](https://en.wikipedia.org/wiki/Truth_table) from the `logical-expr`*/
+	/**
+	 * BooleanTable(logical-expr, variables) - generate [truth values](https://en.wikipedia.org/wiki/Truth_table) from
+	 * the `logical-expr`
+	 */
 	public final static IBuiltInSymbol BooleanTable = F.initFinalSymbol("BooleanTable", ID.BooleanTable);
 
 	/** BooleanVariables(logical-expr) - gives a list of the boolean variables that appear in the `logical-expr`.*/
@@ -446,7 +480,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol CForm = F.initFinalSymbol("CForm", ID.CForm);
 
-    /** CanberraDistance(u, v) - returns the canberra distance between `u` and `v`, which is a weighted version of the Manhattan distance.*/
+	/**
+	 * CanberraDistance(u, v) - returns the canberra distance between `u` and `v`, which is a weighted version of the
+	 * Manhattan distance.
+	 */
 	public final static IBuiltInSymbol CanberraDistance = F.initFinalSymbol("CanberraDistance", ID.CanberraDistance);
 
 	/** Cancel(expr) - cancels out common factors in numerators and denominators.*/
@@ -482,7 +519,10 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol CharacterEncoding = F.initFinalSymbol("CharacterEncoding", ID.CharacterEncoding);
 
-    /** CharacteristicPolynomial(matrix, var) - computes the characteristic polynomial of a `matrix` for the variable `var`.*/
+	/**
+	 * CharacteristicPolynomial(matrix, var) - computes the characteristic polynomial of a `matrix` for the variable
+	 * `var`.
+	 */
 	public final static IBuiltInSymbol CharacteristicPolynomial = F.initFinalSymbol("CharacteristicPolynomial",
 			ID.CharacteristicPolynomial);
 
@@ -492,7 +532,10 @@ public class F {
 	/** ChebyshevU(n, x) - returns the Chebyshev polynomial of the second kind `U_n(x)`.*/
 	public final static IBuiltInSymbol ChebyshevU = F.initFinalSymbol("ChebyshevU", ID.ChebyshevU);
 
-    /** ChessboardDistance(u, v) - returns the chessboard distance (also known as Chebyshev distance) between `u` and `v`, which is the number of moves a king on a chessboard needs to get from square `u` to square `v`.*/
+	/**
+	 * ChessboardDistance(u, v) - returns the chessboard distance (also known as Chebyshev distance) between `u` and
+	 * `v`, which is the number of moves a king on a chessboard needs to get from square `u` to square `v`.
+	 */
 	public final static IBuiltInSymbol ChessboardDistance = F.initFinalSymbol("ChessboardDistance",
 			ID.ChessboardDistance);
 
@@ -503,11 +546,17 @@ public class F {
     /** ChineseRemainder({a1, a2, a3,...}, {n1, n2, n3,...}) -  the chinese remainder function.*/
 	public final static IBuiltInSymbol ChineseRemainder = F.initFinalSymbol("ChineseRemainder", ID.ChineseRemainder);
 
-    /** CholeskyDecomposition(matrix) - calculate the Cholesky decomposition of a hermitian, positive definite square `matrix`.*/
+	/**
+	 * CholeskyDecomposition(matrix) - calculate the Cholesky decomposition of a hermitian, positive definite square
+	 * `matrix`.
+	 */
 	public final static IBuiltInSymbol CholeskyDecomposition = F.initFinalSymbol("CholeskyDecomposition",
 			ID.CholeskyDecomposition);
 
-    /** Chop(numerical-expr) - replaces numerical values in the `numerical-expr` which are close to zero with symbolic value `0`.*/
+	/**
+	 * Chop(numerical-expr) - replaces numerical values in the `numerical-expr` which are close to zero with symbolic
+	 * value `0`.
+	 */
 	public final static IBuiltInSymbol Chop = F.initFinalSymbol("Chop", ID.Chop);
 
 	/** CirclePoints(i) - gives the `i` points on the unit circle for a positive integer `i`.*/
@@ -522,7 +571,10 @@ public class F {
 	/** ClearAttributes(symbol, attrib) - removes `attrib` from `symbol`'s attributes.*/
 	public final static IBuiltInSymbol ClearAttributes = F.initFinalSymbol("ClearAttributes", ID.ClearAttributes);
 
-    /** Clip(expr) - returns `expr` in the range `-1` to `1`. Returns `-1` if `expr` is less than `-1`. Returns `1` if `expr` is greater than `1`.*/
+	/**
+	 * Clip(expr) - returns `expr` in the range `-1` to `1`. Returns `-1` if `expr` is less than `-1`. Returns `1` if
+	 * `expr` is greater than `1`.
+	 */
 	public final static IBuiltInSymbol Clip = F.initFinalSymbol("Clip", ID.Clip);
 
 	/** Coefficient(polynomial, variable, exponent) - get the coefficient of `variable^exponent` in `polynomial`.*/
@@ -554,7 +606,10 @@ public class F {
 	/** Complex - is the head of complex numbers.*/
 	public final static IBuiltInSymbol Complex = F.initFinalSymbol("Complex", ID.Complex);
 
-    /** ComplexExpand(expr) - get the expanded `expr`. All variable symbols in `expr` are assumed to be non complex numbers.*/
+	/**
+	 * ComplexExpand(expr) - get the expanded `expr`. All variable symbols in `expr` are assumed to be non complex
+	 * numbers.
+	 */
 	public final static IBuiltInSymbol ComplexExpand = F.initFinalSymbol("ComplexExpand", ID.ComplexExpand);
 
 	/** ComplexInfinity - represents an infinite complex quantity of undetermined direction.*/
@@ -567,7 +622,10 @@ public class F {
 	public final static IBuiltInSymbol ComplexityFunction = F.initFinalSymbol("ComplexityFunction",
 			ID.ComplexityFunction);
 
-    /** ComposeList(list-of-symbols, variable) - creates a list of compositions of the symbols applied at the argument `x`.*/
+	/**
+	 * ComposeList(list-of-symbols, variable) - creates a list of compositions of the symbols applied at the argument
+	 * `x`.
+	 */
 	public final static IBuiltInSymbol ComposeList = F.initFinalSymbol("ComposeList", ID.ComposeList);
 
     /** ComposeSeries( series1, series2 ) - substitute `series2` into `series1`*/
@@ -580,7 +638,10 @@ public class F {
 	public final static IBuiltInSymbol CompoundExpression = F.initFinalSymbol("CompoundExpression",
 			ID.CompoundExpression);
 
-    /** Condition(pattern, expr) - places an additional constraint on `pattern` that only allows it to match if `expr` evaluates to `True`.*/
+	/**
+	 * Condition(pattern, expr) - places an additional constraint on `pattern` that only allows it to match if `expr`
+	 * evaluates to `True`.
+	 */
 	public final static IBuiltInSymbol Condition = F.initFinalSymbol("Condition", ID.Condition);
 
 	/***/
@@ -609,7 +670,10 @@ public class F {
 	/** ContinuedFraction(number) - get the continued fraction representation of `number`.*/
 	public final static IBuiltInSymbol ContinuedFraction = F.initFinalSymbol("ContinuedFraction", ID.ContinuedFraction);
 
-    /** Convergents({n1, n2, ...}) - return the list of convergents which represents the continued fraction list `{n1, n2, ...}`.*/
+	/**
+	 * Convergents({n1, n2, ...}) - return the list of convergents which represents the continued fraction list `{n1,
+	 * n2, ...}`.
+	 */
 	public final static IBuiltInSymbol Convergents = F.initFinalSymbol("Convergents", ID.Convergents);
 
 	/***/
@@ -744,14 +808,19 @@ public class F {
     /***/
     public final static IBuiltInSymbol DirichletWindow = F.initFinalSymbol("DirichletWindow", ID.DirichletWindow);
 
-    /** DiscreteDelta(n1, n2, n3, ...) - `DiscreteDelta` function returns `1` if all the `ni` are `0`. Returns `0` otherwise.*/
+	/**
+	 * DiscreteDelta(n1, n2, n3, ...) - `DiscreteDelta` function returns `1` if all the `ni` are `0`. Returns `0`
+	 * otherwise.
+	 */
 	public final static IBuiltInSymbol DiscreteDelta = F.initFinalSymbol("DiscreteDelta", ID.DiscreteDelta);
 
     /** DiscreteUniformDistribution({min, max}) - returns a discrete uniform distribution.*/
 	public final static IBuiltInSymbol DiscreteUniformDistribution = F.initFinalSymbol("DiscreteUniformDistribution",
 			ID.DiscreteUniformDistribution);
 
-    /** Discriminant(poly, var) - computes the discriminant of the polynomial `poly` with respect to the variable `var`.*/
+	/**
+	 * Discriminant(poly, var) - computes the discriminant of the polynomial `poly` with respect to the variable `var`.
+	 */
 	public final static IBuiltInSymbol Discriminant = F.initFinalSymbol("Discriminant", ID.Discriminant);
 
 	/***/
@@ -1173,6 +1242,9 @@ public class F {
 	public final static IBuiltInSymbol Hypergeometric0F1 = F.initFinalSymbol("Hypergeometric0F1", ID.Hypergeometric0F1);
     /** Hypergeometric1F1(a, b, z) - return the `Hypergeometric1F1` function*/
 	public final static IBuiltInSymbol Hypergeometric1F1 = F.initFinalSymbol("Hypergeometric1F1", ID.Hypergeometric1F1);
+
+	public final static IBuiltInSymbol Hypergeometric1F1Regularized = F.initFinalSymbol("Hypergeometric1F1Regularized",
+			ID.Hypergeometric1F1Regularized);
 
     /** Hypergeometric2F1(a, b, c, z) - return the `Hypergeometric2F1` function*/
 	public final static IBuiltInSymbol Hypergeometric2F1 = F.initFinalSymbol("Hypergeometric2F1", ID.Hypergeometric2F1);
@@ -3403,6 +3475,7 @@ public class F {
 			QuantityFunctions.initialize();
 			FinancialFunctions.initialize();
 			WXFFunctions.initialize();
+			WindowFunctions.initialize();
 			ComputationalGeometryFunctions.initialize();
 
 			// initialize only the utility function rules for Integrate
@@ -5853,6 +5926,11 @@ public class F {
 	public static IAST Hypergeometric0F1(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Hypergeometric0F1, a0, a1);
 	}
+
+	public static IAST Hypergeometric1F1Regularized(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(Hypergeometric1F1Regularized, a0, a1, a2);
+	}
+
 	public static IAST Hypergeometric2F1(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
 		return quaternary(Hypergeometric2F1, a0, a1, a2, a3);
 	}

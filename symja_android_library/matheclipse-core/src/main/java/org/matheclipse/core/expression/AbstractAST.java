@@ -58,7 +58,6 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Iterator;
@@ -1064,7 +1063,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @param index
 	 * @return
-	 * @throws WrongArgumentType if the cast is not possible
+	 * @throws WrongArgumentType
+	 *             if the cast is not possible
 	 */
 	@Override
 	public final IAST getAST(int index) {
@@ -2578,6 +2578,28 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	@Override
 	public boolean isTimes() {
 		return isSameHeadSizeGE(F.Times, 3);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isTrigFunction() {
+		int id = headID();
+		if (id >= 0) {
+			if (size() == 2) {
+				return id == ID.Cos || id == ID.Cosh || id == ID.ArcCos || id == ID.ArcCosh || //
+						id == ID.Cot || id == ID.Coth || id == ID.ArcCot || id == ID.ArcCoth || //
+						id == ID.Csc || id == ID.Csch || id == ID.ArcCsc || id == ID.ArcCsch || //
+						id == ID.Sec || id == ID.Sech || id == ID.ArcSec || id == ID.ArcSech || //
+						id == ID.Sin || id == ID.Sinh || id == ID.ArcSin || id == ID.ArcSinh || //
+						id == ID.Tan || id == ID.Tanh || id == ID.ArcTan || id == ID.ArcTanh;
+			}
+			if (size() == 3) {
+				return id == ID.ArcTan;
+			}
+		}
+		return false;
 	}
 
 	/** {@inheritDoc} */

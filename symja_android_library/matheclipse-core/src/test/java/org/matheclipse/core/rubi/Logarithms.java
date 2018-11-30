@@ -6,6 +6,12 @@ public class Logarithms extends AbstractRubiTestCase {
 		super(name, false);
 	}
 
+	@Override
+	protected void setUp() {
+		super.setUp();
+		fSeconds = 20;
+	}
+
 	// {2315}
 	public void test0001() {
 		check(//

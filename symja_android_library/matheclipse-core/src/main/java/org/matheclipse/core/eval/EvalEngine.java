@@ -2308,27 +2308,27 @@ public class EvalEngine implements Serializable {
 	 */
 	public IASTMutable threadASTListArgs(final IASTMutable ast) {
 
-		final int[] listLength = new int[] { 0 };
+		final int[] listLength = new int[] { -1 };
 		if (ast.exists(new Predicate<IExpr>() {
-            @Override
-            public boolean test(IExpr x) {
-                if (x.isList()) {
-                    if (listLength[0] == 0) {
-                        listLength[0] = ((IAST) x).argSize();
-                    } else {
-                        if (listLength[0] != ((IAST) x).argSize()) {
-                            EvalEngine.this.printMessage("Lists of unequal lengths cannot be combined: " + ast.toString());
-                            // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        })) {
+			@Override
+			public boolean test(IExpr x) {
+				if (x.isList()) {
+					if (listLength[0] < 0) {
+						listLength[0] = ((IAST) x).argSize();
+					} else {
+						if (listLength[0] != ((IAST) x).argSize()) {
+							EvalEngine.this.printMessage("Lists of unequal lengths cannot be combined: " + ast.toString());
+							// ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+		})) {
 						return F.NIL;
 					}
-		if (listLength[0] != 0) {
+		if (listLength[0] != -1) {
 			IASTAppendable result = EvalAttributes.threadList(ast, F.List, ast.head(), listLength[0]);
 			result.addEvalFlags(IAST.IS_LISTABLE_THREADED);
 			return result;
