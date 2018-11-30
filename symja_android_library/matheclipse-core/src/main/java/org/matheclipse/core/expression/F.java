@@ -1018,10 +1018,16 @@ public class F {
 	/** Fibonacci(n) - returns the Fibonacci number of the integer `n` */
 	public final static IBuiltInSymbol Fibonacci = F.initFinalSymbol("Fibonacci", ID.Fibonacci);
 
-    /** FindFit(list-of-data-points, function, parameters, variable) - solve a least squares problem using the Levenberg-Marquardt algorithm.*/
+	/**
+	 * FindFit(list-of-data-points, function, parameters, variable) - solve a least squares problem using the
+	 * Levenberg-Marquardt algorithm.
+	 */
 	public final static IBuiltInSymbol FindFit = F.initFinalSymbol("FindFit", ID.FindFit);
 
-    /** FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables `vars`.*/
+	/**
+	 * FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables
+	 * `vars`.
+	 */
 	public final static IBuiltInSymbol FindInstance = F.initFinalSymbol("FindInstance", ID.FindInstance);
 
     /** FindRoot(f, {x, xmin, xmax}) - searches for a numerical root of `f` for the variable `x`, in the range `xmin` to `xmax`. */
@@ -2220,6 +2226,8 @@ public class F {
 
 	/** RotateRight(list) - rotates the items of `list` by one item to the right.*/
 	public final static IBuiltInSymbol RotateRight = F.initFinalSymbol("RotateRight", ID.RotateRight);
+
+	public final static IBuiltInSymbol RotationMatrix = F.initFinalSymbol("RotationMatrix", ID.RotationMatrix);
 
 	/** Round(expr) - round a given `expr` to nearest integer.*/
 	public final static IBuiltInSymbol Round = F.initFinalSymbol("Round", ID.Round);
