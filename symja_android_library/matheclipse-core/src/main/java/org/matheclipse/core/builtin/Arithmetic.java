@@ -4505,8 +4505,11 @@ public final class Arithmetic {
 				IQuantity q = (IQuantity) o0;
 				return q.times(o1);
             } else if (o0.isNegative() && o1.isLog() && o1.first().isFraction() && o0.isReal()) {
+				IFraction f = (IFraction) o1.first();
+				if (f.isPositive() && f.isLessThan(F.C1)) {
                 // -<number> * Log(<fraction>) -> <number> * Log(<fraction>.inverse())
-                return o0.negate().times(F.Log(o1.first().inverse()));
+					return o0.negate().times(F.Log(f.inverse()));
+				}
             }
 
             if (o1.isPower()) {
