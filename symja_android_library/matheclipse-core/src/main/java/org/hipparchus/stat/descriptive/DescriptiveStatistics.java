@@ -48,7 +48,6 @@ import java.util.Arrays;
  * puts no limit on the size of the dataset. This value should be used with
  * caution, as the backing store will grow without bound in this case.
  * <p>
- * For very large datasets, {@link StreamingStatistics}, which does not store
  * the dataset, should be used instead of this class. If <code>windowSize</code>
  * is not INFINITE_WINDOW and more values are added than can be stored in the
  * dataset, new values are added in a "rolling" manner, with new values replacing

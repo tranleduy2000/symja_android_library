@@ -6,7 +6,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.dfa.DFA;
 
 public final class StarLoopEntryState extends DecisionState {
@@ -18,7 +17,6 @@ public final class StarLoopEntryState extends DecisionState {
 	 *
 	 * <p>This is a computed property that is calculated during ATN deserialization
 	 * and stored for use in {@link ParserATNSimulator} and
-	 * {@link ParserInterpreter}.</p>
 	 *
 	 * @see DFA#isPrecedenceDfa()
 	 */

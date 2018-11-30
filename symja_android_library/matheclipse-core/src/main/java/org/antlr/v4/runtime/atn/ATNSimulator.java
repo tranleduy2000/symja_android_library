@@ -9,27 +9,8 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.dfa.DFAState;
 
 import java.util.IdentityHashMap;
-import java.util.UUID;
 
 public abstract class ATNSimulator {
-	/**
-	 * @deprecated Use {@link ATNDeserializer#SERIALIZED_VERSION} instead.
-	 */
-	@Deprecated
-	public static final int SERIALIZED_VERSION;
-	static {
-		SERIALIZED_VERSION = ATNDeserializer.SERIALIZED_VERSION;
-	}
-
-	/**
-	 * This is the current serialized UUID.
-	 * @deprecated Use {@link ATNDeserializer#checkCondition(boolean)} instead.
-	 */
-	@Deprecated
-	public static final UUID SERIALIZED_UUID;
-	static {
-		SERIALIZED_UUID = ATNDeserializer.SERIALIZED_UUID;
-	}
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
 

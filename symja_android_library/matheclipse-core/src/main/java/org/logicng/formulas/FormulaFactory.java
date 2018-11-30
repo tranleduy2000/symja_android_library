@@ -35,7 +35,6 @@ import org.logicng.configurations.ConfigurationType;
 import org.logicng.formulas.printer.DefaultStringRepresentation;
 import org.logicng.formulas.printer.FormulaStringRepresentation;
 import org.logicng.functions.SubNodeFunction;
-import org.logicng.io.parsers.PseudoBooleanParser;
 import org.logicng.pseudobooleans.PBEncoder;
 import org.logicng.transformations.FormulaFactoryImporter;
 import org.logicng.transformations.cnf.CNFEncoder;
@@ -89,7 +88,6 @@ public class FormulaFactory {
     private final SubNodeFunction subformulaFunction;
     private final PBEncoder pbEncoder;
     private final CNFEncoder cnfEncoder;
-    private final PseudoBooleanParser parser;
     private final boolean[] formulaAdditionResult;
     Map<String, Variable> posLiterals;
     Map<String, Literal> negLiterals;
@@ -138,7 +136,6 @@ public class FormulaFactory {
             this.cnfPrefix = CNF_PREFIX;
         }
         this.pbEncoder = new PBEncoder(this);
-        this.parser = new PseudoBooleanParser(this);
     }
 
     /**

@@ -6,8 +6,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ParseInfo;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
@@ -24,8 +22,6 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<ParserATNSimulator> {
@@ -72,15 +68,6 @@ public abstract class Parser extends Recognizer<ParserATNSimulator> {
 			}
 		}
 	}
-
-	/**
-	 * This field maps from the serialized ATN string to the deserialized {@link ATN} with
-	 * bypass alternatives.
-	 *
-	 * @see ATNDeserializationOptions#isGenerateRuleBypassTransitions()
-	 */
-	private static final Map<String, ATN> bypassAltsAtnCache =
-		new WeakHashMap<String, ATN>();
 
 	/**
 	 * The error handling strategy for the parser. The default value is a new
@@ -425,33 +412,6 @@ public abstract class Parser extends Recognizer<ParserATNSimulator> {
 		_input.getTokenSource().setTokenFactory(factory);
 	}
 
-	/**
-	 * The ATN with bypass alternatives is expensive to create so we create it
-	 * lazily.
-	 *
-	 * @throws UnsupportedOperationException if the current parser does not
-	 * implement the {@link #getSerializedATN()} method.
-	 */
-
-	public ATN getATNWithBypassAlts() {
-		String serializedAtn = getSerializedATN();
-		if (serializedAtn == null) {
-			throw new UnsupportedOperationException("The current parser does not support an ATN with bypass alternatives.");
-		}
-
-		synchronized (bypassAltsAtnCache) {
-			ATN result = bypassAltsAtnCache.get(serializedAtn);
-			if (result == null) {
-				ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
-				deserializationOptions.setGenerateRuleBypassTransitions(true);
-				result = new ATNDeserializer(deserializationOptions).deserialize(serializedAtn.toCharArray());
-				bypassAltsAtnCache.put(serializedAtn, result);
-			}
-
-			return result;
-		}
-	}
-
 
 	public ANTLRErrorStrategy getErrorHandler() {
 		return _errHandler;
@@ -569,54 +529,6 @@ public abstract class Parser extends Recognizer<ParserATNSimulator> {
 	 */
 	public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
 		return new ErrorNodeImpl(t);
-	}
-
-	protected void addContextToParseTree() {
-		ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
-		// add current context to parent if we have a parent
-		if ( parent!=null )	{
-			parent.addChild(_ctx);
-		}
-	}
-
-	/**
-	 * Always called by generated parsers upon entry to a rule. Access field
-	 * {@link #_ctx} get the current context.
-	 */
-	public void enterRule(ParserRuleContext localctx, int state, int ruleIndex) {
-		setState(state);
-		_ctx = localctx;
-		_ctx.start = _input.LT(1);
-		if (_buildParseTrees) addContextToParseTree();
-        if ( _parseListeners != null) triggerEnterRuleEvent();
-	}
-
-    public void exitRule() {
-		if ( matchedEOF ) {
-			// if we have matched EOF, it cannot consume past EOF so we use LT(1) here
-			_ctx.stop = _input.LT(1); // LT(1) will be end of file
-		}
-		else {
-			_ctx.stop = _input.LT(-1); // stop node is what we just matched
-		}
-        // trigger event on _ctx, before it reverts to parent
-        if ( _parseListeners != null) triggerExitRuleEvent();
-		setState(_ctx.invokingState);
-		_ctx = (ParserRuleContext)_ctx.parent;
-    }
-
-	public void enterOuterAlt(ParserRuleContext localctx, int altNum) {
-		localctx.setAltNumber(altNum);
-		// if we have new localctx, make sure we replace existing ctx
-		// that is previous child of parse tree
-		if ( _buildParseTrees && _ctx != localctx ) {
-			ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
-			if ( parent!=null )	{
-				parent.removeLastChild();
-				parent.addChild(localctx);
-			}
-		}
-		_ctx = localctx;
 	}
 
 	/**
