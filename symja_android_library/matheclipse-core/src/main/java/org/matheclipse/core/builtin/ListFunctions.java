@@ -1,5 +1,6 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.annotations.Nonnull;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Consumer;
@@ -54,8 +55,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-
 
 import static org.matheclipse.core.expression.F.List;
 
@@ -620,8 +619,8 @@ public final class ListFunctions {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * returns an <code>n</code>-by-<code>m</code> matrix created by applying <code>f</code> to indices ranging from <code>(a, b)</code>
-	 * to <code>(a + n, b + m)</code>.
+	 * returns an <code>n</code>-by-<code>m</code> matrix created by applying <code>f</code> to indices ranging from
+	 * <code>(a, b)</code> to <code>(a + n, b + m)</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -1126,7 +1125,7 @@ public final class ListFunctions {
 			return F.List();
 		}
 
-		public static IAST cases(final IAST ast, final IExpr pattern,  EvalEngine engine) {
+		public static IAST cases(final IAST ast, final IExpr pattern, @Nonnull EvalEngine engine) {
 			if (pattern.isRuleAST()) {
 				Function<IExpr, IExpr> function = Functors.rules((IAST) pattern, engine);
 				IAST[] results = ast.filter(function);
@@ -2179,46 +2178,57 @@ public final class ListFunctions {
 
 	/**
 	 * <pre>
-	 * Intersection(set1, set2)
+	 * Intersection(set1, set2, ...)
 	 * </pre>
 	 *
 	 * <blockquote>
 	 * <p>
-	 * get the intersection set from <code>set1</code> and <code>set2</code>.
+	 * get the intersection set from <code>set1</code> and <code>set2</code> &hellip;.
 	 * </p>
 	 * </blockquote>
 	 * <p>
 	 * See:<br />
 	 * </p>
 	 * <ul>
-	 * <li><a href="http://en.wikipedia.org/wiki/Intersection_(set_theory)">Wikipedia - Intersection (set theory)</a></li>
+	 * <li><a href="http://en.wikipedia.org/wiki/Intersection_(set_theory)">Wikipedia - Intersection (set
+	 * theory)</a></li>
 	 * </ul>
 	 */
 	private final static class Intersection extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
-
-			if (ast.isAST1() && ast.arg1().isAST()) {
+			if (ast.size() > 1) {
+				if (ast.isAST1()) {
+					if (ast.arg1().isAST()) {
 				IAST arg1 = (IAST) ast.arg1();
 				Set<IExpr> set = arg1.asSet();
 				final IASTAppendable result = F.ListAlloc(set.size());
 				result.appendAll(set);
-				// for (IExpr IExpr : set) {
-				// result.append(IExpr);
-				// }
 				EvalAttributes.sort(result, Comparators.ExprComparator.CONS);
 				return result;
 			}
-
-			if (ast.arg1().isAST() && ast.arg2().isAST()) {
-				IAST arg1AST = ((IAST) ast.arg1());
-				IAST arg2AST = ((IAST) ast.arg2());
-				final IASTAppendable result = F.ListAlloc((arg1AST.size() + arg2AST.size()) / 2);
-				return intersection(arg1AST, arg2AST, result);
+					return F.NIL;
 			}
 
+				if (ast.arg1().isAST()) {
+					IAST result = ((IAST) ast.arg1());
+					for (int i = 2; i < ast.size(); i++) {
+						if (!ast.get(i).isAST()) {
+							return F.NIL;
+						}
+					}
+					for (int i = 2; i < ast.size(); i++) {
+						IAST expr = (IAST) ast.get(i);
+						final IASTAppendable list = F.ListAlloc((result.size() + expr.size()) / 2);
+						result = intersection(result, expr, list);
+					}
+					if (result.size() > 2) {
+						EvalAttributes.sort((IASTMutable) result, Comparators.ExprComparator.CONS);
+					}
+					return result;
+				}
+			}
 			return F.NIL;
 		}
 
@@ -2233,9 +2243,12 @@ public final class ListFunctions {
 		 *            the AST where the elements of the union should be appended
 		 * @return
 		 */
-		public static IExpr intersection(IAST ast1, IAST ast2, final IASTAppendable result) {
-			Set<IExpr> set1 = new HashSet<IExpr>(ast1.size() + ast1.size() / 10);
-			Set<IExpr> set2 = new HashSet<IExpr>(ast2.size() + ast1.size() / 10);
+		public static IAST intersection(IAST ast1, IAST ast2, final IASTAppendable result) {
+			if (ast1.size() == 1 || ast2.size() == 1) {
+				return F.CEmptyList;
+			}
+			Set<IExpr> set1 = new HashSet<IExpr>(ast1.size() + ast2.size() / 10);
+			Set<IExpr> set2 = new HashSet<IExpr>(ast1.size() + ast2.size() / 10);
 			Set<IExpr> resultSet = new TreeSet<IExpr>();
 			int size = ast1.size();
 			for (int i = 1; i < size; i++) {
@@ -2251,9 +2264,6 @@ public final class ListFunctions {
 				}
 			}
 			result.appendAll(resultSet);
-			// for (IExpr expr : resultSet) {
-			// result.append(expr);
-			// }
 			return result;
 		}
 		@Override
@@ -2558,7 +2568,8 @@ public final class ListFunctions {
 	 * </p>
 	 * </blockquote>
 	 * <p>
-	 * Level 0 corresponds to the whole expression. A negative level <code>-n</code> consists of parts with depth <code>n</code>.
+	 * Level 0 corresponds to the whole expression. A negative level <code>-n</code> consists of parts with depth
+	 * <code>n</code>.
 	 * </p>
 	 * <h3>Examples</h3>
 	 * <p>
@@ -5043,9 +5054,9 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
-
-			if (ast.isAST1() && ast.arg1().isAST()) {
+			if (ast.size() > 1) {
+				if (ast.isAST1()) {
+					if (ast.arg1().isAST()) {
 				IAST arg1 = (IAST) ast.arg1();
 				Set<IExpr> set = arg1.asSet();
 				final IASTAppendable result = F.ListAlloc(set.size());
@@ -5055,12 +5066,26 @@ public final class ListFunctions {
 				EvalAttributes.sort(result, Comparators.ExprComparator.CONS);
 				return result;
 			}
+					return F.NIL;
+				}
 
-			if (ast.arg1().isAST() && ast.arg2().isAST()) {
-				IAST arg1AST = (IAST) ast.arg1();
-				IAST arg2AST = (IAST) ast.arg2();
-				final IASTAppendable result = F.ListAlloc(8);
-				return union(arg1AST, arg2AST, result);
+				if (ast.arg1().isAST()) {
+					IAST result = ((IAST) ast.arg1());
+					for (int i = 2; i < ast.size(); i++) {
+						if (!ast.get(i).isAST()) {
+							return F.NIL;
+						}
+					}
+					for (int i = 2; i < ast.size(); i++) {
+						IAST expr = (IAST) ast.get(i);
+						final IASTAppendable list = F.ListAlloc(result.size() + expr.size());
+						result = union(result, expr, list);
+					}
+					if (result.size() > 2) {
+						EvalAttributes.sort((IASTMutable) result, Comparators.ExprComparator.CONS);
+					}
+					return result;
+				}
 			}
 			return F.NIL;
 		}
@@ -5076,7 +5101,7 @@ public final class ListFunctions {
 		 *            the AST where the elements of the union should be appended
 		 * @return
 		 */
-		public static IExpr union(IAST ast1, IAST ast2, final IASTAppendable result) {
+		public static IASTMutable union(IAST ast1, IAST ast2, final IASTAppendable result) {
 			Set<IExpr> resultSet = new TreeSet<IExpr>();
 			int size = ast1.size();
 			for (int i = 1; i < size; i++) {

@@ -5335,8 +5335,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testIntersection() {
-		check("Intersection({a,a,b,c})", "{a,b,c}");
-		check("Intersection({a,a,b,c},{b,a})", "{a,b}");
+		check("Intersection({a,a,b,c})", //
+				"{a,b,c}");
+		check("Intersection({a,a,b,c},{b,a})", //
+				"{a,b}");
+		check(" Intersection({a, b, c}, {a}, {b})", //
+				"{}");
+		check(" Intersection({}, {a, b, c}, {a,b}, {b,c})", //
+				"{}");
 	}
 
 	public void testInterval() {
@@ -12550,6 +12556,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("Union({a,a,b,c})", "{a,b,c}");
 		check("Union({9, 0, 0, 3, 2, 3, 6, 2, 9, 8, 4, 9, 0, 2, 6, 5, 7, 4, 9, 8})", "{0,2,3,4,5,6,7,8,9}");
+		check("Union({a,a,b,c},{},{})", "{a,b,c}");
+		check("Union({a,a,b,c},{},{z,z,z,x,x,x,y,y,y})", "{a,b,c,x,y,z}");
 	}
 
 	public void testUnique() {
