@@ -1668,24 +1668,29 @@ public class MainTestCase extends AbstractTestCase {
 
     }
 
+//	public void testSystem171c() {
+//		check("Integrate(ArcCoth(x^16)^2,x)", //
+//				"1");
+//	}
     public void testSystem172() {
 
-        check("Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))",
+		check("Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))", //
                 "Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))");
         check("Integrate(Cos(a*x)*Sin(b*x),x)", //
                 "Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))");
         check("Integrate(Cos(a*x)*Sin(b*x),x)", //
                 "Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))");
 
-        check("Csc(b*x)^0", "1");
+		check("Csc(b*x)^0", //
+				"1");
         check("Integrate(Cos(x*(a+b)),x)", //
                 "Sin((a+b)*x)/(a+b)");
 
-        check("Integrate(Cos(a*x)*Sin(b*x)^2,x)",
+		check("Integrate(Cos(a*x)*Sin(b*x)^2,x)", //
                 "Sin(a*x)/(2*a)-Sin((a-2*b)*x)/(4*(a-2*b))-Sin((a+2*b)*x)/(4*(a+2*b))");
-        check("Integrate(Cos(a*x)^2*Sin(b*x),x)",
+		check("Integrate(Cos(a*x)^2*Sin(b*x),x)", //
                 "Cos((2*a-b)*x)/(4*(2*a-b))-Cos(b*x)/(2*b)-Cos((2*a+b)*x)/(4*(2*a+b))");
-        check("Integrate(Cos(b*x)^2*Sin(a*x)^2,x)",
+		check("Integrate(Cos(b*x)^2*Sin(a*x)^2,x)", //
                 "x/4-Sin(2*a*x)/(8*a)-Sin(2*(a-b)*x)/(16*(a-b))+Sin(2*b*x)/(8*b)-Sin(2*(a+b)*x)/(\n" + "16*(a+b))");
     }
 

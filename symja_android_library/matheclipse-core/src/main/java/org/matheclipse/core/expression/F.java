@@ -502,6 +502,11 @@ public class F {
 	/** Break() - exits a `For`, `While`, or `Do` loop.*/
 	public final static IBuiltInSymbol Break = F.initFinalSymbol("Break", ID.Break);
 
+	/***/
+	public final static IBuiltInSymbol ByteArray = F.initFinalSymbol("ByteArray", ID.ByteArray);
+
+	/***/
+	public final static IBuiltInSymbol ByteArrayQ = F.initFinalSymbol("ByteArrayQ", ID.ByteArrayQ);
     /** CDF(distribution, value) - returns the cumulative distribution function of `value`. */
 	public final static IBuiltInSymbol CDF = F.initFinalSymbol("CDF", ID.CDF);
 
@@ -4883,7 +4888,7 @@ public class F {
 	 * @return IFraction
 	 */
 	public static IComplex complex(final double realPart, final double imagPart) {
-		return complex(realPart, imagPart, Config.DOUBLE_EPSILON);
+		return complex(realPart, imagPart, Config.DOUBLE_TOLERANCE);
 	}
 
 	/**
@@ -6515,16 +6520,52 @@ public class F {
 	 * 
 	 */
 	final public static boolean isEqual(double x, double y) {
-		return DoubleMath.fuzzyEquals(x, y, Config.DOUBLE_TOLERANCE);
+		return isFuzzyEquals(x, y, Config.MACHINE_EPSILON);
 	}
 
 	/**
-	 * Test if the absolute value is less <code>Config.DOUBLE_EPSILON</code>.
+	 * Returns {@code true} if {@code a} and {@code b} are within {@code tolerance} (exclusive) of each other.
+	 *
+	 * <p>
+	 * Technically speaking, this is equivalent to {@code Math.abs(a - b) <= tolerance ||
+	 * Double.valueOf(a).equals(Double.valueOf(b))}.
+	 *
+	 * <p>
+	 * Notable special cases include:
+	 *
+	 * <ul>
+	 * <li>All NaNs are fuzzily equal.
+	 * <li>If {@code a == b}, then {@code a} and {@code b} are always fuzzily equal.
+	 * <li>Positive and negative zero are always fuzzily equal.
+	 * <li>If {@code tolerance} is zero, and neither {@code a} nor {@code b} is NaN, then {@code a} and {@code b} are
+	 * fuzzily equal if and only if {@code a == b}.
+	 * <li>With {@link Double#POSITIVE_INFINITY} tolerance, all non-NaN values are fuzzily equal.
+	 * <li>With finite tolerance, {@code Double.POSITIVE_INFINITY} and {@code
+	 *       Double.NEGATIVE_INFINITY} are fuzzily equal only to themselves.
+	 * </ul>
+	 *
+	 * <p>
+	 * This is reflexive and symmetric, but <em>not</em> transitive, so it is <em>not</em> an equivalence relation and
+	 * <em>not</em> suitable for use in {@link Object#equals} implementations.
+	 *
+	 * @throws IllegalArgumentException
+	 *             if {@code tolerance} is {@code < 0} or NaN
+	 */
+	public static boolean isFuzzyEquals(double a, double b, double tolerance) {
+		return Math.copySign(a - b, 1.0) < tolerance
+				// copySign(x, 1.0) is a branch-free version of abs(x), but with different NaN semantics
+				|| (a == b) // needed to ensure that infinities equal themselves
+				|| (Double.isNaN(a) && Double.isNaN(b));
+	}
+
+	/**
+	 * Test if the absolute value is less <code>Config.DOUBLE_TOLERANCE</code>.
 	 * 
 	 * @param value
 	 * @return
 	 */
 	public static boolean isZero(double value) {
+		//j2objc changed: use DOUBLE_TOLERANCE in order to avoid infinity loop.
 		return isZero(value, Config.DOUBLE_TOLERANCE);
 	}
 

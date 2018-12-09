@@ -42,6 +42,12 @@ public class PredicateQ {
 				return x.isTrue() || x.isFalse();
 			}
 		});
+		F.ByteArrayQ.setPredicateQ(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return WXFFunctions.isByteArray(x);
+			}
+		});
 		F.DigitQ.setEvaluator(new DigitQ());
 		F.EvenQ.setEvaluator(new EvenQ());
 		F.ExactNumberQ.setPredicateQ(new Predicate<IExpr>() {

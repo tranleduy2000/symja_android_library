@@ -291,9 +291,9 @@ public class WL {
 				writeAST2(F.Rational, ((IRational) arg1).numerator(), ((IRational) arg1).denominator());
 				return;
 			case IExpr.DOUBLEID:
-//				if (arg1 instanceof ApfloatNum) {
+				// if (arg1 instanceof ApfloatNum) {
 //
-//				}
+				// }
 				stream.write(WL.WXF_CONSTANTS.Real64);
 				writeDouble(((INum) arg1).doubleValue());
 				return;

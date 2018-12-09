@@ -6,4 +6,9 @@ package org.matheclipse.core.interfaces;
  */
 public interface IDataExpr extends IExpr {
 
+	/**
+	 *
+	 * @return the data part of the IDataExpr
+	 */
+	public Object toData();
 }
