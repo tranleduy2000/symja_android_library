@@ -3087,7 +3087,16 @@ public class EllipticCurveMethod {
 		return null;
 	}
 
-	public void factorize(Map<BigInteger, Integer> map) {
+	/**
+	 * Factor the integer number given in the classes constructor.
+	 * 
+	 * @param map
+	 *            the map of prime factors
+	 * @param noSIQS
+	 *            return the rest number; don't call SIQS in this method
+	 * @return
+	 */
+	public BigInteger factorize(Map<BigInteger, Integer> map, boolean noSIQS) {
 		BigInteger NN;// N
 		long TestComp; // , New;
 		BigInteger N1, N2, Tmp;
@@ -3129,7 +3138,7 @@ public class EllipticCurveMethod {
 							j = AprtCle(PD[i]);
 							if (batchFinished == false && batchPrime) {
 								NbrFactors = j;
-								return;
+								return BigInteger.ONE;
 							}
 						}
 						if (j == 0) {
@@ -3162,7 +3171,14 @@ public class EllipticCurveMethod {
 						EC %= 50000000;
 						NN = fnECM(PD[i], i);
 						if (NN.equals(BigInt1)) {
-							NN = factoringSIQS(PD[i]);
+							if (noSIQS) {
+								for (i = 0; i < NbrFactors - 1; i++) {
+									map.put(PD[i], Exp[i]);
+								}
+								return PD[i];
+							} else {
+								NN = factoringSIQS(PD[i]);
+							}
 							// System.out.println(NN.toString());
 						}
 						if (foundByLehman) { // Factor found using Lehman method
@@ -3239,9 +3255,10 @@ public class EllipticCurveMethod {
 				NextEC = -1; /* First curve of new number should be 1 */
 			}
 		} catch (ArithmeticException e) {
-			return;
+
 		}
 		// System.gc();
+		return BigInteger.ONE;
 	}
 
 	private BigInteger fnECM(BigInteger N, int FactorIndex) {
@@ -5762,6 +5779,6 @@ public class EllipticCurveMethod {
 
 	public static void ellipticCurveFactors(final BigInteger val, Map<BigInteger, Integer> map) {
 		EllipticCurveMethod ecm = new EllipticCurveMethod(val);
-		ecm.factorize(map);
+		ecm.factorize(map, false);
 	}
 }

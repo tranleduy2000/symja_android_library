@@ -3,6 +3,7 @@ package org.matheclipse.core.system;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.builtin.ConstantDefinitions;
+import org.matheclipse.core.expression.F;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
 
@@ -2205,7 +2206,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// "");
 		// check("Cos(3/4*Pi+2*x)", //
 		// "");
-
 		check("Cos(e - Pi/2 + f*x)", //
 				"Sin(e+f*x)");
 		check("Cos(-1/2*E+z)", //
@@ -2580,7 +2580,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("D((x^2+5*y^3+z^4)/E^w,{{x,y}})", "{(2*x)/E^w,(15*y^2)/E^w}");
 		check("D(E^(-w)*(x^2 + 5*y^3 + z^4), {{{x, y}, {z, w}}})",
 				"{{(2*x)/E^w,(15*y^2)/E^w},{(4*z^3)/E^w,-(x^2+5*y^3+z^4)/E^w}}");
-		check("D(ExpIntegralEi(b*x),x)",//
+		check("D(ExpIntegralEi(b*x),x)", //
 				"E^(b*x)/x");
 	}
 
@@ -2987,7 +2987,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Pi / 4.0", "0.785398");
 		check("N(1 / 8)", "0.125");
 		check("a / b / c", "a/(b*c)");
-		check("a / (b / c)", "(a*c)/b"); 
+		check("a / (b / c)", "(a*c)/b");
 		check("a / b / (c / (d / e))", "(a*d)/(b*c*e)");
 		check("a / (b ^ 2 * c ^ 3 / e)", "(a*e)/(b^2*c^3)");
 		check("1 / 4.0", "0.25");
@@ -3744,6 +3744,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"((-1+E^x)*(1+E^x)*(-3+E^(2*x)))/E^x");
 		check("Factor(E^x+E^(2*x))", //
 				"E^x*(1+E^x)");
+
 		// TODO https://github.com/kredel/java-algebra-system/issues/8
 		check("Factor(a*c+(b*c+a*d)*x+b*d*x^2)", //
 				"(a+b*x)*(c+d*x)");
@@ -3853,31 +3854,29 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// }
 
 	public void testFactorInteger() {
-		// 10^79+5923 - very slow test > 17 min
-		// check("FactorInteger(10^79+5923)", //
-		// "{{1333322076518899001350381760807974795003,1},{\n" +
-		// "7500063320115780212377802894180923803641,1}}");
-		// check("1333322076518899001350381760807974795003*7500063320115780212377802894180923803641==10^79+5923", //
-		// "True");
 
-		// 10^71-1 - slow test
 
-		// check("FactorInteger(10^71-1)", //
-		// "{{3,2},{241573142393627673576957439049,1},{\n" +
-		// "45994811347886846310221728895223034301839,1}}");
-		// check("3^2*241573142393627673576957439049*45994811347886846310221728895223034301839==10^71-1", //
-		// "True");
-
-		// 10^59+213 - slow test
-
-		// check("FactorInteger(10^59+213)", //
-		// "{{213916881789829278910570173437,1},{467471286806848547076331371449,1}}");
-		// check("213916881789829278910570173437*467471286806848547076331371449== 10^59+213", //
-		// "True");
 		if (Config.EXPENSIVE_JUNIT_TESTS) {
+			// 10^79+5923 - very slow test > 17 min
+			 check("FactorInteger(10^79+5923)", //
+			 "{{1333322076518899001350381760807974795003,1},{\n" +
+			 "7500063320115780212377802894180923803641,1}}");
+			 check("1333322076518899001350381760807974795003*7500063320115780212377802894180923803641==10^79+5923", //
+			 "True");
+
+			 check("FactorInteger(10^71-1)", //
+			 "{{3,2},{241573142393627673576957439049,1},{\n" +
+			 "45994811347886846310221728895223034301839,1}}");
+			 check("3^2*241573142393627673576957439049*45994811347886846310221728895223034301839==10^71-1", //
+			 "True");
+
+			check("FactorInteger(10^59+213)", //
+					"{{213916881789829278910570173437,1},{467471286806848547076331371449,1}}");
+			check("213916881789829278910570173437*467471286806848547076331371449== 10^59+213", //
+					"True");
+
 			check("FactorInteger(966983290915691193309978723256242679920691599725908954700676674631843021151)", //
-					"{{2166660942804222727904664493239497749,1},{\n" +
-					"446301159453293757389122758418041256099,1}}");
+					"{{2166660942804222727904664493239497749,1},{\n" + "446301159453293757389122758418041256099,1}}");
 			check("FactorInteger(672924717570659549138949381690007452648932205241)", //
 					"{{324557421200651278898953,1},{2073361056053736024795697,1}}");
 			check("FactorInteger(475055344870856723877355576259313975012575765717)", //
@@ -3886,7 +3885,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 					"{{59,1},{41387,1},{40320271,1},{85708917607365601059185614891297817,1}}");
 			check("FactorInteger(10^100+1)", //
 					"{{73,1},{137,1},{401,1},{1201,1},{1601,1},{1676321,1},{5964848081,1},{\n"
-					+ "129694419029057750551385771184564274499075700947656757821537291527196801,1}}");
+							+ "129694419029057750551385771184564274499075700947656757821537291527196801,1}}");
 			check("FactorInteger(308119573764812073923)", //
 					"{{19,2},{367,1},{132491,1},{17553335119,1}}");
 			check("19^2*367*132491*17553335119", //
@@ -3898,11 +3897,20 @@ public class LowercaseTestCase extends AbstractTestCase {
 					"132296607982211351148");
 			check("FactorInteger(44343535354351600000003434353)", //
 					"{{149,1},{329569479697,1},{903019357561501,1}}");
-		}
 
-		check("FactorInteger(966983290915691193309978723256242679920691599725908954700676674631843021151)", //
-				"{{2166660942804222727904664493239497749,1},{\n" +
-				"446301159453293757389122758418041256099,1}}");
+		}
+		check("FactorInteger(101546450935661953908994991437690198927080333663460351836152986526126114727314353555755712261904130976988029406423152881932996637460315302992884162068350429 )", //
+				"{{123456789012419,1},{123456789012421,1},{123456789012437,1},{123456789012439,1},{\n"
+						+ "123456789012463,1},{123456789012521,1},{123456789012523,1},{123456789012533,1},{\n"
+						+ "123456789012577,1},{123456789012629,1},{123456789012637,1}}");
+		check("FactorInteger(8225267468394993133669189614204532935183709603155231863020477010700542265332938919716662623)", //
+				"{{1234567891,1},{1234567907,1},{1234567913,1},{1234567927,1},{1234567949,1},{\n"
+						+ "1234567967,1},{1234567981,1},{1234568021,1},{1234568029,1},{1234568047,1}}");
+
+		check("FactorInteger(5679148659138759837165981543 )", //
+				"{{3,3},{466932157,1},{450469808245315337,1}}");
+		check("FactorInteger(2^128 + 1 )", //
+				"{{59649589127497217,1},{5704689200685129054721,1}}");
 		check("FactorInteger(600851475143)", //
 				"{{71,1},{839,1},{1471,1},{6857,1}}");
 		check("FactorInteger(2^32-1)", //
@@ -4093,7 +4101,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("FindInstance(2*Sin(x)==1/2,x)", //
 				"{{x->ArcSin(1/4)}}");
-		check("FindInstance(3+2*Cos(x)==1/2,x)",//
+		check("FindInstance(3+2*Cos(x)==1/2,x)", //
 				"{{x->ArcCos(-5/4)}}");
 		check("FindInstance(Sin(x)==0,x)", "{{x->0}}");
 		check("FindInstance(Sin(x)==0.0,x)", "{{x->0}}");
@@ -4154,14 +4162,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 			// implicit times operator '*' allowed
 			check("Exp(1.2436240901689538 * E - 16) - 1", //
 					"-0.999997");
-			check("Exp(1.2436240901689538E-16) - 1",//
+			check("Exp(1.2436240901689538E-16) - 1", //
 					"-0.999997");
 		} else {
 			check("Exp(1.2436240901689538E-16) - 1", //
 					"0.0");
 		}
 
-		checkNumeric("FindRoot(Exp(x)==Pi^3,{x,-1,10})",//
+		checkNumeric("FindRoot(Exp(x)==Pi^3,{x,-1,10})", //
 				"{x->3.434189629596888}");
 		checkNumeric("$K=10000;\n" + "$g=0.0;\n" + "$n=10*12;\n" + "$Z=12;\n" + "$AA=0.0526;\n" + "$R=100;\n"
 				+ "$d=0.00;\n" + "$vn=0;\n" + "$EAj=0;\n" + "$zj=0;\n" + "$sz=1;\n"
@@ -4244,8 +4252,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FixedPoint(#+1 &, 1, 20)", "21");
 		check("FixedPoint(f, x, 0)", "x");
 		check("FixedPoint(f, x, -1)", "FixedPoint(f,x,-1)");
-		//j2objc changed: Use DOUBLE_TOLERANCE to compare double in odrer to avoid infinity loop
-		checkNumeric("FixedPoint(Cos, 1.0, Infinity)", "0.7390851332151603");
+		checkNumeric("FixedPoint(Cos, 1.0, Infinity)", "0.7390851332151607");
 
 		checkNumeric("FixedPoint((# + 2/#)/2 &, 1.)", "1.414213562373095");
 		check("FixedPoint(1 + Floor(#/2) &, 1000)", "2");
@@ -4275,7 +4282,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testFlat() {
 		// test https://github.com/mathics/Mathics/issues/747
-    // Verified against Mathematica 11.3.0.0 by rebcabin [2018-10-07 Sun 06:31]
+		// Verified against Mathematica 11.3.0.0 by rebcabin [2018-10-07 Sun 06:31]
 		check("SetAttributes(eqv, Flat);eqv(p, q, q, p) /. eqv(x_, y_) :> {x, y}", //
 				"{eqv(p),eqv(q,q,p)}");
 
@@ -4320,7 +4327,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Rest@( fo(p, q, r) /. {fo(x_,y_) :> {x,y}} )", "{fo(q,r)}");
 
 		check("Flatten(Table(Union(Sort/@Permutations({Flat,Orderless,OneIdentity}, {i})), {i,3}), 1)", //
-//
+				//
 				"{{Flat}," //
 						+ "{OneIdentity}," //
 						+ "{Orderless}," //
@@ -4696,6 +4703,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"(x+y)^3");
 		check("FunctionExpand((x+y)*(a+b))", //
 				"(a+b)*(x+y)");
+
 		check("FunctionExpand(Binomial(n,k))", //
 				"Gamma(1+n)/(Gamma(1+k)*Gamma(1-k+n))");
 		check("FunctionExpand(Binomial(n,7))", //
@@ -4773,7 +4781,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Gamma(0.0+I*0.0)", //
 				"ComplexInfinity");
 		check("Table(Gamma(x+I*y), {x,-0.5, 0.5, 1/4}, {y,-0.5, 0.5, 1/4})", //
-				"{{-1.58148+I*0.0548502,-2.75473+I*0.0310004,-3.54491,-2.75473+I*(-0.0310004),-1.58148+I*(-0.0548502)},{-1.31815+I*1.01078,-2.77536+I*1.61484,-4.90167,-2.77536+I*(-1.61484),-1.31815+I*(-1.01078)},{-0.399279+I*1.60339,-0.524105+I*3.76716,ComplexInfinity,-0.524105+I*(-3.76716),-0.399279+I*(-1.60339)},{0.515524+I*1.30733,1.65113+I*1.83788,3.62561,1.65113+I*(-1.83788),0.515524+I*(-1.30733)},{0.818164+I*0.763314,1.38511+I*0.673182,1.77245,1.38511+I*(-0.673182),0.818164+I*(-0.763314)}}");
+				"{{-1.58148+I*0.0548502,-2.75473+I*0.0310004,-3.54491+I*(-4.34126*10^-16),-2.75473+I*(-0.0310004),-1.58148+I*(-0.0548502)},{-1.31815+I*1.01078,-2.77536+I*1.61484,-4.90167+I*(-6.00281*10^-16),-2.77536+I*(-1.61484),-1.31815+I*(-1.01078)},{-0.399279+I*1.60339,-0.524105+I*3.76716,ComplexInfinity,-0.524105+I*(-3.76716),-0.399279+I*(-1.60339)},{0.515524+I*1.30733,1.65113+I*1.83788,3.62561,1.65113+I*(-1.83788),0.515524+I*(-1.30733)},{0.818164+I*0.763314,1.38511+I*0.673182,1.77245,1.38511+I*(-0.673182),0.818164+I*(-0.763314)}}");
 		check("Table(Gamma(x+I ), {x,-10.0, 10.0, 1/2})", //
 				"{5.57498*10^-8+I*5.54232*10^-8,-1.68355*10^-7+I*1.86667*10^-7,-6.12921*10^-7+I*(-4.98482*10^-7),1.41270*10^-6+I*(-1.94169*10^-6),6.01477*10^-6+I*3.87342*10^-6,-0.0000100663+I*0.0000179171,-0.0000519916+I*(-0.0000249726),0.00005758+I*(-0.000144445),0.000388914+I*0.000122817,-0.000229825+I*0.00099647,-0.0024563+I*(-0.000347985),0.00026757+I*(-0.00571041),0.0126295+I*(-0.000716374),0.00450635+I*0.0259644,-0.0498016+I*0.015495,-0.0417366+I*(-0.0863691),0.13391+I*(-0.0962865),0.190711+I*0.174186,-0.171533+I*0.326483,-0.460252+I*(-0.0705685),-0.15495+I*(-0.498016),0.300695+I*(-0.424968),0.498016+I*(-0.15495),0.575315+I*0.0882107,0.652965+I*0.343066,0.774762+I*0.707631,0.962865+I*1.3391,1.22927+I*2.54384,1.5495+I*4.98016,1.75862+I*10.13271,1.21784+I*21.47013,-2.21893+I*47.35583,-15.38094+I*108.5685,-59.55994+I*258.2382,-200.8541+I*636.0298,-645.3778+I*1618.988,-2042.009+I*4251.355,-6459.321+I*11497.03,-20587.42+I*31968.83,-66401.27+I*91265.46,-217255.6+I*267132.0}");
 
@@ -5448,7 +5456,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testIntegrate() {
 		// check("Limit(1/9*x*(9-x^2)^(3/2)*Hypergeometric2F1(1,2,3/2,x^2/9),x->3)", //
 		// "");
-
 		check("Integrate(x^n,x)", //
 				"x^(1+n)/(1+n)");
 		check("Integrate(x^n,{x,0,1})", //
@@ -6143,6 +6150,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"ConditionalExpression(0,n>-13)");
 		// check("Limit(x^(13+n)/a,x->0)", //
 		// "");
+
 		check("Limit(E^(3*x), x->a)", //
 				"E^(3*a)");
 
@@ -6747,7 +6755,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("MatchQ(22/7, _Rational)", "True");
 		check("MatchQ(6/3, _Rational)", "False");
 
-		check("MatchQ(22/7, _Rational)",//
+		check("MatchQ(22/7, _Rational)", //
 				"True");
 		check("MatchQ(b*x,a_.+x^n_.*b_./;FreeQ({a,b,n},x))", //
 				"True");
@@ -6881,6 +6889,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Maximize(-2*x^2 - 3*x + 5, x)", //
 				"{49/8,{x->-3/4}}");
 	}
+
 	public void testMean() {
 		check("Mean({26, 64, 36})", "42");
 		check("Mean({1, 1, 2, 3, 5, 8})", "10/3");
@@ -7067,6 +7076,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Minimize(2*x^2 - 3*x + 5, x)", //
 				"{31/8,{x->3/4}}");
 	}
+
 	public void testMinus() {
 		check("Minus(a)", "-a");
 		check("-a //FullForm", "Times(-1, a)");
@@ -7307,7 +7317,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testNDSolve() {
 
-		check("NDSolve({ y(x)*Cos(x + y(x))== (y'(x)), y(0)==1}, y, {x, 0, 30})",//
+		check("NDSolve({ y(x)*Cos(x + y(x))== (y'(x)), y(0)==1}, y, {x, 0, 30})", //
 				"InterpolatingFunction(\n" + "{{0.0,1.04865},\n" + " {0.1,1.08548},\n" + " {0.2,1.10965},\n"
 						+ " {0.3,1.12126},\n" + " {0.4,1.12111},\n" + " {0.5,1.11044},\n" + " {0.6,1.09069},\n"
 						+ " {0.7,1.06335},\n" + " {0.8,1.02981},\n" + " {0.9,0.991387},\n" + " {1.0,0.949215},\n"
@@ -7977,21 +7987,21 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testOneIdentityOrderless() {
 
-      // github issue 89
+		// github issue 89
 
-      check("Module[{e}, ClearAll[eqv]; SetAttributes[eqv, {Flat}]; eqv[p, q, r] /. {eqv[x_, y_] :> {x, y}}]",
-            "{eqv(p),eqv(q,r)}");
+		check("Module[{e}, ClearAll[eqv]; SetAttributes[eqv, {Flat}]; eqv[p, q, r] /. {eqv[x_, y_] :> {x, y}}]",
+				"{eqv(p),eqv(q,r)}");
 
-      check("Module[{e}, ClearAll[eqv]; SetAttributes[eqv, {Flat, OneIdentity}]; eqv[p, q, r] /. {eqv[x_, y_] :> {x, y}}]",
-            "{p,eqv(q,r)}");
+		check("Module[{e}, ClearAll[eqv]; SetAttributes[eqv, {Flat, OneIdentity}]; eqv[p, q, r] /. {eqv[x_, y_] :> {x, y}}]",
+				"{p,eqv(q,r)}");
 
 		// See discussion here:
 		// https://mathematica.stackexchange.com/questions/183322/subtle-order-of-evaluation-issues-when-pattern-matching-with-attributes
-      check("Module[{e}, ClearAll[eqv]; SetAttributes[eqv, {Flat, Orderless}]; eqv[p, q, r] /. {eqv[x_, y_] :> {x, y}}]",
-            "{p,eqv(q,r)}");
+		check("Module[{e}, ClearAll[eqv]; SetAttributes[eqv, {Flat, Orderless}]; eqv[p, q, r] /. {eqv[x_, y_] :> {x, y}}]",
+				"{p,eqv(q,r)}");
 
-      check("Module[{e}, ClearAll[eqv]; SetAttributes[eqv, {Flat, OneIdentity, Orderless}]; eqv[p, q, r] /. {eqv[x_, y_] :> {x, y}}]",
-            "{p,eqv(q,r)}");
+		check("Module[{e}, ClearAll[eqv]; SetAttributes[eqv, {Flat, OneIdentity, Orderless}]; eqv[p, q, r] /. {eqv[x_, y_] :> {x, y}}]",
+				"{p,eqv(q,r)}");
 
 		check("SetAttributes(f,{Orderless,OneIdentity})", "");
 		check("f(p, q) /. {f(x_,y_) :> {x,y}}", "{p,q}");
@@ -8133,6 +8143,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"True");
 		check("MatchQ(x^x, x^Optional(exp_))", //
 				"True");
+
 		check("f(a) /. f(x_, y_:3) -> {x, y}", "{a,3}");
 
 		check("f(x_, Optional(y_,1)) := {x, y}", "");
@@ -8946,7 +8957,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testPossibleZeroQ() {
 		check("PossibleZeroQ(2^(2*I) - 2^(-2*I) - 2*I*Sin(Log(4)))", //
 				"True");
-		check("PossibleZeroQ(E^Pi - Pi^E)",//
+		check("PossibleZeroQ(E^Pi - Pi^E)", //
 				"False");
 		check("PossibleZeroQ((E + Pi)^2 - E^2 - Pi^2 - 2*E*Pi)", //
 				"True");
@@ -9326,6 +9337,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testPrimePowerQ() {
 		check("PrimePowerQ(1)", "False");
+
 		check("13^9", "10604499373");
 		check("PrimePowerQ(10604499373)", "True");
 		check("PrimePowerQ(-8)", "True");
@@ -10024,7 +10036,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"xvar__");
 		check("x___ /. x->xvar", //
 				"xvar___");
-		check("a + b + c /. a + c -> p",//
+		check("a + b + c /. a + c -> p", //
 				"b+p");
 		// check("g(a + b + c + d, b + d) /. g(x_ + y_, x_) -> p(x, y)", "p(b+d,a+c)");
 
@@ -10169,135 +10181,135 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Replace({a, b, c, d, e, f}, {x__, y__} -> {{x}, {y}})", //
 				"{{a},{b,c,d,e,f}}");
 
-		check("ReplaceList(a+b,(x_+y_) :> {{x},{y}})",//
+		check("ReplaceList(a+b,(x_+y_) :> {{x},{y}})", //
 				"{{{a},{b}}," //
-				+ "{{b},{a}}}");
+						+ "{{b},{a}}}");
 
-		check("ReplaceList(a+b+c,(x_+y_) :> {{x},{y}})",//
+		check("ReplaceList(a+b+c,(x_+y_) :> {{x},{y}})", //
 				"{{{a},{b+c}},"//
-				+ "{{b},{a+c}},"//
-				+ "{{c},{a+b}},"//
-				+ "{{a+b},{c}},"//
-				+ "{{a+c},{b}},"//
-				+ "{{b+c},{a}}}");
+						+ "{{b},{a+c}},"//
+						+ "{{c},{a+b}},"//
+						+ "{{a+b},{c}},"//
+						+ "{{a+c},{b}},"//
+						+ "{{b+c},{a}}}");
 
 		check("ReplaceList(a+b+c+d+e+f,(x_+y_+z_) :> {{x},{y},{z}})", //
 				"{{{a},{b},{c+d+e+f}},"//
-				+ "{{a},{c},{b+d+e+f}},"//
-				+ "{{a},{d},{b+c+e+f}},"//
-				+ "{{a},{e},{b+c+d+f}},"//
-				+ "{{a},{f},{b+c+d+e}},"//
-				+ "{{b},{a},{c+d+e+f}},"//
-				+ "{{b},{c},{a+d+e+f}},"//
-				+ "{{b},{d},{a+c+e+f}},"//
-				+ "{{b},{e},{a+c+d+f}},"//
-				+ "{{b},{f},{a+c+d+e}},"//
-				+ "{{c},{a},{b+d+e+f}},"//
-				+ "{{c},{b},{a+d+e+f}},"//
-				+ "{{c},{d},{a+b+e+f}},"//
-				+ "{{c},{e},{a+b+d+f}},"//
-				+ "{{c},{f},{a+b+d+e}},"//
-				+ "{{d},{a},{b+c+e+f}},"//
-				+ "{{d},{b},{a+c+e+f}},"//
-				+ "{{d},{c},{a+b+e+f}},"//
-				+ "{{d},{e},{a+b+c+f}},"//
-				+ "{{d},{f},{a+b+c+e}},"//
-				+ "{{e},{a},{b+c+d+f}},"//
-				+ "{{e},{b},{a+c+d+f}},"//
-				+ "{{e},{c},{a+b+d+f}},"//
-				+ "{{e},{d},{a+b+c+f}},"//
-				+ "{{e},{f},{a+b+c+d}},"//
-				+ "{{f},{a},{b+c+d+e}},"//
-				+ "{{f},{b},{a+c+d+e}},"//
-				+ "{{f},{c},{a+b+d+e}},"//
-				+ "{{f},{d},{a+b+c+e}},"//
-				+ "{{f},{e},{a+b+c+d}},"//
-				+ "{{a},{b+c},{d+e+f}},"//
-				+ "{{a},{b+d},{c+e+f}},"//
-				+ "{{a},{b+e},{c+d+f}},"//
-				+ "{{a},{b+f},{c+d+e}},"//
-				+ "{{a},{c+d},{b+e+f}},"//
-				+ "{{a},{c+e},{b+d+f}},"//
-				+ "{{a},{c+f},{b+d+e}},"//
-				+ "{{a},{d+e},{b+c+f}},"//
-				+ "{{a},{d+f},{b+c+e}},"//
-				+ "{{a},{e+f},{b+c+d}},"//
-				+ "{{b},{a+c},{d+e+f}},"//
-				+ "{{b},{a+d},{c+e+f}},"//
-				+ "{{b},{a+e},{c+d+f}},"//
-				+ "{{b},{a+f},{c+d+e}},"//
-				+ "{{b},{c+d},{a+e+f}},"//
-				+ "{{b},{c+e},{a+d+f}},"//
-				+ "{{b},{c+f},{a+d+e}},"//
-				+ "{{b},{d+e},{a+c+f}},"//
-				+ "{{b},{d+f},{a+c+e}},"//
-				+ "{{b},{e+f},{a+c+d}},"//
-				+ "{{c},{a+b},{d+e+f}},"//
-				+ "{{c},{a+d},{b+e+f}},"//
-				+ "{{c},{a+e},{b+d+f}},"//
-				+ "{{c},{a+f},{b+d+e}},"//
-				+ "{{c},{b+d},{a+e+f}},"//
-				+ "{{c},{b+e},{a+d+f}},"//
-				+ "{{c},{b+f},{a+d+e}},"//
-				+ "{{c},{d+e},{a+b+f}},"//
-				+ "{{c},{d+f},{a+b+e}},"//
-				+ "{{c},{e+f},{a+b+d}},"//
-				+ "{{d},{a+b},{c+e+f}},"//
-				+ "{{d},{a+c},{b+e+f}},"//
-				+ "{{d},{a+e},{b+c+f}},"//
-				+ "{{d},{a+f},{b+c+e}},"//
-				+ "{{d},{b+c},{a+e+f}},"//
-				+ "{{d},{b+e},{a+c+f}},"//
-				+ "{{d},{b+f},{a+c+e}},"//
-				+ "{{d},{c+e},{a+b+f}},"//
-				+ "{{d},{c+f},{a+b+e}},"//
-				+ "{{d},{e+f},{a+b+c}},"//
-				+ "{{e},{a+b},{c+d+f}},"//
-				+ "{{e},{a+c},{b+d+f}},{{e},{a+d},{b+c+f}},{{e},{a+f},{b+c+d}},{{e},{b+c},{a+d+f}},{{e},{b+d},{a+c+f}},{{e},{b+f},{a+c+d}},{{e},{c+d},{a+b+f}},"
-				+ "{{e},{c+f},{a+b+d}},{{e},{d+f},{a+b+c}},{{f},{a+b},{c+d+e}},"//
-				+ "{{f},{a+c},{b+d+e}},{{f},{a+d},{b+c+e}},{{f},{a+e},{b+c+d}},{{f},{b+c},{a+d+e}},"//
-				+ "{{f},{b+d},{a+c+e}},{{f},{b+e},{a+c+d}},{{f},{c+d},{a+b+e}},{{f},{c+e},{a+b+d}},"//
-				+ "{{f},{d+e},{a+b+c}},{{a},{b+c+d},{e+f}},{{a},{b+c+e},{d+f}},{{a},{b+c+f},{d+e}},"//
-				+ "{{a},{b+d+e},{c+f}},{{a},{b+d+f},{c+e}},{{a},{b+e+f},{c+d}},{{a},{c+d+e},{b+f}},"//
-				+ "{{a},{c+d+f},{b+e}},{{a},{c+e+f},{b+d}},{{a},{d+e+f},{b+c}},{{b},{a+c+d},{e+f}},"//
-				+ "{{b},{a+c+e},{d+f}},{{b},{a+c+f},{d+e}},{{b},{a+d+e},{c+f}},{{b},{a+d+f},{c+e}},"//
-				+ "{{b},{a+e+f},{c+d}},{{b},{c+d+e},{a+f}},{{b},{c+d+f},{a+e}},{{b},{c+e+f},{a+d}},"//
-				+ "{{b},{d+e+f},{a+c}},{{c},{a+b+d},{e+f}},{{c},{a+b+e},{d+f}},{{c},{a+b+f},{d+e}},{{c},{a+d+e},{b+f}},"//
-				+ "{{c},{a+d+f},{b+e}},{{c},{a+e+f},{b+d}},{{c},{b+d+e},{a+f}},{{c},{b+d+f},{a+e}},{{c},{b+e+f},{a+d}},"//
-				+ "{{c},{d+e+f},{a+b}},{{d},{a+b+c},{e+f}},{{d},{a+b+e},{c+f}},{{d},{a+b+f},{c+e}},{{d},{a+c+e},{b+f}},"//
-				+ "{{d},{a+c+f},{b+e}},{{d},{a+e+f},{b+c}},{{d},{b+c+e},{a+f}},{{d},{b+c+f},{a+e}},{{d},{b+e+f},{a+c}},"//
-				+ "{{d},{c+e+f},{a+b}},{{e},{a+b+c},{d+f}},{{e},{a+b+d},{c+f}},{{e},{a+b+f},{c+d}},{{e},{a+c+d},{b+f}},"//
-				+ "{{e},{a+c+f},{b+d}},{{e},{a+d+f},{b+c}},{{e},{b+c+d},{a+f}},{{e},{b+c+f},{a+d}},{{e},{b+d+f},{a+c}},"//
-				+ "{{e},{c+d+f},{a+b}},{{f},{a+b+c},{d+e}},{{f},{a+b+d},{c+e}},{{f},{a+b+e},{c+d}},{{f},{a+c+d},{b+e}},"//
-				+ "{{f},{a+c+e},{b+d}},{{f},{a+d+e},{b+c}},{{f},{b+c+d},{a+e}},{{f},{b+c+e},{a+d}},{{f},{b+d+e},{a+c}},"//
-				+ "{{f},{c+d+e},{a+b}},{{a},{b+c+d+e},{f}},{{a},{b+c+d+f},{e}},{{a},{b+c+e+f},{d}},{{a},{b+d+e+f},{c}},"//
-				+ "{{a},{c+d+e+f},{b}},{{b},{a+c+d+e},{f}},{{b},{a+c+d+f},{e}},{{b},{a+c+e+f},{d}},{{b},{a+d+e+f},{c}},"//
-				+ "{{b},{c+d+e+f},{a}},{{c},{a+b+d+e},{f}},{{c},{a+b+d+f},{e}},{{c},{a+b+e+f},{d}},{{c},{a+d+e+f},{b}},"//
-				+ "{{c},{b+d+e+f},{a}},{{d},{a+b+c+e},{f}},{{d},{a+b+c+f},{e}},{{d},{a+b+e+f},{c}},{{d},{a+c+e+f},{b}},"//
-				+ "{{d},{b+c+e+f},{a}},{{e},{a+b+c+d},{f}},{{e},{a+b+c+f},{d}},{{e},{a+b+d+f},{c}},{{e},{a+c+d+f},{b}},"//
-				+ "{{e},{b+c+d+f},{a}},{{f},{a+b+c+d},{e}},{{f},{a+b+c+e},{d}},{{f},{a+b+d+e},{c}},{{f},{a+c+d+e},{b}},{{f},{b+c+d+e},{a}},{{a+b},{c},{d+e+f}},{{a+b},{d},{c+e+f}},{{a+b},{e},{c+d+f}},{{a+b},{f},{c+d+e}},{{a+c},{b},{d+e+f}},{{a+c},{d},{b+e+f}},{{a+c},{e},{b+d+f}},{{a+c},{f},{b+d+e}},{{a+d},{b},{c+e+f}},{{a+d},{c},{b+e+f}},{{a+d},{e},{b+c+f}},{{a+d},{f},{b+c+e}},{{a+e},{b},{c+d+f}},{{a+e},{c},{b+d+f}},{{a+e},{d},{b+c+f}},{{a+e},{f},{b+c+d}},{{a+f},{b},{c+d+e}},{{a+f},{c},{b+d+e}},{{a+f},{d},{b+c+e}},{{a+f},{e},{b+c+d}},{{b+c},{a},{d+e+f}},{{b+c},{d},{a+e+f}},{{b+c},{e},{a+d+f}},{{b+c},{f},{a+d+e}},{{b+d},{a},{c+e+f}},{{b+d},{c},{a+e+f}},{{b+d},{e},{a+c+f}},{{b+d},{f},{a+c+e}},{{b+e},{a},{c+d+f}},{{b+e},{c},{a+d+f}},{{b+e},{d},{a+c+f}},{{b+e},{f},{a+c+d}},{{b+f},{a},{c+d+e}},{{b+f},{c},{a+d+e}},{{b+f},{d},{a+c+e}},{{b+f},{e},{a+c+d}},{{c+d},{a},{b+e+f}},{{c+d},{b},{a+e+f}},{{c+d},{e},{a+b+f}},{{c+d},{f},{a+b+e}},{{c+e},{a},{b+d+f}},{{c+e},{b},{a+d+f}},{{c+e},{d},{a+b+f}},{{c+e},{f},{a+b+d}},{{c+f},{a},{b+d+e}},{{c+f},{b},{a+d+e}},{{c+f},{d},{a+b+e}},{{c+f},{e},{a+b+d}},{{d+e},{a},{b+c+f}},{{d+e},{b},{a+c+f}},{{d+e},{c},{a+b+f}},{{d+e},{f},{a+b+c}},{{d+f},{a},{b+c+e}},{{d+f},{b},{a+c+e}},{{d+f},{c},{a+b+e}},{{d+f},{e},{a+b+c}},{{e+f},{a},{b+c+d}},{{e+f},{b},{a+c+d}},{{e+f},{c},{a+b+d}},{{e+f},{d},{a+b+c}},{{a+b},{c+d},{e+f}},{{a+b},{c+e},{d+f}},{{a+b},{c+f},{d+e}},{{a+b},{d+e},{c+f}},{{a+b},{d+f},{c+e}},{{a+b},{e+f},{c+d}},{{a+c},{b+d},{e+f}},{{a+c},{b+e},{d+f}},{{a+c},{b+f},{d+e}},{{a+c},{d+e},{b+f}},{{a+c},{d+f},{b+e}},{{a+c},{e+f},{b+d}},{{a+d},{b+c},{e+f}},{{a+d},{b+e},{c+f}},{{a+d},{b+f},{c+e}},{{a+d},{c+e},{b+f}},{{a+d},{c+f},{b+e}},{{a+d},{e+f},{b+c}},{{a+e},{b+c},{d+f}},{{a+e},{b+d},{c+f}},{{a+e},{b+f},{c+d}},{{a+e},{c+d},{b+f}},{{a+e},{c+f},{b+d}},{{a+e},{d+f},{b+c}},{{a+f},{b+c},{d+e}},{{a+f},{b+d},{c+e}},{{a+f},{b+e},{c+d}},{{a+f},{c+d},{b+e}},{{a+f},{c+e},{b+d}},{{a+f},{d+e},{b+c}},{{b+c},{a+d},{e+f}},{{b+c},{a+e},{d+f}},{{b+c},{a+f},{d+e}},{{b+c},{d+e},{a+f}},{{b+c},{d+f},{a+e}},{{b+c},{e+f},{a+d}},{{b+d},{a+c},{e+f}},{{b+d},{a+e},{c+f}},{{b+d},{a+f},{c+e}},{{b+d},{c+e},{a+f}},{{b+d},{c+f},{a+e}},{{b+d},{e+f},{a+c}},{{b+e},{a+c},{d+f}},{{b+e},{a+d},{c+f}},{{b+e},{a+f},{c+d}},{{b+e},{c+d},{a+f}},{{b+e},{c+f},{a+d}},{{b+e},{d+f},{a+c}},{{b+f},{a+c},{d+e}},{{b+f},{a+d},{c+e}},{{b+f},{a+e},{c+d}},{{b+f},{c+d},{a+e}},{{b+f},{c+e},{a+d}},{{b+f},{d+e},{a+c}},{{c+d},{a+b},{e+f}},{{c+d},{a+e},{b+f}},{{c+d},{a+f},{b+e}},{{c+d},{b+e},{a+f}},{{c+d},{b+f},{a+e}},{{c+d},{e+f},{a+b}},{{c+e},{a+b},{d+f}},{{c+e},{a+d},{b+f}},{{c+e},{a+f},{b+d}},{{c+e},{b+d},{a+f}},{{c+e},{b+f},{a+d}},{{c+e},{d+f},{a+b}},{{c+f},{a+b},{d+e}},{{c+f},{a+d},{b+e}},{{c+f},{a+e},{b+d}},{{c+f},{b+d},{a+e}},{{c+f},{b+e},{a+d}},{{c+f},{d+e},{a+b}},{{d+e},{a+b},{c+f}},{{d+e},{a+c},{b+f}},{{d+e},{a+f},{b+c}},{{d+e},{b+c},{a+f}},{{d+e},{b+f},{a+c}},{{d+e},{c+f},{a+b}},{{d+f},{a+b},{c+e}},{{d+f},{a+c},{b+e}},{{d+f},{a+e},{b+c}},{{d+f},{b+c},{a+e}},{{d+f},{b+e},{a+c}},{{d+f},{c+e},{a+b}},{{e+f},{a+b},{c+d}},{{e+f},{a+c},{b+d}},"
-				+ "{{e+f},{a+d},{b+c}},{{e+f},{b+c},{a+d}},{{e+f},{b+d},{a+c}},{{e+f},{c+d},{a+b}},{{a+b},{c+d+e},{f}},"//
-				+ "{{a+b},{c+d+f},{e}},{{a+b},{c+e+f},{d}},{{a+b},{d+e+f},{c}},{{a+c},{b+d+e},{f}},{{a+c},{b+d+f},{e}},{{a+c},{b+e+f},{d}},{{a+c},{d+e+f},{b}},{{a+d},{b+c+e},{f}},{{a+d},{b+c+f},{e}},{{a+d},{b+e+f},{c}},{{a+d},{c+e+f},{b}},{{a+e},{b+c+d},{f}},{{a+e},{b+c+f},{d}},{{a+e},{b+d+f},{c}},{{a+e},{c+d+f},{b}},{{a+f},{b+c+d},{e}},{{a+f},{b+c+e},{d}},{{a+f},{b+d+e},{c}},{{a+f},{c+d+e},{b}},{{b+c},{a+d+e},{f}},{{b+c},{a+d+f},{e}},{{b+c},{a+e+f},{d}},{{b+c},{d+e+f},{a}},{{b+d},{a+c+e},{f}},{{b+d},{a+c+f},{e}},{{b+d},{a+e+f},{c}},{{b+d},{c+e+f},{a}},{{b+e},{a+c+d},{f}},{{b+e},{a+c+f},{d}},{{b+e},{a+d+f},{c}},{{b+e},{c+d+f},{a}},{{b+f},{a+c+d},{e}},{{b+f},{a+c+e},{d}},{{b+f},{a+d+e},{c}},{{b+f},{c+d+e},{a}},{{c+d},{a+b+e},{f}},"
-				+ "{{c+d},{a+b+f},{e}},{{c+d},{a+e+f},{b}},{{c+d},{b+e+f},{a}},{{c+e},{a+b+d},{f}},{{c+e},{a+b+f},{d}},{{c+e},{a+d+f},{b}},{{c+e},{b+d+f},{a}},{{c+f},{a+b+d},{e}},{{c+f},{a+b+e},{d}},{{c+f},{a+d+e},{b}},{{c+f},{b+d+e},{a}},{{d+e},{a+b+c},{f}},{{d+e},{a+b+f},{c}},{{d+e},{a+c+f},{b}},{{d+e},{b+c+f},{a}},{{d+f},{a+b+c},{e}},{{d+f},{a+b+e},{c}},{{d+f},{a+c+e},{b}},{{d+f},{b+c+e},{a}},{{e+f},{a+b+c},{d}},{{e+f},{a+b+d},{c}},{{e+f},{a+c+d},{b}},{{e+f},{b+c+d},{a}},{{a+b+c},{d},{e+f}},{{a+b+c},{e},{d+f}},{{a+b+c},{f},{d+e}},{{a+b+d},{c},{e+f}},{{a+b+d},{e},{c+f}},{{a+b+d},{f},{c+e}},{{a+b+e},{c},{d+f}},{{a+b+e},{d},{c+f}},{{a+b+e},{f},{c+d}},{{a+b+f},{c},{d+e}},{{a+b+f},{d},{c+e}},{{a+b+f},{e},{c+d}},{{a+c+d},{b},{e+f}},{{a+c+d},{e},{b+f}},{{a+c+d},{f},{b+e}},{{a+c+e},{b},{d+f}},{{a+c+e},{d},{b+f}},{{a+c+e},{f},{b+d}},{{a+c+f},{b},{d+e}},{{a+c+f},{d},{b+e}},{{a+c+f},{e},{b+d}},{{a+d+e},{b},{c+f}},{{a+d+e},{c},{b+f}},{{a+d+e},{f},{b+c}},{{a+d+f},{b},{c+e}},{{a+d+f},{c},{b+e}},{{a+d+f},{e},{b+c}},{{a+e+f},{b},{c+d}},{{a+e+f},{c},{b+d}},{{a+e+f},{d},{b+c}},{{b+c+d},{a},{e+f}},{{b+c+d},{e},{a+f}},{{b+c+d},{f},{a+e}},{{b+c+e},{a},{d+f}},{{b+c+e},{d},{a+f}},{{b+c+e},{f},{a+d}},{{b+c+f},{a},{d+e}},{{b+c+f},{d},{a+e}},{{b+c+f},{e},{a+d}},"
-				+ "{{b+d+e},{a},{c+f}},{{b+d+e},{c},{a+f}},{{b+d+e},{f},{a+c}},{{b+d+f},{a},{c+e}},{{b+d+f},{c},{a+e}},{{b+d+f},{e},{a+c}},{{b+e+f},{a},{c+d}},{{b+e+f},{c},{a+d}},{{b+e+f},{d},{a+c}},{{c+d+e},{a},{b+f}},{{c+d+e},{b},{a+f}},{{c+d+e},{f},{a+b}},{{c+d+f},{a},{b+e}},{{c+d+f},{b},{a+e}},{{c+d+f},{e},{a+b}},{{c+e+f},{a},{b+d}},{{c+e+f},{b},{a+d}},{{c+e+f},{d},{a+b}},{{d+e+f},{a},{b+c}},{{d+e+f},{b},{a+c}},{{d+e+f},{c},{a+b}},{{a+b+c},{d+e},{f}},{{a+b+c},{d+f},{e}},{{a+b+c},{e+f},{d}},{{a+b+d},{c+e},{f}},{{a+b+d},{c+f},{e}},{{a+b+d},{e+f},{c}},{{a+b+e},{c+d},{f}},{{a+b+e},{c+f},{d}},{{a+b+e},{d+f},{c}},{{a+b+f},{c+d},{e}},{{a+b+f},{c+e},{d}},{{a+b+f},{d+e},{c}},{{a+c+d},{b+e},{f}},{{a+c+d},{b+f},{e}},{{a+c+d},{e+f},{b}},{{a+c+e},{b+d},{f}},{{a+c+e},{b+f},{d}},{{a+c+e},{d+f},{b}},{{a+c+f},{b+d},{e}},{{a+c+f},{b+e},{d}},{{a+c+f},{d+e},{b}},{{a+d+e},{b+c},{f}},{{a+d+e},{b+f},{c}},{{a+d+e},{c+f},{b}},{{a+d+f},{b+c},{e}},{{a+d+f},{b+e},{c}},{{a+d+f},{c+e},{b}},{{a+e+f},{b+c},{d}},{{a+e+f},{b+d},{c}},{{a+e+f},{c+d},{b}},{{b+c+d},{a+e},{f}},{{b+c+d},{a+f},{e}},{{b+c+d},{e+f},{a}},{{b+c+e},{a+d},{f}},{{b+c+e},{a+f},{d}},{{b+c+e},{d+f},{a}},{{b+c+f},{a+d},{e}},{{b+c+f},{a+e},{d}},{{b+c+f},{d+e},{a}},{{b+d+e},{a+c},{f}},{{b+d+e},{a+f},{c}},{{b+d+e},{c+f},{a}},{{b+d+f},{a+c},{e}},{{b+d+f},{a+e},{c}},{{b+d+f},{c+e},{a}},{{b+e+f},{a+c},{d}},{{b+e+f},{a+d},{c}},{{b+e+f},{c+d},{a}},{{c+d+e},{a+b},{f}},{{c+d+e},{a+f},{b}},{{c+d+e},{b+f},{a}},{{c+d+f},{a+b},{e}},{{c+d+f},{a+e},{b}},{{c+d+f},{b+e},{a}},{{c+e+f},{a+b},{d}},{{c+e+f},{a+d},{b}},{{c+e+f},{b+d},{a}},{{d+e+f},{a+b},{c}},"
-				+ "{{d+e+f},{a+c},{b}},{{d+e+f},{b+c},{a}},{{a+b+c+d},{e},{f}},{{a+b+c+d},{f},{e}},{{a+b+c+e},{d},{f}},{{a+b+c+e},{f},{d}},{{a+b+c+f},{d},{e}},{{a+b+c+f},{e},{d}},{{a+b+d+e},{c},{f}},{{a+b+d+e},{f},{c}},"
-				+ "{{a+b+d+f},{c},{e}},{{a+b+d+f},{e},{c}},{{a+b+e+f},{c},{d}},{{a+b+e+f},{d},{c}},{{a+c+d+e},{b},{f}},"//
-				+ "{{a+c+d+e},{f},{b}},{{a+c+d+f},{b},{e}},{{a+c+d+f},{e},{b}},{{a+c+e+f},{b},{d}},"//
-				+ "{{a+c+e+f},{d},{b}},{{a+d+e+f},{b},{c}},{{a+d+e+f},{c},{b}},{{b+c+d+e},{a},{f}},"//
-				+ "{{b+c+d+e},{f},{a}},{{b+c+d+f},{a},{e}},{{b+c+d+f},{e},{a}},{{b+c+e+f},{a},{d}},"//
-				+ "{{b+c+e+f},{d},{a}},{{b+d+e+f},{a},{c}},{{b+d+e+f},{c},{a}},{{c+d+e+f},{a},{b}},"//
-				+ "{{c+d+e+f},{b},{a}}}");
+						+ "{{a},{c},{b+d+e+f}},"//
+						+ "{{a},{d},{b+c+e+f}},"//
+						+ "{{a},{e},{b+c+d+f}},"//
+						+ "{{a},{f},{b+c+d+e}},"//
+						+ "{{b},{a},{c+d+e+f}},"//
+						+ "{{b},{c},{a+d+e+f}},"//
+						+ "{{b},{d},{a+c+e+f}},"//
+						+ "{{b},{e},{a+c+d+f}},"//
+						+ "{{b},{f},{a+c+d+e}},"//
+						+ "{{c},{a},{b+d+e+f}},"//
+						+ "{{c},{b},{a+d+e+f}},"//
+						+ "{{c},{d},{a+b+e+f}},"//
+						+ "{{c},{e},{a+b+d+f}},"//
+						+ "{{c},{f},{a+b+d+e}},"//
+						+ "{{d},{a},{b+c+e+f}},"//
+						+ "{{d},{b},{a+c+e+f}},"//
+						+ "{{d},{c},{a+b+e+f}},"//
+						+ "{{d},{e},{a+b+c+f}},"//
+						+ "{{d},{f},{a+b+c+e}},"//
+						+ "{{e},{a},{b+c+d+f}},"//
+						+ "{{e},{b},{a+c+d+f}},"//
+						+ "{{e},{c},{a+b+d+f}},"//
+						+ "{{e},{d},{a+b+c+f}},"//
+						+ "{{e},{f},{a+b+c+d}},"//
+						+ "{{f},{a},{b+c+d+e}},"//
+						+ "{{f},{b},{a+c+d+e}},"//
+						+ "{{f},{c},{a+b+d+e}},"//
+						+ "{{f},{d},{a+b+c+e}},"//
+						+ "{{f},{e},{a+b+c+d}},"//
+						+ "{{a},{b+c},{d+e+f}},"//
+						+ "{{a},{b+d},{c+e+f}},"//
+						+ "{{a},{b+e},{c+d+f}},"//
+						+ "{{a},{b+f},{c+d+e}},"//
+						+ "{{a},{c+d},{b+e+f}},"//
+						+ "{{a},{c+e},{b+d+f}},"//
+						+ "{{a},{c+f},{b+d+e}},"//
+						+ "{{a},{d+e},{b+c+f}},"//
+						+ "{{a},{d+f},{b+c+e}},"//
+						+ "{{a},{e+f},{b+c+d}},"//
+						+ "{{b},{a+c},{d+e+f}},"//
+						+ "{{b},{a+d},{c+e+f}},"//
+						+ "{{b},{a+e},{c+d+f}},"//
+						+ "{{b},{a+f},{c+d+e}},"//
+						+ "{{b},{c+d},{a+e+f}},"//
+						+ "{{b},{c+e},{a+d+f}},"//
+						+ "{{b},{c+f},{a+d+e}},"//
+						+ "{{b},{d+e},{a+c+f}},"//
+						+ "{{b},{d+f},{a+c+e}},"//
+						+ "{{b},{e+f},{a+c+d}},"//
+						+ "{{c},{a+b},{d+e+f}},"//
+						+ "{{c},{a+d},{b+e+f}},"//
+						+ "{{c},{a+e},{b+d+f}},"//
+						+ "{{c},{a+f},{b+d+e}},"//
+						+ "{{c},{b+d},{a+e+f}},"//
+						+ "{{c},{b+e},{a+d+f}},"//
+						+ "{{c},{b+f},{a+d+e}},"//
+						+ "{{c},{d+e},{a+b+f}},"//
+						+ "{{c},{d+f},{a+b+e}},"//
+						+ "{{c},{e+f},{a+b+d}},"//
+						+ "{{d},{a+b},{c+e+f}},"//
+						+ "{{d},{a+c},{b+e+f}},"//
+						+ "{{d},{a+e},{b+c+f}},"//
+						+ "{{d},{a+f},{b+c+e}},"//
+						+ "{{d},{b+c},{a+e+f}},"//
+						+ "{{d},{b+e},{a+c+f}},"//
+						+ "{{d},{b+f},{a+c+e}},"//
+						+ "{{d},{c+e},{a+b+f}},"//
+						+ "{{d},{c+f},{a+b+e}},"//
+						+ "{{d},{e+f},{a+b+c}},"//
+						+ "{{e},{a+b},{c+d+f}},"//
+						+ "{{e},{a+c},{b+d+f}},{{e},{a+d},{b+c+f}},{{e},{a+f},{b+c+d}},{{e},{b+c},{a+d+f}},{{e},{b+d},{a+c+f}},{{e},{b+f},{a+c+d}},{{e},{c+d},{a+b+f}},"
+						+ "{{e},{c+f},{a+b+d}},{{e},{d+f},{a+b+c}},{{f},{a+b},{c+d+e}},"//
+						+ "{{f},{a+c},{b+d+e}},{{f},{a+d},{b+c+e}},{{f},{a+e},{b+c+d}},{{f},{b+c},{a+d+e}},"//
+						+ "{{f},{b+d},{a+c+e}},{{f},{b+e},{a+c+d}},{{f},{c+d},{a+b+e}},{{f},{c+e},{a+b+d}},"//
+						+ "{{f},{d+e},{a+b+c}},{{a},{b+c+d},{e+f}},{{a},{b+c+e},{d+f}},{{a},{b+c+f},{d+e}},"//
+						+ "{{a},{b+d+e},{c+f}},{{a},{b+d+f},{c+e}},{{a},{b+e+f},{c+d}},{{a},{c+d+e},{b+f}},"//
+						+ "{{a},{c+d+f},{b+e}},{{a},{c+e+f},{b+d}},{{a},{d+e+f},{b+c}},{{b},{a+c+d},{e+f}},"//
+						+ "{{b},{a+c+e},{d+f}},{{b},{a+c+f},{d+e}},{{b},{a+d+e},{c+f}},{{b},{a+d+f},{c+e}},"//
+						+ "{{b},{a+e+f},{c+d}},{{b},{c+d+e},{a+f}},{{b},{c+d+f},{a+e}},{{b},{c+e+f},{a+d}},"//
+						+ "{{b},{d+e+f},{a+c}},{{c},{a+b+d},{e+f}},{{c},{a+b+e},{d+f}},{{c},{a+b+f},{d+e}},{{c},{a+d+e},{b+f}},"//
+						+ "{{c},{a+d+f},{b+e}},{{c},{a+e+f},{b+d}},{{c},{b+d+e},{a+f}},{{c},{b+d+f},{a+e}},{{c},{b+e+f},{a+d}},"//
+						+ "{{c},{d+e+f},{a+b}},{{d},{a+b+c},{e+f}},{{d},{a+b+e},{c+f}},{{d},{a+b+f},{c+e}},{{d},{a+c+e},{b+f}},"//
+						+ "{{d},{a+c+f},{b+e}},{{d},{a+e+f},{b+c}},{{d},{b+c+e},{a+f}},{{d},{b+c+f},{a+e}},{{d},{b+e+f},{a+c}},"//
+						+ "{{d},{c+e+f},{a+b}},{{e},{a+b+c},{d+f}},{{e},{a+b+d},{c+f}},{{e},{a+b+f},{c+d}},{{e},{a+c+d},{b+f}},"//
+						+ "{{e},{a+c+f},{b+d}},{{e},{a+d+f},{b+c}},{{e},{b+c+d},{a+f}},{{e},{b+c+f},{a+d}},{{e},{b+d+f},{a+c}},"//
+						+ "{{e},{c+d+f},{a+b}},{{f},{a+b+c},{d+e}},{{f},{a+b+d},{c+e}},{{f},{a+b+e},{c+d}},{{f},{a+c+d},{b+e}},"//
+						+ "{{f},{a+c+e},{b+d}},{{f},{a+d+e},{b+c}},{{f},{b+c+d},{a+e}},{{f},{b+c+e},{a+d}},{{f},{b+d+e},{a+c}},"//
+						+ "{{f},{c+d+e},{a+b}},{{a},{b+c+d+e},{f}},{{a},{b+c+d+f},{e}},{{a},{b+c+e+f},{d}},{{a},{b+d+e+f},{c}},"//
+						+ "{{a},{c+d+e+f},{b}},{{b},{a+c+d+e},{f}},{{b},{a+c+d+f},{e}},{{b},{a+c+e+f},{d}},{{b},{a+d+e+f},{c}},"//
+						+ "{{b},{c+d+e+f},{a}},{{c},{a+b+d+e},{f}},{{c},{a+b+d+f},{e}},{{c},{a+b+e+f},{d}},{{c},{a+d+e+f},{b}},"//
+						+ "{{c},{b+d+e+f},{a}},{{d},{a+b+c+e},{f}},{{d},{a+b+c+f},{e}},{{d},{a+b+e+f},{c}},{{d},{a+c+e+f},{b}},"//
+						+ "{{d},{b+c+e+f},{a}},{{e},{a+b+c+d},{f}},{{e},{a+b+c+f},{d}},{{e},{a+b+d+f},{c}},{{e},{a+c+d+f},{b}},"//
+						+ "{{e},{b+c+d+f},{a}},{{f},{a+b+c+d},{e}},{{f},{a+b+c+e},{d}},{{f},{a+b+d+e},{c}},{{f},{a+c+d+e},{b}},{{f},{b+c+d+e},{a}},{{a+b},{c},{d+e+f}},{{a+b},{d},{c+e+f}},{{a+b},{e},{c+d+f}},{{a+b},{f},{c+d+e}},{{a+c},{b},{d+e+f}},{{a+c},{d},{b+e+f}},{{a+c},{e},{b+d+f}},{{a+c},{f},{b+d+e}},{{a+d},{b},{c+e+f}},{{a+d},{c},{b+e+f}},{{a+d},{e},{b+c+f}},{{a+d},{f},{b+c+e}},{{a+e},{b},{c+d+f}},{{a+e},{c},{b+d+f}},{{a+e},{d},{b+c+f}},{{a+e},{f},{b+c+d}},{{a+f},{b},{c+d+e}},{{a+f},{c},{b+d+e}},{{a+f},{d},{b+c+e}},{{a+f},{e},{b+c+d}},{{b+c},{a},{d+e+f}},{{b+c},{d},{a+e+f}},{{b+c},{e},{a+d+f}},{{b+c},{f},{a+d+e}},{{b+d},{a},{c+e+f}},{{b+d},{c},{a+e+f}},{{b+d},{e},{a+c+f}},{{b+d},{f},{a+c+e}},{{b+e},{a},{c+d+f}},{{b+e},{c},{a+d+f}},{{b+e},{d},{a+c+f}},{{b+e},{f},{a+c+d}},{{b+f},{a},{c+d+e}},{{b+f},{c},{a+d+e}},{{b+f},{d},{a+c+e}},{{b+f},{e},{a+c+d}},{{c+d},{a},{b+e+f}},{{c+d},{b},{a+e+f}},{{c+d},{e},{a+b+f}},{{c+d},{f},{a+b+e}},{{c+e},{a},{b+d+f}},{{c+e},{b},{a+d+f}},{{c+e},{d},{a+b+f}},{{c+e},{f},{a+b+d}},{{c+f},{a},{b+d+e}},{{c+f},{b},{a+d+e}},{{c+f},{d},{a+b+e}},{{c+f},{e},{a+b+d}},{{d+e},{a},{b+c+f}},{{d+e},{b},{a+c+f}},{{d+e},{c},{a+b+f}},{{d+e},{f},{a+b+c}},{{d+f},{a},{b+c+e}},{{d+f},{b},{a+c+e}},{{d+f},{c},{a+b+e}},{{d+f},{e},{a+b+c}},{{e+f},{a},{b+c+d}},{{e+f},{b},{a+c+d}},{{e+f},{c},{a+b+d}},{{e+f},{d},{a+b+c}},{{a+b},{c+d},{e+f}},{{a+b},{c+e},{d+f}},{{a+b},{c+f},{d+e}},{{a+b},{d+e},{c+f}},{{a+b},{d+f},{c+e}},{{a+b},{e+f},{c+d}},{{a+c},{b+d},{e+f}},{{a+c},{b+e},{d+f}},{{a+c},{b+f},{d+e}},{{a+c},{d+e},{b+f}},{{a+c},{d+f},{b+e}},{{a+c},{e+f},{b+d}},{{a+d},{b+c},{e+f}},{{a+d},{b+e},{c+f}},{{a+d},{b+f},{c+e}},{{a+d},{c+e},{b+f}},{{a+d},{c+f},{b+e}},{{a+d},{e+f},{b+c}},{{a+e},{b+c},{d+f}},{{a+e},{b+d},{c+f}},{{a+e},{b+f},{c+d}},{{a+e},{c+d},{b+f}},{{a+e},{c+f},{b+d}},{{a+e},{d+f},{b+c}},{{a+f},{b+c},{d+e}},{{a+f},{b+d},{c+e}},{{a+f},{b+e},{c+d}},{{a+f},{c+d},{b+e}},{{a+f},{c+e},{b+d}},{{a+f},{d+e},{b+c}},{{b+c},{a+d},{e+f}},{{b+c},{a+e},{d+f}},{{b+c},{a+f},{d+e}},{{b+c},{d+e},{a+f}},{{b+c},{d+f},{a+e}},{{b+c},{e+f},{a+d}},{{b+d},{a+c},{e+f}},{{b+d},{a+e},{c+f}},{{b+d},{a+f},{c+e}},{{b+d},{c+e},{a+f}},{{b+d},{c+f},{a+e}},{{b+d},{e+f},{a+c}},{{b+e},{a+c},{d+f}},{{b+e},{a+d},{c+f}},{{b+e},{a+f},{c+d}},{{b+e},{c+d},{a+f}},{{b+e},{c+f},{a+d}},{{b+e},{d+f},{a+c}},{{b+f},{a+c},{d+e}},{{b+f},{a+d},{c+e}},{{b+f},{a+e},{c+d}},{{b+f},{c+d},{a+e}},{{b+f},{c+e},{a+d}},{{b+f},{d+e},{a+c}},{{c+d},{a+b},{e+f}},{{c+d},{a+e},{b+f}},{{c+d},{a+f},{b+e}},{{c+d},{b+e},{a+f}},{{c+d},{b+f},{a+e}},{{c+d},{e+f},{a+b}},{{c+e},{a+b},{d+f}},{{c+e},{a+d},{b+f}},{{c+e},{a+f},{b+d}},{{c+e},{b+d},{a+f}},{{c+e},{b+f},{a+d}},{{c+e},{d+f},{a+b}},{{c+f},{a+b},{d+e}},{{c+f},{a+d},{b+e}},{{c+f},{a+e},{b+d}},{{c+f},{b+d},{a+e}},{{c+f},{b+e},{a+d}},{{c+f},{d+e},{a+b}},{{d+e},{a+b},{c+f}},{{d+e},{a+c},{b+f}},{{d+e},{a+f},{b+c}},{{d+e},{b+c},{a+f}},{{d+e},{b+f},{a+c}},{{d+e},{c+f},{a+b}},{{d+f},{a+b},{c+e}},{{d+f},{a+c},{b+e}},{{d+f},{a+e},{b+c}},{{d+f},{b+c},{a+e}},{{d+f},{b+e},{a+c}},{{d+f},{c+e},{a+b}},{{e+f},{a+b},{c+d}},{{e+f},{a+c},{b+d}},"
+						+ "{{e+f},{a+d},{b+c}},{{e+f},{b+c},{a+d}},{{e+f},{b+d},{a+c}},{{e+f},{c+d},{a+b}},{{a+b},{c+d+e},{f}},"//
+						+ "{{a+b},{c+d+f},{e}},{{a+b},{c+e+f},{d}},{{a+b},{d+e+f},{c}},{{a+c},{b+d+e},{f}},{{a+c},{b+d+f},{e}},{{a+c},{b+e+f},{d}},{{a+c},{d+e+f},{b}},{{a+d},{b+c+e},{f}},{{a+d},{b+c+f},{e}},{{a+d},{b+e+f},{c}},{{a+d},{c+e+f},{b}},{{a+e},{b+c+d},{f}},{{a+e},{b+c+f},{d}},{{a+e},{b+d+f},{c}},{{a+e},{c+d+f},{b}},{{a+f},{b+c+d},{e}},{{a+f},{b+c+e},{d}},{{a+f},{b+d+e},{c}},{{a+f},{c+d+e},{b}},{{b+c},{a+d+e},{f}},{{b+c},{a+d+f},{e}},{{b+c},{a+e+f},{d}},{{b+c},{d+e+f},{a}},{{b+d},{a+c+e},{f}},{{b+d},{a+c+f},{e}},{{b+d},{a+e+f},{c}},{{b+d},{c+e+f},{a}},{{b+e},{a+c+d},{f}},{{b+e},{a+c+f},{d}},{{b+e},{a+d+f},{c}},{{b+e},{c+d+f},{a}},{{b+f},{a+c+d},{e}},{{b+f},{a+c+e},{d}},{{b+f},{a+d+e},{c}},{{b+f},{c+d+e},{a}},{{c+d},{a+b+e},{f}},"
+						+ "{{c+d},{a+b+f},{e}},{{c+d},{a+e+f},{b}},{{c+d},{b+e+f},{a}},{{c+e},{a+b+d},{f}},{{c+e},{a+b+f},{d}},{{c+e},{a+d+f},{b}},{{c+e},{b+d+f},{a}},{{c+f},{a+b+d},{e}},{{c+f},{a+b+e},{d}},{{c+f},{a+d+e},{b}},{{c+f},{b+d+e},{a}},{{d+e},{a+b+c},{f}},{{d+e},{a+b+f},{c}},{{d+e},{a+c+f},{b}},{{d+e},{b+c+f},{a}},{{d+f},{a+b+c},{e}},{{d+f},{a+b+e},{c}},{{d+f},{a+c+e},{b}},{{d+f},{b+c+e},{a}},{{e+f},{a+b+c},{d}},{{e+f},{a+b+d},{c}},{{e+f},{a+c+d},{b}},{{e+f},{b+c+d},{a}},{{a+b+c},{d},{e+f}},{{a+b+c},{e},{d+f}},{{a+b+c},{f},{d+e}},{{a+b+d},{c},{e+f}},{{a+b+d},{e},{c+f}},{{a+b+d},{f},{c+e}},{{a+b+e},{c},{d+f}},{{a+b+e},{d},{c+f}},{{a+b+e},{f},{c+d}},{{a+b+f},{c},{d+e}},{{a+b+f},{d},{c+e}},{{a+b+f},{e},{c+d}},{{a+c+d},{b},{e+f}},{{a+c+d},{e},{b+f}},{{a+c+d},{f},{b+e}},{{a+c+e},{b},{d+f}},{{a+c+e},{d},{b+f}},{{a+c+e},{f},{b+d}},{{a+c+f},{b},{d+e}},{{a+c+f},{d},{b+e}},{{a+c+f},{e},{b+d}},{{a+d+e},{b},{c+f}},{{a+d+e},{c},{b+f}},{{a+d+e},{f},{b+c}},{{a+d+f},{b},{c+e}},{{a+d+f},{c},{b+e}},{{a+d+f},{e},{b+c}},{{a+e+f},{b},{c+d}},{{a+e+f},{c},{b+d}},{{a+e+f},{d},{b+c}},{{b+c+d},{a},{e+f}},{{b+c+d},{e},{a+f}},{{b+c+d},{f},{a+e}},{{b+c+e},{a},{d+f}},{{b+c+e},{d},{a+f}},{{b+c+e},{f},{a+d}},{{b+c+f},{a},{d+e}},{{b+c+f},{d},{a+e}},{{b+c+f},{e},{a+d}},"
+						+ "{{b+d+e},{a},{c+f}},{{b+d+e},{c},{a+f}},{{b+d+e},{f},{a+c}},{{b+d+f},{a},{c+e}},{{b+d+f},{c},{a+e}},{{b+d+f},{e},{a+c}},{{b+e+f},{a},{c+d}},{{b+e+f},{c},{a+d}},{{b+e+f},{d},{a+c}},{{c+d+e},{a},{b+f}},{{c+d+e},{b},{a+f}},{{c+d+e},{f},{a+b}},{{c+d+f},{a},{b+e}},{{c+d+f},{b},{a+e}},{{c+d+f},{e},{a+b}},{{c+e+f},{a},{b+d}},{{c+e+f},{b},{a+d}},{{c+e+f},{d},{a+b}},{{d+e+f},{a},{b+c}},{{d+e+f},{b},{a+c}},{{d+e+f},{c},{a+b}},{{a+b+c},{d+e},{f}},{{a+b+c},{d+f},{e}},{{a+b+c},{e+f},{d}},{{a+b+d},{c+e},{f}},{{a+b+d},{c+f},{e}},{{a+b+d},{e+f},{c}},{{a+b+e},{c+d},{f}},{{a+b+e},{c+f},{d}},{{a+b+e},{d+f},{c}},{{a+b+f},{c+d},{e}},{{a+b+f},{c+e},{d}},{{a+b+f},{d+e},{c}},{{a+c+d},{b+e},{f}},{{a+c+d},{b+f},{e}},{{a+c+d},{e+f},{b}},{{a+c+e},{b+d},{f}},{{a+c+e},{b+f},{d}},{{a+c+e},{d+f},{b}},{{a+c+f},{b+d},{e}},{{a+c+f},{b+e},{d}},{{a+c+f},{d+e},{b}},{{a+d+e},{b+c},{f}},{{a+d+e},{b+f},{c}},{{a+d+e},{c+f},{b}},{{a+d+f},{b+c},{e}},{{a+d+f},{b+e},{c}},{{a+d+f},{c+e},{b}},{{a+e+f},{b+c},{d}},{{a+e+f},{b+d},{c}},{{a+e+f},{c+d},{b}},{{b+c+d},{a+e},{f}},{{b+c+d},{a+f},{e}},{{b+c+d},{e+f},{a}},{{b+c+e},{a+d},{f}},{{b+c+e},{a+f},{d}},{{b+c+e},{d+f},{a}},{{b+c+f},{a+d},{e}},{{b+c+f},{a+e},{d}},{{b+c+f},{d+e},{a}},{{b+d+e},{a+c},{f}},{{b+d+e},{a+f},{c}},{{b+d+e},{c+f},{a}},{{b+d+f},{a+c},{e}},{{b+d+f},{a+e},{c}},{{b+d+f},{c+e},{a}},{{b+e+f},{a+c},{d}},{{b+e+f},{a+d},{c}},{{b+e+f},{c+d},{a}},{{c+d+e},{a+b},{f}},{{c+d+e},{a+f},{b}},{{c+d+e},{b+f},{a}},{{c+d+f},{a+b},{e}},{{c+d+f},{a+e},{b}},{{c+d+f},{b+e},{a}},{{c+e+f},{a+b},{d}},{{c+e+f},{a+d},{b}},{{c+e+f},{b+d},{a}},{{d+e+f},{a+b},{c}},"
+						+ "{{d+e+f},{a+c},{b}},{{d+e+f},{b+c},{a}},{{a+b+c+d},{e},{f}},{{a+b+c+d},{f},{e}},{{a+b+c+e},{d},{f}},{{a+b+c+e},{f},{d}},{{a+b+c+f},{d},{e}},{{a+b+c+f},{e},{d}},{{a+b+d+e},{c},{f}},{{a+b+d+e},{f},{c}},"
+						+ "{{a+b+d+f},{c},{e}},{{a+b+d+f},{e},{c}},{{a+b+e+f},{c},{d}},{{a+b+e+f},{d},{c}},{{a+c+d+e},{b},{f}},"//
+						+ "{{a+c+d+e},{f},{b}},{{a+c+d+f},{b},{e}},{{a+c+d+f},{e},{b}},{{a+c+e+f},{b},{d}},"//
+						+ "{{a+c+e+f},{d},{b}},{{a+d+e+f},{b},{c}},{{a+d+e+f},{c},{b}},{{b+c+d+e},{a},{f}},"//
+						+ "{{b+c+d+e},{f},{a}},{{b+c+d+f},{a},{e}},{{b+c+d+f},{e},{a}},{{b+c+e+f},{a},{d}},"//
+						+ "{{b+c+e+f},{d},{a}},{{b+d+e+f},{a},{c}},{{b+d+e+f},{c},{a}},{{c+d+e+f},{a},{b}},"//
+						+ "{{c+d+e+f},{b},{a}}}");
 
 		check("ReplaceList({a, b, c, d, e, f}, {x__, y__, z__} :> {{x},{y},{z}})", //
-				"{{{a},{b},{c,d,e,f}}," //
-						+ "{{a},{b,c},{d,e,f}}," //
-						+ "{{a},{b,c,d},{e,f}}," //
-				+ "{{a},{b,c,d,e},{f}},"//
-				+ "{{a,b},{c},{d,e,f}},"//
-						+ "{{a,b},{c,d},{e,f}}," //
-						+ "{{a,b},{c,d,e},{f}}," //
-				+ "{{a,b,c},{d},{e,f}},"//
-						+ "{{a,b,c},{d,e},{f}}," //
+				"{{{a},{b},{c,d,e,f}},"//
+						+ "{{a},{b,c},{d,e,f}},"//
+						+ "{{a},{b,c,d},{e,f}},"//
+						+ "{{a},{b,c,d,e},{f}},"//
+						+ "{{a,b},{c},{d,e,f}},"//
+						+ "{{a,b},{c,d},{e,f}},"//
+						+ "{{a,b},{c,d,e},{f}},"//
+						+ "{{a,b,c},{d},{e,f}},"//
+						+ "{{a,b,c},{d,e},{f}},"//
 						+ "{{a,b,c,d},{e},{f}}}"); //
 
 		// "{{{a},{b},{c,d,e,f}}, {{a}, {b, c}, {d, e, f}}," +
@@ -10570,6 +10582,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{{1,0,0},\n" + //
 						" {0,1,0},\n" + //
 						" {0,0,1}}");
+
 		check("RowReduce({{1, 0, a}, {1, 1, b}})", //
 				"{{1,0,a},\n" + //
 						" {0,1,-a+b}}");
@@ -11351,7 +11364,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testSolve1() {
 		check("Solve(-28 - 4*Sqrt(-1 + x) + 4*x==0,x)", //
 				"{{x->10}}");
-		check("Solve(Sqrt(5*x-25)-Sqrt(x-1)==2,x)",  //
+		check("Solve(Sqrt(5*x-25)-Sqrt(x-1)==2,x)", //
 				"{{x->10}}");
 
 		// check("Solve(E^x==b,x)", //
@@ -11566,13 +11579,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// public void testSolve2() {
 	// ESameTest("{{x->-Sqrt(-3+y)},{x->Sqrt(-3+y)}}", //
 	// "Solve[y == x^2 + 3, x]");
-//
+	//
 	//// ESameTest("{{x->(-I*Sqrt(3)*Sqrt(a*c))/a},{x->(I*Sqrt(3)*Sqrt(a*c))/a}}", //
 	//// "Solve[a*x^2==-3*c,x]");
-//
+	//
 	// ESameTest("{{x->(-b-Sqrt[b^2-4*a*c])/(2*a)},{x->(-b+Sqrt[b^2-4*a*c])/(2 a)}}", //
 	// "Solve[a*x^2==-b*x-c,x]");
-//
+	//
 	// check("Solve(e*x^4+d*x^3==0,x)", //
 	// "{{x->0},{x->-d/e}}");
 	// check("Solve((a+b)^x==y,x)", //
@@ -11581,7 +11594,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// "{{x->-Sqrt(3-y)},{x->Sqrt(3-y)}}");
 	// check("Solve(2==x^2+y^2+(x-2)^2+(y-2)^2,y)", //
 	// "{{y->1-Sqrt(-2+2*x-x^2)},{y->1+Sqrt(-2+2*x-x^2)}}");
-//
+	//
 	// // from Expreduce
 	// ESameTest("{{x->0}}", //
 	// "Solve[x == 0, x]");
@@ -11661,7 +11674,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// //
 	// C[1],((Re[y]==-(Pi/2)&&Im[y]>=0)||-(Pi/2)<Re[y]<Pi/2||(Re[y]==Pi/2&&Im[y]<=0))&&C[1]\\[Element]Integers]}}//normSol",
 	// // "Solve[ArcSin[Sin[x]]==y,x]//normSol");
-//
+	//
 	// // (* POLYNOMIALS *)
 	// ESameTest("{{x->(-b-Sqrt[b^2-4*a*c])/(2*a)},{x->(-b+Sqrt[b^2-4*a*c])/(2 a)}}", //
 	// "Solve[a*x^2==-b*x-c,x]");
@@ -11671,17 +11684,17 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// "Solve[a*x^2==-c,x]");
 	// ESameTest("{{x->-I Sqrt[c]},{x->I*Sqrt[c]}}", //
 	// "Solve[x^2==-c,x]");
-//
+	//
 	// // (* COLLECTION *)
 	// ESameTest("{{x->4}}", //
 	// "Solve[3x+1==2x+5,x]");
 	// ESameTest("{{x->17/15}}", //
 	// "Solve[5*(4*x-3)+4*(6 x+1)==7*(2*x+3)+2,x]");
-//
+	//
 	// ESameTest("{}", "Solve[x^(1/2) == -2, x]");
 	// // (* Probably needs solution checking for this to work. *)
 	// ESameTest("{}", "Solve[x^(1/4) == -2, x]");
-//
+	//
 	// ESameTest("{}", //
 	// "Solve[False, x]");
 	// ESameTest("{}", //
@@ -11775,6 +11788,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// //
 	// "Solve[-a + (-1 + x^2)^2 == 0, x]");
 	// }
+
 	public void testSolveIssue130() {
 		check("Sqrt(1-x)+Sqrt(3+x)", "Sqrt(1-x)+Sqrt(3+x)");
 		check("Sqrt(-1)*(-1)^(1/10)", "(-1)^(3/5)");
@@ -11888,6 +11902,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Solve(x^10-1==0,x)",
 				"{{x->-1},{x->1},{x->-(-1)^(1/5)},{x->(-1)^(1/5)},{x->-(-1)^(2/5)},{x->(-1)^(2/5)},{x->-(\n"
 						+ "-1)^(3/5)},{x->(-1)^(3/5)},{x->-(-1)^(4/5)},{x->(-1)^(4/5)}}");
+
 		check("Solve(a*x^3+b==0,x)",
 				"{{x->-b^(1/3)/a^(1/3)},{x->((-1)^(1/3)*b^(1/3))/a^(1/3)},{x->(-(-1)^(2/3)*b^(1/3))/a^(\n" + "1/3)}}");
 		check("Solve(a*x^5+b==0,x)",
@@ -12560,7 +12575,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Format(f,g(x))", //
 				"TagSetDelayed test");
 	}
-
 
 	public void testTan() {
 		check("Tan(Pi/2+Pi*n)", "-Cot(n*Pi)");
