@@ -10,7 +10,6 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.WL;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -22,10 +21,6 @@ import org.matheclipse.parser.client.ast.ASTNode;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
-
-import ch.ethz.idsc.tensor.io.Extension;
-import ch.ethz.idsc.tensor.io.Filename;
 
 /**
  * Import some data from file system.
@@ -80,9 +75,10 @@ public class Import extends AbstractEvaluator {
 					File file = new File(fileName);
 					return of(file, engine);
 				} else if (format.equals("WXF")) {
-					File file = new File(fileName);
-					byte[] byteArray = com.gx.common.io.Files.toByteArray(file);
-					return WL.deserialize(byteArray);
+//					File file = new File(fileName);
+//					byte[] byteArray = com.gx.common.io.Files.toByteArray(file);
+//					return WL.deserialize(byteArray);
+					throw new RuntimeException("Unsupported this features!");
 				}
 
 			} catch (IOException ioe) {
@@ -102,17 +98,18 @@ public class Import extends AbstractEvaluator {
 	}
 
 	public static IExpr of(File file, EvalEngine engine) throws IOException {
-		Filename filename = new Filename(file);
-		Extension extension = filename.extension();
-		if (extension.equals(Extension.JPG) || extension.equals(Extension.PNG)) {
-			// if (filename.hasExtension("jpg") || filename.hasExtension("png")) {
-//			return ImageFormat.from(ImageIO.read(file));
-		}
-		AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
-		final Parser parser = new Parser(engine.isRelaxedSyntax(), true);
-		String str = com.gx.common.io.Files.toString(file, Charset.defaultCharset());
-		final ASTNode node = parser.parse(str);
-		return ast2Expr.convert(node);
+//		Filename filename = new Filename(file);
+//		Extension extension = filename.extension();
+//		if (extension.equals(Extension.JPG) || extension.equals(Extension.PNG)) {
+//			// if (filename.hasExtension("jpg") || filename.hasExtension("png")) {
+////			return ImageFormat.from(ImageIO.read(file));
+//		}
+//		AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
+//		final Parser parser = new Parser(engine.isRelaxedSyntax(), true);
+//		String str = com.gx.common.io.Files.toString(file, Charset.defaultCharset());
+//		final ASTNode node = parser.parse(str);
+//		return ast2Expr.convert(node);
+		throw new RuntimeException("Unsupported this features!");
 	}
 
 }

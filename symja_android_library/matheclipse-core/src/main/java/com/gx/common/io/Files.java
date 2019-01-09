@@ -76,15 +76,6 @@ public final class Files {
     }
 
     /**
-     * Returns a new {@link ByteSource} for reading bytes from the given file.
-     *
-     * @since 14.0
-     */
-    public static ByteSource asByteSource(File file) {
-        return new FileByteSource(file);
-    }
-
-    /**
      * Returns a new {@link ByteSink} for writing bytes to the given file. The given {@code modes}
      * control how the file is opened for writing. When no mode is provided, the file will be
      * truncated before writing. When the {@link FileWriteMode#APPEND APPEND} mode is provided, writes
@@ -97,16 +88,6 @@ public final class Files {
     }
 
     /**
-     * Returns a new {@link CharSource} for reading character data from the given file using the given
-     * character set.
-     *
-     * @since 14.0
-     */
-    public static CharSource asCharSource(File file, Charset charset) {
-        return asByteSource(file).asCharSource(charset);
-    }
-
-    /**
      * Returns a new {@link CharSink} for writing character data to the given file using the given
      * character set. The given {@code modes} control how the file is opened for writing. When no mode
      * is provided, the file will be truncated before writing. When the {@link FileWriteMode#APPEND
@@ -116,37 +97,6 @@ public final class Files {
      */
     public static CharSink asCharSink(File file, Charset charset, FileWriteMode... modes) {
         return asByteSink(file, modes).asCharSink(charset);
-    }
-
-    /**
-     * Reads all bytes from a file into a byte array.
-     * <p>
-     * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link java.nio.file.Files#readAllBytes}.
-     *
-     * @param file the file to read from
-     * @return a byte array containing all the bytes from file
-     * @throws IllegalArgumentException if the file is bigger than the largest possible byte array
-     *                                  (2^31 - 1)
-     * @throws IOException              if an I/O error occurs
-     */
-    public static byte[] toByteArray(File file) throws IOException {
-        return asByteSource(file).read();
-    }
-
-    /**
-     * Reads all characters from a file into a {@link String}, using the given character set.
-     *
-     * @param file    the file to read from
-     * @param charset the charset used to decode the input stream; see {@link StandardCharsets} for
-     *                helpful predefined constants
-     * @return a string containing all the characters from the file
-     * @throws IOException if an I/O error occurs
-     * @deprecated Prefer {@code asCharSource(file, charset).read()}. This method is scheduled to be
-     * removed in January 2019.
-     */
-    @Deprecated
-    public static String toString(File file, Charset charset) throws IOException {
-        return asCharSource(file, charset).read();
     }
 
     /**
@@ -177,63 +127,6 @@ public final class Files {
     @Deprecated
     public static void write(CharSequence from, File to, Charset charset) throws IOException {
         asCharSink(to, charset).write(from);
-    }
-
-    /**
-     * Copies all characters from a file to an appendable object, using the given character set.
-     *
-     * @param from    the source file
-     * @param charset the charset used to decode the input stream; see {@link StandardCharsets} for
-     *                helpful predefined constants
-     * @param to      the appendable object
-     * @throws IOException if an I/O error occurs
-     * @deprecated Prefer {@code asCharSource(from, charset).copyTo(to)}. This method is scheduled to
-     * be removed in January 2019.
-     */
-    @Deprecated
-    public static void copy(File from, Charset charset, Appendable to) throws IOException {
-        asCharSource(from, charset).copyTo(to);
-    }
-
-    /**
-     * Appends a character sequence (such as a string) to a file using the given character set.
-     *
-     * @param from    the character sequence to append
-     * @param to      the destination file
-     * @param charset the charset used to encode the output stream; see {@link StandardCharsets} for
-     *                helpful predefined constants
-     * @throws IOException if an I/O error occurs
-     * @deprecated Prefer {@code asCharSink(to, charset, FileWriteMode.APPEND).write(from)}. This
-     * method is scheduled to be removed in January 2019.
-     */
-    @Deprecated
-    public static void append(CharSequence from, File to, Charset charset) throws IOException {
-        asCharSink(to, charset, FileWriteMode.APPEND).write(from);
-    }
-
-    /**
-     * Returns true if the given files exist, are not directories, and contain the same bytes.
-     *
-     * @throws IOException if an I/O error occurs
-     */
-    public static boolean equal(File file1, File file2) throws IOException {
-        checkNotNull(file1);
-        checkNotNull(file2);
-        if (file1 == file2 || file1.equals(file2)) {
-            return true;
-        }
-
-        /*
-         * Some operating systems may return zero as the length for files denoting system-dependent
-         * entities such as devices or pipes, in which case we must fall back on comparing the bytes
-         * directly.
-         */
-        long len1 = file1.length();
-        long len2 = file2.length();
-        if (len1 != 0 && len2 != 0 && len1 != len2) {
-            return false;
-        }
-        return asByteSource(file1).contentEquals(asByteSource(file2));
     }
 
     /**
@@ -429,55 +322,6 @@ public final class Files {
             public String toString() {
                 return "Files.isFile()";
             }
-        }
-    }
-
-    private static final class FileByteSource extends ByteSource {
-
-        private final File file;
-
-        private FileByteSource(File file) {
-            this.file = checkNotNull(file);
-        }
-
-        @Override
-        public FileInputStream openStream() throws IOException {
-            return new FileInputStream(file);
-        }
-
-        @Override
-        public Optional<Long> sizeIfKnown() {
-            if (file.isFile()) {
-                return Optional.of(file.length());
-            } else {
-                return Optional.absent();
-            }
-        }
-
-        @Override
-        public long size() throws IOException {
-            if (!file.isFile()) {
-                throw new FileNotFoundException(file.toString());
-            }
-            return file.length();
-        }
-
-        @Override
-        public byte[] read() throws IOException {
-            Closer closer = Closer.create();
-            try {
-                FileInputStream in = closer.register(openStream());
-                return ByteStreams.toByteArray(in, in.getChannel().size());
-            } catch (Throwable e) {
-                throw closer.rethrow(e);
-            } finally {
-                closer.close();
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "Files.asByteSource(" + file + ")";
         }
     }
 
