@@ -85,6 +85,5 @@ public class IntBuilderFactory
 
     public void shutdown()
             throws ApfloatRuntimeException {
-        DiskDataStorage.cleanUp();
     }
 }

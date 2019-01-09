@@ -9,7 +9,6 @@ import org.apfloat.spi.DataStorage;
  * @author Mikko Tommila
  * @version 1.7.0
  * @see IntMemoryDataStorage
- * @see IntDiskDataStorage
  */
 
 public class IntDataStorageBuilder
@@ -28,7 +27,7 @@ public class IntDataStorageBuilder
 
     protected DataStorage createNonCachedDataStorage()
             throws ApfloatRuntimeException {
-        return new IntDiskDataStorage();
+        return new IntMemoryDataStorage();
     }
 
     protected boolean isCached(DataStorage dataStorage)
