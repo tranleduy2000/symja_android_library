@@ -17,18 +17,13 @@ package com.duy.util;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.InputMismatchException;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -58,7 +53,7 @@ import java.util.regex.Pattern;
  *
  * <p>The {@code Scanner} class is not thread-safe.
  */
-public final class Scanner implements Closeable, Iterator<String> {
+public final class DScanner implements Closeable, Iterator<String> {
 
     private static final String NL = "\n|\r\n|\r|\u0085|\u2028|\u2029";
 
@@ -130,57 +125,8 @@ public final class Scanner implements Closeable, Iterator<String> {
      * @param src
      *            the string to be scanned.
      */
-    public Scanner(String src) {
+    public DScanner(String src) {
         initialize(new StringReader(src));
-    }
-
-    /**
-     * Creates a {@code Scanner} on the specified {@code InputStream}. The default charset is
-     * applied when decoding the input.
-     *
-     * @param src
-     *            the {@code InputStream} to be scanned.
-     */
-    public Scanner(InputStream src) {
-        this(src, Charset.defaultCharset().name());
-    }
-
-    /**
-     * Creates a {@code Scanner} on the specified {@code InputStream}. The specified charset is
-     * applied when decoding the input.
-     *
-     * @param src
-     *            the {@code InputStream} to be scanned.
-     * @param charsetName
-     *            the encoding type of the {@code InputStream}.
-     * @throws IllegalArgumentException
-     *             if the specified character set is not found.
-     */
-    public Scanner(InputStream src, String charsetName) {
-        if (src == null) {
-            throw new NullPointerException("src == null");
-        }
-
-        InputStreamReader streamReader;
-        try {
-            streamReader = new InputStreamReader(src, charsetName);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
-        initialize(streamReader);
-    }
-
-    /**
-     * Creates a {@code Scanner} with the specified {@code Readable} as input.
-     *
-     * @param src
-     *            the {@code Readable} to be scanned.
-     */
-    public Scanner(Readable src) {
-        if (src == null) {
-            throw new NullPointerException("src == null");
-        }
-        initialize(src);
     }
 
     private void initialize(Readable input) {
@@ -412,27 +358,6 @@ public final class Scanner implements Closeable, Iterator<String> {
             matchSuccessful = false;
         }
         return result;
-    }
-
-    /**
-     * Tries to find the pattern in the input between the current position and the specified
-     * {@code horizon}. Delimiters are ignored. This call is the same as invoking
-     * {@code findWithinHorizon(Pattern.compile(pattern))}.
-     *
-     * @param pattern
-     *            the pattern used to scan.
-     * @param horizon
-     *            the search limit.
-     * @return the matched string, or {@code null} if the pattern is not found
-     *         within the specified horizon.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} is closed.
-     * @throws IllegalArgumentException
-     *             if {@code horizon} is less than zero.
-     * @see #findWithinHorizon(Pattern, int)
-     */
-    public String findWithinHorizon(String pattern, int horizon) {
-        return findWithinHorizon(Pattern.compile(pattern), horizon);
     }
 
     /**
@@ -1449,7 +1374,7 @@ public final class Scanner implements Closeable, Iterator<String> {
      * @throws NoSuchElementException
      *             if the specified pattern match fails.
      */
-    public Scanner skip(Pattern pattern) {
+    public DScanner skip(Pattern pattern) {
         checkOpen();
         checkNotNull(pattern);
         matcher.usePattern(pattern);
@@ -1490,7 +1415,7 @@ public final class Scanner implements Closeable, Iterator<String> {
      * @throws IllegalStateException
      *             if the {@code Scanner} is closed.
      */
-    public Scanner skip(String pattern) {
+    public DScanner skip(String pattern) {
         return skip(Pattern.compile(pattern));
     }
 
@@ -1517,7 +1442,7 @@ public final class Scanner implements Closeable, Iterator<String> {
      *            the delimiting pattern to use.
      * @return this {@code Scanner}.
      */
-    public Scanner useDelimiter(Pattern pattern) {
+    public DScanner useDelimiter(Pattern pattern) {
         delimiter = pattern;
         return this;
     }
@@ -1530,7 +1455,7 @@ public final class Scanner implements Closeable, Iterator<String> {
      *            a string from which a {@code Pattern} can be compiled.
      * @return this {@code Scanner}.
      */
-    public Scanner useDelimiter(String pattern) {
+    public DScanner useDelimiter(String pattern) {
         return useDelimiter(Pattern.compile(pattern));
     }
 
@@ -1541,7 +1466,7 @@ public final class Scanner implements Closeable, Iterator<String> {
      *            the specified {@code Locale} to use.
      * @return this {@code Scanner}.
      */
-    public Scanner useLocale(Locale l) {
+    public DScanner useLocale(Locale l) {
         if (l == null) {
             throw new NullPointerException("l == null");
         }
@@ -1556,7 +1481,7 @@ public final class Scanner implements Closeable, Iterator<String> {
      *            the specified radix to use.
      * @return this {@code Scanner}.
      */
-    public Scanner useRadix(int radix) {
+    public DScanner useRadix(int radix) {
         checkRadix(radix);
         this.currentRadix = radix;
         return this;
@@ -2028,7 +1953,7 @@ public final class Scanner implements Closeable, Iterator<String> {
      * @return this scanner
      * @since 1.6
      */
-    public Scanner reset() {
+    public DScanner reset() {
         delimiter = DEFAULT_DELIMITER;
         setLocale(Locale.getDefault());
         currentRadix = DEFAULT_RADIX;

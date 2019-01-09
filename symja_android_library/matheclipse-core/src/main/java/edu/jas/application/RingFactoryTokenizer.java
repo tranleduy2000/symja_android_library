@@ -5,6 +5,8 @@
 package edu.jas.application;
 
 
+import com.duy.util.DScanner;
+
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -17,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 
 import edu.jas.arith.BigComplex;
 import edu.jas.arith.BigDecimal;
@@ -189,7 +190,7 @@ public class RingFactoryTokenizer {
         }
         st = st.replaceAll(",", " ");
         List<String> sl = new ArrayList<String>();
-        Scanner sc = new Scanner(st);
+        DScanner sc = new DScanner(st);
         while (sc.hasNext()) {
             String sn = sc.next();
             sl.add(sn);

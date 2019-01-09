@@ -5,7 +5,7 @@
 package edu.jas.poly;
 
 
-import com.duy.util.Scanner;
+import com.duy.util.DScanner;
 
 import org.apache.log4j.Logger;
 
@@ -190,7 +190,7 @@ public class GenPolynomialTokenizer {
         }
         st = st.replaceAll(",", " ");
         List<String> sl = new ArrayList<String>();
-        Scanner sc = new Scanner(st);
+        DScanner sc = new DScanner(st);
         while (sc.hasNext()) {
             String sn = sc.next();
             sl.add(sn);
@@ -235,7 +235,7 @@ public class GenPolynomialTokenizer {
         //System.out.println("st = " + st);
 
         Set<String> sl = new TreeSet<String>();
-        Scanner sc = new Scanner(st);
+        DScanner sc = new DScanner(st);
         while (sc.hasNext()) {
             String sn = sc.next();
             if (sn == null || sn.length() == 0) {
