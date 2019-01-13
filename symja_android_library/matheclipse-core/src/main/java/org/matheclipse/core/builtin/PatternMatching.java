@@ -544,10 +544,11 @@ public final class PatternMatching {
 					// System.out.println(file.toString());
 					return getFile(file, engine);
 				} else {
-					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
-					if (file.exists()) {
-						return getFile(file, engine);
-					}
+					//Java 7 does't have FileSystems.getDefault() method
+//					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
+//					if (file.exists()) {
+//						return getFile(file, engine);
+//					}
 				}
 
 			}
