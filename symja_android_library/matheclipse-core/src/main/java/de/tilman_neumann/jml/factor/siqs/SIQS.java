@@ -13,15 +13,9 @@
  */
 package de.tilman_neumann.jml.factor.siqs;
 
-import static de.tilman_neumann.jml.base.BigIntConstants.*;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
-//import org.apache.log4j.Logger;
 
 import de.tilman_neumann.jml.factor.FactorAlgorithmBase;
 import de.tilman_neumann.jml.factor.FactorException;
@@ -34,27 +28,25 @@ import de.tilman_neumann.jml.factor.base.congruence.Smooth;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest01;
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver;
-import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver02_BlockLanczos;
 import de.tilman_neumann.jml.factor.base.matrixSolver.SmoothSolverController;
 import de.tilman_neumann.jml.factor.siqs.data.BaseArrays;
 import de.tilman_neumann.jml.factor.siqs.poly.AParamGenerator;
 import de.tilman_neumann.jml.factor.siqs.poly.AParamGenerator01;
 import de.tilman_neumann.jml.factor.siqs.poly.PolyGenerator;
 import de.tilman_neumann.jml.factor.siqs.poly.PolyReport;
-import de.tilman_neumann.jml.factor.siqs.poly.SIQSPolyGenerator;
-import de.tilman_neumann.jml.factor.siqs.powers.NoPowerFinder;
 import de.tilman_neumann.jml.factor.siqs.powers.PowerFinder;
 import de.tilman_neumann.jml.factor.siqs.sieve.Sieve;
-import de.tilman_neumann.jml.factor.siqs.sieve.Sieve03gU;
 import de.tilman_neumann.jml.factor.siqs.sieve.SieveParams;
 import de.tilman_neumann.jml.factor.siqs.sieve.SieveReport;
 import de.tilman_neumann.jml.factor.siqs.tdiv.TDivReport;
 import de.tilman_neumann.jml.factor.siqs.tdiv.TDiv_QS;
-import de.tilman_neumann.jml.factor.siqs.tdiv.TDiv_QS_nLarge_UBI;
 import de.tilman_neumann.jml.powers.PurePowerTest;
-//import de.tilman_neumann.util.ConfigUtil;
-import de.tilman_neumann.util.TimeUtil;
 import de.tilman_neumann.util.Timer;
+
+import static de.tilman_neumann.jml.base.BigIntConstants.I_0;
+
+//import org.apache.log4j.Logger;
+//import de.tilman_neumann.util.ConfigUtil;
 
 /**
  * Main class for single-threaded SIQS implementations.
@@ -378,37 +370,6 @@ public class SIQS extends FactorAlgorithmBase {
 
 	// Standalone test --------------------------------------------------------------------------------------------------
 
-	/**
-	 * Test numbers:
-	 * 11111111111111111111111111
-	 * 5679148659138759837165981543
-	 * 11111111111111111111111111155555555555111111111111111
-	 */
-	private static void testInput() {
-		SIQS qs = new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos(), true);
-		Timer timer = new Timer();
-		while(true) {
-			try {
-//				LOG.info("Please insert the number to factor:");
-				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-				String input = in.readLine().trim();
-				//LOG.debug("input = >" + input + "<");
-				BigInteger N = new BigInteger(input);
-//				LOG.info("Factoring " + N + " (" + N.bitLength() + " bits)...");
-				timer.capture();
-				BigInteger factor = qs.findSingleFactor(N);
-				if (factor != null) {
-					long duration = timer.capture();
-//					LOG.info("Found factor " + factor + " in " + TimeUtil.timeStr(duration) + ".");
-				} else {
-//					LOG.info("No factor found...");
-				}
-			} catch (Exception ex) {
-//				LOG.error("Error " + ex, ex);
-			}
-		}
-	}
-	
 	/**
 	 * Test of input k, N and #iterations.
 	 * @param args ignored

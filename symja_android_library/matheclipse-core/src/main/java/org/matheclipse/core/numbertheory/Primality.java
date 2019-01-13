@@ -5,7 +5,6 @@ import com.gx.common.math.LongMath;
 
 import org.matheclipse.combinatoric.KSubsets;
 import org.matheclipse.combinatoric.KSubsets.KSubsetsList;
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
 import org.matheclipse.core.expression.AbstractIntegerSym;
@@ -689,11 +688,12 @@ public class Primality {
 		if (!rest.equals(BigInteger.ONE)) {
 			CombinedFactorAlgorithm factorizer;
 			final int cores = Runtime.getRuntime().availableProcessors();
-		if (Config.JAVA_UNSAFE) {
-				factorizer = new CombinedFactorAlgorithm(cores / 2 + 1, true, false);
-			} else {
-				factorizer = new CombinedFactorAlgorithm(1, false, false);
-			}
+			// Android changed: Unsafe API isn't available
+//		if (Config.JAVA_UNSAFE) {
+//				factorizer = new CombinedFactorAlgorithm(cores / 2 + 1, true, false);
+//			} else {
+				factorizer = new CombinedFactorAlgorithm(1, false);
+//			}
 				SortedMultiset<BigInteger> result = factorizer.factor(rest);
 
 			for (Map.Entry<BigInteger, Integer> entry : result.entrySet()) {

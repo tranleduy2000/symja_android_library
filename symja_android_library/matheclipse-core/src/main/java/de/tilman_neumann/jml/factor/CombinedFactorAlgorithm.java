@@ -13,7 +13,7 @@
  */
 package de.tilman_neumann.jml.factor;
 
-import static de.tilman_neumann.jml.base.BigIntConstants.*;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,25 +21,26 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
-
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver01_Gauss;
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver02_BlockLanczos;
 import de.tilman_neumann.jml.factor.lehman.Lehman_Fast;
 import de.tilman_neumann.jml.factor.pollardRho.PollardRhoBrentMontgomery64;
 import de.tilman_neumann.jml.factor.psiqs.PSIQS;
 import de.tilman_neumann.jml.factor.psiqs.PSIQSBase;
-import de.tilman_neumann.jml.factor.psiqs.PSIQS_U;
 import de.tilman_neumann.jml.factor.siqs.SIQS;
 import de.tilman_neumann.jml.factor.siqs.poly.SIQSPolyGenerator;
 import de.tilman_neumann.jml.factor.siqs.powers.NoPowerFinder;
 import de.tilman_neumann.jml.factor.siqs.powers.PowerOfSmallPrimesFinder;
-import de.tilman_neumann.jml.factor.siqs.sieve.Sieve03gU;
+import de.tilman_neumann.jml.factor.siqs.sieve.Sieve03g;
 import de.tilman_neumann.jml.factor.siqs.tdiv.TDiv_QS_1Large_UBI;
 import de.tilman_neumann.jml.factor.tdiv.TDiv31Inverse;
-//import de.tilman_neumann.util.ConfigUtil;
 import de.tilman_neumann.util.SortedMultiset;
 import de.tilman_neumann.util.TimeUtil;
+
+import static de.tilman_neumann.jml.base.BigIntConstants.I_1;
+import static de.tilman_neumann.jml.base.BigIntConstants.I_MINUS_1;
+
+//import de.tilman_neumann.util.ConfigUtil;
 
 /**
  * Final combination of factor algorithms.
@@ -55,33 +56,19 @@ public class CombinedFactorAlgorithm extends FactorAlgorithmBase {
 	private PollardRhoBrentMontgomery64 pollardRho = new PollardRhoBrentMontgomery64();
 	private SIQS siqs_smallArgs;
 	private PSIQSBase siqs_bigArgs;
-	
-	/**
-	 * Simple constructor using PSIQS with sun.misc.Unsafe features.
-	 * 
-	 * @param numberOfThreads the number of parallel threads for PSIQS
-	 * @param profile if true then extended profiling information is collected
-	 */
-	public CombinedFactorAlgorithm(int numberOfThreads, boolean profile) {
-		this(numberOfThreads, true, profile);
-	}
+
 	
 	/**
 	 * Complete constructor.
 	 * 
 	 * @param numberOfThreads the number of parallel threads for PSIQS
-	 * @param permitUnsafeUsage if true then PSIQS_U using sun.misc.Unsafe features is used. This may be ~10% faster.
 	 * @param profile if true then extended profiling information is collected
 	 */
-	public CombinedFactorAlgorithm(int numberOfThreads, boolean permitUnsafeUsage, boolean profile) {
+	public CombinedFactorAlgorithm(int numberOfThreads, boolean profile) {
 		// SIQS tuned for small N
-		siqs_smallArgs = new SIQS(0.32F, 0.37F, null, 0.16F, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss(), false);
+		siqs_smallArgs = new SIQS(0.32F, 0.37F, null, 0.16F, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss(), false);
 		// PSIQS for bigger N: monolithic sieve is still slightly faster than SBH in the long run.
-		if (permitUnsafeUsage) {
-			siqs_bigArgs = new PSIQS_U(0.32F, 0.37F, null, null, numberOfThreads, new NoPowerFinder(), new MatrixSolver02_BlockLanczos(), profile);
-		} else {
-			siqs_bigArgs = new PSIQS(0.32F, 0.37F, null, null, numberOfThreads, new NoPowerFinder(), new MatrixSolver02_BlockLanczos(), profile);
-		}
+		siqs_bigArgs = new PSIQS(0.32F, 0.37F, null, null, numberOfThreads, new NoPowerFinder(), new MatrixSolver02_BlockLanczos(), profile);
 	}
 
 	@Override
