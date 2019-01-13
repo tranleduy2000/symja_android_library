@@ -7,6 +7,8 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.ASCIIPrettyPrinter3;
 import org.matheclipse.core.form.output.OutputFormFactory;
+import org.matheclipse.core.graphics.Show2SVG;
+import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.Scanner;
 import org.matheclipse.parser.client.SyntaxError;
@@ -19,7 +21,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -525,6 +526,17 @@ public class Console {
 		}
 	}
 
+	// Android changed: Unsupported openSVGOnDesktop
+//	public static String openSVGOnDesktop(IAST show) throws IOException {
+//		StringBuilder stw = new StringBuilder();
+//		Show2SVG.graphicsToSVG(show.getAST(1), stw);
+//		File temp = File.createTempFile("tempfile", ".svg");
+//		BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+//		bw.write(stw.toString());
+//		bw.close();
+//		Desktop.getDesktop().open(temp);
+//		return temp.toString();
+//	}
     // private String[] prettyPrinter3Lines(final String inputExpression) {
     // IExpr result;
     //
