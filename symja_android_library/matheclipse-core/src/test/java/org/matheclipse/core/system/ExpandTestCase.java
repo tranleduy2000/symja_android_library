@@ -73,7 +73,7 @@ public class ExpandTestCase extends AbstractTestCase {
 		if (temp == null) {
 			temp = ast;
 		}
-		assertEquals(temp.toString(), "4+9*x^4+12*x^2");
+		assertEquals(temp.toString(), "2^2+3^2*(x^2)^2+2*2*3*x^2");
 	}
 
 	public void testExpand007() {

@@ -1,7 +1,5 @@
 package ch.ethz.idsc.tensor.io;
 
-import org.matheclipse.core.interfaces.IAST;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Properties;
@@ -34,14 +32,19 @@ public enum ResourceData {
      * @param string as path to resource
      * @return imported tensor, or null if resource could not be loaded
      */
-    public static IAST of(String string) {
-        try (InputStream inputStream = ResourceData.class.getResourceAsStream(string)) {
-            return ImportHelper.of(new Filename(string), inputStream);
-        } catch (Exception exception) {
-            // ---
-        }
-        return null;
-    }
+//    public static IAST of(String string) {
+//        try {
+//            InputStream inputStream = ResourceData.class.getResourceAsStream(string);
+//            try {
+//                return ImportHelper.of(new Filename(string), inputStream);
+//            } finally {
+//                inputStream.close();
+//            }
+//        } catch (Exception exception) {
+//            // ---
+//        }
+//        return null;
+//    }
 
     /** @param string as path to resource
      * @return imported object, or null if resource could not be loaded */
