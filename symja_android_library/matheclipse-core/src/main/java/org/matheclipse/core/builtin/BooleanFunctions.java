@@ -2407,18 +2407,27 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			    if (ast.isAST1()) {
+			    IExpr arg1 = ast.arg1();
+			    if (arg1.isReal()) {
+			    	return F.bool(arg1.isNegative());
+			    }
+			    if (arg1.isNumber()) {
+			    	return F.False;
+			    }
+			    ISignedNumber signedNumber = arg1.evalReal();
+			    if (signedNumber != null) {
+			    	return F.bool(signedNumber.isNegative());
+			    }
+				if (arg1.isNegativeInfinity()) {
+					return F.True;
+				}
+				if (arg1.isInfinity()) {
+					return F.False;
+				}
+				return F.NIL;
+			}
 			Validate.checkSize(ast, 2);
-			IExpr arg1 = ast.arg1();
-			if (arg1.isReal()) {
-				return F.bool(arg1.isNegative());
-			}
-			if (arg1.isNumber()) {
-				return F.False;
-			}
-			ISignedNumber signedNumber = arg1.evalReal();
-			if (signedNumber != null) {
-				return F.bool(signedNumber.isNegative());
-			}
 
 			return F.NIL;
 		}
@@ -2550,8 +2559,8 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
+			if (ast.isAST1()) {
 			IExpr arg1 = ast.arg1();
 			if (arg1.isReal()) {
 				return F.bool(!arg1.isNegative());
@@ -2563,6 +2572,16 @@ public final class BooleanFunctions {
 			if (signedNumber != null) {
 				return F.bool(!signedNumber.isNegative());
 			}
+				if (arg1.isNegativeInfinity()) {
+					return F.False;
+				}
+				if (arg1.isInfinity()) {
+					return F.True;
+				}
+				return F.NIL;
+			}
+
+			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
 
@@ -2911,8 +2930,8 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
+			if (ast.isAST1()) {
 			IExpr arg1 = ast.arg1();
 			if (arg1.isNumber()) {
 				return F.bool(arg1.isPositive());
@@ -2925,6 +2944,15 @@ public final class BooleanFunctions {
 				return F.bool(signedNumber.isPositive());
 			}
 
+				if (arg1.isNegativeInfinity()) {
+					return F.False;
+				}
+				if (arg1.isInfinity()) {
+					return F.True;
+				}
+				return F.NIL;
+			}
+			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
 
