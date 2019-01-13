@@ -29,6 +29,7 @@ import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Noo;
 import static org.matheclipse.core.expression.F.NumericQ;
+import static org.matheclipse.core.expression.F.PatternTest;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
@@ -106,11 +107,11 @@ public interface GammaRules {
             // Gamma(a_,Infinity):=0
             ISetDelayed(Gamma(a_,oo),
                     C0),
-    // Gamma(1/2,z_NumericQ):=Sqrt(Pi)*Erfc(Sqrt(z))
-    ISetDelayed(Gamma(C1D2,$p(z,NumericQ)),
+    // Gamma(1/2,z_?NumericQ):=Sqrt(Pi)*Erfc(Sqrt(z))
+    ISetDelayed(Gamma(C1D2,PatternTest(z_,NumericQ)),
                     Times(Sqrt(Pi),Erfc(Sqrt(z)))),
-    // Gamma(-1/2,z_NumericQ):=2/(E^z*Sqrt(z))-2*Sqrt(Pi)*Erfc(Sqrt(z))
-    ISetDelayed(Gamma(CN1D2,$p(z,NumericQ)),
+    // Gamma(-1/2,z_?NumericQ):=2/(E^z*Sqrt(z))-2*Sqrt(Pi)*Erfc(Sqrt(z))
+    ISetDelayed(Gamma(CN1D2,PatternTest(z_,NumericQ)),
       Plus(Times(C2,Power(Times(Exp(z),Sqrt(z)),-1)),Times(CN2,Sqrt(Pi),Erfc(Sqrt(z))))),
             // Gamma(1,z_):=E^(-z)
             ISetDelayed(Gamma(C1,z_),

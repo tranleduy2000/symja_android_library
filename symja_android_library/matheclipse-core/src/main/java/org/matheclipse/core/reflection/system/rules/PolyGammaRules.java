@@ -20,7 +20,7 @@ import static org.matheclipse.core.expression.F.Greater;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.ISetDelayed;
-import static org.matheclipse.core.expression.F.IntegerQ;
+import static org.matheclipse.core.expression.F.Integer;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Negate;
@@ -69,8 +69,8 @@ public interface PolyGammaRules {
     // PolyGamma(2,5/6)=4*Sqrt(3)*Pi^3-182*Zeta(3)
     ISet(PolyGamma(C2,QQ(5L,6L)),
       Plus(Times(C4,CSqrt3,Power(Pi,3)),Times(ZZ(-182L),Zeta(C3)))),
-    // PolyGamma(n_IntegerQ):=-EulerGamma+Sum(1/k,{k,1,-1+n})/;n>0
-    ISetDelayed(PolyGamma($p(n,IntegerQ)),
+    // PolyGamma(n_Integer):=-EulerGamma+Sum(1/k,{k,1,-1+n})/;n>0
+    ISetDelayed(PolyGamma($p(n, Integer)),
       Condition(Plus(Negate(EulerGamma),Sum(Power(k,-1),List(k,C1,Plus(CN1,n)))),Greater(n,C0)))
   );
 }

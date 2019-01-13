@@ -1,10 +1,6 @@
 package org.matheclipse.core.expression;
 
-import com.duy.lambda.Predicate;
-
 import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPattern;
@@ -352,21 +348,21 @@ public class Blank extends IPatternImpl implements IPattern {
 			patternMap.setValue(this, expr);
 			return true;
 		}
-		EvalEngine engine = EvalEngine.get();
-		boolean traceMode = false;
-		try {
-			traceMode = engine.isTraceMode();
-			engine.setTraceMode(false);
-			final Predicate<IExpr> matcher = Predicates.isTrue(engine, fCondition);
-			if (matcher.test(expr)) {
-				patternMap.setValue(this, expr);
-				return true;
-			}
-		} finally {
-			if (traceMode) {
-				engine.setTraceMode(true);
-			}
-		}
+		// EvalEngine engine = EvalEngine.get();
+		// boolean traceMode = false;
+		// try {
+		// traceMode = engine.isTraceMode();
+		// engine.setTraceMode(false);
+		// final Predicate<IExpr> matcher = Predicates.isTrue(engine, fCondition);
+		// if (matcher.test(expr)) {
+		// patternMap.setValue(this, expr);
+		// return true;
+		// }
+		// } finally {
+		// if (traceMode) {
+		// engine.setTraceMode(true);
+		// }
+		// }
 		return false;
 	}
 

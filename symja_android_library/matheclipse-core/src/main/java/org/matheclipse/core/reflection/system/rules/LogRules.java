@@ -22,7 +22,7 @@ import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.ISetDelayed;
 import static org.matheclipse.core.expression.F.Indeterminate;
-import static org.matheclipse.core.expression.F.IntegerQ;
+import static org.matheclipse.core.expression.F.Integer;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Noo;
@@ -110,8 +110,8 @@ public interface LogRules {
     // Log(a_,E):=1/Log(a)
     ISetDelayed(Log(a_,E),
       Power(Log(a),-1)),
-    // Log(a_,E^m_IntegerQ):=m/Log(a)
-    ISetDelayed(Log(a_,Exp($p(m,IntegerQ))),
+    // Log(a_,E^m_Integer):=m/Log(a)
+    ISetDelayed(Log(a_,Exp($p(m, Integer))),
       Times(m,Power(Log(a),-1))),
     // Log(a_,0):=-Infinity/Log(a)
     ISetDelayed(Log(a_,C0),

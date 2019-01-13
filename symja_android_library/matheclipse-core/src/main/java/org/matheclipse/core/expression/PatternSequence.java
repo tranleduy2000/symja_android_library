@@ -386,30 +386,30 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 			patternMap.setValue(this, sequence);
 			return true;
 		}
-		EvalEngine engine = EvalEngine.get();
-		boolean traceMode = false;
-		traceMode = engine.isTraceMode();
-		final Predicate<IExpr> matcher = Predicates.isTrue(engine, fCondition);
-		try {
+		// EvalEngine engine = EvalEngine.get();
+		// boolean traceMode = false;
+		// traceMode = engine.isTraceMode();
+		// final Predicate<IExpr> matcher = Predicates.isTrue(engine, fCondition);
+		// try {
 			for (int i = 1; i < sequence.size(); i++) {
-				if (sequence.get(i).head().equals(fCondition)) {
-					continue;
-				}
-				engine.setTraceMode(false);
-
-				if (matcher.test(sequence.get(i))) {
-					continue;
-				}
+			if (!sequence.get(i).head().equals(fCondition)) {
 				return false;
 
 			}
+			// engine.setTraceMode(false);
+			//
+			// if (matcher.test(sequence.get(i))) {
+			// continue;
+			// }
+			// return false;
+			}
 			patternMap.setValue(this, sequence);
 			return true;
-		} finally {
-			if (traceMode) {
-				engine.setTraceMode(true);
-			}
-		}
+		// } finally {
+		// if (traceMode) {
+		// engine.setTraceMode(true);
+		// }
+		// }
 	}
 
 	/** {@inheritDoc} */
@@ -469,9 +469,9 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	/** {@inheritDoc} */
-//	public boolean isFreeOfDefaultPatterns() {
-//		return true;
-//	}
+	// public boolean isFreeOfDefaultPatterns() {
+	// return true;
+	// }
 	/** {@inheritDoc} */
 	@Override
 	public final boolean isPatternExpr() {

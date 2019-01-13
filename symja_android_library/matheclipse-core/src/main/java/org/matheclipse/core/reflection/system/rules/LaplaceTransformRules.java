@@ -3,7 +3,6 @@ package org.matheclipse.core.reflection.system.rules;
 import org.matheclipse.core.interfaces.IAST;
 
 import static org.matheclipse.core.expression.F.$;
-import static org.matheclipse.core.expression.F.$p;
 import static org.matheclipse.core.expression.F.And;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
@@ -37,7 +36,6 @@ import static org.matheclipse.core.expression.F.Sin;
 import static org.matheclipse.core.expression.F.Sinh;
 import static org.matheclipse.core.expression.F.Sqr;
 import static org.matheclipse.core.expression.F.Sqrt;
-import static org.matheclipse.core.expression.F.SymbolQ;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.a;
 import static org.matheclipse.core.expression.F.a_;
@@ -52,6 +50,7 @@ import static org.matheclipse.core.expression.F.n;
 import static org.matheclipse.core.expression.F.n_DEFAULT;
 import static org.matheclipse.core.expression.F.s;
 import static org.matheclipse.core.expression.F.s_;
+import static org.matheclipse.core.expression.F.s_Symbol;
 import static org.matheclipse.core.expression.F.t;
 import static org.matheclipse.core.expression.F.t_;
 
@@ -65,15 +64,15 @@ public interface LaplaceTransformRules {
      * <li>index 0 - number of equal rules in <code>RULES</code></li>
      * </ul>
      */
-    final public static int[] SIZES = { 0, 13 };
+  final public static int[] SIZES = { 0, 11 };
 
     final public static IAST RULES = List(
             IInit(LaplaceTransform, SIZES),
             // LaplaceTransform(a_.*E^(b_.+c_.*t_),t_,s_):=LaplaceTransform(a*E^b,t,-c+s)/;FreeQ({b,c},t)
             ISetDelayed(LaplaceTransform(Times(Exp(Plus(b_DEFAULT,Times(c_DEFAULT,t_))),a_DEFAULT),t_,s_),
                     Condition(LaplaceTransform(Times(a,Exp(b)),t,Plus(Negate(c),s)),FreeQ(List(b,c),t))),
-    // LaplaceTransform(a_*t_^n_.,t_,s_SymbolQ):=(-1)^n*D(LaplaceTransform(a,t,s),{s,n})/;FreeQ({n},t)&&n>0
-    ISetDelayed(LaplaceTransform(Times(a_,Power(t_,n_DEFAULT)),t_,$p(s,SymbolQ)),
+    // LaplaceTransform(a_*t_^n_.,t_,s_Symbol):=(-1)^n*D(LaplaceTransform(a,t,s),{s,n})/;FreeQ({n},t)&&n>0
+    ISetDelayed(LaplaceTransform(Times(a_,Power(t_,n_DEFAULT)),t_,s_Symbol),
       Condition(Times(Power(CN1,n),D(LaplaceTransform(a,t,s),List(s,n))),And(FreeQ(List(n),t),Greater(n,C0)))),
             // LaplaceTransform(Sqrt(t_),t_,s_):=Sqrt(Pi)/(2*s^(3/2))
             ISetDelayed(LaplaceTransform(Sqrt(t_),t_,s_),

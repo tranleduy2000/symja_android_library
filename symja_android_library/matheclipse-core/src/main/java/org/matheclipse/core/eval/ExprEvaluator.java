@@ -442,10 +442,10 @@ public class ExprEvaluator {
 					} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
 					return F.$Aborted;
 				} catch (java.util.concurrent.TimeoutException e) {
-//						Throwable t = e.getCause();
-//						if (t instanceof RuntimeException) {
-//							throw (RuntimeException) t;
-//						}
+						// Throwable t = e.getCause();
+						// if (t instanceof RuntimeException) {
+						// throw (RuntimeException) t;
+						// }
 					return F.$Aborted;
 				} catch (com.gx.common.util.concurrent.UncheckedTimeoutException e) {
 						// Throwable t = e.getCause();
