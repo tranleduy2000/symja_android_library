@@ -240,7 +240,7 @@ public final class ExpVectorLong {
 			prefix = "x";
 		}
 		for (int i = 0; i < n; i++) {
-			vars.append(F.symbol(prefix + i)); // (n-1-i);
+			vars.append(F.Dummy(prefix + i)); // (n-1-i);
 		}
 		return vars;
 	}
@@ -498,19 +498,16 @@ public final class ExpVectorLong {
 	 * @return string representation of the variables.
 	 * @see java.util.Arrays#toString()
 	 */
-	public static String varsToString(final IAST vars) {
+	public static String varsToString(IAST vars) {
 		if (vars == null) {
 			return "null";
 		}
-		final StringBuilder s = new StringBuilder();
-		vars.forEach(vars.size(), new ObjIntConsumer<IExpr>() {
-            @Override
-            public void accept(IExpr x, int i) {
+		StringBuilder s = new StringBuilder();
+		vars.forEach(vars.size(), (x, i) -> {
                 s.append(x);
                 if (i < vars.argSize()) {
                     s.append(",");
                 }
-            }
         });
 		return s.toString();
 	}
@@ -1473,7 +1470,7 @@ public final class ExpVectorLong {
 	 *            array of names of variables
 	 * @return index of x in vars.
 	 */
-	public static int indexVar(IExpr x, IAST vars) {
+	public static int indexVar(IExpr x, final IAST vars) {
 		int len = vars.size();
 		for (int i = 1; i < len; i++) {
 			if (x.equals(vars.get(i))) {
