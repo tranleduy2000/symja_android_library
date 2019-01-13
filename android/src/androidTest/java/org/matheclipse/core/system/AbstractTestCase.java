@@ -21,7 +21,7 @@ import javax.script.ScriptEngine;
  * Tests system.reflection classes
  */
 public abstract class AbstractTestCase extends TestCase {
-    protected final Object mLocker = new Object();
+    protected final Object fScriptManager = new Object();
     protected ScriptEngine fScriptEngine;
     protected ScriptEngine fNumericScriptEngine;
 
@@ -160,7 +160,7 @@ public abstract class AbstractTestCase extends TestCase {
     @Override
     protected void setUp() {
         try {
-            synchronized (mLocker) {
+            synchronized (fScriptManager) {
                 fScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
                 fScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
                 fScriptEngine.put("DECIMAL_FORMAT", "0.0####");
