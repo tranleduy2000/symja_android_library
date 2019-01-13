@@ -1478,7 +1478,6 @@ public final class ExpVectorLong {
 		for (int i = 1; i < len; i++) {
 			if (x.equals(vars.get(i))) {
 				return len - i - 1;
-//				return i - 1;
 			}
 		}
 		return -1; // not found

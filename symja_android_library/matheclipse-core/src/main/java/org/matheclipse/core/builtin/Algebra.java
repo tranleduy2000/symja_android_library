@@ -723,7 +723,7 @@ public class Algebra {
 				IAST poly = (IAST) expr;
 				final IASTAppendable rest = F.PlusAlloc(poly.size());
 
-//				IPatternMatcher matcher = new PatternMatcherEvalEngine(x, engine);
+				// IPatternMatcher matcher = new PatternMatcherEvalEngine(x, engine);
 				final IPatternMatcher matcher = engine.evalPatternMatcher(x);
 				collectToMap(poly, matcher, map, rest);
 				if (listOfVariables != null && listPosition < listOfVariables.size()) {
@@ -918,7 +918,7 @@ public class Algebra {
 				if (option.isTrue()) {
 					trig = true;
 				} else if (!option.isPresent()) {
-					throw new WrongArgumentType(ast, ast.get(2), 2, "Option expected!");
+					throw new WrongArgumentType(ast, ast.arg2(), 2, "Option expected!");
 				}
 			}
 
@@ -1685,8 +1685,8 @@ public class Algebra {
 					IExpr[] parts = Algebra.getNumeratorDenominator((IAST) expr, engine);
 					if (!parts[1].isOne()) {
 						try {
-							IExpr numerator = factorExpr(F.Factor(parts[0]), parts[0], varList);
-							IExpr denomimator = factorExpr(F.Factor(parts[1]), parts[1], varList);
+							IExpr numerator = factorExpr(F.Factor(parts[0]), parts[0], eVar);
+							IExpr denomimator = factorExpr(F.Factor(parts[1]), parts[1], eVar);
 							return F.Divide(numerator, denomimator);
 						} catch (JASConversionException e) {
 							if (Config.DEBUG) {
@@ -1703,7 +1703,7 @@ public class Algebra {
 				if (ast.isAST2()) {
 					return factorWithOption(ast, expr, varList, false, engine);
 				}
-				return factorExpr(ast, expr, varList);
+				return factorExpr(ast, expr, eVar);
 
 			} catch (JASConversionException e) {
 				if (Config.DEBUG) {
@@ -1713,7 +1713,7 @@ public class Algebra {
 			return expr;
 		}
 
-		private IExpr factorExpr(final IAST ast, IExpr expr, final List<IExpr> varList) {
+		private IExpr factorExpr(final IAST ast, IExpr expr, final VariablesSet eVar) {
 				if (expr.isAST()) {
 				IExpr temp;
 				// if (expr.isPower()&&expr.base().isPlus()) {
@@ -1724,45 +1724,66 @@ public class Algebra {
 				if (expr.isTimes()) {
 					// System.out.println(ast.toString());
 					temp = ((IAST) expr).map(new Function<IExpr, IExpr>() {
-                        @Override
-                        public IExpr apply(IExpr x) {
-                            if (x.isPlus()) {
-                                return Factor.this.factorExpr(ast, x, varList);
-                            }
-                            if (x.isPower() && x.base().isPlus()) {
-                                IExpr p = Factor.this.factorExpr(ast, x.base(), varList);
-                                if (!p.equals(x.base())) {
-                                    return F.Power(p, x.exponent());
-                                }
-                            }
-                            return F.NIL;
-                        }
-                    }, 1);
+						@Override
+						public IExpr apply(IExpr x) {
+							if (x.isPlus()) {
+								return Factor.this.factorExpr(ast, x, eVar);
+							}
+							if (x.isPower() && x.base().isPlus()) {
+								IExpr p = Factor.this.factorExpr(ast, x.base(), eVar);
+								if (!p.equals(x.base())) {
+									return F.Power(p, x.exponent());
+								}
+							}
+							return F.NIL;
+						}
+					}, 1);
 				} else {
 				// System.out.println("leafCount " + expr.leafCount());
-					temp = factor((IAST) expr, varList, false);
+					temp = factor((IAST) expr, eVar, false);
 				}
+				if (temp.isPresent()) {
 					F.REMEMBER_AST_CACHE.put(ast, temp);
 					return temp;
 				}
+			}
 				return expr;
 
 		}
 
-		public static IExpr factor(IAST expr, List<IExpr> varList, boolean factorSquareFree)
+		public static IExpr factor(IAST expr, VariablesSet eVar, boolean factorSquareFree)
 				throws JASConversionException {
 			if (Config.MAX_FACTOR_LEAFCOUNT > 0 && expr.leafCount() > Config.MAX_FACTOR_LEAFCOUNT) {
 				return expr;
 			}
 			// use TermOrderByName.INVLEX here!
 			// See https://github.com/kredel/java-algebra-system/issues/8
-			JASConvert<BigRational> jas = new JASConvert<BigRational>(varList, BigRational.ZERO, TermOrderByName.INVLEX);
+			Object[] objects = null;
+			JASConvert<BigRational> jas = new JASConvert<BigRational>(eVar.getArrayList(), BigRational.ZERO,
+					TermOrderByName.INVLEX);
+			try {
 			GenPolynomial<BigRational> polyRat = jas.expr2JAS(expr, false);
 			if (polyRat.length() <= 1) {
 				return expr;
 			}
+				objects = jas.factorTerms(polyRat);
+			} catch (JASConversionException e) {
+				PolynomialSubstitutions pSubs = PolynomialSubstitutions.buildSubs(eVar.getVarList());
+				IExpr subsPolynomial = pSubs.replaceAll(expr);
 
-			Object[] objects = jas.factorTerms(polyRat);
+				if (pSubs.substitutedVariables().size() > 0) {
+					if (subsPolynomial.isAST()) {
+						eVar.addAll(pSubs.substitutedVariables().keySet());
+						IExpr f2 = factor((IAST) subsPolynomial, eVar, factorSquareFree);
+						if (f2.isPresent()) {
+							IdentityHashMap<ISymbol, IExpr> substitutedVariables = pSubs.substitutedVariables();
+							return F.subst(f2, substitutedVariables);
+						}
+					}
+				}
+			}
+
+			if (objects != null) {
 			SortedMap<GenPolynomial<edu.jas.arith.BigInteger>, Long> map;
 			try {
 			GenPolynomial<edu.jas.arith.BigInteger> poly = (GenPolynomial<edu.jas.arith.BigInteger>) objects[2];
@@ -1796,12 +1817,12 @@ public class Algebra {
 				IExpr base = jas.integerPoly2Expr(entry.getKey());
 				if (entry.getValue() == 1L) {
 					if (f.isMinusOne() && base.isPlus()) {
-						base = ((IAST) base).map(new Function<IExpr, IExpr>() {
-                            @Override
-                            public IExpr apply(IExpr x) {
-                                return x.negate();
-                            }
-                        }, 1);
+							base = ((IAST) base).map(new Function<IExpr, IExpr>() {
+								@Override
+								public IExpr apply(IExpr x) {
+									return x.negate();
+								}
+							}, 1);
 						f = F.C1;
 					}
 					result.append(base);
@@ -1816,6 +1837,8 @@ public class Algebra {
 			return result.getOneIdentity(F.C0);
 		}
 
+			return F.NIL;
+		}
 
 		/**
 		 * Factor the <code>expr</code> with the option given in <code>ast</code>.
@@ -1882,7 +1905,7 @@ public class Algebra {
 					return factorWithOption(ast, expr, varList, true, engine);
 				}
 				if (expr.isAST()) {
-					return factor((IAST) expr, varList, true);
+					return factor((IAST) expr, eVar, true);
 				}
 				return expr;
 
@@ -3071,12 +3094,12 @@ public class Algebra {
 							IASTAppendable plusResult = F.PlusAlloc(timesAST.size() + 1);
 							plusResult.append(C1D2);
 							plusResult.appendArgs(timesAST.size(),
-                                    new IntFunction<IExpr>() {
-                                        @Override
-                                        public IExpr apply(int i) {
-                                            return Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi)));
-                                        }
-                                    });
+									new IntFunction<IExpr>() {
+										@Override
+										public IExpr apply(int i) {
+											return Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi)));
+										}
+									});
 							IAST expResult = Power(E, Times(C2, I, Pi, x2, Floor(plusResult)));
 							if (!(timesResult instanceof IASTAppendable)) {
 								timesResult = timesResult.copyAppendable();
@@ -4134,14 +4157,14 @@ public class Algebra {
 					return F.List(c, F.C1);
 				}
 				if (c.isTimes() && c.first().isNumber()) {
-				return F.List(c.first(), c.rest().getOneIdentity(F.C1));
+					return F.List(c.first(), c.rest().getOneIdentity(F.C1));
 				}
 				return F.List(F.C1, c);
 			}
 		});
 
 		private static IExpr reduceFactorConstant(IExpr p, EvalEngine engine) {
-			if (p.isPlus() && !engine.isTogetherMode()) {
+			if (!engine.isNumericMode()&&p.isPlus() && !engine.isTogetherMode()) {
 				IExpr e = p;
 				// ((reduceConstantTerm /@ (List @@ e)) // Transpose)[[1]]
 				IExpr cTerms = F.Transpose
@@ -4720,12 +4743,12 @@ public class Algebra {
 				result.append(F.fraction(gcd, lcm));
 			}
 		}
-//		GenPolynomial<Complex<BigRational>> temp;
+		// GenPolynomial<Complex<BigRational>> temp;
 		for (SortedMap.Entry<GenPolynomial<Complex<BigRational>>, Long> entry : map.entrySet()) {
 			if (entry.getKey().isONE() && entry.getValue().equals(1L)) {
 				continue;
 			}
-//			temp = entry.getKey();
+			// temp = entry.getKey();
 			result.append(F.Power(jas.complexPoly2Expr(entry.getKey()), F.integer(entry.getValue())));
 		}
 		return result;

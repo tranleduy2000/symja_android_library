@@ -1413,6 +1413,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     boolean isPower();
 
+
+    /**
+     * Test if this expression is the function <code>Power[&lt;arg1&gt;, 1/2]</code>
+     *
+     * @return
+     */
+    boolean isSqrt();
+
+
     /**
      * Return {@code true} if this expression unequals <code>F.NIL</code>, otherwise {@code false}. This method is
      * similar to <code>java.util.Optional#isPresent()</code>.

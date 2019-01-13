@@ -656,8 +656,7 @@ public class ExprParser extends Scanner {
 	 * Get a function f[...][...]
 	 * 
 	 */
-	IASTAppendable getFunction(final IExpr head) throws SyntaxError {
-		final IASTAppendable function = F.ast(head, 10, false);
+	IASTMutable getFunction(final IExpr head) throws SyntaxError {
 
 		getNextToken();
 
@@ -665,22 +664,23 @@ public class ExprParser extends Scanner {
 			if (fToken == TT_PRECEDENCE_CLOSE) {
 				getNextToken();
 				if (fToken == TT_PRECEDENCE_OPEN) {
-					return function;
+					return F.headAST0(head);
 				}
 				if (fToken == TT_ARGUMENTS_OPEN) {
-					return getFunctionArguments(function);
+					return getFunctionArguments(F.headAST0(head));
 				}
-				return function;
+				return F.headAST0(head);
 			}
 		} else {
 			if (fToken == TT_ARGUMENTS_CLOSE) {
 				getNextToken();
 				if (fToken == TT_ARGUMENTS_OPEN) {
-					return getFunctionArguments(function);
+					return getFunctionArguments(F.headAST0(head));
 				}
-				return function;
+				return F.headAST0(head);
 			}
 		}
+		final IASTAppendable function = F.ast(head, 10, false);
 		fRecursionDepth++;
 		try {
 			getArguments(function);
@@ -691,29 +691,40 @@ public class ExprParser extends Scanner {
 			if (fToken == TT_PRECEDENCE_CLOSE) {
 				getNextToken();
 				if (fToken == TT_PRECEDENCE_OPEN) {
-					return function;
+					reduceAST(function);
 				}
 				if (fToken == TT_ARGUMENTS_OPEN) {
-					return getFunctionArguments(function);
+					return getFunctionArguments(reduceAST(function));
 				}
-				return function;
+				return reduceAST(function);
 			}
 		} else {
 			if (fToken == TT_ARGUMENTS_CLOSE) {
 				getNextToken();
 				if (fToken == TT_ARGUMENTS_OPEN) {
-					return getFunctionArguments(function);
+					return getFunctionArguments(reduceAST(function));
 				}
-				return function;
+				return reduceAST(function);
 			}
 		}
 
-		if (fRelaxedSyntax) {
-			throwSyntaxError("')' expected.");
-		} else {
-			throwSyntaxError("']' expected.");
-		}
+		throwSyntaxError(fRelaxedSyntax ? "')' expected." : "']' expected.");
 		return null;
+	}
+
+	private static IASTMutable reduceAST(IASTMutable function) {
+		int size = function.size();
+		switch (size) {
+		case 1:
+			return F.headAST0(function.head());
+		case 2:
+			return F.unaryAST1(function.head(), function.arg1());
+		case 3:
+			return F.binaryAST2(function.head(), function.arg1(), function.arg2());
+		case 4:
+			return F.ternaryAST3(function.head(), function.arg1(), function.arg2(), function.arg3());
+				}
+				return function;
 
 	}
 
@@ -721,9 +732,8 @@ public class ExprParser extends Scanner {
 	 * Get a function f[...][...]
 	 * 
 	 */
-	IASTAppendable getFunctionArguments(final IExpr head) throws SyntaxError {
+	IASTMutable getFunctionArguments(final IExpr head) throws SyntaxError {
 
-		final IASTAppendable function = F.ast(head);
 		fRecursionDepth++;
 
 			getNextToken();
@@ -732,19 +742,20 @@ public class ExprParser extends Scanner {
 			fRecursionDepth--;
 				getNextToken();
 				if (fToken == TT_ARGUMENTS_OPEN) {
-					return getFunctionArguments(function);
+				return getFunctionArguments(F.headAST0(head));
 				}
-				return function;
+			return F.headAST0(head);
 			}
 
+		final IASTAppendable function = F.ast(head);
 			getArguments(function);
 			fRecursionDepth--;
 		if (fToken == TT_ARGUMENTS_CLOSE) {
 			getNextToken();
 			if (fToken == TT_ARGUMENTS_OPEN) {
-				return getFunctionArguments(function);
+				return getFunctionArguments(reduceAST(function));
 			}
-			return function;
+			return reduceAST(function);
 		}
 
 		throwSyntaxError("']' expected.");
@@ -1205,13 +1216,13 @@ public class ExprParser extends Scanner {
 					if (infixOperator.getPrecedence() > min_precedence
 							|| ((infixOperator.getPrecedence() == min_precedence)
 									&& (infixOperator.getGrouping() == InfixExprOperator.RIGHT_ASSOCIATIVE))) {
-//						if (infixOperator.isOperator(";")) {
-//							rhs = F.Null;
+						// if (infixOperator.isOperator(";")) {
+						// rhs = F.Null;
 							// if (fPackageMode && fRecursionDepth < 1) {
 							// return createInfixFunction(infixOperator, lhs,
 							// rhs);
 							// }
-//						}
+						// }
 						rhs = parseExpression(rhs, infixOperator.getPrecedence());
 						continue;
 					}

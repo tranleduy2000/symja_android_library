@@ -297,7 +297,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 		return new IExpr[] { m, n };
 	}
 
-	private static IExpr odeSeparable(EvalEngine engine, IExpr m, IExpr n, IExpr x, final IExpr y, IExpr C_1) {
+	private static IExpr odeSeparable(EvalEngine engine, IExpr m, IExpr n, IExpr x, final IExpr y, IExpr C_1 ) {
 		if (n.isOne()) {
 			IExpr fxExpr = F.NIL;
 			IExpr gyExpr = F.NIL;
@@ -309,15 +309,15 @@ public class DSolve extends AbstractFunctionEvaluator {
 				final IASTAppendable fx = F.TimesAlloc(timesAST.size());
 				final IASTAppendable gy = F.TimesAlloc(timesAST.size());
 				timesAST.forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr expr) {
-                        if (expr.isFree(y)) {
-                            fx.append(expr);
-                        } else {
-                            gy.append(expr);
-                        }
-                    }
-                });
+					@Override
+					public void accept(IExpr expr) {
+						if (expr.isFree(y)) {
+							fx.append(expr);
+						} else {
+							gy.append(expr);
+						}
+					}
+				});
 				fxExpr = engine.evaluate(fx);
 				gyExpr = engine.evaluate(gy);
 			}
@@ -325,7 +325,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 				gyExpr = F.Integrate.of(engine, F.Divide(F.C1, gyExpr), y);
 				fxExpr = F.Plus.of(engine, F.Integrate(F.Times(F.CN1, fxExpr), x), C_1);
 				IExpr yEquation = F.Subtract.of(engine, gyExpr, fxExpr);
-				IExpr result = Eliminate.extractVariable(yEquation, y);
+				IExpr result = Eliminate.extractVariable(yEquation, y, engine);
 				if (result.isPresent()) {
 					return engine.evaluate(result);
 				}
