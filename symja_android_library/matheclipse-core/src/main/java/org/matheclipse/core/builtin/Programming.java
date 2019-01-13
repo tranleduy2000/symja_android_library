@@ -2491,27 +2491,6 @@ public final class Programming {
 		return F.NIL;
 	}
 
-	/**
-	 * Check the (possible nested) condition in pattern matcher without evaluating a result.
-	 *
-	 * @param arg1
-	 * @param arg2
-	 * @param engine
-	 * @return
-	 */
-	// public static boolean checkCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
-	// if (engine.evalTrue(arg2)) {
-	// if (arg1.isCondition()) {
-	// return checkCondition(arg1.first(), arg1.second(), engine);
-	// } else if (arg1.isModule()) {
-	// return checkModuleCondition(arg1.first(), arg1.second(), engine);
-	// } else if (arg1.isWith()) {
-	// return checkWithCondition(arg1.first(), arg1.second(), engine);
-	// }
-	// return true;
-	// }
-	// return false;
-	// }
 
 	/**
 	 * Get the element stored at the given <code>position</code>.

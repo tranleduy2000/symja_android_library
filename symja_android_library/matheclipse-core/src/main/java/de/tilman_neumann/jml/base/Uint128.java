@@ -14,7 +14,6 @@
 package de.tilman_neumann.jml.base;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 
 //import org.apache.log4j.Logger;
 
@@ -50,7 +49,7 @@ public class Uint128 {
 	 * 
 	 * @param x
 	 * @param y
-	 * @return
+	 * @return x*y accurate for inputs <= 63 bit
 	 */
 	public static Uint128 mul63(long x, long y) {
 		final long x_hi = x >>> 32;
@@ -60,8 +59,8 @@ public class Uint128 {
 		final long lo_prod = x_lo * y_lo;
 		final long med_term = x_hi * y_lo + x_lo * y_hi; // possible overflow here
 		final long hi_prod = x_hi * y_hi;
-		long r_hi = (((lo_prod >>> 32) + med_term) >>> 32) + hi_prod;
-		long r_lo = ((med_term & 0xFFFFFFFFL) << 32) + lo_prod;
+		final long r_hi = (((lo_prod >>> 32) + med_term) >>> 32) + hi_prod;
+		final long r_lo = ((med_term & 0xFFFFFFFFL) << 32) + lo_prod;
 		return new Uint128(r_hi, r_lo);
 	}
 
@@ -125,7 +124,7 @@ public class Uint128 {
 	}
 
 	/**
-	 * Add two unsigned 127 bit integers.
+	 * Add two unsigned 128 bit integers.
 	 * @param other
 	 * @return this + other
 	 */
@@ -136,26 +135,16 @@ public class Uint128 {
 		long o_lo = other.getLow();
 		long o_hi = other.getHigh();
 		boolean sureCarry = (low<0) && (o_lo<0);
-		long r_hi, r_lo;
+		long r_hi = high + o_hi;
+		long r_lo = low + o_lo;
 		if (sureCarry) {
-			r_hi = high + o_hi + 1;
-			r_lo = low + o_lo; // overflow bit gets dropped, no masks required
+			r_hi++;
 		} else {
 			boolean checkCarry = (low<0) || (o_lo<0);
-			r_hi = high + o_hi;
-			r_lo = low + o_lo;
-			if (checkCarry) {
-				//LOG.debug("check carry!");
-				if (r_lo >= 0) {
-					// low overflow!
-					//LOG.debug("low overflow!");
+			if (checkCarry && r_lo >= 0) {
 					r_hi++;
 				}
 			}
-		}
-		//LOG.debug("low = " + Long.toBinaryString(low));
-		//LOG.debug("o_lo = " + Long.toBinaryString(o_lo));
-		//LOG.debug("r_lo = " + Long.toBinaryString(r_lo));
 		return new Uint128(r_hi, r_lo);
 	}
 	
@@ -189,7 +178,7 @@ public class Uint128 {
 
 	/**
 	 * Bitwise "and" operation with a long.
-	 * @param mask
+	 * @param other
 	 * @return this & other
 	 */
 	public long and(long other) {

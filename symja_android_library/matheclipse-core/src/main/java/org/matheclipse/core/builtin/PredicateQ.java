@@ -20,6 +20,7 @@ import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.visit.IVisitorBoolean;
+import org.matheclipse.core.visit.VisitorBooleanLevelSpecification;
 
 public class PredicateQ {
 

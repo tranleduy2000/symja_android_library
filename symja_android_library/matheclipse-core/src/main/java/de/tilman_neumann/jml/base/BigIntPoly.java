@@ -52,15 +52,15 @@ public class BigIntPoly extends ArrayList<BigInteger> {
 	public BigInteger set(final int n, final BigInteger value) {
 		if (n<0) throw new IllegalArgumentException("index must be non-negative, but is " + n);
 		
-		if (n>=0 && n<this.size()) {
+		if (n < this.size()) {
 			return super.set(n,value);
 		}
 		// fill intermediate powers with coefficients of zero
 		while (this.size() < n ) {
-			this.add(BigInteger.ZERO);
+			this.add(I_0);
 		}
 		this.add(value);
-		return BigInteger.ZERO;
+		return I_0;
 	}
 	
 	/**
@@ -68,18 +68,14 @@ public class BigIntPoly extends ArrayList<BigInteger> {
 	 * @param val the other polynomial
 	 * @return the product of this with the other polynomial
 	 */
-	public BigIntPoly multiply(BigIntPoly val)
-	{
+	public BigIntPoly multiply(BigIntPoly val) {
 		// the degree of the result is the sum of the two degrees.
 		final int nmax = this.degree()+val.degree();
 		BigIntPoly resul = new BigIntPoly(nmax+1);
 		
 		for(int n=0; n<=nmax; n++) {
-			BigInteger coef = BigInteger.ZERO;
+			BigInteger coef = I_0;
 			for (int nleft=0; nleft <= n ; nleft++) {
-				// LOG.debug(""+nleft+" "+at(nleft).toString() ) ;
-				// LOG.debug(" * "+(n-nleft)+" "+at(n-nleft).toString() ) ;
-				// LOG.debug(" = "+ at(nleft).multiply(val.at(n-nleft)).toString() ) ;
 				coef = coef.add(this.at(nleft).multiply(val.at(n-nleft))) ;
 			}
 			resul.set(n,coef) ;
@@ -96,7 +92,7 @@ public class BigIntPoly extends ArrayList<BigInteger> {
 		if ( n>=0 && n<this.size()) {
 			return super.get(n);
 		}
-		return BigInteger.ZERO;
+		return I_0;
 	}
 
 	/**

@@ -38,6 +38,10 @@ public class PowerEntry implements Comparable<PowerEntry> {
 	}
 	
 	@Override
+	public int hashCode() {
+		return power;
+	}
+	@Override
 	public int compareTo(PowerEntry other) {
 		return power - other.power;
 	}

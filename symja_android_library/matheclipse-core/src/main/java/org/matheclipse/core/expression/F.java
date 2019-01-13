@@ -267,10 +267,7 @@ public class F {
 	public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ",
 			ID.AntisymmetricMatrixQ);
 
-	/**
-	 * AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates
-	 * to `True`.
-	 */
+    /** AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates to `True`.*/
 	public final static IBuiltInSymbol AnyTrue = F.initFinalSymbol("AnyTrue", ID.AnyTrue);
 
     /** Apart(expr) - rewrites `expr` as a sum of individual fractions. */
@@ -341,10 +338,7 @@ public class F {
 	/** 'ArrayQ(expr) - tests whether expr is a full array.*/
 	public final static IBuiltInSymbol ArrayQ = F.initFinalSymbol("ArrayQ", ID.ArrayQ);
 
-	/**
-	 * ArrayReshape(list-of-values, list-of-dimension) - returns the `list-of-values` elements reshaped as nested list
-	 * with dimensions according to the `list-of-dimension`.
-	 */
+    /** ArrayReshape(list-of-values, list-of-dimension) - returns the `list-of-values` elements reshaped as nested list with dimensions according to the `list-of-dimension`.*/
 	public final static IBuiltInSymbol ArrayReshape = F.initFinalSymbol("ArrayReshape", ID.ArrayReshape);
 
 	/***/
@@ -353,10 +347,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Assumptions = F.initFinalSymbol("Assumptions", ID.Assumptions);
 
-	/**
-	 * AtomQ(x) - is true if `x` is an atom (an object such as a number or string, which cannot be divided into
-	 * subexpressions using 'Part').
-	 */
+    /** AtomQ(x) - is true if `x` is an atom (an object such as a number or string, which cannot be divided into subexpressions using 'Part').*/
 	public final static IBuiltInSymbol AtomQ = F.initFinalSymbol("AtomQ", ID.AtomQ);
 
     /** Attributes(symbol) - returns the list of attributes which are assigned to `symbol`*/
@@ -1251,6 +1242,9 @@ public class F {
 
 	/** Head(expr) - returns the head of the expression or atom `expr`.*/
 	public final static IBuiltInSymbol Head = F.initFinalSymbol("Head", ID.Head);
+
+    /***/
+    public final static IBuiltInSymbol Heads = F.initFinalSymbol("Heads", ID.Heads);
 
 	/***/
 	public final static IBuiltInSymbol HeavisideTheta = F.initFinalSymbol("HeavisideTheta", ID.HeavisideTheta);

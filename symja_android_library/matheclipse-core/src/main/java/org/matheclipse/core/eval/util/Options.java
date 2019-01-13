@@ -166,7 +166,9 @@ public class Options {
 		}
 		if (fDefaultOptionsList != null) {
 			try {
-				if (fDefaultOptionsList.exists(x -> {
+				if (fDefaultOptionsList.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
 						if (x.isAST()) {
 							IAST temp = (IAST) x;
 							if (temp.isRuleAST() && temp.arg1().toString().equalsIgnoreCase(optionString)) {
@@ -175,6 +177,7 @@ public class Options {
 							}
 						}
 						return false;
+					}
 				}, 1)) {
 					return rule[0].arg2();
 				}
@@ -186,10 +189,12 @@ public class Options {
 	}
 
 	public IExpr getOption(final ISymbol option) {
-		IAST[] rule = new IAST[1];
+		final IAST[] rule = new IAST[1];
 		if (fCurrentOptionsList != null) {
 			try {
-				if (fCurrentOptionsList.exists(x -> {
+				if (fCurrentOptionsList.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
 						if (x.isAST()) {
 							IAST temp = (IAST) x;
 							if (temp.isRuleAST() && temp.arg1().equals(option)) {
@@ -198,6 +203,7 @@ public class Options {
 							}
 						}
 						return false;
+					}
 				})) {
 					return rule[0].arg2();
 				}
@@ -207,7 +213,9 @@ public class Options {
 		}
 		if (fDefaultOptionsList != null) {
 			try {
-				if (fDefaultOptionsList.exists(x -> {
+				if (fDefaultOptionsList.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
 						if (x.isAST()) {
 							IAST temp = (IAST) x;
 							if (temp.isRuleAST() && temp.arg1().equals(option)) {
@@ -216,6 +224,7 @@ public class Options {
 							}
 						}
 						return false;
+					}
 				}, 1)) {
 					return rule[0].arg2();
 				}

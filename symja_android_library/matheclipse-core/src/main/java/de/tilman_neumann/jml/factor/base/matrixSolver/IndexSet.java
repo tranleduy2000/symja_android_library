@@ -140,6 +140,10 @@ public class IndexSet  {
 	}
 
 	@Override
+	public int hashCode() {
+		throw new IllegalStateException("Class IndexSet is not ready to be used in hash structures");
+	}
+	@Override
 	public String toString() {
 		String str = "[";
 		for (int i=0; i<numberOfLongs; i++) {
