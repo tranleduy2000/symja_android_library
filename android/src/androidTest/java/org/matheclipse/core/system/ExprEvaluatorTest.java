@@ -34,7 +34,7 @@ public class ExprEvaluatorTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		// wait for initializing of Integrate() rules:
-		F.join();
+		F.await();
 	}
 
 	public void testStringEval001() {
@@ -100,7 +100,7 @@ public class ExprEvaluatorTest extends TestCase {
 
 			// define a function with a recursive factorial function definition.
 			// Note: fac(0) is the stop condition.
-			result = util.eval("fac(x_IntegerQ):=x*fac(x-1);fac(0)=1");
+			result = util.eval("fac(x_?IntegerQ):=x*fac(x-1);fac(0)=1");
 			// now calculate factorial of 10:
 			result = util.eval("fac(10)");
 			assertEquals("3628800", result.toString());
@@ -114,7 +114,6 @@ public class ExprEvaluatorTest extends TestCase {
 		} catch (final Exception ex) {
 			assertTrue(false);
 		} catch (final StackOverflowError soe) {
-			soe.printStackTrace();
 			assertTrue(false);
 		} catch (final OutOfMemoryError oome) {
 			assertTrue(false);
@@ -211,6 +210,7 @@ public class ExprEvaluatorTest extends TestCase {
 			System.out.println(oome.getMessage());
 		}
 	}
+
 	/**
 	 * See: https://github.com/axkr/symja_android_library/issues/48 why the toString() method output of numeric values
 	 * is different from OutputFormFactory#convert() method.
@@ -236,7 +236,7 @@ public class ExprEvaluatorTest extends TestCase {
 
 			buf = new StringWriter();
 			OutputFormFactory.get(true).convert(buf, expr);
-			assertEquals("0.0", buf.toString());
+			assertEquals("1.0E-15", buf.toString());
 
 		} catch (SyntaxError e) {
 			// catch Symja parser errors here
@@ -252,6 +252,7 @@ public class ExprEvaluatorTest extends TestCase {
 			System.out.println(oome.getMessage());
 		}
 	}
+
 	public void testX2() {
 		ExprEvaluator evaluator = new ExprEvaluator();
 		evaluator.defineVariable("X", evaluator.parse("2"));
