@@ -76,11 +76,11 @@ public class CombinedFactorAlgorithm extends FactorAlgorithmBase {
 	 * @param profile if true then extended profiling information is collected
 	 */
 	public CombinedFactorAlgorithm(int numberOfThreads, boolean permitUnsafeUsage, boolean profile) {
+		// Android changed: Unsafe isn't available
 		// SIQS tuned for small N
-		// Android changed: Unsafe isn't available
 		siqs_smallArgs = new SIQS(0.32F, 0.37F, null, 0.16F, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss(), false);
-		// PSIQS for bigger N: monolithic sieve is still slightly faster than SBH in the long run.
 		// Android changed: Unsafe isn't available
+		// PSIQS for bigger N: monolithic sieve is still slightly faster than SBH in the long run.
 		siqs_bigArgs = new PSIQS(0.32F, 0.37F, null, null, numberOfThreads, new NoPowerFinder(), new MatrixSolver02_BlockLanczos(), profile);
 	}
 
@@ -92,7 +92,7 @@ public class CombinedFactorAlgorithm extends FactorAlgorithmBase {
 	@Override
 	public BigInteger findSingleFactor(BigInteger N) {
 		int NBits = N.bitLength();
-		if (NBits<28) return tDiv31.findSingleFactor(N);
+		if (NBits<31) return tDiv31.findSingleFactor(N);
 		if (NBits<48) return lehman.findSingleFactor(N);
 		if (NBits<58) return pollardRhoR64Mul63.findSingleFactor(N);
 		if (NBits<63) return pollardRho64.findSingleFactor(N);
