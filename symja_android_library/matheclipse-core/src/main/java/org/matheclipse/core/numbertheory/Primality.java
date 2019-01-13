@@ -679,6 +679,16 @@ public class Primality {
 	}
 
 	public static void factorInteger(final BigInteger val, Map<BigInteger, Integer> map) {
+		if (Config.JAVA_UNSAFE) {
+			int cores = Runtime.getRuntime().availableProcessors();
+			CombinedFactorAlgorithm factorizer = new CombinedFactorAlgorithm(cores / 2 + 1, true);
+			SortedMultiset<BigInteger> result = factorizer.factor(val);
+
+			for (Map.Entry<BigInteger, Integer> entry : result.entrySet()) {
+				map.put(entry.getKey(), entry.getValue());
+			}
+			return;
+		}
 		EllipticCurveMethod ecm = new EllipticCurveMethod(val);
 		ecm.factorize(map);
 	}
