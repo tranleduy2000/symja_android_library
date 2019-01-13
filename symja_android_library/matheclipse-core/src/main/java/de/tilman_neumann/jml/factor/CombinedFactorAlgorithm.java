@@ -55,8 +55,11 @@ public class CombinedFactorAlgorithm extends FactorAlgorithmBase {
 	private Lehman_Fast lehman = new Lehman_Fast(true);
 	private PollardRhoBrentMontgomeryR64Mul63 pollardRhoR64Mul63 = new PollardRhoBrentMontgomeryR64Mul63();
 	private PollardRhoBrentMontgomery64 pollardRho64 = new PollardRhoBrentMontgomery64();
-	private SIQS siqs_smallArgs;
-	private PSIQSBase siqs_bigArgs;
+	// SIQS tuned for small N
+	private SIQS siqs_smallArgs = new SIQS(0.32F, 0.37F, null, 0.16F, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss(), false);
+
+	// The SIQS chosen for big arguments depends on constructor parameters
+	private SingleFactorFinder siqs_bigArgs;
 
 	/**
 	 * Simple constructor using PSIQS with sun.misc.Unsafe features.
