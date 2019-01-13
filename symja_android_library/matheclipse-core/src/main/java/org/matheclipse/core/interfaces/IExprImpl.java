@@ -145,13 +145,26 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     @Override
-    public IExpr abs() {
-        return F.eval(F.Abs(this));
+    public IExpr add(IExpr that) {
+        return plus(that);
     }
 
     @Override
-    public IExpr add(IExpr that) {
-        return plus(that);
+    public IExpr multiply(int n) {
+        if (isPlus()) {
+            return F.evalExpand(times(F.integer(n)));
+        }
+        return times(F.integer(n));
+    }
+
+    @Override
+    public IExpr reciprocal() throws MathRuntimeException {
+        return inverse();
+    }
+
+    @Override
+    public Field<IExpr> getField() {
+        return ExprField.CONST;
     }
 
     public IExpr and(final IExpr that) {
@@ -226,22 +239,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     /**
-     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
-     * integer as this expression is canonical less than, equal to, or greater than the specified expression.
-     */
-    @Override
-    public int compareTo(IExpr expr) {
-        if (expr.isAST()) {
-            if (!expr.isDirectedInfinity()) {
-                return -1 * expr.compareTo(this);
-            }
-        }
-        int x = hierarchy();
-        int y = expr.hierarchy();
-        return (x < y) ? -1 : ((x == y) ? 0 : 1);
-    }
-
-    /**
      * Return the argument of a complex number.
      *
      * @return the argument of a complex number
@@ -308,34 +305,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     /**
-     * Returns an <code>IExpr</code> whose value is <code>(this / that)</code>. Calculates
-     * <code>F.eval(F.Times(this, F.Power(that, F.CN1)))</code> in the common case and uses a specialized implementation
-     * for derived number classes.
-     *
-     * @param that
-     * @return
-     */
-    @Override
-    public IExpr divide(IExpr that) {
-        if (that.isOne()) {
-            return this;
-        }
-        if (that.isMinusOne()) {
-            return negate();
-        }
-        EvalEngine engine = EvalEngine.get();
-        if (engine.isTogetherMode() && (this.isPlusTimesPower() || that.isPlusTimesPower())) {
-            return engine.evaluate(F.Together(F.Times(this, that.inverse())));
-        }
-        return engine.evaluate(F.Times(this, that.inverse()));
-    }
-
-    @Override
-    public IExpr[] egcd(IExpr b) {
-        throw new UnsupportedOperationException(toString());
-    }
-
-    /**
      * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>. Returns
      * <code>false</code> otherwise.
      *
@@ -362,7 +331,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
         return ExprUtil.convertToExpr(temp);
     }
-
 
     /**
      * Evaluate the expression to a <code>INumber</code> value.
@@ -443,11 +411,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return second();
     }
 
-    @Override
-    public ElemFactory<IExpr> factory() {
-        return ExprRingFactory.CONST;
-    }
-
     /**
      * Get the first element of this <code>AST</code> list (i.e. get(1)). Return <code>F.NIL</code> if this object isn't
      * an <code>AST</code>.
@@ -460,6 +423,17 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return F.NIL;
     }
 
+    /**
+     * Get the last element of the <code>AST</code> list (i.e. get(size()-1). Return <code>F.NIL</code> if this object
+     * isn't an <code>AST</code>.
+     *
+     * @return the last argument of the function represented by this <code>AST</code>.
+     * @see IExpr#head()
+     */
+    @Override
+    public IExpr last() {
+        return F.NIL;
+    }
 
     /**
      * Return the <code>FullForm()</code> of this expression
@@ -470,11 +444,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return toString();
     }
 
-    @Override
-    public IExpr gcd(IExpr that) {
-        return F.GCD.of(this, that);
-    }
-
     /**
      * Get the element at the specified <code>index</code> if this object is of type <code>IAST</code>.
      *
@@ -483,11 +452,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     public IExpr getAt(final int index) {
         return F.Part.of(this, F.integer(index));
-    }
-
-    @Override
-    public Field<IExpr> getField() {
-        return ExprField.CONST;
     }
 
     /**
@@ -548,18 +512,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     public IExpr greaterThan(IExpr that) {
         COMPARE_TERNARY temp = BooleanFunctions.CONST_GREATER.prepareCompare(this, that);
         return ExprUtil.convertToExpr(temp);
-    }
-
-
-    /**
-     * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the expression itself, did not
-     * match the given pattern. Calls <code>isFree(pattern, true)</code>.
-     *
-     * @param pattern a pattern-matching expression
-     * @return
-     */
-    public boolean has(IExpr pattern) {
-        return isFree(pattern, true);
     }
 
     @Override
@@ -648,19 +600,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     public String internalScalaString(boolean symbolsAsFactoryMethod, int depth) {
         return toString();
-    }
-
-    /**
-     * Returns the multiplicative inverse of this object. It is the object such as
-     * <code>this.times(this.inverse()) == ONE </code>, with <code>ONE</code> being the multiplicative identity.
-     * Calculates <code>F.eval(F.Power(this, F.CN1))</code> in the common case and uses a specialized implmentation for
-     * derived number classes.
-     *
-     * @return <code>ONE / this</code>.
-     */
-    @Override
-    public IExpr inverse() {
-        return power(F.CN1);
     }
 
     /**
@@ -777,6 +716,16 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isDistribution() {
+        return false;
+    }
+
+    @Override
+    public boolean isDiscreteDistribution() {
+        return false;
+    }
+
     /**
      * Test if this expression is an AST list, which contains the given <b>header element</b> at index position
      * <code>0</code> and some optional <b>argument elements</b> at the index positions <code>1..(size()-1)</code>.
@@ -787,16 +736,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @see #isAtom()
      */
     public boolean isAST(IExpr header) {
-        return false;
-    }
-
-    @Override
-    public boolean isDistribution() {
-        return false;
-    }
-
-    @Override
-    public boolean isDiscreteDistribution() {
         return false;
     }
 
@@ -1172,6 +1111,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @return
      */
     public boolean isExcept() {
+        return false;
+    }
+
+    @Override
+    public boolean isOptional() {
         return false;
     }
 
@@ -1791,17 +1735,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @deprecated use {@link #isOne()} instead.
-     */
-    @Deprecated
-    @Override
-    public boolean isONE() {
-        return isOne();
-    }
-
-    /**
      * Test if this expression is an AST list, which contains a <b>header element</b> (i.e. a function symbol like for
      * example <code>Plus or Times</code>) with attribute <code>OneIdentity</code> at index position <code>0</code> and
      * exactly <b>one argument</b> at the index position <code>1</code>. Examples for <code>OneIdentity</code> functions
@@ -1854,6 +1787,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     public boolean isPatternDefault() {
         return false;
+    }
+
+    @Override
+    public IExpr getOptionalValue() {
+        return null;
     }
 
     /**
@@ -2044,6 +1982,15 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     /**
+     * Test if this expression is a signed number. I.e. an instance of type <code>ISignedNumber</code>.
+     *
+     * @return
+     */
+    public boolean isReal() {
+        return this instanceof ISignedNumber;
+    }
+
+    /**
      * Test if this expression is a real matrix (i.e. an ASTRealMatrix) or a <code>List[List[...],...,List[...]]</code>
      * matrix with elements of type <code>org.matheclipse.core.expression.Num</code>.
      *
@@ -2182,16 +2129,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     /**
-     * Test if this expression is a signed number. I.e. an instance of type <code>ISignedNumber</code>.
-     *
-     * @return
-     */
-    public boolean isReal() {
-        return this instanceof ISignedNumber;
-    }
-
-
-    /**
      * Test if this expression is the function <code>Sin[&lt;arg&gt;]</code>
      *
      * @return
@@ -2309,14 +2246,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isUnit() {
-        return true;
-    }
-
-    /**
      * Returns <code>true</code>, if this symbol or ast expression is bound to a value (i.e. the evaluation returns an
      * <i>assigned</i> value).
      *
@@ -2356,32 +2285,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     public boolean isZero() {
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated use {@link #isZero()} instead.
-     */
-    @Deprecated
-    @Override
-    public boolean isZERO() {
-        if (isNumber()) {
-            return isZero();
-        }
-        return F.PossibleZeroQ.ofQ(this);
-    }
-
-    /**
-     * Get the last element of the <code>AST</code> list (i.e. get(size()-1). Return <code>F.NIL</code> if this object
-     * isn't an <code>AST</code>.
-     *
-     * @return the last argument of the function represented by this <code>AST</code>.
-     * @see IExpr#head()
-     */
-    @Override
-    public IExpr last() {
-        return F.NIL;
     }
 
     /**
@@ -2496,48 +2399,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     /**
-     * Additional multiply method which works like <code>times()</code> to fulfill groovy's method signature
-     *
-     * @param that
-     * @return
-     * @see IExpr#times(IExpr)
-     */
-    @Override
-    public IExpr multiply(final IExpr that) {
-        // if (isZero()) {
-        // return this;
-        // }
-        // if (that.isZero()) {
-        // return that;
-        // }
-        // if (isOne()) {
-        // return that;
-        // }
-        // if (that.isOne()) {
-        // return this;
-        // }
-        // if (isPlus() && !that.isPlus()) {
-        // if (that.isAtom() || (that.isPower() && that.base().isAtom())) {
-        // IExpr temp = ((IAST) this).mapThread(F.binaryAST2(F.Times, null, that), 1);
-        // return EvalEngine.get().evaluate(temp);
-        // }
-        // } else if (!isPlus() && that.isPlus()) {
-        // if (isAtom() || (isPower() && base().isAtom())) {
-        // IExpr temp = ((IAST) that).mapThread(F.binaryAST2(F.Times, this, null), 2);
-        // return EvalEngine.get().evaluate(temp);
-        // }
-        // }
-        return times(that);
-    }
-
-    @Override
-    public IExpr multiply(int n) {
-        if (isPlus()) {
-            return F.evalExpand(times(F.integer(n)));
-        }
-        return times(F.integer(n));
-    }
-    /**
      * Multiply <code>this * that</code>. If oneof the arguments is a <code>Plus</code> expression, distribute the other
      * expression other <code>Plus</code>.
      *
@@ -2575,14 +2436,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
             return EvalEngine.get().evaluate(temp);
         }
         return times(that);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IExpr negate() {
-        return opposite();
     }
 
     /**
@@ -2795,91 +2648,12 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     /**
-     * Returns an <code>IExpr</code> whose value is <code>(this ^ n)</code>. Calculates
-     * <code>F.eval(F.Power(this, that))</code> in the common case and uses a specialized implementation for derived
-     * number classes.
-     *
-     * @param n the exponent
-     * @return <code>(this ^ n)</code>
-     */
-    @Override
-    public IExpr power(final long n) {
-        if (n == 0L) {
-            if (!this.isZero()) {
-                return F.C1;
-            }
-            // don't return F.Indeterminate here! The evaluation of F.Power()
-            // returns Indeterminate
-            return F.Power(this, F.C0);
-        } else if (n == 1L) {
-            return this;
-        } else if (this.isNumber()) {
-            long exp = n;
-            if (n < 0) {
-                exp *= -1;
-            }
-            int b2pow = 0;
-
-            while ((exp & 1) == 0) {
-                b2pow++;
-                exp >>= 1;
-            }
-
-            INumber r = (INumber) this;
-            INumber x = r;
-
-            while ((exp >>= 1) > 0) {
-				x = (INumber) x.times(x);
-                if ((exp & 1) != 0) {
-					r = (INumber) r.times(x);
-                }
-            }
-
-            while (b2pow-- > 0) {
-				r = (INumber) r.times(r);
-            }
-            if (n < 0) {
-                return r.inverse();
-            }
-            return r;
-        }
-        return F.Power(this, F.integer(n));
-    }
-
-    /**
      * Return the real part of this expression if possible. Otherwise return <code>Re(this)</code>.
      *
      * @return real part
      */
     public IExpr re() {
         return F.Re.of(this);
-    }
-
-    @Override
-    public IExpr reciprocal() throws MathRuntimeException {
-        return inverse();
-    }
-
-    @Override
-    public IExpr remainder(IExpr that) {
-        if (equals(that)) {
-            return F.C0;
-        }
-        return this;
-    }
-
-    /**
-     * Replace all (sub-) expressions with the given unary function, if the given predicate yields <code>true</code>. If
-     * no substitution matches, the method returns <code>this</code>.
-     *
-     * @param predicate
-     * @param function  if the unary functions <code>apply()</code> method returns <code>F.NIL</code> the expression isn't
-     *                  substituted.
-     * @return <code>this</code> if no substitution of a (sub-)expression was possible.
-     */
-
-    public IExpr replace(final Predicate<IExpr> predicate, final Function<IExpr, IExpr> function) {
-        return accept(new VisitorReplaceAllLambda(predicate, function)).orElse(this);
     }
 
     /**
@@ -2894,7 +2668,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     public IExpr replaceAll(final Function<IExpr, IExpr> function) {
         return accept(new VisitorReplaceAll(function));
     }
-
 
     @Override
     public IExpr replaceAll(Map<? extends IExpr, ? extends IExpr> map) {
@@ -3014,23 +2787,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     /**
-     * Signum functionality is used in JAS toString() method, don't use it as math signum function.
-     *
-     * @deprecated
-     */
-    @Deprecated
-    @Override
-    public int signum() {
-        if (isZero()) {
-            return 0;
-        }
-        if (isReal()) {
-            return ((ISignedNumber) this).sign();
-        }
-        return 1;
-    }
-
-    /**
      * Returns the <b>number of elements</b> in this {@code IAST}.The <b>number of elements</b> equals
      * <code>argSize() + 1</code> (i.e. the <b>number of arguments</b> plus 1). If this is an atom return size
      * <code>0</code>.
@@ -3073,23 +2829,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
             }
         }
         return Sqrt(this);
-    }
-
-    @Override
-    public IExpr subtract(IExpr that) {
-        if (that.isZero()) {
-            return this;
-        }
-        EvalEngine engine = EvalEngine.get();
-        if (engine.isTogetherMode() && (this.isPlusTimesPower() || that.isPlusTimesPower())) {
-            return engine.evaluate(F.Together(F.Plus(this, F.Times(F.CN1, that))));
-        }
-        return engine.evaluate(F.Plus(this, F.Times(F.CN1, that)));
-    }
-
-    @Override
-    public IExpr sum(final IExpr that) {
-        return add(that);
     }
 
     /**
@@ -3184,16 +2923,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return null;
     }
 
-    @Override
-    public String toScript() {
-        return toString();
-    }
-
-    @Override
-    public String toScriptFactory() {
-        throw new UnsupportedOperationException(toString());
-    }
-
     /**
      * Compare if <code>this != that</code:
      * <ul>
@@ -3247,6 +2976,283 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     public IExpr variables2Slots(final Map<IExpr, IExpr> map, final Collection<IExpr> variableCollector) {
         return this;
+    }
+
+    /**
+     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
+     * integer as this expression is canonical less than, equal to, or greater than the specified expression.
+     */
+    @Override
+    public int compareTo(IExpr expr) {
+        if (expr.isAST()) {
+            if (!expr.isDirectedInfinity()) {
+                return -1 * expr.compareTo(this);
+            }
+        }
+        int x = hierarchy();
+        int y = expr.hierarchy();
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+    }
+
+    @Override
+    public ElemFactory<IExpr> factory() {
+        return ExprRingFactory.CONST;
+    }
+
+    @Override
+    public String toScript() {
+        return toString();
+    }
+
+    @Override
+    public String toScriptFactory() {
+        throw new UnsupportedOperationException(toString());
+    }
+
+    @Override
+    public IExpr gcd(IExpr that) {
+        return F.GCD.of(this, that);
+    }
+
+    @Override
+    public IExpr[] egcd(IExpr b) {
+        throw new UnsupportedOperationException(toString());
+    }
+
+    /**
+     * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the expression itself, did not
+     * match the given pattern. Calls <code>isFree(pattern, true)</code>.
+     *
+     * @param pattern a pattern-matching expression
+     * @return
+     */
+    public boolean has(IExpr pattern) {
+        return isFree(pattern, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated use {@link #isOne()} instead.
+     */
+    @Deprecated
+    @Override
+    public boolean isONE() {
+        return isOne();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isUnit() {
+        return true;
+    }
+
+    /**
+     * Additional multiply method which works like <code>times()</code> to fulfill groovy's method signature
+     *
+     * @param that
+     * @return
+     * @see IExpr#times(IExpr)
+     */
+    @Override
+    public IExpr multiply(final IExpr that) {
+        // if (isZero()) {
+        // return this;
+        // }
+        // if (that.isZero()) {
+        // return that;
+        // }
+        // if (isOne()) {
+        // return that;
+        // }
+        // if (that.isOne()) {
+        // return this;
+        // }
+        // if (isPlus() && !that.isPlus()) {
+        // if (that.isAtom() || (that.isPower() && that.base().isAtom())) {
+        // IExpr temp = ((IAST) this).mapThread(F.binaryAST2(F.Times, null, that), 1);
+        // return EvalEngine.get().evaluate(temp);
+        // }
+        // } else if (!isPlus() && that.isPlus()) {
+        // if (isAtom() || (isPower() && base().isAtom())) {
+        // IExpr temp = ((IAST) that).mapThread(F.binaryAST2(F.Times, this, null), 2);
+        // return EvalEngine.get().evaluate(temp);
+        // }
+        // }
+        return times(that);
+    }
+
+    /**
+     * Returns an <code>IExpr</code> whose value is <code>(this / that)</code>. Calculates
+     * <code>F.eval(F.Times(this, F.Power(that, F.CN1)))</code> in the common case and uses a specialized implementation
+     * for derived number classes.
+     *
+     * @param that
+     * @return
+     */
+    @Override
+    public IExpr divide(IExpr that) {
+        if (that.isOne()) {
+            return this;
+        }
+        if (that.isMinusOne()) {
+            return negate();
+        }
+        EvalEngine engine = EvalEngine.get();
+        if (engine.isTogetherMode() && (this.isPlusTimesPower() || that.isPlusTimesPower())) {
+            return engine.evaluate(F.Together(F.Times(this, that.inverse())));
+        }
+        return engine.evaluate(F.Times(this, that.inverse()));
+    }
+
+    @Override
+    public IExpr remainder(IExpr that) {
+        if (equals(that)) {
+            return F.C0;
+        }
+        return this;
+    }
+
+    /**
+     * Returns the multiplicative inverse of this object. It is the object such as
+     * <code>this.times(this.inverse()) == ONE </code>, with <code>ONE</code> being the multiplicative identity.
+     * Calculates <code>F.eval(F.Power(this, F.CN1))</code> in the common case and uses a specialized implmentation for
+     * derived number classes.
+     *
+     * @return <code>ONE / this</code>.
+     */
+    @Override
+    public IExpr inverse() {
+        return power(F.CN1);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated use {@link #isZero()} instead.
+     */
+    @Deprecated
+    @Override
+    public boolean isZERO() {
+        if (isNumber()) {
+            return isZero();
+        }
+        return F.PossibleZeroQ.ofQ(this);
+    }
+
+    /**
+     * Signum functionality is used in JAS toString() method, don't use it as math signum function.
+     *
+     * @deprecated
+     */
+    @Deprecated
+    @Override
+    public int signum() {
+        if (isZero()) {
+            return 0;
+        }
+        if (isReal()) {
+            return ((ISignedNumber) this).sign();
+        }
+        return 1;
+    }
+
+    @Override
+    public IExpr sum(final IExpr that) {
+        return add(that);
+    }
+
+    @Override
+    public IExpr subtract(IExpr that) {
+        if (that.isZero()) {
+            return this;
+        }
+        EvalEngine engine = EvalEngine.get();
+        if (engine.isTogetherMode() && (this.isPlusTimesPower() || that.isPlusTimesPower())) {
+            return engine.evaluate(F.Together(F.Plus(this, F.Times(F.CN1, that))));
+        }
+        return engine.evaluate(F.Plus(this, F.Times(F.CN1, that)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IExpr negate() {
+        return opposite();
+    }
+
+    @Override
+    public IExpr abs() {
+        return F.eval(F.Abs(this));
+    }
+
+    /**
+     * Returns an <code>IExpr</code> whose value is <code>(this ^ n)</code>. Calculates
+     * <code>F.eval(F.Power(this, that))</code> in the common case and uses a specialized implementation for derived
+     * number classes.
+     *
+     * @param n the exponent
+     * @return <code>(this ^ n)</code>
+     */
+    @Override
+    public IExpr power(final long n) {
+        if (n == 0L) {
+            if (!this.isZero()) {
+                return F.C1;
+            }
+            // don't return F.Indeterminate here! The evaluation of F.Power()
+            // returns Indeterminate
+            return F.Power(this, F.C0);
+        } else if (n == 1L) {
+            return this;
+        } else if (this.isNumber()) {
+            long exp = n;
+            if (n < 0) {
+                exp *= -1;
+            }
+            int b2pow = 0;
+
+            while ((exp & 1) == 0) {
+                b2pow++;
+                exp >>= 1;
+            }
+
+            INumber r = (INumber) this;
+            INumber x = r;
+
+            while ((exp >>= 1) > 0) {
+                x = (INumber) x.times(x);
+                if ((exp & 1) != 0) {
+                    r = (INumber) r.times(x);
+                }
+            }
+
+            while (b2pow-- > 0) {
+                r = (INumber) r.times(r);
+            }
+            if (n < 0) {
+                return r.inverse();
+            }
+            return r;
+        }
+        return F.Power(this, F.integer(n));
+    }
+
+    /**
+     * Replace all (sub-) expressions with the given unary function, if the given predicate yields <code>true</code>. If
+     * no substitution matches, the method returns <code>this</code>.
+     *
+     * @param predicate
+     * @param function  if the unary functions <code>apply()</code> method returns <code>F.NIL</code> the expression isn't
+     *                  substituted.
+     * @return <code>this</code> if no substitution of a (sub-)expression was possible.
+     */
+
+    public IExpr replace(final Predicate<IExpr> predicate, final Function<IExpr, IExpr> function) {
+        return accept(new VisitorReplaceAllLambda(predicate, function)).orElse(this);
     }
 
     @Override
