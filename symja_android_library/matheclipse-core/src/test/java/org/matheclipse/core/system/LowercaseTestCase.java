@@ -161,9 +161,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testApart() {
 		// check("Factor(x^2 - y^2 )", "(x-y)*(x+y)");
 		// check("Solve(x^2 - y^2==0, y)", "{{y->-x},{y->x}}");
+
 		// TODO return 1/b - a/(b*(a + b*x))
 		check("Apart((x/(a+(b*x))),x)", //
 				"x/(a+b*x)");
+
 		check("Apart((3*x-8)/((x+1)*(x-5)),x)", //
 				"7/6*1/(-5+x)+11/6*1/(1+x)");
 
@@ -181,6 +183,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("Sin(1 / (x ^ 2 - y ^ 2)) // Apart", //
 				"Sin(1/(x^2-y^2))");
+
 		check("Apart(1 / (x^2 + 5*x + 6))", //
 				"1/(2+x)-1/(3+x)");
 		// TODO return -1 / (2 y (x + y)) + 1 / (2 y (x - y))
@@ -194,6 +197,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"1/(4*(1+x))-1/(4*(5+x))");
 		check("Apart(1 < (x + 1)/(x - 1) < 2)", //
 				"1<1+2/(-1+x)<2");
+
 		check("Apart(1/((1 + x)*(5 + x)))", //
 				"1/(4*(1+x))-1/(4*(5+x))");
 		check("Apart((x)/(x^2-1))", //
@@ -729,7 +733,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testAttributes() {
-		check("Attributes(fun) = {ReadProtected, Protected}",//
+		check("Attributes(fun) = {ReadProtected, Protected}", //
 				"{ReadProtected,Protected}");
 		check("Attributes(Plus)", //
 				"{Flat,Listable,OneIdentity,Orderless,NumericFunction}");
@@ -1023,9 +1027,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"1111");
 		check("Block({x=y,y=z,z=3}, Print({Hold(x),Hold(y),Hold(z)});{x,y,z})", //
 				"{3,3,3}");
-		check("Block({x,f}, f(0)=0;f(x_):=f(x-1)+x;f(3))",//
+		check("Block({x,f}, f(0)=0;f(x_):=f(x-1)+x;f(3))", //
 				"6");
-		check("f(3)",//
+		check("f(3)", //
 				"f(3)");
 	}
 
@@ -1208,6 +1212,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testBooleanMinimize() {
+
 		check("BooleanMinimize(!e && !d && c && b && a || !c && !f && !b && a || !f && a && !c && b || !i && f && h && !a || c && d && b && a || !b && g && a || !j && !h && !a)", //
 				"a&&b&&c&&d||a&&b&&c&&!e||a&&!b&&g||a&&!c&&!f||!a&&f&&h&&!i||!a&&!h&&!j");
 		check("BooleanMinimize((A && !B || !A && B) && "//
@@ -1568,6 +1573,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testCirclePoints() {
 		// check("CirclePoints(3)", "{{Sqrt(3)/2,-1/2},{0,1},{-Sqrt(3)/2,-1/2}}");
 		check("CirclePoints(2)", "{{1,0},{-1,0}}");
+
 		check("CirclePoints(4)",
 				"{{1/Sqrt(2),-1/Sqrt(2)},{1/Sqrt(2),1/Sqrt(2)},{-1/Sqrt(2),1/Sqrt(2)},{-1/Sqrt(2),\n" + "-1/Sqrt(2)}}");
 		// check("CirclePoints(10)", "");
@@ -2006,6 +2012,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ConditionalExpression(a,False)", //
 				"Undefined");
 	}
+
 	public void testConjugate() {
 		check("Conjugate(Sin(Pi+I))", //
 				"I*Sinh(1)");
@@ -2139,6 +2146,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("$Version", //
 				ConstantDefinitions.VERSION);
 	}
+
 	public void testContinue() {
 		check("For(i=1, i<=8, i=i+1, If(Mod(i,2) == 0, Continue()); Print(i))", "");
 	}
@@ -3867,6 +3875,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("213916881789829278910570173437*467471286806848547076331371449== 10^59+213", //
 		// "True");
 		if (Config.EXPENSIVE_JUNIT_TESTS) {
+			check("FactorInteger(966983290915691193309978723256242679920691599725908954700676674631843021151)", //
+					"{{2166660942804222727904664493239497749,1},{\n" +
+					"446301159453293757389122758418041256099,1}}");
 			check("FactorInteger(672924717570659549138949381690007452648932205241)", //
 					"{{324557421200651278898953,1},{2073361056053736024795697,1}}");
 			check("FactorInteger(475055344870856723877355576259313975012575765717)", //
@@ -3889,6 +3900,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 					"{{149,1},{329569479697,1},{903019357561501,1}}");
 		}
 
+//		check("FactorInteger(966983290915691193309978723256242679920691599725908954700676674631843021151)", //
+//				"{{2166660942804222727904664493239497749,1},{\n" +
+//				"446301159453293757389122758418041256099,1}}");
 		check("FactorInteger(600851475143)", //
 				"{{71,1},{839,1},{1471,1},{6857,1}}");
 		check("FactorInteger(2^32-1)", //
@@ -4153,7 +4167,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				+ "$d=0.00;\n" + "$vn=0;\n" + "$EAj=0;\n" + "$zj=0;\n" + "$sz=1;\n"
 				+ "FindRoot((($K*(1+p-$g)^($n/$Z))/(1+$AA))+(Sum((($R*(1+$d)^(Floor(i0/$Z)))/(1+$AA))*(1+p-$g)^(($n-i0-$vn)/$Z),{i0,0,$n-1}))+(Sum(($EAj*(1+p-$g)^(($n-$zj)/$Z))/(1+$AA),{j,1,$sz})) - 30199, {p, 0, 0.1})", //
 				"{p->0.049997093940105534}");
-		checkNumeric("$K=10000;\n" + "$g=0.0;\n" + "$n=10*12;\n" + "$Z=12;\n" + "$AA=0.0526;\n" + "$res=15474;\n"
+		checkNumeric(
+				"$K=10000;\n" + "$g=0.0;\n" + "$n=10*12;\n" + "$Z=12;\n" + "$AA=0.0526;\n" + "$res=15474;\n"
 						+ "FindRoot((($K*(1+p-$g)^($n/$Z))/(1+$AA)) - $res, {p, 0, 0.1})", //
 				"{p->0.04999346433486661}");
 
@@ -6857,8 +6872,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testMaximize() {
 		check("Maximize(-x^4-7*x^3+2*x^2 - 42,x)", //
-				"{-42-7*(-21/8-Sqrt(505)/8)^3+2*(21/8+Sqrt(505)/8)^2-(21/8+Sqrt(505)/8)^4,{x->-21/\n" +
-				"8-Sqrt(505)/8}}");
+				"{-42-7*(-21/8-Sqrt(505)/8)^3+2*(21/8+Sqrt(505)/8)^2-(21/8+Sqrt(505)/8)^4,{x->-21/\n"
+						+ "8-Sqrt(505)/8}}");
 		check("Maximize(x^4+7*Tan(x)-2*x^2 + 42, x)", //
 				"Maximize(42-2*x^2+x^4+7*Tan(x),x)");
 		check("Maximize(x^4+7*x^3-2*x^2 + 42, x)", //
@@ -7835,7 +7850,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Normalize({x,y}, f)", "{x/f({x,y}),y/f({x,y})}");
 		check("Normalize({1, 2*I, 3, 4*I, 5, 6*I})",
 				"{1/Sqrt(91),(I*2)/Sqrt(91),3/Sqrt(91),(I*4)/Sqrt(91),5/Sqrt(91),(I*6)/Sqrt(91)}");
-		check("Normalize(N({1, 2*I, 3, 4*I, 5, 6*I}))", "{0.104828,I*0.209657,0.314485,I*0.419314,0.524142,I*0.628971}");
+		check("Normalize(N({1, 2*I, 3, 4*I, 5, 6*I}))",
+				"{0.104828,I*0.209657,0.314485,I*0.419314,0.524142,I*0.628971}");
 		check("Normalize({{1, 2}, {4, 5}}, Norm)",
 				"{{1/Norm({{1,2},{4,5}}),2/Norm({{1,2},{4,5}})},{4/Norm({{1,2},{4,5}}),5/Norm({{1,\n" + "2},{4,5}})}}");
 		check("Normalize(1 + x + x^2, Integrate(#^2, {x, -1, 1}) &)", "5/22*(1+x+x^2)");
@@ -9309,6 +9325,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPrimePowerQ() {
+		check("PrimePowerQ(1)", "False");
 		check("13^9", "10604499373");
 		check("PrimePowerQ(10604499373)", "True");
 		check("PrimePowerQ(-8)", "True");
