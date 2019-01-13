@@ -31,8 +31,7 @@ import de.tilman_neumann.jml.primes.probable.BPSWTest;
 /**
  * Auxiliary factor algorithm to find smooth decompositions of Q's.
  * 
- * Version 02:
- * Uses trial division first, complete factorization if Q is considered sufficiently smooth.
+ * Version 02: Uses trial division first, complete factorization if Q is considered sufficiently smooth.
  * 
  * @author Tilman Neumann
  */
@@ -116,7 +115,7 @@ public class TDiv_CF63_02 implements TDiv_CF63 {
 				}
 			} // end while (trialDivIndex < primeBaseSize)
 		}
-//		if (DEBUG) assertTrue(Q_rest>1);
+		// if (DEBUG) assertTrue(Q_rest>1);
 		if (Q_rest_bits<32) {
 			int Q_rest_int = (int) Q_rest;
 			while (trialDivIndex < primeBaseSize) {
@@ -137,8 +136,9 @@ public class TDiv_CF63_02 implements TDiv_CF63 {
 		// the remaining Q is either a prime > pMax, or a composite > pMax^2.
 		if (Q_rest > maxQRest) return null; // Q is not sufficiently smooth
 		 
-		// now we consider Q as sufficiently smooth. then we want to know all prime factors, as long as we do not find one that is too big to be useful.
-		//LOG.debug("before factor_recurrent()");
+		// now we consider Q as sufficiently smooth. then we want to know all prime factors, as long as we do not find
+		// one that is too big to be useful.
+		// LOG.debug("before factor_recurrent()");
 		boolean isSmooth = factor_recurrent(Q_rest);
 		if (DEBUG) if (bigFactors.size()>2) LOG.debug("Found " + bigFactors.size() + " distinct big factors: " + bigFactors);
 		return isSmooth ? aqPairFactory.create(A, smallFactors, bigFactors) : null;
@@ -147,12 +147,14 @@ public class TDiv_CF63_02 implements TDiv_CF63 {
 	private boolean factor_recurrent(long Q_rest) {
 		if (Q_rest < pMaxSquare) {
 			// we divided Q_rest by all primes <= pMax and the rest is < pMax^2 -> it must be prime
-//			if (DEBUG) assertTrue(bpsw.isProbablePrime(Q_rest));
-			if (bitLength(Q_rest) > 31) return false;
+			// if (DEBUG) assertTrue(bpsw.isProbablePrime(Q_rest));
+			if (bitLength(Q_rest) > 31)
+				return false;
 			bigFactors.add((int)Q_rest);
 			return true;
 		}
-		// here we can not do without isProbablePrime(), because calling findSingleFactor() may not return when called with a prime argument
+		// here we can not do without isProbablePrime(), because calling findSingleFactor() may not return when called
+		// with a prime argument
 		if (bpsw.isProbablePrime(Q_rest)) {
 			// Q_rest is (probable) prime -> end of recurrence
 			if (bitLength(Q_rest) > 31) return false;

@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import de.tilman_neumann.jml.base.UnsignedBigInt;
 import de.tilman_neumann.jml.factor.base.SortedIntegerArray;
@@ -37,10 +36,7 @@ import de.tilman_neumann.jml.factor.siqs.poly.SIQSPolyGenerator;
 import de.tilman_neumann.jml.factor.siqs.powers.PowerOfSmallPrimesFinder;
 import de.tilman_neumann.jml.factor.siqs.sieve.Sieve03g;
 import de.tilman_neumann.jml.primes.probable.BPSWTest;
-import de.tilman_neumann.util.SortedMultiset;
 import de.tilman_neumann.util.Timer;
-
-import static de.tilman_neumann.jml.base.BigIntConstants.I_1;
 
 /**
  * A trial division engine where partials can have up to 2 large factors.
@@ -157,19 +153,19 @@ public class TDiv_QS_2Large_UBI implements TDiv_QS {
 				// Q(x) was found sufficiently smooth to be considered a (partial) congruence
 				aqPairs.add(aqPair);
 				sufficientSmoothCount++;
-				if (DEBUG) {
-					LOG.debug("Found congruence " + aqPair);
+//				if (DEBUG) {
+//					LOG.debug("Found congruence " + aqPair);
 //					assertEquals(A.multiply(A).mod(kN), Q.mod(kN));
-					// make sure that the product of factors gives Q
-					SortedMultiset<Integer> allQFactors = aqPair.getAllQFactors();
-					BigInteger testProduct = I_1;
-					for (Map.Entry<Integer, Integer> entry : allQFactors.entrySet()) {
-						BigInteger prime = BigInteger.valueOf(entry.getKey());
-						int exponent = entry.getValue();
-						testProduct = testProduct.multiply(prime.pow(exponent));
-					}
+//					// make sure that the product of factors gives Q
+//					SortedMultiset<Integer> allQFactors = aqPair.getAllQFactors();
+//					BigInteger testProduct = I_1;
+//					for (Map.Entry<Integer, Integer> entry : allQFactors.entrySet()) {
+//						BigInteger prime = BigInteger.valueOf(entry.getKey());
+//						int exponent = entry.getValue();
+//						testProduct = testProduct.multiply(prime.pow(exponent));
+//					}
 //					assertEquals(Q, testProduct);
-				}
+//				}
 			}
 		}
 		if (profile) duration += timer.capture();
