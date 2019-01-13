@@ -34,8 +34,9 @@ public class EllipticIntegrals {
 	 * See:
 	 * </p>
 	 * <ul>
-	 * <li><a href= "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind">Wikipedia - Elliptic
-	 * integral - Complete elliptic integral of the second kind)</a></li>
+	 * <li><a href=
+	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind">Wikipedia -
+	 * Elliptic integral - Complete elliptic integral of the second kind)</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
 	 *
@@ -76,6 +77,8 @@ public class EllipticIntegrals {
 					double a = ((ISignedNumber) z).doubleValue();
 					double b = ((ISignedNumber) m).doubleValue();
 					try {
+						// see github #109
+						b = -Math.asin(Math.sqrt(b));
 						return F.num(de.lab4inf.math.functions.IncompleteSecondEllipticIntegral.icseint(a, b));
 					} catch (RuntimeException rex) {
 						engine.printMessage("EllipticE: " + rex.getMessage());
@@ -141,7 +144,8 @@ public class EllipticIntegrals {
 	 * See:
 	 * </p>
 	 * <ul>
-	 * <li><a href= "https://en.wikipedia.org/wiki/Elliptic_integral#Incomplete_elliptic_integral_of_the_first_kind">Wikipedia -
+	 * <li><a href=
+	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Incomplete_elliptic_integral_of_the_first_kind">Wikipedia -
 	 * Elliptic integral - Incomplete elliptic integral of the first kind)</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
@@ -191,6 +195,8 @@ public class EllipticIntegrals {
 				double a = ((ISignedNumber) z).doubleValue();
 				double b = ((ISignedNumber) m).doubleValue();
 				try {
+					// see github #109
+					b = -Math.asin(Math.sqrt(b));
 					return F.num(de.lab4inf.math.functions.IncompleteFirstEllipticIntegral.icfeint(a, b));
 				} catch (RuntimeException rex) {
 					engine.printMessage("EllipticF: " + rex.getMessage());
@@ -236,8 +242,9 @@ public class EllipticIntegrals {
 	 * See:
 	 * </p>
 	 * <ul>
-	 * <li><a href= "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_first_kind">Wikipedia - Elliptic
-	 * integral - Complete elliptic integral of the first kind)</a></li>
+	 * <li><a href=
+	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_first_kind">Wikipedia -
+	 * Elliptic integral - Complete elliptic integral of the first kind)</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
 	 *
@@ -306,8 +313,9 @@ public class EllipticIntegrals {
 	 * See:
 	 * </p>
 	 * <ul>
-	 * <li><a href= "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_third_kind">Wikipedia - Elliptic
-	 * integral - Complete elliptic integral of the third kind</a></li>
+	 * <li><a href=
+	 * "https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_third_kind">Wikipedia -
+	 * Elliptic integral - Complete elliptic integral of the third kind</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
 	 *
@@ -330,6 +338,8 @@ public class EllipticIntegrals {
 					double b = ((ISignedNumber) m).doubleValue();
 					double c = ((ISignedNumber) ast.arg3()).doubleValue();
 					try {
+						// see github #109
+						c = -Math.asin(Math.sqrt(c));
 						return F.num(de.lab4inf.math.functions.IncompleteThirdEllipticIntegral.icteint(a, b, c));
 					} catch (RuntimeException rex) {
 						engine.printMessage("EllipticPi: " + rex.getMessage());
