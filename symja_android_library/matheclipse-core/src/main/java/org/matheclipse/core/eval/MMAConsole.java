@@ -80,6 +80,12 @@ public class MMAConsole {
 		F.initSymbols(null, null, true);
 	}
 
+	public static void runConsole(final String args[], PrintWriter out, PrintWriter err) {
+		stdout = out;
+		stderr = err;
+		main(args);
+	}
+
 	public static void main(final String args[]) {
 
 		MMAConsole console;

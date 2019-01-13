@@ -73,6 +73,11 @@ public class Console {
 	 */
 	private static PrintWriter stderr = new PrintWriter(new OutputStreamWriter(System.err, Charset.forName("UTF-8")),
 			true);
+	public static void runConsole(final String args[], PrintWriter out, PrintWriter err) {
+		stdout = out;
+		stderr = err;
+		main(args);
+	}
     public static void main(final String args[]) {
         F.initSymbols(null, null, true);
         Console console;
@@ -667,7 +672,7 @@ public class Console {
 			out.write(fileContent);
 			out.close();
 
-			System.out.println(temp.toURI().toString());
+			stdout.println(temp.toURI().toString());
 
 			//Android changed: android doesn't have package: java.awt
 //			java.awt.Desktop.getDesktop().browse(temp.toURI());
