@@ -204,7 +204,7 @@ public class Uint128 {
 	 */
 //	public static void main(String[] args) {
 //		ConfigUtil.initProject();
-//		SecureRandom RNG = new SecureRandom();
+//		Random RNG = new Random();
 //		
 //		for (int i=0; i<100000; i++) {
 //			BigInteger a_hi_big = new BigInteger(63, RNG);

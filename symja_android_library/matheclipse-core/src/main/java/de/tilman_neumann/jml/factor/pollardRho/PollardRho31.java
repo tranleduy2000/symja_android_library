@@ -14,7 +14,7 @@
 package de.tilman_neumann.jml.factor.pollardRho;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -29,7 +29,7 @@ import de.tilman_neumann.jml.gcd.Gcd63;
 public class PollardRho31 extends FactorAlgorithmBase {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = Logger.getLogger(PollardRho31.class);
-	private static final SecureRandom RNG = new SecureRandom();
+	private static final Random RNG = new Random();
 
 	private Gcd63 gcdEngine = new Gcd63();
 

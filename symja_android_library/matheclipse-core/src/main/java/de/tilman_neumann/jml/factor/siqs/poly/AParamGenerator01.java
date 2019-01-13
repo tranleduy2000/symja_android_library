@@ -16,7 +16,7 @@ package de.tilman_neumann.jml.factor.siqs.poly;
 import static de.tilman_neumann.jml.base.BigIntConstants.*;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.util.Random;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -80,7 +80,7 @@ public class AParamGenerator01 implements AParamGenerator {
 	/** and the factors themselves */
 	private int[] qArray;
 	/** random generator */
-	private SecureRandom rng = new SecureRandom();
+	private Random rng = new Random();
 	/** map of a-values already used to their q-values */
 	private HashMap<BigInteger, int[]> aParamHistory;
 

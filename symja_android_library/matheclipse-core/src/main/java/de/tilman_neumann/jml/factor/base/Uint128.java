@@ -15,7 +15,7 @@ package de.tilman_neumann.jml.factor.base;
 
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -207,7 +207,7 @@ public class Uint128 {
 	 */
 //	public static void main(String[] args) {
 //		ConfigUtil.initProject();
-//		SecureRandom RNG = new SecureRandom();
+//		Random RNG = new Random();
 //		
 //		for (int i=0; i<100000; i++) {
 //			BigInteger a_hi_big = new BigInteger(63, RNG);

@@ -16,7 +16,7 @@ package de.tilman_neumann.jml.factor.pollardRho;
 import org.apache.log4j.Logger;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.util.Random;
 
 import de.tilman_neumann.jml.base.Uint128;
 import de.tilman_neumann.jml.factor.FactorAlgorithmBase;
@@ -44,7 +44,7 @@ public class PollardRhoBrentMontgomery64 extends FactorAlgorithmBase {
 	private static final Logger LOG = Logger.getLogger(PollardRhoBrentMontgomery64.class);
 	private static final boolean DEBUG = false;
 
-	private static final SecureRandom RNG = new SecureRandom();
+	private static final Random RNG = new Random();
 
 	// The reducer R is 2^64, but the only constant still required is the half of it.
 	private static final long R_HALF = 1L << 63;

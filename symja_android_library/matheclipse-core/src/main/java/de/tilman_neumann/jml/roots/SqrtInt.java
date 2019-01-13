@@ -13,15 +13,16 @@
  */
 package de.tilman_neumann.jml.roots;
 
-import static de.tilman_neumann.jml.base.BigIntConstants.*;
-
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
-
-//import org.apache.log4j.Logger;
+import java.util.Random;
 
 import de.tilman_neumann.jml.base.BigIntConverter;
+
+import static de.tilman_neumann.jml.base.BigIntConstants.I_0;
+import static de.tilman_neumann.jml.base.BigIntConstants.I_1;
+
+//import org.apache.log4j.Logger;
 //import de.tilman_neumann.util.ConfigUtil;
 
 /**
@@ -32,7 +33,7 @@ import de.tilman_neumann.jml.base.BigIntConverter;
  */
 public class SqrtInt {
 //	private static final Logger LOG = Logger.getLogger(SqrtInt.class);
-	private static final SecureRandom RNG = new SecureRandom();
+	private static final Random RNG = new Random();
 
 	/**
 	 * sqrt() computation with integer solutions using Herons (or "Babylonian") method

@@ -14,7 +14,7 @@
 package de.tilman_neumann.jml.factor;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.util.Random;
 import java.util.ArrayList;
 
 //import org.apache.log4j.Logger;
@@ -38,7 +38,7 @@ public class TestsetGenerator {
 	private static final KnuthSchroeppel multiplierFinder = new KnuthSchroeppel(); // used to compute the multiplier k
 
 	/** random generator */
-	private static final SecureRandom RNG = new SecureRandom();
+	private static final Random RNG = new Random();
 
 	/**
 	 * Generate N_count random numbers of the given bit length.

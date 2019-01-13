@@ -15,7 +15,7 @@ public class CompatibleTest extends TestCase {
         String[] unavailablePackages = new String[]{
                 "import java.nio.channels",
                 "import java.net",
-                "import java.security ",
+                "import java.security",
                 "Config.DOUBLE_EPSILON",
                 "java.util.UUID",
         };

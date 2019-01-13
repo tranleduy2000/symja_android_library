@@ -147,7 +147,7 @@ public class TDiv63Inverse extends FactorAlgorithmBase {
 	 */
 //	public static void main(String[] args) {
 //		ConfigUtil.initProject();
-//		SecureRandom RNG = new SecureRandom();
+//		Random RNG = new Random();
 //		int count = 100000;
 //		TDiv63Inverse tdivInv = new TDiv63Inverse(1<<21);
 //		SquFoF63 testFactorizer = new SquFoF63();

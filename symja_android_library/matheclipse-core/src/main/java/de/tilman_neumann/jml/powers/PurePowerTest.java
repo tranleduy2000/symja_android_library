@@ -16,7 +16,7 @@ package de.tilman_neumann.jml.powers;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.util.Random;
 import java.util.ArrayList;
 
 //import org.apache.log4j.Logger;
@@ -244,7 +244,7 @@ public class PurePowerTest {
 	   	PurePowerTest powTest = new PurePowerTest();
 
 	   	// create test set for performance test
-	   	SecureRandom rng = new SecureRandom();
+	   	Random rng = new Random();
 	   	for (int bits=10; bits<=50; bits+=5) {
 //	   		LOG.info("Test correctness with " + nCount + " " + bits + "-bit numbers");
 		   	ArrayList<BigInteger> testSet = new ArrayList<BigInteger>();
@@ -270,7 +270,7 @@ public class PurePowerTest {
 	   	PurePowerTest powTest = new PurePowerTest();
 
 	   	// create test set for performance test
-	   	SecureRandom rng = new SecureRandom();
+	   	Random rng = new Random();
 	   	for (int bits=50; ; bits+=50) {
 		   	ArrayList<BigInteger> testSet = new ArrayList<BigInteger>();
 		   	for (int i=0; i<nCount; i++) {

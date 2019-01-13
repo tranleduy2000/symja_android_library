@@ -58,7 +58,7 @@ public final class PrimeInteger {
     /**
      * Random number generator.
      */
-    //final static SecureRandom random = new SecureRandom();
+    //final static Random random = new Random();
     final static Random random = new Random();
     private static final Logger logger = Logger.getLogger(PrimeInteger.class);
 

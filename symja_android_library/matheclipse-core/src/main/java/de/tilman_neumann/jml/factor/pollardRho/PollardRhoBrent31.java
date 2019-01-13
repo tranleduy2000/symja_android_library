@@ -17,7 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -34,7 +34,7 @@ import de.tilman_neumann.util.SortedMultiset;
  */
 public class PollardRhoBrent31 extends FactorAlgorithmBase {
 	private static final Logger LOG = Logger.getLogger(PollardRhoBrent31.class);
-	private static final SecureRandom RNG = new SecureRandom();
+	private static final Random RNG = new Random();
 
 	private int N;
 
