@@ -15,6 +15,7 @@ import org.hipparchus.linear.RealVector;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.NILPointer;
+import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -78,7 +79,6 @@ import edu.jas.structure.GcdRingElem;
  *            |--- org.matheclipse.core.expression.Symbol - represents variables, function names or constants
  *                                implements ISymbol, IExpr
  * </pre>
- *
  */
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
 
@@ -99,9 +99,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
-	 *
-	 * @param that
-	 * @return
+     *
+     * @param that
+     * @return
      */
     IExpr $div(final IExpr that);
 
@@ -413,6 +413,28 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return
      */
     boolean has(IExpr pattern);
+
+    /**
+     * Returns <code>true</code>, if <b>at least one of the elements</b> in the subexpressions or the expression itself,
+     * match the given pattern.
+     *
+     * @param pattern a pattern-matching expression
+     * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and not the
+     *                <code>Head[]</code> element.
+     * @return
+     */
+    boolean has(IExpr pattern, boolean heads);
+
+    /**
+     * Returns <code>true</code>, if <b>at least one of the elements</b> in the subexpressions or the expression itself,
+     * satisfy the given unary predicate.
+     *
+     * @param predicate a unary predicate
+     * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested and not the
+     *                  <code>Head[]</code> element.
+     * @return
+     */
+    boolean has(Predicate<IExpr> predicate, boolean heads);
 
     /**
      * If this object is an instance of <code>IAST</code> get the first element (offset 0) of the <code>IAST</code> list
@@ -994,7 +1016,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     boolean isIndeterminate();
 
-    boolean isNotDefined();
 
     /**
      * Test if this expression is an inexact number. I.e. an instance of type <code>INum</code> or
@@ -1106,12 +1127,11 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     int[] isMatrix(boolean setMatrixFormat);
 
     /**
-     * Returns <code>true</code>, if <b>at least one of the elements</b> in the subexpressions or the expression itself,
-     * match the given pattern.
+     * Returns <code>true</code>, if <b>at least one of the elements</b> in the subexpressions, match the given pattern.
+     * By default <code>isMember()</code> only operates at level 1.
      *
      * @param pattern a pattern-matching expression
-     * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and not the
-     *                <code>Head[]</code> element.
+     * @return
      */
     boolean isMember(IExpr pattern, boolean heads);
 
@@ -1122,8 +1142,24 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param predicate a unary predicate
      * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested and not the
      *                  <code>Head[]</code> element.
+     * @return
      */
     boolean isMember(Predicate<IExpr> predicate, boolean heads);
+    /**
+     * Returns <code>true</code>, if <b>at least one of the elements</b> in the subexpressions, match the given pattern.
+     * If <code>visitor==null</code> the <code>isMember()</code> method only operates at level 1.
+     *
+     *
+     * @param pattern
+     *            a pattern-matching expression
+     * @param heads
+     *            if set to <code>false</code>, only the arguments of an IAST should be tested and not the
+     *            <code>Head[]</code> element.
+     * @param visitor
+     *            if <code>null</code> use <code>VisitorBooleanLevelSpecification(predicate, 1, heads)</code>
+     * @return
+     */
+     boolean isMember(IExpr pattern, boolean heads, IVisitorBoolean visitor);
 
     /**
      * Test if this expression equals <code>-1</code> in symbolic or numeric mode.
@@ -1200,6 +1236,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression is the function <code>Not[&lt;arg&gt;]</code>
      */
     boolean isNot();
+
+    boolean isNotDefined();
 
     /**
      * Test if this expression is a number. I.e. an instance of type <code>INumber</code>.
@@ -2139,8 +2177,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Generate <code>Sqrt(this)</code>.
-	 *
-	 * @return <code>Sqrt(this)</code>
+     *
+     * @return <code>Sqrt(this)</code>
      */
     IExpr sqrt();
 

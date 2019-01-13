@@ -417,7 +417,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public Context getContext() {
-		return null;
+		return Context.DUMMY;
 	}
 
 	/** {@inheritDoc} */

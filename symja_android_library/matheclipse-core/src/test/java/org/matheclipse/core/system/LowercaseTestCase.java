@@ -5533,19 +5533,32 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testIntegerPart() {
-		check("IntegerPart(Infinity)", "Infinity");
-		check("IntegerPart(-Infinity)", "-Infinity");
-		check("IntegerPart(I*Infinity)", "I*Infinity");
-		check("IntegerPart(-I*Infinity)", "-I*Infinity");
+		check("IntegerPart(2^128-1)", //
+				"340282366920938463463374607431768211455");
+		check("IntegerPart(Infinity)", //
+				"Infinity");
+		check("IntegerPart(-Infinity)", //
+				"-Infinity");
+		check("IntegerPart(I*Infinity)", //
+				"I*Infinity");
+		check("IntegerPart(-I*Infinity)", //
+				"-I*Infinity");
 
-		check("IntegerPart(Pi)", "3");
-		check("IntegerPart(-Pi)", "-3");
-		check("IntegerPart(IntegerPart(Pi))", "3");
+		check("IntegerPart(Pi)", //
+				"3");
+		check("IntegerPart(-Pi)", //
+				"-3");
+		check("IntegerPart(IntegerPart(Pi))", //
+				"3");
 
-		check("IntegerPart(-9/4)", "-2");
-		check("IntegerPart(2.4)", "2");
-		check("IntegerPart(-2.4)", "-2");
-		check("IntegerPart({-2.4, -2.5, -3.0})", "{-2,-2,-3}");
+		check("IntegerPart(-9/4)", //
+				"-2");
+		check("IntegerPart(2.4)", //
+				"2");
+		check("IntegerPart(-2.4)", //
+				"-2");
+		check("IntegerPart({-2.4, -2.5, -3.0})", //
+				"{-2,-2,-3}");
 	}
 
 	public void testIntegerPartitions() {
@@ -6707,7 +6720,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("#^2& /@ {1, 2, 3, 4}", "{1,4,9,16}");
 		check("Map(f, {{a, b}, {c, d, e}}, {2})", "{{f(a),f(b)},{f(c),f(d),f(e)}}");
 		check("Map(f, a + b + c, Heads->True)", "f(Plus)[f(a),f(b),f(c)]");
-		check("Map(f, expr, a+b, Heads->True)", "Map(f,expr,a+b,heads->True)");
+		check("Map(f, expr, a+b, Heads->True)", "Map(f,expr,a+b,Heads->True)");
 		check("Map(f, {{{{a}}}}, -1)", //
 				"{f({f({f({f(a)})})})}");
 		check("Map(f, {{{{a}}}}, -2)", //
@@ -7112,6 +7125,16 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testMemberQ() {
+		check("MemberQ(x,x)", //
+				"False");
+		check("MemberQ({{x^2, y^2}}, x^_)", //
+				"False");
+		check("MemberQ({{x^2, y^2}}, x^_, 2)", //
+				"True");
+		check("MemberQ({{1, 1, 3, 0}, {2, 1, 2, 2}}, 0)", //
+				"False");
+		check("MemberQ({{1, 1, 3, 0}, {2, 1, 2, 2}}, 0, 2)", //
+				"True");
 		check("MemberQ({a, b, c}, b)", "True");
 		check("MemberQ({a, b, c}, d)", "False");
 		check("MemberQ({\"a\", b, f(x)}, _?NumericQ)", "False");
@@ -7122,8 +7145,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("MemberQ({1, 3, 4, 1, 2}, 2)", "True");
 		check("MemberQ({x^2, y^2, x^3}, x^_)", "True");
 		check("MemberQ(a + b + f(c), f)", "False");
-		check("MemberQ(a + b + f(c), f, Heads->True)", "True");
-		check("MemberQ(a + b + c, a + c)", "False");
+		check("MemberQ(a + b + f(c), f, Heads->True)", //
+				"False");
+		check("MemberQ(a + b + c, a + c)", //
+				"False");
 	}
 
 	public void testMersennePrimeExponent() {

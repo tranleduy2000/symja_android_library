@@ -49,6 +49,7 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.IUnaryIndexFunction;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
+import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcherEvalEngine;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
@@ -1842,13 +1843,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
             }, heads);
 		}
 		final IPatternMatcher matcher = new PatternMatcherEvalEngine(pattern, EvalEngine.get());
-		return !isMember(matcher, heads);
+		return !has(matcher, heads);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final boolean isFree(Predicate<IExpr> predicate, boolean heads) {
-		return !isMember(predicate, heads);
+		return !has(predicate, heads);
 	}
 
 	/** {@inheritDoc} */
@@ -2073,16 +2074,33 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return null;
 	}
 
+	public boolean isMember(final IExpr pattern, boolean heads, IVisitorBoolean visitor) {
+		if (visitor != null) {
+			return super.isMember(pattern, heads, visitor);
+		}
+		Predicate<IExpr> predicate;
+		if (pattern.isSymbol() || pattern.isNumber() || pattern.isString()) {
+			predicate = new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.equals(pattern);
+				}
+			};
+		} else {
+			predicate = new PatternMatcher(pattern);
+		}
+		return exists(predicate, heads ? 0 : 1);
+	}
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isMember(final Predicate<IExpr> predicate, final boolean heads) {
+	public final boolean has(final Predicate<IExpr> predicate, final boolean heads) {
 		if (predicate.test(this)) {
 			return true;
 		}
 		return exists(new Predicate<IExpr>() {
 			@Override
 			public boolean test(IExpr x) {
-				return x.isMember(predicate, heads);
+				return x.has(predicate, heads);
 			}
 		}, heads ? 0 : 1);
 	}
@@ -2623,7 +2641,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isUnit() {
+	public boolean isUnit() {
 		if (isZero()) {
 			return false;
 		}

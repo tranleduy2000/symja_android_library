@@ -27,6 +27,7 @@ import org.matheclipse.core.expression.NILPointer;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
+import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.VisitorReplaceAll;
 import org.matheclipse.core.visit.VisitorReplaceAllLambda;
 import org.matheclipse.core.visit.VisitorReplacePart;
@@ -570,6 +571,25 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     public boolean has(IExpr pattern) {
         return isFree(pattern, true);
 
+    }
+
+    @Override
+    public boolean has(final IExpr pattern, boolean heads) {
+        if (pattern.isSymbol() || pattern.isNumber() || pattern.isString()) {
+            return has(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return x.equals(pattern);
+                }
+            }, heads);
+        }
+        final IPatternMatcher matcher = new PatternMatcher(pattern);
+        return has(matcher, heads);
+    }
+
+    @Override
+    public boolean has(Predicate<IExpr> predicate, boolean heads) {
+        return predicate.test(this);
     }
 
     @Override
@@ -1430,11 +1450,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
-    @Override
-    public boolean isNotDefined() {
-        return isIndeterminate() || isDirectedInfinity();
-    }
-
     /**
      * Test if this expression is an inexact number. I.e. an instance of type <code>INum</code> or
      * <code>IComplexNum</code>.
@@ -1645,6 +1660,26 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return predicate.test(this);
     }
 
+    @Override
+    public boolean isMember(final IExpr pattern, boolean heads, IVisitorBoolean visitor) {
+        Predicate<IExpr> predicate;
+        if (pattern.isSymbol() || pattern.isNumber() || pattern.isString()) {
+            predicate = new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    return x.equals(pattern);
+                }
+            };
+        } else {
+            predicate = new PatternMatcher(pattern);
+        }
+
+        if (visitor == null) {
+            visitor = new VisitorBooleanLevelSpecification(predicate, 1, heads);
+        }
+        return accept(visitor);
+    }
+
     /**
      * Test if this expression equals <code>-1</code> in symbolic or numeric mode.
      *
@@ -1813,6 +1848,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public boolean isNot() {
         return false;
+    }
+
+    @Override
+    public boolean isNotDefined() {
+        return isIndeterminate() || isDirectedInfinity();
     }
 
     /**
