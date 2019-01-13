@@ -91,8 +91,15 @@ public final class PatternMatching {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 1) {
 				String contextName = Validate.checkContextName(ast, 1);
-				engine.begin(contextName);
-				return F.Null;
+				Context pack = EvalEngine.get().getContextPath().currentContext();
+				String packageName = pack.getContextName();
+//				if (packageName.equals(Context.GLOBAL_CONTEXT_NAME)) {
+//					completeContextName = contextName;
+//				} else {
+//					completeContextName = packageName.substring(0, packageName.length() - 1) + contextName;
+//				}
+				Context context=engine.begin(contextName, pack);
+				return F.stringx(context.completeContextName());
 			}
 			return F.NIL;
 		}
@@ -139,7 +146,7 @@ public final class PatternMatching {
 				//j2objc changed: incompatible type
 				return F.nilPtr();
 			}
-			return F.stringx(context.getContextName());
+			return F.stringx(context.completeContextName());
 		}
 
 		@Override
@@ -324,7 +331,7 @@ public final class PatternMatching {
 				return F.stringx(((ISymbol) ast.first()).getContext().getContextName());
 			}
 			if (ast.isAST0()) {
-				return F.stringx(EvalEngine.get().getContext().getContextName());
+				return F.stringx(EvalEngine.get().getContext().completeContextName());
 			}
 			return F.NIL;
 		}
@@ -537,7 +544,7 @@ public final class PatternMatching {
 					// System.out.println(file.toString());
 					return getFile(file, engine);
 				} else {
-					//Java 7 does't have FileSystems.getDefault()
+					//Java 7 does't have FileSystems.getDefault() method
 //					file = FileSystems.getDefault().getPath(arg1.toString()).toAbsolutePath().toFile();
 //					if (file.exists()) {
 //						return getFile(file, engine);

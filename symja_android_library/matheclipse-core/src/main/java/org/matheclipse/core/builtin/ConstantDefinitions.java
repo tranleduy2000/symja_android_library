@@ -66,7 +66,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public IExpr evaluate(final ISymbol symbol) {
-			return EvalEngine.get().getContextPath().currentContextString();
+			return EvalEngine.get().getContextPath().currentCompleteContextName();
 		}
 
 	}
