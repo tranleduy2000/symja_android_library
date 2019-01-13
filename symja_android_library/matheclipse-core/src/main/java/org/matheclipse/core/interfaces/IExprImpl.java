@@ -396,7 +396,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     public ISignedNumber evalReal() {
         if (isReal()) {
-            return (ISignedNumber) EvalEngine.get().evalN(this);
+            return (ISignedNumber) this;
         }
         return null;
     }
