@@ -652,10 +652,9 @@ public class EvalEngine implements Serializable {
 			final ICoreFunctionEvaluator coreFunction = (ICoreFunctionEvaluator) ((IBuiltInSymbol) head).getEvaluator();
 			if (isNumericMode()) {
 				return coreFunction.numericEval(ast, this);
-			} else {
+			}
 				return coreFunction.evaluate(ast, this);
 			}
-		}
 		final ISymbol symbol = ast.topHead();
 		// if (symbol.isBuiltInSymbol()) {
 		// Integer i = STATISTICS.get(symbol);
