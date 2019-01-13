@@ -2193,6 +2193,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean isPatternDefault() {
+		return isAST(F.Optional,2,3);
+	}
+	/** {@inheritDoc} */
+	@Override
 	public final boolean isPatternExpr() {
 		return (fEvalFlags & CONTAINS_PATTERN_EXPR) != NO_FLAG;
 	}

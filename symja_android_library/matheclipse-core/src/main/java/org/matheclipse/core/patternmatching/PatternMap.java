@@ -1,5 +1,6 @@
 package org.matheclipse.core.patternmatching;
 
+import com.duy.annotations.Nonnull;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
@@ -197,6 +198,9 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
                 if (x.isAST()) {
                     listEvalFlags[0] |= PatternMap.this.determinePatternsRecursive(patternIndexMap, (IAST) x, treeLevel + 1);
                     fPriority -= 11;
+				if (x.isPatternDefault()) {
+					listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
+				}
                 } else if (x instanceof IPatternObject) {
                     int[] result = ((IPatternObject) x).addPattern(PatternMap.this, patternIndexMap);
                     listEvalFlags[0] |= result[0];
@@ -256,7 +260,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 * @param pExpr
 	 * @return <code>null</code> if no matched expression exists
 	 */
-	public IExpr getValue( IPatternObject pattern) {
+	public IExpr getValue(@Nonnull IPatternObject pattern) {
 		ISymbol sym = pattern.getSymbol();
 		if (sym != null) {
 			return val(sym);
@@ -274,7 +278,7 @@ public final class PatternMap implements ISymbol2IntMap, Cloneable, Serializable
 	 *            the symbol
 	 * @return <code>null</code> if no matched expression exists
 	 */
-	public final IExpr val( ISymbol symbol) {
+	public final IExpr val(@Nonnull ISymbol symbol) {
 		int indx = get(symbol);
 		return indx >= 0 ? fSymbolsOrPatternValues[indx] : null;
 	}

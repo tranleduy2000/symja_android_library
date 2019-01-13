@@ -801,6 +801,13 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      *
      * @return
      */
+    boolean hasDefaultArgument();
+
+    /**
+     * Test if the last argument contains a pattern with a default argument.
+     *
+     * @return
+     */
     boolean haspublicArgument();
 
     /**

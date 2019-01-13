@@ -39,6 +39,14 @@ import java.util.List;
 
 public abstract class IASTImpl extends IExprImpl implements IAST {
 
+    @Override
+    public abstract IAST clone() throws CloneNotSupportedException;
+
+    @Override
+    public int argSize() {
+        return size() - 1;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -64,11 +72,16 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     }
 
     /**
-     * {@inheritDoc}
+     * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the
+     * size of the list is greater or equal <code>length</code>.
+     *
+     * @param head   object to compare with element at location <code>0</code>
+     * @param length
+     * @return
      */
     @Override
-    public IExpr second() {
-        return arg2();
+    public boolean isSameHeadSizeGE(IExpr head, int length) {
+        return head().equals(head) && length <= size();
     }
 
     @Override
@@ -77,11 +90,16 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     }
 
     @Override
-    public abstract IAST clone() throws CloneNotSupportedException;
+    public IASTAppendable rest() {
+        return removeAtClone(1);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public int argSize() {
-        return size() - 1;
+    public IExpr second() {
+        return arg2();
     }
 
     /**
@@ -106,19 +124,6 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
             }
         }
         return true;
-    }
-
-
-    /**
-     * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied). In contrast
-     * to the <code>clone()</code> method, this method returns exactly the same type for
-     * <code>AST0, AST1, AST2,AST3</code>.
-     *
-     * @return a copy of this <code>IAST</code> instance.
-     */
-    @Override
-    public IASTMutable copy() {
-        return copyAppendable();
     }
 
     /**
@@ -286,6 +291,13 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         forEach(1, size(), action);
     }
 
+    @Override
+    public boolean hasDefaultArgument() {
+        if (size() > 1) {
+            return last().isPatternDefault();
+        }
+        return false;
+    }
 
     /**
      * Test if the last argument contains a pattern with a default argument.
@@ -331,19 +343,6 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     }
 
     /**
-     * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the
-     * size of the list is greater or equal <code>length</code>.
-     *
-     * @param head   object to compare with element at location <code>0</code>
-     * @param length
-     * @return
-     */
-    @Override
-    public boolean isSameHeadSizeGE(IExpr head, int length) {
-        return head().equals(head) && length <= size();
-    }
-
-    /**
      * Maps the elements of this IAST with the unary functor <code>Functors.replaceArg(replacement, position)</code>,
      * there <code>replacement</code> is an IAST at which the argument at the given position will be replaced by the
      * currently mapped element and appends the element to <code>appendAST</code>.
@@ -364,11 +363,6 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     @Override
     public IAST mapAt(final IASTAppendable replacement, int position) {
         return mapThread(replacement, position);
-    }
-
-    @Override
-    public IASTAppendable rest() {
-        return removeAtClone(1);
     }
 
     /**
@@ -405,5 +399,17 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         IASTMutable ast = copy();
         ast.set(i, expr);
         return ast;
+    }
+
+    /**
+     * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied). In contrast
+     * to the <code>clone()</code> method, this method returns exactly the same type for
+     * <code>AST0, AST1, AST2,AST3</code>.
+     *
+     * @return a copy of this <code>IAST</code> instance.
+     */
+    @Override
+    public IASTMutable copy() {
+        return copyAppendable();
     }
 }
