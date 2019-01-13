@@ -5,6 +5,7 @@ import com.gx.common.math.LongMath;
 
 import org.matheclipse.combinatoric.KSubsets;
 import org.matheclipse.combinatoric.KSubsets.KSubsetsList;
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
 import org.matheclipse.core.expression.AbstractIntegerSym;
@@ -23,6 +24,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import de.tilman_neumann.jml.factor.CombinedFactorAlgorithm;
+import de.tilman_neumann.util.SortedMultiset;
 
 /**
  * Provides primality probabilistic methods.
@@ -679,18 +683,25 @@ public class Primality {
 	}
 
 	public static void factorInteger(final BigInteger val, Map<BigInteger, Integer> map) {
+		int length = val.bitLength();
+		System.out.println(length);
+		EllipticCurveMethod ecm = new EllipticCurveMethod(val);
+
+		// don't use SIQS in the following method - use PSIQS below
+		BigInteger rest = ecm.factorize(map, true);
+		if (!rest.equals(BigInteger.ONE)) {
+			System.out.println("REST: " + rest.toString());
 		if (Config.JAVA_UNSAFE) {
-			int cores = Runtime.getRuntime().availableProcessors();
+				final int cores = Runtime.getRuntime().availableProcessors();
 			CombinedFactorAlgorithm factorizer = new CombinedFactorAlgorithm(cores / 2 + 1, true);
-			SortedMultiset<BigInteger> result = factorizer.factor(val);
+				SortedMultiset<BigInteger> result = factorizer.factor(rest);
 
 			for (Map.Entry<BigInteger, Integer> entry : result.entrySet()) {
 				map.put(entry.getKey(), entry.getValue());
 			}
 			return;
 		}
-		EllipticCurveMethod ecm = new EllipticCurveMethod(val);
-		ecm.factorize(map);
+		}
 	}
 
 	public static BigInteger rho(final BigInteger val) {
