@@ -820,7 +820,11 @@ public class F {
 	/** DiagonalMatrix(list) - gives a matrix with the values in `list` on its diagonal and zeroes elsewhere.*/
 	public final static IBuiltInSymbol DiagonalMatrix = F.initFinalSymbol("DiagonalMatrix", ID.DiagonalMatrix);
 
-    /** DiceDissimilarity(u, v) - returns the Dice dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `(c_tf + c_ft) / (2 * c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.   */
+	/**
+	 * DiceDissimilarity(u, v) - returns the Dice dissimilarity between the two boolean 1-D lists `u` and `v`, which is
+	 * defined as `(c_tf + c_ft) / (2 * c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of
+	 * occurrences of `u(k)=i` and `v(k)=j` for `k<n`.
+	 */
 	public final static IBuiltInSymbol DiceDissimilarity = F.initFinalSymbol("DiceDissimilarity", ID.DiceDissimilarity);
 
 	/***/
@@ -915,7 +919,10 @@ public class F {
     /** ElementData("name", "property") - gives the value of the property for the chemical specified by name.*/
 	public final static IBuiltInSymbol ElementData = F.initFinalSymbol("ElementData", ID.ElementData);
 
-    /** Eliminate(list-of-equations, list-of-variables) - attempts to eliminate the variables from the `list-of-variables` in the `list-of-equations`.*/
+	/**
+	 * Eliminate(list-of-equations, list-of-variables) - attempts to eliminate the variables from the
+	 * `list-of-variables` in the `list-of-equations`.
+	 */
 	public final static IBuiltInSymbol Eliminate = F.initFinalSymbol("Eliminate", ID.Eliminate);
 
     /** EllipticE(z) - returns the complete elliptic integral of the second kind. */
@@ -936,10 +943,17 @@ public class F {
     /** EndPackage( ) - end a package definition*/
 	public final static IBuiltInSymbol EndPackage = F.initFinalSymbol("EndPackage", ID.EndPackage);
 
-    /** Equal(x, y) - yields `True` if `x` and `y` are known to be equal, or `False` if `x` and `y` are known to be unequal.*/
+	/**
+	 * Equal(x, y) - yields `True` if `x` and `y` are known to be equal, or `False` if `x` and `y` are known to be
+	 * unequal.
+	 */
 	public final static IBuiltInSymbol Equal = F.initFinalSymbol("Equal", ID.Equal);
 
-    /** Equivalent(arg1, arg2, ...) -  Equivalence relation. `Equivalent(A, B)` is `True` iff `A` and `B` are both `True` or both `False`. Returns `True` if all of the arguments are logically equivalent. Returns `False` otherwise. `Equivalent(arg1, arg2, ...)` is equivalent to `(arg1 && arg2 && ...) || (!arg1 && !arg2 && ...)`.*/
+	/**
+	 * Equivalent(arg1, arg2, ...) - Equivalence relation. `Equivalent(A, B)` is `True` iff `A` and `B` are both `True`
+	 * or both `False`. Returns `True` if all of the arguments are logically equivalent. Returns `False` otherwise.
+	 * `Equivalent(arg1, arg2, ...)` is equivalent to `(arg1 && arg2 && ...) || (!arg1 && !arg2 && ...)`.
+	 */
 	public final static IBuiltInSymbol Equivalent = F.initFinalSymbol("Equivalent", ID.Equivalent);
 
 	/** Erf(z) - returns the error function of `z`.*/
@@ -4702,8 +4716,10 @@ public class F {
 	/**
 	 * Create a symbolic complex number
 	 * 
-	 * @param re
-	 * @param im
+	 * @param real_numerator
+	 * @param real_denominator
+	 * @param imag_numerator
+	 * @param imag_denominator
 	 * @return
 	 */
 	public static IComplex CC(final long real_numerator, final long real_denominator, final long imag_numerator,
@@ -4875,7 +4891,7 @@ public class F {
 	 *            the real double value part which should be converted to a complex number
 	 * @param imagPart
 	 *            the imaginary double value part which should be converted to a complex number
-	 * @return IFraction
+	 * @return IComplex
 	 */
 	public static IComplex complex(final double realPart, final double imagPart) {
 		// J2objc changed: use DOUBLE_TOLERANCE to avoid infinity loop
@@ -4921,8 +4937,10 @@ public class F {
 	/**
 	 * Create a symbolic complex number
 	 * 
-	 * @param re
-	 * @param im
+	 * @param real_numerator
+	 * @param real_denominator
+	 * @param imag_numerator
+	 * @param imag_denominator
 	 * @return
 	 */
 	public static IComplex complex(final long real_numerator, final long real_denominator, final long imag_numerator,
@@ -4931,7 +4949,7 @@ public class F {
 	}
 
 	/**
-	 * TODO: check if Complex is working in pattern matching?
+	 * Create a Complex(a, b) symbolic expression?
 	 * 
 	 * @param a0
 	 * @param a1
@@ -5484,7 +5502,7 @@ public class F {
 	 * Evaluate an expression in &quot;quiet mode&quot;. If evaluation is not possible return <code>null</code>. In
 	 * &quot;quiet mode&quot; all warnings would be suppressed.
 	 * 
-	 * @param expr
+	 * @param a
 	 *            the expression which should be evaluated
 	 * @return the evaluated object or <code>F.NIL</code> if no evaluation was possible
 	 * @see EvalEngine#evalQuietNull(IExpr)
@@ -6152,34 +6170,6 @@ public class F {
 		org.matheclipse.core.expression.Context.SYSTEM.put(str, temp);
 		return temp;
 	}
-
-	// public static IBuiltInSymbol initFinalSymbol(final BuiltIns symbolName) {
-	// String str = symbolName.name();
-	// if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
-	// if (str.length() != 1) {
-	// str = symbolName.str();
-	// }
-	// }
-	// IBuiltInSymbol temp = new BuiltInSymbol(str, symbolName.id());
-	// Context.SYSTEM.put(str, temp);
-	// return temp;
-	// }
-
-	/**
-	 * Insert a new Symbol in the <code>SYSTEM</code> context.
-	 * 
-	 * @param symbolName
-	 *            the predefined symbol name in upper-case form
-	 * @param evaluator
-	 *            defines the evaluation behaviour of the symbol
-	 * @return
-	 */
-	// public static IBuiltInSymbol initFinalSymbol(final String symbolName, IEvaluator evaluator) {
-	// IBuiltInSymbol temp = new BuiltInSymbol(symbolName, evaluator);
-	// evaluator.setUp(temp);
-	// Context.SYSTEM.put(symbolName, temp);
-	// return temp;
-	// }
 
 	public static IPattern initPredefinedPattern(@Nonnull final ISymbol symbol) {
 		IPattern temp = new Pattern(symbol);
@@ -7564,15 +7554,6 @@ public class F {
 		return ternaryAST3(PolynomialRemainder, a0, a1, a2);
 	}
 
-	/**
-	 * Pop the current top value from the symbols local variable stack.
-	 * 
-	 * @param temp
-	 */
-	// public static void popLocal(ISymbol temp) {
-	// temp.popLocalVariable();
-	// }
-
 	public static IAST Position(final IExpr a0, final IExpr a1) {
 		return binaryAST2(Position, a0, a1);
 	}
@@ -7692,10 +7673,8 @@ public class F {
 	/**
 	 * Create a "fractional" number
 	 * 
-	 * @param numerator
-	 *            numerator of the fractional number
-	 * @param fDenominator
-	 *            denumerator of the fractional number
+	 * @param frac
+	 *            a big fractional number
 	 * @return IFraction
 	 */
 	public static IFraction QQ(final BigFraction frac) {
@@ -7708,7 +7687,7 @@ public class F {
 	 * @param numerator
 	 *            numerator of the fractional number
 	 * @param denominator
-	 *            denumerator of the fractional number
+	 *            denominator of the fractional number
 	 * @return IFraction
 	 */
 	public static IFraction QQ(final IInteger numerator, final IInteger denominator) {
@@ -7721,7 +7700,7 @@ public class F {
 	 * @param numerator
 	 *            numerator of the fractional number
 	 * @param denominator
-	 *            denumerator of the fractional number
+	 *            denominator of the fractional number
 	 * @return IFraction
 	 */
 	public static IFraction QQ(final long numerator, final long denominator) {
@@ -7978,8 +7957,6 @@ public class F {
 	 * 
 	 * @param symbolName
 	 *            the name of the symbol
-	 * @param engine
-	 *            the evaluation engine
 	 * @return the symbol object from the context path
 	 */
 	public static ISymbol Dummy(final String symbolName) {
@@ -8361,13 +8338,12 @@ public class F {
 	}
 
 	/**
-	 * Substitute all (sub-) expressions with the given map. If no substitution matches, the method returns
-	 * the given <code>expr</code>.
+	 * Substitute all (sub-) expressions with the given map. If no substitution matches, the method returns the given
+	 * <code>expr</code>.
 	 *
 	 * @param expr
 	 * @param map
-	 *            if the maps <code>get()</code> method returns <code>null</code> the expression isn't
-	 *            substituted.
+	 *            if the maps <code>get()</code> method returns <code>null</code> the expression isn't substituted.
 	 * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted
 	 *         expression.
 	 */
@@ -8386,15 +8362,15 @@ public class F {
 	 * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted
 	 *         expression.
 	 */
-	public static IExpr subst(IExpr expr, final IAST list) {
-		if (list.isListOfLists()) {
+	public static IExpr subst(IExpr expr, final IAST astRules) {
+		if (astRules.isListOfLists()) {
 			IExpr result = expr;
-			for (IExpr subList : list) {
+			for (IExpr subList : astRules) {
 				result = F.subst(result, (IAST) subList);
 			}
 			return result;
 		}
-		return expr.replaceAll(list).orElse(expr);
+		return expr.replaceAll(astRules).orElse(expr);
 	}
 
 	/**

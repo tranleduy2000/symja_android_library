@@ -548,7 +548,7 @@ public class QuarticSolver {
 	 * @param a
 	 * @param c
 	 * @param e
-	 * @param subtrahend TODO
+	 * @param sum
 	 * @return
 	 */
 	public static IASTAppendable biQuadraticSolve(IExpr a, IExpr c, IExpr e, IExpr sum) {
@@ -580,8 +580,8 @@ public class QuarticSolver {
 	 * <a href="http://en.wikipedia.org/wiki/Quartic_equation">Wikipedia - Quartic equation</a>. See Bronstein 1.6.2.4
 	 * 
 	 * @param a
+	 * @param b
 	 * @param c
-	 * @param e
 	 * @return
 	 */
 	public static IASTAppendable quasiSymmetricQuarticSolve(IExpr a, IExpr b, IExpr c) {

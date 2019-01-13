@@ -78,6 +78,7 @@ import edu.jas.structure.GcdRingElem;
  *            |--- org.matheclipse.core.expression.Symbol - represents variables, function names or constants
  *                                implements ISymbol, IExpr
  * </pre>
+ *
  */
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
 
@@ -98,6 +99,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
+	 *
+	 * @param that
+	 * @return
      */
     IExpr $div(final IExpr that);
 
@@ -2135,6 +2139,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Generate <code>Sqrt(this)</code>.
+	 *
+	 * @return <code>Sqrt(this)</code>
      */
     IExpr sqrt();
 
