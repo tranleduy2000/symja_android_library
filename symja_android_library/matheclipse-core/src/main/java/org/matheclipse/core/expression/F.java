@@ -3740,9 +3740,9 @@ public class F {
 	 *            use this <code>defaultValue</code> in pattern-matching if an argument is optional
 	 * @return IPattern
 	 */
-	public static IPattern $b(final IExpr condition, IExpr defaultValue) {
-		return new org.matheclipse.core.expression.Blank(condition, defaultValue);
-	}
+//	public static IPattern $b(final IExpr condition, IExpr defaultValue) {
+//		return new org.matheclipse.core.expression.Blank(condition, defaultValue);
+//	}
 
 	/**
 	 * Create a <code>Pattern[]</code> pattern for pattern-matching and term rewriting
@@ -3803,9 +3803,9 @@ public class F {
 	 *            use this <code>defaultValue</code> in pattern-matching if an argument is optional
 	 * @return IPattern
 	 */
-	public static IPattern $p(final ISymbol symbol, final IExpr check, final IExpr defaultValue) {
-		return org.matheclipse.core.expression.Pattern.valueOf(symbol, check, defaultValue);
-	}
+//	public static IPattern $p(final ISymbol symbol, final IExpr check, final IExpr defaultValue) {
+//		return org.matheclipse.core.expression.Pattern.valueOf(symbol, check, defaultValue);
+//	}
 
 	/**
 	 * Create a pattern for pattern-matching and term rewriting
@@ -3896,9 +3896,9 @@ public class F {
 	 *            use this <code>defaultValue</code> in pattern-matching if an argument is optional
 	 * @return IPattern
 	 */
-	public static IPattern pattern(final ISymbol symbol, final IExpr check, final IExpr defaultValue) {
-		return org.matheclipse.core.expression.Pattern.valueOf(symbol, check, defaultValue);
-	}
+//	public static IPattern pattern(final ISymbol symbol, final IExpr check, final IExpr defaultValue) {
+//		return org.matheclipse.core.expression.Pattern.valueOf(symbol, check, defaultValue);
+//	}
 
 	/**
 	 * Create a pattern for pattern-matching and term rewriting
@@ -3910,9 +3910,9 @@ public class F {
 	 *            use this <code>defaultValue</code> in pattern-matching if an argument is optional
 	 * @return IPattern
 	 */
-	public static IPattern $p(@Nonnull final String symbolName, final IExpr check, final IExpr defaultValue) {
-		return org.matheclipse.core.expression.Pattern.valueOf($s(symbolName), check, defaultValue);
-	}
+//	public static IPattern $p(@Nonnull final String symbolName, final IExpr check, final IExpr defaultValue) {
+//		return org.matheclipse.core.expression.Pattern.valueOf($s(symbolName), check, defaultValue);
+//	}
 
 	/**
 	 * Create a pattern for pattern-matching and term rewriting
@@ -4888,6 +4888,7 @@ public class F {
 	 * @return IFraction
 	 */
 	public static IComplex complex(final double realPart, final double imagPart) {
+		// J2objc changed: use DOUBLE_TOLERANCE to avoid infinity loop
 		return complex(realPart, imagPart, Config.DOUBLE_TOLERANCE);
 	}
 
@@ -6577,7 +6578,7 @@ public class F {
 	 * @return
 	 */
 	public static boolean isZero(double x, double epsilon) {
-		return DoubleMath.fuzzyEquals(x, 0.0, epsilon);
+		return isFuzzyEquals(x, 0.0, epsilon);
 		// return -epsilon < x && x < epsilon;
 	}
 

@@ -1808,6 +1808,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
+	public final boolean isOptional() {
+		return isAST(F.Optional, 2, 3);
+	}
+	/** {@inheritDoc} */
+	@Override
 	public final boolean isExpanded() {
 		return !(isPlusTimesPower() && (isEvalFlagOff(IAST.IS_EXPANDED)));
 	}
@@ -2194,7 +2199,16 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isPatternDefault() {
-		return isAST(F.Optional,2,3);
+		return isOptional();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public IExpr getOptionalValue() {
+		if (isAST(F.Optional, 3)) {
+			return arg2();
+	}
+		return null;// fOptionalValue;
 	}
 	/** {@inheritDoc} */
 	@Override

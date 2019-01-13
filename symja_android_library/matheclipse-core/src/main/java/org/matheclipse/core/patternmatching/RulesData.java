@@ -56,15 +56,35 @@ public class RulesData implements Serializable {
 				if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
 					return true;
 				}
-				if (lhsAST.arg1().isBlank()) {
+				IExpr a1 = lhsAST.arg1();
+				if (isComplicatedPatternExpr(a1)) {
 					return true;
-				} else if (lhsAST.arg1().isPattern()) {
+				}
+				if (lhsAST.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return x.isPatternDefault();
+					}
+				}, 2)) {
 					return true;
-				} else if (lhsAST.arg1().isPatternSequence(false)) {
+				}
+			}
+			return isComplicatedPatternExpr(lhs.head());
+		}
+		return isComplicatedPatternExpr(lhs);
+	}
+
+	private static boolean isComplicatedPatternExpr(IExpr a1) {
+		if (a1.isBlank()) {
 					return true;
-				} else if (lhsAST.arg1().isAST()) {
-					IAST arg1 = (IAST) lhsAST.arg1();
-					if (arg1.isCondition() || arg1.isPatternTest() || arg1.isAlternatives() || arg1.isExcept()) {
+		} else if (a1.isPattern()) {
+					return true;
+		} else if (a1.isPatternSequence(false)) {
+					return true;
+		} else if (a1.isAST()) {
+			IAST arg1 = (IAST) a1;
+			if (arg1.isCondition() || arg1.isPatternTest() || arg1.isAlternatives() || arg1.isExcept()
+					|| arg1.isOptional()) {
 						return true;
 					}
 					IExpr head = arg1.head();
@@ -88,24 +108,12 @@ public class RulesData implements Serializable {
 					// the left hand side is associated with the first argument
 					// see if one of the arguments contain a pattern with default
 					// value
-					return arg1.exists(new Predicate<IExpr>() {
-						@Override
-						public boolean test(IExpr x) {
-							return x.isPatternDefault();
-						}
-					}, 1);
-						}
-				return lhsAST.exists(new Predicate<IExpr>() {
-					@Override
-					public boolean test(IExpr x) {
-						return x.isPatternDefault();
-					}
-				}, 2);
-					}
-		} else if (lhs.isPattern()) {
-			return true;
-		} else if (lhs.isPatternSequence(false)) {
-			return true;
+			return arg1.exists(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isPatternDefault();
+				}
+			}, 1);
 		}
 		return false;
 	}

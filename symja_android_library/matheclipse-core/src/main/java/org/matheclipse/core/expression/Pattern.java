@@ -51,9 +51,6 @@ public class Pattern extends Blank {
 		return new Pattern(symbol, check, def);
 	}
 
-	public static IPattern valueOf(@Nonnull final ISymbol symbol, final IExpr check, final IExpr defaultValue) {
-		return new Pattern(symbol, check, defaultValue);
-	}
 
 	private static final long serialVersionUID = 7617138748475243L;
 
@@ -78,11 +75,6 @@ public class Pattern extends Blank {
 		fSymbol = symbol;
 	}
 
-	/** package private */
-	public Pattern(@Nonnull final ISymbol symbol, IExpr condition, IExpr defaultValue) {
-		super(condition, defaultValue);
-		fSymbol = symbol;
-	}
 
 	@Override
 	public int[] addPattern(PatternMap patternMap, List<IExpr> patternIndexMap) {
@@ -98,7 +90,7 @@ public class Pattern extends Blank {
 			result[0] = IAST.CONTAINS_PATTERN;
 			result[1] = 6;
 		}
-		if (fCondition != null) {
+		if (fHeadTest != null) {
 			result[1] += 2;
 		}
 		return result;
@@ -161,8 +153,8 @@ public class Pattern extends Blank {
 				return false;
 			}
 			// test if the "check" expressions are equal
-			final IExpr o1 = getCondition();
-			final IExpr o2 = p2.getCondition();
+			final IExpr o1 = getHeadTest();
+			final IExpr o2 = p2.getHeadTest();
 			if ((o1 == null) || (o2 == null)) {
 				return o1 == o2;
 			}
@@ -189,7 +181,8 @@ public class Pattern extends Blank {
 	@Override
 	public String fullFormString() {
 		StringBuilder buf = new StringBuilder();
-		if (fDefaultValue!=null||fDefault) {
+		// if (fOptionalValue != null || fDefault) {
+		if (fDefault) {
 			buf.append("Optional");
 			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
 				buf.append('(');
@@ -211,8 +204,8 @@ public class Pattern extends Blank {
 		} else {
 			buf.append('[');
 		}
-		if (fCondition != null) {
-			buf.append(fCondition.fullFormString());
+		if (fHeadTest != null) {
+			buf.append(fHeadTest.fullFormString());
 		}
 		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
 			buf.append("))");
@@ -220,15 +213,7 @@ public class Pattern extends Blank {
 			buf.append("]]");
 		}
 
-		if (fDefaultValue!=null) {
-			buf.append(",");
-			buf.append(fDefaultValue.fullFormString());
-			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
-				buf.append(")");
-			} else {
-				buf.append("]");
-			}
-		} else if (fDefault) {
+		if (fDefault) {
 			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
 				buf.append(")");
 			} else {
@@ -268,24 +253,7 @@ public class Pattern extends Blank {
 
 	@Override
 	public boolean isConditionMatched(final IExpr expr, PatternMap patternMap) {
-		if (fCondition == null || expr.head().equals(fCondition)) {
-			return true;
-		}
-//		EvalEngine engine = EvalEngine.get();
-//		boolean traceMode = false;
-//		try {
-//			traceMode = engine.isTraceMode();
-//			engine.setTraceMode(false);
-//			final Predicate<IExpr> matcher = Predicates.isTrue(engine, fCondition);
-//			if (matcher.test(expr)) {
-//				return true;
-//			}
-//		} finally {
-//			if (traceMode) {
-//				engine.setTraceMode(true);
-//			}
-//		}
-		return false;
+		return (fHeadTest == null || expr.head().equals(fHeadTest));
 	}
 
 	@Override
@@ -296,17 +264,17 @@ public class Pattern extends Blank {
 		buffer.append(prefix + "$p(");
 		String symbolStr = fSymbol.toString();
 		char ch = symbolStr.charAt(0);
-		if (symbolStr.length() == 1 && fDefaultValue == null) {
+		if (symbolStr.length() == 1) { // && fOptionalValue == null) {
 			if (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'G' && ch != 'D' && ch != 'E') || ch == 'P'
 					|| ch == 'Q') {
 				if (!fDefault) {
-					if (fCondition == null) {
+					if (fHeadTest == null) {
 						return prefix + symbolStr + "_";
-					} else if (fCondition == F.Symbol) {
+					} else if (fHeadTest == F.Symbol) {
 						return prefix + symbolStr + "_Symbol";
 					}
 				} else {
-					if (fCondition == null) {
+					if (fHeadTest == null) {
 						return prefix + symbolStr + "_DEFAULT";
 					}
 				}
@@ -317,11 +285,11 @@ public class Pattern extends Blank {
 				char ch2 = symbolStr.charAt(1);
 				if ('a' <= ch2 && ch2 <= 'z') {
 					if (!fDefault) {
-						if (fCondition == null) {
+						if (fHeadTest == null) {
 							return prefix + "p" + ch2 + "_";
 						}
 					} else {
-						if (fCondition == null) {
+						if (fHeadTest == null) {
 							return prefix + "p" + ch2 + "_DEFAULT";
 						}
 					}
@@ -334,27 +302,19 @@ public class Pattern extends Blank {
 		} else {
 			buffer.append("\"" + symbolStr + "\"");
 		}
-		if (fCondition != null) {
-			if (fCondition == F.Integer) {
+		if (fHeadTest != null) {
+			if (fHeadTest == F.Integer) {
 				buffer.append(", Integer");
-			} else if (fCondition == F.Symbol) {
+			} else if (fHeadTest == F.Symbol) {
 				buffer.append(", Symbol");
 			} else {
-				buffer.append("," + fCondition.internalJavaString(symbolsAsFactoryMethod, 0, useOperaators, usePrefix,
-						noSymbolPrefix));
+				buffer.append("," + fHeadTest.internalJavaString(symbolsAsFactoryMethod, 0, useOperaators, usePrefix,
+					noSymbolPrefix));
 			}
 		}
-		if (fDefaultValue != null) {
-			if (fCondition == null) {
-				buffer.append(", null");
-			}
-			buffer.append("," + fDefaultValue.internalJavaString(symbolsAsFactoryMethod, 0, useOperaators, usePrefix,
-					noSymbolPrefix));
-		} else {
 			if (fDefault) {
 				buffer.append(",true");
 			}
-		}
 
 		buffer.append(')');
 		return buffer.toString();
@@ -375,41 +335,19 @@ public class Pattern extends Blank {
 	@Override
 	public String toString() {
 		final StringBuilder buffer = new StringBuilder();
-		if (fCondition == null) {
+		if (fHeadTest == null) {
 			buffer.append(fSymbol.toString());
 			buffer.append('_');
-			if (fDefaultValue != null) {
-				buffer.append(':');
-				if (!fDefaultValue.isAtom()) {
-					buffer.append('(');
-				}
-				buffer.append(fDefaultValue.toString());
-				if (!fDefaultValue.isAtom()) {
-					buffer.append(')');
-				}
-			} else {
 				if (fDefault) {
 					buffer.append('.');
 				}
-			}
 		} else {
 			buffer.append(fSymbol.toString());
 			buffer.append('_');
-			if (fDefaultValue != null) {
-				buffer.append(':');
-				if (!fDefaultValue.isAtom()) {
-					buffer.append('(');
-				}
-				buffer.append(fDefaultValue.toString());
-				if (!fDefaultValue.isAtom()) {
-					buffer.append(')');
-				}
-			} else {
 				if (fDefault) {
 					buffer.append('.');
 				}
-			}
-			buffer.append(fCondition.toString());
+			buffer.append(fHeadTest.toString());
 		}
 		return buffer.toString();
 	}

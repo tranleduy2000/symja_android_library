@@ -974,17 +974,19 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 *            the symbol for getting the associated default values from
 	 * @param lhsPatternAST
 	 *            left-hand-side which may contain patterns with default values
+	 * @param engine
+	 *            the evaluation engine
 	 * @return <code>F.NIL</code> if the given <code>lhsPatternAST</code> could not be matched or contains no pattern
 	 *         with default value.
      */
 	private IExpr matchDefaultArgumentsAST(final ISymbol symbolWithDefaultValue, IAST lhsPatternAST, final EvalEngine engine) {
 		final IASTAppendable cloned = F.ast(lhsPatternAST.head(), lhsPatternAST.size(), false);
-        final boolean[] defaultValueMatched = new boolean[] { false };
+		final boolean[] defaultValueMatched = new boolean[] { false };
 		if (lhsPatternAST.exists(new ObjIntPredicate<IExpr>() {
             @Override
             public boolean test(IExpr temp, int i) {
                 if (temp.isPatternDefault()) {
-                    if (temp.isAST(F.Optional, 2, 3)) {
+                    if (temp.isOptional()) {
                         IAST optional = (IAST) temp;
                         IExpr optionalValue;
                         if (optional.size() == 3) {
@@ -997,15 +999,11 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                                 return true;
                             }
                             defaultValueMatched[0] = true;
-                            return false;
                         }
                         return false;
                     }
                     IPattern pattern = (IPattern) temp;
-                    IExpr positionDefaultValue = pattern.getDefaultValue();
-                    if (positionDefaultValue == null) {
-                        positionDefaultValue = symbolWithDefaultValue.getDefaultValue(i);
-                    }
+                    IExpr positionDefaultValue = symbolWithDefaultValue.getDefaultValue(i);
                     if (positionDefaultValue != null) {
                         if (!((IPatternObject) temp).matchPattern(positionDefaultValue, fPatternMap)) {
                             return true;
@@ -1440,14 +1438,17 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	private IExpr matchOptionalArgumentsAST(ISymbol symbolWithDefaultValue, IAST lhsPatternAST, IAST lhsEvalAST,
 			EvalEngine engine) {
         int lhsSize = lhsEvalAST.size();
-        IExpr head = lhsEvalAST.head();
         IASTAppendable cloned = F.ast(lhsPatternAST.head(), lhsPatternAST.size(), false);
         boolean defaultValueMatched = false;
         for (int i = 1; i < lhsPatternAST.size(); i++) {
 			IExpr temp = lhsPatternAST.get(i);
 			if (temp.isPatternDefault()) {
-				if (temp.isAST(F.Optional, 2, 3)) {
+				if (temp.isOptional()) {
 					IAST optional = (IAST) temp;
+					if (i < lhsSize) {
+						cloned.append(optional.arg1());
+						continue;
+					}
 					IExpr optionalValue;
 					if (optional.size() == 3) {
 						optionalValue = optional.arg2();
@@ -1461,19 +1462,9 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 						defaultValueMatched = true;
 						continue;
 					}
-					return F.NIL;
-				}
+				} else {
 				IPattern pattern = (IPattern) temp;
 				IExpr positionDefaultValue = symbolWithDefaultValue.getDefaultValue(i);
-				if (positionDefaultValue == null) {
-                if (i < lhsSize && symbolWithDefaultValue.equals(head)) {
-                    cloned.append(pattern);
-                    continue;
-                }
-				}
-                if (positionDefaultValue == null) {
-					positionDefaultValue = pattern.getDefaultValue();
-                }
                 if (positionDefaultValue != null) {
 					if (!((IPatternObject) temp).matchPattern(positionDefaultValue, fPatternMap)) {
                         return F.NIL;
@@ -1495,6 +1486,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                     }
                 }
 
+				}
             }
 			cloned.append(temp);
         }

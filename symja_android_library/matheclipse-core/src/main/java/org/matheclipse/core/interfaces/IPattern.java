@@ -16,11 +16,5 @@ public interface IPattern extends IPatternObject, IExpr {
 	 * @return
 	 */
 	public boolean isConditionMatched(IExpr expr, PatternMap patternMap);
-	
-	/**
-	 * Get the default value for this pattern if available.
-	 * 
-	 * @return <code>null</code> if no default value is available
-	 */
-	public IExpr getDefaultValue();
+
 }

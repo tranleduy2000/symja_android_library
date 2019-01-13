@@ -25,16 +25,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-
-
 import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
  * (I)nterface for a mathematical (Expr)ession<br />
- * <p>
+ *
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
- * <p>
+ *
  * <pre>
  * java.lang.Object
  *    |--- java.util.AbstractCollection
@@ -122,9 +120,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     IExpr $up(final IExpr that);
 
-    @Override
-    IExpr abs();
-
     /**
      * Accept a visitor with return type T
      */
@@ -147,6 +142,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     @Override
     IExpr add(IExpr that);
+
+    @Override
+    IExpr multiply(int n);
+
+    @Override
+    IExpr reciprocal() throws MathRuntimeException;
+
+    @Override
+    Field<IExpr> getField();
 
     IExpr and(final IExpr that);
 
@@ -174,7 +178,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     Object asType(Class<?> clazz);
 
-
     /**
      * Get the first element of this <code>Power(base, exponent)</code> expression.
      */
@@ -200,7 +203,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return the conjugate complex number
      */
     IExpr conjugate();
-
 
     /**
      * Get a nested list with <code>this</code> expression set as a value.
@@ -228,17 +230,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * number classes.
      */
     IExpr dec();
-
-    /**
-     * Returns an <code>IExpr</code> whose value is <code>(this / that)</code>. Calculates
-     * <code>F.eval(F.Times(this, F.Power(that, F.CN1)))</code> in the common case and uses a specialized implementation
-     * for derived number classes.
-     */
-    @Override
-    IExpr divide(IExpr that);
-
-
-    IExpr[] egcd(IExpr b);
 
     /**
      * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>. Returns
@@ -309,6 +300,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     @Override
     ElemFactory<IExpr> factory();
 
+    @Override
+    String toScript();
+
+    @Override
+    String toScriptFactory();
+
     /**
      * Get the first element of this <code>AST</code> list (i.e. get(1)). Return <code>F.NIL</code> if this object isn't
      * an <code>AST</code>.
@@ -332,8 +329,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     String fullFormString();
 
-
     IExpr gcd(IExpr that);
+
+    IExpr[] egcd(IExpr b);
 
     /**
      * Get the element at the specified <code>index</code> if this object is of type <code>IAST</code>.
@@ -341,9 +339,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @param index
      */
     IExpr getAt(final int index);
-
-    @Override
-    Field<IExpr> getField();
 
     /**
      * Evaluate Greater, if both arguments are real numbers
@@ -468,17 +463,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     String internalScalaString(boolean symbolsAsFactoryMethod, int depth);
 
     /**
-     * Returns the multiplicative inverse of this object. It is the object such as
-     * <code>this.times(this.inverse()) == ONE </code>, with <code>ONE</code> being the multiplicative identity.
-     * Calculates <code>F.eval(F.Power(this, F.CN1))</code> in the common case and uses a specialized implmentation for
-     * derived number classes.
-     *
-     * @return <code>ONE / this</code>.
-     */
-    @Override
-    IExpr inverse();
-
-    /**
      * Test if this expression is the function <code>Abs[&lt;arg&gt;]</code>
      */
     boolean isAbs();
@@ -494,6 +478,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>Alternatives[&lt;pattern1&gt;, &lt;pattern2&gt;, ...]</code>
      */
     boolean isAlternatives();
+
     /**
      * Test if this expression is the <code>HoldPattern</code> function <code>HoldPattern[&lt;expression&gt;]</code> or
      * the deprecated <code>Literal[&lt;expression&gt;]</code> form.
@@ -832,6 +817,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>Except[&lt;pattern1&gt;, &lt;pattern2&gt;]</code>
      */
     boolean isExcept();
+
+    /**
+     * Test if this expression is the <code>Optional</code> function <code>Optional[&lt;pattern&gt;]</code> or
+     * <code>Optional[&lt;pattern&gt;, &lt;value&gt;]</code>
+     *
+     * @return
+     */
+    boolean isOptional();
 
     /**
      * Test if this expression is already expanded i.e. <code>Plus, Times, Power</code> expression is expanded.
@@ -1239,6 +1232,52 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isONE();
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    boolean isUnit();
+
+    /**
+     * Additional multiply method which works like <code>times()</code> to fulfill groovy's method signature
+     *
+     * @see IExpr#times(IExpr)
+     */
+    @Override
+    IExpr multiply(final IExpr that);
+
+    /**
+     * Returns an <code>IExpr</code> whose value is <code>(this / that)</code>. Calculates
+     * <code>F.eval(F.Times(this, F.Power(that, F.CN1)))</code> in the common case and uses a specialized implementation
+     * for derived number classes.
+     */
+    @Override
+    IExpr divide(IExpr that);
+
+    IExpr remainder(IExpr that);
+
+    /**
+     * Returns the multiplicative inverse of this object. It is the object such as
+     * <code>this.times(this.inverse()) == ONE </code>, with <code>ONE</code> being the multiplicative identity.
+     * Calculates <code>F.eval(F.Power(this, F.CN1))</code> in the common case and uses a specialized implmentation for
+     * derived number classes.
+     *
+     * @return <code>ONE / this</code>.
+     */
+    @Override
+    IExpr inverse();
+
+    /**
+     * Returns an <code>IExpr</code> whose value is <code>(this ^ n)</code>. Calculates
+     * <code>F.eval(F.Power(this, that))</code> in the common case and uses a specialized implementation for derived
+     * number classes.
+     *
+     * @param n the exponent
+     * @return <code>(this ^ n)</code>
+     */
+    @Override
+    IExpr power(final long n);
+
+    /**
      * Test if this expression is an AST list, which contains a <b>header element</b> (i.e. a function symbol like for
      * example <code>Plus or Times</code>) with attribute <code>OneIdentity</code> at index position <code>0</code> and
      * exactly <b>one argument</b> at the index position <code>1</code>. Examples for <code>OneIdentity</code> functions
@@ -1274,6 +1313,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>0</code> is the  value for the addition expression <code>x_+y_.</code>)
      */
     boolean isPatternDefault();
+
+    IExpr getOptionalValue();
 
     /**
      * Test if this expression or a subexpression is a pattern object. Used in pattern-matching; checks flags in
@@ -1339,7 +1380,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param variable the variable of the polynomial
      */
-    boolean isPolynomial( IExpr variable);
+    boolean isPolynomial(IExpr variable);
 
     /**
      * Test if this expression is a polynomial of <code>maxDegree</code> (i.e. the maximum exponent <= maxDegree) for
@@ -1408,7 +1449,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression is a signed number. I.e. an instance of type <code>ISignedNumber</code>.
      */
     boolean isReal();
-
 
     /**
      * Test if this expression is a real matrix (i.e. an ASTRealMatrix) or a <code>List[List[...],...,List[...]]</code>
@@ -1574,12 +1614,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isTrue();
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    boolean isUnit();
-
-    /**
      * Returns <code>true</code>, if this symbol or ast expression is bound to a value (i.e. the evaluation returns an
      * <i>assigned</i> value).
      */
@@ -1615,6 +1649,30 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     @Deprecated
     @Override
     boolean isZERO();
+
+    /**
+     * Signum functionality is used in JAS toString() method, don't use it as math signum function.
+     *
+     * @deprecated
+     */
+    @Deprecated
+    @Override
+    int signum();
+
+    @Override
+    IExpr sum(final IExpr that);
+
+    @Override
+    IExpr subtract(IExpr that);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    IExpr negate();
+
+    @Override
+    IExpr abs();
 
     /**
      * Count the number of leaves of this expression.
@@ -1691,24 +1749,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     IExpr mod(final IExpr that);
 
-    /**
-     * Additional multiply method which works like <code>times()</code> to fulfill groovy's method signature
-     *
-     * @see IExpr#times(IExpr)
-     */
-    @Override
-    IExpr multiply(final IExpr that);
-
-    @Override
-    IExpr multiply(int n);
-
     IExpr multiplyDistributed(IExpr that);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    IExpr negate();
 
     /**
      * Additional negative method, which works like opposite to fulfill groovy's method signature
@@ -1870,28 +1911,11 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr power(final IExpr that);
 
     /**
-     * Returns an <code>IExpr</code> whose value is <code>(this ^ n)</code>. Calculates
-     * <code>F.eval(F.Power(this, that))</code> in the common case and uses a specialized implementation for derived
-     * number classes.
-     *
-     * @param n the exponent
-     * @return <code>(this ^ n)</code>
-     */
-    @Override
-    IExpr power(final long n);
-
-    /**
      * Return the real part of this expression if possible. Otherwise return <code>Re(this)</code>.
      *
      * @return real part
      */
     IExpr re();
-
-    @Override
-    IExpr reciprocal() throws MathRuntimeException;
-
-
-    IExpr remainder(IExpr that);
 
     /**
      * Replace all (sub-) expressions with the given unary function. If no substitution matches, the method returns
@@ -1914,7 +1938,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
 
     IExpr replaceAll(final Map<? extends IExpr, ? extends IExpr> map);
-
 
     /**
      * Replace all (sub-) expressions with the given rule set. If no substitution matches, the method returns
@@ -1997,15 +2020,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr second();
 
     /**
-     * Signum functionality is used in JAS toString() method, don't use it as math signum function.
-     *
-     * @deprecated
-     */
-    @Deprecated
-    @Override
-    int signum();
-
-    /**
      * Returns the <b>number of elements</b> in this {@code IAST}.The <b>number of elements</b> equals
      * <code>argSize() + 1</code> (i.e. the <b>number of arguments</b> plus 1). If this is an atom return size
      * <code>0</code>.
@@ -2019,12 +2033,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Generate <code>Sqrt(this)</code>.
      */
     IExpr sqrt();
-
-    @Override
-    IExpr subtract(IExpr that);
-
-    @Override
-    IExpr sum(final IExpr that);
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(this * that)</code>. Calculates
@@ -2091,12 +2099,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>null</code> if this object can not be converted into a RealVector
      */
     RealVector toRealVector();
-
-    @Override
-    String toScript();
-
-    @Override
-    String toScriptFactory();
 
     /**
      * Compare if <code>this != that</code:

@@ -569,7 +569,7 @@ public class ExprParser extends Scanner {
 			// read '_:'
 			getNextToken();
 			IExpr defaultValue = parseExpression();
-			temp = F.$b(null, defaultValue);
+			temp = F.Optional(F.$b( ), defaultValue);
 		}
 		return parseArguments(temp);
 	}
@@ -643,7 +643,7 @@ public class ExprParser extends Scanner {
 			// read '_:'
 			getNextToken();
 			IExpr defaultValue = parseExpression();
-			temp = F.$p(symbol, null, defaultValue);
+			temp = F.Optional(F.$p(symbol), defaultValue);
 		}
 		return temp;
 	}
