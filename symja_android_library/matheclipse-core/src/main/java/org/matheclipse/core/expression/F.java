@@ -8,7 +8,6 @@ import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
 import com.gx.common.cache.Cache;
 import com.gx.common.cache.CacheBuilder;
-import com.gx.common.math.DoubleMath;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
@@ -80,6 +79,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -7218,8 +7218,12 @@ public class F {
 		if (engine.isApfloat()) {
 			return ApfloatNum.valueOf(value.toBigNumerator(), value.toBigDenominator(), engine.getNumericPrecision());
 		}
-		final double n = value.toBigNumerator().doubleValue();
-		final double d = value.toBigDenominator().doubleValue();
+		double n = value.toBigNumerator().doubleValue();
+		double d = value.toBigDenominator().doubleValue();
+		if (F.isEqual(n, d)) {
+			n = new BigDecimal(value.toBigNumerator()).doubleValue();
+			d = new BigDecimal(value.toBigDenominator()).doubleValue();
+		}
 		return num(n / d);
 	}
 

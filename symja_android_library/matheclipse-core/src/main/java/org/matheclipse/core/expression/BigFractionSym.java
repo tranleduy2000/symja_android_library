@@ -157,6 +157,10 @@ public class BigFractionSym extends AbstractFractionSym {
 		// double precision complex number
 		double nr = toBigNumerator().doubleValue();
 		double dr = toBigDenominator().doubleValue();
+		if (F.isEqual(nr, dr)) {
+			nr = new BigDecimal(toBigNumerator()).doubleValue();
+			dr = new BigDecimal(toBigDenominator()).doubleValue();
+		}
 		return ComplexNum.valueOf(nr / dr);
 	}
 
