@@ -683,17 +683,17 @@ public class Primality {
 	}
 
 	public static void factorInteger(final BigInteger val, Map<BigInteger, Integer> map) {
-		int length = val.bitLength();
-		System.out.println(length);
 		EllipticCurveMethod ecm = new EllipticCurveMethod(val);
 
-		// don't use SIQS in the following method - use PSIQS below
-		BigInteger rest = ecm.factorize(map, true);
+		BigInteger rest = ecm.factorize(map);
 		if (!rest.equals(BigInteger.ONE)) {
-			System.out.println("REST: " + rest.toString());
+			CombinedFactorAlgorithm factorizer;
+			final int cores = Runtime.getRuntime().availableProcessors();
 		if (Config.JAVA_UNSAFE) {
-				final int cores = Runtime.getRuntime().availableProcessors();
-			CombinedFactorAlgorithm factorizer = new CombinedFactorAlgorithm(cores / 2 + 1, true);
+				factorizer = new CombinedFactorAlgorithm(cores / 2 + 1, true, false);
+			} else {
+				factorizer = new CombinedFactorAlgorithm(1, false, false);
+			}
 				SortedMultiset<BigInteger> result = factorizer.factor(rest);
 
 			for (Map.Entry<BigInteger, Integer> entry : result.entrySet()) {
@@ -702,7 +702,6 @@ public class Primality {
 			return;
 		}
 		}
-	}
 
 	public static BigInteger rho(final BigInteger val) {
 		BigInteger divisor;
