@@ -977,24 +977,30 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 * @return <code>F.NIL</code> if the given <code>lhsPatternAST</code> could not be matched or contains no pattern
 	 *         with default value.
      */
-	private IExpr matchDefaultArgumentsAST(final ISymbol symbolWithDefaultValue, IAST lhsPatternAST) {
+	private IExpr matchDefaultArgumentsAST(final ISymbol symbolWithDefaultValue, IAST lhsPatternAST, final EvalEngine engine) {
 		final IASTAppendable cloned = F.ast(lhsPatternAST.head(), lhsPatternAST.size(), false);
-		final boolean[] defaultValueMatched = new boolean[] { false };
+        final boolean[] defaultValueMatched = new boolean[] { false };
 		if (lhsPatternAST.exists(new ObjIntPredicate<IExpr>() {
             @Override
             public boolean test(IExpr temp, int i) {
                 if (temp.isPatternDefault()) {
-				if (temp.isAST(F.Optional, 2)) {
-					IExpr commonDefaultValue = symbolWithDefaultValue.getDefaultValue();
-					if (commonDefaultValue != null) {
-						if (!(matchExpr(temp.first(), commonDefaultValue, EvalEngine.get()))) {
-							return true;
-						}
-						defaultValueMatched[0] = true;
-						return false;
-					}
-					return false;
-				}
+                    if (temp.isAST(F.Optional, 2, 3)) {
+                        IAST optional = (IAST) temp;
+                        IExpr optionalValue;
+                        if (optional.size() == 3) {
+                            optionalValue = optional.arg2();
+                        } else {
+                            optionalValue = symbolWithDefaultValue.getDefaultValue();
+                        }
+                        if (optionalValue != null) {
+                            if (!(PatternMatcher.this.matchExpr(temp.first(), optionalValue, engine))) {
+                                return true;
+                            }
+                            defaultValueMatched[0] = true;
+                            return false;
+                        }
+                        return false;
+                    }
                     IPattern pattern = (IPattern) temp;
                     IExpr positionDefaultValue = pattern.getDefaultValue();
                     if (positionDefaultValue == null) {
@@ -1184,12 +1190,13 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                     fPatternMap.resetPattern(patternValues);
 					if (lhsEvalExpr.isAST() && lhsPatternAST.hasOptionalArgument() && !lhsPatternAST.isOrderlessAST()) {
 						// TODO for Power[x_, y_.] matching Power[a,b] test both cases Power[a,b] && Power[Power[a,b],1]
-						temp = matchOptionalArgumentsAST(lhsPatternAST.topHead(), lhsPatternAST, (IAST) lhsEvalExpr);
+						temp = matchOptionalArgumentsAST(lhsPatternAST.topHead(), lhsPatternAST, (IAST) lhsEvalExpr,
+								engine);
                         if (temp.isPresent()) {
 							matched = matchExpr(temp, lhsEvalExpr, engine, stackMatcher, false);
                         }
                     } else {
-                        temp = matchDefaultArgumentsAST(lhsPatternAST.topHead(), lhsPatternAST);
+						temp = matchDefaultArgumentsAST(lhsPatternAST.topHead(), lhsPatternAST, engine);
                         if (temp.isPresent()) {
 							matched = matchExpr(temp, lhsEvalExpr, engine, stackMatcher, false);
                         }
@@ -1425,21 +1432,30 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 *            the symbol for getting the associated default values from
 	 * @param lhsPatternAST
 	 *            left-hand-side which may contain patterns with default values
+	 * @param engine
+	 *            the evaluation engine
 	 * @return <code>F.NIL</code> if the given <code>lhsPatternAST</code> could not be matched or contains no pattern
 	 *         with default value.
      */
-    private IExpr matchOptionalArgumentsAST(ISymbol symbolWithDefaultValue, IAST lhsPatternAST, IAST lhsEvalAST) {
+	private IExpr matchOptionalArgumentsAST(ISymbol symbolWithDefaultValue, IAST lhsPatternAST, IAST lhsEvalAST,
+			EvalEngine engine) {
         int lhsSize = lhsEvalAST.size();
         IExpr head = lhsEvalAST.head();
         IASTAppendable cloned = F.ast(lhsPatternAST.head(), lhsPatternAST.size(), false);
         boolean defaultValueMatched = false;
         for (int i = 1; i < lhsPatternAST.size(); i++) {
-            if (lhsPatternAST.get(i).isPatternDefault()) {
-				if (lhsPatternAST.get(i).isAST(F.Optional, 2, 3)) {
-					IAST optional = (IAST) lhsPatternAST.get(i);
-					IExpr commonDefaultValue = symbolWithDefaultValue.getDefaultValue();
-					if (commonDefaultValue != null) {
-						if (!(matchExpr(optional.arg1(), commonDefaultValue, EvalEngine.get()))) {
+			IExpr temp = lhsPatternAST.get(i);
+			if (temp.isPatternDefault()) {
+				if (temp.isAST(F.Optional, 2, 3)) {
+					IAST optional = (IAST) temp;
+					IExpr optionalValue;
+					if (optional.size() == 3) {
+						optionalValue = optional.arg2();
+					} else {
+						optionalValue = symbolWithDefaultValue.getDefaultValue();
+					}
+					if (optionalValue != null) {
+						if (!(matchExpr(optional.arg1(), optionalValue, engine))) {
 							return F.NIL;
 						}
 						defaultValueMatched = true;
@@ -1447,7 +1463,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 					}
 					return F.NIL;
 				}
-                IPattern pattern = (IPattern) lhsPatternAST.get(i);
+				IPattern pattern = (IPattern) temp;
 				IExpr positionDefaultValue = symbolWithDefaultValue.getDefaultValue(i);
 				if (positionDefaultValue == null) {
                 if (i < lhsSize && symbolWithDefaultValue.equals(head)) {
@@ -1459,7 +1475,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 					positionDefaultValue = pattern.getDefaultValue();
                 }
                 if (positionDefaultValue != null) {
-                    if (!((IPatternObject) lhsPatternAST.get(i)).matchPattern(positionDefaultValue, fPatternMap)) {
+					if (!((IPatternObject) temp).matchPattern(positionDefaultValue, fPatternMap)) {
                         return F.NIL;
                     }
                     defaultValueMatched = true;
@@ -1471,7 +1487,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                     }
                     IExpr commonDefaultValue = symbolWithDefaultValue.getDefaultValue();
                     if (commonDefaultValue != null) {
-                        if (!((IPatternObject) lhsPatternAST.get(i)).matchPattern(commonDefaultValue, fPatternMap)) {
+						if (!((IPatternObject) temp).matchPattern(commonDefaultValue, fPatternMap)) {
                             return F.NIL;
                         }
                         defaultValueMatched = true;
@@ -1480,7 +1496,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                 }
 
             }
-            cloned.append(lhsPatternAST.get(i));
+			cloned.append(temp);
         }
         if (defaultValueMatched) {
             if (cloned.isOneIdentityAST1()) {
