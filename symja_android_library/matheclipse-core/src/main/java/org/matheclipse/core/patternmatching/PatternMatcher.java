@@ -298,7 +298,6 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	/**
 	 * Needed for serialization
 	 *
-	 * @param patternExpr
 	 */
 	public PatternMatcher() {
 		super(null);
@@ -461,7 +460,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
      * @param lhsPatternAST
      * @param lhsEvalAST
      * @param rhsExpr
-     * @param stackMatcher
+	 * @param engine
      * @return <code>F.NIL</code> if no match was found.
      */
 	protected IExpr replaceSubExpressionOrderlessFlat(final IAST lhsPatternAST, final IAST lhsEvalAST,
@@ -472,7 +471,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                     return F.NIL;
                 }
                 final OrderlessMatcher foMatcher = new OrderlessMatcher(lhsPatternAST, lhsEvalAST);
-                boolean matched = foMatcher.matchOrderlessAST(1, null, engine);
+				boolean matched = foMatcher.matchOrderlessAST(1, new StackMatcher(engine), engine);
                 if (matched) {
                     IASTAppendable lhsResultAST = (lhsEvalAST).copyAppendable();
                     foMatcher.filterResult(lhsResultAST);
@@ -1140,7 +1139,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 					}
 					break;
 				case ID.Optional:
-					if (lhsPatternAST.isAST(F.Optional, 2, 3)) {
+					if (lhsPatternAST.isOptional()) {
 						matched = matchExpr(lhsPatternAST.arg1(), lhsEvalExpr, engine, stackMatcher, false);
                             if (!matched) {
                                 return false;

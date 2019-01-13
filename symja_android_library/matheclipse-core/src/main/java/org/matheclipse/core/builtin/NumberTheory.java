@@ -111,13 +111,13 @@ public final class NumberTheory {
 		 * Generates the Bell number of the given index, where B(1) is 1. This is recursive.
 		 * 
 		 * @param index
+		 *            an int number >= 0
 		 * @return
 		 */
 		private static IInteger bellNumber(int index) {
 			if (index < BELLB_25.length) {
 				return AbstractIntegerSym.valueOf(BELLB_25[index]);
 			}
-			if (index > 1) {
 				// Sum[StirlingS2[n, k], {k, 0, n}]
 				IInteger sum = F.C1;
 				for (int ki = 0; ki < index; ki++) {
@@ -125,8 +125,6 @@ public final class NumberTheory {
 				}
 				return sum;
 			}
-			return F.C1;
-		}
 
 		/**
 		 * Generates the Bell polynomial of the given index, where B(1) is 1. This is recursive.

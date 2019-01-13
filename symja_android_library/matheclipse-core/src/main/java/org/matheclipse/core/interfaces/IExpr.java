@@ -2024,7 +2024,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Replace all (sub-) expressions with the given unary function. If no substitution matches, the method returns
-     * <code>null</code>.
+     * <code>F.NIL</code>.
      *
      * @param function if the unary functions <code>apply()</code> method returns <code>F.NIL</code> the expression isn't
      *                 substituted.

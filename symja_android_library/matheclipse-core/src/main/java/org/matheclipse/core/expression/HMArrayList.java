@@ -598,6 +598,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 			}
 			if (obj == this) {
 				return true;
+
 			}
 			HMArrayList list = (HMArrayList) obj;
 			int size = lastIndex - firstIndex;

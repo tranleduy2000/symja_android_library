@@ -2439,44 +2439,6 @@ public final class Programming {
 		}
 	}
 
-	/**
-	 * Check the (possible nested) module condition in pattern matcher without evaluating a result.
-	 *
-	 * @param arg1
-	 * @param arg2
-	 * @param engine
-	 * @return
-	 */
-	// public static boolean checkModuleCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
-	// if (arg1.isList()) {
-	// IAST intializerList = (IAST) arg1;
-	// IExpr result = moduleSubstVariables(intializerList, arg2, engine);
-	// if (result.isCondition()) {
-	// return checkCondition(result.first(), result.second(), engine);
-	// } else if (result.isModule()) {
-	// return checkModuleCondition(result.first(), result.second(), engine);
-	// } else if (result.isWith()) {
-	// return checkWithCondition(result.first(), result.second(), engine);
-	// }
-	// return true;
-	// }
-	// return true;
-	// }
-
-//	public static boolean checkWithCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
-//		if (arg1.isList()) {
-//			IAST intializerList = (IAST) arg1;
-//			IExpr result = withSubstVariables(intializerList, arg2, engine);
-//			if (result.isCondition()) {
-//				return checkCondition(result.first(), result.second(), engine);
-//			} else if (result.isModule()) {
-//				return checkModuleCondition(result.first(), result.second(), engine);
-//			} else if (result.isWith()) {
-//				return checkWithCondition(result.first(), result.second(), engine);
-//			}
-//		}
-//		return true;
-//	}
 
 	/**
 	 * Substitute the variable names from the list with temporary dummy variable names in the &quot;module-block&quot;..
