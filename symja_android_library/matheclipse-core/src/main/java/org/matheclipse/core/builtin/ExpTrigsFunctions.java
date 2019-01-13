@@ -987,15 +987,11 @@ public class ExpTrigsFunctions {
 						// (2/i)*Pi
 						final IExpr angle = engine.evaluate(F.Times(F.QQ(2, i), F.Pi));
 
-						final IASTAppendable result = F.ListAlloc(10);
-						ast.forEach(0, i, //
-								new ObjIntConsumer<IExpr>() {
-									@Override
-									public void accept(IExpr x, int j) {
+						IASTAppendable result = F.ListAlloc(10);
+						for (int j = 0; j < i; j++) {
 										result.append(F.AngleVector(F.Plus(start, F.ZZ(j).times(angle))));
 									}
 
-								});
 						return result;
 					}
 				}
