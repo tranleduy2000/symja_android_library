@@ -1937,7 +1937,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     @Override
-    public boolean isSqrt() {
+    public boolean isSqrtExpr() {
         if (isPower() && second().equals(F.C1D2)) {
             return true;
         }

@@ -1415,11 +1415,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
 
     /**
-     * Test if this expression is the function <code>Power[&lt;arg1&gt;, 1/2]</code>
+     * Test if this expression is the function <code>Power[&lt;arg1&gt;, 1/2]</code> (i.e. <code>Sqrt[&lt;arg1&gt;]</code>) or
+     * <code>-Power[&lt;arg1&gt;, 1/2]</code> (i.e. <code>-Sqrt[&lt;arg1&gt;]</code>)
      *
      * @return
      */
-    boolean isSqrt();
+    boolean isSqrtExpr();
 
 
     /**
