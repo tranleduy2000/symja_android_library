@@ -1,5 +1,6 @@
 package org.matheclipse.core.patternmatching;
 
+import com.duy.annotations.Nonnull;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
@@ -16,6 +17,52 @@ import java.util.List;
  * Interface for the pattern matcher
  */
 public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Serializable {// Comparable<IPatternMatcher>,
+	public final static int NOFLAG = 0x0000;
+
+	/**
+	 * This rule is defined with the <code>Set[]</code>  function
+	 */
+	public final static int SET = 0x0001;
+
+	/**
+	 * This rule is defined with the <code>SetDelayed[]</code>  function
+	 */
+	public final static int SET_DELAYED = 0x0002;
+
+	/**
+	 * This rule is defined with the <code>Set[]</code>  function
+	 */
+	public final static int TAGSET = 0x0004;
+
+	/**
+	 * This rule is defined with the <code>Set[]</code>  function
+	 */
+	public final static int TAGSET_DELAYED = 0x0008;
+
+	/**
+	 * This rule is defined with the <code>Set[]</code>  function
+	 */
+	public final static int UPSET = 0x0010;
+
+	/**
+	 * This rule is defined with the <code>Set[]</code>  function
+	 */
+	public final static int UPSET_DELAYED = 0x0020;
+
+	/**
+	 * This rules left-hand-side is wrapped with a <code>Literal[]</code>  function
+	 */
+	public final static int LITERAL = 0x1000;
+
+	/**
+	 * This rules left-hand-side is wrapped with a <code>HoldPattern[]</code>  function
+	 */
+	public final static int HOLDPATTERN = 0x2000;
+
+	/**
+	 * Serialization mask
+	 */
+	public final static int SERIALIZATION_MASK = 0x8000;
 	public static class EquivalenceComparator implements Comparator<IPatternMatcher>, Serializable {
 
 		private static final long serialVersionUID = 8357661139299702326L;
@@ -114,7 +161,7 @@ public abstract class IPatternMatcher implements Predicate<IExpr>, Cloneable, Se
 	 * @param engine
 	 * @return <code>F.NIL</code> if the match wasn't successful, the evaluated expression otherwise.
 	 */
-	public abstract IExpr eval(final IExpr leftHandSide,  EvalEngine engine);
+	public abstract IExpr eval(final IExpr leftHandSide, @Nonnull EvalEngine engine);
 
 	/**
 	 * Get the "left-hand-side" of a pattern-matching rule.

@@ -50,9 +50,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.matheclipse.core.expression.F.Divide;
 import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.interfaces.ISymbol.HOLDALL;
-import static org.matheclipse.core.interfaces.ISymbol.HOLDALLCOMPLETE;
-import static org.matheclipse.core.interfaces.ISymbol.RuleType;
 
 public final class Programming {
 	private final static Programming CONST = new Programming();
@@ -1562,11 +1559,11 @@ public final class Programming {
 							} else {
 								if (rightHandSide.isList()) {
 									IExpr res = Programming.assignPart(temp, part, 2, (IAST) rightHandSide, 1, engine);
-									symbol.putDownRule(RuleType.SET, true, symbol, res, false);
+									symbol.putDownRule(IPatternMatcher.SET, true, symbol, res, false);
 									return rightHandSide;
 								} else {
 									IExpr res = Programming.assignPart(temp, part, 2, rightHandSide, engine);
-									symbol.putDownRule(RuleType.SET, true, symbol, res, false);
+									symbol.putDownRule(IPatternMatcher.SET, true, symbol, res, false);
 									return rightHandSide;
 								}
 							}
@@ -2450,21 +2447,21 @@ public final class Programming {
 	 * @param engine
 	 * @return
 	 */
-//	public static boolean checkModuleCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
-//		if (arg1.isList()) {
-//			IAST intializerList = (IAST) arg1;
-//			IExpr result = moduleSubstVariables(intializerList, arg2, engine);
-//			if (result.isCondition()) {
-//				return checkCondition(result.first(), result.second(), engine);
-//			} else if (result.isModule()) {
-//				return checkModuleCondition(result.first(), result.second(), engine);
-//			} else if (result.isWith()) {
-//				return checkWithCondition(result.first(), result.second(), engine);
-//			}
-//			return true;
-//		}
-//		return true;
-//	}
+	// public static boolean checkModuleCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
+	// if (arg1.isList()) {
+	// IAST intializerList = (IAST) arg1;
+	// IExpr result = moduleSubstVariables(intializerList, arg2, engine);
+	// if (result.isCondition()) {
+	// return checkCondition(result.first(), result.second(), engine);
+	// } else if (result.isModule()) {
+	// return checkModuleCondition(result.first(), result.second(), engine);
+	// } else if (result.isWith()) {
+	// return checkWithCondition(result.first(), result.second(), engine);
+	// }
+	// return true;
+	// }
+	// return true;
+	// }
 
 //	public static boolean checkWithCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
 //		if (arg1.isList()) {
@@ -2533,19 +2530,19 @@ public final class Programming {
 	 * @param engine
 	 * @return
 	 */
-//	public static boolean checkCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
-//		if (engine.evalTrue(arg2)) {
-//			if (arg1.isCondition()) {
-//				return checkCondition(arg1.first(), arg1.second(), engine);
-//			} else if (arg1.isModule()) {
-//				return checkModuleCondition(arg1.first(), arg1.second(), engine);
-//			} else if (arg1.isWith()) {
-//				return checkWithCondition(arg1.first(), arg1.second(), engine);
-//			}
-//			return true;
-//		}
-//		return false;
-//	}
+	// public static boolean checkCondition(IExpr arg1, IExpr arg2, final EvalEngine engine) {
+	// if (engine.evalTrue(arg2)) {
+	// if (arg1.isCondition()) {
+	// return checkCondition(arg1.first(), arg1.second(), engine);
+	// } else if (arg1.isModule()) {
+	// return checkModuleCondition(arg1.first(), arg1.second(), engine);
+	// } else if (arg1.isWith()) {
+	// return checkWithCondition(arg1.first(), arg1.second(), engine);
+	// }
+	// return true;
+	// }
+	// return false;
+	// }
 
 	/**
 	 * Get the element stored at the given <code>position</code>.

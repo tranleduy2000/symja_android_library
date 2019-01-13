@@ -444,12 +444,12 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @return
      * @see PatternMap#DEFAULT_RULE_PRIORITY
      */
-    public IPatternMatcher putDownRule(final RuleType setSymbol, boolean equalRule, IExpr leftHandSide,
+    public IPatternMatcher putDownRule(final int setSymbol, boolean equalRule, IExpr leftHandSide,
                                        IExpr rightHandSide, boolean packageMode);
 
     public IExpr evalMessage(EvalEngine engine, String messageName);
 
-    public void putMessage(final RuleType setSymbol, String messageName, IStringX message);
+    public void putMessage(final int setSymbol, String messageName, IStringX message);
 
     /**
      * Associate a new rule with the given priority to this symbol.<br/>
@@ -464,7 +464,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @return
      * @see PatternMap#DEFAULT_RULE_PRIORITY
      */
-    public IPatternMatcher putDownRule(final RuleType setSymbol, boolean equalRule, IExpr leftHandSide,
+    public IPatternMatcher putDownRule(final int setSymbol, boolean equalRule, IExpr leftHandSide,
                                        IExpr rightHandSide, int priority, boolean packageMode);
 
     /**
@@ -477,7 +477,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @return
      * @see PatternMap#DEFAULT_RULE_PRIORITY
      */
-    public IPatternMatcher putUpRule(final RuleType setSymbol, boolean equalRule, IAST leftHandSide,
+    public IPatternMatcher putUpRule(final int setSymbol, boolean equalRule, IAST leftHandSide,
                                      IExpr rightHandSide);
 
     /**
@@ -492,7 +492,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @return
      * @see PatternMap#DEFAULT_RULE_PRIORITY
      */
-    public IPatternMatcher putUpRule(final RuleType setSymbol, final boolean equalRule, final IAST leftHandSide,
+    public IPatternMatcher putUpRule(final int setSymbol, final boolean equalRule, final IAST leftHandSide,
                                      final IExpr rightHandSide, final int priority);
 
     /**
@@ -540,7 +540,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @param packageMode
      * @return <code>true</code> if a rule could be removed, <code>false</code> otherwise
      */
-    public boolean removeRule(final IBuiltInSymbol.RuleType setSymbol, final boolean equalRule,
+    public boolean removeRule(final int setSymbol, final boolean equalRule,
                               final IExpr leftHandSide, boolean packageMode);
 
     /**
@@ -568,9 +568,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public boolean writeRules(java.io.ObjectOutputStream stream) throws java.io.IOException;
 
-    public static enum RuleType {
-        SET, SET_DELAYED, TAGSET, TAGSET_DELAYED, UPSET, UPSET_DELAYED;
-    }
 
 
 }

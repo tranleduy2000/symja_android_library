@@ -698,7 +698,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *
      * @return
      */
-    public boolean isHoldPattern() {
+    public boolean isHoldPatternOrLiteral() {
         return false;
     }
 

@@ -1933,8 +1933,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isHoldPattern() {
-		return isSameHead(F.HoldPattern, 2);
+	public final boolean isHoldPatternOrLiteral() {
+		return isSameHead(F.HoldPattern, 2)||isSameHead(F.Literal, 2);
 	}
 	/** {@inheritDoc} */
 	@Override
@@ -2666,11 +2666,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @deprecated use {@link #isZero()} instead.
 	 */
-//	@Deprecated
-//	@Override
-//	public boolean isZERO() {
-//		return isZero();
-//	}
+	// @Deprecated
+	// @Override
+	// public boolean isZERO() {
+	// return isZero();
+	// }
 
 	/**
 	 * Returns an iterator over the elements in this <code>IAST</code> starting with offset <b>1</b>.
@@ -3165,7 +3165,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return 1;
 	}
 
-	//Android changed: Java 7 isn't support Stream API
+	//Android changed: Java 7 doesn't support Stream API
 //	@Override
 //	public Stream<IExpr> stream() {
 //		return Arrays.stream(toArray(), 1, size());

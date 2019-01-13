@@ -77,6 +77,7 @@ import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 
 import java.math.BigInteger;
@@ -214,7 +215,10 @@ public class F {
 	/** Alternatives(p1, p2, ..., p_i) - is a pattern that matches any of the patterns `p1, p2,...., p_i`. */
 	public final static IBuiltInSymbol Alternatives = F.initFinalSymbol("Alternatives", ID.Alternatives);
 
-    /** And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.*/
+	/**
+	 * And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning `False` as soon as
+	 * an expression evaluates to `False`. If all expressions evaluate to `True`, `And` returns `True`.
+	 */
 	public final static IBuiltInSymbol And = F.initFinalSymbol("And", ID.And);
 
 	/** AngleVector(phi) - returns the point at angle `phi` on the unit circle. */
@@ -232,7 +236,7 @@ public class F {
 	public final static IBuiltInSymbol AntihermitianMatrixQ = F.initFinalSymbol("AntihermitianMatrixQ",
 			ID.AntihermitianMatrixQ);
 
-	/** AntisymmetricMatrixQ(m) - returns `True` if `m` is a anti symmetric matrix.*/
+	/** AntisymmetricMatrixQ(m) - returns `True` if `m` is a anti symmetric matrix. */
 	public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ",
 			ID.AntisymmetricMatrixQ);
 
@@ -6411,7 +6415,7 @@ public class F {
 		if (lhs.isAST()) {
 			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
 		}
-		PatternMatching.setDownRule(lhs, rhs, true);
+		PatternMatching.setDownRule(IPatternMatcher.NOFLAG, lhs, rhs, true);
 		return F.NIL;
 	}
 
@@ -6443,7 +6447,7 @@ public class F {
 	
 	public static IAST IIntegrate(int priority, final IAST lhs, final IExpr rhs) {
 			((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
-		org.matheclipse.core.reflection.system.Integrate.INTEGRATE_RULES_DATA.putDownRule(ISymbol.RuleType.SET_DELAYED,
+		org.matheclipse.core.reflection.system.Integrate.INTEGRATE_RULES_DATA.putDownRule(IPatternMatcher.SET_DELAYED,
 				false, lhs, rhs, priority);
 		return F.NIL;
 	}
@@ -6801,6 +6805,15 @@ public class F {
 		return unaryAST1(ListQ, a);
 	}
 
+	/**
+	 *
+	 * @param a0
+	 * @return
+	 * @deprecated use HoldPattern
+	 */
+	public static IAST Literal(final IExpr a0) {
+		return unaryAST1(Literal, a0);
+	}
 	public static IAST Log(final IExpr a0) {
 		return unaryAST1(Log, a0);
 	}
@@ -7824,7 +7837,7 @@ public class F {
 	 *            the name of the symbol
 	 * @param assumptionAST
 	 *            the assumptions which should be set for the symbol. Use <code>#1</code> or {@link F#Slot1} in the
-	 * <code>assumptionAST</code> expression for this symbol.
+	 *            <code>assumptionAST</code> expression for this symbol.
 	 * @param engine
 	 *            the evaluation engine
 	 * @return the symbol object from the context path
@@ -7857,9 +7870,9 @@ public class F {
 		ISymbol symbol;
 		ContextPath contextPath = engine.getContextPath();
 		Context context = contextPath.getContext(contextStr);
-//		if (context == null) {
-//			contextPath.add(new Context(contextStr));
-//		}
+		// if (context == null) {
+		// contextPath.add(new Context(contextStr));
+		// }
 		symbol = contextPath.getSymbol(symbolName, context, engine.isRelaxedSyntax());
 		if (assumptionAST != null) {
 			IExpr temp = Lambda.replaceSlots(assumptionAST, F.List(symbol));

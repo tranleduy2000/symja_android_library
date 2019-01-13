@@ -329,10 +329,10 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
      * Check if the condition for this pattern matcher evaluates to <code>true</code>.
      */
 	final public boolean checkCondition(EvalEngine engine) {
-//		boolean traceMode = false;
-//		try {
-//			traceMode = engine.isTraceMode();
-//			engine.setTraceMode(false);
+		// boolean traceMode = false;
+		// try {
+		// traceMode = engine.isTraceMode();
+		// engine.setTraceMode(false);
 			if (fPatternCondition != null) {
                 final IExpr substConditon = fPatternMap.substituteSymbols(fPatternCondition);
 				if (fPatternMap.isFreeOfPatternSymbols(substConditon)) {
@@ -345,9 +345,9 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 		} else {
 				return checkRHSCondition(engine);
 			}
-//		} finally {
-//			engine.setTraceMode(traceMode);
-//		}
+		// } finally {
+		// engine.setTraceMode(traceMode);
+		// }
         }
 
     /**
@@ -1045,7 +1045,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
             if (functionID > ID.UNKNOWN) {
                 switch (functionID) {
                     case ID.HoldPattern:
-                        if (lhsPatternAST.isHoldPattern()) {
+				case ID.Literal:
+                        if (lhsPatternAST.isHoldPatternOrLiteral()) {
 						return matchExpr(lhsPatternAST.arg1(), lhsEvalExpr, engine, stackMatcher, replaceMode);
                         }
                         break;

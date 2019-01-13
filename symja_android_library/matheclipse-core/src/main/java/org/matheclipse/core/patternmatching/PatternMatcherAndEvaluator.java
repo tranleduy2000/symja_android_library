@@ -10,7 +10,6 @@ import org.matheclipse.core.interfaces.ExprUtil;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.interfaces.ISymbol.RuleType;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -37,7 +36,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	 */
 	protected transient long fRHSleafCountSimplify;
 
-	private ISymbol.RuleType fSetSymbol;
+	private int fSetFlags;
 
 	/**
 	 * Public constructor for serialization.
@@ -55,28 +54,27 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	 *            the result which should be evaluated if the "pattern-matching" succeeds
 	 */
 	public PatternMatcherAndEvaluator(final IExpr leftHandSide, final IExpr rightHandSide) {
-		this(ISymbol.RuleType.SET_DELAYED, leftHandSide, rightHandSide);
+		this(SET_DELAYED, leftHandSide, rightHandSide);
 	}
 
 	/**
 	 * ine a pattern-matching rule.
 	 * 
 	 * @param setSymbol
-	 *            the symbol which defines this pattern-matching rule (i.e. Set, SetDelayed,...)
+	 *            the flags for the symbol which defines this pattern-matching rule (i.e. Set, SetDelayed,...)
 	 * @param leftHandSide
 	 *            could contain pattern expressions for "pattern-matching"
 	 * @param rightHandSide
 	 *            the result which should be evaluated if the "pattern-matching" succeeds
 	 */
-	public PatternMatcherAndEvaluator(final ISymbol.RuleType setSymbol, final IExpr leftHandSide,
-			final IExpr rightHandSide) {
+	public PatternMatcherAndEvaluator(final int setSymbol, final IExpr leftHandSide, final IExpr rightHandSide) {
 		this(setSymbol, leftHandSide, rightHandSide, true, 0);
 	}
 
-	public PatternMatcherAndEvaluator(final ISymbol.RuleType setSymbol, final IExpr leftHandSide,
-			final IExpr rightHandSide, boolean initAll, int patternHash) {
+	public PatternMatcherAndEvaluator(final int setSymbol, final IExpr leftHandSide, final IExpr rightHandSide,
+			boolean initAll, int patternHash) {
 		super(leftHandSide, initAll);
-		fSetSymbol = setSymbol;
+		fSetFlags = setSymbol;
 		fRightHandSide = rightHandSide;
 		fPatterHash = patternHash;
 		if (initAll) {
@@ -84,6 +82,27 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	}
 	}
 
+	/**
+	 * Are the given flags disabled ?
+	 *
+	 * @param flags
+	 * @return
+	 * @see IAST#NO_FLAG
+	 */
+	public final boolean isFlagOff(final int i) {
+		return (fSetFlags & i) == 0;
+	}
+
+	/**
+	 * Are the given flags enabled ?
+	 *
+	 * @param flags
+	 * @return
+	 * @see IAST#NO_FLAG
+	 */
+	public final boolean isFlagOn(int i) {
+		return (fSetFlags & i) == i;
+	}
 	/**
 	 * Check if <code>fPatterHash == 0 || fPatterHash == patternHash;</code>.
 	 *
@@ -116,7 +135,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	public Object clone() throws CloneNotSupportedException {
 		PatternMatcherAndEvaluator v = (PatternMatcherAndEvaluator) super.clone();
 		v.fRightHandSide = fRightHandSide;
-		v.fSetSymbol = fSetSymbol;
+		v.fSetFlags = fSetFlags;
 		v.fReturnResult = F.NIL;
 		return v;
 	}
@@ -168,6 +187,14 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	}
 
 	/**
+	 * Add a flag to the existing ones.
+	 *
+	 * @param i
+	 */
+	public final void addFlags(final int i) {
+		fSetFlags |= i;
+	}
+	/**
 	 * Check if the condition for the right-hand-sides <code>Module[], With[] or Condition[]</code> expressions
 	 * evaluates to <code>true</code>.
 	 * 
@@ -188,7 +215,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 			} else {
 				IExpr rhs = patternMap.substituteSymbols(fRightHandSide);
 				try {
-//					System.out.println(rhs.toString());
+					// System.out.println(rhs.toString());
 					fReturnResult = engine.evaluate(rhs);
 					matched = true;
 				} catch (final ConditionException e) {
@@ -297,6 +324,14 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		return result;
 	}
 
+	/**
+	 * Get the flags for this matcher.
+	 *
+	 * @return
+	 */
+	public int getFlags() {
+		return fSetFlags;
+	}
 	@Override
 	public IExpr getRHS() {
 		return ExprUtil.ofNullable(fRightHandSide);
@@ -316,10 +351,19 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	public IAST getAsAST() {
 		ISymbol setSymbol = getSetSymbol();
 		IExpr condition = getCondition();
+		IAST temp;
 		if (condition != null) {
-			return F.binaryAST2(setSymbol, getLHS(), F.Condition(getRHS(), condition));
+			temp = F.binaryAST2(setSymbol, getLHS(), F.Condition(getRHS(), condition));
+		} else {
+			temp = F.binaryAST2(setSymbol, getLHS(), getRHS());
 		}
-		return F.binaryAST2(setSymbol, getLHS(), getRHS());
+		if (isFlagOn(HOLDPATTERN)) {
+			return F.HoldPattern(temp);
+		}
+		if (isFlagOn(LITERAL)) {
+			return F.Literal(temp);
+		}
+		return temp;
 	}
 
 	/**
@@ -328,22 +372,22 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	 * @return <code>null</code> if no symbol was defined
 	 */
 	public ISymbol getSetSymbol() {
-		if (fSetSymbol == ISymbol.RuleType.SET_DELAYED) {
+		if (isFlagOn(SET_DELAYED)) {
 			return F.SetDelayed;
 		}
-		if (fSetSymbol == ISymbol.RuleType.SET) {
+		if (isFlagOn(SET)) {
 			return F.Set;
 		}
-		if (fSetSymbol == ISymbol.RuleType.UPSET_DELAYED) {
+		if (isFlagOn(UPSET_DELAYED)) {
 			return F.UpSetDelayed;
 		}
-		if (fSetSymbol == ISymbol.RuleType.UPSET) {
+		if (isFlagOn(UPSET)) {
 			return F.UpSet;
 		}
-		if (fSetSymbol == ISymbol.RuleType.TAGSET_DELAYED) {
+		if (isFlagOn(TAGSET_DELAYED)) {
 			return F.TagSetDelayed;
 		}
-		if (fSetSymbol == ISymbol.RuleType.TAGSET) {
+		if (isFlagOn(TAGSET)) {
 			return F.TagSet;
 		}
 		return null;
@@ -381,6 +425,14 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		return comp;
 	}
 
+	/**
+	 * Set the evaluation flags for this list (i.e. replace all existing flags).
+	 *
+	 * @param i
+	 */
+	public void setFlags(int i) {
+		fSetFlags = i;
+	}
 	@Override
 	public String toString() {
 		if (fPatternMap == null) {
@@ -391,9 +443,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
-		short ordinal = (short) fSetSymbol.ordinal();
+		short ordinal = (short) fSetFlags;
 		if (fPatternCondition == null) {
-			ordinal |= 0x8000;
+			ordinal |= SERIALIZATION_MASK;
 		}
 		objectOutput.writeShort(ordinal);
 		objectOutput.writeObject(fLhsPatternExpr);
@@ -406,7 +458,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException, ClassNotFoundException {
 		short ordinal = objectInput.readShort();
-		fSetSymbol = RuleType.values()[ordinal & 0x7FFF];
+		fSetFlags = ordinal & 0x7FFF;
 		fLhsPatternExpr = (IExpr) objectInput.readObject();
 		fRightHandSide = (IExpr) objectInput.readObject();
 		if ((ordinal & 0x8000) == 0x0000) {
@@ -424,7 +476,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((fRightHandSide == null) ? 0 : fRightHandSide.hashCode());
-		result = prime * result + ((fSetSymbol == null) ? 0 : fSetSymbol.hashCode());
+		result = prime * result + fSetFlags;
 		return result;
 	}
 
@@ -447,6 +499,6 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		} else if (!fRightHandSide.equals(other.fRightHandSide)) {
 			return false;
 		}
-		return fSetSymbol == other.fSetSymbol;
+		return fSetFlags == other.fSetFlags;
 	}
 }

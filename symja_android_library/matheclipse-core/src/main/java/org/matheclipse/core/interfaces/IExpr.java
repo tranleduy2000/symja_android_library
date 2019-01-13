@@ -494,11 +494,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>Alternatives[&lt;pattern1&gt;, &lt;pattern2&gt;, ...]</code>
      */
     boolean isAlternatives();
-
     /**
-     * Test if this expression is the <code>HoldPattern</code> function <code>HoldPattern[&lt;expression&gt;]</code>
+     * Test if this expression is the <code>HoldPattern</code> function <code>HoldPattern[&lt;expression&gt;]</code> or
+     * the deprecated <code>Literal[&lt;expression&gt;]</code> form.
+     *
+     * @return
      */
-    boolean isHoldPattern();
+    boolean isHoldPatternOrLiteral();
 
     /**
      * Test if this expression is the function <code>And[&lt;arg&gt;,...]</code>

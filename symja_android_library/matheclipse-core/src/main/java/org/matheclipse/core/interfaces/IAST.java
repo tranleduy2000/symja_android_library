@@ -19,19 +19,19 @@ import java.util.Set;
  * <p>
  * (I)nterface for the (A)bstract (S)yntax (T)ree of a given function.
  * </p>
+ *
  * <p>
- * <p>
- * In Symja, an abstract syntax tree (AST), is a tree representation of the abstract syntactic structure of the Symja source code.
- * Each node of the tree denotes a construct occurring in the source code. The syntax is 'abstract' in the sense that it does not
- * represent every detail that appears in the real syntax. For instance, grouping parentheses are implicit in the tree structure,
- * and a syntactic construct such as a <code>Sin(x)</code> expression will be denoted by an AST with 2 nodes. One node for the
- * header <code>Sin</code> and one node for the argument <code>x</code>.
+ * In Symja, an abstract syntax tree (AST), is a tree representation of the abstract syntactic structure of the Symja
+ * source code. Each node of the tree denotes a construct occurring in the source code. The syntax is 'abstract' in the
+ * sense that it does not represent every detail that appears in the real syntax. For instance, grouping parentheses are
+ * implicit in the tree structure, and a syntactic construct such as a <code>Sin(x)</code> expression will be denoted by
+ * an AST with 2 nodes. One node for the header <code>Sin</code> and one node for the argument <code>x</code>.
  * </p>
  * <p>
  * Internally an AST is represented as a list which contains
  * <ul>
- * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index <code>0</code>
- * and</li>
+ * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index
+ * <code>0</code> and</li>
  * <li>the <code>n</code> arguments of a function in the index <code>1 to n</code></li>
  * </ul>
  * <p>
@@ -242,6 +242,80 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     int argSize();
 
     /**
+     * Calls <code>get(position).equals(expr)</code>.
+     *
+     * @param position the position which should be tested for equality
+     * @param expr     the expr which should be tested for equality
+     * @return
+     */
+    boolean equalsAt(int position, final IExpr expr);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    IExpr first();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    IExpr last();
+
+    /**
+     * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the
+     * size of the list is greater or equal <code>length</code>.
+     *
+     * @param head   object to compare with element at location <code>0</code>
+     * @param length
+     * @return
+     */
+    @Override
+    boolean isSameHeadSizeGE(IExpr head, int length);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    boolean isTimes();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isTrigFunction();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    IASTAppendable rest();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    IExpr second();
+
+    /**
+     * Returns the <b>number of elements</b> in this {@code IAST}.The <b>number of elements</b> equals
+     * <code>argSize() + 1</code> (i.e. the <b>number of arguments</b> plus 1). If this is an atom return size
+     * <code>0</code>.
+     *
+     * @return the <b>number of elements</b> in this {@code IAST}.
+     * @see #argSize()
+     */
+    int size();
+
+    /**
+     * Returns the header. If the header itself is an ISymbol it will return the symbol object. If the header itself is
+     * an IAST it will recursively call headSymbol(). If the head is of type INumbers, the head will return one of these
+     * headers: "DoubleComplex", "Double", "Integer", "Fraction", "Complex". All other objects return <code>null</code>.
+     */
+    @Override
+    ISymbol topHead();
+
+    /**
      * Collect all arguments of this AST in a new set.
      *
      * @return
@@ -370,15 +444,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return
      */
     IASTAppendable copyUntil(final int intialCapacity, int position);
-
-    /**
-     * Calls <code>get(position).equals(expr)</code>.
-     *
-     * @param position the position which should be tested for equality
-     * @param expr     the expr which should be tested for equality
-     * @return
-     */
-    boolean equalsAt(int position, final IExpr expr);
 
     /**
      * Check all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and return
@@ -529,12 +594,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return <code>-1</code> if no position was found
      */
     int indexOf(Predicate<? super IExpr> predicate);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    IExpr first();
 
     /**
      * Apply the functor to the elements of the range from left to right and return the final result. Results do
@@ -760,6 +819,19 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     boolean hasOptionalArgument();
 
     /**
+     * Set the head element of this list
+     */
+    // public void setHeader(IExpr expr);
+
+    /**
+     * Returns an iterator over the elements in this list starting with offset <b>0</b>.
+     *
+     *
+     * @return an iterator over this list values.
+     */
+    // public Iterator<IExpr> iterator0();
+
+    /**
      * Test if this AST contains no argument
      *
      * @return
@@ -796,54 +868,12 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     boolean isFreeAt(int position, final IExpr pattern);
 
     /**
-     * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the
-     * size of the list is greater or equal <code>length</code>.
-     *
-     * @param head   object to compare with element at location <code>0</code>
-     * @param length
-     * @return
-     */
-    @Override
-    boolean isSameHeadSizeGE(IExpr head, int length);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    boolean isTimes();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isTrigFunction();
-
-    /**
      * Returns an iterator over the elements in this list starting with offset <b>1</b>.
      *
      * @return an iterator over this list values.
      */
     @Override
     Iterator<IExpr> iterator();
-
-    /**
-     * Set the head element of this list
-     */
-    // public void setHeader(IExpr expr);
-
-    /**
-     * Returns an iterator over the elements in this list starting with offset <b>0</b>.
-     *
-     *
-     * @return an iterator over this list values.
-     */
-    // public Iterator<IExpr> iterator0();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    IExpr last();
 
     int lastIndexOf(IExpr object);
 
@@ -982,6 +1012,19 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     IASTMutable mapThread(final IAST replacement, int position);
 
     /**
+     * Removes the object at the specified location from this {@code IAST}.
+     *
+     * @param location
+     *            the index of the object to remove.
+     * @return the removed object.
+     * @throws UnsupportedOperationException
+     *             if removing from this {@code IAST} is not supported.
+     * @throws IndexOutOfBoundsException
+     *             if {@code location < 0 || >= size()}
+     */
+    // public IExpr remove(int location);
+
+    /**
      * Maps the elements of this IAST with the unary functor <code>Functors.replaceArg(replacement, position)</code>,
      * there <code>replacement</code> is an IAST at which the argument at the given position will be replaced by the
      * currently mapped element and appends the element to <code>appendAST</code>.
@@ -1020,19 +1063,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     IASTAppendable prependClone(IExpr expr);
 
     /**
-     * Removes the object at the specified location from this {@code IAST}.
-     *
-     * @param location
-     *            the index of the object to remove.
-     * @return the removed object.
-     * @throws UnsupportedOperationException
-     *             if removing from this {@code IAST} is not supported.
-     * @throws IndexOutOfBoundsException
-     *             if {@code location < 0 || >= size()}
-     */
-    // public IExpr remove(int location);
-
-    /**
      * Removes all objects which satisfy the given predicate.
      *
      * @param predicate
@@ -1057,12 +1087,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return
      */
     IAST removeFromEnd(int fromPosition);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    IASTAppendable rest();
 
     /**
      * Append the elements in reversed order to the given <code>list</code>
@@ -1091,12 +1115,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     IAST rotateRight(IASTAppendable list, final int n);
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    IExpr second();
-
-    /**
      * Create a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied) and set the
      * <code>expr</code> at the given <code>position</code>.
      *
@@ -1118,29 +1136,11 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     IASTMutable setAtCopy(int i, IExpr expr);
 
     /**
-     * Returns the <b>number of elements</b> in this {@code IAST}.The <b>number of elements</b> equals
-     * <code>argSize() + 1</code> (i.e. the <b>number of arguments</b> plus 1). If this is an atom return size
-     * <code>0</code>.
-     *
-     * @return the <b>number of elements</b> in this {@code IAST}.
-     * @see #argSize()
-     */
-    int size();
-
-    /**
      * Returns an array containing all elements contained in this {@code List}.
      *
      * @return an array of the elements from this {@code List}.
      */
     IExpr[] toArray();
-
-    /**
-     * Returns the header. If the header itself is an ISymbol it will return the symbol object. If the header itself is
-     * an IAST it will recursively call headSymbol(). If the head is of type INumbers, the head will return one of these
-     * headers: "DoubleComplex", "Double", "Integer", "Fraction", "Complex". All other objects return <code>null</code>.
-     */
-    @Override
-    ISymbol topHead();
 
     /**
      * The enumeration for the properties (keys) of the map possibly associated with this <code>IAST</code> object.

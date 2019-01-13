@@ -9,7 +9,6 @@ import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
 
 public class PatternMatcherList extends PatternMatcherAndEvaluator {
 	IASTAppendable fReplaceList;
@@ -18,7 +17,7 @@ public class PatternMatcherList extends PatternMatcherAndEvaluator {
 		return fReplaceList;
 	}
 
-	public PatternMatcherList(final ISymbol.RuleType setSymbol, final IExpr leftHandSide,
+	public PatternMatcherList(final int setSymbol, final IExpr leftHandSide,
 			final IExpr rightHandSide) {
 		super(setSymbol, leftHandSide, rightHandSide, true, 0);
 		fReplaceList = F.ListAlloc();
