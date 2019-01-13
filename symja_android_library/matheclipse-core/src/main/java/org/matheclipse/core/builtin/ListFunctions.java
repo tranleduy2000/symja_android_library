@@ -3622,7 +3622,7 @@ public final class ListFunctions {
 			if (ast.isAST1()) {
 				return F.operatorFormAST1(ast);
 			}
-			Validate.checkSize(ast, 3);
+			if (ast.size() == 3) {
 			try {
 				IExpr arg1 = ast.arg1();
 				IExpr arg2 = engine.evaluate(ast.arg2());
@@ -3653,6 +3653,9 @@ public final class ListFunctions {
 				}
 				engine.printMessage(wat.getMessage());
 			}
+			return F.NIL;
+		}
+			Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
 

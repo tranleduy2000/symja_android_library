@@ -342,6 +342,19 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         return false;
     }
 
+    @Override
+    public boolean isNotDefined() {
+        if (isIndeterminate() || isDirectedInfinity()) {
+            return true;
+        }
+        for (int i = 0; i < size(); i++) {
+            if (get(i).isIndeterminate() || get(i).isDirectedInfinity()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Maps the elements of this IAST with the unary functor <code>Functors.replaceArg(replacement, position)</code>,
      * there <code>replacement</code> is an IAST at which the argument at the given position will be replaced by the

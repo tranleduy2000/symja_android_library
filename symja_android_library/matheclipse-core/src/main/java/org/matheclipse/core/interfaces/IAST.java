@@ -135,8 +135,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     IAST addEvalFlags(int i);
 
-//	public final int DEFER_AST = 0x00020000;
-
     /**
      * Create a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied) and add the
      * <code>expr</code> at the given <code>position</code>.
@@ -146,6 +144,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return a clone with added <code>expr</code> element at the given <code>position</code>.
      */
     IASTAppendable appendAtClone(int position, IExpr expr);
+
+//	public final int DEFER_AST = 0x00020000;
 
     /**
      * Append an expression to this list.
@@ -262,6 +262,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     @Override
     IExpr last();
 
+    boolean isNotDefined();
+
     /**
      * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the
      * size of the list is greater or equal <code>length</code>.
@@ -283,7 +285,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * {@inheritDoc}
      */
     @Override
-    public boolean isTrigFunction();
+    boolean isTrigFunction();
 
     /**
      * {@inheritDoc}
@@ -1019,19 +1021,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     IASTMutable mapThread(final IAST replacement, int position);
 
     /**
-     * Removes the object at the specified location from this {@code IAST}.
-     *
-     * @param location
-     *            the index of the object to remove.
-     * @return the removed object.
-     * @throws UnsupportedOperationException
-     *             if removing from this {@code IAST} is not supported.
-     * @throws IndexOutOfBoundsException
-     *             if {@code location < 0 || >= size()}
-     */
-    // public IExpr remove(int location);
-
-    /**
      * Maps the elements of this IAST with the unary functor <code>Functors.replaceArg(replacement, position)</code>,
      * there <code>replacement</code> is an IAST at which the argument at the given position will be replaced by the
      * currently mapped element and appends the element to <code>appendAST</code>.
@@ -1044,6 +1033,19 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @see IAST#map(Function, int)
      */
     IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, int position);
+
+    /**
+     * Removes the object at the specified location from this {@code IAST}.
+     *
+     * @param location
+     *            the index of the object to remove.
+     * @return the removed object.
+     * @throws UnsupportedOperationException
+     *             if removing from this {@code IAST} is not supported.
+     * @throws IndexOutOfBoundsException
+     *             if {@code location < 0 || >= size()}
+     */
+    // public IExpr remove(int location);
 
     /**
      * Return <code>this</code> if <code>this</code> unequals <code>F.NIL</code> , otherwise return <code>other</code>.
@@ -1075,7 +1077,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param predicate
      * @return <code>F.NIL</code> if no element could be removed
      */
-    public IASTAppendable remove(Predicate<? super IExpr> predicate);
+    IASTAppendable remove(Predicate<? super IExpr> predicate);
 
     /**
      * Create a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied) and remove the
@@ -1155,6 +1157,5 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     enum PROPERTY {
         CSS
     }
-
 
 }

@@ -30,6 +30,8 @@ import static org.matheclipse.core.expression.F.InverseFunction;
 import static org.matheclipse.core.expression.F.InverseLaplaceTransform;
 import static org.matheclipse.core.expression.F.LaplaceTransform;
 import static org.matheclipse.core.expression.F.LinearProgramming;
+import static org.matheclipse.core.expression.F.Maximize;
+import static org.matheclipse.core.expression.F.Minimize;
 import static org.matheclipse.core.expression.F.MonomialList;
 import static org.matheclipse.core.expression.F.NDSolve;
 import static org.matheclipse.core.expression.F.NFourierTransform;
@@ -92,6 +94,8 @@ public final class FunctionDefinitions {
 		InverseLaplaceTransform.setEvaluator(new org.matheclipse.core.reflection.system.InverseLaplaceTransform());
 		LaplaceTransform.setEvaluator(new org.matheclipse.core.reflection.system.LaplaceTransform());
 		LinearProgramming.setEvaluator(new org.matheclipse.core.reflection.system.LinearProgramming());
+		Maximize.setEvaluator(new org.matheclipse.core.reflection.system.Maximize());
+		Minimize.setEvaluator(new org.matheclipse.core.reflection.system.Minimize());
 		MonomialList.setEvaluator(new org.matheclipse.core.reflection.system.MonomialList());
 		Names.setEvaluator(new org.matheclipse.core.reflection.system.Names());
 		NDSolve.setEvaluator(new org.matheclipse.core.reflection.system.NDSolve());

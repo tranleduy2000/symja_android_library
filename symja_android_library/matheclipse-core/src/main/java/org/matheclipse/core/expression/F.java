@@ -426,10 +426,10 @@ public class F {
 	 */
 	public final static IBuiltInSymbol BinCounts = F.initFinalSymbol("BinCounts", ID.BinCounts);
 
-	/***/
+	/** BinaryDeserialize(byte-array) - deserialize the `byte-array` into a Symja expression. */
 	public final static IBuiltInSymbol BinaryDeserialize = F.initFinalSymbol("BinaryDeserialize", ID.BinaryDeserialize);
 
-	/***/
+	/** BinarySerialize(expr) - serialize the `expr` into a byte array expression. */
 	public final static IBuiltInSymbol BinarySerialize = F.initFinalSymbol("BinarySerialize", ID.BinarySerialize);
 
     /** Binomial(n, k) - returns the binomial coefficient of the 2 integers `n` and `k`*/
@@ -502,7 +502,7 @@ public class F {
 	/** Break() - exits a `For`, `While`, or `Do` loop.*/
 	public final static IBuiltInSymbol Break = F.initFinalSymbol("Break", ID.Break);
 
-	/***/
+	/** ByteArray({list-of-byte-values}) - converts the `list-of-byte-values` into a byte array. */
 	public final static IBuiltInSymbol ByteArray = F.initFinalSymbol("ByteArray", ID.ByteArray);
 
 	/***/
@@ -1010,7 +1010,10 @@ public class F {
 	public final static IBuiltInSymbol ExponentialDistribution = F.initFinalSymbol("ExponentialDistribution",
 			ID.ExponentialDistribution);
 
-	/***/
+	/**
+	 * Export("path-to-filename", expression, "WXF") - if the file system is enabled, export the `expression` in WXF
+	 * format to the "path-to-filename" file.
+	 */
 	public final static IBuiltInSymbol Export = F.initFinalSymbol("Export", ID.Export);
 
     /***/
@@ -1098,10 +1101,10 @@ public class F {
     /** Floor(expr) - gives the smallest integer less than or equal `expr`. */
 	public final static IBuiltInSymbol Floor = F.initFinalSymbol("Floor", ID.Floor);
 
-	/***/
+	/** Fold[f, x, {a, b}] - returns `f[f[x, a], b]`, and this nesting continues for lists of arbitrary length. */
 	public final static IBuiltInSymbol Fold = F.initFinalSymbol("Fold", ID.Fold);
 
-	/***/
+	/** FoldList[f, x, {a, b}] - returns `{x, f[x, a], f[f[x, a], b]}` */
 	public final static IBuiltInSymbol FoldList = F.initFinalSymbol("FoldList", ID.FoldList);
 
     /** For(start, test, incr, body) - evaluates `start`, and then iteratively `body` and `incr` as long as test evaluates to `True`.*/
@@ -1305,10 +1308,10 @@ public class F {
     /** I - Imaginary unit - internally converted to the complex number `0+1*i`. `I` represents the imaginary number `Sqrt(-1)`. `I^2` will be evaluated to `-1`.*/
 	public final static IBuiltInSymbol I = F.initFinalSymbol("I", ID.I);
 
-	/***/
+	/** Identity(expr) - returns `expr`. */
 	public final static IBuiltInSymbol Identity = F.initFinalSymbol("Identity", ID.Identity);
 
-	/** IdentityMatrix(n) - gives the identity matrix with `n` rows and columns.*/
+	/** IdentityMatrix(n) - gives the identity matrix with `n` rows and columns. */
 	public final static IBuiltInSymbol IdentityMatrix = F.initFinalSymbol("IdentityMatrix", ID.IdentityMatrix);
 
 	/** If(cond, pos, neg) - returns `pos` if `cond` evaluates to `True`, and `neg` if it evaluates to `False`.*/
@@ -1320,7 +1323,10 @@ public class F {
     /** Implies(arg1, arg2) - Logical implication. `Implies(A, B)` is equivalent to `!A || B`. `Implies(expr1, expr2)` evaluates each argument in turn, returning `True` as soon as the first argument evaluates to `False`. If the first argument evaluates to `True`, `Implies` returns the second argument.*/
 	public final static IBuiltInSymbol Implies = F.initFinalSymbol("Implies", ID.Implies);
 
-	/***/
+	/**
+	 * Import("path-to-filename", "WXF") - if the file system is enabled, import an expression in WXF format from the
+	 * "path-to-filename" file.
+	 */
 	public final static IBuiltInSymbol Import = F.initFinalSymbol("Import", ID.Import);
 
     /** Increment(x) - increments `x` by `1`, returning the original value of `x`. */
@@ -1659,6 +1665,8 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol MaxPoints = F.initFinalSymbol("MaxPoints", ID.MaxPoints);
 
+	/***/
+	public final static IBuiltInSymbol Maximize = F.initFinalSymbol("Maximize", ID.Maximize);
     /** Mean(list) - returns the statistical mean of `list`. */
 	public final static IBuiltInSymbol Mean = F.initFinalSymbol("Mean", ID.Mean);
 
@@ -1699,19 +1707,21 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Method = F.initFinalSymbol("Method", ID.Method);
 
-	/** Min(e_1, e_2, ..., e_i) - returns the expression with the lowest value among the `e_i`.*/
+	/** Min(e_1, e_2, ..., e_i) - returns the expression with the lowest value among the `e_i`. */
 	public final static IBuiltInSymbol Min = F.initFinalSymbol("Min", ID.Min);
 
 	/***/
 	public final static IBuiltInSymbol MinimalPolynomial = F.initFinalSymbol("MinimalPolynomial", ID.MinimalPolynomial);
 
+	/***/
+	public final static IBuiltInSymbol Minimize = F.initFinalSymbol("Minimize", ID.Minimize);
     /** Minus(expr) - is the negation of `expr`. */
 	public final static IBuiltInSymbol Minus = F.initFinalSymbol("Minus", ID.Minus);
 
 	/***/
 	public final static IBuiltInSymbol Missing = F.initFinalSymbol("Missing", ID.Missing);
 
-	/** MissingQ(expr) - returns `True` if `expr` is a `Missing()` expression.*/
+	/** MissingQ(expr) - returns `True` if `expr` is a `Missing()` expression. */
 	public final static IBuiltInSymbol MissingQ = F.initFinalSymbol("MissingQ", ID.MissingQ);
 
 	/** Mod(x, m) - returns `x` modulo `m`.*/
@@ -1797,7 +1807,10 @@ public class F {
     /** NestWhile(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until applying `test` on the result no longer yields `True`.*/
 	public final static IBuiltInSymbol NestWhile = F.initFinalSymbol("NestWhile", ID.NestWhile);
 
-	/***/
+	/**
+	 * NestWhileList(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until applying `test`
+	 * on the result no longer yields `True`. It returns a list of all intermediate results.
+	 */
 	public final static IBuiltInSymbol NestWhileList = F.initFinalSymbol("NestWhileList", ID.NestWhileList);
 
 	/** NextPrime(n) - gives the next prime after `n`.*/

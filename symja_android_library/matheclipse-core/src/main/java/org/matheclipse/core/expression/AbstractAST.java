@@ -2627,10 +2627,10 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		if (isZero()) {
 			return false;
 		}
-		if (isOne()) {
+		if (isNumber()) {
 			return true;
 		}
-		if (isNumber()) {
+		if (isConstant()) {
 			return true;
 		}
 		IExpr temp = F.eval(F.Times(this, F.Power(this, F.CN1)));

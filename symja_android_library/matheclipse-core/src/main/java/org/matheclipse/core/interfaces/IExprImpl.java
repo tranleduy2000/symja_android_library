@@ -1430,6 +1430,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isNotDefined() {
+        return isIndeterminate() || isDirectedInfinity();
+    }
+
     /**
      * Test if this expression is an inexact number. I.e. an instance of type <code>INum</code> or
      * <code>IComplexNum</code>.

@@ -990,6 +990,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     boolean isIndeterminate();
 
+    boolean isNotDefined();
+
     /**
      * Test if this expression is an inexact number. I.e. an instance of type <code>INum</code> or
      * <code>IComplexNum</code>.

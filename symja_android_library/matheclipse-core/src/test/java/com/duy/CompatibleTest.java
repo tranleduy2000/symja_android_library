@@ -13,9 +13,10 @@ public class CompatibleTest extends TestCase {
 
     public void test() throws IOException {
         String[] unavailablePackages = new String[]{
-                java.nio.channels.AlreadyConnectedException.class.getPackage().getName(),
-                java.net.URISyntaxException.class.getPackage().getName(),
-                java.security.AccessControlException.class.getPackage().getName(),
+                "import " + java.nio.channels.AlreadyConnectedException.class.getPackage().getName(),
+                "import " + java.net.URISyntaxException.class.getPackage().getName(),
+                "import " + java.security.AccessControlException.class.getPackage().getName(),
+                "Config.DOUBLE_EPSILON"
         };
         File sourceDir = new File("../symja_android_library/matheclipse-core/src/main/java");
         assertTrue(sourceDir.exists());
@@ -23,8 +24,8 @@ public class CompatibleTest extends TestCase {
         for (File javaFile : javaFiles) {
             String content = FileUtils.readFileToString(javaFile);
             for (String unavailablePackage : unavailablePackages) {
-                if (content.contains("import " + unavailablePackage)) {
-                    new RuntimeException("Unavailable package " + (unavailablePackage) + " in class " + javaFile.getCanonicalPath()).printStackTrace();
+                if (content.contains(unavailablePackage)) {
+                    System.err.println("Warn: Unavailable symbol " + (unavailablePackage) + " in class " + javaFile.getName());
                 }
             }
         }
