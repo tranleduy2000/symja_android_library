@@ -138,6 +138,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		return new BigIntegerSym(bigInteger);
 	}
 
+	// j2objc changed: type is incompatible
 	public static IInteger valueOf(final int newnum) {
 		return (newnum >= low && newnum <= high) ? cache[newnum + (-low)] : new IntegerSym(newnum);
 	}
@@ -161,7 +162,8 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	 * @param radix
 	 *            the radix to be used while parsing.
 	 * @return the corresponding large integer.
-	 * @throws NumberFormatException if the specified character sequence does not contain a parsable large integer.
+	 * @throws NumberFormatException
+	 *             if the specified character sequence does not contain a parsable large integer.
 	 */
 	public static IInteger valueOf(final String integerString, final int radix) {
 		if (integerString.length() >= 1) {
@@ -413,7 +415,6 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	/**
 	 * Get all prime factors of this integer
 	 *
-	 * @param result
 	 *            add the prime factors to this result list
 	 * @return
 	 */
@@ -429,19 +430,17 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		}
 
 		if (b instanceof IntegerSym) {
-			Map<Long, Integer> map = PrimeInteger.factors(b.longValue());
-			IASTAppendable result = F.ListAlloc(map.size() + 1);
-			if (sign() < 0) {
-				result.append(F.CN1);
+			long longValue = b.longValue();
+			return factorizeLong(longValue);
+		}
+		BigInteger big = b.toBigNumerator();
+		try {
+			long longValue = big.longValue();
+			if (longValue < PrimeInteger.BETA) {
+				return factorizeLong(longValue);
 			}
-			for (Map.Entry<Long, Integer> entry : map.entrySet()) {
-				long key = entry.getKey();
-				IInteger is = valueOf(key);
-				for (int i = 0; i < entry.getValue(); i++) {
-					result.append(is);
-				}
-			}
-			return result;
+		} catch (ArithmeticException aex) {
+			// go on with big integers
 		}
 
 		SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
@@ -453,6 +452,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		}
 		for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
 			int key = entry.getKey();
+			// j2objc changed: type is incompatible
 			IInteger is = valueOf(key);
 			for (int i = 0; i < entry.getValue(); i++) {
 				result.append(is);
@@ -481,6 +481,21 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		return result;
 	}
 
+	private IAST factorizeLong(long longValue) {
+		Map<Long, Integer> map = PrimeInteger.factors(longValue);
+		IASTAppendable result = F.ListAlloc(map.size() + 1);
+		if (sign() < 0) {
+			result.append(F.CN1);
+		}
+		for (Map.Entry<Long, Integer> entry : map.entrySet()) {
+			long key = entry.getKey();
+			IInteger is = valueOf(key);
+			for (int i = 0; i < entry.getValue(); i++) {
+				result.append(is);
+			}
+		}
+		return result;
+	}
 	/** {@inheritDoc} */
 	@Override
 	public IRational fractionalPart() {
@@ -888,7 +903,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	}
 
 
-	//Implemetion default method IInteger
+	//Implements default method IInteger
 	/**
 	 * {@inheritDoc}
 	 */
