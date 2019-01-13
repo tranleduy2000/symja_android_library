@@ -248,9 +248,6 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		if (this == obj) {
 			return true;
 		}
-		if (obj instanceof IBuiltInSymbol) {
-			return false;
-		}
 		if (obj instanceof BuiltInDummy) {
 			BuiltInDummy symbol = (BuiltInDummy) obj;
 			if (hashCode() != symbol.hashCode()) {

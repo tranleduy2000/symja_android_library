@@ -1361,11 +1361,11 @@ public final class LinearAlgebra {
                 final int m = Validate.checkIntType(ast, 1);
                 int[] count = new int[1];
                 count[0] = 1;
-                final IAST scalar = F.Sqrt(F.QQ(1, m));
-                return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
+				final IAST scalar = F.Sqrt(F.QQ(1, m));
+				return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
                     @Override
                     public IExpr apply(Integer i, Integer j) {
-                        return unit(F.QQ(2 * i * j, m).times(F.Pi)).times(scalar);
+                        return unit(F.QQ(2L * ((long) i) * ((long) j), m).times(F.Pi)).times(scalar);
                     }
                 }, m, m);
             }
@@ -1378,7 +1378,7 @@ public final class LinearAlgebra {
      * <pre>
      * HilbertMatrix(n)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * gives the hilbert matrix with <code>n</code> rows and columns.

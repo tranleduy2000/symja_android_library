@@ -45,7 +45,7 @@ import java.util.Set;
  * HMArrayList is an implementation of a list, backed by an array. All optional operations adding, removing, and
  * replacing are supported. The elements can be any objects.
  *
- * 
+ *
  */
 public abstract class HMArrayList extends IASTAppendableImpl implements Cloneable, Serializable, RandomAccess {
 
@@ -67,7 +67,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	/**
 	 * Constructs a new list containing the elements of the specified collection. The initial size of the
 	 * {@code ArrayList} will be 10% higher than the size of the specified collection.
-	 * 
+	 *
 	 * @param collection
 	 *            the collection of elements to add.
 	 */
@@ -150,7 +150,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/**
 	 * Constructs a new instance of {@code HMArrayList} with the specified capacity.
-	 * 
+	 *
 	 * @param capacity
 	 *            the initial capacity of this {@code ArrayList}.
 	 */
@@ -166,7 +166,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/**
 	 * Adds the specified object at the end of this {@code ArrayList}.
-	 * 
+	 *
 	 * @param object
 	 *            the object to add.
 	 * @return always true
@@ -185,7 +185,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * Inserts the specified object into this {@code ArrayList} at the specified location. The object is inserted before
 	 * any previous element at the specified location. If the location is equal to the size of this {@code ArrayList},
 	 * the object is added at the end.
-	 * 
+	 *
 	 * @param location
 	 *            the index at which to insert the object.
 	 * @param object
@@ -227,7 +227,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/**
 	 * Adds the objects in the specified collection to this {@code ArrayList}.
-	 * 
+	 *
 	 * @param collection
 	 *            the collection of objects.
 	 * @return {@code true} if this {@code ArrayList} is modified, {@code false} otherwise.
@@ -273,7 +273,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	/**
 	 * Inserts the objects in the specified collection at the specified location in this List. The objects are added in
 	 * the order they are returned from the collection's iterator.
-	 * 
+	 *
 	 * @param location
 	 *            the index at which to insert.
 	 * @param collection
@@ -350,7 +350,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 		}
 		return false;
 	}
- 
+
 	/** {@inheritDoc} */
 	@Override
 	public boolean appendAll(IExpr[] args, int startPosition, int endPosition) {
@@ -378,7 +378,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 			}
 		}
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
 	public void forEach(int startOffset, int endOffset, ObjIntConsumer<? super IExpr> action) {
@@ -390,7 +390,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 				action.accept(array[index++],j++);
 			}
 		}
-	} 
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -442,7 +442,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * function (i.e. get(1) ). <br />
 	 * <b>Example:</b> for the AST representing the expression <code>Sin(x)</code>, <code>arg1()</code> returns
 	 * <code>x</code>.
-	 * 
+	 *
 	 * @return the first argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
 	 */
@@ -456,7 +456,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * function (i.e. get(2) ). <br />
 	 * <b>Example:</b> for the AST representing the expression <code>x^y</code> (i.e. <code>Power(x, y)</code>),
 	 * <code>arg2()</code> returns <code>y</code>.
-	 * 
+	 *
 	 * @return the second argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
 	 */
@@ -470,7 +470,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * function (i.e. get(3) ).<br />
 	 * <b>Example:</b> for the AST representing the expression <code>f(a, b, c)</code>, <code>arg3()</code> returns
 	 * <code>c</code>.
-	 * 
+	 *
 	 * @return the third argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
 	 */
@@ -484,7 +484,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * function (i.e. get(4) ).<br />
 	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d)</code>, <code>arg4()</code> returns
 	 * <code>d</code>.
-	 * 
+	 *
 	 * @return the fourth argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
 	 */
@@ -498,7 +498,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * (i.e. get(5) ).<br />
 	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d, e)</code>, <code>arg5()</code>
 	 * returns <code>e</code> .
-	 * 
+	 *
 	 * @return the fifth argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
 	 */
@@ -511,7 +511,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	public final int argSize() {
 		return lastIndex - firstIndex - 1;
 	}
-	
+
 	@Override
 	public Set<IExpr> asSet() {
 		int size = size();
@@ -524,7 +524,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/**
 	 * Removes all elements from this {@code ArrayList}, leaving it empty.
-	 * 
+	 *
 	 * @see #isEmpty
 	 * @see #size
 	 */
@@ -539,7 +539,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/**
 	 * Returns a shallow copy of this <tt>AST</tt> instance. (The elements themselves are not copied.)
-	 * 
+	 *
 	 * @return a clone of this <tt>AST</tt> instance.
 	 */
 	// @Override
@@ -561,7 +561,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	/**
 	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this
 	 * {@code HMArrayList}.
-	 * 
+	 *
 	 * @return a shallow copy of this {@code ArrayList}
 	 * @see java.lang.Cloneable
 	 */
@@ -576,7 +576,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	/**
 	 * Ensures that after this operation the {@code ArrayList} can hold the specified number of elements without further
 	 * growing.
-	 * 
+	 *
 	 * @param minimumCapacity
 	 *            the minimum capacity asked for.
 	 */
@@ -591,7 +591,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
+	public final boolean equals(final Object obj) {
 		if (obj instanceof HMArrayList) {
 			if (hashCode() != obj.hashCode()) {
 				return false;
@@ -705,13 +705,14 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 
 	@Override
-	public IExpr get(int location) {
-		int index;
-		if ((index = firstIndex + location) < lastIndex) {
-			return array[index];
-		}
-		throw new IndexOutOfBoundsException(
-				"Index: " + Integer.valueOf(location) + ", Size: " + Integer.valueOf(lastIndex - firstIndex));
+	public final IExpr get(int location) {
+		return array[firstIndex + location];
+		// int index;
+		// if ((index = firstIndex + location) < lastIndex) {
+		// return array[index];
+		// }
+		// throw new IndexOutOfBoundsException(
+		// "Index: " + Integer.valueOf(location) + ", Size: " + Integer.valueOf(lastIndex - firstIndex));
 	}
 
 	private void growAtEnd(int required) {
@@ -796,14 +797,24 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 
 	@Override
+	public final int hashCode() {
+		if (hashValue == 0) {
+			hashValue = 0x811c9dc5;// decimal 2166136261;
+			for (int i = firstIndex; i < lastIndex; i++) {
+				hashValue = (hashValue * 16777619) ^ (array[i].hashCode() & 0xff);
+			}
+		}
+		return hashValue;
+	}
+	@Override
 	public final IExpr head() {
 		return array[firstIndex];
 	}
 
-	
+
 	/**
 	 * Searches this list for the specified object and returns the index of the first occurrence.
-	 * 
+	 *
 	 * @param object
 	 *            the object to search for.
 	 * @return the index of the first occurrence of the object, or -1 if it was not found.
@@ -923,7 +934,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/**
 	 * Removes the object at the specified location from this list.
-	 * 
+	 *
 	 * @param location
 	 *            the index of the object to remove.
 	 * @return the removed object.
@@ -966,7 +977,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/**
 	 * Removes the objects in the specified range from the start to the end, but not including the end index.
-	 * 
+	 *
 	 * @param start
 	 *            the index at which to start removing.
 	 * @param end
@@ -1000,7 +1011,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/**
 	 * Replaces the element at the specified location in this {@code ArrayList} with the specified object.
-	 * 
+	 *
 	 * @param location
 	 *            the index at which to put the specified object.
 	 * @param object
@@ -1027,9 +1038,21 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 		return lastIndex - firstIndex;
 	}
 
+// Android changed: Stream API isn't avaiable
+//	@Override
+//	public Stream<IExpr> stream() {
+//		return Arrays.stream(array, firstIndex + 1, lastIndex - firstIndex);
+//	}
+//
+//	@Override
+//	public Stream<IExpr> stream(int startInclusive, int endExclusive) {
+//		return Arrays.stream(toArray(), firstIndex + startInclusive, firstIndex + endExclusive);
+//	}
+//
+
 	/**
 	 * Returns a new array containing all elements contained in this {@code ArrayList}.
-	 * 
+	 *
 	 * @return an array of the elements from this {@code ArrayList}
 	 */
 	@Override
@@ -1042,7 +1065,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/**
 	 * Sets the capacity of this {@code ArrayList} to be the same as the current size.
-	 * 
+	 *
 	 * @see #size
 	 */
 	public void trimToSize() {

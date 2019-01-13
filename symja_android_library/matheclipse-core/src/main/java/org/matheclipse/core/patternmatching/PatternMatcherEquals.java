@@ -136,8 +136,8 @@ public class PatternMatcherEquals extends IPatternMatcher implements Externaliza
 	 * @return
 	 * @see IAST#NO_FLAG
 	 */
-	public final boolean isFlagOff(final int i) {
-		return (fSetFlags & i) == 0;
+	public final boolean isFlagOff(final int flags) {
+		return (fSetFlags & flags) == 0;
 	}
 
 	/**
@@ -147,8 +147,8 @@ public class PatternMatcherEquals extends IPatternMatcher implements Externaliza
 	 * @return
 	 * @see IAST#NO_FLAG
 	 */
-	public final boolean isFlagOn(int i) {
-		return (fSetFlags & i) == i;
+	public final boolean isFlagOn(int flags) {
+		return (fSetFlags & flags) == flags;
 	}
 	/** {@inheritDoc} */
 	@Override
