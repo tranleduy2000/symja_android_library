@@ -42,15 +42,14 @@ import static java.lang.Math.sqrt;
 import static java.lang.String.format;
 
 /**
- * Solver for A*x=y with help of the singular value decomposition A = UxDxV*.
- * The formal solution is given by the pseudo inverse A+=VxD+xU* with x=A+*y.
- * <br/>
+ * Solver for A*x=y with help of the singular value decomposition A = UxDxV*. The formal solution is given by the pseudo
+ * inverse A+=VxD+xU* with x=A+*y. <br/>
  * <p>
- * As this algorithm is much more complex and time consuming (~40 times the
- * Gauss or Cholesky method) it should only be used in case of singular values,
- * e.g. the determinant vanishes.
+ * As this algorithm is much more complex and time consuming (~40 times the Gauss or Cholesky method) it should only be
+ * used in case of singular values, e.g. the determinant vanishes.
  * <p>
  * <hr/>
+ *
  * <pre>
  * This implementation is partially derived form the LINPACK package ported
  * and refactored for Java.  http://www.netlib.org/linpack/dsvdc.f
@@ -74,7 +73,8 @@ public final class SVDSolver extends LASolver {
     /**
      * Internal utility method to round the eigenvalues to significant digits.
      *
-     * @param d eigenvalues to round
+	 * @param d
+	 *            eigenvalues to round
      * @return rounded eigenvalue array
      */
     private static double[] roundEVs(final double[] d) {
@@ -113,9 +113,8 @@ public final class SVDSolver extends LASolver {
     }
 
     /**
-     * Indicate if |x| is much smaller than |y|.
-     * I.e. |x| <= TINY + EPS*|y| where TINY and EPS
-     * are ~1.E-290 and ~ 1.E-15 for double precision.
+	 * Indicate if |x| is much smaller than |y|. I.e. |x| <= TINY + EPS*|y| where TINY and EPS are ~1.E-290 and ~ 1.E-15
+	 * for double precision.
      *
      * @param x 1.st argument to check
      * @param y 2.nd argument to compare to
@@ -208,7 +207,8 @@ public final class SVDSolver extends LASolver {
     /**
      * Calculate the absolute value for the determinate of matrix A.
      *
-     * @param a float[][] the NxN matrix
+	 * @param a
+	 *            float[][] the NxN matrix
      * @return abs(|A|)
      */
     @Override
@@ -219,7 +219,8 @@ public final class SVDSolver extends LASolver {
     /**
      * Calculate the absolute value for the determinate of matrix A.
      *
-     * @param a double[][] the NxN matrix
+	 * @param a
+	 *            double[][] the NxN matrix
      * @return abs(|A|)
      */
     @Override
@@ -239,10 +240,10 @@ public final class SVDSolver extends LASolver {
     }
 
     /**
-     * Calculate the inverse matrix of A. In case A is singular the
-     * pseudo-inverse A+ is returned.
+	 * Calculate the inverse matrix of A. In case A is singular the pseudo-inverse A+ is returned.
      *
-     * @param a matrix to invert
+	 * @param a
+	 *            matrix to invert
      * @return 1/A the (pseudo) inverse matrix
      */
     @Override
@@ -273,8 +274,10 @@ public final class SVDSolver extends LASolver {
     /**
      * Solve the equation A*x = y for x.
      *
-     * @param a double[][] real NxM matrix.
-     * @param y double[] real M dimensional right side vector.
+	 * @param a
+	 *            double[][] real NxM matrix.
+	 * @param y
+	 *            double[] real M dimensional right side vector.
      * @return double[] real M dimensional solution x.
      */
     @Override
@@ -308,8 +311,10 @@ public final class SVDSolver extends LASolver {
     /**
      * Solve the equation A*X = B for X.
      *
-     * @param a double[][] real NxM matrix with M &le; N
-     * @param b double[][] real MxL right side vectors as matrix
+	 * @param a
+	 *            double[][] real NxM matrix with M &le; N
+	 * @param b
+	 *            double[][] real MxL right side vectors as matrix
      * @return double[][]  real MxL solution matrix X
      */
     @Override
@@ -348,9 +353,12 @@ public final class SVDSolver extends LASolver {
     /**
      * Calculate the pseudo inverse matrix A+ = VxD+xU*.
      *
-     * @param u the matrix U
-     * @param d the diagonal of matrix D
-     * @param v the transpose of matrix V
+	 * @param u
+	 *            the matrix U
+	 * @param d
+	 *            the diagonal of matrix D
+	 * @param v
+	 *            the transpose of matrix V
      * @return
      */
     private double[][] pseudoInverse(final double[][] u, final double[] d, final double[][] v) {
@@ -368,8 +376,7 @@ public final class SVDSolver extends LASolver {
     }
 
     /**
-     * Check if the pseudo-inverse had been calculated correctly,
-     * which means AxApxA = A.
+	 * Check if the pseudo-inverse had been calculated correctly, which means AxApxA = A.
      *
      * @param a  the original matrix
      * @param ap the pseudo-inverse matrix
@@ -442,10 +449,10 @@ public final class SVDSolver extends LASolver {
     }
 
     /**
-     * Calculate the effective rank of the matrix, i.e. the number of
-     * numerical not zero eigenvalues.
+	 * Calculate the effective rank of the matrix, i.e. the number of numerical not zero eigenvalues.
      *
-     * @param d the eigenvalues
+	 * @param d
+	 *            the eigenvalues
      * @return rank of matrix A
      */
     private int rank(final double[] d) {

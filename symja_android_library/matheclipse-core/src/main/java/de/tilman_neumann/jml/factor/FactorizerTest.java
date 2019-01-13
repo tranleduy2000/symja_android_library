@@ -13,33 +13,21 @@
  */
 package de.tilman_neumann.jml.factor;
 
-import static de.tilman_neumann.jml.base.BigIntConstants.*;
+import org.apache.log4j.Logger;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-
-import de.tilman_neumann.jml.factor.base.congruence.*;
-import de.tilman_neumann.jml.factor.base.matrixSolver.*;
-import de.tilman_neumann.jml.factor.cfrac.*;
-import de.tilman_neumann.jml.factor.cfrac.tdiv.*;
-import de.tilman_neumann.jml.factor.lehman.*;
-import de.tilman_neumann.jml.factor.pollardRho.*;
-import de.tilman_neumann.jml.factor.psiqs.*;
-import de.tilman_neumann.jml.factor.siqs.*;
-import de.tilman_neumann.jml.factor.siqs.poly.SIQSPolyGenerator;
-import de.tilman_neumann.jml.factor.siqs.poly.baseFilter.*;
-import de.tilman_neumann.jml.factor.siqs.powers.*;
-import de.tilman_neumann.jml.factor.siqs.sieve.*;
-import de.tilman_neumann.jml.factor.siqs.tdiv.*;
-import de.tilman_neumann.jml.factor.squfof.*;
-import de.tilman_neumann.jml.factor.tdiv.*;
-import de.tilman_neumann.jml.sequence.*;
+import de.tilman_neumann.jml.factor.lehman.Lehman_Fast;
+import de.tilman_neumann.jml.factor.pollardRho.PollardRhoBrentMontgomery63;
+import de.tilman_neumann.jml.factor.pollardRho.PollardRhoBrentMontgomery64;
+import de.tilman_neumann.jml.factor.pollardRho.PollardRhoBrentMontgomeryR64Mul63;
 import de.tilman_neumann.util.TimeUtil;
+
+import static de.tilman_neumann.jml.base.BigIntConstants.I_0;
+import static de.tilman_neumann.jml.base.BigIntConstants.I_1;
 
 /**
  * Main class to compare the performance of factor algorithms.
@@ -51,9 +39,9 @@ public class FactorizerTest {
 
 	// algorithm options
 	/** number of test numbers */
-	private static final int N_COUNT = 10000;
+	private static final int N_COUNT = 100000;
 	/** the bit size of N to start with */
-	private static final int START_BITS = 30;
+	private static final int START_BITS = 40;
 	/** the increment in bit size from test set to test set */
 	private static final int INCR_BITS = 1;
 	/** maximum number of bits to test (no maximum if null) */
@@ -77,7 +65,7 @@ public class FactorizerTest {
 			
 			// Lehman
 			//new Lehman_Simple(),
-			new Lehman_Fast(true), // best algorithm for hard N with 28 to 49 bits
+			new Lehman_Fast(true), // best algorithm for hard N with 28 to 47 bits
 //			new Lehman_Fast(false), // great for random composite N<60 bit having small factors frequently
 			
 			// PollardRho:
@@ -88,8 +76,9 @@ public class FactorizerTest {
 			//new PollardRhoBrent(),
 			//new PollardRho31(),
 			//new PollardRhoBrent31(),
-//			new PollardRhoBrentMontgomery63(),
-			new PollardRhoBrentMontgomery64(), // best algorithm for N from 50 to 62 bit
+			new PollardRhoBrentMontgomery63(),
+			new PollardRhoBrentMontgomery64(), // best algorithm for N from 58 to 62 bit
+			new PollardRhoBrentMontgomeryR64Mul63(), // best algorithm for N from 48 to 57 bit
 
 			// SquFoF variants
 			// * pretty good, but never the best algorithm
@@ -230,7 +219,7 @@ public class FactorizerTest {
 	 * Test factor algorithms for sets of factor arguments of growing size and report timings after each set.
 	 * @param args ignored
 	 */
-//	public static void main(String[] args) {
+//	public static void main(String[] args) {s
 //    	ConfigUtil.initProject();
 //    	FactorizerTest testEngine = new FactorizerTest();
 //		int bits = START_BITS;

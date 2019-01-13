@@ -25,6 +25,7 @@ import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver01_Gauss;
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver02_BlockLanczos;
 import de.tilman_neumann.jml.factor.lehman.Lehman_Fast;
 import de.tilman_neumann.jml.factor.pollardRho.PollardRhoBrentMontgomery64;
+import de.tilman_neumann.jml.factor.pollardRho.PollardRhoBrentMontgomeryR64Mul63;
 import de.tilman_neumann.jml.factor.psiqs.PSIQS;
 import de.tilman_neumann.jml.factor.psiqs.PSIQSBase;
 import de.tilman_neumann.jml.factor.siqs.SIQS;
@@ -40,7 +41,6 @@ import de.tilman_neumann.util.TimeUtil;
 import static de.tilman_neumann.jml.base.BigIntConstants.I_1;
 import static de.tilman_neumann.jml.base.BigIntConstants.I_MINUS_1;
 
-//import de.tilman_neumann.util.ConfigUtil;
 
 /**
  * Final combination of factor algorithms.
@@ -53,21 +53,34 @@ public class CombinedFactorAlgorithm extends FactorAlgorithmBase {
 	
 	private TDiv31Inverse tDiv31 = new TDiv31Inverse();
 	private Lehman_Fast lehman = new Lehman_Fast(true);
-	private PollardRhoBrentMontgomery64 pollardRho = new PollardRhoBrentMontgomery64();
+	private PollardRhoBrentMontgomeryR64Mul63 pollardRhoR64Mul63 = new PollardRhoBrentMontgomeryR64Mul63();
+	private PollardRhoBrentMontgomery64 pollardRho64 = new PollardRhoBrentMontgomery64();
 	private SIQS siqs_smallArgs;
 	private PSIQSBase siqs_bigArgs;
 
-	
 	/**
-	 * Complete constructor.
-	 * 
+	 * Simple constructor using PSIQS with sun.misc.Unsafe features.
+	 *
 	 * @param numberOfThreads the number of parallel threads for PSIQS
 	 * @param profile if true then extended profiling information is collected
 	 */
 	public CombinedFactorAlgorithm(int numberOfThreads, boolean profile) {
+		this(numberOfThreads, true, profile);
+	}
+
+	/**
+	 * Complete constructor.
+	 * 
+	 * @param numberOfThreads the number of parallel threads for PSIQS
+	 * @param permitUnsafeUsage if true then PSIQS_U using sun.misc.Unsafe features is used. This may be ~10% faster.
+	 * @param profile if true then extended profiling information is collected
+	 */
+	public CombinedFactorAlgorithm(int numberOfThreads, boolean permitUnsafeUsage, boolean profile) {
 		// SIQS tuned for small N
+		// Android changed: Unsafe isn't available
 		siqs_smallArgs = new SIQS(0.32F, 0.37F, null, 0.16F, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss(), false);
 		// PSIQS for bigger N: monolithic sieve is still slightly faster than SBH in the long run.
+		// Android changed: Unsafe isn't available
 		siqs_bigArgs = new PSIQS(0.32F, 0.37F, null, null, numberOfThreads, new NoPowerFinder(), new MatrixSolver02_BlockLanczos(), profile);
 	}
 
@@ -80,8 +93,9 @@ public class CombinedFactorAlgorithm extends FactorAlgorithmBase {
 	public BigInteger findSingleFactor(BigInteger N) {
 		int NBits = N.bitLength();
 		if (NBits<28) return tDiv31.findSingleFactor(N);
-		if (NBits<50) return lehman.findSingleFactor(N);
-		if (NBits<63) return pollardRho.findSingleFactor(N);
+		if (NBits<48) return lehman.findSingleFactor(N);
+		if (NBits<58) return pollardRhoR64Mul63.findSingleFactor(N);
+		if (NBits<63) return pollardRho64.findSingleFactor(N);
 		if (NBits<97) return siqs_smallArgs.findSingleFactor(N);
 		return siqs_bigArgs.findSingleFactor(N);
 	}

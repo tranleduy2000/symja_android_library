@@ -314,7 +314,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 						}
 						s.append(" ");
 					}
-					if (e != null && v != null) {
+					if (v != null) {
 						s.append(e.toString(v));
 					} else {
 						s.append(e);

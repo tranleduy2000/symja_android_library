@@ -3455,7 +3455,9 @@ public final class LinearAlgebra {
              */
             private IAST recursiveTranspose(int permutationIndex, IASTAppendable resultList) {
                 if (permutationIndex >= permutation.length) {
+					if (resultList != null) {
                     resultList.append(tensor.getPart(positions));
+					}
                 } else {
                     int size = dimensions[permutation[permutationIndex] - 1];
                     IASTAppendable list = F.ListAlloc(size);
@@ -3538,13 +3540,13 @@ public final class LinearAlgebra {
      * <pre>
      * UnitVector(position)
      * </pre>
-     * <p>
+	 *
      * <blockquote>
      * <p>
      * returns a unit vector with element <code>1</code> at the given <code>position</code>.
      * </p>
      * </blockquote>
-     * <p>
+	 *
      * <pre>
      * UnitVector(dimension, position)
      * </pre>

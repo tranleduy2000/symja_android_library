@@ -4640,7 +4640,7 @@ public final class Arithmetic {
 
             if (size > 3) {
                 final ISymbol sym = astTimes.topHead();
-                IASTAppendable result = null;
+				IASTAppendable result = F.NIL;
                 IExpr tres;
                 IExpr temp = astTimes.arg1();
                 boolean evaled = false;
@@ -4666,7 +4666,7 @@ public final class Arithmetic {
                         }
 
                         if (!tres.isPresent()) {
-                            if (result == null) {
+							if (!result.isPresent()) {
                                 result = F.ast(sym, astTimes.size() - i + 1, false);
                             }
                             result.append(temp);
@@ -4683,7 +4683,7 @@ public final class Arithmetic {
                         temp = tres;
 
                         if (i == astTimes.argSize()) {
-                            if (result == null) {
+							if (!result.isPresent()) {
                                 result = F.ast(sym, astTimes.size() - i + 1, false);
                             }
                             result.append(temp);
@@ -4693,7 +4693,7 @@ public final class Arithmetic {
                     }
                 }
 
-                if (evaled) {
+				if (evaled && result.isPresent()) {
                     if (sym.hasOneIdentityAttribute() && result.size() > 1) {
                         return result.getOneIdentity(F.C0);
                     }
