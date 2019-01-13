@@ -7,21 +7,19 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.ASCIIPrettyPrinter3;
 import org.matheclipse.core.form.output.OutputFormFactory;
-import org.matheclipse.core.graphics.Show2SVG;
-import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -66,6 +64,16 @@ public class MMAConsole {
 
 	private static int COUNTER = 1;
 
+	/**
+	 * See: <a href="https://stackoverflow.com/a/20387039/24819">Printing out unicode from Java code issue in windows console</a>
+	 */
+	private static PrintWriter stdout = new PrintWriter(new OutputStreamWriter(System.out, Charset.forName("UTF-8")),
+			true);
+	/**
+	 * See: <a href="https://stackoverflow.com/a/20387039/24819">Printing out unicode from Java code issue in windows console</a>
+	 */
+	private static PrintWriter stderr = new PrintWriter(new OutputStreamWriter(System.err, Charset.forName("UTF-8")),
+			true);
 	static {
 		// distinguish between lower- and uppercase identifiers
 		Config.PARSER_USE_LOWERCASE_SYMBOLS = false;
@@ -102,55 +110,55 @@ public class MMAConsole {
 		// f.close();
 		// inputExpression = buff.toString();
 		// outputExpression = console.interpreter(inputExpression);
-		// System.out.println("In [" + COUNTER + "]: " + inputExpression);
+		// stdout.println("In [" + COUNTER + "]: " + inputExpression);
 		// if (outputExpression.length() > 0) {
-		// System.out.println("Out[" + COUNTER + "]: " + outputExpression);
+		// stdout.println("Out[" + COUNTER + "]: " + outputExpression);
 		// }
 		// COUNTER++;
 		// } catch (final IOException ioe) {
 		// final String msg = "Cannot read from the specified file. "
 		// + "Make sure the path exists and you have read permission.";
-		// System.out.println(msg);
+		// stdout.println(msg);
 		// return;
 		// }
 		// }
 
 		while (true) {
 			try {
-				inputExpression = console.readString(System.out, "▶    ");
+				inputExpression = console.readString(stdout, "▶    ");
 				if (inputExpression != null) {
 					trimmedInput = inputExpression.trim();
 					if (trimmedInput.length() >= 4 && trimmedInput.charAt(0) == '/') {
 						String command = trimmedInput.substring(1).toLowerCase(Locale.ENGLISH);
 						if (command.equals("exit")) {
-						System.out.println("Closing Symja console... bye.");
+							stdout.println("Closing Symja console... bye.");
 						System.exit(0);
 						} else if (command.equals("java")) {
-							System.out.println("Enabling output for JavaForm");
+							stdout.println("Enabling output for JavaForm");
 							console.fUsedForm = JAVAFORM;
 							continue;
 						} else if (command.equals("traditional")) {
-							System.out.println("Enabling output for TraditionalForm");
+							stdout.println("Enabling output for TraditionalForm");
 							console.fUsedForm = TRADITIONALFORM;
 							continue;
 						} else if (command.equals("output")) {
-							System.out.println("Enabling output for OutputForm");
+							stdout.println("Enabling output for OutputForm");
 							console.fUsedForm = OUTPUTFORM;
 						continue;
 						} else if (command.equals("pretty")) {
-							System.out.println("Enabling output for PrettyPrinterForm");
+							stdout.println("Enabling output for PrettyPrinterForm");
 							console.fUsedForm = PRETTYFORM;
 						continue;
 						} else if (command.equals("input")) {
-							System.out.println("Enabling output for InputForm");
+							stdout.println("Enabling output for InputForm");
 							console.fUsedForm = INPUTFORM;
 							continue;
 						} else if (command.equals("timeoutoff")) {
-						System.out.println("Disabling timeout for evaluation");
+							stdout.println("Disabling timeout for evaluation");
 						console.fSeconds = -1;
 						continue;
 						} else if (command.equals("timeouton")) {
-						System.out.println("Enabling timeout for evaluation to 60 seconds.");
+							stdout.println("Enabling timeout for evaluation to 60 seconds.");
 						console.fSeconds = 60;
 						continue;
 						}
@@ -159,22 +167,22 @@ public class MMAConsole {
 					// if (trimmedInput.length() > 1 && trimmedInput.charAt(0) == '?') {
 					// IAST list = Names.getNamesByPrefix(trimmedInput.substring(1));
 					// for (int i = 1; i < list.size(); i++) {
-					// System.out.print(list.get(i).toString());
+					// stdout.print(list.get(i).toString());
 					// if (i != list.argSize()) {
-					// System.out.print(", ");
+					// stdout.print(", ");
 					// }
 					// }
-					// System.out.println();
+					// stdout.println();
 					// if (list.size() == 2) {
 					// printDocumentation(list.get(1).toString());
 					// }
 					// continue;
 					// }
 					// console.interpreter(trimmedInput);
-					System.out.println("In [" + COUNTER + "]: " + trimmedInput);
-					System.out.flush();
+					stdout.println("In [" + COUNTER + "]: " + trimmedInput);
+					stdout.flush();
 					// if (outputExpression.length() > 0) {
-					// System.out.println("Out[" + COUNTER + "]: " + outputExpression);
+					// stdout.println("Out[" + COUNTER + "]: " + outputExpression);
 					// }
 					// if (console.fPrettyPrinter) {
 					// console.prettyPrinter(trimmedInput);
@@ -185,10 +193,10 @@ public class MMAConsole {
 				}
 				// } catch (final MathRuntimeException mre) {
 				// Throwable me = mre.getCause();
-				// System.out.println(me.getMessage());
+				// stdout.println(me.getMessage());
 			} catch (final Exception e) {
-				System.err.println(e.getMessage());
-				System.err.flush();
+				stderr.println(e.getMessage());
+				stderr.flush();
 			}
 		}
 	}
@@ -222,9 +230,9 @@ public class MMAConsole {
 	// } else {
 	// emptyLine = false;
 	// }
-	// System.out.println(line);
+	// stdout.println(line);
 	// }
-	// System.out.flush();
+	// stdout.flush();
 	// f.close();
 	// is.close();
 	// } catch (IOException e) {
@@ -235,20 +243,20 @@ public class MMAConsole {
 	private String resultPrinter(String inputExpression) {
 		String outputExpression = interpreter(inputExpression);
 		if (outputExpression.length() > 0) {
-			System.out.println("Out[" + COUNTER + "]: " + outputExpression);
-			System.out.flush();
+			stdout.println("Out[" + COUNTER + "]: " + outputExpression);
+			stdout.flush();
 		}
 		return outputExpression;
 	}
 
 	// private void prettyPrinter(String inputExpression) {
-	// System.out.println();
+	// stdout.println();
 	// String[] outputExpression = prettyPrinter3Lines(inputExpression);
-	// ASCIIPrettyPrinter3.prettyPrinter(System.out, outputExpression, "Out[" + COUNTER + "]: ");
+	// ASCIIPrettyPrinter3.prettyPrinter(stdout, outputExpression, "Out[" + COUNTER + "]: ");
 	// }
 
 	/**
-	 * Prints the usage of how to use this class to System.out
+	 * Prints the usage of how to use this class to stdout
 	 */
 	private static void printUsage() {
 		final String lineSeparator = System.getProperty("line.separator");
@@ -275,8 +283,8 @@ public class MMAConsole {
 		msg.append("To enable the output in standard form: /traditional<RETURN>" + lineSeparator);
 		msg.append("****+****+****+****+****+****+****+****+****+****+****+****+");
 
-		System.out.println(msg.toString());
-		System.out.flush();
+		stdout.println(msg.toString());
+		stdout.flush();
 	}
 
 	// private String[] prettyPrinter3Lines(final String inputExpression) {
@@ -301,8 +309,8 @@ public class MMAConsole {
 	// }
 	// } catch (final SyntaxError se) {
 	// String msg = se.getMessage();
-	// System.err.println();
-	// System.err.println(msg);
+	// stderr.println();
+	// stderr.println(msg);
 	// return null;
 	// } catch (final RuntimeException re) {
 	// Throwable me = re.getCause();
@@ -359,12 +367,12 @@ public class MMAConsole {
 				try {
 					String outputExpression = interpreter(args[i + 1]);
 					if (outputExpression.length() > 0) {
-						System.out.print(outputExpression);
+						stdout.print(outputExpression);
 					}
 					throw ReturnException.RETURN_TRUE;
 				} catch (final ArrayIndexOutOfBoundsException aioobe) {
 					final String msg = "You must specify a command when " + "using the -code argument";
-					System.out.println(msg);
+					stdout.println(msg);
 					throw ReturnException.RETURN_FALSE;
 				}
 			} else if (arg.equals("-function") || arg.equals("-f")) {
@@ -373,7 +381,7 @@ public class MMAConsole {
 					i++;
 				} catch (final ArrayIndexOutOfBoundsException aioobe) {
 					final String msg = "You must specify a function when " + "using the -function argument";
-					System.out.println(msg);
+					stdout.println(msg);
 					throw ReturnException.RETURN_FALSE;
 				}
 			} else if (arg.equals("-args") || arg.equals("-a")) {
@@ -391,14 +399,14 @@ public class MMAConsole {
 						inputExpression.append("]");
 						String outputExpression = interpreter(inputExpression.toString());
 						if (outputExpression.length() > 0) {
-							System.out.print(outputExpression);
+							stdout.print(outputExpression);
 						}
 						throw ReturnException.RETURN_TRUE;
 					}
 					return;
 				} catch (final ArrayIndexOutOfBoundsException aioobe) {
 					final String msg = "You must specify a function when " + "using the -function argument";
-					System.out.println(msg);
+					stdout.println(msg);
 					throw ReturnException.RETURN_FALSE;
 				}
 			} else if (arg.equals("-help") || arg.equals("-h")) {
@@ -413,7 +421,7 @@ public class MMAConsole {
 				// i++;
 				// } catch (final ArrayIndexOutOfBoundsException aioobe) {
 				// final String msg = "You must specify a file when " + "using the -file argument";
-				// System.out.println(msg);
+				// stdout.println(msg);
 				// return;
 				// }
 			} else if (arg.equals("-default") || arg.equals("-d")) {
@@ -424,7 +432,7 @@ public class MMAConsole {
 
 				} catch (final ArrayIndexOutOfBoundsException aioobe) {
 					final String msg = "You must specify a file when " + "using the -d argument";
-					System.out.println(msg);
+					stdout.println(msg);
 					return;
 				}
 				// } else if (arg.equals("-pp")) {
@@ -432,7 +440,7 @@ public class MMAConsole {
 			} else if (arg.charAt(0) == '-') {
 				// we don't have any more args to recognize!
 				final String msg = "Unknown arg: " + arg;
-				System.out.println(msg);
+				stdout.println(msg);
 				printUsage();
 				return;
 			}
@@ -465,15 +473,15 @@ public class MMAConsole {
 				return printResult(F.$Aborted);
 			} catch (IOException e) {
 				Validate.printException(buf, e);
-				System.err.println(buf.toString());
-				System.err.flush();
+				stderr.println(buf.toString());
+				stderr.flush();
 				return "";
 			}
 		} catch (final SyntaxError se) {
 			String msg = se.getMessage();
-			System.err.println(msg);
-			System.err.println();
-			System.err.flush();
+			stderr.println(msg);
+			stderr.println();
+			stderr.flush();
 			return "";
 		} catch (final RuntimeException re) {
 			Throwable me = re.getCause();
@@ -482,23 +490,23 @@ public class MMAConsole {
 			} else {
 				Validate.printException(buf, re);
 			}
-			System.err.println(buf.toString());
-			System.err.flush();
+			stderr.println(buf.toString());
+			stderr.flush();
 			return "";
 		} catch (final Exception e) {
 			Validate.printException(buf, e);
-			System.err.println(buf.toString());
-			System.err.flush();
+			stderr.println(buf.toString());
+			stderr.flush();
 			return "";
 		} catch (final OutOfMemoryError e) {
 			Validate.printException(buf, e);
-			System.err.println(buf.toString());
-			System.err.flush();
+			stderr.println(buf.toString());
+			stderr.flush();
 			return "";
 		} catch (final StackOverflowError e) {
 			Validate.printException(buf, e);
-			System.err.println(buf.toString());
-			System.err.flush();
+			stderr.println(buf.toString());
+			stderr.flush();
 			return "";
 		}
 		return buf.toString();
@@ -513,12 +521,16 @@ public class MMAConsole {
 	 *
 	 */
 
-	public void printPrompt(final PrintStream out, final String prompt) {
+	public void printPrompt(final PrintWriter out, final String prompt) {
 		out.print(prompt);
 		out.flush();
 	}
 
 	private String printResult(IExpr result) throws IOException {
+		EvalEngine engine = fEvaluator.getEvalEngine();
+		EvalEngine.set(engine);
+		try {
+			engine.reset();
 		if (result.equals(F.Null)) {
 			return "";
 		}
@@ -533,9 +545,9 @@ public class MMAConsole {
 		case PRETTYFORM:
 			ASCIIPrettyPrinter3 prettyBuffer = new ASCIIPrettyPrinter3();
 			prettyBuffer.convert(result);
-			System.out.println();
+				stdout.println();
 			String[] outputExpression = prettyBuffer.toStringBuilder();
-			ASCIIPrettyPrinter3.prettyPrinter(System.out, outputExpression, "Out[" + COUNTER + "]: ");
+				ASCIIPrettyPrinter3.prettyPrinter(stdout, outputExpression, "Out[" + COUNTER + "]: ");
 			return "";
 		case INPUTFORM:
 			StringBuilder inputBuffer = new StringBuilder();
@@ -543,7 +555,7 @@ public class MMAConsole {
 			fInputFactory.convert(inputBuffer, result);
 			return inputBuffer.toString();
 		default:
-			//Android changed: java.awt not available
+			//Android changed: java.awt is not available in Android framework
 //			if (Desktop.isDesktopSupported()) {
 //				IExpr outExpr = result;
 //				if (result.isAST(F.Graphics)) {// || result.isAST(F.Graphics3D)) {
@@ -574,6 +586,8 @@ public class MMAConsole {
 		fOutputFactory.reset();
 		fOutputFactory.convert(strBuffer, result);
 		return strBuffer.toString();
+			}
+		} finally {
 	}
 	}
 
@@ -585,7 +599,7 @@ public class MMAConsole {
 	 * @return the input string (without the newline)
 	 */
 
-	public String readString(final PrintStream out) {
+	public String readString(final PrintWriter out) {
 		final StringBuilder input = new StringBuilder();
 		//Android Changed: Java 7 doesn't have UTF-8 field, use Charset.forName instead
 		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")));
@@ -623,7 +637,7 @@ public class MMAConsole {
 	 * @return the input string (without the newline)
 	 */
 
-	public String readString(final PrintStream out, final String prompt) {
+	public String readString(final PrintWriter out, final String prompt) {
 		printPrompt(out, prompt);
 		return readString(out);
 	}

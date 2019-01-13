@@ -716,6 +716,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"testit(x) gives x^2");
 		check("testit(x_) :=  x^2 ", //
 				"");
+		check("xxx", //
+				"xxx");
 		check("testit(12)", //
 				"144");
 		check("EndPackage( )", //
@@ -729,6 +731,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"");
 		check("testit(12)", //
 				"144");
+		check("xxx", //
+				"xxx");
 	}
 
 	public void testBeginPackageNested() {
@@ -2364,8 +2368,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"-y/(x^2+y^2)");
 		check("D(ArcTan(x,y),y)", //
 				"x/(x^2+y^2)");
-//		check("D(ArcTan(x,x),x)", //
-//				"0");
+		// check("D(ArcTan(x,x),x)", //
+		// "0");
 		check("D(Cosh(b*x),x)", //
 				"b*Sinh(b*x)");
 		check("D(Sinh(x),x)", //
@@ -4112,7 +4116,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FixedPoint(#+1 &, 1, 20)", "21");
 		check("FixedPoint(f, x, 0)", "x");
 		check("FixedPoint(f, x, -1)", "FixedPoint(f,x,-1)");
-		//j2objc changed: use DOUBLE_TOLERANCE to compare
+		//j2objc changed: Use DOUBLE_TOLERANCE to compare double in odrer to avoid infinity loop
 		checkNumeric("FixedPoint(Cos, 1.0, Infinity)", "0.7390851332151603");
 
 		checkNumeric("FixedPoint((# + 2/#)/2 &, 1.)", "1.414213562373095");

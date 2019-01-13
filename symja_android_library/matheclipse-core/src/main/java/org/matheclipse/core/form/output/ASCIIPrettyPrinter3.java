@@ -9,7 +9,7 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 /**
  * ASCII pretty printer which tries to create a pretty printer ASCII form on 3 lines.
@@ -285,7 +285,7 @@ public class ASCIIPrettyPrinter3 {
 	 * @param prefix
 	 *            a prefix which should be placed before the <code>outputExpression</code>
 	 */
-	public static void prettyPrinter(PrintStream out, String[] outputExpression, String prefix) {
+	public static void prettyPrinter(PrintWriter out, String[] outputExpression, String prefix) {
 		if (outputExpression == null) {
 			out.println(prefix);
 		} else {
