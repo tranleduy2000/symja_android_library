@@ -479,13 +479,17 @@ public abstract class AbstractAST extends IASTMutableImpl {
 				}
 				return compareToASTIncreasing(this, (IAST) rhsExpr);
 			}
+			if (rhsExpr.isNumber()) {
+				// O-7
+				return 1;
+			}
 			rhsOrdinal = (rhsExpr.head() instanceof IBuiltInSymbol) ? ((IBuiltInSymbol) rhsExpr.head()).ordinal() : -1;
 		}
 		if (rhsExpr.isAST()) {
 			if (rhsOrdinal == ID.DirectedInfinity && rhsExpr.isDirectedInfinity()) {
 				return 1;
 			}
-			if (lhsOrdinal >= ID.Plus && size() > 1) {
+			if (lhsOrdinal >= ID.Plus && lhsOrdinal <= ID.Times && size() > 1) {
 			IAST rhs = (IAST) rhsExpr;
 				switch (lhsOrdinal) {
 				case ID.Plus:
@@ -533,11 +537,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return super.compareTo(rhsExpr);
 		}
 
-		if (rhsExpr.isNumber()) {
-			// O-7
-			return 1;
-		}
-		if (lhsOrdinal >= ID.Not && size() > 1) {
+		if (lhsOrdinal >= ID.Not && lhsOrdinal <= ID.Times && size() > 1) {
 			switch (lhsOrdinal) {
 			case ID.Not:
 				if (rhsExpr.isSymbol() && arg1().isSymbol() && size() == 2) {
@@ -2997,6 +2997,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public IExpr opposite() {
+		final int lhsOrdinal = (head() instanceof IBuiltInSymbol) ? ((IBuiltInSymbol) head()).ordinal() : -1;
+		if (lhsOrdinal > 0) {
 		if (isTimes()) {
 			IExpr arg1 = arg1();
 			if (arg1.isNumber()) {
@@ -3018,7 +3020,17 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		if (isInfinity()) {
 			return F.CNInfinity;
 		}
-		return F.eval(F.Times(F.CN1, this));
+			if (isPlus()) {
+				return map(new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return x.negate();
+					}
+				}, 1);
+			}
+		}
+		return F.Times(F.CN1, this);
+		// return F.eval(F.Times(F.CN1, this));
 	}
 
 	@Override

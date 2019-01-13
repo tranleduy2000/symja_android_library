@@ -4424,6 +4424,7 @@ public final class Arithmetic {
         @Override
         public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
 
+			if (o0.isReal() || o1.isReal()) {
             if (o0.isZero()) {
 				if (o1.isQuantity()) {
 					return ((IQuantity)o1).ofUnit(F.C0);
@@ -4451,6 +4452,7 @@ public final class Arithmetic {
             if (o1.isOne()) {
                 return o0;
             }
+			}
 			// note not a general rule
 			// if (o0.isMinusOne() && o1.isPlus()) {
 			// return ((IAST) o1).map(x -> x.negate(), 1);
@@ -4463,6 +4465,7 @@ public final class Arithmetic {
                 return o0.power(F.C2);
             }
 
+			if (o0.isAST() || o1.isAST()) {
             if (o0.isDirectedInfinity()) {
 				IExpr temp = eInfinity((IAST) o0, o1);
 				if (temp.isPresent()) {
@@ -4537,6 +4540,7 @@ public final class Arithmetic {
             }
 			if (o0.isFraction() && o0.isNegative() && o1.isPlus()) {
 				return F.Times(o0.negate(),o1.negate());
+			}
 			}
             return F.NIL;
         }

@@ -1,5 +1,8 @@
 package org.matheclipse.core.eval;
 
+import com.duy.annotations.Nonnull;
+import com.duy.lambda.Consumer;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.Comparators;
@@ -47,7 +50,7 @@ public class EvalAttributes {
 	 * 
 	 * @return returns the flattened list or <code>F.NIL</code>
 	 */
-	public static IASTAppendable flatten( final IAST ast) {
+	public static IASTAppendable flatten(@Nonnull final IAST ast) {
 		if ((ast.getEvalFlags() & IAST.IS_FLATTENED) == IAST.IS_FLATTENED) {
 			// already flattened
 			return F.NIL;
@@ -76,35 +79,39 @@ public class EvalAttributes {
 	 * @return the flattened ast expression if a sublist was flattened out, otherwise return <code>F#NIL</code>..
 	 */
 	public static IASTAppendable flatten(final ISymbol head, final IAST ast) {
-		IExpr expr;
-		final int astSize = ast.size();
-		int newSize = 0;
-		boolean flattened = false;
-		for (int i = 1; i < astSize; i++) {
-			expr = ast.get(i);
-			if (expr.isAST(head)) {
-				flattened = true;
-				int temp = flattenAlloc(head, (IAST) expr);
-				newSize += temp;
-			} else {
-				newSize++;
-			}
-		}
-		if (flattened) {
-			IASTAppendable result = F.ast(ast.head(), newSize, false);
-			for (int i = 1; i < astSize; i++) {
-				expr = ast.get(i);
+		final int[] newSize = new int[1];
+		newSize[0] = 0;
+		final boolean[] flattened = new boolean[] { false };
+		ast.forEach(new Consumer<IExpr>() {
+			@Override
+			public void accept(IExpr expr) {
 				if (expr.isAST(head)) {
-					IAST temp = flatten(head, (IAST) expr);
-					if (temp.isPresent()) {
-						result.appendArgs(temp);
-					} else {
-						result.appendArgs((IAST) expr);
-					}
+					flattened[0] = true;
+					int temp = flattenAlloc(head, (IAST) expr);
+					newSize[0] += temp;
 				} else {
-					result.append(expr);
+					newSize[0]++;
 				}
 			}
+		});
+
+		if (flattened[0]) {
+			final IASTAppendable result = F.ast(ast.head(), newSize[0], false);
+			ast.forEach(new Consumer<IExpr>() {
+				@Override
+				public void accept(IExpr expr) {
+					if (expr.isAST(head)) {
+						IAST temp = flatten(head, (IAST) expr);
+						if (temp.isPresent()) {
+							result.appendArgs(temp);
+						} else {
+							result.appendArgs((IAST) expr);
+						}
+					} else {
+						result.append(expr);
+					}
+				}
+			});
 			return result;
 		}
 		return F.NIL;
@@ -168,18 +175,18 @@ public class EvalAttributes {
 	}
 
 	private static int flattenAlloc(final ISymbol head, final IAST ast) {
-		IExpr expr;
-		final int astSize = ast.size();
-		int newSize = 0;
-		for (int i = 1; i < astSize; i++) {
-			expr = ast.get(i);
-			if (expr.isAST(head)) {
-				newSize += flattenAlloc(head, (IAST) expr);
-			} else {
-				newSize++;
+		final int[] newSize = new int[1];
+		ast.forEach(new Consumer<IExpr>() {
+			@Override
+			public void accept(IExpr expr) {
+				if (expr.isAST(head)) {
+					newSize[0] += flattenAlloc(head, (IAST) expr);
+				} else {
+					newSize[0]++;
+				}
 			}
-		}
-		return newSize;
+		});
+		return newSize[0];
 	}
 
 	/**
@@ -201,19 +208,20 @@ public class EvalAttributes {
 	 */
 	public static boolean flatten(final ISymbol head, final IAST sublist, final IASTAppendable result,
 			final int recursionCounter, final int level) {
-		boolean isEvaled = false;
-		IExpr expr;
-		final int astSize = sublist.size();
-		for (int i = 1; i < astSize; i++) {
-			expr = sublist.get(i);
-			if (expr.isAST(head) && recursionCounter < level) {
-				isEvaled = true;
-				flatten(head, (IAST) expr, result, recursionCounter + 1, level);
-			} else {
-				result.append(expr);
+		final boolean[] flattened = new boolean[1];
+		flattened[0] = false;
+		sublist.forEach(1, sublist.size(), new Consumer<IExpr>() {
+			@Override
+			public void accept(IExpr expr) {
+				if (expr.isAST(head) && recursionCounter < level) {
+					flattened[0] = true;
+					flatten(head, (IAST) expr, result, recursionCounter + 1, level);
+				} else {
+					result.append(expr);
+				}
 			}
-		}
-		return isEvaled;
+		});
+		return flattened[0];
 	}
 
 	/**
@@ -232,7 +240,7 @@ public class EvalAttributes {
 
 	/**
 	 * <p>
-	 * Copy the <code>ast</code> and return the sorted copy using function <code>>Less(a, b)</code>.
+	 * Copy the <code>ast</code> and return the sorted copy using function <code>Less(a, b)</code>.
 	 * </p>
 	 * 
 	 * @param ast
@@ -246,12 +254,11 @@ public class EvalAttributes {
 
 	/**
 	 * <p>
-	 * Sort the <code>ast</code> in place using function <code>Less</code>.
+	 * Sort the <code>ast</code> in place using function <code>Less(a, b)</code>.
 	 * </p>
 	 * 
 	 * @param ast
 	 *            the AST will be sorted in place.
-	 * @return <code>true</code> if the sort algorithm was used; <code>false</code> otherwise
 	 */
 	public static final void sortLess(IASTMutable ast) {
 		sort(ast, new Predicates.IsBinaryFalse(F.Less));

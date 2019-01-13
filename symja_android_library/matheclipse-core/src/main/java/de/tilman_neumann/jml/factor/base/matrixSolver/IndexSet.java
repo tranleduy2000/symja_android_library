@@ -52,6 +52,7 @@ public class IndexSet  {
 	
 	/**
 	 * Add a single element x to this index set.
+	 *
 	 * @param x
 	 */
 	public void add(int x) {
