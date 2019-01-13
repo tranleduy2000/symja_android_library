@@ -13,10 +13,11 @@ public class CompatibleTest extends TestCase {
 
     public void test() throws IOException {
         String[] unavailablePackages = new String[]{
-                "import " + java.nio.channels.AlreadyConnectedException.class.getPackage().getName(),
-                "import " + java.net.URISyntaxException.class.getPackage().getName(),
-                "import " + java.security.AccessControlException.class.getPackage().getName(),
-                "Config.DOUBLE_EPSILON"
+                "import java.nio.channels",
+                "import java.net",
+                "import java.security ",
+                "Config.DOUBLE_EPSILON",
+                "java.util.UUID",
         };
         File sourceDir = new File("../symja_android_library/matheclipse-core/src/main/java");
         assertTrue(sourceDir.exists());

@@ -18,7 +18,6 @@ package org.hipparchus.stat;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
-import org.hipparchus.stat.descriptive.DescriptiveStatistics;
 import org.hipparchus.stat.descriptive.UnivariateStatistic;
 import org.hipparchus.stat.descriptive.moment.GeometricMean;
 import org.hipparchus.stat.descriptive.moment.Mean;
@@ -750,34 +749,6 @@ public final class StatUtils {
             sum2 += diff - meanDifference;
         }
         return (sum1 - (sum2 * sum2 / n)) / (n - 1);
-    }
-
-    /**
-     * Normalize (standardize) the sample, so it is has a mean of 0 and a standard deviation of 1.
-     *
-     * @param sample Sample to normalize.
-     * @return normalized (standardized) sample.
-     */
-    public static double[] normalize(final double... sample) {
-        DescriptiveStatistics stats = new DescriptiveStatistics();
-
-        // Add the data from the series to stats
-        for (int i = 0; i < sample.length; i++) {
-            stats.addValue(sample[i]);
-        }
-
-        // Compute mean and standard deviation
-        double mean = stats.getMean();
-        double standardDeviation = stats.getStandardDeviation();
-
-        // initialize the standardizedSample, which has the same length as the sample
-        double[] standardizedSample = new double[sample.length];
-
-        for (int i = 0; i < sample.length; i++) {
-            // z = (x- mean)/standardDeviation
-            standardizedSample[i] = (sample[i] - mean) / standardDeviation;
-        }
-        return standardizedSample;
     }
 
     /**
