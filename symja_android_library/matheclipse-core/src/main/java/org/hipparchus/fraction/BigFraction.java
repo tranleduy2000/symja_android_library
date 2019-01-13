@@ -716,7 +716,10 @@ public class BigFraction
      */
     @Override
     public double doubleValue() {
-        double result = numerator.doubleValue() / denominator.doubleValue();
+        // Android framework bug:
+        // 2535301200456458802993406410751 =  1.2676506002282294E30
+        // 1267650600228229401496703205376 =  1.2676506002282294E30
+        double result = new BigDecimal(numerator).doubleValue() / new BigDecimal(denominator).doubleValue();
         if (Double.isNaN(result)) {
             // Numerator and/or denominator must be out of range:
             // Calculate how far to shift them to put them in range.
