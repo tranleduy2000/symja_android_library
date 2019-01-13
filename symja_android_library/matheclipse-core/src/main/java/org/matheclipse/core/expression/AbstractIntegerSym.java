@@ -414,8 +414,6 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 
 	/**
 	 * Get all prime factors of this integer
-	 *
-	 *            add the prime factors to this result list
 	 * @return
 	 */
 	public IAST factorize() {
@@ -435,7 +433,8 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		}
 		BigInteger big = b.toBigNumerator();
 		try {
-			long longValue = big.longValue();
+			// Android changed: BigInteger#longValueExact doesn't exist
+			long longValue = new java.math.BigDecimal(big).longValueExact();
 			if (longValue < PrimeInteger.BETA) {
 				return factorizeLong(longValue);
 			}
