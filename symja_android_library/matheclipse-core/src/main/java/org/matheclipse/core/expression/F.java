@@ -2600,6 +2600,8 @@ public class F {
     /** ToCharacterCode(string) - converts `string` into a list of corresponding integer numbers.*/
 	public final static IBuiltInSymbol ToCharacterCode = F.initFinalSymbol("ToCharacterCode", ID.ToCharacterCode);
 
+	/***/
+	public final static IBuiltInSymbol ToExpression = F.initFinalSymbol("ToExpression", ID.ToExpression);
 	/** ToPolarCoordinates({x, y}) - return the polar coordinates for the cartesian coordinates `{x, y}`.*/
 	public final static IBuiltInSymbol ToPolarCoordinates = F.initFinalSymbol("ToPolarCoordinates",
 			ID.ToPolarCoordinates);

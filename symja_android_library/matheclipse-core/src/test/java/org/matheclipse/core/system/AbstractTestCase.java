@@ -21,7 +21,7 @@ import javax.script.ScriptEngine;
  * Tests system.reflection classes
  */
 public abstract class AbstractTestCase extends TestCase {
-    protected final Object mLocker = new Object();
+    protected final Object fScriptManager = new Object();
     protected ScriptEngine fScriptEngine;
     protected ScriptEngine fNumericScriptEngine;
 
@@ -30,6 +30,22 @@ public abstract class AbstractTestCase extends TestCase {
         Config.SERVER_MODE = false;
     }
 
+	public void ESameTest(String expectedString, String evalString  ) {
+		try {
+			if (evalString.length() == 0 && expectedString.length() == 0) {
+				return;
+			}
+			// scriptEngine.put("STEPWISE",Boolean.TRUE);
+			String evaledResult = (String) fScriptEngine.eval(evalString);
+			String expectedResult = (String) fScriptEngine.eval(expectedString);
+
+				assertEquals(expectedResult, evaledResult);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", "1");
+		}
+	}
     public void check(String evalString, String expectedResult) {
         check(fScriptEngine, evalString, expectedResult, -1);
     }
@@ -138,7 +154,7 @@ public abstract class AbstractTestCase extends TestCase {
     @Override
     protected void setUp() {
         try {
-            synchronized (mLocker) {
+            synchronized (fScriptManager) {
                 fScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
                 fScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
                 fScriptEngine.put("DECIMAL_FORMAT", "0.0####");

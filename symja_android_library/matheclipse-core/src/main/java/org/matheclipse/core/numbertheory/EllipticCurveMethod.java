@@ -22,8 +22,8 @@ import java.util.Map;
  * </p>
  *
  * <p>
- * See <a href="https://en.wikipedia.org/wiki/Lenstra_elliptic_curve_factorization"> Wikipedia: Lenstra elliptic curve
- * factorization </a>
+ * See <a href="https://en.wikipedia.org/wiki/Lenstra_elliptic_curve_factorization"> Wikipedia: Lenstra elliptic curve factorization
+ * </a>
  * </p>
  */
 public class EllipticCurveMethod {
@@ -368,9 +368,9 @@ public class EllipticCurveMethod {
 	}
 
 	/**
-	 * Adds Q=(x2:z2) and R=(x1:z1) and puts the result in (x3:z3), using 5/6 mul, 6 add/sub and 6 mod. One assumes that
-	 * Q-R=P or R-Q=P where P=(x:z). Uses the following global variables: - n : number to factor - x, z : coordinates of
-	 * P - u, v, w : auxiliary variables Modifies: x3, z3, u, v, w. (x3,z3) may be identical to (x2,z2) and to (x,z)
+	 * Adds Q=(x2:z2) and R=(x1:z1) and puts the result in (x3:z3), using 5/6 mul, 6 add/sub and 6 mod. One assumes that Q-R=P or R-Q=P
+	 * where P=(x:z). Uses the following global variables: - n : number to factor - x, z : coordinates of P - u, v, w : auxiliary
+	 * variables Modifies: x3, z3, u, v, w. (x3,z3) may be identical to (x2,z2) and to (x,z)
 	 */
 	private void add3(long[] x3, long[] z3, long[] x2, long[] z2, long[] x1, long[] z1, long[] x, long[] z) {
 		long[] t = fieldTX;
@@ -556,8 +556,8 @@ public class EllipticCurveMethod {
 						}
 						if (Computing3Squares == false) {
 							/*
-							 * System.out.println( primalityString + "P = " + P + ",  Q = " + Q + "  (" + (i *
-							 * (TestingQs + 1) + j) * 100 / (NP * (TestingQs + 1)) + "%)");
+							 * System.out.println( primalityString + "P = " + P + ",  Q = " + Q + "  (" + (i * (TestingQs + 1) + j) * 100 / (NP * (TestingQs +
+							 * 1)) + "%)");
 							 */
 						}
 						PM = 1;
@@ -1852,8 +1852,8 @@ public class EllipticCurveMethod {
 	}
 
 	/*
-	 * computes 2P=(x2:z2) from P=(x1:z1), with 5 mul, 4 add/sub, 5 mod. Uses the following global variables: - n :
-	 * number to factor - b : (a+2)/4 mod n - u, v, w : auxiliary variables Modifies: x2, z2, u, v, w
+	 * computes 2P=(x2:z2) from P=(x1:z1), with 5 mul, 4 add/sub, 5 mod. Uses the following global variables: - n : number to factor - b
+	 * : (a+2)/4 mod n - u, v, w : auxiliary variables Modifies: x2, z2, u, v, w
 	 */
 	private void duplicate(long[] x2, long[] z2, long[] x1, long[] z1) {
 		long[] u = fieldUZ;
@@ -1903,7 +1903,7 @@ public class EllipticCurveMethod {
 	}
 
 	private BigInteger factoringSIQS(BigInteger NbrToFactor) {
-		int NbrPrimes, NbrPrimes2;
+		int NbrPrimes2;
 		long modsqrt[];
 		long prime[];
 		byte logar[];
@@ -1924,17 +1924,14 @@ public class EllipticCurveMethod {
 		long vectLeftHandSide[][];
 		int matrixPartial[][];
 		int matrixPartialHashIndex[];
-		long biR0 = 0, biR1 = 0, biR2 = 0, biR3 = 0, biR4 = 0, biR5 = 0;
-		long biR6 = 0;
-		boolean cond = false;
 
 		final double Temp = Math.log(NbrToFactor.doubleValue());
-		NbrPrimes = (int) Math.exp(Math.sqrt(Temp * Math.log(Temp)) * 0.318);
 		int SieveLimit = (int) Math.exp(8.5 + 0.015 * Temp);
 		if (SieveLimit > 30000) {
 			SieveLimit = 30000;
 		}
 		int s = NbrToFactor.bitLength() / 28 + 1;
+		int NbrPrimes = (int) Math.exp(Math.sqrt(Temp * Math.log(Temp)) * 0.318);
 		prime = new long[NbrPrimes + 3];
 		modsqrt = new long[NbrPrimes + 3];
 		logar = new byte[NbrPrimes + 3];
@@ -2051,8 +2048,7 @@ public class EllipticCurveMethod {
 			j = 2;
 		}
 		currentPrime = 3;
-		int pp = 0;
-		int nbrPartials = 0;
+		int[] pp = new int[] { 0 };
 		while (j < NbrPrimes) { /* select small primes */
 			NbrMod = (int) RemDivBigNbrByLong(TestNbr, currentPrime);
 			if (modPow(NbrMod, (currentPrime - 1) / 2, currentPrime) == 1) {
@@ -2160,7 +2156,7 @@ public class EllipticCurveMethod {
 			/*********************************************/
 			/* Initialization stage for first polynomial */
 			/*********************************************/
-			int PolynomialIndex = 1;
+			int[] PolynomialIndex = new int[] { 1 };
 			final double Prod = Math.sqrt(2 * dNumberToFactor) / SieveLimit;
 			final long fact = (long) Math.pow(Prod, 1 / (float) s);
 			int iStage;
@@ -2189,8 +2185,39 @@ public class EllipticCurveMethod {
 				aindex[index] = iStage;
 			}
 
-			// Compute the leading coefficient in biS.
+			computeLeadingCoefficientINBiS(NbrPrimes, modsqrt, prime, ainv, Bainv2, soln1, difsoln, afact, aindex,
+					amodq, SieveLimit, s);
+			do {
+				BigInteger result = sieveStage(NbrPrimes, NbrPrimes2, prime, logar, Bainv2, soln1, difsoln, afact,
+						aindex, amodq, SieveArray, vectExpParity, matrixB, rowMatrixB, vectLeftHandSide, matrixPartial,
+						matrixPartialHashIndex, SieveLimit, s, TestNbr2, multiplier, FactorBase, pp, firstLimit,
+						smallPrimeUpperLimit, logarsmall, threshold, secondLimit, thirdLimit, PolynomialIndex);
+				if (result != null) {
+					return result;
+				}
+			} while (PolynomialIndex[0] < NbrPolynomials);
+		} while (true);
+	}
 
+	/**
+	 * Compute the leading coefficient in biS.
+	 *
+	 * @param NbrPrimes
+	 * @param modsqrt
+	 * @param prime
+	 * @param ainv
+	 * @param Bainv2
+	 * @param soln1
+	 * @param difsoln
+	 * @param afact
+	 * @param aindex
+	 * @param amodq
+	 * @param SieveLimit
+	 * @param s
+	 */
+	private void computeLeadingCoefficientINBiS(int NbrPrimes, long[] modsqrt, long[] prime, long[] ainv,
+			int[][] Bainv2, int[] soln1, int[] difsoln, long[] afact, int[] aindex, int[] amodq, int SieveLimit,
+			int s) {
 			LongToBigNbr(afact[0], biS);
 			for (int index = 1; index < s; index++) {
 				MultBigNbrByLong(biS, afact[index], biS);
@@ -2231,11 +2258,53 @@ public class EllipticCurveMethod {
 				soln1[index] = (int) ((SieveLimit + ainv[index] * (E + modsqrt[index] - D)) % E + 100 * E);
 				difsoln[index] = (int) ((2 * ainv[index] * (E - modsqrt[index])) % E);
 			}
-			do {
+	}
+
+	/**
+	 * Sieve stage.
+	 *
+	 * @param NbrPrimes
+	 * @param NbrPrimes2
+	 * @param prime
+	 * @param logar
+	 * @param Bainv2
+	 * @param soln1
+	 * @param difsoln
+	 * @param afact
+	 * @param aindex
+	 * @param amodq
+	 * @param SieveArray
+	 * @param vectExpParity
+	 * @param matrixB
+	 * @param rowMatrixB
+	 * @param vectLeftHandSide
+	 * @param matrixPartial
+	 * @param matrixPartialHashIndex
+	 * @param SieveLimit
+	 * @param s
+	 * @param TestNbr2
+	 * @param multiplier
+	 * @param FactorBase
+	 * @param pp
+	 * @param firstLimit
+	 * @param smallPrimeUpperLimit
+	 * @param logarsmall
+	 * @param threshold
+	 * @param secondLimit
+	 * @param thirdLimit
+	 * @param PolynomialIndex
+	 * @return
+	 */
+	private BigInteger sieveStage(int NbrPrimes, int NbrPrimes2, long[] prime, byte[] logar, int[][] Bainv2,
+			int[] soln1, int[] difsoln, long[] afact, int[] aindex, int[] amodq, byte[] SieveArray, int[] vectExpParity,
+			int[][] matrixB, int[] rowMatrixB, long[][] vectLeftHandSide, int[][] matrixPartial,
+			int[] matrixPartialHashIndex, int SieveLimit, int s, long[] TestNbr2, int multiplier, long FactorBase,
+			int[] pp, int firstLimit, final int smallPrimeUpperLimit, int logarsmall, byte threshold, int secondLimit,
+			int thirdLimit, int[] PolynomialIndex) {
 				/***************/
 				/* Sieve stage */
 				/***************/
-				long D = PolynomialIndex;
+		long D = PolynomialIndex[0];
 				int index2 = 0;
 				while ((D & 1) == 0) {
 					D /= 2;
@@ -2476,10 +2545,59 @@ public class EllipticCurveMethod {
 					}
 				}
 				// ValuesSieved += 2 * SieveLimit;
+		index2 = 2 * SieveLimit + 1;
 				/************************/
 				/* Trial division stage */
 				/************************/
-				index2 = 2 * SieveLimit + 1;
+		BigInteger result = trialDivisionStage(NbrPrimes, prime, afact, SieveArray, vectExpParity, matrixB, rowMatrixB,
+				vectLeftHandSide, matrixPartial, matrixPartialHashIndex, SieveLimit, s, TestNbr2, multiplier,
+				FactorBase, pp, logarsmall, index2,  primesmall, soln1small, soln2small);
+		if (result != null) {
+			return result;
+		}
+		/*******************/
+		/* Next polynomial */
+		/*******************/
+		PolynomialIndex[0]++;
+		return null;
+	}
+
+	/**
+	 * Trial division stage
+	 *
+	 * @param NbrPrimes
+	 * @param prime
+	 * @param afact
+	 * @param SieveArray
+	 * @param vectExpParity
+	 * @param matrixB
+	 * @param rowMatrixB
+	 * @param vectLeftHandSide
+	 * @param matrixPartial
+	 * @param matrixPartialHashIndex
+	 * @param SieveLimit
+	 * @param s
+	 * @param TestNbr2
+	 * @param multiplier
+	 * @param FactorBase
+	 * @param pp
+	 * @param logarsmall
+	 * @param index2
+	 * @param primesmall
+	 * @param soln1small
+	 * @param soln2small
+	 * @return
+	 */
+	private BigInteger trialDivisionStage(int NbrPrimes, long[] prime, long[] afact, byte[] SieveArray,
+			int[] vectExpParity, int[][] matrixB, int[] rowMatrixB, long[][] vectLeftHandSide, int[][] matrixPartial,
+			int[] matrixPartialHashIndex, int SieveLimit, int s, long[] TestNbr2, int multiplier, long FactorBase,
+			int[] pp, int logarsmall, int index2,   int primesmall, int soln1small, int soln2small) {
+
+		long biR0 = 0, biR1 = 0, biR2 = 0, biR3 = 0, biR4 = 0, biR5 = 0;
+		long biR6 = 0;
+
+		int nbrPartials = 0;
+		boolean cond = false;
 				do {
 					if (SieveArray[--index2] >= 0 && SieveArray[index2] < 64) {
 						if (SieveArray[index2] < logarsmall) {
@@ -2510,7 +2628,7 @@ public class EllipticCurveMethod {
 							positive = false;
 							ChSignBigNbr(biR); // Convert to positive.
 						}
-						for (index = 0; index < s; index++) {
+				for (int index = 0; index < s; index++) {
 							DivBigNbrByLong(biR, afact[index], biR);
 							if ((biR[NumberLength - 1] == 0 && biR[NumberLength - 2] < 0x40000000l)) {
 								NumberLength--;
@@ -2543,7 +2661,7 @@ public class EllipticCurveMethod {
 						long Divid;
 						if (NumberLength <= 2) {
 							Divid = (biR1 << 31) | biR0;
-							for (index = 1; index < NbrPrimes; index++) {
+					for (int index = 1; index < NbrPrimes; index++) {
 								long Divisor = prime[index];
 								while (Divid % Divisor == 0) {
 									Divid /= Divisor;
@@ -2551,7 +2669,7 @@ public class EllipticCurveMethod {
 							}
 						} else {
 							Divid = 0;
-							for (index = 1; index < NbrPrimes; index++) {
+					for (int index = 1; index < NbrPrimes; index++) {
 								while (true) {
 									long Divisor = prime[index];
 									long Rem = 0;
@@ -2649,7 +2767,7 @@ public class EllipticCurveMethod {
 								} /* end while */
 							} /* end for */
 						}
-						F2 = NumberLength;
+				int F2 = NumberLength;
 						NumberLength = F;
 						if (F2 == 2 && Divid == 1) { // Smooth relation found.
 							if (positive == false) {
@@ -2657,8 +2775,8 @@ public class EllipticCurveMethod {
 																// factor.
 							}
 							/*
-							 * factor biT (backup) storing in BiR the square part
-							 */
+					 * factor biT (backup) storing in BiR the square part
+					 */
 							LongToBigNbr(1, biR);
 							while (RemDivBigNbrByLong(biT, 3 * 3) == 0) {
 								DivBigNbrByLong(biT, 3 * 3, biT);
@@ -2668,7 +2786,7 @@ public class EllipticCurveMethod {
 									MultBigNbrByLong(biR, 3, biR);
 								}
 							}
-							for (index = 5; index < 100; index += 4) {
+					for (int index = 5; index < 100; index += 4) {
 								while (RemDivBigNbrByLong(biT, index * index) == 0) {
 									DivBigNbrByLong(biT, index * index, biT);
 									if (RemDivBigNbrByLong(TestNbr, index) == 0) {
@@ -2689,9 +2807,9 @@ public class EllipticCurveMethod {
 							}
 							MultBigNbrByLong(biS, index2 - SieveLimit, biU);
 							AddBigNbr(biU, biN, biU);
-							for (index = 1; index < NbrPrimes; index++) {
+					for (int index = 1; index < NbrPrimes; index++) {
 								int expParity = 0;
-								D = prime[index];
+						long D = prime[index];
 								while (RemDivBigNbrByLong(biT, D) == 0) {
 									DivBigNbrByLong(biT, D, biT);
 									expParity = 1 - expParity;
@@ -2709,33 +2827,30 @@ public class EllipticCurveMethod {
 								}
 							}
 
-							if (InsertNewRelation(biR, biT, biU, nbrColumns, matrixB, rowMatrixB, pp,
-									vectLeftHandSide)) {
-								pp++;
+					if (InsertNewRelation(biR, biT, biU, nbrColumns, matrixB, rowMatrixB, pp[0], vectLeftHandSide)) {
+						pp[0]++;
 								// ShowSIQSStatus(pp, matrixB.length,
 								// startTime);
-								if (pp == matrixB.length) {
+						if (pp[0] == matrixB.length) {
 									int i = EraseSingletons(matrixB, vectLeftHandSide, vectExpParity);
 									if (i != 0) {
 
 										// System.out.println(SIQSInfoText +
 										// "\n" + i + " singletons discarded");
-										pp -= i;
+								pp[0] -= i;
 									} else {
 
 										/*
-										 * System.out.println(SIQSInfoText +
-										 * "\nSolving congruence matrix using Block Lanczos algorithm" );
-										 */
+								 * System.out.println(SIQSInfoText + "\nSolving congruence matrix using Block Lanczos algorithm" );
+								 */
 										if (LinearAlgebraPhase(NbrPrimes, matrixB, prime, biT, biR, biU, vectExpParity,
 												vectLeftHandSide, TestNbr2)) {
 											return BigIntToBigNbr(biT); /* Factor found */
 										} else {
 											/*
-											 * System.out.println(SIQSInfoText +
-											 * "\nLinear dependences were found. Discarding 50 congruences..." );
-											 */
-											pp -= 50; /* Factor not found */
+									 * System.out.println(SIQSInfoText + "\nLinear dependences were found. Discarding 50 congruences..." );
+									 */
+									pp[0] -= 50; /* Factor not found */
 										}
 									}
 								}
@@ -2758,7 +2873,7 @@ public class EllipticCurveMethod {
 								while (i >= 0) {
 									if ((int) Divid == matrixPartial[i][0]) {
 										// Match of partials.
-										for (index = 0; index < NumberLength; index++) {
+								for (int index = 0; index < NumberLength; index++) {
 											biV[index] = matrixPartial[i][index + 2];
 										}
 										MultBigNbr(biV, biV, biT);
@@ -2766,7 +2881,7 @@ public class EllipticCurveMethod {
 
 										/* factor biT */
 
-										D = matrixPartial[i][0];
+								long D = matrixPartial[i][0];
 										long E = RemDivBigNbrByLong(TestNbr, D);
 										long t1 = D;
 										long t2 = E;
@@ -2799,7 +2914,7 @@ public class EllipticCurveMethod {
 											}
 										}
 										nbrColumns = 0;
-										for (index = 1; index < NbrPrimes; index++) {
+								for (int index = 1; index < NbrPrimes; index++) {
 											D = prime[index];
 											int expParity = 0;
 											while (RemDivBigNbrByLong(biT, D) == 0) {
@@ -2839,7 +2954,7 @@ public class EllipticCurveMethod {
 												}
 											}
 										}
-										for (index = 1; index < NbrPrimes; index++) {
+								for (int index = 1; index < NbrPrimes; index++) {
 											int expParity = 0;
 											D = prime[index];
 											while (RemDivBigNbrByLong(biT, D) == 0) {
@@ -2858,14 +2973,15 @@ public class EllipticCurveMethod {
 											if (expParity != 0) {
 												// Check if the index is already
 												// in the row.
-												for (j = 0; j < nbrColumns; j++) {
-													if (index <= rowMatrixB[j]) {
+										int jj;
+										for (jj = 0; jj < nbrColumns; jj++) {
+											if (index <= rowMatrixB[jj]) {
 														break;
 													}
 												}
-												if (j < nbrColumns && index == rowMatrixB[j]) {
+										if (jj < nbrColumns && index == rowMatrixB[jj]) {
 													// Index already in row.
-													D = prime[rowMatrixB[j]];
+											D = prime[rowMatrixB[jj]];
 													NumberLength--;
 													MultBigNbrByLongModN(biR, D, biR);
 													NumberLength++;
@@ -2874,15 +2990,15 @@ public class EllipticCurveMethod {
 														AddBigNbrModN(biR, biU, biR);
 													}
 													// Delete entry from row.
-													for (int k = j + 1; k < nbrColumns; k++) {
+											for (int k = jj + 1; k < nbrColumns; k++) {
 														rowMatrixB[k - 1] = rowMatrixB[k];
 													}
 													nbrColumns--;
 												} else { // Index not in row => Insert entry in row.
-													for (int k = nbrColumns; k > j; k--) {
+											for (int k = nbrColumns; k > jj; k--) {
 														rowMatrixB[k] = rowMatrixB[k - 1];
 													}
-													rowMatrixB[j] = index;
+											rowMatrixB[jj] = index;
 													nbrColumns++;
 												}
 											}
@@ -2896,37 +3012,34 @@ public class EllipticCurveMethod {
 										NumberLength--;
 										MultBigNbrModN(biV, biW, biU);
 										NumberLength++;
-										if (InsertNewRelation(biR, biT, biU, nbrColumns, matrixB, rowMatrixB, pp,
+								if (InsertNewRelation(biR, biT, biU, nbrColumns, matrixB, rowMatrixB, pp[0],
 												vectLeftHandSide)) {
-											pp++;
+									pp[0]++;
 											// ShowSIQSStatus(pp,
 											// matrixB.length, startTime);
-											if (pp == matrixB.length) {
+									if (pp[0] == matrixB.length) {
 												i = EraseSingletons(matrixB, vectLeftHandSide, vectExpParity);
 												if (i != 0) {
 													// System.out.println(SIQSInfoText
 													// + "\n" + i + " singletons
 													// discarded");
-													pp -= i;
+											pp[0] -= i;
 												} else {
 													/*
-													 * System.out.println( SIQSInfoText +
-													 * "\nSolving congruence matrix using Block Lanczos algorithm" );
-													 */
+											 * System.out.println( SIQSInfoText + "\nSolving congruence matrix using Block Lanczos algorithm" );
+											 */
 													if (LinearAlgebraPhase(NbrPrimes, matrixB, prime, biT, biR, biU,
 															vectExpParity, vectLeftHandSide, TestNbr2)) {
 														return BigIntToBigNbr(biT); /*
-																					 * Factor found
-																					 */
+																			 * Factor found
+																			 */
 													} else {
 														/*
-														 * System.out.println( SIQSInfoText +
-														 * "\nLinear dependences were found. Discarding 50 congruences..."
-														 * );
-														 */
-														pp -= 50; /*
-																	 * Factor not found
-																	 */
+												 * System.out.println( SIQSInfoText + "\nLinear dependences were found. Discarding 50 congruences..." );
+												 */
+												pp[0] -= 50; /*
+																 * Factor not found
+																 */
 													}
 												}
 											}
@@ -2940,14 +3053,8 @@ public class EllipticCurveMethod {
 																// for same
 																// hash.
 								} /* end while */
-								if (i == -1 && nbrPartials < matrixPartial.length) { // No
-																						// match.
-																						// Add
-																						// partial
-																						// to
-																						// table
-																						// of
-																						// partials.
+						if (i == -1 && nbrPartials < matrixPartial.length) {
+							// No match. Add partial to table of partials.
 									if (prev >= 0) {
 										matrixPartial[prev][1] = nbrPartials;
 									} else {
@@ -2958,7 +3065,7 @@ public class EllipticCurveMethod {
 									matrixPartial[nbrPartials][1] = -1;
 									MultBigNbrByLong(biS, index2 - SieveLimit, biT);
 									AddBigNbr(biT, biN, biT); // biT = Ax+B
-									for (index = 0; index < NumberLength; index++) {
+							for (int index = 0; index < NumberLength; index++) {
 										matrixPartial[nbrPartials][index + 2] = (int) biT[index];
 									}
 									nbrPartials++;
@@ -2967,12 +3074,7 @@ public class EllipticCurveMethod {
 						}
 					}
 				} while (index2 > 0);
-				/*******************/
-				/* Next polynomial */
-				/*******************/
-				PolynomialIndex++;
-			} while (PolynomialIndex < NbrPolynomials);
-		} while (true);
+		return null;
 	}
 
 	public void factorize(Map<BigInteger, Integer> map) {
@@ -3601,8 +3703,7 @@ public class EllipticCurveMethod {
 	/**
 	 * Gcd calculation:
 	 * <ul>
-	 * <li>Step 1: Set k<-0, and then repeatedly set k<-k+1, u<-u/2, v<-v/2 zero or more times until u and v are not
-	 * both even.</li>
+	 * <li>Step 1: Set k<-0, and then repeatedly set k<-k+1, u<-u/2, v<-v/2 zero or more times until u and v are not both even.</li>
 	 * <li>Step 2: If u is odd, set t<-(-v) and go to step 4. Otherwise set t<-u.</li>
 	 * <li>Step 3: Set t<-t/2</li>
 	 * <li>Step 4: If t is even, go back to step 3.</li>

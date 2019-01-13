@@ -2144,8 +2144,8 @@ public class PolynomialFunctions {
 
 	}
 
-	public static IASTAppendable rootsOfExprPolynomial(final IExpr expr, IAST varList, boolean rootsOfQuartic) {
-		IASTAppendable result = F.NIL;
+	public static IASTMutable rootsOfExprPolynomial(final IExpr expr, IAST varList, boolean rootsOfQuartic) {
+		IASTMutable result = F.NIL;
 		try {
 			// try to generate a common expression polynomial
 			ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, varList);
@@ -2157,7 +2157,7 @@ public class PolynomialFunctions {
 			if (ePoly.degree(0) >= 3) {
 				result = unitPolynomial((int) ePoly.degree(0), ePoly);
 				if (result.isPresent()) {
-					result = QuarticSolver.createSet(result);
+					result = QuarticSolver.sortASTArguments(result);
 					return result;
 				}
 			}
@@ -2171,6 +2171,7 @@ public class PolynomialFunctions {
 						result.set(i, F.chopExpr(result.get(i), Config.DEFAULT_ROOTS_CHOP_DELTA));
 					}
 				}
+				result = QuarticSolver.sortASTArguments(result);
 				return result;
 			}
 		} catch (JASConversionException e2) {
@@ -2189,7 +2190,7 @@ public class PolynomialFunctions {
 	 * @return <code>F.NIL</code> if no evaluation was possible.
 	 */
 	private static IAST rootsOfQuadraticExprPolynomial(final IExpr expr, IAST varList) {
-		IASTAppendable result = F.NIL;
+		IASTMutable result = F.NIL;
 		try {
 			// try to generate a common expression polynomial
 			ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, varList);
@@ -2201,6 +2202,8 @@ public class PolynomialFunctions {
 					result.set(i, F.chopExpr(result.get(i), Config.DEFAULT_ROOTS_CHOP_DELTA));
 				}
 			}
+			result = QuarticSolver.sortASTArguments(result);
+			return result;
 		} catch (JASConversionException e2) {
 			if (Config.SHOW_STACKTRACE) {
 				e2.printStackTrace();
@@ -2254,7 +2257,7 @@ public class PolynomialFunctions {
 			}
 			IASTAppendable result = QuarticSolver.quarticSolve(a, b, c, d, e);
 			if (result.isPresent()) {
-				return QuarticSolver.createSet(result);
+				return (IASTAppendable)QuarticSolver.sortASTArguments(result);
 			}
 		}
 
@@ -2365,7 +2368,7 @@ public class PolynomialFunctions {
 			}
 			IASTAppendable result = QuarticSolver.quarticSolve(a, b, c, d, e);
 			if (result.isPresent()) {
-				result = QuarticSolver.createSet(result);
+				result = (IASTAppendable)QuarticSolver.sortASTArguments (result);
 				return result;
 			}
 
@@ -2385,7 +2388,7 @@ public class PolynomialFunctions {
 	 */
 	public static IAST rootsOfVariable(final IExpr expr, final IExpr denominator, final IAST variables,
 			boolean numericSolutions, EvalEngine engine) {
-		IASTAppendable result = F.NIL;
+		IASTMutable result = F.NIL;
 		// ASTRange r = new ASTRange(variables, 1);
 		// List<IExpr> varList = r;
 		List<IExpr> varList = variables.copyTo();
@@ -2403,7 +2406,7 @@ public class PolynomialFunctions {
 				return result;
 			}
 			// }
-			result = F.ListAlloc(8);
+			IASTAppendable newResult = F.ListAlloc(8);
 			IAST factorRational = Algebra.factorRational(polyRat, jas, varList, F.List);
 			for (int i = 1; i < factorRational.size(); i++) {
 				temp = F.evalExpand(factorRational.get(i));
@@ -2411,10 +2414,10 @@ public class PolynomialFunctions {
 				if (quarticResultList.isPresent()) {
 					for (int j = 1; j < quarticResultList.size(); j++) {
 						if (numericSolutions) {
-							result.append(F.chopExpr(engine.evalN(quarticResultList.get(j)),
+							newResult.append(F.chopExpr(engine.evalN(quarticResultList.get(j)),
 									Config.DEFAULT_ROOTS_CHOP_DELTA));
 						} else {
-							result.append(quarticResultList.get(j));
+							newResult.append(quarticResultList.get(j));
 						}
 					}
 				} else {
@@ -2426,10 +2429,10 @@ public class PolynomialFunctions {
 						if (quarticResultList.isPresent()) {
 							for (int j = 1; j < quarticResultList.size(); j++) {
 								if (numericSolutions) {
-									result.append(F.chopExpr(engine.evalN(quarticResultList.get(j)),
+									newResult.append(F.chopExpr(engine.evalN(quarticResultList.get(j)),
 											Config.DEFAULT_ROOTS_CHOP_DELTA));
 								} else {
-									result.append(quarticResultList.get(j));
+									newResult.append(quarticResultList.get(j));
 								}
 							}
 						} else {
@@ -2441,14 +2444,14 @@ public class PolynomialFunctions {
 							// IAST resultList = RootIntervals.croots(temp,
 							// true);
 							if (resultList.size() > 0) {
-								result.appendArgs(resultList);
+								newResult.appendArgs(resultList);
 							}
 						}
 					}
 				}
 			}
-			result = QuarticSolver.createSet(result);
-			return result;
+			newResult = QuarticSolver.createSet(newResult);
+			return newResult;
 		} catch (RuntimeException rex) {
 			// JAS may throw RuntimeExceptions
 			result = rootsOfExprPolynomial(expr, variables, true);
@@ -2458,10 +2461,15 @@ public class PolynomialFunctions {
 				// eliminate roots from the result list, which occur in the
 				// denominator
 				int i = 1;
+				IASTAppendable appendable=F.NIL;
 				while (i < result.size()) {
 					IExpr temp = denominator.replaceAll(F.Rule(variables.arg1(), result.get(i)));
 					if (temp.isPresent() && engine.evaluate(temp).isZero()) {
-						result.remove(i);
+						if (!appendable.isPresent()) {
+							appendable=result.removeAtClone(i);
+							continue;
+						}
+						appendable.remove(i);
 						continue;
 					}
 					i++;

@@ -15,6 +15,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.polynomials.QuarticSolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -477,6 +478,7 @@ public class NSolve extends AbstractFunctionEvaluator {
 	 * Evaluate the roots of a univariate polynomial with the Roots[] function.
 	 * 
 	 * @param exprAnalyzer
+	 * @param fListOfVariables
 	 * @return
 	 */
 	private static IAST rootsOfUnivariatePolynomial(ExprAnalyzer exprAnalyzer, EvalEngine engine) {
@@ -493,7 +495,7 @@ public class NSolve extends AbstractFunctionEvaluator {
 						IAST rule = F.Rule(sym, root);
 						resultList.append(rule);
 					}
-					return resultList;
+					return QuarticSolver.sortASTArguments(resultList);
 				}
 				return F.NIL;
 			}
