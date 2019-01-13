@@ -13,6 +13,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.Matcher;
 
 import static org.matheclipse.core.expression.F.Beta;
+import static org.matheclipse.core.expression.F.Binomial;
 import static org.matheclipse.core.expression.F.ChebyshevT;
 import static org.matheclipse.core.expression.F.ChebyshevU;
 import static org.matheclipse.core.expression.F.Factorial;
@@ -20,6 +21,7 @@ import static org.matheclipse.core.expression.F.a;
 import static org.matheclipse.core.expression.F.a_;
 import static org.matheclipse.core.expression.F.b;
 import static org.matheclipse.core.expression.F.b_;
+import static org.matheclipse.core.expression.F.c;
 import static org.matheclipse.core.expression.F.k;
 import static org.matheclipse.core.expression.F.m;
 import static org.matheclipse.core.expression.F.m_;
@@ -70,6 +72,21 @@ public class FunctionExpand extends AbstractEvaluator {
 								F.Product(F.Power(F.Plus(k, b), -1), F.List(k, F.C0, F.Plus(F.CN1, a)))),
 						F.And(F.IntegerQ(a), F.Greater(a, F.C0)))); // $$);
 
+		MATCHER.caseOf(Binomial(a_, b_), //
+				// [$ If(IntegerQ(b)&&Positive(b),Product(a-c,{c,0,b-1})/b!, If(IntegerQ(a)&&Positive(a),
+				// (a!*Sin(b*Pi))/(Product(b-c,{c,0,a})*Pi), Gamma(1 + a)/(Gamma(1 + b)*Gamma(1 - b + a))) ) $]
+				F.If(F.And(F.IntegerQ(b), F.Positive(b)),
+						F.Times(F.Power(F.Factorial(b), -1), F.Product(F.Plus(a, F.Negate(c)),
+								F.List(c, F.C0, F.Plus(F.CN1, b)))),
+						F.If(F.And(F.IntegerQ(a), F
+								.Positive(a)), F
+										.Times(F.Power(
+												F.Times(F.Product(F.Plus(b, F.Negate(c)), F.List(c, F.C0, a)),
+														F.Pi),
+												-1), F.Factorial(a), F.Sin(F.Times(b, F.Pi))),
+								F.Times(F.Gamma(F.Plus(F.C1, a)), F.Power(
+										F.Times(F.Gamma(F.Plus(F.C1, b)), F.Gamma(F.Plus(F.C1, F.Negate(b), a))),
+										-1))))); // $$);
 		// CatalanNumber
 		MATCHER.caseOf(F.CatalanNumber(n_), //
 				// [$ (2^(2*n)*Gamma(1/2 + n))/(Sqrt(Pi)*Gamma(2 + n)) $]
