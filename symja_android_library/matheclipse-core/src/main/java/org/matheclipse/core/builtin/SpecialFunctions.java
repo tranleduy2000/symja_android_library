@@ -378,7 +378,7 @@ public class SpecialFunctions {
 			}
 			if (a.isZero()) {
 				return F.C0;
-			} else if (a.equals(F.C1D2)) {
+			} else if (a.isNumEqualRational(F.C1D2)) {
 				// Erfc(Sqrt(z))
 				return F.Erfc(F.Sqrt(z));
 			} else if (a.isOne()) {
@@ -1299,18 +1299,18 @@ public class SpecialFunctions {
 						nInt *= -1;
 						// Zeta(s, -n) := Zeta(s) + Sum(1/k^s, {k, 1, n})
 						return Plus(F.sum(new Function<IExpr, IExpr>() {
-							@Override
-							public IExpr apply(IExpr k) {
-								return Power(Power(k, s), -1);
+                            @Override
+                            public IExpr apply(IExpr k) {
+                                return Power(Power(k, s), -1);
+                            }
+                        }, 1, nInt), Zeta(s));
 							}
-						}, 1, nInt), Zeta(s));
 					}
 				}
-			}
-			if (a.equals(C2)) {
+			if (a.isNumEqualRational(C2)) {
 				return Plus(CN1, Zeta(s));
 			}
-			if (a.equals(C1D2)) {
+			if (a.isNumEqualRational(C1D2)) {
 				return Times(Plus(CN1, Sqr(s)), Zeta(s));
 			}
 			return NIL;
