@@ -26,7 +26,6 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbolImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
-import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 import org.matheclipse.core.patternmatching.PatternMatcherEquals;
 import org.matheclipse.core.patternmatching.RulesData;
@@ -793,11 +792,11 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 
 	/** {@inheritDoc} */
 	@Override
-	public final PatternMatcher putDownRule(final PatternMatcherAndInvoker pmEvaluator) {
+	public final IPatternMatcher putDownRule(final PatternMatcherAndInvoker pmEvaluator) {
 		if (fRulesData == null) {
 			fRulesData = new RulesData(EvalEngine.get().getContext());
 		}
-		return fRulesData.putDownRule(pmEvaluator);
+		return fRulesData.insertMatcher(pmEvaluator);
 	}
 
 	public IExpr evalMessage(EvalEngine engine, String messageName) {

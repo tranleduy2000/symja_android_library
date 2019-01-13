@@ -24,7 +24,6 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbolImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
-import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 import org.matheclipse.core.patternmatching.PatternMatcherEquals;
 import org.matheclipse.core.patternmatching.RulesData;
@@ -828,11 +827,21 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public final PatternMatcher putDownRule(final PatternMatcherAndInvoker pmEvaluator) {
+    public final IPatternMatcher putDownRule(final PatternMatcherAndInvoker pmEvaluator) {
         if (fRulesData == null) {
             fRulesData = new RulesData(EvalEngine.get().getContext());
         }
-        return fRulesData.putDownRule(pmEvaluator);
+        return fRulesData.insertMatcher(pmEvaluator);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IPatternMatcher putDownRule(final int setSymbol, final boolean equalRule,
+                                             final IExpr leftHandSide, final IExpr rightHandSide, boolean packageMode) {
+        return putDownRule(setSymbol, equalRule, leftHandSide, rightHandSide, PatternMap.DEFAULT_RULE_PRIORITY,
+                packageMode);
     }
 
     public IExpr evalMessage(EvalEngine engine, String messageName) {
@@ -845,6 +854,60 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return F.NIL;
     }
 
+    public void putMessage(final int setSymbol, String messageName, IStringX message) {
+        if (fRulesData == null) {
+            fRulesData = new RulesData(EvalEngine.get().getContext());
+        }
+        fRulesData.getMessages().put(messageName, message);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IPatternMatcher putDownRule(final int setSymbol, final boolean equalRule,
+                                             final IExpr leftHandSide, final IExpr rightHandSide, final int priority, boolean packageMode) {
+        EvalEngine engine = EvalEngine.get();
+        if (!packageMode) {
+            if (isLocked(packageMode)) {
+                throw new RuleCreationError(leftHandSide);
+            }
+            engine.addModifiedVariable(this);
+        }
+        if (fRulesData == null) {
+            fRulesData = new RulesData(engine.getContext());
+        }
+        return fRulesData.putDownRule(setSymbol, equalRule, leftHandSide, rightHandSide, priority);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IPatternMatcher putUpRule(final int setSymbol, boolean equalRule, IAST leftHandSide,
+                                           IExpr rightHandSide) {
+        return putUpRule(setSymbol, equalRule, leftHandSide, rightHandSide, PatternMap.DEFAULT_RULE_PRIORITY);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IPatternMatcher putUpRule(final int setSymbol, final boolean equalRule,
+                                           final IAST leftHandSide, final IExpr rightHandSide, final int priority) {
+        EvalEngine engine = EvalEngine.get();
+        if (!engine.isPackageMode()) {
+            if (isLocked(false)) {
+                throw new RuleCreationError(leftHandSide);
+            }
+
+            engine.addModifiedVariable(this);
+        }
+        if (fRulesData == null) {
+            fRulesData = new RulesData(engine.getContext());
+        }
+        return fRulesData.putUpRule(setSymbol, equalRule, leftHandSide, rightHandSide);
+    }
     /**
      * {@inheritDoc}
      */
@@ -859,6 +922,17 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
     }
 
+    // public Object readResolve() throws ObjectStreamException {
+    // ISymbol sym = fContext.get(fSymbolName);
+    // if (sym != null) {
+    // return sym;
+    // }
+    // // probably user defined
+    // Symbol symbol = new Symbol(fSymbolName, fContext);
+    // fContext.put(fSymbolName, symbol);
+    // symbol.fAttributes = fAttributes;
+    // return symbol;
+    // }
     /**
      * {@inheritDoc}
      */
@@ -901,6 +975,25 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
                 + " has no value! Reassignment with a new value is not possible");
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final boolean removeRule(final int setSymbol, final boolean equalRule, final IExpr leftHandSide,
+                                    boolean packageMode) {
+        if (!packageMode) {
+            if (isLocked(packageMode)) {
+                throw new RuleCreationError(leftHandSide);
+            }
+
+            EvalEngine.get().addModifiedVariable(this);
+        }
+        if (fRulesData != null) {
+            return fRulesData.removeRule(setSymbol, equalRule, leftHandSide);
+
+        }
+        return false;
+    }
     /**
      * {@inheritDoc}
      */
@@ -952,17 +1045,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
     }
 
-    // public Object readResolve() throws ObjectStreamException {
-    // ISymbol sym = fContext.get(fSymbolName);
-    // if (sym != null) {
-    // return sym;
-    // }
-    // // probably user defined
-    // Symbol symbol = new Symbol(fSymbolName, fContext);
-    // fContext.put(fSymbolName, symbol);
-    // symbol.fAttributes = fAttributes;
-    // return symbol;
-    // }
 
     /**
      * {@inheritDoc}
@@ -1050,70 +1132,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return "$s(\"" + fSymbolName + "\")";
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final IPatternMatcher putDownRule(final int setSymbol, final boolean equalRule,
-                                             final IExpr leftHandSide, final IExpr rightHandSide, boolean packageMode) {
-        return putDownRule(setSymbol, equalRule, leftHandSide, rightHandSide, PatternMap.DEFAULT_RULE_PRIORITY,
-                packageMode);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final IPatternMatcher putDownRule(final int setSymbol, final boolean equalRule,
-                                             final IExpr leftHandSide, final IExpr rightHandSide, final int priority, boolean packageMode) {
-        EvalEngine engine = EvalEngine.get();
-        if (!packageMode) {
-            if (isLocked(packageMode)) {
-                throw new RuleCreationError(leftHandSide);
-            }
-            engine.addModifiedVariable(this);
-        }
-        if (fRulesData == null) {
-            fRulesData = new RulesData(engine.getContext());
-        }
-        return fRulesData.putDownRule(setSymbol, equalRule, leftHandSide, rightHandSide, priority);
-    }
-
-    public void putMessage(final int setSymbol, String messageName, IStringX message) {
-        if (fRulesData == null) {
-            fRulesData = new RulesData(EvalEngine.get().getContext());
-        }
-        fRulesData.getMessages().put(messageName, message);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final IPatternMatcher putUpRule(final int setSymbol, boolean equalRule, IAST leftHandSide,
-                                           IExpr rightHandSide) {
-        return putUpRule(setSymbol, equalRule, leftHandSide, rightHandSide, PatternMap.DEFAULT_RULE_PRIORITY);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final IPatternMatcher putUpRule(final int setSymbol, final boolean equalRule,
-                                           final IAST leftHandSide, final IExpr rightHandSide, final int priority) {
-        EvalEngine engine = EvalEngine.get();
-        if (!engine.isPackageMode()) {
-            if (isLocked(false)) {
-                throw new RuleCreationError(leftHandSide);
-            }
-
-            engine.addModifiedVariable(this);
-        }
-        if (fRulesData == null) {
-            fRulesData = new RulesData(engine.getContext());
-        }
-        return fRulesData.putUpRule(setSymbol, equalRule, leftHandSide, rightHandSide);
-    }
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         fSymbolName = stream.readUTF();
@@ -1175,25 +1193,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final boolean removeRule(final int setSymbol, final boolean equalRule, final IExpr leftHandSide,
-                                    boolean packageMode) {
-        if (!packageMode) {
-            if (isLocked(packageMode)) {
-                throw new RuleCreationError(leftHandSide);
-            }
-
-            EvalEngine.get().addModifiedVariable(this);
-        }
-        if (fRulesData != null) {
-            return fRulesData.removeRule(setSymbol, equalRule, leftHandSide);
-
-        }
-        return false;
-    }
 
 
     private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
