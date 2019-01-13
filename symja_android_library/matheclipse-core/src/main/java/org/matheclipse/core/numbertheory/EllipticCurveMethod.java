@@ -22,8 +22,8 @@ import java.util.Map;
  * </p>
  *
  * <p>
- * See <a href="https://en.wikipedia.org/wiki/Lenstra_elliptic_curve_factorization"> Wikipedia: Lenstra elliptic curve factorization
- * </a>
+ * See <a href="https://en.wikipedia.org/wiki/Lenstra_elliptic_curve_factorization"> Wikipedia: Lenstra elliptic curve
+ * factorization </a>
  * </p>
  */
 public class EllipticCurveMethod {
@@ -368,9 +368,9 @@ public class EllipticCurveMethod {
 	}
 
 	/**
-	 * Adds Q=(x2:z2) and R=(x1:z1) and puts the result in (x3:z3), using 5/6 mul, 6 add/sub and 6 mod. One assumes that Q-R=P or R-Q=P
-	 * where P=(x:z). Uses the following global variables: - n : number to factor - x, z : coordinates of P - u, v, w : auxiliary
-	 * variables Modifies: x3, z3, u, v, w. (x3,z3) may be identical to (x2,z2) and to (x,z)
+	 * Adds Q=(x2:z2) and R=(x1:z1) and puts the result in (x3:z3), using 5/6 mul, 6 add/sub and 6 mod. One assumes that
+	 * Q-R=P or R-Q=P where P=(x:z). Uses the following global variables: - n : number to factor - x, z : coordinates of
+	 * P - u, v, w : auxiliary variables Modifies: x3, z3, u, v, w. (x3,z3) may be identical to (x2,z2) and to (x,z)
 	 */
 	private void add3(long[] x3, long[] z3, long[] x2, long[] z2, long[] x1, long[] z1, long[] x, long[] z) {
 		long[] t = fieldTX;
@@ -556,8 +556,8 @@ public class EllipticCurveMethod {
 						}
 						if (Computing3Squares == false) {
 							/*
-							 * System.out.println( primalityString + "P = " + P + ",  Q = " + Q + "  (" + (i * (TestingQs + 1) + j) * 100 / (NP * (TestingQs +
-							 * 1)) + "%)");
+							 * System.out.println( primalityString + "P = " + P + ",  Q = " + Q + "  (" + (i *
+							 * (TestingQs + 1) + j) * 100 / (NP * (TestingQs + 1)) + "%)");
 							 */
 						}
 						PM = 1;
@@ -1852,8 +1852,8 @@ public class EllipticCurveMethod {
 	}
 
 	/*
-	 * computes 2P=(x2:z2) from P=(x1:z1), with 5 mul, 4 add/sub, 5 mod. Uses the following global variables: - n : number to factor - b
-	 * : (a+2)/4 mod n - u, v, w : auxiliary variables Modifies: x2, z2, u, v, w
+	 * computes 2P=(x2:z2) from P=(x1:z1), with 5 mul, 4 add/sub, 5 mod. Uses the following global variables: - n :
+	 * number to factor - b : (a+2)/4 mod n - u, v, w : auxiliary variables Modifies: x2, z2, u, v, w
 	 */
 	private void duplicate(long[] x2, long[] z2, long[] x1, long[] z1) {
 		long[] u = fieldUZ;
@@ -1902,6 +1902,12 @@ public class EllipticCurveMethod {
 		return delta;
 	}
 
+	/**
+	 * See: <a href="https://en.wikipedia.org/wiki/Quadratic_sieve">Wikipedia - Quadratic sieve</a>
+	 *
+	 * @param NbrToFactor
+	 * @return
+	 */
 	private BigInteger factoringSIQS(BigInteger NbrToFactor) {
 		int NbrPrimes2;
 		long modsqrt[];
@@ -2841,14 +2847,16 @@ public class EllipticCurveMethod {
 									} else {
 
 										/*
-								 * System.out.println(SIQSInfoText + "\nSolving congruence matrix using Block Lanczos algorithm" );
+								 * System.out.println(SIQSInfoText +
+								 * "\nSolving congruence matrix using Block Lanczos algorithm" );
 								 */
 										if (LinearAlgebraPhase(NbrPrimes, matrixB, prime, biT, biR, biU, vectExpParity,
 												vectLeftHandSide, TestNbr2)) {
 											return BigIntToBigNbr(biT); /* Factor found */
 										} else {
 											/*
-									 * System.out.println(SIQSInfoText + "\nLinear dependences were found. Discarding 50 congruences..." );
+									 * System.out.println(SIQSInfoText +
+									 * "\nLinear dependences were found. Discarding 50 congruences..." );
 									 */
 									pp[0] -= 50; /* Factor not found */
 										}
@@ -3026,7 +3034,8 @@ public class EllipticCurveMethod {
 											pp[0] -= i;
 												} else {
 													/*
-											 * System.out.println( SIQSInfoText + "\nSolving congruence matrix using Block Lanczos algorithm" );
+											 * System.out.println( SIQSInfoText +
+											 * "\nSolving congruence matrix using Block Lanczos algorithm" );
 											 */
 													if (LinearAlgebraPhase(NbrPrimes, matrixB, prime, biT, biR, biU,
 															vectExpParity, vectLeftHandSide, TestNbr2)) {
@@ -3035,7 +3044,8 @@ public class EllipticCurveMethod {
 																			 */
 													} else {
 														/*
-												 * System.out.println( SIQSInfoText + "\nLinear dependences were found. Discarding 50 congruences..." );
+												 * System.out.println( SIQSInfoText +
+												 * "\nLinear dependences were found. Discarding 50 congruences..." );
 												 */
 												pp[0] -= 50; /*
 																 * Factor not found
@@ -3703,7 +3713,8 @@ public class EllipticCurveMethod {
 	/**
 	 * Gcd calculation:
 	 * <ul>
-	 * <li>Step 1: Set k<-0, and then repeatedly set k<-k+1, u<-u/2, v<-v/2 zero or more times until u and v are not both even.</li>
+	 * <li>Step 1: Set k<-0, and then repeatedly set k<-k+1, u<-u/2, v<-v/2 zero or more times until u and v are not
+	 * both even.</li>
 	 * <li>Step 2: If u is odd, set t<-(-v) and go to step 4. Otherwise set t<-u.</li>
 	 * <li>Step 3: Set t<-t/2</li>
 	 * <li>Step 4: If t is even, go back to step 3.</li>
