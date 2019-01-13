@@ -1,7 +1,10 @@
 package org.matheclipse.core.system;
 
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.patternmatching.PatternMatcher;
+import org.matheclipse.core.patternmatching.RulesData;
 
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.a;
@@ -12,8 +15,7 @@ import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
 
 /**
- * Tests for the Java port of the
- * <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
+ * Tests for the Java port of the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
  * 
  */
 public class PatternsTest extends AbstractTestCase {
@@ -52,4 +54,10 @@ public class PatternsTest extends AbstractTestCase {
 
 	}
 	
+	public void testComplicatedPatternRule() {
+		IExpr expr = F.Integrate(F.unary(F.unary(F.Derivative(F.n_), F.f_), F.x_), F.x_Symbol);
+		assertEquals("Integrate[Derivative[n_][f_][x_],x_Symbol]", expr.toString());
+		boolean isComplicated = RulesData.isComplicatedPatternRule(expr);
+		assertTrue(isComplicated);
+	}
 }

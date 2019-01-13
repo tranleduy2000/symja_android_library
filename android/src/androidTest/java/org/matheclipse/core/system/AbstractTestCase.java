@@ -81,14 +81,16 @@ public abstract class AbstractTestCase extends TestCase {
         return result[0];
     }
 
-    public void evalString(String evalString) {
+    public String evalString(String evalString) {
         try {
             // scriptEngine.put("STEPWISE",Boolean.TRUE);
             String evaledResult = (String) fScriptEngine.eval(evalString);
+            return evaledResult;
         } catch (Exception e) {
             e.printStackTrace();
             assertEquals("", "1");
         }
+        return "";
     }
 
     public void checkNumeric(String evalString, String expectedResult) {

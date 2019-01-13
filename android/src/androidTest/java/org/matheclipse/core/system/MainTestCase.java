@@ -13,7 +13,7 @@ import java.io.StringWriter;
 import javax.script.ScriptEngine;
 
 /**
- * Tests system.reflMainTestCaseection classes
+ * Tests system.reflection classes
  */
 public class MainTestCase extends AbstractTestCase {
 
@@ -687,7 +687,8 @@ public class MainTestCase extends AbstractTestCase {
 
         check("D(Cosh(x),x)", "Sinh(x)"); // issue#39
         check("D(x^4, x)", "4*x^3");
-        check("D((-x+2)/(2*x-6), x)", "(-2*(2-x))/(6-2*x)^2+1/(6-2*x)");
+		check("D((-x+2)/(2*x-6), x)", //
+				"(-2*(2-x))/(6-2*x)^2-1/(-6+2*x)");
         check("D((2*x-6)^(-1), x)", "-2/(6-2*x)^2");
 
         // (-x+2)*(2*x-6)^(-2)*2
@@ -699,18 +700,17 @@ public class MainTestCase extends AbstractTestCase {
 
         check("D(f(x)/g(x), x)", "f'(x)/g(x)+(-f(x)*g'(x))/g(x)^2");
 
-        check("Trace(D(Sin(x),x))", "{{{D(x,x),1},1*Cos(x),Cos(x)},Cos(x)}");
+		check("Trace(D(Sin(x),x))", "{{NotListQ(x),True},{{D(x,x),1},1*Cos(x),Cos(x)},Cos(x)}");
         check("D(Sin(x)^Cos(x),x)", "(Cos(x)*Cot(x)-Log(Sin(x))*Sin(x))*Sin(x)^Cos(x)");
         check("Trace(D(Sin(x)^Cos(x),x))",
 				"{{{IntegerQ(#1)&&#1<0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}},Sin(x)^Cos(x)*(D(Cos(x),x)*Log(Sin(x))+(Cos(x)*D(Sin(x),x))/Sin(x)),{{IntegerQ(#1)&&#1<\n" +
-				"0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}},{{{{{D(x,x),\n" +
-				"1},(-1)*1*Sin(x),-Sin(x)},-Sin(x)},Log(Sin(x))*-Sin(x),-Log(Sin(x))*Sin(x)},{{{{D(x,x),\n" +
+				"0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}},{{{{NotListQ(x),True},{{D(x,x),\n" +
+				"1},(-1)*1*Sin(x),-Sin(x)},-Sin(x)},Log(Sin(x))*-Sin(x),-Log(Sin(x))*Sin(x)},{{{NotListQ(x),True},{{D(x,x),\n" +
 				"1},1*Cos(x),Cos(x)},Cos(x)},{{IntegerQ(#1)&&#1<0&[-1],IntegerQ(-1)&&-1<0,{IntegerQ(\n" +
 				"-1),True},{-1<0,True},True},{{(-1)*(-1),1},Csc(x)^1,{IntegerQ(#1)&&#1<0&[1],IntegerQ(\n" +
 				"1)&&1<0,{IntegerQ(1),True},{1<0,False},False},Csc(x)},Csc(x)},Cos(x)*Cos(x)*Csc(x),Cot(x)^\n" +
 				"1*Cos(x),{{IntegerQ(#1)&&#1<0&[1],IntegerQ(1)&&1<0,{IntegerQ(1),True},{1<0,False},False},Cot(x)},Cos(x)*Cot(x)},Cos(x)*Cot(x)-Log(Sin(x))*Sin(x)},(Cos(x)*Cot(x)-Log(Sin(x))*Sin(x))*Sin(x)^Cos(x),{{IntegerQ(#1)&&#1<\n" +
-				"0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}},{{-Cos(x)*Cot(x),-Cos(x)*Cot(x)},{--Log(Sin(x))*Sin(x),(\n" +
-				"-1)*(-1)*Log(Sin(x))*Sin(x),Log(Sin(x))*Sin(x)},-Cos(x)*Cot(x)+Log(Sin(x))*Sin(x)}}");
+				"0&[Cos(x)],IntegerQ(Cos(x))&&Cos(x)<0,{IntegerQ(Cos(x)),False},False}}}");
     }
 
     public void testSystem039() {
@@ -879,7 +879,7 @@ public class MainTestCase extends AbstractTestCase {
         check("SetAttributes($ooi, {Orderless, OneIdentity})", "");
         check("$ooi(z,d,a,b,g)", "$ooi(a,b,d,g,z)");
         check("$ooi(9,12,3,33)", "$ooi(3,9,12,33)");
-        check("$ooi(x_NumberQ,y_):={x,y}", "");
+		check("$ooi(x_?NumberQ,y_):={x,y}", "");
         check("$ooi(a,10)", "{10,a}");
     }
 
@@ -986,9 +986,9 @@ public class MainTestCase extends AbstractTestCase {
 
     public void testSystem081() {
         check("Inverse(s*{{1,0,0},{0,1,0},{0,0,1}}-{{-1,1,1},{-4,-4,1},{1,1,1}})",
-				"{{(5-3*s-s^2)/(10-s-4*s^2-s^3),s/(-10+s+4*s^2+s^3),(5+s)/(-10+s+4*s^2+s^3)},\n" +
-				" {(5-4*s)/(-10+s+4*s^2+s^3),(2-s^2)/(10-s-4*s^2-s^3),(-3+s)/(-10+s+4*s^2+s^3)},\n" +
-				" {-s/(10-s-4*s^2-s^3),(-2-s)/(10-s-4*s^2-s^3),(8+5*s+s^2)/(-10+s+4*s^2+s^3)}}");
+				"{{(5-3*s-s^2)/(10-s-4*s^2-s^3),s/(-10+s+4*s^2+s^3),(5+s)/(-10+s+4*s^2+s^3)},\n"
+						+ " {(5-4*s)/(-10+s+4*s^2+s^3),(2-s^2)/(10-s-4*s^2-s^3),(-3+s)/(-10+s+4*s^2+s^3)},\n"
+						+ " {-s/(10-s-4*s^2-s^3),(-2-s)/(10-s-4*s^2-s^3),(8+5*s+s^2)/(-10+s+4*s^2+s^3)}}");
         check("N(Inverse({{1,2.0},{3,4}}),50)", "{{-2,1},\n" + " {1.5,-5e-1}}");
 
         check("Inverse({{1,2},{3,4}})", "{{-2,1},\n" + " {3/2,-1/2}}");
@@ -1137,16 +1137,18 @@ public class MainTestCase extends AbstractTestCase {
         // "LUBackSubstitution({{{1,2,3},{3,-2,2},{13,19/2,-50}},{1,2,3},0},{10,11,12})"
         // ,
         // "{-11/4,33/4,-5/4}");
-        check("SingularValueDecomposition({{ 24.0/25.0, 43.0/25.0 },{57.0/25.0, 24.0/25.0 }})",
-                "{\n" + "{{0.6000000000000001,0.8},\n" + " {0.8,-0.6000000000000001}},\n"
-                        + "{{3.0000000000000004,0.0},\n" + " {0.0,1.0000000000000004}},\n"
-                        + "{{0.7999999999999999,-0.6000000000000001},\n"
-                        + " {0.6000000000000001,0.7999999999999999}}}");
+		check("SingularValueDecomposition({{ 24.0/25.0, 43.0/25.0 },{57.0/25.0, 24.0/25.0 }})",//
+				"{{{0.6,0.8},\n" +
+				" {0.8,-0.6}},{{3.0,0.0},\n" +
+				" {0.0,1.0}},{{0.8,-0.6},\n" +
+				" {0.6,0.8}}}");
 
         // See http://issues.apache.org/jira/browse/MATH-320:
-        check("SingularValueDecomposition({{1,2},{1,2}})", "{\n" + "{{-0.7071067811865475,-0.7071067811865475},\n"
-                + " {-0.7071067811865475,0.7071067811865476}},\n" + "{{3.162277660168379,0.0},\n" + " {0.0,0.0}},\n"
-                + "{{-0.447213595499958,-0.8944271909999159},\n" + " {-0.8944271909999159,0.447213595499958}}}");
+		check("SingularValueDecomposition({{1,2},{1,2}})",//
+				"{{{-0.707107,-0.707107},\n" +
+				" {-0.707107,0.707107}},{{3.16228,0.0},\n" +
+				" {0.0,0.0}},{{-0.447214,-0.894427},\n" +
+				" {-0.894427,0.447214}}}");
     }
 
     public void testSystem104() {
@@ -1553,10 +1555,10 @@ public class MainTestCase extends AbstractTestCase {
 				"True");
 		check("Rubi`PolyQ((2+2*x)/(2*Sqrt(2)),x)", //
 				"True");
-//		check("Rubi`PolyQ(2+2 *x,x,1)", //
-//				"True");
-//		check("Rubi`PolyQ(-(ArcTan((1+x)/Sqrt(2))/(2 Sqrt(2))),x )", //
-//				"True");
+		// check("Rubi`PolyQ(2+2 *x,x,1)", //
+		// "True");
+		// check("Rubi`PolyQ(-(ArcTan((1+x)/Sqrt(2))/(2 Sqrt(2))),x )", //
+		// "True");
 		check("Rubi`substaux(-ArcTan(x/(2*Sqrt(2)))/(2*Sqrt(2)),x,2+2*x,True)", //
 				"-ArcTan((1+x)/Sqrt(2))/(2*Sqrt(2))");
 		check("Integrate((x^2+2*x+3)^(-1),x)", //
@@ -1566,7 +1568,7 @@ public class MainTestCase extends AbstractTestCase {
         check("Integrate(Log(x)*x^2,x)", //
                 "-x^3/9+1/3*x^3*Log(x)");
         check("Integrate((x^2+1)*Log(x),x)", //
-				"-(3*x+x^3/3)/3+1/3*(3*x+x^3)*Log(x)");
+				"1/3*(-3*x-x^3/3)+1/3*(3*x+x^3)*Log(x)");
         check("Simplify(D(ArcTan((2*x-1)*3^(-1/2))*3^(-1/2)+1/6*Log(x^2-x+1)-1/3*Log(x+1),x))", "x/(1+x^3)");
 
 		check("Integrate(x/(x^3+1),x)", //
@@ -1593,7 +1595,7 @@ public class MainTestCase extends AbstractTestCase {
 				"-(5+2*x)/(1+x+x^2)");
 
 		check("Apart(1/(x^3+1))", //
-				"1/(3+3*x)-(-2+x)/(3-3*x+3*x^2)");
+				"1/(3*(1+x))+(2-x)/(3*(1-x+x^2))");
 		check("Integrate(1/(x^5+x-7),x)", //
 				"Integrate(1/(-7+x+x^5),x)");
 		check("Integrate(1/(x-2),x)", //
@@ -1603,12 +1605,14 @@ public class MainTestCase extends AbstractTestCase {
 		check("Integrate(1/(x^2+1),x)", //
 				"ArcTan(x)");
 		check("Integrate((2*x+5)/(x^2-2*x+5),x)", //
-				"-7/2*ArcTan(1/2*(1-x))+Log(5-2*x+x^2)");
+				"7/2*ArcTan(1/2*(-1+x))+Log(5-2*x+x^2)");
 		check("Integrate((8*x+1)/(x^2+2*x+1),x)", //
 				"7/(1+x)+8*Log(1+x)");
     }
 
     public void testSystem171b() {
+		// check("D(2*E^x-Gamma(3,-x),x)", //
+		// "2*E^x-E^x*x^2");
 		check("Integrate(1/(x^3+1),x)", //
 				"Log(1+x)/3-Log(1-x+x^2)/6");
         // check("Simplify(Integrate(1/3*(2-x)*(x^2-x+1)^(-1),x))",
@@ -1620,12 +1624,12 @@ public class MainTestCase extends AbstractTestCase {
         check("D(2*E^x-Gamma(3,-x),x)", //
 				"2*E^x-E^x*x^2");
         check("Integrate((x^2+1)*Log(x),x)", //
-				"-(3*x+x^3/3)/3+1/3*(3*x+x^3)*Log(x)");
+				"1/3*(-3*x-x^3/3)+1/3*(3*x+x^3)*Log(x)");
 		check("D(-x-Gamma(2,-3*Log(x))/9+x*Log(x),x)", //
 				"Log(x)+x^2*Log(x)");
 
 		check("Apart(2*x^2/(x^3+1))", //
-				"2/(3+3*x)+(2*(-1+2*x))/(3-3*x+3*x^2)");
+				"2/3*1/(1+x)+2/3*(-1+2*x)/(1-x+x^2)");
 
 		check("Integrate(2*x^2/(x^3+1),x)", //
 				"2/3*Log(1+x^3)");
@@ -1685,21 +1689,26 @@ public class MainTestCase extends AbstractTestCase {
 
     }
 
+	// public void testSystem171c() {
+	// check("Integrate(ArcCoth(x^16)^2,x)", //
+	// "1");
+	// }
     public void testSystem172() {
-		check("Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))",
+		check("Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))", //
 				"Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))");
 		check("Integrate(Cos(a*x)*Sin(b*x),x)", //
 				"Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))");
 		check("Integrate(Cos(a*x)*Sin(b*x),x)", //
 				"Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))");
-        check("Csc(b*x)^0", "1");
+		check("Csc(b*x)^0", //
+				"1");
         check("Integrate(Cos(x*(a+b)),x)", //
                 "Sin((a+b)*x)/(a+b)");
-        check("Integrate(Cos(a*x)*Sin(b*x)^2,x)",
+		check("Integrate(Cos(a*x)*Sin(b*x)^2,x)", //
                 "Sin(a*x)/(2*a)-Sin((a-2*b)*x)/(4*(a-2*b))-Sin((a+2*b)*x)/(4*(a+2*b))");
-        check("Integrate(Cos(a*x)^2*Sin(b*x),x)",
+		check("Integrate(Cos(a*x)^2*Sin(b*x),x)", //
                 "Cos((2*a-b)*x)/(4*(2*a-b))-Cos(b*x)/(2*b)-Cos((2*a+b)*x)/(4*(2*a+b))");
-        check("Integrate(Cos(b*x)^2*Sin(a*x)^2,x)",
+		check("Integrate(Cos(b*x)^2*Sin(a*x)^2,x)", //
                 "x/4-Sin(2*a*x)/(8*a)-Sin(2*(a-b)*x)/(16*(a-b))+Sin(2*b*x)/(8*b)-Sin(2*(a+b)*x)/(\n" + "16*(a+b))");
     }
 
@@ -2790,7 +2799,8 @@ public class MainTestCase extends AbstractTestCase {
     public void testSystem390() {
         check("Apply((1 + 1/#) &, 10)", "11/10");
         check("FixedPoint((1 + 1/#) &, 10, 3)", "32/21");
-        checkNumeric("FixedPoint((Cos(#))&,0.8)", "0.7390851332151607");
+        //j2objc changed: use DOUBLE_TOLERANCE to compare double values
+        checkNumeric("FixedPoint((Cos(#))&,0.8)", "0.7390851332151603");
     }
 
     public void testSystem391() {
@@ -3148,10 +3158,10 @@ public class MainTestCase extends AbstractTestCase {
         check("MatchQ(a+b+c+d, HoldPattern(Times(_,_)))", "False");
 
         check("MatchQ(I, Complex(0,x_))", "True");
-        check("MatchQ(Sin(x)^3, Sin(a_.*x_)^n_IntegerQ)", "True");
+		check("MatchQ(Sin(x)^3, Sin(a_.*x_)^n_?IntegerQ)", "True");
         check("MatchQ(powered(h,h), powered(x_ ^ a_., x_))", "True");
         check("MatchQ(powered(h^3,h), powered(x_ ^ a_., x_))", "True");
-        check("MatchQ(42, _IntegerQ)", "True");
+		check("MatchQ(42, _?IntegerQ)", "True");
         check("MatchQ(a+b+c+d, HoldPattern(Times(_,_)))", "False");
         check("MatchQ(a+b+c+d, HoldPattern(Plus(_,_)))", "True");
         check("MatchQ(Expand((a+b)^2), HoldPattern(Plus(_,_)))", "True");
@@ -3200,7 +3210,7 @@ public class MainTestCase extends AbstractTestCase {
 		check("Integrate(1/(x^3 + 1), x)", //
 				"Log(1+x)/3-Log(1-x+x^2)/6");
 		check("D(1/3*(-3*ArcTan((2*x+1)*3^(-1/2))*3^(-1/2)-1/2*Log(x^2-x+1))+1/3*Log(x+1), x)", //
-                "1/(3*(1+x))+1/3*(-(-1+2*x)/(2*(1-x+x^2))+2/(-1-(1+2*x)^2/3))");
+				"1/(3*(1+x))+1/3*((1-2*x)/(2*(1-x+x^2))-2/(1+(1+2*x)^2/3))");
 		check("Simplify(D(Integrate(1/(x^3 + 1), x), x))", //
 				"(1-x)/(2*(1+x^3))");
         // check("Apart((1+(1/x))/(1+(2/x)))","");
@@ -3209,6 +3219,8 @@ public class MainTestCase extends AbstractTestCase {
     }
 
     public void testSystem805() {
+		check("Solve(4*x^(-2)-1==0,x)", //
+				"{{x->-2},{x->2}}");
         check("Solve(x^2==a^2,x)", "{{x->-a},{x->a}}");
         check("Solve((x^2-1)/(x-1)==0,x)", "{{x->-1}}");
 
@@ -3263,7 +3275,7 @@ public class MainTestCase extends AbstractTestCase {
 
         check("Solve({x+y==1, x-y==0}, {x,y})", "{{x->1/2,y->1/2}}");
         check("Solve(x*(-0.006*x^2.0+1.0)^2.0-0.1*x==7.217,x)",
-				"{{x->5.56906+I*(-5.00025)},{x->5.56906+I*5.00025},{x->-14.04698+I*3.70768},{x->-14.04698+I*(-3.70768)},{x->16.95586+I*(-1.35525*10^-14)}}");
+				"{{x->-14.04698+I*(-3.70768)},{x->-14.04698+I*3.70768},{x->5.56906+I*(-5.00025)},{x->5.56906+I*5.00025},{x->16.95586+I*(-1.35525*10^-14)}}");
 
         checkNumeric("CoefficientList(x*(-0.006*x^2.0+1.0)^2.0-0.1*x-7.217,x)", "{-7.217,0.9,0,-0.012,0,3.6E-5}");
 
@@ -3273,13 +3285,16 @@ public class MainTestCase extends AbstractTestCase {
         checkNumeric("NSolve(x*(x^2+1)^2==7,x)",
                 "{{x->1.1927223989709494},{x->-0.9784917834108953+I*(-1.038932735856145)},{x->-0.9784917834108953+I*1.038932735856145},{x->0.38213058392542043+I*(-1.6538990550344321)},{x->0.38213058392542043+I*1.6538990550344321}}");
         check("Solve(x^2==a^2,x)", "{{x->-a},{x->a}}");
-        check("Solve(4*x^(-2)-1==0,x)", "{{x->-2},{x->2}}");
-        check("Solve((x^2-1)/(x-1)==0,x)", "{{x->-1}}");
+		check("Solve(4*x^(-2)-1==0,x)", //
+				"{{x->-2},{x->2}}");
+		check("Solve((x^2-1)/(x-1)==0,x)", //
+				"{{x->-1}}");
 
         check("Solve(x+5==a,x)", "{{x->-5+a}}");
         check("Solve(x+5==10,x)", "{{x->5}}");
         check("Solve(x^2==a,x)", "{{x->-Sqrt(a)},{x->Sqrt(a)}}");
-        check("Solve(x^2+b*c*x+3==0, x)", "{{x->-1/2*b*c-Sqrt(-12+b^2*c^2)/2},{x->-1/2*b*c+Sqrt(-12+b^2*c^2)/2}}");
+		check("Solve(x^2+b*c*x+3==0, x)", //
+				"{{x->1/2*(-b*c-Sqrt(-12+b^2*c^2))},{x->1/2*(-b*c+Sqrt(-12+b^2*c^2))}}");
         check("Solve({x+2*y==10,3*x+y==20},{x,y})", "{{x->6,y->2}}");
         check("Solve(x^2==0,{x,y,z})", "{{x->0}}");
         check("Solve(x^2==0,x)", "{{x->0}}");
@@ -3289,9 +3304,9 @@ public class MainTestCase extends AbstractTestCase {
         check("Solve({x^2==4,x+y^2==6},{x,y})",
                 "{{x->-2,y->-2*Sqrt(2)},{x->-2,y->2*Sqrt(2)},{x->2,y->-2},{x->2,y->2}}");
         check("Solve({x^2==4,x+y^2==6,x+y^2+z^2==24},{x,y,z})",
-                "{{x->-2,y->-2*Sqrt(2),z->-3*Sqrt(2)},{x->-2,y->2*Sqrt(2),z->-3*Sqrt(2)},{x->-2,y->\n"
-                        + "-2*Sqrt(2),z->3*Sqrt(2)},{x->-2,y->2*Sqrt(2),z->3*Sqrt(2)},{x->2,y->-2,z->-3*Sqrt(\n"
-                        + "2)},{x->2,y->2,z->-3*Sqrt(2)},{x->2,y->-2,z->3*Sqrt(2)},{x->2,y->2,z->3*Sqrt(2)}}");
+				"{{x->-2,y->-2*Sqrt(2),z->-3*Sqrt(2)},{x->-2,y->-2*Sqrt(2),z->3*Sqrt(2)},{x->-2,y->\n"
+						+ "2*Sqrt(2),z->-3*Sqrt(2)},{x->-2,y->2*Sqrt(2),z->3*Sqrt(2)},{x->2,y->-2,z->-3*Sqrt(\n"
+						+ "2)},{x->2,y->-2,z->3*Sqrt(2)},{x->2,y->2,z->-3*Sqrt(2)},{x->2,y->2,z->3*Sqrt(2)}}");
     }
 
     public void testSystem806() {
@@ -3338,7 +3353,8 @@ public class MainTestCase extends AbstractTestCase {
 
         check("PolynomialGCD(2*x^5-2*x,(x^2-1)^2)", "-1+x^2");
         check("PolynomialGCD(2*x^5-2*x,(x^2-1)^2,Modulus->2)", "(1+x)^4");
-        check("PolynomialExtendedGCD(2*x^5-2*x,(x^2-1)^2,x)", "{-1+x^2,{x/4,-1-x^2/2}}");
+		check("PolynomialExtendedGCD(2*x^5-2*x,(x^2-1)^2,x)", //
+				"{-1+x^2,{x/4,1/2*(-2-x^2)}}");
         check("PolynomialExtendedGCD(2*x^5-2*x,(x^2-1)^2,x, Modulus->2)", "{1+x^4,{0,1}}");
 
         check("ExpandAll((1+x)^2*(7+x)*(11+x)*(17+x))", "1309+3001*x+2110*x^2+454*x^3+37*x^4+x^5");
@@ -3346,16 +3362,6 @@ public class MainTestCase extends AbstractTestCase {
         check("PolynomialLCM((1+x)^2*(7+x)*(17+x),(1+x)*(7+x)*(11+x), Modulus->31)", "(7+x)*(11+x)*(17+x)*(1+x)^2");
     }
 
-    public void testSystem995() {
-        check("Apart(1/((1 + x)*(5 + x)))", "1/(4+4*x)+1/(-20-4*x)");
-        check("Apart((x)/(x^2-1))", "1/(-2+2*x)+1/(2+2*x)");
-        check("Apart((x+3)/(x^2-3*x-40))", "11/(-104+13*x)+2/(65+13*x)");
-        check("Apart((10*x^2+12*x+20)/(x^3-8))", "7/(-2+x)+(4+3*x)/(4+2*x+x^2)");
-        check("Apart((3*x+5)*(1-2*x)^(-2))", "13/8*1/(1/2-x)^2+3/(-2+4*x)");
-        check("Apart((10*x^2+12*x+20)/(x^3-8))", "7/(-2+x)+(4+3*x)/(4+2*x+x^2)");
-        check("Apart((10*x^2-63*x+29)/((x+2)*(x+3)^5))",
-                "195/(2+x)-308/(3+x)^5-185/(3+x)^4-195/(3+x)^3-195/(3+x)^2+195/(-3-x)");
-    }
 
     public void testSystem996() {
         check("FactorTerms(3+3*x^3)", "3*(1+x^3)");
@@ -3404,13 +3410,17 @@ public class MainTestCase extends AbstractTestCase {
         // + "2-Sqrt(-I*6)/2||x==1/2+I*1/2+Sqrt(-I*6)/2");
 
         // check("Factor(1+x^2,GaussianIntegers->True)", "");
-        check("-5/2+I*1/2*Sqrt(15)", "-5/2+I*1/2*Sqrt(15)");
-        check("Roots(Expand((x-1)^3)==0, x)", "x==1");
-        check("-1/2*(-I*3^(1/2)+1)", "-(1-I*Sqrt(3))/2");
+		check("-5/2+I*1/2*Sqrt(15)", //
+				"-5/2+I*1/2*Sqrt(15)");
+		check("Roots(Expand((x-1)^3)==0, x)",//
+				"x==1");
+		check("-1/2*(-I*3^(1/2)+1)", //
+				"1/2*(-1+I*Sqrt(3))");
         check("Roots(x^3-3*x-2==0, x)", "x==-1||x==2");
 
         check("Roots((x^2-1)/(x-1)==0, x)", "x==-1");
-        check("Roots(3/4*x^2+9/16==0, x)", "x==-I*1/2*Sqrt(3)||x==I*1/2*Sqrt(3)");
+		check("Roots(3/4*x^2+9/16==0, x)", //
+				"x==I*1/2*Sqrt(3)||x==-I*1/2*Sqrt(3)");
 
         check("Factor(3*x^2+6)", "3*(2+x^2)");
         check("Factor(3/4*x^2+9/16)", "3/16*(3+4*x^2)");
@@ -3424,9 +3434,12 @@ public class MainTestCase extends AbstractTestCase {
         // "x==-1-I||x==-1+I||x==1/2-I*1/2-Sqrt(I*6)/2||x==1/2-I*1/2+Sqrt(I*6)/2||x==1/2+I*1/\n"
         // + "2-Sqrt(-I*6)/2||x==1/2+I*1/2+Sqrt(-I*6)/2");
 
-        check("Roots(x^2 + 5*x + 10==0, x)", "x==-5/2-I*1/2*Sqrt(15)||x==-5/2+I*1/2*Sqrt(15)");
-        check("Roots(4+x^2+2*x+3*x^3==0, x)", "x==-1||x==1/3-I*1/3*Sqrt(11)||x==1/3+I*1/3*Sqrt(11)");
-        check("Roots(x^3-4*x^2+x+6==0, x)", "x==-1||x==2||x==3");
+		check("Roots(x^2 + 5*x + 10==0, x)", //
+				"x==1/2*(-5-I*Sqrt(15))||x==1/2*(-5+I*Sqrt(15))");
+		check("Roots(4+x^2+2*x+3*x^3==0, x)", //
+				"x==-1||x==1/3-I*1/3*Sqrt(11)||x==1/3+I*1/3*Sqrt(11)");
+		check("Roots(x^3-4*x^2+x+6==0, x)", //
+				"x==-1||x==2||x==3");
         // check("Roots(x^3+4*x^2+x+2)",
         // "{(-1/3)*((1/2)^(1/3)*(12*87^(1/2)+146)^(1/3)+(1/2)^(1/3)*(-12*87^(1/2)+146)^(1/3)+\n"
         // +
@@ -3439,32 +3452,51 @@ public class MainTestCase extends AbstractTestCase {
         checkNumeric("N({1/2*(I*15^(1/2)-5),1/2*(-I*15^(1/2)-5)})",
                 "{-2.5+I*1.9364916731037085,-2.5+I*(-1.9364916731037085)}");
 
-        check("Roots(x^6-1==0, x)", "x==-1||x==1||x==-(-1)^(1/3)||x==(-1)^(1/3)||x==-(-1)^(2/3)||x==(-1)^(2/3)");
+		check("Roots(x^6-1==0, x)", //
+				"x==(-1)^(2/3)||x==-(-1)^(2/3)||x==(-1)^(1/3)||x==-(-1)^(1/3)||x==-1||x==1");
 
-        check("Factor(x^5 - x^3 - x^2 + 1)", "(1-x)^2*(1+x)*(1+x+x^2)");
-        check("FactorSquareFree(x^5 - x^3 - x^2 + 1)", "(1-x)^2*(1+2*x+2*x^2+x^3)");
-        check("SquareFreeQ(x^5 - x^3 - x^2 + 1)", "False");
-        check("SquareFreeQ(12.0)", "False");
+		check("Factor(x^5 - x^3 - x^2 + 1)", //
+				"(1-x)^2*(1+x)*(1+x+x^2)");
+		check("FactorSquareFree(x^5 - x^3 - x^2 + 1)", //
+				"(1-x)^2*(1+2*x+2*x^2+x^3)");
+		check("SquareFreeQ(x^5 - x^3 - x^2 + 1)", //
+				"False");
+		check("SquareFreeQ(12.0)", //
+				"False");
 
-        check("Factor(4+x^2+2*x+3*x^3)", "(1+x)*(4-2*x+3*x^2)");
-        check("Factor( Expand((x^3+4*x^2+3*x+2)*(x^3+4*x^2+x+2)))", "(2+x+4*x^2+x^3)*(2+3*x+4*x^2+x^3)");
-        check("Factor(4+8*x+19*x^2+20*x^3+20*x^4+8*x^5+x^6)", "(2+x+4*x^2+x^3)*(2+3*x+4*x^2+x^3)");
-        check("Factor(Expand((x-1)^3))", "(-1+x)^3");
-        check("Factor(x^6-1)", "(-1+x)*(1+x)*(1-x+x^2)*(1+x+x^2)");
+		check("Factor(4+x^2+2*x+3*x^3)", //
+				"(1+x)*(4-2*x+3*x^2)");
+		check("Factor( Expand((x^3+4*x^2+3*x+2)*(x^3+4*x^2+x+2)))", //
+				"(2+x+4*x^2+x^3)*(2+3*x+4*x^2+x^3)");
+		check("Factor(4+8*x+19*x^2+20*x^3+20*x^4+8*x^5+x^6)", //
+				"(2+x+4*x^2+x^3)*(2+3*x+4*x^2+x^3)");
+		check("Factor(Expand((x-1)^3))", //
+				"(-1+x)^3");
+		check("Factor(x^6-1)", //
+				"(-1+x)*(1+x)*(1-x+x^2)*(1+x+x^2)");
 
-        check("Expand((y+x)*(-y+x)*(y^4+x*y^3+x^2*y^2+x^3*y+x^4)*(y^4-x*y^3+x^2*y^2-x^3*y+x^4))", "x^10-y^10");
-        check("Factor(x^10-y^10)", "(x-y)*(x+y)*(x^4+x^3*y+x^2*y^2+x*y^3+y^4)*(x^4-x^3*y+x^2*y^2-x*y^3+y^4)");
+		check("Expand((y+x)*(-y+x)*(y^4+x*y^3+x^2*y^2+x^3*y+x^4)*(y^4-x*y^3+x^2*y^2-x^3*y+x^4))", //
+				"x^10-y^10");
+		check("Factor(x^10-y^10)", //
+				"(x-y)*(x+y)*(x^4+x^3*y+x^2*y^2+x*y^3+y^4)*(x^4-x^3*y+x^2*y^2-x*y^3+y^4)");
 
-        check("Expand((-1+x)*(1+x)*(1+x+x^2)*(1-x+x^2))", "-1+x^6");
+		check("Expand((-1+x)*(1+x)*(1+x+x^2)*(1-x+x^2))", //
+				"-1+x^6");
 
-        check("Factor(x^5+x^4+x+1)", "(1+x)*(1+x^4)");
+		check("Factor(x^5+x^4+x+1)", //
+				"(1+x)*(1+x^4)");
 
-        check("Factor(-1+x^16)", "(-1+x)*(1+x)*(1+x^2)*(1+x^4)*(1+x^8)");
-        check("Expand((-1+x)*(1+x)*(1+x^2)*(1+x^4)*(1+x^8))", "-1+x^16");
+		check("Factor(-1+x^16)", //
+				"(-1+x)*(1+x)*(1+x^2)*(1+x^4)*(1+x^8)");
+		check("Expand((-1+x)*(1+x)*(1+x^2)*(1+x^4)*(1+x^8))", //
+				"-1+x^16");
 
-        check("Factor(5+x^12,Modulus->7)", "(2+x^3)*(5+x^3)*(4+x^6)");
-        check("Factor(1+x^10,Modulus->2)", "(1+x)^2*(1+x+x^2+x^3+x^4)^2");// "(1+x)^2*(1+x+x^2+x^3+x^4)^2");
-        check("Factor(1+x^4, Extension->I)", "(-I+x^2)*(I+x^2)");
+		check("Factor(5+x^12,Modulus->7)", //
+				"(2+x^3)*(5+x^3)*(4+x^6)");
+		check("Factor(1+x^10,Modulus->2)", //
+				"(1+x)^2*(1+x+x^2+x^3+x^4)^2");// "(1+x)^2*(1+x+x^2+x^3+x^4)^2");
+		check("Factor(1+x^4, Extension->I)", //
+				"(-I+x^2)*(I+x^2)");
     }
 
     public void testSystem1000() {
@@ -3570,13 +3602,13 @@ public class MainTestCase extends AbstractTestCase {
                         + "{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },\n"
                         + "{ 56.0,  4.0, 24.0, 56.0, 78.0, 0.0, 13.0, 0.0, 24.0, 57.0, 8.0, 1.0 },\n"
 				+ "{ 0.0, 0.0, 46.0, 666.0, 34.0, 13.0, 67.0, 9.0, 12.0, 45.0, 38.0, 0.0 }})", //
-				"{{1.0,0.0,0.0,0.0,0.0,0.0,2.10208,0.880296,1.20494,2.02695,0.0532847,-0.0238165},\n" +
-				" {0.0,1.0,0.0,0.0,0.0,0.0,15.92647,11.96727,11.32597,8.52651,4.08647,-0.243999},\n" +
-				" {0.0,0.0,1.0,0.0,0.0,0.0,35.20901,22.34247,20.93462,20.96898,8.61046,-0.47866},\n" +
-				" {0.0,0.0,0.0,1.0,0.0,0.0,-0.273706,-0.238202,-0.880791,-0.17439,-0.130603,0.0150597},\n" +
-				" {0.0,0.0,0.0,0.0,1.0,0.0,-12.79629,-7.9493,-6.94727,-7.48852,-2.70086,0.1789},\n" +
-				" {0.0,0.0,0.0,0.0,0.0,1.0,-71.94246,-45.37189,-9.85987,-42.21689,-13.79002,0.454309},\n" +
-				" {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}}");
+				"{{1.0,0.0,0.0,0.0,0.0,0.0,2.10208,0.880296,1.20494,2.02695,0.0532847,-0.0238165},\n"
+						+ " {0.0,1.0,0.0,0.0,0.0,0.0,15.92647,11.96727,11.32597,8.52651,4.08647,-0.243999},\n"
+						+ " {0.0,0.0,1.0,0.0,0.0,0.0,35.20901,22.34247,20.93462,20.96898,8.61046,-0.47866},\n"
+						+ " {0.0,0.0,0.0,1.0,0.0,0.0,-0.273706,-0.238202,-0.880791,-0.17439,-0.130603,0.0150597},\n"
+						+ " {0.0,0.0,0.0,0.0,1.0,0.0,-12.79629,-7.9493,-6.94727,-7.48852,-2.70086,0.1789},\n"
+						+ " {0.0,0.0,0.0,0.0,0.0,1.0,-71.94246,-45.37189,-9.85987,-42.21689,-13.79002,0.454309},\n"
+						+ " {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}}");
 
         check("RowReduce({{ 0, 0, 0, 0 }})", "{{0,0,0,0}}");
         check("RowReduce({{ 0.0, 1.0, 0.0, 0.0 }})", "{{0.0,1.0,0.0,0.0}}");
@@ -3588,9 +3620,8 @@ public class MainTestCase extends AbstractTestCase {
 
         check("RowReduce({{ 5.0, 7.0, 10.0, 3.0, 5.0, 8.0 },\n" + "{ 5.0, 2.0, 3.0, 10.0, 11.0, 9.0 },\n"
                         + "{ 4.0, 3.0, 9.0, 12.0, 8.0, 9.0 }})",
-				"{{1.0,0.0,0.0,2.50862,2.67241,1.86207},\n" +
-				" {0.0,1.0,0.0,-3.19828,-1.46552,-0.827586},\n" +
-				" {0.0,0.0,1.0,1.28448,0.189655,0.448276}}");
+				"{{1.0,0.0,0.0,2.50862,2.67241,1.86207},\n" + " {0.0,1.0,0.0,-3.19828,-1.46552,-0.827586},\n"
+						+ " {0.0,0.0,1.0,1.28448,0.189655,0.448276}}");
         check("RowReduce({{1,2,3},{4,5,6}})", "{{1,0,-1},\n" + " {0,1,2}}");
 
         check("RowReduce({{1,1,0,1,5},{1,0,0,2,2},{0,0,1,4,-1},{0,0,0,0,0}})",
@@ -3809,13 +3840,13 @@ public class MainTestCase extends AbstractTestCase {
         check("Simplify(1/(-3+x)-(2+x)/(3-x)^2)", "-5/(3-x)^2");
     }
 
-//	public void testOutputformats() {
-//		check("{6.7^-4, 6.7^6, 6.7^8}", //
-//				"{0.0005,90458.38217,4.06067678*10^6}");
-//		check("{8.^5, 11.^7, 13.^9}", //
-//				"{32768.0,1.94871710*10^7,1.06044994*10^10}");
+	// public void testOutputformats() {
+	// check("{6.7^-4, 6.7^6, 6.7^8}", //
+	// "{0.0005,90458.38217,4.06067678*10^6}");
+	// check("{8.^5, 11.^7, 13.^9}", //
+	// "{32768.0,1.94871710*10^7,1.06044994*10^10}");
 //
-//		checkNumeric("{6.7^-4, 6.7^6, 6.7^8}", //
-//				"{4.962503078612847E-4,90458.38216900002,4060676.7755664107}");
-//	}
+	// checkNumeric("{6.7^-4, 6.7^6, 6.7^8}", //
+	// "{4.962503078612847E-4,90458.38216900002,4060676.7755664107}");
+	// }
 }

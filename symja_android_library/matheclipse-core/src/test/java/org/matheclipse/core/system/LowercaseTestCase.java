@@ -3381,7 +3381,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("EllipticPi(0.4,0.6)", //
 				"2.59092");
 		check("EllipticPi(1/3, Pi/5, 0.3)", //
-				"0.659397");
+				"0.668735");
 		check("Table(EllipticPi(x,0.5), {x,-2.0, 2.0, 1/4})", //
 				"{1.0227,1.07184,1.12843,1.19454,1.27313,1.36859,1.48785,1.64253,1.85407,2.16762,2.70129,3.93061,ComplexInfinity,-0.592756,-0.45672,-0.371748,-0.313545}");
 
