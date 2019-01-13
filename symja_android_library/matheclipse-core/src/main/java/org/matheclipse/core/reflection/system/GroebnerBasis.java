@@ -20,7 +20,6 @@ import edu.jas.arith.BigRational;
 import edu.jas.gb.GroebnerBaseAbstract;
 import edu.jas.gbufd.GroebnerBasePartial;
 import edu.jas.poly.GenPolynomial;
-import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.OrderedPolynomialList;
 import edu.jas.poly.TermOrder;
@@ -102,7 +101,7 @@ public class GroebnerBasis extends AbstractFunctionEvaluator {
 				return F.NIL;
 			}
 			varList.add((ISymbol) listOfVariables.get(i));
-			pvars[i - 1] = listOfVariables.get(i).toString();
+			pvars[i - 1] = ((ISymbol) listOfVariables.get(i)).toString();
 		}
 
 		List<GenPolynomial<BigRational>> polyList = new ArrayList<GenPolynomial<BigRational>>(
@@ -145,7 +144,7 @@ public class GroebnerBasis extends AbstractFunctionEvaluator {
 	 * @return <code>F.NIL</code> if <code>stopUnevaluatedOnPolynomialConversionError==true</code> and one of the
 	 *         polynomials in <code>listOfPolynomials</code> are not convertible to JAS polynomials
 	 */
-	public static IAST solveGroebnerBasis(IAST listOfPolynomials, IAST listOfVariables) {
+	public static IASTAppendable solveGroebnerBasis(IAST listOfPolynomials, IAST listOfVariables) {
 		List<ISymbol> varList = new ArrayList<ISymbol>(listOfVariables.argSize());
 		for (int i = 1; i < listOfVariables.size(); i++) {
 			if (!listOfVariables.get(i).isSymbol()) {
@@ -174,17 +173,14 @@ public class GroebnerBasis extends AbstractFunctionEvaluator {
 		if (polyList.size() == 0) {
 			return F.NIL;
 		}
-		GenPolynomialRing<BigRational> polynomialRingFactory = jas.getPolynomialRingFactory();
 		GroebnerBaseAbstract<BigRational> engine = GBAlgorithmBuilder
-				.polynomialRing(polynomialRingFactory).fractionFree().syzygyPairlist().build();
+				.<BigRational>polynomialRing(jas.getPolynomialRingFactory()).fractionFree().syzygyPairlist().build();
 		List<GenPolynomial<BigRational>> opl = engine.GB(polyList);
 		IASTAppendable resultList = F.ListAlloc(opl.size()+rest.size());
 		// convert rational to integer coefficients and add
 		// polynomial to result list
 		for (GenPolynomial<BigRational> p : opl) {
-			Object[] objects = jas.factorTerms(p);
-			GenPolynomial<BigInteger> object = (GenPolynomial<BigInteger>) objects[2];
-			resultList.append(jas.integerPoly2Expr(object));
+			resultList.append(jas.integerPoly2Expr((GenPolynomial<BigInteger>) jas.factorTerms(p)[2]));
 		}
 		for (int i = 1; i < rest.size(); i++) {
 			resultList.append(rest.get(i));

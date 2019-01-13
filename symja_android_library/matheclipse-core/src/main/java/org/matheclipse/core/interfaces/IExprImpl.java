@@ -1936,6 +1936,19 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isSqrt() {
+        if (isPower() && second().equals(F.C1D2)) {
+            return true;
+        }
+        if (isTimes() && first().equals(F.CN1) && size() == 3) {
+            if (second().isPower() && second().second().equals(F.C1D2)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Return {@code true} if this expression unequals <code>F.NIL</code>, otherwise {@code false}. This method is
      * similar to <code>java.util.Optional#isPresent()</code>.
