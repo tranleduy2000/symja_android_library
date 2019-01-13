@@ -65,12 +65,14 @@ public class MMAConsole {
 	private static int COUNTER = 1;
 
 	/**
-	 * See: <a href="https://stackoverflow.com/a/20387039/24819">Printing out unicode from Java code issue in windows console</a>
+	 * See: <a href="https://stackoverflow.com/a/20387039/24819">Printing out unicode from Java code issue in windows
+	 * console</a>
 	 */
 	private static PrintWriter stdout = new PrintWriter(new OutputStreamWriter(System.out, Charset.forName("UTF-8")),
 			true);
 	/**
-	 * See: <a href="https://stackoverflow.com/a/20387039/24819">Printing out unicode from Java code issue in windows console</a>
+	 * See: <a href="https://stackoverflow.com/a/20387039/24819">Printing out unicode from Java code issue in windows
+	 * console</a>
 	 */
 	private static PrintWriter stderr = new PrintWriter(new OutputStreamWriter(System.err, Charset.forName("UTF-8")),
 			true);
@@ -131,7 +133,7 @@ public class MMAConsole {
 
 		while (true) {
 			try {
-				inputExpression = console.readString(stdout, "▶    ");
+				inputExpression = console.readString(stdout, ">> ");
 				if (inputExpression != null) {
 					trimmedInput = inputExpression.trim();
 					if (trimmedInput.length() >= 4 && trimmedInput.charAt(0) == '/') {
