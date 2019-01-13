@@ -25,6 +25,7 @@ public class Config {
 					+ ".----)   |       |  |     |  |  |  | |  `--'  |  /  _____  \\  \n"
 					+ "|_______/        |__|     |__|  |__|  \\______/  /__/     \\__\\ \n"
 					+ "                                                              \n";
+
 	/**
 	 * A global expression cache which compares keys with <code>==</code> object identity instead of
 	 * <code>equals()</code>. The keys and values are weak references.
@@ -150,6 +151,7 @@ public class Config {
 	 * The real which added to 1.0 gives the next double value greater than 1.0
 	 */
 	public static double MACHINE_EPSILON = Math.nextUp(1.0) - 1.0;
+
 	/**
 	 * Replace <code>double</code> values in root algorithms by 0 if they are below this tolerance.
 	 */
@@ -188,6 +190,11 @@ public class Config {
 	public static boolean JAS_NO_THREADS = false;
 
 	/**
+	 * Use of <code>java.misc.Unsafe</code> is allowed if <code>true</code>.
+	 */
+	public static boolean JAVA_UNSAFE = false;
+
+	/**
 	 * <p>
 	 * Flag for thread usage in TimeConstrained function.
 	 * </p>
@@ -207,6 +214,7 @@ public class Config {
 	 *
 	 */
 	public static java.util.concurrent.ThreadFactory THREAD_FACTORY = null;
+
 	/**
 	 * Use <code>Num</code> objects for numeric calculations up to 16 digits precision.
 	 */
@@ -227,6 +235,7 @@ public class Config {
 	 *
 	 */
 	public static boolean EXPENSIVE_JUNIT_TESTS = false;
+
 	/**
 	 * <p>
 	 * If <code>true</code> the <code>*</code> operator must be written for a <code>Times()</code> expression. I.e. you
@@ -259,8 +268,10 @@ public class Config {
 	 * </p>
 	 */
 	public static boolean DOMINANT_IMPLICIT_TIMES = false;
+
 	/**
 	 * Default package mode with which the EvalEngines initially can be started
 	 */
 	public static boolean PACKAGE_MODE = true;
+
 }

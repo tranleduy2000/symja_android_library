@@ -12,8 +12,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import edu.jas.structure.Element;
-
 /**
  * ExpVectorLong implements exponent vectors for polynomials using arrays of long as storage unit. This class is used by
  * ExpVectorLong internally, there is no need to use this class directly.
@@ -498,17 +496,20 @@ public final class ExpVectorLong {
 	 * @return string representation of the variables.
 	 * @see java.util.Arrays#toString()
 	 */
-	public static String varsToString(IAST vars) {
+	public static String varsToString(final IAST vars) {
 		if (vars == null) {
 			return "null";
 		}
-		StringBuilder s = new StringBuilder();
-		vars.forEach(vars.size(), (x, i) -> {
-                s.append(x);
-                if (i < vars.argSize()) {
-                    s.append(",");
-                }
-        });
+		final StringBuilder s = new StringBuilder();
+		vars.forEach(vars.size(), new ObjIntConsumer<IExpr>() {
+			@Override
+			public void accept(IExpr x, int i) {
+				s.append(x);
+				if (i < vars.argSize()) {
+					s.append(",");
+				}
+			}
+		});
 		return s.toString();
 	}
 
