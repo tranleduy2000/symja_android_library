@@ -699,10 +699,10 @@ public class MainTestCase extends AbstractTestCase {
     }
 
     public void testSystem040() {
-        checkNumeric("(-15.0)^.5", "I*3.872983346207417");
-        checkNumeric("(-15.0)^0.5", "I*3.872983346207417");
+		checkNumeric("(-15.0)^.5", "2.3715183290419594E-16+I*3.872983346207417");
+		checkNumeric("(-15.0)^0.5", "2.3715183290419594E-16+I*3.872983346207417");
         checkNumeric(".5^.5", "0.7071067811865476");
-        checkNumeric("N((-15)^(1/2))", "I*3.872983346207417");
+		checkNumeric("N((-15)^(1/2))", "2.3715183290419594E-16+I*3.872983346207417");
         checkNumeric("N(Sin(1/2))", "0.479425538604203");
         checkNumeric("N(1/6*(I*44^(1/2)+2))", "0.3333333333333333+I*1.1055415967851332");
         // test automatic numericMode (triggered by double value "0.5"):
@@ -1531,10 +1531,10 @@ public class MainTestCase extends AbstractTestCase {
                 "True");
 		check("Rubi`PolyQ((2+2*x)/(2*Sqrt(2)),x)", //
                 "True");
-//		check("Rubi`PolyQ(2+2 *x,x,1)", //
-//				"True");
-//		check("Rubi`PolyQ(-(ArcTan((1+x)/Sqrt(2))/(2 Sqrt(2))),x )", //
-//				"True");
+		// check("Rubi`PolyQ(2+2 *x,x,1)", //
+		// "True");
+		// check("Rubi`PolyQ(-(ArcTan((1+x)/Sqrt(2))/(2 Sqrt(2))),x )", //
+		// "True");
 		check("Rubi`substaux(-ArcTan(x/(2*Sqrt(2)))/(2*Sqrt(2)),x,2+2*x,True)", //
                 "-ArcTan((1+x)/Sqrt(2))/(2*Sqrt(2))");
         check("Integrate((x^2+2*x+3)^(-1),x)", //
@@ -3799,13 +3799,13 @@ public class MainTestCase extends AbstractTestCase {
         check("Simplify(1/(-3+x)-(2+x)/(3-x)^2)", "-5/(3-x)^2");
     }
 
-//	public void testOutputformats() {
-//		check("{6.7^-4, 6.7^6, 6.7^8}", //
-//				"{0.0005,90458.38217,4.06067678*10^6}");
-//		check("{8.^5, 11.^7, 13.^9}", //
-//				"{32768.0,1.94871710*10^7,1.06044994*10^10}");
-//		
-//		checkNumeric("{6.7^-4, 6.7^6, 6.7^8}", //
-//				"{4.962503078612847E-4,90458.38216900002,4060676.7755664107}");
-//	}
+	// public void testOutputformats() {
+	// check("{6.7^-4, 6.7^6, 6.7^8}", //
+	// "{0.0005,90458.38217,4.06067678*10^6}");
+	// check("{8.^5, 11.^7, 13.^9}", //
+	// "{32768.0,1.94871710*10^7,1.06044994*10^10}");
+	//
+	// checkNumeric("{6.7^-4, 6.7^6, 6.7^8}", //
+	// "{4.962503078612847E-4,90458.38216900002,4060676.7755664107}");
+	// }
 }

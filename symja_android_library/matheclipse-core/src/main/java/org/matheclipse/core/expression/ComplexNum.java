@@ -508,7 +508,8 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	@Override
 	public boolean isZero() {
-		return F.isZero(fComplex.getReal()) && F.isZero(fComplex.getImaginary());
+		return F.isZero(fComplex.getReal(), Config.DOUBLE_TOLERANCE) && //
+				F.isZero(fComplex.getImaginary(), Config.DOUBLE_TOLERANCE);
 	}
 
 	@Override
@@ -596,8 +597,8 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	@Override
 	public IComplexNum pow(final IComplexNum val) {
-		//j2objc changed: compare two double value with DOUBLE_EPSILON give false result although
-		//it same value
+		//j2objc changed: compare two double values with DOUBLE_EPSILON gives false result although
+		// it's same value
 		if (Complex.equals(fComplex, Complex.ZERO, Config.DOUBLE_TOLERANCE)) {
 			ISignedNumber sn = val.re();
 			if (sn.isNegative()) {

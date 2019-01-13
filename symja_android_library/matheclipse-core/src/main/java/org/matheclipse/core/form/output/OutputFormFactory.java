@@ -138,7 +138,7 @@ public class OutputFormFactory {
 	public void convertDouble(final Appendable buf, final INum d, final int precedence, boolean caller)
 			throws IOException {
 
-		if (d.isZero()) {
+		if (F.isZero(d.doubleValue(), Config.MACHINE_EPSILON)) {
 			convertDoubleString(buf, convertDoubleToFormattedString(0.0), precedence, false);
 			return;
 		}

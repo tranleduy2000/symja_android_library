@@ -173,12 +173,39 @@ public class F {
     /***/
     public final static IBuiltInSymbol $ContextPath = F.initFinalSymbol("$ContextPath", ID.$ContextPath);
 
+	/***/
+	public final static IBuiltInSymbol $CreationDate = F.initFinalSymbol("$CreationDate", ID.$CreationDate);
     /***/
     public final static IBuiltInSymbol $DisplayFunction = F.initFinalSymbol("$DisplayFunction", ID.$DisplayFunction);
 
+	/***/
+	public final static IBuiltInSymbol $HistoryLength = F.initFinalSymbol("$HistoryLength", ID.$HistoryLength);
+
+	/***/
+	public final static IBuiltInSymbol $IterationLimit = F.initFinalSymbol("$IterationLimit", ID.$IterationLimit);
+
+	/***/
+	public final static IBuiltInSymbol $Line = F.initFinalSymbol("$Line", ID.$Line);
+
+	/***/
+	public final static IBuiltInSymbol $MachineEpsilon = F.initFinalSymbol("$MachineEpsilon", ID.$MachineEpsilon);
+
+	/***/
+	public final static IBuiltInSymbol $MachinePrecision = F.initFinalSymbol("$MachinePrecision", ID.$MachinePrecision);
+
+	/***/
+	public final static IBuiltInSymbol $MaxMachineNumber = F.initFinalSymbol("$MaxMachineNumber", ID.$MaxMachineNumber);
+
+	/***/
+	public final static IBuiltInSymbol $MessageList = F.initFinalSymbol("$MessageList", ID.$MessageList);
+
+	/***/
+	public final static IBuiltInSymbol $MinMachineNumber = F.initFinalSymbol("$MinMachineNumber", ID.$MinMachineNumber);
     /***/
     public final static IBuiltInSymbol $PrePrint = F.initFinalSymbol("$PrePrint", ID.$PrePrint);
 
+	/***/
+	public final static IBuiltInSymbol $RecursionLimit = F.initFinalSymbol("$RecursionLimit", ID.$RecursionLimit);
     /***/
     public final static IBuiltInSymbol $Version = F.initFinalSymbol("$Version", ID.$Version);
 

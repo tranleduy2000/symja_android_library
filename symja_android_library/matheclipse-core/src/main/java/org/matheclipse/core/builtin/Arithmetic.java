@@ -2045,7 +2045,8 @@ public final class Arithmetic {
             try {
                 int numericPrecision = Config.MACHINE_PRECISION;
                 if (ast.isAST2()) {
-                    numericPrecision = Validate.checkIntType(ast.arg2());
+					IExpr arg2 = engine.evaluateNonNumeric(ast.arg2());
+					numericPrecision = Validate.checkIntType(arg2);
                 }
                 engine.setNumericMode(true, numericPrecision);
                 return engine.evalWithoutNumericReset(ast.arg1());
@@ -2057,7 +2058,6 @@ public final class Arithmetic {
 
         @Override
         public void setUp(final ISymbol newSymbol) {
-            newSymbol.setAttributes(ISymbol.HOLDALL);
         }
 
     }
