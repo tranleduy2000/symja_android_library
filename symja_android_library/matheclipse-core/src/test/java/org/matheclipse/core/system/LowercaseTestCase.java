@@ -453,14 +453,24 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcTan() {
-		check("ArcTan(1, 0)", "0");
-		check("ArcTan(1/2, 1/2)", "Pi/4");
-		check("ArcTan(0, 1)", "Pi/2");
-		check("ArcTan(-1/2, 1/2)", "3/4*Pi");
-		check("ArcTan(-1, 0)", "Pi");
-		check("ArcTan(-1/2, -1/2)", "-3/4*Pi");
-		check("ArcTan(0, -1)", "-Pi/2");
-		check("ArcTan(1/2, -1/2)", "-Pi/4");
+		check("ArcTan(Re(Sin(3+I*2)),Im(Sin(3+I*2)))", //
+				"ArcTan(Im(Sin(3+I*2))/Re(Sin(3+I*2)))");
+		check("ArcTan(1, 0)", //
+				"0");
+		check("ArcTan(1/2, 1/2)", //
+				"Pi/4");
+		check("ArcTan(0, 1)",//
+				"Pi/2");
+		check("ArcTan(-1/2, 1/2)", //
+				"3/4*Pi");
+		check("ArcTan(-1, 0)", //
+				"Pi");
+		check("ArcTan(-1/2, -1/2)", //
+				"-3/4*Pi");
+		check("ArcTan(0, -1)", //
+				"-Pi/2");
+		check("ArcTan(1/2, -1/2)", //
+				"-Pi/4");
 
 		check("ArcTan(Tan(-1/2))", //
 				"-1/2");

@@ -1,5 +1,7 @@
 package org.matheclipse.core.eval.interfaces;
 
+import com.duy.annotations.Nonnull;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.AST2;
@@ -11,6 +13,7 @@ import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -102,6 +105,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 			if (checkTimesPlus && expression.isTimes()) {
 				IAST timesAST = ((IAST) expression);
 				IExpr arg1 = timesAST.arg1();
+				// see github #110: checking for arg1.isNegative() will trigger infinite recursion!
 				if (arg1.isNumber()) {
 					if (((INumber) arg1).complexSign() < 0) {
 						IExpr negNum = ((INumber) arg1).negate();
@@ -112,9 +116,6 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 					}
 				} else if (arg1.isNegativeInfinity()) {
 					return timesAST.setAtClone(1, F.CInfinity);
-				} else if (arg1.isNegative()) {
-					IExpr negNum = arg1.negate();
-					return timesAST.setAtClone(1, negNum);
 				}
 			} else if (checkTimesPlus && expression.isPlus()) {
 				IAST plusAST = ((IAST) expression);
@@ -143,13 +144,14 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 						result.set(1, arg1Negated);
 						for (int i = 2; i < plusAST.size(); i++) {
 							IExpr temp = plusAST.get(i);
-//							 if (!temp.isTimes() && !temp.isPower()) {
-//							 return F.NIL;
-//							 }
-//							arg1Negated = getNormalizedNegativeExpression(temp, checkTimesPlus);
-//							if (arg1Negated.isPresent()) {
-//								result.set(i, arg1Negated);
-//							} else {
+							// if (!temp.isTimes() && !temp.isPower()) {
+							// return F.NIL;
+							// }
+
+							// arg1Negated = getNormalizedNegativeExpression(temp, checkTimesPlus);
+							// if (arg1Negated.isPresent()) {
+							// result.set(i, arg1Negated);
+							// } else {
 								// positiveElementsCounter++;
 								// if (positiveElementsCounter * 2 > plusAST.argSize()) {
 									// number of positive elements is greater
@@ -157,7 +159,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 								// return F.NIL;
 								// }
 								result.set(i, temp.negate());
-//							}
+							// }
 						}
 						return result;
 					}
@@ -424,9 +426,20 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 		return F.NIL;
 	}
 
+	/**
+	 * Create a rule which invokes the method name in this class instance.
+	 *
+	 * @param symbol
+	 * @param patternString
+	 * @param methodName
+	 */
+	public void createRuleFromMethod(ISymbol symbol, String patternString, String methodName) {
+		PatternMatcherAndInvoker pm = new PatternMatcherAndInvoker(patternString, this, methodName);
+		symbol.putDownRule(pm);
+	}
 	/** {@inheritDoc} */
 	@Override
-	abstract public IExpr evaluate(final IAST ast,  EvalEngine engine);
+	abstract public IExpr evaluate(final IAST ast, @Nonnull EvalEngine engine);
 
 	/**
 	 * Get the predefined rules for this function symbol.
