@@ -261,13 +261,6 @@ public class StatisticsFunctions {
 			if (b.isZero()) {
 				return b;
 			}
-			if (a.isOne() || b.isInfinity()) {
-				return F.CInfinity;
-			}
-			IExpr div = F.Divide.of(b, a);
-			if (div.equals(F.CSqrt2)) {
-				return F.Times(F.CSqrt2,F.a,F.Power(F.Pi,F.CN1D2),F.Sqr(F.Gamma(F.QQ(3L,4L))));
-			}
 			return F.NIL;
 		}
 
@@ -1487,6 +1480,30 @@ public class StatisticsFunctions {
 
 	}
 
+    /**
+     * <pre>
+     * <code>GumbelDistribution(a, b)
+     * </code>
+     * </pre>
+     *
+     * <blockquote>
+     * <p>
+     * returns a Gumbel distribution.
+     * </p>
+     * </blockquote>
+     * <p>
+     * See:
+     * </p>
+     * <ul>
+     * <li><a href="https://en.wikipedia.org/wiki/Gumbel_distribution">Wikipedia - Gumbel distribution</a></li>
+     * </ul>
+     * <h3>Related terms</h3>
+     * <p>
+     * <a href="CDF.md">CDF</a>, <a href="Mean.md">Mean</a>, <a href="Mean.md">Median</a>, <a href="PDF.md">PDF</a>,
+     * <a href="Quantile.md">Quantile</a>, <a href="StandardDeviation.md">StandardDeviation</a>,
+     * <a href="Variance.md">Variance</a>
+     * </p>
+     */
 	private final static class GumbelDistribution extends IDistributionFunctionImpl
 			implements ICDF, IDistribution, IPDF, IVariance, IRandomVariate {
 
@@ -1587,6 +1604,31 @@ public class StatisticsFunctions {
 
 	}
 
+    /**
+     * <pre>
+     * <code>HypergeometricDistribution(n, s, t)
+     * </code>
+     * </pre>
+     *
+     * <blockquote>
+     * <p>
+     * returns a hypergeometric distribution.
+     * </p>
+     * </blockquote>
+     * <p>
+     * See:
+     * </p>
+     * <ul>
+     * <li><a href="https://en.wikipedia.org/wiki/Hypergeometric_distribution">Wikipedia - Hypergeometric
+     * distribution</a></li>
+     * </ul>
+     * <h3>Related terms</h3>
+     * <p>
+     * <a href="CDF.md">CDF</a>, <a href="Mean.md">Mean</a>, <a href="Mean.md">Median</a>, <a href="PDF.md">PDF</a>,
+     * <a href="Quantile.md">Quantile</a>, <a href="StandardDeviation.md">StandardDeviation</a>,
+     * <a href="Variance.md">Variance</a>
+     * </p>
+     */
 	private final static class HypergeometricDistribution extends IDiscreteDistributionFunctionImpl
 			implements ICDF, IDiscreteDistribution, IPDF, IVariance {
 
@@ -2256,6 +2298,65 @@ public class StatisticsFunctions {
 
 	}
 
+	/**
+	 * <pre>
+	 * <code>KolmogorovSmirnovTest(data)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * Computes the <code>p-value</code>, or <i>observed significance level</i>, of a one-sample
+	 * <a href="http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test">Wikipedia:Kolmogorov-Smirnov test</a> evaluating
+	 * the null hypothesis that <code>data</code> conforms to the <code>NormalDistribution()</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * <code>KolmogorovSmirnovTest(data, distribution)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * Computes the <code>p-value</code>, or <i>observed significance level</i>, of a one-sample
+	 * <a href="http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test">Wikipedia:Kolmogorov-Smirnov test</a> evaluating
+	 * the null hypothesis that <code>data</code> conforms to the (continuous) <code>distribution</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * <code>KolmogorovSmirnovTest(data, distribution, &quot;TestData&quot;)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * Computes the <code>test statistic</code> and the <code>p-value</code>, or <i>observed significance level</i>, of
+	 * a one-sample <a href="http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test">Wikipedia:Kolmogorov-Smirnov test</a>
+	 * evaluating the null hypothesis that <code>data</code> conforms to the (continuous) <code>distribution</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; data = { 0.53236606, -1.36750258, -1.47239199, -0.12517888, -1.24040594, 1.90357309,
+	 *             -0.54429527, 2.22084140, -1.17209146, -0.68824211, -1.75068914, 0.48505896,
+	 *             2.75342248, -0.90675303, -1.05971929, 0.49922388, -1.23214498, 0.79284888,
+	 *             0.85309580, 0.17903487, 0.39894754, -0.52744720, 0.08516943, -1.93817962,
+	 *             0.25042913, -0.56311389, -1.08608388, 0.11912253, 2.87961007, -0.72674865,
+	 *             1.11510699, 0.39970074, 0.50060532, -0.82531807, 0.14715616, -0.96133601,
+	 *             -0.95699473, -0.71471097, -0.50443258, 0.31690224, 0.04325009, 0.85316056,
+	 *             0.83602606, 1.46678847, 0.46891827, 0.69968175, 0.97864326, 0.66985742, -0.20922486, -0.15265994}
+	 *
+	 * &gt;&gt; KolmogorovSmirnovTest(data)
+	 * 0.744855
+	 *
+	 * &gt;&gt; KolmogorovSmirnovTest(data, NormalDistribution(), &quot;TestData&quot;)
+	 * {0.0930213,0.744855}
+	 * </code>
+	 * </pre>
+	 */
 	private final static class KolmogorovSmirnovTest extends AbstractFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
