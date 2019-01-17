@@ -35,7 +35,7 @@ public class TDiv31Inverse extends FactorAlgorithmBase {
 	private static int[] primes;
 	private static double[] reciprocals;
 	
-	public TDiv31Inverse() {
+	static {
 		primes = new int[NUM_PRIMES_FOR_31_BIT_TDIV];
 		reciprocals = new double[NUM_PRIMES_FOR_31_BIT_TDIV];
 		for (int i=0; i<NUM_PRIMES_FOR_31_BIT_TDIV; i++) {
