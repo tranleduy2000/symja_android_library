@@ -355,7 +355,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         if (hasLocalVariableStack()) {
             IExpr temp = get();
-            if (temp != null && temp.isNumericFunction()) {
+            if (temp != null && temp != this && temp.isNumericFunction()) {
                 return true;
             }
         } else {
