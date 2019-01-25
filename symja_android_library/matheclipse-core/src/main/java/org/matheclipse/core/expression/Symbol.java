@@ -125,7 +125,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
                 return 0;
             }
             // sort lexicographically
-            return US_COLLATOR.compare(fSymbolName, ((ISymbol) expr).getSymbolName());// fSymbolName);
+            return StringX.US_COLLATOR.compare(fSymbolName, ((ISymbol) expr).getSymbolName());
         }
         if (expr.isNot() && expr.first().isSymbol()) {
             int cp = compareTo(expr.first());

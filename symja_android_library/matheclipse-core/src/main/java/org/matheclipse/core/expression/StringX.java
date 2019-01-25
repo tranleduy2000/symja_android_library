@@ -11,6 +11,7 @@ import org.matheclipse.core.visit.IVisitorLong;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.text.Collator;
 import java.util.Locale;
 
 /**
@@ -19,6 +20,7 @@ import java.util.Locale;
  * @see org.matheclipse.core.interfaces.IStringX
  */
 public class StringX extends IStringXImpl implements IStringX {
+    public final static Collator US_COLLATOR = Collator.getInstance(Locale.US);
     /**
      *
      */
@@ -194,7 +196,7 @@ public class StringX extends IStringXImpl implements IStringX {
     @Override
     public int compareTo(final IExpr expr) {
         if (expr instanceof StringX) {
-            return fString.compareTo(((StringX) expr).fString);
+			return US_COLLATOR.compare(fString, ((StringX) expr).fString);
         }
 		return super.compareTo(expr);
     }
@@ -204,7 +206,8 @@ public class StringX extends IStringXImpl implements IStringX {
      * @return
      */
     public int compareTo(final StringX anotherString) {
-        return fString.compareTo(anotherString.fString);
+		// sort lexicographically
+		return US_COLLATOR.compare(fString, anotherString.fString);
     }
 
     /**
