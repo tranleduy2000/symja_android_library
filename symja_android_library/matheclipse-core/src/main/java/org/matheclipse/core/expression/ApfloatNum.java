@@ -498,7 +498,14 @@ public class ApfloatNum extends INumImpl implements INum {
 	 */
 	@Override
 	public String toString() {
-		return fApfloat.toString();
+		String str = fApfloat.toString();
+		int index = str.indexOf('e');
+		if (index > 0) {
+			String exponentStr = str.substring(index + 1);
+			String result = str.substring(0, index);
+			return result + "*10^" + exponentStr;
+		}
+		return str;
 	}
 
 	/**
