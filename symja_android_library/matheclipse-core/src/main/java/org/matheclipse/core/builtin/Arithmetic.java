@@ -3209,8 +3209,9 @@ public final class Arithmetic {
                                 }
                             }
                         });
-						if (filterAST.size() > 1 && restAST.size() > 1) {
-							return Times(Power(filterAST, exponent), Power(restAST, exponent));
+						IExpr temp = restAST.getOneIdentity(F.C0); // powBase is Times()
+						if (filterAST.size() > 1 && !temp.isNumber()) {
+							return Times(Power(filterAST, exponent), Power(temp, exponent));
 						}
 					}
 				} else if (base.isPower()) {
