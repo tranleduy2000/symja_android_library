@@ -375,7 +375,7 @@ public final class StringFunctions {
 			if (arg1.isString()) {
 				ISymbol form = F.InputForm;
 				if (ast.size() == 3) {
-					IExpr arg2 = ast.arg2();
+					IExpr arg2 = ast.arg1();
 					if (arg2.equals(F.InputForm)) {
 						form = F.InputForm;
 					} else if (arg2.equals(F.TeXForm)) {
@@ -384,21 +384,12 @@ public final class StringFunctions {
 						return F.NIL;
 					}
 				}
-				try {
 				if (form.equals(F.InputForm)) {
 					ExprParser fParser = new ExprParser(engine);
 					IExpr temp = fParser.parse(arg1.toString());
 					return temp;
 				} else if (form.equals(F.TeXForm)) {
-					//android changed: unsupported TeX parser
-//						TeXParser texParser = new TeXParser(engine);
-//						return texParser.toExpression(arg1.toString());
-					}
-				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
-						rex.printStackTrace();
-					}
-					return F.$Aborted;
+					// TODO call TeXParser
 				}
 			}
 			return F.NIL;

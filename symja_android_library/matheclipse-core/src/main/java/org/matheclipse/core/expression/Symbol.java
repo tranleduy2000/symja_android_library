@@ -36,14 +36,13 @@ import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.text.Collator;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Locale;
 import java.util.Map;
 
 public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
-    private final static Collator US_COLLATOR = Collator.getInstance(Locale.US);
+
     protected transient Context fContext;
     /**
      * The attribute values of the symbol represented by single bits.
