@@ -15,7 +15,6 @@ package de.tilman_neumann.jml.factor.base.matrixSolver;
 
 import java.util.ArrayList;
 
-//import org.apache.log4j.Logger;
 
 /**
  * A congruence used by the matrix solver where the elements have been mapped to integer indices.

@@ -13,7 +13,6 @@
  */
 package de.tilman_neumann.jml.factor.base;
 
-//import org.apache.log4j.Logger;
 
 /**
  * A reused buffer to store small factors temporarily during trial division.
@@ -43,7 +42,6 @@ public class SortedIntegerArray {
 	/**
 	 * Add a factor.
 	 * @param factor
-	 * @param power
 	 */
 	public void add(int factor) {
 		//LOG.debug("add small factor " + factor);

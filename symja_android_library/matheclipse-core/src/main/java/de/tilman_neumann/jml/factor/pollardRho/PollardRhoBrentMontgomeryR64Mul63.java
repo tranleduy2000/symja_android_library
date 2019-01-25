@@ -13,8 +13,6 @@
  */
 package de.tilman_neumann.jml.factor.pollardRho;
 
-import org.apache.log4j.Logger;
-
 import java.math.BigInteger;
 import java.util.Random;
 
@@ -36,9 +34,10 @@ import de.tilman_neumann.jml.gcd.Gcd63;
  * @author Tilman Neumann
  */
 public class PollardRhoBrentMontgomeryR64Mul63 extends FactorAlgorithmBase {
-	private static final Logger LOG = Logger.getLogger(PollardRhoBrentMontgomeryR64Mul63.class);
-	private static final boolean DEBUG = false;
+//	private static final Logger LOG = Logger.getLogger(PollardRhoBrentMontgomeryR64Mul63.class);
+//	private static final boolean DEBUG = false;
 
+	//Swift changed: use native random
 	private static final Random RNG = new Random();
 
 	// The reducer R is 2^64, but the only constant still required is the half of it.

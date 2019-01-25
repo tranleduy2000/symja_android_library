@@ -45,8 +45,6 @@ import de.tilman_neumann.util.Timer;
 
 import static de.tilman_neumann.jml.base.BigIntConstants.I_0;
 
-//import org.apache.log4j.Logger;
-//import de.tilman_neumann.util.ConfigUtil;
 
 /**
  * Main class for single-threaded SIQS implementations.
@@ -300,25 +298,25 @@ public class SIQS extends FactorAlgorithmBase {
 				// report results
 //				LOG.info(getName() + ":");
 //				LOG.info("Found factor " + factor + " (" + factor.bitLength() + " bits) of N=" + N + " in " + TimeUtil.timeStr(timer.totalRuntime()));
-//				int pMaxBits = 32 - Integer.numberOfLeadingZeros(pMax);
+				int pMaxBits = 32 - Integer.numberOfLeadingZeros(pMax);
 //				LOG.info("    multiplier k = " + k + ", kN%8 = " + kN.mod(I_8) + ", primeBaseSize = " + primeBaseSize + ", pMax = " + pMax + " (" + pMaxBits + " bits), sieveArraySize = " + adjustedSieveArraySize);
 //				LOG.info("    polyGenerator: " + polyReport.getOperationDetails());
 //				LOG.info("    tDiv: " + tdivReport.getOperationDetails());
 //				LOG.info("    cc: " + ccReport.getOperationDetails());
-//				if (CongruenceCollector.ANALYZE_BIG_FACTOR_SIZES) {
+				if (CongruenceCollector.ANALYZE_BIG_FACTOR_SIZES) {
 //					LOG.info("        " + ccReport.getPartialBigFactorSizes());
 //					LOG.info("        " + ccReport.getSmoothBigFactorSizes());
 //					LOG.info("        " + ccReport.getNonIntFactorPercentages());
-//				}
-//				if (CongruenceCollector.ANALYZE_Q_SIGNS) {
+				}
+				if (CongruenceCollector.ANALYZE_Q_SIGNS) {
 //					LOG.info("        " + ccReport.getPartialQSignCounts());
 //					LOG.info("        " + ccReport.getSmoothQSignCounts());
-//				}
+			}
 //				LOG.info("    #solverRuns = " + solverRunCount + ", #tested null vectors = " + solverController.getTestedNullVectorCount());
 //				LOG.info("    Approximate phase timings: powerTest=" + powerTestDuration + "ms, initN=" + initNDuration + "ms, initPoly=" + initPolyDuration + "ms, sieve=" + sieveDuration + "ms, tdiv=" + tdivDuration + "ms, cc=" + ccDuration + "ms, solver=" + solverDuration + "ms");
 //				LOG.info("    -> initPoly sub-timings: " + polyReport.getPhaseTimings(1));
 //				LOG.info("    -> sieve sub-timings: " + sieveReport.getPhaseTimings(1));
-//				// TDiv, CC and solver have no sub-timings yet
+				// TDiv, CC and solver have no sub-timings yet
 			}
 //			if (TEST_SIEVE) {
 //				float perfectSmoothPercentage = foundPerfectSmoothCount*100 / (float) allPerfectSmoothCount;
@@ -371,11 +369,40 @@ public class SIQS extends FactorAlgorithmBase {
 	// Standalone test --------------------------------------------------------------------------------------------------
 
 	/**
-	 * Test of input k, N and #iterations.
+	 * Stand-alone test.
 	 * @param args ignored
+	 *
+	 * Some test numbers:
+	 * 11111111111111111111111111
+	 * 5679148659138759837165981543
+	 * 11111111111111111111111111155555555555111111111111111
+	 *
+	 * 2900608971182010301486951469292513060638582965350239259380273225053930627446289431038392125
+	 * = 33333 * 33335 * 33337 * 33339 * 33341 * 33343 * 33345 * 33347 * 33349 * 33351 * 33353 * 33355 * 33357 * 33359 * 33361 * 33363 * 33367 * 33369 * 33369 * 33371
 	 */
 //	public static void main(String[] args) {
 //    	ConfigUtil.initProject();
-//    	testInput();
+//		SIQS qs = new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos(), true);
+//		Timer timer = new Timer();
+//		while(true) {
+//			try {
+//				LOG.info("Please insert the number to factor:");
+//				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+//				String input = in.readLine().trim();
+//				//LOG.debug("input = >" + input + "<");
+//				BigInteger N = new BigInteger(input);
+//				LOG.info("Factoring " + N + " (" + N.bitLength() + " bits)...");
+//				timer.capture();
+//				SortedMultiset<BigInteger> factors = qs.factor(N);
+//				if (factors != null) {
+//					long duration = timer.capture();
+//					LOG.info("Factored N = " + factors + " in " + TimeUtil.timeStr(duration) + ".");
+//			} else {
+//					LOG.info("No factor found...");
+//				}
+//			} catch (Exception ex) {
+//				LOG.error("Error " + ex, ex);
+//			}
+//		}
 //	}
 }

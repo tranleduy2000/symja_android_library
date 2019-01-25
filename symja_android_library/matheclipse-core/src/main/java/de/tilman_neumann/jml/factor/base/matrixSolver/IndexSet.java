@@ -15,8 +15,6 @@ package de.tilman_neumann.jml.factor.base.matrixSolver;
 
 import java.util.ArrayList;
 
-//import org.apache.log4j.Logger;
-//
 /**
  * BitArray implementation of an IndexSet, realized in long[], used by the Gaussian solver.
  * 
@@ -52,7 +50,6 @@ public class IndexSet  {
 	
 	/**
 	 * Add a single element x to this index set.
-	 *
 	 * @param x
 	 */
 	public void add(int x) {

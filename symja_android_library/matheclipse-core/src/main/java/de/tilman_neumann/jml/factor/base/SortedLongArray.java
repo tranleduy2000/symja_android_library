@@ -13,7 +13,6 @@
  */
 package de.tilman_neumann.jml.factor.base;
 
-//import org.apache.log4j.Logger;
 
 /**
  * A reused buffer to store big factors of partials temporarily during trial division.
@@ -44,7 +43,6 @@ public class SortedLongArray {
 	/**
 	 * Add a factor.
 	 * @param factor
-	 * @param power
 	 */
 	// XXX: Big factor arrays have at most 2 (QS) or 3 (CFrac) elements. Overpowered ??
 	public void add(int factor) {

@@ -13,19 +13,18 @@
  */
 package de.tilman_neumann.jml.factor.siqs.poly;
 
-import static de.tilman_neumann.jml.base.BigIntConstants.*;
-
 import java.math.BigInteger;
-import java.util.Random;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
-//import org.apache.log4j.Logger;
-
 import de.tilman_neumann.jml.BinarySearch;
+
+import static de.tilman_neumann.jml.base.BigIntConstants.I_1;
+
+//import org.apache.log4j.Logger;
 
 /**
  * Generator for the a-parameter (or "hypercube"), which is the leading coefficient of the quadratic polynomial
@@ -80,6 +79,7 @@ public class AParamGenerator01 implements AParamGenerator {
 	/** and the factors themselves */
 	private int[] qArray;
 	/** random generator */
+	// Swift changed: use native random
 	private Random rng = new Random();
 	/** map of a-values already used to their q-values */
 	private HashMap<BigInteger, int[]> aParamHistory;
@@ -177,7 +177,7 @@ public class AParamGenerator01 implements AParamGenerator {
 			int wanted_qIndex = indexCentre + randomOffset;
 //			if (DEBUG) LOG.debug("indexCentre=" + indexCentre + ", indexVariance=" + indexVariance + " -> randomOffset=" + randomOffset + ", wanted_qIndex=" + wanted_qIndex);
 			// find the first "free" index around wanted_qIndex
-			Integer qIndex = findFreeQIndex(qIndexSet, wanted_qIndex);
+			int qIndex = findFreeQIndex(qIndexSet, wanted_qIndex);
 			// now we have found qIndex :)
 			qIndexSet.add(qIndex);
 			int q = primesArray[qIndex];
@@ -256,7 +256,7 @@ public class AParamGenerator01 implements AParamGenerator {
 //				int sharedQCount = getSharedQCount(oldQArray, qArray);
 //				int disjunctQCount = qCount - sharedQCount;
 //				disjunctQCountCounts[disjunctQCount-1]++;
-//			}
+//		}
 //			LOG.debug("Disjunct qCount counts = " + Arrays.toString(disjunctQCountCounts));
 //			// Result: The q's are typically quite disjunct. At 200 bit we get something like [0, 0, 0, 0, 1, 4, 15, 78, 87].
 //		}

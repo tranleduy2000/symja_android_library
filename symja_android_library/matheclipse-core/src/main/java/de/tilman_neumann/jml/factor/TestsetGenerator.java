@@ -26,7 +26,8 @@ import static de.tilman_neumann.jml.base.BigIntConstants.*;
 
 /**
  * Generation of random N that are not too easy to factor.
- * 
+ * The standard case are semiprimes N where the smaller factor of N is >= cbrt(N).
+ *
  * @author Tilman Neumann
  */
 public class TestsetGenerator {
@@ -38,6 +39,7 @@ public class TestsetGenerator {
 	private static final KnuthSchroeppel multiplierFinder = new KnuthSchroeppel(); // used to compute the multiplier k
 
 	/** random generator */
+	// Swift changed: use native random
 	private static final Random RNG = new Random();
 
 	/**
@@ -75,11 +77,11 @@ public class TestsetGenerator {
 //			if (DEBUG) {
 //				assertTrue(n1bits >= minBits);
 //				assertTrue(n1bits <= maxBits);
-//				LOG.debug("TestsetGenerator3: minBits = " + minBits + ", maxBits = " + maxBits + ", n1.bitLength() = " + n1.bitLength());
+//				LOG.debug("TestsetGenerator: minBits = " + minBits + ", maxBits = " + maxBits + ", n1.bitLength() = " + n1.bitLength());
 //				assertTrue(n1.bitLength() >= minBits);
 //				assertTrue(n1.bitLength() <= maxBits);
 //				int resultBits = N.bitLength();
-//				LOG.debug("TestsetGenerator3: wanted bits = " + bits + ", result bits = " + resultBits);
+//				LOG.debug("TestsetGenerator: wanted bits = " + bits + ", result bits = " + resultBits);
 //				assertTrue(resultBits >= bits-1);
 //				assertTrue(resultBits <= bits+1);
 //			}

@@ -15,7 +15,6 @@ package de.tilman_neumann.jml.factor.siqs.sieve;
 
 import java.math.BigInteger;
 
-//import org.apache.log4j.Logger;
 
 /**
  * Basic parameters for the quadratic sieve.

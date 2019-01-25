@@ -3906,6 +3906,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testFactorInteger() {
 
 
+		// 147 seconds on notebook
+		// check("FactorInteger(10^79+5923)", "");
+		// 32 seconds on notebook
+		// check("FactorInteger(10^71-1)", "");
 		if (Config.EXPENSIVE_JUNIT_TESTS) {
 			check("FactorInteger(101546450935661953908994991437690198927080333663460351836152986526126114727314353555755712261904130976988029406423152881932996637460315302992884162068350429 )", //
 					"{{123456789012419,1},{123456789012421,1},{123456789012437,1},{123456789012439,1},{\n"
@@ -4000,6 +4004,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{{361909,1},{428862157,1}}");
 		check("FactorInteger(293851765137859)", //
 				"{{11736397,1},{25037647,1}}");
+		// 67915439339311L == 2061599 * 32943089
+		check("FactorInteger(67915439339311)", //
+				"{{2061599,1},{32943089,1}}");
 		// 5640012124823L,
 		check("FactorInteger(5640012124823)", //
 				"{{23117,1},{243976819,1}}");
@@ -4452,7 +4459,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FixedPoint(#+1 &, 1, 20)", "21");
 		check("FixedPoint(f, x, 0)", "x");
 		check("FixedPoint(f, x, -1)", "FixedPoint(f,x,-1)");
-		//Swift changed: Use DOUBLE_TOLERANCE to compare double in odrer to avoid infinity loop
+		//Swift changed: Use DOUBLE_TOLERANCE to compare double in order to avoid infinity loop
 		checkNumeric("FixedPoint(Cos, 1.0, Infinity)", "0.7390851332151603");
 
 		checkNumeric("FixedPoint((# + 2/#)/2 &, 1.)", "1.414213562373095");
