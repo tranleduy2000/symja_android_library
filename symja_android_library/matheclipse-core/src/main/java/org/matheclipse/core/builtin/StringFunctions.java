@@ -206,17 +206,28 @@ public final class StringFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3);
 
+			IAST list = ast;
+			if (ast.size() > 1) {
+				if (ast.isAST1()) {
+					IExpr arg1 = ast.arg1();
+					if (arg1.isList()) {
+						list = (IAST) arg1;
+					} else {
+						return arg1.isString() ? arg1 : F.NIL;
+					}
+				}
 			StringBuilder buf = new StringBuilder();
-			for (int i = 1; i < ast.size(); i++) {
-				if (ast.get(i).isString()) {
-					buf.append(ast.get(i).toString());
+				for (int i = 1; i < list.size(); i++) {
+					if (list.get(i).isString()) {
+						buf.append(list.get(i).toString());
 				} else {
 					return F.NIL;
 				}
 			}
 			return F.$str(buf.toString());
+			}
+			return F.NIL;
 
 		}
 
@@ -364,7 +375,7 @@ public final class StringFunctions {
 			if (arg1.isString()) {
 				ISymbol form = F.InputForm;
 				if (ast.size() == 3) {
-					IExpr arg2 = ast.arg1();
+					IExpr arg2 = ast.arg2();
 					if (arg2.equals(F.InputForm)) {
 						form = F.InputForm;
 					} else if (arg2.equals(F.TeXForm)) {
@@ -373,12 +384,21 @@ public final class StringFunctions {
 						return F.NIL;
 					}
 				}
+				try {
 				if (form.equals(F.InputForm)) {
 					ExprParser fParser = new ExprParser(engine);
 					IExpr temp = fParser.parse(arg1.toString());
 					return temp;
 				} else if (form.equals(F.TeXForm)) {
-					// TODO call TeXParser
+					//android changed: unsupported TeX parser
+//						TeXParser texParser = new TeXParser(engine);
+//						return texParser.toExpression(arg1.toString());
+					}
+				} catch (RuntimeException rex) {
+					if (Config.SHOW_STACKTRACE) {
+						rex.printStackTrace();
+					}
+					return F.$Aborted;
 				}
 			}
 			return F.NIL;

@@ -71,6 +71,24 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         return arg1();
     }
 
+    @Override
+    public IExpr last() {
+        return get(argSize());
+    }
+
+    @Override
+    public boolean isNotDefined() {
+        if (isIndeterminate() || isDirectedInfinity()) {
+            return true;
+        }
+        for (int i = 0; i < size(); i++) {
+            if (get(i).isIndeterminate() || get(i).isDirectedInfinity()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the
      * size of the list is greater or equal <code>length</code>.
@@ -85,13 +103,21 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     }
 
     @Override
-    public IExpr last() {
-        return get(argSize());
-    }
-
-    @Override
-    public IASTAppendable rest() {
-        return removeAtClone(1);
+    public IAST rest() {
+        switch (size()) {
+            case 1:
+                return this;
+            case 2:
+                return F.headAST0(head());
+            case 3:
+                return F.unaryAST1(head(), arg2());
+            case 4:
+                return F.binaryAST2(head(), arg2(), arg3());
+            case 5:
+                return F.ternaryAST3(head(), arg2(), arg3(), arg4());
+            default:
+                return removeAtClone(1);
+        }
     }
 
     /**
@@ -342,19 +368,6 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         return false;
     }
 
-    @Override
-    public boolean isNotDefined() {
-        if (isIndeterminate() || isDirectedInfinity()) {
-            return true;
-        }
-        for (int i = 0; i < size(); i++) {
-            if (get(i).isIndeterminate() || get(i).isDirectedInfinity()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Maps the elements of this IAST with the unary functor <code>Functors.replaceArg(replacement, position)</code>,
      * there <code>replacement</code> is an IAST at which the argument at the given position will be replaced by the
@@ -376,6 +389,30 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     @Override
     public IAST mapAt(final IASTAppendable replacement, int position) {
         return mapThread(replacement, position);
+    }
+
+    @Override
+    public IAST removeFromStart(int firstPosition) {
+        if (0 < firstPosition && firstPosition <= size()) {
+            if (firstPosition == 1) {
+                return this;
+            }
+            int last = size();
+            int size = last - firstPosition + 1;
+            switch (size) {
+                case 1:
+                    return F.headAST0(head());
+                case 2:
+                    return F.unaryAST1(head(), get(last - 1));
+                case 3:
+                    return F.binaryAST2(head(), get(last - 2), get(last - 1));
+                case 4:
+                    return F.ternaryAST3(head(), get(last - 3), get(last - 2), get(last - 1));
+            }
+            return copyFrom(firstPosition);
+        } else {
+            throw new IndexOutOfBoundsException("Index: " + Integer.valueOf(firstPosition) + ", Size: " + size());
+        }
     }
 
     /**

@@ -291,7 +291,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * {@inheritDoc}
      */
     @Override
-    IASTAppendable rest();
+    IAST rest();
 
     /**
      * {@inheritDoc}
@@ -394,7 +394,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param position
      * @return
      */
-    IAST copyFrom(int position);
+    IASTAppendable copyFrom(int position);
 
     /**
      * Create a copy of this <code>AST</code>, which only contains the head element of the list (i.e. the element with
@@ -1087,6 +1087,15 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return a clone with removed element at the given position.
      */
     IASTAppendable removeAtClone(int i);
+
+    /**
+     * Copy to a new <code>IAST</code> and remove all arguments from position <code>1</code> inclusive to the
+     * <code>firstPosition</code> exclusive of this AST.
+     *
+     * @param firstPosition
+     * @return
+     */
+    public IAST removeFromStart(int firstPosition);
 
     /**
      * Create a new <code>IAST</code> and remove all arguments from position <code>fromPosition</code> inclusive to the

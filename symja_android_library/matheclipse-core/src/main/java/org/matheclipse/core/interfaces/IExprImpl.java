@@ -3182,7 +3182,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @see IExpr#head()
      */
     @Override
-    public IASTAppendable rest() {
+    public IAST rest() {
         return F.NIL;
     }
 
