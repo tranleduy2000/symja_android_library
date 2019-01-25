@@ -374,7 +374,19 @@ public class SpecialFunctions {
 			IExpr a = ast.arg1();
 			IExpr z = ast.arg2();
 			if (ast.isAST3()) {
-				return F.Subtract(F.GammaRegularized(a, z), F.GammaRegularized(a, ast.arg3()));
+				if (a.isOne()) {
+					// E^(-arg2)-E^(-arg3)
+					return F.Subtract(F.Power(F.E, F.Negate(z)), F.Power(F.E, F.Negate(ast.arg3())));
+				}
+				if (a.isInteger()&&a.isNegative()) {
+					return F.C0;
+			}
+				// TODO add more rules
+
+
+
+				// return F.Subtract(F.GammaRegularized(a, z), F.GammaRegularized(a, ast.arg3()));
+				return F.NIL;
 			}
 			if (a.isZero()) {
 				return F.C0;
@@ -415,7 +427,7 @@ public class SpecialFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
+			Validate.checkSize(ast, 4);
 
 			return F.NIL;
 		}
