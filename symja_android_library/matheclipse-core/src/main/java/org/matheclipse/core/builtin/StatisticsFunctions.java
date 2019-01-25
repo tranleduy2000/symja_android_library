@@ -579,7 +579,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		private static IExpr binCounts(IAST vector, final IExpr arg2, EvalEngine engine) {
-			//Swift changed: can't assign variable with static variable
+			//Swift changed: can't assign local variable with static variable
 			INum dxNum = F.oneDouble();
 			int dx = 1;
 			int xMin = 0;
@@ -1397,7 +1397,7 @@ public class StatisticsFunctions {
 				return F.num(StatUtils.geometricMean(arg1.toDoubleVector()));
 			}
 			if (arg1.size() > 1) {
-				return F.Power(arg1.setAtClone(0, F.Times), F.fraction(1, arg1.argSize()));
+				return F.Power(arg1.setAtCopy(0, F.Times), F.fraction(1, arg1.argSize()));
 			}
 			return F.NIL;
 		}
@@ -1838,12 +1838,12 @@ public class StatisticsFunctions {
 			final IExpr factor = F.integer(-1 * (arg1.size() - 2));
 			IASTAppendable v1 = F.PlusAlloc(arg1.size());
 			v1.appendArgs(arg1.size(),
-					new IntFunction<IExpr>() {
-						@Override
-						public IExpr apply(int i) {
-							return F.Times(F.CN1, num1.setAtClone(i, F.Times(factor, arg1.get(i))), F.Conjugate(arg2.get(i)));
-						}
-					});
+                    new IntFunction<IExpr>() {
+                        @Override
+                        public IExpr apply(int i) {
+                            return F.Times(F.CN1, num1.setAtCopy(i, F.Times(factor, arg1.get(i))), F.Conjugate(arg2.get(i)));
+                        }
+                    });
 			return F.Divide(v1, F.integer(((long)arg1.argSize()) * (((long)arg1.size()) - 2L)));
 		}
 
@@ -3433,7 +3433,7 @@ public class StatisticsFunctions {
 				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return ast.setAtClone(1, x);
+						return ast.setAtCopy(1, x);
 					}
 				});
 			}
@@ -3970,7 +3970,42 @@ public class StatisticsFunctions {
 		}
 
 	}
-
+	/**
+	 * <pre>
+	 * <code>UniformDistribution({min, max})
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns a uniform distribution.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * <code>UniformDistribution( )
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns a uniform distribution with <code>min = 0</code> and <code>max = 1</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)">Wikipedia - Uniform distribution
+	 * (continous)1</a></li>
+	 * </ul>
+	 * <h3>Related terms</h3>
+	 * <p>
+	 * <a href="CDF.md">CDF</a>, <a href="Mean.md">Mean</a>, <a href="Mean.md">Median</a>, <a href="PDF.md">PDF</a>,
+	 * <a href="Quantile.md">Quantile</a>, <a href="StandardDeviation.md">StandardDeviation</a>,
+	 * <a href="Variance.md">Variance</a>
+	 * </p>
+	 */
 	private final static class UniformDistribution extends IDistributionFunctionImpl
 			implements IDistribution, IVariance, ICDF, IPDF, IRandomVariate {
 

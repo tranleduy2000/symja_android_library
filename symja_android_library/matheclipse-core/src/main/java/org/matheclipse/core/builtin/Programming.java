@@ -662,7 +662,7 @@ public final class Programming {
 						// IterationLimitExceeded.throwIt(iterationCounter, ast);
 						// }
 
-                        //Swift changed: objc can not modify value with in expression
+                        //Swift changed: Swift can not modify value in conditional expression
                         --iterations;
                     } while ((!current.isSame(last)) && (iterations > 0));
 				}
@@ -785,7 +785,7 @@ public final class Programming {
 						// IterationLimitExceeded.throwIt(iterationCounter, ast);
 						// }
 
-                        //Swift changed: objc can not modify value with in expression
+                        //Swift changed: Swift can not modify value in conditional expression
                         --iterations;
 					} while ((!current.isSame(last)) && (iterations > 0));
 				}
@@ -1489,7 +1489,7 @@ public final class Programming {
 					IExpr arg1 = engine.evalLoop(ast.arg1());
 					if (arg1.isPresent()) {
 						if (!arg1.isAST()) {
-							IExpr result = ast.setAtClone(1, arg1);
+							IExpr result = ast.setAtCopy(1, arg1);
 							engine.printMessage("Part: " + result + " could not extract a part");
 							return result;
 						}
@@ -2807,7 +2807,7 @@ public final class Programming {
 			throw new WrappedException(new IndexOutOfBoundsException(
 					"Part[] index " + partPosition + " of " + lhs.toString() + " is out of bounds."));
 		}
-		return lhs.setAtClone(partPosition, value);
+		return lhs.setAtCopy(partPosition, value);
 	}
 
 	/**

@@ -3130,6 +3130,45 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return ast;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public final IASTMutable removeAtCopy(int position) {
+		int size = size();
+		if (position < size) {
+			switch (size) {
+			case 2:
+				switch (position) {
+				case 0:
+					return F.headAST0(arg1());
+				case 1:
+					return F.headAST0(head());
+				}
+			case 3:
+				switch (position) {
+				case 0:
+					return F.unaryAST1(arg1(), arg2());
+				case 1:
+					return F.unaryAST1(head(), arg2());
+				case 2:
+					return F.unaryAST1(head(), arg1());
+				}
+			case 4:
+				switch (position) {
+				case 0:
+					return F.binaryAST2(arg1(), arg2(), arg3());
+				case 1:
+					return F.binaryAST2(head(), arg2(), arg3());
+				case 2:
+					return F.binaryAST2(head(), arg1(), arg3());
+				case 3:
+					return F.binaryAST2(head(), arg1(), arg2());
+				}
+			}
+		}
+		IASTAppendable ast = copyAppendable();
+		ast.remove(position);
+		return ast;
+	}
 	/**
 	 * Append the elements in reversed order to the given <code>list</code>
 	 *

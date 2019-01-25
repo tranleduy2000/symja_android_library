@@ -38,7 +38,7 @@ import java.util.Set;
  * 
  * @see AST
  */
-public class AST3 extends AST2 {
+public final class AST3 extends AST2 {
 	private final static int SIZE = 4;
 
 	/**

@@ -17,7 +17,6 @@ import org.matheclipse.core.convert.JASModInteger;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.PlusOp;
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
@@ -1432,16 +1431,19 @@ public class Algebra {
 				}
 				final IASTAppendable result = F.ast(F.Plus, (int) numberOfTerms, false);
 				plusAST0.forEach(new Consumer<IExpr>() {
+					@Override
 					public void accept(final IExpr x) {
 						plusAST1.forEach(new Consumer<IExpr>() {
-							public void accept(final IExpr y) {
-                            // evaluate to flatten out Times() exprs
-								evalAndExpandAST(x, y, result);
+							@Override
+							public void accept(IExpr y) {
+								// evaluate to flatten out Times() exprs
+								Expander.this.evalAndExpandAST(x, y, result);
 							}
-                        });
-                    }
-                });
-				return PlusOp.plus(result);
+						});
+					}
+				});
+				return flattenOneIdentity(result, F.C0);
+				// return PlusOp.plus(result);
 			}
 
 			/**
@@ -1454,14 +1456,14 @@ public class Algebra {
 			private IExpr expandExprTimesPlus(final IExpr expr1, final IAST plusAST) {
 				final IASTAppendable result = F.ast(F.Plus, plusAST.argSize(), false);
 				plusAST.forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr x) {
-                        // evaluate to flatten out Times() exprs
-                        Expander.this.evalAndExpandAST(expr1, x, result);
-
-                    }
-                });
-				return PlusOp.plus(result);
+					@Override
+					public void accept(IExpr x) {
+						// evaluate to flatten out Times() exprs
+						Expander.this.evalAndExpandAST(expr1, x, result);
+					}
+				});
+				return flattenOneIdentity(result, F.C0);
+				// return PlusOp.plus(result);
 			}
 
 			/**
@@ -3084,7 +3086,7 @@ public class Algebra {
 					if (x1.isTimes()) {
 						IAST timesAST = (IAST) x1;
 						// Log[x_ * y_ * z_] :> Log(x)+Log(y)+Log(z)
-						IAST logResult = timesAST.setAtClone(0, F.Plus);
+						IAST logResult = timesAST.setAtCopy(0, F.Plus);
 						logResult = logResult.mapThread(F.Log(F.Null), 1);
 						return powerExpand(logResult, assumptions);
 					}
@@ -3348,8 +3350,8 @@ public class Algebra {
 			@Override
 			public IExpr visit(IASTMutable ast) {
 				if (!ast.isAST(F.Root)) {
-					IAST cloned = replacement.setAtClone(1, null);
-					return ast.mapThread(cloned, 1);
+					IAST copied = replacement.setAtCopy(1, null);
+					return ast.mapThread(copied, 1);
 				}
 				return F.NIL;
 			}
@@ -3852,7 +3854,7 @@ public class Algebra {
 						temp = ast.get(i);
 						if (temp.isPowerReciprocal() && temp.base().isPlus() && temp.base().size() == 3) {
 							IAST plus1 = (IAST) temp.base();
-							IAST plus2 = plus1.setAtClone(2, plus1.arg2().negate());
+							IAST plus2 = plus1.setAtCopy(2, plus1.arg2().negate());
 							IExpr expr = F.eval(F.Expand(F.Times(plus1, plus2)));
 							if (expr.isNumber()) {
 								if (newTimes.isPresent()) {
@@ -4460,7 +4462,7 @@ public class Algebra {
 					}
 				} else if (arg1.isTimes()) {
 					if (arg1.first().isAtom()) {
-						IExpr times = ((IAST) arg1).removeAtClone(1).getOneIdentity(F.C0);
+						IExpr times = ((IAST) arg1).removeAtCopy(1).getOneIdentity(F.C0);
 						if (times.isPower()) {
 							return F.Times(arg1.first(), together(times, engine));
 						}
