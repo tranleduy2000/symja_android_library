@@ -26,7 +26,7 @@ public class CompatibleTest extends TestCase {
             String content = FileUtils.readFileToString(javaFile);
             for (String unavailablePackage : unavailablePackages) {
                 if (content.contains(unavailablePackage)) {
-                    System.err.println("Warn: Unavailable symbol " + (unavailablePackage) + " in class " + javaFile.getName());
+                    System.err.println("Warn: Symbol " + (unavailablePackage) + " is unavailable in class " + javaFile.getName());
                 }
             }
         }
