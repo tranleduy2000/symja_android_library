@@ -882,7 +882,7 @@ public class TeXFormFactory {
 		private boolean convertTimesOperator(final StringBuilder buf, final IAST timesAST, final int precedence,
 				final int caller) {
 			int size = timesAST.size();
-			//j2objc changed: can not assign NIL
+			//Swift changed: can not assign NIL
 			IExpr arg1 = F.nilPtr();
 			if (size > 1) {
 				arg1 = timesAST.arg1();

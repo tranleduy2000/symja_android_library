@@ -138,7 +138,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		return new BigIntegerSym(bigInteger);
 	}
 
-	// j2objc changed: type is incompatible
+	// Swift changed: type is incompatible
 	public static IInteger valueOf(final int newnum) {
 		return (newnum >= low && newnum <= high) ? cache[newnum + (-low)] : new IntegerSym(newnum);
 	}
@@ -451,7 +451,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		}
 		for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
 			int key = entry.getKey();
-			// j2objc changed: type is incompatible
+			// Swift changed: type is incompatible
 			IInteger is = valueOf(key);
 			for (int i = 0; i < entry.getValue(); i++) {
 				result.append(is);

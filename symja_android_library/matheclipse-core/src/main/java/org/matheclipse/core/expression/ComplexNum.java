@@ -597,8 +597,8 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	@Override
 	public IComplexNum pow(final IComplexNum val) {
-		//j2objc changed: compare two double values with DOUBLE_EPSILON gives false result although
-		// it's same value
+		//Swift changed: compare two double values with DOUBLE_EPSILON gives false result although
+		// its value is same
 		if (Complex.equals(fComplex, Complex.ZERO, Config.DOUBLE_TOLERANCE)) {
 			ISignedNumber sn = val.re();
 			if (sn.isNegative()) {

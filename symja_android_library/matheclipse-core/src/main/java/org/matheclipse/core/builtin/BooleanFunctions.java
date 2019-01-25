@@ -807,7 +807,7 @@ public final class BooleanFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 2) {
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				COMPARE_TERNARY b = COMPARE_TERNARY.UNDEFINED;
 				if (ast.isAST2()) {
 					return equalNull(ast.arg1(), ast.arg2(), engine);
@@ -819,11 +819,11 @@ public final class BooleanFunctions {
 				while (i < result.size()) {
 					IExpr arg2 = F.expandAll(result.get(i), true, true);
 					b = prepareCompare(arg1, arg2, engine);
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					if (b == COMPARE_TERNARY.FALSE) {
 						return F.False;
 					}
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					else if (b == COMPARE_TERNARY.TRUE) {
 						evaled = true;
 						result.remove(i - 1);
@@ -854,7 +854,7 @@ public final class BooleanFunctions {
 		 */
 		protected COMPARE_TERNARY prepareCompare(final IExpr arg1, final IExpr arg2, EvalEngine engine) {
 			if (arg1.isIndeterminate() || arg2.isIndeterminate()) {
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.FALSE;
 			}
 			if (arg1.isList() && arg2.isList()) {
@@ -862,26 +862,26 @@ public final class BooleanFunctions {
 				IAST list2 = (IAST) arg2;
 				int size1 = list1.size();
 				if (size1 != list2.size()) {
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					return COMPARE_TERNARY.FALSE;
 				}
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				COMPARE_TERNARY b = COMPARE_TERNARY.TRUE;
 				for (int i = 1; i < size1; i++) {
 					b = prepareCompare(list1.get(i), list2.get(i), engine);
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					if (b == COMPARE_TERNARY.FALSE) {
-						//j2objc changed: can't declare enum inside protocol
+						//Swift changed: can't declare enum inside protocol
 						return COMPARE_TERNARY.FALSE;
 					}
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					if (b == COMPARE_TERNARY.TRUE) {
 					} else {
-						//j2objc changed: can't declare enum inside protocol
+						//Swift changed: can't declare enum inside protocol
 						return COMPARE_TERNARY.UNDEFINED;
 					}
 				}
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.TRUE;
 			}
 			IExpr a0 = arg1;
@@ -904,57 +904,57 @@ public final class BooleanFunctions {
 		@Override
 		public COMPARE_TERNARY compareTernary(final IExpr o0, final IExpr o1) {
 			if (o0.isSame(o1)) {
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.TRUE;
 			}
 
 			if (o0.isTrue()) {
 				if (o1.isTrue()) {
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					return COMPARE_TERNARY.TRUE;
 				} else if (o1.isFalse()) {
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					return COMPARE_TERNARY.FALSE;
 				}
 			} else if (o0.isFalse()) {
 				if (o1.isTrue()) {
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					return COMPARE_TERNARY.FALSE;
 				} else if (o1.isFalse()) {
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					return COMPARE_TERNARY.TRUE;
 				}
 			}
 			if (o0.isConstant() && o1.isConstant()) {
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.FALSE;
 			}
 
 			if (o0.isNumber() && o1.isNumber()) {
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.FALSE;
 			}
 
 			if ((o0 instanceof StringX) && (o1 instanceof StringX)) {
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.FALSE;
 			}
 
 			IExpr difference = F.eval(F.Subtract(o0, o1));
 			if (difference.isNumber()) {
 				if (difference.isZero()) {
-					//j2objc changed: can't declare enum inside protocol
+					//Swift changed: can't declare enum inside protocol
 					return COMPARE_TERNARY.TRUE;
 				}
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.FALSE;
 			}
 			if (difference.isConstant()) {
-				//j2objc changed: can't declare enum inside protocol
+				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.FALSE;
 			}
 
-			//j2objc changed: can't declare enum inside protocol
+			//Swift changed: can't declare enum inside protocol
 			return COMPARE_TERNARY.UNDEFINED;
 		}
 

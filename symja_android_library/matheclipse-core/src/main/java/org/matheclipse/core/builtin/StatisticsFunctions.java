@@ -579,7 +579,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		private static IExpr binCounts(IAST vector, final IExpr arg2, EvalEngine engine) {
-			//j2objc changed: can't assign variable with static variable
+			//Swift changed: can't assign variable with static variable
 			INum dxNum = F.oneDouble();
 			int dx = 1;
 			int xMin = 0;

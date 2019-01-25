@@ -662,7 +662,7 @@ public final class Programming {
 						// IterationLimitExceeded.throwIt(iterationCounter, ast);
 						// }
 
-                        //j2objc changed: objc can not modify value with in expression
+                        //Swift changed: objc can not modify value with in expression
                         --iterations;
                     } while ((!current.isSame(last)) && (iterations > 0));
 				}
@@ -785,7 +785,7 @@ public final class Programming {
 						// IterationLimitExceeded.throwIt(iterationCounter, ast);
 						// }
 
-                        //j2objc changed: objc can not modify value with in expression
+                        //Swift changed: objc can not modify value with in expression
                         --iterations;
 					} while ((!current.isSame(last)) && (iterations > 0));
 				}

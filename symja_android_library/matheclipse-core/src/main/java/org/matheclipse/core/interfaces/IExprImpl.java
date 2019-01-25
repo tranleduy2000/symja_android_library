@@ -2369,7 +2369,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isSame(IExpr expression) {
-        //j2objc changed: compare two double value with DOUBLE_EPSILON give false result although
+        //Swift changed: compare two double value with DOUBLE_EPSILON give false result although
         //it same value
         return isSame(expression, Config.DOUBLE_TOLERANCE);
     }

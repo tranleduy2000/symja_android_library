@@ -143,7 +143,7 @@ public final class PatternMatching {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			Context context = engine.end();
 			if (context==null) {
-				//j2objc changed: incompatible type
+				//Swift changed: incompatible type
 				return F.nilPtr();
 			}
 			return F.stringx(context.completeContextName());
@@ -1830,7 +1830,7 @@ public final class PatternMatching {
 		IExpr result = F.Null;
 		while (i < node.size()) {
 			temp = ast2Expr.convert(node.get(i++));
-			// j2objc changed: unsupported file
+			// Swift changed: unsupported file
 			// if (temp.isAST()) {
 			// IAST ast = (IAST) temp;
 			// IExpr head = ast.head();
@@ -1862,7 +1862,7 @@ public final class PatternMatching {
 	public static IExpr getFile(File file, EvalEngine engine) {
 		boolean packageMode = engine.isPackageMode();
 //		try {
-			// j2objc changed: unsupported file
+			// Swift changed: unsupported file
 //			engine.setPackageMode(true);
 //			String str = Files.asCharSource(file, Charset.defaultCharset()).read();
 //			return Get.loadPackage(engine, str);

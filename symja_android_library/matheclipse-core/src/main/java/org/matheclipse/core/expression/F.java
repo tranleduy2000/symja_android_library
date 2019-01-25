@@ -6542,7 +6542,7 @@ public class F {
 	 * @return
 	 */
 	public static boolean isZero(double value) {
-		//j2objc changed: use DOUBLE_TOLERANCE in order to avoid infinity loop.
+		//Swift changed: use DOUBLE_TOLERANCE in order to avoid infinity loop.
 		return isZero(value, Config.DOUBLE_TOLERANCE);
 	}
 
