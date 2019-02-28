@@ -1551,17 +1551,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		throw new WrongArgumentType(this, get(index), index);
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final IExpr getOneIdentity(IExpr defaultValue) {
-		if (size() > 2) {
-			return this;
-		}
-		if (size() == 2) {
-			return arg1();
-		}
-		return defaultValue;
-	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -3208,9 +3197,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
 				}
 			}
 			if (subLinear != null) {
-				return new IExpr[] { plusClone.getOneIdentity(F.C0), subLinear[1] };
+				return new IExpr[] { plusClone.oneIdentity0(), subLinear[1] };
 			}
-			return new IExpr[] { plusClone.getOneIdentity(F.C0), F.C0 };
+			return new IExpr[] { plusClone.oneIdentity0(), F.C0 };
 		} else if (isTimes()) {
 			// a * b * c....
 			IASTAppendable timesClone = copyAppendable();
@@ -3230,7 +3219,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 					}
 				}
 			}
-			return new IExpr[] { F.C0, timesClone.getOneIdentity(F.C1) };
+			return new IExpr[] { F.C0, timesClone.oneIdentity1() };
 		} else if (this.equals(variable)) {
 			return new IExpr[] { F.C0, F.C1 };
 		} else if (isFree(variable, true)) {
@@ -3418,6 +3407,17 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return opposite();
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public IExpr oneIdentity(IExpr defaultValue) {
+		if (size() > 2) {
+			return this;
+		}
+		if (size() == 2) {
+			return arg1();
+		}
+		return defaultValue;
+	}
 	/** {@inheritDoc} */
 	@Override
 	public IExpr opposite() {

@@ -68,7 +68,7 @@ public class InverseLaplaceTransform extends AbstractFunctionEvaluator implement
                         }
                     });
 					if (result.size() > 1) {
-						return F.Times(result.getOneIdentity(F.C1), F.InverseLaplaceTransform(rest, s, t));
+						return F.Times(result.oneIdentity1(), F.InverseLaplaceTransform(rest, s, t));
 					}
 				}
 				if (arg1.isTimes() || arg1.isPower()) {

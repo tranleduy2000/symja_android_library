@@ -12,6 +12,7 @@ import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -62,7 +63,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 					IExpr arg1 = timesAST.arg1();
 					if (arg1.isNumber()) {
 						if (((INumber) arg1).isImaginaryUnit()) {
-							return timesAST.rest().getOneIdentity(factor);
+							return timesAST.rest().oneIdentity(factor);
 						}
 		}
 
@@ -108,7 +109,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 					if (((INumber) arg1).complexSign() < 0) {
 						IExpr negNum = ((INumber) arg1).negate();
 						if (negNum.isOne()) {
-							return timesAST.rest().getOneIdentity(F.C1);
+							return timesAST.rest().oneIdentity1();
 						}
 						return timesAST.setAtCopy(1, negNum);
 					}
@@ -202,7 +203,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 			if (ast.isTimes()) {
 				for (int i = 1; i < ast.size(); i++) {
 					if (ast.get(i).equals(period)) {
-						result.set(2, ast.removeAtCopy(i).getOneIdentity(F.C1));
+						result.set(2, ast.removeAtCopy(i).oneIdentity1());
 						return result;
 					}
 				}
@@ -212,7 +213,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 				for (int i = 1; i < ast.size(); i++) {
 					IAST temp = getPeriodicParts(ast.get(i), period);
 					if (temp.isPresent() && temp.arg1().isZero()) {
-						result.set(1, ast.removeAtCopy(i).getOneIdentity(F.C0));
+						result.set(1, ast.removeAtCopy(i).oneIdentity0());
 						result.set(2, temp.arg2());
 						return result;
 					}
@@ -246,7 +247,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 					if (((INumber) arg1).complexSign() < 0) {
 						IExpr negNum = ((INumber) arg1).negate();
 						if (negNum.isOne()) {
-							return timesAST.rest().getOneIdentity(F.C1);
+							return timesAST.rest().oneIdentity1();
 						}
 						return timesAST.setAtCopy(1, negNum);
 					}
@@ -424,6 +425,17 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 		return F.NIL;
 	}
 
+	/**
+	 * Create a rule which invokes the method name in this class instance.
+	 *
+	 * @param symbol
+	 * @param patternString
+	 * @param methodName
+	 */
+	public void createRuleFromMethod(ISymbol symbol, String patternString, String methodName) {
+		PatternMatcherAndInvoker pm = new PatternMatcherAndInvoker(patternString, this, methodName);
+		symbol.putDownRule(pm);
+	}
 	/** {@inheritDoc} */
 	@Override
 	abstract public IExpr evaluate(final IAST ast, @Nonnull EvalEngine engine);

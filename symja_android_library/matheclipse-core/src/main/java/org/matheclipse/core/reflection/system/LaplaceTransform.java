@@ -64,7 +64,7 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
                         }
                     });
 					if (result.size() > 1) {
-						return F.Times(result.getOneIdentity(F.C1), F.LaplaceTransform(rest, t, s));
+						return F.Times(result.oneIdentity1(), F.LaplaceTransform(rest, t, s));
 					}
 				} else if (arg1.isPower() && arg1.base().equals(t)) {
 					IExpr n = arg1.exponent();

@@ -329,7 +329,7 @@ public class Algebra {
 
 			// denominator is Times() here:
 			IExpr first = denominatorTimes.first();
-			IExpr rest = denominatorTimes.rest().getOneIdentity(F.C1);
+			IExpr rest = denominatorTimes.rest().oneIdentity1();
 			if (first.isFree(variable)) {
 				return F.Times.of(engine, F.Power(first, -1),
 						partialFractionDecomposition(numerator, rest, variable, count + 1, engine));
@@ -775,11 +775,11 @@ public class Algebra {
 					// collect next pattern in sub-expressions
 					IASTAppendable result = F.PlusAlloc(map.size() + 1);
 					if (rest.size() > 1) {
-						result.append(collectSingleVariable(rest.getOneIdentity(F.C0),
+						result.append(collectSingleVariable(rest.oneIdentity0(),
 								listOfVariables.get(listPosition), listOfVariables, listPosition + 1, head, engine));
 					}
 					for (Entry<IExpr, IASTAppendable> entry : map.entrySet()) {
-						IExpr temp = collectSingleVariable(entry.getValue().getOneIdentity(F.C0),
+						IExpr temp = collectSingleVariable(entry.getValue().oneIdentity0(),
 								listOfVariables.get(listPosition), listOfVariables, listPosition + 1, head, engine);
 						result.append(F.Times(entry.getKey(), temp));
 					}
@@ -815,7 +815,7 @@ public class Algebra {
 						rest.append(times);
 					}
 				}
-				return rest.getOneIdentity(F.C0);
+				return rest.oneIdentity0();
 			}
 			return expr;
 		}
@@ -1329,7 +1329,7 @@ public class Algebra {
 			}
 
 			private static IExpr flattenOneIdentity(IAST result, IExpr defaultValue) {
-				return EvalAttributes.flatten(result).orElse(result).getOneIdentity(defaultValue);
+				return EvalAttributes.flatten(result).orElse(result).oneIdentity(defaultValue);
 			}
 
 			/**
@@ -1576,7 +1576,7 @@ public class Algebra {
 
 						}
 					}
-					expandedResult.append(timesAST.getOneIdentity(F.C0));
+					expandedResult.append(timesAST.oneIdentity0());
 				}
 			}
 
@@ -1907,7 +1907,7 @@ public class Algebra {
 				result.append(f);
 			}
 			// System.out.println("Factor: " + expr.toString() + " ==> " + result.toString());
-			return result.getOneIdentity(F.C0);
+			return result.oneIdentity0();
 		}
 
 			return F.NIL;
@@ -3862,7 +3862,7 @@ public class Algebra {
                         }
                     });
 					if (basicPlus.size() > 1) {
-						temp = tryTransformations(basicPlus.getOneIdentity(F.C0));
+						temp = tryTransformations(basicPlus.oneIdentity0());
 						if (temp.isPresent()) {
 							if (restPlus.isAST0()) {
 								return temp;
@@ -4023,7 +4023,7 @@ public class Algebra {
 					}
 
 					if (basicTimes.size() > 1) {
-						temp = tryTransformations(basicTimes.getOneIdentity(F.C0));
+						temp = tryTransformations(basicTimes.oneIdentity0());
 						if (temp.isPresent()) {
 							if (restTimes.isAST0()) {
 								return temp;
@@ -4229,7 +4229,7 @@ public class Algebra {
 					return F.List(c, F.C1);
 				}
 				if (c.isTimes() && c.first().isNumber()) {
-					return F.List(c.first(), c.rest().getOneIdentity(F.C1));
+					return F.List(c.first(), c.rest().oneIdentity1());
 				}
 				return F.List(F.C1, c);
 			}
@@ -4375,7 +4375,7 @@ public class Algebra {
 							ni.append(temp);
 						}
 					}
-					numerator.set(i, ni.getOneIdentity(F.C1));
+					numerator.set(i, ni.oneIdentity1());
 				}
 			});
 			int i = 1;
@@ -4390,8 +4390,8 @@ public class Algebra {
 				return F.NIL;
 			}
 
-			IExpr exprNumerator = F.evalExpand(numerator.getOneIdentity(F.C0));
-			IExpr denom=F.eval(denominator.getOneIdentity(F.C1));
+			IExpr exprNumerator = F.evalExpand(numerator.oneIdentity0());
+			IExpr denom=F.eval(denominator.oneIdentity1());
 			IExpr exprDenominator = F.evalExpand(denom);
 			if (exprNumerator.isZero()) {
 				if (exprDenominator.isZero()) {
@@ -4507,7 +4507,7 @@ public class Algebra {
 					}
 				} else if (arg1.isTimes()) {
 					if (arg1.first().isAtom()) {
-						IExpr times = ((IAST) arg1).removeAtCopy(1).getOneIdentity(F.C0);
+						IExpr times = ((IAST) arg1).removeAtCopy(1).oneIdentity0();
 						if (times.isPower()) {
 							return F.Times(arg1.first(), together(times, engine));
 						}
@@ -4973,10 +4973,10 @@ public class Algebra {
 						IExpr denomForm = Denominator.getTrigForm(argAST, trig);
 						if (denomForm.isPresent()) {
 							if (!numerForm.isOne()) {
-								numerator.append(numerForm);// numerator.addMerge(numerForm);
+								numerator.append(numerForm);
 							}
 							if (!denomForm.isOne()) {
-								denominator.append(denomForm);// denominator.addMerge(denomForm);
+								denominator.append(denomForm);
 							}
 							evaled = true;
 							continue;
@@ -4986,10 +4986,10 @@ public class Algebra {
 					IExpr[] parts = Apart.fractionalPartsPower((IAST) arg, trig);
 					if (parts != null) {
 						if (!parts[0].isOne()) {
-							numerator.append(parts[0]); // numerator.addMerge(parts[0]);
+							numerator.append(parts[0]);
 						}
 						if (!parts[1].isOne()) {
-							denominator.append(parts[1]);// denominator.addMerge(parts[1]);
+							denominator.append(parts[1]);
 						}
 						evaled = true;
 						continue;
@@ -4999,13 +4999,13 @@ public class Algebra {
 				if (splitNumeratorOne) {
 					IFraction fr = (IFraction) arg;
 					if (fr.numerator().isOne()) {
-						denominator.append(fr.denominator()); // denominator.addMerge(fr.getDenominator());
+						denominator.append(fr.denominator());
 						splitFractionEvaled = true;
 						continue;
 					}
 					if (fr.numerator().isMinusOne()) {
-						numerator.append(fr.numerator()); // numerator.addMerge(fr.getNumerator());
-						denominator.append(fr.denominator());// denominator.addMerge(fr.getDenominator());
+						numerator.append(fr.numerator());
+						denominator.append(fr.denominator());
 						splitFractionEvaled = true;
 						continue;
 					}
@@ -5014,9 +5014,9 @@ public class Algebra {
 				} else if (splitFractionalNumbers) {
 					IFraction fr = (IFraction) arg;
 					if (!fr.numerator().isOne()) {
-						numerator.append(fr.numerator()); // numerator.addMerge(fr.getNumerator());
+						numerator.append(fr.numerator());
 					}
-					denominator.append(fr.denominator()); // denominator.addMerge(fr.getDenominator());
+					denominator.append(fr.denominator());
 					evaled = true;
 					continue;
 				}
@@ -5028,8 +5028,8 @@ public class Algebra {
 				result[0] = F.eval(numerator);
 				result[1] = F.eval(denominator);
 			} else {
-				result[0] = numerator.getOneIdentity(F.C1);
-				result[1] = denominator.getOneIdentity(F.C1);
+				result[0] = numerator.oneIdentity1();
+				result[1] = denominator.oneIdentity1();
 			}
 			if (negateNumerDenom && result[0].isNegative() && result[1].isPlus() && ((IAST) result[1]).isAST2()) {
 				// negate numerator and denominator:
@@ -5039,13 +5039,13 @@ public class Algebra {
 			return result;
 		}
 		if (splitFractionEvaled) {
-			result[0] = numerator.getOneIdentity(F.C1);// numerator.getProduct();
+			result[0] = numerator.oneIdentity1();
 			if (!result[0].isTimes() && !result[0].isPlus()) {
-				result[1] = denominator.getOneIdentity(F.C1); // denominator.getProduct();
+				result[1] = denominator.oneIdentity1();
 				return result;
 			}
 			if (result[0].isTimes() && ((IAST) result[0]).isAST2() && ((IAST) result[0]).arg1().isMinusOne()) {
-				result[1] = denominator.getOneIdentity(F.C1); // denominator.getProduct();
+				result[1] = denominator.oneIdentity1();
 				return result;
 			}
 		}

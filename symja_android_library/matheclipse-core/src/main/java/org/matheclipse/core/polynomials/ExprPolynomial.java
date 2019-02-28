@@ -2456,8 +2456,8 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 					}
 				}
 			}
-			result.append(monomTimes.getOneIdentity(F.C1));
+			result.append(monomTimes.oneIdentity1());
 		}
-		return result.getOneIdentity(F.C0);
+		return result.oneIdentity0();
 	}
 }

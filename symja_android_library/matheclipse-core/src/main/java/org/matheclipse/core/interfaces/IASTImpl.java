@@ -392,6 +392,16 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     }
 
     @Override
+    public IExpr oneIdentity0() {
+        return oneIdentity(F.C0);
+    }
+
+    @Override
+    public IExpr oneIdentity1() {
+        return oneIdentity(F.C1);
+    }
+
+    @Override
     public IAST removeFromStart(int firstPosition) {
         if (0 < firstPosition && firstPosition <= size()) {
             if (firstPosition == 1) {

@@ -764,16 +764,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     INumber getNumber(int index);
 
     /**
-     * Get the argument at index 1, if the <code>size() == 2</code> or the complete ast if the <code>size() > 2</code>
-     * (useful for ASTs with attribute <code>OneIdentity</code> for example for <code>Plus[]</code> you can call
-     * <code>getOneIdentity(F.C0)</code> or for <code>Times[]</code>) you can call <code>getOneIdentity(F.C1)</code>.
-     *
-     * @param defaultValue default value, if <code>size() < 2</code>.
-     * @return
-     */
-    IExpr getOneIdentity(IExpr defaultValue);
-
-    /**
      * Returns the element at the specified positions in the nested ASTs.
      *
      * @param positions index of the element to return
@@ -1030,6 +1020,32 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @see IAST#map(Function, int)
      */
     IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, int position);
+
+    /**
+     * Get the argument at index 1, if the <code>size() == 2</code> or the complete ast if the <code>size() > 2</code>
+     * (useful for ASTs with attribute <code>OneIdentity</code> for example for <code>Plus[]</code> you can call
+     * <code>getOneIdentity(F.C0)</code> or for <code>Times[]</code>) you can call <code>getOneIdentity(F.C1)</code>.
+     *
+     * @param defaultValue default value, if <code>size() < 2</code>.
+     * @return
+     */
+    public IExpr oneIdentity(IExpr defaultValue);
+
+    /**
+     * Get the argument at index 1, if the <code>size() == 2</code> or the complete ast if the <code>size() > 2</code>
+     * If the <code>size() == 1</code> return <code>01</code>.
+     *
+     * @return
+     */
+    IExpr oneIdentity0();
+
+    /**
+     * Get the argument at index 1, if the <code>size() == 2</code> or the complete ast if the <code>size() > 2</code>
+     * If the <code>size() == 1</code> return <code>1</code>.
+     *
+     * @return
+     */
+    IExpr oneIdentity1();
 
     /**
      * Removes the object at the specified location from this {@code IAST}.

@@ -1654,10 +1654,6 @@ public final class Arithmetic {
                                 return Power(integer(i), Negate(arg2));
                             }
                         });
-                        // for (int i = 1; i <= n; i++) {
-                        // result.append(Power(integer(i), Negate(arg2)));
-                        // }
-                        // return result;
                     }
                     return F.NIL;
                 }
@@ -1779,7 +1775,7 @@ public final class Arithmetic {
             if (arg1.isTimes()) {
                 IExpr first = arg1.first();
 				if (first.isNumber()) {
-					IExpr rest = arg1.rest().getOneIdentity(F.C1);
+					IExpr rest = arg1.rest().oneIdentity1();
                 if (first.isReal()) {
 						return F.Times(first, F.Im(rest));
                 }
@@ -3212,7 +3208,7 @@ public final class Arithmetic {
                                 }
                             }
                         });
-						IExpr temp = restAST.getOneIdentity(F.C0); // powBase is Times()
+						IExpr temp = restAST.oneIdentity0(); // powBase is Times()
 						if (filterAST.size() > 1 && !temp.isNumber()) {
 							return Times(Power(filterAST, exponent), Power(temp, exponent));
 						}
@@ -3860,7 +3856,7 @@ public final class Arithmetic {
             if (expr.isTimes()) {
                 IExpr first = expr.first();
 				if (first.isNumber()) {
-					IExpr rest = expr.rest().getOneIdentity(F.C1);
+					IExpr rest = expr.rest().oneIdentity1();
                 if (first.isReal()) {
                     return F.Times(first, F.Re(expr.rest()));
                 }
@@ -4667,7 +4663,7 @@ public final class Arithmetic {
             if (size > 2) {
 				IAST temp = evaluateHashsRepeated(ast1, engine);
                 if (temp.isPresent()) {
-                    return temp.getOneIdentity(F.C1);
+                    return temp.oneIdentity1();
                 }
             }
             if (size == 3) {
@@ -4747,7 +4743,7 @@ public final class Arithmetic {
 
 				if (evaled && result.isPresent()) {
                     if (sym.hasOneIdentityAttribute() && result.size() > 1) {
-                        return result.getOneIdentity(F.C0);
+                        return result.oneIdentity0();
                     }
 
                     return distributeLeadingFactor(result, F.NIL);
