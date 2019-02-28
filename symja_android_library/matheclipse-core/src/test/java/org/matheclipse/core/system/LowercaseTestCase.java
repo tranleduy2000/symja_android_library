@@ -8697,6 +8697,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPart() {
+		check("{{1,0,0},\n" +
+				" {0,1,0},\n" +
+				" {0,0,1}}[[2]]", //
+				"{0,1,0}");
 		check("T = {a, b, c, d}", "{a,b,c,d}");
 		check("T[[2]]=3", "3");
 		check("{a(x,y,z,f),b,c,d}[[1,2]]", //
