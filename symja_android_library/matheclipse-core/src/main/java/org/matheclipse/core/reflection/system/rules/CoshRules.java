@@ -10,7 +10,7 @@ import static org.matheclipse.core.expression.F.ArcSinh;
 import static org.matheclipse.core.expression.F.ArcTanh;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.*;
 import static org.matheclipse.core.expression.F.C1D4;
 import static org.matheclipse.core.expression.F.C1DSqrt2;
 import static org.matheclipse.core.expression.F.CC;
@@ -18,7 +18,6 @@ import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
-import static org.matheclipse.core.expression.F.CN1D4;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.CSqrt5;
 import static org.matheclipse.core.expression.F.Cosh;
@@ -48,7 +47,7 @@ public interface CoshRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 26, 6 };
+  final public static int[] SIZES = { 26, 8 };
 
   final public static IAST RULES = List(
     IInit(Cosh, SIZES),
@@ -124,6 +123,12 @@ public interface CoshRules {
     // Cosh(2*Pi*I)=1
     ISet(Cosh(Times(CC(0L,1L,2L,1L),Pi)),
       C1),
+    // Cosh(Pi/2*I+x_):=I*Sinh(x)
+    ISetDelayed(Cosh(Plus(Times(CC(0L,1L,1L,2L),Pi),x_)),
+      Times(CI,Sinh(x))),
+    // Cosh(Complex(0,n_Integer)*Pi+x_):=(-1)^n*Cosh(x)
+    ISetDelayed(Cosh(Plus(x_,Times(Pi,Complex(C0,$p(n, Integer))))),
+      Times(Power(CN1,n),Cosh(x))),
     // Cosh(ArcSinh(x_)):=Sqrt(1+x^2)
     ISetDelayed(Cosh(ArcSinh(x_)),
       Sqrt(Plus(C1,Sqr(x)))),

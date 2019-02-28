@@ -292,7 +292,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	}
 
 	/**
-	 * Groovy operator overloading
+	 * SymjaMMA operator overloading
 	 *
 	 * @param that
 	 * @return

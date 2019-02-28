@@ -547,10 +547,9 @@ public class Primality {
 	public static BigInteger countPrimes32749(final BigInteger val, Map<Integer, Integer> map) {
 		BigInteger[] divRem;
 		BigInteger result = val;
-		BigInteger sqrt = BigIntegerMath.sqrt(result, RoundingMode.DOWN);
 		int count = 0;
 		for (int i = 0; i < primes.length; i++) {
-			if (sqrt.compareTo(BIprimes[i]) < 0) {
+			if (result.compareTo(BIprimes[i]) < 0) {
 				break;
 			}
 			divRem = result.divideAndRemainder(BIprimes[i]);
@@ -563,8 +562,7 @@ public class Primality {
 				do {
 					count++;
 					result = divRem[0];// quotient
-					sqrt = BigIntegerMath.sqrt(result, RoundingMode.DOWN);
-					if (sqrt.compareTo(BIprimes[i]) < 0) {
+					if (result.compareTo(BIprimes[i]) < 0) {
 						break;
 					}
 					divRem = result.divideAndRemainder(BIprimes[i]);
@@ -572,9 +570,12 @@ public class Primality {
 				map.put(primes[i], count);
 			}
 		}
+		if (result.isProbablePrime(32)) {
+			return result;
+		}
 		BigInteger b;
 		int prime;
-		sqrt = BigIntegerMath.sqrt(result, RoundingMode.DOWN);
+		BigInteger sqrt = BigIntegerMath.sqrt(result, RoundingMode.UP);
 		for (int i = 0; i < SHORT_PRIMES.length; i++) {
 			prime = SHORT_PRIMES[i];
 			b = BigInteger.valueOf(prime);
@@ -591,8 +592,7 @@ public class Primality {
 				do {
 					count++;
 					result = divRem[0];// quotient
-					sqrt = BigIntegerMath.sqrt(result, RoundingMode.DOWN);
-					if (sqrt.compareTo(b) < 0) {
+					if (result.compareTo(b) < 0) {
 						break;
 					}
 					divRem = result.divideAndRemainder(b);
@@ -686,7 +686,8 @@ public class Primality {
 	 * Call elliptic curve method anf if necessary the parallel SIQS factoring algorithm.
 	 *
 	 * @param val
-	 * @param map of all BigInteger primes and their associated exponents
+	 * @param map
+	 *            of all BigInteger primes and their associated exponents
 	 */
 	public static void factorInteger(final BigInteger val, SortedMap<BigInteger, Integer> map) {
 		EllipticCurveMethod ecm = new EllipticCurveMethod();

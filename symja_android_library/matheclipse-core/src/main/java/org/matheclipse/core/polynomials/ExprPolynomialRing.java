@@ -64,7 +64,6 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	/**
 	 * The names of the variables. This value can be modified.
 	 */
-	// protected String[] vars;
 	protected IAST vars;
 
 	/**
@@ -537,7 +536,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 *
 	 * @param expression
 	 *            the expression which should be checked if it's a polynomial
-	 * param coefficient
+	 * @param coefficient
 	 *            set to <code>true</code> if called by the <code>Coefficient()</code> function
 	 * @return <code>true</code> if the given expression is a polynomial
 	 */

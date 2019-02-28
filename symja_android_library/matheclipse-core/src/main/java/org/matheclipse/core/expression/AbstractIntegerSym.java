@@ -508,7 +508,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		if (number.compareTo(BigInteger.valueOf(7)) <= 0) {
 			return F.NIL;
 		}
-		BigInteger rest = Primality.countPrimes1021(number, map);
+		BigInteger rest = Primality.countPrimes32749(number, map);
 		if (map.size() == 0) {
 			return F.NIL;
 		}

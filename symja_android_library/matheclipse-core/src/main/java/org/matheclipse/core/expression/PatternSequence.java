@@ -488,7 +488,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	/**
-	 * Groovy operator overloading
+	 * SymjaMMA operator overloading
 	 */
 	public boolean isCase(IExpr that) {
 		final IPatternMatcher matcher = new PatternMatcher(this);

@@ -564,8 +564,9 @@ public final class Arithmetic {
      *
      * <blockquote>
      * <p>
-	 * returns <code>expr</code> in the range <code>-1</code> to <code>1</code>. Returns <code>-1</code> if <code>expr</code> is less
-	 * than <code>-1</code>. Returns <code>1</code> if <code>expr</code> is greater than <code>1</code>.
+	 * returns <code>expr</code> in the range <code>-1</code> to <code>1</code>. Returns <code>-1</code> if
+	 * <code>expr</code> is less than <code>-1</code>. Returns <code>1</code> if <code>expr</code> is greater than
+	 * <code>1</code>.
      * </p>
      * </blockquote>
      *
@@ -575,8 +576,9 @@ public final class Arithmetic {
      *
      * <blockquote>
      * <p>
-	 * returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>min</code> if <code>expr</code> is
-	 * less than <code>min</code>. Returns <code>max</code> if <code>expr</code> is greater than <code>max</code>.
+	 * returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>min</code> if
+	 * <code>expr</code> is less than <code>min</code>. Returns <code>max</code> if <code>expr</code> is greater than
+	 * <code>max</code>.
      * </p>
      * </blockquote>
      *
@@ -586,8 +588,9 @@ public final class Arithmetic {
      *
      * <blockquote>
      * <p>
-	 * returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>vMin</code> if <code>expr</code> is
-	 * less than <code>min</code>. Returns <code>vMax</code> if <code>expr</code> is greater than <code>max</code>.
+	 * returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>vMin</code> if
+	 * <code>expr</code> is less than <code>min</code>. Returns <code>vMax</code> if <code>expr</code> is greater than
+	 * <code>max</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
@@ -699,12 +702,18 @@ public final class Arithmetic {
         /**
          * gives <code>vMin</code> for <code>x<min</code> and <code>vMax</code> for <code>x>max</code>.
          *
-		 * @param x    the expreesion value
-		 * @param min  minimum value
-		 * @param max  maximum value
-		 * @param vMin value for x less than minimum
-		 * @param vMax value for x greater than minimum
-		 * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x is greater than max.
+		 * @param x
+		 *            the expression value
+		 * @param min
+		 *            minimum value
+		 * @param max
+		 *            maximum value
+		 * @param vMin
+		 *            value for x less than minimum
+		 * @param vMax
+		 *            value for x greater than minimum
+		 * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x is greater than
+		 *         max.
          */
         private IExpr clip(IExpr x, ISignedNumber min, ISignedNumber max, IExpr vMin, IExpr vMax) {
             if (x.isReal()) {
@@ -1915,7 +1924,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
+		public IExpr e2ObjArg(IAST ast, final IExpr o0, final IExpr o1) {
             if (o0.isZero()) {
                 return o0;
             }
@@ -2389,9 +2398,11 @@ public final class Arithmetic {
 
         /**
          *
-		 * See: <a href="http://www.cs.berkeley.edu/~fateman/papers/newsimp.pdf"> Experiments in Hash-coded Algebraic Simplification</a>
+		 * See: <a href="http://www.cs.berkeley.edu/~fateman/papers/newsimp.pdf"> Experiments in Hash-coded Algebraic
+		 * Simplification</a>
          *
-		 * @param ast the abstract syntax tree (AST) of the form <code>Plus(...)</code> which should be evaluated
+		 * @param ast
+		 *            the abstract syntax tree (AST) of the form <code>Plus(...)</code> which should be evaluated
          * @return the evaluated object or <code>null</code>, if evaluation isn't possible
          */
         @Override
@@ -2510,7 +2521,7 @@ public final class Arithmetic {
     private final static class Pochhammer extends AbstractArg2 {// implements PochhammerRules {
 
         @Override
-        public IExpr e2ObjArg(final IExpr a, final IExpr n) {
+		public IExpr e2ObjArg(IAST ast, final IExpr a, final IExpr n) {
             if (n.isZero()) {
                 return F.C1;
             }
@@ -2564,7 +2575,8 @@ public final class Arithmetic {
          * Compute Pochhammer's symbol (that)_n.
          *
          * @param that
-		 * @param n    The number of product terms in the evaluation.
+		 * @param n
+		 *            The number of product terms in the evaluation.
          * @return Gamma(that+n)/Gamma(that) = that*(that+1)*...*(that+n-1).
          */
 		public static BigFraction pochhammer(BigFraction that, final int n) {
@@ -2715,8 +2727,8 @@ public final class Arithmetic {
          * Calculate <code>interval({lower, upper}) ^ exponent</code>.
          * </p>
          * <p>
-		 * See: <a href= "https://de.wikipedia.org/wiki/Intervallarithmetik#Elementare_Funktionen"> Intervallarithmetik - Elementare
-		 * Funktionen</a>
+		 * See: <a href= "https://de.wikipedia.org/wiki/Intervallarithmetik#Elementare_Funktionen"> Intervallarithmetik
+		 * - Elementare Funktionen</a>
          * </p>
          *
          * @param interval
@@ -3012,7 +3024,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2ObjArg(final IExpr base, final IExpr exponent) {
+		public IExpr e2ObjArg(IAST ast, final IExpr base, final IExpr exponent) {
             if (exponent.isDirectedInfinity()) {
                 IExpr temp = evalDirectedInfinityArg2(base, (IAST) exponent);
                 if (temp.isPresent()) {
@@ -3247,7 +3259,7 @@ public final class Arithmetic {
 					//
 					return F.Times(F.CN1, F.Power(F.CN1, F.C1.add(exponent)), F.Power(base.negate(), exponent));
 				}
-				if (base.isRational()) {
+				if (base.isRational() && !ast.isAllExpanded()) {
 					// try factorizing base
 					IRational num = ((IRational) base);
 					IInteger expNumerator = ((IFraction) exponent).numerator();
@@ -3264,6 +3276,9 @@ public final class Arithmetic {
 								return temp;
 							}
 						}
+					}
+					if (ast.isPresent()) {
+						ast.addEvalFlags(IAST.IS_ALL_EXPANDED);
 					}
 				}
 			}
@@ -4017,7 +4032,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2ObjArg(final IExpr base, final IExpr root) {
+		public IExpr e2ObjArg(IAST ast, final IExpr base, final IExpr root) {
             if (base.isNumber() && root.isInteger()) {
                 EvalEngine ee = EvalEngine.get();
                 if (base.isComplex() || base.isComplexNumeric()) {
@@ -4104,7 +4119,7 @@ public final class Arithmetic {
                 }
             }
 
-            return binaryOperator(ast.arg1(), ast.arg2());
+			return binaryOperator(ast, ast.arg1(), ast.arg2());
         }
     }
 
@@ -4376,10 +4391,13 @@ public final class Arithmetic {
         // }
 
         /**
-		 * Distribute a leading integer factor over the integer powers if available. <code>12*2^x*3^y   ==>   2^(2+x)*3^(1+y)</code>.
+		 * Distribute a leading integer factor over the integer powers if available.
+		 * <code>12*2^x*3^y   ==>   2^(2+x)*3^(1+y)</code>.
          *
-		 * @param ast          the already evaluated expression
-		 * @param originalExpr the original expression which is used, if <code>!ast.isPresent()</code>
+		 * @param ast
+		 *            the already evaluated expression
+		 * @param originalExpr
+		 *            the original expression which is used, if <code>!ast.isPresent()</code>
          * @return the evaluated object or <code>ast</code>, if the distribution of an integer factor isn't possible
          */
         private IExpr distributeLeadingFactor(IExpr ast, IAST originalExpr) {
@@ -4454,7 +4472,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr e2ObjArg(final IExpr o0, final IExpr o1) {
+		public IExpr e2ObjArg(IAST ast, final IExpr o0, final IExpr o1) {
 
 			if (o0.isReal() || o1.isReal()) {
             if (o0.isZero()) {
@@ -4662,7 +4680,7 @@ public final class Arithmetic {
 					final IAST arg2 = (IAST) ast1.arg2();
 					return arg2.mapThread(F.Times(ast1.arg1(), null), 2);
                 }
-				return distributeLeadingFactor(binaryOperator(ast1.arg1(), ast1.arg2()), ast1);
+				return distributeLeadingFactor(binaryOperator(null, ast1.arg1(), ast1.arg2()), ast1);
             }
 
             if (size > 3) {
@@ -4676,12 +4694,12 @@ public final class Arithmetic {
 				IAST astTimes = ast1;
                 while (i < astTimes.size()) {
 
-					IExpr binaryResult = binaryOperator(tempArg1, astTimes.get(i));
+					IExpr binaryResult = binaryOperator(null, tempArg1, astTimes.get(i));
 
 					if (!binaryResult.isPresent()) {
 
                         for (int j = i + 1; j < astTimes.size(); j++) {
-							binaryResult = binaryOperator(tempArg1, astTimes.get(j));
+							binaryResult = binaryOperator(null, tempArg1, astTimes.get(j));
 
 							if (binaryResult.isPresent()) {
                                 evaled = true;
