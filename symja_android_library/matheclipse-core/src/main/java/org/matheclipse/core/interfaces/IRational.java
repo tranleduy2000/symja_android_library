@@ -15,6 +15,17 @@ public interface IRational extends ISignedNumber, IBigNumber {
     @Override
     public IRational abs();
 
+    /**
+     * Return the fractional part of this fraction
+     *
+     * @return
+     */
+    @Override
+    public IRational fractionalPart();
+
+    @Override
+    public IRational negate();
+
     public IRational add(IRational parm1);
 
     public IInteger ceil();
@@ -52,15 +63,16 @@ public interface IRational extends ISignedNumber, IBigNumber {
      */
     public IASTAppendable factorInteger();
 
-    public IInteger floor();
-
     /**
-     * Return the fractional part of this fraction
+     * Factor into small factors below 1021 if possible and determine the root.
      *
-     * @return
+     * @param numerator
+     * @param root      the <code>root > 1</code> which should be determined
+     * @return the rest of the factorization
      */
-    public IRational fractionalPart();
+    public IAST factorSmallPrimes(int numerator, int root);
 
+    public IInteger floor();
 
     /**
      * Returns the denominator of this fraction.
@@ -87,9 +99,6 @@ public interface IRational extends ISignedNumber, IBigNumber {
     IInteger getNumerator();
 
     public IRational multiply(IRational parm1);
-
-    @Override
-    public IRational negate();
 
     /**
      * Return the normalized form of this number (i.e. if the denominator part equals one, return the numerator part as
