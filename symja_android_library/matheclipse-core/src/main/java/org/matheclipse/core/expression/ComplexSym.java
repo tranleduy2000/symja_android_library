@@ -574,7 +574,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	public IComplex pow(final long n) {
 
 		if ((n == 0) && fReal.isZero() && fImaginary.isZero()) {
-			throw new java.lang.ArithmeticException();
+			throw new ArithmeticException("Indeterminate: 0^0");
 		}
 
 		if (n == Long.MIN_VALUE) {

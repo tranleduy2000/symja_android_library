@@ -6,6 +6,7 @@ import java.math.BigInteger;
 
 /**
  * Interface for "rational" numbers (i.e. numbers implementing IInteger or IFraction)
+ *
  */
 public interface IRational extends ISignedNumber, IBigNumber {
 
@@ -45,8 +46,10 @@ public interface IRational extends ISignedNumber, IBigNumber {
      * Check if this number equals the given fraction <code>numerator/denominator</code> number.
      * <code>GCD(numerator, /denominator)</code> should be 1;
      *
-     * @param numerator   the numerator
-     * @param denominator the denominator
+	 * @param numerator
+	 *            the numerator
+	 * @param denominator
+	 *            the denominator
      * @return
      */
     public boolean equalsFraction(final int numerator, final int denominator);
@@ -54,7 +57,7 @@ public interface IRational extends ISignedNumber, IBigNumber {
     /**
      * Return the prime factors paired with their exponents for integer and fractional numbers. For factors of the
      * denominator part of fractional numbers the exponents are negative.
-     * <p>
+	 *
      * <pre>
      * factorInteger(-4) ==> {{-1,1},{2,2}}
      * </pre>
@@ -67,7 +70,8 @@ public interface IRational extends ISignedNumber, IBigNumber {
      * Factor into small factors below 1021 if possible and determine the root.
      *
      * @param numerator
-     * @param root      the <code>root > 1</code> which should be determined
+	 * @param root
+	 *            the <code>root > 1</code> which should be determined
      * @return the rest of the factorization
      */
     public IAST factorSmallPrimes(int numerator, int root);
@@ -116,11 +120,14 @@ public interface IRational extends ISignedNumber, IBigNumber {
     public IInteger numerator();
 
     /**
-     * Returns this number raised at the specified exponent.
+	 * Returns this number raised at the specified exponent. See
+	 * <a href="https://en.wikipedia.org/wiki/Exponentiation_by_squaring">Wikipedia - Exponentiation by squaring</a>
      *
-     * @param exp the exponent.
+	 * @param exp
+	 *            the exponent.
      * @return <code>this<sup>exp</sup></code>
-     * @throws ArithmeticException if {@code 0^0} is given.
+	 * @throws ArithmeticException
+	 *             if {@code 0^0} is given.
      */
     public IRational pow(final long exp) throws ArithmeticException;
 
