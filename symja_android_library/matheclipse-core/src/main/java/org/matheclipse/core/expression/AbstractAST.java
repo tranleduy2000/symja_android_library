@@ -6,6 +6,7 @@ import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
+import com.duy.lambda.Supplier;
 import com.gx.common.cache.Cache;
 import com.gx.common.cache.CacheBuilder;
 
@@ -54,6 +55,7 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
 import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Iterator;
@@ -62,6 +64,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 public abstract class AbstractAST extends IASTMutableImpl {
 	/**
@@ -150,13 +153,467 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 	}
 
+	/**
+	 * The class <code>NILPointer</code> implements the constant object <code>F.NIL</code> (not in list), which
+	 * indicates in the evaluation process that no evaluation was possible (i.e. no further definition was found to
+	 * create a new expression from the existing one).
+	 * <p>
+	 * Almost every modifying method in this class throws an <tt>UnsupportedOperationException</tt>, almost every
+	 * predicate returns <code>false</code>. The main method to check if the object is valid is the
+	 * <code>isPresent()</code> method. The method is designed similar to <code>java.util.Optional#isPresent()</code>.
+	 * </p>
+	 *
+	 * Swift changed: conform INilPointer
+	 * @see org.matheclipse.core.expression.F#NIL
+	 * @see java.util.Optional#isPresent
+	 */
+	private final static class NILPointer extends AbstractAST implements INilPointer {
+
+		private static final long serialVersionUID = -3552302876858011292L;
+
+		/**
+		 * The class <code>NILPointer</code> implements the constant object <code>F#NIL</code> (not in list), which
+		 * indicates in the evaluation process that no evaluation was possible (i.e. no further definition was found to
+		 * create a new expression from the existing one).
+		 *
+		 * @see F#NIL
+		 */
+		protected NILPointer() {
+		}
+
+		@Override
+		public boolean append(IExpr object) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void append(int location, IExpr object) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean appendAll(Collection<? extends IExpr> collection) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean appendAll(IAST ast, int startPosition, int endPosition) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean appendAll(IExpr[] args, int startPosition, int endPosition) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean appendAll(int location, Collection<? extends IExpr> collection) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean appendAll(List<? extends IExpr> list, int startPosition, int endPosition) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean appendArgs(IAST ast) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public final boolean appendArgs(IAST ast, int untilPosition) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IASTAppendable appendArgs(int start, int end, IntFunction<IExpr> function) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IASTAppendable appendArgs(int end, IntFunction<IExpr> function) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IAST appendOneIdentity(IAST subAST) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IExpr arg1() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IExpr arg2() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IExpr arg3() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IExpr arg4() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IExpr arg5() {
+			throw new UnsupportedOperationException();
+		}
+
+		/** {@inheritDoc} */
+		public int argSize() {
+			return -1;
+		}
+
+		@Override
+		public Set<IExpr> asSet() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IAST clone() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean contains(Object object) {
+			return false;
+		}
+
+		@Override
+		public IASTAppendable copy() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public IASTAppendable copyAppendable() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			return this == obj;
+		}
+
+		@Override
+		public final IExpr evaluate(EvalEngine engine) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean exists(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+			return false;
+		}
+
+		@Override
+		public boolean exists(Predicate<? super IExpr> predicate, int startOffset) {
+			return false;
+		}
+
+		@Override
+		public boolean forAll(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
+			return false;
+		}
+
+		@Override
+		public boolean forAll(Predicate<? super IExpr> predicate, int startOffset) {
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return -1;
+		}
+
+		@Override
+		public final IExpr head() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void ifAppendable(Consumer<? super IASTAppendable> consumer) {
+		}
+
+		@Override
+		public void ifPresent(Consumer<? super IExpr> consumer) {
+		}
+
+		@Override
+		public void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction) {
+			emptyAction.run();
+		}
+
+		@Override
+		public boolean isAbs() {
+			return false;
+		}
+
+		@Override
+		public boolean isAllExpanded() {
+			return false;
+		}
+
+		@Override
+		public final boolean isAST() {
+			return false;
+		}
+
+		@Override
+		public final boolean isAST(final IExpr header) {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isAST(final IExpr header, final int length) {
+			return false;
+		}
+
+		@Override
+		public boolean isAST(IExpr header, int length, IExpr... args) {
+			return false;
+		}
+
+		@Override
+		public boolean isASTSizeGE(IExpr header, int length) {
+			return false;
+		}
+
+		@Override
+		public boolean isAST0() {
+			return false;
+		}
+
+		@Override
+		public boolean isAST1() {
+			return false;
+		}
+
+		@Override
+		public boolean isAST2() {
+			return false;
+		}
+
+		@Override
+		public boolean isAST3() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean isList() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isListOfLists() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isListOfRules() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public int[] isMatrix(boolean setMatrixFormat) {
+			return null;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isNumericFunction() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isNumericMode() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isOneIdentityAST1() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isPlus() {
+			return false;
+		}
+
+		@Override
+		public boolean isPlusTimesPower() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isPower() {
+			return false;
+		}
+
+		@Override
+		public final boolean isPresent() {
+			return false;
+		}
+
+		@Override
+		public boolean isRealMatrix() {
+			return false;
+		}
+
+		@Override
+		public boolean isRealVector() {
+			return false;
+		}
+
+		@Override
+		public boolean isSameHead(ISymbol head) {
+			return false;
+		}
+
+		@Override
+		public boolean isSameHead(ISymbol head, int length) {
+			return false;
+		}
+
+		@Override
+		public boolean isSameHead(ISymbol head, int minLength, int maxLength) {
+			return false;
+		}
+
+		@Override
+		public boolean isSameHeadSizeGE(ISymbol head, int length) {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isTimes() {
+			return false;
+		}
+
+		@Override
+		public final int isVector() {
+			return -1;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 *
+		 */
+		@Override
+		public final boolean isZERO() {
+			return false;
+		}
+
+		public final IAST orElse(final IAST other) {
+			return other;
+		}
+
+		@Override
+		public final IExpr orElse(final IExpr other) {
+			return other;
+		}
+
+		@Override
+		public final IExpr orElseGet(Supplier<? extends IExpr> other) {
+			return other.get();
+		}
+
+		@Override
+		public final <X extends Throwable> IExpr orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
+			throw exceptionSupplier.get();
+		}
+
+		private Object readResolve() throws ObjectStreamException {
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr remove(int location) {
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * Removes the objects in the specified range from the start to the end, but not including the end index.
+		 *
+		 * @param start
+		 *            the index at which to start removing.
+		 * @param end
+		 *            the index one after the end of the range to remove.
+		 * @throws IndexOutOfBoundsException
+		 *             when {@code start < 0, start > end} or {@code end > size()}
+		 */
+		@Override
+		public void removeRange(int start, int end) {
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * Replaces the element at the specified location in this {@code ArrayList} with the specified object.
+		 *
+		 * @param location
+		 *            the index at which to put the specified object.
+		 * @param object
+		 *            the object to add.
+		 * @return the previous element at the index.
+		 * @throws IndexOutOfBoundsException
+		 *             when {@code location < 0 || >= size()}
+		 */
+		@Override
+		public IExpr set(int location, IExpr object) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int size() {
+			return 0;
+		}
+
+		/**
+		 * Returns a new array containing all elements contained in this {@code ArrayList}.
+		 *
+		 * @return an array of the elements from this {@code ArrayList}
+		 */
+		@Override
+		public IExpr[] toArray() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String toString() {
+			return "ExprNull";
+		}
+	}
+
+	/** package private */
+	final static INilPointer NIL = new NILPointer();
 	private static final long serialVersionUID = -8682706994448890660L;
 
 	/**
-	 * Compare all adjacent elements from lowest to highest index and return true, if the binary predicate gives true in each step. If
-	 * the size is &lt; 2 the method returns false;
+	 * Compare all adjacent elements from lowest to highest index and return true, if the binary predicate gives true in
+	 * each step. If the size is &lt; 2 the method returns false;
 	 *
-	 * @param predicate the binary predicate
+	 * @param predicate
+	 *            the binary predicate
 	 * @return
 	 */
 	public boolean compareAdjacent(BiPredicate<IExpr, IExpr> predicate) {
@@ -275,8 +732,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 
 	/**
-	 * Replace all elements determined by the unary <code>from</code> predicate, with the element generated by the unary <code>to</code>
-	 * function. If the unary function returns null replaceAll returns null.
+	 * Replace all elements determined by the unary <code>from</code> predicate, with the element generated by the unary
+	 * <code>to</code> function. If the unary function returns null replaceAll returns null.
 	 *
 	 * @return <code>F.NIL</code> if no replacement occurs.
 	 */
@@ -446,8 +903,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	// }
 
 	/**
-	 * Compares this expression with the specified expression for canonical order. Returns a negative integer, zero, or a positive
-	 * integer as this expression is canonical less than, equal to, or greater than the specified expression.
+	 * Compares this expression with the specified expression for canonical order. Returns a negative integer, zero, or
+	 * a positive integer as this expression is canonical less than, equal to, or greater than the specified expression.
 	 */
 	@Override
 	public int compareTo(final IExpr rhsExpr) {
@@ -725,14 +1182,17 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 
 	/**
-	 * Select all elements by applying the <code>function</code> to each argument in this <code>AST</code> and append the result
-	 * elements for which the <code>function</code> returns non-null elements to the <code>filterAST</code>, or otherwise append the
-	 * argument to the <code>restAST</code>.
+	 * Select all elements by applying the <code>function</code> to each argument in this <code>AST</code> and append
+	 * the result elements for which the <code>function</code> returns non-null elements to the <code>filterAST</code>,
+	 * or otherwise append the argument to the <code>restAST</code>.
 	 *
-	 * @param filterAST the non-null elements which were returned by the <code>function#apply()</code> method
-	 * @param restAST   the arguments in this <code>AST</code> for which the <code>function#apply()</code> method returned
-	 *                  <code>null</code>
-	 * @param function  the function which filters each argument by returning a value which unequals <code>F.NIL</code>
+	 * @param filterAST
+	 *            the non-null elements which were returned by the <code>function#apply()</code> method
+	 * @param restAST
+	 *            the arguments in this <code>AST</code> for which the <code>function#apply()</code> method returned
+	 *            <code>null</code>
+	 * @param function
+	 *            the function which filters each argument by returning a value which unequals <code>F.NIL</code>
 	 * @return the given <code>filterAST</code>
 	 */
 	protected IAST filterFunction(final IASTAppendable filterAST, final IASTAppendable restAST,
@@ -804,10 +1264,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 
 	/**
-	 * Apply the functor to the elements of the range from left to right and return the final result. Results do accumulate from one
-	 * invocation to the next: each time this method is called, the accumulation starts over with value from the previous function call.
+	 * Apply the functor to the elements of the range from left to right and return the final result. Results do
+	 * accumulate from one invocation to the next: each time this method is called, the accumulation starts over with
+	 * value from the previous function call.
 	 *
-	 * @param function   a binary function that accumulate the elements
+	 * @param function
+	 *            a binary function that accumulate the elements
 	 * @param startValue
 	 * @return the accumulated elements
 	 */
@@ -823,10 +1285,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 
 	/**
-	 * Apply the functor to the elements of the range from right to left and return the final result. Results do accumulate from one
-	 * invocation to the next: each time this method is called, the accumulation starts over with value from the previous function call.
+	 * Apply the functor to the elements of the range from right to left and return the final result. Results do
+	 * accumulate from one invocation to the next: each time this method is called, the accumulation starts over with
+	 * value from the previous function call.
 	 *
-	 * @param function   a binary function that accumulate the elements
+	 * @param function
+	 *            a binary function that accumulate the elements
 	 * @param startValue
 	 * @return the accumulated elements
 	 */
@@ -1084,7 +1548,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @param index
 	 * @return
-	 * @throws WrongArgumentType if the cast is not possible
+	 * @throws WrongArgumentType
+	 *             if the cast is not possible
 	 */
 	@Override
 	public final IInteger getInt(int index) {
@@ -1116,7 +1581,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @param index
 	 * @return
-	 * @throws WrongArgumentType if the cast is not possible
+	 * @throws WrongArgumentType
+	 *             if the cast is not possible
 	 */
 	@Override
 	public final INumber getNumber(int index) {
@@ -1189,8 +1655,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 
 	/**
-	 * Returns the value to which the specified property is mapped, or <code>null</code> if this map contains no mapping for the
-	 * property.
+	 * Returns the value to which the specified property is mapped, or <code>null</code> if this map contains no mapping
+	 * for the property.
 	 *
 	 * @param key
 	 * @return
@@ -1212,8 +1678,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * </p>
 	 *
 	 * <p>
-	 * See: <a href= "https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash"> Wikipedia: Fowler–Noll–Vo
-	 * hash function</a>
+	 * See: <a href= "https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash"> Wikipedia:
+	 * Fowler–Noll–Vo hash function</a>
 	 * </p>
 	 *
 	 */
@@ -1547,19 +2013,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isAST(final IExpr header) {
-		return isSameHead(header);
+		return head().equals(header);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isAST(final IExpr header, final int length) {
-		return isSameHead(header, length);
+	public boolean isAST(final IExpr header, final int length) {
+		return head().equals(header) && length == size();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean isAST(IExpr header, int length, IExpr... args) {
-		if (isSameHead(header, length)) {
+		if (isAST(header, length)) {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i] != null && !get(i + 1).equals(args[i])) {
 					return false;
@@ -1572,8 +2038,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isAST(IExpr header, int minLength, int maxLength) {
-		return isSameHead(header, minLength, maxLength);
+	public final boolean isAST(IExpr head, int minLength, int maxLength) {
+		int size = size();
+		return head().equals(head) && minLength <= size && maxLength >= size;
 	}
 
 	/**
@@ -1638,8 +2105,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final boolean isASTSizeGE(final IExpr header, final int length) {
-		return isSameHeadSizeGE(header, length);
+	public boolean isASTSizeGE(final IExpr header, final int length) {
+		return head().equals(header) && length <= size();
 	}
 
 	@Override
@@ -1716,14 +2183,14 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	public final IAST[] isDerivative() {
 		if (head().isAST()) {
 			IAST headAST = (IAST) head();
-			if (headAST.isASTSizeGE(F.Derivative, 2)) {
+			if (headAST.isSameHeadSizeGE(F.Derivative, 2)) {
 				IAST[] result = new IAST[3];
 				result[0] = headAST;
 				result[1] = this;
 				return result;
 			}
 
-			if (headAST.head().isASTSizeGE(F.Derivative, 2)) {
+			if (headAST.head().isSameHeadSizeGE(F.Derivative, 2)) {
 				if (this.size() != ((IAST) headAST.head()).size()) {
 					return null;
 				}
@@ -2228,13 +2695,22 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isPlus() {
-		return isSameHeadSizeGE(F.Plus, 3);
+		return head() == F.Plus && 3 <= size();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean isPlusTimesPower() {
-		return isPlus() || isTimes() || isPower();
+		final IExpr h = head();
+		if (h instanceof IBuiltInSymbol) {
+			if (4 <= size()) {
+				return h == F.Plus || h == F.Times;
+			}
+			if (3 == size()) {
+				return h == F.Plus || h == F.Times || h == F.Power;
+			}
+		}
+		return false;
 	}
 
 	/** {@inheritDoc} */
@@ -2476,35 +2952,40 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/**
 	 * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code>
 	 *
-	 * @param head object to compare with element at location <code>0</code>
+	 * @param head
+	 *            object to compare with element at location <code>0</code>
 	 * @return
 	 */
-	public boolean isSameHead(IExpr head) {
-		return head().equals(head);
+	public boolean isSameHead(ISymbol head) {
+		return head() == head;
 	}
 
 	/**
-	 * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the size of the list
-	 * equals <code>length</code>.
+	 * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the
+	 * size of the list equals <code>length</code>.
 	 *
-	 * @param head   object to compare with element at location <code>0</code>
+	 * @param head
+	 *            object to compare with element at location <code>0</code>
 	 * @param length
 	 * @return
 	 */
-	public boolean isSameHead(IExpr head, int length) {
-		return length == size() && head().equals(head);
+	public boolean isSameHead(ISymbol head, int length) {
+		return head() == head && length == size();
 	}
 
 	/**
-	 * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the size of the list is
-	 * between <code>minLength</code> and <code>maxLength</code>.
+	 * Check if the object at index 0 (i.e. the head of the list) is the same object as <code>head</code> and if the
+	 * size of the list is between <code>minLength</code> and <code>maxLength</code>.
 	 *
-	 * @param head      object to compare with element at location <code>0</code>
-	 * @param minLength minimum length of list elements.
-	 * @param maxLength maximum length of list elements.
+	 * @param head
+	 *            object to compare with element at location <code>0</code>
+	 * @param minLength
+	 *            minimum length of list elements.
+	 * @param maxLength
+	 *            maximum length of list elements.
 	 * @return
 	 */
-	public boolean isSameHead(IExpr head, int minLength, int maxLength) {
+	public boolean isSameHead(ISymbol head, int minLength, int maxLength) {
 		int size = size();
 		return head().equals(head) && minLength <= size && maxLength >= size;
 	}
@@ -2594,7 +3075,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isTimes() {
-		return isSameHeadSizeGE(F.Times, 3);
+		return head() == F.Times && 3 <= size();
 	}
 
 	/**
@@ -2883,8 +3364,10 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * Append the mapped ranges elements directly to the given <code>list</code>
 	 *
 	 * @param list
-	 * @param binaryFunction binary function
-	 * @param leftArg        left argument of the binary functions <code>apply()</code> method.
+	 * @param binaryFunction
+	 *            binary function
+	 * @param leftArg
+	 *            left argument of the binary functions <code>apply()</code> method.
 	 * @return
 	 */
 	public IAST mapLeft(IASTAppendable list, BiFunction<IExpr, IExpr, IExpr> binaryFunction, IExpr leftArg) {
@@ -2898,8 +3381,10 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * Append the mapped ranges elements directly to the given <code>list</code>
 	 *
 	 * @param list
-	 * @param binaryFunction a binary function
-	 * @param rightArg       right argument of the binary functions <code>apply()</code> method.
+	 * @param binaryFunction
+	 *            a binary function
+	 * @param rightArg
+	 *            right argument of the binary functions <code>apply()</code> method.
 	 * @return the given list
 	 */
 	public Collection<IExpr> mapRight(Collection<IExpr> list, BiFunction<IExpr, IExpr, IExpr> binaryFunction,
@@ -3055,8 +3540,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 
 	/**
-	 * Associates the specified value with the specified property in the associated <code>EnumMap<PROPERTY, Object></code> map. If the
-	 * map previously contained a mapping for this key, the old value is replaced.
+	 * Associates the specified value with the specified property in the associated
+	 * <code>EnumMap<PROPERTY, Object></code> map. If the map previously contained a mapping for this key, the old value
+	 * is replaced.
 	 *
 	 * @param key
 	 * @param value

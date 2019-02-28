@@ -23,7 +23,6 @@ import org.matheclipse.core.expression.ExprField;
 import org.matheclipse.core.expression.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
-import org.matheclipse.core.expression.NILPointer;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
@@ -2396,7 +2395,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @return
      */
     @Override
-    public boolean isSameHeadSizeGE(IExpr head, int length) {
+    public boolean isSameHeadSizeGE(ISymbol head, int length) {
         return false;
     }
 

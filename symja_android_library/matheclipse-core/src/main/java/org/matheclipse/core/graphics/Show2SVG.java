@@ -14,10 +14,10 @@ import java.util.Locale;
 
 public class Show2SVG {
 //
-//	private static class Dimensions2D {
+	// private static class Dimensions2D {
 //
-//		
-//	}
+	//
+	// }
 
 	private static final DecimalFormatSymbols US_SYNBOLS = new DecimalFormatSymbols(Locale.US);
 	protected static final DecimalFormat FORMATTER = new DecimalFormat("0.0####", US_SYNBOLS);
@@ -26,11 +26,11 @@ public class Show2SVG {
 		for (int i = 1; i < ast.size(); i++) {
 			if (ast.get(i).isSymbol()) {
 				//
-			} else if (ast.get(i).isASTSizeGE(F.Line, 2)) {
+			} else if (ast.get(i).isSameHeadSizeGE(F.Line, 2)) {
 				lineDimension(ast.getAST(i), dim);
-			} else if (ast.get(i).isASTSizeGE(F.Point, 2)) {
+			} else if (ast.get(i).isSameHeadSizeGE(F.Point, 2)) {
 				pointDimension(ast.getAST(i), dim);
-			} else if (ast.get(i).isASTSizeGE(F.Rectangle, 1)) {
+			} else if (ast.get(i).isSameHeadSizeGE(F.Rectangle, 1)) {
 				rectangleDimension(ast.getAST(i), dim);
 			}
 		}
@@ -40,11 +40,11 @@ public class Show2SVG {
 		for (int i = 1; i < ast.size(); i++) {
 			if (ast.get(i).isSymbol()) {
 				dim.setColorRGB(ast.get(i).toString());
-			} else if (ast.get(i).isASTSizeGE(F.Line, 2)) {
+			} else if (ast.get(i).isSameHeadSizeGE(F.Line, 2)) {
 				lineToSVG(ast.getAST(i), buf, dim);
-			} else if (ast.get(i).isASTSizeGE(F.Point, 2)) {
+			} else if (ast.get(i).isSameHeadSizeGE(F.Point, 2)) {
 				pointToSVG(ast.getAST(i), buf, dim);
-			} else if (ast.get(i).isASTSizeGE(F.Rectangle, 2)) {
+			} else if (ast.get(i).isSameHeadSizeGE(F.Rectangle, 2)) {
 				rectangleToSVG(ast.getAST(i), buf, dim);
 			}
 		}
@@ -383,9 +383,9 @@ public class Show2SVG {
 	}
 
 	public static void toSVG(IAST ast, StringBuilder buf) {
-		if (ast.size() > 1 && ast.arg1().isASTSizeGE(F.Graphics, 2)) {
+		if (ast.size() > 1 && ast.arg1().isSameHeadSizeGE(F.Graphics, 2)) {
 			graphicsToSVG(ast.getAST(1), buf);
-		} else if (ast.size() > 1 && ast.arg1().isASTSizeGE(F.Graphics3D, 2)) {
+		} else if (ast.size() > 1 && ast.arg1().isSameHeadSizeGE(F.Graphics3D, 2)) {
 			Show3D2ThreeJS.graphics3dToSVG(ast.getAST(1), buf);
 		}
 	}

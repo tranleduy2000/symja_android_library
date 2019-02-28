@@ -273,7 +273,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return
      */
     @Override
-    boolean isSameHeadSizeGE(IExpr head, int length);
+    boolean isSameHeadSizeGE(ISymbol head, int length);
 
     /**
      * {@inheritDoc}

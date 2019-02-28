@@ -537,6 +537,7 @@ public class Assumptions extends AbstractAssumptions {
 	 * 
 	 * @param ast
 	 *            the assumptions which should be added to the <code>assumptions</code> instance.
+	 * @param assumptions
 	 * @return <code>null</code> if <code>assumptions</code> could not be added from the given expression.
 	 */
 	@Override
@@ -565,7 +566,7 @@ public class Assumptions extends AbstractAssumptions {
 			if (addEqual(ast, this)) {
 				return this;
 			}
-		} else if (ast.isASTSizeGE(F.And, 2) || ast.isASTSizeGE(F.List, 2)) {
+		} else if (ast.isAnd() || ast.isSameHeadSizeGE(F.List, 2)) {
 			return addList(ast, this);
 		} else if (ast.isAST(F.Distributed, 3)) {
 			if (addDistribution(ast, this)) {
@@ -578,6 +579,7 @@ public class Assumptions extends AbstractAssumptions {
 	@Override
 	final public IAST distribution(IExpr expr) {
 		IAST dist = distributionsMap.get(expr);
+		// Swift changed: type is incompatible
 		return (dist == null) ? F.nilPtr() : dist;
 	}
 	/**

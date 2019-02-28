@@ -14,6 +14,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -338,9 +339,9 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluate(EvalEngine engine) {
-//		if ((getEvalFlags() & IAST.DEFER_AST) == IAST.DEFER_AST) {
-//			return F.NIL;
-//		}
+		// if ((getEvalFlags() & IAST.DEFER_AST) == IAST.DEFER_AST) {
+		// return F.NIL;
+		// }
 		return F.NIL;
 	}
 
@@ -449,27 +450,27 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isSameHead(IExpr head) {
-		return F.$RealMatrix.equals(head);
+	public boolean isSameHead(ISymbol head) {
+		return F.$RealMatrix==head;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isSameHead(IExpr head, int length) {
-		return F.$RealMatrix.equals(head) && matrix.getRowDimension() == length - 1;
+	public boolean isSameHead(ISymbol head, int length) {
+		return F.$RealMatrix==head && matrix.getRowDimension() == length - 1;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isSameHead(IExpr head, int minLength, int maxLength) {
+	public boolean isSameHead(ISymbol head, int minLength, int maxLength) {
 		int size = matrix.getRowDimension() + 1;
 		return F.$RealMatrix.equals(head) && minLength <= size && maxLength >= size;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isSameHeadSizeGE(IExpr head, int length) {
-		return F.$RealMatrix.equals(head) && length <= matrix.getRowDimension() + 1;
+	public boolean isSameHeadSizeGE(ISymbol head, int length) {
+		return F.$RealMatrix == head && length <= matrix.getRowDimension() + 1;
 	}
 
 	/** {@inheritDoc} */

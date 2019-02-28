@@ -96,6 +96,7 @@ import edu.jas.kern.PreemptStatus;
  * 
  */
 public class F {
+	// private static final Cache<IAST, IAST> PARSER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(1024).build();
 	private final static IBuiltInSymbol[] BUILT_IN_SYMBOLS = new IBuiltInSymbol[ID.Zeta + 10];
 
 
@@ -161,7 +162,7 @@ public class F {
 	 *
 	 * @see java.util.Optional#isPresent
 	 */
-	public final static INilPointer NIL = new NILPointer();
+	public final static INilPointer NIL = AbstractAST.NIL;
 
 
     /***/
@@ -5359,6 +5360,9 @@ public class F {
 		return binaryAST2(Equal, a0, a1);
 	}
 
+	public static IAST Equivalent(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Equivalent, a0, a1);
+	}
 	public static IAST Erf(final IExpr a) {
 		return unaryAST1(Erf, a);
 	}
@@ -7222,6 +7226,7 @@ public class F {
 		}
 		double n = value.toBigNumerator().doubleValue();
 		double d = value.toBigDenominator().doubleValue();
+		// Avoid android framework's bug
 		if (F.isEqual(n, d)) {
 			n = new BigDecimal(value.toBigNumerator()).doubleValue();
 			d = new BigDecimal(value.toBigDenominator()).doubleValue();

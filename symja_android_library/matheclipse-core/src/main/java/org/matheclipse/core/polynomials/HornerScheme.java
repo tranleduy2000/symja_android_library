@@ -40,12 +40,15 @@ public class HornerScheme {
 
 	public IAST generate(boolean numericMode, IAST poly, final ISymbol sym) {
 		if (numericMode) {
-			for (IExpr x : poly) {
-				collectTermN(sym, x);
-			}
-//			for (int i = 1; i < poly.size(); i++) {
-//				collectTermN(sym, poly.get(i));
-//			}
+			poly.forEach(new Consumer<IExpr>() {
+                @Override
+                public void accept(IExpr x) {
+                    HornerScheme.this.collectTermN(sym, x);
+                }
+            });
+			// for (int i = 1; i < poly.size(); i++) {
+			// collectTermN(sym, poly.get(i));
+			// }
 			IASTAppendable result = F.PlusAlloc(16);
 			IAST startResult = result;
 			IASTAppendable temp;
@@ -134,7 +137,7 @@ public class HornerScheme {
 	private void collectTerm(ISymbol sym, IExpr expr) {
 		if (expr instanceof IAST) {
 			IAST term = (IAST) expr;
-			if (term.isASTSizeGE(F.Times, 2)) {
+			if (term.isTimes()) {
 				for (int i = 1; i < term.size(); i++) {
 					if (sym.equals(term.get(i))) {
 						IAST temp = F.ast(term, F.Times, false, i, i + 1);
@@ -165,7 +168,7 @@ public class HornerScheme {
 	private void collectTermN(ISymbol sym, IExpr expr) {
 		if (expr instanceof IAST) {
 			IAST term = (IAST) expr;
-			if (term.isASTSizeGE(F.Times, 2)) {
+			if (term.isTimes()) {
 				for (int i = 1; i < term.size(); i++) {
 					if (sym.equals(term.get(i))) {
 						IAST temp = F.ast(term, F.Times, false, i, i + 1);

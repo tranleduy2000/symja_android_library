@@ -14,7 +14,6 @@ import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
-import org.matheclipse.core.expression.NILPointer;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -1604,6 +1603,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression equals the given expression. If the compared expressions are of the same numeric type,
      * they are equal to a given EPSILON
+     * @param expression
      */
     boolean isSame(IExpr expression);
 
@@ -1619,7 +1619,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param head object to compare with element at location <code>0</code>
      */
-    boolean isSameHeadSizeGE(IExpr head, int length);
+    boolean isSameHeadSizeGE(ISymbol head, int length);
 
     /**
      * Test if this expression is a sequence (i.e. an AST with head Sequence)
