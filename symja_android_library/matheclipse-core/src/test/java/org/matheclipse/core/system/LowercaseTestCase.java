@@ -3596,8 +3596,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testExpand() {
 		// performance test
-		// check("f = (x + y + z + w)^15 ;Expand(f*(f+w))", //
-		// "");
+		// check("f = (x + y + z + w)^15 ;Expand(f*(f+w));", //
+		// "?");
 		check("Expand((x + 3)^(5/2)+(x + 1)^(3/2))", //
 				"Sqrt(1+x)+x*Sqrt(1+x)+9*Sqrt(3+x)+6*x*Sqrt(3+x)+x^2*Sqrt(3+x)");
 		check("Expand((x + 1)^(5/2))", //
@@ -4482,7 +4482,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FixedPoint(#+1 &, 1, 20)", "21");
 		check("FixedPoint(f, x, 0)", "x");
 		check("FixedPoint(f, x, -1)", "FixedPoint(f,x,-1)");
-		//Swift changed: Use DOUBLE_TOLERANCE to compare double in order to avoid infinity loop
+		//Swift changed: Use Config.DOUBLE_TOLERANCE to compare double in order to avoid infinity loop
 		checkNumeric("FixedPoint(Cos, 1.0, Infinity)", "0.7390851332151603");
 
 		checkNumeric("FixedPoint((# + 2/#)/2 &, 1.)", "1.414213562373095");

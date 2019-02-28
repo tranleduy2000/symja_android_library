@@ -25,8 +25,10 @@ import java.util.Map;
  * See <a href="https://en.wikipedia.org/wiki/Lenstra_elliptic_curve_factorization"> Wikipedia: Lenstra elliptic curve
  * factorization </a>
  * </p>
+ *
+ * @deprecated use de.tilman_neumann.jml.factor.ecm.EllipticCurveMethod
  */
-public class EllipticCurveMethod {
+public class EllipticCurveMethodOLD {
 	/**
 	 * Initial capacity for the arrays which store the factors.
 	 */
@@ -357,7 +359,12 @@ public class EllipticCurveMethod {
 	private BigInteger Quad1, Quad2, Quad3, Quad4;
 	private boolean Computing3Squares;
 
-	public EllipticCurveMethod(BigInteger nn) {
+	/**
+	 *
+	 * @param nn
+	 * @deprecated use de.tilman_neumann.jml.factor.ecm.EllipticCurveMethod
+	 */
+	public EllipticCurveMethodOLD(BigInteger nn) {
 		fCapacity = START_CAPACITY;
 		inputNumber = nn;
 		BigNbrToBigInt(nn);
@@ -3906,7 +3913,7 @@ public class EllipticCurveMethod {
 	}
 
 	public static void ellipticCurveFactors(final BigInteger val, Map<BigInteger, Integer> map) {
-		EllipticCurveMethod ecm = new EllipticCurveMethod(val);
+		EllipticCurveMethodOLD ecm = new EllipticCurveMethodOLD(val);
 		ecm.factorize(map);
 	}
 }

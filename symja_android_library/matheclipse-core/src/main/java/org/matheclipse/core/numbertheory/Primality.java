@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import de.tilman_neumann.jml.factor.CombinedFactorAlgorithm;
+import de.tilman_neumann.jml.factor.ecm.EllipticCurveMethod;
 import de.tilman_neumann.util.SortedMultiset;
 
 /**
@@ -67,7 +68,7 @@ public class Primality {
 		}
 	}
 
-	//J2objc change: use java random
+	//Swift changed: use native java random
 	private final static Random random = new Random();
 	private final static BigInteger TWO = new BigInteger("2");
 
@@ -687,14 +688,16 @@ public class Primality {
 	 * @param val
 	 * @param map of all BigInteger primes and their associated exponents
 	 */
-	public static void factorInteger(final BigInteger val, Map<BigInteger, Integer> map) {
-		EllipticCurveMethod ecm = new EllipticCurveMethod(val);
+	public static void factorInteger(final BigInteger val, SortedMap<BigInteger, Integer> map) {
+		EllipticCurveMethod ecm = new EllipticCurveMethod();
 
-		BigInteger rest = ecm.factorize(map);
-		if (!rest.equals(BigInteger.ONE)) {
-			CombinedFactorAlgorithm factorizer;
-			final int cores = Runtime.getRuntime().availableProcessors();
-			// Android changed: Unsafe API isn't available
+		SortedMap<BigInteger, Integer> unfactoredComposites = ecm.factorize(val, map);
+		for (Map.Entry<BigInteger, Integer> entry : unfactoredComposites.entrySet()) {
+			BigInteger rest = entry.getKey();
+			if (!rest.equals(BigInteger.ONE)) {
+				CombinedFactorAlgorithm factorizer;
+				final int cores = Runtime.getRuntime().availableProcessors();
+				// Android changed: Unsafe API isn't available
 //		if (Config.JAVA_UNSAFE) {
 //				factorizer = new CombinedFactorAlgorithm(cores / 2 + 1, true, false);
 //			} else {
@@ -702,12 +705,13 @@ public class Primality {
 //			}
 				SortedMultiset<BigInteger> result = factorizer.factor(rest);
 
-			for (Map.Entry<BigInteger, Integer> entry : result.entrySet()) {
-				map.put(entry.getKey(), entry.getValue());
+				for (Map.Entry<BigInteger, Integer> entry2 : result.entrySet()) {
+					map.put(entry2.getKey(), entry2.getValue());
+				}
+				}
 			}
 			return;
-		}
-		}
+	}
 
 	public static BigInteger rho(final BigInteger val) {
 		BigInteger divisor;

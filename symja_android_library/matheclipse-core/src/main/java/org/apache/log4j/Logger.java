@@ -4,6 +4,7 @@ package org.apache.log4j;
  * Created by Duy on 2/21/2018.
  */
 
+@SuppressWarnings("all")
 public class Logger {
     static final boolean DEBUG = false;
 
@@ -37,5 +38,9 @@ public class Logger {
 
     public boolean isWarnEnabled() {
         return false;
+    }
+
+    public void debug(String s, Throwable e) {
+
     }
 }

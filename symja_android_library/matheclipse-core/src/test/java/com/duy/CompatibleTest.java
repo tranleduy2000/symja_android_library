@@ -16,7 +16,7 @@ public class CompatibleTest extends TestCase {
                 "import java.nio.channels",
                 "import java.net",
                 "import java.security",
-                "Config.DOUBLE_EPSILON",
+                ".DOUBLE_EPSILON",
                 "java.util.UUID",
         };
         File sourceDir = new File("../symja_android_library/matheclipse-core/src/main/java");
