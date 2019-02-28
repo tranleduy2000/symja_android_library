@@ -10,7 +10,6 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.polynomials.PartialFractionGenerator;
 import org.matheclipse.core.reflection.system.rules.InverseLaplaceTransformRules;
 
 /**
@@ -74,8 +73,9 @@ public class InverseLaplaceTransform extends AbstractFunctionEvaluator implement
 				if (arg1.isTimes() || arg1.isPower()) {
 					IExpr[] parts = Algebra.fractionalParts(arg1, false);
 					if (parts != null) {
-						IExpr temp = Algebra.partialFractionDecompositionRational(new PartialFractionGenerator(), parts,
-								s);
+						IExpr temp = Algebra.partsApart(parts, s, engine);
+						// IExpr temp = Algebra.partialFractionDecompositionRational(new PartialFractionGenerator(),
+						// parts,s);
 						if (temp.isPlus()) {
 							return ((IAST) temp).mapThread(F.InverseLaplaceTransform(F.Null, s, t), 1);
 						}

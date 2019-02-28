@@ -623,8 +623,8 @@ public class SeriesFunctions {
                     }
                 }
 
-                IExpr plusResult = Algebra.partialFractionDecompositionRational(new PartialFractionGenerator(), parts,
-                        symbol);
+				IExpr plusResult = Algebra.partsApart(parts, symbol, EvalEngine.get());
+				// Algebra.partialFractionDecompositionRational(new PartialFractionGenerator(), parts,symbol);
                 if (plusResult.isPlus()) {
                     // OneIdentity if plusResult.isAST1()
                     // if (plusResult.size() > 2) {
@@ -655,7 +655,7 @@ public class SeriesFunctions {
             }
             IExpr firstArg = logAST.arg1();
             if (firstArg.isPower() && firstArg.exponent().isFree(data.getSymbol())) {
-                IAST arg1 = logAST.setAtClone(1, firstArg.base());
+				IAST arg1 = logAST.setAtCopy(1, firstArg.base());
                 return F.Times(firstArg.exponent(), data.limit(arg1));
             } else if (firstArg.isTimes()) {
 				IAST isFreeResult = firstArg.partitionTimes(new Predicate<IExpr>() {
@@ -665,8 +665,8 @@ public class SeriesFunctions {
                     }
                 }, F.C1, F.C1, F.List);
 				if (!isFreeResult.arg1().isOne()) {
-					IAST arg1 = logAST.setAtClone(1, isFreeResult.arg1());
-					IAST arg2 = logAST.setAtClone(1, isFreeResult.arg2());
+					IAST arg1 = logAST.setAtCopy(1, isFreeResult.arg1());
+					IAST arg2 = logAST.setAtCopy(1, isFreeResult.arg2());
                     return F.Plus(arg1, data.limit(arg2));
                 }
             }
