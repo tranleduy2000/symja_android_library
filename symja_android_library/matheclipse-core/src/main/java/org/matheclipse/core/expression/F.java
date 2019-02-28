@@ -4744,6 +4744,9 @@ public class F {
 		return binaryAST2(ChebyshevU, a0, a1);
 	}
 
+	public static IAST CharacteristicPolynomial(final IExpr a0, final IExpr a1) {
+		return binaryAST2(CharacteristicPolynomial, a0, a1);
+	}
 	public static IAST Chop(final IExpr a0) {
 		return unaryAST1(Chop, a0);
 	}

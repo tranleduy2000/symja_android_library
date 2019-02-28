@@ -576,26 +576,9 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      *
      * @param expr
      * @return <code>-1</code> if no position was found
-     */
-    int indexOf(final IExpr expr);
-
-    /**
-     * Find the first argument position, which equals <code>expr</code>. The search starts at index <code>1</code>.
-     *
-     * @param expr
-     * @return <code>-1</code> if no position was found
      * @deprecated use {@link #indexOf(IExpr)} instead
      */
     int findFirstEquals(final IExpr expr);
-
-    /**
-     * Find the first argument position, which fulfills the <code>predicate</code>. The search starts at index
-     * <code>1</code>.
-     *
-     * @param expr
-     * @return <code>-1</code> if no position was found
-     */
-    int indexOf(Predicate<? super IExpr> predicate);
 
     /**
      * Apply the functor to the elements of the range from left to right and return the final result. Results do
@@ -656,6 +639,16 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return the <code>true</code> if the predicate is true for all elements or <code>false</code> otherwise
      */
     boolean forAll(Predicate<? super IExpr> predicate, int startOffset);
+
+    /**
+     * Check all atomic (non IAST objects) leave element by applying the <code>predicate</code> to each leave argument in this <code>AST</code> and sub-<code>AST</code>s and  return
+     * <code>true</code> if all of the leave elements starting from index <code>startOffset</code> satisfy the predicate.
+     *
+     * @param predicate   the predicate which filters each argument in this <code>AST</code>
+     * @param startOffset start offset from which the leave elements have to be tested
+     * @return the <code>true</code> if the predicate is true for all elements or <code>false</code> otherwise
+     */
+    boolean forAllLeaves(Predicate<? super IExpr> predicate, int startOffset);
 
     /**
      * <p>
@@ -828,17 +821,21 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     boolean hasOptionalArgument();
 
     /**
-     * Set the head element of this list
+     * Find the first argument position, which equals <code>expr</code>. The search starts at index <code>1</code>.
+     *
+     * @param expr
+     * @return <code>-1</code> if no position was found
      */
-    // public void setHeader(IExpr expr);
+    public int indexOf(final IExpr expr);
 
     /**
-     * Returns an iterator over the elements in this list starting with offset <b>0</b>.
+     * Find the first argument position, which fulfills the <code>predicate</code>. The search starts at index
+     * <code>1</code>.
      *
-     *
-     * @return an iterator over this list values.
+     * @param expr
+     * @return <code>-1</code> if no position was found
      */
-    // public Iterator<IExpr> iterator0();
+    int indexOf(Predicate<? super IExpr> predicate);
 
     /**
      * Test if this AST contains no argument
@@ -1096,7 +1093,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param i
      * @return a clone with removed element at the given position.
      */
-    IASTAppendable removeAtClone(int i);
+    IASTAppendable removeAtClone(int position);
 
     /**
      * Copy to a new <code>IAST</code> and remove all arguments from position <code>1</code> inclusive to the

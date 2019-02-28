@@ -1119,6 +1119,14 @@ public final class LinearAlgebra {
                             }
                         }
 
+//						if (((IAST) arg1).forAllLeaves(x->x.isExactNumber(), 1)) {
+//							ISymbol x = F.Dummy("x");
+//							IExpr m = engine.evaluate(F.CharacteristicPolynomial(arg1, x));
+//							IAST list = PolynomialFunctions.roots(m, false, F.List(x), engine);
+//							if (list.isPresent()) {
+//								return F.Reverse(list);
+//							}
+//						}
                     }
 
                 } catch (final ClassCastException e) {
@@ -3143,7 +3151,7 @@ public final class LinearAlgebra {
      * <h3>Examples</h3>
 	 *
      * <pre>
-     * &gt;&gt; SingularValueDecomposition({{1.5, 2.0}, {2.5, 3.0}})
+	 * &gt;&gt; SingularValueDecomposition({{1.5, 2.0}, {2.5, 3.0}})
      * {
      * {{0.5389535334972082,0.8423354965397538},
      *  {0.8423354965397537,-0.5389535334972083}},
@@ -3157,7 +3165,7 @@ public final class LinearAlgebra {
      * </p>
 	 *
      * <pre>
-     * &gt;&gt; SingularValueDecomposition({{3/2, 2}, {5/2, 3}})
+	 * &gt;&gt; SingularValueDecomposition({{3/2, 2}, {5/2, 3}})
      * {
      * {{0.5389535334972082,0.8423354965397538},
      *  {0.8423354965397537,-0.5389535334972083}},
