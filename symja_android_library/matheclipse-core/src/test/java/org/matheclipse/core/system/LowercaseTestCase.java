@@ -8660,6 +8660,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPart() {
+		check("T = {a, b, c, d}", "{a,b,c,d}");
+		check("T[[2]]=3", "3");
 		check("{a(x,y,z,f),b,c,d}[[1,2]]", //
 				"y");
 		check("{{3,1},{5,1},{17,1},{257,1},{65537,1}}[[All,2]]", //
@@ -8813,6 +8815,44 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("integersQ(1,2,a)", "False");
 	}
 
+	public void testPatternOrder() {
+		// see https://mathematica.stackexchange.com/questions/8619
+		check("PatternOrder(x_, 1)", //
+				"-1");
+//		check("PatternOrder(g(_, _List), g(_, {___}))", //
+//				"-1");
+//		check("PatternOrder(g({}, _List), g(_, _List))", //
+//				"1");
+		check("PatternOrder(g({}, _List), g(_, {___}))", //
+				"-1");
+		check("PatternOrder(g(a), g(_))", //
+				"1");
+		check("PatternOrder(a,b)", //
+				"1");
+		check("PatternOrder(g(a), g(b))", //
+				"1");
+		// check("PatternOrder(__, (_) ..)", //
+		// "-1");
+	}
+	public void testPatternOrder() {
+		// see https://mathematica.stackexchange.com/questions/8619
+		check("PatternOrder(x_, 1)", //
+				"-1");
+//		check("PatternOrder(g(_, _List), g(_, {___}))", //
+//				"-1");
+//		check("PatternOrder(g({}, _List), g(_, _List))", //
+//				"1");
+		check("PatternOrder(g({}, _List), g(_, {___}))", //
+				"-1");
+		check("PatternOrder(g(a), g(_))", //
+				"1");
+		check("PatternOrder(a,b)", //
+				"1");
+		check("PatternOrder(g(a), g(b))", //
+				"1");
+		// check("PatternOrder(__, (_) ..)", //
+		// "-1");
+	}
 	public void testPatternTest() {
 		check("MatchQ({1,8,Pi},{__?Positive})", //
 				"True");

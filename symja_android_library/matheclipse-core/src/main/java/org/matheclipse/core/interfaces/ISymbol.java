@@ -118,6 +118,18 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     public void addAttributes(final int attributes);
 
     /**
+     * Set the value of the local variable on top of the local variable stack
+     */
+    public void assign(IExpr value);
+
+    /**
+     * Get the value which is assigned to the symbol or <code>null</code>, if no value is assigned.
+     *
+     * @return <code>null</code>, if no value is assigned.
+     */
+    public IExpr assignedValue();
+
+    /**
      * Clear the associated rules for this symbol
      *
      * @param engine the evaluation engine
@@ -196,18 +208,12 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     IAST f(IExpr arg1, IExpr arg2, IExpr arg3);
 
     /**
-     * Get the topmost value from the local variable stack
-     *
-     * @return <code>null</code> if no local variable is defined
-     */
-    public IExpr get();
-
-    /**
      * Get the value which is assigned to the symbol or <code>null</code>, if no value is assigned.
      *
      * @return <code>null</code>, if no value is assigned.
+     * @deprecated use {@link #assignedValue()} instead
      */
-    public IExpr getAssignedValue();
+    public IExpr get();
 
     /**
      * Get the Attributes of this symbol (i.e. LISTABLE, FLAT, ORDERLESS,...)
@@ -288,12 +294,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     boolean hasFlatAttribute();
 
-    /**
-     * Is a local variable stack created for this symbol ?
-     *
-     * @return <code>true</code> if this symbol has a local variable stack
-     */
-    boolean hasLocalVariableStack();
 
     /**
      * Does this symbols attribute set contains the <code>OneIdentity</code> attribute?
@@ -409,29 +409,12 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     int ordinal();
 
     /**
-     * Delete the topmost placeholder from the local variable stack
-     */
-    public void popLocalVariable();
-
-    /**
-     * Create a new variable placeholder on the symbols variable stack
-     */
-    public void pushLocalVariable();
-
-    /**
-     * Create a new variable placeholder on the symbols variable stack and set the local value
-     *
-     * @param localValue
-     */
-    public void pushLocalVariable(IExpr localValue);
-
-    /**
      * Associate a new rule, which invokes a method, to this symbol.
      *
      * @param pmEvaluator
      * @return
      */
-    public IPatternMatcher putDownRule(final PatternMatcherAndInvoker pmEvaluator);
+    public void putDownRule(final PatternMatcherAndInvoker pmEvaluator);
 
     /**
      * Associate a new &quot;down value&quot; rule with default priority to this symbol.
@@ -444,8 +427,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @return
      * @see PatternMap#DEFAULT_RULE_PRIORITY
      */
-    public IPatternMatcher putDownRule(final int setSymbol, boolean equalRule, IExpr leftHandSide,
-                                       IExpr rightHandSide, boolean packageMode);
+    public void putDownRule(final int setSymbol, boolean equalRule, IExpr leftHandSide,
+                            IExpr rightHandSide, boolean packageMode);
 
     public IExpr evalMessage(EvalEngine engine, String messageName);
 
@@ -464,8 +447,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @return
      * @see PatternMap#DEFAULT_RULE_PRIORITY
      */
-    public IPatternMatcher putDownRule(final int setSymbol, boolean equalRule, IExpr leftHandSide,
-                                       IExpr rightHandSide, int priority, boolean packageMode);
+    public void putDownRule(final int setSymbol, boolean equalRule, IExpr leftHandSide,
+                            IExpr rightHandSide, int priority, boolean packageMode);
 
     /**
      * Associate a new &quot;up value&quot; rule with default priority to this symbol.
@@ -545,6 +528,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
 
     /**
      * Set the value of the local variable on top of the local variable stack
+     *
+     * @deprecated use {@link #assign(IExpr)} instead
      */
     public void set(IExpr value);
 
@@ -567,7 +552,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @throws java.io.IOException
      */
     public boolean writeRules(java.io.ObjectOutputStream stream) throws java.io.IOException;
-
 
 
 }

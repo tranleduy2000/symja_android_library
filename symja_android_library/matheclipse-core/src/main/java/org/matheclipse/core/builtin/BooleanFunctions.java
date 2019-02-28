@@ -591,17 +591,19 @@ public final class BooleanFunctions {
 				}
 				IExpr sym = variables.get(position);
 				if (sym.isSymbol()) {
+					ISymbol symbol = (ISymbol) sym;
+					IExpr value = symbol.assignedValue();
 					try {
-						((ISymbol) sym).pushLocalVariable(F.True);
+						symbol.assign(F.True);
 						booleanTable(expr, position + 1);
 					} finally {
-						((ISymbol) sym).popLocalVariable();
+						symbol.assign(value);
 					}
 					try {
-						((ISymbol) sym).pushLocalVariable(F.False);
+						symbol.assign(F.False);
 						booleanTable(expr, position + 1);
 					} finally {
-						((ISymbol) sym).popLocalVariable();
+						symbol.assign(value);
 					}
 				}
 				return resultList;
@@ -3206,21 +3208,23 @@ public final class BooleanFunctions {
 			}
 			IExpr sym = variables.get(position);
 			if (sym.isSymbol()) {
+				ISymbol symbol = (ISymbol) sym;
+				IExpr value = symbol.assignedValue();
 				try {
-					((ISymbol) sym).pushLocalVariable(F.True);
+					symbol.assign(F.True);
 					if (bruteForceSatisfiableQ(expr, variables, position + 1)) {
 						return true;
 					}
 				} finally {
-					((ISymbol) sym).popLocalVariable();
+					symbol.assign(value);
 				}
 				try {
-					((ISymbol) sym).pushLocalVariable(F.False);
+					symbol.assign(F.False);
 					if (bruteForceSatisfiableQ(expr, variables, position + 1)) {
 						return true;
 					}
 				} finally {
-					((ISymbol) sym).popLocalVariable();
+					symbol.assign(value);
 				}
 			}
 			return false;
@@ -3312,21 +3316,23 @@ public final class BooleanFunctions {
 			}
 			IExpr sym = variables.get(position);
 			if (sym.isSymbol()) {
+				ISymbol symbol = (ISymbol) sym;
+				IExpr value = symbol.assignedValue();
 				try {
-					((ISymbol) sym).pushLocalVariable(F.True);
+					symbol.assign(F.True);
 					if (!bruteForceTautologyQ(expr, variables, position + 1)) {
 						return false;
 					}
 				} finally {
-					((ISymbol) sym).popLocalVariable();
+					symbol.assign(value);
 				}
 				try {
-					((ISymbol) sym).pushLocalVariable(F.False);
+					symbol.assign(F.False);
 					if (!bruteForceTautologyQ(expr, variables, position + 1)) {
 						return false;
 					}
 				} finally {
-					((ISymbol) sym).popLocalVariable();
+					symbol.assign(value);
 				}
 			}
 			return true;

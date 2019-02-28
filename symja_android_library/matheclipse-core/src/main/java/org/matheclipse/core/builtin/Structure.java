@@ -28,6 +28,8 @@ import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.ISymbol2IntMap;
+import org.matheclipse.core.patternmatching.PatternMap;
+import org.matheclipse.core.patternmatching.PatternMatcherAndEvaluator;
 import org.matheclipse.core.visit.AbstractVisitorLong;
 import org.matheclipse.core.visit.IndexedLevel;
 import org.matheclipse.core.visit.ModuleReplaceAll;
@@ -64,6 +66,7 @@ public class Structure {
 		F.Order.setEvaluator(new Order());
 		F.OrderedQ.setEvaluator(new OrderedQ());
 		F.Operate.setEvaluator(new Operate());
+		F.PatternOrder.setEvaluator(new PatternOrder());
 		F.Quit.setEvaluator(new Quit());
 		F.Scan.setEvaluator(new Scan());
 		F.Sort.setEvaluator(new Sort());
@@ -708,46 +711,46 @@ public class Structure {
 		/**
 		 * Calculate the number of leaves in an AST
 		 */
-//		public static class SimplifyLeafCountVisitor extends AbstractVisitorLong {
-//			int fHeadOffset;
+		// public static class SimplifyLeafCountVisitor extends AbstractVisitorLong {
+		// int fHeadOffset;
 //
-//			public SimplifyLeafCountVisitor() {
-//				this(1);
-//			}
+		// public SimplifyLeafCountVisitor() {
+		// this(1);
+		// }
 //
-//			public SimplifyLeafCountVisitor(int hOffset) {
-//				fHeadOffset = hOffset;
-//			}
+		// public SimplifyLeafCountVisitor(int hOffset) {
+		// fHeadOffset = hOffset;
+		// }
 //
-//			@Override
-//			public long visit(IAST list) {
-//				long sum = 0;
-//				for (int i = fHeadOffset; i < list.size(); i++) {
-//					sum += list.get(i).accept(this);
-//				}
-//				return sum;
-//			}
+		// @Override
+		// public long visit(IAST list) {
+		// long sum = 0;
+		// for (int i = fHeadOffset; i < list.size(); i++) {
+		// sum += list.get(i).accept(this);
+		// }
+		// return sum;
+		// }
 //
-//			@Override
-//			public long visit(IComplex element) {
-//				return element.leafCountSimplify();
-//			}
+		// @Override
+		// public long visit(IComplex element) {
+		// return element.leafCountSimplify();
+		// }
 //
-//			@Override
-//			public long visit(IComplexNum element) {
-//				return 3;
-//			}
+		// @Override
+		// public long visit(IComplexNum element) {
+		// return 3;
+		// }
 //
-//			@Override
-//			public long visit(IFraction element) {
-//				return element.leafCountSimplify();
-//			}
+		// @Override
+		// public long visit(IFraction element) {
+		// return element.leafCountSimplify();
+		// }
 //
-//			@Override
-//			public long visit(IInteger element) {
-//				return element.leafCountSimplify();
-//			}
-//		}
+		// @Override
+		// public long visit(IInteger element) {
+		// return element.leafCountSimplify();
+		// }
+		// }
 
 		public static class SimplifyLeafCountPatternMapVisitor extends AbstractVisitorLong {
 
@@ -1393,6 +1396,44 @@ public class Structure {
 		}
 	}
 
+	private final static class PatternOrder extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.size() == 3) {
+				IExpr arg1 = ast.arg1();
+				IExpr arg2 = ast.arg2();
+				final PatternMatcherAndEvaluator pmEvaluator1 = new PatternMatcherAndEvaluator(arg1, F.Null);
+				final PatternMatcherAndEvaluator pmEvaluator2 = new PatternMatcherAndEvaluator(arg2, F.Null);
+				PatternMap patternMap1 = pmEvaluator1.getPatternMap();
+				PatternMap patternMap2 = pmEvaluator2.getPatternMap();
+
+				int priority1 = patternMap1.determinePatterns(arg1);
+				int priority2 = patternMap2.determinePatterns(arg2);
+				if (pmEvaluator1.isRuleWithoutPatterns()) {
+					if (pmEvaluator2.isRuleWithoutPatterns()) {
+						return F.ZZ(-1*arg1.compareTo(arg2));
+					}
+					return F.C1;
+				}
+				if (pmEvaluator2.isRuleWithoutPatterns()) {
+					return F.CN1;
+				}
+				if (priority1 > priority2) {
+					return F.C1;
+				} else if (priority1 < priority2) {
+					return F.CN1;
+				}
+
+
+
+				return F.ZZ(pmEvaluator1.equivalentLHS(pmEvaluator2));
+
+			}
+			return F.NIL;
+		}
+
+	}
 	private final static class Quit extends AbstractFunctionEvaluator {
 
 		@Override

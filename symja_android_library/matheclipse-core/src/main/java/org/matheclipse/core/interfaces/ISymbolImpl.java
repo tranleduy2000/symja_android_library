@@ -11,15 +11,6 @@ import org.matheclipse.core.expression.ID;
 
 public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
 
-    public IExpr mapConstantDouble(DoubleFunction<IExpr> function) {
-        return F.NIL;
-    }
-
-    @Override
-    public int ordinal() {
-        return ID.UNKNOWN;
-    }
-
     @Override
     public IAST f(IExpr arg1) {
         return F.unaryAST1(this, arg1);
@@ -33,6 +24,25 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     @Override
     public IAST f(IExpr arg1, IExpr arg2, IExpr arg3) {
         return F.ternaryAST3(this, arg1, arg2, arg3);
+    }
+
+    @Override
+    public IExpr get() {
+        return assignedValue();
+    }
+
+    public IExpr mapConstantDouble(DoubleFunction<IExpr> function) {
+        return F.NIL;
+    }
+
+    @Override
+    public int ordinal() {
+        return ID.UNKNOWN;
+    }
+
+    @Override
+    public void set(IExpr value) {
+        assign(value);
     }
 
     @Override

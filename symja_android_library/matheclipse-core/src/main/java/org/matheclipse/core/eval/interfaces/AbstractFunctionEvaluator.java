@@ -7,13 +7,11 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.AST2;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -426,17 +424,6 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 		return F.NIL;
 	}
 
-	/**
-	 * Create a rule which invokes the method name in this class instance.
-	 *
-	 * @param symbol
-	 * @param patternString
-	 * @param methodName
-	 */
-	public void createRuleFromMethod(ISymbol symbol, String patternString, String methodName) {
-		PatternMatcherAndInvoker pm = new PatternMatcherAndInvoker(patternString, this, methodName);
-		symbol.putDownRule(pm);
-	}
 	/** {@inheritDoc} */
 	@Override
 	abstract public IExpr evaluate(final IAST ast, @Nonnull EvalEngine engine);
