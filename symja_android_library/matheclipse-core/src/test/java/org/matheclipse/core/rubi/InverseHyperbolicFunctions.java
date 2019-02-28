@@ -1,11 +1,24 @@
 package org.matheclipse.core.rubi;
 
 public class InverseHyperbolicFunctions extends AbstractRubiTestCase {
+	static boolean init=true;
 
 	public InverseHyperbolicFunctions(String name) {
 		super(name, false);
 	}
 
+	@Override
+	protected void setUp() {
+		try {
+			super.setUp();
+			if (init) {
+				System.out.println("InverseHyperbolicFunctions");
+				init=false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	// {5675}
 	public void test0003() {
 		check(//

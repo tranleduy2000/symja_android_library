@@ -1,10 +1,7 @@
 package org.matheclipse.core.rubi;
 
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.ExprEvaluator;
-import org.matheclipse.core.expression.F;
-
 public class TrigFunctions extends AbstractRubiTestCase {
+    static boolean init=true;
 
 	public TrigFunctions(String name) {
 		super(name, false);
@@ -12,8 +9,16 @@ public class TrigFunctions extends AbstractRubiTestCase {
 
 	@Override
 	protected void setUp() {
+		try {
 		super.setUp();
 		fSeconds=20;
+			if (init) {
+				System.out.println("TrigFunctions");
+				init=false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			}
 	}
 	// {2638}
 	public void test0001() {

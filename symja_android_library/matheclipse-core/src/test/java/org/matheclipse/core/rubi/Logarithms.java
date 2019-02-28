@@ -1,6 +1,7 @@
 package org.matheclipse.core.rubi;
 
 public class Logarithms extends AbstractRubiTestCase {
+	static boolean init=true;
 
 	public Logarithms(String name) {
 		super(name, false);
@@ -8,8 +9,16 @@ public class Logarithms extends AbstractRubiTestCase {
 
 	@Override
 	protected void setUp() {
+		try {
 		super.setUp();
 		fSeconds = 20;
+			if (init) {
+				System.out.println("Logarithms");
+				init=false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	// {2315}

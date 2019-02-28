@@ -1,11 +1,24 @@
 package org.matheclipse.core.rubi;
 
 public class Exponentials extends AbstractRubiTestCase {
+    static boolean init=true;
 
 	public Exponentials(String name) {
 		super(name, false);
 	}
 
+	@Override
+	protected void setUp() {
+		try {
+			super.setUp();
+			if (init) {
+				System.out.println("Exponentials");
+				init=false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	// {2181}
 	public void test0001() {
 		check(//
