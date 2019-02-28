@@ -248,11 +248,11 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 			return true;
 		}
 		if (obj instanceof BuiltInDummy) {
-			BuiltInDummy symbol = (BuiltInDummy) obj;
-			if (hashCode() != symbol.hashCode()) {
-				return false;
-			}
-			return fSymbolName.equals(symbol.fSymbolName);
+//			BuiltInDummy symbol = (BuiltInDummy) obj;
+//			if (hashCode() != symbol.hashCode()) {
+//				return false;
+//			}
+			return fSymbolName.equals(((BuiltInDummy) obj).fSymbolName);
 		}
 		return false;
 	}

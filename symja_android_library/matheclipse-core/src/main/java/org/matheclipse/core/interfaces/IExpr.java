@@ -15,7 +15,6 @@ import org.hipparchus.linear.RealVector;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.NILPointer;
-import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -1145,21 +1144,18 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return
      */
     boolean isMember(Predicate<IExpr> predicate, boolean heads);
+
     /**
      * Returns <code>true</code>, if <b>at least one of the elements</b> in the subexpressions, match the given pattern.
      * If <code>visitor==null</code> the <code>isMember()</code> method only operates at level 1.
      *
-     *
-     * @param pattern
-     *            a pattern-matching expression
-     * @param heads
-     *            if set to <code>false</code>, only the arguments of an IAST should be tested and not the
-     *            <code>Head[]</code> element.
-     * @param visitor
-     *            if <code>null</code> use <code>VisitorBooleanLevelSpecification(predicate, 1, heads)</code>
+     * @param pattern a pattern-matching expression
+     * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and not the
+     *                <code>Head[]</code> element.
+     * @param visitor if <code>null</code> use <code>VisitorBooleanLevelSpecification(predicate, 1, heads)</code>
      * @return
      */
-     boolean isMember(IExpr pattern, boolean heads, IVisitorBoolean visitor);
+    boolean isMember(IExpr pattern, boolean heads, IVisitorBoolean visitor);
 
     /**
      * Test if this expression equals <code>-1</code> in symbolic or numeric mode.

@@ -54,8 +54,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     protected transient RulesData fRulesData;
 
     /**
-     * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower-
-     * and upper-case function names.
+     * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower- and upper-case
+     * function names.
      */
     protected String fSymbolName;
 
@@ -109,10 +109,9 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return F.ast(expressions, this);
     }
 
-
     /**
-     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
-     * integer as this expression is canonical less than, equal to, or greater than the specified expression.
+     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive integer as this
+     * expression is canonical less than, equal to, or greater than the specified expression.
      */
     @Override
     public int compareTo(final IExpr expr) {
@@ -132,7 +131,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         return super.compareTo(expr);
     }
-
     /**
      * {@inheritDoc}
      */
@@ -144,8 +142,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         throw new WrongArgumentType(this, "Conversion into a complex numeric value is not possible!");
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -235,7 +231,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return F.NIL;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -249,7 +244,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         return fSymbolName;
     }
-
 
     /**
      * {@inheritDoc}
@@ -266,7 +260,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     public int hierarchy() {
         return SYMBOLID;
     }
-
     /**
      * {@inheritDoc}
      */
@@ -308,7 +301,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
             return fSymbolName;
         }
     }
-
 
     /**
      * {@inheritDoc}
@@ -387,7 +379,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public boolean isPolynomial(IExpr variable) {
-            return true;
+        return true;
         // if (variable == null) {
         // return true;
         // }
@@ -445,6 +437,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         final UnaryVariable2Slot uv2s = new UnaryVariable2Slot(map, variableCollector);
         return uv2s.apply(this);
     }
+
 
     /**
      * {@inheritDoc}
@@ -744,6 +737,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     public boolean isLocked(boolean packageMode) {
         return !packageMode && (fContext == Context.SYSTEM || fContext == Context.RUBI);
     }
+
     /**
      * {@inheritDoc}
      */
@@ -907,6 +901,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         return fRulesData.putUpRule(setSymbol, equalRule, leftHandSide, rightHandSide);
     }
+
     /**
      * {@inheritDoc}
      */
@@ -932,6 +927,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     // symbol.fAttributes = fAttributes;
     // return symbol;
     // }
+
+
     /**
      * {@inheritDoc}
      */
@@ -993,6 +990,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         return false;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -1044,15 +1042,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return (fSymbolName == null) ? 31 : fSymbolName.hashCode();
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -1061,20 +1050,28 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof IBuiltInSymbol) {
-            return false;
-        }
         if (obj instanceof Symbol) {
-            Symbol symbol = (Symbol) obj;
-            if (hashCode() != symbol.hashCode()) {
+            if (obj instanceof IBuiltInSymbol) {
                 return false;
             }
-            if (fSymbolName.equals(symbol.fSymbolName)) {
-                // #172
-                return fContext.equals(symbol.fContext);
-            }
+//			Symbol symbol = (Symbol) obj;
+//			if (hashCode() != symbol.hashCode()) {
+//				return false;
+//			}
+//			if () {
+            // #172
+            return fSymbolName.equals(((Symbol) obj).fSymbolName) && fContext.equals(((Symbol) obj).fContext);
+//			}
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return (fSymbolName == null) ? 31 : fSymbolName.hashCode();
     }
 
     @Override
@@ -1131,7 +1128,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return "$s(\"" + fSymbolName + "\")";
     }
 
-
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         fSymbolName = stream.readUTF();
         fAttributes = stream.read();
@@ -1152,7 +1148,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
             }
         }
     }
-
 
     /**
      * {@inheritDoc}
@@ -1191,9 +1186,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         engine.printMessage(toString() + " is not a variable with a value, so its value cannot be changed.");
         return null;
     }
-
-
-
     private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
         stream.writeUTF(fSymbolName);
         stream.write(fAttributes);
