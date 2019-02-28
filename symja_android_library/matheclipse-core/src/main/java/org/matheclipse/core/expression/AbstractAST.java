@@ -1074,12 +1074,18 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			if (size() != list.size()) {
 				return false;
 			}
+			IExpr head = head();
+			if (head != ((AbstractAST) obj).head()) {
+				if (head instanceof ISymbol) {
+					return false;
+				}
+			}
 			return forAll(new ObjIntPredicate<IExpr>() {
-                @Override
-                public boolean test(IExpr x, int i) {
-                    return x.equals(list.get(i));
-                }
-            }, 0);
+				@Override
+				public boolean test(IExpr x, int i) {
+					return x.equals(list.get(i));
+				}
+			}, 0);
 		}
 		return false;
 	}
