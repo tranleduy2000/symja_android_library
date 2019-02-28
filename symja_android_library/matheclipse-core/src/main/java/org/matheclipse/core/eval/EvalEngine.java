@@ -1139,10 +1139,6 @@ public class EvalEngine implements Serializable {
 		boolean evalLHSMode = fEvalLHSMode;
 		try {
 			fEvalLHSMode = true;
-			if ((ast.getEvalFlags() & IAST.IS_FLATTENED_OR_SORTED_MASK) != 0x0000) {
-				// already flattened or sorted
-				return ast;
-			}
 			return evalSetAttributesRecursive(ast, noEvaluation, evalNumericFunction, 0);
 		} finally {
 			fEvalLHSMode = evalLHSMode;
@@ -1545,6 +1541,10 @@ public class EvalEngine implements Serializable {
 			return resultList;
 		}
 
+		if ((ast.getEvalFlags() & IAST.IS_FLATTENED_OR_SORTED_MASK) != 0x0000) {
+			// already flattened or sorted
+			return ast;
+		}
 		if ((ISymbol.FLAT & attr) == ISymbol.FLAT) {
 			// associative
 			IASTAppendable result;
@@ -1585,7 +1585,7 @@ public class EvalEngine implements Serializable {
 	/**
 	 * Currently only the Rubi TagSet rules for <code>Dist()</code> are implemented
 	 *
-	 * @param tempAST
+	 * @param ast
 	 * @return
 	 */
 	private IExpr evalTagSetPlusTimes(IAST ast) {
