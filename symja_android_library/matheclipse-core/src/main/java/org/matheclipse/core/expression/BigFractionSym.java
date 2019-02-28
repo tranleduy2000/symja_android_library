@@ -453,7 +453,7 @@ public class BigFractionSym extends AbstractFractionSym {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isPositive() {
-		return fFraction.getNumerator().compareTo(BigInteger.ZERO) < 0;
+		return fFraction.getNumerator().compareTo(BigInteger.ZERO) > 0;
 	}
 
 	/** {@inheritDoc} */
