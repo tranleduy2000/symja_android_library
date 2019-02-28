@@ -1418,6 +1418,8 @@ public class F {
 
 	/** InverseErf(z) - returns the inverse error function of `z`.*/
 	public final static IBuiltInSymbol InverseErf = F.initFinalSymbol("InverseErf", ID.InverseErf);
+	/***/
+	public final static IBuiltInSymbol InverseCDF = F.initFinalSymbol("InverseCDF", ID.InverseCDF);
 
 	/** InverseErfc(z) - returns the inverse complementary error function of `z`.*/
 	public final static IBuiltInSymbol InverseErfc = F.initFinalSymbol("InverseErfc", ID.InverseErfc);

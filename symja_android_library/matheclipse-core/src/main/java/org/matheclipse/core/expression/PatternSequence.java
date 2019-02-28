@@ -1,17 +1,14 @@
 package org.matheclipse.core.expression;
 
-import com.duy.lambda.Predicate;
-
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IPatternSequenceImpl;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.patternmatching.IPatternMap;
+import org.matheclipse.core.patternmatching.IPatternMapImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
-import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
@@ -86,8 +83,8 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	@Override
-	public int[] addPattern(PatternMap patternMap, List<IExpr> patternIndexMap) {
-		patternMap.addPattern(patternIndexMap, this);
+	public int[] addPattern(List<IExpr> patternIndexMap) {
+		IPatternMapImpl.addPattern(patternIndexMap, this);
 		// the ast contains a pattern sequence (i.e. "x__")
 		int[] result = new int[2];
 		result[0] = IAST.CONTAINS_PATTERN_SEQUENCE;
@@ -137,7 +134,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	 * @return
 	 */
 	@Override
-	public boolean equivalent(final IPatternObject patternExpr2, final PatternMap pm1, PatternMap pm2) {
+	public boolean equivalent(final IPatternObject patternExpr2, final IPatternMap pm1, IPatternMap pm2) {
 		if (this == patternExpr2) {
 			return true;
 		}
@@ -159,13 +156,13 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	@Override
-	public boolean matchPattern(final IExpr expr, PatternMap patternMap) {
+	public boolean matchPattern(final IExpr expr, IPatternMap patternMap) {
 		IAST sequence = F.Sequence(expr);
 		return matchPatternSequence(sequence, patternMap);
 	}
 
 	@Override
-	public boolean matchPatternSequence(final IAST sequence, PatternMap patternMap) {
+	public boolean matchPatternSequence(final IAST sequence, IPatternMap patternMap) {
 		if (!isConditionMatchedSequence(sequence, patternMap)) {
 			return false;
 		}
@@ -196,7 +193,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	 * @return
 	 */
 	@Override
-	public int getIndex(PatternMap pm) {
+	public int getIndex(IPatternMap pm) {
 		if (pm != null) {
 			return pm.get(fSymbol);
 		}
@@ -381,7 +378,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	}
 
 	@Override
-	public boolean isConditionMatchedSequence(final IAST sequence, PatternMap patternMap) {
+	public boolean isConditionMatchedSequence(final IAST sequence, IPatternMap patternMap) {
 		if (fCondition == null) {
 			patternMap.setValue(this, sequence);
 			return true;

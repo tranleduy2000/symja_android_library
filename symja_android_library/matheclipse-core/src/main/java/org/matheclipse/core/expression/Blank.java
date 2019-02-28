@@ -7,8 +7,9 @@ import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternImpl;
 import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.patternmatching.IPatternMap;
+import org.matheclipse.core.patternmatching.IPatternMapImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
-import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
@@ -95,8 +96,8 @@ public class Blank extends IPatternImpl implements IPattern {
 	}
 
 	@Override
-	public int[] addPattern(PatternMap patternMap, List<IExpr> patternIndexMap) {
-		patternMap.addPattern(patternIndexMap, this);
+	public int[] addPattern(List<IExpr> patternIndexMap) {
+		IPatternMapImpl.addPattern(patternIndexMap, this);
 		int[] result = new int[2];
 		if (isPatternDefault() || isPatternOptional()) {
 			// the ast contains a pattern with default value (i.e. "_." or
@@ -177,7 +178,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	 * @return
 	 */
 	@Override
-	public boolean equivalent(final IPatternObject patternObject, final PatternMap pm1, PatternMap pm2) {
+	public boolean equivalent(final IPatternObject patternObject, final IPatternMap pm1, IPatternMap pm2) {
 		if (this == patternObject) {
 			return true;
 		}
@@ -245,7 +246,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	}
 
 	@Override
-	public int getIndex(PatternMap pm) {
+	public int getIndex(IPatternMap pm) {
 		if (pm != null) {
 			return pm.get(this);
 		}
@@ -306,7 +307,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	}
 
 	@Override
-	public boolean isConditionMatched(final IExpr expr, PatternMap patternMap) {
+	public boolean isConditionMatched(final IExpr expr, IPatternMap patternMap) {
 		if (fHeadTest == null || expr.head().equals(fHeadTest)) {
 			patternMap.setValue(this, expr);
 			return true;
@@ -339,7 +340,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	}
 
 	@Override
-	public boolean matchPattern(final IExpr expr, PatternMap patternMap) {
+	public boolean matchPattern(final IExpr expr, IPatternMap patternMap) {
 		return isConditionMatched(expr, patternMap);
 	}
 

@@ -42,10 +42,11 @@ public final class RulesData implements Serializable {
 	public static final int DEFAULT_VALUE_INDEX = Integer.MIN_VALUE;
 
 	/**
-	 * If this method returns <code>false</code>, the matching can try to match the <code>lha</code> with a hash value in a step before
-	 * the &quot;real structural pattern matching&quot;.
+	 * If this method returns <code>false</code>, the matching can try to match the <code>lha</code> with a hash value
+	 * in a step before the &quot;real structural pattern matching&quot;.
 	 *
-	 * @param lhs the left-hand-side of pattern matching definition
+	 * @param lhs
+	 *            the left-hand-side of pattern matching definition
 	 * @return
 	 */
 	public static boolean isComplicatedPatternRule(final IExpr lhs) {
@@ -163,7 +164,8 @@ public final class RulesData implements Serializable {
 	 * </p>
 	 * Example: optimize internal memory usage by sharing common objects.
 	 * 
-	 * @param visitor the visitor whch manipulates the IAST objects
+	 * @param visitor
+	 *            the visitor whch manipulates the IAST objects
 	 * @return
 	 */
 	public IAST accept(AbstractVisitor visitor) {
@@ -248,8 +250,8 @@ public final class RulesData implements Serializable {
 	}
 
 	/**
-	 * Create a pattern hash value for the left-hand-side expression and insert the left-hand-side as a simple pattern rule to the
-	 * <code>fSimplePatternRules</code>.
+	 * Create a pattern hash value for the left-hand-side expression and insert the left-hand-side as a simple pattern
+	 * rule to the <code>fSimplePatternRules</code>.
 	 * 
 	 * @param leftHandSide
 	 * @param pmEvaluator
@@ -401,8 +403,11 @@ public final class RulesData implements Serializable {
 					patternHash = ((IAST) expr).patternHashCode();
 				}
 				for (IPatternMatcher patternEvaluator : fPatternDownRules) {
-					// if (((IPatternMatcher) patternEvaluator).getLHSPriority() == 6656) {
+					// if (patternEvaluator.fLhsPatternExpr.isAST(F.Integrate)) {
+					// System.out.println(((IPatternMatcher) patternEvaluator).getLHSPriority());
+					// if (((IPatternMatcher) patternEvaluator).getLHSPriority() == 6686) {
 					// System.out.println("Debug from this line");
+					// }
 					// }
 					if (patternEvaluator.isPatternHashAllowed(patternHash)) {
 					pmEvaluator = (IPatternMatcher) patternEvaluator.clone();
@@ -435,6 +440,12 @@ public final class RulesData implements Serializable {
 
 					result = pmEvaluator.eval(expr, engine);
 					if (result.isPresent()) {
+							// if (patternEvaluator.fLhsPatternExpr.isAST(F.Integrate)) {
+							// System.out.println(((IPatternMatcher) patternEvaluator).toString());
+							// if (((IPatternMatcher) patternEvaluator).getLHSPriority() == 6686) {
+							// System.out.println("Debug from this line");
+							// }
+							// }
 						if (Config.SHOW_STACKTRACE) {
 							if (isShowPriority(pmEvaluator)) {
 								System.out.println("matched: " + pmEvaluator.getLHSPriority()+": "+pmEvaluator.toString());
@@ -452,13 +463,12 @@ public final class RulesData implements Serializable {
 							}
 						}
 						return result;
-					}else {
+						}
 						if (Config.SHOW_STACKTRACE) {
 							if (isShowPriority(pmEvaluator)) {
 								System.out.print("not matched: " + pmEvaluator.getLHSPriority()+" ");
 							}
 						}
-					}
 				}
 			}
 			}
@@ -582,13 +592,13 @@ public final class RulesData implements Serializable {
 
 	public final IPatternMatcher putDownRule(final IExpr leftHandSide, final IExpr rightHandSide) {
 		return putDownRule(IPatternMatcher.SET_DELAYED, false, leftHandSide, rightHandSide,
-				PatternMap.DEFAULT_RULE_PRIORITY);
+				IPatternMapImpl.DEFAULT_RULE_PRIORITY);
 	}
 
 	public final IPatternMatcher putDownRule(final int setSymbol, final boolean equalRule, final IExpr leftHandSide,
 			final IExpr rightHandSide) {
 		return putDownRule(IPatternMatcher.SET_DELAYED, false, leftHandSide, rightHandSide,
-				PatternMap.DEFAULT_RULE_PRIORITY);
+				IPatternMapImpl.DEFAULT_RULE_PRIORITY);
 	}
 
 	public final IPatternMatcher putDownRule(final int setSymbol, final boolean equalRule, final IExpr leftHandSide,
@@ -630,13 +640,13 @@ public final class RulesData implements Serializable {
 			}
 
 		return insertMatcher(pmEvaluator);
-//		fPatternDownRules = getPatternDownRules();
-//		if (F.isSystemInitialized) {
-//			insertMatcher(pmEvaluator);
-//		} else {
-//			fPatternDownRules.add(pmEvaluator);
-//		}
-//		return pmEvaluator;
+		// fPatternDownRules = getPatternDownRules();
+		// if (F.isSystemInitialized) {
+		// insertMatcher(pmEvaluator);
+		// } else {
+		// fPatternDownRules.add(pmEvaluator);
+		// }
+		// return pmEvaluator;
 	}
 
 	public final IPatternMatcher insertMatcher(final IPatternMatcher pmEvaluator) {
@@ -671,11 +681,11 @@ public final class RulesData implements Serializable {
 			return pmEvaluator;
 		}
 
-//	public PatternMatcher putDownRule(final PatternMatcherAndInvoker pmEvaluator) {
-//		fPatternDownRules = getPatternDownRules();
-//		insertMatcher(pmEvaluator);
-//		return pmEvaluator;
-//	}
+	// public PatternMatcher putDownRule(final PatternMatcherAndInvoker pmEvaluator) {
+	// fPatternDownRules = getPatternDownRules();
+	// insertMatcher(pmEvaluator);
+	// return pmEvaluator;
+	// }
 	public void putfDefaultValues(IExpr expr) {
 		putfDefaultValues(DEFAULT_VALUE_INDEX, expr);
 	}

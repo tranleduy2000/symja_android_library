@@ -1192,6 +1192,11 @@ public class EvalEngine implements Serializable {
 					if (fStopRequested) {
 						throw TimeoutException.TIMED_OUT;
 					}
+					// if (fRecursionCounter < 100 && expr.toString().length() < 80) {
+					// System.out.println("(0):" + expr.toString());
+					// System.out.println("(1) --> " + temp.toString());
+					// System.out.println();
+					// }
 					// if (temp == F.Null&&!expr.isAST(F.SetDelayed)) {
 					// System.out.println(expr.toString());
 					// }
@@ -1207,6 +1212,11 @@ public class EvalEngine implements Serializable {
 							if (fStopRequested) {
 								throw TimeoutException.TIMED_OUT;
 							}
+							// if (fRecursionCounter < 100 && expr.toString().length() < 80) {
+							// System.out.println("(0):" + expr.toString());
+							// System.out.println("(1) --> " + temp.toString());
+							// System.out.println();
+							// }
 							// if (temp == F.Null&&!result.isAST(F.SetDelayed)) {
 							// System.out.println(expr.toString());
 							// }
@@ -1968,6 +1978,13 @@ public class EvalEngine implements Serializable {
 		return fTraceMode;
 	}
 
+	// public final int traceSize() {
+	// return fTraceStack.size();
+	// }
+	//
+	// public final void resetSize(int fromPosition) {
+	// fTraceStack.resetSize(fromPosition);
+	// }
 	/**
 	 * Parse the given <code>expression String</code> into an IExpr without evaluation.
 	 *

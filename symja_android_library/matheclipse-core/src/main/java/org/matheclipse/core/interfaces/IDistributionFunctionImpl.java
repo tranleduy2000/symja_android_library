@@ -30,4 +30,9 @@ public abstract class IDistributionFunctionImpl extends AbstractEvaluator
         }
         return pureFunction;
     }
+
+    @Override
+    public IExpr inverseCDF(IAST dist, IExpr x) {
+        return F.NIL;
+    }
 }

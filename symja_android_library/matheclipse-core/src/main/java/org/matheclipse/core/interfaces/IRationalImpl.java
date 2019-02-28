@@ -13,6 +13,9 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
     @Override
     public abstract IRational abs();
 
+    @Override
+    public abstract IRational negate();
+
     public abstract IRational add(IRational parm1);
 
     public abstract IRational divideBy(IRational parm1);
@@ -32,17 +35,19 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
         return numerator();
     }
 
+    @Override
+    public IRational mod(IRational m) {
+        return subtract(m.multiply(this.divideBy(m).floorFraction()));
+    }
+
+    public abstract IRational multiply(IRational parm1);
+
     /**
      * Returns the numerator of this fraction.
      *
      * @return denominator
      */
     public abstract IInteger numerator();
-
-    public abstract IRational multiply(IRational parm1);
-
-    @Override
-    public abstract IRational negate();
 
     /**
      * Returns this number raised at the specified exponent.

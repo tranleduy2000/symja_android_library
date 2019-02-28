@@ -20,13 +20,13 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
 	protected int[] multiset;
 
 	public FlatOrderlessStepVisitor(final ISymbol sym, IAST lhsPatternAST, IAST lhsEvalAST, StackMatcher stackMatcher,
-			PatternMap patternMap) {
+			IPatternMap patternMap) {
 		super(sym, lhsPatternAST, lhsEvalAST, stackMatcher, patternMap);
 		toIntArray(lhsEvalAST, 1, lhsEvalAST.size());
 	}
 
 	public FlatOrderlessStepVisitor(final ISymbol sym, IAST lhsPatternAST, IAST lhsEvalAST, StackMatcher stackMatcher,
-			PatternMap patternMap, boolean oneIdentity) {
+			IPatternMap patternMap, boolean oneIdentity) {
 		super(sym, lhsPatternAST, lhsEvalAST, stackMatcher, patternMap, oneIdentity);
 		toIntArray(lhsEvalAST, 1, lhsEvalAST.size());
 	}
@@ -35,6 +35,7 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
 	 * Convert the <code>sortedList</code> to an <code>int[]</code> array. Equal elements get the same index in the
 	 * resulting <code>int[]</code> array.
 	 * 
+	 * @param <T>
 	 * @param sortedList
 	 * @param start
 	 * @param end

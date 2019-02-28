@@ -969,7 +969,18 @@ public class PolynomialFunctions {
 			}
 			Set<IExpr> collector = new TreeSet<IExpr>();
 
+			// final IExpr a1 = engine.evaluate(ast.arg1());
+			// IExpr expr = a1;
+			// if (a1.isAST()) {
+			// expr = Algebra.expandAll((IAST) a1, null, true, true, engine);
+			// if (!expr.isPresent()) {
+			// expr = a1;
+			// }
+			// }
 			IExpr expr = F.evalExpandAll(ast.arg1(), engine).normal();
+			// if (expr.isTimes()) {
+			// expr =F.Distribute.of(expr);
+			// }
 			if (expr.isZero()) {
 				collector.add(F.CNInfinity);
 			} else if (expr.isAST()) {

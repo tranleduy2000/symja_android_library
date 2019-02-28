@@ -18,6 +18,25 @@ public interface IInteger extends IRational {
     IInteger abs();
 
     /**
+     * Returns an <code>IInteger</code> whose value is <code>(-1) * this</code>.
+     *
+     * @return
+     */
+    @Override
+    public IInteger negate();
+
+    @Override
+    public IInteger pow(final long exp) throws ArithmeticException;
+
+    /**
+     * Returns the numerator of this Rational.
+     *
+     * @return numerator
+     */
+    @Override
+    public BigInteger toBigNumerator();
+
+    /**
      * <code>this + val</code>
      *
      * @param val
@@ -194,8 +213,48 @@ public interface IInteger extends IRational {
      */
     public long longValue();
 
+    /**
+     * <p>
+     * Returns <code>this mod m</code>, a non-negative value less than m. This differs from <code>this % m</code>, which
+     * might be negative.
+     * </p>
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * mod(7, 4) == 3
+     * mod(-7, 4) == 1
+     * mod(-1, 4) == 3
+     * mod(-8, 4) == 0
+     * mod(8, 4) == 0
+     * </pre>
+     *
+     * @param that
+     * @return
+     * @throws ArithmeticException - if m <= 0
+     */
     public IInteger mod(final IInteger that);
 
+    /**
+     * <p>
+     * Returns <code>this mod m</code>, a non-negative value less than m. This differs from <code>this % m</code>, which
+     * might be negative.
+     * </p>
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * mod(7, 4) == 3
+     * mod(-7, 4) == 1
+     * mod(-1, 4) == 3
+     * mod(-8, 4) == 0
+     * mod(8, 4) == 0
+     * </pre>
+     *
+     * @param that
+     * @return
+     * @throws ArithmeticException - if m <= 0
+     */
     IInteger mod(final int that);
 
     public IInteger modInverse(final IInteger m);
@@ -222,14 +281,6 @@ public interface IInteger extends IRational {
     public IInteger multiply(int value);
 
     /**
-     * Returns an <code>IInteger</code> whose value is <code>(-1) * this</code>.
-     *
-     * @return
-     */
-    @Override
-    public IInteger negate();
-
-    /**
      * Returns the n-th integer root
      *
      * @param n
@@ -245,9 +296,6 @@ public interface IInteger extends IRational {
      * @return <code>{nth-root, rest factor}</code>
      */
     public IInteger[] nthRootSplit(int n);
-
-    @Override
-    public IInteger pow(final long exp) throws ArithmeticException;
 
     /**
      * <pre>
@@ -281,14 +329,6 @@ public interface IInteger extends IRational {
     public IInteger shiftRight(final int n);
 
     public IInteger subtract(IInteger value);
-
-    /**
-     * Returns the numerator of this Rational.
-     *
-     * @return numerator
-     */
-    @Override
-    public BigInteger toBigNumerator();
 
     public byte[] toByteArray();
 

@@ -1,5 +1,7 @@
 package org.matheclipse.core.patternmatching;
 
+import com.duy.annotations.Nonnull;
+
 import org.matheclipse.combinatoric.AbstractListStepVisitor;
 import org.matheclipse.combinatoric.NumberPartitionsIterator;
 import org.matheclipse.core.expression.F;
@@ -21,18 +23,18 @@ public class FlatStepVisitor extends AbstractListStepVisitor<IExpr> {
 
 	protected ISymbol fSymbol;
 	protected StackMatcher stackMatcher;
-	protected PatternMap fPatternMap;
+	protected IPatternMap fPatternMap;
 	protected IExpr[] patternValues;
 	protected IAST fLhsPatternAST;
 	protected final boolean fOneIdentity;
 
 	public FlatStepVisitor(final ISymbol sym, IAST lhsPatternAST, IAST lhsEvalAST, StackMatcher stackMatcher,
-			PatternMap patternMap) {
+			IPatternMap patternMap) {
 		this(sym, lhsPatternAST, lhsEvalAST, stackMatcher, patternMap, sym.hasOneIdentityAttribute());
 	}
 
 	public FlatStepVisitor(final ISymbol sym, IAST lhsPatternAST, IAST lhsEvalAST, StackMatcher stackMatcher,
-			PatternMap patternMap, boolean oneIdentity) {
+			IPatternMap patternMap, boolean oneIdentity) {
 		super(lhsEvalAST);// , 1, lhsEvalAST.size());
 		this.fSymbol = sym;
 		this.stackMatcher = stackMatcher;
@@ -43,11 +45,6 @@ public class FlatStepVisitor extends AbstractListStepVisitor<IExpr> {
 		this.fOneIdentity = oneIdentity;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see org.matheclipse.combinatoric.IStepVisitor#visit(int[][])
-	 */
 	@Override
 	public boolean visit(int[][] result) {
 		if (matchSinglePartition(result, stackMatcher)) {
@@ -65,7 +62,7 @@ public class FlatStepVisitor extends AbstractListStepVisitor<IExpr> {
 	 * @param stackMatcher
 	 * @return
 	 */
-	protected boolean matchSinglePartition(int[][] result,  StackMatcher stackMatcher) {
+	protected boolean matchSinglePartition(int[][] result, @Nonnull StackMatcher stackMatcher) {
 		IASTAppendable partitionElement;
 		// if (Config.SHOW_STACKTRACE == true) {
 		// }

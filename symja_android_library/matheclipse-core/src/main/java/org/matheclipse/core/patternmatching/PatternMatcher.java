@@ -216,8 +216,8 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
      * @param pm2
      * @return
      */
-    public static boolean equivalent(final IExpr patternExpr1, final IExpr patternExpr2, final PatternMap pm1,
-                                     final PatternMap pm2) {
+	public static boolean equivalent(final IExpr patternExpr1, final IExpr patternExpr2, final IPatternMap pm1,
+                                     final IPatternMap pm2) {
         if (patternExpr1 == patternExpr2) {
             return true;
         }
@@ -286,11 +286,11 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 * A map from a pattern to a possibly found value during pattern-matching. Will be set to <code>null</code> if the
 	 * left-hand-side pattern expression contains no pattern.
 	 */
-	protected transient PatternMap fPatternMap;
-    public PatternMap getPatternMap() {
+	protected transient IPatternMap fPatternMap;
+	public IPatternMap getPatternMap() {
 		if (fPatternMap == null) {
-			fPatternMap = new PatternMap();
-			fPatternMap.determinePatterns(fLhsPatternExpr);
+			int[] priority = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
+			fPatternMap = IPatternMapImpl.determinePatterns(fLhsPatternExpr, priority);
 		}
         return fPatternMap;
     }
@@ -301,10 +301,10 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 */
 	public PatternMatcher() {
 		super(null);
-		this.fLHSPriority = PatternMap.DEFAULT_RULE_PRIORITY;
+		this.fLHSPriority = IPatternMapImpl.DEFAULT_RULE_PRIORITY;
 		this.fLhsPatternExpr = null;
 		this.fPatternCondition = null;
-		this.fPatternMap = new PatternMap();
+		this.fPatternMap = null;
 	}
 
 	public PatternMatcher(final IExpr patternExpr) {
@@ -313,15 +313,16 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 
 	public PatternMatcher(final IExpr patternExpr, boolean initAll) {
 		super(patternExpr);
-		this.fLHSPriority = PatternMap.DEFAULT_RULE_PRIORITY;
+		this.fLHSPriority = IPatternMapImpl.DEFAULT_RULE_PRIORITY;
 		this.fPatternCondition = null;
 		if (patternExpr.isCondition()) {
 			this.fLhsPatternExpr = patternExpr.first();
 			this.fPatternCondition = patternExpr.second();
 		}
 		if (initAll) {
-			fPatternMap = new PatternMap();
-			this.fLHSPriority = determinePatterns();
+			int[] priority = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
+			fPatternMap = determinePatterns(priority);
+			this.fLHSPriority = priority[0];
 	}
 	}
     /**
@@ -364,7 +365,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     public Object clone() throws CloneNotSupportedException {
         PatternMatcher v = (PatternMatcher) super.clone();
         v.fPatternCondition = fPatternCondition;
-		PatternMap patternMap = getPatternMap();
+		IPatternMap patternMap = getPatternMap();
 		v.fPatternMap = patternMap.clone();
         v.fLHSPriority = fLHSPriority;
         return v;
@@ -579,9 +580,13 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
         return result;
     }
 
-	@Override
-	public int determinePatterns() {
-		return getPatternMap().determinePatterns(fLhsPatternExpr);
+	public IPatternMap determinePatterns() {
+		int[] priority = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
+		return IPatternMapImpl.determinePatterns(fLhsPatternExpr, priority);
+	}
+	public IPatternMap determinePatterns(int[] priority) {
+		// int[] priority = new int[] { IPatternMap.DEFAULT_RULE_PRIORITY };
+		return IPatternMapImpl.determinePatterns(fLhsPatternExpr, priority);
     }
 
 	/** {@inheritDoc} */
@@ -1067,7 +1072,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                         break;
                     case ID.Alternatives:
                         if (lhsPatternAST.isAlternatives()) {
-                            IAST alternatives = (IAST) lhsPatternAST;
+						IAST alternatives = lhsPatternAST;
 						matched = alternatives.exists(new Predicate<IExpr>() {
                             @Override
                             public boolean test(IExpr x) {
@@ -1487,9 +1492,10 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
     public void readExternal(ObjectInput objectInput) throws IOException, ClassNotFoundException {
         fLhsPatternExpr = (IExpr) objectInput.readObject();
         fPatternCondition = (IExpr) objectInput.readObject();
-        this.fPatternMap = new PatternMap();
         if (fLhsPatternExpr != null) {
-            fLHSPriority = fPatternMap.determinePatterns(fLhsPatternExpr);
+			int[] priority = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
+			this.fPatternMap = IPatternMapImpl.determinePatterns(fLhsPatternExpr, priority);
+			fLHSPriority = priority[0];
         }
     }
 

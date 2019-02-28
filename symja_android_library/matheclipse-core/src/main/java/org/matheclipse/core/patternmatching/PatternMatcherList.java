@@ -24,7 +24,7 @@ public class PatternMatcherList extends PatternMatcherAndEvaluator {
 	}
 
 	final public IExpr replace(final IExpr leftHandSide, @Nonnull EvalEngine engine, boolean evaluate) {
-		PatternMap patternMap = null;
+		IPatternMap patternMap = null;
 		if (isRuleWithoutPatterns()) {
 			// no patterns found match equally:
 			if (fLhsPatternExpr.equals(leftHandSide)) {
@@ -92,7 +92,7 @@ public class PatternMatcherList extends PatternMatcherAndEvaluator {
 	
 	@Override
 	public boolean checkRHSCondition(EvalEngine engine) {
-		PatternMap patternMap = getPatternMap();
+		IPatternMap patternMap = getPatternMap();
 
 		if (patternMap.isAllPatternsAssigned()) {
 			IExpr result = patternMap.substituteSymbols(fRightHandSide);

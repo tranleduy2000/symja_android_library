@@ -45,10 +45,10 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * The attribute values of the symbol represented by single bits.
      */
     protected int fAttributes = NOATTRIBUTE;
-	/**
-	 * The value associate with this symbol.
-	 */
-	protected transient IExpr fValue;
+    /**
+     * The value associate with this symbol.
+     */
+    protected transient IExpr fValue;
     /**
      * The pattern matching &quot;down value&quot; rules associated with this symbol.
      */
@@ -454,6 +454,25 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
+    public final void assign(final IExpr value) {
+        fValue = value;
+        // final Deque<IExpr> localVariableStack = EvalEngine.get().localStack(this);
+        // localVariableStack.remove();
+        // localVariableStack.push(value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IExpr assignedValue() {
+        return fValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final void clear(EvalEngine engine) {
         if (!engine.isPackageMode()) {
             if (isLocked()) {
@@ -569,7 +588,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return fRulesData.evalUpRule(expression, engine);
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -661,7 +679,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return (fAttributes & FLAT) == FLAT;
     }
 
-
     @Override
     public boolean hasOneIdentityAttribute() {
         return (fAttributes & ONEIDENTITY) == ONEIDENTITY;
@@ -711,7 +728,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         return fSymbolName.equals(name);
     }
-
 
     /**
      * {@inheritDoc}
@@ -848,14 +864,13 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     }
 
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public IExpr[] reassignSymbolValue(IASTMutable ast, ISymbol functionSymbol, EvalEngine engine) {
         if (fValue != null) {
-        IExpr[] result = new IExpr[2];
+            IExpr[] result = new IExpr[2];
             result[0] = fValue;
             ast.set(1, fValue);
             IExpr calculatedResult = engine.evaluate(ast);// F.binaryAST2(this, symbolValue, value));
@@ -892,7 +907,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         return false;
     }
-
 
     /**
      * {@inheritDoc}
@@ -963,13 +977,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IExpr assignedValue() {
-        return fValue;
-    }
-    /**
      * Used to generate special Symja Java code
      *
      * @return
@@ -1019,17 +1026,17 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         int contextNumber = stream.readInt();
         switch (contextNumber) {
             case 1:
-            fContext = Context.SYSTEM;
+                fContext = Context.SYSTEM;
                 break;
             case 2:
-            fContext = Context.RUBI;
+                fContext = Context.RUBI;
                 break;
             case 3:
-            fContext = Context.DUMMY;
+                fContext = Context.DUMMY;
                 break;
             default:
-            String contextName = stream.readUTF();
-            fContext = EvalEngine.get().getContextPath().getContext(contextName);
+                String contextName = stream.readUTF();
+                fContext = EvalEngine.get().getContextPath().getContext(contextName);
                 Symbol symbol = (Symbol) fContext.get(fSymbolName);
                 if (symbol == null) {
                     fContext.put(fSymbolName, this);
@@ -1038,10 +1045,10 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
                     symbol.fAttributes = fAttributes;
                     symbol.fValue = fValue;
                 }
-            boolean hasDownRulesData = stream.readBoolean();
-            if (hasDownRulesData) {
+                boolean hasDownRulesData = stream.readBoolean();
+                if (hasDownRulesData) {
                     symbol.fRulesData = (RulesData) stream.readObject();
-            }
+                }
         }
     }
 
@@ -1055,27 +1062,17 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     @Override
     public IExpr[] reassignSymbolValue(Function<IExpr, IExpr> function, ISymbol functionSymbol, EvalEngine engine) {
         if (fValue != null) {
-        IExpr[] result = new IExpr[2];
+            IExpr[] result = new IExpr[2];
             result[0] = fValue;
             IExpr calculatedResult = function.apply(fValue);
-                        if (calculatedResult.isPresent()) {
+            if (calculatedResult.isPresent()) {
                 assign(calculatedResult);
-                            result[1] = calculatedResult;
-                            return result;
-                        }
-                    }
+                result[1] = calculatedResult;
+                return result;
+            }
+        }
         engine.printMessage(toString() + " is not a variable with a value, so its value cannot be changed.");
         return null;
-    }
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final void assign(final IExpr value) {
-        fValue = value;
-        // final Deque<IExpr> localVariableStack = EvalEngine.get().localStack(this);
-        // localVariableStack.remove();
-        // localVariableStack.push(value);
     }
     private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
         stream.writeUTF(fSymbolName);
