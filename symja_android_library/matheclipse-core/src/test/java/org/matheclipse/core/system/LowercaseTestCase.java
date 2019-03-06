@@ -11939,6 +11939,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSinhIntegral() {
+		check("SinIntegral(-x)", //
+				"-SinIntegral(x)");
 		check("SinhIntegral(Infinity)", //
 				"Infinity");
 		check("SinhIntegral(-Infinity)", //
@@ -12036,7 +12038,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Solve(a*x^2+b*x==0, x)", //
 				"{{x->0},{x->-b/a}}");
 		check("Solve({Cos(x)*x==0, x > 10}, x)", //
-				"{}");
+				"Solve({x*Cos(x)==0,x>10},x)");
+		// TODO select a better starting value for internally used FindRoot:
+		check("NSolve({Cos(x)*x==0, x > 10}, x)", //
+				"NSolve({x*Cos(x)==0,x>10},x)");
 		check("Solve({Cos(x)*x==0, x==0}, x)", //
 				"{{x->0}}");
 		check("Solve({Cos(x)*x==0, x < 10}, x)", //

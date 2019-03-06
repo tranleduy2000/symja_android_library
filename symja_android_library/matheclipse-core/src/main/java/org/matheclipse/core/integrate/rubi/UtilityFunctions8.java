@@ -66,6 +66,7 @@ import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.UnifyIner
 /**
  * UtilityFunctions rules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
  * rule-based integrator</a>.
+ *
  */
 public class UtilityFunctions8 {
     public static IAST RULES = List(

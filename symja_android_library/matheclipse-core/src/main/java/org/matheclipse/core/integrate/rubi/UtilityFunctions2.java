@@ -9,6 +9,7 @@ import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.*;
 /**
  * UtilityFunctions rules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
  * rule-based integrator</a>.
+ *
  */
 public class UtilityFunctions2 {
     public static IAST RULES = List(

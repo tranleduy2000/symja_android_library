@@ -96,6 +96,7 @@ import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SubstForI
 /**
  * IndefiniteIntegrationRules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
  * rule-based integrator</a>.
+ *
  */
 public class IntRules124 {
     public static IAST RULES = List(

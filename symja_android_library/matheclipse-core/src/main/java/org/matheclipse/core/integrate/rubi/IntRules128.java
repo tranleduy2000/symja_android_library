@@ -82,6 +82,7 @@ import static org.matheclipse.core.expression.F.*;
 /**
  * IndefiniteIntegrationRules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
  * rule-based integrator</a>.
+ *
  */
 public class IntRules128 {
     public static IAST RULES = List(

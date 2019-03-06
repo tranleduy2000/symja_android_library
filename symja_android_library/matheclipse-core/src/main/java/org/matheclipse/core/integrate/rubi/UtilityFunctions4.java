@@ -91,6 +91,7 @@ import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.UnifyTerm
 /**
  * UtilityFunctions rules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
  * rule-based integrator</a>.
+ *
  */
 public class UtilityFunctions4 {
     public static IAST RULES = List(

@@ -74,14 +74,7 @@ public class EvalEngine implements Serializable {
 	transient private static final ThreadLocal<EvalEngine> instance = new ThreadLocal<EvalEngine>() {
 		private int fID = 1;
 
-		@Override
-		public EvalEngine initialValue() {
-			if (DEBUG) {
-				System.out.println("ThreadLocal" + fID);
-			}
-			return new EvalEngine("ThreadLocal" + (fID++), 0, System.out, true);
-		}
-	};
+	@Override public EvalEngine initialValue(){if(DEBUG){System.out.println("ThreadLocal"+fID);}return new EvalEngine("ThreadLocal"+(fID++),0,System.out,true);}};
 
 	/**
 	 * Get the thread local evaluation engine instance
