@@ -1637,6 +1637,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCoefficient() {
+		check("Coefficient((1+2*x)/Sqrt(3),x,1)", //
+				"2/Sqrt(3)");
+		check("g = (x + 3)^5;Coefficient(g, x, #) & /@ Range(0, Exponent(g, x))", //
+				"{243,405,270,90,15,1}");
 		// http://oeis.org/A133314
 		check("b(0) = 1; " //
 				+ "b(n_) := b(n)=-Sum(Binomial(n, j)*a(j)*b(n-j), {j, 1, n}); row(0) = {1}; " //
@@ -1773,7 +1777,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Coefficient((x + y)*(x + 2*y)*(3*x + 4*y + 5), x^2*y)", "13");
 		check("Coefficient((x + y)*(x + 2*y)*(3*x + 4*y + 5), x*y^2)", "18");
 		check("Coefficient((x + y)*(x + 2*y)*(3*x + 4*y + 5), x*y)", "15");
-		check("Coefficient((x + y)*(x + 2*y)*(3*x + 4*y + 5), y^3)", "8");
+		check("Coefficient((x + y)*(x + 2*y)*(3*x + 4*y + 5), y^3)", //
+				"8");
 	}
 
 	public void testCoefficientList() {
@@ -3746,6 +3751,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testExponent() {
+		check("Exponent((1+2*x)/Sqrt(3),x,List)", //
+				"{0,1}");
+		check("Exponent(Together((1+2*x)/Sqrt(3)),x,List)", //
+				"{0,1}");
+		check("Exponent((1+2*x)/Sqrt(3),x,List)", //
+				"{0,1}");
 		check("Exponent(a+b*x,x,List)", //
 				"{0,1}");
 		check("Exponent(SeriesData(x, 0, {1, 1, 0, 1, 1, 0, 1, 1}, 0, 9, 1), x)", //
@@ -5979,6 +5990,16 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("InverseBetaRegularized(0,z,a,b)", "InverseBetaRegularized(z,a,b)");
 	}
 
+	public void testInverseCDF() {
+		check("InverseCDF[NormalDistribution[ ]]", //
+				"ConditionalExpression(-Sqrt(2)*InverseErfc(2*#1),0<=#1<=1)&");
+		check("InverseCDF[NormalDistribution[ ], p]", //
+				"ConditionalExpression(-Sqrt(2)*InverseErfc(2*p),0<=p<=1)");
+		check("InverseCDF[NormalDistribution[n,m]]", //
+				"ConditionalExpression(n-Sqrt(2)*m*InverseErfc(2*#1),0<=#1<=1)&");
+		check("InverseCDF[NormalDistribution[n,m], p]", //
+				"ConditionalExpression(n-Sqrt(2)*m*InverseErfc(2*p),0<=p<=1)");
+	}
 	public void testInverseErf() {
 		check("InverseErf /@ {-1, 0, 1}", "{-Infinity,0,Infinity}");
 		checkNumeric("InverseErf /@ {0.9, 1.0, 1.1}", "{1.1630871536766743,Infinity,InverseErf(1.1)}");

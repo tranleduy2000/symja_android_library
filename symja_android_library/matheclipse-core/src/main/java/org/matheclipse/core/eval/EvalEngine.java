@@ -214,6 +214,10 @@ public class EvalEngine implements Serializable {
 	public transient Set<ISymbol> fModifiedVariablesList;
 
 	/**
+	 * Set interactive trace mode on or off.
+	 */
+	transient private boolean fOnOffMode = false;
+	/**
 	 * The history list for the <code>Out[]</code> function.
 	 *
 	 */
@@ -1192,11 +1196,13 @@ public class EvalEngine implements Serializable {
 					if (fStopRequested) {
 						throw TimeoutException.TIMED_OUT;
 					}
-					// if (fRecursionCounter < 100 && expr.toString().length() < 80) {
-					// System.out.println("(0):" + expr.toString());
-					// System.out.println("(1) --> " + temp.toString());
-					// System.out.println();
-					// }
+					if (fOnOffMode) {
+						PrintStream stream = getOutPrintStream();
+						if (stream == null) {
+							stream = System.out;
+						}
+						stream.println("  " + expr.toString() + " --> " + temp.toString() + "\n");
+					}
 					// if (temp == F.Null&&!expr.isAST(F.SetDelayed)) {
 					// System.out.println(expr.toString());
 					// }
@@ -1212,11 +1218,13 @@ public class EvalEngine implements Serializable {
 							if (fStopRequested) {
 								throw TimeoutException.TIMED_OUT;
 							}
-							// if (fRecursionCounter < 100 && expr.toString().length() < 80) {
-							// System.out.println("(0):" + expr.toString());
-							// System.out.println("(1) --> " + temp.toString());
-							// System.out.println();
-							// }
+							if (fOnOffMode) {
+								PrintStream stream = getOutPrintStream();
+								if (stream == null) {
+									stream = System.out;
+								}
+								stream.println("  " + result.toString() + " --> " + temp.toString() + "\n");
+							}
 							// if (temp == F.Null&&!result.isAST(F.SetDelayed)) {
 							// System.out.println(expr.toString());
 							// }
@@ -1878,6 +1886,7 @@ public class EvalEngine implements Serializable {
 		fNumericMode = false;
 		fTogetherMode = false;
 		fEvalLHSMode = false;
+		fOnOffMode = false;
 		fTraceMode = false;
 		fTraceStack = null;
 		fStopRequested = false;
@@ -1920,6 +1929,14 @@ public class EvalEngine implements Serializable {
 		return fNumericMode;
 	}
 
+	/**
+	 * Check if the <code>On()</code> has enabled the interactive trace
+	 *
+	 * @return
+	 */
+	public final boolean isOnOffMode() {
+		return fOnOffMode;
+	}
 	/**
 	 * Check if the appending of expressions to the history list for the <code>Out[]</code> function is enabled. If
 	 * enabled, the special variable <code>$ans</code> returns the result from the last evluation done with this
@@ -2134,6 +2151,14 @@ public class EvalEngine implements Serializable {
 		this.fOutListDisabled = outListDisabled;
 	}
 
+	/**
+	 * Set the mode for <code>On()</code> or <code>Off()</code> function
+	 *
+	 * @param b
+	 */
+	public void setOnOffMode(final boolean b) {
+		fOnOffMode = b;
+	}
 	public void setOutListDisabled(LastCalculationsHistory outList) {
 		this.fOutList = outList;
 		this.fOutListDisabled = false;
