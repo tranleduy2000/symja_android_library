@@ -5143,9 +5143,7 @@ public final class Arithmetic {
 				}
 			}
 		}
-		if (power0Arg1.isRational() && power1Arg1.isRational()) {
-			// power0Arg2.isRational() &&
-			// && power1Arg2.isFraction()) {
+		if (power0Arg1.isRational() && power0Arg2.isRational() && power1Arg1.isRational() && power1Arg2.isRational()) {
 			IExpr temp = timesPowerPower(((IRational) power0Arg1).numerator(), ((IRational) power0Arg1).denominator(),
 					power0Arg2, //
 					((IRational) power1Arg1).numerator(), ((IRational) power1Arg1).denominator(), power1Arg2, true);
@@ -5185,6 +5183,7 @@ public final class Arithmetic {
 
             if (evaled[0]) {
 			OpenIntToIExprHashMap<IExpr>.Iterator iter = fn2Map.iterator();
+			iter = fn2Map.iterator();
                 while (iter.hasNext()) {
                     iter.advance();
                     int base = iter.key();
