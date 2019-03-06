@@ -56,6 +56,7 @@ import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FixSimpli
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FunctionOfTrig;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FunctionOfTrigOfLinearQ;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LinearQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.MakeAssocList;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NormalizeTrig;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.PolyQ;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.QuadraticMatchQ;
@@ -482,6 +483,11 @@ public class RubiIntegrationTest extends AbstractTestCase {
 		check(ast, "-ArcTan[(1+2*x)/Sqrt[3]]/Sqrt[3]");
 	}
 
+	public void testRubi023() {
+		IAST ast;
+		ast = MakeAssocList(F.Power(F.x,F.CN1),F.x);
+		check(ast, "{}");
+	}
 	public void testArcSin() {
 
 		check("Integrate(ArcSin(x),x)", "Sqrt(1-x^2)+x*ArcSin(x)");

@@ -24,6 +24,7 @@ import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 import org.matheclipse.core.patternmatching.RulesData;
+import org.matheclipse.core.polynomials.ExprPolynomialRing;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -366,10 +367,12 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         if (variables.isAST0()) {
             return true;
         }
-        if (isConstant()) {
-            return true;
-        }
-        return true;
+//		if (isConstant()) {
+//			return true;
+//		}
+        ExprPolynomialRing ring = new ExprPolynomialRing(variables);
+        return ring.isPolynomial(this);
+//		return true;
     }
 
     /**
@@ -377,7 +380,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public boolean isPolynomial(IExpr variable) {
-        return true;
+        return isPolynomial(F.List(variable));
         // if (variable == null) {
         // return true;
         // }
@@ -981,7 +984,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      *
      * @return
      */
-    private String internalJavaStringAsFactoryMethod() {
+    protected String internalJavaStringAsFactoryMethod() {
         if (fSymbolName.length() == 1) {
             char ch = fSymbolName.charAt(0);
             if ('a' <= ch && ch <= 'z') {

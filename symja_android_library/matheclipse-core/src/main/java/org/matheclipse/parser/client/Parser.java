@@ -252,7 +252,16 @@ public class Parser extends Scanner {
 					getNextToken();
 					if (isSymbolIdentifier()) {
 						final ASTNode check = getSymbol();
+						if (fToken == TT_OPERATOR && fOperatorString.equals(":")) {
+							getNextToken();
+							ASTNode defaultValue = parseExpression();
+							final FunctionNode function = fFactory.createAST(fFactory.createSymbol("Optional"));
+							function.add(fFactory.createPattern(symbol, check));
+							function.add(defaultValue);
+							temp = function;
+						} else {
 						temp = fFactory.createPattern(symbol, check);
+						}
 					} else {
 						temp = fFactory.createPattern(symbol, null);
 					}

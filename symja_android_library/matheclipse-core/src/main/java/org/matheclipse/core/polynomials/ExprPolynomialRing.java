@@ -331,12 +331,12 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 				ix = ExpVectorLong.indexVar(base, getVars());
 				if (ix >= 0) {
 					int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-//					int exponent = -1;
-//					try {
-//						exponent = Validate.checkPowerExponent(ast);
-//					} catch (WrongArgumentType e) {
-//						//
-//					}
+					// int exponent = -1;
+					// try {
+					// exponent = Validate.checkPowerExponent(ast);
+					// } catch (WrongArgumentType e) {
+					// //
+					// }
 					if (checkNegativeExponents && exponent < 0) {
 						throw new ArithmeticException(
 								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
@@ -556,8 +556,19 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	public boolean isPolynomial(final IExpr expression, boolean coefficient)
 			throws ArithmeticException, ClassCastException {
 		for (int i = 1; i < vars.size(); i++) {
-			if (vars.get(i).equals(expression)) {
+			IExpr variable = vars.get(i);
+
+			if (variable.equals(expression)) {
 				return true;
+			}
+			if (variable.isPower() && variable.base().equals(expression) && variable.exponent().isRational()) {
+				IExpr expr = variable.exponent().reciprocal();
+				if (!expr.isZero()) {
+					if (expr.isInteger()) {
+				return true;
+			}
+					return false;
+				}
 			}
 		}
 		if (expression instanceof IAST) {
@@ -579,18 +590,28 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 			} else if (ast.isPower()) {
 				IExpr base = ast.base();
 				for (int i = 1; i < vars.size(); i++) {
-					if (vars.get(i).equals(base)) {
+					IExpr variable = vars.get(i);
+					if (variable.equals(base)) {
 						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-//						int exponent = -1;
-//						try {
-//							exponent = Validate.checkPowerExponent(ast);
-//						} catch (WrongArgumentType e) {
-//							return false;
-//						}
+						// int exponent = -1;
+						// try {
+						// exponent = Validate.checkPowerExponent(ast);
+						// } catch (WrongArgumentType e) {
+						// return false;
+						// }
 						if (exponent < 0) {
 							return false;
 						}
 						return true;
+					} else if (variable.isPower() && variable.base().equals(ast.base())
+							&& variable.exponent().isRational()) {
+						IExpr expr = variable.exponent().reciprocal().times(ast.exponent());
+						if (!expr.isZero()) {
+							if (expr.isInteger()) {
+						return true;
+					}
+							return false;
+						}
 					}
 				}
 			}
@@ -629,7 +650,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-//	@SuppressWarnings("cast")
+	// @SuppressWarnings("cast")
 	@Override
 	public String toString() {
 		String res = null;

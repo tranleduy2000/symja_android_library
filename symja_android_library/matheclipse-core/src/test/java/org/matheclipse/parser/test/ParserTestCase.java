@@ -511,7 +511,7 @@ public class ParserTestCase extends TestCase {
 
 	public void testParse36() {
 		try {
-//			System.out.println(Character.isUnicodeIdentifierPart('\u221E'));
+			// System.out.println(Character.isUnicodeIdentifierPart('\u221E'));
 			Parser p = new Parser();
 			ASTNode obj = p.parse("\u221E");
 			assertEquals(obj.toString(),
@@ -594,6 +594,17 @@ public class ParserTestCase extends TestCase {
 			ASTNode obj = p.parse("m_.k_+b_.");
 			assertEquals(obj.toString(),
 					"Plus(Times(m_., k_), b_.)");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse43() {
+		try {
+			Parser p = new Parser();
+ 			ASTNode obj = p.parse("MakeAssocList[u_,x_Symbol,alst_List:{}] ");
+			assertEquals(obj.toString(), "MakeAssocList(u_, x_Symbol, Optional(alst_List, List()))");
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals("", e.getMessage());

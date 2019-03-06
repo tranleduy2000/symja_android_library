@@ -3,13 +3,13 @@ package org.matheclipse.core.expression;
 import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractCorePredicateEvaluator;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISignedNumberConstant;
 import org.matheclipse.core.eval.interfaces.ISymbolEvaluator;
-import org.matheclipse.core.interfaces.ExprUtil;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IEvaluator;
@@ -127,9 +127,9 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		if (fValue!=null) {
 			return fValue;
 		}
-//		if (hasLocalVariableStack()) {
-//			return ExprUtil.ofNullable(get());
-//		}
+		// if (hasLocalVariableStack()) {
+		// return ExprUtil.ofNullable(get());
+		// }
 		// IExpr result;
 		// if ((result = evalDownRule(engine, this)).isPresent()) {
 		// return result;
@@ -177,6 +177,14 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		return fOrdinal;
 	}
 
+	protected String internalJavaStringAsFactoryMethod() {
+		if (Config.RUBI_CONVERT_SYMBOLS) {
+			if (fOrdinal >= 1) {
+				return fSymbolName;
+			}
+		}
+		return super.internalJavaStringAsFactoryMethod();
+	}
 	/** {@inheritDoc} */
 	@Override
 	public boolean isCoreFunctionSymbol() {
