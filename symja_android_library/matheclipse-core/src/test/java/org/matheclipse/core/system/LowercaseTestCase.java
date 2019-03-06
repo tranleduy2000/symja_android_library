@@ -10390,6 +10390,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRationalize() {
+		check("Rationalize(x+E)", //
+				"E+x");
+		check("Rationalize(E)", //
+				"E");
+		check("Rationalize(E, 0.01)", //
+				"19/7");
+		check("Rationalize(x+E, 0.01)", //
+				"E+x");
 		check("Rationalize(x+y)", //
 				"x+y");
 		check("Rationalize(x+0.3333*y)", //
@@ -10405,7 +10413,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Rationalize(6.75)", //
 				"27/4");
 		check("Rationalize(Pi)", //
-				"245850922/78256779");
+				"Pi");
 		check("Rationalize(Pi, .01)", //
 				"22/7");
 		check("Rationalize(Pi, .001)", //
