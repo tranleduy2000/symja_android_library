@@ -1,7 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.Consumer;
-import com.duy.lambda.IntFunction;
 import com.duy.lambda.ObjIntConsumer;
 
 import org.matheclipse.core.builtin.Algebra;
@@ -510,52 +509,51 @@ public class NSolve extends AbstractFunctionEvaluator {
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkSize(ast, 3);
-		final IAST vars = Validate.checkSymbolOrSymbolList(ast, 2);
-		final IAST termsEqualZeroList = Validate.checkEquations(ast, 1);
+		return Solve.of(ast, true, engine);
+//		IAST vars = Validate.checkSymbolOrSymbolList(ast, 2);
+//		IAST termsEqualZeroList = Validate.checkEquations(ast, 1);
+//
 
-		ExprAnalyzer exprAnalyzer;
-		ArrayList<ExprAnalyzer> analyzerList = new ArrayList<ExprAnalyzer>();
-		// collect linear and univariate polynomial equations:
-		for (IExpr expr : termsEqualZeroList) {
-			exprAnalyzer = new ExprAnalyzer(expr, vars, engine);
-			exprAnalyzer.analyze();
-			analyzerList.add(exprAnalyzer);
-		}
-		IASTAppendable matrix = F.ListAlloc();
-		IASTAppendable vector = F.ListAlloc();
-		try {
-			IASTAppendable resultList = F.ListAlloc();
-			resultList = analyzeSublist(analyzerList, vars, resultList, matrix, vector, engine);
+//		ExprAnalyzer exprAnalyzer;
+//		ArrayList<ExprAnalyzer> analyzerList = new ArrayList<ExprAnalyzer>();
+//		// collect linear and univariate polynomial equations:
+//		for (IExpr expr : termsEqualZeroList) {
+//			exprAnalyzer = new ExprAnalyzer(expr, vars, engine);
+//			exprAnalyzer.analyze();
+//			analyzerList.add(exprAnalyzer);
+//		}
+//		IASTAppendable matrix = F.ListAlloc();
+//		IASTAppendable vector = F.ListAlloc();
+//		try {
+//			IASTAppendable resultList = F.ListAlloc();
+//			resultList = analyzeSublist(analyzerList, vars, resultList, matrix, vector, engine);
+//
 
-			if (vector.size() > 1) {
-				// solve a linear equation <code>matrix.x == vector</code>
-				IExpr temp = engine.evaluate(F.LinearSolve(matrix, vector));
-				if (temp.isSameHeadSizeGE(F.List, 2)) {
-					final IAST rootsList = (IAST) temp;
-					final int size = vars.size();
-					IASTAppendable list = F.ListAlloc(size);
-					list.appendArgs(size, new IntFunction<IExpr>() {
-						@Override
-						public IExpr apply(int j) {
-							return F.Rule(vars.get(j), rootsList.get(j));
-						}
-					});
-					// for (int j = 1; j < size; j++) {
-					// IAST rule = F.Rule(vars.get(j), rootsList.get(j));
-					// list.append(rule);
-					// }
-					resultList.append(list);
-				} else {
-					return F.NIL;
-				}
-			}
+//			if (vector.size() > 1) {
+//				// solve a linear equation <code>matrix.x == vector</code>
+//				IExpr temp = engine.evaluate(F.LinearSolve(matrix, vector));
+//				if (temp.isSameHeadSizeGE(F.List, 2)) {
+//					IAST rootsList = (IAST) temp;
+//					int size = vars.size();
+//					IASTAppendable list = F.ListAlloc(size);
+//					list.appendArgs(size, j -> F.Rule(vars.get(j), rootsList.get(j)));
+//					// for (int j = 1; j < size; j++) {
+//					// IAST rule = F.Rule(vars.get(j), rootsList.get(j));
+//					// list.append(rule);
+//					// }
+//					resultList.append(list);
+//				} else {
+//					return F.NIL;
+//				}
+//			}
+//
 
-			return resultList;
-		} catch (NoSolution e) {
-			if (e.getType() == NoSolution.WRONG_SOLUTION) {
-				return F.List();
-			}
-			return F.NIL;
-		}
+//			return resultList;
+//		} catch (NoSolution e) {
+//			if (e.getType() == NoSolution.WRONG_SOLUTION) {
+//				return F.List();
+//			}
+//			return F.NIL;
+//		}
 	}
 }

@@ -908,7 +908,10 @@ public class Solve extends AbstractFunctionEvaluator {
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		Validate.checkRange(ast, 3, 4);
+		return of(ast, false, engine);
+	}
 
+	public static IExpr of(final IAST ast, boolean numeric, EvalEngine engine) {
 		boolean[] isNumeric = new boolean[] { false };
 		try {
 			IAST variables = Validate.checkIsVariableOrVariableList(ast, 2, engine);
@@ -941,21 +944,26 @@ public class Solve extends AbstractFunctionEvaluator {
 					throw new WrongArgumentType(ast, ast.arg3(), 3, "Booleans or Integers expected!");
 				}
 			}
-			// IAST termsEqualZeroList = Validate.checkEquationsAndInequations(ast, 1);
 			IAST termsList = Validate.checkEquationsAndInequations(ast, 1);
 			IASTMutable[] lists = SolveUtils.filterSolveLists(termsList, F.NIL, isNumeric);
 			if (lists[2].isPresent()) {
-				return solveNumeric(lists[2], isNumeric[0], engine);
+				return solveNumeric(lists[2], isNumeric[0] || numeric, engine);
 			}
 
 			IASTMutable termsEqualZeroList = lists[0];
 			IASTMutable temp = solveTimesEquationsRecursively(termsEqualZeroList, lists[1], variables, engine);
 			if (temp.isPresent()) {
-				return solveNumeric(QuarticSolver.sortASTArguments(temp), isNumeric[0], engine);
+				return solveNumeric(QuarticSolver.sortASTArguments(temp), isNumeric[0] || numeric, engine);
 			}
 
 			if (lists[1].isEmpty() && termsEqualZeroList.size() == 2 && variables.size() == 2) {
-				return solveNumeric(eliminateOneVariable(termsEqualZeroList, variables.arg1(), engine), isNumeric[0], engine);
+				IExpr res = eliminateOneVariable(termsEqualZeroList, variables.arg1(), engine);
+				// if (!res.isPresent()) {
+				// if (isNumeric[0] || numeric) {
+				// return F.FindRoot.of(engine, termsEqualZeroList.arg1(), F.List(variables.arg1(), F.C0));
+				// }
+				// }
+				return solveNumeric(res, isNumeric[0] || numeric, engine);
 			}
 		} catch (RuntimeException rex) {
 			if (Config.SHOW_STACKTRACE) {
@@ -1088,7 +1096,7 @@ public class Solve extends AbstractFunctionEvaluator {
 	 * @return a &quot;list of rules list&quot; which solves the equations, or an empty list if no solution exists, or
 	 *         <code>F.NIL</code> if the equations are not solvable by this algorithm.
 	 */
-	protected IASTMutable solveEquations(IASTMutable termsEqualZeroList, IAST inequationsList, IAST variables,
+	protected static IASTMutable solveEquations(IASTMutable termsEqualZeroList, IAST inequationsList, IAST variables,
 			int maximumNumberOfResults, EvalEngine engine) {
 		try {
 			IASTMutable list = GroebnerBasis.solveGroebnerBasis(termsEqualZeroList, variables);
@@ -1159,7 +1167,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		}
 	}
 
-	protected IASTMutable solveInequations(IASTMutable subSolutionList, IAST inequationsList, IAST variables,
+	protected static IASTMutable solveInequations(IASTMutable subSolutionList, IAST inequationsList, IAST variables,
 			int maximumNumberOfResults, EvalEngine engine) {
 		if (inequationsList.isEmpty()) {
 			return QuarticSolver.sortASTArguments(subSolutionList);
@@ -1199,8 +1207,8 @@ public class Solve extends AbstractFunctionEvaluator {
 	 *            the evaluation engine
 	 * @return
 	 */
-	private IASTMutable solveTimesEquationsRecursively(IASTMutable termsEqualZeroList, IAST inequationsList, IAST variables,
-			EvalEngine engine) {
+	private static IASTMutable solveTimesEquationsRecursively(IASTMutable termsEqualZeroList, IAST inequationsList,
+			IAST variables, EvalEngine engine) {
 		IASTMutable resultList = solveEquations(termsEqualZeroList, inequationsList, variables, 0, engine);
 		if (resultList.isPresent() && !resultList.isEmpty()) {
 			return resultList;
@@ -1238,7 +1246,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		return resultList;
 	}
 
-	private void solveTimesAST(IAST times, IAST termsEqualZeroList, IAST inequationsList, IAST variables,
+	private static void solveTimesAST(IAST times, IAST termsEqualZeroList, IAST inequationsList, IAST variables,
 			EvalEngine engine, Set<IExpr> subSolutionSet, int i) {
 		IAST temp;
 				IAST splittedList = splitNumeratorDenominator(times, engine, false);
