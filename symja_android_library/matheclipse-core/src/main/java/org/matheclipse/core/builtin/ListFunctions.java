@@ -32,6 +32,7 @@ import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IArrayFunction;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IIterator;
@@ -116,9 +117,6 @@ public final class ListFunctions {
 
 	}
 
-	private static interface IArrayFunction {
-		IExpr evaluate(IExpr[] index);
-	}
 
 	private static interface IPositionConverter<T> {
 		/**
@@ -252,6 +250,7 @@ public final class ListFunctions {
 									return createGenericTable(iter, index, iter.allocHint(), temp, null);
 								}
 							}
+							return fDefaultValue;
 						}
 						return createGenericTable(iter, index, iter.allocHint(), null, null);
 					} finally {

@@ -1264,12 +1264,15 @@ public final class BooleanFunctions {
 		private static COMPARE_TERNARY compareGreaterIntervalTernary(final IExpr lower0, final IExpr upper0,
 				final IExpr lower1, final IExpr upper1) {
 			if (lower0.greaterThan(upper1).isTrue()) {
+				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.TRUE;
 			} else {
 				if (upper0.lessThan(lower1).isTrue()) {
+					//Swift changed: can't declare enum inside protocol
 					return COMPARE_TERNARY.FALSE;
 				}
 			}
+			//Swift changed: can't declare enum inside protocol
 			return COMPARE_TERNARY.UNDEFINED;
 		}
 
@@ -1279,6 +1282,7 @@ public final class BooleanFunctions {
 			// don't compare strings
 			if (a0.isReal()) {
 				if (a1.isReal()) {
+					//Swift changed: can't declare enum inside protocol
 					return ((ISignedNumber) a0).isGreaterThan((ISignedNumber) a1) ? COMPARE_TERNARY.TRUE
 							: COMPARE_TERNARY.FALSE;
 				} else if (a1.isInfinity()) {
@@ -1480,6 +1484,9 @@ public final class BooleanFunctions {
 			} else {
 				lhs = F.eval(F.Subtract(a1, a2));
 				rhs = F.C0;
+				if (lhs.isReal()) {
+					return createComparatorResult(lhs, rhs, useOppositeHeader, originalHead, oppositeHead);
+				}
 			}
 			if (lhs.isAST()) {
 				IAST lhsAST = (IAST) lhs;
@@ -3656,6 +3663,9 @@ public final class BooleanFunctions {
 	 * @return <code>F.NIL</code> or the simplified expression, if equality couldn't be determined.
 	 */
 	public static IExpr equalNull(final IExpr a1, final IExpr a2, EvalEngine engine) {
+		if (a1.isExactNumber() && a2.isExactNumber()) {
+			return a1.equals(a2) ? F.True : F.False;
+		}
 		COMPARE_TERNARY b;
 		IExpr arg1 = F.expandAll(a1, true, true);
 		IExpr arg2 = F.expandAll(a2, true, true);
@@ -3681,6 +3691,9 @@ public final class BooleanFunctions {
 	 * @return <code>F.NIL</code> or the simplified expression, if equality couldn't be determined.
 	 */
 	public static IExpr unequalNull(IExpr a1, IExpr a2, EvalEngine engine) {
+		if (a1.isExactNumber() && a2.isExactNumber()) {
+			return a1.equals(a2) ? F.False : F.True;
+		}
 		COMPARE_TERNARY b;
 		IExpr arg1 = F.expandAll(a1, true, true);
 		IExpr arg2 = F.expandAll(a2, true, true);

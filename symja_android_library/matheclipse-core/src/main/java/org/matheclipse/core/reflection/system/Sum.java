@@ -5,6 +5,7 @@ import com.duy.lambda.Predicate;
 import org.matheclipse.core.builtin.ListFunctions;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.util.Iterator;
 import org.matheclipse.core.expression.F;
@@ -210,7 +211,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 
 			if (iterator.isValidVariable() && iterator.isNumericFunction()) {
 				IAST resultList = Plus();
-				temp = evaluateLast(ast.arg1(), iterator, resultList, C0);
+				temp = evaluateLast(ast.arg1(), iterator, resultList, F.C0);
 				if (!temp.isPresent() || temp.equals(resultList)) {
 					return F.NIL;
 				}
@@ -346,6 +347,38 @@ public class Sum extends ListFunctions.Table implements SumRules {
 							F.HurwitzZeta(F.Negate(powAST.arg2()), F.Plus(1, to)));
 				}
 			}
+			try {
+				IAST resultList = Plus();
+				IExpr temp = evaluateLast(arg1, iterator, resultList, F.NIL);
+				if (temp.isPresent() && !temp.equals(resultList)) {
+					return temp;
+				}
+			} catch (RecursionLimitExceeded rle) {
+				engine.printMessage("Sum: Recursionlimit exceeded");
+				return F.NIL;
+			}
+			// try {
+			// iterator.setUp();
+			// if (iterator.hasNext()) {
+			// java.util.List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
+			// iterList.add(iterator);
+			// final TableGenerator generator = new TableGenerator(iterList, F.Plus(),
+			// new UnaryArrayFunction(engine, arg1), F.NIL);
+			// IExpr tableResult = generator.table();
+			// if (tableResult.isPresent()) {
+			// return tableResult;
+			// }
+			// }
+			// } catch (RecursionLimitExceeded rle) {
+			// engine.printMessage("Sum: Recursionlimit exceeded");
+			// return F.NIL;
+			// } catch (RuntimeException rex) {
+			// if (Config.SHOW_STACKTRACE) {
+			// rex.printStackTrace();
+			// }
+			// }finally {
+			// iterator.tearDown();
+			// }
 		}
 		if (from.isPositive()) {
 			IExpr temp1 = engine.evalQuiet(F.Sum(arg1, F.List(var, C0, from.minus(F.C1))));
@@ -500,7 +533,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 		if (getRuleAST() != null) {
 			// don't call EvalEngine#addRules() here!
 			// the rules should add themselves
-//			EvalEngine.get().addRules(ruleList);
+			// EvalEngine.get().addRules(ruleList);
 		}
 
 	}

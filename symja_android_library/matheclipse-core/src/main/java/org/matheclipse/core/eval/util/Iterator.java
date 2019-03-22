@@ -165,7 +165,7 @@ public class Iterator {
 		 */
 		@Override
 		public IExpr next() {
-			if (variable != null) {
+			if (variable != null && variable != count) {
 				variable.assign(count);
 			}
 			final IExpr temp = count;
@@ -226,7 +226,7 @@ public class Iterator {
 			} else {
 				count = lowerLimit;
 			}
-			if (variable != null) {
+			if (variable != null && variable != count) {
 				variable.assign(count);
 			}
 			return true;
@@ -239,7 +239,7 @@ public class Iterator {
 		@Override
 		public void tearDown() {
 			if (variable != null) {
-				variable.assign(variableValue);
+				variable.assign(null);
 			}
 			EvalEngine.get().setNumericMode(fNumericMode);
 		}
@@ -827,8 +827,7 @@ public class Iterator {
 	}
 
 	/**
-	 * Iterator specification for functions like <code>Table()</code> or
-	 * <code>Sum()</code> or <code>Product()</code>
+	 * Iterator specification for functions like <code>Table()</code> or <code>Sum()</code> or <code>Product()</code>
 	 * 
 	 * @param list
 	 *            a list representing an iterator specification
