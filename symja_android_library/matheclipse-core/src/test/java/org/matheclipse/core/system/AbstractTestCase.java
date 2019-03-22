@@ -28,6 +28,7 @@ public abstract class AbstractTestCase extends TestCase {
     public AbstractTestCase(String name) {
         super(name);
         Config.SERVER_MODE = false;
+        Config.SHOW_STACKTRACE = true;
     }
 
 	public void ESameTest(String expectedString, String evalString  ) {
@@ -155,7 +156,8 @@ public abstract class AbstractTestCase extends TestCase {
     protected void setUp() {
         try {
             synchronized (fScriptManager) {
-                fScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
+				EvalEngine engine = new EvalEngine();
+				fScriptEngine = new MathScriptEngine(engine);// fScriptManager.getEngineByExtension("m");
                 fScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
                 fScriptEngine.put("DECIMAL_FORMAT", "0.0####");
 
@@ -163,7 +165,7 @@ public abstract class AbstractTestCase extends TestCase {
                 fNumericScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
                 F.await();
 
-                EvalEngine engine = EvalEngine.get();
+				EvalEngine.set(engine);
 				engine.init();
                 engine.setRecursionLimit(256);
                 engine.setIterationLimit(500);

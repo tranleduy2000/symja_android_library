@@ -203,6 +203,10 @@ public class Integrate extends AbstractFunctionEvaluator {
 					// issue #91
 					return F.NIL;
 				}
+				result = integrateByRubiRules(fx, x, ast);
+				if (result.isPresent()) {
+					return result;
+				}
 				if (arg1.isTimes()) {
 					IAST[] temp = ((IAST) arg1).filter(new Predicate<IExpr>() {
                         @Override
@@ -240,10 +244,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 						return F.Divide(fx, F.Log(base));
 					}
 				}
-					result = integrateByRubiRules(fx, x, ast);
-					if (result.isPresent()) {
-						return result;
-					}
 
 				result = callRestIntegrate(fx, x, engine);
 									if (result.isPresent()) {
