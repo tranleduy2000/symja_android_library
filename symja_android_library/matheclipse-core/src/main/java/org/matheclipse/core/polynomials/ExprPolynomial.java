@@ -1673,7 +1673,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param S
 	 *            nonzero GenPolynomial with invertible leading coefficient.
 	 * @return [ quotient , remainder ] with this = quotient * S + remainder and deg(remainder) &lt; deg(S) or remiander
-	 *         = 0.
+	 *         = 0. Or <code>null</code> is the evaluation was not possible.
 	 * @see edu.jas.poly.PolyUtil#baseSparsePseudoRemainder(edu.jas.poly.GenPolynomial,edu.jas.poly.GenPolynomial)
 	 */
 	@Override
@@ -1697,15 +1697,18 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 				IExpr a = r.leadingBaseCoefficient();
 				ExpVectorLong g = f.subtract(e);
 				a = a.multiplyDistributed(ci);
+				if (a.isZERO()) {
+					return null;
+				}
 				q = q.sum(a, g);
 				h = S.multiply(a, g);
 				r = r.subtract(h);
-//				IExpr a = r.leadingBaseCoefficient();
-//				f = f.subtract(e);
-//				a = a.multiply(ci);
-//				q = q.sum(a, f);
-//				h = S.multiply(a, f);
-//				r = r.subtract(h);
+				// IExpr a = r.leadingBaseCoefficient();
+				// f = f.subtract(e);
+				// a = a.multiply(ci);
+				// q = q.sum(a, f);
+				// h = S.multiply(a, f);
+				// r = r.subtract(h);
 			} else {
 				break;
 			}
@@ -1728,7 +1731,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @deprecated use quotientRemainder()
 	 */
 	@Deprecated
-	public ExprPolynomial[] divideAndRemainder(ExprPolynomial S) {
+	private ExprPolynomial[] divideAndRemainder(ExprPolynomial S) {
 		return quotientRemainder(S);
 	}
 
@@ -1837,7 +1840,8 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @param S
 	 *            GenPolynomial.
-	 * @return [ gcd(this,S), a, b ] with a*this + b*S = gcd(this,S).
+	 * @return [ gcd(this,S), a, b ] with a*this + b*S = gcd(this,S) or <code>null</code> is the evaluation was not
+	 *         possible.
 	 */
 	@Override
 	public ExprPolynomial[] egcd(ExprPolynomial S) {
@@ -1863,6 +1867,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (this.isConstant() && S.isConstant()) {
 			IExpr t = this.leadingBaseCoefficient();
 			IExpr s = S.leadingBaseCoefficient();
+			if (t.isInteger() && s.isInteger()) {
 			IExpr[] gg = t.egcd(s);
 			// System.out.println("coeff gcd = " + Arrays.toString(gg));
 			ExprPolynomial z = this.ring.getZero();
@@ -1870,6 +1875,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			ret[1] = z.sum(gg[1]);
 			ret[2] = z.sum(gg[2]);
 			return ret;
+		}
 		}
 		ExprPolynomial[] qr;
 		ExprPolynomial q = this;
@@ -1882,6 +1888,9 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		ExprPolynomial x2;
 		while (!r.isZERO()) {
 			qr = q.quotientRemainder(r);
+			if (qr == null) {
+				return null;
+			}
 			q = qr[0];
 			x1 = c1.subtract(q.multiply(d1));
 			x2 = c2.subtract(q.multiply(d2));
