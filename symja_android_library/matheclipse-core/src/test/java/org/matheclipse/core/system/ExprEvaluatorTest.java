@@ -9,6 +9,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.ExprMonomial;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
@@ -253,6 +254,17 @@ public class ExprEvaluatorTest extends TestCase {
 		}
 	}
 
+	public void testDefineVariable() {
+		// github #118
+		ExprEvaluator exprEvaluator = new ExprEvaluator();
+		ISymbol symbol = exprEvaluator.defineVariable("x", 1.0);
+		assertEquals(exprEvaluator.eval("x").toString(), "1.0");
+
+		// now clear its value
+		symbol.clear(EvalEngine.get());
+
+		assertEquals(exprEvaluator.eval("x").toString(), "x");
+	}
 	public void testX2() {
 		ExprEvaluator evaluator = new ExprEvaluator();
 		evaluator.defineVariable("X", evaluator.parse("2"));

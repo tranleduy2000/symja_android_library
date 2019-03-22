@@ -510,7 +510,8 @@ public final class Arithmetic {
      *
      * <blockquote>
      * <p>
-	 * replaces numerical values in the <code>numerical-expr</code> which are close to zero with symbolic value <code>0</code>.
+	 * replaces numerical values in the <code>numerical-expr</code> which are close to zero with symbolic value
+	 * <code>0</code>.
      * </p>
      * </blockquote>
      * <h3>Examples</h3>
@@ -1688,7 +1689,8 @@ public final class Arithmetic {
         /**
          * The Harmonic number at the index specified
          *
-		 * @param n the index, non-negative.
+		 * @param n
+		 *            the index, non-negative.
          * @return the H_1=1 for n=1, H_2=3/2 for n=2 etc. For values of n less than 1, zero is returned.
          */
         public BigFraction harmonicNumber(int n) {
@@ -2004,7 +2006,8 @@ public final class Arithmetic {
      * </p>
      * </blockquote>
      * <p>
-	 * <strong>Note</strong>: the upper case identifier <code>N</code> is different from the lower case identifier <code>n</code>.
+	 * <strong>Note</strong>: the upper case identifier <code>N</code> is different from the lower case identifier
+	 * <code>n</code>.
      * </p>
      * <h3>Examples</h3>
      *
@@ -5143,10 +5146,10 @@ public final class Arithmetic {
 				}
 			}
 		}
-		if (power0Arg1.isRational() && power0Arg2.isRational() && power1Arg1.isRational() && power1Arg2.isRational()) {
+		if (power0Arg1.isRational() && power1Arg1.isRational()) {
 			IExpr temp = timesPowerPower(((IRational) power0Arg1).numerator(), ((IRational) power0Arg1).denominator(),
 					power0Arg2, //
-					((IRational) power1Arg1).numerator(), ((IRational) power1Arg1).denominator(), power1Arg2, true);
+					((IRational) power1Arg1).numerator(), ((IRational) power1Arg1).denominator(), power1Arg2, false);
                         if (temp.isPresent()) {
                             return temp;
                         }
@@ -5180,7 +5183,31 @@ public final class Arithmetic {
 		OpenIntToIExprHashMap<IExpr> fn2Map = new OpenIntToIExprHashMap<IExpr>();
 		IInteger fn2Rest = Primality.countPrimes1021(p2Numer, p2Exp, fn2Map, setEvaled, evaled);
 		IInteger fd1Rest = Primality.countPrimes1021(p1Denom, p1Exp.negate(), fn2Map, setEvaled, evaled);
+		if (!evaled[0]) {
+			OpenIntToIExprHashMap<IExpr>.Iterator iter = fn2Map.iterator();
 
+			iter = fn2Map.iterator();
+			while (iter.hasNext()) {
+				iter.advance();
+				int base = iter.key();
+				IExpr exp1 = fn1Map.get(base);
+				if (exp1 != null) {
+					if (exp1.isAST()) {
+						evaled[0] = true;
+						break;
+					}
+					IExpr exp2 = fn2Map.get(base);
+					if (exp2.isAST()) {
+						evaled[0] = true;
+						break;
+					}
+					if ((exp1.isInteger() && exp2.isInteger())) {
+						evaled[0] = true;
+						break;
+					}
+				}
+			}
+		}
             if (evaled[0]) {
 			OpenIntToIExprHashMap<IExpr>.Iterator iter = fn2Map.iterator();
 			iter = fn2Map.iterator();

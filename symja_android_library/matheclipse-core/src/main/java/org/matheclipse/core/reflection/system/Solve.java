@@ -1310,18 +1310,17 @@ public class Solve extends AbstractFunctionEvaluator {
 	 */
 	private static IASTMutable solveTimesEquationsRecursively(IASTMutable termsEqualZeroList, IAST inequationsList,
 			IAST variables, EvalEngine engine) {
+		try {
 		IASTMutable resultList = solveEquations(termsEqualZeroList, inequationsList, variables, 0, engine);
 		if (resultList.isPresent() && !resultList.isEmpty()) {
 			return resultList;
 		}
 		Set<IExpr> subSolutionSet = new TreeSet<IExpr>();
-		boolean isTimesEvaled = false;
 		for (int i = 1; i < termsEqualZeroList.size(); i++) {
 			IExpr termEQZero = termsEqualZeroList.get(i);
 			if (termEQZero.isTimes()) {
-				isTimesEvaled = true;
-				solveTimesAST((IAST) termEQZero, termsEqualZeroList, inequationsList, variables, engine, subSolutionSet,
-						i);
+					solveTimesAST((IAST) termEQZero, termsEqualZeroList, inequationsList, variables, engine,
+							subSolutionSet, i);
 
 			} else {
 				if (termEQZero.isAST()) {
@@ -1329,7 +1328,6 @@ public class Solve extends AbstractFunctionEvaluator {
 					termEQZero = F.Factor.of(engine, termEQZero);
 
 					if (termEQZero.isTimes()) {
-						isTimesEvaled = true;
 						solveTimesAST((IAST) termEQZero, termsEqualZeroList, inequationsList, variables, engine,
 								subSolutionSet, i);
 					}
@@ -1341,10 +1339,16 @@ public class Solve extends AbstractFunctionEvaluator {
 			list.appendAll(subSolutionSet);
 			return list;
 		}
-//		if (isTimesEvaled && !resultList.isPresent()) {
-//			return F.ListAlloc();
-//		}
+			// if (isTimesEvaled && !resultList.isPresent()) {
+			// return F.ListAlloc();
+			// }
 		return resultList;
+		} catch (RuntimeException rex) {
+			if (Config.SHOW_STACKTRACE) {
+				rex.printStackTrace();
+			}
+		}
+		return F.NIL;
 	}
 
 	private static void solveTimesAST(IAST times, IAST termsEqualZeroList, IAST inequationsList, IAST variables,
