@@ -8598,8 +8598,8 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 		check(//
 				"Integrate[(a*d*e + (c*d^2 + a*e^2)*x + c*d*e*x^2)^(3/2)/((d + e*x)^(3/2)*(f + g*x)^(7/2)), x]", //
 				"(2*(a*d*e + (c*d^2 + a*e^2)*x + c*d*e*x^2)^(5/2))/(5*(c*d*f - a*e*g)*(d + e*x)^(5/2)*(f + g*x)^(5/2))", //
-				"-2/5*(e^2*(a*d*e+(c*d^2+a*e^2)*x+c*d*e*x^2)^(5/2))/((-c*d*e^2*f-c*d^2*e*g+e*(c*d^\n" +
-				"2+a*e^2)*g)*(d+e*x)^(5/2)*(f+g*x)^(5/2))",
+				"-2/5*(e^2*(a*d*e+(c*d^2+a*e^2)*x+c*d*e*x^2)^(5/2))/((-c*d*e^2*f-c*d^2*e*g+e*(c*d^\n"
+						+ "2+a*e^2)*g)*(d+e*x)^(5/2)*(f+g*x)^(5/2))",
 				860);
 	}
 
@@ -8608,8 +8608,8 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 		check(//
 				"Integrate[(a*d*e + (c*d^2 + a*e^2)*x + c*d*e*x^2)^(5/2)/((d + e*x)^(5/2)*(f + g*x)^(9/2)), x]", //
 				"(2*(a*d*e + (c*d^2 + a*e^2)*x + c*d*e*x^2)^(7/2))/(7*(c*d*f - a*e*g)*(d + e*x)^(7/2)*(f + g*x)^(7/2))", //
-				"-2/7*(e^2*(a*d*e+(c*d^2+a*e^2)*x+c*d*e*x^2)^(7/2))/((-c*d*e^2*f-c*d^2*e*g+e*(c*d^\n" +
-				"2+a*e^2)*g)*(d+e*x)^(7/2)*(f+g*x)^(7/2))", //
+				"-2/7*(e^2*(a*d*e+(c*d^2+a*e^2)*x+c*d*e*x^2)^(7/2))/((-c*d*e^2*f-c*d^2*e*g+e*(c*d^\n"
+						+ "2+a*e^2)*g)*(d+e*x)^(7/2)*(f+g*x)^(7/2))", //
 				860);
 	}
 
@@ -10302,6 +10302,7 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 
 	// {1588}
 	public void test1346() {
+		fSeconds = 60;
 		check(//
 				"Integrate[x^2*(a + b*x + c*x^2 + d*x^3)^p*(3*a + b*(4 + p)*x + c*(5 + 2*p)*x^2 + d*(6 + 3*p)*x^3), x]", //
 				"x^3*(a + b*x + c*x^2 + d*x^3)^(1 + p)", //
@@ -10310,6 +10311,7 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 
 	// {1588}
 	public void test1347() {
+		fSeconds = 120;
 		check(//
 				"Integrate[x*(a + b*x + c*x^2 + d*x^3)^p*(2*a + b*(3 + p)*x + c*(4 + 2*p)*x^2 + d*(5 + 3*p)*x^3), x]", //
 				"x^2*(a + b*x + c*x^2 + d*x^3)^(1 + p)", //
@@ -10542,6 +10544,7 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 
 	// {1590}
 	public void test1379() {
+		fSeconds = 60;
 		check(//
 				"Integrate[x*(a + b*x + c*x^2)^m*(d + e*x + f*x^2 + g*x^3)^n*(2*a*d + (3*b*d + 3*a*e + b*d*m + a*e*n)*x + (4*c*d + 4*b*e + 4*a*f + 2*c*d*m + b*e*m + b*e*n + 2*a*f*n)*x^2 + (5*c*e + 5*b*f + 5*a*g + 2*c*e*m + b*f*m + c*e*n + 2*b*f*n + 3*a*g*n)*x^3 + (6*c*f + 6*b*g + 2*c*f*m + b*g*m + 2*c*f*n + 3*b*g*n)*x^4 + c*g*(7 + 2*m + 3*n)*x^5), x]", //
 				"x^2*(a + b*x + c*x^2)^(1 + m)*(d + e*x + f*x^2 + g*x^3)^(1 + n)", //
@@ -10550,6 +10553,7 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 
 	// {1590}
 	public void test1380() {
+		fSeconds = 60;
 		check(//
 				"Integrate[(a + b*x + c*x^2)^m*(d + e*x + f*x^2 + g*x^3)^n*(a*d + (2*b*d + 2*a*e + b*d*m + a*e*n)*x + (3*c*d + 3*b*e + 3*a*f + 2*c*d*m + b*e*m + b*e*n + 2*a*f*n)*x^2 + (4*c*e + 4*b*f + 4*a*g + 2*c*e*m + b*f*m + c*e*n + 2*b*f*n + 3*a*g*n)*x^3 + (5*c*f + 5*b*g + 2*c*f*m + b*g*m + 2*c*f*n + 3*b*g*n)*x^4 + c*g*(6 + 2*m + 3*n)*x^5), x]", //
 				"x*(a + b*x + c*x^2)^(1 + m)*(d + e*x + f*x^2 + g*x^3)^(1 + n)", //
@@ -10558,6 +10562,19 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 
 	// {1590}
 	public void test1381() {
+		fSeconds = 60;
+//		check(//
+//				"Rubi`PseudoBinomialParts[(a+b*x+c*x^2)^m*(d+e*x+f*x^2+g*x^3)^n,x]", //
+//				"False", //
+//				1590);
+		check(//
+				"Rubi`PseudoBinomialParts[b*d+a*e+b*d*m+a*e*n+(2*c*d+2*b*e+2*a*f+2*c*d*m+b*e*m+b*e*n+2*a*f*n)*x+(3*c*e+3*b*f+3*a*g+2*c*e*m+b*f*m+c*e*n+2*b*f*n+3*a*g*n)*x^2+(4*c*f+4*b*g+2*c*f*m+b*g*m+2*c*f*n+3*b*g*n)*x^3+c*g*(5+2*m+3*n)*x^4,x]", //
+				"False", //
+				1590);
+//		check(//
+//				"Rubi`PseudoBinomialPairQ[b*d+a*e+b*d*m+a*e*n+(2*c*d+2*b*e+2*a*f+2*c*d*m+b*e*m+b*e*n+2*a*f*n)*x+(3*c*e+3*b*f+3*a*g+2*c*e*m+b*f*m+c*e*n+2*b*f*n+3*a*g*n)*x^2+(4*c*f+4*b*g+2*c*f*m+b*g*m+2*c*f*n+3*b*g*n)*x^3+c*g*(5+2*m+3*n)*x^4,(a+b*x+c*x^2)^m*(d+e*x+f*x^2+g*x^3)^n,x]", //
+//				"False", //
+//				1590);
 		check(//
 				"Integrate[(a + b*x + c*x^2)^m*(d + e*x + f*x^2 + g*x^3)^n*(b*d + a*e + b*d*m + a*e*n + (2*c*d + 2*b*e + 2*a*f + 2*c*d*m + b*e*m + b*e*n + 2*a*f*n)*x + (3*c*e + 3*b*f + 3*a*g + 2*c*e*m + b*f*m + c*e*n + 2*b*f*n + 3*a*g*n)*x^2 + (4*c*f + 4*b*g + 2*c*f*m + b*g*m + 2*c*f*n + 3*b*g*n)*x^3 + c*g*(5 + 2*m + 3*n)*x^4), x]", //
 				"(a + b*x + c*x^2)^(1 + m)*(d + e*x + f*x^2 + g*x^3)^(1 + n)", //
