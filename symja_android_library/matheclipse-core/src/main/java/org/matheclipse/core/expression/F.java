@@ -29,6 +29,7 @@ import org.matheclipse.core.builtin.ExpTrigsFunctions;
 import org.matheclipse.core.builtin.FinancialFunctions;
 import org.matheclipse.core.builtin.FunctionDefinitions;
 import org.matheclipse.core.builtin.HypergeometricFunctions;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.IntegerFunctions;
 import org.matheclipse.core.builtin.LinearAlgebra;
 import org.matheclipse.core.builtin.ListFunctions;
@@ -162,6 +163,7 @@ public class F {
 	 *
 	 * @see java.util.Optional#isPresent
 	 */
+	// Swift changed: type is incompatible
 	public final static INilPointer NIL = AbstractAST.NIL;
 
 
@@ -1191,6 +1193,8 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol GegenbauerC = F.initFinalSymbol("GegenbauerC", ID.GegenbauerC);
 
+    /***/
+    public final static IBuiltInSymbol General = F.initFinalSymbol("General", ID.General);
     /** GeometricDistribution(p) - returns a geometric distribution.*/
 	public final static IBuiltInSymbol GeometricDistribution = F.initFinalSymbol("GeometricDistribution",
 			ID.GeometricDistribution);
@@ -1198,7 +1202,7 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol GeometricMean = F.initFinalSymbol("GeometricMean", ID.GeometricMean);
 
-	/***/
+    /** Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. This function doesn't work in the web interface. A file system has to be available to load a package. */
 	public final static IBuiltInSymbol Get = F.initFinalSymbol("Get", ID.Get);
 
 	/** Glaisher constant.*/
@@ -3594,6 +3598,7 @@ public class F {
 
 			ConstantDefinitions.initialize();
 			FunctionDefinitions.initialize();
+			IOFunctions.initialize();
 			Programming.initialize();
 			PatternMatching.initialize();
 			Algebra.initialize();

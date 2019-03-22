@@ -430,7 +430,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     public void putDownRule(final int setSymbol, boolean equalRule, IExpr leftHandSide,
                             IExpr rightHandSide, boolean packageMode);
 
-    public IExpr evalMessage(EvalEngine engine, String messageName);
+    public IExpr evalMessage(String messageName);
 
     public void putMessage(final int setSymbol, String messageName, IStringX message);
 

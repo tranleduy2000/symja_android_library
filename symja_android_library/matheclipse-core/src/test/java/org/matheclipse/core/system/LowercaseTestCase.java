@@ -5104,6 +5104,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"ComplexInfinity");
 		check("Gamma(0.0+I*0.0)", //
 				"ComplexInfinity");
+		//Swift changed: Use Config.DOUBLE_TOLERANCE to compare double in order to avoid infinity loop
 		check("Table(Gamma(x+I*y), {x,-0.5, 0.5, 1/4}, {y,-0.5, 0.5, 1/4})", //
 				"{{-1.58148+I*0.0548502,-2.75473+I*0.0310004,-3.54491,-2.75473+I*(-0.0310004),-1.58148+I*(-0.0548502)},{-1.31815+I*1.01078,-2.77536+I*1.61484,-4.90167,-2.77536+I*(-1.61484),-1.31815+I*(-1.01078)},{-0.399279+I*1.60339,-0.524105+I*3.76716,ComplexInfinity,-0.524105+I*(-3.76716),-0.399279+I*(-1.60339)},{0.515524+I*1.30733,1.65113+I*1.83788,3.62561,1.65113+I*(-1.83788),0.515524+I*(-1.30733)},{0.818164+I*0.763314,1.38511+I*0.673182,1.77245,1.38511+I*(-0.673182),0.818164+I*(-0.763314)}}");
 		check("Table(Gamma(x+I ), {x,-10.0, 10.0, 1/2})", //
@@ -6406,6 +6407,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLess() {
+		check("3+x<4+x", //
+				"True");
+		check("3+x>4+x", //
+				"False");
 		check("Infinity<Infinity", //
 				"False");
 
@@ -6427,6 +6432,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLessEqual() {
+		check("3+x<=4+x", //
+				"True");
+		check("3+x>=4+x", //
+				"False");
 		check("Infinity<=Infinity", "True");
 
 		check("Refine(Infinity<=x, x>0)", "False");
@@ -7461,6 +7470,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423,9689,\n" + "9941}");
 	}
 
+	public void testMessage() {
+		check("f::failure=\"`1` called with wrong argument; `2`, `3`.\"", //
+				"`1` called with wrong argument; `2`, `3`.");
+		check("Message(f::failure, f, x, y)", //
+				"f: f called with wrong argument; x, y.");
+		check("Message(Rule::argr, Rule, 2)", //
+				"General: Rule called with 1 argument; 2 arguments are expected.");
+	}
 	public void testMessageName() {
 		// Set[MessageName(f,"usage"),"A usage message")
 		check("f::usage=\"A usage message\"", //

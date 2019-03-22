@@ -741,7 +741,13 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		fRulesData.insertMatcher(pmEvaluator);
 	}
 
-	public IExpr evalMessage(EvalEngine engine, String messageName) {
+	public IExpr evalMessage(String messageName) {
+		if (fRulesData != null) {
+			IExpr temp = fRulesData.getMessages().get(messageName);
+			if (temp != null) {
+				return temp;
+			}
+		}
 		return F.NIL;
 	}
 

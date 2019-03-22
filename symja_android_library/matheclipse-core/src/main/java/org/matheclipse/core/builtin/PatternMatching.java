@@ -734,13 +734,13 @@ public final class PatternMatching {
 				if (arg1.isAST()) {
 					IExpr temp = engine.evalHoldPattern((IAST) arg1);
 					if (temp == arg1) {
-						// J2objc changed
+						// Swift changed: type is incompatible
 						return F.nilPtr();
 					}
 					return F.Literal(temp);
 				}
 			}
-			// J2objc changed
+			// Swift changed: type is incompatible
 			return F.nilPtr();
 		}
 	}
@@ -793,7 +793,7 @@ public final class PatternMatching {
 			}
 
 				// Set[MessageName(f,"usage"),"text")
-				IExpr temp = symbol.evalMessage(engine, "usage");
+				IExpr temp = symbol.evalMessage("usage");
 				if (temp.isPresent()) {
 					stream.println(temp.toString());
 				}
