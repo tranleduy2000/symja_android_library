@@ -3456,13 +3456,17 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEqual() {
+		check("-I==1", //
+				"False");
 		check("1/2*(1+Sqrt(5))==GoldenRatio", //
 				"True");
-		check("x^2+4*x+4==(x+2)^2", "True");
+		check("x^2+4*x+4==(x+2)^2", //
+				"True");
 		check("x^2+x==x*(x+1)", "True");
 
 		// github issue #42
-		check("1-i==1.0-i", "True");
+		check("1-i==1.0-i", //
+				"True");
 
 		// Issue #174
 		check("x/(y*x)==0.25", "1/y==0.25");
@@ -5206,11 +5210,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"GCD(0,Cos(b*x)[[2]])");
 		check("GCD(0, CoshIntegral(b*x))", //
 				"GCD(0,CoshIntegral(b*x))");
-		check("GCD(x,x)", "GCD(x,x)");
-		check("GCD(-2147483648)", "2147483648");
-		check("GCD(-2147483648, -2147483648/2)", "1073741824");
-		check("GCD(I)", "1");
-		check("GCD(-I)", "1");
+		check("GCD(x,x)", //
+				"GCD(x,x)");
+		check("GCD(-2147483648)", //
+				"2147483648");
+		check("GCD(-2147483648, -2147483648/2)", //
+				"1073741824");
+		check("GCD(I)", //
+				"1");
+		check("GCD(-I)", //
+				"1");
+		check("GCD(1,I)", //
+				"1");
 
 		check("GCD()", "0");
 		check("GCD(10)", "10");
@@ -14052,6 +14063,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTrigReduce() {
+		check("TrigReduce(-a*Cos(x)^2+a*Sin(x)^2 )", //
+				"-a*Cos(2*x)");
+		check("TrigReduce(Sin(x)*Tan(y))", //
+				"1/2*(Cos(x-y)-Cos(x+y))*Sec(y)");
 		check("TrigReduce(Sin(x)*Tan(y))", //
 				"1/2*(Cos(x-y)-Cos(x+y))*Sec(y)");
 		check("TrigReduce(Cos(x)*Tan(y))", //

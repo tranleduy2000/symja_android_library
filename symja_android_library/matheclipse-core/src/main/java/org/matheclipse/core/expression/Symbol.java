@@ -56,8 +56,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     protected transient RulesData fRulesData;
 
     /**
-     * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower-
-     * and upper-case function names.
+	 * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower- and upper-case
+	 * function names.
      */
     protected String fSymbolName;
 
@@ -112,8 +112,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     }
 
     /**
-     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
-     * integer as this expression is canonical less than, equal to, or greater than the specified expression.
+	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive integer as this
+	 * expression is canonical less than, equal to, or greater than the specified expression.
      */
     @Override
     public int compareTo(final IExpr expr) {
@@ -127,11 +127,18 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
             // sort lexicographically
             return StringX.US_COLLATOR.compare(fSymbolName, ((ISymbol) expr).getSymbolName());
         }
+        if (expr.isAST()) {
         if (expr.isNot() && expr.first().isSymbol()) {
-            int cp = compareTo(expr.first());
+                final int cp = compareTo(expr.first());
             return cp != 0 ? cp : -1;
         }
-        return super.compareTo(expr);
+            if (!expr.isDirectedInfinity()) {
+                return -1 * expr.compareTo(this);
+            }
+    }
+        int x = hierarchy();
+        int y = expr.hierarchy();
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
     /**
      * {@inheritDoc}

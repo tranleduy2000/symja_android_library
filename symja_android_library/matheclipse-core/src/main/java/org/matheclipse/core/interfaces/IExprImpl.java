@@ -3565,8 +3565,8 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
                 return -1 * expr.compareTo(this);
             }
         }
-        int x = hierarchy();
-        int y = expr.hierarchy();
+        final int x = hierarchy();
+        final int y = expr.hierarchy();
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 

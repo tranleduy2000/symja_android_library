@@ -97,6 +97,14 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 	// super(symbolName, context);
 	// fEvaluator = evaluator;
 	// }
+	@Override
+	public int compareTo(IExpr expr) {
+		if (expr instanceof BuiltInSymbol) {
+			final int ordinal = ((BuiltInSymbol) expr).fOrdinal;
+			return fOrdinal < ordinal ? -1 : fOrdinal == ordinal ? 0 : 1;
+		}
+		return super.compareTo(expr);
+	}
 	/** {@inheritDoc} */
 	@Override
 	public String definitionToString() throws IOException {
