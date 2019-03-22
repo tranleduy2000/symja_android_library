@@ -3,7 +3,6 @@ package org.matheclipse.core.eval.interfaces;
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
@@ -301,11 +300,15 @@ public abstract class AbstractArg12 extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkRange(ast, 2, 3);
+		if (ast.size() == 2 || ast.size() == 3) {
 		if (ast.size() != 3) {
 			return unaryOperator(ast.arg1());
 		}
 		return binaryOperator(ast.arg1(), ast.arg2());
+	}
+		engine.printMessage(ast.topHead() + ": " + ast.topHead()
+				+ " function requires 1 or 2 arguments, but number of args equals: " + ast.argSize());
+		return F.NIL;
 	}
 
 }
