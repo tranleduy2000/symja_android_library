@@ -3692,7 +3692,7 @@ public class Algebra {
 
 					if (((IAST) expr).hasTrigonometricFunction()) {
 						try {
-							temp = F.eval(F.TrigReduce(expr));
+							temp = F.eval(F.TrigExpand(expr));
 							count = fComplexityFunction.apply(temp);
 							if (count < minCounter) {
 								minCounter = count;
@@ -3702,7 +3702,7 @@ public class Algebra {
 							//
 						}
 					try {
-						temp = F.eval(F.TrigExpand(expr));
+							temp = F.eval(F.TrigToExp(expr));
 						count = fComplexityFunction.apply(temp);
 						if (count < minCounter) {
 							minCounter = count;
@@ -3713,7 +3713,7 @@ public class Algebra {
 					}
 
 					try {
-						temp = F.eval(F.TrigToExp(expr));
+							temp = F.eval(F.TrigReduce(expr));
 						count = fComplexityFunction.apply(temp);
 						if (count < minCounter) {
 							minCounter = count;

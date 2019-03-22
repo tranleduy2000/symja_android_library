@@ -13498,6 +13498,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTimes() {
+		check("Csch(x)^3 * Sinh(x)^(-2)", //
+				"Csch(x)^5");
+		check("Csch(x)^3 * Sinh(x)^7", //
+				"Sinh(x)^4");
 		check("2*4^(1+p)", //
 				"2^(3+2*p)");
 		check("(2^(3/4)*x*7^(-15/4))", //
