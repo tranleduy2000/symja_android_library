@@ -831,36 +831,34 @@ public class PredicateQ {
 			if (expr.isNumber()) {
 				return expr.isZero();
 			}
-			// System.out.println(arg1);
-			// System.out.println();
-			if (expr.isAST()) {
-				expr = F.expandAll(expr, true, true);
-				if (expr.isZero()) {
+			IExpr temp = arg1.evalNumber();
+			if (temp != null) {
+				if (temp.isZero()) {
 					return true;
 				}
-				if (expr.leafCount() > Config.MAX_FACTOR_LEAFCOUNT && Config.MAX_FACTOR_LEAFCOUNT > 0) {
-					return false;
+			}
+			if (expr.isAST()) {
+				if (expr.isPlus()) {
+					IExpr[] commonFactors = InternalFindCommonFactorPlus.findCommonFactors((IAST) expr);
+					if (commonFactors != null) {
+						temp = engine.evaluate(F.Simplify(F.Times(commonFactors[0], commonFactors[1])));
+						if (temp.isNumber()) {
+							return temp.isZero();
+						}
+						temp = temp.evalNumber();
+						if (temp != null) {
+							if (temp.isZero()) {
+					return true;
 				}
-				if (expr.isPlusTimesPower()) {
-					expr = engine.evaluate(expr);
-					if (expr.isNumber()) {
-						return expr.isZero();
-					}
-					if (expr.isPlusTimesPower()) {
-						expr = F.Together.of(engine, expr);
-						if (expr.isNumber()) {
-							return expr.isZero();
 						}
 					}
 				}
+				// } else {
+				return isZeroTogether(expr, engine);
+				// }
 			}
-			IExpr temp = arg1.evalNumber();
-			if (temp != null) {
-				return temp.isZero();
-			}
-
-			return expr.isZero();
-		}
+					return false;
+				}
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -1332,6 +1330,29 @@ public class PredicateQ {
 
 	}
 
+	public static boolean isZeroTogether(IExpr expr, EvalEngine engine) {
+		expr = F.expandAll(expr, true, true);
+		expr = engine.evaluate(expr);
+		if (expr.isZero()) {
+			return true;
+		}
+		if (expr.leafCount() > Config.MAX_FACTOR_LEAFCOUNT && Config.MAX_FACTOR_LEAFCOUNT > 0) {
+			return false;
+		}
+		if (expr.isPlusTimesPower()) {
+			expr = engine.evaluate(expr);
+			if (expr.isNumber()) {
+				return expr.isZero();
+			}
+			if (expr.isPlusTimesPower()) {
+				expr = F.Together.of(engine, expr);
+				if (expr.isNumber()) {
+					return expr.isZero();
+				}
+			}
+		}
+		return false;
+	}
 	private final static PredicateQ CONST = new PredicateQ();
 
 	public static PredicateQ initialize() {

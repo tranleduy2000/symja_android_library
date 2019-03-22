@@ -56,8 +56,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     protected transient RulesData fRulesData;
 
     /**
-	 * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower- and upper-case
-	 * function names.
+     * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower-
+     * and upper-case function names.
      */
     protected String fSymbolName;
 
@@ -112,8 +112,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     }
 
     /**
-	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive integer as this
-	 * expression is canonical less than, equal to, or greater than the specified expression.
+     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
+     * integer as this expression is canonical less than, equal to, or greater than the specified expression.
      */
     @Override
     public int compareTo(final IExpr expr) {
@@ -374,12 +374,12 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         if (variables.isAST0()) {
             return true;
         }
-//		if (isConstant()) {
-//			return true;
-//		}
+        // if (isConstant()) {
+        // return true;
+        // }
         ExprPolynomialRing ring = new ExprPolynomialRing(variables);
         return ring.isPolynomial(this);
-//		return true;
+        // return true;
     }
 
     /**
@@ -747,7 +747,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         IAST ast = F.ast(args, this);
         return engine.evaluate(ast);
     }
-
     /**
      * {@inheritDoc}
      */
@@ -1029,6 +1028,18 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return "$s(\"" + fSymbolName + "\")";
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IExpr ofNIL(EvalEngine engine, IExpr... args) {
+        IAST ast = F.ast(args, this);
+        IExpr temp = engine.evalLoop(ast);
+        if (temp.isPresent() && temp.head() == this) {
+            return F.NIL;
+        }
+        return temp;
+    }
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         fSymbolName = stream.readUTF();
         fAttributes = stream.read();

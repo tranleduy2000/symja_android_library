@@ -27,7 +27,6 @@ import org.matheclipse.core.interfaces.ISymbolImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
-import org.matheclipse.core.patternmatching.PatternMatcherEquals;
 import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
@@ -40,7 +39,6 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.text.Collator;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.Locale;
 import java.util.Map;
 
@@ -690,6 +688,12 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		return engine.evaluate(ast);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public IExpr ofNIL(EvalEngine engine, IExpr... args) {
+		IAST ast = F.ast(args, this);
+		return engine.evalLoop(ast);
+	}
 	/** {@inheritDoc} */
 	@Override
 	public IExpr of(IExpr... args) {
