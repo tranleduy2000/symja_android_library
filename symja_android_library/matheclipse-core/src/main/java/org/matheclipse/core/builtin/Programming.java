@@ -1968,9 +1968,6 @@ public final class Programming {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST0()) {
-				throw new ReturnException();
-			}
 			if (ast.isAST1()) {
 				if (ast.arg1().isTrue()) {
 					throw ReturnException.RETURN_TRUE;
@@ -1979,6 +1976,9 @@ public final class Programming {
 					throw ReturnException.RETURN_FALSE;
 				}
 				throw new ReturnException(engine.evaluate(ast.arg1()));
+			}
+			if (ast.isAST0()) {
+				throw new ReturnException();
 			}
 			Validate.checkRange(ast, 1, 2);
 

@@ -27,17 +27,17 @@ import java.util.Set;
  * </p>
  * 
  * <p>
- * In Symja, an abstract syntax tree (AST), is a tree representation of the abstract syntactic structure of the Symja
- * source code. Each node of the tree denotes a construct occurring in the source code. The syntax is 'abstract' in the
- * sense that it does not represent every detail that appears in the real syntax. For instance, grouping parentheses are
- * implicit in the tree structure, and a syntactic construct such as a <code>Sin[x]</code> expression will be denoted by
- * an AST with 2 nodes. One node for the header <code>Sin</code> and one node for the argument <code>x</code>.
+ * In Symja, an abstract syntax tree (AST), is a tree representation of the abstract syntactic structure of the Symja source code.
+ * Each node of the tree denotes a construct occurring in the source code. The syntax is 'abstract' in the sense that it does not
+ * represent every detail that appears in the real syntax. For instance, grouping parentheses are implicit in the tree structure,
+ * and a syntactic construct such as a <code>Sin[x]</code> expression will be denoted by an AST with 2 nodes. One node for the
+ * header <code>Sin</code> and one node for the argument <code>x</code>.
  * </p>
  * 
  * Internally an AST is represented as a <code>java.util.List</code> which contains
  * <ul>
- * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index
- * <code>0</code> and</li>
+ * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index <code>0</code>
+ * and</li>
  * <li>the <code>n</code> arguments of a function in the index <code>1 to n</code></li>
  * </ul>
  * 
@@ -69,8 +69,7 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	/**
 	 * Create a function with no arguments (i.e. <code>head[ ]</code>).
 	 * 
-	 * @param head
-	 *            the head of the function
+	 * @param head the head of the function
 	 */
 	protected AST0(IExpr head) {
 		super();
@@ -79,10 +78,9 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 
 
 	/**
-	 * Get the first argument (i.e. the second element of the underlying list structure) of the <code>AST</code>
-	 * function (i.e. get(1) ). <br />
-	 * <b>Example:</b> for the AST representing the expression <code>Sin(x)</code>, <code>arg1()</code> returns
-	 * <code>x</code>.
+	 * Get the first argument (i.e. the second element of the underlying list structure) of the <code>AST</code> function (i.e. get(1)
+	 * ). <br />
+	 * <b>Example:</b> for the AST representing the expression <code>Sin(x)</code>, <code>arg1()</code> returns <code>x</code>.
 	 * 
 	 * @return the first argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -93,10 +91,10 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	}
 
 	/**
-	 * Get the second argument (i.e. the third element of the underlying list structure) of the <code>AST</code>
-	 * function (i.e. get(2) ). <br />
-	 * <b>Example:</b> for the AST representing the expression <code>x^y</code> (i.e. <code>Power(x, y)</code>),
-	 * <code>arg2()</code> returns <code>y</code>.
+	 * Get the second argument (i.e. the third element of the underlying list structure) of the <code>AST</code> function (i.e. get(2)
+	 * ). <br />
+	 * <b>Example:</b> for the AST representing the expression <code>x^y</code> (i.e. <code>Power(x, y)</code>), <code>arg2()</code>
+	 * returns <code>y</code>.
 	 * 
 	 * @return the second argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -107,10 +105,9 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	}
 
 	/**
-	 * Get the third argument (i.e. the fourth element of the underlying list structure) of the <code>AST</code>
-	 * function (i.e. get(3) ).<br />
-	 * <b>Example:</b> for the AST representing the expression <code>f(a, b, c)</code>, <code>arg3()</code> returns
-	 * <code>c</code>.
+	 * Get the third argument (i.e. the fourth element of the underlying list structure) of the <code>AST</code> function (i.e. get(3)
+	 * ).<br />
+	 * <b>Example:</b> for the AST representing the expression <code>f(a, b, c)</code>, <code>arg3()</code> returns <code>c</code>.
 	 * 
 	 * @return the third argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -121,10 +118,9 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	}
 
 	/**
-	 * Get the fourth argument (i.e. the fifth element of the underlying list structure) of the <code>AST</code>
-	 * function (i.e. get(4) ).<br />
-	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d)</code>, <code>arg4()</code> returns
-	 * <code>d</code>.
+	 * Get the fourth argument (i.e. the fifth element of the underlying list structure) of the <code>AST</code> function (i.e. get(4)
+	 * ).<br />
+	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d)</code>, <code>arg4()</code> returns <code>d</code>.
 	 * 
 	 * @return the fourth argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -135,10 +131,10 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	}
 
 	/**
-	 * Get the fifth argument (i.e. the sixth element of the underlying list structure) of the <code>AST</code> function
-	 * (i.e. get(5) ).<br />
-	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d, e)</code>, <code>arg5()</code>
-	 * returns <code>e</code> .
+	 * Get the fifth argument (i.e. the sixth element of the underlying list structure) of the <code>AST</code> function (i.e. get(5)
+	 * ).<br />
+	 * <b>Example:</b> for the AST representing the expression <code>f(a, b ,c, d, e)</code>, <code>arg5()</code> returns <code>e</code>
+	 * .
 	 * 
 	 * @return the fifth argument of the function represented by this <code>AST</code>.
 	 * @see IExpr#head()
@@ -171,8 +167,7 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	// }
 
 	/**
-	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this
-	 * {@code HMArrayList}.
+	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this {@code HMArrayList}.
 	 * 
 	 * @return a shallow copy of this {@code ArrayList}
 	 * @see java.lang.Cloneable
@@ -271,6 +266,13 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 		}
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public void forEach(int startOffset, int endOffset, Consumer<? super IExpr> action) {
+		if (startOffset == 0 && startOffset < endOffset) {
+			action.accept(arg0);
+		}
+	}
 	@Override
 	public IExpr get(int location) {
 		if (location == 0) {
@@ -385,13 +387,10 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	/**
 	 * Replaces the element at the specified location in this {@code ArrayList} with the specified object.
 	 * 
-	 * @param location
-	 *            the index at which to put the specified object.
-	 * @param object
-	 *            the object to add.
+	 * @param location the index at which to put the specified object.
+	 * @param object   the object to add.
 	 * @return the previous element at the index.
-	 * @throws IndexOutOfBoundsException
-	 *             when {@code location < 0 || >= size()}
+	 * @throws IndexOutOfBoundsException when {@code location < 0 || >= size()}
 	 */
 	@Override
 	public IExpr set(int location, IExpr object) {
