@@ -58,6 +58,7 @@ import org.matheclipse.core.visit.VisitorExpr;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -136,6 +137,183 @@ public class Algebra {
 		F.Variables.setEvaluator(new Variables());
 	}
 
+	protected static class InternalFindCommonFactorPlus {
+		private static void splitTimesArg1(IExpr expr, HashMap<IExpr, IInteger> map) {
+			if (expr.isTimes()) {
+				IAST timesAST = (IAST) expr;
+				for (int i = 1; i < timesAST.size(); i++) {
+					IExpr temp = timesAST.get(i);
+					if (temp.isPower() && temp.exponent().isInteger()) {
+						if (!temp.base().isNumber()) {
+							map.put(temp.base(), (IInteger) temp.exponent());
+						}
+					} else {
+						if (!temp.isNumber()) {
+							map.put(temp, F.C1);
+						}
+					}
+				}
+			} else if (expr.isPower() && expr.exponent().isInteger()) {
+				if (!expr.base().isNumber()) {
+					map.put(expr.base(), (IInteger) expr.exponent());
+				}
+			} else {
+				if (!expr.isNumber()) {
+					map.put(expr, F.C1);
+				}
+			}
+		}
+
+		private static boolean splitTimesRest(IExpr expr, HashMap<IExpr, IInteger> map) {
+			if (map.size() > 0) {
+				if (expr.isTimes()) {
+					IAST timesAST = (IAST) expr;
+					Iterator<Entry<IExpr, IInteger>> iter = map.entrySet().iterator();
+					// for (Map.Entry<IExpr, IInteger> entry : map.entrySet()) {
+					while (iter.hasNext()) {
+						Map.Entry<IExpr, IInteger> entry = iter.next();
+						final IExpr key = entry.getKey();
+						boolean foundValue = false;
+						for (int i = 1; i < timesAST.size(); i++) {
+							IExpr temp = timesAST.get(i);
+							if (temp.isPower() && temp.exponent().isInteger()) {
+								if (temp.base().equals(key)) {
+									IInteger value = entry.getValue();
+									IInteger exponent = (IInteger) temp.exponent();
+									if (value.equals(exponent.negate())) {
+										return false;
+									}
+									if (exponent.isNegative()) {
+										if (value.isLessThan(exponent)) {
+											entry.setValue(exponent);
+										}
+									} else {
+										if (value.isGreaterThan(exponent)) {
+											entry.setValue(exponent);
+										}
+									}
+									foundValue = true;
+									break;
+								}
+							} else {
+								if (temp.equals(key)) {
+									IInteger value = entry.getValue();
+									if (value.isMinusOne()) {
+										return false;
+									}
+									if (value.isGreaterThan(F.C1)) {
+										entry.setValue(F.C1);
+									}
+									foundValue = true;
+									break;
+								}
+							}
+						}
+						if (!foundValue) {
+							iter.remove();
+							if (map.size() == 0) {
+								return false;
+							}
+						}
+					}
+				} else {
+					Iterator<Entry<IExpr, IInteger>> iter = map.entrySet().iterator();
+					// for (Map.Entry<IExpr, IInteger> entry : map.entrySet()) {
+					while (iter.hasNext()) {
+						Map.Entry<IExpr, IInteger> entry = iter.next();
+						final IExpr key = entry.getKey();
+						if (expr.isPower() && expr.exponent().isInteger()) {
+							if (!expr.base().equals(key)) {
+								iter.remove();
+								if (map.size() == 0) {
+									return false;
+								}
+							} else {
+								IInteger value = entry.getValue();
+								IInteger exponent = (IInteger) expr.exponent();
+								if (value.equals(exponent.negate())) {
+									return false;
+								}
+								if (exponent.isNegative()) {
+									if (value.isLessThan(exponent)) {
+										entry.setValue(exponent);
+									}
+								} else {
+									if (value.isGreaterThan(exponent)) {
+										entry.setValue(exponent);
+									}
+								}
+							}
+						} else {
+							if (!expr.equals(key)) {
+								iter.remove();
+								if (map.size() == 0) {
+									return false;
+								}
+							} else {
+								IInteger value = entry.getValue();
+								if (value.isMinusOne()) {
+									return false;
+								}
+								if (value.isGreaterThan(F.C1)) {
+									entry.setValue(F.C1);
+								}
+							}
+						}
+					}
+				}
+			}
+			return map.size() != 0;
+		}
+
+		/**
+		 * Determine common factors in a <code>Plus(...)</code> expression. Index <code>[0]</code> contains the common
+		 * factor. Index <code>[1]</code> contains the rest <code>Plus(...)</code> factor;
+		 *
+		 * @param plusAST
+		 * @return <code>null</code> if no common factor was found.
+		 */
+		public static IExpr[] findCommonFactors(IAST plusAST) {
+			if (plusAST.size() > 2) {
+				HashMap<IExpr, IInteger> map = new HashMap<IExpr, IInteger>();
+				splitTimesArg1(plusAST.arg1(), map);
+				if (map.size() != 0) {
+					for (int i = 2; i < plusAST.size(); i++) {
+						if (!splitTimesRest(plusAST.get(i), map)) {
+							// fail fast
+							return null;
+						}
+					}
+
+					IASTAppendable commonFactor = F.TimesAlloc(map.size());
+					for (Map.Entry<IExpr, IInteger> entry : map.entrySet()) {
+						final IExpr key = entry.getKey();
+						IInteger exponent = entry.getValue();
+						if (exponent.isOne()) {
+							commonFactor.append(key);
+						} else {
+							commonFactor.append(F.Power(key, exponent));
+						}
+					}
+
+					IExpr[] result = new IExpr[2];
+					result[0] = commonFactor.oneIdentity1();
+					if (!result[0].isOne()) {
+						IExpr inverse = result[0].inverse();
+
+						IASTAppendable commonPlus = F.PlusAlloc(plusAST.size());
+						for (int i = 1; i < plusAST.size(); i++) {
+							commonPlus.append(F.Times(inverse, plusAST.get(i)));
+						}
+
+						result[1] = commonPlus.oneIdentity1();
+						return result;
+					}
+				}
+			}
+			return null;
+		}
+	}
 	/**
 	 * <h2>Apart</h2>
 	 *
@@ -2465,6 +2643,7 @@ public class Algebra {
 					ExprPolynomial poly1 = ring.create(expr1);
 					ExprPolynomial poly2 = ring.create(expr2);
 					ExprPolynomial[] result = poly1.egcd(poly2);
+					if (result != null) {
 					IASTAppendable list = F.ListAlloc(2);
 					list.append(result[0].getExpr());
 					IASTAppendable subList = F.ListAlloc(2);
@@ -2473,9 +2652,31 @@ public class Algebra {
 					list.append(subList);
 					return list;
 
+					}
+					return F.NIL;
 				} catch (RuntimeException rex) {
 					if (Config.SHOW_STACKTRACE) {
 						rex.printStackTrace();
+					}
+				}
+				if (!expr1.isPolynomial(eVar.getVarList())) {
+					if (!expr2.isPolynomial(eVar.getVarList())) {
+						IASTAppendable list = F.ListAlloc(2);
+						list.append(expr2);
+						IASTAppendable subList = F.ListAlloc(2);
+						subList.append(F.C0);
+						subList.append(F.C1);
+						list.append(subList);
+						return list;
+					}
+					if (expr2.isFree(eVar.getVarList())) {
+						IASTAppendable list = F.ListAlloc(2);
+						list.append(F.C1);
+						IASTAppendable subList = F.ListAlloc(2);
+						subList.append(F.C0);
+						subList.append(F.Power(expr2, F.CN1));
+						list.append(subList);
+						return list;
 					}
 				}
 			}
@@ -2923,6 +3124,9 @@ public class Algebra {
 					ExprPolynomial poly1 = ring.create(arg1);
 					ExprPolynomial poly2 = ring.create(arg2);
 					ExprPolynomial[] divRem = poly1.quotientRemainder(poly2);
+					if (divRem == null) {
+						return null;
+					}
 					IExpr[] result = new IExpr[2];
 					result[0] = divRem[0].getExpr();
 					result[1] = divRem[1].getExpr();
@@ -3635,8 +3839,10 @@ public class Algebra {
 			 * If <code>true</code> we are in full simplify mode
 			 */
 			final boolean fFullSimplify;
-			public SimplifyVisitor(Function<IExpr, Long> complexityFunction, boolean fullSimplify) {
+			final EvalEngine fEngine;
+			public SimplifyVisitor(Function<IExpr, Long> complexityFunction, EvalEngine engine, boolean fullSimplify) {
 				super();
+				fEngine = engine;
 				fComplexityFunction = complexityFunction;
 				fFullSimplify = fullSimplify;
 			}
@@ -3667,6 +3873,7 @@ public class Algebra {
 					long minCounter = fComplexityFunction.apply(expr);
 					IExpr temp;
 					long count;
+					long expandAllCounter = 0;
 
 					if (expr.isPlus()) {
 						temp = FactorTerms.factorTermsPlus((IAST) expr, EvalEngine.get());
@@ -3677,11 +3884,23 @@ public class Algebra {
 								result = temp;
 							}
 						}
+						IExpr[] commonFactors = InternalFindCommonFactorPlus.findCommonFactors((IAST) expr);
+						if (commonFactors != null) {
+							temp = fEngine.evaluate(F.Times(commonFactors[0], commonFactors[1]));
+							// commonFactors[1] = F.Simplify.of(EvalEngine.get(), commonFactors[1]);
+							// temp = F.Times.of(commonFactors[0], commonFactors[1]);
+							count = fComplexityFunction.apply(temp);
+							if (count <= minCounter) {
+								minCounter = count;
+								result = temp;
+							}
+						}
 					}
 
 					try {
 						temp = F.evalExpandAll(expr);
-						count = fComplexityFunction.apply(temp);
+						expandAllCounter = fComplexityFunction.apply(temp);
+						count = expandAllCounter;
 						if (count < minCounter) {
 							minCounter = count;
 							result = temp;
@@ -3783,7 +4002,7 @@ public class Algebra {
 						// TODO: Factor is not fast enough for large expressions!
 						// Maybe restricting factoring to smaller expressions is necessary here
 						temp = F.NIL;
-						if (minCounter < Config.MAX_SIMPLIFY_FACTOR_LEAFCOUNT) {
+						if (fFullSimplify && expandAllCounter < 50) {// Config.MAX_SIMPLIFY_FACTOR_LEAFCOUNT) {
 						temp = F.eval(F.Factor(expr));
 						count = fComplexityFunction.apply(temp);
 						if (count < minCounter) {
@@ -3791,8 +4010,9 @@ public class Algebra {
 							result = temp;
 						}
 						}
-						if (fFullSimplify
-								&& (minCounter >= Config.MAX_SIMPLIFY_FACTOR_LEAFCOUNT || !temp.equals(expr))) {
+						// if (fFullSimplify
+						// && (minCounter >= Config.MAX_SIMPLIFY_FACTOR_LEAFCOUNT || !temp.equals(expr))) {
+						if (expandAllCounter < Config.MAX_SIMPLIFY_FACTOR_LEAFCOUNT) {
 							temp = F.eval(F.FactorSquareFree(expr));
 							count = fComplexityFunction.apply(temp);
 							if (count < minCounter) {
@@ -4100,7 +4320,7 @@ public class Algebra {
 					arg1 = temp;
 				}
 
-				temp = simplifyStep(arg1, complexityFunction, minCounter, result);
+				temp = simplifyStep(arg1, complexityFunction, minCounter, result, engine);
 				F.REMEMBER_AST_CACHE.put(ast, temp);
 				return temp;
 
@@ -4112,11 +4332,11 @@ public class Algebra {
 			return F.NIL;
 		}
 
-		private IExpr simplifyStep(IExpr arg1, Function<IExpr, Long> complexityFunction, long minCounter,
-				IExpr result) {
+		private IExpr simplifyStep(IExpr arg1, Function<IExpr, Long> complexityFunction, long minCounter, IExpr result,
+				EvalEngine engine) {
 			long count;
 			IExpr temp;
-			temp = arg1.accept(new SimplifyVisitor(complexityFunction, isFullSimplifyMode()));
+			temp = arg1.accept(new SimplifyVisitor(complexityFunction, engine, isFullSimplifyMode()));
 				while (temp.isPresent()) {
 					count = complexityFunction.apply(temp);
 				if (count == minCounter) {
@@ -4125,7 +4345,7 @@ public class Algebra {
 					if (count < minCounter) {
 						minCounter = count;
 						result = temp;
-					temp = result.accept(new SimplifyVisitor(complexityFunction, isFullSimplifyMode()));
+					temp = result.accept(new SimplifyVisitor(complexityFunction, engine, isFullSimplifyMode()));
 					} else {
 						return result;
 					}
@@ -5208,11 +5428,24 @@ public class Algebra {
 				IAST s = (IAST) peGCD.second();
 				IExpr A = s.arg1();
 				IExpr B = s.arg2();
-				IExpr u1 = F.PolynomialRemainder.of(engine, F.Expand(F.Times(B, numerator)), v1, variable);
-				IExpr u2 = F.PolynomialRemainder.of(engine, F.Expand(F.Times(A, numerator)), v2, variable);
+				// IExpr u1 = F.PolynomialRemainder.of(engine, F.Expand(F.Times(B, numerator)), v1, variable);
+				// IExpr u2 = F.PolynomialRemainder.of(engine, F.Expand(F.Times(A, numerator)), v2, variable);
+				// return F.Plus.of(engine, F.Times(u1, F.Power(first, -1)),
+				// partialFractionDecomposition(u2, rest, variable, count + 1, engine));
+
+				IExpr u1 = F.PolynomialRemainder.ofNIL(engine, F.Expand(F.Times(B, numerator)), v1, variable);
+				if (u1.isPresent()) {
+					IExpr u2 = F.PolynomialRemainder.ofNIL(engine, F.Expand(F.Times(A, numerator)), v2, variable);
+					if (u2.isPresent()) {
 				return F.Plus.of(engine, F.Times(u1, F.Power(first, -1)),
 						partialFractionDecomposition(u2, rest, variable, count + 1, engine));
 			}
+		}
+		if (count == 0) {
+			return F.NIL;
+		}
+		return F.Times.of(engine, numerator, F.Power(denominatorTimes, -1));
+	}
 		}
 		if (count == 0) {
 			return F.NIL;

@@ -22,6 +22,8 @@ import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.VisitorBooleanLevelSpecification;
 
+import static org.matheclipse.core.builtin.Algebra.*;
+
 public class PredicateQ {
 
 	/**
