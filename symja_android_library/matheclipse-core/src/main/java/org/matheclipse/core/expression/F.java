@@ -7379,6 +7379,14 @@ public class F {
 		return unaryAST1(OddQ, x);
 	}
 
+	public static IAST On(final IExpr a0, final IExpr a1) {
+		return binaryAST2(On, a0, a1);
+	}
+
+	public static IAST On(final IExpr a0) {
+		return unaryAST1(On, a0);
+	}
+
 	public static IInteger one(){
 		return C1;
 	}
