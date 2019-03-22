@@ -74,7 +74,14 @@ public class EvalEngine implements Serializable {
 	transient private static final ThreadLocal<EvalEngine> instance = new ThreadLocal<EvalEngine>() {
 		private int fID = 1;
 
-	@Override public EvalEngine initialValue(){if(DEBUG){System.out.println("ThreadLocal"+fID);}return new EvalEngine("ThreadLocal"+(fID++),0,System.out,true);}};
+		@Override
+		public EvalEngine initialValue() {
+			if (DEBUG) {
+				System.out.println("ThreadLocal" + fID);
+			}
+			return new EvalEngine("ThreadLocal" + (fID++), 0, System.out, true);
+		}
+	};
 
 	/**
 	 * Get the thread local evaluation engine instance
@@ -128,6 +135,7 @@ public class EvalEngine implements Serializable {
 		instance.set(engine);
 	}
 
+	// transient Interner<IAST> fInterner = Interners.newWeakInterner();
 
 	/**
 	 * If set to <code>true</code> the current thread should stop evaluation;
@@ -631,6 +639,8 @@ public class EvalEngine implements Serializable {
 	 * @return <code>F.NIL</code> if no evaluation happened
 	 */
 	public final IExpr evalAST(IAST ast) {
+		// interning costs too much performance here
+		// ast = fInterner.intern(ast);
 		final IExpr head = ast.head();
 		if (head.isCoreFunctionSymbol()) {
 			IExpr temp = evalEvaluate(ast);
