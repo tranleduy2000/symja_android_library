@@ -262,7 +262,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 
 		/** {@inheritDoc} */
-		@Override
 		public int argSize() {
 			return -1;
 		}
@@ -520,7 +519,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return false;
 		}
 
-		@Override
 		public final IAST orElse(final IAST other) {
 			return other;
 		}
