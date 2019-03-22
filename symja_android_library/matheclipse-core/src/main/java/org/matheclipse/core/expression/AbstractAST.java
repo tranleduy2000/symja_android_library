@@ -262,6 +262,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 
 		/** {@inheritDoc} */
+		@Override
 		public int argSize() {
 			return -1;
 		}
@@ -519,6 +520,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return false;
 		}
 
+		@Override
 		public final IAST orElse(final IAST other) {
 			return other;
 		}
@@ -881,6 +883,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param predicate the binary predicate
 	 * @return
 	 */
+	@Override
 	public boolean compareAdjacent(BiPredicate<IExpr, IExpr> predicate) {
 		if (size() < 2) {
 			return false;
@@ -1320,6 +1323,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param startValue
 	 * @return the accumulated elements
 	 */
+	@Override
 	public IExpr foldLeft(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start) {
 		final IExpr[] value = { startValue };
 		forEach(start, size(), new Consumer<IExpr>() {
@@ -1339,6 +1343,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param startValue
 	 * @return the accumulated elements
 	 */
+	@Override
 	public IExpr foldRight(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start) {
 		IExpr value = startValue;
 		int end = argSize();
@@ -1606,6 +1611,48 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			}
 		}, heads ? 0 : 1);
 	}
+
+	@Override
+	public final boolean hasTrigonometricFunction() {
+		return has(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				if (x.isAST1()) {
+					final IExpr head = x.head();
+					if (head.isBuiltInSymbol()) {
+						return //
+								(head == F.ArcCos) || //
+										(head == F.ArcCsc) || //
+										(head == F.ArcCot) || //
+										(head == F.ArcSec) || //
+										(head == F.ArcSin) || //
+										(head == F.ArcTan) || //
+										(head == F.Cos) || //
+										(head == F.Csc) || //
+										(head == F.Cot) || //
+										(head == F.Sec) || //
+										(head == F.Sin) || //
+										(head == F.Sinc) || //
+										(head == F.Tan) || //
+										(head == F.Cosh) || //
+										(head == F.Csch) || //
+										(head == F.Coth) || //
+										(head == F.Sech) || //
+										(head == F.Sinh) || //
+										(head == F.Tanh) || //
+										(head == F.Haversine) || //
+										(head == F.InverseHaversine);
+					}
+				}
+				if (x.isAST2()) {
+					return x.head() == F.ArcTan;
+				}
+				return false;
+			}
+		}, false);
+
+	}
+
 	/**
 	 * <p>
 	 * FNV-1 hash code of this <code>IAST</code>.
@@ -2171,6 +2218,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return isSameHead(F.DirectedInfinity, 2) && arg1().equals(x);
 	}
 
+	@Override
 	public boolean isDiscreteDistribution() {
 		if (head().isBuiltInSymbol()) {
 			IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
@@ -2178,6 +2226,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 		return false;
 	}
+	@Override
 	public boolean isDistribution() {
 		if (head().isBuiltInSymbol()) {
 			IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
@@ -2476,6 +2525,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return null;
 	}
 
+	@Override
 	public boolean isMember(final IExpr pattern, boolean heads, IVisitorBoolean visitor) {
 		if (visitor != null) {
 			return super.isMember(pattern, heads, visitor);
@@ -3264,6 +3314,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param function
 	 * @return
 	 */
+	@Override
 	public IASTAppendable map(IASTAppendable astResult, IUnaryIndexFunction<IExpr, IExpr> function) {
 		for (int i = 1; i < size(); i++) {
 			astResult.append(function.apply(i, get(i)));
@@ -3298,6 +3349,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param leftArg        left argument of the binary functions <code>apply()</code> method.
 	 * @return
 	 */
+	@Override
 	public IAST mapLeft(IASTAppendable list, BiFunction<IExpr, IExpr, IExpr> binaryFunction, IExpr leftArg) {
 		for (int i = 1; i < size(); i++) {
 			list.append(binaryFunction.apply(leftArg, get(i)));
@@ -3330,8 +3382,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *            right argument of the binary functions <code>apply()</code> method.
 	 * @return the given list
 	 */
+	@Override
 	public Collection<IExpr> mapRight(Collection<IExpr> list, BiFunction<IExpr, IExpr, IExpr> binaryFunction,
-			IExpr rightArg) {
+									  IExpr rightArg) {
 		for (int i = 1; i < size(); i++) {
 			list.add(binaryFunction.apply(get(i), rightArg));
 		}
@@ -3438,6 +3491,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return F.Or(this, that);
 	}
 
+	@Override
 	public IAST orElse(final IAST other) {
 		return this;
 	}
@@ -3623,6 +3677,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param list
 	 * @return
 	 */
+	@Override
 	public IASTAppendable reverse(IASTAppendable list) {
 		for (int i = argSize(); i >= 1; i--) {
 			list.append(get(i));
@@ -3637,6 +3692,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param n
 	 * @return the given list
 	 */
+	@Override
 	public IAST rotateLeft(IASTAppendable list, final int n) {
 		int size = size();
 		int n1 = n + 1;
@@ -3658,6 +3714,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param n
 	 * @return the given list
 	 */
+	@Override
 	public IAST rotateRight(IASTAppendable list, final int n) {
 		if (n <= size()) {
 			for (int i = size() - n; i < size(); i++) {
