@@ -42,7 +42,7 @@ public class ReplaceList extends AbstractEvaluator {
 			}
 		} else {
 			WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
-			engine.printMessage(wat.getMessage());
+			engine.printMessage("ReplaceList: " + wat.getMessage());
 		}
 		return result;
 	}
@@ -72,9 +72,9 @@ public class ReplaceList extends AbstractEvaluator {
 			IASTAppendable result = F.ListAlloc();
 			return replaceExpr(ast, arg1, rules, result, maxNumberOfResults, engine);
 		} catch (ArithmeticException ae) {
-			engine.printMessage(ae.getMessage());
+				engine.printMessage("ReplaceList: " + ae.getMessage());
 		} catch (WrongArgumentType wat) {
-			engine.printMessage(wat.getMessage());
+				engine.printMessage("ReplaceList: " + wat.getMessage());
 		}
 		return F.List();
 	}

@@ -6679,6 +6679,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"-Infinity");
 		check("Limit(1/x, x -> 0, Direction->-1)", //
 				"Infinity");
+		// print additional message. Messages are typically suppressed in Limit() steps.
 		check("1/0", //
 				"ComplexInfinity");
 		// check("Limit((4 - x), x -> 4)", "0");

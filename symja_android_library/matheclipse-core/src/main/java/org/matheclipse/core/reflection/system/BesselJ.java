@@ -138,16 +138,16 @@ public class BesselJ extends AbstractFunctionEvaluator {
 					double bessel = Bessel.jn(order, ((INum) z).doubleValue());
 					return F.num(bessel);
 				} else {
-					if (n.isRealNumber()) {
+					if (n.isReal()) {
 						org.hipparchus.special.BesselJ besselJ = new org.hipparchus.special.BesselJ(
 								((ISignedNumber) n).doubleValue());
 						return F.num(besselJ.value(((INum) z).doubleValue()));
 					}
 				}
 			} catch (NegativeArraySizeException nae) {
-				engine.printMessage(ast.toString() + " caused NegativeArraySizeException");
+				engine.printMessage("BesselJ: "+ast.toString() + " caused NegativeArraySizeException");
 			} catch (RuntimeException rte) {
-				engine.printMessage(rte.getMessage());
+				engine.printMessage("BesselJ: "+rte.getMessage());
 			}
 		}
 
