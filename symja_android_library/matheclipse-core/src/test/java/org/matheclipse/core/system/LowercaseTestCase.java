@@ -6866,6 +6866,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLog() {
+		check("Log(10*E) // Simplify", //
+				"1+Log(10)");
+		check("Log(10*E*x*y) // FunctionExpand", //
+				"1+Log(10)+Log(x*y)");
 		check("Log( )", //
 				"Log()");
 		check("Log(2/3)", //
