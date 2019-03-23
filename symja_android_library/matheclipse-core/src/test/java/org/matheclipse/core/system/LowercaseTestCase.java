@@ -5828,6 +5828,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testIntegrate() {
 		// check("Limit(1/9*x*(9-x^2)^(3/2)*Hypergeometric2F1(1,2,3/2,x^2/9),x->3)", //
 		// "");
+		// see github #1206
+		check("Integrate(Ln(x)^2, {x,0,2})", //
+				"4-4*Log(2)+2*Log(2)^2");
+		check("Integrate(Ln(x)^2, {x,0,2}) // N", //
+				"2.18832");
+		check("NIntegrate(Ln(x)^2, {x,0,2}) // N", //
+				"2.1857");
 		// see github #116
 		// should give (2*ArcTan((1 + 2*x)/Sqrt(3)))/Sqrt(3)
 		check(" Integrate(1/(x^2+x+1),x) ", //
@@ -6573,6 +6580,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// }
 
 	public void testLimit() {
+		// github #120
+		check("Limit( x*Log(x) , x->0)", //
+				"0");
+		check("Limit(Log(x),x->0)", //
+				"-Infinity");
+		check("Limit(Log(x)^2,x->0)", //
+				"Infinity");
+		check("Limit(2*x-2*x*Log(x)+x*Log(x)^2, x->0)", //
+				"0");
 		check("Limit(E^(-x)*Sqrt(x), x -> Infinity)",//
 				"0");
 		// adjust LimitRules.m if these 2 tests fails
@@ -6604,68 +6620,114 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("Limit((1 + Sinh(x))/E^x, x ->Infinity)", "Infinity*Limit(E^(-x),x->Infinity)");
 
 		// issue #184
-		check("N(Limit(tan(x),x->pi/2))", "Indeterminate");
+		check("N(Limit(tan(x),x->pi/2))", //
+				"Indeterminate");
 
-		check("Limit(Tan(x), x->Pi/2)", "Indeterminate");
-		check("Limit(Tan(x), x->Pi/2, Direction->1)", "Infinity");
-		check("Limit(Tan(x), x->Pi/2, Direction->-1)", "-Infinity");
-		check("Limit(Tan(x+3*Pi), x->Pi/2)", "Indeterminate");
-		check("Limit(Tan(x+3*Pi), x->Pi/2, Direction->1)", "Infinity");
-		check("Limit(Tan(x+3*Pi), x->Pi/2, Direction->-1)", "-Infinity");
-		check("Limit(Cot(x), x->0)", "Indeterminate");
-		check("Limit(Cot(x), x->0, Direction->1)", "-Infinity");
-		check("Limit(Cot(x), x->0, Direction->-1)", "Infinity");
+		check("Limit(Tan(x), x->Pi/2)", //
+				"Indeterminate");
+		check("Limit(Tan(x), x->Pi/2, Direction->1)", //
+				"Infinity");
+		check("Limit(Tan(x), x->Pi/2, Direction->-1)", //
+				"-Infinity");
+		check("Limit(Tan(x+3*Pi), x->Pi/2)", //
+				"Indeterminate");
+		check("Limit(Tan(x+3*Pi), x->Pi/2, Direction->1)", //
+				"Infinity");
+		check("Limit(Tan(x+3*Pi), x->Pi/2, Direction->-1)", //
+				"-Infinity");
+		check("Limit(Cot(x), x->0)", //
+				"Indeterminate");
+		check("Limit(Cot(x), x->0, Direction->1)", //
+				"-Infinity");
+		check("Limit(Cot(x), x->0, Direction->-1)", //
+				"Infinity");
 		check("Limit(Cot(x+Pi), x->0)", "Indeterminate");
-		check("Limit(Cot(x+Pi), x->0, Direction->1)", "-Infinity");
-		check("Limit(Cot(x+Pi), x->0, Direction->-1)", "Infinity");
+		check("Limit(Cot(x+Pi), x->0, Direction->1)", //
+				"-Infinity");
+		check("Limit(Cot(x+Pi), x->0, Direction->-1)", //
+				"Infinity");
 
-		check("Limit(Log(x^y), x->0)", "DirectedInfinity(-y)");
-		check("Limit(Log(y*x, b), x->1)", "Limit(1/Log(x*y),x->1)*Log(b)");
-		check("Limit(Log(y*x), x->0)", "-Infinity+Log(y)");
-		check("Limit(Log(x), x->Infinity)", "Infinity");
-		check("Limit(Log(x), x->-Infinity)", "Infinity");
+		check("Limit(Log(x^y), x->0)", //
+				"DirectedInfinity(-y)");
+		check("Limit(Log(y*x, b), x->1)", //
+				"Limit(1/Log(x*y),x->1)*Log(b)");
+		check("Limit(Log(y*x), x->0)", //
+				"-Infinity");
+		check("Limit(Log(x), x->Infinity)", //
+				"Infinity");
+		check("Limit(Log(x), x->-Infinity)", //
+				"Infinity");
 		check("Limit((y*x)/Abs(x), x->0)", //
 				"Indeterminate");
-		check("Limit((y*x)/Abs(x), x->0, Direction->1)", "-y");
+		check("Limit((y*x)/Abs(x), x->0, Direction->1)", //
+				"-y");
 		check("Limit(x/Abs(x), x->0)", //
 				"Indeterminate");
-		check("Limit(x/Abs(x), x->0, Direction->-1)", "1");
-		check("Limit(x/Abs(x), x->0, Direction->1)", "-1");
-		check("Limit(Log(x), x -> 0)", "-Infinity");
-		check("Limit(x^x, x -> 0)", "1");
-		check("Limit(1/x, x -> Infinity, Direction->1)", "0");
-		check("Limit(1/x, x -> Infinity, Direction->-1)", "0");
-		check("Limit(1/x, x -> 0, Direction->1)", "-Infinity");
-		check("Limit(1/x, x -> 0, Direction->-1)", "Infinity");
-		check("1/0", "ComplexInfinity");
+		check("Limit(x/Abs(x), x->0, Direction->-1)", //
+				"1");
+		check("Limit(x/Abs(x), x->0, Direction->1)", //
+				"-1");
+		check("Limit(Log(x), x -> 0)", //
+				"-Infinity");
+		check("Limit(x^x, x -> 0)", //
+				"1");
+		check("Limit(1/x, x -> Infinity, Direction->1)", //
+				"0");
+		check("Limit(1/x, x -> Infinity, Direction->-1)", //
+				"0");
+		check("Limit(1/x, x -> 0, Direction->1)", //
+				"-Infinity");
+		check("Limit(1/x, x -> 0, Direction->-1)", //
+				"Infinity");
+		check("1/0", //
+				"ComplexInfinity");
 		// check("Limit((4 - x), x -> 4)", "0");
-		check("Limit(1/(4 - x), x -> 4)", "Infinity");
-		check("Limit(1/(x - 4), x -> 4)", "Infinity");
+		check("Limit(1/(4 - x), x -> 4)", //
+				"Infinity");
+		check("Limit(1/(x - 4), x -> 4)", //
+				"Infinity");
 
-		check("Infinity-1", "Infinity");
-		check("Limit(a+b+2*x,x->-Infinity)", "-Infinity");
-		check("Limit(a+b+2*x,x->Infinity)", "Infinity");
+		check("Infinity-1", //
+				"Infinity");
+		check("Limit(a+b+2*x,x->-Infinity)", //
+				"-Infinity");
+		check("Limit(a+b+2*x,x->Infinity)", //
+				"Infinity");
 		check("Limit(E^(-x)*Sqrt(x), x -> Infinity)",//
 				"0");
-		check("Limit(Sin(x)/x,x->0)", "1");
-		check("Limit(x*Sin(1/x),x->Infinity)", "1");
+		check("Limit(Sin(x)/x,x->0)", //
+				"1");
+		check("Limit(x*Sin(1/x),x->Infinity)", //
+				"1");
 
-		check("Limit(-x,x->Infinity)", "-Infinity");
-		check("Limit((1 + x/n)^n, n -> Infinity)", "E^x");
-		check("Limit((x^2 - 2*x - 8)/(x - 4), x -> 4)", "6");
-		check("Limit((x^3-1)/(2*x^3-3*x),x->Infinity)", "1/2");
-		check("Limit((x^3-1)/(2*x^3+3*x),x->Infinity)", "1/2");
+		check("Limit(-x,x->Infinity)", //
+				"-Infinity");
+		check("Limit((1 + x/n)^n, n -> Infinity)", //
+				"E^x");
+		check("Limit((x^2 - 2*x - 8)/(x - 4), x -> 4)", //
+				"6");
+		check("Limit((x^3-1)/(2*x^3-3*x),x->Infinity)", //
+				"1/2");
+		check("Limit((x^3-1)/(2*x^3+3*x),x->Infinity)", //
+				"1/2");
 
-		check("Limit((2*x^3-3*x),x->Infinity)", "Infinity");
-		check("Limit((2*x^3+3*x),x->Infinity)", "Infinity");
+		check("Limit((2*x^3-3*x),x->Infinity)", //
+				"Infinity");
+		check("Limit((2*x^3+3*x),x->Infinity)", //
+				"Infinity");
 
-		check("Limit(E^x, x->Infinity)", "Infinity");
-		check("Limit(E^x, x->-Infinity)", "0");
-		check("Limit(a^x, x->0)", "1");
-		check("Limit(c*(x^(-10)), x->Infinity)", "0");
+		check("Limit(E^x, x->Infinity)", //
+				"Infinity");
+		check("Limit(E^x, x->-Infinity)", //
+				"0");
+		check("Limit(a^x, x->0)", //
+				"1");
+		check("Limit(c*(x^(-10)), x->Infinity)", //
+				"0");
 
 		// TOOO distinguish between upper and lower limit convergence
-		check("Limit(1/(x - 4), x -> 4)", "Infinity");
+		check("Limit(1/(x - 4), x -> 4)", //
+				"Infinity");
 
 	}
 
