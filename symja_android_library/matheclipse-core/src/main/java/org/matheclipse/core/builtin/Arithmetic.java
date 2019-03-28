@@ -5173,6 +5173,7 @@ public final class Arithmetic {
 					}
 				}
 			}
+
 		}
 		if (power0Arg1.isRational() && power1Arg1.isRational()) {
 			IExpr temp = timesPowerPower(((IRational) power0Arg1).numerator(), ((IRational) power0Arg1).denominator(),

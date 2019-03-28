@@ -620,7 +620,7 @@ public class ConvertRubi {
 		Config.PARSER_USE_LOWERCASE_SYMBOLS = false;
 		Config.RUBI_CONVERT_SYMBOLS = true;
 		EvalEngine.set(new EvalEngine(false));
-		addPredefinedSymbols(); 
+		addPredefinedSymbols();
 		// use same order as in Rubi.m
 		String[] fileNames = { //
 				"./Rubi/RubiRules4.16.0_FullLHS.m", };
