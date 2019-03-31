@@ -25,6 +25,7 @@ import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Noo;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.oo;
 
@@ -61,7 +62,7 @@ public interface ArcSechRules {
     ISet(ArcSech(Plus(CN1,CSqrt5)),
       Times(CC(0L,1L,1L,5L),Pi)),
     // ArcSech(1-Sqrt(5))=4/5*Pi*I
-    ISet(ArcSech(Plus(C1,Negate(CSqrt5))),
+    ISet(ArcSech(Subtract(C1,CSqrt5)),
       Times(CC(0L,1L,4L,5L),Pi)),
     // ArcSech(Sqrt(2))=1/4*Pi*I
     ISet(ArcSech(CSqrt2),
@@ -79,7 +80,7 @@ public interface ArcSechRules {
     ISet(ArcSech(Plus(C1,CSqrt5)),
       Times(CC(0L,1L,2L,5L),Pi)),
     // ArcSech(-1-Sqrt(5))=3/5*Pi*I
-    ISet(ArcSech(Plus(CN1,Negate(CSqrt5))),
+    ISet(ArcSech(Subtract(CN1,CSqrt5)),
       Times(CC(0L,1L,3L,5L),Pi)),
     // ArcSech(I)=-1/2*Pi*I+Log(Sqrt(2)+1)
     ISet(ArcSech(CI),

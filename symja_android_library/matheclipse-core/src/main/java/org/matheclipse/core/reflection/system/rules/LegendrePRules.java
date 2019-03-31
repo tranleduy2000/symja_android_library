@@ -17,13 +17,13 @@ import static org.matheclipse.core.expression.F.ISetDelayed;
 import static org.matheclipse.core.expression.F.IntegerQ;
 import static org.matheclipse.core.expression.F.LegendreP;
 import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.NumericQ;
 import static org.matheclipse.core.expression.F.PatternTest;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
@@ -49,12 +49,12 @@ public interface LegendrePRules {
       C1),
     // LegendreP(x_?NumericQ,0):=Sqrt(Pi)/(Gamma(1/2*(1-x))*Gamma(1+x/2))
     ISetDelayed(LegendreP(PatternTest(x_,NumericQ),C0),
-      Times(Sqrt(Pi),Power(Times(Gamma(Times(C1D2,Plus(C1,Negate(x)))),Gamma(Plus(C1,Times(C1D2,x)))),-1))),
+      Times(Sqrt(Pi),Power(Times(Gamma(Times(C1D2,Subtract(C1,x))),Gamma(Plus(C1,Times(C1D2,x)))),CN1))),
     // LegendreP(x_?IntegerQ,-1):=(-1)^x
     ISetDelayed(LegendreP(PatternTest(x_,IntegerQ),CN1),
       Power(CN1,x)),
     // LegendreP(-1/2,1-2*z_):=2/Pi*EllipticK(z)
     ISetDelayed(LegendreP(CN1D2,Plus(C1,Times(CN2,z_))),
-      Times(C2,Power(Pi,-1),EllipticK(z)))
+      Times(C2,Power(Pi,CN1),EllipticK(z)))
   );
 }

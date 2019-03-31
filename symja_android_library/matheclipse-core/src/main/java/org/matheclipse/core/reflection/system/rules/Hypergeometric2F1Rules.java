@@ -5,15 +5,16 @@ import org.matheclipse.core.interfaces.IAST;
 import static org.matheclipse.core.expression.F.ArcSin;
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.Hypergeometric2F1;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISetDelayed;
 import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.QQ;
 import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.z;
 import static org.matheclipse.core.expression.F.z_;
@@ -34,6 +35,6 @@ public interface Hypergeometric2F1Rules {
     IInit(Hypergeometric2F1, SIZES),
     // Hypergeometric2F1(1,2,3/2,z_):=(Sqrt(z)*Sqrt(1-z)+ArcSin(Sqrt(z)))/(2*(1-z)^(3/2)*Sqrt(z))
     ISetDelayed(Hypergeometric2F1(C1,C2,QQ(3L,2L),z_),
-      Times(Power(Times(C2,Power(Plus(C1,Negate(z)),QQ(3L,2L)),Sqrt(z)),-1),Plus(Times(Sqrt(z),Sqrt(Plus(C1,Negate(z)))),ArcSin(Sqrt(z)))))
+      Times(Power(Times(C2,Power(Subtract(C1,z),QQ(3L,2L)),Sqrt(z)),CN1),Plus(Times(Sqrt(z),Sqrt(Subtract(C1,z))),ArcSin(Sqrt(z)))))
   );
 }

@@ -16,6 +16,7 @@ import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
+import static org.matheclipse.core.expression.F.CN2;
 import static org.matheclipse.core.expression.F.CNI;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.IInit;
@@ -23,12 +24,12 @@ import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.ISetDelayed;
 import static org.matheclipse.core.expression.F.Indeterminate;
 import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Sqr;
 import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Tanh;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.oo;
@@ -78,19 +79,19 @@ public interface TanhRules {
       Times(x,Power(Plus(C1,Sqr(x)),CN1D2))),
     // Tanh(ArcCosh(x_)):=((1+x)*Sqrt((-1+x)/(1+x)))/x
     ISetDelayed(Tanh(ArcCosh(x_)),
-      Times(Power(x,-1),Plus(C1,x),Sqrt(Times(Plus(CN1,x),Power(Plus(C1,x),-1))))),
+      Times(Power(x,CN1),Plus(C1,x),Sqrt(Times(Plus(CN1,x),Power(Plus(C1,x),CN1))))),
     // Tanh(ArcTanh(x_)):=x
     ISetDelayed(Tanh(ArcTanh(x_)),
       x),
     // Tanh(ArcCoth(x_)):=1/x
     ISetDelayed(Tanh(ArcCoth(x_)),
-      Power(x,-1)),
+      Power(x,CN1)),
     // Tanh(ArcSech(x_)):=Sqrt((1-x)/(1+x))*(1+x)
     ISetDelayed(Tanh(ArcSech(x_)),
-      Times(Sqrt(Times(Plus(C1,Negate(x)),Power(Plus(C1,x),-1))),Plus(C1,x))),
+      Times(Sqrt(Times(Subtract(C1,x),Power(Plus(C1,x),CN1))),Plus(C1,x))),
     // Tanh(ArcCsch(x_)):=1/(Sqrt(1+1/x^2)*x)
     ISetDelayed(Tanh(ArcCsch(x_)),
-      Power(Times(Sqrt(Plus(C1,Power(x,-2))),x),-1)),
+      Power(Times(Sqrt(Plus(C1,Power(x,CN2))),x),CN1)),
     // Tanh(Infinity)=1
     ISet(Tanh(oo),
       C1),

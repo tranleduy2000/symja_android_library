@@ -5,18 +5,18 @@ import org.matheclipse.core.interfaces.IAST;
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.Cos;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISetDelayed;
 import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Pi;
-import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Sin;
 import static org.matheclipse.core.expression.F.Sqrt;
 import static org.matheclipse.core.expression.F.StruveH;
+import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.z;
 import static org.matheclipse.core.expression.F.z_;
@@ -37,9 +37,9 @@ public interface StruveHRules {
     IInit(StruveH, SIZES),
     // StruveH(-1/2,z_):=Sqrt(2/(Pi*z))*Sin(z)
     ISetDelayed(StruveH(CN1D2,z_),
-      Times(Sqrt(Times(C2,Power(Times(Pi,z),-1))),Sin(z))),
+      Times(Sqrt(Times(C2,Power(Times(Pi,z),CN1))),Sin(z))),
     // StruveH(1/2,z_):=Sqrt(2/(Pi*z))*(1-Cos(z))
     ISetDelayed(StruveH(C1D2,z_),
-      Times(Sqrt(Times(C2,Power(Times(Pi,z),-1))),Plus(C1,Negate(Cos(z)))))
+      Times(Sqrt(Times(C2,Power(Times(Pi,z),CN1))),Subtract(C1,Cos(z))))
   );
 }
