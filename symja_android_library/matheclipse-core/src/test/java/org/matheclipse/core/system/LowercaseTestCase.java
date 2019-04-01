@@ -6866,6 +6866,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLog() {
+		check("Log(10*E) // Simplify", //
+				"1+Log(10)");
+		check("Log(10*E*x*y) // FunctionExpand", //
+				"1+Log(10)+Log(x*y)");
 		check("Log( )", //
 				"Log()");
 		check("Log(2/3)", //
@@ -11970,6 +11974,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSimplify() {
+		check("Expand((Sqrt(-d)*e+d*Sqrt(e)*Sqrt(-e/d))*(Sqrt(-d)*e-d*Sqrt(e)*Sqrt(-e/d)))", //
+				"0");
+		check("Simplify((e*x^2)/(Sqrt(-d)*e-d*Sqrt(e)*Sqrt(-e/d)))", //
+				"(e*x^2)/(Sqrt(-d)*e-d*Sqrt(e)*Sqrt(-e/d))");
 		check("Simplify((-b^12*x^456)/x^12+(x^12*(a+b*x^37)^12)/x^12)", //
 				"-b^12*x^444+(a+b*x^37)^12");
 		check("Simplify(-Cos(x) +Sin(x)^2/(1-Cos(x)))", //
@@ -11981,7 +11989,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Simplify(-136+40*Sqrt(17))", //
 				"8*(-17+5*Sqrt(17))");
 		check("Simplify(Sqrt(17)/(5+Sqrt(17)))", //
-				"8*(-17+5*Sqrt(17))");
+				"1/8*(-17+5*Sqrt(17))");
 
 		// check("Simplify(Cos(b*x)/(-Cos(b*x)/x^2-CosIntegral(b*x)/x^2))", //
 		// "(x^2*Cos(b*x))/(-Cos(b*x)-CosIntegral(b*x))");
