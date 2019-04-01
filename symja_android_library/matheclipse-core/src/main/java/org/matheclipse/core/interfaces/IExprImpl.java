@@ -2194,7 +2194,10 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isPowerReciprocal() {
-        return isPower() && second().isMinusOne();
+        if (isPower() && second().isMinusOne()) {
+            return true;
+        }
+        return false;
     }
 
     /**
