@@ -1191,6 +1191,8 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol Gather = F.initFinalSymbol("Gather", ID.Gather);
 
+	/***/
+	public final static IBuiltInSymbol GaussianIntegers = F.initFinalSymbol("GaussianIntegers", ID.GaussianIntegers);
     /***/
     public final static IBuiltInSymbol GaussianWindow = F.initFinalSymbol("GaussianWindow", ID.GaussianWindow);
 
