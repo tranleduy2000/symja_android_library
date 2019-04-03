@@ -1,9 +1,5 @@
 package org.matheclipse.core.system;
 
-import java.io.StringWriter;
-
-import javax.script.ScriptEngine;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.eval.EvalEngine;
@@ -11,6 +7,10 @@ import org.matheclipse.core.eval.TimeConstrainedEvaluator;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+
+import java.io.StringWriter;
+
+import javax.script.ScriptEngine;
 
 /**
  * Tests system.reflection classes
@@ -38,8 +38,8 @@ public class MainTestCase extends AbstractTestCase {
 			scriptEngine.put("ENABLE_HISTORY", Boolean.TRUE);
 
 			String evaledResult = (String) scriptEngine.eval(evalString);
-
 			assertEquals(expectedResult, evaledResult);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals(e.getMessage(), "");
@@ -708,10 +708,11 @@ public class MainTestCase extends AbstractTestCase {
 	}
 
 	public void testSystem040() {
-		checkNumeric("(-15.0)^.5", "2.3715183290419594E-16+I*3.872983346207417");
-		checkNumeric("(-15.0)^0.5", "2.3715183290419594E-16+I*3.872983346207417");
+		//Swift changed: use Config.DOUBLE_TOLERANCE to compare double values
+		checkNumeric("(-15.0)^.5", "I*3.872983346207417");
+		checkNumeric("(-15.0)^0.5", "I*3.872983346207417");
 		checkNumeric(".5^.5", "0.7071067811865476");
-		checkNumeric("N((-15)^(1/2))", "2.3715183290419594E-16+I*3.872983346207417");
+		checkNumeric("N((-15)^(1/2))", "I*3.872983346207417");
 		checkNumeric("N(Sin(1/2))", "0.479425538604203");
 		checkNumeric("N(1/6*(I*44^(1/2)+2))", "0.3333333333333333+I*1.1055415967851332");
 		// test automatic numericMode (triggered by double value "0.5"):
@@ -1126,11 +1127,14 @@ public class MainTestCase extends AbstractTestCase {
 		// "LUBackSubstitution({{{1,2,3},{3,-2,2},{13,19/2,-50}},{1,2,3},0},{10,11,12})"
 		// ,
 		// "{-11/4,33/4,-5/4}");
-		check("SingularValueDecomposition({{ 24.0/25.0, 43.0/25.0 },{57.0/25.0, 24.0/25.0 }})", //
-				"{{{0.6,0.8},\n" + " {0.8,-0.6}},{{3.0,0.0},\n" + " {0.0,1.0}},{{0.8,-0.6},\n" + " {0.6,0.8}}}");
+		check("SingularValueDecomposition({{ 24.0/25.0, 43.0/25.0 },{57.0/25.0, 24.0/25.0 }})",//
+				"{{{0.6,0.8},\n" +
+						" {0.8,-0.6}},{{3.0,0.0},\n" +
+						" {0.0,1.0}},{{0.8,-0.6},\n" +
+						" {0.6,0.8}}}");
 
 		// See http://issues.apache.org/jira/browse/MATH-320:
-		check("SingularValueDecomposition({{1,2},{1,2}})", //
+		check("SingularValueDecomposition({{1,2},{1,2}})",//
 				"{{{-0.707107,-0.707107},\n" + " {-0.707107,0.707107}},{{3.16228,0.0},\n"
 						+ " {0.0,0.0}},{{-0.447214,-0.894427},\n" + " {-0.894427,0.447214}}}");
 	}
@@ -1533,6 +1537,7 @@ public class MainTestCase extends AbstractTestCase {
 		check("Integrate(1/(x^5+x-7),x)", //
 				"Integrate(1/(-7+x+x^5),x)");
 
+
 		check("Rubi`PolyQ(x/(2*Sqrt(2)),x,1)", //
 				"True");
 		check("Rubi`PolyQ((2+2*x)/(2*Sqrt(2)),x)", //
@@ -1676,8 +1681,8 @@ public class MainTestCase extends AbstractTestCase {
 	// check("Integrate(ArcCoth(x^16)^2,x)", //
 	// "1");
 	// }
-
 	public void testSystem172() {
+
 		check("Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))", //
 				"Cos((a-b)*x)/(2*(a-b))-Cos((a+b)*x)/(2*(a+b))");
 		check("Integrate(Cos(a*x)*Sin(b*x),x)", //
@@ -1689,6 +1694,7 @@ public class MainTestCase extends AbstractTestCase {
 				"1");
 		check("Integrate(Cos(x*(a+b)),x)", //
 				"Sin((a+b)*x)/(a+b)");
+
 		// Integrate[Cos[a*x]*Sin[b*x]^2,x]
 		check("Integrate(Cos(a*x)*Sin(b*x)^2,x)", //
 				"Sin(a*x)/(2*a)-Sin((a-2*b)*x)/(4*(a-2*b))-Sin((a+2*b)*x)/(4*(a+2*b))");
@@ -2785,7 +2791,8 @@ public class MainTestCase extends AbstractTestCase {
 	public void testSystem390() {
 		check("Apply((1 + 1/#) &, 10)", "11/10");
 		check("FixedPoint((1 + 1/#) &, 10, 3)", "32/21");
-		checkNumeric("FixedPoint((Cos(#))&,0.8)", "0.7390851332151607");
+		//Swift changed: use DOUBLE_TOLERANCE to compare double values
+		checkNumeric("FixedPoint((Cos(#))&,0.8)", "0.7390851332151603");
 	}
 
 	public void testSystem391() {
@@ -3210,7 +3217,6 @@ public class MainTestCase extends AbstractTestCase {
 	public void testSystem805() {
 		check("Solve(4*x^(-2)-1==0,x)", //
 				"{{x->-2},{x->2}}");
-
 		check("Solve(x^2==a^2,x)", "{{x->-a},{x->a}}");
 		check("Solve((x^2-1)/(x-1)==0,x)", "{{x->-1}}");
 
@@ -3353,6 +3359,7 @@ public class MainTestCase extends AbstractTestCase {
 		check("PolynomialLCM((1+x)^2*(7+x)*(17+x),(1+x)*(7+x)*(11+x), Modulus->31)", "(7+x)*(11+x)*(17+x)*(1+x)^2");
 	}
 
+
 	public void testSystem996() {
 		check("FactorTerms(3+3*x^3)", "3*(1+x^3)");
 		check("FactorTerms(3+3/4*x^3+12/17*x^2,x)", "3/68*(68+16*x^2+17*x^3)");
@@ -3402,7 +3409,7 @@ public class MainTestCase extends AbstractTestCase {
 		// check("Factor(1+x^2,GaussianIntegers->True)", "");
 		check("-5/2+I*1/2*Sqrt(15)", //
 				"-5/2+I*1/2*Sqrt(15)");
-		check("Roots(Expand((x-1)^3)==0, x)", //
+		check("Roots(Expand((x-1)^3)==0, x)",//
 				"x==1");
 		check("-1/2*(-I*3^(1/2)+1)", //
 				"1/2*(-1+I*Sqrt(3))");
@@ -3566,11 +3573,11 @@ public class MainTestCase extends AbstractTestCase {
 		check("RowReduce({{1, 2, 3, 4 },\n" + "{ 1, 1, 1, 1 },\n" + "{ 2, 3, 4, 5 },\n" + "{ 2, 2, 2, 2 }})",
 				"{{1,0,-1,-2},\n" + " {0,1,2,3},\n" + " {0,0,0,0},\n" + " {0,0,0,0}}");
 		check("RowReduce({{ 0, 13, 25, 43, 81, 0, 39, 60, 70, 21, 44, 0 },\n"
-				+ "{ 44, 0, 13, 67, 35, 0, 84, 35, 23, 88, 11, 0 },\n"
-				+ "{ 5, 34, 0, 143, 35, 0, 65, 99, 22, 13, 26, 0 },\n"
-				+ "{ 89, 23, 13, 0, 78, 0, 13, 24, 98, 65, 0, 0 },\n" + "{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },\n"
-				+ "{ 56,  4, 24, 56, 78, 0, 13, 0, 24, 57, 8, 1 },\n"
-				+ "{ 0, 0, 46, 666, 34, 13, 67, 9, 12, 45, 38, 0 }})",
+						+ "{ 44, 0, 13, 67, 35, 0, 84, 35, 23, 88, 11, 0 },\n"
+						+ "{ 5, 34, 0, 143, 35, 0, 65, 99, 22, 13, 26, 0 },\n"
+						+ "{ 89, 23, 13, 0, 78, 0, 13, 24, 98, 65, 0, 0 },\n" + "{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },\n"
+						+ "{ 56,  4, 24, 56, 78, 0, 13, 0, 24, 57, 8, 1 },\n"
+						+ "{ 0, 0, 46, 666, 34, 13, 67, 9, 12, 45, 38, 0 }})",
 				"{{1,0,0,0,0,0,1925039/915778,7255405/8242002,14896709/12363003,50118311/24726006,\n"
 						+ "658759/12363003,-294443/12363003},\n"
 						+ " {0,1,0,0,0,0,7292554/457889,49317121/4121001,140022961/12363003,105413240/\n"
@@ -3586,12 +3593,12 @@ public class MainTestCase extends AbstractTestCase {
 						+ " {0,0,0,0,0,0,0,0,0,0,0,0}}");
 
 		check("RowReduce({{ 0.0, 13.0, 25.0, 43.0, 81.0, 0.0, 39.0, 60.0, 70.0, 21.0, 44.0, 0.0 },\n"
-				+ "{ 44.0, 0.0, 13.0, 67.0, 35.0, 0.0, 84.0, 35.0, 23.0, 88.0, 11.0, 0.0 },\n"
-				+ "{ 5.0, 34.0, 0.0, 143.0, 35.0, 0.0, 65.0, 99.0, 22.0, 13.0, 26.0, 0.0 },\n"
-				+ "{ 89.0, 23.0, 13.0, 0.0, 78.0, 0.0, 13.0, 24.0, 98.0, 65.0, 0.0, 0.0 },\n"
-				+ "{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },\n"
-				+ "{ 56.0,  4.0, 24.0, 56.0, 78.0, 0.0, 13.0, 0.0, 24.0, 57.0, 8.0, 1.0 },\n"
-				+ "{ 0.0, 0.0, 46.0, 666.0, 34.0, 13.0, 67.0, 9.0, 12.0, 45.0, 38.0, 0.0 }})", //
+						+ "{ 44.0, 0.0, 13.0, 67.0, 35.0, 0.0, 84.0, 35.0, 23.0, 88.0, 11.0, 0.0 },\n"
+						+ "{ 5.0, 34.0, 0.0, 143.0, 35.0, 0.0, 65.0, 99.0, 22.0, 13.0, 26.0, 0.0 },\n"
+						+ "{ 89.0, 23.0, 13.0, 0.0, 78.0, 0.0, 13.0, 24.0, 98.0, 65.0, 0.0, 0.0 },\n"
+						+ "{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },\n"
+						+ "{ 56.0,  4.0, 24.0, 56.0, 78.0, 0.0, 13.0, 0.0, 24.0, 57.0, 8.0, 1.0 },\n"
+						+ "{ 0.0, 0.0, 46.0, 666.0, 34.0, 13.0, 67.0, 9.0, 12.0, 45.0, 38.0, 0.0 }})", //
 				"{{1.0,0.0,0.0,0.0,0.0,0.0,2.10208,0.880296,1.20494,2.02695,0.0532847,-0.0238165},\n"
 						+ " {0.0,1.0,0.0,0.0,0.0,0.0,15.92647,11.96727,11.32597,8.52651,4.08647,-0.243999},\n"
 						+ " {0.0,0.0,1.0,0.0,0.0,0.0,35.20901,22.34247,20.93462,20.96898,8.61046,-0.47866},\n"
@@ -3604,12 +3611,12 @@ public class MainTestCase extends AbstractTestCase {
 		check("RowReduce({{ 0.0, 1.0, 0.0, 0.0 }})", "{{0.0,1.0,0.0,0.0}}");
 
 		check("RowReduce({{1, 2, 0},\n" + "{0, 0, 0},\n" + "{0, 0, 0},\n" + "{0, 0, 0},\n" + "{0, 0, 1},\n"
-				+ "{0, 0, -1},\n" + "{1, 2, 1}})",
+						+ "{0, 0, -1},\n" + "{1, 2, 1}})",
 				"{{1,2,0},\n" + " {0,0,1},\n" + " {0,0,0},\n" + " {0,0,0},\n" + " {0,0,0},\n" + " {0,0,0},\n"
 						+ " {0,0,0}}");
 
 		check("RowReduce({{ 5.0, 7.0, 10.0, 3.0, 5.0, 8.0 },\n" + "{ 5.0, 2.0, 3.0, 10.0, 11.0, 9.0 },\n"
-				+ "{ 4.0, 3.0, 9.0, 12.0, 8.0, 9.0 }})",
+						+ "{ 4.0, 3.0, 9.0, 12.0, 8.0, 9.0 }})",
 				"{{1.0,0.0,0.0,2.50862,2.67241,1.86207},\n" + " {0.0,1.0,0.0,-3.19828,-1.46552,-0.827586},\n"
 						+ " {0.0,0.0,1.0,1.28448,0.189655,0.448276}}");
 		check("RowReduce({{1,2,3},{4,5,6}})", "{{1,0,-1},\n" + " {0,1,2}}");
