@@ -2325,6 +2325,16 @@ public class ExpTrigsFunctions {
 			if (imPart.isPresent()) {
 				return F.Times(F.CI, F.Tanh(imPart));
 			}
+			if (arg1.isPlus()) {
+				IAST peel = AbstractFunctionEvaluator.peelOff((IAST) arg1, EvalEngine.get());
+				if (peel.isPresent()) {
+					IExpr m = peel.arg2();
+					if (m.isNegative()) {
+						IExpr x = peel.arg1();
+						return F.Negate(F.Cot(x));
+					}
+				}
+			}
 			IAST parts = AbstractFunctionEvaluator.getPeriodicParts(arg1, F.Pi);
 			if (parts.isPresent()) {
 				if (parts.arg2().isInteger()) {
