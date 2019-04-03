@@ -3212,6 +3212,10 @@ public final class Arithmetic {
                         // (a * b * c)^n => a^n * b^n * c^n
 						return powBase.mapThread(Power(null, exponent), 1);
                     }
+					if (base.first().isMinusOne() && exponent.isReal() && base.isRealResult()) {
+						// ((-1) * rest) ^ (exponent) ;rest is real result
+						return F.Times(F.Power(base.first(), exponent), F.Power(base.rest(), exponent));
+					}
 					if ((base.size() > 2)) {
 						final IASTAppendable filterAST = powBase.copyHead();
 						final IASTAppendable restAST = powBase.copyHead();
