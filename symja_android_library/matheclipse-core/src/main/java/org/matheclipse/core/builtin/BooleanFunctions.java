@@ -53,7 +53,14 @@ public final class BooleanFunctions {
 	public final static GreaterEqual CONST_GREATER_EQUAL = new GreaterEqual();
 	public final static LessEqual CONST_LESS_EQUAL = new LessEqual();
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.AllTrue.setEvaluator(new AllTrue());
 		F.And.setEvaluator(new And());
 		F.AnyTrue.setEvaluator(new AnyTrue());
@@ -92,6 +99,7 @@ public final class BooleanFunctions {
 		F.Unequal.setEvaluator(new Unequal());
 		F.UnsameQ.setEvaluator(new UnsameQ());
 		F.Xor.setEvaluator(new Xor());
+	}
 	}
 
 	private static class AllTrue extends AbstractFunctionEvaluator {
@@ -3798,10 +3806,9 @@ public final class BooleanFunctions {
 		return miniSat.enumerateAllModels(vars);
 	}
 
-	private final static BooleanFunctions CONST = new BooleanFunctions();
 
-	public static BooleanFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private BooleanFunctions() {

@@ -108,7 +108,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public final IExpr apply(IExpr... expressions) {
-        return F.ast(expressions, this);
+        return F.function(this, expressions);
     }
 
     /**
@@ -128,14 +128,14 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
             return StringX.US_COLLATOR.compare(fSymbolName, ((ISymbol) expr).getSymbolName());
         }
         if (expr.isAST()) {
-        if (expr.isNot() && expr.first().isSymbol()) {
+            if (expr.isNot() && expr.first().isSymbol()) {
                 final int cp = compareTo(expr.first());
-            return cp != 0 ? cp : -1;
-        }
+                return cp != 0 ? cp : -1;
+            }
             if (!expr.isDirectedInfinity()) {
                 return -1 * expr.compareTo(this);
             }
-    }
+        }
         int x = hierarchy();
         int y = expr.hierarchy();
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
@@ -744,9 +744,23 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public IExpr of(EvalEngine engine, IExpr... args) {
-        IAST ast = F.ast(args, this);
+        IAST ast = F.function(this, args);
         return engine.evaluate(ast);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IExpr ofNIL(EvalEngine engine, IExpr... args) {
+        IAST ast = F.function(this, args);
+        IExpr temp = engine.evalLoop(ast);
+        if (temp.isPresent() && temp.head() == this) {
+            return F.NIL;
+        }
+        return temp;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -760,7 +774,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public boolean ofQ(EvalEngine engine, IExpr... args) {
-        IAST ast = F.ast(args, this);
+        IAST ast = F.function(this, args);
         return engine.evalTrue(ast);
     }
 
@@ -1028,18 +1042,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return "$s(\"" + fSymbolName + "\")";
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IExpr ofNIL(EvalEngine engine, IExpr... args) {
-        IAST ast = F.ast(args, this);
-        IExpr temp = engine.evalLoop(ast);
-        if (temp.isPresent() && temp.head() == this) {
-            return F.NIL;
-        }
-        return temp;
-    }
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         fSymbolName = stream.readUTF();
         fAttributes = stream.read();

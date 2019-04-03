@@ -24,7 +24,14 @@ import java.io.UnsupportedEncodingException;
 
 public final class StringFunctions {
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.FromCharacterCode.setEvaluator(new FromCharacterCode());
 		F.LetterQ.setEvaluator(new LetterQ());
 		F.LowerCaseQ.setEvaluator(new LowerCaseQ());
@@ -38,6 +45,7 @@ public final class StringFunctions {
 		F.ToExpression.setEvaluator(new ToExpression());
 		F.ToString.setEvaluator(new ToString());
 		F.ToUnicode.setEvaluator(new ToUnicode());
+	}
 	}
 
 	private static class FromCharacterCode extends AbstractFunctionEvaluator {
@@ -471,10 +479,9 @@ public final class StringFunctions {
 		return null;
 	}
 
-	private final static StringFunctions CONST = new StringFunctions();
 
-	public static StringFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private StringFunctions() {

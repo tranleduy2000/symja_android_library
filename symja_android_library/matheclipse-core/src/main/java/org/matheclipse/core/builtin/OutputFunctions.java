@@ -20,7 +20,14 @@ import java.io.StringWriter;
 
 public final class OutputFunctions {
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.CForm.setEvaluator(new CForm());
 		F.FullForm.setEvaluator(new FullForm());
 		F.HoldForm.setEvaluator(new HoldForm());
@@ -30,6 +37,7 @@ public final class OutputFunctions {
 		F.MathMLForm.setEvaluator(new MathMLForm());
 		F.TableForm.setEvaluator(new TableForm());
 		F.TeXForm.setEvaluator(new TeXForm());
+	}
 	}
 
 	private static class CForm extends AbstractCoreFunctionEvaluator {
@@ -370,10 +378,9 @@ public final class OutputFunctions {
 		}
 	}
 
-	private final static OutputFunctions CONST = new OutputFunctions();
 
-	public static OutputFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private OutputFunctions() {

@@ -21,8 +21,14 @@ import java.util.Iterator;
 import java.util.List;
 
 public final class Combinatoric {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
 
-	static {
+		private static void init() {
 		F.CartesianProduct.setEvaluator(new CartesianProduct());
 		F.DiceDissimilarity.setEvaluator(new DiceDissimilarity());
 		F.IntegerPartitions.setEvaluator(new IntegerPartitions());
@@ -38,6 +44,7 @@ public final class Combinatoric {
 		F.Subsets.setEvaluator(new Subsets());
 		F.Tuples.setEvaluator(new Tuples());
 		F.YuleDissimilarity.setEvaluator(new YuleDissimilarity());
+	}
 	}
 
 	/**
@@ -1633,10 +1640,9 @@ public final class Combinatoric {
 
 	}
 
-	final static Combinatoric CONST = new Combinatoric();
 
-	public static Combinatoric initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private Combinatoric() {

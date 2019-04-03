@@ -60,7 +60,14 @@ import java.util.TreeSet;
 import static org.matheclipse.core.expression.F.List;
 
 public final class ListFunctions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.Accumulate.setEvaluator(new Accumulate());
 		F.Append.setEvaluator(new Append());
 		F.AppendTo.setEvaluator(new AppendTo());
@@ -117,6 +124,7 @@ public final class ListFunctions {
 
 	}
 
+	}
 
 	private static interface IPositionConverter<T> {
 		/**
@@ -5176,10 +5184,9 @@ public final class ListFunctions {
 		return list.reverse(F.ast(list.head(), list.size(), false));
 	}
 
-	private final static ListFunctions CONST = new ListFunctions();
 
-	public static ListFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private ListFunctions() {

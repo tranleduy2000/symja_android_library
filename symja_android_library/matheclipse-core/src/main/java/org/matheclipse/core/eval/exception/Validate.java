@@ -410,8 +410,10 @@ public final class Validate {
 	/**
 	 * Check if the argument at the given position is a <code>IStringX</code> string object.
 	 * 
-	 * @param position the position which has to be a string.
-	 * @throws WrongArgumentType if it's not a symbol.
+	 * @param position
+	 *            the position which has to be a string.
+	 * @throws WrongArgumentType
+	 *             if it's not a symbol.
 	 */
 	public static String checkContextName(IAST ast, int position) {
 
@@ -699,7 +701,7 @@ public final class Validate {
 			IAST equal = (IAST) eq;
 			final IExpr[] arr = new IExpr[] { F.evalExpandAll(F.Subtract(equal.arg1(), equal.arg2())),
 					F.C0  };
-			return F.ast(arr, F.Equal);
+			return F.function(F.Equal, arr);
 		} 
 		if (eq.isAST()) {
 			IAST equal = (IAST) eq;

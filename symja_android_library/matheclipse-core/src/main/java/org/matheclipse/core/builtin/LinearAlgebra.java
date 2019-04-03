@@ -81,8 +81,14 @@ import static org.matheclipse.core.expression.F.Times;
 
 public final class LinearAlgebra {
 
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
 
-    static {
+		private static void init() {
         F.ArrayDepth.setEvaluator(new ArrayDepth());
         F.BrayCurtisDistance.setEvaluator(new BrayCurtisDistance());
         F.CanberraDistance.setEvaluator(new CanberraDistance());
@@ -135,6 +141,7 @@ public final class LinearAlgebra {
         F.VectorAngle.setEvaluator(new VectorAngle());
     }
 
+	}
 
     /**
      * <pre>
@@ -3921,8 +3928,8 @@ public final class LinearAlgebra {
 		return dims;
 	}
 
-	public static LinearAlgebra initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	/**

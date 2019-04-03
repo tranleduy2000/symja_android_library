@@ -106,7 +106,14 @@ import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
 
 public class Algebra {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.Apart.setEvaluator(new Apart());
 		F.Cancel.setEvaluator(new Cancel());
 		F.Collect.setEvaluator(new Collect());
@@ -135,6 +142,7 @@ public class Algebra {
 		F.Together.setEvaluator(new Together());
 		F.ToRadicals.setEvaluator(new ToRadicals());
 		F.Variables.setEvaluator(new Variables());
+	}
 	}
 
 	protected static class InternalFindCommonFactorPlus {
@@ -5586,10 +5594,9 @@ public class Algebra {
 		return temp;
 	}
 
-	private final static Algebra CONST = new Algebra();
 
-	public static Algebra initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private Algebra() {

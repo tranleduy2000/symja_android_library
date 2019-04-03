@@ -59,8 +59,16 @@ import static org.matheclipse.core.expression.F.y_;
  */
 public class TrigToExp extends AbstractEvaluator {
 
-	final static Matcher MATCHER = new Matcher(EvalEngine.get());
-	static {
+	private final static Matcher MATCHER = new Matcher();
+
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		MATCHER.caseOf(Sec(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
@@ -253,6 +261,7 @@ public class TrigToExp extends AbstractEvaluator {
 								F.Times(F.Exp(x), F.Power(F.Plus(F.Exp(F.Negate(x)), F.Exp(x)), -1)));
 					}
 				}); // $$);
+		}
 	}
 
 	public TrigToExp() {
@@ -282,6 +291,7 @@ public class TrigToExp extends AbstractEvaluator {
 
 	@Override
 	public void setUp(final ISymbol newSymbol) {
+		Initializer.init();
 		newSymbol.setAttributes(ISymbol.LISTABLE);
 	}
 

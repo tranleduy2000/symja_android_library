@@ -52,9 +52,15 @@ import static org.matheclipse.core.expression.F.Divide;
 import static org.matheclipse.core.expression.F.List;
 
 public final class Programming {
-	private final static Programming CONST = new Programming();
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.Abort.setEvaluator(new Abort());
 		F.Break.setEvaluator(new Break());
 		F.Block.setEvaluator(new Block());
@@ -92,6 +98,7 @@ public final class Programming {
 		F.Which.setEvaluator(new Which());
 		F.While.setEvaluator(new While());
 		F.With.setEvaluator(new With());
+	}
 	}
 
 	/**
@@ -3072,8 +3079,8 @@ public final class Programming {
 		return result;
 	}
 
-	public static Programming initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private Programming() {

@@ -186,10 +186,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public IExpr apply(IExpr... leaves) {
         return F.ast(leaves, head());
-        // for (int i = 0; i < leaves.length; i++) {
-        // ast.append(leaves[i]);
-        // }
-        // return ast;
     }
 
     /**

@@ -3908,8 +3908,14 @@ public final class NumberTheory {
 		}
 	}
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
 
+		private static void init() {
 		F.BellB.setEvaluator(new BellB());
 		F.BernoulliB.setEvaluator(new BernoulliB());
 		F.Binomial.setEvaluator(new Binomial());
@@ -3963,7 +3969,7 @@ public final class NumberTheory {
 		F.Unitize.setEvaluator(new Unitize());
 	}
 
-	private final static NumberTheory CONST = new NumberTheory();
+	}
 
 	public static IInteger factorial(final IInteger x) {
 
@@ -4048,8 +4054,8 @@ public final class NumberTheory {
 		return F.ZZ(result);
 	}
 
-	public static NumberTheory initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	/**

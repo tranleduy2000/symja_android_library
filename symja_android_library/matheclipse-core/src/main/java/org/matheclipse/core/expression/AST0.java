@@ -56,8 +56,10 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 
 	/**
 	 * The head of this function.
+	 *
+	 * Package private.
 	 */
-	protected IExpr arg0;
+	IExpr arg0;
 
 	/**
 	 * ctor for deserialization

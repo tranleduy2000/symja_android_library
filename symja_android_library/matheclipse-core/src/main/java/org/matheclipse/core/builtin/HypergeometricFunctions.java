@@ -28,7 +28,14 @@ import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Times;
 
 public class HypergeometricFunctions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.CosIntegral.setEvaluator(new CosIntegral());
 		F.CoshIntegral.setEvaluator(new CoshIntegral());
 		F.ExpIntegralE.setEvaluator(new ExpIntegralE());
@@ -44,6 +51,7 @@ public class HypergeometricFunctions {
 		F.SinhIntegral.setEvaluator(new SinhIntegral());
 	}
 
+	}
 
 	private static class CosIntegral extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
 		@Override
@@ -766,10 +774,9 @@ public class HypergeometricFunctions {
 		}
 	}
 
-	private final static HypergeometricFunctions CONST = new HypergeometricFunctions();
 
-	public static HypergeometricFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private HypergeometricFunctions() {

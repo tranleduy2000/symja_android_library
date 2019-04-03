@@ -53,11 +53,20 @@ import static org.matheclipse.core.expression.F.z_;
  */
 public class FunctionExpand extends AbstractEvaluator {
 
-	final static Matcher MATCHER = new Matcher(EvalEngine.get());
-	static {
+	private final static Matcher MATCHER = new Matcher( );
+
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		// Beta
 		MATCHER.caseOf(Beta(z_, a_, b_), //
-				// [$ Beta(a, b)*(1 - (1 - z)^b*Sum((Pochhammer(b, k)*z^k)/k!, {k, 0, a - 1})) /; IntegerQ(a)&&a>0 $]
+					// [$ Beta(a, b)*(1 - (1 - z)^b*Sum((Pochhammer(b, k)*z^k)/k!, {k, 0, a - 1})) /; IntegerQ(a)&&a>0
+					// $]
 				F.Condition(
 						F.Times(F.Beta(a, b),
 								F.Plus(F.C1, F.Times(F.CN1, F.Power(F.Plus(F.C1, F.Negate(z)), b),
@@ -109,7 +118,8 @@ public class FunctionExpand extends AbstractEvaluator {
 
 		// Fibonacci
 		MATCHER.caseOf(F.Fibonacci(F.Plus(m_, n_)), //
-				// [$ ((1/2)*Fibonacci(m)*LucasL(n) + (1/2)*Fibonacci(n)*LucasL(m)) /; IntegerQ(m)&&Element(n, Integers)
+					// [$ ((1/2)*Fibonacci(m)*LucasL(n) + (1/2)*Fibonacci(n)*LucasL(m)) /; IntegerQ(m)&&Element(n,
+					// Integers)
 				// $]
 				F.Condition(
 						F.Plus(F.Times(F.C1D2, F.Fibonacci(m), F.LucasL(n)),
@@ -133,7 +143,8 @@ public class FunctionExpand extends AbstractEvaluator {
 				F.Plus(F.Log(F.Glaisher), F.Times(F.C1D4, F.Plus(F.Log(F.C2), F.Log(F.Pi))))); // $$);
 		// MATCHER.caseOf(F.PolyGamma(m_, F.C1), //
 		// (1/(-m - 1)!)*(((-m - 1)*EulerGamma)/(-m) + PolyGamma(-m) + Sum(Binomial(-m - 1,
-		// k)*(Sum((-1)^j*Binomial(k, j)*PolyGamma(k - j + 1)*Zeta(j - k, 2), {j, 1, k}) - PolyGamma(1 + k)), {k, 0, -m
+			// k)*(Sum((-1)^j*Binomial(k, j)*PolyGamma(k - j + 1)*Zeta(j - k, 2), {j, 1, k}) - PolyGamma(1 + k)), {k, 0,
+			// -m
 		// - 1}) - Sum(Binomial(-m - 1, k)*Derivative(1)[Zeta][-k], {k, 0, -m - 2})) /; IntegerQ(m) && m < 0
 
 		// F.Condition(F.Times(F.Power(F.Factorial(F.Plus(F.CN1,F.Negate(m))),-1),F.Plus(F.Times(F.EulerGamma,F.Power(F.Negate(m),-1),F.Plus(F.CN1,F.Negate(m))),F.PolyGamma(F.Negate(m)),F.Sum(F.Times(F.Binomial(F.Plus(F.CN1,F.Negate(m)),k),F.Plus(F.Negate(F.PolyGamma(F.Plus(F.C1,k))),F.Sum(F.Times(F.Power(F.CN1,j),F.Binomial(k,j),F.PolyGamma(F.Plus(F.Negate(j),k,F.C1)),F.Zeta(F.Plus(j,F.Negate(k)),F.C2)),F.List(j,F.C1,k)))),F.List(k,F.C0,F.Plus(F.CN1,F.Negate(m)))),F.Negate(F.Sum(F.Times(F.Binomial(F.Plus(F.CN1,F.Negate(m)),k),F.$(F.$(F.Derivative(F.C1),F.Zeta),F.Negate(k))),F.List(k,F.C0,F.Plus(F.CN2,F.Negate(m))))))),F.And(F.IntegerQ(m),F.Less(m,F.C0))));
@@ -163,6 +174,7 @@ public class FunctionExpand extends AbstractEvaluator {
 		MATCHER.caseOf(F.ParzenWindow.of(x_), WindowFunctions.parzenWindow(x));
 		MATCHER.caseOf(F.TukeyWindow.of(x_), WindowFunctions.tukeyWindow(x));
 
+	}
 	}
 
 	public FunctionExpand() {
@@ -210,6 +222,7 @@ public class FunctionExpand extends AbstractEvaluator {
 
 	@Override
 	public void setUp(final ISymbol newSymbol) {
+		Initializer.init();
 		newSymbol.setAttributes(ISymbol.LISTABLE);
 	}
 

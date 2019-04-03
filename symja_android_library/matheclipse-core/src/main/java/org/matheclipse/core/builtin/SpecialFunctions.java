@@ -59,7 +59,14 @@ import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.Zeta;
 
 public class SpecialFunctions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.Beta.setEvaluator(new Beta());
 		F.BetaRegularized.setEvaluator(new BetaRegularized());
 		F.Erf.setEvaluator(new Erf());
@@ -80,6 +87,7 @@ public class SpecialFunctions {
 		F.StruveH.setEvaluator(new StruveH());
 		F.StruveL.setEvaluator(new StruveL());
 		F.Zeta.setEvaluator(new Zeta());
+	}
 	}
 
 	private static class Beta extends AbstractFunctionEvaluator {
@@ -1335,10 +1343,9 @@ public class SpecialFunctions {
 		}
 	}
 
-	private final static SpecialFunctions CONST = new SpecialFunctions();
 
-	public static SpecialFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private SpecialFunctions() {

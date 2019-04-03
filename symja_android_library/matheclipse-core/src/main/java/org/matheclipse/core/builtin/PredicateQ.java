@@ -31,7 +31,14 @@ public class PredicateQ {
 	 */
 	// public final static AtomQ ATOMQ = new AtomQ();
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.AntisymmetricMatrixQ.setEvaluator(new AntisymmetricMatrixQ());
 		F.AntihermitianMatrixQ.setEvaluator(new AntihermitianMatrixQ());
 		F.ArrayQ.setEvaluator(new ArrayQ());
@@ -137,6 +144,7 @@ public class PredicateQ {
 		F.UpperCaseQ.setEvaluator(new UpperCaseQ());
 		F.ValueQ.setEvaluator(new ValueQ());
 		F.VectorQ.setEvaluator(new VectorQ());
+	}
 	}
 
 	/**
@@ -1355,10 +1363,9 @@ public class PredicateQ {
 		}
 		return false;
 	}
-	private final static PredicateQ CONST = new PredicateQ();
 
-	public static PredicateQ initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private PredicateQ() {

@@ -28,7 +28,14 @@ public class ConstantDefinitions {
 	private static int HOUR = Calendar.getInstance().get(Calendar.HOUR);
 	private static int MINUTE = Calendar.getInstance().get(Calendar.MINUTE);
 	private static int SECOND = Calendar.getInstance().get(Calendar.SECOND);
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		Properties properties = ResourceData.properties("/version.txt");
 
 		String versionString = properties.getProperty("version");
@@ -76,11 +83,11 @@ public class ConstantDefinitions {
 		F.True.setEvaluator(NILEvaluator.CONST);
 		F.Null.setEvaluator(NILEvaluator.CONST);
 	}
+	}
 
-	private final static ConstantDefinitions CONST = new ConstantDefinitions();
 
-	public static ConstantDefinitions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private ConstantDefinitions() {
@@ -138,7 +145,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public IExpr evaluate(final ISymbol symbol) {
-//			System.out.println(Config.MACHINE_EPSILON);
+			// System.out.println(Config.MACHINE_EPSILON);
 			return F.num(Config.MACHINE_EPSILON);
 		}
 

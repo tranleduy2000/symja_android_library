@@ -21,7 +21,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TensorFunctions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.ArrayReshape.setEvaluator(new ArrayReshape());
 		F.Ordering.setEvaluator(new Ordering());
 		F.ListConvolve.setEvaluator(new ListConvolve());
@@ -30,6 +37,7 @@ public class TensorFunctions {
 		F.TensorProduct.setEvaluator(new TensorProduct());
 		F.TensorRank.setEvaluator(new TensorRank());
 		F.TensorSymmetry.setEvaluator(new TensorSymmetry());
+	}
 	}
 
 	/**
@@ -547,10 +555,9 @@ public class TensorFunctions {
 
 	}
 
-	private final static TensorFunctions CONST = new TensorFunctions();
 
-	public static TensorFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private TensorFunctions() {

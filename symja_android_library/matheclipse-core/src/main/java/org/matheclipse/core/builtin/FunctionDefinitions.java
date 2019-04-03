@@ -63,7 +63,14 @@ import static org.matheclipse.core.expression.F.TrigReduce;
 import static org.matheclipse.core.expression.F.TrigToExp;
 
 public final class FunctionDefinitions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		AbsArg.setEvaluator(new org.matheclipse.core.reflection.system.AbsArg());
 		BesselJ.setEvaluator(new org.matheclipse.core.reflection.system.BesselJ());
 		ComplexExpand.setEvaluator(new org.matheclipse.core.reflection.system.ComplexExpand());
@@ -127,11 +134,11 @@ public final class FunctionDefinitions {
 		TrigReduce.setEvaluator(new org.matheclipse.core.reflection.system.TrigReduce());
 		TrigToExp.setEvaluator(new org.matheclipse.core.reflection.system.TrigToExp());
 	}
-    private final static FunctionDefinitions CONST = new FunctionDefinitions();
+	}
 
 
-    public static FunctionDefinitions initialize() {
-        return CONST;
+	public static void initialize() {
+		Initializer.init();
     }
 	private FunctionDefinitions() {
 

@@ -239,7 +239,14 @@ public class Characters {
 			"Xnor", "\uF4A2", "Xor", "\u22BB", "YAcute", "\u00FD", "YDoubleDot", "\u00FF", "Yen", "\u00A5", "Zeta",
 			"\u03B6", "ZHacek", "\u017E" };
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		for (int i = 0; i < NamedCharacters.length; i += 2) {
 			NamedCharactersMap.put(NamedCharacters[i], NamedCharacters[i + 1]);
 		}
@@ -248,6 +255,11 @@ public class Characters {
 		CharacterNamesMap.put(NamedCharactersMap.get("ImaginaryJ"), "I");
 		CharacterNamesMap.put(NamedCharactersMap.get("Pi"), "Pi");
 
+	}
+	}
+
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	/**
@@ -269,10 +281,12 @@ public class Characters {
 	}
 
 	/**
-	 * Substitute all named (unicode-) characters in a string with their unicode value
-	 * For example <code>\[Alpha], \[Phi], \[Pi]</code> will be replace with unicode characters:
+	 * Substitute all named (unicode-) characters in a string with their unicode value For example
+	 * <code>\[Alpha], \[Phi], \[Pi]</code> will be replace with unicode characters:
 	 *
-	 * <pre>f(\[Alpha])+\[Phi]*\[Pi]</pre>
+	 * <pre>
+	 * f(\[Alpha])+\[Phi]*\[Pi]
+	 * </pre>
 	 *
 	 * @param str
 	 * @return

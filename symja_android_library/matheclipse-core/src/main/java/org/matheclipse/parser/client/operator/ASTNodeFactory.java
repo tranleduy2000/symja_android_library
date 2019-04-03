@@ -194,7 +194,79 @@ public class ASTNodeFactory implements INodeParserFactory {
 	public static final TagSetOperator TAG_SET_OPERATOR = new TagSetOperator("/:", "TagSet", TAG_SET_PRECEDENCE,
 			InfixOperator.NONE);
 
-	static final Operator[] OPERATORS = { new InfixOperator("::", "MessageName", 750, InfixOperator.NONE),
+	private static Operator[] OPERATORS;
+	// = { new InfixOperator("::", "MessageName", 750, InfixOperator.NONE),
+	// new PrefixOperator("<<", "Get", 720), new InfixOperator("?", "PatternTest", 680, InfixOperator.NONE),
+	// new InfixOperator("//@", "MapAll", 620, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new InfixOperator("*=", "TimesBy", 100, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new InfixOperator("+", "Plus", PLUS_PRECEDENCE, InfixOperator.NONE),
+	// new InfixOperator("^=", "UpSet", 40, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new InfixOperator(";", "CompoundExpression", 10, InfixOperator.NONE), APPLY_HEAD_OPERATOR,
+	// new InfixOperator("/@", "Map", 620, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new PostfixOperator("=.", "Unset", 670), APPLY_OPERATOR, APPLY_LEVEL_OPERATOR,
+	// // new ApplyOperator("@@", "Apply", APPLY_PRECEDENCE,
+	// // InfixOperator.RIGHT_ASSOCIATIVE),
+	// // new ApplyOperator("@@@", "Apply", APPLY_PRECEDENCE,
+	// // InfixOperator.RIGHT_ASSOCIATIVE),
+	// new InfixOperator("//.", "ReplaceRepeated", 110, InfixOperator.LEFT_ASSOCIATIVE),
+	// new InfixOperator("<", "Less", 290, InfixOperator.NONE),
+	// new InfixOperator("&&", "And", 215, InfixOperator.NONE),
+	// new DivideOperator("/", "Divide", DIVIDE_PRECEDENCE, InfixOperator.LEFT_ASSOCIATIVE),
+	// new InfixOperator("=", "Set", 40, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new PostfixOperator("++", "Increment", 660), new PostfixOperator("!!", "Factorial2", 610),
+	// new InfixOperator("<=", "LessEqual", 290, InfixOperator.NONE),
+	// new InfixOperator("**", "NonCommutativeMultiply", 510, InfixOperator.NONE),
+	// new PostfixOperator("!", "Factorial", 610),
+	// new InfixOperator("*", "Times", TIMES_PRECEDENCE, InfixOperator.NONE),
+	// new InfixOperator("^", "Power", POWER_PRECEDENCE, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new InfixOperator(".", "Dot", 490, InfixOperator.NONE), new PrefixOperator("!", "Not", 230),
+	// new PreMinusOperator("-", "PreMinus", 485), new InfixOperator("===", "SameQ", 290, InfixOperator.NONE),
+	// new InfixOperator(":>", "RuleDelayed", 120, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new InfixOperator(">=", "GreaterEqual", 290, InfixOperator.NONE),
+	// new InfixOperator("/;", "Condition", 130, InfixOperator.LEFT_ASSOCIATIVE),
+	// new InfixOperator(":", "Colon", 80, InfixOperator.NONE),
+	// new InfixOperator("//", "//", 70, InfixOperator.LEFT_ASSOCIATIVE),
+	// new InfixOperator("/=", "DivideBy", 100, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new InfixOperator("||", "Or", 213, InfixOperator.NONE),
+	// new InfixOperator(";;", "Span", 305, InfixOperator.NONE),
+	// new InfixOperator("==", "Equal", 290, InfixOperator.NONE),
+	// new InfixOperator("<>", "StringJoin", 600, InfixOperator.NONE),
+	// new InfixOperator("!=", "Unequal", 290, InfixOperator.NONE), new PostfixOperator("--", "Decrement", 660),
+	// new InfixOperator("-=", "SubtractFrom", 100, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new PrePlusOperator("+", "PrePlus", 670), new PostfixOperator("...", "RepeatedNull", 170),
+	// new InfixOperator("=!=", "UnsameQ", 290, InfixOperator.NONE),
+	// new InfixOperator("->", "Rule", 120, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new InfixOperator("^:=", "UpSetDelayed", 40, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new PrefixOperator("++", "PreIncrement", 660), new PostfixOperator("&", "Function", 90),
+	// new InfixOperator(">", "Greater", 290, InfixOperator.NONE), new PrefixOperator("--", "PreDecrement", 660),
+	// new SubtractOperator("-", "Subtract", 310, InfixOperator.LEFT_ASSOCIATIVE),
+	// new InfixOperator(":=", "SetDelayed", 40, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new InfixOperator("|", "Alternatives", 160, InfixOperator.NONE),
+	// new InfixOperator("+=", "AddTo", 100, InfixOperator.RIGHT_ASSOCIATIVE),
+	// new PostfixOperator("..", "Repeated", 170),
+	// new InfixOperator("/.", "ReplaceAll", 110, InfixOperator.LEFT_ASSOCIATIVE), TAG_SET_OPERATOR };
+
+	public final static ASTNodeFactory MMA_STYLE_FACTORY = new ASTNodeFactory(false);
+
+	public final static ASTNodeFactory RELAXED_STYLE_FACTORY = new ASTNodeFactory(true);
+
+	/**
+	 */
+	private static HashMap<String, Operator> fOperatorMap;
+
+	/**
+	 */
+	private static HashMap<String, ArrayList<Operator>> fOperatorTokenStartSet;
+
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
+			OPERATORS = new Operator[] { new InfixOperator("::", "MessageName", 750, InfixOperator.NONE),
 			new PrefixOperator("<<", "Get", 720), new InfixOperator("?", "PatternTest", 680, InfixOperator.NONE),
 			new InfixOperator("//@", "MapAll", 620, InfixOperator.RIGHT_ASSOCIATIVE),
 			new InfixOperator("*=", "TimesBy", 100, InfixOperator.RIGHT_ASSOCIATIVE),
@@ -246,19 +318,6 @@ public class ASTNodeFactory implements INodeParserFactory {
 			new InfixOperator("/.", "ReplaceAll", 110, InfixOperator.LEFT_ASSOCIATIVE),
 			TAG_SET_OPERATOR };
 
-	public final static ASTNodeFactory MMA_STYLE_FACTORY = new ASTNodeFactory(false);
-
-	public final static ASTNodeFactory RELAXED_STYLE_FACTORY = new ASTNodeFactory(true);
-
-	/**
-	 */
-	private static HashMap<String, Operator> fOperatorMap;
-
-	/**
-	 */
-	private static HashMap<String, ArrayList<Operator>> fOperatorTokenStartSet;
-
-	static {
 		StringBuilder buf = new StringBuilder(BASIC_OPERATOR_CHARACTERS);
 		fOperatorMap = new HashMap<String, Operator>();
 		fOperatorTokenStartSet = new HashMap<String, ArrayList<Operator>>();
@@ -271,6 +330,11 @@ public class ASTNodeFactory implements INodeParserFactory {
 		}
 	}
 		DEFAULT_OPERATOR_CHARACTERS = buf.toString();
+	}
+	}
+
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private final boolean fIgnoreCase;

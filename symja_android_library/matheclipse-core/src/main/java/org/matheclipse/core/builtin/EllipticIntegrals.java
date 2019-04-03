@@ -12,12 +12,20 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 
 public class EllipticIntegrals {
-	static { 
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.EllipticE.setEvaluator(new EllipticE());
 		F.EllipticF.setEvaluator(new EllipticF());
 		F.EllipticK.setEvaluator(new EllipticK());
 		F.EllipticPi.setEvaluator(new EllipticPi()); 
 		F.JacobiZeta.setEvaluator(new JacobiZeta());
+	}
 	}
 
 	/**
@@ -432,10 +440,9 @@ public class EllipticIntegrals {
 			super.setUp(newSymbol);
 		}
 	}
-	private final static EllipticIntegrals CONST = new EllipticIntegrals();
 
-	public static EllipticIntegrals initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private EllipticIntegrals() {

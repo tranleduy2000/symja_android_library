@@ -10,7 +10,14 @@ import org.matheclipse.core.interfaces.ISymbol;
 
 public class WindowFunctions {
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.BartlettWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
 			@Override
 			public IExpr apply(IExpr x) {
@@ -83,6 +90,7 @@ public class WindowFunctions {
 				return tukeyWindow(x);
 			}
 		}));
+		}
 	}
 
 	private static class WindowFunction extends AbstractTrigArg1 {
@@ -106,7 +114,6 @@ public class WindowFunctions {
 		}
 	}
 
-	private final static WindowFunctions CONST = new WindowFunctions();
 
 	public static IExpr bartlettWindow(IExpr x) {
 		return
@@ -240,8 +247,8 @@ public class WindowFunctions {
 				F.C0); // $$;
 	}
 
-	public static WindowFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private WindowFunctions() {

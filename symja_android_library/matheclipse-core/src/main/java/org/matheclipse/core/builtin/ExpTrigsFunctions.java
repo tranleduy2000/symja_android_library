@@ -96,8 +96,14 @@ import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.num;
 
 public class ExpTrigsFunctions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
 
+		private static void init() {
 		F.AngleVector.setEvaluator(new AngleVector());
 		F.ArcCos.setEvaluator(new ArcCos());
 		F.ArcCosh.setEvaluator(new ArcCosh());
@@ -133,6 +139,7 @@ public class ExpTrigsFunctions {
 		F.Tan.setEvaluator(new Tan());
 		F.Tanh.setEvaluator(new Tanh());
 
+	}
 	}
 
 	private final static class AngleVector extends AbstractFunctionEvaluator {
@@ -2597,10 +2604,10 @@ public class ExpTrigsFunctions {
 		return F.NIL;
 	}
 
-	private final static ExpTrigsFunctions CONST = new ExpTrigsFunctions();
+	// private final static ExpTrigsFunctions CONST = new ExpTrigsFunctions();
 
-	public static ExpTrigsFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private ExpTrigsFunctions() {

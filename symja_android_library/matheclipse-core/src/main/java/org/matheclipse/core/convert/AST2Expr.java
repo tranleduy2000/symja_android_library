@@ -202,7 +202,14 @@ public class AST2Expr {
 		return SUGGEST_TREE;
 	}
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		for (String str : UPPERCASE_SYMBOL_STRINGS) {
 			// these constants must be written in upper case characters
 			PREDEFINED_SYMBOLS_MAP.put(str, str);
@@ -230,6 +237,11 @@ public class AST2Expr {
 			RUBI_STATISTICS_MAP = new TreeMap<String, Integer>();
 		}
 
+	}
+	}
+
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private int fPrecision;

@@ -218,21 +218,12 @@ public class Matcher implements Function<IExpr, IExpr> {
 	 */
 	private RulesData rules;
 
-	private EvalEngine engine;
 
 	/**
 	 * The Matcher constructor
 	 */
 	public Matcher() {
-		this(EvalEngine.get());
-	}
-
-	/**
-	 * The Matcher constructor
-	 */
-	public Matcher(EvalEngine engine) {
 		this.rules = new RulesData(Context.SYSTEM);
-		this.engine = engine;
 	}
 
 	/**
@@ -245,7 +236,7 @@ public class Matcher implements Function<IExpr, IExpr> {
 	 */
 	@Override
 	public IExpr apply(IExpr expression) {
-		return rules.evalDownRule(expression, engine);
+		return rules.evalDownRule(expression, EvalEngine.get());
 	}
 
 	/**
@@ -314,9 +305,6 @@ public class Matcher implements Function<IExpr, IExpr> {
 		rules.putDownRule(patternMatchingRule, resultExpr);
 	}
 
-	public EvalEngine getEngine() {
-		return engine;
-	}
 
 	/**
 	 * Replace all (sub-) expressions with the given rule set. If no substitution matches, the method returns the given
@@ -329,9 +317,6 @@ public class Matcher implements Function<IExpr, IExpr> {
 		return expression.accept(new MatcherVisitor(this));
 	}
 
-	public void setEngine(EvalEngine engine) {
-		this.engine = engine;
-	}
 
 	// public static IExpr evalTest(PatternMap pm) {
 	// return F.List(pm.val(F.y));

@@ -108,7 +108,14 @@ public final class Arithmetic {
     public final static IFunctionEvaluator CONST_COMPLEX = new Complex();
     public final static IFunctionEvaluator CONST_RATIONAL = new Rational();
 
-    static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
         F.Plus.setDefaultValue(F.C0);
         F.Plus.setEvaluator(CONST_PLUS);
         F.Times.setDefaultValue(F.C1);
@@ -151,6 +158,7 @@ public final class Arithmetic {
         F.TimesBy.setEvaluator(new TimesBy());
 
     }
+	}
 
     /**
      * <pre>
@@ -5304,10 +5312,9 @@ public final class Arithmetic {
 		return F.NIL;
     }
 
-    private final static Arithmetic CONST = new Arithmetic();
 
-    public static Arithmetic initialize() {
-        return CONST;
+	public static void initialize() {
+		Initializer.init();
     }
 
 	private Arithmetic() {

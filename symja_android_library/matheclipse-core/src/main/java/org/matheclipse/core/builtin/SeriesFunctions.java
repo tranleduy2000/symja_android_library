@@ -35,7 +35,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SeriesFunctions {
-    static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
         F.Limit.setEvaluator(new Limit());
         if (ToggleFeature.SERIES) {
             F.ComposeSeries.setEvaluator(new ComposeSeries());
@@ -46,6 +53,7 @@ public class SeriesFunctions {
             F.SeriesData.setEvaluator(new SeriesData());
         }
     }
+	}
 
     /**
      * <pre>
@@ -1503,10 +1511,9 @@ public class SeriesFunctions {
         }
     }
 
-    private final static SeriesFunctions CONST = new SeriesFunctions();
 
-    public static SeriesFunctions initialize() {
-        return CONST;
+	public static void initialize() {
+		Initializer.init();
     }
 
     private SeriesFunctions() {

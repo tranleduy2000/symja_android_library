@@ -51,7 +51,14 @@ public class Structure {
 	private final static Set<ISymbol> LIST_LOGIC_EQUATION_HEADS = Collections
 			.newSetFromMap(new IdentityHashMap<ISymbol, Boolean>(29));
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.Apply.setEvaluator(new Apply());
 		F.Depth.setEvaluator(new Depth());
 		F.Flatten.setEvaluator(new Flatten());
@@ -84,6 +91,7 @@ public class Structure {
 		PLUS_LOGIC_EQUATION_HEADS.add(F.Plus);
 		LIST_LOGIC_EQUATION_HEADS.addAll(LOGIC_EQUATION_HEADS);
 		LIST_LOGIC_EQUATION_HEADS.add(F.List);
+	}
 	}
 
 	/**
@@ -1928,10 +1936,9 @@ public class Structure {
 		return F.NIL;
 	}
 
-	private final static Structure CONST = new Structure();
 
-	public static Structure initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private Structure() {

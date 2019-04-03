@@ -22,6 +22,7 @@ import org.matheclipse.core.patternmatching.RulesData;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
@@ -73,6 +74,17 @@ import static org.matheclipse.core.expression.F.Times;
  * </pre>
  */
 public class Integrate extends AbstractFunctionEvaluator {
+	private static Thread INIT_THREAD = null;
+
+	private final static CountDownLatch COUNT_DOWN_LATCH = new CountDownLatch(1);
+
+	/**
+	 * Causes the current thread to wait until the INIT_THREAD has initialized the Integrate() rules.
+	 *
+	 */
+	public final void await() throws InterruptedException {
+		COUNT_DOWN_LATCH.await();
+	}
 	/**
 	 *
 	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
@@ -83,6 +95,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 		@Override
 		public void run() {
 			// long start = System.currentTimeMillis();
+			if (!INTEGRATE_RULES_READ) {
+				INTEGRATE_RULES_READ = true;
 			final EvalEngine engine = EvalEngine.get();
 			ContextPath path = engine.getContextPath();
 			try {
@@ -92,16 +106,15 @@ public class Integrate extends AbstractFunctionEvaluator {
 			} finally {
 				engine.setContextPath(path);
 			}
-			F.Integrate.setEvaluator(CONST);
+				// F.Integrate.setEvaluator(CONST);
 			engine.setPackageMode(false);
 			// long stop = System.currentTimeMillis();
 			// System.out.println("Milliseconds: " + (stop - start));
-			F.COUNT_DOWN_LATCH.countDown();
+				COUNT_DOWN_LATCH.countDown();
+			}
 		}
 
 		private static synchronized void getRuleASTStatic() {
-			if (!INTEGRATE_RULES_READ) {
-				INTEGRATE_RULES_READ = true;
 				INTEGRATE_RULES_DATA = F.Integrate.createRulesData(new int[] { 0, 7000 });
 				getRuleASTRubi45();
 
@@ -110,7 +123,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 					INT_RUBI_FUNCTIONS.add(rubiSymbols[i]);
 				}
 			}
-		}
 
 		private static void getUtilityFunctionsRuleASTRubi45() {
 			IAST ast = org.matheclipse.core.integrate.rubi.UtilityFunctions0.RULES;
@@ -271,21 +283,21 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 */
 	public final static Integrate CONST = new Integrate();
 
-	/**
-	 * Check if the internal rules are already initialized
-	 */
-	public static boolean INITIALIZED = false;
 	public final static Set<ISymbol> INT_RUBI_FUNCTIONS = new HashSet<ISymbol>();
 
 	public final static Set<IExpr> DEBUG_EXPR = new HashSet<IExpr>(64);
 
-	public static boolean INTEGRATE_RULES_READ = false;
+	public static volatile boolean INTEGRATE_RULES_READ = false;
 
 	public Integrate() {
 	}
 
 	@Override
 	public IExpr evaluate(final IAST holdallAST, final EvalEngine engine) {
+		try {
+			await();
+		} catch (InterruptedException e) {
+		}
 		boolean evaled = false;
 		IExpr result;
 		boolean numericMode = engine.isNumericMode();
@@ -1121,6 +1133,17 @@ public class Integrate extends AbstractFunctionEvaluator {
 		newSymbol.setAttributes(ISymbol.HOLDALL);
 		super.setUp(newSymbol);
 
+		if (Config.THREAD_FACTORY != null) {
+			INIT_THREAD = Config.THREAD_FACTORY.newThread(new IntegrateInitializer());
+		} else {
+			INIT_THREAD = new Thread(new IntegrateInitializer());
+		}
+
+		if (Config.JAS_NO_THREADS) {
+			INIT_THREAD.run();
+		} else {
+			INIT_THREAD.start();
+		}
 		// if (Config.LOAD_SERIALIZED_RULES) {
 		// initSerializedRules(symbol);
 		// }

@@ -30,7 +30,14 @@ import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Round;
 
 public class IntegerFunctions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.BitLength.setEvaluator(new BitLength());
 		F.Ceiling.setEvaluator(new Ceiling());
 		F.Floor.setEvaluator(new Floor());
@@ -46,6 +53,7 @@ public class IntegerFunctions {
 		F.QuotientRemainder.setEvaluator(new QuotientRemainder());
 		F.Round.setEvaluator(new Round());
 		F.UnitStep.setEvaluator(new UnitStep());
+	}
 	}
 
 	/**
@@ -1092,10 +1100,9 @@ public class IntegerFunctions {
 		}
 	}
 
-	private final static IntegerFunctions CONST = new IntegerFunctions();
 
-	public static IntegerFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private IntegerFunctions() {

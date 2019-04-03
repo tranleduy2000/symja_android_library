@@ -14,10 +14,18 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
 public class AttributeFunctions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.Attributes.setEvaluator(new Attributes());
 		F.ClearAttributes.setEvaluator(new ClearAttributes());
 		F.SetAttributes.setEvaluator(new SetAttributes());
+	}
 	}
 
 	/**
@@ -446,10 +454,9 @@ public class AttributeFunctions {
 		return F.Null;
 	}
 
-	private final static AttributeFunctions CONST = new AttributeFunctions();
 
-	public static AttributeFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private AttributeFunctions() {

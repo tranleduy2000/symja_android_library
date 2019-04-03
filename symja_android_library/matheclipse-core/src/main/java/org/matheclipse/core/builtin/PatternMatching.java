@@ -49,7 +49,14 @@ import static org.matheclipse.core.expression.F.RuleDelayed;
 
 public final class PatternMatching {
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.BeginPackage.setEvaluator(new BeginPackage());
 		F.EndPackage.setEvaluator(new EndPackage());
 		F.Begin.setEvaluator(new Begin());
@@ -82,6 +89,7 @@ public final class PatternMatching {
 		F.Unset.setEvaluator(new Unset());
 		F.UpSet.setEvaluator(new UpSet());
 		F.UpSetDelayed.setEvaluator(new UpSetDelayed());
+	}
 	}
 
 	private final static class Begin extends AbstractCoreFunctionEvaluator {
@@ -1863,10 +1871,9 @@ public final class PatternMatching {
 		return F.Null;
 	}
 
-	private final static PatternMatching CONST = new PatternMatching();
 
-	public static PatternMatching initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private PatternMatching() {

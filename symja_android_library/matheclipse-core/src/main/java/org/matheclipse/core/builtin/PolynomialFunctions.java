@@ -88,7 +88,14 @@ import static org.matheclipse.core.expression.F.evalExpandAll;
 import static org.matheclipse.core.expression.F.integer;
 
 public class PolynomialFunctions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.BellY.setEvaluator(new BellY());
 		F.ChebyshevT.setEvaluator(new ChebyshevT());
 		F.ChebyshevU.setEvaluator(new ChebyshevU());
@@ -106,6 +113,7 @@ public class PolynomialFunctions {
 		F.Resultant.setEvaluator(new Resultant());
 		F.RootIntervals.setEvaluator(new RootIntervals());
 		F.Roots.setEvaluator(new Roots());
+	}
 	}
 
 	/**
@@ -2508,10 +2516,9 @@ public class PolynomialFunctions {
 		return F.NIL;
 	}
 
-	private final static PolynomialFunctions CONST = new PolynomialFunctions();
 
-	public static PolynomialFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private PolynomialFunctions() {

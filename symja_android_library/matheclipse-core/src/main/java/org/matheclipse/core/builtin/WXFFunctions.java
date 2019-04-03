@@ -11,10 +11,18 @@ import org.matheclipse.core.interfaces.IDataExpr;
 import org.matheclipse.core.interfaces.IExpr;
 
 public class WXFFunctions {
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.BinarySerialize.setEvaluator(new BinarySerialize());
 		F.BinaryDeserialize.setEvaluator(new BinaryDeserialize());
 		F.ByteArray.setEvaluator(new ByteArray());
+	}
 	}
 
 	private static class BinarySerialize extends AbstractCoreFunctionEvaluator {
@@ -64,7 +72,7 @@ public class WXFFunctions {
 						IExpr temp = WL.deserialize(bArray);
 						// System.out.println(temp);
 						return temp;
-					} catch (ClassCastException cce) {
+					} catch (RuntimeException cce) {
 						if (Config.SHOW_STACKTRACE) {
 							cce.printStackTrace();
 						}
@@ -79,10 +87,9 @@ public class WXFFunctions {
 		return arg1 instanceof IDataExpr && arg1.head().equals(F.ByteArray);
 	}
 
-	private final static WXFFunctions CONST = new WXFFunctions();
 
-	public static WXFFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private WXFFunctions() {

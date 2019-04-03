@@ -61,7 +61,14 @@ import java.util.Random;
 public class StatisticsFunctions {
 	private static final double NEXTDOWNONE = DMath.nextDown(1.0);
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		F.ArithmeticGeometricMean.setEvaluator(new ArithmeticGeometricMean());
 		F.CDF.setEvaluator(new CDF());
 		F.PDF.setEvaluator(new PDF());
@@ -105,6 +112,7 @@ public class StatisticsFunctions {
 		F.UniformDistribution.setEvaluator(new UniformDistribution());
 		F.Variance.setEvaluator(new Variance());
 		F.WeibullDistribution.setEvaluator(new WeibullDistribution());
+	}
 	}
 
 	private static IDistribution getDistribution(final IExpr arg1) {
@@ -4418,10 +4426,9 @@ public class StatisticsFunctions {
 
 
 
-	private final static StatisticsFunctions CONST = new StatisticsFunctions();
 
-	public static StatisticsFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private StatisticsFunctions() {

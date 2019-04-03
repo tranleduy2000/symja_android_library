@@ -13,13 +13,21 @@ import org.matheclipse.core.interfaces.IExpr;
 
 public class FinancialFunctions {
 
-	static {
+	/**
+	 *
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
+	 */
+	private static class Initializer {
+
+		private static void init() {
 		if (ToggleFeature.FINANCE) {
 			F.EffectiveInterest.setEvaluator(new EffectiveInterest());
 			F.TimeValue.setEvaluator(new TimeValue());
 			F.Annuity.setEvaluator(new Annuity());
 			F.AnnuityDue.setEvaluator(new AnnuityDue());
 		}
+	}
 	}
 
 	private static class Annuity extends AbstractEvaluator {
@@ -178,10 +186,9 @@ public class FinancialFunctions {
 		}
 	}
 
-	private final static FinancialFunctions CONST = new FinancialFunctions();
 
-	public static FinancialFunctions initialize() {
-		return CONST;
+	public static void initialize() {
+		Initializer.init();
 	}
 
 	private FinancialFunctions() {
