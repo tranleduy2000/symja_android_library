@@ -56,8 +56,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     protected transient RulesData fRulesData;
 
     /**
-     * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower-
-     * and upper-case function names.
+     * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower- and upper-case
+     * function names.
      */
     protected String fSymbolName;
 
@@ -112,8 +112,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     }
 
     /**
-     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
-     * integer as this expression is canonical less than, equal to, or greater than the specified expression.
+     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive integer as this
+     * expression is canonical less than, equal to, or greater than the specified expression.
      */
     @Override
     public int compareTo(final IExpr expr) {
@@ -128,6 +128,14 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
             return StringX.US_COLLATOR.compare(fSymbolName, ((ISymbol) expr).getSymbolName());
         }
         if (expr.isAST()) {
+            if (expr.isPower()) {
+                // O-4
+                int baseCompare = this.compareTo(expr.base());
+                if (baseCompare == 0) {
+                    return F.C1.compareTo(expr.exponent());
+                }
+                return baseCompare;
+            }
             if (expr.isNot() && expr.first().isSymbol()) {
                 final int cp = compareTo(expr.first());
                 return cp != 0 ? cp : -1;
@@ -261,7 +269,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public ISymbol head() {
+    public final ISymbol head() {
         return F.Symbol;
     }
 
@@ -269,7 +277,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public int hierarchy() {
+    public final int hierarchy() {
         return SYMBOLID;
     }
     /**
@@ -433,7 +441,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public boolean isVariable() {
+    public final boolean isVariable() {
         return (fAttributes & CONSTANT) != CONSTANT;
     }
 
@@ -466,16 +474,13 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     @Override
     public final void assign(final IExpr value) {
         fValue = value;
-        // final Deque<IExpr> localVariableStack = EvalEngine.get().localStack(this);
-        // localVariableStack.remove();
-        // localVariableStack.push(value);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public IExpr assignedValue() {
+    public final IExpr assignedValue() {
         return fValue;
     }
 
@@ -660,7 +665,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * @return <code>null</code> if no rule is defined
      */
     @Override
-    public RulesData getRulesData() {
+    public final RulesData getRulesData() {
         return fRulesData;
     }
 
@@ -680,12 +685,12 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public boolean hasAssignedSymbolValue() {
+    public final boolean hasAssignedSymbolValue() {
         return fValue != null;
     }
 
     @Override
-    public boolean hasFlatAttribute() {
+    public final boolean hasFlatAttribute() {
         return (fAttributes & FLAT) == FLAT;
     }
 
@@ -695,12 +700,12 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     }
 
     @Override
-    public boolean hasOrderlessAttribute() {
+    public final boolean hasOrderlessAttribute() {
         return (fAttributes & ORDERLESS) == ORDERLESS;
     }
 
     @Override
-    public boolean hasOrderlessFlatAttribute() {
+    public final boolean hasOrderlessFlatAttribute() {
         return (fAttributes & FLATORDERLESS) == FLATORDERLESS;
     }
 
@@ -752,7 +757,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public IExpr ofNIL(EvalEngine engine, IExpr... args) {
+    public final IExpr ofNIL(EvalEngine engine, IExpr... args) {
         IAST ast = F.function(this, args);
         IExpr temp = engine.evalLoop(ast);
         if (temp.isPresent() && temp.head() == this) {
@@ -765,7 +770,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public IExpr of(IExpr... args) {
+    public final IExpr of(IExpr... args) {
         return of(EvalEngine.get(), args);
     }
 
@@ -779,7 +784,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     }
 
     @Override
-    public boolean ofQ(IExpr... args) {
+    public final boolean ofQ(IExpr... args) {
         return ofQ(EvalEngine.get(), args);
     }
 

@@ -3090,9 +3090,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return head() == F.Times && 3 <= size();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public boolean isTrigFunction() {
 		int id = headID();

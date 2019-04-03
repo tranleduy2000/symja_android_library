@@ -84,6 +84,7 @@ public class AST2 extends AST1 {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public int argSize() {
 		return SIZE - 1;
 	}
@@ -109,6 +110,11 @@ public class AST2 extends AST1 {
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean contains(Object object) {
+		return arg0.equals(object) || arg1.equals(object) || arg2.equals(object);
+	}
+	/** {@inheritDoc} */
+	@Override
 	public IASTMutable copy() {
 		return new AST2(arg0, arg1, arg2);
 	}
@@ -117,12 +123,7 @@ public class AST2 extends AST1 {
 	public IASTAppendable copyAppendable() {
 		return new AST(arg0, arg1, arg2);
 	}
-	
-	/** {@inheritDoc} */
-	@Override
-	public boolean contains(Object object) {
-		return arg0.equals(object) || arg1.equals(object) || arg2.equals(object);
-	}
+
 
 	@Override
 	public boolean equals(final Object obj) {
@@ -146,20 +147,6 @@ public class AST2 extends AST1 {
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean exists(Predicate<? super IExpr> predicate, int startOffset) {
-		switch (startOffset) {
-		case 0:
-			return predicate.test(arg0) || predicate.test(arg1) || predicate.test(arg2);
-		case 1:
-			return predicate.test(arg1) || predicate.test(arg2);
-		case 2:
-			return predicate.test(arg2);
-		}
-		return false;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public boolean exists(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
 		switch (startOffset) {
 		case 0:
@@ -171,23 +158,19 @@ public class AST2 extends AST1 {
 		}
 		return false;
 	}
+
 	/** {@inheritDoc} */
 	@Override
-	public IAST filterFunction(IASTAppendable filterAST, IASTAppendable restAST,
-			final Function<IExpr, IExpr> function) {
-		IExpr expr = function.apply(arg1);
-		if (expr.isPresent()) {
-			filterAST.append(expr);
-		} else {
-			restAST.append(arg1);
+	public boolean exists(Predicate<? super IExpr> predicate, int startOffset) {
+		switch (startOffset) {
+		case 0:
+			return predicate.test(arg0) || predicate.test(arg1) || predicate.test(arg2);
+		case 1:
+			return predicate.test(arg1) || predicate.test(arg2);
+		case 2:
+			return predicate.test(arg2);
 		}
-		expr = function.apply(arg2);
-		if (expr.isPresent()) {
-			filterAST.append(expr);
-		} else {
-			restAST.append(arg2);
-		}
-		return filterAST;
+		return false;
 	}
 	/** {@inheritDoc} */
 	@Override
@@ -219,16 +202,21 @@ public class AST2 extends AST1 {
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean forAll(Predicate<? super IExpr> predicate, int startOffset) {
-		switch (startOffset) {
-		case 0:
-			return predicate.test(arg0) && predicate.test(arg1) && predicate.test(arg2);
-		case 1:
-			return predicate.test(arg1) && predicate.test(arg2);
-		case 2:
-			return predicate.test(arg2);
+	public IAST filterFunction(IASTAppendable filterAST, IASTAppendable restAST,
+			final Function<IExpr, IExpr> function) {
+		IExpr expr = function.apply(arg1);
+		if (expr.isPresent()) {
+			filterAST.append(expr);
+		} else {
+			restAST.append(arg1);
 		}
-		return true;
+		expr = function.apply(arg2);
+		if (expr.isPresent()) {
+			filterAST.append(expr);
+		} else {
+			restAST.append(arg2);
+		}
+		return filterAST;
 	}
 
 	/** {@inheritDoc} */
@@ -241,6 +229,20 @@ public class AST2 extends AST1 {
 			return predicate.test(arg1, 1) && predicate.test(arg2, 2);
 		case 2:
 			return predicate.test(arg2, 2);
+		}
+		return true;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean forAll(Predicate<? super IExpr> predicate, int startOffset) {
+		switch (startOffset) {
+		case 0:
+			return predicate.test(arg0) && predicate.test(arg1) && predicate.test(arg2);
+		case 1:
+			return predicate.test(arg1) && predicate.test(arg2);
+		case 2:
+			return predicate.test(arg2);
 		}
 		return true;
 	}
@@ -268,31 +270,6 @@ public class AST2 extends AST1 {
 			action.accept(arg2);
 			break;
 		}
-	}
-	@Override
-	public void forEach(int start, int end, ObjIntConsumer<? super IExpr> action) {
-		if (start < end) {
-		switch (start) {
-		case 0:
-			action.accept(arg0, 0);
-				if (start + 1 < end) {
-			action.accept(arg1, 1);
-					if (start + 2 < end) {
-			action.accept(arg2, 2);
-					}
-				}
-			break;
-		case 1:
-			action.accept(arg1, 1);
-				if (start + 1 < end) {
-			action.accept(arg2, 2);
-				}
-			break;
-		case 2:
-			action.accept(arg2, 2);
-			break;
-		}
-	}
 	}
 
 	/** {@inheritDoc} */
@@ -323,6 +300,31 @@ public class AST2 extends AST1 {
 	}
 
 	@Override
+	public void forEach(int start, int end, ObjIntConsumer<? super IExpr> action) {
+		if (start < end) {
+			switch (start) {
+			case 0:
+				action.accept(arg0, 0);
+				if (start + 1 < end) {
+					action.accept(arg1, 1);
+					if (start + 2 < end) {
+						action.accept(arg2, 2);
+					}
+				}
+				break;
+			case 1:
+				action.accept(arg1, 1);
+				if (start + 1 < end) {
+					action.accept(arg2, 2);
+				}
+				break;
+			case 2:
+				action.accept(arg2, 2);
+				break;
+			}
+		}
+	}
+	@Override
 	public IExpr get(int location) {
 		switch (location) {
 		case 0:
@@ -336,11 +338,6 @@ public class AST2 extends AST1 {
 		}
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public IExpr oneIdentity(IExpr defaultValue) {
-		return this;
-	}
 	@Override
 	public int hashCode() {
 		if (hashValue == 0 && arg2 != null) {
@@ -372,6 +369,17 @@ public class AST2 extends AST1 {
 
 	/** {@inheritDoc} */
 	@Override
+	public final boolean isPlus() {
+		return arg0 == F.Plus;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean isPower() {
+		return arg0 == F.Power;
+	}
+	/** {@inheritDoc} */
+	@Override
 	public boolean isSameHead(ISymbol head, int length) {
 		return arg0 == head && length == SIZE;
 	}
@@ -390,9 +398,21 @@ public class AST2 extends AST1 {
 
 	/** {@inheritDoc} */
 	@Override
+	public final boolean isTimes() {
+		return arg0 == F.Times;
+	}
+	/** {@inheritDoc} */
+	@Override
 	public IExpr last() {
 		return arg2;
 	}
+	/** {@inheritDoc} */
+	@Override
+	public final IExpr oneIdentity(IExpr defaultValue) {
+		return this;
+	}
+
+	@Override
 	public IAST removeFromEnd(int fromPosition) {
 		if (fromPosition == 1) {
 			return new AST0(arg0);
@@ -455,11 +475,7 @@ public class AST2 extends AST1 {
 	 */
 	@Override
 	public IExpr[] toArray() {
-		IExpr[] result = new IExpr[SIZE];
-		result[0] = arg0;
-		result[1] = arg1;
-		result[2] = arg2;
-		return result;
+		return new IExpr[] { arg0, arg1, arg2 };
 	}
 
 }

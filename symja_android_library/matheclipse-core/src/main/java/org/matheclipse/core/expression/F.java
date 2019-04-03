@@ -385,10 +385,7 @@ public class F {
     /** BeginPackage("<context-name>") - start a new package definition*/
 	public final static IBuiltInSymbol BeginPackage = F.initFinalSymbol("BeginPackage", ID.BeginPackage);
 
-	/**
-	 * BellB(n) - the Bell number function counts the number of different ways to partition a set that has exactly `n`
-	 * elements
-	 */
+    /** BellB(n) -  the Bell number function counts the number of different ways to partition a set that has exactly `n` elements*/
 	public final static IBuiltInSymbol BellB = F.initFinalSymbol("BellB", ID.BellB);
 
 	/** BellY(n, k, {x1, x2, ... , xN}) - the second kind of Bell polynomials (incomplete Bell polynomials).*/
@@ -416,6 +413,8 @@ public class F {
 	/** Beta(a, b) - is the beta function of the numbers `a`,`b`.*/
 	public final static IBuiltInSymbol Beta = F.initFinalSymbol("Beta", ID.Beta);
 
+    /***/
+    public final static IBuiltInSymbol BetaDistribution = F.initFinalSymbol("BetaDistribution", ID.BetaDistribution);
 	/***/
 	public final static IBuiltInSymbol BetaRegularized = F.initFinalSymbol("BetaRegularized", ID.BetaRegularized);
 
@@ -1920,15 +1919,13 @@ public class F {
 	/** OddQ(x) - returns `True` if `x` is odd, and `False` otherwise.*/
 	public final static IBuiltInSymbol OddQ = F.initFinalSymbol("OddQ", ID.OddQ);
 
-	/***/
+    /** Off( ) - switch off the interactive trace. */
 	public final static IBuiltInSymbol Off = F.initFinalSymbol("Off", ID.Off);
 
-	/***/
+    /** On( ) - switch on the interactive trace. The output is printed in the defined `out` stream.*/
 	public final static IBuiltInSymbol On = F.initFinalSymbol("On", ID.On);
 
-	/**
-	 * OneIdentity - is an attribute specifying that `f(x)` should be treated as equivalent to `x` in pattern matching.
-	 */
+    /** OneIdentity - is an attribute specifying that `f(x)` should be treated as equivalent to `x` in pattern matching.    */
 	public final static IBuiltInSymbol OneIdentity = F.initFinalSymbol("OneIdentity", ID.OneIdentity);
 
 	/** Operate(p, expr) - applies `p` to the head of `expr`.*/
