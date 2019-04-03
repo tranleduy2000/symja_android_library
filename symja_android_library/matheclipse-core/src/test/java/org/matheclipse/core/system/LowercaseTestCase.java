@@ -3915,6 +3915,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// 2)
 		// check("Factor(a*b+(4+4*x+x^2)^2)",//
 		// "16+a*b+32*x+24*x^2+8*x^3+x^4");
+		check("Factor(x^(12)-y^(12), GaussianIntegers->True)", //
+				"Factor(x^12-y^12,GaussianIntegers->True)");
+		check("Factor(1+x^2, GaussianIntegers->True)", //
+				"(-I+x)*(I+x)");
+		check("Factor(1+x^2, Extension->I)", //
+				"(-I+x)*(I+x)");
 
 		// Homogenization example from
 		// https://www.research.ed.ac.uk/portal/files/413486/Solving_Symbolic_Equations_%20with_PRESS.pdf
@@ -3966,9 +3972,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "78-x^80-x^81+x^83+x^84)");
 		check("Factor(4*x^2+3, Extension->I)", "4*(3/4+x^2)");
 		check("Factor(3/4*x^2+9/16, Extension->I)", "3/4*(3/4+x^2)");
-		check("Factor(1+x^2, GaussianIntegers->True)", "(-I+x)*(I+x)");
-		check("Factor(1+x^2, Extension->I)", "(-I+x)*(I+x)");
-		check("Factor(x^10 - 1, Modulus -> 2)", "(1+x)^2*(1+x+x^2+x^3+x^4)^2");
+		check("Factor(x^10 - 1, Modulus -> 2)", //
+				"(1+x)^2*(1+x+x^2+x^3+x^4)^2");
 
 		check("factor(-1+x^16)", "(-1+x)*(1+x)*(1+x^2)*(1+x^4)*(1+x^8)");
 		check("factor((-3)*x^3 +10*x^2-11*x+4)", //
@@ -14737,8 +14742,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testVariance() {
-		check("Variance(BinomialDistribution(n, m))", "(1-m)*m*n");
-		check("Variance(BernoulliDistribution(n))", "(1-n)*n");
+		check("Variance(BinomialDistribution(n, m))", //
+				"(1-m)*m*n");
+		check("Variance(BernoulliDistribution(n))", //
+				"(1-n)*n");
+		check("Variance(BetaDistribution(a,b))", //
+				"(a*b)/((a+b)^2*(1+a+b))");
 		check("Variance(DiscreteUniformDistribution({l, r}))", "1/12*(-1+(1-l+r)^2)");
 		check("Variance(ErlangDistribution(n, m))", "n/m^2");
 		check("Variance(ExponentialDistribution(n))", "1/n^2");
