@@ -2438,7 +2438,7 @@ public class StatisticsFunctions {
 	 * </pre>
 	 */
 	private static class Expectation extends AbstractFunctionEvaluator {
-		// static final double CDF_NUMERIC_THRESHOLD = Config.DOUBLE_EPSILON;
+		// static final double CDF_NUMERIC_THRESHOLD = Config.DOUBLE_TOLERANCE;
 		//
 		// static boolean isFinished(IExpr p_equals, IExpr cumprob) {
 		// boolean finished = false;

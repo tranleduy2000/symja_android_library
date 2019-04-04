@@ -18,78 +18,78 @@ public class WindowFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.BartlettWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return bartlettWindow(x);
-			}
-		}));
-		F.BlackmanHarrisWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return blackmanHarrisWindow(x);
-			}
-		}));
-		F.BlackmanNuttallWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return blackmanNuttallWindow(x);
-			}
-		}));
-		F.BlackmanWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return blackmanWindow(x);
-			}
-		}));
-		F.DirichletWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return dirichletWindow(x);
-			}
-		}));
-		F.FlatTopWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return flatTopWindow(x);
-			}
-		}));
-		F.GaussianWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return gaussianWindow(x);
-			}
-		}));
-		F.HammingWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return hammingWindow(x);
-			}
-		}));
-		F.HannWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x2) {
-				return hannWindow(x2);
-			}
-		}));
-		F.NuttallWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x1) {
-				return nuttallWindow(x1);
-			}
-		}));
-		F.ParzenWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return parzenWindow(x);
-			}
-		}));
-		F.TukeyWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
-			@Override
-			public IExpr apply(IExpr x) {
-				return tukeyWindow(x);
-			}
-		}));
+			F.BartlettWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x11) {
+					return bartlettWindow(x11);
+				}
+			}));
+			F.BlackmanHarrisWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x10) {
+					return blackmanHarrisWindow(x10);
+				}
+			}));
+			F.BlackmanNuttallWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x9) {
+					return blackmanNuttallWindow(x9);
+				}
+			}));
+			F.BlackmanWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x8) {
+					return blackmanWindow(x8);
+				}
+			}));
+			F.DirichletWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x7) {
+					return dirichletWindow(x7);
+				}
+			}));
+			F.FlatTopWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x6) {
+					return flatTopWindow(x6);
+				}
+			}));
+			F.GaussianWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x5) {
+					return gaussianWindow(x5);
+				}
+			}));
+			F.HammingWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x4) {
+					return hammingWindow(x4);
+				}
+			}));
+			F.HannWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x3) {
+					return hannWindow(x3);
+				}
+			}));
+			F.NuttallWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x2) {
+					return nuttallWindow(x2);
+				}
+			}));
+			F.ParzenWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x1) {
+					return parzenWindow(x1);
+				}
+			}));
+			F.TukeyWindow.setEvaluator(new WindowFunction(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x) {
+					return tukeyWindow(x);
+				}
+			}));
 		}
 	}
 
