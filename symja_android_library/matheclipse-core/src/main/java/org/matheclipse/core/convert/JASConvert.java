@@ -363,6 +363,21 @@ public class JASConvert<C extends RingElem<C>> {
 		return result.oneIdentity0();
 	}
 
+	public IExpr complexIntegerPoly2Expr(final GenPolynomial<Complex<edu.jas.arith.BigInteger>> poly)
+			throws ArithmeticException, ClassCastException {
+		if (poly.length() == 0) {
+			return F.C0;
+		}
+		IASTAppendable result = F.PlusAlloc(poly.length());
+		for (Monomial<Complex<edu.jas.arith.BigInteger>> monomial : poly) {
+			Complex<edu.jas.arith.BigInteger> coeff = monomial.coefficient();
+			ExpVector exp = monomial.exponent();
+			IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
+			monomialIntegerToExpr(coeff, exp, monomTimes);
+			result.append(monomTimes.oneIdentity1());
+		}
+		return result.oneIdentity0();
+	}
 	public boolean monomialToExpr(Complex<BigRational> coeff, ExpVector exp, IASTAppendable monomTimes) {
 		BigRational re = coeff.getRe();
 		BigRational im = coeff.getIm();
@@ -371,6 +386,13 @@ public class JASConvert<C extends RingElem<C>> {
 		return expVectorToExpr(exp, monomTimes);
 	}
 
+	public boolean monomialIntegerToExpr(Complex<edu.jas.arith.BigInteger> coeff, ExpVector exp,
+			IASTAppendable monomTimes) {
+		edu.jas.arith.BigInteger re = coeff.getRe();
+		edu.jas.arith.BigInteger im = coeff.getIm();
+		monomTimes.append(F.complex(F.integer(re.getVal()), F.integer(im.getVal())));
+		return expVectorToExpr(exp, monomTimes);
+	}
 	/**
 	 * Convert a jas <code>Integral</code> into a matheclipse expression
 	 * 

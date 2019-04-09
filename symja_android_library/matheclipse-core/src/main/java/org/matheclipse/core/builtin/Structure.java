@@ -1497,10 +1497,12 @@ public class Structure {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			Validate.checkRange(ast, 3, 5);
+			// Validate.checkRange(ast, 3, 5);
 
+			if (ast.size() >= 3 && ast.size() < 5) {
 			int lastIndex = ast.argSize();
 			boolean heads = false;
+				if (ast.size() > 3) {
 			final Options options = new Options(ast.topHead(), ast, lastIndex, engine);
 			IExpr option = options.getOption("Heads");
 			if (option.isPresent()) {
@@ -1508,46 +1510,45 @@ public class Structure {
 				if (option.isTrue()) {
 					heads = true;
 				}
-			} else {
-				Validate.checkRange(ast, 3, 4);
+					}
 			}
 
 			try {
-				final IExpr arg1 = ast.arg1();
+					final IExpr arg1 = ast.arg1();
 				IExpr arg2 = ast.arg2();
 				if (lastIndex == 3) {
-					final IASTAppendable result = F.ListAlloc(10);
-					com.duy.lambda.Function<IExpr, IExpr> sf = new com.duy.lambda.Function<IExpr, IExpr>() {
-						@Override
-						public IExpr apply(IExpr x) {
-							IAST a = F.unaryAST1(arg1, x);
-							result.append(a);
-							return F.NIL;
-						}
-					};
+						final IASTAppendable result = F.ListAlloc(10);
+						com.duy.lambda.Function<IExpr, IExpr> sf = new com.duy.lambda.Function<IExpr, IExpr>() {
+							@Override
+							public IExpr apply(IExpr x) {
+								IAST a = F.unaryAST1(arg1, x);
+								result.append(a);
+								return F.NIL;
+							}
+						};
 
 					VisitorLevelSpecification level = new VisitorLevelSpecification(sf, ast.get(lastIndex), heads,
 							engine);
 
 					arg2.accept(level);
-					result.forEach(result.size(), new Consumer<IExpr>() {
-						@Override
-						public void accept(IExpr x) {
-							engine.evaluate(x);
-						}
-					});
+						result.forEach(result.size(), new Consumer<IExpr>() {
+							@Override
+							public void accept(IExpr x) {
+								engine.evaluate(x);
+							}
+						});
 					// for (int i = 1; i < result.size(); i++) {
 					// engine.evaluate(result.get(i));
 					// }
 
 				} else {
 					if (arg2.isAST()) {
-						engine.evaluate(((IAST) arg2).map(new com.duy.lambda.Function<IExpr, IExpr>() {
-							@Override
-							public IExpr apply(IExpr x) {
-								return F.unaryAST1(arg1, x);
-							}
-						}, 1));
+							engine.evaluate(((IAST) arg2).map(new com.duy.lambda.Function<IExpr, IExpr>() {
+								@Override
+								public IExpr apply(IExpr x) {
+									return F.unaryAST1(arg1, x);
+								}
+							}, 1));
 					} else {
 						engine.evaluate(arg2);
 					}
@@ -1557,6 +1558,8 @@ public class Structure {
 				return e.getValue();
 				// don't catch Throw[] here !
 			}
+		}
+			return F.NIL;
 		}
 
 	}

@@ -3916,7 +3916,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * Returns the ISymbol of the IAST. If the head itself is a IAST it will recursively call head().
 	 */
 	@Override
-	public final ISymbol topHead() {
+	public ISymbol topHead() {
 		IExpr header = head();
 		return header instanceof ISymbol ? (ISymbol) header : header.topHead();
 	}

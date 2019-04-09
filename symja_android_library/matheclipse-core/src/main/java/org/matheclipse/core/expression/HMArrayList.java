@@ -651,7 +651,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	/** {@inheritDoc} */
 	@Override
 	public boolean exists(ObjIntPredicate<? super IExpr> predicate, int startOffset) {
-		int start = firstIndex + startOffset;
+		final int start = firstIndex + startOffset;
 		int j = startOffset;
 		for (int i = start; i < lastIndex; i++) {
 			if (predicate.test(array[i], j++)) {
