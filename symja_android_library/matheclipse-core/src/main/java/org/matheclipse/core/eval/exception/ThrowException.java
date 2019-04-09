@@ -8,6 +8,9 @@ import org.matheclipse.core.interfaces.IExpr;
  */
 public class ThrowException extends FlowControlException {
 
+	public final static ThrowException THROW_FALSE = new ThrowException(F.False);
+
+	public final static ThrowException THROW_TRUE = new ThrowException(F.True);
 	/**
 	 * 
 	 */
