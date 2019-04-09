@@ -1,5 +1,6 @@
 package org.matheclipse.core.eval.exception;
 
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
 /**
