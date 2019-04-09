@@ -46,6 +46,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testAbs() {
+		check("Abs(E-Pi)", //
+				"-E+Pi");
 		check("Abs(x^2)", //
 				"Abs(x)^2");
 		check("Abs(1/2*x)", //
@@ -62,17 +64,28 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"3*Abs(a*b*c)");
 		// check("Abs(x^(-3))", "1/Abs(x)^3");
 
-		check("Abs((1+I)/Sqrt(2))", "1");
-		check("Abs(0)", "0");
-		check("Abs(10/3)", "10/3");
-		check("Abs(-10/3)", "10/3");
-		check("Abs(Indeterminate)", "Indeterminate");
-		check("Abs(Infinity)", "Infinity");
-		check("Abs(-1*Infinity)", "Infinity");
-		check("Abs(ComplexInfinity)", "Infinity");
-		check("Abs(I*Infinity)", "Infinity");
-		check("Abs(Sqrt(Pi))", "Sqrt(Pi)");
-		check("Abs(-3*Sqrt(Pi))", "3*Sqrt(Pi)");
+		check("Abs((1+I)/Sqrt(2))", //
+				"1");
+		check("Abs(0)", //
+				"0");
+		check("Abs(10/3)", //
+				"10/3");
+		check("Abs(-10/3)", //
+				"10/3");
+		check("Abs(Indeterminate)", //
+				"Indeterminate");
+		check("Abs(Infinity)", //
+				"Infinity");
+		check("Abs(-1*Infinity)", //
+				"Infinity");
+		check("Abs(ComplexInfinity)", //
+				"Infinity");
+		check("Abs(I*Infinity)", //
+				"Infinity");
+		check("Abs(Sqrt(Pi))", //
+				"Sqrt(Pi)");
+		check("Abs(-3*Sqrt(Pi))", //
+				"3*Sqrt(Pi)");
 	}
 
 	public void testAbsArg() {
@@ -12409,6 +12422,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSolve() {
+		check("{Re @ #, Im @ #} & /@ Last @@@ Solve(x^3 + 3 == 0, x)", //
+				"{{3^(1/3)/2,3^(5/6)/2},{-3^(1/3),0},{3^(1/3)/2,-3^(5/6)/2}}");
 		check("Solve((x^2 + 2)*(x^2 - 2) == 0, x, Reals)",//
 				"{{x->-Sqrt(2)},{x->Sqrt(2)}}");
 		// github #117
