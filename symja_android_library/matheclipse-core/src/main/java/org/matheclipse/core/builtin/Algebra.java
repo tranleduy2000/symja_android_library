@@ -2109,6 +2109,7 @@ public class Algebra {
 			if (option.isReal()) {
 				return factorModulus(expr, varList, factorSquareFree, option);
 			}
+			if (!factorSquareFree) {
 			option = options.getOption("GaussianIntegers");
 			if (option.isTrue()) {
 				return factorComplex(expr, varList, F.Times, false, false, engine);
@@ -2116,6 +2117,7 @@ public class Algebra {
 			option = options.getOption("Extension");
 			if (option.isImaginaryUnit()) {
 				return factorComplex(expr, varList, F.Times, false, false, engine);
+			}
 			}
 			return F.NIL; // no evaluation
 		}
@@ -5125,10 +5127,6 @@ public class Algebra {
 	 */
 	public static IAST factorComplex(IExpr expr, List<IExpr> varList, ISymbol head, boolean noGCDLCM,
 			boolean numeric2Rational, EvalEngine engine)  {
-		if (varList.size() > 1) {
-			engine.printMessage("Factor: GaussianIntegers for multivariate polynomials are not supported.");
-			return F.NIL;
-		}
 		try {
 		JASConvert<BigRational> jas = new JASConvert<BigRational>(varList, BigRational.ZERO);
 		GenPolynomial<BigRational> polyRat = jas.expr2JAS(expr, numeric2Rational);
@@ -5155,7 +5153,8 @@ public class Algebra {
 		GenPolynomial<BigRational> poly = (GenPolynomial<BigRational>) objects[2];
 
 		ComplexRing<BigRational> cfac = new ComplexRing<BigRational>(BigRational.ZERO);
-		GenPolynomialRing<Complex<BigRational>> cpfac = new GenPolynomialRing<Complex<BigRational>>(cfac, 1, termOrder);
+		GenPolynomialRing<Complex<BigRational>> cpfac = new GenPolynomialRing<Complex<BigRational>>(cfac,
+				varList.size(), termOrder);
 		GenPolynomial<Complex<BigRational>> a = PolyUtil.complexFromAny(cpfac, poly);
 		FactorComplex<BigRational> factorAbstract = new FactorComplex<BigRational>(cfac);
 		SortedMap<GenPolynomial<Complex<BigRational>>, Long> map = factorAbstract.factors(a);
