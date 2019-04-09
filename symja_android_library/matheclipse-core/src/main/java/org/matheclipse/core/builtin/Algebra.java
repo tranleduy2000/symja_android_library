@@ -4089,6 +4089,7 @@ public class Algebra {
 				long minCounter = fComplexityFunction.apply(ast);
 				IExpr temp = visitAST(ast);
 				if (temp.isPresent()) {
+					temp = fEngine.evaluate(temp);
 					long count = fComplexityFunction.apply(temp);
 					if (count <= minCounter) {
 						minCounter = count;
@@ -4323,7 +4324,9 @@ public class Algebra {
 					INumber number = null;
 				IExpr arg1 = timesAST.arg1();
 				if (arg1.isNumber()) {
+					if (!arg1.isZero()) {
 					number = (INumber) arg1;
+					}
 				} else if (arg1.isPlus() && arg1.first().isNumber()) {
 					long minCounter = fComplexityFunction.apply(arg1);
 					IExpr negativeAST = fEngine.evaluate(F.Times(F.CN1, arg1));
