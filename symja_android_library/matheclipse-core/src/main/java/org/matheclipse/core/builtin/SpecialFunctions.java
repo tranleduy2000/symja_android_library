@@ -154,11 +154,18 @@ public class SpecialFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 4);
+			if (ast.size() == 4) {
 
+				try {
 			IExpr z = ast.arg1();
 			IExpr a = ast.arg2();
 			IExpr n = ast.arg3();
+					if (engine.isNumericMode()) {
+						double zn = engine.evalDouble(z);
+						double an = engine.evalDouble(a);
+						double nn = engine.evalDouble(n);
+						return F.num(de.lab4inf.math.functions.IncompleteBeta.incBeta(zn, an, nn));
+					}
 			int ni = n.toIntDefault(Integer.MIN_VALUE);
 			if (ni != Integer.MIN_VALUE) {
 
@@ -177,6 +184,12 @@ public class SpecialFunctions {
 					// z^a * sum
 					return F.Times(F.Power(z, a), sum);
 				}
+				} catch (RuntimeException rex) {
+					if (Config.SHOW_STACKTRACE) {
+						rex.printStackTrace();
+					}
+				}
+			}
 			return F.NIL;
 		}
 
@@ -311,10 +324,11 @@ public class SpecialFunctions {
 					return arg1.negate();
 				}
 			}
-			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
-			if (negExpr.isPresent()) {
-				return F.Subtract(F.C2, F.Erfc(negExpr));
-			}
+			// don't transform negative arg:
+			// IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
+			// if (negExpr.isPresent()) {
+			// return F.Subtract(F.C2, F.Erfc(negExpr));
+			// }
 			return F.NIL;
 		}
 

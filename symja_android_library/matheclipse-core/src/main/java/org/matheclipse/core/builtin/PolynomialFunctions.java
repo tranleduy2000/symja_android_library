@@ -76,16 +76,7 @@ import edu.jas.ufd.Squarefree;
 import edu.jas.ufd.SquarefreeFactory;
 
 import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.C3;
-import static org.matheclipse.core.expression.F.C4;
-import static org.matheclipse.core.expression.F.C5;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.evalExpandAll;
-import static org.matheclipse.core.expression.F.integer;
 
 public class PolynomialFunctions {
 	/**
