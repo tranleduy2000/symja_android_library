@@ -981,17 +981,17 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(final Object obj) {
-        return this == obj;
+    public int hashCode() {
+        return (fSymbolName == null) ? 31 : fSymbolName.hashCode();
     }
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() {
-        return (fSymbolName == null) ? 31 : fSymbolName.hashCode();
+    public boolean equals(final Object obj) {
+        return this == obj;
     }
+
 
     @Override
     public String toString() {

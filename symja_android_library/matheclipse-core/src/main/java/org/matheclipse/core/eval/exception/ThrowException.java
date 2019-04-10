@@ -19,17 +19,26 @@ public class ThrowException extends FlowControlException {
 
 	
 	final private IExpr value;
+	final private IExpr tag;
 
 	public ThrowException() {
 		this(null);
 	}
 
 	public ThrowException(final IExpr val) {
+		this(val, F.None);
+	}
+
+	public ThrowException(final IExpr val, final IExpr tag) {
 		super("Throw an exception for Catch[].");
-		value = val;
+		this.value = val;
+		this.tag = tag;
 	}
 
 	public IExpr getValue() {
 		return value;
+	}
+	public IExpr getTag() {
+		return tag;
 	}
 }
