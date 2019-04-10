@@ -10876,9 +10876,28 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testReap() {
-		check("Reap(x)", "{x,{}}");
-		check("Reap(Sow(a); b; Sow(c); Sow(d); e)", "{e,{{a,c,d}}}");
-		check("Reap(Sum(Sow(i0^2) + 1, {i0, 10}))", "{395,{{1,4,9,16,25,36,49,64,81,100}}}");
+		check("Reap(Sow(1); Sow(2); Sow(3))", //
+				"{3,{{1,2,3}}}");
+		check("Reap(Sow(1, {x, x}); Sow(1); Sow(2); Sow(3, x) )", //
+				"{3,{{1,1,3},{1,2}}}");
+		check("Reap(Sow(1, {x, x}); Sow(2, y); Sow(3, x) )", //
+				"{3,{{1,1,3},{2}}}");
+		check("Reap(Sow(1, {x, x}); Sow(2, y); Sow(3, x), _ )", //
+				"{3,{{1,1,3},{2}}}");
+		check("Reap(Sow(1, {x, x}); Sow(2, y); Sow(3, x), _, f )", //
+				"{3,{f(x,{1,1,3}),f(y,{2})}}");
+		check("Reap(Sow(1, {x, x}); Sow(2, y); Sow(3, x), y, f )", //
+				"{3,{f(y,{2})}}");
+		check("Reap(Sow(1, {x, x}); Sow(2); Sow(3, x), _, f )", //
+				"{3,{f(x,{1,1,3}),f(None,{2})}}");
+		check("Reap(Sow(1, {x, x}); Sow(2,y); Sow(3, x), _, Rule )", //
+				"{3,{x->{1,1,3},y->{2}}}");
+		check("Reap(x)", //
+				"{x,{}}");
+		check("Reap(Sow(a); b; Sow(c); Sow(d); e)", //
+				"{e,{{a,c,d}}}");
+		check("Reap(Sum(Sow(i0^2) + 1, {i0, 10}))", //
+				"{395,{{1,4,9,16,25,36,49,64,81,100}}}");
 	}
 
 	public void testRefine() {
