@@ -4663,7 +4663,7 @@ public final class ListFunctions {
 		 */
 		public static IExpr evalBlockWithoutReap(IExpr expr, IAST localVariablesList) {
 			EvalEngine engine = EvalEngine.get();
-			IASTAppendable reapList = engine.getReapList();
+			java.util.List<IExpr> reapList = engine.getReapList();
 			boolean quietMode = engine.isQuietMode();
 			try {
 				engine.setQuietMode(true);

@@ -458,6 +458,13 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 		return new IExpr[] { arg0 };
 	}
 
+	/**
+	 * Returns the ISymbol of the IAST. If the head itself is a IAST it will recursively call head().
+	 */
+	@Override
+	public final ISymbol topHead() {
+		return arg0 instanceof ISymbol ? (ISymbol) arg0 : arg0.topHead();
+	}
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeShort(fEvalFlags);

@@ -215,6 +215,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 				boolean matched = false;
 				IExpr rhs = patternMap.substituteSymbols(fRightHandSide);
 				try {
+//					if (fLhsPatternExpr.isAST(F.Integrate)) {
+//						System.out.println(" :: " + getLHSPriority()+ " "+fLhsPatternExpr +" -> " +rhs);
+//					}
 					// System.out.println(rhs.toString());
 					fReturnResult = engine.evaluate(rhs);
 					matched = true;

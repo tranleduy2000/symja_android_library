@@ -883,7 +883,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *            the binary predicate
 	 * @return
 	 */
-	@Override
 	public boolean compareAdjacent(BiPredicate<IExpr, IExpr> predicate) {
 		if (size() < 2) {
 			return false;
@@ -1332,7 +1331,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param startValue
 	 * @return the accumulated elements
 	 */
-	@Override
 	public IExpr foldLeft(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start) {
 		final IExpr[] value = { startValue };
 		forEach(start, size(), new Consumer<IExpr>() {
@@ -1354,7 +1352,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param startValue
 	 * @return the accumulated elements
 	 */
-	@Override
 	public IExpr foldRight(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start) {
 		IExpr value = startValue;
 		int end = argSize();
@@ -2251,7 +2248,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return isSameHead(F.DirectedInfinity, 2) && arg1().equals(x);
 	}
 
-	@Override
 	public boolean isDiscreteDistribution() {
 		if (head().isBuiltInSymbol()) {
 			IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
@@ -2259,7 +2255,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 		return false;
 	}
-	@Override
 	public boolean isDistribution() {
 		if (head().isBuiltInSymbol()) {
 			IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
@@ -3419,7 +3414,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *            right argument of the binary functions <code>apply()</code> method.
 	 * @return the given list
 	 */
-	@Override
 	public Collection<IExpr> mapRight(Collection<IExpr> list, BiFunction<IExpr, IExpr, IExpr> binaryFunction,
 									  IExpr rightArg) {
 		for (int i = 1; i < size(); i++) {
@@ -3916,7 +3910,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * Returns the ISymbol of the IAST. If the head itself is a IAST it will recursively call head().
 	 */
 	@Override
-	public final ISymbol topHead() {
+	public ISymbol topHead() {
 		IExpr header = head();
 		return header instanceof ISymbol ? (ISymbol) header : header.topHead();
 	}
