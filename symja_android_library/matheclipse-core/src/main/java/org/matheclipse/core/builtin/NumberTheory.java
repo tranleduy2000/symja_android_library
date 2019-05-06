@@ -798,7 +798,7 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
+			if (ast.size() >= 2 && ast.size() <= 3) {
 
 			IExpr arg1 = ast.arg1();
 
@@ -813,11 +813,11 @@ public final class NumberTheory {
 			}
 			if (arg1 instanceof INum) {
 				// arg1 = F.fraction(((INum) arg1).getRealPart());
-				return realToCF(((INum) arg1), maxIterations, engine);
+					return realToContinuedFraction(((INum) arg1), maxIterations, engine);
 			} else if (arg1.isAST() || arg1.isSymbol() && arg1.isNumericFunction()) {
 				IExpr num = engine.evalN(arg1);
 				if (num instanceof INum) {
-					return realToCF(((INum) num), maxIterations, engine);
+						return realToContinuedFraction(((INum) num), maxIterations, engine);
 				}
 			}
 
@@ -851,24 +851,25 @@ public final class NumberTheory {
 
 			}
 
+			}
 			return F.NIL;
 		}
 
-		private static IAST realToCF(INum d, int limit, EvalEngine engine) {
-			final double D = d.getRealPart();
+		private static IAST realToContinuedFraction(INum value, int iterationLimit, EvalEngine engine) {
+			final double doubleValue = value.getRealPart();
 			IASTAppendable continuedFractionList = F.ListAlloc(10);
-			int ip = (int) D;
-			if (d.isNumIntValue()) {
-				continuedFractionList.append(F.ZZ((int) D));
+			int ip = (int) doubleValue;
+			if (value.isNumIntValue()) {
+				continuedFractionList.append(F.ZZ((int) Math.rint(doubleValue)));
 				return continuedFractionList;
 			}
 
 			int aNow = ip;
-			double tNow = D - aNow;
+			double tNow = doubleValue - aNow;
 			double tNext;
 			int aNext;
 			continuedFractionList.append(F.ZZ(aNow));
-			for (int i = 0; i < limit - 1; i++) {
+			for (int i = 0; i < iterationLimit - 1; i++) {
 				if (i >= 99) {
 					engine.printMessage(
 							"ContinuedFraction: calculations of double number values require a iteration limit less equal 100.");
@@ -889,7 +890,7 @@ public final class NumberTheory {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.NHOLDREST);
+			newSymbol.setAttributes(ISymbol.LISTABLE);
 		}
 
 	}
