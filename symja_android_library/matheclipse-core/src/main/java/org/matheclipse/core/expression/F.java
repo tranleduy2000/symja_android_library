@@ -3053,6 +3053,7 @@ public class F {
 
     private static void createInverseFunctionMap() {
         UNARY_INVERSE_FUNCTIONS.put(Abs, Function(Times(CN1, Slot1)));
+		UNARY_INVERSE_FUNCTIONS.put(ProductLog, Function(Times(Slot1, Power(E, Slot1))));
         UNARY_INVERSE_FUNCTIONS.put(Cos, ArcCos);
         UNARY_INVERSE_FUNCTIONS.put(Cot, ArcCot);
         UNARY_INVERSE_FUNCTIONS.put(Csc, ArcCsc);
@@ -3079,6 +3080,13 @@ public class F {
         UNARY_INVERSE_FUNCTIONS.put(ArcSinh, Sinh);
         UNARY_INVERSE_FUNCTIONS.put(ArcTanh, Tanh);
         UNARY_INVERSE_FUNCTIONS.put(Log, Exp);
+		UNARY_INVERSE_FUNCTIONS.put(Identity, Identity);
+
+		UNARY_INVERSE_FUNCTIONS.put(Erf, InverseErf);
+		UNARY_INVERSE_FUNCTIONS.put(Erfc, InverseErfc);
+
+		UNARY_INVERSE_FUNCTIONS.put(InverseErf, Erf);
+		UNARY_INVERSE_FUNCTIONS.put(InverseErfc, Erfc);
     }
 
     /**
@@ -3165,7 +3173,8 @@ public class F {
      * Create a pattern for pattern-matching and term rewriting
      *
      * @param symbol
-     * @param def    use a default value for this pattern if necessary
+	 * @param def
+	 *            use a default value for this pattern if necessary
      * @return IPattern
      */
     public static IPattern $p(final ISymbol symbol, boolean def) {
