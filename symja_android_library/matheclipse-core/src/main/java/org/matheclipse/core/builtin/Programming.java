@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -2754,51 +2753,44 @@ public final class Programming {
 	}
 
 	/**
-	 * Remember which local variable names (appended with the module counter) we use in the given
-	 * <code>variablesMap</code>.
+	 * Remember which local variable names we use in the given <code>assignedValues</code> and
+	 * <code>assignedRules</code>.
 	 *
 	 * @param variablesList
-	 *            initializer variables list from the <code>Module</code> function
-	 * @param varAppend
-	 *            the module counter string which appended to the variable names.
-	 * @param variablesMap
-	 *            the resulting module variables map
+	 *            initializer variables list from the <code>Block</code> function
+	 * @param assignedValues
+	 *            the variables mapped to their values (IExpr) before evaluating the block
+	 * @param assignedRules
+	 *            the variables mapped to their rules (RulesData) before evaluating the block
 	 * @param engine
 	 *            the evaluation engine
 	 */
-	public static void rememberBlockVariables(IAST variablesList, final String varAppend,
-			final java.util.Map<ISymbol, ISymbol> variablesMap, final EvalEngine engine) {
-		ISymbol oldSymbol;
-		ISymbol newSymbol;
+	public static void rememberBlockVariables(IAST variablesList, final java.util.Map<ISymbol, IExpr> assignedValues,
+											  final java.util.Map<ISymbol, RulesData> assignedRules, final EvalEngine engine) {
+		ISymbol variableSymbol;
 		for (int i = 1; i < variablesList.size(); i++) {
 			if (variablesList.get(i).isSymbol()) {
-				oldSymbol = (ISymbol) variablesList.get(i);
-				newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
-				variablesMap.put(oldSymbol, newSymbol);
+				variableSymbol = (ISymbol) variablesList.get(i);
+				assignedValues.put(variableSymbol, variableSymbol.assignedValue());
+				assignedRules.put(variableSymbol, variableSymbol.getRulesData());
+				variableSymbol.assign(null);
+				variableSymbol.setRulesData(null);
 			} else {
 				if (variablesList.get(i).isAST(F.Set, 3)) {
 					final IAST setFun = (IAST) variablesList.get(i);
 					if (setFun.arg1().isSymbol()) {
-						oldSymbol = (ISymbol) setFun.arg1();
-						newSymbol = F.Dummy(oldSymbol.toString() + varAppend);
-						variablesMap.put(oldSymbol, newSymbol);
-					}
-					}
-			}
-		}
-		for (int i = 1; i < variablesList.size(); i++) {
-			if (variablesList.get(i).isAST(F.Set, 3)) {
-				final IAST setFun = (IAST) variablesList.get(i);
-				if (setFun.arg1().isSymbol()) {
-					oldSymbol = (ISymbol) setFun.arg1();
-					newSymbol = (ISymbol) variablesMap.get(oldSymbol);
-					IExpr temp = F.subst(engine.evaluate(setFun.arg2()), variablesMap);
-					engine.evaluate(F.Set(newSymbol, temp));
+						variableSymbol = (ISymbol) setFun.arg1();
+						assignedValues.put(variableSymbol, variableSymbol.assignedValue());
+						assignedRules.put(variableSymbol, variableSymbol.getRulesData());
+						IExpr temp = engine.evaluate(setFun.arg2());
+						variableSymbol.assign(temp);
+						variableSymbol.setRulesData(null);
 				}
 			}
 		}
 	}
 
+	}
 
 	/**
 	 * Substitute the variable names from the list with temporary dummy variable names in the &quot;module-block&quot;..
