@@ -1,6 +1,7 @@
 package org.matheclipse.core.visit;
 
 import com.duy.lambda.Function;
+import com.duy.lambda.Supplier;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
@@ -163,12 +164,13 @@ public class VisitorReplaceAll extends VisitorExpr {
 	}
 
 	@Override
-	public IExpr visit(IASTMutable ast) {
-		IExpr temp = fFunction.apply(ast);
-		if (temp.isPresent()) {
-			return temp;
-		}
-		return visitAST(ast);
+	public IExpr visit(final IASTMutable ast) {
+		return fFunction.apply(ast).orElseGet(new Supplier<IExpr>() {
+			@Override
+			public IExpr get() {
+				return VisitorReplaceAll.this.visitAST(ast);
+			}
+		});
 	}
 
 	@Override

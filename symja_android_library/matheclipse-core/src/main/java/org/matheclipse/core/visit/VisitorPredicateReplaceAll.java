@@ -3,7 +3,6 @@ package org.matheclipse.core.visit;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
-import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -39,11 +38,7 @@ public class VisitorPredicateReplaceAll extends VisitorReplaceAll {
 		if (fPredicate.test(ast)) {
 			return visitAST(ast);
 		}
-		IExpr temp = fFunction.apply(ast);
-		if (temp.isPresent()) {
-			return temp;
-		}
-		return F.NIL;
+		return fFunction.apply(ast);
 	}
 
 }

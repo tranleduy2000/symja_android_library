@@ -134,6 +134,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testAnd() {
+		check("a && b && True && c", "a&&b&&c");
 		check("True && True && False", "False");
 		check("a && b && True && c", "a&&b&&c");
 		check("And()", "True");

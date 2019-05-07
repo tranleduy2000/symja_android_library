@@ -1,5 +1,7 @@
 package org.matheclipse.core.visit;
 
+import com.duy.lambda.Supplier;
+
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -105,8 +107,7 @@ public class VisitorExpr extends AbstractVisitor {
 	}
 
 	/**
-	 * Visit an <code>IAST</code> with the given head and no arguments (i.e.
-	 * <code>head[]</code>).
+	 * Visit an <code>IAST</code> with the given head and no arguments (i.e. <code>head[]</code>).
 	 * 
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
@@ -115,8 +116,7 @@ public class VisitorExpr extends AbstractVisitor {
 	}
 
 	/**
-	 * Visit an <code>IAST</code> with the given head and one argument (i.e.
-	 * <code>head[arg1]</code>).
+	 * Visit an <code>IAST</code> with the given head and one argument (i.e. <code>head[arg1]</code>).
 	 * 
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
@@ -125,8 +125,7 @@ public class VisitorExpr extends AbstractVisitor {
 	}
 
 	/**
-	 * Visit an <code>IAST</code> with the given head and two arguments (i.e.
-	 * <code>head[arg1, arg2]</code>).
+	 * Visit an <code>IAST</code> with the given head and two arguments (i.e. <code>head[arg1, arg2]</code>).
 	 * 
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
@@ -139,7 +138,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return <code>F.NIL</code>, if no evaluation is possible
 	 */
 	@Override
-	public IExpr visit(IASTMutable ast) {
+	public IExpr visit(final IASTMutable ast) {
 		IExpr temp = F.NIL;
 		switch (ast.size()) {
 		case 1:
@@ -152,17 +151,18 @@ public class VisitorExpr extends AbstractVisitor {
 			temp = visit3(ast.head(), ast.arg1(), ast.arg2());
 			break;
 		}
-		if (temp.isPresent()) {
-			return temp;
-		}
-		return visitAST(ast);
+		return temp.orElseGet(new Supplier<IExpr>() {
+			@Override
+			public IExpr get() {
+				return VisitorExpr.this.visitAST(ast);
+			}
+		});
 	}
 
 	/**
 	 * 
-	 * @return the cloned <code>IAST</code> with changed evaluated
-	 *         subexpressions, or <code>F.NIL</code>, if no evaluation is
-	 *         possible
+	 * @return the cloned <code>IAST</code> with changed evaluated subexpressions, or <code>F.NIL</code>, if no
+	 *         evaluation is possible
 	 */
 	protected IExpr visitAST(IAST ast) {
 		IExpr temp;

@@ -1,5 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.lambda.Supplier;
+
 import org.matheclipse.core.builtin.Structure;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -177,13 +179,15 @@ public class ComplexExpand extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 		Validate.checkRange(ast, 1, 2);
 		IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
-		if (temp.isPresent()) {
-			return temp;
-		}
-		return complexExpand(ast.arg1(), engine);
+		return temp.orElseGet(new Supplier<IExpr>() {
+			@Override
+			public IExpr get() {
+				return complexExpand(ast.arg1(), engine);
+			}
+		});
 	}
 
 	private static IExpr complexExpand(IExpr arg1, EvalEngine engine) {

@@ -249,10 +249,7 @@ public class FunctionExpand extends AbstractEvaluator {
 				assumptionExpr = arg2;
 			}
 			final Options options = new Options(ast.topHead(), ast, 2, engine);
-			IExpr option = options.getOption("Assumptions");
-			if (option.isPresent()) {
-				assumptionExpr = option;
-			}
+			assumptionExpr = options.getOption("Assumptions").orElse(assumptionExpr);
 		}
 		if (assumptionExpr.isPresent()) {
 			if (assumptionExpr.isAST()) {
