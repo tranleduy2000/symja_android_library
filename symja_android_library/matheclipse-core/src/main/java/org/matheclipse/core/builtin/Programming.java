@@ -260,8 +260,7 @@ public final class Programming {
 			if (!ToggleFeature.COMPILE) {
 				return F.NIL;
 			}
-			engine.printMessage("Compile: Compile() function not implemented! ");
-			return F.Null;
+			return engine.printMessage("Compile: Compile() function not implemented! ");
 		}
 
 	}
@@ -692,8 +691,7 @@ public final class Programming {
 					}
 				}
 				if (iterations < 0) {
-					engine.printMessage("FixedPoint: Non-negative integer expected.");
-					return F.NIL;
+					return engine.printMessage("FixedPoint: Non-negative integer expected.");
 				}
 				if (iterations > 0) {
 					IExpr last;
@@ -816,8 +814,7 @@ public final class Programming {
 					}
 				}
 				if (iterations < 0) {
-					engine.printMessage("FixedPoint: Non-negative integer expected.");
-					return F.NIL;
+					return engine.printMessage("FixedPoint: Non-negative integer expected.");
 				}
 				if (iterations > 0) {
 					IExpr last;
@@ -1490,8 +1487,7 @@ public final class Programming {
 			}
 
 			if (ast.isAST1()) {
-				engine.printMessage("On: " + ast + " - disabling messages currently not supported");
-				return F.Null;
+				return engine.printMessage("Off: " + ast + " - disabling messages currently not supported");
 			}
 
 			return F.NIL;
@@ -1853,8 +1849,7 @@ public final class Programming {
 					} else {
 						arg1 = ast.arg1();
 						if (!arg1.isAST()) {
-							engine.printMessage("Part: " + ast + " could not extract a part");
-							return F.NIL;
+							return engine.printMessage("Part: " + ast + " could not extract a part");
 						}
 					}
 					IASTMutable evaledAST = F.NIL;
@@ -1906,7 +1901,7 @@ public final class Programming {
 					IExpr temp = symbol.assignedValue();
 					// RulesData rd = symbol.getRulesData();
 					if (temp == null) {
-						engine.printMessage(
+						return engine.printMessage(
 								"Set: no value defined for symbol '" + symbol.toString() + "' in Part() expression.");
 					} else {
 						try {
@@ -1922,7 +1917,7 @@ public final class Programming {
 									return rightHandSide;
 								}
 						} catch (RuntimeException npe) {
-							engine.printMessage("Set: wrong argument for Part[] function: " + part.toString()
+							return engine.printMessage("Set: wrong argument for Part[] function: " + part.toString()
 									+ " selects no part expression.");
 						}
 					}
@@ -2288,7 +2283,7 @@ public final class Programming {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if ((ast.size() & 0x0001) != 0x0000) {
-				engine.printMessage("Switch: number of arguments must be odd");
+				return engine.printMessage("Switch: number of arguments must be odd");
 			}
 			if (ast.size() > 3) {
 				final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -2382,13 +2377,11 @@ public final class Programming {
 					arg2 = ((ISignedNumber) arg2).ceilFraction();
 					seconds = ((ISignedNumber) arg2).toLong();
 				} else {
-					engine.printMessage("TimeConstrained: " + ast.arg2().toString() + " is not a Java long value.");
-					return F.NIL;
+					return engine.printMessage("TimeConstrained: " + ast.arg2().toString() + " is not a Java long value.");
 				}
 
 			} catch (ArithmeticException ae) {
-				engine.printMessage("TimeConstrained: " + ast.arg2().toString() + " is not a Java long value.");
-				return F.NIL;
+				return engine.printMessage("TimeConstrained: " + ast.arg2().toString() + " is not a Java long value.");
 			}
 			final ExecutorService executor = Executors.newSingleThreadExecutor();
 			TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor);// Executors.newSingleThreadExecutor());
@@ -2573,8 +2566,7 @@ public final class Programming {
 			if (ast.size() == 2) {
 				return ast.arg1();
 			}
-			engine.printMessage("Unevaluated: expected only one argument.");
-			return F.NIL;
+			return engine.printMessage("Unevaluated: expected only one argument.");
 		}
 
 		@Override
@@ -2638,7 +2630,7 @@ public final class Programming {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (((ast.argSize()) & 0x0001) == 0x0001) {
-				engine.printMessage("Which: number of arguments must be even");
+				return engine.printMessage("Which: number of arguments must be even");
 			}
 			for (int i = 1; i < ast.size(); i += 2) {
 				IExpr temp = engine.evaluate(ast.get(i));

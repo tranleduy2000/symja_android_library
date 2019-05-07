@@ -1,7 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import static org.matheclipse.core.expression.F.AbsArg;
-import static org.matheclipse.core.expression.F.BesselJ;
 import static org.matheclipse.core.expression.F.ComplexExpand;
 import static org.matheclipse.core.expression.F.CreateDirectory;
 import static org.matheclipse.core.expression.F.D;
@@ -16,7 +14,6 @@ import static org.matheclipse.core.expression.F.Export;
 import static org.matheclipse.core.expression.F.FindInstance;
 import static org.matheclipse.core.expression.F.FindRoot;
 import static org.matheclipse.core.expression.F.FrobeniusSolve;
-import static org.matheclipse.core.expression.F.FromPolarCoordinates;
 import static org.matheclipse.core.expression.F.FunctionExpand;
 import static org.matheclipse.core.expression.F.GroebnerBasis;
 import static org.matheclipse.core.expression.F.HeavisideTheta;
@@ -39,7 +36,6 @@ import static org.matheclipse.core.expression.F.NIntegrate;
 import static org.matheclipse.core.expression.F.NMaximize;
 import static org.matheclipse.core.expression.F.NMinimize;
 import static org.matheclipse.core.expression.F.NSolve;
-import static org.matheclipse.core.expression.F.Names;
 import static org.matheclipse.core.expression.F.NonCommutativeMultiply;
 import static org.matheclipse.core.expression.F.OptimizeExpression;
 import static org.matheclipse.core.expression.F.Out;
@@ -47,10 +43,7 @@ import static org.matheclipse.core.expression.F.Outer;
 import static org.matheclipse.core.expression.F.Plot;
 import static org.matheclipse.core.expression.F.Plot3D;
 import static org.matheclipse.core.expression.F.Product;
-import static org.matheclipse.core.expression.F.Rationalize;
 import static org.matheclipse.core.expression.F.Share;
-import static org.matheclipse.core.expression.F.Sign;
-import static org.matheclipse.core.expression.F.SignCmp;
 import static org.matheclipse.core.expression.F.Solve;
 import static org.matheclipse.core.expression.F.Sum;
 import static org.matheclipse.core.expression.F.Taylor;
@@ -68,8 +61,6 @@ public final class FunctionDefinitions {
 	private static class Initializer {
 
 		private static void init() {
-		AbsArg.setEvaluator(new org.matheclipse.core.reflection.system.AbsArg());
-		BesselJ.setEvaluator(new org.matheclipse.core.reflection.system.BesselJ());
 		ComplexExpand.setEvaluator(new org.matheclipse.core.reflection.system.ComplexExpand());
 		CreateDirectory.setEvaluator(new org.matheclipse.core.reflection.system.CreateDirectory());
 		D.setEvaluator(new org.matheclipse.core.reflection.system.D());
@@ -84,7 +75,6 @@ public final class FunctionDefinitions {
 		FindInstance.setEvaluator(new org.matheclipse.core.reflection.system.FindInstance());
 		FindRoot.setEvaluator(new org.matheclipse.core.reflection.system.FindRoot());
 		FrobeniusSolve.setEvaluator(new org.matheclipse.core.reflection.system.FrobeniusSolve());
-		FromPolarCoordinates.setEvaluator(new org.matheclipse.core.reflection.system.FromPolarCoordinates());
 		FunctionExpand.setEvaluator(new org.matheclipse.core.reflection.system.FunctionExpand());
 		GroebnerBasis.setEvaluator(new org.matheclipse.core.reflection.system.GroebnerBasis());
 		HeavisideTheta.setEvaluator(new org.matheclipse.core.reflection.system.HeavisideTheta());
@@ -101,7 +91,6 @@ public final class FunctionDefinitions {
 		Maximize.setEvaluator(new org.matheclipse.core.reflection.system.Maximize());
 		Minimize.setEvaluator(new org.matheclipse.core.reflection.system.Minimize());
 		MonomialList.setEvaluator(new org.matheclipse.core.reflection.system.MonomialList());
-		Names.setEvaluator(new org.matheclipse.core.reflection.system.Names());
 		NDSolve.setEvaluator(new org.matheclipse.core.reflection.system.NDSolve());
 		NFourierTransform.setEvaluator(new org.matheclipse.core.reflection.system.NFourierTransform());
 		NIntegrate.setEvaluator(new org.matheclipse.core.reflection.system.NIntegrate());
@@ -116,14 +105,10 @@ public final class FunctionDefinitions {
 		Plot3D.setEvaluator(new org.matheclipse.core.reflection.system.Plot3D());
 		Product.setEvaluator(new org.matheclipse.core.reflection.system.Product());
 
-		Rationalize.setEvaluator(new org.matheclipse.core.reflection.system.Rationalize());
 		Share.setEvaluator(new org.matheclipse.core.reflection.system.Share());
-		Sign.setEvaluator(new org.matheclipse.core.reflection.system.Sign());
-		SignCmp.setEvaluator(new org.matheclipse.core.reflection.system.SignCmp());
 		Solve.setEvaluator(new org.matheclipse.core.reflection.system.Solve());
 		Sum.setEvaluator(new org.matheclipse.core.reflection.system.Sum());
 		Taylor.setEvaluator(new org.matheclipse.core.reflection.system.Taylor());
-		ToPolarCoordinates.setEvaluator(new org.matheclipse.core.reflection.system.ToPolarCoordinates());
 		TrigExpand.setEvaluator(new org.matheclipse.core.reflection.system.TrigExpand());
 		TrigReduce.setEvaluator(new org.matheclipse.core.reflection.system.TrigReduce());
 		TrigToExp.setEvaluator(new org.matheclipse.core.reflection.system.TrigToExp());

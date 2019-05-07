@@ -175,7 +175,10 @@ public class StatisticsFunctions {
 
 		public IExpr cdf(IAST dist, IExpr x);
 
-		IExpr inverseCDF(IAST dist, IExpr x);
+		public IExpr inverseCDF(IAST dist, IExpr x);
+		// default IExpr inverseCDF(IAST dist, IExpr x) {
+		// return F.NIL;
+		// }
 	}
 
 	private static class InverseCDF extends AbstractFunctionEvaluator {
@@ -238,9 +241,10 @@ public class StatisticsFunctions {
 		 */
 		IExpr pdf(IAST dist, IExpr x);
 		/**
-		 * Call the pure PDF function.
+		 * Call the pure (CDF, InverseCDF, PDF,...) function.
 		 *
-		 * @param pureFunction
+		 * @param function
+		 *            the pure function
 		 * @param x
 		 *            if <code>F.NIL</code> return the pure function unevaluated. If <code>List(...)</code> map the pure
 		 *            function over all elements.
@@ -540,6 +544,19 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST1()) {
+				IExpr p = dist.arg1();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{1, # > 1 - p}}, 0), 0 <= # <= 1)& ) $]
+						F.Function(F.ConditionalExpression(
+								F.Piecewise(F.List(F.List(F.C1, F.Greater(F.Slot1, F.Subtract(F.C1, p)))), F.C0),
+								F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
 				IExpr p = dist.arg1();
@@ -605,6 +622,26 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST2()) {
+				//
+				IExpr a = dist.arg1();
+				IExpr b = dist.arg2();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{InverseBetaRegularized(#, a, b), 0 < # < 1}, {0, # <=
+						// 0}}, 1), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(
+										F.Piecewise(F.List(
+												F.List(F.InverseBetaRegularized(F.Slot1, a, b),
+														F.Less(F.C0, F.Slot1, F.C1)),
+												F.List(F.C0, F.LessEqual(F.Slot1, F.C0))), F.C1),
+										F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST2()) {
@@ -944,8 +981,7 @@ public class StatisticsFunctions {
 								.toIntDefault(Integer.MIN_VALUE);
 					}
 					if (index < 0 || index >= res.length) {
-						engine.printMessage("BinCounts: determined not allowed bin index for " + temp.toString());
-						return F.NIL;
+						return engine.printMessage("BinCounts: determined not allowed bin index for " + temp.toString());
 					}
 					res[index - xMin]++;
 				}
@@ -1096,6 +1132,10 @@ public class StatisticsFunctions {
 			}
 			return F.NIL;
 		}
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			return F.NIL;
+		}
 
 		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
@@ -1227,6 +1267,24 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST1()) {
+				IExpr v = dist.arg1();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{2*InverseGammaRegularized(v/2, 0, #), 0 < # < 1}, {0,
+						// # <= 0}}, Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(F.Piecewise(
+										F.List(F.List(
+												F.Times(F.C2,
+														F.InverseGammaRegularized(F.Times(F.C1D2, v), F.C0, F.Slot1)),
+												F.Less(F.C0, F.Slot1, F.C1)), F.List(F.C0, F.LessEqual(F.Slot1, F.C0))),
+										F.oo), F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
 		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
@@ -1410,6 +1468,26 @@ public class StatisticsFunctions {
 			}
 			return F.NIL;
 		}
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{(m*(-1 + 1/InverseBetaRegularized(1, -#, m/2,
+						// n/2)))/n, 0 < # < 1}, {0, # <= 0}}, Infinity), 0 <= # <= 1)& ) $]
+						F.Function(F.ConditionalExpression(
+								F.Piecewise(F.List(F.List(
+										F.Times(m, F.Power(n, F.CN1),
+												F.Plus(F.CN1,
+														F.Power(F.InverseBetaRegularized(F.C1, F.Negate(F.Slot1),
+																F.Times(F.C1D2, m), F.Times(F.C1D2, n)), F.CN1))),
+										F.Less(F.C0, F.Slot1, F.C1)), F.List(F.C0, F.LessEqual(F.Slot1, F.C0))), F.oo),
+								F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
 
 		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
@@ -1523,6 +1601,29 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{m/(-Log[#])^n^(-1), 0 < # < 1}, {0, # <= 0}},
+						// Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(
+										F.Piecewise(
+												F.List(F.List(
+														F.Times(m,
+																F.Power(F.Power(F.Negate(F.Log(F.Slot1)),
+																		F.Power(n, F.CN1)), F.CN1)),
+														F.Less(F.C0, F.Slot1, F.C1)),
+														F.List(F.C0, F.LessEqual(F.Slot1, F.C0))),
+												F.oo),
+										F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
@@ -1616,6 +1717,45 @@ public class StatisticsFunctions {
 				return callFunction(function, k);
 			}
 
+			return F.NIL;
+		}
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST2()) {
+				//
+				IExpr a = dist.arg1();
+				IExpr b = dist.arg2();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{b*InverseGammaRegularized(a, 0, #), 0 < # < 1}, {0, #
+						// <= 0}}, Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(
+										F.Piecewise(F.List(
+												F.List(F.Times(b, F.InverseGammaRegularized(a, F.C0, F.Slot1)),
+														F.Less(F.C0, F.Slot1, F.C1)),
+												F.List(F.C0, F.LessEqual(F.Slot1, F.C0))), F.oo),
+										F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			} else if (dist.isAST(F.GammaDistribution, 5)) {
+				//
+				IExpr a = dist.arg1();
+				IExpr b = dist.arg2();
+				IExpr g = dist.arg3();
+				IExpr d = dist.arg4();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{d + b*InverseGammaRegularized(a, 0, #)^(1/g), 0 < # <
+						// 1}, {d, # <= 0}}, Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(F.Piecewise(
+										F.List(F.List(
+												F.Plus(d,
+														F.Times(b,
+																F.Power(F.InverseGammaRegularized(a, F.C0, F.Slot1),
+																		F.Power(g, F.CN1)))),
+												F.Less(F.C0, F.Slot1, F.C1)), F.List(d, F.LessEqual(F.Slot1, F.C0))),
+										F.oo), F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			}
 			return F.NIL;
 		}
 		@Override
@@ -1789,6 +1929,10 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			return F.NIL;
+		}
+		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
@@ -1889,6 +2033,26 @@ public class StatisticsFunctions {
 						// [$ (1 - E^(-E^((# - n)/m))) & $]
 						F.Function(F.Subtract(F.C1,
 								F.Exp(F.Negate(F.Exp(F.Times(F.Power(m, F.CN1), F.Plus(F.Negate(n), F.Slot1))))))); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{n + m*Log(-Log(1 - #)), 0 < # < 1}, {-Infinity, # <=
+						// 0}}, Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(
+										F.Piecewise(F.List(
+												F.List(F.Plus(n,
+														F.Times(m, F.Log(F.Negate(F.Log(F.Subtract(F.C1, F.Slot1)))))),
+														F.Less(F.C0, F.Slot1, F.C1)),
+												F.List(F.Negate(F.oo), F.LessEqual(F.Slot1, F.C0))), F.oo),
+										F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
 				return callFunction(function, k);
 			}
 			return F.NIL;
@@ -2051,6 +2215,10 @@ public class StatisticsFunctions {
 			}
 			return F.NIL;
 		}
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			return F.NIL;
+		}
 
 		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
@@ -2198,7 +2366,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr numericEval(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 			if (ast.size() == 2) {
 				return super.numericEval(ast, engine);
 			}
@@ -2314,6 +2481,31 @@ public class StatisticsFunctions {
 			}
 			return F.NIL;
 		}
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			IExpr[] minMax = minmax(dist);
+			if (minMax != null) {
+				IExpr a = minMax[0];
+				IExpr b = minMax[1];
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{-1 + a + Max(1, Ceiling(#*(1 - a + b))), 0 < # < 1},
+						// {a, # <= 0}}, b), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(
+										F.Piecewise(
+												F.List(F.List(
+														F.Plus(F.CN1, a,
+																F.Max(F.C1,
+																		F.Ceiling(F.Times(F.Slot1,
+																				F.Plus(F.C1, F.Negate(a), b))))),
+														F.Less(F.C0, F.Slot1, F.C1)),
+														F.List(a, F.LessEqual(F.Slot1, F.C0))),
+												b),
+										F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
 
 		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
@@ -2410,6 +2602,26 @@ public class StatisticsFunctions {
 						F.Function(F.Piecewise(F.List(
 								F.List(F.GammaRegularized(n, F.C0, F.Times(F.Slot1, m)), F.Greater(F.Slot1, F.C0))),
 								F.C0)); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{InverseGammaRegularized(n, 0, #)/m, 0 < # < 1}, {0, #
+						// <= 0}}, Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(
+										F.Piecewise(F.List(
+												F.List(F.Times(F.Power(m, F.CN1),
+														F.InverseGammaRegularized(n, F.C0, F.Slot1)),
+														F.Less(F.C0, F.Slot1, F.C1)),
+												F.List(F.C0, F.LessEqual(F.Slot1, F.C0))), F.oo),
+										F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
 				return callFunction(function, k);
 			}
 			return F.NIL;
@@ -2612,10 +2824,22 @@ public class StatisticsFunctions {
 						F.Function(F.Piecewise(F.List(F.List(F.Subtract(F.C1, F.Exp(F.Times(F.CN1, F.Slot1, n))),
 								F.GreaterEqual(F.Slot1, F.C0))), F.C0)); // $$;
 				return callFunction(function, k);
-				// Piecewise({{1 - E^((-k)*n), k >= 0}}, 0)
-				// return F.Piecewise(F.List(
-				// F.List(F.Plus(F.C1, F.Negate(F.Power(F.E, F.Times(F.CN1, k, n)))), F.GreaterEqual(k, F.C0))),
-				// F.C0);
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST1()) {
+				IExpr n = dist.arg1();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{-(Log(1 - #)/n), # < 1}}, Infinity), 0 <= # <= 1)& )
+						// $]
+						F.Function(F.ConditionalExpression(F.Piecewise(
+								F.List(F.List(F.Times(F.CN1, F.Power(n, F.CN1), F.Log(F.Subtract(F.C1, F.Slot1))),
+										F.Less(F.Slot1, F.C1))),
+								F.oo), F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
 			}
 			return F.NIL;
 		}
@@ -2889,6 +3113,27 @@ public class StatisticsFunctions {
 												F.Erfc(F.Times(F.Power(F.Times(F.CSqrt2, m), F.CN1),
 														F.Subtract(n, F.Log(F.Slot1))))),
 										F.Greater(F.Slot1, F.C0))), F.C0)); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{E^(n - Sqrt(2)*m*InverseErfc(2*#)), 0 < # < 1}, {0, #
+						// <= 0}}, Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(F.Piecewise(
+										F.List(F.List(
+												F.Exp(F.Plus(n,
+														F.Times(F.CN1, F.CSqrt2, m,
+																F.InverseErfc(F.Times(F.C2, F.Slot1))))),
+												F.Less(F.C0, F.Slot1, F.C1)), F.List(F.C0, F.LessEqual(F.Slot1, F.C0))),
+										F.oo), F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
 				return callFunction(function, k);
 			}
 			return F.NIL;
@@ -3221,6 +3466,25 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{Sqrt((m*InverseGammaRegularized(n, 0, #))/n), 0 < # <
+						// 1}, {0, # <= 0}}, Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(F.Piecewise(
+										F.List(F.List(
+												F.Sqrt(F.Times(m, F.Power(n, F.CN1),
+														F.InverseGammaRegularized(n, F.C0, F.Slot1))),
+												F.Less(F.C0, F.Slot1, F.C1)), F.List(F.C0, F.LessEqual(F.Slot1, F.C0))),
+										F.oo), F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
 		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
 			if (dist.isAST2()) {
@@ -3714,6 +3978,10 @@ public class StatisticsFunctions {
 			}
 			return F.NIL;
 		}
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			return F.NIL;
+		}
 
 		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
@@ -3989,10 +4257,10 @@ public class StatisticsFunctions {
 							}
 						}
 					} catch (RuntimeException ex) {
-						engine.printMessage("RandomVariate: " + ex.getMessage());
 						if (Config.SHOW_STACKTRACE) {
 							ex.printStackTrace();
 						}
+						return engine.printMessage("RandomVariate: " + ex.getMessage());
 					}
 				}
 			}
@@ -4337,6 +4605,39 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST1()) {
+				IExpr n = dist.arg1();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{(-Sqrt(n))*Sqrt(-1 + 1/InverseBetaRegularized(2*#,
+						// n/2, 1/2)), 0 < # < 1/2}, {0, # == 1/2}, {Sqrt(n)*Sqrt(-1 + 1/InverseBetaRegularized(2*(1 -
+						// #), n/2, 1/2)), 1/2 < # < 1}, {-Infinity, # <= 0}}, Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(
+										F.Piecewise(F.List(
+												F.List(F.Times(F.CN1, F.Sqrt(n),
+														F.Sqrt(F.Plus(F.CN1, F.Power(F.InverseBetaRegularized(
+																F.Times(F.C2, F.Slot1), F.Times(F.C1D2, n), F.C1D2),
+																F.CN1)))),
+														F.Less(F.C0, F.Slot1, F.C1D2)),
+												F.List(F.C0, F.Equal(F.Slot1, F.C1D2)), F.List(
+														F.Times(F.Sqrt(n),
+																F.Sqrt(F.Plus(
+																		F.CN1, F.Power(
+																				F.InverseBetaRegularized(
+																						F.Times(F.C2,
+																								F.Subtract(F.C1,
+																										F.Slot1)),
+																						F.Times(F.C1D2, n), F.C1D2),
+																				F.CN1)))),
+														F.Less(F.C1D2, F.Slot1, F.C1)),
+												F.List(F.Negate(F.oo), F.LessEqual(F.Slot1, F.C0))), F.oo),
+										F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+		@Override
 		public IExpr pdf(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
@@ -4524,6 +4825,26 @@ public class StatisticsFunctions {
 										F.List(F.Times(F.Power(F.Plus(F.Negate(a), b), F.CN1),
 												F.Plus(F.Negate(a), F.Slot1)), F.LessEqual(a, F.Slot1, b)),
 										F.List(F.C1, F.Greater(F.Slot1, b))), F.C0)); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			IExpr[] minMax = minmax(dist);
+			if (minMax != null) {
+				IExpr a = minMax[0];
+				IExpr b = minMax[1];
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{(1 - #)*a + #*b, 0 < # < 1}, {a, # <= 0}}, b), 0 <= #
+						// <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(
+										F.Piecewise(F.List(
+												F.List(F.Plus(F.Times(F.Subtract(F.C1, F.Slot1), a),
+														F.Times(F.Slot1, b)), F.Less(F.C0, F.Slot1, F.C1)),
+												F.List(a, F.LessEqual(F.Slot1, F.C0))), b),
+										F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
 				return callFunction(function, k);
 			}
 			return F.NIL;
@@ -4768,6 +5089,28 @@ public class StatisticsFunctions {
 														F.Exp(F.Negate(
 																F.Power(F.Times(F.Power(m, F.CN1), F.Slot1), n)))),
 										F.Greater(F.Slot1, F.C0))), F.C0)); // $$;
+				return callFunction(function, k);
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr inverseCDF(IAST dist, IExpr k) {
+			if (dist.isAST2()) {
+				IExpr n = dist.arg1();
+				IExpr m = dist.arg2();
+				IExpr function =
+						// [$ ( ConditionalExpression(Piecewise({{m*(-Log(1 - #))^(1/n), 0 < # < 1}, {0, # <= 0}},
+						// Infinity), 0 <= # <= 1)& ) $]
+						F.Function(
+								F.ConditionalExpression(
+										F.Piecewise(F.List(
+												F.List(F.Times(m,
+														F.Power(F.Negate(F.Log(F.Subtract(F.C1, F.Slot1))),
+																F.Power(n, F.CN1))),
+														F.Less(F.C0, F.Slot1, F.C1)),
+												F.List(F.C0, F.LessEqual(F.Slot1, F.C0))), F.oo),
+										F.LessEqual(F.C0, F.Slot1, F.C1))); // $$;
 				return callFunction(function, k);
 			}
 			return F.NIL;

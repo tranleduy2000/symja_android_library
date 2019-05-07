@@ -5,7 +5,6 @@ import com.duy.lambda.UnaryOperator;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -49,7 +48,6 @@ public class QuantityFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			try {
 				if (ast.size() == 2) {
@@ -66,15 +64,19 @@ public class QuantityFunctions {
 					}
 				}
 			} catch (MathException e) {
-				engine.printMessage("Quantity: " + e.getMessage());
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
+				return engine.printMessage("Quantity: " + e.getMessage());
 			}
 
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 	}
 
 	/**
@@ -102,7 +104,6 @@ public class QuantityFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			try {
 				if (ast.size() == 2) {
@@ -122,15 +123,19 @@ public class QuantityFunctions {
 					}
 				}
 			} catch (MathException e) {
-				engine.printMessage("QuantityMagnitude: " + e.getMessage());
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
+				return engine.printMessage("QuantityMagnitude: " + e.getMessage());
 			}
 
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 	}
 
 	/**
@@ -158,7 +163,6 @@ public class QuantityFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			try {
 				if (ast.size() == 2) {
@@ -176,17 +180,21 @@ public class QuantityFunctions {
 					}
 				}
 			} catch (MathException e) {
-				engine.printMessage("UnitConvert: " + e.getMessage());
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
+				return engine.printMessage("UnitConvert: " + e.getMessage());
 			}
 
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
 	}
 
+	}
 
 	public static void initialize() {
 		Initializer.init();

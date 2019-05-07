@@ -4,7 +4,6 @@ import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractArg2;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
@@ -184,7 +183,6 @@ public class IntegerFunctions {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			try {
 				if (ast.isAST2()) {
@@ -201,6 +199,10 @@ public class IntegerFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		public IExpr evalCeiling(IExpr arg1) {
 			if (arg1.isNumber()) {
 				return ((INumber) arg1).ceilFraction();
@@ -280,7 +282,6 @@ public class IntegerFunctions {
 
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 4);
 			IInteger base = F.C10;
 			int padLeftZeros = 0;
 			if (ast.size() >= 3) {
@@ -324,6 +325,10 @@ public class IntegerFunctions {
 		}
 
 		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_3;
+		}
+		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
 		}
@@ -353,7 +358,6 @@ public class IntegerFunctions {
 
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 			IInteger base = F.C10;
 			if (ast.isAST2()) {
 				IExpr arg2 = ast.arg2();
@@ -370,6 +374,10 @@ public class IntegerFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -473,7 +481,6 @@ public class IntegerFunctions {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			try {
 				if (ast.isAST2()) {
@@ -490,6 +497,10 @@ public class IntegerFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		public IExpr evalFloor(IExpr arg1) {
 			if (arg1.isNumber()) {
 				return ((INumber) arg1).floorFraction();
@@ -614,7 +625,6 @@ public class IntegerFunctions {
 
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 			IExpr base = F.C10;
 			if (ast.size() >= 3) {
 				base = ast.arg2();
@@ -658,6 +668,10 @@ public class IntegerFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		private IExpr fromDigits(IAST list, IExpr radix) {
 			IASTAppendable result = F.PlusAlloc(list.size());
 			int exp = 0;
@@ -744,7 +758,6 @@ public class IntegerFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isInteger()) {
 				IInteger radix = F.C10;
@@ -756,8 +769,7 @@ public class IntegerFunctions {
 					}
 				}
 				if (radix.isLessThan(F.C1)) {
-					engine.printMessage("IntegerLength: The base must be greater than 1");
-					return F.NIL;
+					return engine.printMessage("IntegerLength: The base must be greater than 1");
 				}
 				IInteger iArg1 = (IInteger) ast.arg1();
 				if (iArg1.isZero()) {
@@ -770,6 +782,10 @@ public class IntegerFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);

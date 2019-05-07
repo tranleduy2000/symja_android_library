@@ -1,7 +1,7 @@
 package org.matheclipse.core.form;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.reflection.system.Names;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class Documentation {
 	}
 
 	public static void usageDocumentation(Appendable out, String name) {
-		IAST list = Names.getNamesByPrefix(name);
+		IAST list = IOFunctions.getNamesByPrefix(name);
 		try {
 			if (list.size() != 2) {
 				for (int i = 1; i < list.size(); i++) {

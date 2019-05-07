@@ -2016,7 +2016,7 @@ public class EvalEngine implements Serializable {
 	 * @param str
 	 *            the message which should be printed
 	 */
-	public void printMessage(String str) {
+	public IAST printMessage(String str) {
 		if (!isQuietMode()) {
 			PrintStream stream = getErrorPrintStream();
 			if (stream == null) {
@@ -2027,6 +2027,7 @@ public class EvalEngine implements Serializable {
 		if (fThrowError) {
 			throw new IllegalArgument(str);
 		}
+		return F.NIL;
 	}
 
 	/**

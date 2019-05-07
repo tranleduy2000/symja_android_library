@@ -4148,7 +4148,7 @@ public final class ListFunctions {
 						} else {
 							WrongArgumentType wat = new WrongArgumentType(ast, ast, -1,
 									"List of rule expressions (x->y) expected: ");
-							engine.printMessage(wat.getMessage());
+								return engine.printMessage(wat.getMessage());
 						}
 					}
 					return result;
@@ -4156,15 +4156,14 @@ public final class ListFunctions {
 					return F.subst(arg1, (IAST) arg2);
 				} else {
 					WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
-					engine.printMessage(wat.getMessage());
+						return engine.printMessage(wat.getMessage());
 				}
 			} catch (WrongArgumentType wat) {
 				if (Config.SHOW_STACKTRACE) {
 					wat.printStackTrace();
 				}
-				engine.printMessage(wat.getMessage());
+					return engine.printMessage(wat.getMessage());
 			}
-			return F.NIL;
 		}
 			return F.NIL;
 		}
@@ -4235,7 +4234,7 @@ public final class ListFunctions {
 				}
 			} else {
 				WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
-				engine.printMessage("ReplaceList: " + wat.getMessage());
+				return engine.printMessage("ReplaceList: " + wat.getMessage());
 			}
 			return result;
 		}
@@ -4265,11 +4264,10 @@ public final class ListFunctions {
 					IASTAppendable result = F.ListAlloc();
 					return replaceExpr(ast, arg1, rules, result, maxNumberOfResults, engine);
 				} catch (ArithmeticException ae) {
-					engine.printMessage("ReplaceList: " + ae.getMessage());
+					return engine.printMessage("ReplaceList: " + ae.getMessage());
 				} catch (WrongArgumentType wat) {
-					engine.printMessage("ReplaceList: " + wat.getMessage());
+					return engine.printMessage("ReplaceList: " + wat.getMessage());
 				}
-				return F.List();
 			}
 			return F.NIL;
 		}
@@ -4391,9 +4389,8 @@ public final class ListFunctions {
 				}
 				return result;
 			} catch (WrongArgumentType wat) {
-				engine.printMessage(wat.getMessage());
+				return engine.printMessage(wat.getMessage());
 			}
-			return F.NIL;
 		}
 
 		@Override
@@ -4481,12 +4478,11 @@ public final class ListFunctions {
 					return ast.arg1().replaceRepeated((IAST) arg2);
 				} else {
 					WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
-					engine.printMessage("ReplaceRepeated: " + wat.getMessage());
+					return engine.printMessage("ReplaceRepeated: " + wat.getMessage());
 				}
 			} catch (WrongArgumentType wat) {
-				engine.printMessage("ReplaceRepeated: " + wat.getMessage());
+				return engine.printMessage("ReplaceRepeated: " + wat.getMessage());
 			}
-			return F.NIL;
 		}
 
 		@Override
@@ -4538,7 +4534,7 @@ public final class ListFunctions {
 			if (arg1.isAST() && ((IAST) arg1).size() > 1) {
 				return arg1.rest();
 			}
-			engine.printMessage("Rest: Nonatomic expression expected");
+				return engine.printMessage("Rest: Nonatomic expression expected");
 			}
 			return F.NIL;
 		}

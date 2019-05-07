@@ -57,7 +57,6 @@ public class EllipticIntegrals {
 
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IExpr z = ast.arg1();
 			if (ast.isAST2()) {
@@ -89,7 +88,7 @@ public class EllipticIntegrals {
 						b = -Math.asin(Math.sqrt(b));
 						return F.num(de.lab4inf.math.functions.IncompleteSecondEllipticIntegral.icseint(a, b));
 					} catch (RuntimeException rex) {
-						engine.printMessage("EllipticE: " + rex.getMessage());
+						return engine.printMessage("EllipticE: " + rex.getMessage());
 					}
 				}
 				IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(z);
@@ -131,6 +130,10 @@ public class EllipticIntegrals {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
@@ -206,7 +209,7 @@ public class EllipticIntegrals {
 					b = -Math.asin(Math.sqrt(b));
 					return F.num(de.lab4inf.math.functions.IncompleteFirstEllipticIntegral.icfeint(a, b));
 				} catch (RuntimeException rex) {
-					engine.printMessage("EllipticF: " + rex.getMessage());
+					return engine.printMessage("EllipticF: " + rex.getMessage());
 				}
 			}
 			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(z);
@@ -340,7 +343,6 @@ public class EllipticIntegrals {
 
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3, 4);
 
 			IExpr n = ast.arg1();
 			IExpr m = ast.arg2();
@@ -354,7 +356,7 @@ public class EllipticIntegrals {
 						c = -Math.asin(Math.sqrt(c));
 						return F.num(de.lab4inf.math.functions.IncompleteThirdEllipticIntegral.icteint(a, b, c));
 					} catch (RuntimeException rex) {
-						engine.printMessage("EllipticPi: " + rex.getMessage());
+						return engine.printMessage("EllipticPi: " + rex.getMessage());
 					}
 				}
 				if (m.equals(F.CPiHalf)) {
@@ -403,6 +405,10 @@ public class EllipticIntegrals {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_3;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);

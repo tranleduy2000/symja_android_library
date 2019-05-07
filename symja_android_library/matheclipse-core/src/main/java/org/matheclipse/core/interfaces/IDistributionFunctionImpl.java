@@ -4,6 +4,7 @@ import com.duy.lambda.Function;
 
 import org.hipparchus.distribution.RealDistribution;
 import org.matheclipse.core.builtin.StatisticsFunctions;
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
 
@@ -16,7 +17,14 @@ public abstract class IDistributionFunctionImpl extends AbstractEvaluator
     }
 
     @Override
-    public IExpr callFunction(final IExpr pureFunction, IExpr x) {
+    public IExpr callFunction(final IExpr function, IExpr x) {
+        final IExpr pureFunction = function;
+        if (pureFunction.isFunction()) {
+            EvalEngine engine = EvalEngine.get();
+            if (!engine.isNumericMode()) {
+                ((IASTMutable) pureFunction).set(1, engine.evaluateNonNumeric(pureFunction.first()));
+            }
+        }
         if (x.isPresent()) {
             if (x.isList()) {
                 return ((IAST) x).map(new Function<IExpr, IExpr>() {
@@ -29,10 +37,5 @@ public abstract class IDistributionFunctionImpl extends AbstractEvaluator
             return F.unaryAST1(pureFunction, x);
         }
         return pureFunction;
-    }
-
-    @Override
-    public IExpr inverseCDF(IAST dist, IExpr x) {
-        return F.NIL;
     }
 }
