@@ -461,15 +461,4 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         return ast;
     }
 
-    /**
-     * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied). In contrast
-     * to the <code>clone()</code> method, this method returns exactly the same type for
-     * <code>AST0, AST1, AST2,AST3</code>.
-     *
-     * @return a copy of this <code>IAST</code> instance.
-     */
-    @Override
-    public IASTMutable copy() {
-        return copyAppendable();
-    }
 }

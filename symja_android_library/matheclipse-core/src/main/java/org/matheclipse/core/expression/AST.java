@@ -4,6 +4,7 @@ import com.duy.lambda.Consumer;
 
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
@@ -96,6 +97,10 @@ public class AST extends HMArrayList implements Externalizable {
 			return fDelegate.copyFrom(fFirstIndex);
 		}
 
+		@Override
+		public IASTMutable copy() {
+			return fDelegate.copyFrom(fFirstIndex);
+		}
 		public IExpr head() {
 			return fDelegate.head();
 		}
@@ -378,6 +383,26 @@ public class AST extends HMArrayList implements Externalizable {
 		return ast;
 	}
 
+	@Override
+	public IASTMutable copy() {
+		switch (size()) {
+		case 1:
+			return new AST0(head());
+		case 2:
+			return new AST1(head(), arg1());
+		case 3:
+			return new AST2(head(), arg1(), arg2());
+		case 4:
+			return new AST3(head(), arg1(), arg2(), arg3());
+		}
+		AST ast = new AST();
+		// ast.fProperties = null;
+		ast.array = array.clone();
+		ast.hashValue = 0;
+		ast.firstIndex = firstIndex;
+		ast.lastIndex = lastIndex;
+		return ast;
+	}
 
 	/** {@inheritDoc} */
 	@Override

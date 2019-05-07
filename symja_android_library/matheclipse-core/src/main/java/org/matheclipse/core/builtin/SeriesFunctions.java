@@ -24,7 +24,6 @@ import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
-import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
@@ -1313,16 +1312,12 @@ public class SeriesFunctions {
                 }
 
                 if (x0.isReal()) {
-                    try {
-                        final int lowerLimit = ((ISignedNumber) x0).toInt();
+				final int lowerLimit = x0.toIntDefault(Integer.MIN_VALUE);
                         if (lowerLimit != 0) {
                             // TODO support other cases than 0
                             return F.NIL;
                         }
                         x0 = F.integer(lowerLimit);
-                    } catch (ClassCastException cce) {
-                    } catch (ArithmeticException ae) {
-                    }
                 }
 
                 final int degree = n.toIntDefault(Integer.MIN_VALUE);

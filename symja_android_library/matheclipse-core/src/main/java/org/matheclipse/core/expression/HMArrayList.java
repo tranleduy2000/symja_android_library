@@ -384,9 +384,8 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	public void forEach(int startOffset, int endOffset, ObjIntConsumer<? super IExpr> action) {
 		int index = firstIndex + startOffset;
 		if (index < lastIndex) {
-			int j = startOffset;
 			for (int i = startOffset; i < endOffset; i++) {
-				action.accept(array[index++],j++);
+				action.accept(array[index++], i);
 			}
 		}
 	}

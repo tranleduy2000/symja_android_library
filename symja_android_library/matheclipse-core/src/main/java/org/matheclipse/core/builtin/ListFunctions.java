@@ -2106,31 +2106,69 @@ public final class ListFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * <code>FoldList[f, x, {a, b}]
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>{x, f[x, a], f[f[x, a], b]}</code>
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 */
 	private final static class FoldList extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 4);
-
-			return evaluateNestList(ast, F.ListAlloc(8), engine);
+			if (ast.size() == 3) {
+				return evaluateNestList3(ast, engine);
+			} else if (ast.size() == 4) {
+				return evaluateNestList4(ast, engine);
+			}
+			return F.NIL;
 		}
 
-		private static IAST evaluateNestList(final IAST ast, final IASTAppendable resultList, EvalEngine engine) {
+		private static IAST evaluateNestList3(final IAST ast, EvalEngine engine) {
+			IExpr temp = engine.evaluate(ast.arg2());
+			if (temp.isAST()) {
+				IAST list = (IAST) temp;
+				final IExpr arg1 = engine.evaluate(ast.arg1());
+				if (list.size() == 1 || list.size() == 2) {
+					return list;
+				}
+				final IASTAppendable resultList = F.ast(list.head(), list.size(), false);
+				IExpr arg2 = list.arg1();
+				list = list.rest();
+				return foldLeft(arg2, list, 1, list.size(), new BiFunction<IExpr, IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x, IExpr y) {
+						return F.binaryAST2(arg1, x, y);
+					}
+				}, resultList);
+			}
+			return F.NIL;
+		}
 
-			try {
+		private static IAST evaluateNestList4(final IAST ast, EvalEngine engine) {
+
 				IExpr temp = engine.evaluate(ast.arg3());
 				if (temp.isAST()) {
 					final IAST list = (IAST) temp;
-					final IExpr arg1 = engine.evaluate(ast.arg1());
+				final IExpr arg1 = engine.evaluate(ast.arg1());
 					IExpr arg2 = engine.evaluate(ast.arg2());
-					return foldLeft(arg2, list, 1, list.size(), new BiFunction<IExpr, IExpr, IExpr>() {
-						@Override
-						public IExpr apply(IExpr x, IExpr y) {
-							return F.binaryAST2(arg1, x, y);
+				if (list.size() == 1) {
+					return F.unaryAST1(list.head(), arg2);
 						}
-					}, resultList);
-				}
-			} catch (final ArithmeticException e) {
+				final IASTAppendable resultList = F.ast(list.head(), list.size(), false);
+				return foldLeft(arg2, list, 1, list.size(), new BiFunction<IExpr, IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x, IExpr y) {
+						return F.binaryAST2(arg1, x, y);
+					}
+				}, resultList);
 
 			}
 			return F.NIL;
