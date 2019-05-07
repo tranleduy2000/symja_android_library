@@ -12,6 +12,7 @@ import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
+import static org.matheclipse.core.expression.F.CNI;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.DirectedInfinity;
@@ -20,6 +21,7 @@ import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Noo;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Times;
@@ -35,7 +37,7 @@ public interface ArcCoshRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 13, 0 };
+  final public static int[] SIZES = { 15, 0 };
 
   final public static IAST RULES = List(
     IInit(ArcCosh, SIZES),
@@ -72,8 +74,14 @@ public interface ArcCoshRules {
     // ArcCosh(Infinity)=Infinity
     ISet(ArcCosh(oo),
       oo),
+    // ArcCosh(-Infinity)=Infinity
+    ISet(ArcCosh(Noo),
+      oo),
     // ArcCosh(I*Infinity)=Infinity
     ISet(ArcCosh(DirectedInfinity(CI)),
+      oo),
+    // ArcCosh(-I*Infinity)=Infinity
+    ISet(ArcCosh(DirectedInfinity(CNI)),
       oo),
     // ArcCosh(ComplexInfinity)=Infinity
     ISet(ArcCosh(CComplexInfinity),

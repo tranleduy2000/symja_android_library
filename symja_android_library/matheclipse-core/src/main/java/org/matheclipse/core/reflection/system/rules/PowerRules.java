@@ -20,6 +20,7 @@ import static org.matheclipse.core.expression.F.Coth;
 import static org.matheclipse.core.expression.F.Csc;
 import static org.matheclipse.core.expression.F.Csch;
 import static org.matheclipse.core.expression.F.DirectedInfinity;
+import static org.matheclipse.core.expression.F.Element;
 import static org.matheclipse.core.expression.F.Equal;
 import static org.matheclipse.core.expression.F.EvenQ;
 import static org.matheclipse.core.expression.F.Exp;
@@ -32,6 +33,7 @@ import static org.matheclipse.core.expression.F.If;
 import static org.matheclipse.core.expression.F.Im;
 import static org.matheclipse.core.expression.F.Indeterminate;
 import static org.matheclipse.core.expression.F.IntegerQ;
+import static org.matheclipse.core.expression.F.Integers;
 import static org.matheclipse.core.expression.F.Less;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Log;
@@ -57,6 +59,8 @@ import static org.matheclipse.core.expression.F.c;
 import static org.matheclipse.core.expression.F.j;
 import static org.matheclipse.core.expression.F.m;
 import static org.matheclipse.core.expression.F.m_;
+import static org.matheclipse.core.expression.F.n;
+import static org.matheclipse.core.expression.F.n_;
 import static org.matheclipse.core.expression.F.r;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
@@ -71,13 +75,19 @@ public interface PowerRules {
      * <li>index 0 - number of equal rules in <code>RULES</code></li>
      * </ul>
      */
-  final public static int[] SIZES = { 4, 16 };
+  final public static int[] SIZES = { 5, 17 };
 
     final public static IAST RULES = List(
             IInit(Power, SIZES),
+    // E^(1/2*I*Pi)=I
+    ISet(Exp(Times(CC(0L,1L,1L,2L),Pi)),
+      CI),
             // E^(3/2*I*Pi)=-I
             ISet(Exp(Times(CC(0L,1L,3L,2L),Pi)),
                     CNI),
+    // E^(I*Pi*n_):=(-1)^n/;Element(n,Integers)
+    ISetDelayed(Exp(Times(CI,Pi,n_)),
+      Condition(Power(CN1,n),Element(n,Integers))),
             // E^(Pi*c_Complex):=Module({r=Re(c),j=Im(c)},If(EvenQ(j),1,-1)/;r==0&&IntegerQ(j))
             ISetDelayed(Exp(Times(Pi,$p(c,Complex))),
                     Module(List(Set(r,Re(c)),Set(j,Im(c))),Condition(If(EvenQ(j),C1,CN1),And(Equal(r,C0),IntegerQ(j))))),

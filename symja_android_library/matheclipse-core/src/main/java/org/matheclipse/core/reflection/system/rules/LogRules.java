@@ -29,6 +29,7 @@ import static org.matheclipse.core.expression.F.Integer;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Noo;
+import static org.matheclipse.core.expression.F.PatternTest;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
@@ -43,6 +44,7 @@ import static org.matheclipse.core.expression.F.m;
 import static org.matheclipse.core.expression.F.num;
 import static org.matheclipse.core.expression.F.oo;
 import static org.matheclipse.core.expression.F.x;
+import static org.matheclipse.core.expression.F.x_;
 import static org.matheclipse.core.expression.F.z;
 import static org.matheclipse.core.expression.F.z_;
 
@@ -66,8 +68,8 @@ public interface LogRules {
     // Log(E)=1
     ISet(Log(E),
       C1),
-    // Log(E^x_RealNumberQ):=x
-    ISetDelayed(Log(Exp($p(x,RealNumberQ))),
+    // Log(E^x_?RealNumberQ):=x
+    ISetDelayed(Log(Exp(PatternTest(x_,RealNumberQ))),
       x),
     // Log(E^x_Complex):=x+2*I*Pi*Floor((Pi-Im(x))/(2*Pi))
     ISetDelayed(Log(Exp($p(x,Complex))),

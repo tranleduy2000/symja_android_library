@@ -346,13 +346,20 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testArcCosh() {
-		check("ArcCosh(0)", "I*1/2*Pi");
-		checkNumeric("ArcCosh(0.0)", "I*1.5707963267948966");
-		checkNumeric("ArcCosh(1.4)", "0.867014726490565");
-		check("ArcCosh(-x)", "ArcCosh(-x)");
-		check("D(ArcCosh(x),x)", "1/Sqrt(-1+x^2)");
-		check("ArcCosh(-Infinity)", "ArcCosh(-Infinity)");
-		check("ArcCosh(I*Infinity)", "Infinity");
+		check("ArcCosh(0)", //
+				"I*1/2*Pi");
+		checkNumeric("ArcCosh(0.0)", //
+				"I*1.5707963267948966");
+		checkNumeric("ArcCosh(1.4)", //
+				"0.867014726490565");
+		check("ArcCosh(-x)", //
+				"ArcCosh(-x)");
+		check("D(ArcCosh(x),x)", //
+				"1/Sqrt(-1+x^2)");
+		check("ArcCosh(-Infinity)", //
+				"Infinity");
+		check("ArcCosh(I*Infinity)", //
+				"Infinity");
 	}
 
 	public void testArcCot() {
@@ -2467,6 +2474,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCosh() {
+		check("Cosh(10*Pi*I)", //
+				"1");
+		check("Cosh(43*Pi*I)", //
+				"-1");
+		check("Cosh(17/2*Pi*I)", //
+				"0");
 		check("Refine(Cosh(x+I*k*Pi), Element(k, Integers))", //
 				"(-1)^k*Cosh(x)");
 		check("Refine(Cosh(x-I*k*Pi), Element(k, Integers))", //
@@ -5275,6 +5288,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testFunctionExpand() {
 		// Use Expand for Power() and Times() expressions
+		check("FunctionExpand(Log(Sqrt(x^2)))", //
+				"Log(x^2)/2");
+		check("FunctionExpand(CosIntegral(Sqrt(x^2)))", //
+				"CosIntegral(x)-Log(x)+Log(x^2)/2");
+		check("FunctionExpand(SinIntegral(Sqrt(x^2)))", //
+				"(Sqrt(x^2)*SinIntegral(x))/x");
 		check("FunctionExpand((x+y)^3)", //
 				"(x+y)^3");
 		check("FunctionExpand((x+y)*(a+b))", //
@@ -7237,8 +7256,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// test alias
 		check("Ln(E)", //
 				"1");
-		check("ln(E)", //
-				"1");
+		check("ln(-E)", //
+				"1+I*Pi");
 
 		check("Log(a, b)", //
 				"Log(b)/Log(a)");
@@ -9979,6 +9998,15 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// "$Aborted");
 		// check("TimeConstrained(1^3^3^3, 10)", //
 		// "1");
+		check("Refine(Exp(I*k*Pi),Element(k,Integers))", //
+				"(-1)^k");
+
+		check("Exp(2*I*43*Pi)", //
+				"1");
+		check("Exp(I*43*Pi)", //
+				"-1");
+		check("E^(I/2*Pi)", //
+				"I");
 		check("(I)^(-1)", //
 				"-I");
 		check("(I)^(-1+k)", //
@@ -12499,6 +12527,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testSin() {
 		// check("Sin(Quantity(90,\"Degree\"))",
 		// "");
+		check("Sin(-37/3*Pi+x)", //
+				"-Cos(Pi/6+x)");
+		check("Sin(83/7*Pi+x)", //
+				"-Cos(5/14*Pi+x)");
 		check("Refine(Sin(x+k*Pi), Element(k, Integers))", //
 				"(-1)^k*Sin(x)");
 		check("Sin(3/4*Pi+x)", //
@@ -14506,43 +14538,25 @@ public class LowercaseTestCase extends AbstractTestCase {
 				+ "{Sinh,Cosh,Tanh,Coth,Sech,Csch},"//
 				+ "{ArcSinh, ArcCosh, ArcTanh, ArcCoth, ArcSech, ArcCsch}) //" //
 				+ "Flatten // TableForm ", //
-				"Sinh(ArcSinh(x)) == x\n" +
-				"Sinh(ArcCosh(x)) == Sqrt(-1+x)*Sqrt(1+x)\n" +
-				"Sinh(ArcTanh(x)) == x/Sqrt(1-x^2)\n" +
-				"Sinh(ArcCoth(x)) == 1/(Sqrt(-1+x)*Sqrt(1+x))\n" +
-				"Sinh(ArcSech(x)) == Sqrt(-1+1/x)*Sqrt(1+1/x)\n" +
-				"Sinh(ArcCsch(x)) == 1/x\n" +
-				"Cosh(ArcSinh(x)) == Sqrt(1+x^2)\n" +
-				"Cosh(ArcCosh(x)) == x\n" +
-				"Cosh(ArcTanh(x)) == 1/Sqrt(1-x^2)\n" +
-				"Cosh(ArcCoth(x)) == 1/Sqrt(1-1/x^2)\n" +
-				"Cosh(ArcSech(x)) == 1/x\n" +
-				"Cosh(ArcCsch(x)) == Sqrt(1+1/x^2)\n" +
-				"Tanh(ArcSinh(x)) == x/Sqrt(1+x^2)\n" +
-				"Tanh(ArcCosh(x)) == (Sqrt(-1+x)*Sqrt(1+x))/x\n" +
-				"Tanh(ArcTanh(x)) == x\n" +
-				"Tanh(ArcCoth(x)) == 1/x\n" +
-				"Tanh(ArcSech(x)) == Sqrt(-1+1/x)*Sqrt(1+1/x)*x\n" +
-				"Tanh(ArcCsch(x)) == 1/(Sqrt(1+1/x^2)*x)\n" +
-				"Coth(ArcSinh(x)) == Sqrt(1+x^2)/x\n" +
-				"Coth(ArcCosh(x)) == x/(Sqrt(-1+x)*Sqrt(1+x))\n" +
-				"Coth(ArcTanh(x)) == 1/x\n" +
-				"Coth(ArcCoth(x)) == x\n" +
-				"Coth(ArcSech(x)) == 1/(Sqrt(-1+1/x)*Sqrt(1+1/x)*x)\n" +
-				"Coth(ArcCsch(x)) == Sqrt(1+1/x^2)*x\n" +
-				"Sech(ArcSinh(x)) == 1/Sqrt(1+x^2)\n" +
-				"Sech(ArcCosh(x)) == 1/x\n" +
-				"Sech(ArcTanh(x)) == Sqrt(1-x^2)\n" +
-				"Sech(ArcCoth(x)) == (Sqrt(-1+x)*Sqrt(1+x))/x\n" +
-				"Sech(ArcSech(x)) == x\n" +
-				"Sech(ArcCsch(x)) == 1/Sqrt(1+1/x^2)\n" +
-				"Csch(ArcSinh(x)) == 1/x\n" +
-				"Csch(ArcCosh(x)) == 1/(Sqrt(-1+x)*Sqrt(1+x))\n" +
-				"Csch(ArcTanh(x)) == (Sqrt(1-x)*Sqrt(1+x))/x\n" +
-				"Csch(ArcCoth(x)) == Sqrt(-1+x)*Sqrt(1+x)\n" +
-				"Csch(ArcSech(x)) == x/((1+x)*Sqrt((1-x)/(1+x)))\n" +
-				"Csch(ArcCsch(x)) == x\n" +
-				"");
+				"Sinh(ArcSinh(x)) == x\n" + "Sinh(ArcCosh(x)) == Sqrt(-1+x)*Sqrt(1+x)\n"
+						+ "Sinh(ArcTanh(x)) == x/Sqrt(1-x^2)\n" + "Sinh(ArcCoth(x)) == 1/(Sqrt(-1+x)*Sqrt(1+x))\n"
+						+ "Sinh(ArcSech(x)) == Sqrt(-1+1/x)*Sqrt(1+1/x)\n" + "Sinh(ArcCsch(x)) == 1/x\n"
+						+ "Cosh(ArcSinh(x)) == Sqrt(1+x^2)\n" + "Cosh(ArcCosh(x)) == x\n"
+						+ "Cosh(ArcTanh(x)) == 1/Sqrt(1-x^2)\n" + "Cosh(ArcCoth(x)) == 1/Sqrt(1-1/x^2)\n"
+						+ "Cosh(ArcSech(x)) == 1/x\n" + "Cosh(ArcCsch(x)) == Sqrt(1+1/x^2)\n"
+						+ "Tanh(ArcSinh(x)) == x/Sqrt(1+x^2)\n" + "Tanh(ArcCosh(x)) == (Sqrt(-1+x)*Sqrt(1+x))/x\n"
+						+ "Tanh(ArcTanh(x)) == x\n" + "Tanh(ArcCoth(x)) == 1/x\n"
+						+ "Tanh(ArcSech(x)) == Sqrt(-1+1/x)*Sqrt(1+1/x)*x\n"
+						+ "Tanh(ArcCsch(x)) == 1/(Sqrt(1+1/x^2)*x)\n" + "Coth(ArcSinh(x)) == Sqrt(1+x^2)/x\n"
+						+ "Coth(ArcCosh(x)) == x/(Sqrt(-1+x)*Sqrt(1+x))\n" + "Coth(ArcTanh(x)) == 1/x\n"
+						+ "Coth(ArcCoth(x)) == x\n" + "Coth(ArcSech(x)) == 1/(Sqrt(-1+1/x)*Sqrt(1+1/x)*x)\n"
+						+ "Coth(ArcCsch(x)) == Sqrt(1+1/x^2)*x\n" + "Sech(ArcSinh(x)) == 1/Sqrt(1+x^2)\n"
+						+ "Sech(ArcCosh(x)) == 1/x\n" + "Sech(ArcTanh(x)) == Sqrt(1-x^2)\n"
+						+ "Sech(ArcCoth(x)) == (Sqrt(-1+x)*Sqrt(1+x))/x\n" + "Sech(ArcSech(x)) == x\n"
+						+ "Sech(ArcCsch(x)) == 1/Sqrt(1+1/x^2)\n" + "Csch(ArcSinh(x)) == 1/x\n"
+						+ "Csch(ArcCosh(x)) == 1/(Sqrt(-1+x)*Sqrt(1+x))\n"
+						+ "Csch(ArcTanh(x)) == (Sqrt(1-x)*Sqrt(1+x))/x\n" + "Csch(ArcCoth(x)) == Sqrt(-1+x)*Sqrt(1+x)\n"
+						+ "Csch(ArcSech(x)) == x/((1+x)*Sqrt((1-x)/(1+x)))\n" + "Csch(ArcCsch(x)) == x\n" + "");
 		check("Outer((ToString(#1) <> \"(\" <> ToString(#2) <> \"(x)) == \" <> ToString(InputForm(#1(#2(x)))))&," //
 				+ "{Sin,Cos,Tan,Cot,Sec,Csc},"//
 				+ "{ArcSin, ArcCos, ArcTan, ArcCot, ArcSec, ArcCsc}) //" //
