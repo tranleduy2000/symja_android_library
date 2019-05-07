@@ -10,9 +10,9 @@ import org.hipparchus.optim.linear.PivotSelectionRule;
 import org.hipparchus.optim.linear.Relationship;
 import org.hipparchus.optim.linear.SimplexSolver;
 import org.hipparchus.optim.nonlinear.scalar.GoalType;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.Expr2Object;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrappedException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
@@ -88,7 +88,6 @@ public class LinearProgramming extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr numericEval(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 4);
 		try {
 			if (ast.arg1().isList() && ast.arg2().isList() && ast.arg3().isList()) {
 				double[] arg1D =   ast.arg1().toDoubleVector();
@@ -146,5 +145,9 @@ public class LinearProgramming extends AbstractFunctionEvaluator {
 		}
 
 		return F.NIL;
+	}
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_3_3;
 	}
 }

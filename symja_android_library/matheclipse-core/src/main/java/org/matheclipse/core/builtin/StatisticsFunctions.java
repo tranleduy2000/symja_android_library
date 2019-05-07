@@ -499,10 +499,13 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST1()) {
@@ -1161,7 +1164,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
 				IExpr r = ast.arg2();
@@ -1170,6 +1172,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
@@ -1273,7 +1279,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			IExpr a = ast.arg1();
 			IExpr b = ast.arg2();
 			int dim1 = a.isVector();
@@ -1284,6 +1289,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 	}
 
 	/**
@@ -1321,7 +1330,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			int size = ast.arg1().isVector();
 			if (size >= 0) {
 				IAST param = F.List(F.List(F.C1D2, F.C0), //
@@ -1341,6 +1349,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
@@ -1461,10 +1473,13 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST2()) {
@@ -1709,7 +1724,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			IAST arg1 = Validate.checkASTType(ast, 1);
 			if (arg1.isRealVector()) {
 				return F.num(StatUtils.geometricMean(arg1.toDoubleVector()));
@@ -1721,8 +1735,11 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+		@Override
 		public IExpr numericEval(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			double[] values = ast.getAST(1).toDoubleVector();
 			return F.num(StatUtils.geometricMean(values));
@@ -1733,10 +1750,13 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST1()) {
@@ -1949,10 +1969,13 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 4);
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_3;
+		}
 		private int[] parameters(IAST hypergeometricDistribution) {
 			if (hypergeometricDistribution.size() == 4) {
 				int N = hypergeometricDistribution.arg1().toIntDefault(-1);
@@ -2103,7 +2126,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 			if (ast.size() == 2) {
 				return super.evaluate(ast, engine);
 			}
@@ -2116,6 +2138,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		private IExpr evaluateArg2(final IAST arg1, final IAST arg2, EvalEngine engine) {
 			try {
 				int arg1Length = arg1.isVector();
@@ -2217,10 +2243,13 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			IExpr[] minMax = minmax(dist);
@@ -2342,10 +2371,13 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST2()) {
@@ -2536,10 +2568,13 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST1()) {
@@ -2770,7 +2805,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
 				return F.Divide(F.CentralMoment(list, F.C4), F.Power(F.CentralMoment(list, F.C2), F.C2));
@@ -2778,6 +2812,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
@@ -2983,7 +3021,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			int[] dim = ast.arg1().isMatrix();
 			if (dim == null && ast.arg1().isListOfLists()) {
@@ -3017,6 +3054,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.NOATTRIBUTE);
@@ -3640,10 +3681,13 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST1()) {
@@ -4079,7 +4123,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
 				return F.Divide(F.CentralMoment(list, F.C3), F.Power(F.CentralMoment(list, F.C2), F.C3D2));
@@ -4087,6 +4130,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
@@ -4157,7 +4204,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isList()) {
 				IAST arg1 = (IAST) ast.arg1();
@@ -4179,6 +4225,10 @@ public class StatisticsFunctions {
 		}
 
 		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+		@Override
 		public void setUp(final ISymbol newSymbol) {
 			super.setUp(newSymbol);
 		}
@@ -4188,7 +4238,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			IExpr arg1 = ast.arg1();
 
 			int[] dim = arg1.isMatrix();
@@ -4212,6 +4261,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 	}
 
 	private final static class StudentTDistribution extends IDistributionFunctionImpl
@@ -4390,10 +4443,13 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			IExpr[] minMax = minmax(dist);
@@ -4552,7 +4608,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isAST()) {
 				try {
@@ -4614,6 +4669,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 	}
 
 	/**
@@ -4648,6 +4707,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_3;
+		}
 		@Override
 		public IExpr mean(IAST dist) {
 			if (dist.isAST2()) {

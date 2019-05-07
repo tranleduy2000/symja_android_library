@@ -79,7 +79,6 @@ public class AssumptionFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			final IExpr arg2 = engine.evaluate(ast.arg2());
 			IExpr truthValue;
@@ -101,6 +100,9 @@ public class AssumptionFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		private IExpr assumeDomain(final IExpr arg1, final ISymbol arg2) {
 			if (arg2.isBuiltInSymbol()) {
 				ISymbol truthValue;
@@ -163,7 +165,6 @@ public class AssumptionFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			final IExpr arg2 = engine.evaluate(ast.arg2());
 			if (arg2.isSymbol()) {
@@ -181,6 +182,9 @@ public class AssumptionFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 	}
 	/**
 	 * <pre>

@@ -792,7 +792,6 @@ public class SeriesFunctions {
     private final static class Normal extends AbstractFunctionEvaluator {
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 2);
 
             IExpr arg1 = ast.arg1();
             if (arg1 instanceof ASTSeriesData) {
@@ -805,6 +804,10 @@ public class SeriesFunctions {
             return F.NIL;
         }
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
     }
 
     /**

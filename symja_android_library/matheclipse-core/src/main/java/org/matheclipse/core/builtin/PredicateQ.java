@@ -4,7 +4,6 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractCorePredicateEvaluator;
@@ -22,7 +21,7 @@ import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.VisitorBooleanLevelSpecification;
 
-import static org.matheclipse.core.builtin.Algebra.*;
+import static org.matheclipse.core.builtin.Algebra.InternalFindCommonFactorPlus;
 
 public class PredicateQ {
 
@@ -320,18 +319,18 @@ public class PredicateQ {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			Validate.checkRange(ast, 2, 4);
+			// Validate.checkRange(ast, 2, 4);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			Predicate<IExpr> test = null;
 			if ((ast.size() >= 4)) {
 				final IExpr testArg3 = engine.evaluate(ast.arg3());
 				test = new Predicate<IExpr>() {
-                    @Override
-                    public boolean test(IExpr x) {
-                        return engine.evalTrue(F.unaryAST1(testArg3, x));
-                    }
-                };
+					@Override
+					public boolean test(IExpr x) {
+						return engine.evalTrue(F.unaryAST1(testArg3, x));
+					}
+				};
 					}
 			int depth = determineDepth(arg1, 0, test);
 			if (depth >= 0) {
@@ -348,8 +347,11 @@ public class PredicateQ {
 
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_3;
 	}
 
+	}
 
 	/**
 	 * <pre>
@@ -529,6 +531,9 @@ public class PredicateQ {
 		}
 			return F.NIL;
 		}
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 	}
 
 	/**
@@ -615,6 +620,9 @@ public class PredicateQ {
 		}
 
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 	}
 
 	/**
@@ -649,7 +657,8 @@ public class PredicateQ {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
+			// Validate.checkRange(ast, 2, 3);
+			// if (ast.size() == 2 || ast.size() == 3) {
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			int[] dims = arg1.isMatrix();
@@ -663,7 +672,7 @@ public class PredicateQ {
 				temp.append(F.Slot1);
 				IAST matrix = (IAST) arg1;
 				for (int i = 1; i < dims[0]; i++) {
-					if (!((IAST) matrix.get(i)).forAll(new com.duy.lambda.Predicate<IExpr>() {
+					if (!((IAST) matrix.get(i)).forAll(new Predicate<IExpr>() {
 						@Override
 						public boolean test(IExpr x) {
 							temp.set(1, x);
@@ -675,6 +684,13 @@ public class PredicateQ {
 				}
 			}
 			return F.True;
+			// }
+			// IOFunctions.printMessage(F.MatrixQ, "argt", F.List(F.MatrixQ, F.ZZ(ast.argSize()), F.C1, F.C2), engine);
+			// return F.NIL;
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
 		}
 
 		@Override
@@ -1036,7 +1052,6 @@ public class PredicateQ {
 	private final static class RealNumberQ extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1()) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				if (arg1.isNumber()) {
 					if (arg1.isComplex() || arg1.isComplexNumeric()) {
@@ -1057,8 +1072,8 @@ public class PredicateQ {
 				// }
 				return F.False;
 			}
-			Validate.checkSize(ast, 2);
-			return F.NIL;
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
 		}
 	}
 
@@ -1087,20 +1102,21 @@ public class PredicateQ {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			if (ast.isAST1()) {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			int[] dims = arg1.isMatrix();
 			if (dims == null || dims[0] != dims[1]) {
 				// no square matrix
 				return F.False;
 			}
-			}
-			Validate.checkSize(ast, 2);
+			// Validate.checkSize(ast, 2);
 
 			return F.True;
 		}
 
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 	}
 
 	/**
@@ -1134,7 +1150,6 @@ public class PredicateQ {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			int[] dims = arg1.isMatrix();
@@ -1157,6 +1172,9 @@ public class PredicateQ {
 			return F.True;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 
 	}
 
@@ -1263,13 +1281,12 @@ public class PredicateQ {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1()) {
 
 				// don't eval first argument
 			return F.bool(ast.arg1().isValue());
 		}
-			Validate.checkSize(ast, 2);
-			return F.NIL;
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
 		}
 
 		@Override
@@ -1311,7 +1328,6 @@ public class PredicateQ {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			int dim = arg1.isVector();
@@ -1325,7 +1341,7 @@ public class PredicateQ {
 				temp.append(F.Slot1);
 
 				IAST vector = (IAST) arg1;
-				if (!vector.forAll(new com.duy.lambda.Predicate<IExpr>() {
+				if (!vector.forAll(new Predicate<IExpr>() {
 					@Override
 					public boolean test(IExpr x) {
 						temp.set(1, x);
@@ -1338,6 +1354,9 @@ public class PredicateQ {
 			return F.True;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 	}
 
 	public static boolean isZeroTogether(IExpr expr, EvalEngine engine) {

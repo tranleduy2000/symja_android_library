@@ -103,7 +103,6 @@ public class FinancialFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 4);
 			IExpr a = ast.arg1();
 			IExpr b = ast.arg2();
 			IExpr c = ast.arg3();
@@ -186,8 +185,11 @@ public class FinancialFunctions {
 			}
 			return F.NIL;
 		}
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_3;
 	}
 
+	}
 
 	public static void initialize() {
 		Initializer.init();

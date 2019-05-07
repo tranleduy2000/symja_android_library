@@ -1,8 +1,8 @@
 package org.matheclipse.core.reflection.system;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.Structure;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -112,7 +112,6 @@ public class TrigReduce extends AbstractEvaluator {
 	 */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 2);
 		IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
 		if (temp.isPresent()) {
 			return temp;
@@ -135,6 +134,10 @@ public class TrigReduce extends AbstractEvaluator {
 		return result;
 	}
 
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_1;
+	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 		ORDERLESS_MATCHER.defineHashRule(Sin(x_), Cos(y_),

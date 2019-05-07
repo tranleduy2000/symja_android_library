@@ -4,6 +4,7 @@ import com.duy.lambda.Consumer;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
@@ -60,7 +61,6 @@ public class DSolve extends AbstractFunctionEvaluator {
 		if (!ToggleFeature.DSOLVE) {
 			return F.NIL;
 		}
-		Validate.checkSize(ast, 4);
 
 		IAST uFunction1Arg = F.NIL;
 		IExpr arg2 = ast.arg2();
@@ -94,6 +94,10 @@ public class DSolve extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_3_3;
+	}
 	/**
 	 * Solve unary ODE.
 	 *

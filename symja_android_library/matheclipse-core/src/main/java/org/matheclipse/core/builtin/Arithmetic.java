@@ -348,7 +348,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
             ISymbol sym = Validate.checkSymbolType(ast, 1);
             IExpr arg2 = engine.evaluate(ast.arg2());
             IExpr[] results = sym.reassignSymbolValue(getAST(arg2), getFunctionSymbol(), engine);
@@ -358,6 +357,9 @@ public final class Arithmetic {
             return F.NIL;
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
         @Override
         public void setUp(final ISymbol newSymbol) {
             newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -413,7 +415,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 2);
 
 			IExpr result = F.NIL;
 			IExpr arg1 = engine.evaluateNull(ast.arg1());
@@ -504,6 +505,9 @@ public final class Arithmetic {
 			return result;
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
         @Override
         public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
@@ -835,7 +839,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
 
             try {
 				IExpr realExpr = ast.arg1();
@@ -890,6 +893,9 @@ public final class Arithmetic {
             return F.NIL;
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
         @Override
         public void setUp(final ISymbol newSymbol) {
             newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -900,7 +906,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
 
 			IExpr arg2 = ast.arg2();
             if (arg2.isTrue()) {
@@ -912,6 +917,9 @@ public final class Arithmetic {
             return F.NIL;
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
         @Override
         public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.NUMERICFUNCTION);
@@ -991,7 +999,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr numericEval(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 2);
             IExpr arg1 = ast.arg1();
 			return evaluateArg1(arg1, engine);
         }
@@ -1103,7 +1110,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 2);
             IExpr symbol = ast.arg1();
             if (symbol.isSymbol() && ((ISymbol) symbol).hasAssignedSymbolValue()) {
                 IExpr[] results = ((ISymbol) symbol).reassignSymbolValue(getAST(), getFunctionSymbol(), engine);
@@ -1114,6 +1120,9 @@ public final class Arithmetic {
             return F.NIL;
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
         protected ISymbol getFunctionSymbol() {
             return F.Decrement;
         }
@@ -1214,11 +1223,13 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
             // arg1 * arg2^(-1)
             return F.Divide(ast.arg1(), ast.arg2());
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
         @Override
         public void setUp(final ISymbol newSymbol) {
             newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -1766,7 +1777,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 2);
 
             IExpr arg1 = ast.arg1();
             if (arg1.isDirectedInfinity()) {
@@ -1839,6 +1849,9 @@ public final class Arithmetic {
             return F.NIL;
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
         /**
          * Evaluate <code>Im(x^(a+I*b))</code>
          *
@@ -3641,15 +3654,25 @@ public final class Arithmetic {
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
             int size = ast.size();
+			if (ast.head() == F.Power) {
             if (size == 1) {
                 return F.C1;
             }
-            if (size == 2 && ast.head() == F.Power) {
+				if (size == 2) {
                 return ast.arg1();
             }
+				if (size > 3) {
+					IASTAppendable temp = ast.removeAtClone(size - 1);
+					temp.set(temp.size() - 1, F.Power(ast.get(size - 2), ast.get(size - 1)));
+					return temp;
+				}
+			}
             return super.evaluate(ast, engine);
         }
 
+		public int[] expectedArgSize() {
+			return null;
+		}
         /** {@inheritDoc} */
         @Override
         public void setUp(final ISymbol newSymbol) {
@@ -3662,7 +3685,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            if (ast.size() == 2) {
                 IExpr arg1 = engine.evaluate(ast.arg1());
                 if (arg1 instanceof INum) {
                     return F.integer(((INum) arg1).precision());
@@ -3673,7 +3695,8 @@ public final class Arithmetic {
                 engine.printMessage("Precision: Numeric expression expected");
                 return F.NIL;
             }
-            return Validate.checkSize(ast, 2);
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
         }
     }
 
@@ -3799,7 +3822,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
 
             try {
                 // try to convert into a fractional number
@@ -3856,6 +3878,9 @@ public final class Arithmetic {
             return F.NIL;
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
     }
 
     /**
@@ -3953,12 +3978,14 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 2);
 
             IExpr arg1 = ast.arg1();
             return evalRe(arg1, engine);
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
         /**
          * Evaluate <code>Re(x^(a+I*b))</code>
          *
@@ -4160,7 +4187,6 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
             IExpr base = ast.arg1();
             IExpr arg2 = engine.evaluateNonNumeric(ast.arg2());
             if (arg2.isNumber()) {
@@ -4181,6 +4207,9 @@ public final class Arithmetic {
 
 			return binaryOperator(ast, ast.arg1(), ast.arg2());
         }
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
     }
 
     /**
@@ -4251,11 +4280,13 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkSize(ast, 3);
             // arg1 + (-1)*arg2
             return F.Subtract(ast.arg1(), ast.arg2());
         }
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
         @Override
         public void setUp(final ISymbol newSymbol) {
             newSymbol.setAttributes(ISymbol.HOLDALL);

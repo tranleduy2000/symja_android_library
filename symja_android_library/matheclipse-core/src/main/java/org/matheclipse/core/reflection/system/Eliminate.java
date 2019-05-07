@@ -5,6 +5,7 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.builtin.BooleanFunctions;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
@@ -527,7 +528,6 @@ public class Eliminate extends AbstractFunctionEvaluator {
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 3);
 		try {
 			IAST vars = Validate.checkSymbolOrSymbolList(ast, 2);
 
@@ -555,6 +555,10 @@ public class Eliminate extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_2_2;
+	}
 	private static IExpr resultAsAndEquations(IAST result) {
 		if (result.isList()) {
 			if (result.equals(F.CEmptyList)) {

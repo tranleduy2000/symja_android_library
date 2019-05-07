@@ -12,10 +12,10 @@ import org.hipparchus.optim.linear.NonNegativeConstraint;
 import org.hipparchus.optim.linear.PivotSelectionRule;
 import org.hipparchus.optim.linear.SimplexSolver;
 import org.hipparchus.optim.nonlinear.scalar.GoalType;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.Expr2LP;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrappedException;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
@@ -85,7 +85,6 @@ public class NMinimize extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr numericEval(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 3);
 
 		if (ast.arg1().isList() && ast.arg2().isList()) {
 			IAST list1 = (IAST) ast.arg1();
@@ -107,6 +106,10 @@ public class NMinimize extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_2_2;
+	}
 	protected static LinearObjectiveFunction getObjectiveFunction(VariablesSet vars, IExpr objectiveFunction) {
 		Expr2LP x2LP = new Expr2LP(objectiveFunction, vars);
 		return x2LP.expr2ObjectiveFunction();
@@ -115,12 +118,12 @@ public class NMinimize extends AbstractFunctionEvaluator {
 	protected static List<LinearConstraint> getConstraints(final VariablesSet vars, IAST listOfconstraints) {
 		final List<LinearConstraint> constraints = new ArrayList<LinearConstraint>(listOfconstraints.size());
 		listOfconstraints.forEach(new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr x) {
-                Expr2LP x2LP = new Expr2LP(x, vars);
-                constraints.add(x2LP.expr2Constraint());
-            }
-        });
+			@Override
+			public void accept(IExpr x) {
+				Expr2LP x2LP = new Expr2LP(x, vars);
+				constraints.add(x2LP.expr2Constraint());
+			}
+		});
 		return constraints;
 	}
 

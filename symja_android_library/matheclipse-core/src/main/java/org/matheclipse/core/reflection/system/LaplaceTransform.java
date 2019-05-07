@@ -2,8 +2,8 @@ package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -40,7 +40,6 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 4);
 
 		IExpr a1 = ast.arg1();
 		final IExpr t = ast.arg2();
@@ -81,6 +80,10 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
 		return F.NIL;
 	}
 
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_3_3;
+	}
 	@Override
 	public IAST getRuleAST() {
 		return RULES;

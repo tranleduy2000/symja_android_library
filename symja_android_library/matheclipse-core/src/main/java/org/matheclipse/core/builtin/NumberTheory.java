@@ -630,7 +630,6 @@ public final class NumberTheory {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			if (ast.arg1().isList() && ast.arg2().isList()) {
 				try {
 					long[] a = Validate.checkListOfLongs(ast.arg1(), Long.MIN_VALUE);
@@ -666,6 +665,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 	}
 
 	/**
@@ -695,7 +698,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
@@ -723,6 +725,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.NHOLDREST);
@@ -962,7 +968,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			IExpr n = ast.arg1();
 			if (n.isNumericFunction()) {
 				if (n.isPositiveResult()) {
@@ -973,6 +978,10 @@ public final class NumberTheory {
 			return F.Power(n, F.C1D3);
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
@@ -1158,7 +1167,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isList()) {
 				// thread over first list
@@ -1183,6 +1191,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		/**
 		 * Return F.True or F.False if result is divisible. Return <code>F.NIL</code>, if the result could not be
 		 * determined.
@@ -1287,7 +1299,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			IExpr arg1 = ast.arg1();
 			IExpr arg2 = ast.arg2();
@@ -1299,6 +1310,11 @@ public final class NumberTheory {
 				return divisorSigma(arg1, n);
 			}
 			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
 		}
 
 		private static IExpr divisorSigma(final IExpr arg1, IInteger n) {
@@ -1330,11 +1346,11 @@ public final class NumberTheory {
 				// general formula
 				IASTAppendable sum = F.PlusAlloc(size);
 				return sum.appendArgs(size, new IntFunction<IExpr>() {
-					@Override
-					public IExpr apply(int i) {
-						return F.Power(list.get(i), arg1);
-					}
-				});
+                    @Override
+                    public IExpr apply(int i) {
+                        return F.Power(list.get(i), arg1);
+                    }
+                });
 				// for (int i = 1; i < size; i++) {
 				// sum.append(F.Power(list.get(i), arg1));
 				// }
@@ -2053,13 +2069,16 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			BigInteger[] array = Validate.checkListOfBigIntegers(ast.arg1(), true);
 			BigInteger result = org.matheclipse.core.frobenius.FrobeniusNumber.frobeniusNumber(array);
 			return F.ZZ(result);
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			// newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -2096,7 +2115,6 @@ public final class NumberTheory {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			if (!ast.arg1().isList()) {
 				throw new WrongNumberOfArguments(ast, 1, ast.argSize());
 			}
@@ -2124,6 +2142,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
@@ -2250,7 +2272,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 4);
 
 			IExpr arg1 = ast.arg1();
 			IExpr arg2 = ast.arg2();
@@ -2273,6 +2294,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_3;
+		}
 		private IAST linearRecurrence(IAST list1, IAST list2, int n, EvalEngine engine) {
 			if (n < 0) {
 				return F.NIL;
@@ -2369,6 +2394,10 @@ public final class NumberTheory {
 		}
 
 		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
 		}
@@ -2429,7 +2458,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
 			if (arg1.isInteger()) {
@@ -2449,6 +2477,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -2532,7 +2564,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
 			if (!arg1.isInteger() || arg1.isZero() || arg1.isOne() || arg1.isNegative()) {
@@ -2559,6 +2590,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -2744,7 +2779,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isInteger() && ast.arg2().isInteger()) {
 				try {
@@ -2765,6 +2799,10 @@ public final class NumberTheory {
 
 			}
 			return F.NIL;
+		}
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
 		}
 	}
 
@@ -2900,8 +2938,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			Validate.checkSize(ast, 2);
-
 			final IExpr arg1 = ast.arg1();
 			if (arg1.isZero()) {
 				return F.C1;
@@ -2942,6 +2978,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		/**
 		 * 
 		 * @param engine
@@ -3036,6 +3076,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		/**
 		 * TODO because of recursion you can get stack-overflows
 		 * 
@@ -3139,7 +3183,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
 			if (!arg1.isInteger() || arg1.isZero() || arg1.isOne() || arg1.isNegative()) {
@@ -3175,6 +3218,10 @@ public final class NumberTheory {
 		}
 
 		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
 		}
@@ -3203,7 +3250,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isInteger()) {
 				int nthPrime = ((IInteger) ast.arg1()).toIntDefault(Integer.MIN_VALUE);
@@ -3224,6 +3270,10 @@ public final class NumberTheory {
 		}
 
 		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
 			super.setUp(newSymbol);
@@ -3234,7 +3284,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
 			if (arg1.isNegative() || arg1.isOne() || arg1.isZero()) {
@@ -3275,6 +3324,10 @@ public final class NumberTheory {
 		}
 
 		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
 		}
@@ -3313,7 +3366,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
 			if (arg1.isZero()) {
@@ -3342,6 +3394,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -3381,7 +3437,6 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
 			if (arg1.isInteger()) {
@@ -3390,6 +3445,10 @@ public final class NumberTheory {
 			return F.False;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -3671,7 +3730,6 @@ public final class NumberTheory {
 		/** {@inheritDoc} */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			IExpr nArg1 = ast.arg1();
 			IExpr mArg2 = ast.arg2();
@@ -3691,6 +3749,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -3727,7 +3789,6 @@ public final class NumberTheory {
 		/** {@inheritDoc} */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			try {
 			IExpr nArg1 = ast.arg1();
@@ -3769,6 +3830,10 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);

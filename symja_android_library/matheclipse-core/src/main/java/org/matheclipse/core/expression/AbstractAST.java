@@ -17,6 +17,7 @@ import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.BooleanFunctions;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.Structure.LeafCount;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
@@ -1193,12 +1194,18 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 		final IExpr head = head();
 		if (head.isCoreFunctionSymbol()) {
+			ICoreFunctionEvaluator functionEvaluator = (ICoreFunctionEvaluator) ((IBuiltInSymbol) head).getEvaluator();
+			int[] expected;
+			if ((expected = functionEvaluator.expectedArgSize()) != null) {
+				if (argSize() < expected[0] || argSize() > expected[1]) {
+					return IOFunctions.printArgMessage(this, expected, engine);
+				}
+			}
 			IExpr evaluateTemp = engine.evalEvaluate(this);
 			if (evaluateTemp.isPresent()) {
 				return evaluateTemp;
 			}
-			// evaluate a core function (a function without any value or rule definitions)
-			return ((ICoreFunctionEvaluator) ((IBuiltInSymbol) head).getEvaluator()).evaluate(this, engine);
+			return functionEvaluator.evaluate(this, engine);
 		}
 
 		final ISymbol symbol = topHead();

@@ -44,7 +44,6 @@ public final class OutputFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			// CFormUtilities texUtil = new CFormUtilities(engine, engine.isRelaxedSyntax());
 			// IExpr arg1 = engine.evaluate(ast.arg1());
@@ -54,6 +53,10 @@ public final class OutputFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -87,11 +90,14 @@ public final class OutputFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			return F.stringx(engine.evaluate(ast.arg1()).fullFormString());
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 		}
@@ -327,7 +333,6 @@ public final class OutputFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			MathMLUtilities mathMLUtil = new MathMLUtilities(engine, false, engine.isRelaxedSyntax());
 			IExpr arg1 = ast.arg1();
@@ -336,6 +341,10 @@ public final class OutputFunctions {
 			return F.stringx(stw.toString());
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -363,7 +372,6 @@ public final class OutputFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			TeXUtilities texUtil = new TeXUtilities(engine, engine.isRelaxedSyntax());
 			IExpr arg1 = engine.evaluate(ast.arg1());
@@ -372,6 +380,10 @@ public final class OutputFunctions {
 			return F.$str(stw.toString());
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);

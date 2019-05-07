@@ -1,7 +1,7 @@
 package org.matheclipse.core.eval.interfaces;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.util.Options;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -34,7 +34,7 @@ public abstract class AbstractCorePredicateEvaluator extends AbstractCoreFunctio
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		if (ast.size() >= 2) {
+		// if (ast.size() >= 2) {
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isList()) {
 				// thread over list?
@@ -47,9 +47,12 @@ public abstract class AbstractCorePredicateEvaluator extends AbstractCoreFunctio
 				return F.bool(evalArg1Boole(arg1, engine, options));
 			}
 			return F.bool(evalArg1Boole(arg1, engine));
+		// }
+		// Validate.checkSize(ast, 2);
+		// return F.NIL;
 		}
-		Validate.checkSize(ast, 2);
-		return F.NIL;
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_2;
 	}
 
 }

@@ -1,10 +1,9 @@
 package org.matheclipse.core.reflection.system;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -26,7 +25,6 @@ public class Horner extends AbstractFunctionEvaluator {
 	@Override
 	@Deprecated
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 2);
 
 		if (ast.arg1().isAST()) {
 
@@ -45,6 +43,10 @@ public class Horner extends AbstractFunctionEvaluator {
 		return ast.arg1();
 	}
 
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_1;
+	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 	}

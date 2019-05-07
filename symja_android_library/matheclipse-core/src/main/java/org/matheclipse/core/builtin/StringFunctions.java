@@ -128,7 +128,6 @@ public final class StringFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				throw new WrongNumberOfArguments(ast, 1, ast.argSize());
 			}
@@ -136,6 +135,10 @@ public final class StringFunctions {
 			return F.bool(test(ast.arg1()));
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -163,7 +166,6 @@ public final class StringFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				throw new WrongArgumentType(ast, ast.arg1(), 1);
 			}
@@ -171,6 +173,10 @@ public final class StringFunctions {
 			return F.bool(test(ast.arg1()));
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -194,7 +200,6 @@ public final class StringFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isString()) {
 				String s = ast.arg1().toString();
@@ -207,6 +212,10 @@ public final class StringFunctions {
 			}
 
 			return F.NIL;
+		}
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
 		}
 	}
 
@@ -249,7 +258,6 @@ public final class StringFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isString()) {
 				return F.integer(ast.arg1().toString().length());
@@ -257,6 +265,10 @@ public final class StringFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -305,7 +317,6 @@ public final class StringFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isString()) {
 				String s = ast.arg1().toString();
@@ -319,13 +330,16 @@ public final class StringFunctions {
 
 			return F.NIL;
 		}
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 	}
 
 	private static class SyntaxLength extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				return F.NIL;
 			}
@@ -334,6 +348,10 @@ public final class StringFunctions {
 			return F.integer(ExprParser.syntaxLength(str, engine));
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -345,7 +363,6 @@ public final class StringFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				return F.NIL;
 			}
@@ -353,6 +370,10 @@ public final class StringFunctions {
 			return toCharacterCode(ast.arg1().toString(), "UTF-8", F.ListAlloc());
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -383,7 +404,7 @@ public final class StringFunctions {
 			if (arg1.isString()) {
 				ISymbol form = F.InputForm;
 				if (ast.size() == 3) {
-					IExpr arg2 = ast.arg1();
+					IExpr arg2 = ast.arg2();
 					if (arg2.equals(F.InputForm)) {
 						form = F.InputForm;
 					} else if (arg2.equals(F.TeXForm)) {
@@ -392,23 +413,34 @@ public final class StringFunctions {
 						return F.NIL;
 					}
 				}
-				if (form.equals(F.InputForm)) {
-					ExprParser fParser = new ExprParser(engine);
-					IExpr temp = fParser.parse(arg1.toString());
-					return temp;
-				} else if (form.equals(F.TeXForm)) {
-					// TODO call TeXParser
+				try {
+					if (form.equals(F.InputForm)) {
+						ExprParser fParser = new ExprParser(engine);
+						IExpr temp = fParser.parse(arg1.toString());
+						return temp;
+					} else if (form.equals(F.TeXForm)) {
+//						TeXParser texParser = new TeXParser(engine);
+//						return texParser.toExpression(arg1.toString());
+					}
+				} catch (RuntimeException rex) {
+					if (Config.SHOW_STACKTRACE) {
+						rex.printStackTrace();
+					}
+					return F.$Aborted;
 				}
 			}
 			return F.NIL;
 		}
 
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+//			TeXParser.initialize();
+		}
 	}
 	private static class ToString extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isString()) {
 				return ast.arg1();
@@ -416,6 +448,10 @@ public final class StringFunctions {
 			return F.$str(inputForm(ast.arg1(), true));
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 	}
 
 	private static class ToUnicode extends AbstractFunctionEvaluator {
@@ -423,7 +459,6 @@ public final class StringFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			if (!(ast.arg1() instanceof IStringX)) {
 				return F.NIL;
 			}
@@ -431,6 +466,10 @@ public final class StringFunctions {
 			return StringX.valueOf(toUnicodeString(ast.arg1().toString(), "UTF-8"));
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);

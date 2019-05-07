@@ -95,10 +95,9 @@ public final class PatternMatching {
 	private final static class Begin extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.size() > 1) {
 				String contextName = Validate.checkContextName(ast, 1);
 				Context pack = EvalEngine.get().getContextPath().currentContext();
-				String packageName = pack.getContextName();
+			// String packageName = pack.getContextName();
 				// if (packageName.equals(Context.GLOBAL_CONTEXT_NAME)) {
 				// completeContextName = contextName;
 				// } else {
@@ -107,7 +106,9 @@ public final class PatternMatching {
 				Context context=engine.begin(contextName, pack);
 				return F.stringx(context.completeContextName());
 			}
-			return F.NIL;
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
 		}
 
 		@Override
@@ -157,6 +158,10 @@ public final class PatternMatching {
 			return F.stringx(context.completeContextName());
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_0_0;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -385,7 +390,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			ISymbol symbol = Validate.checkSymbolType(ast, 1);
 
 			PrintStream stream;
@@ -405,6 +409,10 @@ public final class PatternMatching {
 			return F.Null;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -584,7 +592,6 @@ public final class PatternMatching {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (Config.isFileSystemEnabled(engine)) {
-				Validate.checkSize(ast, 2);
 
 				if (!(ast.arg1() instanceof IStringX)) {
 					throw new WrongNumberOfArguments(ast, 1, ast.argSize());
@@ -607,6 +614,10 @@ public final class PatternMatching {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -756,11 +767,14 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2);
 
 			return ast.arg1();
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -834,7 +848,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			// Here we only validate the arguments
 			// Assignment of the message is handled in the Set() function
@@ -852,6 +865,10 @@ public final class PatternMatching {
 			return F.Null;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -984,7 +1001,6 @@ public final class PatternMatching {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (Config.isFileSystemEnabled(engine)) {
-				Validate.checkRange(ast, 3);
 
 				final int argSize = ast.argSize();
 				IStringX fileName = Validate.checkStringType(ast, argSize);
@@ -1010,6 +1026,10 @@ public final class PatternMatching {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_INFINITY;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -1050,7 +1070,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST2()) {
 			IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isAST()) {
 				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
@@ -1066,7 +1085,9 @@ public final class PatternMatching {
 			}
 			return Rule(leftHandSide, arg2);
 		}
-			return F.NIL;
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
 		}
 
 		@Override
@@ -1092,7 +1113,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST2()) {
 			IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isAST()) {
 				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
@@ -1103,10 +1123,13 @@ public final class PatternMatching {
 				return RuleDelayed(leftHandSide, ast.arg2());
 			}
 
-			}
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -1220,7 +1243,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			final IExpr leftHandSide = ast.arg1();
 			final IExpr head = leftHandSide.head();
 			if (head.isBuiltInSymbol()) {
@@ -1239,6 +1261,10 @@ public final class PatternMatching {
 			// return (IExpr) result[1];
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		private static IExpr createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
 				final EvalEngine engine) throws RuleCreationError {
 
@@ -1337,7 +1363,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			final IExpr leftHandSide = ast.arg1();
 			final IExpr rightHandSide = ast.arg2();
 
@@ -1346,6 +1371,10 @@ public final class PatternMatching {
 			return F.Null;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		private static void createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
 				final EvalEngine engine) throws RuleCreationError {
 			int[] flags = new int[] { IPatternMatcher.NOFLAG };
@@ -1422,7 +1451,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 4);
 
 			IExpr arg1 = ast.arg1();
 			if (arg1.isSymbol() && !arg1.isBuiltInSymbol()) {
@@ -1447,6 +1475,10 @@ public final class PatternMatching {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_3;
+		}
 		private static Object[] createPatternMatcher(ISymbol tagSetSymbol, IExpr leftHandSide, IExpr rightHandSide,
 				boolean packageMode, EvalEngine engine) throws RuleCreationError {
 			final Object[] result = new Object[2];
@@ -1483,7 +1515,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 4);
 
 			IExpr arg1 = ast.arg1();
 			if (arg1.isSymbol() && !arg1.isBuiltInSymbol()) {
@@ -1498,6 +1529,10 @@ public final class PatternMatching {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_3;
+		}
 		private static Object[] createPatternMatcher(ISymbol lhsSymbol, IExpr leftHandSide, IExpr rightHandSide,
 				boolean packageMode, EvalEngine engine) throws RuleCreationError {
 			final Object[] result = new Object[2];
@@ -1557,7 +1592,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 1, 2);
 
 			final int moduleCounter = engine.incModuleCounter();
 			if (ast.isAST1()) {
@@ -1574,6 +1608,10 @@ public final class PatternMatching {
 			return F.symbol(varAppend, engine);
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_0_1;
+		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -1641,7 +1679,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 			final IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isList()) {
 				// thread over lists
@@ -1654,6 +1691,10 @@ public final class PatternMatching {
 			return F.Null;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		public void removePatternMatcher(IExpr leftHandSide, boolean packageMode, EvalEngine engine)
 				throws RuleCreationError {
 
@@ -1698,7 +1739,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			final IExpr leftHandSide = ast.arg1();
 			IExpr rightHandSide = ast.arg2();
 			if (leftHandSide.isList()) {
@@ -1717,6 +1757,10 @@ public final class PatternMatching {
 			return (IExpr) result[1];
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		private static Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
 				EvalEngine engine) throws RuleCreationError {
 			final Object[] result = new Object[2];
@@ -1762,7 +1806,6 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			final IExpr leftHandSide = ast.arg1();
 			final IExpr rightHandSide = ast.arg2();
 
@@ -1771,6 +1814,10 @@ public final class PatternMatching {
 			return F.Null;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		private static Object[] createPatternMatcher(IExpr leftHandSide, IExpr rightHandSide, boolean packageMode,
 				EvalEngine engine) throws RuleCreationError {
 			final Object[] result = new Object[2];

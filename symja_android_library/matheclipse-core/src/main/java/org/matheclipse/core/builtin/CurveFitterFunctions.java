@@ -183,6 +183,9 @@ public class CurveFitterFunctions {
 			return numericEval(ast, engine);
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_4_4;
+		}
 		/**
 		 * Determine the initial guess. Default is <code>[1.0, 1.0, 1.0,...]</code>
 		 * 
@@ -230,7 +233,6 @@ public class CurveFitterFunctions {
 
 		@Override
 		public IExpr numericEval(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 5);
 
 			if (ast.arg1().isList() && ast.arg3().isList() && ast.arg4().isSymbol()) {
 				IAST data = (IAST) ast.arg1();
@@ -289,7 +291,6 @@ public class CurveFitterFunctions {
 
 		@Override
 		public IExpr numericEval(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 4);
 
 			if (ast.arg1().isList() && ast.arg2().isReal() && ast.arg3().isSymbol()) {
 				int polynomialDegree = ast.arg2().toIntDefault(Integer.MIN_VALUE);
@@ -309,8 +310,11 @@ public class CurveFitterFunctions {
 
 			return F.NIL;
 		}
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_3;
 	}
 
+	}
 
 	public static void initialize() {
 		Initializer.init();

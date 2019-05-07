@@ -2,8 +2,8 @@ package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.Function;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -33,8 +33,8 @@ import java.util.TreeMap;
  * 
  * <blockquote>
  * <p>
- * common subexpressions elimination for a complicated <code>function</code> by generating &ldquo;dummy&rdquo; variables
- * for these subexpressions.
+ * common subexpressions elimination for a complicated <code>function</code> by generating &ldquo;dummy&rdquo; variables for these
+ * subexpressions.
  * </p>
  * </blockquote>
  * 
@@ -233,7 +233,6 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 2);
 
 		if (ast.arg1().isAST()) {
 			return optimizeExpression((IAST) ast.arg1());
@@ -241,6 +240,10 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_1;
+	}
 	/**
 	 * Try to optimize/extract common sub-<code>IASTs</code> expressions to minimize the number of operations
 	 *

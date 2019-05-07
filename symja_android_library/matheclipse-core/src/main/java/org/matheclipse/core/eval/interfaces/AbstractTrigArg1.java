@@ -1,8 +1,8 @@
 package org.matheclipse.core.eval.interfaces;
 
 import org.hipparchus.complex.Complex;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
@@ -22,14 +22,12 @@ public abstract class AbstractTrigArg1 extends AbstractArg1 {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 2);
 
 		return evaluateArg1(ast.arg1(), engine);
 	}
 
 	@Override
 	public IExpr numericEval(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 2);
 		IExpr arg1 = ast.arg1();
 		if (arg1 instanceof INum) {
 			if (arg1 instanceof ApfloatNum) {
@@ -46,6 +44,9 @@ public abstract class AbstractTrigArg1 extends AbstractArg1 {
 		return evaluateArg1(arg1, engine);
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_1;
+	}
 	@Override
 	public IExpr e1DblArg(final double d) {
 		return F.NIL;

@@ -27,5 +27,5 @@ public interface IBuiltInSymbol extends ISymbol, IExpr {
 	 */
 	public void setPredicateQ(Predicate<IExpr> predicate);
 
-	abstract public ISymbol mapToGlobal(EvalEngine engine);
+	public ISymbol mapToGlobal(EvalEngine engine);
 }

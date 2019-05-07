@@ -3,7 +3,6 @@ package org.matheclipse.core.builtin;
 import com.duy.lambda.IntFunction;
 
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -55,7 +54,6 @@ public class VectorAnalysisFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			if (ast.arg1().isVector() >= 3) {
 				if (ast.arg2().isVector() == 3) {
 					IAST variables = (IAST) ast.arg2();
@@ -77,6 +75,9 @@ public class VectorAnalysisFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 	}
 
 	/**
@@ -106,7 +107,6 @@ public class VectorAnalysisFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			if ((ast.arg1().isVector() == ast.arg2().isVector()) && (ast.arg1().isVector() >= 0)) {
 				final IAST vector = (IAST) ast.arg1();
 				final IAST variables = (IAST) ast.arg2();
@@ -123,13 +123,15 @@ public class VectorAnalysisFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 	}
 
 	private static final class Grad extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 			IExpr function = ast.arg1();
 			if (ast.arg2().isVector() > 0) {
 				IAST variables = (IAST) ast.arg2();
@@ -143,6 +145,9 @@ public class VectorAnalysisFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 	}
 
 	private static final class RotationMatrix extends AbstractFunctionEvaluator {

@@ -7,4 +7,10 @@ import org.matheclipse.core.interfaces.IEvaluatorImpl;
  */
 
 public abstract class IFunctionEvaluatorImpl extends IEvaluatorImpl implements IFunctionEvaluator {
+    @Override
+    public int[] expectedArgSize() {
+        return null;
+    }
+
+
 }

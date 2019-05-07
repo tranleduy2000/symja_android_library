@@ -354,6 +354,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		globalSubstitute.assign(fValue);
 		return globalSubstitute;
 	}
+
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluateHead(IAST ast, EvalEngine engine) {

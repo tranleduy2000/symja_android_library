@@ -749,7 +749,6 @@ public class Algebra {
 		}
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
 			if (ast.isAST1() && arg1.isAtom()) {
@@ -770,6 +769,9 @@ public class Algebra {
 			return arg1;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		private IExpr cancelFractionPowers(EvalEngine engine, IExpr arg1) {
 			IExpr temp;
 			IExpr[] parts = fractionalParts(arg1, false);
@@ -2192,7 +2194,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			VariablesSet eVar = new VariablesSet(ast.arg1());
 			if (!eVar.isSize(1)) {
@@ -2219,6 +2220,9 @@ public class Algebra {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		private static IExpr factorList(IExpr expr, List<IExpr> varList, boolean factorSquareFree)
 				throws JASConversionException {
 			JASConvert<BigRational> jas = new JASConvert<BigRational>(varList, BigRational.ZERO);
@@ -4828,7 +4832,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
 			IAST list = Structure.threadLogicEquationOperators(arg1, ast, 1);
@@ -4838,6 +4841,9 @@ public class Algebra {
 			return together(arg1, engine);
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		private IExpr together(IExpr arg1, EvalEngine engine) {
 			if (arg1.isPlusTimesPower()) {
 				if (arg1.isPower()) {
@@ -4905,11 +4911,13 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			return VariablesSet.getVariables(ast.arg1());
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}

@@ -97,6 +97,9 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 		return F.NIL;
 	}
 
+	public int[] expectedArgSize() {
+		return null;
+	}
 	public HashedOrderlessMatcher getHashRuleMap() {
 		return null;
 	}

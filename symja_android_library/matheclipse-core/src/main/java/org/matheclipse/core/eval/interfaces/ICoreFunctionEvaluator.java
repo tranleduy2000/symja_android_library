@@ -33,6 +33,11 @@ public interface ICoreFunctionEvaluator extends IFunctionEvaluator {
         public void setUp(ISymbol newSymbol) {
 
         }
+
+        @Override
+        public int[] expectedArgSize() {
+            return null;
+        }
     };
 
     @Override

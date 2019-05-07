@@ -101,7 +101,6 @@ public final class RandomFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			if (ast.arg1().isInteger()) {
 				// RandomInteger(100) gives an integer between 0 and 100
@@ -116,6 +115,9 @@ public final class RandomFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 	}
 
 	/**

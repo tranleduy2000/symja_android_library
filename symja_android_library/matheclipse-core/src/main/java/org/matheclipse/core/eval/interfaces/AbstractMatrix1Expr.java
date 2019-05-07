@@ -3,9 +3,9 @@ package org.matheclipse.core.eval.interfaces;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -17,7 +17,6 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 2);
 
 		FieldMatrix<IExpr> matrix;
 		try {
@@ -49,6 +48,10 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_1;
+	}
 	/**
 	 * Evaluate the symbolic matrix for this algorithm.
 	 * 
@@ -60,7 +63,6 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr numericEval(final IAST ast, EvalEngine engine) {
-		Validate.checkSize(ast, 2);
 
 		RealMatrix matrix;
 		IExpr arg1 = ast.arg1();
