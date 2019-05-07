@@ -51,7 +51,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -1741,7 +1740,18 @@ public final class ListFunctions {
 	}
 
 	/**
-	 * Delete duplicate values from a list.
+	 * <pre><code>DeleteDuplicates(list)
+	 * </code></pre>
+	 * <blockquote>
+	 * <p>deletes duplicates from <code>list</code>.</p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * <pre><code>&gt;&gt; DeleteDuplicates({1, 7, 8, 4, 3, 4, 1, 9, 9, 2, 1})
+	 * {1,7,8,4,3,9,2}
+	 * </code></pre>
+	 * <pre><code>&gt;&gt; DeleteDuplicates({3,2,1,2,3,4}, Less)
+	 * {3,2,1}
+	 * </code></pre>
 	 */
 	private final static class DeleteDuplicates extends AbstractFunctionEvaluator {
 
@@ -2083,6 +2093,14 @@ public final class ListFunctions {
 			}
 	}
 
+	/**
+	 * <pre><code>Fold[f, x, {a, b}]
+	 * </code></pre>
+	 * <blockquote>
+	 * <p>returns <code>f[f[x, a], b]</code>, and this nesting continues for lists of arbitrary length.</p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 */
 	private final static class Fold extends AbstractCoreFunctionEvaluator {
 
 		@Override
@@ -2121,6 +2139,19 @@ public final class ListFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * <code>FoldList[f, x, {a, b}]
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>{x, f[x, a], f[f[x, a], b]}</code>
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 */
 	private final static class FoldList extends AbstractCoreFunctionEvaluator {
 
 		@Override
@@ -2183,6 +2214,42 @@ public final class ListFunctions {
 
 	}
 
+	/**
+	 * <pre>
+	 * <code>Gather(list, test)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * gathers leaves of <code>list</code> into sub lists of items that are the same according to <code>test</code>.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * <code>Gather(list)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * gathers leaves of <code>list</code> into sub lists of items that are the same.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 * <p>
+	 * The order of the items inside the sub lists is the same as in the original list.
+	 * </p>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; Gather({1, 7, 3, 7, 2, 3, 9})
+	 * {{1},{7,7},{3,3},{2},{9}}
+	 *
+	 * &gt;&gt; Gather({1/3, 2/6, 1/9})
+	 * {{1/3,1/3},{1/9}}
+	 * </code>
+	 * </pre>
+	 */
 	private final static class Gather extends AbstractEvaluator {
 
 		@Override
@@ -2221,6 +2288,46 @@ public final class ListFunctions {
 
 	}
 
+	/**
+	 * <pre>
+	 * <code>GatherBy(list, f)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * gathers leaves of <code>list</code> into sub lists of items whose image under <code>f</code> identical.
+	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * <code>GatherBy(list, {f, g,...})
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * gathers leaves of <code>list</code> into sub lists of items whose image under <code>f</code> identical. Then,
+	 * gathers these sub lists again into sub sub lists, that are identical under <code>g</code>.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; GatherBy({{1, 3}, {2, 2}, {1, 1}}, Total)
+	 * {{{1,3},{2,2}},{{1,1}}}
+	 *
+	 * &gt;&gt; GatherBy({&quot;xy&quot;, &quot;abc&quot;, &quot;ab&quot;}, StringLength)
+	 * {{xy,ab},{abc}}
+	 *
+	 * &gt;&gt; GatherBy({{2, 0}, {1, 5}, {1, 0}}, Last)
+	 * {{{2,0},{1,0}},{{1,5}}}
+	 *
+	 * &gt;&gt; GatherBy({{1, 2}, {2, 1}, {3, 5}, {5, 1}, {2, 2, 2}}, {Total, Length})
+	 * {{{{1,2},{2,1}}},{{{3,5}}},{{{5,1}},{{2,2,2}}}}
+	 * </code>
+	 * </pre>
+	 */
 	private final static class GatherBy extends AbstractEvaluator {
 
 		@Override
@@ -2232,13 +2339,20 @@ public final class ListFunctions {
 				IAST arg1 = (IAST) ast.arg1();
 				IExpr arg2 = ast.arg2();
 				if (arg2.isList()) {
-					if (arg2.size() == 1) {
-						return F.GatherBy(ast.arg1(), arg2.first());
+					final IAST list2 = (IAST) arg2;
+					final int size2 = list2.argSize();
+					switch (size2) {
+					case 0:
+						return F.GatherBy(ast.arg1(), F.Identity);
+					case 1:
+						return F.GatherBy(ast.arg1(), list2.arg1());
+					case 2:
+						return F.Map(F.Function(F.GatherBy(F.Slot1, list2.arg2())), F.GatherBy(arg1, list2.arg1()));
 					}
-					if (arg2.size() == 3) {
-						return F.Map(F.Function(F.GatherBy(F.Slot1, arg2.second())), F.GatherBy(arg1, arg2.first()));
-					}
-					return F.NIL;
+					IAST r = list2.copyUntil(size2);
+					IExpr f = list2.last();
+					// GatherBy(l_, {r__, f_}) := Map(GatherBy(#, f)&, GatherBy(l, {r}), {Length({r})})
+					return F.Map(F.Function(F.GatherBy(F.Slot1, f)), F.GatherBy(arg1, r), F.List(F.ZZ(r.argSize())));
 				}
 				java.util.Map<IExpr, IASTAppendable> map = new TreeMap<IExpr, IASTAppendable>();
 				IASTAppendable result = F.ListAlloc(map.size());

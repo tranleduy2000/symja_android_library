@@ -6409,6 +6409,9 @@ public class F {
         return binaryAST2(Map, a0, a1);
     }
 
+	public static IAST Map(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(Map, a0, a1, a2);
+	}
     public static IAST MapThread(final IExpr a0, final IExpr a1) {
         return binaryAST2(MapThread, a0, a1);
     }
