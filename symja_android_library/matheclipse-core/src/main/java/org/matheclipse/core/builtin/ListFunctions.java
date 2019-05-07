@@ -38,7 +38,6 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IIterator;
 import org.matheclipse.core.interfaces.IIteratorImpl;
 import org.matheclipse.core.interfaces.INumber;
-import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.reflection.system.Product;
@@ -400,14 +399,11 @@ public final class ListFunctions {
 
 		@Override
 		public int toInt(final IExpr position) {
-			if (position.isReal()) {
-				try {
-					return ((ISignedNumber) position).toInt();
-				} catch (ArithmeticException ae) {
-					//
-				}
-			}
+			int val = position.toIntDefault(Integer.MIN_VALUE);
+			if (val<0) {
 			return -1;
+		}
+			return val;
 		}
 	}
 
@@ -2106,19 +2102,6 @@ public final class ListFunctions {
 		}
 	}
 
-	/**
-	 * <pre>
-	 * <code>FoldList[f, x, {a, b}]
-	 * </code>
-	 * </pre>
-	 *
-	 * <blockquote>
-	 * <p>
-	 * returns <code>{x, f[x, a], f[f[x, a], b]}</code>
-	 * </p>
-	 * </blockquote>
-	 * <h3>Examples</h3>
-	 */
 	private final static class FoldList extends AbstractCoreFunctionEvaluator {
 
 		@Override
@@ -5203,10 +5186,6 @@ public final class ListFunctions {
 					return temp[0];
 				}
 			});
-			// for (int i = from; i < end; i++) {
-			// elem = binaryFunction.apply(elem, list.get(i));
-			// resultCollection.append(elem);
-			// }
 
 		}
 		return resultCollection;
