@@ -3,6 +3,7 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.Function;
 
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
@@ -100,7 +101,7 @@ public class WindowFunctions {
 			this.function = f;
 		}
 
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isRealResult()) {
 				return function.apply(arg1);
 			}

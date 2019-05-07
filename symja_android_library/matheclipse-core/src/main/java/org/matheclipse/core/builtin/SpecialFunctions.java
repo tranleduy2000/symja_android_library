@@ -237,7 +237,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isZero()) {
 				return F.C0;
 			}
@@ -306,7 +306,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isReal()) {
 				if (arg1.isZero()) {
 					return F.C1;
@@ -496,7 +496,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isReal()) {
 				if (arg1.isZero()) {
 					return F.C0;
@@ -552,7 +552,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isReal()) {
 				ISignedNumber z = (ISignedNumber) arg1;
 				if (z.isZero()) {
@@ -685,7 +685,7 @@ public class SpecialFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isInfinity() || arg1.isZero()) {
 				return F.CInfinity;
 			}

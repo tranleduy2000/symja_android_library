@@ -73,7 +73,7 @@ public class HypergeometricFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isZero()) {
 				return F.CNInfinity;
 			}
@@ -102,7 +102,7 @@ public class HypergeometricFunctions {
 	private static class CoshIntegral extends AbstractTrigArg1  {
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isZero()) {
 				return F.CNInfinity;
 			}
@@ -191,7 +191,7 @@ public class HypergeometricFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isZero()) {
 				return F.CNInfinity;
 			}
@@ -241,7 +241,7 @@ public class HypergeometricFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isNumber()) {
 				if (arg1.isZero()) {
 					return F.C0;
@@ -302,7 +302,7 @@ public class HypergeometricFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isNumber()) {
 				if (arg1.isZero()) {
 					return F.C0;
@@ -660,7 +660,7 @@ public class HypergeometricFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isZero()) {
 				return F.C0;
 			}
@@ -703,7 +703,7 @@ public class HypergeometricFunctions {
 		}
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isZero()) {
 				return F.C0;
 			}
@@ -740,7 +740,7 @@ public class HypergeometricFunctions {
 	private static class SinhIntegral extends AbstractTrigArg1  {
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1) {
+		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
 			if (arg1.isZero()) {
 				return F.C0;
 			}

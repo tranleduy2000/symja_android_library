@@ -14,13 +14,16 @@ import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CNI;
 import static org.matheclipse.core.expression.F.CSqrt5;
+import static org.matheclipse.core.expression.F.Complex;
 import static org.matheclipse.core.expression.F.DirectedInfinity;
 import static org.matheclipse.core.expression.F.E;
 import static org.matheclipse.core.expression.F.Exp;
+import static org.matheclipse.core.expression.F.Floor;
 import static org.matheclipse.core.expression.F.GoldenRatio;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.ISetDelayed;
+import static org.matheclipse.core.expression.F.Im;
 import static org.matheclipse.core.expression.F.Indeterminate;
 import static org.matheclipse.core.expression.F.Integer;
 import static org.matheclipse.core.expression.F.List;
@@ -30,6 +33,7 @@ import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.RealNumberQ;
+import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.a;
 import static org.matheclipse.core.expression.F.a_;
@@ -52,7 +56,7 @@ public interface LogRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 18, 3 };
+  final public static int[] SIZES = { 18, 4 };
 
   final public static IAST RULES = List(
     IInit(Log, SIZES),
@@ -65,6 +69,9 @@ public interface LogRules {
     // Log(E^x_RealNumberQ):=x
     ISetDelayed(Log(Exp($p(x,RealNumberQ))),
       x),
+    // Log(E^x_Complex):=x+2*I*Pi*Floor((Pi-Im(x))/(2*Pi))
+    ISetDelayed(Log(Exp($p(x,Complex))),
+      Plus(x,Times(C2,CI,Pi,Floor(Times(Power(Times(C2,Pi),CN1),Subtract(Pi,Im(x))))))),
     // Log(E^I)=I
     ISet(Log(Exp(CI)),
       CI),
