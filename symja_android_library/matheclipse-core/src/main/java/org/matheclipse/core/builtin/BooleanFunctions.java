@@ -236,7 +236,7 @@ public final class BooleanFunctions {
 				return F.True;
 			}
 
-			IASTAppendable result = flattenedAST.copyFrom(start++);
+			IASTAppendable result = flattenedAST.copyFrom(start);
 			result.set(index, temp);
 			int[] symbols = new int[flattenedAST.size()];
 			int[] notSymbols = new int[flattenedAST.size()];
