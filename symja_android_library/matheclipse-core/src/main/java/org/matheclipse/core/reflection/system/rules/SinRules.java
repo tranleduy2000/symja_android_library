@@ -15,6 +15,7 @@ import static org.matheclipse.core.expression.F.C1D3;
 import static org.matheclipse.core.expression.F.C1D4;
 import static org.matheclipse.core.expression.F.C1DSqrt2;
 import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C2Pi;
 import static org.matheclipse.core.expression.F.C5;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
@@ -22,6 +23,7 @@ import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CN2;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.CSqrt5;
@@ -107,7 +109,7 @@ public interface SinRules {
     ISet(Sin(Times(QQ(5L,12L),Pi)),
       Times(C1D2,C1DSqrt2,Plus(C1,CSqrt3))),
     // Sin(Pi/2)=1
-    ISet(Sin(Times(C1D2,Pi)),
+    ISet(Sin(CPiHalf),
       C1),
     // Sin(7/12*Pi)=(1+Sqrt(3))/(2*Sqrt(2))
     ISet(Sin(Times(QQ(7L,12L),Pi)),
@@ -215,7 +217,7 @@ public interface SinRules {
     ISet(Sin(Times(QQ(23L,12L),Pi)),
       Times(C1D2,C1DSqrt2,Subtract(C1,CSqrt3))),
     // Sin(2*Pi)=0
-    ISet(Sin(Times(C2,Pi)),
+    ISet(Sin(C2Pi),
       C0),
     // Sin(I)=I*Sinh(1)
     ISet(Sin(CI),

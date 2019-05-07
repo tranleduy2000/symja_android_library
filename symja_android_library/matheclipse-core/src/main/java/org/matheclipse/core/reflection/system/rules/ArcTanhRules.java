@@ -5,11 +5,11 @@ import org.matheclipse.core.interfaces.IAST;
 import static org.matheclipse.core.expression.F.ArcTanh;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C1DSqrt3;
 import static org.matheclipse.core.expression.F.CC;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.DirectedInfinity;
 import static org.matheclipse.core.expression.F.IInit;
@@ -56,6 +56,6 @@ public interface ArcTanhRules {
       Times(CC(0L,1L,1L,2L),Pi)),
     // ArcTanh(ComplexInfinity)=Pi/2
     ISet(ArcTanh(CComplexInfinity),
-      Times(C1D2,Pi))
+      CPiHalf)
   );
 }

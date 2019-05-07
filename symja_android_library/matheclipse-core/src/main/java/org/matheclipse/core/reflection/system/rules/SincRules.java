@@ -7,7 +7,6 @@ import static org.matheclipse.core.expression.F.ArcSin;
 import static org.matheclipse.core.expression.F.ArcTan;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C1D3;
 import static org.matheclipse.core.expression.F.C1D4;
 import static org.matheclipse.core.expression.F.C2;
@@ -17,6 +16,7 @@ import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.CSqrt5;
@@ -67,7 +67,7 @@ public interface SincRules {
     ISet(Sinc(Times(C1D3,Pi)),
       Times(QQ(3L,2L),CSqrt3,Power(Pi,CN1))),
     // Sinc(Pi/2)=2/Pi
-    ISet(Sinc(Times(C1D2,Pi)),
+    ISet(Sinc(CPiHalf),
       Times(C2,Power(Pi,CN1))),
     // Sinc(Pi)=0
     ISet(Sinc(Pi),

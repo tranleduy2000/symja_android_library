@@ -4131,8 +4131,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("Factor(a*b+(4+4*x+x^2)^2)",//
 		// "16+a*b+32*x+24*x^2+8*x^3+x^4");
 		// github #121
-		// check("Factor(x^(12)-y^(12), GaussianIntegers->True)", //
-		// "Factor(x^12-y^12,GaussianIntegers->True)");
+//		check("Factor(x^(12)-y^(12), GaussianIntegers->True)", //
+//				"-(-x+y)*(x+y)*(-I*x+y)*(I*x+y)*(x^2+x*y+y^2)*(x^2-x*y+y^2)*(-x^2-I*x*y+y^2)*(-x^\n" +
+//				"2+I*x*y+y^2)");
 		check("Factor(x^(2)+y^(2), GaussianIntegers->True)", //
 				"(-I*x+y)*(I*x+y)");
 		check("Factor(1+x^2, GaussianIntegers->True)", //
@@ -8933,6 +8934,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testOperate() {
+		check("Operate(a, (a*c)[f(x)])", //
+				"a(a*c)[f(x)]");
+		check("Through(Operate(a, (a*c)[f(x)]))", //
+				"a((a*c)[f(x)])");
 		check("Through(Operate(p, f(x)))", //
 				"p(f(x))");
 		check("Composition(p, f)[x]", //
@@ -8943,24 +8948,41 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"p(f)[a,b]");
 		check("Operate(p, f(a, b), 1)", //
 				"p(f)[a,b]");
-		check("Operate(p, f(a)[b][c], 0)", "p(f(a)[b][c])");
-		check("Operate(p, f(a)[b][c])", "p(f(a)[b])[c]");
-		check("Operate(p, f(a)[b][c], 1)", "p(f(a)[b])[c]");
-		check("Operate(p, f(a)[b][c], 2)", "p(f(a))[b][c]");
-		check("Operate(p, f(a)[b][c], 3)", "p(f)[a][b][c]");
-		check("Operate(p, f(a)[b][c], 4)", "f(a)[b][c]");
-		check("Operate(p, f, 0)", "p(f)");
-		check("Operate(p, f, -1)", "Operate(p,f,-1)");
+		check("Operate(p, f(a)[b][c], 0)", //
+				"p(f(a)[b][c])");
+		check("Operate(p, f(a)[b][c])", //
+				"p(f(a)[b])[c]");
+		check("Operate(p, f(a)[b][c], 1)", //
+				"p(f(a)[b])[c]");
+		check("Operate(p, f(a)[b][c], 2)", //
+				"p(f(a))[b][c]");
+		check("Operate(p, f(a)[b][c], 3)", //
+				"p(f)[a][b][c]");
+		check("Operate(p, f(a)[b][c], 4)", //
+				"f(a)[b][c]");
+		check("Operate(p, f, 0)", //
+				"p(f)");
+		check("Operate(p, f, -1)", //
+				"Operate(p,f,-1)");
 
-		check("Operate(p, f)", "f");
-		check("Operate(p, f, 0)", "p(f)");
-		check("Operate(p, f(a)[b][c],0)", "p(f(a)[b][c])");
-		check("Operate(p, f(a)[b][c])", "p(f(a)[b])[c]");
-		check("Operate(p, f(a)[b][c],1)", "p(f(a)[b])[c]");
-		check("Operate(p, f(a)[b][c],2)", "p(f(a))[b][c]");
-		check("Operate(p, f(a)[b][c],3)", "p(f)[a][b][c]");
-		check("Operate(p, f(a)[b][c],4)", "f(a)[b][c]");
-		check("Operate(p, f(x, y))", "p(f)[x,y]");
+		check("Operate(p, f)", //
+				"f");
+		check("Operate(p, f, 0)", //
+				"p(f)");
+		check("Operate(p, f(a)[b][c],0)", //
+				"p(f(a)[b][c])");
+		check("Operate(p, f(a)[b][c])", //
+				"p(f(a)[b])[c]");
+		check("Operate(p, f(a)[b][c],1)", //
+				"p(f(a)[b])[c]");
+		check("Operate(p, f(a)[b][c],2)", //
+				"p(f(a))[b][c]");
+		check("Operate(p, f(a)[b][c],3)", //
+				"p(f)[a][b][c]");
+		check("Operate(p, f(a)[b][c],4)", //
+				"f(a)[b][c]");
+		check("Operate(p, f(x, y))", //
+				"p(f)[x,y]");
 	}
 
 	public void testDP() {

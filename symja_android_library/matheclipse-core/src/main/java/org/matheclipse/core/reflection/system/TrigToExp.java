@@ -73,7 +73,7 @@ public class TrigToExp extends AbstractEvaluator {
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Times(F.C2, F.Power(F.Plus(F.Exp(F.Times(F.CNI, x)), F.Exp(F.Times(F.CI, x))), -1));
+						return F.Times(F.C2, F.Power(F.Plus(F.Exp(F.Times(F.CNI, x)), F.Exp(F.Times(F.CI, x))), F.CN1));
 					}
 				}); // $$);
 		MATCHER.caseOf(Sin(x_), //
@@ -81,14 +81,15 @@ public class TrigToExp extends AbstractEvaluator {
 					@Override
 					public IExpr apply(IExpr x) {
 						return F.Plus(F.Times(F.CN1D2, F.CI, F.Exp(F.Times(F.CI, x))),
-								F.Times(F.CI, F.Power(F.Times(F.C2, F.Exp(F.Times(F.CI, x))), -1)));
+								F.Times(F.CI, F.Power(F.Times(F.C2, F.Exp(F.Times(F.CI, x))), F.CN1)));
 					}
 				}); // $$);
 		MATCHER.caseOf(Cos(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Plus(F.Power(F.Times(F.C2, F.Exp(F.Times(F.CI, x))), -1), F.Times(F.C1D2, F.Exp(F.Times(F.CI, x))));
+						return F.Plus(F.Power(F.Times(F.C2, F.Exp(F.Times(F.CI, x))), F.CN1),
+								F.Times(F.C1D2, F.Exp(F.Times(F.CI, x))));
 					}
 				}); // $$);
 		MATCHER.caseOf(Cot(x_), //
@@ -96,7 +97,7 @@ public class TrigToExp extends AbstractEvaluator {
 					@Override
 					public IExpr apply(IExpr x) {
 						return F.Times(F.CN1, F.CI, F.Plus(F.Exp(F.Times(F.CNI, x)), F.Exp(F.Times(F.CI, x))),
-								F.Power(F.Plus(F.Exp(F.Times(F.CNI, x)), F.Negate(F.Exp(F.Times(F.CI, x)))), -1));
+								F.Power(F.Subtract(F.Exp(F.Times(F.CNI, x)), F.Exp(F.Times(F.CI, x))), F.CN1));
 					}
 				}); // $$);
 		MATCHER.caseOf(Csc(x_), //
@@ -104,15 +105,15 @@ public class TrigToExp extends AbstractEvaluator {
 					@Override
 					public IExpr apply(IExpr x) {
 						return F.Times(F.CN1, F.C2, F.CI,
-								F.Power(F.Plus(F.Exp(F.Times(F.CNI, x)), F.Negate(F.Exp(F.Times(F.CI, x)))), -1));
+								F.Power(F.Subtract(F.Exp(F.Times(F.CNI, x)), F.Exp(F.Times(F.CI, x))), F.CN1));
 					}
 				}); // $$);
 		MATCHER.caseOf(Tan(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Times(F.CI, F.Plus(F.Exp(F.Times(F.CNI, x)), F.Negate(F.Exp(F.Times(F.CI, x)))),
-								F.Power(F.Plus(F.Exp(F.Times(F.CNI, x)), F.Exp(F.Times(F.CI, x))), -1));
+						return F.Times(F.CI, F.Subtract(F.Exp(F.Times(F.CNI, x)), F.Exp(F.Times(F.CI, x))),
+								F.Power(F.Plus(F.Exp(F.Times(F.CNI, x)), F.Exp(F.Times(F.CI, x))), F.CN1));
 					}
 				}); // $$);
 
@@ -120,39 +121,39 @@ public class TrigToExp extends AbstractEvaluator {
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Plus(F.Times(F.C1D2, F.Pi), F.Times(F.CI,
-								F.Log(F.Plus(F.Sqrt(F.Plus(F.C1, F.Negate(F.Power(x, -2)))), F.Times(F.CI, F.Power(x, -1))))));
+						return F.Plus(F.CPiHalf, F.Times(F.CI, F.Log(
+								F.Plus(F.Sqrt(F.Subtract(F.C1, F.Power(x, F.CN2))), F.Times(F.CI, F.Power(x, F.CN1))))));
 					}
 				}); // $$);
 		MATCHER.caseOf(ArcSin(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Times(F.CNI, F.Log(F.Plus(F.Times(F.CI, x), F.Sqrt(F.Plus(F.C1, F.Negate(F.Sqr(x)))))));
+						return F.Times(F.CNI, F.Log(F.Plus(F.Times(F.CI, x), F.Sqrt(F.Subtract(F.C1, F.Sqr(x))))));
 					}
 				}); // $$);
 		MATCHER.caseOf(ArcCos(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Plus(F.Times(F.C1D2, F.Pi),
-								F.Times(F.CI, F.Log(F.Plus(F.Times(F.CI, x), F.Sqrt(F.Plus(F.C1, F.Negate(F.Sqr(x))))))));
+						return F.Plus(F.CPiHalf,
+								F.Times(F.CI, F.Log(F.Plus(F.Times(F.CI, x), F.Sqrt(F.Subtract(F.C1, F.Sqr(x)))))));
 					}
 				}); // $$);
 		MATCHER.caseOf(ArcCsc(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Times(F.CNI,
-								F.Log(F.Plus(F.Sqrt(F.Plus(F.C1, F.Negate(F.Power(x, -2)))), F.Times(F.CI, F.Power(x, -1)))));
+						return F.Times(F.CNI, F.Log(
+								F.Plus(F.Sqrt(F.Subtract(F.C1, F.Power(x, F.CN2))), F.Times(F.CI, F.Power(x, F.CN1)))));
 					}
 				}); // $$);
 		MATCHER.caseOf(ArcCot(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Plus(F.Times(F.C1D2, F.CI, F.Log(F.Plus(F.C1, F.Times(F.CNI, F.Power(x, -1))))),
-								F.Times(F.CN1D2, F.CI, F.Log(F.Plus(F.C1, F.Times(F.CI, F.Power(x, -1))))));
+						return F.Plus(F.Times(F.C1D2, F.CI, F.Log(F.Plus(F.C1, F.Times(F.CNI, F.Power(x, F.CN1))))),
+								F.Times(F.CN1D2, F.CI, F.Log(F.Plus(F.C1, F.Times(F.CI, F.Power(x, F.CN1))))));
 					}
 				}); // $$);
 		MATCHER.caseOf(ArcTan(x_), //
@@ -183,23 +184,24 @@ public class TrigToExp extends AbstractEvaluator {
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Log(F.Plus(F.Sqrt(F.Plus(F.C1, F.Power(x, -2))), F.Power(x, -1)));
+						return F.Log(F.Plus(F.Sqrt(F.Plus(F.C1, F.Power(x, F.CN2))), F.Power(x, F.CN1)));
 					}
 				}); // $$);
 		MATCHER.caseOf(ArcCoth(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Plus(F.Times(F.CN1D2, F.Log(F.Plus(F.C1, F.Negate(F.Power(x, -1))))),
-								F.Times(F.C1D2, F.Log(F.Plus(F.C1, F.Power(x, -1)))));
+						return F.Plus(F.Times(F.CN1D2, F.Log(F.Subtract(F.C1, F.Power(x, F.CN1)))),
+								F.Times(F.C1D2, F.Log(F.Plus(F.C1, F.Power(x, F.CN1)))));
 					}
 				}); // $$);
 		MATCHER.caseOf(ArcSech(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Log(F.Plus(F.Times(F.Sqrt(F.Plus(F.CN1, F.Power(x, -1))), F.Sqrt(F.Plus(F.C1, F.Power(x, -1)))),
-								F.Power(x, -1)));
+						return F.Log(F.Plus(
+								F.Times(F.Sqrt(F.Plus(F.CN1, F.Power(x, F.CN1))), F.Sqrt(F.Plus(F.C1, F.Power(x, F.CN1)))),
+								F.Power(x, F.CN1)));
 					}
 				}); // $$);
 		MATCHER.caseOf(ArcSinh(x_), //
@@ -213,7 +215,7 @@ public class TrigToExp extends AbstractEvaluator {
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Plus(F.Times(F.CN1D2, F.Log(F.Plus(F.C1, F.Negate(x)))), F.Times(F.C1D2, F.Log(F.Plus(F.C1, x))));
+						return F.Plus(F.Times(F.CN1D2, F.Log(F.Subtract(F.C1, x))), F.Times(F.C1D2, F.Log(F.Plus(F.C1, x))));
 					}
 				}); // $$);
 
@@ -221,14 +223,14 @@ public class TrigToExp extends AbstractEvaluator {
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Plus(F.Power(F.Times(F.Exp(x), F.C2), -1), F.Times(F.C1D2, F.Exp(x)));
+						return F.Plus(F.Power(F.Times(F.Exp(x), F.C2), F.CN1), F.Times(F.C1D2, F.Exp(x)));
 					}
 				}); // $$);
 		MATCHER.caseOf(Csch(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Times(F.C2, F.Power(F.Plus(F.Negate(F.Exp(F.Negate(x))), F.Exp(x)), -1));
+						return F.Times(F.C2, F.Power(F.Plus(F.Negate(F.Exp(F.Negate(x))), F.Exp(x)), F.CN1));
 					}
 				}); // $$);
 		MATCHER.caseOf(Coth(x_), //
@@ -236,29 +238,29 @@ public class TrigToExp extends AbstractEvaluator {
 					@Override
 					public IExpr apply(IExpr x) {
 						return F.Times(F.Plus(F.Exp(F.Negate(x)), F.Exp(x)),
-								F.Power(F.Plus(F.Negate(F.Exp(F.Negate(x))), F.Exp(x)), -1));
+								F.Power(F.Plus(F.Negate(F.Exp(F.Negate(x))), F.Exp(x)), F.CN1));
 					}
 				}); // $$);
 		MATCHER.caseOf(Sech(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Times(F.C2, F.Power(F.Plus(F.Exp(x), F.Exp(F.Negate(x))), -1));
+						return F.Times(F.C2, F.Power(F.Plus(F.Exp(x), F.Exp(F.Negate(x))), F.CN1));
 					}
 				}); // $$);
 		MATCHER.caseOf(Sinh(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Plus(F.Negate(F.Power(F.Times(F.Exp(x), F.C2), -1)), F.Times(F.C1D2, F.Exp(x)));
+						return F.Plus(F.Negate(F.Power(F.Times(F.Exp(x), F.C2), F.CN1)), F.Times(F.C1D2, F.Exp(x)));
 					}
 				}); // $$);
 		MATCHER.caseOf(Tanh(x_), //
 				new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
-						return F.Plus(F.Negate(F.Power(F.Times(F.Exp(x), F.Plus(F.Exp(F.Negate(x)), F.Exp(x))), -1)),
-								F.Times(F.Exp(x), F.Power(F.Plus(F.Exp(F.Negate(x)), F.Exp(x)), -1)));
+						return F.Plus(F.Negate(F.Power(F.Times(F.Exp(x), F.Plus(F.Exp(F.Negate(x)), F.Exp(x))), F.CN1)),
+								F.Times(F.Exp(x), F.Power(F.Plus(F.Exp(F.Negate(x)), F.Exp(x)), F.CN1)));
 					}
 				}); // $$);
 		}

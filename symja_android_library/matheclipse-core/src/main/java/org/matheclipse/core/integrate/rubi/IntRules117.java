@@ -1,10 +1,107 @@
 package org.matheclipse.core.integrate.rubi;
 
 
-import static org.matheclipse.core.expression.F.*;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.*;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctions.*;
-import org.matheclipse.core.interfaces.IAST;
+import static org.matheclipse.core.expression.F.$p;
+import static org.matheclipse.core.expression.F.$s;
+import static org.matheclipse.core.expression.F.ASymbol;
+import static org.matheclipse.core.expression.F.A_DEFAULT;
+import static org.matheclipse.core.expression.F.And;
+import static org.matheclipse.core.expression.F.ArcCosh;
+import static org.matheclipse.core.expression.F.ArcCsch;
+import static org.matheclipse.core.expression.F.ArcSech;
+import static org.matheclipse.core.expression.F.ArcSinh;
+import static org.matheclipse.core.expression.F.BSymbol;
+import static org.matheclipse.core.expression.F.B_DEFAULT;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C4;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.CN1D2;
+import static org.matheclipse.core.expression.F.CN2;
+import static org.matheclipse.core.expression.F.CPiHalf;
+import static org.matheclipse.core.expression.F.CSqrt2;
+import static org.matheclipse.core.expression.F.CSymbol;
+import static org.matheclipse.core.expression.F.C_DEFAULT;
+import static org.matheclipse.core.expression.F.Condition;
+import static org.matheclipse.core.expression.F.Cosh;
+import static org.matheclipse.core.expression.F.CoshIntegral;
+import static org.matheclipse.core.expression.F.Coth;
+import static org.matheclipse.core.expression.F.D;
+import static org.matheclipse.core.expression.F.Erf;
+import static org.matheclipse.core.expression.F.Erfi;
+import static org.matheclipse.core.expression.F.FreeQ;
+import static org.matheclipse.core.expression.F.FresnelC;
+import static org.matheclipse.core.expression.F.FresnelS;
+import static org.matheclipse.core.expression.F.IIntegrate;
+import static org.matheclipse.core.expression.F.IntegerQ;
+import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Not;
+import static org.matheclipse.core.expression.F.Pi;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.PolynomialQ;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.QQ;
+import static org.matheclipse.core.expression.F.Set;
+import static org.matheclipse.core.expression.F.Sinh;
+import static org.matheclipse.core.expression.F.SinhIntegral;
+import static org.matheclipse.core.expression.F.Sqr;
+import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.Subtract;
+import static org.matheclipse.core.expression.F.Tanh;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.With;
+import static org.matheclipse.core.expression.F.a;
+import static org.matheclipse.core.expression.F.a_;
+import static org.matheclipse.core.expression.F.a_DEFAULT;
+import static org.matheclipse.core.expression.F.b;
+import static org.matheclipse.core.expression.F.b_DEFAULT;
+import static org.matheclipse.core.expression.F.c;
+import static org.matheclipse.core.expression.F.c_;
+import static org.matheclipse.core.expression.F.c_DEFAULT;
+import static org.matheclipse.core.expression.F.d;
+import static org.matheclipse.core.expression.F.d_;
+import static org.matheclipse.core.expression.F.d_DEFAULT;
+import static org.matheclipse.core.expression.F.e;
+import static org.matheclipse.core.expression.F.e_DEFAULT;
+import static org.matheclipse.core.expression.F.f;
+import static org.matheclipse.core.expression.F.f_;
+import static org.matheclipse.core.expression.F.f_DEFAULT;
+import static org.matheclipse.core.expression.F.g;
+import static org.matheclipse.core.expression.F.g_DEFAULT;
+import static org.matheclipse.core.expression.F.m;
+import static org.matheclipse.core.expression.F.m_DEFAULT;
+import static org.matheclipse.core.expression.F.n;
+import static org.matheclipse.core.expression.F.n_;
+import static org.matheclipse.core.expression.F.n_DEFAULT;
+import static org.matheclipse.core.expression.F.p;
+import static org.matheclipse.core.expression.F.p_;
+import static org.matheclipse.core.expression.F.p_DEFAULT;
+import static org.matheclipse.core.expression.F.u;
+import static org.matheclipse.core.expression.F.u_;
+import static org.matheclipse.core.expression.F.u_DEFAULT;
+import static org.matheclipse.core.expression.F.x;
+import static org.matheclipse.core.expression.F.x_;
+import static org.matheclipse.core.expression.F.x_Symbol;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Dist;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.EqQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ExpandIntegrand;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FunctionOfExponentialQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.GtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IGtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Int;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IntegersQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.InverseFunctionFreeQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NeQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.RationalFunctionQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Simp;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SimplifyIntegrand;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Subst;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SumQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Unintegrable;
 
 /** 
  * IndefiniteIntegrationRules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
@@ -67,7 +164,7 @@ IIntegrate(5872,Int(Power(Plus(a_DEFAULT,Times(ArcSinh(Plus(c_,Times(d_DEFAULT,S
 IIntegrate(5873,Int(Power(Plus(a_DEFAULT,Times(ArcSinh(Plus(c_,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),CN1),x_Symbol),
     Condition(Plus(Simp(Times(x,Subtract(Times(c,Cosh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(a,Power(Times(C2,b),CN1)))),CoshIntegral(Times(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Power(Times(C2,b),CN1))),Power(Times(C2,b,Plus(Cosh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Times(c,Sinh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x))))))))),CN1)),x),Simp(Times(x,Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Times(c,Sinh(Times(a,Power(Times(C2,b),CN1))))),SinhIntegral(Times(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Power(Times(C2,b),CN1))),Power(Times(C2,b,Plus(Cosh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Times(c,Sinh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x))))))))),CN1)),x)),And(FreeQ(List(a,b,c,d),x),EqQ(Sqr(c),CN1))));
 IIntegrate(5874,Int(Power(Plus(a_DEFAULT,Times(ArcSinh(Plus(c_,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),CN1D2),x_Symbol),
-    Condition(Plus(Simp(Times(Plus(c,C1),Sqrt(Times(C1D2,Pi)),x,Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(C2,Sqrt(b),Plus(Cosh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Times(c,Sinh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x))))))))),CN1)),x),Simp(Times(Subtract(c,C1),Sqrt(Times(C1D2,Pi)),x,Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Erf(Times(Sqrt(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(C2,Sqrt(b),Plus(Cosh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Times(c,Sinh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x))))))))),CN1)),x)),And(FreeQ(List(a,b,c,d),x),EqQ(Sqr(c),CN1))));
+    Condition(Plus(Simp(Times(Plus(c,C1),Sqrt(CPiHalf),x,Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(C2,Sqrt(b),Plus(Cosh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Times(c,Sinh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x))))))))),CN1)),x),Simp(Times(Subtract(c,C1),Sqrt(CPiHalf),x,Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Erf(Times(Sqrt(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(C2,Sqrt(b),Plus(Cosh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Times(c,Sinh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x))))))))),CN1)),x)),And(FreeQ(List(a,b,c,d),x),EqQ(Sqr(c),CN1))));
 IIntegrate(5875,Int(Power(Plus(a_DEFAULT,Times(ArcSinh(Plus(c_,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),QQ(-3L,2L)),x_Symbol),
     Condition(Plus(Negate(Simp(Times(Sqrt(Plus(Times(C2,c,d,Sqr(x)),Times(Sqr(d),Power(x,C4)))),Power(Times(b,d,x,Sqrt(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x)))))))),CN1)),x)),Negate(Simp(Times(Power(Times(CN1,c,Power(b,CN1)),QQ(3L,2L)),Sqrt(Pi),x,Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Times(c,Sinh(Times(a,Power(Times(C2,b),CN1))))),FresnelC(Times(Sqrt(Times(CN1,c,Power(Times(Pi,b),CN1))),Sqrt(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x))))))))),Power(Plus(Cosh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Times(c,Sinh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))))),CN1)),x)),Simp(Times(Power(Times(CN1,c,Power(b,CN1)),QQ(3L,2L)),Sqrt(Pi),x,Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Times(c,Sinh(Times(a,Power(Times(C2,b),CN1))))),FresnelS(Times(Sqrt(Times(CN1,c,Power(Times(Pi,b),CN1))),Sqrt(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x))))))))),Power(Plus(Cosh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Times(c,Sinh(Times(C1D2,ArcSinh(Plus(c,Times(d,Sqr(x)))))))),CN1)),x)),And(FreeQ(List(a,b,c,d),x),EqQ(Sqr(c),CN1))));
 IIntegrate(5876,Int(Power(Plus(a_DEFAULT,Times(ArcSinh(Plus(c_,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),CN2),x_Symbol),
@@ -75,9 +172,9 @@ IIntegrate(5876,Int(Power(Plus(a_DEFAULT,Times(ArcSinh(Plus(c_,Times(d_DEFAULT,S
 IIntegrate(5877,Int(Power(Plus(a_DEFAULT,Times(ArcSinh(Plus(c_,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),n_),x_Symbol),
     Condition(Plus(Negate(Simp(Times(x,Power(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Plus(n,C2)),Power(Times(C4,Sqr(b),Plus(n,C1),Plus(n,C2)),CN1)),x)),Dist(Power(Times(C4,Sqr(b),Plus(n,C1),Plus(n,C2)),CN1),Int(Power(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Plus(n,C2)),x),x),Simp(Times(Sqrt(Plus(Times(C2,c,d,Sqr(x)),Times(Sqr(d),Power(x,C4)))),Power(Plus(a,Times(b,ArcSinh(Plus(c,Times(d,Sqr(x)))))),Plus(n,C1)),Power(Times(C2,b,d,Plus(n,C1),x),CN1)),x)),And(FreeQ(List(a,b,c,d),x),EqQ(Sqr(c),CN1),LtQ(n,CN1),NeQ(n,CN2))));
 IIntegrate(5878,Int(Sqrt(Plus(a_DEFAULT,Times(ArcCosh(Plus(C1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT))),x_Symbol),
-    Condition(Plus(Simp(Times(C2,Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Sqr(Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(d,x),CN1)),x),Simp(Times(Sqrt(b),Sqrt(Times(C1D2,Pi)),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erf(Times(Power(Times(C2,b),CN1D2),Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))))),Power(Times(d,x),CN1)),x),Negate(Simp(Times(Sqrt(b),Sqrt(Times(C1D2,Pi)),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erfi(Times(Power(Times(C2,b),CN1D2),Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))))),Power(Times(d,x),CN1)),x))),FreeQ(List(a,b,d),x)));
+    Condition(Plus(Simp(Times(C2,Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Sqr(Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(d,x),CN1)),x),Simp(Times(Sqrt(b),Sqrt(CPiHalf),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erf(Times(Power(Times(C2,b),CN1D2),Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))))),Power(Times(d,x),CN1)),x),Negate(Simp(Times(Sqrt(b),Sqrt(CPiHalf),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erfi(Times(Power(Times(C2,b),CN1D2),Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))))),Power(Times(d,x),CN1)),x))),FreeQ(List(a,b,d),x)));
 IIntegrate(5879,Int(Sqrt(Plus(a_DEFAULT,Times(ArcCosh(Plus(CN1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT))),x_Symbol),
-    Condition(Plus(Simp(Times(C2,Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Sqr(Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(d,x),CN1)),x),Negate(Simp(Times(Sqrt(b),Sqrt(Times(C1D2,Pi)),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erf(Times(Power(Times(C2,b),CN1D2),Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))))),Power(Times(d,x),CN1)),x)),Negate(Simp(Times(Sqrt(b),Sqrt(Times(C1D2,Pi)),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erfi(Times(Power(Times(C2,b),CN1D2),Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))))),Power(Times(d,x),CN1)),x))),FreeQ(List(a,b,d),x)));
+    Condition(Plus(Simp(Times(C2,Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Sqr(Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(d,x),CN1)),x),Negate(Simp(Times(Sqrt(b),Sqrt(CPiHalf),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erf(Times(Power(Times(C2,b),CN1D2),Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))))),Power(Times(d,x),CN1)),x)),Negate(Simp(Times(Sqrt(b),Sqrt(CPiHalf),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erfi(Times(Power(Times(C2,b),CN1D2),Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))))),Power(Times(d,x),CN1)),x))),FreeQ(List(a,b,d),x)));
 IIntegrate(5880,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(c_,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),n_),x_Symbol),
     Condition(Plus(Simp(Times(x,Power(Plus(a,Times(b,ArcCosh(Plus(c,Times(d,Sqr(x)))))),n)),x),Dist(Times(C4,Sqr(b),n,Subtract(n,C1)),Int(Power(Plus(a,Times(b,ArcCosh(Plus(c,Times(d,Sqr(x)))))),Subtract(n,C2)),x),x),Negate(Simp(Times(C2,b,n,Plus(Times(C2,c,d,Sqr(x)),Times(Sqr(d),Power(x,C4))),Power(Plus(a,Times(b,ArcCosh(Plus(c,Times(d,Sqr(x)))))),Subtract(n,C1)),Power(Times(d,x,Sqrt(Plus(CN1,c,Times(d,Sqr(x)))),Sqrt(Plus(C1,c,Times(d,Sqr(x))))),CN1)),x))),And(FreeQ(List(a,b,c,d),x),EqQ(Sqr(c),C1),GtQ(n,C1))));
 IIntegrate(5881,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(C1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),CN1),x_Symbol),
@@ -85,13 +182,13 @@ IIntegrate(5881,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(C1,Times(d_DEFAULT,S
 IIntegrate(5882,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(CN1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),CN1),x_Symbol),
     Condition(Plus(Negate(Simp(Times(x,Sinh(Times(a,Power(Times(C2,b),CN1))),CoshIntegral(Times(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Power(Times(C2,b),CN1))),Power(Times(CSqrt2,b,Sqrt(Times(d,Sqr(x)))),CN1)),x)),Simp(Times(x,Cosh(Times(a,Power(Times(C2,b),CN1))),SinhIntegral(Times(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Power(Times(C2,b),CN1))),Power(Times(CSqrt2,b,Sqrt(Times(d,Sqr(x)))),CN1)),x)),FreeQ(List(a,b,d),x)));
 IIntegrate(5883,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(C1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),CN1D2),x_Symbol),
-    Condition(Plus(Simp(Times(Sqrt(Times(C1D2,Pi)),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Sqrt(b),d,x),CN1)),x),Simp(Times(Sqrt(Times(C1D2,Pi)),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erf(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Sqrt(b),d,x),CN1)),x)),FreeQ(List(a,b,d),x)));
+    Condition(Plus(Simp(Times(Sqrt(CPiHalf),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Sqrt(b),d,x),CN1)),x),Simp(Times(Sqrt(CPiHalf),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erf(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Sqrt(b),d,x),CN1)),x)),FreeQ(List(a,b,d),x)));
 IIntegrate(5884,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(CN1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),CN1D2),x_Symbol),
-    Condition(Subtract(Simp(Times(Sqrt(Times(C1D2,Pi)),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Sqrt(b),d,x),CN1)),x),Simp(Times(Sqrt(Times(C1D2,Pi)),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erf(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Sqrt(b),d,x),CN1)),x)),FreeQ(List(a,b,d),x)));
+    Condition(Subtract(Simp(Times(Sqrt(CPiHalf),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Sqrt(b),d,x),CN1)),x),Simp(Times(Sqrt(CPiHalf),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erf(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Sqrt(b),d,x),CN1)),x)),FreeQ(List(a,b,d),x)));
 IIntegrate(5885,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(C1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),QQ(-3L,2L)),x_Symbol),
-    Condition(Plus(Negate(Simp(Times(Sqrt(Times(d,Sqr(x))),Sqrt(Plus(C2,Times(d,Sqr(x)))),Power(Times(b,d,x,Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x)))))))),CN1)),x)),Negate(Simp(Times(Sqrt(Times(C1D2,Pi)),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erf(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Power(b,QQ(3L,2L)),d,x),CN1)),x)),Simp(Times(Sqrt(Times(C1D2,Pi)),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Power(b,QQ(3L,2L)),d,x),CN1)),x)),FreeQ(List(a,b,d),x)));
+    Condition(Plus(Negate(Simp(Times(Sqrt(Times(d,Sqr(x))),Sqrt(Plus(C2,Times(d,Sqr(x)))),Power(Times(b,d,x,Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x)))))))),CN1)),x)),Negate(Simp(Times(Sqrt(CPiHalf),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erf(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Power(b,QQ(3L,2L)),d,x),CN1)),x)),Simp(Times(Sqrt(CPiHalf),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Sinh(Times(C1D2,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Power(b,QQ(3L,2L)),d,x),CN1)),x)),FreeQ(List(a,b,d),x)));
 IIntegrate(5886,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(CN1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),QQ(-3L,2L)),x_Symbol),
-    Condition(Plus(Negate(Simp(Times(Sqrt(Times(d,Sqr(x))),Sqrt(Plus(CN2,Times(d,Sqr(x)))),Power(Times(b,d,x,Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))))),CN1)),x)),Simp(Times(Sqrt(Times(C1D2,Pi)),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erf(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Power(b,QQ(3L,2L)),d,x),CN1)),x),Simp(Times(Sqrt(Times(C1D2,Pi)),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Power(b,QQ(3L,2L)),d,x),CN1)),x)),FreeQ(List(a,b,d),x)));
+    Condition(Plus(Negate(Simp(Times(Sqrt(Times(d,Sqr(x))),Sqrt(Plus(CN2,Times(d,Sqr(x)))),Power(Times(b,d,x,Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))))),CN1)),x)),Simp(Times(Sqrt(CPiHalf),Plus(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erf(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Power(b,QQ(3L,2L)),d,x),CN1)),x),Simp(Times(Sqrt(CPiHalf),Subtract(Cosh(Times(a,Power(Times(C2,b),CN1))),Sinh(Times(a,Power(Times(C2,b),CN1)))),Cosh(Times(C1D2,ArcCosh(Plus(CN1,Times(d,Sqr(x)))))),Erfi(Times(Sqrt(Plus(a,Times(b,ArcCosh(Plus(CN1,Times(d,Sqr(x))))))),Power(Times(C2,b),CN1D2))),Power(Times(Power(b,QQ(3L,2L)),d,x),CN1)),x)),FreeQ(List(a,b,d),x)));
 IIntegrate(5887,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(C1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),CN2),x_Symbol),
     Condition(Plus(Negate(Simp(Times(Sqrt(Times(d,Sqr(x))),Sqrt(Plus(C2,Times(d,Sqr(x)))),Power(Times(C2,b,d,x,Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x))))))),CN1)),x)),Negate(Simp(Times(x,Sinh(Times(a,Power(Times(C2,b),CN1))),CoshIntegral(Times(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Power(Times(C2,b),CN1))),Power(Times(C2,CSqrt2,Sqr(b),Sqrt(Times(d,Sqr(x)))),CN1)),x)),Simp(Times(x,Cosh(Times(a,Power(Times(C2,b),CN1))),SinhIntegral(Times(Plus(a,Times(b,ArcCosh(Plus(C1,Times(d,Sqr(x)))))),Power(Times(C2,b),CN1))),Power(Times(C2,CSqrt2,Sqr(b),Sqrt(Times(d,Sqr(x)))),CN1)),x)),FreeQ(List(a,b,d),x)));
 IIntegrate(5888,Int(Power(Plus(a_DEFAULT,Times(ArcCosh(Plus(CN1,Times(d_DEFAULT,Sqr(x_)))),b_DEFAULT)),CN2),x_Symbol),

@@ -5,7 +5,6 @@ import org.matheclipse.core.interfaces.IAST;
 import static org.matheclipse.core.expression.F.ArcCsc;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C1D3;
 import static org.matheclipse.core.expression.F.C1D4;
 import static org.matheclipse.core.expression.F.C1DSqrt3;
@@ -13,6 +12,7 @@ import static org.matheclipse.core.expression.F.C2;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt5;
 import static org.matheclipse.core.expression.F.CSqrt6;
@@ -47,7 +47,7 @@ public interface ArcCscRules {
       CComplexInfinity),
     // ArcCsc(1)=Pi/2
     ISet(ArcCsc(C1),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // ArcCsc(2/Sqrt(3))=Pi/3
     ISet(ArcCsc(Times(C2,C1DSqrt3)),
       Times(C1D3,Pi)),

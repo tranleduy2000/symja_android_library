@@ -5,7 +5,6 @@ import org.matheclipse.core.interfaces.IAST;
 import static org.matheclipse.core.expression.F.ArcSec;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C1D3;
 import static org.matheclipse.core.expression.F.C1D4;
 import static org.matheclipse.core.expression.F.C1DSqrt3;
@@ -15,6 +14,7 @@ import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN2;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt5;
 import static org.matheclipse.core.expression.F.CSqrt6;
@@ -99,24 +99,24 @@ public interface ArcSecRules {
       Times(QQ(7L,12L),Pi)),
     // ArcSec(I)=Pi/2+I*Log(Sqrt(2)+1)
     ISet(ArcSec(CI),
-      Plus(Times(C1D2,Pi),Times(CI,Log(Plus(C1,CSqrt2))))),
+      Plus(CPiHalf,Times(CI,Log(Plus(C1,CSqrt2))))),
     // ArcSec(-I)=Pi/2+I*Log(-1+Sqrt(2))
     ISet(ArcSec(CNI),
-      Plus(Times(C1D2,Pi),Times(CI,Log(Plus(CN1,CSqrt2))))),
+      Plus(CPiHalf,Times(CI,Log(Plus(CN1,CSqrt2))))),
     // ArcSec(Infinity)=Pi/2
     ISet(ArcSec(oo),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // ArcSec(-Infinity)=Pi/2
     ISet(ArcSec(Noo),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // ArcSec(I*Infinity)=Pi/2
     ISet(ArcSec(DirectedInfinity(CI)),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // ArcSec(-I*Infinity)=Pi/2
     ISet(ArcSec(DirectedInfinity(CNI)),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // ArcSec(ComplexInfinity)=Pi/2
     ISet(ArcSec(CComplexInfinity),
-      Times(C1D2,Pi))
+      CPiHalf)
   );
 }

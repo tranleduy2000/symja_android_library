@@ -15,6 +15,7 @@ import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.CSqrt5;
@@ -80,7 +81,7 @@ public interface ArcSinRules {
       Times(QQ(5L,12L),Pi)),
     // ArcSin(1)=Pi/2
     ISet(ArcSin(C1),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // ArcSin(I)=I*Log(Sqrt(2)+1)
     ISet(ArcSin(CI),
       Times(CI,Log(Plus(C1,CSqrt2)))),

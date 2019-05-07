@@ -2866,10 +2866,8 @@ public class StatisticsFunctions {
 								F.Piecewise(
 						F.List(F.List(F.Power(F.Times(
 														F.Exp(F.Times(F.Power(F.Times(F.C2, F.Sqr(m)), F.CN1),
-																F.Sqr(F.Plus(F.Negate(n), F.Log(F.Slot1))))),
-														F.Slot1, m, F.Sqrt(F.Times(F.C2, F.Pi))), F.CN1),
-												F.Greater(F.Slot1, F.C0))),
-										F.C0)); // $$;
+										F.Sqr(F.Plus(F.Negate(n), F.Log(F.Slot1))))), F.Slot1, m, F.Sqrt(F.C2Pi)),
+								F.CN1), F.Greater(F.Slot1, F.C0))), F.C0)); // $$;
 				return callFunction(function, k);
 			}
 			return F.NIL;
@@ -3378,8 +3376,7 @@ public class StatisticsFunctions {
 			if (dist.isAST0()) {
 				IExpr function =
 						// [$ ( 1/(E^(#^2/2)*Sqrt(2*Pi)) & ) $]
-						F.Function(F.Power(F.Times(F.Exp(F.Times(F.C1D2, F.Sqr(F.Slot1))), F.Sqrt(F.Times(F.C2, F.Pi))),
-								F.CN1)); // $$;
+						F.Function(F.Power(F.Times(F.Exp(F.Times(F.C1D2, F.Sqr(F.Slot1))), F.Sqrt(F.C2Pi)), F.CN1)); // $$;
 				return callFunction(function, k);
 			} else if (dist.isAST2()) {
 				//
@@ -3389,7 +3386,7 @@ public class StatisticsFunctions {
 						// [$ ( 1/(E^((# - n)^2/(2*m^2))*(m*Sqrt(2*Pi))) & ) $]
 						F.Function(F.Power(F.Times(F.Exp(
 								F.Times(F.Power(F.Times(F.C2, F.Sqr(m)), F.CN1), F.Sqr(F.Plus(F.Negate(n), F.Slot1)))),
-								m, F.Sqrt(F.Times(F.C2, F.Pi))), F.CN1)); // $$;
+								m, F.Sqrt(F.C2Pi)), F.CN1)); // $$;
 				return callFunction(function, k);
 			}
 			return F.NIL;

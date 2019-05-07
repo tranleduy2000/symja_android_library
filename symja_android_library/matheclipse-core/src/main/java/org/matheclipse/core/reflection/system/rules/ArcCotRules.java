@@ -5,7 +5,6 @@ import org.matheclipse.core.interfaces.IAST;
 import static org.matheclipse.core.expression.F.ArcCot;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C1D3;
 import static org.matheclipse.core.expression.F.C1D4;
 import static org.matheclipse.core.expression.F.C1DSqrt3;
@@ -16,6 +15,7 @@ import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.CSqrt5;
@@ -48,7 +48,7 @@ public interface ArcCotRules {
     IInit(ArcCot, SIZES),
     // ArcCot(0)=Pi/2
     ISet(ArcCot(C0),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // ArcCot(2-Sqrt(3))=5/12*Pi
     ISet(ArcCot(Subtract(C2,CSqrt3)),
       Times(QQ(5L,12L),Pi)),

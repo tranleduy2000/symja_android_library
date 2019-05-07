@@ -22,11 +22,13 @@ import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C2Pi;
 import static org.matheclipse.core.expression.F.CC;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CNPiHalf;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.Condition;
 import static org.matheclipse.core.expression.F.Cosh;
 import static org.matheclipse.core.expression.F.Cot;
@@ -96,7 +98,7 @@ public interface LimitRules {
   final public static IAST RULES = List(
     IInit(Limit, SIZES),
     // Limit(x_*(Sqrt(2*Pi))^(1/x_)*(Sin(x_)/x_!)^(1/x_),x_Symbol->Infinity):=E
-    ISetDelayed(Limit(Times(Power(Sqrt(Times(C2,Pi)),Power(x_,CN1)),x_,Power(Times(Power(Factorial(x_),CN1),Sin(x_)),Power(x_,CN1))),Rule(x_Symbol,oo)),
+    ISetDelayed(Limit(Times(Power(Sqrt(C2Pi),Power(x_,CN1)),x_,Power(Times(Power(Factorial(x_),CN1),Sin(x_)),Power(x_,CN1))),Rule(x_Symbol,oo)),
       E),
     // Limit(x_/(x_!)^(1/x_),x_Symbol->Infinity):=E
     ISetDelayed(Limit(Times(x_,Power(Factorial(x_),Negate(Power(x_,CN1)))),Rule(x_Symbol,oo)),
@@ -133,9 +135,9 @@ public interface LimitRules {
       Exp(a)),
     // Limit(HarmonicNumber(y_Symbol,s_Integer),x_Symbol->Infinity):=Module({v=s/2},((-1)^(v+1)*(2*Pi)^(2*v)*BernoulliB(2*v))/(2*(2*v)!))/;EvenQ(s)&&Positive(s)
     ISetDelayed(Limit(HarmonicNumber(y_Symbol,$p(s, Integer)),Rule(x_Symbol,oo)),
-      Condition(Module(List(Set(v,Times(C1D2,s))),Times(Power(CN1,Plus(v,C1)),Power(Times(C2,Pi),Times(C2,v)),BernoulliB(Times(C2,v)),Power(Times(C2,Factorial(Times(C2,v))),CN1))),And(EvenQ(s),Positive(s)))),
+      Condition(Module(List(Set(v,Times(C1D2,s))),Times(Power(CN1,Plus(v,C1)),Power(C2Pi,Times(C2,v)),BernoulliB(Times(C2,v)),Power(Times(C2,Factorial(Times(C2,v))),CN1))),And(EvenQ(s),Positive(s)))),
     // Limit(Tan(x_),x_Symbol->Pi/2):=Indeterminate
-    ISetDelayed(Limit(Tan(x_),Rule(x_Symbol,Times(C1D2,Pi))),
+    ISetDelayed(Limit(Tan(x_),Rule(x_Symbol,CPiHalf)),
       Indeterminate),
     // Limit(Cot(x_),x_Symbol->0):=Indeterminate
     ISetDelayed(Limit(Cot(x_),Rule(x_Symbol,C0)),
@@ -160,10 +162,10 @@ public interface LimitRules {
       C0),
     // Limit(ArcSec(x_),x_Symbol->Infinity)=Pi/2
     ISet(Limit(ArcSec(x_),Rule(x_Symbol,oo)),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // Limit(ArcSec(x_),x_Symbol->-Infinity)=Pi/2
     ISet(Limit(ArcSec(x_),Rule(x_Symbol,Negate(oo))),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // Limit(ArcSin(x_),x_Symbol->Infinity)=-I*Infinity
     ISet(Limit(ArcSin(x_),Rule(x_Symbol,oo)),
       DirectedInfinity(CNI)),
@@ -172,10 +174,10 @@ public interface LimitRules {
       DirectedInfinity(CI)),
     // Limit(ArcTan(x_),x_Symbol->Infinity)=Pi/2
     ISet(Limit(ArcTan(x_),Rule(x_Symbol,oo)),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // Limit(ArcTan(x_),x_Symbol->-Infinity)=(-1)*1/2*Pi
     ISet(Limit(ArcTan(x_),Rule(x_Symbol,Negate(oo))),
-      Times(CN1D2,Pi)),
+      CNPiHalf),
     // Limit(ArcCosh(x_),x_Symbol->Infinity)=Infinity
     ISet(Limit(ArcCosh(x_),Rule(x_Symbol,oo)),
       oo),
@@ -255,10 +257,10 @@ public interface LimitRules {
     ISetDelayed(Limit(Times(x_,Power(Abs(x_),CN1)),Rule(x_Symbol,C0),Rule(Direction,CN1)),
       C1),
     // Limit(Tan(x_),x_Symbol->Pi/2,Direction->1):=Infinity
-    ISetDelayed(Limit(Tan(x_),Rule(x_Symbol,Times(C1D2,Pi)),Rule(Direction,C1)),
+    ISetDelayed(Limit(Tan(x_),Rule(x_Symbol,CPiHalf),Rule(Direction,C1)),
       oo),
     // Limit(Tan(x_),x_Symbol->Pi/2,Direction->-1):=-Infinity
-    ISetDelayed(Limit(Tan(x_),Rule(x_Symbol,Times(C1D2,Pi)),Rule(Direction,CN1)),
+    ISetDelayed(Limit(Tan(x_),Rule(x_Symbol,CPiHalf),Rule(Direction,CN1)),
       Negate(oo)),
     // Limit(Cot(x_),x_Symbol->0,Direction->1):=-Infinity
     ISetDelayed(Limit(Cot(x_),Rule(x_Symbol,C0),Rule(Direction,C1)),

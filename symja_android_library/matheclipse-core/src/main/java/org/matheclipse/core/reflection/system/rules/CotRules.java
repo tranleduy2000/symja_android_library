@@ -10,7 +10,6 @@ import static org.matheclipse.core.expression.F.ArcSin;
 import static org.matheclipse.core.expression.F.ArcTan;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C1D3;
 import static org.matheclipse.core.expression.F.C1D4;
 import static org.matheclipse.core.expression.F.C1DSqrt3;
@@ -23,6 +22,7 @@ import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CN2;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.CSqrt5;
@@ -96,7 +96,7 @@ public interface CotRules {
     ISet(Cot(Times(QQ(5L,12L),Pi)),
       Subtract(C2,CSqrt3)),
     // Cot(Pi/2)=0
-    ISet(Cot(Times(C1D2,Pi)),
+    ISet(Cot(CPiHalf),
       C0),
     // Cot(7/12*Pi)=-2+Sqrt(3)
     ISet(Cot(Times(QQ(7L,12L),Pi)),

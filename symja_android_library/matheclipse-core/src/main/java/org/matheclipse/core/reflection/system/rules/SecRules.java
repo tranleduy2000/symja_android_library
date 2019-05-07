@@ -10,18 +10,19 @@ import static org.matheclipse.core.expression.F.ArcSin;
 import static org.matheclipse.core.expression.F.ArcTan;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C1D3;
 import static org.matheclipse.core.expression.F.C1D4;
 import static org.matheclipse.core.expression.F.C1DSqrt3;
 import static org.matheclipse.core.expression.F.C1DSqrt5;
 import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C2Pi;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CN2;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt5;
 import static org.matheclipse.core.expression.F.CSqrt6;
@@ -92,7 +93,7 @@ public interface SecRules {
     ISet(Sec(Times(QQ(5L,12L),Pi)),
       Plus(CSqrt2,CSqrt6)),
     // Sec(Pi/2)=ComplexInfinity
-    ISet(Sec(Times(C1D2,Pi)),
+    ISet(Sec(CPiHalf),
       CComplexInfinity),
     // Sec(7/12*Pi)=-Sqrt(2)-Sqrt(6)
     ISet(Sec(Times(QQ(7L,12L),Pi)),
@@ -176,7 +177,7 @@ public interface SecRules {
     ISet(Sec(Times(QQ(23L,12L),Pi)),
       Plus(Negate(CSqrt2),CSqrt6)),
     // Sec(2*Pi)=1
-    ISet(Sec(Times(C2,Pi)),
+    ISet(Sec(C2Pi),
       C1),
     // Sec(ArcSin(x_)):=1/Sqrt(1-x^2)
     ISetDelayed(Sec(ArcSin(x_)),

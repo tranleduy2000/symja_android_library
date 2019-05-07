@@ -23,6 +23,7 @@ import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CN2;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.CSqrt5;
@@ -105,7 +106,7 @@ public interface TanRules {
     ISet(Tan(Times(QQ(5L,12L),Pi)),
       Plus(C2,CSqrt3)),
     // Tan(Pi/2)=ComplexInfinity
-    ISet(Tan(Times(C1D2,Pi)),
+    ISet(Tan(CPiHalf),
       CComplexInfinity),
     // Tan(7/12*Pi)=-2-Sqrt(3)
     ISet(Tan(Times(QQ(7L,12L),Pi)),

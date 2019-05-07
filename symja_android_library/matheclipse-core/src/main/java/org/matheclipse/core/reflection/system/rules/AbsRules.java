@@ -4,8 +4,8 @@ import org.matheclipse.core.interfaces.IAST;
 
 import static org.matheclipse.core.expression.F.Abs;
 import static org.matheclipse.core.expression.F.ArcTan;
-import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
+import static org.matheclipse.core.expression.F.CPiHalf;
 import static org.matheclipse.core.expression.F.Conjugate;
 import static org.matheclipse.core.expression.F.E;
 import static org.matheclipse.core.expression.F.IInit;
@@ -13,7 +13,6 @@ import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.ISetDelayed;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Pi;
-import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
 
@@ -33,7 +32,7 @@ public interface AbsRules {
     IInit(Abs, SIZES),
     // Abs(ArcTan(ComplexInfinity))=Pi/2
     ISet(Abs(ArcTan(CComplexInfinity)),
-      Times(C1D2,Pi)),
+      CPiHalf),
     // Abs(E)=E
     ISet(Abs(E),
       E),

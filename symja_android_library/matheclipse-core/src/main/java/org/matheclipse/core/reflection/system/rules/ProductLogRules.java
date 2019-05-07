@@ -8,8 +8,8 @@ import static org.matheclipse.core.expression.F.CC;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.CNPiHalf;
 import static org.matheclipse.core.expression.F.DirectedInfinity;
 import static org.matheclipse.core.expression.F.E;
 import static org.matheclipse.core.expression.F.Exp;
@@ -41,7 +41,7 @@ public interface ProductLogRules {
             ISet(ProductLog(C0),
                     C0),
             // ProductLog((-1)*1/2*Pi)=I*Pi/2
-            ISet(ProductLog(Times(CN1D2,Pi)),
+    ISet(ProductLog(CNPiHalf),
                     Times(CC(0L,1L,1L,2L),Pi)),
             // ProductLog(-1/E)=-1
             ISet(ProductLog(Negate(Exp(CN1))),
@@ -50,7 +50,7 @@ public interface ProductLogRules {
             ISet(ProductLog(E),
                     C1),
             // ProductLog(-1,-Pi/2)=-1/2*Pi*I
-            ISet(ProductLog(CN1,Times(CN1D2,Pi)),
+    ISet(ProductLog(CN1,CNPiHalf),
                     Times(CC(0L,1L,-1L,2L),Pi)),
             // ProductLog(-1,-1/E)=-1
             ISet(ProductLog(CN1,Negate(Exp(CN1))),

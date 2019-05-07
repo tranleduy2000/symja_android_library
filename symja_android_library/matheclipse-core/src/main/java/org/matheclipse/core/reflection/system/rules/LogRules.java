@@ -8,6 +8,7 @@ import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C2Pi;
 import static org.matheclipse.core.expression.F.CC;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
@@ -73,7 +74,7 @@ public interface LogRules {
       x),
     // Log(E^x_Complex):=x+2*I*Pi*Floor((Pi-Im(x))/(2*Pi))
     ISetDelayed(Log(Exp($p(x,Complex))),
-      Plus(x,Times(C2,CI,Pi,Floor(Times(Power(Times(C2,Pi),CN1),Subtract(Pi,Im(x))))))),
+      Plus(x,Times(C2,CI,Pi,Floor(Times(Power(C2Pi,CN1),Subtract(Pi,Im(x))))))),
     // Log(E^I)=I
     ISet(Log(Exp(CI)),
       CI),

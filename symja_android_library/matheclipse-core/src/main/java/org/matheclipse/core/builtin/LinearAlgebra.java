@@ -2420,19 +2420,19 @@ public final class LinearAlgebra {
                 }
                 return Convert.matrix2List(resultMatrix);
 
-//			} catch (final ClassCastException e) {
-//				if (Config.SHOW_STACKTRACE) {
-//					e.printStackTrace();
-//				}
-//			} catch (final ArithmeticException e) {
-//				if (Config.SHOW_STACKTRACE) {
-//					e.printStackTrace();
-//				}
-//				throw new NonNegativeIntegerExpected(ast, 2);
-//			} catch (final IndexOutOfBoundsException e) {
-//				if (Config.SHOW_STACKTRACE) {
-//					e.printStackTrace();
-//				}
+				// } catch (final ClassCastException e) {
+				// if (Config.SHOW_STACKTRACE) {
+				// e.printStackTrace();
+				// }
+				// } catch (final ArithmeticException e) {
+				// if (Config.SHOW_STACKTRACE) {
+				// e.printStackTrace();
+				// }
+				// throw new NonNegativeIntegerExpected(ast, 2);
+				// } catch (final IndexOutOfBoundsException e) {
+				// if (Config.SHOW_STACKTRACE) {
+				// e.printStackTrace();
+				// }
 			} catch (final RuntimeException e) {
 				engine.printMessage(ast.topHead()+": "+e.getMessage());
                 if (Config.SHOW_STACKTRACE) {
@@ -3765,7 +3765,6 @@ public final class LinearAlgebra {
 
     }
 
-	private final static LinearAlgebra CONST = new LinearAlgebra();
 
 	/**
 	 * <p>
