@@ -337,6 +337,9 @@ public class ASTNodeFactory implements INodeParserFactory {
 		Initializer.init();
 	}
 
+	static {
+		initialize();
+	}
 	private final boolean fIgnoreCase;
 
 	/**

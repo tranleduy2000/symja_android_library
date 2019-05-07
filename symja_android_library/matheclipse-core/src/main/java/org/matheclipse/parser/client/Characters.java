@@ -262,6 +262,9 @@ public class Characters {
 		Initializer.init();
 	}
 
+	static {
+		Characters.initialize();
+	}
 	/**
 	 * Return the name for a given unicode character.
 	 *
