@@ -11124,6 +11124,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Refine((-1)^(4*k), Element(k, Integers))", //
 				"1");
 
+		check("Refine(Log(-3/4), x < 0)", //
+				"I*Pi-Log(4/3)");
+		check("Refine(Log(x), x < 0)", //
+				"I*Pi+Log(-x)");
 		check("Refine(EvenQ(4*k), Element(k, Integers))", //
 				"True");
 		// for EvenQ result is undetermined
@@ -11187,7 +11191,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("Refine((x^3)^(1/3), x >= 0)", "x");
 
-		check("Refine(Log(x), x<0)", "Log(x)");
 
 		check("Refine(Abs(x), x>0)", "x");
 		check("Refine(Abs(x), Assumptions -> x>0)", "x");
@@ -12429,6 +12432,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSimplify() {
+		check("Simplify(Element(x, Reals), x>0)", //
+				"True");
+		check("Simplify(Sin(n*Pi), Element(n, Integers))", //
+				"0");
+		check("Simplify(Tan(x + Pi*n), Element(n, Integers))", //
+				"Tan(x)");
 		check("Simplify(a/((a-I*b)*(a/(a-I*b)+(-I*b)/(a-I*b)))+(b*Sinh(x))/((a-I*b)*(a/(a-I*b)+(-I*b)/(a-I*b))))",  //
 				 "(a+b*Sinh(x))/(a-I*b)");
 		check("Simplify((a-I*b)*(a/(a-I*b)+(-I*b)/(a-I*b)))", //
