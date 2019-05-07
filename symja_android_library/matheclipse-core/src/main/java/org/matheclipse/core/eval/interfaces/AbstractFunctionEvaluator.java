@@ -432,8 +432,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 		IExpr temp = pureImaginaryPart(expr);
 		if (temp.isPresent()) {
 			return temp;
-		}
-		if (expr.isPlus()) {
+		} else if (expr.isPlus()) {
 			IAST plus = ((IAST) expr);
 			IExpr arg = pureImaginaryPart(plus.arg1());
 			if (arg.isPresent()) {
@@ -451,6 +450,32 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 		return F.NIL;
 	}
 
+	public static IExpr getComplexExpr(final IExpr expr, IExpr factor) {
+		if (expr.isComplex() && (expr.re().isZero() || expr.re().isNegative())) {
+			return F.Times(factor, expr);
+		} else {
+			if (expr.isTimes() && expr.first().isComplex()) {
+				IComplex arg1 = (IComplex) expr.first();
+				if (arg1.re().isZero() || arg1.re().isNegative()) {
+					return F.Times(factor, expr);
+				}
+			} else if (expr.isPlus()) {
+				IExpr arg1 = expr.first();
+				if (arg1.isComplex() && (arg1.re().isZero() || arg1.re().isNegative())) {
+					// distribute the factor over the Plus() args
+					return F.Distribute(F.Times(factor, expr));
+				}
+				if (arg1.isTimes() && arg1.first().isComplex()) {
+					arg1 = arg1.first();
+					if (arg1.re().isZero() || arg1.re().isNegative()) {
+						// distribute the factor over the Plus() args
+						return F.Distribute(F.Times(factor, expr));
+					}
+				}
+			}
+		}
+		return F.NIL;
+	}
 	public static IExpr imaginaryPart(final IExpr expr, boolean unequalsZero) {
 		IExpr imPart = F.Im.of(expr);
 		if (unequalsZero) {
