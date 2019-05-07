@@ -6069,17 +6069,34 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"0");
 		// check("GammaRegularized(a,z1,z2)", "GammaRegularized(a,z1)-GammaRegularized(a,z2)");
 
-		check("GammaRegularized(1/2, z)", "Erfc(Sqrt(z))");
-		check("GammaRegularized(-4, z)", "0");
-		check("GammaRegularized(12, 0)", "1");
-		check("GammaRegularized(-42, 0)", "0");
+		check("GammaRegularized(1/2, z)", //
+				"Erfc(Sqrt(z))");
+		check("GammaRegularized(-4, z)", //
+				"0");
+		check("GammaRegularized(12, 0)", //
+				"1");
+		check("GammaRegularized(-42, 0)", //
+				"0");
 	}
 
 	public void testGather() {
-		check("Gather({{a, 1}, {b, 1}, {a, 2}, {d, 1}, {b, 3}}, (First(#1) == First(#2)) &)",
+		check("Gather({{a, 1}, {b, 1}, {a, 2}, {d, 1}, {b, 3}}, (First(#1) == First(#2)) &)", //
 				"{{{a,1},{a,2}},{{b,1},{b,3}},{{d,1}}}");
-		check("Gather({1,2,3,2,3,4,5,6,2,3})", "{{1},{2,2,2},{3,3,3},{4},{5},{6}}");
-		check("Gather(Range(0, 3, 1/3), Floor(#1) == Floor(#2) &)", "{{0,1/3,2/3},{1,4/3,5/3},{2,7/3,8/3},{3}}");
+		check("Gather({1,2,3,2,3,4,5,6,2,3})", //
+				"{{1},{2,2,2},{3,3,3},{4},{5},{6}}");
+		check("Gather(Range(0, 3, 1/3), Floor(#1) == Floor(#2) &)", //
+				"{{0,1/3,2/3},{1,4/3,5/3},{2,7/3,8/3},{3}}");
+	}
+
+	public void testGatherBy() {
+		check("rr=Range(10); GatherBy(rr, OddQ)", //
+				"{{1,3,5,7,9},{2,4,6,8,10}}");
+		check("GatherBy({{a,10},{b,5},{a,7},{b,3},{b,10}}, First)", //
+				"{{{a,10},{a,7}},{{b,5},{b,3},{b,10}}}");
+		check("Tuples({{a, b}, {1, 2}, {x, y}})", //
+				"{{a,1,x},{a,1,y},{a,2,x},{a,2,y},{b,1,x},{b,1,y},{b,2,x},{b,2,y}}");
+		check("GatherBy({{a,1,x},{a,1,y},{a,2,x},{a,2,y},{b,1,x},{b,1,y},{b,2,x},{b,2,y}}, {First,Last})", //
+				"{{{{a,1,x},{a,2,x}},{{a,1,y},{a,2,y}}},{{{b,1,x},{b,2,x}},{{b,1,y},{b,2,y}}}}");
 	}
 
 	public void testGegenbauerC() {
@@ -6145,19 +6162,31 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("GCD(1,I)", //
 				"1");
 
-		check("GCD()", "0");
-		check("GCD(10)", "10");
-		check("GCD(2, 3, 5)", "1");
-		check("GCD(1/3, 2/5, 3/7)", "1/105");
-		check("GCD(-3, 9)", "3");
-		check("GCD(b, a)", "GCD(a,b)");
+		check("GCD()", //
+				"0");
+		check("GCD(10)", //
+				"10");
+		check("GCD(2, 3, 5)", //
+				"1");
+		check("GCD(1/3, 2/5, 3/7)", //
+				"1/105");
+		check("GCD(-3, 9)", //
+				"3");
+		check("GCD(b, a)", //
+				"GCD(a,b)");
 
-		check("GCD(20, 30)", "10");
-		check("GCD(-20, 30)", "10");
-		check("GCD(20, -30)", "10");
-		check("GCD(-20, -30)", "10");
-		check("GCD(10, y)", "GCD(10,y)");
-		check("GCD(4, {10, 11, 12, 13, 14})", "{2,1,4,1,2}");
+		check("GCD(20, 30)", //
+				"10");
+		check("GCD(-20, 30)", //
+				"10");
+		check("GCD(20, -30)", //
+				"10");
+		check("GCD(-20, -30)", //
+				"10");
+		check("GCD(10, y)", //
+				"GCD(10,y)");
+		check("GCD(4, {10, 11, 12, 13, 14})", //
+				"{2,1,4,1,2}");
 	}
 
 	public void testGeometricMean() {

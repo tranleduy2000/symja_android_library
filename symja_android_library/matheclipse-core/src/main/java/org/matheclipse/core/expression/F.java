@@ -930,6 +930,8 @@ public class F {
     public final static IBuiltInSymbol GammaRegularized = F.initFinalSymbol("GammaRegularized", ID.GammaRegularized);
     /***/
     public final static IBuiltInSymbol Gather = F.initFinalSymbol("Gather", ID.Gather);
+	/***/
+	public final static IBuiltInSymbol GatherBy = F.initFinalSymbol("GatherBy", ID.GatherBy);
     /***/
     public final static IBuiltInSymbol GaussianIntegers = F.initFinalSymbol("GaussianIntegers", ID.GaussianIntegers);
     /***/
@@ -5387,6 +5389,13 @@ public class F {
         return ternaryAST3(GammaRegularized, a0, a1, a2);
     }
 
+	public static IAST Gather(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Gather, a0, a1);
+	}
+
+	public static IAST GatherBy(final IExpr a0, final IExpr a1) {
+		return binaryAST2(GatherBy, a0, a1);
+	}
     public static IAST GCD(final IExpr a0) {
         return unaryAST1(GCD, a0);
     }

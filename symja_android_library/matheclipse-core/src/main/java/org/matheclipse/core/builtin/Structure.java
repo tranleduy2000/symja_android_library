@@ -3,7 +3,6 @@ package org.matheclipse.core.builtin;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Consumer;
-import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
 
@@ -65,7 +64,7 @@ public class Structure {
 		F.Depth.setEvaluator(new Depth());
 		F.Flatten.setEvaluator(new Flatten());
 		F.FlattenAt.setEvaluator(new FlattenAt());
-		F.Function.setEvaluator(new Function());
+		F.Function.setEvaluator(new Structure.Function());
 		F.Head.setEvaluator(new Head());
 		F.LeafCount.setEvaluator(new LeafCount());
 		F.Map.setEvaluator(new Map());

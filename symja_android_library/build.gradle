@@ -67,11 +67,8 @@ repositories {
     }
 }
 dependencies {
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.jsoup:jsoup:1.11.2'
-    // https://mvnrepository.com/artifact/commons-io/commons-io
-    testImplementation group: 'commons-io', name: 'commons-io', version: '2.3'
+    testImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
 
 }
