@@ -146,6 +146,10 @@ public interface IRational extends ISignedNumber, IBigNumber {
      */
     public IRational pow(final long exp) throws ArithmeticException;
 
+    IRational reRational();
+
+    IRational imRational();
+
     public IRational subtract(IRational parm1);
 
     /**

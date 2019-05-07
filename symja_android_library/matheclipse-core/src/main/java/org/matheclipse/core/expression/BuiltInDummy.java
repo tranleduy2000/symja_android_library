@@ -587,11 +587,6 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		return true;
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final boolean isConstant() {
-		return (fAttributes & CONSTANT) == CONSTANT;
-	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -607,7 +602,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 
 	@Override
 	public boolean isNumericFunction() {
-		if (isConstant()) {
+		if (isConstantAttribute()) {
 			return true;
 		}
 			IExpr temp = assignedValue();
@@ -628,7 +623,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		if (variables.isAST0()) {
 			return true;
 		}
-		if (isConstant()) {
+		if (isConstantAttribute()) {
 			return true;
 		}
 		return variables.exists(new Predicate<IExpr>() {
@@ -697,7 +692,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public boolean isVariable() {
-		return (fAttributes & CONSTANT) != CONSTANT;
+		return !isConstantAttribute();
 	}
 
 	/** {@inheritDoc} */

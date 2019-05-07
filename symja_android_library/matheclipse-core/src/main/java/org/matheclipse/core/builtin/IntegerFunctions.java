@@ -563,7 +563,7 @@ public class IntegerFunctions {
 				// the real and imaginary part.
 				return ((INumber) arg1).fractionalPart();
 			}
-			if (arg1.isConstant()) {
+			if (arg1.isConstantAttribute()) {
 				if (arg1.isE() || //
 						arg1.equals(F.Khinchin)) {
 					return F.Plus(F.CN2, arg1);
@@ -975,9 +975,8 @@ public class IntegerFunctions {
 				}
 				return arg1.modPow(arg2, arg3);
 			} catch (ArithmeticException ae) {
-				engine.printMessage("PowerMod: " + ae.getMessage());
+				return engine.printMessage("PowerMod: " + ae.getMessage());
 			}
-			return F.NIL;
 		}
 
 		public int[] expectedArgSize() {
@@ -1092,8 +1091,7 @@ public class IntegerFunctions {
 		public IExpr e2IntArg(final IInteger i0, final IInteger i1) {
 			try {
 				if (i1.isZero()) {
-					EvalEngine.get().printMessage("QuotientRemainder: division by zero");
-					return F.NIL;
+					return EvalEngine.get().printMessage("QuotientRemainder: division by zero");
 				}
 				IASTMutable list = F.ListAlloc(F.Null, F.Null);
 				list.set(1, i0.quotient(i1));
@@ -1104,8 +1102,7 @@ public class IntegerFunctions {
 				list.set(2, i0.mod(i1));
 				return list;
 			} catch (ArithmeticException ae) {
-				EvalEngine.get().printMessage("QuotientRemainder: " + ae.getMessage());
-				return F.NIL;
+				return EvalEngine.get().printMessage("QuotientRemainder: " + ae.getMessage());
 			}
 
 		}

@@ -620,8 +620,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 		boolean quietMode = engine.isQuietMode();
 		ISymbol head = arg1.topHead();
 
-		if ((head.getAttributes() & ISymbol.NUMERICFUNCTION) == ISymbol.NUMERICFUNCTION
-				|| INT_RUBI_FUNCTIONS.contains(head) || head.getSymbolName().startsWith("§")) {
+		if (head.isNumericFunctionAttribute() || INT_RUBI_FUNCTIONS.contains(head)
+				|| head.getSymbolName().startsWith("§")) {
 
 			boolean newCache = false;
 			try {

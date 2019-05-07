@@ -331,13 +331,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final boolean isConstant() {
-        return (fAttributes & CONSTANT) == CONSTANT;
-    }
 
     /**
      * {@inheritDoc}
@@ -355,7 +348,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 
     @Override
     public boolean isNumericFunction() {
-        if (isConstant()) {
+        if (isConstantAttribute()) {
             return true;
         }
         if (fValue != null) {

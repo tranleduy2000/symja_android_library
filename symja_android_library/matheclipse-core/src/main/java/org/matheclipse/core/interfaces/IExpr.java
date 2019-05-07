@@ -772,7 +772,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see #isRealResult()
      * @see #isNumericFunction()
      */
-    boolean isConstant();
+    boolean isConstantAttribute();
 
     /**
      * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements
@@ -1748,7 +1748,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression is a symbol which doesn't has attribute <code>Constant</code>.
      *
-     * @see #isConstant()
+     * @see #isConstantAttribute()
      * @see #isSymbol()
      */
     boolean isVariable();

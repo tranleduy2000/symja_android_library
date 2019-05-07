@@ -976,7 +976,7 @@ public final class BooleanFunctions {
 					return COMPARE_TERNARY.TRUE;
 				}
 			}
-			if (o0.isConstant() && o1.isConstant()) {
+			if (o0.isConstantAttribute() && o1.isConstantAttribute()) {
 				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.FALSE;
 			}
@@ -1000,7 +1000,7 @@ public final class BooleanFunctions {
 				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.FALSE;
 			}
-			if (difference.isConstant()) {
+			if (difference.isConstantAttribute()) {
 				//Swift changed: can't declare enum inside protocol
 				return COMPARE_TERNARY.FALSE;
 			}
@@ -1851,8 +1851,7 @@ public final class BooleanFunctions {
 
 				// return inequality(ast, engine);
 			} catch (WrongNumberOfArguments woa) {
-				engine.printMessage(woa.getMessage());
-				return F.NIL;
+				return engine.printMessage(woa.getMessage());
 			}
 		}
 

@@ -331,6 +331,13 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public boolean isLocked(boolean packageMode);
 
+    boolean isConstantAttribute();
+
+    @Override
+    IExpr[] linear(IExpr variable);
+
+    boolean isNumericFunctionAttribute();
+
     /**
      * Tests if this symbols name equals the given string
      *
@@ -347,9 +354,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @return
      */
     public boolean isSymbolName(String name);
-
-    @Override
-    IExpr[] linear(IExpr variable);
 
     /**
      * If this symbol has attribute <code>ISymbol.CONSTANT</code> and the symbol's evaluator is of instance

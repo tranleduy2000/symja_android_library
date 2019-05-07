@@ -1064,7 +1064,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @see #isNumericFunction()
      */
     @Override
-    public boolean isConstant() {
+    public boolean isConstantAttribute() {
         return false;
     }
 
@@ -1940,7 +1940,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isNumericFunction() {
-        return isNumber() || isConstant();
+        return isNumber() || isConstantAttribute();
     }
 
     /**
@@ -2632,7 +2632,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * Test if this expression is a symbol which doesn't has attribute <code>Constant</code>.
      *
      * @return
-     * @see #isConstant()
+     * @see #isConstantAttribute()
      * @see #isSymbol()
      */
     @Override

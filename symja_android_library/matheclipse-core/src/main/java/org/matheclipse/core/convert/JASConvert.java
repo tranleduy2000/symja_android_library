@@ -51,6 +51,120 @@ import edu.jas.ufd.Quotient;
  * @param <C>
  */
 public class JASConvert<C extends RingElem<C>> {
+	/**
+	 *   Conversion of BigRational to BigInteger. result = (num/gcd)*(lcm/denom).
+	 */
+	static class RatToRatFactor implements UnaryFunctor<BigRational, BigRational> {
+
+		final java.math.BigInteger lcm;
+
+		final java.math.BigInteger gcd;
+
+		public RatToRatFactor(java.math.BigInteger gcd, java.math.BigInteger lcm) {
+			this.gcd = gcd;
+			this.lcm = lcm;
+		}
+
+		@Override
+		public BigRational eval(BigRational c) {
+			if (c == null) {
+				return BigRational.ZERO;
+			}
+			if (gcd.equals(java.math.BigInteger.ONE)) {
+				// p = num*(lcm/denom)
+				java.math.BigInteger b = lcm.divide(c.denominator());
+				return BigRational.valueOf(c.numerator().multiply(b));
+			}
+			// p = (num/gcd)*(lcm/denom)
+			java.math.BigInteger a = c.numerator().divide(gcd);
+			java.math.BigInteger b = lcm.divide(c.denominator());
+			return BigRational.valueOf(a.multiply(b));
+		}
+	}
+
+	public static IComplex jas2Complex(edu.jas.poly.Complex<BigRational> c) {
+		IFraction re = F.fraction(c.getRe().numerator(), c.getRe().denominator());
+		IFraction im = F.fraction(c.getIm().numerator(), c.getIm().denominator());
+		return F.complex(re, im);
+	}
+
+	public static INumber jas2Numeric(edu.jas.poly.Complex<BigRational> c, double epsilon) {
+		IFraction re = F.fraction(c.getRe().numerator(), c.getRe().denominator());
+		double red = re.doubleValue();
+		IFraction im = F.fraction(c.getIm().numerator(), c.getIm().denominator());
+		double imd = im.doubleValue();
+		return F.chopNumber(F.complexNum(red, imd), epsilon);
+	}
+
+	public static INumber jas2Numeric(org.hipparchus.complex.Complex c, double epsilon) {
+		double red = c.getReal();
+		double imd = c.getImaginary();
+		return F.chopNumber(F.complexNum(red, imd), epsilon);
+	}
+
+	public static ModIntegerRing option2ModIntegerRing(ISignedNumber option) {
+		// TODO convert to long value
+		long longValue = option.toLong();
+		final BigInteger value = BigInteger.valueOf(longValue);
+		return new ModIntegerRing(longValue, value.isProbablePrime(32));
+	}
+
+	/**
+	 * BigRational from BigRational coefficients. Represent as polynomial with BigInteger coefficients by multiplication
+	 * with the gcd of the numerators and the lcm of the denominators of the BigRational coefficients. <br />
+	 *
+	 * @param fac
+	 *            result polynomial factory.
+	 * @param A
+	 *            polynomial with BigRational coefficients to be converted.
+	 * @return Object[] with 3 entries: [0]->gcd [1]->lcm and [2]->polynomial with BigInteger coefficients.
+	 */
+	public static Object[] rationalFromRationalCoefficientsFactor(GenPolynomialRing<BigRational> fac,
+			GenPolynomial<BigRational> A) {
+		Object[] result = new Object[3];
+		if (A == null || A.isZERO()) {
+			result[0] = java.math.BigInteger.ONE;
+			result[1] = java.math.BigInteger.ZERO;
+			result[2] = fac.getZERO();
+			return result;
+		}
+		java.math.BigInteger gcd = null;
+		java.math.BigInteger lcm = null;
+		int sLCM = 0;
+		int sGCD = 0;
+		// lcm of denominators
+		Iterator<BigRational> iter = A.coefficientIterator();
+		while (iter.hasNext()) {
+			BigRational y = iter.next();
+			java.math.BigInteger numerator = y.numerator();
+			java.math.BigInteger denominator = y.denominator();
+			// lcm = lcm(lcm,x)
+			if (lcm == null) {
+				lcm = denominator;
+				sLCM = denominator.signum();
+			} else {
+				java.math.BigInteger d = lcm.gcd(denominator);
+				lcm = lcm.multiply(denominator.divide(d));
+			}
+			// gcd = gcd(gcd,x)
+			if (gcd == null) {
+				gcd = numerator;
+				sGCD = numerator.signum();
+			} else {
+				gcd = gcd.gcd(numerator);
+			}
+		}
+		if (sLCM < 0) {
+			lcm = lcm.negate();
+		}
+		if (sGCD < 0) {
+			gcd = gcd.negate();
+		}
+		result[0] = gcd;
+		result[1] = lcm;
+		result[2] = PolyUtil.<BigRational, BigRational>map(fac, A, new RatToRatFactor(gcd, lcm));
+		return result;
+	}
 	private final RingFactory<C> fRingFactory;
 	private final TermOrder fTermOrder;
 	private final GenPolynomialRing<C> fPolyFactory;
@@ -91,49 +205,95 @@ public class JASConvert<C extends RingElem<C>> {
 				fVariables.size(), fTermOrder, vars);
 	}
 
+	public IAST algebraicNumber2Expr(final AlgebraicNumber<BigRational> coeff)
+			throws ArithmeticException, ClassCastException {
+		GenPolynomial<BigRational> val = coeff.val;
+		return rationalPoly2Expr(val, false); // , variable);
+	}
+
+	/**
+	 * Convert a complex number into a jas polynomial. If the conversion isn't possible this method throws a
+	 * <code>ClassCastException</code>.
+	 *
+	 * @param complexValue
+	 *            the complex value containing a rational real and imaginary part
+	 * @return a jas polynomial
+	 * @throws JASConversionException
+	 */
+	private GenPolynomial<C> complex2Poly(final IComplex complexValue) throws JASConversionException {
+		IRational reRational = complexValue.reRational();
+		IRational imRational = complexValue.imRational();
+		BigRational nre = new BigRational(reRational.toBigNumerator());
+		BigRational dre = new BigRational(reRational.toBigDenominator());
+		BigRational re = nre.divide(dre);
+		BigRational nim = new BigRational(imRational.toBigNumerator());
+		BigRational dim = new BigRational(imRational.toBigDenominator());
+		BigRational im = nim.divide(dim);
+		if (fRingFactory instanceof ComplexRing) {
+			ComplexRing ring = (ComplexRing) fRingFactory;
+			Complex<BigRational> c = new Complex<BigRational>(ring, re, im);
+			return new GenPolynomial(fPolyFactory, c);
+		} else {
+			// "ComplexRing expected"
+			throw new JASConversionException( );
+//			throw new ClassCastException(complexValue.toString());
+			// return new GenPolynomial(fPolyFactory, r);
+		}
+	}
+
+	public IExpr complexIntegerPoly2Expr(final GenPolynomial<Complex<edu.jas.arith.BigInteger>> poly)
+			throws ArithmeticException, ClassCastException {
+		if (poly.length() == 0) {
+			return F.C0;
+		}
+		IASTAppendable result = F.PlusAlloc(poly.length());
+		for (Monomial<Complex<edu.jas.arith.BigInteger>> monomial : poly) {
+			Complex<edu.jas.arith.BigInteger> coeff = monomial.coefficient();
+			ExpVector exp = monomial.exponent();
+			IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
+			monomialIntegerToExpr(coeff, exp, monomTimes);
+			result.append(monomTimes.oneIdentity1());
+		}
+		return result.oneIdentity0();
+	}
+
+	/**
+	 * Convert a JAS complex-rational polynomial to <code>IExpr</code>.
+	 *
+	 * @param poly
+	 * @return
+	 * @throws ArithmeticException
+	 * @throws ClassCastException
+	 */
+	public IExpr complexPoly2Expr(final GenPolynomial<Complex<BigRational>> poly)
+			throws ArithmeticException, ClassCastException {
+		if (poly.length() == 0) {
+			return F.C0;
+		}
+		IASTAppendable result = F.PlusAlloc(poly.length());
+		for (Monomial<Complex<BigRational>> monomial : poly) {
+			Complex<BigRational> coeff = monomial.coefficient();
+			ExpVector exp = monomial.exponent();
+			IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
+			monomialToExpr(coeff, exp, monomTimes);
+			result.append(monomTimes.oneIdentity1());
+		}
+		return result.oneIdentity0();
+	}
 	public GenPolynomial<C> expr2JAS(final IExpr exprPoly, boolean numeric2Rational) throws JASConversionException {
 		try {
 			return expr2Poly(exprPoly, numeric2Rational);
-		} catch (Exception ae) {
+		} catch (JASConversionException jce) {
+			throw jce;
+		} catch (RuntimeException rex) {
 			if (Config.SHOW_STACKTRACE) {
-				ae.printStackTrace();
+				rex.printStackTrace();
 			}
 			// System.out.println("expr2JAS"+exprPoly.toString());
 			throw new JASConversionException();
 		}
 	}
 
-	/**
-	 * Convert the given expression into a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial.
-	 * <code>INum</code> double values are internally converted to IFractions and converte into the pokynomial
-	 * structure.
-	 * 
-	 * @param exprPoly
-	 * @return
-	 * @throws JASConversionException
-	 */
-	public GenPolynomial<C> numericExpr2JAS(final IExpr exprPoly) throws JASConversionException {
-		try {
-			return numericExpr2Poly(exprPoly);
-		} catch (Exception ae) {
-			// ae.printStackTrace();
-			throw new JASConversionException();
-		}
-	}
-
-	/**
-	 * Convert the given expression into a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial.
-	 * <code>INum</code> values are internally converted to IFractions and <code>expr2Poly</code> was called for the
-	 * expression
-	 * 
-	 * @param exprPoly
-	 * @return
-	 * @throws ArithmeticException
-	 * @throws ClassCastException
-	 */
-	private GenPolynomial<C> numericExpr2Poly(final IExpr exprPoly) throws ArithmeticException, ClassCastException {
-		return expr2Poly(exprPoly, true);
-	}
 
 	/**
 	 * Convert the given expression into a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial
@@ -145,7 +305,7 @@ public class JASConvert<C extends RingElem<C>> {
 	 * 
 	 * @return
 	 * @throws ArithmeticException
-	 * @throws ClassCastException
+	 * @throws JASConversionException
 	 */
 	private GenPolynomial<C> expr2Poly(final IExpr exprPoly, boolean numeric2Rational)
 			throws ArithmeticException, ClassCastException {
@@ -187,8 +347,8 @@ public class JASConvert<C extends RingElem<C>> {
 					// } catch (WrongArgumentType e) {
 					// }
 					if (exponent < 0) {
-						throw new ArithmeticException(
-								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
+						throw new JASConversionException();
+//								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
 					}
 					try {
 						return fPolyFactory.univariate(base.getSymbolName(), exponent);
@@ -204,8 +364,9 @@ public class JASConvert<C extends RingElem<C>> {
 					// } catch (WrongArgumentType e) {
 					// }
 					if (exponent < 0) {
-						throw new ArithmeticException(
-								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
+						throw new JASConversionException();
+//						throw new ArithmeticException(
+//								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
 					}
 					try {
 						return fPolyFactory.univariate(base.toString(), exponent);
@@ -225,6 +386,9 @@ public class JASConvert<C extends RingElem<C>> {
 					.fromInteger((java.math.BigInteger) ((IInteger) exprPoly).asType(java.math.BigInteger.class));
 		} else if (exprPoly instanceof IFraction) {
 			return fraction2Poly((IFraction) exprPoly);
+		} else if (exprPoly instanceof IComplex) {
+			// may throw ClassCastException
+			return complex2Poly((IComplex) exprPoly);
 		} else if (exprPoly instanceof INum && numeric2Rational) {
 			IFraction frac = F.fraction(((INum) exprPoly).getRealPart());
 			return fraction2Poly(frac);
@@ -235,29 +399,36 @@ public class JASConvert<C extends RingElem<C>> {
 				return fraction2Poly(frac);
 			}
 		}
-		throw new ClassCastException(exprPoly.toString());
+		throw new JASConversionException( );
+//		throw new ClassCastException(exprPoly.toString());
 	}
 
-	private GenPolynomial<C> fraction2Poly(final IFraction exprPoly) {
-		BigInteger n = exprPoly.toBigNumerator();// .toJavaBigInteger();
-		BigInteger d = exprPoly.toBigDenominator();// .toJavaBigInteger();
-		BigRational nr = new BigRational(n);
-		BigRational dr = new BigRational(d);
-		BigRational r = nr.divide(dr);
-		if (fRingFactory instanceof ComplexRing) {
-			ComplexRing ring = (ComplexRing) fRingFactory;
-			Complex<BigRational> c = new Complex<BigRational>(ring, r);
-			return new GenPolynomial(fPolyFactory, c);
-		} else {
-			return new GenPolynomial(fPolyFactory, r);
+	private boolean expVectorToExpr(ExpVector exp, IASTAppendable monomTimes) {
+		long lExp;
+		ExpVector leer = fPolyFactory.evzero;
+		for (int i = 0; i < exp.length(); i++) {
+			lExp = exp.getVal(i);
+			if (lExp != 0) {
+				int ix = leer.varIndex(i);
+				if (ix >= 0) {
+					if (lExp == 1L) {
+						monomTimes.append(fVariables.get(ix));
+					} else {
+						monomTimes.append(F.Power(fVariables.get(ix), F.integer(lExp)));
+					}
+				} else {
+					return false;
+				}
+			}
 		}
+		return true;
 	}
 
 	/**
 	 * Pull out overall numerical factor in poly (BigInteger from BigRational coefficients). Represent as polynomial
 	 * with BigInteger coefficients by multiplication with the gcd of the numerators and the lcm of the denominators of
 	 * the BigRational coefficients.
-	 * 
+	 *
 	 * @param poly
 	 *            polynomial with BigRational coefficients to be converted.
 	 * @return Object[] with 3 entries: [0]->gcd (java.math.BigInteger) [1]->lcm (java.math.BigInteger) and
@@ -265,6 +436,31 @@ public class JASConvert<C extends RingElem<C>> {
 	 */
 	public Object[] factorTerms(GenPolynomial<BigRational> poly) {
 		return PolyUtil.integerFromRationalCoefficientsFactor(fBigIntegerPolyFactory, poly);
+	}
+
+	/**
+	 * Convert a fractional number into a jas polynomial.
+	 *
+	 * @param exprPoly
+	 * @return a jas polynomial
+	 */
+	private GenPolynomial<C> fraction2Poly(final IFraction exprPoly) {
+		BigInteger n = exprPoly.toBigNumerator();// .toJavaBigInteger();
+		BigInteger d = exprPoly.toBigDenominator();// .toJavaBigInteger();
+		BigRational nr = new BigRational(n);
+		BigRational dr = new BigRational(d);
+		BigRational r = nr.divide(dr);
+		if (fRingFactory instanceof ComplexRing) {
+			ComplexRing<BigRational> ring = (ComplexRing<BigRational>) fRingFactory;
+			Complex<BigRational> c = new Complex<BigRational>(ring, r);
+			return new GenPolynomial(fPolyFactory, c);
+		} else {
+			return new GenPolynomial(fPolyFactory, r);
+		}
+	}
+
+	public RingFactory<C> getCoefficientRingFactory() {
+		return fRingFactory;
 	}
 
 	/**
@@ -310,89 +506,6 @@ public class JASConvert<C extends RingElem<C>> {
 		return result.oneIdentity0();
 	}
 
-	public boolean monomialToExpr(edu.jas.arith.BigInteger coeff, ExpVector exp, IASTAppendable monomTimes) {
-		if (!coeff.isONE()) {
-			IInteger coeffValue = F.integer(coeff.getVal());
-			monomTimes.append(coeffValue);
-		}
-		return expVectorToExpr(exp, monomTimes);
-	}
-
-	private boolean expVectorToExpr(ExpVector exp, IASTAppendable monomTimes) {
-		long lExp;
-		ExpVector leer = fPolyFactory.evzero;
-		for (int i = 0; i < exp.length(); i++) {
-			lExp = exp.getVal(i);
-			if (lExp != 0) {
-				int ix = leer.varIndex(i);
-				if (ix >= 0) {
-					if (lExp == 1L) {
-						monomTimes.append(fVariables.get(ix));
-					} else {
-						monomTimes.append(F.Power(fVariables.get(ix), F.integer(lExp)));
-					}
-				} else {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Convert a JAS complex polynomial to <code>IExpr</code>.
-	 * 
-	 * @param poly
-	 * @return
-	 * @throws ArithmeticException
-	 * @throws ClassCastException
-	 */
-	public IExpr complexPoly2Expr(final GenPolynomial<Complex<BigRational>> poly)
-			throws ArithmeticException, ClassCastException {
-		if (poly.length() == 0) {
-			return F.C0;
-		}
-		IASTAppendable result = F.PlusAlloc(poly.length());
-		for (Monomial<Complex<BigRational>> monomial : poly) {
-			Complex<BigRational> coeff = monomial.coefficient();
-			ExpVector exp = monomial.exponent();
-			IASTAppendable monomTimes = F.TimesAlloc(exp.length()+1);
-			monomialToExpr(coeff, exp, monomTimes);
-			result.append(monomTimes.oneIdentity1());
-		}
-		return result.oneIdentity0();
-	}
-
-	public IExpr complexIntegerPoly2Expr(final GenPolynomial<Complex<edu.jas.arith.BigInteger>> poly)
-			throws ArithmeticException, ClassCastException {
-		if (poly.length() == 0) {
-			return F.C0;
-		}
-		IASTAppendable result = F.PlusAlloc(poly.length());
-		for (Monomial<Complex<edu.jas.arith.BigInteger>> monomial : poly) {
-			Complex<edu.jas.arith.BigInteger> coeff = monomial.coefficient();
-			ExpVector exp = monomial.exponent();
-			IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
-			monomialIntegerToExpr(coeff, exp, monomTimes);
-			result.append(monomTimes.oneIdentity1());
-		}
-		return result.oneIdentity0();
-	}
-	public boolean monomialToExpr(Complex<BigRational> coeff, ExpVector exp, IASTAppendable monomTimes) {
-		BigRational re = coeff.getRe();
-		BigRational im = coeff.getIm();
-		monomTimes.append(
-				F.complex(F.fraction(re.numerator(), re.denominator()), F.fraction(im.numerator(), im.denominator())));
-		return expVectorToExpr(exp, monomTimes);
-	}
-
-	public boolean monomialIntegerToExpr(Complex<edu.jas.arith.BigInteger> coeff, ExpVector exp,
-			IASTAppendable monomTimes) {
-		edu.jas.arith.BigInteger re = coeff.getRe();
-		edu.jas.arith.BigInteger im = coeff.getIm();
-		monomTimes.append(F.complex(F.integer(re.getVal()), F.integer(im.getVal())));
-		return expVectorToExpr(exp, monomTimes);
-	}
 	/**
 	 * Convert a jas <code>Integral</code> into a matheclipse expression
 	 * 
@@ -481,54 +594,19 @@ public class JASConvert<C extends RingElem<C>> {
 		return plus;
 	}
 
-	/**
-	 * Converts a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial to a MathEclipse AST with head
-	 * <code>Plus</code>
-	 * 
-	 * @param poly
-	 *            a JAS polynomial
-	 * @param factorTerms
-	 *            TODO
-	 * @param variable
-	 * @return
-	 * @throws ArithmeticException
-	 * @throws ClassCastException
-	 */
-	public IAST rationalPoly2Expr(final GenPolynomial<BigRational> poly, boolean factorTerms)
-			throws ArithmeticException, ClassCastException {
-		if (poly.length() == 0) {
-			return F.Plus(F.C0);
-		}
-		if (factorTerms) {
-			// pull out overall numerical factor in poly.
-			Object[] objects = factorTerms(poly);
-			GenPolynomial<edu.jas.arith.BigInteger> p2 = (GenPolynomial<edu.jas.arith.BigInteger>) objects[2];
-			java.math.BigInteger gcd = (java.math.BigInteger) objects[0];
-			java.math.BigInteger lcm = (java.math.BigInteger) objects[1];
-			IRational factor = F.fraction(gcd, lcm).normalize();
-			IASTAppendable result = F.PlusAlloc(p2.length());
-			for (Monomial<edu.jas.arith.BigInteger> monomial : p2) {
-				edu.jas.arith.BigInteger coeff = monomial.coefficient();
-				ExpVector exp = monomial.exponent();
-				IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
-				monomialToExpr(coeff, exp, monomTimes);
-				result.append(monomTimes.oneIdentity1());
-			}
-			if (factor.isOne()) {
-				return result;
-			}
-			return F.Times(F.fraction(gcd, lcm), result);
+	public boolean monomialIntegerToExpr(Complex<edu.jas.arith.BigInteger> coeff, ExpVector exp,
+			IASTAppendable monomTimes) {
+		edu.jas.arith.BigInteger re = coeff.getRe();
+		edu.jas.arith.BigInteger im = coeff.getIm();
+		monomTimes.append(F.complex(F.integer(re.getVal()), F.integer(im.getVal())));
+		return expVectorToExpr(exp, monomTimes);
 		}
 
-		IASTAppendable result = F.PlusAlloc(poly.length());
-		for (Monomial<BigRational> monomial : poly) {
-			BigRational coeff = monomial.coefficient();
-			ExpVector exp = monomial.exponent();
-			IASTAppendable monomTimes = F.TimesAlloc(exp.length()+1);
-			monomialToExpr(coeff, exp, monomTimes);
-			result.append(monomTimes.oneIdentity1());
+	public boolean monomialToExpr(AlgebraicNumber<BigRational> coeff, ExpVector exp, IASTAppendable monomTimes) {
+		if (!coeff.isONE()) {
+			monomTimes.append(algebraicNumber2Expr(coeff));
 		}
-		return result;
+		return expVectorToExpr(exp, monomTimes);
 	}
 
 	public boolean monomialToExpr(BigRational coeff, ExpVector exp, IASTAppendable monomTimes) {
@@ -539,6 +617,53 @@ public class JASConvert<C extends RingElem<C>> {
 		return expVectorToExpr(exp, monomTimes);
 	}
 
+	public boolean monomialToExpr(Complex<BigRational> coeff, ExpVector exp, IASTAppendable monomTimes) {
+		BigRational re = coeff.getRe();
+		BigRational im = coeff.getIm();
+		monomTimes.append(
+				F.complex(F.fraction(re.numerator(), re.denominator()).normalize(), F.fraction(im.numerator(), im.denominator()).normalize()));
+		return expVectorToExpr(exp, monomTimes);
+	}
+
+	public boolean monomialToExpr(edu.jas.arith.BigInteger coeff, ExpVector exp, IASTAppendable monomTimes) {
+		if (!coeff.isONE()) {
+			IInteger coeffValue = F.integer(coeff.getVal());
+			monomTimes.append(coeffValue);
+		}
+		return expVectorToExpr(exp, monomTimes);
+	}
+
+	/**
+	 * Convert the given expression into a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial.
+	 * <code>INum</code> double values are internally converted to IFractions and converte into the pokynomial
+	 * structure.
+	 *
+	 * @param exprPoly
+	 * @return
+	 * @throws JASConversionException
+	 */
+	public GenPolynomial<C> numericExpr2JAS(final IExpr exprPoly) throws JASConversionException {
+		try {
+			return numericExpr2Poly(exprPoly);
+		} catch (RuntimeException rex) {
+			// ae.printStackTrace();
+			throw new JASConversionException();
+		}
+	}
+
+	/**
+	 * Convert the given expression into a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial.
+	 * <code>INum</code> values are internally converted to IFractions and <code>expr2Poly</code> was called for the
+	 * expression
+	 *
+	 * @param exprPoly
+	 * @return
+	 * @throws ArithmeticException
+	 * @throws ClassCastException
+	 */
+	private GenPolynomial<C> numericExpr2Poly(final IExpr exprPoly) throws ArithmeticException, ClassCastException {
+		return expr2Poly(exprPoly, true);
+	}
 	public IAST polyAlgebraicNumber2Expr(final GenPolynomial<AlgebraicNumber<BigRational>> poly)
 			throws ArithmeticException, ClassCastException {
 		if (poly.length() == 0) {
@@ -562,18 +687,6 @@ public class JASConvert<C extends RingElem<C>> {
 
 	}
 
-	public boolean monomialToExpr(AlgebraicNumber<BigRational> coeff, ExpVector exp, IASTAppendable monomTimes) {
-		if (!coeff.isONE()) {
-			monomTimes.append(algebraicNumber2Expr(coeff));
-		}
-		return expVectorToExpr(exp, monomTimes);
-	}
-
-	public IAST algebraicNumber2Expr(final AlgebraicNumber<BigRational> coeff)
-			throws ArithmeticException, ClassCastException {
-		GenPolynomial<BigRational> val = coeff.val;
-		return rationalPoly2Expr(val, false); // , variable);
-	}
 
 	/**
 	 * Convert a jas <code>Integral</code> into a matheclipse expression
@@ -611,118 +724,53 @@ public class JASConvert<C extends RingElem<C>> {
 		return F.Plus();
 	}
 
-	public static ModIntegerRing option2ModIntegerRing(ISignedNumber option) {
-		// TODO convert to long value
-		long longValue = option.toLong();
-		final BigInteger value = BigInteger.valueOf(longValue);
-		return new ModIntegerRing(longValue, value.isProbablePrime(32));
-	}
-
-	public static IComplex jas2Complex(edu.jas.poly.Complex<BigRational> c) {
-		IFraction re = F.fraction(c.getRe().numerator(), c.getRe().denominator());
-		IFraction im = F.fraction(c.getIm().numerator(), c.getIm().denominator());
-		return F.complex(re, im);
-	}
-
-	public static INumber jas2Numeric(edu.jas.poly.Complex<BigRational> c, double epsilon) {
-		IFraction re = F.fraction(c.getRe().numerator(), c.getRe().denominator());
-		double red = re.doubleValue();
-		IFraction im = F.fraction(c.getIm().numerator(), c.getIm().denominator());
-		double imd = im.doubleValue();
-		return F.chopNumber(F.complexNum(red, imd), epsilon);
-	}
-
-	public static INumber jas2Numeric(org.hipparchus.complex.Complex c, double epsilon) {
-		double red = c.getReal();
-		double imd = c.getImaginary();
-		return F.chopNumber(F.complexNum(red, imd), epsilon);
-	}
 
 	/**
-	 *   Conversion of BigRational to BigInteger. result = (num/gcd)*(lcm/denom).
+	 * Converts a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial to a MathEclipse AST with head
+	 * <code>Plus</code>
+	 *
+	 * @param poly
+	 *            a JAS polynomial
+	 * @param factorTerms
+	 *            TODO
+	 * @param variable
+	 * @return
+	 * @throws ArithmeticException
+	 * @throws ClassCastException
 	 */
-	static class RatToRatFactor implements UnaryFunctor<BigRational, BigRational> {
-
-		final java.math.BigInteger lcm;
-
-		final java.math.BigInteger gcd;
-
-		public RatToRatFactor(java.math.BigInteger gcd, java.math.BigInteger lcm) {
-			this.gcd = gcd;
-			this.lcm = lcm;
-		}
-
-		@Override
-		public BigRational eval(BigRational c) {
-			if (c == null) {
-				return BigRational.ZERO;
+	public IAST rationalPoly2Expr(final GenPolynomial<BigRational> poly, boolean factorTerms)
+			throws ArithmeticException, ClassCastException {
+		if (poly.length() == 0) {
+			return F.Plus(F.C0);
 			}
-			if (gcd.equals(java.math.BigInteger.ONE)) {
-				// p = num*(lcm/denom)
-				java.math.BigInteger b = lcm.divide(c.denominator());
-				return BigRational.valueOf(c.numerator().multiply(b));
-			}
-			// p = (num/gcd)*(lcm/denom)
-			java.math.BigInteger a = c.numerator().divide(gcd);
-			java.math.BigInteger b = lcm.divide(c.denominator());
-			return BigRational.valueOf(a.multiply(b));
+		if (factorTerms) {
+			// pull out overall numerical factor in poly.
+			Object[] objects = factorTerms(poly);
+			GenPolynomial<edu.jas.arith.BigInteger> p2 = (GenPolynomial<edu.jas.arith.BigInteger>) objects[2];
+			java.math.BigInteger gcd = (java.math.BigInteger) objects[0];
+			java.math.BigInteger lcm = (java.math.BigInteger) objects[1];
+			IRational factor = F.fraction(gcd, lcm).normalize();
+			IASTAppendable result = F.PlusAlloc(p2.length());
+			for (Monomial<edu.jas.arith.BigInteger> monomial : p2) {
+				edu.jas.arith.BigInteger coeff = monomial.coefficient();
+				ExpVector exp = monomial.exponent();
+				IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
+				monomialToExpr(coeff, exp, monomTimes);
+				result.append(monomTimes.oneIdentity1());
 		}
-	}
-
-	/**
-	 * BigRational from BigRational coefficients. Represent as polynomial with BigInteger coefficients by multiplication
-	 * with the gcd of the numerators and the lcm of the denominators of the BigRational coefficients. <br />
-	 * 
-	 * @param fac
-	 *            result polynomial factory.
-	 * @param A
-	 *            polynomial with BigRational coefficients to be converted.
-	 * @return Object[] with 3 entries: [0]->gcd [1]->lcm and [2]->polynomial with BigInteger coefficients.
-	 */
-	public static Object[] rationalFromRationalCoefficientsFactor(GenPolynomialRing<BigRational> fac,
-			GenPolynomial<BigRational> A) {
-		Object[] result = new Object[3];
-		if (A == null || A.isZERO()) {
-			result[0] = java.math.BigInteger.ONE;
-			result[1] = java.math.BigInteger.ZERO;
-			result[2] = fac.getZERO();
+			if (factor.isOne()) {
 			return result;
 		}
-		java.math.BigInteger gcd = null;
-		java.math.BigInteger lcm = null;
-		int sLCM = 0;
-		int sGCD = 0;
-		// lcm of denominators
-		Iterator<BigRational> iter = A.coefficientIterator();
-		while (iter.hasNext()) {
-			BigRational y = iter.next();
-			java.math.BigInteger numerator = y.numerator();
-			java.math.BigInteger denominator = y.denominator();
-			// lcm = lcm(lcm,x)
-			if (lcm == null) {
-				lcm = denominator;
-				sLCM = denominator.signum();
-			} else {
-				java.math.BigInteger d = lcm.gcd(denominator);
-				lcm = lcm.multiply(denominator.divide(d));
+			return F.Times(F.fraction(gcd, lcm), result);
 			}
-			// gcd = gcd(gcd,x)
-			if (gcd == null) {
-				gcd = numerator;
-				sGCD = numerator.signum();
-			} else {
-				gcd = gcd.gcd(numerator);
-			}
+		IASTAppendable result = F.PlusAlloc(poly.length());
+		for (Monomial<BigRational> monomial : poly) {
+			BigRational coeff = monomial.coefficient();
+			ExpVector exp = monomial.exponent();
+			IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
+			monomialToExpr(coeff, exp, monomTimes);
+			result.append(monomTimes.oneIdentity1());
 		}
-		if (sLCM < 0) {
-			lcm = lcm.negate();
-		}
-		if (sGCD < 0) {
-			gcd = gcd.negate();
-		}
-		result[0] = gcd;
-		result[1] = lcm;
-		result[2] = PolyUtil.<BigRational, BigRational> map(fac, A, new RatToRatFactor(gcd, lcm));
 		return result;
 	}
 }

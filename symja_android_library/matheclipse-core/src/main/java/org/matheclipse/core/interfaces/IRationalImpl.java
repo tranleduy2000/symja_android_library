@@ -1,20 +1,21 @@
 package org.matheclipse.core.interfaces;
 
 import org.hipparchus.fraction.BigFraction;
+import org.matheclipse.core.expression.F;
 
 /**
  * Created by Duy on 2/20/2018.
  */
 
 public abstract class IRationalImpl extends ISignedNumberImpl implements IRational {
+    @Override
+    public abstract IRational negate();
+
     /**
      * {@inheritDoc}
      */
     @Override
     public abstract IRational abs();
-
-    @Override
-    public abstract IRational negate();
 
     public abstract IRational add(IRational parm1);
 
@@ -57,6 +58,16 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
      * @throws ArithmeticException if {@code 0^0} is given.
      */
     public abstract IRational pow(final long exp) throws ArithmeticException;
+
+    @Override
+    public IRational reRational() {
+        return this;
+    }
+
+    @Override
+    public IRational imRational() {
+        return F.C0;
+    }
 
     public abstract IRational subtract(IRational parm1);
 

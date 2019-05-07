@@ -52,4 +52,14 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
         }
         return new IExpr[]{this, F.C0};
     }
+
+    @Override
+    public boolean isNumericFunctionAttribute() {
+        return ((getAttributes() & NUMERICFUNCTION) == NUMERICFUNCTION);
+    }
+
+    @Override
+    public boolean isConstantAttribute() {
+        return (getAttributes() & CONSTANT) == CONSTANT;
+    }
 }

@@ -2276,7 +2276,7 @@ public class PolynomialFunctions {
 			}
 			// }
 			IASTAppendable newResult = F.ListAlloc(8);
-			IAST factorRational = Algebra.factorRational(polyRat, jas, varList, F.List);
+			IAST factorRational = Algebra.factorRational(polyRat, jas, F.List);
 			for (int i = 1; i < factorRational.size(); i++) {
 				temp = F.evalExpand(factorRational.get(i));
 				IAST quarticResultList = QuarticSolver.solve(temp, variables.arg1());
@@ -2291,7 +2291,7 @@ public class PolynomialFunctions {
 					}
 				} else {
 					polyRat = jas.expr2JAS(temp, numericSolutions);
-					IAST factorComplex = Algebra.factorComplex(polyRat, jas, varList, F.List, true);
+					IAST factorComplex = Algebra.factorComplex(temp,polyRat, jas, F.List);
 					for (int k = 1; k < factorComplex.size(); k++) {
 						temp = F.evalExpand(factorComplex.get(k));
 						quarticResultList = QuarticSolver.solve(temp, variables.arg1());
