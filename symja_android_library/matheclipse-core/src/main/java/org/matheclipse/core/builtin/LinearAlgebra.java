@@ -921,6 +921,10 @@ public final class LinearAlgebra {
      */
     private static class Dot extends AbstractNonOrderlessArgMultiple {
 
+		public IExpr evaluateAST1(final IAST ast, EvalEngine engine) {
+			return ast.arg1();
+		}
+
         @Override
 		public IExpr e2ObjArg(IAST ast, final IExpr o0, final IExpr o1) {
 
@@ -2821,7 +2825,8 @@ public final class LinearAlgebra {
                     return vec;
                 }
                 IExpr function = // [$ (#1-(vec.#2)/(#2.#2)*#2)& $]
-                        F.Function(F.Plus(F.Slot1, F.Times(F.CN1, F.Dot(vec, F.Slot2), F.Power(F.Dot(F.Slot2, F.Slot2), -1), F.Slot2))); // $$;
+					F.Function(F.Plus(F.Slot1,
+							F.Times(F.CN1, F.Dot(vec, F.Slot2), F.Power(F.Dot(F.Slot2, F.Slot2), F.CN1), F.Slot2))); // $$;
                 return F.eval(F.Fold(function, vec, vecmat));
             }
         });
