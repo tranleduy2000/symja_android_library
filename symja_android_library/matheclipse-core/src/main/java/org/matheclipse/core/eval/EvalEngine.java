@@ -15,7 +15,6 @@ import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.exception.TimeoutException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
-import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.expression.ASTRealMatrix;
@@ -633,42 +632,6 @@ public class EvalEngine implements Serializable {
 		return F.NIL;
 	}
 
-	/**
-	 * Evaluate an AST. The evaluation steps are controlled by the header attributes.
-	 *
-	 * @param ast
-	 * @return <code>F.NIL</code> if no evaluation happened
-	 */
-	public final IExpr evalAST(IAST ast) {
-		final IExpr head = ast.head();
-		if (head.isCoreFunctionSymbol()) {
-			IExpr temp = evalEvaluate(ast);
-			if (temp.isPresent()) {
-				return temp;
-			}
-			// evaluate a core function (without no rule definitions)
-			final ICoreFunctionEvaluator coreFunction = (ICoreFunctionEvaluator) ((IBuiltInSymbol) head).getEvaluator();
-			if (isNumericMode()) {
-				return coreFunction.numericEval(ast, this);
-			}
-				return coreFunction.evaluate(ast, this);
-			}
-		final ISymbol symbol = ast.topHead();
-		// if (symbol.isBuiltInSymbol()) {
-		// Integer i = STATISTICS.get(symbol);
-		// if (i == null) {
-		// STATISTICS.put((IBuiltInSymbol) symbol, 1);
-		// } else {
-		// STATISTICS.put((IBuiltInSymbol) symbol, i + 1);
-		// }
-		// }
-		IExpr result = evalAttributes(symbol, ast);
-		if (result.isPresent()) {
-			return result;
-		}
-		// System.out.println(ast.toString());
-		return evalRules(symbol, ast);
-	}
 
 	/**
 	 * Evaluate an AST with only one argument (i.e. <code>head[arg1]</code>). The evaluation steps are controlled by the
@@ -692,14 +655,14 @@ public class EvalEngine implements Serializable {
 			return result;
 		}
 
-		// don't test for OneIdentity here! OneIdentity will be only used in "structural pattern-matching".
+		// don't test for OneIdentity here! OneIdentity will only be used in "structural pattern-matching".
 		// Functions like Times and PLus implement OneIdentity as extra transformation!
 		// if ((ISymbol.ONEIDENTITY & attr) == ISymbol.ONEIDENTITY) {
 		// return ast.arg1();
 		// }
 
+		final IExpr arg1 = ast.arg1();
 		if ((ISymbol.FLAT & attr) == ISymbol.FLAT) {
-			final IExpr arg1 = ast.arg1();
 			if (arg1.topHead().equals(symbol)) {
 				// associative
 				return arg1;
@@ -711,28 +674,25 @@ public class EvalEngine implements Serializable {
 		}
 
 		if ((ISymbol.LISTABLE & attr) == ISymbol.LISTABLE) {
-			final IExpr arg1 = ast.arg1();
+			if (symbol.isBuiltInSymbol()) {
 			if (arg1.isRealVector() && ((IAST) arg1).size() > 1) {
-				if (symbol.isBuiltInSymbol()) {
 					final IEvaluator module = ((IBuiltInSymbol) symbol).getEvaluator();
 					if (module instanceof DoubleUnaryOperator) {
 						DoubleUnaryOperator oper = (DoubleUnaryOperator) module;
 						return ASTRealVector.map((IAST) arg1, oper);
 					}
-				}
 			} else if (arg1.isRealMatrix()) {
-				if (symbol.isBuiltInSymbol()) {
 					final IEvaluator module = ((IBuiltInSymbol) symbol).getEvaluator();
 					if (module instanceof DoubleUnaryOperator) {
 						DoubleUnaryOperator oper = (DoubleUnaryOperator) module;
 						return ASTRealMatrix.map((IAST) arg1, oper);
 					}
 				}
-			}
 			if (arg1.isList()) {
 				// thread over the list
 				return EvalAttributes.threadList(ast, F.List, ast.head(), ((IAST) arg1).argSize());
 			}
+		}
 		}
 
 		if ((ISymbol.NUMERICFUNCTION & attr) == ISymbol.NUMERICFUNCTION) {
@@ -741,17 +701,9 @@ public class EvalEngine implements Serializable {
 			}
 		}
 
-		if (!(ast.arg1() instanceof IPatternObject)) {
-			final IExpr arg1 = ast.arg1();
-			ISymbol lhsSymbol = null;
-			if (arg1.isSymbol()) {
-				lhsSymbol = (ISymbol) arg1;
-			} else {
-				lhsSymbol = arg1.topHead();
-			}
-			if ((result = lhsSymbol.evalUpRule(this, ast)).isPresent()) {
-				return result;
-			}
+		if (!(arg1 instanceof IPatternObject)) {
+			ISymbol lhsSymbol = arg1.isSymbol() ? (ISymbol) arg1 : arg1.topHead();
+			return lhsSymbol.evalUpRule(this, ast);
 		}
 		return F.NIL;
 	}
@@ -791,12 +743,10 @@ public class EvalEngine implements Serializable {
 			final IEvaluator module = ((IBuiltInSymbol) symbol).getEvaluator();
 			if (module instanceof IFunctionEvaluator) {
 				// evaluate a built-in function.
-				IExpr result;
-				if (fNumericMode) {
-					result = ((IFunctionEvaluator) module).numericEval(ast, this);
-				} else {
-					result = ((IFunctionEvaluator) module).evaluate(ast, this);
-				}
+				final IFunctionEvaluator functionEvaluator = (IFunctionEvaluator) module;
+				IExpr result = fNumericMode ? //
+						functionEvaluator.numericEval(ast, this) : //
+						functionEvaluator.evaluate(ast, this);
 				if (result.isPresent()) {
 					// if (symbol.equals(F.Simplify) || symbol.equals(F.FullSimplify)) {
 					// System.out.println(ast.toString());
@@ -806,9 +756,7 @@ public class EvalEngine implements Serializable {
 					return result;
 				}
 				if (((ISymbol.DELAYED_RULE_EVALUATION & attr) == ISymbol.DELAYED_RULE_EVALUATION)) {
-					if ((result = symbol.evalDownRule(this, ast)).isPresent()) {
-						return result;
-					}
+					return symbol.evalDownRule(this, ast);
 				}
 			}
 		}
@@ -882,11 +830,11 @@ public class EvalEngine implements Serializable {
 			if ((ISymbol.NUMERICFUNCTION & attr) == ISymbol.NUMERICFUNCTION) {
 				if (!((ISymbol.HOLDALL & attr) == ISymbol.HOLDALL)) {
 					if (tempAST.exists(new Predicate<IExpr>() {
-                        @Override
-                        public boolean test(IExpr x) {
-                            return x.isIndeterminate();
-                        }
-                    })) {
+						@Override
+						public boolean test(IExpr x) {
+							return x.isIndeterminate();
+						}
+					})) {
 						return F.Indeterminate;
 					}
 				}
@@ -904,11 +852,13 @@ public class EvalEngine implements Serializable {
 	}
 
 	public IExpr evalBlock(final IExpr expr, final IAST localVariablesList) {
+		ISymbol[] symbolList = new ISymbol[localVariablesList.size()];
 		IExpr[] blockVariables = new IExpr[localVariablesList.size()];
 		RulesData[] blockVariablesRulesData = new RulesData[localVariablesList.size()];
 		IExpr result = F.NIL;
 		try {
-			Programming.rememberBlockVariables(localVariablesList, blockVariables, blockVariablesRulesData, this);
+			Programming.rememberBlockVariables(localVariablesList, symbolList, blockVariables, blockVariablesRulesData,
+					this);
 				result = evaluate(expr);
 		} finally {
 			if (localVariablesList.size() > 0) {
@@ -916,13 +866,13 @@ public class EvalEngine implements Serializable {
 				ISymbol variableSymbol;
 				for (int i = 1; i < localVariablesList.size(); i++) {
 					if (localVariablesList.get(i).isSymbol()) {
-						variableSymbol = (ISymbol) localVariablesList.get(i);
+						variableSymbol = symbolList[i];
 						variableSymbol.assign(blockVariables[i]);
 						variableSymbol.setRulesData(blockVariablesRulesData[i]);
 					} else if (localVariablesList.get(i).isAST(F.Set, 3)) {
 						final IAST setFun = (IAST) localVariablesList.get(i);
 						if (setFun.arg1().isSymbol()) {
-							variableSymbol = (ISymbol) setFun.arg1();
+							variableSymbol = symbolList[i];
 							variableSymbol.assign(blockVariables[i]);
 							variableSymbol.setRulesData(blockVariablesRulesData[i]);
 						}
@@ -959,11 +909,7 @@ public class EvalEngine implements Serializable {
 			IExpr temp = F.subst(evaluate(localValue), blockVariables);
 			evaluate(F.Set(newSymbol, temp));
 			result = expr.accept(new ModuleReplaceAll(blockVariables, this, ""));
-			if (result.isPresent()) {
-				result = evaluate(result);
-			} else {
-				result = evaluate(expr);
-			}
+			return evaluate(result.orElse(expr));
 		} finally {
 			setQuietMode(quietMode);
 			if (blockVariables.size()>0) {
@@ -975,7 +921,6 @@ public class EvalEngine implements Serializable {
 				result = F.subst(result, globalVariables);
 		}
 	}
-		return result;
 	}
 
 	/**
@@ -1005,7 +950,7 @@ public class EvalEngine implements Serializable {
 	 * @param ast
 	 * @return
 	 */
-	private IExpr evalEvaluate(final IAST ast) {
+	public final IExpr evalEvaluate(final IAST ast) {
 		final IASTMutable[] rlist = new IASTMutable[] { F.NIL };
 		ast.forEach(1, ast.size(), new ObjIntConsumer<IExpr>() {
 			@Override
@@ -1146,32 +1091,6 @@ public class EvalEngine implements Serializable {
 		}
 	}
 
-	/**
-	 *
-	 * @param ast
-	 * @return
-	 * @deprecated use {@link #evalHoldPattern(IAST)}
-	 */
-	private IExpr evalLHSPattern(IAST ast) {
-		boolean evalLHSMode = fEvalLHSMode;
-		boolean numericMode = fNumericMode;
-		try {
-			fEvalLHSMode = true;
-			numericMode = false;
-			IExpr temp = evalAttributes(ast.topHead(),ast);
-			if (temp.isPresent()) {
-				return temp;
-			}
-		} catch (RuntimeException rex) {
-			if (Config.SHOW_STACKTRACE) {
-				rex.printStackTrace();
-			}
-		} finally {
-			fEvalLHSMode = evalLHSMode;
-			fNumericMode = numericMode;
-		}
-		return ast;
-	}
 	/**
 	 * Evaluate an object, if evaluation is not possible return <code>F.NIL</code>.
 	 *
@@ -1550,7 +1469,7 @@ public class EvalEngine implements Serializable {
 				}
 			}
 			if (evalNumericFunction && ((ISymbol.HOLDALL & attr) == ISymbol.NOATTRIBUTE)) {
-				IAST f = resultList.isPresent() ? resultList : ast;
+				IAST f = resultList.orElse(ast);
 				if (f.isNumericFunction()) {
 					IExpr temp = evalLoop(f);
 					if (temp.isPresent()) {
@@ -1625,15 +1544,9 @@ public class EvalEngine implements Serializable {
 	 */
 	private IExpr evalTagSetPlusTimes(IAST ast) {
 		if (ast.isPlus()) {
-			IExpr temp2 = UtilityFunctionCtors.evalRubiDistPlus(ast);
-			if (temp2.isPresent()) {
-				return temp2;
-			}
+			return UtilityFunctionCtors.evalRubiDistPlus(ast);
 		} else if (ast.isTimes()) {
-			IExpr temp2 = UtilityFunctionCtors.evalRubiDistTimes(ast);
-			if (temp2.isPresent()) {
-				return temp2;
-			}
+			return UtilityFunctionCtors.evalRubiDistTimes(ast);
 		}
 		return F.NIL;
 	}

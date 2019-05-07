@@ -1,6 +1,7 @@
 package org.matheclipse.core.eval;
 
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.exception.TimeExceeded;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
@@ -11,7 +12,7 @@ import java.io.Writer;
  * Run the evaluation of a given math formula <code>String</code> in a time
  * limited thread
  */
-public class TimeConstrainedEvaluator extends EvalUtilities {
+public class TimeConstrainedEvaluator extends EvalUtilities implements Runnable {
 
     protected IExpr fEvaluationResult;
 
@@ -37,6 +38,7 @@ public class TimeConstrainedEvaluator extends EvalUtilities {
         fTraceEvaluation = false;
     }
 
+	@Override
     public void run() {
         try {
             startRequest();
@@ -70,6 +72,7 @@ public class TimeConstrainedEvaluator extends EvalUtilities {
      * limited thread
      *
      * @param traceEvaluation
+	 *
      */
     public IExpr constrainedEval(final Writer writer, final String inputString, boolean traceEvaluation) throws Exception {
 
@@ -92,6 +95,7 @@ public class TimeConstrainedEvaluator extends EvalUtilities {
 
     /**
      * Runs the evaluation of the given math expression in a time limited thread
+	 *
      */
     public IExpr constrainedEval(final Writer writer, final IExpr inputExpression) throws Exception {
 
@@ -102,14 +106,27 @@ public class TimeConstrainedEvaluator extends EvalUtilities {
 
         try {
 
-            run(); //calculate
+			final Thread thread = new Thread(this, "TimeConstrainedEvaluator");// EvaluationRunnable();
+			thread.start();
+			thread.join(fMilliSeconds);
+			if (thread.isAlive()) {
+				thread.interrupt();
+				fEvalEngine.stopRequest();
+				// wait a bit, so the thread can stop by itself
+				Thread.sleep(Config.TIME_CONSTRAINED_SLEEP_MILLISECONDS);
+				if (thread.isAlive()) {
+					// call the deprecated method as last possible exit
+					thread.stop();
+					throw new TimeExceeded();
+				}
+			}
 
             if (fException != null) {
                 writer.write(fException.getMessage() != null ? fException.getMessage() : "Exception: " + fException.getClass().getName());
                 writer.write('\n');
             }
 
-            if ((fEvaluationResult.isPresent()) && !fEvaluationResult.equals(F.Null)) {
+			if (fEvaluationResult.isPresent() && !fEvaluationResult.equals(F.Null)) {
                 OutputFormFactory.get(fRelaxedSyntax).convert(writer, fEvaluationResult);
             }
             return fEvaluationResult;

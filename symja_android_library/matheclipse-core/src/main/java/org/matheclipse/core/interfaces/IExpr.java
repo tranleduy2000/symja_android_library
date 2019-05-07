@@ -885,6 +885,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isExactNumber();
 
     /**
+     * Check if this expression is an even integer result otherwise return false.
+     *
+     * @return <code>true</code> if this is an even integer result.
+     */
+    boolean isEvenResult();
+
+    /**
      * Test if this expression is the <code>Except</code> function <code>Except[&lt;pattern1&gt;]</code> or
      * <code>Except[&lt;pattern1&gt;, &lt;pattern2&gt;]</code>
      */

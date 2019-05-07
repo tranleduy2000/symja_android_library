@@ -1,5 +1,7 @@
 package org.matheclipse.core.eval;
 
+import com.duy.lambda.Supplier;
+
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.F;
@@ -303,16 +305,15 @@ public class PlusOp {
 	 *            the <code>a1+a2+...</code> Plus() expression
 	 * @return
 	 */
-	public static IExpr plus(IAST plusAST) {
-		IAST temp = EvalEngine.get().evalFlatOrderlessAttributesRecursive(plusAST);
-		if (!temp.isPresent()) {
-			temp = plusAST;
-		}
+	public static IExpr plus(final IAST plusAST) {
+		IAST temp = EvalEngine.get().evalFlatOrderlessAttributesRecursive(plusAST).orElse(plusAST);
 		IExpr expr = Arithmetic.CONST_PLUS.evaluate(temp, EvalEngine.get());
-		if (!expr.isPresent()) {
-			return plusAST.oneIdentity0();
-		}
-		return expr;
+		return expr.orElseGet(new Supplier<IExpr>() {
+            @Override
+            public IExpr get() {
+                return plusAST.oneIdentity0();
+            }
+        });
 	}
 
 	/**
@@ -323,13 +324,9 @@ public class PlusOp {
 	 * @return
 	 */
 	public static IExpr plus(IExpr a1, IExpr a2) {
-		IAST plus = F.Plus(a1, a2);
-		IExpr expr = Arithmetic.CONST_PLUS.evaluate(plus, EvalEngine.get());
-		if (!expr.isPresent()) {
-			return plus;
+		final IAST plus = F.Plus(a1, a2);
+		return Arithmetic.CONST_PLUS.evaluate(plus, EvalEngine.get()).orElse(plus);
 		}
-		return expr;
-	}
     /**
      * Use interval arithmetic to add to interval objects
      *

@@ -116,6 +116,8 @@ public class SerializableTest extends TestCase {
 	}
 
 	public void testIntegrateDefinition() {
+		// do a dummy evaluation to load integration rules
+		F.Integrate.of(F.x, F.x);
 		RulesData rulesData = F.Integrate.getRulesData();
 		AbstractVisitor visitor = Share.createVisitor();
 		rulesData.accept(visitor);

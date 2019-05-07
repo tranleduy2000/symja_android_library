@@ -275,6 +275,12 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 	public final void setPredicateQ(final Predicate<IExpr> predicate) {
 		fEvaluator = new PredicateEvaluator(predicate);
 	}
+
+	@Override
+	public ISymbol mapToGlobal(EvalEngine engine) {
+		return null;
+	}
+
 	private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		fOrdinal = stream.readInt();
 	}

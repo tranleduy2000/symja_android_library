@@ -281,7 +281,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	}
 
 	@Override
-	public abstract IFraction ceilFraction();
+	public abstract IInteger ceilFraction();
 
 	/** {@inheritDoc} */
 	@Override
@@ -354,7 +354,6 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 		return result;
 	}
 
-	@Override
 	public IAST factorSmallPrimes(int numerator, int root) {
 		BigInteger b = toBigNumerator();
 		boolean isNegative = false;

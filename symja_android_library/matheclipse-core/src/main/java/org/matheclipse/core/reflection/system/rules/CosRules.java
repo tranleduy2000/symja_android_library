@@ -25,29 +25,21 @@ import static org.matheclipse.core.expression.F.CNI;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.CSqrt5;
-import static org.matheclipse.core.expression.F.Condition;
 import static org.matheclipse.core.expression.F.Cos;
 import static org.matheclipse.core.expression.F.Cosh;
 import static org.matheclipse.core.expression.F.DirectedInfinity;
-import static org.matheclipse.core.expression.F.GreaterEqual;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.ISetDelayed;
-import static org.matheclipse.core.expression.F.If;
 import static org.matheclipse.core.expression.F.Indeterminate;
-import static org.matheclipse.core.expression.F.IntegerPart;
 import static org.matheclipse.core.expression.F.Interval;
-import static org.matheclipse.core.expression.F.Less;
 import static org.matheclipse.core.expression.F.List;
 import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Noo;
-import static org.matheclipse.core.expression.F.NumberQ;
-import static org.matheclipse.core.expression.F.PatternTest;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.QQ;
-import static org.matheclipse.core.expression.F.Quotient;
 import static org.matheclipse.core.expression.F.Sqr;
 import static org.matheclipse.core.expression.F.Sqrt;
 import static org.matheclipse.core.expression.F.Subtract;
@@ -66,7 +58,7 @@ public interface CosRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 55, 8 };
+  final public static int[] SIZES = { 55, 7 };
 
   final public static IAST RULES = List(
     IInit(Cos, SIZES),
@@ -220,9 +212,6 @@ public interface CosRules {
     // Cos(I)=Cosh(1)
     ISet(Cos(CI),
       Cosh(C1)),
-    // Cos(Pi*x_?NumberQ):=If(x<1,-Cos((1-x)*Pi),If(x<2,Cos((2-x)*Pi),Cos((x-2*Quotient(IntegerPart(x),2))*Pi)))/;x>=1/2
-    ISetDelayed(Cos(Times(Pi,PatternTest(x_,NumberQ))),
-      Condition(If(Less(x,C1),Negate(Cos(Times(Subtract(C1,x),Pi))),If(Less(x,C2),Cos(Times(Subtract(C2,x),Pi)),Cos(Times(Plus(x,Times(CN2,Quotient(IntegerPart(x),C2))),Pi)))),GreaterEqual(x,C1D2))),
     // Cos(ArcSin(x_)):=Sqrt(1-x^2)
     ISetDelayed(Cos(ArcSin(x_)),
       Sqrt(Subtract(C1,Sqr(x)))),
@@ -232,9 +221,9 @@ public interface CosRules {
     // Cos(ArcTan(x_)):=1/Sqrt(1+x^2)
     ISetDelayed(Cos(ArcTan(x_)),
       Power(Plus(C1,Sqr(x)),CN1D2)),
-    // Cos(ArcCot(x_)):=1/Sqrt(1+1/x^2)
+    // Cos(ArcCot(x_)):=x/Sqrt(1+x^2)
     ISetDelayed(Cos(ArcCot(x_)),
-      Power(Plus(C1,Power(x,CN2)),CN1D2)),
+      Times(x,Power(Plus(C1,Sqr(x)),CN1D2))),
     // Cos(ArcCsc(x_)):=Sqrt(1-1/x^2)
     ISetDelayed(Cos(ArcCsc(x_)),
       Sqrt(Subtract(C1,Power(x,CN2)))),

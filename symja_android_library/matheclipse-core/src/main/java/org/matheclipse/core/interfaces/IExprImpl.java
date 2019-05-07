@@ -1232,6 +1232,25 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return this instanceof IRational || this instanceof IComplex;
     }
 
+    @Override
+    public boolean isEvenResult() {
+        if (isInteger()) {
+            return ((IInteger) this).isEven();
+        }
+        if (isIntegerResult()) {
+            if (isTimes()) {
+                IAST timesAST = (IAST) this;
+                return timesAST.exists(new Predicate<IExpr>() {
+                    @Override
+                    public boolean test(IExpr x) {
+                        return x.isInteger() && ((IInteger) x).isEven();
+                    }
+                });
+            }
+        }
+        return false;
+    }
+
     /**
      * Test if this expression is the <code>Except</code> function <code>Except[&lt;pattern1&gt;]</code> or
      * <code>Except[&lt;pattern1&gt;, &lt;pattern2&gt;]</code>

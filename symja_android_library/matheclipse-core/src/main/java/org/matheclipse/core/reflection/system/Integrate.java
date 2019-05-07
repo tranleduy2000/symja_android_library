@@ -308,11 +308,12 @@ public class Integrate extends AbstractFunctionEvaluator {
 			if (holdallAST.size() < 3) {
 				return F.NIL;
 			}
-			IExpr arg1 = engine.evaluateNull(holdallAST.arg1());
+			final IExpr a1 = holdallAST.arg1();
+			IExpr arg1 = engine.evaluateNull(a1);
 			if (arg1.isPresent()) {
 				evaled = true;
 			} else {
-				arg1 = holdallAST.arg1();
+				arg1 = a1;
 			}
 			if (arg1.isIndeterminate()) {
 				return F.Indeterminate;
@@ -633,12 +634,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 						if (result.isPresent()) {
 							return result;
 						}
-						IExpr temp = callRestIntegrate(arg1, x, engine);
-						if (temp.isPresent()) {
-							return temp;
-						}
-						// RecursionLimitExceeded.throwIt(engine.getRecursionCounter(), ast);
-						return F.NIL;
+						return callRestIntegrate(arg1, x, engine);
 					}
 				} else {
 					newCache = true;

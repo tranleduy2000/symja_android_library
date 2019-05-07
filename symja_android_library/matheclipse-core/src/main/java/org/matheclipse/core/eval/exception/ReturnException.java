@@ -1,5 +1,7 @@
 package org.matheclipse.core.eval.exception;
 
+import com.duy.annotations.Nonnull;
+
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
@@ -21,8 +23,8 @@ public class ReturnException extends FlowControlException {
 		this(F.Null);
 	}
 
-	public ReturnException( final IExpr val) {
-		super("Return from a function definition.");
+	public ReturnException(@Nonnull final IExpr val) {
+		super();
 		value = val;
 	}
 

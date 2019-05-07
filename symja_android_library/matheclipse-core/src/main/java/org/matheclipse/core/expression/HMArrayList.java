@@ -869,8 +869,9 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 				}
 				j++;
 			}
+			return result;
 		}
-		return (IAST) result.orElse(this);
+		return this;
 	}
 
 	/** {@inheritDoc} */

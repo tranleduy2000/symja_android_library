@@ -56,8 +56,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     protected transient RulesData fRulesData;
 
     /**
-     * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower- and upper-case
-     * function names.
+     * The name of this symbol. The characters may be all lower-cases if the system doesn't distinguish between lower-
+     * and upper-case function names.
      */
     protected String fSymbolName;
 
@@ -112,8 +112,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     }
 
     /**
-     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive integer as this
-     * expression is canonical less than, equal to, or greater than the specified expression.
+     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
+     * integer as this expression is canonical less than, equal to, or greater than the specified expression.
      */
     @Override
     public int compareTo(final IExpr expr) {
@@ -231,11 +231,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         // if (hasLocalVariableStack()) {
         // return ExprUtil.ofNullable(get());
         // }
-        IExpr result;
-        if ((result = evalDownRule(engine, this)).isPresent()) {
-            return result;
-        }
-        return F.NIL;
+        return evalDownRule(engine, this);
     }
 
     /**
@@ -244,11 +240,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     @Override
     public IExpr evaluateHead(IAST ast, EvalEngine engine) {
         IExpr result = evaluate(engine);
-        if (result.isPresent()) {
             // set the new evaluated header !
-            return ast.apply(result);
-        }
-        return F.NIL;
+        return result.isPresent() ? ast.apply(result) : F.NIL;
     }
 
     /**

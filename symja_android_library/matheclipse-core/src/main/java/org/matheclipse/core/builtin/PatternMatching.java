@@ -1050,7 +1050,7 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
+			if (ast.isAST2()) {
 			IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isAST()) {
 				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
@@ -1065,6 +1065,8 @@ public final class PatternMatching {
 				return Rule(leftHandSide, ast.arg2());
 			}
 			return Rule(leftHandSide, arg2);
+		}
+			return F.NIL;
 		}
 
 		@Override
@@ -1090,7 +1092,7 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
+			if (ast.isAST2()) {
 			IExpr leftHandSide = ast.arg1();
 			if (leftHandSide.isAST()) {
 				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
@@ -1101,6 +1103,7 @@ public final class PatternMatching {
 				return RuleDelayed(leftHandSide, ast.arg2());
 			}
 
+			}
 			return F.NIL;
 		}
 

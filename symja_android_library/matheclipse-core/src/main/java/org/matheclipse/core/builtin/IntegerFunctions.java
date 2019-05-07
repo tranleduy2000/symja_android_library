@@ -802,7 +802,7 @@ public class IntegerFunctions {
 				IExpr arg1 = ast.arg1();
 				ISignedNumber signedNumber = arg1.evalReal();
 				if (signedNumber != null) {
-					return signedNumberIntegerPart(signedNumber);
+					return  signedNumber.integerPart();
 				}
 				if (arg1.isIntegerResult()) {
 					return arg1;
@@ -821,13 +821,6 @@ public class IntegerFunctions {
 			return F.NIL;
 		}
 
-		private IExpr signedNumberIntegerPart(ISignedNumber arg1) {
-			if (arg1.isNegative()) {
-				return arg1.ceilFraction();
-			} else {
-				return arg1.floorFraction();
-			}
-		}
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -946,16 +939,16 @@ public class IntegerFunctions {
 			Validate.checkSize(ast, 4);
 
 			if (ast.exists(new Predicate<IExpr>() {
-                @Override
-                public boolean test(IExpr x) {
-                    return !x.isInteger();
-                }
-            }, 1)) {
+				@Override
+				public boolean test(IExpr x) {
+					return !x.isInteger();
+				}
+			})) {
 				return F.NIL;
 			}
-			IInteger arg1 = (IInteger) ast.get(1);
-			IInteger arg2 = (IInteger) ast.get(2);
-			IInteger arg3 = (IInteger) ast.get(3);
+			IInteger arg1 = (IInteger) ast.arg1();
+			IInteger arg2 = (IInteger) ast.arg2();
+			IInteger arg3 = (IInteger) ast.arg3();
 			try {
 				if (arg2.isMinusOne()) {
 					return arg1.modInverse(arg3);

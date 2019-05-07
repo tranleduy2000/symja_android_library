@@ -2,6 +2,7 @@ package org.matheclipse.core.reflection.system.rules;
 
 import org.matheclipse.core.interfaces.IAST;
 
+import static org.matheclipse.core.expression.F.$p;
 import static org.matheclipse.core.expression.F.ArcCosh;
 import static org.matheclipse.core.expression.F.ArcCoth;
 import static org.matheclipse.core.expression.F.ArcCsch;
@@ -9,7 +10,8 @@ import static org.matheclipse.core.expression.F.ArcSech;
 import static org.matheclipse.core.expression.F.ArcSinh;
 import static org.matheclipse.core.expression.F.ArcTanh;
 import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.*;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.CC;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
@@ -18,20 +20,24 @@ import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CNI;
 import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
+import static org.matheclipse.core.expression.F.Complex;
 import static org.matheclipse.core.expression.F.Cosh;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.ISetDelayed;
 import static org.matheclipse.core.expression.F.Indeterminate;
+import static org.matheclipse.core.expression.F.Integer;
 import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Sinh;
 import static org.matheclipse.core.expression.F.Sqr;
 import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.n;
 import static org.matheclipse.core.expression.F.oo;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
@@ -46,7 +52,7 @@ public interface SinhRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 19, 8 };
+  final public static int[] SIZES = { 19, 9 };
 
   final public static IAST RULES = List(
     IInit(Sinh, SIZES),
@@ -110,21 +116,24 @@ public interface SinhRules {
     // Sinh(ArcSinh(x_)):=x
     ISetDelayed(Sinh(ArcSinh(x_)),
       x),
-    // Sinh(ArcCosh(x_)):=Sqrt((-1+x)/(x+1))*(1+x)
+    // Sinh(ArcCosh(x_)):=Sqrt(x+1)*Sqrt(-1+x)
     ISetDelayed(Sinh(ArcCosh(x_)),
-      Times(Sqrt(Times(Power(Plus(x,C1),CN1),Plus(CN1,x))),Plus(C1,x))),
+      Times(Sqrt(Plus(x,C1)),Sqrt(Plus(CN1,x)))),
     // Sinh(ArcTanh(x_)):=x/Sqrt(1-x^2)
     ISetDelayed(Sinh(ArcTanh(x_)),
       Times(x,Power(Subtract(C1,Sqr(x)),CN1D2))),
-    // Sinh(ArcCoth(x_)):=1/(Sqrt(1-1/x^2)*x)
+    // Sinh(ArcCoth(x_)):=1/(Sqrt(-1+x)*Sqrt(x+1))
     ISetDelayed(Sinh(ArcCoth(x_)),
-      Power(Times(Sqrt(Subtract(C1,Power(x,CN2))),x),CN1)),
-    // Sinh(ArcSech(x_)):=((1+x)*Sqrt((1-x)/(1+x)))/x
+      Power(Times(Sqrt(Plus(CN1,x)),Sqrt(Plus(x,C1))),CN1)),
+    // Sinh(ArcSech(x_)):=Sqrt(1/x+1)*Sqrt(-1+1/x)
     ISetDelayed(Sinh(ArcSech(x_)),
-      Times(Power(x,CN1),Plus(C1,x),Sqrt(Times(Subtract(C1,x),Power(Plus(C1,x),CN1))))),
+      Times(Sqrt(Plus(Power(x,CN1),C1)),Sqrt(Plus(CN1,Power(x,CN1))))),
     // Sinh(ArcCsch(x_)):=1/x
     ISetDelayed(Sinh(ArcCsch(x_)),
       Power(x,CN1)),
+    // Sinh(Log(x_)):=-1/(2*x)+x/2
+    ISetDelayed(Sinh(Log(x_)),
+      Plus(Times(CN1D2,Power(x,CN1)),Times(C1D2,x))),
     // Sinh(Infinity)=Infinity
     ISet(Sinh(oo),
       oo),

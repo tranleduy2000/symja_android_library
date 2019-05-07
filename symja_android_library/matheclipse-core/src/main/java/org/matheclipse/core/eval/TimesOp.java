@@ -1,5 +1,7 @@
 package org.matheclipse.core.eval;
 
+import com.duy.lambda.Supplier;
+
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -25,8 +27,7 @@ public class TimesOp {
 	}
 
 	/**
-	 * Add or merge the <code>key, value</code> pair into the given
-	 * <code>timesMap</code>.
+	 * Add or merge the <code>key, value</code> pair into the given <code>timesMap</code>.
 	 * 
 	 * @param key
 	 *            the key expression
@@ -36,8 +37,7 @@ public class TimesOp {
 	}
 
 	/**
-	 * Add or merge the <code>key, value</code> pair into the given
-	 * <code>timesMap</code>.
+	 * Add or merge the <code>key, value</code> pair into the given <code>timesMap</code>.
 	 * 
 	 * @param key
 	 *            the key expression
@@ -70,8 +70,7 @@ public class TimesOp {
 	}
 
 	/**
-	 * Get the current evaluated result of the summation as a
-	 * <code>Plus()</code> expression with respecting the
+	 * Get the current evaluated result of the summation as a <code>Plus()</code> expression with respecting the
 	 * <code>OneIdentity</code> attribute.
 	 * 
 	 * @return
@@ -107,16 +106,14 @@ public class TimesOp {
 	 * @param a1
 	 * @return
 	 */
-	public static IExpr times(IAST timesAST) {
-		IAST temp = EvalEngine.get().evalFlatOrderlessAttributesRecursive(timesAST);
-		if (!temp.isPresent()) {
-			temp = timesAST;
-		}
-		IExpr expr = Arithmetic.CONST_TIMES.evaluate(temp, EvalEngine.get());
-		if (!expr.isPresent()) {
-			return timesAST.oneIdentity0();
-		}
-		return expr;
+	public static IExpr times(final IAST timesAST) {
+		IAST temp = EvalEngine.get().evalFlatOrderlessAttributesRecursive(timesAST).orElse(timesAST);
+		return Arithmetic.CONST_TIMES.evaluate(temp, EvalEngine.get()).orElseGet(new Supplier<IExpr>() {
+			@Override
+			public IExpr get() {
+				return timesAST.oneIdentity0();
+			}
+		});
 	}
 
 	/**
@@ -127,19 +124,8 @@ public class TimesOp {
 	 * @return
 	 */
 	public static IExpr times(IExpr a1, IExpr a2) {
-		IExpr expr = timesNull(a1, a2);
-		if (expr == null) {
-			return F.Times(a1, a2);
-		}
-		return expr;
+		final IAST times = F.Times(a1, a2);
+		return Arithmetic.CONST_TIMES.evaluate(times, EvalEngine.get()).orElse(times);
 	}
 
-	public static IExpr timesNull(IExpr a1, IExpr a2) {
-		IAST times = F.Times(a1, a2);
-		IExpr temp = Arithmetic.CONST_TIMES.evaluate(times, EvalEngine.get());
-		if (temp.isPresent()) {
-			return temp;
-		}
-		return null;
-	}
 }

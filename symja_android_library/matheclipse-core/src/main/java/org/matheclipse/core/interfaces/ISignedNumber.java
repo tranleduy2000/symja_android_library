@@ -48,6 +48,8 @@ public interface ISignedNumber extends INumber {
      */
     double doubleValue();
 
+    IInteger ceilFraction() throws ArithmeticException;
+
     IInteger floorFraction() throws ArithmeticException;
 
     /**
@@ -56,6 +58,14 @@ public interface ISignedNumber extends INumber {
      * @return
      */
     ISignedNumber fractionalPart();
+
+    /**
+     * Return the integer part of this number
+     *
+     * @return
+     */
+     IInteger integerPart();
+
 
     /**
      * {@inheritDoc}

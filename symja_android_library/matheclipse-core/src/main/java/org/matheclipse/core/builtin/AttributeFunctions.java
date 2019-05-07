@@ -3,7 +3,6 @@ package org.matheclipse.core.builtin;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.RuleCreationError;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISetEvaluator;
 import org.matheclipse.core.expression.F;
@@ -49,12 +48,10 @@ public class AttributeFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
-
-			if (ast.arg1().isSymbol()) {
-				final ISymbol sym = ((ISymbol) ast.arg1());
-				return attributesList(sym);
+			if (ast.isAST1() && ast.arg1().isSymbol()) {
+				return attributesList(((ISymbol) ast.arg1()));
 			}
+
 			return F.NIL;
 		}
 
@@ -104,7 +101,7 @@ public class AttributeFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
+			if (ast.isAST2()) {
 
 			if (ast.arg1().isSymbol()) {
 				IExpr arg2 = engine.evaluate(ast.arg2());
@@ -122,6 +119,7 @@ public class AttributeFunctions {
 				}
 				return F.Null;
 
+				}
 			}
 			return F.NIL;
 		}
@@ -259,7 +257,7 @@ public class AttributeFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
+			if (ast.isAST2()) {
 
 			if (ast.arg1().isSymbol()) {
 				IExpr arg2 = engine.evaluate(ast.arg2());
@@ -269,6 +267,7 @@ public class AttributeFunctions {
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
 				return setSymbolsAttributes(list, ast.arg2(), engine);
+			}
 			}
 			return F.NIL;
 		}

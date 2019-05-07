@@ -22,12 +22,12 @@ import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.ISetDelayed;
 import static org.matheclipse.core.expression.F.Indeterminate;
 import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Sqr;
 import static org.matheclipse.core.expression.F.Sqrt;
-import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.num;
 import static org.matheclipse.core.expression.F.oo;
@@ -44,7 +44,7 @@ public interface CothRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 8, 6 };
+  final public static int[] SIZES = { 8, 7 };
 
   final public static IAST RULES = List(
     IInit(Coth, SIZES),
@@ -69,21 +69,24 @@ public interface CothRules {
     // Coth(ArcSinh(x_)):=Sqrt(1+x^2)/x
     ISetDelayed(Coth(ArcSinh(x_)),
       Times(Power(x,CN1),Sqrt(Plus(C1,Sqr(x))))),
-    // Coth(ArcCosh(x_)):=x/(Sqrt((-1+x)/(1+x))*(1+x))
+    // Coth(ArcCosh(x_)):=x/(Sqrt(x+1)*Sqrt(-1+x))
     ISetDelayed(Coth(ArcCosh(x_)),
-      Times(x,Power(Times(Sqrt(Times(Plus(CN1,x),Power(Plus(C1,x),CN1))),Plus(C1,x)),CN1))),
+      Times(Power(Times(Sqrt(Plus(x,C1)),Sqrt(Plus(CN1,x))),CN1),x)),
     // Coth(ArcTanh(x_)):=1/x
     ISetDelayed(Coth(ArcTanh(x_)),
       Power(x,CN1)),
     // Coth(ArcCoth(x_)):=x
     ISetDelayed(Coth(ArcCoth(x_)),
       x),
-    // Coth(ArcSech(x_)):=1/(Sqrt((1-x)/(1+x))*(1+x))
+    // Coth(ArcSech(x_)):=1/(x*Sqrt(-1+1/x)*Sqrt(1/x+1))
     ISetDelayed(Coth(ArcSech(x_)),
-      Power(Times(Sqrt(Times(Subtract(C1,x),Power(Plus(C1,x),CN1))),Plus(C1,x)),CN1)),
+      Power(Times(x,Sqrt(Plus(CN1,Power(x,CN1))),Sqrt(Plus(Power(x,CN1),C1))),CN1)),
     // Coth(ArcCsch(x_)):=Sqrt(1+1/x^2)*x
     ISetDelayed(Coth(ArcCsch(x_)),
       Times(Sqrt(Plus(C1,Power(x,CN2))),x)),
+    // Coth(Log(x_)):=(1+x^2)/(-1+x^2)
+    ISetDelayed(Coth(Log(x_)),
+      Times(Plus(C1,Sqr(x)),Power(Plus(CN1,Sqr(x)),CN1))),
     // Coth(Infinity)=1
     ISet(Coth(oo),
       C1),

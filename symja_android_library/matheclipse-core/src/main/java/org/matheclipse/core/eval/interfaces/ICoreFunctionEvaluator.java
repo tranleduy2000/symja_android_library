@@ -10,29 +10,31 @@ import org.matheclipse.core.interfaces.ISymbol;
  * Interface for &quot;core functions&quot; which don't have associated rules and are only defined by a derived classes
  * from this interface.
  * </p>
- *
  */
 public interface ICoreFunctionEvaluator extends IFunctionEvaluator {
     public final static ICoreFunctionEvaluator ARGS_EVALUATOR = new ICoreFunctionEvaluator() {
 
         @Override
-        public IExpr evaluate(IAST ast, EvalEngine engine) {
-			return engine.evalAttributes(ast.topHead(), ast);
+        public final IExpr evaluate(IAST ast, EvalEngine engine) {
+            return engine.evalAttributes(ast.topHead(), ast);
         }
 
         @Override
-        public IExpr numericEval(IAST ast, EvalEngine engine) {
-			return engine.evalAttributes(ast.topHead(), ast);
-        }
-
-        @Override
-        public void setUp(ISymbol newSymbol) {
-
+        public final IExpr numericEval(IAST ast, EvalEngine engine) {
+            return engine.evalAttributes(ast.topHead(), ast);
         }
 
         @Override
         public void await() {
 
         }
+
+        @Override
+        public void setUp(ISymbol newSymbol) {
+
+        }
     };
+
+    @Override
+    IExpr numericEval(IAST ast, EvalEngine engine);
 }

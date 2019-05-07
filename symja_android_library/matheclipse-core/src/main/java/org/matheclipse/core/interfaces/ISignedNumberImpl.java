@@ -6,38 +6,6 @@ import org.matheclipse.core.expression.F;
  * Created by Duy on 2/20/2018.
  */
 public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNumber {
-    @Override
-    public boolean isPositiveResult() {
-        return isPositive();
-    }
-
-    @Override
-    public boolean isNegativeResult() {
-        return isNegative();
-    }
-
-    @Override
-    public boolean isNonNegativeResult() {
-        return !isNegative();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract ISignedNumber abs();
-
-    @Override
-    public abstract ISignedNumber opposite();
-
-    /**
-     * Returns (-1) * this
-     *
-     * @return
-     */
-    @Override
-    public abstract ISignedNumber negate();
-
     /**
      * Divide <code>this</code> signed number by <code>that</code> signed number.
      *
@@ -46,11 +14,10 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
      */
     public abstract ISignedNumber divideBy(ISignedNumber that);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public abstract ISignedNumber inverse();
+    public IInteger integerPart() {
+        return isNegative() ? ceilFraction() : floorFraction();
+    }
 
     /**
      * Test if <code>this</code> signed number is greater <code>than</code> that signed number..
@@ -77,12 +44,19 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
         return F.C0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public INumber conjugate() {
-        return this;
+    public boolean isNegativeResult() {
+        return isNegative();
+    }
+
+    @Override
+    public boolean isNonNegativeResult() {
+        return !isNegative();
+    }
+
+    @Override
+    public boolean isPositiveResult() {
+        return isPositive();
     }
 
     /**
@@ -96,6 +70,11 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
         return this;
     }
 
+    @Override
+    public IExpr unitStep() {
+        return isNegative() ? F.C0 : F.C1;
+    }
+
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>upper</code> value. If this is a
      * <code>ISignedNUmber</code> expression return <code>this</code>.
@@ -107,8 +86,34 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public IExpr unitStep() {
-        return isNegative() ? F.C0 : F.C1;
+    public abstract ISignedNumber inverse();
+
+    /**
+     * Returns (-1) * this
+     *
+     * @return
+     */
+    @Override
+    public abstract ISignedNumber negate();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract ISignedNumber abs();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public INumber conjugate() {
+        return this;
     }
+
+    @Override
+    public abstract ISignedNumber opposite();
 }

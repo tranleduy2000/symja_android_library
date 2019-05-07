@@ -22,6 +22,7 @@ import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
+import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.generic.ObjIntPredicate;
@@ -404,6 +405,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		public boolean isASTSizeGE(IExpr header, int length) {
 			return false;
 		}
+		/** {@inheritDoc} */
+		@Override
+		public boolean isIntegerResult() {
+			return false;
+		}
 
 		/** {@inheritDoc} */
 		@Override
@@ -429,6 +435,17 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return null;
 		}
 
+		/** {@inheritDoc} */
+		@Override
+		public boolean isNegativeResult() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean isNonNegativeResult() {
+			return false;
+		}
 		/** {@inheritDoc} */
 		@Override
 		public final boolean isNumericFunction() {
@@ -469,6 +486,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return false;
 		}
 
+		/** {@inheritDoc} */
+		@Override
+		public boolean isRealResult() {
+			return false;
+		}
 		@Override
 		public boolean isRealMatrix() {
 			return false;
@@ -1163,15 +1185,29 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return null;
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public IExpr evaluate(EvalEngine engine) {
-		// if ((getEvalFlags() & IAST.DEFER_AST) == IAST.DEFER_AST) {
-		// return F.NIL;
-		// }
+	public IExpr evaluate(final EvalEngine engine) {
 		if (Config.DEBUG) {
 			System.out.println(toString());
 		}
-		IExpr temp = engine.evalAST(this);
+		final IExpr head = head();
+		if (head.isCoreFunctionSymbol()) {
+			IExpr evaluateTemp = engine.evalEvaluate(this);
+			if (evaluateTemp.isPresent()) {
+				return evaluateTemp;
+			}
+			// evaluate a core function (a function without any value or rule definitions)
+			return ((ICoreFunctionEvaluator) ((IBuiltInSymbol) head).getEvaluator()).evaluate(this, engine);
+		}
+
+		final ISymbol symbol = topHead();
+		IExpr temp = engine.evalAttributes(symbol, this).orElseGet(new Supplier<IExpr>() {
+			@Override
+			public IExpr get() {
+				return engine.evalRules(symbol, AbstractAST.this);
+			}
+		});
 		if (Config.SHOW_CONSOLE) {
 			if (temp.isPresent() && (topHead().getAttributes() & ISymbol.CONSOLE_OUTPUT) == ISymbol.CONSOLE_OUTPUT) {
 				System.out.println(toString());
@@ -2430,7 +2466,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isIntegerResult() {
+	public boolean isIntegerResult() {
 		ISymbol symbol = topHead();
 		if (symbol.equals(F.Floor) || symbol.equals(F.Ceiling) || symbol.equals(F.IntegerPart)) {
 			return true;
@@ -2869,7 +2905,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isRealResult() {
+	public boolean isRealResult() {
 		IExpr head = head();
 		if (size() == 2 && F.Cos.equals(head) && F.Sin.equals(head)) {
 			// TODO add more functions
@@ -3381,7 +3417,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *            left argument of the binary functions <code>apply()</code> method.
 	 * @return
 	 */
-	@Override
 	public IAST mapLeft(IASTAppendable list, BiFunction<IExpr, IExpr, IExpr> binaryFunction, IExpr leftArg) {
 		for (int i = 1; i < size(); i++) {
 			list.append(binaryFunction.apply(leftArg, get(i)));
@@ -3522,7 +3557,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return F.Or(this, that);
 	}
 
-	@Override
 	public IAST orElse(final IAST other) {
 		return this;
 	}
@@ -3709,7 +3743,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param list
 	 * @return
 	 */
-	@Override
 	public IASTAppendable reverse(IASTAppendable list) {
 		for (int i = argSize(); i >= 1; i--) {
 			list.append(get(i));
@@ -3724,7 +3757,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param n
 	 * @return the given list
 	 */
-	@Override
 	public IAST rotateLeft(IASTAppendable list, final int n) {
 		int size = size();
 		int n1 = n + 1;
@@ -3746,7 +3778,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param n
 	 * @return the given list
 	 */
-	@Override
 	public IAST rotateRight(IASTAppendable list, final int n) {
 		if (n <= size()) {
 			for (int i = size() - n; i < size(); i++) {

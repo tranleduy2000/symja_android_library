@@ -3096,9 +3096,29 @@ public final class Arithmetic {
                 return F.C1;
             }
 
-            if (base.isMinusOne() && exponent.isInteger()) {
+			if (base.isMinusOne()) {
+				if (exponent.isInteger()) {
                 return (((IInteger) exponent).isEven()) ? F.C1 : F.CN1;
             }
+				if (exponent.isEvenResult()) {
+					return F.C1;
+				}
+				if (exponent.isIntegerResult()) {
+					if (exponent.isPlus() && exponent.first().isInteger()) {
+						IInteger arg1Plus = (IInteger) exponent.first();
+						if (!arg1Plus.isOne()) {
+							IInteger factor = (((IInteger) exponent.first()).isEven()) ? F.C1 : F.CN1;
+							if (factor.isMinusOne()) {
+								return F.Power(F.CN1, F.Plus(1, exponent.rest().oneIdentity1()));
+							}
+							return F.Times(factor, F.Power(F.CN1, exponent.rest().oneIdentity1()));
+						}
+					} else if (exponent.isTimes() && exponent.first().isInteger()) {
+						IInteger arg1Times = (IInteger) exponent.first();
+						return  F.Power(F.Power( F.CN1,arg1Times), exponent.rest().oneIdentity1());
+					}
+				}
+			}
 
             if (exponent.isReal()) {
                 if (base.isPower()) {

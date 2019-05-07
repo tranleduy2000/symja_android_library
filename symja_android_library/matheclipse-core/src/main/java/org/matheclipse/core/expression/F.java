@@ -2646,6 +2646,20 @@ public class F {
      * Represents <code>ComplexInfinity</code> (i.e. <code>ComplexInfinity-&gt;DirectedInfinity()</code>)
      */
     public static IAST CComplexInfinity;
+	/**
+	 * Represents <code>-Pi</code> as Symja expression <code>Times(CN1, Pi)</code>
+	 */
+	public static IAST CNPi;
+
+	/**
+	 * Represents <code>-2*Pi</code> as Symja expression <code>Times(CN2, Pi)</code>
+	 */
+	public static IAST CN2Pi;
+
+	/**
+	 * Represents <code>2*Pi</code> as Symja expression <code>Times(C2, Pi)</code>
+	 */
+	public static IAST C2Pi;
     /**
      * Represents <code>-Pi/2</code> as Symja expression <code>Times(CN1D2, Pi)</code>
      */
@@ -2822,6 +2836,9 @@ public class F {
             CNIInfinity = unaryAST1(DirectedInfinity, CNI);
             CComplexInfinity = headAST0(DirectedInfinity);
 
+			CNPi = binaryAST2(Times, CN1, Pi);
+			CN2Pi = binaryAST2(Times, CN2, Pi);
+			C2Pi = binaryAST2(Times, C2, Pi);
             CNPiHalf = binaryAST2(Times, CN1D2, Pi);
             CPiHalf = binaryAST2(Times, C1D2, Pi);
 
@@ -3506,8 +3523,8 @@ public class F {
                 SYMBOL_OBSERVER.createUserSymbol(symbol);
             }
         } else {
-            // symbol = new BuiltInSymbol(name);
-            symbol = symbol(name);
+			symbol = new BuiltInDummy(name);
+			// symbol = symbol(name);
             HIDDEN_SYMBOLS_MAP.put(name, symbol);
             // if (symbol.isBuiltInSymbol()) {
             // if (!setEval) {
@@ -4469,8 +4486,8 @@ public class F {
         return new AST(head, a);
     }
 
-    public static IAST Condition(final IExpr a0, final IExpr a1) {
-        return binaryAST2(Condition, a0, a1);
+	public static IAST Condition(final IExpr a1, final IExpr a2) {
+		return binaryAST2(Condition, a1, a2);
     }
 
     public static IAST ConditionalExpression(final IExpr a0, final IExpr a1) {
@@ -5087,10 +5104,7 @@ public class F {
     public static IExpr expand(IExpr a, boolean expandNegativePowers, boolean distributePlus, boolean evalParts) {
         if (a.isAST()) {
             EvalEngine engine = EvalEngine.get();
-            IAST ast = engine.evalFlatOrderlessAttributesRecursive((IAST) a);
-            if (!ast.isPresent()) {
-                ast = (IAST) a;
-            }
+			IAST ast = engine.evalFlatOrderlessAttributesRecursive((IAST) a).orElse((IAST) a);
             return Algebra.expand(ast, null, expandNegativePowers, distributePlus, evalParts).orElse(a);
         }
         return a;
@@ -5121,15 +5135,8 @@ public class F {
     public static IExpr expandAll(IExpr a, boolean expandNegativePowers, boolean distributePlus) {
         if (a.isAST()) {
             EvalEngine engine = EvalEngine.get();
-            IAST ast = engine.evalFlatOrderlessAttributesRecursive((IAST) a);
-            if (!ast.isPresent()) {
-                ast = (IAST) a;
-            }
-            IExpr temp = Algebra.expandAll(ast, null, expandNegativePowers, distributePlus, engine);
-            if (temp.isPresent()) {
-                return temp;
-            }
-            return ast;
+			IAST ast = engine.evalFlatOrderlessAttributesRecursive((IAST) a).orElse((IAST) a);
+			return Algebra.expandAll(ast, null, expandNegativePowers, distributePlus, engine).orElse(ast);
         }
         return a;
     }
@@ -6700,7 +6707,8 @@ public class F {
     /**
      * Create a numeric value from the input string.
      *
-     * @param valueString the numeric value represented as a string.
+	 * @param valueString
+	 *            the numeric value represented as a string.
      * @return
      */
     public static INum num(final String valueString) {
@@ -7330,10 +7338,7 @@ public class F {
     public static ISymbol symbol(final String symbolName, IAST assumptionAST, EvalEngine engine) {
         ISymbol symbol = engine.getContextPath().symbol(symbolName, engine.getContext(), engine.isRelaxedSyntax());
         if (assumptionAST != null) {
-            IExpr temp = Lambda.replaceSlots(assumptionAST, F.List(symbol));
-            if (!temp.isPresent()) {
-                temp = assumptionAST;
-            }
+			IExpr temp = Lambda.replaceSlots(assumptionAST, F.List(symbol)).orElse(assumptionAST);
             if (temp.isAST()) {
                 IAssumptions assumptions = engine.getAssumptions();
                 if (assumptions == null) {
@@ -7360,10 +7365,7 @@ public class F {
         // }
         symbol = contextPath.getSymbol(symbolName, context, engine.isRelaxedSyntax());
         if (assumptionAST != null) {
-            IExpr temp = Lambda.replaceSlots(assumptionAST, F.List(symbol));
-            if (!temp.isPresent()) {
-                temp = assumptionAST;
-            }
+			IExpr temp = Lambda.replaceSlots(assumptionAST, F.List(symbol)).orElse(assumptionAST);
             if (temp.isAST()) {
                 IAssumptions assumptions = engine.getAssumptions();
                 if (assumptions == null) {

@@ -30,7 +30,7 @@ public class ThrowException extends FlowControlException {
 	}
 
 	public ThrowException(final IExpr val, final IExpr tag) {
-		super("Throw an exception for Catch[].");
+		super();
 		this.value = val;
 		this.tag = tag;
 	}
