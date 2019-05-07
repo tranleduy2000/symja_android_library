@@ -194,8 +194,10 @@ public class Structure {
 				if (option.isTrue()) {
 					heads = true;
 				}
-//			} else {
-//				Validate.checkRange(evaledAST, 3, 4);
+			} else {
+				if (ast.size() < 3 || ast.size() > 4) {
+					return F.NIL;
+				}
 			}
 
 			IExpr arg1 = evaledAST.arg1();
@@ -897,8 +899,8 @@ public class Structure {
 				if (option.isTrue()) {
 					heads = true;
 				}
-//			} else {
-//				Validate.checkRange(ast, 3, 4);
+				// } else {
+				// Validate.checkRange(ast, 3, 4);
 			}
 
 			try {

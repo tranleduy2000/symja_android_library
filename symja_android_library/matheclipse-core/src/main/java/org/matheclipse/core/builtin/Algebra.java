@@ -446,7 +446,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
 			IAST tempAST = Structure.threadLogicEquationOperators(arg1, ast, 1);
@@ -481,7 +480,10 @@ public class Algebra {
 			return arg1;
 			}
 			return F.evalExpandAll(arg1, engine);
+		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
 		}
 
 		@Override
@@ -1133,7 +1135,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			boolean trig = false;
 			if (ast.isAST2()) {
@@ -1158,6 +1159,9 @@ public class Algebra {
 			return parts[1];
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -1221,7 +1225,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 6);
 
 			IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
 			IExpr arg1 = temp.arg1();
@@ -1252,6 +1255,10 @@ public class Algebra {
 				return resultCollector;
 			}
 			return arg1;
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_5;
 		}
 
 		private void distributePosition(final IASTAppendable resultCollector, final IASTAppendable stepResult, final IExpr head,
@@ -1804,7 +1811,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
 				IAST arg1 = (IAST) ast.arg1();
@@ -1819,6 +1825,9 @@ public class Algebra {
 			}
 
 			return ast.arg1();
+		}
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
 		}
 	}
 
@@ -1865,7 +1874,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
 			IExpr patt = null;
@@ -1878,6 +1886,9 @@ public class Algebra {
 			return arg1;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		private static IExpr setAllExpanded(IExpr expr, boolean expandNegativePowers, boolean distributePlus) {
 			if (expr != null && expandNegativePowers && !distributePlus && expr.isAST()) {
 				((IAST) expr).addEvalFlags(IAST.IS_ALL_EXPANDED);
@@ -1919,7 +1930,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 
 			if (ast.arg1().isList()) {
@@ -1967,6 +1977,9 @@ public class Algebra {
 			return expr;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		private IExpr factorExpr(final IAST ast, IExpr expr, final VariablesSet eVar) {
 				if (expr.isAST()) {
 				IExpr temp;
@@ -2144,7 +2157,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			VariablesSet eVar = new VariablesSet(ast.arg1());
 			if (!eVar.isSize(1)) {
@@ -2174,6 +2186,9 @@ public class Algebra {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 	}
 
 	/**
@@ -2283,7 +2298,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IExpr temp = Structure.threadListLogicEquationOperators(ast.arg1(), ast, 1);
 			if (temp.isPresent()) {
@@ -2369,6 +2383,9 @@ public class Algebra {
 			return ast.arg1();
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		/**
 		 * Factor out a rational number which may be a factor in every sub-expression of <code>plus</code>.
 		 *
@@ -2456,11 +2473,13 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 			// System.out.println(ast.toString());
 			return super.evaluate(ast, engine);
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
         @Override
         public boolean isFullSimplifyMode() {
             return true;
@@ -2496,7 +2515,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			boolean trig = false;
 			if (ast.isAST2()) {
@@ -2521,6 +2539,9 @@ public class Algebra {
 			return parts[0];
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -2601,7 +2622,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 4, 5);
 
 			ISymbol x = Validate.checkSymbolType(ast, 3);
 			IExpr expr1 = F.evalExpandAll(ast.arg1(), engine);
@@ -2698,6 +2718,9 @@ public class Algebra {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_4;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -3023,7 +3046,6 @@ public class Algebra {
 			// IAST temp = engine.evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
 			// return F.bool(temp.arg1().isPolynomial(temp.arg2().orNewList()));
 			// }
-			// Validate.checkSize(ast, 3);
 
 			// return F.NIL;
 		}
@@ -3157,7 +3179,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 4, 5);
 			ISymbol variable = Validate.checkSymbolType(ast, 3);
 			IExpr arg1 = F.evalExpandAll(ast.arg1(), engine);
 			IExpr arg2 = F.evalExpandAll(ast.arg2(), engine);
@@ -3179,6 +3200,9 @@ public class Algebra {
 				return F.NIL;
 			}
 			return F.List(result[0], result[1]);
+		}
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_4;
 		}
 		public IExpr[] quotientRemainderModInteger(IExpr arg1, IExpr arg2, ISymbol variable, IExpr option) {
 			try {
@@ -3233,7 +3257,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 4, 5);
 			ISymbol variable = Validate.checkSymbolType(ast, 3);
 			IExpr arg1 = F.evalExpandAll(ast.arg1(), engine);
 			IExpr arg2 = F.evalExpandAll(ast.arg2(), engine);
@@ -3257,6 +3280,9 @@ public class Algebra {
 			return result[1];
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_4;
+		}
 	}
 
 	/**
@@ -3405,7 +3431,6 @@ public class Algebra {
 		/** {@inheritDoc} */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 			if (ast.arg1().isAST()) {
 				boolean assumptions = false;
 				if (ast.isAST2()) {
@@ -3423,6 +3448,9 @@ public class Algebra {
 			return ast.arg1();
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		public static IExpr powerExpand(final IAST ast, boolean assumptions) {
 			return ast.accept(new PowerExpandVisitor(assumptions)).orElse(ast);
 		}
@@ -4400,7 +4428,6 @@ public class Algebra {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2);
 
 			IExpr result = F.REMEMBER_AST_CACHE.getIfPresent(ast);
 			if (result != null) {
@@ -4470,6 +4497,9 @@ public class Algebra {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_INFINITY;
+		}
 		private IExpr simplifyStep(IExpr arg1, Function<IExpr, Long> complexityFunction, long minCounter, IExpr result,
 				EvalEngine engine) {
 			long count;

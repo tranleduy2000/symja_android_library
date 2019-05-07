@@ -319,7 +319,6 @@ public class PredicateQ {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			// Validate.checkRange(ast, 2, 4);
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			Predicate<IExpr> test = null;
@@ -657,8 +656,6 @@ public class PredicateQ {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			// Validate.checkRange(ast, 2, 3);
-			// if (ast.size() == 2 || ast.size() == 3) {
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			int[] dims = arg1.isMatrix();
@@ -684,9 +681,6 @@ public class PredicateQ {
 				}
 			}
 			return F.True;
-			// }
-			// IOFunctions.printMessage(F.MatrixQ, "argt", F.List(F.MatrixQ, F.ZZ(ast.argSize()), F.C1, F.C2), engine);
-			// return F.NIL;
 		}
 
 		public int[] expectedArgSize() {
@@ -1108,7 +1102,6 @@ public class PredicateQ {
 				// no square matrix
 				return F.False;
 			}
-			// Validate.checkSize(ast, 2);
 
 			return F.True;
 		}

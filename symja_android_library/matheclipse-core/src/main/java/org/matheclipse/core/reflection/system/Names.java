@@ -2,9 +2,9 @@ package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.IntFunction;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.SuggestTree;
 import org.matheclipse.core.eval.util.SuggestTree.Node;
@@ -24,7 +24,6 @@ public class Names extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkRange(ast, 1, 2);
 
 		if (ast.isAST0()) {
 			return getAllNames();
@@ -36,6 +35,9 @@ public class Names extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_0_1;
+	}
 	public static IAST getNamesByPrefix(String name) {
 
 		if (name.length() == 0) {

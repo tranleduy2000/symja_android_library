@@ -505,7 +505,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			try {
 
@@ -524,6 +523,9 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		/**
 		 * Get the transformation from the ast options. Default is DNF.
 		 * 
@@ -655,7 +657,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IAST variables;
 			if (ast.isAST2()) {
@@ -668,6 +669,9 @@ public final class BooleanFunctions {
 			return btp.booleanTable(ast.arg1(), 1);
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 	}
 
 	/**
@@ -1125,7 +1129,6 @@ public final class BooleanFunctions {
 	private final static class Exists extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3, 4);
 
 			boolean evaled = false;
 			// TODO localize x
@@ -1165,6 +1168,9 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_3;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -1174,7 +1180,6 @@ public final class BooleanFunctions {
 	private final static class ForAll extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3, 4);
 
 			boolean evaled = false;
 			// TODO localize x
@@ -1214,6 +1219,9 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_3;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -1390,7 +1398,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			// Validate.checkRange(ast, 3);
 			if (ast.size() <= 2) {
 				return F.True;
 			}
@@ -2062,7 +2069,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 1);
 
 			if (ast.isAST0()) {
 				return F.CNInfinity;
@@ -2085,6 +2091,9 @@ public final class BooleanFunctions {
 			return maximum(ast, false);
 		}
 
+		public int[] expectedArgSize() {
+			return null;
+		}
 		private IExpr maximum(IAST list, boolean flattenedList) {
 			boolean evaled = false;
 			// int j = 1;
@@ -2204,7 +2213,6 @@ public final class BooleanFunctions {
 	private static class Min extends AbstractFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 1);
 
 			if (ast.isAST0()) {
 				return F.CInfinity;
@@ -2227,6 +2235,9 @@ public final class BooleanFunctions {
 			return minimum(ast, false);
 		}
 
+		public int[] expectedArgSize() {
+			return null;
+		}
 		private IExpr minimum(IAST list, final boolean flattenedList) {
 			boolean evaled = false;
 			IASTAppendable f = list.remove(new Predicate<IExpr>() {
@@ -2476,7 +2487,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			if (ast.arg1().isAST()) {
 				IAST list = (IAST) ast.arg1();
@@ -2486,6 +2496,9 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		/**
 		 * If any expression evaluates to <code>true</code> for a given unary predicate function return
 		 * <code>False</code>, if all are <code>false</code> return <code>True</code>, else return an
@@ -2550,7 +2563,6 @@ public final class BooleanFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			if (ast.isAST1()) {
 			IExpr arg1 = ast.arg1();
 			if (arg1.isReal()) {
 				return F.bool(!arg1.isNegative());
@@ -2571,8 +2583,8 @@ public final class BooleanFunctions {
 				return F.NIL;
 			}
 
-			Validate.checkSize(ast, 2);
-			return F.NIL;
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
 		}
 
 		@Override
@@ -2603,7 +2615,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			IExpr arg1 = ast.arg1();
 			if (arg1.isReal()) {
@@ -2619,6 +2630,9 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
@@ -2921,7 +2935,6 @@ public final class BooleanFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			if (ast.isAST1()) {
 			IExpr arg1 = ast.arg1();
 			if (arg1.isNumber()) {
 				return F.bool(arg1.isPositive());
@@ -2942,8 +2955,8 @@ public final class BooleanFunctions {
 				}
 				return F.NIL;
 			}
-			Validate.checkSize(ast, 2);
-			return F.NIL;
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
 		}
 
 		@Override
@@ -3035,7 +3048,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 4);
 
 			IAST userDefinedVariables;
 			IExpr arg1 = ast.arg1();
@@ -3065,6 +3077,9 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_3;
+		}
 		/**
 		 * Use LogicNG MiniSAT method.
 		 * 
@@ -3122,7 +3137,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 4);
 
 			IAST userDefinedVariables;
 			IExpr arg1 = ast.arg1();
@@ -3161,6 +3175,9 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_3;
+		}
 	}
 
 	/**
@@ -3185,7 +3202,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 4);
 
 			IASTMutable userDefinedVariables;
 			IExpr arg1 = ast.arg1();
@@ -3225,6 +3241,9 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_3;
+		}
 		/**
 		 * Use LogicNG MiniSAT method.
 		 * 
@@ -3306,7 +3325,6 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IASTMutable userDefinedVariables;
 			IExpr arg1 = ast.arg1();
@@ -3336,6 +3354,9 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		/**
 		 * <p>
 		 * Use LogicNG MiniSAT method.
@@ -3417,11 +3438,14 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 2);
 
 			return F.bool(ast.equalsAt(1, F.True));
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}

@@ -2,11 +2,11 @@ package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.ListFunctions;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.util.Iterator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -143,7 +143,6 @@ public class Sum extends ListFunctions.Table implements SumRules {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkRange(ast, 3);
 
 		IExpr arg1 = ast.arg1();
 		if (arg1.isAST()) {
@@ -259,6 +258,9 @@ public class Sum extends ListFunctions.Table implements SumRules {
 		return F.NIL;
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_2_INFINITY;
+	}
 	private IExpr collectConstantFactors(final IAST ast, IAST prod, VariablesSet variablesSet) {
 		IASTAppendable filterAST = F.TimesAlloc(16);
 		IASTAppendable restAST = F.TimesAlloc(16);

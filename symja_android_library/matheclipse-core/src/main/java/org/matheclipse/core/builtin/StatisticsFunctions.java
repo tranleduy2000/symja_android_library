@@ -873,7 +873,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			try {
 			if (ast.arg1().isList()) {
@@ -892,6 +891,10 @@ public class StatisticsFunctions {
 				}
 			}
 			return F.NIL;
+		}
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
 		}
 		private static IExpr binCounts(IAST vector, final IExpr arg2, EvalEngine engine) {
 			//Swift changed: can't assign local variable with static variable
@@ -2850,7 +2853,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			// Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
 
@@ -3179,7 +3181,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			// Validate.checkSize(ast, 3);
 			return F.NIL;
 		}
 
@@ -3798,7 +3799,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 4);
 
 			IExpr arg1 = ast.arg1();
 			int[] dim = arg1.isMatrix();
@@ -3917,6 +3917,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_3;
+		}
 		private IExpr of(IAST sorted, IInteger length, ISignedNumber scalar) {
 			if (scalar.isReal()) {
 				int index = 0;
@@ -3942,7 +3946,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
 				final IAST dist = (IAST) ast.arg1();
@@ -3997,6 +4000,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		private static IAST createArray(int[] indx, int offset, IASTAppendable list, Supplier<IExpr> s) {
 			if (indx.length <= offset) {
 				list.append(s.get());
@@ -4058,7 +4065,6 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 4);
 			IExpr x = ast.arg1();
 			if (ast.size() == 2 && x.isList()) {
 				IExpr min = F.Min.of(engine, x);
@@ -4091,6 +4097,10 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_3;
+		}
 		private static IExpr rescale(IExpr x, IExpr min, IExpr max, EvalEngine engine) {
 			IExpr sum = engine.evaluate(F.Subtract(max, min));
 			return engine.evaluate(F.Plus(F.Times(F.CN1, F.Power(sum, -1), min), F.Times(F.Power(sum, -1), x)));

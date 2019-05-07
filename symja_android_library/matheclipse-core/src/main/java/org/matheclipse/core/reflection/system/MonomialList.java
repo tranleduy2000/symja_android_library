@@ -3,6 +3,7 @@ package org.matheclipse.core.reflection.system;
 import com.duy.lambda.Consumer;
 
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.JASIExpr;
 import org.matheclipse.core.convert.JASModInteger;
 import org.matheclipse.core.convert.VariablesSet;
@@ -71,7 +72,6 @@ public class MonomialList extends AbstractFunctionEvaluator {
 	 */
 	@Override
 	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-		Validate.checkRange(ast, 2, 5);
 
 		IExpr expr = F.evalExpandAll(ast.arg1(), engine);
 		VariablesSet eVar;
@@ -121,11 +121,14 @@ public class MonomialList extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_4;
+	}
 	/**
 	 * Get the monomial list of a univariate polynomial.
 	 * 
 	 * @param polynomial
-	 * @param variablesList
+	 * @param variable
 	 * @param termOrder
 	 *            the JAS term ordering
 	 * @return the list of monomials of the univariate polynomial.
@@ -152,7 +155,7 @@ public class MonomialList extends AbstractFunctionEvaluator {
 	 * Get the monomial list of a univariate polynomial with coefficients reduced by a modulo value.
 	 * 
 	 * @param polynomial
-	 * @param variablesList
+	 * @param variable
 	 * @param termOrder
 	 *            the JAS term ordering
 	 * @param option

@@ -3,8 +3,8 @@ package org.matheclipse.core.reflection.system;
 import com.duy.lambda.ObjIntConsumer;
 
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.frobenius.FrobeniusSolver;
@@ -57,19 +57,17 @@ public class FrobeniusSolve extends AbstractEvaluator {
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkRange(ast, 3, 4);
 		if (ast.arg1().isList()) {
 			IAST list = ast.getAST(1);
 			try {
 				final IInteger[][] equations = new IInteger[1][list.size()];
 				// format looks like: { { 12, 16, 20, 27, 123 } };
-				ObjIntConsumer<IExpr> action = new ObjIntConsumer<IExpr>() {
+				list.forEach(new ObjIntConsumer<IExpr>() {
 					@Override
 					public void accept(IExpr x, int i) {
 						equations[0][i - 1] = (IInteger) x;
 					}
-				};
-				list.forEach(action);
+				});
 				equations[0][list.argSize()] = (IInteger) ast.arg2();
 				int numberOfSolutions = -1; // all solutions
 				if (ast.size() == 4) {
@@ -103,6 +101,9 @@ public class FrobeniusSolve extends AbstractEvaluator {
 		return null;
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_2_3;
+	}
 	/** {@inheritDoc} */
 	@Override
 	public void setUp(final ISymbol newSymbol) {

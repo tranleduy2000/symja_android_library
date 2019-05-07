@@ -1,8 +1,8 @@
 package org.matheclipse.core.reflection.system;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.WindowFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.eval.util.Options;
@@ -239,9 +239,8 @@ public class FunctionExpand extends AbstractEvaluator {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkRange(ast, 2, 3);
 		IExpr arg1 = ast.arg1();
-		IExpr assumptionExpr = F.nilPtr();
+		IExpr assumptionExpr = F.NIL;
 		if (ast.size() > 2) {
 			IExpr arg2 = ast.arg2();
 
@@ -274,6 +273,9 @@ public class FunctionExpand extends AbstractEvaluator {
 		return MATCHER.replaceAll(arg1).orElse(arg1);
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_2;
+	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 		Initializer.init();

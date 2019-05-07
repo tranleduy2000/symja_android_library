@@ -16,8 +16,8 @@ import org.hipparchus.analysis.solvers.UnivariateSolverUtils;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathRuntimeException;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.Assumptions;
 import org.matheclipse.core.eval.util.IAssumptions;
@@ -160,7 +160,6 @@ public class FindRoot extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkRange(ast, 3);
 
 		// default: BracketingNthOrderBrentSolver
 		String method = "Brent";
@@ -215,6 +214,9 @@ public class FindRoot extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_2_INFINITY;
+	}
 	private double findRoot(String method, int maxIterations, IAST list, ISignedNumber min, ISignedNumber max,
 			IExpr function, EvalEngine engine) {
 		ISymbol xVar = (ISymbol) list.arg1();
@@ -265,8 +267,9 @@ public class FindRoot extends AbstractFunctionEvaluator {
 			if (max == null) {
 				return solver.solve(maxIterations, f, min.doubleValue());
 			}
+
 			if (solver instanceof BisectionSolver) {
-				// TODO github #60 - remove if hipparchus 1.4 is available
+				// Don't remove it
 				UnivariateSolverUtils.verifyBracketing(f, min.doubleValue(), max.doubleValue());
 			}
 			return solver.solve(maxIterations, f, min.doubleValue(), max.doubleValue());

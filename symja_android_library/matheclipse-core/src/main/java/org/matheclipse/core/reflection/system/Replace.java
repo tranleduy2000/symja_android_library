@@ -2,8 +2,8 @@ package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.Function;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
@@ -201,7 +201,9 @@ public class Replace extends AbstractEvaluator {
 		if (ast.isAST1()) {
 			return F.operatorFormAST1(ast);
 		}
-		Validate.checkRange(ast, 3, 4);
+		if (ast.size() < 3 || ast.size() > 4) {
+			return F.NIL;
+		}
 		try {
 			IExpr arg1 = ast.arg1();
 			IExpr rules = engine.evaluate(ast.arg2());
@@ -216,6 +218,9 @@ public class Replace extends AbstractEvaluator {
 		return F.NIL;
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_3;
+	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 		newSymbol.setAttributes(ISymbol.HOLDREST);

@@ -10,8 +10,8 @@ import org.hipparchus.analysis.integration.gauss.GaussIntegratorFactory;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.util.Precision;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.Options;
 import org.matheclipse.core.expression.F;
@@ -131,7 +131,6 @@ public class NIntegrate extends AbstractFunctionEvaluator {
 	 */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkRange(ast, 3);
 
 		String method = "LegendreGauss";
 		int maxPoints = DEFAULT_MAX_POINTS;
@@ -199,6 +198,9 @@ public class NIntegrate extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_2_INFINITY;
+	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 		newSymbol.setAttributes(ISymbol.HOLDFIRST);

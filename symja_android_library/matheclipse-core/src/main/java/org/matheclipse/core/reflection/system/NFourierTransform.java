@@ -4,6 +4,7 @@ import org.hipparchus.analysis.UnivariateFunction;
 import org.hipparchus.transform.DftNormalization;
 import org.hipparchus.transform.FastFourierTransformer;
 import org.hipparchus.transform.TransformType;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
@@ -21,7 +22,6 @@ public class NFourierTransform extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkRange(ast, 4, 5);
 
 		IExpr expr = ast.arg1();
 		ISymbol t = Validate.checkSymbolType(ast, 2);
@@ -40,6 +40,9 @@ public class NFourierTransform extends AbstractFunctionEvaluator {
 		return Object2Expr.convertComplex(true, result);
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_3_4;
+	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 		newSymbol.setAttributes(ISymbol.HOLDFIRST);

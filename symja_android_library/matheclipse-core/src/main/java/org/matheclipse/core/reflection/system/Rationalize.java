@@ -1,8 +1,8 @@
 package org.matheclipse.core.reflection.system;
 
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -145,7 +145,6 @@ public class Rationalize extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		Validate.checkRange(ast, 2, 3);
 
 		IExpr arg1 = ast.arg1();
 		double epsilon = Config.DOUBLE_EPSILON;
@@ -172,6 +171,9 @@ public class Rationalize extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_2;
+	}
 	/**
 	 * Rationalize numeric numbers and numeric functions (e.g. Sin(Pi*4.5) ) in expression <code>arg</code>.
 	 *
