@@ -153,6 +153,14 @@ public class FunctionExpand extends AbstractEvaluator {
 								F.Times(F.C1D2, F.Fibonacci(n), F.LucasL(m))),
 						F.And(F.IntegerQ(m), F.Element(n, F.Integers)))); // $$);
 
+			// Haversine
+			MATCHER.caseOf(F.Haversine(x_), //
+					// [$ (1/2) * (1 - Cos(x)) $]
+					F.Times(F.C1D2, F.Subtract(F.C1, F.Cos(x)))); // $$);
+			// InverseHaversine
+			MATCHER.caseOf(F.InverseHaversine(x_), //
+					// [$ 2*ArcSin( Sqrt(x) ) $]
+					F.Times(F.C2, F.ArcSin(F.Sqrt(x)))); // $$);
 		// LegendreQ
 		MATCHER.caseOf(F.LegendreQ(x_, y_, z_), //
 				// [$ -((Pi*Csc(Pi*y)*Gamma(1 + x + y)*LegendreP(x, -y, z))/(2*Gamma(1 + x - y))) +
