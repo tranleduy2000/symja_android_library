@@ -5,7 +5,6 @@
 package edu.jas.gb;
 
 
-
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -154,6 +153,144 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
         return G;
     }
 
+    /**
+     * Twosided Groebner base using pairlist class.
+     *
+     * @param modv number of module variables.
+     * @param Fp   solvable polynomial list.
+     * @return tsGB(Fp) a twosided Groebner base of Fp.
+     */
+    @SuppressWarnings("unchecked")
+    public List<GenSolvablePolynomial<C>> twosidedGB(int modv, List<GenSolvablePolynomial<C>> Fp) {
+        List<GenSolvablePolynomial<C>> F = normalizeZerosOnes(Fp);
+        F = PolynomialList.castToSolvableList(PolyUtil.monic(PolynomialList.castToList(F)));
+        if (F.size() < 1) { // 0 not 1
+            return F;
+        }
+        if (F.size() == 1 && F.get(0).isONE()) {
+            return F;
+        }
+        GenSolvablePolynomialRing<C> ring = F.get(0).ring;
+        if (!ring.coFac.isField() && ring.coFac.isCommutative()) {
+            throw new IllegalArgumentException("coefficients not from a field");
+        }
+        // add also coefficient generators
+        List<GenSolvablePolynomial<C>> X;
+        X = PolynomialList.castToSolvableList(ring.generators(modv));
+        logger.info("right multipliers = " + X);
+        List<GenSolvablePolynomial<C>> G = new ArrayList<GenSolvablePolynomial<C>>(F.size() * (1 + X.size()));
+        G.addAll(F);
+        logger.info("right multipy: G = " + G);
+        GenSolvablePolynomial<C> p, q;
+        for (int i = 0; i < G.size(); i++) { // G changes
+            p = G.get(i);
+            for (GenSolvablePolynomial<C> x : X) {
+                //x = X.get(j);
+                if (x.isONE()) {
+                    continue;
+                }
+                q = p.multiply(x);
+                logger.info("right multipy: p = " + p + ", x = " + x + ", q = " + q);
+                q = sred.leftNormalform(G, q);
+                q = q.monic();
+                logger.info("right multipy: red(q) = " + q);
+                if (!q.isZERO()) {
+                    //System.out.println("q generating: = " + q + ", p = " + p + ", x = " + x);
+                    if (q.isONE()) {
+                        //System.out.println("G generated so far: " + G);
+                        G.clear();
+                        G.add(q);
+                        return G; // since no threads are activated
+                    }
+                    if (!G.contains(q)) { // why?
+                        G.add(q);
+                    } else {
+                        logger.info("right multipy contained: q = " + q);
+                    }
+                }
+            }
+        }
+        if (G.size() <= 1) { // 1 ok
+            return G; // since no threads are activated
+        }
+        //System.out.println("G generated = " + G);
+        PairList<C> pairlist = strategy.create(modv, ring);
+        pairlist.put(PolynomialList.castToList(G));
+        logger.info("twosided start " + pairlist);
+
+        Pair<C> pair;
+        GenSolvablePolynomial<C> pi, pj, S, H;
+        while (pairlist.hasNext()) {
+            pair = pairlist.removeNext();
+            if (pair == null) {
+                continue;
+            }
+
+            pi = (GenSolvablePolynomial<C>) pair.pi;
+            pj = (GenSolvablePolynomial<C>) pair.pj;
+            if (debug) {
+                logger.debug("pi    = " + pi);
+                logger.debug("pj    = " + pj);
+            }
+
+            S = sred.leftSPolynomial(pi, pj);
+            if (S.isZERO()) {
+                pair.setZero();
+                continue;
+            }
+            if (debug) {
+                logger.debug("ht(S) = " + S.leadingExpVector());
+            }
+
+            H = sred.leftNormalform(G, S);
+            if (H.isZERO()) {
+                pair.setZero();
+                continue;
+            }
+            if (debug) {
+                logger.debug("ht(H) = " + H.leadingExpVector());
+            }
+
+            H = H.monic();
+            if (H.isONE()) {
+                G.clear();
+                G.add(H);
+                return G; // since no threads are activated
+            }
+            if (debug) {
+                logger.debug("H = " + H);
+            }
+            if (H.length() > 0) {
+                G.add(H);
+                pairlist.put(H);
+                //System.out.println("H generated = " + H);
+                for (GenSolvablePolynomial<C> x : X) {
+                    //x = X.get(j);
+                    if (x.isONE()) {
+                        continue;
+                    }
+                    q = H.multiply(x);
+                    p = sred.leftNormalform(G, q);
+                    if (!p.isZERO()) {
+                        //System.out.println("p generated = " + p + ", x = " + x);
+                        p = p.monic();
+                        if (p.isONE()) {
+                            G.clear();
+                            G.add(p);
+                            return G; // since no threads are activated
+                        }
+                        G.add(p);
+                        pairlist.put(p);
+                    }
+                }
+                //System.out.println("G generated = " + G);
+            }
+        }
+        logger.debug("#sequential list = " + G.size());
+        G = leftMinimalGB(G);
+        logger.info("twosided end " + pairlist);
+        return G;
+    }
 
     /**
      * Solvable Extended Groebner base using critical pair class.
@@ -337,7 +474,7 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
             row.set(G.size(), mone);
             if (H.isONE()) {
                 // pairlist.record( pair, H );
-                // G.clear(); 
+                // G.clear();
                 G.add(H);
                 G2F.add(row);
                 oneInGB = true;
@@ -383,103 +520,60 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
         return new SolvableExtendedGB<C>(F, G, F2G, G2F);
     }
 
-
     /**
-     * Twosided Groebner base using pairlist class.
+     * Right Groebner base via right reduction using pairlist
+     * class. Overides rightGB() via opposite ring.
      *
      * @param modv number of module variables.
-     * @param Fp   solvable polynomial list.
-     * @return tsGB(Fp) a twosided Groebner base of Fp.
+     * @param F    solvable polynomial list.
+     * @return rightGB(F) a right Groebner base of F.
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public List<GenSolvablePolynomial<C>> twosidedGB(int modv, List<GenSolvablePolynomial<C>> Fp) {
-        List<GenSolvablePolynomial<C>> F = normalizeZerosOnes(Fp);
-        F = PolynomialList.castToSolvableList(PolyUtil.monic(PolynomialList.castToList(F)));
-        if (F.size() < 1) { // 0 not 1
-            return F;
+    public List<GenSolvablePolynomial<C>> rightGB(int modv, List<GenSolvablePolynomial<C>> F) {
+        List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(F);
+        G = PolynomialList.castToSolvableList(PolyUtil.monic(PolynomialList.castToList(G)));
+        if (G.size() <= 1) {
+            return G;
         }
-        if (F.size() == 1 && F.get(0).isONE()) {
-            return F;
-        }
-        GenSolvablePolynomialRing<C> ring = F.get(0).ring;
+        GenSolvablePolynomialRing<C> ring = G.get(0).ring;
         if (!ring.coFac.isField() && ring.coFac.isCommutative()) {
             throw new IllegalArgumentException("coefficients not from a field");
         }
-        // add also coefficient generators
-        List<GenSolvablePolynomial<C>> X;
-        X = PolynomialList.castToSolvableList(ring.generators(modv));
-        logger.info("right multipliers = " + X);
-        List<GenSolvablePolynomial<C>> G = new ArrayList<GenSolvablePolynomial<C>>(F.size() * (1 + X.size()));
-        G.addAll(F);
-        logger.info("right multipy: G = " + G);
-        GenSolvablePolynomial<C> p, q;
-        for (int i = 0; i < G.size(); i++) { // G changes
-            p = G.get(i);
-            for (GenSolvablePolynomial<C> x : X) {
-                //x = X.get(j);
-                if (x.isONE()) {
-                    continue;
-                }
-                q = p.multiply(x);
-                logger.info("right multipy: p = " + p + ", x = " + x + ", q = " + q);
-                q = sred.leftNormalform(G, q);
-                q = q.monic();
-                logger.info("right multipy: red(q) = " + q);
-                if (!q.isZERO()) {
-                    //System.out.println("q generating: = " + q + ", p = " + p + ", x = " + x);
-                    if (q.isONE()) {
-                        //System.out.println("G generated so far: " + G);
-                        G.clear();
-                        G.add(q);
-                        return G; // since no threads are activated
-                    }
-                    if (!G.contains(q)) { // why?
-                        G.add(q);
-                    } else {
-                        logger.info("right multipy contained: q = " + q);
-                    }
-                }
-            }
-        }
-        if (G.size() <= 1) { // 1 ok
-            return G; // since no threads are activated
-        }
-        //System.out.println("G generated = " + G);
         PairList<C> pairlist = strategy.create(modv, ring);
         pairlist.put(PolynomialList.castToList(G));
-        logger.info("twosided start " + pairlist);
+        logger.info("start " + pairlist);
 
-        Pair<C> pair;
         GenSolvablePolynomial<C> pi, pj, S, H;
+        Pair<C> pair;
         while (pairlist.hasNext()) {
             pair = pairlist.removeNext();
             if (pair == null) {
                 continue;
             }
-
             pi = (GenSolvablePolynomial<C>) pair.pi;
             pj = (GenSolvablePolynomial<C>) pair.pj;
             if (debug) {
-                logger.debug("pi    = " + pi);
-                logger.debug("pj    = " + pj);
+                logger.info("pi    = " + pi);
+                logger.info("pj    = " + pj);
             }
 
-            S = sred.leftSPolynomial(pi, pj);
+            S = sred.rightSPolynomial(pi, pj);
             if (S.isZERO()) {
                 pair.setZero();
                 continue;
             }
             if (debug) {
-                logger.debug("ht(S) = " + S.leadingExpVector());
+                logger.info("ht(S) = " + S.leadingExpVector());
             }
 
-            H = sred.leftNormalform(G, S);
+            H = sred.rightNormalform(G, S);
             if (H.isZERO()) {
                 pair.setZero();
                 continue;
             }
             if (debug) {
-                logger.debug("ht(H) = " + H.leadingExpVector());
+                logger.info("ht(H) = " + H.leadingExpVector());
             }
 
             H = H.monic();
@@ -489,40 +583,33 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
                 return G; // since no threads are activated
             }
             if (debug) {
-                logger.debug("H = " + H);
+                logger.info("H = " + H);
             }
             if (H.length() > 0) {
+                //l++;
                 G.add(H);
                 pairlist.put(H);
-                //System.out.println("H generated = " + H);
-                for (GenSolvablePolynomial<C> x : X) {
-                    //x = X.get(j);
-                    if (x.isONE()) {
-                        continue;
-                    }
-                    q = H.multiply(x);
-                    p = sred.leftNormalform(G, q);
-                    if (!p.isZERO()) {
-                        //System.out.println("p generated = " + p + ", x = " + x);
-                        p = p.monic();
-                        if (p.isONE()) {
-                            G.clear();
-                            G.add(p);
-                            return G; // since no threads are activated
-                        }
-                        G.add(p);
-                        pairlist.put(p);
-                    }
-                }
-                //System.out.println("G generated = " + G);
             }
         }
         logger.debug("#sequential list = " + G.size());
-        G = leftMinimalGB(G);
-        logger.info("twosided end " + pairlist);
+        G = rightMinimalGB(G);
+        logger.info("end " + pairlist);
         return G;
     }
 
+    /**
+     * Test if M is a left reduction matrix.
+     *
+     * @param exgb an SolvableExtendedGB container.
+     * @return true, if exgb contains a left reduction matrix, else false.
+     */
+    @Override
+    public boolean isLeftReductionMatrix(SolvableExtendedGB<C> exgb) {
+        if (exgb == null) {
+            return true;
+        }
+        return isLeftReductionMatrix(exgb.F, exgb.G, exgb.F2G, exgb.G2F);
+    }
 
     /**
      * Normalize M. Make all rows the same size and make certain column elements
@@ -583,7 +670,7 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
             k++;
         }
         //System.out.println("norm K reduc = " + K);
-        // truncate 
+        // truncate
         N.clear();
         for (List<GenSolvablePolynomial<C>> row : K) {
             List<GenSolvablePolynomial<C>> tr = new ArrayList<GenSolvablePolynomial<C>>();
@@ -596,22 +683,6 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
         //System.out.println("norm K trunc = " + K);
         return K;
     }
-
-
-    /**
-     * Test if M is a left reduction matrix.
-     *
-     * @param exgb an SolvableExtendedGB container.
-     * @return true, if exgb contains a left reduction matrix, else false.
-     */
-    @Override
-    public boolean isLeftReductionMatrix(SolvableExtendedGB<C> exgb) {
-        if (exgb == null) {
-            return true;
-        }
-        return isLeftReductionMatrix(exgb.F, exgb.G, exgb.F2G, exgb.G2F);
-    }
-
 
     /**
      * Minimal solvable extended groebner basis.
@@ -728,84 +799,6 @@ public class SolvableGroebnerBaseSeq<C extends RingElem<C>> extends SolvableGroe
         // does Mf need renormalization?
         */
         return new SolvableExtendedGB<C>(null, F, null, Mf);
-    }
-
-
-    /**
-     * Right Groebner base via right reduction using pairlist
-     * class. Overides rightGB() via opposite ring.
-     *
-     * @param modv number of module variables.
-     * @param F    solvable polynomial list.
-     * @return rightGB(F) a right Groebner base of F.
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<GenSolvablePolynomial<C>> rightGB(int modv, List<GenSolvablePolynomial<C>> F) {
-        List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(F);
-        G = PolynomialList.castToSolvableList(PolyUtil.monic(PolynomialList.castToList(G)));
-        if (G.size() <= 1) {
-            return G;
-        }
-        GenSolvablePolynomialRing<C> ring = G.get(0).ring;
-        if (!ring.coFac.isField() && ring.coFac.isCommutative()) {
-            throw new IllegalArgumentException("coefficients not from a field");
-        }
-        PairList<C> pairlist = strategy.create(modv, ring);
-        pairlist.put(PolynomialList.castToList(G));
-        logger.info("start " + pairlist);
-
-        GenSolvablePolynomial<C> pi, pj, S, H;
-        Pair<C> pair;
-        while (pairlist.hasNext()) {
-            pair = pairlist.removeNext();
-            if (pair == null) {
-                continue;
-            }
-            pi = (GenSolvablePolynomial<C>) pair.pi;
-            pj = (GenSolvablePolynomial<C>) pair.pj;
-            if (debug) {
-                logger.info("pi    = " + pi);
-                logger.info("pj    = " + pj);
-            }
-
-            S = sred.rightSPolynomial(pi, pj);
-            if (S.isZERO()) {
-                pair.setZero();
-                continue;
-            }
-            if (debug) {
-                logger.info("ht(S) = " + S.leadingExpVector());
-            }
-
-            H = sred.rightNormalform(G, S);
-            if (H.isZERO()) {
-                pair.setZero();
-                continue;
-            }
-            if (debug) {
-                logger.info("ht(H) = " + H.leadingExpVector());
-            }
-
-            H = H.monic();
-            if (H.isONE()) {
-                G.clear();
-                G.add(H);
-                return G; // since no threads are activated
-            }
-            if (debug) {
-                logger.info("H = " + H);
-            }
-            if (H.length() > 0) {
-                //l++;
-                G.add(H);
-                pairlist.put(H);
-            }
-        }
-        logger.debug("#sequential list = " + G.size());
-        G = rightMinimalGB(G);
-        logger.info("end " + pairlist);
-        return G;
     }
 
 }

@@ -159,34 +159,6 @@ public class GCDcoFactors<C extends GcdRingElem<C>> implements Serializable {
         return true;
     }
 
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(left.toString());
-        sb.append(" * ");
-        sb.append(coA.toString());
-        sb.append(" * ");
-        sb.append(right.toString());
-        sb.append(" == ");
-        sb.append(polyA.toString());
-        sb.append(",\n ");
-        sb.append(left.toString());
-        sb.append(" * ");
-        sb.append(coB.toString());
-        sb.append(" * ");
-        sb.append(right.toString());
-        sb.append(" == ");
-        sb.append(polyB.toString());
-        return sb.toString();
-    }
-
-
     /**
      * Get a scripting compatible string representation.
      *
@@ -215,7 +187,6 @@ public class GCDcoFactors<C extends GcdRingElem<C>> implements Serializable {
         return sb.toString();
     }
 
-
     /**
      * Hash code for this GCDcoFactors.
      *
@@ -237,7 +208,6 @@ public class GCDcoFactors<C extends GcdRingElem<C>> implements Serializable {
         return h;
     }
 
-
     /**
      * Comparison with any other object.
      *
@@ -256,6 +226,31 @@ public class GCDcoFactors<C extends GcdRingElem<C>> implements Serializable {
         return this.compareTo(a) == 0;
     }
 
+    /**
+     * Get the String representation.
+     *
+     * @see Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(left.toString());
+        sb.append(" * ");
+        sb.append(coA.toString());
+        sb.append(" * ");
+        sb.append(right.toString());
+        sb.append(" == ");
+        sb.append(polyA.toString());
+        sb.append(",\n ");
+        sb.append(left.toString());
+        sb.append(" * ");
+        sb.append(coB.toString());
+        sb.append(" * ");
+        sb.append(right.toString());
+        sb.append(" == ");
+        sb.append(polyB.toString());
+        return sb.toString();
+    }
 
     /**
      * Comparison.

@@ -20,7 +20,7 @@ import com.gx.common.collect.Maps;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
+import com.duy.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 

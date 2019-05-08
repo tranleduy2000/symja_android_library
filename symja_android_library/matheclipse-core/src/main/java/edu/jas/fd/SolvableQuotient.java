@@ -5,7 +5,6 @@
 package edu.jas.fd;
 
 
-
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
@@ -165,18 +164,6 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         den = simp[1];
     }
 
-
-    /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public SolvableQuotientRing<C> factory() {
-        return ring;
-    }
-
-
     /**
      * Numerator.
      *
@@ -185,7 +172,6 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
     public GenSolvablePolynomial<C> numerator() {
         return num;
     }
-
 
     /**
      * Denominator.
@@ -196,6 +182,14 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         return den;
     }
 
+    /**
+     * Is Qoutient a constant.
+     *
+     * @return true, if this has constant numerator and denominator, else false.
+     */
+    public boolean isConstant() {
+        return num.isConstant() && den.isConstant();
+    }
 
     /**
      * Clone this.
@@ -206,96 +200,6 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
     public SolvableQuotient<C> copy() {
         return new SolvableQuotient<C>(ring, num, den, true);
     }
-
-
-    /**
-     * Is SolvableQuotient zero.
-     *
-     * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
-     */
-    public boolean isZERO() {
-        return num.isZERO();
-    }
-
-
-    /**
-     * Is SolvableQuotient one.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        return num.compareTo(den) == 0;
-    }
-
-
-    /**
-     * Is SolvableQuotient a unit.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        return !num.isZERO();
-    }
-
-
-    /**
-     * Is Qoutient a constant.
-     *
-     * @return true, if this has constant numerator and denominator, else false.
-     */
-    public boolean isConstant() {
-        return num.isConstant() && den.isConstant();
-    }
-
-
-    /**
-     * Get the String representation as RingElem.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        if (PrettyPrint.isTrue()) {
-            String s = "{ " + num.toString(ring.ring.getVars());
-            if (!den.isONE()) {
-                s += " | " + den.toString(ring.ring.getVars());
-            }
-            return s + " }";
-        }
-        return "SolvableQuotient[ " + num.toString() + " | " + den.toString() + " ]";
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // any scripting case
-        if (den.isONE()) {
-            return num.toScript();
-        }
-        return num.toScript() + " / " + den.toScript();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        return factory().toScript();
-    }
-
 
     /**
      * SolvableQuotient comparison.
@@ -344,93 +248,62 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         return r.compareTo(s);
     }
 
-
     /**
-     * Comparison with any other object.
+     * Get the corresponding element factory.
      *
-     * @see Object#equals(Object)
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
      */
-    @SuppressWarnings("unchecked")
-    @Override
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof SolvableQuotient)) {
-            return false;
-        }
-        SolvableQuotient<C> a = (SolvableQuotient<C>) b;
-        if (num.equals(a.num) && den.equals(a.den)) { // short cut
-            return true;
-        }
-        return compareTo(a) == 0;
+    public SolvableQuotientRing<C> factory() {
+        return ring;
     }
 
-
     /**
-     * Hash code for this element.
+     * Get a scripting compatible string representation.
      *
-     * @see Object#hashCode()
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        h = 37 * h + num.hashCode();
-        h = 37 * h + den.hashCode();
-        return h;
+    public String toScript() {
+        // any scripting case
+        if (den.isONE()) {
+            return num.toScript();
+        }
+        return num.toScript() + " / " + den.toScript();
     }
-
 
     /**
-     * SolvableQuotient right fraction. <b>Note:</b> It is not possible to
-     * distinguish right from left fractions in the current implementation. So
-     * it is not possible to compute with right fractions.
+     * Get a scripting compatible string representation of the factory.
      *
-     * @return SolvableQuotient(a, b), where den<sup>-1</sup> num = a b
-     * <sup>-1</sup>
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
-    public SolvableQuotient<C> rightFraction() {
-        if (isZERO() || isONE()) {
-            return this;
-        }
-        GenSolvablePolynomial<C>[] oc = ring.engine.rightOreCond(num, den);
-        return new SolvableQuotient<C>(ring, oc[1], oc[0], true); // reversed, true is wrong but okay
+    @Override
+    public String toScriptFactory() {
+        return factory().toScript();
     }
-
 
     /**
-     * Test if SolvableQuotient right fraction. <b>Note:</b> It is not possible
-     * to distinguish right from left fractions in the current implementation.
-     * So it is not possible to compute with right fractions.
+     * Is SolvableQuotient zero.
      *
-     * @param s = SolvableQuotient(a,b)
-     * @return true if s is a right fraction of this, i.e. den<sup>-1</sup> num
-     * = a b<sup>-1</sup>
+     * @return If this is 0 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isZERO()
      */
-    public boolean isRightFraction(SolvableQuotient<C> s) {
-        if (isZERO()) {
-            return s.isZERO();
-        }
-        if (isONE()) {
-            return s.isONE();
-        }
-        GenSolvablePolynomial<C> x = den.multiply(s.num);
-        GenSolvablePolynomial<C> y = num.multiply(s.den);
-        return x.compareTo(y) == 0;
+    public boolean isZERO() {
+        return num.isZERO();
     }
-
 
     /**
-     * SolvableQuotient absolute value.
+     * SolvableQuotient signum.
      *
-     * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @return signum(this).
+     * @see edu.jas.structure.RingElem#signum()
      */
-    public SolvableQuotient<C> abs() {
-        return new SolvableQuotient<C>(ring, (GenSolvablePolynomial<C>) num.abs(), den, true);
+    public int signum() {
+        // assume sign(den) > 0
+        return num.signum();
     }
-
 
     /**
      * SolvableQuotient summation.
@@ -484,6 +357,15 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         return new SolvableQuotient<C>(ring, n, d, false);
     }
 
+    /**
+     * SolvableQuotient subtraction.
+     *
+     * @param S SolvableQuotient.
+     * @return this-S.
+     */
+    public SolvableQuotient<C> subtract(SolvableQuotient<C> S) {
+        return sum(S.negate());
+    }
 
     /**
      * SolvableQuotient negate.
@@ -495,80 +377,35 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         return new SolvableQuotient<C>(ring, (GenSolvablePolynomial<C>) num.negate(), den, true);
     }
 
-
     /**
-     * SolvableQuotient signum.
+     * SolvableQuotient absolute value.
      *
-     * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
+     * @return the absolute value of this.
+     * @see edu.jas.structure.RingElem#abs()
      */
-    public int signum() {
-        // assume sign(den) > 0
-        return num.signum();
+    public SolvableQuotient<C> abs() {
+        return new SolvableQuotient<C>(ring, (GenSolvablePolynomial<C>) num.abs(), den, true);
     }
 
-
     /**
-     * SolvableQuotient subtraction.
+     * Is SolvableQuotient one.
      *
-     * @param S SolvableQuotient.
-     * @return this-S.
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
      */
-    public SolvableQuotient<C> subtract(SolvableQuotient<C> S) {
-        return sum(S.negate());
+    public boolean isONE() {
+        return num.compareTo(den) == 0;
     }
 
-
     /**
-     * SolvableQuotient division.
+     * Is SolvableQuotient a unit.
      *
-     * @param S SolvableQuotient.
-     * @return this/S.
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
      */
-    public SolvableQuotient<C> divide(SolvableQuotient<C> S) {
-        return multiply(S.inverse());
+    public boolean isUnit() {
+        return !num.isZERO();
     }
-
-
-    /**
-     * SolvableQuotient inverse.
-     *
-     * @return S with S = 1/this.
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public SolvableQuotient<C> inverse() {
-        if (num.isZERO()) {
-            throw new ArithmeticException("element not invertible " + this);
-        }
-        return new SolvableQuotient<C>(ring, den, num, true);
-    }
-
-
-    /**
-     * SolvableQuotient remainder.
-     *
-     * @param S SolvableQuotient.
-     * @return this - (this/S)*S.
-     */
-    public SolvableQuotient<C> remainder(SolvableQuotient<C> S) {
-        if (S.isZERO()) {
-            throw new ArithmeticException("element not invertible " + S);
-        }
-        return ring.getZERO();
-    }
-
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a SolvableQuotient
-     * @return [this/S, this - (this/S)*S].
-     */
-    @SuppressWarnings("unchecked")
-    public SolvableQuotient<C>[] quotientRemainder(SolvableQuotient<C> S) {
-        return new SolvableQuotient[]{divide(S), remainder(S)};
-    }
-
 
     /**
      * SolvableQuotient multiplication.
@@ -595,12 +432,12 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
             return new SolvableQuotient<C>(ring, n, den, true);
         }
         /* wrong:
-        if (den.isONE()) { 
+        if (den.isONE()) {
             d = S.den;
             n = num.multiply(S.num);
             return new SolvableQuotient<C>(ring, n, d, false);
         }
-        if (S.den.isONE()) { 
+        if (S.den.isONE()) {
             d = den;
             n = num.multiply(S.num);
             return new SolvableQuotient<C>(ring, n, d, false);
@@ -621,6 +458,141 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         return new SolvableQuotient<C>(ring, n, d, false);
     }
 
+    /**
+     * SolvableQuotient division.
+     *
+     * @param S SolvableQuotient.
+     * @return this/S.
+     */
+    public SolvableQuotient<C> divide(SolvableQuotient<C> S) {
+        return multiply(S.inverse());
+    }
+
+    /**
+     * SolvableQuotient remainder.
+     *
+     * @param S SolvableQuotient.
+     * @return this - (this/S)*S.
+     */
+    public SolvableQuotient<C> remainder(SolvableQuotient<C> S) {
+        if (S.isZERO()) {
+            throw new ArithmeticException("element not invertible " + S);
+        }
+        return ring.getZERO();
+    }
+
+    /**
+     * SolvableQuotient inverse.
+     *
+     * @return S with S = 1/this.
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public SolvableQuotient<C> inverse() {
+        if (num.isZERO()) {
+            throw new ArithmeticException("element not invertible " + this);
+        }
+        return new SolvableQuotient<C>(ring, den, num, true);
+    }
+
+    /**
+     * Hash code for this element.
+     *
+     * @see Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        h = 37 * h + num.hashCode();
+        h = 37 * h + den.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see Object#equals(Object)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof SolvableQuotient)) {
+            return false;
+        }
+        SolvableQuotient<C> a = (SolvableQuotient<C>) b;
+        if (num.equals(a.num) && den.equals(a.den)) { // short cut
+            return true;
+        }
+        return compareTo(a) == 0;
+    }
+
+    /**
+     * Get the String representation as RingElem.
+     *
+     * @see Object#toString()
+     */
+    @Override
+    public String toString() {
+        if (PrettyPrint.isTrue()) {
+            String s = "{ " + num.toString(ring.ring.getVars());
+            if (!den.isONE()) {
+                s += " | " + den.toString(ring.ring.getVars());
+            }
+            return s + " }";
+        }
+        return "SolvableQuotient[ " + num.toString() + " | " + den.toString() + " ]";
+    }
+
+    /**
+     * SolvableQuotient right fraction. <b>Note:</b> It is not possible to
+     * distinguish right from left fractions in the current implementation. So
+     * it is not possible to compute with right fractions.
+     *
+     * @return SolvableQuotient(a, b), where den<sup>-1</sup> num = a b
+     * <sup>-1</sup>
+     */
+    public SolvableQuotient<C> rightFraction() {
+        if (isZERO() || isONE()) {
+            return this;
+        }
+        GenSolvablePolynomial<C>[] oc = ring.engine.rightOreCond(num, den);
+        return new SolvableQuotient<C>(ring, oc[1], oc[0], true); // reversed, true is wrong but okay
+    }
+
+    /**
+     * Test if SolvableQuotient right fraction. <b>Note:</b> It is not possible
+     * to distinguish right from left fractions in the current implementation.
+     * So it is not possible to compute with right fractions.
+     *
+     * @param s = SolvableQuotient(a,b)
+     * @return true if s is a right fraction of this, i.e. den<sup>-1</sup> num
+     * = a b<sup>-1</sup>
+     */
+    public boolean isRightFraction(SolvableQuotient<C> s) {
+        if (isZERO()) {
+            return s.isZERO();
+        }
+        if (isONE()) {
+            return s.isONE();
+        }
+        GenSolvablePolynomial<C> x = den.multiply(s.num);
+        GenSolvablePolynomial<C> y = num.multiply(s.den);
+        return x.compareTo(y) == 0;
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a SolvableQuotient
+     * @return [this/S, this - (this/S)*S].
+     */
+    @SuppressWarnings("unchecked")
+    public SolvableQuotient<C>[] quotientRemainder(SolvableQuotient<C> S) {
+        return new SolvableQuotient[]{divide(S), remainder(S)};
+    }
 
     /**
      * SolvableQuotient multiplication by GenSolvablePolynomial.

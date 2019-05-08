@@ -5,7 +5,6 @@
 package edu.jas.gb;
 
 
-
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -35,104 +34,6 @@ public class EReductionSeq<C extends RingElem<C>> extends DReductionSeq<C> imple
      */
     public EReductionSeq() {
     }
-
-
-    /**
-     * Is top reducible.
-     *
-     * @param A polynomial.
-     * @param P polynomial list.
-     * @return true if A is top reducible with respect to P.
-     */
-    //SuppressWarnings("unchecked") // not jet working
-    @Override
-    public boolean isTopReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A) {
-        if (P == null || P.isEmpty()) {
-            return false;
-        }
-        if (A == null || A.isZERO()) {
-            return false;
-        }
-        boolean mt = false;
-        ExpVector e = A.leadingExpVector();
-        C a = A.leadingBaseCoefficient();
-        for (GenPolynomial<C> p : P) {
-            mt = e.multipleOf(p.leadingExpVector());
-            if (mt) {
-                C b = p.leadingBaseCoefficient();
-                C r = a.remainder(b);
-                mt = !r.equals(a);
-                if (mt) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Is in Normalform.
-     *
-     * @param Ap polynomial.
-     * @param Pp polynomial list.
-     * @return true if Ap is in normalform with respect to Pp.
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public boolean isNormalform(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap) {
-        if (Pp == null || Pp.isEmpty()) {
-            return true;
-        }
-        if (Ap == null || Ap.isZERO()) {
-            return true;
-        }
-        int l;
-        GenPolynomial<C>[] P;
-        synchronized (Pp) {
-            l = Pp.size();
-            P = new GenPolynomial[l];
-            //P = Pp.toArray();
-            for (int i = 0; i < Pp.size(); i++) {
-                P[i] = Pp.get(i);
-            }
-        }
-        ExpVector[] htl = new ExpVector[l];
-        C[] lbc = (C[]) new RingElem[l]; // want <C>
-        GenPolynomial<C>[] p = new GenPolynomial[l];
-        Map.Entry<ExpVector, C> m;
-        int i;
-        int j = 0;
-        for (i = 0; i < l; i++) {
-            p[i] = P[i];
-            m = p[i].leadingMonomial();
-            if (m != null) {
-                p[j] = p[i];
-                htl[j] = m.getKey();
-                lbc[j] = m.getValue();
-                j++;
-            }
-        }
-        l = j;
-        boolean mt = false;
-        Map<ExpVector, C> Am = Ap.getMap();
-        for (Map.Entry<ExpVector, C> me : Am.entrySet()) {
-            ExpVector e = me.getKey();
-            C a = me.getValue(); //Am.get(e);
-            for (i = 0; i < l; i++) {
-                mt = e.multipleOf(htl[i]);
-                if (mt) {
-                    C r = a.remainder(lbc[i]);
-                    mt = !r.equals(a);
-                    if (mt) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
 
     /**
      * Normalform using e-reduction.
@@ -213,10 +114,10 @@ public class EReductionSeq<C extends RingElem<C>> extends DReductionSeq<C> imple
                     }
                 }
             }
-            if (!a.isZERO()) { //! mt ) { 
+            if (!a.isZERO()) { //! mt ) {
                 //logger.debug("irred");
                 R = R.sum(a, e);
-                //S = S.subtract( a, e ); 
+                //S = S.subtract( a, e );
                 S = S.reductum();
             }
             //System.out.println(" R = " + R);
@@ -232,7 +133,6 @@ public class EReductionSeq<C extends RingElem<C>> extends DReductionSeq<C> imple
         //}
         return R.abs();
     }
-
 
     /**
      * Normalform with recording.
@@ -269,10 +169,10 @@ public class EReductionSeq<C extends RingElem<C>> extends DReductionSeq<C> imple
         Map.Entry<ExpVector,C> m;
         int j = 0;
         int i;
-        for ( i = 0; i < l; i++ ) { 
+        for ( i = 0; i < l; i++ ) {
             p[i] = P[i];
             m = p[i].leadingMonomial();
-            if ( m != null ) { 
+            if ( m != null ) {
                 p[j] = p[i];
                 htl[j] = m.getKey();
                 lbc[j] = m.getValue();
@@ -290,20 +190,20 @@ public class EReductionSeq<C extends RingElem<C>> extends DReductionSeq<C> imple
         // GenPolynomial<C> T = null;
         GenPolynomial<C> Q = null;
         GenPolynomial<C> S = Ap;
-        while ( S.length() > 0 ) { 
+        while ( S.length() > 0 ) {
             m = S.leadingMonomial();
             e = m.getKey();
             a = m.getValue();
             for ( i = 0; i < l; i++ ) {
                 mt =  e.multipleOf( htl[i] );
-                if ( mt ) break; 
+                if ( mt ) break;
             }
-            if ( ! mt ) { 
+            if ( ! mt ) {
                 //logger.debug("irred");
                 R = R.sum( a, e );
-                S = S.subtract( a, e ); 
+                S = S.subtract( a, e );
                 // System.out.println(" S = " + S);
-            } else { 
+            } else {
                 e =  e.subtract( htl[i] );
                 //logger.info("red div = " + e);
                 C c = (C)lbc[i];
@@ -323,6 +223,100 @@ public class EReductionSeq<C extends RingElem<C>> extends DReductionSeq<C> imple
         */
     }
 
+    /**
+     * Is top reducible.
+     *
+     * @param A polynomial.
+     * @param P polynomial list.
+     * @return true if A is top reducible with respect to P.
+     */
+    //SuppressWarnings("unchecked") // not jet working
+    @Override
+    public boolean isTopReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A) {
+        if (P == null || P.isEmpty()) {
+            return false;
+        }
+        if (A == null || A.isZERO()) {
+            return false;
+        }
+        boolean mt = false;
+        ExpVector e = A.leadingExpVector();
+        C a = A.leadingBaseCoefficient();
+        for (GenPolynomial<C> p : P) {
+            mt = e.multipleOf(p.leadingExpVector());
+            if (mt) {
+                C b = p.leadingBaseCoefficient();
+                C r = a.remainder(b);
+                mt = !r.equals(a);
+                if (mt) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is in Normalform.
+     *
+     * @param Ap polynomial.
+     * @param Pp polynomial list.
+     * @return true if Ap is in normalform with respect to Pp.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean isNormalform(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap) {
+        if (Pp == null || Pp.isEmpty()) {
+            return true;
+        }
+        if (Ap == null || Ap.isZERO()) {
+            return true;
+        }
+        int l;
+        GenPolynomial<C>[] P;
+        synchronized (Pp) {
+            l = Pp.size();
+            P = new GenPolynomial[l];
+            //P = Pp.toArray();
+            for (int i = 0; i < Pp.size(); i++) {
+                P[i] = Pp.get(i);
+            }
+        }
+        ExpVector[] htl = new ExpVector[l];
+        C[] lbc = (C[]) new RingElem[l]; // want <C>
+        GenPolynomial<C>[] p = new GenPolynomial[l];
+        Map.Entry<ExpVector, C> m;
+        int i;
+        int j = 0;
+        for (i = 0; i < l; i++) {
+            p[i] = P[i];
+            m = p[i].leadingMonomial();
+            if (m != null) {
+                p[j] = p[i];
+                htl[j] = m.getKey();
+                lbc[j] = m.getValue();
+                j++;
+            }
+        }
+        l = j;
+        boolean mt = false;
+        Map<ExpVector, C> Am = Ap.getMap();
+        for (Map.Entry<ExpVector, C> me : Am.entrySet()) {
+            ExpVector e = me.getKey();
+            C a = me.getValue(); //Am.get(e);
+            for (i = 0; i < l; i++) {
+                mt = e.multipleOf(htl[i]);
+                if (mt) {
+                    C r = a.remainder(lbc[i]);
+                    mt = !r.equals(a);
+                    if (mt) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * Irreducible set.

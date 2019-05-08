@@ -62,63 +62,6 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
         return s;
     }
 
-
-    /**
-     * S-Polynomial factors.
-     *
-     * @param A monic polynomial.
-     * @param B monic polynomial.
-     * @return exponent vectors [e,f] such that spol(A,B) = e*a - f*B.
-     */
-    public ExpVector[] SPolynomialExpVectorFactors(SigPoly<C> A, SigPoly<C> B) {
-        Map.Entry<ExpVector, C> ma = A.poly.leadingMonomial();
-        Map.Entry<ExpVector, C> mb = B.poly.leadingMonomial();
-        ExpVector e = ma.getKey();
-        ExpVector f = mb.getKey();
-        ExpVector g = e.lcm(f);
-        ExpVector e1 = g.subtract(e);
-        ExpVector f1 = g.subtract(f);
-        ExpVector[] F = new ExpVector[]{e1, f1};
-        return F;
-    }
-
-
-    /**
-     * S-Polynomial half.
-     *
-     * @param A monic polynomial.
-     * @param B monic polynomial.
-     * @return e*A "half" of an S-polynomial such that spol(A,B) = e*A - f*B.
-     */
-    public GenPolynomial<C> SPolynomialHalf(SigPoly<C> A, SigPoly<C> B) {
-        Map.Entry<ExpVector, C> ma = A.poly.leadingMonomial();
-        Map.Entry<ExpVector, C> mb = B.poly.leadingMonomial();
-        ExpVector e = ma.getKey();
-        ExpVector f = mb.getKey();
-        ExpVector g = e.lcm(f);
-        ExpVector e1 = g.subtract(e);
-        GenPolynomial<C> F = A.poly.multiply(e1);
-        return F;
-    }
-
-
-    /**
-     * S-Polynomial polynomial factors.
-     *
-     * @param A monic polynomial.
-     * @param B monic polynomial.
-     * @return polynomials [e,f] such that spol(A,B) = e*a - f*B.
-     */
-    public GenPolynomial<C>[] SPolynomialFactors(SigPoly<C> A, SigPoly<C> B) {
-        ExpVector[] ev = SPolynomialExpVectorFactors(A, B);
-        GenPolynomial<C> e1 = A.poly.ring.valueOf(ev[0]);
-        GenPolynomial<C> f1 = A.poly.ring.valueOf(ev[1]);
-        @SuppressWarnings("unchecked")
-        GenPolynomial<C>[] F = new GenPolynomial[]{e1, f1};
-        return F;
-    }
-
-
     /**
      * Is top reducible. Condition is lt(B) | lt(A) for some B in F or G.
      *
@@ -130,7 +73,6 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
     public boolean isSigReducible(List<SigPoly<C>> F, List<SigPoly<C>> G, SigPoly<C> A) {
         return !isSigNormalform(F, G, A);
     }
-
 
     /**
      * Is in top normalform.
@@ -178,84 +120,6 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
         }
         return true;
     }
-
-
-    /**
-     * Is sigma redundant.
-     *
-     * @param A polynomial.
-     * @param G polynomial list.
-     * @return true if A is sigma redundant with respect to G.
-     */
-    public boolean isSigRedundant(List<SigPoly<C>> G, SigPoly<C> A) {
-        if (G.isEmpty()) {
-            return false;
-        }
-        ExpVector e = A.sigma.leadingExpVector();
-        if (e == null) {
-            e = A.poly.ring.evzero;
-        }
-        for (SigPoly<C> p : G) {
-            if (p.sigma.isZERO()) {
-                continue;
-            }
-            ExpVector f = p.sigma.leadingExpVector();
-            if (f == null) { // does not happen
-                f = p.poly.ring.evzero;
-            }
-            boolean mt = e.multipleOf(f);
-            if (mt) {
-                ExpVector g = e.subtract(f);
-                ExpVector h = p.poly.leadingExpVector();
-                h = h.sum(g);
-                if (h.compareTo(A.poly.leadingExpVector()) == 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Is sigma redundant, alternative algorithm.
-     *
-     * @param A polynomial.
-     * @param G polynomial list.
-     * @return true if A is sigma redundant per alternative algorithm with
-     * respect to G.
-     */
-    public boolean isSigRedundantAlt(List<SigPoly<C>> G, SigPoly<C> A) {
-        if (G.isEmpty()) {
-            return false;
-        }
-        ExpVector e = A.sigma.leadingExpVector();
-        if (e == null) {
-            e = A.poly.ring.evzero;
-        }
-        for (SigPoly<C> p : G) {
-            if (p.sigma.isZERO()) {
-                continue;
-            }
-            ExpVector f = p.sigma.leadingExpVector();
-            if (f == null) { // does not happen
-                f = p.poly.ring.evzero;
-            }
-            boolean mt = e.multipleOf(f);
-            if (mt) {
-                if (p.poly.isZERO()) {
-                    continue;
-                }
-                ExpVector h = p.poly.leadingExpVector();
-                ExpVector g = A.poly.leadingExpVector();
-                if (g.multipleOf(h)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 
     /**
      * Top normalform.
@@ -334,6 +198,133 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
         return new SigPoly<C>(sigma, a);
     }
 
+    /**
+     * S-Polynomial factors.
+     *
+     * @param A monic polynomial.
+     * @param B monic polynomial.
+     * @return exponent vectors [e,f] such that spol(A,B) = e*a - f*B.
+     */
+    public ExpVector[] SPolynomialExpVectorFactors(SigPoly<C> A, SigPoly<C> B) {
+        Map.Entry<ExpVector, C> ma = A.poly.leadingMonomial();
+        Map.Entry<ExpVector, C> mb = B.poly.leadingMonomial();
+        ExpVector e = ma.getKey();
+        ExpVector f = mb.getKey();
+        ExpVector g = e.lcm(f);
+        ExpVector e1 = g.subtract(e);
+        ExpVector f1 = g.subtract(f);
+        ExpVector[] F = new ExpVector[]{e1, f1};
+        return F;
+    }
+
+    /**
+     * S-Polynomial half.
+     *
+     * @param A monic polynomial.
+     * @param B monic polynomial.
+     * @return e*A "half" of an S-polynomial such that spol(A,B) = e*A - f*B.
+     */
+    public GenPolynomial<C> SPolynomialHalf(SigPoly<C> A, SigPoly<C> B) {
+        Map.Entry<ExpVector, C> ma = A.poly.leadingMonomial();
+        Map.Entry<ExpVector, C> mb = B.poly.leadingMonomial();
+        ExpVector e = ma.getKey();
+        ExpVector f = mb.getKey();
+        ExpVector g = e.lcm(f);
+        ExpVector e1 = g.subtract(e);
+        GenPolynomial<C> F = A.poly.multiply(e1);
+        return F;
+    }
+
+    /**
+     * S-Polynomial polynomial factors.
+     *
+     * @param A monic polynomial.
+     * @param B monic polynomial.
+     * @return polynomials [e,f] such that spol(A,B) = e*a - f*B.
+     */
+    public GenPolynomial<C>[] SPolynomialFactors(SigPoly<C> A, SigPoly<C> B) {
+        ExpVector[] ev = SPolynomialExpVectorFactors(A, B);
+        GenPolynomial<C> e1 = A.poly.ring.valueOf(ev[0]);
+        GenPolynomial<C> f1 = A.poly.ring.valueOf(ev[1]);
+        @SuppressWarnings("unchecked")
+        GenPolynomial<C>[] F = new GenPolynomial[]{e1, f1};
+        return F;
+    }
+
+    /**
+     * Is sigma redundant.
+     *
+     * @param A polynomial.
+     * @param G polynomial list.
+     * @return true if A is sigma redundant with respect to G.
+     */
+    public boolean isSigRedundant(List<SigPoly<C>> G, SigPoly<C> A) {
+        if (G.isEmpty()) {
+            return false;
+        }
+        ExpVector e = A.sigma.leadingExpVector();
+        if (e == null) {
+            e = A.poly.ring.evzero;
+        }
+        for (SigPoly<C> p : G) {
+            if (p.sigma.isZERO()) {
+                continue;
+            }
+            ExpVector f = p.sigma.leadingExpVector();
+            if (f == null) { // does not happen
+                f = p.poly.ring.evzero;
+            }
+            boolean mt = e.multipleOf(f);
+            if (mt) {
+                ExpVector g = e.subtract(f);
+                ExpVector h = p.poly.leadingExpVector();
+                h = h.sum(g);
+                if (h.compareTo(A.poly.leadingExpVector()) == 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is sigma redundant, alternative algorithm.
+     *
+     * @param A polynomial.
+     * @param G polynomial list.
+     * @return true if A is sigma redundant per alternative algorithm with
+     * respect to G.
+     */
+    public boolean isSigRedundantAlt(List<SigPoly<C>> G, SigPoly<C> A) {
+        if (G.isEmpty()) {
+            return false;
+        }
+        ExpVector e = A.sigma.leadingExpVector();
+        if (e == null) {
+            e = A.poly.ring.evzero;
+        }
+        for (SigPoly<C> p : G) {
+            if (p.sigma.isZERO()) {
+                continue;
+            }
+            ExpVector f = p.sigma.leadingExpVector();
+            if (f == null) { // does not happen
+                f = p.poly.ring.evzero;
+            }
+            boolean mt = e.multipleOf(f);
+            if (mt) {
+                if (p.poly.isZERO()) {
+                    continue;
+                }
+                ExpVector h = p.poly.leadingExpVector();
+                ExpVector g = A.poly.leadingExpVector();
+                if (g.multipleOf(h)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Top semi-complete normalform.

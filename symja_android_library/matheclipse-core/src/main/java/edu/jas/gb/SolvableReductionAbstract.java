@@ -5,7 +5,6 @@
 package edu.jas.gb;
 
 
-
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -159,50 +158,6 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
         return red;
     }
 
-
-    /**
-     * Module left normalform set.
-     *
-     * @param Ap module list.
-     * @param Pp module list.
-     * @return list of left-nf(a) with respect to Pp for all a in Ap.
-     */
-    public ModuleList<C> leftNormalform(ModuleList<C> Pp, ModuleList<C> Ap) {
-        return leftNormalform(Pp, Ap, false);
-    }
-
-
-    /**
-     * Module left normalform set.
-     *
-     * @param Ap  module list.
-     * @param Pp  module list.
-     * @param top true for TOP term order, false for POT term order.
-     * @return list of left-nf(a) with respect to Pp for all a in Ap.
-     */
-    public ModuleList<C> leftNormalform(ModuleList<C> Pp, ModuleList<C> Ap, boolean top) {
-        if (Pp == null || Pp.isEmpty()) {
-            return Ap;
-        }
-        if (Ap == null || Ap.isEmpty()) {
-            return Ap;
-        }
-        GenSolvablePolynomialRing<C> sring = (GenSolvablePolynomialRing<C>) Pp.ring;
-        int modv = Pp.cols;
-        GenSolvablePolynomialRing<C> pfac = sring.extend(modv, top);
-        logger.debug("extended ring = " + pfac.toScript());
-        //System.out.println("extended ring = " + pfac.toScript());
-        PolynomialList<C> P = Pp.getPolynomialList(pfac);
-        PolynomialList<C> A = Ap.getPolynomialList(pfac);
-        //System.out.println("P = " + P.toScript());
-
-        List<GenSolvablePolynomial<C>> red = leftNormalform(P.castToSolvableList(), A.castToSolvableList());
-        PolynomialList<C> Fr = new PolynomialList<C>(pfac, red);
-        ModuleList<C> Nr = Fr.getModuleList(modv);
-        return Nr;
-    }
-
-
     /**
      * Left irreducible set.
      *
@@ -259,7 +214,6 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
         return P;
     }
 
-
     /**
      * Is reduction of normal form.
      *
@@ -314,7 +268,6 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
         return t.isZERO();
     }
 
-
     /**
      * Right S-Polynomial.
      *
@@ -357,7 +310,6 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
         return Cp;
     }
 
-
     /**
      * Is top reducible. Is left right symmetric.
      *
@@ -383,7 +335,6 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
         return false;
     }
 
-
     /**
      * Is reducible. Is left right symmetric.
      *
@@ -394,7 +345,6 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
     public boolean isReducible(List<GenSolvablePolynomial<C>> Pp, GenSolvablePolynomial<C> Ap) {
         return !isNormalform(Pp, Ap);
     }
-
 
     /**
      * Is in Normalform. Is left right symmetric.
@@ -443,7 +393,6 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
         return true;
     }
 
-
     /**
      * Two-sided Normalform.
      *
@@ -454,6 +403,47 @@ public abstract class SolvableReductionAbstract<C extends RingElem<C>> implement
     public GenSolvablePolynomial<C> normalform(List<GenSolvablePolynomial<C>> Pp,
                                                GenSolvablePolynomial<C> Ap) {
         throw new UnsupportedOperationException("two-sided normalform not implemented");
+    }
+
+    /**
+     * Module left normalform set.
+     *
+     * @param Ap module list.
+     * @param Pp module list.
+     * @return list of left-nf(a) with respect to Pp for all a in Ap.
+     */
+    public ModuleList<C> leftNormalform(ModuleList<C> Pp, ModuleList<C> Ap) {
+        return leftNormalform(Pp, Ap, false);
+    }
+
+    /**
+     * Module left normalform set.
+     *
+     * @param Ap  module list.
+     * @param Pp  module list.
+     * @param top true for TOP term order, false for POT term order.
+     * @return list of left-nf(a) with respect to Pp for all a in Ap.
+     */
+    public ModuleList<C> leftNormalform(ModuleList<C> Pp, ModuleList<C> Ap, boolean top) {
+        if (Pp == null || Pp.isEmpty()) {
+            return Ap;
+        }
+        if (Ap == null || Ap.isEmpty()) {
+            return Ap;
+        }
+        GenSolvablePolynomialRing<C> sring = (GenSolvablePolynomialRing<C>) Pp.ring;
+        int modv = Pp.cols;
+        GenSolvablePolynomialRing<C> pfac = sring.extend(modv, top);
+        logger.debug("extended ring = " + pfac.toScript());
+        //System.out.println("extended ring = " + pfac.toScript());
+        PolynomialList<C> P = Pp.getPolynomialList(pfac);
+        PolynomialList<C> A = Ap.getPolynomialList(pfac);
+        //System.out.println("P = " + P.toScript());
+
+        List<GenSolvablePolynomial<C>> red = leftNormalform(P.castToSolvableList(), A.castToSolvableList());
+        PolynomialList<C> Fr = new PolynomialList<C>(pfac, red);
+        ModuleList<C> Nr = Fr.getModuleList(modv);
+        return Nr;
     }
 
 }

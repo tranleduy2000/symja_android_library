@@ -14,11 +14,11 @@
 
 package com.gx.common.util.concurrent;
 
+import com.duy.concurrent.Callable;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;

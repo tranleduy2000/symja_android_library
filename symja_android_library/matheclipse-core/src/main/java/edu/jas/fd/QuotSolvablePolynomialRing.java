@@ -5,7 +5,6 @@
 package edu.jas.fd;
 
 
-
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -500,18 +499,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         return r;
     }
 
-
-    /**
-     * Copy polynomial c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public QuotSolvablePolynomial<C> copy(QuotSolvablePolynomial<C> c) {
-        return new QuotSolvablePolynomial<C>(this, c.getMap());
-    }
-
-
     /**
      * Parse a solvable polynomial with the use of GenPolynomialTokenizer
      *
@@ -522,7 +509,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     public QuotSolvablePolynomial<C> parse(String s) {
         return parse(new StringReader(s));
     }
-
 
     /**
      * Parse a solvable polynomial with the use of GenPolynomialTokenizer
@@ -545,7 +531,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         return p;
     }
 
-
     /**
      * Generate univariate solvable polynomial in a given variable.
      *
@@ -556,7 +541,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     public QuotSolvablePolynomial<C> univariate(int i) {
         return (QuotSolvablePolynomial<C>) super.univariate(i);
     }
-
 
     /**
      * Generate univariate solvable polynomial in a given variable with given
@@ -570,7 +554,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     public QuotSolvablePolynomial<C> univariate(int i, long e) {
         return (QuotSolvablePolynomial<C>) super.univariate(i, e);
     }
-
 
     /**
      * Generate univariate solvable polynomial in a given variable with given
@@ -586,7 +569,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         return (QuotSolvablePolynomial<C>) super.univariate(modv, i, e);
     }
 
-
     /**
      * Generate list of univariate polynomials in all variables.
      *
@@ -596,7 +578,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     public List<QuotSolvablePolynomial<C>> univariateList() {
         return univariateList(0, 1L);
     }
-
 
     /**
      * Generate list of univariate polynomials in all variables.
@@ -608,7 +589,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     public List<QuotSolvablePolynomial<C>> univariateList(int modv) {
         return univariateList(modv, 1L);
     }
-
 
     /**
      * Generate list of univariate polynomials in all variables with given
@@ -629,7 +609,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         return pols;
     }
 
-
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
      * variables by i.
@@ -641,7 +620,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     public QuotSolvablePolynomialRing<C> extend(int i) {
         return extend(i, false);
     }
-
 
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
@@ -661,7 +639,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         return spfac;
     }
 
-
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
      * variables by i.
@@ -673,7 +650,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     public QuotSolvablePolynomialRing<C> extend(String[] vn) {
         return extend(vn, false);
     }
-
 
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
@@ -693,7 +669,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         return spfac;
     }
 
-
     /**
      * Contract variables. Used e.g. in module embedding. Contract number of
      * variables by i.
@@ -711,7 +686,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         return spfac;
     }
 
-
     /**
      * Reverse variables. Used e.g. in opposite rings.
      *
@@ -721,7 +695,6 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     public QuotSolvablePolynomialRing<C> reverse() {
         return reverse(false);
     }
-
 
     /**
      * Reverse variables. Used e.g. in opposite rings.
@@ -740,6 +713,15 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
         return spfac;
     }
 
+    /**
+     * Copy polynomial c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public QuotSolvablePolynomial<C> copy(QuotSolvablePolynomial<C> c) {
+        return new QuotSolvablePolynomial<C>(this, c.getMap());
+    }
 
     /**
      * Rational function from integral polynomial coefficients. Represent as

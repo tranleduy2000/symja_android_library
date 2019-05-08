@@ -5,7 +5,6 @@
 package edu.jas.gb;
 
 
-
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -197,23 +196,6 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         return criterion4(ei, ej, e);
     }
 
-
-    /**
-     * GB criterium 4. Use only for commutative polynomial rings.
-     *
-     * @param ei exponent vector.
-     * @param ej exponent vector.
-     * @param e  = lcm(ei,ej)
-     * @return true if the S-polynomial(i,j) is required, else false.
-     */
-    public boolean criterion4(ExpVector ei, ExpVector ej, ExpVector e) {
-        ExpVector g = ei.sum(ej);
-        ExpVector h = g.subtract(e);
-        int s = h.signum();
-        return s != 0;
-    }
-
-
     /**
      * GB criterium 4.
      *
@@ -234,84 +216,20 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         return criterion4(ei, ej, e);
     }
 
-
     /**
-     * Normalform with respect to marked head terms.
+     * GB criterium 4. Use only for commutative polynomial rings.
      *
-     * @param Mp leading monomial list.
-     * @param Pp polynomial list.
-     * @param Ap polynomial.
-     * @return nf(Ap) with respect to Mp+Pp.
+     * @param ei exponent vector.
+     * @param ej exponent vector.
+     * @param e  = lcm(ei,ej)
+     * @return true if the S-polynomial(i,j) is required, else false.
      */
-    public GenPolynomial<C> normalformMarked(List<Monomial<C>> Mp, List<GenPolynomial<C>> Pp,
-                                             GenPolynomial<C> Ap) {
-        throw new UnsupportedOperationException("not implemented: " + Mp + " " + Pp + " " + Ap);
+    public boolean criterion4(ExpVector ei, ExpVector ej, ExpVector e) {
+        ExpVector g = ei.sum(ej);
+        ExpVector h = g.subtract(e);
+        int s = h.signum();
+        return s != 0;
     }
-
-
-    /**
-     * Normalform Set.
-     *
-     * @param Ap polynomial list.
-     * @param Pp polynomial list.
-     * @return list of nf(a) with respect to Pp for all a in Ap.
-     */
-    public List<GenPolynomial<C>> normalform(List<GenPolynomial<C>> Pp, List<GenPolynomial<C>> Ap) {
-        if (Pp == null || Pp.isEmpty()) {
-            return Ap;
-        }
-        if (Ap == null || Ap.isEmpty()) {
-            return Ap;
-        }
-        ArrayList<GenPolynomial<C>> red = new ArrayList<GenPolynomial<C>>();
-        for (GenPolynomial<C> A : Ap) {
-            A = normalform(Pp, A);
-            red.add(A);
-        }
-        return red;
-    }
-
-
-    /**
-     * Module normalform set.
-     *
-     * @param Ap module list.
-     * @param Pp module list.
-     * @return list of nf(a) with respect to Pp for all a in Ap.
-     */
-    public ModuleList<C> normalform(ModuleList<C> Pp, ModuleList<C> Ap) {
-        return normalform(Pp, Ap, false);
-    }
-
-
-    /**
-     * Module normalform set.
-     *
-     * @param Ap  module list.
-     * @param Pp  module list.
-     * @param top true for TOP term order, false for POT term order.
-     * @return list of nf(a) with respect to Pp for all a in Ap.
-     */
-    public ModuleList<C> normalform(ModuleList<C> Pp, ModuleList<C> Ap, boolean top) {
-        if (Pp == null || Pp.isEmpty()) {
-            return Ap;
-        }
-        if (Ap == null || Ap.isEmpty()) {
-            return Ap;
-        }
-        int modv = Pp.cols;
-        GenPolynomialRing<C> pfac = Pp.ring.extend(modv, top);
-        logger.debug("extended ring = " + pfac);
-        //System.out.println("extended ring = " + pfac);
-        PolynomialList<C> P = Pp.getPolynomialList(pfac);
-        PolynomialList<C> A = Ap.getPolynomialList(pfac);
-
-        List<GenPolynomial<C>> red = normalform(P.list, A.list);
-        PolynomialList<C> Fr = new PolynomialList<C>(P.ring, red);
-        ModuleList<C> Nr = Fr.getModuleList(modv);
-        return Nr;
-    }
-
 
     /**
      * Is top reducible.
@@ -338,7 +256,6 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         return false;
     }
 
-
     /**
      * Is reducible.
      *
@@ -349,7 +266,6 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
     public boolean isReducible(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap) {
         return !isNormalform(Pp, Ap);
     }
-
 
     /**
      * Is in Normalform.
@@ -403,7 +319,6 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         return true;
     }
 
-
     /**
      * Is in Normalform.
      *
@@ -427,6 +342,27 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         return true;
     }
 
+    /**
+     * Normalform Set.
+     *
+     * @param Ap polynomial list.
+     * @param Pp polynomial list.
+     * @return list of nf(a) with respect to Pp for all a in Ap.
+     */
+    public List<GenPolynomial<C>> normalform(List<GenPolynomial<C>> Pp, List<GenPolynomial<C>> Ap) {
+        if (Pp == null || Pp.isEmpty()) {
+            return Ap;
+        }
+        if (Ap == null || Ap.isEmpty()) {
+            return Ap;
+        }
+        ArrayList<GenPolynomial<C>> red = new ArrayList<GenPolynomial<C>>();
+        for (GenPolynomial<C> A : Ap) {
+            A = normalform(Pp, A);
+            red.add(A);
+        }
+        return red;
+    }
 
     /**
      * Irreducible set.
@@ -458,7 +394,7 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         GenPolynomial<C> a;
         logger.debug("irr = ");
         while (irr != l) {
-            //it = P.listIterator(); 
+            //it = P.listIterator();
             //a = P.get(0); //it.next();
             a = P.remove(0);
             e = a.leadingExpVector();
@@ -488,7 +424,6 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         //System.out.println();
         return P;
     }
-
 
     /**
      * Is reduction of normal form.
@@ -546,5 +481,57 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
             logger.info("t-a = " + r);
         }
         return z;
+    }
+
+    /**
+     * Normalform with respect to marked head terms.
+     *
+     * @param Mp leading monomial list.
+     * @param Pp polynomial list.
+     * @param Ap polynomial.
+     * @return nf(Ap) with respect to Mp+Pp.
+     */
+    public GenPolynomial<C> normalformMarked(List<Monomial<C>> Mp, List<GenPolynomial<C>> Pp,
+                                             GenPolynomial<C> Ap) {
+        throw new UnsupportedOperationException("not implemented: " + Mp + " " + Pp + " " + Ap);
+    }
+
+    /**
+     * Module normalform set.
+     *
+     * @param Ap module list.
+     * @param Pp module list.
+     * @return list of nf(a) with respect to Pp for all a in Ap.
+     */
+    public ModuleList<C> normalform(ModuleList<C> Pp, ModuleList<C> Ap) {
+        return normalform(Pp, Ap, false);
+    }
+
+    /**
+     * Module normalform set.
+     *
+     * @param Ap  module list.
+     * @param Pp  module list.
+     * @param top true for TOP term order, false for POT term order.
+     * @return list of nf(a) with respect to Pp for all a in Ap.
+     */
+    public ModuleList<C> normalform(ModuleList<C> Pp, ModuleList<C> Ap, boolean top) {
+        if (Pp == null || Pp.isEmpty()) {
+            return Ap;
+        }
+        if (Ap == null || Ap.isEmpty()) {
+            return Ap;
+        }
+        int modv = Pp.cols;
+        GenPolynomialRing<C> pfac = Pp.ring.extend(modv, top);
+        logger.debug("extended ring = " + pfac);
+        //System.out.println("extended ring = " + pfac);
+        PolynomialList<C> P = Pp.getPolynomialList(pfac);
+        PolynomialList<C> A = Ap.getPolynomialList(pfac);
+
+        List<GenPolynomial<C>> red = normalform(P.list, A.list);
+        PolynomialList<C> Fr = new PolynomialList<C>(P.ring, red);
+        ModuleList<C> Nr = Fr.getModuleList(modv);
+        return Nr;
     }
 }

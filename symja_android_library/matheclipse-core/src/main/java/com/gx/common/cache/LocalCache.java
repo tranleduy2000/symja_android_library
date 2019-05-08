@@ -65,7 +65,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.Callable;
+import com.duy.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
@@ -474,7 +474,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
 
     private static <E> ArrayList<E> toArrayList(Collection<E> c) {
         // Avoid calling ArrayList(Collection), which may call back into toArray.
-        ArrayList<E> result = new ArrayList<E>(c.size());
+        ArrayList<E> result = new ArrayList<>(c.size());
         Iterators.addAll(result, c.iterator());
         return result;
     }
@@ -4419,7 +4419,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
         final LocalCache<K, V> localCache;
 
         LocalManualCache(CacheBuilder<? super K, ? super V> builder) {
-            this(new LocalCache<K, V>(builder, null));
+            this(new LocalCache<>(builder, null));
         }
 
         // Cache methods

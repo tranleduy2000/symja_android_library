@@ -14,6 +14,7 @@
 
 package com.gx.common.util.concurrent;
 
+import com.duy.concurrent.Executor;
 import com.gx.common.annotations.Beta;
 import com.gx.common.base.Ascii;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
@@ -23,7 +24,6 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 import static com.gx.common.base.Preconditions.checkNotNull;
 import static com.gx.common.base.Strings.isNullOrEmpty;
 import static com.gx.common.util.concurrent.Futures.getDone;
-import static com.gx.common.util.concurrent.MoreExecutors.directExecutor;
 import static java.util.concurrent.atomic.AtomicReferenceFieldUpdater.newUpdater;
 
 /**
@@ -819,9 +818,18 @@ public abstract class AbstractFuture<V> extends GwtFluentFutureCatchingSpecializ
     abstract static class TrustedFuture<V> extends AbstractFuture<V> {
         @CanIgnoreReturnValue
         @Override
-        public final V get(long timeout, TimeUnit unit)
-                throws InterruptedException, ExecutionException, TimeoutException {
-            return super.get(timeout, unit);
+        public final boolean cancel(boolean mayInterruptIfRunning) {
+            return super.cancel(mayInterruptIfRunning);
+        }
+
+        @Override
+        public final boolean isCancelled() {
+            return super.isCancelled();
+        }
+
+        @Override
+        public final boolean isDone() {
+            return super.isDone();
         }
 
         @CanIgnoreReturnValue
@@ -830,20 +838,11 @@ public abstract class AbstractFuture<V> extends GwtFluentFutureCatchingSpecializ
             return super.get();
         }
 
-        @Override
-        public final boolean isDone() {
-            return super.isDone();
-        }
-
-        @Override
-        public final boolean isCancelled() {
-            return super.isCancelled();
-        }
-
         @CanIgnoreReturnValue
         @Override
-        public final boolean cancel(boolean mayInterruptIfRunning) {
-            return super.cancel(mayInterruptIfRunning);
+        public final V get(long timeout, TimeUnit unit)
+                throws InterruptedException, ExecutionException, TimeoutException {
+            return super.get(timeout, unit);
         }
 
         @Override

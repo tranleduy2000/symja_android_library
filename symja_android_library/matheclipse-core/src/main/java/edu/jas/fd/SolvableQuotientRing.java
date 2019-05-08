@@ -5,7 +5,6 @@
 package edu.jas.fd;
 
 
-
 import org.apache.log4j.Logger;
 
 import java.io.Reader;
@@ -66,15 +65,6 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         logger.debug("quotient ring constructed");
     }
 
-
-    /**
-     * Factory for base elements.
-     */
-    public GenSolvablePolynomialRing<C> pairFactory() {
-        return ring;
-    }
-
-
     /**
      * Create from numerator.
      */
@@ -82,7 +72,6 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
     public SolvableQuotient<C> create(GenPolynomial<C> n) {
         return new SolvableQuotient<C>(this, (GenSolvablePolynomial<C>) n);
     }
-
 
     /**
      * Create from numerator, denominator pair.
@@ -92,27 +81,12 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         return new SolvableQuotient<C>(this, (GenSolvablePolynomial<C>) n, (GenSolvablePolynomial<C>) d);
     }
 
-
     /**
-     * Is this structure finite or infinite.
-     *
-     * @return true if this structure is finite, else false.
+     * Factory for base elements.
      */
-    public boolean isFinite() {
-        return ring.isFinite();
+    public GenSolvablePolynomialRing<C> pairFactory() {
+        return ring;
     }
-
-
-    /**
-     * Copy SolvableQuotient element c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public SolvableQuotient<C> copy(SolvableQuotient<C> c) {
-        return new SolvableQuotient<C>(c.ring, c.num, c.den, true);
-    }
-
 
     /**
      * Get the zero element.
@@ -123,7 +97,6 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         return new SolvableQuotient<C>(this, ring.getZERO());
     }
 
-
     /**
      * Get the one element.
      *
@@ -133,28 +106,6 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         return new SolvableQuotient<C>(this, ring.getONE());
     }
 
-
-    /**
-     * Get a list of the generating elements.
-     *
-     * @return list of generators for the algebraic structure.
-     */
-    public List<SolvableQuotient<C>> generators() {
-        List<GenSolvablePolynomial<C>> pgens = PolynomialList.castToSolvableList(ring.generators());
-        List<SolvableQuotient<C>> gens = new ArrayList<SolvableQuotient<C>>(pgens.size() * 2 - 1);
-        GenSolvablePolynomial<C> one = ring.getONE();
-        for (GenSolvablePolynomial<C> p : pgens) {
-            SolvableQuotient<C> q = new SolvableQuotient<C>(this, p);
-            gens.add(q);
-            if (!p.isONE()) {
-                q = new SolvableQuotient<C>(this, one, p);
-                gens.add(q);
-            }
-        }
-        return gens;
-    }
-
-
     /**
      * Query if this ring is commutative.
      *
@@ -163,7 +114,6 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
     public boolean isCommutative() {
         return ring.isCommutative();
     }
-
 
     /**
      * Query if this ring is associative.
@@ -199,37 +149,34 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         return true;
     }
 
-
     /**
-     * Query if this ring is a field.
+     * Get a list of the generating elements.
      *
-     * @return true.
+     * @return list of generators for the algebraic structure.
      */
-    public boolean isField() {
-        return true;
+    public List<SolvableQuotient<C>> generators() {
+        List<GenSolvablePolynomial<C>> pgens = PolynomialList.castToSolvableList(ring.generators());
+        List<SolvableQuotient<C>> gens = new ArrayList<SolvableQuotient<C>>(pgens.size() * 2 - 1);
+        GenSolvablePolynomial<C> one = ring.getONE();
+        for (GenSolvablePolynomial<C> p : pgens) {
+            SolvableQuotient<C> q = new SolvableQuotient<C>(this, p);
+            gens.add(q);
+            if (!p.isONE()) {
+                q = new SolvableQuotient<C>(this, one, p);
+                gens.add(q);
+            }
+        }
+        return gens;
     }
 
-
     /**
-     * Characteristic of this ring.
+     * Is this structure finite or infinite.
      *
-     * @return characteristic of this ring.
+     * @return true if this structure is finite, else false.
      */
-    public java.math.BigInteger characteristic() {
-        return ring.characteristic();
+    public boolean isFinite() {
+        return ring.isFinite();
     }
-
-
-    /**
-     * Get a SolvableQuotient element from a BigInteger value.
-     *
-     * @param a BigInteger.
-     * @return a SolvableQuotient.
-     */
-    public SolvableQuotient<C> fromInteger(java.math.BigInteger a) {
-        return new SolvableQuotient<C>(this, ring.fromInteger(a));
-    }
-
 
     /**
      * Get a SolvableQuotient element from a long value.
@@ -241,61 +188,15 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         return new SolvableQuotient<C>(this, ring.fromInteger(a));
     }
 
-
     /**
-     * Get the String representation as RingFactory.
-     */
-    @Override
-    public String toString() {
-        String s = null;
-        if (ring.coFac.characteristic().signum() == 0) {
-            s = "RatFunc";
-        } else {
-            s = "ModFunc";
-        }
-        return s + "( " + ring.toString() + " )";
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
+     * Get a SolvableQuotient element from a BigInteger value.
      *
-     * @return script compatible representation for this ElemFactory.
+     * @param a BigInteger.
+     * @return a SolvableQuotient.
      */
-    @Override
-    public String toScript() {
-        // Python case
-        return "SRF(" + ring.toScript() + ")";
+    public SolvableQuotient<C> fromInteger(java.math.BigInteger a) {
+        return new SolvableQuotient<C>(this, ring.fromInteger(a));
     }
-
-
-    /**
-     * Comparison with any other object.
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof SolvableQuotientRing)) {
-            return false;
-        }
-        SolvableQuotientRing<C> a = (SolvableQuotientRing<C>) b;
-        return ring.equals(a.ring);
-    }
-
-
-    /**
-     * Hash code for this quotient ring.
-     */
-    @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        return h;
-    }
-
 
     /**
      * SolvableQuotient random.
@@ -311,26 +212,6 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         } while (s.isZERO());
         return new SolvableQuotient<C>(this, r, s, false);
     }
-
-
-    /**
-     * Generate a random quotient.
-     *
-     * @param k bitsize of random coefficients.
-     * @param l number of terms.
-     * @param d maximal degree in each variable.
-     * @param q density of nozero exponents.
-     * @return a random quotient.
-     */
-    public SolvableQuotient<C> random(int k, int l, int d, float q) {
-        GenSolvablePolynomial<C> r = ring.random(k, l, d, q).monic();
-        GenSolvablePolynomial<C> s = ring.random(k, l, d, q).monic();
-        do {
-            s = ring.random(k, l, d, q).monic();
-        } while (s.isZERO());
-        return new SolvableQuotient<C>(this, r, s, false);
-    }
-
 
     /**
      * SolvableQuotient random.
@@ -348,6 +229,15 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         return new SolvableQuotient<C>(this, r, s, false);
     }
 
+    /**
+     * Copy SolvableQuotient element c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public SolvableQuotient<C> copy(SolvableQuotient<C> c) {
+        return new SolvableQuotient<C>(c.ring, c.num, c.den, true);
+    }
 
     /**
      * Parse SolvableQuotient from String. Syntax: "{ polynomial | polynomial }"
@@ -377,7 +267,6 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
         return new SolvableQuotient<C>(this, n, d);
     }
 
-
     /**
      * Parse SolvableQuotient from Reader.
      *
@@ -387,6 +276,93 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
     public SolvableQuotient<C> parse(Reader r) {
         String s = StringUtil.nextPairedString(r, '{', '}');
         return parse(s);
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        return "SRF(" + ring.toScript() + ")";
+    }
+
+    /**
+     * Query if this ring is a field.
+     *
+     * @return true.
+     */
+    public boolean isField() {
+        return true;
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return characteristic of this ring.
+     */
+    public java.math.BigInteger characteristic() {
+        return ring.characteristic();
+    }
+
+    /**
+     * Hash code for this quotient ring.
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof SolvableQuotientRing)) {
+            return false;
+        }
+        SolvableQuotientRing<C> a = (SolvableQuotientRing<C>) b;
+        return ring.equals(a.ring);
+    }
+
+    /**
+     * Get the String representation as RingFactory.
+     */
+    @Override
+    public String toString() {
+        String s = null;
+        if (ring.coFac.characteristic().signum() == 0) {
+            s = "RatFunc";
+        } else {
+            s = "ModFunc";
+        }
+        return s + "( " + ring.toString() + " )";
+    }
+
+    /**
+     * Generate a random quotient.
+     *
+     * @param k bitsize of random coefficients.
+     * @param l number of terms.
+     * @param d maximal degree in each variable.
+     * @param q density of nozero exponents.
+     * @return a random quotient.
+     */
+    public SolvableQuotient<C> random(int k, int l, int d, float q) {
+        GenSolvablePolynomial<C> r = ring.random(k, l, d, q).monic();
+        GenSolvablePolynomial<C> s = ring.random(k, l, d, q).monic();
+        do {
+            s = ring.random(k, l, d, q).monic();
+        } while (s.isZERO());
+        return new SolvableQuotient<C>(this, r, s, false);
     }
 
 }

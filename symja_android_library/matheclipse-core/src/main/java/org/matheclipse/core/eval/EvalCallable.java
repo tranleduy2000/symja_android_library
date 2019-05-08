@@ -1,9 +1,10 @@
 package org.matheclipse.core.eval;
 
+import com.duy.concurrent.Callable;
+
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
-import java.util.concurrent.Callable;
 
 class EvalCallable implements Callable<IExpr> {
 	protected final EvalEngine fEngine;

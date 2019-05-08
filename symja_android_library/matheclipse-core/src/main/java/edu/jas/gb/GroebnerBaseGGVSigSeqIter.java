@@ -5,7 +5,6 @@
 package edu.jas.gb;
 
 
-
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;

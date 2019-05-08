@@ -5,7 +5,6 @@
 package edu.jas.fd;
 
 
-
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -72,83 +71,6 @@ public class GreatestCommonDivisorSyzygy<C extends GcdRingElem<C>> extends Great
         return rightGcd(P, S);
     }
 
-
-    /**
-     * Left GenSolvablePolynomial greatest common divisor.
-     *
-     * @param P GenSolvablePolynomial.
-     * @param S GenSolvablePolynomial.
-     * @return gcd(P, S) with P = P'*gcd(P,S) and S = S'*gcd(P,S).
-     */
-    @Override
-    public GenSolvablePolynomial<C> leftGcd(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S) {
-        if (S == null || S.isZERO()) {
-            return P;
-        }
-        if (P == null || P.isZERO()) {
-            return S;
-        }
-        if (P.isConstant()) {
-            return P.ring.getONE();
-        }
-        if (S.isConstant()) {
-            return P.ring.getONE();
-        }
-        List<GenSolvablePolynomial<C>> A = new ArrayList<GenSolvablePolynomial<C>>(2);
-        A.add(P);
-        A.add(S);
-        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<C>();
-        logger.info("left syzGcd computing GB: " + A);
-        List<GenSolvablePolynomial<C>> G = sbb.rightGB(A); //not: leftGB, not: sbb.twosidedGB(A);
-        if (debug) {
-            logger.info("G = " + G);
-        }
-        if (G.size() == 1) {
-            return G.get(0);
-        }
-        logger.info("gcd not determined, set to 1: " + G); // + ", A = " + A);
-        return P.ring.getONE();
-    }
-
-
-    /**
-     * Right GenSolvablePolynomial right greatest common divisor.
-     *
-     * @param P GenSolvablePolynomial.
-     * @param S GenSolvablePolynomial.
-     * @return gcd(P, S) with P = gcd(P,S)*P' and S = gcd(P,S)*S'.
-     */
-    @Override
-    public GenSolvablePolynomial<C> rightGcd(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S) {
-        if (S == null || S.isZERO()) {
-            return P;
-        }
-        if (P == null || P.isZERO()) {
-            return S;
-        }
-        if (P.isConstant()) {
-            return P.ring.getONE();
-        }
-        if (S.isConstant()) {
-            return P.ring.getONE();
-        }
-        List<GenSolvablePolynomial<C>> A = new ArrayList<GenSolvablePolynomial<C>>(2);
-        A.add(P);
-        A.add(S);
-        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<C>();
-        logger.info("left syzGcd computing GB: " + A);
-        List<GenSolvablePolynomial<C>> G = sbb.leftGB(A); //not: sbb.twosidedGB(A);
-        if (debug) {
-            logger.info("G = " + G);
-        }
-        if (G.size() == 1) {
-            return G.get(0);
-        }
-        logger.info("gcd not determined, set to 1: " + G); // + ", A = " + A);
-        return P.ring.getONE();
-    }
-
-
     /**
      * Univariate GenSolvablePolynomial left recursive greatest common divisor.
      *
@@ -193,7 +115,6 @@ public class GreatestCommonDivisorSyzygy<C extends GcdRingElem<C>> extends Great
         return P.ring.getONE();
     }
 
-
     /**
      * Univariate GenSolvablePolynomial right recursive greatest common divisor.
      *
@@ -228,6 +149,80 @@ public class GreatestCommonDivisorSyzygy<C extends GcdRingElem<C>> extends Great
         logger.info("right syzGcd computing GB: " + A);
         // will not work, not field
         List<GenSolvablePolynomial<GenPolynomial<C>>> G = sbb.leftGB(A); //not: sbb.twosidedGB(A);
+        if (debug) {
+            logger.info("G = " + G);
+        }
+        if (G.size() == 1) {
+            return G.get(0);
+        }
+        logger.info("gcd not determined, set to 1: " + G); // + ", A = " + A);
+        return P.ring.getONE();
+    }
+
+    /**
+     * Left GenSolvablePolynomial greatest common divisor.
+     *
+     * @param P GenSolvablePolynomial.
+     * @param S GenSolvablePolynomial.
+     * @return gcd(P, S) with P = P'*gcd(P,S) and S = S'*gcd(P,S).
+     */
+    @Override
+    public GenSolvablePolynomial<C> leftGcd(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S) {
+        if (S == null || S.isZERO()) {
+            return P;
+        }
+        if (P == null || P.isZERO()) {
+            return S;
+        }
+        if (P.isConstant()) {
+            return P.ring.getONE();
+        }
+        if (S.isConstant()) {
+            return P.ring.getONE();
+        }
+        List<GenSolvablePolynomial<C>> A = new ArrayList<GenSolvablePolynomial<C>>(2);
+        A.add(P);
+        A.add(S);
+        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<C>();
+        logger.info("left syzGcd computing GB: " + A);
+        List<GenSolvablePolynomial<C>> G = sbb.rightGB(A); //not: leftGB, not: sbb.twosidedGB(A);
+        if (debug) {
+            logger.info("G = " + G);
+        }
+        if (G.size() == 1) {
+            return G.get(0);
+        }
+        logger.info("gcd not determined, set to 1: " + G); // + ", A = " + A);
+        return P.ring.getONE();
+    }
+
+    /**
+     * Right GenSolvablePolynomial right greatest common divisor.
+     *
+     * @param P GenSolvablePolynomial.
+     * @param S GenSolvablePolynomial.
+     * @return gcd(P, S) with P = gcd(P,S)*P' and S = gcd(P,S)*S'.
+     */
+    @Override
+    public GenSolvablePolynomial<C> rightGcd(GenSolvablePolynomial<C> P, GenSolvablePolynomial<C> S) {
+        if (S == null || S.isZERO()) {
+            return P;
+        }
+        if (P == null || P.isZERO()) {
+            return S;
+        }
+        if (P.isConstant()) {
+            return P.ring.getONE();
+        }
+        if (S.isConstant()) {
+            return P.ring.getONE();
+        }
+        List<GenSolvablePolynomial<C>> A = new ArrayList<GenSolvablePolynomial<C>>(2);
+        A.add(P);
+        A.add(S);
+        SolvableGroebnerBaseAbstract<C> sbb = new SolvableGroebnerBaseSeq<C>();
+        logger.info("left syzGcd computing GB: " + A);
+        List<GenSolvablePolynomial<C>> G = sbb.leftGB(A); //not: sbb.twosidedGB(A);
         if (debug) {
             logger.info("G = " + G);
         }

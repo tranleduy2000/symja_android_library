@@ -1,5 +1,8 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.concurrent.Callable;
+import com.duy.concurrent.ExecutorService;
+import com.duy.concurrent.Executors;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.gx.common.util.concurrent.SimpleTimeLimiter;
@@ -43,9 +46,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.matheclipse.core.expression.F.Divide;
