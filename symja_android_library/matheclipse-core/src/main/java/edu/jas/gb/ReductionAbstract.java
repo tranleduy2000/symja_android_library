@@ -5,8 +5,7 @@
 package edu.jas.gb;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -33,7 +32,7 @@ import edu.jas.structure.RingElem;
 public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduction<C> {
 
 
-    private static final Logger logger = LogManager.getLogger(ReductionAbstract.class);
+    private static final Logger logger = Logger.getLogger(ReductionAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -170,7 +169,6 @@ public abstract class ReductionAbstract<C extends RingElem<C>> implements Reduct
         if (modv == 0) {
             return true;
         }
-        // skip pair
         return ei.invLexCompareTo(ej, 0, modv) == 0;
     }
 

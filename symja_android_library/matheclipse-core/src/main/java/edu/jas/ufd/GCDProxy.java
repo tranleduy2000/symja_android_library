@@ -5,14 +5,14 @@
 package edu.jas.ufd;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.duy.concurrent.Callable;
+import com.duy.concurrent.ExecutorService;
+
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 
 import edu.jas.kern.ComputerThreads;
 import edu.jas.kern.PreemptingException;
@@ -33,7 +33,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
 
     //       implements GreatestCommonDivisor<C> {
 
-    private static final Logger logger = LogManager.getLogger(GCDProxy.class);
+    private static final Logger logger = Logger.getLogger(GCDProxy.class);
 
 
     private static final boolean debug = logger.isDebugEnabled(); //logger.isInfoEnabled();
@@ -68,7 +68,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
     /**
      * Get the String representation with gcd engines.
      *
-     * @see java.lang.Object#toString()
+     * @see Object#toString()
      */
     @Override
     public String toString() {

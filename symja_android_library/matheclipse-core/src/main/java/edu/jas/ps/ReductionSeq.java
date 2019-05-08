@@ -5,8 +5,7 @@
 package edu.jas.ps;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class ReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
         /* extends ReductionAbstract<C> */ {
 
 
-    private static final Logger logger = LogManager.getLogger(ReductionSeq.class);
+    private static final Logger logger = Logger.getLogger(ReductionSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -73,7 +72,6 @@ public class ReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
         if (modv == 0) {
             return true;
         }
-        // skip pair
         return ei.invLexCompareTo(ej, 0, modv) == 0;
     }
 

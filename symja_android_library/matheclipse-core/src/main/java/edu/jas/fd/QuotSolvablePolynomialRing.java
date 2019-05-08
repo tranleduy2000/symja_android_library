@@ -5,8 +5,7 @@
 package edu.jas.fd;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -59,7 +58,7 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     //public final RelationTable<GenPolynomial<C>> coeffTable;
 
 
-    private static final Logger logger = LogManager.getLogger(QuotSolvablePolynomialRing.class);
+    private static final Logger logger = Logger.getLogger(QuotSolvablePolynomialRing.class);
     /**
      * Recursive solvable polynomial ring with polynomial coefficients.
      */
@@ -231,7 +230,7 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     /**
      * Get the String representation.
      *
-     * @see java.lang.Object#toString()
+     * @see Object#toString()
      */
     @Override
     public String toString() {
@@ -289,7 +288,7 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     /**
      * Comparison with any other object.
      *
-     * @see java.lang.Object#equals(java.lang.Object)
+     * @see Object#equals(Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -316,7 +315,7 @@ public class QuotSolvablePolynomialRing<C extends GcdRingElem<C>> extends
     /**
      * Hash code for this polynomial ring.
      *
-     * @see java.lang.Object#hashCode()
+     * @see Object#hashCode()
      */
     @Override
     public int hashCode() {

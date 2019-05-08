@@ -5,8 +5,7 @@
 package edu.jas.fd;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,7 @@ import edu.jas.structure.RingFactory;
 public class GreatestCommonDivisorSyzygy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbstract<C> {
 
 
-    private static final Logger logger = LogManager.getLogger(GreatestCommonDivisorSyzygy.class);
+    private static final Logger logger = Logger.getLogger(GreatestCommonDivisorSyzygy.class);
 
 
     private static final boolean debug = true; //logger.isDebugEnabled();

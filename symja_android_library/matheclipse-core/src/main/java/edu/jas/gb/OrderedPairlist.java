@@ -5,8 +5,7 @@
 package edu.jas.gb;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -34,7 +33,7 @@ import edu.jas.structure.RingElem;
 public class OrderedPairlist<C extends RingElem<C>> implements PairList<C> {
 
 
-    private static final Logger logger = LogManager.getLogger(OrderedPairlist.class);
+    private static final Logger logger = Logger.getLogger(OrderedPairlist.class);
     protected final List<GenPolynomial<C>> P;
     protected final SortedMap<ExpVector, LinkedList<Pair<C>>> pairlist;
     protected final List<BitSet> red;
@@ -189,7 +188,7 @@ public class OrderedPairlist<C extends RingElem<C>> implements PairList<C> {
 
     /**
      * Remove the next required pair from the pairlist and reduction matrix.
-     * Appy the criterions 3 and 4 to see if the S-polynomial is required.
+     * Appy the criterions 3 and 4 to @see if the S-polynomial is required.
      *
      * @return the next pair if one exists, otherwise null.
      */

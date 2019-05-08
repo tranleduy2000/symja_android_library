@@ -23,7 +23,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+import com.duy.concurrent.Executor;
 
 import static com.gx.common.base.Preconditions.checkNotNull;
 import static com.gx.common.util.concurrent.Futures.getDone;
@@ -47,16 +47,6 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
     AbstractTransformFuture(ListenableFuture<? extends I> inputFuture, F function) {
         this.inputFuture = checkNotNull(inputFuture);
         this.function = checkNotNull(function);
-    }
-
-    static <I, O> ListenableFuture<O> create(
-            ListenableFuture<I> input,
-            AsyncFunction<? super I, ? extends O> function,
-            Executor executor) {
-        checkNotNull(executor);
-        AsyncTransformFuture<I, O> output = new AsyncTransformFuture<>(input, function);
-        input.addListener(output, rejectionPropagatingExecutor(executor, output));
-        return output;
     }
 
     static <I, O> ListenableFuture<O> create(
@@ -204,37 +194,7 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
     }
 
     /**
-     * An {@link AbstractTransformFuture} that delegates to an {@link AsyncFunction} and {@link
-     * #setFuture(ListenableFuture)}.
-     */
-    private static final class AsyncTransformFuture<I, O>
-            extends AbstractTransformFuture<
-            I, O, AsyncFunction<? super I, ? extends O>, ListenableFuture<? extends O>> {
-        AsyncTransformFuture(
-                ListenableFuture<? extends I> inputFuture, AsyncFunction<? super I, ? extends O> function) {
-            super(inputFuture, function);
-        }
-
-        @Override
-        ListenableFuture<? extends O> doTransform(
-                AsyncFunction<? super I, ? extends O> function, @NullableDecl I input) throws Exception {
-            ListenableFuture<? extends O> outputFuture = function.apply(input);
-            checkNotNull(
-                    outputFuture,
-                    "AsyncFunction.apply returned null instead of a Future. "
-                            + "Did you mean to return immediateFuture(null)?");
-            return outputFuture;
-        }
-
-        @Override
-        void setResult(ListenableFuture<? extends O> result) {
-            setFuture(result);
-        }
-    }
-
-    /**
      * An {@link AbstractTransformFuture} that delegates to a {@link Function} and {@link
-     * #set(Object)}.
      */
     private static final class TransformFuture<I, O>
             extends AbstractTransformFuture<I, O, Function<? super I, ? extends O>, O> {

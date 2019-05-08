@@ -5,8 +5,7 @@
 package edu.jas.gb;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ import edu.jas.structure.RingElem;
 public class DReductionSeq<C extends RingElem<C>> extends ReductionAbstract<C> implements DReduction<C> {
 
 
-    private static final Logger logger = LogManager.getLogger(DReductionSeq.class);
+    private static final Logger logger = Logger.getLogger(DReductionSeq.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -283,9 +282,6 @@ public class DReductionSeq<C extends RingElem<C>> extends ReductionAbstract<C> i
             C a = A.leadingBaseCoefficient();
             C b = B.leadingBaseCoefficient();
             C d = a.gcd(b);
-            // disjoint hc
-            //System.out.println("d1 = " + d + ", a = " + a + ", b = " + b);
-            // can skip pair
             return !d.isONE();
         }
         return true; //! ( s == 0 );
@@ -318,8 +314,6 @@ public class DReductionSeq<C extends RingElem<C>> extends ReductionAbstract<C> i
             C a = A.leadingBaseCoefficient();
             C b = B.leadingBaseCoefficient();
             C d = a.gcd(b);
-            // disjoint hc
-            // can skip pair
             return !d.isONE();
         }
         return true; //! ( s == 0 );

@@ -14,16 +14,14 @@
 
 package com.gx.common.util.concurrent;
 
+import com.duy.concurrent.Callable;
+import com.duy.concurrent.ExecutorService;
+import com.duy.concurrent.Future;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
-import com.gx.common.collect.ObjectArrays;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -31,7 +29,7 @@ import static com.gx.common.base.Preconditions.checkArgument;
 import static com.gx.common.base.Preconditions.checkNotNull;
 
 /**
- * A TimeLimiter that runs method calls in the background using an {@link ExecutorService}. If the
+ * A TimeLimiter that runs method calls in the background using an {#link ExecutorService}. If the
  * time limit expires for a given method call, the thread running the call will be interrupted.
  *
  * @author Kevin Bourrillion
@@ -56,31 +54,11 @@ public final class SimpleTimeLimiter implements TimeLimiter {
      * case the call may even time out before the target method is ever invoked.
      *
      * @param executor the ExecutorService that will execute the method calls on the target objects;
-     *                 for example, a {@link Executors#newCachedThreadPool()}.
+     *                 for example, a {#link Executors#newCachedThreadPool()}.
      * @since 22.0
      */
     public static SimpleTimeLimiter create(ExecutorService executor) {
         return new SimpleTimeLimiter(executor);
-    }
-
-    private static Exception throwCause(Exception e, boolean combineStackTraces) throws Exception {
-        Throwable cause = e.getCause();
-        if (cause == null) {
-            throw e;
-        }
-        if (combineStackTraces) {
-            StackTraceElement[] combined =
-                    ObjectArrays.concat(cause.getStackTrace(), e.getStackTrace(), StackTraceElement.class);
-            cause.setStackTrace(combined);
-        }
-        if (cause instanceof Exception) {
-            throw (Exception) cause;
-        }
-        if (cause instanceof Error) {
-            throw (Error) cause;
-        }
-        // The cause is a weird kind of Throwable, so throw the outer exception.
-        throw e;
     }
 
     private static void checkPositiveTimeout(long timeoutDuration) {
@@ -108,68 +86,6 @@ public final class SimpleTimeLimiter implements TimeLimiter {
         }
     }
 
-    @CanIgnoreReturnValue
-    @Override
-    public <T> T callUninterruptiblyWithTimeout(
-            Callable<T> callable, long timeoutDuration, TimeUnit timeoutUnit)
-            throws TimeoutException, ExecutionException {
-        checkNotNull(callable);
-        checkNotNull(timeoutUnit);
-        checkPositiveTimeout(timeoutDuration);
-
-        Future<T> future = executor.submit(callable);
-
-        try {
-            return Uninterruptibles.getUninterruptibly(future, timeoutDuration, timeoutUnit);
-        } catch (TimeoutException e) {
-            future.cancel(true /* mayInterruptIfRunning */);
-            throw e;
-        } catch (ExecutionException e) {
-            wrapAndThrowExecutionExceptionOrError(e.getCause());
-            throw new AssertionError();
-        }
-    }
-
-    @Override
-    public void runWithTimeout(Runnable runnable, long timeoutDuration, TimeUnit timeoutUnit)
-            throws TimeoutException, InterruptedException {
-        checkNotNull(runnable);
-        checkNotNull(timeoutUnit);
-        checkPositiveTimeout(timeoutDuration);
-
-        Future<?> future = executor.submit(runnable);
-
-        try {
-            future.get(timeoutDuration, timeoutUnit);
-        } catch (InterruptedException | TimeoutException e) {
-            future.cancel(true /* mayInterruptIfRunning */);
-            throw e;
-        } catch (ExecutionException e) {
-            wrapAndThrowRuntimeExecutionExceptionOrError(e.getCause());
-            throw new AssertionError();
-        }
-    }
-
-    @Override
-    public void runUninterruptiblyWithTimeout(
-            Runnable runnable, long timeoutDuration, TimeUnit timeoutUnit) throws TimeoutException {
-        checkNotNull(runnable);
-        checkNotNull(timeoutUnit);
-        checkPositiveTimeout(timeoutDuration);
-
-        Future<?> future = executor.submit(runnable);
-
-        try {
-            Uninterruptibles.getUninterruptibly(future, timeoutDuration, timeoutUnit);
-        } catch (TimeoutException e) {
-            future.cancel(true /* mayInterruptIfRunning */);
-            throw e;
-        } catch (ExecutionException e) {
-            wrapAndThrowRuntimeExecutionExceptionOrError(e.getCause());
-            throw new AssertionError();
-        }
-    }
-
     private void wrapAndThrowExecutionExceptionOrError(Throwable cause) throws ExecutionException {
         if (cause instanceof Error) {
             throw new ExecutionError((Error) cause);
@@ -180,11 +96,4 @@ public final class SimpleTimeLimiter implements TimeLimiter {
         }
     }
 
-    private void wrapAndThrowRuntimeExecutionExceptionOrError(Throwable cause) {
-        if (cause instanceof Error) {
-            throw new ExecutionError((Error) cause);
-        } else {
-            throw new UncheckedExecutionException(cause);
-        }
-    }
 }

@@ -5,8 +5,7 @@
 package edu.jas.fd;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +33,7 @@ import edu.jas.structure.RingFactory;
 public class FDUtil {
 
 
-    private static final Logger logger = LogManager.getLogger(FDUtil.class);
+    private static final Logger logger = Logger.getLogger(FDUtil.class);
 
 
     private static final boolean debug = true; //logger.isDebugEnabled();

@@ -23,7 +23,7 @@ import com.gx.errorprone.annotations.CompatibleWith;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
+import com.duy.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 

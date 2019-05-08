@@ -19,15 +19,15 @@ import com.gx.common.annotations.GwtCompatible;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
- * Unchecked variant of {@link java.util.concurrent.ExecutionException}. As with {@code
- * ExecutionException}, the exception's {@linkplain #getCause() cause} comes from a failed task,
+ * Unchecked variant of {#link java.util.concurrent.ExecutionException}. As with {@code
+ * ExecutionException}, the exception's {#linkplain #getCause() cause} comes from a failed task,
  * possibly run in another thread.
  * <p>
  * <p>{@code UncheckedExecutionException} is intended as an alternative to {@code
  * ExecutionException} when the exception thrown by a task is an unchecked exception. However, it
  * may also wrap a checked exception in some cases.
  * <p>
- * <p>When wrapping an {@code Error} from another thread, prefer {@link ExecutionError}. When
+ * <p>When wrapping an {@code Error} from another thread, prefer {#link ExecutionError}. When
  * wrapping a checked exception, prefer {@code ExecutionException}.
  *
  * @author Charles Fry
@@ -37,25 +37,6 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 public class UncheckedExecutionException extends RuntimeException {
     private static final long serialVersionUID = 0;
 
-    /**
-     * Creates a new instance with {@code null} as its detail message.
-     */
-    protected UncheckedExecutionException() {
-    }
-
-    /**
-     * Creates a new instance with the given detail message.
-     */
-    protected UncheckedExecutionException(@NullableDecl String message) {
-        super(message);
-    }
-
-    /**
-     * Creates a new instance with the given detail message and cause.
-     */
-    public UncheckedExecutionException(@NullableDecl String message, @NullableDecl Throwable cause) {
-        super(message, cause);
-    }
 
     /**
      * Creates a new instance with the given cause.

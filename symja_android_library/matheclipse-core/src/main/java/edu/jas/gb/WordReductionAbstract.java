@@ -5,8 +5,7 @@
 package edu.jas.gb;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -31,7 +30,7 @@ import edu.jas.structure.RingElem;
 public abstract class WordReductionAbstract<C extends RingElem<C>> implements WordReduction<C> {
 
 
-    private static final Logger logger = LogManager.getLogger(WordReductionAbstract.class);
+    private static final Logger logger = Logger.getLogger(WordReductionAbstract.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();

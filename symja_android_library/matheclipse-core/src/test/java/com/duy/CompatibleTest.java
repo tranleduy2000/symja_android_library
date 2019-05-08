@@ -19,8 +19,15 @@ public class CompatibleTest extends TestCase {
                 "import java.security",
                 ".DOUBLE_EPSILON",
                 "java.util.UUID",
+
+
+                // Problem with Objc ARC
                 "java.util.concurrent.ThreadPoolExecutor",
+
+                // Problem with Objc ARC
                 "java.util.concurrent.Executors",
+
+                // Problem with Objc ARC
                 "java.util.concurrent.ExecutorService",
         };
 

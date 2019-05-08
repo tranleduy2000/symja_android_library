@@ -190,7 +190,7 @@ public class GCDcoFactors<C extends GcdRingElem<C>> implements Serializable {
     /**
      * Hash code for this GCDcoFactors.
      *
-     * @see java.lang.Object#hashCode()
+     * @see Object#hashCode()
      */
     @Override
     public int hashCode() {
@@ -211,7 +211,7 @@ public class GCDcoFactors<C extends GcdRingElem<C>> implements Serializable {
     /**
      * Comparison with any other object.
      *
-     * @see java.lang.Object#equals(java.lang.Object)
+     * @see Object#equals(Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -229,7 +229,7 @@ public class GCDcoFactors<C extends GcdRingElem<C>> implements Serializable {
     /**
      * Get the String representation.
      *
-     * @see java.lang.Object#toString()
+     * @see Object#toString()
      */
     @Override
     public String toString() {

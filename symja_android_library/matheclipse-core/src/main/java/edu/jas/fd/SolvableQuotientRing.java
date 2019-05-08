@@ -5,8 +5,7 @@
 package edu.jas.fd;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public class SolvableQuotientRing<C extends GcdRingElem<C>> implements RingFacto
     // should be QuotPairFactory<GenSolvablePolynomial<C>
 
 
-    private static final Logger logger = LogManager.getLogger(SolvableQuotientRing.class);
+    private static final Logger logger = Logger.getLogger(SolvableQuotientRing.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();

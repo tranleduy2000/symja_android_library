@@ -5,8 +5,7 @@
 package edu.jas.gb;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ import edu.jas.structure.GcdRingElem;
 public class GBOptimized<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
 
 
-    private static final Logger logger = LogManager.getLogger(GBOptimized.class);
+    private static final Logger logger = Logger.getLogger(GBOptimized.class);
 
 
     private static final boolean debug = logger.isDebugEnabled(); //logger.isInfoEnabled();
@@ -70,7 +69,7 @@ public class GBOptimized<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<
     /**
      * Get the String representation with GB engine.
      *
-     * @see java.lang.Object#toString()
+     * @see Object#toString()
      */
     @Override
     public String toString() {

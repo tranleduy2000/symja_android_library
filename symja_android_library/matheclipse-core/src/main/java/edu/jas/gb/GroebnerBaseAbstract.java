@@ -5,8 +5,7 @@
 package edu.jas.gb;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,7 +42,7 @@ import edu.jas.vector.BasicLinAlg;
 public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements GroebnerBase<C> {
 
 
-    private static final Logger logger = LogManager.getLogger(GroebnerBaseAbstract.class);
+    private static final Logger logger = Logger.getLogger(GroebnerBaseAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -117,7 +116,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
     /**
      * Get the String representation with GB engines.
      *
-     * @see java.lang.Object#toString()
+     * @see Object#toString()
      */
     @Override
     public String toString() {

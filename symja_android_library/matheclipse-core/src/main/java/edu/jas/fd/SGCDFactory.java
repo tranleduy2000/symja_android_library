@@ -5,8 +5,7 @@
 package edu.jas.fd;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
@@ -64,7 +63,7 @@ import edu.jas.structure.RingFactory;
 public class SGCDFactory {
 
 
-    private static final Logger logger = LogManager.getLogger(SGCDFactory.class);
+    private static final Logger logger = Logger.getLogger(SGCDFactory.class);
 
 
     /**

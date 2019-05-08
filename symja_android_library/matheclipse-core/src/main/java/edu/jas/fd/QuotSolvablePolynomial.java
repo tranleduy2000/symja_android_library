@@ -5,8 +5,7 @@
 package edu.jas.fd;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +34,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         GenSolvablePolynomial<SolvableQuotient<C>> {
 
 
-    private static final Logger logger = LogManager.getLogger(QuotSolvablePolynomial.class);
+    private static final Logger logger = Logger.getLogger(QuotSolvablePolynomial.class);
     private static final boolean debug = logger.isDebugEnabled();
     /**
      * The factory for the recursive solvable polynomial ring. Hides super.ring.
@@ -120,7 +119,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
     /**
      * Clone this QuotSolvablePolynomial.
      *
-     * @see java.lang.Object#clone()
+     * @see Object#clone()
      */
     @Override
     public QuotSolvablePolynomial<C> copy() {
@@ -131,7 +130,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
     /**
      * Comparison with any other object.
      *
-     * @see java.lang.Object#equals(java.lang.Object)
+     * @see Object#equals(Object)
      */
     @Override
     public boolean equals(Object B) {

@@ -5,8 +5,7 @@
 package edu.jas.fd;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +36,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         implements GreatestCommonDivisor<C> {
 
 
-    private static final Logger logger = LogManager.getLogger(GreatestCommonDivisorAbstract.class);
+    private static final Logger logger = Logger.getLogger(GreatestCommonDivisorAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -87,7 +86,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
     /**
      * Get the String representation.
      *
-     * @see java.lang.Object#toString()
+     * @see Object#toString()
      */
     @Override
     public String toString() {

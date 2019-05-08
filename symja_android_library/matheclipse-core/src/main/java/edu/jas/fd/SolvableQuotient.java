@@ -5,8 +5,7 @@
 package edu.jas.fd;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.Arrays;
 
@@ -32,7 +31,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
     // should be QuotPair<GenSolvablePolynomial<C>
 
 
-    private static final Logger logger = LogManager.getLogger(SolvableQuotient.class);
+    private static final Logger logger = Logger.getLogger(SolvableQuotient.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -195,7 +194,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
     /**
      * Clone this.
      *
-     * @see java.lang.Object#clone()
+     * @see Object#clone()
      */
     @Override
     public SolvableQuotient<C> copy() {
@@ -483,17 +482,6 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
     }
 
     /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a SolvableQuotient
-     * @return [this/S, this - (this/S)*S].
-     */
-    @SuppressWarnings("unchecked")
-    public SolvableQuotient<C>[] quotientRemainder(SolvableQuotient<C> S) {
-        return new SolvableQuotient[]{divide(S), remainder(S)};
-    }
-
-    /**
      * SolvableQuotient inverse.
      *
      * @return S with S = 1/this.
@@ -509,7 +497,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
     /**
      * Hash code for this element.
      *
-     * @see java.lang.Object#hashCode()
+     * @see Object#hashCode()
      */
     @Override
     public int hashCode() {
@@ -523,7 +511,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
     /**
      * Comparison with any other object.
      *
-     * @see java.lang.Object#equals(java.lang.Object)
+     * @see Object#equals(Object)
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -544,7 +532,7 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
     /**
      * Get the String representation as RingElem.
      *
-     * @see java.lang.Object#toString()
+     * @see Object#toString()
      */
     @Override
     public String toString() {
@@ -593,6 +581,17 @@ public class SolvableQuotient<C extends GcdRingElem<C>> extends RingElemImpl<Sol
         GenSolvablePolynomial<C> x = den.multiply(s.num);
         GenSolvablePolynomial<C> y = num.multiply(s.den);
         return x.compareTo(y) == 0;
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a SolvableQuotient
+     * @return [this/S, this - (this/S)*S].
+     */
+    @SuppressWarnings("unchecked")
+    public SolvableQuotient<C>[] quotientRemainder(SolvableQuotient<C> S) {
+        return new SolvableQuotient[]{divide(S), remainder(S)};
     }
 
     /**

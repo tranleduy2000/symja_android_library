@@ -5,8 +5,7 @@
 package edu.jas.gb;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ import edu.jas.structure.RingElem;
 public class EReductionSeq<C extends RingElem<C>> extends DReductionSeq<C> implements EReduction<C> {
 
 
-    private static final Logger logger = LogManager.getLogger(DReductionSeq.class);
+    private static final Logger logger = Logger.getLogger(DReductionSeq.class);
 
 
     /**
