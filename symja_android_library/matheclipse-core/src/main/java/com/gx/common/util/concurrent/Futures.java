@@ -320,7 +320,7 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
      *                      {@code get()} throws a different kind of exception, that exception itself.
      * @since 19.0
      * @deprecated Use {@linkplain #catching(ListenableFuture, Class, Function, Executor) the overload
-     * that requires an executor}. For identical behavior, pass {@link
+     * that requires an executor}. For identical behavior, pass {link
      * MoreExecutors#directExecutor}, but consider whether another executor would be safer, as
      * discussed in the {@link ListenableFuture#addListener ListenableFuture.addListener}
      * documentation. This method is scheduled to be removed in July 2018.
@@ -440,7 +440,7 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
      *                      {@code get()} throws a different kind of exception, that exception itself.
      * @since 19.0 (similar functionality in 14.0 as {@code withFallback})
      * @deprecated Use {@linkplain #catchingAsync(ListenableFuture, Class, AsyncFunction, Executor)
-     * the overload that requires an executor}. For identical behavior, pass {@link
+     * the overload that requires an executor}. For identical behavior, pass {link
      * MoreExecutors#directExecutor}, but consider whether another executor would be safer, as
      * discussed in the {@link ListenableFuture#addListener ListenableFuture.addListener}
      * documentation. This method is scheduled to be removed in July 2018.
@@ -582,7 +582,7 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
      * input's failure (if not)
      * @since 19.0 (in 11.0 as {@code transform})
      * @deprecated Use {@linkplain #transformAsync(ListenableFuture, AsyncFunction, Executor) the
-     * overload that requires an executor}. For identical behavior, pass {@link
+     * overload that requires an executor}. For identical behavior, pass {link
      * MoreExecutors#directExecutor}, but consider whether another executor would be safer, as
      * discussed in the {@link ListenableFuture#addListener ListenableFuture.addListener}
      * documentation. This method is scheduled to be removed in July 2018.
@@ -667,7 +667,7 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
      * @return A future that holds result of the transformation.
      * @since 9.0 (in 1.0 as {@code compose})
      * @deprecated Use {@linkplain #transform(ListenableFuture, Function, Executor) the overload that
-     * requires an executor}. For identical behavior, pass {@link MoreExecutors#directExecutor},
+     * requires an executor}. For identical behavior, pass {link MoreExecutors#directExecutor},
      * but consider whether another executor would be safer, as discussed in the {@link
      * ListenableFuture#addListener ListenableFuture.addListener} documentation. This method is
      * scheduled to be removed in July 2018.
@@ -1011,7 +1011,7 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
      * @param callback The callback to invoke when {@code future} is completed.
      * @since 10.0
      * @deprecated Use {@linkplain #addCallback(ListenableFuture, FutureCallback, Executor) the
-     * overload that requires an executor}. For identical behavior, pass {@link
+     * overload that requires an executor}. For identical behavior, pass {link
      * MoreExecutors#directExecutor}, but consider whether another executor would be safer, as
      * discussed in the {@link ListenableFuture#addListener ListenableFuture.addListener}
      * documentation. This method is scheduled to be removed in July 2018.
@@ -1322,11 +1322,11 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
         }
 
         /**
-         * Like {@link #callAsync(AsyncCallable, Executor)} but using {@linkplain
+         * Like {@link #callAsync(AsyncCallable, Executor)} but using {linkplain
          * MoreExecutors#directExecutor direct executor}.
          *
          * @deprecated Use {@linkplain #callAsync(AsyncCallable, Executor) the overload that requires an
-         * executor}. For identical behavior, pass {@link MoreExecutors#directExecutor}, but
+         * executor}. For identical behavior, pass {link MoreExecutors#directExecutor}, but
          * consider whether another executor would be safer, as discussed in the {@link
          * ListenableFuture#addListener ListenableFuture.addListener} documentation. This method is
          * scheduled to be removed in July 2018.
@@ -1357,11 +1357,11 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
         }
 
         /**
-         * Like {@link #call(Callable, Executor)} but using {@linkplain MoreExecutors#directExecutor
+         * Like {@link #call(Callable, Executor)} but using {linkplain MoreExecutors#directExecutor
          * direct executor}.
          *
          * @deprecated Use {@linkplain #call(Callable, Executor) the overload that requires an
-         * executor}. For identical behavior, pass {@link MoreExecutors#directExecutor}, but
+         * executor}. For identical behavior, pass {link MoreExecutors#directExecutor}, but
          * consider whether another executor would be safer, as discussed in the {@link
          * ListenableFuture#addListener ListenableFuture.addListener} documentation. This method is
          * scheduled to be removed in July 2018.

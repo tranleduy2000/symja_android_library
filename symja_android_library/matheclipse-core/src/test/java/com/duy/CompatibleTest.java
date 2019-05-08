@@ -19,6 +19,9 @@ public class CompatibleTest extends TestCase {
                 "import java.security",
                 ".DOUBLE_EPSILON",
                 "java.util.UUID",
+                "java.util.concurrent.ThreadPoolExecutor",
+                "java.util.concurrent.Executors",
+                "java.util.concurrent.ExecutorService",
         };
 
         File sourceDir = new File("../symja_android_library/matheclipse-core/src/main/java");
@@ -28,7 +31,7 @@ public class CompatibleTest extends TestCase {
             String content = FileUtils.readFileToString(javaFile);
             for (String unavailablePackage : unavailableSymbols) {
                 if (content.contains(unavailablePackage)) {
-                    System.err.println("Warn: Symbol " + (unavailablePackage) + " is unavailable in class " + javaFile.getName());
+                    System.err.println("Symbol " + (unavailablePackage) + " is unavailable in class " + javaFile);
                 }
             }
         }

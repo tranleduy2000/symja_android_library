@@ -17,7 +17,6 @@ package com.gx.common.util.concurrent;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.annotations.GwtIncompatible;
-import com.gx.common.annotations.VisibleForTesting;
 import com.gx.common.base.Supplier;
 import com.gx.common.base.Throwables;
 import com.gx.common.collect.Lists;
@@ -41,9 +40,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -63,15 +60,6 @@ import static com.gx.common.base.Preconditions.checkNotNull;
 @GwtCompatible(emulated = true)
 public final class MoreExecutors {
     private MoreExecutors() {
-    }
-
-    @GwtIncompatible // TODO
-    private static void useDaemonThreadFactory(ThreadPoolExecutor executor) {
-        executor.setThreadFactory(
-                new ThreadFactoryBuilder()
-                        .setDaemon(true)
-                        .setThreadFactory(executor.getThreadFactory())
-                        .build());
     }
 
     /**
@@ -577,69 +565,6 @@ public final class MoreExecutors {
         @Override
         public String toString() {
             return "MoreExecutors.directExecutor()";
-        }
-    }
-
-    /**
-     * Represents the current application to register shutdown hooks.
-     */
-    @GwtIncompatible // TODO
-    @VisibleForTesting
-    static class Application {
-
-        final ExecutorService getExitingExecutorService(
-                ThreadPoolExecutor executor, long terminationTimeout, TimeUnit timeUnit) {
-            useDaemonThreadFactory(executor);
-            ExecutorService service = Executors.unconfigurableExecutorService(executor);
-            addDelayedShutdownHook(executor, terminationTimeout, timeUnit);
-            return service;
-        }
-
-        final ExecutorService getExitingExecutorService(ThreadPoolExecutor executor) {
-            return getExitingExecutorService(executor, 120, TimeUnit.SECONDS);
-        }
-
-        final ScheduledExecutorService getExitingScheduledExecutorService(
-                ScheduledThreadPoolExecutor executor, long terminationTimeout, TimeUnit timeUnit) {
-            useDaemonThreadFactory(executor);
-            ScheduledExecutorService service = Executors.unconfigurableScheduledExecutorService(executor);
-            addDelayedShutdownHook(executor, terminationTimeout, timeUnit);
-            return service;
-        }
-
-        final ScheduledExecutorService getExitingScheduledExecutorService(
-                ScheduledThreadPoolExecutor executor) {
-            return getExitingScheduledExecutorService(executor, 120, TimeUnit.SECONDS);
-        }
-
-        final void addDelayedShutdownHook(
-                final ExecutorService service, final long terminationTimeout, final TimeUnit timeUnit) {
-            checkNotNull(service);
-            checkNotNull(timeUnit);
-            addShutdownHook(
-                    MoreExecutors.newThread(
-                            "DelayedShutdownHook-for-" + service,
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        // We'd like to log progress and failures that may arise in the
-                                        // following code, but unfortunately the behavior of logging
-                                        // is undefined in shutdown hooks.
-                                        // This is because the logging code installs a shutdown hook of its
-                                        // own. See Cleaner class inside {@link LogManager}.
-                                        service.shutdown();
-                                        service.awaitTermination(terminationTimeout, timeUnit);
-                                    } catch (InterruptedException ignored) {
-                                        // We're shutting down anyway, so just ignore.
-                                    }
-                                }
-                            }));
-        }
-
-        @VisibleForTesting
-        void addShutdownHook(Thread hook) {
-            Runtime.getRuntime().addShutdownHook(hook);
         }
     }
 

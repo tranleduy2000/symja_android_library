@@ -71,8 +71,8 @@ import java.util.concurrent.RejectedExecutionException;
  * <p>
  * <ul>
  * <li>If you receive them from an {@code java.util.concurrent.ExecutorService}, convert that
- * service to a {@link ListeningExecutorService}, usually by calling {@link
- * MoreExecutors#listeningDecorator(java.util.concurrent.ExecutorService)
+ * service to a {@link ListeningExecutorService}, usually by calling {link
+     * MoreExecutors#listeningDecorator(java.util.concurrent.ExecutorService)
  * MoreExecutors.listeningDecorator}.
  * <li>If you manually call {@link java.util.concurrent.FutureTask#set} or a similar method,
  * create a {@link SettableFuture} instead. (If your needs are more complex, you may prefer
@@ -110,11 +110,11 @@ public interface ListenableFuture<V> extends Future<V> {
      * <p>
      * <p>Exceptions thrown by a listener will be propagated up to the executor. Any exception thrown
      * during {@code Executor.execute} (e.g., a {@code RejectedExecutionException} or an exception
-     * thrown by {@linkplain MoreExecutors#directExecutor direct execution}) will be caught and
+     * thrown by {linkplain MoreExecutors#directExecutor direct execution}) will be caught and
      * logged.
      * <p>
      * <p>Note: For fast, lightweight listeners that would be safe to execute in any thread, consider
-     * {@link MoreExecutors#directExecutor}. Otherwise, avoid it. Heavyweight {@code directExecutor}
+     * {link MoreExecutors#directExecutor}. Otherwise, avoid it. Heavyweight {@code directExecutor}
      * listeners can cause problems, and these problems can be difficult to reproduce because they
      * depend on timing. For example:
      * <p>
