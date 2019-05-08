@@ -76,15 +76,26 @@ public class SigPair<C extends RingElem<C>> //extends AbstractSigPair<C>
         return sigma.degree();
     }
 
-
     /**
-     * toString.
+     * compareTo used in TreeMap // not used at moment. Comparison is based on
+     * the number of the pairs.
+     *
+     * @param p a SigPair.
+     * @return 1 if (this &lt; o), 0 if (this == o), -1 if (this &gt; o).
      */
-    @Override
-    public String toString() {
-        return "pair(" + sigma + " @ " + pi + ", " + pj + ")";
+    public int compareTo(SigPair<C> p) {
+        return sigma.compareTo(p.sigma);
     }
 
+    /**
+     * Hash code for this SigPair.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return (pi.hashCode() << 16) + pj.hashCode();
+    }
 
     /**
      * equals.
@@ -102,27 +113,12 @@ public class SigPair<C extends RingElem<C>> //extends AbstractSigPair<C>
         return 0 == compareTo((SigPair) ob);
     }
 
-
     /**
-     * compareTo used in TreeMap // not used at moment. Comparison is based on
-     * the number of the pairs.
-     *
-     * @param p a SigPair.
-     * @return 1 if (this &lt; o), 0 if (this == o), -1 if (this &gt; o).
-     */
-    public int compareTo(SigPair<C> p) {
-        return sigma.compareTo(p.sigma);
-    }
-
-
-    /**
-     * Hash code for this SigPair.
-     *
-     * @see Object#hashCode()
+     * toString.
      */
     @Override
-    public int hashCode() {
-        return (pi.hashCode() << 16) + pj.hashCode();
+    public String toString() {
+        return "pair(" + sigma + " @ " + pi + ", " + pj + ")";
     }
 
 }

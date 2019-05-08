@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.jas.structure.RingElem;
 
@@ -23,7 +23,7 @@ import edu.jas.structure.RingElem;
 public class WeylRelationsIterated<C extends RingElem<C>> implements RelationGenerator<C> {
 
 
-    private static final Logger logger = Logger.getLogger(WeylRelationsIterated.class);
+    private static final Logger logger = LogManager.getLogger(WeylRelationsIterated.class);
     /**
      * The factory for the solvable polynomial ring.
      */

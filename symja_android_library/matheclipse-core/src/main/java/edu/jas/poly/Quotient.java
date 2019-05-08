@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPair;
@@ -23,7 +23,7 @@ import edu.jas.structure.RingElemImpl;
 public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> implements RingElem<Quotient<C>>, QuotPair<C> {
 
 
-    private static final Logger logger = Logger.getLogger(Quotient.class);
+    private static final Logger logger = LogManager.getLogger(Quotient.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -130,18 +130,6 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         }
     }
 
-
-    /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public QuotientRing<C> factory() {
-        return ring;
-    }
-
-
     /**
      * Numerator.
      *
@@ -150,7 +138,6 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
     public C numerator() {
         return num;
     }
-
 
     /**
      * Denominator.
@@ -161,97 +148,24 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         return den;
     }
 
-
     /**
      * Is Quotient a constant. Not implemented.
      *
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException.
      */
     public boolean isConstant() {
         throw new UnsupportedOperationException("isConstant not implemented");
     }
 
-
     /**
      * Clone this.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public Quotient<C> copy() {
         return new Quotient<C>(ring, num, den, true);
     }
-
-
-    /**
-     * Is Quotient zero.
-     *
-     * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
-     */
-    public boolean isZERO() {
-        return num.isZERO();
-    }
-
-
-    /**
-     * Is Quotient one.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        return num.equals(den);
-    }
-
-
-    /**
-     * Is Quotient unit.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        return !num.isZERO();
-    }
-
-
-    /**
-     * Get the String representation as RingElem.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "Quotient[ " + num.toString() + " / " + den.toString() + " ]";
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return "Quotient( " + num.toScript() + " , " + den.toScript() + " )";
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return factory().toScript();
-    }
-
 
     /**
      * Quotient comparison.
@@ -270,51 +184,59 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         return x.signum();
     }
 
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public QuotientRing<C> factory() {
+        return ring;
+    }
 
     /**
-     * Comparison with any other object.
+     * Get a scripting compatible string representation.
      *
-     * @see Object#equals(Object)
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof Quotient)) {
-            return false;
-        }
-        Quotient<C> a = (Quotient<C>) b;
-        return (0 == compareTo(a));
+    public String toScript() {
+        // Python case
+        return "Quotient( " + num.toScript() + " , " + den.toScript() + " )";
     }
 
-
     /**
-     * Hash code for this local.
+     * Get a scripting compatible string representation of the factory.
      *
-     * @see Object#hashCode()
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        h = 37 * h + num.hashCode();
-        h = 37 * h + den.hashCode();
-        return h;
+    public String toScriptFactory() {
+        // Python case
+        return factory().toScript();
     }
-
 
     /**
-     * Quotient absolute value.
+     * Is Quotient zero.
      *
-     * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @return If this is 0 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isZERO()
      */
-    public Quotient<C> abs() {
-        return new Quotient<C>(ring, num.abs(), den, true);
+    public boolean isZERO() {
+        return num.isZERO();
     }
 
+    /**
+     * Quotient signum.
+     *
+     * @return signum(this).
+     * @see edu.jas.structure.RingElem#signum()
+     */
+    public int signum() {
+        return num.signum();
+    }
 
     /**
      * Quotient summation.
@@ -332,29 +254,6 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         return new Quotient<C>(ring, n, d, false);
     }
 
-
-    /**
-     * Quotient negate.
-     *
-     * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public Quotient<C> negate() {
-        return new Quotient<C>(ring, num.negate(), den, true);
-    }
-
-
-    /**
-     * Quotient signum.
-     *
-     * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
-     */
-    public int signum() {
-        return num.signum();
-    }
-
-
     /**
      * Quotient subtraction.
      *
@@ -371,54 +270,45 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         return new Quotient<C>(ring, n, d, false);
     }
 
-
     /**
-     * Quotient division.
+     * Quotient negate.
      *
-     * @param S Quotient.
-     * @return this/S.
+     * @return -this.
+     * @see edu.jas.structure.RingElem#negate()
      */
-    public Quotient<C> divide(Quotient<C> S) {
-        return multiply(S.inverse());
+    public Quotient<C> negate() {
+        return new Quotient<C>(ring, num.negate(), den, true);
     }
 
-
     /**
-     * Quotient inverse.
+     * Quotient absolute value.
      *
-     * @return S with S = 1/this.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @return the absolute value of this.
+     * @see edu.jas.structure.RingElem#abs()
      */
-    public Quotient<C> inverse() {
-        return new Quotient<C>(ring, den, num, true);
+    public Quotient<C> abs() {
+        return new Quotient<C>(ring, num.abs(), den, true);
     }
 
-
     /**
-     * Quotient remainder.
+     * Is Quotient one.
      *
-     * @param S Quotient.
-     * @return this - (this/S)*S.
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
      */
-    public Quotient<C> remainder(Quotient<C> S) {
-        if (num.isZERO()) {
-            throw new ArithmeticException("element not invertible " + this);
-        }
-        return ring.getZERO();
+    public boolean isONE() {
+        return num.equals(den);
     }
 
-
     /**
-     * Quotient and remainder by division of this by S.
+     * Is Quotient unit.
      *
-     * @param S a Quotient
-     * @return [this/S, this - (this/S)*S].
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
      */
-    @SuppressWarnings("unchecked")
-    public Quotient<C>[] quotientRemainder(Quotient<C> S) {
-        return new Quotient[]{divide(S), remainder(S)};
+    public boolean isUnit() {
+        return !num.isZERO();
     }
-
 
     /**
      * Quotient multiplication.
@@ -444,6 +334,91 @@ public class Quotient<C extends RingElem<C>> extends RingElemImpl<Quotient<C>> i
         return new Quotient<C>(ring, n, d, false);
     }
 
+    /**
+     * Quotient division.
+     *
+     * @param S Quotient.
+     * @return this/S.
+     */
+    public Quotient<C> divide(Quotient<C> S) {
+        return multiply(S.inverse());
+    }
+
+    /**
+     * Quotient remainder.
+     *
+     * @param S Quotient.
+     * @return this - (this/S)*S.
+     */
+    public Quotient<C> remainder(Quotient<C> S) {
+        if (num.isZERO()) {
+            throw new ArithmeticException("element not invertible " + this);
+        }
+        return ring.getZERO();
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a Quotient
+     * @return [this/S, this - (this/S)*S].
+     */
+    @SuppressWarnings("unchecked")
+    public Quotient<C>[] quotientRemainder(Quotient<C> S) {
+        return new Quotient[]{divide(S), remainder(S)};
+    }
+
+    /**
+     * Quotient inverse.
+     *
+     * @return S with S = 1/this.
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public Quotient<C> inverse() {
+        return new Quotient<C>(ring, den, num, true);
+    }
+
+    /**
+     * Hash code for this local.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        h = 37 * h + num.hashCode();
+        h = 37 * h + den.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof Quotient)) {
+            return false;
+        }
+        Quotient<C> a = (Quotient<C>) b;
+        return (0 == compareTo(a));
+    }
+
+    /**
+     * Get the String representation as RingElem.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "Quotient[ " + num.toString() + " / " + den.toString() + " ]";
+    }
 
     /**
      * Quotient monic.

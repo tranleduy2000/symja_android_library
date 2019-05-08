@@ -111,6 +111,31 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
     }
 
     /**
+     * Copy this.
+     *
+     * @return copy of this.
+     */
+    @Override
+    public Word copy() {
+        return new Word(mono, val, false);
+    }
+
+    /**
+     * Word compareTo. Uses <code>String.compareTo</code>.
+     *
+     * @param V other word.
+     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
+     */
+    @Override
+    public int compareTo(Word V) {
+        if (mono == V.mono) {
+            return val.compareTo(V.val);
+        }
+        //System.out.println("compareTo: mono " + mono + ", V = " + V.mono);
+        return toString().compareTo(V.toString());
+    }
+
+    /**
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
@@ -121,13 +146,46 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
     }
 
     /**
-     * Copy this.
+     * Get a scripting compatible string representation.
      *
-     * @return copy of this.
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    public Word copy() {
-        return new Word(mono, val, false);
+    public String toScript() {
+        if (val.length() == 0) {
+            return "";
+        }
+        StringBuffer s = new StringBuffer();
+        if (mono.translation == null) {
+            for (int i = 0; i < length(); i++) {
+                if (i != 0) {
+                    s.append("*"); // checked for python vs ruby
+                }
+                s.append(getVal(i));
+            }
+        } else {
+            for (int i = 0; i < length(); i++) {
+                if (i != 0) {
+                    s.append("*"); // checked for python vs ruby
+                }
+                s.append(mono.transVar(getVal(i)));
+            }
+        }
+        s.append("");
+        return s.toString();
+    }
+
+    /**
+     * Get a scripting compatible string representation of the factory.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
+     */
+    @Override
+    public String toScriptFactory() {
+        // Python case
+        return mono.toString();
     }
 
     /**
@@ -159,9 +217,39 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
     }
 
     /**
+     * hashCode.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        if (hash == 0) {
+            hash = val.hashCode();
+        }
+        return hash;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object B) {
+        if (!(B instanceof Word)) {
+            return false;
+        }
+        Word b = (Word) B;
+        // mono == b.mono ??
+        int t = this.compareTo(b);
+        //System.out.println("equals: this = " + this.val + " b = " + b.val + " t = " + t);
+        return (0 == t);
+    }
+
+    /**
      * Get the string representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -186,78 +274,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         }
         s.append("\"");
         return s.toString();
-    }
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        if (val.length() == 0) {
-            return "";
-        }
-        StringBuffer s = new StringBuffer();
-        if (mono.translation == null) {
-            for (int i = 0; i < length(); i++) {
-                if (i != 0) {
-                    s.append("*"); // checked for python vs ruby
-                }
-                s.append(getVal(i));
-            }
-        } else {
-            for (int i = 0; i < length(); i++) {
-                if (i != 0) {
-                    s.append("*"); // checked for python vs ruby
-                }
-                s.append(mono.transVar(getVal(i)));
-            }
-        }
-        return s.toString();
-    }
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return mono.toString();
-    }
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    public boolean equals(Object B) {
-        if (!(B instanceof Word)) {
-            return false;
-        }
-        Word b = (Word) B;
-        // mono == b.mono ??
-        int t = this.compareTo(b);
-        //System.out.println("equals: this = " + this.val + " b = " + b.val + " t = " + t);
-        return (0 == t);
-    }
-
-    /**
-     * hashCode.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        if (hash == 0) {
-            hash = val.hashCode();
-        }
-        return hash;
     }
 
     /**
@@ -296,6 +312,42 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
      */
     public Word divide(Word V) {
         return divideLeft(V);
+    }
+
+    /**
+     * Word remainder.
+     *
+     * @param V other word.
+     * @return this (this/V). <b>Note:</b> not useful.
+     */
+    public Word remainder(Word V) {
+        int i = this.val.indexOf(V.val);
+        if (i < 0) {
+            throw new NotInvertibleException("not dividable: " + this + ", other " + V);
+        }
+        return V;
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a Word
+     * @return [this/S, this - (this/S)*S]. <b>Note:</b> not useful.
+     */
+    public Word[] quotientRemainder(Word S) {
+        return new Word[]{divide(S), remainder(S)};
+    }
+
+    /**
+     * Word inverse.
+     *
+     * @return 1 / this.
+     */
+    public Word inverse() {
+        if (val.length() == 0) {
+            return this;
+        }
+        throw new NotInvertibleException("not inversible " + this);
     }
 
     /**
@@ -367,42 +419,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
     }
 
     /**
-     * Word remainder.
-     *
-     * @param V other word.
-     * @return this (this/V). <b>Note:</b> not useful.
-     */
-    public Word remainder(Word V) {
-        int i = this.val.indexOf(V.val);
-        if (i < 0) {
-            throw new NotInvertibleException("not dividable: " + this + ", other " + V);
-        }
-        return V;
-    }
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a Word
-     * @return [this/S, this - (this/S)*S]. <b>Note:</b> not useful.
-     */
-    public Word[] quotientRemainder(Word S) {
-        return new Word[]{divide(S), remainder(S)};
-    }
-
-    /**
-     * Word inverse.
-     *
-     * @return 1 / this.
-     */
-    public Word inverse() {
-        if (val.length() == 0) {
-            return this;
-        }
-        throw new NotInvertibleException("not inversible " + this);
-    }
-
-    /**
      * Word signum.
      *
      * @return 0 if this is one, 1 if it is non empty.
@@ -461,7 +477,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return ExpVector.create(k, j, n);
     }
 
-
     /**
      * Word without leading exponent vector.
      *
@@ -489,7 +504,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return new Word(mono, r, false);
     }
 
-
     /**
      * Word multiple test.
      *
@@ -500,7 +514,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
         return this.val.contains(V.val);
     }
 
-
     /**
      * Word divides test.
      *
@@ -510,23 +523,6 @@ public final class Word extends MonoidElemImpl<Word> implements MonoidElem<Word>
     public boolean divides(Word V) {
         return V.val.contains(this.val);
     }
-
-
-    /**
-     * Word compareTo. Uses <code>String.compareTo</code>.
-     *
-     * @param V other word.
-     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
-     */
-    @Override
-    public int compareTo(Word V) {
-        if (mono == V.mono) {
-            return val.compareTo(V.val);
-        }
-        //System.out.println("compareTo: mono " + mono + ", V = " + V.mono);
-        return toString().compareTo(V.toString());
-    }
-
 
     /**
      * Word graded comparison. Compares first be degree, then lexicographical.

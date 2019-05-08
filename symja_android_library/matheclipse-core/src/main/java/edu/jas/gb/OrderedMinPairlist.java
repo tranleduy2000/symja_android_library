@@ -4,8 +4,8 @@
 
 package edu.jas.gb;
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.BitSet;
 import java.util.Iterator;
@@ -28,7 +28,7 @@ import edu.jas.structure.RingElem;
 
 public class OrderedMinPairlist<C extends RingElem<C>> extends OrderedPairlist<C> {
 
-    private static final Logger logger = Logger.getLogger(OrderedMinPairlist.class);
+    private static final Logger logger = LogManager.getLogger(OrderedMinPairlist.class);
 
 
     /**
@@ -140,7 +140,7 @@ public class OrderedMinPairlist<C extends RingElem<C>> extends OrderedPairlist<C
 
     /**
      * Remove the next required pair from the pairlist and reduction matrix.
-     * Appy the criterions 3 and 4 to @see if the S-polynomial is required.
+     * Appy the criterions 3 and 4 to see if the S-polynomial is required.
      *
      * @return the next pair if one exists, otherwise null.
      */

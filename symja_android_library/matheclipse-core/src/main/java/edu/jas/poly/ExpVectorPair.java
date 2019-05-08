@@ -57,20 +57,27 @@ public class ExpVectorPair implements Serializable {
         return e1.totalDeg() + e2.totalDeg();
     }
 
-
     /**
-     * toString.
+     * equals.
+     *
+     * @param b other.
+     * @return true, if this == b, else false.
      */
-    @Override
-    public String toString() {
-        StringBuffer s = new StringBuffer("ExpVectorPair[");
-        s.append(e1.toString());
-        s.append(",");
-        s.append(e2.toString());
-        s.append("]");
-        return s.toString();
+    public boolean equals(ExpVectorPair b) {
+        boolean t = e1.equals(b.getFirst());
+        t = t && e2.equals(b.getSecond());
+        return t;
     }
 
+    /**
+     * hash code.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return (e1.hashCode() << 16) + e2.hashCode();
+    }
 
     /**
      * equals.
@@ -84,30 +91,18 @@ public class ExpVectorPair implements Serializable {
         return equals((ExpVectorPair) B);
     }
 
-
     /**
-     * equals.
-     *
-     * @param b other.
-     * @return true, if this == b, else false.
-     */
-    public boolean equals(ExpVectorPair b) {
-        boolean t = e1.equals(b.getFirst());
-        t = t && e2.equals(b.getSecond());
-        return t;
-    }
-
-
-    /**
-     * hash code.
-     *
-     * @see Object#hashCode()
+     * toString.
      */
     @Override
-    public int hashCode() {
-        return (e1.hashCode() << 16) + e2.hashCode();
+    public String toString() {
+        StringBuffer s = new StringBuffer("ExpVectorPair[");
+        s.append(e1.toString());
+        s.append(",");
+        s.append(e2.toString());
+        s.append("]");
+        return s.toString();
     }
-
 
     /**
      * isMultiple.

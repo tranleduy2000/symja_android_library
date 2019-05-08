@@ -5,8 +5,8 @@
 package edu.jas.gb;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ import edu.jas.vector.BasicLinAlg;
 public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implements SolvableGroebnerBase<C> {
 
 
-    private static final Logger logger = Logger.getLogger(SolvableGroebnerBaseAbstract.class);
+    private static final Logger logger = LogManager.getLogger(SolvableGroebnerBaseAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -149,19 +149,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return isLeftGB(0, F, true);
     }
 
-
-    /**
-     * Left Groebner base test.
-     *
-     * @param F solvable polynomial list.
-     * @param b true for simple test, false for GB test.
-     * @return true, if F is a Groebner base, else false.
-     */
-    public boolean isLeftGB(List<GenSolvablePolynomial<C>> F, boolean b) {
-        return isLeftGB(0, F, b);
-    }
-
-
     /**
      * Left Groebner base test.
      *
@@ -173,75 +160,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return isLeftGB(modv, F, true);
     }
 
-
-    /**
-     * Left Groebner base test.
-     *
-     * @param modv module variable number.
-     * @param F    solvable polynomial list.
-     * @param b    true for simple test, false for GB test.
-     * @return true, if F is a Groebner base, else false.
-     */
-    public boolean isLeftGB(int modv, List<GenSolvablePolynomial<C>> F, boolean b) {
-        if (b) {
-            return isLeftGBsimple(modv, F);
-        }
-        return isLeftGBidem(modv, F);
-    }
-
-
-    /**
-     * Left Groebner base test.
-     *
-     * @param modv number of module variables.
-     * @param F    solvable polynomial list.
-     * @return true, if F is a left Groebner base, else false.
-     */
-    public boolean isLeftGBsimple(int modv, List<GenSolvablePolynomial<C>> F) {
-        GenSolvablePolynomial<C> pi, pj, s, h;
-        for (int i = 0; i < F.size(); i++) {
-            pi = F.get(i);
-            for (int j = i + 1; j < F.size(); j++) {
-                pj = F.get(j);
-                if (!red.moduleCriterion(modv, pi, pj)) {
-                    continue;
-                }
-                // if ( ! red.criterion4( pi, pj ) ) { continue; }
-                s = sred.leftSPolynomial(pi, pj);
-                if (s.isZERO()) {
-                    continue;
-                }
-                h = sred.leftNormalform(F, s);
-                if (!h.isZERO()) {
-                    logger.info("no left GB: pi = " + pi + ", pj = " + pj);
-                    logger.info("s  = " + s + ", h = " + h);
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Left Groebner base idempotence test.
-     *
-     * @param modv module variable number.
-     * @param F    solvable polynomial list.
-     * @return true, if F is equal to GB(F), else false.
-     */
-    public boolean isLeftGBidem(int modv, List<GenSolvablePolynomial<C>> F) {
-        if (F == null || F.isEmpty()) {
-            return true;
-        }
-        GenSolvablePolynomialRing<C> pring = F.get(0).ring;
-        List<GenSolvablePolynomial<C>> G = leftGB(modv, F);
-        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
-        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
-        return Fp.compareTo(Gp) == 0;
-    }
-
-
     /**
      * Twosided Groebner base test.
      *
@@ -251,7 +169,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
     public boolean isTwosidedGB(List<GenSolvablePolynomial<C>> Fp) {
         return isTwosidedGB(0, Fp);
     }
-
 
     /**
      * Twosided Groebner base test.
@@ -314,37 +231,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return true;
     }
 
-
-    /**
-     * Twosided Groebner base idempotence test.
-     *
-     * @param F solvable polynomial list.
-     * @return true, if F is equal to GB(F), else false.
-     */
-    public boolean isTwosidedGBidem(List<GenSolvablePolynomial<C>> F) {
-        return isTwosidedGBidem(0, F);
-    }
-
-
-    /**
-     * Twosided Groebner base idempotence test.
-     *
-     * @param modv module variable number.
-     * @param F    solvable polynomial list.
-     * @return true, if F is equal to GB(F), else false.
-     */
-    public boolean isTwosidedGBidem(int modv, List<GenSolvablePolynomial<C>> F) {
-        if (F == null || F.isEmpty()) {
-            return true;
-        }
-        GenSolvablePolynomialRing<C> pring = F.get(0).ring;
-        List<GenSolvablePolynomial<C>> G = twosidedGB(modv, F);
-        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
-        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
-        return Fp.compareTo(Gp) == 0;
-    }
-
-
     /**
      * Right Groebner base test.
      *
@@ -354,7 +240,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
     public boolean isRightGB(List<GenSolvablePolynomial<C>> F) {
         return isRightGB(0, F);
     }
-
 
     /**
      * Right Groebner base test.
@@ -393,37 +278,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return true;
     }
 
-
-    /**
-     * Right Groebner base idempotence test.
-     *
-     * @param F solvable polynomial list.
-     * @return true, if F is equal to GB(F), else false.
-     */
-    public boolean isRightGBidem(List<GenSolvablePolynomial<C>> F) {
-        return isRightGBidem(0, F);
-    }
-
-
-    /**
-     * Right Groebner base idempotence test.
-     *
-     * @param modv module variable number.
-     * @param F    solvable polynomial list.
-     * @return true, if F is equal to GB(F), else false.
-     */
-    public boolean isRightGBidem(int modv, List<GenSolvablePolynomial<C>> F) {
-        if (F == null || F.isEmpty()) {
-            return true;
-        }
-        GenSolvablePolynomialRing<C> pring = F.get(0).ring;
-        List<GenSolvablePolynomial<C>> G = rightGB(modv, F);
-        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
-        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
-        return Fp.compareTo(Gp) == 0;
-    }
-
-
     /**
      * Left Groebner base using pairlist class.
      *
@@ -434,7 +288,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return leftGB(0, F);
     }
 
-
     /**
      * Solvable Extended Groebner base using critical pair class.
      *
@@ -444,7 +297,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
     public SolvableExtendedGB<C> extLeftGB(List<GenSolvablePolynomial<C>> F) {
         return extLeftGB(0, F);
     }
-
 
     /**
      * Solvable Extended Groebner base using critical pair class.
@@ -458,7 +310,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         throw new UnsupportedOperationException("extLeftGB not implemented in "
                 + this.getClass().getSimpleName());
     }
-
 
     /**
      * Left minimal ordered groebner basis.
@@ -525,71 +376,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return F;
     }
 
-
-    /**
-     * Right minimal ordered groebner basis.
-     *
-     * @param Gp a right Groebner base.
-     * @return rightGBmi(F) a minimal right Groebner base of Gp.
-     */
-    public List<GenSolvablePolynomial<C>> rightMinimalGB(List<GenSolvablePolynomial<C>> Gp) {
-        ArrayList<GenSolvablePolynomial<C>> G = new ArrayList<GenSolvablePolynomial<C>>();
-        ListIterator<GenSolvablePolynomial<C>> it = Gp.listIterator();
-        for (GenSolvablePolynomial<C> a : Gp) {
-            if (a.length() != 0) { // always true
-                G.add(a);
-            }
-        }
-        if (G.size() <= 1) {
-            return G;
-        }
-
-        ExpVector e;
-        ExpVector f;
-        GenSolvablePolynomial<C> a, p;
-        ArrayList<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>();
-        boolean mt;
-
-        while (G.size() > 0) {
-            a = G.remove(0);
-            e = a.leadingExpVector();
-
-            it = G.listIterator();
-            mt = false;
-            while (it.hasNext() && !mt) {
-                p = it.next();
-                f = p.leadingExpVector();
-                mt = e.multipleOf(f);
-            }
-            it = F.listIterator();
-            while (it.hasNext() && !mt) {
-                p = it.next();
-                f = p.leadingExpVector();
-                mt = e.multipleOf(f);
-            }
-            if (!mt) {
-                F.add(a);
-            } else {
-                // System.out.println("dropped " + a.length());
-            }
-        }
-        G = F;
-        if (G.size() <= 1) {
-            return G;
-        }
-
-        F = new ArrayList<GenSolvablePolynomial<C>>();
-        while (G.size() > 0) {
-            a = G.remove(0);
-            // System.out.println("doing " + a.length());
-            a = sred.rightNormalform(G, a);
-            a = sred.rightNormalform(F, a);
-            F.add(a);
-        }
-        return F;
-    }
-
-
     /**
      * Twosided Groebner base using pairlist class.
      *
@@ -600,7 +386,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return twosidedGB(0, Fp);
     }
 
-
     /**
      * Right Groebner base using opposite ring left GB.
      *
@@ -610,7 +395,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
     public List<GenSolvablePolynomial<C>> rightGB(List<GenSolvablePolynomial<C>> F) {
         return rightGB(0, F);
     }
-
 
     /**
      * Right Groebner base using opposite ring left GB.
@@ -670,6 +454,56 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return G;
     }
 
+    /**
+     * Test if left reduction matrix.
+     *
+     * @param exgb an SolvableExtendedGB container.
+     * @return true, if exgb contains a left reduction matrix, else false.
+     */
+    public boolean isLeftReductionMatrix(SolvableExtendedGB<C> exgb) {
+        if (exgb == null) {
+            return true;
+        }
+        return isLeftReductionMatrix(exgb.F, exgb.G, exgb.F2G, exgb.G2F);
+    }
+
+    /**
+     * Test if left reduction matrix.
+     *
+     * @param F  a solvable polynomial list.
+     * @param G  a left Groebner base.
+     * @param Mf a possible left reduction matrix.
+     * @param Mg a possible left reduction matrix.
+     * @return true, if Mg and Mf are left reduction matrices, else false.
+     */
+    public boolean isLeftReductionMatrix(List<GenSolvablePolynomial<C>> F, List<GenSolvablePolynomial<C>> G,
+                                         List<List<GenSolvablePolynomial<C>>> Mf, List<List<GenSolvablePolynomial<C>>> Mg) {
+        // no more check G and Mg: G * Mg[i] == 0
+        // check F and Mg: F * Mg[i] == G[i]
+        int k = 0;
+        for (List<GenSolvablePolynomial<C>> row : Mg) {
+            boolean t = sred.isLeftReductionNF(row, F, G.get(k), null);
+            if (!t) {
+                System.out.println("row = " + row);
+                System.out.println("F   = " + F);
+                System.out.println("Gk  = " + G.get(k));
+                logger.info("F isLeftReductionMatrix s, k = " + F.size() + ", " + k);
+                return false;
+            }
+            k++;
+        }
+        // check G and Mf: G * Mf[i] == F[i]
+        k = 0;
+        for (List<GenSolvablePolynomial<C>> row : Mf) {
+            boolean t = sred.isLeftReductionNF(row, G, F.get(k), null);
+            if (!t) {
+                logger.error("G isLeftReductionMatrix s, k = " + G.size() + ", " + k);
+                return false;
+            }
+            k++;
+        }
+        return true;
+    }
 
     /**
      * Module left Groebner base test.
@@ -681,27 +515,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return isLeftGB(M, false);
     }
 
-
-    /**
-     * Module left Groebner base test.
-     *
-     * @param M   a module basis.
-     * @param top true for TOP term order, false for POT term order.
-     * @return true, if M is a left Groebner base, else false.
-     */
-    public boolean isLeftGB(ModuleList<C> M, boolean top) {
-        if (M == null || M.list == null) {
-            return true;
-        }
-        if (M.rows == 0 || M.cols == 0) {
-            return true;
-        }
-        int modv = M.cols; // > 0  
-        PolynomialList<C> F = M.getPolynomialList(top);
-        return isLeftGB(modv, F.castToSolvableList());
-    }
-
-
     /**
      * Left Groebner base using pairlist class.
      *
@@ -711,39 +524,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
     public ModuleList<C> leftGB(ModuleList<C> M) {
         return leftGB(M, false);
     }
-
-
-    /**
-     * Left Groebner base using pairlist class.
-     *
-     * @param M   a module basis.
-     * @param top true for TOP term order, false for POT term order.
-     * @return leftGB(M) a left Groebner base for M.
-     */
-    @SuppressWarnings("unchecked")
-    public ModuleList<C> leftGB(ModuleList<C> M, boolean top) {
-        ModuleList<C> N = M;
-        if (M == null || M.list == null) {
-            return N;
-        }
-        if (M.rows == 0 || M.cols == 0) {
-            return N;
-        }
-        PolynomialList<C> F = M.getPolynomialList(top);
-        if (debug) {
-            logger.info("F left +++++++++++++++++++ \n" + F);
-        }
-        GenSolvablePolynomialRing<C> sring = (GenSolvablePolynomialRing<C>) F.ring;
-        int modv = M.cols;
-        List<GenSolvablePolynomial<C>> G = leftGB(modv, F.castToSolvableList());
-        F = new PolynomialList<C>(sring, G);
-        if (debug) {
-            logger.info("G left +++++++++++++++++++ \n" + F);
-        }
-        N = F.getModuleList(modv);
-        return N;
-    }
-
 
     /**
      * Module twosided Groebner base test.
@@ -755,27 +535,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return isTwosidedGB(M, false);
     }
 
-
-    /**
-     * Module twosided Groebner base test.
-     *
-     * @param M   a module basis.
-     * @param top true for TOP term order, false for POT term order.
-     * @return true, if M is a twosided Groebner base, else false.
-     */
-    public boolean isTwosidedGB(ModuleList<C> M, boolean top) {
-        if (M == null || M.list == null) {
-            return true;
-        }
-        if (M.rows == 0 || M.cols == 0) {
-            return true;
-        }
-        PolynomialList<C> F = M.getPolynomialList(top);
-        int modv = M.cols; // > 0  
-        return isTwosidedGB(modv, F.castToSolvableList());
-    }
-
-
     /**
      * Twosided Groebner base using pairlist class.
      *
@@ -786,33 +545,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return twosidedGB(M, false);
     }
 
-
-    /**
-     * Twosided Groebner base using pairlist class.
-     *
-     * @param M   a module basis.
-     * @param top true for TOP term order, false for POT term order.
-     * @return tsGB(M) a twosided Groebner base for M.
-     */
-    @SuppressWarnings("unchecked")
-    public ModuleList<C> twosidedGB(ModuleList<C> M, boolean top) {
-        ModuleList<C> N = M;
-        if (M == null || M.list == null) {
-            return N;
-        }
-        if (M.rows == 0 || M.cols == 0) {
-            return N;
-        }
-        PolynomialList<C> F = M.getPolynomialList(top);
-        GenSolvablePolynomialRing<C> sring = (GenSolvablePolynomialRing<C>) F.ring;
-        int modv = M.cols;
-        List<GenSolvablePolynomial<C>> G = twosidedGB(modv, F.castToSolvableList());
-        F = new PolynomialList<C>(sring, G);
-        N = F.getModuleList(modv);
-        return N;
-    }
-
-
     /**
      * Module right Groebner base test.
      *
@@ -822,31 +554,6 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
     public boolean isRightGB(ModuleList<C> M) {
         return isRightGB(M, false);
     }
-
-
-    /**
-     * Module right Groebner base test.
-     *
-     * @param M   a module basis.
-     * @param top true for TOP term order, false for POT term order.
-     * @return true, if M is a right Groebner base, else false.
-     */
-    public boolean isRightGB(ModuleList<C> M, boolean top) {
-        if (M == null || M.list == null) {
-            return true;
-        }
-        if (M.rows == 0 || M.cols == 0) {
-            return true;
-        }
-        if (top) {
-            logger.warn("computation of rightGB with TOP not possible");
-        }
-        int modv = M.cols; // > 0  
-        PolynomialList<C> F = M.getPolynomialList(top);
-        //System.out.println("F test = " + F);
-        return isRightGB(modv, F.castToSolvableList());
-    }
-
 
     /**
      * Right Groebner base using pairlist class.
@@ -911,59 +618,317 @@ public abstract class SolvableGroebnerBaseAbstract<C extends RingElem<C>> implem
         return Mg;
     }
 
-
     /**
-     * Test if left reduction matrix.
+     * Left Groebner base test.
      *
-     * @param exgb an SolvableExtendedGB container.
-     * @return true, if exgb contains a left reduction matrix, else false.
+     * @param F solvable polynomial list.
+     * @param b true for simple test, false for GB test.
+     * @return true, if F is a Groebner base, else false.
      */
-    public boolean isLeftReductionMatrix(SolvableExtendedGB<C> exgb) {
-        if (exgb == null) {
-            return true;
-        }
-        return isLeftReductionMatrix(exgb.F, exgb.G, exgb.F2G, exgb.G2F);
+    public boolean isLeftGB(List<GenSolvablePolynomial<C>> F, boolean b) {
+        return isLeftGB(0, F, b);
     }
 
+    /**
+     * Left Groebner base test.
+     *
+     * @param modv module variable number.
+     * @param F    solvable polynomial list.
+     * @param b    true for simple test, false for GB test.
+     * @return true, if F is a Groebner base, else false.
+     */
+    public boolean isLeftGB(int modv, List<GenSolvablePolynomial<C>> F, boolean b) {
+        if (b) {
+            return isLeftGBsimple(modv, F);
+        }
+        return isLeftGBidem(modv, F);
+    }
 
     /**
-     * Test if left reduction matrix.
+     * Left Groebner base test.
      *
-     * @param F  a solvable polynomial list.
-     * @param G  a left Groebner base.
-     * @param Mf a possible left reduction matrix.
-     * @param Mg a possible left reduction matrix.
-     * @return true, if Mg and Mf are left reduction matrices, else false.
+     * @param modv number of module variables.
+     * @param F    solvable polynomial list.
+     * @return true, if F is a left Groebner base, else false.
      */
-    public boolean isLeftReductionMatrix(List<GenSolvablePolynomial<C>> F, List<GenSolvablePolynomial<C>> G,
-                                         List<List<GenSolvablePolynomial<C>>> Mf, List<List<GenSolvablePolynomial<C>>> Mg) {
-        // no more check G and Mg: G * Mg[i] == 0
-        // check F and Mg: F * Mg[i] == G[i]
-        int k = 0;
-        for (List<GenSolvablePolynomial<C>> row : Mg) {
-            boolean t = sred.isLeftReductionNF(row, F, G.get(k), null);
-            if (!t) {
-                System.out.println("row = " + row);
-                System.out.println("F   = " + F);
-                System.out.println("Gk  = " + G.get(k));
-                logger.info("F isLeftReductionMatrix s, k = " + F.size() + ", " + k);
-                return false;
+    public boolean isLeftGBsimple(int modv, List<GenSolvablePolynomial<C>> F) {
+        GenSolvablePolynomial<C> pi, pj, s, h;
+        for (int i = 0; i < F.size(); i++) {
+            pi = F.get(i);
+            for (int j = i + 1; j < F.size(); j++) {
+                pj = F.get(j);
+                if (!red.moduleCriterion(modv, pi, pj)) {
+                    continue;
+                }
+                // if ( ! red.criterion4( pi, pj ) ) { continue; }
+                s = sred.leftSPolynomial(pi, pj);
+                if (s.isZERO()) {
+                    continue;
+                }
+                h = sred.leftNormalform(F, s);
+                if (!h.isZERO()) {
+                    logger.info("no left GB: pi = " + pi + ", pj = " + pj);
+                    logger.info("s  = " + s + ", h = " + h);
+                    return false;
+                }
             }
-            k++;
-        }
-        // check G and Mf: G * Mf[i] == F[i]
-        k = 0;
-        for (List<GenSolvablePolynomial<C>> row : Mf) {
-            boolean t = sred.isLeftReductionNF(row, G, F.get(k), null);
-            if (!t) {
-                logger.error("G isLeftReductionMatrix s, k = " + G.size() + ", " + k);
-                return false;
-            }
-            k++;
         }
         return true;
     }
 
+    /**
+     * Left Groebner base idempotence test.
+     *
+     * @param modv module variable number.
+     * @param F    solvable polynomial list.
+     * @return true, if F is equal to GB(F), else false.
+     */
+    public boolean isLeftGBidem(int modv, List<GenSolvablePolynomial<C>> F) {
+        if (F == null || F.isEmpty()) {
+            return true;
+        }
+        GenSolvablePolynomialRing<C> pring = F.get(0).ring;
+        List<GenSolvablePolynomial<C>> G = leftGB(modv, F);
+        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
+        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
+        return Fp.compareTo(Gp) == 0;
+    }
+
+    /**
+     * Twosided Groebner base idempotence test.
+     *
+     * @param F solvable polynomial list.
+     * @return true, if F is equal to GB(F), else false.
+     */
+    public boolean isTwosidedGBidem(List<GenSolvablePolynomial<C>> F) {
+        return isTwosidedGBidem(0, F);
+    }
+
+    /**
+     * Twosided Groebner base idempotence test.
+     *
+     * @param modv module variable number.
+     * @param F    solvable polynomial list.
+     * @return true, if F is equal to GB(F), else false.
+     */
+    public boolean isTwosidedGBidem(int modv, List<GenSolvablePolynomial<C>> F) {
+        if (F == null || F.isEmpty()) {
+            return true;
+        }
+        GenSolvablePolynomialRing<C> pring = F.get(0).ring;
+        List<GenSolvablePolynomial<C>> G = twosidedGB(modv, F);
+        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
+        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
+        return Fp.compareTo(Gp) == 0;
+    }
+
+    /**
+     * Right Groebner base idempotence test.
+     *
+     * @param F solvable polynomial list.
+     * @return true, if F is equal to GB(F), else false.
+     */
+    public boolean isRightGBidem(List<GenSolvablePolynomial<C>> F) {
+        return isRightGBidem(0, F);
+    }
+
+    /**
+     * Right Groebner base idempotence test.
+     *
+     * @param modv module variable number.
+     * @param F    solvable polynomial list.
+     * @return true, if F is equal to GB(F), else false.
+     */
+    public boolean isRightGBidem(int modv, List<GenSolvablePolynomial<C>> F) {
+        if (F == null || F.isEmpty()) {
+            return true;
+        }
+        GenSolvablePolynomialRing<C> pring = F.get(0).ring;
+        List<GenSolvablePolynomial<C>> G = rightGB(modv, F);
+        PolynomialList<C> Fp = new PolynomialList<C>(pring, F);
+        PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
+        return Fp.compareTo(Gp) == 0;
+    }
+
+    /**
+     * Right minimal ordered groebner basis.
+     *
+     * @param Gp a right Groebner base.
+     * @return rightGBmi(F) a minimal right Groebner base of Gp.
+     */
+    public List<GenSolvablePolynomial<C>> rightMinimalGB(List<GenSolvablePolynomial<C>> Gp) {
+        ArrayList<GenSolvablePolynomial<C>> G = new ArrayList<GenSolvablePolynomial<C>>();
+        ListIterator<GenSolvablePolynomial<C>> it = Gp.listIterator();
+        for (GenSolvablePolynomial<C> a : Gp) {
+            if (a.length() != 0) { // always true
+                G.add(a);
+            }
+        }
+        if (G.size() <= 1) {
+            return G;
+        }
+
+        ExpVector e;
+        ExpVector f;
+        GenSolvablePolynomial<C> a, p;
+        ArrayList<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>();
+        boolean mt;
+
+        while (G.size() > 0) {
+            a = G.remove(0);
+            e = a.leadingExpVector();
+
+            it = G.listIterator();
+            mt = false;
+            while (it.hasNext() && !mt) {
+                p = it.next();
+                f = p.leadingExpVector();
+                mt = e.multipleOf(f);
+            }
+            it = F.listIterator();
+            while (it.hasNext() && !mt) {
+                p = it.next();
+                f = p.leadingExpVector();
+                mt = e.multipleOf(f);
+            }
+            if (!mt) {
+                F.add(a);
+            } else {
+                // System.out.println("dropped " + a.length());
+            }
+        }
+        G = F;
+        if (G.size() <= 1) {
+            return G;
+        }
+
+        F = new ArrayList<GenSolvablePolynomial<C>>();
+        while (G.size() > 0) {
+            a = G.remove(0);
+            // System.out.println("doing " + a.length());
+            a = sred.rightNormalform(G, a);
+            a = sred.rightNormalform(F, a);
+            F.add(a);
+        }
+        return F;
+    }
+
+    /**
+     * Module left Groebner base test.
+     *
+     * @param M   a module basis.
+     * @param top true for TOP term order, false for POT term order.
+     * @return true, if M is a left Groebner base, else false.
+     */
+    public boolean isLeftGB(ModuleList<C> M, boolean top) {
+        if (M == null || M.list == null) {
+            return true;
+        }
+        if (M.rows == 0 || M.cols == 0) {
+            return true;
+        }
+        int modv = M.cols; // > 0
+        PolynomialList<C> F = M.getPolynomialList(top);
+        return isLeftGB(modv, F.castToSolvableList());
+    }
+
+    /**
+     * Left Groebner base using pairlist class.
+     *
+     * @param M   a module basis.
+     * @param top true for TOP term order, false for POT term order.
+     * @return leftGB(M) a left Groebner base for M.
+     */
+    @SuppressWarnings("unchecked")
+    public ModuleList<C> leftGB(ModuleList<C> M, boolean top) {
+        ModuleList<C> N = M;
+        if (M == null || M.list == null) {
+            return N;
+        }
+        if (M.rows == 0 || M.cols == 0) {
+            return N;
+        }
+        PolynomialList<C> F = M.getPolynomialList(top);
+        if (debug) {
+            logger.info("F left +++++++++++++++++++ \n" + F);
+        }
+        GenSolvablePolynomialRing<C> sring = (GenSolvablePolynomialRing<C>) F.ring;
+        int modv = M.cols;
+        List<GenSolvablePolynomial<C>> G = leftGB(modv, F.castToSolvableList());
+        F = new PolynomialList<C>(sring, G);
+        if (debug) {
+            logger.info("G left +++++++++++++++++++ \n" + F);
+        }
+        N = F.getModuleList(modv);
+        return N;
+    }
+
+    /**
+     * Module twosided Groebner base test.
+     *
+     * @param M   a module basis.
+     * @param top true for TOP term order, false for POT term order.
+     * @return true, if M is a twosided Groebner base, else false.
+     */
+    public boolean isTwosidedGB(ModuleList<C> M, boolean top) {
+        if (M == null || M.list == null) {
+            return true;
+        }
+        if (M.rows == 0 || M.cols == 0) {
+            return true;
+        }
+        PolynomialList<C> F = M.getPolynomialList(top);
+        int modv = M.cols; // > 0
+        return isTwosidedGB(modv, F.castToSolvableList());
+    }
+
+    /**
+     * Twosided Groebner base using pairlist class.
+     *
+     * @param M   a module basis.
+     * @param top true for TOP term order, false for POT term order.
+     * @return tsGB(M) a twosided Groebner base for M.
+     */
+    @SuppressWarnings("unchecked")
+    public ModuleList<C> twosidedGB(ModuleList<C> M, boolean top) {
+        ModuleList<C> N = M;
+        if (M == null || M.list == null) {
+            return N;
+        }
+        if (M.rows == 0 || M.cols == 0) {
+            return N;
+        }
+        PolynomialList<C> F = M.getPolynomialList(top);
+        GenSolvablePolynomialRing<C> sring = (GenSolvablePolynomialRing<C>) F.ring;
+        int modv = M.cols;
+        List<GenSolvablePolynomial<C>> G = twosidedGB(modv, F.castToSolvableList());
+        F = new PolynomialList<C>(sring, G);
+        N = F.getModuleList(modv);
+        return N;
+    }
+
+    /**
+     * Module right Groebner base test.
+     *
+     * @param M   a module basis.
+     * @param top true for TOP term order, false for POT term order.
+     * @return true, if M is a right Groebner base, else false.
+     */
+    public boolean isRightGB(ModuleList<C> M, boolean top) {
+        if (M == null || M.list == null) {
+            return true;
+        }
+        if (M.rows == 0 || M.cols == 0) {
+            return true;
+        }
+        if (top) {
+            logger.warn("computation of rightGB with TOP not possible");
+        }
+        int modv = M.cols; // > 0
+        PolynomialList<C> F = M.getPolynomialList(top);
+        //System.out.println("F test = " + F);
+        return isRightGB(modv, F.castToSolvableList());
+    }
 
     /**
      * Ideal common zero test.

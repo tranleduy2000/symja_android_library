@@ -204,6 +204,34 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
     }
 
     /**
+     * ModLong chinese remainder algorithm. This is a factory method. Assert
+     * c.modul >= a.modul and c.modul * a.modul = this.modul.
+     *
+     * @param c  ModLong.
+     * @param ci inverse of c.modul in ring of a.
+     * @param a  other ModLong.
+     * @return S, with S mod c.modul == c and S mod a.modul == a.
+     */
+    public ModLong chineseRemainder(ModLong c, ModLong ci, ModLong a) {
+        //if (true) {
+        //    if (c.ring.modul < a.ring.modul) {
+        //        System.out.println("ModLong error " + c.ring + ", " + a.ring);
+        //    }
+        //}
+        ModLong b = a.ring.fromInteger(c.val); // c mod a.modul
+        ModLong d = a.subtract(b); // a-c mod a.modul
+        if (d.isZERO()) {
+            return new ModLong(this, c.val);
+        }
+        b = d.multiply(ci); // b = (a-c)*ci mod a.modul
+        // (c.modul*b)+c mod this.modul = c mod c.modul =
+        // (c.modul*ci*(a-c)+c) mod a.modul = a mod a.modul
+        long s = c.ring.modul * b.val;
+        s = s + c.val;
+        return new ModLong(this, s);
+    }
+
+    /**
      * Create ModLong element c.
      *
      * @param c
@@ -234,16 +262,6 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
     }
 
     /**
-     * Copy ModLong element c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public ModLong copy(ModLong c) {
-        return new ModLong(this, c.val);
-    }
-
-    /**
      * Get the zero element.
      *
      * @return 0 as ModLong.
@@ -259,6 +277,24 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
      */
     public ModLong getONE() {
         return new ModLong(this, 1L);
+    }
+
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true.
+     */
+    public boolean isCommutative() {
+        return true;
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true.
+     */
+    public boolean isAssociative() {
+        return true;
     }
 
     /**
@@ -284,21 +320,90 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
     }
 
     /**
-     * Query if this ring is commutative.
+     * Get a ModLong element from a long value.
      *
-     * @return true.
+     * @param a long.
+     * @return a ModLong.
      */
-    public boolean isCommutative() {
-        return true;
+    public ModLong fromInteger(long a) {
+        return new ModLong(this, a);
     }
 
     /**
-     * Query if this ring is associative.
+     * Get a ModLong element from a BigInteger value.
      *
-     * @return true.
+     * @param a BigInteger.
+     * @return a ModLong.
      */
-    public boolean isAssociative() {
-        return true;
+    public ModLong fromInteger(java.math.BigInteger a) {
+        return new ModLong(this, a);
+    }
+
+    /**
+     * ModLong random.
+     *
+     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @return a random integer mod modul.
+     */
+    public ModLong random(int n) {
+        return random(n, random);
+    }
+
+    /**
+     * ModLong random.
+     *
+     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return a random integer mod modul.
+     */
+    public ModLong random(int n, Random rnd) {
+        java.math.BigInteger v = new java.math.BigInteger(n, rnd);
+        return new ModLong(this, v); // rnd.nextLong() not ok
+    }
+
+    /**
+     * Copy ModLong element c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public ModLong copy(ModLong c) {
+        return new ModLong(this, c.val);
+    }
+
+    /**
+     * Parse ModLong from String.
+     *
+     * @param s String.
+     * @return ModLong from s.
+     */
+    public ModLong parse(String s) {
+        return new ModLong(this, s);
+    }
+
+    /**
+     * Parse ModLong from Reader.
+     *
+     * @param r Reader.
+     * @return next ModLong from r.
+     */
+    public ModLong parse(Reader r) {
+        return parse(StringUtil.nextString(r));
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python and Ruby case
+        if (isField()) {
+            return "GFL(" + modul + ")";
+        }
+        return "ZML(" + modul + ")";
     }
 
     /**
@@ -333,54 +438,19 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
     }
 
     /**
-     * Get a ModLong element from a BigInteger value.
+     * Hash code for this ModLongRing.
      *
-     * @param a BigInteger.
-     * @return a ModLong.
-     */
-    public ModLong fromInteger(java.math.BigInteger a) {
-        return new ModLong(this, a);
-    }
-
-    /**
-     * Get a ModLong element from a long value.
-     *
-     * @param a long.
-     * @return a ModLong.
-     */
-    public ModLong fromInteger(long a) {
-        return new ModLong(this, a);
-    }
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        return " mod(" + modul + ")"; //",max="  + MAX_LONG + ")";
-    }
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python and Ruby case
-        if (isField()) {
-            return "GFL(" + modul + ")";
-        }
-        return "ZML(" + modul + ")";
+    public int hashCode() {
+        return (int) modul;
     }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object b) {
@@ -392,83 +462,13 @@ public final class ModLongRing implements ModularRingFactory<ModLong>, Iterable<
     }
 
     /**
-     * Hash code for this ModLongRing.
+     * Get the String representation.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return (int) modul;
-    }
-
-    /**
-     * ModLong random.
-     *
-     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @return a random integer mod modul.
-     */
-    public ModLong random(int n) {
-        return random(n, random);
-    }
-
-    /**
-     * ModLong random.
-     *
-     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return a random integer mod modul.
-     */
-    public ModLong random(int n, Random rnd) {
-        java.math.BigInteger v = new java.math.BigInteger(n, rnd);
-        return new ModLong(this, v); // rnd.nextLong() not ok
-    }
-
-    /**
-     * Parse ModLong from String.
-     *
-     * @param s String.
-     * @return ModLong from s.
-     */
-    public ModLong parse(String s) {
-        return new ModLong(this, s);
-    }
-
-    /**
-     * Parse ModLong from Reader.
-     *
-     * @param r Reader.
-     * @return next ModLong from r.
-     */
-    public ModLong parse(Reader r) {
-        return parse(StringUtil.nextString(r));
-    }
-
-    /**
-     * ModLong chinese remainder algorithm. This is a factory method. Assert
-     * c.modul >= a.modul and c.modul * a.modul = this.modul.
-     *
-     * @param c  ModLong.
-     * @param ci inverse of c.modul in ring of a.
-     * @param a  other ModLong.
-     * @return S, with S mod c.modul == c and S mod a.modul == a.
-     */
-    public ModLong chineseRemainder(ModLong c, ModLong ci, ModLong a) {
-        //if (true) {
-        //    if (c.ring.modul < a.ring.modul) {
-        //        System.out.println("ModLong error " + c.ring + ", " + a.ring);
-        //    }
-        //}
-        ModLong b = a.ring.fromInteger(c.val); // c mod a.modul
-        ModLong d = a.subtract(b); // a-c mod a.modul
-        if (d.isZERO()) {
-            return new ModLong(this, c.val);
-        }
-        b = d.multiply(ci); // b = (a-c)*ci mod a.modul
-        // (c.modul*b)+c mod this.modul = c mod c.modul =
-        // (c.modul*ci*(a-c)+c) mod a.modul = a mod a.modul
-        long s = c.ring.modul * b.val;
-        s = s + c.val;
-        return new ModLong(this, s);
+    public String toString() {
+        return " mod(" + modul + ")"; //",max="  + MAX_LONG + ")";
     }
 
     /**

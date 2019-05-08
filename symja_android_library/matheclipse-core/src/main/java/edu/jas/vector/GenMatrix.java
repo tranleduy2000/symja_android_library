@@ -5,7 +5,8 @@
 package edu.jas.vector;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import edu.jas.structure.RingElem;
 public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<C>, C> implements AlgebraElem<GenMatrix<C>, C> {
 
 
-    private static final Logger logger = Logger.getLogger(GenMatrix.class);
+    private static final Logger logger = LogManager.getLogger(GenMatrix.class);
 
 
     public final GenMatrixRing<C> ring;
@@ -121,43 +122,59 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         return mat;
     }
 
-
     /**
-     * Get the String representation as RingElem.
+     * clone method.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#clone()
      */
     @Override
-    public String toString() {
-        StringBuffer s = new StringBuffer();
-        boolean firstRow = true;
-        s.append("[\n");
-        for (List<C> val : matrix) {
-            if (firstRow) {
-                firstRow = false;
-            } else {
-                s.append(",\n");
-            }
-            boolean first = true;
-            s.append("[ ");
-            for (C c : val) {
-                if (first) {
-                    first = false;
-                } else {
-                    s.append(", ");
-                }
-                s.append(c.toString());
-            }
-            s.append(" ]");
+    @SuppressWarnings("unchecked")
+    public GenMatrix<C> copy() {
+        //return ring.copy(this);
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        ArrayList<C> v;
+        for (ArrayList<C> val : matrix) {
+            v = new ArrayList<C>(val); // val.clone();
+            m.add(v);
         }
-        s.append(" ] ");
-        if (!PrettyPrint.isTrue()) {
-            s.append(":: " + ring.toString());
-            s.append("\n");
-        }
-        return s.toString();
+        return new GenMatrix<C>(ring, m);
     }
 
+    /**
+     * compareTo, lexicogaphical comparison.
+     *
+     * @param b other
+     * @return 1 if (this &lt; b), 0 if (this == b) or -1 if (this &gt; b).
+     */
+    @Override
+    public int compareTo(GenMatrix<C> b) {
+        if (!ring.equals(b.ring)) {
+            return -1;
+        }
+        ArrayList<ArrayList<C>> om = b.matrix;
+        int i = 0;
+        for (ArrayList<C> val : matrix) {
+            ArrayList<C> ov = om.get(i++);
+            int j = 0;
+            for (C c : val) {
+                int s = c.compareTo(ov.get(j++));
+                if (s != 0) {
+                    return s;
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public GenMatrixRing<C> factory() {
+        return ring;
+    }
 
     /**
      * Get a scripting compatible string representation.
@@ -193,7 +210,6 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         return s.toString();
     }
 
-
     /**
      * Get a scripting compatible string representation of the factory.
      *
@@ -205,37 +221,6 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         // Python case
         return factory().toScript();
     }
-
-
-    /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public GenMatrixRing<C> factory() {
-        return ring;
-    }
-
-
-    /**
-     * clone method.
-     *
-     * @see Object#clone()
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public GenMatrix<C> copy() {
-        //return ring.copy(this);
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
-        ArrayList<C> v;
-        for (ArrayList<C> val : matrix) {
-            v = new ArrayList<C>(val); // val.clone();
-            m.add(v);
-        }
-        return new GenMatrix<C>(ring, m);
-    }
-
 
     /**
      * Test if this is equal to a zero matrix.
@@ -251,6 +236,89 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         return true;
     }
 
+    /**
+     * sign of matrix.
+     *
+     * @return 1 if (this &lt; 0), 0 if (this == 0) or -1 if (this &gt; 0).
+     */
+    public int signum() {
+        return compareTo(ring.getZERO());
+    }
+
+    /**
+     * Sum of matrices.
+     *
+     * @return this+b
+     */
+    public GenMatrix<C> sum(GenMatrix<C> b) {
+        ArrayList<ArrayList<C>> om = b.matrix;
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        int i = 0;
+        for (ArrayList<C> val : matrix) {
+            ArrayList<C> ov = om.get(i++);
+            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            int j = 0;
+            for (C c : val) {
+                C e = c.sum(ov.get(j++));
+                v.add(e);
+            }
+            m.add(v);
+        }
+        return new GenMatrix<C>(ring, m);
+    }
+
+    /**
+     * Difference of matrices.
+     *
+     * @return this-b
+     */
+    public GenMatrix<C> subtract(GenMatrix<C> b) {
+        ArrayList<ArrayList<C>> om = b.matrix;
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        int i = 0;
+        for (ArrayList<C> val : matrix) {
+            ArrayList<C> ov = om.get(i++);
+            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            int j = 0;
+            for (C c : val) {
+                C e = c.subtract(ov.get(j++));
+                v.add(e);
+            }
+            m.add(v);
+        }
+        return new GenMatrix<C>(ring, m);
+    }
+
+    /**
+     * Negative of this matrix.
+     *
+     * @return -this
+     */
+    public GenMatrix<C> negate() {
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        //int i = 0;
+        for (ArrayList<C> val : matrix) {
+            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            for (C c : val) {
+                C e = c.negate();
+                v.add(e);
+            }
+            m.add(v);
+        }
+        return new GenMatrix<C>(ring, m);
+    }
+
+    /**
+     * Absolute value of this matrix.
+     *
+     * @return abs(this)
+     */
+    public GenMatrix<C> abs() {
+        if (signum() < 0) {
+            return negate();
+        }
+        return this;
+    }
 
     /**
      * Test if this is one.
@@ -275,70 +343,6 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         }
         return true;
     }
-
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object other) {
-        if (!(other instanceof GenMatrix)) {
-            return false;
-        }
-        GenMatrix om = (GenMatrix) other;
-        if (!ring.equals(om.ring)) {
-            return false;
-        }
-        return matrix.equals(om.matrix);
-    }
-
-
-    /**
-     * Hash code for this GenMatrix.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        if (hashValue == 0) {
-            hashValue = 37 * matrix.hashCode() + ring.hashCode();
-            if (hashValue == 0) {
-                hashValue = 1;
-            }
-        }
-        return hashValue;
-    }
-
-
-    /**
-     * compareTo, lexicogaphical comparison.
-     *
-     * @param b other
-     * @return 1 if (this &lt; b), 0 if (this == b) or -1 if (this &gt; b).
-     */
-    @Override
-    public int compareTo(GenMatrix<C> b) {
-        if (!ring.equals(b.ring)) {
-            return -1;
-        }
-        ArrayList<ArrayList<C>> om = b.matrix;
-        int i = 0;
-        for (ArrayList<C> val : matrix) {
-            ArrayList<C> ov = om.get(i++);
-            int j = 0;
-            for (C c : val) {
-                int s = c.compareTo(ov.get(j++));
-                if (s != 0) {
-                    return s;
-                }
-            }
-        }
-        return 0;
-    }
-
 
     /**
      * Test if this is a unit. I.e. there exists x with this.multiply(x).isONE()
@@ -368,95 +372,159 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         return true;
     }
 
-
     /**
-     * sign of matrix.
+     * Multiply this with S.
      *
-     * @return 1 if (this &lt; 0), 0 if (this == 0) or -1 if (this &gt; 0).
+     * @param S
+     * @return this * S.
      */
-    public int signum() {
-        return compareTo(ring.getZERO());
-    }
+    public GenMatrix<C> multiply(GenMatrix<C> S) {
+        int na = ring.blocksize;
+        int nb = ring.blocksize;
+        //System.out.println("#blocks = " + (matrix.size()/na) + ", na = " + na
+        //    + " SeqMultBlockTrans");
+        ArrayList<ArrayList<C>> m = matrix;
+        //ArrayList<ArrayList<C>> s = S.matrix;
 
+        GenMatrixRing<C> tr = S.ring.transpose();
+        GenMatrix<C> T = S.transpose(tr);
+        ArrayList<ArrayList<C>> t = T.matrix;
+        //System.out.println("T = " + T);
 
-    /**
-     * Sum of matrices.
-     *
-     * @return this+b
-     */
-    public GenMatrix<C> sum(GenMatrix<C> b) {
-        ArrayList<ArrayList<C>> om = b.matrix;
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
-        int i = 0;
-        for (ArrayList<C> val : matrix) {
-            ArrayList<C> ov = om.get(i++);
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
-            int j = 0;
-            for (C c : val) {
-                C e = c.sum(ov.get(j++));
-                v.add(e);
+        GenMatrixRing<C> pr = ring.product(S.ring);
+        GenMatrix<C> P = pr.getZERO().copy();
+        ArrayList<ArrayList<C>> p = P.matrix;
+        //System.out.println("P = " + P);
+
+        for (int ii = 0; ii < m.size(); ii += na) {
+            for (int jj = 0; jj < t.size(); jj += nb) {
+
+                for (int i = ii; i < Math.min((ii + na), m.size()); i++) {
+                    ArrayList<C> Ai = m.get(i); //A[i];
+                    for (int j = jj; j < Math.min((jj + nb), t.size()); j++) {
+                        ArrayList<C> Bj = t.get(j); //B[j];
+                        C c = ring.coFac.getZERO();
+                        for (int k = 0; k < Bj.size(); k++) {
+                            c = c.sum(Ai.get(k).multiply(Bj.get(k)));
+                            //  c += Ai[k] * Bj[k];
+                        }
+                        (p.get(i)).set(j, c); // C[i][j] = c;
+                    }
+                }
+
             }
-            m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return new GenMatrix<C>(pr, p);
     }
 
+    /**
+     * Divide this by S.
+     *
+     * @param S
+     * @return this / S.
+     */
+    public GenMatrix<C> divide(GenMatrix<C> S) {
+        throw new UnsupportedOperationException("divide not yet implemented");
+    }
 
     /**
-     * Difference of matrices.
+     * Remainder after division of this by S.
      *
-     * @return this-b
+     * @param S
+     * @return this - (this / S) * S.
      */
-    public GenMatrix<C> subtract(GenMatrix<C> b) {
-        ArrayList<ArrayList<C>> om = b.matrix;
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
-        int i = 0;
-        for (ArrayList<C> val : matrix) {
-            ArrayList<C> ov = om.get(i++);
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
-            int j = 0;
-            for (C c : val) {
-                C e = c.subtract(ov.get(j++));
-                v.add(e);
+    public GenMatrix<C> remainder(GenMatrix<C> S) {
+        throw new UnsupportedOperationException("remainder not implemented");
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a GenMatrix
+     * @return [this/S, this - (this/S)*S].
+     */
+    public GenMatrix<C>[] quotientRemainder(GenMatrix<C> S) {
+        throw new UnsupportedOperationException("quotientRemainder not implemented, input = " + S);
+    }
+
+    /**
+     * Inverse of this.
+     *
+     * @return x with this * x = 1, if it exists.
+     */
+    public GenMatrix<C> inverse() {
+        throw new UnsupportedOperationException("inverse not yet implemented");
+    }
+
+    /**
+     * Hash code for this GenMatrix.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        if (hashValue == 0) {
+            hashValue = 37 * matrix.hashCode() + ring.hashCode();
+            if (hashValue == 0) {
+                hashValue = 1;
             }
-            m.add(v);
         }
-        return new GenMatrix<C>(ring, m);
+        return hashValue;
     }
 
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object other) {
+        if (!(other instanceof GenMatrix)) {
+            return false;
+        }
+        GenMatrix om = (GenMatrix) other;
+        if (!ring.equals(om.ring)) {
+            return false;
+        }
+        return matrix.equals(om.matrix);
+    }
 
     /**
-     * Negative of this matrix.
+     * Get the String representation as RingElem.
      *
-     * @return -this
+     * @see java.lang.Object#toString()
      */
-    public GenMatrix<C> negate() {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
-        //int i = 0;
-        for (ArrayList<C> val : matrix) {
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
-            for (C c : val) {
-                C e = c.negate();
-                v.add(e);
+    @Override
+    public String toString() {
+        StringBuffer s = new StringBuffer();
+        boolean firstRow = true;
+        s.append("[\n");
+        for (List<C> val : matrix) {
+            if (firstRow) {
+                firstRow = false;
+            } else {
+                s.append(",\n");
             }
-            m.add(v);
+            boolean first = true;
+            s.append("[ ");
+            for (C c : val) {
+                if (first) {
+                    first = false;
+                } else {
+                    s.append(", ");
+                }
+                s.append(c.toString());
+            }
+            s.append(" ]");
         }
-        return new GenMatrix<C>(ring, m);
-    }
-
-
-    /**
-     * Absolute value of this matrix.
-     *
-     * @return abs(this)
-     */
-    public GenMatrix<C> abs() {
-        if (signum() < 0) {
-            return negate();
+        s.append(" ] ");
+        if (!PrettyPrint.isTrue()) {
+            s.append(":: " + ring.toString());
+            s.append("\n");
         }
-        return this;
+        return s.toString();
     }
-
 
     /**
      * Product of this matrix with scalar.
@@ -476,27 +544,6 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         }
         return new GenMatrix<C>(ring, m);
     }
-
-
-    /**
-     * Left product of this matrix with scalar.
-     *
-     * @return s*this
-     */
-    public GenMatrix<C> leftScalarMultiply(C s) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
-        //int i = 0;
-        for (ArrayList<C> val : matrix) {
-            ArrayList<C> v = new ArrayList<C>(ring.cols);
-            for (C c : val) {
-                C e = s.multiply(c);
-                v.add(e);
-            }
-            m.add(v);
-        }
-        return new GenMatrix<C>(ring, m);
-    }
-
 
     /**
      * Linear compination of this matrix with scalar multiple of other matrix.
@@ -522,7 +569,6 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         return new GenMatrix<C>(ring, m);
     }
 
-
     /**
      * Linear combination of this matrix with scalar multiple of other matrix.
      *
@@ -546,6 +592,24 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         return new GenMatrix<C>(ring, m);
     }
 
+    /**
+     * Left product of this matrix with scalar.
+     *
+     * @return s*this
+     */
+    public GenMatrix<C> leftScalarMultiply(C s) {
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(ring.rows);
+        //int i = 0;
+        for (ArrayList<C> val : matrix) {
+            ArrayList<C> v = new ArrayList<C>(ring.cols);
+            for (C c : val) {
+                C e = s.multiply(c);
+                v.add(e);
+            }
+            m.add(v);
+        }
+        return new GenMatrix<C>(ring, m);
+    }
 
     /**
      * Left linear combination of this matrix with scalar multiple of other
@@ -570,7 +634,6 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         }
         return new GenMatrix<C>(ring, m);
     }
-
 
     /**
      * left linear compination of this matrix with scalar multiple of other
@@ -597,7 +660,6 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         return new GenMatrix<C>(ring, m);
     }
 
-
     /**
      * Transposed matrix.
      *
@@ -618,53 +680,6 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         // return new GenMatrix<C>(tr,m);
         return t;
     }
-
-
-    /**
-     * Multiply this with S.
-     *
-     * @param S
-     * @return this * S.
-     */
-    public GenMatrix<C> multiply(GenMatrix<C> S) {
-        int na = ring.blocksize;
-        int nb = ring.blocksize;
-        //System.out.println("#blocks = " + (matrix.size()/na) + ", na = " + na 
-        //    + " SeqMultBlockTrans");
-        ArrayList<ArrayList<C>> m = matrix;
-        //ArrayList<ArrayList<C>> s = S.matrix;
-
-        GenMatrixRing<C> tr = S.ring.transpose();
-        GenMatrix<C> T = S.transpose(tr);
-        ArrayList<ArrayList<C>> t = T.matrix;
-        //System.out.println("T = " + T); 
-
-        GenMatrixRing<C> pr = ring.product(S.ring);
-        GenMatrix<C> P = pr.getZERO().copy();
-        ArrayList<ArrayList<C>> p = P.matrix;
-        //System.out.println("P = " + P); 
-
-        for (int ii = 0; ii < m.size(); ii += na) {
-            for (int jj = 0; jj < t.size(); jj += nb) {
-
-                for (int i = ii; i < Math.min((ii + na), m.size()); i++) {
-                    ArrayList<C> Ai = m.get(i); //A[i];
-                    for (int j = jj; j < Math.min((jj + nb), t.size()); j++) {
-                        ArrayList<C> Bj = t.get(j); //B[j];
-                        C c = ring.coFac.getZERO();
-                        for (int k = 0; k < Bj.size(); k++) {
-                            c = c.sum(Ai.get(k).multiply(Bj.get(k)));
-                            //  c += Ai[k] * Bj[k];
-                        }
-                        (p.get(i)).set(j, c); // C[i][j] = c;
-                    }
-                }
-
-            }
-        }
-        return new GenMatrix<C>(pr, p);
-    }
-
 
     /**
      * Multiply this with S. Simple unblocked algorithm.
@@ -693,50 +708,6 @@ public class GenMatrix<C extends RingElem<C>> extends AlgebraElemImpl<GenMatrix<
         }
         return new GenMatrix<C>(pr, p);
     }
-
-
-    /**
-     * Divide this by S.
-     *
-     * @param S
-     * @return this / S.
-     */
-    public GenMatrix<C> divide(GenMatrix<C> S) {
-        throw new UnsupportedOperationException("divide not yet implemented");
-    }
-
-
-    /**
-     * Remainder after division of this by S.
-     *
-     * @param S
-     * @return this - (this / S) * S.
-     */
-    public GenMatrix<C> remainder(GenMatrix<C> S) {
-        throw new UnsupportedOperationException("remainder not implemented");
-    }
-
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a GenMatrix
-     * @return [this/S, this - (this/S)*S].
-     */
-    public GenMatrix<C>[] quotientRemainder(GenMatrix<C> S) {
-        throw new UnsupportedOperationException("quotientRemainder not implemented, input = " + S);
-    }
-
-
-    /**
-     * Inverse of this.
-     *
-     * @return x with this * x = 1, if it exists.
-     */
-    public GenMatrix<C> inverse() {
-        throw new UnsupportedOperationException("inverse not yet implemented");
-    }
-
 
     /**
      * Greatest common divisor.

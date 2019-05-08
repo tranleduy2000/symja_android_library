@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         Iterable<AlgebraicNumber<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(AlgebraicNumberRing.class);
+    private static final Logger logger = LogManager.getLogger(AlgebraicNumberRing.class);
     /**
      * Ring part of the factory data structure.
      */
@@ -91,18 +91,6 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         return modul;
     }
 
-
-    /**
-     * Copy AlgebraicNumber element c.
-     *
-     * @param c algebraic number to copy.
-     * @return a copy of c.
-     */
-    public AlgebraicNumber<C> copy(AlgebraicNumber<C> c) {
-        return new AlgebraicNumber<C>(this, c.val);
-    }
-
-
     /**
      * Get the zero element.
      *
@@ -111,7 +99,6 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
     public AlgebraicNumber<C> getZERO() {
         return new AlgebraicNumber<C>(this, ring.getZERO());
     }
-
 
     /**
      * Get the one element.
@@ -122,6 +109,23 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         return new AlgebraicNumber<C>(this, ring.getONE());
     }
 
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true if this ring is commutative, else false.
+     */
+    public boolean isCommutative() {
+        return ring.isCommutative();
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true if this ring is associative, else false.
+     */
+    public boolean isAssociative() {
+        return ring.isAssociative();
+    }
 
     /**
      * Get the generating element.
@@ -131,7 +135,6 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
     public AlgebraicNumber<C> getGenerator() {
         return new AlgebraicNumber<C>(this, ring.univariate(0));
     }
-
 
     /**
      * Get a list of the generating elements.
@@ -148,7 +151,6 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         return gens;
     }
 
-
     /**
      * Is this structure finite or infinite.
      *
@@ -159,26 +161,108 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         return ring.coFac.isFinite();
     }
 
-
     /**
-     * Query if this ring is commutative.
+     * Get a AlgebraicNumber element from a long value.
      *
-     * @return true if this ring is commutative, else false.
+     * @param a long.
+     * @return a AlgebraicNumber.
      */
-    public boolean isCommutative() {
-        return ring.isCommutative();
+    public AlgebraicNumber<C> fromInteger(long a) {
+        return new AlgebraicNumber<C>(this, ring.fromInteger(a));
+        //         if ( characteristic().signum() == 0 ) {
+        //         }
+        //         return fromInteger( new java.math.BigInteger(""+a) );
     }
 
-
     /**
-     * Query if this ring is associative.
+     * Get a AlgebraicNumber element from a BigInteger value.
      *
-     * @return true if this ring is associative, else false.
+     * @param a BigInteger.
+     * @return a AlgebraicNumber.
      */
-    public boolean isAssociative() {
-        return ring.isAssociative();
+    public AlgebraicNumber<C> fromInteger(java.math.BigInteger a) {
+        return new AlgebraicNumber<C>(this, ring.fromInteger(a));
     }
 
+    /**
+     * AlgebraicNumber random.
+     *
+     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @return a random integer mod modul.
+     */
+    public AlgebraicNumber<C> random(int n) {
+        GenPolynomial<C> x = ring.random(n).monic();
+        return new AlgebraicNumber<C>(this, x);
+    }
+
+    /**
+     * AlgebraicNumber random.
+     *
+     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return a random integer mod modul.
+     */
+    public AlgebraicNumber<C> random(int n, Random rnd) {
+        GenPolynomial<C> x = ring.random(n, rnd).monic();
+        return new AlgebraicNumber<C>(this, x);
+    }
+
+    /**
+     * Copy AlgebraicNumber element c.
+     *
+     * @param c algebraic number to copy.
+     * @return a copy of c.
+     */
+    public AlgebraicNumber<C> copy(AlgebraicNumber<C> c) {
+        return new AlgebraicNumber<C>(this, c.val);
+    }
+
+    /**
+     * Parse AlgebraicNumber from String.
+     *
+     * @param s String.
+     * @return AlgebraicNumber from s.
+     */
+    public AlgebraicNumber<C> parse(String s) {
+        GenPolynomial<C> x = ring.parse(s);
+        return new AlgebraicNumber<C>(this, x);
+    }
+
+    /**
+     * Parse AlgebraicNumber from Reader.
+     *
+     * @param r Reader.
+     * @return next AlgebraicNumber from r.
+     */
+    public AlgebraicNumber<C> parse(Reader r) {
+        GenPolynomial<C> x = ring.parse(r);
+        return new AlgebraicNumber<C>(this, x);
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        StringBuffer s = new StringBuffer();
+        s.append("AN(");
+        s.append(modul.toScript());
+        switch (Scripting.getLang()) {
+            case Ruby:
+                s.append((isField() ? ",true" : ",false"));
+                break;
+            case Python:
+            default:
+                s.append((isField() ? ",True" : ",False"));
+        }
+        s.append(",");
+        s.append(ring.toScript());
+        s.append(")");
+        return s.toString();
+    }
 
     /**
      * Query if this ring is a field.
@@ -197,6 +281,15 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
             return false;
         }
         return false;
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return characteristic of this ring.
+     */
+    public java.math.BigInteger characteristic() {
+        return ring.characteristic();
     }
 
     /**
@@ -230,16 +323,6 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
     }
 
     /**
-     * Characteristic of this ring.
-     *
-     * @return characteristic of this ring.
-     */
-    public java.math.BigInteger characteristic() {
-        return ring.characteristic();
-    }
-
-
-    /**
      * Get a AlgebraicNumber element from a BigInteger value.
      *
      * @param a BigInteger.
@@ -271,7 +354,6 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         return an;
     }
 
-
     /**
      * Get a AlgebraicNumber element from a long value.
      *
@@ -282,74 +364,20 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         return fillFromInteger(new java.math.BigInteger("" + a));
     }
 
-
     /**
-     * Get a AlgebraicNumber element from a BigInteger value.
+     * Hash code for this AlgebraicNumber.
      *
-     * @param a BigInteger.
-     * @return a AlgebraicNumber.
-     */
-    public AlgebraicNumber<C> fromInteger(java.math.BigInteger a) {
-        return new AlgebraicNumber<C>(this, ring.fromInteger(a));
-    }
-
-
-    /**
-     * Get a AlgebraicNumber element from a long value.
-     *
-     * @param a long.
-     * @return a AlgebraicNumber.
-     */
-    public AlgebraicNumber<C> fromInteger(long a) {
-        return new AlgebraicNumber<C>(this, ring.fromInteger(a));
-        //         if ( characteristic().signum() == 0 ) {
-        //         }
-        //         return fromInteger( new java.math.BigInteger(""+a) );
-    }
-
-
-    /**
-     * Get the String representation as RingFactory.
-     *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        return "AlgebraicNumberRing[ " + modul.toString() + " | isField=" + isField + " :: "
-                + ring.toString() + " ]";
+    public int hashCode() {
+        return 37 * modul.hashCode() + ring.hashCode();
     }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        StringBuffer s = new StringBuffer();
-        s.append("AN(");
-        s.append(modul.toScript());
-        switch (Scripting.getLang()) {
-            case Ruby:
-                s.append((isField() ? ",true" : ",false"));
-                break;
-            case Python:
-            default:
-                s.append((isField() ? ",True" : ",False"));
-        }
-        s.append(",");
-        s.append(ring.toScript());
-        s.append(")");
-        return s.toString();
-    }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -365,66 +393,16 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
         return modul.equals(a.modul);
     }
 
-
     /**
-     * Hash code for this AlgebraicNumber.
+     * Get the String representation as RingFactory.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return 37 * modul.hashCode() + ring.hashCode();
+    public String toString() {
+        return "AlgebraicNumberRing[ " + modul.toString() + " | isField=" + isField + " :: "
+                + ring.toString() + " ]";
     }
-
-
-    /**
-     * AlgebraicNumber random.
-     *
-     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @return a random integer mod modul.
-     */
-    public AlgebraicNumber<C> random(int n) {
-        GenPolynomial<C> x = ring.random(n).monic();
-        return new AlgebraicNumber<C>(this, x);
-    }
-
-
-    /**
-     * AlgebraicNumber random.
-     *
-     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return a random integer mod modul.
-     */
-    public AlgebraicNumber<C> random(int n, Random rnd) {
-        GenPolynomial<C> x = ring.random(n, rnd).monic();
-        return new AlgebraicNumber<C>(this, x);
-    }
-
-
-    /**
-     * Parse AlgebraicNumber from String.
-     *
-     * @param s String.
-     * @return AlgebraicNumber from s.
-     */
-    public AlgebraicNumber<C> parse(String s) {
-        GenPolynomial<C> x = ring.parse(s);
-        return new AlgebraicNumber<C>(this, x);
-    }
-
-
-    /**
-     * Parse AlgebraicNumber from Reader.
-     *
-     * @param r Reader.
-     * @return next AlgebraicNumber from r.
-     */
-    public AlgebraicNumber<C> parse(Reader r) {
-        GenPolynomial<C> x = ring.parse(r);
-        return new AlgebraicNumber<C>(this, x);
-    }
-
 
     /**
      * AlgebraicNumber chinese remainder algorithm. Assert deg(c.modul) >=
@@ -558,7 +536,7 @@ public class AlgebraicNumberRing<C extends RingElem<C>> implements RingFactory<A
 class AlgebraicNumberIterator<C extends RingElem<C>> implements Iterator<AlgebraicNumber<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(AlgebraicNumberIterator.class);
+    private static final Logger logger = LogManager.getLogger(AlgebraicNumberIterator.class);
     /**
      * data structure.
      */

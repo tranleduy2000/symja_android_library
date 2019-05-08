@@ -29,6 +29,12 @@ public interface Element<C> extends Comparable<C>, Serializable {
      */
     C copy();
 
+    /**
+     * Hashcode of this Element.
+     *
+     * @return the hashCode.
+     */
+    int hashCode();
 
     /**
      * Test if this is equal to b.
@@ -37,15 +43,6 @@ public interface Element<C> extends Comparable<C>, Serializable {
      * @return true if this is equal to b, else false.
      */
     boolean equals(Object b);
-
-
-    /**
-     * Hashcode of this Element.
-     *
-     * @return the hashCode.
-     */
-    int hashCode();
-
 
     /**
      * Compare this to b. I.e. this &lt; b iff this.compareTo(b) &lt; 0.

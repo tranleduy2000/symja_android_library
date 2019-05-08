@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,14 +38,14 @@ import edu.jas.ufd.GreatestCommonDivisorFake;
  * @param <C> coefficient type
  * @author Heinz Kredel
  * @see edu.jas.application.GBAlgorithmBuilder
- * @see GBFactory
+ * @see edu.jas.gbufd.GBFactory
  */
 
 public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         SolvableGroebnerBaseAbstract<GenPolynomial<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(SolvableGroebnerBasePseudoRecSeq.class);
+    private static final Logger logger = LogManager.getLogger(SolvableGroebnerBasePseudoRecSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -213,63 +213,6 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         return G;
     }
 
-
-    /**
-     * Minimal ordered Solvable Groebner basis.
-     *
-     * @param Gp a Solvable Groebner base.
-     * @return a reduced Solvable Groebner base of Gp.
-     */
-    @Override
-    public List<GenSolvablePolynomial<GenPolynomial<C>>> leftMinimalGB(
-            List<GenSolvablePolynomial<GenPolynomial<C>>> Gp) {
-        List<GenSolvablePolynomial<GenPolynomial<C>>> G = normalizeZerosOnes(Gp);
-        if (G.size() <= 1) {
-            return G;
-        }
-        // remove top reducible polynomials
-        GenSolvablePolynomial<GenPolynomial<C>> a;
-        List<GenSolvablePolynomial<GenPolynomial<C>>> F = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(
-                G.size());
-        while (G.size() > 0) {
-            a = G.remove(0);
-            if (sred.isTopReducible(G, a) || sred.isTopReducible(F, a)) {
-                // drop polynomial 
-                if (debug) {
-                    System.out.println("dropped " + a);
-                    List<GenSolvablePolynomial<GenPolynomial<C>>> ff;
-                    ff = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(G);
-                    ff.addAll(F);
-                    a = sredRec.leftNormalformRecursive(ff, a);
-                    if (!a.isZERO()) {
-                        System.out.println("error, nf(a) " + a);
-                    }
-                }
-            } else {
-                F.add(a);
-            }
-        }
-        G = F;
-        if (G.size() <= 1) {
-            return G;
-        }
-        Collections.reverse(G); // important for lex GB
-        // reduce remaining polynomials
-        int len = G.size();
-        int i = 0;
-        while (i < len) {
-            a = G.remove(0);
-            //System.out.println("doing " + a.length());
-            a = sredRec.leftNormalformRecursive(G, a);
-            a = (GenSolvablePolynomial<GenPolynomial<C>>) engine.recursivePrimitivePart(a); //a.monic(); not possible
-            a = PolyUtil.monic(a);
-            G.add(a); // adds as last
-            i++;
-        }
-        return G;
-    }
-
-
     /**
      * Twosided Solvable Groebner base using pairlist class.
      *
@@ -394,60 +337,6 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         return G;
     }
 
-
-    /**
-     * Left Groebner base test.
-     *
-     * @param modv number of module variables.
-     * @param F    solvable polynomial list.
-     * @return true, if F is a left Groebner base, else false.
-     */
-    @Override
-    public boolean isLeftGBsimple(int modv, List<GenSolvablePolynomial<GenPolynomial<C>>> F) {
-        //System.out.println("F to left check = " + F);
-        GenSolvablePolynomial<GenPolynomial<C>> pi, pj, s, h;
-        for (int i = 0; i < F.size(); i++) {
-            pi = F.get(i);
-            for (int j = i + 1; j < F.size(); j++) {
-                pj = F.get(j);
-                if (!red.moduleCriterion(modv, pi, pj)) {
-                    continue;
-                }
-                // if ( ! red.criterion4( pi, pj ) ) { continue; }
-                s = sred.leftSPolynomial(pi, pj);
-                if (s.isZERO()) {
-                    continue;
-                }
-                h = sredRec.leftNormalformRecursive(F, s);
-                if (!h.isZERO()) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Left Groebner base idempotence test.
-     *
-     * @param modv module variable number.
-     * @param F    solvable polynomial list.
-     * @return true, if F is equal to GB(F), else false.
-     */
-    @Override
-    public boolean isLeftGBidem(int modv, List<GenSolvablePolynomial<GenPolynomial<C>>> F) {
-        if (F == null || F.isEmpty()) {
-            return true;
-        }
-        GenSolvablePolynomialRing<GenPolynomial<C>> pring = F.get(0).ring;
-        List<GenSolvablePolynomial<GenPolynomial<C>>> G = leftGB(modv, F);
-        PolynomialList<GenPolynomial<C>> Fp = new PolynomialList<GenPolynomial<C>>(pring, F);
-        PolynomialList<GenPolynomial<C>> Gp = new PolynomialList<GenPolynomial<C>>(pring, G);
-        return Fp.compareTo(Gp) == 0;
-    }
-
-
     /**
      * Twosided Groebner base test.
      *
@@ -516,7 +405,6 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         return true;
     }
 
-
     /**
      * Solvable Extended Groebner base using critical pair class.
      *
@@ -530,6 +418,112 @@ public class SolvableGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
     public SolvableExtendedGB<GenPolynomial<C>> extLeftGB(int modv,
                                                           List<GenSolvablePolynomial<GenPolynomial<C>>> F) {
         throw new UnsupportedOperationException(); // TODO
+    }
+
+    /**
+     * Minimal ordered Solvable Groebner basis.
+     *
+     * @param Gp a Solvable Groebner base.
+     * @return a reduced Solvable Groebner base of Gp.
+     */
+    @Override
+    public List<GenSolvablePolynomial<GenPolynomial<C>>> leftMinimalGB(
+            List<GenSolvablePolynomial<GenPolynomial<C>>> Gp) {
+        List<GenSolvablePolynomial<GenPolynomial<C>>> G = normalizeZerosOnes(Gp);
+        if (G.size() <= 1) {
+            return G;
+        }
+        // remove top reducible polynomials
+        GenSolvablePolynomial<GenPolynomial<C>> a;
+        List<GenSolvablePolynomial<GenPolynomial<C>>> F = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(
+                G.size());
+        while (G.size() > 0) {
+            a = G.remove(0);
+            if (sred.isTopReducible(G, a) || sred.isTopReducible(F, a)) {
+                // drop polynomial
+                if (debug) {
+                    System.out.println("dropped " + a);
+                    List<GenSolvablePolynomial<GenPolynomial<C>>> ff;
+                    ff = new ArrayList<GenSolvablePolynomial<GenPolynomial<C>>>(G);
+                    ff.addAll(F);
+                    a = sredRec.leftNormalformRecursive(ff, a);
+                    if (!a.isZERO()) {
+                        System.out.println("error, nf(a) " + a);
+                    }
+                }
+            } else {
+                F.add(a);
+            }
+        }
+        G = F;
+        if (G.size() <= 1) {
+            return G;
+        }
+        Collections.reverse(G); // important for lex GB
+        // reduce remaining polynomials
+        int len = G.size();
+        int i = 0;
+        while (i < len) {
+            a = G.remove(0);
+            //System.out.println("doing " + a.length());
+            a = sredRec.leftNormalformRecursive(G, a);
+            a = (GenSolvablePolynomial<GenPolynomial<C>>) engine.recursivePrimitivePart(a); //a.monic(); not possible
+            a = PolyUtil.monic(a);
+            G.add(a); // adds as last
+            i++;
+        }
+        return G;
+    }
+
+    /**
+     * Left Groebner base test.
+     *
+     * @param modv number of module variables.
+     * @param F    solvable polynomial list.
+     * @return true, if F is a left Groebner base, else false.
+     */
+    @Override
+    public boolean isLeftGBsimple(int modv, List<GenSolvablePolynomial<GenPolynomial<C>>> F) {
+        //System.out.println("F to left check = " + F);
+        GenSolvablePolynomial<GenPolynomial<C>> pi, pj, s, h;
+        for (int i = 0; i < F.size(); i++) {
+            pi = F.get(i);
+            for (int j = i + 1; j < F.size(); j++) {
+                pj = F.get(j);
+                if (!red.moduleCriterion(modv, pi, pj)) {
+                    continue;
+                }
+                // if ( ! red.criterion4( pi, pj ) ) { continue; }
+                s = sred.leftSPolynomial(pi, pj);
+                if (s.isZERO()) {
+                    continue;
+                }
+                h = sredRec.leftNormalformRecursive(F, s);
+                if (!h.isZERO()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Left Groebner base idempotence test.
+     *
+     * @param modv module variable number.
+     * @param F    solvable polynomial list.
+     * @return true, if F is equal to GB(F), else false.
+     */
+    @Override
+    public boolean isLeftGBidem(int modv, List<GenSolvablePolynomial<GenPolynomial<C>>> F) {
+        if (F == null || F.isEmpty()) {
+            return true;
+        }
+        GenSolvablePolynomialRing<GenPolynomial<C>> pring = F.get(0).ring;
+        List<GenSolvablePolynomial<GenPolynomial<C>>> G = leftGB(modv, F);
+        PolynomialList<GenPolynomial<C>> Fp = new PolynomialList<GenPolynomial<C>>(pring, F);
+        PolynomialList<GenPolynomial<C>> Gp = new PolynomialList<GenPolynomial<C>>(pring, G);
+        return Fp.compareTo(Gp) == 0;
     }
 
 }

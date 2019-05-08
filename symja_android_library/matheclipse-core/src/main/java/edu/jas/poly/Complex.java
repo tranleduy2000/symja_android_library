@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.jas.arith.BigComplex;
 import edu.jas.arith.BigDecimal;
@@ -29,7 +29,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
         implements StarRingElem<Complex<C>>, GcdRingElem<Complex<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(Complex.class);
+    private static final Logger logger = LogManager.getLogger(Complex.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -126,24 +126,12 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
         }
         String si = "";
         if (i < s.length()) {
-            si = s.substring(i + 1, s.length());
+            si = s.substring(i + 1);
         }
         //int j = sr.indexOf("+");
         re = ring.ring.parse(sr.trim());
         im = ring.ring.parse(si.trim());
     }
-
-
-    /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public ComplexRing<C> factory() {
-        return ring;
-    }
-
 
     /**
      * Get the real part.
@@ -154,7 +142,6 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
         return re;
     }
 
-
     /**
      * Get the imaginary part.
      *
@@ -163,7 +150,6 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
     public C getIm() {
         return im;
     }
-
 
     /**
      * Copy this.
@@ -175,21 +161,31 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
         return new Complex<C>(ring, re, im);
     }
 
-
     /**
-     * Get the String representation.
+     * Since complex numbers are unordered, we use lexicographical order of re
+     * and im.
+     *
+     * @return 0 if this is equal to b; 1 if re > b.re, or re == b.re and im >
+     * b.im; -1 if re < b.re, or re == b.re and im < b.im
      */
     @Override
-    public String toString() {
-        String s = re.toString();
-        //logger.info("compareTo "+im+" ? 0 = "+i);
-        if (im.isZERO()) {
+    public int compareTo(Complex<C> b) {
+        int s = re.compareTo(b.re);
+        if (s != 0) {
             return s;
         }
-        s += "i" + im;
-        return s;
+        return im.compareTo(b.im);
     }
 
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public ComplexRing<C> factory() {
+        return ring;
+    }
 
     /**
      * Get a scripting compatible string representation.
@@ -220,6 +216,7 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
             } else {
                 s.append(mi.toScript()).append(" * I");
             }
+            s.append("");
         }
         return s.toString();
     }
@@ -248,6 +245,64 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
         return re.isZERO() && im.isZERO();
     }
 
+    /**
+     * Since complex numbers are unordered, we use lexicographical order of re
+     * and im.
+     *
+     * @return 0 if this is equal to 0; 1 if re > 0, or re == 0 and im > 0; -1
+     * if re < 0, or re == 0 and im < 0
+     * @see edu.jas.structure.RingElem#signum()
+     */
+    public int signum() {
+        int s = re.signum();
+        if (s != 0) {
+            return s;
+        }
+        return im.signum();
+    }
+
+    /**
+     * Complex number summation.
+     *
+     * @param B a Complex<C> number.
+     * @return this+B.
+     */
+    public Complex<C> sum(Complex<C> B) {
+        return new Complex<C>(ring, re.sum(B.re), im.sum(B.im));
+    }
+
+    /**
+     * Complex number subtract.
+     *
+     * @param B a Complex<C> number.
+     * @return this-B.
+     */
+    public Complex<C> subtract(Complex<C> B) {
+        return new Complex<C>(ring, re.subtract(B.re), im.subtract(B.im));
+    }
+
+    /**
+     * Complex number negative.
+     *
+     * @return -this.
+     * @see edu.jas.structure.RingElem#negate()
+     */
+    public Complex<C> negate() {
+        return new Complex<C>(ring, re.negate(), im.negate());
+    }
+
+    /**
+     * Complex number absolute value.
+     *
+     * @return |this|^2. <b>Note:</b> The square root is not jet implemented.
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public Complex<C> abs() {
+        Complex<C> n = norm();
+        logger.error("abs() square root missing");
+        // n = n.sqrt();
+        return n;
+    }
 
     /**
      * Is Complex number one.
@@ -258,17 +313,6 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
     public boolean isONE() {
         return re.isONE() && im.isZERO();
     }
-
-
-    /**
-     * Is Complex imaginary one.
-     *
-     * @return If this is i then true is returned, else false.
-     */
-    public boolean isIMAG() {
-        return re.isZERO() && im.isONE();
-    }
-
 
     /**
      * Is Complex unit element.
@@ -287,153 +331,8 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
     }
 
 
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof Complex)) {
-            return false;
-        }
-        Complex<C> bc = (Complex<C>) b;
-        if (!ring.equals(bc.ring)) {
-            return false;
-        }
-        return re.equals(bc.re) && im.equals(bc.im);
-    }
-
-
-    /**
-     * Hash code for this Complex.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return 37 * re.hashCode() + im.hashCode();
-    }
-
-
-    /**
-     * Since complex numbers are unordered, we use lexicographical order of re
-     * and im.
-     *
-     * @return 0 if this is equal to b; 1 if re > b.re, or re == b.re and im >
-     * b.im; -1 if re < b.re, or re == b.re and im < b.im
-     */
-    @Override
-    public int compareTo(Complex<C> b) {
-        int s = re.compareTo(b.re);
-        if (s != 0) {
-            return s;
-        }
-        return im.compareTo(b.im);
-    }
-
-
-    /**
-     * Since complex numbers are unordered, we use lexicographical order of re
-     * and im.
-     *
-     * @return 0 if this is equal to 0; 1 if re > 0, or re == 0 and im > 0; -1
-     * if re < 0, or re == 0 and im < 0
-     * @see edu.jas.structure.RingElem#signum()
-     */
-    public int signum() {
-        int s = re.signum();
-        if (s != 0) {
-            return s;
-        }
-        return im.signum();
-    }
-
-
     /* arithmetic operations: +, -, -
      */
-
-    /**
-     * Complex number summation.
-     *
-     * @param B a Complex<C> number.
-     * @return this+B.
-     */
-    public Complex<C> sum(Complex<C> B) {
-        return new Complex<C>(ring, re.sum(B.re), im.sum(B.im));
-    }
-
-
-    /**
-     * Complex number subtract.
-     *
-     * @param B a Complex<C> number.
-     * @return this-B.
-     */
-    public Complex<C> subtract(Complex<C> B) {
-        return new Complex<C>(ring, re.subtract(B.re), im.subtract(B.im));
-    }
-
-
-    /**
-     * Complex number negative.
-     *
-     * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public Complex<C> negate() {
-        return new Complex<C>(ring, re.negate(), im.negate());
-    }
-
-
-    /* arithmetic operations: conjugate, absolut value
-     */
-
-    /**
-     * Complex number conjugate.
-     *
-     * @return the complex conjugate of this.
-     */
-    public Complex<C> conjugate() {
-        return new Complex<C>(ring, re, im.negate());
-    }
-
-
-    /**
-     * Complex number norm.
-     *
-     * @return ||this||.
-     * @see edu.jas.structure.StarRingElem#norm()
-     */
-    public Complex<C> norm() {
-        // this.multiply(this.conjugate());
-        C v = re.multiply(re);
-        v = v.sum(im.multiply(im));
-        return new Complex<C>(ring, v);
-    }
-
-
-    /**
-     * Complex number absolute value.
-     *
-     * @return |this|^2. <b>Note:</b> The square root is not jet implemented.
-     * @see edu.jas.structure.RingElem#abs()
-     */
-    public Complex<C> abs() {
-        Complex<C> n = norm();
-        logger.error("abs() square root missing");
-        // n = n.sqrt();
-        return n;
-    }
-
-
-    /* arithmetic operations: *, inverse, /
-     */
-
 
     /**
      * Complex number product.
@@ -446,18 +345,18 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
                 im.multiply(B.re)));
     }
 
-
     /**
-     * Complex number inverse.
+     * Complex number divide.
      *
-     * @return S with S*this = 1, if it is defined.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @param B is a complex number, non-zero.
+     * @return this/B.
      */
-    public Complex<C> inverse() {
-        C a = norm().re.inverse();
-        return new Complex<C>(ring, re.multiply(a), im.multiply(a.negate()));
+    public Complex<C> divide(Complex<C> B) {
+        if (ring.isField()) {
+            return this.multiply(B.inverse());
+        }
+        return quotientRemainder(B)[0];
     }
-
 
     /**
      * Complex number remainder.
@@ -473,19 +372,8 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
     }
 
 
-    /**
-     * Complex number divide.
-     *
-     * @param B is a complex number, non-zero.
-     * @return this/B.
+    /* arithmetic operations: conjugate, absolut value
      */
-    public Complex<C> divide(Complex<C> B) {
-        if (ring.isField()) {
-            return this.multiply(B.inverse());
-        }
-        return quotientRemainder(B)[0];
-    }
-
 
     /**
      * Complex number quotient and remainder.
@@ -557,6 +445,96 @@ public class Complex<C extends RingElem<C>> extends RingElemImpl<Complex<C>>
         return ret;
     }
 
+    /**
+     * Complex number inverse.
+     *
+     * @return S with S*this = 1, if it is defined.
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public Complex<C> inverse() {
+        C a = norm().re.inverse();
+        return new Complex<C>(ring, re.multiply(a), im.multiply(a.negate()));
+    }
+
+    /**
+     * Is Complex imaginary one.
+     *
+     * @return If this is i then true is returned, else false.
+     */
+    public boolean isIMAG() {
+        return re.isZERO() && im.isONE();
+    }
+
+
+    /* arithmetic operations: *, inverse, /
+     */
+
+    /**
+     * Hash code for this Complex.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return 37 * re.hashCode() + im.hashCode();
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof Complex)) {
+            return false;
+        }
+        Complex<C> bc = (Complex<C>) b;
+        if (!ring.equals(bc.ring)) {
+            return false;
+        }
+        return re.equals(bc.re) && im.equals(bc.im);
+    }
+
+    /**
+     * Get the String representation.
+     */
+    @Override
+    public String toString() {
+        String s = re.toString();
+        //logger.info("compareTo "+im+" ? 0 = "+i);
+        if (im.isZERO()) {
+            return s;
+        }
+        s += "i" + im;
+        return s;
+    }
+
+    /**
+     * Complex number conjugate.
+     *
+     * @return the complex conjugate of this.
+     */
+    public Complex<C> conjugate() {
+        return new Complex<C>(ring, re, im.negate());
+    }
+
+    /**
+     * Complex number norm.
+     *
+     * @return ||this||.
+     * @see edu.jas.structure.StarRingElem#norm()
+     */
+    public Complex<C> norm() {
+        // this.multiply(this.conjugate());
+        C v = re.multiply(re);
+        v = v.sum(im.multiply(im));
+        return new Complex<C>(ring, v);
+    }
 
     /**
      * Complex number greatest common divisor.

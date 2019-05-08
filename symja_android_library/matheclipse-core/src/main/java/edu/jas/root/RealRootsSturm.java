@@ -5,8 +5,8 @@
 package edu.jas.root;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import edu.jas.structure.RingFactory;
 public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(RealRootsSturm.class);
+    private static final Logger logger = LogManager.getLogger(RealRootsSturm.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -111,6 +111,56 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
         return R;
     }
 
+    /**
+     * Number of real roots in interval.
+     *
+     * @param iv interval with f(left) * f(right) != 0.
+     * @param f  univariate polynomial.
+     * @return number of real roots of f in I.
+     */
+    @Override
+    public long realRootCount(Interval<C> iv, GenPolynomial<C> f) {
+        if (f == null || f.isConstant()) { // ?
+            return 0L;
+        }
+        if (f.isZERO()) {
+            C z = f.leadingBaseCoefficient();
+            if (!iv.contains(z)) {
+                return 0L;
+            }
+            return 1L;
+        }
+        List<GenPolynomial<C>> S = sturmSequence(f);
+        return realRootCount(iv, S);
+    }
+
+    /**
+     * Invariant interval for algebraic number sign.
+     *
+     * @param iv root isolating interval for f, with f(left) * f(right) &lt; 0.
+     * @param f  univariate polynomial, non-zero.
+     * @param g  univariate polynomial, gcd(f,g) == 1.
+     * @return v with v a new interval contained in iv such that g(w) != 0 for w
+     * in v.
+     */
+    @Override
+    public Interval<C> invariantSignInterval(Interval<C> iv, GenPolynomial<C> f, GenPolynomial<C> g) {
+        Interval<C> v = iv;
+        if (g == null || g.isZERO()) {
+            //throw new IllegalArgumentException("g == 0");
+            return v;
+        }
+        if (g.isConstant()) {
+            return v;
+        }
+        if (f == null || f.isZERO()) { // ? || f.isConstant()
+            throw new IllegalArgumentException("f == 0");
+            //return v;
+        }
+        List<GenPolynomial<C>> Sg = sturmSequence(g.monic());
+        Interval<C> ivp = invariantSignInterval(iv, f, Sg);
+        return ivp;
+    }
 
     /**
      * Isolating intervals for the real roots.
@@ -176,7 +226,7 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
             logger.info("R2 = " + R2);
         }
 
-        // refine isolating intervals if adjacent 
+        // refine isolating intervals if adjacent
         if (R1.isEmpty()) {
             R.addAll(R2);
             return R;
@@ -239,7 +289,6 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
         return R;
     }
 
-
     /**
      * Number of real roots in interval.
      *
@@ -261,60 +310,6 @@ public class RealRootsSturm<C extends RingElem<C> & Rational> extends RealRootsA
         }
         return v;
     }
-
-
-    /**
-     * Number of real roots in interval.
-     *
-     * @param iv interval with f(left) * f(right) != 0.
-     * @param f  univariate polynomial.
-     * @return number of real roots of f in I.
-     */
-    @Override
-    public long realRootCount(Interval<C> iv, GenPolynomial<C> f) {
-        if (f == null || f.isConstant()) { // ? 
-            return 0L;
-        }
-        if (f.isZERO()) {
-            C z = f.leadingBaseCoefficient();
-            if (!iv.contains(z)) {
-                return 0L;
-            }
-            return 1L;
-        }
-        List<GenPolynomial<C>> S = sturmSequence(f);
-        return realRootCount(iv, S);
-    }
-
-
-    /**
-     * Invariant interval for algebraic number sign.
-     *
-     * @param iv root isolating interval for f, with f(left) * f(right) &lt; 0.
-     * @param f  univariate polynomial, non-zero.
-     * @param g  univariate polynomial, gcd(f,g) == 1.
-     * @return v with v a new interval contained in iv such that g(w) != 0 for w
-     * in v.
-     */
-    @Override
-    public Interval<C> invariantSignInterval(Interval<C> iv, GenPolynomial<C> f, GenPolynomial<C> g) {
-        Interval<C> v = iv;
-        if (g == null || g.isZERO()) {
-            //throw new IllegalArgumentException("g == 0");
-            return v;
-        }
-        if (g.isConstant()) {
-            return v;
-        }
-        if (f == null || f.isZERO()) { // ? || f.isConstant()
-            throw new IllegalArgumentException("f == 0");
-            //return v;
-        }
-        List<GenPolynomial<C>> Sg = sturmSequence(g.monic());
-        Interval<C> ivp = invariantSignInterval(iv, f, Sg);
-        return ivp;
-    }
-
 
     /**
      * Invariant interval for algebraic number sign.

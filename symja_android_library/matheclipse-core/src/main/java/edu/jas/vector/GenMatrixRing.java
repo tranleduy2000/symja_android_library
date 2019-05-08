@@ -7,15 +7,15 @@ package edu.jas.vector;
 
 // import java.io.IOException;
 
-import com.duy.lambda.BiFunction;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import com.duy.lambda.BiFunction;
 
 import edu.jas.kern.StringUtil;
 import edu.jas.structure.AlgebraFactory;
@@ -35,7 +35,7 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
 
     public final static int DEFAULT_BSIZE = 10;
     public final static float DEFAULT_DENSITY = 0.5f;
-    private static final Logger logger = Logger.getLogger(GenMatrixRing.class);
+    private static final Logger logger = LogManager.getLogger(GenMatrixRing.class);
     private final static Random random = new Random();
     public final RingFactory<C> coFac;
     public final int rows;
@@ -105,42 +105,6 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
                 + coFac.toScript() + " constructed");
     }
 
-
-    /**
-     * Get the String representation as RingElem.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer s = new StringBuffer();
-        s.append(coFac.getClass().getSimpleName());
-        s.append("[" + rows + "," + cols + "]");
-        return s.toString();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        StringBuffer s = new StringBuffer("Mat(");
-        String f = null;
-        try {
-            f = ((RingElem<C>) coFac).toScriptFactory(); // sic
-        } catch (Exception e) {
-            f = coFac.toScript();
-        }
-        s.append(f + "," + rows + "," + cols + ")");
-        return s.toString();
-    }
-
-
     /**
      * Get the constant one for the GenMatrix.
      *
@@ -149,7 +113,6 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
     public GenMatrix<C> getZERO() {
         return ZERO;
     }
-
 
     /**
      * Get the constant one for the GenMatrix.
@@ -160,6 +123,23 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         return ONE;
     }
 
+    /**
+     * Query if this monoid is commutative.
+     *
+     * @return true if this monoid is commutative, else false.
+     */
+    public boolean isCommutative() {
+        return false;
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true if this monoid is associative, else false.
+     */
+    public boolean isAssociative() {
+        return (rows == cols);
+    }
 
     /**
      * Get a list of the generating elements.
@@ -192,116 +172,6 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         return coFac.isFinite();
     }
 
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof GenMatrixRing)) {
-            return false;
-        }
-        GenMatrixRing omod = (GenMatrixRing) other;
-        if (rows != omod.rows) {
-            return false;
-        }
-        if (cols != omod.cols) {
-            return false;
-        }
-        return coFac.equals(omod.coFac);
-    }
-
-
-    /**
-     * Hash code for this matrix ring.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h;
-        h = rows * 17 + cols;
-        h = 37 * h + coFac.hashCode();
-        return h;
-    }
-
-
-    /**
-     * Query if this ring is a field. May return false if it is to hard to
-     * determine if this ring is a field.
-     *
-     * @return true if it is known that this ring is a field, else false.
-     */
-    public boolean isField() {
-        return false;
-    }
-
-
-    /**
-     * Query if this monoid is commutative.
-     *
-     * @return true if this monoid is commutative, else false.
-     */
-    public boolean isCommutative() {
-        return false;
-    }
-
-
-    /**
-     * Query if this ring is associative.
-     *
-     * @return true if this monoid is associative, else false.
-     */
-    public boolean isAssociative() {
-        return (rows == cols);
-    }
-
-
-    /**
-     * Characteristic of this ring.
-     *
-     * @return characteristic of this ring.
-     */
-    public BigInteger characteristic() {
-        return coFac.characteristic();
-    }
-
-
-    /**
-     * Transposed matrix ring.
-     *
-     * @return transposed ring factory.
-     */
-    public GenMatrixRing<C> transpose() {
-        if (rows == cols) {
-            return this;
-        }
-        return new GenMatrixRing<C>(coFac, cols, rows, blocksize);
-    }
-
-
-    /**
-     * Product matrix ring for multiplication.
-     *
-     * @param other matrix ring factory.
-     * @return product ring factory.
-     */
-    public GenMatrixRing<C> product(GenMatrixRing<C> other) {
-        if (cols != other.rows) {
-            throw new IllegalArgumentException("invalid dimensions in product");
-        }
-        if (!coFac.equals(other.coFac)) {
-            throw new IllegalArgumentException("invalid coefficients in product");
-        }
-        if (rows == other.rows && cols == other.cols) {
-            return this;
-        }
-        return new GenMatrixRing<C>(coFac, rows, other.cols, blocksize);
-    }
-
-
     /**
      * Get the matrix for a.
      *
@@ -312,7 +182,6 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         C c = coFac.fromInteger(a);
         return ONE.scalarMultiply(c);
     }
-
 
     /**
      * Get the matrix for a.
@@ -325,42 +194,6 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         return ONE.scalarMultiply(c);
     }
 
-
-    /**
-     * From List of coefficients.
-     *
-     * @param om list of list of coefficients.
-     */
-    public GenMatrix<C> fromList(List<List<C>> om) {
-        if (om == null) {
-            return ZERO;
-        }
-        if (om.size() > rows) {
-            throw new IllegalArgumentException("size v > rows " + om + " > " + rows);
-        }
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
-        for (int i = 0; i < rows; i++) {
-            List<C> ov = om.get(i);
-            ArrayList<C> v;
-            if (ov == null) {
-                v = ZERO.matrix.get(0);
-            } else {
-                if (ov.size() > cols) {
-                    throw new IllegalArgumentException("size v > cols " + ov + " > " + cols);
-                }
-                v = new ArrayList<C>(cols);
-                v.addAll(ov);
-                // pad with zeros if required:
-                for (int j = v.size(); j < cols; j++) {
-                    v.add(coFac.getZERO());
-                }
-            }
-            m.add(v);
-        }
-        return new GenMatrix<C>(this, m);
-    }
-
-
     /**
      * Random matrix.
      *
@@ -369,18 +202,6 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
     public GenMatrix<C> random(int k) {
         return random(k, density, random);
     }
-
-
-    /**
-     * Random matrix.
-     *
-     * @param k size of random coefficients.
-     * @param q density of nozero coefficients.
-     */
-    public GenMatrix<C> random(int k, float q) {
-        return random(k, q, random);
-    }
-
 
     /**
      * Random matrix.
@@ -392,110 +213,6 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
     public GenMatrix<C> random(int k, Random random) {
         return random(k, density, random);
     }
-
-
-    /**
-     * Random matrix.
-     *
-     * @param k      size of random coefficients.
-     * @param q      density of nozero coefficients.
-     * @param random is a source for random bits.
-     * @return a random element.
-     */
-    public GenMatrix<C> random(int k, float q, Random random) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
-        for (int i = 0; i < rows; i++) {
-            ArrayList<C> v = new ArrayList<C>(cols);
-            for (int j = 0; j < cols; j++) {
-                C e;
-                if (random.nextFloat() < q) {
-                    e = coFac.random(k, random);
-                } else {
-                    e = coFac.getZERO();
-                }
-                v.add(e);
-            }
-            m.add(v);
-        }
-        return new GenMatrix<C>(this, m);
-    }
-
-
-    /**
-     * Random upper triangular matrix.
-     *
-     * @param k size of random coefficients.
-     * @param q density of nozero coefficients.
-     */
-    public GenMatrix<C> randomUpper(int k, float q) {
-        return randomUpper(k, q, random);
-    }
-
-
-    /**
-     * Random upper triangular matrix.
-     *
-     * @param k      size of random coefficients.
-     * @param q      density of nozero coefficients.
-     * @param random is a source for random bits.
-     * @return a random element.
-     */
-    public GenMatrix<C> randomUpper(int k, float q, Random random) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
-        for (int i = 0; i < rows; i++) {
-            ArrayList<C> v = new ArrayList<C>(cols);
-            for (int j = 0; j < cols; j++) {
-                C e = coFac.getZERO();
-                if (j >= i) {
-                    if (random.nextFloat() < q) {
-                        e = coFac.random(k, random);
-                    }
-                }
-                v.add(e);
-            }
-            m.add(v);
-        }
-        return new GenMatrix<C>(this, m);
-    }
-
-
-    /**
-     * Random lower triangular matrix.
-     *
-     * @param k size of random coefficients.
-     * @param q density of nozero coefficients.
-     */
-    public GenMatrix<C> randomLower(int k, float q) {
-        return randomLower(k, q, random);
-    }
-
-
-    /**
-     * Random lower triangular matrix.
-     *
-     * @param k      size of random coefficients.
-     * @param q      density of nozero coefficients.
-     * @param random is a source for random bits.
-     * @return a random element.
-     */
-    public GenMatrix<C> randomLower(int k, float q, Random random) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
-        for (int i = 0; i < rows; i++) {
-            ArrayList<C> v = new ArrayList<C>(cols);
-            for (int j = 0; j < cols; j++) {
-                C e = coFac.getZERO();
-                if (j <= i) {
-                    if (random.nextFloat() < q) {
-                        e = coFac.random(k, random);
-                    }
-                }
-                v.add(e);
-            }
-            m.add(v);
-        }
-        return new GenMatrix<C>(this, m);
-    }
-
 
     /**
      * Copy matrix.
@@ -509,27 +226,6 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         }
         return c.copy();
     }
-
-
-    /**
-     * Generate matrix via lambda expression.
-     *
-     * @param gener lambda expression.
-     * @return the generated matrix.
-     */
-    public GenMatrix<C> generate(BiFunction<Integer, Integer, C> gener) {
-        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
-        for (int i = 0; i < rows; i++) {
-            ArrayList<C> v = new ArrayList<C>(cols);
-            for (int j = 0; j < cols; j++) {
-                C e = gener.apply(i, j);
-                v.add(e);
-            }
-            m.add(v);
-        }
-        return new GenMatrix<C>(this, m);
-    }
-
 
     /**
      * Parse a matrix from a String. Syntax: [ [ c, ..., c ], ..., [ c, ..., c ]
@@ -578,7 +274,6 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
         return new GenMatrix<C>(this, mat);
     }
 
-
     /**
      * Parse a matrix from a Reader.
      *
@@ -588,6 +283,283 @@ public class GenMatrixRing<C extends RingElem<C>> implements AlgebraFactory<GenM
     public GenMatrix<C> parse(Reader r) {
         String s = StringUtil.nextPairedString(r, '[', ']');
         return parse(s);
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        StringBuffer s = new StringBuffer("Mat(");
+        String f = null;
+        try {
+            f = ((RingElem<C>) coFac).toScriptFactory(); // sic
+        } catch (Exception e) {
+            f = coFac.toScript();
+        }
+        s.append(f + "," + rows + "," + cols + ")");
+        return s.toString();
+    }
+
+    /**
+     * Hash code for this matrix ring.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = rows * 17 + cols;
+        h = 37 * h + coFac.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof GenMatrixRing)) {
+            return false;
+        }
+        GenMatrixRing omod = (GenMatrixRing) other;
+        if (rows != omod.rows) {
+            return false;
+        }
+        if (cols != omod.cols) {
+            return false;
+        }
+        return coFac.equals(omod.coFac);
+    }
+
+    /**
+     * Get the String representation as RingElem.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer s = new StringBuffer();
+        s.append(coFac.getClass().getSimpleName());
+        s.append("[" + rows + "," + cols + "]");
+        return s.toString();
+    }
+
+    /**
+     * Query if this ring is a field. May return false if it is to hard to
+     * determine if this ring is a field.
+     *
+     * @return true if it is known that this ring is a field, else false.
+     */
+    public boolean isField() {
+        return false;
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return characteristic of this ring.
+     */
+    public java.math.BigInteger characteristic() {
+        return coFac.characteristic();
+    }
+
+    /**
+     * Transposed matrix ring.
+     *
+     * @return transposed ring factory.
+     */
+    public GenMatrixRing<C> transpose() {
+        if (rows == cols) {
+            return this;
+        }
+        return new GenMatrixRing<C>(coFac, cols, rows, blocksize);
+    }
+
+    /**
+     * Product matrix ring for multiplication.
+     *
+     * @param other matrix ring factory.
+     * @return product ring factory.
+     */
+    public GenMatrixRing<C> product(GenMatrixRing<C> other) {
+        if (cols != other.rows) {
+            throw new IllegalArgumentException("invalid dimensions in product");
+        }
+        if (!coFac.equals(other.coFac)) {
+            throw new IllegalArgumentException("invalid coefficients in product");
+        }
+        if (rows == other.rows && cols == other.cols) {
+            return this;
+        }
+        return new GenMatrixRing<C>(coFac, rows, other.cols, blocksize);
+    }
+
+    /**
+     * From List of coefficients.
+     *
+     * @param om list of list of coefficients.
+     */
+    public GenMatrix<C> fromList(List<List<C>> om) {
+        if (om == null) {
+            return ZERO;
+        }
+        if (om.size() > rows) {
+            throw new IllegalArgumentException("size v > rows " + om + " > " + rows);
+        }
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        for (int i = 0; i < rows; i++) {
+            List<C> ov = om.get(i);
+            ArrayList<C> v;
+            if (ov == null) {
+                v = ZERO.matrix.get(0);
+            } else {
+                if (ov.size() > cols) {
+                    throw new IllegalArgumentException("size v > cols " + ov + " > " + cols);
+                }
+                v = new ArrayList<C>(cols);
+                v.addAll(ov);
+                // pad with zeros if required:
+                for (int j = v.size(); j < cols; j++) {
+                    v.add(coFac.getZERO());
+                }
+            }
+            m.add(v);
+        }
+        return new GenMatrix<C>(this, m);
+    }
+
+    /**
+     * Random matrix.
+     *
+     * @param k size of random coefficients.
+     * @param q density of nozero coefficients.
+     */
+    public GenMatrix<C> random(int k, float q) {
+        return random(k, q, random);
+    }
+
+    /**
+     * Random matrix.
+     *
+     * @param k      size of random coefficients.
+     * @param q      density of nozero coefficients.
+     * @param random is a source for random bits.
+     * @return a random element.
+     */
+    public GenMatrix<C> random(int k, float q, Random random) {
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        for (int i = 0; i < rows; i++) {
+            ArrayList<C> v = new ArrayList<C>(cols);
+            for (int j = 0; j < cols; j++) {
+                C e;
+                if (random.nextFloat() < q) {
+                    e = coFac.random(k, random);
+                } else {
+                    e = coFac.getZERO();
+                }
+                v.add(e);
+            }
+            m.add(v);
+        }
+        return new GenMatrix<C>(this, m);
+    }
+
+    /**
+     * Random upper triangular matrix.
+     *
+     * @param k size of random coefficients.
+     * @param q density of nozero coefficients.
+     */
+    public GenMatrix<C> randomUpper(int k, float q) {
+        return randomUpper(k, q, random);
+    }
+
+    /**
+     * Random upper triangular matrix.
+     *
+     * @param k      size of random coefficients.
+     * @param q      density of nozero coefficients.
+     * @param random is a source for random bits.
+     * @return a random element.
+     */
+    public GenMatrix<C> randomUpper(int k, float q, Random random) {
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        for (int i = 0; i < rows; i++) {
+            ArrayList<C> v = new ArrayList<C>(cols);
+            for (int j = 0; j < cols; j++) {
+                C e = coFac.getZERO();
+                if (j >= i) {
+                    if (random.nextFloat() < q) {
+                        e = coFac.random(k, random);
+                    }
+                }
+                v.add(e);
+            }
+            m.add(v);
+        }
+        return new GenMatrix<C>(this, m);
+    }
+
+    /**
+     * Random lower triangular matrix.
+     *
+     * @param k size of random coefficients.
+     * @param q density of nozero coefficients.
+     */
+    public GenMatrix<C> randomLower(int k, float q) {
+        return randomLower(k, q, random);
+    }
+
+    /**
+     * Random lower triangular matrix.
+     *
+     * @param k      size of random coefficients.
+     * @param q      density of nozero coefficients.
+     * @param random is a source for random bits.
+     * @return a random element.
+     */
+    public GenMatrix<C> randomLower(int k, float q, Random random) {
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        for (int i = 0; i < rows; i++) {
+            ArrayList<C> v = new ArrayList<C>(cols);
+            for (int j = 0; j < cols; j++) {
+                C e = coFac.getZERO();
+                if (j <= i) {
+                    if (random.nextFloat() < q) {
+                        e = coFac.random(k, random);
+                    }
+                }
+                v.add(e);
+            }
+            m.add(v);
+        }
+        return new GenMatrix<C>(this, m);
+    }
+
+    /**
+     * Generate matrix via lambda expression.
+     *
+     * @param gener lambda expression.
+     * @return the generated matrix.
+     */
+    public GenMatrix<C> generate(BiFunction<Integer, Integer, C> gener) {
+        ArrayList<ArrayList<C>> m = new ArrayList<ArrayList<C>>(rows);
+        for (int i = 0; i < rows; i++) {
+            ArrayList<C> v = new ArrayList<C>(cols);
+            for (int j = 0; j < cols; j++) {
+                C e = gener.apply(i, j);
+                v.add(e);
+            }
+            m.add(v);
+        }
+        return new GenMatrix<C>(this, m);
     }
 
 }

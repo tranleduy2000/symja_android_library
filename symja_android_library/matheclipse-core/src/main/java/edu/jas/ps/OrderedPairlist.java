@@ -5,8 +5,8 @@
 package edu.jas.ps;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -30,7 +30,7 @@ import edu.jas.structure.RingElem;
 public class OrderedPairlist<C extends RingElem<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(OrderedPairlist.class);
+    private static final Logger logger = LogManager.getLogger(OrderedPairlist.class);
     protected final ArrayList<MultiVarPowerSeries<C>> P;
     protected final TreeMap<ExpVector, LinkedList<Pair<C>>> pairlist;
     protected final ArrayList<BitSet> red;
@@ -152,7 +152,7 @@ public class OrderedPairlist<C extends RingElem<C>> {
 
     /**
      * Remove the next required pair from the pairlist and reduction matrix.
-     * Apply the criterions 3 and 4 to @see if the S-power-series is required.
+     * Apply the criterions 3 and 4 to see if the S-power-series is required.
      *
      * @return the next pair if one exists, otherwise null.
      */

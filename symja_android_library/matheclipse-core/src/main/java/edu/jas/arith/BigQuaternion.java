@@ -5,8 +5,8 @@
 package edu.jas.arith;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Random;
@@ -20,7 +20,7 @@ import edu.jas.structure.StarRingElem;
  * BigQuaternion class based on BigRational implementing the RingElem interface
  * and with the familiar MAS static method names. Objects of this class are
  * immutable. The integer quaternion methods are implemented after
- * https://de.wikipedia.org/wiki/Hurwitzquaternion @see also
+ * https://de.wikipedia.org/wiki/Hurwitzquaternion see also
  * https://en.wikipedia.org/wiki/Hurwitz_quaternion
  *
  * @author Heinz Kredel
@@ -31,7 +31,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
 
 
     protected final static Random random = new Random();
-    private static final Logger logger = Logger.getLogger(BigQuaternion.class);
+    private static final Logger logger = LogManager.getLogger(BigQuaternion.class);
     private static final boolean debug = logger.isDebugEnabled();
     /**
      * Real part of the data structure.
@@ -180,7 +180,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
         }
         String si = "";
         if (i < s.length()) {
-            s = s.substring(i + 1, s.length());
+            s = s.substring(i + 1);
         }
         int j = s.indexOf("j");
         if (j > 0) {
@@ -190,7 +190,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
         }
         String sj = "";
         if (j < s.length()) {
-            s = s.substring(j + 1, s.length());
+            s = s.substring(j + 1);
         }
         int k = s.indexOf("k");
         if (k > 0) {
@@ -200,7 +200,7 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
         }
         String sk = "";
         if (k < s.length()) {
-            s = s.substring(k + 1, s.length());
+            s = s.substring(k + 1);
         }
         sk = s;
 
@@ -336,19 +336,9 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
     /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public BigQuaternionRing factory() {
-        return ring;
-    }
-
-    /**
      * Clone this.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public BigQuaternion copy() {
@@ -356,66 +346,37 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
     /**
-     * Get the real part.
+     * Since quaternion numbers are unordered, we use lexicographical order of
+     * re, im, jm and km.
      *
-     * @return re.
-     */
-    public BigRational getRe() {
-        return re;
-    }
-
-    /**
-     * Get the imaginary part im.
-     *
-     * @return im.
-     */
-    public BigRational getIm() {
-        return im;
-    }
-
-    /**
-     * Get the imaginary part jm.
-     *
-     * @return jm.
-     */
-    public BigRational getJm() {
-        return jm;
-    }
-
-    /**
-     * Get the imaginary part km.
-     *
-     * @return km.
-     */
-    public BigRational getKm() {
-        return km;
-    }
-
-    /**
-     * Get the string representation. Is compatible with the string constructor.
-     *
-     * @see Object#toString()
+     * @param b BigQuaternion.
+     * @return 0 if b is equal to this, 1 if this is greater b and -1 else.
      */
     @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer(re.toString());
-        int i = im.compareTo(BigRational.ZERO);
-        int j = jm.compareTo(BigRational.ZERO);
-        int k = km.compareTo(BigRational.ZERO);
-        if (debug) {
-            logger.debug("compareTo " + im + " ? 0 = " + i);
-            logger.debug("compareTo " + jm + " ? 0 = " + j);
-            logger.debug("compareTo " + km + " ? 0 = " + k);
+    public int compareTo(BigQuaternion b) {
+        int s = re.compareTo(b.re);
+        if (s != 0) {
+            return s;
         }
-        if (i == 0 && j == 0 && k == 0) {
-            return sb.toString();
+        s = im.compareTo(b.im);
+        if (s != 0) {
+            return s;
         }
-        sb.append("i" + im);
-        sb.append("j" + jm);
-        sb.append("k" + km);
-        String s = sb.toString();
-        //s = s.replaceAll("-","~");
-        return s;
+        s = jm.compareTo(b.jm);
+        if (s != 0) {
+            return s;
+        }
+        return km.compareTo(b.km);
+    }
+
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public BigQuaternionRing factory() {
+        return ring;
     }
 
     /**
@@ -490,6 +451,42 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
     /**
+     * Get the real part.
+     *
+     * @return re.
+     */
+    public BigRational getRe() {
+        return re;
+    }
+
+    /**
+     * Get the imaginary part im.
+     *
+     * @return im.
+     */
+    public BigRational getIm() {
+        return im;
+    }
+
+    /**
+     * Get the imaginary part jm.
+     *
+     * @return jm.
+     */
+    public BigRational getJm() {
+        return jm;
+    }
+
+    /**
+     * Get the imaginary part km.
+     *
+     * @return km.
+     */
+    public BigRational getKm() {
+        return km;
+    }
+
+    /**
      * Is BigQuaternion number zero.
      *
      * @return true if this is 0, else false.
@@ -501,109 +498,6 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
 
 
     /* arithmetic operations: +, -, -
-     */
-
-    /**
-     * Is BigQuaternion number one.
-     *
-     * @return true if this is 1, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        return re.isONE() && im.isZERO() && jm.isZERO() && km.isZERO();
-    }
-
-    /**
-     * Is BigQuaternion imaginary one.
-     *
-     * @return true if this is i, else false.
-     */
-    public boolean isIMAG() {
-        return re.isZERO() && im.isONE() && jm.isZERO() && km.isZERO();
-    }
-
-    /**
-     * Is BigQuaternion unit element.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        //if (ring.integral) { not meaningful to test
-        //    System.out.println("*** entier isUnit case not implemented ***");
-        //}
-        return !isZERO();
-    }
-
-    /**
-     * Is BigQuaternion entier element.
-     *
-     * @return If this is an integer Hurwitz element then true is returned, else
-     * false.
-     */
-    public boolean isEntier() {
-        if (re.isEntier() && im.isEntier() && jm.isEntier() && km.isEntier()) {
-            return true;
-        }
-        java.math.BigInteger TWO = BigInteger.TWO.val;
-        return re.den.equals(TWO) && im.den.equals(TWO) && jm.den.equals(TWO) && km.den.equals(TWO);
-    }
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    public boolean equals(Object b) {
-        if (!(b instanceof BigQuaternion)) {
-            return false;
-        }
-        BigQuaternion B = (BigQuaternion) b;
-        // ring == B.ring ?
-        return re.equals(B.re) && im.equals(B.im) && jm.equals(B.jm) && km.equals(B.km);
-    }
-
-    /**
-     * Hash code for this BigQuaternion.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h = re.hashCode();
-        h += h * 37 + im.hashCode();
-        h += h * 37 + jm.hashCode();
-        h += h * 37 + km.hashCode();
-        return h;
-    }
-
-    /**
-     * Since quaternion numbers are unordered, we use lexicographical order of
-     * re, im, jm and km.
-     *
-     * @param b BigQuaternion.
-     * @return 0 if b is equal to this, 1 if this is greater b and -1 else.
-     */
-    @Override
-    public int compareTo(BigQuaternion b) {
-        int s = re.compareTo(b.re);
-        if (s != 0) {
-            return s;
-        }
-        s = im.compareTo(b.im);
-        if (s != 0) {
-            return s;
-        }
-        s = jm.compareTo(b.jm);
-        if (s != 0) {
-            return s;
-        }
-        return km.compareTo(b.km);
-    }
-
-
-    /* arithmetic operations: conjugate, absolute value
      */
 
     /**
@@ -662,34 +556,6 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
     /**
-     * BigQuaternion conjugate.
-     *
-     * @return conjugate(this).
-     */
-    public BigQuaternion conjugate() {
-        return new BigQuaternion(ring, re, im.negate(), jm.negate(), km.negate());
-    }
-
-
-    /* arithmetic operations: *, inverse, /
-     */
-
-    /**
-     * Quaternion number norm.
-     *
-     * @return ||this||.
-     * @see edu.jas.structure.StarRingElem#norm()
-     */
-    public BigQuaternion norm() {
-        // this.multiply(this.conjugate());
-        BigRational v = re.multiply(re);
-        v = v.sum(im.multiply(im));
-        v = v.sum(jm.multiply(jm));
-        v = v.sum(km.multiply(km));
-        return new BigQuaternion(ring, v);
-    }
-
-    /**
      * Quaternion number absolute value.
      *
      * @return |this|.
@@ -703,18 +569,31 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
     /**
-     * BigQuaternion multiply with BigRational.
+     * Is BigQuaternion number one.
      *
-     * @param b BigRational.
-     * @return this*b.
+     * @return true if this is 1, else false.
+     * @see edu.jas.structure.RingElem#isONE()
      */
-    public BigQuaternion multiply(BigRational b) {
-        BigRational r = re.multiply(b);
-        BigRational i = im.multiply(b);
-        BigRational j = jm.multiply(b);
-        BigRational k = km.multiply(b);
-        return new BigQuaternion(ring, r, i, j, k);
+    public boolean isONE() {
+        return re.isONE() && im.isZERO() && jm.isZERO() && km.isZERO();
     }
+
+    /**
+     * Is BigQuaternion unit element.
+     *
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
+     */
+    public boolean isUnit() {
+        //if (ring.integral) { not meaningful to test
+        //    System.out.println("*** entier isUnit case not implemented ***");
+        //}
+        return !isZERO();
+    }
+
+
+    /* arithmetic operations: conjugate, absolute value
+     */
 
     /**
      * BigQuaternion multiply.
@@ -747,15 +626,13 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
     /**
-     * BigQuaternion inverse.
+     * BigQuaternion right divide.
      *
-     * @return S with S * this = this * S = 1.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @param b BigQuaternion.
+     * @return this * b**(-1).
      */
-    public BigQuaternion inverse() {
-        BigRational a = norm().re.inverse();
-        return new BigQuaternion(ring, re.multiply(a), im.negate().multiply(a), jm.negate().multiply(a),
-                km.negate().multiply(a));
+    public BigQuaternion divide(BigQuaternion b) {
+        return rightDivide(b);
     }
 
     /**
@@ -779,15 +656,21 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
     /**
-     * BigQuaternion right divide.
+     * Quotient and remainder by division of this by S.
      *
-     * @param b BigQuaternion.
-     * @return this * b**(-1).
+     * @param S a quaternion number
+     * @return [this*S**(-1), this - (this*S**(-1))*S].
      */
-    public BigQuaternion divide(BigQuaternion b) {
-        return rightDivide(b);
+    public BigQuaternion[] quotientRemainder(BigQuaternion S) {
+        if (ring.integral) {
+            //System.out.println(
+            //     "*** entier left quotient remainder(" + this + ", " + S + "): " + ring + " ***");
+            BigQuaternionInteger c = new BigQuaternionInteger(ring, this);
+            BigQuaternionInteger d = new BigQuaternionInteger(ring, S);
+            return c.rightQuotientAndRemainder(d);
+        }
+        return new BigQuaternion[]{divide(S), ring.getZERO()};
     }
-
 
     /**
      * BigQuaternion right divide.
@@ -807,6 +690,9 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     }
 
 
+    /* arithmetic operations: *, inverse, /
+     */
+
     /**
      * BigQuaternion left divide.
      *
@@ -824,6 +710,134 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
         return b.inverse().multiply(this);
     }
 
+    /**
+     * BigQuaternion inverse.
+     *
+     * @return S with S * this = this * S = 1.
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public BigQuaternion inverse() {
+        BigRational a = norm().re.inverse();
+        return new BigQuaternion(ring, re.multiply(a), im.negate().multiply(a), jm.negate().multiply(a),
+                km.negate().multiply(a));
+    }
+
+    /**
+     * Is BigQuaternion imaginary one.
+     *
+     * @return true if this is i, else false.
+     */
+    public boolean isIMAG() {
+        return re.isZERO() && im.isONE() && jm.isZERO() && km.isZERO();
+    }
+
+    /**
+     * Is BigQuaternion entier element.
+     *
+     * @return If this is an integer Hurwitz element then true is returned, else
+     * false.
+     */
+    public boolean isEntier() {
+        if (re.isEntier() && im.isEntier() && jm.isEntier() && km.isEntier()) {
+            return true;
+        }
+        java.math.BigInteger TWO = BigInteger.TWO.val;
+        return re.den.equals(TWO) && im.den.equals(TWO) && jm.den.equals(TWO) && km.den.equals(TWO);
+    }
+
+    /**
+     * Hash code for this BigQuaternion.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h = re.hashCode();
+        h += h * 37 + im.hashCode();
+        h += h * 37 + jm.hashCode();
+        h += h * 37 + km.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object b) {
+        if (!(b instanceof BigQuaternion)) {
+            return false;
+        }
+        BigQuaternion B = (BigQuaternion) b;
+        // ring == B.ring ?
+        return re.equals(B.re) && im.equals(B.im) && jm.equals(B.jm) && km.equals(B.km);
+    }
+
+    /**
+     * Get the string representation. Is compatible with the string constructor.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(re.toString());
+        int i = im.compareTo(BigRational.ZERO);
+        int j = jm.compareTo(BigRational.ZERO);
+        int k = km.compareTo(BigRational.ZERO);
+        if (debug) {
+            logger.debug("compareTo " + im + " ? 0 = " + i);
+            logger.debug("compareTo " + jm + " ? 0 = " + j);
+            logger.debug("compareTo " + km + " ? 0 = " + k);
+        }
+        if (i == 0 && j == 0 && k == 0) {
+            return sb.toString();
+        }
+        sb.append("i" + im);
+        sb.append("j" + jm);
+        sb.append("k" + km);
+        String s = sb.toString();
+        //s = s.replaceAll("-","~");
+        return s;
+    }
+
+    /**
+     * BigQuaternion conjugate.
+     *
+     * @return conjugate(this).
+     */
+    public BigQuaternion conjugate() {
+        return new BigQuaternion(ring, re, im.negate(), jm.negate(), km.negate());
+    }
+
+    /**
+     * Quaternion number norm.
+     *
+     * @return ||this||.
+     * @see edu.jas.structure.StarRingElem#norm()
+     */
+    public BigQuaternion norm() {
+        // this.multiply(this.conjugate());
+        BigRational v = re.multiply(re);
+        v = v.sum(im.multiply(im));
+        v = v.sum(jm.multiply(jm));
+        v = v.sum(km.multiply(km));
+        return new BigQuaternion(ring, v);
+    }
+
+    /**
+     * BigQuaternion multiply with BigRational.
+     *
+     * @param b BigRational.
+     * @return this*b.
+     */
+    public BigQuaternion multiply(BigRational b) {
+        BigRational r = re.multiply(b);
+        BigRational i = im.multiply(b);
+        BigRational j = jm.multiply(b);
+        BigRational k = km.multiply(b);
+        return new BigQuaternion(ring, r, i, j, k);
+    }
 
     /**
      * BigQuaternion divide.
@@ -836,25 +850,6 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
         return new BigQuaternion(ring, re.multiply(bi), im.multiply(bi), jm.multiply(bi), km.multiply(bi));
     }
 
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a quaternion number
-     * @return [this*S**(-1), this - (this*S**(-1))*S].
-     */
-    public BigQuaternion[] quotientRemainder(BigQuaternion S) {
-        if (ring.integral) {
-            //System.out.println(
-            //     "*** entier left quotient remainder(" + this + ", " + S + "): " + ring + " ***");
-            BigQuaternionInteger c = new BigQuaternionInteger(ring, this);
-            BigQuaternionInteger d = new BigQuaternionInteger(ring, S);
-            return c.rightQuotientAndRemainder(d);
-        }
-        return new BigQuaternion[]{divide(S), ring.getZERO()};
-    }
-
-
     /**
      * Quaternion number greatest common divisor.
      *
@@ -864,53 +859,6 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
     public BigQuaternion gcd(BigQuaternion S) {
         return leftGcd(S);
     }
-
-
-    /**
-     * Quaternion number greatest common divisor.
-     *
-     * @param S BigQuaternion.
-     * @return leftCcd(this, S).
-     */
-    public BigQuaternion leftGcd(BigQuaternion S) {
-        if (S == null || S.isZERO()) {
-            return this;
-        }
-        if (this.isZERO()) {
-            return S;
-        }
-        if (ring.integral) {
-            //System.out.println("*** entier left gcd(" + this + ", " + S + "): " + ring + " ***");
-            BigQuaternionInteger a = new BigQuaternionInteger(ring, this);
-            BigQuaternionInteger b = new BigQuaternionInteger(ring, S);
-            return a.leftGcd(b);
-        }
-        return ring.getONE();
-    }
-
-
-    /**
-     * Quaternion number greatest common divisor.
-     *
-     * @param S BigQuaternion.
-     * @return rightCcd(this, S).
-     */
-    public BigQuaternion rightGcd(BigQuaternion S) {
-        if (S == null || S.isZERO()) {
-            return this;
-        }
-        if (this.isZERO()) {
-            return S;
-        }
-        if (ring.integral) {
-            //System.out.println("*** entier right gcd(" + this + ", " + S + "): " + ring + " ***");
-            BigQuaternionInteger a = new BigQuaternionInteger(ring, this);
-            BigQuaternionInteger b = new BigQuaternionInteger(ring, S);
-            return a.rightGcd(b);
-        }
-        return ring.getONE();
-    }
-
 
     /**
      * BigQuaternion extended greatest common divisor.
@@ -941,6 +889,49 @@ public /*final*/ class BigQuaternion extends RingElemImpl<BigQuaternion>
         return ret;
     }
 
+    /**
+     * Quaternion number greatest common divisor.
+     *
+     * @param S BigQuaternion.
+     * @return leftCcd(this, S).
+     */
+    public BigQuaternion leftGcd(BigQuaternion S) {
+        if (S == null || S.isZERO()) {
+            return this;
+        }
+        if (this.isZERO()) {
+            return S;
+        }
+        if (ring.integral) {
+            //System.out.println("*** entier left gcd(" + this + ", " + S + "): " + ring + " ***");
+            BigQuaternionInteger a = new BigQuaternionInteger(ring, this);
+            BigQuaternionInteger b = new BigQuaternionInteger(ring, S);
+            return a.leftGcd(b);
+        }
+        return ring.getONE();
+    }
+
+    /**
+     * Quaternion number greatest common divisor.
+     *
+     * @param S BigQuaternion.
+     * @return rightCcd(this, S).
+     */
+    public BigQuaternion rightGcd(BigQuaternion S) {
+        if (S == null || S.isZERO()) {
+            return this;
+        }
+        if (this.isZERO()) {
+            return S;
+        }
+        if (ring.integral) {
+            //System.out.println("*** entier right gcd(" + this + ", " + S + "): " + ring + " ***");
+            BigQuaternionInteger a = new BigQuaternionInteger(ring, this);
+            BigQuaternionInteger b = new BigQuaternionInteger(ring, S);
+            return a.rightGcd(b);
+        }
+        return ring.getONE();
+    }
 
     /**
      * Returns the number of bits in the representation of this BigQuaternion,

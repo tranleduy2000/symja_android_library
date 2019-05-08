@@ -41,7 +41,7 @@ import edu.jas.structure.GcdRingElem;
  * engine = FactorFactory.getImplementation(cofac);
  * Sm = engine.factors(poly);
  * </pre>
- * @see FactorFactory#getImplementation
+ * @see edu.jas.ufd.FactorFactory#getImplementation
  */
 
 public interface Factorization<C extends GcdRingElem<C>> extends Serializable {

@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import edu.jas.ufd.SquarefreeFactory;
 public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends MultiplicativeSet<C> {
 
 
-    private static final Logger logger = Logger.getLogger(MultiplicativeSetSquarefree.class);
+    private static final Logger logger = LogManager.getLogger(MultiplicativeSetSquarefree.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -64,22 +64,10 @@ public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends Multi
         engine = eng;
     }
 
-
-    /**
-     * toString.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "MultiplicativeSetSquarefree" + mset;
-    }
-
-
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -89,6 +77,15 @@ public class MultiplicativeSetSquarefree<C extends GcdRingElem<C>> extends Multi
         return super.equals(B);
     }
 
+    /**
+     * toString.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "MultiplicativeSetSquarefree" + mset;
+    }
 
     /**
      * Add polynomial to mset.

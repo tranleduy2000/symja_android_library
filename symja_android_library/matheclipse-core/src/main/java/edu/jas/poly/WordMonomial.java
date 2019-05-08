@@ -76,7 +76,7 @@ public final class WordMonomial<C extends RingElem<C>> {
     /**
      * String representation of Monomial.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

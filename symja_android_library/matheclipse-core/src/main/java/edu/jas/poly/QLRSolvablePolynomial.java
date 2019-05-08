@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
         extends GenSolvablePolynomial<C> {
 
 
-    private static final Logger logger = Logger.getLogger(QLRSolvablePolynomial.class);
+    private static final Logger logger = LogManager.getLogger(QLRSolvablePolynomial.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -104,6 +104,15 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
         val.putAll(v); // assume no zero coefficients
     }
 
+    /**
+     * Clone this QLRSolvablePolynomial.
+     *
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> copy() {
+        return new QLRSolvablePolynomial<C, D>(ring, this.val);
+    }
 
     /**
      * Get the corresponding element factory.
@@ -116,22 +125,10 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
         return ring;
     }
 
-
-    /**
-     * Clone this QLRSolvablePolynomial.
-     *
-     * @see Object#clone()
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> copy() {
-        return new QLRSolvablePolynomial<C, D>(ring, this.val);
-    }
-
-
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -141,6 +138,223 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
         return super.equals(B);
     }
 
+    /**
+     * QLRSolvablePolynomial multiplication. Product with coefficient ring
+     * element.
+     *
+     * @param b solvable coefficient.
+     * @return this*b, where * is coefficient multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiply(C b) {
+        QLRSolvablePolynomial<C, D> Cp = ring.getZERO().copy();
+        if (b == null || b.isZERO()) {
+            return Cp;
+        }
+        if (b.isONE()) {
+            return this;
+        }
+        Cp = new QLRSolvablePolynomial<C, D>(ring, b, ring.evzero);
+        return multiply(Cp);
+    }
+
+    /**
+     * QLRSolvablePolynomial multiplication. Left product with coefficient ring
+     * element.
+     *
+     * @param b coefficient polynomial.
+     * @return b*this, where * is coefficient multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiplyLeft(C b) {
+        QLRSolvablePolynomial<C, D> Cp = ring.getZERO().copy();
+        if (b == null || b.isZERO()) {
+            return Cp;
+        }
+        Map<ExpVector, C> Cm = Cp.val; //getMap();
+        Map<ExpVector, C> Am = val;
+        C c;
+        for (Map.Entry<ExpVector, C> y : Am.entrySet()) {
+            ExpVector e = y.getKey();
+            C a = y.getValue();
+            c = b.multiply(a);
+            if (!c.isZERO()) {
+                Cm.put(e, c);
+            }
+        }
+        return Cp;
+    }
+
+    /**
+     * QLRSolvablePolynomial multiplication. Product with ring element and
+     * exponent vector.
+     *
+     * @param b coefficient polynomial.
+     * @param e exponent.
+     * @return this * b x<sup>e</sup>, where * denotes solvable multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiply(C b, ExpVector e) {
+        if (b == null || b.isZERO()) {
+            return ring.getZERO();
+        }
+        if (b.isONE() && e.isZERO()) {
+            return this;
+        }
+        QLRSolvablePolynomial<C, D> Cp = new QLRSolvablePolynomial<C, D>(ring, b, e);
+        return multiply(Cp);
+    }
+
+    /**
+     * QLRSolvablePolynomial multiplication. Product with exponent vector.
+     *
+     * @param e exponent.
+     * @return this * x<sup>e</sup>, where * denotes solvable multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiply(ExpVector e) {
+        if (e == null || e.isZERO()) {
+            return this;
+        }
+        C b = ring.getONECoefficient();
+        return multiply(b, e);
+    }
+
+    /**
+     * QLRSolvablePolynomial multiplication. Product with 'monomial'.
+     *
+     * @param m 'monomial'.
+     * @return this * m, where * denotes solvable multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiply(Map.Entry<ExpVector, C> m) {
+        if (m == null) {
+            return ring.getZERO();
+        }
+        return multiply(m.getValue(), m.getKey());
+    }
+
+    /**
+     * QLRSolvablePolynomial left and right multiplication. Product with
+     * coefficient ring element.
+     *
+     * @param b coefficient polynomial.
+     * @param c coefficient polynomial.
+     * @return b*this*c, where * is coefficient multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiply(C b, C c) {
+        QLRSolvablePolynomial<C, D> Cp = ring.getZERO().copy();
+        if (b == null || b.isZERO()) {
+            return Cp;
+        }
+        if (c == null || c.isZERO()) {
+            return Cp;
+        }
+        if (b.isONE() && c.isONE()) {
+            return this;
+        }
+        Cp = new QLRSolvablePolynomial<C, D>(ring, b, ring.evzero);
+        QLRSolvablePolynomial<C, D> Dp = new QLRSolvablePolynomial<C, D>(ring, c, ring.evzero);
+        return multiply(Cp, Dp);
+    }
+
+    /**
+     * QLRSolvablePolynomial left and right multiplication. Product with
+     * exponent vector.
+     *
+     * @param e exponent.
+     * @param f exponent.
+     * @return x<sup>e</sup> * this * x<sup>f</sup>, where * denotes solvable
+     * multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiply(ExpVector e, ExpVector f) {
+        if (e == null || e.isZERO()) {
+            return this;
+        }
+        if (f == null || f.isZERO()) {
+            return this;
+        }
+        C b = ring.getONECoefficient();
+        return multiply(b, e, b, f);
+    }
+
+    /**
+     * QLRSolvablePolynomial left and right multiplication. Product with ring
+     * element and exponent vector.
+     *
+     * @param b coefficient polynomial.
+     * @param e exponent.
+     * @param c coefficient polynomial.
+     * @param f exponent.
+     * @return b x<sup>e</sup> * this * c x<sup>f</sup>, where * denotes
+     * solvable multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiply(C b, ExpVector e, C c, ExpVector f) {
+        if (b == null || b.isZERO()) {
+            return ring.getZERO();
+        }
+        if (c == null || c.isZERO()) {
+            return ring.getZERO();
+        }
+        if (b.isONE() && e.isZERO() && c.isONE() && f.isZERO()) {
+            return this;
+        }
+        QLRSolvablePolynomial<C, D> Cp = new QLRSolvablePolynomial<C, D>(ring, b, e);
+        QLRSolvablePolynomial<C, D> Dp = new QLRSolvablePolynomial<C, D>(ring, c, f);
+        return multiply(Cp, Dp);
+    }
+
+
+    /**
+     * QLRSolvablePolynomial multiplication. Left product with ring element and
+     * exponent vector.
+     *
+     * @param b coefficient polynomial.
+     * @param e exponent.
+     * @return b x<sup>e</sup> * this, where * denotes solvable multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiplyLeft(C b, ExpVector e) {
+        if (b == null || b.isZERO()) {
+            return ring.getZERO();
+        }
+        QLRSolvablePolynomial<C, D> Cp = new QLRSolvablePolynomial<C, D>(ring, b, e);
+        return Cp.multiply(this);
+    }
+
+
+    /**
+     * QLRSolvablePolynomial multiplication. Left product with exponent vector.
+     *
+     * @param e exponent.
+     * @return x<sup>e</sup> * this, where * denotes solvable multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiplyLeft(ExpVector e) {
+        if (e == null || e.isZERO()) {
+            return this;
+        }
+        C b = ring.getONECoefficient();
+        QLRSolvablePolynomial<C, D> Cp = new QLRSolvablePolynomial<C, D>(ring, b, e);
+        return Cp.multiply(this);
+    }
+
+    /**
+     * QLRSolvablePolynomial multiplication. Left product with 'monomial'.
+     *
+     * @param m 'monomial'.
+     * @return m * this, where * denotes solvable multiplication.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> multiplyLeft(Map.Entry<ExpVector, C> m) {
+        if (m == null) {
+            return ring.getZERO();
+        }
+        return multiplyLeft(m.getValue(), m.getKey());
+    }
 
     /**
      * QLRSolvablePolynomial multiplication.
@@ -198,7 +412,7 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
                     fl1 = fp[fp.length - 1];
                 }
                 int fl1s = ring.nvar + 1 - fl1;
-                // polynomial with coefficient multiplication 
+                // polynomial with coefficient multiplication
                 QLRSolvablePolynomial<C, D> Cps = ring.getZERO().copy();
                 //QLRSolvablePolynomial<C, D> Cs;
                 QLRSolvablePolynomial<C, D> qp;
@@ -225,7 +439,7 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
                         RingFactory<C> bfq = (RingFactory<C>) b.factory();
                         Cps = new QLRSolvablePolynomial<C, D>(ring, bfq.getONE(), e);
 
-                        // coefficient multiplication with 1/den: 
+                        // coefficient multiplication with 1/den:
                         QLRSolvablePolynomial<C, D> qv = Cps;
                         //C qden = new C(b.denominator().factory(), b.denominator()); // den/1
                         C qden = ring.qpfac.create(b.denominator()); // den/1
@@ -258,7 +472,7 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
                 } // end coeff
                 if (debug)
                     logger.info("coeff-den: Cps = " + Cps);
-                // polynomial multiplication 
+                // polynomial multiplication
                 QLRSolvablePolynomial<C, D> Dps = ring.getZERO().copy();
                 QLRSolvablePolynomial<C, D> Ds = null;
                 QLRSolvablePolynomial<C, D> D1, D2;
@@ -337,7 +551,7 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
                     } // end Dps loop
                     Ds = Dps;
                 }
-                Ds = Ds.multiplyLeft(a); // multiply(a,b); // non-symmetric 
+                Ds = Ds.multiplyLeft(a); // multiply(a,b); // non-symmetric
                 if (debug)
                     logger.debug("Ds = " + Ds);
                 //Dp = (QLRSolvablePolynomial<C, D>) Dp.sum(Ds);
@@ -347,7 +561,6 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
         //System.out.println("this * Bp = " + Dp);
         return Dp;
     }
-
 
     /**
      * QLRSolvablePolynomial left and right multiplication. Product with two
@@ -370,234 +583,6 @@ public class QLRSolvablePolynomial<C extends GcdRingElem<C> & QuotPair<GenPolyno
         }
         return S.multiply(this).multiply(T);
     }
-
-
-    /**
-     * QLRSolvablePolynomial multiplication. Product with coefficient ring
-     * element.
-     *
-     * @param b solvable coefficient.
-     * @return this*b, where * is coefficient multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiply(C b) {
-        QLRSolvablePolynomial<C, D> Cp = ring.getZERO().copy();
-        if (b == null || b.isZERO()) {
-            return Cp;
-        }
-        if (b.isONE()) {
-            return this;
-        }
-        Cp = new QLRSolvablePolynomial<C, D>(ring, b, ring.evzero);
-        return multiply(Cp);
-    }
-
-
-    /**
-     * QLRSolvablePolynomial left and right multiplication. Product with
-     * coefficient ring element.
-     *
-     * @param b coefficient polynomial.
-     * @param c coefficient polynomial.
-     * @return b*this*c, where * is coefficient multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiply(C b, C c) {
-        QLRSolvablePolynomial<C, D> Cp = ring.getZERO().copy();
-        if (b == null || b.isZERO()) {
-            return Cp;
-        }
-        if (c == null || c.isZERO()) {
-            return Cp;
-        }
-        if (b.isONE() && c.isONE()) {
-            return this;
-        }
-        Cp = new QLRSolvablePolynomial<C, D>(ring, b, ring.evzero);
-        QLRSolvablePolynomial<C, D> Dp = new QLRSolvablePolynomial<C, D>(ring, c, ring.evzero);
-        return multiply(Cp, Dp);
-    }
-
-
-    /**
-     * QLRSolvablePolynomial multiplication. Product with exponent vector.
-     *
-     * @param e exponent.
-     * @return this * x<sup>e</sup>, where * denotes solvable multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiply(ExpVector e) {
-        if (e == null || e.isZERO()) {
-            return this;
-        }
-        C b = ring.getONECoefficient();
-        return multiply(b, e);
-    }
-
-
-    /**
-     * QLRSolvablePolynomial left and right multiplication. Product with
-     * exponent vector.
-     *
-     * @param e exponent.
-     * @param f exponent.
-     * @return x<sup>e</sup> * this * x<sup>f</sup>, where * denotes solvable
-     * multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiply(ExpVector e, ExpVector f) {
-        if (e == null || e.isZERO()) {
-            return this;
-        }
-        if (f == null || f.isZERO()) {
-            return this;
-        }
-        C b = ring.getONECoefficient();
-        return multiply(b, e, b, f);
-    }
-
-
-    /**
-     * QLRSolvablePolynomial multiplication. Product with ring element and
-     * exponent vector.
-     *
-     * @param b coefficient polynomial.
-     * @param e exponent.
-     * @return this * b x<sup>e</sup>, where * denotes solvable multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiply(C b, ExpVector e) {
-        if (b == null || b.isZERO()) {
-            return ring.getZERO();
-        }
-        if (b.isONE() && e.isZERO()) {
-            return this;
-        }
-        QLRSolvablePolynomial<C, D> Cp = new QLRSolvablePolynomial<C, D>(ring, b, e);
-        return multiply(Cp);
-    }
-
-
-    /**
-     * QLRSolvablePolynomial left and right multiplication. Product with ring
-     * element and exponent vector.
-     *
-     * @param b coefficient polynomial.
-     * @param e exponent.
-     * @param c coefficient polynomial.
-     * @param f exponent.
-     * @return b x<sup>e</sup> * this * c x<sup>f</sup>, where * denotes
-     * solvable multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiply(C b, ExpVector e, C c, ExpVector f) {
-        if (b == null || b.isZERO()) {
-            return ring.getZERO();
-        }
-        if (c == null || c.isZERO()) {
-            return ring.getZERO();
-        }
-        if (b.isONE() && e.isZERO() && c.isONE() && f.isZERO()) {
-            return this;
-        }
-        QLRSolvablePolynomial<C, D> Cp = new QLRSolvablePolynomial<C, D>(ring, b, e);
-        QLRSolvablePolynomial<C, D> Dp = new QLRSolvablePolynomial<C, D>(ring, c, f);
-        return multiply(Cp, Dp);
-    }
-
-
-    /**
-     * QLRSolvablePolynomial multiplication. Left product with ring element and
-     * exponent vector.
-     *
-     * @param b coefficient polynomial.
-     * @param e exponent.
-     * @return b x<sup>e</sup> * this, where * denotes solvable multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiplyLeft(C b, ExpVector e) {
-        if (b == null || b.isZERO()) {
-            return ring.getZERO();
-        }
-        QLRSolvablePolynomial<C, D> Cp = new QLRSolvablePolynomial<C, D>(ring, b, e);
-        return Cp.multiply(this);
-    }
-
-
-    /**
-     * QLRSolvablePolynomial multiplication. Left product with exponent vector.
-     *
-     * @param e exponent.
-     * @return x<sup>e</sup> * this, where * denotes solvable multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiplyLeft(ExpVector e) {
-        if (e == null || e.isZERO()) {
-            return this;
-        }
-        C b = ring.getONECoefficient();
-        QLRSolvablePolynomial<C, D> Cp = new QLRSolvablePolynomial<C, D>(ring, b, e);
-        return Cp.multiply(this);
-    }
-
-
-    /**
-     * QLRSolvablePolynomial multiplication. Left product with coefficient ring
-     * element.
-     *
-     * @param b coefficient polynomial.
-     * @return b*this, where * is coefficient multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiplyLeft(C b) {
-        QLRSolvablePolynomial<C, D> Cp = ring.getZERO().copy();
-        if (b == null || b.isZERO()) {
-            return Cp;
-        }
-        Map<ExpVector, C> Cm = Cp.val; //getMap();
-        Map<ExpVector, C> Am = val;
-        C c;
-        for (Map.Entry<ExpVector, C> y : Am.entrySet()) {
-            ExpVector e = y.getKey();
-            C a = y.getValue();
-            c = b.multiply(a);
-            if (!c.isZERO()) {
-                Cm.put(e, c);
-            }
-        }
-        return Cp;
-    }
-
-
-    /**
-     * QLRSolvablePolynomial multiplication. Left product with 'monomial'.
-     *
-     * @param m 'monomial'.
-     * @return m * this, where * denotes solvable multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiplyLeft(Map.Entry<ExpVector, C> m) {
-        if (m == null) {
-            return ring.getZERO();
-        }
-        return multiplyLeft(m.getValue(), m.getKey());
-    }
-
-
-    /**
-     * QLRSolvablePolynomial multiplication. Product with 'monomial'.
-     *
-     * @param m 'monomial'.
-     * @return this * m, where * denotes solvable multiplication.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> multiply(Map.Entry<ExpVector, C> m) {
-        if (m == null) {
-            return ring.getZERO();
-        }
-        return multiply(m.getValue(), m.getKey());
-    }
-
 
     /**
      * QLRSolvablePolynomial multiplication with exponent vector.

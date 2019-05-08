@@ -150,9 +150,19 @@ public class OrderedPolynomialList<C extends RingElem<C>> extends PolynomialList
     }
 
     /**
+     * Hash code for OrderedPolynomialList.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -165,17 +175,8 @@ public class OrderedPolynomialList<C extends RingElem<C>> extends PolynomialList
             pl = (OrderedPolynomialList<C>) p;
         } catch (ClassCastException ignored) {
         }
-        return pl != null;
-    }
-
-    /**
-     * Hash code for OrderedPolynomialList.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+        return pl != null;// compare sorted lists
+        // done already in super.equals()
     }
 
 }

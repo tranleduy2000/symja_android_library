@@ -111,18 +111,6 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
         return ring.modul;
     }
 
-
-    /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public ModLongRing factory() {
-        return ring;
-    }
-
-
     /**
      * Get the symmetric value part.
      *
@@ -136,7 +124,6 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
         return val;
     }
 
-
     /**
      * Return a BigInteger from this Element.
      *
@@ -145,7 +132,6 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
     public BigInteger getInteger() {
         return new BigInteger(val);
     }
-
 
     /**
      * Return a symmetric BigInteger from this Element.
@@ -161,94 +147,15 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
         return new BigInteger(v);
     }
 
-
     /**
      * Clone this.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public ModLong copy() {
         return new ModLong(ring, val);
     }
-
-
-    /**
-     * Is ModLong number zero.
-     *
-     * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
-     */
-    public boolean isZERO() {
-        return val == 0L;
-    }
-
-
-    /**
-     * Is ModLong number one.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        return val == 1L;
-    }
-
-
-    /**
-     * Is ModLong number a unit.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        if (isZERO()) {
-            return false;
-        }
-        if (ring.isField()) {
-            return true;
-        }
-        long g = gcd(ring.modul, val);
-        return (g == 1L || g == -1L);
-    }
-
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return Long.toString(val);
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return toString();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return factory().toScript();
-    }
-
 
     /**
      * ModLong comparison.
@@ -268,53 +175,49 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
         return (val < v ? -1 : 0);
     }
 
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public ModLongRing factory() {
+        return ring;
+    }
 
     /**
-     * Comparison with any other object.
+     * Get a scripting compatible string representation.
      *
-     * @see Object#equals(Object)
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    public boolean equals(Object b) {
-        if (!(b instanceof ModLong)) {
-            return false;
-        }
-        return (0 == compareTo((ModLong) b));
+    public String toScript() {
+        // Python case
+        return toString();
     }
 
-
     /**
-     * Hash code for this ModLong.
+     * Get a scripting compatible string representation of the factory.
      *
-     * @see Object#hashCode()
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
-    public int hashCode() {
-        return (int) val;
+    public String toScriptFactory() {
+        // Python case
+        return factory().toScript();
     }
-
 
     /**
-     * ModLong absolute value.
+     * Is ModLong number zero.
      *
-     * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @return If this is 0 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isZERO()
      */
-    public ModLong abs() {
-        return new ModLong(ring, (val < 0 ? -val : val));
+    public boolean isZERO() {
+        return val == 0L;
     }
-
-
-    /**
-     * ModLong negative.
-     *
-     * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public ModLong negate() {
-        return new ModLong(ring, -val);
-    }
-
 
     /**
      * ModLong signum.
@@ -329,6 +232,15 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
         return (val < 0L ? -1 : 0);
     }
 
+    /**
+     * ModLong summation.
+     *
+     * @param S ModLong.
+     * @return this+S.
+     */
+    public ModLong sum(ModLong S) {
+        return new ModLong(ring, val + S.val);
+    }
 
     /**
      * ModLong subtraction.
@@ -340,6 +252,62 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
         return new ModLong(ring, val - S.val);
     }
 
+    /**
+     * ModLong negative.
+     *
+     * @return -this.
+     * @see edu.jas.structure.RingElem#negate()
+     */
+    public ModLong negate() {
+        return new ModLong(ring, -val);
+    }
+
+    /**
+     * ModLong absolute value.
+     *
+     * @return the absolute value of this.
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public ModLong abs() {
+        return new ModLong(ring, (val < 0 ? -val : val));
+    }
+
+    /**
+     * Is ModLong number one.
+     *
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
+     */
+    public boolean isONE() {
+        return val == 1L;
+    }
+
+    /**
+     * Is ModLong number a unit.
+     *
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
+     */
+    public boolean isUnit() {
+        if (isZERO()) {
+            return false;
+        }
+        if (ring.isField()) {
+            return true;
+        }
+        long g = gcd(ring.modul, val);
+        return (g == 1L || g == -1L);
+    }
+
+    /**
+     * ModLong multiply.
+     *
+     * @param S ModLong.
+     * @return this*S.
+     */
+    public ModLong multiply(ModLong S) {
+        return new ModLong(ring, val * S.val);
+    }
 
     /**
      * ModLong divide.
@@ -362,26 +330,6 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
         }
     }
 
-
-    /**
-     * ModLong inverse.
-     *
-     * @return S with S=1/this if defined.
-     * @throws NotInvertibleException if the element is not invertible.
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public ModLong inverse() /*throws NotInvertibleException*/ {
-        try {
-            return new ModLong(ring, modInverse(val, ring.modul));
-        } catch (ArithmeticException e) {
-            long g = gcd(val, ring.modul);
-            long f = ring.modul / g;
-            throw new ModularNotInvertibleException(e, new BigInteger(ring.modul), new BigInteger(g),
-                    new BigInteger(f));
-        }
-    }
-
-
     /**
      * ModLong remainder.
      *
@@ -401,28 +349,56 @@ public final class ModLong extends RingElemImpl<ModLong> implements GcdRingElem<
         return new ModLong(ring, val % S.val);
     }
 
-
     /**
-     * ModLong multiply.
+     * ModLong inverse.
      *
-     * @param S ModLong.
-     * @return this*S.
+     * @return S with S=1/this if defined.
+     * @throws NotInvertibleException if the element is not invertible.
+     * @see edu.jas.structure.RingElem#inverse()
      */
-    public ModLong multiply(ModLong S) {
-        return new ModLong(ring, val * S.val);
+    public ModLong inverse() /*throws NotInvertibleException*/ {
+        try {
+            return new ModLong(ring, modInverse(val, ring.modul));
+        } catch (ArithmeticException e) {
+            long g = gcd(val, ring.modul);
+            long f = ring.modul / g;
+            throw new ModularNotInvertibleException(e, new BigInteger(ring.modul), new BigInteger(g),
+                    new BigInteger(f));
+        }
     }
 
-
     /**
-     * ModLong summation.
+     * Hash code for this ModLong.
      *
-     * @param S ModLong.
-     * @return this+S.
+     * @see java.lang.Object#hashCode()
      */
-    public ModLong sum(ModLong S) {
-        return new ModLong(ring, val + S.val);
+    @Override
+    public int hashCode() {
+        return (int) val;
     }
 
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object b) {
+        if (!(b instanceof ModLong)) {
+            return false;
+        }
+        return (0 == compareTo((ModLong) b));
+    }
+
+    /**
+     * Get the String representation.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return Long.toString(val);
+    }
 
     /**
      * ModInteger greatest common divisor.

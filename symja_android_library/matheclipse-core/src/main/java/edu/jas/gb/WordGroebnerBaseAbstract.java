@@ -5,8 +5,8 @@
 package edu.jas.gb;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +33,7 @@ import edu.jas.structure.RingElem;
 public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements WordGroebnerBase<C> {
 
 
-    private static final Logger logger = Logger.getLogger(WordGroebnerBaseAbstract.class);
+    private static final Logger logger = LogManager.getLogger(WordGroebnerBaseAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -84,7 +84,7 @@ public abstract class WordGroebnerBaseAbstract<C extends RingElem<C>> implements
     /**
      * Get the String representation with GB engines.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

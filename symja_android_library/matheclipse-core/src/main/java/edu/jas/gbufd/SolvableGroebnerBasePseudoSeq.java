@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,13 +37,13 @@ import edu.jas.ufd.GreatestCommonDivisorFake;
  * @param <C> coefficient type
  * @author Heinz Kredel
  * @see edu.jas.application.GBAlgorithmBuilder
- * @see GBFactory
+ * @see edu.jas.gbufd.GBFactory
  */
 
 public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends SolvableGroebnerBaseAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(SolvableGroebnerBasePseudoSeq.class);
+    private static final Logger logger = LogManager.getLogger(SolvableGroebnerBasePseudoSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -188,62 +188,6 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
         return G;
     }
 
-
-    /**
-     * Minimal ordered Solvable Groebner basis.
-     *
-     * @param Gp a Solvable Groebner base.
-     * @return a reduced Solvable Groebner base of Gp.
-     */
-    @Override
-    public List<GenSolvablePolynomial<C>> leftMinimalGB(List<GenSolvablePolynomial<C>> Gp) {
-        List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(Gp);
-        if (G.size() <= 1) {
-            return G;
-        }
-        // remove top reducible polynomials
-        GenSolvablePolynomial<C> a;
-        List<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>(G.size());
-        while (G.size() > 0) {
-            a = G.remove(0);
-            if (sred.isTopReducible(G, a) || sred.isTopReducible(F, a)) {
-                // drop polynomial 
-                if (debug) {
-                    System.out.println("dropped " + a);
-                    List<GenSolvablePolynomial<C>> ff;
-                    ff = new ArrayList<GenSolvablePolynomial<C>>(G);
-                    ff.addAll(F);
-                    a = sred.leftNormalform(ff, a);
-                    if (!a.isZERO()) {
-                        System.out.println("error, nf(a) " + a);
-                    }
-                }
-            } else {
-                F.add(a);
-            }
-        }
-        G = F;
-        if (G.size() <= 1) {
-            return G;
-        }
-        Collections.reverse(G); // important for lex GB
-        // reduce remaining polynomials
-        int len = G.size();
-        int i = 0;
-        while (i < len) {
-            a = G.remove(0);
-            //System.out.println("doing " + a.length());
-            a = sred.leftNormalform(G, a);
-            a = (GenSolvablePolynomial<C>) engine.basePrimitivePart(a); //a.monic(); not possible
-            a = (GenSolvablePolynomial<C>) a.abs();
-            //a = sred.normalform( F, a );
-            G.add(a); // adds as last
-            i++;
-        }
-        return G;
-    }
-
-
     /**
      * Twosided Solvable Groebner base using pairlist class.
      *
@@ -361,7 +305,6 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
         return G;
     }
 
-
     /**
      * Solvable Extended Groebner base using critical pair class.
      *
@@ -374,6 +317,60 @@ public class SolvableGroebnerBasePseudoSeq<C extends GcdRingElem<C>> extends Sol
     @Override
     public SolvableExtendedGB<C> extLeftGB(int modv, List<GenSolvablePolynomial<C>> F) {
         throw new UnsupportedOperationException(); // TODO
+    }
+
+    /**
+     * Minimal ordered Solvable Groebner basis.
+     *
+     * @param Gp a Solvable Groebner base.
+     * @return a reduced Solvable Groebner base of Gp.
+     */
+    @Override
+    public List<GenSolvablePolynomial<C>> leftMinimalGB(List<GenSolvablePolynomial<C>> Gp) {
+        List<GenSolvablePolynomial<C>> G = normalizeZerosOnes(Gp);
+        if (G.size() <= 1) {
+            return G;
+        }
+        // remove top reducible polynomials
+        GenSolvablePolynomial<C> a;
+        List<GenSolvablePolynomial<C>> F = new ArrayList<GenSolvablePolynomial<C>>(G.size());
+        while (G.size() > 0) {
+            a = G.remove(0);
+            if (sred.isTopReducible(G, a) || sred.isTopReducible(F, a)) {
+                // drop polynomial
+                if (debug) {
+                    System.out.println("dropped " + a);
+                    List<GenSolvablePolynomial<C>> ff;
+                    ff = new ArrayList<GenSolvablePolynomial<C>>(G);
+                    ff.addAll(F);
+                    a = sred.leftNormalform(ff, a);
+                    if (!a.isZERO()) {
+                        System.out.println("error, nf(a) " + a);
+                    }
+                }
+            } else {
+                F.add(a);
+            }
+        }
+        G = F;
+        if (G.size() <= 1) {
+            return G;
+        }
+        Collections.reverse(G); // important for lex GB
+        // reduce remaining polynomials
+        int len = G.size();
+        int i = 0;
+        while (i < len) {
+            a = G.remove(0);
+            //System.out.println("doing " + a.length());
+            a = sred.leftNormalform(G, a);
+            a = (GenSolvablePolynomial<C>) engine.basePrimitivePart(a); //a.monic(); not possible
+            a = (GenSolvablePolynomial<C>) a.abs();
+            //a = sred.normalform( F, a );
+            G.add(a); // adds as last
+            i++;
+        }
+        return G;
     }
 
 }

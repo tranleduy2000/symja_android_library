@@ -5,7 +5,8 @@
 package edu.jas.arith;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         implements RegularRingElem<Product<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(Product.class);
+    private static final Logger logger = LogManager.getLogger(Product.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -101,171 +102,15 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         return val.get(i); // auto-boxing
     }
 
-
-    /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public ProductRing<C> factory() {
-        return ring;
-    }
-
-
     /**
      * Clone this.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public Product<C> copy() {
         return new Product<C>(ring, val, isunit);
     }
-
-
-    /**
-     * Is Product zero.
-     *
-     * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
-     */
-    public boolean isZERO() {
-        return val.size() == 0;
-    }
-
-
-    /**
-     * Is Product one.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        if (val.size() != ring.length()) {
-            return false;
-        }
-        for (C e : val.values()) {
-            if (!e.isONE()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Is Product full.
-     *
-     * @return If every component is non-zero, then true is returned, else
-     * false.
-     */
-    public boolean isFull() {
-        return val.size() == ring.length();
-    }
-
-
-    /**
-     * Is Product unit.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        if (isunit > 0) {
-            return true;
-        }
-        if (isunit == 0) {
-            return false;
-        }
-        if (isZERO()) {
-            isunit = 0;
-            return false;
-        }
-        for (C e : val.values()) {
-            if (!e.isUnit()) {
-                isunit = 0;
-                return false;
-            }
-        }
-        isunit = 1;
-        return true;
-    }
-
-
-    /**
-     * Is Product idempotent.
-     *
-     * @return If this is a idempotent element then true is returned, else
-     * false.
-     */
-    public boolean isIdempotent() {
-        for (C e : val.values()) {
-            if (!e.isONE()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Get the String representation as RingElem.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return val.toString();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        StringBuffer s = new StringBuffer("( ");
-        boolean first = true;
-        for (Map.Entry<Integer, C> me : val.entrySet()) {
-            Integer i = me.getKey();
-            C v = me.getValue();
-            if (first) {
-                first = false;
-            } else {
-                if (v.signum() < 0) {
-                    s.append(" - ");
-                    v = v.negate();
-                } else {
-                    s.append(" + ");
-                }
-            }
-            if (!v.isONE()) {
-                s.append(v.toScript() + "*");
-            }
-            s.append("pg" + i);
-        }
-        s.append(" )");
-        return s.toString();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return factory().toScript();
-    }
-
 
     /**
      * Product comparison.
@@ -304,74 +149,84 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         return 0;
     }
 
-
     /**
-     * Comparison with any other object.
+     * Get the corresponding element factory.
      *
-     * @see Object#equals(Object)
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
      */
-    @SuppressWarnings("unchecked")
-    @Override
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof Product)) {
-            return false;
-        }
-        Product<C> a = (Product<C>) b;
-        return (0 == compareTo(a));
+    public ProductRing<C> factory() {
+        return ring;
     }
 
-
     /**
-     * Hash code for this local.
+     * Get a scripting compatible string representation.
      *
-     * @see Object#hashCode()
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    public int hashCode() {
-        int h = ring.hashCode();
-        h = 37 * h + val.hashCode();
-        return h;
+    public String toScript() {
+        // Python case
+        StringBuffer s = new StringBuffer("( ");
+        boolean first = true;
+        for (Map.Entry<Integer, C> me : val.entrySet()) {
+            Integer i = me.getKey();
+            C v = me.getValue();
+            if (first) {
+                first = false;
+            } else {
+                if (v.signum() < 0) {
+                    s.append(" - ");
+                    v = v.negate();
+                } else {
+                    s.append(" + ");
+                }
+            }
+            if (!v.isONE()) {
+                s.append(v.toScript() + "*");
+            }
+            s.append("pg" + i);
+        }
+        s.append(" )");
+        return s.toString();
     }
-
 
     /**
-     * Product extend. Add new component j with value of component i.
+     * Get a scripting compatible string representation of the factory.
      *
-     * @param i from index.
-     * @param j to index.
-     * @return the extended value of this.
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
-    public Product<C> extend(int i, int j) {
-        RingFactory<C> rf = ring.getFactory(j);
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>(val);
-        C v = val.get(i);
-        C w = rf.copy(v); // valueOf
-        if (!w.isZERO()) {
-            elem.put(j, w);
-        }
-        return new Product<C>(ring, elem, isunit);
+    @Override
+    public String toScriptFactory() {
+        // Python case
+        return factory().toScript();
     }
-
 
     /**
-     * Product absolute value.
+     * Is Product zero.
      *
-     * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @return If this is 0 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isZERO()
      */
-    public Product<C> abs() {
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
-        for (Map.Entry<Integer, C> e : val.entrySet()) {
-            Integer i = e.getKey();
-            C v = e.getValue().abs();
-            elem.put(i, v);
-        }
-        return new Product<C>(ring, elem, isunit);
+    public boolean isZERO() {
+        return val.size() == 0;
     }
 
+    /**
+     * Product signum.
+     *
+     * @return signum of first non-zero component.
+     * @see edu.jas.structure.RingElem#signum()
+     */
+    public int signum() {
+        if (val.size() == 0) {
+            return 0;
+        }
+        C v = val.get(val.firstKey());
+        return v.signum();
+    }
 
     /**
      * Product summation.
@@ -406,6 +261,15 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         return new Product<C>(ring, elem);
     }
 
+    /**
+     * Product subtraction.
+     *
+     * @param S Product.
+     * @return this-S.
+     */
+    public Product<C> subtract(Product<C> S) {
+        return sum(S.negate());
+    }
 
     /**
      * Product negate.
@@ -423,32 +287,180 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         return new Product<C>(ring, elem, isunit);
     }
 
-
     /**
-     * Product signum.
+     * Product absolute value.
      *
-     * @return signum of first non-zero component.
-     * @see edu.jas.structure.RingElem#signum()
+     * @return the absolute value of this.
+     * @see edu.jas.structure.RingElem#abs()
      */
-    public int signum() {
-        if (val.size() == 0) {
-            return 0;
+    public Product<C> abs() {
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        for (Map.Entry<Integer, C> e : val.entrySet()) {
+            Integer i = e.getKey();
+            C v = e.getValue().abs();
+            elem.put(i, v);
         }
-        C v = val.get(val.firstKey());
-        return v.signum();
+        return new Product<C>(ring, elem, isunit);
     }
 
+    /**
+     * Is Product one.
+     *
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
+     */
+    public boolean isONE() {
+        if (val.size() != ring.length()) {
+            return false;
+        }
+        for (C e : val.values()) {
+            if (!e.isONE()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
-     * Product subtraction.
+     * Is Product unit.
+     *
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
+     */
+    public boolean isUnit() {
+        if (isunit > 0) {
+            return true;
+        }
+        if (isunit == 0) {
+            return false;
+        }
+        if (isZERO()) {
+            isunit = 0;
+            return false;
+        }
+        for (C e : val.values()) {
+            if (!e.isUnit()) {
+                isunit = 0;
+                return false;
+            }
+        }
+        isunit = 1;
+        return true;
+    }
+
+    /**
+     * Product multiplication.
      *
      * @param S Product.
-     * @return this-S.
+     * @return this*S.
      */
-    public Product<C> subtract(Product<C> S) {
-        return sum(S.negate());
+    public Product<C> multiply(Product<C> S) {
+        if (S == null) {
+            return ring.getZERO();
+        }
+        if (S.isZERO()) {
+            return S;
+        }
+        if (this.isZERO()) {
+            return this;
+        }
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        SortedMap<Integer, C> sel = S.val;
+        for (Map.Entry<Integer, C> me : val.entrySet()) {
+            Integer i = me.getKey();
+            C y = sel.get(i);
+            if (y != null) {
+                C x = me.getValue();
+                x = x.multiply(y);
+                if (x != null && !x.isZERO()) {
+                    elem.put(i, x);
+                }
+            }
+        }
+        return new Product<C>(ring, elem);
     }
 
+    /**
+     * Product quasi-division.
+     *
+     * @param S Product.
+     * @return this/S.
+     */
+    public Product<C> divide(Product<C> S) {
+        if (S == null) {
+            return ring.getZERO();
+        }
+        if (S.isZERO()) {
+            return S;
+        }
+        if (this.isZERO()) {
+            return this;
+        }
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        SortedMap<Integer, C> sel = S.val;
+        for (Map.Entry<Integer, C> me : val.entrySet()) {
+            Integer i = me.getKey();
+            C y = sel.get(i);
+            if (y != null) {
+                C x = me.getValue();
+                try {
+                    x = x.divide(y);
+                } catch (NotInvertibleException e) {
+                    // should not happen any more
+                    System.out.println("product divide error: x = " + x + ", y = " + y);
+                    // could happen for e.g. ModInteger or AlgebraicNumber
+                    x = null; //ring.getFactory(i).getZERO();
+                }
+                if (x != null && !x.isZERO()) { // can happen
+                    elem.put(i, x);
+                }
+            }
+        }
+        return new Product<C>(ring, elem);
+    }
+
+    /**
+     * Product quasi-remainder.
+     *
+     * @param S Product.
+     * @return this - (this/S)*S.
+     */
+    public Product<C> remainder(Product<C> S) {
+        if (S == null) {
+            return this; //ring.getZERO();
+        }
+        if (S.isZERO()) {
+            return this;
+        }
+        if (this.isZERO()) {
+            return this;
+        }
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        SortedMap<Integer, C> sel = S.val;
+        for (Map.Entry<Integer, C> me : val.entrySet()) {
+            Integer i = me.getKey();
+            C y = sel.get(i);
+            if (y != null) {
+                C x = me.getValue();
+                x = x.remainder(y);
+                if (x != null && !x.isZERO()) { // can happen
+                    elem.put(i, x);
+                }
+            }
+        }
+        return new Product<C>(ring, elem);
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a product
+     * @return [this/S, this - (this/S)*S].
+     */
+    @SuppressWarnings("unchecked")
+    public Product<C>[] quotientRemainder(Product<C> S) {
+        return new Product[]{divide(S), remainder(S)};
+    }
 
     /**
      * Product quasi-inverse.
@@ -479,6 +491,30 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         return new Product<C>(ring, elem, isu);
     }
 
+    /**
+     * Is Product full.
+     *
+     * @return If every component is non-zero, then true is returned, else
+     * false.
+     */
+    public boolean isFull() {
+        return val.size() == ring.length();
+    }
+
+    /**
+     * Is Product idempotent.
+     *
+     * @return If this is a idempotent element then true is returned, else
+     * false.
+     */
+    public boolean isIdempotent() {
+        for (C e : val.values()) {
+            if (!e.isONE()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Product idempotent.
@@ -627,124 +663,63 @@ public class Product<C extends RingElem<C>> extends RingElemImpl<Product<C>>
         return new Product<C>(ring, elem, isunit);
     }
 
-
     /**
-     * Product quasi-division.
+     * Hash code for this local.
      *
-     * @param S Product.
-     * @return this/S.
+     * @see java.lang.Object#hashCode()
      */
-    public Product<C> divide(Product<C> S) {
-        if (S == null) {
-            return ring.getZERO();
-        }
-        if (S.isZERO()) {
-            return S;
-        }
-        if (this.isZERO()) {
-            return this;
-        }
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
-        SortedMap<Integer, C> sel = S.val;
-        for (Map.Entry<Integer, C> me : val.entrySet()) {
-            Integer i = me.getKey();
-            C y = sel.get(i);
-            if (y != null) {
-                C x = me.getValue();
-                try {
-                    x = x.divide(y);
-                } catch (NotInvertibleException e) {
-                    // should not happen any more
-                    System.out.println("product divide error: x = " + x + ", y = " + y);
-                    // could happen for e.g. ModInteger or AlgebraicNumber
-                    x = null; //ring.getFactory(i).getZERO();
-                }
-                if (x != null && !x.isZERO()) { // can happen
-                    elem.put(i, x);
-                }
-            }
-        }
-        return new Product<C>(ring, elem);
+    @Override
+    public int hashCode() {
+        int h = ring.hashCode();
+        h = 37 * h + val.hashCode();
+        return h;
     }
 
-
     /**
-     * Product quasi-remainder.
+     * Comparison with any other object.
      *
-     * @param S Product.
-     * @return this - (this/S)*S.
-     */
-    public Product<C> remainder(Product<C> S) {
-        if (S == null) {
-            return this; //ring.getZERO();
-        }
-        if (S.isZERO()) {
-            return this;
-        }
-        if (this.isZERO()) {
-            return this;
-        }
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
-        SortedMap<Integer, C> sel = S.val;
-        for (Map.Entry<Integer, C> me : val.entrySet()) {
-            Integer i = me.getKey();
-            C y = sel.get(i);
-            if (y != null) {
-                C x = me.getValue();
-                x = x.remainder(y);
-                if (x != null && !x.isZERO()) { // can happen
-                    elem.put(i, x);
-                }
-            }
-        }
-        return new Product<C>(ring, elem);
-    }
-
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a product
-     * @return [this/S, this - (this/S)*S].
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @SuppressWarnings("unchecked")
-    public Product<C>[] quotientRemainder(Product<C> S) {
-        return new Product[]{divide(S), remainder(S)};
+    @Override
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof Product)) {
+            return false;
+        }
+        Product<C> a = (Product<C>) b;
+        return (0 == compareTo(a));
     }
-
 
     /**
-     * Product multiplication.
+     * Get the String representation as RingElem.
      *
-     * @param S Product.
-     * @return this*S.
+     * @see java.lang.Object#toString()
      */
-    public Product<C> multiply(Product<C> S) {
-        if (S == null) {
-            return ring.getZERO();
-        }
-        if (S.isZERO()) {
-            return S;
-        }
-        if (this.isZERO()) {
-            return this;
-        }
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
-        SortedMap<Integer, C> sel = S.val;
-        for (Map.Entry<Integer, C> me : val.entrySet()) {
-            Integer i = me.getKey();
-            C y = sel.get(i);
-            if (y != null) {
-                C x = me.getValue();
-                x = x.multiply(y);
-                if (x != null && !x.isZERO()) {
-                    elem.put(i, x);
-                }
-            }
-        }
-        return new Product<C>(ring, elem);
+    @Override
+    public String toString() {
+        return val.toString();
     }
 
+    /**
+     * Product extend. Add new component j with value of component i.
+     *
+     * @param i from index.
+     * @param j to index.
+     * @return the extended value of this.
+     */
+    public Product<C> extend(int i, int j) {
+        RingFactory<C> rf = ring.getFactory(j);
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>(val);
+        C v = val.get(i);
+        C w = rf.copy(v); // valueOf
+        if (!w.isZERO()) {
+            elem.put(j, w);
+        }
+        return new Product<C>(ring, elem, isunit);
+    }
 
     /**
      * Product multiply by coefficient.

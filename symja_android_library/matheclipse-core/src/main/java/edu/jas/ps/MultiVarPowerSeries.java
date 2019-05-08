@@ -126,6 +126,49 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         this.truncate = Math.min(trunc, ring.truncate);
     }
 
+    /**
+     * Clone this power series.
+     *
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public MultiVarPowerSeries<C> copy() {
+        return new MultiVarPowerSeries<C>(ring, lazyCoeffs);
+    }
+
+    /**
+     * Compare to. <b>Note: </b> compare only up to max(truncates).
+     *
+     * @return sign of first non zero coefficient of this-ps.
+     */
+    @Override
+    public int compareTo(MultiVarPowerSeries<C> ps) {
+        final int m = truncate();
+        final int n = ps.truncate();
+        final int pos = Math.min(ring.truncate, Math.min(m, n));
+        int s = 0;
+        //System.out.println("coeffCache_c1 = " + lazyCoeffs.coeffCache);
+        //System.out.println("coeffCache_c2 = " + ps.lazyCoeffs.coeffCache);
+        // test homogeneous parts first is slower
+        for (ExpVector i : new ExpVectorIterable(ring.nvar, true, pos)) {
+            s = coefficient(i).compareTo(ps.coefficient(i));
+            if (s != 0) {
+                //System.out.println("i = " + i + ", coeff = " + coefficient(i) + ", ps.coeff = " + ps.coefficient(i));
+                return s;
+            }
+        }
+        for (int j = pos + 1; j <= Math.min(ring.truncate, Math.max(m, n)); j++) {
+            for (ExpVector i : new ExpVectorIterable(ring.nvar, j)) {
+                s = coefficient(i).compareTo(ps.coefficient(i));
+                //System.out.println("i = " + i + ", coeff = " + coefficient(i) + ", ps.coeff = " + ps.coefficient(i));
+                if (s != 0) {
+                    //System.out.println("i = " + i + ", coeff = " + coefficient(i) + ", ps.coeff = " + ps.coefficient(i));
+                    return s;
+                }
+            }
+        }
+        return s;
+    }
 
     /**
      * Get the corresponding element factory.
@@ -136,85 +179,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
     public MultiVarPowerSeriesRing<C> factory() {
         return ring;
     }
-
-
-    /**
-     * Clone this power series.
-     *
-     * @see Object#clone()
-     */
-    @Override
-    public MultiVarPowerSeries<C> copy() {
-        return new MultiVarPowerSeries<C>(ring, lazyCoeffs);
-    }
-
-
-    /**
-     * String representation of power series.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return toString(truncate);
-    }
-
-
-    /**
-     * To String with given truncate.
-     *
-     * @param trunc truncate parameter for this power series.
-     * @return string representation of this to given truncate.
-     */
-    public String toString(int trunc) {
-        StringBuffer sb = new StringBuffer();
-        MultiVarPowerSeries<C> s = this;
-        String[] vars = ring.vars;
-        //System.out.println("cache1 = " + s.lazyCoeffs.coeffCache);
-        for (ExpVector i : new ExpVectorIterable(ring.nvar, true, trunc)) {
-            C c = s.coefficient(i);
-            //System.out.println("i = " + i + ", c = " +c);
-            int si = c.signum();
-            if (si != 0) {
-                if (si > 0) {
-                    if (sb.length() > 0) {
-                        sb.append(" + ");
-                    }
-                } else {
-                    c = c.negate();
-                    sb.append(" - ");
-                }
-                if (!c.isONE() || i.isZERO()) {
-                    if (c instanceof GenPolynomial || c instanceof AlgebraicNumber) {
-                        sb.append("{ ");
-                    }
-                    sb.append(c.toString());
-                    if (c instanceof GenPolynomial || c instanceof AlgebraicNumber) {
-                        sb.append(" }");
-                    }
-                    if (!i.isZERO()) {
-                        sb.append(" * ");
-                    }
-                }
-                if (i.isZERO()) {
-                    //skip; sb.append(" ");
-                } else {
-                    sb.append(i.toString(vars));
-                }
-                //sb.append(c.toString() + ", ");
-            }
-            //System.out.println("cache = " + s.coeffCache);
-        }
-        if (sb.length() == 0) {
-            sb.append("0");
-        }
-        sb.append(" + BigO( (" + ring.varsToString() + ")^" + (trunc + 1) + "(" + (ring.truncate + 1)
-                + ") )");
-        //sb.append("...");
-        //System.out.println("cache2 = " + s.lazyCoeffs.coeffCache);
-        return sb.toString();
-    }
-
 
     /**
      * Get a scripting compatible string representation.
@@ -270,7 +234,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         return sb.toString();
     }
 
-
     /**
      * Get a scripting compatible string representation of the factory.
      *
@@ -283,6 +246,60 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         return factory().toScript();
     }
 
+    /**
+     * To String with given truncate.
+     *
+     * @param trunc truncate parameter for this power series.
+     * @return string representation of this to given truncate.
+     */
+    public String toString(int trunc) {
+        StringBuffer sb = new StringBuffer();
+        MultiVarPowerSeries<C> s = this;
+        String[] vars = ring.vars;
+        //System.out.println("cache1 = " + s.lazyCoeffs.coeffCache);
+        for (ExpVector i : new ExpVectorIterable(ring.nvar, true, trunc)) {
+            C c = s.coefficient(i);
+            //System.out.println("i = " + i + ", c = " +c);
+            int si = c.signum();
+            if (si != 0) {
+                if (si > 0) {
+                    if (sb.length() > 0) {
+                        sb.append(" + ");
+                    }
+                } else {
+                    c = c.negate();
+                    sb.append(" - ");
+                }
+                if (!c.isONE() || i.isZERO()) {
+                    if (c instanceof GenPolynomial || c instanceof AlgebraicNumber) {
+                        sb.append("{ ");
+                    }
+                    sb.append(c.toString());
+                    if (c instanceof GenPolynomial || c instanceof AlgebraicNumber) {
+                        sb.append(" }");
+                    }
+                    if (!i.isZERO()) {
+                        sb.append(" * ");
+                    }
+                }
+                if (i.isZERO()) {
+                    //skip; sb.append(" ");
+                } else {
+                    sb.append(i.toString(vars));
+                }
+                //sb.append(c.toString() + ", ");
+            }
+            //System.out.println("cache = " + s.coeffCache);
+        }
+        if (sb.length() == 0) {
+            sb.append("0");
+        }
+        sb.append(" + BigO( (" + ring.varsToString() + ")^" + (trunc + 1) + "(" + (ring.truncate + 1)
+                + ") )");
+        //sb.append("...");
+        //System.out.println("cache2 = " + s.lazyCoeffs.coeffCache);
+        return sb.toString();
+    }
 
     /**
      * Get coefficient.
@@ -861,37 +878,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         });
     }
 
-
-    /**
-     * Negate.
-     *
-     * @return - this.
-     */
-    public MultiVarPowerSeries<C> negate() {
-        return map(new UnaryFunctor<C, C>() {
-
-
-            @Override
-            public C eval(C c) {
-                return c.negate();
-            }
-        });
-    }
-
-
-    /**
-     * Absolute value.
-     *
-     * @return abs(this).
-     */
-    public MultiVarPowerSeries<C> abs() {
-        if (signum() < 0) {
-            return negate();
-        }
-        return this;
-    }
-
-
     /**
      * Evaluate at given point.
      *
@@ -909,7 +895,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         }
         return v;
     }
-
 
     /**
      * Order.
@@ -947,18 +932,16 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         return order;
     }
 
-
     /**
      * Order ExpVector.
      *
      * @return ExpVector of first non zero coefficient.
      */
     public ExpVector orderExpVector() {
-        //int x = 
+        //int x =
         order(); // ensure evorder is set
         return evorder;
     }
-
 
     /**
      * Order monomial.
@@ -975,7 +958,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         return new MapEntry<ExpVector, C>(e, coefficient(e));
     }
 
-
     /**
      * Truncate.
      *
@@ -984,7 +966,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
     public int truncate() {
         return truncate;
     }
-
 
     /**
      * Set truncate.
@@ -1007,7 +988,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         return ot;
     }
 
-
     /**
      * Ecart.
      *
@@ -1029,6 +1009,15 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         return hd - d;
     }
 
+    /**
+     * Is power series zero. <b>Note: </b> compare only up to truncate.
+     *
+     * @return If this is 0 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isZERO()
+     */
+    public boolean isZERO() {
+        return (signum() == 0);
+    }
 
     /**
      * Signum.
@@ -1042,121 +1031,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         }
         return 0;
     }
-
-
-    /**
-     * Compare to. <b>Note: </b> compare only up to max(truncates).
-     *
-     * @return sign of first non zero coefficient of this-ps.
-     */
-    @Override
-    public int compareTo(MultiVarPowerSeries<C> ps) {
-        final int m = truncate();
-        final int n = ps.truncate();
-        final int pos = Math.min(ring.truncate, Math.min(m, n));
-        int s = 0;
-        //System.out.println("coeffCache_c1 = " + lazyCoeffs.coeffCache);
-        //System.out.println("coeffCache_c2 = " + ps.lazyCoeffs.coeffCache);
-        // test homogeneous parts first is slower
-        for (ExpVector i : new ExpVectorIterable(ring.nvar, true, pos)) {
-            s = coefficient(i).compareTo(ps.coefficient(i));
-            if (s != 0) {
-                //System.out.println("i = " + i + ", coeff = " + coefficient(i) + ", ps.coeff = " + ps.coefficient(i));
-                return s;
-            }
-        }
-        for (int j = pos + 1; j <= Math.min(ring.truncate, Math.max(m, n)); j++) {
-            for (ExpVector i : new ExpVectorIterable(ring.nvar, j)) {
-                s = coefficient(i).compareTo(ps.coefficient(i));
-                //System.out.println("i = " + i + ", coeff = " + coefficient(i) + ", ps.coeff = " + ps.coefficient(i));
-                if (s != 0) {
-                    //System.out.println("i = " + i + ", coeff = " + coefficient(i) + ", ps.coeff = " + ps.coefficient(i));
-                    return s;
-                }
-            }
-        }
-        return s;
-    }
-
-
-    /**
-     * Is power series zero. <b>Note: </b> compare only up to truncate.
-     *
-     * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
-     */
-    public boolean isZERO() {
-        return (signum() == 0);
-    }
-
-
-    /**
-     * Is power series one. <b>Note: </b> compare only up to truncate.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        if (!leadingCoefficient().isONE()) {
-            return false;
-        }
-        return (compareTo(ring.ONE) == 0);
-        //return reductum().isZERO();
-    }
-
-
-    /**
-     * Comparison with any other object. <b>Note: </b> compare only up to
-     * truncate.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object B) {
-        if (B == null) {
-            return false;
-        }
-        if (!(B instanceof MultiVarPowerSeries)) {
-            return false;
-        }
-        MultiVarPowerSeries<C> a = (MultiVarPowerSeries<C>) B;
-        return compareTo(a) == 0;
-    }
-
-
-    /**
-     * Hash code for this polynomial. <b>Note: </b> only up to truncate.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h = 0;
-        //h = ( ring.hashCode() << 23 );
-        //h += val.hashCode();
-        for (ExpVector i : new ExpVectorIterable(ring.nvar, true, truncate)) {
-            C c = coefficient(i);
-            if (!c.isZERO()) {
-                h += i.hashCode();
-                h = (h << 23);
-            }
-            h += c.hashCode();
-            h = (h << 23);
-        }
-        return h;
-    }
-
-
-    /**
-     * Is unit.
-     *
-     * @return true, if this power series is invertible, else false.
-     */
-    public boolean isUnit() {
-        return leadingCoefficient().isUnit();
-    }
-
 
     /**
      * Sum a another power series.
@@ -1188,7 +1062,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         }, nt);
     }
 
-
     /**
      * Subtract a another power series.
      *
@@ -1219,6 +1092,56 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         }, nt);
     }
 
+    /**
+     * Negate.
+     *
+     * @return - this.
+     */
+    public MultiVarPowerSeries<C> negate() {
+        return map(new UnaryFunctor<C, C>() {
+
+
+            @Override
+            public C eval(C c) {
+                return c.negate();
+            }
+        });
+    }
+
+    /**
+     * Absolute value.
+     *
+     * @return abs(this).
+     */
+    public MultiVarPowerSeries<C> abs() {
+        if (signum() < 0) {
+            return negate();
+        }
+        return this;
+    }
+
+    /**
+     * Is power series one. <b>Note: </b> compare only up to truncate.
+     *
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
+     */
+    public boolean isONE() {
+        if (!leadingCoefficient().isONE()) {
+            return false;
+        }
+        return (compareTo(ring.ONE) == 0);
+        //return reductum().isZERO();
+    }
+
+    /**
+     * Is unit.
+     *
+     * @return true, if this power series is invertible, else false.
+     */
+    public boolean isUnit() {
+        return leadingCoefficient().isUnit();
+    }
 
     /**
      * Multiply by another power series.
@@ -1253,43 +1176,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
             }
         }, nt);
     }
-
-
-    /**
-     * Inverse power series.
-     *
-     * @return ps with this * ps = 1.
-     */
-    public MultiVarPowerSeries<C> inverse() {
-        return new MultiVarPowerSeries<C>(ring, new MultiVarCoefficients<C>(ring) {
-
-
-            @Override
-            public C generate(ExpVector e) {
-                long tdeg = e.totalDeg();
-                C d = leadingCoefficient().inverse(); // may fail
-                if (tdeg == 0) {
-                    return d;
-                }
-                GenPolynomial<C> p = null; //fac.getZERO();
-                for (int k = 0; k < tdeg; k++) {
-                    GenPolynomial<C> m = getHomPart(k).multiply(homogeneousPart(tdeg - k));
-                    if (p == null) {
-                        p = m;
-                    } else {
-                        p = p.sum(m);
-                    }
-                }
-                p = p.multiply(d.negate());
-                //System.out.println("tdeg = " + tdeg + ", p = " + p);
-                coeffCache.put(tdeg, p); // overwrite
-                homCheck.set((int) tdeg);
-                C c = p.coefficient(e);
-                return c;
-            }
-        });
-    }
-
 
     /**
      * Divide by another power series.
@@ -1329,7 +1215,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         return sq;
     }
 
-
     /**
      * Power series remainder.
      *
@@ -1345,7 +1230,6 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         return this;
     }
 
-
     /**
      * Quotient and remainder by division of this by S.
      *
@@ -1357,6 +1241,91 @@ public class MultiVarPowerSeries<C extends RingElem<C>> extends RingElemImpl<Mul
         return new MultiVarPowerSeries[]{divide(S), remainder(S)};
     }
 
+    /**
+     * Inverse power series.
+     *
+     * @return ps with this * ps = 1.
+     */
+    public MultiVarPowerSeries<C> inverse() {
+        return new MultiVarPowerSeries<C>(ring, new MultiVarCoefficients<C>(ring) {
+
+
+            @Override
+            public C generate(ExpVector e) {
+                long tdeg = e.totalDeg();
+                C d = leadingCoefficient().inverse(); // may fail
+                if (tdeg == 0) {
+                    return d;
+                }
+                GenPolynomial<C> p = null; //fac.getZERO();
+                for (int k = 0; k < tdeg; k++) {
+                    GenPolynomial<C> m = getHomPart(k).multiply(homogeneousPart(tdeg - k));
+                    if (p == null) {
+                        p = m;
+                    } else {
+                        p = p.sum(m);
+                    }
+                }
+                p = p.multiply(d.negate());
+                //System.out.println("tdeg = " + tdeg + ", p = " + p);
+                coeffCache.put(tdeg, p); // overwrite
+                homCheck.set((int) tdeg);
+                C c = p.coefficient(e);
+                return c;
+            }
+        });
+    }
+
+    /**
+     * Hash code for this polynomial. <b>Note: </b> only up to truncate.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h = 0;
+        //h = ( ring.hashCode() << 23 );
+        //h += val.hashCode();
+        for (ExpVector i : new ExpVectorIterable(ring.nvar, true, truncate)) {
+            C c = coefficient(i);
+            if (!c.isZERO()) {
+                h += i.hashCode();
+                h = (h << 23);
+            }
+            h += c.hashCode();
+            h = (h << 23);
+        }
+        return h;
+    }
+
+    /**
+     * Comparison with any other object. <b>Note: </b> compare only up to
+     * truncate.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object B) {
+        if (B == null) {
+            return false;
+        }
+        if (!(B instanceof MultiVarPowerSeries)) {
+            return false;
+        }
+        MultiVarPowerSeries<C> a = (MultiVarPowerSeries<C>) B;
+        return compareTo(a) == 0;
+    }
+
+    /**
+     * String representation of power series.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return toString(truncate);
+    }
 
     /**
      * Differentiate with respect to variable r.

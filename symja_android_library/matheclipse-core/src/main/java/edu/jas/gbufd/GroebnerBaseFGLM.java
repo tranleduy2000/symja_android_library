@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +31,12 @@ import edu.jas.structure.RingFactory;
  * @param <C> coefficient type
  * @author Jan Suess
  * @see edu.jas.application.GBAlgorithmBuilder
- * @see GBFactory
+ * @see edu.jas.gbufd.GBFactory
  */
 public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(GroebnerBaseFGLM.class);
+    private static final Logger logger = LogManager.getLogger(GroebnerBaseFGLM.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -107,7 +107,7 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
     /**
      * Get the String representation with GB engine.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -117,6 +117,27 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         return "GroebnerBaseFGLM( " + sgb.toString() + " )";
     }
 
+    /**
+     * Cleanup and terminate ThreadPool.
+     */
+    @Override
+    public void terminate() {
+        if (sgb == null) {
+            return;
+        }
+        sgb.terminate();
+    }
+
+    /**
+     * Cancel ThreadPool.
+     */
+    @Override
+    public int cancel() {
+        if (sgb == null) {
+            return 0;
+        }
+        return sgb.cancel();
+    }
 
     /**
      * Groebner base using FGLM algorithm.
@@ -177,7 +198,6 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         G = convGroebnerToLex(Gp);
         return G;
     }
-
 
     /**
      * Algorithm CONVGROEBNER: Converts Groebner bases w.r.t. total degree
@@ -283,7 +303,6 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         return newGB;
     }
 
-
     /**
      * Algorithm lMinterm: MINTERM algorithm for inverse lexicographical term
      * order.
@@ -313,7 +332,6 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         return null;
     }
 
-
     /**
      * Compute the residues to given polynomial list.
      *
@@ -333,7 +351,7 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
                 terms.clear();
                 return terms; //If 1 e G, return empty list terms
             }
-            ExpVector e = g.leadingExpVector(); //Take the exponent of the leading monomial             
+            ExpVector e = g.leadingExpVector(); //Take the exponent of the leading monomial
             if (e.totalDeg() == e.maxDeg()) { //and check, whether a variable x_i is isolated
                 for (int i = 0; i < numberOfVariables; i++) {
                     long exp = e.getVal(i);
@@ -369,7 +387,6 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         return terms;
     }
 
-
     /**
      * Internal method to create a polynomial ring in i indeterminates. Create
      * new ring over coefficients of ring with i variables Y1,...,Yi
@@ -390,7 +407,6 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         return cpfac;
     }
 
-
     /**
      * Internal method to add new indeterminates. Add another variabe
      * (indeterminate) Y_{i+1} to existing ring
@@ -405,7 +421,6 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         ring = ring.extend(stringIndeterminates);
         return ring;
     }
-
 
     /**
      * Maximum of an array.
@@ -423,30 +438,6 @@ public class GroebnerBaseFGLM<C extends GcdRingElem<C>> extends GroebnerBaseAbst
             }
         }
         return maximum;
-    }
-
-
-    /**
-     * Cleanup and terminate ThreadPool.
-     */
-    @Override
-    public void terminate() {
-        if (sgb == null) {
-            return;
-        }
-        sgb.terminate();
-    }
-
-
-    /**
-     * Cancel ThreadPool.
-     */
-    @Override
-    public int cancel() {
-        if (sgb == null) {
-            return 0;
-        }
-        return sgb.cancel();
     }
 
 }

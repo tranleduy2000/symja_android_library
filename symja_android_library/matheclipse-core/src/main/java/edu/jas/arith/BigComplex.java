@@ -5,8 +5,8 @@
 package edu.jas.arith;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.math.BigInteger;
@@ -45,7 +45,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      */
     public static final BigComplex I = new BigComplex(BigRational.ZERO, BigRational.ONE);
     private final static Random random = new Random();
-    private static final Logger logger = Logger.getLogger(BigComplex.class);
+    private static final Logger logger = LogManager.getLogger(BigComplex.class);
     /**
      * Real part of the data structure.
      */
@@ -126,7 +126,7 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
         }
         String si = "";
         if (i < s.length()) {
-            si = s.substring(i + 1, s.length());
+            si = s.substring(i + 1);
         }
         //int j = sr.indexOf("+");
         re = new BigRational(sr.trim());
@@ -267,16 +267,6 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
     }
 
     /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public BigComplex factory() {
-        return this;
-    }
-
-    /**
      * Get a list of the generating elements.
      *
      * @return list of generators for the algebraic structure.
@@ -300,86 +290,13 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
     }
 
     /**
-     * Clone this.
+     * Get a BigComplex element from a long.
      *
-     * @see Object#clone()
+     * @param a long.
+     * @return a BigComplex.
      */
-    @Override
-    public BigComplex copy() {
-        return new BigComplex(re, im);
-    }
-
-    /**
-     * Copy BigComplex element c.
-     *
-     * @param c BigComplex.
-     * @return a copy of c.
-     */
-    public BigComplex copy(BigComplex c) {
-        return new BigComplex(c.re, c.im);
-    }
-
-    /**
-     * Get the zero element.
-     *
-     * @return 0 as BigComplex.
-     */
-    public BigComplex getZERO() {
-        return ZERO;
-    }
-
-    /**
-     * Get the one element.
-     *
-     * @return 1 as BigComplex.
-     */
-    public BigComplex getONE() {
-        return ONE;
-    }
-
-    /**
-     * Get the i element.
-     *
-     * @return i as BigComplex.
-     */
-    public BigComplex getIMAG() {
-        return I;
-    }
-
-    /**
-     * Query if this ring is commutative.
-     *
-     * @return true.
-     */
-    public boolean isCommutative() {
-        return true;
-    }
-
-    /**
-     * Query if this ring is associative.
-     *
-     * @return true.
-     */
-    public boolean isAssociative() {
-        return true;
-    }
-
-    /**
-     * Query if this ring is a field.
-     *
-     * @return true.
-     */
-    public boolean isField() {
-        return true;
-    }
-
-    /**
-     * Characteristic of this ring.
-     *
-     * @return characteristic of this ring.
-     */
-    public BigInteger characteristic() {
-        return BigInteger.ZERO;
+    public BigComplex fromInteger(long a) {
+        return new BigComplex(new BigRational(a));
     }
 
     /**
@@ -393,45 +310,96 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
     }
 
     /**
-     * Get a BigComplex element from a long.
+     * Complex number, random. Random rational numbers A and B are generated
+     * using random(n). Then R is the complex number with real part A and
+     * imaginary part B.
      *
-     * @param a long.
-     * @return a BigComplex.
+     * @param n such that 0 &le; A, B &le; (2<sup>n</sup>-1).
+     * @return R.
      */
-    public BigComplex fromInteger(long a) {
-        return new BigComplex(new BigRational(a));
+    public BigComplex random(int n) {
+        return random(n, random);
     }
 
     /**
-     * Get the real part.
+     * Complex number, random. Random rational numbers A and B are generated
+     * using random(n). Then R is the complex number with real part A and
+     * imaginary part B.
      *
-     * @return re.
+     * @param n   such that 0 &le; A, B &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return R.
      */
-    public BigRational getRe() {
-        return re;
+    public BigComplex random(int n, Random rnd) {
+        BigRational r = BigRational.ONE.random(n, rnd);
+        BigRational i = BigRational.ONE.random(n, rnd);
+        return new BigComplex(r, i);
     }
 
     /**
-     * Get the imaginary part.
+     * Copy BigComplex element c.
      *
-     * @return im.
+     * @param c BigComplex.
+     * @return a copy of c.
      */
-    public BigRational getIm() {
-        return im;
+    public BigComplex copy(BigComplex c) {
+        return new BigComplex(c.re, c.im);
     }
 
     /**
-     * Get the String representation.
+     * Parse complex number from string.
+     *
+     * @param s String.
+     * @return BigComplex from s.
+     */
+    public BigComplex parse(String s) {
+        return new BigComplex(s);
+    }
+
+    /**
+     * Parse complex number from Reader.
+     *
+     * @param r Reader.
+     * @return next BigComplex from r.
+     */
+    public BigComplex parse(Reader r) {
+        return parse(StringUtil.nextString(r));
+    }
+
+    /**
+     * Clone this.
+     *
+     * @see java.lang.Object#clone()
      */
     @Override
-    public String toString() {
-        String s = "" + re;
-        int i = im.compareTo(BigRational.ZERO);
-        //logger.info("compareTo "+im+" ? 0 = "+i);
-        if (i == 0)
+    public BigComplex copy() {
+        return new BigComplex(re, im);
+    }
+
+    /**
+     * Since complex numbers are unordered, we use lexicographical order of re
+     * and im.
+     *
+     * @return 0 if this is equal to b; 1 if re > b.re, or re == b.re and im >
+     * b.im; -1 if re < b.re, or re == b.re and im < b.im
+     */
+    @Override
+    public int compareTo(BigComplex b) {
+        int s = re.compareTo(b.re);
+        if (s != 0) {
             return s;
-        s += "i" + im;
-        return s;
+        }
+        return im.compareTo(b.im);
+    }
+
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public BigComplex factory() {
+        return this;
     }
 
     /**
@@ -482,10 +450,6 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
         return s.toString();
     }
 
-
-    /* arithmetic operations: +, -, -
-     */
-
     /**
      * Get a scripting compatible string representation of the factory.
      *
@@ -499,6 +463,91 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
     }
 
     /**
+     * Get the zero element.
+     *
+     * @return 0 as BigComplex.
+     */
+    public BigComplex getZERO() {
+        return ZERO;
+    }
+
+    /**
+     * Get the one element.
+     *
+     * @return 1 as BigComplex.
+     */
+    public BigComplex getONE() {
+        return ONE;
+    }
+
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true.
+     */
+    public boolean isCommutative() {
+        return true;
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true.
+     */
+    public boolean isAssociative() {
+        return true;
+    }
+
+
+    /* arithmetic operations: +, -, -
+     */
+
+    /**
+     * Get the i element.
+     *
+     * @return i as BigComplex.
+     */
+    public BigComplex getIMAG() {
+        return I;
+    }
+
+    /**
+     * Query if this ring is a field.
+     *
+     * @return true.
+     */
+    public boolean isField() {
+        return true;
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return characteristic of this ring.
+     */
+    public java.math.BigInteger characteristic() {
+        return java.math.BigInteger.ZERO;
+    }
+
+    /**
+     * Get the real part.
+     *
+     * @return re.
+     */
+    public BigRational getRe() {
+        return re;
+    }
+
+    /**
+     * Get the imaginary part.
+     *
+     * @return im.
+     */
+    public BigRational getIm() {
+        return im;
+    }
+
+    /**
      * Is Complex number zero.
      *
      * @return If this is 0 then true is returned, else false.
@@ -506,79 +555,6 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
      */
     public boolean isZERO() {
         return re.isZERO() && im.isZERO();
-    }
-
-    /**
-     * Is Complex number one.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        return re.isONE() && im.isZERO();
-    }
-
-    /**
-     * Is Complex imaginary one.
-     *
-     * @return If this is i then true is returned, else false.
-     */
-    public boolean isIMAG() {
-        return re.isZERO() && im.isONE();
-    }
-
-    /**
-     * Is Complex unit element.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        return (!isZERO());
-    }
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    public boolean equals(Object b) {
-        if (!(b instanceof BigComplex)) {
-            return false;
-        }
-        BigComplex bc = (BigComplex) b;
-        return re.equals(bc.re) && im.equals(bc.im);
-    }
-
-    /**
-     * Hash code for this BigComplex.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return 37 * re.hashCode() + im.hashCode();
-    }
-
-
-    /* arithmetic operations: conjugate, absolut value
-     */
-
-    /**
-     * Since complex numbers are unordered, we use lexicographical order of re
-     * and im.
-     *
-     * @return 0 if this is equal to b; 1 if re > b.re, or re == b.re and im >
-     * b.im; -1 if re < b.re, or re == b.re and im < b.im
-     */
-    @Override
-    public int compareTo(BigComplex b) {
-        int s = re.compareTo(b.re);
-        if (s != 0) {
-            return s;
-        }
-        return im.compareTo(b.im);
     }
 
     /**
@@ -596,6 +572,10 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
         }
         return im.signum();
     }
+
+
+    /* arithmetic operations: conjugate, absolut value
+     */
 
     /**
      * Complex number summation.
@@ -627,9 +607,144 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
         return new BigComplex(re.negate(), im.negate());
     }
 
+    /**
+     * Complex number absolute value.
+     *
+     * @return |this|.
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public BigComplex abs() {
+        BigComplex n = norm();
+        BigRational r = Roots.sqrt(n.re);
+        //logger.error("abs() square root missing " + r);
+        return new BigComplex(r);
+    }
+
+    /**
+     * Is Complex number one.
+     *
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
+     */
+    public boolean isONE() {
+        return re.isONE() && im.isZERO();
+    }
+
 
     /* arithmetic operations: *, inverse, /
      */
+
+    /**
+     * Is Complex unit element.
+     *
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
+     */
+    public boolean isUnit() {
+        return (!isZERO());
+    }
+
+    /**
+     * Complex number product.
+     *
+     * @param B is a complex number.
+     * @return this*B.
+     */
+    public BigComplex multiply(BigComplex B) {
+        return new BigComplex(re.multiply(B.re).subtract(im.multiply(B.im)), re.multiply(B.im).sum(
+                im.multiply(B.re)));
+    }
+
+    /**
+     * Complex number divide.
+     *
+     * @param B is a complex number, non-zero.
+     * @return this/B.
+     */
+    public BigComplex divide(BigComplex B) {
+        return this.multiply(B.inverse());
+    }
+
+    /**
+     * Complex number inverse.
+     *
+     * @param S is a complex number.
+     * @return 0.
+     */
+    public BigComplex remainder(BigComplex S) {
+        if (S.isZERO()) {
+            throw new ArithmeticException("division by zero");
+        }
+        return ZERO;
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a complex number
+     * @return [this/S, this - (this/S)*S].
+     */
+    public BigComplex[] quotientRemainder(BigComplex S) {
+        return new BigComplex[]{divide(S), ZERO};
+    }
+
+    /**
+     * Complex number inverse.
+     *
+     * @return S with S*this = 1.
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public BigComplex inverse() {
+        BigRational a = norm().re.inverse();
+        return new BigComplex(re.multiply(a), im.multiply(a.negate()));
+    }
+
+    /**
+     * Is Complex imaginary one.
+     *
+     * @return If this is i then true is returned, else false.
+     */
+    public boolean isIMAG() {
+        return re.isZERO() && im.isONE();
+    }
+
+    /**
+     * Hash code for this BigComplex.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return 37 * re.hashCode() + im.hashCode();
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object b) {
+        if (!(b instanceof BigComplex)) {
+            return false;
+        }
+        BigComplex bc = (BigComplex) b;
+        return re.equals(bc.re) && im.equals(bc.im);
+    }
+
+    /**
+     * Get the String representation.
+     */
+    @Override
+    public String toString() {
+        String s = "" + re;
+        int i = im.compareTo(BigRational.ZERO);
+        //logger.info("compareTo "+im+" ? 0 = "+i);
+        if (i == 0)
+            return s;
+        s += "i" + im;
+        return s;
+    }
 
     /**
      * Complex number conjugate.
@@ -652,123 +767,6 @@ public final class BigComplex extends RingElemImpl<BigComplex> implements StarRi
         v = v.sum(im.multiply(im));
         return new BigComplex(v);
     }
-
-    /**
-     * Complex number absolute value.
-     *
-     * @return |this|.
-     * @see edu.jas.structure.RingElem#abs()
-     */
-    public BigComplex abs() {
-        BigComplex n = norm();
-        BigRational r = Roots.sqrt(n.re);
-        //logger.error("abs() square root missing " + r);
-        return new BigComplex(r);
-    }
-
-    /**
-     * Complex number product.
-     *
-     * @param B is a complex number.
-     * @return this*B.
-     */
-    public BigComplex multiply(BigComplex B) {
-        return new BigComplex(re.multiply(B.re).subtract(im.multiply(B.im)), re.multiply(B.im).sum(
-                im.multiply(B.re)));
-    }
-
-    /**
-     * Complex number inverse.
-     *
-     * @return S with S*this = 1.
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public BigComplex inverse() {
-        BigRational a = norm().re.inverse();
-        return new BigComplex(re.multiply(a), im.multiply(a.negate()));
-    }
-
-    /**
-     * Complex number inverse.
-     *
-     * @param S is a complex number.
-     * @return 0.
-     */
-    public BigComplex remainder(BigComplex S) {
-        if (S.isZERO()) {
-            throw new ArithmeticException("division by zero");
-        }
-        return ZERO;
-    }
-
-    /**
-     * Complex number divide.
-     *
-     * @param B is a complex number, non-zero.
-     * @return this/B.
-     */
-    public BigComplex divide(BigComplex B) {
-        return this.multiply(B.inverse());
-    }
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a complex number
-     * @return [this/S, this - (this/S)*S].
-     */
-    public BigComplex[] quotientRemainder(BigComplex S) {
-        return new BigComplex[]{divide(S), ZERO};
-    }
-
-    /**
-     * Complex number, random. Random rational numbers A and B are generated
-     * using random(n). Then R is the complex number with real part A and
-     * imaginary part B.
-     *
-     * @param n such that 0 &le; A, B &le; (2<sup>n</sup>-1).
-     * @return R.
-     */
-    public BigComplex random(int n) {
-        return random(n, random);
-    }
-
-    /**
-     * Complex number, random. Random rational numbers A and B are generated
-     * using random(n). Then R is the complex number with real part A and
-     * imaginary part B.
-     *
-     * @param n   such that 0 &le; A, B &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return R.
-     */
-    public BigComplex random(int n, Random rnd) {
-        BigRational r = BigRational.ONE.random(n, rnd);
-        BigRational i = BigRational.ONE.random(n, rnd);
-        return new BigComplex(r, i);
-    }
-
-    /**
-     * Parse complex number from string.
-     *
-     * @param s String.
-     * @return BigComplex from s.
-     */
-    public BigComplex parse(String s) {
-        return new BigComplex(s);
-    }
-
-
-    /**
-     * Parse complex number from Reader.
-     *
-     * @param r Reader.
-     * @return next BigComplex from r.
-     */
-    public BigComplex parse(Reader r) {
-        return parse(StringUtil.nextString(r));
-    }
-
 
     /**
      * Complex number greatest common divisor.

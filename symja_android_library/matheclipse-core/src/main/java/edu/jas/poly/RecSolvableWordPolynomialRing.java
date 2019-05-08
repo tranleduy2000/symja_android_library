@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -40,7 +40,7 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         GenSolvablePolynomialRing<GenWordPolynomial<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(RecSolvableWordPolynomialRing.class);
+    private static final Logger logger = LogManager.getLogger(RecSolvableWordPolynomialRing.class);
     private static final boolean debug = logger.isDebugEnabled();
     /**
      * The solvable multiplication relations between variables and coefficients.
@@ -184,69 +184,24 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         this(cf, o.nvar, o.tord, o.getVars(), null);
     }
 
-
     /**
-     * Get the String representation.
+     * Hash code for this polynomial ring.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        String res = super.toString();
-        if (PrettyPrint.isTrue()) {
-            //res += "\n" + table.toString(vars);
-            res += "\n" + coeffTable.toString(vars);
-        } else {
-            res += ", #rel = " + table.size() + " + " + coeffTable.size();
-        }
-        return res;
+    public int hashCode() {
+        int h;
+        h = super.hashCode();
+        h = 37 * h + table.hashCode(); // may be different after some computations
+        h = 37 * h + coeffTable.hashCode(); // may be different
+        return h;
     }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        StringBuffer s = new StringBuffer();
-        switch (Scripting.getLang()) {
-            case Ruby:
-                s.append("SolvPolyRing.new(");
-                break;
-            case Python:
-            default:
-                s.append("SolvPolyRing(");
-        }
-        if (coFac instanceof RingElem) {
-            s.append(((RingElem<GenWordPolynomial<C>>) coFac).toScriptFactory());
-        } else {
-            s.append(coFac.toScript().trim());
-        }
-        s.append(",\"" + varsToString() + "\",");
-        String to = tord.toScript();
-        s.append(to);
-        if (table.size() > 0) {
-            String rel = table.toScript();
-            s.append(",rel=");
-            s.append(rel);
-        }
-        if (coeffTable.size() > 0) {
-            String rel = coeffTable.toScript();
-            s.append(",coeffrel=");
-            s.append(rel);
-        }
-        s.append(")");
-        return s.toString();
-    }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -269,21 +224,22 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return coeffTable.equals(oring.coeffTable);
     }
 
-
     /**
-     * Hash code for this polynomial ring.
+     * Get the String representation.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        int h;
-        h = super.hashCode();
-        h = 37 * h + table.hashCode(); // may be different after some computations
-        h = 37 * h + coeffTable.hashCode(); // may be different
-        return h;
+    public String toString() {
+        String res = super.toString();
+        if (PrettyPrint.isTrue()) {
+            //res += "\n" + table.toString(vars);
+            res += "\n" + coeffTable.toString(vars);
+        } else {
+            res += ", #rel = " + table.size() + " + " + coeffTable.size();
+        }
+        return res;
     }
-
 
     /**
      * Get the zero element.
@@ -295,7 +251,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return ZERO;
     }
 
-
     /**
      * Get the one element.
      *
@@ -305,7 +260,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     public RecSolvableWordPolynomial<C> getONE() {
         return ONE;
     }
-
 
     /**
      * Query if this ring is commutative.
@@ -319,7 +273,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         }
         return false;
     }
-
 
     /**
      * Query if this ring is associative. Test if the relations between the mian
@@ -368,7 +321,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return true;
     }
 
-
     /**
      * Get a (constant) RecSolvableWordPolynomial&lt;C&gt; element from a
      * coefficient value.
@@ -381,7 +333,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return new RecSolvableWordPolynomial<C>(this, a);
     }
 
-
     /**
      * Get a RecSolvableWordPolynomial&lt;C&gt; element from an ExpVector.
      *
@@ -392,7 +343,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     public RecSolvableWordPolynomial<C> valueOf(ExpVector e) {
         return valueOf(coFac.getONE(), e);
     }
-
 
     /**
      * Get a RecSolvableWordPolynomial&lt;C&gt; element from a coeffcient and an
@@ -407,6 +357,82 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return new RecSolvableWordPolynomial<C>(this, a, e);
     }
 
+    /**
+     * Generate a random solvable polynomial.
+     *
+     * @param k bitsize of random coefficients.
+     * @param l number of terms.
+     * @param d maximal degree in each variable.
+     * @param q density of nozero exponents.
+     * @return a random solvable polynomial.
+     */
+    @Override
+    public RecSolvableWordPolynomial<C> random(int k, int l, int d, float q) {
+        return random(k, l, d, q, random);
+    }
+
+    /**
+     * Random solvable polynomial.
+     *
+     * @param k   size of random coefficients.
+     * @param l   number of terms.
+     * @param d   maximal degree in each variable.
+     * @param q   density of nozero exponents.
+     * @param rnd is a source for random bits.
+     * @return a random solvable polynomial.
+     */
+    @Override
+    public RecSolvableWordPolynomial<C> random(int k, int l, int d, float q, Random rnd) {
+        RecSolvableWordPolynomial<C> r = getZERO(); // copy( ZERO );
+        ExpVector e;
+        GenWordPolynomial<C> a;
+        // add random coeffs and exponents
+        for (int i = 0; i < l; i++) {
+            e = ExpVector.random(nvar, d, q, rnd);
+            a = coFac.random(k, rnd);
+            r = (RecSolvableWordPolynomial<C>) r.sum(a, e);
+            // somewhat inefficient but clean
+        }
+        return r;
+    }
+
+    /**
+     * Generate univariate solvable polynomial in a given variable.
+     *
+     * @param i the index of the variable.
+     * @return X_i as solvable univariate polynomial.
+     */
+    @Override
+    public RecSolvableWordPolynomial<C> univariate(int i) {
+        return (RecSolvableWordPolynomial<C>) super.univariate(i);
+    }
+
+    /**
+     * Generate univariate solvable polynomial in a given variable with given
+     * exponent.
+     *
+     * @param i the index of the variable.
+     * @param e the exponent of the variable.
+     * @return X_i^e as solvable univariate polynomial.
+     */
+    @Override
+    public RecSolvableWordPolynomial<C> univariate(int i, long e) {
+        return (RecSolvableWordPolynomial<C>) super.univariate(i, e);
+    }
+
+    /**
+     * Generate univariate solvable polynomial in a given variable with given
+     * exponent.
+     *
+     * @param modv number of module variables.
+     * @param i    the index of the variable.
+     * @param e    the exponent of the variable.
+     * @return X_i^e as solvable univariate polynomial.
+     */
+    @Override
+    public RecSolvableWordPolynomial<C> univariate(int modv, int i, long e) {
+        return (RecSolvableWordPolynomial<C>) super.univariate(modv, i, e);
+    }
 
     /**
      * Get a (constant) RecSolvableWordPolynomial&lt;C&gt; element from a long
@@ -420,7 +446,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return new RecSolvableWordPolynomial<C>(this, coFac.fromInteger(a), evzero);
     }
 
-
     /**
      * Get a (constant) RecSolvableWordPolynomial&lt;C&gt; element from a
      * BigInteger value.
@@ -433,7 +458,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return new RecSolvableWordPolynomial<C>(this, coFac.fromInteger(a), evzero);
     }
 
-
     /**
      * Random solvable polynomial. Generates a random solvable polynomial with k
      * = 5, l = n, d = (nvar == 1) ? n : 3, q = (nvar == 1) ? 0.7 : 0.3.
@@ -445,7 +469,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     public RecSolvableWordPolynomial<C> random(int n) {
         return random(n, random);
     }
-
 
     /**
      * Random solvable polynomial. Generates a random solvable polynomial with k
@@ -463,59 +486,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return random(5, n, 3, 0.3f, rnd);
     }
 
-
-    /**
-     * Generate a random solvable polynomial.
-     *
-     * @param k bitsize of random coefficients.
-     * @param l number of terms.
-     * @param d maximal degree in each variable.
-     * @param q density of nozero exponents.
-     * @return a random solvable polynomial.
-     */
-    @Override
-    public RecSolvableWordPolynomial<C> random(int k, int l, int d, float q) {
-        return random(k, l, d, q, random);
-    }
-
-
-    /**
-     * Random solvable polynomial.
-     *
-     * @param k   size of random coefficients.
-     * @param l   number of terms.
-     * @param d   maximal degree in each variable.
-     * @param q   density of nozero exponents.
-     * @param rnd is a source for random bits.
-     * @return a random solvable polynomial.
-     */
-    @Override
-    public RecSolvableWordPolynomial<C> random(int k, int l, int d, float q, Random rnd) {
-        RecSolvableWordPolynomial<C> r = getZERO(); // copy( ZERO ); 
-        ExpVector e;
-        GenWordPolynomial<C> a;
-        // add random coeffs and exponents
-        for (int i = 0; i < l; i++) {
-            e = ExpVector.random(nvar, d, q, rnd);
-            a = coFac.random(k, rnd);
-            r = (RecSolvableWordPolynomial<C>) r.sum(a, e);
-            // somewhat inefficient but clean
-        }
-        return r;
-    }
-
-
-    /**
-     * Copy polynomial c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public RecSolvableWordPolynomial<C> copy(RecSolvableWordPolynomial<C> c) {
-        return new RecSolvableWordPolynomial<C>(this, c.val);
-    }
-
-
     /**
      * Parse a solvable polynomial with the use of GenPolynomialTokenizer
      *
@@ -526,7 +496,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     public RecSolvableWordPolynomial<C> parse(String s) {
         return parse(new StringReader(s));
     }
-
 
     /**
      * Parse a solvable polynomial with the use of GenPolynomialTokenizer
@@ -549,47 +518,44 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return p;
     }
 
-
     /**
-     * Generate univariate solvable polynomial in a given variable.
+     * Get a scripting compatible string representation.
      *
-     * @param i the index of the variable.
-     * @return X_i as solvable univariate polynomial.
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    public RecSolvableWordPolynomial<C> univariate(int i) {
-        return (RecSolvableWordPolynomial<C>) super.univariate(i);
+    public String toScript() {
+        StringBuffer s = new StringBuffer();
+        switch (Scripting.getLang()) {
+            case Ruby:
+                s.append("SolvPolyRing.new(");
+                break;
+            case Python:
+            default:
+                s.append("SolvPolyRing(");
+        }
+        if (coFac instanceof RingElem) {
+            s.append(((RingElem<GenWordPolynomial<C>>) coFac).toScriptFactory());
+        } else {
+            s.append(coFac.toScript().trim());
+        }
+        s.append(",\"" + varsToString() + "\",");
+        String to = tord.toScript();
+        s.append(to);
+        if (table.size() > 0) {
+            String rel = table.toScript();
+            s.append(",rel=");
+            s.append(rel);
+        }
+        if (coeffTable.size() > 0) {
+            String rel = coeffTable.toScript();
+            s.append(",coeffrel=");
+            s.append(rel);
+        }
+        s.append(")");
+        return s.toString();
     }
-
-
-    /**
-     * Generate univariate solvable polynomial in a given variable with given
-     * exponent.
-     *
-     * @param i the index of the variable.
-     * @param e the exponent of the variable.
-     * @return X_i^e as solvable univariate polynomial.
-     */
-    @Override
-    public RecSolvableWordPolynomial<C> univariate(int i, long e) {
-        return (RecSolvableWordPolynomial<C>) super.univariate(i, e);
-    }
-
-
-    /**
-     * Generate univariate solvable polynomial in a given variable with given
-     * exponent.
-     *
-     * @param modv number of module variables.
-     * @param i    the index of the variable.
-     * @param e    the exponent of the variable.
-     * @return X_i^e as solvable univariate polynomial.
-     */
-    @Override
-    public RecSolvableWordPolynomial<C> univariate(int modv, int i, long e) {
-        return (RecSolvableWordPolynomial<C>) super.univariate(modv, i, e);
-    }
-
 
     /**
      * Generate list of univariate polynomials in all variables.
@@ -602,7 +568,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return univariateList(0, 1L);
     }
 
-
     /**
      * Generate list of univariate polynomials in all variables.
      *
@@ -613,7 +578,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     public List<RecSolvableWordPolynomial<C>> univariateList(int modv) {
         return univariateList(modv, 1L);
     }
-
 
     /**
      * Generate list of univariate polynomials in all variables with given
@@ -634,7 +598,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return pols;
     }
 
-
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
      * variables by i.
@@ -651,7 +614,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         spfac.coeffTable.extend(this.coeffTable);
         return spfac;
     }
-
 
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
@@ -671,7 +633,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return spfac;
     }
 
-
     /**
      * Contract variables. Used e.g. in module embedding. Contract number of
      * variables by i.
@@ -689,7 +650,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return spfac;
     }
 
-
     /**
      * Reverse variables. Used e.g. in opposite rings.
      *
@@ -699,7 +659,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
     public RecSolvableWordPolynomialRing<C> reverse() {
         return reverse(false);
     }
-
 
     /**
      * Reverse variables. Used e.g. in opposite rings.
@@ -718,17 +677,6 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         return spfac;
     }
 
-
-    /* not possible:
-     * Distributive representation as polynomial with all main variables.
-     * @return distributive polynomial ring factory.
-    @SuppressWarnings({"cast","unchecked"})
-    public static <C extends RingElem<C>> // must be static because of types
-       GenSolvablePolynomialRing<C> distribute(RecSolvableWordPolynomialRing<C> rf) {
-    }
-     */
-
-
     /**
      * Permutation of polynomial ring variables.
      *
@@ -743,6 +691,26 @@ public class RecSolvableWordPolynomialRing<C extends RingElem<C>> extends
         GenSolvablePolynomialRing<GenWordPolynomial<C>> pfac = (GenSolvablePolynomialRing<GenWordPolynomial<C>>) super
                 .permutation(P);
         return pfac;
+    }
+
+
+    /* not possible:
+     * Distributive representation as polynomial with all main variables.
+     * @return distributive polynomial ring factory.
+    @SuppressWarnings({"cast","unchecked"})
+    public static <C extends RingElem<C>> // must be static because of types
+       GenSolvablePolynomialRing<C> distribute(RecSolvableWordPolynomialRing<C> rf) {
+    }
+     */
+
+    /**
+     * Copy polynomial c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public RecSolvableWordPolynomial<C> copy(RecSolvableWordPolynomial<C> c) {
+        return new RecSolvableWordPolynomial<C>(this, c.val);
     }
 
 }

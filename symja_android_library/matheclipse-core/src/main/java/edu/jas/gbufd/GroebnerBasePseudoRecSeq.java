@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,14 +34,14 @@ import edu.jas.ufd.GreatestCommonDivisorAbstract;
  * @param <C> base coefficient type
  * @author Heinz Kredel
  * @see edu.jas.application.GBAlgorithmBuilder
- * @see GBFactory
+ * @see edu.jas.gbufd.GBFactory
  */
 
 public class GroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         GroebnerBaseAbstract<GenPolynomial<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(GroebnerBasePseudoRecSeq.class);
+    private static final Logger logger = LogManager.getLogger(GroebnerBasePseudoRecSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();

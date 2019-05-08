@@ -157,6 +157,34 @@ public final class ModIntegerRing implements ModularRingFactory<ModInteger>, Ite
     }
 
     /**
+     * ModInteger chinese remainder algorithm. This is a factory method. Assert
+     * c.modul >= a.modul and c.modul * a.modul = this.modul.
+     *
+     * @param c  ModInteger.
+     * @param ci inverse of c.modul in ring of a.
+     * @param a  other ModInteger.
+     * @return S, with S mod c.modul == c and S mod a.modul == a.
+     */
+    public ModInteger chineseRemainder(ModInteger c, ModInteger ci, ModInteger a) {
+        //if (false) { // debug
+        //    if (c.ring.modul.compareTo(a.ring.modul) < 1) {
+        //        System.out.println("ModInteger error " + c + ", " + a);
+        //    }
+        //}
+        ModInteger b = a.ring.fromInteger(c.val); // c mod a.modul
+        ModInteger d = a.subtract(b); // a-c mod a.modul
+        if (d.isZERO()) {
+            return fromInteger(c.val);
+        }
+        b = d.multiply(ci); // b = (a-c)*ci mod a.modul
+        // (c.modul*b)+c mod this.modul = c mod c.modul =
+        // (c.modul*ci*(a-c)+c) mod a.modul = a mod a.modul
+        java.math.BigInteger s = c.ring.modul.multiply(b.val);
+        s = s.add(c.val);
+        return fromInteger(s);
+    }
+
+    /**
      * Create ModInteger element c.
      *
      * @param c
@@ -187,16 +215,6 @@ public final class ModIntegerRing implements ModularRingFactory<ModInteger>, Ite
     }
 
     /**
-     * Copy ModInteger element c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public ModInteger copy(ModInteger c) {
-        return new ModInteger(this, c.val);
-    }
-
-    /**
      * Get the zero element.
      *
      * @return 0 as ModInteger.
@@ -212,6 +230,24 @@ public final class ModIntegerRing implements ModularRingFactory<ModInteger>, Ite
      */
     public ModInteger getONE() {
         return new ModInteger(this, java.math.BigInteger.ONE);
+    }
+
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true.
+     */
+    public boolean isCommutative() {
+        return true;
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true.
+     */
+    public boolean isAssociative() {
+        return true;
     }
 
     /**
@@ -237,21 +273,90 @@ public final class ModIntegerRing implements ModularRingFactory<ModInteger>, Ite
     }
 
     /**
-     * Query if this ring is commutative.
+     * Get a ModInteger element from a long value.
      *
-     * @return true.
+     * @param a long.
+     * @return a ModInteger.
      */
-    public boolean isCommutative() {
-        return true;
+    public ModInteger fromInteger(long a) {
+        return new ModInteger(this, a);
     }
 
     /**
-     * Query if this ring is associative.
+     * Get a ModInteger element from a BigInteger value.
      *
-     * @return true.
+     * @param a BigInteger.
+     * @return a ModInteger.
      */
-    public boolean isAssociative() {
-        return true;
+    public ModInteger fromInteger(java.math.BigInteger a) {
+        return new ModInteger(this, a);
+    }
+
+    /**
+     * ModInteger random.
+     *
+     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @return a random integer mod modul.
+     */
+    public ModInteger random(int n) {
+        return random(n, random);
+    }
+
+    /**
+     * ModInteger random.
+     *
+     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return a random integer mod modul.
+     */
+    public ModInteger random(int n, Random rnd) {
+        java.math.BigInteger v = new java.math.BigInteger(n, rnd);
+        return new ModInteger(this, v);
+    }
+
+    /**
+     * Copy ModInteger element c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public ModInteger copy(ModInteger c) {
+        return new ModInteger(this, c.val);
+    }
+
+    /**
+     * Parse ModInteger from String.
+     *
+     * @param s String.
+     * @return ModInteger from s.
+     */
+    public ModInteger parse(String s) {
+        return new ModInteger(this, s);
+    }
+
+    /**
+     * Parse ModInteger from Reader.
+     *
+     * @param r Reader.
+     * @return next ModInteger from r.
+     */
+    public ModInteger parse(Reader r) {
+        return parse(StringUtil.nextString(r));
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python and Ruby case
+        if (isField()) {
+            return "GF(" + modul.toString() + ")";
+        }
+        return "ZM(" + modul.toString() + ")";
     }
 
     /**
@@ -286,54 +391,19 @@ public final class ModIntegerRing implements ModularRingFactory<ModInteger>, Ite
     }
 
     /**
-     * Get a ModInteger element from a BigInteger value.
+     * Hash code for this ModIntegerRing.
      *
-     * @param a BigInteger.
-     * @return a ModInteger.
-     */
-    public ModInteger fromInteger(java.math.BigInteger a) {
-        return new ModInteger(this, a);
-    }
-
-    /**
-     * Get a ModInteger element from a long value.
-     *
-     * @param a long.
-     * @return a ModInteger.
-     */
-    public ModInteger fromInteger(long a) {
-        return new ModInteger(this, a);
-    }
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        return " bigMod(" + modul.toString() + ")";
-    }
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python and Ruby case
-        if (isField()) {
-            return "GF(" + modul.toString() + ")";
-        }
-        return "ZM(" + modul.toString() + ")";
+    public int hashCode() {
+        return modul.hashCode();
     }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object b) {
@@ -345,83 +415,13 @@ public final class ModIntegerRing implements ModularRingFactory<ModInteger>, Ite
     }
 
     /**
-     * Hash code for this ModIntegerRing.
+     * Get the String representation.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return modul.hashCode();
-    }
-
-    /**
-     * ModInteger random.
-     *
-     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @return a random integer mod modul.
-     */
-    public ModInteger random(int n) {
-        return random(n, random);
-    }
-
-    /**
-     * ModInteger random.
-     *
-     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return a random integer mod modul.
-     */
-    public ModInteger random(int n, Random rnd) {
-        java.math.BigInteger v = new java.math.BigInteger(n, rnd);
-        return new ModInteger(this, v);
-    }
-
-    /**
-     * Parse ModInteger from String.
-     *
-     * @param s String.
-     * @return ModInteger from s.
-     */
-    public ModInteger parse(String s) {
-        return new ModInteger(this, s);
-    }
-
-    /**
-     * Parse ModInteger from Reader.
-     *
-     * @param r Reader.
-     * @return next ModInteger from r.
-     */
-    public ModInteger parse(Reader r) {
-        return parse(StringUtil.nextString(r));
-    }
-
-    /**
-     * ModInteger chinese remainder algorithm. This is a factory method. Assert
-     * c.modul >= a.modul and c.modul * a.modul = this.modul.
-     *
-     * @param c  ModInteger.
-     * @param ci inverse of c.modul in ring of a.
-     * @param a  other ModInteger.
-     * @return S, with S mod c.modul == c and S mod a.modul == a.
-     */
-    public ModInteger chineseRemainder(ModInteger c, ModInteger ci, ModInteger a) {
-        //if (false) { // debug
-        //    if (c.ring.modul.compareTo(a.ring.modul) < 1) {
-        //        System.out.println("ModInteger error " + c + ", " + a);
-        //    }
-        //}
-        ModInteger b = a.ring.fromInteger(c.val); // c mod a.modul
-        ModInteger d = a.subtract(b); // a-c mod a.modul
-        if (d.isZERO()) {
-            return fromInteger(c.val);
-        }
-        b = d.multiply(ci); // b = (a-c)*ci mod a.modul
-        // (c.modul*b)+c mod this.modul = c mod c.modul =
-        // (c.modul*ci*(a-c)+c) mod a.modul = a mod a.modul
-        java.math.BigInteger s = c.ring.modul.multiply(b.val);
-        s = s.add(c.val);
-        return fromInteger(s);
+    public String toString() {
+        return " bigMod(" + modul.toString() + ")";
     }
 
     /**

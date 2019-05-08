@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import edu.jas.structure.RingElem;
 public class RelationTable<C extends RingElem<C>> implements Serializable {
 
 
-    private static final Logger logger = Logger.getLogger(RelationTable.class);
+    private static final Logger logger = LogManager.getLogger(RelationTable.class);
     private static final boolean debug = logger.isDebugEnabled();
     /**
      * The data structure for the relations.
@@ -85,11 +85,104 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
         this.coeffTable = coeffTable;
     }
 
+    /**
+     * Convert mixed list to map for base relations.
+     *
+     * @param a mixed list
+     * @returns a map constructed from the list with deg(key) == 2.
+     */
+    @SuppressWarnings("unchecked")
+    Map<ExpVectorPair, GenPolynomial<C>> fromListDeg2(List a) {
+        Map<ExpVectorPair, GenPolynomial<C>> tex = new HashMap<ExpVectorPair, GenPolynomial<C>>();
+        Iterator ait = a.iterator();
+        while (ait.hasNext()) {
+            ExpVectorPair ae = (ExpVectorPair) ait.next();
+            if (!ait.hasNext()) {
+                break;
+            }
+            GenPolynomial<C> p = (GenPolynomial<C>) ait.next();
+            if (ae.totalDeg() == 2) { // only base relations
+                //System.out.println("ae => p: " + ae + " => " + p);
+                tex.put(ae, p);
+            }
+        }
+        return tex;
+    }
+
+    /**
+     * Hash code for base relations.
+     *
+     * @param a mixed list
+     * @returns hashCode(a)
+     */
+    @SuppressWarnings("unchecked")
+    int fromListDeg2HashCode(List a) {
+        int h = 0;
+        Iterator ait = a.iterator();
+        while (ait.hasNext()) {
+            ExpVectorPair ae = (ExpVectorPair) ait.next();
+            h = 31 * h + ae.hashCode();
+            if (!ait.hasNext()) {
+                break;
+            }
+            GenPolynomial<C> p = (GenPolynomial<C>) ait.next();
+            if (ae.totalDeg() == 2) { // only base relations
+                //System.out.println("ae => p: " + ae + " => " + p);
+                h = 31 * h + p.val.hashCode(); // avoid hash of ring
+            }
+        }
+        return h;
+    }
+
+    /**
+     * Equals for special maps.
+     *
+     * @param m1 first map
+     * @param m2 second map
+     * @returns true if both maps are equal
+     */
+    @SuppressWarnings("unchecked")
+    boolean equalMaps(Map<ExpVectorPair, GenPolynomial<C>> m1, Map<ExpVectorPair, GenPolynomial<C>> m2) {
+        if (!m1.keySet().equals(m2.keySet())) {
+            return false;
+        }
+        for (Map.Entry<ExpVectorPair, GenPolynomial<C>> me : m1.entrySet()) {
+            GenPolynomial<C> p1 = me.getValue();
+            ExpVectorPair ep = me.getKey();
+            GenPolynomial<C> p2 = m2.get(ep);
+            if (p1.compareTo(p2) != 0) { // not working: !p1.equals(p2)
+                logger.info("ep = " + ep + ", p1 = " + p1 + ", p2 = " + p2);
+                //logger.info("p1.compareTo(p2) = " + p1.compareTo(p2));
+                //logger.info("p1.equals(p2) = " + p1.equals(p2));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Hash code for this relation table.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        //int h = ring.hashCode(); // infinite recursion
+        int h = 0; //table.hashCode();
+        h = table.keySet().hashCode();
+        for (Map.Entry<List<Integer>, List> me : table.entrySet()) {
+            //List<Integer> k = me.getKey();
+            List a = me.getValue();
+            int t1 = fromListDeg2HashCode(a);
+            h = 31 * h + t1;
+        }
+        return h;
+    }
 
     /**
      * RelationTable equals. Tests same keySets and base relations.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -126,119 +219,10 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
         return true;
     }
 
-
-    /**
-     * Convert mixed list to map for base relations.
-     *
-     * @param a mixed list
-     * @returns a map constructed from the list with deg(key) == 2.
-     */
-    @SuppressWarnings("unchecked")
-    Map<ExpVectorPair, GenPolynomial<C>> fromListDeg2(List a) {
-        Map<ExpVectorPair, GenPolynomial<C>> tex = new HashMap<ExpVectorPair, GenPolynomial<C>>();
-        Iterator ait = a.iterator();
-        while (ait.hasNext()) {
-            ExpVectorPair ae = (ExpVectorPair) ait.next();
-            if (!ait.hasNext()) {
-                break;
-            }
-            GenPolynomial<C> p = (GenPolynomial<C>) ait.next();
-            if (ae.totalDeg() == 2) { // only base relations
-                //System.out.println("ae => p: " + ae + " => " + p);
-                tex.put(ae, p);
-            }
-        }
-        return tex;
-    }
-
-
-    /**
-     * Hash code for base relations.
-     *
-     * @param a mixed list
-     * @returns hashCode(a)
-     */
-    @SuppressWarnings("unchecked")
-    int fromListDeg2HashCode(List a) {
-        int h = 0;
-        Iterator ait = a.iterator();
-        while (ait.hasNext()) {
-            ExpVectorPair ae = (ExpVectorPair) ait.next();
-            h = 31 * h + ae.hashCode();
-            if (!ait.hasNext()) {
-                break;
-            }
-            GenPolynomial<C> p = (GenPolynomial<C>) ait.next();
-            if (ae.totalDeg() == 2) { // only base relations
-                //System.out.println("ae => p: " + ae + " => " + p);
-                h = 31 * h + p.val.hashCode(); // avoid hash of ring
-            }
-        }
-        return h;
-    }
-
-
-    /**
-     * Equals for special maps.
-     *
-     * @param m1 first map
-     * @param m2 second map
-     * @returns true if both maps are equal
-     */
-    @SuppressWarnings("unchecked")
-    boolean equalMaps(Map<ExpVectorPair, GenPolynomial<C>> m1, Map<ExpVectorPair, GenPolynomial<C>> m2) {
-        if (!m1.keySet().equals(m2.keySet())) {
-            return false;
-        }
-        for (Map.Entry<ExpVectorPair, GenPolynomial<C>> me : m1.entrySet()) {
-            GenPolynomial<C> p1 = me.getValue();
-            ExpVectorPair ep = me.getKey();
-            GenPolynomial<C> p2 = m2.get(ep);
-            if (p1.compareTo(p2) != 0) { // not working: !p1.equals(p2)
-                logger.info("ep = " + ep + ", p1 = " + p1 + ", p2 = " + p2);
-                //logger.info("p1.compareTo(p2) = " + p1.compareTo(p2));
-                //logger.info("p1.equals(p2) = " + p1.equals(p2));
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Hash code for this relation table.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        //int h = ring.hashCode(); // infinite recursion
-        int h = 0; //table.hashCode();
-        h = table.keySet().hashCode();
-        for (Map.Entry<List<Integer>, List> me : table.entrySet()) {
-            //List<Integer> k = me.getKey();
-            List a = me.getValue();
-            int t1 = fromListDeg2HashCode(a);
-            h = 31 * h + t1;
-        }
-        return h;
-    }
-
-
-    /**
-     * Test if the table is empty.
-     *
-     * @return true if the table is empty, else false.
-     */
-    public boolean isEmpty() {
-        return table.isEmpty();
-    }
-
-
     /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -261,12 +245,20 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
         return s.toString();
     }
 
+    /**
+     * Test if the table is empty.
+     *
+     * @return true if the table is empty, else false.
+     */
+    public boolean isEmpty() {
+        return table.isEmpty();
+    }
 
     /**
      * Get the String representation.
      *
      * @param vars names for the variables.
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @SuppressWarnings({"unchecked", "cast"})
     public String toString(String[] vars) {
@@ -370,6 +362,7 @@ public class RelationTable<C extends RingElem<C>> implements Serializable {
             //List<Integer> k = me.getKey();
             if (first) {
                 first = false;
+                s.append("");
             } else {
                 s.append(", ");
             }

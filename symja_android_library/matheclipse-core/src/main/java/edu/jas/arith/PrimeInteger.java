@@ -5,8 +5,8 @@
 package edu.jas.arith;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -58,9 +58,9 @@ public final class PrimeInteger {
     /**
      * Random number generator.
      */
-    //final static Random random = new Random();
+    //final static SecureRandom random = new SecureRandom();
     final static Random random = new Random();
-    private static final Logger logger = Logger.getLogger(PrimeInteger.class);
+    private static final Logger logger = LogManager.getLogger(PrimeInteger.class);
 
     /**
      * Digit prime generator. K and m are positive beta-integers. L is the list

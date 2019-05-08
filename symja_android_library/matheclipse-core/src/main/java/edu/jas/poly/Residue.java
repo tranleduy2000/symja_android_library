@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.NotInvertibleException;
@@ -23,7 +23,7 @@ import edu.jas.structure.RingElemImpl;
 public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> implements RingElem<Residue<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(Residue.class);
+    private static final Logger logger = LogManager.getLogger(Residue.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -101,6 +101,31 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
         isunit = -1;
     }
 
+    /**
+     * Copy this.
+     *
+     * @see edu.jas.structure.Element#copy()
+     */
+    @Override
+    public Residue<C> copy() {
+        return new Residue<C>(ring, val);
+    }
+
+    /**
+     * Residue comparison.
+     *
+     * @param b Residue.
+     * @return sign(this - b), 0 means that this and b are equivalent in this
+     * residue class ring.
+     */
+    @Override
+    public int compareTo(Residue<C> b) {
+        C v = b.val;
+        if (!ring.equals(b.ring)) {
+            v = v.remainder(ring.modul);
+        }
+        return val.compareTo(v);
+    }
 
     /**
      * Get the corresponding element factory.
@@ -112,17 +137,29 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
         return ring;
     }
 
-
     /**
-     * Copy this.
+     * Get a scripting compatible string representation.
      *
-     * @see edu.jas.structure.Element#copy()
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    public Residue<C> copy() {
-        return new Residue<C>(ring, val);
+    public String toScript() {
+        // Python case
+        return "Residue( " + val.toScript() + " , " + ring.toScript() + " )";
     }
 
+    /**
+     * Get a scripting compatible string representation of the factory.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
+     */
+    @Override
+    public String toScriptFactory() {
+        // Python case
+        return factory().toScript();
+    }
 
     /**
      * Is Residue zero.
@@ -134,6 +171,55 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
         return val.equals(ring.ring.getZERO());
     }
 
+    /**
+     * Residue signum.
+     *
+     * @return signum(this).
+     * @see edu.jas.structure.RingElem#signum()
+     */
+    public int signum() {
+        return val.signum();
+    }
+
+    /**
+     * Residue summation.
+     *
+     * @param S Residue.
+     * @return this+S.
+     */
+    public Residue<C> sum(Residue<C> S) {
+        return new Residue<C>(ring, val.sum(S.val));
+    }
+
+    /**
+     * Residue subtraction.
+     *
+     * @param S Residue.
+     * @return this-S.
+     */
+    public Residue<C> subtract(Residue<C> S) {
+        return new Residue<C>(ring, val.subtract(S.val));
+    }
+
+    /**
+     * Residue negate.
+     *
+     * @return -this.
+     * @see edu.jas.structure.RingElem#negate()
+     */
+    public Residue<C> negate() {
+        return new Residue<C>(ring, val.negate());
+    }
+
+    /**
+     * Residue absolute value.
+     *
+     * @return the absolute value of this.
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public Residue<C> abs() {
+        return new Residue<C>(ring, val.abs());
+    }
 
     /**
      * Is Residue one.
@@ -144,7 +230,6 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
     public boolean isONE() {
         return val.equals(ring.ring.getONE());
     }
-
 
     /**
      * Is Residue unit.
@@ -181,150 +266,15 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
         return false;
     }
 
-
     /**
-     * Get the String representation as RingElem.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "Residue[ " + val.toString() + " mod " + ring.toString() + " ]";
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return "Residue( " + val.toScript() + " , " + ring.toScript() + " )";
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return factory().toScript();
-    }
-
-
-    /**
-     * Residue comparison.
-     *
-     * @param b Residue.
-     * @return sign(this - b), 0 means that this and b are equivalent in this
-     * residue class ring.
-     */
-    @Override
-    public int compareTo(Residue<C> b) {
-        C v = b.val;
-        if (!ring.equals(b.ring)) {
-            v = v.remainder(ring.modul);
-        }
-        return val.compareTo(v);
-    }
-
-
-    /**
-     * Comparison with any other object.
-     *
-     * @return true means that this and b are equivalent in this residue class
-     * ring.
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof Residue)) {
-            return false;
-        }
-        Residue<C> a = (Residue<C>) b;
-        return (0 == compareTo(a));
-    }
-
-
-    /**
-     * Hash code for this local.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        h = 37 * h + val.hashCode();
-        return h;
-    }
-
-
-    /**
-     * Residue absolute value.
-     *
-     * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
-     */
-    public Residue<C> abs() {
-        return new Residue<C>(ring, val.abs());
-    }
-
-
-    /**
-     * Residue summation.
+     * Residue multiplication.
      *
      * @param S Residue.
-     * @return this+S.
+     * @return this*S.
      */
-    public Residue<C> sum(Residue<C> S) {
-        return new Residue<C>(ring, val.sum(S.val));
+    public Residue<C> multiply(Residue<C> S) {
+        return new Residue<C>(ring, val.multiply(S.val));
     }
-
-
-    /**
-     * Residue negate.
-     *
-     * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public Residue<C> negate() {
-        return new Residue<C>(ring, val.negate());
-    }
-
-
-    /**
-     * Residue signum.
-     *
-     * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
-     */
-    public int signum() {
-        return val.signum();
-    }
-
-
-    /**
-     * Residue subtraction.
-     *
-     * @param S Residue.
-     * @return this-S.
-     */
-    public Residue<C> subtract(Residue<C> S) {
-        return new Residue<C>(ring, val.subtract(S.val));
-    }
-
 
     /**
      * Residue division.
@@ -336,6 +286,27 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
         return multiply(S.inverse());
     }
 
+    /**
+     * Residue remainder.
+     *
+     * @param S Residue.
+     * @return this - (this/S)*S.
+     */
+    public Residue<C> remainder(Residue<C> S) {
+        C x = val.remainder(S.val);
+        return new Residue<C>(ring, x);
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a Residue
+     * @return [this/S, this - (this/S)*S].
+     */
+    @SuppressWarnings("unchecked")
+    public Residue<C>[] quotientRemainder(Residue<C> S) {
+        return new Residue[]{divide(S), remainder(S)};
+    }
 
     /**
      * Residue inverse.
@@ -371,41 +342,48 @@ public class Residue<C extends RingElem<C>> extends RingElemImpl<Residue<C>> imp
         throw new NotInvertibleException("element not invertible (!gcd)" + this);
     }
 
-
     /**
-     * Residue remainder.
+     * Hash code for this local.
      *
-     * @param S Residue.
-     * @return this - (this/S)*S.
+     * @see java.lang.Object#hashCode()
      */
-    public Residue<C> remainder(Residue<C> S) {
-        C x = val.remainder(S.val);
-        return new Residue<C>(ring, x);
+    @Override
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        h = 37 * h + val.hashCode();
+        return h;
     }
 
-
     /**
-     * Quotient and remainder by division of this by S.
+     * Comparison with any other object.
      *
-     * @param S a Residue
-     * @return [this/S, this - (this/S)*S].
+     * @return true means that this and b are equivalent in this residue class
+     * ring.
+     * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public Residue<C>[] quotientRemainder(Residue<C> S) {
-        return new Residue[]{divide(S), remainder(S)};
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof Residue)) {
+            return false;
+        }
+        Residue<C> a = (Residue<C>) b;
+        return (0 == compareTo(a));
     }
-
 
     /**
-     * Residue multiplication.
+     * Get the String representation as RingElem.
      *
-     * @param S Residue.
-     * @return this*S.
+     * @see java.lang.Object#toString()
      */
-    public Residue<C> multiply(Residue<C> S) {
-        return new Residue<C>(ring, val.multiply(S.val));
+    @Override
+    public String toString() {
+        return "Residue[ " + val.toString() + " mod " + ring.toString() + " ]";
     }
-
 
     /**
      * Greatest common divisor. <b>Note: </b>Not implemented, throws

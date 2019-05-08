@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ import edu.jas.structure.RingFactory;
 public class FactorComplex<C extends GcdRingElem<C>> extends FactorAbsolute<Complex<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(FactorComplex.class);
+    private static final Logger logger = LogManager.getLogger(FactorComplex.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -96,6 +96,54 @@ public class FactorComplex<C extends GcdRingElem<C>> extends FactorAbsolute<Comp
         this.factorAlgeb = factorAlgeb;
     }
 
+    /**
+     * GenPolynomial factorization of a squarefree polynomial.
+     *
+     * @param P squarefree GenPolynomial&lt;AlgebraicNumber&lt;C&gt;&gt;.
+     * @return [p_1, ..., p_k] with P = prod_{i=1, ..., k} p_i.
+     */
+    @Override
+    public List<GenPolynomial<Complex<C>>> factorsSquarefree(GenPolynomial<Complex<C>> P) {
+        if (P == null) {
+            throw new IllegalArgumentException(this.getClass().getName() + " P == null");
+        }
+        List<GenPolynomial<Complex<C>>> factors = new ArrayList<GenPolynomial<Complex<C>>>();
+        if (P.isZERO()) {
+            return factors;
+        }
+        if (P.isONE()) {
+            factors.add(P);
+            return factors;
+        }
+        GenPolynomialRing<Complex<C>> pfac = P.ring; // CC[x]
+        if (pfac.nvar <= 1) {
+            throw new IllegalArgumentException("only for multivariate polynomials");
+        }
+        ComplexRing<C> cfac = (ComplexRing<C>) pfac.coFac;
+        if (!afac.ring.coFac.equals(cfac.ring)) {
+            throw new IllegalArgumentException("coefficient rings do not match");
+        }
+        Complex<C> ldcf = P.leadingBaseCoefficient();
+        if (!ldcf.isONE()) {
+            P = P.monic();
+            factors.add(pfac.getONE().multiply(ldcf));
+        }
+        //System.out.println("\nP = " + P);
+        GenPolynomialRing<AlgebraicNumber<C>> pafac = new GenPolynomialRing<AlgebraicNumber<C>>(afac, pfac);
+        GenPolynomial<AlgebraicNumber<C>> A = PolyUtil.algebraicFromComplex(pafac, P);
+        //System.out.println("A = " + A);
+        List<GenPolynomial<AlgebraicNumber<C>>> afactors = factorAlgeb.factorsSquarefree(A);
+        if (debug) {
+            // System.out.println("complex afactors = " + afactors);
+            logger.info("complex afactors = " + afactors);
+        }
+        for (GenPolynomial<AlgebraicNumber<C>> pa : afactors) {
+            GenPolynomial<Complex<C>> pc = PolyUtil.complexFromAlgebraic(pfac, pa);
+            factors.add(pc);
+        }
+        //System.out.println("cfactors = " + factors);
+        return factors;
+    }
 
     /**
      * GenPolynomial base factorization of a squarefree polynomial.

@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,7 +42,7 @@ public class GreatestCommonDivisorHensel<MOD extends GcdRingElem<MOD> & Modular>
         extends GreatestCommonDivisorAbstract<BigInteger> {
 
 
-    private static final Logger logger = Logger.getLogger(GreatestCommonDivisorHensel.class);
+    private static final Logger logger = LogManager.getLogger(GreatestCommonDivisorHensel.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();

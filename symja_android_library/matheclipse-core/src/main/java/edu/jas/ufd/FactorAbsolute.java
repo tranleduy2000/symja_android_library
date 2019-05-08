@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ import edu.jas.structure.RingFactory;
 public abstract class FactorAbsolute<C extends GcdRingElem<C>> extends FactorAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(FactorAbsolute.class);
+    private static final Logger logger = LogManager.getLogger(FactorAbsolute.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -76,7 +76,7 @@ public abstract class FactorAbsolute<C extends GcdRingElem<C>> extends FactorAbs
     /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

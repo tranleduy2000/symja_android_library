@@ -60,7 +60,7 @@ public class SolvableExtendedGB<C extends RingElem<C>> {
     /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

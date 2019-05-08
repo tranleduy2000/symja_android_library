@@ -149,7 +149,7 @@ public final class ExpVectorByte extends ExpVector
     /**
      * Clone this.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public ExpVectorByte copy() {
@@ -158,6 +158,16 @@ public final class ExpVectorByte extends ExpVector
         return new ExpVectorByte(w);
     }
 
+    /**
+     * ExpVector compareTo.
+     *
+     * @param V
+     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
+     */
+    @Override
+    public int compareTo(ExpVector V) {
+        return this.invLexCompareTo(V);
+    }
 
     /**
      * Get the exponent vector.
@@ -166,13 +176,12 @@ public final class ExpVectorByte extends ExpVector
      */
     @Override
     public long[] getVal() {
-        long v[] = new long[val.length];
+        long[] v = new long[val.length];
         for (int i = 0; i < val.length; i++) {
             v[i] = val[i];
         }
         return v;
     }
-
 
     /**
      * Get the exponent at position i.
@@ -184,7 +193,6 @@ public final class ExpVectorByte extends ExpVector
     public long getVal(int i) {
         return val[i];
     }
-
 
     /**
      * Set the exponent at position i to e.
@@ -203,22 +211,6 @@ public final class ExpVectorByte extends ExpVector
         hash = 0; // beware of race condition
         return x;
     }
-
-
-    /**
-     * Set the exponent at position i to e.
-     *
-     * @param i
-     * @param e
-     * @return old val[i].
-     */
-    protected byte setVal(int i, byte e) {
-        byte x = val[i];
-        val[i] = e;
-        hash = 0; // beware of race condition
-        return x;
-    }
-
 
     /**
      * Get the length of this exponent vector.
@@ -371,22 +363,20 @@ public final class ExpVectorByte extends ExpVector
         return new ExpVectorByte(w);
     }
 
-
     /**
-     * Get the string representation.
+     * hashCode for this exponent vector.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode() Only for findbugs.
      */
     @Override
-    public String toString() {
-        return super.toString() + ":byte";
+    public int hashCode() {
+        return super.hashCode();
     }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -399,147 +389,15 @@ public final class ExpVectorByte extends ExpVector
         return (0 == t);
     }
 
-
     /**
-     * hashCode for this exponent vector.
+     * Get the string representation.
      *
-     * @see Object#hashCode() Only for findbugs.
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return super.hashCode();
+    public String toString() {
+        return super.toString() + ":byte";
     }
-
-
-    /**
-     * ExpVector absolute value.
-     *
-     * @return abs(this).
-     */
-    @Override
-    public ExpVectorByte abs() {
-        byte[] u = val;
-        byte[] w = new byte[u.length];
-        for (int i = 0; i < u.length; i++) {
-            if (u[i] >= 0L) {
-                w[i] = u[i];
-            } else {
-                w[i] = (byte) (-u[i]);
-            }
-        }
-        return new ExpVectorByte(w);
-        //return EVABS(this);
-    }
-
-
-    /**
-     * ExpVector negate.
-     *
-     * @return -this.
-     */
-    @Override
-    public ExpVectorByte negate() {
-        byte[] u = val;
-        byte[] w = new byte[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = (byte) (-u[i]);
-        }
-        return new ExpVectorByte(w);
-        // return EVNEG(this);
-    }
-
-
-    /**
-     * ExpVector summation.
-     *
-     * @param V
-     * @return this+V.
-     */
-    @Override
-    public ExpVectorByte sum(ExpVector V) {
-        byte[] u = val;
-        byte[] v = ((ExpVectorByte) V).val;
-        byte[] w = new byte[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = (byte) (u[i] + v[i]);
-        }
-        return new ExpVectorByte(w);
-        // return EVSUM(this, V);
-    }
-
-
-    /**
-     * ExpVector subtract. Result may have negative entries.
-     *
-     * @param V
-     * @return this-V.
-     */
-    @Override
-    public ExpVectorByte subtract(ExpVector V) {
-        byte[] u = val;
-        byte[] v = ((ExpVectorByte) V).val;
-        byte[] w = new byte[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = (byte) (u[i] - v[i]);
-        }
-        return new ExpVectorByte(w);
-        //return EVDIF(this, V);
-    }
-
-
-    /**
-     * ExpVector multiply by scalar.
-     *
-     * @param s scalar
-     * @return s*this.
-     */
-    @Override
-    public ExpVectorByte scalarMultiply(long s) {
-        if (s >= maxByte || s <= minByte) {
-            throw new IllegalArgumentException("scalar to large: " + s);
-        }
-        byte[] u = val;
-        byte[] w = new byte[u.length];
-        byte sb = (byte) s;
-        for (int i = 0; i < u.length; i++) {
-            w[i] = (byte) (sb * u[i]);
-        }
-        return new ExpVectorByte(w);
-    }
-
-
-    /**
-     * ExpVector substitution. Clone and set exponent to d at position i.
-     *
-     * @param i position.
-     * @param d new exponent.
-     * @return substituted ExpVector.
-     */
-    public ExpVectorByte subst(int i, byte d) {
-        ExpVectorByte V = this.copy();
-        //long e = 
-        V.setVal(i, d);
-        return V;
-        //return EVSU(this, i, d);
-    }
-
-
-    /**
-     * ExpVector substitution. Clone and set exponent to d at position i.
-     *
-     * @param i position.
-     * @param d new exponent.
-     * @return substituted ExpVector.
-     */
-    @Override
-    public ExpVectorByte subst(int i, long d) {
-        ExpVectorByte V = this.copy();
-        //long e = 
-        V.setVal(i, d);
-        return V;
-        //return EVSU(this, i, d);
-    }
-
 
     /**
      * ExpVector signum.
@@ -563,6 +421,113 @@ public final class ExpVectorByte extends ExpVector
         //return EVSIGN(this);
     }
 
+    /**
+     * ExpVector summation.
+     *
+     * @param V
+     * @return this+V.
+     */
+    @Override
+    public ExpVectorByte sum(ExpVector V) {
+        byte[] u = val;
+        byte[] v = ((ExpVectorByte) V).val;
+        byte[] w = new byte[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = (byte) (u[i] + v[i]);
+        }
+        return new ExpVectorByte(w);
+        // return EVSUM(this, V);
+    }
+
+    /**
+     * ExpVector subtract. Result may have negative entries.
+     *
+     * @param V
+     * @return this-V.
+     */
+    @Override
+    public ExpVectorByte subtract(ExpVector V) {
+        byte[] u = val;
+        byte[] v = ((ExpVectorByte) V).val;
+        byte[] w = new byte[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = (byte) (u[i] - v[i]);
+        }
+        return new ExpVectorByte(w);
+        //return EVDIF(this, V);
+    }
+
+    /**
+     * ExpVector negate.
+     *
+     * @return -this.
+     */
+    @Override
+    public ExpVectorByte negate() {
+        byte[] u = val;
+        byte[] w = new byte[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = (byte) (-u[i]);
+        }
+        return new ExpVectorByte(w);
+        // return EVNEG(this);
+    }
+
+    /**
+     * ExpVector absolute value.
+     *
+     * @return abs(this).
+     */
+    @Override
+    public ExpVectorByte abs() {
+        byte[] u = val;
+        byte[] w = new byte[u.length];
+        for (int i = 0; i < u.length; i++) {
+            if (u[i] >= 0L) {
+                w[i] = u[i];
+            } else {
+                w[i] = (byte) (-u[i]);
+            }
+        }
+        return new ExpVectorByte(w);
+        //return EVABS(this);
+    }
+
+    /**
+     * ExpVector multiply by scalar.
+     *
+     * @param s scalar
+     * @return s*this.
+     */
+    @Override
+    public ExpVectorByte scalarMultiply(long s) {
+        if (s >= maxByte || s <= minByte) {
+            throw new IllegalArgumentException("scalar to large: " + s);
+        }
+        byte[] u = val;
+        byte[] w = new byte[u.length];
+        byte sb = (byte) s;
+        for (int i = 0; i < u.length; i++) {
+            w[i] = (byte) (sb * u[i]);
+        }
+        return new ExpVectorByte(w);
+    }
+
+    /**
+     * ExpVector substitution. Clone and set exponent to d at position i.
+     *
+     * @param i position.
+     * @param d new exponent.
+     * @return substituted ExpVector.
+     */
+    @Override
+    public ExpVectorByte subst(int i, long d) {
+        ExpVectorByte V = this.copy();
+        //long e = 
+        V.setVal(i, d);
+        return V;
+        //return EVSU(this, i, d);
+    }
 
     /**
      * ExpVector total degree.
@@ -579,7 +544,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
         //return EVTDEG(this);
     }
-
 
     /**
      * ExpVector maximal degree.
@@ -599,7 +563,6 @@ public final class ExpVectorByte extends ExpVector
         //return EVMDEG(this);
     }
 
-
     /**
      * ExpVector minimal degree.
      *
@@ -617,7 +580,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
     }
 
-
     /**
      * ExpVector weighted degree.
      *
@@ -627,7 +589,7 @@ public final class ExpVectorByte extends ExpVector
     @Override
     public long weightDeg(long[][] w) {
         if (w == null || w.length == 0) {
-            return totalDeg(); // assume weight 1 
+            return totalDeg(); // assume weight 1
         }
         long t = 0;
         byte[] u = val;
@@ -640,7 +602,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
     }
 
-
     /**
      * ExpVector weighted degree.
      *
@@ -650,7 +611,7 @@ public final class ExpVectorByte extends ExpVector
     @Override
     public long weightDeg(long[] w) {
         if (w == null || w.length == 0) {
-            return totalDeg(); // assume weight 1 
+            return totalDeg(); // assume weight 1
         }
         long t = 0;
         byte[] u = val;
@@ -659,7 +620,6 @@ public final class ExpVectorByte extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector least common multiple.
@@ -679,7 +639,6 @@ public final class ExpVectorByte extends ExpVector
         //return EVLCM(this, V);
     }
 
-
     /**
      * ExpVector greatest common divisor.
      *
@@ -698,7 +657,6 @@ public final class ExpVectorByte extends ExpVector
         //return EVGCD(this, V);
     }
 
-
     /**
      * ExpVector dependent variables.
      *
@@ -713,7 +671,6 @@ public final class ExpVectorByte extends ExpVector
         }
         return l;
     }
-
 
     /**
      * ExpVector dependency on variables.
@@ -738,7 +695,6 @@ public final class ExpVectorByte extends ExpVector
         return dep;
     }
 
-
     /**
      * ExpVector multiple test. Test if this is component wise greater or equal
      * to V.
@@ -760,19 +716,6 @@ public final class ExpVectorByte extends ExpVector
         //return EVMT(this, V);
     }
 
-
-    /**
-     * ExpVector compareTo.
-     *
-     * @param V
-     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
-     */
-    @Override
-    public int compareTo(ExpVector V) {
-        return this.invLexCompareTo(V);
-    }
-
-
     /**
      * ExpVector inverse lexicographical compareTo.
      *
@@ -793,7 +736,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
         //return EVILCP(this, V);
     }
-
 
     /**
      * ExpVector inverse lexicographical compareTo.
@@ -823,7 +765,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
         //return EVILCP(this, V, begin, end);
     }
-
 
     /**
      * ExpVector inverse graded lexicographical compareTo.
@@ -866,7 +807,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
         //return EVIGLC(this, V);
     }
-
 
     /**
      * ExpVector inverse graded lexicographical compareTo.
@@ -918,7 +858,6 @@ public final class ExpVectorByte extends ExpVector
         //return EVIGLC(this, V, begin, end);
     }
 
-
     /**
      * ExpVector reverse inverse lexicographical compareTo.
      *
@@ -939,7 +878,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
         //return EVRILCP(this, V);
     }
-
 
     /**
      * ExpVector reverse inverse lexicographical compareTo.
@@ -969,7 +907,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
         //return EVRILCP(this, V, begin, end);
     }
-
 
     /**
      * ExpVector reverse inverse graded compareTo.
@@ -1012,7 +949,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
         //return EVRIGLC(this, V);
     }
-
 
     /**
      * ExpVector reverse inverse graded compareTo.
@@ -1064,7 +1000,6 @@ public final class ExpVectorByte extends ExpVector
         //return EVRIGLC(this, V, begin, end);
     }
 
-
     /**
      * ExpVector inverse total degree lexicographical compareTo.
      *
@@ -1076,7 +1011,6 @@ public final class ExpVectorByte extends ExpVector
         throw new UnsupportedOperationException("not implemented for byte ExpVector");
     }
 
-
     /**
      * ExpVector reverse lexicographical inverse total degree compareTo.
      *
@@ -1087,7 +1021,6 @@ public final class ExpVectorByte extends ExpVector
     public int revLexInvTdegCompareTo(ExpVector V) {
         throw new UnsupportedOperationException("not implemented for byte ExpVector");
     }
-
 
     /**
      * ExpVector inverse weighted lexicographical compareTo.
@@ -1132,7 +1065,6 @@ public final class ExpVectorByte extends ExpVector
         return t;
         //return EVIWLC(w, this, V);
     }
-
 
     /**
      * ExpVector inverse weighted lexicographical compareTo.
@@ -1184,6 +1116,35 @@ public final class ExpVectorByte extends ExpVector
         }
         return t;
         //return EVIWLC(w, this, V, begin, end);
+    }
+
+    /**
+     * Set the exponent at position i to e.
+     *
+     * @param i
+     * @param e
+     * @return old val[i].
+     */
+    protected byte setVal(int i, byte e) {
+        byte x = val[i];
+        val[i] = e;
+        hash = 0; // beware of race condition
+        return x;
+    }
+
+    /**
+     * ExpVector substitution. Clone and set exponent to d at position i.
+     *
+     * @param i position.
+     * @param d new exponent.
+     * @return substituted ExpVector.
+     */
+    public ExpVectorByte subst(int i, byte d) {
+        ExpVectorByte V = this.copy();
+        //long e =
+        V.setVal(i, d);
+        return V;
+        //return EVSU(this, i, d);
     }
 
 }

@@ -33,20 +33,10 @@ public class OptimizedPolynomialList<C extends RingElem<C>> extends PolynomialLi
         perm = P;
     }
 
-
-    /**
-     * String representation.
-     */
-    @Override
-    public String toString() {
-        return "permutation = " + perm + "\n" + super.toString();
-    }
-
-
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -54,6 +44,14 @@ public class OptimizedPolynomialList<C extends RingElem<C>> extends PolynomialLi
             return false;
         }
         return super.equals(B);
+    }
+
+    /**
+     * String representation.
+     */
+    @Override
+    public String toString() {
+        return "permutation = " + perm + "\n" + super.toString();
     }
 
 }

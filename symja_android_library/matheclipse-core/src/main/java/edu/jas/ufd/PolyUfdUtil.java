@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +39,7 @@ import edu.jas.util.ListUtil;
 public class PolyUfdUtil {
 
 
-    private static final Logger logger = Logger.getLogger(PolyUfdUtil.class);
+    private static final Logger logger = LogManager.getLogger(PolyUfdUtil.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -366,13 +366,24 @@ public class PolyUfdUtil {
         AlgebraicNumber<C> alpha = afac.getGenerator();
         AlgebraicNumber<C> ka = afac.fromInteger(k);
         GenPolynomial<AlgebraicNumber<C>> s = x.subtract(ka.multiply(alpha)); // x - k alpha
+        //System.out.println("x - k alpha = " + s);
+        //System.out.println("s.ring = " + s.ring.toScript());
         if (debug) {
             logger.info("x - k alpha: " + s);
         }
         // substitute, convert and switch
-        GenPolynomial<AlgebraicNumber<C>> B = PolyUtil.substituteMain(A, s);
+        //System.out.println("Asubs = " + A);
+        GenPolynomial<AlgebraicNumber<C>> B;
+        if (s.ring.nvar <= 1) {
+            B = PolyUtil.substituteMain(A, s);
+        } else {
+            B = PolyUtil.substituteUnivariateMult(A, s);
+        }
+        //System.out.println("Bsubs = " + B);
         GenPolynomial<GenPolynomial<C>> Pc = PolyUtil.fromAlgebraicCoefficients(rfac, B); // Q[alpha][x]
+        //System.out.println("Pc[a,x] = " + Pc);
         Pc = PolyUtil.switchVariables(Pc); // Q[x][alpha]
+        //System.out.println("Pc[x,a] = " + Pc);
         return Pc;
     }
 
@@ -404,7 +415,13 @@ public class PolyUfdUtil {
         AlgebraicNumber<C> ka = afac.fromInteger(k);
         GenPolynomial<AlgebraicNumber<C>> s = x.sum(ka.multiply(alpha)); // x + k alpha
         // substitute
-        GenPolynomial<AlgebraicNumber<C>> N = PolyUtil.substituteMain(B, s);
+        //System.out.println("s.ring = " + s.ring.toScript());
+        GenPolynomial<AlgebraicNumber<C>> N;
+        if (s.ring.nvar <= 1) {
+            N = PolyUtil.substituteMain(B, s);
+        } else {
+            N = PolyUtil.substituteUnivariateMult(B, s);
+        }
         return N;
     }
 
@@ -412,7 +429,7 @@ public class PolyUfdUtil {
     /**
      * Norm of a polynomial with AlgebraicNumber coefficients.
      *
-     * @param A polynomial from GenPolynomial&lt;AlgebraicNumber&lt;C&gt;&gt;.
+     * @param A uni or multivariate polynomial from GenPolynomial&lt;AlgebraicNumber&lt;C&gt;&gt;.
      * @param k for (y - k x) substitution.
      * @return norm(A) = res_x(A(x,y),m(x)) in GenPolynomialRing&lt;C&gt;.
      */
@@ -421,9 +438,9 @@ public class PolyUfdUtil {
             return null;
         }
         GenPolynomialRing<AlgebraicNumber<C>> pfac = A.ring; // Q(alpha)[x]
-        if (pfac.nvar > 1) {
-            throw new IllegalArgumentException("only for univariate polynomials");
-        }
+        //if (pfac.nvar > 1) {
+        //    throw new IllegalArgumentException("only for univariate polynomials");
+        //}
         AlgebraicNumberRing<C> afac = (AlgebraicNumberRing<C>) pfac.coFac;
         GenPolynomial<C> agen = afac.modul;
         GenPolynomialRing<C> cfac = afac.ring;
@@ -435,16 +452,16 @@ public class PolyUfdUtil {
             A = A.monic();
         }
         GenPolynomialRing<GenPolynomial<C>> rfac = new GenPolynomialRing<GenPolynomial<C>>(cfac, pfac);
+        //System.out.println("rfac = " + rfac.toScript());
 
         // transform minimal polynomial to bi-variate polynomial
         GenPolynomial<GenPolynomial<C>> Ac = PolyUfdUtil.introduceLowerVariable(rfac, agen);
-        //System.out.println("Ac = " + Ac.toScript());
 
         // transform to bi-variate polynomial, 
         // switching varaible sequence from Q[alpha][x] to Q[X][alpha]
         GenPolynomial<GenPolynomial<C>> Pc = PolyUfdUtil.substituteFromAlgebraicCoefficients(rfac, A, k);
         Pc = PolyUtil.monic(Pc);
-        //System.out.println("Pc = " + Pc.toScript());
+        //System.out.println("Pc = " + Pc.toScript() + " :: " + Pc.ring.toScript());
 
         GreatestCommonDivisorSubres<C> engine = new GreatestCommonDivisorSubres<C>( /*cfac.coFac*/);
         // = (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getImplementation( cfac.coFac );
@@ -539,7 +556,7 @@ public class PolyUfdUtil {
      * @return algebraic number field.
      */
     public static <C extends GcdRingElem<C>>
-    AlgebraicNumberRing<C> algebriacNumberField(RingFactory<C> cfac, int degree) {
+    AlgebraicNumberRing<C> algebraicNumberField(RingFactory<C> cfac, int degree) {
         GenPolynomial<C> mod = randomIrreduciblePolynomial(cfac, degree);
         AlgebraicNumberRing<C> afac = new AlgebraicNumberRing<C>(mod, true);
         return afac;

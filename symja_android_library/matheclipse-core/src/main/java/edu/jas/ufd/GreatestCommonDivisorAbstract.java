@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         implements GreatestCommonDivisor<C> {
 
 
-    private static final Logger logger = Logger.getLogger(GreatestCommonDivisorAbstract.class);
+    private static final Logger logger = LogManager.getLogger(GreatestCommonDivisorAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -37,7 +37,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
     /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -338,88 +338,6 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         return contentPrimitivePart(P)[1];
     }
 
-
-    /**
-     * GenPolynomial content and primitive part.
-     *
-     * @param P GenPolynomial.
-     * @return { cont(P), pp(P) }
-     */
-    @SuppressWarnings("unchecked")
-    public GenPolynomial<C>[] contentPrimitivePart(GenPolynomial<C> P) {
-        if (P == null) {
-            throw new IllegalArgumentException(this.getClass().getName() + " P != null");
-        }
-        GenPolynomial<C>[] ret = new GenPolynomial[2];
-        GenPolynomialRing<C> pfac = P.ring;
-        if (P.isZERO()) {
-            ret[0] = pfac.getZERO();
-            ret[1] = pfac.getZERO();
-            return ret;
-        }
-        if (pfac.nvar <= 1) {
-            C Pc = baseContent(P);
-            GenPolynomial<C> Pp = P;
-            if (!Pc.isONE()) {
-                Pp = P.divide(Pc);
-            }
-            ret[0] = pfac.valueOf(Pc);
-            ret[1] = Pp;
-            return ret;
-        }
-        GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(1);
-        //GenPolynomialRing<C> cfac = rfac.coFac;
-        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
-        GenPolynomial<C> Pc = recursiveContent(Pr);
-        // primitive part
-        GenPolynomial<GenPolynomial<C>> Pp = Pr;
-        if (!Pc.isONE()) {
-            Pp = PolyUtil.recursiveDivide(Pr, Pc);
-        }
-        GenPolynomial<C> Ppd = PolyUtil.distribute(pfac, Pp);
-        ret[0] = Pc; // sic!
-        ret[1] = Ppd;
-        return ret;
-    }
-
-
-    /**
-     * GenPolynomial division. Indirection to GenPolynomial method.
-     *
-     * @param a GenPolynomial.
-     * @param b coefficient.
-     * @return a/b.
-     */
-    public GenPolynomial<C> divide(GenPolynomial<C> a, C b) {
-        if (b == null || b.isZERO()) {
-            throw new IllegalArgumentException("division by zero");
-
-        }
-        if (a == null || a.isZERO()) {
-            return a;
-        }
-        return a.divide(b);
-    }
-
-
-    /**
-     * Coefficient greatest common divisor. Indirection to coefficient method.
-     *
-     * @param a coefficient.
-     * @param b coefficient.
-     * @return gcd(a, b).
-     */
-    public C gcd(C a, C b) {
-        if (b == null || b.isZERO()) {
-            return a;
-        }
-        if (a == null || a.isZERO()) {
-            return b;
-        }
-        return a.gcd(b);
-    }
-
-
     /**
      * GenPolynomial greatest common divisor.
      *
@@ -457,7 +375,6 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         return D;
     }
 
-
     /**
      * GenPolynomial least common multiple.
      *
@@ -477,85 +394,6 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         return PolyUtil.basePseudoDivide(A, C);
     }
 
-
-    /**
-     * List of GenPolynomials greatest common divisor.
-     *
-     * @param A non empty list of GenPolynomials.
-     * @return gcd(A_i).
-     */
-    public GenPolynomial<C> gcd(List<GenPolynomial<C>> A) {
-        if (A == null || A.isEmpty()) {
-            throw new IllegalArgumentException("A may not be empty");
-        }
-        GenPolynomial<C> g = A.get(0);
-        for (int i = 1; i < A.size(); i++) {
-            GenPolynomial<C> f = A.get(i);
-            g = gcd(g, f);
-        }
-        return g;
-    }
-
-
-    /**
-     * Univariate GenPolynomial resultant.
-     *
-     * @param P univariate GenPolynomial.
-     * @param S univariate GenPolynomial.
-     * @return res(P, S).
-     * @throws UnsupportedOperationException if there is no implementation in
-     *                                       the sub-class.
-     */
-    @SuppressWarnings("unused")
-    public GenPolynomial<C> baseResultant(GenPolynomial<C> P, GenPolynomial<C> S) {
-        throw new UnsupportedOperationException("not implmented");
-    }
-
-
-    /**
-     * Univariate GenPolynomial recursive resultant.
-     *
-     * @param P univariate recursive GenPolynomial.
-     * @param S univariate recursive GenPolynomial.
-     * @return res(P, S).
-     * @throws UnsupportedOperationException if there is no implementation in
-     *                                       the sub-class.
-     */
-    @SuppressWarnings("unused")
-    public GenPolynomial<GenPolynomial<C>> recursiveUnivariateResultant(GenPolynomial<GenPolynomial<C>> P,
-                                                                        GenPolynomial<GenPolynomial<C>> S) {
-        throw new UnsupportedOperationException("not implmented");
-    }
-
-
-    /**
-     * GenPolynomial recursive resultant.
-     *
-     * @param P univariate recursive GenPolynomial.
-     * @param S univariate recursive GenPolynomial.
-     * @return res(P, S).
-     * @throws UnsupportedOperationException if there is no implementation in
-     *                                       the sub-class.
-     */
-    public GenPolynomial<GenPolynomial<C>> recursiveResultant(GenPolynomial<GenPolynomial<C>> P,
-                                                              GenPolynomial<GenPolynomial<C>> S) {
-        if (S == null || S.isZERO()) {
-            return S;
-        }
-        if (P == null || P.isZERO()) {
-            return P;
-        }
-        GenPolynomialRing<GenPolynomial<C>> rfac = P.ring;
-        GenPolynomialRing<C> cfac = (GenPolynomialRing<C>) rfac.coFac;
-        GenPolynomialRing<C> dfac = cfac.extend(rfac.getVars());
-        GenPolynomial<C> Pp = PolyUtil.distribute(dfac, P);
-        GenPolynomial<C> Sp = PolyUtil.distribute(dfac, S);
-        GenPolynomial<C> res = resultant(Pp, Sp);
-        GenPolynomial<GenPolynomial<C>> Rr = PolyUtil.recursive(rfac, res);
-        return Rr;
-    }
-
-
     /**
      * GenPolynomial resultant. The input polynomials are considered as
      * univariate polynomials in the main variable.
@@ -565,7 +403,7 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
      * @return res(P, S).
      * @throws UnsupportedOperationException if there is no implementation in
      *                                       the sub-class.
-     * @see GreatestCommonDivisorSubres#recursiveResultant
+     * @see edu.jas.ufd.GreatestCommonDivisorSubres#recursiveResultant
      */
     public GenPolynomial<C> resultant(GenPolynomial<C> P, GenPolynomial<C> S) {
         if (S == null || S.isZERO()) {
@@ -587,7 +425,6 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         GenPolynomial<C> D = PolyUtil.distribute(pfac, Dr);
         return D;
     }
-
 
     /**
      * GenPolynomial co-prime list.
@@ -641,6 +478,186 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         return B;
     }
 
+    /**
+     * GenPolynomial test for co-prime list.
+     *
+     * @param A list of GenPolynomials.
+     * @return true if gcd(b,c) = 1 for all b != c in B, else false.
+     */
+    public boolean isCoPrime(List<GenPolynomial<C>> A) {
+        if (A == null || A.isEmpty()) {
+            return true;
+        }
+        if (A.size() == 1) {
+            return true;
+        }
+        for (int i = 0; i < A.size(); i++) {
+            GenPolynomial<C> a = A.get(i);
+            for (int j = i + 1; j < A.size(); j++) {
+                GenPolynomial<C> b = A.get(j);
+                GenPolynomial<C> g = gcd(a, b);
+                if (!g.isONE()) {
+                    System.out.println("not co-prime, a: " + a);
+                    System.out.println("not co-prime, b: " + b);
+                    System.out.println("not co-prime, g: " + g);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * GenPolynomial content and primitive part.
+     *
+     * @param P GenPolynomial.
+     * @return { cont(P), pp(P) }
+     */
+    @SuppressWarnings("unchecked")
+    public GenPolynomial<C>[] contentPrimitivePart(GenPolynomial<C> P) {
+        if (P == null) {
+            throw new IllegalArgumentException(this.getClass().getName() + " P != null");
+        }
+        GenPolynomial<C>[] ret = new GenPolynomial[2];
+        GenPolynomialRing<C> pfac = P.ring;
+        if (P.isZERO()) {
+            ret[0] = pfac.getZERO();
+            ret[1] = pfac.getZERO();
+            return ret;
+        }
+        if (pfac.nvar <= 1) {
+            C Pc = baseContent(P);
+            GenPolynomial<C> Pp = P;
+            if (!Pc.isONE()) {
+                Pp = P.divide(Pc);
+            }
+            ret[0] = pfac.valueOf(Pc);
+            ret[1] = Pp;
+            return ret;
+        }
+        GenPolynomialRing<GenPolynomial<C>> rfac = pfac.recursive(1);
+        //GenPolynomialRing<C> cfac = rfac.coFac;
+        GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
+        GenPolynomial<C> Pc = recursiveContent(Pr);
+        // primitive part
+        GenPolynomial<GenPolynomial<C>> Pp = Pr;
+        if (!Pc.isONE()) {
+            Pp = PolyUtil.recursiveDivide(Pr, Pc);
+        }
+        GenPolynomial<C> Ppd = PolyUtil.distribute(pfac, Pp);
+        ret[0] = Pc; // sic!
+        ret[1] = Ppd;
+        return ret;
+    }
+
+    /**
+     * GenPolynomial division. Indirection to GenPolynomial method.
+     *
+     * @param a GenPolynomial.
+     * @param b coefficient.
+     * @return a/b.
+     */
+    public GenPolynomial<C> divide(GenPolynomial<C> a, C b) {
+        if (b == null || b.isZERO()) {
+            throw new IllegalArgumentException("division by zero");
+
+        }
+        if (a == null || a.isZERO()) {
+            return a;
+        }
+        return a.divide(b);
+    }
+
+    /**
+     * Coefficient greatest common divisor. Indirection to coefficient method.
+     *
+     * @param a coefficient.
+     * @param b coefficient.
+     * @return gcd(a, b).
+     */
+    public C gcd(C a, C b) {
+        if (b == null || b.isZERO()) {
+            return a;
+        }
+        if (a == null || a.isZERO()) {
+            return b;
+        }
+        return a.gcd(b);
+    }
+
+    /**
+     * List of GenPolynomials greatest common divisor.
+     *
+     * @param A non empty list of GenPolynomials.
+     * @return gcd(A_i).
+     */
+    public GenPolynomial<C> gcd(List<GenPolynomial<C>> A) {
+        if (A == null || A.isEmpty()) {
+            throw new IllegalArgumentException("A may not be empty");
+        }
+        GenPolynomial<C> g = A.get(0);
+        for (int i = 1; i < A.size(); i++) {
+            GenPolynomial<C> f = A.get(i);
+            g = gcd(g, f);
+        }
+        return g;
+    }
+
+    /**
+     * Univariate GenPolynomial resultant.
+     *
+     * @param P univariate GenPolynomial.
+     * @param S univariate GenPolynomial.
+     * @return res(P, S).
+     * @throws UnsupportedOperationException if there is no implementation in
+     *                                       the sub-class.
+     */
+    @SuppressWarnings("unused")
+    public GenPolynomial<C> baseResultant(GenPolynomial<C> P, GenPolynomial<C> S) {
+        throw new UnsupportedOperationException("not implmented");
+    }
+
+    /**
+     * Univariate GenPolynomial recursive resultant.
+     *
+     * @param P univariate recursive GenPolynomial.
+     * @param S univariate recursive GenPolynomial.
+     * @return res(P, S).
+     * @throws UnsupportedOperationException if there is no implementation in
+     *                                       the sub-class.
+     */
+    @SuppressWarnings("unused")
+    public GenPolynomial<GenPolynomial<C>> recursiveUnivariateResultant(GenPolynomial<GenPolynomial<C>> P,
+                                                                        GenPolynomial<GenPolynomial<C>> S) {
+        throw new UnsupportedOperationException("not implmented");
+    }
+
+    /**
+     * GenPolynomial recursive resultant.
+     *
+     * @param P univariate recursive GenPolynomial.
+     * @param S univariate recursive GenPolynomial.
+     * @return res(P, S).
+     * @throws UnsupportedOperationException if there is no implementation in
+     *                                       the sub-class.
+     */
+    public GenPolynomial<GenPolynomial<C>> recursiveResultant(GenPolynomial<GenPolynomial<C>> P,
+                                                              GenPolynomial<GenPolynomial<C>> S) {
+        if (S == null || S.isZERO()) {
+            return S;
+        }
+        if (P == null || P.isZERO()) {
+            return P;
+        }
+        GenPolynomialRing<GenPolynomial<C>> rfac = P.ring;
+        GenPolynomialRing<C> cfac = (GenPolynomialRing<C>) rfac.coFac;
+        GenPolynomialRing<C> dfac = cfac.extend(rfac.getVars());
+        GenPolynomial<C> Pp = PolyUtil.distribute(dfac, P);
+        GenPolynomial<C> Sp = PolyUtil.distribute(dfac, S);
+        GenPolynomial<C> res = resultant(Pp, Sp);
+        GenPolynomial<GenPolynomial<C>> Rr = PolyUtil.recursive(rfac, res);
+        return Rr;
+    }
 
     /**
      * GenPolynomial co-prime list.
@@ -663,7 +680,6 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         }
         return B;
     }
-
 
     /**
      * GenPolynomial co-prime list.
@@ -721,37 +737,6 @@ public abstract class GreatestCommonDivisorAbstract<C extends GcdRingElem<C>>
         }
         return B;
     }
-
-
-    /**
-     * GenPolynomial test for co-prime list.
-     *
-     * @param A list of GenPolynomials.
-     * @return true if gcd(b,c) = 1 for all b != c in B, else false.
-     */
-    public boolean isCoPrime(List<GenPolynomial<C>> A) {
-        if (A == null || A.isEmpty()) {
-            return true;
-        }
-        if (A.size() == 1) {
-            return true;
-        }
-        for (int i = 0; i < A.size(); i++) {
-            GenPolynomial<C> a = A.get(i);
-            for (int j = i + 1; j < A.size(); j++) {
-                GenPolynomial<C> b = A.get(j);
-                GenPolynomial<C> g = gcd(a, b);
-                if (!g.isONE()) {
-                    System.out.println("not co-prime, a: " + a);
-                    System.out.println("not co-prime, b: " + b);
-                    System.out.println("not co-prime, g: " + g);
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
 
     /**
      * GenPolynomial test for co-prime list of given list.

@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import edu.jas.structure.RingElem;
 public class PolynomialList<C extends RingElem<C>> implements Comparable<PolynomialList<C>>, Serializable {
 
 
-    private static final Logger logger = Logger.getLogger(PolynomialList.class);
+    private static final Logger logger = LogManager.getLogger(PolynomialList.class);
     /**
      * The factory for the solvable polynomial ring.
      */
@@ -167,30 +167,6 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
     }
 
     /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object p) {
-        if (p == null) {
-            return false;
-        }
-        if (!(p instanceof PolynomialList)) {
-            System.out.println("no PolynomialList");
-            return false;
-        }
-        PolynomialList<C> pl = (PolynomialList<C>) p;
-        if (!ring.equals(pl.ring)) {
-            System.out.println("not same Ring " + ring.toScript() + ", " + pl.ring.toScript());
-            return false;
-        }
-        return (compareTo(pl) == 0);
-        // otherwise tables may be different
-    }
-
-    /**
      * Polynomial list comparison.
      *
      * @param L other PolynomialList.
@@ -224,7 +200,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
     /**
      * Hash code for this polynomial list.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
@@ -235,21 +211,33 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
     }
 
     /**
-     * Test if list is empty.
+     * Comparison with any other object.
      *
-     * @return true if this is empty, alse false.
+     * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean isEmpty() {
-        if (list == null) {
-            return true;
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object p) {
+        if (p == null) {
+            return false;
         }
-        return list.isEmpty();
+        if (!(p instanceof PolynomialList)) {
+            System.out.println("no PolynomialList");
+            return false;
+        }
+        PolynomialList<C> pl = (PolynomialList<C>) p;
+        if (!ring.equals(pl.ring)) {
+            System.out.println("not same Ring " + ring.toScript() + ", " + pl.ring.toScript());
+            return false;
+        }
+        return (compareTo(pl) == 0);
+        // otherwise tables may be different
     }
 
     /**
      * String representation of the polynomial list.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -280,6 +268,18 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
         }
         erg.append("\n)");
         return erg.toString();
+    }
+
+    /**
+     * Test if list is empty.
+     *
+     * @return true if this is empty, alse false.
+     */
+    public boolean isEmpty() {
+        if (list == null) {
+            return true;
+        }
+        return list.isEmpty();
     }
 
     /**
@@ -344,7 +344,7 @@ public class PolynomialList<C extends RingElem<C>> implements Comparable<Polynom
      *
      * @param i number of variables to be contract form the polynomials.
      * @return module list corresponding to this.
-     * @see ModuleList
+     * @see edu.jas.poly.ModuleList
      */
     @SuppressWarnings("unchecked")
     public ModuleList<C> getModuleList(int i) {

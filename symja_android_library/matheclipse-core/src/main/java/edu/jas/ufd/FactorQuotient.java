@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import edu.jas.structure.GcdRingElem;
 public class FactorQuotient<C extends GcdRingElem<C>> extends FactorAbstract<Quotient<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(FactorQuotient.class);
+    private static final Logger logger = LogManager.getLogger(FactorQuotient.class);
 
 
     //private static final boolean debug = logger.isInfoEnabled();
@@ -68,19 +68,6 @@ public class FactorQuotient<C extends GcdRingElem<C>> extends FactorAbstract<Quo
         super(fac);
         this.nengine = nengine;
     }
-
-
-    /**
-     * GenPolynomial base factorization of a squarefree polynomial.
-     *
-     * @param P squarefree GenPolynomial.
-     * @return [p_1, ..., p_k] with P = prod_{i=1, ..., k} p_i.
-     */
-    @Override
-    public List<GenPolynomial<Quotient<C>>> baseFactorsSquarefree(GenPolynomial<Quotient<C>> P) {
-        return factorsSquarefree(P);
-    }
-
 
     /**
      * GenPolynomial factorization of a squarefree polynomial.
@@ -140,6 +127,17 @@ public class FactorQuotient<C extends GcdRingElem<C>> extends FactorAbstract<Quo
         }
         factors.addAll(qfacts);
         return factors;
+    }
+
+    /**
+     * GenPolynomial base factorization of a squarefree polynomial.
+     *
+     * @param P squarefree GenPolynomial.
+     * @return [p_1, ..., p_k] with P = prod_{i=1, ..., k} p_i.
+     */
+    @Override
+    public List<GenPolynomial<Quotient<C>>> baseFactorsSquarefree(GenPolynomial<Quotient<C>> P) {
+        return factorsSquarefree(P);
     }
 
 }

@@ -64,26 +64,6 @@ public class HenselApprox<MOD extends GcdRingElem<MOD> & Modular> implements Ser
         this.Bm = Bm;
     }
 
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(A.toString());
-        sb.append(",");
-        sb.append(B.toString());
-        sb.append(",");
-        sb.append(Am.toString());
-        sb.append(",");
-        sb.append(Bm.toString());
-        return sb.toString();
-    }
-
-
     /**
      * Get a scripting compatible string representation.
      *
@@ -103,11 +83,10 @@ public class HenselApprox<MOD extends GcdRingElem<MOD> & Modular> implements Ser
         return sb.toString();
     }
 
-
     /**
      * Hash code for this Factors.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
@@ -118,11 +97,10 @@ public class HenselApprox<MOD extends GcdRingElem<MOD> & Modular> implements Ser
         return h;
     }
 
-
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -137,6 +115,23 @@ public class HenselApprox<MOD extends GcdRingElem<MOD> & Modular> implements Ser
         return A.equals(a.A) && B.equals(a.B) && Am.equals(a.Am) && Bm.equals(a.Bm);
     }
 
+    /**
+     * Get the String representation.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(A.toString());
+        sb.append(",");
+        sb.append(B.toString());
+        sb.append(",");
+        sb.append(Am.toString());
+        sb.append(",");
+        sb.append(Bm.toString());
+        return sb.toString();
+    }
 
     /**
      * Get modul of modular polynomial.

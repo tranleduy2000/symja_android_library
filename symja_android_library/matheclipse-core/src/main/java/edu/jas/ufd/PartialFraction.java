@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import edu.jas.structure.GcdRingElem;
 public class PartialFraction<C extends GcdRingElem<C>> implements Serializable {
 
 
-    private static final Logger logger = Logger.getLogger(PartialFraction.class);
+    private static final Logger logger = LogManager.getLogger(PartialFraction.class);
 
 
     /**
@@ -107,58 +107,6 @@ public class PartialFraction<C extends GcdRingElem<C>> implements Serializable {
         }
     }
 
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("(" + num.toString() + ")");
-        sb.append(" / ");
-        sb.append("(" + den.toString() + ")");
-        sb.append(" =\n");
-        boolean first = true;
-        for (int i = 0; i < cfactors.size(); i++) {
-            C cp = cfactors.get(i);
-            if (first) {
-                first = false;
-            } else {
-                sb.append(" + ");
-            }
-            sb.append("(" + cp.toString() + ")");
-            GenPolynomial<C> p = cdenom.get(i);
-            sb.append(" / (" + p.toString() + ")");
-        }
-        if (!first && afactors.size() > 0) {
-            sb.append(" + ");
-        }
-        first = true;
-        for (int i = 0; i < afactors.size(); i++) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(" + ");
-            }
-            AlgebraicNumber<C> ap = afactors.get(i);
-            AlgebraicNumberRing<C> ar = ap.factory();
-            GenPolynomial<AlgebraicNumber<C>> p = adenom.get(i);
-            if (p.degree(0) < ar.modul.degree(0) && ar.modul.degree(0) > 2) {
-                sb.append("sum_(" + ar.getGenerator() + " in ");
-                sb.append("rootOf(" + ar.modul + ") ) ");
-            } else {
-                //sb.append("sum_("+ar+") ");
-            }
-            sb.append("(" + ap.toString() + ")");
-            sb.append(" / (" + p.toString() + ")");
-            //sb.append(" ## over " + ap.factory() + "\n");
-        }
-        return sb.toString();
-    }
-
-
     /**
      * Get a scripting compatible string representation.
      *
@@ -210,11 +158,10 @@ public class PartialFraction<C extends GcdRingElem<C>> implements Serializable {
         return sb.toString();
     }
 
-
     /**
      * Hash code for this Factors.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
@@ -227,11 +174,10 @@ public class PartialFraction<C extends GcdRingElem<C>> implements Serializable {
         return h;
     }
 
-
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -263,6 +209,55 @@ public class PartialFraction<C extends GcdRingElem<C>> implements Serializable {
         return t;
     }
 
+    /**
+     * Get the String representation.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("(" + num.toString() + ")");
+        sb.append(" / ");
+        sb.append("(" + den.toString() + ")");
+        sb.append(" =\n");
+        boolean first = true;
+        for (int i = 0; i < cfactors.size(); i++) {
+            C cp = cfactors.get(i);
+            if (first) {
+                first = false;
+            } else {
+                sb.append(" + ");
+            }
+            sb.append("(" + cp.toString() + ")");
+            GenPolynomial<C> p = cdenom.get(i);
+            sb.append(" / (" + p.toString() + ")");
+        }
+        if (!first && afactors.size() > 0) {
+            sb.append(" + ");
+        }
+        first = true;
+        for (int i = 0; i < afactors.size(); i++) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(" + ");
+            }
+            AlgebraicNumber<C> ap = afactors.get(i);
+            AlgebraicNumberRing<C> ar = ap.factory();
+            GenPolynomial<AlgebraicNumber<C>> p = adenom.get(i);
+            if (p.degree(0) < ar.modul.degree(0) && ar.modul.degree(0) > 2) {
+                sb.append("sum_(" + ar.getGenerator() + " in ");
+                sb.append("rootOf(" + ar.modul + ") ) ");
+            } else {
+                //sb.append("sum_("+ar+") ");
+            }
+            sb.append("(" + ap.toString() + ")");
+            sb.append(" / (" + p.toString() + ")");
+            //sb.append(" ## over " + ap.factory() + "\n");
+        }
+        return sb.toString();
+    }
 
     /**
      * Test if correct partial fraction. num/den = sum( a_i / d_i )

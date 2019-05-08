@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +22,7 @@ import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
 import edu.jas.poly.OptimizedPolynomialList;
 import edu.jas.poly.PolyUtil;
+import edu.jas.poly.TermOrderByName;
 import edu.jas.poly.TermOrderOptimization;
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.RingFactory;
@@ -37,13 +38,13 @@ import edu.jas.util.KsubSet;
  *
  * @param <C> coefficient type
  * @author Heinz Kredel
- * @see FactorFactory
+ * @see edu.jas.ufd.FactorFactory
  */
 
 public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factorization<C> {
 
 
-    private static final Logger logger = Logger.getLogger(FactorAbstract.class);
+    private static final Logger logger = LogManager.getLogger(FactorAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -101,7 +102,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
     /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -152,6 +153,192 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
      */
     public boolean isSquarefree(GenPolynomial<C> P) {
         return sengine.isSquarefree(P);
+    }
+
+    /**
+     * GenPolynomial factorization of a squarefree polynomial, using Kronecker
+     * substitution.
+     *
+     * @param P squarefree and primitive! (respectively monic) GenPolynomial.
+     * @return [p_1, ..., p_k] with P = prod_{i=1,...,r} p_i.
+     */
+    @Override
+    public List<GenPolynomial<C>> factorsSquarefree(GenPolynomial<C> P) {
+        if (P != null && P.ring.nvar > 1) {
+            logger.warn("no multivariate factorization for " + P.toScript() + ": falling back to Kronecker algorithm in " + P.ring.toScript());
+            //if (P.ring.characteristic().signum() == 0) {
+            //    throw new IllegalArgumentException("P.ring.characteristic().signum() == 0");
+            //}
+            //throw new RuntimeException("get stack trace");
+        }
+        //if (logger.isInfoEnabled()) {
+        //    logger.info(StringUtil.selectStackTrace("edu\\.jas.*"));
+        //}
+        return factorsSquarefreeKronecker(P);
+        //return factorsSquarefreeOptimize(P); // test only
+    }
+
+    /**
+     * GenPolynomial factorization.
+     *
+     * @param P GenPolynomial.
+     * @return [p_1 -&gt; e_1, ..., p_k -&gt; e_k] with P = prod_{i=1,...,k}
+     * p_i**e_i.
+     */
+    public SortedMap<GenPolynomial<C>, Long> factors(GenPolynomial<C> P) {
+        if (P == null) {
+            throw new IllegalArgumentException(this.getClass().getName() + " P != null");
+        }
+        GenPolynomialRing<C> pfac = P.ring;
+        if (pfac.nvar == 1) {
+            return baseFactors(P);
+        }
+        SortedMap<GenPolynomial<C>, Long> factors = new TreeMap<GenPolynomial<C>, Long>(pfac.getComparator());
+        if (P.isZERO()) {
+            return factors;
+        }
+        if (P.isConstant()) {
+            factors.put(P, 1L);
+            return factors;
+        }
+        if (!pfac.tord.equals(TermOrderByName.INVLEX)) {
+            logger.warn("wrong term order " + pfac.tord + ", factorization may not be correct, better use " + TermOrderByName.INVLEX);
+        }
+        C c;
+        if (pfac.coFac.isField()) {
+            c = P.leadingBaseCoefficient();
+        } else {
+            c = engine.baseContent(P);
+            // move sign to the content
+            if (P.signum() < 0 && c.signum() > 0) {
+                c = c.negate();
+                //P = P.negate();
+            }
+        }
+        if (!c.isONE()) {
+            GenPolynomial<C> pc = pfac.getONE().multiply(c);
+            factors.put(pc, 1L);
+            P = P.divide(c); // make base primitive or base monic
+        }
+        if (logger.isInfoEnabled()) {
+            logger.info("base primitive part P = " + P);
+        }
+        GenPolynomial<C>[] cpp = engine.contentPrimitivePart(P);
+        GenPolynomial<C> pc = cpp[0];
+        if (!pc.isONE()) {
+            SortedMap<GenPolynomial<C>, Long> rec = factors(pc); // recursion
+            for (Map.Entry<GenPolynomial<C>, Long> me : rec.entrySet()) {
+                GenPolynomial<C> g = me.getKey();
+                Long d = me.getValue();
+                GenPolynomial<C> pn = g.extend(pfac, 0, 0L);
+                factors.put(pn, d);
+            }
+            if (logger.isInfoEnabled()) {
+                logger.info("content factors = " + factors);
+            }
+        }
+        P = cpp[1];
+        if (logger.isInfoEnabled()) {
+            logger.info("primitive part P = " + P);
+        }
+        if (P.isONE()) {
+            return factors;
+        }
+        SortedMap<GenPolynomial<C>, Long> facs = sengine.squarefreeFactors(P);
+        if (facs == null || facs.size() == 0) {
+            facs = new TreeMap<GenPolynomial<C>, Long>();
+            facs.put(P, 1L);
+            throw new RuntimeException("this should not happen, facs is empty: " + facs);
+        }
+        if (logger.isInfoEnabled()) {
+            if (facs.size() > 1) {
+                logger.info("squarefree mfacs      = " + facs);
+            } else if (facs.size() == 1 && facs.get(facs.firstKey()) > 1L) {
+                logger.info("squarefree #mfacs 1-n = " + facs);
+            } else {
+                logger.info("squarefree #mfacs 1-1 = " + facs);
+            }
+        }
+        for (Map.Entry<GenPolynomial<C>, Long> me : facs.entrySet()) {
+            GenPolynomial<C> g = me.getKey();
+            if (g.isONE()) { // skip 1
+                continue;
+            }
+            Long d = me.getValue(); // facs.get(g);
+            List<GenPolynomial<C>> sfacs = factorsSquarefree(g);
+            if (logger.isInfoEnabled()) {
+                logger.info("factors of squarefree ^" + d + " = " + sfacs);
+                //System.out.println("sfacs   = " + sfacs);
+            }
+            for (GenPolynomial<C> h : sfacs) {
+                long dd = d;
+                Long j = factors.get(h); // evtl. constants
+                if (j != null) {
+                    dd += j;
+                }
+                factors.put(h, dd);
+            }
+        }
+        //System.out.println("factors = " + factors);
+        return factors;
+    }
+
+    /**
+     * GenPolynomial factorization ignoring multiplicities.
+     *
+     * @param P GenPolynomial.
+     * @return [p_1, ..., p_k] with P = prod_{i=1,...,k} p_i**{e_i} for some
+     * e_i.
+     */
+    public List<GenPolynomial<C>> factorsRadical(GenPolynomial<C> P) {
+        return new ArrayList<GenPolynomial<C>>(factors(P).keySet());
+    }
+
+    /**
+     * GenPolynomial greatest squarefree divisor. Delegates computation to a
+     * GreatestCommonDivisor class.
+     *
+     * @param P GenPolynomial.
+     * @return squarefree(P).
+     */
+    public GenPolynomial<C> squarefreePart(GenPolynomial<C> P) {
+        return sengine.squarefreePart(P);
+    }
+
+    /**
+     * GenPolynomial squarefree factorization. Delegates computation to a
+     * GreatestCommonDivisor class.
+     *
+     * @param P GenPolynomial.
+     * @return [p_1 -&gt; e_1, ..., p_k -&gt; e_k] with P = prod_{i=1,...,k}
+     * p_i**e_i.
+     */
+    public SortedMap<GenPolynomial<C>, Long> squarefreeFactors(GenPolynomial<C> P) {
+        return sengine.squarefreeFactors(P);
+    }
+
+    /**
+     * GenPolynomial is factorization.
+     *
+     * @param P GenPolynomial.
+     * @param F = [p_1,...,p_k].
+     * @return true if P = prod_{i=1,...,r} p_i, else false.
+     */
+    public boolean isFactorization(GenPolynomial<C> P, List<GenPolynomial<C>> F) {
+        return sengine.isFactorization(P, F);
+        // test irreducible
+    }
+
+    /**
+     * GenPolynomial is factorization.
+     *
+     * @param P GenPolynomial.
+     * @param F = [p_1 -&gt; e_1, ..., p_k -&gt; e_k].
+     * @return true if P = prod_{i=1,...,k} p_i**e_i , else false.
+     */
+    public boolean isFactorization(GenPolynomial<C> P, SortedMap<GenPolynomial<C>, Long> F) {
+        return sengine.isFactorization(P, F);
+        // test irreducible
     }
 
     /**
@@ -210,28 +397,6 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
      * @param P squarefree and primitive! (respectively monic) GenPolynomial.
      * @return [p_1, ..., p_k] with P = prod_{i=1,...,r} p_i.
      */
-    @Override
-    public List<GenPolynomial<C>> factorsSquarefree(GenPolynomial<C> P) {
-        if (P != null && P.ring.nvar > 1) {
-            logger.warn("no multivariate factorization for " + P.ring.toScript() + ": falling back to Kronecker algorithm");
-            //if (P.ring.characteristic().signum() == 0) {
-            //    throw new IllegalArgumentException(this.getClass().getName() + " P.ring.characteristic().signum() == 0");
-            //}
-        }
-        //if (logger.isInfoEnabled()) {
-        //    logger.info(StringUtil.selectStackTrace("edu\\.jas.*"));
-        //}
-        return factorsSquarefreeKronecker(P);
-        //return factorsSquarefreeOptimize(P); // test only
-    }
-
-    /**
-     * GenPolynomial factorization of a squarefree polynomial, using Kronecker
-     * substitution.
-     *
-     * @param P squarefree and primitive! (respectively monic) GenPolynomial.
-     * @return [p_1, ..., p_k] with P = prod_{i=1,...,r} p_i.
-     */
     public List<GenPolynomial<C>> factorsSquarefreeKronecker(GenPolynomial<C> P) {
         if (P == null) {
             throw new IllegalArgumentException(this.getClass().getName() + " P != null");
@@ -258,7 +423,7 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
             //System.out.println("subs(P,d=" + d + ") = " + kr);
         }
         if (kr.degree(0) > 100) {
-            logger.warn("Kronecker substitution has to high degree");
+            logger.warn("Kronecker substitution has to high degree " + kr.degree(0));
             TimeStatus.checkTime("degree > 100");
         }
 
@@ -373,7 +538,6 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         return new ArrayList<GenPolynomial<C>>(baseFactors(P).keySet());
     }
 
-
     /**
      * Univariate GenPolynomial factorization.
      *
@@ -462,7 +626,6 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         return factors;
     }
 
-
     /**
      * Univariate GenPolynomial factorization of a squarefree polynomial.
      *
@@ -470,19 +633,6 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
      * @return [p_1, ..., p_k] with P = prod_{i=1,...,k} p_i.
      */
     public abstract List<GenPolynomial<C>> baseFactorsSquarefree(GenPolynomial<C> P);
-
-
-    /**
-     * GenPolynomial factorization ignoring multiplicities.
-     *
-     * @param P GenPolynomial.
-     * @return [p_1, ..., p_k] with P = prod_{i=1,...,k} p_i**{e_i} for some
-     * e_i.
-     */
-    public List<GenPolynomial<C>> factorsRadical(GenPolynomial<C> P) {
-        return new ArrayList<GenPolynomial<C>>(factors(P).keySet());
-    }
-
 
     /**
      * GenPolynomial list factorization ignoring multiplicities.
@@ -500,122 +650,6 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         return new ArrayList<GenPolynomial<C>>(facs);
     }
 
-
-    /**
-     * GenPolynomial factorization.
-     *
-     * @param P GenPolynomial.
-     * @return [p_1 -&gt; e_1, ..., p_k -&gt; e_k] with P = prod_{i=1,...,k}
-     * p_i**e_i.
-     */
-    public SortedMap<GenPolynomial<C>, Long> factors(GenPolynomial<C> P) {
-        if (P == null) {
-            throw new IllegalArgumentException(this.getClass().getName() + " P != null");
-        }
-        GenPolynomialRing<C> pfac = P.ring;
-        if (pfac.nvar == 1) {
-            return baseFactors(P);
-        }
-        SortedMap<GenPolynomial<C>, Long> factors = new TreeMap<GenPolynomial<C>, Long>(pfac.getComparator());
-        if (P.isZERO()) {
-            return factors;
-        }
-        if (P.isConstant()) {
-            factors.put(P, 1L);
-            return factors;
-        }
-        C c;
-        if (pfac.coFac.isField()) {
-            c = P.leadingBaseCoefficient();
-        } else {
-            c = engine.baseContent(P);
-            // move sign to the content
-            if (P.signum() < 0 && c.signum() > 0) {
-                c = c.negate();
-                //P = P.negate();
-            }
-        }
-        if (!c.isONE()) {
-            GenPolynomial<C> pc = pfac.getONE().multiply(c);
-            factors.put(pc, 1L);
-            P = P.divide(c); // make base primitive or base monic
-        }
-        if (logger.isInfoEnabled()) {
-            logger.info("base primitive part P = " + P);
-        }
-        GenPolynomial<C>[] cpp = engine.contentPrimitivePart(P);
-        GenPolynomial<C> pc = cpp[0];
-        if (!pc.isONE()) {
-            SortedMap<GenPolynomial<C>, Long> rec = factors(pc); // recursion
-            for (Map.Entry<GenPolynomial<C>, Long> me : rec.entrySet()) {
-                GenPolynomial<C> g = me.getKey();
-                Long d = me.getValue();
-                GenPolynomial<C> pn = g.extend(pfac, 0, 0L);
-                factors.put(pn, d);
-            }
-            if (logger.isInfoEnabled()) {
-                logger.info("content factors = " + factors);
-            }
-        }
-        P = cpp[1];
-        if (logger.isInfoEnabled()) {
-            logger.info("primitive part P = " + P);
-        }
-        if (P.isONE()) {
-            return factors;
-        }
-        SortedMap<GenPolynomial<C>, Long> facs = sengine.squarefreeFactors(P);
-        if (facs == null || facs.size() == 0) {
-            facs = new TreeMap<GenPolynomial<C>, Long>();
-            facs.put(P, 1L);
-            throw new RuntimeException("this should not happen, facs is empty: " + facs);
-        }
-        if (logger.isInfoEnabled()) {
-            if (facs.size() > 1) {
-                logger.info("squarefree mfacs      = " + facs);
-            } else if (facs.size() == 1 && facs.get(facs.firstKey()) > 1L) {
-                logger.info("squarefree #mfacs 1-n = " + facs);
-            } else {
-                logger.info("squarefree #mfacs 1-1 = " + facs);
-            }
-        }
-        for (Map.Entry<GenPolynomial<C>, Long> me : facs.entrySet()) {
-            GenPolynomial<C> g = me.getKey();
-            if (g.isONE()) { // skip 1
-                continue;
-            }
-            Long d = me.getValue(); // facs.get(g);
-            List<GenPolynomial<C>> sfacs = factorsSquarefree(g);
-            if (logger.isInfoEnabled()) {
-                logger.info("factors of squarefree ^" + d + " = " + sfacs);
-                //System.out.println("sfacs   = " + sfacs);
-            }
-            for (GenPolynomial<C> h : sfacs) {
-                long dd = d;
-                Long j = factors.get(h); // evtl. constants
-                if (j != null) {
-                    dd += j;
-                }
-                factors.put(h, dd);
-            }
-        }
-        //System.out.println("factors = " + factors);
-        return factors;
-    }
-
-
-    /**
-     * GenPolynomial greatest squarefree divisor. Delegates computation to a
-     * GreatestCommonDivisor class.
-     *
-     * @param P GenPolynomial.
-     * @return squarefree(P).
-     */
-    public GenPolynomial<C> squarefreePart(GenPolynomial<C> P) {
-        return sengine.squarefreePart(P);
-    }
-
-
     /**
      * GenPolynomial primitive part. Delegates computation to a
      * GreatestCommonDivisor class.
@@ -627,7 +661,6 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
         return engine.primitivePart(P);
     }
 
-
     /**
      * GenPolynomial base primitive part. Delegates computation to a
      * GreatestCommonDivisor class.
@@ -638,46 +671,6 @@ public abstract class FactorAbstract<C extends GcdRingElem<C>> implements Factor
     public GenPolynomial<C> basePrimitivePart(GenPolynomial<C> P) {
         return engine.basePrimitivePart(P);
     }
-
-
-    /**
-     * GenPolynomial squarefree factorization. Delegates computation to a
-     * GreatestCommonDivisor class.
-     *
-     * @param P GenPolynomial.
-     * @return [p_1 -&gt; e_1, ..., p_k -&gt; e_k] with P = prod_{i=1,...,k}
-     * p_i**e_i.
-     */
-    public SortedMap<GenPolynomial<C>, Long> squarefreeFactors(GenPolynomial<C> P) {
-        return sengine.squarefreeFactors(P);
-    }
-
-
-    /**
-     * GenPolynomial is factorization.
-     *
-     * @param P GenPolynomial.
-     * @param F = [p_1,...,p_k].
-     * @return true if P = prod_{i=1,...,r} p_i, else false.
-     */
-    public boolean isFactorization(GenPolynomial<C> P, List<GenPolynomial<C>> F) {
-        return sengine.isFactorization(P, F);
-        // test irreducible
-    }
-
-
-    /**
-     * GenPolynomial is factorization.
-     *
-     * @param P GenPolynomial.
-     * @param F = [p_1 -&gt; e_1, ..., p_k -&gt; e_k].
-     * @return true if P = prod_{i=1,...,k} p_i**e_i , else false.
-     */
-    public boolean isFactorization(GenPolynomial<C> P, SortedMap<GenPolynomial<C>, Long> F) {
-        return sengine.isFactorization(P, F);
-        // test irreducible
-    }
-
 
     /**
      * Degree of a factorization.

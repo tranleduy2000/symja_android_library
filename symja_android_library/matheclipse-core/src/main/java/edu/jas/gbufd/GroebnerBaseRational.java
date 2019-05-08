@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ import edu.jas.poly.PolyUtil;
 public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbstract<BigRational> {
 
 
-    private static final Logger logger = Logger.getLogger(GroebnerBaseRational.class);
+    private static final Logger logger = LogManager.getLogger(GroebnerBaseRational.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -72,43 +72,12 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
     /**
      * Get the String representation with GB engines.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "(" + bba.toString() + ")";
     }
-
-
-    /**
-     * Groebner base using fraction free computation.
-     *
-     * @param modv module variable number.
-     * @param F    polynomial list.
-     * @return GB(F) a Groebner base of F.
-     */
-    @Override
-    public List<GenPolynomial<BigRational>> GB(int modv, List<GenPolynomial<BigRational>> F) {
-        List<GenPolynomial<BigRational>> G = F;
-        if (F == null || F.isEmpty()) {
-            return G;
-        }
-        GenPolynomialRing<BigRational> rring = F.get(0).ring;
-        BigInteger cf = new BigInteger();
-        GenPolynomialRing<BigInteger> iring = new GenPolynomialRing<BigInteger>(cf, rring);
-        List<GenPolynomial<BigInteger>> Fi = PolyUtil.integerFromRationalCoefficients(iring, F);
-        //System.out.println("Fi = " + Fi);
-        logger.info("#Fi = " + Fi.size());
-
-        List<GenPolynomial<BigInteger>> Gi = bba.GB(modv, Fi);
-        //System.out.println("Gi = " + Gi);
-        logger.info("#Gi = " + Gi.size());
-
-        G = PolyUtil.fromIntegerCoefficients(rring, Gi);
-        G = PolyUtil.monic(G);
-        return G;
-    }
-
 
     /**
      * Minimal ordered Groebner basis.
@@ -139,7 +108,7 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
-                // drop polynomial 
+                // drop polynomial
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenPolynomial<BigRational>> ff;
@@ -174,7 +143,6 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
         return G;
     }
 
-
     /**
      * Cleanup and terminate ThreadPool.
      */
@@ -183,13 +151,41 @@ public class GroebnerBaseRational<C extends BigRational> extends GroebnerBaseAbs
         bba.terminate();
     }
 
-
     /**
      * Cancel ThreadPool.
      */
     @Override
     public int cancel() {
         return bba.cancel();
+    }
+
+    /**
+     * Groebner base using fraction free computation.
+     *
+     * @param modv module variable number.
+     * @param F    polynomial list.
+     * @return GB(F) a Groebner base of F.
+     */
+    @Override
+    public List<GenPolynomial<BigRational>> GB(int modv, List<GenPolynomial<BigRational>> F) {
+        List<GenPolynomial<BigRational>> G = F;
+        if (F == null || F.isEmpty()) {
+            return G;
+        }
+        GenPolynomialRing<BigRational> rring = F.get(0).ring;
+        BigInteger cf = new BigInteger();
+        GenPolynomialRing<BigInteger> iring = new GenPolynomialRing<BigInteger>(cf, rring);
+        List<GenPolynomial<BigInteger>> Fi = PolyUtil.integerFromRationalCoefficients(iring, F);
+        //System.out.println("Fi = " + Fi);
+        logger.info("#Fi = " + Fi.size());
+
+        List<GenPolynomial<BigInteger>> Gi = bba.GB(modv, Fi);
+        //System.out.println("Gi = " + Gi);
+        logger.info("#Gi = " + Gi.size());
+
+        G = PolyUtil.fromIntegerCoefficients(rring, Gi);
+        G = PolyUtil.monic(G);
+        return G;
     }
 
 }

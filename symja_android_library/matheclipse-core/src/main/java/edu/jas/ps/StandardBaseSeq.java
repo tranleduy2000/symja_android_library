@@ -5,8 +5,8 @@
 package edu.jas.ps;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class StandardBaseSeq<C extends RingElem<C>>
         /* extends StandardBaseAbstract<C> */ {
 
 
-    private static final Logger logger = Logger.getLogger(StandardBaseSeq.class);
+    private static final Logger logger = LogManager.getLogger(StandardBaseSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();

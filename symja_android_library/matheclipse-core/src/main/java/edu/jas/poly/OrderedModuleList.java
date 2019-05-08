@@ -111,9 +111,19 @@ public class OrderedModuleList<C extends RingElem<C>> extends ModuleList<C> {
     }
 
     /**
+     * Hash code for OrderedModuleList.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -127,17 +137,8 @@ public class OrderedModuleList<C extends RingElem<C>> extends ModuleList<C> {
             ml = (OrderedModuleList<C>) m;
         } catch (ClassCastException ignored) {
         }
-        return ml != null;
-    }
-
-    /**
-     * Hash code for OrderedModuleList.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+        return ml != null;// compare sorted lists
+        // done already in super.equals()
     }
 
 }

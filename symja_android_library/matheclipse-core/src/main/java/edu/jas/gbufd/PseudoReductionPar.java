@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
         PseudoReduction<C> {
 
 
-    private static final Logger logger = Logger.getLogger(PseudoReductionPar.class);
+    private static final Logger logger = LogManager.getLogger(PseudoReductionPar.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -125,6 +125,22 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
         return R;
     }
 
+    /**
+     * Normalform with recording. <b>Note:</b> Only meaningful if all divisions
+     * are exact. Compute first the multiplication factor <code>m</code> with
+     * <code>normalform(Pp,Ap,m)</code>, then call this method with
+     * <code>normalform(row,Pp,m*Ap)</code>.
+     *
+     * @param row recording matrix, is modified.
+     * @param Pp  a polynomial list for reduction.
+     * @param Ap  a polynomial.
+     * @return nf(Pp, Ap), the normal form of Ap wrt. Pp.
+     */
+    @SuppressWarnings("unchecked")
+    public GenPolynomial<C> normalform(List<GenPolynomial<C>> row, List<GenPolynomial<C>> Pp,
+                                       GenPolynomial<C> Ap) {
+        throw new RuntimeException("normalform with recording not implemented");
+    }
 
     /**
      * Normalform.
@@ -214,25 +230,6 @@ public class PseudoReductionPar<C extends RingElem<C>> extends ReductionAbstract
         pf = new PseudoReductionEntry<C>(R, mfac);
         return pf;
     }
-
-
-    /**
-     * Normalform with recording. <b>Note:</b> Only meaningful if all divisions
-     * are exact. Compute first the multiplication factor <code>m</code> with
-     * <code>normalform(Pp,Ap,m)</code>, then call this method with
-     * <code>normalform(row,Pp,m*Ap)</code>.
-     *
-     * @param row recording matrix, is modified.
-     * @param Pp  a polynomial list for reduction.
-     * @param Ap  a polynomial.
-     * @return nf(Pp, Ap), the normal form of Ap wrt. Pp.
-     */
-    @SuppressWarnings("unchecked")
-    public GenPolynomial<C> normalform(List<GenPolynomial<C>> row, List<GenPolynomial<C>> Pp,
-                                       GenPolynomial<C> Ap) {
-        throw new RuntimeException("normalform with recording not implemented");
-    }
-
 
     /**
      * Normalform recursive.

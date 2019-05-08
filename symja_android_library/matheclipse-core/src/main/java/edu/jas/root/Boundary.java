@@ -118,18 +118,6 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         rfac = new GenPolynomialRing<C>(cf, A.ring);
     }
 
-
-    /**
-     * String representation of Boundary.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return rect.toString();
-    }
-
-
     /**
      * Get a scripting compatible string representation.
      *
@@ -139,7 +127,6 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         // Python case
         return rect.toScript();
     }
-
 
     /**
      * Get real part for polynomial i.
@@ -152,7 +139,6 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         return f;
     }
 
-
     /**
      * Get imaginary part for polynomial i.
      *
@@ -164,7 +150,6 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         return g;
     }
 
-
     /**
      * Copy this.
      *
@@ -174,11 +159,22 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         return new Boundary<C>(rect, A, polys);
     }
 
+    /**
+     * Hash code for this Rectangle.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int hc = 0;
+        hc += 37 * rect.hashCode();
+        return 37 * hc + A.hashCode();
+    }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -194,17 +190,14 @@ public class Boundary<C extends RingElem<C> & Rational> implements Serializable 
         return rect.equals(a.rect) && A.equals(a.A);
     }
 
-
     /**
-     * Hash code for this Rectangle.
+     * String representation of Boundary.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        int hc = 0;
-        hc += 37 * rect.hashCode();
-        return 37 * hc + A.hashCode();
+    public String toString() {
+        return rect.toString();
     }
 
 }

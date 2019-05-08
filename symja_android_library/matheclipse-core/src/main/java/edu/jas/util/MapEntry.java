@@ -36,7 +36,7 @@ public final class MapEntry<K, V> implements Map.Entry<K, V> {
     /**
      * Get the key.
      *
-     * @see Map.Entry#getKey()
+     * @see java.util.Map.Entry#getKey()
      */
     public K getKey() {
         return key;
@@ -46,7 +46,7 @@ public final class MapEntry<K, V> implements Map.Entry<K, V> {
     /**
      * Get the value.
      *
-     * @see Map.Entry#getValue()
+     * @see java.util.Map.Entry#getValue()
      */
     public V getValue() {
         return value;
@@ -57,17 +57,26 @@ public final class MapEntry<K, V> implements Map.Entry<K, V> {
      * Set the value.
      * Is not implemented.
      *
-     * @see Map.Entry
+     * @see java.util.Map.Entry
      */
     public V setValue(V value) {
         throw new UnsupportedOperationException("not implemented");
     }
 
+    /**
+     * Hash code for this MapEntry.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return key.hashCode() * 37 + value.hashCode();
+    }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -77,17 +86,6 @@ public final class MapEntry<K, V> implements Map.Entry<K, V> {
         }
         Map.Entry<K, V> me = (Map.Entry<K, V>) b;
         return key.equals(me.getKey()) && value.equals(me.getValue());
-    }
-
-
-    /**
-     * Hash code for this MapEntry.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return key.hashCode() * 37 + value.hashCode();
     }
 
 }

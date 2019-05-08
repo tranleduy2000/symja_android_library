@@ -5,8 +5,8 @@
 package edu.jas.root;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ import edu.jas.ufd.SquarefreeFactory;
 public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> implements ComplexRoots<C> {
 
 
-    private static final Logger logger = Logger.getLogger(ComplexRootsAbstract.class);
+    private static final Logger logger = LogManager.getLogger(ComplexRootsAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -90,6 +90,182 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
         return M;
     }
 
+    /**
+     * Complex root count of complex polynomial on rectangle.
+     *
+     * @param rect rectangle.
+     * @param a    univariate complex polynomial.
+     * @return root count of a in rectangle.
+     */
+    public abstract long complexRootCount(Rectangle<C> rect, GenPolynomial<Complex<C>> a)
+            throws InvalidBoundaryException;
+
+    /**
+     * List of complex roots of complex polynomial a on rectangle.
+     *
+     * @param rect rectangle.
+     * @param a    univariate squarefree complex polynomial.
+     * @return list of complex roots.
+     */
+    public abstract List<Rectangle<C>> complexRoots(Rectangle<C> rect, GenPolynomial<Complex<C>> a)
+            throws InvalidBoundaryException;
+
+    /**
+     * List of complex roots of complex polynomial.
+     *
+     * @param a univariate complex polynomial.
+     * @return list of complex roots.
+     */
+    @SuppressWarnings({"cast", "unchecked"})
+    public List<Rectangle<C>> complexRoots(GenPolynomial<Complex<C>> a) {
+        List<Rectangle<C>> roots = new ArrayList<Rectangle<C>>();
+        if (a.isConstant() || a.isZERO()) {
+            return roots;
+        }
+        ComplexRing<C> cr = (ComplexRing<C>) a.ring.coFac;
+        SortedMap<GenPolynomial<Complex<C>>, Long> sa = engine.squarefreeFactors(a);
+        for (Map.Entry<GenPolynomial<Complex<C>>, Long> me : sa.entrySet()) {
+            GenPolynomial<Complex<C>> p = me.getKey();
+            Complex<C> Mb = rootBound(p);
+            C M = Mb.getRe();
+            C M1 = M.sum(M.factory().fromInteger(1)); // asymmetric to origin
+            //System.out.println("M = " + M);
+            if (debug) {
+                logger.info("rootBound = " + M);
+            }
+            Complex<C>[] corner = (Complex<C>[]) new Complex[4];
+            corner[0] = new Complex<C>(cr, M1.negate(), M); // nw
+            corner[1] = new Complex<C>(cr, M1.negate(), M1.negate()); // sw
+            corner[2] = new Complex<C>(cr, M, M1.negate()); // se
+            corner[3] = new Complex<C>(cr, M, M); // ne
+            Rectangle<C> rect = new Rectangle<C>(corner);
+            try {
+                List<Rectangle<C>> rs = complexRoots(rect, p);
+                long e = me.getValue(); // sa.get(p);
+                for (int i = 0; i < e; i++) { // add with multiplicity
+                    roots.addAll(rs);
+                }
+            } catch (InvalidBoundaryException e) {
+                //logger.error("invalid boundary for p = " + p);
+                throw new RuntimeException("this should never happen " + e);
+            }
+        }
+        return roots;
+    }
+
+    /**
+     * Complex root refinement of complex polynomial a on rectangle.
+     *
+     * @param rect rectangle containing exactly one complex root.
+     * @param a    univariate squarefree complex polynomial.
+     * @param len  rational length for refinement.
+     * @return refined complex root.
+     */
+    @SuppressWarnings({"cast", "unchecked"})
+    public Rectangle<C> complexRootRefinement(Rectangle<C> rect, GenPolynomial<Complex<C>> a, BigRational len)
+            throws InvalidBoundaryException {
+        ComplexRing<C> cr = (ComplexRing<C>) a.ring.coFac;
+        Rectangle<C> root = rect;
+        long w;
+        if (debug) {
+            w = complexRootCount(root, a);
+            if (w != 1) {
+                System.out.println("#root = " + w);
+                System.out.println("root = " + root);
+                throw new ArithmeticException("no initial isolating rectangle " + rect);
+            }
+        }
+        Complex<C> eps = cr.fromInteger(1);
+        eps = eps.divide(cr.fromInteger(1000)); // 1/1000
+        BigRational length = len.multiply(len);
+        Complex<C> delta = null;
+        boolean work = true;
+        while (work) {
+            try {
+                while (root.rationalLength().compareTo(length) > 0) {
+                    //System.out.println("root = " + root + ", len = " + new BigDecimal(root.rationalLength()));
+                    if (delta == null) {
+                        delta = root.corners[3].subtract(root.corners[1]);
+                        delta = delta.divide(cr.fromInteger(2));
+                        //System.out.println("delta = " + toDecimal(delta));
+                    }
+                    Complex<C> center = root.corners[1].sum(delta);
+                    //System.out.println("refine center = " + toDecimal(center));
+                    if (debug) {
+                        logger.info("new center = " + center);
+                    }
+
+                    Complex<C>[] cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
+                    // cp[0] fix
+                    cp[1] = new Complex<C>(cr, cp[1].getRe(), center.getIm());
+                    cp[2] = center;
+                    cp[3] = new Complex<C>(cr, center.getRe(), cp[3].getIm());
+                    Rectangle<C> nw = new Rectangle<C>(cp);
+                    w = complexRootCount(nw, a);
+                    if (w == 1) {
+                        root = nw;
+                        delta = null;
+                        continue;
+                    }
+
+                    cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
+                    cp[0] = new Complex<C>(cr, cp[0].getRe(), center.getIm());
+                    // cp[1] fix
+                    cp[2] = new Complex<C>(cr, center.getRe(), cp[2].getIm());
+                    cp[3] = center;
+                    Rectangle<C> sw = new Rectangle<C>(cp);
+                    w = complexRootCount(sw, a);
+                    //System.out.println("#swr = " + w);
+                    if (w == 1) {
+                        root = sw;
+                        delta = null;
+                        continue;
+                    }
+
+                    cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
+                    cp[0] = center;
+                    cp[1] = new Complex<C>(cr, center.getRe(), cp[1].getIm());
+                    // cp[2] fix
+                    cp[3] = new Complex<C>(cr, cp[3].getRe(), center.getIm());
+                    Rectangle<C> se = new Rectangle<C>(cp);
+                    w = complexRootCount(se, a);
+                    //System.out.println("#ser = " + w);
+                    if (w == 1) {
+                        root = se;
+                        delta = null;
+                        continue;
+                    }
+
+                    cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
+                    cp[0] = new Complex<C>(cr, center.getRe(), cp[0].getIm());
+                    cp[1] = center;
+                    cp[2] = new Complex<C>(cr, cp[2].getRe(), center.getIm());
+                    // cp[3] fix
+                    Rectangle<C> ne = new Rectangle<C>(cp);
+                    w = complexRootCount(ne, a);
+                    //System.out.println("#ner = " + w);
+                    if (w == 1) {
+                        root = ne;
+                        delta = null;
+                        continue;
+                    }
+                    if (true) {
+                        w = complexRootCount(root, a);
+                        System.out.println("#root = " + w);
+                        System.out.println("root = " + root);
+                    }
+                    throw new ArithmeticException("no isolating rectangle " + rect);
+                }
+                work = false;
+            } catch (InvalidBoundaryException e) {
+                // repeat with new center
+                delta = delta.sum(delta.multiply(eps)); // distort
+                //System.out.println("new refine delta = " + toDecimal(delta));
+                eps = eps.sum(eps.multiply(cr.getIMAG()));
+            }
+        }
+        return root;
+    }
 
     /**
      * Magnitude bound.
@@ -144,188 +320,6 @@ public abstract class ComplexRootsAbstract<C extends RingElem<C> & Rational> imp
         //System.out.println("B = " + B);
         return B.getRe();
     }
-
-
-    /**
-     * Complex root count of complex polynomial on rectangle.
-     *
-     * @param rect rectangle.
-     * @param a    univariate complex polynomial.
-     * @return root count of a in rectangle.
-     */
-    public abstract long complexRootCount(Rectangle<C> rect, GenPolynomial<Complex<C>> a)
-            throws InvalidBoundaryException;
-
-
-    /**
-     * List of complex roots of complex polynomial a on rectangle.
-     *
-     * @param rect rectangle.
-     * @param a    univariate squarefree complex polynomial.
-     * @return list of complex roots.
-     */
-    public abstract List<Rectangle<C>> complexRoots(Rectangle<C> rect, GenPolynomial<Complex<C>> a)
-            throws InvalidBoundaryException;
-
-
-    /**
-     * List of complex roots of complex polynomial.
-     *
-     * @param a univariate complex polynomial.
-     * @return list of complex roots.
-     */
-    @SuppressWarnings({"cast", "unchecked"})
-    public List<Rectangle<C>> complexRoots(GenPolynomial<Complex<C>> a) {
-        List<Rectangle<C>> roots = new ArrayList<Rectangle<C>>();
-        if (a.isConstant() || a.isZERO()) {
-            return roots;
-        }
-        ComplexRing<C> cr = (ComplexRing<C>) a.ring.coFac;
-        SortedMap<GenPolynomial<Complex<C>>, Long> sa = engine.squarefreeFactors(a);
-        for (Map.Entry<GenPolynomial<Complex<C>>, Long> me : sa.entrySet()) {
-            GenPolynomial<Complex<C>> p = me.getKey();
-            Complex<C> Mb = rootBound(p);
-            C M = Mb.getRe();
-            C M1 = M.sum(M.factory().fromInteger(1)); // asymmetric to origin
-            //System.out.println("M = " + M);
-            if (debug) {
-                logger.info("rootBound = " + M);
-            }
-            Complex<C>[] corner = (Complex<C>[]) new Complex[4];
-            corner[0] = new Complex<C>(cr, M1.negate(), M); // nw
-            corner[1] = new Complex<C>(cr, M1.negate(), M1.negate()); // sw
-            corner[2] = new Complex<C>(cr, M, M1.negate()); // se
-            corner[3] = new Complex<C>(cr, M, M); // ne
-            Rectangle<C> rect = new Rectangle<C>(corner);
-            try {
-                List<Rectangle<C>> rs = complexRoots(rect, p);
-                long e = me.getValue(); // sa.get(p);
-                for (int i = 0; i < e; i++) { // add with multiplicity
-                    roots.addAll(rs);
-                }
-            } catch (InvalidBoundaryException e) {
-                //logger.error("invalid boundary for p = " + p);
-                throw new RuntimeException("this should never happen " + e);
-            }
-        }
-        return roots;
-    }
-
-
-    /**
-     * Complex root refinement of complex polynomial a on rectangle.
-     *
-     * @param rect rectangle containing exactly one complex root.
-     * @param a    univariate squarefree complex polynomial.
-     * @param len  rational length for refinement.
-     * @return refined complex root.
-     */
-    @SuppressWarnings({"cast", "unchecked"})
-    public Rectangle<C> complexRootRefinement(Rectangle<C> rect, GenPolynomial<Complex<C>> a, BigRational len)
-            throws InvalidBoundaryException {
-        ComplexRing<C> cr = (ComplexRing<C>) a.ring.coFac;
-        Rectangle<C> root = rect;
-        long w;
-        if (debug) {
-            w = complexRootCount(root, a);
-            if (w != 1) {
-                System.out.println("#root = " + w);
-                System.out.println("root = " + root);
-                throw new ArithmeticException("no initial isolating rectangle " + rect);
-            }
-        }
-        Complex<C> eps = cr.fromInteger(1);
-        eps = eps.divide(cr.fromInteger(1000)); // 1/1000
-        BigRational length = len.multiply(len);
-        Complex<C> delta = null;
-        boolean work = true;
-        while (work) {
-            try {
-                while (root.rationalLength().compareTo(length) > 0) {
-                    //System.out.println("root = " + root + ", len = " + new BigDecimal(root.rationalLength())); 
-                    if (delta == null) {
-                        delta = root.corners[3].subtract(root.corners[1]);
-                        delta = delta.divide(cr.fromInteger(2));
-                        //System.out.println("delta = " + toDecimal(delta)); 
-                    }
-                    Complex<C> center = root.corners[1].sum(delta);
-                    //System.out.println("refine center = " + toDecimal(center)); 
-                    if (debug) {
-                        logger.info("new center = " + center);
-                    }
-
-                    Complex<C>[] cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
-                    // cp[0] fix
-                    cp[1] = new Complex<C>(cr, cp[1].getRe(), center.getIm());
-                    cp[2] = center;
-                    cp[3] = new Complex<C>(cr, center.getRe(), cp[3].getIm());
-                    Rectangle<C> nw = new Rectangle<C>(cp);
-                    w = complexRootCount(nw, a);
-                    if (w == 1) {
-                        root = nw;
-                        delta = null;
-                        continue;
-                    }
-
-                    cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
-                    cp[0] = new Complex<C>(cr, cp[0].getRe(), center.getIm());
-                    // cp[1] fix
-                    cp[2] = new Complex<C>(cr, center.getRe(), cp[2].getIm());
-                    cp[3] = center;
-                    Rectangle<C> sw = new Rectangle<C>(cp);
-                    w = complexRootCount(sw, a);
-                    //System.out.println("#swr = " + w); 
-                    if (w == 1) {
-                        root = sw;
-                        delta = null;
-                        continue;
-                    }
-
-                    cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
-                    cp[0] = center;
-                    cp[1] = new Complex<C>(cr, center.getRe(), cp[1].getIm());
-                    // cp[2] fix
-                    cp[3] = new Complex<C>(cr, cp[3].getRe(), center.getIm());
-                    Rectangle<C> se = new Rectangle<C>(cp);
-                    w = complexRootCount(se, a);
-                    //System.out.println("#ser = " + w); 
-                    if (w == 1) {
-                        root = se;
-                        delta = null;
-                        continue;
-                    }
-
-                    cp = (Complex<C>[]) copyOfComplex(root.corners, 4);
-                    cp[0] = new Complex<C>(cr, center.getRe(), cp[0].getIm());
-                    cp[1] = center;
-                    cp[2] = new Complex<C>(cr, cp[2].getRe(), center.getIm());
-                    // cp[3] fix
-                    Rectangle<C> ne = new Rectangle<C>(cp);
-                    w = complexRootCount(ne, a);
-                    //System.out.println("#ner = " + w); 
-                    if (w == 1) {
-                        root = ne;
-                        delta = null;
-                        continue;
-                    }
-                    if (true) {
-                        w = complexRootCount(root, a);
-                        System.out.println("#root = " + w);
-                        System.out.println("root = " + root);
-                    }
-                    throw new ArithmeticException("no isolating rectangle " + rect);
-                }
-                work = false;
-            } catch (InvalidBoundaryException e) {
-                // repeat with new center
-                delta = delta.sum(delta.multiply(eps)); // distort
-                //System.out.println("new refine delta = " + toDecimal(delta));
-                eps = eps.sum(eps.multiply(cr.getIMAG()));
-            }
-        }
-        return root;
-    }
-
 
     /**
      * List of complex roots of complex polynomial.

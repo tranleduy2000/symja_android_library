@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -44,7 +44,7 @@ import edu.jas.util.KsubSet;
 public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends FactorAbstract<BigInteger> {
 
 
-    private static final Logger logger = Logger.getLogger(FactorInteger.class);
+    private static final Logger logger = LogManager.getLogger(FactorInteger.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -117,38 +117,75 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
     }
 
     /**
-     * GenPolynomial test if is irreducible with Eisenstein criterion.
+     * GenPolynomial factorization of a multivariate squarefree polynomial,
+     * using Hensel lifting if possible.
      *
-     * @param P univariate polynomial.
-     * @return true if P is irreducible, else false if it is unknown.
+     * @param P squarefree and primitive! (respectively monic) multivariate
+     *          GenPolynomial over the integers.
+     * @return [p_1, ..., p_k] with P = prod_{i=1,...,r} p_i.
      */
-    public boolean isIrreducibleEisenstein(GenPolynomial<BigInteger> P) {
-        if (P.ring.nvar != 1) {
-            throw new IllegalArgumentException("only for univariate polynomials");
+    @Override
+    public List<GenPolynomial<BigInteger>> factorsSquarefree(GenPolynomial<BigInteger> P) {
+        GenPolynomialRing<BigInteger> pfac = P.ring;
+        if (pfac.nvar <= 1) {
+            return baseFactorsSquarefree(P);
         }
-        if (P.degree(0) <= 1L) { // linear or constant is irreducible
-            return true;
-        }
-        BigInteger rcont = engine.baseContent(P.reductum());
-        if (rcont.isZERO() || rcont.isONE()) { // case x**n
-            return false;
-        }
-        // todo test
-        if (rcont.compareTo(BigInteger.valueOf(PrimeInteger.BETA)) >= 0) { // integer too big
-            return false;
-        }
-        long lcont = rcont.getVal().longValue();
-        BigInteger lc = P.leadingBaseCoefficient().abs();
-        BigInteger tc = P.trailingBaseCoefficient().abs();
-        SortedMap<Long, Integer> fac = PrimeInteger.factors(lcont);
-        for (Long p : fac.keySet()) {
-            BigInteger pi = BigInteger.valueOf(p);
-            if (!lc.remainder(pi).isZERO() && !tc.remainder(pi.power(2)).isZERO()) {
-                logger.info("isIrreducibleEisenstein: fac = " + fac + ", lc = " + lc + ", tc = " + tc);
-                return true;
+        OptimizedPolynomialList<BigInteger> opt = null;
+        List<Integer> iperm = null;
+        final boolean USE_OPT = true;
+        if (USE_OPT) {
+            List<GenPolynomial<BigInteger>> topt = new ArrayList<GenPolynomial<BigInteger>>(1);
+            topt.add(P);
+            opt = TermOrderOptimization.optimizeTermOrder(pfac, topt);
+            if (!TermOrderOptimization.isIdentityPermutation(opt.perm)) {
+                iperm = TermOrderOptimization.inversePermutation(opt.perm);
+                P = opt.list.get(0);
+                logger.info("optimized polynomial: " + P);
+                logger.warn("optimized ring: " + opt.ring + ", original ring: " + pfac);
             }
         }
-        return false;
+        ExpVector degv = P.degreeVector();
+        int[] donv = degv.dependencyOnVariables();
+        List<GenPolynomial<BigInteger>> facs = null;
+        if (degv.length() == donv.length) { // all variables appear, hack for Hensel, check
+            try {
+                logger.info("try factorsSquarefreeHensel: " + P);
+                facs = factorsSquarefreeHensel(P);
+            } catch (Exception e) {
+                logger.info("exception " + e);
+                //e.printStackTrace();
+            }
+        } else { // not all variables appear, remove unused variables, hack for Hensel, check
+            GenPolynomial<BigInteger> pu = PolyUtil.removeUnusedUpperVariables(P);
+            GenPolynomial<BigInteger> pl = PolyUtil.removeUnusedLowerVariables(pu); // not useful
+            try {
+                logger.info("try factorsSquarefreeHensel: " + pl);
+                facs = factorsSquarefreeHensel(pu);
+                List<GenPolynomial<BigInteger>> fs = new ArrayList<GenPolynomial<BigInteger>>(facs.size());
+                GenPolynomialRing<BigInteger> pf = P.ring;
+                GenPolynomialRing<BigInteger> pfu = pu.ring;
+                for (GenPolynomial<BigInteger> p : facs) {
+                    GenPolynomial<BigInteger> pel = p.extendLower(pfu, 0, 0L);
+                    GenPolynomial<BigInteger> pe = pel.extend(pf, 0, 0L);
+                    fs.add(pe);
+                }
+                //System.out.println("fs = " + fs);
+                facs = fs;
+            } catch (Exception e) {
+                logger.info("exception " + e);
+                //e.printStackTrace();
+            }
+        }
+        if (facs == null) {
+            logger.warn("factorsSquarefreeHensel not applicable or failed, reverting to Kronecker for: " + P);
+            facs = super.factorsSquarefree(P);
+        }
+        if (USE_OPT && iperm != null) {
+            facs = TermOrderOptimization.permutation(iperm, pfac, facs);
+            logger.warn("de-optimized polynomials: " + facs);
+        }
+        facs = normalizeFactorization(facs);
+        return facs;
     }
 
     /**
@@ -404,6 +441,41 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
     }
 
     /**
+     * GenPolynomial test if is irreducible with Eisenstein criterion.
+     *
+     * @param P univariate polynomial.
+     * @return true if P is irreducible, else false if it is unknown.
+     */
+    public boolean isIrreducibleEisenstein(GenPolynomial<BigInteger> P) {
+        if (P.ring.nvar != 1) {
+            throw new IllegalArgumentException("only for univariate polynomials");
+        }
+        if (P.degree(0) <= 1L) { // linear or constant is irreducible
+            return true;
+        }
+        BigInteger rcont = engine.baseContent(P.reductum());
+        if (rcont.isZERO() || rcont.isONE()) { // case x**n
+            return false;
+        }
+        // todo test
+        if (rcont.compareTo(BigInteger.valueOf(PrimeInteger.BETA)) >= 0) { // integer too big
+            return false;
+        }
+        long lcont = rcont.getVal().longValue();
+        BigInteger lc = P.leadingBaseCoefficient().abs();
+        BigInteger tc = P.trailingBaseCoefficient().abs();
+        SortedMap<Long, Integer> fac = PrimeInteger.factors(lcont);
+        for (Long p : fac.keySet()) {
+            BigInteger pi = BigInteger.valueOf(p);
+            if (!lc.remainder(pi).isZERO() && !tc.remainder(pi.power(2)).isZERO()) {
+                logger.info("isIrreducibleEisenstein: fac = " + fac + ", lc = " + lc + ", tc = " + tc);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * BitSet for factor degree list.
      *
      * @param E exponent vector list.
@@ -489,14 +561,14 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
 
         // combine trial factors
         int dl = (lift.size() + 1) / 2;
-        //System.out.println("dl = " + dl); 
+        //System.out.println("dl = " + dl);
         GenPolynomial<BigInteger> u = PP;
         long deg = (u.degree(0) + 1L) / 2L;
-        //System.out.println("deg = " + deg); 
+        //System.out.println("deg = " + deg);
         //BigInteger ldcf = u.leadingBaseCoefficient();
-        //System.out.println("ldcf = " + ldcf); 
+        //System.out.println("ldcf = " + ldcf);
         for (int j = 1; j <= dl; j++) {
-            //System.out.println("j = " + j + ", dl = " + dl + ", lift = " + lift); 
+            //System.out.println("j = " + j + ", dl = " + dl + ", lift = " + lift);
             KsubSet<GenPolynomial<MOD>> ps = new KsubSet<GenPolynomial<MOD>>(lift, j);
             for (List<GenPolynomial<MOD>> flist : ps) {
                 //System.out.println("degreeSum = " + degreeSum(flist));
@@ -534,7 +606,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                     lift = removeOnce(lift, flist);
                     logger.info("new lift= " + lift);
                     dl = (lift.size() + 1) / 2;
-                    //System.out.println("dl = " + dl); 
+                    //System.out.println("dl = " + dl);
                     j = 0; // since j++
                     break;
                     //} logger.error("error removing flist from lift = " + lift);
@@ -553,7 +625,6 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         return normalizeFactorization(factors);
     }
-
 
     /**
      * Factor search with modular Hensel lifting algorithm. Let p =
@@ -605,10 +676,10 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         long deg = (u.degree(0) + 1L) / 2L;
         GenPolynomial<MOD> um = Pm;
         //BigInteger ldcf = u.leadingBaseCoefficient();
-        //System.out.println("ldcf = " + ldcf); 
+        //System.out.println("ldcf = " + ldcf);
         HenselApprox<MOD> ilist = null;
         for (int j = 1; j <= dl; j++) {
-            //System.out.println("j = " + j + ", dl = " + dl + ", ilist = " + ilist); 
+            //System.out.println("j = " + j + ", dl = " + dl + ", ilist = " + ilist);
             KsubSet<GenPolynomial<MOD>> ps = new KsubSet<GenPolynomial<MOD>>(mlist, j);
             for (List<GenPolynomial<MOD>> flist : ps) {
                 //System.out.println("degreeSum = " + degreeSum(flist));
@@ -648,7 +719,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                     logger.info("       modlist = " + trial + ", cofactor " + cofactor);
                     logger.info("lifted intlist = " + itrial + ", cofactor " + icofactor);
                 }
-                //System.out.println("lifted intlist = " + itrial + ", cofactor " + icofactor); 
+                //System.out.println("lifted intlist = " + itrial + ", cofactor " + icofactor);
 
                 itrial = engine.basePrimitivePart(itrial);
                 //System.out.println("pp(trial)= " + itrial);
@@ -686,78 +757,6 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
         }
         return normalizeFactorization(factors);
     }
-
-
-    /**
-     * GenPolynomial factorization of a multivariate squarefree polynomial,
-     * using Hensel lifting if possible.
-     *
-     * @param P squarefree and primitive! (respectively monic) multivariate
-     *          GenPolynomial over the integers.
-     * @return [p_1, ..., p_k] with P = prod_{i=1,...,r} p_i.
-     */
-    @Override
-    public List<GenPolynomial<BigInteger>> factorsSquarefree(GenPolynomial<BigInteger> P) {
-        GenPolynomialRing<BigInteger> pfac = P.ring;
-        if (pfac.nvar <= 1) {
-            return baseFactorsSquarefree(P);
-        }
-        OptimizedPolynomialList<BigInteger> opt = null;
-        List<Integer> iperm = null;
-        final boolean USE_OPT = true;
-        if (USE_OPT) {
-            List<GenPolynomial<BigInteger>> topt = new ArrayList<GenPolynomial<BigInteger>>(1);
-            topt.add(P);
-            opt = TermOrderOptimization.optimizeTermOrder(pfac, topt);
-            P = opt.list.get(0);
-            logger.info("optimized polynomial: " + P);
-            iperm = TermOrderOptimization.inversePermutation(opt.perm);
-            logger.warn("optimized ring: " + opt.ring + ", original ring: " + pfac);
-        }
-        ExpVector degv = P.degreeVector();
-        int[] donv = degv.dependencyOnVariables();
-        List<GenPolynomial<BigInteger>> facs = null;
-        if (degv.length() == donv.length) { // all variables appear, hack for Hensel, check
-            try {
-                logger.info("try factorsSquarefreeHensel: " + P);
-                facs = factorsSquarefreeHensel(P);
-            } catch (Exception e) {
-                logger.info("exception " + e);
-                //e.printStackTrace();
-            }
-        } else { // not all variables appear, remove unused variables, hack for Hensel, check
-            GenPolynomial<BigInteger> pu = PolyUtil.removeUnusedUpperVariables(P);
-            GenPolynomial<BigInteger> pl = PolyUtil.removeUnusedLowerVariables(pu); // not useful
-            try {
-                logger.info("try factorsSquarefreeHensel: " + pl);
-                facs = factorsSquarefreeHensel(pu);
-                List<GenPolynomial<BigInteger>> fs = new ArrayList<GenPolynomial<BigInteger>>(facs.size());
-                GenPolynomialRing<BigInteger> pf = P.ring;
-                GenPolynomialRing<BigInteger> pfu = pu.ring;
-                for (GenPolynomial<BigInteger> p : facs) {
-                    GenPolynomial<BigInteger> pel = p.extendLower(pfu, 0, 0L);
-                    GenPolynomial<BigInteger> pe = pel.extend(pf, 0, 0L);
-                    fs.add(pe);
-                }
-                //System.out.println("fs = " + fs);
-                facs = fs;
-            } catch (Exception e) {
-                logger.info("exception " + e);
-                //e.printStackTrace();
-            }
-        }
-        if (facs == null) {
-            logger.warn("factorsSquarefreeHensel not applicable or failed, reverting to Kronecker for: " + P);
-            facs = super.factorsSquarefree(P);
-        }
-        if (USE_OPT) {
-            facs = TermOrderOptimization.permutation(iperm, pfac, facs);
-            logger.info("de-optimized polynomials: " + facs);
-        }
-        facs = normalizeFactorization(facs);
-        return facs;
-    }
-
 
     /**
      * GenPolynomial factorization of a multivariate squarefree polynomial,
@@ -1158,6 +1157,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                         notLucky = true;
                     }
                 }
+                //logger.warn("V = " + V + ", pe = " + pe + ", cei = " + cei + ", lf = " + lf + ", ln = " + ln);
             } // end determine leading coefficients for factors
 
             if (!notLucky) {
@@ -1177,6 +1177,7 @@ public class FactorInteger<MOD extends GcdRingElem<MOD> & Modular> extends Facto
                     notLucky = true;
                 }
             }
+            //logger.warn("tParts = " + tParts);
         } // end notLucky loop
 
         // search TrialParts with shortest factorization of univariate polynomial
@@ -1519,7 +1520,7 @@ class TrialParts {
 
 
     /**
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

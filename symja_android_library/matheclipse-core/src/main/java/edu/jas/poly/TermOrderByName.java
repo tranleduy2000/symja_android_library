@@ -5,15 +5,15 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
 
 /**
  * Term order names for ordered polynomials. Defines names for the most used
- * term orders: graded and lexicographical orders. For the definitions @see for
+ * term orders: graded and lexicographical orders. For the definitions see for
  * example the articles <a href="http://doi.acm.org/10.1145/43882.43887">Kredel
  * "Admissible term orderings used in computer algebra systems"</a> and
  * <a href="http://doi.acm.org/10.1145/70936.70941">Sit,
@@ -179,7 +179,7 @@ public class TermOrderByName {
      * TermOrder name Ds of Singular.
      */
     public final static TermOrder Ds = negdeglex; // = REVTDEG;
-    private static final Logger logger = Logger.getLogger(TermOrderByName.class);
+    private static final Logger logger = LogManager.getLogger(TermOrderByName.class);
 
 
     // missing: public final static TermOrder negrevlex; // = LEX; 

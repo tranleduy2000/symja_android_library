@@ -5,8 +5,8 @@
 package edu.jas.arith;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
 
 
     protected final static Random random = new Random();
-    private static final Logger logger = Logger.getLogger(BigQuaternionRing.class);
+    private static final Logger logger = LogManager.getLogger(BigQuaternionRing.class);
     /**
      * List of all 24 integral units.
      */
@@ -109,6 +109,59 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
     }
 
     /**
+     * Get a BigQuaternion element from a long.
+     *
+     * @param a long.
+     * @return a BigQuaternion.
+     */
+    public BigQuaternion fromInteger(long a) {
+        return new BigQuaternion(this, new BigRational(a));
+    }
+
+    /**
+     * Get a BigQuaternion element from a BigInteger.
+     *
+     * @param a BigInteger.
+     * @return a BigQuaternion.
+     */
+    public BigQuaternion fromInteger(java.math.BigInteger a) {
+        return new BigQuaternion(this, new BigRational(a));
+    }
+
+    /**
+     * BigQuaternion random. Random rational numbers A, B, C and D are generated
+     * using random(n). Then R is the quaternion number with real part A and
+     * imaginary parts B, C and D.
+     *
+     * @param n such that 0 &le; A, B, C, D &le; (2<sup>n</sup>-1).
+     * @return R, a random BigQuaternion.
+     */
+    public BigQuaternion random(int n) {
+        return random(n, random);
+    }
+
+    /**
+     * BigQuaternion random. Random rational numbers A, B, C and D are generated
+     * using RNRAND(n). Then R is the quaternion number with real part A and
+     * imaginary parts B, C and D.
+     *
+     * @param n   such that 0 &le; A, B, C, D &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return R, a random BigQuaternion.
+     */
+    public BigQuaternion random(int n, Random rnd) {
+        BigRational r = BigRational.ONE.random(n, rnd);
+        BigRational i = BigRational.ONE.random(n, rnd);
+        BigRational j = BigRational.ONE.random(n, rnd);
+        BigRational k = BigRational.ONE.random(n, rnd);
+        BigQuaternion q = new BigQuaternion(this, r, i, j, k);
+        if (integral) {
+            q = q.roundToHurwitzian();
+        }
+        return q;
+    }
+
+    /**
      * Copy BigQuaternion element c.
      *
      * @param c BigQuaternion.
@@ -116,6 +169,47 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
      */
     public BigQuaternion copy(BigQuaternion c) {
         return new BigQuaternion(this, c.re, c.im, c.jm, c.km);
+    }
+
+    /**
+     * Parse quaternion number from String.
+     *
+     * @param s String.
+     * @return BigQuaternion from s.
+     */
+    public BigQuaternion parse(String s) {
+        return new BigQuaternion(this, s);
+    }
+
+    /**
+     * Parse quaternion number from Reader.
+     *
+     * @param r Reader.
+     * @return next BigQuaternion from r.
+     */
+    public BigQuaternion parse(Reader r) {
+        return parse(StringUtil.nextString(r));
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
+     */
+    @Override
+    public String toScript() {
+        StringBuffer s = new StringBuffer("BigQuaternionRing(");
+        switch (Scripting.getLang()) {
+            case Ruby:
+                s.append((integral ? ",true" : ",false"));
+                break;
+            case Python:
+            default:
+                s.append((integral ? ",True" : ",False"));
+        }
+        s.append(")");
+        return s.toString();
     }
 
     /**
@@ -173,26 +267,6 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
     }
 
     /**
-     * Get a BigQuaternion element from a BigInteger.
-     *
-     * @param a BigInteger.
-     * @return a BigQuaternion.
-     */
-    public BigQuaternion fromInteger(java.math.BigInteger a) {
-        return new BigQuaternion(this, new BigRational(a));
-    }
-
-    /**
-     * Get a BigQuaternion element from a long.
-     *
-     * @param a long.
-     * @return a BigQuaternion.
-     */
-    public BigQuaternion fromInteger(long a) {
-        return new BigQuaternion(this, new BigRational(a));
-    }
-
-    /**
      * Get a BigQuaternion element from a long vector.
      *
      * @param a long vector.
@@ -204,43 +278,20 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
     }
 
     /**
-     * Get the string representation. Is compatible with the string constructor.
+     * Hash code for this BigQuaternionRing.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        String s = "BigQuaternionRing(" + integral + ")";
-        return s;
+    public int hashCode() {
+        int h = 4711;
+        return h;
     }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        StringBuffer s = new StringBuffer("BigQuaternionRing(");
-        switch (Scripting.getLang()) {
-            case Ruby:
-                s.append((integral ? ",true" : ",false"));
-                break;
-            case Python:
-            default:
-                s.append((integral ? ",True" : ",False"));
-        }
-        s.append(")");
-        return s.toString();
-    }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object b) {
@@ -252,17 +303,27 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
     }
 
 
+    /*
+     * Quaternion number, random. Random rational numbers A, B, C and D are
+     * generated using RNRAND(n). Then R is the quaternion number with real part
+     * A and imaginary parts B, C and D.
+     * @param n such that 0 &le; A, B, C, D &le; (2<sup>n</sup>-1).
+     * @return R, a random BigQuaternion.
+    public static BigQuaternion QRAND(int n) {
+        return ONE.random(n, random);
+    }
+     */
+
     /**
-     * Hash code for this BigQuaternionRing.
+     * Get the string representation. Is compatible with the string constructor.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        int h = 4711;
-        return h;
+    public String toString() {
+        String s = "BigQuaternionRing(" + integral + ")";
+        return s;
     }
-
 
     /**
      * BigQuaternion units of the Hurwitzian integers. BigQuaternion units with
@@ -297,75 +358,6 @@ public final class BigQuaternionRing implements RingFactory<BigQuaternion> {
         //}
         entierUnits = units;
         return units;
-    }
-
-
-    /**
-     * BigQuaternion random. Random rational numbers A, B, C and D are generated
-     * using random(n). Then R is the quaternion number with real part A and
-     * imaginary parts B, C and D.
-     *
-     * @param n such that 0 &le; A, B, C, D &le; (2<sup>n</sup>-1).
-     * @return R, a random BigQuaternion.
-     */
-    public BigQuaternion random(int n) {
-        return random(n, random);
-    }
-
-
-    /**
-     * BigQuaternion random. Random rational numbers A, B, C and D are generated
-     * using RNRAND(n). Then R is the quaternion number with real part A and
-     * imaginary parts B, C and D.
-     *
-     * @param n   such that 0 &le; A, B, C, D &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return R, a random BigQuaternion.
-     */
-    public BigQuaternion random(int n, Random rnd) {
-        BigRational r = BigRational.ONE.random(n, rnd);
-        BigRational i = BigRational.ONE.random(n, rnd);
-        BigRational j = BigRational.ONE.random(n, rnd);
-        BigRational k = BigRational.ONE.random(n, rnd);
-        BigQuaternion q = new BigQuaternion(this, r, i, j, k);
-        if (integral) {
-            q = q.roundToHurwitzian();
-        }
-        return q;
-    }
-
-
-    /*
-     * Quaternion number, random. Random rational numbers A, B, C and D are
-     * generated using RNRAND(n). Then R is the quaternion number with real part
-     * A and imaginary parts B, C and D.
-     * @param n such that 0 &le; A, B, C, D &le; (2<sup>n</sup>-1).
-     * @return R, a random BigQuaternion.
-    public static BigQuaternion QRAND(int n) {
-        return ONE.random(n, random);
-    }
-     */
-
-
-    /**
-     * Parse quaternion number from String.
-     *
-     * @param s String.
-     * @return BigQuaternion from s.
-     */
-    public BigQuaternion parse(String s) {
-        return new BigQuaternion(this, s);
-    }
-
-
-    /**
-     * Parse quaternion number from Reader.
-     *
-     * @param r Reader.
-     * @return next BigQuaternion from r.
-     */
-    public BigQuaternion parse(Reader r) {
-        return parse(StringUtil.nextString(r));
     }
 
 }

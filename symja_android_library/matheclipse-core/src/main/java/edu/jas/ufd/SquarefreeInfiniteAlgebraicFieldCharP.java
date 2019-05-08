@@ -6,8 +6,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>>
         extends SquarefreeFieldCharP<AlgebraicNumber<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(SquarefreeInfiniteAlgebraicFieldCharP.class);
+    private static final Logger logger = LogManager.getLogger(SquarefreeInfiniteAlgebraicFieldCharP.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -114,6 +114,108 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>>
         return factors;
     }
 
+    /**
+     * GenPolynomial char-th root univariate polynomial.
+     *
+     * @param P GenPolynomial.
+     * @return char-th_rootOf(P).
+     */
+    @Override
+    public GenPolynomial<AlgebraicNumber<C>> baseRootCharacteristic(GenPolynomial<AlgebraicNumber<C>> P) {
+        if (P == null || P.isZERO()) {
+            return P;
+        }
+        GenPolynomialRing<AlgebraicNumber<C>> pfac = P.ring;
+        if (pfac.nvar > 1) {
+            // basePthRoot not possible by return type
+            throw new IllegalArgumentException(P.getClass().getName() + " only for univariate polynomials");
+        }
+        RingFactory<AlgebraicNumber<C>> rf = pfac.coFac;
+        if (rf.characteristic().signum() != 1) {
+            // basePthRoot not possible
+            throw new IllegalArgumentException(P.getClass().getName() + " only for char p > 0 " + rf);
+        }
+        long mp = rf.characteristic().longValue();
+        GenPolynomial<AlgebraicNumber<C>> d = pfac.getZERO().copy();
+        for (Monomial<AlgebraicNumber<C>> m : P) {
+            //System.out.println("m = " + m);
+            ExpVector f = m.e;
+            long fl = f.getVal(0);
+            if (fl % mp != 0) {
+                return null;
+            }
+            fl = fl / mp;
+            SortedMap<AlgebraicNumber<C>, Long> sm = rootCharacteristic(m.c);
+            if (sm == null) {
+                return null;
+            }
+            if (logger.isInfoEnabled()) {
+                logger.info("sm_alg,base,root = " + sm);
+            }
+            AlgebraicNumber<C> r = rf.getONE();
+            for (Map.Entry<AlgebraicNumber<C>, Long> me : sm.entrySet()) {
+                AlgebraicNumber<C> rp = me.getKey();
+                //System.out.println("rp = " + rp);
+                long gl = me.getValue();
+                //System.out.println("gl = " + gl);
+                AlgebraicNumber<C> re = rp;
+                if (gl > 1) {
+                    re = rp.power(gl);
+                }
+                //System.out.println("re = " + re);
+                r = r.multiply(re);
+            }
+            ExpVector e = ExpVector.create(1, 0, fl);
+            d.doPutToMap(e, r);
+        }
+        if (logger.isInfoEnabled()) {
+            logger.info("sm_alg,base,d = " + d);
+        }
+        return d;
+    }
+
+    /**
+     * GenPolynomial char-th root univariate polynomial with polynomial
+     * coefficients.
+     *
+     * @param P recursive univariate GenPolynomial.
+     * @return char-th_rootOf(P), or null if P is no char-th root.
+     */
+    @Override
+    public GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> recursiveUnivariateRootCharacteristic(
+            GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> P) {
+        if (P == null || P.isZERO()) {
+            return P;
+        }
+        GenPolynomialRing<GenPolynomial<AlgebraicNumber<C>>> pfac = P.ring;
+        if (pfac.nvar > 1) {
+            // basePthRoot not possible by return type
+            throw new IllegalArgumentException(
+                    P.getClass().getName() + " only for univariate recursive polynomials");
+        }
+        RingFactory<GenPolynomial<AlgebraicNumber<C>>> rf = pfac.coFac;
+        if (rf.characteristic().signum() != 1) {
+            // basePthRoot not possible
+            throw new IllegalArgumentException(P.getClass().getName() + " only for char p > 0 " + rf);
+        }
+        long mp = rf.characteristic().longValue();
+        GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> d = pfac.getZERO().copy();
+        for (Monomial<GenPolynomial<AlgebraicNumber<C>>> m : P) {
+            ExpVector f = m.e;
+            long fl = f.getVal(0);
+            if (fl % mp != 0) {
+                return null;
+            }
+            fl = fl / mp;
+            GenPolynomial<AlgebraicNumber<C>> r = rootCharacteristic(m.c);
+            if (r == null) {
+                return null;
+            }
+            ExpVector e = ExpVector.create(1, 0, fl);
+            d.doPutToMap(e, r);
+        }
+        return d;
+    }
 
     /**
      * Characteristics root of a AlgebraicNumber.
@@ -191,9 +293,9 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>>
                         }
                         //C dc = cc.divide(pc);
                         Quotient<C> dcp = ccp.divide(pcp);
-                        if (dcp.isConstant()) { // not possible: dc.isConstant() 
+                        if (dcp.isConstant()) { // not possible: dc.isConstant()
                             //System.out.println("dcp = " + dcp + " : " + cc.toScriptFactory()); //  + ", dc = " + dc);
-                            //if ( dcp.num.isConstant() ) 
+                            //if ( dcp.num.isConstant() )
                             cc1 = cc;
                             pc1 = pc;
                         }
@@ -287,7 +389,6 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>>
         return root;
     }
 
-
     /**
      * GenPolynomial char-th root main variable.
      *
@@ -346,111 +447,6 @@ public class SquarefreeInfiniteAlgebraicFieldCharP<C extends GcdRingElem<C>>
             d.doPutToMap(e, r);
         }
         logger.info("sm_alg,root,d = " + d);
-        return d;
-    }
-
-
-    /**
-     * GenPolynomial char-th root univariate polynomial.
-     *
-     * @param P GenPolynomial.
-     * @return char-th_rootOf(P).
-     */
-    @Override
-    public GenPolynomial<AlgebraicNumber<C>> baseRootCharacteristic(GenPolynomial<AlgebraicNumber<C>> P) {
-        if (P == null || P.isZERO()) {
-            return P;
-        }
-        GenPolynomialRing<AlgebraicNumber<C>> pfac = P.ring;
-        if (pfac.nvar > 1) {
-            // basePthRoot not possible by return type
-            throw new IllegalArgumentException(P.getClass().getName() + " only for univariate polynomials");
-        }
-        RingFactory<AlgebraicNumber<C>> rf = pfac.coFac;
-        if (rf.characteristic().signum() != 1) {
-            // basePthRoot not possible
-            throw new IllegalArgumentException(P.getClass().getName() + " only for char p > 0 " + rf);
-        }
-        long mp = rf.characteristic().longValue();
-        GenPolynomial<AlgebraicNumber<C>> d = pfac.getZERO().copy();
-        for (Monomial<AlgebraicNumber<C>> m : P) {
-            //System.out.println("m = " + m);
-            ExpVector f = m.e;
-            long fl = f.getVal(0);
-            if (fl % mp != 0) {
-                return null;
-            }
-            fl = fl / mp;
-            SortedMap<AlgebraicNumber<C>, Long> sm = rootCharacteristic(m.c);
-            if (sm == null) {
-                return null;
-            }
-            if (logger.isInfoEnabled()) {
-                logger.info("sm_alg,base,root = " + sm);
-            }
-            AlgebraicNumber<C> r = rf.getONE();
-            for (Map.Entry<AlgebraicNumber<C>, Long> me : sm.entrySet()) {
-                AlgebraicNumber<C> rp = me.getKey();
-                //System.out.println("rp = " + rp);
-                long gl = me.getValue();
-                //System.out.println("gl = " + gl);
-                AlgebraicNumber<C> re = rp;
-                if (gl > 1) {
-                    re = rp.power(gl);
-                }
-                //System.out.println("re = " + re);
-                r = r.multiply(re);
-            }
-            ExpVector e = ExpVector.create(1, 0, fl);
-            d.doPutToMap(e, r);
-        }
-        if (logger.isInfoEnabled()) {
-            logger.info("sm_alg,base,d = " + d);
-        }
-        return d;
-    }
-
-
-    /**
-     * GenPolynomial char-th root univariate polynomial with polynomial
-     * coefficients.
-     *
-     * @param P recursive univariate GenPolynomial.
-     * @return char-th_rootOf(P), or null if P is no char-th root.
-     */
-    @Override
-    public GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> recursiveUnivariateRootCharacteristic(
-            GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> P) {
-        if (P == null || P.isZERO()) {
-            return P;
-        }
-        GenPolynomialRing<GenPolynomial<AlgebraicNumber<C>>> pfac = P.ring;
-        if (pfac.nvar > 1) {
-            // basePthRoot not possible by return type
-            throw new IllegalArgumentException(
-                    P.getClass().getName() + " only for univariate recursive polynomials");
-        }
-        RingFactory<GenPolynomial<AlgebraicNumber<C>>> rf = pfac.coFac;
-        if (rf.characteristic().signum() != 1) {
-            // basePthRoot not possible
-            throw new IllegalArgumentException(P.getClass().getName() + " only for char p > 0 " + rf);
-        }
-        long mp = rf.characteristic().longValue();
-        GenPolynomial<GenPolynomial<AlgebraicNumber<C>>> d = pfac.getZERO().copy();
-        for (Monomial<GenPolynomial<AlgebraicNumber<C>>> m : P) {
-            ExpVector f = m.e;
-            long fl = f.getVal(0);
-            if (fl % mp != 0) {
-                return null;
-            }
-            fl = fl / mp;
-            GenPolynomial<AlgebraicNumber<C>> r = rootCharacteristic(m.c);
-            if (r == null) {
-                return null;
-            }
-            ExpVector e = ExpVector.create(1, 0, fl);
-            d.doPutToMap(e, r);
-        }
         return d;
     }
 

@@ -5,8 +5,8 @@
 package edu.jas.vector;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import edu.jas.structure.RingElem;
 public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>, C> {
 
 
-    private static final Logger logger = Logger.getLogger(GenVector.class);
+    private static final Logger logger = LogManager.getLogger(GenVector.class);
 
 
     public final GenVectorModul<C> modul;
@@ -55,33 +55,50 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         logger.info(modul.cols + " vector constructed");
     }
 
-
     /**
-     * Get the String representation as RingElem.
+     * clone method.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#clone()
      */
     @Override
-    public String toString() {
-        StringBuffer s = new StringBuffer();
-        s.append("[ ");
-        boolean first = true;
-        for (C c : val) {
-            if (first) {
-                first = false;
-            } else {
-                s.append(", ");
-            }
-            s.append(c.toString());
-        }
-        s.append(" ]");
-        if (!PrettyPrint.isTrue()) {
-            s.append(" :: " + modul.toString());
-            s.append("\n");
-        }
-        return s.toString();
+    @SuppressWarnings("unchecked")
+    public GenVector<C> copy() {
+        //return modul.copy(this);
+        ArrayList<C> av = new ArrayList<C>(val);
+        return new GenVector<C>(modul, av);
     }
 
+    /**
+     * compareTo, lexicographical comparison.
+     *
+     * @param b other
+     * @return 1 if (this &lt; b), 0 if (this == b) or -1 if (this &gt; b).
+     */
+    @Override
+    public int compareTo(GenVector<C> b) {
+        if (!modul.equals(b.modul)) {
+            return -1;
+        }
+        List<C> oval = b.val;
+        int i = 0;
+        for (C c : val) {
+            int s = c.compareTo(oval.get(i++));
+            if (s != 0) {
+                return s;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public GenVectorModul<C> factory() {
+        return modul;
+    }
 
     /**
      * Get a scripting compatible string representation.
@@ -107,7 +124,6 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         return s.toString();
     }
 
-
     /**
      * Get a scripting compatible string representation of the factory.
      *
@@ -120,89 +136,12 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         return factory().toScript();
     }
 
-
-    /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public GenVectorModul<C> factory() {
-        return modul;
-    }
-
-
-    /**
-     * clone method.
-     *
-     * @see Object#clone()
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public GenVector<C> copy() {
-        //return modul.copy(this);
-        ArrayList<C> av = new ArrayList<C>(val);
-        return new GenVector<C>(modul, av);
-    }
-
-
     /**
      * test if this is equal to a zero vector.
      */
     public boolean isZERO() {
         return (0 == this.compareTo(modul.getZERO()));
     }
-
-
-    /**
-     * equals method.
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof GenVector)) {
-            return false;
-        }
-        GenVector ovec = (GenVector) other;
-        if (!modul.equals(ovec.modul)) {
-            return false;
-        }
-        return val.equals(ovec.val);
-    }
-
-
-    /**
-     * Hash code for this GenVector.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return 37 * val.hashCode() + modul.hashCode();
-    }
-
-
-    /**
-     * compareTo, lexicographical comparison.
-     *
-     * @param b other
-     * @return 1 if (this &lt; b), 0 if (this == b) or -1 if (this &gt; b).
-     */
-    @Override
-    public int compareTo(GenVector<C> b) {
-        if (!modul.equals(b.modul)) {
-            return -1;
-        }
-        List<C> oval = b.val;
-        int i = 0;
-        for (C c : val) {
-            int s = c.compareTo(oval.get(i++));
-            if (s != 0) {
-                return s;
-            }
-        }
-        return 0;
-    }
-
 
     /**
      * sign of vector.
@@ -212,7 +151,6 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
     public int signum() {
         return compareTo(modul.getZERO());
     }
-
 
     /**
      * Sum of vectors.
@@ -231,7 +169,6 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         return new GenVector<C>(modul, a);
     }
 
-
     /**
      * Difference of vectors.
      *
@@ -249,7 +186,6 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         return new GenVector<C>(modul, a);
     }
 
-
     /**
      * Negative of this vector.
      *
@@ -264,7 +200,6 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         return new GenVector<C>(modul, a);
     }
 
-
     /**
      * Absolute value of this vector.
      *
@@ -277,6 +212,56 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         return this;
     }
 
+    /**
+     * Hash code for this GenVector.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return 37 * val.hashCode() + modul.hashCode();
+    }
+
+    /**
+     * equals method.
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof GenVector)) {
+            return false;
+        }
+        GenVector ovec = (GenVector) other;
+        if (!modul.equals(ovec.modul)) {
+            return false;
+        }
+        return val.equals(ovec.val);
+    }
+
+    /**
+     * Get the String representation as RingElem.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer s = new StringBuffer();
+        s.append("[ ");
+        boolean first = true;
+        for (C c : val) {
+            if (first) {
+                first = false;
+            } else {
+                s.append(", ");
+            }
+            s.append(c.toString());
+        }
+        s.append(" ]");
+        if (!PrettyPrint.isTrue()) {
+            s.append(" :: " + modul.toString());
+            s.append("\n");
+        }
+        return s.toString();
+    }
 
     /**
      * Product of this vector with scalar.
@@ -292,23 +277,6 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         }
         return new GenVector<C>(modul, a);
     }
-
-
-    /**
-     * Left product of this vector with scalar.
-     *
-     * @param s scalar.
-     * @return s*this
-     */
-    public GenVector<C> leftScalarMultiply(C s) {
-        ArrayList<C> a = new ArrayList<C>(modul.cols);
-        for (C c : val) {
-            C e = s.multiply(c);
-            a.add(e);
-        }
-        return new GenVector<C>(modul, a);
-    }
-
 
     /**
      * Linear combination of this vector with scalar multiple of other vector.
@@ -331,7 +299,6 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         return new GenVector<C>(modul, a);
     }
 
-
     /**
      * Linear combination of this vector with scalar multiple of other vector.
      *
@@ -351,6 +318,54 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         return new GenVector<C>(modul, a);
     }
 
+    /**
+     * scalar / dot product of this vector with other vector.
+     *
+     * @param b other vector.
+     * @return this . b
+     */
+    public C scalarProduct(GenVector<C> b) {
+        C a = modul.coFac.getZERO();
+        List<C> oval = b.val;
+        int i = 0;
+        for (C c : val) {
+            C c2 = c.multiply(oval.get(i++));
+            a = a.sum(c2);
+        }
+        return a;
+    }
+
+    /**
+     * scalar / dot product of this vector with list of other vectors.
+     *
+     * @param B list of vectors.
+     * @return this * b
+     */
+    public GenVector<C> scalarProduct(List<GenVector<C>> B) {
+        GenVector<C> A = modul.getZERO();
+        int i = 0;
+        for (C c : val) {
+            GenVector<C> b = B.get(i++);
+            GenVector<C> a = b.leftScalarMultiply(c);
+            A = A.sum(a);
+        }
+        return A;
+    }
+
+    /**
+     * Left product of this vector with scalar.
+     *
+     * @param s scalar.
+     * @return s*this
+     */
+    public GenVector<C> leftScalarMultiply(C s) {
+        ArrayList<C> a = new ArrayList<C>(modul.cols);
+        for (C c : val) {
+            C e = s.multiply(c);
+            a.add(e);
+        }
+        return new GenVector<C>(modul, a);
+    }
 
     /**
      * Left linear combination of this vector with scalar multiple of other
@@ -371,7 +386,6 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         }
         return new GenVector<C>(modul, a);
     }
-
 
     /**
      * left linear combination of this vector with scalar multiple of other
@@ -394,43 +408,6 @@ public class GenVector<C extends RingElem<C>> implements ModulElem<GenVector<C>,
         }
         return new GenVector<C>(modul, a);
     }
-
-
-    /**
-     * scalar / dot product of this vector with other vector.
-     *
-     * @param b other vector.
-     * @return this . b
-     */
-    public C scalarProduct(GenVector<C> b) {
-        C a = modul.coFac.getZERO();
-        List<C> oval = b.val;
-        int i = 0;
-        for (C c : val) {
-            C c2 = c.multiply(oval.get(i++));
-            a = a.sum(c2);
-        }
-        return a;
-    }
-
-
-    /**
-     * scalar / dot product of this vector with list of other vectors.
-     *
-     * @param B list of vectors.
-     * @return this * b
-     */
-    public GenVector<C> scalarProduct(List<GenVector<C>> B) {
-        GenVector<C> A = modul.getZERO();
-        int i = 0;
-        for (C c : val) {
-            GenVector<C> b = B.get(i++);
-            GenVector<C> a = b.leftScalarMultiply(c);
-            A = A.sum(a);
-        }
-        return A;
-    }
-
 
     /**
      * right scalar / dot product of this vector with list of other vectors.

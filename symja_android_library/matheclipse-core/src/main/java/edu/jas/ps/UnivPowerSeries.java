@@ -93,6 +93,33 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         this.truncate = ring.truncate;
     }
 
+    /**
+     * Clone this power series.
+     *
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public UnivPowerSeries<C> copy() {
+        return new UnivPowerSeries<C>(ring, lazyCoeffs);
+    }
+
+    /**
+     * Compare to. <b>Note: </b> compare only up to truncate.
+     *
+     * @return sign of first non zero coefficient of this-ps.
+     */
+    @Override
+    public int compareTo(UnivPowerSeries<C> ps) {
+        int m = order();
+        int n = ps.order();
+        int pos = (m <= n) ? m : n;
+        int s = 0;
+        do {
+            s = coefficient(pos).compareTo(ps.coefficient(pos));
+            pos++;
+        } while (s == 0 && pos <= truncate);
+        return s;
+    }
 
     /**
      * Get the corresponding element factory.
@@ -103,83 +130,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
     public UnivPowerSeriesRing<C> factory() {
         return ring;
     }
-
-
-    /**
-     * Clone this power series.
-     *
-     * @see Object#clone()
-     */
-    @Override
-    public UnivPowerSeries<C> copy() {
-        return new UnivPowerSeries<C>(ring, lazyCoeffs);
-    }
-
-
-    /**
-     * String representation of power series.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return toString(truncate);
-    }
-
-
-    /**
-     * To String with given truncate.
-     *
-     * @return string representation of this to given truncate.
-     */
-    public String toString(int truncate) {
-        StringBuffer sb = new StringBuffer();
-        UnivPowerSeries<C> s = this;
-        String var = ring.var;
-        //System.out.println("cache = " + s.coeffCache);
-        for (int i = 0; i < truncate; i++) {
-            C c = s.coefficient(i);
-            int si = c.signum();
-            if (si != 0) {
-                if (si > 0) {
-                    if (sb.length() > 0) {
-                        sb.append(" + ");
-                    }
-                } else {
-                    c = c.negate();
-                    sb.append(" - ");
-                }
-                if (!c.isONE() || i == 0) {
-                    if (c instanceof GenPolynomial || c instanceof AlgebraicNumber) {
-                        sb.append("{ ");
-                    }
-                    sb.append(c.toString());
-                    if (c instanceof GenPolynomial || c instanceof AlgebraicNumber) {
-                        sb.append(" }");
-                    }
-                    if (i > 0) {
-                        sb.append(" * ");
-                    }
-                }
-                if (i == 0) {
-                    //skip; sb.append(" ");
-                } else if (i == 1) {
-                    sb.append(var);
-                } else {
-                    sb.append(var + "^" + i);
-                }
-                //sb.append(c.toString() + ", ");
-            }
-            //System.out.println("cache = " + s.coeffCache);
-        }
-        if (sb.length() == 0) {
-            sb.append("0");
-        }
-        sb.append(" + BigO(" + var + "^" + truncate + ")");
-        //sb.append("...");
-        return sb.toString();
-    }
-
 
     /**
      * Get a scripting compatible string representation.
@@ -236,7 +186,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         return sb.toString();
     }
 
-
     /**
      * Get a scripting compatible string representation of the factory.
      *
@@ -249,6 +198,58 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         return factory().toScript();
     }
 
+    /**
+     * To String with given truncate.
+     *
+     * @return string representation of this to given truncate.
+     */
+    public String toString(int truncate) {
+        StringBuffer sb = new StringBuffer();
+        UnivPowerSeries<C> s = this;
+        String var = ring.var;
+        //System.out.println("cache = " + s.coeffCache);
+        for (int i = 0; i < truncate; i++) {
+            C c = s.coefficient(i);
+            int si = c.signum();
+            if (si != 0) {
+                if (si > 0) {
+                    if (sb.length() > 0) {
+                        sb.append(" + ");
+                    }
+                } else {
+                    c = c.negate();
+                    sb.append(" - ");
+                }
+                if (!c.isONE() || i == 0) {
+                    if (c instanceof GenPolynomial || c instanceof AlgebraicNumber) {
+                        sb.append("{ ");
+                    }
+                    sb.append(c.toString());
+                    if (c instanceof GenPolynomial || c instanceof AlgebraicNumber) {
+                        sb.append(" }");
+                    }
+                    if (i > 0) {
+                        sb.append(" * ");
+                    }
+                }
+                if (i == 0) {
+                    //skip; sb.append(" ");
+                } else if (i == 1) {
+                    sb.append(var);
+                } else {
+                    sb.append(var + "^" + i);
+                }
+                //sb.append(c.toString() + ", ");
+            }
+            //System.out.println("cache = " + s.coeffCache);
+        }
+        if (sb.length() == 0) {
+            sb.append("0");
+        }
+        sb.append(" + BigO(" + var + "^" + truncate + ")");
+        //sb.append("...");
+        return sb.toString();
+    }
 
     /**
      * Get coefficient.
@@ -438,29 +439,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         });
     }
 
-
-    /**
-     * Sum of two power series.
-     *
-     * @param ps other power series.
-     * @return this + ps.
-     */
-    public UnivPowerSeries<C> sum(UnivPowerSeries<C> ps) {
-        return zip(new Sum<C>(), ps);
-    }
-
-
-    /**
-     * Subtraction of two power series.
-     *
-     * @param ps other power series.
-     * @return this - ps.
-     */
-    public UnivPowerSeries<C> subtract(UnivPowerSeries<C> ps) {
-        return zip(new Subtract<C>(), ps);
-    }
-
-
     /**
      * Multiply by coefficient.
      *
@@ -470,7 +448,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
     public UnivPowerSeries<C> multiply(C c) {
         return map(new Multiply<C>(c));
     }
-
 
     /**
      * Monic.
@@ -497,30 +474,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         });
     }
 
-
-    /**
-     * Negate.
-     *
-     * @return - this.
-     */
-    public UnivPowerSeries<C> negate() {
-        return map(new Negate<C>());
-    }
-
-
-    /**
-     * Absolute value.
-     *
-     * @return abs(this).
-     */
-    public UnivPowerSeries<C> abs() {
-        if (signum() < 0) {
-            return negate();
-        }
-        return this;
-    }
-
-
     /**
      * Evaluate at given point.
      *
@@ -536,7 +489,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         }
         return v;
     }
-
 
     /**
      * Order.
@@ -556,7 +508,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         return order;
     }
 
-
     /**
      * Truncate.
      *
@@ -565,7 +516,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
     public int truncate() {
         return truncate;
     }
-
 
     /**
      * Set truncate.
@@ -582,36 +532,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         return ot;
     }
 
-
-    /**
-     * Signum.
-     *
-     * @return sign of first non zero coefficient.
-     */
-    public int signum() {
-        return coefficient(order()).signum();
-    }
-
-
-    /**
-     * Compare to. <b>Note: </b> compare only up to truncate.
-     *
-     * @return sign of first non zero coefficient of this-ps.
-     */
-    @Override
-    public int compareTo(UnivPowerSeries<C> ps) {
-        int m = order();
-        int n = ps.order();
-        int pos = (m <= n) ? m : n;
-        int s = 0;
-        do {
-            s = coefficient(pos).compareTo(ps.coefficient(pos));
-            pos++;
-        } while (s == 0 && pos <= truncate);
-        return s;
-    }
-
-
     /**
      * Is power series zero. <b>Note: </b> compare only up to truncate.
      *
@@ -622,6 +542,55 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         return (compareTo(ring.ZERO) == 0);
     }
 
+    /**
+     * Signum.
+     *
+     * @return sign of first non zero coefficient.
+     */
+    public int signum() {
+        return coefficient(order()).signum();
+    }
+
+    /**
+     * Sum of two power series.
+     *
+     * @param ps other power series.
+     * @return this + ps.
+     */
+    public UnivPowerSeries<C> sum(UnivPowerSeries<C> ps) {
+        return zip(new Sum<C>(), ps);
+    }
+
+    /**
+     * Subtraction of two power series.
+     *
+     * @param ps other power series.
+     * @return this - ps.
+     */
+    public UnivPowerSeries<C> subtract(UnivPowerSeries<C> ps) {
+        return zip(new Subtract<C>(), ps);
+    }
+
+    /**
+     * Negate.
+     *
+     * @return - this.
+     */
+    public UnivPowerSeries<C> negate() {
+        return map(new Negate<C>());
+    }
+
+    /**
+     * Absolute value.
+     *
+     * @return abs(this).
+     */
+    public UnivPowerSeries<C> abs() {
+        if (signum() < 0) {
+            return negate();
+        }
+        return this;
+    }
 
     /**
      * Is power series one. <b>Note: </b> compare only up to truncate.
@@ -633,46 +602,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         return (compareTo(ring.ONE) == 0);
     }
 
-
-    /**
-     * Comparison with any other object. <b>Note: </b> compare only up to
-     * truncate.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object B) {
-        UnivPowerSeries<C> a = null;
-        try {
-            a = (UnivPowerSeries<C>) B;
-        } catch (ClassCastException ignored) {
-        }
-        if (a == null) {
-            return false;
-        }
-        return compareTo(a) == 0;
-    }
-
-
-    /**
-     * Hash code for this polynomial. <b>Note: </b> only up to truncate.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h = 0;
-        //h = ( ring.hashCode() << 23 );
-        //h += val.hashCode();
-        for (int i = 0; i <= truncate; i++) {
-            h += coefficient(i).hashCode();
-            h = (h << 23);
-        }
-        return h;
-    }
-
-
     /**
      * Is unit.
      *
@@ -681,7 +610,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
     public boolean isUnit() {
         return leadingCoefficient().isUnit();
     }
-
 
     /**
      * Multiply by another power series.
@@ -707,38 +635,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
             }
         });
     }
-
-
-    /**
-     * Inverse power series.
-     *
-     * @return ps with this * ps = 1.
-     */
-    public UnivPowerSeries<C> inverse() {
-        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
-
-
-            @Override
-            public C generate(int i) {
-                C d = leadingCoefficient().inverse(); // may fail
-                if (i == 0) {
-                    return d;
-                }
-                C c = null; //fac.getZERO();
-                for (int k = 0; k < i; k++) {
-                    C m = get(k).multiply(coefficient(i - k));
-                    if (c == null) {
-                        c = m;
-                    } else {
-                        c = c.sum(m);
-                    }
-                }
-                c = c.multiply(d.negate());
-                return c;
-            }
-        });
-    }
-
 
     /**
      * Divide by another power series.
@@ -779,7 +675,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         return sq;
     }
 
-
     /**
      * Power series remainder.
      *
@@ -795,7 +690,6 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         return this;
     }
 
-
     /**
      * Quotient and remainder by division of this by S.
      *
@@ -807,6 +701,82 @@ public class UnivPowerSeries<C extends RingElem<C>> extends RingElemImpl<UnivPow
         return new UnivPowerSeries[]{divide(S), remainder(S)};
     }
 
+    /**
+     * Inverse power series.
+     *
+     * @return ps with this * ps = 1.
+     */
+    public UnivPowerSeries<C> inverse() {
+        return new UnivPowerSeries<C>(ring, new Coefficients<C>() {
+
+
+            @Override
+            public C generate(int i) {
+                C d = leadingCoefficient().inverse(); // may fail
+                if (i == 0) {
+                    return d;
+                }
+                C c = null; //fac.getZERO();
+                for (int k = 0; k < i; k++) {
+                    C m = get(k).multiply(coefficient(i - k));
+                    if (c == null) {
+                        c = m;
+                    } else {
+                        c = c.sum(m);
+                    }
+                }
+                c = c.multiply(d.negate());
+                return c;
+            }
+        });
+    }
+
+    /**
+     * Hash code for this polynomial. <b>Note: </b> only up to truncate.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h = 0;
+        //h = ( ring.hashCode() << 23 );
+        //h += val.hashCode();
+        for (int i = 0; i <= truncate; i++) {
+            h += coefficient(i).hashCode();
+            h = (h << 23);
+        }
+        return h;
+    }
+
+    /**
+     * Comparison with any other object. <b>Note: </b> compare only up to
+     * truncate.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object B) {
+        UnivPowerSeries<C> a = null;
+        try {
+            a = (UnivPowerSeries<C>) B;
+        } catch (ClassCastException ignored) {
+        }
+        if (a == null) {
+            return false;
+        }
+        return compareTo(a) == 0;
+    }
+
+    /**
+     * String representation of power series.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return toString(truncate);
+    }
 
     /**
      * Differentiate.

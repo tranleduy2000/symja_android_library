@@ -5,8 +5,8 @@
 package edu.jas.arith;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -36,7 +36,7 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
 
 
     //private static final boolean debug = logger.isDebugEnabled();
-    private static final Logger logger = Logger.getLogger(ProductRing.class);
+    private static final Logger logger = LogManager.getLogger(ProductRing.class);
     /**
      * One Ring factory.
      */
@@ -127,38 +127,6 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
         return ringList.contains(rf);
     }
 
-
-    /**
-     * Is this structure finite or infinite.
-     *
-     * @return true if this structure is finite, else false.
-     * @see edu.jas.structure.ElemFactory#isFinite()
-     */
-    public boolean isFinite() {
-        if (nCopies != 0) {
-            return ring.isFinite();
-        }
-        for (RingFactory<C> f : ringList) {
-            boolean b = f.isFinite();
-            if (!b) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Copy Product element c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public Product<C> copy(Product<C> c) {
-        return new Product<C>(c.ring, c.val, c.isunit);
-    }
-
-
     /**
      * Get the zero element.
      *
@@ -167,7 +135,6 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
     public Product<C> getZERO() {
         return new Product<C>(this);
     }
-
 
     /**
      * Get the one element.
@@ -190,6 +157,39 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
         return new Product<C>(this, elem, 1);
     }
 
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true if this ring is commutative, else false.
+     */
+    public boolean isCommutative() {
+        if (nCopies != 0) {
+            return ring.isCommutative();
+        }
+        for (RingFactory<C> f : ringList) {
+            if (!f.isCommutative()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true if this ring is associative, else false.
+     */
+    public boolean isAssociative() {
+        if (nCopies != 0) {
+            return ring.isAssociative();
+        }
+        for (RingFactory<C> f : ringList) {
+            if (!f.isAssociative()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Get a list of the generating elements.
@@ -218,138 +218,34 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
         return gens;
     }
 
-
     /**
-     * Get an atomic element.
+     * Is this structure finite or infinite.
      *
-     * @param i index.
-     * @return e_i as Product.
+     * @return true if this structure is finite, else false.
+     * @see edu.jas.structure.ElemFactory#isFinite()
      */
-    public Product<C> getAtomic(int i) {
-        if (i < 0 || i >= length()) {
-            throw new IllegalArgumentException("index out of bounds " + i);
-        }
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+    public boolean isFinite() {
         if (nCopies != 0) {
-            elem.put(i, ring.getONE());
-        } else {
-            RingFactory<C> f = ringList.get(i);
-            elem.put(i, f.getONE());
-        }
-        return new Product<C>(this, elem, 1);
-    }
-
-
-    /**
-     * Get the number of factors of this ring.
-     *
-     * @return nCopies or ringList.size().
-     */
-    public int length() {
-        if (nCopies != 0) {
-            return nCopies;
-        }
-        return ringList.size();
-    }
-
-
-    /**
-     * Query if this ring is commutative.
-     *
-     * @return true if this ring is commutative, else false.
-     */
-    public boolean isCommutative() {
-        if (nCopies != 0) {
-            return ring.isCommutative();
+            return ring.isFinite();
         }
         for (RingFactory<C> f : ringList) {
-            if (!f.isCommutative()) {
+            boolean b = f.isFinite();
+            if (!b) {
                 return false;
             }
         }
         return true;
     }
 
-
     /**
-     * Query if this ring is associative.
+     * Get a Product element from a long value.
      *
-     * @return true if this ring is associative, else false.
+     * @param a long.
+     * @return a Product.
      */
-    public boolean isAssociative() {
-        if (nCopies != 0) {
-            return ring.isAssociative();
-        }
-        for (RingFactory<C> f : ringList) {
-            if (!f.isAssociative()) {
-                return false;
-            }
-        }
-        return true;
+    public Product<C> fromInteger(long a) {
+        return fromInteger(new java.math.BigInteger("" + a));
     }
-
-
-    /**
-     * Query if this ring is a field.
-     *
-     * @return true or false.
-     */
-    public boolean isField() {
-        if (nCopies != 0) {
-            if (nCopies == 1) {
-                return ring.isField();
-            }
-        } else {
-            if (ringList.size() == 1) {
-                return ringList.get(0).isField();
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Query if this ring consists only of fields.
-     *
-     * @return true or false.
-     */
-    public boolean onlyFields() {
-        if (nCopies != 0) {
-            return ring.isField();
-        }
-        for (RingFactory<C> f : ringList) {
-            if (!f.isField()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Characteristic of this ring.
-     *
-     * @return minimal characteristic of ring component.
-     */
-    public java.math.BigInteger characteristic() {
-        if (nCopies != 0) {
-            return ring.characteristic();
-        }
-        java.math.BigInteger c = null;
-        java.math.BigInteger d;
-        for (RingFactory<C> f : ringList) {
-            if (c == null) {
-                c = f.characteristic();
-            } else {
-                d = f.characteristic();
-                if (c.compareTo(d) > 0) { // c > d
-                    c = d;
-                }
-            }
-        }
-        return c;
-    }
-
 
     /**
      * Get a Product element from a BigInteger value.
@@ -374,49 +270,69 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
         return new Product<C>(this, elem);
     }
 
-
     /**
-     * Get a Product element from a long value.
+     * Product random.
      *
-     * @param a long.
-     * @return a Product.
+     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @return a random product element v.
      */
-    public Product<C> fromInteger(long a) {
-        return fromInteger(new java.math.BigInteger("" + a));
+    public Product<C> random(int n) {
+        return random(n, 0.5f);
     }
 
+    /**
+     * Product random.
+     *
+     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return a random product element v.
+     */
+    public Product<C> random(int n, Random rnd) {
+        return random(n, 0.5f, random);
+    }
 
     /**
-     * Get the String representation as RingFactory.
+     * Copy Product element c.
      *
-     * @see Object#toString()
+     * @param c
+     * @return a copy of c.
      */
-    @Override
-    public String toString() {
+    public Product<C> copy(Product<C> c) {
+        return new Product<C>(c.ring, c.val, c.isunit);
+    }
+
+    /**
+     * Parse Product from String.
+     *
+     * @param s String.
+     * @return Product from s.
+     */
+    public Product<C> parse(String s) {
+        StringReader sr = new StringReader(s);
+        return parse(sr);
+    }
+
+    /**
+     * Parse Product from Reader. Syntax: p1 ... pn (no commas)
+     *
+     * @param r Reader.
+     * @return next Product from r.
+     */
+    public Product<C> parse(Reader r) {
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
         if (nCopies != 0) {
-            String cf = ring.toString();
-            if (cf.matches("[0-9].*")) {
-                cf = ring.getClass().getSimpleName();
+            for (int i = 0; i < nCopies; i++) {
+                elem.put(i, ring.parse(r));
             }
-            return "ProductRing[ " + cf + "^" + nCopies + " ]";
+        } else {
+            int i = 0;
+            for (RingFactory<C> f : ringList) {
+                elem.put(i, f.parse(r));
+                i++;
+            }
         }
-        StringBuffer sb = new StringBuffer("ProductRing[ ");
-        int i = 0;
-        for (RingFactory<C> f : ringList) {
-            if (i != 0) {
-                sb.append(", ");
-            }
-            String cf = f.toString();
-            if (cf.matches("[0-9].*")) {
-                cf = f.getClass().getSimpleName();
-            }
-            sb.append(cf);
-            i++;
-        }
-        sb.append(" ]");
-        return sb.toString();
+        return new Product<C>(this, elem);
     }
-
 
     /**
      * Get a scripting compatible string representation.
@@ -445,11 +361,120 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
         return s.toString();
     }
 
+    /**
+     * Get an atomic element.
+     *
+     * @param i index.
+     * @return e_i as Product.
+     */
+    public Product<C> getAtomic(int i) {
+        if (i < 0 || i >= length()) {
+            throw new IllegalArgumentException("index out of bounds " + i);
+        }
+        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
+        if (nCopies != 0) {
+            elem.put(i, ring.getONE());
+        } else {
+            RingFactory<C> f = ringList.get(i);
+            elem.put(i, f.getONE());
+        }
+        return new Product<C>(this, elem, 1);
+    }
+
+    /**
+     * Get the number of factors of this ring.
+     *
+     * @return nCopies or ringList.size().
+     */
+    public int length() {
+        if (nCopies != 0) {
+            return nCopies;
+        }
+        return ringList.size();
+    }
+
+    /**
+     * Query if this ring is a field.
+     *
+     * @return true or false.
+     */
+    public boolean isField() {
+        if (nCopies != 0) {
+            if (nCopies == 1) {
+                return ring.isField();
+            }
+        } else {
+            if (ringList.size() == 1) {
+                return ringList.get(0).isField();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return minimal characteristic of ring component.
+     */
+    public java.math.BigInteger characteristic() {
+        if (nCopies != 0) {
+            return ring.characteristic();
+        }
+        java.math.BigInteger c = null;
+        java.math.BigInteger d;
+        for (RingFactory<C> f : ringList) {
+            if (c == null) {
+                c = f.characteristic();
+            } else {
+                d = f.characteristic();
+                if (c.compareTo(d) > 0) { // c > d
+                    c = d;
+                }
+            }
+        }
+        return c;
+    }
+
+    /**
+     * Query if this ring consists only of fields.
+     *
+     * @return true or false.
+     */
+    public boolean onlyFields() {
+        if (nCopies != 0) {
+            return ring.isField();
+        }
+        for (RingFactory<C> f : ringList) {
+            if (!f.isField()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Hash code for this product ring.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h = 0;
+        if (nCopies != 0) {
+            h = ring.hashCode();
+            h = 37 * h + nCopies;
+        } else {
+            for (RingFactory<C> f : ringList) {
+                h = 37 * h + f.hashCode();
+            }
+        }
+        return h;
+    }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -478,37 +503,36 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
         return true;
     }
 
-
     /**
-     * Hash code for this product ring.
+     * Get the String representation as RingFactory.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        int h = 0;
+    public String toString() {
         if (nCopies != 0) {
-            h = ring.hashCode();
-            h = 37 * h + nCopies;
-        } else {
-            for (RingFactory<C> f : ringList) {
-                h = 37 * h + f.hashCode();
+            String cf = ring.toString();
+            if (cf.matches("[0-9].*")) {
+                cf = ring.getClass().getSimpleName();
             }
+            return "ProductRing[ " + cf + "^" + nCopies + " ]";
         }
-        return h;
+        StringBuffer sb = new StringBuffer("ProductRing[ ");
+        int i = 0;
+        for (RingFactory<C> f : ringList) {
+            if (i != 0) {
+                sb.append(", ");
+            }
+            String cf = f.toString();
+            if (cf.matches("[0-9].*")) {
+                cf = f.getClass().getSimpleName();
+            }
+            sb.append(cf);
+            i++;
+        }
+        sb.append(" ]");
+        return sb.toString();
     }
-
-
-    /**
-     * Product random.
-     *
-     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @return a random product element v.
-     */
-    public Product<C> random(int n) {
-        return random(n, 0.5f);
-    }
-
 
     /**
      * Product random.
@@ -520,19 +544,6 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
     public Product<C> random(int n, float q) {
         return random(n, q, random);
     }
-
-
-    /**
-     * Product random.
-     *
-     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return a random product element v.
-     */
-    public Product<C> random(int n, Random rnd) {
-        return random(n, 0.5f, random);
-    }
-
 
     /**
      * Product random.
@@ -565,41 +576,6 @@ public class ProductRing<C extends RingElem<C>> implements RingFactory<Product<C
                         elem.put(i, r);
                     }
                 }
-                i++;
-            }
-        }
-        return new Product<C>(this, elem);
-    }
-
-
-    /**
-     * Parse Product from String.
-     *
-     * @param s String.
-     * @return Product from s.
-     */
-    public Product<C> parse(String s) {
-        StringReader sr = new StringReader(s);
-        return parse(sr);
-    }
-
-
-    /**
-     * Parse Product from Reader. Syntax: p1 ... pn (no commas)
-     *
-     * @param r Reader.
-     * @return next Product from r.
-     */
-    public Product<C> parse(Reader r) {
-        SortedMap<Integer, C> elem = new TreeMap<Integer, C>();
-        if (nCopies != 0) {
-            for (int i = 0; i < nCopies; i++) {
-                elem.put(i, ring.parse(r));
-            }
-        } else {
-            int i = 0;
-            for (RingFactory<C> f : ringList) {
-                elem.put(i, f.parse(r));
                 i++;
             }
         }

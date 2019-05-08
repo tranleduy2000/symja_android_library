@@ -5,8 +5,8 @@
 package edu.jas.fd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +35,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         GenSolvablePolynomial<SolvableQuotient<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(QuotSolvablePolynomial.class);
+    private static final Logger logger = LogManager.getLogger(QuotSolvablePolynomial.class);
     private static final boolean debug = logger.isDebugEnabled();
     /**
      * The factory for the recursive solvable polynomial ring. Hides super.ring.
@@ -120,7 +120,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
     /**
      * Clone this QuotSolvablePolynomial.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public QuotSolvablePolynomial<C> copy() {
@@ -131,7 +131,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -141,6 +141,222 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         return super.equals(B);
     }
 
+    /**
+     * QuotSolvablePolynomial multiplication. Product with coefficient ring
+     * element.
+     *
+     * @param b solvable coefficient.
+     * @return this*b, where * is coefficient multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiply(SolvableQuotient<C> b) {
+        QuotSolvablePolynomial<C> Cp = ring.getZERO().copy();
+        if (b == null || b.isZERO()) {
+            return Cp;
+        }
+        if (b.isONE()) {
+            return this;
+        }
+        Cp = new QuotSolvablePolynomial<C>(ring, b, ring.evzero);
+        return multiply(Cp);
+    }
+
+    /**
+     * QuotSolvablePolynomial left and right multiplication. Product with
+     * coefficient ring element.
+     *
+     * @param b coefficient polynomial.
+     * @param c coefficient polynomial.
+     * @return b*this*c, where * is coefficient multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiply(SolvableQuotient<C> b, SolvableQuotient<C> c) {
+        QuotSolvablePolynomial<C> Cp = ring.getZERO().copy();
+        if (b == null || b.isZERO()) {
+            return Cp;
+        }
+        if (c == null || c.isZERO()) {
+            return Cp;
+        }
+        if (b.isONE() && c.isONE()) {
+            return this;
+        }
+        Cp = new QuotSolvablePolynomial<C>(ring, b, ring.evzero);
+        QuotSolvablePolynomial<C> Dp = new QuotSolvablePolynomial<C>(ring, c, ring.evzero);
+        return multiply(Cp, Dp);
+    }
+
+    /**
+     * QuotSolvablePolynomial multiplication. Product with exponent vector.
+     *
+     * @param e exponent.
+     * @return this * x<sup>e</sup>, where * denotes solvable multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiply(ExpVector e) {
+        if (e == null || e.isZERO()) {
+            return this;
+        }
+        SolvableQuotient<C> b = ring.getONECoefficient();
+        return multiply(b, e);
+    }
+
+    /**
+     * QuotSolvablePolynomial left and right multiplication. Product with
+     * exponent vector.
+     *
+     * @param e exponent.
+     * @param f exponent.
+     * @return x<sup>e</sup> * this * x<sup>f</sup>, where * denotes solvable
+     * multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiply(ExpVector e, ExpVector f) {
+        if (e == null || e.isZERO()) {
+            return this;
+        }
+        if (f == null || f.isZERO()) {
+            return this;
+        }
+        SolvableQuotient<C> b = ring.getONECoefficient();
+        return multiply(b, e, b, f);
+    }
+
+    /**
+     * QuotSolvablePolynomial multiplication. Product with ring element and
+     * exponent vector.
+     *
+     * @param b coefficient polynomial.
+     * @param e exponent.
+     * @return this * b x<sup>e</sup>, where * denotes solvable multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiply(SolvableQuotient<C> b, ExpVector e) {
+        if (b == null || b.isZERO()) {
+            return ring.getZERO();
+        }
+        if (b.isONE() && e.isZERO()) {
+            return this;
+        }
+        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
+        return multiply(Cp);
+    }
+
+    /**
+     * QuotSolvablePolynomial left and right multiplication. Product with ring
+     * element and exponent vector.
+     *
+     * @param b coefficient polynomial.
+     * @param e exponent.
+     * @param c coefficient polynomial.
+     * @param f exponent.
+     * @return b x<sup>e</sup> * this * c x<sup>f</sup>, where * denotes
+     * solvable multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiply(SolvableQuotient<C> b, ExpVector e, SolvableQuotient<C> c,
+                                              ExpVector f) {
+        if (b == null || b.isZERO()) {
+            return ring.getZERO();
+        }
+        if (c == null || c.isZERO()) {
+            return ring.getZERO();
+        }
+        if (b.isONE() && e.isZERO() && c.isONE() && f.isZERO()) {
+            return this;
+        }
+        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
+        QuotSolvablePolynomial<C> Dp = new QuotSolvablePolynomial<C>(ring, c, f);
+        return multiply(Cp, Dp);
+    }
+
+    /**
+     * QuotSolvablePolynomial multiplication. Left product with ring element and
+     * exponent vector.
+     *
+     * @param b coefficient polynomial.
+     * @param e exponent.
+     * @return b x<sup>e</sup> * this, where * denotes solvable multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiplyLeft(SolvableQuotient<C> b, ExpVector e) {
+        if (b == null || b.isZERO()) {
+            return ring.getZERO();
+        }
+        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
+        return Cp.multiply(this);
+    }
+
+    /**
+     * QuotSolvablePolynomial multiplication. Left product with exponent vector.
+     *
+     * @param e exponent.
+     * @return x<sup>e</sup> * this, where * denotes solvable multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiplyLeft(ExpVector e) {
+        if (e == null || e.isZERO()) {
+            return this;
+        }
+        SolvableQuotient<C> b = ring.getONECoefficient();
+        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
+        return Cp.multiply(this);
+    }
+
+    /**
+     * QuotSolvablePolynomial multiplication. Left product with coefficient ring
+     * element.
+     *
+     * @param b coefficient polynomial.
+     * @return b*this, where * is coefficient multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiplyLeft(SolvableQuotient<C> b) {
+        QuotSolvablePolynomial<C> Cp = ring.getZERO().copy();
+        if (b == null || b.isZERO()) {
+            return Cp;
+        }
+        Map<ExpVector, SolvableQuotient<C>> Cm = Cp.val; //getMap();
+        Map<ExpVector, SolvableQuotient<C>> Am = val;
+        SolvableQuotient<C> c;
+        for (Map.Entry<ExpVector, SolvableQuotient<C>> y : Am.entrySet()) {
+            ExpVector e = y.getKey();
+            SolvableQuotient<C> a = y.getValue();
+            c = b.multiply(a);
+            if (!c.isZERO()) {
+                Cm.put(e, c);
+            }
+        }
+        return Cp;
+    }
+
+    /**
+     * QuotSolvablePolynomial multiplication. Left product with 'monomial'.
+     *
+     * @param m 'monomial'.
+     * @return m * this, where * denotes solvable multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiplyLeft(Map.Entry<ExpVector, SolvableQuotient<C>> m) {
+        if (m == null) {
+            return ring.getZERO();
+        }
+        return multiplyLeft(m.getValue(), m.getKey());
+    }
+
+    /**
+     * QuotSolvablePolynomial multiplication. Product with 'monomial'.
+     *
+     * @param m 'monomial'.
+     * @return this * m, where * denotes solvable multiplication.
+     */
+    @Override
+    public QuotSolvablePolynomial<C> multiply(Map.Entry<ExpVector, SolvableQuotient<C>> m) {
+        if (m == null) {
+            return ring.getZERO();
+        }
+        return multiply(m.getValue(), m.getKey());
+    }
 
     /**
      * QuotSolvablePolynomial multiplication.
@@ -199,7 +415,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                     fl1 = fp[fp.length - 1];
                 }
                 int fl1s = ring.nvar + 1 - fl1;
-                // polynomial with coefficient multiplication 
+                // polynomial with coefficient multiplication
                 QuotSolvablePolynomial<C> Cps = ring.getZERO().copy();
                 //QuotSolvablePolynomial<C> Cs;
                 QuotSolvablePolynomial<C> qp;
@@ -223,7 +439,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                             logger.info("coeff-num: Cps = " + Cps + ", num = " + b.num + ", den = " + b.den);
                         Cps = new QuotSolvablePolynomial<C>(ring, b.ring.getONE(), e);
 
-                        // coefficient multiplication with 1/den: 
+                        // coefficient multiplication with 1/den:
                         QuotSolvablePolynomial<C> qv = Cps;
                         SolvableQuotient<C> qden = new SolvableQuotient<C>(b.ring, b.den); // den/1
                         //System.out.println("qv = " + qv + ", den = " + den);
@@ -251,7 +467,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                 } // end coeff
                 if (debug)
                     logger.info("coeff-den: Cps = " + Cps);
-                // polynomial multiplication 
+                // polynomial multiplication
                 QuotSolvablePolynomial<C> Dps = ring.getZERO().copy();
                 QuotSolvablePolynomial<C> Ds = null;
                 QuotSolvablePolynomial<C> D1, D2;
@@ -329,7 +545,7 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
                     } // end Dps loop
                     Ds = Dps;
                 }
-                Ds = Ds.multiplyLeft(a); // multiply(a,b); // non-symmetric 
+                Ds = Ds.multiplyLeft(a); // multiply(a,b); // non-symmetric
                 if (debug)
                     logger.debug("Ds = " + Ds);
                 Dp = (QuotSolvablePolynomial<C>) Dp.sum(Ds);
@@ -338,7 +554,6 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         //System.out.println("this * Bp = " + Dp);
         return Dp;
     }
-
 
     /**
      * QuotSolvablePolynomial left and right multiplication. Product with two
@@ -361,235 +576,6 @@ public class QuotSolvablePolynomial<C extends GcdRingElem<C>> extends
         }
         return S.multiply(this).multiply(T);
     }
-
-
-    /**
-     * QuotSolvablePolynomial multiplication. Product with coefficient ring
-     * element.
-     *
-     * @param b solvable coefficient.
-     * @return this*b, where * is coefficient multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiply(SolvableQuotient<C> b) {
-        QuotSolvablePolynomial<C> Cp = ring.getZERO().copy();
-        if (b == null || b.isZERO()) {
-            return Cp;
-        }
-        if (b.isONE()) {
-            return this;
-        }
-        Cp = new QuotSolvablePolynomial<C>(ring, b, ring.evzero);
-        return multiply(Cp);
-    }
-
-
-    /**
-     * QuotSolvablePolynomial left and right multiplication. Product with
-     * coefficient ring element.
-     *
-     * @param b coefficient polynomial.
-     * @param c coefficient polynomial.
-     * @return b*this*c, where * is coefficient multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiply(SolvableQuotient<C> b, SolvableQuotient<C> c) {
-        QuotSolvablePolynomial<C> Cp = ring.getZERO().copy();
-        if (b == null || b.isZERO()) {
-            return Cp;
-        }
-        if (c == null || c.isZERO()) {
-            return Cp;
-        }
-        if (b.isONE() && c.isONE()) {
-            return this;
-        }
-        Cp = new QuotSolvablePolynomial<C>(ring, b, ring.evzero);
-        QuotSolvablePolynomial<C> Dp = new QuotSolvablePolynomial<C>(ring, c, ring.evzero);
-        return multiply(Cp, Dp);
-    }
-
-
-    /**
-     * QuotSolvablePolynomial multiplication. Product with exponent vector.
-     *
-     * @param e exponent.
-     * @return this * x<sup>e</sup>, where * denotes solvable multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiply(ExpVector e) {
-        if (e == null || e.isZERO()) {
-            return this;
-        }
-        SolvableQuotient<C> b = ring.getONECoefficient();
-        return multiply(b, e);
-    }
-
-
-    /**
-     * QuotSolvablePolynomial left and right multiplication. Product with
-     * exponent vector.
-     *
-     * @param e exponent.
-     * @param f exponent.
-     * @return x<sup>e</sup> * this * x<sup>f</sup>, where * denotes solvable
-     * multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiply(ExpVector e, ExpVector f) {
-        if (e == null || e.isZERO()) {
-            return this;
-        }
-        if (f == null || f.isZERO()) {
-            return this;
-        }
-        SolvableQuotient<C> b = ring.getONECoefficient();
-        return multiply(b, e, b, f);
-    }
-
-
-    /**
-     * QuotSolvablePolynomial multiplication. Product with ring element and
-     * exponent vector.
-     *
-     * @param b coefficient polynomial.
-     * @param e exponent.
-     * @return this * b x<sup>e</sup>, where * denotes solvable multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiply(SolvableQuotient<C> b, ExpVector e) {
-        if (b == null || b.isZERO()) {
-            return ring.getZERO();
-        }
-        if (b.isONE() && e.isZERO()) {
-            return this;
-        }
-        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
-        return multiply(Cp);
-    }
-
-
-    /**
-     * QuotSolvablePolynomial left and right multiplication. Product with ring
-     * element and exponent vector.
-     *
-     * @param b coefficient polynomial.
-     * @param e exponent.
-     * @param c coefficient polynomial.
-     * @param f exponent.
-     * @return b x<sup>e</sup> * this * c x<sup>f</sup>, where * denotes
-     * solvable multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiply(SolvableQuotient<C> b, ExpVector e, SolvableQuotient<C> c,
-                                              ExpVector f) {
-        if (b == null || b.isZERO()) {
-            return ring.getZERO();
-        }
-        if (c == null || c.isZERO()) {
-            return ring.getZERO();
-        }
-        if (b.isONE() && e.isZERO() && c.isONE() && f.isZERO()) {
-            return this;
-        }
-        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
-        QuotSolvablePolynomial<C> Dp = new QuotSolvablePolynomial<C>(ring, c, f);
-        return multiply(Cp, Dp);
-    }
-
-
-    /**
-     * QuotSolvablePolynomial multiplication. Left product with ring element and
-     * exponent vector.
-     *
-     * @param b coefficient polynomial.
-     * @param e exponent.
-     * @return b x<sup>e</sup> * this, where * denotes solvable multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiplyLeft(SolvableQuotient<C> b, ExpVector e) {
-        if (b == null || b.isZERO()) {
-            return ring.getZERO();
-        }
-        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
-        return Cp.multiply(this);
-    }
-
-
-    /**
-     * QuotSolvablePolynomial multiplication. Left product with exponent vector.
-     *
-     * @param e exponent.
-     * @return x<sup>e</sup> * this, where * denotes solvable multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiplyLeft(ExpVector e) {
-        if (e == null || e.isZERO()) {
-            return this;
-        }
-        SolvableQuotient<C> b = ring.getONECoefficient();
-        QuotSolvablePolynomial<C> Cp = new QuotSolvablePolynomial<C>(ring, b, e);
-        return Cp.multiply(this);
-    }
-
-
-    /**
-     * QuotSolvablePolynomial multiplication. Left product with coefficient ring
-     * element.
-     *
-     * @param b coefficient polynomial.
-     * @return b*this, where * is coefficient multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiplyLeft(SolvableQuotient<C> b) {
-        QuotSolvablePolynomial<C> Cp = ring.getZERO().copy();
-        if (b == null || b.isZERO()) {
-            return Cp;
-        }
-        Map<ExpVector, SolvableQuotient<C>> Cm = Cp.val; //getMap();
-        Map<ExpVector, SolvableQuotient<C>> Am = val;
-        SolvableQuotient<C> c;
-        for (Map.Entry<ExpVector, SolvableQuotient<C>> y : Am.entrySet()) {
-            ExpVector e = y.getKey();
-            SolvableQuotient<C> a = y.getValue();
-            c = b.multiply(a);
-            if (!c.isZERO()) {
-                Cm.put(e, c);
-            }
-        }
-        return Cp;
-    }
-
-
-    /**
-     * QuotSolvablePolynomial multiplication. Left product with 'monomial'.
-     *
-     * @param m 'monomial'.
-     * @return m * this, where * denotes solvable multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiplyLeft(Map.Entry<ExpVector, SolvableQuotient<C>> m) {
-        if (m == null) {
-            return ring.getZERO();
-        }
-        return multiplyLeft(m.getValue(), m.getKey());
-    }
-
-
-    /**
-     * QuotSolvablePolynomial multiplication. Product with 'monomial'.
-     *
-     * @param m 'monomial'.
-     * @return this * m, where * denotes solvable multiplication.
-     */
-    @Override
-    public QuotSolvablePolynomial<C> multiply(Map.Entry<ExpVector, SolvableQuotient<C>> m) {
-        if (m == null) {
-            return ring.getZERO();
-        }
-        return multiply(m.getValue(), m.getKey());
-    }
-
 
     /**
      * QuotSolvablePolynomial multiplication. Left product with coefficient ring

@@ -21,9 +21,9 @@
  */
 package org.hipparchus.stat.descriptive;
 
-import org.hipparchus.exception.MathIllegalArgumentException;
+import com.duy.lambda.DoubleConsumer;
 
-import java.util.function.DoubleConsumer;
+import org.hipparchus.exception.MathIllegalArgumentException;
 
 /**
  * Extends the definition of {@link UnivariateStatistic} with

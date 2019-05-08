@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import edu.jas.structure.RingFactory;
 public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Squarefree<C> {
 
 
-    private static final Logger logger = Logger.getLogger(SquarefreeAbstract.class);
+    private static final Logger logger = LogManager.getLogger(SquarefreeAbstract.class);
 
 
     /**
@@ -133,23 +133,6 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         return true;
     }
 
-
-    /**
-     * Recursive GenPolynomial test if is squarefree.
-     *
-     * @param P recursive univariate GenPolynomial.
-     * @return true if P is squarefree, else false.
-     */
-    public boolean isRecursiveSquarefree(GenPolynomial<GenPolynomial<C>> P) {
-        GenPolynomial<GenPolynomial<C>> S = recursiveUnivariateSquarefreePart(P);
-        boolean f = P.equals(S);
-        if (!f) {
-            logger.info("not Squarefree, S != P: " + P + " != " + S);
-        }
-        return f;
-    }
-
-
     /**
      * GenPolynomial squarefree factorization.
      *
@@ -158,107 +141,6 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
      * p_i^{e_i} and p_i squarefree.
      */
     public abstract SortedMap<GenPolynomial<C>, Long> squarefreeFactors(GenPolynomial<C> P);
-
-
-    /**
-     * GenPolynomial squarefree and co-prime list.
-     *
-     * @param A list of GenPolynomials.
-     * @return B with gcd(b,c) = 1 for all b != c in B and for all non-constant
-     * a in A there exists b in B with b|a and each b in B is
-     * squarefree. B does not contain zero or constant polynomials.
-     */
-    public List<GenPolynomial<C>> coPrimeSquarefree(List<GenPolynomial<C>> A) {
-        if (A == null || A.isEmpty()) {
-            return A;
-        }
-        List<GenPolynomial<C>> S = new ArrayList<GenPolynomial<C>>();
-        for (GenPolynomial<C> g : A) {
-            SortedMap<GenPolynomial<C>, Long> sm = squarefreeFactors(g);
-            S.addAll(sm.keySet());
-        }
-        List<GenPolynomial<C>> B = engine.coPrime(S);
-        return B;
-    }
-
-
-    /**
-     * GenPolynomial squarefree and co-prime list.
-     *
-     * @param a polynomial.
-     * @param P squarefree co-prime list of GenPolynomials.
-     * @return B with gcd(b,c) = 1 for all b != c in B and for non-constant a
-     * there exists b in P with b|a. B does not contain zero or constant
-     * polynomials.
-     */
-    public List<GenPolynomial<C>> coPrimeSquarefree(GenPolynomial<C> a, List<GenPolynomial<C>> P) {
-        if (a == null || a.isZERO() || a.isConstant()) {
-            return P;
-        }
-        SortedMap<GenPolynomial<C>, Long> sm = squarefreeFactors(a);
-        List<GenPolynomial<C>> B = P;
-        for (GenPolynomial<C> f : sm.keySet()) {
-            B = engine.coPrime(f, B);
-        }
-        return B;
-    }
-
-
-    /**
-     * Test if list of GenPolynomials is squarefree and co-prime.
-     *
-     * @param B list of GenPolynomials.
-     * @return true, if for all b != c in B gcd(b,c) = 1 and each b in B is
-     * squarefree, else false.
-     */
-    public boolean isCoPrimeSquarefree(List<GenPolynomial<C>> B) {
-        if (B == null || B.isEmpty()) {
-            return true;
-        }
-        if (!engine.isCoPrime(B)) {
-            return false;
-        }
-        return isSquarefree(B);
-    }
-
-
-    /**
-     * Normalize factorization. p'_i &gt; 0 for i &gt; 1 and p'_1 != 1 if k &gt;
-     * 1.
-     *
-     * @param F = [p_1-&gt;e_1;, ..., p_k-&gt;e_k].
-     * @return F' = [p'_1-&gt;e_1, ..., p'_k-&gt;e_k].
-     */
-    public SortedMap<GenPolynomial<C>, Long> normalizeFactorization(SortedMap<GenPolynomial<C>, Long> F) {
-        if (F == null || F.size() <= 1) {
-            return F;
-        }
-        List<GenPolynomial<C>> Fp = new ArrayList<GenPolynomial<C>>(F.keySet());
-        GenPolynomial<C> f0 = Fp.get(0);
-        if (f0.ring.characteristic().signum() != 0) { // only ordered coefficients
-            return F;
-        }
-        long e0 = F.get(f0);
-        SortedMap<GenPolynomial<C>, Long> Sp = new TreeMap<GenPolynomial<C>, Long>();
-        for (int i = 1; i < Fp.size(); i++) {
-            GenPolynomial<C> fi = Fp.get(i);
-            long ei = F.get(fi);
-            if (fi.signum() < 0) {
-                //System.out.println("e0 = " + e0 + ", f0 = " + f0);
-                //System.out.println("ei = " + ei + ", fi = " + fi);
-                if (ei % 2 != 0 && e0 % 2 != 0) { // bug
-                    fi = fi.negate();
-                    f0 = f0.negate();
-                }
-            }
-            Sp.put(fi, ei);
-        }
-        if (!f0.isONE()) {
-            Sp.put(f0, e0);
-        }
-        return Sp;
-    }
-
 
     /**
      * GenPolynomial is (squarefree) factorization.
@@ -281,25 +163,6 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         }
         return f;
     }
-
-
-    /**
-     * Count number of factors in a (squarefree) factorization.
-     *
-     * @param F = [p_1 -&gt; e_1, ..., p_k -&gt; e_k].
-     * @return sum_{i=1,...,k} e_i.
-     */
-    public long factorCount(SortedMap<GenPolynomial<C>, Long> F) {
-        if (F == null || F.isEmpty()) {
-            return 0L;
-        }
-        long f = 0L;
-        for (Long e : F.values()) {
-            f += e;
-        }
-        return f;
-    }
-
 
     /**
      * GenPolynomial is (squarefree) factorization.
@@ -339,6 +202,133 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         return f;
     }
 
+    /**
+     * GenPolynomial squarefree and co-prime list.
+     *
+     * @param A list of GenPolynomials.
+     * @return B with gcd(b,c) = 1 for all b != c in B and for all non-constant
+     * a in A there exists b in B with b|a and each b in B is
+     * squarefree. B does not contain zero or constant polynomials.
+     */
+    public List<GenPolynomial<C>> coPrimeSquarefree(List<GenPolynomial<C>> A) {
+        if (A == null || A.isEmpty()) {
+            return A;
+        }
+        List<GenPolynomial<C>> S = new ArrayList<GenPolynomial<C>>();
+        for (GenPolynomial<C> g : A) {
+            SortedMap<GenPolynomial<C>, Long> sm = squarefreeFactors(g);
+            S.addAll(sm.keySet());
+        }
+        List<GenPolynomial<C>> B = engine.coPrime(S);
+        return B;
+    }
+
+    /**
+     * GenPolynomial squarefree and co-prime list.
+     *
+     * @param a polynomial.
+     * @param P squarefree co-prime list of GenPolynomials.
+     * @return B with gcd(b,c) = 1 for all b != c in B and for non-constant a
+     * there exists b in P with b|a. B does not contain zero or constant
+     * polynomials.
+     */
+    public List<GenPolynomial<C>> coPrimeSquarefree(GenPolynomial<C> a, List<GenPolynomial<C>> P) {
+        if (a == null || a.isZERO() || a.isConstant()) {
+            return P;
+        }
+        SortedMap<GenPolynomial<C>, Long> sm = squarefreeFactors(a);
+        List<GenPolynomial<C>> B = P;
+        for (GenPolynomial<C> f : sm.keySet()) {
+            B = engine.coPrime(f, B);
+        }
+        return B;
+    }
+
+    /**
+     * Test if list of GenPolynomials is squarefree and co-prime.
+     *
+     * @param B list of GenPolynomials.
+     * @return true, if for all b != c in B gcd(b,c) = 1 and each b in B is
+     * squarefree, else false.
+     */
+    public boolean isCoPrimeSquarefree(List<GenPolynomial<C>> B) {
+        if (B == null || B.isEmpty()) {
+            return true;
+        }
+        if (!engine.isCoPrime(B)) {
+            return false;
+        }
+        return isSquarefree(B);
+    }
+
+    /**
+     * Recursive GenPolynomial test if is squarefree.
+     *
+     * @param P recursive univariate GenPolynomial.
+     * @return true if P is squarefree, else false.
+     */
+    public boolean isRecursiveSquarefree(GenPolynomial<GenPolynomial<C>> P) {
+        GenPolynomial<GenPolynomial<C>> S = recursiveUnivariateSquarefreePart(P);
+        boolean f = P.equals(S);
+        if (!f) {
+            logger.info("not Squarefree, S != P: " + P + " != " + S);
+        }
+        return f;
+    }
+
+    /**
+     * Normalize factorization. p'_i &gt; 0 for i &gt; 1 and p'_1 != 1 if k &gt;
+     * 1.
+     *
+     * @param F = [p_1-&gt;e_1;, ..., p_k-&gt;e_k].
+     * @return F' = [p'_1-&gt;e_1, ..., p'_k-&gt;e_k].
+     */
+    public SortedMap<GenPolynomial<C>, Long> normalizeFactorization(SortedMap<GenPolynomial<C>, Long> F) {
+        if (F == null || F.size() <= 1) {
+            return F;
+        }
+        List<GenPolynomial<C>> Fp = new ArrayList<GenPolynomial<C>>(F.keySet());
+        GenPolynomial<C> f0 = Fp.get(0);
+        if (f0.ring.characteristic().signum() != 0) { // only ordered coefficients
+            return F;
+        }
+        long e0 = F.get(f0);
+        SortedMap<GenPolynomial<C>, Long> Sp = new TreeMap<GenPolynomial<C>, Long>();
+        for (int i = 1; i < Fp.size(); i++) {
+            GenPolynomial<C> fi = Fp.get(i);
+            long ei = F.get(fi);
+            if (fi.signum() < 0) {
+                //System.out.println("e0 = " + e0 + ", f0 = " + f0);
+                //System.out.println("ei = " + ei + ", fi = " + fi);
+                if (ei % 2 != 0 && e0 % 2 != 0) { // bug
+                    fi = fi.negate();
+                    f0 = f0.negate();
+                }
+            }
+            Sp.put(fi, ei);
+        }
+        if (!f0.isONE()) {
+            Sp.put(f0, e0);
+        }
+        return Sp;
+    }
+
+    /**
+     * Count number of factors in a (squarefree) factorization.
+     *
+     * @param F = [p_1 -&gt; e_1, ..., p_k -&gt; e_k].
+     * @return sum_{i=1,...,k} e_i.
+     */
+    public long factorCount(SortedMap<GenPolynomial<C>, Long> F) {
+        if (F == null || F.isEmpty()) {
+            return 0L;
+        }
+        long f = 0L;
+        for (Long e : F.values()) {
+            f += e;
+        }
+        return f;
+    }
 
     /**
      * GenPolynomial is (squarefree) factorization.
@@ -605,8 +595,9 @@ public abstract class SquarefreeAbstract<C extends GcdRingElem<C>> implements Sq
         }
         C s = null;
         SortedMap<C, Long> factors = squarefreeFactors(P);
-        //logger.info("sqfPart,factors = " + factors);
-        System.out.println("sqfPart,factors = " + factors);
+        //if (logger.isWarnEnabled()) {
+        //    logger.warn("sqfPart, better use sqfFactors, factors = " + factors);
+        //}
         for (C sp : factors.keySet()) {
             if (s == null) {
                 s = sp;
